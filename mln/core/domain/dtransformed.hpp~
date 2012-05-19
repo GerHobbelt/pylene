@@ -1,0 +1,8 @@
+#ifndef MLN_CORE_DOMAINS_DTRANSFORMED_HPP
+# define MLN_CORE_DOMAINS_DTRANSFORMED_HPP
+
+/// \file
+/// \brief Lazy transformation of a domain through a function
+
+
+#endif //!MLN_CORE_DOMAINS_DTRANSFORMED_HPP

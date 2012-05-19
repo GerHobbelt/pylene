@@ -1,0 +1,23 @@
+#ifndef MLN_IO_IMSAVE_HPP
+# define MLN_IO_IMSAVE_HPP
+
+namespace mln {
+  namespace io {
+
+
+
+
+    template <typename Image, typename Writer = freeimage_write>
+    void imread(const Image& ima, const char* path, Writer r = Writer())
+    {
+      internal::imread(path, r, out, typename image_traits<Image>::category ());
+    }
+
+
+
+  } // end of namespace mln::io
+} // end of namespace mln
+
+
+
+#endif //!MLN_IO_IMSAVE_HPP

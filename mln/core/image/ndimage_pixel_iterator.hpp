@@ -1,14 +1,25 @@
 #ifndef MLN_CORE_NDIMAGE_PIXEL_ITERATOR_HPP
 # define MLN_CORE_NDIMAGE_PIXEL_ITERATOR_HPP
 
-# include <mln/core/ndimage_pixel.hpp>
+
 # include <boost/iterator/reverse_iterator.hpp>
-# include <boost/iterator/iterator_facade.hpp>
+
+# include <mln/core/image/ndimage_pixel.hpp>
 # include <mln/core/iterator/fast_reverse_iterator.hpp>
-# include <algorithm>
+# include <mln/core/image/internal/nested_loop_iterator.hpp>
+
 
 namespace mln {
 
+  template <typename T, unsigned dim, typename Image>
+  using ndimage_pixel_iterator = internal::nested_loop_iterator<
+    internal::domain_point_visitor< point<short, dim> >,
+    internal::strided_pointer_value_visitor<char, point<short, dim> >,
+    ndimage_pixel<T, dim, Image>,
+    internal::deref_return_structure_policy>;
+
+
+  /*
   template <typename T, unsigned dim, typename I>
   struct ndimage_pixel_iterator :
     public boost::iterator_facade< ndimage_pixel_iterator<T, dim, I>,
@@ -22,13 +33,13 @@ namespace mln {
 
 
     ndimage_pixel_iterator(I* ima, site_type pstart, char* ptr) :
-      domain_           (ima->domain_)
+      domain_           (ima->domain_),
+      strides_          (ima->strides_),
+      pixel_            (ima)
     {
       pixel_.point_ = pstart;
-      pixel_.ima_ = ima;
       pixel_.ptr_ = ptr;
-      std::copy(ima->strides_, ima->strides_ + dim, strides_);
-      std::fill(pstack_, pstack_ + dim, ptr);
+      std::fill(pstack_.begin(), pstack_.end(), ptr);
     }
 
   public:
@@ -44,10 +55,10 @@ namespace mln {
     const pixel_type& dereference() const;
 
   private:
-    box<short, dim> domain_;             // Domain iteration
-    size_t          strides_[dim];    // Strides for memory access
-    char*           pstack_[dim];               // pointer stack
-    pixel_type      pixel_;
+    box<short, dim>          domain_;     // Domain iteration
+    std::array<size_t, dim>  strides_;    // Strides for memory access
+    std::array<char*, dim>   pstack_;     // pointer stack
+    pixel_type               pixel_;
   };
 
 
@@ -112,7 +123,7 @@ namespace mln {
         --i;
       }
     if (i < dim-1)
-      std::fill(pstack_ + i + 1, pstack_ + dim, pstack_[i]);
+      std::fill(pstack_.begin() + i + 1, pstack_.end(), pstack_[i]);
     pixel_.ptr_ = pstack_[i];
   }
 
@@ -193,7 +204,7 @@ namespace mln {
   //   return pixel_;
   // }
 
-
+  */
 
 } // end of namespace mln
 

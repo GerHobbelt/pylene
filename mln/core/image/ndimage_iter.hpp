@@ -1,23 +1,32 @@
 #ifndef MLN_NDIMAGE_ITER_HH
 # define MLN_NDIMAGE_ITER_HH
 
-# include <boost/iterator/iterator_facade.hpp>
 # include <boost/iterator/reverse_iterator.hpp>
-# include <mln/core/iterator/fast_reverse_iterator.hpp>
 
-# include <algorithm>
+# include <mln/core/iterator/fast_reverse_iterator.hpp>
+# include <mln/core/image/internal/nested_loop_iterator.hpp>
+# include <mln/core/image/ndimage_pixel.hpp>
+
 //# include <type_traits>
 
 namespace mln
 {
 
+template <typename Image, typename T>
+using ndimage_iter = internal::nested_loop_iterator<
+  internal::origin_point_visitor< typename Image::point_type >,
+  internal::strided_pointer_value_visitor<char, typename Image::point_type>,
+  ndimage_pixel<T, Image::ndim, Image>,
+  internal::deref_return_value_policy>;
+
+  /*
   template <typename Image, typename T>
   struct ndimage_iter :
     public boost::iterator_facade< ndimage_iter<Image, T>, T, boost::bidirectional_traversal_tag>
   {
   private:
     enum { dim = Image::ndim };
-    typedef typename point<short,dim>::type site_type;
+    typedef point<short,dim>     site_type;
 
   private:
     typedef char* ptr_t;
@@ -25,14 +34,25 @@ namespace mln
   public:
     ndimage_iter() {}
 
+    template <typename T2>
+    ndimage_iter(const ndimage_iter<Image, T2>& other,
+                 std::enable_if< std::is_convertible<T2, T>::value, void>* dummy = NULL)
+      : shape_ (other.shape_),
+        strides_ (other.strides_),
+        indices_ (other.indices_),
+        pstack_ (other.pstack_)
+    {
+      (void) dummy;
+    }
 
-    ndimage_iter(const Image& ima, ptr_t ptr) :
+
+    ndimage_iter(const Image& ima, site_type p, ptr_t ptr) :
       shape_ (ima.domain_.shape()),
-      indices_ {{0,}}
+      strides_ (ima.strides_),
+      indices_ (p)
     {
       //std::copy(ima.strides_, ima.strides_ + dim, strides_);
-      std::copy(ima.strides_, ima.strides_ + dim, strides_);
-      std::fill(pstack_, pstack_ + dim, ptr);
+      std::fill(pstack_.begin(), pstack_.end(), ptr);
     }
 
 
@@ -56,7 +76,7 @@ namespace mln
           --i;
         }
       if (i < dim-1)
-        std::fill(pstack_ + i + 1, pstack_ + dim, pstack_[i]);
+        std::fill(pstack_.begin() + i + 1, pstack_.begin() + dim, pstack_[i]);
     }
 
     inline
@@ -92,10 +112,12 @@ namespace mln
 
 
     site_type shape_; // Domain iteration
-    size_t strides_[dim]; // Strides for memory access
+    std::array<size_t, dim> strides_; // Strides for memory access
     site_type indices_; // Site location
-    char* pstack_[dim];	// pointer stack
-  };
+    std::array<char*, dim> pstack_;	// pointer stack
+    };
+
+  */
 
 } // end of namespace mln
 

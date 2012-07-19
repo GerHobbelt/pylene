@@ -1,7 +1,8 @@
-#ifndef NDIMAGE_HH
-# define NDIMAGE_HH
+#ifndef MLN_CORE_IMAGE_NDIMAGE_HH
+# define MLN_CORE_IMAGE_NDIMAGE_HH
 
-//# include <mln/core/image_base.hpp>
+
+# include <mln/core/image_base.hpp>
 
 # include <mln/core/domain/box.hpp>
 # include <mln/core/memory.hpp>
@@ -11,75 +12,68 @@
 
 # include <boost/range/iterator_range.hpp>
 
+# include <mln/core/image/ndimage_iter.hpp>
+# include <mln/core/image/ndimage_pixel_iterator.hpp>
+
 namespace mln
 {
+  // FWD
+  //template <typename I, typename T> struct ndimage_iter;
+  //template <typename I, typename T> struct ndimage_rev_iter;
+  //template <typename T, unsigned dim, typename I> struct ndimage_pixel_iterator;
+  //template <typename T, unsigned dim, typename I> struct ndimage_rev_pixel_iterator;
+  template <typename T, unsigned dim, typename I> struct ndimage_pixel;
+  template <typename T, unsigned dim, typename E> struct ndimage_base;
+
+/******************************************/
+/****              Traits              ****/
+/******************************************/
+
+
+  template <typename T, unsigned dim, typename E>
+  struct image_traits< ndimage_base<T, dim, E> >
+  {
+    typedef raw_image_tag               category;
+    typedef std::true_type              accessible;
+  };
+
+/******************************************/
+/****            Definition            ****/
+/******************************************/
 
   namespace internal
   {
-
     template <typename T, unsigned dim>
     struct ndimage_data
     {
-      ndimage_data(size_t* shape_, unsigned border);
+      ndimage_data(size_t* shape_, unsigned border, T v = T());
       ~ndimage_data();
 
       size_t shape[dim];
       size_t strides[dim];
       size_t nbytes;
       char*  buffer;
+
+    private:
+      ndimage_data(const ndimage_data&);
     };
-
   }
-
-  // FWD
-  template <typename I, typename T> struct ndimage_iter;
-  template <typename I, typename T> struct ndimage_rev_iter;
-  template <typename T, unsigned dim, typename I> struct ndimage_pixel_iterator;
-  template <typename T, unsigned dim, typename I> struct ndimage_rev_pixel_iterator;
-  template <typename T, unsigned dim, typename I> struct ndimage_pixel;
-  //template <typename T, unsigned dim, typename E> struct ndimage_base;
-  template <typename T> struct image2d;
-
-  // template <typename T, unsigned dim, typename E>
-  // struct image_base_types< ndimage_base<T, dim, E> >
-  // {
-  //   typedef box<short, dim>					domain_type;
-  //   typedef ndimage_iter<T, dim>                                value_iterator;
-  //   typedef ndimage_iter<const T, dim>                          const_value_iterator;
-  //   typedef ndimage_rev_iter<T, dim>                            reverse_value_iterator;
-  //   typedef ndimage_rev_iter<const T, dim>                      const_reverse_value_iterator;
-  //   typedef ndimage_pixel_iterator<T, dim, E>                   pixel_iterator;
-  //   typedef ndimage_pixel_iterator<const T, dim, const E>       const_pixel_iterator;
-  //   typedef ndimage_rev_pixel_iterator<T, dim, E>               reverse_pixel_iterator;
-  //   typedef ndimage_rev_pixel_iterator<const T, dim, const E>   const_reverse_pixel_iterator;
-
-  //   typedef std::pair<value_iterator, value_iterator>                                   value_range;
-  //   typedef std::pair<const_value_iterator, const_value_iterator>                       const_value_range;
-  //   typedef std::pair<pixel_iterator, pixel_iterator>                                   pixel_range;
-  //   typedef std::pair<const_pixel_iterator, const_pixel_iterator>                       const_pixel_range;
-  //   typedef std::pair<reverse_value_iterator, reverse_value_iterator>                   reverse_value_range;
-  //   typedef std::pair<const_reverse_value_iterator, const_reverse_value_iterator>       const_reverse_value_range;
-  //   typedef std::pair<reverse_pixel_iterator, reverse_pixel_iterator>                   reverse_pixel_range;
-  //   typedef std::pair<const_reverse_pixel_iterator, const_reverse_pixel_iterator>       const_reverse_pixel_range;
-  // };
-
-  // template <typename T>
-  // struct image_base_types< image2d<T> > : image_base_types< ndimage_base<T, 2, image2d<T> > >
-  // {
-  // };
 
 
   template <typename T, unsigned dim, typename E>
-  struct ndimage_base // : image_base<E, raw_image_tag>
+  struct ndimage_base : image_base<E, point<short, dim>, T,
+                                   ndimage_pixel<T, dim, E>,
+                                   ndimage_pixel<const T, dim, const E>
+                                   >
   {
   private:
     typedef ndimage_base<T, dim, E>                             this_type;
   public:
     // As an Image
-    typedef raw_image_tag					category;
+
     typedef box<short, dim>					domain_type;
-    typedef typename point<short,dim>::type			site_type;
-    typedef typename point<short,dim>::type			point_type;
+    typedef point<short,dim>                                    site_type;
+    typedef point<short,dim>                                    point_type;
     typedef ndimage_pixel<const T, dim, const E>                const_pixel_type;
     typedef ndimage_pixel<T, dim, E>                            pixel_type;
     typedef T							value_type;
@@ -95,14 +89,20 @@ namespace mln
 
 
     // As an Image
+    // \group Constructors
+    // \{
     explicit ndimage_base(unsigned border = 3);
     explicit ndimage_base(const domain_type& domain, unsigned border = 3);
+    // \}
 
     const domain_type&  domain() const;
 
     // As an ContainerImage
+    // \group Point-wise access
+    // \{
     reference operator() (site_type p);
     const_reference operator() (site_type p) const;
+    // \}
 
     // FIXME move to base
     pixel_type pix_at(site_type p)
@@ -118,9 +118,8 @@ namespace mln
     const_pixel_type pix_at(site_type p) const
     {
       mln_precondition(domain_.has(p));
-      const_pixel_type pix;
+      const_pixel_type pix((const E*) this);
       pix.point_ = p;
-      pix.ima_  = (const E*) this;
       pix.ptr_ = (char*) & (operator () (p));
       return pix;
     }
@@ -135,7 +134,7 @@ namespace mln
 
     // As an IterableImage
     typedef ndimage_iter<this_type, T>                                  value_iterator;
-    typedef ndimage_iter<this_type, const T>                            const_value_iterator;
+    typedef ndimage_iter<const this_type, const T>                      const_value_iterator;
     typedef boost::reverse_iterator<value_iterator>                     reverse_value_iterator;
     typedef boost::reverse_iterator<const_value_iterator>               const_reverse_value_iterator;
     typedef ndimage_pixel_iterator<T, dim, E>                           pixel_iterator;
@@ -151,13 +150,11 @@ namespace mln
 
     value_range         values();
     const_value_range   values() const;
-    //reverse_value_range         rvalues();
-    //const_reverse_value_range   rvalues() const;
+
 
     pixel_range                 pixels();
     const_pixel_range           pixels() const;
-    //reverse_pixel_range         rpixels();
-    //const_reverse_pixel_range   rpixels() const;
+
 
 
 
@@ -170,57 +167,21 @@ namespace mln
     friend struct ndimage_pixel<T, dim, E>;
     friend struct ndimage_pixel<const T, dim, const E>;
 
-    friend struct ndimage_iter<this_type, T>;
-    friend struct ndimage_iter<this_type, const T>;
+    //friend struct ndimage_iter<this_type, T>;
+    //friend struct ndimage_iter<this_type, const T>;
 
-    friend struct ndimage_pixel_iterator<T, dim, E>;
-    friend struct ndimage_pixel_iterator<const T, dim, const E>;
+    //friend struct ndimage_pixel_iterator<T, dim, E>;
+    //friend struct ndimage_pixel_iterator<const T, dim, const E>;
 
 
     domain_type	domain_;	///< Domain of image
-    size_t	strides_[dim];	///< Strides in bytes
+    std::array<size_t, dim>	strides_;	///< Strides in bytes
     std::shared_ptr< internal::ndimage_data<T, dim> > data_;
     int		border_;
     char*	ptr_;           ///< Pointer to the first element
     char*	last_;          ///< Pointer to the last element
   };
 
-  template <typename T>
-  struct image2d : ndimage_base<T, 2, image2d<T> >
-  {
-  protected:
-    typedef ndimage_base<T, 2, image2d<T> > base_type;
-    typedef typename base_type::domain_type domain_type;
-
-    // As an Image
-    // typedef raw_image_tag					category;
-
-    // typedef typename point<short,2>::type			site_type;
-    // typedef typename point<short,2>::type			point_type;
-    // typedef T							value_type;
-    // enum { ndim = 2};
-
-    // As a ContainerImage
-    // typedef T&			reference;
-    // typedef const T&		const_reference;
-    // typedef T*			pointer;
-    // typedef ptrdiff_t		difference_type;
-    // typedef size_t		size_type;
-
-  public:
-    explicit image2d (unsigned border = 3) : ndimage_base<T,2,image2d<T> > (border) {}
-
-    explicit image2d(const domain_type& domain, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >(domain, border)
-    {
-    }
-
-    image2d(short nrows, short ncols, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{{0,0}},{{nrows, ncols}}}, border)
-    {
-    }
-
-  };
 
   template <typename T>
   struct image3d : ndimage_base<T, 3, image3d<T> >
@@ -247,7 +208,7 @@ namespace mln
   namespace internal
   {
     template <typename T, unsigned dim>
-    ndimage_data<T, dim>::ndimage_data(size_t* shape_, unsigned border)
+    ndimage_data<T, dim>::ndimage_data(size_t* shape_, unsigned border, T v)
     {
       for (unsigned i = 0; i < dim; ++i)
 	shape[i] = shape_[i] + 2 * border;
@@ -279,12 +240,12 @@ namespace mln
           for (unsigned i = 0; i < nlines; ++i, ptr += strides[dim-2]) {
             T* p_ = (T*) ptr;
             for (unsigned j = 0; j < nelements; ++j, ++p_)
-              new (p_) T;
+              new (p_) T(v);
           }
         } else {
           T* p_ = (T*) ptr;
           for (unsigned j = 0; j < nelements; ++j, ++p_)
-            new (p_) T;
+            new (p_) T(v);
         }
       }
     }
@@ -330,13 +291,13 @@ namespace mln
   {
     //mln_precondition(domain.size() > 0);
     site_type shp = domain.shape();
-    typename point<size_t, dim>::type sz;
+    point<size_t, dim> sz;
     sz = shp;
 
     // Compute strides size (in bytes)
     // The row stride is 16 bytes aligned
     data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border));
-    std::copy(data_->strides, data_->strides + dim, strides_);
+    std::copy(data_->strides, data_->strides + dim, strides_.begin());
 
     // Compute pointer at (0,0)
     ptr_ = data_->buffer;
@@ -356,13 +317,13 @@ namespace mln
     border_ = border;
 
     site_type shp = domain.shape();
-    typename point<size_t, dim>::type sz;
+    point<size_t, dim> sz;
     sz = shp;
 
     // Compute strides size (in bytes)
     // The row stride is 16 bytes aligned
     data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border));
-    std::copy(data_->strides, data_->strides + dim, strides_);
+    std::copy(data_->strides, data_->strides + dim, strides_.begin());
 
     // Compute pointer at (0,0)
     ptr_ = data_->buffer;
@@ -423,7 +384,7 @@ namespace mln
   const size_t*
   ndimage_base<T,dim,E>::strides () const
   {
-    return strides_;
+    return &strides_[0];
   }
 
   // template <typename T, unsigned dim, typename E>
@@ -451,10 +412,25 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_value_range
   ndimage_base<T,dim,E>::values () const
   {
-    size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
-    return boost::make_iterator_range(const_value_iterator(*this, const_cast<char*>(ptr_)),
-                          const_value_iterator(*this, const_cast<char*>(ptr_ + sz)));
+    point_type shp = domain_.shape();
+    size_t sz = shp[0] * strides_[0];
+    const_pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
+    pix_begin_.ptr_ = ptr_;
+    pix_begin_.point_ = (point_type) {{0,}} ;
+    pix_end_.ptr_ = ptr_ + sz;
+    pix_end_.point_ = (point_type) {{0,}};
+    pix_end_.point_[0] = shp[0];
 
+    const_value_iterator begin_( pix_begin_,
+                                 internal::make_point_visitor(shp),
+                                 internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
+
+
+    const_value_iterator end_(   pix_end_,
+                                 internal::make_point_visitor(shp),
+                                 internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
+
+    return boost::make_iterator_range(begin_, end_);
   }
 
   template <typename T, unsigned dim, typename E>
@@ -462,38 +438,107 @@ namespace mln
   typename ndimage_base<T,dim,E>::value_range
   ndimage_base<T,dim,E>::values ()
   {
-    size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
-    return boost::make_iterator_range(value_iterator( *this, ptr_),
-                          value_iterator( *this, ptr_ + sz));
+    point_type shp = domain_.shape();
+    size_t sz = shp[0] * strides_[0];
+    pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
+    pix_begin_.ptr_ = ptr_;
+    pix_begin_.point_ = point_type ();
+    pix_end_.ptr_ = ptr_ + sz;
+    pix_end_.point_ = point_type ();
+    pix_end_.point_[0] = shp[0];
+
+    value_iterator begin_( pix_begin_,
+                           internal::make_point_visitor(shp),
+                           internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
+
+
+    value_iterator end_(   pix_end_,
+                           internal::make_point_visitor(shp),
+                           internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
+
+    return boost::make_iterator_range(begin_, end_);
   }
 
+  /* -- Value range -- */
 
-
-  /* -- Pixel range  */
   template <typename T, unsigned dim, typename E>
+  inline
   typename ndimage_base<T,dim,E>::const_pixel_range
-  ndimage_base<T,dim,E>::pixels() const
+  ndimage_base<T,dim,E>::pixels () const
   {
-    size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
-    point_type pend = domain_.pmin; pend[0] = domain_.pmax[0];
-    return boost::make_iterator_range(const_pixel_iterator(reinterpret_cast<const E*>(this), domain_.pmin, ptr_),
-                                      const_pixel_iterator(reinterpret_cast<const E*>(this), pend, ptr_ + sz));
+    point_type shp = domain_.shape();
+    size_t sz = shp[0] * strides_[0];
+    const_pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
+    pix_begin_.ptr_ = ptr_;
+    pix_begin_.point_ = domain_.pmin;
+    pix_end_.ptr_ = ptr_ + sz;
+    pix_end_.point_ = domain_.pmin;
+    pix_end_.point_[0] = domain_.pmax[0];
+
+    const_pixel_iterator begin_( pix_begin_,
+                                 internal::make_point_visitor(domain_.pmin, domain_.pmax),
+                                 internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
+
+
+    const_pixel_iterator end_(   pix_end_,
+                                 internal::make_point_visitor(domain_.pmin, domain_.pmax),
+                                 internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
+
+    return boost::make_iterator_range(begin_, end_);
   }
 
   template <typename T, unsigned dim, typename E>
+  inline
   typename ndimage_base<T,dim,E>::pixel_range
-  ndimage_base<T,dim,E>::pixels()
+  ndimage_base<T,dim,E>::pixels ()
   {
-    size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
-    point_type pend = domain_.pmin; pend[0] = domain_.pmax[0];
-    return boost::make_iterator_range(pixel_iterator(reinterpret_cast<E*>(this), domain_.pmin, ptr_),
-                                      pixel_iterator(reinterpret_cast<E*>(this), pend, ptr_ + sz));
+    point_type shp = domain_.shape();
+    size_t sz = shp[0] * strides_[0];
+    pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
+    pix_begin_.ptr_ = ptr_;
+    pix_begin_.point_ = domain_.pmin;
+    pix_end_.ptr_ = ptr_ + sz;
+    pix_end_.point_ = domain_.pmin;
+    pix_end_.point_[0] = domain_.pmax[0];
+
+    pixel_iterator begin_( pix_begin_,
+                           internal::make_point_visitor(domain_.pmin, domain_.pmax),
+                           internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
+
+    pixel_iterator end_(   pix_end_,
+                           internal::make_point_visitor(domain_.pmin, domain_.pmax),
+                           internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
+
+    return boost::make_iterator_range(begin_, end_);
   }
+
+
+  // /* -- Pixel range  */
+  // template <typename T, unsigned dim, typename E>
+  // inline
+  // typename ndimage_base<T,dim,E>::const_pixel_range
+  // ndimage_base<T,dim,E>::pixels() const
+  // {
+  //   size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
+  //   point_type pend = domain_.pmin; pend[0] = domain_.pmax[0];
+  //   return boost::make_iterator_range(const_pixel_iterator(reinterpret_cast<const E*>(this), domain_.pmin, ptr_),
+  //                                     const_pixel_iterator(reinterpret_cast<const E*>(this), pend, ptr_ + sz));
+  // }
+
+  // template <typename T, unsigned dim, typename E>
+  // inline
+  // typename ndimage_base<T,dim,E>::pixel_range
+  // ndimage_base<T,dim,E>::pixels()
+  // {
+  //   size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
+  //   point_type pend = domain_.pmin; pend[0] = domain_.pmax[0];
+  //   return boost::make_iterator_range(pixel_iterator(reinterpret_cast<E*>(this), domain_.pmin, ptr_),
+  //                                     pixel_iterator(reinterpret_cast<E*>(this), pend, ptr_ + sz));
+  // }
 
 
 } // end of namespace mln
 
-# include <mln/core/ndimage_iter.hpp>
-# include <mln/core/ndimage_pixel_iterator.hpp>
 
-#endif // !NDIMAGE_HH
+
+#endif // !MLN_CORE_IMAGE_NDIMAGE_HH

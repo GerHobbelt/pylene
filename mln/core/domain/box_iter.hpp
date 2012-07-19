@@ -4,10 +4,45 @@
 # include <boost/iterator/iterator_facade.hpp>
 # include <mln/core/iterator/fast_reverse_iterator.hpp>
 # include <boost/iterator/reverse_iterator.hpp>
+# include <mln/core/image/internal/nested_loop_iterator.hpp>
+
 
 namespace mln
 {
 
+  namespace internal
+  {
+
+    template <typename T, unsigned dim>
+    struct point_structure
+    {
+      typedef mln::point<T, dim> point_type;
+
+      point_structure();
+      point_structure(const mln::point<T, dim>& p) : point_ (p) {}
+
+
+      const mln::point<T, dim>& point() const { return point_; }
+
+
+      mln::point<T, dim>& get_point() { return point_; }
+      void                get_value() { }
+      bool                equal(const point_structure& other) const { return point_ == other.point_; }
+
+      mln::point<T, dim> point_;
+    };
+
+  }
+
+  template <typename T, unsigned dim>
+  using box_iter = internal::nested_loop_iterator<
+    internal::domain_point_visitor< point<T, dim> >,
+    internal::no_op_value_visitor,
+    internal::point_structure<T, dim>,
+    internal::deref_return_point_policy>;
+
+
+  /*
   template <typename T, unsigned dim>
   struct box_iter :
     public boost::iterator_facade< box_iter<T, dim>, const typename box<T, dim>::point_type,
@@ -140,7 +175,7 @@ namespace mln
     box<short, dim> box_; // Domain iteration (do faster than reference)
     point_type point_; // Site location
   };
-
+  */
 }
 
 // Specialization of the boost::reverse_iterator

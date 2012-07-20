@@ -24,19 +24,13 @@ namespace mln {
 
 
   template <typename Domain>
-  struct translated_domain
-  {
-    typedef boost::transformed_range<typename internal::translate_fun<Domain>::type, const Domain > type;
-  };
-
-  //template <typename Domain>
-  //using translated_domain = boost::transformed_range<Domain, typename internal::translate_fun<Domain>::type >;
+  using translated_domain = boost::transformed_range<typename internal::translate_fun<Domain>::type, const Domain >;
 
 
 
   template <typename Domain>
   inline
-  typename translated_domain<Domain>::type
+  translated_domain<Domain>
   dtranslate(const Domain& domain, typename boost::range_value<Domain>::type p)
   {
     typedef typename boost::range_value<Domain>::type P;

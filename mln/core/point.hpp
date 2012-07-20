@@ -21,18 +21,15 @@ namespace mln
 		};
 	}
 
-	template <typename T, std::size_t dim>
-	struct point : internal::vec_base<T, dim, point_tag>
-	{
-	  typedef internal::vec_base<T, dim, point_tag> type;
-	};
+  template <typename T, std::size_t dim>
+  using point = internal::vec_base<T, dim, point_tag>;
 
-	typedef internal::vec_base<short, 1, point_tag> point1d;
-	typedef internal::vec_base<short, 2, point_tag> point2d;
-	typedef internal::vec_base<short, 3, point_tag> point3d;
-	typedef internal::vec_base<float, 1, point_tag> point1df;
-	typedef internal::vec_base<float, 2, point_tag> point2df;
-	typedef internal::vec_base<float, 3, point_tag> point3df;
+  typedef point<short, 1> point1d;
+  typedef point<short, 2> point2d;
+  typedef point<short, 3> point3d;
+  typedef point<float, 1> point1df;
+  typedef point<float, 2> point2df;
+  typedef point<float, 3> point3df;
 
 }
 

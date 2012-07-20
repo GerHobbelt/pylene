@@ -1,17 +1,27 @@
-#include <mln/core/ndimage.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/io/imread.hpp>
-#include <mln/io/imprint.hpp>
-#include <mln/io/freeimage_reader.hpp>
+#include <mln/core/algorithm/equal.hpp>
+#include <mln/core/algorithm/iota.hpp>
+
+#ifndef MLN_IMG_PATH
+# error "MLN_IMG_PATH must be defined."
+#endif
 
 
-int main(int argc, char** argv)
+#define BOOST_TEST_MODULE IO
+#include <boost/test/unit_test.hpp>
+
+
+BOOST_AUTO_TEST_CASE(Freeimage_pgm)
 {
-  assert(argc > 1);
-  const char* path = argv[1];
+  using namespace mln;
 
-  mln::image2d<mln::uint8> ima;
-  mln::io::imread(path, mln::io::freeimage_reader (), ima);
+  image2d<uint8> ima;
+  image2d<uint8> ref(5, 5);
 
-  mln::io::imprint(ima);
+  iota(ref, 1);
+  io::imread(MLN_IMG_PATH "/iota2d.pgm", ima, mln::io::freeimage_reader ());
+
+  BOOST_CHECK(equal(ima, ref));
 }

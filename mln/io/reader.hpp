@@ -1,6 +1,8 @@
 #ifndef MLN_IO_READER_HH
 # define MLN_IO_READER_HH
 
+# include <typeindex>
+
 namespace mln
 {
   namespace io
@@ -32,7 +34,7 @@ namespace mln
       virtual int get_ndim() const = 0;
 
       /// \brief Get value type id of data
-      virtual int get_value_type_id() const = 0;
+      virtual std::type_index get_value_type_id() const = 0;
 
       // Concept
       // void read_pixel_();

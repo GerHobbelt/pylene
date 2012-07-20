@@ -7,13 +7,28 @@
 # include <mln/core/image_traits.hpp>
 # include <mln/io/reader.hpp>
 # include <mln/io/ioexception.hpp>
-# include <mln/io/registration.hpp>
+//# include <mln/io/registration.hpp>
 # include <mln/io/freeimage_reader.hpp>
 
 namespace mln
 {
   namespace io
   {
+
+    /// \brief Load an image from disk.
+    /// \ingroup io
+    ///
+    /// \param path Path to the image
+    /// \param[out] out Image to be loaded
+    /// \param r The plugin to use for loading
+    template <typename Image, typename Reader = freeimage_reader>
+    void imread(const char* path, Image& out, Reader r = Reader());
+
+
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
+
 
     namespace internal
     {
@@ -54,13 +69,13 @@ namespace mln
 	r.load(path);
 
 	typedef typename Image::value_type V;
-	const type_info_base* rinfo = registration_map_[r.get_value_type_id()];
+        std::type_index ridx = r.get_value_type_id();
 	if (Image::ndim != r.get_ndim())
 	  throw MLNIOException("Dimensions incompatibles");
-	else if (type_info<V>::id_ != rinfo->id()) {
+	else if (ridx != typeid(V)) {
 	  std::string ex = "Value types incompatibles: ";
-	  (ex += "expected: ") += rinfo->name();
-	  (ex += " but got ") += type_info<V>::name_;
+	  (ex += "expected: ") += ridx.name();
+	  (ex += " but got ") += typeid(V).name();
 	  throw MLNIOException(ex);
 	}
 
@@ -70,8 +85,8 @@ namespace mln
       }
     }
 
-    template <typename Image, typename Reader = freeimage_reader>
-    void imread(const char* path, Image& out, Reader r = Reader())
+    template <typename Image, typename Reader>
+    void imread(const char* path, Image& out, Reader r)
     {
       internal::imread(path, r, out, typename image_traits<Image>::category ());
     }

@@ -1,10 +1,12 @@
 #ifndef MLN_IO_FREE_IMAGE_READER_HPP
 # define MLN_IO_FREE_IMAGE_READER_HPP
 
-# include <string.h>
+# include <cstring>
 
-# include <mln/core/box.hpp>
-# include <mln/io/typeinfo.hpp>
+# include <mln/core/grays.hpp>
+# include <mln/core/domain/box.hpp>
+
+//# include <mln/io/typeinfo.hpp>
 # include <mln/io/reader.hpp>
 
 # include <FreeImage.h>
@@ -26,7 +28,7 @@ namespace mln
       virtual void read_next_pixel(void* out);
       virtual void read_next_line(void* out);
       virtual int get_ndim() const;
-      virtual int get_value_type_id() const;
+      virtual std::type_index get_value_type_id() const;
       const domain_type& get_domain() const;
 
 
@@ -101,7 +103,8 @@ namespace mln
     }
 
     inline
-    int freeimage_reader::get_value_type_id() const
+    std::type_index
+    freeimage_reader::get_value_type_id() const
     {
       mln_precondition(init_);
       mln_precondition(dib != NULL);
@@ -109,18 +112,18 @@ namespace mln
       switch (type)
 	{
 	case FIT_BITMAP:	break;
-	case FIT_UINT16:	return MLN_UINT16;
-	case FIT_INT16:		return MLN_INT16;
-	default:		return MLN_UNKNOWN;
+	case FIT_UINT16:	return typeid(uint16);
+	case FIT_INT16:		return typeid(int16);
+	default:		return typeid(void);
 	}
 
       int bppp = FreeImage_GetBPP(dib);
       switch (bppp)
 	{
-	case 1:  return MLN_BOOL;
-	case 8:  return MLN_UINT8;
-	case 16: return MLN_UINT16;
-	default: return MLN_UNKNOWN;
+	case 1:  return typeid(bool);
+	case 8:  return typeid(uint8);
+	case 16: return typeid(uint16);
+	default: return typeid(void);
 	}
     }
 

@@ -1,6 +1,8 @@
 #ifndef MLN_INTERNAL_VEC_BASE_HH
 # define MLN_INTERNAL_VEC_BASE_HH
 
+
+
 // FIXME:
 // replace boost::common_type by c++11 decltype for type broadcasting
 // replace boost::enable_if by c++11 std::enable_if
@@ -16,7 +18,7 @@
 #include <boost/utility.hpp>
 #include <iostream>
 #include <array>
-
+#include <mln/core/assert.hpp>
 
 
 // Element-wise operator
@@ -147,6 +149,8 @@ namespace mln
       typedef size_t size_type;
       typedef ptrdiff_t difference_type;
 
+      enum { ndim = dim };
+
       template <typename U>
       vec_base&
       operator= (const vec_base<U, dim, tag>& other)
@@ -155,8 +159,8 @@ namespace mln
 	return *this;
       }
 
-      T& operator[] (size_type n) { assert(n < dim); return v_[n]; }
-      const T& operator[] (size_type n) const { assert(n < dim); return v_[n]; }
+      T& operator[] (size_type n) { mln_precondition(n < dim); return v_[n]; }
+      const T& operator[] (size_type n) const { mln_precondition(n < dim); return v_[n]; }
 
       T* begin() { return v_; }
       T* end()   { return v_ + dim; }

@@ -3,6 +3,7 @@
 
 # include <mln/core/concept/image.hpp>
 # include <mln/core/image_traits.hpp>
+
 # include <cstddef>
 
 namespace mln
@@ -56,5 +57,7 @@ namespace mln
 
 } // end of namespace mln
 
+# include <mln/core/image/image_expr.hpp>
+# include <mln/core/image/image_ops.hpp>
 
 #endif //!MLN_CORE_IMAGE_BASE_HPP

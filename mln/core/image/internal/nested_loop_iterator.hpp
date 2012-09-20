@@ -364,7 +364,7 @@ namespace mln
 
       template <typename ValueVisitor2, typename InternalStruct2>
       nested_loop_iterator(const nested_loop_iterator<PointVisitor, ValueVisitor2, InternalStruct2, DereferencePolicy>& other,
-                           std::enable_if< std::is_convertible<InternalStruct2, InternalStruct>::value, void>* dummy = NULL)
+                           std::enable_if< std::is_convertible<InternalStruct2, InternalStruct>::value, void>* = NULL)
         : s_ (other.s_), p_ (other.p_), v_ (other.v_)
       {
       }

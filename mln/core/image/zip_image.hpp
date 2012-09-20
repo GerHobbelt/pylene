@@ -1,49 +1,23 @@
+#ifndef MLN_CORE_IMAGE_BASE_HPP
+# warning "This file should be included only by image_base.hpp"
+# include <mln/core/image_base.hpp>
+#endif
+
 #ifndef MLN_CORE_IMAGE_ZIP_IMAGE_HPP
 # define MLN_CORE_IMAGE_ZIP_IMAGE_HPP
+
+# include <boost/mpl/and.hpp>
+# include <boost/tuple/tuple.hpp>
 
 # include <mln/core/assert.hpp>
 # include <mln/core/image_base.hpp>
 # include <mln/core/iterator/pixel_iterator.hpp>
 
+# include <mln/core/image/zip_image_value_iterator.hpp>
+
 # include <boost/iterator/zip_iterator.hpp>
 # include <boost/range/iterator_range.hpp>
 
-
-# include <boost/mpl/and.hpp>
-# include <boost/tuple/tuple.hpp>
-
-# include <mln/core/image/zip_image_value_iterator.hpp>
-
-# include <boost/preprocessor/repetition/repeat.hpp>
-# include <boost/preprocessor/arithmetic/div.hpp>
-# include <boost/preprocessor/variadic/to_seq.hpp>
-# include <boost/preprocessor/variadic/elem.hpp>
-# include <boost/preprocessor/variadic/size.hpp>
-# include <boost/preprocessor/seq/rest_n.hpp>
-# include <boost/preprocessor/seq/enum.hpp>
-# include <boost/preprocessor/seq/elem.hpp>
-
-# define MLN_DECLARE(z, n, var)						\
-  if (bool _mln_continue_##n = false) {} else				\
-    for (BOOST_PP_SEQ_ELEM(n, var) = boost::get<n>(*_mln_for_cur_); !_mln_continue_##n; _mln_continue_##n = true)
-
-# define forall_v(...)							\
-  static_assert( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__) > 0 and		\
-		 BOOST_PP_VARIADIC_SIZE(__VA_ARGS__) % 2 == 0,		\
-		 "Number of arguments of the forall macros should be odd"); \
-  auto _mln_zip_image__ = imzip( BOOST_PP_SEQ_ENUM(			\
-    BOOST_PP_SEQ_REST_N(BOOST_PP_DIV( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2), \
-			BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__) )));	\
-  auto _mln_for_range_ =  _mln_zip_image__.values();			\
-  using std::begin;							\
-  using std::end;							\
-  auto _mln_for_cur_ = begin(_mln_for_range_);				\
-  auto _mln_for_end_ = end(_mln_for_range_);				\
-  for (; _mln_for_cur_ != _mln_for_end_; ++_mln_for_cur_)		\
-    BOOST_PP_REPEAT(							\
-      BOOST_PP_DIV( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2),		\
-      MLN_DECLARE,							\
-      BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
 
 namespace mln {
@@ -52,14 +26,28 @@ namespace mln {
   struct zip_image;
 
   template <typename... I>
-  zip_image<I...> imzip(Image<I>&&... images);
+  zip_image<I...> imzip(I&&... images);
 
   // template <typename... I>
-  // zip_image<I...> imzip(const Image<I>&... images);
+  // zip_image<I...> imzip(I&... images);
+
+}
+
+namespace boost
+{
+  // template <int N, typename... Images>
+  // get(const zip_image<Images...>& ima);
+
+  // template <int N, typename... Images>
+  // get(zip_image<Images...>& ima);
+}
 
 /******************************************/
 /****              Traits              ****/
 /******************************************/
+
+namespace mln
+{
 
   namespace internal
   {
@@ -94,7 +82,8 @@ namespace mln {
     typedef boost::tuple<Images...> ImageTuple;
 
   public:
-    typedef typename internal::zip_image_category<ImageTuple>::type	 category;
+    typedef typename std::common_type<typename internal::zip_image_category<ImageTuple>::type,
+				      bidirectional_image_tag>::type		 category;
     typedef typename internal::zip_image_accessibility<ImageTuple>::type accessible;
   };
 
@@ -103,6 +92,21 @@ namespace mln {
 /******************************************/
 /****          Implementation          ****/
 /******************************************/
+
+  template <typename... I>
+  zip_image<I...>
+  imzip(I&&... images)
+  {
+    return zip_image<I...> (std::forward<I>(images)...);
+  }
+
+  // template <typename... I>
+  // zip_image<I...>
+  // imzip(I&... images)
+  // {
+  //   return zip_image<I...> (images...);
+  // }
+
 
 
   // Some helpers
@@ -114,7 +118,7 @@ namespace mln {
     {
       get_image_operator_call(const Point& p) : p_ (p) {}
 
-      template <class Image> struct apply;
+      template <class Image> struct apply { typedef typename Image::reference type; };
       template <class Image> struct apply<Image&> { typedef typename Image::reference type; };
       template <class Image> struct apply<const Image&> { typedef typename Image::const_reference type; };
 
@@ -129,16 +133,18 @@ namespace mln {
     private:
       const Point& p_;
     };
+
+    struct constify
+    {
+      template <typename T> struct apply { typedef const typename std::remove_reference<T>::type& type; };
+      //template <typename T> struct apply<T&> { typedef const T& type; };
+
+      template <typename T>
+      const T&
+      operator() (T& x) const {return static_cast<const T&> (x); }
+    };
+
   }
-
-
-  template <typename... I>
-  zip_image<I...>
-  imzip(I&&... images)
-  {
-    return zip_image<I...> (std::forward<I>(images)...);
-  }
-
 
 
   // template <typename... I>
@@ -153,20 +159,27 @@ namespace mln {
   template <typename... Images>
   struct zip_image : mln::Image< zip_image<Images...> >
   {
-    static_assert(sizeof...(Images) > 0, "Must have at least one image as parameter.");
-
   private:
-    typedef boost::tuple<Images...> ImageTuple;
+    static_assert(sizeof...(Images) > 0, "Must have at least one image as parameter.");
     typedef zip_image<Images...> E;
+
+    BOOST_CONCEPT_ASSERT((IterableImage<E>));
+
+
+    typedef boost::tuple<Images...> ImageTuple;
+    typedef typename internal::tuple_meta_transform<ImageTuple, internal::constify>::type ConstImageTuple;
     typedef typename boost::tuples::element<0, ImageTuple>::type Image; 
     typedef typename std::decay<Image>::type VImage;
     typedef boost::tuple<Images...> images_t;
 
   public:
+    typedef ImageTuple image_tuple_t;
+
     typedef typename VImage::domain_type         domain_type;
     typedef typename VImage::point_type          point_type;
+    typedef typename VImage::point_type          site_type;
 
-    typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_reference>::type        value_type;
+    typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_value>::type            value_type;
     typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_reference>::type        reference;
     typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_const_reference>::type  const_reference;
     typedef value_type*										   pointer;
@@ -179,19 +192,17 @@ namespace mln {
     // typedef boost::iterator_range<value_iterator> value_range;
     // typedef boost::iterator_range<const_value_iterator> const_value_range;
 
-    typedef zip_image_value_range<typename image_traits<E>::category, ImageTuple>		value_range;
-    typedef zip_image_value_range<typename image_traits<E>::category, const ImageTuple>		const_value_range;
-    typedef typename value_range::iterator							value_iterator;
-    typedef typename const_value_range::iterator						const_value_iterator;
+    typedef zip_image_value_range<typename internal::zip_image_category<ImageTuple>::type, ImageTuple>		 value_range;
+    typedef zip_image_value_range<typename internal::zip_image_category<ImageTuple>::type, ConstImageTuple>           const_value_range;
+    typedef typename value_range::iterator							 value_iterator;
+    typedef typename const_value_range::iterator						 const_value_iterator;
 
-
-    typedef zip_point_value_pixel<typename domain_type::iterator, value_iterator, E>             pixel_type;
-    typedef zip_point_value_pixel<typename domain_type::iterator, const_value_iterator, const E> const_pixel_type;
-    typedef mln::pixel_iterator<typename domain_type::iterator, value_iterator, E>               pixel_iterator;
-    typedef mln::pixel_iterator<typename domain_type::iterator, const_value_iterator, const E>   const_pixel_iterator;
-    typedef boost::iterator_range<pixel_iterator>                                                pixel_range;
-    typedef boost::iterator_range<const_pixel_iterator>                                          const_pixel_range;
-
+    typedef zip_image_pixel_range<typename internal::zip_image_category<ImageTuple>::type, ImageTuple, E>		 pixel_range;
+    typedef zip_image_pixel_range<typename internal::zip_image_category<ImageTuple>::type, ConstImageTuple, const E>  const_pixel_range;
+    typedef typename pixel_range::iterator							 pixel_iterator;
+    typedef typename const_pixel_range::iterator						 const_pixel_iterator;
+    typedef typename pixel_iterator::value_type                                                  pixel_type;
+    typedef typename const_pixel_iterator::value_type                                            const_pixel_type;
 
     /// \brief Constructor
     /// \todo Check that all domain are equals
@@ -200,6 +211,12 @@ namespace mln {
       images_ (std::forward<Images>(imas)...)
     {
     }
+
+    // zip_image(const Images&... imas) :
+    //   images_ (imas...)
+    // {
+    // }
+
 
     const domain_type& domain() const
     {
@@ -218,7 +235,7 @@ namespace mln {
 
     const_value_range values() const
     {
-      return const_value_range(images_);
+      return const_value_range(internal::tuple_transform(images_, internal::constify ()));
       // using namespace boost::detail::tuple_impl_specific;
       // auto w = tuple_transform(images_, internal::get_image_value_range ());
       // const_value_iterator begin_(tuple_transform(w, internal::get_image_value_iterator_begin ()));
@@ -228,18 +245,20 @@ namespace mln {
 
     pixel_range pixels()
     {
-      auto x = this->values();
-      pixel_iterator begin_(std::begin(this->domain()), std::begin(x), *this);
-      pixel_iterator end_(std::end(this->domain()), std::end(x), *this);
-      return pixel_range(begin_, end_);
+      return pixel_range(images_, *this);
+      // auto x = this->values();
+      // pixel_iterator begin_(std::begin(this->domain()), std::begin(x), *this);
+      // pixel_iterator end_(std::end(this->domain()), std::end(x), *this);
+      // return pixel_range(begin_, end_);
     }
 
     const_pixel_range pixels() const
     {
-      auto x = this->values();
-      const_pixel_iterator begin_(std::begin(this->domain()), std::begin(x),*this);
-      const_pixel_iterator end_(std::end(this->domain()), std::end(x), *this);
-      return const_pixel_range(begin_, end_);
+      return const_pixel_range(internal::tuple_transform(images_, internal::constify ()), *this);
+      // auto x = this->values();
+      // const_pixel_iterator begin_(std::begin(this->domain()), std::begin(x),*this);
+      // const_pixel_iterator end_(std::end(this->domain()), std::end(x), *this);
+      // return const_pixel_range(begin_, end_);
     }
 
     template <typename dummy = void>
@@ -255,6 +274,10 @@ namespace mln {
     {
       return internal::tuple_transform(images_, internal::get_image_operator_call<point_type> (p));
     }
+
+
+    boost::tuple<Images...>& images()             { return images_; }
+    const boost::tuple<Images...>& images() const { return images_; }
 
   private:
     boost::tuple<Images...> images_;

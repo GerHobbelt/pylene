@@ -26,6 +26,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "-W -Wextra -Wall -O3 -DNDEBUG")
 ENABLE_TESTING()
 SUBDIRS(tests)
 
-set(CPACK_GENERATOR "TBZ2")
-set(CPACK_SOURCE_IGNORE_FILES "/\\\\.git/;.*~;/build/;#.*#")
+set(CPACK_SOURCE_GENERATOR "TBZ2")
+set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")
 INCLUDE(CPack)
+
+
+add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)

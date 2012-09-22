@@ -6,13 +6,12 @@
 namespace mln
 {
 
-
   template <typename T, unsigned dim, typename I>
   struct ndimage_pixel
   {
     typedef mln::point<short, dim>              site_type;
     typedef site_type				point_type;
-    typedef T                                   value_type;
+    typedef typename std::remove_const<T>::type value_type;
     typedef T&                                  reference;
     typedef ptrdiff_t                           distance_type;
     typedef I                                   image_type;
@@ -58,7 +57,7 @@ namespace mln
 
 
   private:
-    image_type*         const ima_;
+    image_type*         ima_;
     site_type           point_;
     char*               ptr_;
   };
@@ -84,7 +83,8 @@ namespace mln
   ndimage_pixel<T, dim, I>&
   ndimage_pixel<T, dim, I>::operator= (const ndimage_pixel& other)
   {
-    mln_precondition(other.ima_ == ima_);
+    //mln_precondition(other.ima_ == ima_);
+    ima_ = other.ima_;
     point_ = other.point_;
     ptr_ = other.ptr_;
     return *this;

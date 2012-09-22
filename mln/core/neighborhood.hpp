@@ -4,6 +4,8 @@
 # include <type_traits>
 # include <mln/core/domain/dtranslate.hpp>
 # include <mln/core/neighborhood_pixel_range.hpp>
+# include <mln/core/pix_range_iterator_proxy.hpp>
+
 
 namespace mln {
 
@@ -32,6 +34,16 @@ namespace mln {
     nbh<Pixel>
     operator() (const Pixel& pix) const;
 
+
+    template <typename PixelRange>
+    inline
+    nbh< typename boost::range_value<PixelRange>::type >
+    operator() (const internal::pix_range_iterator_proxy<PixelRange>& pix) const
+    {
+      typedef nbh< typename boost::range_value<PixelRange>::type > nbh_t;
+      nbh_t x(Derived::dpoints, pix);
+      return x;
+    }
 
     template <typename Image>
     inline

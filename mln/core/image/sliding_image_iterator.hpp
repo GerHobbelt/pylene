@@ -40,8 +40,10 @@ namespace mln {
   public:
 
     sliding_image_value_iterator() {};
+    //    sliding_image_value_iterator(V* ptr, const std::array<difference_type, N>& offsets, int i)
+
     sliding_image_value_iterator(V* ptr, const std::array<difference_type, N>& offsets, int i)
-      : offsets_ (offsets), ptr_ ((char*)ptr),  i_ (i)
+      : offsets_ (&offsets), ptr_ ((char*)ptr),  i_ (i)
     {
     }
 
@@ -50,23 +52,24 @@ namespace mln {
     typedef sliding_image_value_iterator<Image, std::array<P, N>, raw_image_tag> this_t;
     friend class boost::iterator_core_access;
 
-    V& dereference() const { return *(V*)(ptr_ + offsets_[i_]); }
+    V& dereference() const { return *(V*)(ptr_ + (*offsets_)[i_]); }
     void increment() { ++i_; }
     void decrement() { --i_; }
 
 
     template <typename I2>
     typename std::enable_if<std::is_same<typename std::remove_cv<I2>::type,
-                                         typename std::remove_cv<this_t>::type>::value, bool>::type
+                                         typename std::remove_cv<Image>::type>::value, bool>::type
     equal(const sliding_image_value_iterator<I2, std::array<P, N>, raw_image_tag>& other) const
     {
       return i_ == other.i_;
     }
 
+    //const std::shared_ptr< std::array<difference_type, N> > offsets_;
 
-    const std::array<difference_type, N>& offsets_;
-    char*                        ptr_;
-    int                       i_;
+    const std::array<difference_type, N>*       offsets_;
+    char*                                       ptr_;
+    int                                         i_;
   };
 
 }

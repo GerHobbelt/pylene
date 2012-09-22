@@ -4,6 +4,11 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/io/imprint.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/wrt_offset.hpp>
+
+#include <mln/core/forall.hpp>
+#include <mln/core/pix_range_iterator_proxy.hpp>
 
 #include <boost/range/numeric.hpp>
 #include <boost/timer.hpp>
@@ -43,6 +48,16 @@ double test_zip(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
+double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
+{
+  auto ima = imzip(a, b);
+  typedef typename decltype(ima)::const_pixel_type pixel_t;
+  double v = boost::accumulate(ima.pixels(), 0.0d, [](double v, const pixel_t& x)
+                               { return v + boost::get<0>(x.val()) * boost::get<1>(x.val()); });
+  return v;
+}
+
+
 double test_for(const image2d<int>& a, const image2d<int>& b)
 {
   double v = 0;
@@ -53,17 +68,80 @@ double test_for(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
+double test_for_pixel(const image2d<int>& a, const image2d<int>& b)
+{
+  double v = 0;
+
+  forall_pix (auto x, auto y, a, b)
+    v += x.val() * y.val();
+
+  return v;
+}
+
+void test_dilation_native(const image2d<int>& a, image2d<int>& b)
+{
+  fill(b, std::numeric_limits<int>::max());
+
+  const size_t* strides = a.strides();
+  const char* ptra = (const char*) &(a(point2d {0,0}));
+  char* ptrb = (char*) &(b(point2d {0,0}));
+
+  unsigned nrows = a.nrows(), ncols = a.ncols();
+  std::array<int, 8> offsets;
+  mln::wrt_offset(a, c8_t::dpoints, offsets.begin());
+
+
+  for (unsigned i = 0; i < nrows; ++i, ptra += strides[0], ptrb += strides[0])
+    {
+      const int* pa = (const int*) ptra;
+      int *pb = (int*) ptrb;
+      for (unsigned j = 0; j < ncols; ++j, ++pa, ++pb)
+        for (int k = 0; k < 8; ++k)
+          *pb = std::min(*pb, *(const int*) ((const char*)pa + offsets[k]));
+    }
+}
+
+
+void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
+{
+  fill(b, std::numeric_limits<int>::max());
+  forall_pix(auto in, auto out, a, b)
+    for (auto x: c8(in))
+      out.val() = std::min(out.val(), x.val());
+}
+
+void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
+{
+  fill(b, std::numeric_limits<int>::max());
+
+  mln_pixter (px, a);
+  mln_pixter (pout, b);
+  mln_nixter (nx, c4(px));
+
+  forall(px, pout)
+    {
+      //std::cout << px.point() << ":" << pout.point() << " {";
+      forall(nx)
+      {
+        //std::cout << nx.val() << ", ";
+        pout.val() = std::min(pout.val(), nx.val());
+      }
+      //std::cout << "}" << std::endl;
+    }
+}
+
 
 int main()
 {
-  image2d<int> ima1(1000, 10000);
-  image2d<int> ima2(1000, 10000);
+  int NTEST = 100;
+
+  image2d<int> ima1(1000, 1000);
+  image2d<int> ima2(1000, 1000);
 
   iota(ima1, 0);
   iota(ima2, 1);
 
   auto zp = imzip(ima1, ima2);
-  static_assert(std::is_same<raw_image_tag, typename image_traits< decltype(zp) >::category> (), "lol");
 
   //io::imprint(imzip(ima1, ima2));
 
@@ -72,7 +150,7 @@ int main()
 
   std::cout << "Native pointer..." << std::endl;
   t.restart();
-  for (int i = 0; i < 100; ++i)
+  for (int i = 0; i < NTEST; ++i)
     r  = test_native(ima1, ima2);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
@@ -80,26 +158,66 @@ int main()
 
   std::cout << "Normal Iterators..." << std::endl;
   t.restart();
-  for (int i = 0; i < 100; ++i)
+  for (int i = 0; i < NTEST; ++i)
     r  = test_iterator(ima1, ima2);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 
 
-  std::cout << "Zip Iterators..." << std::endl;
+    std::cout << "Zip Value Iterators..." << std::endl;
   t.restart();
-  for (int i = 0; i < 100; ++i)
+  for (int i = 0; i < NTEST; ++i)
     r  = test_zip(ima1, ima2);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 
+  std::cout << "Zip Pixel Iterators..." << std::endl;
+  t.restart();
+  for (int i = 0; i < NTEST; ++i)
+    r  = test_zip_pix(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+
+
   std::cout << "Zip For loop..." << std::endl;
   t.restart();
-  for (int i = 0; i < 100; ++i)
+  for (int i = 0; i < NTEST; ++i)
     r  = test_for(ima1, ima2);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 
+   std::cout << "Zip For loop pixel..." << std::endl;
+  t.restart();
+  for (int i = 0; i < NTEST; ++i)
+    r  = test_for_pixel(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+
+
+  std::cout << "Zip For Dilation..." << std::endl;
+  mln::fill(ima2, 0);
+  t.restart();
+  for (int i = 0; i < NTEST/2; ++i)
+    test_dilation_pixel(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+
+  std::cout << "New For Dilation ..." << std::endl;
+  mln::fill(ima2, 0);
+  t.restart();
+  for (int i = 0; i < NTEST/2; ++i)
+    test_dilation_extfor(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+
+
+  std::cout << "Native Dilation..." << std::endl;
+  mln::fill(ima2, 0);
+  t.restart();
+  for (int i = 0; i < NTEST/2; ++i)
+    test_dilation_native(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 
 }
 

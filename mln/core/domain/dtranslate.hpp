@@ -15,11 +15,10 @@ namespace mln {
     struct translate_fun
     {
       typedef typename boost::range_value<Domain>::type P;
-      typedef decltype( std::bind(std::plus<P> (), std::placeholders::_1, std::declval<P> ()) ) type;
+      typedef std::binder1st< std::plus<P> > type;
+      //typedef decltype( std::bind(std::plus<P> (), std::placeholders::_1, std::declval<P> ()) ) type;
     };
 
-    //template <typename Domain>
-    //using translate_fun = std::binder1st<std::add<typename boost::range_value<Domain>::type>>;
   };
 
 
@@ -34,7 +33,7 @@ namespace mln {
   dtranslate(const Domain& domain, typename boost::range_value<Domain>::type p)
   {
     typedef typename boost::range_value<Domain>::type P;
-    return boost::adaptors::transform(domain, std::bind(std::plus<P> (), std::placeholders::_1, p));
+    return boost::adaptors::transform(domain, std::bind1st(std::plus<P> (), p));
   }
 
 

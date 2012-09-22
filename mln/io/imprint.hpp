@@ -7,6 +7,7 @@
 
 # include <mln/core/domain/box.hpp>
 # include <mln/core/macros.hpp>
+# include <mln/core/grays.hpp>
 
 
 namespace mln
@@ -49,7 +50,7 @@ namespace mln
         typedef typename Image::value_type V;
 	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
 	mln_point(Image) p;
-        std::cout << domain << std::endl;
+        std::cout << domain << "(" << typeid(V).name() << ")" << std::endl;
 	for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0]) {
 	  for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1]) {
 	    std::cout << ((T) ima(p)) << " ";

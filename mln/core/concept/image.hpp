@@ -115,7 +115,7 @@ namespace mln {
       check(std::is_same<typename std::iterator_traits<const_value_iterator>::reference, const_reference> ());
       // "Iterator's reference type is expected to be the image const reference");
 
-      check(std::is_const<typename std::remove_reference<const_reference>::type > ());
+      //check(std::is_const<typename std::remove_reference<const_reference>::type > ());
 
       check(std::is_convertible<typename std::iterator_traits<pixel_iterator>::reference, pixel_type> ());
       check(std::is_same<typename std::iterator_traits<pixel_iterator>::value_type, pixel_type> ());

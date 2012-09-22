@@ -15,7 +15,7 @@ namespace mln {
   }
 
   /**
-   * \brief Lazy application of the function to site domain
+   * \brief Lazy application of the function to domain
    *
    * \param domain The domain to be mapped.
    * \param f The function to map.

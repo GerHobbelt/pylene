@@ -105,11 +105,12 @@ double test_nbh_wo_object_creation(const image2d<int>& ima)
 
   double u = 0;
 
-  c8_t::nbh<I::const_pixel_type> sliding(c8_t::dpoints, ima.pix_at(point2d{0,0}));
+  image2d<int>::const_pixel_type pix;
+  c8_t::nbh<I::const_pixel_type> sliding(c8_t::dpoints, pix);
 
-  for (auto pix: ima.pixels())
+  for (auto pix_ : ima.pixels())
     {
-      sliding.center(pix);
+      pix = pix_;
       for (auto& n: sliding)
         u += n.val();
     }

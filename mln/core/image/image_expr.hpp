@@ -340,11 +340,11 @@ namespace mln
     : internal::unary_image_expr_base< std::binder1st<BinaryFunction>, Image, binary_scalar_image_expr<BinaryFunction,Scalar,Image> >
   {
   private:
-    typedef internal::unary_image_expr_base< std::binder2nd<BinaryFunction>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> > base_t;
+    typedef internal::unary_image_expr_base< std::binder1st<BinaryFunction>, Image, binary_scalar_image_expr<BinaryFunction, Scalar, Image> > base_t;
 
   public:
     binary_scalar_image_expr(const Scalar& x, Image&& ima, BinaryFunction f):
-      base_t(std::forward<Image>(ima), std::bind2nd(f, x))
+      base_t(std::forward<Image>(ima), std::bind1st(f, x))
     {
     }
   };

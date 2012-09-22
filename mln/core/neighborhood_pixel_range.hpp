@@ -4,6 +4,7 @@
 # include <mln/core/image/sliding_image_iterator.hpp>
 # include <mln/core/iterator/pixel_iterator.hpp>
 # include <mln/core/domain/dtranslate.hpp>
+# include <mln/core/wrt_offset.hpp>
 
 namespace mln
 {
@@ -79,7 +80,10 @@ namespace mln
       typedef sliding_image_value_iterator<image_t, std::array<Point, N> > value_iterator;
       typedef mln::pixel_iterator<piter, value_iterator, image_t> pixel_iterator;
 
+
     public:
+      typedef pixel_iterator iterator;
+
       neighborhood_pixel_range_base(const std::array<Point, N>& s, const Pixel& pix)
         : pix_ (pix),
           domain_ (dtranslate(s, pix.point()))
@@ -87,29 +91,29 @@ namespace mln
         wrt_offset(pix.image(), s, offsets_.begin());
       }
 
-      pixel_iterator begin() const
+      iterator begin() const
       {
-        return pixel_iterator(std::begin(domain_),
+        return iterator(std::begin(domain_),
                               value_iterator(&pix_.val(), offsets_, 0),
                               pix_.image());
       }
 
 
-      pixel_iterator end() const
+      iterator end() const
       {
-        return pixel_iterator(std::end(domain_),
+        return iterator(std::end(domain_),
                               value_iterator(&pix_.val(), offsets_, N),
                               pix_.image());
       }
 
-      void center(const Pixel& p)
-      {
-        mln_precondition(&p.image() == &pix_.image());
-        pix_ = p;
-      }
+      // void center(const Pixel& p)
+      // {
+      //   mln_precondition(&p.image() == &pix_.image());
+      //   pix_ = p;
+      // }
 
     private:
-      Pixel  pix_;
+      const Pixel& pix_;
       domain_t  domain_;
       std::array<typename image_t::difference_type, N> offsets_;
     };

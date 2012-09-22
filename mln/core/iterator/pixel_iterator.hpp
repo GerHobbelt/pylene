@@ -4,13 +4,15 @@
 # include <boost/iterator/iterator_facade.hpp>
 # include <iterator>
 
+// FIXME: 
+
 namespace mln {
 
   
-  template <typename PointIterator, typename ValueIterator>
+  template <typename PointIterator, typename ValueIterator, typename Image>
   struct zip_point_value_pixel;
 
-  template <typename PointIterator, typename ValueIterator>
+  template <typename PointIterator, typename ValueIterator, typename Image>
   struct pixel_iterator;
 
 /******************************************/
@@ -18,34 +20,41 @@ namespace mln {
 /******************************************/
 
 
-  template <typename PointIterator, typename ValueIterator>
+  template <typename PointIterator, typename ValueIterator, typename Image>
   struct zip_point_value_pixel
   {
     typedef typename std::iterator_traits<PointIterator>::value_type point_type;
+    typedef typename std::iterator_traits<PointIterator>::value_type site_type;
     typedef typename std::iterator_traits<ValueIterator>::value_type value_type;
-    typedef typename std::iterator_traits<ValueIterator>::reference reference;
+    typedef typename std::iterator_traits<ValueIterator>::reference  reference;
+    typedef Image image_type;
 
-    zip_point_value_pixel(PointIterator pit, ValueIterator vit)
-      : pit_ (pit), vit_(vit)
+    zip_point_value_pixel() = default;
+
+    zip_point_value_pixel(const PointIterator& pit, const ValueIterator& vit, Image& ima)
+      : pit_ (pit), vit_(vit), ima_ (&ima)
     {
     }
 
     point_type point() const { return *pit_; }
     reference val() const { return *vit_; }
+    image_type& image() const { return *ima_; }
 
-    friend class pixel_iterator<PointIterator, ValueIterator>;
+
+    friend class pixel_iterator<PointIterator, ValueIterator, Image>;
   private:
     PointIterator pit_;
     ValueIterator vit_;
+    Image*        ima_;
   };
 
-  template <typename SiteSetIterator, typename ValueIterator>
-  struct pixel_iterator : boost::iterator_facade< pixel_iterator<SiteSetIterator, ValueIterator>,
-                                           const zip_point_value_pixel<SiteSetIterator, ValueIterator>,
+  template <typename SiteSetIterator, typename ValueIterator, typename Image>
+  struct pixel_iterator : boost::iterator_facade< pixel_iterator<SiteSetIterator, ValueIterator, Image>,
+                                                  const zip_point_value_pixel<SiteSetIterator, ValueIterator, Image>,
                                            typename std::common_type< typename boost::iterator_traversal<SiteSetIterator>::type,
                                                                       typename boost::iterator_traversal<SiteSetIterator>::type >::type >
   {
-    typedef zip_point_value_pixel<SiteSetIterator, ValueIterator> pixel_t;
+    typedef zip_point_value_pixel<SiteSetIterator, ValueIterator, Image> pixel_t;
 
     pixel_iterator() = default;
 
@@ -58,8 +67,10 @@ namespace mln {
     // {
     // }
 
-    pixel_iterator(SiteSetIterator pit, ValueIterator vit)
-      : pixel_ (pit, vit)
+    pixel_iterator(const SiteSetIterator& pit,
+                   const ValueIterator& vit,
+                   Image& ima)
+      : pixel_ (pit, vit, ima)
     {
     }
 
@@ -71,7 +82,7 @@ namespace mln {
     // Two pixel iterators are equals iif its point iterator are equals 
     bool equal(const pixel_iterator& other) const
     {
-        return pixel_.pit_ == other.pixel_.pit_;
+        return pixel_.vit_ == other.pixel_.vit_;
     }
 
     const pixel_t& dereference() const { return pixel_; }

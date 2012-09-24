@@ -6,13 +6,9 @@
 # include <boost/concept_check.hpp>
 # include <boost/range/iterator.hpp>
 # include <boost/static_assert.hpp>
+# include <mln/core/concept/check.hpp>
 
 namespace mln {
-
-
-  void check(const std::true_type&)
-  {
-  }
 
 
   template <typename I>

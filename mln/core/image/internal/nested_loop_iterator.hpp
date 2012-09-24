@@ -51,8 +51,8 @@ namespace mln
     /// \brief Implement an iterator that has the semantic:
     ///
     /// \code
-    /// for (p.fwd_init<0>(), v.fwd_init<0>(); p.fwd_finished(); p.fwd_inc<0>(), v.fwd_inc<0>())
-    ///   for (p.fwd_init<1>(), v.fwd_init<1>(); p.fwd_finished(); p.fwd_inc<1>(), v.fwd_inc<1>())
+    /// for (p.init<0>(), v.init<0>(); p.finished(); p.inc<0>(), v.inc<0>())
+    ///   for (p.init<1>(), v.init<1>(); p.finished(); p.inc<1>(), v.inc<1>())
     ///    .
     ///      .
     ///        yield
@@ -81,12 +81,10 @@ namespace mln
     /// The point is the object that guides the iteration.
     /// The point visitor \p PVis provides:
     /// * `PVis::point_type`
-    /// * `PVis::fwd_init<n>(P&)`
-    /// * `PVis::bwd_init<n>(P&)`
-    /// * `PVis::fwd_inc<n>(P&)`
-    /// * `PVis::bwd_inc<n>(P&)`
-    /// * `PVis::fwd_finished<n>(P&)`
-    /// * `PVis::bwd_finished<n>(P&)`
+    /// * `PVis::initialize(P&)`
+    /// * `PVis::init<n>(P&)`
+    /// * `PVis::next<n>(P&)`
+    /// * `PVis::finished<n>(P&)`
     /// \{
     template <typename Point> struct origin_point_visitor;
     template <typename Point> struct domain_point_visitor;
@@ -103,17 +101,14 @@ namespace mln
     /// about the way to iterate over values.
     /// The point visitor \p VVis provides:
     /// * `VVis::arg` : Type of argument
-    /// * `VVis::fwd_init<n>(VVis::arg)`
-    /// * `VVis::fwd_inc<n>(VVis::arg)`
-    /// * `VVis::bwd_init<n>(VVis::arg)`
-    /// * `VVis::fwd_inc<n>(VVis::arg)`
+    /// * `VVis::initialize(VVis::arg)`
+    /// * `VVis::init<n>(VVis::arg)`
+    /// * `VVis::next<n>(VVis::arg)`
     /// The type of `s.get_value()` must be convertible to `VVis::arg`
     /// \{
-    template <typename V, typename Point> struct strided_pointer_value_visitor;
+    template <typename V, size_t dim, bool forward> struct strided_pointer_value_visitor;
     struct no_op_value_visitor;
 
-    template <typename V, typename Point>
-    strided_pointer_value_visitor<V, Point> make_strided_pointer_value_visitor(V* start, const Point& shape, const size_t* strides);
     /// \}
 
 
@@ -165,326 +160,291 @@ namespace mln
     };
 
 
-    // Point Visitors
-
+    //// Point Visitors
     template <typename P>
-    struct origin_point_visitor
+    struct origin_point_visitor_forward
     {
       typedef P point_type;
 
-      origin_point_visitor() : pmax_ () {}
-      origin_point_visitor(const P& pmax) : pmax_ (pmax) {}
+      origin_point_visitor_forward() : pmax_ () {}
+      origin_point_visitor_forward(const P& pmax) : pmax_ (pmax) {}
 
-      template <size_t n> void  fwd_initialize(P& point) const { point = (P){0,}; }
-      template <size_t n> void  fwd_init(P& point) const { point[n] = 0; }
-      template <size_t n> void  fwd_inc(P& point) const  { ++point[n]; }
-      template <size_t n> bool  fwd_finished(const P& point) const { return point[n] >= pmax_[n]; }
-
-      template <size_t n> void  bwd_initialize(P& point) const { point = (P){0,}; point[0] = pmax_[0]; }
-      template <size_t n> void  bwd_init(P& point) const { point[n] = pmax_[n] - 1; }
-      template <size_t n> void  bwd_inc(P& point) const { --point[n]; }
-      template <size_t n> bool  bwd_inc(P& point) const { return point[n] < 0; }
-
+      void initialize(P& point) const { point = (P){0,}; }
+      template <size_t n> void  init(P& point) const { point[n] = 0; }
+      template <size_t n> void  next(P& point) const  { ++point[n]; }
+      template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
     private:
       P pmax_;
     };
 
     template <typename P>
-    struct domain_point_visitor
+    struct origin_point_visitor_backward
     {
       typedef P point_type;
 
-      domain_point_visitor():
-	pmin_ (), pmax_ () {}
+      origin_point_visitor_backward() : pmax_ () {}
+      origin_point_visitor_backward(const P& pmax) : pmax_ (pmax) {}
 
-      domain_point_visitor(const P& pmin, const P& pmax) :
-	pmin_ (pmin), pmax_ (pmax) {}
+      void  initialize(P& point) const { point = (P){0,}; point[0] = pmax_[0]; }
+      template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
+      template <size_t n> void  next(P& point) const { --point[n]; }
+      template <size_t n> bool  finished(P& point) const { return point[n] < 0; }
 
-      template <size_t n> void  fwd_initialize(P& point) const { point = pmin_; }
-      template <size_t n> void  fwd_init(P& point) const { point[n] = pmin_[n]; }
-      template <size_t n> void  fwd_inc(P& point) const  { ++point[n]; }
-      template <size_t n> bool  fwd_finished(const P& point) const { return point[n] >= pmax_[n]; }
+    private:
+      P pmax_;
+    };
 
-      template <size_t n> void  bwd_initialize(P& point) const { point = pmin_; point[0] = pmax_[0]; }
-      template <size_t n> void  bwd_init(P& point) const { point[n] = pmax_[n] - 1; }
-      template <size_t n> void  bwd_inc(P& point) const { --point[n]; }
-      template <size_t n> bool  bwd_finished(P& point) const { return point[n] < pmin_[n]; }
+
+    template <typename P>
+    struct domain_point_visitor_backward
+    {
+      typedef P point_type;
+
+      domain_point_visitor_backward(): pmin_ (), pmax_ () {}
+      domain_point_visitor_backward(const P& pmin, const P& pmax) : pmin_ (pmin), pmax_ (pmax) {}
+
+      void  initialize(P& point) const { point = pmin_; point[0] = pmax_[0]; }
+      template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
+      template <size_t n> void  next(P& point) const { --point[n]; }
+      template <size_t n> bool  finished(P& point) const { return point[n] < pmin_[n]; }
+
+    private:
+      P pmin_;
+      P pmax_;
+    };
+
+    template <typename P>
+    struct domain_point_visitor_forward
+    {
+      typedef P point_type;
+
+      domain_point_visitor_forward(): pmin_ (), pmax_ () {}
+      domain_point_visitor_forward(const P& pmin, const P& pmax) : pmin_ (pmin), pmax_ (pmax) {}
+
+      void  initialize(P& point) const                  { point = pmin_; }
+      template <size_t n> void  init(P& point) const    { point[n] = pmin_[n]; }
+      template <size_t n> void  next(P& point) const    { ++point[n]; }
+      template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
     private:
       P pmin_;
       P pmax_;
     };
 
 
+
+
     template <typename P>
     inline
-    origin_point_visitor<P>
-    make_point_visitor(const P& pmax)
+    origin_point_visitor_forward<P>
+    make_point_visitor_forward(const P& pmax)
     {
-      return origin_point_visitor<P>(pmax);
+      return origin_point_visitor_forward<P>(pmax);
     }
 
     template <typename P>
-    domain_point_visitor<P>
-    make_point_visitor(const P& pmin, const P& pmax)
+    inline
+    origin_point_visitor_backward<P>
+    make_point_visitor_backward(const P& pmax)
     {
-      return domain_point_visitor<P>(pmin, pmax);
+      return origin_point_visitor_backward<P>(pmax);
     }
 
+    template <typename P>
+    domain_point_visitor_forward<P>
+    make_point_visitor_forward(const P& pmin, const P& pmax)
+    {
+      return domain_point_visitor_forward<P>(pmin, pmax);
+    }
+
+    template <typename P>
+    domain_point_visitor_backward<P>
+    make_point_visitor_backward(const P& pmin, const P& pmax)
+    {
+      return domain_point_visitor_backward<P>(pmin, pmax);
+    }
 
 
     // Value visitor
+    template <typename V, size_t dim, bool forward>
+    struct strided_pointer_value_visitor
+    {
+      typedef char* ptr_t;
+      enum { ndim = dim };
 
+      strided_pointer_value_visitor()
+      {
+      }
 
-    template <typename V, typename Point>
-     struct strided_pointer_value_visitor
-     {
-       typedef char* ptr_t;
-       enum { ndim = Point::ndim };
-
-
-       strided_pointer_value_visitor()
+      strided_pointer_value_visitor(ptr_t start, const size_t* strides)
+        : start_ (start)
        {
-       }
-
-       strided_pointer_value_visitor(ptr_t start, Point shape, const size_t* strides)
-         : shp_ (shape)
-       {
-	 stack_.fill(start);
 	 std::copy(strides, strides + ndim, strides_.begin());
        }
 
-
-       // Conversion non-const -> const
-       template <typename U>
-       strided_pointer_value_visitor(const strided_pointer_value_visitor<U, Point>& other,
-                                     typename std::enable_if< std::is_convertible<U*, V*>::value, void>* dummy = NULL) :
-         shp_ (other.shp_),
-         strides_ (other.strides_),
-         stack_ (other.stack_)
+      // Conversion non-const -> const
+      template <typename U>
+      strided_pointer_value_visitor(const strided_pointer_value_visitor<U, dim, forward>& other,
+                                    typename std::enable_if< std::is_convertible<U*, V*>::value >* dummy = NULL) :
+        start_ (other.start_),
+        strides_ (other.strides_),
+        stack_ (other.stack_)
        {
        }
 
-       template <size_t n>
-       typename std::enable_if< (n > 0 and n < ndim-1),void>::type
-         fwd_init (ptr_t& )
-       {
-	 stack_[n] = stack_[n-1];
-       }
-
-       template <size_t n>
-       typename std::enable_if< (n > 0 and n < ndim-1),void>::type
-       bwd_init (ptr_t& )
-       {
-	 stack_[n] = stack_[n-1] + (strides_[n] * (shp_[n] - 1));
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n > 0 and n == ndim-1), void>::type
-       fwd_init(ptr_t& ptr)
-       {
-         ptr = stack_[n] = stack_[n-1];
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n > 0 and n == ndim-1), void>::type
-       bwd_init(ptr_t& ptr)
-       {
-         ptr = stack_[ndim-1] = (stack_[ndim-2] + strides_[ndim-1] * (shp_[ndim-1] - 1));
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n < ndim-1), void>::type
-       fwd_inc (ptr_t&)
-       {
-         stack_[n] += strides_[n];
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n == ndim-1), void>::type
-       fwd_inc (ptr_t& ptr)
-       {
-         ptr = (stack_[n] += strides_[n]);
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n < ndim-1), void>::type
-       bwd_inc (ptr_t&)
-       {
-         stack_[n] -= strides_[n];
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n == ndim-1), void>::type
-       bwd_inc (ptr_t& ptr)
-       {
-         ptr = (stack_[n] -= strides_[n]);
-       }
+      void
+      initialize(ptr_t& ptr)
+      {
+        ptr = start_;
+        stack_.fill(start_);
+      }
 
 
-     private:
-       Point shp_;
-       std::array<size_t, ndim> strides_;
-       std::array<char*, ndim> stack_;
+      template <size_t n>
+      typename std::enable_if<(n < ndim-1)>::type
+      init (ptr_t& )
+      {
+        static_assert(n > 0, "");
+        stack_[n] = stack_[n-1];
+      }
+
+      template <size_t n>
+      typename std::enable_if<(n == ndim-1)>::type
+      init(ptr_t& ptr)
+      {
+        static_assert(n > 0, "");
+        ptr = stack_[n] = stack_[n-1];
+      }
+
+    private:
+      char* start_;
+      std::array<size_t, ndim> strides_;
+      std::array<char*, ndim> stack_;
     };
 
-    template <typename V, typename Point>
-    inline
-    strided_pointer_value_visitor<V, Point>
-    make_strided_pointer_value_visitor(V* start, const Point& shape, const size_t* strides)
+    template <typename V, size_t dim>
+    template <size_t n>
+    typename std::enable_if<(n < dim-1)>::type
+    strided_pointer_value_visitor<V, dim, false>::next (ptr_t&)
     {
-      return strided_pointer_value_visitor<V, Point>(start, shape, strides);
+      stack_[n] -= strides_[n];
     }
+
+    template <typename V, size_t dim>
+    template <size_t n>
+    typename std::enable_if<(n < dim-1)>::type
+    strided_pointer_value_visitor<V, dim, true>::next (ptr_t&)
+    {
+      stack_[n] += strides_[n];
+    }
+
+    template <typename V, size_t dim>
+    template <size_t n>
+    typename std::enable_if<(n == dim-1)>::type
+    strided_pointer_value_visitor<V, dim, false>::next (ptr_t& ptr)
+    {
+      ptr = (stack_[n] -= strides_[n]);
+    }
+
+    template <typename V, size_t dim>
+    template <size_t n>
+    typename std::enable_if<(n == dim-1)>::type
+    strided_pointer_value_visitor<V, dim, true>::next (ptr_t& ptr)
+    {
+      ptr = (stack_[n] += strides_[n]);
+    }
+
+
 
     struct no_op_value_visitor
     {
-      template <size_t n> void fwd_init (const boost::any& ) {}
-      template <size_t n> void bwd_init (const boost::any& ) {}
-      template <size_t n> void fwd_inc (const boost::any& ) {}
-      template <size_t n> void bwd_inc (const boost::any& ) {}
+      void initialize(const boost::any& ) {}
+      template <size_t n> void init (const boost::any& ) {}
+      template <size_t n> void next (const boost::any& ) {}
     };
+
 
 
     template <typename PointVisitor, typename ValueVisitor,
 	      typename InternalStruct, typename DereferencePolicy>
     struct nested_loop_iterator :
-      public boost::iterator_facade< nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>,
-                                     typename DereferencePolicy::template value_type<InternalStruct>,
-				     boost::bidirectional_traversal_tag,
-				     typename DereferencePolicy::template reference<InternalStruct> >,
+      iterator_base< nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>,
+                     typename DereferencePolicy::template value_type<InternalStruct>,
+                     typename DereferencePolicy::template reference<InternalStruct> >,
       public internal::iterator_core_access
     {
+      typedef typename DereferencePolicy::template reference<InternalStruct> reference;
+
       nested_loop_iterator()
       {
       }
+
 
       nested_loop_iterator(const InternalStruct s, const PointVisitor& pv, const ValueVisitor& vv)
         : s_ (s), p_ (pv), v_ (vv)
       {
       }
 
-      template <typename ValueVisitor2, typename InternalStruct2>
-      nested_loop_iterator(const nested_loop_iterator<PointVisitor, ValueVisitor2, InternalStruct2, DereferencePolicy>& other,
-                           std::enable_if< std::is_convertible<InternalStruct2, InternalStruct>::value, void>* = NULL)
-        : s_ (other.s_), p_ (other.p_), v_ (other.v_)
+
+      void init()
       {
+        p_.initialize();
+        v_.initialize()
       }
 
-    private:
-      friend class boost::iterator_core_access;
+      void next()
+      {
+        this->next_<ndim-1>();
+      }
 
+      void finished() const
+      {
+        return p_.finished();
+      }
+
+      reference
+      dereference() const
+      {
+        return DereferencePolicy::dereference(s_);
+      }
+
+
+  private:
       template <typename, typename, typename, typename>
-      friend struct nested_loop_iterator;
+      friend struct nested_loop_iterator_forward;
 
       enum { ndim = PointVisitor::point_type::ndim };
 
 
-      template <size_t n> typename std::enable_if<(n > 0), void>::type inc();
-      template <size_t n> typename std::enable_if<(n > 0), void>::type dec();
-      template <size_t n> typename std::enable_if<n == 0, void>::type inc();
-      template <size_t n> typename std::enable_if<n == 0, void>::type dec();
-
-
-
-
-      void increment();
-      void decrement();
-
-      typename DereferencePolicy::template reference<InternalStruct> dereference() const;
-
-      template <typename ValueVisitor2, typename InternalStruct2>
-      typename std::enable_if< std::is_convertible<InternalStruct, InternalStruct2>::value, bool>::type
-      equal(const nested_loop_iterator<PointVisitor, ValueVisitor2, InternalStruct2, DereferencePolicy>& other) const
+      template <size_t n>
+      typename std::enable_if<(n > 0), void>::type
+      next_()
       {
-
-        return iterator_core_access::equal(s_, other.s_);
+        mln_precondition(not this->finished());
+        p_.template next<n>(iterator_core_access::get_point(s_));
+        if (not p_.template finished<n>(iterator_core_access::get_point(s_)))
+          {
+            v_.template next<n>(get_value(s_));
+            return;
+          }
+        this->next<n-1>();
+        p_.template init<n>(get_point(s_));
+        v_.template init<n>(get_value(s_));
       }
 
+      template <size_t n>
+      typename std::enable_if<n == 0, void>::type
+      next_()
+      {
+        mln_precondition(not this->finished());
+        p_.template next<0>(get_point(s_));
+        v_.template next<0>(get_value(s_));
+      }
 
     private:
       InternalStruct s_;
       PointVisitor p_;
       ValueVisitor v_;
     };
-
-
-
-
-    template < typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    template <size_t n>
-    inline
-    typename std::enable_if< (n > 0), void >::type
-    nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::inc()
-    {
-      p_.template fwd_inc<n>(iterator_core_access::get_point(s_));
-      if (not p_.template fwd_finished<n>(iterator_core_access::get_point(s_)))
-        {
-          v_.template fwd_inc<n>(get_value(s_));
-          return;
-        }
-      this->inc<n-1>();
-      p_.template fwd_init<n>(get_point(s_));
-      v_.template fwd_init<n>(get_value(s_));
-    }
-
-    template <typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    template <size_t n>
-    inline
-    typename std::enable_if< (n == 0), void >::type
-    nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::inc()
-    {
-      p_.template fwd_inc<0>(get_point(s_));
-      v_.template fwd_inc<0>(get_value(s_));
-    }
-
-
-    template < typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    template <size_t n>
-    inline
-    typename std::enable_if< (n > 0), void >::type
-    nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::dec()
-    {
-      p_.template bwd_inc<n>(get_point(s_));
-      if (not p_.template bwd_finished<n>(get_point(s_)))
-        {
-          v_.template bwd_inc<n>(get_value(s_));
-          return;
-        }
-      this->dec<n-1>();
-      p_.template bwd_init<n>(get_point(s_));
-      v_.template bwd_init<n>(get_value(s_));
-    }
-
-    template <typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    template <size_t n>
-    inline
-    typename std::enable_if< (n == 0), void >::type
-    nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::dec()
-    {
-      p_.template bwd_inc<0>(get_point(s_));
-      v_.template bwd_inc<0>(get_value(s_));
-    }
-
-    template < typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    inline
-    void nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::increment()
-    {
-      this->inc<ndim-1>();
-    }
-
-    template < typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    inline
-    void nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::decrement()
-    {
-      this->dec<ndim-1>();
-    }
-
-    template < typename PointVisitor, typename ValueVisitor, typename InternalStruct, typename DereferencePolicy>
-    inline
-    typename DereferencePolicy::template reference<InternalStruct>
-    nested_loop_iterator<PointVisitor, ValueVisitor, InternalStruct, DereferencePolicy>::dereference() const
-    {
-      return DereferencePolicy::dereference(s_);
-    }
 
   }
 

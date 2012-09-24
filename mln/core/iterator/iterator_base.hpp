@@ -7,6 +7,8 @@
 namespace mln
 {
 
+  struct use_default {};
+
   namespace internal
   {
 

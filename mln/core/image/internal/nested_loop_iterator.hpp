@@ -4,7 +4,7 @@
 # include <type_traits>
 # include <utility>
 
-# include <boost/iterator/iterator_facade.hpp>
+# include <mln/core/iterator/iterator_base.hpp>
 # include <boost/any.hpp>
 
 namespace mln
@@ -33,6 +33,9 @@ namespace mln
     protected:
       template <typename S>
       auto get_point(S& v) -> decltype(v.get_point()) { return v.get_point(); }
+
+      template <typename S>
+      auto get_point(const S& v) const -> decltype(v.get_point()) { return v.get_point(); }
 
       template <typename S>
       typename get_value_helper<S>::type
@@ -86,13 +89,17 @@ namespace mln
     /// * `PVis::next<n>(P&)`
     /// * `PVis::finished<n>(P&)`
     /// \{
-    template <typename Point> struct origin_point_visitor;
-    template <typename Point> struct domain_point_visitor;
-    template <typename Point> struct strided_domain_point_visitor;
+    template <typename Point> struct origin_point_visitor_forward;
+    template <typename Point> struct origin_point_visitor_backward;
+    template <typename Point> struct domain_point_visitor_forward;
+    template <typename Point> struct domain_point_visitor_backward;
+    //template <typename Point> struct strided_domain_point_visitor;
 
-    template <typename P> origin_point_visitor<P> make_point_visitor(const P& pmax);
-    template <typename P> domain_point_visitor<P> make_point_visitor(const P& pmin, const P& pmax);
-    template <typename P> strided_domain_point_visitor<P> make_point_visitor(const P& pmin, const P& pmax, const P& strides);
+    template <typename P> origin_point_visitor_forward<P> make_point_visitor_forward(const P& pmax);
+    template <typename P> origin_point_visitor_backward<P> make_point_visitor_backward(const P& pmax);
+    template <typename P> domain_point_visitor_forward<P> make_point_visitor_forward(const P& pmin, const P& pmax);
+    template <typename P> domain_point_visitor_backward<P> make_point_visitor_backward(const P& pmin, const P& pmax);
+    //template <typename P> strided_domain_point_visitor<P> make_point_visitor(const P& pmin, const P& pmax, const P& strides);
     /// \}
 
 
@@ -106,9 +113,8 @@ namespace mln
     /// * `VVis::next<n>(VVis::arg)`
     /// The type of `s.get_value()` must be convertible to `VVis::arg`
     /// \{
-    template <typename V, size_t dim, bool forward> struct strided_pointer_value_visitor;
+    template <size_t dim, bool forward> struct strided_pointer_value_visitor;
     struct no_op_value_visitor;
-
     /// \}
 
 
@@ -185,10 +191,10 @@ namespace mln
       origin_point_visitor_backward() : pmax_ () {}
       origin_point_visitor_backward(const P& pmax) : pmax_ (pmax) {}
 
-      void  initialize(P& point) const { point = (P){0,}; point[0] = pmax_[0]; }
+      void  initialize(P& point) const { point = pmax_; point -= 1; }
       template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
       template <size_t n> void  next(P& point) const { --point[n]; }
-      template <size_t n> bool  finished(P& point) const { return point[n] < 0; }
+      template <size_t n> bool  finished(const P& point) const { return point[n] < 0; }
 
     private:
       P pmax_;
@@ -203,7 +209,7 @@ namespace mln
       domain_point_visitor_backward(): pmin_ (), pmax_ () {}
       domain_point_visitor_backward(const P& pmin, const P& pmax) : pmin_ (pmin), pmax_ (pmax) {}
 
-      void  initialize(P& point) const { point = pmin_; point[0] = pmax_[0]; }
+      void  initialize(P& point) const { point = pmax_; point -= 1; }
       template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
       template <size_t n> void  next(P& point) const { --point[n]; }
       template <size_t n> bool  finished(P& point) const { return point[n] < pmin_[n]; }
@@ -265,34 +271,24 @@ namespace mln
 
 
     // Value visitor
-    template <typename V, size_t dim, bool forward>
+    template <size_t dim, bool forward>
     struct strided_pointer_value_visitor
     {
-      typedef char* ptr_t;
+      typedef char* byte_ptr_t;
       enum { ndim = dim };
 
       strided_pointer_value_visitor()
       {
       }
 
-      strided_pointer_value_visitor(ptr_t start, const size_t* strides)
+      strided_pointer_value_visitor(byte_ptr_t start, const size_t* strides)
         : start_ (start)
        {
 	 std::copy(strides, strides + ndim, strides_.begin());
        }
 
-      // Conversion non-const -> const
-      template <typename U>
-      strided_pointer_value_visitor(const strided_pointer_value_visitor<U, dim, forward>& other,
-                                    typename std::enable_if< std::is_convertible<U*, V*>::value >* dummy = NULL) :
-        start_ (other.start_),
-        strides_ (other.strides_),
-        stack_ (other.stack_)
-       {
-       }
-
       void
-      initialize(ptr_t& ptr)
+      initialize(byte_ptr_t& ptr)
       {
         ptr = start_;
         stack_.fill(start_);
@@ -301,7 +297,7 @@ namespace mln
 
       template <size_t n>
       typename std::enable_if<(n < ndim-1)>::type
-      init (ptr_t& )
+      init (byte_ptr_t& )
       {
         static_assert(n > 0, "");
         stack_[n] = stack_[n-1];
@@ -309,51 +305,46 @@ namespace mln
 
       template <size_t n>
       typename std::enable_if<(n == ndim-1)>::type
-      init(ptr_t& ptr)
+      init(byte_ptr_t& ptr)
       {
         static_assert(n > 0, "");
         ptr = stack_[n] = stack_[n-1];
       }
+
+    template <size_t n>
+    typename std::enable_if<(!forward and n < dim-1)>::type
+    next (char* &)
+    {
+      stack_[n] -= strides_[n];
+    }
+
+    template <size_t n>
+    typename std::enable_if<(forward and n < dim-1)>::type
+    next (char* &)
+    {
+      stack_[n] += strides_[n];
+    }
+
+    template <size_t n>
+    typename std::enable_if<(!forward and n == dim-1)>::type
+    next (char*& ptr)
+    {
+      ptr = (stack_[n] -= strides_[n]);
+    }
+
+    template <size_t n>
+    typename std::enable_if<(forward and n == dim-1)>::type
+    next (char*& ptr)
+    {
+      ptr = (stack_[n] += strides_[n]);
+    }
+
 
     private:
       char* start_;
       std::array<size_t, ndim> strides_;
       std::array<char*, ndim> stack_;
     };
-
-    template <typename V, size_t dim>
-    template <size_t n>
-    typename std::enable_if<(n < dim-1)>::type
-    strided_pointer_value_visitor<V, dim, false>::next (ptr_t&)
-    {
-      stack_[n] -= strides_[n];
-    }
-
-    template <typename V, size_t dim>
-    template <size_t n>
-    typename std::enable_if<(n < dim-1)>::type
-    strided_pointer_value_visitor<V, dim, true>::next (ptr_t&)
-    {
-      stack_[n] += strides_[n];
-    }
-
-    template <typename V, size_t dim>
-    template <size_t n>
-    typename std::enable_if<(n == dim-1)>::type
-    strided_pointer_value_visitor<V, dim, false>::next (ptr_t& ptr)
-    {
-      ptr = (stack_[n] -= strides_[n]);
-    }
-
-    template <typename V, size_t dim>
-    template <size_t n>
-    typename std::enable_if<(n == dim-1)>::type
-    strided_pointer_value_visitor<V, dim, true>::next (ptr_t& ptr)
-    {
-      ptr = (stack_[n] += strides_[n]);
-    }
-
-
 
     struct no_op_value_visitor
     {
@@ -387,8 +378,8 @@ namespace mln
 
       void init()
       {
-        p_.initialize();
-        v_.initialize()
+        p_.initialize(get_point(s_));
+        v_.initialize(get_value(s_));
       }
 
       void next()
@@ -396,9 +387,9 @@ namespace mln
         this->next_<ndim-1>();
       }
 
-      void finished() const
+      bool finished() const
       {
-        return p_.finished();
+        return p_.template finished<0>(get_point(s_));
       }
 
       reference
@@ -426,7 +417,7 @@ namespace mln
             v_.template next<n>(get_value(s_));
             return;
           }
-        this->next<n-1>();
+        this->next_<n-1>();
         p_.template init<n>(get_point(s_));
         v_.template init<n>(get_value(s_));
       }

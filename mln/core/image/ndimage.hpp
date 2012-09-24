@@ -10,10 +10,7 @@
 # include <mln/core/image_traits.hpp>
 # include <mln/core/image_category.hpp>
 
-# include <boost/range/iterator_range.hpp>
-
 # include <mln/core/image/ndimage_iter.hpp>
-# include <mln/core/image/ndimage_pixel_iterator.hpp>
 
 namespace mln
 {
@@ -136,30 +133,26 @@ namespace mln
     const_reference at (difference_type n) const;
 
     // As an IterableImage
-    typedef ndimage_iter<this_type, T>                                  value_iterator;
-    typedef ndimage_iter<const this_type, const T>                      const_value_iterator;
-    typedef boost::reverse_iterator<value_iterator>                     reverse_value_iterator;
-    typedef boost::reverse_iterator<const_value_iterator>               const_reverse_value_iterator;
-    typedef ndimage_pixel_iterator<T, dim, E>                           pixel_iterator;
-    typedef ndimage_pixel_iterator<const T, dim, const E>               const_pixel_iterator;
-    typedef boost::reverse_iterator<pixel_iterator>                     reverse_pixel_iterator;
-    typedef boost::reverse_iterator<const_pixel_iterator>               const_reverse_pixel_iterator;
+    typedef ndimage_value_range<this_type, T>					value_range;
+    typedef ndimage_value_range<const this_type, const T>			const_value_range;
+    typedef typename value_range::iterator				value_iterator;
+    typedef typename value_range::reverse_iterator			reverse_value_iterator;
+    typedef typename const_value_range::iterator			const_value_iterator;
+    typedef typename const_value_range::reverse_iterator		const_reverse_value_iterator;
 
-    typedef boost::iterator_range<value_iterator>                                   value_range;
-    typedef boost::iterator_range<const_value_iterator>                       const_value_range;
-    typedef boost::iterator_range<pixel_iterator>                                   pixel_range;
-    typedef boost::iterator_range<const_pixel_iterator>                       const_pixel_range;
+    typedef ndimage_pixel_range<this_type, T>					pixel_range;
+    typedef ndimage_pixel_range<const this_type, const T>			const_pixel_range;
+    typedef typename pixel_range::iterator				pixel_iterator;
+    typedef typename pixel_range::reverse_iterator			reverse_pixel_iterator;
+    typedef typename const_pixel_range::iterator			const_pixel_iterator;
+    typedef typename const_pixel_range::reverse_iterator		const_reverse_pixel_iterator;
+
 
 
     value_range         values();
     const_value_range   values() const;
-
-
     pixel_range                 pixels();
     const_pixel_range           pixels() const;
-
-
-
 
 
     // As a Raw Image
@@ -169,12 +162,9 @@ namespace mln
   protected:
     friend struct ndimage_pixel<T, dim, E>;
     friend struct ndimage_pixel<const T, dim, const E>;
+    template <typename, typename> friend struct ndimage_value_range;
+    template <typename, typename> friend struct ndimage_pixel_range;
 
-    //friend struct ndimage_iter<this_type, T>;
-    //friend struct ndimage_iter<this_type, const T>;
-
-    //friend struct ndimage_pixel_iterator<T, dim, E>;
-    //friend struct ndimage_pixel_iterator<const T, dim, const E>;
 
 
     domain_type	domain_;	///< Domain of image
@@ -415,25 +405,7 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_value_range
   ndimage_base<T,dim,E>::values () const
   {
-    point_type shp = domain_.shape();
-    size_t sz = shp[0] * strides_[0];
-    const_pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
-    pix_begin_.ptr_ = ptr_;
-    pix_begin_.point_ = (point_type) {{0,}} ;
-    pix_end_.ptr_ = ptr_ + sz;
-    pix_end_.point_ = (point_type) {{0,}};
-    pix_end_.point_[0] = shp[0];
-
-    const_value_iterator begin_( pix_begin_,
-                                 internal::make_point_visitor(shp),
-                                 internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
-
-
-    const_value_iterator end_(   pix_end_,
-                                 internal::make_point_visitor(shp),
-                                 internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
-
-    return boost::make_iterator_range(begin_, end_);
+    return const_value_range(exact(*this));
   }
 
   template <typename T, unsigned dim, typename E>
@@ -441,53 +413,15 @@ namespace mln
   typename ndimage_base<T,dim,E>::value_range
   ndimage_base<T,dim,E>::values ()
   {
-    point_type shp = domain_.shape();
-    size_t sz = shp[0] * strides_[0];
-    pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
-    pix_begin_.ptr_ = ptr_;
-    pix_begin_.point_ = point_type ();
-    pix_end_.ptr_ = ptr_ + sz;
-    pix_end_.point_ = point_type ();
-    pix_end_.point_[0] = shp[0];
-
-    value_iterator begin_( pix_begin_,
-                           internal::make_point_visitor(shp),
-                           internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
-
-
-    value_iterator end_(   pix_end_,
-                           internal::make_point_visitor(shp),
-                           internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
-
-    return boost::make_iterator_range(begin_, end_);
+    return value_range(*this);
   }
-
-  /* -- Value range -- */
 
   template <typename T, unsigned dim, typename E>
   inline
   typename ndimage_base<T,dim,E>::const_pixel_range
   ndimage_base<T,dim,E>::pixels () const
   {
-    point_type shp = domain_.shape();
-    size_t sz = shp[0] * strides_[0];
-    const_pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
-    pix_begin_.ptr_ = ptr_;
-    pix_begin_.point_ = domain_.pmin;
-    pix_end_.ptr_ = ptr_ + sz;
-    pix_end_.point_ = domain_.pmin;
-    pix_end_.point_[0] = domain_.pmax[0];
-
-    const_pixel_iterator begin_( pix_begin_,
-                                 internal::make_point_visitor(domain_.pmin, domain_.pmax),
-                                 internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
-
-
-    const_pixel_iterator end_(   pix_end_,
-                                 internal::make_point_visitor(domain_.pmin, domain_.pmax),
-                                 internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
-
-    return boost::make_iterator_range(begin_, end_);
+    return const_pixel_range(*this);
   }
 
   template <typename T, unsigned dim, typename E>
@@ -495,49 +429,8 @@ namespace mln
   typename ndimage_base<T,dim,E>::pixel_range
   ndimage_base<T,dim,E>::pixels ()
   {
-    point_type shp = domain_.shape();
-    size_t sz = shp[0] * strides_[0];
-    pixel_type pix_begin_(exact(this)), pix_end_(exact(this));
-    pix_begin_.ptr_ = ptr_;
-    pix_begin_.point_ = domain_.pmin;
-    pix_end_.ptr_ = ptr_ + sz;
-    pix_end_.point_ = domain_.pmin;
-    pix_end_.point_[0] = domain_.pmax[0];
-
-    pixel_iterator begin_( pix_begin_,
-                           internal::make_point_visitor(domain_.pmin, domain_.pmax),
-                           internal::make_strided_pointer_value_visitor(ptr_, shp, strides_.begin()));
-
-    pixel_iterator end_(   pix_end_,
-                           internal::make_point_visitor(domain_.pmin, domain_.pmax),
-                           internal::make_strided_pointer_value_visitor(ptr_ + sz, shp, strides_.begin()));
-
-    return boost::make_iterator_range(begin_, end_);
+    return pixel_range(*this);
   }
-
-
-  // /* -- Pixel range  */
-  // template <typename T, unsigned dim, typename E>
-  // inline
-  // typename ndimage_base<T,dim,E>::const_pixel_range
-  // ndimage_base<T,dim,E>::pixels() const
-  // {
-  //   size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
-  //   point_type pend = domain_.pmin; pend[0] = domain_.pmax[0];
-  //   return boost::make_iterator_range(const_pixel_iterator(reinterpret_cast<const E*>(this), domain_.pmin, ptr_),
-  //                                     const_pixel_iterator(reinterpret_cast<const E*>(this), pend, ptr_ + sz));
-  // }
-
-  // template <typename T, unsigned dim, typename E>
-  // inline
-  // typename ndimage_base<T,dim,E>::pixel_range
-  // ndimage_base<T,dim,E>::pixels()
-  // {
-  //   size_t sz = (domain_.pmax[0] - domain_.pmin[0]) * strides_[0];
-  //   point_type pend = domain_.pmin; pend[0] = domain_.pmax[0];
-  //   return boost::make_iterator_range(pixel_iterator(reinterpret_cast<E*>(this), domain_.pmin, ptr_),
-  //                                     pixel_iterator(reinterpret_cast<E*>(this), pend, ptr_ + sz));
-  // }
 
 
 } // end of namespace mln

@@ -45,8 +45,10 @@ namespace mln
   private:
     friend struct internal::iterator_core_access;
 
-    char* &        get_value() { return ptr_; }
-    site_type&      get_point() { return point_; }
+    char* &		get_value() { return ptr_; }
+    site_type&		get_point() { return point_; }
+    const char*         get_value() const { return ptr_; }
+    const site_type&    get_point() const { return point_; }
 
     template <typename U, typename Other>
     typename std::enable_if< std::is_convertible<U*,T*>::value, bool>::type

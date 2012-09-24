@@ -97,28 +97,28 @@ namespace mln {
       (void) ptr3;
       (void) ptr4;
 
-      typedef typename boost::range_iterator<value_range>::type       value_iterator;
-      typedef typename boost::range_iterator<const_value_range>::type const_value_iterator;
-      typedef typename boost::range_iterator<pixel_range>::type       pixel_iterator;
-      typedef typename boost::range_iterator<const_pixel_range>::type const_pixel_iterator;
+      typedef typename value_range::iterator       value_iterator;
+      typedef typename const_value_range::iterator const_value_iterator;
+      typedef typename pixel_range::iterator       pixel_iterator;
+      typedef typename const_pixel_range::iterator const_pixel_iterator;
 
-      check(std::is_convertible<typename std::iterator_traits<value_iterator>::value_type, value_type> ());
+       check(std::is_convertible<typename value_iterator::value_type, value_type> ());
       // "Iterator's value type is expected to be the image value type.");
-      check(std::is_same<typename std::iterator_traits<value_iterator>::reference, reference> ());
+       check(std::is_same<typename value_iterator::reference, reference> ());
       // "Iterator's reference is expected to be the image reference");
-      check(std::is_convertible<typename std::iterator_traits<const_value_iterator>::value_type, value_type> ());
+       check(std::is_convertible<typename const_value_iterator::value_type, value_type> ());
       // "Iterator's value type is expected to be the image value type");
-      check(std::is_same<typename std::iterator_traits<const_value_iterator>::reference, const_reference> ());
+      check(std::is_same<typename const_value_iterator::reference, const_reference> ());
       // "Iterator's reference type is expected to be the image const reference");
 
       //check(std::is_const<typename std::remove_reference<const_reference>::type > ());
 
-      check(std::is_convertible<typename std::iterator_traits<pixel_iterator>::reference, pixel_type> ());
-      check(std::is_same<typename std::iterator_traits<pixel_iterator>::value_type, pixel_type> ());
+      check(std::is_convertible<typename pixel_iterator::reference, pixel_type> ());
+      check(std::is_same<typename pixel_iterator::value_type, pixel_type> ());
       // "Pixel Iterator's value type is expected to be the image pixel type");
 
-      check(std::is_convertible<typename std::iterator_traits<const_pixel_iterator>::reference, const_pixel_type> ());
-      check(std::is_same<typename std::iterator_traits<const_pixel_iterator>::value_type, const_pixel_type> ());
+      check(std::is_convertible<typename const_pixel_iterator::reference, const_pixel_type> ());
+      check(std::is_same<typename const_pixel_iterator::value_type, const_pixel_type> ());
       // "Pixel Iterator's value type is expected to be the image const pixel type");
 
       check(std::is_same<typename pixel_type::image_type, I> ());

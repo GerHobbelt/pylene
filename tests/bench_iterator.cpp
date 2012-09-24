@@ -1,7 +1,6 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/core/macros.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <algorithm>
 #include <numeric>
@@ -9,7 +8,7 @@
 
 
 using namespace mln;
-
+/*
 double test_viter(const image2d<int>& ima)
 {
   double v = 0;
@@ -39,7 +38,7 @@ double test_piter(const image2d<int>& ima)
   }
   return v;
 }
-
+*/
 
 
 double test_native(const int* ima2, int nrows, int ncols)
@@ -53,7 +52,7 @@ double test_native(const int* ima2, int nrows, int ncols)
   return v;
 }
 
-
+/*
 double test_nbh(image2d<int>& ima)
 {
   typedef image2d<int> I;
@@ -159,16 +158,63 @@ double test_native_nbh(const image2d<int>& ima)
 
   return r2;
 }
+*/
+
+#define foreach(v, rng)				\
+  auto _mln_iter_ = rng.iter();			\
+  for (_mln_iter_.init(); !_mln_iter_.finished(); _mln_iter_.next())	\
+    if (bool _mln_break_ = false) {} else				\
+      for (v = *_mln_iter_; !_mln_break_; _mln_break_ = true)
+
+
+template <typename T>
+void iota(image2d<T>& ima, T v)
+{
+  foreach(auto& x, ima.values())
+    x = v++;
+}
+
+
+void display()
+{
+  const int nrows = 5, ncols = 5;
+  image2d<int> ima(nrows, ncols);
+  iota(ima, 0);
+
+  {
+    std::cout << "Display forward site iterator." << std::endl;
+    foreach(auto p, ima.domain())
+      std::cout << p << ",";
+    std::cout << std::endl;
+  }
+  {
+    std::cout << "Display forward value iterator." << std::endl;
+    foreach(auto x, ima.values())
+      std::cout << x << ",";
+    std::cout << std::endl;
+  }
+  {
+    std::cout << "Display forward pixel iterator." << std::endl;
+    foreach(auto x, ima.pixels())
+      std::cout << "(" << x.point() << ":" << x.val() << "),";
+    std::cout << std::endl;
+  }
+}
 
 
 
 int main()
 {
 
-  const int nrows = 1000, ncols = 10000;
+  const int nrows = 5, ncols = 5;
 
   typedef image2d<int> I;
   image2d<int> ima(nrows, ncols);
+  iota(ima, 0);
+
+  display();
+
+    /*;
   std::iota(std::begin(ima.values()), std::end(ima.values()), 1);
 
   // bench using iterators
@@ -219,14 +265,14 @@ int main()
 
   // bench neighborhood
 
-  /*
+  
   std::cout << "Neighborhood... piter/niter" << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
     r1 = test_nbh_piter(ima);
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
-  */
+  
 
   std::cout << "Neighborhood... v iterators" << std::endl;
   t.restart();
@@ -259,7 +305,7 @@ int main()
   std::cout << r1 << std::endl;
 
   delete [] ima2;
-  
+  */
 }
 
 

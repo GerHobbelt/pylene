@@ -61,6 +61,7 @@ namespace mln {
   template <typename E>
   struct Object
   {
+    typedef E exact_type;
 
   protected:
     Object (const Object&) = default;
@@ -76,6 +77,18 @@ namespace mln {
     Object_ (const Object_&) = default;
     //Object_ (Object_&&) = default;
     Object_ () = default;
+  };
+
+  template <typename E>
+  struct exact_type
+  {
+    typedef typename E::exact_type type;
+  };
+
+  template <typename E>
+  struct exact_type<const E>
+  {
+    typedef const typename E::exact_type type;
   };
 
 

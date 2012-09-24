@@ -2,7 +2,8 @@
 # define MLN_BOX_HH
 
 # include <mln/core/point.hpp>
-# include <mln/core/iterator/fast_reverse_iterator.hpp>
+# include <mln/core/image/internal/nested_loop_iterator.hpp>
+//# include <mln/core/iterator/fast_reverse_iterator.hpp>
 # include <mln/core/domain/box_iter.hpp>
 
 namespace mln
@@ -19,10 +20,17 @@ namespace mln
   {
     typedef point<T, dim>          point_type;
 
-    typedef box_iter<T, dim> iterator;
-    typedef iterator const_iterator;
-    typedef mln::fast_reverse_iterator<iterator> reverse_iterator;
-    typedef reverse_iterator const_reverse_iterator;
+    typedef internal::nested_loop_iterator<
+      internal::domain_point_visitor_forward< point<T, dim> >,
+      internal::no_op_value_visitor,
+      internal::point_structure<T, dim>,
+      internal::deref_return_point_policy> iterator;
+
+    typedef internal::nested_loop_iterator<
+      internal::domain_point_visitor_backward< point<T, dim> >,
+      internal::no_op_value_visitor,
+      internal::point_structure<T, dim>,
+      internal::deref_return_point_policy> reverse_iterator;
 
     bool has(const point_type& p) const
     {
@@ -34,36 +42,19 @@ namespace mln
       return pmax - pmin;
     }
 
-    iterator begin() const
-    {
-      //return iterator(*this, pmin);
-      return iterator( internal::point_structure<T, dim> (pmin),
-                       internal::make_point_visitor(pmin, pmax),
-                       internal::no_op_value_visitor ());
 
+    iterator iter() const
+    {
+      return iterator( internal::point_structure<T, dim> (),
+		       internal::make_point_visitor_forward(pmin, pmax),
+		       internal::no_op_value_visitor ());
     }
 
-    iterator end() const
+    reverse_iterator riter() const
     {
-      internal::point_structure<T, dim> ps(pmin);
-      ps.point_[0] = pmax[0];
-      return iterator( ps, internal::make_point_visitor(pmin, pmax),
-                       internal::no_op_value_visitor ());
-
-      //return iterator(*this, pend );
-    }
-
-    reverse_iterator rbegin() const
-    {
-      //point_type pend = pmax - (short)1;
-      return reverse_iterator(end());
-    }
-
-    reverse_iterator rend() const
-    {
-      //point_type pbeg = pmax - (short)1;
-      //pbeg[0] = pmin[0] - 1;
-      return reverse_iterator(begin());
+      return iterator( internal::point_structure<T, dim> (),
+		       internal::make_point_visitor_backward(pmin, pmax),
+		       internal::no_op_value_visitor ());
     }
 
 

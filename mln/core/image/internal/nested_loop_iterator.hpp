@@ -175,7 +175,7 @@ namespace mln
       origin_point_visitor_forward() : pmax_ () {}
       origin_point_visitor_forward(const P& pmax) : pmax_ (pmax) {}
 
-      void initialize(P& point) const { point = (P){0,}; }
+      void initialize(P& point) const { point = (P){{0,}}; }
       template <size_t n> void  init(P& point) const { point[n] = 0; }
       template <size_t n> void  next(P& point) const  { ++point[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }

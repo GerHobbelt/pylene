@@ -90,6 +90,20 @@ namespace mln
   };
 
   template <typename Image>
+  struct image_pointer
+  {
+    typedef typename std::conditional<std::is_const<Image>::value,
+                                      typename Image::const_pointer,
+                                      typename Image::pointer>::type type;
+  };
+
+  template <typename Image>
+  struct image_const_pointer
+  {
+    typedef typename Image::const_reference type;
+  };
+
+  template <typename Image>
   struct image_value_range
   {
     typedef typename std::conditional<std::is_const<Image>::value,

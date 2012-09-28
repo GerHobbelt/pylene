@@ -12,7 +12,7 @@ namespace mln {
   template <typename Derived, typename SiteSet>
   struct neighborhood_base
   {
-    typedef typename boost::range_value<SiteSet>::type point_type;
+    typedef typename SiteSet::value_type point_type;
 
 
     template <typename Pixel>

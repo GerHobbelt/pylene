@@ -6,25 +6,32 @@
 #include <numeric>
 #include <boost/timer.hpp>
 
+#define foreach(v, rng)				\
+  auto _mln_iter_ = rng.iter();			\
+  for (_mln_iter_.init(); !_mln_iter_.finished(); _mln_iter_.next())	\
+    if (bool _mln_break_ = false) {} else				\
+      for (v = *_mln_iter_; !_mln_break_; _mln_break_ = true)
+
+#define forall(p)				\
+  for (p.init(); !p.finished(); p.next())
+
 
 using namespace mln;
-/*
+
+
 double test_viter(const image2d<int>& ima)
 {
   double v = 0;
-  auto tmp = ima.values();
-  for(auto x: tmp) {
+  foreach(auto& x, ima.values()) {
     v += x;
   }
-
   return v;
 }
 
 double test_pixter(const image2d<int>& ima)
 {
   double v = 0;
-  auto tmp = ima.pixels();
-  for(auto x: tmp)
+  foreach(auto& x, ima.pixels())
     v += x.val();
 
   return v;
@@ -33,104 +40,59 @@ double test_pixter(const image2d<int>& ima)
 double test_piter(const image2d<int>& ima)
 {
   double v = 0;
-  for(auto p: ima.domain()) {
+  foreach(auto p, ima.domain()) {
     v += ima(p);
   }
   return v;
 }
-*/
+
 
 
 double test_native(const int* ima2, int nrows, int ncols)
 {
-  static int u = 0;
   double v = 0;
   int end = nrows * ncols;
   for (int i = 0; i < end; ++i)
     v += ima2[i];
-  u++;
+
   return v;
 }
 
-/*
-double test_nbh(image2d<int>& ima)
+
+double test_nbh_pixter(const image2d<int>& ima)
 {
   typedef image2d<int> I;
 
   double u = 0;
-  for (auto pix: ima.pixels())
-    {
-      auto tmp = c8(pix);
-      for (auto n: tmp)
-        u += n.val();
-    }
+  image2d<int>::const_pixel_range::iterator px = ima.pixels().iter();
+  auto nx = c8(*px).iter();
+
+  std::cout << "fuck" << std::endl;
+  forall(px)
+    forall(nx)
+  {
+      u += nx->val();
+  }
 
   return u;
 }
 
-double test_nbh_pix(const image2d<int>& ima)
+double test_nbh_piter(const image2d<int>& ima)
 {
-  typedef const image2d<int> I;
+  typedef image2d<int> I;
 
   double u = 0;
-  //c8_t::nbh<I>::type sliding(ima, c8_t::dpoints);
+  auto p = ima.domain().iter();
+  auto n = c8(*p).iter();
 
-  for (auto pix: ima.pixels())
-    {
-      auto tmp = c8(pix);
-      for (auto n: tmp)
-        u += n.val();
-    }
-
-  return u;
-}
-
-// double test_nbh_piter(const image2d<int>& ima)
-// {
-//   double v = 0;
-
-//   for(auto p: ima.domain())
-//     for (auto n: c8(p))
-//       v += ima(n);
-
-//   return v;
-// }
-
-
-
-double test_nbh_wo_object_creation(const image2d<int>& ima)
-{
-  typedef const image2d<int> I;
-
-  double u = 0;
-
-  image2d<int>::const_pixel_type pix;
-  c8_t::nbh<I::const_pixel_type> sliding(c8_t::dpoints, pix);
-
-  for (auto pix_ : ima.pixels())
-    {
-      pix = pix_;
-      for (auto& n: sliding)
-        u += n.val();
-    }
-
+  forall(p)
+    forall(n)
+    if (ima.domain().has(*n))
+	u += ima(*n);
 
   return u;
 }
 
-
-double test_cstor(const image2d<int>& ima)
-{
-  image2d<int>::const_pixel_type pix = ima.pix_at(point2d{0,0});
-
-  double u = 0;
-
-  auto tmp = c8(pix);
-  for (auto n: tmp)
-    u += n.val();
-
-  return u;
-}
 
 
 
@@ -158,13 +120,6 @@ double test_native_nbh(const image2d<int>& ima)
 
   return r2;
 }
-*/
-
-#define foreach(v, rng)				\
-  auto _mln_iter_ = rng.iter();			\
-  for (_mln_iter_.init(); !_mln_iter_.finished(); _mln_iter_.next())	\
-    if (bool _mln_break_ = false) {} else				\
-      for (v = *_mln_iter_; !_mln_break_; _mln_break_ = true)
 
 
 template <typename T>
@@ -202,7 +157,6 @@ void display()
 }
 
 
-
 int main()
 {
 
@@ -214,10 +168,9 @@ int main()
 
   display();
 
-    /*;
-  std::iota(std::begin(ima.values()), std::end(ima.values()), 1);
 
-  // bench using iterators
+  //std::iota(std::begin(ima.values()), std::end(ima.values()), 1);
+
   static const int ntest = 10;
 
   boost::timer t;
@@ -265,34 +218,19 @@ int main()
 
   // bench neighborhood
 
-  
+
   std::cout << "Neighborhood... piter/niter" << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
     r1 = test_nbh_piter(ima);
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
-  
 
-  std::cout << "Neighborhood... v iterators" << std::endl;
+
+  std::cout << "Neighborhood... pixter iterators" << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
-    r1 = test_nbh(ima);
-  std::cout << "Elapsed: " << t.elapsed() << std::endl;
-  std::cout << r1 << std::endl;
-
-
-  std::cout << "Neighborhood...w pixels" << std::endl;
-  t.restart();
-  for (int i = 0; i < ntest; ++i)
-    r1 = test_nbh_pix(ima);
-  std::cout << "Elapsed: " << t.elapsed() << std::endl;
-  std::cout << r1 << std::endl;
-
-  std::cout << "Neighborhood WO object creation..." << std::endl;
-  t.restart();
-  for (int i = 0; i < ntest; ++i)
-    r1 = test_nbh_wo_object_creation(ima);
+    r1 = test_nbh_pixter(ima);
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
 
@@ -305,7 +243,6 @@ int main()
   std::cout << r1 << std::endl;
 
   delete [] ima2;
-  */
 }
 
 

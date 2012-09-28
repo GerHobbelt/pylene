@@ -5,6 +5,8 @@
 # include <mln/core/iterator/pixel_iterator.hpp>
 # include <mln/core/domain/dtranslate.hpp>
 # include <mln/core/wrt_offset.hpp>
+# include <mln/core/range/adaptor/transformed.hpp>
+# include <mln/core/std/array.hpp>
 
 namespace mln
 {
@@ -47,82 +49,131 @@ namespace mln
 
     /// \brief Fast case if offset
     template <typename Pixel, typename Point, size_t N>
-    struct neighborhood_pixel_range_base<Pixel, std::array<Point, N>, raw_image_tag>;
+    struct neighborhood_pixel_range_base<Pixel, mln::array<Point, N>, raw_image_tag>;
 
 
     template <typename Pixel, typename SiteSet, typename image_tag>
-    struct neighborhood_pixel_range_base
+    struct neighborhood_pixel_iterator;
+
+
+    template <typename P, typename V, typename I>
+    struct neighborhood_pixel
+    {
+      typedef P point_type;
+      typedef P site_type;
+      typedef V value_type;
+      typedef V& reference;
+      typedef I image_type;
+
+      neighborhood_pixel() = default;
+      neighborhood_pixel(const neighborhood_pixel&) = default;
+
+      // Non-const -> const conversion
+      template <typename U, typename J>
+      neighborhood_pixel(const neighborhood_pixel<P, U, J>& x,
+			 typename std::enable_if< std::is_convertible<U*, V*>::value >::type* dummy = NULL)
+	: v_ (x.v_), p_ (x.p_), image_ (x.image_)
+      {
+      }
+
+
+      V& val() const { return *v_; }
+      const P& point() const { return p_; }
+      const P& site() const { return p_; }
+      image_type& image() const { return *image_; }
+
+    private:
+      template <typename, typename, typename>
+      friend struct neighborhood_pixel_iterator;
+
+      V* v_;
+      P  p_;
+      I* image_;
+    };
+
+
+    template  <typename Pixel, typename Point, size_t N>
+    struct neighborhood_pixel_iterator<Pixel, mln::array<Point, N>, raw_image_tag>
+      : iterator_base< neighborhood_pixel_iterator<Pixel, mln::array<Point, N>, raw_image_tag>,
+		       const neighborhood_pixel<typename Pixel::point_type,
+						typename Pixel::value_type,
+						typename Pixel::image_type> >
     {
     private:
-      typedef typename Pixel::image_type image_t;
-      typedef typename Pixel::point_type point_t;
-      typedef translated_domain<SiteSet> domain_t;
-      //typedef typename restricted_img_pixter<image_t, domain_t> iterator;
+      typedef typename Pixel::image_type I;
+      typedef typename I::difference_type difference_type;
+      typedef typename Pixel::value_type V;
 
     public:
-      neighborhood_pixel_range_base(const SiteSet& s, const Pixel& pix);
-      //iterator begin() const;
-      //iterator end() const;
+      neighborhood_pixel_iterator() = default;
+
+      neighborhood_pixel_iterator(const mln::array<Point, N>& domain, const Pixel& pix)
+	: bind_ (&pix), domain_(domain)
+      {
+	wrt_offset(pix.image(), domain_, offset_);
+      }
+
+      void init() {
+	i_ = 0;
+	p_ = bind_->point();
+	ptr_ = (char*)(& bind_->val());
+	mypix_.p_ = p_ + domain_[i_];
+	mypix_.v_ = (V*)(ptr_ + offset_[i_]);
+      }
+
+      void next() {
+	++i_;
+	mypix_.p_ = p_ + domain_[i_];
+	mypix_.v_ = (V*)(ptr_ + offset_[i_]);
+      }
+
+      bool finished() const {
+	return i_ == N;
+      }
+
+      const neighborhood_pixel<typename Pixel::point_type, typename Pixel::value_type, I>&
+      dereference() const {
+	return mypix_;
+      }
 
     private:
-      image_t&  image_;
-      domain_t domain_;
+      const Pixel* bind_;
+      mln::array<Point, N> domain_;
+      mln::array<difference_type, N> offset_;
+      neighborhood_pixel<typename Pixel::point_type, typename Pixel::value_type, I> mypix_;
+
+      int i_;
+      char* ptr_;
+      Point p_;
     };
+
+
 
     template <typename Pixel, typename Point, size_t N>
-    struct neighborhood_pixel_range_base<Pixel, std::array<Point, N>, raw_image_tag>
+    struct neighborhood_pixel_range_base<Pixel, mln::array<Point, N>, raw_image_tag>
     {
-    private:
-      typedef typename Pixel::image_type image_t;
-      typedef typename Pixel::point_type point_t;
-      typedef translated_domain< std::array<Point, N> > domain_t;
-      typedef typename domain_t::iterator piter;
-      typedef sliding_image_value_iterator<image_t, std::array<Point, N> > value_iterator;
-      typedef mln::pixel_iterator<piter, value_iterator, image_t> pixel_iterator;
-
 
     public:
-      typedef pixel_iterator iterator;
+      typedef neighborhood_pixel_iterator<Pixel, mln::array<Point, N>, raw_image_tag> iterator;
+      typedef iterator const_iterator;
 
-      neighborhood_pixel_range_base(const std::array<Point, N>& s, const Pixel& pix)
-        : pix_ (pix),
-          domain_ (dtranslate(s, pix.point()))
+      neighborhood_pixel_range_base(const mln::array<Point, N>& s, const Pixel& pix)
+        : pix_ (pix), arr_(s)
+
       {
-        wrt_offset(pix.image(), s, offsets_.begin());
       }
 
-      iterator begin() const
+      iterator iter() const
       {
-        return iterator(std::begin(domain_),
-                              value_iterator(&pix_.val(), offsets_, 0),
-                              pix_.image());
+        return iterator(arr_, pix_);
       }
-
-
-      iterator end() const
-      {
-        return iterator(std::end(domain_),
-                              value_iterator(&pix_.val(), offsets_, N),
-                              pix_.image());
-      }
-
-      // void center(const Pixel& p)
-      // {
-      //   mln_precondition(&p.image() == &pix_.image());
-      //   pix_ = p;
-      // }
 
     private:
-      const Pixel& pix_;
-      domain_t  domain_;
-      std::array<typename image_t::difference_type, N> offsets_;
+      const Pixel&	pix_;
+      const mln::array<Point, N>& arr_;
     };
 
-
-
-
   }
-
 
 } // end of namespace mln
 

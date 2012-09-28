@@ -3,6 +3,8 @@
 
 # include <mln/core/pixel.hpp>
 # include <boost/iterator/iterator_facade.hpp>
+# include <mln/core/std/array.hpp>
+# include <mln/core/image_traits.hpp>
 
 namespace mln {
 
@@ -15,61 +17,38 @@ namespace mln {
   /****          Implementation          ****/
   /******************************************/
 
-
-
   template <typename Image, size_t N>
-  struct sliding_image_value_iterator<Image, std::array<typename Image::point_type, N>, raw_image_tag>
-    :  boost::iterator_facade< sliding_image_value_iterator<Image,
-                                                            std::array<typename Image::point_type, N>,
-                                                            raw_image_tag>, // Exact
-                               typename std::conditional<std::is_const<Image>::value,
-                                                         typename std::add_const<typename Image::value_type>::type,
-                                                         typename Image::value_type>::type, // Value type
-                               boost::bidirectional_traversal_tag >
+  struct sliding_image_value_iterator<Image, mln::array<typename Image::point_type, N>, raw_image_tag>
+    : iterator_base< sliding_image_value_iterator<Image, mln::array<typename Image::point_type, N>, raw_image_tag>,
+		     typename Image::value_type,
+		     typename image_reference<Image>::type>
   {
   private:
-    typedef typename std::conditional<std::is_const<Image>::value,
-                                      typename std::add_const<typename Image::value_type>::type,
-                                      typename Image::value_type>::type V;
+    typedef std::array<typename Image::difference_type, N> offset_t;
+    typedef typename image_pointer<Image>::type		ptr_t;
 
   public:
-  typedef typename Image::point_type P;
-  typedef typename Image::difference_type difference_type;
+    typedef typename image_reference<Image>::type	reference;
 
-
-  public:
-
-    sliding_image_value_iterator() {};
-    //    sliding_image_value_iterator(V* ptr, const std::array<difference_type, N>& offsets, int i)
-
-    sliding_image_value_iterator(V* ptr, const std::array<difference_type, N>& offsets, int i)
-      : offsets_ (&offsets), ptr_ ((char*)ptr),  i_ (i)
+    sliding_image_value_iterator()
     {
     }
 
+    sliding_image_value_iterator(ptr_t ptr, const offset_t& offsets)
+      : offsets_ (offsets), ptr_ ((char*)ptr)
+    {
+    }
+
+
+    void init() { i_ = 0; }
+    void next() { ++i_; }
+    bool finished() const { return i_ == N; }
+    reference dereference() const { return *(ptr_t)(ptr_ + offsets_[i_]); }
 
   private:
-    typedef sliding_image_value_iterator<Image, std::array<P, N>, raw_image_tag> this_t;
-    friend class boost::iterator_core_access;
-
-    V& dereference() const { return *(V*)(ptr_ + (*offsets_)[i_]); }
-    void increment() { ++i_; }
-    void decrement() { --i_; }
-
-
-    template <typename I2>
-    typename std::enable_if<std::is_same<typename std::remove_cv<I2>::type,
-                                         typename std::remove_cv<Image>::type>::value, bool>::type
-    equal(const sliding_image_value_iterator<I2, std::array<P, N>, raw_image_tag>& other) const
-    {
-      return i_ == other.i_;
-    }
-
-    //const std::shared_ptr< std::array<difference_type, N> > offsets_;
-
-    const std::array<difference_type, N>*       offsets_;
-    char*                                       ptr_;
-    int                                         i_;
+    offset_t offsets_;
+    char*    ptr_;
+    int      i_;
   };
 
 }

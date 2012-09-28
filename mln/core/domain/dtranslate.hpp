@@ -18,13 +18,12 @@ namespace mln {
 
 
   template <typename Domain>
-  using translated_domain = adaptors::transformed_range<typename internal::translate_fun<Domain>::type, const Domain >;
-
+  using translated_domain = adaptors::transformed_range<const Domain&, typename internal::translate_fun<Domain>::type>;
 
   template <typename Domain>
   inline
   translated_domain<Domain>
-  dtranslate(const Domain& domain, typename boost::range_value<Domain>::type p)
+  dtranslate(const Domain& domain, typename Domain::value_type p)
   {
     typedef typename Domain::value_type P;
     return adaptors::transform(domain, std::bind1st(std::plus<P> (), p));

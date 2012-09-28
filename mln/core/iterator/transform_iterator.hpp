@@ -2,6 +2,7 @@
 # define MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
 
 # include <mln/core/iterator/iterator_base.hpp>
+# include <type_traits>
 
 namespace mln
 {
@@ -14,7 +15,7 @@ namespace mln
     struct transform_iterator_helper
     {
       typedef typename std::conditional<std::is_same<Reference, use_default>::value,
-                                        typename std::result_of< UnaryFunction(Iterator::reference) >::type,
+                                        typename std::result_of< UnaryFunction(typename Iterator::reference) >::type,
                                         Reference>::type reference;
 
       typedef typename std::conditional<std::is_same<Value, use_default>::value,
@@ -28,13 +29,13 @@ namespace mln
             typename Reference = use_default,
             typename Value = use_default>
   struct transform_iterator :
-    iterator_base< transform_iterator<Iterator, Function>,
+    iterator_base< transform_iterator<Iterator, UnaryFunction>,
                    typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::value_type,
                    typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference >
   {
     typedef typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference reference;
 
-    transform_iterator(const Iterator& it, const Function& f)
+    transform_iterator(const Iterator& it, const UnaryFunction& f)
       : it_ (it), f_ (f)
     {
     }
@@ -46,7 +47,7 @@ namespace mln
 
   private:
     Iterator it_;
-    Function f_;
+    UnaryFunction f_;
   };
 
 

@@ -3,16 +3,17 @@
 
 # include <mln/core/iterator/iterator_base.hpp>
 # include <type_traits>
+# include <iterator>
 
 namespace mln
 {
 
   template <typename Iterator>
   struct stditerator : iterator_base< stditerator<Iterator>,
-				      std::iterator_traits<Iterator>::reference,
-				      std::iterator_traits<Iterator>::value_type>
+				      typename std::iterator_traits<Iterator>::reference,
+				      typename std::iterator_traits<Iterator>::value_type >
   {
-    typedef std::iterator_traits<Iterator>::reference reference;
+    typedef typename std::iterator_traits<Iterator>::reference reference;
 
     stditerator()
     {
@@ -40,9 +41,9 @@ namespace mln
       ++cur_;
     }
 
-    bool finished()
+    bool finished() const
     {
-      cur_ == end_;
+      return cur_ == end_;
     }
 
     reference dereference() const

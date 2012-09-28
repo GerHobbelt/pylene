@@ -24,19 +24,18 @@ namespace mln
 
 
     template <typename T>
-    inline
-    T* make_pointer(T& x)
+    struct make_pointer
     {
-      return boost::addressof(x);
-    }
+      typedef pointer_wrapper<T> type;
+      static pointer_wrapper<T> foo(T x) { return pointer_wrapper<T> (x); }
+    };
 
-    template <typename Reference>
-    inline
-    pointer_wrapper<Reference>
-    make_pointer(Reference x)
+    template <typename T>
+    struct make_pointer<T&>
     {
-      return pointer_wrapper<Reference> (x);
-    }
+      typedef T* type;
+      static T* foo(T& x) { return boost::addressof (x); }
+    };
 
   };
 
@@ -68,7 +67,7 @@ namespace mln
     pointer
     operator-> () const
     {
-      return internal::make_pointer(this->derived()->dereference());
+      return internal::make_pointer<reference>::foo(this->derived()->dereference());
     }
 
   private:

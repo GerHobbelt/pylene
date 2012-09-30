@@ -10,8 +10,9 @@ namespace mln
   struct iterator_range
   {
     typedef I iterator;
+    typedef I const_iterator;
 
-    iterator_range(const iterator& x)
+    explicit iterator_range(const iterator& x)
       : iter_ (x)
     {
     }
@@ -25,14 +26,23 @@ namespace mln
     I iter_;
   };
 
+  template <typename Iterator_>
+  iterator_range<Iterator_>
+  make_iterator_range(const Iterator_& it)
+  {
+    return iterator_range<Iterator_>(it);
+  }
+
 
   template <typename Iterator1, typename Iterator2>
   struct bidirectional_iterator_range
   {
     typedef Iterator1 iterator;
+    typedef Iterator1 const_iterator;
     typedef Iterator2 reverse_iterator;
+    typedef Iterator2 const_reverse_iterator;
 
-    iterator_range(const iterator& x, const reverse_iterator& y)
+    bidirectional_iterator_range(const iterator& x, const reverse_iterator& y)
       : iter_ (x), riter_(y)
     {
     }
@@ -52,7 +62,7 @@ namespace mln
   private:
     iterator iter_;
     reverse_iterator riter_;
-  }
+  };
 
 
 } // end of namespace mln

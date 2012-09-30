@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_WRT_OFFSET_HPP
 # define MLN_CORE_WRT_OFFSET_HPP
 
-# include <boost/range.hpp>
+//# include <mln/core/range.hpp>
 
 namespace mln {
 
@@ -10,7 +10,7 @@ namespace mln {
   void wrt_offset(const Image& ima, const SiteSet& dpoints, OutputIterator out)
   {
     const size_t* strides = ima.strides();
-    typedef typename range_const_iterator<SiteSet>::type Iterator;
+    typedef typename SiteSet::const_iterator Iterator;
     auto it = dpoints.iter();
     for (it.init(); !it.finished(); it.next(), ++out)
       {

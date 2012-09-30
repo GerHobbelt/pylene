@@ -6,9 +6,9 @@
 namespace mln
 {
 
-  template <typename E>
+  template <typename I>
   struct Iterator
-    : boost::Assignable<E>, boost::DefaultConstructible<E>
+    : boost::Assignable<I>, boost::DefaultConstructible<I>
   {
 
     BOOST_CONCEPT_USAGE(Iterator)
@@ -25,8 +25,7 @@ namespace mln
       (void) method2;
       void (I::*method3) () const = &I::finished;
       (void) method3;
-
-      E (I::*method4) () const = &I::iter;
+      I (I::*method4) () const = &I::iter;
       (void) method4;
     }
   };

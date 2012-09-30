@@ -67,12 +67,10 @@ double test_nbh_pixter(const image2d<int>& ima)
   image2d<int>::const_pixel_range::iterator px = ima.pixels().iter();
   auto nx = c8(*px).iter();
 
-  std::cout << "fuck" << std::endl;
+
   forall(px)
     forall(nx)
-  {
       u += nx->val();
-  }
 
   return u;
 }
@@ -156,18 +154,49 @@ void display()
   }
 }
 
+void display_nbh()
+{
+  const int nrows = 5, ncols = 5;
+  image2d<int> ima(nrows, ncols);
+  iota(ima, 0);
+
+  {
+    std::cout << "Display forward site iterator." << std::endl;
+    auto p = ima.domain().iter();
+    auto n = c8(*p).iter();
+    forall(p)
+    {
+      std::cout << *p << ": ";
+      forall(n) std::cout << *n << ",";
+      std::cout << std::endl;
+    }
+  }
+
+  {
+    std::cout << "Display forward pixel iterator." << std::endl;
+    auto px = ima.pixels().iter();
+    auto nx = c8(*px).iter();
+    forall(px)
+    {
+      std::cout << "{" << px->point() << "," << px->val() << "}: ";
+      forall(nx) std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
+      std::cout << std::endl;
+    }
+  }
+}
+
 
 int main()
 {
 
-  const int nrows = 5, ncols = 5;
+  const int nrows = 1000, ncols = 10000;
 
   typedef image2d<int> I;
   image2d<int> ima(nrows, ncols);
   iota(ima, 0);
 
   display();
-
+  display_nbh();
 
   //std::iota(std::begin(ima.values()), std::end(ima.values()), 1);
 

@@ -70,6 +70,10 @@ namespace mln
       return internal::make_pointer<reference>::foo(this->derived()->dereference());
     }
 
+    void set_dejavu_(bool)
+    {
+    }
+
   private:
     const Derived* derived() const
     {

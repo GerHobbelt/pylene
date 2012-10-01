@@ -7,14 +7,16 @@
 #include <boost/timer.hpp>
 
 #define foreach(v, rng)				\
-  auto _mln_iter_ = rng.iter();			\
-  for (_mln_iter_.init(); !_mln_iter_.finished(); _mln_iter_.next())	\
-    if (bool _mln_break_ = false) {} else				\
-      for (v = *_mln_iter_; !_mln_break_; _mln_break_ = true)
+  auto _mln_iter_ = rng.iter();						\
+   for (_mln_iter_.init(); !_mln_iter_.finished(); _mln_iter_.next())	\
+     if (bool _mln_break_ = false) {} else				\
+       for (v = *_mln_iter_; !_mln_break_; _mln_break_ = true)
 
-#define forall(p)				\
-  for (p.init(); !p.finished(); p.next())
+/*
 
+// #define mln_forall(p)				\
+//   for (p.init(); !p.finished(); p.next())
+*/
 
 using namespace mln;
 
@@ -68,8 +70,8 @@ double test_nbh_pixter(const image2d<int>& ima)
   auto nx = c8(*px).iter();
 
 
-  forall(px)
-    forall(nx)
+  mln_forall(px)
+    mln_forall(nx)
       u += nx->val();
 
   return u;
@@ -83,8 +85,8 @@ double test_nbh_piter(const image2d<int>& ima)
   auto p = ima.domain().iter();
   auto n = c8(*p).iter();
 
-  forall(p)
-    forall(n)
+  mln_forall(p)
+    mln_forall(n)
     if (ima.domain().has(*n))
 	u += ima(*n);
 
@@ -142,8 +144,9 @@ void display()
   }
   {
     std::cout << "Display forward value iterator." << std::endl;
-    foreach(auto x, ima.values())
-      std::cout << x << ",";
+    mln_viter(x, ima);
+    mln_forall(x)
+      std::cout << *x << ",";
     std::cout << std::endl;
   }
   {
@@ -164,10 +167,10 @@ void display_nbh()
     std::cout << "Display forward site iterator." << std::endl;
     auto p = ima.domain().iter();
     auto n = c8(*p).iter();
-    forall(p)
+    mln_forall(p)
     {
       std::cout << *p << ": ";
-      forall(n) std::cout << *n << ",";
+      mln_forall(n) std::cout << *n << ",";
       std::cout << std::endl;
     }
   }
@@ -176,10 +179,10 @@ void display_nbh()
     std::cout << "Display forward pixel iterator." << std::endl;
     auto px = ima.pixels().iter();
     auto nx = c8(*px).iter();
-    forall(px)
+    mln_forall(px)
     {
       std::cout << "{" << px->point() << "," << px->val() << "}: ";
-      forall(nx) std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
+      mln_forall(nx) std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
       std::cout << std::endl;
     }
   }

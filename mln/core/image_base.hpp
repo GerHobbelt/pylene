@@ -57,6 +57,8 @@ namespace mln
 
 } // end of namespace mln
 
+
+# include <mln/core/forall.hpp>
 //# include <mln/core/image/image_expr.hpp>
 //# include <mln/core/image/image_ops.hpp>
 

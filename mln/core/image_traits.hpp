@@ -44,7 +44,7 @@ namespace mln
 
   struct image_meta_accessibility {
     template <typename Image>
-    struct apply { typedef typename image_traits< typename std::decay<Image>::type >::accessible type; };
+    struct apply { typedef typename image_traits<Image>::accessible type; };
   };
 
   template <typename Image>
@@ -52,27 +52,27 @@ namespace mln
 
   struct image_meta_category {
     template <typename Image>
-    struct apply { typedef typename image_traits< typename std::decay<Image>::type >::category type; };
+    struct apply { typedef typename image_traits<Image>::category type; };
   };
 
   template <typename Image>
   struct image_value
   {
-    typedef typename std::remove_const<Image>::type::value_type type;
+    typedef typename Image::value_type type;
   };
 
   template <typename Image>
   struct image_pixel
   {
     typedef typename std::conditional<std::is_const<Image>::value,
-                                      typename std::remove_const<Image>::type::const_pixel_type,
+                                      typename Image::const_pixel_type,
                                       typename Image::pixel_type>::type type;
   };
 
   template <typename Image>
   struct image_const_pixel
   {
-    typedef typename std::remove_const<Image>::type::const_pixel_type type;
+    typedef typename Image::const_pixel_type type;
   };
 
   template <typename Image>
@@ -134,113 +134,51 @@ namespace mln
   template <typename Image>
   struct image_value_iterator
   {
-    typedef typename boost::range_iterator<typename image_value_range<Image>::type>::type type;
+    typedef typename image_value_range<Image>::type::iterator type;
   };
 
   template <typename Image>
   struct image_pixel_iterator
   {
-    typedef typename boost::range_iterator<typename image_pixel_range<Image>::type>::type type;
+    typedef typename image_pixel_range<Image>::type::iterator type;
   };
 
   template <typename Image>
   struct image_const_value_iterator
   {
-    typedef typename boost::range_iterator<typename image_const_value_range<Image>::type>::type type;
+    typedef typename image_const_value_range<Image>::type::iterator type;
   };
 
   template <typename Image>
   struct image_const_pixel_iterator
   {
-    typedef typename boost::range_iterator<typename image_const_pixel_range<Image>::type>::type type;
+    typedef typename image_const_pixel_range<Image>::type::iterator type;
   };
 
 
-  struct image_meta_value {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::value_type type; };
+# define MLN_GENERATE_META_IMAGE_OPERATORS(meta_op, op)			\
+  struct meta_op							\
+  {									\
+    template <typename Image>						\
+      struct apply { typedef typename op< typename std::remove_reference<Image>::type >::type type; }; \
   };
 
-  struct image_meta_pixel {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::pixel_type type; };
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_value, image_value)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_reference, image_reference)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_reference, image_const_reference)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_pixel, image_pixel)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_pixel, image_const_pixel)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_pointer, image_pointer)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_pointer, image_const_pointer)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_value_range, image_value_range)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_value_range, image_const_value_range)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_pixel_range, image_pixel_range)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_pixel_range, image_const_pixel_range)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_value_iterator, image_value_iterator)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_value_iterator, image_const_value_iterator)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_pixel_iterator, image_pixel_iterator)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_pixel_iterator, image_const_pixel_iterator)
 
-    template <typename Image>
-    struct apply<const Image&> { typedef typename std::decay<Image>::type::const_pixel_type type; };
-  };
-
-  struct image_meta_const_pixel {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::const_pixel_type type; };
-  };
-
-  struct image_meta_reference {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::reference type; };
-
-    template <typename Image>
-    struct apply<const Image&> { typedef typename std::decay<Image>::type::const_reference type; };
-  };
-
-  struct image_meta_const_reference {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::const_reference type; };
-  };
-
-  struct image_meta_pointer {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::pointer type; };
-
-    template <typename Image>
-    struct apply<const Image&> { typedef typename std::decay<Image>::type::const_pointer type; };
-  };
-
-  struct image_meta_const_pointer {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::const_pointer type; };
-  };
-
-
-  struct image_meta_value_iterator {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::value_iterator type; };
-
-    template <typename Image>
-    struct apply<const Image&> { typedef typename std::decay<Image>::type::const_value_iterator type; };
-  };
-
-  struct image_meta_const_value_iterator {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::const_value_iterator type; };
-  };
-
-  struct image_meta_value_range {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::value_range type; };
-
-    template <typename Image>
-    struct apply<const Image&> { typedef typename std::decay<Image>::type::const_value_range type; };
-  };
-
-  struct image_meta_const_value_range {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::const_value_range type; };
-  };
-
-  struct image_meta_pixel_iterator {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::pixel_iterator type; };
-
-    template <typename Image>
-    struct apply<const Image&> { typedef typename std::decay<Image>::type::const_pixel_iterator type; };
-  };
-
-  struct image_meta_const_pixel_iterator {
-    template <typename Image>
-    struct apply { typedef typename std::decay<Image>::type::const_pixel_iterator type; };
-  };
-
-  /// \}
 }
 
 

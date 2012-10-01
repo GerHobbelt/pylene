@@ -2,6 +2,7 @@
 # define MLN_CORE_FORALL_HPP
 
 # include <mln/core/image/zip_image.hpp>
+# include <mln/core/iterator/unzip_proxy_iterator.hpp>
 
 # include <boost/preprocessor/comparison/equal.hpp>
 # include <boost/preprocessor/control/iif.hpp>
@@ -12,9 +13,12 @@
 # include <boost/preprocessor/variadic/to_seq.hpp>
 //# include <boost/preprocessor/variadic/elem.hpp>
 # include <boost/preprocessor/variadic/size.hpp>
+# include <boost/preprocessor/cat.hpp>
 # include <boost/preprocessor/seq/rest_n.hpp>
 # include <boost/preprocessor/seq/enum.hpp>
 # include <boost/preprocessor/seq/elem.hpp>
+# include <boost/preprocessor/seq/push_front.hpp>
+# include <boost/preprocessor/seq/seq.hpp>
 
 
 namespace mln
@@ -40,7 +44,6 @@ namespace mln
   if (mln::internal::false_var_t< decltype(VALUE) > ID = {VALUE}) {} else
 
 
-
 # define MLN_DECLARE(z, n, var)						\
   if (bool _mln_continue_##n = false) {} else				\
     for (BOOST_PP_SEQ_ELEM(n, var) = boost::get<n>(*_mln_for_cur_.get()); !_mln_continue_##n; _mln_continue_##n = true)
@@ -52,7 +55,7 @@ namespace mln
 
 
 
-
+/*
 # define forall_v_(ARGC, ARGV)						\
   static_assert( ARGC > 0 and ARGC % 2 == 0,				\
 		 "Number of arguments of the forall macros should be odd"); \
@@ -101,6 +104,42 @@ namespace mln
 			   BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
 
 
+
+# define mln_pixter(ID, IMAGE)						\
+  mln::internal::pix_range_iterator_proxy<decltype(IMAGE.pixels())> ID(IMAGE.pixels());
+
+# define mln_nixter(ID, PIXRANGE)						\
+  mln::internal::pix_range_iterator_proxy<decltype(PIXRANGE)> ID(PIXRANGE);
+*/
+
+// ARGV contains variables identifiers + id of iterator at end
+# define __mln_viter_decl__(z, N, ARGV)					\
+  auto BOOST_PP_SEQ_ELEM(N, BOOST_PP_SEQ_TAIL(ARGV)) =			\
+    mln::make_unzip_proxy_iterator<N, decltype(BOOST_PP_SEQ_HEAD(ARGV))> \
+				   (BOOST_PP_SEQ_HEAD(ARGV));
+
+
+# define __mln_viter__(ARGC, ARGV, ID_IMA, ID_ITER)					\
+  auto ID_IMA = imzip(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_REST_N(BOOST_PP_DIV(ARGC, 2), ARGV))); \
+  auto ID_ITER = mln::make_proxy_iterator(ID_IMA.values().iter());	\
+  BOOST_PP_REPEAT(BOOST_PP_DIV(ARGC, 2), __mln_viter_decl__,		\
+		  BOOST_PP_SEQ_PUSH_FRONT(ARGV, ID_ITER));
+
+# define __mln_viter_chap__(ARGC, ARGV)					\
+  static_assert(ARGC > 0 and ARGC % 2 == 0,				\
+		"Number of arguments of the forall macros should be odd"); \
+  __mln_viter__(ARGC, ARGV,						\
+		BOOST_PP_CAT(__mln_zip_ima__,BOOST_PP_SEQ_HEAD(ARGV)),	\
+		BOOST_PP_CAT(__mln_zip_iter__,BOOST_PP_SEQ_HEAD(ARGV)))
+
+# define mln_viter(...)					\
+  __mln_viter_chap__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),	\
+		     BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+
+
+
+
+
 # define MLN_FORALL_INIT(z, n, args)		\
   BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).init()
 
@@ -110,21 +149,18 @@ namespace mln
 # define MLN_FORALL_UNSET_DEJAVU(z, n, args)	\
   BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).set_dejavu_(false)
 
-# define forall_(ARGC, ARGV)						\
-  for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_INIT, ARGV);			\
-       BOOST_PP_SEQ_ELEM(0, ARGV).is_valid();				\
+# define __mln_forall__(ARGC, ARGV)						\
+  for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_INIT, ARGV),			\
+	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV);		\
+       !BOOST_PP_SEQ_ELEM(0, ARGV).finished();				\
        BOOST_PP_REPEAT(ARGC, MLN_FORALL_NEXT, ARGV),			\
 	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))
 
-# define forall(...)				\
-  forall_(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),	\
-	  BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+# define mln_forall(...)				\
+  __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),	\
+		 BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
-# define mln_pixter(ID, IMAGE)						\
-  mln::internal::pix_range_iterator_proxy<decltype(IMAGE.pixels())> ID(IMAGE.pixels());
 
-# define mln_nixter(ID, PIXRANGE)						\
-  mln::internal::pix_range_iterator_proxy<decltype(PIXRANGE)> ID(PIXRANGE);
 
 
 #endif //!MLN_CORE_FORALL_HPP

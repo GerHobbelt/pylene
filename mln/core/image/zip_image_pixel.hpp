@@ -31,99 +31,84 @@ namespace mln {
   {
     using namespace boost::detail::tuple_impl_specific;
 
-    template <size_t nelems, typename Point>
+    template <size_t nelems, size_t dim, bool forward>
     struct strided_tuple_pointer_value_visitor
     {
       typedef char* ptr_t;
       typedef std::array<ptr_t, nelems> arg_t;
-      enum { ndim = Point::ndim };
+      enum { ndim = dim };
 
       strided_tuple_pointer_value_visitor()
       {
       }
 
-      strided_tuple_pointer_value_visitor(const std::array<ptr_t, nelems>& start,
-					  const std::array<const size_t*, nelems>& strides,
-					  Point shape)
-	: shp_ (shape)
+      strided_tuple_pointer_value_visitor(const std::array<ptr_t, nelems>&		start,
+					  const std::array<const size_t*, nelems>&	strides)
+	: start_ (start)
       {
 	 for (unsigned i = 0; i < nelems; ++i)
-	   {
-	     std::copy(strides[i], strides[i] + ndim, strides_arr_[i].begin());
-	     stack_arr_[i].fill(start[i]);
-	   }
+	   std::copy(strides[i], strides[i] + ndim, strides_[i].begin());
+      }
 
+      void initialize(arg_t& x)
+      {
+	x = start_;
+	for (unsigned i = 0; i < nelems; ++i)
+	  stack_[i].fill(start_[i]);
       }
 
       template <size_t n>
-      typename std::enable_if< (n > 0 and n < ndim-1),void>::type
-      fwd_init (arg_t& )
+      typename std::enable_if<(n < ndim-1)>::type
+      init (arg_t& )
       {
 	for (unsigned i = 0; i < nelems; ++i)
-	  stack_arr_[i][n] = stack_arr_[i][n-1];
+	  stack_[i][n] = stack_[i][n-1];
       }
 
       template <size_t n>
-      typename std::enable_if< (n > 0 and n < ndim-1),void>::type
-      bwd_init (arg_t& )
+      typename std::enable_if<(n == ndim-1)>::type
+      init (arg_t& x)
       {
 	for (unsigned i = 0; i < nelems; ++i)
-	  stack_arr_[i][n] = stack_arr_[i][n-1] + (strides_arr_[i][n] * (shp_[n] - 1));
+	  x[i] = (stack_[i][n] = stack_[i][n-1]);
       }
 
       template <size_t n>
-      typename std::enable_if<(n > 0 and n == ndim-1), void>::type
-      fwd_init(arg_t& x)
+      typename std::enable_if<(!forward and n < ndim-1)>::type
+      next (arg_t&)
       {
 	for (unsigned i = 0; i < nelems; ++i)
-	  x[i] = (stack_arr_[i][n] = stack_arr_[i][n-1]);
+	  stack_[i][n] -= strides_[i][n];
       }
 
       template <size_t n>
-      typename std::enable_if<(n > 0 and n == ndim-1), void>::type
-      bwd_init(arg_t& x)
+      typename std::enable_if<(forward and n < ndim-1)>::type
+      next (arg_t&)
       {
 	for (unsigned i = 0; i < nelems; ++i)
-	  x[i] = (stack_arr_[i][ndim-1] =
-                  (stack_arr_[i][ndim-2] + strides_arr_[i][ndim-1] * (shp_[ndim-1] - 1)));
+	  stack_[i][n] += strides_[i][n];
       }
 
-       template <size_t n>
-       typename std::enable_if<(n < ndim-1), void>::type
-       fwd_inc (arg_t&)
-       {
-	 for (unsigned i = 0; i < nelems; ++i)
-	   stack_arr_[i][n] += strides_arr_[i][n];
-       }
+	template <size_t n>
+	typename std::enable_if<(!forward and n == ndim-1)>::type
+	next (arg_t& x)
+      {
+	for (unsigned i = 0; i < nelems; ++i)
+	  x[i] = (stack_[i][n] -= strides_[i][n]);
+      }
 
-       template <size_t n>
-       typename std::enable_if<(n == ndim-1), void>::type
-       fwd_inc (arg_t& x)
-       {
-	 for (unsigned i = 0; i < nelems; ++i)
-	   x[i] = (stack_arr_[i][n] += strides_arr_[i][n]);
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n < ndim-1), void>::type
-       bwd_inc (arg_t&)
-       {
-	 for (unsigned i = 0; i < nelems; ++i)
-	   stack_arr_[i][n] -= strides_arr_[i][n];
-       }
-
-       template <size_t n>
-       typename std::enable_if<(n == ndim-1), void>::type
-       bwd_inc (arg_t& x)
-       {
-	 for (unsigned i = 0; i < nelems; ++i)
-	   x[i] = (stack_arr_[i][n] -= strides_arr_[i][n]);
-       }
+      template <size_t n>
+      typename std::enable_if<(forward and n == ndim-1), void>::type
+      next (arg_t& x)
+      {
+	for (unsigned i = 0; i < nelems; ++i)
+	  x[i] = (stack_[i][n] += strides_[i][n]);
+      }
 
     private:
-      Point shp_;
-      std::array< std::array<size_t, ndim>, nelems > strides_arr_;
-      std::array< std::array<ptr_t,  ndim>, nelems > stack_arr_;
+      std::array<ptr_t, nelems>			     start_;
+      std::array< std::array<size_t, ndim>, nelems > strides_;
+      std::array< std::array<ptr_t,  ndim>, nelems > stack_;
     };
 
     struct ptr_2_ref
@@ -221,8 +206,10 @@ namespace mln {
       return p_ == other.p_;
     }
 
-    std::array<ptr_t, nelems>&	get_value() { return x_; }
-    Point&			get_point() { return p_; }
+    std::array<ptr_t, nelems>&		get_value()	{ return x_; }
+    const std::array<ptr_t, nelems>&	get_value() const { return x_; }
+    Point&				get_point() { return p_; }
+    const Point&			get_point() const { return p_; }
 
   private:
     template <typename, typename, typename>

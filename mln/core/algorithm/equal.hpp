@@ -36,9 +36,10 @@ namespace mln
   {
     // FIXME: add test for domain comparison
 
-    for (auto x: imzip(exact(ima1), exact(ima2)).values())
-      if (boost::get<0>(x) != boost::get<1>(x))
-        return false;
+    mln_viter(v1, v2, exact(ima1), exact(ima2));
+    mln_forall(v1, v2)
+      if (*v1 != *v2)
+	return false;
 
     return true;
   };

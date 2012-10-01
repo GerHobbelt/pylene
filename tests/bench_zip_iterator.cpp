@@ -7,8 +7,8 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/wrt_offset.hpp>
 
-#include <mln/core/forall.hpp>
-#include <mln/core/pix_range_iterator_proxy.hpp>
+//#include <mln/core/forall.hpp>
+//#include <mln/core/pix_range_iterator_proxy.hpp>
 
 #include <boost/range/numeric.hpp>
 #include <boost/timer.hpp>

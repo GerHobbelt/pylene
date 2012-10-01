@@ -64,12 +64,15 @@ namespace mln {
   namespace impl
   {
 
-    template <typename I, typename OutputIterator>
+    template <typename I, typename J>
     inline
-    OutputIterator
-    copy(const I& input, OutputIterator it)
+    void
+    copy(const I& input, J&& output)
     {
-      return boost::copy(input.values(), it);
+      mln_viter(vin, vout, input, output);
+
+      mln_forall(vin, vout)
+	*vout = *vin;
     }
 
   }
@@ -79,7 +82,7 @@ namespace mln {
   OutputImage&
   copy(const Image<InputImage>& input, Image<OutputImage>& output)
   {
-    impl::copy(exact(input), std::begin(exact(output).values()));
+    impl::copy(exact(input), exact(output));
     return exact(output);
   }
 
@@ -87,8 +90,8 @@ namespace mln {
   OutputImage&&
   copy(const Image<InputImage>& input, Image<OutputImage>&& output)
   {
-    impl::copy(exact(input), std::begin(fwd_exact(output).values()));
-    return fwd_exact(output);
+    impl::copy(exact(input), exact(output));
+    return move_exact(output);
   }
 
 

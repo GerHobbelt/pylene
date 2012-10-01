@@ -36,15 +36,26 @@ namespace mln {
 /****          Implementation          ****/
 /******************************************/
 
+  namespace impl
+  {
+
+    template <typename I, typename V>
+    void iota(I& ima, V v)
+    {
+      mln_viter(vout, ima);
+      mln_forall(vout)
+	*vout = v++;
+    }
+
+  }
 
   template <typename I, typename Value>
   inline
   I&&
   iota(Image<I>&& output_, Value val)
   {
-    I&& output = fwd_exact(output_);
-    boost::iota(output.values(), val);
-    return std::forward<I>(output);
+    iota(output_, val);
+    return move_exact(output_);
   }
 
   template <typename I, typename Value>
@@ -53,7 +64,7 @@ namespace mln {
   iota(Image<I>& output_, Value val)
   {
     I& output = exact(output_);
-    boost::iota(output.values(), val);
+    impl::iota(output, val);
     return output;
   }
 

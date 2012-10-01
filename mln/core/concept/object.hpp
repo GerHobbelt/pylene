@@ -45,14 +45,14 @@ namespace mln {
 
   template <typename E>
   inline
-  E&& fwd_exact(Object<E>& object)
+  E&& move_exact(Object<E>& object)
   {
     return static_cast<E&&>(object);
   }
 
   template <typename E>
   inline
-  E&& fwd_exact(const Object<E>& object)
+  const E&& move_exact(const Object<E>& object)
   {
     return static_cast<E&&>(object);
   }

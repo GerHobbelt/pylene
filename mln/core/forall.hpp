@@ -6,6 +6,7 @@
 
 # include <boost/preprocessor/comparison/equal.hpp>
 # include <boost/preprocessor/control/iif.hpp>
+# include <boost/preprocessor/control/if.hpp>
 # include <boost/preprocessor/punctuation/comma_if.hpp>
 //# include <boost/preprocessor/control/if.hpp>
 # include <boost/preprocessor/repetition/repeat.hpp>
@@ -112,11 +113,58 @@ namespace mln
   mln::internal::pix_range_iterator_proxy<decltype(PIXRANGE)> ID(PIXRANGE);
 */
 
-// ARGV contains variables identifiers + id of iterator at end
+namespace mln
+{
+  namespace internal
+  {
+
+    template <typename ColExpr>
+    struct should_copy_col_;
+
+    // The expression is a lvalue, no need to copy
+    template <typename ColExpr>
+    struct should_copy_col_<ColExpr&>
+    {
+      typedef ColExpr& type;
+
+      static ColExpr&
+      copy(ColExpr& col) { return col; }
+    };
+
+    // The expression is a rvalue, need to copy
+    template <typename ColExpr>
+    struct should_copy_col_<ColExpr&&>
+    {
+      typedef ColExpr type;
+
+      static ColExpr&&
+        copy(ColExpr&& col) { return std::move<ColExpr>(col); }
+    };
+
+    template <typename ColExpr>
+    typename should_copy_col_<ColExpr>::type
+    should_copy_col(ColExpr&& x)
+    {
+      return should_copy_col_<ColExpr>::copy(std::forward<ColExpr>(x));
+    }
+
+  }
+}
+
+
+# define __mln_should_copy_col__(COL, ID)          \
+  decltype(mln::internal::should_copy_col(COL)) ID = mln::internal::should_copy_col(COL)
+
+
+/******************************************/
+/****            mln_viter            *****/
+/******************************************/
+
+
 # define __mln_viter_decl__(z, N, ARGV)					\
   auto BOOST_PP_SEQ_ELEM(N, BOOST_PP_SEQ_TAIL(ARGV)) =			\
-    mln::make_unzip_proxy_iterator<N, decltype(BOOST_PP_SEQ_HEAD(ARGV))> \
-				   (BOOST_PP_SEQ_HEAD(ARGV));
+    (mln::make_unzip_proxy_iterator<N, decltype(BOOST_PP_SEQ_HEAD(ARGV))> \
+     (BOOST_PP_SEQ_HEAD(ARGV)));
 
 
 # define __mln_viter__(ARGC, ARGV, ID_IMA, ID_ITER)					\
@@ -132,11 +180,64 @@ namespace mln
 		BOOST_PP_CAT(__mln_zip_ima__,BOOST_PP_SEQ_HEAD(ARGV)),	\
 		BOOST_PP_CAT(__mln_zip_iter__,BOOST_PP_SEQ_HEAD(ARGV)))
 
-# define mln_viter(...)					\
-  __mln_viter_chap__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),	\
-		     BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+# define __mln_viter_chap__2(p, ima, ...)                           \
+  __mln_should_copy_col__(ima, BOOST_PP_CAT(__mln_ima_, p));    \
+  auto p = BOOST_PP_CAT(__mln_ima_, p).values().iter();
+
+# define mln_viter(...)                                                 \
+  BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2),	\
+               __mln_viter_chap__2(__VA_ARGS__),                        \
+               __mln_viter_chap__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),  \
+                                  BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
 
 
+/******************************************/
+/****            mln_pixter           *****/
+/******************************************/
+
+
+# define __mln_pixter_decl__(z, N, ARGV)                                \
+  auto BOOST_PP_SEQ_ELEM(N, BOOST_PP_SEQ_TAIL(ARGV)) =			\
+    (mln::make_unzip_proxy_pixel_iterator<N, decltype(BOOST_PP_SEQ_HEAD(ARGV))> \
+     (BOOST_PP_SEQ_HEAD(ARGV)));
+
+
+# define __mln_pixter__(ARGC, ARGV, ID_IMA, ID_ITER)					\
+  auto ID_IMA = imzip(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_REST_N(BOOST_PP_DIV(ARGC, 2), ARGV))); \
+  auto ID_ITER = mln::make_proxy_iterator(ID_IMA.pixels().iter());	\
+  BOOST_PP_REPEAT(BOOST_PP_DIV(ARGC, 2), __mln_pixter_decl__,		\
+		  BOOST_PP_SEQ_PUSH_FRONT(ARGV, ID_ITER));
+
+# define __mln_pixter_chap__(ARGC, ARGV)					\
+  static_assert(ARGC > 0 and ARGC % 2 == 0,				\
+		"Number of arguments of the forall macros should be odd"); \
+  __mln_pixter__(ARGC, ARGV,						\
+		BOOST_PP_CAT(__mln_zip_ima__,BOOST_PP_SEQ_HEAD(ARGV)),	\
+		BOOST_PP_CAT(__mln_zip_iter__,BOOST_PP_SEQ_HEAD(ARGV)))
+
+# define __mln_pixter_chap__2(p, ima, ...)                          \
+  __mln_should_copy_col__(ima, BOOST_PP_CAT(__mln_ima_, p));    \
+  auto p = BOOST_PP_CAT(__mln_ima_, p).pixels().iter();
+
+# define mln_pixter(...)                                                 \
+  BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2),	\
+               __mln_pixter_chap__2(__VA_ARGS__),                       \
+               __mln_pixter_chap__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), \
+                                    BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
+
+
+
+/******************************************/
+/****             mln_iter             ****/
+/******************************************/
+
+# define mln_iter(p, rng)                       \
+  auto p = rng.iter();
+
+
+/******************************************/
+/****         mln_forall macro         ****/
+/******************************************/
 
 
 
@@ -156,9 +257,14 @@ namespace mln
        BOOST_PP_REPEAT(ARGC, MLN_FORALL_NEXT, ARGV),			\
 	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))
 
-# define mln_forall(...)				\
-  __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),	\
-		 BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+# define __mln_forall__1(p, ...)                    \
+  for (p.init(); !p.finished(); p.next())
+
+# define mln_forall(...)                                                \
+  BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 1),  \
+               __mln_forall__1(__VA_ARGS__),                            \
+               __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),      \
+                              BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
 
 
 

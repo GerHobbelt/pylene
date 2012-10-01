@@ -49,7 +49,8 @@ namespace mln
       // Non-const -> const conversion
       template <typename U, typename J>
       sliding_win_pixel(const sliding_win_pixel<P, U, J>& x,
-			 typename std::enable_if< std::is_convertible<U*, V*>::value >::type* dummy = NULL)
+                        typename std::enable_if< std::is_convertible<typename std::remove_reference<U>::type*,
+                        typename std::remove_reference<V>::type*>::value >::type* dummy = NULL)
 	: v_ (x.v_), p_ (x.p_), image_ (x.image_)
       {
       }

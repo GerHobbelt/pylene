@@ -3,6 +3,10 @@
 #include <mln/core/image/zip_image.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/fill.hpp>
+
+#include <mln/core/range/algorithm/accumulate.hpp>
+#include <mln/core/range/algorithm/inner_product.hpp>
+
 #include <mln/io/imprint.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/wrt_offset.hpp>
@@ -35,7 +39,7 @@ double test_native(const image2d<int>& a, const image2d<int>& b)
 
 double test_iterator(const image2d<int>& a, const image2d<int>& b)
 {
-  double v = boost::inner_product(a.values(), b.values(), 0.0d);
+  double v = range::inner_product(a.values(), b.values(), 0.0d);
   return v;
 }
 
@@ -43,7 +47,7 @@ double test_zip(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
 
-  double v = boost::accumulate(ima.values(), 0.0d, [](double v, const boost::tuple<const int&, const int&>& x)
+  double v = range::accumulate(ima.values(), 0.0d, [](double v, const boost::tuple<const int&, const int&>& x)
                         { return v + boost::get<0>(x) * boost::get<1>(x); });
   return v;
 }
@@ -52,7 +56,7 @@ double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
   typedef typename decltype(ima)::const_pixel_type pixel_t;
-  double v = boost::accumulate(ima.pixels(), 0.0d, [](double v, const pixel_t& x)
+  double v = range::accumulate(ima.pixels(), 0.0d, [](double v, const pixel_t& x)
                                { return v + boost::get<0>(x.val()) * boost::get<1>(x.val()); });
   return v;
 }
@@ -61,9 +65,10 @@ double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
 double test_for(const image2d<int>& a, const image2d<int>& b)
 {
   double v = 0;
+  mln_viter(x, y, a, b);
 
-  forall_v (int x, int y, a, b)
-    v += x * y;
+  mln_forall(x, y)
+    v += *x * *y;
 
   return v;
 }
@@ -72,8 +77,9 @@ double test_for_pixel(const image2d<int>& a, const image2d<int>& b)
 {
   double v = 0;
 
-  forall_pix (auto x, auto y, a, b)
-    v += x.val() * y.val();
+  mln_pixter(x, y, a, b);
+  mln_forall (x, y)
+    v += x->val() * y->val();
 
   return v;
 }
@@ -105,11 +111,14 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
-  forall_pix(auto in, auto out, a, b)
-    for (auto x: c8(in))
-      out.val() = std::min(out.val(), x.val());
-}
+  mln_pixter(pin, pout, a, b);
+  mln_iter(x, c8(*pin));
 
+  mln_forall(pin, pout)
+    mln_forall(x)
+    pout->val() = std::min(pout->val(), x->val());
+}
+/*
 void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
@@ -129,7 +138,7 @@ void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
       //std::cout << "}" << std::endl;
     }
 }
-
+*/
 
 int main()
 {
@@ -199,14 +208,6 @@ int main()
   t.restart();
   for (int i = 0; i < NTEST/2; ++i)
     test_dilation_pixel(ima1, ima2);
-  thistime = t.elapsed();
-  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
-
-  std::cout << "New For Dilation ..." << std::endl;
-  mln::fill(ima2, 0);
-  t.restart();
-  for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_extfor(ima1, ima2);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 

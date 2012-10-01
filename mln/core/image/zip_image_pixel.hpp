@@ -14,13 +14,6 @@ namespace mln {
   template <typename PointerTuple, typename Point, typename ZipImage = void>
   struct zip_raw_pixel;
 
-  namespace internal
-  {
-    // The type of pixel when zip_pixel is unzipped
-    template <size_t n, typename TuplePixel>
-    struct unzip_pixel_proxy;
-  }
-
 
 
 /******************************************/
@@ -234,39 +227,6 @@ namespace mln {
     Point p_;
     std::array<ptr_t, nelems> x_;
   };
-
-
-  namespace internal
-  {
-
-    template <size_t n, typename TuplePixel>
-    struct unzip_pixel_proxy
-    {
-    private:
-      typedef typename std::decay<TuplePixel>::type pixel_t;
-
-    public:
-      typedef typename pixel_t::point_type                                  point_type;
-      typedef typename boost::tuples::element<n, typename pixel_t::value_type>::type value_type;
-      typedef typename boost::tuples::element<n, typename pixel_t::value_type>::type reference;
-      typedef typename std::remove_reference<typename boost::tuples::element<n, typename pixel_t::image_type::image_tuple_t>::type>::type image_type;
-
-      unzip_pixel_proxy(const pixel_t& pixel)
-        : tuple_pix_ (pixel)
-      {
-      }
-
-      reference val() const { return boost::get<n>(tuple_pix_.val()); }
-      point_type point() const { return tuple_pix_.point(); }
-      image_type& image() const { return boost::get<n>(tuple_pix_.image().images()); }
-
-    private:
-      const pixel_t& tuple_pix_;
-    };
-
-  }
-
-
 
 
 } // end of namespace mln

@@ -151,8 +151,9 @@ void display()
   }
   {
     std::cout << "Display forward pixel iterator." << std::endl;
-    foreach(auto x, ima.pixels())
-      std::cout << "(" << x.point() << ":" << x.val() << "),";
+    mln_pixter(x, ima);
+    mln_forall(x)
+      std::cout << "(" << x->point() << ":" << x->val() << "),";
     std::cout << std::endl;
   }
 }
@@ -166,23 +167,26 @@ void display_nbh()
   {
     std::cout << "Display forward site iterator." << std::endl;
     auto p = ima.domain().iter();
-    auto n = c8(*p).iter();
+    mln_iter(n, c8(*p));
     mln_forall(p)
     {
       std::cout << *p << ": ";
-      mln_forall(n) std::cout << *n << ",";
+      mln_forall(n)
+        std::cout << *n << ",";
       std::cout << std::endl;
     }
   }
 
   {
     std::cout << "Display forward pixel iterator." << std::endl;
-    auto px = ima.pixels().iter();
-    auto nx = c8(*px).iter();
+    mln_pixter(px, ima);
+    mln_iter(nx, c8(*px));
+
     mln_forall(px)
     {
       std::cout << "{" << px->point() << "," << px->val() << "}: ";
-      mln_forall(nx) std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
+      mln_forall(nx)
+        std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
       std::cout << std::endl;
     }
   }

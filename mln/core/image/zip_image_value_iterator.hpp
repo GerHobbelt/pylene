@@ -241,7 +241,7 @@ namespace mln
     }
 
 
-    iterator iter()
+    iterator iter() const
     {
       auto& ima = boost::get<0>(imas_);
       auto pmin = ima.domain().pmin;
@@ -256,7 +256,7 @@ namespace mln
 		      internal::strided_tuple_pointer_value_visitor<nelems, ndim, true>(ptr_arr, strides_arr));
     }
 
-    reverse_iterator riter()
+    reverse_iterator riter() const
     {
       auto& ima = boost::get<0>(imas_);
       auto pmin = ima.domain().pmin;
@@ -274,7 +274,7 @@ namespace mln
   private:
     template <size_t n>
     typename std::enable_if<(n == 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p = boost::get<0>(imas_).values().iter();
       p.init();
@@ -284,7 +284,7 @@ namespace mln
 
     template <size_t n>
     typename std::enable_if<(n > 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p = boost::get<n>(imas_).values().iter();
       p.init();
@@ -295,7 +295,7 @@ namespace mln
 
     template <size_t n>
     typename std::enable_if<(n == 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p = boost::get<0>(imas_).values().riter();
       p.init();
@@ -305,7 +305,7 @@ namespace mln
 
     template <size_t n>
     typename std::enable_if<(n > 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p = boost::get<n>(imas_).values().riter();
       p.init();
@@ -327,9 +327,9 @@ namespace mln
 
     typedef char* ptr_t;
     typedef zip_image_raw_pixel_iterator_forward<PointerTuple, Point, ZipImage> iterator;
-    typedef zip_image_raw_pixel_iterator_forward<ConstPointerTuple, Point, ZipImage> const_iterator;
+    typedef zip_image_raw_pixel_iterator_forward<ConstPointerTuple, Point, const ZipImage> const_iterator;
     typedef zip_image_raw_pixel_iterator_backward<PointerTuple, Point, ZipImage> reverse_iterator;
-    typedef zip_image_raw_pixel_iterator_backward<ConstPointerTuple, Point, ZipImage> const_reverse_iterator;
+    typedef zip_image_raw_pixel_iterator_backward<ConstPointerTuple, Point, const ZipImage> const_reverse_iterator;
     typedef zip_raw_pixel<PointerTuple, Point, ZipImage> pixel_t;
     typedef zip_raw_pixel<ConstPointerTuple, Point, ZipImage> const_pixel_t;
 
@@ -342,6 +342,21 @@ namespace mln
     }
 
 
+    const_iterator iter() const
+    {
+      auto& ima = boost::get<0>(imas_);
+      auto pmin = ima.domain().pmin;
+      auto pmax = ima.domain().pmax;
+
+      std::array<ptr_t, nelems>		ptr_arr;
+      std::array<const size_t*, nelems> strides_arr;
+      this->init_forward<nelems-1>(ptr_arr, strides_arr);
+
+      return const_iterator(zip_raw_pixel<PointerTuple, Point, const ZipImage> (Point (), ptr_arr, &zip_),
+			    internal::make_point_visitor_forward(pmin, pmax),
+			    internal::strided_tuple_pointer_value_visitor<nelems, ndim, true>(ptr_arr, strides_arr));
+    }
+
     iterator iter()
     {
       auto& ima = boost::get<0>(imas_);
@@ -352,12 +367,12 @@ namespace mln
       std::array<const size_t*, nelems> strides_arr;
       this->init_forward<nelems-1>(ptr_arr, strides_arr);
 
-      return iterator(zip_raw_pixel<PointerTuple, Point> (Point (), ptr_arr),
+      return iterator(zip_raw_pixel<PointerTuple, Point, ZipImage> (Point (), ptr_arr, &zip_),
 		      internal::make_point_visitor_forward(pmin, pmax),
 		      internal::strided_tuple_pointer_value_visitor<nelems, ndim, true>(ptr_arr, strides_arr));
     }
 
-    reverse_iterator riter()
+    reverse_iterator riter() const
     {
       auto& ima = boost::get<0>(imas_);
       auto pmin = ima.domain().pmin;
@@ -375,7 +390,7 @@ namespace mln
   private:
     template <size_t n>
     typename std::enable_if<(n == 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p =  boost::get<0>(imas_).values().iter();
       p.init();
@@ -385,7 +400,7 @@ namespace mln
 
     template <size_t n>
     typename std::enable_if<(n > 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p =  boost::get<n>(imas_).values().iter();
       p.init();
@@ -396,7 +411,7 @@ namespace mln
 
     template <size_t n>
     typename std::enable_if<(n == 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p =  boost::get<0>(imas_).values().riter();
       p.init();
@@ -406,7 +421,7 @@ namespace mln
 
     template <size_t n>
     typename std::enable_if<(n > 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides)
+    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
     {
       auto p =  boost::get<n>(imas_).values().riter();
       p.init();

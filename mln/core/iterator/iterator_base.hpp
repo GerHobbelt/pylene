@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
 # define MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
 
+# include <mln/core/concept/iterator.hpp>
 # include <boost/utility.hpp>
 # include <type_traits>
 
@@ -45,7 +46,7 @@ namespace mln
   ///
   template <typename Derived, typename Value,
             typename Reference = Value&>
-  struct iterator_base
+  struct iterator_base : Iterator<Derived>
   {
     typedef typename std::remove_const<Value>::type value_type;
     typedef Reference reference;

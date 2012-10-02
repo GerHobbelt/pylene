@@ -8,14 +8,15 @@ namespace mln
 
   template <typename I>
   struct Iterator
-    : boost::Assignable<I>, boost::DefaultConstructible<I>
   {
 
-    BOOST_CONCEPT_USAGE(Iterator)
+    Iterator()
     {
+      BOOST_CONCEPT_ASSERT((boost::Assignable<I>));
+      BOOST_CONCEPT_ASSERT((boost::DefaultConstructible<I>));
+
       typedef typename I::value_type    value_type;
       typedef typename I::reference     reference;
-
 
       reference (I::*method) () const = &I::operator*;
       (void) method;
@@ -23,7 +24,7 @@ namespace mln
       (void) method1;
       void (I::*method2) () = &I::init;
       (void) method2;
-      void (I::*method3) () const = &I::finished;
+      bool (I::*method3) () const = &I::finished;
       (void) method3;
       I (I::*method4) () const = &I::iter;
       (void) method4;

@@ -112,12 +112,25 @@ void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
   mln_pixter(pin, pout, a, b);
-  mln_iter(x, c8(*pin));
+  mln_iter(x, c8(pin));
 
   mln_forall(pin, pout)
     mln_forall(x)
     pout->val() = std::min(pout->val(), x->val());
 }
+
+void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
+{
+  fill(b, std::numeric_limits<int>::max());
+  mln_pixter(pin, a);
+  mln_viter(pout, b);
+  mln_iter(x, c8(pin));
+
+  for(pin.init(), pout.init(); !pin.finished(); pin.next(), pout.next())
+    mln_forall(x)
+      *pout = std::min(*pout, x->val());
+}
+
 /*
 void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
 {
@@ -144,8 +157,8 @@ int main()
 {
   int NTEST = 100;
 
-  image2d<int> ima1(1000, 1000);
-  image2d<int> ima2(1000, 1000);
+  image2d<int> ima1(1000, 10000);
+  image2d<int> ima2(1000, 10000);
 
   iota(ima1, 0);
   iota(ima2, 1);
@@ -204,6 +217,14 @@ int main()
 
 
   std::cout << "Zip For Dilation..." << std::endl;
+  mln::fill(ima2, 0);
+  t.restart();
+  for (int i = 0; i < NTEST/2; ++i)
+    test_dilation_pixel(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+
+  std::cout << "Zip For Dilation 2..." << std::endl;
   mln::fill(ima2, 0);
   t.restart();
   for (int i = 0; i < NTEST/2; ++i)

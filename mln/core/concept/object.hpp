@@ -7,6 +7,23 @@ namespace mln {
   template <typename E>
   struct Object;
 
+  template <typename E>		E&	  exact(Object<E>& object);
+  template <typename E>		const E&  exact(const Object<E>& object);
+  template <typename E>		E*	  exact(Object<E>* object);
+  template <typename E>		const E*  exact(const Object<E>* object);
+  template <typename E>		E&&	  exact(Object<E>&& object);
+  template <typename E>		const E&& exact(const Object<E>&& object);
+  template <typename E>		E&&	  move_exact(Object<E>& object);
+  template <typename E>		const E&& move_exact(const Object<E>& object);
+
+  template <typename T, template <typename> class Concept>
+  using is_a = std::is_convertible< T, Concept<T> >;
+
+
+  /*********************/
+  /* Implementation    */
+  /*********************/
+
   template <typename E>
   inline
   E& exact(Object<E>& object)
@@ -90,8 +107,6 @@ namespace mln {
   {
     typedef const typename E::exact_type type;
   };
-
-
 
 } // end of namespace mln
 

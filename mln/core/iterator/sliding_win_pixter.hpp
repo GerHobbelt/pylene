@@ -10,9 +10,8 @@ namespace mln
 {
 
 
-  template <typename SiteSet, typename Pixel>
+  template <typename SiteSet, typename PixelOrPixelIterator>
   struct sliding_win_pixter;
-
 
 
   namespace internal
@@ -23,8 +22,11 @@ namespace mln
     template <typename SiteSet, typename Pixel, typename image_tag, typename E>
     struct sliding_win_pixter_base;
 
-    template <typename Point, size_t N, typename Pixel, typename E>
-    struct sliding_win_pixter_base< mln::array<Point, N>, Pixel, raw_image_tag, E>;
+    template <typename Point, size_t N, typename PixelOrPixelIterator, typename E>
+    struct sliding_win_pixter_base< mln::array<Point, N>, PixelOrPixelIterator, raw_image_tag, E>;
+
+    template <typename PixelOrPixelIterator, bool is_iterator = is_a<PixelOrPixelIterator, Iterator>::value >
+    struct sliding_win_pixter_dispatch;
   }
 
   /******************************************/
@@ -70,23 +72,37 @@ namespace mln
       I* image_;
     };
 
+    template <typename PixelOrPixelIterator>
+    struct sliding_win_pixter_dispatch<PixelOrPixelIterator, true>
+    {
+      typedef typename PixelOrPixelIterator::value_type Pixel;
+      static typename PixelOrPixelIterator::reference getpixel(const PixelOrPixelIterator* x) { return x->dereference(); } ;
+    };
 
+    template <typename PixelOrPixelIterator>
+    struct sliding_win_pixter_dispatch<PixelOrPixelIterator, false>
+    {
+      typedef PixelOrPixelIterator Pixel;
+      static const Pixel& getpixel(const PixelOrPixelIterator* x) { return *x; } ;
+    };
 
   }
 
-  template <typename SiteSet, typename Pixel>
+  template <typename SiteSet, typename PixelOrPixelIterator>
   struct sliding_win_pixter :
-    internal::sliding_win_pixter_base< SiteSet, Pixel, typename Pixel::image_type::category,
-                             sliding_win_pixter<SiteSet, Pixel> >
+    internal::sliding_win_pixter_base< SiteSet, PixelOrPixelIterator,
+				       typename internal::sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type::category,
+				       sliding_win_pixter<SiteSet, PixelOrPixelIterator> >
   {
   private:
-    typedef internal::sliding_win_pixter_base< SiteSet, Pixel, typename Pixel::image_type::category,
-                                               sliding_win_pixter<SiteSet, Pixel> > base;
+    typedef internal::sliding_win_pixter_base< SiteSet, PixelOrPixelIterator,
+					       typename internal::sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type::category,
+                                               sliding_win_pixter<SiteSet, PixelOrPixelIterator> > base;
 
   public:
     sliding_win_pixter() = default;
-    sliding_win_pixter(const SiteSet& domain, const Pixel& pixel)
-      : base(domain, pixel)
+    sliding_win_pixter(const SiteSet& domain, const PixelOrPixelIterator& pix)
+      : base(domain, pix)
     {
     }
 
@@ -100,13 +116,15 @@ namespace mln
   {
 
 
-    template <typename Point, size_t N, typename Pixel, typename E>
-    struct sliding_win_pixter_base< mln::array<Point, N>, Pixel, raw_image_tag, E>
-      : iterator_base<E, const sliding_win_pixel<typename Pixel::point_type,
-                                                 typename Pixel::value_type,
-                                                 typename Pixel::image_type> >
+    template <typename Point, size_t N, typename PixelOrPixelIterator, typename E>
+    struct sliding_win_pixter_base< mln::array<Point, N>, PixelOrPixelIterator, raw_image_tag, E>
+      : iterator_base<E, const sliding_win_pixel<typename sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::point_type,
+                                                 typename sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::value_type,
+                                                 typename sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type> >,
+	protected sliding_win_pixter_dispatch<PixelOrPixelIterator>
     {
     private:
+      typedef typename sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel Pixel;
       typedef typename Pixel::point_type P;
       typedef typename Pixel::image_type I;
       typedef typename Pixel::value_type V;
@@ -116,16 +134,16 @@ namespace mln
     public:
       sliding_win_pixter_base() = default;
 
-      sliding_win_pixter_base(const mln::array<Point, N>& domain, const Pixel& pix)
+      sliding_win_pixter_base(const mln::array<Point, N>& domain, const PixelOrPixelIterator& pix)
 	: bind_ (&pix), domain_(&domain)
       {
-	wrt_offset(pix.image(), domain, offset_);
+	wrt_offset( this->getpixel(bind_).image(), domain, offset_);
       }
 
       void init() {
 	i_ = 0;
-	p_ = bind_->point();
-	ptr_ = (char*)(& bind_->val());
+	p_ = this->getpixel(bind_).point();
+	ptr_ = (char*)(& this->getpixel(bind_).val());
 	mypix_.p_ = p_ + (*domain_)[0];
 	mypix_.v_ = (V*)(ptr_ + offset_[0]);
       }
@@ -146,7 +164,7 @@ namespace mln
       }
 
     private:
-      const Pixel* bind_;
+      const PixelOrPixelIterator* bind_;
       const mln::array<Point, N>* domain_;
       mln::array<difference_type, N> offset_;
       pixel_t mypix_;

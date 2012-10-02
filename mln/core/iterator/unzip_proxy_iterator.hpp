@@ -48,6 +48,8 @@ namespace mln
 		     typename Iterator::value_type,
 		     typename Iterator::reference >
   {
+    proxy_iterator() = default;
+
 
     proxy_iterator(const Iterator& x)
     : x_ (x)
@@ -133,6 +135,8 @@ namespace mln
   public:
     typedef typename internal::unzip_proxy_iterator_helper<ZipIterator, n>::reference  reference;
 
+    unzip_proxy_iterator() = default;
+
     unzip_proxy_iterator(ZipIterator& zip)
     : zip_(&zip)
     {
@@ -165,7 +169,7 @@ namespace mln
 
     public:
       typedef typename pixel_t::point_type                                  point_type;
-      typedef typename boost::tuples::element<n, typename pixel_t::value_type>::type value_type;
+      typedef typename std::remove_reference<typename boost::tuples::element<n, typename pixel_t::value_type>::type>::type value_type;
       typedef typename boost::tuples::element<n, typename pixel_t::value_type>::type reference;
       typedef typename std::remove_reference<typename boost::tuples::element<n, typename pixel_t::image_type::image_tuple_t>::type>::type image_type;
 
@@ -198,6 +202,8 @@ namespace mln
 
   public:
     typedef internal::unzip_pixel_proxy<n, typename ZipIterator::reference> reference;
+
+    unzip_proxy_pixel_iterator() = default;
 
     unzip_proxy_pixel_iterator(ZipIterator& zip)
     : zip_(&zip)

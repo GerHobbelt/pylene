@@ -15,5 +15,8 @@ BOOST_AUTO_TEST_CASE(Fill)
 
   image2d<uint8> ima(10, 10);
   fill(ima, 69);
-  BOOST_CHECK( boost::count(ima.values(), 69) == 100 );
+
+  mln_viter(v, ima);
+  mln_forall(v)
+    BOOST_CHECK(*v == 69);
 }

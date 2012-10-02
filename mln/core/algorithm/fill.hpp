@@ -34,14 +34,25 @@ namespace mln {
 /****          Implementation          ****/
 /******************************************/
 
+  namespace impl
+  {
+    template <typename I, typename V>
+    void fill(I& ima, const V& v)
+    {
+      mln_viter(pin, ima);
+      mln_forall(pin)
+	*pin = v;
+    }
+
+  }
+
 
   template <typename OutputImage, typename Value>
   OutputImage&&
   fill(Image<OutputImage>&& output_, const Value& val)
   {
-    OutputImage&& output = fwd_exact(output_);
-    boost::fill(output.values(), val);
-    return fwd_exact(output);
+    fill(output_, val);
+    return move_exact(output_);
   }
 
 
@@ -50,7 +61,7 @@ namespace mln {
   fill(Image<OutputImage>& output_, const Value& val)
   {
     OutputImage& output = exact(output_);
-    boost::fill(output.values(), val);
+    impl::fill(output, val);
     return output;
   }
 

@@ -150,6 +150,48 @@ namespace mln
 
   namespace internal
   {
+    template <typename Pixel, typename F>
+    struct transformed_pixel
+    {
+      typedef typename std::result_of<F(typename Pixel::reference)>	reference;
+      typedef typename std::remove_reference<reference>::type		value_type;
+      typedef typename Pixel::image_type				image_type;
+      typedef typename Pixel::point_type				point_type;
+      typedef typename Pixel::site_type					site_type;
+
+      transform_pixel(const Pixel& x, F fun)
+	: x_ (x), fun_ (fun)
+      {
+      }
+
+      auto point() const -> decltype(x_.point())
+      {
+	return x_.point();
+      }
+
+      auto site() const -> decltype(x_.point())
+      {
+	return x_.point();
+      }
+
+      reference val() const
+      {
+	return fun_(x_.val());
+      }
+
+    private:
+      const Pixel x_;
+      F fun_;
+    };
+
+    template <typename Pixel, typename F>
+    inline
+    transformed_pixel<Pixel, F>
+    make_transform_pixel(const Pixel& pix, const F& fun)
+    {
+      return transformed_pixel<Pixel, F>(pix, fun);
+    }
+
 
   template <typename UnaryFunction, typename Image, typename E>
   struct unary_image_expr_base : image_expr<E>
@@ -167,12 +209,15 @@ namespace mln
     typedef typename image_const_value_iterator<image_t>::type          ConstVit;
     typedef typename image_const_pixel_iterator<image_t>::type          ConstPixit;
 
+    typedef std::bind2nd< make_transform_pixel<typename Pixit::value_type, UnaryFunction> > PixFun;
+    typedef std::bind2nd< make_transform_pixel<typename ConstPixit::value_type, UnaryFunction> > ConstPixFun;
+
   public:
     typedef typename image_t::point_type                                                        point_type;
     typedef typename image_t::point_type                                                        site_type;
     typedef typename image_t::domain_type                                                       domain_type;
     typedef typename std::result_of< UnaryFunction(arg_t) >::type                               reference;
-    typedef typename std::result_of< const UnaryFunction(const_arg_t) >::type                         const_reference;
+    typedef typename std::result_of< const UnaryFunction(const_arg_t) >::type                   const_reference;
     typedef typename std::decay<reference>::type                                                value_type;
 
     typedef boost::transform_iterator< UnaryFunction, Vit >                                     value_iterator;

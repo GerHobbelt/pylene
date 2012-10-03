@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_CONCEPT_OBJECT_HPP
 # define MLN_CORE_CONCEPT_OBJECT_HPP
 
+# include <type_traits>
 
 namespace mln {
 

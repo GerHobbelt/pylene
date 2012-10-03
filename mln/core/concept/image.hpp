@@ -1,12 +1,15 @@
 #ifndef MLN_CORE_CONCEPT_IMAGE_HPP
 # define MLN_CORE_CONCEPT_IMAGE_HPP
 
-# include <mln/core/image_traits.hpp>
 # include <mln/core/concept/object.hpp>
-# include <boost/concept_check.hpp>
-# include <boost/range/iterator.hpp>
-# include <boost/static_assert.hpp>
 # include <mln/core/concept/check.hpp>
+# include <mln/core/concept/pixel.hpp>
+
+# include <mln/core/image_traits.hpp>
+
+# include <boost/concept_check.hpp>
+# include <boost/static_assert.hpp>
+
 
 namespace mln {
 
@@ -41,6 +44,11 @@ namespace mln {
       check(std::is_same<typename pixel::reference, reference> ());
       check(std::is_convertible<typename const_pixel::value_type, value> ());
       check(std::is_same<typename const_pixel::reference, const_reference> ());
+
+      BOOST_CONCEPT_ASSERT((Pixel<pixel>));
+      BOOST_CONCEPT_ASSERT((Pixel<const_pixel>));
+
+      check(std::is_convertible<pixel, const_pixel> ());
     }
   };
 

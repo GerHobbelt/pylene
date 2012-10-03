@@ -157,6 +157,7 @@ namespace mln {
     typedef typename internal::tuple_meta_transform<PointerTuple, internal::ptr_2_ref>::type ref_tuple_t;
 
     typedef Point point_type;
+    typedef Point site_type;
     typedef ref_tuple_t value_type;
     typedef ref_tuple_t reference;
     typedef internal::zip_raw_pixel_base<ZipImage> base;
@@ -190,7 +191,8 @@ namespace mln {
       return internal::tuple_transform(x, internal::ptr_2_ref());
     }
 
-    const point_type& point() const { return p_; }
+    point_type point() const { return p_; }
+    point_type site() const { return p_; }
 
 
     bool

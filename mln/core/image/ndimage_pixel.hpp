@@ -36,6 +36,7 @@ namespace mln
 
     reference	        val() const;
     site_type           point()  const;
+    site_type           site()  const;
     distance_type	offset() const;
     image_type&         image() const;
 
@@ -105,6 +106,14 @@ namespace mln
   inline
   typename ndimage_pixel<T,dim,I>::site_type
   ndimage_pixel<T,dim,I>::point() const
+  {
+    return point_;
+  }
+
+  template <typename T, unsigned dim, typename I>
+  inline
+  typename ndimage_pixel<T,dim,I>::site_type
+  ndimage_pixel<T,dim,I>::site() const
   {
     return point_;
   }

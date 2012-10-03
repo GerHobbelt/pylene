@@ -10,8 +10,8 @@ namespace mln
 
   template <typename Iterator>
   struct stditerator : iterator_base< stditerator<Iterator>,
-				      typename std::iterator_traits<Iterator>::reference,
-				      typename std::iterator_traits<Iterator>::value_type >
+				      typename std::iterator_traits<Iterator>::value_type,
+				      typename std::iterator_traits<Iterator>::reference >
   {
     typedef typename std::iterator_traits<Iterator>::reference reference;
 

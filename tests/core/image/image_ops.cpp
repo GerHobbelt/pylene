@@ -89,8 +89,9 @@ BOOST_AUTO_TEST_CASE(Operators)
 
   iota(ima, 0);
   int i = 0;
-  for (auto& v: ref.values())
-    v = i--;
+  mln_viter(v, ref);
+  mln_forall(v)
+    *v = i--;
 
   BOOST_CHECK( boost::equal((-ima).values(), ref.values()) );
   BOOST_CHECK( all(-ima == ref) );

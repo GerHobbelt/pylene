@@ -4,7 +4,7 @@
 /// \FIXME Rename this file
 
 # include <boost/tuple/tuple.hpp>
-# include <boost/iterator/zip_iterator.hpp>
+# include <mln/core/iterator/zip_iterator.hpp>
 
 # include <mln/core/image_traits.hpp>
 # include <mln/core/image/internal/nested_loop_iterator.hpp>
@@ -74,8 +74,8 @@ namespace mln
   {
     typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_value_range>::type ValueRangeTuple;
     typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_value_iterator>::type IteratorTuple;
-    typedef boost::zip_iterator<IteratorTuple> iterator;
-    typedef boost::zip_iterator<const IteratorTuple> const_iterator;
+    typedef zip_iterator<IteratorTuple> iterator;
+    typedef zip_iterator<const IteratorTuple> const_iterator;
 
     zip_image_value_range(const ImageTuple& x)
     : w (internal::tuple_transform(x, internal::get_image_value_range ()))
@@ -103,7 +103,7 @@ namespace mln
     typedef typename std::remove_reference<typename boost::tuples::element<0, ImageTuple>::type>::type first_image_t;
     typedef typename first_image_t::domain_type			        Domain;
     typedef zip_image_value_range<category, ImageTuple>			ValueRange;
-    typedef typename Domain::const_iterator				PointIterator;
+    typedef typename Domain::iterator                                   PointIterator;
     typedef typename ValueRange::iterator				ValueIterator;
     typedef typename ValueRange::const_iterator				ConstValueIterator;
 

@@ -5,9 +5,8 @@
 
 # include <mln/core/image/zip_image.hpp>
 
-# include <boost/range/iterator_range.hpp>
-# include <boost/iterator/transform_iterator.hpp>
-
+# include <mln/core/range/iterator_range.hpp>
+# include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/iterator/transform_pixel_iterator.hpp>
 
 
@@ -136,12 +135,6 @@ namespace mln
 
 
 
-
-
-
-
-
-
   template <typename Expr>
   struct image_expr : Image<Expr>
   {
@@ -150,47 +143,7 @@ namespace mln
 
   namespace internal
   {
-    template <typename Pixel, typename F>
-    struct transformed_pixel
-    {
-      typedef typename std::result_of<F(typename Pixel::reference)>	reference;
-      typedef typename std::remove_reference<reference>::type		value_type;
-      typedef typename Pixel::image_type				image_type;
-      typedef typename Pixel::point_type				point_type;
-      typedef typename Pixel::site_type					site_type;
 
-      transform_pixel(const Pixel& x, F fun)
-	: x_ (x), fun_ (fun)
-      {
-      }
-
-      auto point() const -> decltype(x_.point())
-      {
-	return x_.point();
-      }
-
-      auto site() const -> decltype(x_.point())
-      {
-	return x_.point();
-      }
-
-      reference val() const
-      {
-	return fun_(x_.val());
-      }
-
-    private:
-      const Pixel x_;
-      F fun_;
-    };
-
-    template <typename Pixel, typename F>
-    inline
-    transformed_pixel<Pixel, F>
-    make_transform_pixel(const Pixel& pix, const F& fun)
-    {
-      return transformed_pixel<Pixel, F>(pix, fun);
-    }
 
 
   template <typename UnaryFunction, typename Image, typename E>
@@ -209,34 +162,31 @@ namespace mln
     typedef typename image_const_value_iterator<image_t>::type          ConstVit;
     typedef typename image_const_pixel_iterator<image_t>::type          ConstPixit;
 
-    typedef std::bind2nd< make_transform_pixel<typename Pixit::value_type, UnaryFunction> > PixFun;
-    typedef std::bind2nd< make_transform_pixel<typename ConstPixit::value_type, UnaryFunction> > ConstPixFun;
 
   public:
     typedef typename image_t::point_type                                                        point_type;
     typedef typename image_t::point_type                                                        site_type;
     typedef typename image_t::domain_type                                                       domain_type;
-    typedef typename std::result_of< UnaryFunction(arg_t) >::type                               reference;
+    typedef typename std::result_of< const UnaryFunction(arg_t) >::type                         reference;
     typedef typename std::result_of< const UnaryFunction(const_arg_t) >::type                   const_reference;
-    typedef typename std::decay<reference>::type                                                value_type;
+    typedef typename std::remove_reference<reference>::type                                     value_type;
 
-    typedef boost::transform_iterator< UnaryFunction, Vit >                                     value_iterator;
-    typedef transformed_pixel_iterator< UnaryFunction, Pixit, self_t>                           pixel_iterator;
+    typedef transform_iterator< Vit, UnaryFunction >                                            value_iterator;
+    typedef transform_pixel_iterator<UnaryFunction, Pixit, E>                                     pixel_iterator;
 
-    typedef boost::transform_iterator< UnaryFunction, ConstVit, const_reference>                                const_value_iterator;
-    typedef transformed_pixel_iterator< UnaryFunction, ConstPixit, const self_t>                const_pixel_iterator;
+    typedef transform_iterator< ConstVit, UnaryFunction>                                        const_value_iterator;
+    typedef transform_pixel_iterator< UnaryFunction, ConstPixit, const E>                       const_pixel_iterator;
 
     //typedef typename const_value_iterator::reference::empty empty;
     //static_assert(std::is_const<typename std::remove_reference<typename const_value_iterator::reference>::type>::value, "");
 
+    typedef transformed_pixel<UnaryFunction, Pixit, E>                                          pixel_type;
+    typedef transformed_pixel<UnaryFunction, ConstPixit, const E>                               const_pixel_type;
 
-    typedef typename std::iterator_traits<pixel_iterator>::value_type                           pixel_type;
-    typedef typename std::iterator_traits<const_pixel_iterator>::value_type                     const_pixel_type;
-
-    typedef boost::iterator_range<value_iterator>                                               value_range;
-    typedef boost::iterator_range<pixel_iterator>                                               pixel_range;
-    typedef boost::iterator_range<const_value_iterator>                                         const_value_range;
-    typedef boost::iterator_range<const_pixel_iterator>                                         const_pixel_range;
+    typedef iterator_range<value_iterator>                                               value_range;
+    typedef iterator_range<pixel_iterator>                                               pixel_range;
+    typedef iterator_range<const_value_iterator>                                         const_value_range;
+    typedef iterator_range<const_pixel_iterator>                                         const_pixel_range;
 
     unary_image_expr_base(Image&& ima_, UnaryFunction f_):
       ima (std::forward<Image>(ima_)),
@@ -268,38 +218,30 @@ namespace mln
     value_range
     values()
     {
-      auto rng = ima.values();
-      value_iterator a(std::begin(rng), f);
-      value_iterator b(std::end(rng), f);
-      return boost::make_iterator_range(a, b);
+      value_iterator x(ima.values().iter(), f);
+      return make_iterator_range(x);
     }
 
     const_value_range
     values() const
     {
-      auto rng = ima.values();
-      const_value_iterator a(std::begin(rng), f);
-      const_value_iterator b(std::end(rng), f);
-      return boost::make_iterator_range(a, b);
+      const_value_iterator x(ima.values().iter(), f);
+      return make_iterator_range(x);
     }
 
 
     pixel_range
     pixels()
     {
-      auto rng = ima.pixels();
-      pixel_iterator a(f, std::begin(rng), exact(this));
-      pixel_iterator b(f, std::end(rng), exact(this));
-      return boost::make_iterator_range(a, b);
+      pixel_iterator x(ima.pixels().iter(), f);
+      return make_iterator_range(x);
     }
 
     const_pixel_range
     pixels() const
     {
-      auto rng = ima.pixels();
-      const_pixel_iterator a(f, std::begin(rng), exact(this));
-      const_pixel_iterator b(f, std::end(rng), exact(this));
-      return boost::make_iterator_range(a, b);
+      const_pixel_iterator x(ima.pixels().iter(), f);
+      return make_iterator_range(x);
     }
 
   private:

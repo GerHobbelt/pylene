@@ -4,7 +4,7 @@
 # include <type_traits>
 # include <mln/core/iterator/iterator_base.hpp>
 # include <boost/iterator/zip_iterator.hpp>
-# include <boost/tuple.hpp>
+# include <boost/tuple/tuple.hpp>
 
 namespace mln
 {
@@ -19,15 +19,15 @@ namespace mln
 
   namespace internal
   {
-    using boost::tuple_impl_specific::tuple_meta_transform;
-    using boost::tuple_impl_specific::tuple_meta_accumulate;
-    using boost::tuple_impl_specific::tuple_transform;
-    using boost::tuple_impl_specific::tuple_for_each;
+    using boost::detail::tuple_impl_specific::tuple_meta_transform;
+    using boost::detail::tuple_impl_specific::tuple_meta_accumulate;
+    using boost::detail::tuple_impl_specific::tuple_transform;
+    using boost::detail::tuple_impl_specific::tuple_for_each;
 
     struct iterator_dereference
     {
       template <typename Iterator>
-      struct apply { typedef typename std::remove_reference<Iterator>::type::reference type; }
+      struct apply { typedef typename std::remove_reference<Iterator>::type::reference type; };
 
       template <typename Iterator>
       typename Iterator::reference
@@ -69,7 +69,7 @@ namespace mln
 
     template <typename OtherIteratorTuple>
     zip_iterator(const zip_iterator<OtherIteratorTuple>& other,
-		 typedef std::enable_if< std::is_convertible<OtherIteratorTuple, IteratorTuple>::value >::type* = NULL)
+		 typename std::enable_if< std::is_convertible<OtherIteratorTuple, IteratorTuple>::value >::type* = NULL)
       : iterator_tuple_ (other.iterator_tuple_)
     {
     }
@@ -77,12 +77,12 @@ namespace mln
 
     void init()
     {
-      internal::tuple_for_each(iterator_tuple_, iterator_init ());
+      internal::tuple_for_each(iterator_tuple_, internal::iterator_init ());
     }
 
     void next()
     {
-      internal::tuple_for_each(iterator_tuple_, iterator_init ());
+      internal::tuple_for_each(iterator_tuple_, internal::iterator_init ());
     }
 
     bool finished() const
@@ -92,7 +92,7 @@ namespace mln
 
     reference dereference() const
     {
-      return internal::tuple_transform(iterator_tuple_, internal::iterator_dereference) ();
+      return internal::tuple_transform(iterator_tuple_, internal::iterator_dereference ());
     }
 
   private:

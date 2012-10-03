@@ -82,7 +82,7 @@ namespace mln
 
     void next()
     {
-      internal::tuple_for_each(iterator_tuple_, internal::iterator_init ());
+      internal::tuple_for_each(iterator_tuple_, internal::iterator_next ());
     }
 
     bool finished() const

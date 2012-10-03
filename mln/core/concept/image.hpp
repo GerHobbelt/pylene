@@ -13,6 +13,8 @@
 
 namespace mln {
 
+  template <typename I> struct Image;
+  template <typename I> struct IterableImage;
 
   template <typename I>
   struct Image : Object_<I>
@@ -48,7 +50,12 @@ namespace mln {
       BOOST_CONCEPT_ASSERT((Pixel<pixel>));
       BOOST_CONCEPT_ASSERT((Pixel<const_pixel>));
 
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+	BOOST_CONCEPT_ASSERT((IterableImage<I>));
+      MLN_CONCEPT_END_CHECK_IF((std::is_convertible<category, forward_image_tag>::value))
+
       check(std::is_convertible<pixel, const_pixel> ());
+
     }
   };
 
@@ -131,6 +138,9 @@ namespace mln {
 
       check(std::is_same<typename pixel_type::image_type, I> ());
       check(std::is_same<typename const_pixel_type::image_type, const I> ());
+
+      check(std::is_convertible<value_iterator, const_value_iterator> ());
+      check(std::is_convertible<pixel_iterator, const_pixel_iterator> ());
     }
   };
 

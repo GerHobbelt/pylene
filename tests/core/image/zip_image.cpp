@@ -2,6 +2,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/range/algorithm/for_each.hpp>
 #include <mln/core/grays.hpp>
 
 
@@ -40,9 +41,7 @@ BOOST_AUTO_TEST_CASE(Value_Iteration_1)
   image2d<uint16>       b(5,5);
 
   auto x = imzip(a,b);
-  auto values = x.values(); // This is undefined behavior to write imzip(a,b).values();
-  std::for_each(std::begin(values), std::end(values),
-    [](boost::tuple<int&, uint16&> w) { w = boost::make_tuple(2,4); });
+  range::for_each(x.values(), [](boost::tuple<int&, uint16&> w) { w = boost::make_tuple(2,4); });
   BOOST_CHECK( all(a == 2) );
   BOOST_CHECK( all(b == 4) );
 }
@@ -55,10 +54,8 @@ BOOST_AUTO_TEST_CASE(Pixel_Iteration_1)
   image2d<uint16>       b(5,5);
 
   auto x = imzip(a,b);
-  auto pixels = x.pixels(); // This is undefined behavior to write imzip(a,b).pixels();
   typedef zip_image<image2d<int>&, image2d<uint16>& >::pixel_type pixel_t;
-  std::for_each(std::begin(pixels), std::end(pixels),
-    [](pixel_t x) { x.val() = boost::make_tuple(2,4); });
+  range::for_each(x.pixels(), [](pixel_t x) { x.val() = boost::make_tuple(2,4); });
 
 
   BOOST_CHECK( all(a == 2) );
@@ -79,12 +76,12 @@ BOOST_AUTO_TEST_CASE(Value_Iteration_2)
   int sum1 = 0;
   {
   int x, y;
-  for (auto w: tmp.values())
+  mln_foreach (auto w, tmp.values())
     {
-  boost::tie(x, y) = w;
-  sum1 += x + y;
-}
-}
+      boost::tie(x, y) = w;
+      sum1 += x + y;
+    }
+  }
   BOOST_CHECK_EQUAL(sum1, 25 * 24); // sum of 25 first integers * 2
 }
 
@@ -95,7 +92,7 @@ BOOST_AUTO_TEST_CASE(Value_Iteration_2)
   image2d<int> ima(5,5);
   auto x = imzip(ima, make_image());
 
-  for (auto w : x.values())
+  mln_foreach(auto w, x.values())
     boost::get<0>(w) = boost::get<1>(w);
 
   BOOST_CHECK( all(ima == make_image()) );

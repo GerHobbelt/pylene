@@ -133,19 +133,19 @@ namespace mln
 
     // The expression is a rvalue, need to copy
     template <typename ColExpr>
-    struct should_copy_col_<ColExpr&&>
+    struct should_copy_col_
     {
       typedef ColExpr type;
 
-      static ColExpr&&
-        copy(ColExpr&& col) { return std::move<ColExpr>(col); }
+      static ColExpr
+        copy(ColExpr& col) { return std::move(col); }
     };
 
     template <typename ColExpr>
     typename should_copy_col_<ColExpr>::type
     should_copy_col(ColExpr&& x)
     {
-      return should_copy_col_<ColExpr>::copy(std::forward<ColExpr>(x));
+      return should_copy_col_<ColExpr>::copy(x);
     }
 
   }
@@ -154,6 +154,12 @@ namespace mln
 
 # define __mln_should_copy_col__(COL, ID)          \
   decltype(mln::internal::should_copy_col(COL)) ID = mln::internal::should_copy_col(COL)
+
+# define __mln_should_copy_col_local__(COL, ID)				\
+  if (mln::internal::false_var_t< decltype(mln::internal::should_copy_col(COL)) > ID = \
+    {mln::internal::should_copy_col(COL)}) {} else
+
+
 
 
 /******************************************/
@@ -268,5 +274,15 @@ namespace mln
 
 
 
+# define __mln_do_local__(EXPR)			\
+  if ((EXPR), false) {} else
+
+
+# define mln_foreach(p, COL)					\
+  __mln_should_copy_col_local__(COL, _mln_range_)		\
+  MLN_DECL_VAR(_mln_it_, _mln_range_.get().iter())		\
+  for (_mln_it_.get().init(); !_mln_it_.get().finished(); _mln_it_.get().next()) \
+    if (bool _mln_continue_ = false) {} else				\
+      for (p = *(_mln_it_.get()); !_mln_continue_; _mln_continue_ = true) \
 
 #endif //!MLN_CORE_FORALL_HPP

@@ -35,8 +35,17 @@ namespace mln
   {
     typedef typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference reference;
 
+    transform_iterator() = default;
+
     transform_iterator(const Iterator& it, const UnaryFunction& f)
       : it_ (it), f_ (f)
+    {
+    }
+
+    template <typename Iterator2, typename Reference2, typename Value2>
+    transform_iterator(const transform_iterator<Iterator2, UnaryFunction, Reference2, Value2>& other,
+		       typename std::enable_if<std::is_convertible<Iterator2, Iterator>::value>::type* = NULL)
+      : it_ (other.it_), f_ (other.f_)
     {
     }
 
@@ -46,6 +55,9 @@ namespace mln
     reference dereference() const { return f_(*it_); }
 
   private:
+    template <typename, typename, typename, typename>
+    friend struct transform_iterator;
+
     Iterator it_;
     UnaryFunction f_;
   };

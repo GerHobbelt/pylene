@@ -63,9 +63,6 @@ namespace mln
                                    ndimage_pixel<const T, dim, const E>
                                    >
   {
-    BOOST_CONCEPT_ASSERT((IterableImage<E>));
-    BOOST_CONCEPT_ASSERT((AccessibleImage<E>));
-
   private:
     typedef ndimage_base<T, dim, E>                             this_type;
   public:

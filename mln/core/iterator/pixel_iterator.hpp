@@ -34,13 +34,28 @@ namespace mln {
     {
     }
 
+    template <typename PointIterator2, typename ValueIterator2, typename Image2>
+    zip_point_value_pixel(const zip_point_value_pixel<PointIterator2, ValueIterator2, Image2>& other,
+			  typename std::enable_if<std::is_convertible<PointIterator2, PointIterator>::value and
+			  std::is_convertible<ValueIterator2, ValueIterator>::value and
+			  std::is_convertible<Image2*, Image*>::value>::type* = NULL)
+      : pit_ (other.pit_), vit_ (other.vit_), ima_ (other.ima_)
+    {
+    }
+
+
     point_type point() const  { return *pit_; }
+    point_type site() const  { return *pit_; }
     reference val() const     { return *vit_; }
     image_type& image() const { return *ima_; }
 
 
     friend class pixel_iterator<PointIterator, ValueIterator, Image>;
+
   private:
+    template <typename, typename, typename>
+    friend struct zip_point_value_pixel;
+
     PointIterator pit_;
     ValueIterator vit_;
     Image*        ima_;
@@ -55,6 +70,14 @@ namespace mln {
 
     pixel_iterator() = default;
     pixel_iterator(const pixel_iterator&) = default;
+
+    template <typename SiteSetIterator2, typename ValueIterator2, typename Image2>
+    pixel_iterator(const pixel_iterator<SiteSetIterator2, ValueIterator2, Image2>& other,
+		   typename std::enable_if< std::is_convertible<typename pixel_iterator<SiteSetIterator2, ValueIterator2, Image2>::pixel_t,
+								pixel_t>::value >::type* = NULL)
+      : pixel_ (other.pixel_)
+    {
+    }
 
     pixel_iterator(const SiteSetIterator& pit,
                    const ValueIterator& vit,
@@ -77,6 +100,9 @@ namespace mln {
     // }
 
   private:
+    template <typename, typename, typename>
+    friend struct pixel_iterator;
+
     pixel_t pixel_;
   };
 

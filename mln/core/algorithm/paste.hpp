@@ -42,26 +42,34 @@ namespace mln {
 /****          Implementation          ****/
 /******************************************/
 
+  namespace impl
+  {
+    template <typename I, typename J>
+    void paste(const I& ima, J& out)
+    {
+      mln_pixter(px, ima);
+      mln_forall(px)
+	out(px->point()) = px->val();
+    }
 
+
+  }
 
   template <typename InputImage, typename OutputImage>
   OutputImage&
   paste(const Image<InputImage>& input, Image<OutputImage>& output_)
 
   {
-    paste(input, fwd_exact(output_));
+    impl::paste(exact(input), exact(output_));
     return exact(output_);
   }
 
   template <typename InputImage, typename OutputImage>
   OutputImage&&
   paste(const Image<InputImage>& input_, Image<OutputImage>&& output_)
-
   {
-    OutputImage&& output = fwd_exact(output_);
-    for (auto px: exact(input_).pixels())
-      output(px.point()) = px.val();
-    return std::forward<OutputImage>(output);
+    paste(input_, output_);
+    return move_exact(output_);
   }
 
 

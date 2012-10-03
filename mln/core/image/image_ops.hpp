@@ -3,7 +3,7 @@
 
 # include <mln/core/image/image_expr.hpp>
 # include <mln/core/ops.hpp>
-
+#include <iostream>
 namespace mln
 {
   /// \defgroup ima_ops Image operators
@@ -116,8 +116,10 @@ namespace mln
     static_assert(std::is_convertible<typename I::value_type, bool>::value,
                   "Image value type must be convertible to bool");
 
-    for(bool v : exact(ima).values())
-      if (!v) return false;
+    mln_viter(v, exact(ima));
+    mln_forall(v)
+      if (!*v) return false;
+
     return true;
   }
 
@@ -130,8 +132,10 @@ namespace mln
     static_assert(std::is_convertible<typename I::value_type, bool>::value,
                   "Image value type must be convertible to bool");
 
-    for(bool v : exact(ima).values())
-      if (v) return true;
+    mln_viter(v, exact(ima));
+    mln_forall(v)
+      if (*v) return true;
+
     return false;
   }
 

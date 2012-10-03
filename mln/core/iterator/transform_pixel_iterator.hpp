@@ -11,7 +11,7 @@ namespace mln
   struct transformed_pixel;
 
   template <typename UnaryFunction, typename PixelIterator, typename Image>
-  struct transformed_pixel_iterator;
+  struct transform_pixel_iterator;
 
 
   /***********************/
@@ -41,7 +41,7 @@ namespace mln
     template <typename PixelIterator2, typename Image2>
     transformed_pixel(const transformed_pixel<UnaryFunction, PixelIterator2, Image2>& other,
                       typename std::enable_if< std::is_convertible<PixelIterator2, PixelIterator>::value and
-                      std::is_convertible<Image2*, Image*>::value >::type* = NULL)
+					       std::is_convertible<Image2*, Image*>::value >::type* = NULL)
       : x_ (other.x_), fun_ (other.fun_), ima_ (other.ima_)
     {
     }
@@ -95,6 +95,16 @@ namespace mln
     {
     }
 
+    template <typename PixelIterator2, typename Image2>
+    transform_pixel_iterator(const transform_pixel_iterator<UnaryFunction, PixelIterator2, Image2>& other,
+			     typename std::enable_if<std::is_convertible<
+			     typename transform_pixel_iterator<UnaryFunction, PixelIterator2, Image2>::pixel_t,
+			     pixel_t>::value>::type* = NULL)
+      : px_ (other.px_)
+    {
+    }
+
+
     void init() { px_.x_.init(); }
     void next() { px_.x_.next(); }
     bool finished() const { return px_.x_.finished(); }
@@ -102,6 +112,9 @@ namespace mln
     const pixel_t& dereference() const { return px_; }
 
   private:
+    template <typename, typename, typename>
+    friend struct transform_pixel_iterator;
+
     pixel_t px_;
   };
 

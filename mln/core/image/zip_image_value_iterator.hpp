@@ -54,7 +54,7 @@ namespace mln
     {
       template <class Range> struct apply
       {
-	typedef typename range_iterator< std::remove_reference<Range> >::type type;
+	typedef typename range_iterator< typename std::remove_reference<Range>::type >::type type;
       };
 
       template <typename Range>

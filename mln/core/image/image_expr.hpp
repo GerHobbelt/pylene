@@ -1,6 +1,8 @@
 #ifndef MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 # define MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 
+# include <mln/core/functional.hpp>
+
 # include <mln/core/concept/image.hpp>
 
 # include <mln/core/image/zip_image.hpp>
@@ -28,9 +30,9 @@ namespace mln
   template <typename BinaryFunction, typename Scalar, typename Image>
   struct binary_scalar_image_expr;
 
-  template <typename UnaryFunction, typename I>
-  unary_image_expr<UnaryFunction, I>
-  make_unary_image_expr(I&& ima, UnaryFunction f);
+  // template <typename UnaryFunction, typename I>
+  // unary_image_expr<UnaryFunction, I>
+  // make_unary_image_expr(I&& ima, UnaryFunction f);
 
 
 
@@ -59,34 +61,34 @@ namespace mln
 
   template <typename UnaryFunction, typename I>
   unary_image_expr<UnaryFunction, I>
-  make_unary_image_expr(I&& ima, UnaryFunction f)
+  make_unary_image_expr(I&& ima, const UnaryFunction& f)
   {
-    BOOST_CONCEPT_ASSERT((Image<typename std::remove_reference<I>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I>::type>));
     return unary_image_expr<UnaryFunction, I>(std::forward<I>(ima), f);
   }
 
   template <typename BinaryFunction, typename I1, typename I2>
   binary_image_expr<BinaryFunction, I1, I2>
-  make_binary_image_expr(I1&& ima1, I2&& ima2, BinaryFunction f)
+  make_binary_image_expr(I1&& ima1, I2&& ima2, const BinaryFunction& f)
   {
-    BOOST_CONCEPT_ASSERT((Image<typename std::remove_reference<I1>::type>));
-    BOOST_CONCEPT_ASSERT((Image<typename std::remove_reference<I2>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
     return binary_image_expr<BinaryFunction, I1, I2>(std::forward<I1>(ima1), std::forward<I2>(ima2), f);
   }
 
   template <typename BinaryFunction, typename I, typename Scalar>
   binary_image_scalar_expr<BinaryFunction, I, Scalar>
-  make_binary_image_scalar_expr(I&& ima, const Scalar& x, BinaryFunction f)
+  make_binary_image_scalar_expr(I&& ima, const Scalar& x, const BinaryFunction& f)
   {
-    BOOST_CONCEPT_ASSERT((Image<typename std::remove_reference<I>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I>::type>));
     return binary_image_scalar_expr<BinaryFunction, I, Scalar>(std::forward<I>(ima), x, f);
   }
 
   template <typename BinaryFunction, typename Scalar, typename I>
   binary_scalar_image_expr<BinaryFunction, Scalar, I>
-  make_binary_scalar_image_expr(const Scalar& x, I&& ima, BinaryFunction f)
+  make_binary_scalar_image_expr(const Scalar& x, I&& ima, const BinaryFunction& f)
   {
-    BOOST_CONCEPT_ASSERT((Image<typename std::remove_reference<I>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I>::type>));
     return binary_scalar_image_expr<BinaryFunction, Scalar, I>(x, std::forward<I>(ima), f);
   }
 
@@ -188,7 +190,7 @@ namespace mln
     typedef iterator_range<const_value_iterator>                                         const_value_range;
     typedef iterator_range<const_pixel_iterator>                                         const_pixel_range;
 
-    unary_image_expr_base(Image&& ima_, UnaryFunction f_):
+    unary_image_expr_base(Image&& ima_, const UnaryFunction& f_):
       ima (std::forward<Image>(ima_)),
       f (f_)
     {
@@ -233,14 +235,14 @@ namespace mln
     pixel_range
     pixels()
     {
-      pixel_iterator x(ima.pixels().iter(), f);
+      pixel_iterator x(f, ima.pixels().iter(), exact(*this));
       return make_iterator_range(x);
     }
 
     const_pixel_range
     pixels() const
     {
-      const_pixel_iterator x(ima.pixels().iter(), f);
+      const_pixel_iterator x(f, ima.pixels().iter(), exact(*this));
       return make_iterator_range(x);
     }
 
@@ -258,7 +260,10 @@ namespace mln
     {
       typedef typename std::result_of<Function (U, V)>::type result_type;
 
-      wrap_tuple_to_arg(Function f_)
+      wrap_tuple_to_arg() = default;
+
+
+      wrap_tuple_to_arg(const Function& f_)
         : f(f_)
       {
       }
@@ -289,7 +294,7 @@ namespace mln
     typedef internal::unary_image_expr_base< F, zip_image<Image1, Image2>,  binary_image_expr<BinaryFunction, Image1, Image2> > base_t;
 
   public:
-    binary_image_expr(Image1&& ima1, Image2&& ima2, BinaryFunction f):
+    binary_image_expr(Image1&& ima1, Image2&& ima2, const BinaryFunction& f):
       base_t( imzip(std::forward<Image1>(ima1), std::forward<Image2>(ima2)), F(f) )
     {
     }
@@ -300,7 +305,7 @@ namespace mln
   struct unary_image_expr : internal::unary_image_expr_base< UnaryFunction, Image, unary_image_expr<UnaryFunction, Image> >
   {
 
-    unary_image_expr(Image&& ima, UnaryFunction f):
+    unary_image_expr(Image&& ima, const UnaryFunction& f):
       internal::unary_image_expr_base< UnaryFunction, Image, unary_image_expr<UnaryFunction, Image> >(std::forward<Image>(ima), f)
     {
     }
@@ -309,14 +314,14 @@ namespace mln
 
   template <typename BinaryFunction, typename Image, typename Scalar>
   struct binary_image_scalar_expr :
-    internal::unary_image_expr_base< std::binder2nd<BinaryFunction>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> >
+    internal::unary_image_expr_base< mln::binder2nd<BinaryFunction, Scalar>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> >
   {
   private:
-    typedef internal::unary_image_expr_base< std::binder2nd<BinaryFunction>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> > base_t;
+    typedef internal::unary_image_expr_base< mln::binder2nd<BinaryFunction, Scalar>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> > base_t;
 
   public:
-    binary_image_scalar_expr(Image&& ima, const Scalar& x, BinaryFunction f):
-      base_t(std::forward<Image>(ima), std::bind2nd(f, x))
+    binary_image_scalar_expr(Image&& ima, const Scalar& x, const BinaryFunction& f):
+      base_t(std::forward<Image>(ima), mln::bind2nd(f, x))
     {
     }
   };
@@ -324,14 +329,14 @@ namespace mln
 
   template <typename BinaryFunction, typename Scalar, typename Image>
   struct binary_scalar_image_expr
-    : internal::unary_image_expr_base< std::binder1st<BinaryFunction>, Image, binary_scalar_image_expr<BinaryFunction,Scalar,Image> >
+    : internal::unary_image_expr_base< mln::binder1st<BinaryFunction, Scalar>, Image, binary_scalar_image_expr<BinaryFunction,Scalar,Image> >
   {
   private:
-    typedef internal::unary_image_expr_base< std::binder1st<BinaryFunction>, Image, binary_scalar_image_expr<BinaryFunction, Scalar, Image> > base_t;
+    typedef internal::unary_image_expr_base< mln::binder1st<BinaryFunction, Scalar>, Image, binary_scalar_image_expr<BinaryFunction, Scalar, Image> > base_t;
 
   public:
-    binary_scalar_image_expr(const Scalar& x, Image&& ima, BinaryFunction f):
-      base_t(std::forward<Image>(ima), std::bind1st(f, x))
+    binary_scalar_image_expr(const Scalar& x, Image&& ima, const BinaryFunction& f):
+      base_t(std::forward<Image>(ima), mln::bind1st(f, x))
     {
     }
   };

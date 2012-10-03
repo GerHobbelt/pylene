@@ -65,6 +65,26 @@ BOOST_AUTO_TEST_CASE(LValueOperator)
   BOOST_CHECK( all(ima == douze) );
 }
 
+BOOST_AUTO_TEST_CASE(Operators)
+ {
+   using namespace mln;
+
+
+  image2d<int> ima(5,5);
+  image2d<int> ref(5,5);
+
+  iota(ima, 0);
+  int i = 0;
+
+  mln_viter(v, ref);
+  mln_forall(v)
+    *v = i--;
+
+  BOOST_CHECK( all(-ima == ref) );
+ }
+
+
+
 BOOST_AUTO_TEST_CASE(MixedOperator)
 {
   using namespace mln;
@@ -77,25 +97,10 @@ BOOST_AUTO_TEST_CASE(MixedOperator)
 
   BOOST_CHECK( (std::is_same<typename decltype(x + x)::value_type, char> ()) );
   BOOST_CHECK( (std::is_same<typename decltype(x + y)::value_type, typename std::common_type<char, short>::type> ()) );
+
+
   BOOST_CHECK( all((x + y) == (2*y)) );
 }
-BOOST_AUTO_TEST_CASE(Operators)
- {
-   using namespace mln;
-
-
-  image2d<int> ima(5,5);
-  image2d<int> ref(5,5);
-
-  iota(ima, 0);
-  int i = 0;
-  mln_viter(v, ref);
-  mln_forall(v)
-    *v = i--;
-
-  BOOST_CHECK( boost::equal((-ima).values(), ref.values()) );
-  BOOST_CHECK( all(-ima == ref) );
- }
 
 
 //   // Const: Lvalue + Lvalue
@@ -108,3 +113,4 @@ BOOST_AUTO_TEST_CASE(Operators)
 //   // Const: Rvalue + Lvalue
 //   io::imprint((ima + ima) - (ima));
 // }
+

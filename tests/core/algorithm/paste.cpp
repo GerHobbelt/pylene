@@ -4,11 +4,11 @@
 #include <mln/core/algorithm/paste.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-
+#include <mln/core/range/algorithm/accumulate.hpp>
 
 #define BOOST_TEST_MODULE Algorithm
 #include <boost/test/unit_test.hpp>
-#include <boost/range/numeric.hpp>
+
 
 
 BOOST_AUTO_TEST_CASE(Paste)
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(Paste)
   // 16  x  x  19
   // 31  x  x  34
   // 46  47 48 49
-  int r = boost::accumulate(out.values(), 0);
+  int r = range::accumulate(out.values(), 0);
 
 
 

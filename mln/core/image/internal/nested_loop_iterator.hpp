@@ -375,6 +375,15 @@ namespace mln
       {
       }
 
+      template <typename PointVisitor2, typename ValueVisitor2, typename InternalStruct2>
+      nested_loop_iterator(const nested_loop_iterator<PointVisitor2, ValueVisitor2, InternalStruct2, DereferencePolicy>& other,
+			   typename std::enable_if< std::is_convertible<PointVisitor, PointVisitor2>::value and
+			   std::is_convertible<ValueVisitor2, ValueVisitor>::value and
+			   std::is_convertible<InternalStruct2, InternalStruct>::value>::type* = NULL)
+	: s_ (other.s_), p_ (other.p_), v_ (other.v_)
+      {
+      }
+
 
       void init()
       {
@@ -401,7 +410,7 @@ namespace mln
 
   private:
       template <typename, typename, typename, typename>
-      friend struct nested_loop_iterator_forward;
+      friend struct nested_loop_iterator;
 
       enum { ndim = PointVisitor::point_type::ndim };
 

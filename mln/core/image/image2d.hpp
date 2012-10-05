@@ -30,10 +30,10 @@ namespace mln {
   struct image2d : ndimage_base<T, 2, image2d<T> >
   {
   private:
-    typedef ndimage_base<T, 2, image2d<T> > base_type;
+    typedef ndimage_base<T, 2, image2d<T> > base;
 
   public:
-    typedef typename base_type::domain_type domain_type;
+    typedef typename base::domain_type domain_type;
 
 
     explicit image2d (unsigned border = 3) : ndimage_base<T,2,image2d<T> > (border)
@@ -50,6 +50,25 @@ namespace mln {
       : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{{0,0}},{{nrows, ncols}}}, border)
     {
     }
+
+    image2d(image2d<T>&& other)
+      : base( std::move(other) )
+    {
+    }
+
+    image2d(image2d<T>& other)
+      : base( other )
+    {
+    }
+
+    template <typename U>
+    image2d(const image2d<U>& other,
+	    typename std::enable_if< std::is_const<T>::value and
+	    std::is_convertible<U*, T*>::value>::type* = NULL)
+      : base( other )
+    {
+    }
+
 
     unsigned nrows() const { return this->domain_.pmax[0] - this->domain_.pmin[0]; }
     unsigned ncols() const { return this->domain_.pmax[1] - this->domain_.pmin[1]; }

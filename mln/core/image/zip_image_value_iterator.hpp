@@ -431,7 +431,7 @@ namespace mln
     }
 
   private:
-    ImageTuple imas_;
+    ImageTuple  imas_;
     ZipImage&   zip_;
   };
 

@@ -1,6 +1,7 @@
 #ifndef MLN_BOX_HH
 # define MLN_BOX_HH
 
+# include <mln/core/image_traits.hpp>
 # include <mln/core/point.hpp>
 # include <mln/core/image/internal/nested_loop_iterator.hpp>
 //# include <mln/core/iterator/fast_reverse_iterator.hpp>
@@ -65,11 +66,25 @@ namespace mln
     point_type pmax;
   };
 
+  // Aliases
   typedef box<short, 1> box1d;
   typedef box<float, 1> box1df;
   typedef box<short, 2> box2d;
   typedef box<float, 2> box2df;
   typedef box<short, 3> box3d;
+
+  // Image traits specialization
+  // forward declaration
+  template <typename V> struct image2d;
+
+  template <typename V>
+  struct image_from_domain<box2d, V>
+  {
+    typedef image2d<V> type;
+  };
+
+
+
 
   template <typename T, unsigned dim>
   inline

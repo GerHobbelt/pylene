@@ -22,6 +22,17 @@ namespace mln
   template <typename I>
   struct image_traits<const volatile I> : image_traits<I> {};
 
+
+  template <typename Domain, typename V>
+  struct image_from_domain;
+
+  template <typename Image, typename V>
+  struct image_change_value
+  {
+    typedef typename image_from_domain<typename Image::domain_type, V>::type type;
+  };
+
+
   //{
     // Type of image (dynamic or static)
     //typedef typename image_traits<I>::category category;

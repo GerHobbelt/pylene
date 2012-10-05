@@ -90,6 +90,44 @@ namespace mln
     // \{
     explicit ndimage_base(unsigned border = 3);
     explicit ndimage_base(const domain_type& domain, unsigned border = 3);
+
+    // construction from const lvalue or rvalue
+    template <typename T2, typename E2>
+    ndimage_base(const ndimage_base<T2, dim, E2>& other,
+		 typename std::enable_if< std::is_const<T>::value and
+		 std::is_convertible<T2*, T*>::value>::type* = NULL)
+      : domain_ (other.domain_),
+	strides_ (other.strides_),
+	data_ (other.data_),
+	border_ (other.border_),
+	ptr_ (other.ptr_),
+	last_ (other.last_)
+    {
+    }
+
+    // Construction from rvalue
+    ndimage_base(ndimage_base<T, dim, E>&& other)
+      : domain_ (std::move(other.domain_)),
+	strides_ (std::move(other.strides_)),
+	data_ (std::move(other.data_)),
+	border_ (std::move(other.border_)),
+	ptr_ (std::move(other.ptr_)),
+	last_ (std::move(other.last_))
+    {
+    }
+
+    // Construction from lvalue
+    ndimage_base(ndimage_base<T, dim, E>& other)
+      : domain_ (other.domain_),
+	strides_ (other.strides_),
+	data_ (other.data_),
+	border_ (other.border_),
+	ptr_ (other.ptr_),
+	last_ (other.last_)
+    {
+    }
+
+
     // \}
 
     const domain_type&  domain() const;
@@ -161,12 +199,12 @@ namespace mln
     friend struct ndimage_pixel<const T, dim, const E>;
     template <typename, typename> friend struct ndimage_value_range;
     template <typename, typename> friend struct ndimage_pixel_range;
-
+    template <typename, unsigned, typename> friend struct ndimage_base;
 
 
     domain_type	domain_;	///< Domain of image
     std::array<size_t, dim>	strides_;	///< Strides in bytes
-    std::shared_ptr< internal::ndimage_data<T, dim> > data_;
+  std::shared_ptr< internal::ndimage_data<typename std::remove_const<T>::type, dim> > data_;
     int		border_;
     char*	ptr_;           ///< Pointer to the first element
     char*	last_;          ///< Pointer to the last element

@@ -22,6 +22,13 @@ namespace mln
     typedef typename Range::const_iterator type;
   };
 
+  template <typename Range>
+  struct range_value
+  {
+    typedef typename range_iterator<Range>::type::value_type type;
+  };
+
+
 }
 
 #endif // ! RANGE_TRAITS_HPP

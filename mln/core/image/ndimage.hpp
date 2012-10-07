@@ -56,7 +56,6 @@ namespace mln
     };
   }
 
-
   template <typename T, unsigned dim, typename E>
   struct ndimage_base : image_base<E, point<short, dim>, T,
                                    ndimage_pixel<T, dim, E>,
@@ -156,6 +155,16 @@ namespace mln
     const size_t*       strides() const;
     int border() const { return border_; }
 
+
+    // Specialized algorithm
+    template <typename T_, unsigned dim_, typename E_>
+    friend const E_ make_subimage(const ndimage_base<T_, dim_, E_>&, const typename ndimage_base<T_, dim_, E_>::domain_type& domain);
+    template <typename T_, unsigned dim_, typename E_>
+    friend E_ make_subimage(ndimage_base<T_, dim_, E_>&, const typename ndimage_base<T_, dim_, E_>::domain_type& domain);
+    template <typename T_, unsigned dim_, typename E_>
+    friend E_ make_subimage(ndimage_base<T_, dim_, E_>&&, const typename ndimage_base<T_, dim_, E_>::domain_type& domain);
+
+
   protected:
     friend struct ndimage_pixel<T, dim, E>;
     friend struct ndimage_pixel<const T, dim, const E>;
@@ -169,7 +178,7 @@ namespace mln
     std::shared_ptr< internal::ndimage_data<T, dim> > data_;
     int		border_;
     char*	ptr_;           ///< Pointer to the first element
-    char*	last_;          ///< Pointer to the last element
+    char*	last_;          ///< Pointer to the last element (not past-the-end)
   };
 
 

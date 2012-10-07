@@ -1,6 +1,7 @@
 #ifndef MLN_INTERNAL_VEC_BASE_HH
 # define MLN_INTERNAL_VEC_BASE_HH
 
+# include <mln/core/literal/vectorial.hpp>
 
 
 // FIXME:
@@ -150,6 +151,35 @@ namespace mln
       typedef ptrdiff_t difference_type;
 
       enum { ndim = dim };
+
+      vec_base() = default;
+
+      constexpr vec_base(const literal::zero_t&)
+        : v_ {0,}
+      {
+      }
+
+      vec_base(const literal::one_t&)
+      {
+        v_.set_all(1);
+      }
+
+      vec_base(std::initializer_list<T> l)
+      {
+        std::copy(l.begin(), l.end(), v_);
+      }
+
+
+      template <typename U>
+      vec_base(const vec_base<U, dim, tag>& other)
+      {
+	std::copy(other.v_, other.v_ + dim, v_);
+      }
+
+      void set_all(const T& v)
+      {
+        std::fill(v_, v_ + dim, v);
+      }
 
       template <typename U>
       vec_base&

@@ -134,7 +134,7 @@ namespace mln
       const Point& p_;
     };
 
-    struct constify
+    struct meta_add_const_reference
     {
       template <typename T> struct apply { typedef const typename std::remove_reference<T>::type& type; };
       //template <typename T> struct apply<T&> { typedef const T& type; };
@@ -142,6 +142,16 @@ namespace mln
       template <typename T>
       const T&
       operator() (T& x) const {return static_cast<const T&> (x); }
+    };
+
+    struct meta_add_reference
+    {
+      template <typename T> struct apply { typedef typename std::remove_reference<T>::type& type; };
+      //template <typename T> struct apply<T&> { typedef const T& type; };
+
+      template <typename T>
+      T&
+      operator() (const T& x) const {return const_cast<T&>(x); }
     };
 
   }
@@ -167,7 +177,8 @@ namespace mln
 
 
     typedef boost::tuple<Images...> ImageTuple;
-    typedef typename internal::tuple_meta_transform<ImageTuple, internal::constify>::type ConstImageTuple;
+    typedef typename internal::tuple_meta_transform<ImageTuple, internal::meta_add_const_reference>::type ConstImageRefTuple;
+    typedef typename internal::tuple_meta_transform<ImageTuple, internal::meta_add_reference>::type       ImageRefTuple;
     typedef typename boost::tuples::element<0, ImageTuple>::type Image; 
     typedef typename std::decay<Image>::type VImage;
     typedef boost::tuple<Images...> images_t;
@@ -192,13 +203,13 @@ namespace mln
     // typedef boost::iterator_range<value_iterator> value_range;
     // typedef boost::iterator_range<const_value_iterator> const_value_range;
 
-    typedef zip_image_value_range<typename internal::zip_image_category<ImageTuple>::type, ImageTuple>		 value_range;
-    typedef zip_image_value_range<typename internal::zip_image_category<ImageTuple>::type, ConstImageTuple>           const_value_range;
+    typedef zip_image_value_range<typename internal::zip_image_category<ImageTuple>::type, ImageRefTuple>		 value_range;
+    typedef zip_image_value_range<typename internal::zip_image_category<ImageTuple>::type, ConstImageRefTuple>           const_value_range;
     typedef typename value_range::iterator							 value_iterator;
     typedef typename const_value_range::iterator						 const_value_iterator;
 
-    typedef zip_image_pixel_range<typename internal::zip_image_category<ImageTuple>::type, ImageTuple, E>		 pixel_range;
-    typedef zip_image_pixel_range<typename internal::zip_image_category<ImageTuple>::type, ConstImageTuple, const E>  const_pixel_range;
+    typedef zip_image_pixel_range<typename internal::zip_image_category<ImageTuple>::type, ImageRefTuple, E>		 pixel_range;
+    typedef zip_image_pixel_range<typename internal::zip_image_category<ImageTuple>::type, ConstImageRefTuple, const E>  const_pixel_range;
     typedef typename pixel_range::iterator							 pixel_iterator;
     typedef typename const_pixel_range::iterator						 const_pixel_iterator;
     typedef typename pixel_iterator::value_type                                                  pixel_type;
@@ -225,7 +236,7 @@ namespace mln
 
     value_range values()
     {
-      return value_range(images_);
+      return value_range(internal::tuple_transform(images_, internal::meta_add_reference ()));
       // using namespace boost::detail::tuple_impl_specific;
       // auto w = tuple_transform(images_, internal::get_image_value_range ());
       // value_iterator begin_(tuple_transform(w, internal::get_image_value_iterator_begin ()));
@@ -235,7 +246,7 @@ namespace mln
 
     const_value_range values() const
     {
-      return const_value_range(internal::tuple_transform(images_, internal::constify ()));
+      return const_value_range(internal::tuple_transform(images_, internal::meta_add_const_reference ()));
       // using namespace boost::detail::tuple_impl_specific;
       // auto w = tuple_transform(images_, internal::get_image_value_range ());
       // const_value_iterator begin_(tuple_transform(w, internal::get_image_value_iterator_begin ()));
@@ -245,7 +256,8 @@ namespace mln
 
     pixel_range pixels()
     {
-      return pixel_range(images_, *this);
+      return pixel_range(internal::tuple_transform(images_, internal::meta_add_reference ()), *this);
+
       // auto x = this->values();
       // pixel_iterator begin_(std::begin(this->domain()), std::begin(x), *this);
       // pixel_iterator end_(std::end(this->domain()), std::end(x), *this);
@@ -254,7 +266,7 @@ namespace mln
 
     const_pixel_range pixels() const
     {
-      return const_pixel_range(internal::tuple_transform(images_, internal::constify ()), *this);
+      return const_pixel_range(internal::tuple_transform(images_, internal::meta_add_const_reference ()), *this);
       // auto x = this->values();
       // const_pixel_iterator begin_(std::begin(this->domain()), std::begin(x),*this);
       // const_pixel_iterator end_(std::end(this->domain()), std::end(x), *this);

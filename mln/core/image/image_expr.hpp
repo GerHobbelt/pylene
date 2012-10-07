@@ -140,7 +140,6 @@ namespace mln
   template <typename Expr>
   struct image_expr : Image<Expr>
   {
-    BOOST_CONCEPT_ASSERT((IterableImage<Expr>));
   };
 
   namespace internal

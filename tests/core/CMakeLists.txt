@@ -3,7 +3,10 @@ add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 
 add_executable(array std/array.cpp)
+
+
 add_executable(zip_image image/zip_image.cpp)
+add_executable(sub_image image/sub_image.cpp)
 add_executable(image_ops image/image_ops.cpp)
 
 

@@ -5,6 +5,10 @@
 # include <type_traits>
 # include <boost/range/iterator.hpp>
 
+# define mln_value(I) typename I::value_type
+# define mln_point(I) typename I::point_type
+# define mln_site(I)  typename I::point_type
+
 namespace mln
 {
   struct image_dynamic_tag {};
@@ -21,6 +25,7 @@ namespace mln
 
   template <typename I>
   struct image_traits<const volatile I> : image_traits<I> {};
+
 
   //{
     // Type of image (dynamic or static)

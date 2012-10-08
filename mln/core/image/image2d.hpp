@@ -2,6 +2,7 @@
 # define MLN_CORE_IMAGE_IMAGE2D_HPP
 
 # include <mln/core/image/ndimage.hpp>
+# include <mln/core/ch_value.hpp>
 
 namespace mln {
 
@@ -15,6 +16,11 @@ namespace mln {
   {
   };
 
+  template <typename T, typename V>
+  struct image_ch_value< image2d<T>, V >
+  {
+    typedef image2d<V> type;
+  };
 
   ///
   /// \brief The standard 2D image type.

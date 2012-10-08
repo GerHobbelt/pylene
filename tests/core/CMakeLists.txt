@@ -14,11 +14,16 @@ add_executable(copy algorithm/copy.cpp)
 add_executable(fill algorithm/fill.cpp)
 add_executable(paste algorithm/paste.cpp)
 add_executable(equal algorithm/equal.cpp)
+add_executable(sort_offset algorithm/sort_offset.cpp)
 
 
 add_test(zip_image zip_image)
 add_test(image_ops image_ops)
+add_test(sub_image sib_image)
+
+
 add_test(copy copy)
 add_test(fill fill)
 add_test(paste paste)
 add_test(equal equal)
+add_test(sort_offset sort_offset)

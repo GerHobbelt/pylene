@@ -2,5 +2,5 @@
 link_libraries(${Boost_LIBRARIES})
 add_definitions(-DBOOST_TEST_DYN_LINK)
 
-SUBDIRS(core io)
+SUBDIRS(core io morpho)
 

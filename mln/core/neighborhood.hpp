@@ -28,50 +28,27 @@ namespace mln {
     }
 
 
-
-    template <typename Pixel>
+    template <typename PixelOrPixelIterator>
     inline
-    nbh<Pixel>
-    operator() (const Pixel& pix) const;
-
-
-    // template <typename PixelRange>
-    // inline
-    // nbh< typename boost::range_value<PixelRange>::type >
-    // operator() (const internal::pix_range_iterator_proxy<PixelRange>& pix) const
-    // {
-    //   typedef nbh< typename boost::range_value<PixelRange>::type > nbh_t;
-    //   nbh_t x(Derived::dpoints, pix);
-    //   return x;
-    // }
-
-    // template <typename Image>
-    // inline
-    // constexpr
-    // typename nbh<Image>::type
-    // operator() (const Image& ima, point_type p) const
-    // {
-    //   static_assert(std::is_convertible<point_type, typename Image::point_type>::value, "Point is not convertible to Image::point_type");
-
-    //   typename nbh<Image>::type x(ima, Derived::dpoints);
-    //   x.center(p);
-    //   return x;
-    // }
-  };
-
-
-
-    template <typename Derived, typename SiteSet>
-    template <typename Pixel>
-    typename neighborhood_base<Derived, SiteSet>::template nbh<Pixel>
-    neighborhood_base<Derived, SiteSet>::operator() (const Pixel& pix) const
+    nbh<PixelOrPixelIterator>
+    operator() (const PixelOrPixelIterator& pix) const
     {
-      typedef nbh<Pixel> nbh_t;
+      typedef nbh<PixelOrPixelIterator> nbh_t;
 
       nbh_t x(Derived::dpoints, pix);
       return x;
     }
 
+    template <typename PixelOrPixelIterator,
+	      typename = typename std::enable_if<not std::is_lvalue_reference<PixelOrPixelIterator>::value>::type>
+    nbh<PixelOrPixelIterator>
+    operator() (PixelOrPixelIterator&& pix) const
+    {
+      static_assert(not std::is_lvalue_reference<PixelOrPixelIterator>::value,
+		    "You must pass a lvalue to neighborhood.");
+    }
+
+  };
 
 } // end of namespace mln
 

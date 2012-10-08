@@ -14,6 +14,9 @@
 
 namespace mln
 {
+
+  template <typename T, unsigned dim, typename E> struct ndimage_base;
+
   // FWD
   //template <typename I, typename T> struct ndimage_iter;
   //template <typename I, typename T> struct ndimage_rev_iter;
@@ -32,6 +35,7 @@ namespace mln
   {
     typedef raw_image_tag               category;
     typedef std::true_type              accessible;
+    typedef std::true_type		swallow_copy;
   };
 
 /******************************************/
@@ -88,7 +92,7 @@ namespace mln
     // \group Constructors
     // \{
     explicit ndimage_base(unsigned border = 3);
-    explicit ndimage_base(const domain_type& domain, unsigned border = 3);
+    explicit ndimage_base(const domain_type& domain, unsigned border = 3, T v = T());
     // \}
 
     const domain_type&  domain() const;
@@ -122,11 +126,11 @@ namespace mln
 
 
     // As a Resizable Image
-    void resize(const domain_type& domain, unsigned border = 3);
+    void resize(const domain_type& domain, unsigned border = 3, T v = T());
 
     // As a RandomAccessImage
-    reference at (difference_type n);
-    const_reference at (difference_type n) const;
+    reference element(difference_type n);
+    const_reference element(difference_type n) const;
 
     // As an IterableImage
     typedef ndimage_value_range<this_type, T>					value_range;
@@ -180,6 +184,10 @@ namespace mln
     char*	ptr_;           ///< Pointer to the first element
     char*	last_;          ///< Pointer to the last element (not past-the-end)
   };
+
+  /******************************/
+  /** Free function Impl        */
+  /******************************/
 
 
   template <typename T>
@@ -284,7 +292,7 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
-  ndimage_base<T,dim,E>::ndimage_base(const domain_type& domain, unsigned border)
+  ndimage_base<T,dim,E>::ndimage_base(const domain_type& domain, unsigned border, T v)
     : domain_ (domain),
       border_ (border)
   {
@@ -295,7 +303,7 @@ namespace mln
 
     // Compute strides size (in bytes)
     // The row stride is 16 bytes aligned
-    data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border));
+    data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border, v));
     std::copy(data_->strides, data_->strides + dim, strides_.begin());
 
     // Compute pointer at (0,0)
@@ -310,7 +318,7 @@ namespace mln
 
   template <typename T, unsigned dim, typename E>
   void
-  ndimage_base<T,dim,E>::resize(const domain_type& domain, unsigned border)
+  ndimage_base<T,dim,E>::resize(const domain_type& domain, unsigned border, T v)
   {
     domain_ = domain;
     border_ = border;
@@ -321,7 +329,7 @@ namespace mln
 
     // Compute strides size (in bytes)
     // The row stride is 16 bytes aligned
-    data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border));
+    data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border, v));
     std::copy(data_->strides, data_->strides + dim, strides_.begin());
 
     // Compute pointer at (0,0)
@@ -364,7 +372,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::at (difference_type n)
+  ndimage_base<T,dim,E>::element (difference_type n)
   {
     mln_precondition(0 <= n && n < data_->nbytes);
     return *reinterpret_cast<T*>(ptr_+n);
@@ -373,7 +381,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::at (difference_type n) const
+  ndimage_base<T,dim,E>::element (difference_type n) const
   {
     mln_precondition(0 <= n && n < data_->nbytes);
     return *reinterpret_cast<const T*>(ptr_+n);

@@ -3,11 +3,35 @@
 
 # include <mln/core/concept/image.hpp>
 # include <mln/core/image_traits.hpp>
-
+# include <mln/core/ch_value.hpp>
 # include <cstddef>
 
 namespace mln
 {
+  /// Free functions
+  /// \{
+
+
+  /// \brief Initialize an image from an other such that
+  /// domains correspond
+  ///
+  /// \param ima Image to be initialized
+  /// \param other Image to initialize with.
+  ///
+  template <typename I, typename J>
+  void resize(Image<I>& ima, const Image<J>& other)
+  {
+    exact(ima).resize(exact(other).domain());
+  }
+
+  template <typename I, typename J>
+  void resize(Image<I>& ima, const Image<J>& other, unsigned border, mln_value(I) v)
+  {
+    exact(ima).resize(exact(other).domain(), border, v);
+  }
+
+  /// \}
+
 
   struct undef {};
 
@@ -56,10 +80,5 @@ namespace mln
   };
 
 } // end of namespace mln
-
-
-# include <mln/core/forall.hpp>
-# include <mln/core/image/image_expr.hpp>
-# include <mln/core/image/image_ops.hpp>
 
 #endif //!MLN_CORE_IMAGE_BASE_HPP

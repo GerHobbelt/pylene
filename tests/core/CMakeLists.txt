@@ -19,7 +19,7 @@ add_executable(sort_offset algorithm/sort_offset.cpp)
 
 add_test(zip_image zip_image)
 add_test(image_ops image_ops)
-add_test(sub_image sib_image)
+add_test(sub_image sub_image)
 
 
 add_test(copy copy)

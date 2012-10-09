@@ -31,7 +31,8 @@ namespace mln {
     template <typename PixelOrPixelIterator>
     inline
     nbh<PixelOrPixelIterator>
-    operator() (const PixelOrPixelIterator& pix) const
+    operator() (const PixelOrPixelIterator& pix,
+		typename std::enable_if<not std::is_convertible<PixelOrPixelIterator, point_type>::value>::type* = NULL) const
     {
       typedef nbh<PixelOrPixelIterator> nbh_t;
 

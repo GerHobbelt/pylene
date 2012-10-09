@@ -10,6 +10,7 @@
 # include <mln/core/image/internal/nested_loop_iterator.hpp>
 # include <mln/core/image/zip_image_pixel.hpp>
 # include <mln/core/range/range_traits.hpp>
+# include <mln/core/stride_utils.hpp>
 
 namespace mln
 {
@@ -191,28 +192,32 @@ namespace mln
   template <typename PointerTuple, typename Point>
   using zip_image_raw_value_iterator_forward = internal::nested_loop_iterator
     <internal::origin_point_visitor_forward<Point>,
-     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim, true>,
+     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim>,
+     internal::no_op_visitor,
      zip_raw_pixel<PointerTuple, Point>,
      internal::deref_return_value_policy >;
 
   template <typename PointerTuple, typename Point, typename ZipImage>
   using zip_image_raw_pixel_iterator_forward = internal::nested_loop_iterator
     <internal::domain_point_visitor_forward<Point>,
-     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim, true>,
+     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim>,
+     internal::no_op_visitor,
      zip_raw_pixel<PointerTuple, Point, ZipImage>,
      internal::deref_return_structure_policy >;
 
   template <typename PointerTuple, typename Point>
   using zip_image_raw_value_iterator_backward = internal::nested_loop_iterator
     <internal::origin_point_visitor_backward<Point>,
-     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim, false>,
+     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim>,
+     internal::no_op_visitor,
      zip_raw_pixel<PointerTuple, Point>,
      internal::deref_return_value_policy >;
 
   template <typename PointerTuple, typename Point, typename ZipImage>
   using zip_image_raw_pixel_iterator_backward = internal::nested_loop_iterator
     <internal::domain_point_visitor_backward<Point>,
-     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim, false>,
+     internal::strided_tuple_pointer_value_visitor<boost::tuples::length<PointerTuple>::value, Point::ndim>,
+     internal::no_op_visitor,
      zip_raw_pixel<PointerTuple, Point, ZipImage>,
      internal::deref_return_structure_policy >;
 
@@ -248,12 +253,13 @@ namespace mln
       auto pmax = ima.domain().pmax;
 
       std::array<ptr_t, nelems>		ptr_arr;
-      std::array<const size_t*, nelems> strides_arr;
-      this->init_forward<nelems-1>(ptr_arr, strides_arr);
+      std::array< std::array<std::ptrdiff_t, ndim> , nelems> delta_strides_arr;
+      this->init_forward<nelems-1>(ptr_arr, delta_strides_arr);
 
       return iterator(zip_raw_pixel<PointerTuple, Point> (Point (), ptr_arr),
 		      internal::make_point_visitor_forward(pmax - pmin),
-		      internal::strided_tuple_pointer_value_visitor<nelems, ndim, true>(ptr_arr, strides_arr));
+		      internal::strided_tuple_pointer_value_visitor<nelems, ndim>(ptr_arr, delta_strides_arr),
+		      internal::no_op_visitor ());
     }
 
     reverse_iterator riter() const
@@ -263,55 +269,64 @@ namespace mln
       auto pmax = ima.domain().pmax;
 
       std::array<ptr_t, nelems>		ptr_arr;
-      std::array<const size_t*, nelems> strides_arr;
-      this->init_backward<nelems-1>(ptr_arr, strides_arr);
+      std::array< std::array<std::ptrdiff_t, ndim> , nelems> delta_strides_arr;
+      this->init_backward<nelems-1>(ptr_arr, delta_strides_arr);
 
       return reverse_iterator(zip_raw_pixel<PointerTuple, Point> (Point (), ptr_arr),
 			      internal::make_point_visitor_backward(pmax - pmin),
-			      internal::strided_tuple_pointer_value_visitor<nelems, ndim, false>(ptr_arr, strides_arr));
+			      internal::strided_tuple_pointer_value_visitor<nelems, ndim>(ptr_arr, delta_strides_arr),
+			      internal::no_op_visitor ());
     }
 
   private:
     template <size_t n>
-    typename std::enable_if<(n == 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
+    typename std::enable_if< (n > 0) >::type
+    init_forward(std::array<ptr_t, nelems>& x,
+		 std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
     {
-      auto p = boost::get<0>(imas_).values().iter();
-      p.init();
-      x[0] = (ptr_t) (& (*p) );
-      strides[0] = boost::get<0>(imas_).strides();
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmin));
+      compute_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
+      if (n > 0)
+	this->init_forward<n-1>(x, delta_strides);
     }
 
     template <size_t n>
-    typename std::enable_if<(n > 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
+    typename std::enable_if< (n == 0) >::type
+    init_forward(std::array<ptr_t, nelems>& x,
+		 std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
     {
-      auto p = boost::get<n>(imas_).values().iter();
-      p.init();
-      x[n] = (ptr_t) (& *(p) );
-      strides[n] = boost::get<n>(imas_).strides();
-      this->init_forward<n-1> (x, strides);
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmin));
+      compute_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
+    }
+
+
+
+    template <size_t n>
+    typename std::enable_if< (n > 0) >::type
+    init_backward(std::array<ptr_t, nelems>& x,
+		  std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
+    {
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmax));
+      compute_negative_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
+      if (n > 0)
+	this->init_backward<n-1>(x, delta_strides);
     }
 
     template <size_t n>
-    typename std::enable_if<(n == 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
+    typename std::enable_if< (n == 0) >::type
+    init_backward(std::array<ptr_t, nelems>& x,
+		  std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
     {
-      auto p = boost::get<0>(imas_).values().riter();
-      p.init();
-      x[0] = (ptr_t) (& (*p) );
-      strides[0] = boost::get<0>(imas_).strides();
-    }
-
-    template <size_t n>
-    typename std::enable_if<(n > 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
-    {
-      auto p = boost::get<n>(imas_).values().riter();
-      p.init();
-      x[n] = (ptr_t) (& *(p) );
-      strides[n] = boost::get<n>(imas_).strides();
-      this->init_backward<n-1> (x, strides);
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmax));
+      compute_negative_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
     }
 
   private:
@@ -327,9 +342,10 @@ namespace mln
 
     typedef char* ptr_t;
     typedef zip_image_raw_pixel_iterator_forward<PointerTuple, Point, ZipImage> iterator;
-    typedef zip_image_raw_pixel_iterator_forward<ConstPointerTuple, Point, const ZipImage> const_iterator;
     typedef zip_image_raw_pixel_iterator_backward<PointerTuple, Point, ZipImage> reverse_iterator;
-    typedef zip_image_raw_pixel_iterator_backward<ConstPointerTuple, Point, const ZipImage> const_reverse_iterator;
+    typedef iterator const_iterator;
+    typedef reverse_iterator const_reverse_iterator;
+
     typedef zip_raw_pixel<PointerTuple, Point, ZipImage> pixel_t;
     typedef zip_raw_pixel<ConstPointerTuple, Point, ZipImage> const_pixel_t;
 
@@ -337,39 +353,24 @@ namespace mln
     enum { ndim = Point::ndim };
 
     zip_image_pixel_range(const ImageTuple& x, ZipImage& zip)
-      : imas_ (x), zip_ (zip)
+      : imas_ (x), zip_ (&zip)
     {
     }
 
-
-    const_iterator iter() const
+    iterator iter() const
     {
       auto& ima = boost::get<0>(imas_);
       auto pmin = ima.domain().pmin;
       auto pmax = ima.domain().pmax;
 
       std::array<ptr_t, nelems>		ptr_arr;
-      std::array<const size_t*, nelems> strides_arr;
-      this->init_forward<nelems-1>(ptr_arr, strides_arr);
+      std::array< std::array<std::ptrdiff_t, ndim> , nelems> delta_strides_arr;
+      this->init_forward<nelems-1>(ptr_arr, delta_strides_arr);
 
-      return const_iterator(zip_raw_pixel<PointerTuple, Point, const ZipImage> (Point (), ptr_arr, &zip_),
-			    internal::make_point_visitor_forward(pmin, pmax),
-			    internal::strided_tuple_pointer_value_visitor<nelems, ndim, true>(ptr_arr, strides_arr));
-    }
-
-    iterator iter()
-    {
-      auto& ima = boost::get<0>(imas_);
-      auto pmin = ima.domain().pmin;
-      auto pmax = ima.domain().pmax;
-
-      std::array<ptr_t, nelems>		ptr_arr;
-      std::array<const size_t*, nelems> strides_arr;
-      this->init_forward<nelems-1>(ptr_arr, strides_arr);
-
-      return iterator(zip_raw_pixel<PointerTuple, Point, ZipImage> (Point (), ptr_arr, &zip_),
+      return iterator(zip_raw_pixel<PointerTuple, Point, ZipImage> (Point (), ptr_arr, zip_),
 		      internal::make_point_visitor_forward(pmin, pmax),
-		      internal::strided_tuple_pointer_value_visitor<nelems, ndim, true>(ptr_arr, strides_arr));
+		      internal::strided_tuple_pointer_value_visitor<nelems, ndim>(ptr_arr, delta_strides_arr),
+		      internal::no_op_visitor ());
     }
 
     reverse_iterator riter() const
@@ -379,60 +380,69 @@ namespace mln
       auto pmax = ima.domain().pmax;
 
       std::array<ptr_t, nelems>		ptr_arr;
-      std::array<const size_t*, nelems> strides_arr;
-      this->init_forward<nelems-1>(ptr_arr, strides_arr);
+      std::array< std::array<std::ptrdiff_t, ndim> , nelems> delta_strides_arr;
+      this->init_backward<nelems-1>(ptr_arr, delta_strides_arr);
 
-      return reverse_iterator(zip_raw_pixel<PointerTuple, Point> (Point (), ptr_arr),
-			      internal::make_point_visitor_forward(pmin, pmax),
-			      internal::strided_tuple_pointer_value_visitor<nelems, ndim, false>(ptr_arr, strides_arr));
+      return reverse_iterator(zip_raw_pixel<PointerTuple, Point, ZipImage> (Point (), ptr_arr, zip_),
+			      internal::make_point_visitor_backward(pmin, pmax),
+			      internal::strided_tuple_pointer_value_visitor<nelems, ndim>(ptr_arr, delta_strides_arr),
+			      internal::no_op_visitor ());
     }
 
   private:
     template <size_t n>
-    typename std::enable_if<(n == 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
+    typename std::enable_if< (n > 0) >::type
+    init_forward(std::array<ptr_t, nelems>& x,
+		 std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
     {
-      auto p =  boost::get<0>(imas_).values().iter();
-      p.init();
-      x[0] = (ptr_t) (& (*p) );
-      strides[0] = boost::get<0>(imas_).strides();
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmin));
+      compute_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
+      if (n > 0)
+	this->init_forward<n-1>(x, delta_strides);
     }
 
     template <size_t n>
-    typename std::enable_if<(n > 0), void>::type
-    init_forward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
+    typename std::enable_if< (n == 0) >::type
+    init_forward(std::array<ptr_t, nelems>& x,
+		 std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
     {
-      auto p =  boost::get<n>(imas_).values().iter();
-      p.init();
-      x[n] = (ptr_t) (& *(p) );
-      strides[n] = boost::get<n>(imas_).strides();
-      this->init_forward<n-1> (x, strides);
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmin));
+      compute_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
+    }
+
+
+
+    template <size_t n>
+    typename std::enable_if< (n > 0) >::type
+    init_backward(std::array<ptr_t, nelems>& x,
+		  std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
+    {
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmax));
+      compute_negative_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
+      if (n > 0)
+	this->init_backward<n-1>(x, delta_strides);
     }
 
     template <size_t n>
-    typename std::enable_if<(n == 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
+    typename std::enable_if< (n == 0) >::type
+    init_backward(std::array<ptr_t, nelems>& x,
+		  std::array<std::array<std::ptrdiff_t, ndim>, nelems>& delta_strides) const
     {
-      auto p =  boost::get<0>(imas_).values().riter();
-      p.init();
-      x[0] = (ptr_t) (& (*p) );
-      strides[0] = boost::get<0>(imas_).strides();
-    }
-
-    template <size_t n>
-    typename std::enable_if<(n > 0), void>::type
-    init_backward(std::array<ptr_t, nelems>& x, std::array<const size_t*, nelems>& strides) const
-    {
-      auto p =  boost::get<n>(imas_).values().riter();
-      p.init();
-      x[n] = (ptr_t) (& *(p) );
-      strides[n] = boost::get<n>(imas_).strides();
-      this->init_backward<n-1> (x, strides);
+      auto& f = boost::get<n>(imas_);
+      auto shp = f.domain().shape();
+      x[n] = (ptr_t) &(f(f.domain().pmax));
+      compute_negative_delta_strides<ndim>(f.strides(), &shp[0], & delta_strides[n][0]);
     }
 
   private:
     ImageTuple imas_;
-    ZipImage&   zip_;
+    ZipImage*   zip_;
   };
 
 } // end of namespace mln

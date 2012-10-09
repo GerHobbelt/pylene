@@ -6,6 +6,7 @@
 # include <array>
 
 # include <boost/tuple/tuple.hpp>
+# include <mln/core/image/internal/nested_loop_iterator.hpp>
 
 namespace mln {
 
@@ -24,7 +25,7 @@ namespace mln {
   {
     using namespace boost::detail::tuple_impl_specific;
 
-    template <size_t nelems, size_t dim, bool forward>
+    template <size_t nelems, size_t dim>
     struct strided_tuple_pointer_value_visitor
     {
       typedef char* ptr_t;
@@ -35,73 +36,28 @@ namespace mln {
       {
       }
 
-      strided_tuple_pointer_value_visitor(const std::array<ptr_t, nelems>&		start,
-					  const std::array<const size_t*, nelems>&	strides)
-	: start_ (start)
+      strided_tuple_pointer_value_visitor(const std::array<ptr_t, nelems>&				start,
+					  const std::array< std::array<ptrdiff_t, ndim>, nelems>&	delta_strides)
+	: m_start (start), m_delta_strides (delta_strides)
       {
-	 for (unsigned i = 0; i < nelems; ++i)
-	   std::copy(strides[i], strides[i] + ndim, strides_[i].begin());
       }
 
       void initialize(arg_t& x)
       {
-	x = start_;
-	for (unsigned i = 0; i < nelems; ++i)
-	  stack_[i].fill(start_[i]);
+	x = m_start;
       }
 
       template <size_t n>
-      typename std::enable_if<(n < ndim-1)>::type
-      init (arg_t& )
-      {
-	for (unsigned i = 0; i < nelems; ++i)
-	  stack_[i][n] = stack_[i][n-1];
-      }
-
-      template <size_t n>
-      typename std::enable_if<(n == ndim-1)>::type
-      init (arg_t& x)
-      {
-	for (unsigned i = 0; i < nelems; ++i)
-	  x[i] = (stack_[i][n] = stack_[i][n-1]);
-      }
-
-      template <size_t n>
-      typename std::enable_if<(!forward and n < ndim-1)>::type
-      next (arg_t&)
-      {
-	for (unsigned i = 0; i < nelems; ++i)
-	  stack_[i][n] -= strides_[i][n];
-      }
-
-      template <size_t n>
-      typename std::enable_if<(forward and n < ndim-1)>::type
-      next (arg_t&)
-      {
-	for (unsigned i = 0; i < nelems; ++i)
-	  stack_[i][n] += strides_[i][n];
-      }
-
-	template <size_t n>
-	typename std::enable_if<(!forward and n == ndim-1)>::type
-	next (arg_t& x)
-      {
-	for (unsigned i = 0; i < nelems; ++i)
-	  x[i] = (stack_[i][n] -= strides_[i][n]);
-      }
-
-      template <size_t n>
-      typename std::enable_if<(forward and n == ndim-1), void>::type
+      void
       next (arg_t& x)
       {
 	for (unsigned i = 0; i < nelems; ++i)
-	  x[i] = (stack_[i][n] += strides_[i][n]);
+	  x[i] += m_delta_strides[i][n];
       }
 
     private:
-      std::array<ptr_t, nelems>			     start_;
-      std::array< std::array<size_t, ndim>, nelems > strides_;
-      std::array< std::array<ptr_t,  ndim>, nelems > stack_;
+      std::array<ptr_t, nelems>			        m_start;
+      std::array< std::array<ptrdiff_t, ndim>, nelems > m_delta_strides;
     };
 
     struct ptr_2_ref
@@ -149,7 +105,9 @@ namespace mln {
   }
 
   template <typename PointerTuple, typename Point, typename ZipImage>
-  struct zip_raw_pixel : internal::zip_raw_pixel_base<ZipImage>
+  struct zip_raw_pixel :
+    internal::zip_raw_pixel_base<ZipImage>,
+    internal::nested_loop_pixel_structure_base
   {
     enum { nelems = boost::tuples::length<PointerTuple>::value };
     typedef char* ptr_t;

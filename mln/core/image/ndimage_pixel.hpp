@@ -39,6 +39,7 @@ namespace mln
     site_type           site()  const;
     distance_type	offset() const;
     image_type&         image() const;
+    size_t		index() const { return index_; }
 
     template <typename, unsigned, typename> friend struct ndimage_pixel;
     template <typename, unsigned, typename> friend struct ndimage_base;
@@ -48,8 +49,10 @@ namespace mln
 
     char* &		get_value() { return ptr_; }
     site_type&		get_point() { return point_; }
+    size_t&		get_index() { return index_; }
     const char*         get_value() const { return ptr_; }
     const site_type&    get_point() const { return point_; }
+    size_t		get_index() const { return index_; }
 
     template <typename U, typename Other>
     typename std::enable_if< std::is_convertible<U*,T*>::value, bool>::type
@@ -63,6 +66,7 @@ namespace mln
     image_type*         ima_;
     site_type           point_;
     char*               ptr_;
+    size_t		index_;
   };
 
 /******************************************/
@@ -77,7 +81,8 @@ namespace mln
                                           typename std::enable_if< std::is_convertible<U*,T*>::value, void*>::type)
     : ima_ (pix.ima_),
       point_ (pix.point_),
-      ptr_ (pix.ptr_)
+      ptr_ (pix.ptr_),
+      index_ (pix.index_)
   {
   }
 
@@ -90,6 +95,7 @@ namespace mln
     ima_ = other.ima_;
     point_ = other.point_;
     ptr_ = other.ptr_;
+    index_ = other.index_;
     return *this;
   }
 

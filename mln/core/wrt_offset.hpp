@@ -20,6 +20,7 @@ namespace mln {
       }
   }
 
+
   template <typename Image, size_t N>
   inline
   void wrt_offset(const Image& ima,
@@ -36,6 +37,22 @@ namespace mln {
       }
   }
 
+  template <typename Image, size_t N>
+  inline
+  void wrt_delta_index(const Image& ima,
+		       const mln::array<typename Image::point_type, N>& dpoints,
+		       mln::array<typename Image::difference_type, N>& out)
+  {
+
+    const size_t* strides = ima.index_strides();
+    for (unsigned j = 0; j < N; ++j)
+      {
+        out[j] = 0;
+        for (int i = 0; i < Image::ndim; ++i)
+          out[j] += strides[i] * dpoints[j][i];
+      }
+  }
+
 
   template <typename Image, size_t N>
   mln::array<typename Image::difference_type, N>
@@ -43,6 +60,15 @@ namespace mln {
   {
     mln::array<typename Image::difference_type, N> out;
     wrt_offset(ima, dpoints, out);
+    return out;
+  }
+
+  template <typename Image, size_t N>
+  mln::array<typename Image::difference_type, N>
+  wrt_dela_index(const Image& ima, const mln::array<typename Image::point_type, N>& dpoints)
+  {
+    mln::array<typename Image::difference_type, N> out;
+    wrt_delta_index(ima, dpoints, out);
     return out;
   }
 

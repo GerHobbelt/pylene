@@ -8,7 +8,7 @@
 
 #define BOOST_TEST_MODULE Core
 #include <boost/test/unit_test.hpp>
-
+#include <boost/tuple/tuple_io.hpp>
 
 mln::image2d<int>
 make_image()

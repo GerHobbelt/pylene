@@ -22,13 +22,15 @@ namespace mln
 
     typedef internal::nested_loop_iterator<
       internal::domain_point_visitor_forward< point<T, dim> >,
-      internal::no_op_value_visitor,
+      internal::no_op_visitor,
+      internal::no_op_visitor,
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> iterator;
 
     typedef internal::nested_loop_iterator<
       internal::domain_point_visitor_backward< point<T, dim> >,
-      internal::no_op_value_visitor,
+      internal::no_op_visitor,
+      internal::no_op_visitor,
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> reverse_iterator;
 
@@ -67,7 +69,8 @@ namespace mln
       mln_precondition(__is_valid());
       return iterator( internal::point_structure<T, dim> (),
 		       internal::make_point_visitor_forward(pmin, pmax),
-		       internal::no_op_value_visitor ());
+		       internal::no_op_visitor (),
+		       internal::no_op_visitor ());
     }
 
     reverse_iterator riter() const
@@ -75,7 +78,8 @@ namespace mln
       mln_precondition(__is_valid());
       return iterator( internal::point_structure<T, dim> (),
 		       internal::make_point_visitor_backward(pmin, pmax),
-		       internal::no_op_value_visitor ());
+		       internal::no_op_visitor (),
+		       internal::no_op_visitor ());
     }
 
 

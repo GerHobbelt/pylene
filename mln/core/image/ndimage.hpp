@@ -85,7 +85,9 @@ namespace mln
     typedef T*			pointer;
     typedef const T*		const_pointer;
     typedef ptrdiff_t		difference_type;
+    typedef size_t		index_type;
     typedef size_t		size_type;
+
 
 
     // As an Image
@@ -102,6 +104,10 @@ namespace mln
     // \{
     reference operator() (site_type p);
     const_reference operator() (site_type p) const;
+
+    // without bound checking
+    reference at() (site_type p);
+    const_reference at() (site_type p) const;
     // \}
 
     // FIXME move to base
@@ -129,8 +135,10 @@ namespace mln
     void resize(const domain_type& domain, unsigned border = 3, T v = T());
 
     // As a RandomAccessImage
-    reference element(difference_type n);
-    const_reference element(difference_type n) const;
+    //reference element(difference_type n);
+    //const_reference element(difference_type n) const;
+    reference operator[] (index_type n);
+    const_reference operator[] (index_type n) const;
 
     // As an IterableImage
     typedef ndimage_value_range<this_type, T>					value_range;
@@ -157,6 +165,7 @@ namespace mln
 
     // As a Raw Image
     const size_t*       strides() const;
+    const size_t*	index_strides() const;
     int border() const { return border_; }
 
 
@@ -175,14 +184,20 @@ namespace mln
     template <typename, typename> friend struct ndimage_value_range;
     template <typename, typename> friend struct ndimage_pixel_range;
 
-
+    void resize_(const domain_type& domain, unsigned border = 3, T v = T());
 
     domain_type	domain_;	///< Domain of image
     std::array<size_t, dim>	strides_;	///< Strides in bytes
     std::shared_ptr< internal::ndimage_data<T, dim> > data_;
     int		border_;
-    char*	ptr_;           ///< Pointer to the first element
-    char*	last_;          ///< Pointer to the last element (not past-the-end)
+    char*	ptr_;           ///< Pointer to the first element in the domain
+    char*	last_;          ///< Pointer to the last element in the domain (not past-the-end)
+
+    //
+    char*			m_ptr_origin;		///< Pointer to the first element
+    std::array<size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
+    size_t			m_index_first;
+    size_t			m_index_last;
   };
 
   /******************************/
@@ -283,7 +298,7 @@ namespace mln
 
   template <typename T, unsigned dim, typename E>
   ndimage_base<T,dim,E>::ndimage_base(unsigned border)
-    : domain_ (), border_ (border), ptr_ (NULL)
+  : domain_ (), border_ (border), ptr_ (NULL), m_ptr_origin (NULL)
   {
     for (unsigned i = 0; i < dim; ++i){
       mln_postcondition(domain_.pmin[i] == 0);
@@ -296,7 +311,13 @@ namespace mln
     : domain_ (domain),
       border_ (border)
   {
-    //mln_precondition(domain.size() > 0);
+    resize_(domain_, border, v);
+  }
+
+  template <typename T, unsigned dim, typename E>
+  void
+  ndimage_base<T,dim,E>::resize_(const domain_type& domain, unsigned border, T v)
+  {
     site_type shp = domain.shape();
     point<size_t, dim> sz;
     sz = shp;
@@ -307,14 +328,25 @@ namespace mln
     std::copy(data_->strides, data_->strides + dim, strides_.begin());
 
     // Compute pointer at (0,0)
-    ptr_ = data_->buffer;
-    last_ = data_->buffer;
-    for (unsigned i = 0; i < dim; ++i) {
-      ptr_ += border * strides_[i];
-      last_ += (border + sz[i] - 1) * strides_[i];
-    }
+    m_ptr_origin = data_->buffer;
 
+    m_index_strides[dim-1] = 1;
+    m_index_first = border;
+    m_index_last  = border + sz[dim-1] - 1;
+    ptr_  = data_->buffer + border * strides_[dim-1];
+    last_ = data_->buffer + (border + sz[dim-1] - 1) * strides_[dim-1];
+
+    for (int i = dim-2; i >= 0; --i)
+      {
+	m_index_strides[i] = (sz[i] + 2 * border) * m_index_strides[i+1];
+
+	m_index_first += border * m_index_strides[i];
+	m_index_last  += (border + sz[i] - 1) * m_index_strides[i];
+	ptr_ += border * strides_[i];
+	last_ += (border + sz[i] - 1) * strides_[i];
+      }
   }
+
 
   template <typename T, unsigned dim, typename E>
   void
@@ -322,31 +354,14 @@ namespace mln
   {
     domain_ = domain;
     border_ = border;
-
-    site_type shp = domain.shape();
-    point<size_t, dim> sz;
-    sz = shp;
-
-    // Compute strides size (in bytes)
-    // The row stride is 16 bytes aligned
-    data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border, v));
-    std::copy(data_->strides, data_->strides + dim, strides_.begin());
-
-    // Compute pointer at (0,0)
-    ptr_ = data_->buffer;
-    last_ = data_->buffer;
-    for (unsigned i = 0; i < dim; ++i) {
-      ptr_ += border * strides_[i];
-      last_ += (border + sz[i] - 1) * strides_[i];
-    }
+    resize_(domain_, border, v);
   }
 
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::operator() (site_type p)
+  ndimage_base<T,dim,E>::at (site_type p)
   {
-    mln_precondition(domain_.has(p));
     site_type q = p - domain_.pmin;
 
     char* ptr = ptr_;
@@ -355,43 +370,91 @@ namespace mln
     return * (T*)ptr;
   }
 
+
+  template <typename T, unsigned dim, typename E>
+  inline
+  const T&
+  ndimage_base<T,dim,E>::at (site_type p) const
+  {
+    site_type q = p - domain_.pmin;
+
+    char* ptr = ptr_;
+    for (unsigned i = 0; i < dim; ++i)
+      ptr += q[i] * strides_[i];
+    return * (const T*)ptr;
+  }
+
+
+  template <typename T, unsigned dim, typename E>
+  inline
+  T&
+  ndimage_base<T,dim,E>::operator() (site_type p)
+  {
+    mln_precondition(domain_.has(p));
+    return this->at(p);
+  }
+
   template <typename T, unsigned dim, typename E>
   inline
   const T&
   ndimage_base<T,dim,E>::operator() (site_type p) const
   {
     mln_precondition(domain_.has(p));
-    site_type q = p - domain_.pmin;
-
-    const char* ptr = ptr_;
-    for (unsigned i = 0; i < dim; ++i)
-      ptr += q[i] * strides_[i];
-    return * (const T*)ptr;
+    return this->at(p);
   }
+
+  // template <typename T, unsigned dim, typename E>
+  // inline
+  // T&
+  // ndimage_base<T,dim,E>::element (difference_type n)
+  // {
+  //   return *reinterpret_cast<T*>(ptr_+n);
+  // }
+
+  // template <typename T, unsigned dim, typename E>
+  // inline
+  // const T&
+  // ndimage_base<T,dim,E>::element (difference_type n) const
+  // {
+  //   return *reinterpret_cast<const T*>(ptr_+n);
+  // }
 
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::element (difference_type n)
+  ndimage_base<T,dim,E>::operator[] (size_t index)
   {
-    mln_precondition(0 <= n && n < data_->nbytes);
-    return *reinterpret_cast<T*>(ptr_+n);
+    // We need this because of extra padding for 128-bits alignment
+    size_t i = index / m_index_strides[0];
+    size_t j = index % m_index_strides[0];
+    size_t n = i * strides_[1] + j * strides_[0];
+    return *reinterpret_cast<T*>(m_ptr_origin + n);
   }
 
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::element (difference_type n) const
+  ndimage_base<T,dim,E>::operator[] (size_t index) const
   {
-    mln_precondition(0 <= n && n < data_->nbytes);
-    return *reinterpret_cast<const T*>(ptr_+n);
+    size_t i = index / m_index_strides[0];
+    size_t j = index % m_index_strides[0];
+    size_t n = i * strides_[1] + j * strides_[0];
+    return *reinterpret_cast<const T*>(m_ptr_origin + n);
   }
+
 
   template <typename T, unsigned dim, typename E>
   const size_t*
   ndimage_base<T,dim,E>::strides () const
   {
     return &strides_[0];
+  }
+
+  template <typename T, unsigned dim, typename E>
+  const size_t*
+  ndimage_base<T,dim,E>::index_strides () const
+  {
+    return &m_index_strides[0];
   }
 
   // template <typename T, unsigned dim, typename E>

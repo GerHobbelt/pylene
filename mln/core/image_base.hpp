@@ -1,9 +1,8 @@
 #ifndef MLN_CORE_IMAGE_BASE_HPP
 # define MLN_CORE_IMAGE_BASE_HPP
 
-# include <mln/core/concept/image.hpp>
-# include <mln/core/image_traits.hpp>
-# include <mln/core/ch_value.hpp>
+
+# include <mln/core/image/image.hpp>
 # include <cstddef>
 
 namespace mln

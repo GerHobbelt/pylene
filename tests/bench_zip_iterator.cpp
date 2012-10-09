@@ -119,6 +119,17 @@ void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
     pout->val() = std::min(pout->val(), x->val());
 }
 
+void test_dilation_point(const image2d<int>& a, image2d<int>& b)
+{
+  fill(b, std::numeric_limits<int>::max());
+  mln_iter(p, a.domain());
+  mln_iter(n, c8(*p));
+
+  mln_forall(p)
+    mln_forall(n)
+    b(*p) = std::min(b(*p), b(*n));
+}
+
 void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
@@ -224,11 +235,19 @@ int main()
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 
-  std::cout << "Zip For Dilation 2..." << std::endl;
+  std::cout << "Dilation without zip..." << std::endl;
   mln::fill(ima2, 0);
   t.restart();
   for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_pixel(ima1, ima2);
+    test_dilation_pixel_2(ima1, ima2);
+  thistime = t.elapsed();
+  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+
+  std::cout << "Point Dilation 2..." << std::endl;
+  mln::fill(ima2, 0);
+  t.restart();
+  for (int i = 0; i < NTEST/2; ++i)
+    test_dilation_point(ima1, ima2);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
 

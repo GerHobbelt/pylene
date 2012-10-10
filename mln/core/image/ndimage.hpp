@@ -35,7 +35,7 @@ namespace mln
   {
     typedef raw_image_tag               category;
     typedef std::true_type              accessible;
-    typedef std::true_type		swallow_copy;
+    typedef std::true_type		shallow_copy;
   };
 
 /******************************************/
@@ -106,8 +106,8 @@ namespace mln
     const_reference operator() (site_type p) const;
 
     // without bound checking
-    reference at() (site_type p);
-    const_reference at() (site_type p) const;
+    reference at (site_type p);
+    const_reference at (site_type p) const;
     // \}
 
     // FIXME move to base
@@ -425,10 +425,15 @@ namespace mln
   ndimage_base<T,dim,E>::operator[] (size_t index)
   {
     // We need this because of extra padding for 128-bits alignment
-    size_t i = index / m_index_strides[0];
-    size_t j = index % m_index_strides[0];
-    size_t n = i * strides_[1] + j * strides_[0];
-    return *reinterpret_cast<T*>(m_ptr_origin + n);
+    if (dim < 2)
+      return *reinterpret_cast<T*>(m_ptr_origin + index);
+    else
+      {
+        size_t i = index / m_index_strides[dim-2];
+        size_t j = index % m_index_strides[dim-2];
+        size_t n = i * strides_[dim-2] + j * strides_[dim-1];
+        return *reinterpret_cast<T*>(m_ptr_origin + n);
+      }
   }
 
   template <typename T, unsigned dim, typename E>
@@ -436,10 +441,15 @@ namespace mln
   const T&
   ndimage_base<T,dim,E>::operator[] (size_t index) const
   {
-    size_t i = index / m_index_strides[0];
-    size_t j = index % m_index_strides[0];
-    size_t n = i * strides_[1] + j * strides_[0];
-    return *reinterpret_cast<const T*>(m_ptr_origin + n);
+    if (dim < 2)
+      return *reinterpret_cast<T*>(m_ptr_origin + index);
+    else
+      {
+        size_t i = index / m_index_strides[dim-2];
+        size_t j = index % m_index_strides[dim-2];
+        size_t n = i * strides_[dim-2] + j * strides_[dim-1];
+        return *reinterpret_cast<const T*>(m_ptr_origin + n);
+      }
   }
 
 

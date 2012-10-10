@@ -24,7 +24,7 @@ namespace mln
   }
 
   template <typename I, typename J>
-  void resize(Image<I>& ima, const Image<J>& other, unsigned border, mln_value(I) v)
+  void resize(Image<I>& ima, const Image<J>& other, int border, mln_value(I) v)
   {
     exact(ima).resize(exact(other).domain(), border, v);
   }

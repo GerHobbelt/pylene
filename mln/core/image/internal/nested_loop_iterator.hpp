@@ -330,11 +330,15 @@ namespace mln
     struct no_op_visitor
     {
       //void initialize(boost::any) const {}
-      void initialize(std::nullptr_t) const {}
+      template <typename T>
+      void initialize(T) const {}
+      void initialize(std::ptrdiff_t) const {}
 
       //template <size_t n> void init (const boost::any& ) {}
       //template <size_t n> void next (boost::any) const {}
-      template <size_t n> void next (std::nullptr_t) const {}
+
+      template <size_t n, typename T> void next (T) const {}
+      template <size_t n> void next(std::ptrdiff_t) const {}
     };
 
 

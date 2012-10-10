@@ -4,21 +4,6 @@
 # include <type_traits>
 # include <string>
 
-namespace internal
-{
-  template <bool cond, typename T>
-  struct mln_check_if_
-  {
-    mln_check_if_() {}
-  };
-
-  template <typename T>
-  struct mln_check_if_<true, T>
-  {
-    mln_check_if_() { ((T*)0)->~T(); }
-  };
-}
-
 # define MLN_CONCEPT_BEGIN_CHECK_IF()					\
   {									\
   struct __mln_check_if__						\
@@ -30,7 +15,7 @@ namespace internal
 # define MLN_CONCEPT_END_CHECK_IF(TEST)			\
   }							\
     };							\
-  internal::mln_check_if_<TEST, __mln_check_if__> ();	\
+  mln::internal::mln_check_if_<TEST, __mln_check_if__> ();	\
   }
 
 
@@ -38,6 +23,24 @@ namespace internal
 
 namespace mln
 {
+
+  namespace internal
+  {
+    template <bool cond, typename T>
+    struct mln_check_if_
+    {
+      mln_check_if_() {}
+    };
+
+    template <typename T>
+    struct mln_check_if_<true, T>
+    {
+      mln_check_if_() { ((T*)0)->~T(); }
+    };
+  }
+
+  template <bool condition>
+  using check_t = std::integral_constant<bool, condition>;
 
   void check(std::true_type)
   {

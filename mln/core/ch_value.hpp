@@ -11,7 +11,8 @@ namespace mln
   struct image_from_domain;
 
   template <typename Image>
-  struct image_concrete : image_from_domain<typename Image::domain_type>
+  struct image_concrete :
+    image_from_domain<typename Image::domain_type>::template apply< mln_value(Image) >
   {
   };
 

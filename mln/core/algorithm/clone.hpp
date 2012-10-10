@@ -20,23 +20,23 @@ namespace mln
 
     // Clone by copy construction
     template <typename Image>
-    mln_concrete(I)
+    mln_concrete(Image)
     clone(const Image& ima, std::true_type _use_copy_construction_)
     {
       (void) _use_copy_construction_;
-      mln_concrete(I) x(ima);
-      return x
+      mln_concrete(Image) x(ima);
+      return x;
     }
 
     // Clone by deep copy
     template <typename Image>
-    mln_concrete(I)
+    mln_concrete(Image)
     clone(const Image& ima, std::false_type _use_copy_construction_)
     {
       (void) _use_copy_construction_;
-      mln_concrete(I) x;
+      mln_concrete(Image) x;
       resize(x, ima);
-      copy(ima, out);
+      copy(ima, x);
       return x;
     }
 
@@ -46,9 +46,8 @@ namespace mln
   mln_concrete(I)
   clone(const Image<I>& ima)
   {
-    return impl::clone(ima, std::integral_constant<bool,
-						   std::is_convertible<I, mln_concrete(I)>::value and
-						   image_traits<mln_concrete(I)>::shallow_copy::value> ());
+    return impl::clone(exact(ima), check_t<std::is_convertible<I, mln_concrete(I)>::value and
+                       not image_traits<mln_concrete(I)>::shallow_copy::value> ());
   }
 
 

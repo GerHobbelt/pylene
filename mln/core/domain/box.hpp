@@ -123,7 +123,11 @@ namespace mln
   template <>
   struct image_from_domain<box2d>
   {
-    typedef image2d<void> type;
+    template <typename T>
+    struct apply
+    {
+      typedef image2d<T> type;
+    };
   };
 
 }

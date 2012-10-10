@@ -6,17 +6,6 @@
 #include <numeric>
 #include <boost/timer.hpp>
 
-#define foreach(v, rng)				\
-  auto _mln_iter_ = rng.iter();						\
-   for (_mln_iter_.init(); !_mln_iter_.finished(); _mln_iter_.next())	\
-     if (bool _mln_break_ = false) {} else				\
-       for (v = *_mln_iter_; !_mln_break_; _mln_break_ = true)
-
-/*
-
-// #define mln_forall(p)				\
-//   for (p.init(); !p.finished(); p.next())
-*/
 
 using namespace mln;
 
@@ -24,7 +13,7 @@ using namespace mln;
 double test_viter(const image2d<int>& ima)
 {
   double v = 0;
-  foreach(auto& x, ima.values()) {
+  mln_foreach(auto& x, ima.values()) {
     v += x;
   }
   return v;
@@ -33,7 +22,7 @@ double test_viter(const image2d<int>& ima)
 double test_pixter(const image2d<int>& ima)
 {
   double v = 0;
-  foreach(auto& x, ima.pixels())
+  mln_foreach(auto& x, ima.pixels())
     v += x.val();
 
   return v;
@@ -42,7 +31,7 @@ double test_pixter(const image2d<int>& ima)
 double test_piter(const image2d<int>& ima)
 {
   double v = 0;
-  foreach(auto p, ima.domain()) {
+  mln_foreach(auto p, ima.domain()) {
     v += ima(p);
   }
   return v;
@@ -87,8 +76,7 @@ double test_nbh_piter(const image2d<int>& ima)
 
   mln_forall(p)
     mln_forall(n)
-    if (ima.domain().has(*n))
-	u += ima(*n);
+	u += ima.at(*n);
 
   return u;
 }
@@ -125,7 +113,7 @@ double test_native_nbh(const image2d<int>& ima)
 template <typename T>
 void iota(image2d<T>& ima, T v)
 {
-  foreach(auto& x, ima.values())
+  mln_foreach(auto& x, ima.values())
     x = v++;
 }
 
@@ -138,7 +126,7 @@ void display()
 
   {
     std::cout << "Display forward site iterator." << std::endl;
-    foreach(auto p, ima.domain())
+    mln_foreach(auto p, ima.domain())
       std::cout << p << ",";
     std::cout << std::endl;
   }
@@ -153,7 +141,7 @@ void display()
     std::cout << "Display forward pixel iterator." << std::endl;
     mln_pixter(x, ima);
     mln_forall(x)
-      std::cout << "(" << x->point() << ":" << x->val() << "),";
+      std::cout << "(" << x->point() << ":" << x->val() << "," << x->index() << "),";
     std::cout << std::endl;
   }
 }
@@ -184,7 +172,7 @@ void display_nbh()
 
     mln_forall(px)
     {
-      std::cout << "{" << px->point() << "," << px->val() << "}: ";
+      std::cout << "{" << px->point() << "," << px->val() << "," << px->index() << "}: ";
       mln_forall(nx)
         std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
       std::cout << std::endl;

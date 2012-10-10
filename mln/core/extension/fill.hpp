@@ -6,7 +6,6 @@
 
 namespace mln
 {
-
   namespace extension
   {
 
@@ -25,21 +24,20 @@ namespace mln
     {
 
       template <typename I>
-      I& fill(I& ima, mln_value(I) v, std::true_type __is_raw_image_and_box2d__)
+      void fill(I& ima, mln_value(I) v, box2d, std::true_type __is_raw_image__)
       {
-	(void) __is_raw_image_and_box__;
+	(void) __is_raw_image__;
 	typedef mln_value(I) V;
 
 	int ncols = ima.ncols();
 	int nrows = ima.nrows();
 	int border = ima.border();
 	int nbcols = ima.ncols() + 2 * border;
-	int nbrows = ima.nrows() + 2 * border;
 
 	// Fill border rows
-	if (sizeof(V) == strides_[1])
+	if (sizeof(V) == ima.strides()[1])
 	  {
-	    char* ptr = &ima[0];
+	    char* ptr = (char*)&ima[0];
 	    for (int j = 0; j < border; ++j)
 	      {
 		std::fill((V*)ptr, (V*)ptr + nbcols, v);
@@ -54,38 +52,55 @@ namespace mln
 	  }
 	else
 	  {
-	    char* ptr = &ima[0];
+	    char* ptr = (char*)&ima[0];
 	    for (int j = 0; j < border; ++j)
 	      {
 		for (int i = 0; i < nbcols; ++i)
-		  *(V*)(ptr + i * strides()[1]) = v;
+		  *(V*)(ptr + i * ima.strides()[1]) = v;
 		ptr += ima.strides()[0];
 	      }
 	    ptr += ima.strides()[0] * nrows;
 	    for (int j = 0; j < border; ++j)
 	      {
 		for (int i = 0; i < nbcols; ++i)
-		  *(V*)(ptr + i * strides()[1]) = v;
+		  *(V*)(ptr + i * ima.strides()[1]) = v;
 		ptr += ima.strides()[0];
 	      }
 	  }
 
 	// Fill border cols
-	for (int i = 0; i < nrows; ++i)
+        mln_point(I) p;
+	for (p[0] = 0; p[0] < nrows; ++p[0])
 	  {
-	    for (int j = -3; j < 0; ++j)
-	      ima.at_(point2d{i,j}) = v;
-	    for (int j = ncols; j < ncols+3; ++j)
-	      ima.at_(point2d{i,j}) = v;
+	    for (p[1] = -3; p[1] < 0; ++p[1])
+	      ima.at(p) = v;
+	    for (p[1] = ncols; p[1] < ncols+3; ++p[1])
+	      ima.at(p) = v;
 	  }
       }
 
+    } // end of namespace mln::extension::impl
 
+
+    template <typename I>
+    I& fill(Image<I>& ima, mln_value(I) v)
+    {
+      impl::fill(exact(ima), v, exact(ima).domain(),
+                 std::is_same<typename image_traits<I>::category, raw_image_tag> ());
+      return exact(ima);
     }
 
 
-  }
+    template <typename I>
+    I&& fill(Image<I>&& ima, mln_value(I) v)
+    {
+      fill(exact(ima), v);
+      return move_exact(ima);
+    }
 
-}
+
+  } // end of namespace mln::extension
+} // end of namespace mln
+
 
 #endif // ! MLN_CORE_EXTENSION_FILL_HPP

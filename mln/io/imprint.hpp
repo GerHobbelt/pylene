@@ -59,14 +59,35 @@ namespace mln
 	}
       }
 
-
+      template <typename Image, typename P>
+      typename std::enable_if< image_traits<Image>::accessible::value, void>::type
+      imprint_with_border(const Image& ima, box<P, 2> domain)
+      {
+        typedef typename Image::value_type V;
+	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
+	mln_point(Image) p;
+        int border = ima.border();
+        std::cout << domain << "(" << typeid(V).name() << ")" << std::endl;
+	for (p[0] = domain.pmin[0] - border; p[0] < domain.pmax[0] + border; ++p[0]) {
+	  for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1]) {
+	    std::cout << ((T) ima.at(p)) << " ";
+	  }
+	  std::cout << std::endl;
+	}
+      }
 
     }
 
-    template <typename Image>
-    void imprint(const Image& ima)
+    template <typename I>
+    void imprint(const Image<I>& ima)
     {
-      internal::imprint(ima, ima.domain());
+      internal::imprint(exact(ima), exact(ima).domain());
+    }
+
+    template <typename I>
+    void imprint_with_border(const Image<I>& ima)
+    {
+      internal::imprint_with_border(exact(ima), exact(ima).domain());
     }
 
   }

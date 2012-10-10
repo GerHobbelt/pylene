@@ -65,7 +65,7 @@ namespace mln {
 
   template <typename Image, size_t N>
   mln::array<typename Image::difference_type, N>
-  wrt_dela_index(const Image& ima, const mln::array<typename Image::point_type, N>& dpoints)
+  wrt_delta_index(const Image& ima, const mln::array<typename Image::point_type, N>& dpoints)
   {
     mln::array<typename Image::difference_type, N> out;
     wrt_delta_index(ima, dpoints, out);

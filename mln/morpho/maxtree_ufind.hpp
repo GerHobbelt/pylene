@@ -3,6 +3,9 @@
 
 # include <mln/core/image/image.hpp>
 # include <mln/core/image/sub_image.hpp>
+# include <mln/core/extension/fill.hpp>
+# include <mln/core/algorithm/sort_indexes.hpp>
+# include <mln/core/wrt_offset.hpp>
 //# include <tbb/parallel_reduce.h>
 
 namespace mln
@@ -38,41 +41,50 @@ namespace mln
 
   }
 
+    std::size_t
+    zfind_root(image2d<std::size_t>& parent, std::size_t p)
+    {
+      if (parent[p] == p)
+        return p;
+      else
+        return parent[p] = zfind_root(parent, parent[p]);
+    }
 
   template <typename V, typename Neighborhood>
-  image2d<std::ptrdiff_t>
+  image2d<std::size_t>
   maxtree(const image2d<V>& ima, const Neighborhood& nbh)
   {
-    image2d<ptrdiff_t> parent, zpar;
+    image2d<std::size_t> parent, zpar;
     image2d<bool> deja_vu;
     resize(parent, ima);
     resize(zpar, ima);
-    resize(deja_vu, ima, false);
+    resize(deja_vu, ima, ima.border(), false);
 
     extension::fill(deja_vu, true);
 
-    std::vector<unsigned> v = sort_offset(f);
+    std::vector<std::size_t> v = sort_indexes(ima);
+    auto offsets = wrt_delta_index(ima, nbh.dpoints);
 
-    auto offsets = wrt_offset(ima, nbh.dpoints);
-    for (std::ptrdiff_t p: v)
+    for (std::size_t p: v)
       {
+        std::cout << p << std::endl;
 	// make set
 	{
-	  parent.element(p) = p;
-	  zpar.element(p) = p;
-	  deja_vu.element(p) = true;
+	  parent[p] = p;
+	  zpar[p] = p;
+	  deja_vu[p] = true;
 	}
 
-	for (int k = 0; k < offsets.size(); ++k)
+	for (unsigned k = 0; k < offsets.size(); ++k)
 	  {
-	    std::ptrdiff_t q = p + offsets[k];
-	    if (deja_vu.element(q))
+	    std::size_t q = p + offsets[k];
+	    if (deja_vu[q])
 	      {
-		r = zfind_root(zpar, q);
+                std::size_t r = zfind_root(zpar, q);
 		if (r != p) // make union
 		  {
-		    parent.element(r) = p;
-		    zpar.element(r) = p;
+		    parent[r] = p;
+		    zpar[r] = p;
 		  }
 	      }
 	  }
@@ -81,10 +93,10 @@ namespace mln
     // canonization
     for (int i = v.size()-1; i >= 0; --i)
       {
-	std::ptrdiff_t p = v[i];
-	std::ptrdiff_t q = parent.element(p);
-	if (ima.element(parent.element(q)) == ima.element(q))
-	  parent.element(p) = parent.element(q);
+	std::size_t p = v[i];
+	std::size_t q = parent[p];
+	if (ima[parent[q]] == ima[q])
+	  parent[p] = parent[q];
       }
 
     return parent;

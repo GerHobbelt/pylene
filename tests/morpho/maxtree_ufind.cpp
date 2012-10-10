@@ -2,6 +2,7 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/neighb2d.hpp>
 
+#include <mln/core/algorithm/iota.hpp>
 #include <mln/morpho/maxtree_ufind.hpp>
 #include <mln/io/imprint.hpp>
 
@@ -16,6 +17,7 @@ BOOST_AUTO_TEST_CASE(maxtree_ufind)
   image2d<uint8> ima(5,5);
   iota(ima, 2);
 
-  image2d<std::ptrdiff_t> parent = morpho::maxtree(ima, c4);
+  io::imprint(ima);
+  image2d<std::size_t> parent = morpho::maxtree(ima, c4);
   io::imprint(parent);
 }

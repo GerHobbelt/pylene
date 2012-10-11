@@ -102,8 +102,8 @@ namespace mln
     // As an ContainerImage
     // \group Point-wise access
     // \{
-    reference operator() (site_type p);
-    const_reference operator() (site_type p) const;
+    reference operator() (const site_type& p);
+    const_reference operator() (const site_type& p) const;
 
     // without bound checking
     reference at (site_type p);
@@ -137,8 +137,8 @@ namespace mln
     // As a RandomAccessImage
     //reference element(difference_type n);
     //const_reference element(difference_type n) const;
-    reference operator[] (index_type n);
-    const_reference operator[] (index_type n) const;
+    reference operator[] (size_type n);
+    const_reference operator[] (size_type n) const;
 
     // As an IterableImage
     typedef ndimage_value_range<this_type, T>					value_range;
@@ -338,12 +338,20 @@ namespace mln
     ptr_  = data_->buffer + border * strides_[dim-1];
     last_ = data_->buffer + (border + sz[dim-1] - 1) * strides_[dim-1];
 
+    if (dim >= 2)
+      {
+	m_index_strides[dim-2] = 1 << (sizeof(short) * 8);
+	m_index_first += border << (sizeof(short) * 8);
+	m_index_last  += (border + sz[dim-2] - 1) << (sizeof(short) * 8);
+	for (int i = dim-3; i >= 0; --i)
+	  {
+	    m_index_strides[i] = (sz[i+1] + 2 * border) * m_index_strides[i+1];
+	    m_index_first += border * m_index_strides[i];
+	    m_index_last  += (border + sz[i] - 1) * m_index_strides[i];
+	  }
+      }
     for (int i = dim-2; i >= 0; --i)
       {
-	m_index_strides[i] = (sz[i+1] + 2 * border) * m_index_strides[i+1];
-
-	m_index_first += border * m_index_strides[i];
-	m_index_last  += (border + sz[i] - 1) * m_index_strides[i];
 	ptr_ += border * strides_[i];
 	last_ += (border + sz[i] - 1) * strides_[i];
       }
@@ -390,19 +398,19 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::operator() (site_type p)
+  ndimage_base<T,dim,E>::operator() (const site_type& p)
   {
     mln_precondition(domain_.has(p));
-    return this->at(p);
+    return at(p);
   }
 
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator() (site_type p) const
+  ndimage_base<T,dim,E>::operator() (const site_type& p) const
   {
     mln_precondition(domain_.has(p));
-    return this->at(p);
+    return at(p);
   }
 
   // template <typename T, unsigned dim, typename E>
@@ -424,17 +432,17 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::operator[] (size_t index)
+  ndimage_base<T,dim,E>::operator[] (size_type index)
   {
     // We need this because of extra padding for 128-bits alignment
     if (dim < 2)
       return *reinterpret_cast<T*>(m_ptr_origin + index);
     else
       {
-        // size_t i = index / m_index_strides[dim-2];
-        // size_t j = index % m_index_strides[dim-2];
-        // size_t n = i * strides_[dim-2] + j * strides_[dim-1];
-        size_t n = index;
+        //size_t i = index % m_index_strides[dim-2];
+        //size_t j = index % m_index_strides[dim-2];
+	//std::cout << "[" << (index >> 16) << "," << (index & 0x0000FFFF) << "]" << std::endl;
+	size_t n = (index >> 16) * strides_[dim-2] + (index & 0x0000FFFF) * strides_[dim-1];
         return *reinterpret_cast<T*>(m_ptr_origin + n);
       }
   }
@@ -442,15 +450,18 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator[] (size_t index) const
+  ndimage_base<T,dim,E>::operator[] (size_type index) const
   {
     if (dim < 2)
       return *reinterpret_cast<const T*>(m_ptr_origin + index);
     else
       {
-        size_t i = index / m_index_strides[dim-2];
-        size_t j = index % m_index_strides[dim-2];
-        size_t n = i * strides_[dim-2] + j * strides_[dim-1];
+        // size_t i = index / m_index_strides[dim-2];
+        // size_t j = index % m_index_strides[dim-2];
+        // size_t n = i * strides_[dim-2] + j * strides_[dim-1];
+        //size_t n = index;
+	//std::cout << "[" << (index >> 16) << "," << (index & 0x0000FFFF) << "]" << std::endl;
+	size_t n = (index >> 16) * strides_[dim-2] + (index & 0x0000FFFF) * strides_[dim-1];
         return *reinterpret_cast<const T*>(m_ptr_origin + n);
       }
   }

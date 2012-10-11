@@ -89,6 +89,8 @@ double test_nbh_index(const image2d<int>& ima)
   std::size_t idx = ima.index_of_point(ima.domain().pmin);
   auto w = wrt_delta_index(ima, c8_t::dpoints);
 
+  //std::cout << ima.index_strides()[0] << "," << ima.index_strides()[1] << std::endl;
+
   unsigned nrows = ima.nrows();
   unsigned ncols = ima.ncols();
   for (unsigned i = 0; i < nrows; ++i)
@@ -96,9 +98,12 @@ double test_nbh_index(const image2d<int>& ima)
       for (unsigned j = 0; j < ncols; ++j)
         {
           std::size_t p = idx + j;// * ima.index_strides()[1];
-          mln_foreach(auto k, w) {
+	  //std::cout << p << " {";
+          for(auto k: w) {
+	    //std::cout << (p+k) << ",";
             u += ima[p + k];
           }
+	  //std::cout << "}" << std::endl;
         }
       idx += ima.index_strides()[0];
     }

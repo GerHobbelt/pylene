@@ -166,6 +166,8 @@ namespace mln
     // As a Raw Image
     const size_t*       strides() const;
     const size_t*	index_strides() const;
+    size_type           index_of_point(site_type p) const;
+
     int border() const { return border_; }
 
 
@@ -196,8 +198,8 @@ namespace mln
     //
     char*			m_ptr_origin;		///< Pointer to the first element
     std::array<size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
-    size_t			m_index_first;
-    size_t			m_index_last;
+    size_t			m_index_first;          ///< index of pmin
+    size_t			m_index_last;           ///< index of pmax
   };
 
   /******************************/
@@ -338,7 +340,7 @@ namespace mln
 
     for (int i = dim-2; i >= 0; --i)
       {
-	m_index_strides[i] = (sz[i] + 2 * border) * m_index_strides[i+1];
+	m_index_strides[i] = (sz[i+1] + 2 * border) * m_index_strides[i+1];
 
 	m_index_first += border * m_index_strides[i];
 	m_index_last  += (border + sz[i] - 1) * m_index_strides[i];
@@ -429,9 +431,10 @@ namespace mln
       return *reinterpret_cast<T*>(m_ptr_origin + index);
     else
       {
-        size_t i = index / m_index_strides[dim-2];
-        size_t j = index % m_index_strides[dim-2];
-        size_t n = i * strides_[dim-2] + j * strides_[dim-1];
+        // size_t i = index / m_index_strides[dim-2];
+        // size_t j = index % m_index_strides[dim-2];
+        // size_t n = i * strides_[dim-2] + j * strides_[dim-1];
+        size_t n = index;
         return *reinterpret_cast<T*>(m_ptr_origin + n);
       }
   }
@@ -442,7 +445,7 @@ namespace mln
   ndimage_base<T,dim,E>::operator[] (size_t index) const
   {
     if (dim < 2)
-      return *reinterpret_cast<T*>(m_ptr_origin + index);
+      return *reinterpret_cast<const T*>(m_ptr_origin + index);
     else
       {
         size_t i = index / m_index_strides[dim-2];
@@ -465,6 +468,17 @@ namespace mln
   ndimage_base<T,dim,E>::index_strides () const
   {
     return &m_index_strides[0];
+  }
+
+  template <typename T, unsigned dim, typename E>
+  size_t
+  ndimage_base<T,dim,E>::index_of_point (site_type p) const
+  {
+    std::size_t idx = m_index_first;
+    point_type    q = p - domain_.pmin;
+    for (unsigned i = 0; i < dim; ++i)
+      idx += q[i] * m_index_strides[i];
+    return idx;
   }
 
   // template <typename T, unsigned dim, typename E>

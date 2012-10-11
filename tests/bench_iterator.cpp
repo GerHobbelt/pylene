@@ -81,7 +81,30 @@ double test_nbh_piter(const image2d<int>& ima)
   return u;
 }
 
+double test_nbh_index(const image2d<int>& ima)
+{
+  typedef image2d<int> I;
 
+  double u = 0;
+  std::size_t idx = ima.index_of_point(ima.domain().pmin);
+  auto w = wrt_delta_index(ima, c8_t::dpoints);
+
+  unsigned nrows = ima.nrows();
+  unsigned ncols = ima.ncols();
+  for (unsigned i = 0; i < nrows; ++i)
+    {
+      for (unsigned j = 0; j < ncols; ++j)
+        {
+          std::size_t p = idx + j;// * ima.index_strides()[1];
+          mln_foreach(auto k, w) {
+            u += ima[p + k];
+          }
+        }
+      idx += ima.index_strides()[0];
+    }
+
+  return u;
+}
 
 
 double test_native_nbh(const image2d<int>& ima)
@@ -255,6 +278,14 @@ int main()
   t.restart();
   for (int i = 0; i < ntest; ++i)
     r1 = test_nbh_pixter(ima);
+  std::cout << "Elapsed: " << t.elapsed() << std::endl;
+  std::cout << r1 << std::endl;
+
+
+  std::cout << "Neighborhood... indexes" << std::endl;
+  t.restart();
+  for (int i = 0; i < ntest; ++i)
+    r1 = test_nbh_index(ima);
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
 

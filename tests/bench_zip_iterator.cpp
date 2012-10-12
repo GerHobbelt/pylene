@@ -3,6 +3,8 @@
 #include <mln/core/image/zip_image.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/algorithm/equal.hpp>
+#include <mln/core/extension/fill.hpp>
 
 #include <mln/core/range/algorithm/accumulate.hpp>
 #include <mln/core/range/algorithm/inner_product.hpp>
@@ -122,6 +124,7 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b) __attribute__ 
 void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
 
   const size_t* strides = a.strides();
   const char* ptra = (const char*) &(a(point2d {0,0}));
@@ -146,8 +149,10 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 void test_dilation_pixel(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
 
 void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
-{ 
+{
   fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
+
   mln_pixter(pin, pout, a, b);
   mln_iter(x, c8(pin));
 
@@ -160,18 +165,22 @@ void test_dilation_point(const image2d<int>& a, image2d<int>& b) __attribute__ (
 void test_dilation_point(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
+
   mln_iter(p, a.domain());
   mln_iter(n, c8(*p));
 
   mln_forall(p)
     mln_forall(n)
-    b(*p) = std::min(b(*p), a(*n));
+    b.at(*p) = std::min(b.at(*p), a.at(*n));
 }
 
 void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
 void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
 {
   fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
+
   mln_pixter(pin, a);
   mln_viter(pout, b);
   mln_iter(x, c8(pin));
@@ -185,13 +194,14 @@ void test_dilation_index(const image2d<int>& a, image2d<int>& b) __attribute__ (
 void test_dilation_index(const image2d<int>& a, image2d<int>& b) 
 {
   fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
 
   std::size_t idx = a.index_of_point(a.domain().pmin);
   auto w = wrt_delta_index(a, c8_t::dpoints);
 
   unsigned nrows = a.nrows();
   unsigned ncols = a.ncols();
-  for (unsigned i = 0; i < nrows; ++i)
+  for (unsigned i = 0; i < nrows; ++i, idx += a.index_strides()[0])
     {
       for (unsigned j = 0; j < ncols; ++j)
         {
@@ -200,7 +210,6 @@ void test_dilation_index(const image2d<int>& a, image2d<int>& b)
             b[p] = std::min(b[p], a[p+w[k]]);
           }
         }
-      idx += a.index_strides()[0];
     }
 }
 
@@ -228,7 +237,7 @@ void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
 
 int main()
 {
-  int NTEST = 100;
+  int NTEST = 50;
 
   image2d<int> ima1(1000, 10000);
   image2d<int> ima2(1000, 10000);
@@ -299,45 +308,52 @@ int main()
 
 
   std::cout << "Zip For Dilation..." << std::endl;
-  mln::fill(ima2, 0);
+  image2d<int> ref(1000, 10000);
   t.restart();
   for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_pixel(ima1, ima2);
+    test_dilation_pixel(ima1, ref);
   thistime = t.elapsed();
-  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+  std::cout << "Elapsed: " << thistime <<std::endl;
 
-  std::cout << "Dilation without zip..." << std::endl;
-  mln::fill(ima2, 0);
-  t.restart();
-  for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_pixel_2(ima1, ima2);
-  thistime = t.elapsed();
-  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+  {
+    std::cout << "Dilation without zip..." << std::endl;
+    image2d<int> out(1000, 10000);
+    t.restart();
+    for (int i = 0; i < NTEST/2; ++i)
+      test_dilation_pixel_2(ima1, out);
+    thistime = t.elapsed();
+    std::cout << "Elapsed: " << thistime << " Eq:" << equal(out, ref) <<std::endl;
+  }
 
-  std::cout << "Point Dilation 2..." << std::endl;
-  mln::fill(ima2, 0);
-  t.restart();
-  for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_point(ima1, ima2);
-  thistime = t.elapsed();
-  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+  {
+    std::cout << "Point Dilation 2..." << std::endl;
+    image2d<int> out(1000, 10000);
+    t.restart();
+    for (int i = 0; i < NTEST/2; ++i)
+      test_dilation_point(ima1, out);
+    thistime = t.elapsed();
+    std::cout << "Elapsed: " << thistime << " Eq:" << equal(out, ref) <<std::endl;
+  }
 
-  std::cout << "Dilation with index..." << std::endl;
-  mln::fill(ima2, 0);
-  t.restart();
-  for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_index(ima1, ima2);
-  thistime = t.elapsed();
-  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+  {
+    std::cout << "Dilation with index..." << std::endl;
+    image2d<int> out(1000, 10000);
+    t.restart();
+    for (int i = 0; i < NTEST/2; ++i)
+      test_dilation_index(ima1, out);
+    thistime = t.elapsed();
+    std::cout << "Elapsed: " << thistime << " Eq:" << equal(out, ref) <<std::endl;
+  }
 
-
-  std::cout << "Native Dilation..." << std::endl;
-  mln::fill(ima2, 0);
-  t.restart();
-  for (int i = 0; i < NTEST/2; ++i)
-    test_dilation_native(ima1, ima2);
-  thistime = t.elapsed();
-  std::cout << "Elapsed: " << thistime << " R:" << r <<std::endl;
+  {
+    std::cout << "Native Dilation..." << std::endl;
+    image2d<int> out(1000, 10000);
+    t.restart();
+    for (int i = 0; i < NTEST/2; ++i)
+      test_dilation_native(ima1, out);
+    thistime = t.elapsed();
+    std::cout << "Elapsed: " << thistime << " Eq:" << equal(out, ref) <<std::endl;
+  }
 
 }
 

@@ -98,12 +98,9 @@ double test_nbh_index(const image2d<int>& ima)
       for (unsigned j = 0; j < ncols; ++j)
         {
           std::size_t p = idx + j;// * ima.index_strides()[1];
-	  //std::cout << p << " {";
-          for(auto k: w) {
-	    //std::cout << (p+k) << ",";
+          mln_foreach(auto k, w) {
             u += ima[p + k];
           }
-	  //std::cout << "}" << std::endl;
         }
       idx += ima.index_strides()[0];
     }

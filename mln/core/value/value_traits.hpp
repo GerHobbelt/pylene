@@ -10,38 +10,28 @@ namespace mln
   template <typename V, typename StrictWeakOrdering = std::less<V>, class Enable = void>
   struct value_traits;
 
-  template <typename V, class Enable = void>
-  struct value_traits_base;
 
-  // Specilization for primitive types
-  template <typename V>
-  struct value_traits_base<V, typename std::enable_if<std::is_arithmetic<V>::value>::type>
+  // Default traits for std::greater
+  template <typename V, class Enable>
+  struct value_traits<V, std::greater<V>, Enable>
   {
-    static constexpr unsigned quant = sizeof(V) * 8;
+    static constexpr unsigned quant = value_traits<V, std::less<V>, Enable>::quant;
+    static constexpr V min() { return value_traits<V, std::less<V>, Enable>::max(); }
+    static constexpr V max() { return value_traits<V, std::less<V>, Enable>::min(); }
+    static constexpr V inf() { return value_traits<V, std::less<V>, Enable>::sup(); }
+    static constexpr V sup() { return value_traits<V, std::less<V>, Enable>::inf(); }
+
   };
 
-  template <typename V, typename StrictWeakOrdering>
-  struct value_traits<V, StrictWeakOrdering, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits_base<V>
-  {
-  };
 
+
+  // Specialization for primitive types
   template <typename V>
   struct value_traits<V, std::less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits_base<V>
   {
+    static constexpr unsigned quant = sizeof(V) * 8;
     static constexpr V min() { return std::numeric_limits<V>::lowest(); }
     static constexpr V max() { return std::numeric_limits<V>::max(); }
-    static constexpr V inf() { return min(); }
-    static constexpr V sup() { return max(); }
-  };
-
-  template <typename V>
-  struct value_traits<V, std::greater<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits_base<V>
-  {
-    static constexpr V min() { return std::numeric_limits<V>::max(); }
-    static constexpr V max() { return std::numeric_limits<V>::lowest(); }
     static constexpr V inf() { return min(); }
     static constexpr V sup() { return max(); }
   };

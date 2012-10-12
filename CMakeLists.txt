@@ -19,7 +19,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 
 set(CMAKE_CXX_FLAGS "-W -Wextra -Wall -std=c++0x")
 set(CMAKE_CXX_FLAGS_DEBUG "-W -Wextra -Wall -g -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "-W -Wextra -Wall -O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-W -Wextra -Wall -O3 -DNDEBUG -march=native")
 
 
 # 

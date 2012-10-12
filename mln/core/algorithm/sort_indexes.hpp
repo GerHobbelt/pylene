@@ -3,6 +3,7 @@
 
 # include <mln/core/value/value_traits.hpp>
 # include <mln/core/image/image.hpp>
+# include <mln/core/value/indexer.hpp>
 # include <vector>
 
 // FIXME: use indexer
@@ -21,22 +22,26 @@ namespace mln
 
   namespace impl
   {
-    template <typename I>
+    template <typename I, typename StrictWeakOrdering,
+	      typename Indexer = indexer<mln_value(I), StrictWeakOrdering> >
     std::vector<typename I::size_type>
-    sort_indexes(const I& input, std::less<mln_value(I)>, std::true_type _is_low_quant_)
+    sort_indexes(const I& input, StrictWeakOrdering, std::true_type _is_low_quant_)
     {
       (void) _is_low_quant_;
+      typedef typename Indexer::index_type index_t;
+      Indexer f;
+
 
       typedef mln_value(I) V;
-      static constexpr V sup = value_traits<V>::sup();
-      unsigned h[sup+1] = {0,};
+      static constexpr std::size_t nvalues = 1 << value_traits<index_t>::quant;
+      unsigned h[nvalues] = {0,};
       {
 	mln_viter(v, input);
 	mln_forall(v)
-	  ++h[*v];
+	  ++h[f(*v)];
 
 	unsigned count = 0;
-	for (int i = 0; i < sup+1; ++i)
+	for (index_t i = value_traits<index_t>::min(); i < value_traits<index_t>::max(); ++i)
 	  {
 	    unsigned tmp = h[i];
 	    h[i] = count;
@@ -59,7 +64,7 @@ namespace mln
 
   template <typename I, typename BinaryFunction>
   std::vector<typename I::size_type>
-  sort_indexes(const Image<I>& input,  BinaryFunction cmp)
+  sort_indexes(const Image<I>& input, BinaryFunction cmp)
   {
     static_assert(std::is_same<typename image_category<I>::type, raw_image_tag>::value,
 		  "Image must model the Raw Image Concept");

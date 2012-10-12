@@ -102,8 +102,8 @@ namespace mln
     // As an ContainerImage
     // \group Point-wise access
     // \{
-    reference operator() (const site_type& p);
-    const_reference operator() (const site_type& p) const;
+    reference operator() (site_type p);
+    const_reference operator() (site_type p) const;
 
     // without bound checking
     reference at (site_type p);
@@ -398,7 +398,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::operator() (const site_type& p)
+  ndimage_base<T,dim,E>::operator() (site_type p)
   {
     mln_precondition(domain_.has(p));
     return at(p);
@@ -407,7 +407,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator() (const site_type& p) const
+  ndimage_base<T,dim,E>::operator() (site_type p) const
   {
     mln_precondition(domain_.has(p));
     return at(p);

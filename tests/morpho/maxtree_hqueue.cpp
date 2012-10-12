@@ -3,7 +3,7 @@
 #include <mln/core/neighb2d.hpp>
 
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/morpho/maxtree_ufind.hpp>
+#include <mln/morpho/maxtree_hqueue.hpp>
 #include <mln/io/imprint.hpp>
 
 #define BOOST_TEST_MODULE Morpho
@@ -19,13 +19,12 @@ BOOST_AUTO_TEST_CASE(maxtree_ufind)
 
   io::imprint(ima);
   {
-    image2d<std::size_t> parent = morpho::maxtree(ima, c4, std::less<uint8> ());
+    image2d<std::size_t> parent = morpho::maxtree_hqueue(ima, c4, std::less<uint8> () );
     io::imprint(parent);
   }
 
   {
-    image2d<std::size_t> parent = morpho::maxtree(ima, c4, std::greater<uint8> ());
+    image2d<std::size_t> parent = morpho::maxtree_hqueue(ima, c4, std::greater<uint8> ());
     io::imprint(parent);
   }
-
 }

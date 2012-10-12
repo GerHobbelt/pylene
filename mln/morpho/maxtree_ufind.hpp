@@ -31,7 +31,6 @@ namespace mln
     //   {
     //   }
 
-
     // private:
     //   const image2d<V>& m_ima;
     //   Neighborhood m_nbh;
@@ -50,9 +49,9 @@ namespace mln
         return parent[p] = zfind_root(parent, parent[p]);
     }
 
-  template <typename V, typename Neighborhood>
+    template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::greater<V> >
   image2d<std::size_t>
-  maxtree(const image2d<V>& ima, const Neighborhood& nbh)
+    maxtree(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
   {
     image2d<std::size_t> parent, zpar;
     image2d<bool> deja_vu;
@@ -62,12 +61,11 @@ namespace mln
 
     extension::fill(deja_vu, true);
 
-    std::vector<std::size_t> v = sort_indexes(ima);
+    std::vector<std::size_t> v = sort_indexes(ima, cmp);
     auto offsets = wrt_delta_index(ima, nbh.dpoints);
 
     for (std::size_t p: v)
       {
-        std::cout << p << std::endl;
 	// make set
 	{
 	  parent[p] = p;

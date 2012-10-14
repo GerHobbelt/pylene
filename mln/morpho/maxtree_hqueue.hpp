@@ -35,9 +35,13 @@ namespace mln
 	  elt_type r = m_repr[level];
 	  mln_precondition(m_h(m_ima[r]) == level);
 
+          //std::cout << "Start of flood: " << (int)level << "(repr:" << r << ")" << std::endl;
+          //io::imprint(m_parent);
+
 	  while (!m_q[level].empty())
 	    {
 	      elt_type p = m_q[level].back();
+              //std::cout << "-- process: " << p << std::endl;
 	      m_q[level].pop_back();
 	      m_parent[p] = r;
 
@@ -52,6 +56,7 @@ namespace mln
 			  m_repr[newlevel] = q;
 			  m_has_repr[newlevel] = true;
 			}
+                      //std::cout << "++ push: " << q << " @ " << (int)newlevel << std::endl;
 		      m_q[newlevel].push_back(q);
 		      m_deja_vu[q] = true;
 
@@ -65,20 +70,21 @@ namespace mln
 
 	  // Attach to parent
 	  m_has_repr[level] = false;
-	  level_t old = level;
-	  --level;
-	  while (level > value_traits<level_t>::min() and !m_has_repr[level]) {
-	    --level;
+	  while (level > value_traits<level_t>::min()) {
+            --level;
+            if (m_has_repr[level]) {
+              m_parent[r] = m_repr[level];
+              break;
+            }
 	  }
-	  if (level > value_traits<level_t>::min())
-	      m_parent[r] = m_repr[level];
+
 	  return level;
 	}
 
-	maxtree_flood_algorithm(const I& ima, image2d<std::size_t>& parent, const Neighborhood& nbh,
-				StrictWeakOrdering)
-	  : m_ima(ima), m_parent (parent), m_nbh_delta_indexes(wrt_delta_index(ima, Neighborhood::dpoints)),
-	    m_has_repr {false,}
+	maxtree_flood_algorithm(const I& ima, image2d<std::size_t>& parent, std::vector<std::size_t>& S,
+                                const Neighborhood&, StrictWeakOrdering)
+	  : m_ima(ima), m_parent (parent), m_S(S), m_nbh_delta_indexes(wrt_delta_index(ima, Neighborhood::dpoints)),
+	    m_has_repr {false,}, m_pos(0)
 	{
 	  resize(m_deja_vu, ima, ima.border(), false);
 	  extension::fill(m_deja_vu, true);
@@ -114,10 +120,10 @@ namespace mln
 	  flood(vmin);
 	}
 
-	static void run(const I& ima, image2d<std::size_t>& parent, const Neighborhood& nbh,
+	static void run(const I& ima, image2d<std::size_t>& parent, std::vector<std::size_t>& S, const Neighborhood& nbh,
 			StrictWeakOrdering cmp)
 	{
-	  maxtree_flood_algorithm x(ima, parent, nbh, cmp);
+	  maxtree_flood_algorithm x(ima, parent, S, nbh, cmp);
 	  (void) x;
 	}
 
@@ -130,26 +136,30 @@ namespace mln
 
 	const I&		    m_ima;
 	mln_ch_value(I, elt_type)&  m_parent;
+        std::vector<std::size_t>&   m_S;
 	mln_ch_value(I, bool)	    m_deja_vu;
 	mln::array<typename I::difference_type, Neighborhood::static_size> m_nbh_delta_indexes;
 
 	std::vector<elt_type>   m_q[nlevels];
 	bool			m_has_repr[nlevels];
 	elt_type		m_repr[nlevels];
+        unsigned                m_pos;
       };
 
     } // end of namespace mln::morpho::internal
 
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-    image2d<std::size_t>
+    std::pair< image2d<std::size_t>, std::vector<std::size_t> >
     maxtree_hqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       image2d<std::size_t> parent;
-      resize(parent, ima);
+      std::vector<std::size_t> S;
+      resize(parent, ima, ima.border(), 69);
+      S.resize(ima.domain().size());
 
-      internal::maxtree_flood_algorithm<image2d<V>, Neighborhood, StrictWeakOrdering>::run(ima, parent, nbh, cmp);
-      return parent;
+      internal::maxtree_flood_algorithm<image2d<V>, Neighborhood, StrictWeakOrdering>::run(ima, parent, S, nbh, cmp);
+      return std::make_pair(std::move(parent), std::move(S));
     }
 
   }  // end of namespace mln::morpho

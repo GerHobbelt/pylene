@@ -3,7 +3,7 @@
 
 # include <type_traits>
 # include <iostream>
-
+# include <iomanip>
 
 # include <mln/core/domain/box.hpp>
 # include <mln/core/macros.hpp>
@@ -50,13 +50,24 @@ namespace mln
         typedef typename Image::value_type V;
 	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
 	mln_point(Image) p;
+        std::ios state(NULL);
+        state.copyfmt(std::cout);
+
         std::cout << domain << "(" << typeid(V).name() << ")" << std::endl;
+
+        const int wtext =
+          std::is_same<V, uint8>::value ? 3 :
+          std::is_same<V, std::size_t>::value ? 6 : 0;
+
+        //if (std::is_same<V, uint8>::value)
+        std::cout.width(4);
 	for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0]) {
 	  for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1]) {
-	    std::cout << ((T) ima(p)) << " ";
+	    std::cout << std::setw(wtext) << ((T) ima(p)) << " ";
 	  }
 	  std::cout << std::endl;
 	}
+        std::cout.copyfmt(state);
       }
 
       template <typename Image, typename P>

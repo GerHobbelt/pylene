@@ -27,7 +27,7 @@
 # define INDEX_HPP
 
 # include <mln/core/value/value_traits.hpp>
-# include <boost/operators.hpp>
+//# include <boost/operators.hpp>
 # include <functional>
 
 namespace mln
@@ -38,9 +38,7 @@ namespace mln
 
 
   template <typename T>
-  struct Index<T, std::less<T> >:
-    boost::totally_ordered< Index<T, std::less<T> >,
-    boost::unit_steppable< Index<T, std::less<T> > > >
+  struct Index<T, std::less<T> >
   {
     explicit Index(T v) : x (v) {}
 
@@ -60,9 +58,7 @@ namespace mln
   };
 
   template <typename T>
-  struct Index<T, std::greater<T> >:
-    boost::totally_ordered< Index<T, std::greater<T> >,
-    boost::unit_steppable< Index<T, std::greater<T> > > >
+  struct Index<T, std::greater<T> >
   {
     explicit Index(T v) : x (v) {}
 

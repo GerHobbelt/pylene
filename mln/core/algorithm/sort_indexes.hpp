@@ -41,12 +41,13 @@ namespace mln
 	  ++h[f(*v)];
 
 	unsigned count = 0;
-	for (index_t i = value_traits<index_t>::min(); i < value_traits<index_t>::max(); ++i)
-	  {
-	    unsigned tmp = h[i];
-	    h[i] = count;
-	    count += tmp;
-	  }
+        index_t i = value_traits<index_t>::min();
+	do {
+          unsigned tmp = h[i];
+          h[i] = count;
+          count += tmp;
+        } while (i++ < value_traits<index_t>::max());
+        assert(count == input.domain().size());
       }
 
       std::vector<typename I::size_type> v;
@@ -54,7 +55,7 @@ namespace mln
       {
 	mln_pixter(px, input);
 	mln_forall(px)
-	  v[ h[px->val()]++ ] = px->index();
+	  v[ h[f(px->val())]++ ] = px->index();
       }
       return v;
     }

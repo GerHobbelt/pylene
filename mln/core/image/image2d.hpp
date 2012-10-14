@@ -53,7 +53,7 @@ namespace mln {
 
 
     image2d(short nrows, short ncols, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{{0,0}},{{nrows, ncols}}}, border)
+      : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{0,0},{nrows, ncols}}, border)
     {
     }
 

@@ -21,7 +21,7 @@ iota(out, 0);
 
 BOOST_CHECK(equal(ima, out));
 
-point2d p = {{2,3}};
+point2d p = {2,3};
 out(p) = 12;
 BOOST_CHECK(not equal(ima, out));
 }

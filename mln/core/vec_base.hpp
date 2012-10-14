@@ -164,9 +164,27 @@ namespace mln
         v_.set_all(1);
       }
 
-      vec_base(std::initializer_list<T> l)
+
+      template <typename dummy = void>
+      constexpr
+      vec_base(const T& x, typename std::enable_if<dim==1, dummy>::type* = NULL)
+        : v_ {x}
       {
-        std::copy(l.begin(), l.end(), v_);
+      }
+
+      template <typename dummy = void>
+      constexpr
+      vec_base(const T& x, const T& y, typename std::enable_if<dim==2, dummy>::type* = NULL)
+        : v_ {x,y}
+      {
+      }
+
+
+      template <typename dummy = void>
+      constexpr
+      vec_base(const T& x, const T& y, const T& z, typename std::enable_if<dim==3, dummy>::type* = NULL)
+        : v_ {x,y,z}
+      {
       }
 
 

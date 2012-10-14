@@ -33,7 +33,7 @@ namespace mln
       {
         image2d<V> ima = m_ima | domain;
         image2d<V> parent = m_parent | domain;
-        image2d<V> parent = m_zpar | domain;
+        image2d<V> zpar = m_zpar | domain;
         image2d<bool> deja_vu;
         resize(deja_vu, ima, 1, false);
 

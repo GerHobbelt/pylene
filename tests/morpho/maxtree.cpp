@@ -4,8 +4,10 @@
 #include <mln/morpho/maxtree_ufind.hpp>
 #include <mln/morpho/maxtree_ufindrank.hpp>
 #include <mln/morpho/maxtree_hqueue.hpp>
+#include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/io/imprint.hpp>
+#include <tbb/task_scheduler_init.h>
 
 #define BOOST_TEST_MODULE Morpho
 #include <boost/test/unit_test.hpp>
@@ -57,6 +59,8 @@ BOOST_AUTO_TEST_CASE(Maxtree)
   std::uniform_int_distribution<uint8> sampler(0, 20);
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
+  tbb::task_scheduler_init ts(1);
+
   // {
   //   image2d<std::size_t> f;
   //   resize(f, ima);
@@ -69,10 +73,12 @@ BOOST_AUTO_TEST_CASE(Maxtree)
 
   {
     image2d<std::size_t> parent1, parent2, parent3;
+    image2d<point2d> parent4;
     std::vector<std::size_t> S1, S2, S3;
     std::tie(parent1, S1) = morpho::maxtree(ima, c4, std::less<uint8> ());
     std::tie(parent2, S2) = morpho::maxtree_hqueue(ima, c4, std::less<uint8> () );
     std::tie(parent3, S3) = morpho::maxtree_ufindbyrank(ima, c4, std::less<uint8> () );
+    parent4 = morpho::maxtree_ufind_parallel(ima, c4, std::less<uint8> () );
     // io::imprint(parent1);
     // io::imprint(parent3);
 

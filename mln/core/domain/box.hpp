@@ -5,6 +5,8 @@
 # include <mln/core/image/internal/nested_loop_iterator.hpp>
 # include <mln/core/domain/box_iter.hpp>
 # include <mln/core/ch_value.hpp>
+# include <tbb/tbb_stddef.h>
+
 
 namespace mln
 {
@@ -33,6 +35,17 @@ namespace mln
       internal::no_op_visitor,
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> reverse_iterator;
+
+
+    box() = default;
+
+
+    constexpr box(const point_type& pmin_, const point_type& pmax_)
+      : pmin (pmin_), pmax(pmax_)
+    {
+    }
+
+
 
     bool has(const point_type& p) const
     {

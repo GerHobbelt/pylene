@@ -234,6 +234,7 @@ namespace mln
 
       /* RELATIONAL */
       VEC_BASE_GEN_REL(is_equality_comparable, ==)
+      VEC_BASE_GEN_REL(is_equality_comparable, !=)
       VEC_BASE_GEN_REL(is_less_than_comparable, <)
       VEC_BASE_GEN_REL(is_less_than_comparable, >)
       VEC_BASE_GEN_REL(is_less_than_comparable, <=)

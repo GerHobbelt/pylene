@@ -83,7 +83,20 @@ namespace mln
     }
 
 
-#ifdef MLN_TBB
+#ifndef MLN_DISABLE_PARALLELIZATION
+    bool is_divisible() const
+    {
+      return (pmax[0] - pmin[0]) > 1;
+    }
+
+    box(box& r, tbb::split)
+    {
+      mln_precondition(r.is_divisible());
+      pmin = r.pmin;
+      pmax = r.pmax;
+      r.pmax[0] = r.pmin[0] + (pmax[0] - pmin[0]) / 2 ;
+      pmin[0] = r.pmax[0];
+    }
 #endif
 
     bool __is_valid() const

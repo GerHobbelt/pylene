@@ -1,9 +1,21 @@
 cmake_minimum_required(VERSION 2.8)
 project(MILENA)
 
+# Add FindTBB directory to CMake's module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
 include(FindBoost)
 
+
+
 find_package(Boost 1.42 COMPONENTS unit_test_framework REQUIRED)
+find_package(TBB)
+
+if(TBB_FOUND)
+        MESSAGE (STATUS "TBB found.")
+else()
+        MESSAGE (STATUS "TBB not found. Example project will not be built.")
+endif()
 
 if(Boost_FOUND)
  message(STATUS, "Boost trouvé ${Boost_INCLUDE_DIRS}")
@@ -16,6 +28,7 @@ endif()
 
 # add source directory to find mln path
 include_directories("${PROJECT_SOURCE_DIR}")
+include_directories(${TBB_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "-W -Wextra -Wall -std=c++0x")
 set(CMAKE_CXX_FLAGS_DEBUG "-W -Wextra -Wall -g -ggdb")

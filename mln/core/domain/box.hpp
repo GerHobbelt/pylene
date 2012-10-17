@@ -62,7 +62,7 @@ namespace mln
     bool empty() const
     {
       mln_precondition(__is_valid());
-      for (int i = 0; i < dim; ++i)
+      for (unsigned i = 0; i < dim; ++i)
 	if (pmax[i] <= pmin[i])
 	  return true;
       return false;
@@ -97,10 +97,6 @@ namespace mln
 
 
 #ifndef MLN_DISABLE_PARALLELIZATION
-    bool is_divisible() const
-    {
-      return (pmax[0] - pmin[0]) > 1;
-    }
 
     box(box& r, tbb::split)
     {
@@ -110,7 +106,21 @@ namespace mln
       r.pmax[0] = r.pmin[0] + (pmax[0] - pmin[0]) / 2 ;
       pmin[0] = r.pmax[0];
     }
+
 #endif
+
+    bool is_divisible() const
+    {
+      mln_precondition(__is_valid());
+      return (pmax[0] - pmin[0]) > 1;
+    }
+
+    void join(const box& other)
+    {
+      mln_precondition(__is_valid());
+      mln_precondition(pmax[0] == other.pmin[0]);
+      pmax[0] = other.pmax[0];
+    }
 
     bool __is_valid() const
     {
@@ -155,6 +165,48 @@ namespace mln
       typedef image2d<T> type;
     };
   };
+
+
+  template <typename T, unsigned dim>
+  struct grain_box : box<T, dim>
+  {
+  private:
+    typedef box<T, dim> base;
+
+  public:
+    grain_box() = default;
+    grain_box(const grain_box&) = default;
+
+    grain_box(const box<T, dim>& b, unsigned grain = 1)
+      : base(b), m_grain (grain)
+    {
+    }
+
+    bool is_divisible() const
+    {
+      mln_precondition(__is_valid);
+      return (this->pmax[0] - this->pmin[0]) > (int)m_grain;
+    }
+
+#ifndef MLN_DISABLE_PARALLELIZATION
+
+    grain_box(grain_box& r, tbb::split)
+      : base(r, tbb::split ())
+    {
+    }
+
+#endif
+
+
+  private:
+    unsigned m_grain;
+  };
+
+  typedef grain_box<short, 1> grain_box1d;
+  typedef grain_box<float, 1> grain_box1df;
+  typedef grain_box<short, 2> grain_box2d;
+  typedef grain_box<float, 2> grain_box2df;
+  typedef grain_box<short, 3> grain_box3d;
 
 }
 

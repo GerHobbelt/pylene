@@ -102,12 +102,12 @@ namespace mln
     // As an ContainerImage
     // \group Point-wise access
     // \{
-    reference operator() (site_type p);
-    const_reference operator() (site_type p) const;
+    reference operator() (const site_type& p);
+    const_reference operator() (const site_type& p) const;
 
     // without bound checking
-    reference at (site_type p);
-    const_reference at (site_type p) const;
+    reference at (const site_type& p);
+    const_reference at (const site_type& p) const;
     // \}
 
     // FIXME move to base
@@ -172,12 +172,13 @@ namespace mln
 
 
     // Specialized algorithm
-    template <typename T_, unsigned dim_, typename E_>
-    friend const E_ make_subimage(const ndimage_base<T_, dim_, E_>&, const typename ndimage_base<T_, dim_, E_>::domain_type& domain);
-    template <typename T_, unsigned dim_, typename E_>
-    friend E_ make_subimage(ndimage_base<T_, dim_, E_>&, const typename ndimage_base<T_, dim_, E_>::domain_type& domain);
-    template <typename T_, unsigned dim_, typename E_>
-    friend E_ make_subimage(ndimage_base<T_, dim_, E_>&&, const typename ndimage_base<T_, dim_, E_>::domain_type& domain);
+    template <typename T_, unsigned dim_, typename E_, typename Domain_>
+    friend typename std::enable_if<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>::type
+      make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
+    // template <typename T_, unsigned dim_, typename E_, typename Domain_>
+    // friend E_ make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
+    // template <typename T_, unsigned dim_, typename E_, typename Domain_>
+    // friend typename E_ make_subimage(ndimage_base<T_, dim_, E_>&&, const Domain_& domain);
 
 
   protected:
@@ -370,7 +371,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::at (site_type p)
+  ndimage_base<T,dim,E>::at (const site_type& p)
   {
     site_type q = p - domain_.pmin;
 
@@ -384,7 +385,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::at (site_type p) const
+  ndimage_base<T,dim,E>::at (const site_type& p) const
   {
     site_type q = p - domain_.pmin;
 
@@ -398,7 +399,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::operator() (site_type p)
+  ndimage_base<T,dim,E>::operator() (const site_type& p)
   {
     mln_precondition(domain_.has(p));
     return at(p);
@@ -407,7 +408,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator() (site_type p) const
+  ndimage_base<T,dim,E>::operator() (const site_type& p) const
   {
     mln_precondition(domain_.has(p));
     return at(p);

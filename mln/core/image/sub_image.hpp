@@ -40,8 +40,8 @@ namespace mln
   operator| (Image<I>& ima, const Domain& domain);
 
   template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<I&&>(), std::declval<const Domain&>()) )
-  operator| (const Image<I>&& ima, const Domain& domain);
+  auto
+  operator| (const Image<I>&& ima, const Domain& domain) -> decltype( make_subimage(move_exact(ima), domain) );
 
   template <typename I, typename Domain>
   decltype( make_subimage(std::declval<I&&>(), std::declval<const Domain&>()) )
@@ -96,8 +96,8 @@ namespace mln
   }
 
   template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<I&&>(), std::declval<const Domain&>()) )
-  operator| (const Image<I>&& ima, const Domain& domain)
+  auto
+  operator| (const Image<I>&& ima, const Domain& domain) -> decltype( make_subimage(move_exact(ima), domain) )
   {
     return make_subimage(move_exact(ima), domain);
   }

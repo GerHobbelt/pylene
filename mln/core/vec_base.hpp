@@ -22,6 +22,10 @@
 #include <mln/core/assert.hpp>
 
 
+# define VEC_BASE_ENABLE_IF(Trait, R)					\
+  typename std::enable_if< vec_base_traits<tag, U>::Trait and std::is_convertible<T,U>::value, R>::type
+
+
 // Element-wise operator
 // Ex: vector u,v,w;
 // w = u + v; <=> w[i] = u[i] + v[i] forall i
@@ -35,6 +39,7 @@
       v_[i] Op o.v_[i];							\
     return *this;							\
   }
+
 
 // External operator
 // Ex: vector u, v; scalar a;
@@ -64,6 +69,39 @@
 	return false;							\
     return true;							\
   }
+
+// Relational operator
+// Ex: vector u, v;
+// u op v iif u[i] op v[i] forall i
+# define VEC_BASE_GEN_REL_ALL(Trait, Op)				\
+  template <typename U>							\
+  typename								\
+  std::enable_if< vec_base_traits<tag, U>::Trait, bool >::type		\
+  operator Op (const vec_base<U, dim, tag>& o) const			\
+  {									\
+    for (unsigned i = 0; i < dim; ++i)					\
+      if (!(v_[i] Op o.v_[i]))						\
+	return false;							\
+    return true;							\
+  }
+
+
+// Relational operator
+// Ex: vector u, v;
+// u op v iif exists i u[i] op v[i]
+# define VEC_BASE_GEN_REL_ANY(Trait, Op)				\
+  template <typename U>							\
+  typename								\
+  std::enable_if< vec_base_traits<tag, U>::Trait, bool >::type		\
+  operator Op (const vec_base<U, dim, tag>& o) const			\
+  {									\
+    for (unsigned i = 0; i < dim; ++i)					\
+      if (v_[i] Op o.v_[i])						\
+	return true;							\
+    return false;							\
+  }
+
+
 
 // Outside class, Element-wise operator
 # define VEC_BASE_GEN_EW_OP_EXT(TraitName, Op)				\
@@ -112,7 +150,7 @@
     typedef vec_base<typename std::common_type<T, U>::type, dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
-      r.v_[i] = x.v_[i] Op y;						\
+      r.v_[i] = y Op x.v_[i];						\
     return r;								\
   }
 
@@ -161,7 +199,7 @@ namespace mln
 
       vec_base(const literal::one_t&)
       {
-        v_.set_all(1);
+        this->set_all(1);
       }
 
 
@@ -233,12 +271,59 @@ namespace mln
       VEC_BASE_GEN_EXT_OP(is_additive_ext, +=)
 
       /* RELATIONAL */
-      VEC_BASE_GEN_REL(is_equality_comparable, ==)
-      VEC_BASE_GEN_REL(is_equality_comparable, !=)
-      VEC_BASE_GEN_REL(is_less_than_comparable, <)
-      VEC_BASE_GEN_REL(is_less_than_comparable, >)
-      VEC_BASE_GEN_REL(is_less_than_comparable, <=)
-      VEC_BASE_GEN_REL(is_less_than_comparable, >=)
+      template <typename U>
+      VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
+      operator== (const vec_base<U, dim, tag>& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (!(v_[i] == o.v_[i]))
+	    return false;
+	return true;
+      }
+
+      template <typename U>
+      VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
+      operator!= (const vec_base<U, dim, tag>& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (v_[i] != o.v_[i])
+	    return true;
+	return false;
+      }
+
+      template <typename U>
+      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator< (const vec_base<U, dim, tag>& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (v_[i] < o.v_[i])
+	    return true;
+	return false;
+      }
+
+      template <typename U>
+      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator<= (const vec_base<U, dim, tag>& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (v_[i] > o.v_[i])
+	    return false;
+	return true;
+      }
+
+      template <typename U>
+      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator > (const vec_base<U, dim, tag>& o) const
+      {
+	return not(*this <= o);
+      }
+
+      template <typename U>
+      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator >= (const vec_base<U, dim, tag>& o) const
+      {
+	return not(*this < o);
+      }
 
       T v_[dim];
     };

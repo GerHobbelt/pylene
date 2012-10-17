@@ -1,11 +1,42 @@
 #ifndef MLN_CORE_MORPHO_MERGE_TREE_HPP
 # define MLN_CORE_MORPHO_MERGE_TREE_HPP
 
+# include <tbb/compat/thread>
+
 namespace mln
 {
 
   namespace morpho
   {
+
+    namespace internal
+    {
+
+      template <typename V>
+      point2d
+      zfind_repr(const image2d<V>& ima, image2d<point2d>& parent, const point2d& p)
+      {
+	point2d q = parent(p);
+	if (q != p and ima(q) == ima(p))
+	  return parent(p) = zfind_repr(ima, parent, q);
+	else
+	  return p;
+      }
+
+      template <typename V>
+      point2d
+      zfind_parent(const image2d<V>& ima, image2d<point2d>& parent, const point2d& p)
+      {
+	point2d q = parent(p);
+	point2d r = parent(q);
+	if (q != r and ima(q) == ima(r))
+	  return parent(p) = zfind_repr(ima, parent, r);
+	else
+	  return q;
+      }
+
+
+    }
 
 
     // After tree merge, (parent | domain) needs canonization
@@ -16,50 +47,58 @@ namespace mln
 		    box2d domain,
 		    StrictWeakOrdering cmp)
     {
-      mln_precondition(domain.empty());
+      mln_precondition(!domain.empty());
 
       point2d p;
       point2d q;
-      p[0] = domain.pmin[0]-1;
-      q[0] = domain.pmin[0];
+      p[0] = domain.pmax[0]-1;
+      q[0] = domain.pmax[0];
 
       unsigned ncols = ima.ncols();
       for (unsigned i = 0; i < ncols; ++i)
 	{
 	  p[1] = q[1] = i;
-	  point2d rp = ima(p) == ima(parent(p)) ? parent(p) : p;
-	  point2d rq = ima(q) == ima(parent(q)) ? parent(q) : q;
-	  // check that parent is canonized
-	  mln_assertion(rp == parent(rp) or ima(parent(rp)) != ima(rp));
-	  mln_assertion(rq == parent(rq) or ima(parent(rq)) != ima(rq));
+	  point2d rp = internal::zfind_repr(ima, parent, p);
+	  point2d rq = internal::zfind_repr(ima, parent, q);
 
 	  while (rp != rq)
 	    {
+	      // check that rp and rq are representative
+	      mln_assertion(rp == parent(rp) or ima(parent(rp)) != ima(rp));
+	      mln_assertion(rq == parent(rq) or ima(parent(rq)) != ima(rq));
+
+
 	      if (cmp(ima(rq), ima(rp))) // attach zpar(rp) to rq
 		{
-		  point2d par = parent(rp);
-		  while (cmp(ima(rq), ima(par))) {
+		  point2d par = internal::zfind_parent(ima, parent, rp);
+		  while (par != rp and cmp(ima(rq), ima(par))) {
 		    rp = par;
-		    par = parent(rp);
+		    par = internal::zfind_parent(ima, parent, rp);
 		  }
 		  parent(rp) = rq;
+		  if (par == rp)
+		    break;
 		  rp = par;
 		}
 	      else if (cmp(ima(rp), ima(rq))) // attach zpar(rq) to rp
 		{
-		  point2d par = parent(rq);
-		  while (cmp(ima(rp), ima(par))) {
+		  point2d par = internal::zfind_parent(ima, parent, rq);
+		  while (par != rq and cmp(ima(rp), ima(par))) {
 		    rq = par;
-		    par = parent(rq);
+		    par = internal::zfind_parent(ima, parent, rq);
 		  }
 		  parent(rq) = rp;
+		  if (par == rq)
+		    break;
 		  rq = par;
 		}
 	      else
 		{
-		  point2d par = parent(rq);
+		  point2d par = internal::zfind_parent(ima, parent, rq);
 		  parent(rq) = rp;
-		  rp = par;
+		  if (par == rq)
+		    break;
+		  rq = par;
 		}
 	    }
 

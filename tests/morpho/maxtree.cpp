@@ -15,6 +15,8 @@
 
 namespace mln
 {
+
+
   void unify_parent(const mln::image2d<uint8>& f,
                     const std::vector<std::size_t>& S,
                     mln::image2d<std::size_t>& parent)
@@ -47,19 +49,84 @@ namespace mln
 
 }
 
+bool iscanonized(const mln::image2d<mln::uint8>& ima,
+		 const mln::image2d<std::size_t>& parent)
+{
+  mln_pixter(px, parent);
+  mln_forall(px)
+  {
+    std::size_t q = px->val();
+    if (not(q == parent[q] or ima[q] != ima[parent[q]]))
+      {
+	std::cout << "canaonization error @ " << px->index() << std::endl;
+	return false;
+      }
+  }
+  return true;
+}
+
+mln::image2d<std::size_t>
+pt2idx(const mln::image2d<mln::point2d>& parent)
+{
+  mln::image2d<std::size_t> out;
+  mln::resize(out, parent);
+
+
+  mln_viter(vin, vout, parent, out);
+  mln_forall(vin, vout)
+    *vout = parent.index_of_point(*vin);
+  return out;
+}
+
+
+
+template <typename StrictWeakOrdering>
+void runtest(const mln::image2d<mln::uint8>& ima, StrictWeakOrdering cmp)
+{
+  using namespace mln;
+
+  image2d<std::size_t> parent1, parent2, parent3, parent4;
+  image2d<point2d> parent4_;
+  std::vector<std::size_t> S1, S2, S3;
+  std::tie(parent1, S1) = morpho::maxtree(ima, c4, cmp);
+  std::tie(parent2, S2) = morpho::maxtree_hqueue(ima, c4, cmp );
+  std::tie(parent3, S3) = morpho::maxtree_ufindbyrank(ima, c4, cmp );
+  parent4_ = morpho::maxtree_ufind_parallel(ima, c4, cmp );
+  parent4 = pt2idx(parent4_);
+
+  // io::imprint(parent1);
+  // io::imprint(parent4);
+  // io::imprint(parent4_);
+  // io::imprint(parent3);
+  BOOST_CHECK(iscanonized(ima, parent1));
+  BOOST_CHECK(iscanonized(ima, parent2));
+  BOOST_CHECK(iscanonized(ima, parent3));
+  BOOST_CHECK(iscanonized(ima, parent4));
+
+  unify_parent(ima, S1, parent1);
+  unify_parent(ima, S1, parent2);
+  unify_parent(ima, S3, parent3);
+  unify_parent(ima, S1, parent4);
+  //io::imprint(parent1);
+  //io::imprint(parent3);
+  BOOST_CHECK(all(parent1 == parent2));
+  BOOST_CHECK(all(parent1 == parent3));
+  BOOST_CHECK(all(parent1 == parent4));
+}
+
 
 BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
 
-  image2d<uint8> ima(96, 64);
+  image2d<uint8> ima(2000, 3000);
 
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<uint8> sampler(0, 20);
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
-  tbb::task_scheduler_init ts(1);
+  tbb::task_scheduler_init ts;
 
   // {
   //   image2d<std::size_t> f;
@@ -69,45 +136,9 @@ BOOST_AUTO_TEST_CASE(Maxtree)
   //   io::imprint(f);
   // }
 
-  //io::imprint(ima);
+  // io::imprint(ima);
 
-  {
-    image2d<std::size_t> parent1, parent2, parent3;
-    image2d<point2d> parent4;
-    std::vector<std::size_t> S1, S2, S3;
-    std::tie(parent1, S1) = morpho::maxtree(ima, c4, std::less<uint8> ());
-    std::tie(parent2, S2) = morpho::maxtree_hqueue(ima, c4, std::less<uint8> () );
-    std::tie(parent3, S3) = morpho::maxtree_ufindbyrank(ima, c4, std::less<uint8> () );
-    parent4 = morpho::maxtree_ufind_parallel(ima, c4, std::less<uint8> () );
-    // io::imprint(parent1);
-    // io::imprint(parent3);
-
-    unify_parent(ima, S1, parent1);
-    unify_parent(ima, S1, parent2);
-    unify_parent(ima, S3, parent3);
-    //io::imprint(parent1);
-    //io::imprint(parent3);
-    BOOST_CHECK(all(parent1 == parent2));
-    BOOST_CHECK(all(parent1 == parent3));
-  }
-
-
-  {
-    image2d<std::size_t> parent1, parent2, parent3;
-    std::vector<std::size_t> S1, S2, S3;
-    std::tie(parent1, S1) = morpho::maxtree(ima, c4, std::greater<uint8> ());
-    std::tie(parent2, S2) = morpho::maxtree_hqueue(ima, c4, std::greater<uint8> () );
-    std::tie(parent3, S3) = morpho::maxtree_ufindbyrank(ima, c4, std::greater<uint8> () );
-    // io::imprint(parent1);
-    // io::imprint(parent2);
-
-    unify_parent(ima, S1, parent1);
-    unify_parent(ima, S1, parent2);
-    unify_parent(ima, S3, parent3);
-    // io::imprint(parent1);
-    // io::imprint(parent2);
-    BOOST_CHECK(all(parent1 == parent2));
-    BOOST_CHECK(all(parent1 == parent3));
-  }
+  runtest(ima, std::less<uint8> ());
+  runtest(ima, std::greater<uint8> ());
 
 }

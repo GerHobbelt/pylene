@@ -210,7 +210,7 @@ namespace mln
       void  initialize(P& point) const { point = pmax_; point -= 1; }
       template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
       template <size_t n> void  next(P& point) const { --point[n]; }
-      template <size_t n> bool  finished(P& point) const { return point[n] < pmin_[n]; }
+      template <size_t n> bool  finished(const P& point) const { return point[n] < pmin_[n]; }
 
     private:
       P pmin_;

@@ -180,18 +180,19 @@ namespace mln
     grain_box(const box<T, dim>& b, unsigned grain = 1)
       : base(b), m_grain (grain)
     {
+      mln_assertion(grain > 0);
     }
 
     bool is_divisible() const
     {
-      mln_precondition(__is_valid);
+      mln_precondition(this->__is_valid());
       return (this->pmax[0] - this->pmin[0]) > (int)m_grain;
     }
 
 #ifndef MLN_DISABLE_PARALLELIZATION
 
     grain_box(grain_box& r, tbb::split)
-      : base(r, tbb::split ())
+      : base(r, tbb::split ()), m_grain (r.m_grain)
     {
     }
 

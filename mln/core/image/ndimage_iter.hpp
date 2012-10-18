@@ -142,14 +142,14 @@ namespace mln
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
       std::array<std::ptrdiff_t, ndim> delta_index_strides;
-      compute_negative_delta_strides<ndim>(&ima_->m_index_strides, &shp, &delta_index_strides);
-      compute_negative_delta_strides<ndim>(&ima_->strides_,        &shp, &delta_byte_strides);
+      compute_negative_delta_strides<ndim>(&ima_->m_index_strides[0], &shp[0], &delta_index_strides[0]);
+      compute_negative_delta_strides<ndim>(&ima_->strides_[0],        &shp[0], &delta_byte_strides[0]);
 
-      return const_reverse_iterator(pixel_t(exact(ima_)),
-				    internal::make_point_visitor_forward(pmin, pmax),
-				    internal::strided_pointer_value_visitor<ndim>(ima_->last_, delta_byte_strides),
-				    internal::strided_index_visitor<ndim>(ima_->m_index_last, delta_index_strides)
-				    );
+      return reverse_iterator(pixel_t(exact(ima_)),
+			      internal::make_point_visitor_backward(pmin, pmax),
+			      internal::strided_pointer_value_visitor<ndim>(ima_->last_, delta_byte_strides),
+			      internal::strided_index_visitor<ndim>(ima_->m_index_last, delta_index_strides)
+			      );
     }
   private:
     Image* ima_;

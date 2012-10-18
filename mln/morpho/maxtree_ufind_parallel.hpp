@@ -11,6 +11,8 @@
 # include <mln/morpho/merge_tree.hpp>
 
 # include <tbb/parallel_reduce.h>
+# include <tbb/parallel_for.h>
+
 # include <tbb/mutex.h>
 
 namespace mln
@@ -149,6 +151,29 @@ namespace mln
       template <typename V, typename Neighborhood, typename StrictWeakOrdering>
       tbb::mutex MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering>::m_mutex;
 
+      template <typename V>
+      struct MaxtreeCanonizationAlgorithm
+      {
+	MaxtreeCanonizationAlgorithm(const image2d<V>& ima,
+				     image2d<point2d>& parent)
+	  : m_ima (ima), m_parent (parent)
+	{
+	}
+
+
+	void
+	operator() (const grain_box2d& domain) const
+	{
+	  image2d<point2d> parent = m_parent | domain;
+	  mln_foreach(auto& p, parent.values())
+	    p = internal::zfind_repr(m_ima, m_parent, p);
+	}
+
+	const image2d<V>& m_ima;
+	image2d<point2d>&  m_parent;
+
+      };
+
 
       namespace parallel
       {
@@ -157,15 +182,22 @@ namespace mln
 	maxtree_ufind(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
 	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
-	  tbb::parallel_reduce(grain_box2d(ima.domain(), ima.nrows() / 64), algo, tbb::auto_partitioner());
+	  std::cout << "Grain: " <<  ima.nrows() / 64 << std::endl;
+	  tbb::parallel_reduce(grain_box2d(ima.domain(), 2), algo, tbb::auto_partitioner());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
-	  // canonization
-	  image2d<point2d>& parent = algo.m_parent;
-	  mln_foreach(auto& p, parent.values())
-	    p = internal::zfind_repr(ima, parent, p);
 
-	  return algo.m_parent;
+
+	  image2d<point2d>& parent = algo.m_parent;
+	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
+	  tbb::parallel_for(grain_box2d(ima.domain(), 2), canonizer, tbb::auto_partitioner());
+
+	  // canonization
+	  // image2d<point2d>& parent = algo.m_parent;
+	  // mln_foreach(auto& p, parent.values())
+	  //   p = internal::zfind_repr(ima, parent, p);
+
+	  return parent;
 	}
 
       }
@@ -199,20 +231,20 @@ namespace mln
     }
 
 
-    template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-    image2d<point2d>
-    maxtree_ufind_parallel(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
-    {
-      impl::MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
-      tbb::parallel_reduce(ima.domain(), algo, tbb::auto_partitioner());
+    // template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
+    // image2d<point2d>
+    // maxtree_ufind_parallel(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+    // {
+    //   impl::MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
+    //   tbb::parallel_reduce(ima.domain(), algo, tbb::auto_partitioner());
 
-      // canonization
-      image2d<point2d>& parent = algo.m_parent;
-      mln_foreach(auto& p, parent.values())
-	p = internal::zfind_repr(ima, parent, p);
+    //   // canonization
+    //   image2d<point2d>& parent = algo.m_parent;
+    //   mln_foreach(auto& p, parent.values())
+    // 	p = internal::zfind_repr(ima, parent, p);
 
-      return algo.m_parent;
-    }
+    //   return algo.m_parent;
+    // }
 
 
 

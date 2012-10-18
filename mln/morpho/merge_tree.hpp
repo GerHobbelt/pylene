@@ -24,6 +24,18 @@ namespace mln
       }
 
       template <typename V>
+      unsigned
+      zfind_repr(const image2d<V>& ima, image2d<std::size_t>& parent,
+		 unsigned p)
+      {
+	unsigned q = parent[p];
+	if (q != p and ima[q] == ima[p])
+	  return parent[p] = zfind_repr(ima, parent, q);
+	else
+	  return p;
+      }
+
+      template <typename V>
       point2d
       zfind_parent(const image2d<V>& ima, image2d<point2d>& parent, const point2d& p)
       {
@@ -58,48 +70,71 @@ namespace mln
       for (unsigned i = 0; i < ncols; ++i)
 	{
 	  p[1] = q[1] = i;
-	  point2d rp = internal::zfind_repr(ima, parent, p);
-	  point2d rq = internal::zfind_repr(ima, parent, q);
+	  //std::cout << "Merge: " << p << " @ " << q << std::endl;
+	  point2d x = internal::zfind_repr(ima, parent, p);
+	  point2d y = internal::zfind_repr(ima, parent, q);
+	  if (cmp(ima(x), ima(y)))
+	    std::swap(x, y);
 
-	  while (rp != rq)
+	  while (x != y)
 	    {
-	      // check that rp and rq are representative
-	      mln_assertion(rp == parent(rp) or ima(parent(rp)) != ima(rp));
-	      mln_assertion(rq == parent(rq) or ima(parent(rq)) != ima(rq));
+	      // check that x and y are representative
+	      mln_assertion(x == parent(x) or ima(parent(x)) != ima(x));
+	      mln_assertion(y == parent(y) or ima(parent(y)) != ima(y));
+	      mln_assertion(!cmp(ima(x), ima(y)));
 
-
-	      if (cmp(ima(rq), ima(rp))) // attach zpar(rp) to rq
+	      // we want to attach x to y
+	      if (parent(x) == x)
 		{
-		  point2d par = internal::zfind_parent(ima, parent, rp);
-		  while (par != rp and cmp(ima(rq), ima(par))) {
-		    rp = par;
-		    par = internal::zfind_parent(ima, parent, rp);
-		  }
-		  parent(rp) = rq;
-		  if (par == rp)
-		    break;
-		  rp = par;
-		}
-	      else if (cmp(ima(rp), ima(rq))) // attach zpar(rq) to rp
-		{
-		  point2d par = internal::zfind_parent(ima, parent, rq);
-		  while (par != rq and cmp(ima(rp), ima(par))) {
-		    rq = par;
-		    par = internal::zfind_parent(ima, parent, rq);
-		  }
-		  parent(rq) = rp;
-		  if (par == rq)
-		    break;
-		  rq = par;
+		  parent(x) = y;
+		  x = y;
 		}
 	      else
 		{
-		  point2d par = internal::zfind_parent(ima, parent, rq);
-		  parent(rq) = rp;
-		  if (par == rq)
-		    break;
-		  rq = par;
+		  point2d z = internal::zfind_parent(ima, parent, x);
+		  if (!cmp(ima(z), ima(y)))
+		    x = z;
+		  else
+		    {
+		      //std::cout << "Connect " << x << "/" << (int)ima(x) << " @ " << y << "/" << (int) ima(y) << std::endl;
+		      parent(x) = y;
+		      x = y;
+		      y = z;
+		    }
 		}
+
+	      // if (cmp(ima(rq), ima(rp))) // attach zpar(rp) to rq
+	      // 	{
+	      // 	  point2d par = internal::zfind_parent(ima, parent, rp);
+	      // 	  while (par != rp and cmp(ima(rq), ima(par))) {
+	      // 	    rp = par;
+	      // 	    par = internal::zfind_parent(ima, parent, rp);
+	      // 	  }
+	      // 	  parent(rp) = rq;
+	      // 	  if (par == rp)
+	      // 	    break;
+	      // 	  rp = par;
+	      // 	}
+	      // else if (cmp(ima(rp), ima(rq))) // attach zpar(rq) to rp
+	      // 	{
+	      // 	  point2d par = internal::zfind_parent(ima, parent, rq);
+	      // 	  while (par != rq and cmp(ima(rp), ima(par))) {
+	      // 	    rq = par;
+	      // 	    par = internal::zfind_parent(ima, parent, rq);
+	      // 	  }
+	      // 	  parent(rq) = rp;
+	      // 	  if (par == rq)
+	      // 	    break;
+	      // 	  rq = par;
+	      // 	}
+	      // else
+	      // 	{
+	      // 	  point2d par = internal::zfind_parent(ima, parent, rq);
+	      // 	  parent(rq) = rp;
+	      // 	  if (par == rq)
+	      // 	    break;
+	      // 	  rq = par;
+	      // 	}
 	    }
 
 	}

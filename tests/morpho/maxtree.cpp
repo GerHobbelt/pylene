@@ -24,27 +24,25 @@ namespace mln
   {
     mln::image2d< std::set<std::size_t> > ima;
     resize(ima, parent);
-
-    mln_foreach(auto& px, parent.pixels())
+    auto px = parent.pixels().riter();
+    mln_forall(px)
       {
-        std::size_t p = px.index();
-        std::size_t q = parent[p];
+	//std::cout << px->val() << " ! " << px->index() << std::endl;
+        std::size_t p = px->index();
+        std::size_t q = mln::morpho::internal::zfind_repr(f, parent, parent[p]);
         if (f[p] == f[parent[p]]) // p and q belong to the same node.
           if (p < parent[p])
             {
-              parent[p] = parent[q];
+	      if (q == parent[q]) // transmit root property
+		parent[p] = p;
+	      else
+		parent[p] = parent[q];
               parent[q] = p;
             }
       }
 
-    // Recanonize
-    for (unsigned i = 0; i < S.size(); ++i)
-      {
-        std::size_t p = S[i];
-        std::size_t q = parent[p];
-        if (f[q] == f[parent[q]])
-          parent[p] = parent[q];
-      }
+    mln_foreach(auto& p, parent.values())
+      p = mln::morpho::internal::zfind_repr(f, parent, p);
   }
 
 }
@@ -85,18 +83,20 @@ void runtest(const mln::image2d<mln::uint8>& ima, StrictWeakOrdering cmp)
 {
   using namespace mln;
 
+  
+
   image2d<std::size_t> parent1, parent2, parent3, parent4;
   image2d<point2d> parent4_;
   std::vector<std::size_t> S1, S2, S3;
   std::tie(parent1, S1) = morpho::maxtree(ima, c4, cmp);
   std::tie(parent2, S2) = morpho::maxtree_hqueue(ima, c4, cmp );
   std::tie(parent3, S3) = morpho::maxtree_ufindbyrank(ima, c4, cmp );
-  parent4_ = morpho::maxtree_ufind_parallel(ima, c4, cmp );
+  parent4_ = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp );
   parent4 = pt2idx(parent4_);
 
-  // io::imprint(parent1);
-  // io::imprint(parent4);
-  // io::imprint(parent4_);
+  //io::imprint(parent1);
+  //io::imprint(parent4);
+  //io::imprint(parent4_);
   // io::imprint(parent3);
   BOOST_CHECK(iscanonized(ima, parent1));
   BOOST_CHECK(iscanonized(ima, parent2));
@@ -108,7 +108,7 @@ void runtest(const mln::image2d<mln::uint8>& ima, StrictWeakOrdering cmp)
   unify_parent(ima, S3, parent3);
   unify_parent(ima, S1, parent4);
   //io::imprint(parent1);
-  //io::imprint(parent3);
+  //io::imprint(parent4);
   BOOST_CHECK(all(parent1 == parent2));
   BOOST_CHECK(all(parent1 == parent3));
   BOOST_CHECK(all(parent1 == parent4));
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
 
-  image2d<uint8> ima(2000, 3000);
+  image2d<uint8> ima(300, 200);
 
   std::random_device rd;
   std::mt19937 gen(rd());

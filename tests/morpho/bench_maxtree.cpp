@@ -7,6 +7,8 @@
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/io/imprint.hpp>
+#include <boost/program_options.hpp>
+
 #include <tbb/task_scheduler_init.h>
 #include <tbb/tick_count.h>
 
@@ -114,10 +116,27 @@ pt2idx(const mln::image2d<mln::point2d>& parent)
 // }
 
 
-int main()
+int main(int ac, char** av)
 {
   using namespace mln;
   using namespace tbb;
+  namespace po = boost::program_options;
+
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help", "produce help message")
+    ("nthread", po::value<int>()->default_value((int) tbb::task_scheduler_init::automatic), "set number of thread (default: auto)")
+    ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(ac, av, desc), vm);
+  po::notify(vm);
+
+  if (vm.count("help")) {
+    std::cout << desc << "\n";
+    return 1;
+  }
+
 
   image2d<uint8> ima(4000, 5000);
 
@@ -126,7 +145,8 @@ int main()
   std::uniform_int_distribution<uint8> sampler(0, 20);
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
-  tbb::task_scheduler_init ts();
+  std::cout << "Number of thread (default): " << tbb::task_scheduler_init::default_num_threads() << std::endl;
+  tbb::task_scheduler_init ts(vm["nthread"].as<int>());
 
   static const int NTEST = 3;
 

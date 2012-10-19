@@ -54,12 +54,9 @@ namespace mln
 	    return parent(p) = zfindroot(parent, parent(p));
 	}
 
-
-        void
-        operator() (const grain_box2d& domain)
-        {
-	  //std::cout << "Running: " << domain << std::endl;
-
+	void
+	unionfind(const grain_box2d& domain)
+	{
           image2d<V> ima = m_ima | domain;
           image2d<point2d> parent = m_parent | domain;
           image2d<point2d> zpar = m_zpar | domain;
@@ -93,11 +90,95 @@ namespace mln
                       }
                   }
               }
-              //io::imprint(pare
             }
+	}
 
-	  //std::cout << "End of process." << std::endl;
-	  //io::imprint(m_parent);
+
+	void
+	unionfind_line(int row)
+	{
+	  static const int nvalues = 1 << value_traits<V>::quant;
+	  point2d p = m_ima.domain().pmin;
+	  p[0] = row;
+
+	  int ncols = m_ima.ncols();
+	  point2d stack[nvalues];
+	  int sz = 0;
+	  point2d prec = p;
+	  ++p[1];
+	  for (int i = 1; i < ncols; ++i, ++p[1])
+	    {
+	      if (m_cmp(m_ima(prec),m_ima(p))) // m_ima(prec) < m_ima(p) => start new component
+		{
+		  stack[sz++] = prec;
+		  //m_parent(prec) = prec;
+		  prec = p;
+		}
+	      else if (not m_cmp(m_ima(p), m_ima(prec))) // m_ima(p) == m_ima(prec) => extend component
+		{
+		  m_parent(p) = prec;
+		}
+	      else // m_ima(p) < m_ima(prec) => we need to attach prec to its m_parent
+		{
+		  while (sz > 0 and not m_cmp(m_ima(stack[sz-1]), m_ima(p)))
+		    {
+		      m_parent(prec) = stack[sz-1];
+		      prec = stack[sz-1];
+		      --sz;
+		    }
+		  // we have m_ima(p) <= m_ima(prec)
+		  if (m_cmp(m_ima(p), m_ima(prec))) // m_ima(p) < m_ima(prec) => attach prec to p, p new component
+		    {
+		      m_parent(prec) = p;
+		      prec = p;
+		    }
+		  else                        // m_ima(p) == m_ima(prec) => attach p to prec (canonization)
+		    {
+		      m_parent(p) = prec;
+		    }
+		}
+	    }
+
+	  // Attach last point (i.e prec)
+	  while (sz > 0)
+	    {
+	      m_parent(prec) = stack[sz-1];
+	      prec = stack[sz-1];
+	      --sz;
+	    }
+	  m_parent(prec) = prec;
+	}
+
+
+        void
+        operator() (const grain_box2d& domain)
+        {
+	  if (domain.shape()[0] > 1)
+	    unionfind(domain);
+	  else
+	    unionfind_line(domain.pmin[0]);
+
+          if (m_has_previous)
+	    {
+	      this->join(*this, false);
+	      m_current_domain.join(domain);
+	      m_nsplit += 1;
+	    }
+	  else
+	    {
+	      m_current_domain = domain;
+	      m_has_previous = true;
+	    }
+        }
+
+        void
+        operator() (const box2d& domain)
+        {
+	  //std::cout << domain << std::endl;
+	  if (domain.shape()[0] > 1)
+	    unionfind(domain);
+	  else
+	    unionfind_line(domain.pmin[0]);
 
           if (m_has_previous)
 	    {
@@ -145,11 +226,8 @@ namespace mln
 
         std::vector<point2d> m_S;
 	unsigned	    m_nsplit;
-	static tbb::mutex   m_mutex;
       };
 
-      template <typename V, typename Neighborhood, typename StrictWeakOrdering>
-      tbb::mutex MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering>::m_mutex;
 
       template <typename V>
       struct MaxtreeCanonizationAlgorithm
@@ -182,23 +260,39 @@ namespace mln
 	maxtree_ufind(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
 	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
-	  std::cout << "Grain: " <<  ima.nrows() / 64 << std::endl;
-	  tbb::parallel_reduce(grain_box2d(ima.domain(), 2), algo, tbb::auto_partitioner());
+	  int grain = std::max(ima.nrows() / 64, 1u);
+	  std::cout << "Grain: " << grain << std::endl;
+	  tbb::parallel_reduce(grain_box2d(ima.domain(), grain), algo, tbb::auto_partitioner());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
 
 	  image2d<point2d>& parent = algo.m_parent;
 	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
-	  tbb::parallel_for(grain_box2d(ima.domain(), 2), canonizer, tbb::auto_partitioner());
-
-	  // canonization
-	  // image2d<point2d>& parent = algo.m_parent;
-	  // mln_foreach(auto& p, parent.values())
-	  //   p = internal::zfind_repr(ima, parent, p);
+	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
 
 	  return parent;
 	}
+
+	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
+	image2d<point2d>
+	maxtree_ufind_line(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+	{
+	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
+	  std::cout << "Grain: " <<  1 << std::endl;
+	  tbb::parallel_reduce(ima.domain(), algo, tbb::simple_partitioner());
+
+	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
+
+
+	  image2d<point2d>& parent = algo.m_parent;
+	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
+	  int grain = std::max(ima.nrows() / 64, 1u);
+	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
+
+	  return parent;
+	}
+
 
       }
 

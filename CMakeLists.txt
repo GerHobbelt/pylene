@@ -8,7 +8,7 @@ include(FindBoost)
 
 
 
-find_package(Boost 1.42 COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost 1.42 COMPONENTS program_options unit_test_framework REQUIRED)
 find_package(TBB)
 
 if(TBB_FOUND)

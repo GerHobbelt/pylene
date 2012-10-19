@@ -138,7 +138,7 @@ int main(int ac, char** av)
   }
 
 
-  image2d<uint8> ima(4000, 5000);
+  image2d<uint8> ima(4000, 3500);
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -195,6 +195,14 @@ int main(int ac, char** av)
       parent_ = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
+  }
+
+  {
+    t0 = tick_count::now();
+    for (int i = 0; i < NTEST; ++i)
+      parent_ = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp);
+    t1 = tick_count::now();
+    std::cout << "Parallel Union Find Line Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
 
 }

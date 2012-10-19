@@ -9,8 +9,9 @@
 # include <mln/core/assert.hpp>
 # include <mln/core/image_traits.hpp>
 # include <mln/core/image_category.hpp>
-
 # include <mln/core/image/ndimage_iter.hpp>
+
+
 
 namespace mln
 {
@@ -35,6 +36,7 @@ namespace mln
   {
     typedef raw_image_tag               category;
     typedef std::true_type              accessible;
+    typedef std::true_type		indexable;
     typedef std::true_type		shallow_copy;
   };
 
@@ -60,11 +62,10 @@ namespace mln
     };
   }
 
+
   template <typename T, unsigned dim, typename E>
-  struct ndimage_base : image_base<E, point<short, dim>, T,
-                                   ndimage_pixel<T, dim, E>,
-                                   ndimage_pixel<const T, dim, const E>
-                                   >
+  struct ndimage_base :
+    image_base<E, point<short, dim>, T, ndimage_pixel<T, dim, E>, ndimage_pixel<const T, dim, const E> >
   {
   private:
     typedef ndimage_base<T, dim, E>                             this_type;
@@ -134,12 +135,6 @@ namespace mln
     // As a Resizable Image
     void resize(const domain_type& domain, unsigned border = 3, T v = T());
 
-    // As a RandomAccessImage
-    //reference element(difference_type n);
-    //const_reference element(difference_type n) const;
-    reference operator[] (size_type n);
-    const_reference operator[] (size_type n) const;
-
     // As an IterableImage
     typedef ndimage_value_range<this_type, T>					value_range;
     typedef ndimage_value_range<const this_type, const T>			const_value_range;
@@ -165,9 +160,6 @@ namespace mln
 
     // As a Raw Image
     const size_t*       strides() const;
-    const size_t*	index_strides() const;
-    size_type           index_of_point(site_type p) const;
-
     int border() const { return border_; }
 
 
@@ -181,9 +173,26 @@ namespace mln
     // friend typename E_ make_subimage(ndimage_base<T_, dim_, E_>&&, const Domain_& domain);
 
 
+    // As an Indexable Image
+    T&		operator[] (std::size_t i)        { return *(m_ptr_origin + i); }
+    const T&	operator[] (std::size_t i) const  { return *(m_ptr_origin + i); }
+    const size_t*	index_strides() const     { return &m_index_strides[0]; }
+
+    std::size_t         index_of_point(const point_type& p) const
+    {
+      std::size_t idx = m_index_first;
+      point_type  q = p - domain_.pmin;
+      for (unsigned i = 0; i < dim; ++i)
+	idx += q[i] * m_index_strides[i];
+      return idx;
+    }
+
+
+
   protected:
     friend struct ndimage_pixel<T, dim, E>;
     friend struct ndimage_pixel<const T, dim, const E>;
+    template <typename, typename, unsigned, typename> friend struct indexible_ndimage_base;
     template <typename, typename> friend struct ndimage_value_range;
     template <typename, typename> friend struct ndimage_pixel_range;
 
@@ -196,11 +205,10 @@ namespace mln
     char*	ptr_;           ///< Pointer to the first element in the domain
     char*	last_;          ///< Pointer to the last element in the domain (not past-the-end)
 
-    //
-    char*			m_ptr_origin;		///< Pointer to the first element
-    std::array<size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
-    size_t			m_index_first;          ///< index of pmin
-    size_t			m_index_last;           ///< index of pmax
+    T*					m_ptr_origin;		///< Pointer to the first element
+    std::array<std::size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
+    size_t				m_index_first;          ///< index of pmin
+    size_t				m_index_last;           ///< index of pmax
   };
 
   /******************************/
@@ -242,12 +250,22 @@ namespace mln
 
       // Each row / page ... are 16 bytes aligned
       unsigned ndim = dim;
+
+#ifdef MLN_128B_ALIGNMENT
       if (ndim >= 2)
 	{
 	  strides[dim-2] = ((shape[dim-1] * sizeof(T)) & ~(size_t)15) + (size_t) 16;
 	  for (int i = dim-3; i >= 0; --i)
 	    strides[i] = shape[i+1] * strides[i+1];
 	}
+#else
+      if (ndim >= 2)
+	{
+	  strides[dim-2] = shape[dim-1] * sizeof(T);
+	  for (int i = dim-3; i >= 0; --i)
+	    strides[i] = shape[i+1] * strides[i+1];
+	}
+#endif
 
       // Allocate data
       nbytes = shape[0] * strides[0];
@@ -301,7 +319,7 @@ namespace mln
 
   template <typename T, unsigned dim, typename E>
   ndimage_base<T,dim,E>::ndimage_base(unsigned border)
-  : domain_ (), border_ (border), ptr_ (NULL), m_ptr_origin (NULL)
+  : domain_ (), border_ (border), ptr_ (NULL)
   {
     for (unsigned i = 0; i < dim; ++i){
       mln_postcondition(domain_.pmin[i] == 0);
@@ -331,28 +349,17 @@ namespace mln
     std::copy(data_->strides, data_->strides + dim, strides_.begin());
 
     // Compute pointer at (0,0)
-    m_ptr_origin = data_->buffer;
-
+    m_ptr_origin = (T*)data_->buffer;
     m_index_strides[dim-1] = 1;
-    m_index_first = border;
-    m_index_last  = border + sz[dim-1] - 1;
+    m_index_first = border_;
+    m_index_last  = border_ + sz[dim-1] - 1;
     ptr_  = data_->buffer + border * strides_[dim-1];
     last_ = data_->buffer + (border + sz[dim-1] - 1) * strides_[dim-1];
-
-    if (dim >= 2)
-      {
-	m_index_strides[dim-2] = 1 << (sizeof(short) * 8);
-	m_index_first += border << (sizeof(short) * 8);
-	m_index_last  += (border + sz[dim-2] - 1) << (sizeof(short) * 8);
-	for (int i = dim-3; i >= 0; --i)
-	  {
-	    m_index_strides[i] = (sz[i+1] + 2 * border) * m_index_strides[i+1];
-	    m_index_first += border * m_index_strides[i];
-	    m_index_last  += (border + sz[i] - 1) * m_index_strides[i];
-	  }
-      }
     for (int i = dim-2; i >= 0; --i)
       {
+	m_index_strides[i] = strides_[i] / sizeof(T);
+	m_index_first += border_ * m_index_strides[i];
+	m_index_last  += (border_ + sz[i] - 1) * m_index_strides[i];
 	ptr_ += border * strides_[i];
 	last_ += (border + sz[i] - 1) * strides_[i];
       }
@@ -430,43 +437,6 @@ namespace mln
   //   return *reinterpret_cast<const T*>(ptr_+n);
   // }
 
-  template <typename T, unsigned dim, typename E>
-  inline
-  T&
-  ndimage_base<T,dim,E>::operator[] (size_type index)
-  {
-    // We need this because of extra padding for 128-bits alignment
-    if (dim < 2)
-      return *reinterpret_cast<T*>(m_ptr_origin + index);
-    else
-      {
-        //size_t i = index % m_index_strides[dim-2];
-        //size_t j = index % m_index_strides[dim-2];
-	//std::cout << "[" << (index >> 16) << "," << (index & 0x0000FFFF) << "]" << std::endl;
-	size_t n = (index >> 16) * strides_[dim-2] + (index & 0x0000FFFF) * strides_[dim-1];
-        return *reinterpret_cast<T*>(m_ptr_origin + n);
-      }
-  }
-
-  template <typename T, unsigned dim, typename E>
-  inline
-  const T&
-  ndimage_base<T,dim,E>::operator[] (size_type index) const
-  {
-    if (dim < 2)
-      return *reinterpret_cast<const T*>(m_ptr_origin + index);
-    else
-      {
-        // size_t i = index / m_index_strides[dim-2];
-        // size_t j = index % m_index_strides[dim-2];
-        // size_t n = i * strides_[dim-2] + j * strides_[dim-1];
-        //size_t n = index;
-	//std::cout << "[" << (index >> 16) << "," << (index & 0x0000FFFF) << "]" << std::endl;
-	size_t n = (index >> 16) * strides_[dim-2] + (index & 0x0000FFFF) * strides_[dim-1];
-        return *reinterpret_cast<const T*>(m_ptr_origin + n);
-      }
-  }
-
 
   template <typename T, unsigned dim, typename E>
   const size_t*
@@ -475,23 +445,6 @@ namespace mln
     return &strides_[0];
   }
 
-  template <typename T, unsigned dim, typename E>
-  const size_t*
-  ndimage_base<T,dim,E>::index_strides () const
-  {
-    return &m_index_strides[0];
-  }
-
-  template <typename T, unsigned dim, typename E>
-  size_t
-  ndimage_base<T,dim,E>::index_of_point (site_type p) const
-  {
-    std::size_t idx = m_index_first;
-    point_type    q = p - domain_.pmin;
-    for (unsigned i = 0; i < dim; ++i)
-      idx += q[i] * m_index_strides[i];
-    return idx;
-  }
 
   // template <typename T, unsigned dim, typename E>
   // ptrdiff_t

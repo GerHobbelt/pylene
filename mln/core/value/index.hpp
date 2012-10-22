@@ -40,9 +40,14 @@ namespace mln
   template <typename T>
   struct Index<T, std::less<T> >
   {
+    Index() = default;
     explicit Index(T v) : x (v) {}
 
-    operator T () const { return x; }
+    operator long () const { return x; }
+    operator unsigned long () const { return x; }
+    operator int () const { return x; }
+    operator unsigned () const { return x; }
+
     Index& operator++ ()    { ++x; return *this; }
     Index& operator-- ()    { --x; return *this; }
     Index  operator++ (int) { return Index(x++); }
@@ -60,9 +65,14 @@ namespace mln
   template <typename T>
   struct Index<T, std::greater<T> >
   {
+    Index() = default;
     explicit Index(T v) : x (v) {}
 
-    operator T () const { return x; }
+    operator long () const { return x; }
+    operator unsigned long () const { return x; }
+    operator int () const { return x; }
+    operator unsigned () const { return x; }
+
     Index& operator++ ()    { --x; return *this; }
     Index& operator-- ()    { ++x; return *this; }
     Index  operator++ (int) { return Index(x--); }

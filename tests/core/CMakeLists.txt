@@ -20,6 +20,11 @@ add_executable(extension_fill extension/fill.cpp)
 
 add_test(extension_fill extension_fill)
 
+# test Value
+add_executable(value_int value/int.cpp)
+
+add_test(value_int value_int)
+
 
 # test Algorithms
 

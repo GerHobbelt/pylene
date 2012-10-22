@@ -7,8 +7,8 @@
 # include <mln/core/assert.hpp>
 # include <mln/core/value/value_traits.hpp>
 # include <mln/core/value/index.hpp>
+# include <mln/core/value/int.hpp>
 
-# include <boost/integer.hpp>
 
 namespace mln
 {
@@ -61,7 +61,7 @@ namespace mln
 		  "The type is not indexable");
 
   private:
-    typedef typename boost::uint_t<value_traits<V>::quant + 1>::type enc;
+    typedef UInt<value_traits<V>::quant + 1> enc;
 
   public:
     typedef Index<enc, std::less<enc> > index_type;
@@ -77,7 +77,7 @@ namespace mln
 							     std::is_signed<V>::value>::type>
   {
   private:
-    typedef typename boost::uint_t<value_traits<V>::quant + 1>::type enc;
+    typedef UInt<value_traits<V>::quant + 1> enc;
 
   public:
     typedef Index<enc, std::greater<enc> > index_type;

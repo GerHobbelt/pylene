@@ -46,50 +46,56 @@ namespace mln
 
 	static
 	inline
-	point2d zfindroot(image2d<point2d>& parent, const point2d& p)
+	std::size_t
+	zfindroot(image2d<std::size_t>& parent, const std::size_t& p)
 	{
-	  if (parent(p) == p)
+	  if (parent[p] == p)
 	    return p;
 	  else
-	    return parent(p) = zfindroot(parent, parent(p));
+	    return parent[p] = zfindroot(parent, parent[p]);
 	}
 
 	void
 	unionfind(const grain_box2d& domain)
 	{
           image2d<V> ima = m_ima | domain;
-          image2d<point2d> parent = m_parent | domain;
-          image2d<point2d> zpar = m_zpar | domain;
+          image2d<std::size_t> parent = m_parent | domain;
+          image2d<std::size_t> zpar = m_zpar | domain;
           image2d<bool> deja_vu;
-          resize(deja_vu, ima, 1, false);
+          resize(deja_vu, ima, m_ima.border(), false);
+	  deja_vu.reindex(ima.index_of_point(domain.pmin));
 
-          m_S = sort_sites(ima, m_cmp);
-          point2d p;
-          mln_iter(n, m_nbh(p));
+	  //int djvu_offset = deja_vu.index_of_point(domain.pmin) - ima.index_of_point(domain.pmin);
+          m_S = sort_indexes(ima, m_cmp);
+	  auto dindexes = wrt_delta_index(ima, m_nbh.dpoints);
+
 
           for (int i = m_S.size()-1; i >= 0; --i)
             {
-              p = m_S[i];
-	      //std::cout << "Processing: " << p << " @ " << (int)ima(p) << std::endl;
+	      std::size_t p = m_S[i];
+	      //std::cout << deja_vu.point_at_index(djvu_offset + p) << std::endl;
               // make set
+	      assert(domain.has(deja_vu.point_at_index(p)));
               {
-                parent(p) = p;
-                zpar(p) = p;
-                deja_vu(p) = true;
+                parent[p] = p;
+                zpar[p] = p;
+                deja_vu[p] = true;
               }
 
-              mln_forall(n)
-              {
-                if (deja_vu.at(*n))
+              for (unsigned j = 0; j < dindexes.size(); ++j)
+		{
+		  std::size_t n = p + dindexes[j];
+
+		  if (deja_vu[n])
                   {
-                    point2d r = zfindroot(zpar, *n);
+		    std::size_t r = zfindroot(zpar, n);
                     if (r != p) // make union
                       {
-                        parent(r) = p;
-                        zpar(r) = p;
+                        parent[r] = p;
+                        zpar[r] = p;
                       }
                   }
-              }
+		}
             }
 	}
 
@@ -98,43 +104,44 @@ namespace mln
 	unionfind_line(int row)
 	{
 	  static const int nvalues = 1 << value_traits<V>::quant;
-	  point2d p = m_ima.domain().pmin;
-	  p[0] = row;
+	  point2d p_ = m_ima.domain().pmin;
+	  p_[0] = row;
 
 	  int ncols = m_ima.ncols();
-	  point2d stack[nvalues];
+	  std::size_t stack[nvalues];
 	  int sz = 0;
-	  point2d prec = p;
-	  ++p[1];
-	  for (int i = 1; i < ncols; ++i, ++p[1])
+	  std::size_t prec = m_ima.index_of_point(p_);
+	  std::size_t p = prec + 1;
+
+	  for (int i = 1; i < ncols; ++i, ++p)
 	    {
-	      if (m_cmp(m_ima(prec),m_ima(p))) // m_ima(prec) < m_ima(p) => start new component
+	      if (m_cmp(m_ima[prec],m_ima[p])) // m_ima[prec] < m_ima[p] => start new component
 		{
 		  stack[sz++] = prec;
-		  //m_parent(prec) = prec;
+		  //m_parent[prec] = prec;
 		  prec = p;
 		}
-	      else if (not m_cmp(m_ima(p), m_ima(prec))) // m_ima(p) == m_ima(prec) => extend component
+	      else if (not m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] == m_ima[prec] => extend component
 		{
-		  m_parent(p) = prec;
+		  m_parent[p] = prec;
 		}
-	      else // m_ima(p) < m_ima(prec) => we need to attach prec to its m_parent
+	      else // m_ima[p] < m_ima[prec] => we need to attach prec to its m_parent
 		{
-		  while (sz > 0 and not m_cmp(m_ima(stack[sz-1]), m_ima(p)))
+		  while (sz > 0 and not m_cmp(m_ima[stack[sz-1]], m_ima[p]))
 		    {
-		      m_parent(prec) = stack[sz-1];
+		      m_parent[prec] = stack[sz-1];
 		      prec = stack[sz-1];
 		      --sz;
 		    }
-		  // we have m_ima(p) <= m_ima(prec)
-		  if (m_cmp(m_ima(p), m_ima(prec))) // m_ima(p) < m_ima(prec) => attach prec to p, p new component
+		  // we have m_ima[p] <= m_ima[prec]
+		  if (m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] < m_ima[prec] => attach prec to p, p new component
 		    {
-		      m_parent(prec) = p;
+		      m_parent[prec] = p;
 		      prec = p;
 		    }
-		  else                        // m_ima(p) == m_ima(prec) => attach p to prec (canonization)
+		  else                        // m_ima[p] == m_ima[prec] => attach p to prec (canonization)
 		    {
-		      m_parent(p) = prec;
+		      m_parent[p] = prec;
 		    }
 		}
 	    }
@@ -142,11 +149,11 @@ namespace mln
 	  // Attach last point (i.e prec)
 	  while (sz > 0)
 	    {
-	      m_parent(prec) = stack[sz-1];
+	      m_parent[prec] = stack[sz-1];
 	      prec = stack[sz-1];
 	      --sz;
 	    }
-	  m_parent(prec) = prec;
+	  m_parent[prec] = prec;
 	}
 
 
@@ -218,14 +225,14 @@ namespace mln
         Neighborhood	   m_nbh;
         StrictWeakOrdering m_cmp;
 
-        image2d<point2d>   m_parent;
+        image2d<std::size_t> m_parent;
 
-        image2d<point2d>  m_zpar;
+        image2d<std::size_t> m_zpar;
         bool	          m_has_previous;
         box2d	          m_current_domain;
 
-        std::vector<point2d> m_S;
-	unsigned	    m_nsplit;
+        std::vector<std::size_t> m_S;
+	unsigned	     m_nsplit;
       };
 
 
@@ -233,22 +240,22 @@ namespace mln
       struct MaxtreeCanonizationAlgorithm
       {
 	MaxtreeCanonizationAlgorithm(const image2d<V>& ima,
-				     image2d<point2d>& parent)
+				     image2d<std::size_t>& parent)
 	  : m_ima (ima), m_parent (parent)
 	{
 	}
 
 
 	void
-	operator() (const grain_box2d& domain) const
+	operator() (const box2d& domain) const
 	{
-	  image2d<point2d> parent = m_parent | domain;
+	  image2d<std::size_t> parent = m_parent | domain;
 	  mln_foreach(auto& p, parent.values())
 	    p = internal::zfind_repr(m_ima, m_parent, p);
 	}
 
-	const image2d<V>& m_ima;
-	image2d<point2d>&  m_parent;
+	const image2d<V>&	m_ima;
+	image2d<std::size_t>&   m_parent;
 
       };
 
@@ -256,7 +263,7 @@ namespace mln
       namespace parallel
       {
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	image2d<point2d>
+	image2d<std::size_t>
 	maxtree_ufind(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
 	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
@@ -267,7 +274,7 @@ namespace mln
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
 
-	  image2d<point2d>& parent = algo.m_parent;
+	  image2d<std::size_t>& parent = algo.m_parent;
 	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
 	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
 
@@ -275,7 +282,7 @@ namespace mln
 	}
 
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	image2d<point2d>
+	image2d<std::size_t>
 	maxtree_ufind_line(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
 	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
@@ -285,7 +292,7 @@ namespace mln
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
 
-	  image2d<point2d>& parent = algo.m_parent;
+	  image2d<std::size_t>& parent = algo.m_parent;
 	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
 	  int grain = std::max(ima.nrows() / 64, 1u);
 	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
@@ -301,7 +308,7 @@ namespace mln
       {
 
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	image2d<point2d>
+	image2d<std::size_t>
 	maxtree_ufind(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
 	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
@@ -309,12 +316,12 @@ namespace mln
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 	  // canonization
-	  image2d<point2d>& parent = algo.m_parent;
-	  for (point2d p : algo.m_S)
+	  image2d<std::size_t>& parent = algo.m_parent;
+	  for (std::size_t p : algo.m_S)
 	    {
-	      point2d q = parent(p);
-	      if (ima(parent(q)) == ima(q))
-		parent(p) = parent(q);
+	      std::size_t q = parent[p];
+	      if (ima[parent[q]] == ima[q])
+		parent[p] = parent[q];
 	    }
 
 	  return algo.m_parent;

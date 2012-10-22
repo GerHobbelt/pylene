@@ -139,7 +139,7 @@ int main(int ac, char** av)
   }
 
 
-  typedef UInt<12> V;
+  typedef uint8 V;
   image2d<V> ima(4000, 3500);
 
   std::random_device rd;
@@ -169,7 +169,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent_ = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
+      parent = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Union Find Maxtree Point: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -194,7 +194,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent_ = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp);
+      parent = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -202,7 +202,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent_ = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp);
+      parent = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find Line Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }

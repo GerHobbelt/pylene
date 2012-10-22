@@ -93,12 +93,12 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
   std::tie(parent2, S2) = morpho::maxtree_hqueue(ima, c4, cmp );
   std::tie(parent3, S3) = morpho::maxtree_ufindbyrank(ima, c4, cmp );
   {
-    auto parent_ = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp );
-    parent4 = pt2idx(parent_);
+    parent4 = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp );
+    //parent4 = pt2idx(parent_);
   }
   {
-    auto parent_ = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp );
-    parent5 = pt2idx(parent_);
+    parent5 = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp );
+    //parent5 = pt2idx(parent_);
   }
   std::cout << "Done" << std::endl;
 
@@ -130,14 +130,14 @@ BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
   typedef UInt<12> V;
-  image2d<V> ima(300, 100);
+  image2d<V> ima(300, 200);
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> sampler(0, 20);
+  std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
-  tbb::task_scheduler_init ts(1);
+  tbb::task_scheduler_init ts;
 
   // {
   //   image2d<std::size_t> f;
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(Maxtree)
   //   io::imprint(f);
   // }
 
-  //io::imprint(ima);
+  // io::imprint(ima);
 
   // {
   //   image2d<point2d> parent_;

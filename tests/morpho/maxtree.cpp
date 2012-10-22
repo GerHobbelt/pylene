@@ -18,7 +18,8 @@ namespace mln
 {
 
 
-  void unify_parent(const mln::image2d<uint8>& f,
+  template <typename V>
+  void unify_parent(const mln::image2d<V>& f,
                     const std::vector<std::size_t>& S,
                     mln::image2d<std::size_t>& parent)
 
@@ -47,7 +48,8 @@ namespace mln
 
 }
 
-bool iscanonized(const mln::image2d<mln::uint8>& ima,
+template <typename V>
+bool iscanonized(const mln::image2d<V>& ima,
 		 const mln::image2d<std::size_t>& parent)
 {
   mln_pixter(px, parent);
@@ -78,8 +80,8 @@ pt2idx(const mln::image2d<mln::point2d>& parent)
 
 
 
-template <typename StrictWeakOrdering>
-void runtest(const mln::image2d<mln::uint8>& ima, StrictWeakOrdering cmp)
+template <typename V, typename StrictWeakOrdering>
+void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
 {
   using namespace mln;
 
@@ -98,7 +100,7 @@ void runtest(const mln::image2d<mln::uint8>& ima, StrictWeakOrdering cmp)
     auto parent_ = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp );
     parent5 = pt2idx(parent_);
   }
-
+  std::cout << "Done" << std::endl;
 
   //io::imprint(parent1);
   //io::imprint(parent4);
@@ -127,12 +129,12 @@ void runtest(const mln::image2d<mln::uint8>& ima, StrictWeakOrdering cmp)
 BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
-
-  image2d<uint8> ima(300, 100);
+  typedef UInt<12> V;
+  image2d<V> ima(300, 100);
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint8> sampler(0, 20);
+  std::uniform_int_distribution<int> sampler(0, 20);
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
   tbb::task_scheduler_init ts(1);
@@ -166,7 +168,7 @@ BOOST_AUTO_TEST_CASE(Maxtree)
   //   BOOST_CHECK(all(parent == parent1));
   // }
 
-  runtest(ima, std::less<uint8> ());
-  runtest(ima, std::greater<uint8> ());
+  runtest(ima, std::less<V> ());
+  runtest(ima, std::greater<V> ());
 
 }

@@ -12,72 +12,73 @@
 #include <tbb/task_scheduler_init.h>
 #include <tbb/tick_count.h>
 
+#include <mln/core/value/int.hpp>
 #include <random>
 
-namespace mln
-{
+// namespace mln
+// {
 
 
-  void unify_parent(const mln::image2d<uint8>& f,
-                    const std::vector<std::size_t>& S,
-                    mln::image2d<std::size_t>& parent)
+//   void unify_parent(const mln::image2d<uint8>& f,
+//                     const std::vector<std::size_t>& S,
+//                     mln::image2d<std::size_t>& parent)
 
-  {
-    mln::image2d< std::set<std::size_t> > ima;
-    resize(ima, parent);
+//   {
+//     mln::image2d< std::set<std::size_t> > ima;
+//     resize(ima, parent);
 
-    mln_foreach(auto& px, parent.pixels())
-      {
-        std::size_t p = px.index();
-        std::size_t q = parent[p];
-        if (f[p] == f[parent[p]]) // p and q belong to the same node.
-          if (p < parent[p])
-            {
-              parent[p] = parent[q];
-              parent[q] = p;
-            }
-      }
+//     mln_foreach(auto& px, parent.pixels())
+//       {
+//         std::size_t p = px.index();
+//         std::size_t q = parent[p];
+//         if (f[p] == f[parent[p]]) // p and q belong to the same node.
+//           if (p < parent[p])
+//             {
+//               parent[p] = parent[q];
+//               parent[q] = p;
+//             }
+//       }
 
-    // Recanonize
-    for (unsigned i = 0; i < S.size(); ++i)
-      {
-        std::size_t p = S[i];
-        std::size_t q = parent[p];
-        if (f[q] == f[parent[q]])
-          parent[p] = parent[q];
-      }
-  }
+//     // Recanonize
+//     for (unsigned i = 0; i < S.size(); ++i)
+//       {
+//         std::size_t p = S[i];
+//         std::size_t q = parent[p];
+//         if (f[q] == f[parent[q]])
+//           parent[p] = parent[q];
+//       }
+//   }
 
-}
+// }
 
-bool iscanonized(const mln::image2d<mln::uint8>& ima,
-		 const mln::image2d<std::size_t>& parent)
-{
-  mln_pixter(px, parent);
-  mln_forall(px)
-  {
-    std::size_t q = px->val();
-    if (not(q == parent[q] or ima[q] != ima[parent[q]]))
-      {
-	std::cout << "canaonization error @ " << px->index() << std::endl;
-	return false;
-      }
-  }
-  return true;
-}
+// bool iscanonized(const mln::image2d<mln::uint8>& ima,
+// 		 const mln::image2d<std::size_t>& parent)
+// {
+//   mln_pixter(px, parent);
+//   mln_forall(px)
+//   {
+//     std::size_t q = px->val();
+//     if (not(q == parent[q] or ima[q] != ima[parent[q]]))
+//       {
+// 	std::cout << "canaonization error @ " << px->index() << std::endl;
+// 	return false;
+//       }
+//   }
+//   return true;
+// }
 
-mln::image2d<std::size_t>
-pt2idx(const mln::image2d<mln::point2d>& parent)
-{
-  mln::image2d<std::size_t> out;
-  mln::resize(out, parent);
+// mln::image2d<std::size_t>
+// pt2idx(const mln::image2d<mln::point2d>& parent)
+// {
+//   mln::image2d<std::size_t> out;
+//   mln::resize(out, parent);
 
 
-  mln_viter(vin, vout, parent, out);
-  mln_forall(vin, vout)
-    *vout = parent.index_of_point(*vin);
-  return out;
-}
+//   mln_viter(vin, vout, parent, out);
+//   mln_forall(vin, vout)
+//     *vout = parent.index_of_point(*vin);
+//   return out;
+// }
 
 
 
@@ -138,11 +139,12 @@ int main(int ac, char** av)
   }
 
 
-  image2d<uint8> ima(4000, 3500);
+  typedef UInt<12> V;
+  image2d<V> ima(4000, 3500);
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<uint8> sampler(0, 20);
+  std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
   std::cout << "Number of thread (default): " << tbb::task_scheduler_init::default_num_threads() << std::endl;
@@ -153,7 +155,7 @@ int main(int ac, char** av)
   image2d<std::size_t> parent;
   image2d<point2d> parent_;
   std::vector<std::size_t> S;
-  std::less<uint8>     cmp;
+  std::less<V>     cmp;
 
   tick_count t0, t1;
   {

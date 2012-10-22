@@ -178,6 +178,15 @@ namespace mln
     const T&	operator[] (std::size_t i) const  { return *(m_ptr_origin + i); }
     const size_t*	index_strides() const     { return &m_index_strides[0]; }
 
+    void reindex(std::size_t index_first)
+    {
+      std::ptrdiff_t diff = index_first - m_index_first;
+      m_ptr_origin -= diff;
+      m_index_first += diff;
+      m_index_last += diff;
+    }
+
+
     std::size_t         index_of_point(const point_type& p) const
     {
       std::size_t idx = m_index_first;
@@ -187,6 +196,15 @@ namespace mln
       return idx;
     }
 
+    point_type		point_at_index(std::size_t idx) const
+    {
+      std::size_t k = idx - m_index_first;
+      point_type  p = domain_.pmin;
+      p[0] += k / m_index_strides[0];
+      for (unsigned i = 1; i < dim; ++i)
+	p[i] += (k % m_index_strides[i-1]) / m_index_strides[i];
+      return p;
+    }
 
 
   protected:

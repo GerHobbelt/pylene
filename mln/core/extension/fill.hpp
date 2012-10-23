@@ -29,7 +29,6 @@ namespace mln
 	(void) __is_raw_image__;
 	typedef mln_value(I) V;
 
-	int ncols = ima.ncols();
 	int nrows = ima.nrows();
 	int border = ima.border();
 	int nbcols = ima.ncols() + 2 * border;
@@ -37,7 +36,7 @@ namespace mln
 	// Fill border rows
 	if (sizeof(V) == ima.strides()[1])
 	  {
-	    char* ptr = (char*)&ima[0];
+	    char* ptr = (char*)&ima.at(ima.domain().pmin - border);
 	    for (int j = 0; j < border; ++j)
 	      {
 		std::fill((V*)ptr, (V*)ptr + nbcols, v);
@@ -69,12 +68,12 @@ namespace mln
 	  }
 
 	// Fill border cols
-        mln_point(I) p;
-	for (p[0] = 0; p[0] < nrows; ++p[0])
+        mln_point(I) p = ima.domain().pmin;
+	for (int i = 0; i < nrows; ++i, ++p[0])
 	  {
-	    for (p[1] = -3; p[1] < 0; ++p[1])
+	    for (p[1] = ima.domain().pmin[1]-border; p[1] < ima.domain().pmin[1]; ++p[1])
 	      ima.at(p) = v;
-	    for (p[1] = ncols; p[1] < ncols+3; ++p[1])
+	    for (p[1] = ima.domain().pmax[1]; p[1] < ima.domain().pmax[1]+border; ++p[1])
 	      ima.at(p) = v;
 	  }
       }

@@ -174,8 +174,8 @@ namespace mln
 
 
     // As an Indexable Image
-    T&		operator[] (std::size_t i)        { return *(m_ptr_origin + i); }
-    const T&	operator[] (std::size_t i) const  { return *(m_ptr_origin + i); }
+    T&		operator[] (std::size_t i);
+    const T&	operator[] (std::size_t i) const;
     const size_t*	index_strides() const     { return &m_index_strides[0]; }
 
     void reindex(std::size_t index_first)
@@ -198,11 +198,15 @@ namespace mln
 
     point_type		point_at_index(std::size_t idx) const
     {
-      std::size_t k = idx - m_index_first;
+      int k = idx - m_index_first;
       point_type  p = domain_.pmin;
-      p[0] += k / m_index_strides[0];
-      for (unsigned i = 1; i < dim; ++i)
-	p[i] += (k % m_index_strides[i-1]) / m_index_strides[i];
+
+      for (unsigned i = 0; i < dim; ++i) {
+	int q = (k >= 0) ? (int)(k / m_index_strides[i]) : (k / (int)m_index_strides[i] - 1); // because k can be negative
+	p[i] += q;
+	k -= q * m_index_strides[i];
+      }
+      mln_postcondition(vbox_.has(p));
       return p;
     }
 
@@ -217,6 +221,10 @@ namespace mln
     void resize_(const domain_type& domain, unsigned border = 3, T v = T());
 
     domain_type	domain_;	///< Domain of image
+#ifndef MLN_NDEBUG
+    domain_type vbox_;
+#endif
+
     std::array<size_t, dim>	strides_;	///< Strides in bytes
     std::shared_ptr< internal::ndimage_data<T, dim> > data_;
     int		border_;
@@ -359,6 +367,9 @@ namespace mln
   {
     site_type shp = domain.shape();
     point<size_t, dim> sz;
+    MLN_EVAL_IF_DEBUG(vbox_ = domain);
+    MLN_EVAL_IF_DEBUG(vbox_.pmin -= border);
+    MLN_EVAL_IF_DEBUG(vbox_.pmax += border);
     sz = shp;
 
     // Compute strides size (in bytes)
@@ -398,6 +409,7 @@ namespace mln
   T&
   ndimage_base<T,dim,E>::at (const site_type& p)
   {
+    mln_precondition(vbox_.has(p));
     site_type q = p - domain_.pmin;
 
     char* ptr = ptr_;
@@ -412,6 +424,7 @@ namespace mln
   const T&
   ndimage_base<T,dim,E>::at (const site_type& p) const
   {
+    mln_precondition(vbox_.has(p));
     site_type q = p - domain_.pmin;
 
     char* ptr = ptr_;
@@ -438,6 +451,25 @@ namespace mln
     mln_precondition(domain_.has(p));
     return at(p);
   }
+
+  template <typename T, unsigned dim, typename E>
+  inline
+  T&
+  ndimage_base<T,dim,E>::operator[] (std::size_t i)
+  {
+    mln_precondition(vbox_.has(point_at_index(i)));
+    return *(m_ptr_origin + i);
+  }
+
+  template <typename T, unsigned dim, typename E>
+  inline
+  const T&
+  ndimage_base<T,dim,E>::operator[] (std::size_t i) const
+  {
+    mln_precondition(vbox_.has(point_at_index(i)));
+    return *(m_ptr_origin + i);
+  }
+
 
   // template <typename T, unsigned dim, typename E>
   // inline

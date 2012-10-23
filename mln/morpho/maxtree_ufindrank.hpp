@@ -14,32 +14,6 @@ namespace mln
   namespace morpho
   {
 
-  namespace impl
-  {
-
-    // template <typename V, typename Neighborhood>
-    // struct MaxTreeAlgorithmUF
-    // {
-    //   MaxTreeAlgorithmUF(const image2d<V>& ima, const Neighborhood& nbh)
-    // 	: m_ima (ima), m_nbh (nbh)
-    //   {
-    //   }
-
-
-    //   std::tuple< image2d<unsigned>, image2d<unsigned>, box2d >
-    //   operator() (const box2d& domain)
-    //   {
-    //   }
-
-    // private:
-    //   const image2d<V>& m_ima;
-    //   Neighborhood m_nbh;
-    //   image2d<unsigned> parent;
-    //   image2d<unsigned> zpar;
-    // };
-
-  }
-
     namespace internal
     {
       static

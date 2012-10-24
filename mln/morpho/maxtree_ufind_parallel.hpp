@@ -63,7 +63,6 @@ namespace mln
           image2d<std::size_t> zpar = m_zpar | domain;
           image2d<bool> deja_vu;
           resize(deja_vu, ima, m_ima.border(), false);
-	  deja_vu.reindex(ima.index_of_point(domain.pmin));
 
 	  //int djvu_offset = deja_vu.index_of_point(domain.pmin) - ima.index_of_point(domain.pmin);
           m_S = sort_indexes(ima, m_cmp);

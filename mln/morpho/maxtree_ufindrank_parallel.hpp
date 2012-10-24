@@ -25,23 +25,39 @@ namespace mln
       template <typename V, typename Neighborhood, typename StrictWeakOrdering>
       struct MaxTreeAlgorithmUFRank
       {
+	struct aux_data
+	{
+	  unsigned	rank;
+	  std::size_t	zpar;
+	  std::size_t	repr;
+	};
+
+
         MaxTreeAlgorithmUFRank(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
           : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false)
         {
           resize(m_parent, ima);
-          resize(m_zpar, ima);
-	  resize(m_root, ima);
-	  resize(m_rank, ima, ima.border(), 0);
+	  resize(m_aux, ima, ima.border(), aux_data ());
 	  m_nsplit = 0;
         }
 
 
         MaxTreeAlgorithmUFRank(MaxTreeAlgorithmUFRank& other, tbb::split)
           : m_ima(other.m_ima), m_nbh(other.m_nbh), m_cmp(other.m_cmp), m_parent(other.m_parent),
-            m_zpar(other.m_zpar), m_root(other.m_root), m_rank(other.m_rank), m_has_previous(false)
+            m_aux(other.m_aux), m_has_previous(false)
         {
 	  m_nsplit = 0;
         }
+
+	std::size_t
+	zfindroot(image2d<aux_data>& aux, std::size_t p)
+	{
+	  std::size_t q = aux[p].zpar;
+	  if (p != q)
+	    return aux[p].zpar = zfindroot(aux, q);
+	  else
+	    return q;
+	}
 
 
 	void
@@ -49,9 +65,7 @@ namespace mln
 	{
           image2d<V> ima = m_ima | domain;
           image2d<std::size_t>  parent = m_parent | domain;
-          image2d<std::size_t>  zpar = m_zpar | domain;
-	  image2d<unsigned>	rank = m_rank | domain;
-	  image2d<std::size_t>  root = m_root | domain;
+          image2d<aux_data>  aux = m_aux | domain;
           image2d<bool> deja_vu;
           resize(deja_vu, ima, m_ima.border(), false);
 
@@ -67,8 +81,8 @@ namespace mln
 	      assert(domain.has(deja_vu.point_at_index(p)));
               {
                 parent[p] = p;
-                zpar[p] = p;
-		root[p] = p;
+                aux[p].zpar = p;
+		aux[p].repr = p;
                 deja_vu[p] = true;
               }
 
@@ -79,19 +93,19 @@ namespace mln
 
 		  if (deja_vu[n])
                   {
-		    std::size_t r = internal::zfind_root(zpar, n);
+		    std::size_t r = zfindroot(aux, n);
                     if (r != x) // make union
                       {
-			parent[root[r]] = p;
-			if (rank[x] < rank[r]) { //we merge p to r
-			  zpar[x] = r;
-			  root[r] = p;
+			parent[aux[r].repr] = p;
+			if (aux[x].rank < aux[r].rank) { //we merge x to r
+			  aux[x].zpar = r;
+			  aux[r].repr = p;
 			  x = r;
-			} else if (rank[r] < rank[p]) { // merge r to p
-			  zpar[r] = p;
+			} else if (aux[x].rank > aux[r].rank) { // merge r to x
+			  aux[r].zpar = x;
 			} else { // same height
-			  zpar[r] = p;
-			  rank[p] += 1;
+			  aux[r].zpar = x;
+			  aux[x].rank += 1;
 			}
                       }
                   }
@@ -100,71 +114,68 @@ namespace mln
 	}
 
 
-	void
-	unionfind_line(int row)
-	{
-	  static const int nvalues = 1 << value_traits<V>::quant;
-	  point2d p_ = m_ima.domain().pmin;
-	  p_[0] = row;
+	// void
+	// unionfind_line(int row)
+	// {
+	//   static const int nvalues = 1 << value_traits<V>::quant;
+	//   point2d p_ = m_ima.domain().pmin;
+	//   p_[0] = row;
 
-	  int ncols = m_ima.ncols();
-	  std::size_t stack[nvalues];
-	  int sz = 0;
-	  std::size_t prec = m_ima.index_of_point(p_);
-	  std::size_t p = prec + 1;
+	//   int ncols = m_ima.ncols();
+	//   std::size_t stack[nvalues];
+	//   int sz = 0;
+	//   std::size_t prec = m_ima.index_of_point(p_);
+	//   std::size_t p = prec + 1;
 
-	  for (int i = 1; i < ncols; ++i, ++p)
-	    {
-	      if (m_cmp(m_ima[prec],m_ima[p])) // m_ima[prec] < m_ima[p] => start new component
-		{
-		  stack[sz++] = prec;
-		  //m_parent[prec] = prec;
-		  prec = p;
-		}
-	      else if (not m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] == m_ima[prec] => extend component
-		{
-		  m_parent[p] = prec;
-		}
-	      else // m_ima[p] < m_ima[prec] => we need to attach prec to its m_parent
-		{
-		  while (sz > 0 and not m_cmp(m_ima[stack[sz-1]], m_ima[p]))
-		    {
-		      m_parent[prec] = stack[sz-1];
-		      prec = stack[sz-1];
-		      --sz;
-		    }
-		  // we have m_ima[p] <= m_ima[prec]
-		  if (m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] < m_ima[prec] => attach prec to p, p new component
-		    {
-		      m_parent[prec] = p;
-		      prec = p;
-		    }
-		  else                        // m_ima[p] == m_ima[prec] => attach p to prec (canonization)
-		    {
-		      m_parent[p] = prec;
-		    }
-		}
-	    }
+	//   for (int i = 1; i < ncols; ++i, ++p)
+	//     {
+	//       if (m_cmp(m_ima[prec],m_ima[p])) // m_ima[prec] < m_ima[p] => start new component
+	// 	{
+	// 	  stack[sz++] = prec;
+	// 	  //m_parent[prec] = prec;
+	// 	  prec = p;
+	// 	}
+	//       else if (not m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] == m_ima[prec] => extend component
+	// 	{
+	// 	  m_parent[p] = prec;
+	// 	}
+	//       else // m_ima[p] < m_ima[prec] => we need to attach prec to its m_parent
+	// 	{
+	// 	  while (sz > 0 and not m_cmp(m_ima[stack[sz-1]], m_ima[p]))
+	// 	    {
+	// 	      m_parent[prec] = stack[sz-1];
+	// 	      prec = stack[sz-1];
+	// 	      --sz;
+	// 	    }
+	// 	  // we have m_ima[p] <= m_ima[prec]
+	// 	  if (m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] < m_ima[prec] => attach prec to p, p new component
+	// 	    {
+	// 	      m_parent[prec] = p;
+	// 	      prec = p;
+	// 	    }
+	// 	  else                        // m_ima[p] == m_ima[prec] => attach p to prec (canonization)
+	// 	    {
+	// 	      m_parent[p] = prec;
+	// 	    }
+	// 	}
+	//     }
 
-	  // Attach last point (i.e prec)
-	  while (sz > 0)
-	    {
-	      m_parent[prec] = stack[sz-1];
-	      prec = stack[sz-1];
-	      --sz;
-	    }
-	  m_parent[prec] = prec;
-	}
+	//   // Attach last point (i.e prec)
+	//   while (sz > 0)
+	//     {
+	//       m_parent[prec] = stack[sz-1];
+	//       prec = stack[sz-1];
+	//       --sz;
+	//     }
+	//   m_parent[prec] = prec;
+	// }
 
 
         void
         operator() (const box2d& domain)
         {
 	  //std::cout << domain << std::endl;
-	  if (domain.shape()[0] > 1)
-	    unionfind(domain);
-	  else
-	    unionfind_line(domain.pmin[0]);
+	  unionfind(domain);
 
           if (m_has_previous)
 	    {
@@ -199,9 +210,7 @@ namespace mln
         StrictWeakOrdering m_cmp;
 
         image2d<std::size_t> m_parent;
-        image2d<std::size_t> m_zpar;
-	image2d<std::size_t> m_root;
-	image2d<unsigned>    m_rank;
+        image2d<aux_data>	     m_aux;
 
         bool	          m_has_previous;
         box2d	          m_current_domain;

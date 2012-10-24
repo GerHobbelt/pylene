@@ -139,7 +139,7 @@ int main(int ac, char** av)
   }
 
 
-  typedef uint8 V;
+  typedef UInt<12> V;
   image2d<V> ima(4000, 3500);
 
   std::random_device rd;

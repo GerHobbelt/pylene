@@ -9,6 +9,8 @@
 #define BOOST_TEST_MODULE Morpho
 #include <boost/test/unit_test.hpp>
 
+#include <mln/core/value/int.hpp>
+#include <random>
 
 BOOST_AUTO_TEST_CASE(maxtree_ufind)
 {

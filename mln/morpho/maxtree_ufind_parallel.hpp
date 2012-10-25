@@ -4,7 +4,7 @@
 # include <mln/core/image/image.hpp>
 # include <mln/core/image/sub_image.hpp>
 # include <mln/core/extension/fill.hpp>
-# include <mln/core/algorithm/sort_sites.hpp>
+# include <mln/core/algorithm/sort_indexes.hpp>
 # include <mln/core/wrt_offset.hpp>
 
 # include <mln/io/imprint.hpp>

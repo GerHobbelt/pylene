@@ -5,7 +5,6 @@
 # include <boost/integer.hpp>
 
 # include <mln/core/value/value_traits.hpp>
-# include <mln/core/value/indexer.hpp>
 # include <mln/core/value/index.hpp>
 
 

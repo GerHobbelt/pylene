@@ -22,7 +22,7 @@ namespace mln
     /// \param[out] out Image to be loaded
     /// \param r The plugin to use for loading
     template <typename Image, typename Reader = freeimage_reader>
-    void imread(const char* path, Image& out, Reader r = Reader());
+    void imread(const std::string& path, Image& out, Reader r = Reader());
 
 
     /******************************************/
@@ -63,10 +63,10 @@ namespace mln
       // }
 
       template <typename Image, typename Reader>
-      void imread(const char* path, Reader r, Image& out, raw_image_tag)
+      void imread(const std::string& path, Reader r, Image& out, raw_image_tag)
       {
 	r.initialize();
-	r.load(path);
+	r.load(path.c_str());
 
 	typedef typename Image::value_type V;
         std::type_index ridx = r.get_value_type_id();
@@ -86,7 +86,7 @@ namespace mln
     }
 
     template <typename Image, typename Reader>
-    void imread(const char* path, Image& out, Reader r)
+    void imread(const std::string& path, Image& out, Reader r)
     {
       internal::imread(path, r, out, typename image_traits<Image>::category ());
     }

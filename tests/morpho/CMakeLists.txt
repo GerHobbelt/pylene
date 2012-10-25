@@ -1,10 +1,23 @@
 
-add_executable(maxtree_ufind maxtree_ufind.cpp)
-add_executable(maxtree_hqueue maxtree_hqueue.cpp)
+add_executable(maxtree_serial_ufind bench_serial_ufind.cpp)
+add_executable(maxtree_parallel_ufind bench_parallel_ufind.cpp)
+add_executable(maxtree_parallel_ufind_line bench_parallel_ufind_line.cpp)
+add_executable(maxtree_serial_ufindrank bench_serial_ufindrank.cpp)
+add_executable(maxtree_parallel_ufindrank bench_parallel_ufindrank.cpp)
+add_executable(maxtree_serial_hqueue bench_serial_hqueue.cpp)
+add_executable(maxtree_parallel_hqueue bench_parallel_hqueue.cpp)
+
 add_executable(maxtree maxtree.cpp)
 add_executable(bench_maxtree bench_maxtree.cpp)
 target_link_libraries(bench_maxtree ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+target_link_libraries(maxtree_serial_ufind -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_parallel_ufind -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_parallel_ufind_line -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_serial_ufindrank -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_parallel_ufindrank -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_serial_hqueue -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_parallel_hqueue -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 
 add_test(maxtree_ufind maxtree_ufind)

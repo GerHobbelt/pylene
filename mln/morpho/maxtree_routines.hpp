@@ -34,28 +34,23 @@ namespace mln
 	  return p;
       }
 
-      template <typename V>
-      point2d
-      zfind_parent(const image2d<V>& ima, image2d<point2d>& parent, const point2d& p)
-      {
-	point2d q = parent(p);
-	point2d r = parent(q);
-	if (q != r and ima(q) == ima(r))
-	  return parent(p) = zfind_repr(ima, parent, r);
-	else
-	  return q;
-      }
+      // template <typename V>
+      // point2d
+      // zfind_parent(const image2d<V>& ima, image2d<point2d>& parent, const point2d& p)
+      // {
+      // 	point2d q = parent(p);
+      // 	point2d r = parent(q);
+      // 	if (q != r and ima(q) == ima(r))
+      // 	  return parent(p) = zfind_repr(ima, parent, r);
+      // 	else
+      // 	  return q;
+      // }
 
       template <typename V>
       std::size_t
       zfind_parent(const image2d<V>& ima, image2d<std::size_t>& parent, std::size_t p)
       {
-	std::size_t q = parent[p];
-	std::size_t r = parent[q];
-	if (q != r and ima[q] == ima[r])
-	  return parent[p] = zfind_repr(ima, parent, r);
-	else
-	  return q;
+	return parent[p] = zfind_repr(ima, parent, parent[p]);
       }
 
       template <typename V>

@@ -81,6 +81,7 @@ namespace mln
                 deja_vu[p] = true;
               }
 
+	      std::size_t z = p; // zpar of p
               for (unsigned j = 0; j < dindexes.size(); ++j)
 		{
 		  std::size_t n = p + dindexes[j];
@@ -88,10 +89,16 @@ namespace mln
 		  if (deja_vu[n])
                   {
 		    std::size_t r = zfindroot(zpar, n);
-                    if (r != p) // make union
+                    if (r != z) // make union
                       {
-                        parent[r] = p;
-                        zpar[r] = p;
+			if (ima[r] != ima[z]) {
+			  parent[r] = z;
+			  zpar[r] = z;
+			} else {
+			  parent[z] = r;
+			  zpar[z] = r;
+			  z = r;
+			}
                       }
                   }
 		}

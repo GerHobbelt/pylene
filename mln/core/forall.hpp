@@ -33,6 +33,7 @@ namespace mln
     {
       constexpr operator bool() const { return false; }
       T& get() { return x_;}
+      false_var_t& set(const T& v) { x_ = v; return *this; }
 
       T x_;
     };
@@ -278,11 +279,14 @@ namespace mln
   if ((EXPR), false) {} else
 
 
-# define mln_foreach(p, COL)					\
-  __mln_should_copy_col_local__(COL, _mln_range_)		\
-  MLN_DECL_VAR(_mln_it_, _mln_range_.get().iter())		\
-  for (_mln_it_.get().init(); !_mln_it_.get().finished(); _mln_it_.get().next()) \
-    if (bool _mln_continue_ = false) {} else				\
-      for (p = *(_mln_it_.get()); !_mln_continue_; _mln_continue_ = true) \
+# define mln_foreach(p, COL)						\
+  __mln_should_copy_col_local__(COL, _mln_range_)			\
+  MLN_DECL_VAR(_mln_it_, _mln_range_.get().iter())			\
+  MLN_DECL_VAR(_mln_continue_, true)					\
+  for (_mln_it_.get().init();						\
+       _mln_continue_.get() and !_mln_it_.get().finished();		\
+       _mln_continue_.get() ? _mln_it_.get().next() : (void) 0)		\
+    if (_mln_continue_.set(false)) {} else				\
+      for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true)) \
 
 #endif //!MLN_CORE_FORALL_HPP

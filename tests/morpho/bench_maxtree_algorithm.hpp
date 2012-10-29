@@ -1,6 +1,8 @@
 #ifndef BENCH_MAXTREE_ALGORITHM_HPP
 # define BENCH_MAXTREE_ALGORITHM_HPP
 
+# define MLN_MAXBIT 24
+
 # include <tbb/task_scheduler_init.h>
 # include <tbb/tick_count.h>
 # include <iostream>
@@ -14,6 +16,7 @@
 
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/maxtree_hqueue_parallel.hpp>
+#include <mln/morpho/maxtree_pqueue_parallel.hpp>
 #include <mln/morpho/maxtree_ufindrank_parallel.hpp>
 #include <boost/program_options.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
@@ -38,6 +41,8 @@ MAXTREE_ALGO(meta_parallel_union_find, mln::morpho::impl::parallel::maxtree_ufin
 MAXTREE_ALGO(meta_parallel_union_find_line, mln::morpho::impl::parallel::maxtree_ufind_line)
 MAXTREE_ALGO(meta_serial_hqueue, mln::morpho::impl::serial::maxtree_hqueue)
 MAXTREE_ALGO(meta_parallel_hqueue, mln::morpho::impl::parallel::maxtree_hqueue)
+MAXTREE_ALGO(meta_serial_pqueue, mln::morpho::impl::serial::maxtree_pqueue)
+MAXTREE_ALGO(meta_parallel_pqueue, mln::morpho::impl::parallel::maxtree_pqueue)
 MAXTREE_ALGO(meta_serial_union_find_rank, mln::morpho::impl::serial::maxtree_ufindrank)
 MAXTREE_ALGO(meta_parallel_union_find_rank, mln::morpho::impl::parallel::maxtree_ufindrank)
 
@@ -118,7 +123,7 @@ void run_test(int argc, char** argv, Algorithm algo)
   int nbits = vm["nbits"].as<int>();
   switch (nbits)
     {
-      BOOST_PP_REPEAT_FROM_TO(9,16, DECL, "")
+      BOOST_PP_REPEAT_FROM_TO(9,BOOST_PP_ADD(MLN_MAXBIT, 1), DECL, "")
 
       default:
 	bench_algo(ima, vm["nthread"].as<int>(), algo);

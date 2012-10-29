@@ -6,6 +6,8 @@ add_executable(maxtree_serial_ufindrank bench_serial_ufindrank.cpp)
 add_executable(maxtree_parallel_ufindrank bench_parallel_ufindrank.cpp)
 add_executable(maxtree_serial_hqueue bench_serial_hqueue.cpp)
 add_executable(maxtree_parallel_hqueue bench_parallel_hqueue.cpp)
+add_executable(maxtree_serial_pqueue bench_serial_pqueue.cpp)
+add_executable(maxtree_parallel_pqueue bench_parallel_pqueue.cpp)
 
 add_executable(maxtree maxtree.cpp)
 add_executable(bench_maxtree bench_maxtree.cpp)
@@ -18,6 +20,8 @@ target_link_libraries(maxtree_serial_ufindrank -lfreeimage ${Boost_PROGRAM_OPTIO
 target_link_libraries(maxtree_parallel_ufindrank -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_serial_hqueue -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_hqueue -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_serial_pqueue -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_parallel_pqueue -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 
 add_test(maxtree_ufind maxtree_ufind)

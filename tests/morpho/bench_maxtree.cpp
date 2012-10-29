@@ -4,6 +4,7 @@
 #include <mln/morpho/maxtree_ufind.hpp>
 #include <mln/morpho/maxtree_ufindrank_parallel.hpp>
 #include <mln/morpho/maxtree_hqueue_parallel.hpp>
+#include <mln/morpho/maxtree_pqueue_parallel.hpp>
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/io/imprint.hpp>
@@ -222,6 +223,22 @@ int main(int ac, char** av)
       parent = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find By Rank Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
+  }
+
+  {
+    t0 = tick_count::now();
+    for (int i = 0; i < NTEST; ++i)
+      parent = morpho::impl::serial::maxtree_pqueue(ima, c4, cmp);
+    t1 = tick_count::now();
+    std::cout << "Serial PQueue Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
+  }
+
+  {
+    t0 = tick_count::now();
+    for (int i = 0; i < NTEST; ++i)
+      parent = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp);
+    t1 = tick_count::now();
+    std::cout << "Parallel Pqueue Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
 
 

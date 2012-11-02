@@ -5,8 +5,9 @@
 # include <mln/core/image/image.hpp>
 # include <mln/core/value/indexer.hpp>
 # include <vector>
+# include <algorithm>
 
-// FIXME: use indexer
+// FIXME: Speed up HQ version
 
 namespace mln
 {
@@ -59,6 +60,24 @@ namespace mln
       }
       return v;
     }
+
+    template <typename I, typename StrictWeakOrdering,
+	      typename Indexer = indexer<mln_value(I), StrictWeakOrdering> >
+    std::vector<typename I::size_type>
+    sort_indexes(const I& input, StrictWeakOrdering cmp, std::false_type _is_low_quant_)
+    {
+      (void) _is_low_quant_;
+      typedef typename I::size_type size_type;
+      std::vector<size_type> v;
+      v.reserve(input.domain().size());
+      mln_pixter(px, input);
+      mln_forall(px)
+	v.push_back(px->index());
+
+      std::sort(v.begin(), v.end(), [&input, cmp](size_type x, size_type y) { return cmp(input[x], input[y]); });
+      return v;
+    }
+
 
   } // end of namespace mln::impl
 

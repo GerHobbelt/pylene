@@ -9,6 +9,7 @@
 
 # include <mln/io/imprint.hpp>
 # include <mln/morpho/merge_tree.hpp>
+# include <alloca.h>
 
 # include <tbb/parallel_reduce.h>
 # include <tbb/parallel_for.h>
@@ -89,16 +90,17 @@ namespace mln
 		  if (deja_vu[n])
                   {
 		    std::size_t r = zfindroot(zpar, n);
+
                     if (r != z) // make union
                       {
-			if (ima[r] != ima[z]) {
-			  parent[r] = z;
-			  zpar[r] = z;
-			} else {
-			  parent[z] = r;
-			  zpar[z] = r;
-			  z = r;
-			}
+		    	if (ima[r] != ima[z]) {
+		    	  parent[r] = z;
+		    	  zpar[r] = z;
+		    	} else {  // level compression
+		    	  parent[z] = r;
+		    	  zpar[z] = r;
+		    	  z = r;
+		    	}
                       }
                   }
 		}
@@ -109,15 +111,20 @@ namespace mln
 	void
 	unionfind_line(int row)
 	{
-	  static const int nvalues = 1 << value_traits<V>::quant;
+	  static constexpr std::size_t nvalues = 1ul << value_traits<V>::quant;
 	  point2d p_ = m_ima.domain().pmin;
 	  p_[0] = row;
 
 	  int ncols = m_ima.ncols();
-	  std::size_t stack[nvalues];
 	  int sz = 0;
 	  std::size_t prec = m_ima.index_of_point(p_);
 	  std::size_t p = prec + 1;
+	  std::size_t* stack;
+
+	  if (value_traits<V>::quant <= 16)
+	    stack = (std::size_t*) alloca(nvalues * sizeof(size_t));
+	  else
+	    stack = new std::size_t[nvalues];
 
 	  for (int i = 1; i < ncols; ++i, ++p)
 	    {
@@ -160,6 +167,9 @@ namespace mln
 	      --sz;
 	    }
 	  m_parent[prec] = prec;
+
+	  if (value_traits<V>::quant > 16)
+	    delete [] stack;
 	}
 
 
@@ -211,6 +221,7 @@ namespace mln
 	  mln_precondition(m_has_previous);
 
           merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
+	  merge_S(m_parent, m_dejavu, m_S, m_Saux);
 
 	  // {
 	  //   tbb::mutex::scoped_lock lock(m_mutex);
@@ -322,13 +333,13 @@ namespace mln
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 	  // canonization
-	  image2d<std::size_t>& parent = algo.m_parent;
-	  for (std::size_t p : algo.m_S)
-	    {
-	      std::size_t q = parent[p];
-	      if (ima[parent[q]] == ima[q])
-		parent[p] = parent[q];
-	    }
+	  // image2d<std::size_t>& parent = algo.m_parent;
+	  // for (std::size_t p : algo.m_S)
+	  //   {
+	  //     std::size_t q = parent[p];
+	  //     if (ima[parent[q]] == ima[q])
+	  // 	parent[p] = parent[q];
+	  //   }
 
 	  return algo.m_parent;
 	}

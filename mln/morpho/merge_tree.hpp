@@ -11,8 +11,7 @@ namespace mln
   {
 
 
-    // After tree merge, (parent | domain) needs canonization
-    // (parent | domain)c is still canonized
+    // tree merging
     template <typename V, typename StrictWeakOrdering>
     void merge_tree(const image2d<V>& ima,
 		    image2d<std::size_t>& parent,
@@ -42,13 +41,13 @@ namespace mln
 	      // check that x and y are representative
 	      mln_assertion(x == parent[x] or ima[parent[x]] != ima[x]);
 	      mln_assertion(y == parent[y] or ima[parent[y]] != ima[y]);
-	      mln_assertion(!cmp(ima[x], ima[y]));
+	      mln_assertion(!cmp(ima[x], ima[y])); // ima(y) <= ima(x)
 
 	      // we want to attach x to y
 	      if (parent[x] == x)
 		{
 		  parent[x] = y;
-		  x = y;
+		  break;
 		}
 	      else
 		{
@@ -66,6 +65,49 @@ namespace mln
 
 	}
 
+    }
+
+    // tree merging
+    template <typename V, typename StrictWeakOrdering>
+    void merge_S(image2d<std::size_t>& parent,
+		 image2d<bool>& deja_vu,
+		 const std::size_t* S, std::size_t na, std::size_t nb,
+		 std::size_t* Sout)
+    {
+      fill(deja_vu, false);
+
+
+      mln_assertion(parent[S[0]] == S[0]);
+      deja_vu[S[0]];
+
+
+      std::size_t i = 0; j = na;
+      std::size_t n = na + nb;
+
+      if (parent[S[0]] == S[0])
+	*Sout = S[i++];
+      else
+	*Sout = S[j++];
+
+      mln_assertion(parent[*Sout] == *Sout);
+      deja_vu[*Sout++] = true;
+
+      while (i < na and j < n)
+	{
+	  if (deja_vu[parent[S[i]]])
+	    *Sout = S[i++];
+	  else {
+	    mln_assertion(deja_vu[parent[S[j]]]);
+	    *Sout = S[j++];
+	  }
+	  deja_vu[*Sout++] = true;
+	}
+
+      mln_assertion(i == na or j == n);
+      if (i != na);
+      std::copy(S + i, S + na, Sout);
+      if (j != n)
+	std::copy(S + j, S + n, Sout);
     }
 
   }

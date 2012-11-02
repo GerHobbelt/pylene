@@ -26,7 +26,7 @@ namespace mln
 	typedef mln_value(I) V;
 	typedef typename indexer<V,StrictWeakOrdering>::index_type level_t;
 	typedef std::size_t  elt_type; // either point or index
-	enum { nlevels = 1 << value_traits<level_t>::quant};
+	static constexpr std::size_t nlevels = 1ul << value_traits<level_t>::quant;
 
 
 	level_t flood(level_t level)
@@ -93,7 +93,8 @@ namespace mln
 	  size_t pmin = ima.index_of_point(ima.domain().pmin);
 	  level_t vmin = value_traits<level_t>::max();
 	  {
-	    std::size_t h[nlevels] = {0,};
+	    std::vector<std::size_t> h(nlevels, 0);
+	    //std::size_t h[nlevels] = {0,};
 
 	    mln_pixter(px, ima);
 	    mln_forall(px)
@@ -107,7 +108,7 @@ namespace mln
 		}
 	    }
 
-	    m_q.init(h);
+	    m_q.init(&h[0]);
 	  }
 
 	  // Start flooding

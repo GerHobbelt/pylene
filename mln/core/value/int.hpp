@@ -36,7 +36,7 @@ namespace mln
   {
     static constexpr unsigned quant = nbits;
     static constexpr UInt<nbits> min() { return 0; }
-static constexpr UInt<nbits> max() { return (1 << nbits) - 1; }
+    static constexpr UInt<nbits> max() { return (1ul << nbits) - 1; }
     static constexpr UInt<nbits> inf() { return min(); }
     static constexpr UInt<nbits> sup() { return max(); }
   };
@@ -46,7 +46,7 @@ static constexpr UInt<nbits> max() { return (1 << nbits) - 1; }
   {
     static constexpr unsigned quant = nbits;
     static constexpr Int<nbits> min() { return -(1 << (nbits-1)); }
-    static constexpr Int<nbits> max() { return (1 << (nbits-1)) - 1; }
+    static constexpr Int<nbits> max() { return (1ul << (nbits-1)) - 1; }
     static constexpr Int<nbits> inf() { return min(); }
     static constexpr Int<nbits> sup() { return max(); }
   };

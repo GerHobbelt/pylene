@@ -57,22 +57,27 @@ namespace mln
 	}
 
 	void
-	unionfind(const grain_box2d& domain)
+	unionfind(const box2d& domain)
 	{
           image2d<V> ima = m_ima | domain;
           image2d<std::size_t> parent = m_parent | domain;
           image2d<std::size_t> zpar = m_zpar | domain;
           image2d<bool> deja_vu;
+	  std::size_t i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);
+	  std::size_t* S = &m_S[i];
+
           resize(deja_vu, ima, m_ima.border(), false);
 
 	  //int djvu_offset = deja_vu.index_of_point(domain.pmin) - ima.index_of_point(domain.pmin);
-          m_S = sort_indexes(ima, m_cmp);
+	  const box2d& d = m_ima.domain();
+
+          sort_indexes_it(ima, S, m_cmp);
 	  auto dindexes = wrt_delta_index(ima, m_nbh.dpoints);
 
 
-          for (int i = m_S.size()-1; i >= 0; --i)
+          for (int i = ima.domain().size() - 1; i >= 0; --i)
             {
-	      std::size_t p = m_S[i];
+	      std::size_t p = S[i];
 	      //std::cout << deja_vu.point_at_index(djvu_offset + p) << std::endl;
               // make set
 	      assert(domain.has(deja_vu.point_at_index(p)));
@@ -172,27 +177,6 @@ namespace mln
 	    delete [] stack;
 	}
 
-
-        void
-        operator() (const grain_box2d& domain)
-        {
-	  if (domain.shape()[0] > 1)
-	    unionfind(domain);
-	  else
-	    unionfind_line(domain.pmin[0]);
-
-          if (m_has_previous)
-	    {
-	      this->join(*this, false);
-	      m_current_domain.join(domain);
-	      m_nsplit += 1;
-	    }
-	  else
-	    {
-	      m_current_domain = domain;
-	      m_has_previous = true;
-	    }
-        }
 
         void
         operator() (const box2d& domain)

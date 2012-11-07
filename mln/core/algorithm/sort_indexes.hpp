@@ -17,16 +17,21 @@ namespace mln
   sort_indexes(const Image<I>& input,  BinaryFunction cmp = BinaryFunction ());
 
 
+  template <typename I, typename OutputIterator, typename BinaryFunction = std::less<mln_value(I)> >
+  OutputIterator
+  sort_indexes_it(const Image<I>& input, OutputIterator out, BinaryFunction cmp = BinaryFunction ());
+
+
   /****************/
   /* Implem       */
   /****************/
 
   namespace impl
   {
-    template <typename I, typename StrictWeakOrdering,
+    template <typename I, typename OutputIterator, typename StrictWeakOrdering,
 	      typename Indexer = indexer<mln_value(I), StrictWeakOrdering> >
-    std::vector<typename I::size_type>
-    sort_indexes(const I& input, StrictWeakOrdering, std::true_type _is_low_quant_)
+    void
+    sort_indexes(const I& input, OutputIterator v, StrictWeakOrdering, std::true_type _is_low_quant_)
     {
       (void) _is_low_quant_;
       typedef typename Indexer::index_type index_t;
@@ -51,8 +56,6 @@ namespace mln
         assert(count == input.domain().size());
       }
 
-      std::vector<typename I::size_type> v;
-      v.resize(input.domain().size());
       {
 	mln_pixter(px, input);
 	mln_forall(px)
@@ -61,21 +64,21 @@ namespace mln
       return v;
     }
 
-    template <typename I, typename StrictWeakOrdering,
+    template <typename I, typename OutputIterator, typename StrictWeakOrdering,
 	      typename Indexer = indexer<mln_value(I), StrictWeakOrdering> >
     std::vector<typename I::size_type>
-    sort_indexes(const I& input, StrictWeakOrdering cmp, std::false_type _is_low_quant_)
+    sort_indexes(const I& input, OutputIterator v, StrictWeakOrdering cmp, std::false_type _is_low_quant_)
     {
       (void) _is_low_quant_;
       typedef typename I::size_type size_type;
-      std::vector<size_type> v;
-      v.reserve(input.domain().size());
+
+      std::size_t i = 0;
       mln_pixter(px, input);
       mln_forall(px)
-	v.push_back(px->index());
+	v[i++] = px->index());
 
-      std::sort(v.begin(), v.end(), [&input, cmp](size_type x, size_type y) { return cmp(input[x], input[y]); });
-      return v;
+    std::sort(v, v + input.domain().size(), [&input, cmp](size_type x, size_type y) { return cmp(input[x], input[y]); });
+    return v;
     }
 
 
@@ -89,8 +92,25 @@ namespace mln
     static_assert(std::is_same<typename image_category<I>::type, raw_image_tag>::value,
 		  "Image must model the Raw Image Concept");
     typedef std::integral_constant<bool, (value_traits<mln_value(I)>::quant <= 16)> is_low_quant;
-    return impl::sort_indexes(exact(input), cmp, is_low_quant ());
+
+    std::vector<size_type> v;
+    v.resize(exact(input).domain().size());
+
+    impl::sort_indexes(exact(input), v.begin(), cmp, is_low_quant ());
+    return v;
   }
+
+  template <typename I, typename OutputIterator, typename BinaryFunction>
+  OutputIterator
+  sort_indexes_it(const Image<I>& input, OutputIterator out, BinaryFunction cmp)
+  {
+    static_assert(std::is_same<typename image_category<I>::type, raw_image_tag>::value,
+		  "Image must model the Raw Image Concept");
+    typedef std::integral_constant<bool, (value_traits<mln_value(I)>::quant <= 16)> is_low_quant;
+
+    return impl::sort_indexes(exact(input), out, cmp, is_low_quant ());
+  }
+
 
 } // end of namespace mln
 

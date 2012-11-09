@@ -68,46 +68,40 @@ namespace mln
     }
 
     // tree merging
-    template <typename V, typename StrictWeakOrdering>
-    void merge_S(image2d<std::size_t>& parent,
+    // note: dst may alias with src2 but not src1
+    void merge_S(const image2d<std::size_t>& parent,
 		 image2d<bool>& deja_vu,
-		 const std::size_t* S, std::size_t na, std::size_t nb,
-		 std::size_t* Sout)
+		 const std::size_t* src1, const std::size_t* end1,
+		 const std::size_t* src2, const std::size_t* end2,
+		 std::size_t* dst)
     {
-      fill(deja_vu, false);
+      mln_precondition(dst != src1);
+      mln_precondition(src2 == end1 or (src2 == (dst + (end1-src1))));
 
-
-      mln_assertion(parent[S[0]] == S[0]);
-      deja_vu[S[0]];
-
-
-      std::size_t i = 0; j = na;
-      std::size_t n = na + nb;
-
-      if (parent[S[0]] == S[0])
-	*Sout = S[i++];
+      if (parent[*src1] == *src1)
+	*dst = *(src1++);
       else
-	*Sout = S[j++];
+	*dst = *(src2++);
 
-      mln_assertion(parent[*Sout] == *Sout);
-      deja_vu[*Sout++] = true;
+      mln_assertion(parent[*dst] == *dst);
+      deja_vu[*(dst++)] = true;
 
-      while (i < na and j < n)
+      while (src1 < end1 and src2 < end2)
 	{
-	  if (deja_vu[parent[S[i]]])
-	    *Sout = S[i++];
+	  if (deja_vu[parent[*src1]])
+	    *dst = *(src1++);
 	  else {
-	    mln_assertion(deja_vu[parent[S[j]]]);
-	    *Sout = S[j++];
+	    mln_assertion(deja_vu[parent[*src2]]);
+	    *dst = *(src2++);
 	  }
-	  deja_vu[*Sout++] = true;
+	  deja_vu[*(dst++)] = true;
 	}
 
-      mln_assertion(i == na or j == n);
-      if (i != na);
-      std::copy(S + i, S + na, Sout);
-      if (j != n)
-	std::copy(S + j, S + n, Sout);
+      mln_assertion((src1 == end1) != (src2 == end2));
+      if (src1 != end1)
+	std::copy(src1, end1, dst);
+      else if (src2 != end2 and src2 != dst)
+	std::copy(src2, end2, dst);
     }
 
   }

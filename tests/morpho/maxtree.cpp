@@ -87,12 +87,19 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
   using namespace mln;
 
 
-  image2d<std::size_t> parent1;
-  std::vector<std::size_t> S1;
-  std::tie(parent1, S1) = morpho::maxtree(ima, c4, cmp);
+  image2d<std::size_t> parent1, parent;
+  std::vector<std::size_t> S1, S;
+  std::tie(parent1, S1) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
   auto parent2 = morpho::impl::serial::maxtree_hqueue(ima, c4, cmp );
   auto parent3 = morpho::impl::parallel::maxtree_hqueue(ima, c4, cmp );
-  auto parent4 = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp );
+
+  {
+    std::tie(parent, S) = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
+
   auto parent5 = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp );
   auto parent6 = morpho::impl::serial::maxtree_ufindrank(ima, c4, cmp );
   auto parent7 = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp );
@@ -102,20 +109,18 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
   //io::imprint(parent4);
   //io::imprint(parent4_);
   //io::imprint(parent8);
-  BOOST_CHECK(iscanonized(ima, parent1));
+
   BOOST_CHECK(iscanonized(ima, parent2));
   BOOST_CHECK(iscanonized(ima, parent3));
-  BOOST_CHECK(iscanonized(ima, parent4));
   BOOST_CHECK(iscanonized(ima, parent5));
   BOOST_CHECK(iscanonized(ima, parent6));
   BOOST_CHECK(iscanonized(ima, parent7));
   BOOST_CHECK(iscanonized(ima, parent8));
   BOOST_CHECK(iscanonized(ima, parent9));
 
-  unify_parent(ima, S1, parent1);
+
   unify_parent(ima, S1, parent2);
   unify_parent(ima, S1, parent3);
-  unify_parent(ima, S1, parent4);
   unify_parent(ima, S1, parent5);
   unify_parent(ima, S1, parent6);
   unify_parent(ima, S1, parent7);
@@ -123,9 +128,7 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
   unify_parent(ima, S1, parent9);
   //io::imprint(parent1);
   //io::imprint(parent4);
-  BOOST_CHECK(all(parent1 == parent2));
   BOOST_CHECK(all(parent1 == parent3));
-  BOOST_CHECK(all(parent1 == parent4));
   BOOST_CHECK(all(parent1 == parent5));
   BOOST_CHECK(all(parent1 == parent6));
   BOOST_CHECK(all(parent1 == parent7));
@@ -137,7 +140,7 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
 BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
-  typedef uint8 V;
+  typedef UInt<18> V;
   image2d<V> ima(300, 100);
 
   std::random_device rd;
@@ -145,7 +148,7 @@ BOOST_AUTO_TEST_CASE(Maxtree)
   std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
   range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
 
-  tbb::task_scheduler_init ts;
+  tbb::task_scheduler_init ts(1);
 
   // {
   //   image2d<std::size_t> f;

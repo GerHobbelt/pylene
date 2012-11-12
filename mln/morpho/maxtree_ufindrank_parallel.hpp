@@ -38,6 +38,9 @@ namespace mln
         {
           resize(m_parent, ima);
 	  resize(m_aux, ima, ima.border(), aux_data ());
+
+	  std::size_t n = m_ima.domain().size();
+	  m_S = new std::vector<std::size_t>(n);
 	  m_nsplit = 0;
         }
 
@@ -69,14 +72,17 @@ namespace mln
           image2d<bool> deja_vu;
           resize(deja_vu, ima, m_ima.border(), false);
 
+	  const box2d& d = m_ima.domain();
+	  std::size_t i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);
+	  std::size_t* S = m_S->data() + i;
+
 	  //int djvu_offset = deja_vu.index_of_point(domain.pmin) - ima.index_of_point(domain.pmin);
-          m_S = sort_indexes(ima, m_cmp);
+          sort_indexes(ima, S, m_cmp);
 	  auto dindexes = wrt_delta_index(ima, m_nbh.dpoints);
 
-
-          for (int i = m_S.size()-1; i >= 0; --i)
+          for (int i = ima.domain().size()-1; i >= 0; --i)
             {
-	      std::size_t p = m_S[i];
+	      std::size_t p = S[i];
               // make set
 	      assert(domain.has(deja_vu.point_at_index(p)));
               {
@@ -86,7 +92,7 @@ namespace mln
                 deja_vu[p] = true;
               }
 
-	      std::size_t x = p; // zpar of p
+	      std::size_t z = p; // zpar of p
               for (unsigned j = 0; j < dindexes.size(); ++j)
 		{
 		  std::size_t n = p + dindexes[j];
@@ -94,82 +100,24 @@ namespace mln
 		  if (deja_vu[n])
                   {
 		    std::size_t r = zfindroot(aux, n);
-                    if (r != x) // make union
+                    if (r != z) // make union
                       {
 			parent[aux[r].repr] = p;
-			if (aux[x].rank < aux[r].rank) { //we merge x to r
-			  aux[x].zpar = r;
+			if (aux[z].rank < aux[r].rank) { //we merge z to r
+			  aux[z].zpar = r;
 			  aux[r].repr = p;
-			  x = r;
-			} else if (aux[x].rank > aux[r].rank) { // merge r to x
-			  aux[r].zpar = x;
+			  z = r;
+			} else if (aux[z].rank > aux[r].rank) { // merge r to z
+			  aux[r].zpar = z;
 			} else { // same height
-			  aux[r].zpar = x;
-			  aux[x].rank += 1;
+			  aux[r].zpar = z;
+			  aux[z].rank += 1;
 			}
                       }
                   }
 		}
             }
 	}
-
-
-	// void
-	// unionfind_line(int row)
-	// {
-	//   static const int nvalues = 1 << value_traits<V>::quant;
-	//   point2d p_ = m_ima.domain().pmin;
-	//   p_[0] = row;
-
-	//   int ncols = m_ima.ncols();
-	//   std::size_t stack[nvalues];
-	//   int sz = 0;
-	//   std::size_t prec = m_ima.index_of_point(p_);
-	//   std::size_t p = prec + 1;
-
-	//   for (int i = 1; i < ncols; ++i, ++p)
-	//     {
-	//       if (m_cmp(m_ima[prec],m_ima[p])) // m_ima[prec] < m_ima[p] => start new component
-	// 	{
-	// 	  stack[sz++] = prec;
-	// 	  //m_parent[prec] = prec;
-	// 	  prec = p;
-	// 	}
-	//       else if (not m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] == m_ima[prec] => extend component
-	// 	{
-	// 	  m_parent[p] = prec;
-	// 	}
-	//       else // m_ima[p] < m_ima[prec] => we need to attach prec to its m_parent
-	// 	{
-	// 	  while (sz > 0 and not m_cmp(m_ima[stack[sz-1]], m_ima[p]))
-	// 	    {
-	// 	      m_parent[prec] = stack[sz-1];
-	// 	      prec = stack[sz-1];
-	// 	      --sz;
-	// 	    }
-	// 	  // we have m_ima[p] <= m_ima[prec]
-	// 	  if (m_cmp(m_ima[p], m_ima[prec])) // m_ima[p] < m_ima[prec] => attach prec to p, p new component
-	// 	    {
-	// 	      m_parent[prec] = p;
-	// 	      prec = p;
-	// 	    }
-	// 	  else                        // m_ima[p] == m_ima[prec] => attach p to prec (canonization)
-	// 	    {
-	// 	      m_parent[p] = prec;
-	// 	    }
-	// 	}
-	//     }
-
-	//   // Attach last point (i.e prec)
-	//   while (sz > 0)
-	//     {
-	//       m_parent[prec] = stack[sz-1];
-	//       prec = stack[sz-1];
-	//       --sz;
-	//     }
-	//   m_parent[prec] = prec;
-	// }
-
 
         void
         operator() (const box2d& domain)
@@ -215,7 +163,7 @@ namespace mln
         bool	          m_has_previous;
         box2d	          m_current_domain;
 
-        std::vector<std::size_t> m_S;
+        std::vector<std::size_t>* m_S;
 	unsigned	     m_nsplit;
       };
 
@@ -233,12 +181,12 @@ namespace mln
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
-
 	  image2d<std::size_t>& parent = algo.m_parent;
-	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
-	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
+	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  delete algo.m_S;
 
-	  return parent;
+	  canonize(ima, parent, &S[0]);
+	  return std::make_pair(std::move(parent), std::move(S));
 	}
 
       }
@@ -255,16 +203,20 @@ namespace mln
 	  algo(ima.domain());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
+
+	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  delete algo.m_S;
+
 	  // canonization
 	  image2d<std::size_t>& parent = algo.m_parent;
-	  for (std::size_t p : algo.m_S)
+	  for (std::size_t p : S)
 	    {
 	      std::size_t q = parent[p];
 	      if (ima[parent[q]] == ima[q])
 		parent[p] = parent[q];
 	    }
 
-	  return parent;
+	  return std::make_pair(std::move(parent), std::move(S));
 	}
 
       }

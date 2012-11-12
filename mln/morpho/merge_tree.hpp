@@ -67,7 +67,7 @@ namespace mln
 
     }
 
-    void
+    bool
     check_S(const image2d<std::size_t>& parent, const std::size_t* begin, const std::size_t* end)
     {
       image2d<bool> dejavu;
@@ -76,11 +76,14 @@ namespace mln
       dejavu[*begin] = true;
       for (;begin != end; ++begin) {
         assert(dejavu[parent[*begin]]);
+	if (!dejavu[parent[*begin]])
+	  return false;
         dejavu[*begin] = true;
       }
-
+      return true;
     }
 
+    /*
     static
     inline
     void
@@ -146,7 +149,7 @@ namespace mln
 
       check_S(parent, buffer, buffer+n);
     }
-
+    */
   }
 
 }

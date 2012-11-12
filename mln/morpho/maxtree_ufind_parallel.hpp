@@ -10,6 +10,7 @@
 
 # include <mln/io/imprint.hpp>
 # include <mln/morpho/merge_tree.hpp>
+# include <mln/morpho/canonize.hpp>
 # include <alloca.h>
 
 # include <tbb/parallel_reduce.h>
@@ -29,28 +30,21 @@ namespace mln
       template <typename V, typename Neighborhood, typename StrictWeakOrdering>
       struct MaxTreeAlgorithmUF
       {
-        MaxTreeAlgorithmUF(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp, bool parallel = true)
-          : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false), m_Sdst (NULL)
+        MaxTreeAlgorithmUF(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
+          : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false)
         {
 	  std::size_t n = m_ima.domain().size();
-	  m_Ssrc = new std::vector<std::size_t>(n);
+	  m_S = new std::vector<std::size_t>(n);
 
           resize(m_parent, ima);
           resize(m_zpar, ima);
-
-	  if (parallel) {
-	    resize(m_dejavu, ima);
-	    m_Sdst = new std::vector<std::size_t>(n);
-	  }
-
 	  m_nsplit = 0;
         }
 
 
         MaxTreeAlgorithmUF(MaxTreeAlgorithmUF& other, tbb::split)
           : m_ima(other.m_ima), m_nbh(other.m_nbh), m_cmp(other.m_cmp), m_parent(other.m_parent),
-            m_zpar(other.m_zpar), m_has_previous(false), m_Ssrc (other.m_Ssrc), m_Sdst (other.m_Sdst),
-	    m_dejavu(other.m_dejavu)
+            m_zpar(other.m_zpar), m_has_previous(false), m_S (other.m_S)
         {
 	  m_nsplit = 0;
         }
@@ -238,18 +232,6 @@ namespace mln
 
 	  // Merge trees
           merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
-
-	  // Merge S
-          // const box2d& d = m_ima.domain();
-          // std::size_t w = (d.pmax[1] - d.pmin[1]);
-          // std::size_t begin1 = w * (this->m_current_domain.pmin[0] - d.pmin[0]);
-          // std::size_t end1 = w * (this->m_current_domain.pmax[0] - d.pmin[0]);
-          // std::size_t end2 = w * (other.m_current_domain.pmax[0] - d.pmin[0]);
-
-          // fill(m_dejavu | m_current_domain, false);
-          // merge_S(m_parent, m_dejavu, this->m_Ssrc->data() + begin1, this->m_Ssrc->data() + end1,
-          //         other.m_Ssrc->data() + end1, other.m_Ssrc->data() + end2, m_Sdst->data() + begin1);
-          // std::swap(*m_Ssrc, *m_Sdst);
           m_current_domain.join(other.m_current_domain);
           m_nsplit += other.m_nsplit + 1;
         }
@@ -271,36 +253,6 @@ namespace mln
 	unsigned	     m_nsplit;
       };
 
-
-      template <typename V>
-      struct MaxtreeCanonizationAlgorithm
-      {
-	MaxtreeCanonizationAlgorithm(const image2d<V>& ima,
-				     image2d<std::size_t>& parent)
-	  : m_ima (ima), m_parent (parent)
-	{
-	}
-
-	void
-	operator() (const box2d& domain) const
-	{
-	  image2d<std::size_t> parent = m_parent | domain;
-	  mln_foreach(auto& p, parent.values())
-            {
-              p = internal::zfind_repr(m_ima, m_parent, p);
-
-
-            }
-	}
-
-	const image2d<V>&	  m_ima;
-	image2d<std::size_t>&     m_parent;
-        std::vector<std::size_t>& m_S;
-        image2d<std::size_t>      m_dejavu;
-
-      };
-
-
       namespace parallel
       {
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
@@ -316,17 +268,15 @@ namespace mln
 
 
 	  image2d<std::size_t>& parent = algo.m_parent;
-	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
-	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
+	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  delete algo.m_S;
 
-	  std::vector<std::size_t> S = std::move(*(algo.m_Ssrc));
-	  delete algo.m_Ssrc;
-	  delete algo.m_Sdst;
-	  return std::make_pair(std::move(algo.m_parent), std::move(S));
+	  canonize(ima, parent, &S[0]);
+	  return std::make_pair(std::move(parent), std::move(S));
 	}
 
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	image2d<std::size_t>
+	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
 	maxtree_ufind_line(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
 	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
@@ -336,12 +286,12 @@ namespace mln
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
 
-	  image2d<std::size_t>& parent = algo.m_parent;
-	  MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
-	  int grain = std::max(ima.nrows() / 64, 1u);
-	  tbb::parallel_for(grain_box2d(ima.domain(), grain), canonizer, tbb::auto_partitioner());
+	  image2d<std::size_t>&    parent = algo.m_parent;
+	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  delete algo.m_S;
 
-	  return parent;
+	  canonize(ima, parent, &S[0]);
+	  return std::make_pair(std::move(parent), std::move(S));
 	}
 
 
@@ -368,9 +318,8 @@ namespace mln
 	  // 	parent[p] = parent[q];
 	  //   }
 
-	  std::vector<std::size_t> S = std::move(*(algo.m_Ssrc));
-	  delete algo.m_Ssrc;
-	  delete algo.m_Sdst;
+	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  delete algo.m_S;
 	  return std::make_pair(std::move(algo.m_parent), std::move(S));
 	}
 

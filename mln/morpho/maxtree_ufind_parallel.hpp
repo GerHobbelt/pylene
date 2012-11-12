@@ -76,7 +76,7 @@ namespace mln
 
 	  const box2d& d = m_ima.domain();
 	  std::size_t i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);
-	  std::size_t* S = m_Ssrc->data() + i;
+	  std::size_t* S = m_S->data() + i;
 
           resize(deja_vu, ima, m_ima.border(), false);
 
@@ -87,6 +87,7 @@ namespace mln
 	  auto dindexes = wrt_delta_index(ima, m_nbh.dpoints);
 
 
+          std::size_t* R = S + ima.domain().size();
           for (int i = ima.domain().size() - 1; i >= 0; --i)
             {
 	      std::size_t p = S[i];
@@ -113,15 +114,20 @@ namespace mln
 		    	if (ima[r] != ima[z]) {
 		    	  parent[r] = z;
 		    	  zpar[r] = z;
+                          *(--R) = r;
 		    	} else {  // level compression
 		    	  parent[z] = r;
 		    	  zpar[z] = r;
+                          *(--R) = z;
 		    	  z = r;
 		    	}
                       }
                   }
 		}
             }
+          *(--R) = parent[S[0]];
+          assert(R == S);
+          check_S(parent, S, S + ima.domain().size());
 	}
 
 
@@ -199,19 +205,24 @@ namespace mln
 	  else
 	    unionfind_line(domain.pmin[0]);
 
+
           if (m_has_previous)
 	    {
 	      merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
-	      const box2d& d = m_ima.domain();
-	      std::size_t w = (d.pmax[1] - d.pmin[1]);
-	      std::size_t begin1 = w * (m_current_domain.pmin[0] - d.pmin[0]);
-	      std::size_t end1 = w * (m_current_domain.pmax[0] - d.pmin[0]);
-	      std::size_t end2 = w * (domain.pmax[0] - d.pmin[0]);
 	      m_current_domain.join(domain);
-	      fill(m_dejavu | m_current_domain, false);
-	      merge_S(m_parent, m_dejavu, m_Ssrc->data() + begin1, m_Ssrc->data() + end1,
-		      m_Ssrc->data() + end1, m_Ssrc->data() + end2, m_Sdst->data() + begin1);
-	      std::swap(*m_Ssrc, *m_Sdst);
+
+	      // const box2d& d = m_ima.domain();
+	      // std::size_t w = (d.pmax[1] - d.pmin[1]);
+	      // std::size_t begin1 = w * (m_current_domain.pmin[0] - d.pmin[0]);
+	      // std::size_t end1 = w * (m_current_domain.pmax[0] - d.pmin[0]);
+	      // std::size_t end2 = w * (domain.pmax[0] - d.pmin[0]);
+              // check_S(m_parent, m_Ssrc->data() + begin1, m_Ssrc->data() + end1);
+              // check_S(m_parent, m_Ssrc->data() + end1, m_Ssrc->data() + end2);
+
+	      // fill(m_dejavu | m_current_domain, false);
+	      // merge_S(m_parent, m_dejavu, m_Ssrc->data() + begin1, m_Ssrc->data() + end1,
+	      //         m_Ssrc->data() + end1, m_Ssrc->data() + end2, m_Sdst->data() + begin1);
+	      // std::swap(*m_Ssrc, *m_Sdst);
 	      m_nsplit += 1;
 	    }
 	  else
@@ -229,19 +240,18 @@ namespace mln
           merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
 
 	  // Merge S
-	  {
-	    const box2d& d = m_ima.domain();
-	    std::size_t w = (d.pmax[1] - d.pmin[1]);
-	    std::size_t begin1 = w * (this->m_current_domain.pmin[0] - d.pmin[0]);
-	    std::size_t end1 = w * (this->m_current_domain.pmax[0] - d.pmin[0]);
-	    std::size_t end2 = w * (other.m_current_domain.pmax[0] - d.pmin[0]);
-	    m_current_domain.join(other.m_current_domain);
-	    fill(m_dejavu | m_current_domain, false);
-	    merge_S(m_parent, m_dejavu, this->m_Ssrc->data() + begin1, this->m_Ssrc->data() + end1,
-		    other.m_Ssrc->data() + end1, other.m_Ssrc->data() + end2, m_Sdst->data() + begin1);
-	    std::swap(*m_Ssrc, *m_Sdst);
-	    m_nsplit += other.m_nsplit + 1;
-	  }
+          // const box2d& d = m_ima.domain();
+          // std::size_t w = (d.pmax[1] - d.pmin[1]);
+          // std::size_t begin1 = w * (this->m_current_domain.pmin[0] - d.pmin[0]);
+          // std::size_t end1 = w * (this->m_current_domain.pmax[0] - d.pmin[0]);
+          // std::size_t end2 = w * (other.m_current_domain.pmax[0] - d.pmin[0]);
+
+          // fill(m_dejavu | m_current_domain, false);
+          // merge_S(m_parent, m_dejavu, this->m_Ssrc->data() + begin1, this->m_Ssrc->data() + end1,
+          //         other.m_Ssrc->data() + end1, other.m_Ssrc->data() + end2, m_Sdst->data() + begin1);
+          // std::swap(*m_Ssrc, *m_Sdst);
+          m_current_domain.join(other.m_current_domain);
+          m_nsplit += other.m_nsplit + 1;
         }
 
 
@@ -256,12 +266,7 @@ namespace mln
         bool	             m_has_previous;
         box2d	             m_current_domain;
 
-	std::vector<std::size_t>*  m_Ssrc;
-
-	// for parallel version only
-	std::vector<std::size_t>*  m_Sdst;
-	image2d<bool> m_dejavu;
-
+	std::vector<std::size_t>*  m_S;
 
 	unsigned	     m_nsplit;
       };
@@ -276,17 +281,22 @@ namespace mln
 	{
 	}
 
-
 	void
 	operator() (const box2d& domain) const
 	{
 	  image2d<std::size_t> parent = m_parent | domain;
 	  mln_foreach(auto& p, parent.values())
-	    p = internal::zfind_repr(m_ima, m_parent, p);
+            {
+              p = internal::zfind_repr(m_ima, m_parent, p);
+
+
+            }
 	}
 
-	const image2d<V>&	m_ima;
-	image2d<std::size_t>&   m_parent;
+	const image2d<V>&	  m_ima;
+	image2d<std::size_t>&     m_parent;
+        std::vector<std::size_t>& m_S;
+        image2d<std::size_t>      m_dejavu;
 
       };
 

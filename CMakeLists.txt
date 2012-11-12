@@ -30,7 +30,7 @@ endif()
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories(${TBB_INCLUDE_DIRS})
 link_directories(${TBB_LIBRARY_DIRS})
-link_libraries(${TBB_LIBRARIES})
+link_libraries(${TBB_LIBRARIES} rt)
 
 set(CMAKE_CXX_FLAGS "-W -Wextra -Wall -std=c++0x")
 set(CMAKE_CXX_FLAGS_DEBUG "-W -Wextra -Wall -g -ggdb")

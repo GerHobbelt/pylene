@@ -67,6 +67,34 @@ namespace mln
 
     }
 
+    void
+    check_S(const image2d<std::size_t>& parent, const std::size_t* begin, const std::size_t* end)
+    {
+      image2d<bool> dejavu;
+      resize(dejavu, parent, 3, false);
+
+      dejavu[*begin] = true;
+      for (;begin != end; ++begin) {
+        assert(dejavu[parent[*begin]]);
+        dejavu[*begin] = true;
+      }
+
+    }
+
+    static
+    inline
+    void
+    addP(image2d<bool>& dejavu, const image2d<std::size_t>& parent, std::size_t p, (std::size_t*)& dst)
+    {
+      if (!deja_vu[p])
+        {
+          deja_vu[p] = true;
+          addAncestor(deja_vu, parent, parent[p], dst);
+          *(dst++) = p;
+        }
+    }
+
+
     // tree merging
     // note: dst may alias with src2 but not src1
     void merge_S(const image2d<std::size_t>& parent,
@@ -78,6 +106,9 @@ namespace mln
       mln_precondition(dst != src1);
       mln_precondition(src2 == end1 or (src2 == (dst + (end1-src1))));
 
+      std::size_t* buffer = dst;
+      std::size_t n = (end1-src1) + (end2-src2);
+
       if (parent[*src1] == *src1)
 	*dst = *(src1++);
       else
@@ -86,14 +117,24 @@ namespace mln
       mln_assertion(parent[*dst] == *dst);
       deja_vu[*(dst++)] = true;
 
-      while (src1 < end1 and src2 < end2)
-	{
+      for (;src1 != end1; ++src1)
+        if (!deja_vu[*src1])
+          {
+            std::size_t q = parent[*src1];
+            while (!deja_vu[q]) {
+              *ds
+            }
+            *(dst++) = *src1;
+          }
+
 	  if (deja_vu[parent[*src1]])
 	    *dst = *(src1++);
-	  else {
-	    mln_assertion(deja_vu[parent[*src2]]);
+	  else if (deja_vu[parent[*src2]])
 	    *dst = *(src2++);
-	  }
+          else
+            {
+              
+            }
 	  deja_vu[*(dst++)] = true;
 	}
 
@@ -102,6 +143,8 @@ namespace mln
 	std::copy(src1, end1, dst);
       else if (src2 != end2 and src2 != dst)
 	std::copy(src2, end2, dst);
+
+      check_S(parent, buffer, buffer+n);
     }
 
   }

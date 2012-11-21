@@ -27,9 +27,16 @@ namespace mln
     namespace impl
     {
 
-      template <typename V, typename Neighborhood, typename StrictWeakOrdering>
+      
+
+
+      template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
       struct MaxTreeAlgorithmUF
       {
+	static constexpr bool level_compression = value_traits<V>::quant < 18;
+	static constexpr bool use_dejavu = false;
+	static constexpr std::size_t UNINITIALIZED = std::numeric_limits<std::size_t>::max();
+
         MaxTreeAlgorithmUF(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
           : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false)
         {
@@ -37,7 +44,7 @@ namespace mln
 	  m_S = new std::vector<std::size_t>(n);
 
           resize(m_parent, ima);
-          resize(m_zpar, ima);
+          resize(m_zpar, ima, ima.border(), UNINITIALIZED);
 	  m_nsplit = 0;
         }
 
@@ -66,15 +73,18 @@ namespace mln
           image2d<V> ima = m_ima | domain;
           image2d<std::size_t> parent = m_parent | domain;
           image2d<std::size_t> zpar = m_zpar | domain;
-          image2d<bool> deja_vu;
+
 
 	  const box2d& d = m_ima.domain();
 	  std::size_t i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);
 	  std::size_t* S = m_S->data() + i;
 
-          resize(deja_vu, ima, m_ima.border(), false);
+	  image2d<bool> deja_vu;
+	  if (use_dejavu)
+	    resize(deja_vu, ima, m_ima.border(), false);
 
-	  //int djvu_offset = deja_vu.index_of_point(domain.pmin) - ima.index_of_point(domain.pmin);
+	  std::size_t first_index = ima.index_of_point(ima.domain().pmin);
+	  std::size_t last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
 
 
           sort_indexes_it(ima, S, m_cmp);
@@ -87,11 +97,12 @@ namespace mln
 	      std::size_t p = S[i];
 	      //std::cout << deja_vu.point_at_index(djvu_offset + p) << std::endl;
               // make set
-	      assert(domain.has(deja_vu.point_at_index(p)));
+	      assert(!use_dejavu or domain.has(deja_vu.point_at_index(p)));
               {
                 parent[p] = p;
                 zpar[p] = p;
-                deja_vu[p] = true;
+		if (use_dejavu)
+		  deja_vu[p] = true;
               }
 
 	      std::size_t z = p; // zpar of p
@@ -99,29 +110,37 @@ namespace mln
 		{
 		  std::size_t n = p + dindexes[j];
 
-		  if (deja_vu[n])
+		  bool processed;
+		  if (use_dejavu)
+		    processed = deja_vu[n];
+		  else if (!parallel) // no bound checking
+		    processed = (zpar[n] != UNINITIALIZED);
+		  else
+		    processed = (zpar[n] != UNINITIALIZED) and (first_index <= n and n < last_index);
+
+		  if (processed)
                   {
 		    std::size_t r = zfindroot(zpar, n);
 
                     if (r != z) // make union
                       {
-		    	if (ima[r] != ima[z]) {
-		    	  parent[r] = z;
-		    	  zpar[r] = z;
-                          *(--R) = r;
-		    	} else {  // level compression
-		    	  parent[z] = r;
-		    	  zpar[z] = r;
-                          *(--R) = z;
-		    	  z = r;
-		    	}
+			if (level_compression and ima[r] == ima[z])
+			  std::swap(r, z);
+
+			parent[r] = z;
+			zpar[r] = z;
+			if (level_compression and !parallel)
+			  *(--R) = r;
                       }
                   }
 		}
             }
-          *(--R) = parent[S[0]];
-          assert(R == S);
-          check_S(parent, S, S + ima.domain().size());
+
+	  if (level_compression and !parallel) {
+	    *(--R) = parent[S[0]];
+	    assert(R == S);
+	    check_S(parent, S, S + ima.domain().size());
+	  }
 	}
 
 
@@ -259,7 +278,7 @@ namespace mln
 	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
 	maxtree_ufind(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
-	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
+	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering, true> algo(ima, nbh, cmp);
 	  int grain = std::max(ima.nrows() / 64, 1u);
 	  std::cout << "Grain: " << grain << std::endl;
 	  tbb::parallel_reduce(grain_box2d(ima.domain(), grain), algo, tbb::auto_partitioner());
@@ -279,7 +298,7 @@ namespace mln
 	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
 	maxtree_ufind_line(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
-	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
+	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering, true> algo(ima, nbh, cmp);
 	  std::cout << "Grain: " <<  1 << std::endl;
 	  tbb::parallel_reduce(ima.domain(), algo, tbb::simple_partitioner());
 
@@ -305,7 +324,7 @@ namespace mln
 	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
 	maxtree_ufind(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
-	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering> algo(ima, nbh, cmp);
+	  MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering, false> algo(ima, nbh, cmp);
 	  algo(ima.domain());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
@@ -320,6 +339,8 @@ namespace mln
 
 	  std::vector<std::size_t> S = std::move(*(algo.m_S));
 	  delete algo.m_S;
+
+	  canonize(ima, S, algo.m_parent);
 	  return std::make_pair(std::move(algo.m_parent), std::move(S));
 	}
 

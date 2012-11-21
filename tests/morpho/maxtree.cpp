@@ -108,6 +108,13 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
     BOOST_CHECK(all(parent == parent1));
   }
 
+  {
+    std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
 
   {
     std::tie(parent, S) = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp );
@@ -126,44 +133,47 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
   }
 
 
-  auto parent6 = morpho::impl::serial::maxtree_ufindrank(ima, c4, cmp );
-  auto parent7 = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp );
-  auto parent8 = morpho::impl::serial::maxtree_pqueue(ima, c4, cmp );
-  auto parent9 = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp );
-  //io::imprint(parent1);
-  //io::imprint(parent4);
-  //io::imprint(parent4_);
-  //io::imprint(parent8);
+  {
+    std::tie(parent, S) = morpho::impl::serial::maxtree_ufindrank(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
 
-  //BOOST_CHECK(iscanonized(ima, parent2));
-  //BOOST_CHECK(iscanonized(ima, parent3));
-  BOOST_CHECK(iscanonized(ima, parent6));
-  BOOST_CHECK(iscanonized(ima, parent7));
-  BOOST_CHECK(iscanonized(ima, parent8));
-  BOOST_CHECK(iscanonized(ima, parent9));
+  {
+    std::tie(parent, S) = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
 
 
-  //unify_parent(ima, S1, parent2);
-  //unify_parent(ima, S1, parent3);
-  unify_parent(ima, S1, parent6);
-  unify_parent(ima, S1, parent7);
-  unify_parent(ima, S1, parent8);
-  unify_parent(ima, S1, parent9);
-  //io::imprint(parent1);
-  //io::imprint(parent4);
-  //BOOST_CHECK(all(parent1 == parent3));
-  //BOOST_CHECK(all(parent1 == parent5));
-  BOOST_CHECK(all(parent1 == parent6));
-  BOOST_CHECK(all(parent1 == parent7));
-  BOOST_CHECK(all(parent1 == parent8));
-  BOOST_CHECK(all(parent1 == parent9));
+
+  {
+    std::tie(parent, S) = morpho::impl::serial::maxtree_pqueue(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
+
+  {
+    std::tie(parent, S) = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
+
 }
 
 
 BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
-  typedef UInt<8> V;
+  typedef UInt<18> V;
   image2d<V> ima(300, 100);
 
   std::random_device rd;

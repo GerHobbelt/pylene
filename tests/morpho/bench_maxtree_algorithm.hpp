@@ -58,9 +58,11 @@ bench_algo(const mln::image2d<V>&  ima,
   task_scheduler_init ts(nthread);
 
   mln::image2d<std::size_t> parent;
+  std::vector<std::size_t> S;
+
   auto t0 = tick_count::now();
   for (int i = 0; i < ntest; ++i)
-    parent = algo (ima, mln::c4, std::less<V> ());
+    std::tie(parent, S) = algo (ima, mln::c4, std::less<V> ());
   auto t1 = tick_count::now();
   std::cout << "Run in:\t" << (t1-t0).seconds() / ntest << std::endl;
 }

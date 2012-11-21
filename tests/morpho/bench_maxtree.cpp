@@ -170,7 +170,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Serial Union Find Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -178,7 +178,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -186,7 +186,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find Line Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -195,7 +195,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::serial::maxtree_hqueue(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::serial::maxtree_hqueue(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Serial Hqueue Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -203,7 +203,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::parallel::maxtree_hqueue(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::parallel::maxtree_hqueue(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Hqueue Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -212,7 +212,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::serial::maxtree_ufindrank(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::serial::maxtree_ufindrank(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Serial Union Find By Rank Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -220,7 +220,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Union Find By Rank Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -228,7 +228,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::serial::maxtree_pqueue(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::serial::maxtree_pqueue(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Serial PQueue Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }
@@ -236,7 +236,7 @@ int main(int ac, char** av)
   {
     t0 = tick_count::now();
     for (int i = 0; i < NTEST; ++i)
-      parent = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp);
+      std::tie(parent, S) = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp);
     t1 = tick_count::now();
     std::cout << "Parallel Pqueue Maxtree: " << (t1-t0).seconds() / NTEST << std::endl;
   }

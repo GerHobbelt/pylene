@@ -21,12 +21,16 @@ namespace mln
     namespace internal
     {
 
-      template <typename V, typename Neighborhood, typename StrictWeakOrdering>
+      template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
       void
       maxtree_flood_pqueue_algorithm(const image2d<V>& ima,
 				     image2d<std::size_t>& parent,
-				     const Neighborhood& , StrictWeakOrdering cmp)
+				     const Neighborhood& , StrictWeakOrdering cmp, std::size_t* Send)
       {
+	static constexpr bool use_dejavu = true;
+	static constexpr std::size_t UNINITIALIZED = std::numeric_limits<std::size_t>::max();
+	static constexpr std::size_t INQUEUE = 0;
+
 	image2d<bool> deja_vu;
 	typedef std::vector<std::size_t> vec_t;
 	vec_t v_stack; v_stack.reserve(ima.domain().size());
@@ -37,10 +41,19 @@ namespace mln
 	  pqueue(fcmp, std::move(v_pqueue));
 	auto nbh_delta_indexes = wrt_delta_index(ima, Neighborhood::dpoints);
 
+	std::size_t* Send_ = Send;
+	(void) Send_;
+
+	std::size_t first_index = ima.index_of_point(ima.domain().pmin);
+	std::size_t last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
+
+
 	// INIT
 	{
-	  resize(deja_vu, ima, (ima.index_strides()[0] - ima.ncols()) / 2, false);
-	  extension::fill(deja_vu, true);
+	  if (use_dejavu) {
+	    resize(deja_vu, ima, (ima.index_strides()[0] - ima.ncols()) / 2, false);
+	    extension::fill(deja_vu, true);
+	  }
 
 	  // Get min element and reserve queue
 	  std::size_t pmin = ima.index_of_point(ima.domain().pmin);
@@ -58,7 +71,10 @@ namespace mln
 
 	    pqueue.push(pmin);
 	    stack.push(pmin);
-	    deja_vu[pmin] = true;
+	    if (use_dejavu)
+	      deja_vu[pmin] = true;
+	    else
+	      parent[pmin] = 0;
 	  }
 	}
 
@@ -79,6 +95,7 @@ namespace mln
 		  {
 		    stack.pop();
 		    parent[repr] = par;
+		    if (!parallel) *(--Send) = repr;
 		    repr = par;
 		    par = stack.top();
 		  }
@@ -87,6 +104,7 @@ namespace mln
 		  par = p;
 		}
 		parent[repr] = par;
+		if (!parallel) *(--Send) = repr;
 		repr = par;
 	      }
 
@@ -96,9 +114,20 @@ namespace mln
 	    mln_foreach(auto k, nbh_delta_indexes)
 	      {
 		auto q = p + k;
-		if (!deja_vu[q]) {
+		bool processed;
+		if (use_dejavu)
+		  processed = deja_vu[q];
+		else if (!parallel)
+		  processed = (parent[q] != UNINITIALIZED);
+		else
+		  processed = !(first_index <= q and q < last_index) or (parent[q] != UNINITIALIZED); 
+
+		if (!processed) {
 		  pqueue.push(q);
-		  deja_vu[q] = true;
+		  if (use_dejavu)
+		    deja_vu[q] = true;
+		  else
+		    parent[q] = INQUEUE;
 		  if (cmp(ima[p], ima[q])) {
 		    stack.push(q);
 		    done = false;
@@ -109,9 +138,19 @@ namespace mln
 
 	    if (done) {
 	      parent[p] = repr;
+	      if (!parallel and p != repr) *(--Send) = p;
 	      pqueue.pop();
 	    }
 	  }
+
+	if (!parallel)
+	  while (!stack.empty()) {
+	    *(--Send) = stack.top();
+	    stack.pop();
+	  }
+
+	if (!parallel)
+	  assert((Send + ima.domain().size()) == Send_);
 
       }
 

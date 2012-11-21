@@ -27,13 +27,24 @@ namespace mln
       template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
       struct MaxTreeAlgorithmHQ
       {
+	static constexpr std::size_t UNINITIALIZED = std::numeric_limits<std::size_t>::max();
+	static constexpr std::size_t INQUEUE = 0;
+	static constexpr bool use_dejavu = false;
+
         MaxTreeAlgorithmHQ(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
           : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false)
         {
-          resize(m_parent, ima);
+	  if (!use_dejavu) {
+	    resize(m_parent, ima, ima.border(), UNINITIALIZED);
+	    extension::fill(m_parent, INQUEUE);
+	  } else {
+	    resize(m_parent, ima);
+	  }
+
 	  m_nsplit = 0;
-	  if (!parallel)
+	  if (!parallel) {
 	    m_S.resize(ima.domain().size());
+	  }
         }
 
 

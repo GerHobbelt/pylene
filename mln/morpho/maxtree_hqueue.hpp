@@ -27,7 +27,10 @@ namespace mln
 	typedef typename indexer<V,StrictWeakOrdering>::index_type level_t;
 	typedef std::size_t  elt_type; // either point or index
 	static constexpr std::size_t nlevels = 1ul << value_traits<level_t>::quant;
+	static constexpr bool use_dejavu = true;
 
+	static constexpr std::size_t UNINITIALIZED =  std::numeric_limits<std::size_t>::max();
+	static constexpr std::size_t INQUEUE = 0;
 
 	level_t flood(level_t level)
 	{
@@ -48,7 +51,16 @@ namespace mln
 	      mln_foreach(auto k, m_nbh_delta_indexes)
 		{
 		  auto q = p + k;
-		  if (!m_deja_vu[q])
+
+		  bool processed;
+		  if (use_dejavu)
+		    processed = m_deja_vu[q];
+		  else if (!parallel) // no bound checking
+		    processed = (m_parent[q] != UNINITIALIZED);
+		  else
+		    processed = q < m_first_index or m_last_index <= q or (m_parent[q] != UNINITIALIZED);
+
+		  if (!processed)
 		    {
 		      level_t newlevel = m_h(m_ima[q]);
 		      if (!m_has_repr[newlevel])
@@ -58,7 +70,10 @@ namespace mln
 			}
                       //std::cout << "++ push: " << q << " @ " << (int)newlevel << std::endl;
 		      m_q.push_at_level(q, newlevel);
-		      m_deja_vu[q] = true;
+		      if (use_dejavu)
+			m_deja_vu[q] = true;
+		      else
+			m_parent[q] = INQUEUE;
 
 		      if (level < newlevel)
 			do {
@@ -88,8 +103,13 @@ namespace mln
 	    m_nbh_delta_indexes(wrt_delta_index(ima, Neighborhood::dpoints)),
 	    m_has_repr {false,}, m_out (Send)
 	{
-	  resize(m_deja_vu, ima, (ima.index_strides()[0] - ima.ncols()) / 2, false);
-	  extension::fill(m_deja_vu, true);
+	  if (use_dejavu) {
+	    resize(m_deja_vu, ima, (ima.index_strides()[0] - ima.ncols()) / 2, false);
+	    extension::fill(m_deja_vu, true);
+	  }
+
+	  m_first_index = m_ima.index_of_point(m_ima.domain().pmin);
+	  m_last_index =  m_ima.index_of_point(m_ima.domain().pmax) - ima.index_strides()[0];
 
 	  // Get min element and reserve queue
 	  size_t pmin = ima.index_of_point(ima.domain().pmin);
@@ -118,7 +138,10 @@ namespace mln
 	  m_q.push_at_level(pmin, vmin);
 	  m_repr[vmin] = pmin;
 	  m_has_repr[vmin] = true;
-	  m_deja_vu[pmin] = true;
+	  if (use_dejavu)
+	    m_deja_vu[pmin] = true;
+	  else
+	    m_parent[pmin] = INQUEUE;
 	  flood(vmin);
 	}
 
@@ -147,6 +170,8 @@ namespace mln
 	bool			m_has_repr[nlevels];
 	elt_type		m_repr[nlevels];
 	std::size_t*		m_out;
+	std::size_t		m_first_index;
+	std::size_t		m_last_index;
       };
 
     } // end of namespace mln::morpho::internal

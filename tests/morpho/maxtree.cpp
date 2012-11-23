@@ -173,7 +173,7 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
 BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
-  typedef UInt<18> V;
+  typedef UInt<8> V;
   image2d<V> ima(300, 100);
 
   std::random_device rd;

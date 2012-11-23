@@ -20,6 +20,7 @@ namespace mln
 
     bool empty(unsigned l) const;
     void push_at_level(const T& x, unsigned l);
+    T	 top_at_level(unsigned l) const;
     T	 pop_at_level(unsigned l);
 
   private:
@@ -41,6 +42,7 @@ namespace mln
 
     bool empty(unsigned l) const;
     void push_at_level(const T& x, unsigned l);
+    T	 top_at_level(unsigned l) const;
     T	 pop_at_level(unsigned l);
 
   private:
@@ -133,6 +135,17 @@ namespace mln
     return x;
   }
 
+  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  inline
+  T
+  bounded_hqueue<T, nLevel, Allocator, Enable>::top_at_level(unsigned level) const
+  {
+    mln_precondition(level < nLevel);
+    mln_precondition(!empty(level));
+    T x = *(m_tail[level]-1);
+    return x;
+  }
+
   /*********************************/
   /* Implementation specialization */
   /*********************************/
@@ -215,6 +228,18 @@ namespace mln
     mln_precondition(!empty(level));
     T x = std::move(*(--m_tail[level]));
     m_allocator.destroy(m_tail[level]);
+    return x;
+  }
+
+
+  template <typename T, std::size_t nLevel, typename Allocator>
+  inline
+  T
+  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::top_at_level(unsigned level) const
+  {
+    mln_precondition(level < nLevel);
+    mln_precondition(!empty(level));
+    T x = *(m_tail[level]-1);
     return x;
   }
 

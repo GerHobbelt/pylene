@@ -16,6 +16,17 @@ namespace mln
   template <typename V, typename StrictWeakOrdering, typename Enable = void>
   struct indexer;
 
+  namespace internal
+  {
+    struct no_indexer_tag {};
+  }
+
+  template <typename V, typename StrictWeakOrdering>
+  using has_indexer = typename std::is_base_of< internal::no_indexer_tag, indexer<V, StrictWeakOrdering> >::type;
+
+
+  template <typename V, typename StrictWeakOrdering, typename Enable>
+  struct indexer : internal::no_indexer_tag {};
 
   // Specialization for builtin unsigned integral type
   template <typename V>

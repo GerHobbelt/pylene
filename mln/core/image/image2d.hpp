@@ -37,6 +37,7 @@ namespace mln {
   {
   private:
     typedef ndimage_base<T, 2, image2d<T> > base_type;
+    typedef ndimage_base<T, 2, image2d<T> > base;
 
   public:
     typedef typename base_type::domain_type domain_type;
@@ -55,6 +56,18 @@ namespace mln {
     image2d(short nrows, short ncols, unsigned border = 3)
       : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{0,0},{nrows, ncols}}, border)
     {
+    }
+
+    using base::at;
+
+    T& at(short nrows, short ncols)
+    {
+      return base::at(typename base::point_type(nrows, ncols));
+    }
+
+    const T& at(short nrows, short ncols) const
+    {
+      return base::at(typename base::point_type(nrows, ncols));
     }
 
     unsigned nrows() const { return this->domain_.pmax[0] - this->domain_.pmin[0]; }

@@ -14,24 +14,25 @@ namespace mln
     // tree merging
     template <typename V, typename StrictWeakOrdering>
     void merge_tree(const image2d<V>& ima,
-		    image2d<std::size_t>& parent,
+		    image2d<typename image2d<V>::size_type>& parent,
 		    box2d domain,
 		    StrictWeakOrdering cmp)
     {
+      typedef typename image2d<V>::size_type size_type;
       mln_precondition(!domain.empty());
 
       point2d p_ = domain.pmin;
       point2d q_ = domain.pmin;
       p_[0] = domain.pmax[0]-1;
       q_[0] = domain.pmax[0];
-      std::size_t p = ima.index_of_point(p_);
-      std::size_t q = ima.index_of_point(q_);
+      size_type p = ima.index_of_point(p_);
+      size_type q = ima.index_of_point(q_);
 
       unsigned ncols = ima.ncols();
       for (unsigned i = 0; i < ncols; ++i, ++p, ++q)
 	{
-	  std::size_t x = internal::zfind_repr(ima, parent, p);
-	  std::size_t y = internal::zfind_repr(ima, parent, q);
+	  size_type x = internal::zfind_repr(ima, parent, p);
+	  size_type y = internal::zfind_repr(ima, parent, q);
 	  if (cmp(ima[x], ima[y]))
 	    std::swap(x, y);
 
@@ -51,8 +52,8 @@ namespace mln
 		}
 	      else
 		{
-		  std::size_t z = internal::zfind_parent(ima, parent, x);
-		  if (!cmp(ima[z], ima[y]))
+		  size_type z = internal::zfind_parent(ima, parent, x);
+		  if (!cmp(ima[z], ima[y])) // ima(y) <= ima(z)
 		    x = z;
 		  else
 		    {
@@ -67,8 +68,9 @@ namespace mln
 
     }
 
+    template <typename size_type>
     bool
-    check_S(const image2d<std::size_t>& parent, const std::size_t* begin, const std::size_t* end)
+    check_S(const image2d<size_type>& parent, const size_type* begin, const size_type* end)
     {
       image2d<bool> dejavu;
       resize(dejavu, parent, 3, false);

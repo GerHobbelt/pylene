@@ -24,13 +24,15 @@ namespace mln
       struct maxtree_flood_algorithm
       {
 	typedef mln_value(I) V;
+	typedef typename I::size_type size_type;
+
 	typedef typename indexer<V,StrictWeakOrdering>::index_type level_t;
-	typedef std::size_t  elt_type; // either point or index
+	typedef size_type  elt_type; // either point or index
 	static constexpr std::size_t nlevels = 1ul << value_traits<level_t>::quant;
 	static constexpr bool use_dejavu = true;
 
-	static constexpr std::size_t UNINITIALIZED =  std::numeric_limits<std::size_t>::max();
-	static constexpr std::size_t INQUEUE = 0;
+	static constexpr size_type UNINITIALIZED =  std::numeric_limits<size_type>::max();
+	static constexpr size_type INQUEUE = 0;
 
 	level_t flood(level_t level)
 	{
@@ -44,7 +46,7 @@ namespace mln
 
 	  while (!m_q.empty(level))
 	    {
-	      std::size_t p = m_q.pop_at_level(level);
+	      size_type p = m_q.pop_at_level(level);
 	      if (!parallel and p != r) { *(--m_out) = p; }
 	      m_parent[p] = r;
 
@@ -97,8 +99,8 @@ namespace mln
 	  return level;
 	}
 
-	maxtree_flood_algorithm(const I& ima, image2d<std::size_t>& parent,
-                                const Neighborhood&, StrictWeakOrdering, std::size_t* Send = NULL)
+	maxtree_flood_algorithm(const I& ima, image2d<size_type>& parent,
+                                const Neighborhood&, StrictWeakOrdering, size_type* Send = NULL)
 	  : m_ima(ima), m_parent (parent),
 	    m_nbh_delta_indexes(wrt_delta_index(ima, Neighborhood::dpoints)),
 	    m_has_repr {false,}, m_out (Send)
@@ -116,7 +118,7 @@ namespace mln
 	  level_t vmin = value_traits<level_t>::max();
 	  {
 	    std::vector<std::size_t> h(nlevels, 0);
-	    //std::size_t h[nlevels] = {0,};
+	    //size_type h[nlevels] = {0,};
 
 	    mln_pixter(px, ima);
 	    mln_forall(px)
@@ -145,9 +147,9 @@ namespace mln
 	  flood(vmin);
 	}
 
-	static void run(const I& ima, image2d<std::size_t>& parent,
+	static void run(const I& ima, image2d<size_type>& parent,
 			const Neighborhood& nbh,
-			StrictWeakOrdering cmp, std::size_t* Send)
+			StrictWeakOrdering cmp, size_type* Send)
 	{
 	  maxtree_flood_algorithm x(ima, parent, nbh, cmp, Send);
 	  if (!parallel)
@@ -166,12 +168,12 @@ namespace mln
 	mln_ch_value(I, bool)	    m_deja_vu;
 	mln::array<typename I::difference_type, Neighborhood::static_size> m_nbh_delta_indexes;
 
-	bounded_hqueue<std::size_t, nlevels>  m_q;
+	bounded_hqueue<size_type, nlevels>  m_q;
 	bool			m_has_repr[nlevels];
 	elt_type		m_repr[nlevels];
-	std::size_t*		m_out;
-	std::size_t		m_first_index;
-	std::size_t		m_last_index;
+	size_type*		m_out;
+	size_type		m_first_index;
+	size_type		m_last_index;
       };
 
     } // end of namespace mln::morpho::internal

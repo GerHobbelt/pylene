@@ -86,8 +86,8 @@ namespace mln
     typedef T*			pointer;
     typedef const T*		const_pointer;
     typedef ptrdiff_t		difference_type;
-    typedef size_t		index_type;
-    typedef size_t		size_type;
+    typedef unsigned		index_type;
+    typedef unsigned		size_type;
 
 
 

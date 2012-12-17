@@ -14,6 +14,7 @@
 
 # include <tbb/parallel_reduce.h>
 # include <tbb/parallel_for.h>
+# include <tbb/task_scheduler_init.h>
 
 namespace mln
 {
@@ -27,8 +28,9 @@ namespace mln
       template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
       struct MaxTreeAlgorithmHQ
       {
-	static constexpr std::size_t UNINITIALIZED = std::numeric_limits<std::size_t>::max();
-	static constexpr std::size_t INQUEUE = 0;
+	typedef typename image2d<V>::size_type size_type;
+	static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
+	static constexpr size_type INQUEUE = 0;
 	static constexpr bool use_dejavu = false;
 
         MaxTreeAlgorithmHQ(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
@@ -61,7 +63,7 @@ namespace mln
         operator() (const box2d& domain)
         {
 	  image2d<V> ima = m_ima | domain;
-          image2d<std::size_t> parent = m_parent | domain;
+          image2d<size_type> parent = m_parent | domain;
 
 	  if (parallel)
 	    internal::maxtree_flood_algorithm<image2d<V>, Neighborhood, StrictWeakOrdering, parallel>::run(ima, parent, m_nbh, m_cmp, NULL);
@@ -99,11 +101,11 @@ namespace mln
         Neighborhood	   m_nbh;
         StrictWeakOrdering m_cmp;
 
-        image2d<std::size_t>	 m_parent;
+        image2d<size_type>	 m_parent;
         bool			 m_has_previous;
         box2d			 m_current_domain;
 	unsigned		 m_nsplit;
-	std::vector<std::size_t> m_S;
+	std::vector<size_type> m_S;
       };
 
 
@@ -112,17 +114,19 @@ namespace mln
       namespace parallel
       {
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
+	std::pair< image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type> >
 	maxtree_hqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
+	  typedef typename image2d<V>::size_type size_type;
 	  MaxTreeAlgorithmHQ<V, Neighborhood, StrictWeakOrdering, true> algo(ima, nbh, cmp);
-	  int grain = std::max(ima.nrows() / 64, 1u);
+	  int nmaxsplit = tbb::task_scheduler_init::default_num_threads() * 4;
+	  int grain = std::max(ima.nrows() / nmaxsplit, 1u);
 	  std::cout << "Grain: " << grain << std::endl;
 	  tbb::parallel_reduce(grain_box2d(ima.domain(), grain), algo, tbb::auto_partitioner());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
-	  image2d<std::size_t>& parent = algo.m_parent;
-	  std::vector<std::size_t> S(ima.domain().size());
+	  image2d<size_type>& parent = algo.m_parent;
+	  std::vector<size_type> S(ima.domain().size());
 	  canonize(ima, parent, &S[0]);
 
 	  // MaxtreeCanonizationAlgorithm<V> canonizer(ima, parent);
@@ -137,9 +141,10 @@ namespace mln
       {
 
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
+	std::pair< image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type> >
 	maxtree_hqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
+	  typedef typename image2d<V>::size_type size_type;
 	  MaxTreeAlgorithmHQ<V, Neighborhood, StrictWeakOrdering, false> algo(ima, nbh, cmp);
 	  algo(ima.domain());
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;

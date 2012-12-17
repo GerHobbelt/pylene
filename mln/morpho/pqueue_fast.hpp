@@ -58,9 +58,11 @@ namespace mln
 
     template<typename V, typename Compare, typename Enable = void>
     struct priority_queue_ima :
-      public std::priority_queue<std::size_t, std::vector<std::size_t>, internal::pqueue_cmp_t<V, Compare> >
+      public std::priority_queue<typename image2d<V>::size_type, std::vector<typename image2d<V>::size_type>, internal::pqueue_cmp_t<V, Compare> >
     {
-      typedef std::priority_queue<std::size_t, std::vector<std::size_t>, internal::pqueue_cmp_t<V, Compare> > base;
+      typedef typename image2d<V>::size_type size_type;
+
+      typedef std::priority_queue<size_type, std::vector<size_type>, internal::pqueue_cmp_t<V, Compare> > base;
 
       priority_queue_ima(const image2d<V>& ima, Compare cmp)
 	: base ( internal::pqueue_cmp_t<V, Compare> {ima, cmp} )
@@ -71,8 +73,9 @@ namespace mln
 
 
     template<typename V, typename Compare>
-    struct priority_queue_ima<V, Compare, typename std::enable_if< (value_traits<V>::quant <= 16) >::type>
+    struct priority_queue_ima<V, Compare, typename std::enable_if< (value_traits<V>::quant < 18) >::type>
     {
+      typedef typename image2d<V>::size_type size_type;
 
       priority_queue_ima(const image2d<V>& ima, Compare)
 	: m_ima(ima)
@@ -91,17 +94,17 @@ namespace mln
 	}
       }
 
-      std::size_t top() const { return m_hq.top_at_level(i); }
-      std::size_t pop()
+      size_type top() const { return m_hq.top_at_level(i); }
+      size_type pop()
       {
-	std::size_t x = m_hq.pop_at_level(i);
+	size_type x = m_hq.pop_at_level(i);
 	index_type b = i;
 	while (i > value_traits<index_type>::min() and m_hq.empty(i))
 	  --i;
 	return x;
       }
 
-      void push(std::size_t p) {
+      void push(size_type p) {
 	index_type x = h(m_ima[p]);
 	m_hq.push_at_level(p, x);
 	if (x > i)
@@ -112,11 +115,11 @@ namespace mln
 
     private:
       typedef typename indexer<V, Compare>::index_type index_type;
-      static constexpr unsigned nlevels = 1 << value_traits<index_type>::quant;
+      static constexpr std::size_t nlevels = (std::size_t)1 << value_traits<index_type>::quant;
       const image2d<V>& m_ima;
       indexer<V, Compare> h;
       index_type i;
-      bounded_hqueue<std::size_t, nlevels> m_hq;
+      bounded_hqueue<size_type, nlevels, std::allocator<size_type>, true> m_hq;
     };
 
 

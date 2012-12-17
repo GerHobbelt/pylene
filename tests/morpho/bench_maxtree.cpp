@@ -141,6 +141,7 @@ int main(int ac, char** av)
 
 
   typedef UInt<12> V;
+  typedef typename image2d<V>::size_type size_type;
   image2d<V> ima(4000, 3500);
 
   std::random_device rd;
@@ -153,9 +154,9 @@ int main(int ac, char** av)
 
   static const int NTEST = 3;
 
-  image2d<std::size_t> parent;
+  image2d<size_type> parent;
   image2d<point2d> parent_;
-  std::vector<std::size_t> S;
+  std::vector<size_type> S;
   std::less<V>     cmp;
 
   tick_count t0, t1;

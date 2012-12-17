@@ -23,18 +23,18 @@ namespace mln
     namespace impl
     {
 
-      template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
+      template <typename V, typename Neighborhood, typename StrictWeakOrdering, typename size_type, bool parallel>
       struct MaxTreeAlgorithmUFRank
       {
 	static constexpr bool level_compression = false;// value_traits<V>::quant < 18;
 	static constexpr bool use_dejavu = false;
-	static constexpr std::size_t UNINITIALIZED = std::numeric_limits<std::size_t>::max();
+	static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
 
 	struct aux_data
 	{
 	  unsigned	rank;
-	  std::size_t	zpar;
-	  std::size_t	repr;
+	  size_type	zpar;
+	  size_type	repr;
 	};
 
 
@@ -45,8 +45,8 @@ namespace mln
 	  aux_data x = {0, UNINITIALIZED, 0};
 	  resize(m_aux, ima, ima.border(), x);
 
-	  std::size_t n = m_ima.domain().size();
-	  m_S = new std::vector<std::size_t>(n);
+	  size_type n = m_ima.domain().size();
+	  m_S = new std::vector<size_type>(n);
 	  m_nsplit = 0;
         }
 
@@ -58,10 +58,10 @@ namespace mln
 	  m_nsplit = 0;
         }
 
-	std::size_t
-	zfindroot(image2d<aux_data>& aux, std::size_t p)
+	size_type
+	zfindroot(image2d<aux_data>& aux, size_type p)
 	{
-	  std::size_t q = aux[p].zpar;
+	  size_type q = aux[p].zpar;
 	  if (p != q)
 	    return aux[p].zpar = zfindroot(aux, q);
 	  else
@@ -73,7 +73,7 @@ namespace mln
 	unionfind(const grain_box2d& domain)
 	{
           image2d<V> ima = m_ima | domain;
-          image2d<std::size_t>  parent = m_parent | domain;
+          image2d<size_type>  parent = m_parent | domain;
           image2d<aux_data>  aux = m_aux | domain;
           image2d<bool> deja_vu;
 
@@ -81,20 +81,20 @@ namespace mln
 	    resize(deja_vu, ima, m_ima.border(), false);
 
 	  const box2d& d = m_ima.domain();
-	  std::size_t i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);
-	  std::size_t* S = m_S->data() + i;
+	  size_type i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);
+	  size_type* S = m_S->data() + i;
 
 	  //int djvu_offset = deja_vu.index_of_point(domain.pmin) - ima.index_of_point(domain.pmin);
           sort_indexes_it(ima, S, m_cmp);
 	  auto dindexes = wrt_delta_index(ima, m_nbh.dpoints);
-	  std::size_t* R = S + ima.domain().size();
+	  size_type* R = S + ima.domain().size();
 
-	  std::size_t first_index = ima.index_of_point(ima.domain().pmin);
-	  std::size_t last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
+	  size_type first_index = ima.index_of_point(ima.domain().pmin);
+	  size_type last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
 
           for (int i = ima.domain().size()-1; i >= 0; --i)
             {
-	      std::size_t p = S[i];
+	      size_type p = S[i];
               // make set
               {
                 parent[p] = p;
@@ -104,11 +104,11 @@ namespace mln
 		  deja_vu[p] = true;
               }
 
-	      std::size_t z = p; // zpar of p
-	      std::size_t x = p; // aux[z].repr
+	      size_type z = p; // zpar of p
+	      size_type x = p; // aux[z].repr
               for (unsigned j = 0; j < dindexes.size(); ++j)
 		{
-		  std::size_t n = p + dindexes[j];
+		  size_type n = p + dindexes[j];
 
 		  bool processed;
 		  if (use_dejavu)
@@ -120,7 +120,7 @@ namespace mln
 
 		  if (processed)
                   {
-		    std::size_t r = zfindroot(aux, n);
+		    size_type r = zfindroot(aux, n);
                     if (r != z) // make union
                       {
 			if (level_compression and ima[aux[r].repr] == ima[x]) // FIXME: use !(b>a) for a==b because ima[x]<=ima[repr[r]]
@@ -191,13 +191,13 @@ namespace mln
         Neighborhood	   m_nbh;
         StrictWeakOrdering m_cmp;
 
-        image2d<std::size_t> m_parent;
+        image2d<size_type> m_parent;
         image2d<aux_data>	     m_aux;
 
         bool	          m_has_previous;
         box2d	          m_current_domain;
 
-        std::vector<std::size_t>* m_S;
+        std::vector<size_type>* m_S;
 	unsigned	     m_nsplit;
       };
 
@@ -205,18 +205,19 @@ namespace mln
       namespace parallel
       {
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	std::pair< image2d<std::size_t>, std::vector<std::size_t> >
+	std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type> >
 	maxtree_ufindrank(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
-	  MaxTreeAlgorithmUFRank<V, Neighborhood, StrictWeakOrdering, true> algo(ima, nbh, cmp);
+	  typedef typename image2d<V>::size_type size_type;
+	  MaxTreeAlgorithmUFRank<V, Neighborhood, StrictWeakOrdering, size_type, true> algo(ima, nbh, cmp);
 	  int grain = std::max(ima.nrows() / 64, 1u);
 	  std::cout << "Grain: " << grain << std::endl;
 	  tbb::parallel_reduce(grain_box2d(ima.domain(), grain), algo, tbb::auto_partitioner());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
-	  image2d<std::size_t>& parent = algo.m_parent;
-	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  image2d<size_type>& parent = algo.m_parent;
+	  std::vector<size_type> S = std::move(*(algo.m_S));
 	  delete algo.m_S;
 
 	  canonize(ima, parent, &S[0]);
@@ -230,15 +231,16 @@ namespace mln
       {
 
 	template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-	std::pair<image2d<std::size_t>, std::vector<std::size_t> >
+	std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type> >
 	maxtree_ufindrank(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
-	  MaxTreeAlgorithmUFRank<V, Neighborhood, StrictWeakOrdering, false> algo(ima, nbh, cmp);
+	  typedef typename image2d<V>::size_type size_type;
+	  MaxTreeAlgorithmUFRank<V, Neighborhood, StrictWeakOrdering, size_type, false> algo(ima, nbh, cmp);
 	  algo(ima.domain());
 
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;
 
-	  std::vector<std::size_t> S = std::move(*(algo.m_S));
+	  std::vector<size_type> S = std::move(*(algo.m_S));
 	  delete algo.m_S;
 
 	  // canonization

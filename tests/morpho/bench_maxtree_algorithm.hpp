@@ -14,6 +14,7 @@
 # include <mln/core/value/int.hpp>
 # include <mln/io/imread.hpp>
 
+#include <mln/morpho/maxtree_najman.hpp>
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/maxtree_hqueue_parallel.hpp>
 #include <mln/morpho/maxtree_pqueue_parallel.hpp>
@@ -35,7 +36,7 @@
     }								\
   };
 
-
+MAXTREE_ALGO(meta_serial_najman, mln::morpho::maxtree_najman)
 MAXTREE_ALGO(meta_serial_union_find, mln::morpho::impl::serial::maxtree_ufind)
 MAXTREE_ALGO(meta_parallel_union_find, mln::morpho::impl::parallel::maxtree_ufind)
 MAXTREE_ALGO(meta_parallel_union_find_line, mln::morpho::impl::parallel::maxtree_ufind_line)
@@ -57,8 +58,9 @@ bench_algo(const mln::image2d<V>&  ima,
   using namespace tbb;
   task_scheduler_init ts(nthread);
 
-  mln::image2d<std::size_t> parent;
-  std::vector<std::size_t> S;
+  typedef typename mln::image2d<V>::size_type size_type;
+  mln::image2d<size_type> parent;
+  std::vector<size_type> S;
 
   auto t0 = tick_count::now();
   for (int i = 0; i < ntest; ++i)
@@ -89,16 +91,45 @@ addnoise(const mln::image2d<mln::uint8>& ima)
   return out;
 }
 
+
+mln::image2d<mln::uint8>
+resizetile(const mln::image2d<mln::uint8>& ima, unsigned size)
+{
+  if (size == 0)
+    return ima;
+
+  unsigned nc = ima.ncols(), nr = ima.nrows();
+  float q = (float)nc / nr;
+  unsigned r = std::sqrt(size / q);
+  unsigned c = r * q;
+
+  mln::image2d<mln::uint8> out(r, c);
+  for (unsigned i = 0; i < r; ++i)
+    for (unsigned j = 0; j < c; ++j)
+      out.at(i,j) = ima.at(i % nr, j % nc);
+  return out;
+}
+
 template <typename Algorithm>
 void run_test(int argc, char** argv, Algorithm algo)
 {
   namespace po = boost::program_options;
-  po::options_description desc("Allowed options");
+  po::options_description desc(std::string("Usage: ") + argv[0] + " inputfile\nAllowed options");
   desc.add_options()
     ("help", "produce help message")
     ("nthread", po::value<int>()->default_value((int) tbb::task_scheduler_init::automatic), "set number of thread (default: auto)")
-    ("nbits", po::value<int>()->default_value(8), "set number of bits (default: 8)")
-    ("ntest", po::value<int>()->default_value(3), "number of runs (default: 3)")
+    ("nbits", po::value<int>()->default_value(8),
+     "Set number of bits (default: 8). "
+     "Quantization of the original is changed. Upper bits are moved left "
+     "and missing lower bits are generated at random.")
+    ("ntest", po::value<int>()->default_value(3), "set number of runs (default: 3)")
+    ("sz",  po::value<int>()->default_value(0),
+     "Set size (number of pixels) (0: original). Resize the image "
+     "by tiling or cropping the original until matching the number "
+     "of pixel required. Original ratio width/height is kept.");
+
+  po::options_description hidden;
+  hidden.add_options()
     ("input-file", po::value<std::string>()->required(), "input")
     ;
   po::positional_options_description p;
@@ -107,7 +138,7 @@ void run_test(int argc, char** argv, Algorithm algo)
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).
-	    options(desc).positional(p).run(), vm);
+	    options(desc).options(hidden).positional(p).run(), vm);
   try {
     po::notify(vm);
 
@@ -123,6 +154,9 @@ void run_test(int argc, char** argv, Algorithm algo)
 
   mln::image2d<mln::uint8> ima;
   mln::io::imread(vm["input-file"].as<std::string> (), ima);
+
+  ima = resizetile(ima, vm["sz"].as<int> ());
+  std::cout << "Size:\t" << ima.domain().size() << std::endl;
 
 # define DECL(z, n, text)						\
   case n:								\

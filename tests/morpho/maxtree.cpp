@@ -6,6 +6,7 @@
 #include <mln/morpho/maxtree_ufindrank_parallel.hpp>
 #include <mln/morpho/maxtree_hqueue_parallel.hpp>
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
+#include <mln/morpho/maxtree_najman.hpp>
 #include <mln/morpho/maxtree1d.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/io/imprint.hpp>
@@ -19,14 +20,12 @@ namespace mln
 {
 
 
-  template <typename V>
+  template <typename V, typename size_type>
   void unify_parent(const mln::image2d<V>& f,
-                    const std::vector<std::size_t>&,
-                    mln::image2d<std::size_t>& parent)
+                    const std::vector<size_type>&,
+                    mln::image2d<size_type>& parent)
 
   {
-    mln::image2d< std::set<std::size_t> > ima;
-    resize(ima, parent);
     auto px = parent.pixels().riter();
     mln_forall(px)
       {
@@ -49,9 +48,9 @@ namespace mln
 
 }
 
-template <typename V>
+template <typename V, typename size_type>
 bool iscanonized(const mln::image2d<V>& ima,
-		 const mln::image2d<std::size_t>& parent)
+		 const mln::image2d<size_type>& parent)
 {
   mln_pixter(px, parent);
   mln_forall(px)
@@ -86,14 +85,23 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
 {
   using namespace mln;
 
-
-  image2d<std::size_t> parent1, parent;
-  std::vector<std::size_t> S1, S;
+  typedef typename image2d<V>::size_type size_type;
+  image2d<size_type> parent1, parent;
+  std::vector<size_type> S1, S;
   std::tie(parent1, S1) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
   unify_parent(ima, S1, parent1);
 
   {
     std::tie(parent, S) = morpho::impl::serial::maxtree_hqueue(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, parent));
+    BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
+
+
+  {
+    std::tie(parent, S) = morpho::maxtree_najman(ima, c4, cmp );
     BOOST_CHECK(iscanonized(ima, parent));
     BOOST_CHECK(morpho::check_S(parent, S.data(), S.data() + S.size()));
     unify_parent(ima, S1, parent);
@@ -174,7 +182,9 @@ BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
   typedef UInt<8> V;
+  typedef typename image2d<V>::size_type size_type;
   image2d<V> ima(300, 100);
+
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -184,7 +194,7 @@ BOOST_AUTO_TEST_CASE(Maxtree)
   tbb::task_scheduler_init ts;
 
   // {
-  //   image2d<std::size_t> f;
+  //   image2d<size_type> f;
   //   resize(f, ima);
   //   mln_foreach(auto px, f.pixels())
   //     px.val() = px.index();
@@ -195,8 +205,8 @@ BOOST_AUTO_TEST_CASE(Maxtree)
 
   // {
   //   image2d<point2d> parent_;
-  //   image2d<std::size_t> parent1;
-  //   std::vector<std::size_t> S;
+  //   image2d<size_type> parent1;
+  //   std::vector<size_type> S;
   //   std::less<uint8> cmp;
   //   resize(parent_, ima);
 

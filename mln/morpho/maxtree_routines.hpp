@@ -24,10 +24,10 @@ namespace mln
 
       template <typename V>
       unsigned
-      zfind_repr(const image2d<V>& ima, image2d<std::size_t>& parent,
-		 std::size_t p)
+      zfind_repr(const image2d<V>& ima, image2d<typename image2d<V>::size_type >& parent,
+		 typename image2d<V>::size_type p)
       {
-	std::size_t q = parent[p];
+	typename image2d<V>::size_type q = parent[p];
 	if (q != p and ima[q] == ima[p])
 	  return parent[p] = zfind_repr(ima, parent, q);
 	else
@@ -48,16 +48,16 @@ namespace mln
 
       template <typename V>
       std::size_t
-      zfind_parent(const image2d<V>& ima, image2d<std::size_t>& parent, std::size_t p)
+      zfind_parent(const image2d<V>& ima, image2d<typename image2d<V>::size_type>& parent, typename image2d<V>::size_type p)
       {
 	return parent[p] = zfind_repr(ima, parent, parent[p]);
       }
 
       template <typename V>
       std::size_t
-      zfind_root(const image2d<V>& ima, image2d<std::size_t>& parent, std::size_t p)
+      zfind_root(const image2d<V>& ima, image2d<typename image2d<V>::size_type>& parent, typename image2d<V>::size_type p)
       {
-	std::size_t q = parent[p];
+	typename image2d<V>::size_type q = parent[p];
 	if (q != p)
 	  return parent[p] = zfind_root(ima, parent, q);
 	else

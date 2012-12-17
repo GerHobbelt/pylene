@@ -71,9 +71,10 @@ namespace mln
 
 
     template <typename I, typename StrictWeakOrdering,
+	      typename size_type = typename I::size_type,
 	      typename Indexer = indexer<mln_value(I), StrictWeakOrdering> >
     void
-    sort_indexes(const I& input, std::size_t* v, StrictWeakOrdering, use_radix_sort_tag)
+    sort_indexes(const I& input, size_type* v, StrictWeakOrdering, use_radix_sort_tag)
     {
       typedef typename Indexer::index_type index_t;
       Indexer f;
@@ -85,8 +86,8 @@ namespace mln
       unsigned h[nvalues] = {0,};
       unsigned h2[nvalues2] = {0, };
 
-      std::size_t* buffer;
-      std::tie(buffer, std::ignore) = std::get_temporary_buffer<std::size_t>(n);
+      size_type* buffer;
+      std::tie(buffer, std::ignore) = std::get_temporary_buffer<size_type>(n);
 
       // Last digit first
       {
@@ -197,12 +198,12 @@ namespace mln
     static_assert(std::is_same<typename image_category<I>::type, raw_image_tag>::value,
 		  "Image must model the Raw Image Concept");
     typedef typename
-      std::conditional< (value_traits<mln_value(I)>::quant <= 16), impl::use_counting_sort_tag, impl::use_radix_sort_tag >::type dispatch_tag;
+      std::conditional< (value_traits<mln_value(I)>::quant <= 18), impl::use_counting_sort_tag, impl::use_radix_sort_tag >::type dispatch_tag;
 
     std::vector<typename I::size_type> v;
     v.resize(exact(input).domain().size());
 
-    impl::sort_indexes(exact(input), v.begin(), cmp, dispatch_tag ());
+    impl::sort_indexes(exact(input), &v[0], cmp, dispatch_tag ());
     return v;
   }
 

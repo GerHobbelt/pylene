@@ -25,30 +25,33 @@ namespace mln
       template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
       void
       maxtree_flood_pqueue_algorithm(const image2d<V>& ima,
-				     image2d<std::size_t>& parent,
-				     const Neighborhood& , StrictWeakOrdering cmp, std::size_t* Send)
+				     image2d<typename image2d<V>::size_type>& parent,
+				     const Neighborhood& , StrictWeakOrdering cmp, typename image2d<V>::size_type* Send)
       {
+	typedef typename image2d<V>::size_type size_type;
 	static constexpr bool use_dejavu = true;
-	static constexpr std::size_t UNINITIALIZED = std::numeric_limits<std::size_t>::max();
-	static constexpr std::size_t INQUEUE = 0;
+	static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
+	static constexpr size_type INQUEUE = 0;
+	static constexpr std::size_t nlevels = (std::size_t)1 << value_traits<V>::quant;
+
 
 	image2d<bool> deja_vu;
-	typedef std::vector<std::size_t> vec_t;
-	vec_t v_stack; v_stack.reserve(ima.domain().size());
+	typedef std::vector<size_type> vec_t;
+	vec_t v_stack; v_stack.reserve(std::min<std::size_t>(ima.domain().size(), nlevels));
 	//vec_t v_pqueue; v_pqueue.reserve(ima.domain().size());
-	//auto fcmp = [&ima, cmp] (std::size_t x, std::size_t y) { return cmp(ima[x], ima[y]); };
-	std::stack<std::size_t, vec_t> stack(std::move(v_stack));
+	//auto fcmp = [&ima, cmp] (size_type x, size_type y) { return cmp(ima[x], ima[y]); };
+	std::stack<size_type, vec_t> stack(std::move(v_stack));
 	priority_queue_ima<V, StrictWeakOrdering> pqueue(ima, cmp);
 
-	  //std::priority_queue<std::size_t, vec_t, decltype(fcmp)>
+	  //std::priority_queue<size_type, vec_t, decltype(fcmp)>
 	  //pqueue(fcmp, std::move(v_pqueue));
 	auto nbh_delta_indexes = wrt_delta_index(ima, Neighborhood::dpoints);
 
-	std::size_t* Send_ = Send;
+	size_type* Send_ = Send;
 	(void) Send_;
 
-	std::size_t first_index = ima.index_of_point(ima.domain().pmin);
-	std::size_t last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
+	size_type first_index = ima.index_of_point(ima.domain().pmin);
+	size_type last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
 
 
 	// INIT
@@ -59,7 +62,7 @@ namespace mln
 	  }
 
 	  // Get min element and reserve queue
-	  std::size_t pmin = ima.index_of_point(ima.domain().pmin);
+	  size_type pmin = ima.index_of_point(ima.domain().pmin);
 	  //V vmin = ima[pmin];
 	  {
 	    // mln_pixter(px, ima);
@@ -81,16 +84,12 @@ namespace mln
 	  }
 	}
 
-	unsigned cpt = 0;
-	unsigned cpt2 = 0;
-	unsigned cpt3 = 0;
-	unsigned cpt4 = 1;
 
 	while (!pqueue.empty())
 	  {
 	  flood:
-	    std::size_t p = pqueue.top();
-	    std::size_t repr = stack.top();
+	    size_type p = pqueue.top();
+	    size_type repr = stack.top();
 	    assert(ima[p] == ima[repr]);
 
 	    mln_foreach(auto k, nbh_delta_indexes)
@@ -111,53 +110,49 @@ namespace mln
 		  else
 		    parent[q] = INQUEUE;
 		  if (cmp(ima[p], ima[q])) {
-		    stack.push(q); cpt4++;
+		    stack.push(q);
 		    goto flood;
-		  } else if (!cmp(ima[q], ima[p]))
-		    goto flood;
+		  }
 		}
 	      }
 
 	    // p done
 	    pqueue.pop();
 	    parent[p] = repr;
-	    if (!parallel and p != repr) { *(--Send) = p; cpt++; }
-	    cpt2++;
+	    if (!parallel and p != repr) *(--Send) = p;
 
 	    // Stack handle : attach to parent
 	    if (pqueue.empty()) break;
-	    std::size_t next = pqueue.top();
+	    size_type next = pqueue.top();
 	    assert(!cmp(ima[repr], ima[next]));
 	    if (cmp(ima[next], ima[repr]))
 	      {
-		//std::size_t par;
+		//size_type par;
 		stack.pop();
 		while (!stack.empty() and cmp(ima[next], ima[stack.top()]))
 		  {
-		    if (!parallel) { *(--Send) = repr; cpt3++; }
+		    if (!parallel) *(--Send) = repr;
 		    repr = (parent[repr] = stack.top());
 		    stack.pop();
 		  }
-		if (stack.empty() or cmp(ima[stack.top()], ima[next])) {
-		  stack.push(next); cpt4++;
-		}
+		if (stack.empty() or cmp(ima[stack.top()], ima[next]))
+		  stack.push(next);
 
 		parent[repr] = stack.top();
-		if (!parallel) { *(--Send) = repr; cpt3++; }
+		if (!parallel) *(--Send) = repr;
 	      }
 	  }
 
 	assert(stack.size() == 1);
 	if (!parallel)
 	  *(--Send) = stack.top();
-	cpt3++;
 
-	std::cout << ima.domain().size()  << std::endl;
-	std::cout << cpt  << std::endl;
-	std::cout << cpt2  << std::endl;
-	std::cout << "D:" << (cpt2-cpt)  << std::endl;
-	std::cout << cpt3  << std::endl;
-	std::cout << cpt4  << std::endl;
+	// std::cout << ima.domain().size()  << std::endl;
+	// std::cout << cpt  << std::endl;
+	// std::cout << cpt2  << std::endl;
+	// std::cout << "D:" << (cpt2-cpt)  << std::endl;
+	// std::cout << cpt3  << std::endl;
+	// std::cout << cpt4  << std::endl;
 
 	if (!parallel)
 	  assert((Send + ima.domain().size()) == Send_);
@@ -166,8 +161,8 @@ namespace mln
 	/* 	// Flood
 	while (!pqueue.empty())
 	  {
-	    std::size_t p = pqueue.top();
-	    std::size_t repr = stack.top();
+	    size_type p = pqueue.top();
+	    size_type repr = stack.top();
 
 	    if (cmp(ima[p], ima[repr]))
 	      {
@@ -175,7 +170,7 @@ namespace mln
 		// we attach repr to its parent
 		stack.pop();
 		assert(!stack.empty());
-		std::size_t par = stack.top();
+		size_type par = stack.top();
 		while (cmp(ima[p], ima[par]))
 		  {
 		    stack.pop();
@@ -243,10 +238,11 @@ namespace mln
 
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-    image2d<std::size_t>
+    image2d<typename image2d<V>::size_type>
     maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
     {
-      image2d<std::size_t> parent;
+      typedef typename image2d<V>::size_type size_type;
+      image2d<size_type> parent;
       resize(parent, ima);
 
       internal::maxtree_flood_pqueue_algorithm(ima, parent, nbh, cmp);

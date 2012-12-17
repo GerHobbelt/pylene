@@ -9,7 +9,7 @@
 namespace mln
 {
 
-  template <typename T, std::size_t nLevel, typename Allocator = std::allocator<T>, typename Enable = void >
+  template <typename T, std::size_t nLevel, typename Allocator = std::allocator<T>, bool queue = false, typename Enable = void>
   struct bounded_hqueue
   {
     bounded_hqueue();
@@ -31,8 +31,8 @@ namespace mln
     T*		m_end;
   };
 
-  template <typename T, std::size_t nLevel, typename Allocator>
-  struct bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
+  struct bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>
   {
     bounded_hqueue();
     explicit bounded_hqueue(const size_t* histo);
@@ -57,23 +57,23 @@ namespace mln
   /** Implementation **/
   /********************/
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
-  bounded_hqueue<T, nLevel, Allocator, Enable>::bounded_hqueue()
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::bounded_hqueue()
     : m_head {{NULL,}}, m_tail {{NULL,}}, m_q(NULL), m_end (NULL)
   {
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
-  bounded_hqueue<T, nLevel, Allocator, Enable>::bounded_hqueue(const size_t* histo)
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::bounded_hqueue(const size_t* histo)
   {
     init(histo);
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
-  bounded_hqueue<T, nLevel, Allocator, Enable>::~bounded_hqueue()
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::~bounded_hqueue()
   {
     if (m_q != NULL)
       {
@@ -85,10 +85,10 @@ namespace mln
   }
 
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
   void
-  bounded_hqueue<T, nLevel, Allocator, Enable>::init(const size_t* histo)
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::init(const size_t* histo)
   {
     mln_precondition(m_q == NULL);
 
@@ -104,46 +104,57 @@ namespace mln
   }
 
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
   bool
-  bounded_hqueue<T, nLevel, Allocator, Enable>::empty(unsigned level) const
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::empty(unsigned level) const
   {
     mln_precondition(level < nLevel);
     return m_head[level] == m_tail[level];
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
   void
-  bounded_hqueue<T, nLevel, Allocator, Enable>::push_at_level(const T& x, unsigned level)
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::push_at_level(const T& x, unsigned level)
   {
     mln_precondition(level < nLevel);
     mln_precondition(m_tail[level] < m_end and (level == nLevel-1 or m_tail[level] < m_head[level+1]));
     m_allocator.construct(m_tail[level]++, x);
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
   T
-  bounded_hqueue<T, nLevel, Allocator, Enable>::pop_at_level(unsigned level)
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::pop_at_level(unsigned level)
   {
     mln_precondition(level < nLevel);
     mln_precondition(!empty(level));
-    T x = std::move(*(--m_tail[level]));
-    m_allocator.destroy(m_tail[level]);
-    return x;
+    if (queue) {
+      T x = std::move(*(m_head[level]));
+      m_allocator.destroy(m_head[level]++);
+      return x;
+    } else {
+      T x = std::move(*(--m_tail[level]));
+      m_allocator.destroy(m_tail[level]);
+      return x;
+    }
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator, typename Enable>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline
   T
-  bounded_hqueue<T, nLevel, Allocator, Enable>::top_at_level(unsigned level) const
+  bounded_hqueue<T, nLevel, Allocator, queue, Enable>::top_at_level(unsigned level) const
   {
     mln_precondition(level < nLevel);
     mln_precondition(!empty(level));
-    T x = *(m_tail[level]-1);
-    return x;
+    if (queue) {
+      T x = *(m_head[level]);
+      return x;
+    } else {
+      T x = *(m_tail[level]-1);
+      return x;
+    }
   }
 
   /*********************************/
@@ -151,25 +162,25 @@ namespace mln
   /*********************************/
 
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::bounded_hqueue()
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::bounded_hqueue()
     : m_q(NULL), m_end (NULL)
   {
     m_head.resize(nLevel);
     m_tail.resize(nLevel);
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::bounded_hqueue(const size_t* histo)
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::bounded_hqueue(const size_t* histo)
   {
     init(histo);
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::~bounded_hqueue()
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::~bounded_hqueue()
   {
     if (m_q != NULL)
       {
@@ -181,10 +192,10 @@ namespace mln
   }
 
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
   void
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::init(const size_t* histo)
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::init(const size_t* histo)
   {
     mln_precondition(m_q == NULL);
 
@@ -200,47 +211,58 @@ namespace mln
   }
 
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
   bool
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::empty(unsigned level) const
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::empty(unsigned level) const
   {
     mln_precondition(level < nLevel);
     return m_head[level] == m_tail[level];
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
   void
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::push_at_level(const T& x, unsigned level)
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::push_at_level(const T& x, unsigned level)
   {
     mln_precondition(level < nLevel);
     mln_precondition(m_tail[level] < m_end and (level == nLevel-1 or m_tail[level] < m_head[level+1]));
     m_allocator.construct(m_tail[level]++, x);
   }
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
   T
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::pop_at_level(unsigned level)
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::pop_at_level(unsigned level)
   {
     mln_precondition(level < nLevel);
     mln_precondition(!empty(level));
-    T x = std::move(*(--m_tail[level]));
-    m_allocator.destroy(m_tail[level]);
-    return x;
+    if (queue) {
+      T x = std::move(*(m_head[level]));
+      m_allocator.destroy(m_head[level]++);
+      return x;
+    } else {
+      T x = std::move(*(--m_tail[level]));
+      m_allocator.destroy(m_tail[level]);
+      return x;
+    }
   }
 
 
-  template <typename T, std::size_t nLevel, typename Allocator>
+  template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline
   T
-  bounded_hqueue<T, nLevel, Allocator, typename std::enable_if< (nLevel > 16) >::type>::top_at_level(unsigned level) const
+  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if< (nLevel > 16) >::type>::top_at_level(unsigned level) const
   {
     mln_precondition(level < nLevel);
     mln_precondition(!empty(level));
-    T x = *(m_tail[level]-1);
-    return x;
+    if (queue) {
+      T x = *(m_head[level]);
+      return x;
+    } else {
+      T x = *(m_tail[level]-1);
+      return x;
+    }
   }
 
 

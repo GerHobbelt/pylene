@@ -1,5 +1,8 @@
 
-add_executable(maxtree_serial_ufind bench_serial_ufind.cpp)
+add_executable(maxtree_serial_najman bench_serial_najman.cpp)
+add_executable(maxtree_serial_ufind    bench_serial_ufind.cpp)
+add_executable(maxtree_serial_berger   bench_serial_ufind.cpp)
+add_executable(maxtree_serial_ufind_wlc bench_serial_ufind.cpp)
 add_executable(maxtree_parallel_ufind bench_parallel_ufind.cpp)
 add_executable(maxtree_parallel_ufind_line bench_parallel_ufind_line.cpp)
 add_executable(maxtree_serial_ufindrank bench_serial_ufindrank.cpp)
@@ -11,9 +14,17 @@ add_executable(maxtree_parallel_pqueue bench_parallel_pqueue.cpp)
 
 add_executable(maxtree maxtree.cpp)
 add_executable(bench_maxtree bench_maxtree.cpp)
+
+set_target_properties(maxtree_serial_berger PROPERTIES COMPILE_DEFINITIONS NO_LEVEL_COMPRESSION)
+set_target_properties(maxtree_serial_ufind_wlc PROPERTIES COMPILE_DEFINITIONS LEVEL_COMPRESSION)
+
+
 target_link_libraries(bench_maxtree ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+target_link_libraries(maxtree_serial_najman -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_serial_ufind -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_serial_berger -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(maxtree_serial_ufind_wlc -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_ufind -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_ufind_line -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_serial_ufindrank -lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})

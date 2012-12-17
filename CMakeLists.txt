@@ -12,7 +12,7 @@ find_package(Boost 1.42 COMPONENTS program_options unit_test_framework REQUIRED)
 find_package(TBB)
 
 if(TBB_FOUND)
-        MESSAGE (STATUS "TBB found in ${TBB_INSTALL_DIR}")
+        MESSAGE (STATUS "TBB found in ${TBB_INSTALL_DIR} + ${TBB_LIBRARY_DIRS}")
 else()
         MESSAGE (FATAL "TBB not found.")
 endif()
@@ -32,13 +32,19 @@ include_directories(${TBB_INCLUDE_DIRS})
 link_directories(${TBB_LIBRARY_DIRS})
 link_libraries(${TBB_LIBRARIES} rt)
 
-set(CMAKE_CXX_FLAGS "-W -Wextra -Wall -std=c++0x")
-set(CMAKE_CXX_FLAGS_DEBUG "-W -Wextra -Wall -g -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "-W -Wextra -Wall -O3 -DNDEBUG -march=native")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-W -Wextra -Wall -O3 -DNDEBUG -g -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++0x")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W -Wextra -Wall -g -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -W -Wextra -Wall -O3 -DNDEBUG -march=native")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -W -Wextra -Wall -O3 -DNDEBUG -g -march=native")
 
 
-# 
+# default buidling type
+if (NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type selected, default to Release")
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+
 ENABLE_TESTING()
 SUBDIRS(tests)
 

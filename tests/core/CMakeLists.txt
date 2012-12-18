@@ -4,6 +4,10 @@ add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 add_executable(array std/array.cpp)
 
+# test Domain
+add_executable(box domain/box.cpp)
+
+add_test(box box)
 
 # test Images
 add_executable(zip_image image/zip_image.cpp)

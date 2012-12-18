@@ -23,16 +23,19 @@
 
 
 # define VEC_BASE_ENABLE_IF(Trait, R)					\
-  typename std::enable_if< vec_base_traits<tag, U>::Trait and std::is_convertible<T,U>::value, R>::type
+  typename std::enable_if< vec_base_traits<tag>::Trait, R>::type
+
+# define VEC_BASE_ENABLE_IFC(Trait, R)					\
+  typename std::enable_if< vec_base_traits<tag>::Trait and std::is_convertible<T,U>::value, R>::type
 
 
 // Element-wise operator
 // Ex: vector u,v,w;
 // w = u + v; <=> w[i] = u[i] + v[i] forall i
 # define VEC_BASE_GEN_EW_OP(Trait, Op)					\
-  template <typename U>							\
-  typename								\
-  std::enable_if< vec_base_traits<tag, U>::Trait, vec_base& >::type	\
+  template <typename U, typename = typename				\
+	    std::enable_if<vec_base_traits<tag>::Trait, U>::type>	\
+  vec_base&								\
   operator Op (const vec_base<U, dim, tag>& o)				\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
@@ -45,9 +48,9 @@
 // Ex: vector u, v; scalar a;
 // u = v + a; <=> u[i] = v[i] + a forall i
 # define VEC_BASE_GEN_EXT_OP(Trait, Op)					\
-  template <typename U>							\
-  typename								\
-  std::enable_if< vec_base_traits<tag, U>::Trait, vec_base& >::type	\
+  template <typename U, typename = typename				\
+	    std::enable_if<vec_base_traits<tag>::Trait, U>::type>	\
+  vec_base&								\
   operator Op (const U& o)						\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
@@ -59,9 +62,9 @@
 // Ex: vector u, v;
 // u < v iif u[i] = v[i] forall i
 # define VEC_BASE_GEN_REL(Trait, Op)					\
-  template <typename U>							\
-  typename								\
-  std::enable_if< vec_base_traits<tag, U>::Trait, bool >::type	\
+  template <typename U, typename = typename				\
+	    std::enable_if<vec_base_traits<tag>::Trait, U>::type>	\
+  bool									\
   operator Op (const vec_base<U, dim, tag>& o) const			\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
@@ -76,7 +79,7 @@
 # define VEC_BASE_GEN_REL_ALL(Trait, Op)				\
   template <typename U>							\
   typename								\
-  std::enable_if< vec_base_traits<tag, U>::Trait, bool >::type		\
+  std::enable_if< vec_base_traits<tag>::Trait, bool >::type		\
   operator Op (const vec_base<U, dim, tag>& o) const			\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
@@ -92,7 +95,7 @@
 # define VEC_BASE_GEN_REL_ANY(Trait, Op)				\
   template <typename U>							\
   typename								\
-  std::enable_if< vec_base_traits<tag, U>::Trait, bool >::type		\
+  std::enable_if< vec_base_traits<tag>::Trait, bool >::type		\
   operator Op (const vec_base<U, dim, tag>& o) const			\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
@@ -107,7 +110,7 @@
 # define VEC_BASE_GEN_EW_OP_EXT(TraitName, Op)				\
   template <typename T, typename U, unsigned dim, typename tag>		\
   typename								\
-  std::enable_if< vec_base_traits<tag, U>::TraitName,		\
+  std::enable_if< vec_base_traits<tag>::TraitName,		\
 		      vec_base<typename std::common_type<T, U>::type , dim, tag> \
 		      >::type						\
   inline								\
@@ -125,7 +128,7 @@
 # define VEC_BASE_GEN_EXT_OP_EXT(TraitName, Op)				\
   template <typename T, typename U, unsigned dim, typename tag>		\
   typename								\
-  boost::lazy_enable_if_c< vec_base_traits<tag,U>::TraitName && std::is_convertible<U,T>::value, \
+  boost::lazy_enable_if_c< vec_base_traits<tag>::TraitName && std::is_convertible<U,T>::value, \
                            vec_base_helper<std::common_type<T, U>, dim, tag> \
                            >::type                                      \
   inline								\
@@ -141,7 +144,7 @@
 									\
   template <typename T, typename U, unsigned dim, typename tag>		\
   typename								\
-  boost::lazy_enable_if_c< vec_base_traits<tag,U>::TraitName && std::is_convertible<U,T>::value, \
+  boost::lazy_enable_if_c< vec_base_traits<tag>::TraitName && std::is_convertible<U,T>::value, \
                            vec_base_helper<std::common_type<T, U>, dim, tag> \
                            >::type                                      \
   inline								\
@@ -157,11 +160,13 @@
 namespace mln
 {
 
+  struct generic_vector_tag {};
+
 
   namespace internal
   {
 
-    template <typename Tag, typename dummy = void>
+    template <typename Tag>
     struct vec_base_traits;
 
     template <typename T, unsigned dim, typename tag = void>
@@ -248,6 +253,18 @@ namespace mln
       T& operator[] (size_type n) { mln_precondition(n < dim); return v_[n]; }
       const T& operator[] (size_type n) const { mln_precondition(n < dim); return v_[n]; }
 
+      vec_base<T, dim, generic_vector_tag>&
+      as_vec()
+      {
+	return *reinterpret_cast< vec_base<T, dim, generic_vector_tag>* >(this);
+      }
+
+      const vec_base<T, dim, generic_vector_tag>&
+      as_vec() const
+      {
+	return *reinterpret_cast<const vec_base<T, dim, generic_vector_tag>* >(this);
+      }
+
       T* begin() { return v_; }
       T* end()   { return v_ + dim; }
       const T* begin() const { return v_; }
@@ -263,16 +280,18 @@ namespace mln
       VEC_BASE_GEN_EW_OP(is_additive, -=)
       VEC_BASE_GEN_EW_OP(is_multiplicative, *=)
       VEC_BASE_GEN_EW_OP(is_multiplicative, /=)
+      VEC_BASE_GEN_EW_OP(is_multiplicative, %=)
 
       /* Ring */
       VEC_BASE_GEN_EXT_OP(is_multiplicative_ext, *=)
       VEC_BASE_GEN_EXT_OP(is_multiplicative_ext, /=)
+      VEC_BASE_GEN_EXT_OP(is_multiplicative_ext, %=)
       VEC_BASE_GEN_EXT_OP(is_additive_ext, -=)
       VEC_BASE_GEN_EXT_OP(is_additive_ext, +=)
 
       /* RELATIONAL */
       template <typename U>
-      VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
+      VEC_BASE_ENABLE_IFC(is_equality_comparable, bool)
       operator== (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
@@ -281,8 +300,19 @@ namespace mln
 	return true;
       }
 
-      template <typename U>
+      template <typename dummy=void>
       VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
+      operator== (const vec_base& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (!(v_[i] == o.v_[i]))
+	    return false;
+	return true;
+      }
+
+
+      template <typename U>
+      VEC_BASE_ENABLE_IFC(is_equality_comparable, bool)
       operator!= (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
@@ -291,39 +321,97 @@ namespace mln
 	return false;
       }
 
+      template <typename dummy=void>
+      VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
+      operator!= (const vec_base& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (v_[i] != o.v_[i])
+	    return true;
+	return false;
+      }
+
+
       template <typename U>
-      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
       operator< (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
 	  if (v_[i] < o.v_[i])
 	    return true;
+	  else if (v_[i] > o.v_[i])
+	    return false;
 	return false;
       }
 
-      template <typename U>
+      template <typename dummy=void>
       VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator< (const vec_base& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (v_[i] < o.v_[i])
+	    return true;
+	  else if (v_[i] > o.v_[i])
+	    return false;
+	return false;
+      }
+
+
+
+      template <typename U>
+      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
       operator<= (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
-	  if (v_[i] > o.v_[i])
+	  if (v_[i] < o.v_[i])
+	    return true;
+	  else if (v_[i] > o.v_[i])
 	    return false;
 	return true;
       }
 
-      template <typename U>
+      template <typename dummy=void>
       VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator<= (const vec_base& o) const
+      {
+	for (unsigned i = 0; i < dim; ++i)
+	  if (v_[i] < o.v_[i])
+	    return true;
+	  else if (v_[i] > o.v_[i])
+	    return false;
+	return true;
+      }
+
+
+      template <typename U>
+      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
       operator > (const vec_base<U, dim, tag>& o) const
       {
 	return not(*this <= o);
       }
 
-      template <typename U>
+      template <typename dummy=void>
       VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator > (const vec_base& o) const
+      {
+	return not(*this <= o);
+      }
+
+
+      template <typename U>
+      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
       operator >= (const vec_base<U, dim, tag>& o) const
       {
 	return not(*this < o);
       }
+
+      template <typename dummy=void>
+      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
+      operator >= (const vec_base& o) const
+      {
+	return not(*this < o);
+      }
+
 
       T v_[dim];
     };
@@ -335,8 +423,10 @@ namespace mln
     VEC_BASE_GEN_EXT_OP_EXT(is_additive_ext, -)
     VEC_BASE_GEN_EW_OP_EXT(is_multiplicative, *)
     VEC_BASE_GEN_EW_OP_EXT(is_multiplicative, /)
+    VEC_BASE_GEN_EW_OP_EXT(is_multiplicative, %)
     VEC_BASE_GEN_EXT_OP_EXT(is_multiplicative_ext, *)
     VEC_BASE_GEN_EXT_OP_EXT(is_multiplicative_ext, /)
+    VEC_BASE_GEN_EXT_OP_EXT(is_multiplicative_ext, %)
 
     template <typename T, unsigned dim, typename tag>
     inline
@@ -350,7 +440,40 @@ namespace mln
       return os;
     }
 
+    template <>
+    struct vec_base_traits<generic_vector_tag>
+    {
+      static const bool is_additive = true;
+      static const bool is_additive_ext = true;
+      static const bool is_multiplicative = true;
+      static const bool is_multiplicative_ext = true;
+      static const bool is_less_than_comparable = true;
+      static const bool is_equality_comparable = true;
+    };
+
   }
+
+  template <typename T, std::size_t dim>
+  using vec = internal::vec_base<T, dim, generic_vector_tag>;
+
+  typedef vec<unsigned char, 1>	vec1ub;
+  typedef vec<unsigned char, 2>	vec2ub;
+  typedef vec<unsigned char, 3>	vec3ub;
+  typedef vec<char, 1>		vec1b;
+  typedef vec<char, 2>		vec2b;
+  typedef vec<char, 3>		vec3b;
+  typedef vec<unsigned short, 1> vec1us;
+  typedef vec<unsigned short, 2> vec2us;
+  typedef vec<unsigned short, 3> vec3us;
+  typedef vec<short, 1>		vec1s;
+  typedef vec<short, 2>		vec2s;
+  typedef vec<short, 3>		vec3s;
+  typedef vec<unsigned, 1>	vec1ui;
+  typedef vec<unsigned, 2>	vec2ui;
+  typedef vec<unsigned, 3>	vec3ui;
+  typedef vec<int, 1>		vec1i;
+  typedef vec<int, 2>		vec2i;
+  typedef vec<int, 3>		vec3i;
 
 }
 

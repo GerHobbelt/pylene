@@ -9,16 +9,17 @@ namespace mln
 
 	namespace internal
 	{
-		template <typename dummy>
-		struct vec_base_traits<point_tag, dummy>
-		{
-			static const bool is_additive = true;
-			static const bool is_additive_ext = true;
-			static const bool is_multiplicative = false;
-			static const bool is_multiplicative_ext = true;
-			static const bool is_less_than_comparable = true;
-			static const bool is_equality_comparable = true;
-		};
+
+	  template <>
+	  struct vec_base_traits<point_tag>
+	  {
+	    static const bool is_additive = true;
+	    static const bool is_additive_ext = true;
+	    static const bool is_multiplicative = false;
+	    static const bool is_multiplicative_ext = true;
+	    static const bool is_less_than_comparable = true;
+	    static const bool is_equality_comparable = true;
+	  };
 	}
 
   template <typename T, std::size_t dim>

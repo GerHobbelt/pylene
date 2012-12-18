@@ -37,6 +37,7 @@ namespace mln
     typedef raw_image_tag               category;
     typedef std::true_type              accessible;
     typedef std::true_type		indexable;
+    typedef std::true_type		concrete;
     typedef std::true_type		shallow_copy;
   };
 

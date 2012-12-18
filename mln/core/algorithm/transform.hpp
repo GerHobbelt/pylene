@@ -14,6 +14,9 @@ namespace mln {
   OutputImage&&
   transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>&& output);
 
+  template <typename InputImage, class UnaryFunction>
+  unary_image_expr<UnaryFunction, InputImage>
+  lazy_transform(InputImage&& input, UnaryFunction f);
 
   template <typename InputImage, class UnaryFunction>
   mln_ch_value(InputImage, typename std::result_of<UnaryFunction(mln_value(InputImage))>::type)
@@ -67,6 +70,14 @@ namespace mln {
     transform(input, f, out);
     return out;
   }
+
+  template <typename InputImage, class UnaryFunction>
+  unary_image_expr<UnaryFunction, InputImage>
+  lazy_transform(InputImage&& input, UnaryFunction f)
+  {
+    return make_unary_image_expr(std::forward<InputImage>(input), f);
+  }
+
 
 }
 

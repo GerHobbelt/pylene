@@ -90,13 +90,15 @@ namespace mln
     template <typename Point> struct origin_point_visitor_backward;
     template <typename Point> struct domain_point_visitor_forward;
     template <typename Point> struct domain_point_visitor_backward;
-    //template <typename Point> struct strided_domain_point_visitor;
+    template <typename Point> struct strided_domain_point_visitor_forward;
+    template <typename Point> struct strided_domain_point_visitor_backward;
 
     template <typename P> origin_point_visitor_forward<P> make_point_visitor_forward(const P& pmax);
     template <typename P> origin_point_visitor_backward<P> make_point_visitor_backward(const P& pmax);
     template <typename P> domain_point_visitor_forward<P> make_point_visitor_forward(const P& pmin, const P& pmax);
     template <typename P> domain_point_visitor_backward<P> make_point_visitor_backward(const P& pmin, const P& pmax);
-    //template <typename P> strided_domain_point_visitor<P> make_point_visitor(const P& pmin, const P& pmax, const P& strides);
+    template <typename P> strided_domain_point_visitor_forward<P>  make_strided_point_visitor_forward(const P& pmin, const P& pmax, const P& strides);
+    template <typename P> strided_domain_point_visitor_backward<P> make_strided_point_visitor_backward(const P& pmin, const P& pmax, const P& strides);
     /// \}
 
 
@@ -234,6 +236,48 @@ namespace mln
       P pmax_;
     };
 
+    template <typename P>
+    struct strided_domain_point_visitor_backward
+    {
+      typedef P point_type;
+
+      strided_domain_point_visitor_backward(): pmin_ (), pmax_ (), strides_ ()  {}
+      strided_domain_point_visitor_backward(const P& pmin, const P& pmax, const P& strides) :
+	pmin_ (pmin), pmax_(pmax), strides_ (strides)
+      {
+	mln_precondition( (pmax - pmin) % strides == P (literal::zero) );
+      }
+
+      void  initialize(P& point) const { point = pmax_; point -= strides_; }
+      template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - strides_[n]; }
+      template <size_t n> void  next(P& point) const { point[n] -= strides_[n]; }
+      template <size_t n> bool  finished(const P& point) const { return point[n] < pmin_[n]; }
+
+    private:
+      P pmin_;
+      P pmax_;
+      P strides_;
+    };
+
+    template <typename P>
+    struct strided_domain_point_visitor_forward
+    {
+      typedef P point_type;
+
+      strided_domain_point_visitor_forward(): pmin_ (), pmax_ (), strides_ () {}
+      strided_domain_point_visitor_forward(const P& pmin, const P& pmax, const P& strides) :
+	pmin_ (pmin), pmax_ (pmax), strides_ (strides) {}
+
+      void  initialize(P& point) const                  { point = pmin_; }
+      template <size_t n> void  init(P& point) const    { point[n] = pmin_[n]; }
+      template <size_t n> void  next(P& point) const    { point[n] += strides_[n]; }
+      template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
+    private:
+      P pmin_;
+      P pmax_;
+      P strides_;
+    };
+
 
 
 
@@ -266,6 +310,21 @@ namespace mln
     {
       return domain_point_visitor_backward<P>(pmin, pmax);
     }
+
+    template <typename P>
+    strided_domain_point_visitor_forward<P>
+    make_strided_point_visitor_forward(const P& pmin, const P& pmax, const P& strides)
+    {
+      return strided_domain_point_visitor_forward<P>(pmin, pmax, strides);
+    }
+
+    template <typename P>
+    strided_domain_point_visitor_backward<P>
+    make_strided_point_visitor_backward(const P& pmin, const P& pmax, const P& strides)
+    {
+      return strided_domain_point_visitor_backward<P>(pmin, pmax, strides);
+    }
+
 
 
     template <size_t dim>

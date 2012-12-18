@@ -1,8 +1,8 @@
 #ifndef MLN_CORE_ALGORITHM_CLONE_HPP
 # define MLN_CORE_ALGORITHM_CLONE_HPP
 
+# include <mln/core/image/image.hpp>
 # include <mln/core/algorithm/copy.hpp>
-# include <mln/core/image_traits.hpp>
 
 namespace mln
 {

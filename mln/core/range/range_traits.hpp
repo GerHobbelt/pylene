@@ -5,6 +5,12 @@ namespace mln
 {
 
   template <typename Range>
+  struct range_traits;
+  //{
+  // bidirectional true_type/false_type
+  //};
+
+  template <typename Range>
   struct range_iterator
   {
     typedef typename Range::iterator type;

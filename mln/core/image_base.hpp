@@ -7,45 +7,6 @@
 
 namespace mln
 {
-  /// Free functions
-  /// \{
-
-  template <typename I, typename J>
-  typename std::enable_if<image_traits<I>::indexable::value and image_traits<J>::indexable::value>::type
-  reindex(Image<I>& ima, const Image<J>& ima2)
-  {
-    exact(ima).reindex(exact(ima2).index_of_point(exact(ima2).domain().pmin));
-  }
-
-  template <typename I, typename J>
-  typename std::enable_if<!(image_traits<I>::indexable::value and image_traits<J>::indexable::value)>::type
-  reindex(Image<I>&, const Image<J>&)
-  {
-  }
-
-  /// \brief Initialize an image from an other such that
-  /// domains correspond
-  ///
-  /// \param ima Image to be initialized
-  /// \param other Image to initialize with.
-  ///
-  template <typename I, typename J>
-  void resize(Image<I>& ima, const Image<J>& other)
-  {
-    exact(ima).resize(exact(other).domain());
-    reindex(ima, other);
-  }
-
-
-  template <typename I, typename J>
-  void resize(Image<I>& ima, const Image<J>& other, int border, mln_value(I) v)
-  {
-    exact(ima).resize(exact(other).domain(), border, v);
-    reindex(ima, other);
-  }
-  /// \}
-
-
   struct undef {};
 
   template <typename Derived,

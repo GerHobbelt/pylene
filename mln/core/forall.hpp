@@ -281,7 +281,9 @@ namespace mln
                __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),      \
                               BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
 
-
+/******************************************/
+/****         mln_foreach macro         ****/
+/******************************************/
 
 # define __mln_do_local__(EXPR)			\
   if ((EXPR), false) {} else

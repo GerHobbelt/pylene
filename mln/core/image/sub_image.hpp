@@ -121,6 +121,7 @@ namespace mln
   {
     typedef std::true_type      accessible;
     typedef forward_image_tag   category; // FIXME: category depends on domain category
+    typedef std::false_type	concrete;
   };
 
 

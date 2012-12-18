@@ -6,6 +6,7 @@
 # include <mln/core/ch_value.hpp>
 
 # include <mln/core/forall.hpp>
+# include <mln/core/image/image_routines.hpp>
 # include <mln/core/image/image_expr.hpp>
 # include <mln/core/image/image_ops.hpp>
 

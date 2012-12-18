@@ -1,6 +1,6 @@
-#ifndef MLN_CORE_IMAGE_BASE_HPP
+#ifndef MLN_CORE_IMAGE_IMAGE_HPP
 # warning "This file should be included only by image_base.hpp"
-# include <mln/core/image_base.hpp>
+# include <mln/core/image/image.hpp>
 #endif
 
 #ifndef MLN_CORE_IMAGE_ZIP_IMAGE_HPP

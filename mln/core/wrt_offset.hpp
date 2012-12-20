@@ -2,6 +2,7 @@
 # define MLN_CORE_WRT_OFFSET_HPP
 
 //# include <mln/core/range.hpp>
+#include <mln/core/std/array.hpp>
 
 namespace mln {
 

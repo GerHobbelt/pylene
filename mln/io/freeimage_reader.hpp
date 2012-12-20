@@ -4,12 +4,19 @@
 # include <cstring>
 
 # include <mln/core/grays.hpp>
+# include <mln/core/colors.hpp>
 # include <mln/core/domain/box.hpp>
 
 //# include <mln/io/typeinfo.hpp>
 # include <mln/io/reader.hpp>
 
 # include <FreeImage.h>
+
+
+
+
+/// FIXME: Handle Color correctly !
+
 
 namespace mln
 {
@@ -109,31 +116,47 @@ namespace mln
       mln_precondition(init_);
       mln_precondition(dib != NULL);
       FREE_IMAGE_TYPE type = FreeImage_GetImageType(dib);
+      int bppp = FreeImage_GetBPP(dib);
+      int colortype = FreeImage_GetColorType(dib);
+
       switch (type)
 	{
-	case FIT_BITMAP:	break;
-	case FIT_UINT16:	return typeid(uint16);
-	case FIT_INT16:		return typeid(int16);
-	default:		return typeid(void);
+	  case FIT_BITMAP:	break;
+	  case FIT_UINT16:	return typeid(uint16);
+	  case FIT_INT16:		return typeid(int16);
+	  default:		goto error;
 	}
 
-      int bppp = FreeImage_GetBPP(dib);
       switch (bppp)
 	{
-	case 1:  return typeid(bool);
-	case 8:  return typeid(uint8);
-	case 16: return typeid(uint16);
-	default: return typeid(void);
+	  case 1:  return typeid(bool);
+	  case 8:  return typeid(uint8);
+	  case 16: return typeid(uint16);
+	  case 24: switch (colortype)
+	    {
+	      case FIC_RGB: return typeid(rgb8);
+	      default: goto error;
+	    }
 	}
+
+    error: return typeid(void);
     }
 
     inline
-    void freeimage_reader::read_next_line(void* out)
+    void freeimage_reader::read_next_line(void* out_)
     {
+      char* out = (char*)out_;
       mln_precondition(init_);
       mln_precondition(dib != NULL);
       mln_precondition(x < (int) FreeImage_GetHeight(dib));
-      std::memcpy(out, ptr, domain.pmax[1] * bpp);
+      if (FreeImage_GetColorType(dib) != FIC_RGB)
+	std::memcpy(out, ptr, domain.pmax[1] * bpp);
+      else
+	for (int y = 0; y < domain.pmax[1]; ++y) {
+	  *(out + y * bpp + 0) = *(ptr + y * bpp + 2);
+	  *(out + y * bpp + 1) = *(ptr + y * bpp + 1);
+	  *(out + y * bpp + 2) = *(ptr + y * bpp + 0);
+	}
       ++x;
       ptr -= pitch;
     }

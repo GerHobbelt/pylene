@@ -27,6 +27,7 @@
 # define MLN_MORPHO_TOS_TOS_HPP
 
 # include <mln/core/image/image.hpp>
+# include <mln/core/value/value_traits.hpp>
 # include <mln/core/wrt_offset.hpp>
 # include <mln/core/extension/fill.hpp>
 # include <mln/morpho/tos/irange.hpp>
@@ -49,8 +50,8 @@ namespace mln
     /// \return
     ///
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
-    std::pair< mln_ch_value<I, typename I::size_type>, std::vector<typename I::size_type> >
-    tos(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare ());
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare ());
 
 
 
@@ -63,36 +64,34 @@ namespace mln
       template <typename I>
       inline
       typename I::size_type
-      zfind_root(I& zpar, I::size_type x)
+      zfind_root(I& zpar, typename I::size_type x)
       {
-	if (zpar(x) != x)
-	  zpar(x) = zfind_root(zpar, zpar(x));
-	return zpar(x);
+	if (zpar[x] != x)
+	  zpar[x] = zfind_root(zpar, zpar[x]);
+	return zpar[x];
       }
     }
 
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
-    std::pair< mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
-    tos(const Image<I>& ima_, const Neighborhood& nbh, const Compare& cmp = Compare ())
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS(const Image<I>& ima_, const Neighborhood& nbh, const Compare& cmp = Compare ())
     {
       using namespace mln::morpho::tos;
 
       typedef mln_value(I) V;
-      typedef irange<V, Compare> R;
+      typedef irange<V> R;
       typedef typename I::size_type size_type;
 
       static constexpr size_type UNPROCESSED = value_traits<size_type>::max();
       static constexpr size_type PROCESSED = 0;
 
-      const I& ima = exact(ima);
-      auto pmin = ima.domain().pmin;
-      V curlevel = ima(pmin);
+      const I& ima = exact(ima_);
 
 
       // f: image of interval in Khalimsky space
       // K: image of value in Khalimsky that tells at which a level a point is inserted
-      mln_ch_value(I, R) f = internal::immerse(ima, cmp);
+      mln_ch_value(I, R) f = tos::internal::immerse(ima, cmp);
       mln_concrete(I) K;
       mln_ch_value(I, size_type) parent, zpar;
       std::vector<size_type> S;
@@ -103,30 +102,37 @@ namespace mln
       extension::fill(parent, PROCESSED);
 
       pset<I, Compare> W(K, cmp);
+      auto pmin = f.domain().pmin;
+      size_type p = f.index_of_point(pmin);
+      W.insert(p);
+      parent[p] = PROCESSED;
+      K[p] = f[p].lower;
 
       auto dindexes = wrt_delta_index(f, nbh.dpoints);
-
       while (!W.empty())
 	{
-	  std::size_t p = W.has_next(curlevel) ? W.pop_next(curlevel) : W.pop_previous(curlevel);
-	  curlevel = K[p];
+	  std::cout << "Search: " << K[p] << std::endl;
+	  p = W.has_next(p) ? W.pop_next(p) : W.pop_previous(p);
+	  std::cout << "Found: " << p << " @ " << K[p] << std::endl;
+	  V curlevel = K[p];
 	  S.push_back(p);
 
-	  for (int k : dindexes)
+	  mln_foreach (int k, dindexes)
 	    {
 	      size_type q = p + k;
-	      if (parent[q] != UNPROCESSED)
-		continue;
+	      if (parent[q] == UNPROCESSED)
+		{
+		  if (cmp(f[q].upper, curlevel))
+		    K[q] = f[q].upper;
+		  else if (cmp(curlevel, f[q].lower))
+		    K[q] = f[q].lower;
+		  else
+		    K[q] = curlevel;
 
-	      if (cmp(f[q].upper, curlevel))
-		K[q] = f[q].upper;
-	      else if (cmp(curlevel, f[q].lower))
-		K[q] = f[q].lower;
-	      else
-		K[q] = curlevel;
-
-	      parent[q] = PROCESSED;
-	      W.insert(q);
+		  parent[q] = PROCESSED;
+		  std::cout << "Insert:" << q << " @ " << K[q] << std::endl;
+		  W.insert(q);
+		}
 	    }
 	}
 
@@ -138,12 +144,12 @@ namespace mln
 	  parent[p] = p;
 	  zpar[p] = p;
 
-	  for (int k : dindexes)
+	  mln_foreach (int k,  dindexes)
 	    {
 	      size_type q = p + k;
-	      if (parent[q] != UNPROCESSED)
+	      if (zpar[q] != UNPROCESSED)
 		{
-		  r = internal::zfindroot(zpar, q);
+		  size_type r = morpho::internal::zfind_root(zpar, q);
 		  if (r != p) {
 		    parent[r] = p;
 		    zpar[r] = p;
@@ -161,7 +167,7 @@ namespace mln
 	}
 
       // All done !
-      return std::make_pair(std::move(parent), std::move(S));
+      return std::make_tuple(std::move(K), std::move(parent), std::move(S));
     }
 
   }

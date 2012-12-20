@@ -411,11 +411,10 @@ namespace mln
   ndimage_base<T,dim,E>::at (const site_type& p)
   {
     mln_precondition(vbox_.has(p));
-    site_type q = p - domain_.pmin;
 
     char* ptr = ptr_;
     for (unsigned i = 0; i < dim; ++i)
-      ptr += q[i] * strides_[i];
+      ptr += (p[i] - domain_.pmin[i]) * strides_[i];
     return * (T*)ptr;
   }
 
@@ -426,11 +425,10 @@ namespace mln
   ndimage_base<T,dim,E>::at (const site_type& p) const
   {
     mln_precondition(vbox_.has(p));
-    site_type q = p - domain_.pmin;
 
     char* ptr = ptr_;
     for (unsigned i = 0; i < dim; ++i)
-      ptr += q[i] * strides_[i];
+      ptr += (p[i] - domain_.pmin[i]) * strides_[i];
     return * (const T*)ptr;
   }
 

@@ -138,7 +138,7 @@ operator unsigned () const { return m_x; }
     Int(enc x) : m_x(x) {}
     operator enc& ()           { return m_x; }
 //    operator enc  () const     { return m_x; }
-operator int () const { return m_x; }
+    operator int () const { return m_x; }
 
   private:
     enc m_x;

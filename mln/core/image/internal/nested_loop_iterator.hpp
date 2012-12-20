@@ -5,6 +5,7 @@
 # include <utility>
 
 # include <mln/core/iterator/iterator_base.hpp>
+# include <mln/core/literal/vectorial.hpp>
 # include <boost/any.hpp>
 
 namespace mln

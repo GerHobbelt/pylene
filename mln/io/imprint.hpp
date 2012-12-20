@@ -38,7 +38,8 @@ namespace mln
         typedef typename Image::value_type V;
 	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
         (void) domain;
-        for (auto pix : ima.pixels())
+	typedef typename Image::const_pixel_type pixel_t;
+        mln_foreach (const pixel_t& pix, ima.pixels())
           std::cout << '{' << pix.point() << "," << (T)pix.val() << "}," << std::endl;
       }
 

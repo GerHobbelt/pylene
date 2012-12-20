@@ -25,6 +25,8 @@ namespace mln {
   public:
     typedef typename traits::accessible  accessible;
     typedef typename traits::category    category;
+    typedef typename traits::concrete    concrete;
+    typedef typename traits::indexable    indexable;
 
     BOOST_CONCEPT_USAGE(Image)
     {
@@ -73,8 +75,8 @@ namespace mln {
       typedef typename I::reference         reference;
       typedef typename I::const_reference   const_reference;
 
-      reference (I::*ptr) (point_type) = &I::operator();
-      const_reference (I::*ptr2) (point_type) const = &I::operator();
+      reference (I::*ptr) (const point_type&) = &I::operator();
+      const_reference (I::*ptr2) (const point_type&) const = &I::operator();
       (void) ptr; (void) ptr2;
     }
   };

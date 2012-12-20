@@ -1,7 +1,7 @@
 #ifndef MLN_MOPRHO_TOS_IRANGE_HPP
 # define MLN_MOPRHO_TOS_IRANGE_HPP
 
-# include <iostream>
+# include <mln/io/format.hpp>
 
 namespace mln
 {
@@ -15,14 +15,22 @@ namespace mln
       template <class V>
       struct irange
       {
+	irange() = default;
+	irange(const V& v) : lower (v), upper(v) {}
+	irange(const V& lower_, const V& upper_) : lower (lower_), upper(upper_) {}
+
 	V lower, upper;
       };
 
 
       template <typename V>
+      std::ostream&
       operator <<(std::ostream& os, const irange<V>& rng)
       {
-	return (os << '[' << rng.lower << ',' << rng.upper << ']' << std::endl);
+	using namespace mln::io;
+	os << '['; format(os, rng.lower);
+	os << ','; format(os, rng.upper);
+	return os << ']';
       }
 
     }

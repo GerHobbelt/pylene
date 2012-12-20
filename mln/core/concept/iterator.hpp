@@ -12,8 +12,9 @@ namespace mln
 
     Iterator()
     {
-      BOOST_CONCEPT_ASSERT((boost::Assignable<I>));
-      BOOST_CONCEPT_ASSERT((boost::DefaultConstructible<I>));
+      // Remove concept because lambda not assignable
+      //BOOST_CONCEPT_ASSERT((boost::Assignable<I>));
+      //BOOST_CONCEPT_ASSERT((boost::DefaultConstructible<I>));
 
       typedef typename I::value_type    value_type;
       typedef typename I::reference     reference;

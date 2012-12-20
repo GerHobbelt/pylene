@@ -34,9 +34,10 @@ namespace mln
   namespace morpho
   {
 
+    //bool Enable = has_indexer<typename I::value_type, Compare>::value  >
     template <typename I,
 	      typename Compare = std::less<typename I::value_type>,
-	      bool Enable = has_indexer<typename I::value_type, Compare>::value  >
+	      bool Enable = false>
     struct pset;
 
 
@@ -48,9 +49,14 @@ namespace mln
 
       struct cmp_t
       {
-	bool operator () (const key_type& a, const key_type& b)
+	bool operator () (const value_type& a, const value_type& b)
 	{
 	  return m_cmp(m_ima[a], m_ima[b]);
+	}
+
+	bool cmpkey (const key_type& x, const value_type& b)
+	{
+	  return m_cmp(x, m_ima[b]);
 	}
 
 	const I& m_ima;
@@ -59,15 +65,15 @@ namespace mln
 
       pset(const I& ima, const Compare& cmp = Compare() );
 
-      void insert(const key_type& v);
+      void insert(const value_type& v);
       bool empty() const;
-      bool has_previous(const key_type& v) const;
-      bool has_next(const key_type& v)	  const;
+      bool has_previous(const value_type& v) const;
+      bool has_next(const value_type& v)	  const;
 
-      value_type find_next(const key_type& v) const;
-      value_type find_previous(const key_type& v) const;
-      value_type pop_next(const key_type& v);
-      value_type pop_previous(const key_type& v);
+      value_type find_next(const value_type& v) const;
+      value_type find_previous(const value_type& v) const;
+      value_type pop_next(const value_type& v);
+      value_type pop_previous(const value_type& v);
 
     private:
       std::multiset<std::size_t, cmp_t>		m_set;
@@ -89,7 +95,7 @@ namespace mln
 
     template <typename I, typename Compare>
     void
-    pset<I, Compare, false>::insert(const key_type& v)
+    pset<I, Compare, false>::insert(const value_type& v)
     {
       m_set.insert(v);
     }
@@ -103,55 +109,58 @@ namespace mln
 
     template <typename I, typename Compare>
     bool
-    pset<I, Compare, false>::has_previous(const key_type& k) const
+    pset<I, Compare, false>::has_previous(const value_type& p) const
     {
       mln_precondition(!empty());
-      return !m_set.key_comp(k, *(m_set.begin()));
+      return m_set.key_comp()(*(m_set.begin()), p);
     }
 
     template <typename I, typename Compare>
     bool
-    pset<I, Compare, false>::has_next(const key_type& k) const
+    pset<I, Compare, false>::has_next(const value_type& p) const
     {
       mln_precondition(!empty());
-      return m_set.key_comp(k, *(m_set.cbegin()));
+      return !m_set.key_comp()(*(m_set.rbegin()), p);
     }
 
     template <typename I, typename Compare>
     typename I::size_type
-    pset<I, Compare, false>::find_previous(const key_type& k) const
+    pset<I, Compare, false>::find_previous(const value_type& p) const
     {
-      mln_precondition(!has_previous(k));
-      return *m_set.lower_bound(k);
+      mln_precondition(has_previous(p));
+      return *m_set.lower_bound(p);
     }
 
     template <typename I, typename Compare>
     typename I::size_type
-    pset<I, Compare, false>::find_next(const key_type& k) const
+    pset<I, Compare, false>::find_next(const value_type& p) const
     {
-      mln_precondition(!has_next(k));
-      return *m_set.upper_bound(k);
+      mln_precondition(has_next(p));
+      return *m_set.upper_bound(p);
     }
 
     template <typename I, typename Compare>
     typename I::size_type
-    pset<I, Compare, false>::pop_previous(const key_type& k)
+    pset<I, Compare, false>::pop_previous(const value_type& p)
     {
-      mln_precondition(!has_previous(k));
-      auto x = m_set.lower_bound(k);
+      mln_precondition(has_previous(p));
+      auto x = m_set.upper_bound(p);
+      --x;
+      mln_assertion(x != m_set.end());
       value_type v = *x;
-      m_set.remove(x);
+      m_set.erase(x);
       return v;
     }
 
     template <typename I, typename Compare>
     typename I::size_type
-    pset<I, Compare, false>::pop_next(const key_type& k)
+    pset<I, Compare, false>::pop_next(const value_type& p)
     {
-      mln_precondition(!has_next(k));
-      auto x = m_set.upper_bound(k);
+      mln_precondition(has_next(p));
+      auto x = m_set.lower_bound(p);
+      mln_assertion(x != m_set.end());
       value_type v = *x;
-      m_set.remove(x);
+      m_set.erase(x);
       return v;
     }
 

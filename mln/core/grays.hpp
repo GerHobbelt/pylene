@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_GRAYS_HH
 # define MLN_CORE_GRAYS_HH
 
-# include <boost/cstdint.hpp>
+# include <mln/core/value/int.hpp>
 
 
 /**
@@ -25,22 +25,6 @@ namespace mln
     MLN_DOUBLE = 0x11
   };
 
-  typedef boost::uint8_t	uint8;	///< Definition of an unsigned 8-bits integer.
-  typedef boost::int8_t		int8;	///< Definition of an signed 8-bits integer.
-  typedef boost::uint16_t	uint16;	///< Definition of an unsigned 16-bits integer.
-  typedef boost::int16_t	int16;	///< Definition of an signed 16-bits integer.
-  typedef boost::uint32_t	uint32;	///< Definition of an unsigned 32-bits integer.
-  typedef boost::int32_t	int32;	///< Definition of an signed 32-bits integer.
-
-# ifndef BOOST_NO_INT64_T
-  /** \brief Definition of an unsigned 64-bits integer. (Available if \b
-      BOOST_NO_INT64_T is not defined) */
-  typedef boost::uint64_t	uint64;
-
-  /** \brief Definition of an unsigned 64-bits integer. Available if \b
-      BOOST_NO_INT64_T is not defined) **/
-  typedef boost::int64_t	int64;
-# endif
 }
 
 #endif /* !MLN_CORE_GRAYS_HH */

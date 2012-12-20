@@ -199,6 +199,15 @@ namespace mln
     return s << "[" << b.pmin << " ... " << b.pmax << "]";
   }
 
+  template <typename T, unsigned dim>
+  inline
+  std::ostream&
+  operator<< (std::ostream& s, const strided_box<T, dim>& b)
+  {
+    return s << "[" << b.pmin << " ... " << b.pmax << "..." << b.strides << "]";
+  }
+
+
   /// Traits
 
   /// Forward
@@ -270,7 +279,7 @@ namespace mln
   {
     mln_precondition(pmin_ <= pmax_);
     for (unsigned i = 0; i < dim; ++i) {
-      T q = (pmax_[i] - pmin_[i] % strides_[i]);
+      T q = (pmax_[i] - pmin_[i]) % strides_[i];
       if (q > 0)
 	pmax[i] = pmax_[i] - q + strides_[i];
       else
@@ -283,7 +292,7 @@ namespace mln
   bool
   strided_box<T, dim>::has(const point_type& p) const
   {
-    return (p < pmin or pmax <= p or ((p - pmin).as_vec() % strides.as_vec() != literal::zero));
+    return (pmin <= p and p < pmax and ((p - pmin).as_vec() % strides.as_vec() == literal::zero));
   }
 
   template <typename T, unsigned dim>

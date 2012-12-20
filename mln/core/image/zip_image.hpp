@@ -85,6 +85,8 @@ namespace mln
     typedef typename std::common_type<typename internal::zip_image_category<ImageTuple>::type,
 				      bidirectional_image_tag>::type		 category;
     typedef typename internal::zip_image_accessibility<ImageTuple>::type accessible;
+    typedef std::false_type concrete;
+    typedef std::false_type indexable; // Should be true_type
   };
 
 

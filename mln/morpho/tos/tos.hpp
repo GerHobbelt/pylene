@@ -111,9 +111,9 @@ namespace mln
       auto dindexes = wrt_delta_index(f, nbh.dpoints);
       while (!W.empty())
 	{
-	  std::cout << "Search: " << K[p] << std::endl;
+	  //std::cout << "Search: " << K[p] << std::endl;
 	  p = W.has_next(p) ? W.pop_next(p) : W.pop_previous(p);
-	  std::cout << "Found: " << p << " @ " << K[p] << std::endl;
+	  //std::cout << "Found: " << p << " @ " << K[p] << std::endl;
 	  V curlevel = K[p];
 	  S.push_back(p);
 
@@ -130,7 +130,7 @@ namespace mln
 		    K[q] = curlevel;
 
 		  parent[q] = PROCESSED;
-		  std::cout << "Insert:" << q << " @ " << K[q] << std::endl;
+		  //std::cout << "Insert:" << q << " @ " << K[q] << std::endl;
 		  W.insert(q);
 		}
 	    }
@@ -138,6 +138,7 @@ namespace mln
 
       // 2nd step: union-find
       resize(zpar, parent, parent.border(), UNPROCESSED);
+      extension::fill(zpar, UNPROCESSED);
       for (int i = S.size()-1; i >= 0; --i)
 	{
 	  size_type p = S[i];
@@ -166,6 +167,9 @@ namespace mln
 	    parent[p] = parent[q];
 	}
 
+
+      mln_postcondition(S.size() == K.domain().size());
+      mln_postcondition(S.size() == parent.domain().size());
       // All done !
       return std::make_tuple(std::move(K), std::move(parent), std::move(S));
     }

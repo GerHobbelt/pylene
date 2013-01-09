@@ -19,9 +19,9 @@ namespace mln
       namespace internal
       {
 
-	template <typename I, class Compare>
+	template <typename I, class Compare = std::less<mln_value(I)> >
 	mln_ch_value(I, irange<mln_value(I)> )
-	  immerse(const Image<I>& ima_, Compare cmp)
+	  immerse(const Image<I>& ima_, Compare cmp = Compare())
 	{
 	  static_assert(std::is_same<typename I::domain_type, box2d>::value,
 			"Only box2d handled");
@@ -40,10 +40,10 @@ namespace mln
 		c = ima.at(p + P{1,0}),
 		d = ima.at(p + P{1,1});
 
-	      V min1 = std::min(a,b), min2 = std::min(a,c);
-	      V max1 = std::max(a,b), max2 = std::max(a,c);
-	      V min3 = std::min(d, std::min(c, min1));
-	      V max3 = std::max(d, std::max(c, max1));
+	      V min1 = std::min(a,b, cmp), min2 = std::min(a,c, cmp);
+	      V max1 = std::max(a,b, cmp), max2 = std::max(a,c, cmp);
+	      V min3 = std::min(d, std::min(c, min1, cmp), cmp);
+	      V max3 = std::max(d, std::max(c, max1, cmp), cmp);
 
 	      point2d q = 2 * p;
 	      out.at(q) = ima.at(p);

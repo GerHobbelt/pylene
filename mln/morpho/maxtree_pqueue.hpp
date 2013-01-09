@@ -238,14 +238,16 @@ namespace mln
 
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-    image2d<typename image2d<V>::size_type>
+    std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type> >
     maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       typedef typename image2d<V>::size_type size_type;
       image2d<size_type> parent;
       resize(parent, ima);
 
-      internal::maxtree_flood_pqueue_algorithm(ima, parent, nbh, cmp);
+      std::vector<size_type> S(ima.domain().size());
+
+      internal::maxtree_flood_pqueue_algorithm(ima, parent, nbh, cmp, &(*S.rend));
       return parent;
     }
 

@@ -10,63 +10,52 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <boost/format.hpp>
+#include <libgen.h>
+#include "addborder.hpp"
 #include "topology.hpp"
 #include <mln/morpho/maxtree_pqueue_parallel.hpp>
-#include <libgen.h>
+#include <mln/core/algorithm/fill.hpp>
 
 namespace mln
 {
 
-  template < class I, class Compare = std::less<mln_value(I)> >
-  mln_concrete(I)
-  addborder(const Image<I>& ima_, const Compare& cmp = Compare ())
+  template <typename T>
+  void
+  displayTree(const image2d<T>& ima,
+	      const image2d<typename image2d<T>::size_type>& parent,
+	      const std::vector<typename image2d<T>::size_type>& S,
+	      const point2d strides = point2d{1,1})
   {
-    const I& ima = exact(ima_);
-    typedef mln_value(I) V;
-    image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
+    mln_precondition(ima.domain() == parent.domain());
+    mln_precondition(ima.domain().size() == S.size());
 
-    {
-      box2d box = ima.domain();
-      box.pmin += 1; box.pmax += 1;
-      copy(ima, out | box);
-    }
+    image2d<bool> deja_vu;
+    point2d pmin = ima.domain().pmin;
+    point2d pmax = ima.domain().pmax;
 
-    V median;
-    unsigned ncols = ima.ncols(), nrows = ima.nrows();
-    {
-      std::vector<V> border;
-      border.reserve(2 * (nrows + ncols) - 4);
-      for (int i = 0; i < ncols; ++i) {
-	border.push_back(ima.at(0,i));
-	border.push_back(ima.at(nrows-1,i));
+
+    io::imprint(ima);
+    resize(deja_vu, ima);
+    auto deja_vu_ = deja_vu | sbox2d(pmin, pmax, strides);
+
+    // Print each node
+    for (unsigned i = 0; i < S.size(); ++i)
+      {
+	fill(deja_vu, false);
+	unsigned q = S[i];
+	if (i != 0 and ima[q] == ima[parent[q]])
+	  continue;
+
+	std::cout << "==== showing node " << q << " @ " << ima[q] << std::endl;
+	deja_vu[q] = true;
+	for (unsigned j = i; j < S.size() ; ++j)
+	  {
+	    unsigned p = S[j];
+	    if (deja_vu[parent[p]])
+	      deja_vu[p] = true;
+	  }
+	Kdisplay( deja_vu_, strides );
       }
-
-      for (int i = 1; i < nrows-1; ++i) {
-	border.push_back(ima.at(i,0));
-	border.push_back(ima.at(i,ncols-1));
-      }
-
-      std::cout << border.size() << std::endl;
-      std::partial_sort(border.begin(), border.begin() + border.size()/2+1, border.end(), cmp);
-      if (border.size() % 2 == 0) {
-	V a = border[border.size()/2 - 1], b = border[border.size()/2];
-	median = a + (b-a) / 2;
-      } else
-	median = border[border.size()/2];
-    }
-
-    {
-      for (int i = 0; i < ncols+2; ++i) {
-	out.at(0,i) = median;
-	out.at(nrows+1,i) = median;
-      }
-
-      for (int i = 1; i < nrows+1; ++i) {
-	out.at(i,0) = median;
-	out.at(i,ncols+1) = median;
-      }
-    }
-    return out;
   }
 
 }
@@ -162,27 +151,8 @@ int main(int argc, char** argv)
   point2d strides = use_tos ? point2d{4,4} : point2d{2,2};
   copy(ima2, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, strides));
 
-  {
-    image2d<unsigned> x;
-    if (use_tos)
-      x = morpho::area_compute(K, parent, S, K2::is_face_2);
-    else
-      x = morpho::area_compute(K, parent, S, K1::is_face_2, std::greater<unsigned> ());
-    io::imsave(transform(x, [=](unsigned v) -> float { return (float)v; }), "area2.tiff");
-  }
-
-  for (int i = 4; i < argc; ++i) {
-    int fvalue = std::atoi(argv[i]);
-    image2d<rgb8> out;
-    if (use_tos)
-      out = morpho::area_filter(tmp, K, parent, S, fvalue, K2::is_face_2);
-    else
-      out = morpho::area_filter(tmp, K, parent, S, fvalue, K1::is_face_2, std::greater<unsigned> ());
-
-    image2d<rgb8> under;
-    resize(under, ima2);
-    copy(out | sbox2d(out.domain().pmin, out.domain().pmax, strides), under);
-    io::imsave(under, boost::str(boost::format("out-%06i.tiff") % fvalue).c_str());
-  }
-
+  if (use_tos)
+    displayTree(K, parent, S, point2d{2,2});
+  else
+    displayTree(K, parent, S, point2d{1,1});
 }

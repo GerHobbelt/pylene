@@ -237,6 +237,14 @@ namespace mln
 	std::copy(other.v_, other.v_ + dim, v_);
       }
 
+      template <typename U, typename other_tag>
+      explicit
+      vec_base(const vec_base<U, dim, other_tag>& other)
+      {
+	std::copy(other.v_, other.v_ + dim, v_);
+      }
+
+
       void set_all(const T& v)
       {
         std::fill(v_, v_ + dim, v);
@@ -410,6 +418,25 @@ namespace mln
       operator >= (const vec_base& o) const
       {
 	return not(*this < o);
+      }
+
+
+      template <typename OtherTag>
+      operator vec_base<T, dim, OtherTag>& ()
+      {
+	static_assert( std::is_same<tag, generic_vector_tag>::value,
+		       "Only a generic a vector can be implicitely converted"
+		       "to another vector type. Use as_vec() method.");
+	return * reinterpret_cast< vec_base<T, dim, OtherTag>* > (this);
+      }
+
+      template <typename OtherTag>
+      operator const vec_base<T, dim, OtherTag>& () const
+      {
+	static_assert( std::is_same<tag, generic_vector_tag>::value,
+		       "Only a generic a vector can be implicitely converted"
+		       "to another vector type. Use as_vec() method.");
+	return * reinterpret_cast< const vec_base<T, dim, OtherTag>* > (this);
       }
 
 

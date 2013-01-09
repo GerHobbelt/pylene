@@ -47,6 +47,8 @@ namespace mln
     iterator		iter() const;
     reverse_iterator    riter() const;
 
+    bool		operator== (const strided_box& other) const;
+
     point_type pmin;
     point_type pmax;
     point_type strides;
@@ -172,6 +174,12 @@ namespace mln
     }
 
 
+    bool operator== (const box& other) const
+    {
+      return pmin == other.pmin and pmax == other.pmax;
+    }
+
+
     point_type pmin;
     point_type pmax;
   };
@@ -222,6 +230,17 @@ namespace mln
       typedef image2d<T> type;
     };
   };
+
+  template <>
+  struct image_from_domain<sbox2d>
+  {
+    template <typename T>
+    struct apply
+    {
+      typedef image2d<T> type;
+    };
+  };
+
 
 
   template <typename T, unsigned dim>
@@ -300,7 +319,7 @@ namespace mln
   typename strided_box<T, dim>::point_type
   strided_box<T, dim>::shape() const
   {
-    point_type shp = (pmax - pmin) / strides;
+    point_type shp((pmax - pmin).as_vec() / strides.as_vec());
     return shp;
   }
 
@@ -336,6 +355,14 @@ namespace mln
 			      internal::no_op_visitor (),
 			      internal::no_op_visitor ());
 
+  }
+
+  template <typename T, unsigned dim>
+  inline
+  bool
+  strided_box<T, dim>::operator== (const strided_box& other) const
+  {
+    return pmin == other.pmin and pmax == other.pmax and strides == other.strides;
   }
 
 }

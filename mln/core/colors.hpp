@@ -36,13 +36,13 @@ namespace mln
   }
 
   template <typename T>
-  using rgb = internal::vec_base<T, 3, point_tag>;
+  using rgb = internal::vec_base<T, 3, rgb_tag>;
 
   typedef rgb<uint8> rgb8;
   typedef rgb<uint16> rgb16;
 
   template <typename T>
-  using bgr = internal::vec_base<T, 3, point_tag>;
+  using bgr = internal::vec_base<T, 3, bgr_tag>;
 
   typedef bgr<uint8> bgr8;
   typedef bgr<uint16> bgr16;

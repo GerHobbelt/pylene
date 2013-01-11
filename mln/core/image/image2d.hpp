@@ -6,22 +6,6 @@
 
 namespace mln {
 
-  // FWD declaration
-  template <typename T> struct image2d;
-
-
-  // Specialization of traits
-  template <typename T>
-  struct image_traits< image2d<T> > : image_traits< ndimage_base<T, 2, image2d<T> > >
-  {
-  };
-
-  template <typename T, typename V>
-  struct image_ch_value< image2d<T>, V >
-  {
-    typedef image2d<V> type;
-  };
-
   ///
   /// \brief The standard 2D image type.
   ///
@@ -33,48 +17,7 @@ namespace mln {
   /// \p image2d models a Writable Point-Accessible Image concept.
   /// See \see image2d \see image3d
   template <typename T>
-  struct image2d : ndimage_base<T, 2, image2d<T> >
-  {
-  private:
-    typedef ndimage_base<T, 2, image2d<T> > base_type;
-    typedef ndimage_base<T, 2, image2d<T> > base;
-
-  public:
-    typedef typename base_type::domain_type domain_type;
-
-
-    explicit image2d (unsigned border = 3) : ndimage_base<T,2,image2d<T> > (border)
-    {
-    }
-
-    explicit image2d(const domain_type& domain, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >(domain, border)
-    {
-    }
-
-
-    image2d(short nrows, short ncols, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{0,0},{nrows, ncols}}, border)
-    {
-    }
-
-    using base::at;
-
-    T& at(short nrows, short ncols)
-    {
-      return base::at(typename base::point_type(nrows, ncols));
-    }
-
-    const T& at(short nrows, short ncols) const
-    {
-      return base::at(typename base::point_type(nrows, ncols));
-    }
-
-    unsigned nrows() const { return this->domain_.pmax[0] - this->domain_.pmin[0]; }
-    unsigned ncols() const { return this->domain_.pmax[1] - this->domain_.pmin[1]; }
-
-  };
-
+  using image2d = ndimage<T, 2>;
 
 
 } // end of namespace mln

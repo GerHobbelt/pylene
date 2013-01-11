@@ -10,19 +10,19 @@ namespace mln
   // fwd decl
   template <typename, unsigned, typename> struct ndimage_base;
 
-  template <typename T, unsigned dim, typename E, typename Domain>
-  typename std::enable_if< std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, const E>::type
-  make_subimage(const ndimage_base<T, dim, E>&,
+  template <typename T, unsigned dim, typename Domain>
+  typename std::enable_if< std::is_convertible<Domain, typename ndimage<T, dim>::domain_type>::value, ndimage<T, dim> >::type
+  make_subimage(const ndimage<T, dim>&,
 		const Domain& domain);
 
-  template <typename T, unsigned dim, typename E, typename Domain>
-  typename std::enable_if< std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, E>::type
-  make_subimage(ndimage_base<T, dim, E>&,
+  template <typename T, unsigned dim, typename Domain>
+  typename std::enable_if< std::is_convertible<Domain, typename ndimage<T, dim>::domain_type>::value, ndimage<T, dim> >::type
+  make_subimage(ndimage<T, dim>&,
 		const Domain& domain);
 
-  template <typename T, unsigned dim, typename E, typename Domain>
-  typename std::enable_if< std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, E>::type
-  make_subimage(ndimage_base<T, dim, E>&&,
+  template <typename T, unsigned dim, typename Domain>
+  typename std::enable_if< std::is_convertible<Domain, typename ndimage<T, dim>::domain_type>::value, ndimage<T, dim> >::type
+  make_subimage(ndimage<T, dim>&&,
 		const Domain& domain);
 
 
@@ -30,13 +30,22 @@ namespace mln
   /****          Implementation          ****/
   /******************************************/
 
-  template <typename T, unsigned dim, typename E, typename Domain>
+  template <typename T, unsigned dim, typename Domain>
   inline
-  typename std::enable_if< std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, E>::type
-  make_subimage(ndimage_base<T, dim, E>& image,
+  typename std::enable_if< std::is_convertible<Domain, typename ndimage<T, dim>::domain_type>::value, ndimage<T, dim> >::type
+  make_subimage(ndimage<T, dim>& image,
                 const Domain& domain)
   {
-    E other(exact(image));
+    return make_subimage((const ndimage<T, dim>&) image, domain);
+  }
+
+  template <typename T, unsigned dim, typename Domain>
+  inline
+  typename std::enable_if< std::is_convertible<Domain, typename ndimage<T, dim>::domain_type>::value, ndimage<T, dim> >::type
+  make_subimage(const ndimage<T, dim>& image,
+                const Domain& domain)
+  {
+    ndimage<T, dim> other(image);
     other.domain_ = domain;
     other.border_ = 0;
     other.ptr_ = (char*) &image(domain.pmin);
@@ -47,20 +56,11 @@ namespace mln
     return other;
   }
 
-  template <typename T, unsigned dim, typename E, typename Domain>
-  inline
-  typename std::enable_if< std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, const E>::type
-  make_subimage(const ndimage_base<T, dim, E>& image,
-                const Domain& domain)
-  {
-    return make_subimage(const_cast< ndimage_base<T, dim, E>& >(image), domain);
-  }
 
-
-  template <typename T, unsigned dim, typename E, typename Domain>
+  template <typename T, unsigned dim, typename Domain>
   inline
-  typename std::enable_if< std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, E>::type
-  make_subimage(ndimage_base<T, dim, E>&& image,
+  typename std::enable_if< std::is_convertible<Domain, typename ndimage<T, dim>::domain_type>::value, ndimage<T, dim> >::type
+  make_subimage(ndimage<T, dim>&& image,
                 const Domain& domain)
   {
     return make_subimage(image, domain);

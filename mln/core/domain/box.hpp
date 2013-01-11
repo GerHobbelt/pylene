@@ -219,7 +219,7 @@ namespace mln
   /// Traits
 
   /// Forward
-  template <typename> struct image2d;
+  template <typename T, unsigned dim> struct ndimage;
 
   template <>
   struct image_from_domain<box2d>
@@ -227,7 +227,7 @@ namespace mln
     template <typename T>
     struct apply
     {
-      typedef image2d<T> type;
+      typedef ndimage<T, 2> type;
     };
   };
 
@@ -237,7 +237,7 @@ namespace mln
     template <typename T>
     struct apply
     {
-      typedef image2d<T> type;
+      typedef ndimage<T, 2> type;
     };
   };
 

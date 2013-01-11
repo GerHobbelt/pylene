@@ -16,23 +16,21 @@
 namespace mln
 {
 
-  template <typename T, unsigned dim, typename E> struct ndimage_base;
-
   // FWD
   //template <typename I, typename T> struct ndimage_iter;
   //template <typename I, typename T> struct ndimage_rev_iter;
   //template <typename T, unsigned dim, typename I> struct ndimage_pixel_iterator;
   //template <typename T, unsigned dim, typename I> struct ndimage_rev_pixel_iterator;
   template <typename T, unsigned dim, typename I> struct ndimage_pixel;
-  template <typename T, unsigned dim, typename E> struct ndimage_base;
+  template <typename T, unsigned dim> struct ndimage;
 
 /******************************************/
 /****              Traits              ****/
 /******************************************/
 
 
-  template <typename T, unsigned dim, typename E>
-  struct image_traits< ndimage_base<T, dim, E> >
+  template <typename T, unsigned dim>
+  struct image_traits< ndimage<T, dim> >
   {
     typedef raw_image_tag               category;
     typedef std::true_type              accessible;
@@ -40,6 +38,14 @@ namespace mln
     typedef std::true_type		concrete;
     typedef std::true_type		shallow_copy;
   };
+
+
+  template <typename T, unsigned dim, typename V>
+  struct image_ch_value< ndimage<T, dim>, V >
+  {
+    typedef ndimage<V, dim> type;
+  };
+
 
 /******************************************/
 /****            Definition            ****/
@@ -64,12 +70,17 @@ namespace mln
   }
 
 
-  template <typename T, unsigned dim, typename E>
-  struct ndimage_base :
-    image_base<E, point<short, dim>, T, ndimage_pixel<T, dim, E>, ndimage_pixel<const T, dim, const E> >
+  template <typename T, unsigned dim>
+  struct ndimage :
+    image_base< ndimage<T, dim>, point<short, dim>, T, ndimage_pixel<T, dim, ndimage<T, dim> >, ndimage_pixel<const T, dim, const ndimage<T, dim> > >
   {
   private:
-    typedef ndimage_base<T, dim, E>                             this_type;
+    typedef image_base< ndimage<T, dim>,
+			point<short, dim>, T,
+			ndimage_pixel<T, dim, ndimage<T, dim> >,
+			ndimage_pixel<const T, dim, const ndimage<T, dim> > > base;
+    typedef ndimage<T, dim>                             this_type;
+    typedef ndimage<T, dim>                             E;
   public:
     // As an Image
 
@@ -95,8 +106,16 @@ namespace mln
     // As an Image
     // \group Constructors
     // \{
-    explicit ndimage_base(unsigned border = 3);
-    explicit ndimage_base(const domain_type& domain, unsigned border = 3, T v = T());
+    explicit ndimage(unsigned border = 3);
+    explicit ndimage(const domain_type& domain, unsigned border = 3, T v = T());
+
+    template <typename = typename std::enable_if<dim == 2>::type>
+    ndimage(short nrows, short ncols, unsigned border = 3, T v = T()) :
+      domain_ {{0,0},{nrows, ncols}},
+      border_ (border)
+    {
+      resize_(domain_, border, v);
+    }
     // \}
 
     const domain_type&  domain() const;
@@ -104,6 +123,10 @@ namespace mln
     // As an ContainerImage
     // \group Point-wise access
     // \{
+
+    using base::operator ();
+    using base::at;
+
     reference operator() (const site_type& p);
     const_reference operator() (const site_type& p) const;
 
@@ -165,13 +188,9 @@ namespace mln
 
 
     // Specialized algorithm
-    template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    friend typename std::enable_if<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>::type
-      make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
-    // template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    // friend E_ make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
-    // template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    // friend typename E_ make_subimage(ndimage_base<T_, dim_, E_>&&, const Domain_& domain);
+    template <typename T_, unsigned dim_, typename Domain_>
+    friend typename std::enable_if<std::is_convertible<Domain_, typename ndimage<T_, dim_>::domain_type>::value, ndimage<T_, dim_> >::type
+    make_subimage(const ndimage<T_, dim_>&, const Domain_& domain);
 
 
     // As an Indexable Image
@@ -212,10 +231,17 @@ namespace mln
     }
 
 
+    template <typename = typename std::enable_if<dim == 2>::type >
+    unsigned nrows() const { return this->domain_.pmax[0] - this->domain_.pmin[0]; }
+
+    template <typename = typename std::enable_if<dim == 2>::type >
+    unsigned ncols() const { return this->domain_.pmax[1] - this->domain_.pmin[1]; }
+
+
   protected:
     friend struct ndimage_pixel<T, dim, E>;
     friend struct ndimage_pixel<const T, dim, const E>;
-    template <typename, typename, unsigned, typename> friend struct indexible_ndimage_base;
+    template <typename, typename, unsigned, typename> friend struct indexible_ndimage;
     template <typename, typename> friend struct ndimage_value_range;
     template <typename, typename> friend struct ndimage_pixel_range;
 
@@ -238,32 +264,10 @@ namespace mln
     size_t				m_index_last;           ///< index of pmax
   };
 
+
   /******************************/
   /** Free function Impl        */
   /******************************/
-
-
-  template <typename T>
-  struct image3d : ndimage_base<T, 3, image3d<T> >
-  {
-  protected:
-    typedef ndimage_base<T, 3, image3d<T> > base;
-    typedef typename base::domain_type domain_type;
-
-  public:
-    explicit image3d (unsigned border = 3) : base (border) {}
-
-    explicit image3d(const domain_type& domain, unsigned border = 3)
-      : base(domain, border)
-    {
-    }
-
-    image3d(short nslices, short nrows, short ncols, unsigned border = 3)
-      : base( (box<short,3>) {{{0,0,0}},{{nslices, nrows, ncols}}}, border)
-    {
-    }
-  };
-
 
   namespace internal
   {
@@ -344,8 +348,8 @@ namespace mln
   }
 
 
-  template <typename T, unsigned dim, typename E>
-  ndimage_base<T,dim,E>::ndimage_base(unsigned border)
+  template <typename T, unsigned dim>
+  ndimage<T,dim>::ndimage(unsigned border)
   : domain_ (), border_ (border), ptr_ (NULL)
   {
     for (unsigned i = 0; i < dim; ++i){
@@ -354,17 +358,17 @@ namespace mln
     }
   }
 
-  template <typename T, unsigned dim, typename E>
-  ndimage_base<T,dim,E>::ndimage_base(const domain_type& domain, unsigned border, T v)
+  template <typename T, unsigned dim>
+  ndimage<T,dim>::ndimage(const domain_type& domain, unsigned border, T v)
     : domain_ (domain),
       border_ (border)
   {
     resize_(domain_, border, v);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   void
-  ndimage_base<T,dim,E>::resize_(const domain_type& domain, unsigned border, T v)
+  ndimage<T,dim>::resize_(const domain_type& domain, unsigned border, T v)
   {
     site_type shp = domain.shape();
     point<size_t, dim> sz;
@@ -396,19 +400,19 @@ namespace mln
   }
 
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   void
-  ndimage_base<T,dim,E>::resize(const domain_type& domain, unsigned border, T v)
+  ndimage<T,dim>::resize(const domain_type& domain, unsigned border, T v)
   {
     domain_ = domain;
     border_ = border;
     resize_(domain_, border, v);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
   T&
-  ndimage_base<T,dim,E>::at (const site_type& p)
+  ndimage<T,dim>::at (const site_type& p)
   {
     mln_precondition(vbox_.has(p));
 
@@ -419,10 +423,10 @@ namespace mln
   }
 
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
   const T&
-  ndimage_base<T,dim,E>::at (const site_type& p) const
+  ndimage<T,dim>::at (const site_type& p) const
   {
     mln_precondition(vbox_.has(p));
 
@@ -433,71 +437,71 @@ namespace mln
   }
 
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
   T&
-  ndimage_base<T,dim,E>::operator() (const site_type& p)
+  ndimage<T,dim>::operator() (const site_type& p)
   {
     mln_precondition(domain_.has(p));
     return at(p);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator() (const site_type& p) const
+  ndimage<T,dim>::operator() (const site_type& p) const
   {
     mln_precondition(domain_.has(p));
     return at(p);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
   T&
-  ndimage_base<T,dim,E>::operator[] (std::size_t i)
+  ndimage<T,dim>::operator[] (std::size_t i)
   {
     mln_precondition(vbox_.has(point_at_index(i)));
     return *(m_ptr_origin + i);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator[] (std::size_t i) const
+  ndimage<T,dim>::operator[] (std::size_t i) const
   {
     mln_precondition(vbox_.has(point_at_index(i)));
     return *(m_ptr_origin + i);
   }
 
 
-  // template <typename T, unsigned dim, typename E>
+  // template <typename T, unsigned dim>
   // inline
   // T&
-  // ndimage_base<T,dim,E>::element (difference_type n)
+  // ndimage<T,dim>::element (difference_type n)
   // {
   //   return *reinterpret_cast<T*>(ptr_+n);
   // }
 
-  // template <typename T, unsigned dim, typename E>
+  // template <typename T, unsigned dim>
   // inline
   // const T&
-  // ndimage_base<T,dim,E>::element (difference_type n) const
+  // ndimage<T,dim>::element (difference_type n) const
   // {
   //   return *reinterpret_cast<const T*>(ptr_+n);
   // }
 
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   const size_t*
-  ndimage_base<T,dim,E>::strides () const
+  ndimage<T,dim>::strides () const
   {
     return &strides_[0];
   }
 
 
-  // template <typename T, unsigned dim, typename E>
+  // template <typename T, unsigned dim>
   // ptrdiff_t
-  // ndimage_base<T,dim,E>::offset (point_type dp) const
+  // ndimage<T,dim>::offset (point_type dp) const
   // {
   //   ptrdiff_t x = 0;
   //   for (unsigned i = 0; i < dim; ++i)
@@ -505,44 +509,44 @@ namespace mln
   //   return x;
   // }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
-  const typename ndimage_base<T,dim,E>::domain_type&
-  ndimage_base<T,dim,E>::domain () const
+  const typename ndimage<T,dim>::domain_type&
+  ndimage<T,dim>::domain () const
   {
     return domain_;
   }
 
   /* -- Value range -- */
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
-  typename ndimage_base<T,dim,E>::const_value_range
-  ndimage_base<T,dim,E>::values () const
+  typename ndimage<T,dim>::const_value_range
+  ndimage<T,dim>::values () const
   {
     return const_value_range(exact(*this));
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
-  typename ndimage_base<T,dim,E>::value_range
-  ndimage_base<T,dim,E>::values ()
+  typename ndimage<T,dim>::value_range
+  ndimage<T,dim>::values ()
   {
     return value_range(*this);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
-  typename ndimage_base<T,dim,E>::const_pixel_range
-  ndimage_base<T,dim,E>::pixels () const
+  typename ndimage<T,dim>::const_pixel_range
+  ndimage<T,dim>::pixels () const
   {
     return const_pixel_range(*this);
   }
 
-  template <typename T, unsigned dim, typename E>
+  template <typename T, unsigned dim>
   inline
-  typename ndimage_base<T,dim,E>::pixel_range
-  ndimage_base<T,dim,E>::pixels ()
+  typename ndimage<T,dim>::pixel_range
+  ndimage<T,dim>::pixels ()
   {
     return pixel_range(*this);
   }

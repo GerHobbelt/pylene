@@ -3,6 +3,7 @@
 
 
 # include <mln/core/image/image.hpp>
+# include <mln/core/image/internal/image_base_at_mixin.hpp>
 # include <cstddef>
 
 namespace mln
@@ -21,7 +22,9 @@ namespace mln
             typename SizeType = std::size_t,
             typename Difference = std::ptrdiff_t
             >
-  struct image_base : mln::Image<Derived>
+  struct image_base :
+    mln::Image<Derived>,
+    internal::image_base_at_mixin<Derived, Point, Reference, ConstReference>
   {
     typedef Point point_type;
     typedef Point site_type;
@@ -51,6 +54,7 @@ namespace mln
       mln_precondition(pix.image() == this);
       return pix.val();
     }
+
   };
 
 } // end of namespace mln

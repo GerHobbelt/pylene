@@ -13,6 +13,7 @@
 #include "topology.hpp"
 #include <mln/morpho/maxtree_pqueue_parallel.hpp>
 #include <libgen.h>
+#include "thicken.hpp"
 
 namespace mln
 {
@@ -153,6 +154,10 @@ int main(int argc, char** argv)
   else
     K = area,
     std::tie(parent, S) = morpho::impl::serial::maxtree_pqueue(area, c4, std::greater<unsigned> ());
+
+  auto w = thicken(K, parent, S);
+  io::imsave(transform(w, [=](unsigned v) -> float { return (float)v; }), "thicken.tiff");
+  std::exit(0);
 
   std::cout << "S.size(): " << S.size() << std::endl;
   auto ima2 = addborder(ima); // add border with median w.r.t < lexico

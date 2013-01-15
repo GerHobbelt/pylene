@@ -11,66 +11,11 @@
 #include <mln/io/imsave.hpp>
 #include <boost/format.hpp>
 #include "topology.hpp"
-#include <mln/morpho/maxtree_pqueue_parallel.hpp>
+#include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <libgen.h>
 #include "thicken.hpp"
+#include "addborder.hpp"
 
-namespace mln
-{
-
-  template < class I, class Compare = std::less<mln_value(I)> >
-  mln_concrete(I)
-  addborder(const Image<I>& ima_, const Compare& cmp = Compare ())
-  {
-    const I& ima = exact(ima_);
-    typedef mln_value(I) V;
-    image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
-
-    {
-      box2d box = ima.domain();
-      box.pmin += 1; box.pmax += 1;
-      copy(ima, out | box);
-    }
-
-    V median;
-    unsigned ncols = ima.ncols(), nrows = ima.nrows();
-    {
-      std::vector<V> border;
-      border.reserve(2 * (nrows + ncols) - 4);
-      for (int i = 0; i < ncols; ++i) {
-	border.push_back(ima.at(0,i));
-	border.push_back(ima.at(nrows-1,i));
-      }
-
-      for (int i = 1; i < nrows-1; ++i) {
-	border.push_back(ima.at(i,0));
-	border.push_back(ima.at(i,ncols-1));
-      }
-
-      std::cout << border.size() << std::endl;
-      std::partial_sort(border.begin(), border.begin() + border.size()/2+1, border.end(), cmp);
-      if (border.size() % 2 == 0) {
-	V a = border[border.size()/2 - 1], b = border[border.size()/2];
-	median = a + (b-a) / 2;
-      } else
-	median = border[border.size()/2];
-    }
-
-    {
-      for (int i = 0; i < ncols+2; ++i) {
-	out.at(0,i) = median;
-	out.at(nrows+1,i) = median;
-      }
-
-      for (int i = 1; i < nrows+1; ++i) {
-	out.at(i,0) = median;
-	out.at(i,ncols+1) = median;
-      }
-    }
-    return out;
-  }
-
-}
 
 void usage(int argc, char** argv)
 {
@@ -82,6 +27,50 @@ void usage(int argc, char** argv)
 		<< "Output the results of filtering" << std::endl;
       abort();
     }
+}
+
+namespace mln
+{
+
+  template <typename V, typename T, class FilterFun>
+  image2d<V>
+  setmean_on_nodes(const image2d<V>& ima, const image2d<T>& K,
+		   const image2d<unsigned>& parent, const std::vector<unsigned>& S, FilterFun pred)
+  {
+    typedef rgb<unsigned> SumType;
+    image2d<SumType>  sum;
+    image2d<unsigned> count;
+    resize(count, K, K.border(), 0);
+    resize(sum, K, K.border(), SumType ());
+
+    for (int i = S.size() - 1; i >= 0; --i)
+      {
+	unsigned p = S[i];
+	if (pred(K.point_at_index(p)))
+	  {
+	    unsigned q = parent[p];
+	    if (K[p] != K[q])
+	      q = p;
+	    count[q] += 1;
+	    sum[q] += ima[p];
+	  }
+      }
+
+    image2d<V> out;
+    resize(out, ima);
+    unsigned p = S[0];
+    out[p] = sum[p] / count[p];
+    for (unsigned p: S)
+      {
+	unsigned q = parent[p];
+	if (K[p] == K[q])
+	  out[p] = out[q];
+	else if (count[p] != 0)
+	  out[p] = sum[p] / count[p];
+      }
+    return out;
+  }
+
 }
 
 
@@ -117,9 +106,9 @@ int main(int argc, char** argv)
   // io::imprint(K);
   // io::imprint(parent);
 
-  auto r_area = morpho::area_compute(rK, rparent, rS, K1::is_face_2);
-  auto g_area = morpho::area_compute(gK, gparent, gS, K1::is_face_2);
-  auto b_area = morpho::area_compute(bK, bparent, bS, K1::is_face_2);
+  auto r_area = morpho::area_compute(rK, rparent, rS);//, K1::is_face_2);
+  auto g_area = morpho::area_compute(gK, gparent, gS);//, K1::is_face_2);
+  auto b_area = morpho::area_compute(bK, bparent, bS);//, K1::is_face_2);
 
   image2d<unsigned> area;
   if (std::string(argv[2]) == "max")
@@ -136,7 +125,7 @@ int main(int argc, char** argv)
   io::imsave(transform(r_area, [=](unsigned x) -> float { return (float)x / maxr; }), "red.tiff");
   io::imsave(transform(g_area, [=](unsigned x) -> float { return (float)x / maxg; }), "green.tiff");
   io::imsave(transform(b_area, [=](unsigned x) -> float { return (float)x / maxb; }), "blue.tiff");
-  io::imsave(transform(area, [=](unsigned x) -> float { return (float)x / maxr; }), "area.tiff");
+  io::imsave(transform(area, [=](unsigned x) -> float { return (float)x; }), "area.tiff");
   // io::imsave(r_area, "red.tiff");
   // io::imsave(g_area, "green.tiff");
   // io::imsave(b_area, "blue.tiff");
@@ -153,19 +142,28 @@ int main(int argc, char** argv)
     std::tie(K, parent, S) = morpho::ToS(area, c4);
   else
     K = area,
-    std::tie(parent, S) = morpho::impl::serial::maxtree_pqueue(area, c4, std::greater<unsigned> ());
+    std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(area, c8, std::greater<unsigned> ());
 
-  auto w = thicken(K, parent, S);
-  io::imsave(transform(w, [=](unsigned v) -> float { return (float)v; }), "thicken.tiff");
-  std::exit(0);
-
-  std::cout << "S.size(): " << S.size() << std::endl;
   auto ima2 = addborder(ima); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent, parent.border(), rgb8{0,0,255});
 
   point2d strides = use_tos ? point2d{4,4} : point2d{2,2};
   copy(ima2, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, strides));
+
+  {
+    auto w = thicken_tdn(K, parent, S, c8);
+    image2d<rgb8> out;
+    if (use_tos)
+      out = setmean_on_nodes(tmp, w, parent, S, K2::is_face_2);
+    else
+      out = setmean_on_nodes(tmp, w, parent, S, K1::is_face_2);
+
+    io::imsave(transform(w, [=](unsigned v) -> float { return (float)v; }), "thicken.tiff");
+    io::imsave(out, "thicken_rgb.tiff");
+    std::exit(0);
+  }
+
 
   {
     image2d<unsigned> x;

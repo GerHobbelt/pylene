@@ -5,6 +5,7 @@
 # include <mln/core/value/value_traits.hpp>
 # include <mln/core/wrt_offset.hpp>
 # include <mln/io/imprint.hpp>
+# include <mln/morpho/maxtree_ufind_parallel.hpp>
 
 namespace mln
 {
@@ -12,7 +13,7 @@ namespace mln
 
   template <typename V>
   image2d<unsigned>
-  thicken(const image2d<V>& ima, image2d<unsigned>& parent, const std::vector<unsigned>& S)
+  thicken_bup(const image2d<V>& ima, image2d<unsigned>& parent, const std::vector<unsigned>& S)
   {
     image2d<unsigned> depth;
     resize(depth, ima);
@@ -43,18 +44,21 @@ namespace mln
         mln_foreach(int k, offset)
           mindepth[q] = std::min(mindepth[q], depth[p + k]);
 
-        if (ima[q] != ima[parent[q]]) // q is a non-root node
+        if (p == q) // p is a node
           {
-            mindepth[parent[q]] = std::min(mindepth[parent[q]], mindepth[q]);
-            if (depth[q] <= validdepth[q]) // Then q is a kept
+	    q = parent[p];
+            mindepth[q] = std::min(mindepth[q], mindepth[p]);
+            if (depth[p] <= validdepth[p]) // Then p is a kept
               {
-                validdepth[q] = depth[q];
-                validdepth[parent[q]] = mindepth[q];
+                validdepth[p] = depth[p];
+                validdepth[q] = std::min(validdepth[q], mindepth[p]);
               }
-            else // q collapsed with its parent
-              validdepth[parent[q]] = validdepth[q];
+            else // p collapsed with its parent
+              validdepth[q] = std::min(validdepth[q], validdepth[p]);
           }
       }
+    io::imsave(transform(depth, [](unsigned x) -> float { return x; }), "depth.tiff");
+    io::imsave(transform(validdepth, [](unsigned x) -> float { return x; }), "validdepth.tiff");
 
     // propagate and collapse parent
     for (unsigned p: S)
@@ -62,6 +66,9 @@ namespace mln
         unsigned q = parent[p];
         if (ima[p] == ima[q])
           validdepth[p] = validdepth[q];
+	else if (depth[p] > validdepth[p])
+	  validdepth[p] = validdepth[q];
+
         if (validdepth[q] == validdepth[parent[q]])
           parent[p] = parent[q];
       }
@@ -70,6 +77,70 @@ namespace mln
     //io::imprint(validdepth);
     return validdepth;
   }
+
+  template <typename V, typename Nbh>
+  image2d<unsigned>
+  thicken_tdn(const image2d<V>& ima, image2d<unsigned>& parent, const std::vector<unsigned>& S, const Nbh& nbh = c4)
+  {
+    image2d<unsigned> depth;
+    resize(depth, ima);
+
+    auto offset = wrt_delta_index(ima, nbh.dpoints);
+    depth[S[0]] = 0;
+    for (unsigned p : S)
+      {
+	unsigned q = parent[p];
+	if (ima[p] == ima[q])
+	  depth[p] = depth[q];
+	else
+	  depth[p] = depth[q] + 1;
+      }
+
+
+
+    image2d<unsigned> outdepth; // The depth of the highest node in the internal hole
+    static constexpr unsigned UNDEF = value_traits<unsigned>::max();
+    resize(outdepth, ima, ima.border(), UNDEF);
+    outdepth[S[0]] = 0;
+    unsigned i = 0;
+    for (unsigned p : S)
+      {
+        unsigned q = ima[p] == ima[parent[p]] ? parent[p] : p;
+
+	outdepth[p] = outdepth[q];
+
+        mln_foreach(int k, offset)
+	  {
+	    unsigned n = p + k;
+	    unsigned r = ima[parent[n]] == ima[n] ? parent[n] : n;
+	    if (outdepth[r] == UNDEF)
+	      outdepth[r] = outdepth[q]+1;
+	    else if (depth[q] < depth[r] and outdepth[q] > outdepth[r]) // node collapse
+	      {
+		unsigned x = q;
+		unsigned d = outdepth[r];
+		while (outdepth[x] > d) {
+		  outdepth[x] = d;
+		  x = parent[x];
+		}
+	      }
+
+	  }
+      }
+
+    for (unsigned p : S)
+      {
+	unsigned q = parent[p];
+	if (ima[p] == ima[q])
+	  outdepth[p] = outdepth[q];
+
+	if (outdepth[q] == outdepth[parent[q]])
+	  parent[p] = parent[q];
+      }
+
+    return outdepth;
+  }
+
 
 }
 

@@ -103,6 +103,8 @@ resizetile(const mln::image2d<mln::uint8>& ima, unsigned size)
   unsigned r = std::sqrt(size / q);
   unsigned c = r * q;
 
+
+
   mln::image2d<mln::uint8> out(r, c);
   for (unsigned i = 0; i < r; ++i)
     for (unsigned j = 0; j < c; ++j)

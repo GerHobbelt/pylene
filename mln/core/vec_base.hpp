@@ -439,6 +439,13 @@ namespace mln
 	return * reinterpret_cast< const vec_base<T, dim, OtherTag>* > (this);
       }
 
+      template <typename SumType = T>
+      SumType sum(SumType s = 0) const
+      {
+	for (int i = 0; i < dim; ++i)
+	  s += v_[i];
+	return s;
+      }
 
       T v_[dim];
     };

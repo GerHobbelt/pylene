@@ -8,9 +8,19 @@ namespace mln
 
   struct zero_t
   {
-};
+    constexpr int () const
+    {
+      return 0;
+    }
+  };
 
-  struct one_t {};
+  struct one_t
+  {
+    constexpr int () const
+    {
+      return 1;
+    }
+  };
 
 
   static const zero_t zero;

@@ -3,6 +3,7 @@
 
 # include <mln/accu/accumulator.hpp>
 # include <mln/core/algorithm/fill.hpp>
+# include <mln/core/extension/fill.hpp>
 
 namespace mln
 {
@@ -11,13 +12,14 @@ namespace mln
   {
 
 
-    template <typename V, typename T, typename Accumulator2F = NoOpAccumulator, typename Accumulalor1F = NoOpAccumulator>
+    template <typename V, typename T, typename Accumulator2F = accu::NoOpAccumulator, typename Accumulator1F = accu::NoOpAccumulator>
+    std::pair< image2d<Accumulator2F>, image2d<Accumulator1F> >
     tos_compute_attribute(const image2d<V>& K, const image2d<unsigned>& parent,
 			  const std::vector<unsigned>& S, const image2d<T>& ori,
-			  Accumulalor2f acc2f = Accumulalor2f (), Accumulalor1f acc1f = Accumulalor1f ())
+			  Accumulator2F acc2f = Accumulator2F (), Accumulator1F acc1f = Accumulator1F ())
     {
-      static constexpr bool use_acc1f = !std::is_same<Accumulator1F, NoOpAccumulator>::value;
-      static constexpr bool use_acc2f = !std::is_same<Accumulator2F, NoOpAccumulator>::value;
+      static constexpr bool use_acc1f = !std::is_same<Accumulator1F, accu::NoOpAccumulator>::value;
+      static constexpr bool use_acc2f = !std::is_same<Accumulator2F, accu::NoOpAccumulator>::value;
 
       static constexpr unsigned UNACTIVE = value_traits<unsigned>::max();
 
@@ -33,22 +35,24 @@ namespace mln
 
       box2d domain = K.domain();
       domain.pmax = domain.pmax * 2 - 1;
-      mln_ch_value(I, edge_attribute) e(domain);
+      image2d<edge_attribute> e;
 
       edge_attribute default_value = { UNACTIVE, UNACTIVE, };
-      fill(e, default_value);
+      e.resize(domain, K.border(), default_value);
+      extension::fill(e, default_value);
 
       // Kge of accumulators
-      mln_ch_value(I, Accumulator2F) im_acc2f;
-      mln_ch_value(I, Accumulator1F) im_acc1f;
+      image2d<Accumulator2F> im_acc2f;
+      image2d<Accumulator1F> im_acc1f;
 
-      resize(im_acc2f, f, f.border(), acc2f);
-      resize(im_acc1f, f, f.border(), acc1f);
+      resize(im_acc2f, K, K.border(), acc2f);
+      resize(im_acc1f, K, K.border(), acc1f);
 
 
 
-      auto didx_k1 = wrt_delta_index(K, c4);
-      auto didx_k2 = wrt_delta_index(active, c4);
+      auto didx_k1 = wrt_delta_index(K, c4.dpoints);
+      auto didx_k2 = wrt_delta_index(e, c4.dpoints);
+
 
       // Compute appear/vanish for edges
       // and 2-face attributes
@@ -57,48 +61,100 @@ namespace mln
 	  unsigned p  = S[i];
 	  unsigned rp = K[parent[p]] == K[p] ? parent[p] : p;
 
-	  point2d realp = K.point_at_index(p);
+	  point2d p_ = K.point_at_index(p);
+	  point2d p2_ = 2 * p_;
 
-	  if (K1::is_face_2(realp))
+	  if (K1::is_face_2(p_))
 	    {
-	      im_acc2f[rp].take(ori[p])
+	      im_acc2f[rp].take(ori[p]);
 
-	      point2d realp2 = 2 * p;
-	      unsigned p2 = active.index_of_point(realp2);
-	      for (int k = 0; k < 4; ++k)
-		{
-		  unsigned n1 = p + didx_k1[k];
-		  unsigned n2 = p2 + didx_k2[k];
-
-		  if (e[n2].appear == UNACTIVE) {
-		    e[n2].appear = rp;
-		    auto grad = (ori[p] - ori[n1]);
-		    e[n2].value = (grad*grad).sum();
-		  } else
-		    e[n2].vanish = rp;
-		}
+	      mln_iter(n,  c4(p_));
+	      mln_iter(n2, c4(p2_));
+	      mln_forall(n, n2)
+	      {
+		if (e.at(*n2).appear == UNACTIVE) {
+		  e.at(*n2).appear = rp;
+		  vec3i grad = (vec3i) ori.at(*n) - (vec3i) ori[p];
+		  e.at(*n2).value = (grad*grad).sum();
+		} else
+		  e.at(*n2).vanish = rp;
+	      }
+	    }
+	  else if (K1::is_face_1v(p_))
+	    {
+	      mln_iter(n,  c2_h(p_));
+	      mln_iter(n2, c2_h(p2_));
+	      mln_forall(n, n2)
+	      {
+		//std::cout << "fuck" << p_ << *n << *n2 << std::endl;
+		if (e.at(*n2).appear == UNACTIVE) {
+		  e.at(*n2).appear = rp;
+		  vec3i grad = (vec3i) ori.at(*n) - (vec3i) ori[p];
+		  e.at(*n2).value = (grad*grad).sum();
+		} else
+		  e.at(*n2).vanish = rp;
+	      }
+	    }
+	  else if (K1::is_face_1h(p_))
+	    {
+	      mln_iter(n,  c2_v(p_));
+	      mln_iter(n2, c2_v(p2_));
+	      mln_forall(n, n2)
+	      {
+		if (e.at(*n2).appear == UNACTIVE) {
+		  e.at(*n2).appear = rp;
+		  vec3i grad = (vec3i) ori.at(*n) - (vec3i) ori[p];
+		  e.at(*n2).value = (grad*grad).sum();
+		} else
+		  e.at(*n2).vanish = rp;
+	      }
 	    }
 	}
 
-
+      //io::imprint_with_border(transform(e, [](edge_attribute x) { return x.appear; }));
+      //io::imprint_with_border(transform(e, [](edge_attribute x) { return x.vanish; }));
       // Transmit edge atribute to nodes
       if (use_acc1f)
       {
 	point2d pmin = e.domain().pmin;
 	point2d pmax = e.domain().pmax;
-	for (int i = pmin[0]; i < pmax[0]; ++i)
-	  for (int j = pmin[1] + i % 2 + 1; j < pmax[1]; j += 2) // foreach edges
+	for (int i = pmin[0]-1; i < pmax[0]+1; ++i)
+	  {
+	    if (i % 4 == 2)
+	      continue;
+	    int step = i % 2 == 0 ? 2 : 4;
+	  for (int j = pmin[1] - (i % 2 == 0); j < pmax[1]+1; j += step) // foreach edges
 	    {
-	      point2d p = {i,j};
-	      unsigned cur_node  = e(p).appear;
-	      unsigned last_node = e(p).vanish;
-	      float    val = e(p).value;
-	      while (cur_node != last_node) {
+	      point2d p{i,j};
+	      unsigned cur_node  = e.at(p).appear;
+	      unsigned last_node = e.at(p).vanish;
+	      float    val = e.at(p).value;
+	      assert(cur_node != UNACTIVE);
+	      if (last_node == UNACTIVE)
 		im_acc1f[cur_node].take(val);
-		cur_node = parent[cur_node];
-	      }
+	      else
+		while (cur_node != last_node) {
+		  im_acc1f[cur_node].take(val);
+		  cur_node = parent[cur_node];
+		}
 	    }
+	  }
       }
+
+      if (true)
+	{
+	  for (unsigned p: S)
+	    {
+	      unsigned q = parent[p];
+	      if (K[p] == K[q])
+		{
+		  if (use_acc2f)
+		    im_acc2f[p] = im_acc2f[q];
+		  if (use_acc1f)
+		    im_acc1f[p] = im_acc1f[q];
+		}
+	    }
+	}
 
       return std::make_pair(im_acc2f, im_acc1f);
     }

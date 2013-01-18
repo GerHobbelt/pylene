@@ -15,7 +15,7 @@
 #include <libgen.h>
 #include "thicken.hpp"
 #include "addborder.hpp"
-#include <mln/morpho/tos/compute_attribute.hpp>
+#include "compute_attribute.hpp"
 
 
 void usage(int argc, char** argv)
@@ -66,8 +66,11 @@ namespace mln
 	unsigned q = parent[p];
 	if (K[p] == K[q])
 	  out[p] = out[q];
-	else if (count[p] != 0)
+	else {
+	  while (count[p] == 0)
+	    p = parent[p];
 	  out[p] = sum[p] / count[p];
+	}
       }
     return out;
   }
@@ -109,7 +112,7 @@ namespace mln
   {
     attr_1f()
       : size (0),
-	maxgrad (0)
+	gradient (0)
     {
     }
 
@@ -122,6 +125,52 @@ namespace mln
     float gradient;
     int size;
   };
+
+
+  template <typename V, typename T, class FilterFun>
+  void
+  set_mean_on_01face(const image2d<T>& K, const image2d<unsigned>& parent,
+		     const std::vector<unsigned>& S, image2d<V>& out, FilterFun filter)
+  {
+    struct myattribute {
+      unsigned count;
+      vec3i sum;
+    };
+
+    mln_precondition(K.domain() == out.domain());
+    mln_precondition(K.domain() == parent.domain());
+
+    image2d<myattribute> attr;
+    resize(attr, K, K.border(), myattribute ());
+
+    for (int i = S.size() - 1; i >= 0; --i)
+      {
+	unsigned p = S[i];
+	point2d realp = out.point_at_index(p);
+	if (filter(realp))
+	  {
+	    unsigned q = K[p] == K [parent[p]]  ? parent[p] : p;
+	    ++attr[q].count;
+	    attr[q].sum += out[p].as_vec();
+	  }
+      }
+
+    mln_foreach(point2d p, out.domain())
+      {
+	if (not filter(p))
+	  {
+	    unsigned i = out.index_of_point(p);
+	    unsigned q = K[i] == K[parent[i]] ? parent[i] : i;
+	    myattribute a = attr[q];
+	    while (a.count == 0) {
+	      q = parent[q];
+	      a = attr[q];
+	    }
+	    out[i] = (V) (a.sum / a.count);
+	  }
+      }
+  }
+
 
 }
 
@@ -203,11 +252,20 @@ int main(int argc, char** argv)
   point2d strides = use_tos ? point2d{4,4} : point2d{2,2};
   copy(ima2, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, strides));
 
-  {
-    auto w = morpho::tos_compute_attribute(K, parent, S, ima2, attr_2f(), attr_1f());
+  if (use_tos)
+    set_mean_on_01face(K, parent, S, tmp, K2::is_face_2);
+  else
+    set_mean_on_01face(K, parent, S, tmp, K1::is_face_2);
 
-    io::imsave(transform(w, [=](unsigned v) -> float { return (float)v; }), "thicken.tiff");
-    io::imsave(out, "thicken_rgb.tiff");
+  io::imsave(tmp, "tmp.tiff");
+  {
+    image2d<attr_2f> x;
+    image2d<attr_1f> y;
+    std::tie(x,y) = morpho::tos_compute_attribute(K, parent, S, tmp, attr_2f(), attr_1f());
+
+    io::imsave(transform(y, [=](attr_1f v) -> float { return (float)v.size; }),     "clength.tiff");
+    io::imsave(transform(y, [=](attr_1f v) -> float { return (float)v.gradient; }), "cgradient.tiff");
+    //io::imsave(out, "thicken_rgb.tiff");
   }
 
 

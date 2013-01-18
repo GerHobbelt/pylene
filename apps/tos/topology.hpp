@@ -20,6 +20,9 @@ namespace mln
 
   namespace K1 {
     bool is_face_2(point2d p);
+    bool is_face_1(point2d p);
+    bool is_face_1v(point2d p);
+    bool is_face_1h(point2d p);
   }
 
   namespace K2 {
@@ -76,6 +79,21 @@ namespace mln
     bool is_face_2(point2d p)
     {
       return (p[0] % 2 == 0 and p[1] % 2 == 0);
+    }
+
+    bool is_face_1(point2d p)
+    {
+      return (p[0] % 2 == 0 xor p[1] % 2 == 0);
+    }
+
+    bool is_face_1v(point2d p)
+    {
+      return (p[0] % 2 == 0 and p[1] % 2 == 1);
+    }
+
+    bool is_face_1h(point2d p)
+    {
+      return (p[0] % 2 == 1 and p[1] % 2 == 0);
     }
 
   }

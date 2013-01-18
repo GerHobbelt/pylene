@@ -508,7 +508,9 @@ namespace mln
   typedef vec<int, 1>		vec1i;
   typedef vec<int, 2>		vec2i;
   typedef vec<int, 3>		vec3i;
-
+  typedef vec<float, 1>		vec1f;
+  typedef vec<float, 2>		vec2f;
+  typedef vec<float, 3>		vec3f;
 }
 
 # ifdef _MSC_VER

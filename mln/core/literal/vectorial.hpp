@@ -8,7 +8,7 @@ namespace mln
 
   struct zero_t
   {
-    constexpr int () const
+    constexpr operator int () const
     {
       return 0;
     }
@@ -16,7 +16,7 @@ namespace mln
 
   struct one_t
   {
-    constexpr int () const
+    constexpr operator int () const
     {
       return 1;
     }

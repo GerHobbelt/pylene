@@ -172,6 +172,29 @@ namespace mln
   }
 
 
+  template <typename T>
+  simplify(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S,
+	   const image2d<attr2_f>& acc2, const image2d<attr1_f>& acc1)
+  {
+    std::vector<unsigned> nodes;
+    nodes.reserve(S.size());
+    nodes.push_back(S[0]);
+    for (unsigend p : S)
+      if (K[parent[p]] != K[p])
+	node.push_back(p);
+    std::sort(nodes.begin(), nodes.end(), [&] (unsigned x, unsigned y) { return acc1[x].gradient < acc1[y].gradient; });
+
+    bool need_repeat = true;
+    while (need_repeat)
+      {
+	need_repeat = true;
+	for (unsigned n: nodes)
+	  if (!is_removed(n))
+	    {
+	      float delta_e = 
+	    }
+      }
+  }
 }
 
 

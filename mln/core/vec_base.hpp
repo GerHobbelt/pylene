@@ -297,6 +297,17 @@ namespace mln
       VEC_BASE_GEN_EXT_OP(is_additive_ext, -=)
       VEC_BASE_GEN_EXT_OP(is_additive_ext, +=)
 
+
+      vec_base operator - () const
+      {
+        vec_base out;
+        for (unsigned i = 0; i < dim; ++i)
+          out.v_[i] = -v_[i];
+        return out;
+      }
+
+
+
       /* RELATIONAL */
       template <typename U>
       VEC_BASE_ENABLE_IFC(is_equality_comparable, bool)
@@ -442,7 +453,7 @@ namespace mln
       template <typename SumType = T>
       SumType sum(SumType s = 0) const
       {
-	for (int i = 0; i < dim; ++i)
+	for (unsigned i = 0; i < dim; ++i)
 	  s += v_[i];
 	return s;
       }

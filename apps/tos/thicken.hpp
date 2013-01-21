@@ -83,7 +83,8 @@ namespace mln
   thicken_tdn(const image2d<V>& ima, image2d<unsigned>& parent, const std::vector<unsigned>& S, const Nbh& nbh = c4)
   {
     image2d<unsigned> depth;
-    resize(depth, ima);
+    static constexpr unsigned UNDEF = value_traits<unsigned>::max();
+    resize(depth, ima, ima.border(), UNDEF);
 
     auto offset = wrt_delta_index(ima, nbh.dpoints);
     depth[S[0]] = 0;
@@ -99,7 +100,6 @@ namespace mln
 
 
     image2d<unsigned> outdepth; // The depth of the highest node in the internal hole
-    static constexpr unsigned UNDEF = value_traits<unsigned>::max();
     resize(outdepth, ima, ima.border(), UNDEF);
     outdepth[S[0]] = 0;
     unsigned i = 0;
@@ -112,6 +112,10 @@ namespace mln
         mln_foreach(int k, offset)
 	  {
 	    unsigned n = p + k;
+
+	    if (depth[n] == UNDEF) // outside domain
+	      continue;
+
 	    unsigned r = ima[parent[n]] == ima[n] ? parent[n] : n;
 	    if (outdepth[r] == UNDEF)
 	      outdepth[r] = outdepth[q]+1;

@@ -31,13 +31,21 @@
 # include <mln/core/wrt_offset.hpp>
 # include <mln/core/extension/fill.hpp>
 # include <mln/morpho/tos/irange.hpp>
+# include <mln/morpho/tos/immerse.hpp>
 # include <mln/morpho/tos/pset.hpp>
+
 
 namespace mln
 {
 
   namespace morpho
   {
+
+    namespace internal
+    {
+      template <typename Compare>
+      struct equiv;
+    }
 
 
     /// \brief Compute the tree of shapes
@@ -49,9 +57,14 @@ namespace mln
     ///
     /// \return
     ///
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>, typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
+
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
-    ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare ());
+    ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () );
+
 
 
 
@@ -70,12 +83,31 @@ namespace mln
 	  zpar[x] = zfind_root(zpar, zpar[x]);
 	return zpar[x];
       }
+
+
+      template <typename Compare>
+      struct equiv
+      {
+	equiv(const Compare& cmp) :
+	m_cmp (cmp)
+	{
+	}
+
+	template <typename T>
+	bool operator () (const T& x, const T& y) const
+	{
+	  return !m_cmp(x,y) and !m_cmp(y,x);
+	}
+
+      private:
+	Compare m_cmp;
+      };
     }
 
 
-    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>, typename Equiv = internal::equiv<Compare> >
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
-    ToS(const Image<I>& ima_, const Neighborhood& nbh, const Compare& cmp = Compare ())
+    ToS(const Image<I>& ima_, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq)
     {
       using namespace mln::morpho::tos;
 
@@ -137,6 +169,7 @@ namespace mln
 	}
 
       // 2nd step: union-find
+
       resize(zpar, parent, parent.border(), UNPROCESSED);
       extension::fill(zpar, UNPROCESSED);
       for (int i = S.size()-1; i >= 0; --i)
@@ -145,7 +178,7 @@ namespace mln
 	  parent[p] = p;
 	  zpar[p] = p;
 
-	  mln_foreach (int k,  dindexes)
+	  mln_foreach (int k, dindexes)
 	    {
 	      size_type q = p + k;
 	      if (zpar[q] != UNPROCESSED)
@@ -157,13 +190,14 @@ namespace mln
 		  }
 		}
 	    }
+
 	}
 
       // 3rd step: canonicalization
       for (size_type p : S)
 	{
 	  size_type q = parent[p];
-	  if (K[q] == K[parent[q]])
+	  if (eq(K[q], K[parent[q]]))
 	    parent[p] = parent[q];
 	}
 
@@ -172,6 +206,14 @@ namespace mln
       mln_postcondition(S.size() == parent.domain().size());
       // All done !
       return std::make_tuple(std::move(K), std::move(parent), std::move(S));
+    }
+
+
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () )
+    {
+      return ToS(ima, nbh, cmp, internal::equiv<Compare> (cmp));
     }
 
   }

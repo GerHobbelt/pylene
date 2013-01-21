@@ -7,6 +7,12 @@
 namespace mln
 {
 
+  /**
+  *
+  * Important note:
+  * this method assume that for two values a,b s.t a < b
+  * then  a < (a+b)/2 < b
+  */
   template < class I, class Compare = std::less<mln_value(I)> >
   mln_concrete(I)
   addborder(const Image<I>& ima_, const Compare& cmp = Compare ())
@@ -40,7 +46,8 @@ namespace mln
       std::partial_sort(border.begin(), border.begin() + border.size()/2+1, border.end(), cmp);
       if (border.size() % 2 == 0) {
 	V a = border[border.size()/2 - 1], b = border[border.size()/2];
-	median = a + (b-a) / 2;
+	//median = a + (b-a) / 2;
+	median = border[border.size()/2];
       } else
 	median = border[border.size()/2];
     }

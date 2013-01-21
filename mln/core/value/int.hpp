@@ -121,7 +121,7 @@ namespace mln
     UInt(enc x) : m_x(x) {}
     operator enc& ()          { return m_x; }
 //operator enc  () const     { return m_x; }
-operator unsigned () const { return m_x; }
+    operator unsigned () const { return m_x; }
 
   private:
     enc m_x;
@@ -147,5 +147,53 @@ operator unsigned () const { return m_x; }
 
 } // end of namespace mln
 
+// Specialization of standards traits with Int and UInt
+
+namespace std
+{
+  // Forward declaration
+  template <typename... types_>
+  struct common_type;
+
+
+  template <unsigned n1, unsigned n2>
+  struct common_type< mln::UInt<n1>, mln::UInt<n2> >
+  {
+    typedef mln::UInt<(n1 > n2 ? n1 : n2)> type;
+  };
+
+  template <unsigned n, typename V>
+  struct common_type< mln::UInt<n>, V >
+    : common_type< typename boost::uint_t<n>::least, V >
+  {
+  };
+
+  template <unsigned n, typename V>
+  struct common_type< V, mln::UInt<n> >
+    : common_type< V, typename boost::uint_t<n>::least >
+  {
+  };
+
+
+  template <unsigned n1, unsigned n2>
+  struct common_type< mln::Int<n1>, mln::UInt<n2> >
+  {
+    typedef mln::Int<(n1 > n2 ? n1 : n2)> type;
+  };
+
+  template <unsigned n, typename V>
+  struct common_type< mln::Int<n>, V >
+    : common_type< typename boost::int_t<n>::least, V >
+  {
+  };
+
+  template <unsigned n, typename V>
+  struct common_type< V, mln::Int<n> >
+    : common_type< V, typename boost::int_t<n>::least >
+  {
+  };
+
+
+}
 
 #endif //!MLN_CORE_VALUE_INT_HPP

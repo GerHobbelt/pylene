@@ -83,7 +83,7 @@ namespace mln
 
     bool is_face_1(point2d p)
     {
-      return (p[0] % 2 == 0 xor p[1] % 2 == 0);
+      return ((p[0] % 2 == 0) xor (p[1] % 2 == 0));
     }
 
     bool is_face_1v(point2d p)

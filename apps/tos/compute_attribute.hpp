@@ -37,7 +37,7 @@ namespace mln
       domain.pmax = domain.pmax * 2 - 1;
       image2d<edge_attribute> e;
 
-      edge_attribute default_value = { UNACTIVE, UNACTIVE, };
+      edge_attribute default_value = { UNACTIVE, UNACTIVE, 0.0};
       e.resize(domain, K.border(), default_value);
       extension::fill(e, default_value);
 
@@ -48,10 +48,6 @@ namespace mln
       resize(im_acc2f, K, K.border(), acc2f);
       resize(im_acc1f, K, K.border(), acc1f);
 
-
-
-      auto didx_k1 = wrt_delta_index(K, c4.dpoints);
-      auto didx_k2 = wrt_delta_index(e, c4.dpoints);
 
 
       // Compute appear/vanish for edges
@@ -118,12 +114,12 @@ namespace mln
       {
 	point2d pmin = e.domain().pmin;
 	point2d pmax = e.domain().pmax;
-	for (int i = pmin[0]-1; i < pmax[0]+1; ++i)
+	for (short i = pmin[0]-1; i < pmax[0]+1; ++i)
 	  {
 	    if (i % 4 == 2)
 	      continue;
 	    int step = i % 2 == 0 ? 2 : 4;
-	  for (int j = pmin[1] - (i % 2 == 0); j < pmax[1]+1; j += step) // foreach edges
+            for (short j = pmin[1] - (i % 2 == 0); j < pmax[1]+1; j += step) // foreach edges
 	    {
 	      point2d p{i,j};
 	      unsigned cur_node  = e.at(p).appear;

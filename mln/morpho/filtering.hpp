@@ -139,8 +139,6 @@ namespace mln
 
       // filter + propagate to canonical element to non-canonical
       std::cout << "Area: " << area[S[0]] << std::endl;
-      rgb<T> red = {255,0,0};
-      rgb<T> green = {0,255,0};
       std::cout << lambda << std::endl;
 
       copy(ima, out);

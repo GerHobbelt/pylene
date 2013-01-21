@@ -26,12 +26,12 @@ namespace mln
     {
       std::vector<V> border;
       border.reserve(2 * (nrows + ncols) - 4);
-      for (int i = 0; i < ncols; ++i) {
+      for (unsigned i = 0; i < ncols; ++i) {
 	border.push_back(ima.at(0,i));
 	border.push_back(ima.at(nrows-1,i));
       }
 
-      for (int i = 1; i < nrows-1; ++i) {
+      for (unsigned i = 1; i < nrows-1; ++i) {
 	border.push_back(ima.at(i,0));
 	border.push_back(ima.at(i,ncols-1));
       }
@@ -46,12 +46,12 @@ namespace mln
     }
 
     {
-      for (int i = 0; i < ncols+2; ++i) {
+      for (unsigned i = 0; i < ncols+2; ++i) {
 	out.at(0,i) = median;
 	out.at(nrows+1,i) = median;
       }
 
-      for (int i = 1; i < nrows+1; ++i) {
+      for (unsigned i = 1; i < nrows+1; ++i) {
 	out.at(i,0) = median;
 	out.at(i,ncols+1) = median;
       }

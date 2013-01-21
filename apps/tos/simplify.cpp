@@ -20,11 +20,11 @@
 
 void usage(int argc, char** argv)
 {
-  if (argc < 4 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
+  if (argc < 5 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
       (argv[2] != std::string("min") && argv[2] != std::string("max")))
     {
-      std::cerr << "Usage: " << argv[0] << "(mintree|tos) (min|max) ima.(ppm|png|tiff...) lambda1 [lambda2  [lambda3 [...]]]" << std::endl
-		<< "Compute the ToS marginally, compute area attribute and compute another ToS on it."
+      std::cerr << "Usage: " << argv[0] << "(mintree|tos) (min|max) ima.(ppm|png|tiff...) mu1 [lambda2  [lambda3 [...]]]" << std::endl
+		<< "Compute the ToS marginally -> area -> a Tree and run simplification."
 		<< "Output the results of filtering" << std::endl;
       abort();
     }
@@ -38,6 +38,9 @@ namespace mln
   setmean_on_nodes(const image2d<V>& ima, const image2d<T>& K,
 		   const image2d<unsigned>& parent, const std::vector<unsigned>& S, FilterFun pred)
   {
+    mln_precondition(ima.domain() == K.domain());
+    mln_precondition(parent.domain() == K.domain());
+
     typedef rgb<unsigned> SumType;
     image2d<SumType>  sum;
     image2d<unsigned> count;
@@ -58,19 +61,20 @@ namespace mln
       }
 
     image2d<V> out;
-    resize(out, ima);
+    resize(out, ima, ima.border(), literal::zero);
     unsigned p = S[0];
     out[p] = sum[p] / count[p];
     for (unsigned p: S)
       {
 	unsigned q = parent[p];
-	if (K[p] == K[q])
+        assert(K[q] != K[parent[q]] or q == parent[q]);
+
+	if (K[p] == K[q] or count[p] == 0) {
 	  out[p] = out[q];
-	else {
-	  while (count[p] == 0)
-	    p = parent[p];
+        } else {
 	  out[p] = sum[p] / count[p];
 	}
+        assert(out[p] != literal::zero);
       }
     return out;
   }
@@ -91,8 +95,9 @@ namespace mln
     void take(const V& x)
     {
       ++size;
-      sum += x.as_vec();
-      sum2 += x.as_vec()*x.as_vec();
+      vec3f y = x.as_vec();
+      sum += y;
+      sum2 += y * y;
     }
 
 
@@ -122,8 +127,8 @@ namespace mln
       ++size;
     }
 
-    float gradient;
     int size;
+    float gradient;
   };
 
 
@@ -171,29 +176,106 @@ namespace mln
       }
   }
 
+  // p must be node (caonical element)
+  inline
+  unsigned
+  findcanonical(const image2d<bool>& is_removed, image2d<unsigned>& parent, unsigned p)
+  {
+    if (!is_removed[p])
+      return p;
+    else
+      return parent[p] = findcanonical(is_removed, parent, parent[p]);
+  }
+
 
   template <typename T>
-  simplify(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S,
-	   const image2d<attr2_f>& acc2, const image2d<attr1_f>& acc1)
+  void
+  simplify(image2d<T>& K, image2d<unsigned>& parent, const std::vector<unsigned>& S,
+	   image2d<attr_2f>& acc2, image2d<attr_1f>& acc1, float mu)
   {
     std::vector<unsigned> nodes;
+
     nodes.reserve(S.size());
-    nodes.push_back(S[0]);
-    for (unsigend p : S)
+    //nodes.push_back(S[0]); all execept the root
+    for (unsigned p : S)
       if (K[parent[p]] != K[p])
-	node.push_back(p);
+	nodes.push_back(p);
     std::sort(nodes.begin(), nodes.end(), [&] (unsigned x, unsigned y) { return acc1[x].gradient < acc1[y].gradient; });
 
+    unsigned nnodes = nodes.size();
+    std::cout << "Number of nodes: " << nnodes << std::endl;
+
+    image2d<bool> is_removed;
+    resize(is_removed, K, K.border(), false);
+
     bool need_repeat = true;
+    auto sqr = [] (vec3f x) { return x * x; };
+    unsigned cpt = 0;
     while (need_repeat)
       {
-	need_repeat = true;
-	for (unsigned n: nodes)
-	  if (!is_removed(n))
+	need_repeat = false;
+        unsigned i = 0;
+	for (unsigned p: nodes) {
+	  if (!is_removed[p])
 	    {
-	      float delta_e = 
+              unsigned q = findcanonical(is_removed, parent, parent[p]);
+	      float delta_e = (-sqr(acc2[p].sum) / acc2[p].size - sqr(acc2[q].sum) / acc2[q].size +
+                               sqr(acc2[p].sum + acc2[q].sum) / (acc2[p].size + acc2[q].size)).sum();
+              //std::cout << (-sqr(acc2[p].sum) / acc2[p].size).sum() << std::endl;
+              //std::cout << (-sqr(acc2[q].sum) / acc2[q].size).sum() << std::endl;
+              //std::cout << (-sqr(acc2[q].sum + acc2[p].sum) / (acc2[p].size + acc2[q].size)).sum() << std::endl;
+              if (std::isfinite(delta_e) and delta_e > (-mu * acc1[p].size) )
+                {
+                  ++cpt;
+                  need_repeat = true;
+                  is_removed[p] = true;
+                  acc2[q].sum += acc2[p].sum;
+                  acc2[q].sum2 += acc2[p].sum2;
+                  acc2[q].size += acc2[p].size;
+                  parent[p] = q;
+                }
 	    }
+          ++i;
+        }
       }
+
+    std::cout << "remove: " << cpt << " nodes." << std::endl;
+
+    // recanonize
+    for (int i = S.size() - 1; i >= 0; --i)
+      {
+        unsigned p = S[i];
+        unsigned q = parent[p];
+        assert(K[q] != K[parent[q]] or q == parent[q]);
+        if (K[p] == K[q]) // p non canonical
+          {
+            q = findcanonical(is_removed, parent, q);
+            K[p] = K[q];
+            parent[p] = q;
+          }
+        else // p canonical
+          {
+            q = findcanonical(is_removed, parent, p);
+            if (p != q) {
+              K[p] = K[q];
+              parent[p] = q;
+            } else {
+              parent[p] = findcanonical(is_removed, parent, parent[p]);
+            }
+          }
+      }
+
+    nnodes = 1;
+    for (unsigned p: S)
+      {
+        unsigned q = parent[p];
+        assert(!is_removed[q]);
+        assert(K[q] != K[parent[q]] or q == parent[q]);
+        nnodes += (K[p] != K[q]);
+      }
+
+
+    std::cout << "Number of nodes: " << nnodes << std::endl;
   }
 }
 
@@ -288,9 +370,21 @@ int main(int argc, char** argv)
 
     io::imsave(transform(y, [=](attr_1f v) -> float { return (float)v.size; }),     "clength.tiff");
     io::imsave(transform(y, [=](attr_1f v) -> float { return (float)v.gradient; }), "cgradient.tiff");
-    //io::imsave(out, "thicken_rgb.tiff");
+
+    float mu = std::atof(argv[4]);
+    simplify(K, parent, S, x, y, mu);
+
+    image2d<rgb8> out;
+    if (use_tos)
+      out = setmean_on_nodes(tmp, K, parent, S, K2::is_face_2);
+    else
+      out = setmean_on_nodes(tmp, K, parent, S, K1::is_face_2);
+
+    io::imsave(tmp, "simplify_0.tiff");
+    io::imsave(out, "simplify_1.tiff");
   }
 
+  exit(0);
 
   {
     image2d<unsigned> x;

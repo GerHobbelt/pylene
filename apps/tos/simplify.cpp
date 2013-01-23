@@ -4,7 +4,7 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/algorithm/copy.hpp>
-
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/morpho/tos/tos.hpp>
 #include <mln/morpho/filtering.hpp>
 #include <mln/io/imread.hpp>
@@ -23,9 +23,9 @@ void usage(int argc, char** argv)
   if (argc < 5 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
       (argv[2] != std::string("min") && argv[2] != std::string("max")))
     {
-      std::cerr << "Usage: " << argv[0] << "(mintree|tos) (min|max) ima.(ppm|png|tiff...) mu1 [lambda2  [lambda3 [...]]]" << std::endl
+      std::cerr << "Usage: " << argv[0] << "(mintree|tos) (min|max) ima.(ppm|png|tiff...) out_without_extension mu1 [mu2  [mu3 [...]]]" << std::endl
 		<< "Compute the ToS marginally -> area -> a Tree and run simplification."
-		<< "Output the results of filtering" << std::endl;
+		<< std::endl;
       abort();
     }
 }
@@ -221,9 +221,6 @@ namespace mln
               unsigned q = findcanonical(is_removed, parent, parent[p]);
 	      float delta_e = (-sqr(acc2[p].sum) / acc2[p].size - sqr(acc2[q].sum) / acc2[q].size +
                                sqr(acc2[p].sum + acc2[q].sum) / (acc2[p].size + acc2[q].size)).sum();
-              //std::cout << (-sqr(acc2[p].sum) / acc2[p].size).sum() << std::endl;
-              //std::cout << (-sqr(acc2[q].sum) / acc2[q].size).sum() << std::endl;
-              //std::cout << (-sqr(acc2[q].sum + acc2[p].sum) / (acc2[p].size + acc2[q].size)).sum() << std::endl;
               if (std::isfinite(delta_e) and delta_e > (-mu * acc1[p].size) )
                 {
                   ++cpt;
@@ -324,20 +321,7 @@ int main(int argc, char** argv)
     area = transform(imzip(r_area, g_area, b_area), [](const boost::tuple<unsigned, unsigned, unsigned>& x) {
 	return std::min(boost::get<0>(x), std::min(boost::get<1>(x), boost::get<2>(x))); });
 
-  unsigned maxr = r_area[rS[0]];
-  unsigned maxg = g_area[gS[0]];
-  unsigned maxb = b_area[bS[0]];
-  std::cout << maxr << " " << maxg << " " << maxb << std::endl;
-  io::imsave(transform(r_area, [=](unsigned x) -> float { return (float)x / maxr; }), "red.tiff");
-  io::imsave(transform(g_area, [=](unsigned x) -> float { return (float)x / maxg; }), "green.tiff");
-  io::imsave(transform(b_area, [=](unsigned x) -> float { return (float)x / maxb; }), "blue.tiff");
-  io::imsave(transform(area, [=](unsigned x) -> float { return (float)x; }), "area.tiff");
-  // io::imsave(r_area, "red.tiff");
-  // io::imsave(g_area, "green.tiff");
-  // io::imsave(b_area, "blue.tiff");
 
-
-  //++io::imprint(area);
   image2d<unsigned> K;
   image2d<unsigned> parent;
   std::vector<unsigned> S;
@@ -362,51 +346,32 @@ int main(int argc, char** argv)
   else
     set_mean_on_01face(K, parent, S, tmp, K1::is_face_2);
 
-  io::imsave(tmp, "tmp.tiff");
-  {
-    image2d<attr_2f> x;
-    image2d<attr_1f> y;
-    std::tie(x,y) = morpho::tos_compute_attribute(K, parent, S, tmp, attr_2f(), attr_1f());
 
-    io::imsave(transform(y, [=](attr_1f v) -> float { return (float)v.size; }),     "clength.tiff");
-    io::imsave(transform(y, [=](attr_1f v) -> float { return (float)v.gradient; }), "cgradient.tiff");
+  image2d<attr_2f> x;
+  image2d<attr_1f> y;
+  std::tie(x,y) = morpho::tos_compute_attribute(K, parent, S, tmp, attr_2f(), attr_1f());
 
-    float mu = std::atof(argv[4]);
-    simplify(K, parent, S, x, y, mu);
 
-    image2d<rgb8> out;
-    if (use_tos)
-      out = setmean_on_nodes(tmp, K, parent, S, K2::is_face_2);
-    else
-      out = setmean_on_nodes(tmp, K, parent, S, K1::is_face_2);
 
-    io::imsave(tmp, "simplify_0.tiff");
-    io::imsave(out, "simplify_1.tiff");
-  }
+  for (int i = 5; i < argc; ++i)
+    {
+      auto K_ = clone(K);
+      auto parent_ = clone(parent);
+      auto S_ = S;
+      auto x_ = clone(x);
+      auto y_ = clone(y);
 
-  exit(0);
+      float mu = std::atof(argv[i]);
+      simplify(K_, parent_, S_, x_, y_, mu);
 
-  {
-    image2d<unsigned> x;
-    if (use_tos)
-      x = morpho::area_compute(K, parent, S, K2::is_face_2);
-    else
-      x = morpho::area_compute(K, parent, S, K1::is_face_2, std::greater<unsigned> ());
-    io::imsave(transform(x, [=](unsigned v) -> float { return (float)v; }), "area2.tiff");
-  }
+      image2d<rgb8> out;
+      if (use_tos)
+	out = setmean_on_nodes(clone(tmp), K_, parent_, S_, K2::is_face_2);
+      else
+	out = setmean_on_nodes(clone(tmp), K_, parent_, S_, K1::is_face_2);
 
-  for (int i = 4; i < argc; ++i) {
-    int fvalue = std::atoi(argv[i]);
-    image2d<rgb8> out;
-    if (use_tos)
-      out = morpho::area_filter(tmp, K, parent, S, fvalue, K2::is_face_2);
-    else
-      out = morpho::area_filter(tmp, K, parent, S, fvalue, K1::is_face_2, std::greater<unsigned> ());
-
-    image2d<rgb8> under;
-    resize(under, ima2);
-    copy(out | sbox2d(out.domain().pmin, out.domain().pmax, strides), under);
-    io::imsave(under, boost::str(boost::format("out-%06i.tiff") % fvalue).c_str());
-  }
+      std::string filename = boost::str(boost::format("%s-%05i.tiff") % argv[4] % mu);
+      io::imsave(out, filename.c_str());
+    }
 
 }

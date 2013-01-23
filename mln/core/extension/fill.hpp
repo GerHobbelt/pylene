@@ -2,6 +2,7 @@
 # define MLN_CORE_EXTENSION_FILL_HPP
 
 # include <mln/core/image/image.hpp>
+# include <mln/core/domain/box.hpp>
 # include <algorithm>
 
 namespace mln

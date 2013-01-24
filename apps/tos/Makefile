@@ -3,7 +3,7 @@ override LDFLAGS += -lfreeimage -ltbb
 
 all:
 
-bin: marginalfilter simplify thicken lexico_grainfilter k12k0
+bin: marginalfilter simplify thicken lexico_grainfilter k12k0 rgbgrainfilter
 	[ -e bin ] || mkdir bin
 	cp $^ bin
 

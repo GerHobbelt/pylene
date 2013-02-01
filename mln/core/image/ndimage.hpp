@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_IMAGE_NDIMAGE_HH
 # define MLN_CORE_IMAGE_NDIMAGE_HH
 
-
+# include <cstdlib>
 # include <mln/core/image_base.hpp>
 
 # include <mln/core/domain/box.hpp>
@@ -199,14 +199,15 @@ namespace mln
 
     point_type		point_at_index(std::size_t idx) const
     {
-      int k = idx - m_index_first;
-      point_type  p = domain_.pmin;
+      int k = idx;
+      point_type p = point_type ();
 
       for (unsigned i = 0; i < dim; ++i) {
-	int q = (k >= 0) ? (int)(k / m_index_strides[i]) : (k / (int)m_index_strides[i] - 1); // because k can be negative
-	p[i] += q;
-	k -= q * m_index_strides[i];
+	std::div_t res = std::div((int)k,  (int)m_index_strides[i]);
+	p[i] += res.quot;
+	k = res.rem;
       }
+      p -= (domain_.pmin + border_);
       mln_postcondition(vbox_.has(p));
       return p;
     }
@@ -222,9 +223,9 @@ namespace mln
     void resize_(const domain_type& domain, unsigned border = 3, T v = T());
 
     domain_type	domain_;	///< Domain of image
-#ifndef MLN_NDEBUG
+    //#ifndef MLN_NDEBUG
     domain_type vbox_;
-#endif
+    //#endif
 
     std::array<size_t, dim>	strides_;	///< Strides in bytes
     std::shared_ptr< internal::ndimage_data<T, dim> > data_;

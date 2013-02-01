@@ -19,6 +19,7 @@ namespace mln
   struct strided_box
   {
     typedef point<T, dim>          point_type;
+    typedef point<T, dim>          value_type;
 
     typedef internal::nested_loop_iterator<
       internal::strided_domain_point_visitor_forward< point<T, dim> >,
@@ -42,12 +43,13 @@ namespace mln
     point_type  shape()	const;
     bool        empty()	const;
     unsigned    size()	const;
-
+    bool	__is_valid() const;
 
     iterator		iter() const;
     reverse_iterator    riter() const;
 
     bool		operator== (const strided_box& other) const;
+
 
     point_type pmin;
     point_type pmax;
@@ -62,6 +64,7 @@ namespace mln
   struct box
   {
     typedef point<T, dim>          point_type;
+    typedef point<T, dim>          value_type;
 
     typedef internal::nested_loop_iterator<
       internal::domain_point_visitor_forward< point<T, dim> >,
@@ -91,7 +94,10 @@ namespace mln
     bool has(const point_type& p) const
     {
       mln_precondition(__is_valid());
-      return (pmin <= p) && (p < pmax);
+      for (unsigned i = 0; i < dim; ++i)
+	if (p[i] < pmin[i] or p[i] >= pmax[i])
+	  return false;
+      return true;
     }
 
     point_type shape() const
@@ -311,8 +317,25 @@ namespace mln
   bool
   strided_box<T, dim>::has(const point_type& p) const
   {
-    return (pmin <= p and p < pmax and ((p - pmin).as_vec() % strides.as_vec() == literal::zero));
+    mln_precondition(__is_valid());
+    for (unsigned i = 0; i < dim; ++i)
+      if (p[i] < pmin[i] or p[i] >= pmax[i] or (p[i] - pmin[i]) % strides[i] != 0)
+	return false;
+    return true;
   }
+
+  template <typename T, unsigned dim>
+  inline
+  bool
+  strided_box<T, dim>::__is_valid() const
+    {
+      for (unsigned i = 0; i < dim; ++i)
+	if (pmin[i] > pmax[i])
+	  return false;
+	else if (pmin[i] == pmax[i]) // empty <=> pmin = pmax
+	  return pmin == pmax;
+      return true;
+    }
 
   template <typename T, unsigned dim>
   inline

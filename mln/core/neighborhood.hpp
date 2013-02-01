@@ -24,7 +24,7 @@ namespace mln {
     iterator_range< sliding_win_piter<SiteSet> >
     operator() (const point_type& p) const
     {
-      return make_iterator_range( sliding_win_piter<SiteSet>(Derived::dpoints, p) );
+      return make_iterator_range( sliding_win_piter<SiteSet>(derived()->dpoints, p) );
     }
 
 
@@ -36,7 +36,7 @@ namespace mln {
     {
       typedef nbh<PixelOrPixelIterator> nbh_t;
 
-      nbh_t x(Derived::dpoints, pix);
+      nbh_t x(derived()->dpoints, pix);
       return x;
     }
 
@@ -48,6 +48,10 @@ namespace mln {
       static_assert(not std::is_lvalue_reference<PixelOrPixelIterator>::value,
 		    "You must pass a lvalue to neighborhood.");
     }
+
+
+  private:
+    const Derived* derived() const { return reinterpret_cast<const Derived*>(this); }
 
   };
 

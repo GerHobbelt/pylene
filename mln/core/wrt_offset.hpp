@@ -11,7 +11,7 @@ namespace mln {
   void wrt_offset(const Image& ima, const SiteSet& dpoints, OutputIterator out)
   {
     const size_t* strides = ima.strides();
-    typedef typename SiteSet::const_iterator Iterator;
+    typedef typename SiteSet::iterator Iterator;
     auto it = dpoints.iter();
     for (it.init(); !it.finished(); it.next(), ++out)
       {

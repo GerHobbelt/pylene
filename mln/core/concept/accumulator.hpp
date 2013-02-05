@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_CONCEPT_ACCUMULATOR_HPP
 # define MLN_CORE_CONCEPT_ACCUMULATOR_HPP
 
+# include <mln/core/concept/object.hpp>
 # include <mln/core/concept/check.hpp>
 # include <boost/concept_check.hpp>
 
@@ -8,7 +9,7 @@ namespace mln
 {
 
   template <typename Acc>
-  struct Accumulator
+  struct Accumulator : Object<Acc>
   {
 
     BOOST_CONCEPT_USAGE(Accumulator)

@@ -40,7 +40,7 @@ namespace mln
     {
 
       template <typename CountType>
-      struct count
+      struct count : feature_base< count<CountType> >
       {
 	template <typename T>
 	struct apply

@@ -42,7 +42,7 @@ namespace mln
     {
 
       template <typename SumType>
-      struct sum
+      struct sum : feature_base<SumType>
       {
 	template <typename T>
 	struct apply
@@ -52,7 +52,7 @@ namespace mln
       };
 
       template <>
-      struct sum<void>
+      struct sum<void> : feature_base< sum<void> >
       {
 	template <typename T>
 	struct apply

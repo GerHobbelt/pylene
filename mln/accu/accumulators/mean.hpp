@@ -11,7 +11,7 @@ namespace mln
   namespace accu
   {
 
-  namespace accumulators
+    namespace accumulators
     {
       template <typename T, typename SumType = decltype( std::declval<T>() + std::declval<T>() )  >
       struct mean;
@@ -40,7 +40,7 @@ namespace mln
     namespace features
     {
       template <typename SumType>
-      struct mean
+      struct mean : feature_base< mean<SumType> >
       {
 	template <typename T>
 	struct apply
@@ -50,7 +50,7 @@ namespace mln
       };
 
       template <>
-      struct mean<void>
+      struct mean<void> : feature_base< mean<void> >
       {
 	template <typename T>
 	struct apply
@@ -85,6 +85,7 @@ namespace mln
     }
 
   }
+
 }
 
 #endif // ! MLN_ACCU_ACCUMULATOTS_MEAN_HPP

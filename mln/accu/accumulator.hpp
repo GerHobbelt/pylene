@@ -21,6 +21,35 @@ namespace mln
     {
     }
 
+    /// \defgroup freefun Free functions
+    /// \{
+    template <typename A>
+    A& make_accumulator(Accumulator<A>& accu);
+
+    template <typename F, typename T>
+    typename F::template apply<T>::type
+    make_accumulator(const Feature<F>& feat);
+    /// \}
+
+
+    /*********************/
+    /*** Implementation  */
+    /*********************/
+
+    template <typename A>
+    A& make_accumulator(Accumulator<A>& accu)
+    {
+      return exact(accu);
+    }
+
+    template <typename F, typename T>
+    typename F::template apply<T>::type
+    make_accumulator(const Feature<F>& feat)
+    {
+
+    }
+
+
   }
 
 }

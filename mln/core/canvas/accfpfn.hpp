@@ -9,15 +9,15 @@ namespace mln
 
   template <typename InputImage, typename OutputImage, typename Neighborhood, typename A, typename Extract>
   void
-  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>&& out, bool boundcheck = true, A acc = A(), const Extract& extract = Extract());
+  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>&& out, bool boundcheck = true, Accumulator<A> acc = A(), const Extract& extract = Extract());
 
   template <typename InputImage, typename OutputImage, typename Neighborhood, typename A, typename Extract>
   void
-  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>& out, bool boundcheck = true, A acc = A(), const Extract& extract = Extract());
+  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>& out, bool boundcheck = true, Accumulator<A> acc = A(), const Extract& extract = Extract());
 
   template <typename InputImage, typename Neighborhood, typename A, typename Extract>
   mln_ch_value(InputImage, typename std::result_of< Extract(A) >::type )
-  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, bool boundcheck = true, A acc = A(), const Extract& extract = Extract());
+    accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, bool boundcheck = true, Accumulator<A> acc = A(), const Extract& extract = Extract());
 
   /************************/
   /** Implementation      */
@@ -64,25 +64,25 @@ namespace mln
 
   template <typename InputImage, typename OutputImage, typename Neighborhood, typename A, typename Extract>
   void
-  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>& out, bool boundcheck = true, A acc = A(), const Extract& extract = Extract())
+  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>& out, bool boundcheck = true, Accumulator<A> acc = A(), const Extract& extract = Extract())
   {
-    impl::accfpfn(exact(ima), nbh, exact(out), boundcheck, acc, extract);
+    impl::accfpfn(exact(ima), nbh, exact(out), boundcheck, exact(acc), extract);
   }
 
   template <typename InputImage, typename OutputImage, typename Neighborhood, typename A, typename Extract>
   void
-  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>&& out, bool boundcheck = true, A acc = A(), const Extract& extract = Extract())
+  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, Image<OutputImage>&& out, bool boundcheck = true, Accumulator<A> acc = A(), const Extract& extract = Extract())
   {
-    impl::accfpfn(exact(ima), nbh, exact(out), boundcheck, acc, extract);
+    impl::accfpfn(exact(ima), nbh, exact(out), boundcheck, exact(acc), extract);
   }
 
   template <typename InputImage, typename Neighborhood, typename A, typename Extract>
   mln_ch_value(InputImage, typename std::result_of< Extract(A) >::type )
-  accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, bool boundcheck = true, A acc = A(), const Extract& extract = Extract())
+    accfpfn(const Image<InputImage>& ima, const Neighborhood& nbh, bool boundcheck = true, Accumulator<A> acc = A(), const Extract& extract = Extract())
   {
     mln_ch_value(InputImage, typename std::result_of< Extract(A) >::type )  out;
     resize(out, ima);
-    accfpfn(ima, nbh, out, boundcheck, acc, extract);
+    accfpfn(ima, nbh, out, boundcheck, exact(acc), extract);
     return out;
   }
 

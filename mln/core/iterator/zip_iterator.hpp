@@ -14,7 +14,7 @@ namespace mln
 
 
   /********************/
-  /* Implementatoin   */
+  /* Implementation   */
   /********************/
 
   namespace internal

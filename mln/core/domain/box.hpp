@@ -73,6 +73,8 @@ namespace mln
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> iterator;
 
+    typedef iterator const_iterator;
+
     typedef internal::nested_loop_iterator<
       internal::domain_point_visitor_backward< point<T, dim> >,
       internal::no_op_visitor,

@@ -46,7 +46,6 @@ namespace mln
     typename F::template apply<T>::type
     make_accumulator(const Feature<F>& feat)
     {
-
     }
 
 

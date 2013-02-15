@@ -59,6 +59,12 @@ namespace mln
 	};
       };
 
+      template <typename SumType>
+      struct depends
+      {
+        typedef boost::mpl::set< sum<SumType>, count > type;
+      };
+
     }
 
    namespace accumulators

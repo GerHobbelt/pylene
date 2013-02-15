@@ -2,6 +2,8 @@
 # define ACCUMULATOR_HPP
 
 # include <mln/core/concept/accumulator.hpp>
+# include <mln/accu/feature.hpp>
+# include <mln/accu/composite_accumulator.hpp>
 
 namespace mln
 {
@@ -26,9 +28,9 @@ namespace mln
     template <typename A>
     A& make_accumulator(Accumulator<A>& accu);
 
-    template <typename F, typename T>
+    template <typename T, typename F>
     typename F::template apply<T>::type
-    make_accumulator(const Feature<F>& feat);
+    make_accumulator(const features::FeatureSet<F>& feat);
     /// \}
 
 
@@ -42,12 +44,12 @@ namespace mln
       return exact(accu);
     }
 
-    template <typename F, typename T>
-    typename F::template apply<T>::type
-    make_accumulator(const Feature<F>& feat)
+    template <typename T, typename F>
+    typename features::FeatureSet<F>::template apply<T>::type
+    make_accumulator(const features::FeatureSet<F>&)
     {
+      return typename features::FeatureSet<F>::template apply<T>::type ();
     }
-
 
   }
 

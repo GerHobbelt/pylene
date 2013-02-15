@@ -70,7 +70,7 @@ namespace mln
       {
 	typedef T		argument_type;
 	typedef SumType		return_type;
-	typedef features::sum<> feature;
+	typedef boost::mpl::set< features::sum<> > provides;
 
 	sum()
 	  : m_sum ( SumType() )

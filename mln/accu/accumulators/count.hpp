@@ -59,7 +59,7 @@ namespace mln
       {
 	typedef dontcare		argument_type;
 	typedef CountType		return_type;
-	typedef features::count<>	feature;
+	typedef boost::mpl::set< features::count<> >	provides;
 
 	count()
 	  : m_count (0)

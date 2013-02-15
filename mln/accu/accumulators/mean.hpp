@@ -3,7 +3,7 @@
 
 # include <mln/accu/accumulators/sum.hpp>
 # include <mln/accu/accumulators/count.hpp>
-# include <mln/accu/accumulator_base.hpp>
+# include <mln/accu/composite_accumulator.hpp>
 
 namespace mln
 {
@@ -60,9 +60,9 @@ namespace mln
       };
 
       template <typename SumType>
-      struct depends
+      struct depends< mean<SumType> >
       {
-        typedef boost::mpl::set< sum<SumType>, count > type;
+        typedef boost::mpl::set< sum<SumType>, count<> > type;
       };
 
     }
@@ -71,12 +71,12 @@ namespace mln
     {
 
       template <typename T, typename SumType>
-      struct mean : composite_accumulator_base< mean<T, SumType>, T, sum<T, SumType>, count<> >
+      struct mean : composite_accumulator_facade< mean<T, SumType>, T, features::mean<SumType> >
       {
 	typedef T	argument_type;
 	typedef SumType return_type;
 
-	typedef features::mean<> feature;
+	typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
 
 	friend
 	SumType extract(const mean& accu, features::mean<> )

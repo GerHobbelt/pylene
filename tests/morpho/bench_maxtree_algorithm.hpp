@@ -137,11 +137,13 @@ void run_test(int argc, char** argv, Algorithm algo)
   po::positional_options_description p;
   p.add("input-file", -1);
 
+  po::options_description all("Allowed options");
+  all.add(desc).add(hidden);
 
   po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).
-	    options(desc).options(hidden).positional(p).run(), vm);
   try {
+    po::store(po::command_line_parser(argc, argv).
+	      options(all).positional(p).run(), vm);
     po::notify(vm);
 
     if (vm.count("help")) {

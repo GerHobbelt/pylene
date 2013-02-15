@@ -26,6 +26,11 @@
 #ifndef PQUEUE_FAST_HPP
 # define PQUEUE_FAST_HPP
 
+
+# ifndef PQUEUE_FAST_SWITCH_HQUEUE_NBITS
+#  define PQUEUE_FAST_SWITCH_HQUEUE_NBITS 18
+# endif
+
 # include <mln/core/value/indexer.hpp>
 # include <mln/morpho/bounded_hqueue.hpp>
 # include <mln/core/image/image2d.hpp>
@@ -73,7 +78,7 @@ namespace mln
 
 
     template<typename V, typename Compare>
-    struct priority_queue_ima<V, Compare, typename std::enable_if< (value_traits<V>::quant < 18) >::type>
+    struct priority_queue_ima<V, Compare, typename std::enable_if< (value_traits<V>::quant < PQUEUE_FAST_SWITCH_HQUEUE_NBITS) >::type>
     {
       typedef typename image2d<V>::size_type size_type;
 

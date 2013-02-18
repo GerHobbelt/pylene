@@ -20,10 +20,10 @@
 
 void usage(int argc, char** argv)
 {
-  if (argc < 5 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
+  if (argc < 6 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
       (argv[2] != std::string("min") && argv[2] != std::string("max")))
     {
-      std::cerr << "Usage: " << argv[0] << "(mintree|tos) (min|max) ima.(ppm|png|tiff...) out_without_extension mu1 [mu2  [mu3 [...]]]" << std::endl
+      std::cerr << "Usage: " << argv[0] << "(mintree|tos) (min|max) ima.(ppm|png|tiff...) out_without_extension grain mu1 [mu2  [mu3 [...]]]" << std::endl
 		<< "Compute the ToS marginally -> area -> a Tree and run simplification."
 		<< std::endl;
       abort();
@@ -274,6 +274,39 @@ namespace mln
 
     std::cout << "Number of nodes: " << nnodes << std::endl;
   }
+
+  template <typename V>
+  void
+  close(image2d<V>& K, image2d<unsigned>& parent, const std::vector<unsigned>& S, unsigned lambda)
+  {
+    image2d<unsigned> count;
+    resize(count, K, K.border(), 0);
+
+    for (int i = S.size() - 1; i >= 0; --i)
+      {
+	unsigned p = S[i];
+	unsigned q = parent[p];
+	if (K[p] != K[q])
+	  q = p;
+	count[q] += 1;
+      }
+
+    for (unsigned p: S)
+      {
+	unsigned q = parent[p];
+	if (K[p] == K[q])
+	  count[p] = count[q];
+
+	if (count[p] < lambda) {
+	  K[p] = K[q];
+	  if (count[q] >= lambda)
+	    parent[p] = q;
+	  else
+	    parent[p] = parent[q];
+	}
+      }
+  }
+
 }
 
 
@@ -334,6 +367,11 @@ int main(int argc, char** argv)
     K = area,
     std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(area, c8, std::greater<unsigned> ());
 
+  unsigned grain = std::atoi(argv[5]);
+  close(K, parent, S, grain);
+
+  io::imsave(transform(K, [] (unsigned v) -> float { return v; }), "area.tiff");
+
   auto ima2 = addborder(ima); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent, parent.border(), rgb8{0,0,255});
@@ -346,14 +384,14 @@ int main(int argc, char** argv)
   else
     set_mean_on_01face(K, parent, S, tmp, K1::is_face_2);
 
+  io::imsave(tmp, "aux.tiff");
+
 
   image2d<attr_2f> x;
   image2d<attr_1f> y;
   std::tie(x,y) = morpho::tos_compute_attribute(K, parent, S, tmp, attr_2f(), attr_1f());
 
-
-
-  for (int i = 5; i < argc; ++i)
+  for (int i = 6; i < argc; ++i)
     {
       auto K_ = clone(K);
       auto parent_ = clone(parent);
@@ -365,11 +403,15 @@ int main(int argc, char** argv)
       simplify(K_, parent_, S_, x_, y_, mu);
 
       image2d<rgb8> out;
-      if (use_tos)
-	out = setmean_on_nodes(clone(tmp), K_, parent_, S_, K2::is_face_2);
-      else
-	out = setmean_on_nodes(clone(tmp), K_, parent_, S_, K1::is_face_2);
 
+      if (use_tos) {
+	out = setmean_on_nodes(clone(tmp), K_, parent_, S_, K2::is_face_2);
+	//out = morpho::area_filterr(out, K_, parent_, S_, grain, K2::is_face_2);
+      } else {
+	out = setmean_on_nodes(clone(tmp), K_, parent_, S_, K1::is_face_2);
+	//out = clone(tmp);
+	//out = morpho::area_filterr(out, K_, parent_, S_, grain, K1::is_face_2);
+      }
       std::string filename = boost::str(boost::format("%s-%05i.tiff") % argv[4] % mu);
       io::imsave(out, filename.c_str());
     }

@@ -6,8 +6,6 @@
 namespace mln
 {
   using std::negate;
-  using std::logical_and;
-  using std::logical_or;
   using std::logical_not;
 
   /**
@@ -179,6 +177,28 @@ namespace mln
       return x >= y;
     }
   };
+
+  template <typename U, typename V = U>
+  struct logical_and : std::binary_function<U, V, bool>
+  {
+    bool
+    operator() (const U& x, const V& y) const
+    {
+      return x && y;
+    }
+  };
+
+  template <typename U, typename V = U>
+  struct logical_or : std::binary_function<U, V, bool>
+  {
+    bool
+    operator() (const U& x, const V& y) const
+    {
+      return x || y;
+    }
+  };
+
+
 
 
 

@@ -96,6 +96,7 @@ namespace mln
   MLN_GENERATE_CONST_BINARY_EXPR(operator-, substract);
   MLN_GENERATE_CONST_BINARY_EXPR(operator*, multiplies);
   MLN_GENERATE_CONST_BINARY_EXPR(operator/, devides);
+  MLN_GENERATE_CONST_BINARY_EXPR(operator%, modulo);
 
   // Point-wise relational operators
   MLN_GENERATE_CONST_BINARY_EXPR(operator==, equal_to);
@@ -104,6 +105,10 @@ namespace mln
   MLN_GENERATE_CONST_BINARY_EXPR(operator>,  greater_than);
   MLN_GENERATE_CONST_BINARY_EXPR(operator<=, less_equal);
   MLN_GENERATE_CONST_BINARY_EXPR(operator>=, greater_equal);
+
+  // Point-wise logical operators
+  MLN_GENERATE_CONST_BINARY_EXPR(land, logical_and);
+  MLN_GENERATE_CONST_BINARY_EXPR(lor, logical_or);
 
 
 

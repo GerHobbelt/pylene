@@ -28,11 +28,12 @@ int main(int argc, const char** argv)
 
   // Compute TOS on cc[L]
   {
+    image2d<bool> mask = transform(f, [] (lsh8 x) { return (x[1] < 45); });
     auto L = transform(f, [] (lsh8 x) -> uint8 { return x[0]; });
 
     image2d<uint8> lbl;
     unsigned nlabel;
-    std::tie(lbl, nlabel) = labeling::blobs<uint8>(L);
+    std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8());
 
     std::vector< std::pair< FIXME, FIXME >
 

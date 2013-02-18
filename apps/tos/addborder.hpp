@@ -13,12 +13,11 @@ namespace mln
   * this method assume that for two values a,b s.t a < b
   * then  a < (a+b)/2 < b
   */
-  template < class I, class Compare = std::less<mln_value(I)> >
-  mln_concrete(I)
-  addborder(const Image<I>& ima_, const Compare& cmp = Compare ())
+  template < class V, class Compare = std::less<V> >
+  image2d<V>
+  addborder(const image2d<V>& ima_, const Compare& cmp = Compare ())
   {
     const I& ima = exact(ima_);
-    typedef mln_value(I) V;
     image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
 
     {
@@ -64,6 +63,51 @@ namespace mln
       }
     }
     return out;
+  }
+
+  template <class V, class M, class Compare = std::less<V> >
+  std::pair< image2d<V>, image2d<bool> >
+  addborder(const image2d<V>& ima, const Image<M>& mask_, const Compare& cmp = Compare ())
+  {
+    typedef mln_value(I) V;
+
+    const M& mask = exact(mask_);
+    image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
+    image2d<bool> omask(ima.nrows() + 2, ima.ncols() + 2);
+
+    std::vector<V> border;
+
+    mln_piter(p, ima);
+    mln_iter(n, c4(p));
+
+    mln_forall(p)
+      if (mask(p))
+        {
+          mln_forall(n) {
+            if (!mask.domain.has(n) or !mask(*n))
+              border.push_back(ima(*p));
+            omask(*n + point2d{1,1}) = true;
+          }
+          point2d q = *p + point2d{1,1};
+          omask(q) = true;
+          out(q) = ima(*p);
+        }
+
+    std::partial_sort(border.begin(), border.begin() + border.size()/2+1, border.end(), cmp);
+    V median = border[border.size()/2];
+
+    mln_forall(p)
+      if (mask(p))
+        {
+          mln_forall(n)
+            if (!mask.domain().has(*n) or !mask(*n))
+              {
+                point2d q = *n + point2d{1,1};
+                out(q) = median;
+              }
+        }
+
+    return std::make_pair(out, omask) ;
   }
 
 }

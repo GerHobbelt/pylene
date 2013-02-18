@@ -28,14 +28,13 @@ namespace mln {
     }
 
 
-    template <typename PixelOrPixelIterator>
+    template <typename PixelOrPixelIterator,
+	      typename = typename std::enable_if<not std::is_convertible<PixelOrPixelIterator, point_type>::value>::type>
     inline
     nbh<PixelOrPixelIterator>
-    operator() (const PixelOrPixelIterator& pix,
-		typename std::enable_if<not std::is_convertible<PixelOrPixelIterator, point_type>::value>::type* = NULL) const
+    operator() (const PixelOrPixelIterator& pix)
     {
       typedef nbh<PixelOrPixelIterator> nbh_t;
-
       nbh_t x(derived()->dpoints, pix);
       return x;
     }

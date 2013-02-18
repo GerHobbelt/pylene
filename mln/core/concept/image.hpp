@@ -19,17 +19,17 @@ namespace mln {
   template <typename I>
   struct Image : Object_<I>
   {
-  private:
-    typedef image_traits<I> traits;
-
-  public:
-    typedef typename traits::accessible  accessible;
-    typedef typename traits::category    category;
-    typedef typename traits::concrete    concrete;
-    typedef typename traits::indexable    indexable;
 
     BOOST_CONCEPT_USAGE(Image)
     {
+      typedef image_traits<I> traits;
+
+      typedef typename traits::accessible  accessible;
+      typedef typename traits::category    category;
+      typedef typename traits::concrete    concrete;
+      typedef typename traits::indexable    indexable;
+
+
       typedef typename I::value_type         value;
       typedef typename I::reference          reference;
       typedef typename I::const_reference    const_reference;
@@ -65,7 +65,7 @@ namespace mln {
   struct AccessibleImage : Image<I>
   {
   public:
-    typedef typename Image<I>::accessible accessible;
+    typedef typename image_traits<I>::accessible accessible;
 
     static_assert(accessible::value, "Image must be accessible");
 
@@ -85,7 +85,7 @@ namespace mln {
   struct IterableImage : Image<I>
   {
   public:
-    typedef typename Image<I>::category category;
+    typedef typename image_traits<I>::category category;
 
     static_assert(std::is_convertible<category, forward_image_tag>::value,
                   "Image category must be iterable");

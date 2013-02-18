@@ -17,8 +17,25 @@ namespace mln {
   template <typename E>		E&&	  move_exact(Object<E>& object);
   template <typename E>		const E&& move_exact(const Object<E>& object);
 
+
+  namespace internal
+  {
+
+    template <typename T, template <typename> class Concept>
+    struct is_a_helper
+    {
+      template <typename dummy>
+      static std::true_type foo(Concept<dummy>) { return std::true_type (); }
+
+
+      static std::false_type foo(...) { return std::false_type (); }
+
+      typedef decltype(foo(std::declval<T> ())) type;
+    };
+  }
+
   template <typename T, template <typename> class Concept>
-  using is_a = std::is_convertible< T, Concept<T> >;
+  using is_a = typename internal::is_a_helper<T, Concept>::type;
 
 
   /*********************/

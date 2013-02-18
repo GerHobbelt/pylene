@@ -45,7 +45,7 @@ namespace mln
 
   public:
     image_access_value_iterator() = default;
-    image_access_value_iterator(const image_access_value_iterator& other) = default;
+    image_access_value_iterator(const image_access_value_iterator&) = default;
 
     image_access_value_iterator(Image& ima, SiteIterator p)
       : m_ima(&ima), m_p (p)

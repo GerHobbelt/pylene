@@ -7,6 +7,7 @@
 # include <mln/core/range/range_traits.hpp>
 # include <mln/core/range/iterator_range.hpp>
 # include <mln/core/iterator/image_access_iterator.hpp>
+# include <mln/core/range/filter.hpp>
 
 namespace mln
 {
@@ -14,40 +15,68 @@ namespace mln
   template <typename Image, typename Domain>
   struct sub_image;
 
+  namespace internal
+  {
+    template <typename I>
+    struct is_in_mask;
+  }
+
   /// These overloads are worst-conversion possible
   /// \{
+
+  // Ima | Domain
   template <typename I, typename Domain>
   sub_image<const I&, Domain>
-  make_subimage(const Image<I>& ima, const Domain& domain);
+  make_subimage(const Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL);
 
   template <typename I, typename Domain>
   sub_image<I&, Domain>
-  make_subimage(Image<I>& ima, const Domain& domain);
+  make_subimage(Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL);
 
   template <typename I, typename Domain>
   sub_image<const I, Domain>
-  make_subimage(const Image<I>&& ima, const Domain& domain);
+  make_subimage(const Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL);
 
   template <typename I, typename Domain>
   sub_image<I, Domain>
-  make_subimage(Image<I>&& ima, const Domain& domain);
+  make_subimage(Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL );
+
+
+  // Ima | mask
+  template <typename I, typename J>
+  sub_image<const I&, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(const Image<I>& ima, const Image<J>& mask);
+
+  template <typename I, typename J>
+  sub_image<I&, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(Image<I>& ima, const Image<J>& mask);
+
+  template <typename I, typename J>
+  sub_image<const I, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(const Image<I>&& ima, const Image<J>& mask);
+
+  template <typename I, typename J>
+  sub_image<I, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(Image<I>&& ima, const Image<J>& mask);
   /// \}
 
-  template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<const I&>(), std::declval<const Domain&>()) )
-  operator| (const Image<I>& ima, const Domain& domain);
+  // Ima | {domain, mask}
+  template <typename I, typename DomainOrMask>
+  auto operator| (const Image<I>& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(exact(ima), other) );
 
-  template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<I&>(), std::declval<const Domain&>()) )
-  operator| (Image<I>& ima, const Domain& domain);
+  template <typename I, typename DomainOrMask>
+  auto operator| (Image<I>& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(exact(ima), other) );
 
-  template <typename I, typename Domain>
-  auto
-  operator| (const Image<I>&& ima, const Domain& domain) -> decltype( make_subimage(move_exact(ima), domain) );
+  template <typename I, typename DomainOrMask>
+  auto operator| (const Image<I>&& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(move_exact(ima), other) );
 
-  template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<I&&>(), std::declval<const Domain&>()) )
-  operator| (Image<I>&& ima, const Domain& domain);
+  template <typename I, typename DomainOrMask>
+  auto operator| (Image<I>&& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(move_exact(ima), other) );
+
 
   /******************************************/
   /****          Implementation          ****/
@@ -55,60 +84,116 @@ namespace mln
 
   /// These overloads are worst-conversion possible
   /// \{
+
+  // Ima | Domain
   template <typename I, typename Domain>
   sub_image<const I&, Domain>
-  make_subimage(const Image<I>& ima, const Domain& domain)
+  make_subimage(const Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
   {
     return sub_image<const I&, Domain>(exact(ima), domain);
   }
 
   template <typename I, typename Domain>
   sub_image<I&, Domain>
-  make_subimage(Image<I>& ima, const Domain& domain)
+  make_subimage(Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
   {
     return sub_image<I&, Domain>(exact(ima), domain);
   }
 
   template <typename I, typename Domain>
   sub_image<const I, Domain>
-  make_subimage(const Image<I>&& ima, const Domain& domain)
+  make_subimage(const Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
   {
     return sub_image<I, Domain>(move_exact(ima), domain);
   }
 
   template <typename I, typename Domain>
   sub_image<I, Domain>
-  make_subimage(Image<I>&& ima, const Domain& domain)
+  make_subimage(Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
   {
     return sub_image<I, Domain>(move_exact(ima), domain);
   }
 
-  template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<const I&>(), std::declval<const Domain&>()) )
-  operator| (const Image<I>& ima, const Domain& domain)
+  // Ima | Mask
+  namespace internal
   {
-    return make_subimage(exact(ima), domain);
+    template <typename I>
+    struct is_in_mask
+    {
+      typedef typename I::point_type P;
+
+      is_in_mask(const I& ima)
+      : m_mask(ima)
+      {
+      }
+
+      bool operator () (const P& p) const
+      {
+	return m_mask(p);
+      }
+
+    private:
+      const I& m_mask;
+    };
   }
 
-  template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<I&>(), std::declval<const Domain&>()) )
-  operator| (Image<I>& ima, const Domain& domain)
+
+  template <typename I, typename J>
+  sub_image<const I&, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(const Image<I>& ima, const Image<J>& mask)
   {
-    return make_subimage(exact(ima), domain);
+    return make_subimage(exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J> (exact(mask))));
   }
 
-  template <typename I, typename Domain>
-  auto
-  operator| (const Image<I>&& ima, const Domain& domain) -> decltype( make_subimage(move_exact(ima), domain) )
+  template <typename I, typename J>
+  sub_image<I&, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(Image<I>& ima, const Image<J>& mask)
   {
-    return make_subimage(move_exact(ima), domain);
+    return make_subimage(exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J> (exact(mask))));
   }
 
-  template <typename I, typename Domain>
-  decltype( make_subimage(std::declval<I&&>(), std::declval<const Domain&>()) )
-  operator| (Image<I>&& ima, const Domain& domain)
+  template <typename I, typename J>
+  sub_image<const I, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(const Image<I>&& ima, const Image<J>& mask)
   {
-    return make_subimage(move_exact(ima), domain);
+    return make_subimage(move_exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J> (exact(mask))));
+  }
+
+  template <typename I, typename J>
+  sub_image<I, filtered_range<const typename J::domain_type, internal::is_in_mask<J> > >
+  make_subimage(Image<I>&& ima, const Image<J>& mask)
+  {
+    return make_subimage(move_exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J> (exact(mask))));
+  }
+
+
+  // Operator |
+  template <typename I, typename DomainOrMask>
+  auto operator| (const Image<I>& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(exact(ima), other) )
+  {
+    return make_subimage(exact(ima), other);
+  }
+
+  template <typename I, typename DomainOrMask>
+  auto operator| (Image<I>& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(exact(ima), other) )
+  {
+    return make_subimage(exact(ima), other);
+  }
+
+  template <typename I, typename DomainOrMask>
+  auto operator| (const Image<I>&& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(move_exact(ima), other) )
+  {
+    return make_subimage(move_exact(ima), other);
+  }
+
+  template <typename I, typename DomainOrMask>
+  auto operator| (Image<I>&& ima, const DomainOrMask& other)
+    -> decltype( make_subimage(move_exact(ima), other) )
+  {
+    return make_subimage(move_exact(ima), other);
   }
 
 
@@ -123,7 +208,7 @@ namespace mln
   {
     typedef std::true_type      accessible;
     typedef forward_image_tag   category; // FIXME: category depends on domain category
-    typedef std::false_type	concrete;
+    typedef typename image_traits<Image>::concrete  concrete;
     typedef std::false_type	indexable; // FIXME: depends
   };
 
@@ -131,7 +216,7 @@ namespace mln
 
   template <typename I, typename Domain>
   struct sub_image : image_base< sub_image<I, Domain>,
-                                 typename Domain::point_type,
+                                 typename Domain::value_type,
                                  typename image_value<typename std::remove_reference<I>::type>::type >
   {
     BOOST_CONCEPT_ASSERT((AccessibleImage<typename std::decay<I>::type>));
@@ -140,7 +225,7 @@ namespace mln
     typedef typename std::remove_reference<I>::type  image_t;
     typedef sub_image<I, Domain>		     this_type;
 
-    static_assert( std::is_convertible<typename Domain::point_type, typename image_t::point_type>::value,
+    static_assert( std::is_convertible<typename Domain::value_type, typename image_t::point_type>::value,
 		"Domain's site type must be convertible to image's site type." );
 
 
@@ -167,6 +252,18 @@ namespace mln
     sub_image(I&& ima, const Domain& domain)
       : m_ima(std::forward<I>(ima)), m_domain(domain)
     {
+    }
+
+    template <typename dummy = void>
+    sub_image(typename std::enable_if< not std::is_reference<I>::value, dummy >::type* = NULL )
+    {
+    }
+
+    template <typename OtherImage, typename OtherDomain>
+    void resize(const sub_image<OtherImage, OtherDomain>& other)
+    {
+      resize(m_ima, other.m_ima);
+      m_domain = other.m_domain;
     }
 
     const Domain& domain() const
@@ -212,6 +309,25 @@ namespace mln
     Domain      m_domain;
   };
 
+
+  template <typename I, typename Domain>
+  struct image_concrete< sub_image<I, Domain> >
+  {
+    typedef sub_image<mln_concrete(typename std::remove_reference<I>::type), Domain> type;
+  };
+
+  template <typename I, typename Domain, typename V>
+  struct image_ch_value< sub_image<I, Domain>, V >
+  {
+    typedef sub_image<mln_ch_value(typename std::remove_reference<I>::type, V), Domain> type;
+  };
+
+
+  template <typename I, typename J, typename D1, typename D2>
+  void resize(sub_image<I, D1>& out, const sub_image<J, D2>& ima)
+  {
+    out.resize(ima);
+  }
 
 
 } // end of namespace mln

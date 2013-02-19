@@ -28,21 +28,24 @@ namespace mln
   reindex(Image<I>& ima1, const Image<J>& ima2);
 
 
+  template <typename O, typename I, typename has_border = typename image_traits<O>::has_border>
+  struct resizer;
+
+
   /// \brief Initialize an image from an other such that
   /// domains correspond. If \p ima and \p other are indexable
   /// indexes match as well.
   ///
   /// \param ima Image to be initialized.
   /// \param other Image to initialize with.
-  /// \param border Require a border of custom size.
-  /// \param v Initialize memory with a custom value.
   ///
   template <typename I, typename J>
-  void resize(Image<I>& ima, const Image<J>& other, int border, mln_value(I) v);
+  resizer<I,J>
+  resize(Image<I>& ima, const Image<J>& other);
 
-  /// \overload
   template <typename I, typename J>
-  void resize(Image<I>& ima, const Image<J>& other);
+  void
+  resize(Image<I>& ima, const Image<J>& other, unsigned border, const mln_value(I)& v) __attribute__ ((deprecated));
 
 
   /// \brief Return a concrete version of the image.
@@ -73,7 +76,10 @@ namespace mln
   typename std::enable_if<image_traits<I>::indexable::value and image_traits<J>::indexable::value>::type
   reindex(Image<I>& ima, const Image<J>& ima2)
   {
-    exact(ima).reindex(exact(ima2).index_of_point(exact(ima2).domain().pmin));
+    mln_piter(p, exact(ima2));
+    p.init();
+    auto pmin = *p;
+    exact(ima).reindex(exact(ima2).index_of_point(pmin));
   }
 
   template <typename I, typename J>
@@ -85,21 +91,18 @@ namespace mln
 
   template <typename I, typename J>
   inline
-  void resize(Image<I>& ima, const Image<J>& other)
+  resizer<I, J>
+  resize(Image<I>& ima, const Image<J>& other)
   {
-    exact(ima).resize(exact(other).domain());
-    reindex(ima, other);
+    return std::move(resizer<I, J>(exact(ima), exact(other)));
   }
-
 
   template <typename I, typename J>
-  inline
-  void resize(Image<I>& ima, const Image<J>& other, int border, mln_value(I) v)
+  void
+  resize(Image<I>& ima, const Image<J>& other, unsigned b, const mln_value(I)& v)
   {
-    exact(ima).resize(exact(other).domain(), border, v);
-    reindex(ima, other);
+    resize(ima, other).border(b).init(v);
   }
-
 
   template <typename InputImage>
   inline
@@ -118,6 +121,131 @@ namespace mln
     return clone(std::forward<InputImage>(ima));
   }
 
+  template <typename O, typename I>
+  struct resizer<O, I, std::true_type>
+  {
+    static_assert(image_traits<O>::concrete::value, "Output image must be concrete.");
+
+    resizer(O& ima, const I& ref)
+      : m_ima (ima), m_ref(ref), m_has_hook (true)
+    {
+      m_border = m_ref.border();
+    }
+
+    ~resizer()
+    {
+      if (m_has_hook)
+	{
+	  if (m_set_init)
+	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
+	  else
+	    m_ima.resize(m_ref.domain(), m_border);
+	  reindex(m_ima, m_ref);
+	}
+    }
+
+    resizer(resizer&& other)
+    : m_ima(other.m_ima),
+      m_ref(other.m_ref),
+      m_has_hook(true),
+      m_border(other.m_border),
+      m_set_init(other.m_set_init),
+      m_init_value(other.m_init_value)
+    {
+      other.m_has_hook = false;
+    }
+
+    resizer&
+    border(unsigned b)
+    {
+      m_border = b;
+      return *this;
+    }
+
+    template <typename Neighborhood>
+    resizer&
+    adjust(const Neighborhood& nbh)
+    {
+      unsigned b = get_border_from_nbh(nbh);
+      if (b != 0)
+	m_border = b;
+      return *this;
+    }
+
+    resizer&
+    init(const mln_value(O)& v)
+    {
+      m_set_init = true;
+      m_init_value = v;
+      return *this;
+    }
+
+  private:
+    resizer(const resizer&);
+    resizer& operator= (const resizer&);
+
+    O&		m_ima;
+    const I&	m_ref;
+    bool	m_has_hook;
+
+    unsigned	 m_border;
+    bool	 m_set_init;
+    mln_value(O) m_init_value;
+  };
+
+  template <typename O, typename I>
+  struct resizer<O, I, std::false_type>
+  {
+    static_assert(image_traits<O>::concrete::value, "Output image must be concrete.");
+
+    resizer(O& ima, const I& ref)
+      : m_ima (ima), m_ref(ref)
+    {
+    }
+
+    ~resizer()
+    {
+      if (m_has_hook)
+	{
+	  if (m_set_init)
+	    m_ima.resize(m_ref.domain(), m_init_value);
+	  else
+	    m_ima.resize(m_ref.domain());
+	}
+      reindex(m_ima, m_ref);
+    }
+
+    resizer(resizer&& other)
+    : m_ima(other.m_ima),
+      m_ref(other.m_ref),
+      m_has_hook(true),
+      m_set_init(other.m_set_init),
+      m_init_value(other.m_init_value)
+    {
+      other.m_has_hook = false;
+    }
+
+
+    resizer&
+    init(const mln_value(O)& v)
+    {
+      m_set_init = true;
+      m_init_value = v;
+      return *this;
+    }
+
+
+  private:
+    resizer(const resizer&);
+    resizer& operator= (const resizer&);
+
+    O&		 m_ima;
+    const I&	 m_ref;
+    bool	 m_has_hook;
+
+    bool	 m_set_init;
+    mln_value(O) m_init_value;
+  };
 
 }
 

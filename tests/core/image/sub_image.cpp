@@ -10,7 +10,7 @@
 
 BOOST_AUTO_TEST_SUITE(SubImage)
 
-BOOST_AUTO_TEST_CASE(ndimage)
+BOOST_AUTO_TEST_CASE(subdomain)
 {
   using namespace mln;
 
@@ -18,6 +18,21 @@ BOOST_AUTO_TEST_CASE(ndimage)
   iota(ima, 0);
   fill(ima | box2d{{1,1}, {4,4}}, 42);
   fill((ima | box2d{{1,1}, {4,4}}) | box2d{{1,1}, {2,3}}, 44);
+
+
+  static_assert( std::is_same< decltype(ima | box2d()), image2d<int> >::value, "");
+  io::imprint(ima);
+}
+
+
+BOOST_AUTO_TEST_CASE(mask)
+{
+  using namespace mln;
+
+  image2d<int> ima(5,5);
+  iota(ima, 0);
+  fill(ima | (ima > 12), 12);
+  fill(ima | (ima < 5) , 5);
 
 
   static_assert( std::is_same< decltype(ima | box2d()), image2d<int> >::value, "");

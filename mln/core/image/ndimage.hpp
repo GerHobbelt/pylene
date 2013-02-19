@@ -39,6 +39,7 @@ namespace mln
     typedef std::true_type		indexable;
     typedef std::true_type		concrete;
     typedef std::true_type		shallow_copy;
+    typedef std::true_type		has_border;
   };
 
 /******************************************/

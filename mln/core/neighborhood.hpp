@@ -19,33 +19,31 @@ namespace mln {
     using nbh = neighborhood_pixel_range<Pixel, SiteSet>;
 
 
-    inline
+
     constexpr
     iterator_range< sliding_win_piter<SiteSet> >
-    operator() (const point_type& p) const
+    make_nbh(const point_type& p, std::true_type) const
     {
       return make_iterator_range( sliding_win_piter<SiteSet>(derived()->dpoints, p) );
     }
 
 
-    template <typename PixelOrPixelIterator,
-	      typename = typename std::enable_if<not std::is_convertible<PixelOrPixelIterator, point_type>::value>::type>
-    inline
+    template <typename PixelOrPixelIterator>
     nbh<PixelOrPixelIterator>
-    operator() (const PixelOrPixelIterator& pix)
+    make_nbh(const PixelOrPixelIterator& pix, std::false_type) const
     {
       typedef nbh<PixelOrPixelIterator> nbh_t;
       nbh_t x(derived()->dpoints, pix);
       return x;
     }
 
-    template <typename PixelOrPixelIterator,
-	      typename = typename std::enable_if<not std::is_lvalue_reference<PixelOrPixelIterator>::value>::type>
-    nbh<PixelOrPixelIterator>
-    operator() (PixelOrPixelIterator&& pix) const
+
+    template <typename PointOrPixelOrPixelIterator>
+    auto operator() (PointOrPixelOrPixelIterator&& p) const
+      -> decltype(this->make_nbh(std::forward<PointOrPixelOrPixelIterator>(p), std::is_convertible<PointOrPixelOrPixelIterator, point_type> ()))
     {
-      static_assert(not std::is_lvalue_reference<PixelOrPixelIterator>::value,
-		    "You must pass a lvalue to neighborhood.");
+      static_assert(std::is_lvalue_reference<PointOrPixelOrPixelIterator>::value, "You must pass a lvalue to neighborhood.");
+      return make_nbh(std::forward<PointOrPixelOrPixelIterator>(p), std::is_convertible<PointOrPixelOrPixelIterator, point_type> ());
     }
 
 

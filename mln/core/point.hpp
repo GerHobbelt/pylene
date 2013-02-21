@@ -22,7 +22,7 @@ namespace mln
 	  };
 	}
 
-  template <typename T, std::size_t dim>
+  template <typename T, unsigned dim>
   using point = internal::vec_base<T, dim, point_tag>;
 
   typedef point<short, 1> point1d;

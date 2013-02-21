@@ -106,7 +106,8 @@ namespace mln
     typedef typename std::common_type< typename image_traits<Image>::category,
                                        bidirectional_image_tag >::type category;
     typedef std::false_type concrete;
-    typedef std::false_type indexable; // !< FIXME
+    typedef std::false_type indexable;  // !< FIXME
+    typedef std::false_type has_border; // !< FIXME
   };
 
   template <typename BinaryFunction, typename Image1, typename Image2>
@@ -120,6 +121,7 @@ namespace mln
                                        bidirectional_image_tag >::type category;
     typedef std::false_type concrete;
     typedef std::false_type indexable; // !< FIXME
+    typedef std::false_type has_border; // !< FIXME
   };
 
   template <typename BinaryFunction, typename Image, typename Scalar>
@@ -130,6 +132,7 @@ namespace mln
                                        bidirectional_image_tag >::type category;
     typedef std::false_type concrete;
     typedef std::false_type indexable; // !< FIXME
+    typedef std::false_type has_border; // !< FIXME
   };
 
   template <typename BinaryFunction, typename Scalar, typename Image>
@@ -140,6 +143,7 @@ namespace mln
                                        bidirectional_image_tag >::type category;
     typedef std::false_type concrete;
     typedef std::false_type indexable; // !< FIXME
+    typedef std::false_type has_border; // !< FIXME
   };
 
 

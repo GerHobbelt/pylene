@@ -2,6 +2,7 @@
 # define MLN_CORE_IMAGE_IMAGE_ROUTINES_HPP
 
 # include <mln/core/algorithm/clone.hpp>
+# include <mln/core/internal/get_border_from_nbh.hpp>
 
 namespace mln
 {
@@ -127,27 +128,22 @@ namespace mln
     static_assert(image_traits<O>::concrete::value, "Output image must be concrete.");
 
     resizer(O& ima, const I& ref)
-      : m_ima (ima), m_ref(ref), m_has_hook (true)
+      : m_ima (ima), m_ref(ref), m_has_hook (true), m_failed(false)
     {
-      m_border = m_ref.border();
+      initborder_();
+      //m_border = m_ref.border();
     }
 
     ~resizer()
     {
-      if (m_has_hook)
-	{
-	  if (m_set_init)
-	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
-	  else
-	    m_ima.resize(m_ref.domain(), m_border);
-	  reindex(m_ima, m_ref);
-	}
+      do_it();
     }
 
     resizer(resizer&& other)
     : m_ima(other.m_ima),
       m_ref(other.m_ref),
       m_has_hook(true),
+      m_failed(other.m_failed),
       m_border(other.m_border),
       m_set_init(other.m_set_init),
       m_init_value(other.m_init_value)
@@ -166,9 +162,11 @@ namespace mln
     resizer&
     adjust(const Neighborhood& nbh)
     {
-      unsigned b = get_border_from_nbh(nbh);
+      unsigned b = internal::get_border_from_nbh(nbh);
       if (b != 0)
 	m_border = b;
+      else
+	m_failed = true;
       return *this;
     }
 
@@ -180,6 +178,41 @@ namespace mln
       return *this;
     }
 
+    operator bool ()
+    {
+      do_it();
+      return !m_failed;
+    }
+
+  private:
+    void do_it()
+    {
+      if (m_has_hook)
+	{
+	  if (m_set_init and m_border)
+	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
+	  else if (m_border)
+	    m_ima.resize(m_ref.domain(), m_border);
+	  else if (m_set_init)
+	    m_ima.resize(m_ref.domain(), m_border);
+	  reindex(m_ima, m_ref);
+	  m_has_hook = false;
+	}
+    }
+
+    template <typename dummy=void>
+    void initborder_(typename std::enable_if<image_traits<I>::has_border::value, dummy>::type* = NULL)
+    {
+      m_border = m_ref.border();
+    }
+
+    template <typename dummy=void>
+    void initborder_(typename std::enable_if<!image_traits<I>::has_border::value, dummy>::type* = NULL)
+    {
+      m_border = 0;
+    }
+
+
   private:
     resizer(const resizer&);
     resizer& operator= (const resizer&);
@@ -187,6 +220,7 @@ namespace mln
     O&		m_ima;
     const I&	m_ref;
     bool	m_has_hook;
+    bool	m_failed;
 
     unsigned	 m_border;
     bool	 m_set_init;

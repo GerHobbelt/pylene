@@ -3,7 +3,8 @@
 
 # include <mln/core/image/image.hpp>
 # include <mln/core/value/value_traits.hpp>
-# include <mln/core/algorithm/fill.hpp>
+//# include <mln/core/algorithm/fill.hpp>
+# include <mln/core/extension/fill.hpp>
 # include <vector>
 # include <type_traits>
 
@@ -36,30 +37,57 @@ namespace mln
       Label bg = lbl;
 
       mln_ch_value(I, Label) out;
-      resize(out, ima);
-      fill(out, bg);
+      bool nocheck_boundary = resize(out, ima).adjust(nbh).init(bg);
 
       std::vector<P> queue;
       queue.reserve(ima.domain().size());
 
-      P q;
-      mln_iter(n, nbh(q));
-
-      mln_foreach(P p, ima.domain())
+      if (nocheck_boundary)
 	{
-	  if (ima(p) and out(p) == bg)
+	  extension::fill(out, value_traits<Label>::max());
+	  P q;
+	  mln_iter(n, nbh(q));
+
+	  mln_foreach(P p, ima.domain())
 	    {
-	      queue.push_back(p);
-	      ++lbl;
-              mln_assertion(lbl <= value_traits<Label>::max());
-	      while (not queue.empty())
+	      if (ima(p) and out(p) == bg)
 		{
-		  q = queue.back();
-                  queue.pop_back();
-		  out(q) = lbl;
-		  mln_forall(n)
-                    if (ima.domain().has(*n) and ima(*n) and out(*n) == bg)
-                      queue.push_back(*n);
+		  queue.push_back(p);
+		  ++lbl;
+		  mln_assertion(lbl <= value_traits<Label>::max());
+		  while (not queue.empty())
+		    {
+		      q = queue.back();
+		      queue.pop_back();
+		      out(q) = lbl;
+		      mln_forall(n)
+			if (out.at(*n) == bg and ima(*n))
+			  queue.push_back(*n);
+		    }
+		}
+	    }
+	}
+      else
+	{
+	  P q;
+	  mln_iter(n, nbh(q));
+
+	  mln_foreach(P p, ima.domain())
+	    {
+	      if (ima(p) and out(p) == bg)
+		{
+		  queue.push_back(p);
+		  ++lbl;
+		  mln_assertion(lbl <= value_traits<Label>::max());
+		  while (not queue.empty())
+		    {
+		      q = queue.back();
+		      queue.pop_back();
+		      out(q) = lbl;
+		      mln_forall(n)
+			if (ima.domain().has(*n) and ima(*n) and out(*n) == bg)
+			  queue.push_back(*n);
+		    }
 		}
 	    }
 	}

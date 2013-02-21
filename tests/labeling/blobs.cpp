@@ -9,7 +9,23 @@
 #include <boost/test/unit_test.hpp>
 #include <mln/io/imprint.hpp>
 
-BOOST_AUTO_TEST_CASE(blobs_1)
+BOOST_AUTO_TEST_CASE(blobs_fast)
+{
+  using namespace mln;
+
+  image2d<uint8> ima(5,5);
+  iota(ima, 0);
+
+  image2d<bool> mask = eval(ima % 2 == 0);
+
+  image2d<uint8> lbl;
+  unsigned nlabel;
+  std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8 ());
+  BOOST_CHECK_EQUAL(nlabel, 13);
+}
+
+
+BOOST_AUTO_TEST_CASE(blobs_custom)
 {
 
   using namespace mln;
@@ -21,8 +37,10 @@ BOOST_AUTO_TEST_CASE(blobs_1)
   unsigned nlabel;
 
   std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c4, uint8 ());
-  BOOST_CHECK(nlabel == 13);
+  BOOST_CHECK_EQUAL(nlabel, 13);
 
   std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c8, uint8 ());
-  BOOST_CHECK(nlabel == 1);
+
+  io::imprint(lbl);
+  BOOST_CHECK_EQUAL(nlabel, 1);
 }

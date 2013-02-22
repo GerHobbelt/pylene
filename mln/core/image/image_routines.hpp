@@ -164,7 +164,7 @@ namespace mln
     {
       unsigned b = internal::get_border_from_nbh(nbh);
       if (b != 0)
-	m_border = b;
+	m_border = std::max(m_border, b);
       else
 	m_failed = true;
       return *this;
@@ -194,7 +194,7 @@ namespace mln
 	  else if (m_border)
 	    m_ima.resize(m_ref.domain(), m_border);
 	  else if (m_set_init)
-	    m_ima.resize(m_ref.domain(), m_border);
+	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
 	  reindex(m_ima, m_ref);
 	  m_has_hook = false;
 	}

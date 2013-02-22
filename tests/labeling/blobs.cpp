@@ -40,7 +40,5 @@ BOOST_AUTO_TEST_CASE(blobs_custom)
   BOOST_CHECK_EQUAL(nlabel, 13);
 
   std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c8, uint8 ());
-
-  io::imprint(lbl);
   BOOST_CHECK_EQUAL(nlabel, 1);
 }

@@ -123,7 +123,7 @@ namespace mln
 	{
 	  case FIT_BITMAP:	break;
 	  case FIT_UINT16:	return typeid(uint16);
-	  case FIT_INT16:		return typeid(int16);
+	  case FIT_INT16:	return typeid(int16);
 	  default:		goto error;
 	}
 
@@ -149,7 +149,15 @@ namespace mln
       mln_precondition(init_);
       mln_precondition(dib != NULL);
       mln_precondition(x < (int) FreeImage_GetHeight(dib));
-      if (FreeImage_GetColorType(dib) != FIC_RGB)
+      int bppp = FreeImage_GetBPP(dib);
+
+      if (bppp == 1) // Case of bool images
+	{
+	  for (int y = 0, z = 0; y < domain.pmax[1]; y += 8, z += 1)
+	    for (int b = 0; b < 8; ++b)
+	      out[y+b] = ((ptr[z] & (0x80 >> b)) != 0);
+	}
+      else if (FreeImage_GetColorType(dib) != FIC_RGB)
 	std::memcpy(out, ptr, domain.pmax[1] * bpp);
       else
 	for (int y = 0; y < domain.pmax[1]; ++y) {

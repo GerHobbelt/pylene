@@ -58,7 +58,8 @@ namespace mln
 
         const int wtext =
           std::is_same<V, uint8>::value ? 3 :
-          std::is_same<V, std::size_t>::value ? 6 : 0;
+          std::is_same<V, unsigned>::value ? 10 :
+          std::is_same<V, std::size_t>::value ? 10 : 0;
 
         //if (std::is_same<V, uint8>::value)
         std::cout.width(4);
@@ -79,10 +80,17 @@ namespace mln
 	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
 	mln_point(Image) p;
         int border = ima.border();
+
+	const int wtext =
+          std::is_same<V, uint8>::value ? 3 :
+          std::is_same<V, unsigned>::value ? 10 :
+          std::is_same<V, std::size_t>::value ? 10 : 0;
+
         std::cout << domain << "(" << typeid(V).name() << ")" << std::endl;
+	std::cout.width(4);
 	for (p[0] = domain.pmin[0] - border; p[0] < domain.pmax[0] + border; ++p[0]) {
 	  for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1]) {
-	    std::cout << ((T) ima.at(p)) << " ";
+	    std::cout << std::setw(wtext) << ((T) ima.at(p)) << " ";
 	  }
 	  std::cout << std::endl;
 	}

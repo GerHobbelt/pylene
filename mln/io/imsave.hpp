@@ -24,7 +24,7 @@ namespace mln
         FreeImage_Initialise();
         FREE_IMAGE_TYPE fit;
 
-	if (std::is_same<V, uint8>::value or std::is_same<V, rgb8>::value)
+	if (std::is_same<V, bool>::value or std::is_same<V, uint8>::value or std::is_same<V, rgb8>::value)
 	  fit = FIT_BITMAP;
 	else if (std::is_same<V, uint16>::value)
 	  fit = FIT_UINT16;
@@ -46,7 +46,15 @@ namespace mln
         FIBITMAP* dib;
 	if (std::is_same<V, rgb8>::value)
 	  dib = FreeImage_AllocateT(fit, w, h, sizeof(V) * 8, 0xFF000000, 0x00FF00, 0xFF000000);
-	else
+	else if (std::is_same<V, bool>::value) {
+	  dib = FreeImage_AllocateT(fit, w, h, 1);
+	  RGBQUAD *pal = FreeImage_GetPalette(dib);
+	  mln_assertion(pal != NULL);
+	  pal[1].rgbRed = 0xFF;
+	  pal[1].rgbGreen = 0XFF;
+	  pal[1].rgbBlue = 0xFF;
+	  mln_assertion(FreeImage_GetColorType(dib) == FIC_MINISBLACK);
+	} else
 	  dib = FreeImage_AllocateT(fit, w, h, sizeof(V) * 8);
 
 
@@ -63,8 +71,14 @@ namespace mln
 		*(bits + j * bpp + 2) = *(ptr + j * bpp + 0);
 	      }
 	    }
+	  else if (std::is_same<V, bool>::value)
+	    {
+	      for (int j = 0, z = 0; j < w; ++z)
+		for (int b = 7; b >= 0; --b, ++j)
+		  bits[z] |= ptr[j] << b;
+	    }
 	  else
-	      std::memcpy(bits, ptr, w * sizeof(V));
+	    std::memcpy(bits, ptr, w * sizeof(V));
         }
 
         //FreeImage_DeInitialise();

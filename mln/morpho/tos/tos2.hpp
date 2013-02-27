@@ -133,20 +133,17 @@ namespace mln
       resize(parent, f, f.border(), PROCESSED);
       extension::fill(parent, PROCESSED);
 
-      int i = 0;
       mln_foreach(point2d p, subdomain)
 	{
-	  auto q = 2*p;
+	  point2d q = 2*p;
 	  mln_iter(n1, c8(p));
-	  mln_iter(n2, c8(q)); // FIXME: why 2*p does not work ?
+	  mln_iter(n2, c8(q)); // Q: why 2*p does not work ? A: because not a lvalue
 
 	  mln_forall(n1, n2)
 	    if (mask.at(*n1))
 	      parent.at(*n2) = UNPROCESSED;
 	  parent(q) = UNPROCESSED;
-	  ++i;
 	}
-      std::cout << "Size: " << i << std::endl;
 
       pset<I, Compare> W(K, cmp);
       auto pit = subdomain.iter(); pit.init();
@@ -221,7 +218,7 @@ namespace mln
       //mln_postcondition(S.size() == K.domain().size());
       //mln_postcondition(S.size() == parent.domain().size());
       // All done !
-      std::cout << "Size: " << S.size() << std::endl;
+      //std::cout << "Size: " << S.size() << std::endl;
       return std::make_tuple(std::move(K), std::move(parent), std::move(S));
     }
 

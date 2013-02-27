@@ -84,7 +84,7 @@ namespace mln
   {
     image2d<unsigned> depth;
     static constexpr unsigned UNDEF = value_traits<unsigned>::max();
-    resize(depth, ima, ima.border(), UNDEF);
+    resize(depth, ima).init(UNDEF);
 
     auto offset = wrt_delta_index(ima, nbh.dpoints);
     depth[S[0]] = 0;
@@ -100,9 +100,8 @@ namespace mln
 
 
     image2d<unsigned> outdepth; // The depth of the highest node in the internal hole
-    resize(outdepth, ima, ima.border(), UNDEF);
+    resize(outdepth, ima).init(UNDEF);
     outdepth[S[0]] = 0;
-    unsigned i = 0;
     for (unsigned p : S)
       {
         unsigned q = ima[p] == ima[parent[p]] ? parent[p] : p;

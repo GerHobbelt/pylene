@@ -10,8 +10,10 @@ namespace mln
 {
 
   template <typename T>
-  struct Minmax
+  struct Minmax : Accumulator< Minmax<T> >
   {
+    typedef T argument_type;
+
     void init() {
       min = value_traits<T>::max();
       max = value_traits<T>::min();

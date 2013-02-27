@@ -43,8 +43,8 @@ namespace mln
     typedef rgb<unsigned> SumType;
     image2d<SumType>  sum;
     image2d<unsigned> count;
-    resize(count, K, K.border(), 0);
-    resize(sum, K, K.border(), SumType ());
+    resize(count, K).init(0);
+    resize(sum, K).init(SumType ());
 
     for (int i = S.size() - 1; i >= 0; --i)
       {
@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 
   auto ima2 = addborder(ima); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
-  resize(tmp, parent, parent.border(), rgb8{0,0,255});
+  resize(tmp, parent).init(rgb8{0,0,255});
 
   point2d strides = use_tos ? point2d{4,4} : point2d{2,2};
   copy(ima2, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, strides));

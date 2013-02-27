@@ -78,43 +78,50 @@ int main(int argc, const char** argv)
   using namespace mln;
   typedef UInt<9> uint9;
 
-  std::string filename = argv[1];
+  if (argc < 3)
+    {
+      std::cout << "Usage: " << argv[0] << " input output(wo ext) [saturation]" << std::endl;
+      abort();
+    }
 
+  std::string filename = argv[1];
+  std::string output = argv[2];
+  unsigned sat = (argc > 3) ? std::atoi(argv[3]) : 45;
 
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
   image2d<lsh8> f = transform(ima, rgb2lsh<uint8> );
 
-  image2d<uint8> mask = transform(f, [] (lsh8 x) { return (uint8) ((x[1] < 45) * 255); });
+  image2d<uint8> mask = transform(f, [sat] (lsh8 x) { return (uint8) ((x[1] < sat) * 255); });
 
 
-  io::imsave(mask, "mask.tiff");
-  io::imsave(transform(f, [] (lsh8 x) -> uint8 { return x[1] < 45 ? x[0] : 0; }), "lum.tiff");
-  io::imsave(transform(f, [] (lsh8 x) -> uint8 { return x[1] > 45 ? x[2] : 0; }), "hue.tiff");
+
+  io::imsave(mask, (boost::format("%s-mask.tiff") % output).str().c_str());
+  io::imsave(transform(f, [] (lsh8 x) -> uint8 { return x[1] < 45 ? x[0] : 0; }), (boost::format("%s-lum.tiff") % output).str().c_str());
+  io::imsave(transform(f, [] (lsh8 x) -> uint8 { return x[1] > 45 ? x[2] : 0; }), (boost::format("%s-hue.tiff") % output).str().c_str());
 
   image2d<rgb8> bima = addborder(ima);
   image2d<rgb8> tmp(2*bima.nrows()-1, 2*bima.ncols()-1);
   fill(tmp, rgb8{0,0,255});
   copy(bima, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, point2d{2,2}));
 
-  auto k1tok0dom = sbox2d(tmp.domain().pmin, tmp.domain().pmax, point2d{2,2});
-
   image2d<rgb8> final;
   resize(final, bima);
   fill(final, rgb8{0,0,255});
   // Compute TOS on cc[L]
   {
-    image2d<bool> mask = transform(f, [] (lsh8 x) { return (x[1] < 45); });
+    image2d<bool> mask = transform(f, [sat] (lsh8 x) { return (x[1] < sat); });
     auto L = transform(f, [] (lsh8 x) -> uint9 { return 2 * x[0]; });
 
-    image2d<uint8> lbl;
+    image2d<uint16> lbl;
     unsigned nlabel;
-    std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8());
-
+    //std::cout << "Start: labeling" << std::endl;
+    std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint16());
+    //std::cout << "End: labeling" << std::endl;
     //std::vector< std::pair< FIXME, FIXME >
 
-    for (int i = 1; i <= nlabel; ++i)
+    for (unsigned i = 1; i <= nlabel; ++i)
       {
 	//auto x = (lbl == i);
 	//auto subima = (L | ));
@@ -122,20 +129,25 @@ int main(int argc, const char** argv)
 	image2d<bool> mask2;
 
 	std::tie(ima2, mask2) = addborder2(L, lbl == i);
-	io::imsave(transform(ima2, [] (uint9 x) -> uint8 { return x/2; }),
-		   (boost::format("L_%02i.tiff") % i).str().c_str());
+	//io::imsave(transform(ima2, [] (uint9 x) -> uint8 { return x/2; }),
+	//	   (boost::format("L_%02i.tiff") % i).str().c_str());
 	auto domain = rng::filter(ima2.domain(), [mask2](point2d p) { return mask2(p); });
 
 	image2d<uint9> K;
 	image2d<unsigned> parent;
 	std::vector<unsigned> S;
 
+	//std::cout << "Start: subtos (" << i << ")" << std::endl;
 	std::tie(K, parent, S) = morpho::subToS(ima2, mask2, domain, c4);
+	//std::cout << "End: subtos (" << i << ")" << std::endl;
+
+	//std::cout << "Start: thicken (" << i << ")" << std::endl;
 	auto w = thicken_tdn(K, parent, S, c8);
+	//std::cout << "End: thicken (" << i << ")" << std::endl;
 
 	auto res = setmean_on_nodes(tmp, w, parent, S, K1::is_face_2);
 	auto k0 = k1tok0(res);
-	io::imsave(res, (boost::format("Lres_%02i.tiff") % i).str().c_str());
+	//io::imsave(res, (boost::format("Lres_%02i.tiff") % i).str().c_str());
 	copy(k0 | mask2, final | mask2);
 	//fill(final|mask2, rgb8{0,255,0});
       }
@@ -143,21 +155,21 @@ int main(int argc, const char** argv)
 
   // Compute TOS on cc[H]
   {
-    image2d<bool> mask = transform(f, [] (lsh8 x) { return (x[1] >= 45); });
+    image2d<bool> mask = transform(f, [sat] (lsh8 x) { return (x[1] >= sat); });
     auto H = transform(f, [] (lsh8 x) -> uint9 { return 2 * x[2]; });
 
-    image2d<uint8> lbl;
+    image2d<uint16> lbl;
     unsigned nlabel;
-    std::tie(lbl, nlabel) = labeling::blobs(mask, c8, uint8());
+    std::tie(lbl, nlabel) = labeling::blobs(mask, c8, uint16());
 
-    for (int i = 1; i <= nlabel; ++i)
+    for (unsigned i = 1; i <= nlabel; ++i)
       {
 	image2d<uint9> ima2;
 	image2d<bool> mask2;
 
 	std::tie(ima2, mask2) = addborder2(H, lbl == i);
-	io::imsave(transform(ima2, [] (uint9 x) -> uint8 { return x/2; }),
-		   (boost::format("H_%02i.tiff") % i).str().c_str());
+	//io::imsave(transform(ima2, [] (uint9 x) -> uint8 { return x/2; }),
+	//	   (boost::format("H_%02i.tiff") % i).str().c_str());
 	auto domain = rng::filter(ima2.domain(), [mask2](point2d p) { return mask2(p); });
 
 	image2d<uint9> K;
@@ -168,11 +180,11 @@ int main(int argc, const char** argv)
 	auto w = thicken_tdn(K, parent, S, c8);
 
 	auto res = setmean_on_nodes(tmp, w, parent, S, K1::is_face_2);
-	io::imsave(res, (boost::format("Hres_%02i.tiff") % i).str().c_str());
+	//io::imsave(res, (boost::format("Hres_%02i.tiff") % i).str().c_str());
 	copy(k1tok0(res) | mask2, final | mask2);
 	//fill(final|mask2, rgb8{0,0,255});
       }
   }
 
-  io::imsave(final, "final.tiff");
+  io::imsave(final, (boost::format("%s.tiff") % output).str().c_str() );
 }

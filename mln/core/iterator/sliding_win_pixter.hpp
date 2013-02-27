@@ -95,12 +95,12 @@ namespace mln
   template <typename SiteSet, typename PixelOrPixelIterator>
   struct sliding_win_pixter :
     internal::sliding_win_pixter_base< SiteSet, PixelOrPixelIterator,
-				       typename internal::sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type::category,
+				       typename image_traits<typename internal::sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type>::category,
 				       sliding_win_pixter<SiteSet, PixelOrPixelIterator> >
   {
   private:
     typedef internal::sliding_win_pixter_base< SiteSet, PixelOrPixelIterator,
-					       typename internal::sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type::category,
+					       typename image_traits<typename internal::sliding_win_pixter_dispatch<PixelOrPixelIterator>::Pixel::image_type>::category,
                                                sliding_win_pixter<SiteSet, PixelOrPixelIterator> > base;
 
   public:

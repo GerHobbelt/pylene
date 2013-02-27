@@ -7,6 +7,21 @@
 
 namespace mln
 {
+  namespace accu
+  {
+
+    struct NoOpAccumulator
+    {
+      void init() {};
+
+      template <typename T>
+      void take(T) {}
+
+      void take(const NoOpAccumulator&) {}
+
+    };
+
+  }
 
   namespace morpho
   {
@@ -45,8 +60,8 @@ namespace mln
       image2d<Accumulator2F> im_acc2f;
       image2d<Accumulator1F> im_acc1f;
 
-      resize(im_acc2f, K, K.border(), acc2f);
-      resize(im_acc1f, K, K.border(), acc1f);
+      resize(im_acc2f, K).init(acc2f);
+      resize(im_acc1f, K).init(acc1f);
 
 
 

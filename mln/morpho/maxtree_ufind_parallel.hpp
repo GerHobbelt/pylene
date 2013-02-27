@@ -50,7 +50,7 @@ namespace mln
 	  m_S = new std::vector<size_type>(n);
 
           resize(m_parent, ima);
-          resize(m_zpar, ima, ima.border(), UNINITIALIZED);
+          resize(m_zpar, ima).init(UNINITIALIZED);
 	  m_nsplit = 0;
         }
 
@@ -87,7 +87,7 @@ namespace mln
 
 	  image2d<bool> deja_vu;
 	  if (use_dejavu)
-	    resize(deja_vu, ima, m_ima.border(), false);
+	    resize(deja_vu, ima).init(false);
 
 	  size_type first_index = ima.index_of_point(ima.domain().pmin);
 	  size_type last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
@@ -277,6 +277,10 @@ namespace mln
 
 	unsigned	     m_nsplit;
       };
+
+      template <typename V, typename Neighborhood, typename StrictWeakOrdering, typename size_type, bool parallel>
+      constexpr size_type MaxTreeAlgorithmUF<V, Neighborhood, StrictWeakOrdering, size_type, parallel>::UNINITIALIZED;
+
 
       namespace parallel
       {

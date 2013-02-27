@@ -2,6 +2,7 @@
 # define MLLN_CORE_CANVAS_ACCFPFN_HPP
 
 # include <mln/core/image/image.hpp>
+# include <mln/accu/accumulator.hpp>
 # include <type_traits>
 
 namespace mln

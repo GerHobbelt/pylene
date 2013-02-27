@@ -87,6 +87,7 @@ namespace mln
     typedef typename internal::zip_image_accessibility<ImageTuple>::type accessible;
     typedef std::false_type concrete;
     typedef std::false_type indexable; // Should be true_type
+    typedef std::false_type has_border;
   };
 
 

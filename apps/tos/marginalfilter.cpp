@@ -41,7 +41,7 @@ namespace mln
 
     // 1. compute area attribute
     image2d<unsigned> area;
-    resize(area, K, K.border(), 0);
+    resize(area, K).init(0);
 
     area[S[0]] += K1::is_face_2(K.point_at_index(S[0]));
     for (int i = S.size() - 1; i > 0; --i) // Strict >0 non root

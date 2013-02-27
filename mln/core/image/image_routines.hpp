@@ -189,12 +189,14 @@ namespace mln
     {
       if (m_has_hook)
 	{
-	  if (m_set_init and m_border)
+	  if (m_set_init and m_border != 0)
 	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
-	  else if (m_border)
+	  else if (m_border != 0)
 	    m_ima.resize(m_ref.domain(), m_border);
 	  else if (m_set_init)
-	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
+	    m_ima.resize(m_ref.domain(), 3, m_init_value);
+	  else
+	    m_ima.resize(m_ref.domain());
 	  reindex(m_ima, m_ref);
 	  m_has_hook = false;
 	}

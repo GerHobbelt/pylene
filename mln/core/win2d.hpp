@@ -35,17 +35,19 @@ namespace mln
   /**************************/
 
   inline
-  rect2d make_rectangle2d(unsigned height, unsigned width);
+  rect2d make_rectangle2d(unsigned height, unsigned width)
   {
     mln_precondition(height % 2 == 1);
     mln_precondition(width % 2 == 1);
-    unsigned h = height / 2;
-    unsigned w = width / 2;
-    return rect2d{ {-h,-w}, {h+1,w+1} };
+    int h = height / 2;
+    int w = width / 2;
+    rect2d rec;
+    rec.dpoints = box2d{point2d(-h,-w), point2d(h+1,w+1)};
+    return rec;
   }
 
   inline
-  rect2d make_rectangle2d(unsigned height, unsigned width, point2d center);
+  rect2d make_rectangle2d(unsigned height, unsigned width, point2d center)
   {
     mln_precondition(height % 2 == 1);
     mln_precondition(width % 2 == 1);
@@ -57,7 +59,9 @@ namespace mln
     uleft[1] -= w;
     lright[0] += h+1;
     lright[1] += w+1;
-    return rect2d{ {uleft, lright} };
+    rect2d rec;
+    rec.dpoints = box2d{uleft, lright};
+    return rec;
   }
 
 }

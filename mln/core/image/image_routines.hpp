@@ -164,7 +164,7 @@ namespace mln
     {
       unsigned b = internal::get_border_from_nbh(nbh);
       if (b != 0)
-	m_border = std::max(m_border, b);
+	m_border = std::max<int>(m_border, b);
       else
 	m_failed = true;
       return *this;
@@ -189,9 +189,9 @@ namespace mln
     {
       if (m_has_hook)
 	{
-	  if (m_set_init and m_border != 0)
+	  if (m_set_init and m_border != -1)
 	    m_ima.resize(m_ref.domain(), m_border, m_init_value);
-	  else if (m_border != 0)
+	  else if (m_border != -1)
 	    m_ima.resize(m_ref.domain(), m_border);
 	  else if (m_set_init)
 	    m_ima.resize(m_ref.domain(), 3, m_init_value);
@@ -211,7 +211,7 @@ namespace mln
     template <typename dummy=void>
     void initborder_(typename std::enable_if<!image_traits<I>::has_border::value, dummy>::type* = NULL)
     {
-      m_border = 0;
+      m_border = -1;
     }
 
 
@@ -224,7 +224,7 @@ namespace mln
     bool	m_has_hook;
     bool	m_failed;
 
-    unsigned	 m_border;
+    int		 m_border;
     bool	 m_set_init;
     mln_value(O) m_init_value;
   };

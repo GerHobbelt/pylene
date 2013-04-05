@@ -14,8 +14,8 @@ namespace mln
       typedef typename iterator::value_type				value_type;
       typedef typename iterator::reference				reference;
 
-      filtered_range(InputRange& rng, const Predicate& pred)
-	: m_rng (rng), m_pred(pred)
+      filtered_range(InputRange&& rng, const Predicate& pred)
+	: m_rng (std::forward<InputRange>(rng)), m_pred(pred)
       {
       }
 
@@ -35,7 +35,7 @@ namespace mln
       }
 
     private:
-      InputRange& m_rng;
+      InputRange  m_rng;
       Predicate   m_pred;
     };
 
@@ -46,9 +46,9 @@ namespace mln
 
     template <typename InputRange, typename Predicate>
     filtered_range<InputRange, Predicate>
-    filter(InputRange& rng, Predicate pred)
+    filter(InputRange&& rng, Predicate pred)
     {
-      return filtered_range<InputRange, Predicate>(rng, pred);
+      return filtered_range<InputRange, Predicate>(std::forward<InputRange>(rng), pred);
     }
 
   } // end of namespace mln::rng

@@ -216,7 +216,7 @@ namespace mln
 
   template <typename I, typename Domain>
   struct sub_image : image_base< sub_image<I, Domain>,
-                                 typename Domain::value_type,
+                                 typename range_value<Domain>::type,
                                  typename image_value<typename std::remove_reference<I>::type>::type >
   {
     BOOST_CONCEPT_ASSERT((AccessibleImage<typename std::decay<I>::type>));
@@ -225,7 +225,7 @@ namespace mln
     typedef typename std::remove_reference<I>::type  image_t;
     typedef sub_image<I, Domain>		     this_type;
 
-    static_assert( std::is_convertible<typename Domain::value_type, typename image_t::point_type>::value,
+    static_assert( std::is_convertible<typename range_value<Domain>::type, typename image_t::point_type>::value,
 		"Domain's site type must be convertible to image's site type." );
 
 

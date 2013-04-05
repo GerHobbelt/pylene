@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_FORALL_HPP
 # define MLN_CORE_FORALL_HPP
 
+# include <mln/core/foreach.hpp>
 # include <mln/core/image/zip_image.hpp>
 # include <mln/core/iterator/unzip_proxy_iterator.hpp>
 
@@ -22,29 +23,6 @@
 # include <boost/preprocessor/seq/seq.hpp>
 
 
-namespace mln
-{
-
-  namespace internal
-  {
-
-    template <typename T>
-    struct false_var_t
-    {
-      constexpr operator bool() const { return false; }
-      T& get() { return x_;}
-      false_var_t& set(const T& v) { x_ = v; return *this; }
-
-      T x_;
-    };
-
-  }
-
-}
-
-# define MLN_DECL_VAR(ID, VALUE)				\
-  if (mln::internal::false_var_t< decltype(VALUE) > ID = {VALUE}) {} else
-
 
 # define MLN_DECLARE(z, n, var)						\
   if (bool _mln_continue_##n = false) {} else				\
@@ -54,113 +32,6 @@ namespace mln
   if (bool _mln_continue_##n = false) {} else				\
     for (BOOST_PP_SEQ_ELEM(n, var) =					\
 	   internal::unzip_pixel_proxy<n, decltype(*_mln_for_cur_.get())>(*_mln_for_cur_.get()); !_mln_continue_##n; _mln_continue_##n = true)
-
-
-
-/*
-# define forall_v_(ARGC, ARGV)						\
-  static_assert( ARGC > 0 and ARGC % 2 == 0,				\
-		 "Number of arguments of the forall macros should be odd"); \
-  using std::begin;							\
-  using std::end;							\
-  MLN_DECL_VAR(_mln_zip_image__,					\
-	       imzip(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_REST_N(BOOST_PP_DIV(ARGC, 2), ARGV)))) \
-  MLN_DECL_VAR(_mln_for_range_, _mln_zip_image__.get().values())	\
-  MLN_DECL_VAR(_mln_for_cur_, begin(_mln_for_range_.get()))		\
-  MLN_DECL_VAR(_mln_for_end_, end(_mln_for_range_.get()))		\
-  for (; _mln_for_cur_.get() != _mln_for_end_.get(); ++(_mln_for_cur_.get())) \
-    BOOST_PP_REPEAT(BOOST_PP_DIV(ARGC, 2), MLN_DECLARE, ARGV)
-
-
-# define forall_pix_(ARGC, ARGV)						\
-  static_assert( ARGC > 0 and ARGC % 2 == 0,				\
-		 "Number of arguments of the forall macros should be odd"); \
-  using std::begin;							\
-  using std::end;							\
-  MLN_DECL_VAR(_mln_zip_image__,					\
-	       imzip(BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_REST_N(BOOST_PP_DIV(ARGC, 2), ARGV)))) \
-  MLN_DECL_VAR(_mln_for_range_, _mln_zip_image__.get().pixels())	\
-  MLN_DECL_VAR(_mln_for_cur_, begin(_mln_for_range_.get()))		\
-  MLN_DECL_VAR(_mln_for_end_, end(_mln_for_range_.get()))		\
-  for (; _mln_for_cur_.get() != _mln_for_end_.get(); ++(_mln_for_cur_.get())) \
-    BOOST_PP_REPEAT(BOOST_PP_DIV(ARGC, 2), MLN_DECLARE_2, ARGV)
-
-# define forall_v_2(Arg1, Arg2, ...) for (Arg1 : Arg2.values())
-
-# define forall_v(...)							\
-  BOOST_PP_IIF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2),	\
-	       forall_v_2(__VA_ARGS__),					\
-	       forall_v_(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),		\
-			 BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
-
-
-
-# define forall_pix_2(Arg1, Arg2, ...)		\
-  for (Arg1 : Arg2.pixels())
-
-
-# define forall_pix(...)						\
-  BOOST_PP_IIF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2),	\
-	       forall_pix_2(__VA_ARGS__),				\
-	       forall_pix_(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),		\
-			   BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
-
-
-
-# define mln_pixter(ID, IMAGE)						\
-  mln::internal::pix_range_iterator_proxy<decltype(IMAGE.pixels())> ID(IMAGE.pixels());
-
-# define mln_nixter(ID, PIXRANGE)						\
-  mln::internal::pix_range_iterator_proxy<decltype(PIXRANGE)> ID(PIXRANGE);
-*/
-
-namespace mln
-{
-  namespace internal
-  {
-
-    template <typename ColExpr>
-    struct should_copy_col_;
-
-    // The expression is a lvalue, no need to copy
-    template <typename ColExpr>
-    struct should_copy_col_<ColExpr&>
-    {
-      typedef ColExpr& type;
-
-      static ColExpr&
-      copy(ColExpr& col) { return col; }
-    };
-
-    // The expression is a rvalue, need to copy
-    template <typename ColExpr>
-    struct should_copy_col_
-    {
-      typedef ColExpr type;
-
-      static ColExpr
-        copy(ColExpr& col) { return std::move(col); }
-    };
-
-    template <typename ColExpr>
-    typename should_copy_col_<ColExpr>::type
-    should_copy_col(ColExpr&& x)
-    {
-      return should_copy_col_<ColExpr>::copy(x);
-    }
-
-  }
-}
-
-
-# define __mln_should_copy_col__(COL, ID)          \
-  decltype(mln::internal::should_copy_col(COL)) ID = mln::internal::should_copy_col(COL)
-
-# define __mln_should_copy_col_local__(COL, ID)				\
-  if (mln::internal::false_var_t< decltype(mln::internal::should_copy_col(COL)) > ID = \
-    {mln::internal::should_copy_col(COL)}) {} else
-
-
 
 
 /******************************************/
@@ -280,23 +151,5 @@ namespace mln
                __mln_forall__1(__VA_ARGS__),                            \
                __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),      \
                               BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
-
-/******************************************/
-/****         mln_foreach macro         ****/
-/******************************************/
-
-# define __mln_do_local__(EXPR)			\
-  if ((EXPR), false) {} else
-
-
-# define mln_foreach(p, COL)						\
-  __mln_should_copy_col_local__(COL, _mln_range_)			\
-  MLN_DECL_VAR(_mln_it_, _mln_range_.get().iter())			\
-  MLN_DECL_VAR(_mln_continue_, true)					\
-  for (_mln_it_.get().init();						\
-       _mln_continue_.get() and !_mln_it_.get().finished();		\
-       _mln_continue_.get() ? _mln_it_.get().next() : (void) 0)		\
-    if (_mln_continue_.set(false)) {} else				\
-      for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true)) \
 
 #endif //!MLN_CORE_FORALL_HPP

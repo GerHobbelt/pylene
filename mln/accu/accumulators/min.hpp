@@ -4,7 +4,7 @@
 /// \file
 /// FIXME: use literal::zero instead of default initialization
 
-# include <mln/accu/accumulator.hpp>
+# include <mln/accu/accumulator_base.hpp>
 # include <utility>
 
 namespace mln
@@ -42,7 +42,7 @@ namespace mln
     {
 
       template <typename Compare>
-      struct min : feature_base< min<Compare> >
+      struct min : simple_feature< min<Compare> >
       {
 	template <typename T>
 	struct apply
@@ -52,7 +52,7 @@ namespace mln
       };
 
       template <>
-      struct min<void> : feature_base< min<void> >
+      struct min<void> : simple_feature< min<void> >
       {
 	template <typename T>
 	struct apply
@@ -66,7 +66,7 @@ namespace mln
     {
 
       template <typename T, typename Compare>
-      struct min : Accumulator< min<T, Compare> >
+      struct min : accumulator_base< min<T, Compare>, T, T, features::min<> >
       {
 	typedef T		argument_type;
 	typedef T		return_type;
@@ -92,7 +92,7 @@ namespace mln
 	template <typename Other>
 	void take(const Accumulator<Other>& other)
 	{
-	  T v = extract::min(other);
+	  T v = extractor::min(other);
 	  if (m_cmp(v, m_val))
 	    m_val = v;
 	}

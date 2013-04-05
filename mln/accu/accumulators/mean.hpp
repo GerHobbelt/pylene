@@ -40,7 +40,7 @@ namespace mln
     namespace features
     {
       template <typename SumType>
-      struct mean : feature_base< mean<SumType> >
+      struct mean : simple_feature< mean<SumType> >
       {
 	template <typename T>
 	struct apply
@@ -50,7 +50,7 @@ namespace mln
       };
 
       template <>
-      struct mean<void> : feature_base< mean<void> >
+      struct mean<void> : simple_feature< mean<void> >
       {
 	template <typename T>
 	struct apply
@@ -71,7 +71,7 @@ namespace mln
     {
 
       template <typename T, typename SumType>
-      struct mean : composite_accumulator_facade< mean<T, SumType>, T, features::mean<SumType> >
+      struct mean : composite_accumulator_facade< mean<T, SumType>, T,  SumType, features::mean<SumType> >
       {
 	typedef T	argument_type;
 	typedef SumType return_type;
@@ -79,10 +79,19 @@ namespace mln
 	typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
 
 	friend
+	SumType extract(const mean& accu, features::mean<SumType> )
+	{
+	  //std::string x = extract(exact(accu), features::count<> ());
+	  //std::string y = extractor::count(accu);
+	  return extractor::sum(accu) / extractor::count(accu);
+	}
+
+	friend
 	SumType extract(const mean& accu, features::mean<> )
 	{
 	  return extractor::sum(accu) / extractor::count(accu);
 	}
+
 
       private:
 	SumType m_sum;

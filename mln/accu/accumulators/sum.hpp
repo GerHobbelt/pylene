@@ -4,7 +4,7 @@
 /// \file
 /// FIXME: use literal::zero instead of default initialization
 
-# include <mln/accu/accumulator.hpp>
+# include <mln/accu/accumulator_base.hpp>
 # include <utility>
 
 namespace mln
@@ -42,7 +42,7 @@ namespace mln
     {
 
       template <typename SumType>
-      struct sum : feature_base<SumType>
+      struct sum : simple_feature< sum<SumType> >
       {
 	template <typename T>
 	struct apply
@@ -52,7 +52,7 @@ namespace mln
       };
 
       template <>
-      struct sum<void> : feature_base< sum<void> >
+      struct sum<void> : simple_feature< sum<void> >
       {
 	template <typename T>
 	struct apply
@@ -66,7 +66,7 @@ namespace mln
     {
 
       template <typename T, typename SumType>
-      struct sum : Accumulator< sum<T, SumType> >
+      struct sum : accumulator_base< sum<T, SumType>, T, SumType, features::sum<> >
       {
 	typedef T		argument_type;
 	typedef SumType		return_type;

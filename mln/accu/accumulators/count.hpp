@@ -1,7 +1,7 @@
 #ifndef MLN_ACCU_ACCUMULATOTS_COUNT_HPP
 # define MLN_ACCU_ACCUMULATOTS_COUNT_HPP
 
-# include <mln/accu/accumulator.hpp>
+# include <mln/accu/accumulator_base.hpp>
 # include <mln/accu/dontcare.hpp>
 # include <utility>
 
@@ -27,8 +27,9 @@ namespace mln
 
       template <typename A>
       inline
-      typename A::return_type
+      auto
       count(const Accumulator<A>& acc)
+	-> decltype(extract(exact(acc), features::count<> ()))
       {
 	return extract(exact(acc), features::count<> ());
       }
@@ -40,7 +41,7 @@ namespace mln
     {
 
       template <typename CountType>
-      struct count : feature_base< count<CountType> >
+      struct count : simple_feature< count<CountType> >
       {
 	template <typename T>
 	struct apply
@@ -55,7 +56,7 @@ namespace mln
     {
 
       template <typename CountType>
-      struct count : Accumulator< count<CountType> >
+      struct count : accumulator_base< count<CountType>, dontcare, CountType, features::count<> >
       {
 	typedef dontcare		argument_type;
 	typedef CountType		return_type;

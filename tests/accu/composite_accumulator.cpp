@@ -22,11 +22,11 @@ namespace mln
     namespace features
     {
 
-      struct f1 : feature_base<f1> { template <typename T> struct apply { typedef accumulators::accu1<T> type; }; };
-      struct f2 : feature_base<f2> { template <typename T> struct apply { typedef accumulators::accu2<T> type; }; };
-      struct f3 : feature_base<f3> { template <typename T> struct apply { typedef accumulators::accu3<T> type; }; };
-      struct f4 : feature_base<f4> { template <typename T> struct apply { typedef accumulators::accu4<T> type; }; };
-      struct f5 : feature_base<f5> { template <typename T> struct apply { typedef accumulators::accu5<T> type; }; };
+      struct f1 : simple_feature<f1> { template <typename T> struct apply { typedef accumulators::accu1<T> type; }; };
+      struct f2 : simple_feature<f2> { template <typename T> struct apply { typedef accumulators::accu2<T> type; }; };
+      struct f3 : simple_feature<f3> { template <typename T> struct apply { typedef accumulators::accu3<T> type; }; };
+      struct f4 : simple_feature<f4> { template <typename T> struct apply { typedef accumulators::accu4<T> type; }; };
+      struct f5 : simple_feature<f5> { template <typename T> struct apply { typedef accumulators::accu5<T> type; }; };
 
 
       template<>
@@ -39,7 +39,7 @@ namespace mln
       struct depends<f3> { typedef boost::mpl::set<f4,f5> type; };
 
       template<>
-      struct depends<f5> { typedef boost::mpl::set<f3> type; };
+      struct depends<f5> { typedef boost::mpl::set<f4> type; };
 
     }
 
@@ -48,7 +48,7 @@ namespace mln
 
 #define DEF_ACCU(N)							\
       template <typename T>						\
-      struct accu##N : Accumulator< accu##N<T> >			\
+      struct accu##N : composite_accumulator_facade< accu##N<T>, T, T, features::f##N> \
       {									\
 	typedef T argument_type;					\
 	typedef boost::mpl::set<features::f##N> provides;		\
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(Accu_Features)
   static_assert(boost::mpl::has_key<Features, features::f5>::value, "");
 
 
-  auto x = make_accumulator<int>(features::f3 () );
+  auto x = make_accumulator(features::f3 (), int() );
   extract(x, features::f3 ());
   extract(x, features::f4 ());
   extract(x, features::f5 ());

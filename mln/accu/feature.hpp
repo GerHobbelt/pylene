@@ -27,39 +27,59 @@ namespace mln
     namespace features
     {
 
+      // FeatureSet uses a composite design patern
+      //	  +----------+
+      //          |FeatureSet|
+      //	  +----------+
+      //	       |
+      //         +-----+ -----------------+
+      //	 |			  |
+      //  +------+--------+    +----------+------+
+      //  | simple_feature|    |composite_feature|
+      //  +---------------+    +-----------------+
+      //
+      //
+      //
       template <typename FSet>
-      struct FeatureSet
+      struct composite_feature : FeatureSet< composite_feature<FSet> >
       {
         typedef FSet features;
 
 	template <typename T>
 	struct apply
 	{
-	  typedef composite_accumulator<T, FeatureSet> type;
+	  typedef composite_accumulator<T, composite_feature<FSet> > type;
 	};
       };
 
       template <typename F>
-      struct feature_base : FeatureSet< boost::mpl::set<F> >
+      struct simple_feature : FeatureSet<F>
       {
+	typedef boost::mpl::set<F> features;
       };
 
       namespace ph = boost::mpl::placeholders;
 
-      template <typename FSetA, typename FSetB>
-      FeatureSet< typename boost::mpl::copy<FSetA , boost::mpl::inserter<FSetB, boost::mpl::insert<ph::_1, ph::_2> > >::type >
-      operator& (const FeatureSet<FSetA>&, const FeatureSet<FSetB>& )
+      template <typename fsetA, typename fsetB>
+      composite_feature<typename boost::mpl::copy<typename fsetA::features, boost::mpl::inserter<
+						  typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2> > >::type >
+      operator& (const FeatureSet<fsetA>&, const FeatureSet<fsetB>& )
       {
-	return FeatureSet< typename boost::mpl::copy<FSetA , boost::mpl::inserter<FSetB, boost::mpl::insert<ph::_1, ph::_2> > >::type > ();
+	return composite_feature<typename boost::mpl::copy<typename fsetA::features, boost::mpl::inserter<
+	  typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2> > >::type > ();
       }
 
 
       template <typename F>
-      struct depends;
+      struct depends
+      {
+	//static_assert(false, "dgfd");
+	typedef boost::mpl::set<> type;
+      };
 
 
       template <typename F>
-      struct depends< FeatureSet<F> >
+      struct depends< simple_feature<F> >
       {
         typedef boost::mpl::set<> type;
       };

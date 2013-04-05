@@ -133,7 +133,10 @@ namespace mln
       {
 	typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature> >::type iterator;
 	typedef typename boost::fusion::result_of::end<AccuList>::type end;
-	static constexpr bool value = not std::is_same<iterator, end>::value;
+	static constexpr bool value = not boost::fusion::result_of::equal_to<iterator, end>::value;
+
+
+	//static constexpr iterator x = end ();
       };
 
       template <typename AccuList, typename Feature>
@@ -142,6 +145,7 @@ namespace mln
 	typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature> >::type iterator;
 	typedef typename boost::fusion::result_of::deref<iterator>::type accu;
 
+	
 	typedef decltype(extract (std::declval<accu>(), Feature ()) ) type;
       };
     }
@@ -186,6 +190,7 @@ namespace mln
       extract(const composite_accumulator_base& accu, Feature feat)
       {
 	auto res = boost::fusion::find_if< internal::accu_has_feature<Feature> >(accu.m_accus);
+
 	return extract(*res, feat);
       }
 
@@ -199,10 +204,18 @@ namespace mln
     {
     };
 
-    template <typename E, typename T, typename Feature>
+    template <typename E, typename ArgumentType, typename ResultType, typename Feature>
     struct composite_accumulator_facade :
-      composite_accumulator_base<E, T, features::FeatureSet<typename features::depends<Feature>::type> >
+      composite_accumulator_base<E, ArgumentType, features::composite_feature<typename features::depends<Feature>::type> >
     {
+      typedef ArgumentType	   argument_type;
+      typedef ResultType	   result_type;
+      typedef Feature		   feature;
+
+      ResultType to_result() const
+      {
+	return extract(exact(*this), Feature() );
+      }
     };
 
   }

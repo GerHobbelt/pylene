@@ -41,7 +41,7 @@ namespace mln
     {
 
       template <typename Compare>
-      struct max : feature_base< max<Compare> >
+      struct max : simple_feature< max<Compare> >
       {
 	template <typename T>
 	struct apply
@@ -51,7 +51,7 @@ namespace mln
       };
 
       template <>
-      struct max<void> : feature_base< max<void> >
+      struct max<void> : simple_feature< max<void> >
       {
 	template <typename T>
 	struct apply
@@ -65,7 +65,7 @@ namespace mln
     {
 
       template <typename T, typename Compare>
-      struct max : Accumulator< max<T, Compare> >
+      struct max : accumulator_base< max<T, Compare>, T, T, feature::max<> >
       {
 	typedef T		argument_type;
 	typedef T		return_type;

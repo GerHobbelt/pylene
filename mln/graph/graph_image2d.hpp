@@ -45,6 +45,10 @@ namespace mln
 
 
 
+	static constexpr std::size_t m_alignment = std::alignment_of<Vtype>::value > std::alignment_of<Etype>::value ? std::alignment_of<Vtype>::value : std::alignment_of<Etype>::value;
+	typedef typename std::aligned_storage<sizeof(Vtype), m_alignment>::type AVtype;
+	typedef typename std::aligned_storage<sizeof(Etype), m_alignment>::type AEtype;
+
 	size_t m_shape[dim];
 	size_t m_estrides[dim];
 	size_t m_vstrides[dim];
@@ -63,7 +67,7 @@ namespace mln
       mln::array<P, N> arr_x2(const mln::array<P, N>& arr)
       {
 	mln::array<P, N> out;
-	for (int i = 0; i < N; ++i)
+	for (unsigned i = 0; i < N; ++i)
 	  out[i] = arr[i] * 2;
 	return out;
       }
@@ -123,16 +127,21 @@ namespace mln
       Etype& edge_at(const point2d& e);
 
 
-    private:
+    protected:
       static bool _is_edge(const point2d&);
       static bool _is_vertex(const point2d&);
+
+
 
 
     private:
       mln::array<point2d, N> m_enbh;
       mln::array<point2d, N> m_vnbh;
 
+    protected:
       box2d		m_domain;
+
+    private:
       std::shared_ptr< internal::undirected_graph_ndimage_data<Vtype, Etype, 2> > m_data;
 
 
@@ -175,8 +184,11 @@ namespace mln
     template <typename Vtype, typename Etype, unsigned dim>
     undirected_graph_ndimage_data<Vtype, Etype, dim>::undirected_graph_ndimage_data(size_t* shape_, unsigned border, Vtype v, Etype e)
     {
-      m_vstrides[dim-1] = sizeof(Vtype);
-      m_estrides[dim-1] = sizeof(Etype);
+      m_vstrides[dim-1] = sizeof(AVtype);
+      m_estrides[dim-1] = sizeof(AEtype);
+      //std::cout << "Vtype: " << sizeof(Vtype) << "-->" << sizeof(AVtype) << std::endl;
+      //std::cout << "Etype: " << sizeof(Etype) << "-->" << sizeof(AEtype) << std::endl;
+
       m_shape[dim-1] = shape_[dim-1] + 2*border;
 
       for (int i = dim-2; i >= 0; --i) {
@@ -210,8 +222,14 @@ namespace mln
       ptr += m_vstrides[d];
       for (unsigned k = 1; k < m_shape[d]; ++k)
 	{
-	  std::uninitialized_fill((Etype*)ptr, (Etype*) (ptr+m_estrides[d]), e); // < edges
+	  {
+	    AEtype* tmp = (AEtype*) ptr;
+	    AEtype* end = (AEtype*) (ptr+m_estrides[d]);
+	    for (;tmp != end; ++tmp)
+	      m_ealloca.construct(reinterpret_cast<Etype*>(tmp), e);
+	  }
 	  ptr += m_estrides[d];
+	  //std::cout << k << "b" << std::endl;
 	  m_construct_rec<d+1>(ptr, v, e); // < vertex
 	  ptr += m_vstrides[d];
 	}
@@ -223,14 +241,14 @@ namespace mln
     typename std::enable_if<d == dim-1>::type
     undirected_graph_ndimage_data<Vtype, Etype, dim>::m_construct_rec(char* ptr, const Vtype& v, const Etype& e)
     {
-      m_valloca.construct((Vtype*)ptr, v);
-      ptr += sizeof(Vtype);
+      m_valloca.construct(reinterpret_cast<Vtype*>(ptr), v);
+      ptr += sizeof(AVtype);
       for (unsigned k = 1; k < m_shape[d]; ++k)
 	{
-	  m_ealloca.construct((Etype*)ptr, e);
-	  ptr += sizeof(Etype);
-	  m_valloca.construct((Vtype*)ptr, v);
-	  ptr += sizeof(Vtype);
+	  m_ealloca.construct(reinterpret_cast<Etype*>(ptr), e);
+	  ptr += sizeof(AEtype);
+	  m_valloca.construct(reinterpret_cast<Vtype*>(ptr), v);
+	  ptr += sizeof(AVtype);
 	}
     }
 
@@ -244,8 +262,8 @@ namespace mln
       ptr += m_vstrides[d];
       for (unsigned k = 1; k < m_shape[d]; ++k)
 	{
-	  for (unsigned i = 0; i < m_estrides[d]; i += sizeof(Etype))
-	    m_ealloca.destroy((Etype*) (ptr + i));
+	  for (unsigned i = 0; i < m_estrides[d]; i += sizeof(AEtype))
+	    m_ealloca.destroy(reinterpret_cast<Etype*>(ptr + i));
 
 	  ptr += m_estrides[d];
 	  m_destruct_rec<d+1>(ptr); // < vertex
@@ -259,14 +277,14 @@ namespace mln
     typename std::enable_if<d == dim-1>::type
       undirected_graph_ndimage_data<Vtype, Etype, dim>::m_destruct_rec(char* ptr)
     {
-      m_valloca.destroy((Vtype*)ptr);
-      ptr += sizeof(Vtype);
+      m_valloca.destroy(reinterpret_cast<Vtype*>(ptr));
+      ptr += sizeof(AVtype);
       for (unsigned k = 1; k < m_shape[d]; ++k)
 	{
-	  m_ealloca.destroy((Etype*)ptr);
-	  ptr += sizeof(Etype);
-	  m_valloca.destroy((Vtype*)ptr);
-	  ptr += sizeof(Vtype);
+	  m_ealloca.destroy(reinterpret_cast<Etype*>(ptr));
+	  ptr += sizeof(AEtype);
+	  m_valloca.destroy(reinterpret_cast<Vtype*>(ptr));
+	  ptr += sizeof(AVtype);
 	}
     }
 
@@ -355,13 +373,15 @@ namespace mln
     mln_precondition(m_domain.has(e));
     mln_precondition(_is_edge(e));
     int x = e[0], y = e[1];
+    typedef point2d::value_type T;
+
     if (x % 2 == 1)
       if (y % 2 == 1) // diagonal edge
-	return point2d{x-1,y-1};
+	return point2d{(T) (x-1),(T) (y-1)};
       else
-	return point2d{x-1,y};
+	return point2d{(T) (x-1),(T) y};
     else
-      return point2d{x,y-1};
+      return point2d{(T) x,(T) (y-1)};
   }
 
   template <typename Vtype, typename Etype, typename Nbh>
@@ -372,13 +392,16 @@ namespace mln
     mln_precondition(m_domain.has(e));
     mln_precondition(_is_edge(e));
     int x = e[0], y = e[1];
+
+    typedef point2d::value_type T;
+
     if (x % 2 == 1)
       if (y % 2 == 1) // diagonal edge
-	return point2d{x+1,y+1};
+	return point2d{(T) (x+1),(T) (y+1)};
       else
-	return point2d{x+1,y};
+	return point2d{(T) (x+1), (T) y};
     else
-      return point2d{x,y+1};
+      return point2d{(T) x,(T) (y+1)};
   }
 
   template <typename Vtype, typename Etype, typename Nbh>

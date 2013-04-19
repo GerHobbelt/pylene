@@ -35,7 +35,7 @@ link_libraries(${TBB_LIBRARIES} rt)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++0x")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W -Wextra -Wall -g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -W -Wextra -Wall -O3 -DNDEBUG -march=native")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -W -Wextra -Wall -O3 -DNDEBUG -g -march=native")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -W -Wextra -Wall -O3 -DNDEBUG -g -ggdb")
 
 
 # default buidling type
@@ -46,7 +46,7 @@ endif()
 
 
 ENABLE_TESTING()
-SUBDIRS(tests)
+SUBDIRS(tests bench)
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")

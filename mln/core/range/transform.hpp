@@ -7,15 +7,19 @@ namespace mln
 {
 
   template <typename InputRange, typename UnaryFunction>
-    struct transformed_range
-    {
-      typedef transform_iterator<typename InputRange::iterator, UnaryFunction>		iterator;
-      typedef transform_iterator<typename InputRange::const_iterator, UnaryFunction>	const_iterator;
-      typedef typename iterator::value_type				value_type;
-      typedef typename iterator::reference				reference;
+  struct transformed_range
+  {
+  private:
+    typedef typename std::remove_reference<InputRange>::type R
 
-      filtered_range(InputRange& rng, const UnaryFunction& fun)
-	: m_rng (rng), m_fun(fun)
+  public:
+      typedef transform_iterator<typename R::iterator, UnaryFunction>		iterator;
+      typedef transform_iterator<typename R::const_iterator, UnaryFunction>	const_iterator;
+      typedef typename iterator::value_type						value_type;
+      typedef typename iterator::reference						reference;
+
+      transformed_range(InputRange&& rng, const UnaryFunction& fun)
+	: m_rng (std::forward<InputRange>(rng), m_fun(fun)
       {
       }
 
@@ -29,18 +33,13 @@ namespace mln
 	return iterator( m_rng.iter(), m_fun );
       }
 
-      bool has(const value_type& v)
-      {
-	return m_pred(v) and m_rng.has(v);
-      }
-
       std::size_t size() const
       {
 	return m_rng.size();
       }
 
     private:
-      InputRange&	m_rng;
+      InputRange	m_rng;
       UnaryFunction     m_fun;
     };
 
@@ -49,15 +48,15 @@ namespace mln
   namespace rng
   {
 
-    template <typename InputRange, typename Predicate>
-    filtered_range<InputRange, Predicate>
-    filter(InputRange& rng, Predicate pred)
+    template <typename InputRange, typename UnaryFunction>
+    transformed_range<InputRange, UnaryFunction>
+    transform(InputRange&& rng, const UnaryFunction& fun)
     {
-      return filtered_range<InputRange, Predicate>(rng, pred);
+      return transformed_range<InputRange, UnaryFunction>(rng, fun);
     }
 
   } // end of namespace mln::rng
 
 } // end of namespace mln
 
-#endif // ! MLN_CORE_RANGE_FILTER_HPP
+#endif // ! MLN_CORE_RANGE_TRANSFORM_HPP

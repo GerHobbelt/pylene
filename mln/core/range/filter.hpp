@@ -9,8 +9,12 @@ namespace mln
     template <typename InputRange, typename Predicate>
     struct filtered_range
     {
-      typedef filter_iterator<typename InputRange::iterator, Predicate>		iterator;
-      typedef filter_iterator<typename InputRange::const_iterator, Predicate>	const_iterator;
+    private:
+      typedef typename std::remove_reference<InputRange>::type R;
+
+    public:
+      typedef filter_iterator<typename R::iterator, Predicate>		iterator;
+      typedef filter_iterator<typename R::const_iterator, Predicate>	const_iterator;
       typedef typename iterator::value_type				value_type;
       typedef typename iterator::reference				reference;
 

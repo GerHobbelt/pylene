@@ -125,9 +125,12 @@ namespace mln
       template <class Image> struct apply<Image&> { typedef typename Image::reference type; };
       template <class Image> struct apply<const Image&> { typedef typename Image::const_reference type; };
 
+
+      // FIXME: because tuple_transform take the tuple by const reference
+      // instead od reference to const_cast
       template <typename Image>
-      typename Image::const_reference
-      operator() (const Image& ima) const { return ima(p_); }
+      typename Image::reference
+      operator() (const Image& ima) const { return const_cast<Image&>(ima)(p_); }
 
       template <typename Image>
       typename Image::reference

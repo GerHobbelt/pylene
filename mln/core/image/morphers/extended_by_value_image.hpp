@@ -2,6 +2,7 @@
 # define EXTENDED_BY_VALUE_IMAGE_HPP
 
 # include <mln/core/image/image.hpp>
+# include <mln/core/image/morphers/morpher_base.hpp>
 
 namespace mln
 {
@@ -10,6 +11,24 @@ namespace mln
   /// \brief An image with an extension defined by a value
   template <typename I>
   struct extended_by_value_image;
+
+  /// \{
+
+  /// \brief Add an extension by value to an image
+  template <typename I>
+  extended_by_value_image<const I&>
+  extend_by_value(const Image<I>& ima, const mln_value(I)& v);
+
+  template <typename I>
+  extended_by_value_image<I&>
+  extend_by_value(Image<I>& ima, const mln_value(I)& v);
+
+  template <typename I>
+  extended_by_value_image<I&>
+  extend_by_value(Image<I>&& ima, const mln_value(I)& v);
+  /// \}
+
+
 
   template <typename V>
   struct by_value_extension;
@@ -26,10 +45,18 @@ namespace mln
     typedef typename std::remove_reference<I>::type image_t;
 
   public:
+    // Actually if I is concrete we could set this image concrete as well
+    // but since adding this extension prevents indexation we better use
+    // the concrete image of I rather than this morpher, as long as concretization
+    // does not impose any property about this extension.
+
+    typedef std::false_type				concrete;
     typedef typename image_traits<image_t>::category	category;
     typedef typename image_traits<image_t>::accessible	accessible;
-    typedef typename image_traits<image_t>::indexable   indexable;
-    typedef std::false_type				concrete;
+
+    // we can check if an index belongs to a domain using ima.domain().has(ima.point_at_index(i))
+    // but this is not efficient. We better use points directly.
+    typedef std::false_type				indexable;
     typedef std::true_type				has_extension;
   };
 
@@ -40,7 +67,7 @@ namespace mln
 
 
   template <typename I>
-  struct extended_by_value_image : image_base< extended_by_value_image<I>,
+  struct extended_by_value_image : morpher_base< extended_by_value_image<I>, I,
 					       typename image_point<typename std::remove_reference<I>::type>::type,
 					       typename image_value<typename std::remove_reference<I>::type>::type >
   {
@@ -51,15 +78,15 @@ namespace mln
     typedef image_t::point_type			point_type;
     typedef image_t::domain_type		domain_type;
     typedef image_t::value_type			value_type;
-    typedef image_t::reference			reference;
-    typedef image_t::const_reference		const_reference;
-    typedef image_t::pixel_type			pixel_type;
-    typedef image_t::const_pixel_type		const_pixel_type;
+    typedef typename image_reference<image_t>::type		reference;
+    typedef typename image_const_reference<image_t>::type	const_reference;
+    typedef typename image_pixel<image_t>::type			pixel_type;
+    typedef typename image_const_pixel<image_t>::type		const_pixel_type;
 
-    typedef image_t::value_range		value_range;
-    typedef image_t::const_value_range		const_value_range;
-    typedef image_t::pixel_range		pixel_range;
-    typedef image_t::const_pixel_range		const_pixel_range;
+    typedef typename image_value_range<image_t>::type		value_range;
+    typedef typename image_const_value_range<image_t>::type	const_value_range;
+    typedef typename image_pixel_range<image_t>::type		pixel_range;
+    typedef typename image_const_pixel_range<image_t>::type	const_pixel_range;
 
     typedef by_value_extension<value_type>	extension_type;
 
@@ -71,7 +98,7 @@ namespace mln
 
     template <typename = void>
     typename std::enable_if<image_traits<image_t>::accessible::value, reference>::type
-    operator() (const point_type& p)
+    at (const point_type& p)
     {
       if (m_ima.domain().has(p))
 	return m_ima(p);
@@ -81,7 +108,7 @@ namespace mln
 
     template <typename = void>
     typename std::enable_if<image_traits<image_t>::accessible::value, const_reference>::type
-    operator() (const point_type& p) const
+    at (const point_type& p) const
     {
       if (m_ima.domain().has(p))
 	return m_ima(p);
@@ -115,7 +142,30 @@ namespace mln
 
   private:
     V& m_val;
+  };
+
+
+  template <typename I>
+  extended_by_value_image<const I&>
+  extend_by_value(const Image<I>& ima, const mln_value(I)& v)
+  {
+    return extended_by_value_image<const I&>(exact(ima), v);
   }
+
+  template <typename I>
+  extended_by_value_image<I&>
+  extend_by_value(Image<I>& ima, const mln_value(I)& v)
+  {
+    return extended_by_value_image<const I&>(exact(ima), v);
+  }
+
+  template <typename I>
+  extended_by_value_image<I>
+  extend_by_value(Image<I>&& ima, const mln_value(I)& v)
+  {
+    return extended_by_value_image<I>(move_exact(ima), v);
+  }
+
 
 }
 

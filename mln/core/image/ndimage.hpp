@@ -87,7 +87,7 @@ namespace mln
     typedef const T&		const_reference;
     typedef T*			pointer;
     typedef const T*		const_pointer;
-    typedef ptrdiff_t		difference_type;
+    typedef int			difference_type;
     typedef unsigned		index_type;
     typedef unsigned		size_type;
 
@@ -176,8 +176,8 @@ namespace mln
 
 
     // As an Indexable Image
-    T&		operator[] (std::size_t i);
-    const T&	operator[] (std::size_t i) const;
+    T&		operator[] (size_type i);
+    const T&	operator[] (size_type i) const;
     const size_t*	index_strides() const     { return &m_index_strides[0]; }
 
     void reindex(std::size_t index_first)
@@ -189,7 +189,7 @@ namespace mln
     }
 
 
-    std::size_t         index_of_point(const point_type& p) const
+    size_type         index_of_point(const point_type& p) const
     {
       std::size_t idx = m_index_first;
       point_type  q = p - domain_.pmin;
@@ -198,7 +198,7 @@ namespace mln
       return idx;
     }
 
-    point_type		point_at_index(std::size_t idx) const
+    point_type		point_at_index(size_type idx) const
     {
       int k = idx;
       point_type p = point_type ();
@@ -211,6 +211,14 @@ namespace mln
       p -= (domain_.pmin + border_);
       mln_postcondition(vbox_.has(p));
       return p;
+    }
+
+    difference_type delta_index(const point_type& p) const
+    {
+      difference_type idx = 0;
+      for (unsigned i = 0; i < dim; ++i)
+	idx += p[i] * m_index_strides[i];
+      return idx;
     }
 
 
@@ -456,7 +464,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   T&
-  ndimage_base<T,dim,E>::operator[] (std::size_t i)
+  ndimage_base<T,dim,E>::operator[] (size_type i)
   {
     mln_precondition(vbox_.has(point_at_index(i)));
     return *(m_ptr_origin + i);
@@ -465,7 +473,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline
   const T&
-  ndimage_base<T,dim,E>::operator[] (std::size_t i) const
+  ndimage_base<T,dim,E>::operator[] (size_type i) const
   {
     mln_precondition(vbox_.has(point_at_index(i)));
     return *(m_ptr_origin + i);

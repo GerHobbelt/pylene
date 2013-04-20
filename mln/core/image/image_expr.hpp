@@ -215,14 +215,14 @@ namespace mln
 
     template <typename dummy = void>
     typename std::enable_if< image_accessibility<self_t>::type::value, const_reference >::type
-    operator() (point_type p) const
+    operator() (const point_type& p) const
     {
       return f(ima(p));
     }
 
     template <typename dummy = void>
     typename std::enable_if< image_accessibility<self_t>::type::value, reference >::type
-    operator() (point_type p)
+    operator() (const point_type& p)
     {
       return f(ima(p));
     }

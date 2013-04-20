@@ -15,6 +15,8 @@ namespace mln {
 
   template <typename I> struct Image;
   template <typename I> struct IterableImage;
+  template <typename I> struct IndexableImage;
+  template <typename I> struct AccessibleImage;
 
   template <typename I>
   struct Image : Object_<I>
@@ -54,7 +56,16 @@ namespace mln {
 
       MLN_CONCEPT_BEGIN_CHECK_IF()
 	BOOST_CONCEPT_ASSERT((IterableImage<I>));
-      MLN_CONCEPT_END_CHECK_IF((std::is_convertible<category, forward_image_tag>::value))
+      MLN_CONCEPT_END_CHECK_IF((std::is_convertible<category, forward_image_tag>::value));
+
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+	BOOST_CONCEPT_ASSERT((IndexableImage<I>));
+      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::indexable::value));
+
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+	BOOST_CONCEPT_ASSERT((AccessibleImage<I>));
+      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::accessible::value));
+
 
       check(std::is_convertible<pixel, const_pixel> ());
 
@@ -77,9 +88,39 @@ namespace mln {
 
       reference (I::*ptr) (const point_type&) = &I::operator();
       const_reference (I::*ptr2) (const point_type&) const = &I::operator();
+      reference (I::*ptr) (const point_type&) = &I::at();
+      const_reference (I::*ptr2) (const point_type&) const = &I::at();
       (void) ptr; (void) ptr2;
     }
   };
+
+
+  template <typename I>
+  struct IndexableImage
+  {
+  public:
+    typedef typename image_traits<I>::indexable indexable;
+
+    static_assert(indexable::value, "Image must be indexable");
+
+    BOOST_CONCEPT_USAGE(IndexableImage)
+    {
+      typedef typename I::size_type	    size_type;
+      typedef typename I::difference_type   difference_type;
+      typedef typename I::reference         reference;
+      typedef typename I::const_reference   const_reference;
+      typedef typename I::point_type        point_type;
+
+      reference (I::*ptr) (size_type) = &I::operator[];
+      const_reference (I::*ptr2) (size_type) const = &I::operator[];
+      size_type (I::*ptr3) (const point_type&) const = &I::index_of_point;
+      point_type (I::*ptr4) (size_type) const = &I::point_at_index;
+      difference_type (I::*ptr5) (const point_type&) const = &I::delta_index;
+
+      (void) ptr; (void) ptr2; (void) ptr3; (void) ptr4; (void) ptr5;
+    }
+  };
+
 
   template <typename I>
   struct IterableImage : Image<I>

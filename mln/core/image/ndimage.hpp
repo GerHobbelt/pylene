@@ -26,6 +26,7 @@ namespace mln
   template <typename T, unsigned dim, typename I> struct ndimage_pixel;
   template <typename T, unsigned dim, typename E> struct ndimage_base;
 
+
 /******************************************/
 /****              Traits              ****/
 /******************************************/
@@ -40,6 +41,7 @@ namespace mln
     typedef std::true_type		concrete;
     typedef std::true_type		shallow_copy;
     typedef std::true_type		has_border;
+    typedef mln::extension::border_extension_tag        extension;
   };
 
 /******************************************/
@@ -62,7 +64,51 @@ namespace mln
     private:
       ndimage_data(const ndimage_data&);
     };
-  }
+
+    template <typename T, unsigned dim>
+    struct ndimage_extension
+    {
+    private:
+      typedef point<short, dim> P;
+
+    public:
+      typedef T value_type;
+      typedef std::true_type    support_fill;
+      typedef std::false_type   support_mirror;
+      typedef std::false_type   support_periodize;
+
+
+      ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border);
+      void fill(const T& v);
+
+    private:
+      template <unsigned d>
+      typename std::enable_if<(d < dim)>::type
+      _fill(char* ptr, const T& v);
+
+      template <unsigned d>
+      typename std::enable_if<(d == dim)>::type
+      _fill(char* ptr, const T& v);
+
+      template <unsigned d>
+      typename std::enable_if<(d < dim)>::type
+      _fillall(char* ptr, const T& v);
+
+      template <unsigned d>
+      typename std::enable_if<(d == dim)>::type
+      _fillall(char* ptr, const T& v);
+
+
+
+    private:
+      size_t              m_strides[dim];
+      P                   m_shp;
+      char*               m_ptr;
+      int                 m_border;
+    };
+
+
+  } // end of namespace mln::internal
 
 
   template <typename T, unsigned dim, typename E>
@@ -220,6 +266,10 @@ namespace mln
 	idx += p[i] * m_index_strides[i];
       return idx;
     }
+
+    // Extension
+    typedef internal::ndimage_extension<T, dim> extension_type;
+    extension_type extension() const;
 
 
   protected:
@@ -557,6 +607,84 @@ namespace mln
     return pixel_range(*this);
   }
 
+  template <typename T, unsigned dim, typename E>
+  inline
+  typename ndimage_base<T,dim,E>::extension_type
+  ndimage_base<T,dim,E>::extension () const
+  {
+    return extension_type(ptr_, &strides_[0], domain_.shape(), border_);
+  }
+
+
+  /******************************************/
+  /****     Extension implementation     ****/
+  /******************************************/
+
+
+  namespace internal
+  {
+
+    template <typename T, unsigned dim>
+    ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border)
+      : m_shp (shp), m_border (border)
+    {
+      m_ptr = ptr;
+      for (unsigned i = 0; i < dim; ++i) {
+        m_strides[i] = strides[i];
+        m_ptr -= m_strides[i] * border;
+      }
+    }
+
+    template <typename T, unsigned dim>
+    void
+    ndimage_extension<T, dim>::fill(const T& v)
+    {
+      _fill<0>(m_ptr, v);
+    }
+
+
+    template <typename T, unsigned dim>
+    template <unsigned d>
+    typename std::enable_if<(d < dim)>::type
+    ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
+    {
+      for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
+        _fillall<d+1>(ptr, v);
+
+      for (int i = 0; i < m_shp[d]; ++i, ptr += m_strides[d])
+        _fill<d+1>(ptr, v);
+
+      for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
+        _fillall<d+1>(ptr, v);
+    }
+
+    template <typename T, unsigned dim>
+    template <unsigned d>
+    typename std::enable_if<(d == dim)>::type
+    ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
+    {
+      (void) ptr;
+      (void) v;
+    }
+
+    template <typename T, unsigned dim>
+    template <unsigned d>
+    typename std::enable_if<(d < dim)>::type
+    ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+    {
+      for (int i = 0; i < m_shp[d] + m_border; ++i, ptr += m_strides[d])
+        _fillall<d+1>(ptr, v);
+    }
+
+    template <typename T, unsigned dim>
+    template <unsigned d>
+    typename std::enable_if<(d == dim)>::type
+    ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+    {
+      *(reinterpret_cast<T*>(ptr)) = v;
+    }
+
+  }
 
 } // end of namespace mln
 

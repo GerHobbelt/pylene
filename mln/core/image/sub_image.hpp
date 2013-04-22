@@ -214,6 +214,7 @@ namespace mln
     typedef forward_image_tag   category; // FIXME: category depends on domain category
     typedef typename image_traits<Image>::concrete  concrete;
     typedef std::false_type	indexable; // FIXME: depends
+    typedef mln::extension::none_extension_tag extension;
   };
 
 
@@ -305,6 +306,18 @@ namespace mln
     operator() (const point_type& p) const
     {
       return m_ima(p);
+    }
+
+    reference
+    at (const point_type& p)
+    {
+      return m_ima.at(p);
+    }
+
+    const_reference
+    at (const point_type& p) const
+    {
+      return m_ima.at(p);
     }
 
 

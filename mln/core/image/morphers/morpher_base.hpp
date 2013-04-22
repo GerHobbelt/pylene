@@ -4,16 +4,16 @@
 # include <mln/core/image/image.hpp>
 
 
-struct mln
+namespace mln
 {
 
   /// \brief Base class for morpher that acts like a mixin w.r.t to I
   ///
   /// 
-  template <typename Derived, typename I>
+  template <typename Derived, typename I, typename P, typename V>
   struct morpher_base;
 
-
+  // FWD declaration
   struct morpher_core_access;
 
 
@@ -23,18 +23,21 @@ struct mln
 
   struct morpher_core_access
   {
+    template <typename Morpher>
     static
-    template <typename Derived, typename I, template <typename, typename> class M>
-    I& get_ima(M<Derived, I>* morpher)
+    typename Morpher::image_t&
+    get_ima(Morpher* morpher)
     {
-      return reinterpret_cast<Derived*>(morpher)->m_ima;
+      return reinterpret_cast<typename Morpher::derived_t*>(morpher)->m_ima;
     }
 
+
+    template <typename Morpher>
     static
-    template <typename Derived, typename I, template <typename, typename> class M>
-    const I& get_ima(const M<Derived, I>* morpher)
+    const typename Morpher::image_t&
+    get_ima(const Morpher* morpher)
     {
-      return reinterpret_cast<const Derived*>(morpher)->m_ima;
+      return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
     }
   };
 
@@ -45,11 +48,17 @@ struct mln
     template <typename Derived, typename I, bool _is_accessible = image_traits<Derived>::accessible::value>
     struct morpher_accessible
     {
+      friend struct mln::morpher_core_access;
     };
 
     template <typename Derived, typename I>
     struct morpher_accessible<Derived, I, true>
     {
+    private:
+      typedef I         image_t;
+      typedef Derived   derived_t;
+
+    public:
       typedef mln_point(I) point_type;
       typedef mln_point(I) site_type;
       typedef typename image_reference<I>::type		reference;
@@ -60,7 +69,7 @@ struct mln
 	return morpher_core_access::get_ima(this) (p);
       }
 
-      const_reference operator() (const point_type& p)
+      const_reference operator() (const point_type& p) const
       {
 	return morpher_core_access::get_ima(this) (p);
       }
@@ -70,11 +79,12 @@ struct mln
 	return morpher_core_access::get_ima(this).at(p);
       }
 
-      const_reference at(const point_type& p)
+      const_reference at(const point_type& p) const
       {
 	return morpher_core_access::get_ima(this).at(p);
       }
 
+      friend struct mln::morpher_core_access;
     };
 
     /// \brief Default implementation for morphing an accessible image
@@ -86,6 +96,12 @@ struct mln
     template <typename Derived, typename I>
     struct morpher_indexable<Derived, I, true>
     {
+    private:
+      friend  struct morpher_core_access;
+      typedef I          image_t;
+      typedef Derived    derived_t;
+
+    public:
       typedef typename I::point_type			point_type;
       typedef typename I::size_type			size_type;
       typedef typename I::difference_type		difference_type;
@@ -97,7 +113,7 @@ struct mln
 	return morpher_core_access::get_ima(this) [i];
       }
 
-      const_reference operator[] (size_type p) const
+      const_reference operator[] (size_type i) const
       {
 	return morpher_core_access::get_ima(this) [i];
       }
@@ -123,11 +139,13 @@ struct mln
 
   template <typename Derived, typename I, typename P, typename V>
   struct morpher_base : image_base<Derived, P, V>,
-    morpher_accessible<Derived, typename std::remove_reference<I>::type >,
-    morpher_indexable<Derived, typename std::remove_reference<I>::type >
+    impl::morpher_accessible<Derived, typename std::remove_reference<I>::type >,
+    impl::morpher_indexable<Derived, typename std::remove_reference<I>::type >
   {
   private:
+    friend  struct morpher_core_access;
     typedef typename std::remove_reference<I>::type image_t;
+    typedef Derived                                 derived_t;
 
   public:
     typedef typename image_t::value_type	value_type;
@@ -137,34 +155,34 @@ struct mln
     typedef typename image_t::domain_type		domain_type;
     typedef typename image_value_range<image_t>::type		value_range;
     typedef typename image_const_value_range<image_t>::type	const_value_range;
-    typedef typename image_pixel_range<image_t>::type		value_range;
-    typedef typename image_const_pixel_range<image_t>::type	const_value_range;
+    typedef typename image_pixel_range<image_t>::type		pixel_range;
+    typedef typename image_const_pixel_range<image_t>::type	const_pixel_range;
 
 
-    const domain_type& domain()
+    const domain_type& domain() const
     {
-      return morpher_core_access::getima(this).domain();
+      return morpher_core_access::get_ima(this).domain();
     }
 
     value_range values()
     {
-      return morpher_core_access::getima(this).values();
+      return morpher_core_access::get_ima(this).values();
     }
 
     const_value_range values() const
     {
-      return morpher_core_access::getima(this).values();
+      return morpher_core_access::get_ima(this).values();
     }
 
 
     pixel_range pixels()
     {
-      return morpher_core_access::getima(this).pixels();
+      return morpher_core_access::get_ima(this).pixels();
     }
 
     const_pixel_range pixels() const
     {
-      return morpher_core_access::getima(this).pixels();
+      return morpher_core_access::get_ima(this).pixels();
     }
 
   };

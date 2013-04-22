@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(box2d_general)
 {
   using namespace mln;
   {
-    box2d a ({0,0}, {-2,18});
+    box2d a ({0,0}, {0,0});
     BOOST_CHECK(a.empty());
   }
 

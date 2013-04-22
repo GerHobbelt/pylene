@@ -1,12 +1,13 @@
 #ifndef MLN_CORE_IMAGE_TRAITS_HPP
 # define MLN_CORE_IMAGE_TRAITS_HPP
 
+# include <mln/core/extension/extension_traits.hpp>
 # include <mln/core/image_category.hpp>
 # include <type_traits>
 
-# define mln_value(I) typename I::value_type
-# define mln_point(I) typename I::point_type
-# define mln_site(I)  typename I::point_type
+# define mln_value(I) typename std::remove_reference<I>::type::value_type
+# define mln_point(I) typename std::remove_reference<I>::type::point_type
+# define mln_site(I)  typename std::remove_reference<I>::type::point_type
 
 namespace mln
 {
@@ -44,20 +45,38 @@ namespace mln
   /// \group Meta-functions
   /// \{
   template <typename Image>
-  struct image_accessibility { typedef typename image_traits<Image>::accessible type; };
-
-  struct image_meta_accessibility {
-    template <typename Image>
-    struct apply { typedef typename image_traits<Image>::accessible type; };
+  struct image_accessibility
+  {
+    typedef typename image_traits<Image>::accessible type;
   };
 
   template <typename Image>
-  struct image_category { typedef typename image_traits<Image>::category type; };
-
-  struct image_meta_category {
-    template <typename Image>
-    struct apply { typedef typename image_traits<Image>::category type; };
+  struct image_category
+  {
+    typedef typename image_traits<Image>::category type;
   };
+
+  template <typename Image>
+  struct image_extension
+  {
+    typedef typename image_traits<Image>::extension type;
+  };
+
+  template <typename Image>
+  struct image_extension_type
+  {
+    typedef typename Image::extension_type type;
+  };
+
+  template <typename Image>
+  struct image_has_extension :
+    std::integral_constant<bool,
+                           not std::is_same<typename image_traits<Image>::extension,
+                                            mln::extension::none_extension_tag>::value
+                           >
+  {
+  };
+
 
   template <typename Image>
   struct image_value
@@ -167,6 +186,10 @@ namespace mln
       struct apply { typedef typename op< typename std::remove_reference<Image>::type >::type type; }; \
   };
 
+
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_accessibility, image_accessibility)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_category, image_category)
+MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_extension, image_extension)
 MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_value, image_value)
 MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_reference, image_reference)
 MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_reference, image_const_reference)

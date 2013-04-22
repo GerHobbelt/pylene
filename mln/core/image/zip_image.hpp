@@ -88,6 +88,7 @@ namespace mln
     typedef std::false_type concrete;
     typedef std::false_type indexable; // Should be true_type
     typedef std::false_type has_border;
+    typedef mln::extension::none_extension_tag extension;
   };
 
 
@@ -135,6 +136,30 @@ namespace mln
       template <typename Image>
       typename Image::reference
       operator() (Image& ima) const { return ima(p_); }
+
+    private:
+      const Point& p_;
+    };
+
+    template <typename Point>
+    struct get_image_at
+    {
+      get_image_at(const Point& p) : p_ (p) {}
+
+      template <class Image> struct apply { typedef typename Image::reference type; };
+      template <class Image> struct apply<Image&> { typedef typename Image::reference type; };
+      template <class Image> struct apply<const Image&> { typedef typename Image::const_reference type; };
+
+
+      // FIXME: because tuple_transform take the tuple by const reference
+      // instead od reference to const_cast
+      template <typename Image>
+      typename Image::reference
+      operator() (const Image& ima) const { return const_cast<Image&>(ima).at(p_); }
+
+      template <typename Image>
+      typename Image::reference
+      operator() (Image& ima) const { return ima.at(p_); }
 
     private:
       const Point& p_;
@@ -292,6 +317,21 @@ namespace mln
     {
       return internal::tuple_transform(images_, internal::get_image_operator_call<point_type> (p));
     }
+
+    template <typename dummy = void>
+    typename std::enable_if<image_accessibility<E>::type::value, reference>::type
+    at (const point_type& p)
+    {
+      return internal::tuple_transform(images_, internal::get_image_at<point_type> (p));
+    }
+
+    template <typename dummy = void>
+    typename std::enable_if<image_accessibility<E>::type::value, const_reference>::type
+    at (const point_type& p) const
+    {
+      return internal::tuple_transform(images_, internal::get_image_at<point_type> (p));
+    }
+
 
 
     boost::tuple<Images...>& images()             { return images_; }

@@ -108,6 +108,7 @@ namespace mln
     typedef std::false_type concrete;
     typedef std::false_type indexable;  // !< FIXME
     typedef std::false_type has_border; // !< FIXME
+    typedef mln::extension::none_extension_tag extension;
   };
 
   template <typename BinaryFunction, typename Image1, typename Image2>
@@ -122,6 +123,7 @@ namespace mln
     typedef std::false_type concrete;
     typedef std::false_type indexable; // !< FIXME
     typedef std::false_type has_border; // !< FIXME
+    typedef mln::extension::none_extension_tag extension;
   };
 
   template <typename BinaryFunction, typename Image, typename Scalar>
@@ -133,6 +135,7 @@ namespace mln
     typedef std::false_type concrete;
     typedef std::false_type indexable; // !< FIXME
     typedef std::false_type has_border; // !< FIXME
+    typedef mln::extension::none_extension_tag extension;
   };
 
   template <typename BinaryFunction, typename Scalar, typename Image>
@@ -144,6 +147,7 @@ namespace mln
     typedef std::false_type concrete;
     typedef std::false_type indexable; // !< FIXME
     typedef std::false_type has_border; // !< FIXME
+    typedef mln::extension::none_extension_tag extension;
   };
 
 
@@ -225,6 +229,20 @@ namespace mln
     operator() (const point_type& p)
     {
       return f(ima(p));
+    }
+
+    template <typename dummy = void>
+    typename std::enable_if< image_accessibility<self_t>::type::value, const_reference >::type
+    at (const point_type& p) const
+    {
+      return f(ima.at(p));
+    }
+
+    template <typename dummy = void>
+    typename std::enable_if< image_accessibility<self_t>::type::value, reference >::type
+    at (const point_type& p)
+    {
+      return f(ima.at(p));
     }
 
 

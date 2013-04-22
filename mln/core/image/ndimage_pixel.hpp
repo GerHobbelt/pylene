@@ -104,7 +104,6 @@ namespace mln
   typename ndimage_pixel<T,dim,I>::reference
   ndimage_pixel<T,dim,I>::val() const
   {
-    mln_precondition(ptr_ != NULL);
     return *reinterpret_cast<T*>(ptr_);
   }
 

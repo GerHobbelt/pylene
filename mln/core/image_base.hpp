@@ -37,7 +37,7 @@ namespace mln
     typedef SizeType size_type;
     typedef Difference difference_type;
 
-
+    /*
     reference
     operator () (const pixel_type& pix)
     {
@@ -51,6 +51,7 @@ namespace mln
       mln_precondition(pix.image() == this);
       return pix.val();
     }
+    */
   };
 
 } // end of namespace mln

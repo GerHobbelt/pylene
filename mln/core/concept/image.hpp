@@ -4,6 +4,7 @@
 # include <mln/core/concept/object.hpp>
 # include <mln/core/concept/check.hpp>
 # include <mln/core/concept/pixel.hpp>
+# include <mln/core/concept/extension.hpp>
 
 # include <mln/core/image_traits.hpp>
 
@@ -26,11 +27,11 @@ namespace mln {
     {
       typedef image_traits<I> traits;
 
-      typedef typename traits::accessible  accessible;
-      typedef typename traits::category    category;
-      typedef typename traits::concrete    concrete;
+      typedef typename traits::accessible   accessible;
+      typedef typename traits::category     category;
+      typedef typename traits::concrete     concrete;
       typedef typename traits::indexable    indexable;
-
+      typedef typename traits::extension    extension;
 
       typedef typename I::value_type         value;
       typedef typename I::reference          reference;
@@ -50,6 +51,7 @@ namespace mln {
       check(std::is_same<typename pixel::reference, reference> ());
       check(std::is_convertible<typename const_pixel::value_type, value> ());
       check(std::is_same<typename const_pixel::reference, const_reference> ());
+      check(std::is_convertible<pixel, const_pixel> ());
 
       BOOST_CONCEPT_ASSERT((Pixel<pixel>));
       BOOST_CONCEPT_ASSERT((Pixel<const_pixel>));
@@ -66,8 +68,10 @@ namespace mln {
 	BOOST_CONCEPT_ASSERT((AccessibleImage<I>));
       MLN_CONCEPT_END_CHECK_IF((image_traits<I>::accessible::value));
 
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+        BOOST_CONCEPT_ASSERT((Extension<typename I::extension_type>));
+      MLN_CONCEPT_END_CHECK_IF((image_has_extension<I>::value));
 
-      check(std::is_convertible<pixel, const_pixel> ());
 
     }
   };
@@ -88,9 +92,9 @@ namespace mln {
 
       reference (I::*ptr) (const point_type&) = &I::operator();
       const_reference (I::*ptr2) (const point_type&) const = &I::operator();
-      reference (I::*ptr) (const point_type&) = &I::at();
-      const_reference (I::*ptr2) (const point_type&) const = &I::at();
-      (void) ptr; (void) ptr2;
+      reference (I::*ptr3) (const point_type&) = &I::at;
+      const_reference (I::*ptr4) (const point_type&) const = &I::at;
+      (void) ptr; (void) ptr2; (void) ptr3; (void) ptr4;
     }
   };
 

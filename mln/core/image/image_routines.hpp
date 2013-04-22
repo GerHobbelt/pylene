@@ -154,7 +154,10 @@ namespace mln
     resizer&
     border(unsigned b)
     {
-      m_border = b;
+      if (m_border != -1)
+        m_border = b;
+      else
+        m_failed = 1;
       return *this;
     }
 
@@ -163,7 +166,7 @@ namespace mln
     adjust(const Neighborhood& nbh)
     {
       unsigned b = internal::get_border_from_nbh(nbh);
-      if (b != 0)
+      if (b != 0 and m_border != -1)
 	m_border = std::max<int>(m_border, b);
       else
 	m_failed = true;
@@ -203,13 +206,17 @@ namespace mln
     }
 
     template <typename dummy=void>
-    void initborder_(typename std::enable_if<image_traits<I>::has_border::value, dummy>::type* = NULL)
+    typename std::enable_if< std::is_same<typename image_extension<I>::type,
+                                          mln::extension::border_extension_tag>::value, dummy>::type
+    initborder_()
     {
       m_border = m_ref.border();
     }
 
     template <typename dummy=void>
-    void initborder_(typename std::enable_if<!image_traits<I>::has_border::value, dummy>::type* = NULL)
+    typename std::enable_if< !std::is_same<typename image_extension<I>::type,
+                                          mln::extension::border_extension_tag>::value, dummy>::type
+    initborder_()
     {
       m_border = -1;
     }

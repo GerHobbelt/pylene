@@ -15,11 +15,15 @@ add_executable(range_filter range/filter.cpp)
 add_test(range_filter range_filter)
 
 # test Images
+add_executable(image2d   image/image2d.cpp)
+add_executable(extended_by_value_image image/morphers/extended_by_value.cpp)
 add_executable(zip_image image/zip_image.cpp)
 add_executable(sub_image image/sub_image.cpp)
 add_executable(image_ops image/image_ops.cpp)
 
 
+add_test(image2d   image2d)
+add_test(extended_by_value_image extended_by_value_image)
 add_test(zip_image zip_image)
 add_test(image_ops image_ops)
 add_test(sub_image sub_image)

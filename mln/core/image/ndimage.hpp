@@ -672,7 +672,7 @@ namespace mln
     typename std::enable_if<(d < dim)>::type
     ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
     {
-      for (int i = 0; i < m_shp[d] + m_border; ++i, ptr += m_strides[d])
+      for (int i = 0; i < m_shp[d] + (2*m_border); ++i, ptr += m_strides[d])
         _fillall<d+1>(ptr, v);
     }
 

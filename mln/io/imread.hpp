@@ -9,6 +9,10 @@
 # include <mln/io/ioexception.hpp>
 //# include <mln/io/registration.hpp>
 # include <mln/io/freeimage_reader.hpp>
+# include <mln/io/internal/demangle.hpp>
+
+
+
 
 namespace mln
 {
@@ -69,14 +73,15 @@ namespace mln
 	r.initialize();
 	r.load(path.c_str());
 
+
 	typedef typename Image::value_type V;
         std::type_index ridx = r.get_value_type_id();
 	if (Image::ndim != r.get_ndim())
 	  throw MLNIOException("Dimensions incompatibles");
 	else if (ridx != typeid(V)) {
 	  std::string ex = "Value types incompatibles: ";
-	  (ex += "expected: ") += ridx.name();
-	  (ex += " but got ") += typeid(V).name();
+	  (ex += "trying to load ") += demangle(ridx.name());
+	  (ex += " in an image of ") += demangle(typeid(V).name());
 	  throw MLNIOException(ex);
 	}
 

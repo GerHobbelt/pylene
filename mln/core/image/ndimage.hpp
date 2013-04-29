@@ -162,7 +162,6 @@ namespace mln
     // FIXME move to base
     pixel_type pix_at(site_type p)
     {
-      mln_precondition(domain_.has(p));
       pixel_type pix;
       pix.point_ = p;
       pix.ima_  = (E*)this;
@@ -172,11 +171,23 @@ namespace mln
 
     const_pixel_type pix_at(site_type p) const
     {
-      mln_precondition(domain_.has(p));
       const_pixel_type pix((const E*) this);
       pix.point_ = p;
       pix.ptr_ = (char*) & (operator () (p));
       return pix;
+    }
+
+
+    pixel_type pixel(site_type p)
+    {
+      mln_precondition(domain_.has(p));
+      return pix_at(p);
+    }
+
+    const_pixel_type pixel(site_type p) const
+    {
+      mln_precondition(domain_.has(p));
+      return pix_at(p);
     }
 
 

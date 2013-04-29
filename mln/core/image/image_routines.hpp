@@ -3,6 +3,8 @@
 
 # include <mln/core/algorithm/clone.hpp>
 # include <mln/core/internal/get_border_from_nbh.hpp>
+# include <mln/core/iterator/transform_iterator.hpp>
+# include <mln/core/iterator/filter_iterator.hpp>
 
 namespace mln
 {
@@ -64,6 +66,51 @@ namespace mln
   typename std::enable_if< image_traits<InputImage>::concrete::value, InputImage&& >::type
   eval(InputImage&& ima);
 
+
+  namespace internal
+  {
+    // FWD declaration
+    template <typename I, class Predicate, class Enable = bool>
+    struct where_t;
+
+    template <typename I>
+    struct where_binary_t;
+  };
+
+
+  /// \brief Return the domain of the image where the predicate is true.
+  ///
+  /// \param ima The input image \f$E \rightarrow V\f$
+  ///
+  /// \param pred A unary predicate that takes either the pixel or the pixel
+  /// value as argument i.e \f$V \rightarrow T\f$ or \f$(E,V) \rightarrow T\f$, where 
+  /// \p T is convertible to bool.
+  ///
+  /// \return The subdomain of the image where the predicate is true. The result
+  /// type fits the Domain concept.
+  ///
+  template <typename I, class Predicate>
+  internal::where_t<const I&, Predicate>
+  where(const Image<I>& ima, const Predicate& pred);
+
+  template <typename I, class Predicate>
+  internal::where_t<I, Predicate>
+  where(Image<I>&& ima, const Predicate& pred);
+
+
+  /// \brief  Return the domain of the image where it is true.
+  ///
+  /// \param ima The input image
+  /// \return The subdomain of the image where it is true. The result
+  /// type fits the Domain concept.
+  /// \pre The value type of the image must be convertible to bool.
+  template <typename I>
+  internal::where_binary_t<const I&>
+  where(const Image<I>& ima);
+
+  template <typename I>
+  internal::where_binary_t<I>
+  where(Image<I>&& ima);
   ///\}
 
 
@@ -289,6 +336,196 @@ namespace mln
     bool	 m_set_init;
     mln_value(O) m_init_value;
   };
+
+
+  namespace internal
+  {
+
+    // FIXME: result_of still produces a HARD error, simplify as soon as it produces a SFINAE instead
+    template <typename I, typename Predicate>
+    struct where_t<I, Predicate, decltype( std::declval<Predicate>() (std::declval<mln_pixel(I)>()) )>
+    {
+    private:
+      typedef typename std::remove_reference<I>::type                 image_t;
+      typedef typename image_const_pixel_iterator<image_t>::type      IT;
+
+      struct getpoint
+      {
+        mln_point(I)
+        operator() (const mln_pixel(const I)& pix) const
+        {
+          return pix.point();
+        }
+      };
+
+    public:
+      typedef transform_iterator< filter_iterator<IT, Predicate>, getpoint> iterator;
+      typedef iterator const_iterator;
+
+      where_t(I&& ima, const Predicate& pred)
+        : m_ima(std::forward<I>(ima)),
+          m_pred(pred)
+      {
+
+      }
+
+      where_t(const where_t&) = default;
+
+      iterator iter() const
+      {
+        return iterator( filter_iterator<IT, Predicate>(m_ima.pixels().iter(), m_pred), getpoint() );
+      }
+
+      bool has(const mln_point(I)& p) const
+      {
+        return m_ima.domain().has(p) and m_pred(m_ima.pixel(p));
+      }
+
+
+    private:
+      I                 m_ima;
+      Predicate         m_pred;
+    };
+
+
+    template <typename I, typename Predicate>
+    struct where_t<I, Predicate, decltype( std::declval<Predicate>() (std::declval<mln_value(I)>()) )>
+    {
+    private:
+      typedef typename std::remove_reference<I>::type                 image_t;
+      typedef typename image_const_pixel_iterator<image_t>::type      IT;
+
+      struct getpoint
+      {
+        mln_point(I)
+        operator() (const mln_pixel(const I)& pix) const
+        {
+          return pix.point();
+        }
+      };
+
+      struct predicate_t
+      {
+        bool
+        operator() (const mln_pixel(const I)& px) const
+        {
+          return pred(px.val());
+        }
+
+        Predicate pred;
+      };
+
+    public:
+      typedef transform_iterator< filter_iterator<IT, predicate_t>, getpoint> iterator;
+      typedef iterator const_iterator;
+
+      where_t(I&& ima, const Predicate& pred)
+        : m_ima(std::forward<I>(ima)),
+          m_pred{pred}
+      {
+      }
+
+      where_t(const where_t&) = default;
+
+      iterator iter() const
+      {
+        return iterator( filter_iterator<IT, predicate_t>(m_ima.pixels().iter(), m_pred), getpoint() );
+      }
+
+      bool has(const mln_point(I)& p) const
+      {
+        return m_ima.domain().has(p) and m_pred.pred(m_ima(p));
+      }
+
+
+    private:
+      I                   m_ima;
+      predicate_t         m_pred;
+    };
+
+
+    template <typename I>
+    struct where_binary_t
+    {
+    private:
+      typedef typename std::remove_reference<I>::type                 image_t;
+      typedef typename image_const_pixel_iterator<image_t>::type      IT;
+
+      struct getpoint
+      {
+        mln_point(I)
+        operator() (const mln_pixel(const I)& pix) const
+        {
+          return pix.point();
+        }
+      };
+
+      struct predicate_t
+      {
+        bool
+        operator() (const mln_pixel(const I)& px) const
+        {
+          return px.val();
+        }
+      };
+
+    public:
+      typedef transform_iterator< filter_iterator<IT, predicate_t>, getpoint> iterator;
+      typedef iterator const_iterator;
+
+      where_binary_t(I&& ima)
+        : m_ima(std::forward<I>(ima))
+      {
+      }
+
+      where_binary_t(const where_binary_t&) = default;
+
+      iterator iter() const
+      {
+        return iterator( filter_iterator<IT, predicate_t>(m_ima.pixels().iter(), predicate_t() ), getpoint() );
+      }
+
+      bool has(const mln_point(I)& p) const
+      {
+        return m_ima.domain().has(p) and m_ima(p);
+      }
+
+
+    private:
+      I m_ima;
+    };
+
+  }
+
+
+  template <typename I, class Predicate>
+  internal::where_t<const I&, Predicate>
+  where(const Image<I>& ima, const Predicate& pred)
+  {
+    return internal::where_t<const I&, Predicate>(exact(ima), pred);
+  }
+
+  template <typename I>
+  internal::where_binary_t<const I&>
+  where(const Image<I>& ima)
+  {
+    return internal::where_binary_t<const I&>(exact(ima));
+  }
+
+  template <typename I, class Predicate>
+  internal::where_t<I, Predicate>
+  where(Image<I>&& ima, const Predicate& pred)
+  {
+    return internal::where_t<I, Predicate>(move_exact(ima), pred);
+  }
+
+  template <typename I>
+  internal::where_binary_t<I>
+  where(Image<I>&& ima)
+  {
+    return internal::where_binary_t<I>(move_exact(ima));
+  }
+
 
 }
 

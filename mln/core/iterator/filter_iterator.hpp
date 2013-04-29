@@ -10,6 +10,10 @@ namespace mln
   template <typename Iterator, typename Predicate>
   struct filter_iterator;
 
+  template <typename Iterator, typename Predicate>
+  filter_iterator<Iterator, Predicate>
+  make_filter_iterator(const Iterator& it, const Predicate& pred);
+
   /*********************/
   /*** Implementation  */
   /*********************/
@@ -64,9 +68,21 @@ namespace mln
     }
 
   private:
+    template <typename, typename>
+    friend struct filter_iterator;
+
     Iterator  m_it;
     Predicate m_pred;
   };
+
+
+  template <typename Iterator, typename Predicate>
+  filter_iterator<Iterator, Predicate>
+  make_filter_iterator(const Iterator& it, const Predicate& pred)
+  {
+    return filter_iterator<Iterator, Predicate>(it, pred);
+  }
+
 
 }
 

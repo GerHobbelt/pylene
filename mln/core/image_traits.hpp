@@ -8,6 +8,7 @@
 # define mln_value(I) typename std::remove_reference<I>::type::value_type
 # define mln_point(I) typename std::remove_reference<I>::type::point_type
 # define mln_site(I)  typename std::remove_reference<I>::type::point_type
+# define mln_pixel(I)  typename image_pixel<typename std::remove_reference<I>::type>::type
 
 namespace mln
 {

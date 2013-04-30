@@ -106,7 +106,7 @@ namespace mln
 	    m_has_repr {false,}, m_out (Send)
 	{
 	  if (use_dejavu) {
-	    resize(m_deja_vu, ima, (ima.index_strides()[0] - ima.ncols()) / 2, false);
+	    resize(m_deja_vu, ima).init(false);
 	    extension::fill(m_deja_vu, true);
 	  }
 

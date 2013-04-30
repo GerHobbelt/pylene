@@ -29,16 +29,16 @@ namespace mln
       struct MaxTreeAlgorithmHQ
       {
 	typedef typename image2d<V>::size_type size_type;
-	static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
-	static constexpr size_type INQUEUE = 0;
-	static constexpr bool use_dejavu = false;
+	static constexpr const size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
+	static constexpr const size_type INQUEUE = 0;
+	static constexpr const bool use_dejavu = false;
 
         MaxTreeAlgorithmHQ(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
           : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false)
         {
 	  if (!use_dejavu) {
-	    resize(m_parent, ima, ima.border(), UNINITIALIZED);
-	    extension::fill(m_parent, INQUEUE);
+	    resize(m_parent, ima).init((size_type) UNINITIALIZED);
+	    extension::fill(m_parent, (size_type) INQUEUE);
 	  } else {
 	    resize(m_parent, ima);
 	  }

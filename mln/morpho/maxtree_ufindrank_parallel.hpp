@@ -43,7 +43,7 @@ namespace mln
         {
           resize(m_parent, ima);
 	  aux_data x = {0, UNINITIALIZED, 0};
-	  resize(m_aux, ima, ima.border(), x);
+	  resize(m_aux, ima).init(x);
 
 	  size_type n = m_ima.domain().size();
 	  m_S = new std::vector<size_type>(n);
@@ -78,7 +78,7 @@ namespace mln
           image2d<bool> deja_vu;
 
 	  if (use_dejavu)
-	    resize(deja_vu, ima, m_ima.border(), false);
+	    resize(deja_vu, ima).init(false);
 
 	  const box2d& d = m_ima.domain();
 	  size_type i = (d.pmax[1] - d.pmin[1]) * (domain.pmin[0] - d.pmin[0]);

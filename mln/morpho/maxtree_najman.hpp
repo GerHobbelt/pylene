@@ -73,11 +73,11 @@ namespace mln
       image2d<internal::aux_data<size_type> >	        ttree;
       image2d<internal::aux_data<size_type> >	        tnode;
 
-      resize(parent, ima, ima.border(), UNINITIALIZED);
+      resize(parent, ima).init(UNINITIALIZED);
       resize(lowestNode, ima);
       internal::aux_data<size_type> x = {0,0};
-      resize(ttree, ima, ima.border(), x);
-      resize(tnode, ima, ima.border(), x);
+      resize(ttree, ima).init(x);
+      resize(tnode, ima).init(x);
 
       /* coucou */
 

@@ -18,7 +18,7 @@ namespace mln
 	Canonizer(const image2d<V>& ima, image2d<size_type>& parent, size_type* S)
 	  : m_ima(ima), m_parent(parent), m_out (S)
 	{
-	  resize(m_dejavu, m_ima, m_ima.border(), false);
+	  resize(m_dejavu, m_ima).init(false);
 	  //m_back = S + ima.domain().size();
 	}
 

@@ -36,7 +36,7 @@ namespace mln
           : m_ima (ima), m_nbh (nbh), m_cmp(cmp), m_has_previous(false)
         {
 	  if (!use_dejavu) {
-	    resize(m_parent, ima, ima.border(), UNINITIALIZED);
+	    resize(m_parent, ima).init(UNINITIALIZED);
 	    extension::fill(m_parent, INQUEUE);
 	  } else {
 	    resize(m_parent, ima);

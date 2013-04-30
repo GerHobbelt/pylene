@@ -111,13 +111,13 @@
   template <typename T, typename U, unsigned dim, typename tag>		\
   typename								\
   std::enable_if< vec_base_traits<tag>::TraitName,		\
-		      vec_base<typename std::common_type<T, U>::type , dim, tag> \
+		      vec_base<decltype( std::declval<T>() + std::declval<U>() ) , dim, tag> \
 		      >::type						\
   inline								\
   operator Op (const vec_base<T, dim, tag>& x,				\
 	       const vec_base<U, dim, tag>& y)				\
   {									\
-    typedef vec_base<typename std::common_type<T, U>::type , dim, tag> R; \
+    typedef vec_base<decltype( std::declval<T>() + std::declval<U>() ) , dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
       r.v_[i] = x.v_[i] Op y.v_[i];					\
@@ -135,7 +135,7 @@
   operator Op (const vec_base<T, dim, tag>& x,				\
 	       const U& y)						\
   {									\
-    typedef vec_base<typename std::common_type<T, U>::type , dim, tag> R; \
+    typedef vec_base<decltype( std::declval<T>() + std::declval<U>() ) , dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
       r.v_[i] = x.v_[i] Op y;						\
@@ -150,7 +150,7 @@
   inline								\
   operator Op (const U& y, const vec_base<T, dim, tag>& x)		\
   {									\
-    typedef vec_base<typename std::common_type<T, U>::type, dim, tag> R; \
+    typedef vec_base<decltype( std::declval<T>() + std::declval<U>() ), dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
       r.v_[i] = y Op x.v_[i];						\
@@ -236,6 +236,7 @@ namespace mln
       {
 	std::copy(other.v_, other.v_ + dim, v_);
       }
+
 
       template <typename U, typename other_tag>
       explicit
@@ -513,9 +514,9 @@ namespace mln
   typedef vec<short, 1>		vec1s;
   typedef vec<short, 2>		vec2s;
   typedef vec<short, 3>		vec3s;
-  typedef vec<unsigned, 1>	vec1ui;
-  typedef vec<unsigned, 2>	vec2ui;
-  typedef vec<unsigned, 3>	vec3ui;
+  typedef vec<unsigned, 1>	vec1u;
+  typedef vec<unsigned, 2>	vec2u;
+  typedef vec<unsigned, 3>	vec3u;
   typedef vec<int, 1>		vec1i;
   typedef vec<int, 2>		vec2i;
   typedef vec<int, 3>		vec3i;

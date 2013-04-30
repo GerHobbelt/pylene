@@ -257,7 +257,7 @@ namespace mln
       this->init_forward<nelems-1>(ptr_arr, delta_strides_arr);
 
       return iterator(zip_raw_pixel<PointerTuple, Point> (Point (), ptr_arr),
-		      internal::make_point_visitor_forward(pmax - pmin),
+		      internal::make_point_visitor_forward((Point) (pmax - pmin) ),
 		      internal::strided_tuple_pointer_value_visitor<nelems, ndim>(ptr_arr, delta_strides_arr),
 		      internal::no_op_visitor ());
     }
@@ -273,7 +273,7 @@ namespace mln
       this->init_backward<nelems-1>(ptr_arr, delta_strides_arr);
 
       return reverse_iterator(zip_raw_pixel<PointerTuple, Point> (Point (), ptr_arr),
-			      internal::make_point_visitor_backward(pmax - pmin),
+			      internal::make_point_visitor_backward((Point) (pmax - pmin)),
 			      internal::strided_tuple_pointer_value_visitor<nelems, ndim>(ptr_arr, delta_strides_arr),
 			      internal::no_op_visitor ());
     }

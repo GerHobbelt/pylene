@@ -42,8 +42,8 @@ namespace mln
     {
     }
 
-    template <typename Iterator2, typename Reference2, typename Value2>
-    transform_iterator(const transform_iterator<Iterator2, UnaryFunction, Reference2, Value2>& other,
+    template <typename Iterator2, typename UnaryFunction2, typename Reference2, typename Value2>
+    transform_iterator(const transform_iterator<Iterator2, UnaryFunction2, Reference2, Value2>& other,
 		       typename std::enable_if<std::is_convertible<Iterator2, Iterator>::value>::type* = NULL)
       : it_ (other.it_), f_ (other.f_)
     {
@@ -62,6 +62,13 @@ namespace mln
     UnaryFunction f_;
   };
 
+
+  template <typename Iterator, typename UnaryFunction>
+  transform_iterator<Iterator, UnaryFunction>
+  make_transform_iterator(const Iterator& it, const UnaryFunction& f)
+  {
+    return transform_iterator<Iterator, UnaryFunction>(it, f);
+  }
 
 } // end of namespace mln
 

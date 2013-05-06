@@ -160,7 +160,7 @@ namespace mln
     // \}
 
     // FIXME move to base
-    pixel_type pix_at(site_type p)
+    pixel_type pixel_at(const site_type& p)
     {
       pixel_type pix;
       pix.point_ = p;
@@ -169,7 +169,7 @@ namespace mln
       return pix;
     }
 
-    const_pixel_type pix_at(site_type p) const
+    const_pixel_type pixel_at(const site_type& p) const
     {
       const_pixel_type pix((const E*) this);
       pix.point_ = p;
@@ -178,16 +178,16 @@ namespace mln
     }
 
 
-    pixel_type pixel(site_type p)
+    pixel_type pixel(const site_type& p)
     {
       mln_precondition(domain_.has(p));
-      return pix_at(p);
+      return pixel_at(p);
     }
 
-    const_pixel_type pixel(site_type p) const
+    const_pixel_type pixel(const site_type& p) const
     {
       mln_precondition(domain_.has(p));
-      return pix_at(p);
+      return pixel_at(p);
     }
 
 

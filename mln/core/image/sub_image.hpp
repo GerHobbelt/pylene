@@ -6,8 +6,10 @@
 # include <mln/core/image_base.hpp>
 # include <mln/core/range/range_traits.hpp>
 # include <mln/core/range/iterator_range.hpp>
-# include <mln/core/iterator/image_access_iterator.hpp>
+//# include <mln/core/iterator/image_access_iterator.hpp>
+# include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/range/filter.hpp>
+# include <mln/core/pixel_utility.hpp>
 
 namespace mln
 {
@@ -228,10 +230,75 @@ namespace mln
 
   private:
     typedef typename std::remove_reference<I>::type  image_t;
-    typedef sub_image<I, Domain>		     this_type;
+    typedef sub_image<I, Domain>		     self_t;
 
     static_assert( std::is_convertible<typename range_value<Domain>::type, typename image_t::point_type>::value,
 		"Domain's site type must be convertible to image's site type." );
+
+
+    // static_assert( std::is_convertible<
+    //                std::reference_wrapper<image_t>,
+    //                std::reference_wrapper<const image_t> >::value, "pas conv");
+
+
+    typedef transform_iterator<typename Domain::iterator,
+                               std::reference_wrapper<image_t> >           value_iterator;
+    typedef transform_iterator<typename Domain::iterator,
+                               std::reference_wrapper<const image_t> >     const_value_iterator;
+
+    struct pix_fun_t
+    {
+      pix_fun_t(image_t& ima)
+        : m_ima(&ima)
+      {
+      }
+
+      typename image_pixel<image_t>::type
+      operator() (const mln_point(I)& p) const
+      {
+        return m_ima->pixel(p);
+      }
+    private:
+      friend struct const_pix_fun_t;
+      image_t* m_ima;
+    };
+
+    struct const_pix_fun_t
+    {
+      const_pix_fun_t(const image_t& ima)
+        : m_ima(&ima)
+      {
+      }
+
+      const_pix_fun_t(const pix_fun_t& other)
+        : m_ima(other.m_ima)
+      {
+      }
+
+      typename image_const_pixel<image_t>::type
+      operator() (const mln_point(I)& p) const
+      {
+        return m_ima->pixel(p);
+      }
+    private:
+      const image_t* m_ima;
+    };
+
+
+    // typedef decltype(std::bind( (typename image_pixel<image_t>::type (image_t::*)(const typename image_t::point_type&))
+    //                             &image_t::pixel_at, std::declval<image_t&>(), std::placeholders::_1))           pix_fun_t;
+    // typedef decltype(std::bind( (typename image_pixel<const image_t>::type (image_t::*)(const typename image_t::point_type&) const)
+    //                             &image_t::pixel_at, std::declval<const image_t&>(), std::placeholders::_1))     const_pix_fun_t;
+
+    typedef rebind_pixel_iterator<
+      self_t, transform_iterator<
+                typename Domain::iterator,
+                pix_fun_t > >                     pixel_iterator;
+    typedef rebind_pixel_iterator<
+      const self_t, transform_iterator<
+                      typename Domain::iterator,
+                      const_pix_fun_t > >         const_pixel_iterator;
+
 
 
   public:
@@ -241,13 +308,16 @@ namespace mln
     typedef typename image_const_reference<image_t>::type       const_reference;
     typedef Domain						domain_type;
 
-    typedef image_access_value_iterator<image_t, typename Domain::iterator>             value_iterator;
-    typedef image_access_value_iterator<const image_t, typename Domain::iterator>       const_value_iterator;
-    typedef image_access_pixel_iterator<image_t, typename Domain::iterator, this_type>             pixel_iterator;
-    typedef image_access_pixel_iterator<const image_t, typename Domain::iterator, const this_type>       const_pixel_iterator;
+    typedef rebinded_pixel<self_t, typename image_pixel<image_t>::type>               pixel_type;
+    typedef rebinded_pixel<const self_t, typename image_const_pixel<image_t>::type>   const_pixel_type;
 
-    typedef typename pixel_iterator::value_type          pixel_type;
-    typedef typename const_pixel_iterator::value_type    const_pixel_type;
+    // typedef image_access_value_iterator<image_t, typename Domain::iterator>             value_iterator;
+    // typedef image_access_value_iterator<const image_t, typename Domain::iterator>       const_value_iterator;
+    // typedef image_access_pixel_iterator<image_t, typename Domain::iterator, self_t>             pixel_iterator;
+    // typedef image_access_pixel_iterator<const image_t, typename Domain::iterator, const self_t>       const_pixel_iterator;
+
+    // typedef typename pixel_iterator::value_type          pixel_type;
+    // typedef typename const_pixel_iterator::value_type    const_pixel_type;
 
     typedef iterator_range<value_iterator>		value_range;
     typedef iterator_range<const_value_iterator>	const_value_range;
@@ -278,33 +348,46 @@ namespace mln
 
     value_range values()
     {
-      return make_iterator_range( value_iterator(m_ima, m_domain.iter()) );
+      //return make_iterator_range( value_iterator(m_ima, m_domain.iter()) );
+      return value_range(value_iterator(m_domain.iter(), m_ima));
+
     }
 
     const_value_range values() const
     {
-      return make_iterator_range( const_value_iterator(m_ima, m_domain.iter()) );
+      //return make_iterator_range( const_value_iterator(m_ima, m_domain.iter()) );
+      return const_value_range(const_value_iterator(m_domain.iter(), m_ima));
     }
 
     pixel_range pixels()
     {
-      return make_iterator_range( pixel_iterator(m_ima, m_domain.iter(), *this) );
+      //return make_iterator_range( pixel_iterator(m_ima, m_domain.iter(), *this) );
+      return pixel_range(pixel_iterator
+                         (*this, make_transform_iterator
+                          (m_domain.iter(),
+                           pix_fun_t(m_ima))));
     }
 
     const_pixel_range pixels() const
     {
-      return make_iterator_range( const_pixel_iterator(m_ima, m_domain.iter(), *this) );
+      return const_pixel_range(const_pixel_iterator
+                               (*this, make_transform_iterator
+                                (m_domain.iter(), const_pix_fun_t(m_ima))));
     }
 
     reference
     operator() (const point_type& p)
     {
+      mln_precondition(m_domain.has(p));
+      mln_precondition(m_ima.domain().has(p));
       return m_ima(p);
     }
 
     const_reference
     operator() (const point_type& p) const
     {
+      mln_precondition(m_domain.has(p));
+      mln_precondition(m_ima.domain().has(p));
       return m_ima(p);
     }
 
@@ -319,6 +402,34 @@ namespace mln
     {
       return m_ima.at(p);
     }
+
+    pixel_type
+    pixel_at (const point_type& p)
+    {
+      return pixel_type(*this, m_ima.pixel_at(p));
+    }
+
+    const_pixel_type
+    pixel_at (const point_type& p) const
+    {
+      return const_pixel_type(*this, m_ima.pixel_at(p));
+    }
+
+    pixel_type
+    pixel (const point_type& p)
+    {
+      mln_precondition(m_domain.has(p));
+      return pixel_type(*this, m_ima.pixel_at(p));
+    }
+
+    const_pixel_type
+    pixel (const point_type& p) const
+    {
+      mln_precondition(m_domain.has(p));
+      return const_pixel_type(*this, m_ima.pixel_at(p));
+    }
+
+
 
 
   private:

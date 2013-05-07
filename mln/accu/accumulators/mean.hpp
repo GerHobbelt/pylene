@@ -89,12 +89,16 @@ namespace mln
 	friend
 	SumType extract(const mean& accu, features::mean<> )
 	{
-	  return extractor::sum(accu) / extractor::count(accu);
+	  auto v = extractor::count(accu);
+	  if (v == 0)
+	    return extractor::sum(accu);
+	  else
+	    return extractor::sum(accu) / extractor::count(accu);
 	}
 
 
-      private:
-	SumType m_sum;
+	//private:
+	//SumType m_sum;
       };
 
     }

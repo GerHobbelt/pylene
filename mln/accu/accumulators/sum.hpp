@@ -84,12 +84,12 @@ namespace mln
 
 	void take(const T& v)
 	{
-	  m_sum += v;
+	  m_sum += (SumType) v;
 	}
 
 	void untake(const T& v)
 	{
-	  m_sum -= v;
+	  m_sum -= (SumType) v;
 	}
 
 	template <typename Other>

@@ -11,7 +11,7 @@ namespace mln
   ///
   template <typename I>
   void
-  Kdisplay(const Image<I>& ima);
+  Kdisplay(const Image<I>& ima, const point2d strides = point2d{1,1});
 
 
   struct K1_tag {};
@@ -19,14 +19,14 @@ namespace mln
 
 
   namespace K1 {
-    bool is_face_2(point2d p);
-    bool is_face_1(point2d p);
-    bool is_face_1v(point2d p);
-    bool is_face_1h(point2d p);
+    bool is_face_2(const point2d& p);
+    bool is_face_1(const point2d& p);
+    bool is_face_1v(const point2d& p);
+    bool is_face_1h(const point2d& p);
   }
 
   namespace K2 {
-    bool is_face_2(point2d p);
+    bool is_face_2(const point2d& p);
   }
 
   /***************************/
@@ -56,7 +56,7 @@ namespace mln
 	for (int j = 0; j < nc; j++)
 	  {
 	    point2d p = point2d{i, j};
-	    if (ima((point2d{i, j}).as_vec() * strides.as_vec()))
+	    if (ima((point2d) (p.as_vec() * strides.as_vec())))
 	      {
 	      if (i % 2 == 0 and j % 2 == 0)
 		std::cout << "x";
@@ -76,22 +76,22 @@ namespace mln
 
 
   namespace K1 {
-    bool is_face_2(point2d p)
+    bool is_face_2(const point2d& p)
     {
       return (p[0] % 2 == 0 and p[1] % 2 == 0);
     }
 
-    bool is_face_1(point2d p)
+    bool is_face_1(const point2d& p)
     {
       return ((p[0] % 2 == 0) xor (p[1] % 2 == 0));
     }
 
-    bool is_face_1v(point2d p)
+    bool is_face_1v(const point2d& p)
     {
       return (p[0] % 2 == 0 and p[1] % 2 == 1);
     }
 
-    bool is_face_1h(point2d p)
+    bool is_face_1h(const point2d& p)
     {
       return (p[0] % 2 == 1 and p[1] % 2 == 0);
     }
@@ -100,7 +100,7 @@ namespace mln
 
   namespace K2
   {
-    bool is_face_2(point2d p)
+    bool is_face_2(const point2d& p)
     {
       return (p[0] % 4 == 0 and p[1] % 4 == 0);
     }

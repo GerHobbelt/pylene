@@ -8,6 +8,9 @@
 #include <mln/morpho/filtering.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <mln/accu/accumulators/mean.hpp>
+
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include "topology.hpp"
@@ -83,7 +86,7 @@ namespace mln
   close(image2d<V>& K, image2d<unsigned>& parent, const std::vector<unsigned>& S, unsigned lambda)
   {
     image2d<unsigned> count;
-    resize(count, K, K.border(), 0);
+    resize(count, K).init(0);
 
     for (int i = S.size() - 1; i >= 0; --i)
       {
@@ -134,6 +137,46 @@ namespace mln
     return out;
 
   }
+
+  template <typename V, typename W, class Pred>
+  image2d<V>
+  set_mean_on_node(const image2d<V>& ima, const image2d<W>& K, const std::vector<unsigned>& S, const image2d<unsigned>& parent,
+		   const Pred& pred)
+  {
+    typedef accu::accumulators::mean<V, vec3u> Acc;
+
+    image2d<V> mean;
+    image2d<Acc> accus;
+
+    resize(accus, ima);
+    resize(mean, ima);
+
+    // Accumulate
+    {
+      for (int i = S.size()-1; i > 0 ; --i)
+	{
+	  unsigned k = S[i];
+	  if (pred(ima.point_at_index(k)))
+	      accus[k].take(ima[k]);
+	  accus[parent[k]].take(accus[k]);
+	}
+      accus[S[0]].take(ima[S[0]]);
+    }
+
+    // reconstruct
+    {
+      mean[S[0]] = (V) accu::extractor::mean(accus[S[0]]);
+      for (unsigned k : S)
+	{
+	  if (K[parent[k]] != K[k])
+	    mean[k] = (V) accu::extractor::mean(accus[k]);
+	  else
+	    mean[k] = mean[parent[k]];
+	}
+    }
+    return mean;
+  }
+
 
 }
 
@@ -254,13 +297,14 @@ int main(int argc, char** argv)
 
   if (use_tos)
     std::tie(K, parent, S) = morpho::ToS(area, c4);
-  else
-    K = area,
+  else {
+    K = area;
     std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(area, c8, std::greater<unsigned> ());
+  }
 
   auto ima2 = addborder(ima); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
-  resize(tmp, parent, parent.border(), rgb8{0,0,255});
+  resize(tmp, parent).init(rgb8{0,0,255});
 
   point2d strides = use_tos ? point2d{4,4} : point2d{2,2};
   copy(ima2, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, strides));
@@ -274,6 +318,12 @@ int main(int argc, char** argv)
       x = morpho::area_compute(K, parent, S, K1::is_face_2, std::greater<unsigned> ());
     io::imsave(transform(x, [=](unsigned v) -> float { return (float)v; }), "area2.tiff");
   }
+
+  // Set mean on nodes
+  // if (use_tos)
+  //   tmp = set_mean_on_node(tmp, K, S, parent, K2::is_face_2);
+  // else
+  //   tmp = set_mean_on_node(tmp, K, S, parent, K1::is_face_2);
 
   if (vm.count("grain"))
     {

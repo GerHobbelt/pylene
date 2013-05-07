@@ -9,6 +9,8 @@
 #include <mln/io/imsave.hpp>
 #include <boost/format.hpp>
 
+#include <mln/graphcut/graphcut.hh>
+
 #include <mln/morpho/tos/tos2.hpp>
 #include "addborder.hpp"
 #include "thicken.hpp"
@@ -25,8 +27,8 @@ namespace mln
     typedef rgb<unsigned> SumType;
     image2d<SumType>  sum;
     image2d<unsigned> count;
-    resize(count, K, K.border(), 0);
-    resize(sum, K, K.border(), SumType ());
+    resize(count, K).init(0);
+    resize(sum, K).init(SumType ());
 
     for (int i = S.size() - 1; i >= 0; --i)
       {
@@ -86,20 +88,18 @@ int main(int argc, const char** argv)
 
   std::string filename = argv[1];
   std::string output = argv[2];
-  unsigned sat = (argc > 3) ? std::atoi(argv[3]) : 45;
+  int sat = (argc > 3) ? std::atoi(argv[3]) : 45;
 
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
   image2d<lsh8> f = transform(ima, rgb2lsh<uint8> );
 
-  image2d<uint8> mask = transform(f, [sat] (lsh8 x) { return (uint8) ((x[1] < sat) * 255); });
 
-
-
-  io::imsave(mask, (boost::format("%s-mask.tiff") % output).str().c_str());
-  io::imsave(transform(f, [] (lsh8 x) -> uint8 { return x[1] < 45 ? x[0] : 0; }), (boost::format("%s-lum.tiff") % output).str().c_str());
-  io::imsave(transform(f, [] (lsh8 x) -> uint8 { return x[1] > 45 ? x[2] : 0; }), (boost::format("%s-hue.tiff") % output).str().c_str());
+  io::imsave(transform(f, [sat] (lsh8 x) -> bool { return x[1] > sat; }), (boost::format("%s-mask.tiff") % output).str().c_str());
+  io::imsave(transform(f, [sat] (lsh8 x) -> uint8 { return x[1]; }), (boost::format("%s-sat.tiff") % output).str().c_str());
+  io::imsave(transform(f, [sat] (lsh8 x) -> uint8 { return x[1] < sat ? x[0] : 0; }), (boost::format("%s-lum.tiff") % output).str().c_str());
+  io::imsave(transform(f, [sat] (lsh8 x) -> uint8 { return x[1] > sat ? x[2] : 0; }), (boost::format("%s-hue.tiff") % output).str().c_str());
 
   image2d<rgb8> bima = addborder(ima);
   image2d<rgb8> tmp(2*bima.nrows()-1, 2*bima.ncols()-1);
@@ -109,9 +109,27 @@ int main(int argc, const char** argv)
   image2d<rgb8> final;
   resize(final, bima);
   fill(final, rgb8{0,0,255});
+
+  //image2d<bool> mask_ = transform(f, [sat] (lsh8 x) { return (x[1] < sat); });
+  image2d<bool> mask_;
+  resize(mask_, f);
+
+  // regularisation
+  graphcut::graphcut(f, mask_, c4,
+		     [sat] (bool x, const lsh8& v) -> float { return 0 * (x != (v[1] > sat)) + 1 * std::abs(x - 1.0 / (1.0 + std::exp(-(v[1] - sat)/3.0))); },
+		     [] (bool x, bool y) { return 1 * (x != y); },
+  		     [] (float x, float y) { return (std::abs(x - y) > 0.001) * (x - y); }  // to compare float
+		     );
+
+
+  io::imsave(mask_, (boost::format("%s-mask-reg.tiff") % output).str().c_str());
+
+  //std::exit(1);
+
   // Compute TOS on cc[L]
   {
-    image2d<bool> mask = transform(f, [sat] (lsh8 x) { return (x[1] < sat); });
+    //image2d<bool> mask = transform(f, [sat] (lsh8 x) { return (x[1] < sat); });
+    image2d<bool> mask = mask_;
     auto L = transform(f, [] (lsh8 x) -> uint9 { return 2 * x[0]; });
 
     image2d<uint16> lbl;
@@ -155,7 +173,8 @@ int main(int argc, const char** argv)
 
   // Compute TOS on cc[H]
   {
-    image2d<bool> mask = transform(f, [sat] (lsh8 x) { return (x[1] >= sat); });
+    auto mask = lnot(mask_);
+    //image2d<bool> mask = transform(f, [sat] (lsh8 x) { return (x[1] >= sat); });
     auto H = transform(f, [] (lsh8 x) -> uint9 { return 2 * x[2]; });
 
     image2d<uint16> lbl;

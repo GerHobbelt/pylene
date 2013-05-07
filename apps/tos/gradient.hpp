@@ -13,6 +13,7 @@ namespace mln
   struct Minmax : Accumulator< Minmax<T> >
   {
     typedef T argument_type;
+    typedef std::pair<T,T> result_type;
 
     void init() {
       min = value_traits<T>::max();

@@ -47,14 +47,14 @@ namespace mln {
     {
     }
 
-    explicit image2d(const domain_type& domain, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >(domain, border)
+    explicit image2d(const domain_type& domain, unsigned border = 3, const T& init = T())
+      : ndimage_base<T,2, image2d<T> >(domain, border, init)
     {
     }
 
 
     image2d(short nrows, short ncols, unsigned border = 3)
-      : ndimage_base<T,2, image2d<T> >( (box<short,2>) {{0,0},{nrows, ncols}}, border)
+      : ndimage_base<T,2, image2d<T> >( (box<short,2>){{0,0},{nrows, ncols}}, border)
     {
     }
 

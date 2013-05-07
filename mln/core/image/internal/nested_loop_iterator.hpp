@@ -3,6 +3,7 @@
 
 # include <type_traits>
 # include <utility>
+# include <array>
 
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/literal/vectorial.hpp>

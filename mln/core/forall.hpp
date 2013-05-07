@@ -23,7 +23,6 @@
 # include <boost/preprocessor/seq/seq.hpp>
 
 
-
 # define MLN_DECLARE(z, n, var)						\
   if (bool _mln_continue_##n = false) {} else				\
     for (BOOST_PP_SEQ_ELEM(n, var) = boost::get<n>(*_mln_for_cur_.get()); !_mln_continue_##n; _mln_continue_##n = true)

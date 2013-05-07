@@ -90,28 +90,28 @@ namespace mln
   // Ima | Domain
   template <typename I, typename Domain>
   sub_image<const I&, Domain>
-  make_subimage(const Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
+  make_subimage(const Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type*)
   {
     return sub_image<const I&, Domain>(exact(ima), domain);
   }
 
   template <typename I, typename Domain>
   sub_image<I&, Domain>
-  make_subimage(Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
+  make_subimage(Image<I>& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type*)
   {
     return sub_image<I&, Domain>(exact(ima), domain);
   }
 
   template <typename I, typename Domain>
   sub_image<const I, Domain>
-  make_subimage(const Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
+  make_subimage(const Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type*)
   {
     return sub_image<I, Domain>(move_exact(ima), domain);
   }
 
   template <typename I, typename Domain>
   sub_image<I, Domain>
-  make_subimage(Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type* = NULL)
+  make_subimage(Image<I>&& ima, const Domain& domain, typename std::enable_if< not is_a<Domain, Image>::value >::type*)
   {
     return sub_image<I, Domain>(move_exact(ima), domain);
   }
@@ -449,14 +449,6 @@ namespace mln
   {
     typedef sub_image<mln_ch_value(typename std::remove_reference<I>::type, V), Domain> type;
   };
-
-
-  template <typename I, typename J, typename D1, typename D2>
-  void resize(sub_image<I, D1>& out, const sub_image<J, D2>& ima)
-  {
-    out.resize(ima);
-  }
-
 
 } // end of namespace mln
 

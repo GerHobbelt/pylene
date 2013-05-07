@@ -39,7 +39,7 @@ namespace mln
     {
       unsigned b = 1;
       auto cwin = make_win(1);
-      mln_foreach(auto dp, nbh.dpoints())
+      mln_foreach(auto dp, nbh.dpoints)
 	while (not cwin.has(dp))
 	  cwin = make_win(++b);
       return b;

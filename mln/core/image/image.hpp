@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_IMAGE_IMAGE_HPP
 # define MLN_CORE_IMAGE_IMAGE_HPP
 
+# include <mln/core/config.hpp>
 # include <mln/core/concept/image.hpp>
 # include <mln/core/image_traits.hpp>
 # include <mln/core/ch_value.hpp>

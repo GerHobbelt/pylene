@@ -12,9 +12,12 @@ namespace mln
     template <typename T>
     struct false_var_t
     {
+      false_var_t(const T& v) : x_(v) {}
+
       constexpr operator bool() const { return false; }
       T& get() { return x_;}
       false_var_t& set(const T& v) { x_ = v; return *this; }
+
 
       T x_;
     };
@@ -54,15 +57,15 @@ namespace mln
 }
 
 # define MLN_DECL_VAR(ID, VALUE)				\
-  if (mln::internal::false_var_t< decltype(VALUE) > ID = {VALUE}) {} else
+  if (mln::internal::false_var_t< decltype(VALUE) > ID = VALUE) {} else
 
 
 # define __mln_should_copy_col__(COL, ID)          \
   decltype(mln::internal::should_copy_col(COL)) ID = mln::internal::should_copy_col(COL)
 
 # define __mln_should_copy_col_local__(COL, ID)				\
-  if (mln::internal::false_var_t< decltype(mln::internal::should_copy_col(COL)) > ID = \
-    {mln::internal::should_copy_col(COL)}) {} else
+  if (mln::internal::false_var_t< decltype(mln::internal::should_copy_col(COL)) > \
+      ID = mln::internal::should_copy_col(COL) ) {} else
 
 
 /******************************************/

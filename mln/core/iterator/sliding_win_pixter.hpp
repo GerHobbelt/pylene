@@ -4,6 +4,7 @@
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/std/array.hpp>
 # include <mln/core/wrt_offset.hpp>
+# include <mln/core/range/size.hpp>
 # include <vector>
 
 namespace mln
@@ -210,6 +211,7 @@ namespace mln
       const P& point() const { return p_; }
       const P& site() const { return p_; }
       image_type& image() const { return *image_; }
+      unsigned index() const { return idx_; }
 
     private:
       template <typename, typename, typename, typename>
@@ -217,6 +219,7 @@ namespace mln
 
       V* v_;
       P  p_;
+      unsigned idx_;
       I* image_;
     };
 
@@ -241,18 +244,23 @@ namespace mln
       sliding_win_pixter_base(const SiteSet& domain, const PixelOrPixelIterator& pix)
 	: bind_ (&pix), domain_(&domain)
       {
-	offset_.resize(domain.size());
+	unsigned sz = rng::size(domain);
+	offset_.resize(sz);
+	indexes_.resize(sz);
 	wrt_offset( this->getpixel(bind_).image(), domain, offset_.begin());
+	wrt_delta_index( this->getpixel(bind_).image(), domain, indexes_.begin());
 	pit_ = domain.iter();
       }
 
       void init() {
 	i_ = 0;
 	p_ = this->getpixel(bind_).point();
-	pit_.init();
+	idx_ = this->getpixel(bind_).index();
 	ptr_ = (char*)(& this->getpixel(bind_).val());
+	pit_.init();
 	mypix_.p_ = p_ + *pit_;
 	mypix_.v_ = (V*)(ptr_ + offset_[0]);
+	mypix_.idx_ = idx_ + indexes_[0];
       }
 
       void next() {
@@ -260,6 +268,7 @@ namespace mln
 	pit_.next();
 	mypix_.p_ = p_ + *pit_;
 	mypix_.v_ = (V*)(ptr_ + offset_[i_]);
+	mypix_.idx_ = idx_ + indexes_[i_];
       }
 
       bool finished() const {
@@ -275,10 +284,12 @@ namespace mln
       const PixelOrPixelIterator* bind_;
       const SiteSet* domain_;
       std::vector<difference_type> offset_;
+      std::vector<difference_type> indexes_;
       typename SiteSet::iterator pit_;
       pixel_t mypix_;
 
       unsigned i_;
+      unsigned idx_;
       char* ptr_;
       P p_;
 
@@ -310,20 +321,24 @@ namespace mln
 	: bind_ (&pix), domain_(&domain)
       {
 	wrt_offset( this->getpixel(bind_).image(), domain, offset_);
+	wrt_delta_index( this->getpixel(bind_).image(), domain, indexes_);
       }
 
       void init() {
 	i_ = 0;
+	idx_ = this->getpixel(bind_).index();
 	p_ = this->getpixel(bind_).point();
 	ptr_ = (char*)(& this->getpixel(bind_).val());
 	mypix_.p_ = p_ + (*domain_)[0];
 	mypix_.v_ = (V*)(ptr_ + offset_[0]);
+	mypix_.idx_ = idx_ + indexes_[0];
       }
 
       void next() {
 	++i_;
 	mypix_.p_ = p_ + (*domain_)[i_];
 	mypix_.v_ = (V*)(ptr_ + offset_[i_]);
+	mypix_.idx_ = idx_ + indexes_[i_];
       }
 
       bool finished() const {
@@ -339,11 +354,13 @@ namespace mln
       const PixelOrPixelIterator* bind_;
       const mln::array<Point, N>* domain_;
       mln::array<difference_type, N> offset_;
+      mln::array<difference_type, N> indexes_;
       pixel_t mypix_;
 
       int i_;
       char* ptr_;
       Point p_;
+      unsigned idx_;
 
     };
 

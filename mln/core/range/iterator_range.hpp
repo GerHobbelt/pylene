@@ -12,6 +12,7 @@ namespace mln
     typedef I iterator;
     typedef I const_iterator;
 
+    iterator_range() = default;
     explicit iterator_range(const iterator& x)
       : iter_ (x)
     {

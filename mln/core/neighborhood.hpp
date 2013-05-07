@@ -12,7 +12,7 @@ namespace mln {
   template <typename Derived, typename SiteSet>
   struct neighborhood_base
   {
-    typedef typename SiteSet::value_type point_type;
+    typedef typename range_value<SiteSet>::type point_type;
 
 
     template <typename Pixel>
@@ -51,6 +51,13 @@ namespace mln {
     const Derived* derived() const { return reinterpret_cast<const Derived*>(this); }
 
   };
+
+  template <typename SiteSet>
+  struct nbh : neighborhood_base< nbh<SiteSet>, SiteSet>
+  {
+    SiteSet dpoints;
+  };
+
 
 } // end of namespace mln
 

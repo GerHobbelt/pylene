@@ -54,6 +54,21 @@ namespace mln {
       }
   }
 
+  template <typename Image, typename SiteSet, typename OutputIterator>
+  inline
+  void wrt_delta_index(const Image& ima, const SiteSet& dpoints, OutputIterator out)
+  {
+    const size_t* strides = ima.index_strides();
+    typedef typename SiteSet::iterator Iterator;
+    auto it = dpoints.iter();
+    for (it.init(); !it.finished(); it.next(), ++out)
+      {
+        *out = 0;
+        for (int i = 0; i < Image::ndim; ++i)
+          *out += strides[i] * (*it)[i];
+      }
+  }
+
 
   template <typename Image, size_t N>
   mln::array<typename Image::difference_type, N>

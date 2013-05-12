@@ -46,7 +46,9 @@ endif()
 
 
 ENABLE_TESTING()
-SUBDIRS(tests bench)
+add_subdirectory(tests)
+add_subdirectory(bench)
+add_subdirectory(apps)
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")

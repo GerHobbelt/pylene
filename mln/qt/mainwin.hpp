@@ -4,7 +4,7 @@
 # include <QMainWindow>
 # include <QGraphicsScene>
 # include <QGraphicsView>
-# include <QGraphicsPixmapItem>
+# include <mln/qt/graphics_pixmap_item.hpp>
 # include <mln/qt/qtimage.hpp>
 
 namespace mln
@@ -14,17 +14,30 @@ namespace mln
 
     class MainWindowBase : public QMainWindow
     {
-      //Q_OBJECT;
+      Q_OBJECT;
 
     public:
       MainWindowBase(QtImageBase* image);
       virtual ~MainWindowBase();
 
     private:
-      QGraphicsPixmapItem       m_pixmap;
+      graphics_pixmap_item      m_pixmap;
       QGraphicsScene*           m_scene;
       QGraphicsView*            m_view;
       QtImageBase* m_ima;
+
+    protected:
+      virtual bool eventFilter(QObject* obj, QEvent* event);
+
+    signals:
+      void pointSelected(const point2d& pt);
+      void pointHover(const point2d& pt);
+
+    public slots:
+      void update();
+
+    protected slots:
+      void onzoom(const QRectF& rect);
     };
 
 

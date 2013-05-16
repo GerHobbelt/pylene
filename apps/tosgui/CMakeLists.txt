@@ -16,12 +16,6 @@ QT4_WRAP_CPP(tosgui_HEADERS_MOC
   dispatcher.hpp
   )
 
-QT4_WRAP_CPP(tosgui_HEADERS_MOC
-  ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.hpp
-  qattribute.hpp
-  dispatcher.hpp
-  )
-
 
 add_executable(tosgui tosgui.cpp qattribute.cpp dispatcher.cpp
                       ${tosgui_HEADERS_MOC}
@@ -50,6 +44,4 @@ target_link_libraries(toscgui
   ${QT_QTMAIN_LIBRARY}
   ${QT_LIBRARIES}
 )
-
-
 

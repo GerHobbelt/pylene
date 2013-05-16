@@ -9,9 +9,13 @@
 #include <mln/morpho/tos/tos.hpp>
 #include <mln/qt/mainwin.hpp>
 #include <apps/tos/Kinterpolate.hpp>
+
 #include <apps/tos/mumford_shah.hpp>
 #include "qattribute.hpp"
 #include "dispatcher.hpp"
+
+#include "tosapp.hpp"
+
 
 int main(int argc, char** argv)
 {
@@ -31,17 +35,13 @@ int main(int argc, char** argv)
   std::vector<unsigned> S;
   image2d<unsigned> parent;
 
-
-
-
-
-
   std::tie(K, parent, S) = morpho::ToS(f, c4);
 
 
   auto Kui8 = transform(K, [](const UInt<9>& v) -> uint8 {
       return v / 2;
     });
+
 
   image2d<float> energy = compute_energy(f, K, parent, S);
   image2d<float> cenergy = close(energy, K, parent, S);
@@ -67,6 +67,15 @@ int main(int argc, char** argv)
 
   //  QObject::connect(&main, SIGNAL(pointSelected(const point2d&)),
   //&wattr, SLOT(plotNode(const point2d&)));
+
+  qt::MainWindow<uint8> main(Kui8);
+  main.show();
+
+  QAttribute<uint8> wattr(Kui8, parent);
+  wattr.show();
+
+  QObject::connect(&main, SIGNAL(pointSelected(const point2d&)),
+		   &wattr, SLOT(plotNode(const point2d&)));
 
 
   // QImage image("../../../img/small.pgm");

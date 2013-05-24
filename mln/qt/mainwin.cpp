@@ -12,7 +12,7 @@ namespace mln
     MainWindowBase::MainWindowBase(QtImageBase* ima)
       : m_ima(ima)
     {
-      m_pixmap.setPixmap(QPixmap::fromImage(*m_ima));
+      m_pixmap.setPixmap(QPixmap::fromImage(m_ima->getQImage()));
 
       m_scene = new QGraphicsScene;
       QObject::connect(m_scene, SIGNAL(sceneRectChanged(const QRectF&)),
@@ -45,12 +45,30 @@ namespace mln
       this->resize(w+10, h+10);
     }
 
+    void
+    MainWindowBase::reset()
+    {
+      m_ima->reset();
+    }
+
+    image2d<rgb8>&
+    MainWindowBase::getView()
+    {
+      return m_ima->getView();
+    }
+
+    const image2d<rgb8>&
+    MainWindowBase::getView() const
+    {
+      return m_ima->getView();
+    }
+
 
     void
     MainWindowBase::update()
     {
       std::cout << "Image updated." << std::endl;
-      m_pixmap.setPixmap(QPixmap::fromImage(*m_ima));
+      m_pixmap.setPixmap(QPixmap::fromImage(m_ima->getQImage()));
     }
 
     bool

@@ -20,11 +20,15 @@ namespace mln
       MainWindowBase(QtImageBase* image);
       virtual ~MainWindowBase();
 
+      void reset();
+      image2d<rgb8>&		getView();
+      const image2d<rgb8>&	getView() const;
+
     private:
       graphics_pixmap_item      m_pixmap;
       QGraphicsScene*           m_scene;
       QGraphicsView*            m_view;
-      QtImageBase* m_ima;
+      QtImageBase*		m_ima;
 
     protected:
       virtual bool eventFilter(QObject* obj, QEvent* event);

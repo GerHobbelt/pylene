@@ -6,22 +6,31 @@
 # include <mln/core/image/image2d.hpp>
 # include <mln/core/grays.hpp>
 # include <mln/core/colors.hpp>
+# include <mln/core/algorithm/transform.hpp>
+# include <mln/core/algorithm/copy.hpp>
 
 namespace mln
 {
   namespace qt
   {
 
-    class QtImageBase : public QImage
+    class QtImageBase
     {
-      //Q_OBJECT;
-
     public:
-      QtImageBase(const uchar * data, int width, int height,
-                  int bytesPerLine, Format format);
+      QtImageBase(int nrows, int ncols, int border);
+      virtual ~QtImageBase() = default;
 
+      const image2d<rgb8>&	getView() const;
+      image2d<rgb8>&		getView();
+      const QImage&		getQImage() const;
+      QImage&			getQImage();
+
+      virtual void reset() = 0;
 
     protected:
+      image2d<rgb8>	m_view;
+      QImage		m_qima;
+
       static QVector<QRgb> default_lut8;
     };
 
@@ -31,6 +40,9 @@ namespace mln
     {
     public:
       QtImage(const image2d<V>& ima);
+
+
+      virtual void reset();
 
     private:
       const image2d<V>& m_ima;
@@ -63,19 +75,32 @@ namespace mln
         static const QImage::Format format = QImage::Format_RGB888;
       };
 
+      template <typename V>
+      void rgb_convert(const image2d<V>& ima, image2d<rgb8>& out);
+
+      template <>
+      inline
+      void rgb_convert<uint8>(const image2d<uint8>& ima, image2d<rgb8>& out)
+      {
+	transform(ima, [] (const uint8& x) { return rgb8{x,x,x}; }, out);
+      }
+
+      template <>
+      inline
+      void rgb_convert<rgb8>(const image2d<rgb8>& ima, image2d<rgb8>& out)
+      {
+	copy(ima, out);
+      }
+
     }
 
 
     template <typename V>
     QtImage<V>::QtImage(const image2d<V>& ima)
-      : QtImageBase((uchar*)&ima(ima.domain().pmin),
-                    ima.ncols(),
-                    ima.nrows(),
-                    ima.strides()[0],
-                    internal::qt_format<V>::format),
+      : QtImageBase(ima.nrows(), ima.ncols(), ima.border()),
         m_ima(ima)
     {
-      mln_precondition(ima.strides()[1] == sizeof(V));
+      reindex(this->m_view, m_ima);
 
       if (internal::qt_format<V>::format == QImage::Format_Indexed8)
         {
@@ -84,8 +109,16 @@ namespace mln
             for (int i = 0; i < 256; ++i)
               this->default_lut8[i] = QColor(i,i,i).rgb();
           }
-          this->setColorTable(this->default_lut8);
+          //this->setColorTable(this->default_lut8);
         }
+      this->reset();
+    }
+
+    template <typename V>
+    void
+    QtImage<V>::reset()
+    {
+      internal::rgb_convert(m_ima, this->m_view);
     }
 
   } // end of namespace mln::qt

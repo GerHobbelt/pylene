@@ -15,6 +15,9 @@
 #include "dispatcher.hpp"
 
 #include "tosapp.hpp"
+#include <apps/tos/mumford_shah.hpp>
+#include "qattribute.hpp"
+#include "dispatcher.hpp"
 
 
 int main(int argc, char** argv)
@@ -42,6 +45,20 @@ int main(int argc, char** argv)
       return v / 2;
     });
 
+  image2d<float> energy = compute_energy(f, K, parent, S);
+  image2d<float> cenergy = close(energy, K, parent, S);
+
+  qt::MainWindow<uint8> w1(Kui8);
+  w1.show();
+
+  QAttribute<uint8> wattr1(Kui8, parent, QString("Gray values"));
+  wattr1.show();
+
+  QAttribute<float> wattr2(energy, parent, QString("Mumford shah"));
+  wattr2.show();
+
+  QAttribute<float> wattr3(cenergy, parent, QString("Mumford shah (clo)"));
+  wattr3.show();
 
   image2d<float> energy = compute_energy(f, K, parent, S);
   image2d<float> cenergy = close(energy, K, parent, S);
@@ -71,11 +88,14 @@ int main(int argc, char** argv)
   qt::MainWindow<uint8> main(Kui8);
   main.show();
 
-  QAttribute<uint8> wattr(Kui8, parent);
-  wattr.show();
+  QDispatcher disp(parent, S);
+  disp.addImageWindow(&w1);
+  disp.addAttribute(&wattr1);
+  disp.addAttribute(&wattr2);
+  disp.addAttribute(&wattr3);
 
-  QObject::connect(&main, SIGNAL(pointSelected(const point2d&)),
-		   &wattr, SLOT(plotNode(const point2d&)));
+  //  QObject::connect(&main, SIGNAL(pointSelected(const point2d&)),
+  //&wattr, SLOT(plotNode(const point2d&)));
 
 
   // QImage image("../../../img/small.pgm");

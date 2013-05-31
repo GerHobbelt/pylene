@@ -159,6 +159,7 @@ namespace mln
       typedef typename boost::mpl::transform<fset, internal::feature_to_accu_helper<T>,
 					     boost::mpl::back_inserter< boost::fusion::list<> > >::type acculist;
 
+      typedef E result_type;
 
       void init()
       {
@@ -192,6 +193,11 @@ namespace mln
 	auto res = boost::fusion::find_if< internal::accu_has_feature<Feature> >(accu.m_accus);
 
 	return extract(*res, feat);
+      }
+
+      const E& to_result() const
+      {
+	return exact(*this);
       }
 
     private:

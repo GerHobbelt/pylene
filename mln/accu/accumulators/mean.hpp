@@ -28,8 +28,9 @@ namespace mln
 
       template <typename A>
       inline
-      typename A::return_type
+      auto
       mean(const Accumulator<A>& acc)
+	-> decltype(extract(exact(acc), features::mean<> ()))
       {
 	return extract(exact(acc), features::mean<> ());
       }

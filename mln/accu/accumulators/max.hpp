@@ -28,8 +28,9 @@ namespace mln
     {
 
       template <typename A>
-      typename A::return_type
+      auto
       max(const Accumulator<A>& acc)
+	-> decltype( extract(exact(acc), features::max<> ()) )
       {
 	return extract(exact(acc), features::max<> ());
       }
@@ -56,7 +57,7 @@ namespace mln
 	template <typename T>
 	struct apply
 	{
-	  typedef accumulators::sum<T, std::less<T> > type;
+	  typedef accumulators::max<T, std::less<T> > type;
 	};
       };
     }
@@ -65,7 +66,7 @@ namespace mln
     {
 
       template <typename T, typename Compare>
-      struct max : accumulator_base< max<T, Compare>, T, T, feature::max<> >
+      struct max : accumulator_base< max<T, Compare>, T, T, features::max<> >
       {
 	typedef T		argument_type;
 	typedef T		return_type;
@@ -91,7 +92,7 @@ namespace mln
 	template <typename Other>
 	void take(const Accumulator<Other>& other)
 	{
-	  T v = extract::max(other);
+	  T v = extractor::max(other);
 	  if (m_cmp(v, m_val))
 	    m_val = v;
 	}

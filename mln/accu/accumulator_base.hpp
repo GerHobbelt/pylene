@@ -28,6 +28,7 @@ namespace mln
       typedef ArgumentType argument_type;
       typedef ResultType   result_type;
       typedef Feature	   feature;
+      typedef boost::mpl::set<Feature> provides;
 
       // You mut implement the following function
       // void init()

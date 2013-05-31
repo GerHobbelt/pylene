@@ -5,6 +5,7 @@
 /// FIXME: use literal::zero instead of default initialization
 
 # include <mln/accu/accumulator_base.hpp>
+# include <mln/core/value/value_traits.hpp>
 # include <utility>
 
 namespace mln
@@ -29,8 +30,9 @@ namespace mln
     {
 
       template <typename A>
-      typename A::return_type
+      auto
       min(const Accumulator<A>& acc)
+	-> decltype( extract(exact(acc), features::min<> ()) )
       {
 	return extract(exact(acc), features::min<> ());
       }
@@ -57,7 +59,7 @@ namespace mln
 	template <typename T>
 	struct apply
 	{
-	  typedef accumulators::sum<T, std::less<T> > type;
+	  typedef accumulators::min<T, std::less<T> > type;
 	};
       };
     }

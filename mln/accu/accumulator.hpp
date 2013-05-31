@@ -40,7 +40,7 @@ namespace mln
       typename A::result_type
       operator() (const Accumulator<A>& accu) const
       {
-	return accu.to_result();
+	return exact(accu).to_result();
       }
     };
 

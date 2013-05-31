@@ -29,8 +29,9 @@ namespace mln
     {
 
       template <typename A>
-      typename A::return_type
+      auto
       sum(const Accumulator<A>& acc)
+	-> decltype( extract(exact(acc), features::sum<> ()) )
       {
 	return extract(exact(acc), features::sum<> ());
       }

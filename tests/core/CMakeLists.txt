@@ -49,10 +49,12 @@ add_executable(copy algorithm/copy.cpp)
 add_executable(fill algorithm/fill.cpp)
 add_executable(paste algorithm/paste.cpp)
 add_executable(equal algorithm/equal.cpp)
+add_executable(accumulate algorithm/accumulate.cpp)
 add_executable(sort_indexes algorithm/sort_indexes.cpp)
 
 
 add_test(copy copy)
+add_test(accumulate accumulate)
 add_test(fill fill)
 add_test(paste paste)
 add_test(equal equal)

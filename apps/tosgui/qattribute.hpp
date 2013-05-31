@@ -5,9 +5,14 @@
 
 #include <QEvent>
 #include <QMouseEvent>
+#include <QSlider>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
+
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/accu/accumulators/min.hpp>
+#include <mln/accu/accumulators/max.hpp>
 
 namespace mln
 {
@@ -25,6 +30,9 @@ namespace mln
     virtual void plotNode(const point2d& pt) = 0;
 
   protected:
+    virtual void showFilteringWindow() = 0;
+
+
     QwtPlotPicker*		picker;
     QwtPlotCurve*		m_curve;
     QVector<QPointF>		m_data;
@@ -45,10 +53,16 @@ namespace mln
     virtual bool eventFilter(QObject* obj, QEvent *ev);
 
   private:
+    virtual void showFilteringWindow();
+
+
     const image2d<V>&		m_attr;
     const image2d<unsigned>&	m_parent;
     unsigned			m_current;
     unsigned			m_num_nodes;
+
+    std::pair<V,V>		m_minmax;
+    QSlider*			m_slider;
   };
 
 
@@ -65,6 +79,10 @@ namespace mln
       m_parent (parent),
       m_current (-1)
   {
+    auto acc = accumulate(m_attr, accu::features::min<> () & accu::features::max<> ());
+
+    m_minmax.first = accu::extractor::min(acc);
+    m_minmax.second = accu::extractor::max(acc);
   }
 
   template <typename V>
@@ -98,6 +116,15 @@ namespace mln
     this->m_data[0].setY(m_attr[x]);
     this->m_curve->setSamples(m_data);
     this->replot();
+  }
+
+  template <typename V>
+  void
+  QAttribute<V>::showFilteringWindow()
+  {
+    m_slider = new QSlider();
+    m_slider->setWindowTitle("Attribute filtering");
+    m_slider->show();
   }
 
   template <typename V>

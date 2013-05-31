@@ -23,6 +23,15 @@ namespace mln
   }
 
   void
+    QDispatcher::addImageWindowToFilter(qt::MainWindowBase* win,
+                                        const image2d<rgb8>& mean)
+  {
+    m_fwins.push_back(std::make_pair(win, mean));
+    QObject::connect(win, SIGNAL(pointSelected(const point2d&)),
+		     this, SLOT(onPointSelected(const point2d&)));
+  }
+
+  void
   QDispatcher::addAttribute(QAttributeBase* attr)
   {
     m_attributes.push_back(attr);
@@ -30,6 +39,8 @@ namespace mln
     QObject::connect(attr, SIGNAL(nodeSelected(const point2d&)),
 		     this, SLOT(onNodeSelected(const point2d&)));
   }
+
+
 
   void
   QDispatcher::onNodeSelected(const point2d& p)
@@ -43,6 +54,9 @@ namespace mln
 
     for (qt::MainWindowBase* win : m_windows)
       this->doNodeSection(win);
+
+    for (auto& win : m_fwins)
+      this->doFiltering(win);
   }
 
   void
@@ -87,6 +101,24 @@ namespace mln
     mln_foreach(auto& v, x.values()) {
       v[0] = v[0] / 2 + 128;
     }
+
+    win->update();
+  }
+
+  void
+  QDispatcher::doFiltering(std::pair<qt::MainWindowBase*, image2d<rgb8> >& obj)
+  {
+    qt::MainWindowBase* win = obj.first;
+    image2d<rgb8>& view = obj.first->getView();
+    image2d<rgb8>& mean = obj.second;
+    win->reset();
+
+    for (unsigned x: m_S)
+      if (m_mask_selection[m_parent[x]]) {
+        view[x] = view[m_parent[x]];
+      } else if (m_mask_selection[x]) {
+        view[x] = mean[x];
+      }
 
     win->update();
   }

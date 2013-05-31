@@ -1,9 +1,11 @@
 #include <QApplication>
 #include <QtGui>
 
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/algorithm/transform.hpp>
+#include <mln/accu/accumulators/mean.hpp>
 
 #include <mln/io/imread.hpp>
 
@@ -44,6 +46,47 @@ namespace mln
     return out;
   }
 
+
+  template <typename V, typename W>
+  image2d<V>
+  set_mean_on_node(const image2d<V>& ima,
+                   const image2d<W>& K,
+                   const std::vector<unsigned>& S,
+                   const image2d<unsigned>& parent)
+  {
+    typedef accu::accumulators::mean<V, vec3u> Acc;
+
+    image2d<V> mean;
+    image2d<Acc> accus;
+
+    resize(accus, ima);
+    resize(mean, ima);
+
+    // Accumulate
+    {
+      for (int i = S.size()-1; i > 0 ; --i)
+	{
+	  unsigned k = S[i];
+	  if (K1::is_face_2(ima.point_at_index(k)))
+            accus[k].take(ima[k]);
+	  accus[parent[k]].take(accus[k]);
+	}
+      accus[S[0]].take(ima[S[0]]);
+    }
+
+    // reconstruct
+    {
+      mean[S[0]] = (V) accu::extractor::mean(accus[S[0]]);
+      for (unsigned k : S)
+	{
+	  if (K[parent[k]] != K[k])
+	    mean[k] = (V) accu::extractor::mean(accus[k]);
+	  else
+	    mean[k] = mean[parent[k]];
+	}
+    }
+    return mean;
+  }
 
 }
 
@@ -124,6 +167,11 @@ int main(int argc, char** argv)
   qt::MainWindow<rgb8> w2(f2);
   w2.show();
 
+  auto mean = set_mean_on_node(f2, K, S, parent);
+  qt::MainWindow<rgb8> w3(f2);
+  w3.show();
+
+
   QAttribute<unsigned> wattr1(K, parent, QString("Gray values"));
   wattr1.show();
 
@@ -137,6 +185,7 @@ int main(int argc, char** argv)
   QDispatcher disp(parent, S);
   disp.addImageWindow(&w1);
   disp.addImageWindow(&w2);
+  disp.addImageWindowToFilter(&w3, mean);
   disp.addAttribute(&wattr1);
   disp.addAttribute(&wattr2);
   disp.addAttribute(&wattr3);

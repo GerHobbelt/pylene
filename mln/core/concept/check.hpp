@@ -42,18 +42,22 @@ namespace mln
   template <bool condition>
   using check_t = std::integral_constant<bool, condition>;
 
+  inline
   void check(std::true_type)
   {
   }
 
+  inline
   void check(std::true_type, std::string)
   {
   }
 
+  inline
   void check_false(std::false_type)
   {
   }
 
+  inline
   void check_false(std::false_type, std::string)
   {
   }

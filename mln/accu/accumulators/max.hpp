@@ -85,7 +85,7 @@ namespace mln
 
 	void take(const T& v)
 	{
-	  if (m_cmp(v, m_val))
+	  if (m_cmp(m_val, v))
 	    m_val = v;
 	}
 
@@ -93,7 +93,7 @@ namespace mln
 	void take(const Accumulator<Other>& other)
 	{
 	  T v = extractor::max(other);
-	  if (m_cmp(v, m_val))
+	  if (m_cmp(m_val, v))
 	    m_val = v;
 	}
 

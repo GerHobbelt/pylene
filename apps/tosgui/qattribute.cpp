@@ -25,4 +25,11 @@ namespace mln
     this->canvas()->installEventFilter(this);
   }
 
+  void
+  QAttributeBase::keyReleaseEvent(QKeyEvent* event)
+  {
+    if (event->key() == Qt::Key_F)
+      this->showFilteringWindow();
+  }
+
 }

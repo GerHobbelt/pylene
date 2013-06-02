@@ -6,6 +6,9 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QSlider>
+#include <QKeyEvent>
+#include <QSlider>
+
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -25,12 +28,17 @@ namespace mln
 
   signals:
     void nodeSelected(const point2d& pt);
+    void nodeSelected(const image2d<bool>& pts);
 
   public slots:
     virtual void plotNode(const point2d& pt) = 0;
 
+  protected slots:
+    virtual void onSliderReleased() = 0;
+
   protected:
     virtual void showFilteringWindow() = 0;
+    virtual void keyReleaseEvent(QKeyEvent* event);
 
 
     QwtPlotPicker*		picker;
@@ -53,6 +61,7 @@ namespace mln
     virtual bool eventFilter(QObject* obj, QEvent *ev);
 
   private:
+    virtual void onSliderReleased();
     virtual void showFilteringWindow();
 
 
@@ -124,7 +133,15 @@ namespace mln
   {
     m_slider = new QSlider();
     m_slider->setWindowTitle("Attribute filtering");
+    m_slider->setMinimum(m_minmax.first);
+    m_slider->setMaximum(m_minmax.second);
+    m_slider->setOrientation(Qt::Horizontal);
     m_slider->show();
+    std::cout << "Show filtering " << m_minmax.first << " / "
+              << m_minmax.second << std::endl;
+
+    QObject::connect(m_slider, SIGNAL(sliderReleased()),
+                     this, SLOT(onSliderReleased()));
   }
 
   template <typename V>
@@ -149,6 +166,18 @@ namespace mln
       return false;
     }
     return QAttributeBase::eventFilter(obj, event);
+  }
+
+  
+
+
+  template <typename V>
+  void
+  QAttribute<V>::onSliderReleased()
+  {
+    int lambda = m_slider->value();
+    std::cout << "Filtering with lambda < " << lambda << std::endl;
+    image2d<bool> mask = eval(m_attr < lambda);
   }
 
 }

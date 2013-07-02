@@ -1,452 +1,257 @@
 # include <mln/core/image/image2d.hpp>
-# include <mln/core/value/value_traits.hpp>
-# include <mln/core/wrt_offset.hpp>
-# include <mln/core/extension/fill.hpp>
-# include <mln/morpho/tos/irange.hpp>
-# include <mln/morpho/tos/immerse.hpp>
-# include <mln/morpho/tos/pset.hpp>
-# include <mln/morpho/tos/tos.hpp>
-# include <mln/core/neighb2d.hpp>
-# include <mln/io/imread.hpp>
-# include <mln/core/trace.hpp>
 
-#include "topology.hpp"
-#include "Kinterpolate.hpp"
+# include <mln/io/imread.hpp>
+# include <mln/io/imsave.hpp>
+
+# include <mln/core/algorithm/paste.hpp>
+
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/colorToSGrad.hpp>
+#include <apps/tos/mumford_shah.hpp>
+#include <apps/tos/addborder.hpp>
+#include <apps/tos/set_mean_on_nodes.hpp>
+#include <apps/tos/objdetection.hpp>
+#include <boost/format.hpp>
+
+namespace mln
+{
+  /*
+  inline
+  unsigned
+  zfindroot(image2d<unsigned>& par, unsigned x)
+  {
+    if (par[x] != x)
+      par[x] = zfindroot(par, par[x]);
+    return par[x];
+  }
+
+
+  template <typename V>
+  void
+  getObjects(const image2d<float>& energy,
+	     image2d<V>& K,
+	     image2d<unsigned>& parent,
+	     const std::vector<unsigned>& S,
+	     unsigned seuil)
+  {
+    static const unsigned NullNode = -1;
+
+    struct child_t {
+      unsigned first_child = -1;
+      unsigned next_sibling = -1;
+    };
+
+    trace::entering("Meaningfull line detection");
+
+    // Copy energy of nodes and set child relation
+    std::vector< std::pair<unsigned, float> > E;
+    image2d<child_t> crel;
+    resize(crel, K);
+
+    for (unsigned x: S)
+      if (K[parent[x]] != K[x]) {
+	E.push_back(std::make_pair(x, energy[x]));
+	unsigned y = crel[parent[x]].first_child;
+	if (y == NullNode)
+	  crel[parent[x]].first_child = x;
+	else  {
+	  while (crel[y].next_sibling != NullNode)
+	    y = crel[y].next_sibling;
+	  crel[y].next_sibling = x;
+	}
+      }
+
+    // Sort
+    std::sort(E.begin(), E.end(), [](const std::pair<unsigned, float>& a, const std::pair<unsigned, float>& b) {
+	return a.second < b.second; });
+
+
+    // Union-find
+    unsigned n = E.size();
+    image2d<unsigned> par;
+    image2d<unsigned> area;
+    resize(par, K);
+    resize(area, K);
+
+    unsigned num_node_deleted = 0;
+    unsigned num_node_kept = 0;
+
+    for (unsigned i = 0; i < n; ++i)
+      {
+	unsigned x = E[i].first;
+	par[x] = x;
+	area[x] = 1;
+
+	// Visist Nbh
+	// Parent First
+	{
+	  unsigned y = zfindroot(par, parent[x]);
+	  if (y != x) {
+	    par[y] = x;
+	    area[x] += area[y];
+	  }
+	}
+	// Children next
+	{
+	  unsigned y = crel[x].first_child;
+	  if (y != NullNode)
+	    do {
+	      unsigned r = zfindroot(par, y);
+	      if (r != x) {
+		par[r] = x;
+		area[x] += area[r];
+	      }
+	      y = crel[y].next_sibling;
+	    } while (y != NullNode);
+	}
+	if (area[x] < seuil)
+	  num_node_deleted++;
+	else
+	  num_node_kept++;
+      }
+
+    // simplify, remove non significant level lines
+    // AND RECANONIZE !
+    {
+      for (unsigned x: S) {
+	if (area[x] < seuil) {
+	  K[x] = K[parent[x]];
+	}
+	unsigned q = parent[x];
+	if (K[q] == K[parent[q]])
+	  parent[x] = parent[q];
+      }
+    }
+
+    std::cout << "Level line removed: " << num_node_deleted << std::endl
+	      << "Level line kept: " << num_node_kept << std::endl;
+
+    trace::exiting();
+  }
+  */
+
+} // end of mln
 
 
 namespace mln
 {
 
-    struct energy_t {
-      bool dejavu = false;
-      int depth = -1;
-      int m_e_length = 0;
-      float m_e_sumcurv = 0;
-      int m_v_n_int = 0;
-      int m_v_sum_int = 0;
-      int m_v_sum_int_sqr = 0;
-      int m_v_n_ext = 0;
-      int m_v_sum_ext = 0;
-      int m_v_sum_ext_sqr = 0;
-
-      float energy() const
-      {
-	const float alpha = 60;
-	const float beta = 2;
-	auto sqr = [](float x) { return x*x; };
-
-	float Vin = m_v_sum_int_sqr - sqr(m_v_sum_int) / m_v_n_int;
-	float Vout = m_v_n_ext == 0 ? 0 : m_v_sum_ext_sqr - sqr(m_v_sum_ext) / m_v_n_ext;
-	float Eext = (Vin + Vout) / ((m_v_sum_int_sqr + m_v_sum_ext_sqr) -
-				     sqr(m_v_sum_int + m_v_sum_ext) / (m_v_n_ext + m_v_n_int));
-
-	float Eint = m_e_sumcurv / m_e_length;
-	float Econ = 1 / m_e_length;
-	return alpha * Eint + Eext + beta * Econ;
-      }
-
-      friend
-      std::ostream&
-      operator <<(std::ostream& os, const energy_t& acc)
-      {
-	return os << "Contour length: " <<  acc.m_e_length << std::endl
-		  << "Curvature: " << acc.m_e_sumcurv << std::endl
-		  << "Internal Vertex: " << acc.m_v_n_int << std::endl
-		  << "External Vertex: " << acc.m_v_n_ext << std::endl
-		  << "Energy: " << acc.energy() << std::endl;
-      }
-
-    };
-
-
-
-
-  /// \pre x and y must be canonical elements
-  unsigned
-  common_ancestor(unsigned x, unsigned y, const image2d<energy_t>& e, const image2d<unsigned>& parent)
+  template <typename V>
+  image2d<unsigned>
+  make_unique_id(const image2d<V>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S)
   {
-    while (x != y) {
-      if (e[x].depth > e[y].depth)
-	x = parent[x];
+    image2d<unsigned> out;
+    resize(out, K);
+    for (unsigned x: S)
+      if (K[x] == K[parent[x]])
+	out[x] = parent[x];
       else
-	y = parent[y];
-    }
-    return x;
+	out[x] = x;
+    return out;
   }
-
-  template <typename Iterator, typename V>
-  unsigned
-  common_ancestor(Iterator x, const image2d<energy_t>& e, const image2d<unsigned>& parent, const image2d<V>& K)
-  {
-    std::vector<unsigned> v;
-    int mindepth = value_traits<int>::max();
-    mln_forall(x) {
-      if (!K.domain().has(x->point()))
-	continue;
-
-      unsigned i = x->index();
-      i = (K[i] == K[parent[i]]) ? parent[i] : i;
-      v.push_back(i);
-      if (e[i].depth < mindepth)
-	mindepth = e[i].depth;
-    }
-
-    bool modif = true;
-    while (modif)
-      {
-	modif = false;
-	for(unsigned& i: v)
-	  if (e[i].depth > mindepth)
-	    {
-	      i = parent[i];
-	      modif = true;
-	      if (e[i].depth < mindepth)
-		mindepth = e[i].depth;
-	    }
-
-	if (!modif) {
-	  bool alleq = std::all_of(v.begin(), v.end(), [&](unsigned x) { return x == v[0]; });
-	  if (!alleq)
-	    for(unsigned& i: v)
-	      {
-		i = parent[i];
-		modif = true;
-		if (e[i].depth < mindepth)
-		  mindepth = e[i].depth;
-	      }
-	}
-      }
-
-    return v[0];
-  }
-
-  template <typename V>
-  image2d<float>
-  curvature_on_edge(const image2d<V>& ima)
-  {
-    typedef decltype(V() + V()) Vec;
-
-    trace::entering("mln::curvature_on_edge");
-
-    //auto norm = [] (const Vec& x) -> int { return std::abs(x[0] + x[1] + x[2]); };
-    auto norm = [] (const Vec& x) -> int { return std::abs(x); };
-    auto sqr = [] (float x) -> float { return x*x; };
-
-    auto domain = ima.domain();
-    domain.pmin *= 2;
-    domain.pmax = domain.pmax * 2 - 1;
-    image2d<float> curv(domain, ima.border(), 0);
-
-    mln_foreach(const point2d& p, ima.domain())
-      {
-	// Right edge
-	{
-	  int ux = norm((ima.at(p + point2d{0,1}) - ima.at(p)));
-	  int uy = norm( (ima.at(p + point2d{1,0}) - ima.at(p + point2d{-1,0}) +
-			  ima.at(p + point2d{1,1}) - ima.at(p + point2d{-1,1})) / 4 );
-
-	  //std::cout << p << " " << ux << " " << (- ima.at(p + point2d{-1,0})) << ":" << uy << std::endl;
-
-	  int uxx = norm( ima.at(p + point2d{0,-1}) - ima.at(p)
-			  -ima.at(p + point2d{0,1}) + ima.at(p + point2d{0,2}) / 2);
-
-	  int uyy = norm( ima.at(p + point2d{-1,0}) + ima.at(p + point2d{-1,1})
-			  -2 * (ima.at(p) + ima.at(p + point2d{0,1}))
-			  + ima.at(p + point2d{1,0}) + ima.at(p + point2d{1,1}) / 2);
-
-	  int uxy = norm( ( ima.at(p + point2d{1,0}) - ima.at(p + point2d{-1,0}) +
-			    ima.at(p + point2d{1,1}) - ima.at(p + point2d{-1,1})) / 2 );
-
-	  float den = (sqr(ux) + sqr(uy));
-	  point2d p_ = p * 2 + point2d{0,1};
-	  if (den != 0)
-	    curv.at(p_) = std::abs((uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux)) / (den * std::sqrt(den)));
-	  else
-	    curv.at(p_) = 0;
-	}
-
-	// Bottom edge
-	{
-	  int uy = norm((ima.at(p + point2d{1,0}) - ima.at(p)));
-
-	  int ux = norm( (ima.at(p + point2d{0,1}) - ima.at(p + point2d{0,-1}) +
-			  ima.at(p + point2d{1,1}) - ima.at(p + point2d{1,-1})) / 4 );
-
-	  int uxx = norm( ima.at(p + point2d{-1,0}) - ima.at(p)
-			  -ima.at(p + point2d{1,0}) + ima.at(p + point2d{2,0}) / 2);
-
-	  int uyy = norm( ima.at(p + point2d{0,-1}) + ima.at(p + point2d{1,-1})
-			  -2 * (ima.at(p) + ima.at(p + point2d{1,0}))
-			  + ima.at(p + point2d{0,1}) + ima.at(p + point2d{1,1}) / 2);
-
-	  int uxy = norm( ( ima.at(p + point2d{0,-1}) - ima.at(p + point2d{1,0})
-			   -ima.at(p + point2d{1,-1}) + ima.at(p + point2d{1,1})) / 2 );
-
-	  float den = (sqr(ux) + sqr(uy));
-	  point2d p_ = p * 2 + point2d{1,0};
-	  if (den != 0)
-	    curv.at(p_) = std::abs((uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux)) / (den * std::sqrt(den)));
-	  else
-	    curv.at(p_) = 0;
-	}
-      }
-
-    trace::exiting();
-    return curv;
-  }
-
-  template <typename V>
-  image2d<float>
-  close(const image2d<float>& energy, const image2d<V>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S)
-  {
-    image2d<float> imdilate = clone(energy);
-
-    // Dilate
-    for (int i = S.size()-1; i >= 0; --i)
-      {
-	unsigned x = S[i];
-	unsigned q = parent[x];
-	if (K[x] != K[q])
-	  {
-	    imdilate[x] = std::max(imdilate[x], energy[q]);
-	    imdilate[q] = std::max(imdilate[q], energy[x]);
-	  }
-      }
-
-    // Erode
-    image2d<float> imerode = clone(imdilate);
-    for (int i = S.size()-1; i >= 0; --i)
-      {
-	unsigned x = S[i];
-	unsigned q = parent[x];
-	if (K[x] != K[q])
-	  {
-	    imerode[x] = std::min(imerode[x], imdilate[q]);
-	    imerode[q] = std::min(imerode[q], imdilate[x]);
-	  }
-      }
-
-    return imerode;
-  }
-
-
-  template <typename V>
-  image2d<float>
-  compute_energy(const image2d<V>& ima, const image2d<V>& K, image2d<unsigned>& parent, const std::vector<unsigned>& S,
-		 int eps = 5)
-  {
-    extension::fill(ima, ima(ima.domain().pmin));
-
-    image2d<float> curv = curvature_on_edge(ima);
-
-    trace::entering("mln::compute_energy");
-
-    image2d<energy_t> acc;
-    resize(acc, K);
-
-    //io::imprint(ima);
-    //io::imprint(curv);
-
-    // Compute depth attribute
-    acc[S[0]].depth = 0;
-    for (unsigned i = 1; i < S.size(); ++i)
-      {
-	unsigned x = S[i];
-	if (K[x] != K[parent[x]]) // canonical element
-	  acc[x].depth = acc[parent[x]].depth + 1;
-      }
-
-
-    // Compute attribute about edges
-    {
-      auto c4_idx = wrt_delta_index(curv, c4.dpoints);
-      acc[S[0]].m_e_length = 4;
-      for (int i = S.size()-1; i > 0; --i)
-	{
-	  unsigned x = S[i];
-	  if (K1::is_face_2(K.point_at_index(x))) {
-	    acc[x].m_e_length += 4;
-	    mln_foreach(int i, c4_idx) {
-	      mln_assertion(K1::is_face_1(curv.point_at_index(x + i)));
-	      acc[x].m_e_sumcurv += curv[x + i];
-	    }
-	  }
-	  else if (K1::is_face_1(K.point_at_index(x))) {
-	    acc[x].m_e_length += -2;
-	    acc[x].m_e_sumcurv -= 2 * curv[x];
-	  }
-	  acc[parent[x]].m_e_length += acc[x].m_e_length;
-	  acc[parent[x]].m_e_sumcurv += acc[x].m_e_sumcurv;
-	}
-    }
-
-
-
-    typedef iterator_range< stditerator<std::vector<point2d>::const_iterator> > Vec;
-    typedef nbh< Vec > Nbh;
-    Nbh ball;
-    std::vector<point2d> dpoints;
-    for (int i = -eps*2; i <= eps*2; i += 2)
-      for (int j = -eps*2; j <= eps*2; j += 2)
-	dpoints.emplace_back(i,j);
-
-    ball.dpoints = make_iterator_range(stditerator< std::vector<point2d>::const_iterator >(dpoints.begin(),dpoints.end()));
-
-    // FIX TO HANDLE THE ROOT CORRECTLY
-    parent[S[0]] = (unsigned) -1;
-
-    // Compute attribute about internal area of components
-    {
-      mln_pixter(px, K);
-      mln_iter(nx, ball(px));
-      mln_forall(px)
-      {
-	if (K1::is_face_2(px->point()))
-	  {
-	    unsigned x = px->index();
-	    x = (x != S[0] and K[x] == K[parent[x]]) ? parent[x] : x;
-
-	    unsigned y = 0;
-	    mln_forall(nx) {
-	      if (!K.domain().has(nx->point()))
-		{
-		  y = (unsigned) -1; // This pixel is on the border
-		  break;
-		}
-	    }
-
-	    if (y == 0)
-	      y = common_ancestor(nx, acc, parent, K);
-
-	    while (x != y)
-	      {
-		// p in Xint
-		acc[x].m_v_n_int += 1;
-		acc[x].m_v_sum_int += px->val();
-		acc[x].m_v_sum_int_sqr += px->val() * px->val();
-		x = parent[x];
-	      }
-	  }
-      }
-    }
-
-    // RESTORE ROOT
-    parent[S[0]] = S[0];
-
-    // Compute attribute about external area of components
-    {
-      mln_pixter(px, K);
-      mln_iter(nx, ball(px));
-
-      std::vector< std::pair<unsigned, unsigned> > branches;
-      mln_forall(px)
-      {
-	if (K1::is_face_2(px->point()))
-	  {
-	    unsigned r = px->index();
-	    r = (K[r] == K[parent[r]]) ? parent[r] : r;
-	    branches.clear();
-
-	    mln_forall(nx)
-	    {
-	      if (!K.domain().has(nx->point()))
-		continue;
-
-	      unsigned x = nx->index();
-	      x = (K[x] == K[parent[x]]) ? parent[x] : x;
-
-	      unsigned y = common_ancestor(x, r, acc, parent);
-	      branches.emplace_back(x,y);
-
-	      while (x != y)
-		{
-		  if (acc[x].dejavu) {
-		    x = parent[x];
-		    continue;
-		  }
-		  // p in Xint
-		  acc[x].m_v_n_ext += 1;
-		  acc[x].m_v_sum_ext += px->val();
-		  acc[x].m_v_sum_ext_sqr += px->val() * px->val();
-		  acc[x].dejavu = true;
-		  x = parent[x];
-		}
-	    }
-
-	    unsigned x,y;
-	    for (auto v: branches) {
-	      std::tie(x,y) = v;
-	      while (x != y) {
-		acc[x].dejavu = false;
-		x = parent[x];
-	      }
-	    }
-
-	  }
-      }
-    }
-
-    
-    // Display
-    {
-      image2d<bool> bdebug;
-      resize(bdebug, K).init(false);
-
-      for (int i = S.size()-1; i >= 0; --i)
-	{
-	  unsigned p = S[i];
-	  bdebug[p] = true;
-	  if (p == parent[p] or K[p] != K[parent[p]]) {
-	    std::cout << "=================" << std::endl
-		      << "Process: " << p << std::endl << acc[p] << std::endl;
-	    Kdisplay(bdebug);
-	  }
-	}
-    }
-
-
-    // make enery image
-    image2d<float> energy;
-    resize(energy, acc);
-    {
-      for (unsigned x : S)
-	{
-	  if (K[x] != K[parent[x]] or x == parent[x])
-	    energy[x] = acc[x].energy();
-	}
-    }
-
-    trace::exiting();
-
-    return energy;
-  }
-
 
 }
-
-
+void usage(char** argv)
+{
+  std::cout << "Usage: " << argv[0] << " input(color) output[wo ext] lambda [lambda_2...]" << std::endl
+	    << "Perform a simplification of the ToS by removing non significant"
+	    << "level lines. A closing in shape space in performed." << std::endl
+	    << "Param:" << std::endl
+	    << "lambda: minimal grain size (in shape space)" << std::endl
+	    << std::endl;
+  std::terminate();
+}
 
 
 int main(int argc, char** argv)
 {
-  if (argc != 2)
-    std::cerr << "Usage: " << argv[0] << " ima.pgm" << std::endl;
+  static const bool use_tos = true;
+
+  if (argc < 4)
+    usage(argv);
 
   using namespace mln;
-  image2d<uint8> ima;
+  image2d<rgb8> ima;
   io::imread(argv[1], ima);
 
 
-  auto f = interpolate_median(ima, UInt<9> ());
+  //auto f = interpolate_median(ima, UInt<9> ());
 
-  image2d< UInt<9> > K;
+
+  image2d<rgb8> ima_ = addborder(ima);
+  image2d<rgb8> f = interpolate_k1(ima_);
+
+  image2d<unsigned> K;
   std::vector<unsigned> S;
   image2d<unsigned> parent;
-  std::tie(K, parent, S) = morpho::ToS(f, c4);
 
-  image2d<float> energy = compute_energy(f, K, parent, S);
+  image2d<rgb8> out, final;
+  resize(out, K);
+  resize(final, ima);
 
-  io::imprint(energy);
-  energy = close(energy, K, parent, S);
-  io::imprint(energy);
+
+  // case 1 with tos
+  if (!use_tos)
+    {
+      colorToSGrad_with_mintree(ima, K, parent, S);
+
+      image2d<float> energy = compute_energy(f, K, parent, S);
+      image2d<unsigned> ids = make_unique_id(K, parent, S);
+
+      for (int i = 3; i < argc; ++i)
+	{
+	  int lambda = std::atoi(argv[i]);
+	  auto cIds = clone(ids);
+	  auto cParent = clone(parent);
+	  auto cEnergy = clone(energy);
+
+	  getObjects(cEnergy, cIds, cParent, S, lambda);
+	  out = set_mean_on_node(f, cIds, S, cParent, K1::is_face_2);
+
+	  {
+	    box2d d = out.domain();
+	    sbox2d sub_domain { {2,2}, {d.pmax[0]-2, d.pmax[1]-2}, {2,2} };
+	    copy(out | sub_domain, final);
+	  }
+
+	  if (argc == 4)
+	    io::imsave(final, (std::string(argv[2]) + ".tiff").c_str());
+	  else
+	    io::imsave(final, (boost::format("%s-%06i.tiff") % argv[2] % lambda).str().c_str());
+	}
+
+    }
+  else
+    {
+      colorToSGrad(ima, K, parent, S);
+      //colorToSGrad_f2(ima, K, parent, S);
+
+      image2d<float> energy = compute_energy(f, K, parent, S);
+      //image2d<float> energy = compute_energy(ima, K, parent, S);
+      image2d<unsigned> ids = make_unique_id(K, parent, S);
+
+      for (int i = 3; i < argc; ++i)
+	{
+	  int lambda = std::atoi(argv[i]);
+	  auto cIds = clone(ids);
+	  auto cParent = clone(parent);
+	  auto cEnergy = clone(energy);
+
+	  getObjects(cEnergy, cIds, cParent, S, lambda);
+	  out = set_mean_on_node(interpolate_k1(f), cIds, S, cParent, K1::is_face_2);
+	  //out = set_mean_on_node(f, cIds, S, cParent, K1::is_face_2);
+
+	  {
+	    box2d d = out.domain();
+	    //sbox2d sub_domain { {2,2}, {d.pmax[0]-2, d.pmax[1]-2}, {2,2} };
+	    sbox2d sub_domain { {4,4}, {d.pmax[0]-4, d.pmax[1]-4}, {4,4} };
+	    copy(out | sub_domain, final);
+	  }
+
+	  if (argc == 4)
+	    io::imsave(final, (std::string(argv[2]) + ".tiff").c_str());
+	  else
+	    io::imsave(final, (boost::format("%s-%06i.tiff") % argv[2] % lambda).str().c_str());
+	}
+    }
 }

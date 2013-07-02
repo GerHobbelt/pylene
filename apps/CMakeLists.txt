@@ -1,2 +1,5 @@
+add_subdirectory(tests)
 add_subdirectory(imview)
 add_subdirectory(maxtree_comparison)
+add_subdirectory(simplification)
+

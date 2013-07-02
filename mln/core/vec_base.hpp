@@ -2,6 +2,7 @@
 # define MLN_INTERNAL_VEC_BASE_HH
 
 # include <mln/core/literal/vectorial.hpp>
+# include <type_traits>
 
 
 // FIXME:
@@ -156,6 +157,9 @@
       r.v_[i] = y Op x.v_[i];						\
     return r;								\
   }
+
+
+
 
 namespace mln
 {
@@ -523,6 +527,37 @@ namespace mln
   typedef vec<float, 1>		vec1f;
   typedef vec<float, 2>		vec2f;
   typedef vec<float, 3>		vec3f;
+}
+
+/*********************************/
+/**          Traits              */
+/*********************************/
+
+namespace std
+{
+
+  template <typename T, unsigned dim, typename tag>
+  struct is_signed< mln::internal::vec_base<T, dim, tag> > : is_signed<T>
+  {
+  };
+
+  template <typename T, unsigned dim, typename tag>
+  struct is_unsigned< mln::internal::vec_base<T, dim, tag> > : is_unsigned<T>
+  {
+  };
+
+  template <typename T, unsigned dim, typename tag>
+  struct make_signed< mln::internal::vec_base<T, dim, tag> >
+  {
+    typedef mln::internal::vec_base< typename make_signed<T>::type, dim, tag > type;
+  };
+
+  template <typename T, unsigned dim, typename tag>
+  struct make_unsigned< mln::internal::vec_base<T, dim, tag> >
+  {
+    typedef mln::internal::vec_base< typename make_unsigned<T>::type, dim, tag > type;
+  };
+
 }
 
 # ifdef _MSC_VER

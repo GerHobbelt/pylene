@@ -27,12 +27,70 @@ namespace mln
   template <unsigned nbits>
   struct Int;
 
+} // end of namespace mln
+
   /******************************************/
   /****              traits              ****/
   /******************************************/
 
+namespace std
+{
   template <unsigned nbits>
-  struct value_traits<UInt<nbits>, std::less< UInt<nbits> >, void>
+  struct is_arithmetic< mln::UInt<nbits> > : std::true_type
+  {
+  };
+
+  template <unsigned nbits>
+  struct is_arithmetic< mln::Int<nbits> > : std::true_type
+  {
+  };
+
+  template <unsigned nbits>
+  struct is_signed< mln::Int<nbits> > : std::true_type
+  {
+  };
+
+  template <unsigned nbits>
+  struct is_unsigned< mln::UInt<nbits> > : std::true_type
+  {
+  };
+
+
+  template <unsigned nbits>
+  struct make_signed< mln::UInt<nbits> >
+  {
+    typedef mln::Int<nbits> type;
+  };
+
+  template <unsigned nbits>
+  struct make_signed< mln::Int<nbits> >
+  {
+    typedef mln::Int<nbits> type;
+  };
+
+
+  template <unsigned nbits>
+  struct make_unsigned< mln::UInt<nbits> >
+  {
+    typedef mln::UInt<nbits> type;
+  };
+
+  template <unsigned nbits>
+  struct make_unsigned< mln::Int<nbits> >
+  {
+    typedef mln::UInt<nbits> type;
+  };
+
+}
+
+namespace mln
+{
+
+  // Note that typename std::enable_if<std::is_arithmetic< UInt<nbits> >::value>::type
+  // instead of just void is required to avoid ambiguous specialization
+  template <unsigned nbits>
+  struct value_traits<UInt<nbits>, std::less< UInt<nbits> >,
+		      typename std::enable_if<std::is_arithmetic< UInt<nbits> >::value>::type >
   {
     static constexpr unsigned quant = nbits;
     static constexpr UInt<nbits> min() { return 0; }
@@ -42,7 +100,8 @@ namespace mln
   };
 
   template <unsigned nbits>
-  struct value_traits<Int<nbits>, std::less< Int<nbits> >, void>
+  struct value_traits<Int<nbits>, std::less< Int<nbits> >,
+		      typename std::enable_if<std::is_arithmetic< Int<nbits> >::value>::type >
   {
     static constexpr unsigned quant = nbits;
     static constexpr Int<nbits> min() { return -(1 << (nbits-1)); }
@@ -51,10 +110,13 @@ namespace mln
     static constexpr Int<nbits> sup() { return max(); }
   };
 
+} // end of namespace mln
 
   /******************************************/
   /****     Indexers specialization     *****/
   /******************************************/
+
+namespace mln {
 
   // Forward declaration
   template <typename V, typename StrictWeakOrdering, typename Enable>

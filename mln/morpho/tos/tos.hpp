@@ -172,11 +172,18 @@ namespace mln
 
       resize(zpar, parent).init(UNPROCESSED);
       extension::fill(zpar, UNPROCESSED);
+
+      auto is_face_2 = [](const point2d& p) { return p[0] % 2 == 0 and p[1] % 2 == 0; };
+
+      int spos = S.size()-1;
       for (int i = S.size()-1; i >= 0; --i)
 	{
 	  size_type p = S[i];
 	  parent[p] = p;
 	  zpar[p] = p;
+
+	  size_type rp = p;
+	  bool face2 = is_face_2(K.point_at_index(p));
 
 	  mln_foreach (int k, dindexes)
 	    {
@@ -184,14 +191,26 @@ namespace mln
 	      if (zpar[q] != UNPROCESSED)
 		{
 		  size_type r = morpho::internal::zfind_root(zpar, q);
-		  if (r != p) {
-		    parent[r] = p;
-		    zpar[r] = p;
+		  if (r != rp) { // MERGE r and p
+		    if (eq(K[p], K[r]) and !face2 and is_face_2(K.point_at_index(r)))
+		      {
+			parent[rp] = r;
+			zpar[rp] = r;
+			face2 = true;
+			S[spos--] = rp;
+			rp = r;
+		      }
+		    else
+		      {
+			parent[r] = rp;
+			zpar[r] = rp;
+			S[spos--] = r;
+		      }
 		  }
 		}
 	    }
-
 	}
+      S[0] = morpho::internal::zfind_root(zpar, S[0]);
 
       // 3rd step: canonicalization
       for (size_type p : S)

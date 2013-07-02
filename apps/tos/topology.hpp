@@ -76,21 +76,25 @@ namespace mln
 
 
   namespace K1 {
+    inline
     bool is_face_2(const point2d& p)
     {
       return (p[0] % 2 == 0 and p[1] % 2 == 0);
     }
 
+    inline
     bool is_face_1(const point2d& p)
     {
       return ((p[0] % 2 == 0) xor (p[1] % 2 == 0));
     }
 
+    inline
     bool is_face_1v(const point2d& p)
     {
       return (p[0] % 2 == 0 and p[1] % 2 == 1);
     }
 
+    inline
     bool is_face_1h(const point2d& p)
     {
       return (p[0] % 2 == 1 and p[1] % 2 == 0);
@@ -100,6 +104,7 @@ namespace mln
 
   namespace K2
   {
+    inline
     bool is_face_2(const point2d& p)
     {
       return (p[0] % 4 == 0 and p[1] % 4 == 0);

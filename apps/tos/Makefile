@@ -10,5 +10,7 @@ bin: marginalfilter simplify thicken lexico_grainfilter k12k0 rgbgrainfilter tos
 
 bin: CXXFLAGS += -O3 -DNDEBUG -march=native
 
+objdetection: objdetection.o colorToSGrad.o
+
 
 tos: LDFLAGS += -lboost_program_options

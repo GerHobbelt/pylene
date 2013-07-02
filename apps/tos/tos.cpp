@@ -9,13 +9,12 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-#include <mln/accu/accumulators/mean.hpp>
-
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include "topology.hpp"
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <libgen.h>
+#include "set_mean_on_nodes.hpp"
 #include "addborder.hpp"
 #include "gradient.hpp"
 
@@ -138,47 +137,8 @@ namespace mln
 
   }
 
-  template <typename V, typename W, class Pred>
-  image2d<V>
-  set_mean_on_node(const image2d<V>& ima, const image2d<W>& K, const std::vector<unsigned>& S, const image2d<unsigned>& parent,
-		   const Pred& pred)
-  {
-    typedef accu::accumulators::mean<V, vec3u> Acc;
-
-    image2d<V> mean;
-    image2d<Acc> accus;
-
-    resize(accus, ima);
-    resize(mean, ima);
-
-    // Accumulate
-    {
-      for (int i = S.size()-1; i > 0 ; --i)
-	{
-	  unsigned k = S[i];
-	  if (pred(ima.point_at_index(k)))
-	      accus[k].take(ima[k]);
-	  accus[parent[k]].take(accus[k]);
-	}
-      accus[S[0]].take(ima[S[0]]);
-    }
-
-    // reconstruct
-    {
-      mean[S[0]] = (V) accu::extractor::mean(accus[S[0]]);
-      for (unsigned k : S)
-	{
-	  if (K[parent[k]] != K[k])
-	    mean[k] = (V) accu::extractor::mean(accus[k]);
-	  else
-	    mean[k] = mean[parent[k]];
-	}
-    }
-    return mean;
-  }
-
-
 }
+
 
 template < typename V, typename Compare=std::less<V> >
 std::tuple<V,V,V>
@@ -200,8 +160,6 @@ minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())
       return std::make_tuple(y,z,x);
   }
 }
-
-
 
 
 int main(int argc, char** argv)

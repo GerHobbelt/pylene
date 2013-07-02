@@ -14,6 +14,16 @@ namespace mln
   interpolate_median(const image2d<U>& ima, const V& = V(), const Compare& = Compare());
 
 
+  /// \brief perform a interpolation by setting the mean on
+  /// on 0-1 face from 2-faces.
+  /// \param ima Original image
+  /// \return An image twice as big as \p ima with mean on 0 abd 1 faces. 
+  template <typename T>
+  image2d<T>
+  interpolate_k1(const image2d<T>& ima);
+
+
+
   /*******************************/
   /***    Implementation       ***/
   /*******************************/
@@ -44,6 +54,30 @@ namespace mln
 	out.at(q + point2d{1,0}) = (a + c);
 	out.at(q + point2d{1,1}) = med4x2(a,b,c,d);
       }
+    return out;
+  }
+
+
+  template <typename T>
+  image2d<T>
+  interpolate_k1(const image2d<T>& ima)
+  {
+    image2d<T> out(2*ima.nrows()-1, 2*ima.ncols()-1);
+    typedef point2d P;
+    mln_foreach(point2d p, ima.domain())
+      {
+	T a = ima.at(p),
+	  b = ima.at(p + P{0,1}),
+	  c = ima.at(p + P{1,0}),
+	  d = ima.at(p + P{1,1});
+
+	point2d q = 2 * p;
+	out.at(q) = ima.at(p);
+	out.at(q + P{0,1}) = (a + b) / 2;
+	out.at(q + P{1,0}) = (a + c) / 2;
+	out.at(q + P{1,1}) = (a + b + c + d) / 4;
+      }
+
     return out;
   }
 

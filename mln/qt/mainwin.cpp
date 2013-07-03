@@ -62,8 +62,9 @@ namespace mln
 	    {
 	      QGraphicsSceneMouseEvent* event = static_cast<QGraphicsSceneMouseEvent*>(ev);
 	      QPointF p_ = m_pixmap.mapFromScene(event->scenePos());
-	      if (m_scene->sceneRect().contains(p_)) {
-		point2d p = { p_.y(), p_.x() };
+	      point2d p = { p_.y(), p_.x() };
+	      if (m_ima->getView().domain().has(p)) {
+		std::cout << p << std::endl;
 		emit pointHover(p);
 		return true;
 	      }
@@ -72,8 +73,9 @@ namespace mln
 	    {
 	      QGraphicsSceneMouseEvent* event = static_cast<QGraphicsSceneMouseEvent*>(ev);
 	      QPointF p_ = m_pixmap.mapFromScene(event->scenePos());
-	      if (m_scene->sceneRect().contains(p_)) {
-		point2d p = { p_.y(), p_.x() };
+	      point2d p = { p_.y(), p_.x() };
+	      if (m_ima->getView().domain().has(p)) {
+		std::cout << p << std::endl;
 		emit pointSelected(p);
 		return true;
 	      }

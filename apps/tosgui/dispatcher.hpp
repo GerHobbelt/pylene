@@ -23,6 +23,7 @@ namespace mln
 
   protected slots:
     void onNodeSelected(const point2d& p);
+    void onNodeSelected(const image2d<bool>& mask);
     void onPointSelected(const point2d& p);
 
   private:

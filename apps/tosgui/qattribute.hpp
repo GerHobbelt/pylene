@@ -27,14 +27,18 @@ namespace mln
     QAttributeBase(const QwtText& name = QString("Attribute") );
 
   signals:
+    /// \brief Signal emited when a single node is selected 
     void nodeSelected(const point2d& pt);
+
+    /// \brief Signal emited when several nodes are selected.
+    /// The mask is a boolean image
     void nodeSelected(const image2d<bool>& pts);
 
   public slots:
     virtual void plotNode(const point2d& pt) = 0;
 
   protected slots:
-    virtual void onSliderReleased() = 0;
+    virtual void onSliderReleased(int x) = 0;
 
   protected:
     virtual void showFilteringWindow() = 0;
@@ -61,7 +65,7 @@ namespace mln
     virtual bool eventFilter(QObject* obj, QEvent *ev);
 
   private:
-    virtual void onSliderReleased();
+    virtual void onSliderReleased(int x);
     virtual void showFilteringWindow();
 
 
@@ -113,6 +117,7 @@ namespace mln
     this->m_data.clear();
     this->m_data.resize(m_num_nodes);
 
+    std::cout << "Leaf value: " << m_attr[x] << std::endl;
     unsigned n = m_num_nodes;
     while (x != m_parent[x]) {
       this->m_data[n-1].setX(n-1);
@@ -121,6 +126,8 @@ namespace mln
       --n;
       x = m_parent[x];
     }
+
+    std::cout << "Root value: " << m_attr[x] << std::endl;
     this->m_data[0].setX(0);
     this->m_data[0].setY(m_attr[x]);
     this->m_curve->setSamples(m_data);
@@ -135,13 +142,16 @@ namespace mln
     m_slider->setWindowTitle("Attribute filtering");
     m_slider->setMinimum(m_minmax.first);
     m_slider->setMaximum(m_minmax.second);
+
+    // m_slider->setMinimum(m_minmax.first);
+    // m_slider->setMaximum(m_minmax.second);
     m_slider->setOrientation(Qt::Horizontal);
     m_slider->show();
     std::cout << "Show filtering " << m_minmax.first << " / "
               << m_minmax.second << std::endl;
 
-    QObject::connect(m_slider, SIGNAL(sliderReleased()),
-                     this, SLOT(onSliderReleased()));
+    QObject::connect(m_slider, SIGNAL(valueChanged(int)),
+                     this, SLOT(onSliderReleased(int)));
   }
 
   template <typename V>
@@ -155,7 +165,7 @@ namespace mln
 	  unsigned i = std::max<int>(0, this->invTransform(QwtPlot::xBottom, p.x()));
 
 	  unsigned x = m_current;
-	  for (; i < m_num_nodes; ++i)
+	  for (; i < m_num_nodes-1; ++i)
 	    x = m_parent[x];
 
 	  point2d q = m_parent.point_at_index(x);
@@ -168,16 +178,15 @@ namespace mln
     return QAttributeBase::eventFilter(obj, event);
   }
 
-  
-
 
   template <typename V>
   void
-  QAttribute<V>::onSliderReleased()
+  QAttribute<V>::onSliderReleased(int x)
   {
     int lambda = m_slider->value();
     std::cout << "Filtering with lambda < " << lambda << std::endl;
     image2d<bool> mask = eval(m_attr < lambda);
+    emit nodeSelected(mask);
   }
 
 }

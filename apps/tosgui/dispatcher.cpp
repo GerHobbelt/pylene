@@ -38,6 +38,8 @@ namespace mln
 
     QObject::connect(attr, SIGNAL(nodeSelected(const point2d&)),
 		     this, SLOT(onNodeSelected(const point2d&)));
+    QObject::connect(attr, SIGNAL(nodeSelected(const image2d<bool>&)),
+		     this, SLOT(onNodeSelected(const image2d<bool>&)));
   }
 
 
@@ -58,6 +60,28 @@ namespace mln
     for (auto& win : m_fwins)
       this->doFiltering(win);
   }
+
+  void
+  QDispatcher::onNodeSelected(const image2d<bool>& mask)
+  {
+    fill(m_mask_selection, false);
+    int n = 0;
+    for (unsigned p: m_S)
+      if (mask[p] or m_mask_selection[m_parent[p]])
+	{
+	  m_mask_selection[p] = true;
+	  ++n;
+	}
+
+    std::cout << "Filtering: " << n << std::endl;
+
+    for (qt::MainWindowBase* win : m_windows)
+      this->doNodeSection(win);
+
+    for (auto& win : m_fwins)
+      this->doFiltering(win);
+  }
+
 
   void
   QDispatcher::onPointSelected(const point2d& p)
@@ -117,7 +141,7 @@ namespace mln
       if (m_mask_selection[m_parent[x]]) {
         view[x] = view[m_parent[x]];
       } else if (m_mask_selection[x]) {
-        view[x] = mean[x];
+        view[x] = mean[m_parent[x]];
       }
 
     win->update();

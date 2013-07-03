@@ -23,28 +23,6 @@
 
 namespace mln
 {
-  template <typename T>
-  image2d<T>
-  interpolate_k1(const image2d<T>& ima)
-  {
-    image2d<T> out(2*ima.nrows()-1, 2*ima.ncols()-1);
-    typedef point2d P;
-    mln_foreach(point2d p, ima.domain())
-      {
-	T a = ima.at(p),
-	  b = ima.at(p + P{0,1}),
-	  c = ima.at(p + P{1,0}),
-	  d = ima.at(p + P{1,1});
-
-	point2d q = 2 * p;
-	out.at(q) = ima.at(p);
-	out.at(q + P{0,1}) = (a + b) / 2;
-	out.at(q + P{1,0}) = (a + c) / 2;
-	out.at(q + P{1,1}) = (a + b + c + d) / 4;
-      }
-
-    return out;
-  }
 
 
   template <typename V, typename W>
@@ -150,6 +128,10 @@ int main(int argc, char** argv)
   image2d<unsigned> parent;
   std::tie(K, parent, S) = morpho::ToS(area, c4);
 
+
+  auto Area = morpho::area_compute(K, parent, S, K1::is_face_2);
+
+
   unsigned maxarea = S[0];
 
   auto Kui8 = transform(K, [maxarea](const unsigned& v) -> uint8 {
@@ -157,7 +139,8 @@ int main(int argc, char** argv)
     });
 
   auto f = interpolate_k1(addborder(ima));
-  image2d<float> energy = compute_energy(f, K, parent, S);
+  image2d< internal::energy_t<rgb8> > imacc;
+  image2d<float> energy = compute_energy(f, K, parent, S, imacc);
   image2d<float> cenergy = close(energy, K, parent, S);
 
   qt::MainWindow<uint8> w1(Kui8);
@@ -181,6 +164,24 @@ int main(int argc, char** argv)
   QAttribute<float> wattr3(cenergy, parent, QString("Mumford shah (clo)"));
   wattr3.show();
 
+  QAttribute<unsigned> wattr4(Area, parent, QString("Grain"));
+  wattr4.show();
+
+# define IF_NOT_NULL(v, XEXPR) ((v) == 0) ? 0 : (XEXPR);
+
+  auto attr5 = transform(imacc,[](const internal::energy_t<rgb8>& x) -> float {
+      return IF_NOT_NULL(x.m_e_length, x.alpha * x.m_e_sumcurv / x.m_e_length); });
+  QAttribute<float> wattr5(attr5, parent, QString("Internal Energy (sum_curv / e_length)"));
+  wattr5.show();
+
+  auto attr6 = transform(imacc,[](const internal::energy_t<rgb8>& x) -> float { return IF_NOT_NULL(x.m_v_n_int, x.external_energy()); });
+  QAttribute<float> wattr6(attr6, parent, QString("External Energy"));
+  wattr6.show();
+
+  auto attr7 = transform(imacc,[](const internal::energy_t<rgb8>& x) -> float { return IF_NOT_NULL(x.m_e_length, x.beta / x.m_e_length); });
+  QAttribute<float> wattr7(attr7, parent, QString("Constraint Energy"));
+  wattr7.show();
+
 
   QDispatcher disp(parent, S);
   disp.addImageWindow(&w1);
@@ -189,6 +190,10 @@ int main(int argc, char** argv)
   disp.addAttribute(&wattr1);
   disp.addAttribute(&wattr2);
   disp.addAttribute(&wattr3);
+  disp.addAttribute(&wattr4);
+  disp.addAttribute(&wattr5);
+  disp.addAttribute(&wattr6);
+  disp.addAttribute(&wattr7);
 
   //  QObject::connect(&main, SIGNAL(pointSelected(const point2d&)),
   //&wattr, SLOT(plotNode(const point2d&)));

@@ -8,6 +8,7 @@
 
 namespace mln {
 
+  namespace {
 
   struct c4_t : neighborhood_base< c4_t, mln::array<point2d, 4> >
   {
@@ -53,6 +54,7 @@ namespace mln {
 
   static const c2_h_t c2_h;
 
+  }
 
 } // end of namespace mln
 

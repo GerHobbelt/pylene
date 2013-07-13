@@ -15,6 +15,7 @@ namespace mln
     typedef T&                                  reference;
     typedef ptrdiff_t                           distance_type;
     typedef I                                   image_type;
+    typedef typename I::size_type		size_type;
 
     ndimage_pixel() : ima_ (NULL) {}
 
@@ -39,7 +40,7 @@ namespace mln
     site_type           site()  const;
     distance_type	offset() const;
     image_type&         image() const;
-    size_t		index() const { return index_; }
+    size_type		index() const { return index_; }
 
     template <typename, unsigned, typename> friend struct ndimage_pixel;
     template <typename, unsigned, typename> friend struct ndimage_base;

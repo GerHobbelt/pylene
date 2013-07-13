@@ -16,6 +16,9 @@ namespace mln
     typedef typename exact_type<Image>::type E;
     typedef ndimage_pixel<Value, Image::ndim, E> pixel_t;
 
+    template <typename J, typename V>
+    friend struct ndimage_value_range;
+
   public:
 
     typedef internal::nested_loop_iterator<
@@ -38,6 +41,13 @@ namespace mln
     : ima_(&ima)
     {
     }
+
+    // interop
+    ndimage_value_range(const typename Image::value_range& other)
+      : ima_(other.ima_)
+    {
+    }
+
 
     const_iterator iter() const
     {
@@ -90,6 +100,9 @@ namespace mln
     typedef typename exact_type<Image>::type E;
     typedef ndimage_pixel<Value, Image::ndim, E> pixel_t;
 
+    template <typename I, typename V>
+    friend struct ndimage_pixel_range;
+
   public:
     typedef internal::nested_loop_iterator<
     internal::domain_point_visitor_forward< typename Image::point_type >,
@@ -97,15 +110,24 @@ namespace mln
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> iterator;
 
+    typedef iterator const_iterator;
+
   typedef internal::nested_loop_iterator<
     internal::domain_point_visitor_backward< typename Image::point_type >,
     internal::strided_pointer_value_visitor<ndim>,
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> reverse_iterator;
 
+    typedef iterator const_reverse_iterator;
+
 
     ndimage_pixel_range(Image& ima)
     : ima_(&ima)
+    {
+    }
+
+    ndimage_pixel_range(const typename Image::pixel_range& other)
+      : ima_(other.ima_)
     {
     }
 

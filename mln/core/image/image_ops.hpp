@@ -38,6 +38,23 @@ namespace mln
   /****          Implementation          ****/
   /******************************************/
 
+  namespace internal
+  {
+
+    template <typename I, typename Scalar, template<class, class> class Op>
+    struct binary_image_scalar_expr_helper
+    {
+      typedef binary_image_scalar_expr< Op<mln_value(I), Scalar>, const I&, Scalar> type;
+    };
+
+    template <typename I, typename Scalar, template <class, class> class Op>
+    struct binary_scalar_image_expr_helper
+    {
+      typedef binary_scalar_image_expr< Op<Scalar, mln_value(I)>, Scalar, const I&> type;
+    };
+
+  }
+
 # define MLN_GENERATE_LVALUE_UNARY_EXPR(Name, Obj)                      \
   template <typename I>                                                 \
   unary_image_expr< Obj<typename I::value_type>, I>                     \
@@ -46,8 +63,6 @@ namespace mln
     BOOST_CONCEPT_ASSERT(( Image<typename std::remove_reference<I>::type )); \
     return make_unary_image_expr(std::forward<I>(ima), Obj<typename I::reference> ()); \
   }
-
-
 
 
 # define MLN_GENERATE_CONST_UNARY_EXPR(Name, Obj)                       \
@@ -60,29 +75,31 @@ namespace mln
 
 # define MLN_GENERATE_CONST_BINARY_EXPR(Name, Obj)                      \
   template <typename I1, typename I2>                                   \
-  binary_image_expr< Obj<typename I1::value_type, typename I2::value_type>, const I1&, const I2&> \
-  Name (const Image<I1>& ima1, const Image<I2>& ima2)                    \
+  binary_image_expr<Obj<mln_value(I1), mln_value(I2)>, const I1&, const I2&> \
+  Name (const Image<I1>& ima1, const Image<I2>& ima2)			\
   {                                                                     \
-    typedef Obj<typename I1::value_type, typename I2::value_type> O; \
-    return make_binary_image_expr(exact(ima1), exact(ima2), O());    \
-  }                                                                  \
+    typedef Obj<typename I1::value_type, typename I2::value_type> O;	\
+    return make_binary_image_expr(exact(ima1), exact(ima2), O());	\
+  }									\
                                                                         \
   template <typename I, typename Scalar>                                \
-  typename std::enable_if< !std::is_base_of<Image<Scalar>, Scalar>::value, \
-                           binary_image_scalar_expr< Obj<typename I::value_type, Scalar>, const I&, Scalar> >::type \
+  typename boost::lazy_enable_if_c						\
+  < !is_a<Scalar, Image>::value,			\
+    internal::binary_image_scalar_expr_helper<I, Scalar, Obj> >::type	\
   Name (const Image<I>& ima, const Scalar& x)                           \
   {                                                                     \
     typedef Obj<typename I::value_type, Scalar> O;                      \
-    return make_binary_image_scalar_expr(exact(ima), x, O());                  \
+    return make_binary_image_scalar_expr(exact(ima), x, O());		\
   }                                                                     \
                                                                         \
   template <typename I, typename Scalar>                                \
-  typename std::enable_if< !std::is_base_of<Image<Scalar>, Scalar>::value, \
-                           binary_scalar_image_expr< Obj<Scalar, typename I::value_type>, Scalar, const I&> >::type \
+  typename boost::lazy_enable_if_c					\
+  < !is_a<Scalar, Image>::value,					\
+    internal::binary_scalar_image_expr_helper<I, Scalar, Obj> >::type	\
   Name (const Scalar& x, const Image<I>& ima)                           \
   {                                                                     \
     typedef Obj<Scalar, typename I::value_type> O;                      \
-    return make_binary_scalar_image_expr(x, exact(ima), O());                  \
+    return make_binary_scalar_image_expr(x, exact(ima), O());		\
   }
 
 

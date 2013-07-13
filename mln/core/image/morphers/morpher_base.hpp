@@ -9,9 +9,14 @@ namespace mln
 
   /// \brief Base class for morpher that acts like a mixin w.r.t to I
   ///
-  /// 
+  ///
   template <typename Derived, typename I, typename P, typename V>
   struct morpher_base;
+
+
+  /// \brief Base class for morphed pixels thats acts like a mixin on Pix.
+  template <typename Derived, typename Pix>
+  struct morpher_pixel_base;
 
   // FWD declaration
   struct morpher_core_access;
@@ -39,7 +44,26 @@ namespace mln
     {
       return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
     }
+
+    template <typename PixMorpher>
+    static
+    typename PixMorpher::pixel_t&
+    get_pix(PixMorpher* morpher)
+    {
+      return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->m_pix;
+    }
+
+
+    template <typename PixMorpher>
+    static
+    const typename PixMorpher::pixel_t&
+    get_pix(const PixMorpher* morpher)
+    {
+      return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->m_pix;
+    }
+
   };
+
 
 
   namespace impl
@@ -55,6 +79,7 @@ namespace mln
     struct morpher_accessible<Derived, I, true>
     {
     private:
+      friend  struct mln::morpher_core_access;
       typedef I         image_t;
       typedef Derived   derived_t;
 
@@ -83,8 +108,6 @@ namespace mln
       {
 	return morpher_core_access::get_ima(this).at(p);
       }
-
-      friend struct mln::morpher_core_access;
     };
 
     /// \brief Default implementation for morphing an accessible image
@@ -97,12 +120,12 @@ namespace mln
     struct morpher_indexable<Derived, I, true>
     {
     private:
-      friend  struct morpher_core_access;
-      typedef I          image_t;
-      typedef Derived    derived_t;
+      friend  struct mln::morpher_core_access;
+      typedef I						image_t;
+      typedef Derived                                   derived_t;
+      typedef typename I::point_type			point_type;
 
     public:
-      typedef typename I::point_type			point_type;
       typedef typename I::size_type			size_type;
       typedef typename I::difference_type		difference_type;
       typedef typename image_reference<I>::type		reference;
@@ -143,7 +166,7 @@ namespace mln
     impl::morpher_indexable<Derived, typename std::remove_reference<I>::type >
   {
   private:
-    friend  struct morpher_core_access;
+    friend  struct mln::morpher_core_access;
     typedef typename std::remove_reference<I>::type image_t;
     typedef Derived                                 derived_t;
 
@@ -187,7 +210,80 @@ namespace mln
 
   };
 
+  namespace impl
+  {
+    // If the image of the pixel is indexable
+    // we add the following typedefs/methods:
+    // + typedef size_type
+    // + index()
+    template <typename Derived, typename Pix,
+	      bool is_indexable =
+	      image_traits<typename Pix::image_type>::indexable::value
+	      >
+    struct morpher_pixel_indexable;
 
+    template <typename Derived, typename Pix>
+    struct morpher_pixel_indexable<Derived, Pix, false>
+    {
+    };
+
+    template <typename Derived, typename Pix>
+    struct morpher_pixel_indexable<Derived, Pix, true>
+    {
+    private:
+      friend  struct mln::morpher_core_access;
+      typedef Pix         pixel_t;
+      typedef Derived     derived_t;
+
+    public:
+      typedef typename Pix::size_type	size_type;
+
+      size_type index() const
+      {
+	return morpher_core_access::get_pix(this).index();
+      }
+    };
+
+  }
+
+  template <typename Derived, typename Pix>
+  struct morpher_pixel_base :
+    Pixel<Derived>,
+    impl::morpher_pixel_indexable<Derived, Pix>
+  {
+  private:
+    friend  struct morpher_core_access;
+    typedef Pix         pixel_t;
+    typedef Derived     derived_t;
+
+  public:
+    typedef typename Pix::value_type value_type;
+    typedef typename Pix::point_type point_type;
+    typedef typename Pix::site_type  site_type;
+    typedef typename Pix::reference  reference;
+    typedef typename Pix::image_type image_type;
+
+    reference val() const
+    {
+      return morpher_core_access::get_pix(this).val();
+    }
+
+    point_type point() const
+    {
+      return morpher_core_access::get_pix(this).point();
+    }
+
+    site_type site() const
+    {
+      return morpher_core_access::get_pix(this).site();
+    }
+
+    image_type& image() const
+    {
+      return morpher_core_access::get_pix(this).image();
+    }
+
+  };
 
 }
 

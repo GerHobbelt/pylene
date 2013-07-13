@@ -182,6 +182,15 @@ namespace mln
       point_type point() const { return tuple_pix_.point(); }
       image_type& image() const { return boost::get<n>(tuple_pix_.image().images()); }
 
+
+      template <typename image_type = image_type>
+      typename std::enable_if< image_traits<image_type>::indexable::value,
+			       typename image_type::size_type >::type
+      index() const
+      {
+	return boost::get<n>(tuple_pix_.image().images()).index_of_point(tuple_pix_.point());
+      }
+
     private:
       const pixel_t& tuple_pix_;
     };

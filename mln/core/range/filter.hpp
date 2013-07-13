@@ -33,7 +33,7 @@ namespace mln
 	return iterator( m_rng.iter(), m_pred );
       }
 
-      bool has(const value_type& v)
+      bool has(const value_type& v) const
       {
 	return m_pred(v) and m_rng.has(v);
       }

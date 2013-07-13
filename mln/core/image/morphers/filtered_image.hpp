@@ -47,23 +47,7 @@ namespace mln
   /****          Implementation          ****/
   /******************************************/
 
-  namespace internal
-  {
 
-    template <typename I, class Predicate>
-    struct use_pix_helper
-    {
-      template <typename U>
-      static
-      std::true_type foo(const U&, decltype( std::declval<Predicate>() (std::declval<U>()) )* = NULL);
-
-      static
-      std::false_type foo(...);
-
-      typedef decltype(foo(std::declval<mln_pixel(I)>())) type;
-    };
-
-  }
 
   template <typename I, class Predicate, bool use_pix = internal::use_pix_helper<I, Predicate>::type::value >
   struct filtered_image_base;

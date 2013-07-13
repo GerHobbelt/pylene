@@ -9,6 +9,9 @@
 # define mln_point(I) typename std::remove_reference<I>::type::point_type
 # define mln_site(I)  typename std::remove_reference<I>::type::point_type
 # define mln_pixel(I)  typename image_pixel<typename std::remove_reference<I>::type>::type
+# define mln_cpixel(I) typename image_const_pixel<typename std::remove_reference<I>::type>::type
+# define mln_reference(I) typename image_reference<typename std::remove_reference<I>::type>::type
+# define mln_creference(I) typename image_const_reference<typename std::remove_reference<I>::type>::type
 
 namespace mln
 {

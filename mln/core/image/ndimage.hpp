@@ -1,9 +1,10 @@
 #ifndef MLN_CORE_IMAGE_NDIMAGE_HH
 # define MLN_CORE_IMAGE_NDIMAGE_HH
 
-# include <cstdlib>
-# include <mln/core/image_base.hpp>
+/// \file
 
+# include <cstdlib>
+# include <mln/core/image/image.hpp>
 # include <mln/core/domain/box.hpp>
 # include <mln/core/memory.hpp>
 # include <mln/core/assert.hpp>
@@ -16,6 +17,7 @@
 namespace mln
 {
 
+  /// \brief base class for ndimage
   template <typename T, unsigned dim, typename E> struct ndimage_base;
 
   // FWD
@@ -140,7 +142,7 @@ namespace mln
 
 
     // As an Image
-    // \group Constructors
+    // Constructors
     // \{
     explicit ndimage_base(unsigned border = 3);
     explicit ndimage_base(const domain_type& domain, unsigned border = 3, T v = T());
@@ -148,16 +150,14 @@ namespace mln
 
     const domain_type&  domain() const;
 
-    // As an ContainerImage
-    // \group Point-wise access
-    // \{
-    reference operator() (const site_type& p);
-    const_reference operator() (const site_type& p) const;
 
-    // without bound checking
-    reference at (const site_type& p);
-    const_reference at (const site_type& p) const;
-    // \}
+    reference		operator() (const site_type& p);
+    const_reference	operator() (const site_type& p) const;
+    reference		operator[] (size_type i);
+    const_reference	operator[] (size_type i) const;
+    reference		at (const site_type& p);
+    const_reference	at (const site_type& p) const;
+
 
     // FIXME move to base
     pixel_type pixel_at(const site_type& p)
@@ -233,8 +233,6 @@ namespace mln
 
 
     // As an Indexable Image
-    T&		operator[] (size_type i);
-    const T&	operator[] (size_type i) const;
     const size_t*	index_strides() const     { return &m_index_strides[0]; }
 
     void reindex(std::size_t index_first)

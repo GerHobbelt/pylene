@@ -14,10 +14,38 @@ namespace mln
   struct get_pixel_value;
   struct get_pixel_point;
 
+  namespace internal
+  {
+    /// \brief Helper class to know if a function accepts pixels or values
+    template <typename I, class UnaryFunction>
+    struct use_pix_helper;
+  }
 
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
+
+
+  namespace internal
+  {
+
+    template <typename I, class UnaryFunction>
+    struct use_pix_helper
+    {
+      template <typename U>
+      static
+      std::true_type foo(const U&, decltype( std::declval<UnaryFunction>() (std::declval<U>()) )* = NULL);
+
+      static
+      std::false_type foo(...);
+
+      typedef decltype(foo(std::declval<mln_pixel(I)>())) type;
+    };
+
+  }
+
+
+
 
   template <typename I, typename Pixel>
   struct rebinded_pixel

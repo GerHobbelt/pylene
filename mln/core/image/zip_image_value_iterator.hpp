@@ -73,25 +73,26 @@ namespace mln
   template <typename category, typename ImageTuple>
   struct zip_image_value_range
   {
-    typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_value_range>::type ValueRangeTuple;
+    typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_value_range>::type	 ValueRangeTuple;
     typedef typename internal::tuple_meta_transform<ImageTuple, image_meta_value_iterator>::type IteratorTuple;
     typedef zip_iterator<IteratorTuple> iterator;
-    typedef zip_iterator<const IteratorTuple> const_iterator;
+    typedef iterator const_iterator;
+    //typedef zip_iterator<const IteratorTuple> const_iterator;
 
     zip_image_value_range(const ImageTuple& x)
     : w (internal::tuple_transform(x, internal::get_image_value_range ()))
     {
     }
 
-    iterator iter()
+    iterator iter() const
     {
       return iterator(internal::tuple_transform(w, internal::get_iterator ()));
     }
 
-    const_iterator iter() const
-    {
-      return const_iterator(internal::tuple_transform(w, internal::get_iterator ()));
-    }
+    // const_iterator iter() const
+    // {
+    //   return const_iterator(internal::tuple_transform(w, internal::get_iterator ()));
+    // }
 
   private:
     ValueRangeTuple w;

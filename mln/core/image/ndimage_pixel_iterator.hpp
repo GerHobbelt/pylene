@@ -32,12 +32,16 @@ struct ndimage_pixel_range
     pixel_t,
     internal::deref_return_value_policy> iterator;
 
+  typedef iterator const_iterator;
+
 
   typedef internal::nested_loop_iterator<
     internal::origin_point_visitor_backward< typename Image::point_type >,
     internal::strided_pointer_value_visitor<ndim, false>,
     pixel_t,
-    internal::deref_return_value_policy> iterator;
+    internal::deref_return_value_policy> reverse_iterator;
+
+  typedef reverse_iterator const_reverse_iterator;
 
     ndimage_value_range(Image& ima)
     : ima_(ima)

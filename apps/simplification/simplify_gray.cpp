@@ -60,8 +60,9 @@ int main(int argc, char** argv)
   std::tie(K, parent, S) = morpho::ToS(f, c4);
 
 
-  image2d<uint8> simp = simplify_bottom_up(ima, K, parent, S, lambda, grainsize, areafactor);
-  //image2d<uint8> simp = simplify_top_down(ima, K, parent, S, std::atoi(argv[2]));
+  //image2d<uint8> simp = simplify_bottom_up(ima, K, parent, S, lambda, grainsize, areafactor);
+  image2d<uint8> simp2 = simplify_top_down(ima, K, parent, S, lambda);
 
-  io::imsave(simp, argv[3]);
+  //io::imsave(simp, argv[3]);
+  io::imsave(simp2, argv[3]);
 }

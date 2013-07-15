@@ -4,6 +4,7 @@
 /// \file
 
 # include <mln/accu/accumulator.hpp>
+# include <mln/accu/accumulator_base.hpp>
 # include <utility>
 
 namespace mln

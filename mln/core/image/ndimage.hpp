@@ -256,14 +256,17 @@ namespace mln
     point_type		point_at_index(size_type idx) const
     {
       int k = idx;
+      int kpmin = m_index_first;
       point_type p = point_type ();
 
       for (unsigned i = 0; i < dim; ++i) {
+	std::div_t off = std::div((int)kpmin,  (int)m_index_strides[i]);
 	std::div_t res = std::div((int)k,  (int)m_index_strides[i]);
-	p[i] += res.quot;
+	p[i] = res.quot - off.quot + domain_.pmin[i];
 	k = res.rem;
+	kpmin = off.rem;
       }
-      p -= (domain_.pmin + border_);
+      //p -= (domain_.pmin + border_);
       mln_postcondition(vbox_.has(p));
       return p;
     }

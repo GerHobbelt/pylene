@@ -38,6 +38,9 @@ namespace mln
   simplify_top_down(const image2d<V>& f, const image2d<T>& K,
 		    const image2d<unsigned>& parent, const std::vector<unsigned>& S, int eps);
 
+  /// \brief For any shape \p S, retrieve the smallest shape \p A such that $\delta_\epslison(s) \subset A$
+  ///
+  /// A stucturing element used for dilation is square of radius $\epsilon$.
   template <typename T>
   image2d<unsigned>
   smallest_enclosing_shape(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S, int eps);
@@ -195,6 +198,8 @@ namespace mln
 	areas[parent[x]] += areas[x];
 	active[x] = areas[x] >= area;
       }
+    // root
+    areas[S[0]] += 1;
 
     image2d<unsigned> enc = smallest_enclosing_shape(K, parent, S, eps);
     image2d<unsigned> depth;
@@ -229,7 +234,6 @@ namespace mln
 	// unactive ]x ---> anc[
 	if (x != anc) {
 	  unsigned p = parent[x];
-	  int k = 0;
 	  while (p != anc and areas[p] * areafactor < areas[x])
 	    {
 	      active[p] = false;
@@ -258,102 +262,66 @@ namespace mln
 	  }
       }
     std::cout << "Number of nodes: " << nactive << std::endl;
-    io::imsave(transform(enc, [&areas, &S](unsigned x) -> float { return (float) areas[x] / areas[S[0]]; }), "tmp.tiff");
+    //io::imsave(transform(enc, [&areas, &S](unsigned x) -> float { return (float) areas[x] / areas[S[0]]; }), "tmp.tiff");
 
     return out;
   }
 
-
   template <typename V, typename T>
   image2d<V>
   simplify_top_down(const image2d<V>& f, const image2d<T>& K,
-		    const image2d<unsigned>& parent, const std::vector<unsigned>& S, int eps)
+   		    const image2d<unsigned>& parent, const std::vector<unsigned>& S, int eps)
   {
-    image2d<unsigned> depth;
-    resize(depth, K);
-
-
-    // Compute depth attribute
-    {
-      depth[S[0]] = 0;
-      for (unsigned i = 1; i < S.size(); ++i)
-	{
-	  unsigned x = S[i];
-	  if (K[x] != K[parent[x]]) // canonical element
-	    depth[x] = depth[parent[x]] + 1;
-	  else
-	    depth[x] = depth[parent[x]];
-	}
-    }
-
-    //
-    std::vector<int> dx;
-    for (int i = -eps*1; i <= eps*1; i += 1)
-      for (int j = -eps*1; j <= eps*1; j += 1)
-	dx.push_back(K.delta_index(point2d{i,j}));
-
-
     // Compute node activity
-    enum { UNSEEN = 0, ACTIVE = 1, UNACTIVE =2 };
-    image2d<char> status;
-    resize(status, K).init(UNSEEN);
-    extension::fill(status, UNACTIVE);
-    status[S[0]] = ACTIVE;
-    for (unsigned x: S)
+    image2d<bool> active;
+    resize(active, K).init(false);
+
+
+    image2d<unsigned> enc = smallest_enclosing_shape(K, parent, S, eps);
+    active[S[0]] = true;
+    for (int i = 1; i < S.size(); ++i)
       {
-	if (not K1::is_face_2(K.point_at_index(x)))
+	unsigned x = S[i];
+	if (K[x] == K[parent[x]])
 	  continue;
 
-	unsigned rx = (K[parent[x]] == K[x]) ? parent[x] : x;
+	unsigned anc = enc[x];
 
-	if (status[rx] != UNACTIVE)
-	  {
-	    status[x] = ACTIVE;
-	    for (int delta : dx)
-	      {
-		unsigned q = x + delta;
-		if (not K.domain().has(K.point_at_index(q)))
-		  continue;
+	// A node is active if ]x --> anc[ are inactive
+	unsigned p = parent[x];
+	while (p != anc and !active[p])
+	  p = parent[p];
 
-		unsigned rq = (K[q] == K[parent[q]]) ? parent[q] : q;
-		if (status[rq] != UNSEEN)
-		  continue;
-
-		unsigned anc = internal::common_ancestor(rx, rq, parent, depth);
-		if (anc != rx) // rq is not in the same lineage
-		  continue;
-
-		while (rq != rx) {
-		  if (status[rq] == UNSEEN)
-		    status[rq] = UNACTIVE;
-		  rq = parent[rq];
-		}
-	      }
-	  }
+	if (p == anc) {
+	  active[x] = true;
+	}
       }
 
     // Simplify
     image2d<V> out;
     resize(out, f);
-
+    int nactive = 0;
     for (unsigned x: S)
       {
 	point2d p = K.point_at_index(x);
 	if (K1::is_face_2(p))
 	  {
-	    if ((status[x] == ACTIVE and K[parent[x]] != K[x]) or x == parent[x]) {
+	    if ((active[x] and K[parent[x]] != K[x]) or x == parent[x]) {
+	      ++nactive;
 	      out(p/2) = f(p/2);
 	    } else {
 	      point2d q = K.point_at_index(parent[x]);
 	      mln_assertion(K1::is_face_2(q));
 	      out(p/2) = out(q/2);
-	    } 
+	    }
 	  }
       }
+    std::cout << "Number of nodes: " << nactive << std::endl;
+    //io::imsave(transform(enc, [&areas, &S](unsigned x) -> float { return (float) areas[x] / areas[S[0]]; }), "tmp.tiff");
 
     return out;
-  }
 
+  }
 
 }
 

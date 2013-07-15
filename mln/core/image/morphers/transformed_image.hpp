@@ -247,7 +247,7 @@ namespace mln
 
 
     private:
-      const mln_pixel(I)&	m_pix;
+      mln_pixel(I)		m_pix;
       image_type*		m_ima;
     };
 
@@ -284,7 +284,7 @@ namespace mln
 
 
     private:
-      const mln_pixel(I)&  m_pix;
+      mln_pixel(I)	   m_pix;
       image_type*	   m_ima;
     };
 

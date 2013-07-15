@@ -175,7 +175,7 @@ namespace mln
     static_assert(image_traits<O>::concrete::value, "Output image must be concrete.");
 
     resizer(O& ima, const I& ref)
-      : m_ima (ima), m_ref(ref), m_has_hook (true), m_failed(false)
+      : m_ima (ima), m_ref(ref), m_has_hook (true), m_failed(false), m_set_init(false)
     {
       initborder_();
       //m_border = m_ref.border();
@@ -201,10 +201,12 @@ namespace mln
     resizer&
     border(unsigned b)
     {
-      if (m_border != -1)
-        m_border = b;
-      else
-        m_failed = 1;
+      // if (m_border != -1)
+      //   m_border = b;
+      // else
+      //   m_failed = 1;
+      if ((int)b > m_border)
+	m_border = b;
       return *this;
     }
 
@@ -213,7 +215,7 @@ namespace mln
     adjust(const Neighborhood& nbh)
     {
       unsigned b = internal::get_border_from_nbh(nbh);
-      if (b != 0 and m_border != -1)
+      if (b != 0) // before: and m_border != -1 ? WHY (-1 just means UNINITIALIZED) 
 	m_border = std::max<int>(m_border, b);
       else
 	m_failed = true;

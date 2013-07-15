@@ -779,7 +779,7 @@ namespace mln
 
 	  // Adoption stage
 	  {
-	    point2d p;
+	    point2d p = {0,0}; 
 	    mln_iter(qit, graph.adjacent_vertices(p));
 
 	    for (unsigned i = 0; i < orphans.size(); ++i)
@@ -788,7 +788,7 @@ namespace mln
 		node_t& x = graph.vertex(p);
 		//std::cout << " -- Proc orphan " << p << "(par=" << x.par << ",zpar=" << x.zpar << ")" << std::endl;
 		bool adopted = false;
-		mln_forall(qit);
+		mln_forall(qit)
 		  {
 		    const point2d& q = *qit;
 		    bool orphan = internal::is_orphan(graph, q);

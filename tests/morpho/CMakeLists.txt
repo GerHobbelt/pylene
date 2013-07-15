@@ -46,3 +46,8 @@ target_link_libraries(maxtree_parallel_pqueue -lfreeimage ${Boost_PROGRAM_OPTION
 add_test(maxtree_ufind maxtree_ufind)
 add_test(maxtree_hqueue maxtree_hqueue)
 add_test(maxtree maxtree)
+
+
+add_executable(saturate	saturate.cpp)
+target_link_libraries(saturate -lfreeimage)
+add_test(saturate saturate)

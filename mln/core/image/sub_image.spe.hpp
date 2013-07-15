@@ -38,7 +38,7 @@ namespace mln
   {
     E other(exact(image));
     other.domain_ = domain;
-    other.border_ = 0;
+    other.border_ = image.border_; // FIXME
     other.ptr_ = (char*) &image(domain.pmin);
     other.last_ = (char*) &image(domain.pmax - 1);
     other.m_ptr_origin = image.m_ptr_origin;

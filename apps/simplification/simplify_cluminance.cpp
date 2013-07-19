@@ -4,10 +4,13 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/grays.hpp>
+#include <mln/core/colors.hpp>
 
 #include <mln/core/algorithm/transform.hpp>
 
 #include <mln/morpho/tos/tos.hpp>
+#include <apps/tos/set_mean_on_nodes.hpp>
+#include <apps/tos/Kinterpolate.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
@@ -44,10 +47,12 @@ int main(int argc, char** argv)
   float areafactor = argc >= 6 ? std::atof(argv[5]) : 0.0;
 
 
+  image2d<rgb8> ori, ori_;
+  io::imread(argv[1], ori_);
+  ori = addborder(ori_);
 
   image2d<uint8> ima_, ima;
-  io::imread(argv[1], ima_);
-  ima = addborder(ima_);
+  ima = transform(ori, [](const rgb8& v) -> uint8 { return (v[0] + v[1] + v[2]) / 3; });
 
 
   typedef UInt<9> V;
@@ -63,7 +68,8 @@ int main(int argc, char** argv)
 
 
   //image2d<uint8> simp = simplify_bottom_up(ima, K, parent, S, lambda, grainsize, areafactor);
-  image2d<uint8> simp2 = simplify_top_down(ima, K, parent, S, lambda);
+  image2d<rgb8>  mean = set_mean_on_node2(immerse_k1(ori), K, S, parent, K1::is_face_2);
+  image2d<rgb8>  simp2 = simplify_top_down(unimmerse_k1(mean), K, parent, S, lambda);
 
   //io::imsave(simp, argv[3]);
   io::imsave(simp2, argv[3]);

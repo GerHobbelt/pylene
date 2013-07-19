@@ -12,6 +12,7 @@
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/set_mean_on_nodes.hpp>
 #include "simplify.hpp"
 
 
@@ -21,10 +22,12 @@ void usage(char** argv)
 	    << "Perform a simplification of the ToS by removing overlapping"
 	    << "level lines in radius of lambda pixels" << std::endl
 	    << "Param:" << std::endl
-	    << "grainsize: minimal grain size (default: 0)" << std::endl
-	    << "areafactor: avoid sur-simplification by limiting node desactivation (default: 0.0)" << std::endl
-	    << "\t a shape S1 can only be desactived by a shape S2 if area(S1) * areafactor < area(S2)"
-	    << std::endl;
+	    << "lambda: size of the dilation" << std::endl
+    //      << "grainsize: minimal grain size (default: 0)" << std::endl
+    //	    << "areafactor: avoid sur-simplification by limiting node desactivation (default: 0.0)" << std::endl
+    //	    << "\t a shape S1 can only be desactived by a shape S2 if area(S1) * areafactor < area(S2)"
+	    << std::endl
+    ;
   std::terminate();
 }
 
@@ -50,7 +53,8 @@ int main(int argc, char** argv)
 
 
   ima = interpolate_k1(addborder(ima_));
-  image2d<rgb8> simp = simplify_bottom_up(ima, K, parent, S, lambda, grainsize, areafactor);
+  image2d<rgb8>  mean = set_mean_on_node2(immerse_k1(ima), K, S, parent, K1::is_face_2);
+  image2d<rgb8> simp = simplify_top_down(unimmerse_k1(mean), K, parent, S, lambda); //, grainsize, areafactor);
 
   io::imsave(simp, argv[3]);
 }

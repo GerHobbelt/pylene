@@ -22,7 +22,16 @@ namespace mln
   image2d<T>
   interpolate_k1(const image2d<T>& ima);
 
+  /// \brief perform a immersion, 0-1 face have undedfined values.
+  /// \param ima Original image
+  /// \return An image twice as big as \p ima.
+  template <typename T>
+  image2d<T>
+  immerse_k1(const image2d<T>& ima);
 
+  template <typename T>
+  image2d<T>
+  unimmerse_k1(const image2d<T>& ima);
 
   /*******************************/
   /***    Implementation       ***/
@@ -78,6 +87,29 @@ namespace mln
 	out.at(q + P{1,1}) = (a + b + c + d) / 4;
       }
 
+    return out;
+  }
+
+
+  template <typename T>
+  image2d<T>
+  immerse_k1(const image2d<T>& ima)
+  {
+    image2d<T> out(2*ima.nrows()-1, 2*ima.ncols()-1);
+    typedef point2d P;
+    mln_foreach(const point2d& p, ima.domain())
+      out(2*p) = ima(p);
+    return out;
+  }
+
+  template <typename T>
+  image2d<T>
+  unimmerse_k1(const image2d<T>& ima)
+  {
+    sbox2d dom(ima.domain().pmin, ima.domain().pmax, point2d{2,2});
+    image2d<T> out((ima.nrows() + 1) / 2, (ima.ncols() + 1) / 2);
+
+    copy(ima | dom, out);
     return out;
   }
 

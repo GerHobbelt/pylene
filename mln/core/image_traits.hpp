@@ -12,6 +12,10 @@
 # define mln_cpixel(I) typename image_const_pixel<typename std::remove_reference<I>::type>::type
 # define mln_reference(I) typename image_reference<typename std::remove_reference<I>::type>::type
 # define mln_creference(I) typename image_const_reference<typename std::remove_reference<I>::type>::type
+# define mln_vrange(I)  typename image_value_range<typename std::remove_reference<I>::type>::type
+# define mln_cvrange(I) typename image_const_value_range<typename std::remove_reference<I>::type>::type
+# define mln_pixrange(I)  typename image_pixel_range<typename std::remove_reference<I>::type>::type
+# define mln_cpixrange(I) typename image_const_pixel_range<typename std::remove_reference<I>::type>::type
 
 namespace mln
 {

@@ -12,9 +12,10 @@ namespace mln
 
 
     struct none_extension_tag {};
-    struct border_extension_tag {};
-    struct value_extension_tag {};
-    struct image_extension_tag {};
+    struct custom_extension_tag {};
+    struct border_extension_tag : custom_extension_tag {};
+    struct value_extension_tag : custom_extension_tag {};
+    struct image_extension_tag : custom_extension_tag {};
 
 
   } // end of namespace mln::extension

@@ -28,6 +28,8 @@ namespace mln
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> iterator;
 
+    typedef iterator const_iterator;
+
     typedef internal::nested_loop_iterator<
       internal::strided_domain_point_visitor_backward< point<T, dim> >,
       internal::no_op_visitor,
@@ -35,6 +37,7 @@ namespace mln
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> reverse_iterator;
 
+    typedef reverse_iterator const_reverse_iterator;
 
     strided_box() = default;
     strided_box(const point_type& pmin, const point_type& pmax, const point_type& strides);

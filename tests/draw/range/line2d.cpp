@@ -21,7 +21,6 @@ BOOST_AUTO_TEST_CASE(line2d)
   // 8 octhans
   {
     auto r = draw::line2d({0,0}, {4,-11});
-    unsigned i = 0;
     mln_foreach(point2d p, r)
       std::cout << p;
     std::cout << std::endl;

@@ -74,6 +74,9 @@ namespace mln
   template <typename Morpher, typename Pix>
   struct extended_by_value_image_pixel : Pixel< extended_by_value_image_pixel<Morpher, Pix> >
   {
+    template <typename, typename>
+    friend struct extended_by_value_image_pixel;
+
   public:
     typedef typename Pix::value_type value_type;
     typedef typename Pix::reference  reference;
@@ -120,6 +123,8 @@ namespace mln
   {
   private:
     typedef extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type> pixel_type;
+    template <typename, typename>
+    friend struct extended_by_value_image_pixel_iterator;
 
   public:
     extended_by_value_image_pixel_iterator() = default;

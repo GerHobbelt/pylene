@@ -78,7 +78,7 @@ namespace mln
 
     public:
       typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type	reference;
-      typedef typename std::remove_reference<reference>::type			value_type;
+      typedef typename std::decay<reference>::type				value_type;
       typedef typename std::conditional<
 	std::is_reference<reference>::value,
 	typename std::add_lvalue_reference<typename std::add_const<value_type>::type>::type,
@@ -140,13 +140,15 @@ namespace mln
       const_value_range
       values() const
       {
-	return const_value_range(m_ima.values(), const_val_fun_t{m_fun} );
+	const_val_fun_t f {m_fun};
+	return const_value_range(m_ima.values(), f);
       }
 
       value_range
       values()
       {
-	return value_range(m_ima.values(), val_fun_t{m_fun} );
+	val_fun_t f {m_fun};
+	return value_range(m_ima.values(), f);
       }
 
       const_pixel_range

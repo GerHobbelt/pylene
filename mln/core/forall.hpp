@@ -1,10 +1,9 @@
 #ifndef MLN_CORE_FORALL_HPP
 # define MLN_CORE_FORALL_HPP
 
+# include <mln/core/range/range.hpp>
+# include <mln/core/config.hpp>
 # include <mln/core/foreach.hpp>
-# include <mln/core/image/zip_image.hpp>
-# include <mln/core/iterator/unzip_proxy_iterator.hpp>
-
 # include <boost/preprocessor/comparison/equal.hpp>
 # include <boost/preprocessor/control/iif.hpp>
 # include <boost/preprocessor/control/if.hpp>
@@ -22,6 +21,66 @@
 # include <boost/preprocessor/seq/push_front.hpp>
 # include <boost/preprocessor/seq/seq.hpp>
 
+
+/******************************************/
+/****    Generic mln_forall macro      ****/
+/******************************************/
+
+
+
+# define MLN_FORALL_INIT(z, n, args)		\
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).init()
+
+# define MLN_FORALL_NEXT(z, n, args)		\
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).next()
+
+# define MLN_FORALL_UNSET_DEJAVU(z, n, args)	\
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).set_dejavu_(false)
+
+# define __mln_forall__(ARGC, ARGV)						\
+  for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_INIT, ARGV),			\
+	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV);		\
+       !BOOST_PP_SEQ_ELEM(0, ARGV).finished();				\
+       BOOST_PP_REPEAT(ARGC, MLN_FORALL_NEXT, ARGV),			\
+	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))
+
+# define __mln_forall__1(p, ...)                    \
+  for (p.init(); !p.finished(); p.next())
+
+# define mln_forall(...)                                                \
+  BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 1),  \
+               __mln_forall__1(__VA_ARGS__),                            \
+               __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),      \
+                              BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
+
+/******************************************/
+/****             mln_iter             ****/
+/******************************************/
+
+# define mln_iter(p, range)                       \
+  auto p = rng::iter(range);
+
+#endif
+
+/// FIXME: move image specific macros to its own file.
+
+
+#ifndef MLN_CORE_IMAGE_IMAGE_HPP
+# include <mln/core/image/image.hpp>
+# warning "this part should be included by mln/core/image/image.hpp only"
+#endif
+
+
+#ifndef MLN_CORE_FORALL_1_HPP
+# define MLN_CORE_FORALL_1_HPP
+
+# include <mln/core/image/zip_image.hpp>
+# include <mln/core/iterator/unzip_proxy_iterator.hpp>
+
+
+/************************************/
+/***        Helper macros          **/
+/************************************/
 
 # define MLN_DECLARE(z, n, var)						\
   if (bool _mln_continue_##n = false) {} else				\
@@ -103,15 +162,6 @@
                                     BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
 
 
-
-/******************************************/
-/****             mln_iter             ****/
-/******************************************/
-
-# define mln_iter(p, rng)                       \
-  auto p = rng.iter();
-
-
 /******************************************/
 /****             mln_piter             ****/
 /******************************************/
@@ -119,36 +169,4 @@
 # define mln_piter(p, ima)                       \
   auto p = ima.domain().iter();
 
-
-/******************************************/
-/****         mln_forall macro         ****/
-/******************************************/
-
-
-
-# define MLN_FORALL_INIT(z, n, args)		\
-  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).init()
-
-# define MLN_FORALL_NEXT(z, n, args)		\
-  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).next()
-
-# define MLN_FORALL_UNSET_DEJAVU(z, n, args)	\
-  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).set_dejavu_(false)
-
-# define __mln_forall__(ARGC, ARGV)						\
-  for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_INIT, ARGV),			\
-	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV);		\
-       !BOOST_PP_SEQ_ELEM(0, ARGV).finished();				\
-       BOOST_PP_REPEAT(ARGC, MLN_FORALL_NEXT, ARGV),			\
-	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))
-
-# define __mln_forall__1(p, ...)                    \
-  for (p.init(); !p.finished(); p.next())
-
-# define mln_forall(...)                                                \
-  BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 1),  \
-               __mln_forall__1(__VA_ARGS__),                            \
-               __mln_forall__(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),      \
-                              BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
-
-#endif //!MLN_CORE_FORALL_HPP
+#endif // !MLN_CORE_FORALL_1_HPP

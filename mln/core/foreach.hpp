@@ -2,6 +2,7 @@
 # define MLN_CORE_FOREACH_HPP
 
 # include <utility>
+# include <mln/core/range/iter.hpp>
 
 namespace mln
 {
@@ -17,7 +18,6 @@ namespace mln
       constexpr operator bool() const { return false; }
       T& get() { return x_;}
       false_var_t& set(const T& v) { x_ = v; return *this; }
-
 
       T x_;
     };
@@ -78,7 +78,7 @@ namespace mln
 
 # define mln_foreach(p, COL)						\
   __mln_should_copy_col_local__(COL, _mln_range_)			\
-  MLN_DECL_VAR(_mln_it_, _mln_range_.get().iter())			\
+  MLN_DECL_VAR(_mln_it_, rng::iter(_mln_range_.get()))			\
   MLN_DECL_VAR(_mln_continue_, true)					\
   for (_mln_it_.get().init();						\
        _mln_continue_.get() and !_mln_it_.get().finished();		\

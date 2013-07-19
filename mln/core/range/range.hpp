@@ -1,8 +1,10 @@
-#ifndef RANGE_HPP
-# define RANGE_HPP
+#ifndef MLN_CORE_RANGE_RANGE_HPP
+# define MLN_CORE_RANGE_RANGE_HPP
 
+# include <mln/core/config.hpp>
 # include <mln/core/range/range_traits.hpp>
+# include <mln/core/range/iter.hpp>
 # include <mln/core/range/size.hpp>
 
 
-#endif // ! RANGE_HPP
+#endif // ! MLN_CORE_RANGE_RANGE_HPP

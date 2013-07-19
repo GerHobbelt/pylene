@@ -1,8 +1,9 @@
 #ifndef RANGE_SIZE_HPP
 # define RANGE_SIZE_HPP
 
+
 # include <type_traits>
-# include <mln/core/forall.hpp>
+# include <mln/core/range/range.hpp>
 
 namespace mln
 {
@@ -27,8 +28,8 @@ namespace mln
 	std::size_t size(const R& rng)
 	{
 	  std::size_t sz = 0;
-	  auto it = rng.iter();
-	  mln_forall(it)
+	  auto it = rng::iter(rng);
+	  for (it.init(); !it.finished(); it.next())
 	    ++sz;
 	  return sz;
 	}

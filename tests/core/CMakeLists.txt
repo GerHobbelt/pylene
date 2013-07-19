@@ -10,9 +10,13 @@ add_executable(box domain/box.cpp)
 add_test(box box)
 
 # test Range
+add_executable(range range/range.cpp)
 add_executable(range_filter range/filter.cpp)
+add_executable(range_zip range/zip.cpp)
 
+add_test(range range)
 add_test(range_filter range_filter)
+add_test(range_zip range_zip)
 
 # test Images
 add_executable(image2d   image/image2d.cpp)

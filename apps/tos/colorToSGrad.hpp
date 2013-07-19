@@ -14,6 +14,12 @@ namespace mln
   /// \param[out] K
   /// \param[out] parent
   /// \param[out] S
+  ///
+  /// The following step are done:
+  /// * adding border
+  /// * computing 3 ToS on r,g,b
+  /// * computing area attributes + merge by gradient
+  /// * computing ToS on area attributes.
   void colorToSGrad(const image2d<rgb8>& ima,
 		    image2d<unsigned>& K,
 		    image2d<unsigned>& parent,

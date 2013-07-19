@@ -2,7 +2,7 @@
 # define MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
 
 # include <mln/core/concept/iterator.hpp>
-# include <boost/utility.hpp>
+# include <memory>
 # include <type_traits>
 
 namespace mln
@@ -17,8 +17,8 @@ namespace mln
     struct pointer_wrapper
     {
       explicit pointer_wrapper(Reference x) : x_ (x) {}
-      Reference* operator->() { return boost::addressof(x_); }
-      operator Reference* () { return boost::addressof(x_); }
+      Reference* operator->() { return std::addressof(x_); }
+      operator Reference* () { return std::addressof(x_); }
     private:
       Reference x_;
     };
@@ -35,7 +35,7 @@ namespace mln
     struct make_pointer<T&>
     {
       typedef T* type;
-      static T* foo(T& x) { return boost::addressof (x); }
+      static T* foo(T& x) { return std::addressof (x); }
     };
 
   };
@@ -48,6 +48,9 @@ namespace mln
             typename Reference = Value&>
   struct iterator_base : Iterator<Derived>
   {
+    typedef Derived iterator;
+    typedef Derived const_iterator;
+
     typedef typename std::remove_const<Value>::type value_type;
     typedef Reference reference;
     typedef typename std::conditional< std::is_reference<Reference>::value,

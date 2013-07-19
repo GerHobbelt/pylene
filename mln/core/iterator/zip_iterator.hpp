@@ -2,9 +2,9 @@
 # define ZIP_ITERATOP_HPP
 
 # include <type_traits>
+# include <tuple>
 # include <mln/core/iterator/iterator_base.hpp>
-# include <boost/iterator/zip_iterator.hpp>
-# include <boost/tuple/tuple.hpp>
+# include <mln/core/internal/tuple_utility.hpp>
 
 namespace mln
 {
@@ -19,10 +19,6 @@ namespace mln
 
   namespace internal
   {
-    using boost::detail::tuple_impl_specific::tuple_meta_transform;
-    using boost::detail::tuple_impl_specific::tuple_meta_accumulate;
-    using boost::detail::tuple_impl_specific::tuple_transform;
-    using boost::detail::tuple_impl_specific::tuple_for_each;
 
     struct iterator_dereference
     {
@@ -51,54 +47,55 @@ namespace mln
 
   };
 
-  template <typename IteratorTuple>
-  struct zip_iterator
-    : iterator_base< zip_iterator<IteratorTuple>,
-		     typename internal::tuple_meta_transform<IteratorTuple, internal::iterator_dereference>::type,
-		     typename internal::tuple_meta_transform<IteratorTuple, internal::iterator_dereference>::type >
+  template <class... TTypes>
+  struct zip_iterator< std::tuple<TTypes...> >
+    : iterator_base< zip_iterator< std::tuple<TTypes...> >,
+		     std::tuple< typename std::remove_reference<TTypes>::type::reference... >,
+		     std::tuple< typename std::remove_reference<TTypes>::type::reference... > >
   {
-    typedef typename internal::tuple_meta_transform<IteratorTuple, internal::iterator_dereference>::type value_type;
+    typedef std::tuple<TTypes...> IteratorTuple;
+    typedef std::tuple< typename std::remove_reference<TTypes>::type::reference... > value_type;
     typedef value_type reference;
 
     zip_iterator() {}
 
     zip_iterator(const IteratorTuple& tuple)
-    : iterator_tuple_ (tuple)
+    : m_iterator_tuple (tuple)
     {
     }
 
     template <typename OtherIteratorTuple>
     zip_iterator(const zip_iterator<OtherIteratorTuple>& other,
 		 typename std::enable_if< std::is_convertible<OtherIteratorTuple, IteratorTuple>::value >::type* = NULL)
-      : iterator_tuple_ (other.iterator_tuple_)
+      : m_iterator_tuple (other.m_iterator_tuple)
     {
     }
 
 
     void init()
     {
-      internal::tuple_for_each(iterator_tuple_, internal::iterator_init ());
+      internal::tuple_for_each(m_iterator_tuple, internal::iterator_init ());
     }
 
     void next()
     {
-      internal::tuple_for_each(iterator_tuple_, internal::iterator_next ());
+      internal::tuple_for_each(m_iterator_tuple, internal::iterator_next ());
     }
 
     bool finished() const
     {
-      return boost::get<0>(iterator_tuple_).finished();
+      return std::get<0>(m_iterator_tuple).finished();
     }
 
     reference dereference() const
     {
-      return internal::tuple_transform(iterator_tuple_, internal::iterator_dereference ());
+      return internal::tuple_transform(m_iterator_tuple, internal::iterator_dereference ());
     }
 
   private:
     template <typename> friend struct zip_iterator;
 
-    IteratorTuple iterator_tuple_;
+    IteratorTuple m_iterator_tuple;
   };
 
 }

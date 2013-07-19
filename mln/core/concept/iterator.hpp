@@ -1,13 +1,14 @@
 #ifndef MLN_CORE_CONCEPT_ITERATOR_HPP
 # define MLN_CORE_CONCEPT_ITERATOR_HPP
 
+# include <mln/core/concept/object.hpp>
 # include <boost/concept_check.hpp>
 
 namespace mln
 {
 
   template <typename I>
-  struct Iterator
+  struct Iterator : Object<I>
   {
 
     Iterator()

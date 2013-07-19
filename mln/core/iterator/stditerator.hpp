@@ -26,7 +26,7 @@ namespace mln
 
     template <typename Iterator2>
     stditerator(const stditerator<Iterator2>& other,
-		typename std::enable_if<std::is_convertible<Iterator2, Iterator>::value>::type* dummmy = NULL)
+		typename std::enable_if<std::is_convertible<Iterator2, Iterator>::value>::type* = NULL)
       : cur_(other.cur_), begin_ (other.begin_), end_(other.end_)
     {
     }

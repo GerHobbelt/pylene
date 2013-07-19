@@ -98,7 +98,7 @@ namespace mln
     struct is_boost_tuple_base
     {
       template <typename... U>
-      static constexpr std::true_type check(boost::tuple<U...> );
+      static constexpr std::true_type check(std::tuple<U...> );
       static constexpr std::false_type check(...);
 
       typedef decltype(check( std::declval<T>() )) type;
@@ -109,14 +109,14 @@ namespace mln
     {
     };
 
-    template <typename ZipIterator, size_t n>
-    struct unzip_proxy_iterator_helper
-    {
-      typedef typename ZipIterator::reference Reference;
-      typedef typename ZipIterator::value_type Value;
-      typedef typename boost::tuples::element<n, Reference>::type	reference;
-      typedef typename boost::tuples::element<n, Value>::type		value_type;
-    };
+    // template <typename ZipIterator, size_t n>
+    // struct unzip_proxy_iterator_helper
+    // {
+    //   typedef typename ZipIterator::reference Reference;
+    //   typedef typename ZipIterator::value_type Value;
+    //   typedef typename std::tuple_element<n, Reference>::type	reference;
+    //   typedef typename boost::tuples::element<n, Value>::type		value_type;
+    // };
   }
 
 
@@ -125,15 +125,15 @@ namespace mln
   template <typename ZipIterator, size_t n>
   struct unzip_proxy_iterator
     : iterator_base< unzip_proxy_iterator<ZipIterator, n>,
-		     typename internal::unzip_proxy_iterator_helper<ZipIterator, n>::value_type,
-		     typename internal::unzip_proxy_iterator_helper<ZipIterator, n>::reference >
+		     typename std::tuple_element<n, typename ZipIterator::value_type>::type,
+		     typename std::tuple_element<n, typename ZipIterator::reference>::type>
   {
 
   private:
     typedef typename ZipIterator::reference Reference;
     //static_assert(internal::is_boost_tuple<Reference>::value, "");
   public:
-    typedef typename internal::unzip_proxy_iterator_helper<ZipIterator, n>::reference  reference;
+    typedef typename std::tuple_element<n, typename ZipIterator::reference>::type reference;
 
     unzip_proxy_iterator() = default;
 
@@ -145,7 +145,7 @@ namespace mln
     void init() { zip_->init(); }
     void next() { zip_->next(); }
     bool finished() const { return zip_->finished(); }
-    reference dereference() const { return boost::get<n>(zip_->dereference()); }
+    reference dereference() const { return std::get<n>(zip_->dereference()); }
 
     void set_dejavu_(bool v)
     {
@@ -160,7 +160,6 @@ namespace mln
   namespace internal
   {
 
-
     template <size_t n, typename TuplePixel>
     struct unzip_pixel_proxy
     {
@@ -169,18 +168,21 @@ namespace mln
 
     public:
       typedef typename pixel_t::point_type                                  point_type;
-      typedef typename std::remove_reference<typename boost::tuples::element<n, typename pixel_t::value_type>::type>::type value_type;
-      typedef typename boost::tuples::element<n, typename pixel_t::value_type>::type reference;
-      typedef typename std::remove_reference<typename boost::tuples::element<n, typename pixel_t::image_type::image_tuple_t>::type>::type image_type;
+      typedef typename std::remove_reference<typename std::tuple_element<n, typename pixel_t::value_type>::type>::type value_type;
+      typedef typename std::tuple_element<n, typename pixel_t::value_type>::type reference;
+      typedef typename std::remove_reference<typename std::tuple_element<n, typename pixel_t::image_type::image_tuple_t>::type>::type image_type;
 
-      unzip_pixel_proxy(const pixel_t& pixel)
-        : tuple_pix_ (pixel)
+      unzip_pixel_proxy(TuplePixel&& pixel)
+      : tuple_pix_ (pixel)
       {
       }
 
-      reference val() const { return boost::get<n>(tuple_pix_.val()); }
+      //unzip_pixel_proxy(const unzip_pixel_proxy&) = delete;
+      //unzip_pixel_proxy& operator=(const unzip_pixel_proxy&) = delete;
+
+      reference val() const { return std::get<n>(tuple_pix_.val()); }
       point_type point() const { return tuple_pix_.point(); }
-      image_type& image() const { return boost::get<n>(tuple_pix_.image().images()); }
+      image_type& image() const { return std::get<n>(tuple_pix_.image().images()); }
 
 
       template <typename image_type = image_type>
@@ -188,12 +190,27 @@ namespace mln
 			       typename image_type::size_type >::type
       index() const
       {
-	return boost::get<n>(tuple_pix_.image().images()).index_of_point(tuple_pix_.point());
+	return std::get<n>(tuple_pix_.image().images()).index_of_point(tuple_pix_.point());
       }
 
     private:
-      const pixel_t& tuple_pix_;
+      TuplePixel tuple_pix_;
     };
+
+
+    // We have two cases:
+    // * The pixel range creates a temporary tuple of pixel (e.g. zip_image) in which case:
+    //   TuplePixel = <Pix1, Pix2, ..., Pixn>&&
+    //   We can avoid the copy by doing a perfect forwarding
+    // * The pixel range create a reference
+    //   TuplePixel = <Pix1, Pix2, ..., Pixn>&
+    // template <size_t n, typename TuplePixel>
+    // struct unzip_pixel_proxy : Pixel< unzip_pixel_proxy<n, TuplePixel> >
+    // {
+    // private:
+    //   typedef typename std::remove_reference<TuplePixel> 
+    //   typename std::tuple_element<TuplePixel
+    // };
 
   }
 

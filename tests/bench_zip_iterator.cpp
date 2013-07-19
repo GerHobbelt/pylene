@@ -1,6 +1,5 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
-#include <mln/core/image/zip_image.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/equal.hpp>
@@ -72,8 +71,8 @@ double test_zip(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
 
-  double v = range::accumulate(ima.values(), 0.0d, [](double v, const boost::tuple<const int&, const int&>& x)
-                        { return v + boost::get<0>(x) * boost::get<1>(x); });
+  double v = range::accumulate(ima.values(), 0.0d, [](double v, const std::tuple<const int&, const int&>& x)
+			       { return v + std::get<0>(x) * std::get<1>(x); });
   asm ("");
   return v;
 }
@@ -85,7 +84,7 @@ double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
   auto ima = imzip(a, b);
   typedef typename decltype(ima)::const_pixel_type pixel_t;
   double v = range::accumulate(ima.pixels(), 0.0d, [](double v, const pixel_t& x)
-                               { return v + boost::get<0>(x.val()) * boost::get<1>(x.val()); });
+                               { return v + std::get<0>(x.val()) * std::get<1>(x.val()); });
   asm ("");
   return v;
 }

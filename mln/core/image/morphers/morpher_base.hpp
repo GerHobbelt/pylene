@@ -15,7 +15,8 @@ namespace mln
 
 
   /// \brief Base class for morphed pixels thats acts like a mixin on Pix.
-  template <typename Derived, typename Pix>
+  template <typename Derived, typename Pix,
+	    typename Morpher = typename Pix::image_type>
   struct morpher_pixel_base;
 
   // FWD declaration
@@ -31,7 +32,7 @@ namespace mln
     template <typename Morpher>
     static
     typename Morpher::image_t&
-    get_ima(Morpher* morpher)
+    get_ima_(Morpher* morpher)
     {
       return reinterpret_cast<typename Morpher::derived_t*>(morpher)->m_ima;
     }
@@ -40,15 +41,33 @@ namespace mln
     template <typename Morpher>
     static
     const typename Morpher::image_t&
-    get_ima(const Morpher* morpher)
+    get_ima_(const Morpher* morpher)
     {
       return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
     }
 
+    template <typename Morpher>
+    static
+    typename Morpher::image_t&
+    get_ima(Morpher* morpher)
+    {
+      return reinterpret_cast<typename Morpher::derived_t*>(morpher)->get_morphed();
+    }
+
+
+    template <typename Morpher>
+    static
+    const typename Morpher::image_t&
+    get_ima(const Morpher* morpher)
+    {
+      return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->get_morphed();
+    }
+
+
     template <typename PixMorpher>
     static
     typename PixMorpher::pixel_t&
-    get_pix(PixMorpher* morpher)
+    get_pix_(PixMorpher* morpher)
     {
       return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->m_pix;
     }
@@ -57,9 +76,26 @@ namespace mln
     template <typename PixMorpher>
     static
     const typename PixMorpher::pixel_t&
-    get_pix(const PixMorpher* morpher)
+    get_pix_(const PixMorpher* morpher)
     {
       return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->m_pix;
+    }
+
+    template <typename PixMorpher>
+    static
+    typename PixMorpher::pixel_t&
+    get_pix(PixMorpher* morpher)
+    {
+      return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->get_morphed();
+    }
+
+
+    template <typename PixMorpher>
+    static
+    const typename PixMorpher::pixel_t&
+    get_pix(const PixMorpher* morpher)
+    {
+      return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->get_morphed();
     }
 
   };
@@ -208,6 +244,9 @@ namespace mln
       return morpher_core_access::get_ima(this).pixels();
     }
 
+  protected:
+    image_t&		get_morphed() { return morpher_core_access::get_ima_(this); }
+    const image_t&	get_morphed() const { return morpher_core_access::get_ima_(this); }
   };
 
   namespace impl
@@ -216,19 +255,19 @@ namespace mln
     // we add the following typedefs/methods:
     // + typedef size_type
     // + index()
-    template <typename Derived, typename Pix,
+    template <typename Derived, typename Pix, typename Morpher,
 	      bool is_indexable =
-	      image_traits<typename Pix::image_type>::indexable::value
+	      image_traits<Morpher>::indexable::value
 	      >
     struct morpher_pixel_indexable;
 
-    template <typename Derived, typename Pix>
-    struct morpher_pixel_indexable<Derived, Pix, false>
+    template <typename Derived, typename Pix, typename Morpher>
+    struct morpher_pixel_indexable<Derived, Pix, Morpher, false>
     {
     };
 
-    template <typename Derived, typename Pix>
-    struct morpher_pixel_indexable<Derived, Pix, true>
+    template <typename Derived, typename Pix, typename Morpher>
+    struct morpher_pixel_indexable<Derived, Pix, Morpher, true>
     {
     private:
       friend  struct mln::morpher_core_access;
@@ -246,10 +285,10 @@ namespace mln
 
   }
 
-  template <typename Derived, typename Pix>
+  template <typename Derived, typename Pix, typename Morpher>
   struct morpher_pixel_base :
     Pixel<Derived>,
-    impl::morpher_pixel_indexable<Derived, Pix>
+    impl::morpher_pixel_indexable<Derived, Pix, Morpher>
   {
   private:
     friend  struct morpher_core_access;
@@ -278,10 +317,15 @@ namespace mln
       return morpher_core_access::get_pix(this).site();
     }
 
+    // FIXME: This does not make sense
     image_type& image() const
     {
       return morpher_core_access::get_pix(this).image();
     }
+
+  protected:
+    Pix&		get_morphed() { return morpher_core_access::get_pix_(this); }
+    const Pix&		get_morphed() const { return morpher_core_access::get_pix_(this); }
 
   };
 

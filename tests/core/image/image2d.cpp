@@ -22,18 +22,24 @@ BOOST_AUTO_TEST_CASE(extension)
   iota(ref, 1);
 
   mln::extension::fill(ima, 69);
+  BOOST_CHECK_EQUAL(ima.at(-1,-1), 69);
 
   mln_pixter(p1, p2, ima, ref);
   mln_iter(q1, c4(p1));
   mln_iter(q2, c4(p2));
 
+  int i = 1;
   mln_forall(p1, p2)
-    mln_forall(q1, q2)
     {
-      if (ima.domain().has(q1->point()))
-        BOOST_CHECK_EQUAL(q1->val(), q2->val());
-      else
-        BOOST_CHECK_EQUAL(q1->val(), 69);
+      BOOST_CHECK_EQUAL(p1->val(), p2->val());
+      BOOST_CHECK_EQUAL(p1->val(), i++);
+      mln_forall(q1, q2)
+	{
+	  if (ima.domain().has(q1->point()))
+	    BOOST_CHECK_EQUAL(q1->val(), q2->val());
+	  else
+	    BOOST_CHECK_EQUAL(q1->val(), 69);
+	}
     }
 }
 

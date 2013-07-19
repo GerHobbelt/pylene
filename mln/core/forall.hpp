@@ -74,7 +74,7 @@
 #ifndef MLN_CORE_FORALL_1_HPP
 # define MLN_CORE_FORALL_1_HPP
 
-# include <mln/core/image/zip_image.hpp>
+# include <mln/core/image/morphers/zip_image.hpp>
 # include <mln/core/iterator/unzip_proxy_iterator.hpp>
 
 

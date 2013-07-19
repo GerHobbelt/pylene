@@ -1,4 +1,3 @@
-#include <mln/core/image/zip_image.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
@@ -27,11 +26,19 @@ BOOST_AUTO_TEST_CASE(Mixed_writable)
 
   image2d<int> ima(5,5);
   image2d<uint16> ima2(5,5);
+  iota(ima,0);
+  iota(ima2,1);
 
-  fill(imzip(ima, ima2), boost::make_tuple(2,4));
+  // auto x = imzip(ima, ima2);
+  // mln_viter(v, x);
+  // mln_forall(v)
+  //   std::cout << std::get<0>(*v) << "," <<  std::get<1>(*v)    << std::endl;
+
+  fill(imzip(ima, ima2), std::make_tuple(2,4));
   BOOST_CHECK( all(ima == 2) );
   BOOST_CHECK( all(ima2 == 4) );
 }
+
 
 BOOST_AUTO_TEST_CASE(Value_Iteration_1)
 {
@@ -41,7 +48,7 @@ BOOST_AUTO_TEST_CASE(Value_Iteration_1)
   image2d<uint16>       b(5,5);
 
   auto x = imzip(a,b);
-  range::for_each(x.values(), [](boost::tuple<int&, uint16&> w) { w = boost::make_tuple(2,4); });
+  range::for_each(x.values(), [](std::tuple<int&, uint16&> w) { w = std::make_tuple(2,4); });
   BOOST_CHECK( all(a == 2) );
   BOOST_CHECK( all(b == 4) );
 }
@@ -55,7 +62,7 @@ BOOST_AUTO_TEST_CASE(Pixel_Iteration_1)
 
   auto x = imzip(a,b);
   typedef zip_image<image2d<int>&, image2d<uint16>& >::pixel_type pixel_t;
-  range::for_each(x.pixels(), [](pixel_t x) { x.val() = boost::make_tuple(2,4); });
+  range::for_each(x.pixels(), [](pixel_t x) { x.val() = std::make_tuple(2,4); });
 
 
   BOOST_CHECK( all(a == 2) );
@@ -78,7 +85,7 @@ BOOST_AUTO_TEST_CASE(Value_Iteration_2)
   int x, y;
   mln_foreach (auto w, tmp.values())
     {
-      boost::tie(x, y) = w;
+      std::tie(x, y) = w;
       sum1 += x + y;
     }
   }
@@ -93,10 +100,11 @@ BOOST_AUTO_TEST_CASE(Value_Iteration_2)
   auto x = imzip(ima, make_image());
 
   mln_foreach(auto w, x.values())
-    boost::get<0>(w) = boost::get<1>(w);
+    std::get<0>(w) = std::get<1>(w);
 
   BOOST_CHECK( all(ima == make_image()) );
-}
+ }
+
 
  BOOST_AUTO_TEST_SUITE_END()
 

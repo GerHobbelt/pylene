@@ -1,8 +1,7 @@
 #ifndef MLN_CORE_ALGORITHM_EQUAL_HPP
 # define MLN_CORE_ALGORITHM_EQUAL_HPP
 
-# include <mln/core/concept/image.hpp>
-# include <mln/core/image/zip_image.hpp>
+# include <mln/core/image/image.hpp>
 
 namespace mln
 {

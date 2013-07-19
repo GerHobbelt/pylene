@@ -1,12 +1,14 @@
+#ifndef MLN_CORE_IMAGE_IMAGE_HPP
+# warning "You should not include this file directly but <mln/core/image/image.hpp> instead"
+# include <mln/core/image/image.hpp>
+#endif
+
 #ifndef MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 # define MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 
 # include <type_traits>
 
-//# include <mln/core/functional.hpp>
-
-# include <mln/core/concept/image.hpp>
-# include <mln/core/image/zip_image.hpp>
+# include <mln/core/image/morphers/zip_image.hpp>
 # include <mln/core/image/morphers/transformed_image.hpp>
 
 namespace mln
@@ -76,9 +78,9 @@ namespace mln
       }
 
       typename std::result_of<Function(U, V)>::type
-      operator() (boost::tuple<U, V> x) const
+      operator() (std::tuple<U, V> x) const
       {
-        return f(boost::get<0>(x), boost::get<1>(x));
+        return f(std::get<0>(x), std::get<1>(x));
       }
 
     private:

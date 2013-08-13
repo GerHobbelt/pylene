@@ -282,6 +282,16 @@ namespace mln
   }
 
 
+  template <typename U, typename V>
+  struct lexicographicalorder_less
+  {
+    bool
+    operator() (const U& u, const V& v)
+    {
+      return u < v;
+    }
+  };
+
 
   template <typename U, typename V,
 	    unsigned dim, typename tag>

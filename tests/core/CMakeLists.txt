@@ -52,7 +52,6 @@ add_core_test(extension_fill extension_fill)
 add_executable(value_int value/int.cpp)
 add_executable(vec_math_ops vec/vec_math_ops.cpp)
 
-
 add_core_test(value_int value_int)
 add_core_test(vec_math_ops vec_math_ops)
 

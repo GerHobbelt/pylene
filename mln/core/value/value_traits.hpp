@@ -8,8 +8,11 @@ namespace mln
 {
 
   template <typename V, typename StrictWeakOrdering = std::less<V>, class Enable = void>
-  struct value_traits;
-
+  struct value_traits
+  {
+    static_assert(!std::is_same<Enable, void>::value,
+		  "You must specialize this trait for your types.");
+  };
 
   // Default traits for std::greater
   template <typename V, class Enable>

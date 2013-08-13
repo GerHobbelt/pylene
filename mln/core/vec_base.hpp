@@ -1,3 +1,8 @@
+#ifndef MLN_CORE_VEC_HPP
+# warning "This should not be included directly. Include <mln/core/vec.hpp> instead."
+# include <mln/core/vec.hpp>
+#endif
+
 #ifndef MLN_INTERNAL_VEC_BASE_HH
 # define MLN_INTERNAL_VEC_BASE_HH
 
@@ -84,7 +89,7 @@
   operator Op (const vec_base<U, dim, tag>& o) const			\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
-      if (!(v_[i] Op o.v_[i]))						\
+      if (!(v_[i] Op o[i]))						\
 	return false;							\
     return true;							\
   }
@@ -100,7 +105,7 @@
   operator Op (const vec_base<U, dim, tag>& o) const			\
   {									\
     for (unsigned i = 0; i < dim; ++i)					\
-      if (v_[i] Op o.v_[i])						\
+      if (v_[i] Op o[i])						\
 	return true;							\
     return false;							\
   }
@@ -121,7 +126,7 @@
     typedef vec_base<decltype( std::declval<T>() + std::declval<U>() ) , dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
-      r.v_[i] = x.v_[i] Op y.v_[i];					\
+      r[i] = x[i] Op y[i];					\
     return r;								\
   }
 
@@ -139,7 +144,7 @@
     typedef vec_base<decltype( std::declval<T>() + std::declval<U>() ) , dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
-      r.v_[i] = x.v_[i] Op y;						\
+      r[i] = x[i] Op y;						\
     return r;								\
   }									\
 									\
@@ -154,7 +159,7 @@
     typedef vec_base<decltype( std::declval<T>() + std::declval<U>() ), dim, tag> R; \
     R r;								\
     for (unsigned i = 0; i < dim; ++i)					\
-      r.v_[i] = y Op x.v_[i];						\
+      r[i] = y Op x[i];						\
     return r;								\
   }
 
@@ -182,10 +187,30 @@ namespace mln
       typedef vec_base<typename T::type, dim, tag> type;
     };
 
+    template <int... N>
+    struct Seq {};
+
+
+    template <int n, int... S>
+    struct genseq : genseq<n-1, n-1, S...>
+    {
+    };
+
+    template <int... S>
+    struct genseq<1, S...>
+    {
+      typedef Seq<0, S...> type;
+    };
+
+
+
 
     template <typename T, unsigned dim, typename tag>
     struct vec_base
     {
+      template <typename, unsigned, typename>
+      friend struct vec_base;
+
     public:
       typedef T value_type;
       typedef T* pointer;
@@ -201,21 +226,22 @@ namespace mln
 
       vec_base() = default;
 
-      constexpr vec_base(const literal::zero_t&)
+      constexpr
+      vec_base(const literal::zero_t&)
         : v_ {0,}
       {
       }
 
+      constexpr
       vec_base(const literal::one_t&)
+	: vec_base(1)
       {
-        this->set_all(1);
       }
 
 
-      template <typename dummy = void>
       constexpr
-      vec_base(const T& x, typename std::enable_if<dim==1, dummy>::type* = NULL)
-        : v_ {x}
+      vec_base(const T& x)
+      : vec_base(x, typename genseq<dim>::type ())
       {
       }
 
@@ -263,8 +289,18 @@ namespace mln
 	return *this;
       }
 
-      T& operator[] (size_type n) { mln_precondition(n < dim); return v_[n]; }
-      const T& operator[] (size_type n) const { mln_precondition(n < dim); return v_[n]; }
+      T& operator[] (size_type n)
+      {
+	mln_precondition(n < dim);
+	return v_[n];
+      }
+
+      constexpr
+      const T& operator[] (size_type n) const
+      {
+	//mln_precondition(n < dim);
+	return v_[n];
+      }
 
       vec_base<T, dim, generic_vector_tag>&
       as_vec()
@@ -319,17 +355,7 @@ namespace mln
       operator== (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
-	  if (!(v_[i] == o.v_[i]))
-	    return false;
-	return true;
-      }
-
-      template <typename dummy=void>
-      VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
-      operator== (const vec_base& o) const
-      {
-	for (unsigned i = 0; i < dim; ++i)
-	  if (!(v_[i] == o.v_[i]))
+	  if (!(v_[i] == o[i]))
 	    return false;
 	return true;
       }
@@ -340,17 +366,7 @@ namespace mln
       operator!= (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
-	  if (v_[i] != o.v_[i])
-	    return true;
-	return false;
-      }
-
-      template <typename dummy=void>
-      VEC_BASE_ENABLE_IF(is_equality_comparable, bool)
-      operator!= (const vec_base& o) const
-      {
-	for (unsigned i = 0; i < dim; ++i)
-	  if (v_[i] != o.v_[i])
+	  if (v_[i] != o[i])
 	    return true;
 	return false;
       }
@@ -361,25 +377,12 @@ namespace mln
       operator< (const vec_base<U, dim, tag>& o) const
       {
 	for (unsigned i = 0; i < dim; ++i)
-	  if (v_[i] < o.v_[i])
+	  if (v_[i] < o[i])
 	    return true;
-	  else if (v_[i] > o.v_[i])
+	  else if (v_[i] > o[i])
 	    return false;
 	return false;
       }
-
-      template <typename dummy=void>
-      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
-      operator< (const vec_base& o) const
-      {
-	for (unsigned i = 0; i < dim; ++i)
-	  if (v_[i] < o.v_[i])
-	    return true;
-	  else if (v_[i] > o.v_[i])
-	    return false;
-	return false;
-      }
-
 
 
       template <typename U>
@@ -389,19 +392,7 @@ namespace mln
 	for (unsigned i = 0; i < dim; ++i)
 	  if (v_[i] < o.v_[i])
 	    return true;
-	  else if (v_[i] > o.v_[i])
-	    return false;
-	return true;
-      }
-
-      template <typename dummy=void>
-      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
-      operator<= (const vec_base& o) const
-      {
-	for (unsigned i = 0; i < dim; ++i)
-	  if (v_[i] < o.v_[i])
-	    return true;
-	  else if (v_[i] > o.v_[i])
+	  else if (v_[i] > o[i])
 	    return false;
 	return true;
       }
@@ -414,24 +405,9 @@ namespace mln
 	return not(*this <= o);
       }
 
-      template <typename dummy=void>
-      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
-      operator > (const vec_base& o) const
-      {
-	return not(*this <= o);
-      }
-
-
       template <typename U>
       VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
       operator >= (const vec_base<U, dim, tag>& o) const
-      {
-	return not(*this < o);
-      }
-
-      template <typename dummy=void>
-      VEC_BASE_ENABLE_IF(is_less_than_comparable, bool)
-      operator >= (const vec_base& o) const
       {
 	return not(*this < o);
       }
@@ -463,6 +439,20 @@ namespace mln
 	return s;
       }
 
+    private:
+      template <int... N>
+      constexpr
+      vec_base(const T& x, Seq<N...>)
+	: v_ { __copy<N>(x)... }
+      {
+      }
+
+      template <int i>
+      static
+      constexpr
+      T __copy(T x) { return x; }
+
+
       T v_[dim];
     };
 
@@ -478,17 +468,6 @@ namespace mln
     VEC_BASE_GEN_EXT_OP_EXT(is_multiplicative_ext, /)
     VEC_BASE_GEN_EXT_OP_EXT(is_multiplicative_ext, %)
 
-    template <typename T, unsigned dim, typename tag>
-    inline
-    std::ostream&
-    operator<< (std::ostream& os, const vec_base<T, dim, tag>& x)
-    {
-      os << '[';
-      for (unsigned i = 0; i < dim-1; ++i)
-	os << x.v_[i] << ',';
-      os << x.v_[dim-1] << ']';
-      return os;
-    }
 
     template <>
     struct vec_base_traits<generic_vector_tag>
@@ -503,30 +482,7 @@ namespace mln
 
   }
 
-  template <typename T, std::size_t dim>
-  using vec = internal::vec_base<T, dim, generic_vector_tag>;
 
-  typedef vec<unsigned char, 1>	vec1ub;
-  typedef vec<unsigned char, 2>	vec2ub;
-  typedef vec<unsigned char, 3>	vec3ub;
-  typedef vec<char, 1>		vec1b;
-  typedef vec<char, 2>		vec2b;
-  typedef vec<char, 3>		vec3b;
-  typedef vec<unsigned short, 1> vec1us;
-  typedef vec<unsigned short, 2> vec2us;
-  typedef vec<unsigned short, 3> vec3us;
-  typedef vec<short, 1>		vec1s;
-  typedef vec<short, 2>		vec2s;
-  typedef vec<short, 3>		vec3s;
-  typedef vec<unsigned, 1>	vec1u;
-  typedef vec<unsigned, 2>	vec2u;
-  typedef vec<unsigned, 3>	vec3u;
-  typedef vec<int, 1>		vec1i;
-  typedef vec<int, 2>		vec2i;
-  typedef vec<int, 3>		vec3i;
-  typedef vec<float, 1>		vec1f;
-  typedef vec<float, 2>		vec2f;
-  typedef vec<float, 3>		vec3f;
 }
 
 /*********************************/

@@ -199,7 +199,44 @@ namespace mln
   };
 
 
+  /****************************/
+  /**  Relational operations **/
+  /****************************/
+  using std::min;
+  using std::max;
 
+
+  template <typename U>
+  const U&
+  inf(const U& x, const U& y)
+  {
+    return std::min(x, y);
+  }
+
+  template <typename U>
+  const U&
+  sup(const U& x, const U& y)
+  {
+    return std::max(x, y);
+  }
+
+  template <typename U, class Compare>
+  const U&
+  inf(const U& x, const U& y, Compare cmp)
+  {
+    return std::min(x, y, cmp);
+  }
+
+  template <typename U, class Compare>
+  const U&
+  sup(const U& x, const U& y, Compare cmp)
+  {
+    return std::max(x, y, cmp);
+  }
+
+  /*****************************/
+  /** Aggregation operations  **/
+  /*****************************/
 
 
 } // end of namespace mln

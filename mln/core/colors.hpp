@@ -19,7 +19,7 @@ namespace mln
       static const bool is_additive_ext = true;
       static const bool is_multiplicative = false;
       static const bool is_multiplicative_ext = true;
-      static const bool is_less_than_comparable = true;
+      static const bool is_less_than_comparable = false;
       static const bool is_equality_comparable = true;
     };
 
@@ -30,7 +30,7 @@ namespace mln
       static const bool is_additive_ext = true;
       static const bool is_multiplicative = false;
       static const bool is_multiplicative_ext = true;
-      static const bool is_less_than_comparable = true;
+      static const bool is_less_than_comparable = false;
       static const bool is_equality_comparable = true;
     };
   }

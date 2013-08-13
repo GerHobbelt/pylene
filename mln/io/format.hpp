@@ -1,5 +1,5 @@
-#ifndef FORMAT_HPP
-# define FORMAT_HPP
+#ifndef MLN_IO_FORMAT_HPP
+# define MLN_IO_FORMAT_HPP
 
 # include <iostream>
 # include <mln/core/grays.hpp>
@@ -19,17 +19,15 @@ namespace mln
     }
 
 
-    template <>
     inline
     std::ostream&
-    format<uint8>(std::ostream& os, const uint8& v)
+    format(std::ostream& os, const uint8& v)
     {
       return os << (int)v;
     }
-
 
   }
 
 }
 
-#endif // ! FORMAT_HPP
+#endif // ! MLN_IO_FORMAT_HPP

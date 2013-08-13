@@ -8,6 +8,7 @@
 # include <mln/core/domain/box.hpp>
 # include <mln/core/macros.hpp>
 # include <mln/core/grays.hpp>
+# include <mln/io/format.hpp>
 
 
 namespace mln
@@ -23,10 +24,12 @@ namespace mln
       imprint(const Image& ima, Domain domain)
       {
         typedef typename Image::value_type V;
-	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
+	//typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
 
-        for (auto p : domain)
-          std::cout << '{' << p << "," << (T)ima(p) << "}," << std::endl;
+        for (auto p : domain) {
+          std::cout << '{' << p << ",";
+	  format(std::cout, ima(p)) << "}," << std::endl;
+	}
       }
 
 
@@ -36,11 +39,13 @@ namespace mln
       imprint(const Image& ima, Domain domain)
       {
         typedef typename Image::value_type V;
-	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
+	//typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
         (void) domain;
 	typedef typename Image::const_pixel_type pixel_t;
-        mln_foreach (const pixel_t& pix, ima.pixels())
-          std::cout << '{' << pix.point() << "," << (T)pix.val() << "}," << std::endl;
+        mln_foreach (const pixel_t& pix, ima.pixels()) {
+          std::cout << '{' << pix.point() << ",";
+	  format(std::cout, pix.val()) << "}," << std::endl;
+	}
       }
 
 
@@ -49,7 +54,7 @@ namespace mln
       imprint(const Image& ima, box<P, 2> domain)
       {
         typedef typename Image::value_type V;
-	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
+	//typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
 	mln_point(Image) p;
         std::ios state(NULL);
         state.copyfmt(std::cout);
@@ -65,7 +70,8 @@ namespace mln
         std::cout.width(4);
 	for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0]) {
 	  for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1]) {
-	    std::cout << std::setw(wtext) << ((T) ima(p)) << " ";
+	    std::cout << std::setw(wtext);
+	    format(std::cout, ima(p)) << " ";
 	  }
 	  std::cout << std::endl;
 	}
@@ -77,7 +83,7 @@ namespace mln
       imprint_with_border(const Image& ima, box<P, 2> domain)
       {
         typedef typename Image::value_type V;
-	typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
+	//typedef typename std::conditional<std::is_same<V, uint8>::value, int, typename Image::const_reference>::type T;
 	mln_point(Image) p;
         int border = ima.border();
 
@@ -90,12 +96,12 @@ namespace mln
 	std::cout.width(4);
 	for (p[0] = domain.pmin[0] - border; p[0] < domain.pmax[0] + border; ++p[0]) {
 	  for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1]) {
-	    std::cout << std::setw(wtext) << ((T) ima.at(p)) << " ";
+	    std::cout << std::setw(wtext);
+	    format(std::cout, ima.at(p)) << " ";
 	  }
 	  std::cout << std::endl;
 	}
       }
-
     }
 
     template <typename I>

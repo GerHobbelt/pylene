@@ -1,5 +1,5 @@
-#ifndef MLN_IO_IMSAVE_HPP
-# define MLN_IO_IMSAVE_HPP
+#ifndef MLN_IO_PNG_IMSAVE_HPP
+# define MLN_IO_PNG_IMSAVE_HPP
 
 # include <FreeImage.h>
 # include <mln/core/grays.hpp>
@@ -11,6 +11,9 @@ namespace mln
 
   namespace io
   {
+
+    namespace png
+    {
 
     namespace internal
     {
@@ -28,18 +31,8 @@ namespace mln
 	  fit = FIT_BITMAP;
 	else if (std::is_same<V, uint16>::value)
 	  fit = FIT_UINT16;
-	else if (std::is_same<V, int16>::value)
-	  fit = FIT_INT16;
-	else if (std::is_same<V, uint32>::value)
-	  fit = FIT_UINT32;
-	else if (std::is_same<V, int32>::value)
-	  fit = FIT_INT32;
-	else if (std::is_same<V, float>::value)
-	  fit = FIT_FLOAT;
-	else if (std::is_same<V, double>::value)
-	  fit = FIT_DOUBLE;
 	else
-            throw MLNIOException("Unhandled image type.");
+	  throw MLNIOException("Unhandled image type.");
 
 
         int h = ima.domain().shape()[0], w = ima.domain().shape()[1];
@@ -82,21 +75,19 @@ namespace mln
         }
 
         //FreeImage_DeInitialise();
-        bool res = FreeImage_Save(FIF_TIFF, dib, path);
+        bool res = FreeImage_Save(FIF_PNG, dib, path);
 	if (!res)
 	  throw MLNIOException("Unable to save the image.");
-
         FreeImage_Unload(dib);
       }
     }
 
-
-  template <typename Image>
-  void imsave(const Image& ima, const char* path)
-  {
-    internal::imsave(ima, path, typename image_traits<Image>::category ());
-  }
-
+      template <typename Image>
+      void imsave(const Image& ima, const char* path)
+      {
+	internal::imsave(ima, path, typename image_traits<Image>::category ());
+      }
+    }
 
 
   } // end of namespace mln::io
@@ -104,4 +95,4 @@ namespace mln
 
 
 
-#endif //!MLN_IO_IMSAVE_HPP
+#endif //!MLN_IO_PNG_IMSAVE_HPP

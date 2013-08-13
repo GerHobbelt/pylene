@@ -1,3 +1,3 @@
 add_executable(graphcut graphcut.cpp)
 
-add_test(graphcut graphcut)
+add_core_test(graphcut graphcut)

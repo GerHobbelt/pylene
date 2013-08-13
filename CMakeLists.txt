@@ -45,14 +45,23 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 
+# Testing
 ENABLE_TESTING()
-add_subdirectory(tests)
-add_subdirectory(bench)
-add_subdirectory(apps)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+macro(add_core_test Testname Exename)
+add_test(${ARGV})
+add_dependencies(check ${Exename})
+endmacro(add_core_test)
+
+
+
+
+# Subdirectories
+add_subdirectory(tests EXCLUDE_FROM_ALL)
+add_subdirectory(bench EXCLUDE_FROM_ALL)
+add_subdirectory(apps EXCLUDE_FROM_ALL)
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")
 INCLUDE(CPack)
-
-
 add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)

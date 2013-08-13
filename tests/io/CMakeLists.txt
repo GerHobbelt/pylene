@@ -3,5 +3,5 @@ add_definitions(-DMLN_IMG_PATH="$(CMAKE_SOURCE_DIR)/img/")
 
 
 add_executable(freeimage freeimage.cpp)
-add_test(freeimage freeimage)
+add_core_test(freeimage freeimage)
 

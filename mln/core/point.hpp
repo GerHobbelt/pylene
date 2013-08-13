@@ -1,7 +1,7 @@
 #ifndef MLN_POINT_HH
 # define MLN_POINT_HH
 
-# include <mln/core/vec_base.hpp>
+# include <mln/core/vec.hpp>
 
 namespace mln
 {

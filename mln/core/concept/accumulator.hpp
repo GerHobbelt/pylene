@@ -11,6 +11,10 @@ namespace mln
   template <typename Acc>
   struct AccumulatorLike : Object<Acc>
   {
+  protected:
+    AccumulatorLike() = default;
+    AccumulatorLike(const AccumulatorLike&) = default;
+    AccumulatorLike& operator= (const AccumulatorLike&) = default;
   };
 
 

@@ -40,10 +40,10 @@ namespace mln
 		c = ima.at(p + P{1,0}),
 		d = ima.at(p + P{1,1});
 
-	      V min1 = std::min(a,b, cmp), min2 = std::min(a,c, cmp);
-	      V max1 = std::max(a,b, cmp), max2 = std::max(a,c, cmp);
-	      V min3 = std::min(d, std::min(c, min1, cmp), cmp);
-	      V max3 = std::max(d, std::max(c, max1, cmp), cmp);
+	      V min1 = inf(a,b, cmp), min2 = inf(a,c, cmp);
+	      V max1 = sup(a,b, cmp), max2 = sup(a,c, cmp);
+	      V min3 = inf(d, inf(c, min1, cmp), cmp);
+	      V max3 = sup(d, sup(c, max1, cmp), cmp);
 
 	      point2d q = 2 * p;
 	      out.at(q) = ima.at(p);

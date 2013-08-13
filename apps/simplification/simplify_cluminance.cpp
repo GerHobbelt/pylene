@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
   image2d<rgb8> ori, ori_;
   io::imread(argv[1], ori_);
-  ori = addborder(ori_);
+  ori = addborder(ori_, lexicographicalorder_less<rgb8> ());
 
   image2d<uint8> ima_, ima;
   ima = transform(ori, [](const rgb8& v) -> uint8 { return (v[0] + v[1] + v[2]) / 3; });

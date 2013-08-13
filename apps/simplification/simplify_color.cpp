@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   colorToSGrad(ima_, K, parent, S);
 
 
-  ima = interpolate_k1(addborder(ima_));
+  ima = interpolate_k1(addborder(ima_, lexicographicalorder_less<rgb8>()));
   image2d<rgb8>  mean = set_mean_on_node2(immerse_k1(ima), K, S, parent, K1::is_face_2);
   image2d<rgb8> simp = simplify_top_down(unimmerse_k1(mean), K, parent, S, lambda); //, grainsize, areafactor);
 

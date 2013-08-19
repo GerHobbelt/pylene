@@ -201,17 +201,17 @@ int main(int argc, char** argv)
   image2d<unsigned> area;
   std::string merge = vm["merge"].as<std::string>();
   if (merge == "max") {
-    area = transform(imzip(r_area, g_area, b_area), [](const boost::tuple<unsigned, unsigned, unsigned>& x) {
-  	return std::max(boost::get<0>(x), std::max(boost::get<1>(x), boost::get<2>(x))); });
+    area = transform(imzip(r_area, g_area, b_area), [](const std::tuple<unsigned, unsigned, unsigned>& x) {
+  	return std::max(std::get<0>(x), std::max(std::get<1>(x), std::get<2>(x))); });
     io::imsave(transform(area, [=](unsigned x) -> float { return (float)x; }), "maxarea.tiff");
   } else if (merge == "min") {
-    area = transform(imzip(r_area, g_area, b_area), [](const boost::tuple<unsigned, unsigned, unsigned>& x) {
-  	return std::min(boost::get<0>(x), std::min(boost::get<1>(x), boost::get<2>(x))); });
+    area = transform(imzip(r_area, g_area, b_area), [](const std::tuple<unsigned, unsigned, unsigned>& x) {
+  	return std::min(std::get<0>(x), std::min(std::get<1>(x), std::get<2>(x))); });
     io::imsave(transform(area, [=](unsigned x) -> float { return (float)x; }), "minarea.tiff");
   } else if (merge == "comp") {
-    area = transform(imzip(r_area, g_area, b_area), [](const boost::tuple<unsigned, unsigned, unsigned>& x) {
+    area = transform(imzip(r_area, g_area, b_area), [](const std::tuple<unsigned, unsigned, unsigned>& x) {
 	unsigned min, med, max;
-	std::tie(min, med, max) = minmedmax(boost::get<0>(x), boost::get<1>(x), boost::get<2>(x));
+	std::tie(min, med, max) = minmedmax(std::get<0>(x), std::get<1>(x), std::get<2>(x));
 	return (med - min) < (max - med) ? min : max;
     });
     io::imsave(transform(area, [=](unsigned x) -> float { return (float)x; }), "comparea.tiff");
@@ -260,7 +260,7 @@ int main(int argc, char** argv)
     std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(area, c8, std::greater<unsigned> ());
   }
 
-  auto ima2 = addborder(ima); // add border with median w.r.t < lexico
+  auto ima2 = addborder(ima, lexicographicalorder_less<rgb8>() ); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent).init(rgb8{0,0,255});
 

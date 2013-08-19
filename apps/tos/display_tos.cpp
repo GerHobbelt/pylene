@@ -111,11 +111,11 @@ int main(int argc, char** argv)
 
   image2d<unsigned> area;
   if (std::string(argv[2]) == "max")
-    area = transform(imzip(r_area, g_area, b_area), [](const boost::tuple<unsigned, unsigned, unsigned>& x) {
-	return std::max(boost::get<0>(x), std::max(boost::get<1>(x), boost::get<2>(x))); });
+    area = transform(imzip(r_area, g_area, b_area), [](const std::tuple<unsigned, unsigned, unsigned>& x) {
+	return std::max(std::get<0>(x), std::max(std::get<1>(x), std::get<2>(x))); });
   else
-    area = transform(imzip(r_area, g_area, b_area), [](const boost::tuple<unsigned, unsigned, unsigned>& x) {
-	return std::min(boost::get<0>(x), std::min(boost::get<1>(x), boost::get<2>(x))); });
+    area = transform(imzip(r_area, g_area, b_area), [](const std::tuple<unsigned, unsigned, unsigned>& x) {
+	return std::min(std::get<0>(x), std::min(std::get<1>(x), std::get<2>(x))); });
 
   unsigned maxr = r_area[rS[0]];
   unsigned maxg = g_area[gS[0]];

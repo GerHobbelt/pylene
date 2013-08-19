@@ -116,8 +116,8 @@ int main(int argc, char** argv)
     image2d<V> outb = grainfilter(bb, Kb, parentb, Sb, lambda);
 
 
-    image2d<rgb8> res = transform(imzip(outr, outg, outb), [](const boost::tuple<V,V,V>& x) {
-	return rgb8{ (uint8) (boost::get<0>(x) / 2), (uint8) (boost::get<1>(x) / 2), (uint8) (boost::get<2>(x) / 2) }; });
+    image2d<rgb8> res = transform(imzip(outr, outg, outb), [](const std::tuple<V,V,V>& x) {
+	return rgb8{ (uint8) (std::get<0>(x) / 2), (uint8) (std::get<1>(x) / 2), (uint8) (std::get<2>(x) / 2) }; });
 
     std::string filename = boost::str(boost::format("%s-%05i.tiff") % argv[2] % lambda);
     io::imsave(res, filename.c_str());

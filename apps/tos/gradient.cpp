@@ -40,9 +40,9 @@ int main(int argc, char** argv)
   io::imsave(gb, "gb.tiff");
 
 
-  image2d<rgb8> output = transform(imzip(gr, gg, gb), [] (const boost::tuple<V,V,V>& x) {
+  image2d<rgb8> output = transform(imzip(gr, gg, gb), [] (const std::tuple<V,V,V>& x) {
       V r,g,b;
-      boost::tie(r,g,b) = x;
+      std::tie(r,g,b) = x;
       if (r >= g) {
 	return (r >= b) ? rgb8{255,0,0} : rgb8{0,0,255};
       } else {

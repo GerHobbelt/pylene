@@ -178,7 +178,7 @@ int main(int argc, char** argv)
   //auto f = interpolate_median(ima, UInt<9> ());
 
 
-  image2d<rgb8> ima_ = addborder(ima);
+  image2d<rgb8> ima_ = addborder(ima, lexicographicalorder_less<rgb8>() );
   image2d<rgb8> f = interpolate_k1(ima_);
 
   image2d<unsigned> K;

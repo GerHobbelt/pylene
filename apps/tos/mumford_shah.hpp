@@ -5,6 +5,7 @@
 # include <mln/core/image/image2d.hpp>
 # include <mln/core/neighb2d.hpp>
 # include <mln/core/extension/fill.hpp>
+# include <mln/core/wrt_offset.hpp>
 # include <mln/io/imprint.hpp>
 # include "topology.hpp"
 
@@ -393,14 +394,13 @@ namespace mln
 
 
     typedef iterator_range< stditerator<std::vector<point2d>::const_iterator> > Vec;
-    typedef nbh< Vec > Nbh;
-    Nbh ball;
+    typedef dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag> Nbh;
     std::vector<point2d> dpoints;
     for (int i = -eps*2; i <= eps*2; i += 2)
       for (int j = -eps*2; j <= eps*2; j += 2)
 	dpoints.emplace_back(i,j);
 
-    ball.dpoints = make_iterator_range(stditerator< std::vector<point2d>::const_iterator >(dpoints.begin(),dpoints.end()));
+    Nbh ball(dpoints);
 
     // FIX TO HANDLE THE ROOT CORRECTLY
     parent[S[0]] = (unsigned) -1;

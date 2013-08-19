@@ -75,7 +75,7 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima);
   io::imread(argv[2], ref);
 
-  image2d<rgb8> ima_ = addborder(ima);
+  image2d<rgb8> ima_ = addborder(ima, lexicographicalorder_less<rgb8>() );
   image2d<uint8> f = add_border_and_interp_nn_x2(ref, value_traits<uint8>::max());
 
   image2d<unsigned> K, K_;

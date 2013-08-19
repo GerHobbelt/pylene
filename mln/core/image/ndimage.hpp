@@ -279,6 +279,15 @@ namespace mln
       return idx;
     }
 
+    difference_type delta_offset(const point_type& p) const
+    {
+      difference_type idx = 0;
+      for (unsigned i = 0; i < dim; ++i)
+	idx += p[i] * strides_[i];
+      return idx;
+    }
+
+
     // Extension
     typedef internal::ndimage_extension<T, dim> extension_type;
     extension_type extension() const;

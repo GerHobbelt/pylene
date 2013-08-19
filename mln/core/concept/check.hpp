@@ -62,6 +62,13 @@ namespace mln
   {
   }
 
+  template <typename T>
+  T&&
+  make_object()
+  {
+    return static_cast<T&&>(*(typename std::remove_reference<T>::type*)(0));
+  }
+
 
 } // end of namespace mln
 

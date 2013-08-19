@@ -29,13 +29,6 @@ namespace mln
   unzip_proxy_iterator<ProxyIterator, n>
   make_unzip_proxy_pixel_iterator(const ProxyIterator& x);
 
-  namespace internal
-  {
-    // The type of pixel when zip_pixel is unzipped
-    template <size_t n, typename TuplePixel>
-    struct unzip_pixel_proxy;
-  }
-
 
   /*****************/
   /***** Implem ****/
@@ -160,19 +153,29 @@ namespace mln
   namespace internal
   {
 
+
     template <size_t n, typename TuplePixel>
-    struct unzip_pixel_proxy
+    struct unzip_pixel_proxy_base
     {
     private:
       typedef typename std::decay<TuplePixel>::type pixel_t;
 
     public:
-      typedef typename pixel_t::point_type                                  point_type;
-      typedef typename std::remove_reference<typename std::tuple_element<n, typename pixel_t::value_type>::type>::type value_type;
-      typedef typename std::tuple_element<n, typename pixel_t::value_type>::type reference;
-      typedef typename std::remove_reference<typename std::tuple_element<n, typename pixel_t::image_type::image_tuple_t>::type>::type image_type;
+      typedef typename pixel_t::point_type point_type;
+      typedef typename pixel_t::site_type  site_type;
 
-      unzip_pixel_proxy(TuplePixel&& pixel)
+      typedef typename std::remove_reference<
+	typename std::tuple_element<n, typename pixel_t::value_type>::type
+	>::type value_type;
+
+      typedef typename std::tuple_element<
+	n, typename pixel_t::value_type>::type reference;
+
+      typedef typename std::remove_reference<
+	typename std::tuple_element<n, typename pixel_t::image_type::image_tuple_t>
+	::type>::type image_type;
+
+      unzip_pixel_proxy_base(TuplePixel&& pixel)
       : tuple_pix_ (pixel)
       {
       }
@@ -182,20 +185,59 @@ namespace mln
 
       reference val() const { return std::get<n>(tuple_pix_.val()); }
       point_type point() const { return tuple_pix_.point(); }
+      point_type site() const { return tuple_pix_.point(); }
       image_type& image() const { return std::get<n>(tuple_pix_.image().images()); }
 
 
-      template <typename image_type = image_type>
-      typename std::enable_if< image_traits<image_type>::indexable::value,
-			       typename image_type::size_type >::type
-      index() const
-      {
-	return std::get<n>(tuple_pix_.image().images()).index_of_point(tuple_pix_.point());
-      }
-
-    private:
+    protected:
       TuplePixel tuple_pix_;
     };
+
+
+
+    template <size_t n, typename TuplePixel,
+	      bool indexable =
+	      image_traits<
+		typename unzip_pixel_proxy_base<n, TuplePixel>::image_type>
+	      ::indexable::value
+	      >
+    struct unzip_pixel_proxy;
+
+
+
+    template <size_t n, typename TuplePixel>
+    struct unzip_pixel_proxy<n, TuplePixel, false>
+      : unzip_pixel_proxy_base<n, TuplePixel>,
+        Pixel< unzip_pixel_proxy<n, TuplePixel> >
+    {
+      unzip_pixel_proxy(TuplePixel&& pixel)
+      : unzip_pixel_proxy_base<n, TuplePixel>(std::forward<TuplePixel>(pixel))
+      {
+      }
+    };
+
+    template <size_t n, typename TuplePixel>
+    struct unzip_pixel_proxy<n, TuplePixel, true>
+      : unzip_pixel_proxy_base<n, TuplePixel>,
+        Pixel< unzip_pixel_proxy<n, TuplePixel> >
+    {
+      typedef typename unzip_pixel_proxy_base<n, TuplePixel>::image_type image_type;
+      typedef typename image_type::size_type size_type;
+
+      unzip_pixel_proxy(TuplePixel&& pixel)
+      : unzip_pixel_proxy_base<n, TuplePixel>(std::forward<TuplePixel>(pixel))
+      {
+      }
+
+      size_type
+      index() const
+      {
+	const image_type& ima = std::get<n>(this->tuple_pix_.image().images());
+	return ima.index_of_point(this->tuple_pix_.point());
+      }
+    };
+
+
 
 
     // We have two cases:

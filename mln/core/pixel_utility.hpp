@@ -48,7 +48,7 @@ namespace mln
 
 
   template <typename I, typename Pixel>
-  struct rebinded_pixel
+  struct rebinded_pixel : mln::Pixel< rebinded_pixel<I, Pixel> >
   {
   private:
     typedef typename std::remove_reference<Pixel>::type  pixel_t;

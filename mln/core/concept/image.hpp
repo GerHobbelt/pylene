@@ -25,6 +25,8 @@ namespace mln {
 
     BOOST_CONCEPT_USAGE(Image)
     {
+      check(std::is_base_of< Image<I>, I > ());
+
       typedef image_traits<I> traits;
 
       typedef typename traits::accessible   accessible;
@@ -52,6 +54,7 @@ namespace mln {
       check(std::is_convertible<typename const_pixel::value_type, value> ());
       check(std::is_same<typename const_pixel::reference, const_reference> ());
       check(std::is_convertible<pixel, const_pixel> ());
+
 
       BOOST_CONCEPT_ASSERT((Pixel<pixel>));
       BOOST_CONCEPT_ASSERT((Pixel<const_pixel>));

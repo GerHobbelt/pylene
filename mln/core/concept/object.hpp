@@ -25,7 +25,7 @@ namespace mln {
     struct is_a_helper
     {
       template <typename dummy>
-      static std::true_type foo(Concept<dummy>) { return std::true_type (); }
+      static std::true_type foo(const Concept<dummy>&) { return std::true_type (); }
 
 
       static std::false_type foo(...) { return std::false_type (); }

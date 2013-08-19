@@ -7,7 +7,7 @@ namespace mln
 {
 
   template <typename T, unsigned dim, typename I>
-  struct ndimage_pixel
+  struct ndimage_pixel : Pixel< ndimage_pixel<T, dim, I> >
   {
     typedef mln::point<short, dim>              site_type;
     typedef site_type				point_type;

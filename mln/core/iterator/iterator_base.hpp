@@ -2,6 +2,7 @@
 # define MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
 
 # include <mln/core/concept/iterator.hpp>
+# include <mln/core/iterator/iterator_traits.hpp>
 # include <memory>
 # include <type_traits>
 

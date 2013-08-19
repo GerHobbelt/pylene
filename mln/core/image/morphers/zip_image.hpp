@@ -477,7 +477,7 @@ namespace mln
 
   template <class... Images>
   struct zip_image<Images...>::pixel_type
-    : morpher_pixel_base< const_pixel_type,
+    : morpher_pixel_base< pixel_type,
 			  typename std::remove_reference<
 			    typename std::tuple_element<0, pixel_tuple>::type>::type >
   {

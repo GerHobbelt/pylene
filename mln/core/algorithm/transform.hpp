@@ -54,7 +54,7 @@ namespace mln {
   OutputImage&&
   transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>&& output)
   {
-    transform(input, f, output);
+    mln::transform(input, f, output);
     return move_exact(output);
   }
 
@@ -67,7 +67,7 @@ namespace mln {
     mln_ch_value(InputImage, T) out;
     resize(out, input);
 
-    transform(input, f, out);
+    mln::transform(input, f, out);
     return out;
   }
 

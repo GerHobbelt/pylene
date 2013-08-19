@@ -259,7 +259,7 @@ namespace mln
         return m_ima->pixel(p);
       }
     private:
-      friend struct const_pix_fun_t;
+      friend struct sub_image::const_pix_fun_t;
       image_t* m_ima;
     };
 

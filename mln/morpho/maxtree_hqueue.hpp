@@ -166,7 +166,7 @@ namespace mln
 	const I&		    m_ima;
 	mln_ch_value(I, elt_type)&  m_parent;
 	mln_ch_value(I, bool)	    m_deja_vu;
-	mln::array<typename I::difference_type, Neighborhood::static_size> m_nbh_delta_indexes;
+	std::array<typename I::difference_type, Neighborhood::static_size> m_nbh_delta_indexes;
 
 	bounded_hqueue<size_type, nlevels>  m_q;
 	bool			m_has_repr[nlevels];

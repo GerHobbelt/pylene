@@ -15,6 +15,21 @@ namespace mln
     std::size_t size(const Range& rng);
 
     /***********************/
+    /*** Specialization  ***/
+    /***********************/
+
+    template <typename T, std::size_t N>
+    struct array;
+
+
+    template <typename T, std::size_t N>
+    constexpr
+    std::size_t size(const std::array<T, N>&)
+    {
+      return N;
+    }
+
+    /***********************/
     /*** Implementation  ***/
     /***********************/
 

@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_WIN2D_HPP
 # define MLN_CORE_WIN2D_HPP
 
-# include <mln/core/neighborhood.hpp>
+# include <mln/core/neighborhood/dyn_neighborhood.hpp>
 # include <mln/core/point.hpp>
 # include <mln/core/domain/box.hpp>
 # include <mln/core/assert.hpp>
@@ -16,10 +16,7 @@ namespace mln
   ///
   /// \brief Define a dynamic rectangular window
   ///
-  struct rect2d : neighborhood_base< rect2d, box2d >
-  {
-    box2d dpoints;
-  };
+  using rect2d = dyn_neighborhood<box2d, dynamic_neighborhood_tag>;
 
 
   /// \defgroup Free functions
@@ -41,9 +38,8 @@ namespace mln
     mln_precondition(width % 2 == 1);
     int h = height / 2;
     int w = width / 2;
-    rect2d rec;
-    rec.dpoints = box2d{point2d(-h,-w), point2d(h+1,w+1)};
-    return rec;
+    box2d b = {point2d(-h,-w), point2d(h+1,w+1)};
+    return b;
   }
 
   inline
@@ -59,9 +55,8 @@ namespace mln
     uleft[1] -= w;
     lright[0] += h+1;
     lright[1] += w+1;
-    rect2d rec;
-    rec.dpoints = box2d{uleft, lright};
-    return rec;
+    box2d b = {uleft, lright};
+    return b;
   }
 
 }

@@ -4,6 +4,9 @@ add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 add_executable(array std/array.cpp)
 
+add_executable(win2d win2d.cpp)
+add_test(win2d win2d)
+
 # test Domain
 add_executable(box domain/box.cpp)
 

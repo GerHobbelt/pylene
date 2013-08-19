@@ -176,7 +176,8 @@ namespace mln
 	  edge_type			m_e;
 	};
 
-	struct adjacency_vertex_iterator : iterator_base<adjacency_vertex_iterator, point2d, const point2d&>
+	struct adjacency_vertex_iterator
+	  : iterator_base<adjacency_vertex_iterator, point2d, point2d>
 	{
 	  typedef typename range_iterator<typename base::adjacency_vertex_range>::type inner_iterator;
 
@@ -217,7 +218,7 @@ namespace mln
 	      }
 	  }
 
-	  const point2d& dereference() const
+	  point2d dereference() const
 	  {
 	    mln_precondition(!finished());
 	    switch (m_status)

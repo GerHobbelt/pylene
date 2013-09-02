@@ -169,36 +169,35 @@ namespace mln
 
     sliding_pixter_pixel_pointer() = default;
     sliding_pixter_pixel_pointer(const Px& pix,
-				 const SiteSet& pset,
-				 const difference_type* indexes,
-				 const difference_type* offsets)
+				 const SiteSet& pset)
       : m_pix(pix),
-	m_site_it(rng::iter(pset)),
-	m_index_it(indexes),
-	m_offset_it(offsets)
+	m_site_it(rng::iter(pset))
     {
     }
 
-    point_type  point() const { return m_pix->point() + *m_site_it; }
-    point_type  site()  const { return m_pix->point() + *m_site_it; }
-    image_type& image() const { return m_pix->image(); }
-    size_type	  index() const { return m_pix->index() + *m_index_it; }
-    reference   val() const
+    point_type    point() const { return m_pix->point() + *m_site_it; }
+    point_type    site()  const { return m_pix->point() + *m_site_it; }
+    image_type&   image() const { return m_pix->image(); }
+    size_type	  index() const { return m_pix->index() + m_delta_index; }
+    reference     val() const
     {
       typedef typename std::remove_reference<reference>::type T;
       typedef typename std::conditional<
 	std::is_const<T>::value, const char*, char*>::type buffer_ptr_t;
       typedef typename std::add_pointer<T>::type ptr_t;
+
       return * reinterpret_cast<ptr_t>(reinterpret_cast<buffer_ptr_t>(&(m_pix->val()))
-				       + *m_offset_it);
+				       + m_delta_offset);
     }
 
   private:
     typename std::conditional<std::is_pointer<Px>::value,
 			      const Px, const Px&>::type m_pix;
     typename range_const_iterator<SiteSet>::type   m_site_it;
-    const difference_type* m_index_it;
-    const difference_type* m_offset_it;
+    difference_type m_delta_index;
+    difference_type m_delta_offset;
+    //const difference_type* m_index_it;
+    //const difference_type* m_offset_it;
   };
 
 
@@ -267,7 +266,7 @@ namespace mln
     public:
       sliding_pixter_base() = default;
       sliding_pixter_base(const Pixel& px, const S& s)
-	: m_pix (px, s, m_index_set.begin())
+	: m_pix (px, s, &m_index_set[0])
       {
 	Image& ima = px->image();
 	auto it = rng::iter(s);
@@ -279,7 +278,7 @@ namespace mln
       void init()
       {
 	m_i = 0;
-	m_pix.m_index_it = m_index_set.begin();
+	m_pix.m_index_it = &m_index_set[0];
 	m_pix.m_site_it.init();
       }
 
@@ -326,7 +325,7 @@ namespace mln
 
       sliding_pixter_base(const Pixel& px, const SiteSet& s)
 	: m_index_set(rng::size(s)),
-	  m_pix (px, s, m_index_set.begin())
+	  m_pix (px, s, &m_index_set[0])
       {
 	Image& ima = px->image();
 	auto it = rng::iter(s);
@@ -338,7 +337,7 @@ namespace mln
 
       void init()
       {
-	m_pix.m_index_it = m_index_set.begin();
+	m_pix.m_index_it = &m_index_set[0];
 	m_pix.m_site_it.init();
       }
 
@@ -350,7 +349,7 @@ namespace mln
 
       bool finished() const
       {
-	return m_pix.m_index_it == m_index_set.end();
+	return m_pix.m_index_it == &m_index_set[0] + m_index_set.size();
       }
 
       const sliding_pixter_pixel_index<Pixel, SiteSet>&
@@ -390,7 +389,7 @@ namespace mln
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const Pixel& px, const S& s)
-	: m_pix (px, s, m_index_set.begin(), m_offset_set.begin())
+	: m_pix (px, s)
       {
 	Image& ima = px->image();
 	auto it = rng::iter(s);
@@ -405,17 +404,23 @@ namespace mln
       void init()
       {
 	m_i = 0;
-	m_pix.m_index_it  = m_index_set.begin();
-	m_pix.m_offset_it = m_offset_set.begin();
 	m_pix.m_site_it.init();
+	if (0 < N)
+	  {
+	    m_pix.m_delta_index  = m_index_set[0];
+	    m_pix.m_delta_offset = m_offset_set[0];
+	  }
       }
 
       void next()
       {
 	++m_i;
-	++m_pix.m_index_it;
-	++m_pix.m_offset_it;
 	m_pix.m_site_it.next();
+	if (m_i < N)
+	  {
+	    m_pix.m_delta_index = m_index_set[m_i];
+	    m_pix.m_delta_offset = m_offset_set[m_i];
+	  }
       }
 
       bool finished() const
@@ -460,7 +465,7 @@ namespace mln
 	: m_sz(rng::size(s)),
 	  m_index_set(m_sz),
 	  m_offset_set(m_sz),
-	  m_pix (px, s, m_index_set.begin(), m_offset_set.begin())
+	  m_pix (px, s)
       {
 	Image& ima = px->image();
 	auto it = rng::iter(s);
@@ -473,21 +478,29 @@ namespace mln
 
       void init()
       {
+	m_i = 0;
 	m_pix.m_site_it.init();
-	m_pix.m_index_it = m_index_set.begin();
-	m_pix.m_offset_it = m_offset_set.begin();
+	if (0 < m_sz)
+	  {
+	    m_pix.m_delta_index = m_index_set[0];
+	    m_pix.m_delta_offset = m_offset_set[0];
+	  }
       }
 
       void next()
       {
+	++m_i;
 	m_pix.m_site_it.next();
-	++m_pix.m_index_it;
-	++m_pix.m_offset_it;
+	if (m_i < m_sz)
+	  {
+	    m_pix.m_delta_index  = m_index_set[m_i];
+	    m_pix.m_delta_offset = m_offset_set[m_i];
+	  }
       }
 
       bool finished() const
       {
-	return m_pix.m_index_it == m_index_set.end();
+	return m_i >= m_sz;
       }
 
       const sliding_pixter_pixel_pointer<Pixel, SiteSet>&
@@ -498,6 +511,7 @@ namespace mln
 
     private:
       const unsigned m_sz;
+      unsigned m_i;
       I m_index_set;
       O m_offset_set;
       sliding_pixter_pixel_pointer<Pixel, SiteSet> m_pix;

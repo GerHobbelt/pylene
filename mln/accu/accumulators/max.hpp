@@ -5,6 +5,7 @@
 
 # include <mln/accu/accumulator.hpp>
 # include <mln/accu/accumulator_base.hpp>
+# include <mln/core/value/value_traits.hpp>
 # include <utility>
 
 namespace mln

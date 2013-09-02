@@ -124,6 +124,7 @@ namespace mln
 	  case FIT_BITMAP:	break;
 	  case FIT_UINT16:	return typeid(uint16);
 	  case FIT_INT16:	return typeid(int16);
+	  case FIT_FLOAT:	return typeid(float);
 	  default:		goto error;
 	}
 

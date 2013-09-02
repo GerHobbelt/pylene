@@ -181,7 +181,7 @@ namespace mln
 
   template <typename V>
   void
-  QAttribute<V>::onSliderReleased(int x)
+  QAttribute<V>::onSliderReleased(int)
   {
     int lambda = m_slider->value();
     std::cout << "Filtering with lambda < " << lambda << std::endl;

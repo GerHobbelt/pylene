@@ -138,7 +138,7 @@ int main(int argc, char** argv)
       return (float) v / maxarea * 255;
     });
 
-  auto f = interpolate_k1(addborder(ima));
+  auto f = interpolate_k1(addborder(ima, mln::lexicographicalorder_less<rgb8>()));
   image2d< internal::energy_t<rgb8> > imacc;
   image2d<float> energy = compute_energy(f, K, parent, S, imacc);
   image2d<float> cenergy = close(energy, K, parent, S);

@@ -21,11 +21,13 @@
 
 void usage(char** argv)
 {
-  std::cout << "Usage: " << argv[0] << " input(gray) lambda output.tiff" << std::endl
+  std::cout << "Usage: " << argv[0] << " input(gray) eps output.tiff [tolerance]" << std::endl
 	    << "Perform a simplification of the ToS by removing overlapping"
 	    << "level lines in radius of lambda pixels" << std::endl
 	    << "Param:" << std::endl
-	    << "lambda: size of the dilation" << std::endl
+	    << "eps: size of the dilation" << std::endl
+	    << "tolerance: Allow shapes that provides at least n% of non-overlap" << std::endl
+	    << "           (0 <= n <= 1): 0 means all shapes, 1 means strictly included shapes." << std::endl
     //	    << "grainsize: minimal grain size (default: 0)" << std::endl
     //	    << "areafactor: avoid sur-simplification by limiting node desactivation (default: 0.0)" << std::endl
     //	    << "\t a shape S1 can only be desactived by a shape S2 if area(S1) * areafactor < area(S2)"
@@ -42,9 +44,8 @@ int main(int argc, char** argv)
   if (argc < 4)
     usage(argv);
 
-  int lambda = std::atoi(argv[2]);
-  int grainsize = argc >= 5 ? std::atoi(argv[4]) : 0;
-  float areafactor = argc >= 6 ? std::atof(argv[5]) : 0.0;
+  int eps = std::atoi(argv[2]);
+  float tol = argc >= 5 ? std::atof(argv[4]) : 1.0;
 
 
   image2d<rgb8> ori, ori_;
@@ -69,7 +70,7 @@ int main(int argc, char** argv)
 
   //image2d<uint8> simp = simplify_bottom_up(ima, K, parent, S, lambda, grainsize, areafactor);
   image2d<rgb8>  mean = set_mean_on_node2(immerse_k1(ori), K, S, parent, K1::is_face_2);
-  image2d<rgb8>  simp2 = simplify_top_down(unimmerse_k1(mean), K, parent, S, lambda);
+  image2d<rgb8>  simp2 = simplify_top_down_tolerance(unimmerse_k1(mean), K, parent, S, eps, tol);
 
   //io::imsave(simp, argv[3]);
   io::imsave(simp2, argv[3]);

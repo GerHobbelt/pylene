@@ -58,6 +58,11 @@ namespace mln
 				       typename std::remove_reference<Reference>::type*,
 				       internal::pointer_wrapper<Reference> >::type pointer;
 
+    Derived& iter()
+    {
+      return *(this->derived());
+    }
+
     Derived iter() const
     {
       return *(this->derived());

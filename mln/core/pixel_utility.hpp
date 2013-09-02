@@ -72,7 +72,8 @@ namespace mln
     rebinded_pixel(const rebinded_pixel<J, Pixel2>& other,
                    typename std::enable_if<std::is_convertible<J*, I*>::value and
                    std::is_convertible<Pixel2, Pixel>::value>::type* = NULL)
-      : m_ima(other.m_ima), m_pix(other.m_pix)
+      : m_ima(other.m_ima),
+	m_pix(other.m_pix)
     {
     }
 
@@ -114,7 +115,7 @@ namespace mln
   struct rebind_pixel_iterator :
     iterator_base <rebind_pixel_iterator<I, PixelIterator>,
                    rebinded_pixel<I, typename PixelIterator::value_type>,
-                   const rebinded_pixel<I, typename PixelIterator::reference>& >
+                   rebinded_pixel<I, typename PixelIterator::reference> >
   {
   private:
     static const bool use_ref = std::is_reference<typename PixelIterator::reference>::value;
@@ -123,13 +124,11 @@ namespace mln
   public:
     rebind_pixel_iterator() = default;
 
-    rebind_pixel_iterator(const rebind_pixel_iterator& other)
-      : m_pixter(other.m_pixter), m_pix(*(other.m_pix.m_ima), *m_pixter)
-    {
-    }
+    rebind_pixel_iterator(const rebind_pixel_iterator& other) = default;
 
     rebind_pixel_iterator(I& ima, const PixelIterator& pixter)
-      : m_pixter(pixter), m_pix(ima, *m_pixter)
+      : m_ima(&ima),
+	m_pixter(pixter)
     {
     }
 
@@ -137,25 +136,24 @@ namespace mln
     rebind_pixel_iterator(const rebind_pixel_iterator<J, PixelIterator2>& other,
                             typename std::enable_if< std::is_convertible<J*, I*>::value and
                             std::is_convertible<PixelIterator2, PixelIterator>::value>::type* = NULL)
-      : m_pixter(other.m_pixter), m_pix(*(other.m_pix.m_ima), *(other.m_pixter) )
+      : m_ima(other.m_ima),
+	m_pixter(other.m_pixter)
     {
     }
 
     void init()
     {
       m_pixter.init();
-      update_();
     }
 
     void next()
     {
       m_pixter.next();
-      update_();
     }
 
-    const pixel_t& dereference() const
+    pixel_t dereference() const
     {
-      return m_pix;
+      return pixel_t(*m_ima, *m_pixter);
     }
 
     bool finished() const
@@ -165,20 +163,10 @@ namespace mln
 
 
   private:
-    template <typename dummy = void>
-    typename std::enable_if<!use_ref, dummy>::type
-    update_() { m_pix.m_pix = *m_pixter; }
-
-    template <typename dummy = void>
-    typename std::enable_if<use_ref, dummy>::type
-    update_() { }
-
-
     template <typename, typename>
     friend struct rebind_pixel_iterator;
-
+    I*			m_ima;
     PixelIterator       m_pixter;
-    pixel_t             m_pix;
   };
 
 

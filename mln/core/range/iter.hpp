@@ -11,8 +11,17 @@ namespace mln
   {
 
     template <typename R>
-    typename range_iterator<R>::type
+    typename std::conditional<
+      is_a<R, Iterator>::value,
+      R&,
+      typename range_iterator<R>::type>::type
     iter(R& range);
+
+
+    template <typename R>
+    typename range_const_iterator<R>::type
+    iter(const R& range);
+
 
     /*********************/
     /** Implementation  **/
@@ -20,14 +29,27 @@ namespace mln
 
     namespace impl
     {
+      // This is a real MLN range
       template <typename R>
       typename range_iterator<R>::type
       iter(R& range, typename std::enable_if<
-	     is_mln_range<R>::value>::type* = NULL)
+	     is_mln_range<R>::value and
+	     !is_a<R, Iterator>::value
+	     >::type* = NULL)
       {
 	return range.iter();
       }
 
+      /// This is a pseudo-range (MLN Iterator)
+      template <typename R>
+      typename range_iterator<R>::type&
+      iter(R& range, typename std::enable_if<
+	     is_a<R, Iterator>::value>::type* = NULL)
+      {
+	return range.iter(); // i.e itself
+      }
+
+      // This is a STL range
       template <typename R>
       typename range_iterator<R>::type
       iter(R& range, typename std::enable_if<
@@ -40,7 +62,10 @@ namespace mln
 
 
     template <typename R>
-    typename range_iterator<R>::type
+    typename std::conditional<
+      is_a<R, Iterator>::value,
+      R&,
+      typename range_iterator<R>::type>::type
     iter(R& range)
     {
       return impl::iter(range);

@@ -15,6 +15,9 @@
 //#include <mln/core/forall.hpp>
 //#include <mln/core/pix_range_iterator_proxy.hpp>
 
+#include <mln/kernel/kernel.hpp>
+#include <mln/accu/accumulators/min.hpp>
+
 #include <boost/range/numeric.hpp>
 #include <boost/timer.hpp>
 #include <boost/tuple/tuple_io.hpp>
@@ -52,7 +55,7 @@ double test_native(const image2d<int>& a, const image2d<int>& b)
       for (unsigned j = 0; j < ncols; ++j, ++pa, ++pb)
 	v += *pa * *pb;
     }
-  asm ("");
+
   return v;
 }
 
@@ -61,7 +64,7 @@ double test_iterator(const image2d<int>& a, const image2d<int>& b) __attribute__
 double test_iterator(const image2d<int>& a, const image2d<int>& b)
 {
   double v = range::inner_product(a.values(), b.values(), 0.0d);
-  asm ("");
+
   return v;
 }
 
@@ -73,7 +76,7 @@ double test_zip(const image2d<int>& a, const image2d<int>& b)
 
   double v = range::accumulate(ima.values(), 0.0d, [](double v, const std::tuple<const int&, const int&>& x)
 			       { return v + std::get<0>(x) * std::get<1>(x); });
-  asm ("");
+
   return v;
 }
 
@@ -85,7 +88,6 @@ double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
   typedef typename decltype(ima)::const_pixel_type pixel_t;
   double v = range::accumulate(ima.pixels(), 0.0d, [](double v, const pixel_t& x)
                                { return v + std::get<0>(x.val()) * std::get<1>(x.val()); });
-  asm ("");
   return v;
 }
 
@@ -100,7 +102,6 @@ double test_for(const image2d<int>& a, const image2d<int>& b)
   mln_forall(x, y)
     v += *x * *y;
 
-  asm ("");
   return v;
 }
 
@@ -114,7 +115,6 @@ double test_for_pixel(const image2d<int>& a, const image2d<int>& b)
   mln_forall (x, y)
     v += x->val() * y->val();
 
-  asm ("");
   return v;
 }
 
@@ -122,7 +122,6 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b) __attribute__ 
 
 void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 {
-  fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   const size_t* strides = a.strides();
@@ -130,17 +129,19 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b)
   char* ptrb = (char*) &(b(point2d {0,0}));
 
   unsigned nrows = a.nrows(), ncols = a.ncols();
-  std::array<int, 8> offsets;
-  mln::wrt_offset(a, c8_t::dpoints, offsets.begin());
-
+  auto offsets = wrt_offset(a, c8_t::dpoints);
 
   for (unsigned i = 0; i < nrows; ++i, ptra += strides[0], ptrb += strides[0])
     {
       const int* pa = (const int*) ptra;
       int *pb = (int*) ptrb;
       for (unsigned j = 0; j < ncols; ++j, ++pa, ++pb)
-        for (int k = 0; k < 8; ++k)
-          *pb = std::min(*pb, *(const int*) ((const char*)pa + offsets[k]));
+	{
+	  int tmp = value_traits<int>::max();
+	  for (int k = 0; k < 8; ++k)
+	    tmp = std::min(tmp, *(const int*) ((const char*)pa + offsets[k]));
+	  *pb = tmp;
+	}
     }
 }
 
@@ -149,50 +150,63 @@ void test_dilation_pixel(const image2d<int>& a, image2d<int>& b) __attribute__ (
 
 void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
 {
-  fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   mln_pixter(pin, pout, a, b);
   mln_iter(x, c8(pin));
 
+
   mln_forall(pin, pout)
-    mln_forall(x)
-    pout->val() = std::min(pout->val(), x->val());
+    {
+      int tmp = value_traits<int>::max();
+      mln_forall(x)
+	tmp = std::min(tmp, x->val());
+      pout->val() = tmp;
+    }
 }
 
 void test_dilation_point(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
 void test_dilation_point(const image2d<int>& a, image2d<int>& b)
 {
-  fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   mln_iter(p, a.domain());
   mln_iter(n, c8(*p));
 
   mln_forall(p)
+  {
+    int tmp = value_traits<int>::max();
     mln_forall(n)
-    b.at(*p) = std::min(b.at(*p), a.at(*n));
+      tmp = std::min(tmp, a.at(*n));
+    b(*p) = tmp;
+  }
 }
 
 void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
 void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
 {
-  fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   mln_pixter(pin, a);
   mln_viter(pout, b);
+
+  //mln_pixter(tmp, a);
+  //mln_iter(x, c8(tmp));
   mln_iter(x, c8(pin));
 
+  //tmp.init();
   for(pin.init(), pout.init(); !pin.finished(); pin.next(), pout.next())
-    mln_forall(x)
-      *pout = std::min(*pout, x->val());
+    {
+      int tmp = value_traits<int>::max();
+      mln_forall(x)
+	tmp = std::min(tmp, x->val());
+      *pout = tmp;
+    }
 }
 
 void test_dilation_index(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
 void test_dilation_index(const image2d<int>& a, image2d<int>& b) 
 {
-  fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   std::size_t idx = a.index_of_point(a.domain().pmin);
@@ -204,13 +218,60 @@ void test_dilation_index(const image2d<int>& a, image2d<int>& b)
     {
       for (unsigned j = 0; j < ncols; ++j)
         {
-          std::size_t p = idx + j;
+          unsigned p = idx + j;
+	  int tmp = value_traits<int>::max();
           for (unsigned k = 0; k < 8; k++) {
-            b[p] = std::min(b[p], a[p+w[k]]);
+            tmp = std::min(tmp, a[p+w[k]]);
           }
+	  b[p] = tmp;
         }
     }
 }
+
+void test_dilation_kernel(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
+
+void
+test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
+{
+  //fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
+
+  {
+    const kernel::image<0> f;
+    const kernel::image<1> out;
+    using kernel::placeholders::p;
+    using kernel::placeholders::n;
+    const kernel::Aggregate< mln::accu::features::min<> > Min = {};
+
+    auto expr = (out(p) = Min(f(n)));
+
+    kernel::execute(expr, c8, a, b);
+  }
+}
+
+void test_extgrad_kernel(const image2d<int>& a, image2d<int>& b) __attribute__ ((noinline));
+
+void
+test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
+{
+  //fill(b, std::numeric_limits<int>::max());
+  extension::fill(b, std::numeric_limits<int>::max());
+
+  {
+    const kernel::image<0> f;
+    const kernel::image<1> out;
+    using kernel::placeholders::p;
+    using kernel::placeholders::n;
+
+    const kernel::Aggregate< mln::accu::features::min<> > Min = {};
+
+    auto expr = (out(p) = f(p) - Min(f(n)));
+
+    kernel::execute(expr, c8, a, b);
+  }
+}
+
+
 
 /*
 void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
@@ -354,5 +415,25 @@ int main()
     std::cout << "Elapsed: " << thistime << " Eq:" << equal(out, ref) <<std::endl;
   }
 
+   {
+    std::cout << "Kernel Dilation..." << std::endl;
+    image2d<int> out(1000, 10000);
+    t.restart();
+    for (int i = 0; i < NTEST/2; ++i)
+      test_dilation_kernel(ima1, out);
+    thistime = t.elapsed();
+    std::cout << "Elapsed: " << thistime << " Eq:" << equal(out, ref) <<std::endl;
+  }
+
+
+   {
+     std::cout << "Kernel Ext-gradient..." << std::endl;
+    image2d<int> out(1000, 10000);
+    t.restart();
+    for (int i = 0; i < NTEST/2; ++i)
+      test_extgrad_kernel(ima1, out);
+    thistime = t.elapsed();
+    std::cout << "Elapsed: " << thistime << " Eq:" << 1 <<std::endl;
+  }
 }
 

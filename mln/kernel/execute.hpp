@@ -35,14 +35,21 @@ namespace mln
       void
       exec_nbh(const ExprList& elist, Context& ctx, const intseq<K...>&)
       {
-        dontcare( (boost::fusion::at_c<K>(ctx.m_accus).take(proto::eval(proto::child(boost::fusion::at_c<K>(elist)), ctx)), true) ... );
+        // eval with the const version of the variable enables
+        // gcc to perform a better SRA since ctx does not need to
+        // live in memory anymore.
+        namespace bf = boost::fusion;
+
+        const Context ctx_ = ctx;
+        dontcare( (bf::at_c<K>(ctx.m_accus)
+                   .take(proto::eval(proto::child(bf::at_c<K>(elist)), ctx_)), true) ... );
       }
 
-      template <class Context, int... K>
+      template <class AccuList, int... K>
       void
-      init_nbh(Context& ctx, const intseq<K...>&)
+      init_nbh(AccuList& accus, const intseq<K...>&)
       {
-        dontcare( (boost::fusion::at_c<K>(ctx.m_accus).init(), true) ... );
+        dontcare( (boost::fusion::at_c<K>(accus).init(), true) ... );
       }
 
       template <class Context>
@@ -110,16 +117,27 @@ namespace mln
 
         typename int_list_seq<boost::mpl::size<SubexprList>::type::value>::type iseq;
 
+        typedef zip_image<I...> image_t;
+        typedef mln_reference(image_t) V;
+
+        auto z = imzip(images...);
+        mln_pixter(px, z);
+        mln_iter(nx, nbh(px));
+
         // Define context
-        typedef kernel::kernel_context<Expr, SubExprTypeList, AccuList, Nbh, I...> Context;
-        Context ctx(accus, nbh, std::forward<I>(images)...);
+        typedef kernel::kernel_context<V, SubExprTypeList, AccuList> Context;
 
-        for (ctx.p_init(); !ctx.p_finished(); ctx.p_next())
-          {
-            init_nbh(ctx, iseq);
-            for (ctx.n_init(); !ctx.n_finished(); ctx.n_next())
+        mln_forall(px)
+        {
+            init_nbh(accus, iseq);
+
+            mln_forall(nx)
+            {
+              Context ctx (accus, px->val(), nx->val());
               exec_nbh(subexprs, ctx, iseq);
+            }
 
+            const Context ctx (accus, px->val(), px->val());
             proto::eval(newexpr, ctx);
           }
       }

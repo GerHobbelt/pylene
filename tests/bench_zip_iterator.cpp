@@ -17,6 +17,7 @@
 
 #include <mln/kernel/kernel.hpp>
 #include <mln/accu/accumulators/min.hpp>
+#include <mln/accu/accumulators/max.hpp>
 
 #include <boost/range/numeric.hpp>
 #include <boost/timer.hpp>
@@ -264,8 +265,9 @@ test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
     using kernel::placeholders::n;
 
     const kernel::Aggregate< mln::accu::features::min<> > Min = {};
+    const kernel::Aggregate< mln::accu::features::max<> > Max = {};
 
-    auto expr = (out(p) = f(p) - Min(f(n)));
+    auto expr = (out(p) = Max(f(n)) - Min(f(n)));
 
     kernel::execute(expr, c8, a, b);
   }

@@ -10,9 +10,9 @@ namespace mln
 /****               Tags               ****/
 /******************************************/
 
-
-    struct none_extension_tag {};
-    struct custom_extension_tag {};
+    struct extension_tag {};
+    struct none_extension_tag : extension_tag {};
+    struct custom_extension_tag : extension_tag {};
     struct border_extension_tag : custom_extension_tag {};
     struct value_extension_tag : custom_extension_tag {};
     struct image_extension_tag : custom_extension_tag {};

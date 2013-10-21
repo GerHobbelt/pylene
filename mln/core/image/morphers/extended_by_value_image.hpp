@@ -88,7 +88,7 @@ namespace mln
     extended_by_value_image_pixel(const extended_by_value_image_pixel&) = default;
 
     extended_by_value_image_pixel(Morpher& ima, const Pix& pix)
-      : m_ima(&ima), m_pix(&pix)
+      : m_ima(&ima), m_pix(pix)
     {
     }
 
@@ -100,14 +100,14 @@ namespace mln
     {
     }
 
-    reference   val() const   { return m_pix->val(); }
-    point_type  point() const { return m_pix->point(); }
-    site_type   site() const  { return m_pix->site(); }
+    reference   val() const   { return m_pix.val(); }
+    point_type  point() const { return m_pix.point(); }
+    site_type   site() const  { return m_pix.site(); }
     image_type& image() const { return *m_ima; }
 
   private:
     Morpher*   m_ima;
-    const Pix* m_pix;
+    Pix        m_pix;
   };
 
 
@@ -118,7 +118,8 @@ namespace mln
   template <typename Morpher, typename PixelIterator>
   struct extended_by_value_image_pixel_iterator :
     iterator_base< extended_by_value_image_pixel_iterator<Morpher, PixelIterator>,
-                   const extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>
+                   extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>,
+                   extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>
                    >
   {
   private:
@@ -131,14 +132,14 @@ namespace mln
     extended_by_value_image_pixel_iterator(const extended_by_value_image_pixel_iterator&) = default;
 
     extended_by_value_image_pixel_iterator(Morpher& ima, const PixelIterator& it)
-      : m_it (it), m_pix(ima, *m_it)
+      : m_ima(&ima), m_it (it)
     {
     }
 
     template <typename Morpher2, typename PixelIterator2>
     extended_by_value_image_pixel_iterator(const extended_by_value_image_pixel_iterator<Morpher2, PixelIterator2>& other,
                                            typename std::enable_if< std::is_convertible<Morpher2*, Morpher*>::value>::type* = NULL)
-      : m_it (other.m_it), m_pix (other.m_pix)
+      : m_ima(other.m_ima), m_it (other.m_it)
     {
     }
 
@@ -146,11 +147,11 @@ namespace mln
     void init()           { m_it.init(); }
     void next()           { m_it.next(); }
     bool finished() const { return m_it.finished(); }
-    const pixel_type& dereference() const { return m_pix; }
+    pixel_type dereference() const { return pixel_type(*m_ima, *m_it); }
 
   private:
+    Morpher*      m_ima;
     PixelIterator m_it;
-    pixel_type    m_pix;
   };
 
 

@@ -313,7 +313,7 @@ namespace mln
     < Pixel,
       SiteSet,
       Image,
-      typename std::enable_if< image_traits<Image>::indexable and
+      typename std::enable_if< image_traits<Image>::indexable::value and
 			       !std::is_same<typename image_traits<Image>::category,
 					     raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, SiteSet>,

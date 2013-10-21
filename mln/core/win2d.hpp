@@ -25,7 +25,53 @@ namespace mln
   rect2d make_rectangle2d(unsigned height, unsigned width, point2d center);
   /// \}
 
+  namespace {
 
+    struct winc4_t : dyn_neighborhood_base<std::array<point2d, 5>, constant_neighborhood_tag,  winc4_t>
+    {
+      static const int static_size = 5;
+      static constexpr std::array<point2d, 5> dpoints = {{ {-1,0}, {0,-1}, {0,0}, {0,1}, {1,0} }};
+    };
+
+    constexpr std::array<point2d, 5> winc4_t::dpoints;
+
+    static const winc4_t winc4;
+
+    struct winc8_t : dyn_neighborhood_base< std::array<point2d, 9>,  constant_neighborhood_tag, winc8_t >
+    {
+      static const int static_size = 9;
+      static constexpr std::array<point2d, 9> dpoints = {{ {-1,-1}, {-1,0}, {-1,1},
+							   {0, -1}, {0,0},  {0, 1},
+							   {1,-1},  {1,1},  {1,0} }};
+    };
+
+    constexpr std::array<point2d, 9> winc8_t::dpoints;
+
+    static const winc8_t winc8;
+
+    struct winc2_v_t : dyn_neighborhood_base< std::array<point2d, 3>,  constant_neighborhood_tag, winc2_v_t >
+    {
+      static const int static_size = 3;
+      static constexpr std::array<point2d, 3> dpoints = {{ {-1,0}, {0, 0}, {1,0} }};
+    };
+
+    constexpr std::array<point2d, 3> winc2_v_t::dpoints;
+
+    static const winc2_v_t winc2_v;
+
+
+
+    struct winc2_h_t : dyn_neighborhood_base< std::array<point2d, 3>,  constant_neighborhood_tag, winc2_h_t >
+    {
+      static const int static_size = 3;
+      static constexpr std::array<point2d, 3> dpoints = {{ {0,-1}, {0, 0}, {0,1} }};
+    };
+
+    constexpr std::array<point2d, 3> winc2_h_t::dpoints;
+
+    static const winc2_h_t winc2_h;
+
+  }
 
   /**************************/
   /***  Implementation     **/

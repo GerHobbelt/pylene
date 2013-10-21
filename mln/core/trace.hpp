@@ -54,6 +54,12 @@ namespace mln
       callstack.pop();
     };
 
+    inline
+    void warn(const std::string& msg)
+    {
+      if (verbose)
+        std::clog << std::string(callstack.size(), ' ') << msg << std::endl;
+    }
 
   }
 

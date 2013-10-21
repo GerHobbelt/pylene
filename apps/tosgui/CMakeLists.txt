@@ -14,10 +14,12 @@ QT4_WRAP_CPP(tosgui_HEADERS_MOC
   ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.hpp
   qattribute.hpp
   dispatcher.hpp
+  plotwindow.hpp
+  attribute.hpp
   )
 
 
-add_executable(tosgui tosgui.cpp qattribute.cpp dispatcher.cpp
+add_executable(tosgui tosgui.cpp qattribute.cpp dispatcher.cpp plotwindow.cpp attribute.cpp
                       ${tosgui_HEADERS_MOC}
                       ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
                       ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.cpp

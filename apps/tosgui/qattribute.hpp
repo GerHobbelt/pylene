@@ -14,6 +14,7 @@
 #include <qwt_plot_picker.h>
 
 #include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/trace.hpp>
 #include <mln/accu/accumulators/min.hpp>
 #include <mln/accu/accumulators/max.hpp>
 
@@ -27,12 +28,12 @@ namespace mln
     QAttributeBase(const QwtText& name = QString("Attribute") );
 
   signals:
-    /// \brief Signal emited when a single node is selected 
-    void nodeSelected(const point2d& pt);
+    /// \brief Signal emited when a single node is selected
+    void nodeSelected(const mln::point2d& pt);
 
     /// \brief Signal emited when several nodes are selected.
     /// The mask is a boolean image
-    void nodeSelected(const image2d<bool>& pts);
+    void nodeSelected(const mln::image2d<bool>& pts);
 
   public slots:
     virtual void plotNode(const point2d& pt) = 0;
@@ -102,6 +103,7 @@ namespace mln
   void
   QAttribute<V>::plotNode(const point2d& p)
   {
+    mln::trace::entering("QAttribute::plotNode");
     unsigned x = m_parent.index_of_point(p);
     m_current = x;
     m_num_nodes = 1;
@@ -132,6 +134,7 @@ namespace mln
     this->m_data[0].setY(m_attr[x]);
     this->m_curve->setSamples(m_data);
     this->replot();
+    mln::trace::exiting();
   }
 
   template <typename V>
@@ -185,7 +188,7 @@ namespace mln
   {
     int lambda = m_slider->value();
     std::cout << "Filtering with lambda < " << lambda << std::endl;
-    image2d<bool> mask = eval(m_attr < lambda);
+    image2d<bool> mask = eval(m_attr < (V) lambda);
     emit nodeSelected(mask);
   }
 

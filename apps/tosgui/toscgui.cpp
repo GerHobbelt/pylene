@@ -183,7 +183,7 @@ int main(int argc, char** argv)
   wattr7.show();
 
 
-  QDispatcher disp(parent, S);
+  QDispatcher disp(K, parent, S);
   disp.addImageWindow(&w1);
   disp.addImageWindow(&w2);
   disp.addImageWindowToFilter(&w3, mean);

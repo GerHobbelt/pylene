@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "dispatcher.hpp"
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/sub_image.hpp>
@@ -5,21 +7,12 @@
 namespace mln
 {
 
-  QDispatcher::QDispatcher(const image2d<unsigned>& parent,
-			   const std::vector<unsigned>& S)
-    : QObject(),
-      m_parent(parent),
-      m_S (S)
-  {
-    resize(m_mask_selection, parent);
-  }
-
   void
   QDispatcher::addImageWindow(qt::MainWindowBase* win)
   {
     m_windows.push_back(win);
-    QObject::connect(win, SIGNAL(pointSelected(const point2d&)),
-		     this, SLOT(onPointSelected(const point2d&)));
+    QObject::connect(win, SIGNAL(pointSelected(const mln::point2d&)),
+		     this, SLOT(onPointSelected(const mln::point2d&)));
   }
 
   void
@@ -27,19 +20,29 @@ namespace mln
                                         const image2d<rgb8>& mean)
   {
     m_fwins.push_back(std::make_pair(win, mean));
-    QObject::connect(win, SIGNAL(pointSelected(const point2d&)),
-		     this, SLOT(onPointSelected(const point2d&)));
+    QObject::connect(win, SIGNAL(pointSelected(const mln::point2d&)),
+		     this, SLOT(onPointSelected(const mln::point2d&)));
   }
 
-  void
-  QDispatcher::addAttribute(QAttributeBase* attr)
-  {
-    m_attributes.push_back(attr);
+  // void
+  // QDispatcher::addAttribute(QAttributeBase* attr)
+  // {
+  //   m_attributes.push_back(attr);
 
-    QObject::connect(attr, SIGNAL(nodeSelected(const point2d&)),
-		     this, SLOT(onNodeSelected(const point2d&)));
-    QObject::connect(attr, SIGNAL(nodeSelected(const image2d<bool>&)),
-		     this, SLOT(onNodeSelected(const image2d<bool>&)));
+  //   QObject::connect(attr, SIGNAL(nodeSelected(const point2d&)),
+  // 		     this, SLOT(onNodeSelected(const point2d&)));
+  //   QObject::connect(attr, SIGNAL(nodeSelected(const image2d<bool>&)),
+  // 		     this, SLOT(onNodeSelected(const image2d<bool>&)));
+  // }
+
+  void
+  QDispatcher::setPlotWindow(PlotWindow* pltwin)
+  {
+    m_pltwin = pltwin;
+    QObject::connect(pltwin, SIGNAL(nodeSelected(const mln::point2d&)),
+		     this, SLOT(onNodeSelected(const mln::point2d&)));
+    QObject::connect(pltwin, SIGNAL(nodeSelected(const mln::image2d<bool>&)),
+		     this, SLOT(onNodeSelected(const mln::image2d<bool>&)));
   }
 
 
@@ -86,33 +89,20 @@ namespace mln
   void
   QDispatcher::onPointSelected(const point2d& p)
   {
-    // Set true on leaves in desc(p)
-    unsigned x = m_parent.index_of_point(p);
-    fill(m_mask_selection, false);
-    for (unsigned q: m_S)
-      if (q == x or m_mask_selection[m_parent[q]]) {
-	m_mask_selection[m_parent[q]] = false;
-	m_mask_selection[q] = true;
-      }
-
     // Select leaf
-    auto dist = [] (const point2d& p, const point2d& q) {
-      return abs(p[0] - q[0]) + abs(p[1] - q[1]);
+    auto dist = [&p] (const point2d& q) {
+      return std::abs(p[0] - q[0]) + std::abs(p[1] - q[1]);
     };
-    double dmin = value_traits<double>::max();
-    point2d pmin;
-    mln_foreach(const auto& px, m_mask_selection.pixels())
-      {
-	if (px.val() and dist(px.point(), p) < dmin)
-	  {
-	    pmin = px.point();
-	    dmin = dist(pmin, p);
-	  }
-      }
+
+    std::vector<unsigned> tmp(m_leaves.size());
+    std::transform(m_leaves.begin(), m_leaves.end(), tmp.begin(), dist);
+    auto x = std::min_element(tmp.begin(), tmp.end());
+
+    point2d pmin = m_leaves[x - tmp.begin()];
 
     // Transmit selection
-    for (QAttributeBase* attr : m_attributes)
-      attr->plotNode(pmin);
+    if (m_pltwin)
+      m_pltwin->plotNode(pmin);
   }
 
   void

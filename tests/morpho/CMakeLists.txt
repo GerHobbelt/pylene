@@ -51,3 +51,7 @@ add_test(maxtree maxtree)
 add_executable(saturate	saturate.cpp)
 target_link_libraries(saturate -lfreeimage)
 add_test(saturate saturate)
+
+add_executable(dilate	dilate.cpp)
+target_link_libraries(dilate -lfreeimage)
+add_test(dilate dilate)

@@ -34,7 +34,7 @@ namespace mln
       virtual bool eventFilter(QObject* obj, QEvent* event);
 
     signals:
-      void pointSelected(const point2d& pt);
+      void pointSelected(const mln::point2d& pt);
       void pointHover(const point2d& pt);
 
     public slots:

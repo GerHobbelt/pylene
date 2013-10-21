@@ -57,6 +57,18 @@ namespace mln
     ///
     /// \return
     ///
+    template <typename I,
+	      typename Neighborhood,
+	      typename Compare = std::less<mln_value(I)>,
+	      typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS(const Image<I>& ima,
+	const Neighborhood& nbh,
+	mln_point(I) pmin,
+	const Compare& cmp,
+	const Equiv& eq);
+
+
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>, typename Equiv = internal::equiv<Compare> >
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
     ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
@@ -105,9 +117,16 @@ namespace mln
     }
 
 
-    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>, typename Equiv = internal::equiv<Compare> >
+    template <typename I,
+	      typename Neighborhood,
+	      typename Compare = std::less<mln_value(I)>,
+	      typename Equiv = internal::equiv<Compare> >
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
-    ToS(const Image<I>& ima_, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq)
+    ToS(const Image<I>& ima_,
+	const Neighborhood& nbh,
+	mln_point(I) pmin,
+	const Compare& cmp,
+	const Equiv& eq)
     {
       using namespace mln::morpho::tos;
 
@@ -134,7 +153,7 @@ namespace mln
       extension::fill(parent, PROCESSED);
 
       pset<I, Compare> W(K, cmp);
-      auto pmin = f.domain().pmin;
+      //auto pmin = f.domain().pmin;
       size_type p = f.index_of_point(pmin);
       W.insert(p);
       parent[p] = PROCESSED;
@@ -227,12 +246,23 @@ namespace mln
       return std::make_tuple(std::move(K), std::move(parent), std::move(S));
     }
 
+    template <typename I,
+	      typename Neighborhood,
+	      typename Compare = std::less<mln_value(I)>,
+	      typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& equiv)
+    {
+      mln_point(I) pmin = exact(ima).domain().pmin;
+      return ToS(ima, nbh, pmin, cmp, equiv);
+    }
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
     ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () )
     {
-      return ToS(ima, nbh, cmp, internal::equiv<Compare> (cmp));
+      mln_point(I) pmin = exact(ima).domain().pmin;
+      return ToS(ima, nbh, pmin, cmp, internal::equiv<Compare> (cmp));
     }
 
   }

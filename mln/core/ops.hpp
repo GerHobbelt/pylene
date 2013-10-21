@@ -3,6 +3,31 @@
 
 # include <functional>
 
+/**
+* \file
+* \brief Defines the fundamental logical, arithmetic and relational operators:
+* \see mln::logical_not
+* \see mln::logical_and
+* \see mln::logical_or
+* \see mln::negate
+* \see mln::add
+* \see mln::substract
+* \see mln::multiples
+* \see mln::devides
+* \see mln::modulo
+* \see mln::equals_to
+* \see mln::not_equals_to
+* \see mln::greater_than
+* \see mln::less_than
+* \see mln::greater_equal
+* \see mln::less_equal
+* \see mln::inf
+* \see mln::sup
+* \see mln::min
+* \see mln::max
+*/
+
+
 namespace mln
 {
   using std::negate;

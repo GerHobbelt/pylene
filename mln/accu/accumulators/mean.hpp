@@ -84,7 +84,11 @@ namespace mln
 	{
 	  //std::string x = extract(exact(accu), features::count<> ());
 	  //std::string y = extractor::count(accu);
-	  return extractor::sum(accu) / extractor::count(accu);
+	  auto v = extractor::count(accu);
+	  if (v == 0)
+	    return extractor::sum(accu);
+	  else
+	    return extractor::sum(accu) / extractor::count(accu);
 	}
 
 	friend

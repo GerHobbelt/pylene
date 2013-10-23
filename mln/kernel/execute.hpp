@@ -3,8 +3,11 @@
 
 # include <mln/core/neighborhood/neighborhood.hpp>
 # include <mln/core/image/image.hpp>
+# include <mln/core/image/constant_image.hpp>
+# include <mln/core/dontcare.hpp>
 # include <mln/core/internal/intseq.hpp>
 # include <mln/kernel/context.hpp>
+# include <mln/kernel/intro.hpp>
 
 # include <boost/fusion/include/as_list.hpp>
 
@@ -86,6 +89,63 @@ namespace mln
         }
       };
 
+      template <class Expr, int K, class ImageTuple>
+      struct get_used_image_tuple_helper
+      {
+	typedef typename std::remove_reference<
+	  typename std::tuple_element<0, ImageTuple>::type
+	  >::type first_image;
+
+	typedef typename first_image::domain_type domain_t;
+
+	static constexpr bool used = get_image_usage<Expr, K>::with_n::value;
+
+	template <bool used, class Dummy = void>
+	struct foo;
+
+	template <class Dummy>
+	struct foo<true, Dummy>
+	{
+	  typedef typename std::tuple_element<K, ImageTuple>::type result_type;
+
+	  result_type operator() (ImageTuple& t) const
+	  {
+	    return std::get<K>(t);
+	  }
+	};
+
+	template <class Dummy>
+	struct foo<false, Dummy>
+	{
+	  typedef constant_image<domain_t, dontcare_t> result_type;
+
+	  result_type operator() (ImageTuple& t) const
+	  {
+	    return result_type(std::get<0>(t).domain(), dontcare);
+	  }
+	};
+
+	typedef typename foo<used>::result_type result_type;
+
+	result_type
+	operator () (ImageTuple& t) const
+	{
+	  return foo<used> () (t);
+	}
+      };
+
+
+
+      template <class Expr, int... K, class... I>
+      zip_image< typename
+		 get_used_image_tuple_helper<Expr, K, std::tuple<I...> >::result_type ...
+		 >
+      get_used_image_tuple(const Expr&, const intseq<K...>&, I&&... images)
+      {
+	auto t = std::forward_as_tuple(images...);
+
+	return imzip( get_used_image_tuple_helper<Expr, K, std::tuple<I...> > () (t) ... );
+      }
 
       template <class Expr, class Nbh, class... I>
       void
@@ -120,14 +180,22 @@ namespace mln
         typedef zip_image<I...> image_t;
         typedef mln_reference(image_t) V;
 
+
         auto z = imzip(images...);
+	auto z2 = get_used_image_tuple(expr, typename int_list_seq<sizeof... (I)>::type (), images...);
+
+	typedef decltype(z2) image_t_2;
+	typedef mln_reference(image_t_2) V2;
+
         mln_pixter(px, z);
-        mln_iter(nx, nbh(px));
+        mln_pixter(px2, z2);
+        mln_iter(nx, nbh(px2));
 
         // Define context
-        typedef kernel::kernel_context<V, SubExprTypeList, AccuList> Context;
+        typedef kernel::kernel_context<V, V2, SubExprTypeList, AccuList> Context;
+        typedef kernel::kernel_context<V, V, SubExprTypeList, AccuList>  Context2;
 
-        mln_forall(px)
+        mln_forall(px, px2)
         {
             init_nbh(accus, iseq);
 
@@ -151,10 +219,6 @@ namespace mln
     {
       impl::execute(expr, exact(nbh), std::forward<I>(images)...);
     }
-
-
-
-
   }
 
 } // end of namespace mln::kernel

@@ -23,7 +23,7 @@ namespace mln
     ///
     ///
     ///
-    template <class V,
+    template <class V, class V2,
               class SubexprTypeList,
               class AccuList>
     struct kernel_context;
@@ -86,7 +86,7 @@ namespace mln
 
     };
 
-    template <class V,
+    template <class V, class V2,
               class SubexprTypeList,
               class AccuList>
     struct kernel_context
@@ -96,7 +96,7 @@ namespace mln
 
       kernel_context(AccuList& accus,
                      const V& pval,
-                     const V& nval)
+                     const V2& nval)
         : m_accus (accus),
           m_pval(pval),
           m_nval(nval)
@@ -168,7 +168,7 @@ namespace mln
     public:
       AccuList& m_accus;
       V         m_pval;
-      V         m_nval;
+      V2        m_nval;
     };
 
   } // end of namespace mln::kernel

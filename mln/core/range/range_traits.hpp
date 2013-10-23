@@ -7,13 +7,16 @@
 
 namespace mln
 {
+  struct input_range_tag {};
+  struct output_range_tag {};
+  struct forward_range_tag : input_range_tag {} ;
+  struct bidirectional_range_tag : forward_range_tag {};
+  struct random_access_range_tag : bidirectional_range_tag {};
+
+
 
   template <typename Range>
   struct range_traits;
-  //{
-  // bidirectional true_type/false_type
-  //};
-
 
   template <typename Range>
   struct is_mln_range;
@@ -100,6 +103,66 @@ namespace mln
   struct range_reference
   {
     typedef typename range_iterator<R>::type::reference	type;
+  };
+
+  namespace internal
+  {
+
+    template <typename R, bool mln_range>
+    struct range_traits;
+
+    template <typename R>
+    struct range_traits<R, true>
+    {
+      typedef typename R::category category;
+    };
+
+    template <class iterator_tag>
+    struct iterator_to_range_trait;
+
+    template <>
+    struct iterator_to_range_trait<std::input_iterator_tag>
+    {
+      typedef input_range_tag category;
+    };
+
+    template <>
+    struct iterator_to_range_trait<std::output_iterator_tag>
+    {
+      typedef output_range_tag category;
+    };
+
+    template <>
+    struct iterator_to_range_trait<std::forward_iterator_tag>
+    {
+      typedef forward_range_tag category;
+    };
+
+    template <>
+    struct iterator_to_range_trait<std::bidirectional_iterator_tag>
+    {
+      typedef bidirectional_range_tag category;
+    };
+
+    template <>
+    struct iterator_to_range_trait<std::random_access_iterator_tag>
+    {
+      typedef random_access_range_tag category;
+    };
+
+    template <typename R>
+    struct range_traits<R, false>
+    {
+      typedef typename iterator_to_range_trait<
+	typename std::iterator_traits<typename R::iterator>::type
+	>::category category;
+    };
+  }
+
+
+  template <typename R>
+  struct range_traits : internal::range_traits<R, is_mln_range<R>::value>
+  {
   };
 
 }

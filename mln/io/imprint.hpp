@@ -7,9 +7,11 @@
 
 # include <mln/core/domain/box.hpp>
 # include <mln/core/macros.hpp>
+# include <mln/core/value/value_traits.hpp>
 # include <mln/core/grays.hpp>
 # include <mln/io/format.hpp>
 
+# include <cmath>
 
 namespace mln
 {
@@ -61,10 +63,14 @@ namespace mln
 
         std::cout << domain << "(" << typeid(V).name() << ")" << std::endl;
 
-        const int wtext =
-          std::is_same<V, uint8>::value ? 3 :
-          std::is_same<V, unsigned>::value ? 10 :
-          std::is_same<V, std::size_t>::value ? 10 : 0;
+        //const int wtext = frmt_max_width<V>::value;
+
+	int wtext = 0;
+	frmt_max_width<V> frmter;
+	mln_foreach(V v, ima.values())
+	  wtext = std::max(wtext, frmter(v));
+
+	std::cout << wtext << std::endl;
 
         //if (std::is_same<V, uint8>::value)
         std::cout.width(4);

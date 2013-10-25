@@ -3,6 +3,7 @@
 
 # include <mln/core/vec.hpp>
 # include <mln/io/format.hpp>
+# include <sstream>
 
 namespace mln
 {
@@ -15,10 +16,13 @@ namespace mln
     std::ostream&
     operator<< (std::ostream& os, const vec_base<T, dim, tag>& x)
     {
-      os << '[';
+      std::ostringstream s;
+      s << '[';
       for (unsigned i = 0; i < dim-1; ++i)
-	os << x[i] << ',';
-      os << x[dim-1] << ']';
+	s << x[i] << ',';
+      s << x[dim-1] << ']';
+
+      os << s.str();
       return os;
     }
 
@@ -29,11 +33,14 @@ namespace mln
     format (std::ostream& os, const vec_base<T, dim, tag>& x)
     {
       using io::format;
+      std::ostringstream s;
 
-      os << '[';
+      s << '[';
       for (unsigned i = 0; i < dim-1; ++i)
-	format(os, x[i]) << ',';
-      format(os, x[dim-1]) << ']';
+	s << x[i] << ',';
+      s << x[dim-1] << ']';
+
+      os << s.str();
       return os;
     }
 

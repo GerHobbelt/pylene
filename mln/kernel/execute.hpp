@@ -4,6 +4,7 @@
 # include <mln/core/neighborhood/neighborhood.hpp>
 # include <mln/core/image/image.hpp>
 # include <mln/core/image/constant_image.hpp>
+# include <mln/core/image/morphers/morpher_base.hpp>
 # include <mln/core/dontcare.hpp>
 # include <mln/core/internal/intseq.hpp>
 # include <mln/kernel/context.hpp>
@@ -147,6 +148,59 @@ namespace mln
 	return imzip( get_used_image_tuple_helper<Expr, K, std::tuple<I...> > () (t) ... );
       }
 
+      template <class Pixter, class I>
+      struct kernel_wrap_pixter_pixel
+        : morpher_pixel_base< kernel_wrap_pixter_pixel<Pixter, I>,
+                              typename Pixter::value_type>
+      {
+      public:
+        friend struct mln::morpher_core_access;
+        typedef I image_type;
+        typedef typename I::reference reference;
+        typedef typename I::value_type value_type;
+
+        kernel_wrap_pixter_pixel(I* ima, const typename Pixter::reference& pix)
+          : m_ima(ima), m_pix(pix)
+        {
+        }
+
+        image_type& image() const { return *m_ima; }
+        reference   val()   const { return m_pix.val(); }
+
+      private:
+        I*                              m_ima;
+        typename Pixter::reference      m_pix;
+      };
+
+
+      template <class Pixter, class I>
+      struct kernel_wrap_pixter :
+        iterator_base< kernel_wrap_pixter<Pixter, I>,
+                       kernel_wrap_pixter_pixel<Pixter, I>,
+                       kernel_wrap_pixter_pixel<Pixter, I> >
+      {
+        kernel_wrap_pixter(Pixter* pixter, I* ima)
+          : m_ima(ima), m_pixter(pixter)
+        {
+        }
+
+        void init() { m_pixter->init(); }
+        void next() { m_pixter->next(); }
+        bool finished() const { return m_pixter->finished(); }
+
+        kernel_wrap_pixter_pixel<Pixter, I>
+        dereference() const
+        {
+          return kernel_wrap_pixter_pixel<Pixter, I>(m_ima, *(*m_pixter));
+        }
+
+      private:
+        I*      m_ima;
+        Pixter* m_pixter;
+      };
+
+
+
       template <class Expr, class Nbh, class... I>
       void
       execute(Expr& expr, const Nbh& nbh, I&&... images)
@@ -181,21 +235,27 @@ namespace mln
         typedef mln_reference(image_t) V;
 
 
-        auto z = imzip(images...);
-	auto z2 = get_used_image_tuple(expr, typename int_list_seq<sizeof... (I)>::type (), images...);
 
+
+        // Wraps the temporary pixel iterator in a new one that
+        // whose image is the tuple image where unused image on neighborhood
+        // are replaced by a null
+        auto z = imzip(images...);
+        mln_pixter(px, z);
+
+
+	auto z2 = get_used_image_tuple(expr, typename int_list_seq<sizeof... (I)>::type (), images...);
 	typedef decltype(z2) image_t_2;
 	typedef mln_reference(image_t_2) V2;
 
-        mln_pixter(px, z);
-        mln_pixter(px2, z2);
-        mln_iter(nx, nbh(px2));
+        kernel_wrap_pixter<decltype(px), image_t_2> tmp(&px, &z2);
+        mln_iter(nx, nbh(tmp));
 
         // Define context
         typedef kernel::kernel_context<V, V2, SubExprTypeList, AccuList> Context;
         typedef kernel::kernel_context<V, V, SubExprTypeList, AccuList>  Context2;
 
-        mln_forall(px, px2)
+        mln_forall(px)
         {
             init_nbh(accus, iseq);
 

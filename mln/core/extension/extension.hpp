@@ -74,11 +74,6 @@ namespace mln
     add_value_extension(Image<I>&& ima, const mln_value(I)& v);
 
 
-    /// \brief Fill an extension with a value
-    template <class I>
-    void fill(const Image<I>& ima, mln_value(I) v);
-
-
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
@@ -157,20 +152,6 @@ namespace mln
                                           typename image_traits<I>::extension (),
                                           typename N::category ());
     }
-
-
-    template <class I>
-    void fill(const Image<I>& ima, mln_value(I) v)
-    {
-      static_assert(image_has_extension<I>::value,
-                    "Image must have an extension.");
-
-      static_assert(extension_traits<typename I::extension_type>::support_fill::value,
-                    "Image extension must support filling.");
-
-      exact(ima).extension().fill(v);
-    }
-
 
   } // end of namespace mln::extension
 } // end of namespace mln

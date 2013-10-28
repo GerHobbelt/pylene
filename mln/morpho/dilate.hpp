@@ -3,6 +3,7 @@
 
 # include <mln/core/image/image.hpp>
 # include <mln/core/extension/extension.hpp>
+# include <mln/core/extension/fill.hpp>
 # include <mln/core/trace.hpp>
 # include <mln/morpho/se/se.hpp>
 # include <mln/kernel/kernel.hpp>

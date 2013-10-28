@@ -11,10 +11,10 @@ namespace mln
   {
 
     template <typename I>
-    const I& fill(const Image<I>& ima, const mln_value(I)& v);
+    const I& fill(const Image<I>& ima, mln_value(I) v);
 
     template <typename I>
-    I&& fill(Image<I>&& ima, const mln_value(I)& v);
+    I&& fill(Image<I>&& ima, mln_value(I) v);
 
 /******************************************/
 /****          Implementation          ****/
@@ -23,7 +23,7 @@ namespace mln
 
     template <typename I>
     const I&
-    fill(const Image<I>& ima, const mln_value(I)& v)
+    fill(const Image<I>& ima, mln_value(I) v)
     {
       static_assert(image_has_extension<I>::value, "Image must have an extension.");
       static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
@@ -35,7 +35,7 @@ namespace mln
 
     template <typename I>
     I&&
-    fill(Image<I>&& ima, const mln_value(I)& v)
+    fill(Image<I>&& ima, mln_value(I) v)
     {
       static_assert(image_has_extension<I>::value, "Image must have an extension.");
       static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,

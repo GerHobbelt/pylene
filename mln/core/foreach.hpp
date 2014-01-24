@@ -78,7 +78,7 @@ namespace mln
 
 # define mln_foreach(p, COL)						\
   __mln_should_copy_col_local__(COL, _mln_range_)			\
-  MLN_DECL_VAR(_mln_it_, rng::iter(_mln_range_.get()))			\
+  MLN_DECL_VAR(_mln_it_, mln::rng::iter(_mln_range_.get()))		\
   MLN_DECL_VAR(_mln_continue_, true)					\
   for (_mln_it_.get().init();						\
        _mln_continue_.get() and !_mln_it_.get().finished();		\

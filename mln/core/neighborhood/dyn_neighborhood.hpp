@@ -186,6 +186,22 @@ namespace mln
 	     dyn_neighborhood_base<SiteSet, constant_neighborhood_tag, E>::N>
   dyn_neighborhood_base<SiteSet, constant_neighborhood_tag, E>::m_dpoints_acc;
 
+
+  template <class SiteSet>
+  struct dyn_neighborhood<SiteSet, constant_neighborhood_tag>
+    : dyn_neighborhood_base<SiteSet,
+			    constant_neighborhood_tag,
+			    dyn_neighborhood<SiteSet, constant_neighborhood_tag> >
+  {
+    dyn_neighborhood(const SiteSet& s)
+    : dpoints(s)
+    {
+    }
+
+    SiteSet dpoints;
+  };
+
+
 }
 
 #endif // ! MLN_CORE_NEIGHBORHOOD_DYN_NEIGHBORHOOD_HPP

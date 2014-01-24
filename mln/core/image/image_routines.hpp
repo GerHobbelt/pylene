@@ -6,6 +6,10 @@
 # include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/iterator/filter_iterator.hpp>
 
+# include <boost/mpl/or.hpp>
+# include <boost/mpl/and.hpp>
+
+
 namespace mln
 {
 
@@ -29,6 +33,9 @@ namespace mln
   template <typename I, typename J>
   typename std::enable_if<image_traits<I>::indexable::value and image_traits<J>::indexable::value>::type
   reindex(Image<I>& ima1, const Image<J>& ima2);
+
+  template <typename I, typename J>
+  bool are_indexes_compatible(const Image<I>& f, const Image<J>& g);
 
 
   template <typename O, typename I, typename has_border = typename image_traits<O>::has_border>
@@ -146,11 +153,53 @@ namespace mln
   }
 
   template <typename I, typename J>
+  inline
   void
   resize(Image<I>& ima, const Image<J>& other, unsigned b, const mln_value(I)& v)
   {
     resize(ima, other).border(b).init(v);
   }
+
+  namespace internal
+  {
+
+    template <typename... I>
+    inline
+    constexpr
+    typename
+    std::enable_if< not boost::mpl::and_<typename image_traits<I>::indexable ...>::value,
+		    bool >::type
+    are_indexes_compatible(const I&...)
+    {
+      return false;
+    }
+
+
+    template <typename I, typename J, typename... R>
+    inline
+    typename
+    std::enable_if< boost::mpl::and_<
+		      typename image_traits<I>::indexable,
+		      typename image_traits<J>::indexable,
+		      typename image_traits<R>::indexable...>::value,
+		    bool>::type
+    are_indexes_compatible(const I& f, const J& g, const R&... rest)
+    {
+      return f.is_index_compatible(g) and are_indexes_compatible(f, rest...);
+    }
+
+  }
+
+
+  template <typename I, typename J>
+  inline
+  bool
+  are_indexes_compatible(const Image<I>& f, const Image<J>& g)
+  {
+    return false;
+    //return internal::are_indexes_compatible(exact(f), exact(g));
+  }
+
 
   template <typename InputImage>
   inline

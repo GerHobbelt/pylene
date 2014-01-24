@@ -119,6 +119,15 @@ namespace mln
   {
   private:
     typedef ndimage_base<T, dim, E>                             this_type;
+
+    template <class, unsigned, class>
+    friend struct ndimage_base;
+
+    template <unsigned d, typename T1, typename E1, typename T2, typename E2>
+    friend
+    bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self,
+				const ndimage_base<T2, d, E2>& other);
+
   public:
     // As an Image
 
@@ -234,6 +243,10 @@ namespace mln
 
     // As an Indexable Image
     const size_t*	index_strides() const     { return &m_index_strides[0]; }
+
+    // template <typename O>
+    // bool friend_index_compatible(ndimage_base self, const Image<O>& other) const;
+
 
     void reindex(std::size_t index_first)
     {
@@ -635,6 +648,18 @@ namespace mln
   {
     return extension_type(ptr_, &strides_[0], domain_.shape(), border_);
   }
+
+  template <unsigned d, typename T1, typename E1, typename T2, typename E2>
+  inline
+  bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self,
+			      const ndimage_base<T2, d, E2>& other)
+  {
+    return
+      (self.index_of_point(self.domain().pmin) ==
+       other.index_of_point(other.domain().pmin)) and
+      (self.m_index_strides == other.m_index_strides);
+  }
+
 
 
   /******************************************/

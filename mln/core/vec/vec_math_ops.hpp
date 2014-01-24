@@ -117,7 +117,7 @@ namespace mln
   {
     MLN_PROMOTE(T) res = x[0];
     for (unsigned i = 1; i < dim; ++i)
-      res[i] += x[i];
+      res += x[i];
     return res;
   }
 
@@ -128,7 +128,7 @@ namespace mln
   {
     MLN_PROMOTE(T) res = x[0];
     for (unsigned i = 1; i < dim; ++i)
-      res[i] *= x[i];
+      res *= x[i];
     return res;
   }
 

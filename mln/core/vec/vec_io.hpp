@@ -36,9 +36,10 @@ namespace mln
       std::ostringstream s;
 
       s << '[';
-      for (unsigned i = 0; i < dim-1; ++i)
-	s << x[i] << ',';
-      s << x[dim-1] << ']';
+      for (unsigned i = 0; i < dim-1; ++i) {
+	format(s, x[i]); s << ',';
+      }
+      format(s, x[dim-1]); s << ']';
 
       os << s.str();
       return os;

@@ -339,9 +339,12 @@ namespace mln
       VEC_BASE_GEN_EXT_OP(is_additive_ext, +=)
 
 
-      vec_base operator - () const
+
+      vec_base< decltype(- std::declval<T>()), dim, tag>
+      operator - () const
       {
-        vec_base out;
+	typedef vec_base< decltype(- std::declval<T>()), dim, tag> R;
+	R out;
         for (unsigned i = 0; i < dim; ++i)
           out.v_[i] = -v_[i];
         return out;

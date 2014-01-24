@@ -13,7 +13,7 @@ namespace mln
   /// a < b \leftrightarrow \exists i s.t. a_i < b_i
   /// \text{ and } \forall j < i \, \neg b_j < a_j
   /// \f]
-  template <typename U, typename V = U>
+  template <typename U, typename V>
   struct lexicographicalorder_less;
 
   template <typename U, typename V>
@@ -44,7 +44,7 @@ namespace mln
   /// \f[
   /// a < b \leftrightarrow a \leq b and a \ne b
   /// \f]
-  template <typename U, typename V = U>
+  template <typename U, typename V>
   struct productorder_less;
 
   template <typename U, typename V = U>
@@ -55,6 +55,8 @@ namespace mln
 
   template <typename U, typename V = U>
   struct productorder_greater_equal;
+
+#if 0 // Facade only
 
   template <typename U, typename V>
   bool
@@ -72,6 +74,7 @@ namespace mln
   bool
   vecprod_isgreaterequal(const U&, const V&);
 
+#endif
 
   /*********************/
   /**   Traits        **/
@@ -251,6 +254,15 @@ namespace mln
     return res;
   }
 
+  template <typename U, typename V>
+  typename std::enable_if< std::is_arithmetic<U>::value and
+                           std::is_arithmetic<V>::value, bool>::type
+  vecprod_isless(const U& u, const V& v)
+  {
+    return u < v;
+  }
+
+
 
   template <typename U, typename V, unsigned dim, typename tag>
   bool
@@ -305,13 +317,11 @@ namespace mln
     }
   };
 
-  template <typename U, typename V,
-	    unsigned dim, typename tag>
-  struct productorder_less< internal::vec_base<U, dim, tag>, internal::vec_base<V, dim, tag> >
+  template <typename U, typename V>
+  struct productorder_less
   {
     bool
-    operator() (const internal::vec_base<U, dim, tag>& u,
-		const internal::vec_base<V, dim, tag>& v)
+    operator() (const U& u, const V& v)
     {
       return vecprod_isless(u, v);
     }

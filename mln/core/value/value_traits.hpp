@@ -6,6 +6,14 @@
 
 namespace mln
 {
+  // Forward declaration: special ordering.
+  template <typename U, typename V = U>
+  struct productorder_less;
+
+  template <typename U, typename V = U>
+  struct lexicographicalorder_less;
+
+
 
   template <typename V, typename StrictWeakOrdering = std::less<V>, class Enable = void>
   struct value_traits
@@ -27,7 +35,6 @@ namespace mln
   };
 
 
-
   // Specialization for primitive types
   template <typename V>
   struct value_traits<V, std::less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
@@ -38,6 +45,19 @@ namespace mln
     static constexpr V inf() { return min(); }
     static constexpr V sup() { return max(); }
   };
+
+  template <typename V>
+  struct value_traits<V, productorder_less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
+    : value_traits<V, std::less<V> >
+  {
+  };
+
+  template <typename V>
+  struct value_traits<V, lexicographicalorder_less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
+    : value_traits<V, std::less<V> >
+  {
+  };
+
 
 }
 

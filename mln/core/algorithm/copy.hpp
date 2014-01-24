@@ -3,9 +3,6 @@
 
 # include <mln/core/assert.hpp>
 # include <mln/core/concept/image.hpp>
-
-# include <boost/range/algorithm/copy.hpp>
-
 /// \file
 
 namespace mln {

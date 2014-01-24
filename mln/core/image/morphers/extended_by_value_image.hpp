@@ -3,6 +3,7 @@
 
 # include <mln/core/image/image.hpp>
 # include <mln/core/image/morphers/morpher_base.hpp>
+# include <mln/core/range/iterator_range.hpp>
 
 namespace mln
 {

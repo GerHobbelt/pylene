@@ -68,7 +68,7 @@ export_shape_as_cluster(int id,
   // Add shape points to the cluster
   bool has_repr = false;
   mln::point2d repr;
-  for (const mln::point2d& p : shp.m_set)
+  for (const mln::point2d& p : shp.pset())
     if (!deja_vu(p)) {
       if (!summary or !has_repr)
 	dotsream << '"' << p << '"' << " [style=filled, color=\".3 .7 1.\"]" << std::endl;
@@ -90,7 +90,7 @@ export_shape_as_cluster(int id,
 
   // Link to representant
   bool is_repr = true;
-  for (const mln::point2d& p : shp.m_set)
+  for (const mln::point2d& p : shp.pset())
     {
       if (!deja_vu(p) and !summary)
 	{
@@ -130,7 +130,7 @@ export_shape_as_image(int id,
   std::string repr = (boost::format("shape_%i") % id).str();
 
   mln::image2d<bool> bin(domain, 0, false);
-  for (const mln::point2d& p: shp.m_set)
+  for (const mln::point2d& p: shp.pset())
     bin(p) = true;
   mln::io::png::imsave(bin, (dirname + "/" + repr + ".png").c_str());
   return repr;

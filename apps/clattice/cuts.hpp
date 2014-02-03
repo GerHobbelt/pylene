@@ -45,24 +45,16 @@ void cut_and_get_shapes(const mln::image2d<R>&				ima,
   // io::imprint(input);
   // io::imprint(imlabel);
 
+  shape_t shp(lambda, cmp, ima.domain().size(), ima.ncols());
+
   for (int l = 1; l <= nlabel; ++l)
     {
-      int sz = 0;
-      shape_t shp(lambda, cmp);
-
       morpho::saturate(imlabel == l, nbhBg, point2d(0,0), cc);
-      bbox.init();
-      mln_foreach(const point2d& p, where(cc))
-	{
-	  bbox.take(p);
-	  ++sz;
-	}
 
-      shp.m_bbox = { accu::extractor::inf(bbox), accu::extractor::sup(bbox) };
-      shp.m_set.reserve(sz);
-
+      shp.init();
+      shp.set_level(lambda, cmp);
       mln_foreach(const point2d& p, where(cc))
-	shp.m_set.push_back(p);
+	shp.add_point(p);
 
       // insert new shape in the set
       auto res = shapes.insert(std::move(shp));
@@ -70,6 +62,8 @@ void cut_and_get_shapes(const mln::image2d<R>&				ima,
       // If shape already there, update with new information
       if (not res.second)
 	res.first->update_with(shp);
+
+      mln_postcondition(res.first->islower() or res.first->isupper());
     }
 }
 

@@ -9,7 +9,7 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-#include <mln/core/internal/nested_loop_iterator.hpp>
+//#include <mln/core/internal/nested_loop_iterator.hpp>
 
 #include <apps/tos/addborder.hpp>
 
@@ -42,37 +42,37 @@
  };
 
 
- template <class Vec, class Compare>
- struct vset;
+ // template <class Vec, class Compare>
+ // struct vset;
 
- template <class Vec>
- struct vset< Vec, mln::productorder_less<Vec> >
- {
-   typedef mln::__nested_loop_iterator
-   <Vec, mln::__iterate_from_to<Vec, false> > iterator;
+ // template <class Vec>
+ // struct vset< Vec, mln::productorder_less<Vec> >
+ // {
+ //   typedef mln::__nested_loop_iterator
+ //   <Vec, mln::__iterate_from_to<Vec, false> > iterator;
 
-   typedef iterator const_iterator;
+ //   typedef iterator const_iterator;
 
-   vset(const Vec& from, const Vec& to)
-     : m_from (from), m_to (to)
-   {
-   }
+ //   vset(const Vec& from, const Vec& to)
+ //     : m_from (from), m_to (to)
+ //   {
+ //   }
 
-   iterator iter() const
-   {
-     return iterator(Vec(),
-		     mln::__iterate_from_to<Vec,false> (m_from, m_to));
-   }
+ //   iterator iter() const
+ //   {
+ //     return iterator(Vec(),
+ // 		     mln::__iterate_from_to<Vec,false> (m_from, m_to));
+ //   }
 
 
-   unsigned size() const
-   {
-     return (m_to - m_from + 1).sum();
-   }
+ //   unsigned size() const
+ //   {
+ //     return (m_to - m_from + 1).sum();
+ //   }
 
- private:
-   Vec m_from, m_to;
- };
+ // private:
+ //   Vec m_from, m_to;
+ // };
 
 
  void showstat(const ublas::triangular_matrix<bool, ublas::upper>&  mat)
@@ -221,7 +221,7 @@
    {
      resize(phi, f);
      for (int i = vshapes.size() - 1; i >= 0; --i)
-       for (point2d x : vshapes[i].m_set)
+       for (point2d x : vshapes[i].pset())
 	 phi(x) = i;
    }
 
@@ -234,7 +234,7 @@
 
    image2d<rgb8> tmp(f.nrows()-2, f.ncols()-2);
 
-   for (int grain: grains)
+   for (unsigned grain: grains)
      {
        fill(out, rgb8{0,0,255});
 
@@ -310,7 +310,9 @@
    // Compute value set of inf/sup
    boost::dynamic_bitset<> valset(1 << 24);
 
-   auto idx2rgb = [](unsigned x) { return rgb8{ (x & 0xFF0000) >> 16, (x & 0x00FF00) >> 8, (x & 0x0000FF) }; };
+   auto idx2rgb = [](unsigned x) { return rgb8{ (uint8)((x & 0xFF0000) >> 16),
+						(uint8)((x & 0x00FF00) >> 8),
+						(uint8)(x & 0x0000FF) }; };
    {
      auto rgb2idx = [] (rgb8 x) -> unsigned { return (x[0] << 16) + (x[1] << 8) + x[2]; };
      mln_foreach(rgb8 x, f.values())

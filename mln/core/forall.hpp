@@ -60,6 +60,10 @@
 # define mln_iter(p, range)                       \
   auto p = mln::rng::iter(range);
 
+# define mln_riter(p, range)                       \
+  auto p = mln::rng::riter(range);
+
+
 #endif
 
 /// FIXME: move image specific macros to its own file.

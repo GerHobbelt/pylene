@@ -86,4 +86,16 @@ namespace mln
     if (_mln_continue_.set(false)) {} else				\
       for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true)) \
 
+
+# define mln_reverse_foreach(p, COL)						\
+  __mln_should_copy_col_local__(COL, _mln_range_)			\
+  MLN_DECL_VAR(_mln_it_, mln::rng::riter(_mln_range_.get()))		\
+  MLN_DECL_VAR(_mln_continue_, true)					\
+  for (_mln_it_.get().init();						\
+       _mln_continue_.get() and !_mln_it_.get().finished();		\
+       _mln_continue_.get() ? _mln_it_.get().next() : (void) 0)		\
+    if (_mln_continue_.set(false)) {} else				\
+      for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true))
+
+
 #endif // ! MLN_CORE_FOREACH_HPP

@@ -27,6 +27,12 @@ namespace mln
   template <typename Range, bool mln_range = is_mln_range<Range>::value>
   struct range_const_iterator;
 
+  template <typename Range, bool mln_range = is_mln_range<Range>::value>
+  struct range_reverse_iterator;
+
+  template <typename Range, bool mln_range = is_mln_range<Range>::value>
+  struct range_const_reverse_iterator;
+
   template <typename Range>
   struct range_value;
 
@@ -92,6 +98,44 @@ namespace mln
   {
     typedef stditerator<typename R::const_iterator>	type;
   };
+
+
+  template <typename R>
+  struct range_reverse_iterator<R, true>
+  {
+    typedef typename R::reverse_iterator			type;
+  };
+
+  template <typename R>
+  struct range_reverse_iterator<R, false>
+  {
+    typedef stditerator<typename R::reverse_iterator>		type;
+  };
+
+  template <typename R>
+  struct range_reverse_iterator<const R, true>
+  {
+    typedef typename R::const_reverse_iterator			type;
+  };
+
+  template <typename R>
+  struct range_reverse_iterator<const R, false>
+  {
+    typedef stditerator<typename R::const_reverse_iterator>	type;
+  };
+
+  template <typename R>
+  struct range_const_reverse_iterator<R, true>
+  {
+    typedef typename R::const_reverse_iterator			type;
+  };
+
+  template <typename R>
+  struct range_const_reverse_iterator<R, false>
+  {
+    typedef stditerator<typename R::const_reverse_iterator>	type;
+  };
+
 
   template <typename R>
   struct range_value

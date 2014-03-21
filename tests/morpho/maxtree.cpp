@@ -2,6 +2,8 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/range/algorithm/generate.hpp>
 #include <mln/morpho/maxtree_ufind.hpp>
+#include <mln/morpho/maxtree_pqueue_2.hpp>
+
 #include <mln/morpho/maxtree_pqueue_parallel.hpp>
 #include <mln/morpho/maxtree_ufindrank_parallel.hpp>
 #include <mln/morpho/maxtree_hqueue_parallel.hpp>
@@ -9,6 +11,7 @@
 #include <mln/morpho/maxtree_najman.hpp>
 #include <mln/morpho/maxtree1d.hpp>
 #include <mln/core/grays.hpp>
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/io/imprint.hpp>
 #include <tbb/task_scheduler_init.h>
 
@@ -64,6 +67,43 @@ bool iscanonized(const mln::image2d<V>& ima,
   }
   return true;
 }
+
+template <typename V>
+bool iscanonized(const mln::image2d<V>& ima,
+		 const mln::image2d<mln::morpho::maxtree_node>& tree)
+{
+  mln_pixter(px, tree);
+  mln_forall(px)
+  {
+    std::size_t q = px->val().m_parent;
+    if (not(q == tree[q].m_parent or ima[q] != ima[tree[q].m_parent]))
+      {
+	std::cout << "canaonization error @ " << px->index() << std::endl;
+	return false;
+      }
+  }
+  return true;
+}
+
+bool
+check_S(const mln::image2d<mln::morpho::maxtree_node>& tree, unsigned root)
+{
+  using namespace mln;
+  image2d<bool> dejavu;
+  resize(dejavu, tree).init(false);
+
+  dejavu[root] = true;
+  for (unsigned x = root; x != (unsigned) -1; x = tree[x].m_next)
+    {
+      assert(dejavu[tree[x].m_parent]);
+      if (!dejavu[tree[x].m_parent])
+	return false;
+      dejavu[x] = true;
+    }
+  return true;
+}
+
+
 
 mln::image2d<std::size_t>
 pt2idx(const mln::image2d<mln::point2d>& parent)
@@ -166,6 +206,18 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
     unify_parent(ima, S1, parent);
     BOOST_CHECK(all(parent == parent1));
   }
+
+  {
+    image2d<morpho::maxtree_node> tree;
+    unsigned root;
+    std::tie(tree, root) = morpho::maxtree_pqueue_2(ima, c4, cmp );
+    BOOST_CHECK(iscanonized(ima, tree));
+    BOOST_CHECK(check_S(tree, root));
+    auto parent = transform(tree, std::mem_fn(&morpho::maxtree_node::m_parent));
+    unify_parent(ima, S1, parent);
+    BOOST_CHECK(all(parent == parent1));
+  }
+
 
   {
     std::tie(parent, S) = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp );

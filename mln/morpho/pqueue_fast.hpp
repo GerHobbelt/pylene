@@ -63,7 +63,9 @@ namespace mln
 
     template<typename V, typename Compare, typename Enable = void>
     struct priority_queue_ima :
-      public std::priority_queue<typename image2d<V>::size_type, std::vector<typename image2d<V>::size_type>, internal::pqueue_cmp_t<V, Compare> >
+      public std::priority_queue<typename image2d<V>::size_type,
+				 std::vector<typename image2d<V>::size_type>,
+				 internal::pqueue_cmp_t<V, Compare> >
     {
       typedef typename image2d<V>::size_type size_type;
 

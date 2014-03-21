@@ -31,7 +31,10 @@ namespace mln
 	  typedef point2d      P;
 	  const I& ima = exact(ima_);
 
-	  image2d<R> out(2*ima.nrows()-1, 2*ima.ncols()-1);
+	  box2d dom = ima.domain();
+	  dom.pmin = dom.pmin * 2;
+	  dom.pmax = dom.pmax * 2 - 1;
+	  image2d<R> out(dom);
 
 	  mln_foreach(point2d p, ima.domain())
 	    {

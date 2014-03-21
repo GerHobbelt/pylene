@@ -33,6 +33,7 @@
 # include <mln/morpho/tos/irange.hpp>
 # include <mln/morpho/tos/immerse.hpp>
 # include <mln/morpho/tos/pset.hpp>
+# include <mln/morpho/tos/pset_priority.hpp>
 
 
 namespace mln
@@ -60,7 +61,8 @@ namespace mln
     template <typename I,
 	      typename Neighborhood,
 	      typename Compare = std::less<mln_value(I)>,
-	      typename Equiv = internal::equiv<Compare> >
+	      typename Equiv = internal::equiv<Compare>,
+	      bool use_priority = false>
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
     ToS(const Image<I>& ima,
 	const Neighborhood& nbh,
@@ -76,6 +78,26 @@ namespace mln
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
     ToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () );
+
+
+    /***********************************************/
+    /* Same as before but using priority proagation */
+    /***********************************************/
+
+    template <typename I,
+	      typename Neighborhood,
+	      typename Compare = std::less<mln_value(I)>,
+	      typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS_priority(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq);
+
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>, typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
+
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () );
 
 
 
@@ -120,7 +142,8 @@ namespace mln
     template <typename I,
 	      typename Neighborhood,
 	      typename Compare = std::less<mln_value(I)>,
-	      typename Equiv = internal::equiv<Compare> >
+	      typename Equiv = internal::equiv<Compare>,
+	      bool use_priority = false>
     std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
     ToS(const Image<I>& ima_,
 	const Neighborhood& nbh,
@@ -152,7 +175,11 @@ namespace mln
       resize(parent, f).init(UNPROCESSED);
       extension::fill(parent, PROCESSED);
 
-      pset<I, Compare> W(K, cmp);
+      typedef typename std::conditional<not use_priority,
+					pset<I, Compare>,
+					pset_priority<I, Compare> >::type pset_t;
+
+      pset_t W(K, cmp);
       //auto pmin = f.domain().pmin;
       size_type p = f.index_of_point(pmin);
       W.insert(p);
@@ -263,6 +290,36 @@ namespace mln
     {
       mln_point(I) pmin = exact(ima).domain().pmin;
       return ToS(ima, nbh, pmin, cmp, internal::equiv<Compare> (cmp));
+    }
+
+
+    template <typename I,
+	      typename Neighborhood,
+	      typename Compare = std::less<mln_value(I)>,
+	      typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS_priority(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& equiv)
+    {
+      return ToS<I, Neighborhood, Compare, Equiv, true>(ima, nbh, pmin, cmp, equiv);
+    }
+
+    template <typename I,
+	      typename Neighborhood,
+	      typename Compare = std::less<mln_value(I)>,
+	      typename Equiv = internal::equiv<Compare> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& equiv)
+    {
+      mln_point(I) pmin = exact(ima).domain().pmin;
+      return ToS<I, Neighborhood, Compare, Equiv, true>(ima, nbh, pmin, cmp, equiv);
+    }
+
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
+    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
+    ToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () )
+    {
+      mln_point(I) pmin = exact(ima).domain().pmin;
+      return ToS<I, Neighborhood, Compare, internal::equiv<Compare>, true>(ima, nbh, pmin, cmp, internal::equiv<Compare> (cmp));
     }
 
   }

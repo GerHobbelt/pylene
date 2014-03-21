@@ -1,0 +1,2 @@
+add_executable(component_tree component_tree.cpp)
+add_core_test(component_tree component_tree)

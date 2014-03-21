@@ -60,6 +60,7 @@ endmacro(add_core_test)
 add_subdirectory(tests EXCLUDE_FROM_ALL)
 add_subdirectory(bench EXCLUDE_FROM_ALL)
 add_subdirectory(apps EXCLUDE_FROM_ALL)
+add_subdirectory(cli EXCLUDE_FROM_ALL)
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")

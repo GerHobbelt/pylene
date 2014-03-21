@@ -32,13 +32,39 @@ namespace mln
   transformed_image<I&, UnaryFunction>
   imtransform(Image<I>& ima, const UnaryFunction& f);
 
+  /******************************************/
+  /****           HELPER MACROS          ****/
+  /******************************************/
+
+# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(NAME, F_CONSTREF, F_REF)	\
+  template <typename I>							\
+  internal::transformed_image<I, BOOST_PP_TUPLE_REM () F_REF, false>				\
+  NAME(Image<I>&& ima, const BOOST_PP_TUPLE_REM () F_REF& f = BOOST_PP_TUPLE_REM () F_REF ()) \
+  {									\
+    return internal::transformed_image<I, BOOST_PP_TUPLE_REM () F_REF, false>(move_exact<I>(ima), f); \
+  }									\
+									\
+  template <typename I>							\
+  internal::transformed_image<I&, BOOST_PP_TUPLE_REM () F_REF, false>	\
+  NAME(Image<I>& ima, const BOOST_PP_TUPLE_REM () F_REF& f = BOOST_PP_TUPLE_REM () F_REF ()) \
+  {									\
+    return internal::transformed_image<I&, BOOST_PP_TUPLE_REM () F_REF, false>(exact(ima), f); \
+  }									\
+  									\
+  template <typename I>							\
+  internal::transformed_image<const I&, BOOST_PP_TUPLE_REM () F_CONSTREF, false>	\
+  NAME(const Image<I>& ima, const BOOST_PP_TUPLE_REM () F_CONSTREF& f = BOOST_PP_TUPLE_REM () F_CONSTREF ()) \
+  {									\
+    return internal::transformed_image<const I&, BOOST_PP_TUPLE_REM () F_CONSTREF, false>(exact(ima), f); \
+  }
+
 
   /******************************************/
   /****              Traits              ****/
   /******************************************/
 
-  template <typename I, class UnaryFunction>
-  struct image_traits< transformed_image<I, UnaryFunction> >
+  template <typename I, class UnaryFunction, bool b>
+  struct image_traits< internal::transformed_image<I, UnaryFunction, b> >
   {
   private:
     typedef typename std::remove_reference<I>::type image_t;
@@ -195,6 +221,36 @@ namespace mln
       at (const mln_point(I)& p) const
       {
 	return m_fun(m_ima.at(p));
+      }
+
+      template <typename dummy = pixel_type>
+      typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
+      pixel (const mln_point(I)& p)
+      {
+	mln_precondition(this->domain().has(p));
+	return pixel_type(m_ima.pixel(p), this);
+      }
+
+      template <typename dummy = const_pixel_type>
+      typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
+      pixel (const mln_point(I)& p) const
+      {
+	mln_precondition(this->domain().has(p));
+	return const_pixel_type(m_ima.pixel(p), this);
+      }
+
+      template <typename dummy = pixel_type>
+      typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
+      pixel_at (const mln_point(I)& p)
+      {
+	return pixel_type(m_ima.pixel_at(p), this);
+      }
+
+      template <typename dummy = const_pixel_type>
+      typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
+      pixel_at (const mln_point(I)& p) const
+      {
+	return const_pixel_type(m_ima.pixel_at(p), this);
       }
 
 

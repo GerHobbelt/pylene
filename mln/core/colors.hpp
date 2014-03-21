@@ -2,7 +2,9 @@
 # define MLN_CORE_COLORS_HPP
 
 # include <mln/core/value/int.hpp>
+# include <mln/core/ops.hpp>
 # include <mln/core/vec_base.hpp>
+# include <mln/core/image/morphers/transformed_image.hpp>
 
 namespace mln
 {
@@ -46,6 +48,11 @@ namespace mln
 
   typedef bgr<uint8> bgr8;
   typedef bgr<uint16> bgr16;
+
+
+  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(red,   (mln::getter<0, const rgb8&>), (mln::getter<0, rgb8&>));
+  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(green, (mln::getter<1, const rgb8&>), (mln::getter<1, rgb8&>));
+  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(blue,  (mln::getter<2, const rgb8&>), (mln::getter<2, rgb8&>));
 
 }
 

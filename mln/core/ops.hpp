@@ -21,6 +21,7 @@
 * \see mln::less_than
 * \see mln::greater_equal
 * \see mln::less_equal
+* \see mln::getter
 * \see mln::inf
 * \see mln::sup
 * \see mln::min
@@ -220,6 +221,17 @@ namespace mln
     operator() (const U& x, const V& y) const
     {
       return x || y;
+    }
+  };
+
+  template <size_t N, class C>
+  struct getter
+  {
+    auto
+    operator() (C&& obj) const
+      -> decltype(std::get<N>(std::forward<C>(obj)))
+    {
+      return std::get<N>(std::forward<C>(obj));
     }
   };
 

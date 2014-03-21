@@ -212,6 +212,45 @@ namespace mln
     };
 
     template <typename P>
+    struct meta_access_pixel
+    {
+      template <typename I>
+      struct apply
+      {
+    	typedef mln_pixel(I) type;
+      };
+
+      template <typename I>
+      mln_pixel(I)
+      operator() (I& ima) const
+      {
+    	return ima.pixel(m_p);
+      }
+
+      const P& m_p;
+    };
+
+    template <typename P>
+    struct meta_const_access_pixel
+    {
+      template <typename I>
+      struct apply
+      {
+    	typedef mln_cpixel(I) type;
+      };
+
+      template <typename I>
+      mln_cpixel(I)
+      operator() (const I& ima) const
+      {
+    	return ima.pixel(m_p);
+      }
+
+      const P& m_p;
+    };
+
+
+    template <typename P>
     struct meta_at
     {
       template <typename I>
@@ -373,7 +412,7 @@ namespace mln
     typedef transformed_range<zip_range<pixrange_tuple>, pixel_fun_t>		pixel_range;
     typedef transformed_range<zip_range<cpixrange_tuple>, const_pixel_fun_t>	const_pixel_range;
 
-    
+
     zip_image(Images&&... images)
       : m_images(std::forward_as_tuple(images...))
     {
@@ -444,6 +483,19 @@ namespace mln
       return internal::tuple_transform(m_images, internal::meta_const_at<point_type> {p});
     }
 
+    pixel_type
+    pixel (const point_type& p)
+    {
+      auto t = internal::tuple_transform(m_images, internal::meta_access_pixel<point_type> {p} );
+      return pixel_type(t, this);
+    }
+
+    const_pixel_type
+    pixel (const point_type& p) const
+    {
+      auto t = internal::tuple_transform(m_images, internal::meta_const_access_pixel<point_type> {p} );
+      return const_pixel_type(t, this);
+    }
 
     template <typename image_t = I0>
     reference

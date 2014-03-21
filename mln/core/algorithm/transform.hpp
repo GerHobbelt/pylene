@@ -19,8 +19,11 @@ namespace mln {
   lazy_transform(InputImage&& input, UnaryFunction f);
 
   template <typename InputImage, class UnaryFunction>
-  mln_ch_value(InputImage, typename std::result_of<UnaryFunction(mln_value(InputImage))>::type)
-    transform(const Image<InputImage>& input, UnaryFunction f);
+  mln_ch_value(InputImage,
+	       typename std::decay<
+		 typename std::result_of<UnaryFunction(mln_value(InputImage))>::type
+		 >::type)
+  transform(const Image<InputImage>& input, UnaryFunction f);
 
 
 /******************************************/
@@ -60,10 +63,16 @@ namespace mln {
 
 
   template <typename InputImage, class UnaryFunction>
-  mln_ch_value(InputImage, typename std::result_of<UnaryFunction(mln_value(InputImage))>::type)
+  mln_ch_value(InputImage,
+	       typename std::decay<
+		 typename std::result_of<UnaryFunction(mln_value(InputImage))>::type
+		 >::type)
     transform(const Image<InputImage>& input, UnaryFunction f)
   {
-    typedef typename std::result_of<UnaryFunction(mln_value(InputImage))>::type T;
+    typedef typename std::decay<
+      typename std::result_of<UnaryFunction(mln_value(InputImage))>::type
+      >::type T;
+
     mln_ch_value(InputImage, T) out;
     resize(out, input);
 

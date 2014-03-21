@@ -247,7 +247,7 @@ namespace mln
       strided_domain_point_visitor_backward(const P& pmin, const P& pmax, const P& strides) :
 	pmin_ (pmin), pmax_(pmax), strides_ (strides)
       {
-	mln_precondition( (pmax - pmin).as_vec() % strides.as_vec() == literal::zero );
+	mln_precondition( (pmax - pmin).as_vec() % strides.as_vec() == P(literal::zero).as_vec() );
       }
 
       void  initialize(P& point) const { point = pmax_; point -= strides_; }

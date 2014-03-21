@@ -1,9 +1,11 @@
+// Transformed image is core morpher, include image.hpp to ensure dependencies
+#include <mln/core/image/image.hpp>
+
 #ifndef MLN_CORE_IMAGE_MORPHERS_TRANSFORMED_IMAGE_HPP
 # define MLN_CORE_IMAGE_MORPHERS_TRANSFORMED_IMAGE_HPP
 
 // FIXME: pixel do not preserve properties
 
-# include <mln/core/image/morphers/morpher_base.hpp>
 # include <mln/core/range/transform.hpp>
 # include <mln/core/pixel_utility.hpp>
 

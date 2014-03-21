@@ -2,6 +2,7 @@
 # define MLN_CORE_OPS_HPP
 
 # include <functional>
+# include <algorithm>
 
 /**
 * \file

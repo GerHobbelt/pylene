@@ -226,14 +226,13 @@ namespace mln
 
       vec_base() = default;
 
-      explicit
+
       constexpr
       vec_base(const literal::zero_t&)
         : v_ {0,}
       {
       }
 
-      explicit
       constexpr
       vec_base(const literal::one_t&)
 	: vec_base(1)

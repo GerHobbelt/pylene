@@ -25,8 +25,7 @@ namespace mln {
   accumulate(const Image<I>& input, const AccumulatorLike<AccuLike>& accu_, const Extractor& ex)
   {
     const I& ima = exact(input);
-    AccuLike tmp = exact(accu_);
-    auto a = accu::make_accumulator<AccuLike, mln_value(I)>(tmp);
+    auto a = accu::make_accumulator(exact(accu_), mln_value(I) ());
 
     mln_foreach(const auto& v, ima.values())
       a.take(v);

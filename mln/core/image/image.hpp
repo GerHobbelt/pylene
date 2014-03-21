@@ -7,6 +7,7 @@
 # include <mln/core/concept/image.hpp>
 # include <mln/core/image_traits.hpp>
 # include <mln/core/image_base.hpp>
+# include <mln/core/image/morphers/morpher_base.hpp>
 # include <mln/core/ch_value.hpp>
 
 # include <mln/core/forall.hpp>

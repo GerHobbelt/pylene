@@ -3,6 +3,7 @@
 
 # include <FreeImage.h>
 # include <mln/core/grays.hpp>
+# include <mln/io/ioexception.hpp>
 # include <boost/static_assert.hpp>
 
 
@@ -26,6 +27,8 @@ namespace mln
 
 	if (std::is_same<V, bool>::value or std::is_same<V, uint8>::value or std::is_same<V, rgb8>::value)
 	  fit = FIT_BITMAP;
+	else if (std::is_same<V, rgb<float> >::value)
+	  fit = FIT_RGBF;
 	else if (std::is_same<V, uint16>::value)
 	  fit = FIT_UINT16;
 	else if (std::is_same<V, int16>::value)
@@ -63,7 +66,7 @@ namespace mln
 	unsigned bpp = sizeof(V);
         for(int y = h-1; y >= 0; --y, ptr += strides[0]) {
           BYTE *bits = FreeImage_GetScanLine(dib, y);
-	  if (std::is_same<V, rgb8>::value)
+	  if (std::is_same<V, rgb8>::value or std::is_same<V, rgb<float> >::value)
 	    {
 	      for (int j = 0; j < w; ++j) {
 		*(bits + j * bpp + 0) = *(ptr + j * bpp + 2);

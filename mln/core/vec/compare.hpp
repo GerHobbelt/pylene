@@ -298,7 +298,7 @@ namespace mln
   struct lexicographicalorder_less
   {
     bool
-    operator() (const U& u, const V& v)
+    operator() (const U& u, const V& v) const
     {
       return u < v;
     }
@@ -311,7 +311,7 @@ namespace mln
   {
     bool
     operator() (const internal::vec_base<U, dim, tag>& u,
-		const internal::vec_base<V, dim, tag>& v)
+		const internal::vec_base<V, dim, tag>& v) const
     {
       return veclex_isless(u,v);
     }
@@ -321,7 +321,7 @@ namespace mln
   struct productorder_less
   {
     bool
-    operator() (const U& u, const V& v)
+    operator() (const U& u, const V& v) const
     {
       return vecprod_isless(u, v);
     }
@@ -333,7 +333,7 @@ namespace mln
   {
     bool
     operator() (const internal::vec_base<U, dim, tag>& u,
-		const internal::vec_base<V, dim, tag>& v)
+		const internal::vec_base<V, dim, tag>& v) const
     {
       return vecprod_islessequal(u, v);
     }
@@ -345,7 +345,7 @@ namespace mln
   {
     bool
     operator() (const internal::vec_base<U, dim, tag>& u,
-		const internal::vec_base<V, dim, tag>& v)
+		const internal::vec_base<V, dim, tag>& v) const
     {
       return vecprod_isgreater(u, v);
     }
@@ -357,7 +357,7 @@ namespace mln
   {
     bool
     operator() (const internal::vec_base<U, dim, tag>& u,
-		const internal::vec_base<V, dim, tag>& v)
+		const internal::vec_base<V, dim, tag>& v) const
     {
       return vecprod_isgreaterequal(u, v);
     }

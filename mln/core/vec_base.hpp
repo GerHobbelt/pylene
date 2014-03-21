@@ -226,19 +226,21 @@ namespace mln
 
       vec_base() = default;
 
+      explicit
       constexpr
       vec_base(const literal::zero_t&)
         : v_ {0,}
       {
       }
 
+      explicit
       constexpr
       vec_base(const literal::one_t&)
 	: vec_base(1)
       {
       }
 
-
+      explicit
       constexpr
       vec_base(const T& x)
       : vec_base(x, typename genseq<dim>::type ())
@@ -442,7 +444,29 @@ namespace mln
 	return s;
       }
 
+      template <unsigned N>
+      constexpr
+      const T& get() const
+      {
+	return v_[N];
+      }
+
+      template <unsigned N>
+      constexpr
+      T& get()
+      {
+	return v_[N];
+      }
+
     private:
+      template <size_t N, class T2, unsigned dim2, typename tag2>
+      friend constexpr const T2& std::get(const vec_base<T2, dim2, tag2>&);
+      template <size_t N, class T2, unsigned dim2, typename tag2>
+      friend constexpr T2& std::get(vec_base<T2, dim2, tag2>&);
+      template <size_t N, class T2, unsigned dim2, typename tag2>
+      friend constexpr T2&& std::get(vec_base<T2, dim2, tag2>&&);
+
+
       template <int... N>
       constexpr
       vec_base(const T& x, Seq<N...>)
@@ -516,6 +540,31 @@ namespace std
   {
     typedef mln::internal::vec_base< typename make_unsigned<T>::type, dim, tag > type;
   };
+
+
+  template <size_t N, class T, unsigned dim, typename tag>
+  inline
+  constexpr
+  T& get(mln::internal::vec_base<T, dim, tag>& vec)
+  {
+    return vec.v_[N];
+  }
+
+  template <size_t N, class T, unsigned dim, typename tag>
+  inline
+  constexpr
+  const T& get(const mln::internal::vec_base<T, dim, tag>& vec)
+  {
+    return vec.v_[N];
+  }
+
+  template <size_t N, class T, unsigned dim, typename tag>
+  inline
+  constexpr
+  T&& get(mln::internal::vec_base<T, dim, tag>&& vec)
+  {
+    return std::move<T>(vec.v_[N]);
+  }
 
 }
 

@@ -43,21 +43,22 @@ namespace mln
     Index() = default;
     explicit Index(T v) : x (v) {}
 
-    operator long () const { return x; }
-    operator unsigned long () const { return x; }
+    // operator long () const { return x; }
+    // operator unsigned long () const { return x; }
     operator int () const { return x; }
-    operator unsigned () const { return x; }
+    // operator unsigned () const { return x; }
+    // operator T () const { return x; }
 
     Index& operator++ ()    { ++x; return *this; }
     Index& operator-- ()    { --x; return *this; }
     Index  operator++ (int) { return Index(x++); }
     Index  operator-- (int) { return Index(x--); }
-    bool operator== (const Index& other) { return x == other.x; }
-    bool operator!= (const Index& other) { return x != other.x; }
-    bool operator< (const Index& other)  { return x < other.x; }
-    bool operator> (const Index& other)  { return x > other.x; }
-    bool operator<= (const Index& other)  { return x <= other.x; }
-    bool operator>= (const Index& other)  { return x >= other.x; }
+    bool operator== (const Index& other) const { return x == other.x; }
+    bool operator!= (const Index& other) const { return x != other.x; }
+    bool operator< (const Index& other)  const { return x < other.x; }
+    bool operator> (const Index& other)  const { return x > other.x; }
+    bool operator<= (const Index& other) const { return x <= other.x; }
+    bool operator>= (const Index& other) const { return x >= other.x; }
   private:
     T x;
   };
@@ -68,21 +69,23 @@ namespace mln
     Index() = default;
     explicit Index(T v) : x (v) {}
 
-    operator long () const { return x; }
-    operator unsigned long () const { return x; }
+    // operator long () const { return x; }
+    // operator unsigned long () const { return x; }
     operator int () const { return x; }
-    operator unsigned () const { return x; }
+    // operator unsigned () const { return x; }
+    //operator T () const { return x; }
+
 
     Index& operator++ ()    { --x; return *this; }
     Index& operator-- ()    { ++x; return *this; }
     Index  operator++ (int) { return Index(x--); }
     Index  operator-- (int) { return Index(x++); }
-    bool operator== (const Index& other) { return x == other.x; }
-    bool operator!= (const Index& other) { return x != other.x; }
-    bool operator< (const Index& other)  { return x > other.x; }
-    bool operator> (const Index& other)  { return x < other.x; }
-    bool operator<= (const Index& other)  { return x >= other.x; }
-    bool operator>= (const Index& other)  { return x <= other.x; }
+    bool operator== (const Index& other) const { return x == other.x; }
+    bool operator!= (const Index& other) const { return x != other.x; }
+    bool operator< (const Index& other)  const { return x > other.x; }
+    bool operator> (const Index& other)  const { return x < other.x; }
+    bool operator<= (const Index& other) const { return x >= other.x; }
+    bool operator>= (const Index& other) const { return x <= other.x; }
   private:
     T x;
   };

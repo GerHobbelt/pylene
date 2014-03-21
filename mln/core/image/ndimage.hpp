@@ -494,9 +494,16 @@ namespace mln
   void
   ndimage_base<T,dim,E>::resize(const domain_type& domain, unsigned border, T v)
   {
-    domain_ = domain;
-    border_ = border;
-    resize_(domain_, border, v);
+    if (not (domain == domain_) or (int)border != border_)
+      {
+	domain_ = domain;
+	border_ = border;
+	resize_(domain_, border, v);
+      }
+    else
+      {
+	std::fill((T*) ptr_, ((T*)last_) + 1, v);
+      }
   }
 
   template <typename T, unsigned dim, typename E>

@@ -28,6 +28,9 @@ namespace mln
     template <typename A, typename ...>
     A& make_accumulator(Accumulator<A>& accu);
 
+    template <typename A, typename ...>
+    const A& make_accumulator(const Accumulator<A>& accu, ...);
+
     template <typename F, typename T>
     typename F::template apply<T>::type
     make_accumulator(const FeatureSet<F>& feat, T = T());
@@ -84,6 +87,12 @@ namespace mln
 
     template <typename A, typename ...>
     A& make_accumulator(Accumulator<A>& accu)
+    {
+      return exact(accu);
+    }
+
+    template <typename A, typename ...>
+    const A& make_accumulator(const Accumulator<A>& accu, ...)
     {
       return exact(accu);
     }

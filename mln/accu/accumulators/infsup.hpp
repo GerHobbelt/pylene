@@ -14,7 +14,7 @@ namespace mln
     namespace accumulators
     {
 
-      template <typename T, typename Compare = std::less<T> >
+      template <typename T, typename Compare = productorder_less<T> >
       struct infsup;
     }
 

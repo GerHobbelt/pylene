@@ -179,6 +179,15 @@ namespace mln
 
   template <typename U, unsigned dim, typename tag>
   internal::vec_base<U, dim, tag>
+  inf(const internal::vec_base<U, dim, tag>& u,
+      const internal::vec_base<U, dim, tag>& v)
+  {
+	return inf(u, v, productorder_less< internal::vec_base<U, dim, tag> > ());
+  }
+
+
+  template <typename U, unsigned dim, typename tag>
+  internal::vec_base<U, dim, tag>
   sup(const internal::vec_base<U, dim, tag>& u,
       const internal::vec_base<U, dim, tag>& v,
       productorder_less< internal::vec_base<U, dim, tag> >)
@@ -187,6 +196,14 @@ namespace mln
     for (unsigned i = 0; i < dim; ++i)
       res[i] = std::max(u[i], v[i]);
     return res;
+  }
+
+  template <typename U, unsigned dim, typename tag>
+  internal::vec_base<U, dim, tag>
+  sup(const internal::vec_base<U, dim, tag>& u,
+      const internal::vec_base<U, dim, tag>& v)
+  {
+	return sup(u, v, productorder_less< internal::vec_base<U, dim, tag> > ());
   }
 
   /*********************/

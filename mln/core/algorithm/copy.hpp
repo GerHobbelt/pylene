@@ -54,9 +54,9 @@ namespace mln {
 
 
 
-/******************************************/
-/****          Implementation          ****/
-/******************************************/
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
 
   namespace impl
   {
@@ -69,7 +69,7 @@ namespace mln {
       mln_viter(vin, vout, input, output);
 
       mln_forall(vin, vout)
-	*vout = *vin;
+        *vout = (mln_value(I)) *vin;
     }
 
   }
@@ -79,6 +79,9 @@ namespace mln {
   OutputImage&
   copy(const Image<InputImage>& input, Image<OutputImage>& output)
   {
+    static_assert(std::is_convertible<mln_value(InputImage), mln_value(OutputImage)>::value,
+                  "The input image value type must be convertible to the output image value type");
+
     impl::copy(exact(input), exact(output));
     return exact(output);
   }
@@ -87,6 +90,9 @@ namespace mln {
   OutputImage&&
   copy(const Image<InputImage>& input, Image<OutputImage>&& output)
   {
+    static_assert(std::is_convertible<mln_value(InputImage), mln_value(OutputImage)>::value,
+                  "The input image value type must be convertible to the output image value type");
+
     impl::copy(exact(input), exact(output));
     return move_exact(output);
   }

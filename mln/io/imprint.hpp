@@ -70,8 +70,6 @@ namespace mln
 	mln_foreach(V v, ima.values())
 	  wtext = std::max(wtext, frmter(v));
 
-	std::cout << wtext << std::endl;
-
         //if (std::is_same<V, uint8>::value)
         std::cout.width(4);
 	for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0]) {

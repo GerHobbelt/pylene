@@ -10,6 +10,7 @@
 //# include <mln/io/typeinfo.hpp>
 # include <mln/io/reader.hpp>
 
+# include <iostream>
 # include <FreeImage.h>
 
 
@@ -23,6 +24,67 @@ namespace mln
   namespace io
   {
 
+    namespace internal
+    {
+
+      struct istream_wrapper
+      {
+        istream_wrapper(std::istream& is)
+          : m_original_stream(is)
+        {
+          std::istream::pos_type pos = is.tellg();
+          m_support_streaming = (pos != std::istream::pos_type(-1));
+
+          if (m_support_streaming) {
+            m_cs = &is;
+            m_offset = pos;
+          } else {
+            m_cs = new std::stringstream(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
+            is >> m_cs->rdbuf();
+            m_offset = 0;
+          }
+        }
+
+        ~istream_wrapper()
+        {
+          if (not m_support_streaming)
+            delete m_cs;
+        }
+
+        static
+        unsigned read(void* buffer, unsigned size, unsigned count, fi_handle isw_)
+        {
+          istream_wrapper* isw = (istream_wrapper*) isw_;
+          isw->m_cs->read((char*)buffer, size * count);
+          return (isw->m_cs) ? count : 0;
+        }
+
+        static
+        int seek(fi_handle isw_, long offset, int origin)
+        {
+          istream_wrapper* isw = (istream_wrapper*) isw_;
+          if (origin == SEEK_SET) offset += isw->m_offset;
+          isw->m_cs->seekg(offset, (std::ios_base::seekdir) origin);
+          return (isw->m_cs) ? 0 : -1;
+        }
+
+        static
+        long tell(fi_handle isw_)
+        {
+          istream_wrapper* isw = (istream_wrapper*) isw_;
+          return isw->m_cs->tellg() - isw->m_offset;
+        }
+
+      private:
+        std::istream&                   m_original_stream;
+        std::istream*                   m_cs;
+        std::istream::off_type          m_offset;
+        bool                            m_support_streaming;
+      };
+
+    }
+
+
     class freeimage_reader : public Reader
     {
     public:
@@ -30,6 +92,7 @@ namespace mln
 
       freeimage_reader();
 
+      virtual void load(std::istream& s);
       virtual void load(const char* filename);
       virtual void close();
       virtual void read_next_pixel(void* out);
@@ -53,6 +116,7 @@ namespace mln
 
     bool freeimage_reader::init_ = false;
 
+
     inline
     freeimage_reader::freeimage_reader()
       : dib (NULL), x (0), y (0)
@@ -64,8 +128,9 @@ namespace mln
     freeimage_reader::initialize()
     {
       if (!init_){
-	init_ = true;
-	FreeImage_Initialise();
+        init_ = true;
+        //FreeImage_SetOutputMessage(freeimage_reader::printErr);
+        //FreeImage_Initialise();
       }
     }
 
@@ -79,12 +144,49 @@ namespace mln
       FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
       fif = FreeImage_GetFileType(filename, 0);
       if (fif == FIF_UNKNOWN)
-	fif = FreeImage_GetFIFFromFilename(filename);
+        fif = FreeImage_GetFIFFromFilename(filename);
 
       if (fif == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(fif))
-	throw MLNIOException("File format not supported");
+        throw MLNIOException("File format not supported");
 
       dib = FreeImage_Load(fif, filename, 0);
+      domain.pmin[0] = 0;
+      domain.pmin[1] = 0;
+      domain.pmax[0] = FreeImage_GetHeight(dib);
+      domain.pmax[1] = FreeImage_GetWidth(dib);
+      pitch = FreeImage_GetPitch(dib);
+      ptr = (char*)FreeImage_GetBits(dib) + pitch * (domain.pmax[0]-1);
+      bpp = FreeImage_GetBPP(dib) / 8;
+      mln_postcondition(dib != NULL);
+    }
+
+    inline
+    void
+    freeimage_reader::load(std::istream& is)
+    {
+      mln_precondition(init_);
+      mln_precondition(dib == NULL);
+
+
+      internal::istream_wrapper isw(is);
+      fi_handle handle = (fi_handle) &isw;
+
+      FreeImageIO       fio = {
+        internal::istream_wrapper::read,
+        NULL,
+        internal::istream_wrapper::seek,
+        internal::istream_wrapper::tell
+      };
+
+
+      FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+      fif = FreeImage_GetFileTypeFromHandle(&fio, handle);
+
+      if (fif == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(fif))
+        throw MLNIOException("File format not supported");
+
+      dib = FreeImage_LoadFromHandle(fif, &fio, handle, 0);
+
       domain.pmin[0] = 0;
       domain.pmin[1] = 0;
       domain.pmax[0] = FreeImage_GetHeight(dib);
@@ -119,26 +221,30 @@ namespace mln
       int bppp = FreeImage_GetBPP(dib);
       int colortype = FreeImage_GetColorType(dib);
 
+
       switch (type)
-	{
-	  case FIT_BITMAP:	break;
-	  case FIT_UINT16:	return typeid(uint16);
-	  case FIT_INT16:	return typeid(int16);
-	  case FIT_FLOAT:	return typeid(float);
-	  default:		goto error;
-	}
+        {
+          case FIT_BITMAP:	break;
+          case FIT_UINT16:	return typeid(uint16);
+          case FIT_INT16:	return typeid(int16);
+          case FIT_UINT32:  return typeid(uint32);
+          case FIT_INT32:   return typeid(int32);
+          case FIT_FLOAT:	return typeid(float);
+          case FIT_DOUBLE:  return typeid(double);
+          default:		goto error;
+        }
 
       switch (bppp)
-	{
-	  case 1:  return typeid(bool);
-	  case 8:  return typeid(uint8);
-	  case 16: return typeid(uint16);
-	  case 24: switch (colortype)
-	    {
-	      case FIC_RGB: return typeid(rgb8);
-	      default: goto error;
-	    }
-	}
+        {
+          case 1:  return typeid(bool);
+          case 8:  return typeid(uint8);
+          case 16: return typeid(uint16);
+          case 24: switch (colortype)
+            {
+              case FIC_RGB: return typeid(rgb8);
+              default: goto error;
+            }
+        }
 
     error: return typeid(void);
     }

@@ -3,13 +3,34 @@
 
 # include <mln/core/image/image.hpp>
 
+/// \file
+
 namespace mln {
 
-
+  /// \ingroup Algorithms
+  /// \brief Transform the value of an image through a function.
+  ///
+  /// This is equivalent to the following code.
+  /// \code
+  /// mln_iter(vout, out.values())
+  /// mln_iter(vin, in.values())
+  /// mln_forall(vin, vout)
+  ///    *vout = f(*vin)
+  ///
+  /// \endcode
+  ///
+  /// \tparam InputImage A model of :concept:ref:`forward_image`
+  /// \tparam OutputImage A model of Writable :concept:ref:`forward_image`
+  /// \tparam UnaryFunction A mondel of unary function.
+  /// \param input The input image.
+  /// \param f The unary function.
+  /// \param output The output image.
+  /// \see mln::imtransform
   template <typename InputImage, typename OutputImage, class UnaryFunction>
   OutputImage&
   transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>& output);
 
+  /// \overload
   template <typename InputImage, typename OutputImage, class UnaryFunction>
   OutputImage&&
   transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>&& output);
@@ -18,6 +39,7 @@ namespace mln {
   unary_image_expr<UnaryFunction, InputImage>
   lazy_transform(InputImage&& input, UnaryFunction f);
 
+  /// \overload
   template <typename InputImage, class UnaryFunction>
   mln_ch_value(InputImage,
 	       typename std::decay<
@@ -38,7 +60,7 @@ namespace mln {
     {
       mln_viter(vin, vout, input, output);
       mln_forall(vin, vout)
-	*vout = f(*vin);
+        *vout = f(*vin);
     }
 
   }

@@ -1,6 +1,9 @@
 #ifndef MLN_CORE_CH_VALUE_HPP
 # define MLN_CORE_CH_VALUE_HPP
 
+/// \file
+/// \brief Meta-Function to transform images.
+
 # define mln_ch_value(I, V) typename image_ch_value<I, V>::type
 # define mln_concrete(I)    typename image_concrete<I>::type
 

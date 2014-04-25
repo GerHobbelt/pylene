@@ -28,11 +28,10 @@ namespace mln {
   /// This is equivalent to the following code.
   ///
   /// \code
-  /// vin = std::begin(input.values())
-  /// vend = std::end(input.values())
-  /// vout = std::begin(output.values())
-  /// while (vin != vend)
-  ///   vout++ = vin++;
+  /// mln_iter(vin, input.values())
+  /// mln_iter(vout, output.values())
+  /// mln_forall(vin, vout)
+  ///   *vout = *vin;
   /// \endcode
   ///
   /// \param[in] input Input Image

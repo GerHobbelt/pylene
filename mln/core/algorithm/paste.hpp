@@ -15,7 +15,7 @@ namespace mln {
   /// This is equivalent to the following code:
   ///
   /// \code
-  /// for (auto px: input.pixels())
+  /// mln_foreach (auto px, input.pixels())
   ///    output(px.point()) = px.val()
   /// \endcode
   ///
@@ -49,9 +49,8 @@ namespace mln {
     {
       mln_pixter(px, ima);
       mln_forall(px)
-	out(px->point()) = px->val();
+        out(px->point()) = px->val();
     }
-
 
   }
 

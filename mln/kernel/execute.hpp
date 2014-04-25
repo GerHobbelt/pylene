@@ -46,7 +46,7 @@ namespace mln
 
         const Context ctx_ = ctx;
         dontcare( (bf::at_c<K>(ctx.m_accus)
-                   .take(proto::eval(proto::child(bf::at_c<K>(elist)), ctx_)), true) ... );
+                   .take(proto::eval(proto::right(bf::at_c<K>(elist)), ctx_)), true) ... );
       }
 
       template <class AccuList, int... K>
@@ -76,17 +76,21 @@ namespace mln
         template <class F, class Expr>
         struct result<F(Expr)>
         {
-          typedef typename proto::tag_of<Expr>::type::feature feature;
-          typedef typename proto::result_of::child<Expr>::type child;
+          typedef typename proto::result_of::child_c<Expr, 0>::type	A0;
+	  typedef typename proto::result_of::value<A0>::value_type	feature;
+          typedef typename proto::result_of::child_c<Expr, 1>::type	child;
           typedef typename proto::result_of::eval<typename std::remove_reference<child>::type, Context>::type V;
           typedef typename feature::template apply<typename std::decay<V>::type>::type  type;
         };
 
         template <class Expr>
         typename result< void(Expr)>::type
-        operator() (const Expr&) const
+        operator() (const Expr& x) const
         {
-          return typename result<void(Expr)>::type ();
+          typedef typename proto::result_of::child_c<Expr, 1>::type child;
+          typedef typename proto::result_of::eval<typename std::remove_reference<child>::type, Context>::type V;
+
+          return proto::value(x.child0).template make<typename std::decay<V>::type>() ;
         }
       };
 

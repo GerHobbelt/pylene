@@ -23,7 +23,6 @@ BOOST_AUTO_TEST_CASE(dilate_0)
     auto win = make_rectangle2d(7, 7);
     auto out = morpho::dilate(ima, win);
     BOOST_CHECK( all(out >= ima) ); // extensive
-
   }
 
   { // Border is not wide enough => use morpher
@@ -31,6 +30,12 @@ BOOST_AUTO_TEST_CASE(dilate_0)
     auto out = morpho::dilate(ima, win);
     BOOST_CHECK( all(out >= ima) ); // extensive
 
+  }
+
+  { // Custom comparison function, erosion
+    auto win = make_rectangle2d(5, 5);
+    auto out = morpho::dilate(ima, win, std::greater<uint8> ());
+    BOOST_CHECK( all(out <= ima) ); // anti-extensive
   }
 
 

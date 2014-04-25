@@ -52,11 +52,11 @@ namespace mln
       struct meta_is_aggregate
       {
 
-        template <class Y>
+        template <class Y, class dummy = void>
         struct apply : boost::mpl::false_ {};
 
-        template <class AccTag>
-        struct apply< kernel::tag::aggregate<AccTag> >
+	template <class dummy>
+        struct apply< kernel::tag::aggregate, dummy >
           : boost::mpl::true_ {};
       };
 

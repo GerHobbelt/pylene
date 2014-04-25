@@ -13,6 +13,8 @@
 # include <type_traits>
 # include <boost/utility/enable_if.hpp>
 
+/// Fixme:
+/// Use boost fusion to transmit dynamic data of features when composing
 
 namespace mln
 {
@@ -23,17 +25,16 @@ namespace mln
     template <typename T, typename FeatureSet>
     struct composite_accumulator;
 
-
     namespace features
     {
 
       // FeatureSet uses a composite design patern
-      //	  +----------+
+      //          +----------+
       //          |FeatureSet|
-      //	  +----------+
-      //	       |
+      //          +----------+
+      //               |
       //         +-----+ -----------------+
-      //	 |			  |
+      //         |                        |
       //  +------+--------+    +----------+------+
       //  | simple_feature|    |composite_feature|
       //  +---------------+    +-----------------+
@@ -45,36 +46,84 @@ namespace mln
       {
         typedef FSet features;
 
-	template <typename T>
-	struct apply
-	{
-	  typedef composite_accumulator<T, composite_feature<FSet> > type;
-	};
+        template <typename T>
+        struct apply
+        {
+          typedef composite_accumulator<T, composite_feature<FSet> > type;
+        };
+
+        // Create an accumulator for a composite feature
+        template <typename T>
+        typename apply<T>::type
+        make() const
+        {
+          return typename apply<T>::type ();
+        }
+
       };
 
+
+      // A simple feature must implement:
+      // F::apply<T>
+      // F::make<T>(...)
       template <typename F>
       struct simple_feature : FeatureSet<F>
       {
-	typedef boost::mpl::set<F> features;
+        typedef boost::mpl::set<F> features;
+
+        // Create an accumulator for a simple feature
+        // May me reimplemented in features that have
+        // dynamic parameters.
+        /*
+        template <typename V>
+        typename F::template apply<V>::type
+        make()
+        {
+          return typename F::template apply<V>::type ();
+        }
+        */
       };
+
+      /// \brief A facace other a simple feature that does not have
+      /// dynamic parameters.
+      /// \tparam F the feature implemented
+      /// \tparam A must be a single parameter accumulator and must be default constructible.
+      template <typename F, template<typename> class A>
+      struct simple_feature_facade : FeatureSet<F>
+      {
+        typedef boost::mpl::set<F> features;
+
+        template <typename T>
+        struct apply
+        {
+          typedef A<T> type;
+        };
+
+        template <typename T>
+        A<T>
+        make() const
+        {
+          return A<T> ();
+        }
+      };
+
 
       namespace ph = boost::mpl::placeholders;
 
       template <typename fsetA, typename fsetB>
       composite_feature<typename boost::mpl::copy<typename fsetA::features, boost::mpl::inserter<
-						  typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2> > >::type >
+                                                  typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2> > >::type >
       operator& (const FeatureSet<fsetA>&, const FeatureSet<fsetB>& )
       {
-	return composite_feature<typename boost::mpl::copy<typename fsetA::features, boost::mpl::inserter<
-	  typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2> > >::type > ();
+        return composite_feature<typename boost::mpl::copy<typename fsetA::features, boost::mpl::inserter<
+          typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2> > >::type > ();
       }
 
 
       template <typename F>
       struct depends
       {
-	//static_assert(false, "dgfd");
-	typedef boost::mpl::set<> type;
+        typedef boost::mpl::set<> type;
       };
 
 

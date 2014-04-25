@@ -22,11 +22,11 @@ namespace mln
     namespace features
     {
 
-      struct f1 : simple_feature<f1> { template <typename T> struct apply { typedef accumulators::accu1<T> type; }; };
-      struct f2 : simple_feature<f2> { template <typename T> struct apply { typedef accumulators::accu2<T> type; }; };
-      struct f3 : simple_feature<f3> { template <typename T> struct apply { typedef accumulators::accu3<T> type; }; };
-      struct f4 : simple_feature<f4> { template <typename T> struct apply { typedef accumulators::accu4<T> type; }; };
-      struct f5 : simple_feature<f5> { template <typename T> struct apply { typedef accumulators::accu5<T> type; }; };
+      struct f1 : simple_feature_facade<f1,  accumulators::accu1> {};
+      struct f2 : simple_feature_facade<f2,  accumulators::accu2> {};
+      struct f3 : simple_feature_facade<f3,  accumulators::accu3> {};
+      struct f4 : simple_feature_facade<f4,  accumulators::accu4> {};
+      struct f5 : simple_feature_facade<f5,  accumulators::accu5> {};
 
 
       template<>

@@ -30,9 +30,9 @@ namespace mln
       inline
       auto
       mean(const Accumulator<A>& acc)
-	-> decltype(extract(exact(acc), features::mean<> ()))
+        -> decltype(extract(exact(acc), features::mean<> ()))
       {
-	return extract(exact(acc), features::mean<> ());
+        return extract(exact(acc), features::mean<> ());
       }
 
     }
@@ -43,21 +43,35 @@ namespace mln
       template <typename SumType>
       struct mean : simple_feature< mean<SumType> >
       {
-	template <typename T>
-	struct apply
-	{
-	  typedef accumulators::mean<T, SumType> type;
-	};
+        template <typename T>
+        struct apply
+        {
+          typedef accumulators::mean<T, SumType> type;
+        };
+
+        template <typename T>
+        accumulators::mean<T, SumType>
+        make() const
+        {
+          return accumulators::mean<T, SumType>();
+        }
       };
 
       template <>
       struct mean<void> : simple_feature< mean<void> >
       {
-	template <typename T>
-	struct apply
-	{
-	  typedef accumulators::mean<T> type;
-	};
+        template <typename T>
+        struct apply
+        {
+          typedef accumulators::mean<T> type;
+        };
+
+        template <typename T>
+        accumulators::mean<T>
+        make() const
+        {
+          return accumulators::mean<T>();
+        }
       };
 
       template <typename SumType>
@@ -68,42 +82,32 @@ namespace mln
 
     }
 
-   namespace accumulators
+    namespace accumulators
     {
 
       template <typename T, typename SumType>
       struct mean : composite_accumulator_facade< mean<T, SumType>, T,  SumType, features::mean<SumType> >
       {
-	typedef T	argument_type;
-	typedef SumType return_type;
+        typedef T       argument_type;
+        typedef SumType result_type;
 
-	typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
+        //typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
 
-	friend
-	SumType extract(const mean& accu, features::mean<SumType> )
-	{
-	  //std::string x = extract(exact(accu), features::count<> ());
-	  //std::string y = extractor::count(accu);
-	  auto v = extractor::count(accu);
-	  if (v == 0)
-	    return extractor::sum(accu);
-	  else
-	    return extractor::sum(accu) / extractor::count(accu);
-	}
+        friend
+        SumType extract(const mean& accu, features::mean<SumType> )
+        {
+          return extract(accu, features::mean<>() );
+        }
 
-	friend
-	SumType extract(const mean& accu, features::mean<> )
-	{
-	  auto v = extractor::count(accu);
-	  if (v == 0)
-	    return extractor::sum(accu);
-	  else
-	    return extractor::sum(accu) / extractor::count(accu);
-	}
-
-
-	//private:
-	//SumType m_sum;
+        friend
+        SumType extract(const mean& accu, features::mean<> )
+        {
+          auto v = extractor::count(accu);
+          if (v == 0)
+            return extractor::sum(accu);
+          else
+            return extractor::sum(accu) / extractor::count(accu);
+        }
       };
 
     }

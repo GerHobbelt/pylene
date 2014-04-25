@@ -58,7 +58,7 @@ namespace mln
 
       template<class Expr,
 	       class Tag = typename proto::tag_of<Expr>::type,
-	       class Args0 = typename Expr::proto_child0 >
+	       class Arg0 = typename Expr::proto_child0>
       struct eval
 	: proto::default_eval<Expr, meta_kernel_context, Tag>
       {};
@@ -77,11 +77,15 @@ namespace mln
 	typedef mln_reference(image_t) result_type;
       };
 
-      template <class Expr, class Tag, class Arg0>
-      struct eval<Expr, kernel::tag::aggregate<Tag>, Arg0>
+      template <class Expr, class dummy>
+      struct eval<Expr, kernel::tag::aggregate, dummy>
       {
+	typedef typename proto::result_of::child_c<Expr, 0>::type A0;
+	typedef typename proto::result_of::value<A0>::type	  Feature;
+	typedef typename proto::result_of::child_c<Expr, 1>::type Arg0;
+
         typedef typename proto::result_of::eval<Arg0, meta_kernel_context>::type V;
-        typedef typename accu::result_of<Tag, typename std::decay<V>::type>::type result_type;
+        typedef typename accu::result_of<Feature, typename std::decay<V>::type>::type result_type;
       };
 
     };
@@ -106,7 +110,7 @@ namespace mln
 
       template<class Expr,
 	       class Tag = typename proto::tag_of<Expr>::type,
-	       class Args0 = typename Expr::proto_child0 >
+	       class Arg0 = typename Expr::proto_child0>
       struct eval
 	: proto::default_eval<Expr, const kernel_context, Tag>
       {};
@@ -153,9 +157,11 @@ namespace mln
 
       // Specialization for A(...) on computation
       // This returns nothing, it only pre-computed an aggragation subexpr
-      template <class Expr, class Tag, class Arg0>
-      struct eval<Expr, kernel::tag::aggregate<Tag>, Arg0>
+      template <class Expr, class dummy>
+      struct eval<Expr, kernel::tag::aggregate, dummy>
       {
+
+	typedef typename proto::result_of::child_c<Expr, 1>::type Arg0;
         typedef typename proto::result_of::eval<Arg0, kernel_context> result_type;
 
 	result_type

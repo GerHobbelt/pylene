@@ -14,6 +14,8 @@ namespace mln
       template <class Compare = void>
       using Max_t = Aggregate< accu::features::max<Compare> >;
 
+
+
       template <class Compare = void, class Expr>
       auto
       Max(Expr&& expr)

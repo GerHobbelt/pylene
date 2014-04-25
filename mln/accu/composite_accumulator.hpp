@@ -80,73 +80,73 @@ namespace mln
       template <typename T>
       struct feature_to_accu_helper
       {
-	template <typename F>
-	struct apply
-	{
-	  typedef typename F::template apply<T>::type type;
-	};
+        template <typename F>
+        struct apply
+        {
+          typedef typename F::template apply<T>::type type;
+        };
       };
 
       struct accu_init
       {
-	template <typename Accu>
-	void operator () (Accu& acc) const { acc.init(); }
+        template <typename Accu>
+        void operator () (Accu& acc) const { acc.init(); }
       };
 
       template <typename T>
       struct accu_take
       {
-	accu_take(const T& x) : m_x(x) {}
+        accu_take(const T& x) : m_x(x) {}
 
-	template <typename Accu>
-	void operator () (Accu& acc) const { acc.take(m_x); }
+        template <typename Accu>
+        void operator () (Accu& acc) const { acc.take(m_x); }
 
       private:
-	const T& m_x;
+        const T& m_x;
       };
 
       template <typename T>
       struct accu_untake
       {
-	accu_untake(const T& x) : m_x(x) {}
+        accu_untake(const T& x) : m_x(x) {}
 
-	template <typename Accu>
-	void operator () (Accu& acc) const { acc.untake(m_x); }
+        template <typename Accu>
+        void operator () (Accu& acc) const { acc.untake(m_x); }
 
       private:
-	const T& m_x;
+        const T& m_x;
       };
 
       template <typename Feature>
       struct accu_has_feature
       {
-	template <typename Accu>
-	struct apply
-	{
-	  typedef typename boost::mpl::has_key<typename Accu::provides, Feature>::type type;
-	};
+        template <typename Accu>
+        struct apply
+        {
+          typedef typename boost::mpl::has_key<typename Accu::provides, Feature>::type type;
+        };
       };
 
 
       template <typename AccuList, typename Feature>
       struct acculist_has_feature
       {
-	typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature> >::type iterator;
-	typedef typename boost::fusion::result_of::end<AccuList>::type end;
-	static constexpr bool value = not boost::fusion::result_of::equal_to<iterator, end>::value;
+        typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature> >::type iterator;
+        typedef typename boost::fusion::result_of::end<AccuList>::type end;
+        static constexpr bool value = not boost::fusion::result_of::equal_to<iterator, end>::value;
 
 
-	//static constexpr iterator x = end ();
+        //static constexpr iterator x = end ();
       };
 
       template <typename AccuList, typename Feature>
       struct acculist_get_feature
       {
-	typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature> >::type iterator;
-	typedef typename boost::fusion::result_of::deref<iterator>::type accu;
+        typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature> >::type iterator;
+        typedef typename boost::fusion::result_of::deref<iterator>::type accu;
 
 	
-	typedef decltype(extract (std::declval<accu>(), Feature ()) ) type;
+        typedef decltype(extract (std::declval<accu>(), Feature ()) ) type;
       };
     }
 
@@ -157,47 +157,47 @@ namespace mln
       typedef T					 argument_type;
       typedef typename internal::resolve_dependances<typename FeatureSet::features>::type	        fset;
       typedef typename boost::mpl::transform<fset, internal::feature_to_accu_helper<T>,
-					     boost::mpl::back_inserter< boost::fusion::list<> > >::type acculist;
+                                             boost::mpl::back_inserter< boost::fusion::list<> > >::type acculist;
 
       typedef E result_type;
 
       void init()
       {
-	boost::fusion::for_each(m_accus, internal::accu_init ());
+        boost::fusion::for_each(m_accus, internal::accu_init ());
       }
 
 
       void take(const argument_type& x)
       {
-	boost::fusion::for_each(m_accus, internal::accu_take<argument_type>(x));
+        boost::fusion::for_each(m_accus, internal::accu_take<argument_type>(x));
       }
 
       template <typename Other>
       void take(const Accumulator<Other>& other)
       {
-	boost::fusion::for_each(m_accus, internal::accu_take<Other>(exact(other)));
+        boost::fusion::for_each(m_accus, internal::accu_take<Other>(exact(other)));
       }
 
 
       void untake(const argument_type& x)
       {
-	boost::fusion::for_each(m_accus, internal::accu_untake<argument_type>(x));
+        boost::fusion::for_each(m_accus, internal::accu_untake<argument_type>(x));
       }
 
       template <typename Feature>
       friend
       typename boost::lazy_enable_if_c< internal::acculist_has_feature<acculist, Feature>::value,
-					internal::acculist_get_feature<acculist, Feature> >::type
+                                        internal::acculist_get_feature<acculist, Feature> >::type
       extract(const composite_accumulator_base& accu, Feature feat)
       {
-	auto res = boost::fusion::find_if< internal::accu_has_feature<Feature> >(accu.m_accus);
+        auto res = boost::fusion::find_if< internal::accu_has_feature<Feature> >(accu.m_accus);
 
-	return extract(*res, feat);
+        return extract(*res, feat);
       }
 
       const E& to_result() const
       {
-	return exact(*this);
+        return exact(*this);
       }
 
     private:
@@ -220,7 +220,7 @@ namespace mln
 
       ResultType to_result() const
       {
-	return extract(exact(*this), Feature() );
+        return extract(exact(*this), Feature() );
       }
     };
 

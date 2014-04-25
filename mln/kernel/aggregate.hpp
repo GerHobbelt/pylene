@@ -13,29 +13,30 @@ namespace mln
     {
 
       /// \brief The node tag for aggregation nodes.
-      template <typename AccTag>
-      struct aggregate {
-        typedef AccTag feature;
-      };
+      struct aggregate {};
 
     }
 
-    template <class AccTag, class Expr>
-    using aggregate_expr = boost::proto::expr<kernel::tag::aggregate<AccTag>,
-                                              boost::proto::list1<Expr> >;
+    template <class Feature, class Expr>
+    using aggregate_expr = typename boost::proto::result_of::make_expr<kernel::tag::aggregate, Feature, Expr>::type;
 
-
-    template <class AccTag>
+    template <class Feature>
     struct Aggregate
     {
-
-      template <typename Expr>
-      aggregate_expr<AccTag, Expr>
-      operator() (Expr&& expr) const
+      template <typename... TParams>
+      Aggregate(TParams&&... params)
+	: feature(std::forward<TParams>(params) ...)
       {
-        return aggregate_expr<AccTag, Expr>::make(std::forward<Expr>(expr));
       }
 
+      template <typename Expr>
+      aggregate_expr<Feature, Expr>
+      operator() (Expr&& expr) const
+      {
+        return boost::proto::make_expr<kernel::tag::aggregate, Feature, Expr>(feature, std::forward<Expr>(expr));
+      }
+
+      Feature feature;
     };
 
 

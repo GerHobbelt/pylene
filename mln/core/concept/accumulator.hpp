@@ -8,6 +8,8 @@
 namespace mln
 {
 
+  /// \brief Concept for accumulator-like objects
+  /// accumulator-like = accumulator | feature-set
   template <typename Acc>
   struct AccumulatorLike : Object<Acc>
   {
@@ -17,24 +19,14 @@ namespace mln
     AccumulatorLike& operator= (const AccumulatorLike&) = default;
   };
 
-
+  /// \brief Concept for accumulator objects
   template <typename Acc>
   struct Accumulator : AccumulatorLike<Acc>
   {
-
-    BOOST_CONCEPT_USAGE(Accumulator)
-    {
-      typedef typename Acc::argument_type    argument_type;
-      typedef typename Acc::result_type      result_type;
-
-      void (Acc::*method1) ()                     = &Acc::init;
-      void (Acc::*method2) (const argument_type&) = &Acc::take;
-
-      (void) method1;
-      (void) method2;
-    }
+    BOOST_CONCEPT_ASSERT((Accumulator<Acc>));
   };
 
+  /// \brief Concept for feature-set objects
   template <typename E>
   struct FeatureSet : AccumulatorLike<E>
   {
@@ -51,10 +43,32 @@ namespace mln
     {
       typedef typename E::features    features;
       check_inner_struct_apply<E> ();
-    }
 
+    }
   };
 
+
+
+  template <typename Acc>
+  struct Accumulator_
+  {
+    typedef typename Acc::argument_type    argument_type;
+    typedef typename Acc::result_type      result_type;
+
+
+    BOOST_CONCEPT_USAGE(Accumulator_)
+    {
+      accu.init();
+      accu.take(x);
+      accu.take(accu2);
+      res = accu.to_result();
+    }
+
+  private:
+    Acc           accu, accu2;
+    argument_type x;
+    result_type   res;
+  };
 
 } // end of namespace mln
 

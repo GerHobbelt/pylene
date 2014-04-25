@@ -7,7 +7,7 @@
 # include <mln/core/trace.hpp>
 # include <mln/morpho/se/se.hpp>
 # include <mln/kernel/kernel.hpp>
-# include <mln/kernel/aggregate/max.hpp>
+# include <mln/kernel/aggregate/sup.hpp>
 
 namespace mln
 {
@@ -36,7 +36,9 @@ namespace mln
         namespace ker = mln::kernel;
         using namespace mln::kernel::placeholders;
 
-        auto expr = (g(p) = ker::aggregate::Max<Compare> (f(n)));
+        ker::aggregate::Sup_t<Compare> Sup(cmp);
+
+        auto expr = (g(p) = Sup (f(n)));
         ker::execute(expr, nbh, ima, out);
       }
 

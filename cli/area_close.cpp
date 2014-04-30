@@ -30,9 +30,9 @@ int main(int argc, char** argv)
   morpho::component_tree< size_type, image2d<size_type> > tree;
 
   if (argv[2][0] == '4')
-    tree = morpho::maxtree_indexes(ima, c4);
+    tree = morpho::maxtree_indexes(ima, c4, std::greater<uint8>() );
   else
-    tree = morpho::maxtree_indexes(ima, c8);
+    tree = morpho::maxtree_indexes(ima, c8, std::greater<uint8>());
 
   auto areamap = morpho::paccumulate(tree, ima, accu::features::count<> ());
 

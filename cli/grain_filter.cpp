@@ -33,9 +33,10 @@ int main(int argc, char** argv)
   image2d<uint8> Ima = immerse_k1(ima);
 
   typedef image2d<uint8>::size_type size_type;
-  morpho::component_tree< size_type, image2d<size_type> > tree;
+  typedef morpho::component_tree< size_type, image2d<size_type> > tree_t;
+  tree_t tree;
   tree = morpho::cToS(ima, c4);
-  tree._reorder_pset();
+  //tree._reorder_pset();
 
   auto isface2 = [](const point2d& p) { return K1::is_face_2(p); };
   typedef accu::accumulators::accu_if< accu::accumulators::count<>, decltype(isface2), point2d> ACC;
@@ -45,27 +46,20 @@ int main(int argc, char** argv)
 
   unsigned lambda = std::atoi(argv[2]);
   auto criterion = make_functional_property_map
-    ([&areamap, lambda](size_type x) {
+    ([&areamap, lambda](tree_t::node_type x) {
       return areamap[x] >= lambda;
     });
 
-  morpho::filter_min_inplace(tree, criterion);
-
-  auto valuemap = morpho::make_attribute_map_from_image(tree, Ima);
-
-  // {
-  //   mln_foreach(auto x, tree.nodes())
-  //     std::cout << "---" << x.id() << "\tparent: "<< x.parent().id()
-  // 		<< "\tval  : " << (int)valuemap[x.id()]
-  // 		<< "\tprev : " << x.get_prev_node_id()
-  // 		<< "\tnext : " << x.get_next_node_id()
-  // 		<< "\tnexts: " << x.get_next_sibling_id() <<  std::endl;
-  // }
-
-
   image2d<uint8> out;
   resize(out, tree._get_data()->m_pmap);
-  morpho::reconstruction(tree, valuemap, out);
+
+  auto valuemap = morpho::make_attribute_map_from_image(tree, Ima);
+  morpho::filter_direct_and_reconstruct(tree, criterion, valuemap, out);
+
+  // {
+  //   morpho::filter_min_inplace(tree, criterion);
+  //   morpho::reconstruction(tree, valuemap, out);
+  // }
 
   image2d<uint8> res;
   resize(res, f);

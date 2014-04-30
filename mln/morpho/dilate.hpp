@@ -21,6 +21,13 @@ namespace mln
            const StructuringElement<SE>& nbh,
            Compare cmp = Compare ());
 
+    template <class I, class SE, class OutputImage, class Compare = std::less<mln_value(I)> >
+    OutputImage&
+    dilate(const Image<I>& ima,
+           const StructuringElement<SE>& nbh,
+           Image<OutputImage>& output,
+           Compare cmp = Compare ());
+
 
     /******************************************/
     /****          Implementation          ****/
@@ -36,8 +43,8 @@ namespace mln
         namespace ker = mln::kernel;
         using namespace mln::kernel::placeholders;
 
-        ker::aggregate::Sup_t<Compare> Sup(cmp);
 
+        ker::aggregate::Sup_t<Compare> Sup(cmp);
         auto expr = (g(p) = Sup (f(n)));
         ker::execute(expr, nbh, ima, out);
       }
@@ -75,20 +82,34 @@ namespace mln
 
     }
 
-    template <class I, class SE, class Compare>
-    mln_concrete(I)
-    dilate(const Image<I>& ima_, const StructuringElement<SE>& nbh_, Compare cmp)
+    template <class I, class SE, class O, class Compare>
+    O&
+    dilate(const Image<I>& ima_, const StructuringElement<SE>& nbh_,
+           Image<O>& output, Compare cmp)
     {
       mln::trace::entering("mln::morpho::dilate");
+
       const I& ima = exact(ima_);
       const SE& nbh = exact(nbh_);
-
-      mln_concrete(I) out;
-      resize(out, ima);
+      O& out = exact(output);
 
       mln::morpho::impl::dilate_0(ima, nbh, cmp, out, typename image_has_extension<I>::type ());
 
       mln::trace::exiting();
+      return out;
+    }
+
+
+    template <class I, class SE, class Compare>
+    mln_concrete(I)
+    dilate(const Image<I>& ima_, const StructuringElement<SE>& nbh_, Compare cmp)
+    {
+      const I& ima = exact(ima_);
+
+      mln_concrete(I) out;
+      resize(out, ima);
+      dilate(ima, nbh_, out, cmp);
+
       return out;
     }
 

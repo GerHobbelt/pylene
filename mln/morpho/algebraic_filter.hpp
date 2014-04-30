@@ -1,0 +1,83 @@
+#ifndef MLN_MORPHO_ALGEBRAIC_FILTER_HPP
+# define MLN_MORPHO_ALGEBRAIC_FILTER_HPP
+
+# include <mln/accu/accumulators/count.hpp>
+# include <mln/morpho/canvas/unionfind.hpp>
+# include <mln/core/trace.hpp>
+
+namespace mln
+{
+
+  namespace morpho
+  {
+
+    template <class I, class N, class Compare = std::less<mln_value(I)> >
+    mln_concrete(I)
+    area_closing(const Image<I>& ima,
+                 const Neighborhood<N>& nbh,
+                 typename I::size_type  area,
+                 Compare cmp = Compare());
+
+
+
+    /******************************/
+    /*** Implementation          **/
+    /******************************/
+
+    namespace internal
+    {
+      template <class I, class Accu>
+      struct attribute_and_reconstruct_ufind_visitor
+      {
+        void on_make_set(const mln_point(I)& p)
+        {
+          m_acc_img(p).take(p);
+        }
+
+        void on_union(const mln_point(I)& p, const mln_point(I)& q)
+        {
+          m_acc_img(q).take(m_acc_img(p));
+        }
+
+        void on_finish(const mln_point(I)& p, const mln_point(I)& q)
+        {
+          m_rec(p) = m_rec(q);
+        }
+
+        mln_ch_value(I, Accu)&    m_acc_img;
+        mln_concrete(I)&          m_rec;
+      };
+
+    }
+
+    template <class I, class N, class Compare = std::less<mln_value(I)> >
+    mln_concrete(I)
+    area_closing(const Image<I>& ima_,
+                 const Neighborhood<N>& nbh,
+                 typename I::size_type  area,
+                 Compare cmp)
+    {
+      mln_entering("mln::morpho::area_closing");
+
+      const I& ima = exact(ima_);
+
+      typedef mln::accu::accumulators::count<typename I::size_type> ACCU;
+
+      mln_ch_value(I, ACCU) accu_img;
+      mln_concrete(I) out = clone(ima);
+      resize(accu_img, ima);
+
+      internal::attribute_and_reconstruct_ufind_visitor<I, ACCU> viz {accu_img, out};
+      mln::morpho::canvas::unionfind(ima, nbh,
+                                     [&accu_img, area] (const mln_point(I)& p) {
+                                       return accu_img(p).to_result() >= area; },
+                                     cmp, viz);
+      mln_exiting();
+      return out;
+    }
+
+  }
+
+}
+
+#endif // ! MLN_MORPHO_ALGEBRAIC_FILTER_HPP

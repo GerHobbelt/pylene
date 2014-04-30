@@ -1,4 +1,11 @@
 add_executable(area_close area_close.cpp)
+add_executable(closing_by_reconstruction closing_by_reconstruction.cpp)
+add_executable(leveling leveling.cpp)
+add_executable(area_fast_close area_fast_close.cpp)
 add_executable(grain_filter grain_filter.cpp)
+
 target_link_libraries(area_close -lfreeimage)
+target_link_libraries(area_fast_close -lfreeimage)
 target_link_libraries(grain_filter -lfreeimage)
+target_link_libraries(closing_by_reconstruction -lfreeimage)
+target_link_libraries(leveling -lfreeimage)

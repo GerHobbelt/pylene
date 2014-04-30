@@ -1,11 +1,14 @@
 #ifndef MLN_CORE_IMAGE_IMAGE_ROUTINES_HPP
 # define MLN_CORE_IMAGE_IMAGE_ROUTINES_HPP
 
+# include <mln/core/iref.hpp>
 # include <mln/core/algorithm/clone.hpp>
 # include <mln/core/internal/get_border_from_nbh.hpp>
 # include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/iterator/filter_iterator.hpp>
+# include <mln/core/pixel_utility.hpp>
 
+# include <type_traits>
 # include <boost/mpl/or.hpp>
 # include <boost/mpl/and.hpp>
 
@@ -38,7 +41,9 @@ namespace mln
   bool are_indexes_compatible(const Image<I>& f, const Image<J>& g);
 
 
-  template <typename O, typename I, typename has_border = typename image_traits<O>::has_border>
+  template <typename O, typename I,
+            typename has_border = typename std::is_convertible<typename image_traits<O>::extension,
+                                                               extension::border_extension_tag>::type>
   struct resizer;
 
 
@@ -77,7 +82,8 @@ namespace mln
   namespace internal
   {
     // FWD declaration
-    template <typename I, class Predicate, class Enable = bool>
+    template <typename I, class Predicate, class use_pix =
+              typename internal::use_pix_helper<typename std::remove_reference<I>::type, Predicate>::type >
     struct where_t;
 
     template <typename I>
@@ -162,7 +168,7 @@ namespace mln
 
   namespace internal
   {
-
+    /*
     template <typename... I>
     inline
     constexpr
@@ -187,7 +193,7 @@ namespace mln
     {
       return f.is_index_compatible(g) and are_indexes_compatible(f, rest...);
     }
-
+    */
   }
 
 
@@ -392,9 +398,9 @@ namespace mln
   namespace internal
   {
 
-    // FIXME: result_of still produces a HARD error, simplify as soon as it produces a SFINAE instead
+    // Specialization when the Predicate uses pixels as argument.
     template <typename I, typename Predicate>
-    struct where_t<I, Predicate, decltype( std::declval<Predicate>() (std::declval<mln_pixel(I)>()) )>
+    struct where_t<I, Predicate, std::true_type>
     {
     private:
       typedef typename std::remove_reference<I>::type                 image_t;
@@ -424,23 +430,23 @@ namespace mln
 
       iterator iter() const
       {
-        return iterator( filter_iterator<IT, Predicate>(m_ima.pixels().iter(), m_pred), getpoint() );
+        return iterator( filter_iterator<IT, Predicate>(m_ima.get().pixels().iter(), m_pred), getpoint() );
       }
 
       bool has(const mln_point(I)& p) const
       {
-        return m_ima.domain().has(p) and m_pred(m_ima.pixel(p));
+        return m_ima.get().domain().has(p) and m_pred(m_ima.get().pixel(p));
       }
 
 
     private:
-      I                 m_ima;
+      iref<I>           m_ima;
       Predicate         m_pred;
     };
 
 
     template <typename I, typename Predicate>
-    struct where_t<I, Predicate, decltype( std::declval<Predicate>() (std::declval<mln_value(I)>()) )>
+    struct where_t<I, Predicate, std::false_type>
     {
     private:
       typedef typename std::remove_reference<I>::type                 image_t;
@@ -480,17 +486,17 @@ namespace mln
 
       iterator iter() const
       {
-        return iterator( filter_iterator<IT, predicate_t>(m_ima.pixels().iter(), m_pred), getpoint() );
+        return iterator( filter_iterator<IT, predicate_t>(m_ima.get().pixels().iter(), m_pred), getpoint() );
       }
 
       bool has(const mln_point(I)& p) const
       {
-        return m_ima.domain().has(p) and m_pred.pred(m_ima(p));
+        return m_ima.get().domain().has(p) and m_pred.pred(m_ima.get()(p));
       }
 
 
     private:
-      I                   m_ima;
+      iref<I>             m_ima;
       predicate_t         m_pred;
     };
 
@@ -505,7 +511,7 @@ namespace mln
       struct getpoint
       {
         mln_point(I)
-        operator() (const mln_pixel(const I)& pix) const
+        operator() (const mln_cpixel(I)& pix) const
         {
           return pix.point();
         }
@@ -514,7 +520,7 @@ namespace mln
       struct predicate_t
       {
         bool
-        operator() (const mln_pixel(const I)& px) const
+        operator() (const mln_cpixel(I)& px) const
         {
           return px.val();
         }
@@ -524,26 +530,29 @@ namespace mln
       typedef transform_iterator< filter_iterator<IT, predicate_t>, getpoint> iterator;
       typedef iterator const_iterator;
 
+      where_binary_t() = default;
+
       where_binary_t(I&& ima)
         : m_ima(std::forward<I>(ima))
       {
       }
 
-      where_binary_t(const where_binary_t&) = default;
+      // where_binary_t(const where_binary_t&) = default;
+      // where_binary_t(where_binary_t&&) = default;
 
       iterator iter() const
       {
-        return iterator( filter_iterator<IT, predicate_t>(m_ima.pixels().iter(), predicate_t() ), getpoint() );
+        return iterator( filter_iterator<IT, predicate_t>(m_ima.get().pixels().iter(), predicate_t() ), getpoint() );
       }
 
       bool has(const mln_point(I)& p) const
       {
-        return m_ima.domain().has(p) and m_ima(p);
+        return m_ima.get().domain().has(p) and m_ima.get()(p);
       }
 
 
     private:
-      I m_ima;
+      iref<I&&> m_ima;
     };
 
   }

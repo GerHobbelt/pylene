@@ -329,10 +329,9 @@ namespace mln
     {
     }
 
-    template <typename dummy = void>
-    sub_image(typename std::enable_if< not std::is_reference<I>::value, dummy >::type* = NULL )
-    {
-    }
+    sub_image() = default;
+    // sub_image(const sub_image&) = default;
+    // sub_image(sub_image&&) = default;
 
     template <typename OtherImage, typename OtherDomain>
     void resize(const sub_image<OtherImage, OtherDomain>& other)
@@ -340,6 +339,7 @@ namespace mln
       resize(m_ima, other.m_ima);
       m_domain = other.m_domain;
     }
+
 
     const Domain& domain() const
     {
@@ -449,6 +449,7 @@ namespace mln
   {
     typedef sub_image<mln_ch_value(typename std::remove_reference<I>::type, V), Domain> type;
   };
+
 
 } // end of namespace mln
 

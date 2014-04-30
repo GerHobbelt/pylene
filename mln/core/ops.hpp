@@ -272,6 +272,59 @@ namespace mln
     return std::max(x, y, cmp);
   }
 
+  namespace functional
+  {
+
+    template <class U, class V = U>
+    struct maximum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    {
+      typedef typename std::common_type<U,V>::type R;
+
+      R
+      operator() (const U& x, const V& y) const
+      {
+        return std::max<R>(x,y);
+      }
+    };
+
+    template <class U, class V = U>
+    struct minimum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    {
+      typedef typename std::common_type<U,V>::type R;
+
+      R
+      operator() (const U& x, const V& y) const
+      {
+        return std::min<R>(x,y);
+      }
+    };
+
+    template <class U, class V = U>
+    struct infimum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    {
+      typedef typename std::common_type<U,V>::type R;
+
+      R
+      operator() (const U& x, const V& y) const
+      {
+        return inf<R>(x,y);
+      }
+    };
+
+    template <class U, class V = U>
+    struct supremum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    {
+      typedef typename std::common_type<U,V>::type R;
+
+      R
+      operator() (const U& x, const V& y) const
+      {
+        return sup<R>(x,y);
+      }
+    };
+
+  }
+
   /*****************************/
   /** Aggregation operations  **/
   /*****************************/

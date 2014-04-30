@@ -58,6 +58,26 @@ namespace mln {
     {
     }
 
+
+    image2d(std::initializer_list< std::initializer_list<T> > l, unsigned border = 3)
+    {
+      mln_precondition(l.size() != 0);
+      mln_precondition((l.begin())->size() != 0);
+
+      short nr = l.size();
+      short nc = (l.begin()->size());
+      resize(domain_type{{0,0}, {nr,nc}}, border);
+
+      mln_iter(v, this->values());
+      v.init();
+      for (const std::initializer_list<T>& row : l)
+        {
+          mln_assertion(row.size() == nc);
+          for (const T* val = row.begin(); val != row.end(); ++val, v.next())
+            *v = *val;
+        }
+    }
+
     using base::at;
 
     T& at(short nrows, short ncols)

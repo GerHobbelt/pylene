@@ -31,25 +31,25 @@ namespace mln
     property_map< component_tree<P, AssociativeMap>,
 		  typename accu::result_of<Accu, mln_value(I)>::type >
     vaccumulate(const component_tree<P, AssociativeMap>& ctree,
-		const Image<I>& ima,
-		const AccumulatorLike<Accu>& accu,
-		bool require_ordering = true);
+                const Image<I>& ima,
+                const AccumulatorLike<Accu>& accu,
+                bool require_ordering = true);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
-		  typename accu::result_of<Accu, mln_value(I)>::type >
+                  typename accu::result_of<Accu, mln_value(I)>::type >
     vaccumulate_proper(const component_tree<P, AssociativeMap>& ctree,
-		       const Image<I>& ima,
-		       const AccumulatorLike<Accu>& accu);
+                       const Image<I>& ima,
+                       const AccumulatorLike<Accu>& accu);
 
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
 		  typename accu::result_of<Accu, mln_point(I)>::type >
     paccumulate(const component_tree<P, AssociativeMap>& ctree,
-		const Image<I>& ima,
-		const AccumulatorLike<Accu>& accu,
-		bool require_ordering = true);
+                const Image<I>& ima,
+                const AccumulatorLike<Accu>& accu,
+                bool require_ordering = true);
 
 
 
@@ -165,11 +165,11 @@ namespace mln
 
       property_map<Tree, R> vmap(tree);
       if (not require_order) {
-	auto pixfunctor = [](const mln_cpixel(AssociativeMap)& px) { return px.index(); };
-	impl::accumulate_index(tree, tree._get_data()->m_pmap, acc, vmap, pixfunctor);
+        auto pixfunctor = [](const mln_cpixel(AssociativeMap)& px) { return px.index(); };
+        impl::accumulate_index(tree, tree._get_data()->m_pmap, acc, vmap, pixfunctor);
       } else {
-	auto ifunctor = [](P i) { return i; };
-	impl::accumulate_ordered_index(tree, tree._get_data()->m_pmap, acc, vmap, ifunctor);
+        auto ifunctor = [](P i) { return i; };
+        impl::accumulate_ordered_index(tree, tree._get_data()->m_pmap, acc, vmap, ifunctor);
       }
       mln_exiting();
       return vmap;

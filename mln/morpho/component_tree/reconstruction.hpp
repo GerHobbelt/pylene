@@ -31,9 +31,9 @@ namespace mln
 				const property_map< component_tree<P, AMap>, V >& pmap,
 				I& out)
       {
-	mln_pixter(px, out);
-	mln_forall(px)
-	  px->val() = pmap[tree.get_node_id(px->index())];
+        mln_pixter(px, out);
+        mln_forall(px)
+          px->val() = pmap[tree.get_node_id(px->index())];
       }
 
     }

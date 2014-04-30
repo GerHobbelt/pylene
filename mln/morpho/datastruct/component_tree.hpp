@@ -38,8 +38,9 @@ namespace mln
     /// user uses a method that requires this ordering, the ordering process occurs.
     ///
     /// The vector N has an extra sentinel node at the end to ease traversal processes.
-    /// This sentinel is the triplet (parent:npos, size:0, first_point: S.size())
-    /// The root node is the triplet (parent:npos, size:..., first_point: 0)
+    /// This sentinel is at index (npos) and is composed by the triplet
+    ///   (parent: npos, prev: root, next: npos, sexts: npos, first_point: S.size())
+    /// The root node is the triplet (parent:npos, prev: npos, next/nexts: ? size:..., first_point: 0)
     template <class P, class AssociativeMap>
     struct component_tree;
 
@@ -153,7 +154,7 @@ namespace mln
       ///        interface. Fix it.
       void		_reorder_pset();
 
-      _data_t*		_get_data();
+      _data_t*		    _get_data();
       const _data_t*	_get_data() const;
       /// \}
 
@@ -764,6 +765,7 @@ namespace mln
     {
       return m_data.get();
     }
+
 
     template <class P, class AssociativeMap>
     inline

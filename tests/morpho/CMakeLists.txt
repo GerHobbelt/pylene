@@ -1,5 +1,6 @@
 add_subdirectory(datastruct)
 add_subdirectory(maxtree)
+add_subdirectory(component_tree)
 
 add_executable(maxtree		maxtree.cpp)
 add_core_test(maxtree		maxtree)

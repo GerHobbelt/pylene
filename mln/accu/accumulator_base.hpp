@@ -39,7 +39,7 @@ namespace mln
 
       result_type to_result() const
       {
-	return extract(exact(*this), feature ());
+        return extract(exact(*this), feature ());
       }
 
     };

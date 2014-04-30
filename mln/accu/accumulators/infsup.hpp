@@ -70,14 +70,14 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::sup<T, Compare> type;
+          typedef accumulators::inf<T, Compare> type;
         };
 
         template <typename T>
-        accumulators::sup<T, Compare>
+        accumulators::inf<T, Compare>
         make() const
         {
-          return accumulators::sup<T, Compare>(m_cmp);
+          return accumulators::inf<T, Compare>(m_cmp);
         }
 
       private:
@@ -92,14 +92,14 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::sup<T> type;
+          typedef accumulators::inf<T> type;
         };
 
         template <typename T>
-        accumulators::sup<T>
+        accumulators::inf<T>
         make() const
         {
-          return accumulators::sup<T>();
+          return accumulators::inf<T>();
         }
       };
 
@@ -146,8 +146,6 @@ namespace mln
           return accumulators::sup<T>();
         }
       };
-
-
 
     }
 

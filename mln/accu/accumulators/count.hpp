@@ -56,7 +56,7 @@ namespace mln
 
         template <typename T>
         accumulators::count<CountType>
-        make()
+        make() const
         {
           return accumulators::count<CountType> ();
         }

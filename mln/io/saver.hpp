@@ -79,7 +79,6 @@ namespace mln
 
       mln_foreach(mln_value(I) v, ima.values())
         {
-          format(std::cout, v) << std::endl;
           write_next_pixel((void*) &v);
         }
     }

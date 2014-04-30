@@ -81,8 +81,7 @@ BOOST_AUTO_TEST_CASE(Freeimage_slow_pgm)
   BOOST_CHECK(equal(ima, ref));
 
   auto tmp = 2u * ref;
-  io::imsave(eval(imcast<uint32>(tmp)), "test.tiff");
-
+  io::imsave(imcast<uint32>(tmp), "test.tiff");
   image2d<unsigned> ima2;
   io::imread("test.tiff", ima2);
   BOOST_CHECK(equal(ima2, tmp));
@@ -105,8 +104,8 @@ BOOST_AUTO_TEST_CASE(Freeimage_slow_ppm)
   io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);
   BOOST_CHECK(equal(ima, ref));
 
-  auto tmp = 2 * ref;
-  io::imsave(eval(imcast<rgb8>(tmp)), "test.tiff");
+  auto tmp = 2u * ref;
+  io::imsave(imcast<rgb8>(tmp), "test.tiff");
   io::imread("test.tiff", ima);
   BOOST_CHECK(equal(ima, 2 * ref));
 }
@@ -121,16 +120,9 @@ BOOST_AUTO_TEST_CASE(Freeimage_slow_pbm)
   mln_foreach(point2d p, ref.domain())
     ref(p) = ((p[0] % 2) == (p[1] % 2));
 
-  io::imsave(ref, "test.tiff");
-  io::imread("test.tiff", ima);
-  BOOST_CHECK(equal(ima, ref));
-
-  io::imsave(eval(lnot(ref)), "test.tiff");
+  io::imsave(lnot(ref), "test.tiff");
   io::imread("test.tiff", ima);
   BOOST_CHECK(equal(ima, lnot(ref)));
-
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()

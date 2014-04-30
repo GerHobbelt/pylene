@@ -630,6 +630,7 @@ namespace mln
       if (x == m_ncols) {
         x = 0;
         y = 0;
+        m_ptr -= pitch;
       } else if (y == 8) {
         y = 0;
       }

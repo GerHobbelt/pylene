@@ -28,7 +28,13 @@ namespace mln
         {
           istream_wrapper* isw = (istream_wrapper*) isw_;
           isw->m_cs->read((char*)buffer, size * count);
-          return (isw->m_cs) ? count : 0;
+          if (*isw->m_cs)
+            return count;
+          else
+            {
+              isw->m_cs->clear();
+              return isw->m_cs->gcount() / size;
+            }
         }
 
         static
@@ -37,7 +43,7 @@ namespace mln
           istream_wrapper* isw = (istream_wrapper*) isw_;
           if (origin == SEEK_SET) offset += isw->m_offset;
           isw->m_cs->seekg(offset, (std::ios_base::seekdir) origin);
-          return (isw->m_cs) ? 0 : -1;
+          return (*isw->m_cs) ? 0 : -1;
         }
 
         static

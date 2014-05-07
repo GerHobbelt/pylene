@@ -1,7 +1,9 @@
 #ifndef MLN_MORPHO_DATASTRUCT_IMAGE_PROPERTY_MAP_HPP
 # define MLN_MORPHO_DATASTRUCT_IMAGE_PROPERTY_MAP_HPP
 
-# include <mln/core/image_base.hpp>
+# include <mln/core/image/image.hpp>
+# include <mln/core/neighborhood/neighborhood_base.hpp>
+# include <mln/core/object_wrappers.hpp>
 # include <mln/morpho/datastruct/component_tree.hpp>
 # include <mln/morpho/datastruct/attribute_map.hpp>
 # include <mln/core/range/transform.hpp>
@@ -13,6 +15,9 @@ namespace mln
   {
     template <class P, class AMap, class ValueMap>
     struct image_tree_property_map;
+
+    // The neighborhood on the tree
+    struct tree_neighb_t;
 
     template <class P, class AMap, class ValueMap>
     image_tree_property_map<P, AMap, ValueMap>
@@ -107,6 +112,9 @@ namespace mln
       pixel_range               pixels();
       const_pixel_range         pixels() const;
 
+      // Specific.
+      const ValueMap&           get_vmap() const;
+      ValueMap&                 get_vmap();
 
     private:
       tree_t           m_tree;
@@ -329,6 +337,20 @@ namespace mln
       return const_pixel_range(m_tree.nodes(), fun);
     }
 
+    template <class P, class AMap, class ValueMap>
+    const ValueMap&
+    image_tree_property_map<P, AMap, ValueMap>::get_vmap() const
+    {
+      return m_vmap;
+    }
+
+    template <class P, class AMap, class ValueMap>
+    ValueMap&
+    image_tree_property_map<P, AMap, ValueMap>::get_vmap()
+    {
+      return m_vmap;
+    }
+
 
     template <class P, class AMap, class ValueMap>
     image_tree_property_map<P, AMap, ValueMap>
@@ -337,6 +359,188 @@ namespace mln
     {
       return image_tree_property_map<P, AMap, ValueMap>(tree, vmap);
     }
+
+
+    /***********************************/
+    /** Neighborhood iterators       ***/
+    /***********************************/
+
+    namespace internal
+    {
+
+      template <class Wrapper,
+                typename _is_iterator = typename mln::is_a<typename Wrapper::type, Iterator>::type>
+      struct tree_nbh_iter_helper;
+
+      template <class Wrapper>
+      struct tree_nbh_iter_helper<Wrapper, std::false_type>
+      {
+        typedef typename Wrapper::type value_type;
+
+      protected:
+        template <class U>
+        const value_type& __get(const U& x) const { return x.get(); }
+      };
+
+      template <class Wrapper>
+      struct tree_nbh_iter_helper<Wrapper, std::true_type>
+      {
+        typedef typename Wrapper::type::value_type value_type;
+      protected:
+
+        template <class U>
+        typename Wrapper::type::reference __get(const U& x) const { return *(x.get()); }
+      };
+
+
+      template <class NodeType>
+      struct tree_nbh_piter
+      : tree_nbh_iter_helper<NodeType>,
+        iterator_base< tree_nbh_piter<NodeType>,
+                       typename tree_nbh_iter_helper<NodeType>::value_type,
+                       typename tree_nbh_iter_helper<NodeType>::value_type >
+      {
+        typedef typename tree_nbh_iter_helper<NodeType>::value_type node_type;
+        typedef typename node_type::tree_t tree_t;
+        typedef node_type value_type;
+
+        tree_nbh_piter() = default;
+
+        tree_nbh_piter(const NodeType& x)
+        : m_x (x)
+        {
+        }
+
+        void init()
+        {
+          m_started = (this->__get(m_x).get_parent_id() == node_type::tree_t::npos());
+          m_child_iter = this->__get(m_x).children().iter();
+          m_child_iter.init();
+        }
+
+        bool finished() const
+        {
+          return m_started and m_child_iter.finished();
+        }
+
+        void next()
+        {
+          if (m_started)
+            m_child_iter.next();
+          m_started = true;
+        }
+
+        node_type dereference() const
+        {
+          return m_started ? (*m_child_iter) : this->__get(m_x).parent();
+        }
+
+      private:
+        NodeType                                m_x; // A node or a node iterator
+        bool                                    m_started;
+        typename tree_t::children_iterator      m_child_iter;
+      };
+
+      template <class NodePixelType>
+      struct tree_nbh_pixter
+      : tree_nbh_iter_helper<NodePixelType>,
+        iterator_base< tree_nbh_pixter<NodePixelType>,
+                       typename tree_nbh_iter_helper<NodePixelType>::value_type,
+                       typename tree_nbh_iter_helper<NodePixelType>::value_type >
+      {
+        typedef typename tree_nbh_iter_helper<NodePixelType>::value_type value_type;
+        typedef typename value_type::point_type node_type;
+        typedef typename node_type::tree_t tree_t;
+
+        tree_nbh_pixter() = default;
+        tree_nbh_pixter(const NodePixelType& x)
+        : m_x (x)
+        {
+        }
+
+        void init()
+        {
+          auto x = this->__get(m_x).point();
+          m_started = (x.get_parent_id() == node_type::tree_t::npos());
+          m_child_iter = x.children().iter();
+          m_child_iter.init();
+        }
+
+        bool finished() const
+        {
+          return m_started and m_child_iter.finished();
+        }
+
+        void next()
+        {
+          if (m_started)
+            m_child_iter.next();
+          m_started = true;
+        }
+
+        value_type dereference() const
+        {
+          auto x = this->__get(m_x);
+          return m_started ?
+            value_type(& (x.image()), m_child_iter->id())  :
+            value_type(& (x.image()), x.point().get_parent_id()) ;
+        }
+
+      private:
+        NodePixelType                           m_x; // A node or a node iterator
+        bool                                    m_started;
+        typename tree_t::children_iterator      m_child_iter;
+      };
+
+    }
+
+
+    // The neighborhood on the tree
+    struct tree_neighb_t : neighborhood_base<tree_neighb_t,
+                                             adaptative_neighborhood_tag>
+    {
+    public:
+      template <class NodeType>
+      iterator_range< internal::tree_nbh_piter< object_wrapper<NodeType> > >
+      __process_point(const NodeType& node) const
+      {
+        typedef iterator_range< internal::tree_nbh_piter< object_wrapper<NodeType> > > R;
+        return R{ { node } };
+      }
+
+      template <class NodeType>
+      iterator_range< internal::tree_nbh_piter<std::reference_wrapper<const NodeType> > >
+      __bind_point(NodeType& node) const
+      {
+        typedef iterator_range< internal::tree_nbh_piter<std::reference_wrapper<const NodeType> > > R;
+        return R{ { std::cref(node) } };
+      }
+
+      template <class NodeIterator>
+      iterator_range< internal::tree_nbh_piter<std::reference_wrapper<const NodeIterator> > >
+      __bind_point_iterator(const NodeIterator& node_iter) const
+      {
+        typedef iterator_range< internal::tree_nbh_piter<std::reference_wrapper<const NodeIterator> > > R;
+        return R{ { std::cref(node_iter) } };
+      }
+
+      template <class NodePixType>
+      iterator_range< internal::tree_nbh_pixter<std::reference_wrapper<const NodePixType> > >
+      __bind_pixel(NodePixType& node) const
+      {
+        typedef iterator_range< internal::tree_nbh_pixter<std::reference_wrapper<const NodePixType> > > R;
+        return R{ { std::cref(node) } };
+      }
+
+      template <class NodePixIterator>
+      iterator_range< internal::tree_nbh_pixter<std::reference_wrapper<const NodePixIterator> > >
+      __bind_pixel_iterator(const NodePixIterator& node_iter) const
+      {
+        typedef iterator_range< internal::tree_nbh_pixter<std::reference_wrapper<const NodePixIterator> > > R;
+        return R{ { std::cref(node_iter) } };
+      }
+
+    };
 
   }
 

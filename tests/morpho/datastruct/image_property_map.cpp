@@ -2,6 +2,7 @@
 #include <mln/morpho/datastruct/image_property_map.hpp>
 #include <mln/core/foreach.hpp>
 #include <mln/core/forall.hpp>
+#include <mln/core/algorithm/iota.hpp>
 
 
 #define BOOST_TEST_MODULE Morpho
@@ -55,13 +56,9 @@ BOOST_AUTO_TEST_CASE(property_image)
   tree_t tree = make_tree();
   property_map<tree_t, int> vmap(tree);
 
-  {
-    int i = 0;
-    mln_foreach(tree_t::node_type x, tree.nodes())
-      vmap[x] = i++;
-  }
-
   auto ima = make_image(tree, vmap);
+  iota(ima, 0);
+
   {
     int i = 0;
     mln_pixter(px, ima);
@@ -72,7 +69,63 @@ BOOST_AUTO_TEST_CASE(property_image)
       BOOST_CHECK(px->point() == *nit);
     }
   }
+}
 
+BOOST_AUTO_TEST_CASE(property_image_nbh)
+{
+  tree_t tree = make_tree();
+  property_map<tree_t, int> vmap(tree);
+
+  auto ima = make_image(tree, vmap);
+  iota(ima, 1);
+
+  {
+    std::vector<unsigned> voisins[7] = {
+      {},
+      {2,5},
+      {1,3,4},
+      {2},
+      {2},
+      {1,6},
+      {5}
+    };
+
+    morpho::tree_neighb_t nbh;
+    {
+      mln_pixter(px, ima);
+      mln_iter(nx, nbh(px));
+      int i = 1;
+      mln_forall(px)
+      {
+        unsigned j = 0;
+        mln_forall(nx)
+        {
+          BOOST_CHECK_EQUAL(nx->val(), voisins[i][j]);
+          BOOST_CHECK_EQUAL(nx->point().id(), voisins[i][j]);
+          ++j;
+        }
+        ++i;
+      }
+    }
+
+    {
+      mln_piter(p, ima);
+      mln_iter(n, nbh(p));
+      int i = 1;
+      mln_forall(p)
+      {
+        unsigned j = 0;
+        mln_forall(n)
+        {
+          BOOST_CHECK_EQUAL(ima(*n), voisins[i][j]);
+          BOOST_CHECK(n->id() == voisins[i][j]);
+          ++j;
+        }
+        ++i;
+      }
+    }
+
+  }
 }
 
 

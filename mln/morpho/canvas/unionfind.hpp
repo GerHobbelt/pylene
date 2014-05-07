@@ -106,6 +106,8 @@ namespace mln
 
               status(p) = status(p) || term(p);
             }
+          // Set the root status to PASS
+          status(S.back()) = PASS;
 
           // Reverse, canonize and call on_finish
           mln_reverse_foreach(p, S)

@@ -66,13 +66,13 @@ namespace mln {
 
       short nr = l.size();
       short nc = (l.begin()->size());
-      resize(domain_type{{0,0}, {nr,nc}}, border);
+      this->resize(domain_type{{0,0}, {nr,nc}}, border);
 
       mln_iter(v, this->values());
       v.init();
       for (const std::initializer_list<T>& row : l)
         {
-          mln_assertion(row.size() == nc);
+          mln_assertion(row.size() == (unsigned)nc);
           for (const T* val = row.begin(); val != row.end(); ++val, v.next())
             *v = *val;
         }

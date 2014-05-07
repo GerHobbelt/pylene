@@ -15,7 +15,7 @@ namespace mln
     mln_concrete(I)
     area_closing(const Image<I>& ima,
                  const Neighborhood<N>& nbh,
-                 typename I::size_type  area,
+                 unsigned area,
                  Compare cmp = Compare());
 
 
@@ -54,7 +54,7 @@ namespace mln
     mln_concrete(I)
     area_closing(const Image<I>& ima_,
                  const Neighborhood<N>& nbh,
-                 typename I::size_type  area,
+                 unsigned area,
                  Compare cmp)
     {
       mln_entering("mln::morpho::area_closing");

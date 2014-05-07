@@ -52,7 +52,7 @@ namespace mln
     reverse_iterator    riter() const;
 
     bool		operator== (const strided_box& other) const;
-
+    bool		operator!= (const strided_box& other) const;
 
     point_type pmin;
     point_type pmax;
@@ -188,6 +188,11 @@ namespace mln
     bool operator== (const box& other) const
     {
       return pmin == other.pmin and pmax == other.pmax;
+    }
+
+    bool operator!= (const box& other) const
+    {
+      return pmin != other.pmin or pmax != other.pmax;
     }
 
 
@@ -391,6 +396,14 @@ namespace mln
   strided_box<T, dim>::operator== (const strided_box& other) const
   {
     return pmin == other.pmin and pmax == other.pmax and strides == other.strides;
+  }
+
+  template <typename T, unsigned dim>
+  inline
+  bool
+  strided_box<T, dim>::operator!= (const strided_box& other) const
+  {
+    return pmin != other.pmin or pmax != other.pmax or strides != other.strides;
   }
 
 }

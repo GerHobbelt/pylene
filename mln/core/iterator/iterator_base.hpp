@@ -68,9 +68,14 @@ namespace mln
       return *(this->derived());
     }
 
+
     reference
     operator* () const
     {
+      // It may not be necessary to start iteration to have valid
+      // member (e.g. the image pointer in pixels), thus we should
+      // assert this:
+      // mln_precondition(not this->derived()->finished());
       return this->derived()->dereference();
     }
 

@@ -43,7 +43,8 @@ namespace mln {
     typedef typename base_type::domain_type domain_type;
 
 
-    explicit image2d (unsigned border = 3) : ndimage_base<T,2,image2d<T> > (border)
+    explicit image2d (unsigned border = 3)
+      : ndimage_base<T,2,image2d<T> > (border)
     {
     }
 
@@ -52,11 +53,26 @@ namespace mln {
     {
     }
 
-
     image2d(short nrows, short ncols, unsigned border = 3)
       : ndimage_base<T,2, image2d<T> >( (box<short,2>){{0,0},{nrows, ncols}}, border)
     {
     }
+
+    /// \brief Initialization constructor
+    /// \{
+    template <typename U>
+    image2d(const image2d<U>& f, mln::init)
+      : base(f, mln::init() )
+    {
+    }
+
+    template <typename U>
+    image2d(const image2d<U>& f, unsigned border, const T& v = T())
+      : base(f, border, v)
+    {
+    }
+    /// \}
+
 
 
     image2d(std::initializer_list< std::initializer_list<T> > l, unsigned border = 3)

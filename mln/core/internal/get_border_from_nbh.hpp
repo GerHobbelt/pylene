@@ -10,7 +10,8 @@ namespace mln
   {
 
     /// \brief Compute the minimal size \p b of the window necessary
-    /// to hold the neighbor \p nbh.
+    /// to hold the neighbor \p nbh. It returns -1 in this border
+    /// cannot be computed.
     ///
     /// Compute the minimal size of the window that contains the neighborhood i.e it
     /// computes b s.t.
@@ -21,11 +22,11 @@ namespace mln
     /// \pre The neighborhood must be non-adaptative.
     /// \pre \p make_win must be increasing
     template <typename Neighborhood, typename SiteSetGenerator>
-    unsigned
+    int
     get_border_from_nbh(const Neighborhood& nbh, const SiteSetGenerator& make_win);
 
     template <typename Neighborhood>
-    unsigned
+    int
     get_border_from_nbh(const Neighborhood& nbh);
 
 
@@ -34,28 +35,28 @@ namespace mln
     /*********************/
 
     template <typename Neighborhood, typename SiteSetGenerator>
-    unsigned
+    int
     get_border_from_nbh(const Neighborhood& nbh, const SiteSetGenerator& make_win)
     {
       unsigned b = 1;
       auto cwin = make_win(1);
       mln_foreach(auto dp, nbh.dpoints)
-	while (not cwin.has(dp))
-	  cwin = make_win(++b);
+        while (not cwin.has(dp))
+          cwin = make_win(++b);
       return b;
     }
 
     namespace dispatch
     {
       template <typename Neighborhood, typename Site>
-      unsigned
+      int
       get_border_from_nbh(const Neighborhood&, const Site&)
       {
-      	return 0;
+      	return -1;
       }
 
       template <typename Neighborhood, typename T, unsigned dim>
-      unsigned
+      int
       get_border_from_nbh(const Neighborhood& nbh, const point<T,dim>&)
       {
       	unsigned b = 0;
@@ -67,7 +68,7 @@ namespace mln
     }
 
     template <typename Neighborhood>
-    unsigned
+    int
     get_border_from_nbh(const Neighborhood& nbh)
     {
       return dispatch::get_border_from_nbh(nbh, typename Neighborhood::point_type ());

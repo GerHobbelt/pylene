@@ -2,7 +2,10 @@
 # define MLN_CORE_IMAGE_MORPHERS_FILTERED_IMAGE_HPP
 
 # include <mln/core/image/morphers/morpher_base.hpp>
+# include <mln/core/image/sub_image.hpp>
+# include <mln/core/image/internal/where.hpp>
 # include <mln/core/pixel_utility.hpp>
+
 
 namespace mln
 {
@@ -41,6 +44,25 @@ namespace mln
     typedef std::false_type                     indexable;
     typedef mln::extension::none_extension_tag  extension;
   };
+
+
+  template <class I, class Predicate>
+  struct image_concrete< filtered_image<I, Predicate> >
+  {
+    typedef sub_image< mln_concrete(I),
+                       internal::where_t<I, Predicate> > type;
+  };
+
+  namespace internal
+  {
+    template <class I, class Predicate>
+    struct image_init_from< filtered_image<I,Predicate> >
+    {
+      typedef typename image_init_from<
+        sub_image<I, internal::where_t<I, Predicate> >
+        >::type type;
+    };
+  }
 
 
   /******************************************/
@@ -97,10 +119,11 @@ namespace mln
 
     filtered_image_base(I&& ima, const Predicate& pred)
       : m_ima(std::forward<I>(ima)),
-      m_pred(pred),
-      m_domain(m_ima, m_pred)
-        {
-        }
+        m_pred(pred),
+        m_domain(m_ima, m_pred)
+    {
+    }
+
 
     const domain_type& domain() const
     {
@@ -186,7 +209,7 @@ namespace mln
       return pixel_type(static_cast<self_t&>(*this), m_ima.pixel_at(p));
     }
 
-  private:
+  protected:
     I           m_ima;
     Predicate   m_pred;
     domain_type m_domain;
@@ -262,10 +285,11 @@ namespace mln
 
     filtered_image_base(I&& ima, const Predicate& pred)
       : m_ima(std::forward<I>(ima)),
-      m_pred(pred),
-      m_domain(m_ima, m_pred)
-        {
-        }
+        m_pred(pred),
+        m_domain(m_ima, m_pred)
+    {
+    }
+
 
     const domain_type& domain() const
     {
@@ -347,7 +371,7 @@ namespace mln
       return pixel_type(static_cast<self_t&>(*this), m_ima.pixel_at(p));
     }
 
-  private:
+  protected:
     I           m_ima;
     Predicate   m_pred;
     domain_type m_domain;
@@ -357,10 +381,38 @@ namespace mln
   template <typename I, class Predicate>
   struct filtered_image : filtered_image_base<I, Predicate>
   {
+  private:
+    typedef filtered_image_base<I, Predicate>   base;
+    typedef internal::where_t<I, Predicate>     domain_t;
+  public:
+    typedef typename base::domain_type domain_type;
+
+  public:
     filtered_image(I&& ima, const Predicate& pred)
       : filtered_image_base<I, Predicate>(std::forward<I>(ima), pred)
     {
     }
+
+
+    friend
+    internal::initializer<mln_concrete(filtered_image),
+                          typename internal::image_init_from<filtered_image>::type>
+    imconcretize(const filtered_image& f)
+    {
+      sub_image<I, domain_t> sub(f.m_ima, {f.m_ima, f.m_pred});
+      return std::move(imconcretize(sub));
+    }
+
+    template <typename V>
+    friend
+    internal::initializer<mln_ch_value(filtered_image, V),
+                          typename internal::image_init_from<filtered_image>::type>
+    imchvalue(const filtered_image& f)
+    {
+      sub_image<I, domain_t> sub(f.m_ima, {f.m_ima, f.m_pred});
+      return std::move(imchvalue<V>(sub));
+    }
+
 
   };
 

@@ -131,13 +131,13 @@ namespace mln
       const I& ima = exact(ima_);
       Label bg = lbl;
 
-      mln_ch_value(I, Label) out;
-      bool nocheck_boundary = resize(out, ima).adjust(nbh).init(bg);
+      int status;
+      mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).init(bg).get_status(status);
 
-      if (nocheck_boundary)
-	lbl = impl::generic::blobs_no_boundcheck(ima, nbh, lbl, out);
+      if (status == 0)
+        lbl = impl::generic::blobs_no_boundcheck(ima, nbh, lbl, out);
       else
-	lbl = impl::generic::blobs_boundcheck(ima, nbh, lbl, out);
+        lbl = impl::generic::blobs_boundcheck(ima, nbh, lbl, out);
 
       mln_exiting();
 

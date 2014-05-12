@@ -3,7 +3,8 @@
 
 # include <mln/core/image/image_expr.hpp>
 # include <mln/core/ops.hpp>
-#include <iostream>
+# include <boost/utility/enable_if.hpp>
+# include <iostream>
 namespace mln
 {
   /// \defgroup ima_ops Image operators

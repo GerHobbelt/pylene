@@ -47,8 +47,8 @@ namespace mln
 	size_type sz = ima.domain().size();
 
 	nodes.resize(sz + 1);   // grow from the back
-	S.resize(sz);		//
-	resize(pmap, ima);	//
+	S.resize(sz);		    //
+	pmap = imchvalue<size_type>(ima);	//
 
 
 	size_type stack_size = 0;
@@ -83,10 +83,9 @@ namespace mln
 
 	// 2. Create auxiliary structure for the computation
 	// {
-	mln_ch_value(I, bool)				  deja_vu;
+	mln_ch_value(I, bool) deja_vu = imchvalue<bool>(ima).adjust(nbh).init(false);
 	priority_queue_ima<V, StrictWeakOrdering> pqueue(ima, cmp);
 
-	resize(deja_vu, ima).adjust(nbh).init(false);
 	extension::fill(deja_vu, true);
 	// }
 

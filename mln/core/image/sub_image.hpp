@@ -4,12 +4,12 @@
 # include <type_traits>
 
 # include <mln/core/image_base.hpp>
+# include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/range/range_traits.hpp>
 # include <mln/core/range/iterator_range.hpp>
-//# include <mln/core/iterator/image_access_iterator.hpp>
-# include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/range/filter.hpp>
 # include <mln/core/pixel_utility.hpp>
+# include <boost/optional.hpp>
 
 namespace mln
 {
@@ -212,14 +212,45 @@ namespace mln
   template <typename Image, typename Domain>
   struct image_traits< sub_image<Image, Domain> >
   {
+    typedef typename std::remove_reference<Image>::type I;
+
     typedef std::true_type      accessible;
     typedef forward_image_tag   category; // FIXME: category depends on domain category
-    typedef typename image_traits<Image>::concrete  concrete;
+    typedef std::integral_constant<bool,
+                                   not std::is_reference<Image>::value and
+                                   image_traits<I>::concrete::value> concrete;
     typedef std::false_type	indexable; // FIXME: depends
     typedef mln::extension::none_extension_tag extension;
   };
 
 
+  template <typename I, typename Domain>
+  struct image_concrete< sub_image<I, Domain> >
+  {
+    typedef sub_image<mln_concrete(I), Domain> type;
+  };
+
+  template <typename I, typename Domain, typename V>
+  struct image_ch_value< sub_image<I, Domain>, V >
+  {
+    typedef sub_image<mln_ch_value(I, V), Domain> type;
+  };
+
+  // namespace internal
+  // {
+  //   template <class I, class Domain>
+  //   struct image_init_from< sub_image<I, Domain> >
+  //   {
+  //     typedef sub_image<
+  //       typename image_init_from<typename std::remove_reference<I>::type>::type,
+  //       Domain> type;
+  //   };
+
+  // }
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
 
   template <typename I, typename Domain>
   struct sub_image : image_base< sub_image<I, Domain>,
@@ -284,12 +315,6 @@ namespace mln
       const image_t* m_ima;
     };
 
-
-    // typedef decltype(std::bind( (typename image_pixel<image_t>::type (image_t::*)(const typename image_t::point_type&))
-    //                             &image_t::pixel_at, std::declval<image_t&>(), std::placeholders::_1))           pix_fun_t;
-    // typedef decltype(std::bind( (typename image_pixel<const image_t>::type (image_t::*)(const typename image_t::point_type&) const)
-    //                             &image_t::pixel_at, std::declval<const image_t&>(), std::placeholders::_1))     const_pix_fun_t;
-
     typedef rebind_pixel_iterator<
       self_t, transform_iterator<
                 typename Domain::iterator,
@@ -298,7 +323,6 @@ namespace mln
       const self_t, transform_iterator<
                       typename Domain::iterator,
                       const_pix_fun_t > >         const_pixel_iterator;
-
 
 
   public:
@@ -311,18 +335,13 @@ namespace mln
     typedef rebinded_pixel<self_t, typename image_pixel<image_t>::type>               pixel_type;
     typedef rebinded_pixel<const self_t, typename image_const_pixel<image_t>::type>   const_pixel_type;
 
-    // typedef image_access_value_iterator<image_t, typename Domain::iterator>             value_iterator;
-    // typedef image_access_value_iterator<const image_t, typename Domain::iterator>       const_value_iterator;
-    // typedef image_access_pixel_iterator<image_t, typename Domain::iterator, self_t>             pixel_iterator;
-    // typedef image_access_pixel_iterator<const image_t, typename Domain::iterator, const self_t>       const_pixel_iterator;
-
-    // typedef typename pixel_iterator::value_type          pixel_type;
-    // typedef typename const_pixel_iterator::value_type    const_pixel_type;
-
     typedef iterator_range<value_iterator>		value_range;
     typedef iterator_range<const_value_iterator>	const_value_range;
     typedef iterator_range<pixel_iterator>		pixel_range;
     typedef iterator_range<const_pixel_iterator>	const_pixel_range;
+
+    template <class, class>
+    friend struct sub_image;
 
     sub_image(I&& ima, const Domain& domain)
       : m_ima(std::forward<I>(ima)), m_domain(domain)
@@ -330,16 +349,21 @@ namespace mln
     }
 
     sub_image() = default;
-    // sub_image(const sub_image&) = default;
-    // sub_image(sub_image&&) = default;
+
 
     template <typename OtherImage, typename OtherDomain>
-    void resize(const sub_image<OtherImage, OtherDomain>& other)
+    sub_image(const sub_image<OtherImage, OtherDomain>& other, mln::init)
+      : m_ima(imchvalue<value_type>(other.m_ima)),
+        m_domain(other.m_domain)
     {
-      resize(m_ima, other.m_ima);
-      m_domain = other.m_domain;
     }
 
+    template <typename OtherImage, typename OtherDomain>
+    sub_image(const sub_image<OtherImage, OtherDomain>& other, const value_type& v)
+      : m_ima(imchvalue<value_type>(other.m_ima).init(v)),
+        m_domain(other.m_domain)
+    {
+    }
 
     const Domain& domain() const
     {
@@ -430,24 +454,9 @@ namespace mln
     }
 
 
-
-
   private:
     I           m_ima;
     Domain      m_domain;
-  };
-
-
-  template <typename I, typename Domain>
-  struct image_concrete< sub_image<I, Domain> >
-  {
-    typedef sub_image<mln_concrete(typename std::remove_reference<I>::type), Domain> type;
-  };
-
-  template <typename I, typename Domain, typename V>
-  struct image_ch_value< sub_image<I, Domain>, V >
-  {
-    typedef sub_image<mln_ch_value(typename std::remove_reference<I>::type, V), Domain> type;
   };
 
 

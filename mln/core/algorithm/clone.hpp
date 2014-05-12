@@ -45,8 +45,7 @@ namespace mln
     clone(const Image& ima, std::false_type _use_copy_construction_)
     {
       (void) _use_copy_construction_;
-      mln_concrete(Image) x;
-      resize(x, ima);
+      mln_concrete(Image) x = imconcretize(ima);
       copy(ima, x);
       return x;
     }

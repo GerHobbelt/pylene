@@ -195,6 +195,12 @@ namespace mln
     // \{
     explicit ndimage_base(unsigned border = 3);
     explicit ndimage_base(const domain_type& domain, unsigned border = 3, T v = T());
+
+    template <typename U, class E2>
+    ndimage_base(const ndimage_base<U, dim, E2>& other, mln::init);
+
+    template <typename U, class E2>
+    ndimage_base(const ndimage_base<U, dim, E2>& other, unsigned border, T v = T());
     // \}
 
     /// \name Accession Operators
@@ -279,7 +285,6 @@ namespace mln
     /// \param v The initialization value of the image. If \p is given, values
     /// are copy constructed from \p v, otherwise, they are default-initialized.
     void resize(const domain_type& domain, unsigned border = 3, T v = T());
-
 
     /// \brief Re-indexation of the image.
     ///
@@ -506,6 +511,24 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
+  template <typename U, typename E2>
+  ndimage_base<T,dim,E>::ndimage_base(const ndimage_base<U, dim, E2>& g, unsigned border, T v)
+    : domain_ (g.domain()),
+      border_ (border)
+  {
+    resize_(domain_, border_, v);
+  }
+
+  template <typename T, unsigned dim, typename E>
+  template <typename U, typename E2>
+  ndimage_base<T,dim,E>::ndimage_base(const ndimage_base<U, dim, E2>& g, mln::init)
+    : domain_ (g.domain()),
+      border_ (g.border())
+  {
+    resize_(domain_, border_, T());
+  }
+
+  template <typename T, unsigned dim, typename E>
   void
   ndimage_base<T,dim,E>::resize_(const domain_type& domain, unsigned border, T v)
   {
@@ -545,13 +568,13 @@ namespace mln
   {
     if (not (domain == domain_) or (int)border != border_)
       {
-	domain_ = domain;
-	border_ = border;
-	resize_(domain_, border, v);
+        domain_ = domain;
+        border_ = border;
+        resize_(domain_, border, v);
       }
     else
       {
-	std::fill((T*) ptr_, ((T*)last_) + 1, v);
+        std::fill((T*) ptr_, ((T*)last_) + 1, v);
       }
   }
 

@@ -6,6 +6,7 @@
 # include <mln/core/extension/extension.hpp>
 # include <mln/core/algorithm/sort_sites.hpp>
 # include <mln/core/dontcare.hpp>
+# include <mln/core/trace.hpp>
 
 namespace mln
 {
@@ -131,10 +132,8 @@ namespace mln
         mln_ch_value(I, mln_point(I))
           unionfind_facade(const I& input, const N& nbh, StopCriterion term, Compare cmp, uf_visitor viz)
         {
-          mln_ch_value(I, mln_point(I)) par;
-          mln_ch_value(I, unsigned char) status;
-          resize(status, input).init(NONE);
-          resize(par, input);
+          mln_ch_value(I, mln_point(I)) par = imchvalue<mln_point(I)>(input);
+          mln_ch_value(I, unsigned char) status = imchvalue<unsigned char>(input).init(NONE);
 
           if (not extension::need_adjust(status, nbh))
             unionfind_impl(input, nbh, term, cmp, viz, par, status);

@@ -25,7 +25,7 @@ namespace mln
   extend_by_value(Image<I>& ima, const mln_value(I)& v);
 
   template <typename I>
-  extended_by_value_image<I&>
+  extended_by_value_image<I>
   extend_by_value(Image<I>&& ima, const mln_value(I)& v);
   /// \}
 
@@ -61,6 +61,22 @@ namespace mln
     typedef std::false_type				indexable;
     typedef mln::extension::value_extension_tag		extension;
   };
+
+
+  template <typename I>
+  struct image_concrete< extended_by_value_image<I> >
+  {
+    typedef mln_concrete(I) type;
+  };
+
+  namespace internal
+  {
+    template <typename I>
+    struct image_init_from< extended_by_value_image<I> >
+    {
+      typedef typename image_init_from<typename std::decay<I>::type>::type type;
+    };
+  }
 
 
   /*****************************/
@@ -203,6 +219,24 @@ namespace mln
     {
     }
 
+    friend
+    internal::initializer<mln_concrete(I),
+                          typename internal::image_init_from<extended_by_value_image>::type>
+    imconcretize(const extended_by_value_image& f)
+    {
+      return std::move(imconcretize(f.m_ima));
+    }
+
+    template <typename V>
+    friend
+    internal::initializer<mln_ch_value(I, V),
+                          typename internal::image_init_from<extended_by_value_image>::type>
+    imchvalue(const extended_by_value_image& f)
+    {
+      return std::move(imchvalue<V>(f.m_ima));
+    }
+
+
     template <typename = void>
     typename std::enable_if<image_traits<image_t>::accessible::value, reference>::type
     operator() (const point_type& p)
@@ -235,10 +269,27 @@ namespace mln
     at (const point_type& p) const
     {
       if (m_ima.domain().has(p))
-	return m_ima(p);
+        return m_ima(p);
       else
-	return m_val;
+        return m_val;
     }
+
+    template <typename = void>
+    typename std::enable_if<image_traits<image_t>::accessible::value, pixel_type>::type
+    pixel (const point_type& p)
+    {
+      // FIXME: this is wrong
+      return {*this,  m_ima.pixel(p)};
+    }
+
+    template <typename = void>
+    typename std::enable_if<image_traits<image_t>::accessible::value, const_pixel_type>::type
+    pixel (const point_type& p) const
+    {
+      // FIXME: this is wrong
+      return {*this,  m_ima.pixel(p)};
+    }
+
 
     const_pixel_range pixels() const
     {

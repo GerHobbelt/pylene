@@ -19,6 +19,10 @@ namespace mln
     /// \brief Helper class to know if a function accepts pixels or values
     template <typename I, class UnaryFunction>
     struct use_pix_helper;
+
+
+    typedef mln::get_pixel_value meta_get_pixel_value;
+    typedef mln::get_pixel_point meta_get_pixel_point;
   }
 
   /******************************************/

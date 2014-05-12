@@ -106,8 +106,7 @@ namespace mln
     {
       const I& ima = exact(ima_);
 
-      mln_concrete(I) out;
-      resize(out, ima);
+      mln_concrete(I) out = imconcretize(ima);
       dilate(ima, nbh_, out, cmp);
 
       return out;

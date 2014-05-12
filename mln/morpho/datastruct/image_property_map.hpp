@@ -31,12 +31,25 @@ namespace mln
   {
     typedef std::true_type              accessible;
     typedef random_access_image_tag     category;
-    typedef std::true_type              concrete; // depend
+    typedef std::false_type             concrete; // depend
     typedef std::true_type              indexable;
     typedef extension::none_extension_tag         extension;
     typedef std::false_type             shallow_copy;
   };
 
+  template <class P, class AMap, class ValueMap>
+  struct image_concrete< morpho::image_tree_property_map<P,AMap,ValueMap> >
+  {
+    typedef property_map<morpho::component_tree<P, AMap >, typename ValueMap::value_type> NewValueMap;
+    typedef morpho::image_tree_property_map<P, AMap, NewValueMap> type;
+  };
+
+  template <class P, class AMap, class ValueMap, typename V>
+  struct image_ch_value< morpho::image_tree_property_map<P,AMap,ValueMap>, V>
+  {
+    typedef property_map<morpho::component_tree<P, AMap >, V> NewValueMap;
+    typedef morpho::image_tree_property_map<P, AMap, NewValueMap> type;
+  };
 
   namespace morpho
   {
@@ -88,6 +101,16 @@ namespace mln
 
       image_tree_property_map(const tree_t& tree, const ValueMap& vmap);
 
+      /// \{
+      /// \brief Initializer constructors
+      template <class OtherVMap>
+      image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other, mln::init);
+
+      template <class OtherVMap>
+      image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other, const value_type& v);
+      /// \}
+
+
       // Acces
       reference         operator() (const node_t& node);
       const_reference   operator() (const node_t& node) const;
@@ -95,6 +118,8 @@ namespace mln
       const_reference   at (const node_t& node) const;
       reference         operator[] (size_type index);
       const_reference   operator[] (size_type index) const;
+      pixel_type        pixel(const node_t& node);
+      const_pixel_type  pixel(const node_t& node) const;
 
       node_t          point_at_index(size_type index) const;
       size_type       index_of_point(const node_t& node) const;
@@ -103,7 +128,7 @@ namespace mln
       /// This function does not make sense on a Tree Property Map.
       /// It's here to fulfill the concept requirement.
       difference_type delta_index(const node_t& node) const;
-
+      void            reindex(size_type index);
 
       // Range & iterator
       domain_type               domain() const;
@@ -232,6 +257,24 @@ namespace mln
     {
     }
 
+    template <class P, class AMap, class ValueMap>
+    template <class OtherVMap>
+    image_tree_property_map<P, AMap, ValueMap>::image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other,
+                                                                        const value_type& v)
+      : m_tree(other.m_tree),
+        m_vmap(m_tree, v)
+    {
+    }
+
+    template <class P, class AMap, class ValueMap>
+    template <class OtherVMap>
+    image_tree_property_map<P, AMap, ValueMap>::image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other,
+                                                                        mln::init)
+      : m_tree(other.m_tree),
+        m_vmap(m_tree)
+    {
+    }
+
 
     template <class P, class AMap, class ValueMap>
     inline
@@ -276,6 +319,20 @@ namespace mln
       return m_vmap[index];
     }
 
+    template <class P, class AMap, class ValueMap>
+    typename image_tree_property_map<P, AMap, ValueMap>::const_pixel_type
+    image_tree_property_map<P, AMap, ValueMap>::pixel(const node_t& node) const
+    {
+      return {this, node.id()};
+    }
+
+    template <class P, class AMap, class ValueMap>
+    typename image_tree_property_map<P, AMap, ValueMap>::pixel_type
+    image_tree_property_map<P, AMap, ValueMap>::pixel(const node_t& node)
+    {
+      return {this, node.id()};
+    }
+
 
     template <class P, class AMap, class ValueMap>
     typename image_tree_property_map<P, AMap, ValueMap>::point_type
@@ -296,6 +353,13 @@ namespace mln
     image_tree_property_map<P, AMap, ValueMap>::delta_index(const node_t& node) const
     {
       (void) node;
+    }
+
+    template <class P, class AMap, class ValueMap>
+    void
+    image_tree_property_map<P, AMap, ValueMap>::reindex(size_type i)
+    {
+      (void) i;
     }
 
     template <class P, class AMap, class ValueMap>

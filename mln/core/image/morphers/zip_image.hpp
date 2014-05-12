@@ -19,9 +19,10 @@ namespace mln
   zip_image<Images...>
   imzip(Images&&... images);
 
-  /***************************/
-  /** Traits                **/
-  /***************************/
+
+  /******************************************/
+  /****              Traits              ****/
+  /******************************************/
 
   // Specilization for a single image
   template <class I_>
@@ -91,11 +92,30 @@ namespace mln
     typedef extension::none_extension_tag			extension;
   };
 
+  template <class I0, class... I>
+  struct image_concrete< zip_image<I0, I...> >
+  {
+    typedef std::tuple<typename std::decay<mln_reference(I0)>::type,
+                       typename std::decay<mln_reference(I)>::type...> vtype;
+    typedef mln_ch_value(I0, vtype) type;
+  };
+
+  namespace internal
+  {
+    template <class I0, class... I>
+    struct image_init_from< zip_image<I0, I...> >
+    {
+      typedef typename image_init_from<
+        typename std::decay<I0>::type
+        >::type type;
+    };
+  }
 
 
-  /***************************/
-  /** Implementation        **/
-  /***************************/
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
 
   template <class... Images>
   zip_image<Images...>
@@ -416,6 +436,25 @@ namespace mln
     zip_image(Images&&... images)
       : m_images(std::forward_as_tuple(images...))
     {
+    }
+
+    friend
+    internal::initializer<mln_concrete(zip_image),
+                          typename internal::image_init_from<zip_image>::type>
+    imconcretize(const zip_image& f)
+    {
+      using mln::imchvalue;
+      return std::move(imchvalue<value_type>(std::get<0>(f.m_images)));
+    }
+
+    template <typename V>
+    friend
+    internal::initializer<mln_ch_value(zip_image, V),
+                          typename internal::image_init_from<zip_image>::type>
+    imchvalue(const zip_image& f)
+    {
+      using mln::imchvalue;
+      return std::move(imchvalue<V>(std::get<0>(f.m_images)));
     }
 
     images_type& images()

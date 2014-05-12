@@ -130,7 +130,7 @@ namespace mln
 
       //S.reserve(f.domain().size());
       resize(K, f);
-      resize(parent, f, f.border(), PROCESSED);
+      resize(parent, f).init(PROCESSED);
       extension::fill(parent, PROCESSED);
 
       mln_foreach(point2d p, subdomain)
@@ -183,7 +183,7 @@ namespace mln
 
       // 2nd step: union-find
 
-      resize(zpar, parent, parent.border(), UNPROCESSED);
+      resize(zpar, parent).init(UNPROCESSED);
       extension::fill(zpar, UNPROCESSED);
       for (int i = S.size()-1; i >= 0; --i)
 	{

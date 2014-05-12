@@ -186,13 +186,16 @@ namespace mln
       const I& ima = exact(ima_);
       const Label bg = value_traits<Label>::max();
 
-      mln_ch_value(I, Label) out;
-      bool nocheck_boundary = resize(out, ima).adjust(nbh).init(bg);
+      int status;
+      mln_ch_value(I, Label) out = imchvalue<Label>(ima)
+        .adjust(nbh)
+        .init(bg)
+        .get_status(status);
 
-      if (nocheck_boundary)
-	lbl = impl::rag(ima, nbh, graph, lbl, out);
+      if (status == 0)
+        lbl = impl::rag(ima, nbh, graph, lbl, out);
       else
-	lbl = impl::rag(ima, nbh, graph, lbl, extension::add_value_extension(out,bg));
+        lbl = impl::rag(ima, nbh, graph, lbl, extension::add_value_extension(out,bg));
 
       mln_exiting();
 

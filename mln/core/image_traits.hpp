@@ -16,8 +16,8 @@
 # define mln_cvrange(I) typename image_const_value_range<typename std::remove_reference<I>::type>::type
 # define mln_pixrange(I)  typename image_pixel_range<typename std::remove_reference<I>::type>::type
 # define mln_cpixrange(I) typename image_const_pixel_range<typename std::remove_reference<I>::type>::type
-# define mln_pixiterator(I)  typename image_pixel_iterator<typename std::remove_reference<I>::type>::type
-# define mln_cpixiterator(I) typename image_const_pixel_iterator<typename std::remove_reference<I>::type>::type
+# define mln_pxter(I)  typename image_pixel_iterator<typename std::remove_reference<I>::type>::type
+# define mln_cpxter(I) typename image_const_pixel_iterator<typename std::remove_reference<I>::type>::type
 
 
 
@@ -25,6 +25,10 @@ namespace mln
 {
   struct image_dynamic_tag {};
   struct image_static_tag {};
+
+  // FWD declaration
+  template <class I>
+  struct Image;
 
   template <typename I>
   struct image_traits : image_traits< typename std::decay<I>::type > {};
@@ -82,10 +86,15 @@ namespace mln
 
   template <typename Image>
   struct image_has_extension :
-    std::integral_constant<bool,
-                           not std::is_same<typename image_traits<Image>::extension,
-                                            mln::extension::none_extension_tag>::value
-                           >
+    std::is_convertible<typename image_traits<Image>::extension,
+                        mln::extension::custom_extension_tag>
+  {
+  };
+
+  template <typename Image>
+  struct image_has_border :
+    std::is_convertible<typename image_traits<Image>::extension,
+                        mln::extension::border_extension_tag>
   {
   };
 

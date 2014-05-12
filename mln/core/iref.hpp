@@ -2,6 +2,7 @@
 # define MLN_CORE_IREF_HPP
 
 # include <memory>
+# include <mln/core/assert.hpp>
 
 namespace mln
 {

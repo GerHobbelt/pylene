@@ -80,6 +80,23 @@ namespace mln
     typedef mln::extension::none_extension_tag		 extension; // FIXME
   };
 
+  template <class I, class UnaryFunction, bool b>
+  struct image_concrete< internal::transformed_image<I, UnaryFunction, b> >
+  {
+    typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type __vtype;
+    typedef typename std::decay<__vtype>::type                             value_type;
+
+    typedef mln_ch_value(typename std::remove_reference<I>::type, value_type) type;
+  };
+
+  namespace internal
+  {
+    template <class I, class UnaryFunction, bool b>
+    struct image_init_from< transformed_image<I, UnaryFunction, b> >
+    {
+      typedef typename image_init_from<typename std::decay<I>::type>::type type;
+    };
+  }
 
   /******************************************/
   /****          Implementation          ****/
@@ -181,6 +198,27 @@ namespace mln
           m_fun(f)
       {
       }
+
+
+      friend
+      internal::initializer<mln_concrete(transformed_image),
+                            typename internal::image_init_from<transformed_image>::type>
+      imconcretize(const transformed_image& f)
+      {
+        using mln::imchvalue;
+        return std::move(imchvalue<value_type>(f.m_ima));
+      }
+
+      template <typename V>
+      friend
+      internal::initializer<mln_ch_value(transformed_image, V),
+                            typename internal::image_init_from<transformed_image>::type>
+      imchvalue(const transformed_image& f)
+      {
+        using mln::imchvalue;
+        return std::move(imchvalue<V>(f.m_ima));
+      }
+
 
       const_value_range
       values() const

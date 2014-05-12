@@ -15,6 +15,8 @@
 namespace mln {
 
   template <typename I> struct Image;
+  template <typename I> struct Image_;
+  template <typename I> struct ConcreteImage;
   template <typename I> struct IterableImage;
   template <typename I> struct IndexableImage;
   template <typename I> struct AccessibleImage;
@@ -22,32 +24,47 @@ namespace mln {
   template <typename I>
   struct Image : Object_<I>
   {
-
     BOOST_CONCEPT_USAGE(Image)
     {
+      BOOST_CONCEPT_ASSERT((Image_<I>));
+    }
+
+  };
+
+  template <typename I>
+  struct Image_
+  {
+    typedef image_traits<I> traits;
+
+    typedef typename traits::accessible   accessible;
+    typedef typename traits::category     category;
+    typedef typename traits::concrete     concrete;
+    typedef typename traits::indexable    indexable;
+    typedef typename traits::extension    extension;
+
+    typedef typename I::value_type         value;
+    typedef typename I::reference          reference;
+    typedef typename I::const_reference    const_reference;
+    typedef typename I::pixel_type         pixel;
+    typedef typename I::const_pixel_type   const_pixel;
+
+
+    typedef typename I::site_type          site_type;
+    typedef typename I::point_type         point_type;
+    typedef typename I::domain_type        domain_type;
+
+    BOOST_CONCEPT_ASSERT((Pixel<pixel>));
+    BOOST_CONCEPT_ASSERT((Pixel<const_pixel>));
+
+    BOOST_CONCEPT_USAGE(Image_)
+    {
       check(std::is_base_of< Image<I>, I > ());
+      // FIXME: to relax, an image can return an rvalue for the domain
+      // const domain_type& (I::*method) () const = &I::domain;
+      // (void) method;
 
-      typedef image_traits<I> traits;
-
-      typedef typename traits::accessible   accessible;
-      typedef typename traits::category     category;
-      typedef typename traits::concrete     concrete;
-      typedef typename traits::indexable    indexable;
-      typedef typename traits::extension    extension;
-
-      typedef typename I::value_type         value;
-      typedef typename I::reference          reference;
-      typedef typename I::const_reference    const_reference;
-      typedef typename I::pixel_type         pixel;
-      typedef typename I::const_pixel_type   const_pixel;
-
-
-      typedef typename I::site_type          site_type;
-      typedef typename I::point_type         point_type;
-      typedef typename I::domain_type        domain_type;
-
-      const domain_type& (I::*method) () const = &I::domain;
-      (void) method;
+      domain_type dom = ima.domain();
+      (void) dom;
 
       check(std::is_convertible<typename pixel::value_type, value> ());
       check(std::is_same<typename pixel::reference, reference> ());
@@ -55,32 +72,82 @@ namespace mln {
       check(std::is_same<typename const_pixel::reference, const_reference> ());
       check(std::is_convertible<pixel, const_pixel> ());
 
-
-      BOOST_CONCEPT_ASSERT((Pixel<pixel>));
-      BOOST_CONCEPT_ASSERT((Pixel<const_pixel>));
+      {
+        mln_concrete(I)       __ima2 = imconcretize(ima);
+        mln_ch_value(I, int)  __ima3 = imchvalue<int>(ima);
+      }
 
       MLN_CONCEPT_BEGIN_CHECK_IF()
-	BOOST_CONCEPT_ASSERT((IterableImage<I>));
+        BOOST_CONCEPT_ASSERT((ConcreteImage<I>));
+      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::concrete::value));
+
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+        BOOST_CONCEPT_ASSERT((IterableImage<I>));
       MLN_CONCEPT_END_CHECK_IF((std::is_convertible<category, forward_image_tag>::value));
 
       MLN_CONCEPT_BEGIN_CHECK_IF()
-	BOOST_CONCEPT_ASSERT((IndexableImage<I>));
+        BOOST_CONCEPT_ASSERT((IndexableImage<I>));
       MLN_CONCEPT_END_CHECK_IF((image_traits<I>::indexable::value));
 
       MLN_CONCEPT_BEGIN_CHECK_IF()
-	BOOST_CONCEPT_ASSERT((AccessibleImage<I>));
+        BOOST_CONCEPT_ASSERT((AccessibleImage<I>));
       MLN_CONCEPT_END_CHECK_IF((image_traits<I>::accessible::value));
 
       MLN_CONCEPT_BEGIN_CHECK_IF()
         BOOST_CONCEPT_ASSERT((Extension<typename I::extension_type>));
       MLN_CONCEPT_END_CHECK_IF((image_has_extension<I>::value));
-
-
     }
+
+  private:
+    I ima;
   };
 
+
   template <typename I>
-  struct AccessibleImage : Image<I>
+  struct ConcreteImage : Image_<I>
+  {
+  public:
+    typedef typename image_traits<I>::concrete concrete;
+
+    static_assert(concrete::value, "Image must be concrete");
+
+    BOOST_CONCEPT_USAGE(ConcreteImage)
+    {
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+        {
+          mln_value(I) val;
+          I f = *((I*)0);
+          I g(f, mln::init ());
+          I h(f, val);
+        }
+      MLN_CONCEPT_END_CHECK_IF((not image_has_border<I>::value));
+
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+        {
+          mln_value(I) val;
+          I f = *((I*)0);
+          I g(f, mln::init ());
+          I h(f, f.border());
+          I i(f, f.border(), val);
+        }
+      MLN_CONCEPT_END_CHECK_IF((image_has_border<I>::value));
+
+      MLN_CONCEPT_BEGIN_CHECK_IF()
+        {
+          typedef typename I::size_type size_type;
+          void (I::*ptr) (size_type) = &I::reindex;
+          (void) ptr;
+        }
+      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::indexable::value));
+    }
+
+  private:
+    typename I::domain_type domain;
+  };
+
+
+  template <typename I>
+  struct AccessibleImage : Image_<I>
   {
   public:
     typedef typename image_traits<I>::accessible accessible;
@@ -92,18 +159,24 @@ namespace mln {
       typedef typename I::point_type        point_type;
       typedef typename I::reference         reference;
       typedef typename I::const_reference   const_reference;
+      typedef typename I::pixel_type        pixel_type;
+      typedef typename I::const_pixel_type  const_pixel_type;
 
       reference (I::*ptr) (const point_type&) = &I::operator();
       const_reference (I::*ptr2) (const point_type&) const = &I::operator();
       reference (I::*ptr3) (const point_type&) = &I::at;
       const_reference (I::*ptr4) (const point_type&) const = &I::at;
+      pixel_type (I::*ptr5) (const point_type&) = &I::pixel;
+      const_pixel_type (I::*ptr6) (const point_type&) const = &I::pixel;
+
       (void) ptr; (void) ptr2; (void) ptr3; (void) ptr4;
+      (void) ptr5; (void) ptr6;
     }
   };
 
 
   template <typename I>
-  struct IndexableImage
+  struct IndexableImage : Image_<I>
   {
   public:
     typedef typename image_traits<I>::indexable indexable;
@@ -130,7 +203,7 @@ namespace mln {
 
 
   template <typename I>
-  struct IterableImage : Image<I>
+  struct IterableImage : Image_<I>
   {
   public:
     typedef typename image_traits<I>::category category;

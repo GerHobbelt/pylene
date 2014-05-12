@@ -12,21 +12,34 @@ namespace mln
   template <class Domain, class V>
   struct constant_image;
 
-  /******************************************/
-  /****          Implementation          ****/
-  /******************************************/
 
+  /******************************************/
+  /****              Traits              ****/
+  /******************************************/
 
   template <class Domain, class V>
   struct image_traits< constant_image<Domain, V> >
   {
     typedef std::false_type		concrete;
-    typedef forward_image_tag		category;
+    typedef forward_image_tag	category;
     typedef std::true_type		accessible;
     typedef std::true_type		indexable;
     typedef mln::extension::value_extension_tag extension;
   };
 
+  namespace internal
+  {
+    template <class Domain, class V>
+    struct image_init_from< constant_image<Domain, V> >
+    {
+      typedef Domain type;
+    };
+  }
+
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
 
   template <class Domain, class V>
   struct constant_image : image_base< constant_image<Domain, V>,
@@ -53,7 +66,7 @@ namespace mln
 						V, V>
     {
       const_value_iterator(const piter& x, const V& value)
-	: m_x(x), m_value(value)
+        : m_x(x), m_value(value)
       {
       }
       void init() { m_x.init(); }
@@ -169,6 +182,22 @@ namespace mln
     {
     }
 
+    friend
+    internal::initializer<mln_concrete(constant_image),
+                          Domain>
+    imconcretize(const constant_image& f)
+    {
+      return { f.m_domain };
+    }
+
+    template <typename T>
+    friend
+    internal::initializer<mln_ch_value(constant_image, T),
+                          Domain>
+    imchvalue(const constant_image& f)
+    {
+      return { f.m_domain };
+    }
 
     const domain_type&
     domain() const
@@ -223,6 +252,31 @@ namespace mln
     {
       return m_value;
     }
+
+    pixel_type
+    pixel(const point_type& p)
+    {
+      return pixel_type(this, p, m_value);
+    }
+
+    const_pixel_type
+    pixel(const point_type& p) const
+    {
+      return const_pixel_type(this, p, m_value);
+    }
+
+    pixel_type
+    pixel_at(const point_type& p)
+    {
+      return pixel_type(this, p, m_value);
+    }
+
+    const_pixel_type
+    pixel_at(const point_type& p) const
+    {
+      return const_pixel_type(this, p, m_value);
+    }
+
 
     constexpr
     V operator [] (size_type) const

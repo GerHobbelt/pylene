@@ -5,6 +5,7 @@
 # include <mln/core/neighborhood/neighborhood.hpp>
 # include <mln/morpho/canvas/unionfind.hpp>
 # include <mln/core/always.hpp>
+# include <mln/core/trace.hpp>
 
 namespace mln
 {
@@ -78,10 +79,8 @@ namespace mln
       const I& ima = exact(ima_);
       const N& nbh = exact(nbh_);
 
-      mln_concrete(I) extinction;
-      mln_ch_value(I, mln_point(I)) amin;
-      resize(extinction, ima);
-      resize(amin, ima);
+      mln_concrete(I) extinction = imconcretize(ima);
+      mln_ch_value(I, mln_point(I)) amin = imchvalue<mln_point(I)>(ima);
 
 
       internal::extinction_dynamic_ufind_visitor<I, Compare>

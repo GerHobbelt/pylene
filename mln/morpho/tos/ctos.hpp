@@ -143,7 +143,7 @@ namespace mln
       // f: image of interval in Khalimsky space
       // K: image of value in Khalimsky that tells at which a level a point is inserted
       mln_ch_value(I, R) f = tos::internal::immerse(ima, cmp);
-      mln_concrete(I) K;
+      mln_concrete(I) K(f, mln::init());
 
 
       component_tree<size_type, mln_ch_value(I, unsigned)> tree;
@@ -151,10 +151,8 @@ namespace mln
       auto& S = tree._get_data()->m_S;
       auto& pmap = tree._get_data()->m_pmap;
 
-
       S.reserve(f.domain().size());
-      resize(pmap, f).init(UNPROCESSED);
-      resize(K, f);
+      pmap = imchvalue<unsigned>(f).init(UNPROCESSED);
       extension::fill(pmap, PROCESSED);
 
       typedef typename std::conditional<not use_priority,

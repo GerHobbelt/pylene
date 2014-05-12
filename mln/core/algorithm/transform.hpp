@@ -95,9 +95,7 @@ namespace mln {
       typename std::result_of<UnaryFunction(mln_value(InputImage))>::type
       >::type T;
 
-    mln_ch_value(InputImage, T) out;
-    resize(out, input);
-
+    mln_ch_value(InputImage, T) out = imchvalue<T>(input);
     mln::transform(input, f, out);
     return out;
   }

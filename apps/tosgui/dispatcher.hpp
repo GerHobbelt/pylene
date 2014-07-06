@@ -4,7 +4,7 @@
 # include <utility>
 # include <vector>
 # include "qattribute.hpp"
-# include <mln/qt/mainwin.hpp>
+# include <mln/qt/imageviewer.hpp>
 # include "plotwindow.hpp"
 
 namespace mln
@@ -20,8 +20,8 @@ namespace mln
 		const image2d<unsigned>& parent,
 		const std::vector<unsigned>& S);
 
-    void addImageWindow(qt::MainWindowBase* win);
-    void addImageWindowToFilter(qt::MainWindowBase* win, const image2d<rgb8>& mean);
+    void addImageWindow(qt::ImageViewer* win);
+    void addImageWindowToFilter(qt::ImageViewer* win, const image2d<rgb8>& mean);
     //void addAttribute(QAttributeBase* attr);
     void setPlotWindow(PlotWindow* pltwin);
 
@@ -31,8 +31,8 @@ namespace mln
     void onPointSelected(const mln::point2d& p);
 
   private:
-    void doNodeSection(qt::MainWindowBase*);
-    void doFiltering(std::pair<qt::MainWindowBase*, image2d<rgb8> >& obj);
+    void doNodeSection(qt::ImageViewer*);
+    void doFiltering(std::pair<qt::ImageViewer*, image2d<rgb8> >& obj);
 
     const image2d<unsigned>&	 m_parent;
     const std::vector<unsigned>& m_S;
@@ -42,8 +42,8 @@ namespace mln
     image2d<bool>		 m_mask_selection;
     //std::vector<QAttributeBase*> m_attributes;
     PlotWindow*			 m_pltwin;
-    std::vector<qt::MainWindowBase*> m_windows;
-    std::vector< std::pair<qt::MainWindowBase*, image2d<rgb8> > > m_fwins;
+    std::vector<qt::ImageViewer*> m_windows;
+    std::vector< std::pair<qt::ImageViewer*, image2d<rgb8> > > m_fwins;
   };
 
 

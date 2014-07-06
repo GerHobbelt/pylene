@@ -5,7 +5,7 @@
 #include <QtGui>
 #include <QSlider>
 
-#include <mln/qt/mainwin.hpp>
+#include <mln/qt/imageviewer.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/accu/accumulators/minmax.hpp>
 
@@ -118,7 +118,7 @@ private:
   image2d<float>	m_ori;
   const image2d<rgb8>*	m_ref;
   image2d<rgb8>		m_ima;
-  qt::MainWindow<rgb8>	m_win;
+  qt::ImageViewer	m_win;
   QSlider		m_slider;
 };
 

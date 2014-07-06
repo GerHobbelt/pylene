@@ -13,7 +13,7 @@
 #include <apps/tos/addborder.hpp>
 //#include <apps/tos/objdetection.hpp>
 //#include <apps/attributes/MSER.hpp>
-#include <mln/qt/mainwin.hpp>
+#include <mln/qt/imageviewer.hpp>
 #include "qattribute.hpp"
 #include "dispatcher.hpp"
 #include "plotwindow.hpp"
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
   auto Kui8 = transform(K, [](const UInt<9>& v) -> uint8 {
       return v / 2;
     });
-  qt::MainWindow<uint8> w1(Kui8);
-  qt::MainWindow<uint8> w2(Kui8);
+  qt::ImageViewer w1(Kui8);
+  qt::ImageViewer w2(Kui8);
 
   w1.show();
   w2.show();

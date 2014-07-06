@@ -12,7 +12,7 @@
 #include <mln/morpho/tos/tos.hpp>
 #include <mln/morpho/filtering.hpp>
 
-#include <mln/qt/mainwin.hpp>
+#include <mln/qt/imageviewer.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/gradient.hpp>
@@ -143,15 +143,15 @@ int main(int argc, char** argv)
   image2d<float> energy = compute_energy(f, K, parent, S, imacc);
   image2d<float> cenergy = close(energy, K, parent, S);
 
-  qt::MainWindow<uint8> w1(Kui8);
+  qt::ImageViewer w1(Kui8);
   w1.show();
 
   auto f2 = interpolate_k1(f);
-  qt::MainWindow<rgb8> w2(f2);
+  qt::ImageViewer w2(f2);
   w2.show();
 
   auto mean = set_mean_on_node(f2, K, S, parent);
-  qt::MainWindow<rgb8> w3(f2);
+  qt::ImageViewer w3(f2);
   w3.show();
 
 

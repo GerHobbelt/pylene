@@ -5,7 +5,7 @@ link_libraries(-lfreeimage)
 
 
 QT4_WRAP_CPP(dispsaliency_HEADERS_MOC
-  ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.hpp
+  ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hpp
   dispsaliency.hpp
   )
 
@@ -13,8 +13,7 @@ QT4_WRAP_CPP(dispsaliency_HEADERS_MOC
 add_executable(dispsaliency dispsaliency.cpp
                       ${dispsaliency_HEADERS_MOC}
                       ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.cpp
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/graphics_pixmap_item.cpp
+                      ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.cpp
 		      )
 
 
@@ -28,4 +27,4 @@ add_executable(saliency saliency.cpp
 
 target_link_libraries(saliency ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-add_executable(tosview tosview.cpp)
+#add_executable(tosview tosview.cpp)

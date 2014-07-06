@@ -11,7 +11,7 @@ link_libraries(-lfreeimage)
 
 
 QT4_WRAP_CPP(tosgui_HEADERS_MOC
-  ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.hpp
+  ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hpp
   qattribute.hpp
   dispatcher.hpp
   plotwindow.hpp
@@ -22,15 +22,13 @@ QT4_WRAP_CPP(tosgui_HEADERS_MOC
 add_executable(tosgui tosgui.cpp qattribute.cpp dispatcher.cpp plotwindow.cpp attribute.cpp
                       ${tosgui_HEADERS_MOC}
                       ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.cpp
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/graphics_pixmap_item.cpp
+                      ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.cpp
 		      )
 
 add_executable(toscgui toscgui.cpp qattribute.cpp dispatcher.cpp
                       ${tosgui_HEADERS_MOC}
                       ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/mainwin.cpp
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/graphics_pixmap_item.cpp
+                      ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.cpp
 		      )
 
 

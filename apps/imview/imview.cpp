@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include <mln/qt/mainwin.hpp>
+#include <mln/qt/imageviewer.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 
@@ -15,7 +15,7 @@ int main(int argc, char** argv)
   image2d<uint8> ima;
   io::imread(argv[1], ima);
 
-  qt::MainWindow<uint8> main(ima);
+  qt::ImageViewer main(ima);
   main.show();
 
   // QImage image("../../../img/small.pgm");

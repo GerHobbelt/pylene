@@ -95,8 +95,8 @@ namespace mln
   template <class I0, class... I>
   struct image_concrete< zip_image<I0, I...> >
   {
-    typedef std::tuple<typename std::decay<mln_reference(I0)>::type,
-                       typename std::decay<mln_reference(I)>::type...> vtype;
+    typedef std::tuple<typename std::decay<mln_value(I0)>::type,
+                       typename std::decay<mln_value(I)>::type...> vtype;
     typedef mln_ch_value(I0, vtype) type;
   };
 
@@ -425,7 +425,7 @@ namespace mln
     typedef typename I0::domain_type			domain_type;
     typedef std::tuple<mln_reference(Images)...>	reference;
     typedef std::tuple<mln_creference(Images)...>	const_reference;
-    typedef std::tuple<typename std::decay<mln_reference(Images)>::type...>	value_type;
+    typedef std::tuple<typename std::decay<mln_value(Images)>::type...>            value_type;
 
     typedef zip_range<vrange_tuple>						value_range;
     typedef zip_range<cvrange_tuple>						const_value_range;

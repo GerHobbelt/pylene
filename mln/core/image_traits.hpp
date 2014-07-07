@@ -78,6 +78,7 @@ namespace mln
     typedef typename image_traits<Image>::extension type;
   };
 
+
   template <typename Image>
   struct image_extension_type
   {
@@ -95,6 +96,22 @@ namespace mln
   struct image_has_border :
     std::is_convertible<typename image_traits<Image>::extension,
                         mln::extension::border_extension_tag>
+  {
+  };
+
+
+  template <typename I,
+            typename has_extension = typename image_has_extension<I>::type>
+  struct image_extension_traits
+  {
+    typedef std::false_type      support_fill;
+    typedef std::false_type      support_mirror;
+    typedef std::false_type      support_periodize;
+  };
+
+
+  template <typename I>
+  struct image_extension_traits<I, std::true_type> : extension_traits<typename I::extension_type>
   {
   };
 

@@ -102,7 +102,6 @@ namespace mln {
     I ima;
   };
 
-
   template <typename I>
   struct ConcreteImage : Image_<I>
   {
@@ -132,6 +131,7 @@ namespace mln {
         }
       MLN_CONCEPT_END_CHECK_IF((image_has_border<I>::value));
 
+
       MLN_CONCEPT_BEGIN_CHECK_IF()
         {
           typedef typename I::size_type size_type;
@@ -141,10 +141,7 @@ namespace mln {
       MLN_CONCEPT_END_CHECK_IF((image_traits<I>::indexable::value));
     }
 
-  private:
-    typename I::domain_type domain;
   };
-
 
   template <typename I>
   struct AccessibleImage : Image_<I>

@@ -2,15 +2,15 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/extension/fill.hpp>
+#include <mln/core/extension/mirror.hpp>
 
 #define BOOST_TEST_MODULE Core
 #include <boost/test/unit_test.hpp>
 
-
 BOOST_AUTO_TEST_SUITE(_image2d)
 
 
-BOOST_AUTO_TEST_CASE(extension)
+BOOST_AUTO_TEST_CASE(extension_fill)
 {
   using namespace mln;
 
@@ -43,6 +43,30 @@ BOOST_AUTO_TEST_CASE(extension)
     }
 }
 
+BOOST_AUTO_TEST_CASE(extension_mirror)
+{
+  using namespace mln;
 
+  image2d<int> ima(5,5);
+  iota(ima, 1);
+
+  mln::extension::mirror(ima);
+  box2d dom = {{-3,-3}, {8,8}};
+
+  // MIRROR f(p) = f(n - |p % 2n - n|
+  {
+    mln_foreach(point2d p, dom)
+      {
+        point2d q = p % 10;
+        q[0] = q[0] < 0 ? q[0] + 10 : q[0];
+        q[1] = q[1] < 0 ? q[1] + 10 : q[1]; // because c++ modulo rounds toward 0 (also for neg) 
+        q[0] = q[0] < 5 ? q[0] : 9 - q[0];
+        q[1] = q[1] < 5 ? q[1] : 9 - q[1];
+
+        BOOST_CHECK(ima.at(p) == ima.at(q));
+      }
+  }
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()

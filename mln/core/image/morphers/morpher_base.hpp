@@ -218,7 +218,8 @@ namespace mln
     typedef typename image_const_pixel_range<image_t>::type	const_pixel_range;
 
 
-    const domain_type& domain() const
+    auto domain() const
+      -> decltype(morpher_core_access::get_ima(this).domain())
     {
       return morpher_core_access::get_ima(this).domain();
     }

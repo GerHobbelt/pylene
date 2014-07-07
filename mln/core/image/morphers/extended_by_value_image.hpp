@@ -278,7 +278,8 @@ namespace mln
     typename std::enable_if<image_traits<image_t>::accessible::value, pixel_type>::type
     pixel (const point_type& p)
     {
-      // FIXME: this is wrong
+      // FIXME: this is wrong: it depends if we are in the domain or not
+      mln_precondition(false);
       return {*this,  m_ima.pixel(p)};
     }
 
@@ -286,7 +287,8 @@ namespace mln
     typename std::enable_if<image_traits<image_t>::accessible::value, const_pixel_type>::type
     pixel (const point_type& p) const
     {
-      // FIXME: this is wrong
+      // FIXME: this is wrong: it depends if we are in the domain or not
+      mln_precondition(false);
       return {*this,  m_ima.pixel(p)};
     }
 

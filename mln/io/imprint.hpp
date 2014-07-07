@@ -111,7 +111,7 @@ namespace mln
         for (p[0] = domain.pmin[0]-border; p[0] < domain.pmax[0]+border; ++p[0]) {
           for (p[1] = domain.pmin[1]-border; p[1] < domain.pmax[1]+border; ++p[1]) {
             os << std::setw(wtext);
-            format(os, ima(p)) << " ";
+            format(os, ima.at(p)) << " ";
           }
           os << std::endl;
         }

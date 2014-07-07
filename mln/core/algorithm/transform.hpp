@@ -2,7 +2,7 @@
 # define MLN_CORE_ALGORITHM_TRANSFORM_HPP
 
 # include <mln/core/image/image.hpp>
-
+# include <mln/core/trace.hpp>
 /// \file
 
 namespace mln {
@@ -71,7 +71,9 @@ namespace mln {
   transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>& output)
   {
     OutputImage& out = exact(output);
+    mln_entering("mln::transform");
     impl::transform(exact(input), f, exact(output));
+    mln_exiting();
     return out;
   }
 

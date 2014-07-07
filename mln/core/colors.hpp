@@ -49,11 +49,11 @@ namespace mln
   typedef bgr<uint8> bgr8;
   typedef bgr<uint16> bgr16;
 
-
-  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(red,   (mln::getter<0, const rgb8&>), (mln::getter<0, rgb8&>));
-  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(green, (mln::getter<1, const rgb8&>), (mln::getter<1, rgb8&>));
-  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(blue,  (mln::getter<2, const rgb8&>), (mln::getter<2, rgb8&>));
-
 }
+
+MLN_DECLARE_IMAGE_LVALUE_OPERATOR(red,   (mln::rgb8), (mln::getter<0, const mln::rgb8&>), (mln::getter<0, mln::rgb8&>));
+MLN_DECLARE_IMAGE_LVALUE_OPERATOR(green, (mln::rgb8), (mln::getter<1, const mln::rgb8&>), (mln::getter<1, mln::rgb8&>));
+MLN_DECLARE_IMAGE_LVALUE_OPERATOR(blue,  (mln::rgb8), (mln::getter<2, const mln::rgb8&>), (mln::getter<2, mln::rgb8&>));
+
 
 #endif // !MLN_CORE_COLORS_HPP

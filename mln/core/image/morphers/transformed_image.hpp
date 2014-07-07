@@ -33,37 +33,64 @@ namespace mln
   template <typename I, class UnaryFunction>
   transformed_image<I&, UnaryFunction>
   imtransform(Image<I>& ima, const UnaryFunction& f);
+}
 
   /******************************************/
   /****           HELPER MACROS          ****/
   /******************************************/
 
-# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(NAME, F_CONSTREF, F_REF)	\
+# define  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F)             \
+  namespace mln { namespace internal {                                  \
+                                                                        \
+  template <typename I>                                                 \
+  transformed_image<I, BOOST_PP_TUPLE_REM () F, false>                  \
+  NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)                  \
+  {                                                                     \
+    BOOST_PP_TUPLE_REM () F f;                                          \
+    return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f); \
+  }                                                                     \
+  } }
+
+# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(NAME, TYPE, F_CONSTREF, F_REF) \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F_REF);                \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME##_const, TYPE, F_CONSTREF);
+
+# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F_CONSTREF, F_REF) \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F_REF);                \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME##_const, TYPE, F_CONSTREF);   \
+                                                                        \
+  namespace mln {                                                       \
+                                                                        \
   template <typename I>							\
-  internal::transformed_image<I, BOOST_PP_TUPLE_REM () F_REF, false>				\
-  NAME(Image<I>&& ima, const BOOST_PP_TUPLE_REM () F_REF& f = BOOST_PP_TUPLE_REM () F_REF ()) \
+  internal::transformed_image<I, BOOST_PP_TUPLE_REM () F_REF, false>    \
+  NAME(Image<I>&& ima)                                                  \
   {									\
-    return internal::transformed_image<I, BOOST_PP_TUPLE_REM () F_REF, false>(move_exact<I>(ima), f); \
+    return internal::NAME##_helper(move_exact<I>(ima), (mln_value(I)*)NULL); \
   }									\
 									\
   template <typename I>							\
   internal::transformed_image<I&, BOOST_PP_TUPLE_REM () F_REF, false>	\
-  NAME(Image<I>& ima, const BOOST_PP_TUPLE_REM () F_REF& f = BOOST_PP_TUPLE_REM () F_REF ()) \
+  NAME(Image<I>& ima)                                                   \
   {									\
-    return internal::transformed_image<I&, BOOST_PP_TUPLE_REM () F_REF, false>(exact(ima), f); \
+    return internal::NAME##_helper(exact(ima), (mln_value(I)*) NULL);   \
   }									\
   									\
   template <typename I>							\
-  internal::transformed_image<const I&, BOOST_PP_TUPLE_REM () F_CONSTREF, false>	\
-  NAME(const Image<I>& ima, const BOOST_PP_TUPLE_REM () F_CONSTREF& f = BOOST_PP_TUPLE_REM () F_CONSTREF ()) \
+  internal::transformed_image<const I&, BOOST_PP_TUPLE_REM () F_CONSTREF, false> \
+  NAME(const Image<I>& ima)                                             \
   {									\
-    return internal::transformed_image<const I&, BOOST_PP_TUPLE_REM () F_CONSTREF, false>(exact(ima), f); \
-  }
+    return internal::NAME##_const_helper(exact(ima), (mln_value(I)*) NULL); \
+  }                                                                     \
+                                                                        \
+  }                                                                     \
+
 
 
   /******************************************/
   /****              Traits              ****/
   /******************************************/
+namespace mln
+{
 
   template <typename I, class UnaryFunction, bool b>
   struct image_traits< internal::transformed_image<I, UnaryFunction, b> >

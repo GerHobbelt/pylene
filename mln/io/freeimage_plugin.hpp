@@ -5,6 +5,7 @@
 # include <mln/io/stream_wrapper.hpp>
 # include <mln/core/grays.hpp>
 # include <mln/core/colors.hpp>
+# include <mln/colors/rgba.hpp>
 # include <unordered_map>
 # include <FreeImage.h>
 
@@ -33,8 +34,14 @@ namespace mln
 
     private:
       void _load();
-      void read_next_line_rgb(void* out);
-      void read_next_pixel_rgb(void* out);
+      template <class colortype, class FI_type> void read_next_line_rgb(void* out);
+      template <class colortype, class FI_type> void read_next_pixel_rgb(void* out);
+      template <class colortype, class FI_type> void read_next_line_rgba(void* out);
+      template <class colortype, class FI_type> void read_next_pixel_rgba(void* out);
+      void read_next_line_rgb8(void* out);
+      void read_next_pixel_rgb8(void* out);
+      void read_next_line_rgba8(void* out);
+      void read_next_pixel_rgba8(void* out);
       void read_next_line_gray(void* out);
       void read_next_pixel_gray(void* out);
       void read_next_line_bool(void* out);
@@ -204,9 +211,17 @@ namespace mln
           case FIT_DOUBLE:
             m_vtype = typeid(double);
             break;
+          case FIT_RGB16:
+            m_vtype = typeid(rgb16);
+            break;
+          case FIT_RGBA16:
+            m_vtype = typeid(colors::rgba16);
+            break;
           default:
             goto error;
         }
+      // For any non-bitmap or 8-bit bitmap type, we simply memcpy the pixel
+      // because the underlying FreeImage value type is the same as our.
       if (type != FIT_BITMAP or bppp == 8)
         {
           m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_gray,
@@ -215,6 +230,10 @@ namespace mln
                                         this, std::placeholders::_1);
         }
 
+      // We only need to take care of those special cases:
+      // * 8-bit RGB[A] (because Freeimage value type ordering is OS dependant)
+      // * 1-bit monochrome bitmap
+      // * 4-bit bitmap
       if (type == FIT_BITMAP)
         {
           switch (bppp)
@@ -238,12 +257,23 @@ namespace mln
             case 24:
               if (colortype == FIC_RGB) {
                 m_vtype = typeid(rgb8);
-                m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_rgb,
+                m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_rgb8,
                                              this, std::placeholders::_1);
-                m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_rgb,
+                m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_rgb8,
                                               this, std::placeholders::_1);
                 break;
               }
+              goto error;
+            case 32:
+              if (colortype == FIC_RGBALPHA) {
+                m_vtype = typeid(colors::rgba8);
+                m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_rgba8,
+                                             this, std::placeholders::_1);
+                m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_rgba8,
+                                              this, std::placeholders::_1);
+                break;
+              }
+
             default:
               goto error;
             }
@@ -346,8 +376,23 @@ namespace mln
 
     // 24-bit DIBs have every 3 bytes representing a color, using the
     // same ordering as the RGBTRIPLE structure.
+    template <class colortype, class FI_type>
     inline
     void freeimage_reader_plugin::read_next_line_rgb(void* out)
+    {
+      colortype* buffer = (colortype*) out;
+      FI_type* ptr = (FI_type*) m_ptr;
+      for (int y = 0; y < m_domain.pmax[1]; ++y, ++ptr)
+        {
+          buffer[y][0] = ptr->red;
+          buffer[y][1] = ptr->green;
+          buffer[y][2] = ptr->blue;
+        }
+      m_ptr -= pitch;
+    }
+
+    inline
+    void freeimage_reader_plugin::read_next_line_rgb8(void* out)
     {
       rgb8* buffer = (rgb8*) out;
       for (int y = 0; y < m_domain.pmax[1]; y++)
@@ -359,14 +404,96 @@ namespace mln
       m_ptr -= pitch;
     }
 
+    template <class colortype, class FI_type>
     inline
     void freeimage_reader_plugin::read_next_pixel_rgb(void* out)
+    {
+      colortype* pixel = (colortype*) out;
+      FI_type* ptr = (FI_type*)(m_ptr);
+      (*pixel)[0] = ptr[y].red;
+      (*pixel)[1] = ptr[y].green;
+      (*pixel)[2] = ptr[y].blue;
+
+      if (++y == m_domain.pmax[1])
+        {
+          y = 0;
+          m_ptr -= pitch;
+        }
+    }
+
+    inline
+    void freeimage_reader_plugin::read_next_pixel_rgb8(void* out)
     {
       rgb8* pixel = (rgb8*) out;
       (*pixel)[0] = m_ptr[y * bpp + FI_RGBA_RED];
       (*pixel)[1] = m_ptr[y * bpp + FI_RGBA_GREEN];
       (*pixel)[2] = m_ptr[y * bpp + FI_RGBA_BLUE];
+      if (++y == m_domain.pmax[1])
+        {
+          y = 0;
+          m_ptr -= pitch;
+        }
+    }
 
+    // 32-bit DIBs have every 4 bytes representing a color, using the
+    // same ordering as the RGBQUAD structure.
+    template <class colortype, class FI_type>
+    inline
+    void freeimage_reader_plugin::read_next_line_rgba(void* out)
+    {
+      colortype* buffer = (colortype*) out;
+      FI_type* ptr = (FI_type*) m_ptr;
+      for (int y = 0; y < m_domain.pmax[1]; ++y, ++ptr)
+        {
+          buffer[y][0] = ptr->red;
+          buffer[y][1] = ptr->green;
+          buffer[y][2] = ptr->blue;
+          buffer[y][3] = ptr->alpha;
+        }
+      m_ptr -= pitch;
+    }
+
+    inline
+    void freeimage_reader_plugin::read_next_line_rgba8(void* out)
+    {
+      colors::rgba8* buffer = (colors::rgba8*) out;
+      for (int y = 0; y < m_domain.pmax[1]; y++)
+        {
+          buffer[y][0] = m_ptr[y * bpp + FI_RGBA_RED];
+          buffer[y][1] = m_ptr[y * bpp + FI_RGBA_GREEN];
+          buffer[y][2] = m_ptr[y * bpp + FI_RGBA_BLUE];
+          buffer[y][3] = m_ptr[y * bpp + FI_RGBA_ALPHA];
+        }
+      m_ptr -= pitch;
+    }
+
+
+    template <class colortype, class FI_type>
+    inline
+    void freeimage_reader_plugin::read_next_pixel_rgba(void* out)
+    {
+      colortype* pixel = (colortype*) out;
+      FI_type* ptr = (FI_type*) (m_ptr);
+      (*pixel)[0] = ptr[y].red;
+      (*pixel)[1] = ptr[y].green;
+      (*pixel)[2] = ptr[y].blue;
+      (*pixel)[3] = ptr[y].alpha;
+
+      if (++y == m_domain.pmax[1])
+        {
+          y = 0;
+          m_ptr -= pitch;
+        }
+    }
+
+    inline
+    void freeimage_reader_plugin::read_next_pixel_rgba8(void* out)
+    {
+      colors::rgba8* pixel = (colors::rgba8*) out;
+      (*pixel)[0] = m_ptr[y * bpp + FI_RGBA_RED];
+      (*pixel)[1] = m_ptr[y * bpp + FI_RGBA_GREEN];
+      (*pixel)[2] = m_ptr[y * bpp + FI_RGBA_BLUE];
+      (*pixel)[3] = m_ptr[y * bpp + FI_RGBA_ALPHA];
       if (++y == m_domain.pmax[1])
         {
           y = 0;

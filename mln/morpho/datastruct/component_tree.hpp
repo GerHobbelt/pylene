@@ -661,6 +661,21 @@ namespace mln
         return reverse_iterator(m_tree, m_node_id, m_ignore_root);
       }
 
+      size_type size() const
+      {
+        return m_tree->size();
+      }
+
+      bool has(const node_type& p) const
+      {
+        if (p.id() == npos())
+          return false;
+
+        return (p.tree().get_root_id() == m_node_id); // the same subtree
+        // FIXME: if they are not referring the same tree, we should check
+        // the current root is in the parenthood of p.
+      }
+
     private:
       const component_tree*	m_tree;
       vertex_id_t		m_node_id;

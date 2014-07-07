@@ -26,6 +26,12 @@ namespace mln
 	       const AccumulatorLike<Accu>& accu,
 	       bool require_ordering = true);
 
+    template <class P, class AssociativeMap, class Accu>
+    property_map< component_tree<P, AssociativeMap>,
+		  typename accu::result_of<Accu, P>::type >
+    accumulate_proper(const component_tree<P, AssociativeMap>& ctree,
+                      const AccumulatorLike<Accu>& accu);
+
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
@@ -64,7 +70,7 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
-		  typename accu::result_of<Accu, mln_pixel(I)>::type >
+		  typename accu::result_of<Accu, mln_cpixel(I)>::type >
     pixaccumulate(const component_tree<P, AssociativeMap>& ctree,
 		  const Image<I>& ima,
 		  const AccumulatorLike<Accu>& accu,
@@ -72,7 +78,7 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
-		  typename accu::result_of<Accu, mln_pixel(I)>::type >
+		  typename accu::result_of<Accu, mln_cpixel(I)>::type >
     pixaccumulate_proper(const component_tree<P, AssociativeMap>& ctree,
 			 const Image<I>& ima,
 			 const AccumulatorLike<Accu>& accu);
@@ -175,13 +181,31 @@ namespace mln
       return vmap;
     }
 
+    template <class P, class AssociativeMap,  class Accu>
+    property_map< component_tree<P, AssociativeMap>,
+		  typename accu::result_of<Accu, P>::type >
+    accumulate_proper(const component_tree<P, AssociativeMap>& tree,
+                      const AccumulatorLike<Accu>& accu_)
+    {
+      mln_entering("mln::morpho::accumulate");
+      auto acc = accu::make_accumulator(exact(accu_), P ());
+      typedef typename accu::result_of<Accu, P>::type R;
+      typedef component_tree<P, AssociativeMap> Tree;
+
+      property_map<Tree, R> vmap(tree);
+
+      auto pixfunctor = [](const mln_cpixel(AssociativeMap)& px) { return px.index(); };
+      impl::accumulate_proper_index(tree, tree._get_data()->m_pmap, acc, vmap, pixfunctor);
+      mln_exiting();
+      return vmap;
+    }
 
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
 		  typename accu::result_of<Accu, mln_value(I)>::type >
     vaccumulate(const component_tree<P, AssociativeMap>& tree,
-		const Image<I>& ima,
+		const Image<I>& ima_,
 		const AccumulatorLike<Accu>& accu_,
 		bool require_order)
     {
@@ -191,6 +215,7 @@ namespace mln
       typedef component_tree<P, AssociativeMap> Tree;
 
       property_map<Tree, R> vmap(tree);
+      const I& ima = exact(ima_);
 
       if (not require_order) {
 	auto pixfunctor = [](const mln_cpixel(I)& px) { return px.val(); };
@@ -280,14 +305,14 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
-		  typename accu::result_of<Accu, mln_point(I)>::type >
+		  typename accu::result_of<Accu, mln_cpixel(I)>::type >
     pixaccumulate(const component_tree<P, AssociativeMap>& tree,
 		  const Image<I>& ima_,
 		  const AccumulatorLike<Accu>& accu_,
 		  bool require_order)
     {
       mln_entering("mln::morpho::pixaccumulate");
-      auto acc = accu::make_accumulator(exact(accu_), mln_pixel(I) ());
+      auto acc = accu::make_accumulator(exact(accu_), mln_cpixel(I) ());
 
       typedef typename accu::result_of<Accu, mln_pixel(I)>::type R;
       typedef component_tree<P, AssociativeMap> Tree;
@@ -309,15 +334,15 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
-		  typename accu::result_of<Accu, mln_point(I)>::type >
+		  typename accu::result_of<Accu, mln_cpixel(I)>::type >
     pixaccumulate_proper(const component_tree<P, AssociativeMap>& tree,
 			 const Image<I>& ima,
 			 const AccumulatorLike<Accu>& accu_)
     {
       mln_entering("mln::morpho::pixaccumulate_proper");
-      auto acc = accu::make_accumulator(exact(accu_), mln_pixel(I) ());
+      auto acc = accu::make_accumulator(exact(accu_), mln_cpixel(I) ());
 
-      typedef typename accu::result_of<Accu, mln_pixel(I)>::type R;
+      typedef typename accu::result_of<Accu, mln_cpixel(I)>::type R;
       typedef component_tree<P, AssociativeMap> Tree;
       property_map<Tree, R> vmap(tree);
 

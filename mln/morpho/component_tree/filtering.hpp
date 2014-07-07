@@ -79,38 +79,54 @@ namespace mln
 
         auto data = tree._get_data();
 
-        property_map<tree_t, vertex_id_t> newrepr(tree);
+        property_map<tree_t, bool> alive(tree, true);
 
-        // forward
-        for (auto x = tree.get_root(); x.id() != tree.npos(); )
-          if (not pred[x])
-            {
-              vertex_id_t q = x.get_parent_id();
-              data->m_nodes[x.get_prev_node_id()].m_next = x.get_next_sibling_id();
-              data->m_nodes[x.get_next_sibling_id()].m_prev = x.get_prev_node_id();
+        // forward: update parent
+        for (auto x = tree.get_root(); x.id() != tree.npos();)
+          {
+            if (not pred[x])
+              {
+                vertex_id_t q = x.get_parent_id();
 
-              // unactive subtree.
-              auto end = x.next_sibling();
-              for (; x != end; x = x.next_node())
-                newrepr[x.id()] = q;
-            }
-          else
-            {
-              newrepr[x.id()] = x.id();
-              x = x.next_node();
-            }
+                // unactive subtree and set parent
+                auto end = x.next_sibling();
+                for (; x != end; x = x.next_node()) {
+                  alive[x] = false;
+                  data->m_nodes[x.id()].m_parent = q;
+                }
+              }
+            else
+              {
+                x = x.next_node();
+              }
+          }
 
-        // backward to update next_sibling relation
+        // backward update next-sibling and the dble-linked list
         mln_reverse_foreach(auto x, tree.nodes())
-          if (not pred[x.next_sibling()])
-            data->m_nodes[x.id()].m_next_sibling = x.next_sibling().get_next_sibling_id();
+          {
+            vertex_id_t snext = x.get_next_sibling_id();
+            if (not alive[snext]) {
+              snext = data->m_nodes[snext].m_next;
+              data->m_nodes[x.id()].m_next_sibling = snext;
+            }
+
+            if (not alive[x.id()]) {
+              data->m_nodes[x.get_prev_node_id()].m_next = x.get_next_node_id();
+              data->m_nodes[x.get_next_node_id()].m_prev = x.get_prev_node_id();
+            }
+
+            assert(alive[x.get_parent_id()]);
+            assert(alive[x.get_next_node_id()]);
+            assert(alive[x.get_next_sibling_id()]);
+          }
 
         // reaffect point to nodes
         mln_foreach (auto& v, data->m_pmap.values())
-          v = newrepr[v];
+          {
+            if (not alive[v])
+              v = data->m_nodes[v].m_parent;
+          }
       }
-
-
     }
 
 
@@ -122,7 +138,7 @@ namespace mln
       mln_entering("mln::morpho::filter_min_inplace");
 
       // even if pred is not increasing, as
-      // so as pred[n] is false, the subtree is removed.
+      // soon as pred[n] is false, the subtree is removed.
       internal::prune_inplace(tree, pred);
       mln_exiting();
     }
@@ -132,7 +148,7 @@ namespace mln
     filter_max_inplace(component_tree<P, Amap>& tree,
                        const PredicateMap& pred)
     {
-      mln_entering("mln::morpho::filter_direct_inplace");
+      mln_entering("mln::morpho::filter_max_inplace");
 
       typedef component_tree<P, Amap> tree_t;
       auto data = tree._get_data();
@@ -162,32 +178,40 @@ namespace mln
 
       auto data = tree._get_data();
 
-      property_map<tree_t, vertex_id_t> newrepr(tree);
-
-      // forward
+      // Forward: set parent
       for (auto x = tree.get_root(); x.id() != tree.npos(); x = x.next_node())
-        if (not pred[x.id()])
-          {
-            vertex_id_t q = x.get_parent_id();
+        {
+          vertex_id_t q = x.get_parent_id();
+          if (not pred[q])
+            data->m_nodes[x.id()].m_parent = data->m_nodes[q].m_parent;
+        }
+
+      // Backward: set other relation
+      mln_reverse_foreach(auto x, tree.nodes())
+        {
+          vertex_id_t nexts = x.get_next_sibling_id();
+          if (not pred[nexts])
+            {
+              nexts = data->m_nodes[nexts].m_next;
+              data->m_nodes[x.id()].m_next_sibling = nexts;
+            }
+          if (not pred[x.id()]) {
             data->m_nodes[x.get_prev_node_id()].m_next = x.get_next_node_id();
             data->m_nodes[x.get_next_node_id()].m_prev = x.get_prev_node_id();
-
-            // unactive this node.
-            newrepr[x.id()] = newrepr[q];
-          }
-        else
-          {
-            newrepr[x.id()] = x.id();
           }
 
-      // backward to update next_sibling relation
-      mln_reverse_foreach(auto x, tree.nodes())
-        if (not pred[x.get_next_sibling_id()])
-          data->m_nodes[x.id()].m_next_sibling = x.next_sibling().get_next_node_id();
+          // Take care of the sentinel
+          assert(x.get_parent_id() == tree.npos() or pred[x.get_parent_id()]);
+          assert(x.get_next_node_id() == tree.npos() or pred[x.get_next_node_id()]);
+          assert(x.get_next_sibling_id() == tree.npos() or pred[x.get_next_sibling_id()]);
+        }
 
       // reaffect point to nodes
-      mln_foreach (auto& v, data->m_pmap.values())
-        v = newrepr[v];
+      {
+        mln_foreach (auto& v, data->m_pmap.values())
+          if (not pred[v])
+            v = data->m_nodes[v].m_parent;
+      }
 
       mln_exiting();
     }

@@ -87,8 +87,8 @@ namespace mln
       template <class ImTreePropMap>
       friend struct image_tree_property_map_pixel;
 
-      template <class ImTreePropMap>
-      friend struct image_tree_property_map_pixel;
+      template <class, class, class>
+      friend struct image_tree_property_map;
 
 
       // Ranges & iterators
@@ -161,6 +161,8 @@ namespace mln
       typedef mln_point(ImTreePropMap)                  site_type;
       typedef typename ImTreePropMap::size_type         size_type;
 
+      friend struct ImTreePropMap::const_pixel_type;
+
       image_tree_property_map_pixel() = default;
       image_tree_property_map_pixel(ImTreePropMap* ima, size_type node_id)
         : m_ima(ima), m_index(node_id)
@@ -217,6 +219,10 @@ namespace mln
     template <class P, class AMap, class ValueMap>
     struct image_tree_property_map<P, AMap, ValueMap>::fun_cviter
     {
+      fun_cviter() = default;
+      fun_cviter(const self_t* self) : m_this(self) {};
+      fun_cviter(const fun_viter& other) : m_this(other.m_this) {}
+
       const_reference
       operator() (const point_type& node) const
       {
@@ -241,10 +247,14 @@ namespace mln
     template <class P, class AMap, class ValueMap>
     struct image_tree_property_map<P, AMap, ValueMap>::fun_cpixter
     {
+      fun_cpixter() = default;
+      fun_cpixter(const self_t* self) : m_this(self) {};
+      fun_cpixter(const fun_pixter& other) : m_this(other.m_this) {}
+
       const_pixel_type
       operator() (const point_type& node) const
       {
-        return pixel_type(m_this, node.id());
+        return const_pixel_type(m_this, node.id());
       }
 
       const self_t* m_this;

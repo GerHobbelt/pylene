@@ -14,9 +14,9 @@ namespace mln
   namespace morpho
   {
 
-    template <class P, class AMap, class V, class I>
+    template <class P, class AMap, class ValueMap, class I>
     void reconstruction(const component_tree<P, AMap>& tree,
-			const property_map< component_tree<P, AMap>, V >& pmap,
+			const ValueMap& vmap,
 			Image<I>& out);
 
 
@@ -26,25 +26,25 @@ namespace mln
 
     namespace impl
     {
-      template <class P, class AMap, class V, class I>
+      template <class P, class AMap, class ValueMap, class I>
       void reconstruction_index(const component_tree<P, AMap>& tree,
-				const property_map< component_tree<P, AMap>, V >& pmap,
+				const ValueMap& vmap,
 				I& out)
       {
         mln_pixter(px, out);
         mln_forall(px)
-          px->val() = pmap[tree.get_node_id(px->index())];
+          px->val() = vmap[tree.get_node_at(px->index())];
       }
 
     }
 
-    template <class P, class AMap, class V, class I>
+    template <class P, class AMap, class ValueMap, class I>
     void reconstruction(const component_tree<P, AMap>& tree,
-			const property_map< component_tree<P, AMap>, V >& pmap,
+			const ValueMap& vmap,
 			Image<I>& out)
     {
       mln_entering("mln::morpho::reconstruction");
-      impl::reconstruction_index(tree, pmap, exact(out));
+      impl::reconstruction_index(tree, vmap, exact(out));
       mln_exiting();
     }
 

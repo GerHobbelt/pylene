@@ -90,8 +90,7 @@ namespace mln
       {
         typedef T       argument_type;
         typedef SumType result_type;
-
-        //typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
+        typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
 
         friend
         SumType extract(const mean& accu, features::mean<SumType> )

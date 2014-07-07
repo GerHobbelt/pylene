@@ -49,7 +49,7 @@ namespace mln
     /// \endcode
     ///
     template <typename A, typename T>
-    unspecified make_accumulator(const AccumulatorLike<A>& accu, T arg);
+    unspecified make_accumulator(const AccumulatorLike<A>& accu, const T& arg);
 
     /// \brief Helper structure to get the return type of an accumulator-like object.
     /// It defines an internal member type named \p type which is the result type
@@ -70,15 +70,15 @@ namespace mln
 
 
 #   ifndef MLN_DOXYGEN
-    template <typename A, typename ...>
+    template <typename A, typename...>
     A& make_accumulator(Accumulator<A>& accu);
 
-    template <typename A, typename ...>
-    const A& make_accumulator(const Accumulator<A>& accu, ...);
+    template <typename A, typename T>
+    const A& make_accumulator(const Accumulator<A>& accu, const T&);
 
     template <typename F, typename T>
     typename F::template apply<T>::type
-    make_accumulator(const FeatureSet<F>& feat, T = T());
+    make_accumulator(const FeatureSet<F>& feat, const T& = T());
 
     struct default_extractor
     {
@@ -133,21 +133,21 @@ namespace mln
     template <typename A, typename ...>
     A& make_accumulator(Accumulator<A>& accu)
     {
-    return exact(accu);
-  }
+      return exact(accu);
+    }
 
-    template <typename A, typename ...>
-    const A& make_accumulator(const Accumulator<A>& accu, ...)
+    template <typename A, typename T>
+    const A& make_accumulator(const Accumulator<A>& accu, const T&)
     {
       return exact(accu);
     }
 
     template <typename F, typename T>
     typename F::template apply<T>::type
-    make_accumulator(const FeatureSet<F>& fs, T)
+    make_accumulator(const FeatureSet<F>& fs, const T&)
     {
-    return exact(fs).template make<T>();
-  }
+      return exact(fs).template make<T>();
+    }
 
   }
 

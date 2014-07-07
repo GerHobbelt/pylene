@@ -37,6 +37,15 @@ namespace mln
   using std::cbrt;
   using std::pow;
 
+  namespace functional
+  {
+    template <typename T = void> struct sqrt_t;
+    template <typename T = void> struct cbrt_t;
+    template <typename T = void> struct pow_t;
+    template <typename T = void> struct sqr_t;
+    template <typename T = void> struct abs_t;
+  };
+
 
   /* Reduction operators */
   int			sum(int x);
@@ -109,6 +118,16 @@ namespace mln
   double		l2norm(double x);
   long double		l2norm(long double x);
 
+  int			l2norm_sqr(int x);
+  long			l2norm_sqr(long n);
+  long long		l2norm_sqr(long long n);
+  unsigned int		l2norm_sqr(unsigned int x);
+  unsigned long		l2norm_sqr(unsigned long n);
+  unsigned long long	l2norm_sqr(unsigned long long n);
+  float			l2norm_sqr(float x);
+  double		l2norm_sqr(double x);
+  long double		l2norm_sqr(long double x);
+
   int			linfnorm(int x);
   long			linfnorm(long n);
   long long		linfnorm(long long n);
@@ -129,6 +148,18 @@ namespace mln
   template <unsigned p> double			lpnorm(double x);
   template <unsigned p> long double		lpnorm(long double x);
 
+  namespace functional
+  {
+    template <typename T = void> struct sum_t;
+    template <typename T = void> struct prod_t;
+    template <typename T = void> struct minimum_t;
+    template <typename T = void> struct maximum_t;
+    template <typename T = void> struct l0norm_t;
+    template <typename T = void> struct l1norm_t;
+    template <typename T = void> struct l2norm_t;
+    template <typename T = void> struct linfnorm_t;
+    template <unsigned p, typename T = void> struct lpnorm_t;
+  };
 
 
   /********************************/
@@ -141,6 +172,43 @@ namespace mln
 # define MLN_GEN_CODE_2(TEMPLATE, FUN, TYPE, OP)	\
   TEMPLATE inline TYPE FUN(TYPE x) { return OP; }
 
+# define MLN_FUNCTIONAL_GEN_CODE(FUN)                      \
+  namespace functional {                                   \
+  using mln::FUN;                                          \
+  template <typename T>                                    \
+  struct FUN##_t {                                         \
+    typedef decltype(FUN(std::declval<T>())) result_type;  \
+    auto operator() (const T& x) -> decltype(FUN(x))       \
+    { return FUN(x); }                                     \
+  };                                                       \
+  template <>                                              \
+  struct FUN##_t<void> {                                   \
+    template <typename T>                                  \
+    auto operator() (const T& x) -> decltype(FUN(x))       \
+    { return FUN(x); }                                     \
+  };                                                       \
+  }
+
+# define MLN_FUNCTIONAL_GEN_CODE_2(TTYPE, TNAME, FUN)               \
+  namespace functional {                                            \
+    template <TTYPE TNAME, typename T>                              \
+    struct FUN##_t {                                                \
+      typedef decltype(FUN<TTYPE>(std::declval<T>())) result_type;  \
+      auto operator() (const T& x) -> decltype(FUN<TTYPE>(x))       \
+      { return FUN<TTYPE>(x); }                                     \
+    };                                                              \
+    template <TTYPE TNAME>                                          \
+    struct FUN##_t<TNAME, void>{                                    \
+      template <typename T>                                         \
+      auto operator() (const T& x) -> decltype(FUN<TTYPE>(x))       \
+      { return FUN<TTYPE>(x); }                                     \
+    };                                                              \
+  }
+
+  MLN_FUNCTIONAL_GEN_CODE(sqrt);
+  MLN_FUNCTIONAL_GEN_CODE(cbrt);
+  MLN_FUNCTIONAL_GEN_CODE(pow);
+
   MLN_GEN_CODE(sqr, int, x*x);
   MLN_GEN_CODE(sqr, long, x*x);
   MLN_GEN_CODE(sqr, long long, x*x);
@@ -150,6 +218,7 @@ namespace mln
   MLN_GEN_CODE(sqr, float, x*x);
   MLN_GEN_CODE(sqr, double, x*x);
   MLN_GEN_CODE(sqr, long double, x*x);
+  MLN_FUNCTIONAL_GEN_CODE(sqr);
 
   MLN_GEN_CODE(abs, int, std::abs(x));
   MLN_GEN_CODE(abs, long, std::abs(x));
@@ -160,7 +229,7 @@ namespace mln
   MLN_GEN_CODE(abs, float, std::abs(x));
   MLN_GEN_CODE(abs, double, std::abs(x));
   MLN_GEN_CODE(abs, long double, std::abs(x));
-
+  MLN_FUNCTIONAL_GEN_CODE(abs);
 
   MLN_GEN_CODE(l0norm, int, std::abs(x));
   MLN_GEN_CODE(l0norm, long, std::abs(x));
@@ -171,6 +240,7 @@ namespace mln
   MLN_GEN_CODE(l0norm, float, std::abs(x));
   MLN_GEN_CODE(l0norm, double, std::abs(x));
   MLN_GEN_CODE(l0norm, long double, std::abs(x));
+  MLN_FUNCTIONAL_GEN_CODE(l0norm);
 
   MLN_GEN_CODE(l1norm, int, std::abs(x));
   MLN_GEN_CODE(l1norm, long, std::abs(x));
@@ -181,6 +251,7 @@ namespace mln
   MLN_GEN_CODE(l1norm, float, std::abs(x));
   MLN_GEN_CODE(l1norm, double, std::abs(x));
   MLN_GEN_CODE(l1norm, long double, std::abs(x));
+  MLN_FUNCTIONAL_GEN_CODE(l1norm);
 
   MLN_GEN_CODE(l2norm, int, std::abs(x));
   MLN_GEN_CODE(l2norm, long, std::abs(x));
@@ -191,6 +262,18 @@ namespace mln
   MLN_GEN_CODE(l2norm, float, std::abs(x));
   MLN_GEN_CODE(l2norm, double, std::abs(x));
   MLN_GEN_CODE(l2norm, long double, std::abs(x));
+  MLN_FUNCTIONAL_GEN_CODE(l2norm);
+
+  MLN_GEN_CODE(l2norm_sqr, int, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, long, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, long long, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, unsigned int, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, unsigned long, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, unsigned long long, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, float, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, double, sqr(x));
+  MLN_GEN_CODE(l2norm_sqr, long double, sqr(x));
+  MLN_FUNCTIONAL_GEN_CODE(l2norm_sqr);
 
   MLN_GEN_CODE(linfnorm, int, std::abs(x));
   MLN_GEN_CODE(linfnorm, long, std::abs(x));
@@ -201,6 +284,7 @@ namespace mln
   MLN_GEN_CODE(linfnorm, float, std::abs(x));
   MLN_GEN_CODE(linfnorm, double, std::abs(x));
   MLN_GEN_CODE(linfnorm, long double, std::abs(x));
+  MLN_FUNCTIONAL_GEN_CODE(linfnorm);
 
   MLN_GEN_CODE_2(template <unsigned p>, lpnorm, int, std::abs(x));
   MLN_GEN_CODE_2(template <unsigned p>, lpnorm, long, std::abs(x));
@@ -211,6 +295,7 @@ namespace mln
   MLN_GEN_CODE_2(template <unsigned p>, lpnorm, float, std::abs(x));
   MLN_GEN_CODE_2(template <unsigned p>, lpnorm, double, std::abs(x));
   MLN_GEN_CODE_2(template <unsigned p>, lpnorm, long double, std::abs(x));
+  MLN_FUNCTIONAL_GEN_CODE_2(unsigned, p, lpnorm);
 
   MLN_GEN_CODE(maximum, int, x);
   MLN_GEN_CODE(maximum, long, x);
@@ -221,6 +306,7 @@ namespace mln
   MLN_GEN_CODE(maximum, float, x);
   MLN_GEN_CODE(maximum, double, x);
   MLN_GEN_CODE(maximum, long double, x);
+  MLN_FUNCTIONAL_GEN_CODE(maximum);
 
   MLN_GEN_CODE(minimum, int, x);
   MLN_GEN_CODE(minimum, long, x);
@@ -231,6 +317,7 @@ namespace mln
   MLN_GEN_CODE(minimum, float, x);
   MLN_GEN_CODE(minimum, double, x);
   MLN_GEN_CODE(minimum, long double, x);
+  MLN_FUNCTIONAL_GEN_CODE(minimum);
 
   MLN_GEN_CODE(sum, int, x);
   MLN_GEN_CODE(sum, long, x);
@@ -241,6 +328,7 @@ namespace mln
   MLN_GEN_CODE(sum, float, x);
   MLN_GEN_CODE(sum, double, x);
   MLN_GEN_CODE(sum, long double, x);
+  MLN_FUNCTIONAL_GEN_CODE(sum);
 
   MLN_GEN_CODE(prod, int, x);
   MLN_GEN_CODE(prod, long, x);
@@ -251,9 +339,12 @@ namespace mln
   MLN_GEN_CODE(prod, float, x);
   MLN_GEN_CODE(prod, double, x);
   MLN_GEN_CODE(prod, long double, x);
+  MLN_FUNCTIONAL_GEN_CODE(prod);
 
 # undef MLN_GEN_CODE
-
+# undef MLN_GEN_CODE_2
+# undef MLN_FUNCTIONAL_GEN_CODE
+# undef MLN_FUNCTIONAL_GEN_CODE_2
 }
 
 #endif // ! MLN_CORE_MATH_OPS_HPP

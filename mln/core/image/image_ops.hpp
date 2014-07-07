@@ -124,10 +124,10 @@ namespace mln
   MLN_GENERATE_CONST_BINARY_EXPR(operator>,  greater_than);
   MLN_GENERATE_CONST_BINARY_EXPR(operator<=, less_equal);
   MLN_GENERATE_CONST_BINARY_EXPR(operator>=, greater_equal);
-  MLN_GENERATE_CONST_BINARY_EXPR(imin, functional::minimum);
-  MLN_GENERATE_CONST_BINARY_EXPR(imax, functional::maximum);
-  MLN_GENERATE_CONST_BINARY_EXPR(iinf, functional::infimum);
-  MLN_GENERATE_CONST_BINARY_EXPR(isup, functional::supremum);
+  MLN_GENERATE_CONST_BINARY_EXPR(imin, functional::min_t);
+  MLN_GENERATE_CONST_BINARY_EXPR(imax, functional::max_t);
+  MLN_GENERATE_CONST_BINARY_EXPR(iinf, functional::inf_t);
+  MLN_GENERATE_CONST_BINARY_EXPR(isup, functional::sup_t);
 
 
   // Point-wise logical operators

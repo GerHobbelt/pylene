@@ -79,6 +79,11 @@ namespace mln
   MLN_PROMOTE_FUNCOMP(T, sqrt, sqr)
     l2norm(const internal::vec_base<T, dim, tag>& x);
 
+  template <typename T, unsigned dim, class tag>
+  inline
+  MLN_PROMOTE_FUN(T, sqr)
+    l2norm_sqr(const internal::vec_base<T, dim, tag>& x);
+
   template <unsigned p, typename T, unsigned dim, class tag>
   MLN_PROMOTE_FUNCOMP(T, pow, abs)
     lpnorm(const internal::vec_base<T, dim, tag>& x);
@@ -213,6 +218,18 @@ namespace mln
     return sqrt(res);
   }
 
+  template <typename T, unsigned dim, class tag>
+  inline
+  MLN_PROMOTE_FUN(T, sqr)
+    l2norm_sqr(const internal::vec_base<T, dim, tag>& x)
+  {
+    typedef MLN_PROMOTE_FUNCOMP(T, sqrt, sqr) U;
+    U res = sqr(x[0]);
+    for (unsigned i = 1; i < dim; ++i)
+      res += sqr(x[i]);
+    return res;
+  }
+
 
   template <unsigned p, typename T, unsigned dim, class tag>
   MLN_PROMOTE_FUNCOMP(T, pow, abs)
@@ -229,5 +246,6 @@ namespace mln
 
 # undef MLN_VEC_PROMOTE_FUN
 # undef MLN_VEC_PROMOTE
+# undef MLN_PROMOTE_FUNCOMP
 
 #endif // ! MLN_CORE_VEC_VEC_MATH_OPS_HPP

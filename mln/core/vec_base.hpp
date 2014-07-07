@@ -7,6 +7,7 @@
 # define MLN_INTERNAL_VEC_BASE_HH
 
 # include <mln/core/literal/vectorial.hpp>
+# include <boost/type_traits/promote.hpp>
 # include <type_traits>
 
 
@@ -459,11 +460,11 @@ namespace mln
 
     private:
       template <size_t N, class T2, unsigned dim2, typename tag2>
-      friend constexpr const T2& std::get(const vec_base<T2, dim2, tag2>&);
+      friend constexpr const T2& get(const vec_base<T2, dim2, tag2>&);
       template <size_t N, class T2, unsigned dim2, typename tag2>
-      friend constexpr T2& std::get(vec_base<T2, dim2, tag2>&);
+      friend constexpr T2& get(vec_base<T2, dim2, tag2>&);
       template <size_t N, class T2, unsigned dim2, typename tag2>
-      friend constexpr T2&& std::get(vec_base<T2, dim2, tag2>&&);
+      friend constexpr T2&& get(vec_base<T2, dim2, tag2>&&);
 
 
       template <int... N>
@@ -506,6 +507,30 @@ namespace mln
       static const bool is_equality_comparable = true;
     };
 
+    template <size_t N, class T, unsigned dim, typename tag>
+    inline
+    constexpr
+    T& get(mln::internal::vec_base<T, dim, tag>& vec)
+    {
+      return vec.v_[N];
+    }
+
+    template <size_t N, class T, unsigned dim, typename tag>
+    inline
+    constexpr
+    const T& get(const mln::internal::vec_base<T, dim, tag>& vec)
+    {
+      return vec.v_[N];
+    }
+
+    template <size_t N, class T, unsigned dim, typename tag>
+    inline
+    constexpr
+    T&& get(mln::internal::vec_base<T, dim, tag>&& vec)
+    {
+      return std::move<T>(vec.v_[N]);
+    }
+
   }
 
 
@@ -540,32 +565,17 @@ namespace std
     typedef mln::internal::vec_base< typename make_unsigned<T>::type, dim, tag > type;
   };
 
-
-  template <size_t N, class T, unsigned dim, typename tag>
-  inline
-  constexpr
-  T& get(mln::internal::vec_base<T, dim, tag>& vec)
-  {
-    return vec.v_[N];
-  }
-
-  template <size_t N, class T, unsigned dim, typename tag>
-  inline
-  constexpr
-  const T& get(const mln::internal::vec_base<T, dim, tag>& vec)
-  {
-    return vec.v_[N];
-  }
-
-  template <size_t N, class T, unsigned dim, typename tag>
-  inline
-  constexpr
-  T&& get(mln::internal::vec_base<T, dim, tag>&& vec)
-  {
-    return std::move<T>(vec.v_[N]);
-  }
-
 }
+
+namespace boost
+{
+  template <typename T, unsigned dim, typename tag>
+  struct promote< mln::internal::vec_base<T, dim, tag> >
+  {
+    typedef mln::internal::vec_base<typename boost::promote<T>::type, dim, tag> type;
+  };
+}
+
 
 # ifdef _MSC_VER
 #	pragma warning(default: 4701)

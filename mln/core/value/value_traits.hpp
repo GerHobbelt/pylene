@@ -26,6 +26,7 @@ namespace mln
   template <typename V, class Enable>
   struct value_traits<V, std::greater<V>, Enable>
   {
+    static constexpr unsigned ndim = value_traits<V, std::less<V>, Enable>::ndim;
     static constexpr unsigned quant = value_traits<V, std::less<V>, Enable>::quant;
     static constexpr V min() { return value_traits<V, std::less<V>, Enable>::max(); }
     static constexpr V max() { return value_traits<V, std::less<V>, Enable>::min(); }
@@ -39,6 +40,7 @@ namespace mln
   template <typename V>
   struct value_traits<V, std::less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
   {
+    static constexpr unsigned ndim = 1;
     static constexpr unsigned quant = sizeof(V) * 8;
     static constexpr V min() { return std::numeric_limits<V>::lowest(); }
     static constexpr V max() { return std::numeric_limits<V>::max(); }

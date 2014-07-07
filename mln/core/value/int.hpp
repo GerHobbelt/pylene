@@ -92,6 +92,7 @@ namespace mln
   struct value_traits<UInt<nbits>, std::less< UInt<nbits> >,
 		      typename std::enable_if<std::is_arithmetic< UInt<nbits> >::value>::type >
   {
+    static constexpr unsigned ndim = 1;
     static constexpr unsigned quant = nbits;
     static constexpr UInt<nbits> min() { return 0; }
     static constexpr UInt<nbits> max() { return (1ul << nbits) - 1; }
@@ -103,6 +104,7 @@ namespace mln
   struct value_traits<Int<nbits>, std::less< Int<nbits> >,
 		      typename std::enable_if<std::is_arithmetic< Int<nbits> >::value>::type >
   {
+    static constexpr unsigned ndim = 1;
     static constexpr unsigned quant = nbits;
     static constexpr Int<nbits> min() { return -(1 << (nbits-1)); }
     static constexpr Int<nbits> max() { return (1ul << (nbits-1)) - 1; }

@@ -225,21 +225,33 @@ namespace mln
     }
   };
 
+}
+
+// FIXME: get must be imported in the mln namespace to prevent
+// a dependant name lookup that would force the lookup at
+// definition instead of the instanciation.
+namespace mln
+{
+  using std::get;
+
   template <size_t N, class C>
   struct getter
   {
     auto
     operator() (C&& obj) const
-      -> decltype(std::get<N>(std::forward<C>(obj)))
+      -> decltype(get<N>(std::forward<C>(obj)))
     {
-      return std::get<N>(std::forward<C>(obj));
+      using namespace std;
+      return get<N>(std::forward<C>(obj));
     }
   };
-
+}
 
   /****************************/
   /**  Relational operations **/
   /****************************/
+namespace mln
+{
   using std::min;
   using std::max;
 
@@ -276,7 +288,7 @@ namespace mln
   {
 
     template <class U, class V = U>
-    struct maximum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    struct max_t : std::binary_function<U, V, typename std::common_type<U,V>::type >
     {
       typedef typename std::common_type<U,V>::type R;
 
@@ -288,7 +300,7 @@ namespace mln
     };
 
     template <class U, class V = U>
-    struct minimum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    struct min_t : std::binary_function<U, V, typename std::common_type<U,V>::type >
     {
       typedef typename std::common_type<U,V>::type R;
 
@@ -300,7 +312,7 @@ namespace mln
     };
 
     template <class U, class V = U>
-    struct infimum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    struct inf_t : std::binary_function<U, V, typename std::common_type<U,V>::type >
     {
       typedef typename std::common_type<U,V>::type R;
 
@@ -312,7 +324,7 @@ namespace mln
     };
 
     template <class U, class V = U>
-    struct supremum : std::binary_function<U, V, typename std::common_type<U,V>::type >
+    struct sup_t : std::binary_function<U, V, typename std::common_type<U,V>::type >
     {
       typedef typename std::common_type<U,V>::type R;
 

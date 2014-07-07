@@ -80,6 +80,47 @@ namespace mln
   /**   Traits        **/
   /*********************/
 
+  template <typename U, unsigned dim, typename tag>
+  struct value_traits< internal::vec_base<U, dim, tag>,
+                       std::less<internal::vec_base<U, dim, tag> > >
+  {
+  private:
+    typedef internal::vec_base<U, dim, tag> Vec;
+
+    static
+    void __check()
+    {
+      static_assert(internal::vec_base_traits<tag>::is_less_than_comparable,
+                    "This type does not support comparison by default."
+                    "You must explicity provide the comparison function.");
+    }
+
+  public:
+    static constexpr unsigned quant = value_traits<U>::quant;
+    static constexpr unsigned ndim = dim;
+
+    static constexpr Vec min()
+    {
+      return __check(), Vec( value_traits<U>::min() );
+    }
+
+    static constexpr Vec max()
+    {
+      return __check(), Vec( value_traits<U>::max() );
+    }
+
+    static constexpr Vec inf()
+    {
+      return __check(), min();
+    }
+
+    static constexpr Vec sup()
+    {
+      return __check(), max();
+    }
+
+  };
+
 
   template <typename U, unsigned dim, typename tag>
   struct value_traits< internal::vec_base<U, dim, tag>,
@@ -91,6 +132,7 @@ namespace mln
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;
+    static constexpr unsigned ndim = dim;
 
     static constexpr Vec min()
     {
@@ -113,20 +155,6 @@ namespace mln
     }
   };
 
-  template <typename U, unsigned dim, typename tag>
-  struct value_traits< internal::vec_base<U, dim, tag>,
-		       std::less< internal::vec_base<U, dim, tag> >
-		       >
-  : value_traits< internal::vec_base<U, dim, tag>,
-		  lexicographicalorder_less< internal::vec_base<U, dim, tag> >
-		  >
-  {
-    static_assert(internal::vec_base_traits<tag>::is_less_than_comparable,
-		  "This type does not support comparison by default."
-		  "You must explicity provide the comparison function.");
-  };
-
-
 
   template <typename U, unsigned dim, typename tag>
   struct value_traits< internal::vec_base<U, dim, tag>,
@@ -138,6 +166,7 @@ namespace mln
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;
+    static constexpr unsigned ndim = dim;
 
     static constexpr Vec min()
     {

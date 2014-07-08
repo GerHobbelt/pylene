@@ -41,6 +41,15 @@ namespace mln
       return m_qima;
     }
 
+    void
+    QtImageBase::update()
+    {
+      m_qima = QImage((uchar*)&m_view(m_view.domain().pmin),
+                      m_view.ncols(),
+                      m_view.nrows(),
+                      m_view.strides()[0],
+                      QImage::Format_RGB888);
+    }
 
     QVector<QRgb> QtImageBase::default_lut8;
   }

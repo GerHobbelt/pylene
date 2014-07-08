@@ -91,6 +91,7 @@ namespace mln
     ImageViewer::update()
     {
       std::cout << "Image updated." << std::endl;
+      m_ima->update();
       m_pixmap.setPixmap(QPixmap::fromImage(m_ima->getQImage()));
     }
 

@@ -27,6 +27,9 @@ namespace mln
 
       virtual void reset() = 0;
 
+
+      void update();
+
     protected:
       image2d<rgb8>	m_view;
       QImage		m_qima;

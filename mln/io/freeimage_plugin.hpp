@@ -44,6 +44,8 @@ namespace mln
       void read_next_pixel_rgba8(void* out);
       void read_next_line_gray(void* out);
       void read_next_pixel_gray(void* out);
+      void read_next_line_gray_palette(void* out);
+      void read_next_pixel_gray_palette(void* out);
       void read_next_line_bool(void* out);
       void read_next_pixel_bool(void* out);
 
@@ -57,6 +59,7 @@ namespace mln
       FIBITMAP*         m_dib;
       char*             m_ptr;
       std::type_index   m_vtype;
+      RGBQUAD*          m_palette;
       unsigned  pitch;          // Size in byte of the scanline (padding inc.)
       unsigned  byteperline;    // Size in byte of the line (without padding)
       int       bpp;            // Size in bit of the pixel
@@ -188,6 +191,7 @@ namespace mln
       int bppp = FreeImage_GetBPP(m_dib);
       int colortype = FreeImage_GetColorType(m_dib);
       bpp = bppp / 8;
+      m_palette = FreeImage_GetPalette(m_dib);
 
       switch (type)
         {
@@ -252,7 +256,14 @@ namespace mln
               if (colortype == FIC_MINISBLACK) {
                 m_vtype = typeid(uint8);
                 break;
-            }
+              } else if (colortype == FIC_PALETTE) {
+                m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_gray_palette,
+                                             this, std::placeholders::_1);
+                m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_gray_palette,
+                                              this, std::placeholders::_1);
+                m_vtype = typeid(rgb8);
+                break;
+              }
               goto error;
             case 24:
               if (colortype == FIC_RGB) {
@@ -295,6 +306,12 @@ namespace mln
         break;
       case FIC_RGB:
         cstr_ctype = "FIC_RGB";
+        break;
+      case FIC_RGBALPHA:
+        cstr_ctype = "FIC_RGBALPHA";
+        break;
+      case FIC_CMYK:
+        cstr_ctype = "FIC_CMYK";
         break;
       };
 
@@ -366,6 +383,39 @@ namespace mln
     void freeimage_reader_plugin::read_next_pixel_gray(void* out)
     {
       std::memcpy(out, m_ptr + y * bpp, bpp);
+      if (++y == m_domain.pmax[1])
+        {
+          y = 0;
+          m_ptr -= pitch;
+        }
+    }
+
+
+    // BITMAP with a color lookup table
+    // It may be 1,4 or 8 bits images
+    inline
+    void freeimage_reader_plugin::read_next_line_gray_palette(void* out)
+    {
+      rgb8* buffer = (rgb8*) out;
+      uint8* ptr = (uint8*) m_ptr;
+      for (int y = 0; y < m_domain.pmax[1]; ++y, ++ptr)
+        {
+          buffer[y][0] = m_palette[*ptr].rgbRed;
+          buffer[y][1] = m_palette[*ptr].rgbGreen;
+          buffer[y][2] = m_palette[*ptr].rgbBlue;
+        }
+      m_ptr -= pitch;
+    }
+
+    inline
+    void freeimage_reader_plugin::read_next_pixel_gray_palette(void* out)
+    {
+      rgb8* pxout = (rgb8*) out;
+      uint8* ptr = (uint8*) m_ptr;
+      (*pxout)[0] = m_palette[*ptr].rgbRed;
+      (*pxout)[1] = m_palette[*ptr].rgbGreen;
+      (*pxout)[2] = m_palette[*ptr].rgbBlue;
+
       if (++y == m_domain.pmax[1])
         {
           y = 0;

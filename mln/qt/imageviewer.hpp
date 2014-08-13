@@ -11,6 +11,9 @@ namespace mln
   namespace qt
   {
 
+
+    class ImageViewerEventHandler; // Fwd declaration
+
     class ImageViewer : public QGraphicsView
     {
       Q_OBJECT;
@@ -32,17 +35,18 @@ namespace mln
 
     private:
       void _init(QtImageBase* ima);
-      void _zoom_by(float factor);
-      void _zoom_at(float factor);
 
     private:
-      QGraphicsPixmapItem       m_pixmap;
-      QGraphicsScene*           m_scene;
-      QtImageBase*		m_ima;
-      QPointF                   m_selection_pstart;
+      friend class ImageViewerEventHandler;
+
+      QGraphicsPixmapItem                       m_pixmap;
+      QGraphicsScene*                           m_scene;
+      QtImageBase*                              m_ima;
+      ImageViewerEventHandler*                  m_ev_hdler;
 
     protected:
       virtual bool eventFilter(QObject* obj, QEvent* event);
+      virtual void wheelEvent(QWheelEvent* e);
 
     signals:
       void pointSelected(const mln::point2d& pt);

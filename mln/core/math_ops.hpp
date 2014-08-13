@@ -178,13 +178,13 @@ namespace mln
   template <typename T>                                    \
   struct FUN##_t {                                         \
     typedef decltype(FUN(std::declval<T>())) result_type;  \
-    auto operator() (const T& x) -> decltype(FUN(x))       \
+    auto operator() (const T& x) const -> decltype(FUN(x)) \
     { return FUN(x); }                                     \
   };                                                       \
   template <>                                              \
   struct FUN##_t<void> {                                   \
     template <typename T>                                  \
-    auto operator() (const T& x) -> decltype(FUN(x))       \
+    auto operator() (const T& x) const -> decltype(FUN(x)) \
     { return FUN(x); }                                     \
   };                                                       \
   }
@@ -194,13 +194,13 @@ namespace mln
     template <TTYPE TNAME, typename T>                              \
     struct FUN##_t {                                                \
       typedef decltype(FUN<TTYPE>(std::declval<T>())) result_type;  \
-      auto operator() (const T& x) -> decltype(FUN<TTYPE>(x))       \
+      auto operator() (const T& x) const -> decltype(FUN<TTYPE>(x)) \
       { return FUN<TTYPE>(x); }                                     \
     };                                                              \
     template <TTYPE TNAME>                                          \
     struct FUN##_t<TNAME, void>{                                    \
       template <typename T>                                         \
-      auto operator() (const T& x) -> decltype(FUN<TTYPE>(x))       \
+      auto operator() (const T& x) const -> decltype(FUN<TTYPE>(x)) \
       { return FUN<TTYPE>(x); }                                     \
     };                                                              \
   }

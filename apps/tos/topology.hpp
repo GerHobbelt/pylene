@@ -23,6 +23,8 @@ namespace mln
     bool is_face_1(const point2d& p);
     bool is_face_1v(const point2d& p);
     bool is_face_1h(const point2d& p);
+
+    struct is_face_2_t;
   }
 
   namespace K2 {
@@ -99,6 +101,15 @@ namespace mln
     {
       return (p[0] % 2 == 1 and p[1] % 2 == 0);
     }
+
+    struct is_face_2_t
+    {
+      bool
+      operator() (const point2d& p) const
+      {
+	return is_face_2(p);
+      }
+    };
 
   }
 

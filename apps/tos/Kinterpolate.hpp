@@ -2,6 +2,8 @@
 # define KINTERPOLATE_HPP
 
 # include <mln/core/image/image2d.hpp>
+# include <apps/tos/addborder.hpp>
+# include <exception>
 
 namespace mln
 {
@@ -25,13 +27,20 @@ namespace mln
   /// \brief perform a immersion, 0-1 face have undedfined values.
   /// \param ima Original image
   /// \return An image twice as big as \p ima.
-  template <typename T>
-  image2d<T>
-  immerse_k1(const image2d<T>& ima);
+  template <typename I>
+  image2d<mln_value(I)>
+  immerse_k1(const Image<I>& ima, mln_value(I) v = mln_value(I) ());
 
   template <typename T>
   image2d<T>
   unimmerse_k1(const image2d<T>& ima);
+
+  /// \brief Adjust ima to the domain using K1 or K2 interpolation
+  /// And adding a border if necessary
+  template <typename T>
+  image2d<T>
+  Kadjust_to(const image2d<T>& ima, box2d domain, const std::string& method = "");
+
 
   /*******************************/
   /***    Implementation       ***/
@@ -91,12 +100,21 @@ namespace mln
   }
 
 
-  template <typename T>
-  image2d<T>
-  immerse_k1(const image2d<T>& ima)
+  template <typename I>
+  image2d<mln_value(I)>
+  immerse_k1(const Image<I>& ima_, mln_value(I) v = mln_value(I) ())
   {
-    image2d<T> out(2*ima.nrows()-1, 2*ima.ncols()-1);
-    typedef point2d P;
+    static_assert( std::is_convertible<typename I::domain_type, box2d>::value,
+		   "Image domain must be convertible to box2d." );
+
+    const I& ima = exact(ima_);
+
+    box2d dom = ima.domain();
+    dom.pmin = dom.pmin * 2;
+    dom.pmax = dom.pmax * 2 - 1;
+
+    image2d<mln_value(I)> out(dom, 3, v);
+
     mln_foreach(const point2d& p, ima.domain())
       out(2*p) = ima(p);
     return out;
@@ -113,6 +131,59 @@ namespace mln
     return out;
   }
 
+
+  template <typename T>
+  image2d<T>
+  Kadjust_to(const image2d<T>& ima, box2d domain, const std::string& method)
+  {
+    point2d shp0 = ima.domain().shape();
+    point2d shp = domain.shape();
+    sbox2d subdomain;
+
+    std::function< image2d<T>(const image2d<T>&) > callback;
+    if (method == "zero")
+      callback = [] (const image2d<T>& ima) { return immerse_k1(ima); };
+    else
+      callback = &interpolate_k1<T>;
+
+
+    if (shp+2 == shp0) { // remove border
+      subdomain = sbox2d{ima.domain().pmin + point2d{1,1},
+                         ima.domain().pmax - point2d{1,1},
+                         {1,1}};
+    } else if (shp*2-1 == shp0) { // unimmerse k1
+      subdomain = sbox2d{ima.domain().pmin, ima.domain().pmax, {2,2}};
+    } else if (shp*2+3 == shp0) { // unimmerse k1 - border
+      subdomain = sbox2d{ima.domain().pmin + point2d{2,2},
+                         ima.domain().pmax - point2d{2,2},
+                         {2,2}};
+    } else if (shp*4-3 == shp0) { // unimmerse k2
+      subdomain = sbox2d{ima.domain().pmin, ima.domain().pmax, {4,4}};
+    } else if (shp*4+5 == shp0) { // unimmerse k2 - border
+      subdomain = sbox2d{ima.domain().pmin + point2d{4,4},
+                         ima.domain().pmax - point2d{4,4},
+                         {4,4}};
+    } else if (shp == shp0) {
+        return ima;
+    } else if (shp == shp0+2) {
+        return addborder(ima, lexicographicalorder_less<T>());
+    } else if (shp == shp0*2-1) { // immerse_k1
+      return callback(ima);
+    } else if (shp == (shp0*2+3)) { // addborder + callback
+      return callback(addborder(ima, lexicographicalorder_less<T>()));
+    } else if (shp == (shp0*4-3)) { // immerse_k2
+      return callback(callback(ima));
+    } else if (shp == (shp0*4+5)) { // addborder + immerse_k2
+      return callback(callback(addborder(ima, lexicographicalorder_less<T>())));
+    } else {
+      std::cerr << "Unable to convert the image from: " << ima.domain() << " to " << domain << "\n";
+      throw std::runtime_error("Domains have invalid size.");
+    }
+
+    image2d<T> out(domain);
+    copy(ima | subdomain, out);
+    return out;
+  }
 
 }
 

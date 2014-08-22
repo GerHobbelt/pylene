@@ -58,7 +58,7 @@ namespace mln
 	}
       }
 
-    std::tie(K, parent, S) = morpho::ToS(area, c4);
+    std::tie(K, parent, S) = morpho::ToS_priority(area, c4);
   }
 
   void colorToSGrad_2f(const image2d<rgb8>& ima,

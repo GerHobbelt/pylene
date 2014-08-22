@@ -10,6 +10,8 @@ namespace mln
 
 
   /// \brief Compute the ToS on the areas of R,G,B channel guided by gradient
+  /// The algorithm internally add a border to the image.
+  /// 
   /// \param ima The original ima (rgb)
   /// \param[out] K
   /// \param[out] parent

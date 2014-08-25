@@ -35,13 +35,9 @@ namespace mln
       inline
       auto
       count(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), features::count<> ()))
-      {
-        return extract(exact(acc), features::count<> ());
-      }
+        -> decltype(extract(exact(acc), std::declval<features::count<>> ()));
 
     }
-
 
     namespace features
     {
@@ -62,6 +58,21 @@ namespace mln
         }
       };
     }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      inline
+      auto
+      count(const Accumulator<A>& acc)
+        -> decltype(extract(exact(acc), std::declval<features::count<>> ()))
+      {
+        return extract(exact(acc), features::count<> ());
+      }
+
+    }
+
 
     namespace accumulators
     {

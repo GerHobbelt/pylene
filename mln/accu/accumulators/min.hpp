@@ -32,13 +32,14 @@ namespace mln
       template <typename A>
       auto
       min(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::min<> ()) )
-      {
-        return extract(exact(acc), features::min<> ());
-      }
+        -> decltype( extract(exact(acc), std::declval<features::min<>> ()) );
 
     }
 
+
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
 
     namespace features
     {
@@ -79,6 +80,19 @@ namespace mln
         : simple_feature_facade< min<void>, internal::meta_min>
       {
       };
+    }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      auto
+      min(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), std::declval<features::min<>> ()) )
+      {
+        return extract(exact(acc), features::min<> ());
+      }
+
     }
 
     namespace accumulators

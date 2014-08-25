@@ -30,10 +30,7 @@ namespace mln
       inline
       auto
       mean(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), features::mean<> ()))
-      {
-        return extract(exact(acc), features::mean<> ());
-      }
+        -> decltype(extract(exact(acc), std::declval<features::mean<>> ()));
 
     }
 
@@ -81,6 +78,21 @@ namespace mln
       };
 
     }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      inline
+      auto
+      mean(const Accumulator<A>& acc)
+        -> decltype(extract(exact(acc), std::declval<features::mean<>> ()))
+      {
+        return extract(exact(acc), features::mean<> ());
+      }
+
+    }
+
 
     namespace accumulators
     {

@@ -37,10 +37,7 @@ namespace mln
       template <typename A>
       auto
       minmax(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::minmax<> ()) )
-      {
-        return extract(exact(acc), features::minmax<> ());
-      }
+        -> decltype( extract(exact(acc), std::declval<features::minmax<>> ()) );
 
     }
 
@@ -90,6 +87,20 @@ namespace mln
         }
       };
     }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      auto
+      minmax(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), std::declval<features::minmax<>> ()) )
+      {
+        return extract(exact(acc), features::minmax<> ());
+      }
+
+    }
+
 
     namespace accumulators
     {

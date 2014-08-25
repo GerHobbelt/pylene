@@ -39,12 +39,13 @@ namespace mln
       template <typename A>
       auto
       max(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::max<> ()) )
-      {
-        return extract(exact(acc), features::max<> ());
-      }
-
+        -> decltype( extract(exact(acc), std::declval<features::max<>> ()) );
     }
+
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
+
 
 
     namespace features
@@ -85,6 +86,20 @@ namespace mln
         : simple_feature_facade< max<void>, internal::meta_max>
       {
       };
+    }
+
+
+    namespace extractor
+    {
+
+      template <typename A>
+      auto
+      max(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), std::declval<features::max<>> ()) )
+      {
+        return extract(exact(acc), features::max<> ());
+      }
+
     }
 
     namespace accumulators

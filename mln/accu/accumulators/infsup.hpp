@@ -40,21 +40,14 @@ namespace mln
       template <typename A>
       auto
       inf(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::inf<> ()) )
-      {
-        return extract(exact(acc), features::inf<> ());
-      }
+        -> decltype( extract(exact(acc), std::declval<features::inf<>> ()));
 
       template <typename A>
       auto
       sup(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::sup<> ()) )
-      {
-        return extract(exact(acc), features::sup<> ());
-      }
+        -> decltype( extract(exact(acc), std::declval<features::sup<>> ()));
 
     }
-
 
     namespace features
     {
@@ -146,6 +139,27 @@ namespace mln
           return accumulators::sup<T>();
         }
       };
+
+    }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      auto
+      inf(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), std::declval<features::inf<>> ()) )
+      {
+        return extract(exact(acc), features::inf<> ());
+      }
+
+      template <typename A>
+      auto
+      sup(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), std::declval<features::sup<>> ()) )
+      {
+        return extract(exact(acc), features::sup<> ());
+      }
 
     }
 

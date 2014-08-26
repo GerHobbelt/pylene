@@ -3,22 +3,10 @@
 
 # include <type_traits>
 # include <string>
+# include <boost/concept_check.hpp>
 
-# define MLN_CONCEPT_BEGIN_CHECK_IF()					\
-  {									\
-  struct __mln_check_if__						\
-  {									\
-  ~__mln_check_if__()							\
-  {									\
-
-
-# define MLN_CONCEPT_END_CHECK_IF(TEST)			\
-  }							\
-    };							\
-  mln::internal::mln_check_if_<TEST, __mln_check_if__> ();	\
-  }
-
-
+# define MLN_CONCEPT_ASSERT_IF(TEST, CONCEPT)    \
+  mln::internal::mln_check_if_<TEST, CONCEPT> ();
 
 
 namespace mln
@@ -35,7 +23,7 @@ namespace mln
     template <typename T>
     struct mln_check_if_<true, T>
     {
-      mln_check_if_() { ((T*)0)->~T(); }
+      mln_check_if_() { BOOST_CONCEPT_ASSERT((T)); }
     };
   }
 

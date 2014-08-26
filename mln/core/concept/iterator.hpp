@@ -7,18 +7,32 @@
 namespace mln
 {
 
+  // Fwd declaration
+  template <typename I>
+  struct Iterator_;
+
   template <typename I>
   struct Iterator : Object<I>
   {
+    BOOST_CONCEPT_USAGE(Iterator)
+    {
+      BOOST_CONCEPT_ASSERT((Iterator_<I>));
+    }
+  };
 
-    Iterator()
+
+  // Real concept here.
+  template <typename I>
+  struct Iterator_
+  {
+    typedef typename I::value_type    value_type;
+    typedef typename I::reference     reference;
+
+    BOOST_CONCEPT_USAGE(Iterator_)
     {
       // Remove concept because lambda not assignable
       //BOOST_CONCEPT_ASSERT((boost::Assignable<I>));
       //BOOST_CONCEPT_ASSERT((boost::DefaultConstructible<I>));
-
-      typedef typename I::value_type    value_type;
-      typedef typename I::reference     reference;
 
       reference (I::*method) () const = &I::operator*;
       (void) method;
@@ -31,6 +45,7 @@ namespace mln
       I (I::*method4) () const = &I::iter;
       (void) method4;
     }
+
   };
 
 } // end of namespace mln

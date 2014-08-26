@@ -20,6 +20,7 @@ namespace mln {
   template <typename I> struct IterableImage;
   template <typename I> struct IndexableImage;
   template <typename I> struct AccessibleImage;
+  template <typename I> struct ImageWithExtension;
 
   template <typename I>
   struct Image : Object_<I>
@@ -77,30 +78,37 @@ namespace mln {
         mln_ch_value(I, int)  __ima3 = imchvalue<int>(ima);
       }
 
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        BOOST_CONCEPT_ASSERT((ConcreteImage<I>));
-      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::concrete::value));
+      MLN_CONCEPT_ASSERT_IF(image_traits<I>::concrete::value,
+                            ConcreteImage<I>);
 
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        BOOST_CONCEPT_ASSERT((IterableImage<I>));
-      MLN_CONCEPT_END_CHECK_IF((std::is_convertible<category, forward_image_tag>::value));
+      MLN_CONCEPT_ASSERT_IF((std::is_convertible<category, forward_image_tag>::value),
+                            IterableImage<I>);
 
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        BOOST_CONCEPT_ASSERT((IndexableImage<I>));
-      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::indexable::value));
+      MLN_CONCEPT_ASSERT_IF(image_traits<I>::indexable::value,
+                            IndexableImage<I>);
 
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        BOOST_CONCEPT_ASSERT((AccessibleImage<I>));
-      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::accessible::value));
+      MLN_CONCEPT_ASSERT_IF(image_traits<I>::accessible::value,
+                            AccessibleImage<I>);
 
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        BOOST_CONCEPT_ASSERT((Extension<typename I::extension_type>));
-      MLN_CONCEPT_END_CHECK_IF((image_has_extension<I>::value));
+      MLN_CONCEPT_ASSERT_IF(image_has_extension<I>::value,
+                            ImageWithExtension<I>);
+
     }
 
   private:
     I ima;
   };
+
+  template <typename I>
+  struct ImageWithExtension
+  {
+    BOOST_CONCEPT_USAGE(ImageWithExtension)
+    {
+      typedef typename I::extension_type extension;
+      BOOST_CONCEPT_ASSERT((Extension<extension>));
+    }
+  };
+
 
   template <typename I>
   struct ConcreteImage : Image_<I>
@@ -110,35 +118,48 @@ namespace mln {
 
     static_assert(concrete::value, "Image must be concrete");
 
+    template <class J, bool has_border = image_has_border<I>::value>
+    struct check_border
+    {
+      BOOST_CONCEPT_USAGE(check_border)
+      {
+        mln_value(J) val;
+        J f = *((J*)0);
+        J g(f, mln::init ());
+        J h(f, f.border());
+        J i(f, f.border(), val);
+      }
+    };
+
+    template <class J>
+    struct check_border<J, false>
+    {
+      BOOST_CONCEPT_USAGE(check_border)
+      {
+        mln_value(J) val;
+        J f = *((J*)0);
+        J g(f, mln::init ());
+        J h(f, val);
+      }
+    };
+
+    template <class J>
+    struct check_indexable
+    {
+      BOOST_CONCEPT_USAGE(check_indexable)
+      {
+        typedef typename I::size_type size_type;
+        void (I::*ptr) (size_type) = &I::reindex;
+        (void) ptr;
+      }
+    };
+
+
     BOOST_CONCEPT_USAGE(ConcreteImage)
     {
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        {
-          mln_value(I) val;
-          I f = *((I*)0);
-          I g(f, mln::init ());
-          I h(f, val);
-        }
-      MLN_CONCEPT_END_CHECK_IF((not image_has_border<I>::value));
-
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        {
-          mln_value(I) val;
-          I f = *((I*)0);
-          I g(f, mln::init ());
-          I h(f, f.border());
-          I i(f, f.border(), val);
-        }
-      MLN_CONCEPT_END_CHECK_IF((image_has_border<I>::value));
-
-
-      MLN_CONCEPT_BEGIN_CHECK_IF()
-        {
-          typedef typename I::size_type size_type;
-          void (I::*ptr) (size_type) = &I::reindex;
-          (void) ptr;
-        }
-      MLN_CONCEPT_END_CHECK_IF((image_traits<I>::indexable::value));
+      BOOST_CONCEPT_ASSERT((check_border<I>));
+      MLN_CONCEPT_ASSERT_IF(image_traits<I>::indexable::value,
+                            check_indexable<I>);
     }
 
   };

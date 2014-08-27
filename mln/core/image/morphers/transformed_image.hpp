@@ -188,6 +188,21 @@ namespace mln
 
   namespace internal
   {
+    // Helper for clang, it refuses to hold mutable reference
+    template <typename I, class Enable = typename std::is_reference<I>::type>
+    struct transformed_image_helper;
+
+    template <typename I>
+    struct transformed_image_helper<I, std::true_type>
+    {
+      I m_ima;
+    };
+
+    template <typename I>
+    struct transformed_image_helper<I, std::false_type>
+    {
+      mutable I m_ima;
+    };
 
     // With a value transformation: V -> W
     template <typename I, class UnaryFunction>
@@ -195,7 +210,8 @@ namespace mln
       : morpher_base< transformed_image<I, UnaryFunction, false>,
                       I, mln_point(I),
                       typename std::remove_reference
-                      <typename std::result_of<UnaryFunction(mln_reference(I))>::type>::type >
+                      <typename std::result_of<UnaryFunction(mln_reference(I))>::type>::type >,
+        transformed_image_helper<I>
     {
     private:
       typedef typename std::remove_reference<I>::type image_t;
@@ -286,7 +302,7 @@ namespace mln
       transformed_image() = default;
 
       transformed_image(I&& ima, const UnaryFunction& f)
-        : m_ima(std::forward<I>(ima)),
+        : transformed_image_helper<I> { std::forward<I>(ima) },
           m_fun(f)
       {
       }
@@ -316,28 +332,28 @@ namespace mln
       values() const
       {
         const_val_fun_t f {m_fun};
-        return const_value_range(m_ima.values(), f);
+        return const_value_range(this->m_ima.values(), f);
       }
 
       value_range
       values()
       {
         val_fun_t f {m_fun};
-        return value_range(m_ima.values(), f);
+        return value_range(this->m_ima.values(), f);
       }
 
       const_pixel_range
       pixels() const
       {
         const_pix_fun_t fun = { this };
-        return const_pixel_range(m_ima.pixels(), fun);
+        return const_pixel_range(this->m_ima.pixels(), fun);
       }
 
       pixel_range
       pixels()
       {
         pix_fun_t fun = { this };
-        return pixel_range(m_ima.pixels(), fun);
+        return pixel_range(this->m_ima.pixels(), fun);
       }
 
 
@@ -347,8 +363,7 @@ namespace mln
       operator() (const mln_point(I)& p)
       {
         mln_precondition(this->domain().has(p));
-        std::cout <<  m_fun(m_ima(p)) << std::endl;
-        return m_fun(m_ima(p));
+        return m_fun(this->m_ima(p));
       }
 
       template <typename dummy = const_reference>
@@ -356,21 +371,21 @@ namespace mln
       operator() (const mln_point(I)& p) const
       {
         mln_precondition(this->domain().has(p));
-        return m_fun(m_ima(p));
+        return m_fun(this->m_ima(p));
       }
 
       template <typename dummy = reference>
       typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
       at (const mln_point(I)& p)
       {
-        return m_fun(m_ima.at(p));
+        return m_fun(this->m_ima.at(p));
       }
 
       template <typename dummy = const_reference>
       typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
       at (const mln_point(I)& p) const
       {
-        return m_fun(m_ima.at(p));
+        return m_fun(this->m_ima.at(p));
       }
 
       template <typename dummy = pixel_type>
@@ -378,7 +393,7 @@ namespace mln
       pixel (const mln_point(I)& p)
       {
         mln_precondition(this->domain().has(p));
-        return pixel_type(m_ima.pixel(p), this);
+        return pixel_type(this->m_ima.pixel(p), this);
       }
 
       template <typename dummy = const_pixel_type>
@@ -386,21 +401,21 @@ namespace mln
       pixel (const mln_point(I)& p) const
       {
         mln_precondition(this->domain().has(p));
-        return const_pixel_type(m_ima.pixel(p), this);
+        return const_pixel_type(this->m_ima.pixel(p), this);
       }
 
       template <typename dummy = pixel_type>
       typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
       pixel_at (const mln_point(I)& p)
       {
-        return pixel_type(m_ima.pixel_at(p), this);
+        return pixel_type(this->m_ima.pixel_at(p), this);
       }
 
       template <typename dummy = const_pixel_type>
       typename std::enable_if< image_traits<this_t>::accessible::value, dummy >::type
       pixel_at (const mln_point(I)& p) const
       {
-        return const_pixel_type(m_ima.pixel_at(p), this);
+        return const_pixel_type(this->m_ima.pixel_at(p), this);
       }
 
 
@@ -408,18 +423,17 @@ namespace mln
       typename std::enable_if< image_traits<this_t>::indexable::value, dummy >::type
       operator[] (typename image_type::size_type i)
       {
-        return m_fun(m_ima[i]);
+        return m_fun(this->m_ima[i]);
       }
 
       template <typename dummy = const_reference, typename image_type = image_t>
       typename std::enable_if< image_traits<this_t>::indexable::value, dummy >::type
       operator[] (typename image_type::size_type i) const
       {
-        return m_fun(m_ima[i]);
+        return m_fun(this->m_ima[i]);
       }
 
     private:
-      mutable I m_ima;
       UnaryFunction m_fun;
     };
 

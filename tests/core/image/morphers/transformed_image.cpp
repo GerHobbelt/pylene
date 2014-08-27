@@ -15,12 +15,8 @@ BOOST_AUTO_TEST_CASE(transform_byval_rvalue)
 {
   using namespace mln;
 
-  typedef image2d<int> I;
-
   box2d dom{{-1,-2}, {3,3}};
   image2d<int> ima(dom);
-
-  typedef I::const_pixel_type Pix;
 
   iota(ima, 0);
   {
@@ -53,12 +49,8 @@ BOOST_AUTO_TEST_CASE(transform_byval_chain)
 {
   using namespace mln;
 
-  typedef image2d<int> I;
-
   box2d dom{{-1,-2}, {3,3}};
   image2d<int> ima(dom);
-
-  typedef I::const_pixel_type Pix;
 
   iota(ima, 0);
   {
@@ -94,7 +86,6 @@ BOOST_AUTO_TEST_CASE(transform_byval_lvalue)
   using namespace mln;
 
   typedef std::pair<int, int> V;
-  typedef image2d<V> I;
 
   box2d dom{{-1,-2}, {3,3}};
   image2d<V> ima(dom);

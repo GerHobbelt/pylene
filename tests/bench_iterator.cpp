@@ -52,8 +52,6 @@ double test_native(const int* ima2, int nrows, int ncols)
 
 double test_nbh_pixter(const image2d<int>& ima)
 {
-  typedef image2d<int> I;
-
   double u = 0;
   image2d<int>::const_pixel_range::iterator px = ima.pixels().iter();
   auto nx = c8(*px).iter();
@@ -68,8 +66,6 @@ double test_nbh_pixter(const image2d<int>& ima)
 
 double test_nbh_piter(const image2d<int>& ima)
 {
-  typedef image2d<int> I;
-
   double u = 0;
   auto p = ima.domain().iter();
   auto n = c8(*p).iter();
@@ -83,8 +79,6 @@ double test_nbh_piter(const image2d<int>& ima)
 
 double test_nbh_index(const image2d<int>& ima)
 {
-  typedef image2d<int> I;
-
   double u = 0;
   std::size_t idx = ima.index_of_point(ima.domain().pmin);
   auto w = wrt_delta_index(ima, c8_t::dpoints);
@@ -210,8 +204,6 @@ int main()
 {
 
   const int nrows = 1000, ncols = 10000;
-
-  typedef image2d<int> I;
   image2d<int> ima(nrows, ncols);
   iota(ima, 0);
 

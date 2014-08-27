@@ -161,7 +161,7 @@ namespace mln
       typedef mln_point(ImTreePropMap)                  site_type;
       typedef typename ImTreePropMap::size_type         size_type;
 
-      friend struct ImTreePropMap::const_pixel_type;
+      friend typename ImTreePropMap::const_pixel_type;
 
       image_tree_property_map_pixel() = default;
       image_tree_property_map_pixel(ImTreePropMap* ima, size_type node_id)

@@ -64,7 +64,7 @@ double test_iterator(const image2d<int>& a, const image2d<int>& b) __attribute__
 
 double test_iterator(const image2d<int>& a, const image2d<int>& b)
 {
-  double v = range::inner_product(a.values(), b.values(), 0.0d);
+  double v = range::inner_product(a.values(), b.values(), 0.0);
 
   return v;
 }
@@ -75,7 +75,7 @@ double test_zip(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
 
-  double v = range::accumulate(ima.values(), 0.0d, [](double v, const std::tuple<const int&, const int&>& x)
+  double v = range::accumulate(ima.values(), 0.0, [](double v, const std::tuple<const int&, const int&>& x)
 			       { return v + std::get<0>(x) * std::get<1>(x); });
 
   return v;
@@ -87,7 +87,7 @@ double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
   typedef typename decltype(ima)::const_pixel_type pixel_t;
-  double v = range::accumulate(ima.pixels(), 0.0d, [](double v, const pixel_t& x)
+  double v = range::accumulate(ima.pixels(), 0.0, [](double v, const pixel_t& x)
                                { return v + std::get<0>(x.val()) * std::get<1>(x.val()); });
   return v;
 }
@@ -238,8 +238,8 @@ test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
   extension::fill(b, std::numeric_limits<int>::max());
 
   {
-    const kernel::image<0> f;
-    const kernel::image<1> out;
+    const kernel::image<0> f {};
+    const kernel::image<1> out {};
     using kernel::placeholders::p;
     using kernel::placeholders::n;
     const kernel::Aggregate< mln::accu::features::min<> > Min = {};
@@ -259,8 +259,8 @@ test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
   extension::fill(b, std::numeric_limits<int>::max());
 
   {
-    const kernel::image<0> f;
-    const kernel::image<1> out;
+    const kernel::image<0> f {};
+    const kernel::image<1> out {};
     using kernel::placeholders::p;
     using kernel::placeholders::n;
 

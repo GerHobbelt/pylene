@@ -51,7 +51,6 @@ namespace mln
 	pmap = imchvalue<size_type>(ima);	//
 
 
-	size_type stack_size = 0;
 	size_type spos = sz;
 	// }
 

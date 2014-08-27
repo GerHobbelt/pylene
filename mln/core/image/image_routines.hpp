@@ -83,6 +83,8 @@ namespace mln
   bool
   are_indexes_compatible(const Image<I>& f, const Image<J>& g)
   {
+    (void) f;
+    (void) g;
     return false;
     //return internal::are_indexes_compatible(exact(f), exact(g));
   }

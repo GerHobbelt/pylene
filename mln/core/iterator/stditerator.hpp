@@ -52,7 +52,7 @@ namespace mln
     }
 
   private:
-    template <typename> friend class stditerator;
+    template <typename> friend struct stditerator;
 
     Iterator cur_;
     Iterator begin_;

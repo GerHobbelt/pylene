@@ -50,10 +50,10 @@ namespace mln {
 }
 
 
-  static const c4_t c4;
-  static const c8_t c8;
-  static const c2_v_t c2_v;
-  static const c2_h_t c2_h;
+  static const c4_t c4 {};
+  static const c8_t c8 {};
+  static const c2_v_t c2_v {};
+  static const c2_h_t c2_h {};
 
 } // end of namespace mln
 

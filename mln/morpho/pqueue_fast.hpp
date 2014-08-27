@@ -105,7 +105,6 @@ namespace mln
       size_type pop()
       {
 	size_type x = m_hq.pop_at_level(i);
-	index_type b = i;
 	while (i > value_traits<index_type>::min() and m_hq.empty(i))
 	  --i;
 	return x;

@@ -38,8 +38,6 @@ namespace mln
       typename std::enable_if< image_traits<Image>::accessible, void>::type
       imprint(const Image& ima, Domain domain, std::ostream& os)
       {
-        typedef typename Image::value_type V;
-
         for (auto p : domain) {
           os << '{' << p << ",";
           format(os, ima(p)) << "}," << std::endl;

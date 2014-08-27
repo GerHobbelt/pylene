@@ -43,8 +43,6 @@ namespace mln
       typedef typename Indexer::index_type index_t;
       Indexer f;
 
-
-      typedef mln_value(I) V;
       static constexpr std::size_t nvalues = 1 << value_traits<index_t>::quant;
       unsigned h[nvalues] = {0,};
       {
@@ -80,7 +78,7 @@ namespace mln
       Indexer f;
 
       std::size_t n = input.domain().size();
-      typedef mln_value(I) V;
+
       static constexpr std::size_t nvalues = 1 << 16;
       static constexpr std::size_t nvalues2 = 1 << (value_traits<index_t>::quant - 16);
       unsigned h[nvalues] = {0,};

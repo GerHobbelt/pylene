@@ -3,6 +3,7 @@
 
 # include <iosfwd>
 # include <string>
+# include <typeindex>
 # include <mln/io/ioexception.hpp>
 # include <mln/io/internal/demangle.hpp>
 # include <mln/core/domain/box.hpp>

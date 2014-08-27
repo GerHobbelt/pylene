@@ -82,7 +82,7 @@ namespace mln
     struct pixel_t : Pixel< pixel_t<I> >
     {
       template <class>
-      friend class pixel_t;
+      friend struct pixel_t;
 
       typedef constant_image::point_type point_type;
       typedef point_type site_type;

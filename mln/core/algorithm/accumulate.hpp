@@ -20,7 +20,7 @@ namespace mln {
   /*** Implementation  */
   /*********************/
 
-  template <typename I, class AccuLike, class Extractor = accu::default_extractor>
+  template <typename I, class AccuLike, class Extractor>
   typename accu::result_of<AccuLike, mln_value(I), Extractor>::type
   accumulate(const Image<I>& input, const AccumulatorLike<AccuLike>& accu_, const Extractor& ex)
   {

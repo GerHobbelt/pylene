@@ -4,6 +4,7 @@
 # include <type_traits>
 # include <memory>
 # include <algorithm>
+# include <fstream>
 
 # include <mln/core/value/value_traits.hpp>
 # include <mln/core/image/image.hpp>

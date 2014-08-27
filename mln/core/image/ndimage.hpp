@@ -424,7 +424,7 @@ namespace mln
     }
 
     image3d(short nslices, short nrows, short ncols, unsigned border = 3)
-      : base( (box<short,3>) {{{0,0,0}},{{nslices, nrows, ncols}}}, border)
+      : base( (box<short,3>) {{0,0,0},{nslices, nrows, ncols}}, border)
     {
     }
   };

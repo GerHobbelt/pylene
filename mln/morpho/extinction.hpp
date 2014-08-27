@@ -68,11 +68,11 @@ namespace mln
 
     }
 
-    template <class I, class N, class Compare = std::less<mln_value(I)> >
+    template <class I, class N, class Compare>
     mln_concrete(I)
     extinction(const Image<I>& ima_,
                const Neighborhood<N>& nbh_,
-               const Compare& cmp = Compare())
+               const Compare& cmp)
     {
       mln_entering("mln::morpho::extinction");
 

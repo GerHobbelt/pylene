@@ -108,12 +108,8 @@ BOOST_AUTO_TEST_CASE(filtered_byval_writing)
 {
   using namespace mln;
 
-  typedef image2d<int> I;
-
   box2d dom{{-1,-2}, {3,3}};
   image2d<int> ima(dom);
-
-  typedef I::const_pixel_type Pix;
 
   iota(ima, 0);
   auto x = imfilter(ima, [](float x) { return x > 10; });
@@ -129,8 +125,6 @@ BOOST_AUTO_TEST_CASE(filtered_byval_writing)
 BOOST_AUTO_TEST_CASE(filtered_chaining)
 {
   using namespace mln;
-
-  typedef image2d<int> I;
 
   box2d dom{{-1,-2}, {3,3}};
   image2d<int> ima(dom);

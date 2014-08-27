@@ -68,6 +68,8 @@ namespace mln
       {
 	typedef typename std::tuple_element<k, image_tuple_t>::type image_t;
 	typedef mln_reference(image_t) result_type;
+
+        result_type operator () (Expr&, const meta_kernel_context& ctx) const;
       };
 
       template <class Expr, int k>
@@ -75,6 +77,8 @@ namespace mln
       {
 	typedef typename std::tuple_element<k, image_tuple_t>::type image_t;
 	typedef mln_reference(image_t) result_type;
+
+        result_type operator () (Expr&, const meta_kernel_context& ctx) const;
       };
 
       template <class Expr, class dummy>
@@ -86,6 +90,8 @@ namespace mln
 
         typedef typename proto::result_of::eval<Arg0, meta_kernel_context>::type V;
         typedef typename accu::result_of<Feature, typename std::decay<V>::type>::type result_type;
+
+        result_type operator () (Expr&, const meta_kernel_context& ctx) const;
       };
 
     };

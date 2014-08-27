@@ -40,13 +40,13 @@ namespace mln
 
     namespace placeholders
     {
-      static const kernel::image<0> f;
-      static const kernel::image<1> g;
-      static const kernel::image<2> h;
-      static const kernel::image<3> out;
+      static const kernel::image<0> f {};
+      static const kernel::image<1> g {};
+      static const kernel::image<2> h {};
+      static const kernel::image<3> out {};
 
-      static const kernel::point p;
-      static const kernel::neighbor n;
+      static const kernel::point p {};
+      static const kernel::neighbor n {};
     };
 
 

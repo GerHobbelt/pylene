@@ -57,15 +57,20 @@ namespace mln
       }
 
       template <class Context>
-      struct retrieve_accu_result_type
+      struct eval_in
       {
         template <class> struct result;
 
-        template <class F, class Expr>
-        struct result<F(Expr)>
+        template <class This, class Expr>
+        struct result<This(Expr)> : boost::proto::functional::eval::result<This(Expr,Context)>
         {
-          typedef typename proto::result_of::eval<Expr, Context>::type type;
         };
+
+
+        template<typename Expr>
+        typename boost::proto::result_of::eval<Expr, Context>::type
+        operator()(Expr expr) const;
+
       };
 
       template <class Context>
@@ -223,7 +228,7 @@ namespace mln
         // SubExprTypeList: The type of the mpl list holding the subexprs evaluation type
         typedef decltype(subexprs) SubexprList;
         typedef meta_kernel_context<I...> meta_ctx;
-        typedef retrieve_accu_result_type<meta_ctx> Acc2Type;
+        typedef eval_in<meta_ctx> Acc2Type;
         typedef typename boost::fusion::result_of::transform<const SubexprList, Acc2Type>::type SubExprTypeList_;
         typedef typename boost::fusion::result_of::as_list<SubExprTypeList_>::type SubExprTypeList;
 
@@ -257,7 +262,7 @@ namespace mln
 
         // Define context
         typedef kernel::kernel_context<V, V2, SubExprTypeList, AccuList> Context;
-        typedef kernel::kernel_context<V, V, SubExprTypeList, AccuList>  Context2;
+        //typedef kernel::kernel_context<V, V, SubExprTypeList, AccuList>  Context2;
 
         mln_forall(px)
         {

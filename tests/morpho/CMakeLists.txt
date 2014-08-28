@@ -11,9 +11,9 @@ add_executable(dilate           dilate.cpp)
 add_executable(gradient         gradient.cpp)
 add_executable(extinction       extinction.cpp)
 
-target_link_libraries(saturate -lfreeimage)
-target_link_libraries(dilate -lfreeimage)
-target_link_libraries(gradient -lfreeimage)
+target_link_libraries(saturate ${FreeImage_LIBRARIES})
+target_link_libraries(dilate ${FreeImage_LIBRARIES})
+target_link_libraries(gradient ${FreeImage_LIBRARIES})
 
 add_core_test(saturate          saturate)
 add_core_test(dilate            dilate)

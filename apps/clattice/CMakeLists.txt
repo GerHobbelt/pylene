@@ -7,5 +7,5 @@ target_link_libraries(clattice
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  -lfreeimage
+  ${FreeImage_LIBRARIES}
 )

@@ -1,2 +1,2 @@
 SUBDIRS(labeling)
-link_libraries(-lfreeimage)
+link_libraries(${FreeImage_LIBRARIES})

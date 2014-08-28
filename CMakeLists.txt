@@ -4,24 +4,15 @@ project(MILENA)
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-include(FindBoost)
-
-
-
 find_package(Boost 1.42 COMPONENTS program_options unit_test_framework REQUIRED)
+find_package(FreeImage REQUIRED)
 find_package(TBB)
+find_package(Qt4)
 
 if(TBB_FOUND)
         MESSAGE (STATUS "TBB found in ${TBB_INSTALL_DIR} + ${TBB_LIBRARY_DIRS}")
 else()
         MESSAGE (FATAL "TBB not found.")
-endif()
-
-if(Boost_FOUND)
- message(STATUS, "Boost trouvé ${Boost_INCLUDE_DIRS}")
- include_directories(${Boost_INCLUDE_DIRS})
-else()
- message(FATAL_ERROR, "Boost pas trouvé")
 endif()
 
 
@@ -53,6 +44,9 @@ add_test(${ARGV})
 add_dependencies(check ${Exename})
 endmacro(add_core_test)
 
+#### Configuration of the Compiler ###
+# set BOOST to use variadic macros
+add_definitions(-D BOOST_PP_VARIADICS=1)
 
 
 

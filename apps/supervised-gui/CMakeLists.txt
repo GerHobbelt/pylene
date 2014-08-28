@@ -1,23 +1,26 @@
-FIND_PACKAGE(Qt4 REQUIRED)
-INCLUDE(${QT_USE_FILE})
+if(Qt4_FOUND)
 
-link_libraries(-lfreeimage)
+  INCLUDE(${QT_USE_FILE})
 
-
-QT4_WRAP_CPP(supervised_MOC
-  ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hpp
-  brush.hpp)
-
-QT4_GENERATE_MOC(${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hxx
-                 ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
-
-add_executable(supervised-cli  supervised-cli.cpp)
-
-add_executable(supervised-gui-3c  supervised-gui-3c.cpp brush.cpp
-                      ${supervised_MOC}
-                      ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
-                      ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
-
-target_link_libraries(supervised-gui-3c ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+  link_libraries(${FreeImage_LIBRARIES})
 
 
+  QT4_WRAP_CPP(supervised_MOC
+    ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hpp
+    brush.hpp)
+
+  QT4_GENERATE_MOC(${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hxx
+    ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
+
+
+  add_executable(supervised-cli  supervised-cli.cpp)
+
+  add_executable(supervised-gui-3c  supervised-gui-3c.cpp brush.cpp
+    ${supervised_MOC}
+    ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
+
+  target_link_libraries(supervised-gui-3c ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+  target_link_libraries(supervised-cli ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+
+endif(Qt4_FOUND)

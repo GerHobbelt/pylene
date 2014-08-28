@@ -1,61 +1,85 @@
-INCLUDE (FindPkgConfig)
+# Find the FreeImage library.
+#
+# This module defines
+#  FreeImage_FOUND             - True if FreeImage was found.
+#  FreeImage_INCLUDE_DIRS      - Include directories for FreeImage headers.
+#  FreeImage_LIBRARIES         - Libraries for FreeImage.
+#
+# To specify an additional directory to search, set FreeImage_ROOT.
+#
+# Copyright (c) 2010, Ewen Cheslack-Postava
+# Based on FindSQLite3.cmake by:
+#  Copyright (c) 2006, Jaroslaw Staniek, <js@iidea.pl>
+#  Extended by Siddhartha Chaudhuri, 2008.
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+#
 
-SET (freeimage_include_dir "/usr/include/" CACHE STRING "FreeImage include paths")
-SET (freeimage_library_dir "/usr/lib" CACHE STRING "FreeImage library paths")
-SET (freeimage_library "freeimage" CACHE STRING "FreeImage library")
+SET(FreeImage_FOUND FALSE)
+SET(FreeImage_INCLUDE_DIRS)
+SET(FreeImage_LIBRARIES)
 
-########################################
-# Find packages
-IF (PKG_CONFIG_FOUND)
-  pkg_check_modules(FI freeimage>=${FREEIMAGE_VERSION})
-  IF (NOT FI_FOUND)
-    MESSAGE (STATUS "  freeimage.pc not found, trying freeimage_include_dir and freeimage_library_dir flags.")
-  ENDIF (NOT FI_FOUND)
-ENDIF (PKG_CONFIG_FOUND)
+SET(SEARCH_PATHS
+  $ENV{ProgramFiles}/freeimage/include
+  $ENV{SystemDrive}/freeimage/include
+  $ENV{ProgramFiles}/freeimage
+  $ENV{SystemDrive}/freeimage
+  )
+IF(FreeImage_ROOT)
+  SET(SEARCH_PATHS
+    ${FreeImage_ROOT}
+    ${FreeImage_ROOT}/include
+    ${SEARCH_PATHS}
+    )
+ENDIF()
 
-IF (NOT FI_FOUND)
-  FIND_PATH(freeimage_include_dir FreeImage.h ${freeimage_include_dir})
-  IF (NOT freeimage_include_dir)
-    MESSAGE (STATUS "  Looking for FreeImage.h - not found")
-    MESSAGE (FATAL_ERROR "  Unable to find FreeImage.h")
-  ELSE (NOT freeimage_include_dir)
+FIND_PATH(FreeImage_INCLUDE_DIRS
+  NAMES FreeImage.h
+  PATHS ${SEARCH_PATHS}
+  NO_DEFAULT_PATH)
+IF(NOT FreeImage_INCLUDE_DIRS)  # now look in system locations
+  FIND_PATH(FreeImage_INCLUDE_DIRS NAMES FreeImage.h)
+ENDIF(NOT FreeImage_INCLUDE_DIRS)
 
-    # Check the FreeImage header for the right version
-    SET (testFreeImageSource ${CMAKE_CURRENT_BINARY_DIR}/CMakeTmp/test_freeimage.cc)
-    FILE (WRITE ${testFreeImageSource} 
-      "#include <FreeImage.h>\nint main () { if (FREEIMAGE_MAJOR_VERSION >= ${FREEIMAGE_MAJOR_VERSION} && FREEIMAGE_MINOR_VERSION >= ${FREEIMAGE_MINOR_VERSION}) return 1; else return 0;} \n")
-    TRY_RUN(FREEIMAGE_RUNS FREEIMAGE_COMPILES ${CMAKE_CURRENT_BINARY_DIR} 
-                ${testFreeImageSource})
-    IF (NOT FREEIMAGE_RUNS)
-      MESSAGE (FATAL_ERROR "  Invalid FreeImage Version. Requires ${FREEIMAGE_VERSION}")
-    ELSE (NOT FREEIMAGE_RUNS)
-       MESSAGE (STATUS "  Looking for FreeImage.h - found")
-    ENDIF (NOT FREEIMAGE_RUNS)
+SET(FreeImage_LIBRARY_DIRS)
+IF(FreeImage_ROOT)
+  SET(FreeImage_LIBRARY_DIRS ${FreeImage_ROOT})
+  IF(EXISTS "${FreeImage_ROOT}/lib")
+    SET(FreeImage_LIBRARY_DIRS ${FreeImage_LIBRARY_DIRS} ${FreeImage_ROOT}/lib)
+  ENDIF()
+  IF(EXISTS "${FreeImage_ROOT}/lib/static")
+    SET(FreeImage_LIBRARY_DIRS ${FreeImage_LIBRARY_DIRS} ${FreeImage_ROOT}/lib/static)
+  ENDIF()
+ENDIF()
 
-  ENDIF (NOT freeimage_include_dir)
+# FreeImage
+# Without system dirs
+FIND_LIBRARY(FreeImage_LIBRARY
+  NAMES freeimage
+  PATHS ${FreeImage_LIBRARY_DIRS}
+  NO_DEFAULT_PATH
+  )
+IF(NOT FreeImage_LIBRARY)  # now look in system locations
+  FIND_LIBRARY(FreeImage_LIBRARY NAMES freeimage)
+ENDIF(NOT FreeImage_LIBRARY)
 
-  FIND_LIBRARY(freeimage_library freeimage ${freeimage_library_dir})
-  IF (NOT freeimage_library)
-    MESSAGE (STATUS "  Looking for libfreeimage - not found")
-    MESSAGE (FATAL_ERROR "  Unable to find libfreeimage")
-  ELSE (NOT freeimage_library)
-    MESSAGE (STATUS "  Looking for libfreeimage - found")
-  ENDIF (NOT freeimage_library)
+SET(FreeImage_LIBRARIES)
+IF(FreeImage_LIBRARY)
+  SET(FreeImage_LIBRARIES ${FreeImage_LIBRARY})
+ENDIF()
 
-ELSE (NOT FI_FOUND)
-  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                        ${gazeboserver_include_dirs_desc} 
-                        ${FI_INCLUDE_DIRS})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                        ${gazeboserver_link_dirs_desc} 
-                        ${FI_LIBRARY_DIRS})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${FI_LINK_LIBS})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${FI_LIBRARIES})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${FI_LDFLAGS})
-ENDIF (NOT FI_FOUND)
+
+IF(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
+  SET(FreeImage_FOUND TRUE)
+  IF(NOT FreeImage_FIND_QUIETLY)
+    MESSAGE(STATUS "Found FreeImage: headers at ${FreeImage_INCLUDE_DIRS}, libraries at ${FreeImage_LIBRARY_DIRS} :: ${FreeImage_LIBRARIES}")
+  ENDIF(NOT FreeImage_FIND_QUIETLY)
+ELSE(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
+  SET(FreeImage_FOUND FALSE)
+  IF(FreeImage_FIND_REQUIRED)
+    MESSAGE(FATAL_ERROR "FreeImage not found")
+  ELSE(FreeImage_FIND_REQUIRED)
+    MESSAGE(STATUS "FreeImage not found")
+  ENDIF(FreeImage_FIND_REQUIRED)
+ENDIF(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
+MARK_AS_ADVANCED(FreeImage_INCLUDE_DIRS FreeImage_LIBRARIES)

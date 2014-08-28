@@ -12,6 +12,7 @@ namespace mln
   namespace accu
   {
 
+    // Not that the argument of the accumulator is a point (or an index), not a node.
     template <class P, class Amap>
     struct least_common_ancestor : Accumulator< least_common_ancestor<P, Amap> >
     {
@@ -26,7 +27,8 @@ namespace mln
       least_common_ancestor(const tree_t& tree,
 			    const amap_t& depth)
 	: m_tree (tree),
-	  m_depth (depth)
+	  m_depth (depth),
+          m_current (m_tree.nend())
       {
       }
 

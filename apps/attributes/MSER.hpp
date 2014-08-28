@@ -78,15 +78,27 @@ compute_MSER_attribute(const mln::image2d<V>& f,
 
   // compute area
   image2d<unsigned> area;
+  image2d<unsigned> maxarea; // the max area of the children in Δh
 
   {
     resize(area, K).init(0);
+    resize(maxarea, K).init((unsigned)0);
     area[S[0]] = 1;
     for (int i = S.size()-1; i > 0; --i)
       {
 	unsigned x = S[i];
 	++area[x];
 	area[parent[x]] += area[x];
+
+	if (K[x] != K[parent[x]]) { // canonical propagate to parent
+	  unsigned y = parent[x];
+	  unsigned a = area[x];
+	  V v = f[x];
+	  while (parent[y] != y and dist(v, f[y]) < eps) {
+	    y = parent[y];
+	  }
+	  maxarea[y] = std::max(a, maxarea[y]);
+	}
       }
   }
 
@@ -103,13 +115,19 @@ compute_MSER_attribute(const mln::image2d<V>& f,
 
 	V v = f[x];
 	unsigned y = parent[x];
-	while (dist(v, f[y]) < eps and y != parent[y])
+	unsigned smally = parent[x];
+	while (dist(v, f[y]) < eps and y != parent[y]) {
+	  if (dist(v,f[y]) < (eps / 3))
+	    smally = y;
 	  y = parent[y];
+	}
 
 	switch (amser) {
-	  case MSER_DIFF: mser[x] = area[y] - area[x]; break;
-	  case MSER_RATIO: mser[x] = (float) area[x] / area[y]; break;
-	  case MSER_NORM: mser[x] = (float) (area[y] - area[x]) / area[x]; break;
+	  case MSER_DIFF: mser[x] = area[y] - maxarea[x]; break;
+	  case MSER_RATIO: mser[x] = //(float) area[x] / area[y]; break;
+	    //mser[x] = std::max(10.0f, (float) (area[y] - maxarea[x]) / area[x]); break;
+	    mser[x] = (float) (area[smally] - area[x]) / (area[y] - area[x]); break;
+	  case MSER_NORM: mser[x] = (float) (area[y] - maxarea[x]) / maxarea[x]; break;
 	}
       }
 

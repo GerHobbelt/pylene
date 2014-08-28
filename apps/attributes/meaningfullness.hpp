@@ -7,10 +7,9 @@
 # include <mln/core/extension/fill.hpp>
 # include <mln/core/wrt_offset.hpp>
 
+# include <mln/core/colors.hpp>
 # include <mln/core/math_ops.hpp>
 # include <mln/core/vec/vec_math_ops.hpp>
-
-# include <mln/io/imprint.hpp>
 # include <apps/tos/topology.hpp>
 
 namespace mln
@@ -42,6 +41,8 @@ namespace mln
 
   /// \brief Take an image and puts its curvature on the edges
   /// The image is doubled, non-edges pixels have undefined values.
+  /// If the input value type is a rgb, the image is first converted
+  /// to gray-levels (by averaging r,g,b values)
   template <typename V>
   image2d<float>
   curvature_on_edge(const image2d<V>& ima);
@@ -97,7 +98,7 @@ namespace mln
       int		m_v_n_ext = 0;
       sum_type		m_v_sum_ext = literal::zero;
       sum_sqr_type	m_v_sum_ext_sqr = literal::zero;
-      unsigned		m_area;
+      unsigned		m_area = 0;
 
       energy_t()
       {
@@ -110,6 +111,19 @@ namespace mln
 	  return 0;
 	return sum(x2 / n - sqr(x / n)) / (float) dim;
       }
+
+      /// Return the variance σ² of the gaussian distribution
+      /// with a covariance matrix: V = σ².Idⁿ where n is the dimension.
+      static float var(sum_type x, sum_sqr_type x2, float n)
+      {
+	if (n == 0) return 0;
+
+	// float s = sum(x2 / n) - sum(sqr(x / n));
+	// which is equivalent to
+	float s = sum(x2 / n - sqr(x) / (n*n)  );
+	return s / (float) dim; //std::pow(s, 1.0 / dim);
+      }
+
 
       static
       std::pair<float, float>
@@ -129,15 +143,21 @@ namespace mln
 
 
       float external_energy() const {
-	float Vin = cvar(m_v_sum_int, m_v_sum_int_sqr, m_v_n_int);
-	float Vout = cvar(m_v_sum_ext, m_v_sum_ext_sqr, m_v_n_ext);
-	float Vtotal = cvar(m_v_sum_int + m_v_sum_ext,
-			    m_v_sum_int_sqr + m_v_sum_ext_sqr,
-			    m_v_n_int + m_v_n_ext);
+	float Vin = var(m_v_sum_int, m_v_sum_int_sqr, m_v_n_int);
+	float Vout = var(m_v_sum_ext, m_v_sum_ext_sqr, m_v_n_ext);
+	// float Vtotal = var(m_v_sum_int + m_v_sum_ext,
+	// 		   m_v_sum_int_sqr + m_v_sum_ext_sqr,
+	// 		   m_v_n_int + m_v_n_ext);
 
-	auto c1 = (m_v_sum_int / (float)m_v_n_int);
-	auto c2 = (m_v_sum_ext / (float)m_v_n_ext);
-	float dinter = sum(sqr(c1-c2));
+	auto c1_ = (m_v_sum_int / (float)m_v_n_int);
+	auto c2_ = (m_v_sum_ext / (float)m_v_n_ext);
+	auto v_ = c2_ - c1_;
+	auto v = (v_) / (float)l2norm(v_);
+
+	float c1 = sum(c1_ * v);
+	float c2 = sum(c2_ * v);
+
+	//float dinter = sum(sqr(c1-c2));
 
 	if (Vin == 0 or Vout == 0)
 	  return 1.0;
@@ -330,14 +350,32 @@ namespace mln
   }
 
 
-
   template <typename V>
   image2d<float>
-  curvature_on_edge(const image2d<V>& ima)
+  curvature_on_edge(const image2d<V>& ima_)
   {
-    typedef decltype(V() + V()) Vec;
-    typedef typename std::make_signed<Vec>::type vec_t;
-    //static_assert(std::is_same<vec_t, int>::value, "here!");
+    static_assert(std::is_same<V, uint8>::value or
+		  std::is_same<V, rgb8>::value,
+		  "V must either uint8 or rgb8.");
+
+    struct to_uint8 {
+      static
+      image2d<uint8>
+      foo(const image2d<uint8>& x)
+      {
+	return x;
+      }
+
+      static
+      image2d<uint8>
+      foo(const image2d<rgb8>& ima_)
+      {
+	return transform(ima_, [] (rgb8 x) -> uint8 { return (x[0] + x[1] + x[2]) / 3; });
+      }
+    };
+
+    image2d<uint8> ima = to_uint8::foo(ima_);
+
 
     trace::entering("mln::curvature_on_edge");
 
@@ -346,85 +384,92 @@ namespace mln
     domain.pmax = domain.pmax * 2 - 1;
     image2d<float> curv(domain, ima.border(), 0);
 
-    auto l1norm = [](vec_t x) { return x; };
+    //auto l1norm = [](vec_t x) { return x; };
 
     mln_foreach(const point2d& p, ima.domain())
       {
 	// Right edge
 	{
-	  float ux = l1norm( ((vec_t) ima.at(p + point2d{0,1}) - (vec_t) ima.at(p)));
-	  float uy = l1norm( ((vec_t) ima.at(p + point2d{1,0}) - (vec_t) ima.at(p + point2d{-1,0}) +
-			  (vec_t) ima.at(p + point2d{1,1}) - (vec_t) ima.at(p + point2d{-1,1})) / 4.0 );
+	  float ux = ima.at(p + point2d{0,1}) - ima.at(p);
+	  float uy =
+	    (ima.at(p + point2d{1,0}) - ima.at(p + point2d{-1,0}) +
+	     ima.at(p + point2d{1,1}) - ima.at(p + point2d{-1,1})) / 4.0;
 
-	  //std::cout << p << " " << ux << " " << (- (vec_t) ima.at(p + point2d{-1,0})) << ":" << uy << std::endl;
+	  float uxx =
+	    (ima.at(p + point2d{0,-1}) - ima.at(p) -
+	     ima.at(p + point2d{0,1})  + ima.at(p + point2d{0,2})) / 2.0;
 
-	  float uxx = l1norm( (vec_t) ima.at(p + point2d{0,-1}) - (vec_t) ima.at(p)
-			    -(vec_t) ima.at(p + point2d{0,1}) + (vec_t) ima.at(p + point2d{0,2})) / 2.0;
+	  float uxy =
+	    (-ima.at(p + point2d{1,0}) + ima.at(p + point2d{-1,0}) +
+	     ima.at(p + point2d{1,1}) - ima.at(p + point2d{-1,1})) / 2.0;
 
-	  float uyy = l1norm( (vec_t) ima.at(p + point2d{-1,0}) + (vec_t) ima.at(p + point2d{-1,1})
-			    -2 * ((vec_t) ima.at(p) + (vec_t) ima.at(p + point2d{0,1}))
-			    + (vec_t) ima.at(p + point2d{1,0}) + (vec_t) ima.at(p + point2d{1,1}) ) / 2.0;
 
-	  float uxy = l1norm( (vec_t) ima.at(p + point2d{1,0}) - (vec_t) ima.at(p + point2d{-1,0}) +
-			    (vec_t) ima.at(p + point2d{1,1}) - (vec_t) ima.at(p + point2d{-1,1}) ) / 2.0;
+	  float uyy =
+	    (ima.at(p + point2d{-1,0}) + ima.at(p + point2d{-1,1}) +
+	     ima.at(p + point2d{1,0}) + ima.at(p + point2d{1,1})
+	     - 2 * ima.at(p) - 2 * ima.at(p + point2d{0,1})) / 2.0;
+
 
 	  float den = (sqr(ux) + sqr(uy));
 	  point2d p_ = p * 2 + point2d{0,1};
 	  if (den != 0)
-	    curv.at(p_) = std::abs((uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux)) / (den * std::sqrt(den)));
+	    curv.at(p_) = std::abs(uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux)) / (den * std::sqrt(den));
 	  else
 	    curv.at(p_) = 0;
 
-	  if (MLN_HAS_DEBUG and curv.at(p_) > 100 and p > point2d{1,1}) {
-	    std::cout << p_ << std::endl;
-	    io::imprint(ima | box2d{ p + point2d{-1,-1}, p + point2d{3,3}});
 
-	    std::cout << l1norm((vec_t) ima.at(p + point2d{0,-1}) - (vec_t) ima.at(p)
-			      -(vec_t) ima.at(p + point2d{0,1}) + (vec_t) ima.at(p + point2d{0,2})) << std::endl;
+	  // if (MLN_HAS_DEBUG and curv.at(p_) > 100 and p > point2d{1,1}) {
+	  //   std::cout << p_ << std::endl;
+	  //   io::imprint(ima | box2d{ p + point2d{-1,-1}, p + point2d{3,3}});
 
-	    std::cout << curv.at(p_) << std::endl
-		      << "ux: " << ux << std::endl
-		      << "uy: " << uy << std::endl
-		      << "uxx: " << uxx << std::endl
-		      << "uyy: " << uyy << std::endl
-		      << "uxy: " << uxy << std::endl
-		      << "num: " << uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux) << std::endl
-		      << "den: " << den * std::sqrt(den) << std::endl;
-	    mln_assertion(false);
-	  }
+
+	  //   std::cout << curv.at(p_) << std::endl
+	  // 	      << "ux: " << ux << std::endl
+	  // 	      << "uy: " << uy << std::endl
+	  // 	      << "uxx: " << uxx << std::endl
+	  // 	      << "uyy: " << uyy << std::endl
+	  // 	      << "uxy: " << uxy << std::endl
+	  // 	      << "num: " << uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux) << std::endl
+	  // 	      << "den: " << den * std::sqrt(den) << std::endl;
+	  //   mln_assertion(false);
+	  // }
 	}
 
 	// Bottom edge
 	{
-	  float uy = l1norm( (vec_t) ima.at(p + point2d{1,0}) );
+	  float uy = ima.at(p + point2d{1,0}) - ima.at(p);
 
-	  float ux = l1norm( (vec_t) ima.at(p + point2d{0,1}) - (vec_t) ima.at(p + point2d{0,-1}) +
-			   (vec_t) ima.at(p + point2d{1,1}) - (vec_t) ima.at(p + point2d{1,-1}) ) / 4.0;
+	  float ux =
+	    (ima.at(p + point2d{0,1}) - ima.at(p + point2d{0,-1}) +
+	     ima.at(p + point2d{1,1}) - ima.at(p + point2d{1,-1})) / 4.0;
 
-	  float uxx = l1norm( (vec_t) ima.at(p + point2d{-1,0}) - (vec_t) ima.at(p)
-			    -(vec_t) ima.at(p + point2d{1,0}) + (vec_t) ima.at(p + point2d{2,0})) / 2.0;
+	  float uyy =
+	    (ima.at(p + point2d{-1,0}) - ima.at(p) -
+	     ima.at(p + point2d{1,0}) + ima.at(p + point2d{2,0})) / 2.0;
 
-	  float uyy = l1norm( (vec_t) ima.at(p + point2d{0,-1}) + (vec_t) ima.at(p + point2d{1,-1})
-			    -2 * ((vec_t) ima.at(p) + (vec_t) ima.at(p + point2d{1,0}))
-			    + (vec_t) ima.at(p + point2d{0,1}) + (vec_t) ima.at(p + point2d{1,1}) / 2.0);
+	  float uxx =
+	    (ima.at(p + point2d{0,-1}) + ima.at(p + point2d{1,-1})
+	     - 2 * ima.at(p) - 2 * ima.at(p + point2d{1,0}) +
+	     ima.at(p + point2d{0,1}) + ima.at(p + point2d{1,1})) / 2.0;
 
-	  float uxy = l1norm( (vec_t) ima.at(p + point2d{1,0}) - (vec_t) ima.at(p + point2d{0,-1}) +
-			    (vec_t) ima.at(p + point2d{1,1}) - (vec_t) ima.at(p + point2d{1,-1})) / 2.0;
+	  float uxy =
+	    (ima.at(p + point2d{0,-1}) - ima.at(p + point2d{0,1}) -
+	     ima.at(p + point2d{1,-1}) + ima.at(p + point2d{1,1})) / 2.0;
 
 	  float den = (sqr(ux) + sqr(uy));
 	  point2d p_ = p * 2 + point2d{1,0};
 	  if (den != 0)
-	    curv.at(p_) = std::abs((uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux)) / (den * std::sqrt(den)));
+	    curv.at(p_) = std::abs(uxx * sqr(uy) - 2 * uxy * ux *uy + uyy * sqr(ux)) / (den * std::sqrt(den));
 	  else
 	    curv.at(p_) = 0;
-	  // std::cout << curv.at(p_) << std::endl;
-	  // assert(curv.at(p_) <= 1);
 	}
       }
 
     trace::exiting();
     mln_postcondition(all(curv >= 0));
-    //io::imsave(curv, "/tmp/curvature.tiff");
+
+
+    //io::imsave(tmp, "/tmp/curvature.tiff");
     return curv;
   }
 
@@ -469,6 +514,10 @@ namespace mln
 	if (K[x] != K[parent[x]]) // canonical element
 	  acc[x].depth = acc[parent[x]].depth + 1;
       }
+
+
+    mln_assertion( are_indexes_compatible(curv, parent) );
+    mln_assertion( are_indexes_compatible(curv, K) );
 
 
     // Compute attribute about edges

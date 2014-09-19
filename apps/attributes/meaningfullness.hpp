@@ -712,7 +712,7 @@ namespace mln
 		  float alpha,
 		  float beta,
 		  float gamma,
-		  int eps = 5)
+		  int eps)
   {
     return compute_energy_(ima, K, parent_, S, alpha, beta, gamma, eps);
   }

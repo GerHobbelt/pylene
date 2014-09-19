@@ -540,7 +540,7 @@ namespace mln
   template <typename V, typename T>
   image2d<float>
   compute_energy(const image2d<V>& ima, const image2d<T>& K, const image2d<unsigned>& parent_,
-		  const std::vector<unsigned>& S, int eps = 5)
+		  const std::vector<unsigned>& S, int eps)
   {
     return compute_energy_(ima, K, parent_, S, eps);
   }

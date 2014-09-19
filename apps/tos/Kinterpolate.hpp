@@ -102,7 +102,7 @@ namespace mln
 
   template <typename I>
   image2d<mln_value(I)>
-  immerse_k1(const Image<I>& ima_, mln_value(I) v = mln_value(I) ())
+  immerse_k1(const Image<I>& ima_, mln_value(I) v)
   {
     static_assert( std::is_convertible<typename I::domain_type, box2d>::value,
 		   "Image domain must be convertible to box2d." );

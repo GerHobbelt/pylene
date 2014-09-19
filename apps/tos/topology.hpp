@@ -39,7 +39,7 @@ namespace mln
 
   template <typename I>
   void
-  Kdisplay(const Image<I>& ima_, const point2d strides = point2d{1,1})
+  Kdisplay(const Image<I>& ima_, const point2d strides)
   {
     static_assert( std::is_same<mln_value(I), bool>::value,
 		   "Bool required for image type");

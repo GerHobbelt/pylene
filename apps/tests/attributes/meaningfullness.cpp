@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(meaningfullness_app)
 
    image2d<float> curv = curvature_on_edge(ima);
    image2d< internal::energy_t<uint8> > attributes;
-   image2d<float> energy = meaningfullness(ima, K, parent, S, attributes, 0,0,0);
+   image2d<float> energy = meaningfullness(ima, K, parent, S, attributes, 1, 1, 1);
 
    for (unsigned x: S)
      {

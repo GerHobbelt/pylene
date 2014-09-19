@@ -4,7 +4,6 @@
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 #include "satmaxtree.hpp"
-#include <mln/morpho/datastruct/checktree.hpp>
 
 namespace mln
 {

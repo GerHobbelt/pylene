@@ -43,15 +43,14 @@ namespace mln
 }
 
 
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(red,   (mln::colors::rgba8),
-                                           (mln::getter<0, const mln::colors::rgba8&>),
-                                           (mln::getter<0, mln::colors::rgba8&>));
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(green, (mln::colors::rgba8),
-                                           (mln::getter<1, const mln::colors::rgba8&>),
-                                           (mln::getter<1, mln::colors::rgba8&>));
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(blue,  (mln::colors::rgba8),
-                                           (mln::getter<2, const mln::colors::rgba8&>),
-                                           (mln::getter<2, mln::colors::rgba8&>));
+MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD
+(red, (mln::colors::rgba8), (mln::getter<0>))
+
+MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD
+(green, (mln::colors::rgba8), (mln::getter<1>))
+
+MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD
+(blue, (mln::colors::rgba8), (mln::getter<2>))
 
 
 #endif // ! MLN_COLORS_RGBA_HPP

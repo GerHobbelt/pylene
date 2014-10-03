@@ -234,9 +234,10 @@ namespace mln
 {
   using std::get;
 
-  template <size_t N, class C>
+  template <size_t N>
   struct getter
   {
+    template <class C>
     auto
     operator() (C&& obj) const
       -> decltype(get<N>(std::forward<C>(obj)))
@@ -245,6 +246,7 @@ namespace mln
       return get<N>(std::forward<C>(obj));
     }
   };
+
 }
 
   /****************************/

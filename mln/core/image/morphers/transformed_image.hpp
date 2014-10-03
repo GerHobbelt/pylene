@@ -39,50 +39,106 @@ namespace mln
   /****           HELPER MACROS          ****/
   /******************************************/
 
-# define  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F)             \
-  namespace mln { namespace internal {                                  \
+  // template <typename I>                                                 
+  // transformed_image<I, BOOST_PP_TUPLE_REM () F, false>                  
+  // NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)                  
+  // {                                                                     
+  //   BOOST_PP_TUPLE_REM () F f;                                          
+  //   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f); 
+  // }                                                                     
+
+
+
+# define  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_TEMPLATE_2(NAME, TYPE, F)  \
+ namespace mln { namespace internal {                                  \
                                                                         \
-  template <typename I>                                                 \
-  transformed_image<I, BOOST_PP_TUPLE_REM () F, false>                  \
-  NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)                  \
-  {                                                                     \
-    BOOST_PP_TUPLE_REM () F f;                                          \
-    return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f); \
-  }                                                                     \
-  } }
+      template <typename T>                                             \
+      struct NAME##_helper_t<BOOST_PP_TUPLE_REM () TYPE>                \
+      {                                                                 \
+        typedef BOOST_PP_TUPLE_REM () TYPE          type;               \
+        typedef BOOST_PP_TUPLE_REM () F             f_type;             \
+                                                                        \
+        template <class I>                                              \
+        struct apply                                                    \
+        {                                                               \
+          typedef transformed_image<I, f_type, false> result_type;      \
+          result_type                                                   \
+            operator() (I f) const                                      \
+          {                                                             \
+            return result_type(std::forward<I>(f), f_type());           \
+          }                                                             \
+        };                                                              \
+      };                                                                \
+   }}
 
-# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(NAME, TYPE, F_CONSTREF, F_REF) \
-  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F_REF);                \
-  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME##_const, TYPE, F_CONSTREF);
+# define  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_2(NAME, TYPE, F)           \
+  namespace mln { namespace internal {                                  \
+      template<>                                                        \
+      struct NAME##_helper_t<BOOST_PP_TUPLE_REM () TYPE>                \
+      {                                                                 \
+        typedef BOOST_PP_TUPLE_REM () TYPE          type;               \
+        typedef BOOST_PP_TUPLE_REM () F             f_type;             \
+                                                                        \
+        template <class I>                                              \
+        struct apply                                                    \
+        {                                                               \
+          typedef transformed_image<I, f_type, false> result_type;      \
+          result_type                                                   \
+            operator() (I f) const                                      \
+          {                                                             \
+            return result_type(std::forward<I>(f), f_type());           \
+          }                                                             \
+        };                                                              \
+      };                                                                \
+    }}
 
-# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F_CONSTREF, F_REF) \
-  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F_REF);                \
-  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR(NAME##_const, TYPE, F_CONSTREF);   \
+
+# define MLN_INTERNAL_IMAGE_DECLARE_OPERATOR(NAME)                      \
                                                                         \
   namespace mln {                                                       \
                                                                         \
-  template <typename I>							\
-  internal::transformed_image<I, BOOST_PP_TUPLE_REM () F_REF, false>    \
-  NAME(Image<I>&& ima)                                                  \
-  {									\
-    return internal::NAME##_helper(move_exact<I>(ima), (mln_value(I)*)NULL); \
-  }									\
-									\
-  template <typename I>							\
-  internal::transformed_image<I&, BOOST_PP_TUPLE_REM () F_REF, false>	\
-  NAME(Image<I>& ima)                                                   \
-  {									\
-    return internal::NAME##_helper(exact(ima), (mln_value(I)*) NULL);   \
-  }									\
-  									\
-  template <typename I>							\
-  internal::transformed_image<const I&, BOOST_PP_TUPLE_REM () F_CONSTREF, false> \
-  NAME(const Image<I>& ima)                                             \
-  {									\
-    return internal::NAME##_const_helper(exact(ima), (mln_value(I)*) NULL); \
-  }                                                                     \
+    namespace internal {                                                \
+      template <class T>                                                \
+      struct NAME##_helper_t;                                           \
+    }                                                                   \
                                                                         \
-  }                                                                     \
+    template <typename I>                                               \
+    typename internal::NAME##_helper_t<mln_value(I)>::template apply<I&&>::result_type \
+    NAME(Image<I>&& ima)                                                \
+    {									\
+      return typename internal::NAME##_helper_t<mln_value(I)>::template apply<I&&> () (move_exact<I>(ima)); \
+    }									\
+                                                                        \
+    template <typename I>                                               \
+    typename internal::NAME##_helper_t<mln_value(I)>::template apply<I&>::result_type \
+    NAME(Image<I>& ima)                                                 \
+    {									\
+      return typename internal::NAME##_helper_t<mln_value(I)>::template apply<I&> () (exact(ima)); \
+    }									\
+                                                                        \
+    template <typename I>                                               \
+    typename internal::NAME##_helper_t<mln_value(I)>::template apply<const I&>::result_type \
+    NAME(const Image<I>& ima)                                           \
+    {									\
+      return typename internal::NAME##_helper_t<mln_value(I)>::template apply<const I&> () (exact(ima)); \
+    }                                                                   \
+  }
+
+
+
+# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(NAME, TYPE, F)     \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_2(NAME, TYPE, F)
+
+
+# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR(NAME, TYPE, F)              \
+  MLN_INTERNAL_IMAGE_DECLARE_OPERATOR(NAME);                            \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_2(NAME, TYPE, F)
+
+
+
+# define  MLN_DECLARE_IMAGE_LVALUE_OPERATOR_TEMPLATE(NAME, TYPE, F)     \
+  MLN_INTERNAL_IMAGE_DECLARE_OPERATOR(NAME)                             \
+  MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_TEMPLATE_2(NAME, TYPE, F)
 
 
 
@@ -145,11 +201,20 @@ namespace mln
       typedef typename std::remove_reference<I>::type image_t;
       typedef transformed_image<I, UnaryFunction, false> this_t;
       friend struct mln::morpher_core_access;
-
+      typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type    result_type;
 
     public:
-      typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type	reference;
+      // If F(x) -> T&& then the return type is T (because it would yield a dangling rvalue ref to x)
+      // reference is thus T&, const T& or T
+      typedef typename std::conditional<std::is_rvalue_reference<result_type>::value,
+                                        typename std::remove_reference<result_type>::type,
+                                        result_type>::type                      reference;
+
       typedef typename std::decay<reference>::type				value_type;
+
+
+      // if reference is T& or T const &, the const_reference is T const &
+      // if reference is T, the const_reference is still T
       typedef typename std::conditional<
         std::is_reference<reference>::value,
         typename std::add_lvalue_reference<typename std::add_const<value_type>::type>::type,
@@ -164,7 +229,7 @@ namespace mln
     private:
       struct val_fun_t {
         reference operator() (mln_reference(I) v) const {
-          return m_fun(v);
+          return m_fun(std::forward<mln_reference(I)>(v));
         }
         UnaryFunction m_fun;
       };
@@ -179,7 +244,7 @@ namespace mln
         }
 
         const_reference operator() (mln_reference(I) v) const {
-          return m_fun(v);
+          return m_fun(std::forward<mln_reference(I)>(v));
         }
         UnaryFunction m_fun;
       };
@@ -282,6 +347,7 @@ namespace mln
       operator() (const mln_point(I)& p)
       {
         mln_precondition(this->domain().has(p));
+        std::cout <<  m_fun(m_ima(p)) << std::endl;
         return m_fun(m_ima(p));
       }
 
@@ -368,9 +434,9 @@ namespace mln
     {
       friend struct mln::morpher_core_access;
       friend struct const_pixel_type;
-      typedef transformed_image<I, UnaryFunction, false> image_type;
-      typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type	reference;
-      typedef typename std::remove_reference<reference>::type			value_type;
+      typedef transformed_image<I, UnaryFunction, false>                           image_type;
+      typedef typename transformed_image<I, UnaryFunction, false>::reference       reference;
+      typedef typename transformed_image<I, UnaryFunction, false>::value_type      value_type;
 
       pixel_type(const mln_pixel(I)& px, image_type* ima)
 	: m_pix(px), m_ima(ima)
@@ -398,7 +464,7 @@ namespace mln
       : morpher_pixel_base<transformed_image<I, UnaryFunction, false>::const_pixel_type, mln_pixel(I)>
     {
       friend struct mln::morpher_core_access;
-      typedef const transformed_image<I, UnaryFunction, false> image_type;
+      typedef const transformed_image<I, UnaryFunction, false>                  image_type;
       typedef transformed_image<I, UnaryFunction, false>::value_type		value_type;
       typedef transformed_image<I, UnaryFunction, false>::const_reference	reference;
 

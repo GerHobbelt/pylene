@@ -29,7 +29,11 @@ namespace mln
     virtual void read_next_pixel(void* out) = 0;
     virtual std::function<void(void*)> get_read_next_pixel_method() const = 0;
 
+    /// \brief Return the type id of pixel type
     virtual std::type_index get_value_type_id() const = 0;
+
+    /// \brief Return the number of *bytes* per pixel
+    virtual int             get_bpp() const = 0;
   };
 
   class PluginReader2D : public PluginReader

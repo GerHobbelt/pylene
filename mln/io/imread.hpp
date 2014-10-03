@@ -17,7 +17,7 @@ namespace mln
     /// \param path Path to the image
     /// \param[out] out Image to be loaded
     template <typename I>
-    void imread(const std::string& path, Image<I>& out, bool permissice = false);
+    void imread(const std::string& path, Image<I>& out, bool permissive = false);
 
     template <typename I>
     void imread(std::istream& path, Image<I>& out, bool permissive = false);

@@ -1,7 +1,13 @@
 #ifndef MLN_IO_LOADER_HPP
 # define MLN_IO_LOADER_HPP
 
+# include <type_traits>
+# include <memory>
+# include <algorithm>
+
+# include <mln/core/value/value_traits.hpp>
 # include <mln/core/image/image.hpp>
+# include <boost/preprocessor/seq/for_each.hpp>
 # include <mln/io/plugin.hpp>
 # include <mln/io/ioexception.hpp>
 # include <mln/io/internal/demangle.hpp>
@@ -28,6 +34,8 @@ namespace mln
       void m_check_value_type_compatible() const;
       virtual bool is_value_type_convertible(std::type_index x,
                                              std::type_index y) const;
+      virtual bool is_value_type_convertible_from(std::type_index src_type) const;
+
       virtual void m_resize() = 0;
       virtual void m_load();
 
@@ -96,13 +104,69 @@ namespace mln
         }
     }
 
+    namespace internal
+    {
+      template <typename VIN, typename VOUT>
+      void value_convert(void* buffer_in, void* buffer_out, std::size_t n)
+      {
+        VIN*  in = (VIN*) buffer_in;
+        VOUT* out = (VOUT*) buffer_out;
+        std::copy(in, in + n, out);
+      }
+
+
+# define MLN_INTERNAL_SCALAR_TYPE_SEQ (bool) (int8) (uint8) (int16) (uint16)\
+        (int32) (uint32) (int64) (uint64) (float) (double)
+
+# define MLN_INTERNAL_VEC_TYPE_SEQ (rgb8) (rgba8) (rgb16) (rgba16) (rgb32) (rgba32)
+
+
+      template <typename VIN, typename VOUT, class Enable = void>
+      struct default_converter
+      {
+        static constexpr void (*ptr) (void*,void*,std::size_t) = nullptr;
+      };
+
+      template <typename VIN, typename VOUT>
+      struct default_converter<VIN, VOUT, typename std::enable_if
+                               <std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
+                                value_traits<VIN>::quant < value_traits<VOUT>::quant>::type>
+      {
+        static constexpr void (*ptr) (void*,void*,std::size_t) = &value_convert<VIN, VOUT>;
+      };
+
+
+# define MLN_INTERNAL_CONV_EXPAND(r, data, VIN)                         \
+      if (sidx == typeid(VIN)) return default_converter<VIN, VOUT>::ptr;
+
+      template <typename VOUT>
+      std::function<void (void*, void*, std::size_t n)>
+      defaut_value_type_converter(std::type_index sidx)
+      {
+        BOOST_PP_SEQ_FOR_EACH(MLN_INTERNAL_CONV_EXPAND, _, MLN_INTERNAL_SCALAR_TYPE_SEQ);
+
+        return nullptr;
+      }
+
+    }
+
     template <class I>
     inline
     bool
     Loader<I>::is_value_type_convertible(std::type_index sidx,
                                          std::type_index tidx) const
     {
+
       return sidx == tidx;
+    }
+
+    template <class I>
+    inline
+    bool
+    Loader<I>::is_value_type_convertible_from(std::type_index sidx) const
+    {
+      typedef mln_value(I) V;
+      return sidx == typeid(V) or internal::defaut_value_type_converter<V>(sidx);
     }
 
 
@@ -114,8 +178,8 @@ namespace mln
       std::type_index sidx = m_plugin->get_value_type_id();
       std::type_index tidx = typeid(V);
 
-      if (sidx != tidx or
-          (m_permissive and not is_value_type_convertible(sidx, tidx)))
+      if (sidx != tidx and (not m_permissive or
+                            not is_value_type_convertible_from(sidx)))
         {
           std::string ex = "Value types incompatibles: ";
           (ex += "trying to load ") += internal::demangle(sidx.name());
@@ -131,10 +195,31 @@ namespace mln
       std::type_index sidx = m_plugin->get_value_type_id();
       std::type_index tidx = typeid(mln_value(I));
 
-      if (sidx == tidx)
+      std::function<void (void*,void*,std::size_t)> from_to =
+        internal::defaut_value_type_converter< mln_value(I) >(sidx);
+
+      std::function<void (void*)> read_next_pixel =
+        m_plugin->get_read_next_pixel_method();
+
+
+      if (sidx != tidx and from_to) // need to convert
         {
-          std::function<void (void*)> read_next_pixel =
-            m_plugin->get_read_next_pixel_method();
+          int bpp       = m_plugin->get_bpp();
+          int bytes     = bpp / 8 + (bpp % 8 != 0);
+          void* valptr  = std::malloc(bytes);
+
+          mln_pixter(px, *m_ima);
+          mln_forall(px)
+          {
+            read_next_pixel(valptr);
+            from_to(valptr, &(px->val()), 1);
+          }
+
+          std::free(valptr);
+        }
+      else
+        {
+          mln_assertion(sidx == tidx);
 
           mln_value(I) v;
           mln_pixter(px, *m_ima);
@@ -144,13 +229,13 @@ namespace mln
             px->val() = v;
           }
         }
-      else
-        {
-          std::string ex = "Value types incompatibles: ";
-          (ex += "trying to load ") += internal::demangle(sidx.name());
-          (ex += " in an image of ") += internal::demangle(tidx.name());
-          throw MLNIOException(ex);
-        }
+      // else
+      //   {
+      //     std::string ex = "Value types incompatibles: ";
+      //     (ex += "trying to load ") += internal::demangle(sidx.name());
+      //     (ex += " in an image of ") += internal::demangle(tidx.name());
+      //     throw MLNIOException(ex);
+      //   }
     }
 
 
@@ -184,10 +269,35 @@ namespace mln
       std::function<void (void*)> read_next_line =
         plug->get_read_next_line_method();
 
-      for (; p[0] != q[0]; ++p[0])
+      std::type_index sidx = plug->get_value_type_id();
+      std::type_index tidx = typeid(mln_value(I));
+
+      std::function<void (void*,void*,std::size_t)> from_to =
+        internal::defaut_value_type_converter<mln_value(I)>(sidx);
+
+      if (sidx != tidx and from_to) // we need to convert the value type
         {
-          void* lineptr = &(*this->m_ima)(p);
-          read_next_line(lineptr);
+          int bpp       = plug->get_bpp();
+          std::size_t n = q[1] - p[1];
+          void* buffer  = std::malloc(bpp * n);
+
+          for (; p[0] != q[0]; ++p[0])
+             {
+               void* lineptr = &(*this->m_ima)(p);
+               read_next_line(buffer);
+               from_to(buffer, lineptr, n);
+             }
+
+          std::free(buffer);
+        }
+      else
+        {
+          mln_assertion(sidx == tidx);
+          for (; p[0] != q[0]; ++p[0])
+            {
+              void* lineptr = &(*this->m_ima)(p);
+              read_next_line(lineptr);
+            }
         }
     }
 

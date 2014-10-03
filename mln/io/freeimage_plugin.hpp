@@ -31,6 +31,7 @@ namespace mln
       virtual std::type_index get_value_type_id() const final;
 
       virtual box2d get_domain() const final;
+      virtual int   get_bpp() const final;
 
     private:
       void _load();
@@ -62,7 +63,7 @@ namespace mln
       RGBQUAD*          m_palette;
       unsigned  pitch;          // Size in byte of the scanline (padding inc.)
       unsigned  byteperline;    // Size in byte of the line (without padding)
-      int       bpp;            // Size in bit of the pixel
+      int       bpp;            // Size in byte of the pixel (1/4/8bits bitmap => 1 bpp, 16bits -> 2bpp...)
       int       x, y; // internally used by read/write to store current position
     };
 
@@ -85,8 +86,10 @@ namespace mln
     private:
       void _allocate();
       void _get_fit_and_bpp_from_type(FREE_IMAGE_TYPE& fit, unsigned& bpp, std::type_index vtype) const;
-      void write_next_line_rgb(void* out);
-      void write_next_pixel_rgb(void* out);
+      void write_next_line_rgb8(void* out);
+      void write_next_pixel_rgb8(void* out);
+      void write_next_line_rgba8(void* out);
+      void write_next_pixel_rgba8(void* out);
       void write_next_line_gray(void* out);
       void write_next_pixel_gray(void* out);
       void write_next_line_bool(void* out);
@@ -128,6 +131,12 @@ namespace mln
       return m_domain;
     }
 
+    inline
+    int
+    freeimage_reader_plugin::get_bpp() const
+    {
+      return bpp;
+    }
 
     inline
     std::function<void(void*)>
@@ -620,6 +629,7 @@ namespace mln
           { typeid(bool),   {FIT_BITMAP, 1}  },
           { typeid(uint8),  {FIT_BITMAP, 8}  },
           { typeid(rgb8),   {FIT_BITMAP, 24} },
+          { typeid(colors::rgba8),  {FIT_BITMAP, 32} },
           { typeid(uint16), {FIT_UINT16, 16} },
           { typeid(int16),  {FIT_INT16,  16} },
           { typeid(uint32), {FIT_UINT32, 32} },
@@ -663,7 +673,7 @@ namespace mln
 
       mln_precondition(m_dib == NULL);
 
-      if (m_vtype == typeid(rgb8))
+      if (m_vtype == typeid(rgb8) or m_vtype == typeid(colors::rgba8))
         {
           red_mask = FI_RGBA_RED_MASK;
           green_mask = FI_RGBA_GREEN_MASK;
@@ -695,9 +705,16 @@ namespace mln
         }
       else if (m_vtype == typeid(rgb8))
         {
-          m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_rgb,
+          m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_rgb8,
                                          this, std::placeholders::_1);
-          m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_rgb,
+          m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_rgb8,
+                                         this, std::placeholders::_1);
+        }
+      else if (m_vtype == typeid(colors::rgba8))
+        {
+          m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_rgba8,
+                                         this, std::placeholders::_1);
+          m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_rgba8,
                                          this, std::placeholders::_1);
         }
       else
@@ -839,7 +856,7 @@ namespace mln
     // 24-bit DIBs have every 3 bytes representing a color, using the
     // same ordering as the RGBTRIPLE structure.
     inline
-    void freeimage_writer_plugin::write_next_line_rgb(void* src)
+    void freeimage_writer_plugin::write_next_line_rgb8(void* src)
     {
       rgb8* buffer = (rgb8*) src;
       for (unsigned y = 0; y < m_ncols; y++)
@@ -852,12 +869,45 @@ namespace mln
     }
 
     inline
-    void freeimage_writer_plugin::write_next_pixel_rgb(void* src)
+    void freeimage_writer_plugin::write_next_pixel_rgb8(void* src)
     {
       rgb8* pixel = (rgb8*) src;
       m_ptr[y * psz + FI_RGBA_RED]   = (*pixel)[0];
       m_ptr[y * psz + FI_RGBA_GREEN] = (*pixel)[1];
       m_ptr[y * psz + FI_RGBA_BLUE]  = (*pixel)[2];
+
+      if (++y == m_ncols)
+        {
+          y = 0;
+          m_ptr -= pitch;
+        }
+    }
+
+
+    // 32-bit DIBs have every 4 bytes representing a color, using the
+    // same ordering as the RGBQUAD structure (ordering OS-dependant)
+    inline
+    void freeimage_writer_plugin::write_next_line_rgba8(void* src)
+    {
+      colors::rgba8* buffer = (colors::rgba8*) src;
+      for (unsigned y = 0; y < m_ncols; y++)
+        {
+          m_ptr[y * psz + FI_RGBA_RED] =   buffer[y][0];
+          m_ptr[y * psz + FI_RGBA_GREEN] = buffer[y][1];
+          m_ptr[y * psz + FI_RGBA_BLUE] =  buffer[y][2];
+          m_ptr[y * psz + FI_RGBA_ALPHA] =  buffer[y][3];
+        }
+      m_ptr -= pitch;
+    }
+
+    inline
+    void freeimage_writer_plugin::write_next_pixel_rgba8(void* src)
+    {
+      colors::rgba8* pixel = (colors::rgba8*) src;
+      m_ptr[y * psz + FI_RGBA_RED]   = (*pixel)[0];
+      m_ptr[y * psz + FI_RGBA_GREEN] = (*pixel)[1];
+      m_ptr[y * psz + FI_RGBA_BLUE]  = (*pixel)[2];
+      m_ptr[y * psz + FI_RGBA_ALPHA]  = (*pixel)[3];
 
       if (++y == m_ncols)
         {

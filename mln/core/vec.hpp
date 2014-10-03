@@ -5,6 +5,7 @@
 # include <mln/core/vec_base.hpp>
 # include <mln/core/vec/compare.hpp>
 # include <mln/core/vec/vec_io.hpp>
+# include <mln/core/vec/vec_ops.hpp>
 # include <mln/core/vec/vec_math_ops.hpp>
 
 

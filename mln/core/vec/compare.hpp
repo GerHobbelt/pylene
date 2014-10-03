@@ -47,7 +47,7 @@ namespace mln
   template <typename U, typename V>
   struct productorder_less;
 
-  template <typename U, typename V = U>
+  template <typename U, typename V>
   struct productorder_less_equal;
 
   template <typename U, typename V = U>
@@ -321,6 +321,14 @@ namespace mln
     return true;
   }
 
+  template <typename U, typename V>
+  typename std::enable_if< std::is_arithmetic<U>::value and
+                           std::is_arithmetic<V>::value, bool>::type
+  vecprod_islessequal(const U& u, const V& v)
+  {
+    return u <= v;
+  }
+
 
   template <typename U, typename V, unsigned dim, typename tag>
   bool
@@ -373,13 +381,11 @@ namespace mln
     }
   };
 
-  template <typename U, typename V,
-	    unsigned dim, typename tag>
-  struct productorder_less_equal< internal::vec_base<U, dim, tag>, internal::vec_base<V, dim, tag> >
+  template <typename U, typename V>
+  struct productorder_less_equal
   {
     bool
-    operator() (const internal::vec_base<U, dim, tag>& u,
-		const internal::vec_base<V, dim, tag>& v) const
+    operator() (const U& u, const U& v) const
     {
       return vecprod_islessequal(u, v);
     }

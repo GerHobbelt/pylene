@@ -528,7 +528,7 @@ namespace mln
     constexpr
     T&& get(mln::internal::vec_base<T, dim, tag>&& vec)
     {
-      return std::move<T>(vec.v_[N]);
+      return std::move<T&>(vec.v_[N]);
     }
 
   }

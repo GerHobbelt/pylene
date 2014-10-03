@@ -11,6 +11,9 @@ namespace mln
   struct productorder_less;
 
   template <typename U, typename V = U>
+  struct productorder_less_equal;
+
+  template <typename U, typename V = U>
   struct lexicographicalorder_less;
 
 

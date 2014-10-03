@@ -29,9 +29,9 @@
 
 int main(int argc, char** argv)
 {
-  if (argc < 4)
+  if (argc != 11)
     {
-      std::cerr << "Usage:" << argv[0] << "tree input.tiff λ ε α β γ out.tree spectra.csv\n"
+      std::cerr << "Usage:" << argv[0] << "tree input.tiff λ ε α β γ t₁ out.tree spectra.csv\n"
                 << "The tree and input must hold the 0 and 1 faces.\n"
                 << " λ:\t Grain filter before anything else (number of 2F)\n"
                 << " ε:\t The radius of the ball when considering the contextual energy (3-10).\n"
@@ -43,7 +43,6 @@ int main(int argc, char** argv)
                 << "\t     Consider α=1, β=1, γ=10-100\n"
                 << "\t     (you can set one of these parameters to 0 to unactive the term).\n"
                 << " t₁:\t Threshold above which node having an energy greater that t₁ are removed.\n";
-      // << " t₂:\t Threshold below which node having an extinction value lesser than t₂ are removed.\n";
       std::abort();
     }
 

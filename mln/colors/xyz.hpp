@@ -34,8 +34,8 @@ namespace mln
   template <typename T>
   xyz<float> rgb2xyz(const rgb<T>& v);
 
-  // template <typename T>
-  // rgb<T> xyz2rgb(const xyz<T>& v);
+  template <typename T>
+  rgb<float> xyz2rgb(const xyz<T>& v);
 
 
   /*********************/
@@ -47,11 +47,23 @@ namespace mln
   xyz<float>
   rgb2xyz(const rgb<T>& v)
   {
-    float x = (0.4125 * v[0] + 0.3576 * v[1] + 0.1804 * v[2]);
+    float x = (0.4125 * v[0] + 0.3576 * v[1] + 0.1805 * v[2]);
     float y = (0.2127 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]);
-    float z = (0.0193 * v[0] + 0.1192 * v[1] + 0.9502 * v[2]);
+    float z = (0.0193 * v[0] + 0.1192 * v[1] + 0.9505 * v[2]);
 
     return {x,y,z};
+  }
+
+  template <typename T>
+  inline
+  rgb<float>
+  xyz2rgb(const xyz<T>& v)
+  {
+    float r = ( 3.2406 * v[0] - 1.5372 * v[1] - 0.4986 * v[2]);
+    float g = (-0.9689 * v[0] + 1.8758 * v[1] + 0.0415 * v[2]);
+    float b = ( 0.0557 * v[0] - 0.2040 * v[1] + 1.0570 * v[2]);
+
+    return {r,g,b};
   }
 
 }

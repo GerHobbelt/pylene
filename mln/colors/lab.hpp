@@ -35,8 +35,8 @@ namespace mln
   template <typename T>
   lab<float> rgb2lab(const rgb<T>& v);
 
-  // template <typename T>
-  // rgb<T> lab2rgb(const lab<T>& v);
+  template <typename T>
+  rgb<T> lab2rgb(const lab<T>& v);
 
 
   /*********************/
@@ -55,7 +55,7 @@ namespace mln
     constexpr float zn = (0.0193 + 0.1192 + 0.9502) * value_traits<T>::max();
 
     auto f = [] (float t) {
-      return (t > (216.0f / 24389.0f)) ? std::cbrt(t) : (t * 841.0f / 208.0f + (4.0f / 29.0f));
+      return (t > .008856f) ? std::cbrt(t) : (t * 7.787f + 16.0f/116.0f);
     };
 
     float xr = f(xyz[0] / xn);
@@ -67,6 +67,28 @@ namespace mln
     float b = 200 * (yr - zr);
 
     return {l, a, b};
+  }
+
+
+  template <typename T>
+  inline
+  rgb<T>
+  lab2rgb(const lab<float>& v)
+  {
+    constexpr float xn = (0.4125 + 0.3576 + 0.1804) * value_traits<T>::max();
+    constexpr float yn = (0.2127 + 0.7152 + 0.0722) * value_traits<T>::max();
+    constexpr float zn = (0.0193 + 0.1192 + 0.9502) * value_traits<T>::max();
+
+    auto f = [] (float t) {
+      return (t > .2068965f) ? std::pow(t,3) : .12842f * (t - 4.0f /29.0f);
+    };
+
+    float K = .00862069f * (v[0] + 16.0f);
+    float Y = yn * f(K);
+    float X = xn * f(K + 0.002 * v[1]);
+    float Z = zn * f(K - 0.005 * v[2]);
+
+    return xyz2rgb(xyz<float>{X, Y, Z});
   }
 
 }

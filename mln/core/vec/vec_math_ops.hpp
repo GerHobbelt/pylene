@@ -27,6 +27,11 @@ namespace mln
 {
 
   /* Element wise operators */
+  template <class U, class V, unsigned dim, class tag>
+  internal::vec_base< decltype( pow(std::declval<U>(), std::declval<V>()) ),
+                      dim, tag>
+  pow(const internal::vec_base<U, dim, tag>& x, V exp);
+
   template <class T, unsigned dim, class tag>
   MLN_VEC_PROMOTE_FUN(T, dim, tag, sqr)
     sqr(const internal::vec_base<T, dim, tag>& x);
@@ -114,6 +119,19 @@ namespace mln
 
 
 # undef MLN_GEN_CODE
+
+  template <class U, class V, unsigned dim, class tag>
+  internal::vec_base< decltype( pow(std::declval<U>(), std::declval<V>()) ),
+                      dim, tag>
+  pow(const internal::vec_base<U, dim, tag>& x, V exp)
+  {
+    typedef decltype(pow(std::declval<U>(), std::declval<V>())) R;
+    internal::vec_base<R, dim, tag> res;
+    for (unsigned i = 0; i < dim; ++i)
+      res[i] = pow(x[i], exp);
+    return res;
+  }
+
 
   template <typename T, unsigned dim, class tag>
   inline

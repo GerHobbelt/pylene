@@ -18,7 +18,7 @@ namespace mln
     mln_entering("mln::compute_gradient_magnitude");
 
     image2d<float> grad;
-    resize(grad, f);
+    resize(grad, f).init(1.0);
 
     box2d dom = f.domain();
     sbox2d d2f = {dom.pmin - point2d{2,2}, dom.pmax, point2d{2,2}};
@@ -29,6 +29,7 @@ namespace mln
       {
         grad.at(p + point2d{0,1}) = 1 - l1norm(f.at(p) - f.at(p + point2d{0,2})) / lmax;
         grad.at(p + point2d{1,0}) = 1 - l1norm(f.at(p) - f.at(p + point2d{2,0})) / lmax;
+        grad.at(p + point2d{1,1}) = 1 - l1norm(f.at(p) - f.at(p + point2d{2,2})) / lmax;
       }
 
     auto res = compute_attribute_on_contour(tree, grad, accu::features::mean<> ());

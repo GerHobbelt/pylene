@@ -5,14 +5,14 @@ namespace mln
 {
 
   void
-  compute_graph_map(const Graph& g2,
+  compute_graph_map(const MyGraph& g2,
                     const tree_t& t1, const tree_t& t2, const tree_t& t3,
                     const tlink_t& t1link, const tlink_t& t2link, const tlink_t& t3link,
                     image2d<vec3u>& out)
   {
     mln_entering("mln::compute_graph_map");
 
-    auto SES = boost::get(&graph_content::senc, g2);
+    auto SES = boost::get(&my_graph_content::senc, g2);
 
     mln_pixter(px, out);
     mln_forall(px)
@@ -48,14 +48,14 @@ namespace mln
 
 
   void
-  compute_graph_map(const Graph& g2,
+  compute_graph_map(const MyGraph& g2,
                     const tree_t* t,
                     const tlink_t* tlink,
                     image2d< vec<unsigned, NTREE> >& out)
   {
     mln_entering("mln::compute_graph_map");
 
-    auto d = boost::get(&graph_content::depth, g2);
+    auto d = boost::get(&my_graph_content::depth, g2);
 
     productorder_less< vec<unsigned, NTREE> > prec;
 

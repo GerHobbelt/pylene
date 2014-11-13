@@ -19,7 +19,7 @@ namespace mln
   /// + bZ is the value of the smallest enclosing blue shape Z of x
   template <typename V>
   boost::vector_property_map< vec<V, NTREE> >
-  compute_graph_node_colors(const Graph& g2,
+  compute_graph_node_colors(const MyGraph& g2,
                             const property_map<tree_t, V>* vmap);
 
                             // const property_map<tree_t, uint8>& vr,
@@ -43,14 +43,14 @@ namespace mln
   ///  Gx = S² if S² ∈ LB else ∅
   ///  Bx = S³ if S³ ∈ LB else ∅
   void
-  compute_graph_map(const Graph& g2,
+  compute_graph_map(const MyGraph& g2,
                     const tree_t& t1, const tree_t& t2, const tree_t& t3,
                     const tlink_t& t1link, const tlink_t& t2link, const tlink_t& t3link,
                     image2d<vec3u>& out);
 
 
   void
-  compute_graph_map(const Graph& g2,
+  compute_graph_map(const MyGraph& g2,
                     const tree_t* trees,
                     const tlink_t* tlink,
                     image2d< vec<unsigned, NTREE> >& out);
@@ -63,16 +63,16 @@ namespace mln
 
   template <typename V>
   boost::vector_property_map< vec<V,NTREE> >
-  compute_graph_node_colors(const Graph& g2,
+  compute_graph_node_colors(const MyGraph& g2,
                             const property_map<tree_t, V>* vmap)
   {
     mln_entering("mln::compute_graph_node_colors");
 
 
     boost::vector_property_map< vec<V,NTREE> > output(boost::num_vertices(g2));
-    auto senc = boost::get(&graph_content::senc, g2);
+    auto senc = boost::get(&my_graph_content::senc, g2);
 
-    Graph::vertex_iterator vi, vend;
+    MyGraph::vertex_iterator vi, vend;
     boost::tie(vi, vend) = boost::vertices(g2);
     for (; vi != vend; ++vi)
       for (int k = 0; k < NTREE; ++k)

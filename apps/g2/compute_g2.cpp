@@ -3,6 +3,7 @@
 # include <mln/morpho/component_tree/accumulate.hpp>
 # include <mln/morpho/component_tree/compute_depth.hpp>
 # include <apps/g2/accu/lca.hpp>
+# include <tbb/parallel_for.h>
 
 namespace mln
 {
@@ -20,6 +21,35 @@ namespace mln
   }
 
 
+  void
+  compute_g2_precomputation(const tree_t* trees, int NTREE,
+                            property_map<tree_t, unsigned>* d,
+                            property_map<tree_t, tree_t::node_type>* SES)
+  {
+    mln_entering("G2 - precomputation");
+
+    // 0. Compute the depth attribute on each tree
+    // {
+    for (int i = 0; i < NTREE; ++i)
+      d[i] = morpho::compute_depth(trees[i]);
+
+    // }
+
+    // 1. Compute the smallest enclosing shape each VS each tree
+    // {
+    tbb::parallel_for(0, (int)NTREE, [&SES,&trees,&d,NTREE](int i) {
+        for (int j = 0; j < NTREE; ++j)
+          if (i != j)
+            SES[i * NTREE + j] = smallest_enclosing_shape(trees[i], trees[j], d[j]);
+      });
+    // }
+
+    mln_exiting();
+  }
+
+
+
+  /*
   std::tuple<Graph,
 	     property_map<tree_t, Graph::vertex_descriptor>,
 	     property_map<tree_t, Graph::vertex_descriptor>,
@@ -218,187 +248,20 @@ namespace mln
     mln_exiting();
     return std::tie(graph, t1link, t2link, t3link);
   }
+  */
 
 
-  std::tuple<Graph, std::array< property_map<tree_t, Graph::vertex_descriptor>, NTREE> >
-  compute_g2(const tree_t* trees)
-  {
-    mln_entering("mln::compute_g2");
+ // Explicit definition
+ template
+ std::tuple<Graph<2>, std::array<tlink_t, 2> >
+ compute_g2<2>(const tree_t* trees);
 
+ template
+ std::tuple<Graph<3>, std::array<tlink_t, 3> >
+ compute_g2<3>(const tree_t* trees);
 
-    // 0. Compute the depth attribute on each tree
-    // {
-    typedef property_map<tree_t, unsigned> depth_attribute_t;
-    depth_attribute_t d[NTREE];
-
-    for (int i = 0; i < NTREE; ++i)
-      d[i] = morpho::compute_depth(trees[i]);
-    // }
-
-
-    // 1. Compute the smallest enclosing shape each VS each tree
-    // {
-    typedef property_map<tree_t, tree_t::node_type> tree_assoc_t;
-    tree_assoc_t SES[NTREE][NTREE];
-
-    for (int i = 0; i < NTREE; ++i)
-      for (int j = 0; j < NTREE; ++j)
-        if (i != j)
-          SES[i][j] = smallest_enclosing_shape(trees[i], trees[j], d[j]);
-    // }
-
-    // 2. Build the graph
-    mln_entering("mln::compute_g2 - graph-construction - vertices");
-    for (int i = 0; i < NTREE; ++i)
-      std::cout << "T" << i << ": " << trees[i].size() << std::endl;
-
-    Graph graph(trees[0].size()-1);
-
-    // 2.1 Insert the nodes (not twice) and keep the correspondance tree <-> graph
-    // For now, the graph is nor reduced, it does not matter.
-    //{
-    typedef property_map<tree_t, Graph::vertex_descriptor> graph_assoc_t;
-    std::array<graph_assoc_t, NTREE> tlink;
-    for (int i = 0; i < NTREE; ++i)
-      tlink[i] = graph_assoc_t (trees[i]);
-
-    auto glink = boost::get(&graph_content::tlinks, graph);
-    auto ulink = boost::get(&graph_content::ulink, graph);
-    auto gdepth = boost::get(&graph_content::depth, graph);
-    auto senc = boost::get(&graph_content::senc, graph);
-
-    // Handle root seperatly
-    Graph::vertex_descriptor v;
-    Graph::vertex_iterator vcur, vend;
-
-    // Root
-    {
-      std::tie(vcur, vend) = boost::vertices(graph);
-      v = *vcur++;
-      for (int i = 0; i < NTREE; ++i)
-        {
-          tlink[i][trees[i].get_root_id()] = v;
-          glink[v][i] = trees[i].get_root();
-          gdepth[v][i] = 0;
-          senc[v][i] = trees[i].get_root_id();
-        }
-      ulink[v] = trees[0].get_root();
-    }
-
-    // First tree : Special case since every node must be inserted
-    mln_foreach(auto node, trees[0].nodes_without_root())
-      {
-        v = *vcur++;
-        glink[v][0] = node; // Set graph -> tree link
-        senc[v][0] = node.id();
-        gdepth[v][0] = d[0][senc[v][0]];
-        ulink[v] = node;
-
-        for (int i = 1; i < NTREE; ++i) {
-          glink[v][i] = trees[i].nend();
-          senc[v][i] = SES[0][i][node].id();
-          gdepth[v][i] = d[i][senc[v][i]];
-        }
-
-        tlink[0][node] = v;   // Set tree -> graph link
-      }
-
-    // Other tree : Insert only if the node does not exist
-    for (int i = 0; i < NTREE; ++i)
-      {
-        const tree_t& t = trees[i];
-
-        mln_foreach(auto node, t.nodes_without_root())
-          {
-            int j = 0;
-            for (j = 0; j < i; ++j)
-              {
-                tree_t::node_type ses_in_tj = SES[i][j][node];
-                if (SES[j][i][ses_in_tj] == node) { // Already inserted
-                  v = tlink[j][ses_in_tj];
-                  break;
-                }
-              }
-            if (j == i) // No node found, create new one
-              {
-                v = boost::add_vertex(graph);
-                for (int j = 0; j < NTREE; ++j)
-                  if (i != j)
-                    {
-                      glink[v][j] = trees[j].nend();
-                      senc[v][j] = SES[i][j][node].id();
-                      gdepth[v][j] = d[j][senc[v][j]];
-                    }
-                ulink[v] = node;
-              }
-            senc[v][i] = node.id();
-            gdepth[v][i] = d[i][node];
-            glink[v][i] = node; // Set graph -> tree link
-            tlink[i][node] = v;   // Set tree -> graph link
-          }
-      }
-    mln_exiting();
-
-    // Add the edges
-    {
-      mln_entering("mln::compute_g2 - graph-construction - edges")
-      Graph::vertex_iterator cur, end;
-      boost::tie(cur,end) = boost::vertices(graph);
-      for (++cur; cur != end; ++cur) //skip the root
-        {
-          for (int i = 0; i < NTREE; ++i) {
-            tree_t::vertex_id_t par;
-            tree_t::node_type s = glink[*cur][i];
-            if (s != trees[i].nend())
-              par = s.get_parent_id();
-            else
-              par = senc[*cur][i];
-            boost::add_edge(*cur, tlink[i][par], graph);
-          }
-        }
-      mln_exiting();
-    }
-    //}
-
-    // 3. Reduction step
-    {
-      Graph::vertex_iterator v, vend;
-      Graph::out_edge_iterator e1, e2, next, eend;
-      boost::tie(v,vend) = boost::vertices(graph);
-      for (; v != vend; ++v)
-      	{
-      	  std::tie(e1, eend) = boost::out_edges(*v, graph);
-      	  for (next = e1; e1 != eend; e1 = next)
-      	    {
-      	      Graph::vertex_descriptor v1 = boost::target(*e1, graph);
-      	      ++next;
-      	      e2 = boost::out_edges(*v, graph).first;
-      	      for (; e2 != eend; ++e2)
-                if (vecprod_isless(gdepth[v1], gdepth[boost::target(*e2, graph)]))
-                  {
-                    //std::cout << "Remove: " << *e1 << std::endl;
-                    boost::remove_edge(*e1, graph);
-                    break;
-                  }
-      	    }
-      	  // std::tie(e1, eend) = boost::out_edges(*v, graph);
-	  // std::cout << "--";
-	  // for (; e1 != eend; ++e1)
-	  //    std::cout << *e1;
-	  // std::cout << std::endl;
-      	}
-    }
-
-
-
-    // Some stat
-    std::cout << "Graph: " << boost::num_vertices(graph) << std::endl;
-
-    mln_exiting();
-    return std::tie(graph, tlink);
-  }
-
-
-
+ template
+ std::tuple<Graph<4>, std::array<tlink_t, 4> >
+ compute_g2<4>(const tree_t* trees);
 
 }

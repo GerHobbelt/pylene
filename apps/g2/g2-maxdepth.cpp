@@ -5,6 +5,9 @@
 #include <mln/core/dontcare.hpp>
 #include <mln/core/vec_base.hpp>
 
+#include <tbb/parallel_for.h>
+#include <tbb/task_scheduler_init.h>
+
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
@@ -32,19 +35,19 @@
 namespace mln
 {
   boost::vector_property_map<unsigned>
-  compute_graph_depth(const Graph& g)
+  compute_graph_depth(const MyGraph& g)
   {
     mln_entering("Compute graph depth");
 
     boost::vector_property_map<unsigned> depth(boost::num_vertices(g));
 
     auto one = [](mln::dontcare_t) -> int{ return 1; };
-    auto w = boost::make_function_property_map<Graph::edge_descriptor, int, decltype(one)>(one);
+    auto w = boost::make_function_property_map<MyGraph::edge_descriptor, int, decltype(one)>(one);
 
-    Graph::vertex_descriptor root = boost::vertex(0, g);
+    MyGraph::vertex_descriptor root = boost::vertex(0, g);
     depth[root] = 0;
 
-    Graph gT;
+    MyGraph gT;
     boost::transpose_graph(g, gT);
     boost::dag_shortest_paths(gT, root, boost::weight_map(w)
                               .distance_map(depth)
@@ -58,10 +61,11 @@ namespace mln
     return depth;
   }
 
+  
   boost::vector_property_map<unsigned>
-  compute_graph_count(const Graph& g)
+  compute_graph_count(const MyGraph& g)
   {
-    
+
     struct viz_t : public boost::default_dfs_visitor
     {
       viz_t(boost::vector_property_map<unsigned>& common)
@@ -69,10 +73,10 @@ namespace mln
       {
       }
 
-      void examine_edge(Graph::edge_descriptor e, const Graph& g)
+      void examine_edge(MyGraph::edge_descriptor e, const MyGraph& g)
       {
-        Graph::vertex_descriptor s = boost::source(e, g);
-        Graph::vertex_descriptor t = boost::target(e, g);
+        MyGraph::vertex_descriptor s = boost::source(e, g);
+        MyGraph::vertex_descriptor t = boost::target(e, g);
         m_common[t] += m_common[s];
       }
 
@@ -84,8 +88,8 @@ namespace mln
     // 1. Set for each node its redondancy (the number of tree it belongs to minus 1)
     boost::vector_property_map<unsigned> common(boost::num_vertices(g));
     {
-      auto tlinks = boost::get(&graph_content::tlinks, g);
-      BOOST_FOREACH(Graph::vertex_descriptor v, boost::vertices(g))
+      auto tlinks = boost::get(&my_graph_content::tlinks, g);
+      BOOST_FOREACH(MyGraph::vertex_descriptor v, boost::vertices(g))
         {
           common[v] = 0;
           for (int i = 0; i < NTREE; ++i)
@@ -93,20 +97,20 @@ namespace mln
               common[v] += 1;
           common[v] -= 1;
         }
-      Graph::vertex_descriptor root = 0;
+      MyGraph::vertex_descriptor root = 0;
       common[root] = 0;
     }
 
     // 2. Propagate i.e. for each node X, compute the number of redondancy in X↑
-    Graph gT;
+    MyGraph gT;
     boost::transpose_graph(g, gT);
     boost::depth_first_search(gT, boost::visitor(viz_t(common)));
 
     // 3. Set for each node, the number of node it is included in.
     boost::vector_property_map<unsigned>& count = common; // do not need another vector, inplace
     {
-      auto depth = boost::get(&graph_content::depth, g);
-      BOOST_FOREACH(Graph::vertex_descriptor v, boost::vertices(g))
+      auto depth = boost::get(&my_graph_content::depth, g);
+      BOOST_FOREACH(MyGraph::vertex_descriptor v, boost::vertices(g))
         count[v] = sum(depth[v]) - common[v];
     }
 
@@ -118,7 +122,7 @@ namespace mln
   /// \brief Compute for each point the number of shapes it belongs to.
   /// \[ ω(x) = { X ∈ S, x ∈ X } \]
   image2d<unsigned>
-  compute_map_count(const Graph& g,
+  compute_map_count(const MyGraph& g,
                     const tree_t* t,
                     const tlink_t* tlink)
   {
@@ -127,9 +131,9 @@ namespace mln
     // and we sum up the weights throurgh the paths
     // We first store in redondancy_map[X] the number of trees X belongs to.
     boost::vector_property_map<char> redondancy_map(boost::num_vertices(g));
-    auto glinks = boost::get(&graph_content::tlinks, g);
+    auto glinks = boost::get(&my_graph_content::tlinks, g);
 
-    BOOST_FOREACH(Graph::vertex_descriptor v, boost::vertices(g))
+    BOOST_FOREACH(MyGraph::vertex_descriptor v, boost::vertices(g))
       {
         redondancy_map[v] = 0;
         for (int i = 0; i < NTREE; ++i)
@@ -144,7 +148,7 @@ namespace mln
         w[i][t[i].get_root()] = 0;
         mln_foreach(auto x, t[i].nodes_without_root()) // downward
           {
-            Graph::vertex_descriptor v = tlink[i][x];
+            MyGraph::vertex_descriptor v = tlink[i][x];
             w[i][x] = w[i][x.parent()] + 1.0 / redondancy_map[v];
           }
       }
@@ -170,7 +174,7 @@ namespace mln
 
   template <typename V>
   boost::vector_property_map<unsigned>
-  compute_graph_variation(const Graph& g,
+  compute_graph_variation(const MyGraph& g,
                           const boost::vector_property_map< vec<V, NTREE> >& colors)
   {
     mln_entering("Compute graph variation");
@@ -178,15 +182,15 @@ namespace mln
     boost::vector_property_map<unsigned> variation(boost::num_vertices(g));
 
 
-    auto e_val = [&g,&colors](Graph::edge_descriptor e) -> int {
+    auto e_val = [&g,&colors](MyGraph::edge_descriptor e) -> int {
       return linfnorm(colors[boost::source(e,g)] - colors[boost::target(e,g)]);
     };
-    auto w = boost::make_function_property_map<Graph::edge_descriptor, int, decltype(e_val)>(e_val);
+    auto w = boost::make_function_property_map<MyGraph::edge_descriptor, int, decltype(e_val)>(e_val);
 
-    Graph::vertex_descriptor root = boost::vertex(0, g);
+    MyGraph::vertex_descriptor root = boost::vertex(0, g);
     variation[root] = 0;
 
-    Graph gT;
+    MyGraph gT;
     boost::transpose_graph(g, gT);
     boost::dag_shortest_paths(gT, root, boost::weight_map(w)
                               .distance_map(variation)
@@ -201,7 +205,7 @@ namespace mln
 
   template <typename V>
   boost::vector_property_map<float>
-  compute_graph_area(const Graph& g,
+  compute_graph_area(const MyGraph& g,
                      const image2d<V>& ima,
                      const tree_t* trees,
                      const tlink_t* tlinks)
@@ -228,7 +232,7 @@ namespace mln
 
   template <class ValueMap, class BinaryFunction, class ValueType>
   void
-  write_vmap_to_image(const Graph& g, const tree_t* t, const tlink_t* tlink,
+  write_vmap_to_image(const MyGraph& g, const tree_t* t, const tlink_t* tlink,
                       const ValueMap& vmap, BinaryFunction op, ValueType init,
                       image2d<ValueType>& out)
   {
@@ -241,7 +245,7 @@ namespace mln
       for (int i = 0; i < NTREE; ++i)
         {
           tree_t::node_type tnode = t[i].get_node_at(px->index());
-          Graph::vertex_descriptor gnode = tlink[i][tnode];
+          MyGraph::vertex_descriptor gnode = tlink[i][tnode];
           w = op(w, vmap[gnode]);
         }
       px->val() = w;
@@ -252,7 +256,7 @@ namespace mln
   template <class ValueMap, class ColorMap, class Compare,
             class ValueType, class ColorType>
   void
-  write_vmap_to_image_and_rec(const Graph& g, const tree_t* t, const tlink_t* tlink,
+  write_vmap_to_image_and_rec(const MyGraph& g, const tree_t* t, const tlink_t* tlink,
                               const ValueMap& vmap,
                               const ColorMap& cmap,
                               Compare cmp,
@@ -266,12 +270,12 @@ namespace mln
     mln_forall(px, px2)
     {
       tree_t::node_type tnode = t[0].get_node_at(px->index());
-      Graph::vertex_descriptor current = tlink[0][tnode];
+      MyGraph::vertex_descriptor current = tlink[0][tnode];
       int from = 0;
       for (int i = 1; i < NTREE; ++i)
         {
           tree_t::node_type tnode = t[i].get_node_at(px->index());
-          Graph::vertex_descriptor gnode = tlink[i][tnode];
+          MyGraph::vertex_descriptor gnode = tlink[i][tnode];
           if (cmp(vmap[gnode], vmap[current])) {
             current = gnode;
             from = i;
@@ -317,6 +321,8 @@ int main(int argc, char** argv)
     usage(argv);
 
 
+  tbb::task_scheduler_init init;
+
   using namespace mln;
 
   e_opt attribute = str2opt[argv[1]];
@@ -336,14 +342,15 @@ int main(int argc, char** argv)
 
   /// Compute the marginal ToS
   tree_t t[NTREE];
-  for (int i = 0; i < NTREE; ++i)
-    t[i] = morpho::cToS(imtransform(f, [i](value_t x) { return x[i]; }), c4);
 
+  tbb::parallel_for(0, (int)NTREE, [&t,&f](int i){
+      t[i] = morpho::cToS(imtransform(f, [i](value_t x) { return x[i]; }), c4);
+    });
 
   /// Compute the graph
-  Graph g2;
-  std::array<property_map<tree_t, Graph::vertex_descriptor>, NTREE> tlink;
-  std::tie(g2, tlink) = compute_g2(t);
+  MyGraph g2;
+  std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
+  std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
 
   /// If we have selected the depth attribute

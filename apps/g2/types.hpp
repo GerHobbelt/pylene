@@ -20,6 +20,7 @@ enum { NTREE = value_t::ndim }; // We merge 3 trees
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned> > tree_t;
 struct tree_node_t { typedef boost::vertex_property_tag kind; };
 
+template <unsigned NTREE>
 struct graph_content
 {
   std::array<tree_t::node_type, NTREE> tlinks;
@@ -29,12 +30,15 @@ struct graph_content
                                    // tlinks[i] ≠ None ⇒ senc[i] = tlinks[i].id()
 };
 
-typedef boost::adjacency_list<boost::setS,
-			      boost::vecS,
-			      boost::directedS,
-			      graph_content> Graph;
+template <unsigned NTREE>
+using Graph = boost::adjacency_list<boost::setS,
+                                    boost::vecS,
+                                    boost::directedS,
+                                    graph_content<NTREE> >;
 
-typedef mln::property_map<tree_t, Graph::vertex_descriptor> tlink_t;
+typedef mln::property_map<tree_t, Graph<2>::vertex_descriptor> tlink_t;
+typedef Graph<NTREE> MyGraph;
+typedef graph_content<NTREE> my_graph_content;
 
 #endif // ! TYPES_HPP
 

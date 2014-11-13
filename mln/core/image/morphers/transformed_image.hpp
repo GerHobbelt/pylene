@@ -201,14 +201,14 @@ namespace mln
       typedef typename std::remove_reference<I>::type image_t;
       typedef transformed_image<I, UnaryFunction, false> this_t;
       friend struct mln::morpher_core_access;
-      typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type    result_type;
+      typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type    _result_type;
 
     public:
       // If F(x) -> T&& then the return type is T (because it would yield a dangling rvalue ref to x)
       // reference is thus T&, const T& or T
-      typedef typename std::conditional<std::is_rvalue_reference<result_type>::value,
-                                        typename std::remove_reference<result_type>::type,
-                                        result_type>::type                      reference;
+      typedef typename std::conditional<std::is_rvalue_reference<_result_type>::value,
+                                        typename std::remove_reference<_result_type>::type,
+                                        _result_type>::type                      reference;
 
       typedef typename std::decay<reference>::type				value_type;
 

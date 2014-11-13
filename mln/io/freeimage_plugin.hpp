@@ -230,6 +230,12 @@ namespace mln
           case FIT_RGBA16:
             m_vtype = typeid(colors::rgba16);
             break;
+          case FIT_RGBF:
+            m_vtype = typeid(rgb<float>);
+            break;
+          case FIT_RGBAF:
+            m_vtype = typeid(colors::rgba<float>);
+            break;
           default:
             goto error;
         }
@@ -635,7 +641,9 @@ namespace mln
           { typeid(uint32), {FIT_UINT32, 32} },
           { typeid(int32),  {FIT_INT32,  32} },
           { typeid(float),  {FIT_FLOAT,  32} },
-          { typeid(double), {FIT_DOUBLE, 64} }
+          { typeid(double), {FIT_DOUBLE, 64} },
+          { typeid(rgb<float>), {FIT_RGBF, 96} },
+          { typeid(colors::rgba<float>), {FIT_RGBAF, 128} }
         };
 
       auto x = tinfo.find(vtype);
@@ -656,9 +664,10 @@ namespace mln
       unsigned bpp;
       _get_fit_and_bpp_from_type(fit, bpp, type);
 
+      // This test fails even for legit format e.g. rgbf32
       // return FreeImage_FIFSupportsExportType(m_fif, fit) and
       //   FreeImage_FIFSupportsExportBPP(m_fif, bpp);
-      return true;
+      return (fit != FIT_UNKNOWN);
     }
 
 

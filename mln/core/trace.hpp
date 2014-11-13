@@ -7,6 +7,7 @@
 # include <iostream>
 # include <stack>
 # include <string>
+# include <mutex>
 
 # define mln_entering(NAME) \
   mln::trace::entering(NAME);
@@ -33,25 +34,32 @@ namespace mln
 
     static std::stack<trace_t> callstack;
     static bool verbose = (std::getenv("TRACE") != NULL);
+    static std::mutex stack_mutex;
 
-    inline
+    static inline
     void entering(const std::string& fname)
     {
-      callstack.emplace(fname);
-      if (verbose)
+      if (verbose) {
+        std::lock_guard<std::mutex> lock(stack_mutex);
+        callstack.emplace(fname);
+
 	std::clog << std::string(callstack.size(), ' ') << fname << std::endl;
+      }
     };
 
 
-    inline
+    static inline
     void exiting()
     {
       if (verbose) {
+        std::lock_guard<std::mutex> lock(stack_mutex);
+
 	trace_t tr = callstack.top();
 	std::clog << std::string(callstack.size(), ' ') << tr.fname
 		  << " in " << ((float)(std::clock() - tr.clock) / CLOCKS_PER_SEC) << std::endl;
+
+        callstack.pop();
       }
-      callstack.pop();
     };
 
     inline

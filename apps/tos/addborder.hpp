@@ -43,7 +43,6 @@ namespace mln
 	border.push_back(ima.at(i,ncols-1));
       }
 
-      std::cout << border.size() << std::endl;
       std::partial_sort(border.begin(), border.begin() + border.size()/2+1, border.end(), cmp);
       if (border.size() % 2 == 0) {
 	//V a = border[border.size()/2 - 1], b = border[border.size()/2];
@@ -66,6 +65,21 @@ namespace mln
     }
     return out;
   }
+
+  // Add a border with the median computed marginally on each channel.
+  template < class V>
+  image2d<V>
+  addborder_marginal(const image2d<V>& ima)
+  {
+    //const I& ima = exact(ima_);
+    image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
+
+    for (unsigned i = 0; i < value_traits<V>::ndim; ++i)
+      copy(addborder(eval(channel(ima,i))), channel(out,i));
+
+    return out;
+  }
+
 
   template <class V, class M, class Compare = std::less<V> >
   std::pair< image2d<V>, image2d<bool> >

@@ -2,6 +2,11 @@
 # define MLN_APPS_TOS_CROUTINES_HPP
 
 # include <apps/tos/topology.hpp>
+# include <mln/accu/accumulators/accu_if.hpp>
+# include <mln/accu/accumulators/count.hpp>
+# include <mln/morpho/component_tree/accumulate.hpp>
+# include <mln/morpho/component_tree/filtering.hpp>
+# include <mln/morpho/component_tree/compute_depth.hpp>
 
 namespace mln
 {
@@ -25,6 +30,11 @@ namespace mln
   compute_attribute_on_contour(const morpho::component_tree<P, image2d<P> >& tree,
                                const Image<I>& valuemap,
                                const AccumulatorLike<AccuLike>& accu);
+
+  template <class P>
+  void
+  grain_filter_inplace(morpho::component_tree<P, image2d<P> >& tree,
+                       unsigned alpha);
 
 
   /*******************************/
@@ -107,6 +117,28 @@ namespace mln
     mln_exiting();
     return out;
   }
+
+  template <class P>
+  void
+  grain_filter_inplace(morpho::component_tree<P, image2d<P> >& tree,
+                       unsigned alpha)
+  {
+    mln_entering("grain_filter_inplace");
+
+    typedef morpho::component_tree<P, image2d<P> > tree_t;
+
+    accu::accumulators::accu_if<accu::accumulators::count<>,
+                                K1::is_face_2_t, point2d> acc;
+
+    auto area = morpho::paccumulate(tree, tree._get_data()->m_pmap, acc);
+
+    auto pred = make_functional_property_map<typename tree_t::vertex_id_t>
+      ([alpha, &area] (unsigned x) { return area[x] >= alpha; });
+
+    morpho::filter_direct_inplace(tree, pred);
+    tree.shrink_to_fit();
+  }
+
 
 }
 

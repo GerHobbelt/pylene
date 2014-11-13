@@ -18,10 +18,10 @@ namespace mln
       template <typename T, typename Compare = productorder_less<T> >
       struct infsup;
 
-      template <typename T, typename Compare = std::less<T> >
+      template <typename T, typename Compare = productorder_less<T> >
       struct sup;
 
-      template <typename T, typename Compare = std::less<T> >
+      template <typename T, typename Compare = productorder_less<T> >
       struct inf;
     }
 
@@ -218,7 +218,7 @@ namespace mln
       };
 
       template <typename T, typename Compare>
-      struct inf : Accumulator< inf<T, Compare> >
+      struct inf : accumulator_base< inf<T, Compare>, T, T, features::inf<> >
       {
         typedef T           argument_type;
         typedef T			result_type;
@@ -249,11 +249,6 @@ namespace mln
         }
 
 
-        T to_result() const
-        {
-          return m_inf;
-        }
-
         friend
         T extract(const inf& accu, features::inf<> )
         {
@@ -266,7 +261,7 @@ namespace mln
       };
 
       template <typename T, typename Compare>
-      struct sup : Accumulator< sup<T, Compare> >
+      struct sup : accumulator_base< sup<T, Compare>, T, T, features::sup<> >
       {
         typedef T           argument_type;
         typedef T			result_type;
@@ -294,12 +289,6 @@ namespace mln
           using mln::sup;
           T vsup = extractor::sup(other);
           m_sup = sup(m_sup, vsup, m_cmp);
-        }
-
-
-        T to_result() const
-        {
-          return m_sup;
         }
 
         friend

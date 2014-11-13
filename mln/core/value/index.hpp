@@ -118,6 +118,17 @@ namespace mln
     static constexpr index_t sup() { return max(); }
   };
 
+  template <typename T>
+  struct value_traits< Index<T, std::less<T> >, productorder_less<Index<T, std::less<T> > >, void>
+    : value_traits< Index<T, std::less<T> >, std::less< Index<T, std::less<T> > >, void>
+  {
+  };
+
+  template <typename T>
+  struct value_traits< Index<T, std::greater<T> >, productorder_less<Index<T, std::greater<T> > >, void>
+    : value_traits< Index<T, std::greater<T> >, std::less< Index<T, std::greater<T> > >, void>
+  {
+  };
 
 }
 

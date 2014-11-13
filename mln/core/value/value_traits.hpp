@@ -18,7 +18,8 @@ namespace mln
 
 
 
-  template <typename V, typename StrictWeakOrdering = std::less<V>, class Enable = void>
+  template <typename V, typename Ordering = productorder_less<V>,
+            class Enable = void>
   struct value_traits
   {
     static_assert(!std::is_same<Enable, void>::value,

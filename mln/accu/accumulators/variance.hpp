@@ -124,6 +124,13 @@ namespace mln
           m_sum_sqr += other.m_sum_sqr;
         }
 
+        void untake(const variance& other)
+        {
+          m_count -= other.m_count;
+          m_sum -= other.m_sum;
+          m_sum_sqr -= other.m_sum_sqr;
+        }
+
 
         template <class ST1, class ST2>
         friend
@@ -134,6 +141,12 @@ namespace mln
 
           result_type n = accu.m_count;
           return (accu.m_sum_sqr / n) - l2norm_sqr(accu.m_sum / n);
+        }
+
+        friend
+        unsigned extract(const variance& accu, features::count<> )
+        {
+          return accu.m_count;
         }
 
       private:

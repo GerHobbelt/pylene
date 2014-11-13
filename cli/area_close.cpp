@@ -37,7 +37,7 @@ int main(int argc, char** argv)
   auto areamap = morpho::paccumulate(tree, ima, accu::features::count<> ());
 
   unsigned lambda = std::atoi(argv[3]);
-  auto criterion = make_functional_property_map
+  auto criterion = make_functional_property_map<size_type>
     ([&areamap, lambda](size_type x) {
       return areamap[x] >= lambda;
     });

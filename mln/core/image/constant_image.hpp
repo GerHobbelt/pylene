@@ -89,6 +89,7 @@ namespace mln
       typedef I image_type;
       typedef V value_type;
       typedef V reference;
+      typedef unsigned size_type;
 
       pixel_t() = default;
       pixel_t(const pixel_t&) = default;
@@ -108,7 +109,9 @@ namespace mln
       point_type  point() const { return m_p; }
       point_type  site() const { return m_p; }
       V		  val() const { return m_value; }
-      I& image() const { return *m_ima; }
+      I&          image() const { return *m_ima; }
+      constexpr
+      size_type   index() const { return 0; }
     private:
       I* m_ima;
       point_type  m_p;

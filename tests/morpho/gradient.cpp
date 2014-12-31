@@ -5,7 +5,7 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/morpho/gradient.hpp>
+#include <mln/morpho/structural/gradient.hpp>
 
 #define BOOST_TEST_MODULE Morpho
 #include <tests/test.hpp>
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(gradient_0)
 
   { // Fast: border wide enough
     auto win = make_rectangle2d(1, 3);
-    auto out = morpho::gradient(ima, win);
+    auto out = morpho::structural::gradient(ima, win);
 
     static_assert( std::is_same<decltype(out)::value_type, int>::value,
                    "Error integral promotion should give int.");
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(gradient_1)
 
   { // Fast: border wide enough
     auto win = make_rectangle2d(7, 7);
-    auto out = morpho::gradient(ima, win);
+    auto out = morpho::structural::gradient(ima, win);
   }
 }
 
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE(gradient_2)
   io::imread(MLN_IMG_PATH "small.pgm", ima2);
 
   auto win = make_rectangle2d(3, 3);
-  auto out1 = morpho::gradient(ima, win);
-  auto out2 = morpho::gradient(ima2, win);
+  auto out1 = morpho::structural::gradient(ima, win);
+  auto out2 = morpho::structural::gradient(ima2, win);
   BOOST_CHECK(all(out1 == out2));
 }
 
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(gradient_3)
 
   // Morpher has no extension
   auto win = make_rectangle2d(3, 3);
-  auto out = morpho::gradient(ima > 128, win);
+  auto out = morpho::structural::gradient(ima > 128, win);
 }
 
 // Dilation on a with a vmorph / binary case
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(gradient_4)
   image2d<uint8> out;
   resize(out, ima).init(0);
   auto tmp = out | where(ima > 128);
-  morpho::gradient(ima | where(ima > 128), win, std::less<uint8>(),
+  morpho::structural::gradient(ima | where(ima > 128), win, std::less<uint8>(),
                    functional::l2norm_t<uint8>(), tmp);
 }
 
@@ -90,11 +90,10 @@ BOOST_AUTO_TEST_CASE(gradient_5)
   io::imread(MLN_IMG_PATH "small.ppm", ima2);
 
   auto win = make_rectangle2d(3, 3);
-  auto out1 = morpho::gradient(ima, win);
-  auto out2 = morpho::gradient(ima2, win);
+  auto out1 = morpho::structural::gradient(ima, win);
+  auto out2 = morpho::structural::gradient(ima2, win);
   BOOST_CHECK(all(out1 == out2));
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

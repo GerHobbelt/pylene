@@ -75,7 +75,7 @@ namespace mln
           : m_inf(value_traits<T>::sup()),
             m_sup(value_traits<T>::inf()),
             m_count (0),
-            m_hist {0,}
+            m_hist {{0,}}
         {
         }
 

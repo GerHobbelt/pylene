@@ -50,7 +50,8 @@ namespace mln
   {
 
   public:
-    typedef tag category;
+    typedef tag                 category;
+    typedef std::false_type     is_incremental;
 
     /// \brief Overload if x is a point lvalue or rvalue
     template <typename X>

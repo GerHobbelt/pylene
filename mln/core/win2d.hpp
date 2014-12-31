@@ -16,7 +16,7 @@ namespace mln
   ///
   /// \brief Define a dynamic rectangular window
   ///
-  using rect2d = dyn_neighborhood<box2d, dynamic_neighborhood_tag>;
+  struct rect2d;
 
 
   /// \defgroup Free functions
@@ -76,6 +76,39 @@ namespace mln
   /**************************/
   /***  Implementation     **/
   /**************************/
+
+  struct rect2d :
+    dyn_neighborhood_base<box2d, dynamic_neighborhood_tag, rect2d>
+  {
+    typedef std::true_type                                is_incremental;
+    typedef std::false_type                               is_separable;
+
+    typedef dyn_neighborhood<box2d, dynamic_neighborhood_tag> dec_type;
+    typedef dyn_neighborhood<box2d, dynamic_neighborhood_tag> inc_type;
+
+    rect2d() = default;
+
+    rect2d(const box2d& r)
+      : dyn_neighborhood_base<box2d, dynamic_neighborhood_tag, rect2d>(r)
+    {
+    }
+
+    inc_type inc() const
+    {
+      box2d b = this->dpoints;
+      b.pmin[1] = b.pmax[1] - 1;
+      return b;
+    }
+
+    dec_type dec() const
+    {
+      box2d b = this->dpoints;
+      b.pmin[1] -= 1;
+      b.pmax[1] = b.pmin[1]+1;
+      return b;
+    }
+
+  };
 
   inline
   rect2d make_rectangle2d(unsigned height, unsigned width)

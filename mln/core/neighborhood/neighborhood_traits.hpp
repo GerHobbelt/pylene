@@ -15,6 +15,7 @@ namespace mln
   struct neighborhood_traits
   {
     typedef typename N::category category;
+    typedef typename N::is_incremental is_incremental;
   };
 
 

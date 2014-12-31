@@ -50,7 +50,7 @@ namespace mln
 
     }
 
-    template <class I, class N, class Compare = std::less<mln_value(I)> >
+    template <class I, class N, class Compare>
     mln_concrete(I)
     area_closing(const Image<I>& ima_,
                  const Neighborhood<N>& nbh,

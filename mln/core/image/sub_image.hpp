@@ -402,16 +402,16 @@ namespace mln
     reference
     operator() (const point_type& p)
     {
-      mln_precondition(m_domain.has(p));
-      mln_precondition(m_ima.domain().has(p));
+      mln_precondition(rng::has(m_domain, p));
+      mln_precondition(rng::has(m_ima.domain(), p));
       return m_ima(p);
     }
 
     const_reference
     operator() (const point_type& p) const
     {
-      mln_precondition(m_domain.has(p));
-      mln_precondition(m_ima.domain().has(p));
+      mln_precondition(rng::has(m_domain, p));
+      mln_precondition(rng::has(m_ima.domain(), p));
       return m_ima(p);
     }
 
@@ -442,14 +442,14 @@ namespace mln
     pixel_type
     pixel (const point_type& p)
     {
-      mln_precondition(m_domain.has(p));
+      mln_precondition(rng::has(m_domain, p));
       return pixel_type(*this, m_ima.pixel_at(p));
     }
 
     const_pixel_type
     pixel (const point_type& p) const
     {
-      mln_precondition(m_domain.has(p));
+      mln_precondition(rng::has(m_domain, p));
       return const_pixel_type(*this, m_ima.pixel_at(p));
     }
 

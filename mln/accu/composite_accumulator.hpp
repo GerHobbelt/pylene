@@ -1,7 +1,7 @@
 #ifndef COMPOSITE_ACCUMULATOR_HPP
 # define COMPOSITE_ACCUMULATOR_HPP
 
-# include <mln/core/concept/accumulator.hpp>
+# include <mln/accu/concept/accumulator.hpp>
 # include <mln/accu/feature.hpp>
 # include <boost/mpl/assert.hpp>
 # include <boost/mpl/set.hpp>

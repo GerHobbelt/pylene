@@ -1,5 +1,5 @@
-#ifndef MLN_ACCU_INFSUP_HPP
-# define MLN_ACCU_INFSUP_HPP
+#ifndef MLN_ACCU_ACCUMULATORS_INFSUP_HPP
+# define MLN_ACCU_ACCUMULATORS_INFSUP_HPP
 
 # include <mln/accu/accumulator_base.hpp>
 # include <mln/core/value/value_traits.hpp>
@@ -169,10 +169,10 @@ namespace mln
       template <typename T, typename Compare>
       struct infsup : Accumulator< infsup<T, Compare> >
       {
-        typedef T                       argument_type;
+        typedef T                               argument_type;
         typedef std::pair<T,T>			result_type;
         typedef boost::mpl::set<
-          features::inf<>, features::sup<> > provides;
+          features::inf<>, features::sup<> >    provides;
 
         infsup(const Compare& cmp = Compare())
           : m_inf( value_traits<T, Compare>::sup() ),
@@ -235,7 +235,7 @@ namespace mln
       struct inf : accumulator_base< inf<T, Compare>, T, T, features::inf<> >
       {
         typedef T           argument_type;
-        typedef T			result_type;
+        typedef T           result_type;
 
         inf(const Compare& cmp = Compare())
           : m_cmp( cmp ),
@@ -260,6 +260,13 @@ namespace mln
           using mln::inf;
           T vinf = extractor::inf(other);
           m_inf = inf(m_inf, vinf, m_cmp);
+        }
+
+        template <class dummy = bool>
+        typename std::enable_if<std::is_same<T, bool>::value, dummy>::type
+        stop() const
+        {
+          return m_inf == value_traits<bool, Compare>::inf();
         }
 
 
@@ -305,6 +312,13 @@ namespace mln
           m_sup = sup(m_sup, vsup, m_cmp);
         }
 
+        template <class dummy = bool>
+        typename std::enable_if<std::is_same<T, bool>::value, dummy>::type
+        stop() const
+        {
+          return m_sup == value_traits<bool, Compare>::sup();
+        }
+
         friend
         T extract(const sup& accu, features::sup<> )
         {
@@ -322,4 +336,4 @@ namespace mln
 
 }
 
-#endif // ! MLN_ACCU_INFSUP_HPP
+#endif // ! MLN_ACCU_ACCUMULATORS_INFSUP_HPP

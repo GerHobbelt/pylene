@@ -30,11 +30,23 @@ namespace mln
       typedef Feature	   feature;
       typedef boost::mpl::set<Feature> provides;
 
+      typedef std::false_type          has_untake;
+
+
       // You mut implement the following function
       // void init()
       // void take(const argument_type&)
       // void take(const Accumulator<A>& other)
       // friend result_type extract(const E&, Feature)
+      //
+      // and the optional following methods:
+      // bool stop()
+      // void untake(const argument_type&)
+
+      constexpr bool stop() const
+      {
+        return false;
+      }
 
 
       result_type to_result() const

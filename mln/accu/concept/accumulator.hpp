@@ -1,5 +1,5 @@
-#ifndef MLN_CORE_CONCEPT_ACCUMULATOR_HPP
-# define MLN_CORE_CONCEPT_ACCUMULATOR_HPP
+#ifndef MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
+# define MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
 
 # include <mln/core/concept/object.hpp>
 # include <mln/core/concept/check.hpp>
@@ -71,4 +71,4 @@ namespace mln
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_CONCEPT_PIXEL_HPP
+#endif //!MLN_ACCU_CONCEPT_ACCUMULATOR_HPP

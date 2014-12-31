@@ -1,7 +1,7 @@
 #ifndef ACCUMULATOR_HPP
 # define ACCUMULATOR_HPP
 
-# include <mln/core/concept/accumulator.hpp>
+# include <mln/accu/concept/accumulator.hpp>
 # include <mln/accu/feature.hpp>
 # include <mln/accu/composite_accumulator.hpp>
 
@@ -60,8 +60,8 @@ namespace mln
     template <typename AccuLike, typename T, typename Extractor = default_extractor>
     struct result_of
     {
-    typedef unspecified type;
-  };
+      typedef unspecified type;
+    };
 
     /// \brief The defaut extractor
     /// It calls the `to_result` method of the accumulator.
@@ -93,36 +93,32 @@ namespace mln
 #   endif
 
 
-    template <typename AccuLike, typename T, typename Extractor = default_extractor,
-              typename Enabler = void>
+    template <typename AccuLike, typename T, typename Enable = void>
+    struct accu_of
+    {
+      static_assert(is_a<AccuLike, Accumulator>::value,
+                    "First template parameter is not an Accumulator");
+
+      typedef AccuLike type;
+    };
+
+
+    template <typename AccuLike, typename T>
+    struct accu_of<AccuLike, T, typename std::enable_if<is_a<AccuLike, FeatureSet>::value>::type>
+    {
+      typedef typename AccuLike::template apply<T>::type type;
+    };
+
+
+
+    template <typename AccuLike, typename T, typename Extractor = default_extractor>
     struct result_of
     {
-    static_assert( std::is_convertible<AccuLike, FeatureSet<AccuLike> >::value,
-      "sdfsd");
-  };
-
-
-    template <typename AccuLike, typename T, typename Extractor>
-    struct result_of<AccuLike, T, Extractor,
-                     typename std::enable_if< is_a<AccuLike, FeatureSet>::value >::type>
-    {
-  private:
-    typedef typename AccuLike::template apply<T>::type Accu;
-
-  public:
-    typedef typename std::result_of<Extractor(Accu)>::type type;
-  };
-
-    template <typename AccuLike, typename T, typename Extractor>
-    struct result_of<AccuLike, T, Extractor,
-                     typename std::enable_if< is_a<AccuLike, Accumulator>::value >::type>
-    {
-    typedef typename std::result_of<Extractor(AccuLike)>::type type;
-  };
-
-
-
-
+    private:
+      typedef typename accu_of<AccuLike,T>::type accu_type;
+    public:
+      typedef typename std::result_of<Extractor(accu_type)>::type type;
+    };
     /// \}
 
 

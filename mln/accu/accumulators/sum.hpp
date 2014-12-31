@@ -93,9 +93,10 @@ namespace mln
       template <typename T, typename SumType>
       struct sum : accumulator_base< sum<T, SumType>, T, SumType, features::sum<> >
       {
-        typedef T               argument_type;
-        typedef SumType         result_type;
-        typedef boost::mpl::set< features::sum<> > provides;
+        typedef T                                       argument_type;
+        typedef SumType                                 result_type;
+        typedef boost::mpl::set< features::sum<> >      provides;
+        typedef std::true_type                          has_untake;
 
         sum()
           : m_sum ( SumType() )

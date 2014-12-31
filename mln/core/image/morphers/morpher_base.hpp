@@ -2,6 +2,8 @@
 # define MORPHER_BASE_HPP
 
 # include <mln/core/image/image.hpp>
+# include <mln/core/image/morphers/details/morpher_core_access.hpp>
+# include <mln/core/pixel_utility.hpp>
 
 //
 // This interface aims at easing the creation of image morpher.
@@ -58,16 +60,6 @@ namespace mln
   {
   };
 
-
-
-  /// \brief Base class for morphed pixels thats acts like a mixin on Pix.
-  template <typename Derived, typename Pix,
-	    typename Morpher = typename Pix::image_type>
-  struct morpher_pixel_base;
-
-  // FWD declaration
-  struct morpher_core_access;
-
   /******************************************************/
   /**                HELPER MACROS                     **/
   /******************************************************/
@@ -88,14 +80,6 @@ namespace mln
     return morpher_core_access::get_ima(this).F(x);             \
   }
 
-# define MLN_PIXMORPHER_FORWARD_IF_0_(COND, F, RETURN, CV)      \
-  typename std::enable_if<COND, RETURN>::type                   \
-  F() CV                                                        \
-  {                                                             \
-    return morpher_core_access::get_pix(this).F();              \
-  }
-
-
 # define MLN_IMMORPHER_FORWARD_0(F, RETURN)          MLN_IMMORPHER_FORWARD_IF_0_(true, F, RETURN, )
 # define MLN_IMMORPHER_FORWARD_CONST_0(F, RETURN)    MLN_IMMORPHER_FORWARD_IF_0_(true, F, RETURN, const)
 # define MLN_IMMORPHER_FORWARD_IF_0(COND, F, RETURN) MLN_IMMORPHER_FORWARD_IF_0_(COND, F, RETURN, )
@@ -106,84 +90,11 @@ namespace mln
 # define MLN_IMMORPHER_FORWARD_IF_1(COND, F, RETURN, ARG)       MLN_IMMORPHER_FORWARD_IF_1_(COND, F, RETURN, ARG,)
 # define MLN_IMMORPHER_FORWARD_IF_CONST_1(COND, F, RETURN, ARG) MLN_IMMORPHER_FORWARD_IF_1_(COND, F, RETURN, ARG, const)
 
-# define MLN_PIXMORPHER_FORWARD_CONST_0(F, RETURN)    MLN_PIXMORPHER_FORWARD_IF_0_(true, F, RETURN, const)
-
   /***********************/
   /**  Implementation   **/
   /***********************/
 
-  struct morpher_core_access
-  {
-    template <typename Morpher>
-    static
-    typename Morpher::image_t&
-    get_ima_(Morpher* morpher)
-    {
-      return reinterpret_cast<typename Morpher::derived_t*>(morpher)->m_ima;
-    }
 
-
-    template <typename Morpher>
-    static
-    const typename Morpher::image_t&
-    get_ima_(const Morpher* morpher)
-    {
-      return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
-    }
-
-    template <typename Morpher>
-    static
-    typename Morpher::image_t&
-    get_ima(Morpher* morpher)
-    {
-      return reinterpret_cast<typename Morpher::derived_t*>(morpher)->get_morphed();
-    }
-
-
-    template <typename Morpher>
-    static
-    const typename Morpher::image_t&
-    get_ima(const Morpher* morpher)
-    {
-      return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->get_morphed();
-    }
-
-
-    template <typename PixMorpher>
-    static
-    typename PixMorpher::pixel_t&
-    get_pix_(PixMorpher* morpher)
-    {
-      return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->m_pix;
-    }
-
-
-    template <typename PixMorpher>
-    static
-    const typename PixMorpher::pixel_t&
-    get_pix_(const PixMorpher* morpher)
-    {
-      return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->m_pix;
-    }
-
-    template <typename PixMorpher>
-    static
-    typename PixMorpher::pixel_t&
-    get_pix(PixMorpher* morpher)
-    {
-      return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->get_morphed();
-    }
-
-
-    template <typename PixMorpher>
-    static
-    const typename PixMorpher::pixel_t&
-    get_pix(const PixMorpher* morpher)
-    {
-      return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->get_morphed();
-    }
-
-  };
 
   //
   // We define in this namespace some Mixin that will delegate the method calls
@@ -291,65 +202,6 @@ namespace mln
     const image_t&	get_morphed() const { return morpher_core_access::get_ima_(this); }
   };
 
-  namespace impl
-  {
-    // If the image of the pixel is indexable
-    // we add the following typedefs/methods:
-    // + typedef size_type
-    // + index()
-    template <typename Derived, typename Pix, typename Morpher,
-	      bool is_indexable =
-	      image_traits<Morpher>::indexable::value
-	      >
-    struct morpher_pixel_indexable;
-
-    template <typename Derived, typename Pix, typename Morpher>
-    struct morpher_pixel_indexable<Derived, Pix, Morpher, false>
-    {
-    };
-
-    template <typename Derived, typename Pix, typename Morpher>
-    struct morpher_pixel_indexable<Derived, Pix, Morpher, true>
-    {
-    private:
-      friend  struct mln::morpher_core_access;
-      typedef Pix         pixel_t;
-      typedef Derived     derived_t;
-
-    public:
-      typedef typename Pix::size_type	size_type;
-
-      MLN_PIXMORPHER_FORWARD_CONST_0(index, size_type);
-    };
-
-  }
-
-  template <typename Derived, typename Pix, typename Morpher>
-  struct morpher_pixel_base :
-    Pixel<Derived>,
-    impl::morpher_pixel_indexable<Derived, Pix, Morpher>
-  {
-  private:
-    friend  struct morpher_core_access;
-    typedef Pix         pixel_t;
-    typedef Derived     derived_t;
-
-  public:
-    typedef typename Pix::value_type value_type;
-    typedef typename Pix::point_type point_type;
-    typedef typename Pix::site_type  site_type;
-    typedef typename Pix::reference  reference;
-    typedef Morpher                  image_type;
-
-    MLN_PIXMORPHER_FORWARD_CONST_0(val, reference);
-    MLN_PIXMORPHER_FORWARD_CONST_0(point, point_type);
-    MLN_PIXMORPHER_FORWARD_CONST_0(site, site_type);
-
-  protected:
-    Pix&		get_morphed() { return morpher_core_access::get_pix_(this); }
-    const Pix&		get_morphed() const { return morpher_core_access::get_pix_(this); }
-  };
-
 
   // template <class Pixel, class Morpher>
   // struct morpher_default_pixel
@@ -390,8 +242,6 @@ namespace mln
 # undef MLN_IMMORPHER_FORWARD_CONST_1
 # undef MLN_IMMORPHER_FORWARD_IF_1
 # undef MLN_IMMORPHER_FORWARD_IF_CONST_1
-# undef MLN_PIXMORPHER_FORWARD_0_
-# undef MLN_PIXMORPHER_FORWARD_CONST_0
 
 
 #endif // ! MORPHER_BASE_HPP

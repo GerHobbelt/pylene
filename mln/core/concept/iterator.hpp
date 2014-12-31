@@ -27,6 +27,7 @@ namespace mln
   {
     typedef typename I::value_type    value_type;
     typedef typename I::reference     reference;
+    typedef typename I::has_NL        has_NL;
 
     BOOST_CONCEPT_USAGE(Iterator_)
     {

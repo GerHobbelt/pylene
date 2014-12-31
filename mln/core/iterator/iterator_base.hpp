@@ -51,6 +51,7 @@ namespace mln
   {
     typedef Derived iterator;
     typedef Derived const_iterator;
+    typedef std::false_type has_NL;
 
     typedef typename std::remove_const<Value>::type value_type;
     typedef Reference reference;

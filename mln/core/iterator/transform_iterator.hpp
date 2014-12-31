@@ -34,6 +34,7 @@ namespace mln
                    typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference >
   {
     typedef typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference reference;
+    typedef typename Iterator::has_NL has_NL;
 
     transform_iterator() = default;
 
@@ -53,6 +54,10 @@ namespace mln
     void next() { it_.next(); }
     bool finished() const { return it_.finished(); }
     reference dereference() const { return f_(*it_); }
+
+    template <class dummy = bool>
+    typename std::enable_if<has_NL::value, dummy>::type NL() const { return it_.NL(); }
+
 
   private:
     template <typename, typename, typename, typename>

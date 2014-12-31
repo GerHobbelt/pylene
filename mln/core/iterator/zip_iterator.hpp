@@ -5,6 +5,9 @@
 # include <tuple>
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/internal/tuple_utility.hpp>
+# include <boost/mpl/fold.hpp>
+# include <boost/mpl/list.hpp>
+# include <boost/mpl/and.hpp>
 
 namespace mln
 {
@@ -56,6 +59,11 @@ namespace mln
     typedef std::tuple<TTypes...> IteratorTuple;
     typedef std::tuple< typename std::remove_reference<TTypes>::type::reference... > value_type;
     typedef value_type reference;
+    typedef std::integral_constant<
+      bool,
+      boost::mpl::fold<boost::mpl::list<typename TTypes::has_NL...>,
+                       boost::mpl::true_,
+                       boost::mpl::and_<boost::mpl::_1, boost::mpl::_2> >::type::value> has_NL;
 
     zip_iterator() {}
 
@@ -90,6 +98,13 @@ namespace mln
     reference dereference() const
     {
       return internal::tuple_transform(m_iterator_tuple, internal::iterator_dereference ());
+    }
+
+    template <class dummy = bool>
+    typename std::enable_if<has_NL::value, dummy>::type
+    NL() const
+    {
+      return std::get<0>(m_iterator_tuple).NL();
     }
 
   private:

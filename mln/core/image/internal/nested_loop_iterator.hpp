@@ -181,6 +181,7 @@ namespace mln
       template <size_t n> void  init(P& point) const { point[n] = 0; }
       template <size_t n> void  next(P& point) const  { ++point[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
+      bool NL(const P& point) const { return point[P::ndim-1] == 0; }
     private:
       P pmax_;
     };
@@ -197,7 +198,7 @@ namespace mln
       template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
       template <size_t n> void  next(P& point) const { --point[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] < 0; }
-
+      bool NL(const P& point) const { return point[P::ndim-1] == pmax_[P::ndim-1] - 1; }
     private:
       P pmax_;
     };
@@ -215,7 +216,7 @@ namespace mln
       template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - 1; }
       template <size_t n> void  next(P& point) const { --point[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] < pmin_[n]; }
-
+      bool NL(const P& point) const { return point[P::ndim-1] == pmax_[P::ndim-1] - 1; }
     private:
       P pmin_;
       P pmax_;
@@ -233,6 +234,7 @@ namespace mln
       template <size_t n> void  init(P& point) const    { point[n] = pmin_[n]; }
       template <size_t n> void  next(P& point) const    { ++point[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
+      bool NL(const P& point) const { return point[P::ndim-1] == pmin_[P::ndim-1]; }
     private:
       P pmin_;
       P pmax_;
@@ -254,7 +256,7 @@ namespace mln
       template <size_t n> void  init(P& point) const { point[n] = pmax_[n] - strides_[n]; }
       template <size_t n> void  next(P& point) const { point[n] -= strides_[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] < pmin_[n]; }
-
+      bool NL(const P& point) const { return point[P::ndim-1] == pmax_[P::ndim-1] - strides_[P::ndim-1]; }
     private:
       P pmin_;
       P pmax_;
@@ -274,6 +276,7 @@ namespace mln
       template <size_t n> void  init(P& point) const    { point[n] = pmin_[n]; }
       template <size_t n> void  next(P& point) const    { point[n] += strides_[n]; }
       template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
+      bool NL(const P& point) const { return point[P::ndim-1] == pmin_[P::ndim-1]; }
     private:
       P pmin_;
       P pmax_;
@@ -413,6 +416,7 @@ namespace mln
       public internal::iterator_core_access
     {
       typedef typename DereferencePolicy::template reference<InternalStruct> reference;
+      typedef std::true_type has_NL;
 
       nested_loop_iterator()
       {
@@ -448,6 +452,11 @@ namespace mln
       bool finished() const
       {
         return m_pv.template finished<0>(get_point(m_s));
+      }
+
+      bool NL() const
+      {
+        return m_pv.NL(get_point(m_s));
       }
 
       reference

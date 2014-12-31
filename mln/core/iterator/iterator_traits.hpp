@@ -11,7 +11,10 @@ namespace mln
   {
     typedef typename I::value_type value_type;
     typedef typename I::reference  reference;
+
+    typedef typename I::has_NL     has_NL;
   };
+
 
   template <typename T>
   struct iterator_traits<T*> : std::iterator_traits<T*>

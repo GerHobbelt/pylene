@@ -145,6 +145,8 @@ namespace mln
     friend struct extended_by_value_image_pixel_iterator;
 
   public:
+    typedef typename PixelIterator::has_NL has_NL;
+
     extended_by_value_image_pixel_iterator() = default;
     extended_by_value_image_pixel_iterator(const extended_by_value_image_pixel_iterator&) = default;
 
@@ -165,6 +167,10 @@ namespace mln
     void next()           { m_it.next(); }
     bool finished() const { return m_it.finished(); }
     pixel_type dereference() const { return pixel_type(*m_ima, *m_it); }
+
+    template <class dummy = bool>
+    typename std::enable_if<has_NL::value, dummy>::type NL() const { return m_it.NL(); }
+
 
   private:
     Morpher*      m_ima;

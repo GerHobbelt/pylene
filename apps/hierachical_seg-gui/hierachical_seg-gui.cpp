@@ -1,10 +1,12 @@
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/colors/literal.hpp>
 
 #include <mln/morpho/component_tree/component_tree.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/maxtree/maxtree.hpp>
 #include <mln/data/stretch.hpp>
 
@@ -14,7 +16,6 @@
 #include <apps/tos/topology.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 #include "brush.hpp"
-#include "myheap.hpp"
 
 
 using namespace mln;
@@ -49,10 +50,23 @@ segmentation(const tree_t& tree,
       colortag v = (colortag)px.val();
 
       if (K1::is_face_2(px.point()) and v != BLANC)
-        tags[x] = v;
+        {
+          if (tags[x] == BLANC)
+            tags[x] = v;
+          else if (tags[x] != v)
+            tags[x] = NOIR; // Ambuiguity => set background
+        }
     }
 
   tags[tree.get_root()] = NOIR; // Root is background
+
+
+  {
+    image2d<uint8> markers = imchvalue<uint8>(markers__);
+    morpho::reconstruction(tree, tags, markers);
+    io::imsave(markers, "/tmp/markers.tiff");
+  }
+
 
   // Propagate up
   mln_reverse_foreach(auto x, tree.nodes()) {
@@ -71,6 +85,12 @@ segmentation(const tree_t& tree,
     mln_assertion(tags[q] != BLANC);
     if (tags[x] == BLANC)
       tags[x] = tags[q];
+  }
+
+  {
+    image2d<uint8> markers = imchvalue<uint8>(markers__);
+    morpho::reconstruction(tree, tags, markers);
+    io::imsave(markers, "/tmp/markers2.tiff");
   }
 
   //

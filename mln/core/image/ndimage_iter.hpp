@@ -118,7 +118,7 @@ namespace mln
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> reverse_iterator;
 
-    typedef iterator const_reverse_iterator;
+    typedef reverse_iterator const_reverse_iterator;
 
 
     ndimage_pixel_range(Image& ima)
@@ -155,7 +155,7 @@ namespace mln
 		      );
     }
 
-    reverse_iterator riter()
+    reverse_iterator riter() const
     {
       typename Image::point_type pmin = ima_->domain().pmin;
       typename Image::point_type pmax = ima_->domain().pmax;

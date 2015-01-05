@@ -61,9 +61,9 @@ struct ndimage_pixel_range
     {
       Image::point_type pmin = ima_->domain().pmin;
       Image::point_type pmax = ima_->domain().pmax;
-      return iterator(pixel_t(ima_),
-		      internal::make_point_visitor(pmax - pmin),
-		      internal::strided_pointer_value_visitor<ndim>(ima->last_, strides.begin()));
+      return reverse_iterator(pixel_t(ima_),
+                              internal::make_point_visitor(pmax - pmin),
+                              internal::strided_pointer_value_visitor<ndim>(ima->last_, strides.begin()));
     }
 
   private:

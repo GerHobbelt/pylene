@@ -3,6 +3,7 @@
 
 # include <mln/accu/accumulators/sum.hpp>
 # include <mln/accu/accumulators/count.hpp>
+# include <mln/accu/accumulators/mean.hpp>
 # include <mln/accu/composite_accumulator.hpp>
 # include <boost/type_traits/promote.hpp>
 
@@ -147,6 +148,13 @@ namespace mln
         unsigned extract(const variance& accu, features::count<> )
         {
           return accu.m_count;
+        }
+
+        friend
+        SumType
+        extract(const variance& accu, features::mean<> )
+        {
+          return accu.m_sum / accu.m_count;
         }
 
       private:

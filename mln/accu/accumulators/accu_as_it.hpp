@@ -43,9 +43,13 @@ namespace mln
 
         void take(const Accu& x)
         {
-          m_accu.take(x.m_accu);
+          m_accu.take(x);
         }
 
+        void take(const accu_as_it& x)
+        {
+          m_accu.take(x.m_accu);
+        }
 
         void untake(const argument_type& x)
         {

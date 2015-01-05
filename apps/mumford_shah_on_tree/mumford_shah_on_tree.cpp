@@ -12,6 +12,10 @@
 
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned> > tree_t;
 
+#ifndef MLN_INPUT_VALUE_TYPE
+# define MLN_INPUT_VALUE_TYPE mln::rgb8
+#endif
+
 tree_t::vertex_id_t
 find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar,
                tree_t::vertex_id_t x)
@@ -26,7 +30,7 @@ find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar,
 int main(int argc, char** argv)
 {
   if (argc < 6) {
-    std::cerr << "Usage: " << argv[0] << " input.ppm input.tree lambda grain output.ppm\n"
+    std::cerr << "Usage: " << argv[0] << " input.ppm input.tree lambda grain output.ppm [output.tree]\n"
       ;
     std::exit(1);
   }
@@ -41,9 +45,9 @@ int main(int argc, char** argv)
 
   using namespace mln;
 
+  typedef MLN_INPUT_VALUE_TYPE V;
 
-
-  image2d<rgb8> f, F;
+  image2d<V> f, F;
   tree_t tree;
 
   io::imread(input_path, f);
@@ -68,4 +72,10 @@ int main(int argc, char** argv)
   mumford_shah_on_tree(tree, F, lambda);
   F = Kadjust_to(F, f.domain());
   io::imsave(F, output_path);
+
+  if (argc == 7) {
+    const char* output_path = argv[6];
+    morpho::save(tree, output_path);
+  }
+
 }

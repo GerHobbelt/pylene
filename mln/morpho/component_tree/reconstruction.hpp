@@ -17,6 +17,11 @@ namespace mln
     template <class P, class AMap, class ValueMap, class I>
     void reconstruction(const component_tree<P, AMap>& tree,
 			const ValueMap& vmap,
+			Image<I>&& out);
+
+    template <class P, class AMap, class ValueMap, class I>
+    void reconstruction(const component_tree<P, AMap>& tree,
+			const ValueMap& vmap,
 			Image<I>& out);
 
 
@@ -42,6 +47,16 @@ namespace mln
     void reconstruction(const component_tree<P, AMap>& tree,
 			const ValueMap& vmap,
 			Image<I>& out)
+    {
+      mln_entering("mln::morpho::reconstruction");
+      impl::reconstruction_index(tree, vmap, exact(out));
+      mln_exiting();
+    }
+
+    template <class P, class AMap, class ValueMap, class I>
+    void reconstruction(const component_tree<P, AMap>& tree,
+			const ValueMap& vmap,
+			Image<I>&& out)
     {
       mln_entering("mln::morpho::reconstruction");
       impl::reconstruction_index(tree, vmap, exact(out));

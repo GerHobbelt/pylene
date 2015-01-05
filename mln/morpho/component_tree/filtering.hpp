@@ -231,11 +231,14 @@ namespace mln
       typedef component_tree<P, Amap> tree_t;
       typedef typename tree_t::vertex_id_t vertex_id_t;
 
-      ValueMap vmap = value_map;
+      //ValueMap vmap = value_map;
+      property_map<component_tree<P, Amap>, typename ValueMap::value_type> vmap(tree);
 
       mln_foreach(auto x, tree.nodes())
         if (not predicate_map[x])
           vmap[x] = vmap[x.parent()];
+        else
+          vmap[x] = value_map[x];
 
       mln_foreach(auto px, out.pixels())
         {

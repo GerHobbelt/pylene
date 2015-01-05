@@ -40,6 +40,13 @@ namespace mln
     /// The vector N has an extra sentinel node at the end to ease traversal processes.
     /// This sentinel is at index (npos) and is composed by the triplet
     ///   (parent: npos, prev: root, next: npos, sexts: npos, first_point: S.size())
+    /// This sentinal can be considered as the NULL pointer i.e.:
+    ///
+    /// You can traverse a branch upward:
+    /// while (x.id() != NULL) // or x == tree.nend()
+    ///   ...
+    ///   x = x.parent();
+
     /// The root node is the triplet (parent:npos, prev: npos, next/nexts: ? size:..., first_point: 0)
     template <class P, class AssociativeMap>
     struct component_tree;
@@ -108,11 +115,19 @@ namespace mln
       struct node_range;
 
       size_type		size() const;
+      size_type		realsize() const;
       node_type		get_node(vertex_id_t v) const;
       node_type		get_node_at(const point_type& p) const;
       component_tree	get_subtree(vertex_id_t v) const;
       node_range	nodes(bool ignore_root = false) const;
       node_range	nodes_without_root() const;
+
+      ///  \brief Shrink the nodes vector to free space.
+      ///
+      /// This is usually used after a filtering operation
+      /// to remove unused node from the node vector.
+      void              shrink_to_fit();
+
       /// \}
 
       /// \defgroup Misc
@@ -713,6 +728,23 @@ namespace mln
 
     template <class P, class AssociativeMap>
     inline
+    typename component_tree<P, AssociativeMap>::size_type
+    component_tree<P, AssociativeMap>::realsize() const
+    {
+      size_type n = 1;
+      unsigned next = m_data->m_nodes[m_root].m_next;
+      while (next != npos()) {
+        next = m_data->m_nodes[next].m_next;
+        ++n;
+      }
+
+      return n;
+    }
+
+
+
+    template <class P, class AssociativeMap>
+    inline
     typename component_tree<P, AssociativeMap>::node_range
     component_tree<P, AssociativeMap>::nodes(bool ignore_root) const
     {
@@ -852,6 +884,62 @@ namespace mln
       mln_assertion(spos == m_data->m_S.size());
 
       m_data->m_pset_ordered = true;
+      mln_exiting();
+    }
+
+
+
+    template <class P, class AssociativeMap>
+    void
+    component_tree<P, AssociativeMap>::shrink_to_fit()
+    {
+      mln_entering("mln::morpho::component_tree::shrink_to_fit");
+
+      std::vector<vertex_id_t> newidx;
+      newidx.resize(m_data->m_nodes.size());
+
+      unsigned n = 1;
+      mln_foreach(auto x, this->nodes())
+        newidx[x.id()] = n++;
+      newidx[0] = 0;
+
+      // Create a new vector of nodes
+      // Note: maybe it can be done inplace i.e. in-place permutation ?
+      std::vector<internal::component_tree_node> nvec(n);
+      {
+        int i = 1;
+        mln_foreach(auto x, this->nodes())
+          {
+            nvec[i].m_parent = newidx[x.get_parent_id()];
+            nvec[i].m_prev = i-1;
+            nvec[i].m_next = i+1;
+            nvec[i].m_next_sibling = newidx[x.get_next_sibling_id()];
+            nvec[i].m_point_index = x.get_first_point_id();
+            i++;
+          }
+
+        // Fix last node
+        nvec[n-1].m_next = 0;
+
+        // Sentinel
+        nvec[0] = {
+          0,   // parent -> itself
+          n-1, // prev -> lastnode
+          0,   // next -> itself
+          0,   // next_sibling -> itself
+          (unsigned) m_data->m_S.size() // point_index: past the end
+        };
+      }
+
+      // Update pmap to the new node indexes
+      mln_foreach(auto px, m_data->m_pmap.pixels())
+        px.val() = newidx[px.val()];
+
+      // Swap buffer
+      m_data->m_nodes = std::move(nvec);
+
+      m_root = newidx[m_root];
+
       mln_exiting();
     }
 

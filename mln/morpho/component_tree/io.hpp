@@ -20,6 +20,9 @@ namespace mln
     void
     load(std::istream& is, component_tree<P, AssociativeMap>& tree);
 
+    template <class P, class AssociativeMap>
+    void
+    load(const std::string& s, component_tree<P, AssociativeMap>& tree);
 
 
     /*************************************/
@@ -115,6 +118,23 @@ namespace mln
       // set the rooted
       tree = tree.get_subtree(root);
     }
+
+    template <class P, class AssociativeMap>
+    void
+    load(const std::string& s, component_tree<P, AssociativeMap>& tree)
+    {
+      std::ifstream f(s);
+      load(f, tree);
+    }
+
+    template <class P, class AssociativeMap>
+    void
+    save(component_tree<P, AssociativeMap>& tree, const std::string& s)
+    {
+      std::ofstream f(s);
+      save(tree, f);
+    }
+
 
   }
 

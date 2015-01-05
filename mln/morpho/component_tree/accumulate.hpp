@@ -24,7 +24,7 @@ namespace mln
 		  typename accu::result_of<Accu, P>::type >
     accumulate(const component_tree<P, AssociativeMap>& ctree,
 	       const AccumulatorLike<Accu>& accu,
-	       bool require_ordering = true);
+	       bool require_ordering = false);
 
     template <class P, class AssociativeMap, class Accu>
     property_map< component_tree<P, AssociativeMap>,
@@ -39,7 +39,7 @@ namespace mln
     vaccumulate(const component_tree<P, AssociativeMap>& ctree,
                 const Image<I>& ima,
                 const AccumulatorLike<Accu>& accu,
-                bool require_ordering = true);
+                bool require_ordering = false);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map< component_tree<P, AssociativeMap>,
@@ -55,7 +55,7 @@ namespace mln
     paccumulate(const component_tree<P, AssociativeMap>& ctree,
                 const Image<I>& ima,
                 const AccumulatorLike<Accu>& accu,
-                bool require_ordering = true);
+                bool require_ordering = false);
 
 
 
@@ -130,6 +130,7 @@ namespace mln
 	    vmap[x.id()] = accmap[x.id()].to_result();
 	    accmap[x.get_parent_id()].take(accmap[x.id()]);
 	  }
+        vmap[Tree::npos()] = accmap[Tree::npos()].to_result();
       }
 
       template <class Tree, class I, class Accu, class Pmap, class IFunctor>
@@ -148,12 +149,21 @@ namespace mln
 	    accmap[ node.id() ].take( ifun(x) );
 
 	    // Transmit & set if last
-	    if (node.first_point() == x)
-	      {
-		vmap[node.id()] = accmap[ node.id() ].to_result();
-		accmap[ node.get_parent_id() ].take(accmap[node.id()]);
-	      }
+            // WARning: Does not work if a node is empty
+	    // if (node.first_point() == x)
+	    //   {
+	    //     vmap[node.id()] = accmap[ node.id() ].to_result();
+	    //     accmap[ node.get_parent_id() ].take(accmap[node.id()]);
+	    //   }
 	  }
+
+        // 2. Transmit to parent & set value
+	mln_reverse_foreach(auto x, tree.nodes())
+	  {
+	    vmap[x.id()] = accmap[x.id()].to_result();
+	    accmap[x.get_parent_id()].take(accmap[x.id()]);
+	  }
+        vmap[Tree::npos()] = accmap[Tree::npos()].to_result();
       }
     }
 
@@ -347,7 +357,7 @@ namespace mln
       property_map<Tree, R> vmap(tree);
 
       auto pixfunctor = [](const mln_cpixel(I)& px) { return px; };
-      impl::accumulate_index(tree, exact(ima), acc, vmap, pixfunctor);
+      impl::accumulate_proper_index(tree, exact(ima), acc, vmap, pixfunctor);
 
       mln_exiting();
       return vmap;

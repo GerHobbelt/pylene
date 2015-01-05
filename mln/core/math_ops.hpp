@@ -7,6 +7,7 @@
 *
 */
 
+# include <utility>
 # include <cmath>
 
 namespace mln
@@ -118,6 +119,17 @@ namespace mln
   double		l2norm(double x);
   long double		l2norm(long double x);
 
+  int			l2dist(int x, int y);
+  long			l2dist(long x, long y);
+  long long		l2dist(long long x, long long y);
+  unsigned int		l2dist(unsigned int x, unsigned int y);
+  unsigned long		l2dist(unsigned long x, unsigned long y);
+  unsigned long long	l2dist(unsigned long long x, unsigned long long y);
+  float			l2dist(float x, float y);
+  double		l2dist(double x, double y);
+  long double		l2dist(long double x, long double y);
+
+
   int			l2norm_sqr(int x);
   long			l2norm_sqr(long n);
   long long		l2norm_sqr(long long n);
@@ -127,6 +139,16 @@ namespace mln
   float			l2norm_sqr(float x);
   double		l2norm_sqr(double x);
   long double		l2norm_sqr(long double x);
+
+  int			l2dist_sqr(int x, int y);
+  long			l2dist_sqr(long x, long y);
+  long long		l2dist_sqr(long long x, long long y);
+  unsigned int		l2dist_sqr(unsigned int x, unsigned int y);
+  unsigned long		l2dist_sqr(unsigned long x, unsigned long y);
+  unsigned long long	l2dist_sqr(unsigned long long x, unsigned long long y);
+  float			l2dist_sqr(float x, float y);
+  double		l2dist_sqr(double x, double y);
+  long double		l2dist_sqr(long double x, long double y);
 
   int			linfnorm(int x);
   long			linfnorm(long n);
@@ -157,6 +179,7 @@ namespace mln
     template <typename T = void> struct l0norm_t;
     template <typename T = void> struct l1norm_t;
     template <typename T = void> struct l2norm_t;
+    template <typename T = void> struct l2norm_sqr_t;
     template <typename T = void> struct linfnorm_t;
     template <unsigned p, typename T = void> struct lpnorm_t;
   };
@@ -168,6 +191,9 @@ namespace mln
 
 # define MLN_GEN_CODE(FUN, TYPE, OP)		\
   inline TYPE FUN(TYPE x) { return OP; }
+
+# define MLN_GEN_BINARY_CODE(FUN, TYPE, OP)		\
+  inline TYPE FUN(TYPE x, TYPE y) { return OP; }
 
 # define MLN_GEN_CODE_2(TEMPLATE, FUN, TYPE, OP)	\
   TEMPLATE inline TYPE FUN(TYPE x) { return OP; }
@@ -186,6 +212,23 @@ namespace mln
     template <typename T>                                  \
     auto operator() (const T& x) const -> decltype(FUN(x)) \
     { return FUN(x); }                                     \
+  };                                                       \
+  }
+
+# define MLN_FUNCTIONAL_GEN_BINARY_CODE(FUN)               \
+  namespace functional {                                   \
+  using mln::FUN;                                          \
+  template <typename T>                                    \
+  struct FUN##_t {                                         \
+    typedef decltype(FUN(std::declval<T>(), std::declval<T>())) result_type; \
+    auto operator() (const T& x, const T& y) const -> decltype(FUN(x,y)) \
+    { return FUN(x,y); }                                                \
+  };                                                       \
+  template <>                                              \
+  struct FUN##_t<void> {                                   \
+    template <typename T>                                  \
+    auto operator() (const T& x, const T& y) const -> decltype(FUN(x,y)) \
+    { return FUN(x,y); }                                                \
   };                                                       \
   }
 
@@ -264,6 +307,17 @@ namespace mln
   MLN_GEN_CODE(l2norm, long double, std::abs(x));
   MLN_FUNCTIONAL_GEN_CODE(l2norm);
 
+  MLN_GEN_BINARY_CODE(l2dist, int, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, long long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, unsigned int, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, unsigned long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, unsigned long long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, float, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, double, abs(x - y));
+  MLN_GEN_BINARY_CODE(l2dist, long double, abs(x - y));
+  MLN_FUNCTIONAL_GEN_BINARY_CODE(l2dist);
+
   MLN_GEN_CODE(l2norm_sqr, int, sqr(x));
   MLN_GEN_CODE(l2norm_sqr, long, sqr(x));
   MLN_GEN_CODE(l2norm_sqr, long long, sqr(x));
@@ -274,6 +328,17 @@ namespace mln
   MLN_GEN_CODE(l2norm_sqr, double, sqr(x));
   MLN_GEN_CODE(l2norm_sqr, long double, sqr(x));
   MLN_FUNCTIONAL_GEN_CODE(l2norm_sqr);
+
+  MLN_GEN_BINARY_CODE(l2dist_sqr, int, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, long, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, long long, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, unsigned int, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, unsigned long, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, unsigned long long, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, float, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, double, sqr(x - y));
+  MLN_GEN_BINARY_CODE(l2dist_sqr, long double, sqr(x - y));
+  MLN_FUNCTIONAL_GEN_BINARY_CODE(l2dist_sqr);
 
   MLN_GEN_CODE(linfnorm, int, std::abs(x));
   MLN_GEN_CODE(linfnorm, long, std::abs(x));
@@ -342,8 +407,10 @@ namespace mln
   MLN_FUNCTIONAL_GEN_CODE(prod);
 
 # undef MLN_GEN_CODE
+# undef MLN_GEN_BINARY_CODE
 # undef MLN_GEN_CODE_2
 # undef MLN_FUNCTIONAL_GEN_CODE
+# undef MLN_FUNCTIONAL_GEN_BINARY_CODE
 # undef MLN_FUNCTIONAL_GEN_CODE_2
 }
 

@@ -93,7 +93,12 @@ namespace mln
   MLN_PROMOTE_FUNCOMP(T, pow, abs)
     lpnorm(const internal::vec_base<T, dim, tag>& x);
 
-
+  template <typename T, unsigned dim, class tag>
+  inline
+  auto
+  l2dist(const internal::vec_base<T, dim, tag>& x,
+         const internal::vec_base<T, dim, tag>& y)
+    -> decltype(l2norm(x-y));
 
 
   /*****************************/
@@ -112,13 +117,26 @@ namespace mln
     return res;					\
   }
 
+#define MLN_GEN_BINARY_CODE(FUN, FUNBASE, EXPR)                  \
+  template <class T, unsigned dim, class tag>                    \
+  inline                                                         \
+  auto                                                           \
+  FUN(const internal::vec_base<T, dim, tag>& x,                  \
+      const internal::vec_base<T, dim, tag>& y)                  \
+    -> decltype(FUNBASE(EXPR))                                   \
+  {                                                              \
+    return FUNBASE(EXPR);                                        \
+  }
+
+
+
   MLN_GEN_CODE(sqr);
   MLN_GEN_CODE(sqrt);
   MLN_GEN_CODE(abs);
   MLN_GEN_CODE(cbrt);
 
+  MLN_GEN_BINARY_CODE(l2dist, l2norm, x-y);
 
-# undef MLN_GEN_CODE
 
   template <class U, class V, unsigned dim, class tag>
   internal::vec_base< decltype( pow(std::declval<U>(), std::declval<V>()) ),
@@ -262,6 +280,8 @@ namespace mln
 
 }
 
+# undef MLN_GEN_CODE
+# undef MLN_GEN_BINARY_CODE
 # undef MLN_VEC_PROMOTE_FUN
 # undef MLN_VEC_PROMOTE
 # undef MLN_PROMOTE_FUNCOMP

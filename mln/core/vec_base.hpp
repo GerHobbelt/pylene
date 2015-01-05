@@ -227,6 +227,16 @@ namespace mln
 
       vec_base() = default;
 
+      vec_base(const vec_base&) = default;
+
+      template <class OtherTag>
+      explicit
+      vec_base(const vec_base<T, dim, OtherTag>& other)
+      {
+        for (unsigned i = 0; i < dim; ++i)
+          v_[i] = other.v_[i];
+      }
+
 
       constexpr
       vec_base(const literal::zero_t&)
@@ -565,6 +575,13 @@ namespace std
     typedef mln::internal::vec_base< typename make_unsigned<T>::type, dim, tag > type;
   };
 
+
+  template <typename T1, typename T2, unsigned dim, typename Tag>
+  struct common_type< mln::internal::vec_base<T1,dim,Tag>,
+                      mln::internal::vec_base<T2,dim,Tag> >
+  {
+    typedef mln::internal::vec_base<typename std::common_type<T1,T2>::type, dim, Tag> type;
+  };
 }
 
 namespace boost

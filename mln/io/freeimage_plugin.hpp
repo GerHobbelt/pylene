@@ -642,6 +642,8 @@ namespace mln
           { typeid(int32),  {FIT_INT32,  32} },
           { typeid(float),  {FIT_FLOAT,  32} },
           { typeid(double), {FIT_DOUBLE, 64} },
+          { typeid(rgb16),   {FIT_RGB16, 48} },
+          { typeid(colors::rgba16),  {FIT_RGBA16, 64} },
           { typeid(rgb<float>), {FIT_RGBF, 96} },
           { typeid(colors::rgba<float>), {FIT_RGBAF, 128} }
         };

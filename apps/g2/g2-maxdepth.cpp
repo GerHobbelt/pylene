@@ -335,7 +335,7 @@ int main(int argc, char** argv)
   image2d<value_t> ima;
   io::imread(inname, ima);
 
-  image2d<value_t> f = addborder(ima, lexicographicalorder_less<value_t>());
+  image2d<value_t> f = addborder_marginal(ima);
   image2d<value_t> F = immerse_k1(f);
 
   typedef value_t::value_type V;

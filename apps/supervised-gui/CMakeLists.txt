@@ -1,4 +1,4 @@
-if(Qt4_FOUND)
+if(QT4_FOUND)
 
   INCLUDE(${QT_USE_FILE})
 
@@ -12,15 +12,22 @@ if(Qt4_FOUND)
   QT4_GENERATE_MOC(${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hxx
     ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
 
-
   add_executable(supervised-cli  supervised-cli.cpp)
+  add_executable(supervised-cli-multi  supervised-cli-multi.cpp)
+  add_executable(automatic  automatic.cpp)
 
   add_executable(supervised-gui-3c  supervised-gui-3c.cpp brush.cpp
     ${supervised_MOC}
     ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
 
+
   target_link_libraries(supervised-gui-3c ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
   target_link_libraries(supervised-cli ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
 
-endif(Qt4_FOUND)
+  set_property(TARGET supervised-cli-multi APPEND PROPERTY INCLUDE_DIRECTORIES "/work/carlinet/src/eigen/")
+
+endif(QT4_FOUND)
+
+
+

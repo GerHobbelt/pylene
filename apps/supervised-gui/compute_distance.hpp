@@ -2,6 +2,7 @@
 # define COMPUTE_DISTANCE_HPP
 
 # include "constants.hpp"
+# include <mln/colors/lab.hpp>
 
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned> > tree_t;
 
@@ -28,12 +29,14 @@ compute_distance(const tree_t& tree,
 
   distancemap[tree.npos()] = value_traits<float>::sup();
 
+  //auto mydist = [](rgb8 a, rgb8 b) -> float { return l2norm(rgb2lab(a) - rgb2lab(b)); };
+  auto mydist = [](rgb8 a, rgb8 b) -> float { return l2norm(a - b); };
   // Upward
   mln_reverse_foreach(auto x, tree.nodes_without_root())
     {
       // Note the 0.1
       // The distance must stricly > 0
-      float tmp = distancemap[x] + l2norm(vmap[x] - vmap[x.parent()]) + 0.1;
+      float tmp = distancemap[x] + mydist(vmap[x], vmap[x.parent()]) + 0.1;
       if (tmp < distancemap[x.parent()])
         distancemap[x.parent()] = tmp;
     }
@@ -43,7 +46,7 @@ compute_distance(const tree_t& tree,
   mln_foreach(auto x, tree.nodes_without_root())
     {
       // The distance must stricly > 0
-      float tmp = distancemap[x.parent()] + l2norm(vmap[x] - vmap[x.parent()]) + 0.1;
+      float tmp = distancemap[x.parent()] + mydist(vmap[x], vmap[x.parent()]) + 0.1;
       if (tmp < distancemap[x])
         distancemap[x] = tmp;
     }

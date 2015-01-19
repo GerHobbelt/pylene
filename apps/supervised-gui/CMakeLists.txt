@@ -15,6 +15,8 @@ if(QT4_FOUND)
   add_executable(supervised-cli  supervised-cli.cpp)
   add_executable(supervised-cli-multi  supervised-cli-multi.cpp)
   add_executable(automatic  automatic.cpp)
+  add_executable(nettoyage  nettoyage.cpp)
+  add_executable(generate_res  generate_res.cpp)
 
   add_executable(supervised-gui-3c  supervised-gui-3c.cpp brush.cpp
     ${supervised_MOC}
@@ -24,6 +26,7 @@ if(QT4_FOUND)
 
   target_link_libraries(supervised-gui-3c ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
   target_link_libraries(supervised-cli ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+  target_link_libraries(nettoyage ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 
   set_property(TARGET supervised-cli-multi APPEND PROPERTY INCLUDE_DIRECTORIES "/work/carlinet/src/eigen/")
 

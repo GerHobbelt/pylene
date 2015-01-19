@@ -67,6 +67,9 @@ int main(int argc, char** argv)
 
   morpho::reconstruction(tree, avmap, out);
 
+  std::cout << "See: /tmp/alpha.tiff" << std::endl;
+  io::imsave(out, "/tmp/alpha.tiff");
+
   // Get the seeds.
   unsigned area_threshold = std::atoi(argv[3]);
   property_map<tree_t, uint8> active(tree, true);
@@ -137,6 +140,8 @@ int main(int argc, char** argv)
     ske = morpho::area_closing(ske, c8, 20);
 
     transform::chamfer_distance_transform(ske, c4, ske);
+
+    std::cout << "See: " << stem << ".ske.pgm\n";
     io::imsave(ske, stem + ".ske.pgm");
 
 
@@ -175,6 +180,10 @@ int main(int argc, char** argv)
       }
   }
 
+  // Clean Remove small CC
+  imlabel = morpho::area_opening(imlabel, c8, 100);
+
   io::imsave(imlabel, argv[5]);
+  std::cout << "See: " << stem << ".markers.tiff\n";
   io::imsave(out, stem + ".markers.tiff");
 }

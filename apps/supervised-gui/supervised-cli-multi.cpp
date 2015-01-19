@@ -144,7 +144,6 @@ int main(int argc, char** argv)
   image2d<rgb8> seg;
   int nlabel = accumulate(markers, accu::features::max<> ());
   res = segmentation(tree, vmap, markers, nlabel);
-
   for (int i = 1; i <= nlabel; ++i) {
     auto clo = morpho::area_closing(res == i, c4, grain);
     fill(res | clo, i);

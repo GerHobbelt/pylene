@@ -147,6 +147,7 @@ segmentation(const tree_t& tree,
         image2d<rgb8> out = clone(original);
         fill(out | (markers_ == BACKGROUND), colors::literal::red);
         fill(out | (markers_ == FOREGROUND), colors::literal::blue);
+        std::cout << "See /tmp/markers_.tiff for the image marked" << std::endl;
         io::imsave(out, "/tmp/markers_.tiff");
       }
 
@@ -154,6 +155,7 @@ segmentation(const tree_t& tree,
         image2d<uint8> out;
         resize(out, tree._get_data()->m_pmap);
         morpho::reconstruction(tree, colormap, out);
+        std::cout << "See /tmp/markers.tiff for tree markers" << std::endl;
         io::imsave(out, "/tmp/markers.tiff");
       }
 
@@ -161,8 +163,20 @@ segmentation(const tree_t& tree,
         image2d< rgb<float> > out;
         resize(out, tree._get_data()->m_pmap);
         morpho::reconstruction(tree, dmap, out);
+        std::cout << "See /tmp/distances.tiff for distances" << std::endl;
         io::imsave(out, "/tmp/distances.tiff");
       }
+
+       {
+         auto bmap = make_functional_property_map<tree_t::node_type>
+           ([&cmap] (const tree_t::node_type& x) -> bool { return cmap[x] == FOREGROUND; });
+         image2d<bool> out;
+         resize(out, tree._get_data()->m_pmap);
+         morpho::reconstruction(tree, bmap, out);
+         out = Kadjust_to(out, markers__.domain());
+         std::cout << "See /tmp/mask.pbm for mask" << std::endl;
+         io::imsave(out, "/tmp/mask.pbm");
+       }
     }
 
 
@@ -186,6 +200,7 @@ segmentation(const tree_t& tree,
 
   if (trace::verbose)
     {
+      std::cout << "See /tmp/segmented.png for distances" << std::endl;
       io::imsave(output, "/tmp/segmented.png");
     }
 

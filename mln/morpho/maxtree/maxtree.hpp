@@ -12,13 +12,27 @@ namespace mln
   namespace morpho
   {
     ///
-    /// \brief Compute a maxtree as a component tree where nodes contain indexes instead of points.
+    /// \brief Compute a maxtree as a component tree where nodes
+    /// contain indexes instead of points.
     ///
-    ///
+    /// \param ima The image
+    /// \param nbh The neighborhood
+    /// \param cmp A strict weak order on values
     template <typename I, typename N, typename StrictWeakOrdering = std::less<mln_value(I)> >
     component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
     maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh,
-		    StrictWeakOrdering cmp = StrictWeakOrdering());
+                    StrictWeakOrdering cmp = StrictWeakOrdering());
+
+    ///
+    /// \brief Compute a mintree as a component tree where nodes
+    /// contain indexes instead of points.
+    ///
+    /// \param ima The image
+    /// \param nbh The neighborhood
+    /// \param cmp A strict weak order on values
+    template <typename I, typename N>
+    component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    mintree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh);
 
 
     /*****************************/
@@ -34,6 +48,17 @@ namespace mln
       mln_exiting();
       return res;
     }
+
+    template <typename I, typename N>
+    component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    mintree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh)
+    {
+      mln_entering("mln::morpho::mintree_indexes");
+      auto res = impl::maxtree_queue_indexes(exact(ima), exact(nbh), std::greater<mln_value(I)> ());
+      mln_exiting();
+      return res;
+    }
+
 
 
   }

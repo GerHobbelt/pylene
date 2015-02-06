@@ -9,8 +9,6 @@
 #include <mln/core/algorithm/transform.hpp>
 
 #include <apps/tos/Kinterpolate.hpp>
-#include <apps/saliency/attribute_on_contour.hpp>
-
 #include <mln/morpho/component_tree/io.hpp>
 //#include <mln/morpho/component_tree/graphviz.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>

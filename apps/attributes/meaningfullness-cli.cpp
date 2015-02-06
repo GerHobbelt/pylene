@@ -8,8 +8,6 @@
 #include <mln/colors/rgba.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <apps/tos/Kinterpolate.hpp>
-#include <apps/saliency/attribute_on_contour.hpp>
-
 #include <mln/morpho/component_tree/io.hpp>
 //#include <mln/morpho/component_tree/graphviz.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
@@ -132,8 +130,7 @@ int main(int argc, char** argv)
 
   {
     auto& attr = extincted.get_vmap();
-    image2d<float> sal = imchvalue<float>(F).init(0);
-    attribute_on_contour(tree, attr, sal);
+    image2d<float> sal = set_value_on_contour(tree, attr);
     io::imsave(sal, output_path);
   }
 

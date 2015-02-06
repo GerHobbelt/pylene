@@ -6,7 +6,6 @@
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
-#include <mln/morpho/component_tree/pattern_spectra.hpp>
 #include <mln/morpho/algebraic_filter.hpp>
 
 #include <mln/accu/accumulators/accu_if.hpp>

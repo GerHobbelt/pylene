@@ -31,6 +31,11 @@ namespace mln
                                const Image<I>& valuemap,
                                const AccumulatorLike<AccuLike>& accu);
 
+  template <class P, class VMap>
+  image2d<typename VMap::value_type>
+  set_value_on_contour(const morpho::component_tree<P, image2d<P> >& tree,
+                       const VMap& vmap);
+
   template <class P>
   void
   grain_filter_inplace(morpho::component_tree<P, image2d<P> >& tree,
@@ -137,6 +142,45 @@ namespace mln
 
     morpho::filter_direct_inplace(tree, pred);
     tree.shrink_to_fit();
+  }
+
+  template <class P, class VMap>
+  image2d<typename VMap::value_type>
+  set_value_on_contour(const morpho::component_tree<P, image2d<P> >& tree,
+                       const VMap& vmap)
+  {
+    mln_entering("set_value_on_countour");
+
+    typedef typename VMap::value_type V;
+    typedef morpho::component_tree<P, image2d<P> > tree_t;
+    typedef typename tree_t::node_type node_t;
+
+    image2d<V> saliency;
+    resize(saliency, tree._get_data()->m_pmap).init(0);
+
+    auto depth = morpho::compute_depth(tree);
+
+    mln_pixter(px, saliency);
+    mln_iter(qx, c8(px));
+    mln_forall(px)
+      {
+        if (K1::is_face_2(px->point()))
+          {
+            mln_forall(qx)
+              {
+                node_t x = tree.get_node_at(px->index());
+                node_t y = tree.get_node_at(qx->index());
+                V m = qx->val();
+                while (depth[y] < depth[x]) {
+                  m = std::max(m, vmap[x]);
+                  x = x.parent();
+                }
+                qx->val() = m;
+              }
+          }
+      }
+    mln_exiting();
+    return saliency;
   }
 
 

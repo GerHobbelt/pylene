@@ -11,12 +11,27 @@ namespace mln
   namespace morpho
   {
 
+    /// \brief Compute the area algebraic closing of an image.
+    /// \param ima The input image
+    /// \param nbh The neighborhood
+    /// \param area The grain size
+    /// \param cmp A strict total ordering on values
     template <class I, class N, class Compare = std::less<mln_value(I)> >
     mln_concrete(I)
     area_closing(const Image<I>& ima,
                  const Neighborhood<N>& nbh,
                  unsigned area,
                  Compare cmp = Compare());
+
+    /// \brief Compute the area algebraic opening of an image.
+    /// \param ima The input image
+    /// \param nbh The neighborhood
+    /// \param area The grain size
+    template <class I, class N>
+    mln_concrete(I)
+    area_opening(const Image<I>& ima,
+                 const Neighborhood<N>& nbh,
+                 unsigned area);
 
 
 
@@ -71,6 +86,19 @@ namespace mln
                                      [&accu_img, area] (const mln_point(I)& p) {
                                        return accu_img(p).to_result() >= area; },
                                      cmp, viz);
+      mln_exiting();
+      return out;
+    }
+
+    template <class I, class N>
+    mln_concrete(I)
+    area_opening(const Image<I>& ima_,
+                 const Neighborhood<N>& nbh,
+                 unsigned area)
+    {
+      mln_entering("mln::morpho::area_opening");
+      mln_concrete(I) out = area_closing(exact(ima_), exact(nbh), area,
+                                         std::greater<mln_value(I)> ());
       mln_exiting();
       return out;
     }

@@ -3,9 +3,10 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/extension/mirror.hpp>
+#include <numeric>
 
 #define BOOST_TEST_MODULE Core
-#include <boost/test/unit_test.hpp>
+#include <tests/test.hpp>
 
 BOOST_AUTO_TEST_SUITE(_image2d)
 
@@ -68,5 +69,20 @@ BOOST_AUTO_TEST_CASE(extension_mirror)
   }
 
 }
+
+BOOST_AUTO_TEST_CASE(from_buffer)
+{
+  using namespace mln;
+  int buffer[12];
+  std::iota(buffer, buffer + 12, 1);
+
+  image2d<int> ima = image2d<int>::from_buffer(buffer, box2d{{0,0},{3,4}});
+  image2d<int> ref(3,4);
+
+  iota(ref, 1);
+
+  MLN_CHECK_IMEQUAL(ima, ref);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

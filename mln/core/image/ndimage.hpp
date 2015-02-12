@@ -55,11 +55,15 @@ namespace mln
     template <typename T, unsigned dim>
     struct ndimage_data
     {
+      // Constructor for library managed memory
       ndimage_data(size_t* shape_, unsigned border, T v = T());
       ~ndimage_data();
 
+      // These elements are used to ensure a correct destruction
       size_t shape[dim];
       size_t strides[dim];
+
+      // These elements are used to free memory
       size_t nbytes;
       char*  buffer;
 
@@ -220,6 +224,17 @@ namespace mln
     ndimage_base(const ndimage_base<U, dim, E2>& other, unsigned border, T v = T());
     // \}
 
+    /// \brief Constructors from external sources
+    /// \{
+    static
+    E
+    from_buffer(void* buffer, const domain_type& domain, bool copy = false);
+
+    static
+    E
+    from_buffer(void* buffer, const domain_type& domain, const size_t* strides, bool copy = false);
+    /// \}
+
     /// \name Accession Operators
     /// \{
 
@@ -375,6 +390,17 @@ namespace mln
     // Extension
     typedef internal::ndimage_extension<T, dim> extension_type;
     extension_type extension() const;
+
+  private:
+    static
+    E
+    from_buffer_copy_(void* buffer, const domain_type& domain, const size_t* strides);
+
+    static
+    E
+    from_buffer_extern_(void* buffer, const domain_type& domain, const size_t* strides);
+
+
 
 
   protected:
@@ -543,6 +569,93 @@ namespace mln
       border_ (g.border())
   {
     resize_(domain_, border_, T());
+  }
+
+  template <typename T, unsigned dim, typename E>
+  E
+  ndimage_base<T,dim,E>::from_buffer_extern_(void* buffer,
+                                             const domain_type& domain,
+                                             const size_t* strides)
+  {
+    E image_;
+    image_.domain_ = domain;
+    image_.border_ = 0;
+
+    MLN_EVAL_IF_DEBUG(image_.vbox_ = domain);
+    std::copy(strides, strides + dim, image_.strides_.begin());
+
+    if (image_.strides_[dim-1] % sizeof(T) != 0) {
+      throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
+    }
+
+    point<size_t, dim> sz = domain.shape();
+    image_.m_ptr_origin = (T*)buffer;
+    image_.m_index_strides[dim-1] = 1;
+    image_.m_index_first = 0;
+    image_.m_index_last = sz[dim-1] - 1;
+    image_.ptr_ = (char*)buffer;
+    image_.last_ = (char*)buffer + (sz[dim-1] - 1) * image_.strides_[dim-1];
+
+    for (int i = dim-2; i >= 0; --i)
+      {
+        if (image_.strides_[i] % sizeof(T) != 0) {
+          throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
+        }
+
+        image_.m_index_strides[i] = image_.strides_[i] / sizeof(T);
+        image_.m_index_last  += (sz[i] - 1) * image_.m_index_strides[i];
+        image_.last_ += (sz[i] - 1) * image_.strides_[i];
+      }
+
+    return image_;
+  }
+
+  template <typename T, unsigned dim, typename E>
+  E
+  ndimage_base<T,dim,E>::from_buffer_copy_(void* buffer,
+                                           const domain_type& domain,
+                                           const size_t* strides)
+  {
+    E in = from_buffer_extern_(buffer, domain, strides);
+
+    E out(domain);
+
+    mln_pixter(pin, pout, in, out);
+    mln_forall(pin, pout)
+      pout->val() = pin->val();
+
+    return out;
+  }
+
+  template <typename T, unsigned dim, typename E>
+  E
+  ndimage_base<T,dim,E>::from_buffer(void* buffer,
+                                     const domain_type& domain,
+                                     const size_t* strides,
+                                     bool copy)
+  {
+    if (copy)
+      return from_buffer_copy_(buffer, domain, strides);
+    else
+      return from_buffer_extern_(buffer, domain, strides);
+  }
+
+
+
+  template <typename T, unsigned dim, typename E>
+  E
+  ndimage_base<T,dim,E>::from_buffer(void* buffer,
+                                     const domain_type& domain,
+                                     bool copy)
+  {
+    point<size_t, dim> sz = domain.shape();
+    size_t strides[dim];
+
+    strides[dim-1] = sizeof(T);
+    for (int i = dim-2; i >= 0; --i)
+      strides[i] = strides[i+1] * sz[i+1];
+
+    return from_buffer(buffer, domain, strides, copy);
   }
 
   template <typename T, unsigned dim, typename E>

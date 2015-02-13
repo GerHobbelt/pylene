@@ -10,53 +10,6 @@
 #include <apps/tos/topology.hpp>
 #include "satmaxtree.hpp"
 
-namespace mln
-{
-
-  template <class P>
-  morpho::component_tree<P, image2d<P> >
-  tree_keep_2F(const morpho::component_tree<P, image2d<P> >& tree)
-  {
-    morpho::component_tree<P, image2d<P> > out;
-
-    auto newdata = out._get_data();
-    auto olddata = tree._get_data();
-
-    // 1. Copy the point2node map
-    box2d olddom = olddata->m_pmap.domain();
-    box2d dom;
-    dom.pmin = olddom.pmin / 2;
-    dom.pmax = (olddom.pmax + 1) / 2;
-    newdata->m_pmap.resize(dom);
-    copy(olddata->m_pmap | sbox2d{olddom.pmin, olddom.pmax, {2,2}},
-         newdata->m_pmap);
-
-    // 2. Copy the node
-    newdata->m_nodes = olddata->m_nodes;
-
-    // 3. Copy the point set and update node first point index/
-    newdata->m_S.resize(dom.size());
-    unsigned j = 0;
-    for (unsigned i = 0; i < olddata->m_S.size(); ++i)
-      {
-        P p = olddata->m_S[i];
-        point2d pt = olddata->m_pmap.point_at_index(p);
-        if (K1::is_face_2(pt))
-          {
-            newdata->m_S[j] = newdata->m_pmap.index_of_point(pt/2);
-            auto node = tree.get_node_at(p);
-            if (node.get_first_point_id() == i)
-              newdata->m_nodes[node.id()].m_point_index = j;
-            ++j;
-          }
-      }
-    // 4. Do not forget the sentinel
-    newdata->m_nodes[out.npos()].m_point_index = j;
-
-    return out.get_subtree(tree.get_root_id());
-  }
-
-}
 
 void usage(char** argv)
 {

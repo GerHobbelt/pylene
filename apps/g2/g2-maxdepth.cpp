@@ -341,10 +341,17 @@ int main(int argc, char** argv)
   typedef value_t::value_type V;
 
   /// Compute the marginal ToS
+  bool ASK = false;
+  point2d pmin{0,0};
+  if (ASK) {
+    std::cout << "Point a l'infini: " << std::endl;
+    std::cin >> pmin[0] >> pmin[1];
+  }
+
   tree_t t[NTREE];
 
-  tbb::parallel_for(0, (int)NTREE, [&t,&f](int i){
-      t[i] = morpho::cToS(imtransform(f, [i](value_t x) { return x[i]; }), c4);
+  tbb::parallel_for(0, (int)NTREE, [&t,&f,pmin](int i){
+      t[i] = morpho::cToS_pinf(imtransform(f, [i](value_t x) { return x[i]; }), c4, pmin);
     });
 
   /// Compute the graph

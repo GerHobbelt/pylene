@@ -56,6 +56,10 @@ namespace mln
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
     cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare () );
 
+    template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)> >
+    morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    cToS_pinf(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin,
+              const Compare& cmp = Compare ());
 
     /***********************************************/
     /* Same as before but using priority proagation */
@@ -167,7 +171,7 @@ namespace mln
         mln_entering("mln::morpho::tos - propagation");
 
         pset_t W(K, cmp);
-        size_type p = f.index_of_point(pmin);
+        size_type p = f.index_of_point(pmin * 2);
         W.insert(p);
         pmap[p] = PROCESSED;
         K[p] = f[p].lower;
@@ -326,6 +330,14 @@ namespace mln
     cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp)
     {
       mln_point(I) pmin = exact(ima).domain().pmin;
+      return cToS(ima, nbh, pmin, cmp, internal::equiv<Compare> (cmp));
+    }
+
+    template <typename I, typename Neighborhood, typename Compare>
+    morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    cToS_pinf(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin,
+              const Compare& cmp)
+    {
       return cToS(ima, nbh, pmin, cmp, internal::equiv<Compare> (cmp));
     }
 

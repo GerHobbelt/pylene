@@ -1,9 +1,8 @@
 #ifndef ADDBORDER_HPP
 # define ADDBORDER_HPP
 
-# include <mln/core/image/image.hpp>
+# include <mln/core/image/image2d.hpp>
 # include <mln/core/neighb2d.hpp>
-# include <mln/core/image/sub_image.hpp>
 # include <vector>
 
 namespace mln

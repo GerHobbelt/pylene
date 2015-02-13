@@ -142,6 +142,7 @@ namespace mln
 
     morpho::filter_direct_inplace(tree, pred);
     tree.shrink_to_fit();
+    mln_exiting();
   }
 
   template <class P, class VMap>

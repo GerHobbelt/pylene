@@ -1,6 +1,8 @@
 #ifndef MLN_ACCU_ACCUMULATORS_ACCU_AS_IT_HPP
 # define MLN_ACCU_ACCUMULATORS_ACCU_AS_IT_HPP
 
+# include <mln/accu/accumulator_base.hpp>
+
 namespace mln
 {
 

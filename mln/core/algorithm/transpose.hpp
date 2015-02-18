@@ -36,6 +36,26 @@ namespace mln
     mln_exiting();
   }
 
+  namespace internal
+  {
+
+    template <class I>
+    image2d<mln_value(I)>
+    transpose_init_out(const I& ima, box2d d, extension::extension_tag)
+    {
+      (void) ima;
+      return image2d<mln_value(I)>(d);
+    }
+
+    template <class I>
+    image2d<mln_value(I)>
+    transpose_init_out(const I& ima, box2d d, extension::border_extension_tag)
+    {
+      return image2d<mln_value(I)>(d, ima.border());
+    }
+  }
+
+
   template <class I>
   image2d<mln_value(I)>
   transpose(const Image<I>& ima_)
@@ -46,7 +66,7 @@ namespace mln
     box2d dom2 = {{dom.pmin[1], dom.pmin[0]},
                   {dom.pmax[1], dom.pmax[0]}};
 
-    image2d<mln_value(I)> out(dom2);
+    image2d<mln_value(I)> out = internal::transpose_init_out(ima, dom2, typename image_traits<I>::extension ());
     transpose(ima, out);
     return out;
   }

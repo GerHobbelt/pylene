@@ -18,6 +18,8 @@ add_executable(smartdoc_app2 main2.cpp
 
 add_executable(smartdoc_cli smartdoc-cli.cpp smartdoc.cpp)
 
+add_executable(challenge2 challenge2.cpp unhomo.cpp border_detection.cpp)
+
 target_link_libraries(smartdoc_cli ${FreeImage_LIBRARIES})
 
 target_link_libraries(smartdoc_app
@@ -28,7 +30,10 @@ target_link_libraries(smartdoc_app2
   -lavcodec -lavformat -lswscale -lboost_date_time
   ${FreeImage_LIBRARIES})
 
+target_link_libraries(challenge2 ${FreeImage_LIBRARIES})
+
 set_source_files_properties(video_tools.cpp PROPERTIES
   COMPILE_DEFINITIONS __STDC_CONSTANT_MACROS)
 
-#target_set_properties(
+set_property(TARGET challenge2 APPEND PROPERTY
+  INCLUDE_DIRECTORIES /work/carlinet/src/eigen/)

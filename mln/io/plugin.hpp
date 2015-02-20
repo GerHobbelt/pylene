@@ -27,7 +27,12 @@ namespace mln
   {
   public:
     virtual void open(std::istream& s) = 0;
-    virtual void read_next_pixel(void* out) = 0;
+
+    /// This should be overriden if the loader does not
+    /// support istream as input.
+    virtual void open(const char* filename) { (void) filename; };
+
+
     virtual std::function<void(void*)> get_read_next_pixel_method() const = 0;
 
     /// \brief Return the type id of pixel type
@@ -35,13 +40,15 @@ namespace mln
 
     /// \brief Return the number of *bytes* per pixel
     virtual int             get_bpp() const = 0;
+
+    /// \brief True (default) if it supports reading from istream.
+    virtual bool support_istream() const { return true; }
   };
 
   class PluginReader2D : public PluginReader
   {
   public:
     virtual box2d get_domain() const = 0;
-    virtual void  read_next_line(void* out) = 0;
     virtual std::function<void(void*)> get_read_next_line_method() const = 0;
   };
 

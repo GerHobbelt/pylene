@@ -83,7 +83,6 @@ namespace mln
 
       m_plugin->initialize();
       m_plugin->open(s);
-
       this->m_check_value_type_compatible();
       this->m_resize();
       this->m_load();
@@ -94,7 +93,20 @@ namespace mln
     Loader<I>::load(const std::string& s, Image<I>& ima, PluginReader* plugin,
                     bool permissive)
     {
-      if (s == "-")
+      if (not plugin->support_istream() )
+        {
+          m_plugin = plugin;
+          m_ima = & (exact(ima));
+          m_permissive = permissive;
+
+          m_plugin->initialize();
+          m_plugin->open(s.c_str());
+
+          this->m_check_value_type_compatible();
+          this->m_resize();
+          this->m_load();
+        }
+      else if (s == "-")
         {
           this->load(std::cin, ima, plugin, permissive);
         }
@@ -125,7 +137,7 @@ namespace mln
       template <typename VIN, typename VOUT, class Enable = void>
       struct default_converter
       {
-        static constexpr void (*ptr) (void*,void*,std::size_t) = nullptr;
+        static constexpr std::nullptr_t ptr = nullptr;
       };
 
       template <typename VIN, typename VOUT>

@@ -49,7 +49,7 @@ namespace mln
             bool,
             std::is_integral<mln_value(I)>::value and
             std::is_same<Compare, productorder_less<mln_value(I)> >::value and
-            (value_traits<mln_value(I)>::quant <= 8)
+            (value_traits<mln_value(I)>::quant <= 16)
             >;
 
           using aggregate_type      = accu::accumulators::sup<mln_value(I), Compare>;

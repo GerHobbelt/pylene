@@ -60,7 +60,7 @@ namespace mln
       template <typename E, typename T, typename F>
       struct h_infsup_base<E, T, F, typename std::enable_if<
                                       std::is_integral<T>::value and
-                                      value_traits<T>::quant <= 8>::type>
+                                      value_traits<T>::quant <= 16>::type>
       : accumulator_base<E, T, T, F>
       {
         typedef T argument_type;

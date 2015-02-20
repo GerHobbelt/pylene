@@ -23,21 +23,28 @@ namespace mln
         template <class I, class Compare, class J, class OpTraits>
         typename
         std::enable_if<std::is_same<typename I::domain_type, box2d>::value>::type
-        dilation_like(const Image<I>& ima,
+        dilation_like(const Image<I>& ima_,
                       const rect2d& nbh,
                       Compare cmp,
                       Image<J>& output,
                       OpTraits __op__)
         {
           box2d r = nbh.dpoints;
+          const I& ima = exact(ima_);
 
-          if (r.shape()[0] == 1 or r.shape()[1] == 1) {
-            impl::dilate_like_0(exact(ima),
+          if (r.shape()[0] == 1) {
+            impl::dilate_like_0(ima,
                                 nbh,
                                 cmp,
                                 exact(output),
                                 __op__,
                                 typename image_has_extension<I>::type ());
+          } else if (r.shape()[1] == 1) {
+            rect2d h0 { box2d {{0, r.pmin[0]}, {1, r.pmax[0]}} };
+            mln_concrete(I) tmp = transpose(ima);
+            mln_concrete(I) out = imconcretize(tmp);
+            morpho::canvas::dilation_like(tmp, h0, cmp, out, __op__);
+            transpose(out, output);
           } else {
 
             rect2d h0 { box2d {{0, r.pmin[0]}, {1, r.pmax[0]}} };
@@ -45,13 +52,13 @@ namespace mln
 
             image2d<mln_value(I)> f;
             {
-              mln_concrete(I) tmp = imconcretize(exact(ima));
-              morpho::canvas::dilation_like(exact(ima), h1, cmp, tmp, __op__);
+              mln_concrete(I) tmp = imconcretize(ima);
+              morpho::canvas::dilation_like(ima, h1, cmp, tmp, __op__);
               f = transpose(tmp);
             }
 
             {
-              mln_concrete(I) tmp = imconcretize(exact(f));
+              mln_concrete(I) tmp = imconcretize(f);
               morpho::canvas::dilation_like(f, h0, cmp, tmp, __op__);
               transpose(tmp, output);
             }

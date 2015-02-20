@@ -1,14 +1,12 @@
+add_library(smartdoc-objs OBJECT video_tools.cpp smartdoc.cpp export.cpp)
+
 add_executable(smartdoc_app main.cpp
-  video_tools.cpp
-  smartdoc.cpp
-  export.cpp
+  $<TARGET_OBJECTS:smartdoc-objs>
   $<TARGET_OBJECTS:g2-tools>
   )
 
 add_executable(smartdoc_app2 main2.cpp
-  video_tools.cpp
-  smartdoc.cpp
-  export.cpp
+  $<TARGET_OBJECTS:smartdoc-objs>
   $<TARGET_OBJECTS:g2-tools>
   )
 

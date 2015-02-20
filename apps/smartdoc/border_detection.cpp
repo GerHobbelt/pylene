@@ -46,7 +46,7 @@ detect_start_end_x(const std::vector<mln::point2d>& V)
 
   int start, end;
   int i;
-  for (i = s; i < (V.size() - s); i += BORDER_IN)
+  for (i = s; i < int(V.size() - s); i += BORDER_IN)
     if (abs(V[i][1] - V[i-s][1]) < START_END_STEP_T)
       break;
   start = i;
@@ -69,7 +69,7 @@ detect_start_end_y(const std::vector<mln::point2d>& V)
 
   int start, end;
   int i;
-  for (i = s; i < (V.size() - s); i += BORDER_IN)
+  for (i = s; i < int(V.size() - s); i += BORDER_IN)
     if (abs(V[i][0] - V[i-s][0]) < START_END_STEP_T)
       break;
   start = i;
@@ -272,7 +272,7 @@ border_detection(const mln::image2d<mln::rgb8>& f,
 
   if (debug_filename) {
     image2d<rgb8> out = clone(f);
-    for (short x = 0; x < f.ncols(); ++x)
+    for (short x = 0; x < (int)f.ncols(); ++x)
       {
         short y1 = (c3 - a3 * x) / b3;
         short y2 = (c4 - a4 * x) / b4;
@@ -282,7 +282,7 @@ border_detection(const mln::image2d<mln::rgb8>& f,
         if (out.domain().has(q)) out(q)[1] += 127;
       }
 
-    for (short y = 0; y < f.nrows(); ++y)
+    for (short y = 0; y < (int)f.nrows(); ++y)
       {
         short x1 = (c1 - b1 * y) / a1;
         short x2 = (c2 - b2 * y) / a2;

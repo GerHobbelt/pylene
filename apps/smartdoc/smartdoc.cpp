@@ -289,7 +289,7 @@ process(tree_t& tree,
 
 
   //
-  tree_t::node_type shp;
+  tree_t::node_type shp = tree.get_root();
   {
     float emax = value_traits<float>::min();
     mln_foreach(auto x, tree.nodes())

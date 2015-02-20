@@ -101,7 +101,7 @@ namespace mln
 
         template <class dummy=resizer_base&>
         typename std::enable_if<has_border, dummy>::type
-        border(unsigned b)
+        border(int b)
         {
           if (b > m_border)
             m_border = b;

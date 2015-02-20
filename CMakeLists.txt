@@ -20,7 +20,7 @@ endif()
 # add source directory to find mln path
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories(${TBB_INCLUDE_DIRS})
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${TBB_LIBRARY_DIRS})
 link_libraries(${TBB_LIBRARIES} rt)
 

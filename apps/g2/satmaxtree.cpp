@@ -51,7 +51,7 @@ namespace mln
       mln_foreach(auto x, tree.nodes_without_root()) {
         vmap[x] += delta[x];
       }
-      std::cout << "Number of nodes before: " << n << std::endl;
+      std::cerr << "Number of nodes before: " << n << std::endl;
     }
 
     morpho::filter_direct_inplace(tree, pred);
@@ -62,7 +62,7 @@ namespace mln
         assert(vmap[x] > vmap[x.parent()]);
         ++n;
       }
-      std::cout << "Number of nodes after: " << n << std::endl;
+      std::cerr << "Number of nodes after: " << n << std::endl;
     }
 
     mln_exiting();

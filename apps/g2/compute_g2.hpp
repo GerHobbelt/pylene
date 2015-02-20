@@ -84,7 +84,7 @@ namespace mln
     // 2. Build the graph
     mln_entering("mln::compute_g2 - graph-construction - vertices");
     for (unsigned i = 0; i < NTREE; ++i)
-      std::cout << "T" << i << ": " << trees[i].realsize() << std::endl;
+      std::cerr << "T" << i << ": " << trees[i].realsize() << std::endl;
 
     typedef Graph<NTREE> MyGraph;
     typedef graph_content<NTREE> my_graph_content;
@@ -229,7 +229,7 @@ namespace mln
 
 
     // Some stat
-    std::cout << "Graph: " << boost::num_vertices(graph) << std::endl;
+    std::cerr << "Graph: " << boost::num_vertices(graph) << std::endl;
 
     mln_exiting();
     return std::tie(graph, tlink);

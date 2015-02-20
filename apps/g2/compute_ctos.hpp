@@ -21,6 +21,11 @@ namespace mln
                image2d<uint16>* depth = nullptr);
 
 
+  morpho::component_tree<unsigned, image2d<unsigned> >
+  compute_ctos_from_maxtrees(const image2d<rgb8>& input,
+                             image2d<uint16>* imdepth,
+                             bool mintree = false);
+
 }
 
 #endif // ! APPS_G2_COMPUTE_CTOS_HPP

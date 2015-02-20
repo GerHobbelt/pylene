@@ -2,18 +2,14 @@ add_executable(smartdoc_app main.cpp
   video_tools.cpp
   smartdoc.cpp
   export.cpp
-  ../g2/compute_g2.cpp
-  ../g2/compute_ctos.cpp
-  ../g2/satmaxtree.cpp
+  $<TARGET_OBJECTS:g2-tools>
   )
 
 add_executable(smartdoc_app2 main2.cpp
   video_tools.cpp
   smartdoc.cpp
   export.cpp
-  ../g2/compute_g2.cpp
-  ../g2/compute_ctos.cpp
-  ../g2/satmaxtree.cpp
+  $<TARGET_OBJECTS:g2-tools>
   )
 
 add_executable(smartdoc_cli smartdoc-cli.cpp smartdoc.cpp)

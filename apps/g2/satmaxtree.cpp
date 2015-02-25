@@ -28,9 +28,13 @@ namespace mln
     // }
     T tree = morpho::cToS_pinf(f, c4, pmin);
 
-    image2d<uint16> F = immerse_k1(f, 69);
-    property_map<T, uint16> vmap = morpho::make_attribute_map_from_image(tree, F);
-    vmap[tree.npos()] = 0;
+
+    property_map<T, uint16> vmap;
+    {
+      image2d<uint16> F = immerse_k1(f, 69);
+      vmap = morpho::make_attribute_map_from_image(tree, F);
+      vmap[tree.npos()] = 0;
+    }
 
     auto predfun = [&vmap,&tree](const T::vertex_id_t& n) {
       return vmap[n] > vmap[tree.get_node(n).parent()] or tree.get_node(n).get_parent_id() == tree.npos();

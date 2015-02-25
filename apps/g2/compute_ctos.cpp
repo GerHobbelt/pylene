@@ -70,42 +70,45 @@ namespace mln
   }
 
 
+  template <class V>
   tree_t
-  compute_ctos(const image2d<rgb8>& input,
+  compute_ctos(const image2d<V>& input,
                image2d<uint16>* imdepth)
   {
-    typedef rgb8 value_t;
+    typedef V value_t;
     enum { NTREE = value_t::ndim };
 
 
     image2d<value_t> f = addborder_marginal(input);
     image2d<value_t> F = immerse_k1(f);
-
+    image2d<uint16> maxdepth;
     point2d pmin = {0,0};
 
-    /// Compute the marginal tree
-    tree_t t[NTREE];
-    tbb::parallel_for(0, (int)NTREE, [&t,&f,pmin](int i){
-        t[i] = morpho::cToS_pinf(imtransform(f, [i](value_t x) {
-              return x[i]; }), c4, pmin);
-      });
-
-    /// Compute the graph
-    Graph<NTREE> g2;
-    std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
-    std::tie(g2, tlink) = compute_g2<NTREE>(t);
+    {
+      /// Compute the marginal tree
+      tree_t t[NTREE];
+      tbb::parallel_for(0, (int)NTREE, [&t,&f,pmin](int i){
+          t[i] = morpho::cToS_pinf(imtransform(f, [i](value_t x) {
+                return x[i]; }), c4, pmin);
+        });
 
 
-    /// Compute depth
-    boost::vector_property_map<unsigned> gdepth;
-    gdepth = compute_graph_depth(g2);
+      /// Compute the graph
+      Graph<NTREE> g2;
+      std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
+      std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
 
-    /// Compute the pw depth image from graph
-    image2d<uint16> maxdepth;
-    resize(maxdepth, F);
-    write_vmap_to_image(g2, t, &tlink[0], gdepth,
-                        functional::max_t<unsigned> (), uint16(0), maxdepth);
+      /// Compute depth
+      boost::vector_property_map<unsigned> gdepth;
+      gdepth = compute_graph_depth(g2);
+
+
+      /// Compute the pw depth image from graph
+      resize(maxdepth, F);
+      write_vmap_to_image(g2, t, &tlink[0], gdepth,
+                          functional::max_t<unsigned> (), uint16(0), maxdepth);
+    }
 
     /// Compute the saturated maxtree
     tree_t tw;
@@ -172,5 +175,17 @@ namespace mln
      }
      return tw;
    }
+
+  // Explicit instanciation.
+  template
+  tree_t
+  compute_ctos<rgb8>(const image2d<rgb8>& input,
+                     image2d<uint16>* imdepth);
+
+  // Explicit instanciation.
+  template
+  tree_t
+  compute_ctos<rgb16>(const image2d<rgb16>& input,
+                      image2d<uint16>* imdepth);
 
 }

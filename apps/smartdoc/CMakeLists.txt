@@ -10,11 +10,15 @@ add_executable(smartdoc_app2 main2.cpp
   $<TARGET_OBJECTS:g2-tools>
   )
 
+add_executable(prettyview prettyview.cpp)
+
 add_executable(smartdoc_cli smartdoc-cli.cpp smartdoc.cpp)
 
 add_executable(challenge2 challenge2.cpp unhomo.cpp border_detection.cpp)
 
 target_link_libraries(smartdoc_cli ${FreeImage_LIBRARIES})
+
+target_link_libraries(prettyview ${FreeImage_LIBRARIES})
 
 target_link_libraries(smartdoc_app
   -lavcodec -lavformat -lswscale

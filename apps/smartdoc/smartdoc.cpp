@@ -3,8 +3,11 @@
 #include <mln/io/imsave.hpp>
 #include <mln/accu/accumulators/accu_as_it.hpp>
 #include <mln/accu/accumulators/count.hpp>
+#include <mln/accu/accumulators/max.hpp>
 #include <mln/core/algorithm/transform.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
 #include <mln/morpho/component_tree/io.hpp>
+#include <mln/morpho/extinction.hpp>
 #include <apps/tos/croutines.hpp>
 
 
@@ -163,11 +166,12 @@ namespace mln
 
 
 using namespace mln;
+using vec2df = vec<float, 2>;
 
-std::pair<bool, std::array<point2d, 4> >
+
+std::array<process_result_t, 3>
 process(tree_t& tree,
         const image2d<uint16>& ima,
-        image2d<rgb8>* feedback,
         const char* csvfile,
         const char* treefile)
 {
@@ -175,169 +179,179 @@ process(tree_t& tree,
   // Filter first
   grain_filter_inplace(tree, GRAINSIZE);
 
+  property_map<tree_t, float> energy(tree);
+  property_map<tree_t, accu::accumulators::fitting_quad> quadri;
+  // 1. Compute energy related attributes
+  {
 
-  // Accumulation du nombre de feuilles + profondeurs.
-  property_map<tree_t, unsigned> nleaves(tree, 0);
-  property_map<tree_t, unsigned> sumdepth(tree, 0);
-  property_map<tree_t, unsigned> sumdepth2(tree, 0);
-  property_map<tree_t, unsigned> depth = morpho::compute_depth(tree);
-  property_map<tree_t, unsigned> area = morpho::accumulate(tree, accu::features::count<unsigned> ());
+    // Accumulation du nombre de feuilles + profondeurs.
+    property_map<tree_t, unsigned> nleaves(tree, 0);
+    property_map<tree_t, unsigned> sumdepth(tree, 0);
+    property_map<tree_t, unsigned> sumdepth2(tree, 0);
+    property_map<tree_t, unsigned> depth = morpho::compute_depth(tree);
+    property_map<tree_t, unsigned> area = morpho::accumulate(tree, accu::features::count<unsigned> ());
 
-  float maxdepth = 0;
-  mln_reverse_foreach(auto x, tree.nodes())
-    {
-      if (not x.has_child())
-        {
-          nleaves[x]++;
-          sumdepth[x] += depth[x];
-        }
-      if (depth[x] > maxdepth)
-        maxdepth = depth[x];
-      nleaves[x.parent()] += nleaves[x];
-      sumdepth[x.parent()] += sumdepth[x];
-      sumdepth2[x] = sumdepth[x] - (depth[x] * nleaves[x]);
-    }
+    float maxdepth = 0;
+    mln_reverse_foreach(auto x, tree.nodes())
+      {
+        if (not x.has_child())
+          {
+            nleaves[x]++;
+            sumdepth[x] += depth[x];
+          }
+        if (depth[x] > maxdepth)
+          maxdepth = depth[x];
+        nleaves[x.parent()] += nleaves[x];
+        sumdepth[x.parent()] += sumdepth[x];
+        sumdepth2[x] = sumdepth[x] - (depth[x] * nleaves[x]);
+      }
 
-  typedef accu::accumulators::accu_as_it<accu::accumulators::fitting_quad> accu_t;
-  auto quadri = morpho::paccumulate(tree, ima, accu_t ());
-
-
+    typedef accu::accumulators::accu_as_it<accu::accumulators::fitting_quad> accu_t;
+    quadri = morpho::paccumulate(tree, ima, accu_t ());
 
   // Recompute the point inside/outside
-  using vec2df = vec<float, 2>;
-
-  mln_pixter(px, ima);
-  mln_forall(px)
-  {
-    tree_t::node_type x = tree.get_node_at(px->index());
-    vec2df p_ = px->point().as_vec();
-
-    while (x.id() != tree.npos())
-      {
-        vec2df p = p_ - quadri[x].m_quad[0].as_vec();
-        vec2df u = (quadri[x].m_quad[1] - quadri[x].m_quad[0]).as_vec();
-        vec2df v = (quadri[x].m_quad[2] - quadri[x].m_quad[0]).as_vec();
-        vec2df w = (quadri[x].m_quad[3] - quadri[x].m_quad[0]).as_vec();
-        bool inside1, inside2;
-        {
-          float n = (u[0]*v[1] - u[1]*v[0]);
-          float alpha = (u[0]*p[1] - u[1]*p[0]) / n;
-          float beta = (p[0]*v[1] - p[1]*v[0]) / n;
-          inside1 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
-        }
-        {
-          float n = (w[0]*v[1] - w[1]*v[0]);
-          float alpha = (w[0]*p[1] - w[1]*p[0]) / n;
-          float beta = (p[0]*v[1] - p[1]*v[0]) / n;
-          inside2 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
-        }
-
-        quadri[x].m_inside += inside1 or inside2;
-        x = x.parent();
-      }
-  }
-
-
-  // Save tree
-  if (treefile)
-    morpho::save(tree, treefile);
-
-  // {
-  //   accu::accumulators::fitting_quad test;
-  //   test.take({1,2});
-  //   test.take({2,6});
-  //   test.take({9,1});
-  //   test.take({8,7});
-
-  //   std::cout << test.m_pmin << test.m_pmax << "\n";
-  //   for (int i = 0; i < 4; ++i)
-  //     std::cout << test.m_quad[i];
-  //   std::cout << "\n" << test.to_result() << std::endl;
-  // }
-
-  auto noising = make_functional_property_map<tree_t::node_type>
-    ([&sumdepth2,&area](const tree_t::node_type& x) {
-      return (sumdepth2[x] / float(area[x]));
-    });
-
-
-  float imsize = ima.domain().size();
-  auto energy = make_functional_property_map<tree_t::node_type>
-    ([&quadri,&noising,&area,&depth,imsize,maxdepth](const tree_t::node_type& x) -> float{
-      if (area[x] < (MIN_OBJECT_SIZE * imsize) or
-          area[x] > (MAX_OBJECT_SIZE * imsize))
-        return 0;
-      return WEIGHT_QUAD * quadri[x].to_result() + WEIGHT_NOISE * noising[x];
-    });
-
-  // Save attributes
-  if (csvfile)
+    mln_pixter(px, ima);
+    mln_forall(px)
     {
-      std::ofstream f(csvfile);
-      f << "nleaves,sumdepth,noising,quadri,inside,energy,bbox,quad\n";
-      mln_foreach(auto x, tree.nodes())
-        f << nleaves[x]
-          << "," << sumdepth[x]
-          << "," << noising[x]
-          << "," << quadri[x].to_result()
-          << "," << (quadri[x].m_inside / float(quadri[x].m_count))
-          << "," << energy[x]
-          << "," << "\"" << quadri[x].m_pmin << quadri[x].m_pmax << "\""
-          << "," << "\"" << quadri[x].m_quad[0] << quadri[x].m_quad[1] << quadri[x].m_quad[2] << quadri[x].m_quad[3] << "\""
-          << "\n";
-    }
+      tree_t::node_type x = tree.get_node_at(px->index());
+      vec2df p_ = px->point().as_vec();
 
-
-  //
-  tree_t::node_type shp = tree.get_root();
-  {
-    float emax = value_traits<float>::min();
-    mln_foreach(auto x, tree.nodes())
-      {
-        float e = energy[x];
-        if (e > emax) {
-          emax = e;
-          shp = x;
-        }
-      }
-  }
-
-  if (feedback)
-    {
-      image2d<rgb8> out = transform(ima, [maxdepth](uint16 x) {
-          uint8 v = std::min(1.0f, (x / maxdepth)) * 127;
-          return rgb8(v);
-        });
-
-      vec2df u = (quadri[shp].m_quad[1] - quadri[shp].m_quad[0]).as_vec();
-      vec2df v = (quadri[shp].m_quad[2] - quadri[shp].m_quad[0]).as_vec();
-      vec2df w = (quadri[shp].m_quad[3] - quadri[shp].m_quad[0]).as_vec();
-      float n1 = (u[0]*v[1] - u[1]*v[0]);
-      float n2 = (w[0]*v[1] - w[1]*v[0]);
-      mln_foreach(point2d x, ima.domain())
+      while (x.id() != tree.npos())
         {
-          vec2df p = x.as_vec() - quadri[shp].m_quad[0].as_vec();
-
+          vec2df p = p_ - quadri[x].m_quad[0].as_vec();
+          vec2df u = (quadri[x].m_quad[1] - quadri[x].m_quad[0]).as_vec();
+          vec2df v = (quadri[x].m_quad[2] - quadri[x].m_quad[0]).as_vec();
+          vec2df w = (quadri[x].m_quad[3] - quadri[x].m_quad[0]).as_vec();
           bool inside1, inside2;
           {
-            float alpha = (u[0]*p[1] - u[1]*p[0]) / n1;
-            float beta = (p[0]*v[1] - p[1]*v[0]) / n1;
+            float n = (u[0]*v[1] - u[1]*v[0]);
+            float alpha = (u[0]*p[1] - u[1]*p[0]) / n;
+            float beta = (p[0]*v[1] - p[1]*v[0]) / n;
             inside1 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
           }
           {
-            float alpha = (w[0]*p[1] - w[1]*p[0]) / n2;
-            float beta = (p[0]*v[1] - p[1]*v[0]) / n2;
+            float n = (w[0]*v[1] - w[1]*v[0]);
+            float alpha = (w[0]*p[1] - w[1]*p[0]) / n;
+            float beta = (p[0]*v[1] - p[1]*v[0]) / n;
             inside2 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
           }
 
-          if (inside1 or inside2)
-            out(x)[0] += 128;
+          quadri[x].m_inside += inside1 or inside2;
+          x = x.parent();
         }
-      std::cout << out.domain() << feedback->domain() << std::endl;
-      copy(out, *feedback);
     }
-  std::array<point2d, 4> res;
-  std::copy(quadri[shp].m_quad, quadri[shp].m_quad + 4, res.begin());
-  return std::make_pair(true, res);
+
+    auto noising = make_functional_property_map<tree_t::node_type>
+      ([&sumdepth2,&area](const tree_t::node_type& x) {
+        return (sumdepth2[x] / float(area[x]));
+      });
+
+
+    float imsize = ima.domain().size();
+    {
+      mln_foreach (const tree_t::node_type& x, tree.nodes())
+        {
+          if (area[x] < (MIN_OBJECT_SIZE * imsize) or
+              area[x] > (MAX_OBJECT_SIZE * imsize))
+            energy[x] =  0;
+          else
+            energy[x] = WEIGHT_QUAD * quadri[x].to_result() + WEIGHT_NOISE * noising[x];
+        }
+    }
+
+    // Save tree
+    if (treefile)
+      morpho::save(tree, treefile);
+
+    // Save attributes
+    if (csvfile)
+      {
+        std::ofstream f(csvfile);
+        f << "nleaves,sumdepth,noising,quadri,inside,energy,bbox,quad\n";
+        mln_foreach(auto x, tree.nodes())
+          f << nleaves[x]
+            << "," << sumdepth[x]
+            << "," << noising[x]
+            << "," << quadri[x].to_result()
+            << "," << (quadri[x].m_inside / float(quadri[x].m_count))
+            << "," << energy[x]
+            << "," << "\"" << quadri[x].m_pmin << quadri[x].m_pmax << "\""
+            << "," << "\"" << quadri[x].m_quad[0] << quadri[x].m_quad[1] << quadri[x].m_quad[2] << quadri[x].m_quad[3] << "\""
+            << "\n";
+      }
+  }
+
+  // 2. Compute extinction values
+  property_map<tree_t, float> extvalues;
+  {
+    auto eimg = morpho::make_image(tree, energy);
+    auto extimg = morpho::extinction(eimg, morpho::tree_neighb_t (), std::greater<float> ());
+    extvalues = std::move(extimg.get_vmap());
+  }
+
+  // 3. Get the top three shapes
+  tree_t::node_type shps[3] = {tree.get_root(), tree.get_root(), tree.get_root()};
+  {
+    float emax[3] = {0,0,0};
+    mln_foreach(auto x, tree.nodes())
+      {
+        float e = extvalues[x];
+        if (e > emax[0]) {
+          shps[2] = shps[1];   shps[1] = shps[0];   shps[0] = x;
+          emax[2] = emax[1]; emax[1] = emax[0]; emax[0] = e;
+        } else if (e > emax[1]) {
+          shps[2] = shps[1];   shps[1] = x;
+          emax[2] = emax[1]; emax[1] = e;
+        } else if (e > emax[2]) {
+          shps[2] = x;
+          emax[2] = e;
+        }
+      }
+  }
+
+  std::array<process_result_t, 3> res;
+  for (int i = 0; i < 3; ++i) {
+    std::copy(quadri[shps[i]].m_quad, quadri[shps[i]].m_quad + 4, res[i].points.begin());
+    res[i].energy = energy[shps[i]];
+  }
+
+  return res;
 }
 
+void
+draw_quad_superimpose(std::array<mln::point2d, 4> quad,
+                      const image2d<uint16>& depth,
+                      image2d<rgb8>& out)
+{
+  float maxdepth = accumulate(depth, accu::features::max<>());
+
+  transform(depth, [maxdepth](uint16 x) {
+      uint8 v = std::min(1.0f, (x / maxdepth)) * 127;
+      return rgb8(v);
+    }, out);
+
+  vec2df u = (quad[1] - quad[0]).as_vec();
+  vec2df v = (quad[2] - quad[0]).as_vec();
+  vec2df w = (quad[3] - quad[0]).as_vec();
+  float n1 = (u[0]*v[1] - u[1]*v[0]);
+  float n2 = (w[0]*v[1] - w[1]*v[0]);
+  mln_foreach(point2d x, out.domain())
+    {
+      vec2df p = x.as_vec() - quad[0].as_vec();
+
+      bool inside1, inside2;
+      {
+        float alpha = (u[0]*p[1] - u[1]*p[0]) / n1;
+        float beta = (p[0]*v[1] - p[1]*v[0]) / n1;
+        inside1 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
+      }
+      {
+        float alpha = (w[0]*p[1] - w[1]*p[0]) / n2;
+        float beta = (p[0]*v[1] - p[1]*v[0]) / n2;
+        inside2 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
+      }
+
+      if (inside1 or inside2)
+        out(x)[0] += 128;
+    }
+}

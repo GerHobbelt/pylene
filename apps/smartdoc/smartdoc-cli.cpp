@@ -22,13 +22,14 @@ int main(int argc, char** argv)
   tree_t tree;
   morpho::load(argv[1], tree);
 
-  image2d<uint16> ima;
-  io::imread(argv[2], ima);
+  image2d<uint16> depth;
+  io::imread(argv[2], depth);
 
   image2d<rgb8> out;
-  process(tree, ima, &out, argv[4], argv[3]);
+  std::array<process_result_t, 3> res = process(tree, depth, argv[4], argv[3]);
 
+  resize(out, depth);
+  draw_quad_superimpose(res[0].points, depth, out);
 
   io::imsave(out, argv[5]);
-
 }

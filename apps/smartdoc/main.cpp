@@ -152,10 +152,13 @@ int main(int argc, char** argv)
               // Process
               SmartDoc_t res;
               tree = compute_ctos(img_in, &depth);
-              std::tie(res.good, res.quad) = process(tree, depth, ptr_img_out);
+              auto quads = process(tree, depth);
+              res = {true, quads[0].points};
 
               // Output the video
               if (VIDEO_OUTPUT) {
+                draw_quad_superimpose(quads[0].points, depth, *ptr_img_out);
+
                 encode_video(skipped, &pFormatCtx_Enc, output_video_path,
                              &pFrame_outRGB, &pFrame_outYUV, nbframe,
                              &Ctx_Enc, packet_enc, &convert_ctx_rgb2out);

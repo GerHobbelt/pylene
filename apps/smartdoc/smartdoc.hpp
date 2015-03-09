@@ -22,11 +22,19 @@ constexpr float WEIGHT_DEPTH = 1;
 constexpr float WEIGHT_QUAD = 1;
 constexpr float WEIGHT_NOISE = 1;
 
+constexpr float MAX_DISTANCE_INTER_FRAME = 100;
+
 
 
 
 
 using tree_t = mln::morpho::component_tree<unsigned, mln::image2d<unsigned> >;
+
+struct process_result_t
+{
+  std::array<mln::point2d, 4> points;
+  float                       energy;
+};
 
 
 /// \brief Document detection method entry point.
@@ -39,12 +47,18 @@ using tree_t = mln::morpho::component_tree<unsigned, mln::image2d<unsigned> >;
 /// \param[out] feedback The image with the detected object colorized (must be the same size of imdepth)
 /// \param csvfile (optional) Path to the CSV file where attributes will be saved
 /// \param treefile (optional) Path to the file where the tree will be saved (after filtering)
-std::pair<bool, std::array<mln::point2d, 4> >
+std::array<process_result_t, 3>
 process(tree_t& tree,
         const mln::image2d<mln::uint16>& imdepth,
-        mln::image2d<mln::rgb8>* feedback = nullptr,
         const char* csvfile = nullptr,
         const char* treefile = nullptr);
+
+
+void
+draw_quad_superimpose(std::array<mln::point2d, 4> quad,
+                      const mln::image2d<mln::uint16>& depth,
+                      mln::image2d<mln::rgb8>& out);
+
 
 
 #endif // ! APPS_SMARTDOC_SMARTDOC_HPP

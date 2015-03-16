@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <string>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 void export_xml(const char* filename,
@@ -14,10 +15,16 @@ void export_xml(const char* filename,
   std::ofstream f(filename);
   ptime now = second_clock::local_time();
 
+  std::string doc_id = document_id;
+  size_t pos = doc_id.rfind("test/");
+  if (pos != std::string::npos)
+    doc_id = doc_id.substr(pos + 5);
+
+
   f << "<?xml version='1.0' encoding='utf-8'?>\n"
-    << "<seg_result version=\"0.2\" generated=\"" << to_iso_string(now) << "\">\n"
+    << "<seg_result version=\"0.2\" generated=\"" << to_iso_extended_string(now) << "\">\n"
     << "  <software_used name=\"" << APP_NAME << "\" version=\"" << APP_VERSION << "\"/>\n"
-    << "  <source_sample_file>" << document_id << "</source_sample_file>\n"
+    << "  <source_sample_file>" << doc_id << "</source_sample_file>\n"
     << "  <segmentation_results>\n"
     ;
 

@@ -337,14 +337,15 @@ private:
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    std::cerr << "Usage: " << argv[0] << " input.mpg output.xml [output.mpg]\n";
+    std::cerr << "Usage: " << argv[0] << " input.mpg output.xml [number of threads=10] [output.mpg]\n";
     std::exit(1);
   }
 
   const char* input_path = argv[1];
   const char* output_path = argv[2];
-  const char* output_video_path = (argc > 3) ? argv[3] : NULL;
-  VIDEO_OUTPUT = argc > 3;
+  int nthread = (argc > 3) ? std::atoi(argv[3]) : 10;
+  const char* output_video_path = (argc > 4) ? argv[4] : NULL;
+  VIDEO_OUTPUT = argc > 4;
 
   using namespace mln;
 
@@ -365,7 +366,7 @@ int main(int argc, char** argv)
 
   tbb::filter_t<void,void> f = f1 & f2 & f3;
 
-  tbb::parallel_pipeline(4,f);
+  tbb::parallel_pipeline(nthread,f);
 
   export_xml(output_path, input_path, &results[0], results.size());
 }

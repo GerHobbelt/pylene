@@ -49,6 +49,8 @@ namespace mln
       void read_next_pixel_gray_palette(void* out);
       void read_next_line_bool(void* out);
       void read_next_pixel_bool(void* out);
+      void read_next_line_bool_inv(void* out);
+      void read_next_pixel_bool_inv(void* out);
 
     private:
       std::function<void (void*)>   m_read_next_pixel;
@@ -258,15 +260,19 @@ namespace mln
           switch (bppp)
             {
             case 1:
+              m_vtype = typeid(bool);
               if (colortype == FIC_MINISBLACK) {
-                m_vtype = typeid(bool);
                 m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_bool,
                                              this, std::placeholders::_1);
                 m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_bool,
                                               this, std::placeholders::_1);
-                break;
+              } else {
+                m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_bool_inv,
+                                             this, std::placeholders::_1);
+                m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_bool_inv,
+                                              this, std::placeholders::_1);
               }
-              goto error;
+              break;
             case 8:
               if (colortype == FIC_MINISBLACK) {
                 m_vtype = typeid(uint8);
@@ -382,6 +388,38 @@ namespace mln
           }
       }
     }
+
+    inline
+    void freeimage_reader_plugin::read_next_line_bool_inv(void* out_)
+    {
+      mln_precondition(m_dib != NULL);
+
+      char* out = (char*)out_;
+      for (int y = 0, z = 0; y < m_domain.pmax[1]; y += 8, z += 1)
+        for (int b = 0; b < 8; ++b)
+          out[y+b] = ((m_ptr[z] & (0x80 >> b)) == 0);
+
+      m_ptr -= pitch;
+    }
+
+    inline
+    void freeimage_reader_plugin::read_next_pixel_bool_inv(void* out_)
+    {
+      mln_precondition(m_dib != NULL);
+
+      char* out = (char*)out_;
+      *out = ((m_ptr[x] & (0x80 >> y)) == 0);
+
+      if (++y == 8) {
+        y = 0;
+        if (++x == (int)byteperline)
+          {
+            x = 0;
+            m_ptr -= pitch;
+          }
+      }
+    }
+
 
     // 8-bit DIBs are the easiest to store because each byte is an
     // index into the color table.

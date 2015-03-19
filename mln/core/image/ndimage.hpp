@@ -3,7 +3,6 @@
 
 /// \file
 
-# include <cstdlib>
 # include <mln/core/image/image.hpp>
 # include <mln/core/domain/box.hpp>
 # include <mln/core/memory.hpp>

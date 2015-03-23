@@ -49,10 +49,10 @@ namespace mln
 
           if (cmp(f(mp), f(mq))) {      // mp is the minimum
             amin(q) = mp;
-            extinction(mq) = f(q) - f(mq);
+            extinction(mq) = abs(f(q) - f(mq));
           } else {                      // mq is the minimum
             amin(q) = mq;
-            extinction(mp) = f(q) - f(mp);
+            extinction(mp) = abs(f(q) - f(mp));
           }
         }
 
@@ -92,7 +92,7 @@ namespace mln
         mln_viter(v, par);
         v.init();
         mln_point(I) root = *v;
-        extinction(amin(root)) = ima(root) - ima(amin(root));
+        extinction(amin(root)) = abs(ima(root) - ima(amin(root)));
       }
 
       // Propagate extinction value to minima flatzones ?

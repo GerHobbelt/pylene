@@ -1,6 +1,8 @@
 #ifndef MLN_APPS_TOS_CROUTINES_HPP
 # define MLN_APPS_TOS_CROUTINES_HPP
 
+# include <mln/core/image/image2d.hpp>
+# include <mln/core/neighb2d.hpp>
 # include <apps/tos/topology.hpp>
 # include <mln/accu/accumulators/accu_if.hpp>
 # include <mln/accu/accumulators/count.hpp>

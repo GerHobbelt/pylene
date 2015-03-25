@@ -46,7 +46,7 @@ namespace mln
     po::options_description all("Allowed options");
     po::options_description visible("Allowed options");
     all.add(desc_).add(hidden).add(desc).add(desc2).add(desc3);
-    visible.add(desc_).add(desc2).add(desc3);
+    visible.add(desc_).add(desc).add(desc2).add(desc3);
 
     po::variables_map vm;
     try {
@@ -119,6 +119,17 @@ namespace mln
                int sz)
   {
     mln_entering("export_");
+
+    {
+      int nnodes = 0;
+      mln_foreach(auto x, tree.nodes())
+        if (saliency_map[x] > 0)
+          nnodes++;
+
+      std::cout << "Remaining nodes: " << nnodes << std::endl;
+    }
+
+
     if (vm.count("output-saliency"))
       {
         image2d<float> sal = set_value_on_contour(tree, saliency_map);
@@ -136,19 +147,22 @@ namespace mln
             f << vmaps[i](x) << ((i+1 < sz) ? ',' : '\n');
       }
 
-    if (vm.count("output-simp-tree") or vm.count("output-simp-depth"))
+    if (vm.count("output-simp-tree") or
+        vm.count("output-simp-depth") or
+        vm.count("export-rec"))
       {
         auto binmap = make_functional_property_map<tree_t::vertex_id_t>
           ([&saliency_map](tree_t::vertex_id_t x) -> bool {
             return saliency_map[x] > 0;
           });
 
-        
+
         morpho::filter_direct_inplace(tree, binmap);
 
         if (vm.count("output-simp-tree"))
           morpho::save(tree, vm["output-simp-tree"].as<std::string>());
-        else
+
+        if (vm.count("output-simp-depth"))
           {
             auto depth = morpho::compute_depth(tree);
             image2d<uint16> d;

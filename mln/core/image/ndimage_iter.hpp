@@ -75,13 +75,13 @@ namespace mln
       typename Image::point_type shp = pmax - pmin;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
-      delta_byte_strides[ndim-1]  = ima_->strides[ndim-1];
+      delta_byte_strides[ndim-1]  = -ima_->strides_[ndim-1];
 
       for (unsigned i = 0; i < ndim-1; ++i)
-        delta_byte_strides[i] = -(ima_->strides_[i] - ima_->strides[i+1] * (shp[i+1] - 1));
+        delta_byte_strides[i] = -(ima_->strides_[i] - ima_->strides_[i+1] * (shp[i+1] - 1));
 
       return const_reverse_iterator(pixel_t(exact(ima_)),
-				    internal::make_point_visitor_forward(shp),
+				    internal::make_point_visitor_backward(shp),
 				    internal::strided_pointer_value_visitor<ndim>(ima_->last_, delta_byte_strides),
                                     internal::no_op_visitor ()
 				    );

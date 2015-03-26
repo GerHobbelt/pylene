@@ -26,7 +26,15 @@ int main(int argc, char** argv)
   io::imread(argv[2], depth);
 
   image2d<rgb8> out;
-  std::array<process_result_t, 3> res = process(tree, depth, argv[4], argv[3]);
+  std::array<process_result_t, NQUAD> res = process(tree, depth, argv[4], argv[3]);
+
+  for (int i = 0; i < NQUAD; ++i)
+    std::cout << "Quad " << i << ": " << res[i].energy << " "
+              << res[i].points[0]
+              << res[i].points[1]
+              << res[i].points[3]
+              << res[i].points[2]
+              << std::endl;
 
   resize(out, depth);
   draw_quad_superimpose(res[0].points, depth, out);

@@ -12,7 +12,7 @@
 /**************************************/
 
 constexpr unsigned GRAINSIZE = 10;
-constexpr float CORNER_TOLERANCE = 0.2;
+constexpr float CORNER_TOLERANCE = 0.35;
 
 // Min/Max Size of the target (in % the image size)
 constexpr float MIN_OBJECT_SIZE = 0.05;
@@ -23,7 +23,7 @@ constexpr float WEIGHT_QUAD = 1;
 constexpr float WEIGHT_NOISE = 1;
 
 constexpr float MAX_DISTANCE_INTER_FRAME = 100;
-
+constexpr int NQUAD = 7;
 
 
 
@@ -47,7 +47,7 @@ struct process_result_t
 /// \param[out] feedback The image with the detected object colorized (must be the same size of imdepth)
 /// \param csvfile (optional) Path to the CSV file where attributes will be saved
 /// \param treefile (optional) Path to the file where the tree will be saved (after filtering)
-std::array<process_result_t, 3>
+std::array<process_result_t, NQUAD>
 process(tree_t& tree,
         const mln::image2d<mln::uint16>& imdepth,
         const char* csvfile = nullptr,

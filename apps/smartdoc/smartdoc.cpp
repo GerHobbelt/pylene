@@ -10,6 +10,8 @@
 #include <mln/morpho/extinction.hpp>
 #include <apps/tos/croutines.hpp>
 
+static constexpr int EXTINCTION_THRESHOLD = 0.05;
+static constexpr int MINIMUM_ABSOLUTE_SIZE = 400 * 400 * 4; // 400*400*4
 
 namespace mln
 {
@@ -115,7 +117,7 @@ namespace mln
 
         float to_result() const
         {
-          // Si les points du quadri sont distants de plus de 5%
+          // Si les points du quadri sont distants de plus de CORNER_TOLERANCE %
           // de bbbox, c'est vain
           float scale = 1.0 / mydist(m_pmin.as_vec(), m_pmax.as_vec());
           vec2d<short> pts[4];
@@ -169,7 +171,7 @@ using namespace mln;
 using vec2df = vec<float, 2>;
 
 
-std::array<process_result_t, 3>
+std::array<process_result_t, NQUAD>
 process(tree_t& tree,
         const image2d<uint16>& ima,
         const char* csvfile,
@@ -177,10 +179,14 @@ process(tree_t& tree,
 {
 
   // Filter first
-  grain_filter_inplace(tree, GRAINSIZE);
+  {
+    grain_filter_inplace(tree, GRAINSIZE);
+  }
 
   property_map<tree_t, float> energy(tree);
   property_map<tree_t, accu::accumulators::fitting_quad> quadri;
+  property_map<tree_t, unsigned> depth = morpho::compute_depth(tree);
+
   // 1. Compute energy related attributes
   {
 
@@ -188,7 +194,6 @@ process(tree_t& tree,
     property_map<tree_t, unsigned> nleaves(tree, 0);
     property_map<tree_t, unsigned> sumdepth(tree, 0);
     property_map<tree_t, unsigned> sumdepth2(tree, 0);
-    property_map<tree_t, unsigned> depth = morpho::compute_depth(tree);
     property_map<tree_t, unsigned> area = morpho::accumulate(tree, accu::features::count<unsigned> ());
 
     float maxdepth = 0;
@@ -246,14 +251,30 @@ process(tree_t& tree,
         return (sumdepth2[x] / float(area[x]));
       });
 
-
     float imsize = ima.domain().size();
+
+    // property_map<tree_t, unsigned> area = morpho::accumulate(tree, accu::features::count<unsigned> ());
+    // unsigned root_id = tree.get_root_id();
+    // auto predicate = make_functional_property_map<tree_t::vertex_id_t>([&area, imsize, root_id](tree_t::vertex_id_t x) {
+    //     return (x == root_id) or
+    //     ((area[x] > (MIN_OBJECT_SIZE * imsize)) and
+    //      (area[x] < (MAX_OBJECT_SIZE * imsize)));
+    //   });
+    // filter_direct_inplace(tree, predicate);
+
     {
+      int w = ima.ncols();
+      int h = ima.nrows();
+
       mln_foreach (const tree_t::node_type& x, tree.nodes())
         {
-          if (area[x] < (MIN_OBJECT_SIZE * imsize) or
-              area[x] > (MAX_OBJECT_SIZE * imsize))
-            energy[x] =  0;
+          if ((area[x] < (MINIMUM_ABSOLUTE_SIZE)) or (area[x] > (MAX_OBJECT_SIZE * imsize)))
+            energy[x] = 0;
+          else if (quadri[x].m_pmin[0] < 50 or
+                   quadri[x].m_pmin[1] < 50 or
+                   (w-quadri[x].m_pmax[1]) < 50 or
+                   (h-quadri[x].m_pmax[0]) < 50) // if we are to close from the border
+            energy[x] = 0;
           else
             energy[x] = WEIGHT_QUAD * quadri[x].to_result() + WEIGHT_NOISE * noising[x];
         }
@@ -266,8 +287,15 @@ process(tree_t& tree,
     // Save attributes
     if (csvfile)
       {
+        property_map<tree_t, float> extvalues;
+        {
+          auto eimg = morpho::make_image(tree, energy);
+          auto extimg = morpho::extinction(eimg, morpho::tree_neighb_t (), std::greater<float> ());
+          extvalues = std::move(extimg.get_vmap());
+        }
+
         std::ofstream f(csvfile);
-        f << "nleaves,sumdepth,noising,quadri,inside,energy,bbox,quad\n";
+        f << "nleaves,sumdepth,noising,quadri,inside,energy,bbox,quad,extinction\n";
         mln_foreach(auto x, tree.nodes())
           f << nleaves[x]
             << "," << sumdepth[x]
@@ -277,6 +305,7 @@ process(tree_t& tree,
             << "," << energy[x]
             << "," << "\"" << quadri[x].m_pmin << quadri[x].m_pmax << "\""
             << "," << "\"" << quadri[x].m_quad[0] << quadri[x].m_quad[1] << quadri[x].m_quad[2] << quadri[x].m_quad[3] << "\""
+            << "," << extvalues[x]
             << "\n";
       }
   }
@@ -290,27 +319,54 @@ process(tree_t& tree,
   }
 
   // 3. Get the top three shapes
-  tree_t::node_type shps[3] = {tree.get_root(), tree.get_root(), tree.get_root()};
+  constexpr int NMINIMA = 10;
+
+  tree_t::node_type shps[NMINIMA];
+
   {
-    float emax[3] = {0,0,0};
+    auto heapcmp = [&extvalues](const tree_t::node_type& x, const tree_t::node_type& y) {
+      return extvalues[x] > extvalues[y];
+    };
+    std::fill(shps, shps + NMINIMA, tree.get_root());
+
     mln_foreach(auto x, tree.nodes())
       {
-        float e = extvalues[x];
-        if (e > emax[0]) {
-          shps[2] = shps[1];   shps[1] = shps[0];   shps[0] = x;
-          emax[2] = emax[1]; emax[1] = emax[0]; emax[0] = e;
-        } else if (e > emax[1]) {
-          shps[2] = shps[1];   shps[1] = x;
-          emax[2] = emax[1]; emax[1] = e;
-        } else if (e > emax[2]) {
-          shps[2] = x;
-          emax[2] = e;
-        }
+        if (extvalues[x] > extvalues[shps[0]])
+          {
+            std::pop_heap(shps, shps + NMINIMA, heapcmp);
+            shps[NMINIMA-1] = x;
+            std::push_heap(shps, shps + NMINIMA, heapcmp);
+          }
       }
+
+    std::sort_heap(shps, shps + NMINIMA, heapcmp);
+    std::cout << "emin:" << extvalues[shps[NMINIMA-1]]
+              << " , emax: " << extvalues[shps[0]] << std::endl;
+
+    // Filter the nodes whose extinction is below 0.1
+    for (int i = NMINIMA - 1; i >= 0 and extvalues[shps[i]] < EXTINCTION_THRESHOLD; --i)
+      energy[shps[i]] = 0;
   }
 
-  std::array<process_result_t, 3> res;
-  for (int i = 0; i < 3; ++i) {
+  // 4. Sort the shapes by energy
+  std::sort(shps, shps+NMINIMA, [&energy] (const tree_t::node_type& x, const tree_t::node_type& y) {
+      return energy[x] > energy[y];
+    });
+
+  // 5. If there are two shapes nested, get the biggest shape. (Reject threshold of 70% energetic)
+  // {
+  //   for (int i = 1; i < 3; ++i)
+  //     if (energy[shps[i]] > 0.9 and
+  //         energy[shps[i]] > (0.70 * energy[shps[0]]) and
+  //         lca(tree, depth, shps[0], shps[i]) == shps[i]) {
+  //       std::swap(shps[0], shps[i]);
+  //       break;
+  //     }
+  // }
+
+
+  std::array<process_result_t, NQUAD> res;
+  for (int i = 0; i < NQUAD; ++i) {
     std::copy(quadri[shps[i]].m_quad, quadri[shps[i]].m_quad + 4, res[i].points.begin());
     res[i].energy = energy[shps[i]];
   }

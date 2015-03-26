@@ -151,7 +151,7 @@ private:
 struct middle_filter_result
 {
   mln::image2d<mln::uint16>             depth;
-  std::array<process_result_t, 3>       res;
+  std::array<process_result_t, NQUAD>       res;
 };
 
 
@@ -240,11 +240,11 @@ public:
   getquad(middle_filter_result* mdr) const
   {
     int selection = 0;
-
+    bool dismissed[NQUAD] = {0,};
     if (not m_results->empty() and m_results->back().good)
       {
         auto lastr = m_results->back().quad;
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < NQUAD; ++i)
           {
             bool dismiss = false;
             for (int j = 0; j < 4; ++j)
@@ -252,6 +252,7 @@ public:
                 dismiss = true;
                 break;
               }
+            dismissed[i] = dismiss;
             if (not dismiss) {
               selection = i;
               break;
@@ -261,14 +262,16 @@ public:
 
 
     std::cout << "### FRAME: " << m_nbframe << std::endl;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < NQUAD; ++i) {
       std::cout << "\t" << (selection == i ? '*' : ' ')
                 << "Quad " << i << ": " << mdr->res[i].energy << " "
                 << mdr->res[i].points[0]
                 << mdr->res[i].points[1]
                 << mdr->res[i].points[3]
-                << mdr->res[i].points[2]
-                << std::endl;
+                << mdr->res[i].points[2];
+      if (dismissed[i])
+        std::cout << " (dissmissed)";
+      std::cout << std::endl;
     }
     return mdr->res[selection].points;
   }
@@ -353,6 +356,7 @@ int main(int argc, char** argv)
   av_register_all();
   avcodec_register_all();
 
+  std::cout << input_path << std::endl;
   std::vector<SmartDoc_t> results;
 
   input_filter func1(input_path);

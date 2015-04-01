@@ -11,7 +11,7 @@
 #include <apps/tos/croutines.hpp>
 
 static constexpr int EXTINCTION_THRESHOLD = 0.05;
-static constexpr int MINIMUM_ABSOLUTE_SIZE = 400 * 400 * 4; // 400*400*4
+static constexpr int MINIMUM_ABSOLUTE_SIZE = 300000; // 500 * 500; // 400*400*4
 
 namespace mln
 {

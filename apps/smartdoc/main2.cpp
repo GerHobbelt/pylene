@@ -1,12 +1,21 @@
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/morphers/casted_image.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/io/imsave.hpp>
+#include <mln/colors/lab.hpp>
+#include <mln/morpho/tos/ctos.hpp>
+#include <mln/morpho/component_tree/compute_depth.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/structural/opening.hpp>
+#include <mln/morpho/structural/closing.hpp>
 
 #include <tbb/pipeline.h>
 #include <boost/format.hpp>
-
+#include <mutex>
 #include <apps/g2/compute_ctos.hpp>
+#include <apps/tos/addborder.hpp>
 #include <mln/io/imsave.hpp>
 #include "video_tools.hh"
 #include "smartdoc.hpp"
@@ -19,11 +28,17 @@
 
 const bool ENABLE_CACHING = true;
 bool VIDEO_OUTPUT = false; // non-const modifiable by the cmdline
+bool USE_LAB = true;
+
+enum e_method { ON_LAB_L = 0, ON_LAB_B = 1, BACKUP_METHOD = 2, AUTO = 3};
+e_method APP_METHOD = ON_LAB_L;
 
 
 /****************************************************/
 /**     PROCESSORS                                ***/
 /****************************************************/
+
+std::mutex my_mutex;
 
 /*
 We have a pipeline with 3 filters:
@@ -95,32 +110,59 @@ public:
             avcodec_decode_video2(Ctx_Dec, pFrame_inYUV, &frameFinished, &packet_dec);
             if (frameFinished)
               {
-                /* convert from YUV to RGB24 to decode video */
-                sws_scale(convert_ctx_yuv2rgb,
-                          (const uint8_t * const*) pFrame_inYUV->data,
-                          pFrame_inYUV->linesize,
-                          0,
-                          Ctx_Dec->height,
-                          pFrame_inRGB->data,
-                          pFrame_inRGB->linesize);
-
-                /* copy to mln image2d */
-
                 mln::image2d<mln::rgb8>* out = new mln::image2d<mln::rgb8> ();
-                size_t strides[2] = {(size_t)pFrame_inRGB->linesize[0], sizeof(mln::rgb8)};
-                mln::box2d domain{{0,0},{(short)pFrame_inRGB->height, (short)pFrame_inRGB->width}};
-
-                *out = mln::image2d<mln::rgb8>::from_buffer(pFrame_inRGB->data[0],
-                                                            domain, strides, true);
-
+                *out = this->getCurrentFrame();
                 ++m_nbframe;
                 return out;
               }
           }
       }
+
+    packet_dec.data = NULL;
+    packet_dec.size = 0;
+    packet_dec.stream_index = m_videoStream;
+
+    while (avcodec_decode_video2(Ctx_Dec, pFrame_inYUV,
+                                 &frameFinished, &packet_dec) >= 0)
+      {
+        if (frameFinished)
+          {
+            mln::image2d<mln::rgb8>* out = new mln::image2d<mln::rgb8> ();
+            *out = this->getCurrentFrame();
+            ++m_nbframe;
+            return out;
+          }
+        else
+          {
+            break;
+          }
+      }
     fc.stop(); // NO MORE FRAME
     return NULL;
   }
+
+  mln::image2d<mln::rgb8>
+  getCurrentFrame() const
+  {
+    /* convert from YUV to RGB24 to decode video */
+    sws_scale(convert_ctx_yuv2rgb,
+              (const uint8_t * const*) pFrame_inYUV->data,
+              pFrame_inYUV->linesize,
+              0,
+              Ctx_Dec->height,
+              pFrame_inRGB->data,
+              pFrame_inRGB->linesize);
+
+    /* copy to mln image2d */
+
+    size_t strides[2] = {(size_t)pFrame_inRGB->linesize[0], sizeof(mln::rgb8)};
+    mln::box2d domain{{0,0},{(short)pFrame_inRGB->height,
+          (short)pFrame_inRGB->width}};
+
+    return mln::image2d<mln::rgb8>::from_buffer(pFrame_inRGB->data[0],
+                                                domain, strides, true);
+  }
+
 
   AVCodecContext*
   get_context()
@@ -162,6 +204,8 @@ public:
   middle_filter_result*
   operator() (mln::image2d<mln::rgb8>* input) const
   {
+    using namespace mln;
+
     // Process
     middle_filter_result* mdr = new middle_filter_result;
 
@@ -173,7 +217,140 @@ public:
     //   ptr_img_out = &(mdr->ima);
     // }
 
-    auto tree = compute_ctos(*input, &(mdr->depth));
+    typedef morpho::component_tree< unsigned, image2d<unsigned> > tree_t;
+    tree_t tree;
+
+    if (not USE_LAB)
+      {
+        tree = compute_ctos(*input, &(mdr->depth));
+      }
+    else
+      {
+        //std::array<process_result_t, NQUAD>       resL, resB;
+        //image2d< lab<float> > f = transform(*input, [](rgb8 x) { return rgb2lab(x); });
+
+        image2d<uint8> f;
+        property_map<tree_t, unsigned> vmap;
+
+        my_mutex.lock();
+        if (APP_METHOD == AUTO)
+          {
+            std::array<process_result_t, NQUAD> resL, resB;
+
+            // 1st try on LAB_B
+            {
+              f = transform(*input, [](rgb8 x) -> uint8 {
+                  lab<float> v = rgb2lab(x);
+                  return (v[2] + 110) * 256 / 220;
+                });
+
+              f = addborder(f);
+              tree = morpho::cToS(f, c4);
+              resize(mdr->depth, tree._get_data()->m_pmap);
+              vmap = morpho::compute_depth(tree);
+              morpho::reconstruction(tree, vmap, mdr->depth);
+              resB = process(tree, mdr->depth);
+            }
+
+            if (resB[0].energy > 0.78)
+              {
+                std::cout << "==> Using the B component." << std::endl;
+                APP_METHOD = ON_LAB_B;
+                mdr->res = resB;
+                my_mutex.unlock();
+                delete input;
+                return mdr;
+              }
+
+            // 2nd try on LAB_L
+            {
+              f = transform(*input, [](rgb8 x) -> uint8 {
+                  lab<float> v = rgb2lab(x);
+                  return v[0] * 256 / 100;
+              });
+              f = addborder(f);
+              tree = morpho::cToS(f, c4);
+              vmap = morpho::compute_depth(tree);
+              morpho::reconstruction(tree, vmap, mdr->depth);
+              resL = process(tree, mdr->depth);
+            }
+            if (resB[0].energy > 0.72 and resL[0].energy < 0.8)
+              {
+                std::cout << "==> Using the B component." << std::endl;
+                APP_METHOD = ON_LAB_B;
+                mdr->res = resB;
+                my_mutex.unlock();
+                delete input;
+                return mdr;
+              }
+            else if (resL[0].energy > 0.8)
+              {
+                std::cout << "==> Using the L component." << std::endl;
+                APP_METHOD = ON_LAB_L;
+                mdr->res = resL;
+                my_mutex.unlock();
+                delete input;
+                return mdr;
+              }
+            // 3. Backup
+            {
+              f = transform(*input, [](rgb8 x) -> uint8 {
+                  lab<float> v = rgb2lab(x);
+                return (v[2] + 110) * 256 / 220;
+                });
+
+              rect2d r = make_rectangle2d(101, 1);
+              f = morpho::structural::opening(f, r);
+              f = morpho::structural::closing(f, r);
+              f = addborder(f);
+              tree = morpho::cToS(f, c4);
+              vmap = morpho::compute_depth(tree);
+              morpho::reconstruction(tree, vmap, mdr->depth);
+              mdr->res = process(tree, mdr->depth);
+            }
+            {
+              std::cout << "==> Using the BACKUP method." << std::endl;
+              APP_METHOD = BACKUP_METHOD;
+              my_mutex.unlock();
+              delete input;
+              return mdr;
+            }
+          }
+
+        // We now which method to run OK.
+        my_mutex.unlock();
+        if (APP_METHOD == ON_LAB_B)
+          {
+            f = transform(*input, [](rgb8 x) -> uint8 {
+                lab<float> v = rgb2lab(x);
+                return (v[2] + 110) * 256 / 220;
+              });
+          }
+        else if (APP_METHOD == ON_LAB_L)
+          {
+            f = transform(*input, [](rgb8 x) -> uint8 {
+                lab<float> v = rgb2lab(x);
+                return v[0] * 256 / 100;
+              });
+          }
+        else if (APP_METHOD == BACKUP_METHOD)
+          {
+            f = transform(*input, [](rgb8 x) -> uint8 {
+                lab<float> v = rgb2lab(x);
+                return (v[2] + 110) * 256 / 220;
+              });
+
+            rect2d r = make_rectangle2d(101, 1);
+            f = morpho::structural::opening(f, r);
+            f = morpho::structural::closing(f, r);
+          }
+
+        f = addborder(f);
+        tree = morpho::cToS(f, c4);
+        resize(mdr->depth, tree._get_data()->m_pmap);
+        vmap = morpho::compute_depth(tree);
+        morpho::reconstruction(tree, vmap, mdr->depth);
+      }
     mdr->res = process(tree, mdr->depth);
 
     delete input;
@@ -340,15 +517,20 @@ private:
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    std::cerr << "Usage: " << argv[0] << " input.mpg output.xml [number of threads=10] [output.mpg]\n";
+    std::cerr << "Usage: " << argv[0] << " input.mpg output.xml [method = 0] [number of threads=10] [output.mpg]\n"
+      "method: (0) LAB_L, (1): LAB_B, (2): BACKUP\n";
     std::exit(1);
   }
 
   const char* input_path = argv[1];
   const char* output_path = argv[2];
-  int nthread = (argc > 3) ? std::atoi(argv[3]) : 10;
-  const char* output_video_path = (argc > 4) ? argv[4] : NULL;
-  VIDEO_OUTPUT = argc > 4;
+  if (argc > 3) {
+    APP_METHOD = (e_method) std::atoi(argv[3]);
+  }
+
+  int nthread = (argc > 4) ? std::atoi(argv[4]) : 10;
+  const char* output_video_path = (argc > 5) ? argv[5] : NULL;
+  VIDEO_OUTPUT = argc > 5;
 
   using namespace mln;
 

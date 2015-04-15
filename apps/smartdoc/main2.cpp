@@ -28,10 +28,9 @@
 
 const bool ENABLE_CACHING = true;
 bool VIDEO_OUTPUT = false; // non-const modifiable by the cmdline
-bool USE_LAB = true;
 
-enum e_method { ON_LAB_L = 0, ON_LAB_B = 1, BACKUP_METHOD = 2, AUTO = 3};
-e_method APP_METHOD = ON_LAB_L;
+enum e_method { ON_LAB_L = 0, ON_LAB_B = 1, BACKUP_METHOD = 2, AUTO = 3, MTOS_METHOD = 4};
+e_method APP_METHOD = AUTO;
 
 
 /****************************************************/
@@ -220,7 +219,7 @@ public:
     typedef morpho::component_tree< unsigned, image2d<unsigned> > tree_t;
     tree_t tree;
 
-    if (not USE_LAB)
+    if (APP_METHOD == MTOS_METHOD)
       {
         tree = compute_ctos(*input, &(mdr->depth));
       }
@@ -518,7 +517,7 @@ int main(int argc, char** argv)
 {
   if (argc < 3) {
     std::cerr << "Usage: " << argv[0] << " input.mpg output.xml [method = 0] [number of threads=10] [output.mpg]\n"
-      "method: (0) LAB_L, (1): LAB_B, (2): BACKUP\n";
+      "method: (0) LAB_L, (1): LAB_B, (2): BACKUP, (3) AUTO, (4) MTOS\n";
     std::exit(1);
   }
 

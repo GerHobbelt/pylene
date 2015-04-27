@@ -147,91 +147,9 @@ namespace mln
 	if (!parallel)
 	  *(--Send) = stack.top();
 
-	// std::cout << ima.domain().size()  << std::endl;
-	// std::cout << cpt  << std::endl;
-	// std::cout << cpt2  << std::endl;
-	// std::cout << "D:" << (cpt2-cpt)  << std::endl;
-	// std::cout << cpt3  << std::endl;
-	// std::cout << cpt4  << std::endl;
-
 	if (!parallel)
 	  assert((Send + ima.domain().size()) == Send_);
 
-
-	/* 	// Flood
-	while (!pqueue.empty())
-	  {
-	    size_type p = pqueue.top();
-	    size_type repr = stack.top();
-
-	    if (cmp(ima[p], ima[repr]))
-	      {
-		// the component represented by repr is over
-		// we attach repr to its parent
-		stack.pop();
-		assert(!stack.empty());
-		size_type par = stack.top();
-		while (cmp(ima[p], ima[par]))
-		  {
-		    stack.pop();
-		    parent[repr] = par;
-		    if (!parallel) *(--Send) = repr;
-		    repr = par;
-		    par = stack.top();
-		  }
-		if (cmp(ima[par], ima[p])) { // ima[par] < ima[p]
-		  stack.push(p);
-		  par = p;
-		}
-		parent[repr] = par;
-		if (!parallel) *(--Send) = repr;
-		repr = par;
-	      }
-
-
-	    assert(ima[repr] == ima[p]);
-	    bool done = true;
-	    mln_foreach(auto k, nbh_delta_indexes)
-	      {
-		auto q = p + k;
-		bool processed;
-		if (use_dejavu)
-		  processed = deja_vu[q];
-		else if (!parallel)
-		  processed = (parent[q] != UNINITIALIZED);
-		else
-		  processed = !(first_index <= q and q < last_index) or (parent[q] != UNINITIALIZED); 
-
-		if (!processed) {
-		  pqueue.push(q);
-		  if (use_dejavu)
-		    deja_vu[q] = true;
-		  else
-		    parent[q] = INQUEUE;
-		  if (cmp(ima[p], ima[q])) {
-		    stack.push(q);
-		    done = false;
-		    break;
-		  }
-		}
-	      }
-
-	    if (done) {
-	      parent[p] = repr;
-	      if (!parallel and p != repr) *(--Send) = p;
-	      pqueue.pop();
-	    }
-	  }
-
-	if (!parallel)
-	  while (!stack.empty()) {
-	    *(--Send) = stack.top();
-	    stack.pop();
-	  }
-
-	if (!parallel)
-	  assert((Send + ima.domain().size()) == Send_);
-	*/
       }
 
     } // end of namespace mln::morpho::internal

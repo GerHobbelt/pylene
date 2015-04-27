@@ -176,7 +176,7 @@ namespace mln
         {
 	  mln_precondition(m_has_previous);
 
-          merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
+          merge_tree(m_ima, m_nbh, m_parent, this->m_current_domain, m_cmp);
 
 	  if (joindomain)
 	    {

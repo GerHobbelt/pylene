@@ -227,7 +227,7 @@ namespace mln
 
           if (m_has_previous)
 	    {
-	      merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
+	      merge_tree(m_ima, m_nbh, m_parent, this->m_current_domain, m_cmp);
 	      m_current_domain.join(domain);
 
 	      // const box2d& d = m_ima.domain();
@@ -256,7 +256,7 @@ namespace mln
 	  mln_precondition(m_has_previous);
 
 	  // Merge trees
-          merge_tree(m_ima, m_parent, this->m_current_domain, m_cmp);
+          merge_tree(m_ima, m_nbh, m_parent, this->m_current_domain, m_cmp);
           m_current_domain.join(other.m_current_domain);
           m_nsplit += other.m_nsplit + 1;
         }

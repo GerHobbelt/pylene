@@ -27,7 +27,9 @@ namespace mln
 
     po::options_description desc2("Extinction Options");
     desc2.add_options()
-      ("clip", po::value<float>(), "Clip the energy map to [0, t₁]");
+      ("clip", po::value<float>(), "Clip the energy map to [0, t₁]")
+      ("ethreshold", po::value<float>(), "Remove nodes whose extinction ≤ t")
+      ;
 
     po::options_description desc3("Output Options");
     desc3.add_options()
@@ -108,6 +110,15 @@ namespace mln
     auto extincted = morpho::extinction(ienergy, morpho::tree_neighb_t());
 
     property_map<tree_t, float> vmap = std::move(extincted.get_vmap());
+
+    if (vm.count("ethreshold"))
+      {
+        float t = vm["ethreshold"].as<float>();
+        mln_foreach(auto x, tree.nodes())
+          if (vmap[x] < t)
+            vmap[x] = 0;
+      }
+
     return vmap;
   }
 

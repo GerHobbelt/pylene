@@ -325,6 +325,7 @@ namespace mln
     /// \postcondition `this->index_of_point(domain().pmin) == index_first`
     void reindex(size_type index_first)
     {
+      mln_precondition(index_first >= m_index_first);
       std::ptrdiff_t diff = index_first - m_index_first;
       m_ptr_origin -= diff;
       m_index_first += diff;

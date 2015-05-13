@@ -63,7 +63,7 @@ namespace mln
       unsigned n = 0;
       mln_foreach(auto x, tree.nodes()) {
         (void) x;
-        assert(vmap[x] > vmap[x.parent()]);
+        assert(vmap[x] > vmap[x.parent()] or x.get_parent_id() == tree.npos());
         ++n;
       }
       std::cerr << "Number of nodes after: " << n << std::endl;

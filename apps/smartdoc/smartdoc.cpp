@@ -6,9 +6,14 @@
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/extinction.hpp>
 #include <apps/tos/croutines.hpp>
+#include <mln/core/se/ball.hpp>
+
+#include <mln/morpho/structural/gradient.hpp>
+#include <mln/colors/literal.hpp>
 
 static constexpr int EXTINCTION_THRESHOLD = 0.05;
 static constexpr int MINIMUM_ABSOLUTE_SIZE = 300000; // 500 * 500; // 400*400*4
@@ -62,6 +67,9 @@ namespace mln
 
         void take(point2d x)
         {
+          using mln::inf;
+          using mln::sup;
+
           m_pmin = inf(m_pmin, x);
           m_pmax = sup(m_pmax, x);
 
@@ -84,6 +92,9 @@ namespace mln
 
         void take(const fitting_quad& other)
         {
+          using mln::inf;
+          using mln::sup;
+
           m_pmin = inf(m_pmin, other.m_pmin);
           m_pmax = sup(m_pmax, other.m_pmax);
 
@@ -410,4 +421,47 @@ draw_quad_superimpose(std::array<mln::point2d, 4> quad,
       if (inside1 or inside2)
         out(x)[0] += 128;
     }
+}
+
+
+void
+draw_quad_superimpose(std::array<mln::point2d, 4> quad,
+                      image2d<rgb8>& out)
+{
+  vec2df u = (quad[1] - quad[0]).as_vec();
+  vec2df v = (quad[2] - quad[0]).as_vec();
+  vec2df w = (quad[3] - quad[0]).as_vec();
+  float n1 = (u[0]*v[1] - u[1]*v[0]);
+  float n2 = (w[0]*v[1] - w[1]*v[0]);
+
+
+  image2d<bool> bin;
+  //  resize(bin, out).border(11);
+  bin.resize(out.domain(), 11, false);
+
+  //std::cout << "Border: " << bin.border() << std::endl;
+
+  mln_foreach(auto px, bin.pixels())
+    {
+      point2d x = 2 * (px.point() + 1);
+      vec2df p = x.as_vec() - quad[0].as_vec();
+
+      bool inside1, inside2;
+      {
+        float alpha = (u[0]*p[1] - u[1]*p[0]) / n1;
+        float beta = (p[0]*v[1] - p[1]*v[0]) / n1;
+        inside1 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
+      }
+      {
+        float alpha = (w[0]*p[1] - w[1]*p[0]) / n2;
+        float beta = (p[0]*v[1] - p[1]*v[0]) / n2;
+        inside2 = 0 <= alpha and 0 <= beta and (alpha + beta) <= 1;
+      }
+
+      px.val() = inside1 or inside2;
+    }
+
+  auto myse = se::make_ball2d(10);
+  bin = morpho::structural::external_gradient(bin, myse, productorder_less<bool>(), [](int x) -> bool { return x; });
+  fill(out | bin, colors::literal::red);
 }

@@ -191,8 +191,9 @@ private:
 
 struct middle_filter_result
 {
+  mln::image2d<mln::rgb8>               input;
   mln::image2d<mln::uint16>             depth;
-  std::array<process_result_t, NQUAD>       res;
+  std::array<process_result_t, NQUAD>   res;
 };
 
 
@@ -208,6 +209,9 @@ public:
     // Process
     middle_filter_result* mdr = new middle_filter_result;
 
+    mdr->input = std::move(*input);
+    delete input;
+
     // if (VIDEO_OUTPUT) {
     //   mln::box2d d;
     //   d.pmin = {0,0};
@@ -221,12 +225,12 @@ public:
 
     if (APP_METHOD == MTOS_METHOD)
       {
-        tree = compute_ctos(*input, &(mdr->depth));
+        tree = compute_ctos(mdr->input, &(mdr->depth));
       }
     else
       {
         //std::array<process_result_t, NQUAD>       resL, resB;
-        //image2d< lab<float> > f = transform(*input, [](rgb8 x) { return rgb2lab(x); });
+        //image2d< lab<float> > f = transform(mdr->input, [](rgb8 x) { return rgb2lab(x); });
 
         image2d<uint8> f;
         property_map<tree_t, unsigned> vmap;
@@ -238,7 +242,7 @@ public:
 
             // 1st try on LAB_B
             {
-              f = transform(*input, [](rgb8 x) -> uint8 {
+              f = transform(mdr->input, [](rgb8 x) -> uint8 {
                   lab<float> v = rgb2lab(x);
                   return (v[2] + 110) * 256 / 220;
                 });
@@ -257,13 +261,12 @@ public:
                 APP_METHOD = ON_LAB_B;
                 mdr->res = resB;
                 my_mutex.unlock();
-                delete input;
                 return mdr;
               }
 
             // 2nd try on LAB_L
             {
-              f = transform(*input, [](rgb8 x) -> uint8 {
+              f = transform(mdr->input, [](rgb8 x) -> uint8 {
                   lab<float> v = rgb2lab(x);
                   return v[0] * 256 / 100;
               });
@@ -279,7 +282,6 @@ public:
                 APP_METHOD = ON_LAB_B;
                 mdr->res = resB;
                 my_mutex.unlock();
-                delete input;
                 return mdr;
               }
             else if (resL[0].energy > 0.8)
@@ -288,12 +290,11 @@ public:
                 APP_METHOD = ON_LAB_L;
                 mdr->res = resL;
                 my_mutex.unlock();
-                delete input;
                 return mdr;
               }
             // 3. Backup
             {
-              f = transform(*input, [](rgb8 x) -> uint8 {
+              f = transform(mdr->input, [](rgb8 x) -> uint8 {
                   lab<float> v = rgb2lab(x);
                 return (v[2] + 110) * 256 / 220;
                 });
@@ -311,7 +312,6 @@ public:
               std::cout << "==> Using the BACKUP method." << std::endl;
               APP_METHOD = BACKUP_METHOD;
               my_mutex.unlock();
-              delete input;
               return mdr;
             }
           }
@@ -320,21 +320,21 @@ public:
         my_mutex.unlock();
         if (APP_METHOD == ON_LAB_B)
           {
-            f = transform(*input, [](rgb8 x) -> uint8 {
+            f = transform(mdr->input, [](rgb8 x) -> uint8 {
                 lab<float> v = rgb2lab(x);
                 return (v[2] + 110) * 256 / 220;
               });
           }
         else if (APP_METHOD == ON_LAB_L)
           {
-            f = transform(*input, [](rgb8 x) -> uint8 {
+            f = transform(mdr->input, [](rgb8 x) -> uint8 {
                 lab<float> v = rgb2lab(x);
                 return v[0] * 256 / 100;
               });
           }
         else if (APP_METHOD == BACKUP_METHOD)
           {
-            f = transform(*input, [](rgb8 x) -> uint8 {
+            f = transform(mdr->input, [](rgb8 x) -> uint8 {
                 lab<float> v = rgb2lab(x);
                 return (v[2] + 110) * 256 / 220;
               });
@@ -352,7 +352,6 @@ public:
       }
     mdr->res = process(tree, mdr->depth);
 
-    delete input;
     return mdr;
   }
 
@@ -374,8 +373,11 @@ public:
                                                   &pFrame_outYUV, NULL, &Ctx_Enc);
 
       // Because the output image is in K0 + border
-      short w = (Ctx_Dec->width + 2) * 2 - 1;
-      short h = (Ctx_Dec->height + 2) * 2 - 1;
+      // short w = (Ctx_Dec->width + 2) * 2 - 1;
+      // short h = (Ctx_Dec->height + 2) * 2 - 1;
+      short w = Ctx_Dec->width;
+      short h = Ctx_Dec->height;
+
 
       pFrame_outRGB = avcodec_alloc_frame();
       av_image_alloc(pFrame_outRGB->data,
@@ -393,7 +395,7 @@ public:
                                            Ctx_Enc->pix_fmt,
                                            SWS_BILINEAR, 0, 0, 0);
 
-      m_output.resize(mln::box2d{{0,0}, {h,w}});
+      m_output.resize(mln::box2d{{0,0}, {h,w}}, 5);
     }
     m_filename = filename;
     m_nbframe = 0;
@@ -462,8 +464,9 @@ public:
       {
         // Copy the image to the output buffer.
         {
-          draw_quad_superimpose(quad, mdr->depth, m_output);
-
+          //draw_quad_superimpose(quad, mdr->depth, m_output);
+          m_output = mdr->input;
+          draw_quad_superimpose(quad, m_output);
 
           char* ptrin = (char*) &(m_output.at(0,0));
           char* ptrout = (char*) pFrame_outRGB->data[0];

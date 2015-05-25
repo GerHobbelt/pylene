@@ -22,6 +22,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories(${TBB_INCLUDE_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${TBB_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 link_libraries(${TBB_LIBRARIES} rt)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++0x")

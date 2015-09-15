@@ -129,6 +129,17 @@ namespace mln
   double		l2dist(double x, double y);
   long double		l2dist(long double x, long double y);
 
+  int			l1dist(int x, int y);
+  long			l1dist(long x, long y);
+  long long		l1dist(long long x, long long y);
+  unsigned int		l1dist(unsigned int x, unsigned int y);
+  unsigned long		l1dist(unsigned long x, unsigned long y);
+  unsigned long long	l1dist(unsigned long long x, unsigned long long y);
+  float			l1dist(float x, float y);
+  double		l1dist(double x, double y);
+  long double		l1dist(long double x, long double y);
+
+
 
   int			l2norm_sqr(int x);
   long			l2norm_sqr(long n);
@@ -317,6 +328,18 @@ namespace mln
   MLN_GEN_BINARY_CODE(l2dist, double, abs(x - y));
   MLN_GEN_BINARY_CODE(l2dist, long double, abs(x - y));
   MLN_FUNCTIONAL_GEN_BINARY_CODE(l2dist);
+
+  MLN_GEN_BINARY_CODE(l1dist, int, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, long long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, unsigned int, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, unsigned long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, unsigned long long, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, float, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, double, abs(x - y));
+  MLN_GEN_BINARY_CODE(l1dist, long double, abs(x - y));
+  MLN_FUNCTIONAL_GEN_BINARY_CODE(l1dist);
+
 
   MLN_GEN_CODE(l2norm_sqr, int, sqr(x));
   MLN_GEN_CODE(l2norm_sqr, long, sqr(x));

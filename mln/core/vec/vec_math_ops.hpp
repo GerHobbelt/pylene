@@ -96,10 +96,24 @@ namespace mln
   template <typename T, unsigned dim, class tag>
   inline
   auto
+  l1dist(const internal::vec_base<T, dim, tag>& x,
+         const internal::vec_base<T, dim, tag>& y)
+    -> decltype(l1norm(x-y));
+
+
+  template <typename T, unsigned dim, class tag>
+  inline
+  auto
   l2dist(const internal::vec_base<T, dim, tag>& x,
          const internal::vec_base<T, dim, tag>& y)
     -> decltype(l2norm(x-y));
 
+  template <typename T, unsigned dim, class tag>
+  inline
+  auto
+  l2dist_sqr(const internal::vec_base<T, dim, tag>& x,
+             const internal::vec_base<T, dim, tag>& y)
+    -> decltype(l2norm_sqr(x-y));
 
   /*****************************/
   /**   Implementation       ***/
@@ -135,7 +149,9 @@ namespace mln
   MLN_GEN_CODE(abs);
   MLN_GEN_CODE(cbrt);
 
+  MLN_GEN_BINARY_CODE(l1dist, l1norm, x-y);
   MLN_GEN_BINARY_CODE(l2dist, l2norm, x-y);
+  MLN_GEN_BINARY_CODE(l2dist_sqr, l2norm_sqr, x-y);
 
 
   template <class U, class V, unsigned dim, class tag>

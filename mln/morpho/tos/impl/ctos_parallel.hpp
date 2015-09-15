@@ -143,6 +143,7 @@ namespace mln
             }
           else
             {
+              mln::trace::warn("Max depth > 16bits, slow version");
               tree = morpho::maxtree_indexes(D, nbh);
             }
         }

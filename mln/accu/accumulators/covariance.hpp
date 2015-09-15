@@ -21,7 +21,7 @@ namespace mln
       /// V(X) = E(\norm X - E(X) \norm_2^2)
       /// \f]
       template <typename T,
-                typename SumType = typename boost::promote<T>::type,
+                typename SumType = typename boost::promote<typename T::value_type>::type,
                 typename SumSqrType = SumType>
       struct covariance;
   }
@@ -157,7 +157,6 @@ namespace mln
           return result_type::Zero();
 
         double n = accu.m_count;
-        std::cout << accu.m_sum / n << std::endl;
         result_type COV;
         for (int i = 0; i < ndim; ++i)
           for (int j = i; j < ndim; ++j)

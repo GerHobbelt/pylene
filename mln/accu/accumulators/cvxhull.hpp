@@ -27,6 +27,14 @@ namespace mln
 	{
 	  typedef accumulators::cvxhull<P> type;
 	};
+
+
+        template <typename P>
+        accumulators::cvxhull<P>
+        make() const
+        {
+          return accumulators::cvxhull<P> ();
+        }
       };
 
       struct pvector : simple_feature<pvector>
@@ -36,6 +44,13 @@ namespace mln
 	{
 	  typedef accumulators::cvxhull<P> type;
 	};
+
+        template <typename P>
+        accumulators::cvxhull<P>
+        make() const
+        {
+          return accumulators::cvxhull<P> ();
+        }
       };
 
     }
@@ -80,12 +95,26 @@ namespace mln
 	void init()
 	{
 	  m_points.clear();
+          m_newline = true;
 	}
 
 	void take(const P& p)
 	{
 	  mln_precondition(m_points.empty() || m_points.back() < p);
-	  m_points.push_back(p);
+          if (m_points.empty() or m_points.back()[0] != p[0])
+            {
+              m_points.push_back(p);
+              m_newline = true;
+            }
+          else if (m_newline)
+            {
+              m_points.push_back(p);
+              m_newline = false;
+            }
+          else
+            {
+              m_points.back() = p;
+            }
 	}
 
 	template <typename A>
@@ -114,6 +143,7 @@ namespace mln
 
       private:
 	std::vector<P> m_points;
+        bool           m_newline;
       };
 
     }

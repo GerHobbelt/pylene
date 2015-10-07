@@ -19,19 +19,39 @@ namespace mln
     namespace structural
     {
 
-      /// \brief Compute the morphological opening.
+      /// \ingroup morpho
+      /// \brief Compute the structural morphological opening.
       ///
-      /// \[
-      /// \gamma(f) = \delta(\varepsilon(f))
-      /// \]
+      /// The structurual morphological closing γ of \p f by a structuring
+      /// element 𝓑
+      /// \f[
+      /// \gamma(f) = \delta_\mathcal{B}(\varepsilon_\mathcal{B}(f))
+      /// \f]
+      /// where ε denotes the erosion and δ the dilation.
       ///
-      /// \param[in] input        Input image.
-      /// \param[in] se   Neighborhood/SE/Window to look around.
-      /// \param[in] cmp  (optional) Comparaison function. The method internally does an
-      ///                 unqualified call to `inf(x, y, cmp)` and `sup(x, y, cmp)`. Default
-      ///                 is the product-order.
-      /// \param[out] out (optional) Output image to write in.
       ///
+      /// + If the optional \p out image is provided, it must be wide enough to store
+      ///   the results (the function does not perform any resizing).
+      ///
+      /// + If a optional \p cmp function is provided, the algorithm
+      ///   will internally do an unqualified call to `sup(x, y, cmp)`
+      ///   and `inf(x, y,cmp)`.  The default is the product-order so
+      ///   that it works for vectorial type as well.
+      ///
+      /// \param[in] input Input image \p f
+      /// \param[in] se Structuring element/Neighborhood/Window \p B to look around.
+      /// \param[out] out (optional) Output image \p g to write in.
+      /// \param[in] cmp (optional) Comparaison function.
+      ///
+      template <class I, class SE, class Compare, class O>
+      O&
+      opening(const Image<I>& input,
+              const StructuringElement<SE>& se,
+              Compare cmp,
+              Image<O>& out);
+
+      /// \ingroup morpho
+      /// \overload OutputImage& opening(const Image<I>&, const StructuringElement<SE>&, Compare cmp, Image<OutputImage>&)
       template <class I, class SE,
                 class Compare = productorder_less<mln_value(I)> >
       mln_concrete(I)
@@ -39,12 +59,6 @@ namespace mln
               const StructuringElement<SE>& se,
               Compare cmp = Compare ());
 
-      template <class I, class SE, class Compare, class O>
-      O&
-      opening(const Image<I>& input,
-              const StructuringElement<SE>& se,
-              Compare cmp,
-              Image<O>& out);
 
       /*************************/
       /***  Implementation   ***/

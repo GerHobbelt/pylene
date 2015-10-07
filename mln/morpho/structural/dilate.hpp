@@ -14,11 +14,39 @@ namespace mln
     namespace structural
     {
 
-      /// \brief Dilation by a structuring element
-      /// \param ima Input image
-      /// \param se Structuring element
-      /// \param cmp Comparaison function
+      /// \ingroup morpho
+      /// \brief Dilation by a structuring element.
       ///
+      /// Given a structuring element 𝐵, the dilation \f$\varepsilon(f)\f$ of the input
+      /// image 𝑓 is defined as:
+      /// \f[
+      /// \varepsilon(f)(x) = \bigvee \{ \, f(y), y \in B_x \, \}
+      /// \f]
+      ///
+      /// + If the optional \p out image is provided, it must be wide enough to store
+      ///   the results (the function does not perform any resizing).
+      ///
+      /// + If a optional \p cmp function is provided, the algorithm
+      ///   will internally do an unqualified call to `sup(x, y,
+      ///   cmp)`.  The default is the product-order so that it works
+      ///   for vectorial type as well.
+      ///
+      /// \param[in] ima Input image \p f
+      /// \param[in] se Structuring element/Neighborhood/Window \p B to look around.
+      /// \param[out] out (optional) Output image \p g to write in.
+      /// \param[in] cmp (optional) Comparaison function.
+      ///
+      template <class I, class SE, class OutputImage,
+                class Compare = productorder_less<mln_value(I)> >
+      OutputImage&
+      dilate(const Image<I>& ima,
+             const StructuringElement<SE>& se,
+             Image<OutputImage>& out,
+             Compare cmp = Compare ());
+
+
+      /// \ingroup morpho
+      /// \overload OutputImage& dilate(const Image<I>&, const StructuringElement<SE>&, Image<OutputImage>&, Compare cmp)
       template <class I, class SE,
                 class Compare = productorder_less<mln_value(I)> >
       mln_concrete(I)
@@ -26,13 +54,6 @@ namespace mln
              const StructuringElement<SE>& se,
              Compare cmp = Compare ());
 
-      template <class I, class SE, class OutputImage,
-                class Compare = productorder_less<mln_value(I)> >
-      OutputImage&
-      dilate(const Image<I>& ima,
-             const StructuringElement<SE>& nbh,
-             Image<OutputImage>& output,
-             Compare cmp = Compare ());
 
       /******************************************/
       /****          Implementation          ****/

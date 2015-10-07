@@ -20,13 +20,22 @@ namespace mln
     namespace structural
     {
 
+      /// \ingroup morpho
       /// \brief Compute the Beucher gradient.
       ///
       /// The beucher gradient is defined as:
       /// \f[
-      ///  |\Nabla u(p)| = \left| \bigvee_{q \in \mathcal{N}(p)} f(q) -
-      ///    |\bigwedge_{q \in \mathcal{N}(p)} f(q) \right|
+      ///  |\nabla u(p)| = \left| \bigvee_{q \in \mathcal{N}(p)} f(q) -
+      ///    \bigwedge_{q \in \mathcal{N}(p)} f(q) \right|
       /// \f]
+      ///
+      /// + If the optional \p out image is provided, it must be wide enough to store
+      ///   the results (the function does not perform any resizing).
+      ///
+      /// + If a optional \p cmp function is provided, the algorithm
+      ///   will internally do an unqualified call to `sup(x, y, cmp)`
+      ///   and `inf(x, y,cmp)`.  The default is the product-order so
+      ///   that it works for vectorial type as well.
       ///
       /// \param[in] input        Input image.
       /// \param[in] se   Neighborhood/SE/Window to look around.
@@ -41,15 +50,6 @@ namespace mln
       /// we have to consider:
       /// * an incrementable accumlator
       /// * an extension that is mirrorizable
-      template <class I, class SE,
-                class Compare = productorder_less<mln_value(I)>,
-                class NormFunction = mln::functional::l2norm_t<mln_value(I)> >
-      mln_ch_value(I, typename std::result_of<NormFunction(mln_value(I))>::type)
-        gradient(const Image<I>& input,
-                 const StructuringElement<SE>& se,
-                 Compare cmp = Compare (),
-                 NormFunction norm = NormFunction ());
-
       template <class I, class SE, class Compare, class NormFunction, class O>
       void
       gradient(const Image<I>& input,
@@ -59,12 +59,33 @@ namespace mln
                Image<O>& out);
 
 
+      /// \ingroup morpho
+      /// \overload void gradient(const Image<I>&, const StructuringElement<SE>&, Compare cmp, NormFunction, Image<O>&)
+      template <class I, class SE,
+                class Compare = productorder_less<mln_value(I)>,
+                class NormFunction = mln::functional::l2norm_t<mln_value(I)> >
+      mln_ch_value(I, typename std::result_of<NormFunction(mln_value(I))>::type)
+        gradient(const Image<I>& input,
+                 const StructuringElement<SE>& se,
+                 Compare cmp = Compare (),
+                 NormFunction norm = NormFunction ());
+
+
+      /// \ingroup morpho
       /// \brief Compute the morphological external gradient.
       ///
       /// The beucher external gradient is defined as:
       /// \f[
-      ///  |\Nabla u(p)| = \left| \bigvee_{q \in \mathcal{N}(p)} f(q) - f(p) \right|
+      ///  |\nabla u(p)| = \left| \bigvee_{q \in \mathcal{N}(p)} f(q) - f(p) \right|
       /// \f]
+      ///
+      /// + If the optional \p out image is provided, it must be wide enough to store
+      ///   the results (the function does not perform any resizing).
+      ///
+      /// + If a optional \p cmp function is provided, the algorithm
+      ///   will internally do an unqualified call to `sup(x, y,
+      ///   cmp)`. The default is the product-order so that it works
+      ///   for vectorial type as well.
       ///
       /// \param[in] input        Input image.
       /// \param[in] se   Neighborhood/SE/Window to look around.
@@ -79,6 +100,16 @@ namespace mln
       /// we have to consider:
       /// * an incrementable accumlator
       /// * an extension that is mirrorizable
+      template <class I, class SE, class Compare, class NormFunction, class O>
+      void
+      external_gradient(const Image<I>& input,
+                        const StructuringElement<SE>& se,
+                        Compare cmp,
+                        NormFunction norm,
+                        Image<O>& out);
+
+      /// \ingroup morpho
+      /// \overload void external_gradient(const Image<I>&, const StructuringElement<SE>&, Compare cmp, NormFunction, Image<O>&)
       template <class I, class SE,
                 class Compare = productorder_less<mln_value(I)>,
                 class NormFunction = mln::functional::l2norm_t<mln_value(I)> >
@@ -88,13 +119,6 @@ namespace mln
                  Compare cmp = Compare (),
                  NormFunction norm = NormFunction ());
 
-      template <class I, class SE, class Compare, class NormFunction, class O>
-      void
-      external_gradient(const Image<I>& input,
-                        const StructuringElement<SE>& se,
-                        Compare cmp,
-                        NormFunction norm,
-                        Image<O>& out);
 
       /*************************/
       /***  Implementation   ***/

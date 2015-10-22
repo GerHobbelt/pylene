@@ -126,14 +126,10 @@ namespace mln
 
     dyn_neighborhood_base()
     {
-      if (not __init__)
-	{
-	  const SiteSet& dpoints = exact(this)->dpoints;
-	  m_dpoints_acc[0] = dpoints[0];
-	  for (int i = 1; i < N; ++i)
-	    m_dpoints_acc[i] = dpoints[i] - m_dpoints_acc[i-1];
-	  __init__ = true;
-	}
+      const SiteSet& dpoints = exact(this)->dpoints;
+      m_dpoints_acc[0] = dpoints[0];
+      for (int i = 1; i < N; ++i)
+        m_dpoints_acc[i] = dpoints[i] - m_dpoints_acc[i-1];
     }
 
     ~dyn_neighborhood_base() = default;
@@ -174,17 +170,8 @@ namespace mln
 
 
   private:
-    static bool __init__;
-    static std::array<point_type, N> m_dpoints_acc;
+    std::array<point_type, N> m_dpoints_acc;
   };
-
-  template <class SiteSet, class E>
-  bool dyn_neighborhood_base<SiteSet, constant_neighborhood_tag, E>::__init__ = false;
-
-  template <class SiteSet, class E>
-  std::array<typename range_value<SiteSet>::type,
-	     dyn_neighborhood_base<SiteSet, constant_neighborhood_tag, E>::N>
-  dyn_neighborhood_base<SiteSet, constant_neighborhood_tag, E>::m_dpoints_acc;
 
 
   template <class SiteSet>

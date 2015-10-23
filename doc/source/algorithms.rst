@@ -1,0 +1,4 @@
+Algorithms
+==========
+
+.. doxygengroup:: Algorithms

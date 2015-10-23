@@ -1,2 +1,5 @@
 /build
-/doc
+/doc/build
+/doc/html
+/doc/doxyxml
+

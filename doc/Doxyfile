@@ -1559,7 +1559,8 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = MLN_DOXYGEN \
                          mln_concrete(I):=concrete<I> \
-                         mln_ch_value(I,V):=ch_value<I,V>
+                         mln_ch_value(I,V):=ch_value<I,V> \
+                         decltype(M):=unspecified
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 

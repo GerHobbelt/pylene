@@ -2,6 +2,7 @@
 #include <mln/core/image/image_ops.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/grays.hpp>
 
 #include <mln/io/imprint.hpp>
 #include <boost/tuple/tuple_io.hpp>
@@ -101,6 +102,28 @@ BOOST_AUTO_TEST_CASE(MixedOperator)
 
   BOOST_CHECK( all((x + y) == (2*y)) );
 }
+
+BOOST_AUTO_TEST_CASE(WhereOperator)
+{
+  using namespace mln;
+
+  image2d<uint8>  x(5,5);
+  image2d<uint8>  y(5,5);
+  iota(x, 0);
+  iota(y, 0);
+
+  auto f1 = where(x > 12, x, (uint8) 12);
+  auto f2 = where(x > 12, x, y);
+  auto f3 = where(x > 12, (uint8) 12, x);
+  auto f4 = where(x > 12, (uint8) 0, (uint8) 1);
+
+
+
+  BOOST_CHECK( all(f1 >= 12) );
+  BOOST_CHECK( (std::is_same<mln_reference(decltype(f1)), uint8> ()) );
+  BOOST_CHECK( (std::is_same<mln_reference(decltype(f2)), uint8&> ()) );
+}
+
 
 
 //   // Const: Lvalue + Lvalue

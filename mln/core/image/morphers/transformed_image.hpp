@@ -247,7 +247,7 @@ namespace mln
         reference operator() (mln_reference(I) v) const {
           return m_fun(std::forward<mln_reference(I)>(v));
         }
-        UnaryFunction m_fun;
+        mutable UnaryFunction m_fun;
       };
 
       struct const_val_fun_t {
@@ -262,7 +262,7 @@ namespace mln
         const_reference operator() (mln_reference(I) v) const {
           return m_fun(std::forward<mln_reference(I)>(v));
         }
-        UnaryFunction m_fun;
+        mutable UnaryFunction m_fun;
       };
 
       struct pix_fun_t {
@@ -434,7 +434,7 @@ namespace mln
       }
 
     private:
-      UnaryFunction m_fun;
+      mutable UnaryFunction m_fun;
     };
 
 

@@ -33,6 +33,9 @@ namespace mln
   bool any(const Image<I>& ima);
 
 
+
+
+
   /// \}
 
   /******************************************/
@@ -53,6 +56,31 @@ namespace mln
     {
       typedef binary_scalar_image_expr< Op<Scalar, mln_value(I)>, Scalar, I> type;
     };
+
+    template <typename I1, typename I2, typename I3, class Op>
+    struct ternary_image_image_image_expr_helper
+    {
+      typedef ternary_image_image_image_expr< Op, I1, I2, I3> type;
+    };
+
+    template <typename I1, typename I2, typename S, class Op>
+    struct ternary_image_image_scalar_expr_helper
+    {
+      typedef ternary_image_image_scalar_expr< Op, I1, I2, S> type;
+    };
+
+    template <typename I1, typename S, typename I2, class Op>
+    struct ternary_image_scalar_image_expr_helper
+    {
+      typedef ternary_image_scalar_image_expr< Op, I1, S, I2> type;
+    };
+
+    template <typename I1, typename S1, typename S2, class Op>
+    struct ternary_image_scalar_scalar_expr_helper
+    {
+      typedef ternary_image_scalar_scalar_expr< Op, I1, S1, S2> type;
+    };
+
 
   }
 
@@ -166,6 +194,58 @@ namespace mln
       if (*v) return true;
 
     return false;
+  }
+
+  template <class I, class Image1, class Image2>
+  typename boost::lazy_enable_if_c<
+    is_a<Image1, Image>::value and is_a<Image2, Image>::value,
+    internal::ternary_image_image_image_expr_helper<I, Image1, Image2, conditional_ternary>
+    >::type
+  where(const Image<I>& f, Image1&& g, Image2&& h)
+  {
+    return make_ternary_image_image_image_expr(I(exact(f)),
+                                               std::forward<Image1>(g),
+                                               std::forward<Image2>(h),
+                                               conditional_ternary() );
+  }
+
+  template <class I, class Image1, class Scalar>
+  typename boost::lazy_enable_if_c<
+    is_a<Image1, Image>::value and !is_a<Scalar, Image>::value,
+    internal::ternary_image_image_scalar_expr_helper<I, Image1, Scalar, conditional_ternary>
+    >::type
+  where(const Image<I>& f, Image1&& g, const Scalar& s)
+  {
+    return make_ternary_image_image_scalar_expr(I(exact(f)),
+                                                std::forward<Image1>(g),
+                                                s,
+                                                conditional_ternary());
+  }
+
+  template <class I, class Scalar, class Image1>
+  typename boost::lazy_enable_if_c<
+    is_a<Image1, Image>::value and !is_a<Scalar, Image>::value,
+    internal::ternary_image_scalar_image_expr_helper<I, Scalar, Image1, conditional_ternary>
+    >::type
+  where(const Image<I>& f, const Scalar& s, Image1&& g)
+  {
+    return make_ternary_image_scalar_image_expr(I(exact(f)),
+                                                s,
+                                                std::forward<Image1>(g),
+                                                conditional_ternary() );
+  }
+
+  template <class I, class Scalar1, class Scalar2>
+  typename boost::lazy_enable_if_c<
+    !is_a<Scalar1, Image>::value and !is_a<Scalar2, Image>::value,
+    internal::ternary_image_scalar_scalar_expr_helper<I, Scalar1, Scalar2, conditional_ternary>
+    >::type
+    where(const Image<I>& f, const Scalar1& s1, const Scalar2& s2)
+  {
+    return make_ternary_image_scalar_scalar_expr(I(exact(f)),
+                                                s1,
+                                                s2,
+                                                conditional_ternary() );
   }
 
 

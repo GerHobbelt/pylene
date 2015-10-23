@@ -225,6 +225,20 @@ namespace mln
     }
   };
 
+
+  struct conditional_ternary
+  {
+
+    template <typename E1, typename E2, typename E3>
+    inline
+    typename std::common_type<E2,E3>::type
+    operator() (E1&& expr1, E2&& expr2, E3&& expr3) const
+    {
+      return std::forward<E1>(expr1) ? std::forward<E2>(expr2) : std::forward<E3>(expr3);
+    }
+
+  };
+
 }
 
 // FIXME: get must be imported in the mln namespace to prevent

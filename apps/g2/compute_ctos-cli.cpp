@@ -34,6 +34,7 @@ int main(int argc, char** argv)
   visible.add_options()
     ("help", "Help message")
     ("grain,g", po::value<int>(), "Grain filter")
+    ("pmin", po::value< std::vector<int> >()->multitoken(), "Point at infinity (format: 'row col')")
     ("attr,a", po::value<std::string>()->default_value("depth"),
      "The type of attribute used to compute the inclusion map:\n"
      "depth: Length of the path to A\n"
@@ -98,6 +99,12 @@ int main(int argc, char** argv)
   if (vm.count("export-mdepth")) {
     params.export_marginal_depth = true;
     params.export_marginal_depth_path = vm["export-mdepth"].as<std::string>();
+  }
+
+  if (vm.count("pmin")){
+    std::vector<int> tmp = vm["pmin"].as< std::vector<int> >();
+    params.pmin[0] = tmp[0];
+    params.pmin[1] = tmp[1];
   }
 
   auto tree = compute_ctos(f, NULL, attr, params);

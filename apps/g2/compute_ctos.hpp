@@ -19,6 +19,7 @@ namespace mln
   {
     bool        export_marginal_depth = false;
     std::string export_marginal_depth_path;
+    point2d     pmin = {0,0};
   };
 
 
@@ -60,4 +61,9 @@ namespace mln
 
 }
 
+
+# include "compute_ctos.hxx"
+
 #endif // ! APPS_G2_COMPUTE_CTOS_HPP
+
+

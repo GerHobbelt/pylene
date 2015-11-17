@@ -231,7 +231,7 @@ namespace mln
 
     template <typename E1, typename E2, typename E3>
     inline
-    typename std::common_type<E2,E3>::type
+    decltype( std::declval<E1>() ? std::declval<E2>() : std::declval<E3>() )
     operator() (E1&& expr1, E2&& expr2, E3&& expr3) const
     {
       return std::forward<E1>(expr1) ? std::forward<E2>(expr2) : std::forward<E3>(expr3);

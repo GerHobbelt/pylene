@@ -84,7 +84,7 @@ namespace mln
       internal::no_op_visitor,
       internal::point_structure<T, dim>,
       internal::deref_return_point_policy> reverse_iterator;
-
+    typedef reverse_iterator const_reverse_iterator;
 
     box() = default;
 

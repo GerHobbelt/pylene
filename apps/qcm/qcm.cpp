@@ -62,10 +62,11 @@ namespace mln
 
     box2d dom = { {125, 2300}, {250, 2470} };
     image2d<bool> bin(dom);
-    copy((f < 150) | dom, bin);
+    copy((f < 180) | dom, bin);
 
     //auto markers = morpho::opening(f, se);
-    rect2d se = make_rectangle2d(21,51);
+    rect2d se = make_rectangle2d(21,49);
+
     bin = morpho::structural::opening(bin, se);
 
     //auto sub = bin | dom;
@@ -219,7 +220,14 @@ int main(int argc, char** argv)
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).
             options(desc2).positional(pd).run(), vm);
-  po::notify(vm);
+  try {
+    po::notify(vm);
+  } catch (...) {
+    std::cout << "Usage: " << argv[0] << " input output\n"
+      "Les images doivent être en 200dpi\n"
+              << desc << "\n";
+    return 1;
+  }
 
   if (vm.count("help")) {
     std::cout << desc << "\n";

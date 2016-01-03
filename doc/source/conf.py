@@ -252,3 +252,11 @@ breathe_default_project = "Pylene"
 
 
 breathe_path = os.path.realpath("../doxyxml/")
+
+
+
+# Substitution
+rst_prolog = """
+.. |pylene| replace:: pylene
+.. |milena| replace:: milena
+"""

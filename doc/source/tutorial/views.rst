@@ -62,3 +62,58 @@ Foundamental image morphers
 
 Lazy images operators
 ---------------------
+
+Arithmetical, logical and comparison operations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. topic:: Notations
+
+* `f`, `g`, `h` are images of value type: `V1`, `V2`, `R`
+* `s` is a scalar of type `S`
+
+All arithemtical and logical operators on images return a view where
+values will be computed on the fly. The value type of the view will be
+the *common type* between operand types (note that *integer promotion*
+will performed during the computation but then casted to the *common
+type*). For example::
+
+  image2d<uint8> f, g;
+  auto h = f + g; // V1 = uint8, V2 = uint8, R = uint8
+  auto h = f + 2; // V1 = uint8, V2 = int, R = int
+  auto h = -f; // V1 = uint8, R = uint8
+  auto h = - imcast<int>(f); // V1 = int, R = int
+  auto h = (f == g); // V1 = uint8, V2 = int, R = bool
+
+.. topic:: Operators
+
++----------------------------------------------------+--------------------------------------+
+| ``-f``                                             | Element-wise negate                  |
++----------------------------------------------------+--------------------------------------+
+| ``lnot(f)``                                        | Element-wise logical not             |
++----------------------------------------------------+--------------------------------------+
+| ``f + g, f + s, s + f``                            | Element-wise binary addition         |
++----------------------------------------------------+--------------------------------------+
+| ``f - g, f - s, s - f``                            | Element-wise binary soustraction     |
++----------------------------------------------------+--------------------------------------+
+| ``f * g, s * f, f * s``                            | Element-wise binary multiplication   |
++----------------------------------------------------+--------------------------------------+
+| ``f / g, s / f, f / s``                            | Element-wise binary division         |
++----------------------------------------------------+--------------------------------------+
+| ``land(f,g), land(f,s), land(s,f)``                | Element-wise logical and             |
++----------------------------------------------------+--------------------------------------+
+| ``lor(f,g), lor(f,s), lor(s,f)``                   | Element-wise logical or              |
++----------------------------------------------------+--------------------------------------+
+| ``where(f, g, h), where(f, g, s), where(f, s, g)`` | Element-wise ternary condition       |
++----------------------------------------------------+--------------------------------------+
+| ``f < g, f < s, s < f``                            | Element-wise less than               |
++----------------------------------------------------+--------------------------------------+
+| ``f > g, f > s, s > f``                            | Element-wise greater than            |
++----------------------------------------------------+--------------------------------------+
+| ``f <= g, f <= s, s <= f``                         | Element-wise less or equal than      |
++----------------------------------------------------+--------------------------------------+
+| ``f >= g, f >= s, s >= f``                         | Element-wise greater or equal than   |
++----------------------------------------------------+--------------------------------------+
+| ``f == g, f == s, s == f``                         | Element-wise equal to                |
++----------------------------------------------------+--------------------------------------+
+|                                                    |                                      |
++----------------------------------------------------+--------------------------------------+

@@ -24,9 +24,9 @@ int main(int argc, char** argv)
 
   po::options_description hidden;
   desc.add_options()
-    ("mask.pbm", po::value<std::string> ())
-    ("input.ppm", po::value<std::string> ())
-    ("out.ppm", po::value<std::string> ())
+    ("mask.pbm", po::value<std::string> ()->required())
+    ("input.ppm", po::value<std::string> ()->required())
+    ("out.ppm", po::value<std::string> ()->required())
     ;
 
   po::positional_options_description pd;

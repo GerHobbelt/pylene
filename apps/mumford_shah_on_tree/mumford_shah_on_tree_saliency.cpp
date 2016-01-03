@@ -12,6 +12,9 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/accu/accumulators/max.hpp>
+
 #include <mln/core/dontcare.hpp>
 #include <boost/graph/dag_shortest_paths.hpp>
 #include <boost/graph/transpose_graph.hpp>
@@ -118,19 +121,17 @@ tree_keep_2F(const mln::morpho::component_tree<P, mln::image2d<P> >& tree)
 
 void usage(char** argv)
 {
-  std::cout << "Usage: " << argv[0] << " input[rgb] α₀ α₁ λ output[rgb] [output[uint16]]\n"
+  std::cout << "Usage: " << argv[0] << " input[.jpg|.png] α₀ α₁ λ output.tiff\n"
     "α₀\tGrain filter size before merging trees (0 to disable)\n"
     "α₁\tGrain filter size on the color ToS (0 to disable)\n"
-    "λ\tMumford-shah regularisation weight (e.g. 5000)\n"
-    "Ex.\n"
-            << argv[0] << " input.jpg 30 30 6000 simp.tiff label.tiff\n";
+    "λ\tMumford-shah regularisation weight (e.g. 5000)\n";
   std::exit(1);
 }
 
 
 int main(int argc, char** argv)
 {
-  if (argc < 6)
+  if (argc < 5)
     usage(argv);
 
 
@@ -198,27 +199,11 @@ int main(int argc, char** argv)
       }
 
     std::cout << "Simplification (number of llines): " << std::endl;
-    mumford_shah_on_tree(T, F, lambda);
-    auto output = Kadjust_to(F, ima.domain());
-    io::imsave(output, output_path);
-  }
+    image2d<float> saliency;
+    mumford_shah_on_tree(T, F, lambda, &saliency);
 
-
-  // Output label image
-  {
-    if (argc > 6)
-      {
-        image2d<uint16> lbl;
-        property_map<tree_t, uint16> lblmap(T);
-
-        unsigned i = 1;
-        mln_foreach(auto x, T.nodes())
-          lblmap[x] = i++;
-
-        resize(lbl, F);
-        morpho::reconstruction(T, lblmap, lbl);
-        io::imsave(lbl, argv[6]);
-      }
+    float maxv = accumulate(saliency, accu::features::max<>());
+    io::imsave(1 - saliency / maxv, output_path);
   }
 
 }

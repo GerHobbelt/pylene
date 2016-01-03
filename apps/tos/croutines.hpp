@@ -41,7 +41,7 @@ namespace mln
   template <class P>
   void
   grain_filter_inplace(morpho::component_tree<P, image2d<P> >& tree,
-                       unsigned alpha);
+                       unsigned alpha, bool shrink = true);
 
 
   /*******************************/
@@ -128,7 +128,8 @@ namespace mln
   template <class P>
   void
   grain_filter_inplace(morpho::component_tree<P, image2d<P> >& tree,
-                       unsigned alpha)
+                       unsigned alpha,
+                       bool shrink)
   {
     mln_entering("grain_filter_inplace");
 
@@ -143,7 +144,9 @@ namespace mln
       ([alpha, &area] (unsigned x) { return area[x] >= alpha; });
 
     morpho::filter_direct_inplace(tree, pred);
-    tree.shrink_to_fit();
+
+    if (shrink)
+      tree.shrink_to_fit();
     mln_exiting();
   }
 

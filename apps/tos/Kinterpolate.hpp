@@ -166,15 +166,15 @@ namespace mln
     } else if (shp == shp0) {
         return ima;
     } else if (shp == shp0+2) {
-        return addborder(ima, lexicographicalorder_less<T>());
+        return addborder_marginal(ima);
     } else if (shp == shp0*2-1) { // immerse_k1
       return callback(ima);
     } else if (shp == (shp0*2+3)) { // addborder + callback
-      return callback(addborder(ima, lexicographicalorder_less<T>()));
+      return callback(addborder_marginal(ima));
     } else if (shp == (shp0*4-3)) { // immerse_k2
       return callback(callback(ima));
     } else if (shp == (shp0*4+5)) { // addborder + immerse_k2
-      return callback(callback(addborder(ima, lexicographicalorder_less<T>())));
+      return callback(callback(addborder_marginal(ima)));
     } else {
       std::cerr << "Unable to convert the image from: " << ima.domain() << " to " << domain << "\n";
       throw std::runtime_error("Domains have invalid size.");

@@ -67,7 +67,7 @@ namespace mln
 
   // Add a border with the median computed marginally on each channel.
   template < class V>
-  image2d<V>
+  typename std::enable_if<not std::is_scalar<V>::value, image2d<V> >::type
   addborder_marginal(const image2d<V>& ima)
   {
     //const I& ima = exact(ima_);
@@ -77,6 +77,13 @@ namespace mln
       copy(addborder(eval(channel(ima,i))), channel(out,i));
 
     return out;
+  }
+
+  template < class V>
+  typename std::enable_if<std::is_scalar<V>::value, image2d<V> >::type
+  addborder_marginal(const image2d<V>& ima)
+  {
+    return addborder(ima);
   }
 
 

@@ -182,7 +182,7 @@ namespace mln {
 
   public:
     UInt() = default;
-    UInt(enc x) : m_x(x) {}
+    constexpr UInt(enc x) : m_x(x) {}
     operator enc& ()          { return m_x; }
 //operator enc  () const     { return m_x; }
     operator unsigned () const { return m_x; }
@@ -199,7 +199,7 @@ namespace mln {
 
   public:
     Int() = default;
-    Int(enc x) : m_x(x) {}
+    constexpr Int(enc x) : m_x(x) {}
     operator enc& ()           { return m_x; }
 //    operator enc  () const     { return m_x; }
     operator int () const { return m_x; }
@@ -215,11 +215,6 @@ namespace mln {
 
 namespace std
 {
-  // Forward declaration
-  template <typename... types_>
-  struct common_type;
-
-
   template <unsigned n1, unsigned n2>
   struct common_type< mln::UInt<n1>, mln::UInt<n2> >
   {

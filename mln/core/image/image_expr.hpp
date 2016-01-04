@@ -31,13 +31,13 @@ namespace mln
   template <typename BinaryFunction, typename Image, typename Scalar>
   using binary_image_scalar_expr = internal::transformed_image<
     Image,
-    decltype( std::bind(std::declval<BinaryFunction>(), std::placeholders::_1, std::declval<Scalar>()) )
+    decltype( std::bind(std::declval<const BinaryFunction&>(), std::placeholders::_1, std::declval<const Scalar&>()) )
     >;
 
   template <typename BinaryFunction, typename Scalar, typename Image>
   using binary_scalar_image_expr = internal::transformed_image<
     Image,
-    decltype( std::bind(std::declval<BinaryFunction>(), std::declval<Scalar>(), std::placeholders::_1) )
+    decltype( std::bind(std::declval<const BinaryFunction&>(), std::declval<const Scalar&>(), std::placeholders::_1) )
     >;
 
   template <typename TernaryFunction, typename Image1, typename Image2, typename Image3>
@@ -52,7 +52,7 @@ namespace mln
   using ternary_image_image_scalar_expr = internal::transformed_image<
     zip_image<Image1, Image2>,
     internal::func_call_from_tupleargs<
-      decltype( std::bind(std::declval<TernaryFunction>(), std::placeholders::_1, std::placeholders::_2, std::declval<Scalar>()) ),
+      decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::placeholders::_2, std::declval<const Scalar&>()) ),
       mln_reference(Image1),
       mln_reference(Image2)>
     >;
@@ -61,7 +61,7 @@ namespace mln
   using ternary_image_scalar_image_expr = internal::transformed_image<
     zip_image<Image1, Image2>,
     internal::func_call_from_tupleargs<
-      decltype( std::bind(std::declval<TernaryFunction>(), std::placeholders::_1, std::declval<Scalar>(), std::placeholders::_2) ),
+      decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::declval<const Scalar&>(), std::placeholders::_2) ),
       mln_reference(Image1),
       mln_reference(Image2)>
     >;
@@ -69,7 +69,7 @@ namespace mln
   template <typename TernaryFunction, typename Image1, typename Scalar1, typename Scalar2>
   using ternary_image_scalar_scalar_expr = internal::transformed_image<
     Image1,
-    decltype( std::bind(std::declval<TernaryFunction>(), std::placeholders::_1, std::declval<Scalar1>(), std::declval<Scalar2>()) )
+    decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::declval<const Scalar1&>(), std::declval<const Scalar2&>()) )
     >;
 
 

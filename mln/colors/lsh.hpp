@@ -91,8 +91,6 @@ namespace mln
   {
     static constexpr float k = (1 << value_traits<T>::quant) / 6;
 
-    rgb<T> out;
-
     T l = v[0], s = v[1], h = v[2];
 
     int lambda = h / (int) k;

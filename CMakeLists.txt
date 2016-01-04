@@ -23,12 +23,16 @@ include_directories(${TBB_INCLUDE_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 link_directories(${TBB_LIBRARY_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
-link_libraries(${TBB_LIBRARIES} rt)
+link_libraries(${TBB_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++0x")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W -Wextra -Wall -g -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -W -Wextra -Wall -O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -W -Wextra -Wall -O2 -g -ggdb")
+if (UNIX AND NOT APPLE)
+   link_libraries(rt)
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++0x -Wno-unused-local-typedef")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -ggdb")
 
 
 # default buidling type

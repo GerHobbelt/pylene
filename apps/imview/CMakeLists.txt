@@ -1,3 +1,5 @@
+if(Qt4_FOUND)
+
 FIND_PACKAGE(Qt4 REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
@@ -22,4 +24,4 @@ add_executable(imview imview.cpp
 
 target_link_libraries(imview ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
 
-
+endif(Qt4_FOUND)

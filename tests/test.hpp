@@ -28,7 +28,7 @@ namespace mln
             io::imprint(f, msg);
             msg << " and\n:";
             io::imprint(g, msg);
-            BOOST_ERROR(msg);
+            BOOST_ERROR(msg.str());
           }
       }
 

@@ -56,7 +56,12 @@ namespace mln
       int
       operator() (const T& v) const
       {
-	return (int)(std::log10(std::abs(v))) + 1 ;
+        if (v < 0)
+          return (int)(std::log10(std::abs(v))) + 2;
+        else if (v > 0)
+          return (int)(std::log10(v)) + 1;
+        else
+          return 1;
       }
 
     };

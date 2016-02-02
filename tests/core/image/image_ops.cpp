@@ -112,15 +112,14 @@ BOOST_AUTO_TEST_CASE(WhereOperator)
   iota(x, 0);
   iota(y, 0);
 
-  auto f1 = where(x > 12, x, (uint8) 12);
-  auto f2 = where(x > 12, x, y);
-  auto f3 = where(x > 12, (uint8) 12, x);
-  auto f4 = where(x > 12, (uint8) 0, (uint8) 1);
-
+  auto f1 = where(x > 12, x, (uint8) 12);          // RValue image + LValue image + scalar
+  auto f2 = where(x > 12, x, y);                   // RValue image + LValue image + LValue image
+  auto f3 = where(x > 12, (uint8) 12, x);          // RValue image + Scalar + LValue image
+  auto f4 = where(x > 12, (uint8) 0, (uint8) 1);   // RValue image + Scalar + Scalar
 
 
   BOOST_CHECK( all(f1 >= 12) );
-  BOOST_CHECK( (std::is_same<mln_reference(decltype(f1)), uint8> ()) );
+  BOOST_CHECK( (std::is_same<mln_reference(decltype(f1)), const uint8&> ()) );
   BOOST_CHECK( (std::is_same<mln_reference(decltype(f2)), uint8&> ()) );
 }
 

@@ -26,19 +26,20 @@ namespace mln
   template <typename BinaryFunction, typename Image1, typename Image2>
   using binary_image_expr = internal::transformed_image<
     zip_image<Image1, Image2>,
-    internal::func_call_from_tupleargs<BinaryFunction, mln_reference(Image1), mln_reference(Image2)> >;
+    internal::func_call_from_tupleargs<BinaryFunction, mln_reference(Image1), mln_reference(Image2)>,
+    false>;
 
   template <typename BinaryFunction, typename Image, typename Scalar>
   using binary_image_scalar_expr = internal::transformed_image<
     Image,
-    decltype( std::bind(std::declval<const BinaryFunction&>(), std::placeholders::_1, std::declval<const Scalar&>()) )
-    >;
+    decltype( std::bind(std::declval<const BinaryFunction&>(), std::placeholders::_1, std::declval<const Scalar&>()) ),
+    false>;
 
   template <typename BinaryFunction, typename Scalar, typename Image>
   using binary_scalar_image_expr = internal::transformed_image<
     Image,
-    decltype( std::bind(std::declval<const BinaryFunction&>(), std::declval<const Scalar&>(), std::placeholders::_1) )
-    >;
+    decltype( std::bind(std::declval<const BinaryFunction&>(), std::declval<const Scalar&>(), std::placeholders::_1) ),
+    false>;
 
   template <typename TernaryFunction, typename Image1, typename Image2, typename Image3>
   using ternary_image_image_image_expr = internal::transformed_image<
@@ -46,7 +47,8 @@ namespace mln
     internal::func_call_from_tupleargs<TernaryFunction,
                                        mln_reference(Image1),
                                        mln_reference(Image2),
-                                       mln_reference(Image3)> >;
+                                       mln_reference(Image3)>,
+    false>;
 
   template <typename TernaryFunction, typename Image1, typename Image2, typename Scalar>
   using ternary_image_image_scalar_expr = internal::transformed_image<
@@ -54,8 +56,8 @@ namespace mln
     internal::func_call_from_tupleargs<
       decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::placeholders::_2, std::declval<const Scalar&>()) ),
       mln_reference(Image1),
-      mln_reference(Image2)>
-    >;
+      mln_reference(Image2)>,
+    false>;
 
   template <typename TernaryFunction, typename Image1, typename Scalar, typename Image2>
   using ternary_image_scalar_image_expr = internal::transformed_image<
@@ -63,14 +65,14 @@ namespace mln
     internal::func_call_from_tupleargs<
       decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::declval<const Scalar&>(), std::placeholders::_2) ),
       mln_reference(Image1),
-      mln_reference(Image2)>
-    >;
+      mln_reference(Image2)>,
+    false>;
 
   template <typename TernaryFunction, typename Image1, typename Scalar1, typename Scalar2>
   using ternary_image_scalar_scalar_expr = internal::transformed_image<
     Image1,
-    decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::declval<const Scalar1&>(), std::declval<const Scalar2&>()) )
-    >;
+    decltype( std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1, std::declval<const Scalar1&>(), std::declval<const Scalar2&>()) ),
+    false>;
 
 
 
@@ -111,20 +113,36 @@ namespace mln
       {
       }
 
+      // template <class TTuple, int... N>
+      // inline
+      // typename std::result_of<const Function(ArgType...)>::type
+      // call(const TTuple& x, intseq<N...>) const
+      // {
+      //   return f(static_cast<typename std::tuple_element<N, TTuple>::type>(std::get<N>(x))...);
+      // }
+
+      // inline
+      // typename std::result_of<const Function(ArgType...)>::type
+      // operator() (const std::tuple<ArgType...>& x) const
+      // {
+      //   return call(x, typename int_list_seq<sizeof...(ArgType)>::type ());
+      // }
+
       template <class TTuple, int... N>
       inline
-      typename std::result_of<const Function(ArgType...)>::type
-      call(const TTuple& x, intseq<N...>) const
+      typename std::result_of<const Function(ArgType&&...)>::type
+      call(TTuple&& x, intseq<N...>) const
       {
-        return f(std::get<N>(x)...);
+        return f(std::get<N>(std::move(x))...);
       }
 
       inline
-      typename std::result_of<const Function(ArgType...)>::type
-      operator() (const std::tuple<ArgType...>& x) const
+      typename std::result_of<const Function(ArgType&&...)>::type
+      operator() (std::tuple<ArgType...>&& x) const
       {
-        return call(x, typename int_list_seq<sizeof...(ArgType)>::type ());
+        return call(std::move(x), typename int_list_seq<sizeof...(ArgType)>::type ());
       }
+
 
     private:
       Function f;
@@ -182,7 +200,7 @@ namespace mln
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I3>::type>));
-    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2), std::forward<I2>(ima3));
+    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2), std::forward<I3>(ima3));
     internal::func_call_from_tupleargs<TernaryFunction, mln_reference(I1), mln_reference(I2), mln_reference(I3)> fun(f);
     return ternary_image_image_image_expr<TernaryFunction, I1, I2, I3>(std::move(z), fun);
   }

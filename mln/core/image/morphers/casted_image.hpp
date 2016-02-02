@@ -25,7 +25,7 @@ namespace mln
   imcast(Image<I>& ima);
 
   template <class V, class I>
-  casted_image<I&&, V>
+  casted_image<I, V>
   imcast(Image<I>&& ima);
 
   /******************************************/
@@ -61,10 +61,10 @@ namespace mln
   }
 
   template <class V, class I>
-  casted_image<I&&, V>
+  casted_image<I, V>
   imcast(Image<I>&& ima)
   {
-    return casted_image<I&&, V> (move_exact(ima), internal::cast_to<V> ());
+    return casted_image<I, V> (move_exact(ima), internal::cast_to<V> ());
   }
 
 }

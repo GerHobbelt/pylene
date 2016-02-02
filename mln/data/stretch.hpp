@@ -46,8 +46,8 @@ namespace mln
       double m, M;
       std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)> ());
 
-      double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0d;
-      double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0d;
+      double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
+      double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;
 
       double r = (y - x) / (M - m);
       transform(f, [m,x,r](mln_value(I) v) -> V { return x + (v - m) * r; }, out);
@@ -76,8 +76,8 @@ namespace mln
       double m, M;
       std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)> ());
 
-      double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0d;
-      double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0d;
+      double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
+      double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;
 
       double r = (y - x) / (M - m);
       mln_ch_value(I, V) out = transform(f, [m,x,r](mln_value(I) v) -> V { return x + (v - m) * r; });

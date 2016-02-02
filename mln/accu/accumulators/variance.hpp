@@ -33,20 +33,6 @@ namespace mln
       struct variance;
     }
 
-    namespace extractor
-    {
-
-      template <typename A>
-      inline
-      auto
-      variance(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), features::variance<> ()))
-      {
-        return extract(exact(acc), features::variance<> ());
-      }
-
-    }
-
 
     namespace features
     {
@@ -73,6 +59,20 @@ namespace mln
                                                internal::meta_variance<SumType, SumSqrType>::template type>
       {
       };
+    }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      inline
+      auto
+      variance(const Accumulator<A>& acc)
+        -> decltype(extract(exact(acc), features::variance<> ()))
+      {
+        return extract(exact(acc), features::variance<> ());
+      }
+
     }
 
     namespace accumulators

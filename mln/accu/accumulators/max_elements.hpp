@@ -41,19 +41,6 @@ namespace mln
       struct maximal_elements;
     }
 
-    namespace extractor
-    {
-
-      template <typename A>
-      auto
-      maximal_elements(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::maximal_elements<> ()) )
-      {
-        return extract(exact(acc), features::maximal_elements<> ());
-      }
-
-    }
-
 
     namespace features
     {
@@ -94,6 +81,20 @@ namespace mln
       {
       };
     }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      auto
+      maximal_elements(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), features::maximal_elements<> ()) )
+      {
+        return extract(exact(acc), features::maximal_elements<> ());
+      }
+
+    }
+
 
     namespace accumulators
     {

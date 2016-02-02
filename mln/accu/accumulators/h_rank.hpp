@@ -55,7 +55,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typename accumulators::h_rank<T, Ratio> type;
+          typedef typename accumulators::h_rank<T, Ratio> type;
         };
 
         template <typename T>

@@ -34,20 +34,6 @@ namespace mln
       struct minimal_elements;
     }
 
-    namespace extractor
-    {
-
-      template <typename A>
-      auto
-      minimal_elements(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), features::minimal_elements<> ()) )
-      {
-        return extract(exact(acc), features::minimal_elements<> ());
-      }
-
-    }
-
-
     namespace features
     {
       template <typename Compare>
@@ -87,6 +73,20 @@ namespace mln
       {
       };
     }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      auto
+      minimal_elements(const Accumulator<A>& acc)
+        -> decltype( extract(exact(acc), features::minimal_elements<> ()) )
+      {
+        return extract(exact(acc), features::minimal_elements<> ());
+      }
+
+    }
+
 
     namespace accumulators
     {

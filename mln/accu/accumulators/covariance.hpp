@@ -33,21 +33,6 @@ namespace mln
       struct covariance;
     }
 
-  namespace extractor
-  {
-
-    template <typename A>
-    inline
-    auto
-    covariance(const Accumulator<A>& acc)
-      -> decltype(extract(exact(acc), features::covariance<> ()))
-    {
-      return extract(exact(acc), features::covariance<> ());
-    }
-
-  }
-
-
   namespace features
   {
     namespace internal
@@ -73,7 +58,21 @@ namespace mln
                                                internal::meta_covariance<SumType, SumSqrType>::template type>
     {
     };
-}
+  }
+
+  namespace extractor
+  {
+
+    template <typename A>
+    inline
+    auto
+    covariance(const Accumulator<A>& acc)
+      -> decltype(extract(exact(acc), features::covariance<> ()))
+    {
+      return extract(exact(acc), features::covariance<> ());
+    }
+
+  }
 
   namespace accumulators
   {
@@ -92,7 +91,7 @@ namespace mln
       typedef Eigen::Array<SumSqrType, ndim, ndim>     matrix_t;
 
     public:
-
+      typedef Eigen::Array<double, ndim, 1>     mean_result_type;
       typedef T                                 argument_type;
       typedef Eigen::Array<double, ndim, ndim>  result_type;
 
@@ -148,7 +147,6 @@ namespace mln
         m_S -= other.m_S;
       }
 
-
       template <class ST1, class ST2>
       friend
       result_type extract(const covariance& accu, features::covariance<ST1, ST2> )
@@ -163,6 +161,17 @@ namespace mln
             COV(i,j) = (COV(j,i) = (accu.m_S(i,j) / n) - (accu.m_sum(i) * accu.m_sum(j)) / sqr(n));
 
         return COV;
+      }
+
+      template <class S>
+      friend
+      mean_result_type
+      extract(const covariance& accu, features::mean<S>)
+      {
+        if (accu.m_count == 0)
+          return mean_result_type::Zero();
+
+        return accu.m_sum / (double)accu.m_count;
       }
 
       friend

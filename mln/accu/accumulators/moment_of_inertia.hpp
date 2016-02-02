@@ -44,20 +44,6 @@ namespace mln
       struct moment_of_inertia;
     }
 
-    namespace extractor
-    {
-
-      template <typename A>
-      inline
-      auto
-      moment_of_inertia(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), features::moment_of_inertia<> ()))
-      {
-        return extract(exact(acc), features::moment_of_inertia<> ());
-      }
-
-    }
-
 
     namespace features
     {
@@ -86,6 +72,20 @@ namespace mln
         >
       {
       };
+    }
+
+    namespace extractor
+    {
+
+      template <typename A>
+      inline
+      auto
+      moment_of_inertia(const Accumulator<A>& acc)
+        -> decltype(extract(exact(acc), features::moment_of_inertia<> ()))
+      {
+        return extract(exact(acc), features::moment_of_inertia<> ());
+      }
+
     }
 
     namespace accumulators

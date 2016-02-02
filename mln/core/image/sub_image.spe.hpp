@@ -43,7 +43,7 @@ namespace mln
     other.last_ = (char*) &image(domain.pmax - 1);
     other.m_ptr_origin = image.m_ptr_origin;
     other.m_index_first = image.index_of_point(domain.pmin);
-    other.m_index_last = image.index_of_point(domain.pmax);
+    other.m_index_last = image.index_of_point(domain.pmax - 1);
     return other;
   }
 

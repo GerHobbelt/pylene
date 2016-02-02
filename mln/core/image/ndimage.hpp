@@ -266,6 +266,13 @@ namespace mln
     /// \copydoc image::pixel_at(const point_type&) const
     const_pixel_type    pixel_at(const point_type& p) const;
 
+    /// \copydoc image::pixel_at_index(size_type) const
+    pixel_type          pixel_at_index(size_type i);
+
+    /// \copydoc image::pixel_at_index(size_type) const
+    const_pixel_type    pixel_at_index(size_type i) const;
+
+
     /// \copydoc image::pixel(const point_type&) const
     pixel_type          pixel(const point_type& p);
 
@@ -426,7 +433,7 @@ namespace mln
     T*					m_ptr_origin;		///< Pointer to the first element
     std::array<std::size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
     size_t				m_index_first;          ///< index of pmin
-    size_t				m_index_last;           ///< index of pmax
+    size_t				m_index_last;           ///< index of pmax-1
   };
 
   /******************************/
@@ -778,9 +785,10 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at(const point_type& p)
   {
     pixel_type pix;
-    pix.point_ = p;
     pix.ima_  = (E*)this;
-    pix.ptr_ = (char*) & (operator () (p));
+    pix.point_ = p;
+    pix.index_ = this->index_of_point(p);
+    pix.ptr_ = (char*) (m_ptr_origin + pix.index_);
     return pix;
   }
 
@@ -789,11 +797,40 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_pixel_type
   ndimage_base<T,dim,E>::pixel_at(const point_type& p) const
   {
-    const_pixel_type pix((const E*) this);
+    const_pixel_type pix;
+    pix.ima_  = (const E*)this;
     pix.point_ = p;
-    pix.ptr_ = (char*) & (operator () (p));
+    pix.index_ = this->index_of_point(p);
+    pix.ptr_ = (char*) (m_ptr_origin + pix.index_);
     return pix;
   }
+
+  template <typename T, unsigned dim, typename E>
+  inline
+  typename ndimage_base<T,dim,E>::pixel_type
+  ndimage_base<T,dim,E>::pixel_at_index(size_type i)
+  {
+    pixel_type pix;
+    pix.ima_  = (E*)this;
+    pix.point_ = this->point_at_index(i);
+    pix.index_ = i;
+    pix.ptr_ = (char*) (m_ptr_origin + i);
+    return pix;
+  }
+
+  template <typename T, unsigned dim, typename E>
+  inline
+  typename ndimage_base<T,dim,E>::const_pixel_type
+  ndimage_base<T,dim,E>::pixel_at_index(size_type i) const
+  {
+    pixel_type pix;
+    pix.ima_  = (const E*)this;
+    pix.point_ = this->point_at_index(i);
+    pix.index_ = i;
+    pix.ptr_ = (char*) (m_ptr_origin + i);
+    return pix;
+  }
+
 
 
   template <typename T, unsigned dim, typename E>
@@ -831,17 +868,23 @@ namespace mln
   typename ndimage_base<T,dim,E>::point_type
   ndimage_base<T,dim,E>::point_at_index(size_type idx) const
   {
-    int k = idx;
-    int kpmin = m_index_first;
-    point_type p = point_type ();
+    point_type p = domain_.pmin - border_;
+
+    int diff = idx - m_index_first;
+    for (unsigned i = 0; i < dim; ++i) {
+      diff += m_index_strides[i] * border_;
+    }
 
     for (unsigned i = 0; i < dim; ++i) {
-      std::div_t off = std::div((int)kpmin,  (int)m_index_strides[i]);
-      std::div_t res = std::div((int)k,  (int)m_index_strides[i]);
-      p[i] = res.quot - off.quot + domain_.pmin[i];
-      k = res.rem;
-      kpmin = off.rem;
+      std::div_t q = std::div(diff,  (int)m_index_strides[i]);
+      if (q.rem < 0) {
+        q.rem += m_index_strides[i];
+        q.quot -= 1;
+      }
+      p[i] += q.quot;
+      diff = q.rem;
     }
+
     mln_postcondition(vbox_.has(p));
     return p;
   }

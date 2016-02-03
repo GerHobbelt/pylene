@@ -54,7 +54,7 @@ namespace mln
     {
 
       int
-      operator() (const T& v) const
+      operator() (double v) const
       {
         if (v < 0)
           return (int)(std::log10(std::abs(v))) + 2;

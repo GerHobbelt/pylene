@@ -7,11 +7,15 @@
 # include <iostream>
 # include <stack>
 # include <string>
-//# include <mutex>
 # include <thread>
+
+#if MLN_HAS_TBB
 # include <tbb/compat/thread>
 # include <tbb/combinable.h>
 # include <tbb/tick_count.h>
+#else
+# include <chrono>
+#endif
 
 # define mln_entering(NAME) \
   mln::trace::entering(NAME);
@@ -23,6 +27,8 @@ namespace mln
 
   namespace trace
   {
+
+#if MLN_HAS_TBB
     struct trace_t
     {
       explicit trace_t(const std::string& fun)
@@ -79,9 +85,62 @@ namespace mln
                   << "#" << std::this_thread::get_id() << " - "
                   << msg << std::endl;
     }
+#else
 
+    struct trace_t
+    {
+      explicit trace_t(const std::string& fun)
+	: fname (fun)
+      {
+	clock = std::chrono::system_clock::now();
+      }
+
+      std::string       fname;
+      std::chrono::time_point<std::chrono::system_clock>   clock;
+    };
+
+    static std::stack<trace_t> callstack;
+    static bool verbose = (std::getenv("TRACE") != NULL);
+
+    static inline
+    void entering(const std::string& fname)
+    {
+      if (verbose) {
+        callstack.emplace(fname);
+
+	std::clog << std::string(callstack.size(), ' ')
+                  << "#" << std::this_thread::get_id() << " - "
+                  << fname << std::endl;
+      }
+    };
+
+
+    static inline
+    void exiting()
+    {
+      if (verbose) {
+	trace_t tr = callstack.top();
+        std::chrono::duration_cast<std::chrono::seconds> duration = (std::chrono::system_clock::now() - tr.clock);
+	std::clog << std::string(callstack.size(), ' ')
+                  << "#" << std::this_thread::get_id() << " - "
+                  << tr.fname
+		  << " in " << duration.count() << std::endl;
+
+        callstack.pop();
+      }
+    };
+
+    inline
+    void warn(const std::string& msg)
+    {
+      if (verbose)
+        std::clog << std::string(callstacks.local().size(), ' ')
+                  << "#" << std::this_thread::get_id() << " - "
+                  << msg << std::endl;
+    }
+
+#endif
   }
-
 }
 
 #endif // ! TRACE_HPP

@@ -5,7 +5,10 @@
 # include <mln/core/point.hpp>
 # include <mln/core/image/internal/nested_loop_iterator.hpp>
 # include <mln/core/domain/box_iter.hpp>
-# include <tbb/tbb_stddef.h>
+
+# if MLN_HAS_TBB
+#  include <tbb/tbb_stddef.h>
+# endif
 
 
 namespace mln
@@ -148,7 +151,7 @@ namespace mln
     }
 
 
-#ifndef MLN_DISABLE_PARALLELIZATION
+#if MLN_HAS_TBB
 
     box(box& r, tbb::split)
     {
@@ -281,7 +284,7 @@ namespace mln
       return (this->pmax[0] - this->pmin[0]) > (int)m_grain;
     }
 
-#ifndef MLN_DISABLE_PARALLELIZATION
+#if MLN_HAS_TBB
 
     grain_box(grain_box& r, tbb::split)
       : base(r, tbb::split ()), m_grain (r.m_grain)

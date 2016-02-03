@@ -11,29 +11,37 @@ find_package(Qt4)
 
 if(TBB_FOUND)
         MESSAGE (STATUS "TBB found in ${TBB_INSTALL_DIR} + ${TBB_LIBRARY_DIRS}")
-else()
-        MESSAGE (FATAL "TBB not found.")
 endif()
+
+# CONFIGURATION OPTIONS
+set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
 
 
 # add source directory to find mln path
 include_directories("${PROJECT_SOURCE_DIR}")
-include_directories(${TBB_INCLUDE_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-link_directories(${TBB_LIBRARY_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
-link_libraries(${TBB_LIBRARIES})
+
+if (TBB_FOUND AND MLN_USE_TBB)
+  include_directories(${TBB_INCLUDE_DIRS})
+  link_directories(${TBB_LIBRARY_DIRS})
+  link_libraries(${TBB_LIBRARIES})
+else()
+  add_definitions(-DMLN_NO_TBB)
+endif()
 
 if (UNIX AND NOT APPLE)
    link_libraries(rt)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++0x -Wno-unused-local-typedef")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -ggdb")
-
+if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++14 -Wno-unused-local-typedef")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -ggdb")
+endif()
+message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 
 # default buidling type
 if (NOT CMAKE_BUILD_TYPE)

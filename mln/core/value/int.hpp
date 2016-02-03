@@ -181,11 +181,11 @@ namespace mln {
     typedef typename boost::uint_t<nbits>::least enc;
 
   public:
-    UInt() = default;
+    constexpr UInt() = default;
     constexpr UInt(enc x) : m_x(x) {}
-    operator enc& ()          { return m_x; }
+    constexpr operator enc& ()          { return m_x; }
 //operator enc  () const     { return m_x; }
-    operator unsigned () const { return m_x; }
+    constexpr operator unsigned () const { return m_x; }
 
   private:
     enc m_x;
@@ -198,11 +198,11 @@ namespace mln {
     typedef typename boost::int_t<nbits>::least enc;
 
   public:
-    Int() = default;
+    constexpr Int() = default;
     constexpr Int(enc x) : m_x(x) {}
-    operator enc& ()           { return m_x; }
+    constexpr operator enc& ()           { return m_x; }
 //    operator enc  () const     { return m_x; }
-    operator int () const { return m_x; }
+    constexpr operator int () const { return m_x; }
 
   private:
     enc m_x;

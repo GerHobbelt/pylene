@@ -93,12 +93,12 @@ namespace mln
   private:
     const Derived* derived() const
     {
-      return reinterpret_cast<const Derived*>(this);
+      return static_cast<const Derived*>(this);
     }
 
     Derived* derived()
     {
-      return reinterpret_cast<Derived*>(this);
+      return static_cast<Derived*>(this);
     }
 
   };

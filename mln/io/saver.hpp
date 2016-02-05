@@ -87,7 +87,7 @@ namespace mln
     void
     Saver2D<I, category>::m_set_domain(const I& ima, PluginWriter* plugin)
     {
-      PluginWriter2D* plug = reinterpret_cast<PluginWriter2D*>(plugin);
+      PluginWriter2D* plug = static_cast<PluginWriter2D*>(plugin);
       plug->set_domain(ima.domain());
     }
 
@@ -95,7 +95,7 @@ namespace mln
     void
     Saver2D<I, raw_image_tag>::m_set_domain(const I& ima, PluginWriter* plugin)
     {
-      PluginWriter2D* plug = reinterpret_cast<PluginWriter2D*>(plugin);
+      PluginWriter2D* plug = static_cast<PluginWriter2D*>(plugin);
       plug->set_domain(ima.domain());
     }
 
@@ -106,7 +106,7 @@ namespace mln
     {
       (void) permissive;
 
-      PluginWriter2D* plug = reinterpret_cast<PluginWriter2D*>(plugin);
+      PluginWriter2D* plug = static_cast<PluginWriter2D*>(plugin);
       std::function<void(void*)> write_line =
         plug->get_write_next_line_method();
 

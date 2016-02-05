@@ -11,7 +11,7 @@ namespace mln
     typename Morpher::image_t&
     get_ima_(Morpher* morpher)
     {
-      return reinterpret_cast<typename Morpher::derived_t*>(morpher)->m_ima;
+      return static_cast<typename Morpher::derived_t*>(morpher)->m_ima;
     }
 
 
@@ -20,7 +20,7 @@ namespace mln
     const typename Morpher::image_t&
     get_ima_(const Morpher* morpher)
     {
-      return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
+      return static_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
     }
 
     template <typename Morpher>
@@ -28,7 +28,7 @@ namespace mln
     typename Morpher::image_t&
     get_ima(Morpher* morpher)
     {
-      return reinterpret_cast<typename Morpher::derived_t*>(morpher)->get_morphed();
+      return static_cast<typename Morpher::derived_t*>(morpher)->get_morphed();
     }
 
 
@@ -37,7 +37,7 @@ namespace mln
     const typename Morpher::image_t&
     get_ima(const Morpher* morpher)
     {
-      return reinterpret_cast<const typename Morpher::derived_t*>(morpher)->get_morphed();
+      return static_cast<const typename Morpher::derived_t*>(morpher)->get_morphed();
     }
 
 
@@ -46,7 +46,7 @@ namespace mln
     typename PixMorpher::pixel_t&
     get_pix_(PixMorpher* morpher)
     {
-      return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->m_pix;
+      return static_cast<typename PixMorpher::derived_t*>(morpher)->m_pix;
     }
 
 
@@ -55,7 +55,7 @@ namespace mln
     const typename PixMorpher::pixel_t&
     get_pix_(const PixMorpher* morpher)
     {
-      return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->m_pix;
+      return static_cast<const typename PixMorpher::derived_t*>(morpher)->m_pix;
     }
 
     template <typename PixMorpher>
@@ -63,7 +63,7 @@ namespace mln
     typename PixMorpher::pixel_t&
     get_pix(PixMorpher* morpher)
     {
-      return reinterpret_cast<typename PixMorpher::derived_t*>(morpher)->get_morphed();
+      return static_cast<typename PixMorpher::derived_t*>(morpher)->get_morphed();
     }
 
 
@@ -72,7 +72,7 @@ namespace mln
     const typename PixMorpher::pixel_t&
     get_pix(const PixMorpher* morpher)
     {
-      return reinterpret_cast<const typename PixMorpher::derived_t*>(morpher)->get_morphed();
+      return static_cast<const typename PixMorpher::derived_t*>(morpher)->get_morphed();
     }
 
   };

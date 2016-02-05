@@ -265,7 +265,7 @@ namespace mln
     void
     Loader2D<I, category>::m_resize()
     {
-      PluginReader2D* plug = reinterpret_cast<PluginReader2D*>(this->m_plugin);
+      PluginReader2D* plug = static_cast<PluginReader2D*>(this->m_plugin);
       box2d dom = plug->get_domain();
       this->m_ima->resize(dom);
     }
@@ -274,7 +274,7 @@ namespace mln
     void
     Loader2D<I, raw_image_tag>::m_resize()
     {
-      PluginReader2D* plug = reinterpret_cast<PluginReader2D*>(this->m_plugin);
+      PluginReader2D* plug = static_cast<PluginReader2D*>(this->m_plugin);
       box2d dom = plug->get_domain();
       this->m_ima->resize(dom, this->m_ima->border());
     }
@@ -283,7 +283,7 @@ namespace mln
     void
     Loader2D<I, raw_image_tag>::m_load()
     {
-      PluginReader2D* plug = reinterpret_cast<PluginReader2D*>(this->m_plugin);
+      PluginReader2D* plug = static_cast<PluginReader2D*>(this->m_plugin);
       box2d dom = this->m_ima->domain();
       point2d p = dom.pmin;
       point2d q = dom.pmax;

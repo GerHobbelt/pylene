@@ -84,7 +84,7 @@ namespace mln
       template <class>
       friend struct pixel_t;
 
-      typedef constant_image::point_type point_type;
+      typedef typename constant_image::point_type point_type;
       typedef point_type site_type;
       typedef I image_type;
       typedef V value_type;
@@ -92,7 +92,10 @@ namespace mln
       typedef unsigned size_type;
 
       pixel_t() = default;
-      pixel_t(const pixel_t&) = default;
+      pixel_t(const pixel_t& other)
+	  	: m_ima (other.m_ima), m_p (other.m_p) , m_value (other.m_value)
+	  {
+	  }
 
       template <class dummy = void>
       pixel_t(const pixel_t<typename std::remove_const<I>::type>& other,
@@ -130,7 +133,10 @@ namespace mln
 
     public:
       pixel_iterator_t() = default;
-      pixel_iterator_t(const pixel_iterator_t&) = default;
+      pixel_iterator_t(const pixel_iterator_t& other)
+	  	: m_ima (other.m_ima), m_x (other.m_x), m_value (other.m_value)
+      {
+      }
 
       template <class dummy = void>
       pixel_iterator_t(const pixel_iterator_t<typename std::remove_const<I>::type>& other,

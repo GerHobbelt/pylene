@@ -25,27 +25,27 @@ namespace mln
 
   };
 
-  template <typename Iterator, typename UnaryFunction,
+  template <typename Iterator_, typename UnaryFunction,
             typename Reference = use_default,
             typename Value = use_default>
   struct transform_iterator :
-    iterator_base< transform_iterator<Iterator, UnaryFunction>,
-                   typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::value_type,
-                   typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference >
+    iterator_base< transform_iterator<Iterator_, UnaryFunction>,
+                   typename internal::transform_iterator_helper<Iterator_, UnaryFunction, Reference, Value>::value_type,
+                   typename internal::transform_iterator_helper<Iterator_, UnaryFunction, Reference, Value>::reference >
   {
-    typedef typename internal::transform_iterator_helper<Iterator, UnaryFunction, Reference, Value>::reference reference;
-    typedef typename Iterator::has_NL has_NL;
+    typedef typename internal::transform_iterator_helper<Iterator_, UnaryFunction, Reference, Value>::reference reference;
+    typedef typename Iterator_::has_NL has_NL;
 
     transform_iterator() = default;
 
-    transform_iterator(const Iterator& it, const UnaryFunction& f)
+    transform_iterator(const Iterator_& it, const UnaryFunction& f)
       : it_ (it), f_ (f)
     {
     }
 
     template <typename Iterator2, typename UnaryFunction2, typename Reference2, typename Value2>
     transform_iterator(const transform_iterator<Iterator2, UnaryFunction2, Reference2, Value2>& other,
-		       typename std::enable_if<std::is_convertible<Iterator2, Iterator>::value>::type* = NULL)
+		       typename std::enable_if<std::is_convertible<Iterator2, Iterator_>::value>::type* = NULL)
       : it_ (other.it_), f_ (other.f_)
     {
     }
@@ -63,7 +63,7 @@ namespace mln
     template <typename, typename, typename, typename>
     friend struct transform_iterator;
 
-    Iterator it_;
+    Iterator_ it_;
     UnaryFunction f_;
   };
 

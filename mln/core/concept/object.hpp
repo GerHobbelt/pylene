@@ -2,6 +2,7 @@
 # define MLN_CORE_CONCEPT_OBJECT_HPP
 
 # include <type_traits>
+# include <mln/core/config.hpp>
 
 namespace mln {
 

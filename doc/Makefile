@@ -2,8 +2,8 @@ doc:
 	sphinx-build -b html source build
 
 doxy:
-	#doxygen
-	/lrde/home/stage/carlinet/Downloads/doxygen/bin/doxygen
+	doxygen
+	#/lrde/home/stage/carlinet/Downloads/doxygen/bin/doxygen
 
 extract:
 	#sudo systemctl start mongod.service

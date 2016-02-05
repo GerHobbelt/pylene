@@ -35,16 +35,16 @@ namespace mln
   /*****************/
 
 
-  template <typename Iterator>
+  template <typename Iterator_>
   struct proxy_iterator
-    : iterator_base< proxy_iterator<Iterator>,
-		     typename Iterator::value_type,
-		     typename Iterator::reference >
+    : iterator_base< proxy_iterator<Iterator_>,
+		     typename Iterator_::value_type,
+		     typename Iterator_::reference >
   {
     proxy_iterator() = default;
 
 
-    proxy_iterator(const Iterator& x)
+    proxy_iterator(const Iterator_& x)
     : x_ (x)
     {
     }
@@ -64,7 +64,7 @@ namespace mln
     }
 
     bool finished() const { return x_.finished(); }
-    typename Iterator::reference dereference() const { return *x_; }
+    typename Iterator_::reference dereference() const { return *x_; }
 
     void set_dejavu_(bool v)
     {
@@ -72,7 +72,7 @@ namespace mln
     }
 
   private:
-    Iterator x_;
+    Iterator_ x_;
     bool deja_vu_;
   };
 

@@ -14,7 +14,7 @@
 BOOST_AUTO_TEST_CASE(Maxtree)
 {
   using namespace mln;
-  typedef UInt<8> V;
+  typedef uint8 V;
   typedef typename image2d<V>::size_type size_type;
   image2d<V> ima(500, 500);
 

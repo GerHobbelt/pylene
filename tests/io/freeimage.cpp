@@ -16,9 +16,9 @@
 #include <boost/test/unit_test.hpp>
 
 
-BOOST_AUTO_TEST_SUITE()
+BOOST_AUTO_TEST_SUITE(FreeImage)
 
-BOOST_AUTO_TEST_CASE(Freeimage_pgm)
+BOOST_AUTO_TEST_CASE(pgm)
 {
   using namespace mln;
 
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(Freeimage_pgm)
 
 
 
-BOOST_AUTO_TEST_CASE(Freeimage_ppm)
+BOOST_AUTO_TEST_CASE(ppm)
 {
   using namespace mln;
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(Freeimage_ppm)
   BOOST_CHECK(equal(ima, ref));
 }
 
-BOOST_AUTO_TEST_CASE(Freeimage_pbm)
+BOOST_AUTO_TEST_CASE(pbm)
 {
   using namespace mln;
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(Freeimage_pbm)
   BOOST_CHECK(equal(ima, ref));
 }
 
-BOOST_AUTO_TEST_CASE(Freeimage_slow_pgm)
+BOOST_AUTO_TEST_CASE(slow_pgm)
 {
   using namespace mln;
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(Freeimage_slow_pgm)
 
 
 
-BOOST_AUTO_TEST_CASE(Freeimage_slow_ppm)
+BOOST_AUTO_TEST_CASE(slow_ppm)
 {
   using namespace mln;
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(Freeimage_slow_ppm)
   BOOST_CHECK(equal(ima, 2 * ref));
 }
 
-BOOST_AUTO_TEST_CASE(Freeimage_slow_pbm)
+BOOST_AUTO_TEST_CASE(slow_pbm)
 {
   using namespace mln;
 

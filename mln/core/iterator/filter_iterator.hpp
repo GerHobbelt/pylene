@@ -7,7 +7,7 @@
 namespace mln
 {
 
-  template <typename Iterator, typename Predicate>
+  template <typename Iterator_, typename Predicate>
   struct filter_iterator;
 
   template <typename Iterator, typename Predicate>
@@ -18,18 +18,18 @@ namespace mln
   /*** Implementation  */
   /*********************/
 
-  template <typename Iterator, typename Predicate>
-  struct filter_iterator : iterator_base< filter_iterator<Iterator, Predicate>,
-					  typename Iterator::value_type,
-					  typename Iterator::reference>
+  template <typename Iterator_, typename Predicate>
+  struct filter_iterator : iterator_base< filter_iterator<Iterator_, Predicate>,
+					  typename Iterator_::value_type,
+					  typename Iterator_::reference>
   {
-    typedef typename Iterator::value_type value_type;
-    typedef typename Iterator::reference  reference;
+    typedef typename Iterator_::value_type value_type;
+    typedef typename Iterator_::reference  reference;
 
 
     filter_iterator() {}
 
-    filter_iterator(const Iterator& iterator, const Predicate& pred)
+    filter_iterator(const Iterator_& iterator, const Predicate& pred)
       : m_it (iterator),
 	m_pred (pred)
     {
@@ -37,7 +37,7 @@ namespace mln
 
     template <typename Other>
     filter_iterator(const filter_iterator<Other, Predicate>& other,
-		    typename std::enable_if< std::is_convertible<Other, Iterator>::value >::type* = NULL)
+		    typename std::enable_if< std::is_convertible<Other, Iterator_>::value >::type* = NULL)
       : m_it (other.m_it),
 	m_pred (other.m_pred)
     {
@@ -71,7 +71,7 @@ namespace mln
     template <typename, typename>
     friend struct filter_iterator;
 
-    Iterator  m_it;
+    Iterator_  m_it;
     Predicate m_pred;
   };
 

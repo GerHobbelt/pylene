@@ -8,17 +8,17 @@ namespace mln
     namespace details
     {
 
-      template <typename I, typename Pixel>
+      template <typename I, typename Pixel_>
       struct wrap_pixel :
-        morpher_pixel_base< wrap_pixel<I, Pixel>,
-                            typename std::remove_reference<Pixel>::type, I>
+        morpher_pixel_base< wrap_pixel<I, Pixel_>,
+                            typename std::remove_reference<Pixel_>::type, I>
       {
         friend struct mln::morpher_core_access;
         typedef I                      image_type;
         typedef typename I::reference  reference;
         typedef typename I::value_type value_type;
 
-        wrap_pixel(I& ima, const Pixel& pix)
+        wrap_pixel(I& ima, const Pixel_& pix)
           : m_ima(&ima), m_pix(pix)
         {
         }
@@ -28,7 +28,7 @@ namespace mln
 
       private:
         I*    m_ima;
-        Pixel m_pix;
+        Pixel_ m_pix;
       };
 
 

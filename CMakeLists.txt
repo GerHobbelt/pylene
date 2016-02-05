@@ -21,6 +21,8 @@ set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelizat
 # add source directory to find mln path
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(${FreeImage_INCLUDE_DIRS})
+link_directories(${FreeImage_LIBRARY_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
 if (TBB_FOUND AND MLN_USE_TBB)
@@ -35,13 +37,13 @@ if (UNIX AND NOT APPLE)
    link_libraries(rt)
 endif()
 
+
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++14 -Wno-unused-local-typedef")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -ggdb")
 endif()
-message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 
 # default buidling type
 if (NOT CMAKE_BUILD_TYPE)

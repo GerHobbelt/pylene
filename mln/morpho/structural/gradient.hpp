@@ -1,4 +1,4 @@
-#ifndef MLN_MORPHO_STRUCTURAL_GRADIENT_HPP
+﻿#ifndef MLN_MORPHO_STRUCTURAL_GRADIENT_HPP
 # define MLN_MORPHO_STRUCTURAL_GRADIENT_HPP
 
 # include <mln/core/image/image.hpp>
@@ -170,16 +170,16 @@ namespace mln
       }
 
 
-      template <class I, class SE, class Compare, class Norm>
-      mln_ch_value(I, typename std::result_of<Norm(mln_value(I))>::type)
+      template <class I, class SE, class Compare, class NormFunction>
+      mln_ch_value(I, typename std::result_of<NormFunction(mln_value(I))>::type)
         gradient(const Image<I>& ima_,
                  const StructuringElement<SE>& se,
-                 Compare cmp, Norm norm)
+                 Compare cmp, NormFunction norm)
       {
         const I& ima = exact(ima_);
 
         typedef mln_value(I) V;
-        typedef typename std::result_of<Norm(V)>::type result_type;
+        typedef typename std::result_of<NormFunction(V)>::type result_type;
 
         mln_ch_value(I, result_type) out = imchvalue<result_type> (ima);
         mln::morpho::structural::gradient(ima, se, cmp, norm, out);
@@ -206,16 +206,16 @@ namespace mln
       }
 
 
-      template <class I, class SE, class Compare, class Norm>
-      mln_ch_value(I, typename std::result_of<Norm(mln_value(I))>::type)
+      template <class I, class SE, class Compare, class NormFunction>
+      mln_ch_value(I, typename std::result_of<NormFunction(mln_value(I))>::type)
         external_gradient(const Image<I>& ima_,
                           const StructuringElement<SE>& se,
-                          Compare cmp, Norm norm)
+                          Compare cmp, NormFunction norm)
       {
         const I& ima = exact(ima_);
 
         typedef mln_value(I) V;
-        typedef typename std::result_of<Norm(V)>::type result_type;
+        typedef typename std::result_of<NormFunction(V)>::type result_type;
 
         mln_ch_value(I, result_type) out = imchvalue<result_type> (ima);
         mln::morpho::structural::external_gradient(ima, se, cmp, norm, out);

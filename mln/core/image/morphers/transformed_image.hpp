@@ -195,12 +195,18 @@ namespace mln
     template <typename I>
     struct transformed_image_helper<I, std::true_type>
     {
+		transformed_image_helper (I&& f) : m_ima { std::forward<I>(f) }
+		{
+		}
       I m_ima;
     };
 
     template <typename I>
     struct transformed_image_helper<I, std::false_type>
     {
+	    transformed_image_helper (I&& f) : m_ima { std::forward<I>(f) }
+		{
+		}
       mutable I m_ima;
     };
 
@@ -302,7 +308,7 @@ namespace mln
       transformed_image() = default;
 
       transformed_image(I&& ima, const UnaryFunction& f)
-        : transformed_image_helper<I> { std::forward<I>(ima) },
+		  : transformed_image_helper<I>( std::forward<I>(ima) ),
           m_fun(f)
       {
       }
@@ -444,7 +450,7 @@ namespace mln
 
     template <typename I, class UnaryFunction>
     struct transformed_image<I, UnaryFunction, false>::pixel_type
-      : morpher_pixel_base<transformed_image<I, UnaryFunction, false>::pixel_type, mln_pixel(I)>
+      : morpher_pixel_base<typename transformed_image<I, UnaryFunction, false>::pixel_type, mln_pixel(I)>
     {
       friend struct mln::morpher_core_access;
       friend struct const_pixel_type;
@@ -475,12 +481,12 @@ namespace mln
 
     template <typename I, class UnaryFunction>
     struct transformed_image<I, UnaryFunction, false>::const_pixel_type
-      : morpher_pixel_base<transformed_image<I, UnaryFunction, false>::const_pixel_type, mln_pixel(I)>
+      : morpher_pixel_base<typename transformed_image<I, UnaryFunction, false>::const_pixel_type, mln_pixel(I)>
     {
       friend struct mln::morpher_core_access;
       typedef const transformed_image<I, UnaryFunction, false>                  image_type;
-      typedef transformed_image<I, UnaryFunction, false>::value_type		value_type;
-      typedef transformed_image<I, UnaryFunction, false>::const_reference	reference;
+      typedef typename transformed_image<I, UnaryFunction, false>::value_type		value_type;
+      typedef typename transformed_image<I, UnaryFunction, false>::const_reference	reference;
 
       const_pixel_type(const mln_pixel(I)& px, image_type* ima)
 	: m_pix(px), m_ima(ima)

@@ -71,7 +71,11 @@
 
 #ifndef MLN_CORE_IMAGE_IMAGE_HPP
 # include <mln/core/image/image.hpp>
+# if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 # warning "this part should be included by mln/core/image/image.hpp only"
+# elif defined(_MSC_VER)
+# pragma message("this part should be included by mln/core/image/image.hpp only")
+# endif
 #endif
 
 

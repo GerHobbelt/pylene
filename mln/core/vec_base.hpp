@@ -1,14 +1,23 @@
 #ifndef MLN_CORE_VEC_HPP
+# if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 # warning "This should not be included directly. Include <mln/core/vec.hpp> instead."
+# elif defined(_MSC_VER)
+# pragma message "This should not be included directly. Include <mln/core/vec.hpp> instead."
+# endif
 # include <mln/core/vec.hpp>
 #endif
 
 #ifndef MLN_INTERNAL_VEC_BASE_HH
 # define MLN_INTERNAL_VEC_BASE_HH
 
+# include <mln/core/config.hpp>
+# include <mln/core/assert.hpp>
 # include <mln/core/literal/vectorial.hpp>
 # include <boost/type_traits/promote.hpp>
+# include <boost/utility.hpp>
 # include <type_traits>
+# include <iostream>
+# include <array>
 
 
 // FIXME:
@@ -20,13 +29,6 @@
 # ifdef _MSC_VER
 #	pragma warning(disable: 4701)
 # endif
-
-#include <type_traits>
-#include <boost/tr1/functional.hpp>
-#include <boost/utility.hpp>
-#include <iostream>
-#include <array>
-#include <mln/core/assert.hpp>
 
 
 # define VEC_BASE_ENABLE_IF(Trait, R)                               \

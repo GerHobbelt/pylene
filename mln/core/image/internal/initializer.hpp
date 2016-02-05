@@ -54,6 +54,7 @@ namespace mln
     {
     private:
       static constexpr bool has_border = image_has_border<OutputImage>::value;
+	  using has_border_t = image_has_border<OutputImage>;
 
     public:
       initializer(const InputImageOrDomain& ref)
@@ -99,7 +100,7 @@ namespace mln
 
       operator OutputImage() const
       {
-        OutputImage out = this->do_it();
+        OutputImage out = this->do_it(has_border_t (), is_input_an_image_t ());
         this->__reindex(out);
         return out;
       }
@@ -124,10 +125,15 @@ namespace mln
                           image_has_border<InputImageOrDomain>,
                           std::false_type >::type::value;
 
+      typedef typename mln::is_a<InputImageOrDomain, mln::Image>::type is_input_an_image_t;
+      typedef typename std::conditional< is_input_an_image, image_has_border<InputImageOrDomain>, std::false_type >::type input_has_border_t;
+
       template <class dummy=void>
       OutputImage
-      do_it(typename std::enable_if<( (dummy*)0 or (has_border and is_input_an_image)), dummy>::type* = nullptr) const
+      do_it(std::true_type __has_border, std::true_type __is_input_an_image) const
       {
+        (void) __has_border;
+        (void) __is_input_an_image;
         if (m_border != -1)
           {
             if (m_has_init)
@@ -146,8 +152,10 @@ namespace mln
 
       template <class dummy=void>
       OutputImage
-      do_it(typename std::enable_if<( (dummy*)0 or (has_border and !is_input_an_image)), dummy>::type* = nullptr) const
+      do_it(std::true_type __has_border, std::false_type __is_input_an_image) const
       {
+        (void) __has_border;
+        (void) __is_input_an_image;
         if (m_border != -1)
           {
             if (m_has_init)
@@ -166,8 +174,10 @@ namespace mln
 
       template <class dummy=void>
       OutputImage
-      do_it(typename std::enable_if<( (dummy*)0 or (!has_border and is_input_an_image)), dummy>::type* = nullptr) const
+      do_it(std::false_type __has_border, std::true_type __is_input_an_image) const
       {
+        (void) __has_border;
+        (void) __is_input_an_image;
         if (m_has_init)
           return OutputImage(m_ref, m_init);
         else
@@ -176,8 +186,10 @@ namespace mln
 
       template <class dummy=void>
       OutputImage
-      do_it(typename std::enable_if<( (dummy*)0 or (!has_border and !is_input_an_image)), dummy>::type* = nullptr) const
+      do_it(std::false_type __has_border, std::false_type __is_input_an_image) const
       {
+        (void) __has_border;
+        (void) __is_input_an_image;
         if (m_has_init)
           return make_image_from_domain<mln_value(OutputImage)>(m_ref, m_init);
         else

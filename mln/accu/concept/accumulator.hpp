@@ -41,7 +41,7 @@ namespace mln
   public:
     BOOST_CONCEPT_USAGE(FeatureSet)
     {
-      typedef typename E::features    features __attribute__((unused));
+      typedef typename E::features    features;
       check_inner_struct_apply<E> ();
     }
   };

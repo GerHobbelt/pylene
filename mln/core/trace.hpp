@@ -120,7 +120,7 @@ namespace mln
     {
       if (verbose) {
 	trace_t tr = callstack.top();
-        std::chrono::duration_cast<std::chrono::seconds> duration = (std::chrono::system_clock::now() - tr.clock);
+    std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - tr.clock);
 	std::clog << std::string(callstack.size(), ' ')
                   << "#" << std::this_thread::get_id() << " - "
                   << tr.fname
@@ -134,7 +134,7 @@ namespace mln
     void warn(const std::string& msg)
     {
       if (verbose)
-        std::clog << std::string(callstacks.local().size(), ' ')
+        std::clog << std::string(callstack.size(), ' ')
                   << "#" << std::this_thread::get_id() << " - "
                   << msg << std::endl;
     }

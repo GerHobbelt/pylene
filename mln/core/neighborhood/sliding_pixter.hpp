@@ -5,6 +5,8 @@
 # include <mln/core/image/image.hpp>
 # include <mln/core/iterator/iterator_base.hpp>
 
+#include <vector>
+
 namespace mln
 {
 
@@ -54,7 +56,6 @@ namespace mln
     // \tparam Pixel must be a pointer to a pixel or a pixel iterator.
     template <class Pixel,
 	      class SiteSet,
-	      class Image = image_t<Pixel>,
 	      class Enable = void>
     struct sliding_pixter_base;
 
@@ -209,13 +210,12 @@ namespace mln
 
     //
     // Specialization for accessible only images.
-    template <class Pixel, class SiteSet, class Image>
+    template <class Pixel, class SiteSet>
     struct sliding_pixter_base<
       Pixel,
       SiteSet,
-      Image,
-      typename std::enable_if< image_traits<Image>::accessible::value and
-			       !image_traits<Image>::indexable::value
+      typename std::enable_if< image_traits<image_t<Pixel>>::accessible::value and
+			       !image_traits<image_t<Pixel>>::indexable::value
 			       >::type>
     : iterator_base< sliding_pixter<Pixel, SiteSet>,
 		     sliding_pixter_pixel_site<Pixel, SiteSet>,
@@ -246,13 +246,12 @@ namespace mln
 
     // Specialization for indexable images not raw.
     // with a static siteset
-    template <class Pixel, class Image, std::size_t N, typename P>
+    template <class Pixel, std::size_t N, typename P>
     struct sliding_pixter_base
     < Pixel,
       std::array<P, N>,
-      Image,
-      typename std::enable_if< image_traits<Image>::indexable::value and
-			       !std::is_same<typename image_traits<Image>::category,
+      typename std::enable_if< image_traits<image_t<Pixel>>::indexable::value and
+			       !std::is_same<typename image_traits<image_t<Pixel>>::category,
 					     raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, std::array<P, N> >,
 		     sliding_pixter_pixel_index< Pixel, std::array<P, N> >,
@@ -260,6 +259,7 @@ namespace mln
 		     >
     {
     private:
+	  typedef image_t<Pixel> Image;
       typedef std::array<P, N> S;
       typedef std::array<typename Image::difference_type, N> C;
 
@@ -308,19 +308,21 @@ namespace mln
 
     // Specialization for indexable images not raw.
     // with a dynamic siteset
-    template <class Pixel, class SiteSet, class Image>
+    template <class Pixel, class SiteSet>
     struct sliding_pixter_base
     < Pixel,
       SiteSet,
-      Image,
-      typename std::enable_if< image_traits<Image>::indexable::value and
-			       !std::is_same<typename image_traits<Image>::category,
+      typename std::enable_if< image_traits<image_t<Pixel>>::indexable::value and
+			       !std::is_same<typename image_traits<image_t<Pixel>>::category,
 					     raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, SiteSet>,
 		     sliding_pixter_pixel_index<Pixel, SiteSet>,
 		     const sliding_pixter_pixel_index<Pixel, SiteSet>&
 		     >
     {
+		private:
+		typedef image_t<Pixel> Image;
+	  public:
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const Pixel& px, const SiteSet& s)
@@ -359,7 +361,7 @@ namespace mln
       }
 
     private:
-      typedef std::vector<typename Image::difference_type> C;
+      typedef std::vector<typename image_t<Pixel>::difference_type> C;
       C m_index_set;
       sliding_pixter_pixel_index<Pixel, SiteSet> m_pix;
     };
@@ -370,10 +372,10 @@ namespace mln
 
     // Specialization for raw images.
     // with a static siteset
-    template <class Pixel, class Image, std::size_t N, typename P>
+    template <class Pixel, std::size_t N, typename P>
     struct sliding_pixter_base
-    < Pixel, std::array<P, N>, Image,
-      typename std::enable_if< std::is_same<typename image_traits<Image>::category,
+    < Pixel, std::array<P, N>,
+		typename std::enable_if< std::is_same<typename image_traits< image_t<Pixel> >::category,
 					    raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, std::array<P, N> >,
 		     sliding_pixter_pixel_pointer<Pixel, std::array<P, N> >,
@@ -381,6 +383,7 @@ namespace mln
 		     >
     {
     private:
+      typedef image_t<Pixel> Image;
       typedef std::array<P, N> S;
       typedef std::array<typename Image::difference_type, N> I;
       typedef std::array<typename Image::difference_type, N> O;
@@ -444,10 +447,10 @@ namespace mln
 
     // Specialization for raw images.
     // with a static siteset
-    template <class Pixel, class SiteSet, class Image>
+    template <class Pixel, class SiteSet>
     struct sliding_pixter_base
-    < Pixel, SiteSet, Image,
-      typename std::enable_if< std::is_same<typename image_traits<Image>::category,
+    < Pixel, SiteSet,
+		typename std::enable_if< std::is_same<typename image_traits<image_t<Pixel>>::category,
 					    raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, SiteSet>,
 		     sliding_pixter_pixel_pointer<Pixel, SiteSet>,
@@ -455,6 +458,7 @@ namespace mln
 		     >
     {
     private:
+	  typedef image_t<Pixel> Image;
       typedef std::vector<typename Image::difference_type> I;
       typedef std::vector<typename Image::difference_type> O;
 

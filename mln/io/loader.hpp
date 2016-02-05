@@ -138,6 +138,8 @@ namespace mln
       struct default_converter
       {
         static constexpr std::nullptr_t ptr = nullptr;
+
+		static std::nullptr_t get_ptr() { return nullptr;  }
       };
 
       template <typename VIN, typename VOUT>
@@ -145,8 +147,15 @@ namespace mln
                                <std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
                                 value_traits<VIN>::quant < value_traits<VOUT>::quant>::type>
       {
-        static constexpr void (*ptr) (void*,void*,std::size_t) = &value_convert<VIN, VOUT>;
+		// VISUAL STUDIO does not support constexpr pointer to function
+        //static constexpr void (*ptr) (void*,void*,std::size_t) = &value_convert<VIN, VOUT>;
+		static void(*const ptr) (void*, void*, std::size_t);
       };
+
+	  template <typename VIN, typename VOUT>
+	  void (*const default_converter<VIN, VOUT, typename std::enable_if
+		  <std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
+		  value_traits<VIN>::quant < value_traits<VOUT>::quant>::type>::ptr) (void*, void*, std::size_t) = &value_convert<VIN, VOUT>;
 
 
 # define MLN_INTERNAL_CONV_EXPAND(r, data, VIN)                         \

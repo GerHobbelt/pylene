@@ -140,14 +140,14 @@ namespace mln
   /******************************************/
 
 
-  template <typename I, typename Pixel>
+  template <typename I, typename PixelType>
   struct rebinded_pixel :
-    morpher_pixel_base< rebinded_pixel<I, Pixel>,
-                        typename std::remove_reference<Pixel>::type, I>
+    morpher_pixel_base< rebinded_pixel<I, PixelType>,
+                        typename std::remove_reference<PixelType>::type, I>
   {
     rebinded_pixel() = default;
     rebinded_pixel(const rebinded_pixel&) = default;
-    rebinded_pixel(I& ima, const Pixel& pix)
+    rebinded_pixel(I& ima, const PixelType& pix)
       : m_ima(&ima), m_pix(pix)
     {
     }
@@ -155,7 +155,7 @@ namespace mln
     template <typename J, typename Pixel2>
     rebinded_pixel(const rebinded_pixel<J, Pixel2>& other,
                    typename std::enable_if<std::is_convertible<J*, I*>::value and
-                   std::is_convertible<Pixel2, Pixel>::value>::type* = NULL)
+                   std::is_convertible<Pixel2, PixelType>::value>::type* = NULL)
       : m_ima(other.m_ima),
 	m_pix(other.m_pix)
     {
@@ -172,7 +172,7 @@ namespace mln
     template <typename, typename>
     friend struct rebinded_pixel;
     I*    m_ima;
-    Pixel m_pix;
+    PixelType m_pix;
   };
 
 

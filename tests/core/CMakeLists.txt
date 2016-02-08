@@ -4,71 +4,68 @@ add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 add_executable(array std/array.cpp)
 
-add_executable(win2d win2d.cpp)
-add_core_test(win2d win2d)
+set(test_prefix "UTCore_")
+add_executable(${test_prefix}win2d win2d.cpp)
 
 # test Domain
-add_executable(box domain/box.cpp)
+add_executable(${test_prefix}box domain/box.cpp)
 
-add_core_test(box box)
 
 # test Range
-add_executable(range range/range.cpp)
-add_executable(range_filter range/filter.cpp)
-add_executable(range_zip range/zip.cpp)
-
-add_core_test(range range)
-add_core_test(range_filter range_filter)
-add_core_test(range_zip range_zip)
+add_executable(${test_prefix}range range/range.cpp)
+add_executable(${test_prefix}range_filter range/filter.cpp)
+add_executable(${test_prefix}range_zip range/zip.cpp)
 
 
 # test Images
-add_executable(image2d   image/image2d.cpp)
-add_executable(extended_by_value_image image/morphers/extended_by_value.cpp)
-add_executable(transformed_image image/morphers/transformed_image.cpp)
-add_executable(filtered_image image/morphers/filtered_image.cpp)
-add_executable(zip_image image/zip_image.cpp)
-add_executable(sub_image image/sub_image.cpp)
-add_executable(image_ops image/image_ops.cpp)
-add_executable(image_routines image/image_routines.cpp)
+add_executable(${test_prefix}image2d   image/image2d.cpp)
+add_executable(${test_prefix}extended_by_value_image image/morphers/extended_by_value.cpp)
+add_executable(${test_prefix}transformed_image image/morphers/transformed_image.cpp)
+add_executable(${test_prefix}filtered_image image/morphers/filtered_image.cpp)
+add_executable(${test_prefix}zip_image image/zip_image.cpp)
+add_executable(${test_prefix}sub_image image/sub_image.cpp)
+add_executable(${test_prefix}image_ops image/image_ops.cpp)
+add_executable(${test_prefix}image_routines image/image_routines.cpp)
 
-
-add_core_test(image2d   image2d)
-add_core_test(extended_by_value_image extended_by_value_image)
-add_core_test(filtered_image filtered_image)
-add_core_test(transformed_image transformed_image)
-
-add_core_test(zip_image zip_image)
-add_core_test(image_ops image_ops)
-add_core_test(image_routines image_routines)
-add_core_test(sub_image sub_image)
 
 # test Extension
-add_executable(extension_fill extension/fill.cpp)
-
-add_core_test(extension_fill extension_fill)
+add_executable(${test_prefix}extension_fill     extension/fill.cpp)
 
 # test Value
-add_executable(value_int value/int.cpp)
-add_executable(vec_math_ops vec/vec_math_ops.cpp)
-
-add_core_test(value_int value_int)
-add_core_test(vec_math_ops vec_math_ops)
+add_executable(${test_prefix}value_int          value/int.cpp)
+add_executable(${test_prefix}vec_math_ops       vec/vec_math_ops.cpp)
 
 # test Algorithms
 
-add_executable(copy algorithm/copy.cpp)
-add_executable(fill algorithm/fill.cpp)
-add_executable(paste algorithm/paste.cpp)
-add_executable(equal algorithm/equal.cpp)
-add_executable(accumulate algorithm/accumulate.cpp)
-add_executable(sort_indexes algorithm/sort_indexes.cpp)
+add_executable(${test_prefix}copy               algorithm/copy.cpp)
+add_executable(${test_prefix}fill               algorithm/fill.cpp)
+add_executable(${test_prefix}paste              algorithm/paste.cpp)
+add_executable(${test_prefix}equal              algorithm/equal.cpp)
+add_executable(${test_prefix}accumulate         algorithm/accumulate.cpp)
+add_executable(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 
 
-add_core_test(copy copy)
-add_core_test(accumulate accumulate)
-add_core_test(fill fill)
-add_core_test(paste paste)
-add_core_test(equal equal)
-add_core_test(sort_indexes sort_indexes)
+
+add_core_test(${test_prefix}win2d                       ${test_prefix}win2d)
+add_core_test(${test_prefix}box                         ${test_prefix}box)
+add_core_test(${test_prefix}range                       ${test_prefix}range)
+add_core_test(${test_prefix}range_filter                ${test_prefix}range_filter)
+add_core_test(${test_prefix}range_zip                   ${test_prefix}range_zip)
+add_core_test(${test_prefix}image2d                     ${test_prefix}image2d)
+add_core_test(${test_prefix}extended_by_value_image     ${test_prefix}extended_by_value_image)
+add_core_test(${test_prefix}filtered_image              ${test_prefix}filtered_image)
+add_core_test(${test_prefix}transformed_image           ${test_prefix}transformed_image)
+add_core_test(${test_prefix}zip_image                   ${test_prefix}zip_image)
+add_core_test(${test_prefix}image_ops                   ${test_prefix}image_ops)
+add_core_test(${test_prefix}image_routines              ${test_prefix}image_routines)
+add_core_test(${test_prefix}sub_image                   ${test_prefix}sub_image)
+add_core_test(${test_prefix}extension_fill              ${test_prefix}extension_fill)
+add_core_test(${test_prefix}value_int                   ${test_prefix}value_int)
+add_core_test(${test_prefix}vec_math_ops                ${test_prefix}vec_math_ops)
+add_core_test(${test_prefix}copy                        ${test_prefix}copy)
+add_core_test(${test_prefix}accumulate                  ${test_prefix}accumulate)
+add_core_test(${test_prefix}fill                        ${test_prefix}fill)
+add_core_test(${test_prefix}paste                       ${test_prefix}paste)
+add_core_test(${test_prefix}equal                       ${test_prefix}equal)
+add_core_test(${test_prefix}sort_indexes                ${test_prefix}sort_indexes)
 

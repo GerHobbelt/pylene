@@ -1,3 +1,4 @@
-add_executable(graphcut graphcut.cpp)
+set(test_prefix "UTGraphcut")
 
-add_core_test(graphcut graphcut)
+add_executable(${test_prefix}graphcut graphcut.cpp)
+add_core_test(${test_prefix}graphcut ${test_prefix}graphcut)

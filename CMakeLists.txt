@@ -54,11 +54,6 @@ endif()
 
 # Testing
 ENABLE_TESTING()
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-macro(add_core_test Testname Exename)
-add_test(${ARGV})
-add_dependencies(check ${Exename})
-endmacro(add_core_test)
 
 #### Configuration of the Compiler ###
 # set BOOST to use variadic macros

@@ -120,11 +120,11 @@ namespace mln
     {
       if (verbose) {
 	trace_t tr = callstack.top();
-    std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - tr.clock);
+        std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - tr.clock);
 	std::clog << std::string(callstack.size(), ' ')
                   << "#" << std::this_thread::get_id() << " - "
                   << tr.fname
-		  << " in " << duration.count() << std::endl;
+		  << " in " << duration.count() << "ms" << std::endl;
 
         callstack.pop();
       }

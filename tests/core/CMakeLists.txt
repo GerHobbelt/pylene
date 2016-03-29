@@ -27,6 +27,8 @@ add_executable(${test_prefix}sub_image image/sub_image.cpp)
 add_executable(${test_prefix}image_ops image/image_ops.cpp)
 add_executable(${test_prefix}image_routines image/image_routines.cpp)
 
+# test Neighborhood
+add_executable(${test_prefix}sliding_wpiter   neighborhood/sliding_wpiter.cpp)
 
 # test Extension
 add_executable(${test_prefix}extension_fill     extension/fill.cpp)

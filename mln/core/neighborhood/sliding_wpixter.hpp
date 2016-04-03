@@ -12,6 +12,8 @@ namespace mln
   /// \brief Define a pixel iterator over a weighted siteset centered on a pixel.
   ///
   /// Define an iterator over a weighted siteset centered on a pixel.
+  /// If you want the iterator to bind the point, use std::ref/std::cref and
+  /// proxy iterator for binded iterators
   ///
   ///
   /// Note that the siteset is not copied and

@@ -180,20 +180,25 @@ namespace mln
     {
     private:
       typedef image_t<Pixel> Image;
+      typedef std::vector<typename range_value<SiteSet>::type > S;
       typedef std::vector<typename image_t<Pixel>::difference_type> C;
     public:
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const Pixel& px, const SiteSet& s)
 	: m_size (rng::size(s)),
-          m_site_set (s),
+          m_site_set (m_size),
           m_index_set(m_size),
           m_pixel (px),
           m_i (0)
       {
 	Image& ima = px->image();
-	for (unsigned i = 0; i < m_size; ++i)
-	  m_index_set[i] = ima.delta_index(m_site_set[m_i]);
+        auto it = rng::iter(s);
+        it.init();
+	for (unsigned i = 0; i < m_size; ++i, it.next()) {
+          m_site_set[i] = *it;
+	  m_index_set[i] = ima.delta_index(m_site_set[i]);
+        }
       }
 
       void init() { m_i = 0; }
@@ -210,7 +215,7 @@ namespace mln
 
     private:
       unsigned m_size;
-      SiteSet m_site_set;
+      S       m_site_set;
       C       m_index_set;
       typename std::conditional<std::is_pointer<Pixel>::value,
                                 const Pixel, const Pixel&>::type m_pixel;
@@ -235,6 +240,7 @@ namespace mln
     {
     private:
       typedef image_t<Pixel> Image;
+      typedef std::vector<typename range_value<SiteSet>::type > S;
       typedef std::vector<typename Image::difference_type> I;
       typedef std::vector<typename Image::difference_type> O;
 
@@ -243,16 +249,17 @@ namespace mln
 
       sliding_pixter_base(const Pixel& px, const SiteSet& s)
 	: m_size(rng::size(s)),
-          m_site_set(s),
+          m_site_set(m_size),
           m_index_set(m_size),
 	  m_offset_set(m_size),
           m_pixel (px),
           m_i (0)
       {
 	Image& ima = px->image();
-	auto it = rng::iter(m_site_set);
+	auto it = rng::iter(s);
 	it.init();
 	for (unsigned i = 0; i < m_size; ++i, it.next()) {
+          m_site_set[i] = *it;
 	  m_index_set[i] = ima.delta_index(*it);
 	  m_offset_set[i] = ima.delta_offset(*it);
 	}
@@ -265,7 +272,7 @@ namespace mln
       pointer_pixel<Image>
       dereference() const
       {
-        char* current_ptr = static_cast<char*>(&(m_pixel->val())) + m_offset_set[m_i];
+        char* current_ptr = (char*)(&(m_pixel->val())) + m_offset_set[m_i];
         return { m_pixel->image(),
             current_ptr,
             m_pixel->point() + m_site_set[m_i],
@@ -275,7 +282,7 @@ namespace mln
 
     private:
       size_t            m_size;
-      SiteSet           m_site_set;
+      S                 m_site_set;
       I                 m_index_set;
       O                 m_offset_set;
       typename std::conditional<std::is_pointer<Pixel>::value,
@@ -325,7 +332,7 @@ namespace mln
       {
         mln_precondition(m_i < N);
 	return {m_pixel->image(),
-            reinterpret_cast<char*>(&(m_pixel->val())) + m_offset_set[m_i],
+            (char*)(&(m_pixel->val())) + m_offset_set[m_i],
             m_pixel->point() + m_site_set[m_i],
             m_pixel->index() + m_index_set[m_i]
             };

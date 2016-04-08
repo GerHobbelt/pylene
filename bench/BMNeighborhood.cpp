@@ -3,6 +3,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/neighb2d.hpp>
+#include <mln/core/neighborhood/sliding_viter.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/core/algorithm/iota.hpp>
 
@@ -34,7 +35,24 @@ BENCHMARK_F(Bench_Neighborhood, pixter)(benchmark::State& st)
         mln_forall(nx)
           benchmark::DoNotOptimize(u += nx->val());
     }
+  std::cout << u << std::endl;
+  (void) u;
+}
 
+BENCHMARK_F(Bench_Neighborhood, viter)(benchmark::State& st)
+{
+  double u;
+  while (st.KeepRunning())
+    {
+      mln_pixter(px, ima);
+      auto nv = make_sliding_viter(px, c8.dpoints);
+
+      u = 0;
+      mln_forall(px)
+        mln_forall(nv)
+          benchmark::DoNotOptimize(u += *nv);
+    }
+  std::cout << u << std::endl;
   (void) u;
 }
 
@@ -51,7 +69,7 @@ BENCHMARK_F(Bench_Neighborhood, piter)(benchmark::State& st)
         mln_forall(n)
           benchmark::DoNotOptimize(u += ima.at(*n));
     }
-
+  std::cout << u << std::endl;
   (void) u;
 }
 
@@ -80,7 +98,7 @@ BENCHMARK_F(Bench_Neighborhood, indexes)(benchmark::State& st)
           idx += ima.index_strides()[0];
         }
     }
-
+  std::cout << u << std::endl;
   (void) u;
 }
 
@@ -107,7 +125,7 @@ BENCHMARK_F(Bench_Neighborhood, pointers)(benchmark::State& st)
               benchmark::DoNotOptimize(u += *(const int*)(ptr + offsets[k]));
         }
     }
-
+  std::cout << u << std::endl;
   (void) u;
 }
 

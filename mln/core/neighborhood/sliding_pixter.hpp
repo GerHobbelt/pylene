@@ -8,6 +8,7 @@
 # include <mln/core/pixel/point_pixel.hpp>
 # include <mln/core/pixel/index_pixel.hpp>
 # include <vector>
+# include <functional>
 
 namespace mln
 {
@@ -17,10 +18,10 @@ namespace mln
   ///
   /// Define an iterator over a siteset centered on a pixel.
   ///
-  /// \p Pixel can be a pointer type, in that case, the iterator will
-  /// be binded to the Pixel.
-  /// \p Pixel can be an itetaror, in that case, the current iterator will
-  /// be binded to the iterator.
+  /// \p Pixel can be anything convertible to a pixel, e.g.,
+  /// * a pixel
+  /// * a reference wrapper to a pixel
+  /// * a proxy iterator to a pixel iterator
   ///
   /// Note that the siteset is not copied and
   /// its lifetime should be longer that the iterator's one.
@@ -43,6 +44,7 @@ namespace mln
     return {pixel, pset};
   }
 
+}
 
   /******************************************/
   /****          Facade                  ****/
@@ -53,11 +55,17 @@ namespace mln
   /****          Implementation          ****/
   /******************************************/
 
+// Fwd declaration
+namespace mln {
+  template <class T>
+  struct iterator_proxy_wrapper;
+}
+
+namespace mln
+{
+
   namespace internal
   {
-
-    template <typename Px>
-    using image_t = typename mln::iterator_traits<Px>::value_type::image_type;
 
     // Forward:
     // \tparam Pixel must be a pointer to a pixel or a pixel iterator.
@@ -65,6 +73,35 @@ namespace mln
 	      class SiteSet,
 	      class Enable = void>
     struct sliding_pixter_base;
+
+
+    template <class Pixel>
+    struct sliding_pixter_helper
+    {
+      using pixel_t = Pixel;
+      using pixel_ref_t = const Pixel&;
+      using image_t = typename Pixel::image_type;
+    };
+
+    template <class Pixel>
+    struct sliding_pixter_helper< std::reference_wrapper<Pixel> >
+    {
+      using pixel_t = Pixel;
+      using pixel_ref_t = const Pixel&;
+      using image_t = typename Pixel::image_type;
+    };
+
+    template <class PixelIterator>
+    struct sliding_pixter_helper< iterator_proxy_wrapper<PixelIterator> >
+    {
+      using pixel_t = typename mln::iterator_traits<PixelIterator>::value_type;
+      using pixel_ref_t = typename mln::iterator_traits<const PixelIterator>::reference;
+      using image_t = typename pixel_t::image_type;
+    };
+
+    template <typename Px>
+    using spixter_image_t = typename sliding_pixter_helper<Px>::image_t;
+
 
 
     /********************************************************************/
@@ -75,16 +112,18 @@ namespace mln
     struct sliding_pixter_base<
       Pixel,
       SiteSet,
-      typename std::enable_if< image_traits<image_t<Pixel>>::accessible::value and
-			       !image_traits<image_t<Pixel>>::indexable::value
+      typename std::enable_if< image_traits<typename sliding_pixter_helper<Pixel>::image_t>::accessible::value and
+			       !image_traits<typename sliding_pixter_helper<Pixel>::image_t>::indexable::value
 			       >::type>
     : iterator_base< sliding_pixter<Pixel, SiteSet>,
-		     point_pixel< image_t<Pixel> >,
-                     point_pixel< image_t<Pixel> >
+		     point_pixel< typename sliding_pixter_helper<Pixel>::image_t >,
+                     point_pixel< typename sliding_pixter_helper<Pixel>::image_t >
 		     >
     {
     private:
-      using Image = image_t<Pixel>;
+      using Image       = typename sliding_pixter_helper<Pixel>::image_t;
+      using pixel_ref_t = typename sliding_pixter_helper<Pixel>::pixel_ref_t;
+      using pixel_t     = typename sliding_pixter_helper<Pixel>::pixel_t;
 
     public:
       sliding_pixter_base() = default;
@@ -101,12 +140,13 @@ namespace mln
       point_pixel<Image>
       dereference() const
       {
-        return {m_pixel->image(), m_pixel->point() + *m_pset_iter};
+        return {m_pix().image(), m_pix().point() + *m_pset_iter};
       }
 
     private:
-      typename std::conditional<std::is_pointer<Pixel>::value,
-                                const Pixel, const Pixel&>::type m_pixel;
+      pixel_ref_t m_pix() const { return m_pixel; }
+
+      Pixel m_pixel;
       typename range_const_iterator<SiteSet>::type m_pset_iter;
     };
 
@@ -121,15 +161,17 @@ namespace mln
     struct sliding_pixter_base
     < Pixel,
       std::array<P, N>,
-      typename std::enable_if< image_traits<image_t<Pixel>>::indexable::value and
-			       !std::is_same<typename image_traits<image_t<Pixel>>::category,
+      typename std::enable_if< image_traits<typename sliding_pixter_helper<Pixel>::image_t>::indexable::value and
+			       !std::is_same<typename image_traits<typename sliding_pixter_helper<Pixel>::image_t>::category,
 					     raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, std::array<P, N> >,
-		     index_pixel< image_t<Pixel> >,
-                     index_pixel< image_t<Pixel> > >
+		     index_pixel<typename sliding_pixter_helper<Pixel>::image_t>,
+                     index_pixel<typename sliding_pixter_helper<Pixel>::image_t> >
     {
     private:
-      typedef image_t<Pixel> Image;
+      using Image       = typename sliding_pixter_helper<Pixel>::image_t;
+      using pixel_ref_t = typename sliding_pixter_helper<Pixel>::pixel_ref_t;
+      using pixel_t     = typename sliding_pixter_helper<Pixel>::pixel_t;
       typedef std::array<P, N> S;
       typedef std::array<typename Image::difference_type, N> C;
 
@@ -140,7 +182,7 @@ namespace mln
           m_pixel(px),
           m_i (0)
       {
-	Image& ima = px->image();
+	Image& ima = m_pix().image();
 	for (unsigned i = 0; i < N; ++i)
 	  m_index_set[i] = ima.delta_index(m_site_set[i]);
       }
@@ -152,17 +194,18 @@ namespace mln
       index_pixel<Image>
       dereference() const
       {
-	return {m_pixel->image(),
-            m_pixel->point() + m_site_set[m_i],
-            m_pixel->index() + m_index_set[m_i] };
+	return {m_pix().image(),
+            m_pix().point() + m_site_set[m_i],
+            m_pix().index() + m_index_set[m_i] };
       }
 
     private:
-      S m_site_set;
-      C m_index_set;
-      typename std::conditional<std::is_pointer<Pixel>::value,
-                                const Pixel, const Pixel&>::type m_pixel;
-      unsigned m_i;
+      pixel_ref_t m_pix() const { return m_pixel; }
+
+      S         m_site_set;
+      C         m_index_set;
+      Pixel     m_pixel;
+      unsigned  m_i;
     };
 
     // Specialization for indexable images not raw.
@@ -171,17 +214,19 @@ namespace mln
     struct sliding_pixter_base
     < Pixel,
       SiteSet,
-      typename std::enable_if< image_traits<image_t<Pixel>>::indexable::value and
-			       !std::is_same<typename image_traits<image_t<Pixel>>::category,
+      typename std::enable_if< image_traits<typename sliding_pixter_helper<Pixel>::image_t>::indexable::value and
+			       !std::is_same<typename image_traits<typename sliding_pixter_helper<Pixel>::image_t>::category,
 					     raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, SiteSet>,
-		     index_pixel< image_t<Pixel> >,
-                     index_pixel< image_t<Pixel> > >
+		     index_pixel< typename sliding_pixter_helper<Pixel>::image_t >,
+                     index_pixel< typename sliding_pixter_helper<Pixel>::image_t > >
     {
     private:
-      typedef image_t<Pixel> Image;
+      using Image       = typename sliding_pixter_helper<Pixel>::image_t;
+      using pixel_ref_t = typename sliding_pixter_helper<Pixel>::pixel_ref_t;
+      using pixel_t     = typename sliding_pixter_helper<Pixel>::pixel_t;
       typedef std::vector<typename range_value<SiteSet>::type > S;
-      typedef std::vector<typename image_t<Pixel>::difference_type> C;
+      typedef std::vector<typename Image::difference_type> C;
     public:
       sliding_pixter_base() = default;
 
@@ -192,7 +237,7 @@ namespace mln
           m_pixel (px),
           m_i (0)
       {
-	Image& ima = px->image();
+	Image& ima = m_pix().image();
         auto it = rng::iter(s);
         it.init();
 	for (unsigned i = 0; i < m_size; ++i, it.next()) {
@@ -208,17 +253,18 @@ namespace mln
       index_pixel<Image>
       dereference() const
       {
-	return { m_pixel->image(),
-            m_pixel->point() + m_site_set[m_i],
-            m_pixel->index() + m_index_set[m_i] };
+	return { m_pix().image(),
+            m_pix().point() + m_site_set[m_i],
+            m_pix().index() + m_index_set[m_i] };
       }
 
     private:
+      pixel_ref_t m_pix() const { return m_pixel; }
+
       unsigned m_size;
       S       m_site_set;
       C       m_index_set;
-      typename std::conditional<std::is_pointer<Pixel>::value,
-                                const Pixel, const Pixel&>::type m_pixel;
+      Pixel   m_pixel;
       unsigned m_i;
     };
 
@@ -232,14 +278,16 @@ namespace mln
     template <class Pixel, class SiteSet>
     struct sliding_pixter_base
     < Pixel, SiteSet,
-      typename std::enable_if< std::is_same<typename image_traits<image_t<Pixel>>::category,
+      typename std::enable_if< std::is_same<typename image_traits<typename sliding_pixter_helper<Pixel>::image_t>::category,
 					    raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, SiteSet>,
-                     pointer_pixel< image_t<Pixel> >,
-                     pointer_pixel< image_t<Pixel> > >
+                     pointer_pixel< typename sliding_pixter_helper<Pixel>::image_t >,
+                     pointer_pixel< typename sliding_pixter_helper<Pixel>::image_t > >
     {
     private:
-      typedef image_t<Pixel> Image;
+      using Image       = typename sliding_pixter_helper<Pixel>::image_t;
+      using pixel_ref_t = typename sliding_pixter_helper<Pixel>::pixel_ref_t;
+      using pixel_t     = typename sliding_pixter_helper<Pixel>::pixel_t;
       typedef std::vector<typename range_value<SiteSet>::type > S;
       typedef std::vector<typename Image::difference_type> I;
       typedef std::vector<typename Image::difference_type> O;
@@ -255,7 +303,7 @@ namespace mln
           m_pixel (px),
           m_i (0)
       {
-	Image& ima = px->image();
+	Image& ima = m_pix().image();
 	auto it = rng::iter(s);
 	it.init();
 	for (unsigned i = 0; i < m_size; ++i, it.next()) {
@@ -272,21 +320,22 @@ namespace mln
       pointer_pixel<Image>
       dereference() const
       {
-        char* current_ptr = (char*)(&(m_pixel->val())) + m_offset_set[m_i];
-        return { m_pixel->image(),
+        char* current_ptr = (char*)(&(m_pix().val())) + m_offset_set[m_i];
+        return { m_pix().image(),
             current_ptr,
-            m_pixel->point() + m_site_set[m_i],
-            m_pixel->index() + m_index_set[m_i]
+            m_pix().point() + m_site_set[m_i],
+            m_pix().index() + m_index_set[m_i]
             };
       }
 
     private:
+      pixel_ref_t m_pix() const { return m_pixel; }
+
       size_t            m_size;
       S                 m_site_set;
       I                 m_index_set;
       O                 m_offset_set;
-      typename std::conditional<std::is_pointer<Pixel>::value,
-                                const Pixel, const Pixel&>::type m_pixel;
+      Pixel             m_pixel;
       unsigned          m_i;
     };
 
@@ -294,15 +343,17 @@ namespace mln
     template <class Pixel, std::size_t N, typename P>
     struct sliding_pixter_base
     < Pixel, std::array<P, N>,
-		typename std::enable_if< std::is_same<typename image_traits< image_t<Pixel> >::category,
+		typename std::enable_if< std::is_same<typename image_traits< typename sliding_pixter_helper<Pixel>::image_t >::category,
 					    raw_image_tag>::value>::type >
     : iterator_base< sliding_pixter<Pixel, std::array<P, N> >,
-		     pointer_pixel< image_t<Pixel> >,
-		     pointer_pixel< image_t<Pixel> >
+		     pointer_pixel< typename sliding_pixter_helper<Pixel>::image_t >,
+		     pointer_pixel< typename sliding_pixter_helper<Pixel>::image_t >
 		     >
     {
     private:
-      typedef image_t<Pixel> Image;
+      using Image       = typename sliding_pixter_helper<Pixel>::image_t;
+      using pixel_ref_t = typename sliding_pixter_helper<Pixel>::pixel_ref_t;
+      using pixel_t     = typename sliding_pixter_helper<Pixel>::pixel_t;
       typedef std::array<P, N> S;
       typedef std::array<typename Image::difference_type, N> I;
       typedef std::array<typename Image::difference_type, N> O;
@@ -314,7 +365,7 @@ namespace mln
 	: m_site_set (s),
           m_pixel    (px)
       {
-	Image& ima = px->image();
+	Image& ima = m_pix().image();
 	for (unsigned i = 0; i < N; ++i) {
 	  m_index_set[i] = ima.delta_index( m_site_set[i]);
 	  m_offset_set[i] = ima.delta_offset( m_site_set[i]);
@@ -331,19 +382,20 @@ namespace mln
       dereference() const
       {
         mln_precondition(m_i < N);
-	return {m_pixel->image(),
-            (char*)(&(m_pixel->val())) + m_offset_set[m_i],
-            m_pixel->point() + m_site_set[m_i],
-            m_pixel->index() + m_index_set[m_i]
+	return {m_pix().image(),
+            (char*)(&(m_pix().val())) + m_offset_set[m_i],
+            m_pix().point() + m_site_set[m_i],
+            m_pix().index() + m_index_set[m_i]
             };
       }
 
     private:
+      pixel_ref_t m_pix() const { return m_pixel; }
+
       S              m_site_set;
       I              m_index_set;
       O              m_offset_set;
-      typename std::conditional<std::is_pointer<Pixel>::value,
-                                const Pixel, const Pixel&>::type m_pixel;
+      Pixel          m_pixel;
       unsigned       m_i;
     };
   }
@@ -352,9 +404,9 @@ namespace mln
   struct sliding_pixter : internal::sliding_pixter_base<Pixel, SiteSet>
   {
   private:
-    typedef typename mln::iterator_traits<Pixel>::value_type::image_type I;
-    static_assert(image_traits<I>::accessible::value or
-		  image_traits<I>::indexable::value,
+    using Image       = typename internal::sliding_pixter_helper<Pixel>::image_t;
+    static_assert(image_traits<Image>::accessible::value or
+		  image_traits<Image>::indexable::value,
 		  "You cannot set a neighborhood on a pixel whose image is not"
 		  "accessible <ima(p)> nor indexable <ima[i]>");
 

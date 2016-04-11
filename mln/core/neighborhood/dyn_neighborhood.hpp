@@ -6,7 +6,7 @@
 # include <mln/core/range/iterator_range.hpp>
 # include <mln/core/neighborhood/sliding_pixter.hpp>
 # include <mln/core/neighborhood/sliding_piter.hpp>
-
+# include <mln/core/utils/iterator_proxy.hpp>
 
 namespace mln
 {
@@ -155,17 +155,17 @@ namespace mln
     }
 
     template <typename Px>
-    iterator_range< sliding_pixter<const Px*, SiteSet> >
+    auto
     __bind_pixel(Px& px) const
     {
-      return make_iterator_range( sliding_pixter<const Px*, SiteSet>(&px, exact(this)->dpoints) );
+      return make_iterator_range(make_sliding_pixter(std::cref(px), exact(this)->dpoints));
     }
 
     template <typename Px>
-    iterator_range< sliding_pixter<Px, SiteSet> >
+    auto
     __bind_pixel_iterator(const Px& px) const
     {
-      return make_iterator_range( sliding_pixter<Px, SiteSet>(px, exact(this)->dpoints) );
+      return make_iterator_range(make_sliding_pixter(make_iterator_proxy(px), exact(this)->dpoints));
     }
 
 

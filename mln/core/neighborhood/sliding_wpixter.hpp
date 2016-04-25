@@ -31,6 +31,12 @@ namespace mln
   template <class Pixel, class SiteSet, class WeightSet>
   struct sliding_wpixter;
 
+  template <class Pixel, class SiteSet, class WeightSet>
+  auto
+  make_sliding_wpixter(const Pixel& px, const SiteSet& pset, const WeightSet& wset)
+  {
+    return sliding_wpixter<Pixel, SiteSet, WeightSet>(px, pset, wset);
+  }
 
   /******************************************/
   /****          Implementation          ****/

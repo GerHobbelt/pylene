@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(binding_lvalue)
                      {5, 6, 7, 8, 9} };
 
   auto px = f.pixel_at({0,2});
-  sliding_wpixter<decltype(&px), pset_t, wset_t> it(&px, pset, wset);
+  auto it = make_sliding_wpixter(std::cref(px), pset, wset);
   {
     it.init();
     BOOST_CHECK_EQUAL(it->val(), 1);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(binding_iterator)
   f.extension().fill(0);
 
   mln_pixter(px, f);
-  sliding_wpixter<decltype(px), pset_t, wset_t> it(px, pset, wset);
+  auto it = make_sliding_wpixter(make_iterator_proxy(px), pset, wset);
   px.init();
   {
     it.init();

@@ -90,6 +90,60 @@ namespace mln
     T x;
   };
 
+  template <>
+  struct Index<bool, std::greater<bool> >
+  {
+    Index() = default;
+    explicit Index(bool v) : x (v) {}
+
+    // operator long () const { return x; }
+    // operator unsigned long () const { return x; }
+    operator int () const { return x; }
+    // operator unsigned () const { return x; }
+    //operator T () const { return x; }
+
+
+    Index& operator++ ()    { x = !x; return *this; }
+    Index& operator-- ()    { x = !x; return *this; }
+    Index  operator++ (int) { x = !x; return Index(!x); }
+    Index  operator-- (int) { x = !x; return Index(!x); }
+    bool operator== (const Index& other) const { return x == other.x; }
+    bool operator!= (const Index& other) const { return x != other.x; }
+    bool operator< (const Index& other)  const { return x > other.x; }
+    bool operator> (const Index& other)  const { return x < other.x; }
+    bool operator<= (const Index& other) const { return x >= other.x; }
+    bool operator>= (const Index& other) const { return x <= other.x; }
+  private:
+    bool x;
+  };
+
+  template <>
+  struct Index<bool, std::less<bool> >
+  {
+    Index() = default;
+    explicit Index(bool v) : x (v) {}
+
+    // operator long () const { return x; }
+    // operator unsigned long () const { return x; }
+    operator int () const { return x; }
+    // operator unsigned () const { return x; }
+    //operator T () const { return x; }
+
+
+    Index& operator++ ()    { x = !x; return *this; }
+    Index& operator-- ()    { x = !x; return *this; }
+    Index  operator++ (int) { x = !x; return Index(!x); }
+    Index  operator-- (int) { x = !x; return Index(!x); }
+    bool operator== (const Index& other) const { return x == other.x; }
+    bool operator!= (const Index& other) const { return x != other.x; }
+    bool operator< (const Index& other)  const { return x < other.x; }
+    bool operator> (const Index& other)  const { return x > other.x; }
+    bool operator<= (const Index& other) const { return x <= other.x; }
+    bool operator>= (const Index& other) const { return x >= other.x; }
+  private:
+    bool x;
+  };
+
 
 
   template <typename T>

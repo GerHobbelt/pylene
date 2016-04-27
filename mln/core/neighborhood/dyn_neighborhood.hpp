@@ -22,133 +22,29 @@ namespace mln
   /******************************************/
 
 
-  // template <class SiteSet, class category, class E>
-  // struct dyn_neighborhood_base
-  // {
-  //   dyn_neighborhood_base(const SiteSet& x)
-  //   {
-  //   }
-  // };
-
-
-  template <class SiteSet, class E>
-  struct dyn_neighborhood_base<SiteSet, dynamic_neighborhood_tag, E>
-    : neighborhood_base<E, dynamic_neighborhood_tag>
+  template <class SiteSet, class category, class E>
+  struct dyn_neighborhood_base<SiteSet, category, E>
+    : neighborhood_base<E, category>
   {
   public:
     typedef typename range_value<SiteSet>::type point_type;
     typedef typename range_value<SiteSet>::type site_type;
 
-    dyn_neighborhood_base(const SiteSet& dpts)
-    : dpoints(dpts)
-    {
-      m_dpoints_acc.resize(rng::size(dpoints));
-      mln_iter(p, dpoints);
-      p.init();
-      m_dpoints_acc[0] = *p;
-      for (int i = 1; p.finished(); ++i, p.next())
-	m_dpoints_acc[i] = *p - m_dpoints_acc[i-1];
-    }
-
-    ~dyn_neighborhood_base() = default;
-
-    iterator_range< sliding_piter<point_type, SiteSet> >
-    __process_point(const point_type& p) const
-    {
-      return make_iterator_range( sliding_piter<point_type, SiteSet>(p, this->dpoints) );
-    }
-
-    template <typename P>
-    iterator_range< sliding_piter<const P*, SiteSet> >
-    __bind_point(P& p) const
-    {
-      return make_iterator_range( sliding_piter<const P*, SiteSet>(&p, this->dpoints) );
-    }
-
-    template <typename PointIterator>
-    iterator_range< sliding_piter<PointIterator, SiteSet> >
-    __bind_point_iterator(const PointIterator& p) const
-    {
-      return make_iterator_range( sliding_piter<PointIterator, SiteSet>(p, this->dpoints) );
-    }
-
-    template <typename Px>
     auto
-    __bind_pixel(Px& px) const
-    {
-      return make_iterator_range( make_sliding_pixter(std::cref(px), this->dpoints) );
-    }
-
-    template <typename Px>
-    auto
-    __bind_pixel_iterator(const Px& px) const
-    {
-      return make_iterator_range( make_sliding_pixter(make_iterator_proxy(px), this->dpoints) );
-    }
-
-    const SiteSet dpoints;
-
-  private:
-    std::vector<point_type> m_dpoints_acc;
-  };
-
-
-  template <class SiteSet, class category>
-  struct dyn_neighborhood
-    : dyn_neighborhood_base<SiteSet,
-			    category,
-			    dyn_neighborhood<SiteSet, category> >
-  {
-    dyn_neighborhood(const SiteSet& s)
-    : dyn_neighborhood_base<SiteSet,
-			    category,
-			    dyn_neighborhood<SiteSet, category> >(s)
-    {
-    }
-  };
-
-
-  /**************************************/
-  /***   Specialization of static  NBH **/
-  /**************************************/
-
-  template <class SiteSet, class E>
-  struct dyn_neighborhood_base<SiteSet, constant_neighborhood_tag, E>
-    : neighborhood_base<E, constant_neighborhood_tag>
-  {
-  private:
-    enum { N = rng::size(*(SiteSet*)0) };
-
-  public:
-    typedef typename range_value<SiteSet>::type point_type;
-    typedef typename range_value<SiteSet>::type site_type;
-
-
-    dyn_neighborhood_base()
-    {
-      const SiteSet& dpoints = exact(this)->dpoints;
-      m_dpoints_acc[0] = dpoints[0];
-      for (int i = 1; i < N; ++i)
-        m_dpoints_acc[i] = dpoints[i] - m_dpoints_acc[i-1];
-    }
-
-    ~dyn_neighborhood_base() = default;
-
-    iterator_range< sliding_piter<point_type, SiteSet> >
     __process_point(const point_type& p) const
     {
       return make_iterator_range( sliding_piter<point_type, SiteSet>(p, exact(this)->dpoints) );
     }
 
     template <typename P>
-    iterator_range< sliding_piter<const P*, SiteSet> >
+    auto
     __bind_point(P& p) const
     {
       return make_iterator_range( sliding_piter<const P*, SiteSet>(&p, exact(this)->dpoints) );
     }
 
     template <typename PointIterator>
-    iterator_range< sliding_piter<PointIterator, SiteSet> >
+    auto
     __bind_point_iterator(const PointIterator& p) const
     {
       return make_iterator_range( sliding_piter<PointIterator, SiteSet>(p, exact(this)->dpoints) );
@@ -158,36 +54,30 @@ namespace mln
     auto
     __bind_pixel(Px& px) const
     {
-      return make_iterator_range(make_sliding_pixter(std::cref(px), exact(this)->dpoints));
+      return make_iterator_range( make_sliding_pixter(std::cref(px), exact(this)->dpoints) );
     }
 
     template <typename Px>
     auto
     __bind_pixel_iterator(const Px& px) const
     {
-      return make_iterator_range(make_sliding_pixter(make_iterator_proxy(px), exact(this)->dpoints));
+      return make_iterator_range( make_sliding_pixter(make_iterator_proxy(px), exact(this)->dpoints) );
     }
 
-
-  private:
-    std::array<point_type, N> m_dpoints_acc;
   };
 
 
-  template <class SiteSet>
-  struct dyn_neighborhood<SiteSet, constant_neighborhood_tag>
-    : dyn_neighborhood_base<SiteSet,
-			    constant_neighborhood_tag,
-			    dyn_neighborhood<SiteSet, constant_neighborhood_tag> >
+  template <class SiteSet, class category>
+  struct dyn_neighborhood
+    : dyn_neighborhood_base<SiteSet, category, dyn_neighborhood<SiteSet, category> >
   {
-    dyn_neighborhood(const SiteSet& s)
-    : dpoints(s)
+    dyn_wneighborhood(const SiteSet& pset)
+      : dpoints{pset}
     {
     }
 
-    SiteSet dpoints;
+    const SiteSet   dpoints;
   };
-
 
 }
 

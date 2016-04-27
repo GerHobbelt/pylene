@@ -73,17 +73,17 @@ namespace mln
     }
 
     template <typename Px>
-    iterator_range< sliding_pixter<const Px*, SiteSet> >
+    auto
     __bind_pixel(Px& px) const
     {
-      return make_iterator_range( sliding_pixter<const Px*, SiteSet>(&px, this->dpoints) );
+      return make_iterator_range( make_sliding_pixter(std::cref(px), this->dpoints) );
     }
 
     template <typename Px>
-    iterator_range< sliding_pixter<Px, SiteSet> >
+    auto
     __bind_pixel_iterator(const Px& px) const
     {
-      return make_iterator_range( sliding_pixter<Px, SiteSet>(px, this->dpoints) );
+      return make_iterator_range( make_sliding_pixter(make_iterator_proxy(px), this->dpoints) );
     }
 
     const SiteSet dpoints;

@@ -20,30 +20,45 @@ namespace mln
   ///
   ///
   template <typename I, typename J>
-  typename std::enable_if<image_traits<I>::indexable::value and image_traits<J>::indexable::value>::type
+  void
   reindex(Image<I>& ima1, const Image<J>& ima2);
 
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
-  template <typename I, typename J>
-  inline
-  typename std::enable_if<image_traits<I>::indexable::value and image_traits<J>::indexable::value>::type
-  reindex(Image<I>& ima, const Image<J>& ima2_)
+  namespace impl
   {
-    const J& ima2 = exact(ima2_);
-    auto domain = ima2.domain();
-    auto p = domain.iter();
-    p.init();
-    exact(ima).reindex(ima2.index_of_point(*p));
+
+    template <typename I, typename J>
+    inline
+    void
+    reindex(Image<I>& ima, const Image<J>& ima2_, std::true_type __are_indexable__)
+    {
+      (void) __are_indexable__;
+      const J& ima2 = exact(ima2_);
+      auto domain = ima2.domain();
+      auto p = domain.iter();
+      p.init();
+      exact(ima).reindex(ima2.index_of_point(*p));
+    }
+
+    template <typename I, typename J>
+    inline
+    void
+    reindex(Image<I>&, const Image<J>&, std::false_type __are_indexable__)
+    {
+      (void) __are_indexable__;
+    }
+
   }
 
   template <typename I, typename J>
-  inline
-  typename std::enable_if<!(image_traits<I>::indexable::value and image_traits<J>::indexable::value)>::type
-  reindex(Image<I>&, const Image<J>&)
+  void
+  reindex(Image<I>& ima1, const Image<J>& ima2)
   {
+    impl::reindex(ima1, ima2, std::integral_constant<bool,image_traits<I>::indexable::value and
+                  image_traits<J>::indexable::value> ());
   }
 
 

@@ -40,7 +40,7 @@ namespace mln
       ball2d(const std::vector<point2d>& dpts,
              const std::vector<point2d>& vdec,
              const std::vector<point2d>& vinc)
-        : dyn_neighborhood_base(dpts),
+        : dpoints(dpts),
           m_dec(vdec),
           m_inc(vinc)
       {
@@ -98,6 +98,7 @@ namespace mln
         return m_dec;
       }
 
+      const std::vector<point2d> dpoints;
     private:
       dec_type m_dec;
       inc_type m_inc;

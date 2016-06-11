@@ -23,8 +23,7 @@ namespace mln
 
 
   template <class SiteSet, class category, class E>
-  struct dyn_neighborhood_base<SiteSet, category, E>
-    : neighborhood_base<E, category>
+  struct dyn_neighborhood_base : neighborhood_base<E, category>
   {
   public:
     typedef typename range_value<SiteSet>::type point_type;
@@ -63,9 +62,7 @@ namespace mln
     {
       return make_iterator_range( make_sliding_pixter(make_iterator_proxy(px), exact(this)->dpoints) );
     }
-
   };
-
 
   template <class SiteSet, class category>
   struct dyn_neighborhood

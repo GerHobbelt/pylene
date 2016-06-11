@@ -77,8 +77,7 @@ namespace mln
   /***  Implementation     **/
   /**************************/
 
-  struct rect2d :
-    dyn_neighborhood_base<box2d, dynamic_neighborhood_tag, rect2d>
+  struct rect2d : dyn_neighborhood_base<box2d, dynamic_neighborhood_tag, rect2d>
   {
     typedef std::true_type                                is_incremental;
     typedef std::false_type                               is_separable;
@@ -89,7 +88,7 @@ namespace mln
     rect2d() = default;
 
     rect2d(const box2d& r)
-      : dyn_neighborhood_base<box2d, dynamic_neighborhood_tag, rect2d>(r)
+      : dpoints(r)
     {
     }
 
@@ -108,6 +107,7 @@ namespace mln
       return b;
     }
 
+    const box2d dpoints;
   };
 
   inline

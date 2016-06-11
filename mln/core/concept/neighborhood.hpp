@@ -9,11 +9,24 @@
 namespace mln
 {
 
+  /// \brief Neighborhood Concept
   template <class N> struct Neighborhood;
   template <class N> struct Neighborhood_;
 
+  /// \brief Weighted Neighborhood Concept
+  template <class N> struct WNeighborhood;
+
   template <class N>
-  struct Neighborhood : Object<N>
+  struct WNeighborhood : Object<N>
+  {
+  protected:
+    WNeighborhood() = default;
+    WNeighborhood(const WNeighborhood&) = default;
+    WNeighborhood(WNeighborhood&&) = default;
+  };
+
+  template <class N>
+  struct Neighborhood : WNeighborhood<N>
   {
     BOOST_CONCEPT_USAGE(Neighborhood)
     {
@@ -25,6 +38,9 @@ namespace mln
     Neighborhood(const Neighborhood&) = default;
     Neighborhood(Neighborhood&&) = default;
   };
+
+
+
 
   template <class N>
   struct Neighborhood_

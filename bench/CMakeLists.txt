@@ -1,5 +1,4 @@
 #SUBDIRS(labeling)
-#link_libraries(${FreeImage_LIBRARIES})
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
@@ -11,3 +10,7 @@ endif()
 link_libraries(benchmark)
 add_executable(BMNeighborhood   BMNeighborhood.cpp)
 add_executable(BMRotation       BMRotation.cpp)
+add_executable(BMMorphers       BMMorphers.cpp)
+
+target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
+target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})

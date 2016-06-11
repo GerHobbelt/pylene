@@ -21,10 +21,10 @@ for f in sys.argv[1:]:
         if bench["name"].endswith("_mean"):
             bench_name, name = bench["name"].split("/")
             names.append(name[:-5])
-            times_avg.append(bench["real_time"] / 1000000)
+            times_avg.append(bench["real_time"] / 1000000.0)
         elif bench["name"].endswith("_stddev"):
             bench_name, name = bench["name"].split("/")
-            times_stdv.append(bench["real_time"] / 1000000)
+            times_stdv.append(bench["real_time"] / 1000000.0)
     df[platform] = { n : v for n,v,err in zip(names, times_avg, times_stdv) }
 
 df = pd.DataFrame.from_dict(df)
@@ -32,7 +32,7 @@ print df
 ax = df.plot(kind="barh")
 
 for p in ax.patches:
-    ax.annotate("%i ms " % p.get_width(),
+    ax.annotate("%0.1f ms " % p.get_width(),
                 (p.get_width(), p.get_y() + p.get_height()/2),
                 horizontalalignment="right", verticalalignment="center")
 

@@ -43,7 +43,6 @@ BOOST_AUTO_TEST_CASE(AlphaTree_2)
 {
   using namespace mln;
   typedef uint8 V;
-  typedef typename image2d<V>::size_type size_type;
   image2d<V> ima;
 
   io::imread(MLN_IMG_PATH "fly.pgm", ima);

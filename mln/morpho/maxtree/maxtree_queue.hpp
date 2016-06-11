@@ -38,7 +38,7 @@ namespace mln
 	typedef morpho::internal::component_tree_node node_t;
 	typedef component_tree<size_type, map_t> tree_t;
 
-	component_tree<size_type, mln_ch_value(I, size_type)> ctree;
+	tree_t ctree;
 
 	auto& nodes = ctree._get_data()->m_nodes;
 	auto& S     = ctree._get_data()->m_S;

@@ -144,7 +144,6 @@ namespace mln
 	std::pair< image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type> >
 	maxtree_hqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
 	{
-	  typedef typename image2d<V>::size_type size_type;
 	  MaxTreeAlgorithmHQ<V, Neighborhood, StrictWeakOrdering, false> algo(ima, nbh, cmp);
 	  algo(ima.domain());
 	  std::cout << "Number of split: " << algo.m_nsplit << std::endl;

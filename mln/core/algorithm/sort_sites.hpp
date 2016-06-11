@@ -45,7 +45,6 @@ namespace mln
       (void) _use_indexer_;
       Indexer f;
 
-      typedef mln_value(I) V;
       static constexpr std::size_t nvalues = 1 << value_traits<index_t>::quant;
       unsigned h[nvalues] = {0,};
       {

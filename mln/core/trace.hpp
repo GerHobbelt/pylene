@@ -7,13 +7,12 @@
 # include <iostream>
 # include <stack>
 # include <string>
+# include <thread>
 
 #if MLN_HAS_TBB
-# include <tbb/compat/thread>
 # include <tbb/combinable.h>
 # include <tbb/tick_count.h>
 #else
-# include <thread>
 # include <chrono>
 #endif
 

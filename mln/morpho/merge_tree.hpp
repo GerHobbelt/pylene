@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_MORPHO_MERGE_TREE_HPP
 # define MLN_CORE_MORPHO_MERGE_TREE_HPP
 
-# include <tbb/compat/thread>
+# include <thread>
 # include <mln/morpho/maxtree_routines.hpp>
 
 namespace mln

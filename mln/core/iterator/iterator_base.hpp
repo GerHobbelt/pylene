@@ -90,6 +90,35 @@ namespace mln
     {
     }
 
+    void __inner_init()
+    {
+    }
+
+    void __inner_next()
+    {
+      exact(this)->next();
+    }
+
+    bool __inner_finished() const
+    {
+      return exact(this)->finished();
+    }
+
+    void __outer_init()
+    {
+      exact(this)->init();
+    }
+
+    void __outer_next()
+    {
+    }
+
+    bool __outer_finished() const
+    {
+      return exact(this)->finished();
+    }
+
+
   private:
     const Derived* derived() const
     {
@@ -100,7 +129,6 @@ namespace mln
     {
       return static_cast<Derived*>(this);
     }
-
   };
 
 } // end of namespace mln

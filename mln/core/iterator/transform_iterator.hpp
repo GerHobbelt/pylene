@@ -55,6 +55,15 @@ namespace mln
     bool finished() const { return it_.finished(); }
     reference dereference() const { return f_(*it_); }
 
+    void __inner_init () { it_.__inner_init(); }
+    void __inner_next () { it_.__inner_next(); }
+    bool __inner_finished () const { return it_.__inner_finished(); }
+
+    void __outer_init () { it_.__outer_init(); }
+    void __outer_next () { it_.__outer_next(); }
+    bool __outer_finished () const { return it_.__outer_finished(); }
+
+
     template <class dummy = bool>
     typename std::enable_if<has_NL::value, dummy>::type NL() const { return it_.NL(); }
 

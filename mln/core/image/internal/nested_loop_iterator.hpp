@@ -7,7 +7,6 @@
 
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/literal/vectorial.hpp>
-# include <boost/any.hpp>
 
 namespace mln
 {
@@ -19,16 +18,16 @@ namespace mln
     struct iterator_core_access
     {
       template <typename S>
-      auto get_point(S& v) -> decltype(v.get_point()) { return v.get_point(); }
+      decltype(auto) get_point(S& v) { return v.get_point(); }
 
       template <typename S>
-      auto get_point(const S& v) const -> decltype(v.get_point()) { return v.get_point(); }
+      decltype(auto) get_point(const S& v) const { return v.get_point(); }
 
       template <typename S>
-      auto get_value(S& v) -> decltype(v.get_value()) { return v.get_value(); }
+      decltype(auto) get_value(S& v) { return v.get_value(); }
 
       template <typename S>
-      auto get_index(S& v) const -> decltype(v.get_index()) { return v.get_index(); }
+      decltype(auto) get_index(S& v) const { return v.get_index(); }
 
       template <typename S, typename T>
       bool equal(const S& v, const T& other) const { return v.equal(other); }
@@ -114,7 +113,7 @@ namespace mln
     /// * `VVis::next<n>(VVis::arg)`
     /// The type of `s.get_value()` must be convertible to `VVis::arg`
     /// \{
-    template <size_t dim> struct strided_pointer_value_visitor;
+    template <size_t dim, std::ptrdiff_t lastOffset> struct strided_pointer_value_visitor;
     /// \}
 
     struct no_op_visitor;
@@ -180,7 +179,7 @@ namespace mln
       void initialize(P& point) const { point.set_all(0); }
       template <size_t n> void  init(P& point) const { point[n] = 0; }
       template <size_t n> void  next(P& point) const  { ++point[n]; }
-      template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
+      template <size_t n> bool  finished(const P& point) const { return !(point[n] < pmax_[n]); }
       bool NL(const P& point) const { return point[P::ndim-1] == 0; }
     private:
       P pmax_;
@@ -233,7 +232,7 @@ namespace mln
       void  initialize(P& point) const                  { point = pmin_; }
       template <size_t n> void  init(P& point) const    { point[n] = pmin_[n]; }
       template <size_t n> void  next(P& point) const    { ++point[n]; }
-      template <size_t n> bool  finished(const P& point) const { return point[n] >= pmax_[n]; }
+      template <size_t n> bool  finished(const P& point) const { return !(point[n] < pmax_[n]); }
       bool NL(const P& point) const { return point[P::ndim-1] == pmin_[P::ndim-1]; }
     private:
       P pmin_;
@@ -342,6 +341,9 @@ namespace mln
       strided_index_visitor(size_t index, const std::array<ptrdiff_t, dim>& delta_indexes)
 	: m_init_index(index), m_delta_indexes(delta_indexes)
       {
+        for (unsigned i = 0; i < dim-1; ++i)
+          m_delta_indexes[i] = delta_indexes[i] - delta_indexes[dim-1];
+        m_delta_indexes[dim-1] = delta_indexes[dim-1];
       }
 
       void initialize(size_t& index)
@@ -361,7 +363,7 @@ namespace mln
       std::array<std::ptrdiff_t, dim>	m_delta_indexes;
     };
 
-    template <size_t dim>
+    template <size_t dim, ptrdiff_t lastOffset>
     struct strided_pointer_value_visitor
     {
       typedef char* byte_ptr_t;
@@ -370,8 +372,10 @@ namespace mln
       strided_pointer_value_visitor() = default;
 
       strided_pointer_value_visitor(byte_ptr_t start, const std::array<ptrdiff_t, dim>& delta_offsets)
-	: m_init_ptr(start), m_delta_offsets(delta_offsets)
+	: m_init_ptr(start)
       {
+        for (unsigned i = 0; i < dim; ++i)
+          m_delta_offsets[i] = delta_offsets[i] - lastOffset;
       }
 
       void initialize(byte_ptr_t& ptr)
@@ -380,9 +384,15 @@ namespace mln
       }
 
       template <size_t n>
-      void next(byte_ptr_t& ptr)
+      std::enable_if_t<(n < dim-1)> next(byte_ptr_t& ptr)
       {
 	ptr += m_delta_offsets[n];
+      }
+
+      template <size_t n>
+      std::enable_if_t<(n == dim-1)> next(byte_ptr_t& ptr)
+      {
+	ptr += lastOffset;
       }
 
     private:
@@ -393,13 +403,10 @@ namespace mln
 
     struct no_op_visitor
     {
-      //void initialize(boost::any) const {}
       template <typename T>
       void initialize(T) const {}
       void initialize(std::ptrdiff_t) const {}
 
-      //template <size_t n> void init (const boost::any& ) {}
-      //template <size_t n> void next (boost::any) const {}
 
       template <size_t n, typename T> void next (T) const {}
       template <size_t n> void next(std::ptrdiff_t) const {}
@@ -465,6 +472,40 @@ namespace mln
         return DereferencePolicy::dereference(m_s);
       }
 
+      void __inner_init()
+      {
+        m_pv.template init<ndim-1>(get_point(m_s));
+      }
+
+      void __inner_next()
+      {
+        m_pv.template next<ndim-1>(get_point(m_s));
+        m_vv.template next<ndim-1>(get_value(m_s));
+        m_iv.template next<ndim-1>(get_index(m_s));
+      }
+
+      bool __inner_finished() const
+      {
+        return m_pv.template finished<ndim-1>(get_point(m_s));
+      }
+
+      void __outer_init()
+      {
+        m_pv.initialize(get_point(m_s));
+        m_vv.initialize(get_value(m_s));
+        m_iv.initialize(get_index(m_s));
+      }
+
+    void __outer_next()
+    {
+      this->next_<ndim-2>();
+    }
+
+    bool __outer_finished() const
+    {
+      return m_pv.template finished<0>(get_point(m_s));
+    }
+
 
   private:
       template <typename, typename, typename, typename, typename>
@@ -473,8 +514,8 @@ namespace mln
       enum { ndim = PointVisitor::point_type::ndim };
 
 
-      template <size_t n>
-      typename std::enable_if<(n > 0), void>::type
+      template <int n>
+      typename std::enable_if<(n > 0 and n < ndim-1), void>::type
       next_()
       {
         mln_precondition(not this->finished());
@@ -489,7 +530,22 @@ namespace mln
 	m_pv.template init<n>(iterator_core_access::get_point(m_s));
       }
 
-      template <size_t n>
+      template <int n>
+      typename std::enable_if<(n == ndim-1 and n != 0), void>::type
+      next_()
+      {
+        mln_precondition(not this->finished());
+        m_pv.template next<n>(iterator_core_access::get_point(m_s));
+        m_vv.template next<n>(get_value(m_s));
+        m_iv.template next<n>(get_index(m_s));
+        if (not m_pv.template finished<n>(iterator_core_access::get_point(m_s)))
+          return;
+
+        this->next_<n-1>();
+	m_pv.template init<n>(iterator_core_access::get_point(m_s));
+      }
+
+      template <int n>
       typename std::enable_if<n == 0, void>::type
       next_()
       {
@@ -498,6 +554,13 @@ namespace mln
         m_vv.template next<0>(get_value(m_s));
         m_iv.template next<0>(get_index(m_s));
       }
+
+      template <int n>
+      typename std::enable_if<n < 0, void>::type
+      next_()
+      {
+      }
+
 
     private:
       InternalStruct m_s;

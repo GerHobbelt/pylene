@@ -26,6 +26,7 @@ struct BMRotation : public benchmark::Fixture
 
 
 template <class T>
+__attribute__ ((noinline))
 void rotate_ptr(const image2d<T>& f, image2d<T>& out)
 {
 
@@ -46,6 +47,7 @@ void rotate_ptr(const image2d<T>& f, image2d<T>& out)
 }
 
 template <class T>
+__attribute__ ((noinline))
 void rotate_p(const image2d<T>& f, image2d<T>& out)
 {
   mln_foreach(point2d p, f.domain()) {
@@ -56,6 +58,7 @@ void rotate_p(const image2d<T>& f, image2d<T>& out)
 
 
 template <class T>
+__attribute__ ((noinline))
 void rotate_pix(const image2d<T>& f, image2d<T>& out)
 {
   mln_foreach(auto px, f.pixels()) {

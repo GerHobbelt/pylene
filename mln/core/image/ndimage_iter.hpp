@@ -19,17 +19,18 @@ namespace mln
     template <typename J, typename V>
     friend struct ndimage_value_range;
 
+    using P = point<int, Image::ndim>;
   public:
 
     typedef internal::nested_loop_iterator<
-    internal::origin_point_visitor_forward< typename Image::point_type >,
-    internal::strided_pointer_value_visitor<ndim>,
+    internal::origin_point_visitor_forward<P>,
+    internal::strided_pointer_value_visitor<ndim, sizeof(Value)>,
     internal::no_op_visitor,
     pixel_t, internal::deref_return_value_policy> iterator;
 
   typedef internal::nested_loop_iterator<
-    internal::origin_point_visitor_backward< typename Image::point_type >,
-    internal::strided_pointer_value_visitor<ndim>,
+    internal::origin_point_visitor_backward<P>,
+    internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>,
     internal::no_op_visitor,
     pixel_t, internal::deref_return_value_policy> reverse_iterator;
 
@@ -51,9 +52,9 @@ namespace mln
 
     const_iterator iter() const
     {
-      typename Image::point_type pmin = ima_->domain().pmin;
-      typename Image::point_type pmax = ima_->domain().pmax;
-      typename Image::point_type shp = pmax - pmin;
+      P pmin = ima_->domain().pmin;
+      P pmax = ima_->domain().pmax;
+      P shp = pmax - pmin;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
       delta_byte_strides[ndim-1]  = ima_->strides_[ndim-1];
@@ -63,16 +64,16 @@ namespace mln
 
       return const_iterator(pixel_t(exact(ima_)),
 			    internal::make_point_visitor_forward(shp),
-			    internal::strided_pointer_value_visitor<ndim>(ima_->ptr_, delta_byte_strides),
+			    internal::strided_pointer_value_visitor<ndim, sizeof(Value)>(ima_->ptr_, delta_byte_strides),
                             internal::no_op_visitor ()
 			    );
     }
 
     const_reverse_iterator riter() const
     {
-      typename Image::point_type pmin = ima_->domain().pmin;
-      typename Image::point_type pmax = ima_->domain().pmax;
-      typename Image::point_type shp = pmax - pmin;
+      P pmin = ima_->domain().pmin;
+      P pmax = ima_->domain().pmax;
+      P shp = pmax - pmin;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
       delta_byte_strides[ndim-1]  = -ima_->strides_[ndim-1];
@@ -82,7 +83,7 @@ namespace mln
 
       return const_reverse_iterator(pixel_t(exact(ima_)),
 				    internal::make_point_visitor_backward(shp),
-				    internal::strided_pointer_value_visitor<ndim>(ima_->last_, delta_byte_strides),
+				    internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>(ima_->last_, delta_byte_strides),
                                     internal::no_op_visitor ()
 				    );
     }
@@ -103,18 +104,20 @@ namespace mln
     template <typename I, typename V>
     friend struct ndimage_pixel_range;
 
+    using P = point<int, Image::ndim>;
+
   public:
     typedef internal::nested_loop_iterator<
-    internal::domain_point_visitor_forward< typename Image::point_type >,
-    internal::strided_pointer_value_visitor<ndim>,
+    internal::domain_point_visitor_forward<P>,
+    internal::strided_pointer_value_visitor<ndim, sizeof(Value)>,
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> iterator;
 
     typedef iterator const_iterator;
 
   typedef internal::nested_loop_iterator<
-    internal::domain_point_visitor_backward< typename Image::point_type >,
-    internal::strided_pointer_value_visitor<ndim>,
+    internal::domain_point_visitor_backward<P>,
+    internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>,
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> reverse_iterator;
 
@@ -133,9 +136,9 @@ namespace mln
 
     iterator iter() const
     {
-      typename Image::point_type pmin = ima_->domain().pmin;
-      typename Image::point_type pmax = ima_->domain().pmax;
-      typename Image::point_type shp = pmax - pmin;
+      P pmin = ima_->domain().pmin;
+      P pmax = ima_->domain().pmax;
+      P shp = pmax - pmin;
       //typename Image::point_type bshp = shp + 2*ima_->border_;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
@@ -150,16 +153,16 @@ namespace mln
 
       return iterator(pixel_t(exact(ima_)),
 		      internal::make_point_visitor_forward(pmin, pmax),
-		      internal::strided_pointer_value_visitor<ndim>(ima_->ptr_, delta_byte_strides),
+		      internal::strided_pointer_value_visitor<ndim, sizeof(Value)>(ima_->ptr_, delta_byte_strides),
 		      internal::strided_index_visitor<ndim>(ima_->m_index_first, delta_index_strides)
 		      );
     }
 
     reverse_iterator riter() const
     {
-      typename Image::point_type pmin = ima_->domain().pmin;
-      typename Image::point_type pmax = ima_->domain().pmax;
-      typename Image::point_type shp = pmax - pmin;
+      P pmin = ima_->domain().pmin;
+      P pmax = ima_->domain().pmax;
+      P shp = pmax - pmin;
       //typename Image::point_type bshp = shp + 2*ima_->border_;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
@@ -169,7 +172,7 @@ namespace mln
 
       return reverse_iterator(pixel_t(exact(ima_)),
 			      internal::make_point_visitor_backward(pmin, pmax),
-			      internal::strided_pointer_value_visitor<ndim>(ima_->last_, delta_byte_strides),
+			      internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>(ima_->last_, delta_byte_strides),
 			      internal::strided_index_visitor<ndim>(ima_->m_index_last, delta_index_strides)
 			      );
     }

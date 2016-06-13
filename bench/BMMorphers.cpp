@@ -34,16 +34,19 @@ threshold1(const image2d<T>& f, image2d<bool>& out, T v)
   int ostride = out.strides()[0];
   int nr = f.nrows();
   int nc = f.ncols();
-  const T* ptr_in = & f({0,0});
+  const char* ptr_in = (const char*) &f({0,0});
   bool*    ptr_out = &out({0,0});
   unsigned count = 0;
 
-  for (int i = 0; i < nr; ++i) {
-    for (int j = 0; j < nc; ++j) {
-      //ptr_out[j] = ptr_in[j] < v;
-      count += ptr_in[j] < v;
+  int p[2];
+  int sz[2] = {nr, nc};
+  for (p[0] = 0; p[0] < sz[0]; ++p[0]) {
+    for (p[1] = 0; p[1] < sz[1]; ++p[1]) {
+      ///ptr_out[j] = ptr_in[j] < v;
+      count += *(const T*)ptr_in < v;
+      ptr_in = ptr_offset(ptr_in, sizeof(T));
     }
-    ptr_in = ptr_offset(ptr_in, istride);
+    ptr_in = ptr_offset(ptr_in, istride - sizeof(T));
     //ptr_out = ptr_offset(ptr_out, ostride);
   }
   return count;
@@ -78,15 +81,29 @@ threshold2(const image2d<T>& f, image2d<bool>& out, T v)
   return count;
 }
 
+// template <class T>
+// unsigned
+// __attribute__ ((noinline))
+// threshold3(const image2d<T>& f, image2d<bool>& out, T v)
+// {
+//   auto g = f < v;
+//   unsigned count = 0;
+//   mln_foreach(auto v, g.values()) {
+//     count += (bool)v;
+//   }
+//   return count;
+// }
+
+
 template <class T>
 unsigned
 __attribute__ ((noinline))
 threshold3(const image2d<T>& f, image2d<bool>& out, T v)
 {
-  auto g = f < v;
+  
   unsigned count = 0;
-  mln_foreach(auto v, g.values()) {
-    count += (bool)v;
+  mln_foreach(auto val, f.values()) {
+    count += (val < v) ? 1 : 0;
   }
   return count;
 }

@@ -49,10 +49,10 @@ namespace mln
     friend struct internal::iterator_core_access;
 
     char* &		get_value() { return ptr_; }
-    site_type&		get_point() { return point_; }
+    mln::point<int, dim>&	get_point() { return point_; }
     size_t&		get_index() { return index_; }
     const char*         get_value() const { return ptr_; }
-    const site_type&    get_point() const { return point_; }
+    const mln::point<int, dim>& get_point() const { return point_; }
     size_t		get_index() const { return index_; }
 
     template <typename U, typename Other>
@@ -65,7 +65,8 @@ namespace mln
 
   private:
     image_type*         ima_;
-    site_type           point_;
+    mln::point<int, dim>     point_;
+    //site_type           point_;
     char*               ptr_;
     size_t		index_;
   };

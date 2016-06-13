@@ -125,7 +125,7 @@
 		BOOST_PP_CAT(__mln_zip_iter__,BOOST_PP_SEQ_HEAD(ARGV)))
 
 # define __mln_viter_chap__2(p, ima, ...)                           \
-  __mln_should_copy_col__(ima, BOOST_PP_CAT(__mln_ima_, p));    \
+  auto&& BOOST_PP_CAT(__mln_ima_, p) = ima;                         \
   auto p = BOOST_PP_CAT(__mln_ima_, p).values().iter();
 
 # define mln_viter(...)                                                 \
@@ -160,7 +160,7 @@
 		BOOST_PP_CAT(__mln_zip_iter__,BOOST_PP_SEQ_HEAD(ARGV)))
 
 # define __mln_pixter_chap__2(p, ima, ...)                          \
-  __mln_should_copy_col__(ima, BOOST_PP_CAT(__mln_ima_, p));    \
+  auto&& BOOST_PP_CAT(__mln_ima_, p) = ima;                         \
   auto p = BOOST_PP_CAT(__mln_ima_, p).pixels().iter();
 
 # define mln_pixter(...)                                                 \

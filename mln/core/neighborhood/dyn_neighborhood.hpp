@@ -68,7 +68,7 @@ namespace mln
   struct dyn_neighborhood
     : dyn_neighborhood_base<SiteSet, category, dyn_neighborhood<SiteSet, category> >
   {
-    dyn_wneighborhood(const SiteSet& pset)
+    dyn_neighborhood(const SiteSet& pset)
       : dpoints{pset}
     {
     }

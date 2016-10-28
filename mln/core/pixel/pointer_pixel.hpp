@@ -60,7 +60,7 @@ namespace mln
     site_type           point() const { mln_precondition(m_image); return m_point; }
     site_type           site() const { mln_precondition(m_image); return m_point; }
     size_type		index() const { mln_precondition(m_image); return m_index; }
-
+    constexpr int       weight() const { return 1; }
 
   private:
     // Enable this pixel to be compliant as an internal structure used for iterating

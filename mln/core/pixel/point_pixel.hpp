@@ -37,6 +37,7 @@ namespace mln
     }
 
     image_type&         image() const { mln_precondition(m_image); return *m_image; }
+    constexpr int       weight() const { return 1; }
     reference           val() const   { mln_precondition(m_image); return m_image->at(m_point); }
     point_type          point() const { mln_precondition(m_image); return m_point; }
     point_type          site() const { mln_precondition(m_image); return m_point; }

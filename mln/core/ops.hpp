@@ -246,7 +246,32 @@ namespace mln
 // definition instead of the instanciation.
 namespace mln
 {
-  using std::get;
+  //using std::get;
+  namespace internal
+  {
+    template <size_t N, class C>
+    decltype(auto)
+    get_helper(C&& obj, std::true_type _is_scalar_)
+    {
+      static_assert(N == 0, "N must be null for scalar");
+      return std::forward<C>(obj);
+    }
+
+    template <size_t N, class C>
+    decltype(auto)
+    get_helper(C&& obj, std::false_type _is_scalar_)
+    {
+      using std::get;
+      return get<N>(std::forward<C>(obj));
+    }
+  }
+
+  template <size_t N, class C>
+  decltype(auto) get(C&& obj)
+  {
+    return internal::get_helper<N>(std::forward<C>(obj),
+                                   std::is_scalar<std::remove_reference_t<C>> ());
+  }
 
   template <size_t N>
   struct getter

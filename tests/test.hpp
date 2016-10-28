@@ -29,6 +29,7 @@ namespace mln
             msg << " and\n:";
             io::imprint(g, msg);
             BOOST_ERROR(msg.str());
+            return;
           }
       }
 

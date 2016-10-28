@@ -21,6 +21,11 @@
 
 # define mln_exiting()  mln::trace::exiting();
 
+# define mln_scoped_entering(NAME)                              \
+  mln::trace::entering(NAME);                                   \
+  auto __mln_trace__COUNTER__ = mln::trace::scoped_exit();
+
+
 namespace mln
 {
 
@@ -139,6 +144,12 @@ namespace mln
     }
 
 #endif
+
+    struct scoped_exit
+    {
+      ~scoped_exit() { exiting(); }
+    };
+
   }
 }
 

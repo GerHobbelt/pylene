@@ -24,13 +24,13 @@ namespace mln
 
     typedef internal::nested_loop_iterator<
     internal::origin_point_visitor_forward<P>,
-    internal::strided_pointer_value_visitor<ndim, sizeof(Value)>,
+    internal::strided_offset_visitor<ndim, sizeof(Value)>,
     internal::no_op_visitor,
     pixel_t, internal::deref_return_value_policy> iterator;
 
   typedef internal::nested_loop_iterator<
     internal::origin_point_visitor_backward<P>,
-    internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>,
+    internal::strided_offset_visitor<ndim, -(int)sizeof(Value)>,
     internal::no_op_visitor,
     pixel_t, internal::deref_return_value_policy> reverse_iterator;
 
@@ -52,38 +52,34 @@ namespace mln
 
     const_iterator iter() const
     {
-      P pmin = ima_->domain().pmin;
-      P pmax = ima_->domain().pmax;
-      P shp = pmax - pmin;
+      P shp = ima_->domain().shape();
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
       delta_byte_strides[ndim-1]  = ima_->strides_[ndim-1];
 
       for (unsigned i = 0; i < ndim-1; ++i)
-        delta_byte_strides[i] = ima_->strides_[i] - ima_->strides_[i+1] * (shp[i+1] - 1);
+        delta_byte_strides[i] = ima_->strides_[i] - ima_->strides_[i+1] * shp[i+1];
 
-      return const_iterator(pixel_t(exact(ima_)),
+      return const_iterator(pixel_t(nullptr, ima_->ptr_),
 			    internal::make_point_visitor_forward(shp),
-			    internal::strided_pointer_value_visitor<ndim, sizeof(Value)>(ima_->ptr_, delta_byte_strides),
+			    internal::strided_offset_visitor<ndim, sizeof(Value)>(0, delta_byte_strides),
                             internal::no_op_visitor ()
 			    );
     }
 
     const_reverse_iterator riter() const
     {
-      P pmin = ima_->domain().pmin;
-      P pmax = ima_->domain().pmax;
-      P shp = pmax - pmin;
+      P shp = ima_->domain().shape();
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
-      delta_byte_strides[ndim-1]  = -ima_->strides_[ndim-1];
+      delta_byte_strides[ndim-1]  = -static_cast<std::ptrdiff_t>(ima_->strides_[ndim-1]);
 
       for (unsigned i = 0; i < ndim-1; ++i)
-        delta_byte_strides[i] = -(ima_->strides_[i] - ima_->strides_[i+1] * (shp[i+1] - 1));
+        delta_byte_strides[i] = -static_cast<std::ptrdiff_t>(ima_->strides_[i] - ima_->strides_[i+1] * shp[i+1]);
 
-      return const_reverse_iterator(pixel_t(exact(ima_)),
+      return const_reverse_iterator(pixel_t(nullptr, ima_->last_),
 				    internal::make_point_visitor_backward(shp),
-				    internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>(ima_->last_, delta_byte_strides),
+				    internal::strided_offset_visitor<ndim, -(int)sizeof(Value)>(0, delta_byte_strides),
                                     internal::no_op_visitor ()
 				    );
     }
@@ -109,7 +105,7 @@ namespace mln
   public:
     typedef internal::nested_loop_iterator<
     internal::domain_point_visitor_forward<P>,
-    internal::strided_pointer_value_visitor<ndim, sizeof(Value)>,
+    internal::strided_offset_visitor<ndim, sizeof(Value)>,
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> iterator;
 
@@ -117,7 +113,7 @@ namespace mln
 
   typedef internal::nested_loop_iterator<
     internal::domain_point_visitor_backward<P>,
-    internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>,
+    internal::strided_offset_visitor<ndim, -(int)sizeof(Value)>,
     internal::strided_index_visitor<ndim>,
     pixel_t, internal::deref_return_structure_policy> reverse_iterator;
 
@@ -134,48 +130,53 @@ namespace mln
     {
     }
 
-    iterator iter() const
+    const_iterator iter() const
     {
       P pmin = ima_->domain().pmin;
       P pmax = ima_->domain().pmax;
       P shp = pmax - pmin;
-      //typename Image::point_type bshp = shp + 2*ima_->border_;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
       std::array<std::ptrdiff_t, ndim> delta_index_strides;
 
-      compute_delta_strides<ndim>(& ima_->m_index_strides[0], &shp[0], &delta_index_strides[0]);
-      compute_delta_strides<ndim>(& ima_->strides_[0],        &shp[0], &delta_byte_strides[0]);
-      // std::cout << ima_->m_index_strides[0] << std::endl;
-      // std::cout << ima_->m_index_strides[1] << std::endl;
-      // std::cout << delta_index_strides[0] << std::endl;
-      // std::cout << delta_index_strides[1] << std::endl;
+      delta_byte_strides[ndim-1]  = ima_->strides_[ndim-1];
+      delta_index_strides[ndim-1]  = ima_->m_index_strides[ndim-1];
 
-      return iterator(pixel_t(exact(ima_)),
-		      internal::make_point_visitor_forward(pmin, pmax),
-		      internal::strided_pointer_value_visitor<ndim, sizeof(Value)>(ima_->ptr_, delta_byte_strides),
-		      internal::strided_index_visitor<ndim>(ima_->m_index_first, delta_index_strides)
-		      );
+      for (unsigned i = 0; i < ndim-1; ++i) {
+        delta_byte_strides[i] = ima_->strides_[i] - ima_->strides_[i+1] * shp[i+1];
+        delta_index_strides[i] = ima_->m_index_strides[i] - ima_->m_index_strides[i+1] * shp[i+1];
+      }
+
+      return const_iterator(pixel_t(exact(ima_), ima_->ptr_),
+                            internal::make_point_visitor_forward(pmin, pmax),
+                            internal::strided_offset_visitor<ndim, sizeof(Value)>(0, delta_byte_strides),
+                            internal::strided_index_visitor<ndim>(ima_->m_index_first, delta_index_strides)
+                            );
     }
 
-    reverse_iterator riter() const
+    const_reverse_iterator riter() const
     {
       P pmin = ima_->domain().pmin;
       P pmax = ima_->domain().pmax;
       P shp = pmax - pmin;
-      //typename Image::point_type bshp = shp + 2*ima_->border_;
 
       std::array<std::ptrdiff_t, ndim> delta_byte_strides;
       std::array<std::ptrdiff_t, ndim> delta_index_strides;
-      compute_negative_delta_strides<ndim>(&ima_->m_index_strides[0], &shp[0], &delta_index_strides[0]);
-      compute_negative_delta_strides<ndim>(&ima_->strides_[0],        &shp[0], &delta_byte_strides[0]);
+      delta_byte_strides[ndim-1]  = -static_cast<std::ptrdiff_t>(ima_->strides_[ndim-1]);
+      delta_index_strides[ndim-1]  = -static_cast<std::ptrdiff_t>(ima_->m_index_strides[ndim-1]);
 
-      return reverse_iterator(pixel_t(exact(ima_)),
+      for (unsigned i = 0; i < ndim-1; ++i) {
+        delta_byte_strides[i] = -static_cast<std::ptrdiff_t>(ima_->strides_[i] - ima_->strides_[i+1] * shp[i+1]);
+        delta_index_strides[i] = -static_cast<std::ptrdiff_t>(ima_->m_index_strides[i] - ima_->m_index_strides[i+1] * shp[i+1]);
+      }
+
+      return reverse_iterator(pixel_t(exact(ima_), ima_->last_),
 			      internal::make_point_visitor_backward(pmin, pmax),
-			      internal::strided_pointer_value_visitor<ndim, -(int)sizeof(Value)>(ima_->last_, delta_byte_strides),
+			      internal::strided_offset_visitor<ndim, -(int)sizeof(Value)>(0, delta_byte_strides),
 			      internal::strided_index_visitor<ndim>(ima_->m_index_last, delta_index_strides)
 			      );
     }
+
   private:
     Image* ima_;
   };

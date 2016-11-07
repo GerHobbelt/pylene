@@ -18,19 +18,20 @@ namespace mln
     struct iterator_core_access
     {
       template <typename S>
-      decltype(auto) get_point(S& v) { return v.get_point(); }
+      static decltype(auto) get_point(S& v) { return v.get_point(); }
 
       template <typename S>
-      decltype(auto) get_point(const S& v) const { return v.get_point(); }
+      static decltype(auto) get_value(S& v) { return v.get_value(); }
 
       template <typename S>
-      decltype(auto) get_value(S& v) { return v.get_value(); }
+      static decltype(auto) get_index(S& v) { return v.get_index(); }
 
       template <typename S>
-      decltype(auto) get_index(S& v) const { return v.get_index(); }
+      static decltype(auto) get_offset(S& v) { return v.get_offset(); }
+
 
       template <typename S, typename T>
-      bool equal(const S& v, const T& other) const { return v.equal(other); }
+      static bool equal(const S& v, const T& other) { return v.equal(other); }
     };
 
     struct nested_loop_pixel_structure_base
@@ -42,6 +43,8 @@ namespace mln
       std::nullptr_t get_value() const  { return nullptr; }
       std::nullptr_t get_index()        { return nullptr; }
       std::nullptr_t get_index() const  { return nullptr; }
+      std::nullptr_t get_offset()        { return nullptr; }
+      std::nullptr_t get_offset() const  { return nullptr; }
     };
 
 
@@ -113,7 +116,7 @@ namespace mln
     /// * `VVis::next<n>(VVis::arg)`
     /// The type of `s.get_value()` must be convertible to `VVis::arg`
     /// \{
-    template <size_t dim, std::ptrdiff_t lastOffset> struct strided_pointer_value_visitor;
+    template <size_t dim, std::ptrdiff_t lastOffset> struct strided_offset_visitor;
     /// \}
 
     struct no_op_visitor;
@@ -173,7 +176,7 @@ namespace mln
     {
       typedef P point_type;
 
-      origin_point_visitor_forward() : pmax_ () {}
+      origin_point_visitor_forward() = default;
       origin_point_visitor_forward(const P& pmax) : pmax_ (pmax) {}
 
       void initialize(P& point) const { point.set_all(0); }
@@ -181,7 +184,7 @@ namespace mln
       template <size_t n> void  next(P& point) const  { ++point[n]; }
       template <size_t n> bool  finished(const P& point) const { return !(point[n] < pmax_[n]); }
       bool NL(const P& point) const { return point[P::ndim-1] == 0; }
-    private:
+      //private:
       P pmax_;
     };
 
@@ -190,7 +193,7 @@ namespace mln
     {
       typedef P point_type;
 
-      origin_point_visitor_backward() : pmax_ () {}
+      origin_point_visitor_backward() = default;
       origin_point_visitor_backward(const P& pmax) : pmax_ (pmax) {}
 
       void  initialize(P& point) const { point = pmax_; point -= 1; }
@@ -208,7 +211,7 @@ namespace mln
     {
       typedef P point_type;
 
-      domain_point_visitor_backward(): pmin_ (), pmax_ () {}
+      domain_point_visitor_backward() = default;
       domain_point_visitor_backward(const P& pmin, const P& pmax) : pmin_ (pmin), pmax_ (pmax) {}
 
       void  initialize(P& point) const { point = pmax_; point -= 1; }
@@ -226,7 +229,7 @@ namespace mln
     {
       typedef P point_type;
 
-      domain_point_visitor_forward(): pmin_ (), pmax_ () {}
+      domain_point_visitor_forward() = default;
       domain_point_visitor_forward(const P& pmin, const P& pmax) : pmin_ (pmin), pmax_ (pmax) {}
 
       void  initialize(P& point) const                  { point = pmin_; }
@@ -244,7 +247,7 @@ namespace mln
     {
       typedef P point_type;
 
-      strided_domain_point_visitor_backward(): pmin_ (), pmax_ (), strides_ ()  {}
+      strided_domain_point_visitor_backward() = default;
       strided_domain_point_visitor_backward(const P& pmin, const P& pmax, const P& strides) :
 	pmin_ (pmin), pmax_(pmax), strides_ (strides)
       {
@@ -267,7 +270,7 @@ namespace mln
     {
       typedef P point_type;
 
-      strided_domain_point_visitor_forward(): pmin_ (), pmax_ (), strides_ () {}
+      strided_domain_point_visitor_forward() = default;
       strided_domain_point_visitor_forward(const P& pmin, const P& pmax, const P& strides) :
 	pmin_ (pmin), pmax_ (pmax), strides_ (strides) {}
 
@@ -334,16 +337,12 @@ namespace mln
     template <size_t dim>
     struct strided_index_visitor
     {
-      strided_index_visitor()
-      {
-      }
+      strided_index_visitor() = default;
 
       strided_index_visitor(size_t index, const std::array<ptrdiff_t, dim>& delta_indexes)
-	: m_init_index(index), m_delta_indexes(delta_indexes)
+	: m_init_index(index),
+          m_delta_indexes(delta_indexes)
       {
-        for (unsigned i = 0; i < dim-1; ++i)
-          m_delta_indexes[i] = delta_indexes[i] - delta_indexes[dim-1];
-        m_delta_indexes[dim-1] = delta_indexes[dim-1];
       }
 
       void initialize(size_t& index)
@@ -363,40 +362,39 @@ namespace mln
       std::array<std::ptrdiff_t, dim>	m_delta_indexes;
     };
 
-    template <size_t dim, ptrdiff_t lastOffset>
-    struct strided_pointer_value_visitor
+    template <size_t dim, std::ptrdiff_t lastOffset>
+    struct strided_offset_visitor
     {
-      typedef char* byte_ptr_t;
+      typedef std::ptrdiff_t offset_t;
       enum { ndim = dim };
 
-      strided_pointer_value_visitor() = default;
+      strided_offset_visitor() = default;
 
-      strided_pointer_value_visitor(byte_ptr_t start, const std::array<ptrdiff_t, dim>& delta_offsets)
-	: m_init_ptr(start)
+      strided_offset_visitor(std::ptrdiff_t start, const std::array<std::ptrdiff_t, dim>& delta_offsets)
+	: m_init_offset(start),
+          m_delta_offsets(delta_offsets)
       {
-        for (unsigned i = 0; i < dim; ++i)
-          m_delta_offsets[i] = delta_offsets[i] - lastOffset;
       }
 
-      void initialize(byte_ptr_t& ptr)
+      void initialize(offset_t& ptr)
       {
-	ptr = m_init_ptr;
+	ptr = m_init_offset;
       }
 
       template <size_t n>
-      std::enable_if_t<(n < dim-1)> next(byte_ptr_t& ptr)
+      std::enable_if_t<(n < dim-1)> next(offset_t& ptr)
       {
 	ptr += m_delta_offsets[n];
       }
 
       template <size_t n>
-      std::enable_if_t<(n == dim-1)> next(byte_ptr_t& ptr)
+      std::enable_if_t<(n == dim-1)> next(offset_t& ptr)
       {
 	ptr += lastOffset;
       }
 
     private:
-      byte_ptr_t			m_init_ptr;
+      std::ptrdiff_t			m_init_offset;
       std::array<std::ptrdiff_t, dim>	m_delta_offsets;
     };
 
@@ -405,19 +403,16 @@ namespace mln
     {
       template <typename T>
       void initialize(T) const {}
-      void initialize(std::ptrdiff_t) const {}
-
 
       template <size_t n, typename T> void next (T) const {}
-      template <size_t n> void next(std::ptrdiff_t) const {}
     };
 
 
 
-    template <typename PointVisitor, typename ValueVisitor, typename IndexVisitor,
+    template <typename PointVisitor, typename OffsetVisitor, typename IndexVisitor,
 	      typename InternalStruct, typename DereferencePolicy>
     struct nested_loop_iterator :
-      iterator_base< nested_loop_iterator<PointVisitor, ValueVisitor, IndexVisitor, InternalStruct, DereferencePolicy>,
+      iterator_base< nested_loop_iterator<PointVisitor, OffsetVisitor, IndexVisitor, InternalStruct, DereferencePolicy>,
                      typename DereferencePolicy::template value_type<InternalStruct>,
                      typename DereferencePolicy::template reference<InternalStruct> >,
       public internal::iterator_core_access
@@ -425,19 +420,19 @@ namespace mln
       typedef typename DereferencePolicy::template reference<InternalStruct> reference;
       typedef std::true_type has_NL;
 
-      nested_loop_iterator()
-      {
-      }
+      nested_loop_iterator() = default;
 
-      nested_loop_iterator(const InternalStruct s, const PointVisitor& pv, const ValueVisitor& vv, const IndexVisitor& iv)
+      nested_loop_iterator(const InternalStruct s, const PointVisitor& pv, const OffsetVisitor& vv, const IndexVisitor& iv)
         : m_s (s), m_pv (pv), m_vv (vv), m_iv (iv)
       {
       }
 
-      template <typename PointVisitor2, typename ValueVisitor2, typename IndexVisitor2, typename InternalStruct2>
-      nested_loop_iterator(const nested_loop_iterator<PointVisitor2, ValueVisitor2, IndexVisitor2, InternalStruct2, DereferencePolicy>& other,
+      nested_loop_iterator(const nested_loop_iterator&) = default;
+
+      template <typename PointVisitor2, typename OffsetVisitor2, typename IndexVisitor2, typename InternalStruct2>
+      nested_loop_iterator(const nested_loop_iterator<PointVisitor2, OffsetVisitor2, IndexVisitor2, InternalStruct2, DereferencePolicy>& other,
 			   typename std::enable_if< std::is_convertible<PointVisitor, PointVisitor2>::value and
-			   std::is_convertible<ValueVisitor2, ValueVisitor>::value and
+			   std::is_convertible<OffsetVisitor2, OffsetVisitor>::value and
 			   std::is_convertible<InternalStruct2, InternalStruct>::value>::type* = NULL)
 	: m_s (other.m_s), m_pv (other.m_pv), m_vv (other.m_vv), m_iv (other.m_iv)
       {
@@ -447,7 +442,7 @@ namespace mln
       void init()
       {
         m_pv.initialize(get_point(m_s));
-        m_vv.initialize(get_value(m_s));
+        m_vv.initialize(get_offset(m_s));
         m_iv.initialize(get_index(m_s));
       }
 
@@ -480,7 +475,7 @@ namespace mln
       void __inner_next()
       {
         m_pv.template next<ndim-1>(get_point(m_s));
-        m_vv.template next<ndim-1>(get_value(m_s));
+        m_vv.template next<ndim-1>(get_offset(m_s));
         m_iv.template next<ndim-1>(get_index(m_s));
       }
 
@@ -492,13 +487,13 @@ namespace mln
       void __outer_init()
       {
         m_pv.initialize(get_point(m_s));
-        m_vv.initialize(get_value(m_s));
+        m_vv.initialize(get_offset(m_s));
         m_iv.initialize(get_index(m_s));
       }
 
     void __outer_next()
     {
-      this->next_<ndim-2>();
+      next_<ndim-2>();
     }
 
     bool __outer_finished() const
@@ -507,7 +502,7 @@ namespace mln
     }
 
 
-  private:
+  public:
       template <typename, typename, typename, typename, typename>
       friend struct nested_loop_iterator;
 
@@ -515,58 +510,32 @@ namespace mln
 
 
       template <int n>
-      typename std::enable_if<(n > 0 and n < ndim-1), void>::type
+      std::enable_if_t<(n >= 0)>
       next_()
       {
         mln_precondition(not this->finished());
-        m_pv.template next<n>(iterator_core_access::get_point(m_s));
-        if (not m_pv.template finished<n>(iterator_core_access::get_point(m_s)))
-          {
-            m_vv.template next<n>(get_value(m_s));
-            m_iv.template next<n>(get_index(m_s));
-            return;
-          }
-        this->next_<n-1>();
-	m_pv.template init<n>(iterator_core_access::get_point(m_s));
-      }
-
-      template <int n>
-      typename std::enable_if<(n == ndim-1 and n != 0), void>::type
-      next_()
-      {
-        mln_precondition(not this->finished());
-        m_pv.template next<n>(iterator_core_access::get_point(m_s));
-        m_vv.template next<n>(get_value(m_s));
+        m_pv.template next<n>(get_point(m_s));
+        m_vv.template next<n>(get_offset(m_s));
         m_iv.template next<n>(get_index(m_s));
-        if (not m_pv.template finished<n>(iterator_core_access::get_point(m_s)))
-          return;
 
-        this->next_<n-1>();
-	m_pv.template init<n>(iterator_core_access::get_point(m_s));
+        if (n != 0 and m_pv.template finished<n>(get_point(m_s)))
+          {
+            m_pv.template init<n>(get_point(m_s));
+            this->next_<n-1>();
+          }
       }
 
       template <int n>
-      typename std::enable_if<n == 0, void>::type
-      next_()
-      {
-        mln_precondition(not this->finished());
-        m_pv.template next<0>(get_point(m_s));
-        m_vv.template next<0>(get_value(m_s));
-        m_iv.template next<0>(get_index(m_s));
-      }
-
-      template <int n>
-      typename std::enable_if<n < 0, void>::type
+      std::enable_if_t<(n < 0)>
       next_()
       {
       }
 
-
-    private:
+    public:
       InternalStruct m_s;
-      PointVisitor m_pv;
-      ValueVisitor m_vv;
-      IndexVisitor m_iv;
+      PointVisitor   m_pv;
+      OffsetVisitor  m_vv;
+      IndexVisitor   m_iv;
     };
 
   }

@@ -53,17 +53,28 @@ namespace mln
       for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true))
 */
 
+namespace mln
+{
+namespace internal
+{
+  template <class T>
+  T&&
+  iter_outer_init(T&& x)
+  {
+    x.__outer_init();
+    return std::forward<T>(x);
+  }
+}
+}
+
 # define mln_foreach(p, COL)						\
   MLN_DECL_VAR(_mln_range_, COL)                                        \
-  MLN_DECL_VAR(_mln_it_, mln::rng::iter(_mln_range_.get()))		\
-  for (_mln_it_.get().__outer_init();                                   \
-       !_mln_it_.get().__outer_finished();                               \
-       _mln_it_.get().__outer_next())                                   \
-    for (_mln_it_.get().__inner_init();                                 \
-         !_mln_it_.get().__inner_finished();                            \
-         _mln_it_.get().__inner_next())                                 \
+  for (auto _mln_it_ = mln::internal::iter_outer_init(mln::rng::iter(_mln_range_.get())); \
+       !_mln_it_.__outer_finished();                                    \
+         _mln_it_.__outer_next())                                       \
+    for (_mln_it_.__inner_init(); !_mln_it_.__inner_finished(); _mln_it_.__inner_next()) \
       MLN_DECL_VAR(_mln_stop_, false)                                   \
-        for(p = *(_mln_it_.get()); !_mln_stop_.get(); _mln_stop_.set(true))
+        for(p = *_mln_it_; !_mln_stop_.get(); _mln_stop_.set(true))
 
 
 # define mln_reverse_foreach(p, COL)						\

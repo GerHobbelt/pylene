@@ -292,7 +292,8 @@ namespace mln
 
       void set_all(const T& v)
       {
-        std::fill(v_, v_ + dim, v);
+        for (unsigned i = 0; i < dim; ++i)
+          v_[i] = v;
       }
 
       template <typename U>

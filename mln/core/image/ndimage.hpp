@@ -427,6 +427,7 @@ namespace mln
     std::array<size_t, dim>	strides_;	///< Strides in bytes
     std::shared_ptr< internal::ndimage_data<T, dim> > data_;
     int		border_;
+  public:
     char*	ptr_;           ///< Pointer to the first element in the domain
     char*	last_;          ///< Pointer to the last element in the domain (not past-the-end)
 
@@ -785,10 +786,11 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at(const point_type& p)
   {
     pixel_type pix;
-    pix.ima_  = (E*)this;
-    pix.point_ = p;
-    pix.index_ = this->index_of_point(p);
-    pix.ptr_ = (char*) (m_ptr_origin + pix.index_);
+    pix.m_ima  = (E*)this;
+    pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);  //+ pix.index_);
+    pix.m_point = p;
+    pix.m_index = this->index_of_point(p);
+    pix.m_offset = pix.m_index * sizeof(T);
     return pix;
   }
 
@@ -798,10 +800,11 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at(const point_type& p) const
   {
     const_pixel_type pix;
-    pix.ima_  = (const E*)this;
-    pix.point_ = p;
-    pix.index_ = this->index_of_point(p);
-    pix.ptr_ = (char*) (m_ptr_origin + pix.index_);
+    pix.m_ima  = (const E*)this;
+    pix.m_ptr  = reinterpret_cast<char*>(m_ptr_origin);
+    pix.m_point = p;
+    pix.m_index = this->index_of_point(p);
+    pix.m_offset = pix.m_index * sizeof(T);
     return pix;
   }
 
@@ -811,10 +814,11 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at_index(size_type i)
   {
     pixel_type pix;
-    pix.ima_  = (E*)this;
-    pix.point_ = this->point_at_index(i);
-    pix.index_ = i;
-    pix.ptr_ = (char*) (m_ptr_origin + i);
+    pix.m_ima  = (E*)this;
+    pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);
+    pix.m_point = this->point_at_index(i);
+    pix.m_index = i;
+    pix.m_offset = i * sizeof(T);
     return pix;
   }
 
@@ -823,11 +827,12 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_pixel_type
   ndimage_base<T,dim,E>::pixel_at_index(size_type i) const
   {
-    pixel_type pix;
-    pix.ima_  = (const E*)this;
-    pix.point_ = this->point_at_index(i);
-    pix.index_ = i;
-    pix.ptr_ = (char*) (m_ptr_origin + i);
+    const_pixel_type pix;
+    pix.m_ima  = (const E*)this;
+    pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);
+    pix.m_point = this->point_at_index(i);
+    pix.m_index = i;
+    pix.m_offset = i * sizeof(T);
     return pix;
   }
 

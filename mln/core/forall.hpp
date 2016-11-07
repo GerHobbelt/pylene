@@ -28,24 +28,43 @@
 
 
 
-# define MLN_FORALL_INIT(z, n, args)		\
+# define MLN_FORALL_INIT(z, n, args)                            \
   BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).init()
 
-# define MLN_FORALL_NEXT(z, n, args)		\
+# define MLN_FORALL_NEXT(z, n, args)                            \
   BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).next()
 
-# define MLN_FORALL_UNSET_DEJAVU(z, n, args)	\
+# define MLN_FORALL_OUTER_INIT(z, n, args)                              \
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).__outer_init()
+
+# define MLN_FORALL_OUTER_NEXT(z, n, args)                              \
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).__outer_next()
+
+# define MLN_FORALL_INNER_INIT(z, n, args)                              \
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).__inner_init()
+
+# define MLN_FORALL_INNER_NEXT(z, n, args)                              \
+  BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).__inner_next()
+
+# define MLN_FORALL_UNSET_DEJAVU(z, n, args)                            \
   BOOST_PP_COMMA_IF(n) BOOST_PP_SEQ_ELEM(n, args).set_dejavu_(false)
 
-# define __mln_forall__(ARGC, ARGV)						\
-  for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_INIT, ARGV),			\
+# define __mln_forall__(ARGC, ARGV)                                     \
+  for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_OUTER_INIT, ARGV),              \
 	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV);		\
-       !BOOST_PP_SEQ_ELEM(0, ARGV).finished();				\
-       BOOST_PP_REPEAT(ARGC, MLN_FORALL_NEXT, ARGV),			\
-	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))
+       !BOOST_PP_SEQ_ELEM(0, ARGV).__outer_finished();                  \
+       BOOST_PP_REPEAT(ARGC, MLN_FORALL_OUTER_NEXT, ARGV),              \
+	 BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))          \
+    for( BOOST_PP_REPEAT(ARGC, MLN_FORALL_INNER_INIT, ARGV),            \
+           BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV);        \
+         !BOOST_PP_SEQ_ELEM(0, ARGV).__inner_finished();                \
+         BOOST_PP_REPEAT(ARGC, MLN_FORALL_INNER_NEXT, ARGV),            \
+           BOOST_PP_REPEAT(ARGC, MLN_FORALL_UNSET_DEJAVU, ARGV))
 
-# define __mln_forall__1(p, ...)                    \
-  for (p.init(); !p.finished(); p.next())
+
+# define __mln_forall__1(p, ...)                                        \
+  for (p.__outer_init(); !p.__outer_finished(); p.__outer_next())       \
+   for (p.__inner_init(); !p.__inner_finished(); p.__inner_next())
 
 # define mln_forall(...)                                                \
   BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 1),  \

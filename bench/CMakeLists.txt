@@ -8,17 +8,20 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rpass=loop-vectorize -Rpass-analysis=loop-vectorize -Rpass-missed=loop-vectorize -g")
-endif()
+  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(STANDALONE_COMPILE_FLAGS "-fopt-info-vec-all")
+endif ()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopt-info-vec-all")
-endif()
+set(src_standalone
+  standalone.cpp
+  )
+
+set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
 link_libraries(benchmark)
 add_executable(BMNeighborhood   BMNeighborhood.cpp)
 add_executable(BMRotation       BMRotation.cpp)
-add_executable(BMMorphers       BMMorphers.cpp)
-
+add_executable(BMMorphers       BMMorphers.cpp   standalone.cpp)
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
 target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})

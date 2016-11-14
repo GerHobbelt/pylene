@@ -20,35 +20,6 @@ namespace mln
   /* Implementation   */
   /********************/
 
-  namespace internal
-  {
-
-    struct iterator_dereference
-    {
-      template <typename Iterator>
-      struct apply { typedef typename std::remove_reference<Iterator>::type::reference type; };
-
-      template <typename Iterator>
-      typename Iterator::reference
-      operator () (Iterator& it) const
-      {
-	return *it;
-      }
-    };
-
-    struct iterator_init
-    {
-      template <typename Iterator>
-      void operator() (Iterator& it) const { it.init(); }
-    };
-
-    struct iterator_next
-    {
-      template <typename Iterator>
-      void operator() (Iterator& it) const { it.next(); }
-    };
-
-  };
 
   template <class... TTypes>
   struct zip_iterator< std::tuple<TTypes...> >
@@ -82,12 +53,12 @@ namespace mln
 
     void init()
     {
-      internal::tuple_for_each(m_iterator_tuple, internal::iterator_init ());
+      internal::tuple_for_each(m_iterator_tuple, [](auto& x) { x.init(); });
     }
 
     void next()
     {
-      internal::tuple_for_each(m_iterator_tuple, internal::iterator_next ());
+      internal::tuple_for_each(m_iterator_tuple, [](auto& x) { x.next(); });
     }
 
     bool finished() const
@@ -95,9 +66,41 @@ namespace mln
       return std::get<0>(m_iterator_tuple).finished();
     }
 
+    void __inner_init()
+    {
+      internal::tuple_for_each(m_iterator_tuple, [](auto& x) { x.__inner_init(); });
+    }
+
+    void __outer_init()
+    {
+      internal::tuple_for_each(m_iterator_tuple, [](auto& x) { x.__outer_init(); });
+    }
+
+    void __inner_next()
+    {
+      internal::tuple_for_each(m_iterator_tuple, [](auto& x) { x.__inner_next(); });
+    }
+
+    void __outer_next()
+    {
+      internal::tuple_for_each(m_iterator_tuple, [](auto& x) { x.__outer_next(); });
+    }
+
+
+    bool __inner_finished() const
+    {
+      return std::get<0>(m_iterator_tuple).__inner_finished();
+    }
+
+    bool __outer_finished() const
+    {
+      return std::get<0>(m_iterator_tuple).__outer_finished();
+    }
+
+
     reference dereference() const
     {
-      return internal::tuple_transform(m_iterator_tuple, internal::iterator_dereference ());
+      return internal::tuple_transform(m_iterator_tuple, [](auto& x) -> decltype(auto) { return x.dereference(); });
     }
 
     template <class dummy = bool>

@@ -14,13 +14,14 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 set(src_standalone
+  BMNeighborhood_standalone.cpp
   standalone.cpp
   )
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
 link_libraries(benchmark)
-add_executable(BMNeighborhood   BMNeighborhood.cpp)
+add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_standalone.cpp)
 add_executable(BMRotation       BMRotation.cpp)
 add_executable(BMMorphers       BMMorphers.cpp   standalone.cpp)
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})

@@ -13,14 +13,14 @@ namespace mln
     using type = typename Iterator::value_type;
     using reference = typename Iterator::reference;
 
-    iterator_proxy_wrapper(Iterator& ref) : m_x(ref) {}
+    iterator_proxy_wrapper(Iterator& ref) : m_x(&ref) {}
     iterator_proxy_wrapper(Iterator&& ref) = delete;
 
-    operator reference () const { return *(m_x.get()); }
-    reference get() const { return *(m_x.get()); }
+    operator reference () const { return *(*m_x); }
+    reference get() const { return *(*m_x); }
 
-    private:
-      std::reference_wrapper<Iterator> m_x;
+  private:
+    Iterator* m_x;
   };
 
 

@@ -26,7 +26,7 @@ struct BMMorphers : public benchmark::Fixture
 
 
 
-BENCHMARK_F(BMMorphers, Threshold_CStyle_Uint8)(benchmark::State& st) {
+BENCHMARK_F(BMMorphers, Threshold_Count_CStyle_Uint8)(benchmark::State& st) {
   auto input = eval(red(m_input));
   unsigned count;
   while (st.KeepRunning()) {
@@ -35,16 +35,27 @@ BENCHMARK_F(BMMorphers, Threshold_CStyle_Uint8)(benchmark::State& st) {
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
-BENCHMARK_F(BMMorphers, Threshold_ValueIterator_Uint8)(benchmark::State& st) {
+BENCHMARK_F(BMMorphers, Threshold_Count_CStyle2_Uint8)(benchmark::State& st) {
+  auto input = eval(red(m_input));
+  unsigned count;
+  while (st.KeepRunning()) {
+    benchmark::DoNotOptimize(count = threshold1_bis(input, (uint8)128));
+  }
+  std::cout << count << "\n";
+  st.SetBytesProcessed(st.iterations() * m_bytes);
+}
+
+BENCHMARK_F(BMMorphers, Threshold_Count_ValueIterator_Uint8)(benchmark::State& st) {
   auto input = eval(red(m_input));
   unsigned count;
   while (st.KeepRunning()) {
     benchmark::DoNotOptimize(count = threshold2(input, (uint8)128));
   }
+    std::cout << count << "\n";
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
-BENCHMARK_F(BMMorphers, Threshold_PixelIterator_Uint8)(benchmark::State& st) {
+BENCHMARK_F(BMMorphers, Threshold_Count_PixelIterator_Uint8)(benchmark::State& st) {
   auto input = eval(red(m_input));
   unsigned count;
   while (st.KeepRunning()) {
@@ -53,7 +64,7 @@ BENCHMARK_F(BMMorphers, Threshold_PixelIterator_Uint8)(benchmark::State& st) {
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
-BENCHMARK_F(BMMorphers, Threshold_Morpher1)(benchmark::State& st) {
+BENCHMARK_F(BMMorphers, Threshold_Count_Morpher1)(benchmark::State& st) {
   auto input = eval(red(m_input));
   unsigned count;
   while (st.KeepRunning()) {
@@ -62,10 +73,18 @@ BENCHMARK_F(BMMorphers, Threshold_Morpher1)(benchmark::State& st) {
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
-BENCHMARK_F(BMMorphers, Threshold_Out_Morpher)(benchmark::State& st) {
+BENCHMARK_F(BMMorphers, Threshold_Out_Native)(benchmark::State& st) {
   auto input = eval(red(m_input));
   while (st.KeepRunning()) {
     threshold5(input, m_output, (uint8)128);
+  }
+  st.SetBytesProcessed(st.iterations() * m_bytes);
+}
+
+BENCHMARK_F(BMMorphers, Threshold_Out_Morpher)(benchmark::State& st) {
+  auto input = eval(red(m_input));
+  while (st.KeepRunning()) {
+    threshold6(input, m_output, (uint8)128);
   }
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }

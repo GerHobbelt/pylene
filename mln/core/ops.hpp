@@ -253,6 +253,7 @@ namespace mln
     decltype(auto)
     get_helper(C&& obj, std::true_type _is_scalar_)
     {
+      (void) _is_scalar_;
       static_assert(N == 0, "N must be null for scalar");
       return std::forward<C>(obj);
     }
@@ -261,6 +262,7 @@ namespace mln
     decltype(auto)
     get_helper(C&& obj, std::false_type _is_scalar_)
     {
+      (void) _is_scalar_;
       using std::get;
       return get<N>(std::forward<C>(obj));
     }

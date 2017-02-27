@@ -163,9 +163,9 @@ BOOST_AUTO_TEST_CASE(bg_is_zero_weighted_distance_transform_float)
                                                {+0,-1},          {+0,1},
                                                 {+1,-1}, {+1,+0}, {+1,1} }};
 
-  constexpr std::array<float, 8> weights = { 1.5f, 1.0f, 1.5f,
+  constexpr std::array<float, 8> weights = {{ 1.5f, 1.0f, 1.5f,
                                               1.0f,       1.0f,
-                                              1.5f, 1.0f, 1.5f };
+                                              1.5f, 1.0f, 1.5f }};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag ());
   image2d<float> res = transform::chamfer_distance_transform<float>(f, nbh);
@@ -201,9 +201,9 @@ BOOST_AUTO_TEST_CASE(bg_is_one_weighted_distance_transform_float)
                                                 {+0,-1},          {+0,1},
                                                 {+1,-1}, {+1,+0}, {+1,1} }};
 
-  constexpr std::array<float, 8> weights = { 1.5f, 1.0f, 1.5f,
+  constexpr std::array<float, 8> weights = {{ 1.5f, 1.0f, 1.5f,
                                               1.0f,       1.0f,
-                                              1.5f, 1.0f, 1.5f };
+                                              1.5f, 1.0f, 1.5f }};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag ());
   image2d<float> res = transform::chamfer_distance_transform<float>(f, nbh, true);

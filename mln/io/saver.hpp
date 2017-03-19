@@ -18,6 +18,7 @@ namespace mln
       BOOST_CONCEPT_ASSERT((Image<I>));
 
     public:
+      virtual ~Saver() = default;
       void save(const Image<I>& ima, PluginWriter* plugin, bool permissive);
 
     protected:

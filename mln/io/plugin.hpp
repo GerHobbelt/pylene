@@ -18,6 +18,7 @@ namespace mln
   public:
 
     /// \brief Initialize the plugin.
+    virtual ~Plugin() = default;
     virtual void initialize();
 
     //virtual bool support_streaming() const = 0;

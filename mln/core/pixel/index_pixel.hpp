@@ -43,7 +43,7 @@ namespace mln
     point_type          point() const { mln_precondition(m_image); return m_point; }
     point_type          site() const { mln_precondition(m_image); return m_point; }
     size_type		index() const { mln_precondition(m_image); return m_index; }
-
+    constexpr int       weight() const { return 1; }
 
   private:
     image_type*         m_image;

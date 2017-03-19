@@ -823,7 +823,7 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_pixel_type
   ndimage_base<T,dim,E>::pixel_at_index(size_type i) const
   {
-    pixel_type pix;
+    const_pixel_type pix;
     pix.ima_  = (const E*)this;
     pix.point_ = this->point_at_index(i);
     pix.index_ = i;

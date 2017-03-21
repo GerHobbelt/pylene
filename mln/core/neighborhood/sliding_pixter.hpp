@@ -231,7 +231,7 @@ namespace mln
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const Pixel& px, const SiteSet& s)
-	: m_size (rng::size(s)),
+	: m_size ((unsigned)rng::size(s)),
           m_site_set (m_size),
           m_index_set(m_size),
           m_pixel (px),

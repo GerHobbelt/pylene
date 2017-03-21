@@ -53,10 +53,10 @@ namespace mln
  namespace mln { namespace internal {                                  \
                                                                         \
       template <typename T>                                             \
-      struct NAME##_helper_t<BOOST_PP_TUPLE_REM () TYPE>                \
+      struct NAME##_helper_t<BOOST_PP_TUPLE_REM (0) TYPE>                \
       {                                                                 \
-        typedef BOOST_PP_TUPLE_REM () TYPE          type;               \
-        typedef BOOST_PP_TUPLE_REM () F             f_type;             \
+        typedef BOOST_PP_TUPLE_REM (0) TYPE          type;               \
+        typedef BOOST_PP_TUPLE_REM (0) F             f_type;             \
                                                                         \
         template <class I>                                              \
         struct apply                                                    \

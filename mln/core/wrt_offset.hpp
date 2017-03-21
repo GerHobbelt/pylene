@@ -55,7 +55,7 @@ namespace mln {
       {
         out[j] = 0;
         for (int i = 0; i < I::ndim; ++i)
-          out[j] += strides[i] * dpoints[j][i];
+          out[j] += static_cast<typename I::difference_type>(strides[i] * dpoints[j][i]);
       }
   }
 

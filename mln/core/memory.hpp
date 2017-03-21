@@ -28,7 +28,7 @@ namespace mln
             return buffer;
           char* ptr = (char*)(((size_t)(buffer + offset) & ~((size_t)15)) + 16) - offset;
           char* adr = (char*) ptr - 1;
-          *adr = (ptr - buffer);
+          *adr = static_cast<char>(ptr - buffer);
           mln_assertion(adr >= buffer);
           mln_assertion(ptr >= buffer);
           mln_assertion((ptr + n) <= (buffer + n + 16));

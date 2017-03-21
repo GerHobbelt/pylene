@@ -36,6 +36,9 @@ namespace mln
   typedef vec<float, 1>		vec1f;
   typedef vec<float, 2>		vec2f;
   typedef vec<float, 3>		vec3f;
+  typedef vec<double, 1>	vec1d;
+  typedef vec<double, 2>	vec2d;
+  typedef vec<double, 3>	vec3d;
 
 }
 

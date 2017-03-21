@@ -278,7 +278,9 @@ namespace mln
       template <typename U>
       vec_base(const vec_base<U, dim, tag>& other)
       {
-        std::copy(other.v_, other.v_ + dim, v_);
+        //std::copy(other.v_, other.v_ + dim, v_);
+        for (int i = 0; i < dim; ++i)
+          v_[i] = other.v_[i];
       }
 
 
@@ -352,19 +354,15 @@ namespace mln
       VEC_BASE_GEN_EXT_OP(is_additive_ext, -=)
       VEC_BASE_GEN_EXT_OP(is_additive_ext, +=)
 
-
-
-      vec_base< decltype(- std::declval<T>()), dim, tag>
+      vec_base< decltype(+ std::declval<T>()), dim, tag>
       operator - () const
       {
-        typedef vec_base< decltype(- std::declval<T>()), dim, tag> R;
+        typedef vec_base< decltype(+ std::declval<T>()), dim, tag> R;
         R out;
         for (unsigned i = 0; i < dim; ++i)
           out.v_[i] = -v_[i];
         return out;
       }
-
-
 
       /* RELATIONAL */
       template <typename U>
@@ -463,12 +461,21 @@ namespace mln
         return v_[N];
       }
 
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
+#endif
+
       template <unsigned N>
       constexpr
       T& get()
       {
         return v_[N];
       }
+
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
     private:
       template <size_t N, class T2, unsigned dim2, typename tag2>

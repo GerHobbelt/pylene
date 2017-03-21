@@ -55,7 +55,7 @@ namespace mln
         typedef point2d::value_type P;
         mln_precondition(r_ >= 0);
 
-        int k = r_;
+        int k = (int) r_;
         int d = 2*k+1;
         float r2 = r_ * r_;
 
@@ -72,7 +72,7 @@ namespace mln
             }
 
         {
-          int n = dpoints.size();
+          int n = (int) dpoints.size();
           for (int i = 0; i < n; i++)
             {
               point2d p = dpoints[i];

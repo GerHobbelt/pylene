@@ -6,8 +6,8 @@
 #include <cassert>
 
 #ifndef _MLN_HAS_NDEBUG_FIRST_
-# ifdef NDEBUG
-#  define MLN_NDEBUG
+# if defined(NDEBUG) && !defined(MLN_NDEBUG) 
+#   define MLN_NDEBUG
 # endif
 # define _MLN_HAS_NDEBUG_FIRST_
 #endif

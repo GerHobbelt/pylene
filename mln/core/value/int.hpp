@@ -173,6 +173,10 @@ namespace mln {
   /******************************************/
   /****          implementation          ****/
   /******************************************/
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
+#endif
 
   template <unsigned nbits>
   struct UInt
@@ -208,6 +212,9 @@ namespace mln {
     enc m_x;
   };
 
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
 } // end of namespace mln
 

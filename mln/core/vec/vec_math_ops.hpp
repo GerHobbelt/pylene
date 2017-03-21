@@ -14,8 +14,8 @@
 # define MLN_VEC_PROMOTE_FUN(T, dim, tag, fun)				\
   internal::vec_base< decltype(fun(std::declval<T>())), dim, tag>
 
-# define MLN_PROMOTE(T)					\
-  decltype(std::declval<T>() + std::declval<T>())
+# define MLN_PROMOTE(T1, T2)                            \
+  decltype(std::declval<T1>() + std::declval<T2>())
 
 # define MLN_PROMOTE_FUN(T, fun)		\
   decltype(fun(std::declval<T>()))
@@ -49,14 +49,26 @@ namespace mln
     cbrt(const internal::vec_base<T, dim, tag>& x);
 
 
+  /* algebraic operators */
+  template <class U, class V, unsigned dim, class tag>
+  MLN_PROMOTE(U, V)
+  dot(const internal::vec_base<U, dim, tag>& x,
+      const internal::vec_base<V, dim, tag>& y);
+
+  template <class U, class V, class tag>
+  internal::vec_base<MLN_PROMOTE(U,V), 3, tag>
+  cross(const internal::vec_base<U, 3, tag>& x,
+        const internal::vec_base<V, 3, tag>& y);
+
+
   /* Reduction operators */
 
   template <typename T, unsigned dim, class tag>
-  MLN_PROMOTE(T)
+  MLN_PROMOTE(T,T)
   sum(const internal::vec_base<T, dim, tag>& x);
 
   template <typename T, unsigned dim, class tag>
-  MLN_PROMOTE(T)
+  MLN_PROMOTE(T,T)
   prod(const internal::vec_base<T, dim, tag>& x);
 
   template <typename T, unsigned dim, class tag>
@@ -167,12 +179,38 @@ namespace mln
   }
 
 
+
+  template <class U, class V, unsigned dim, class tag>
+  MLN_PROMOTE(U, V)
+  dot(const internal::vec_base<U, dim, tag>& x,
+      const internal::vec_base<V, dim, tag>& y)
+  {
+    MLN_PROMOTE(U, V) res = 0;
+    for (int i = 0; i < dim; ++i)
+      res += x[i] * y[i];
+    return res;
+  }
+
+  template <class U, class V, class tag>
+  internal::vec_base<MLN_PROMOTE(U,V), 3, tag>
+  cross(const internal::vec_base<U, 3, tag>& u,
+        const internal::vec_base<V, 3, tag>& v)
+  {
+    return {
+      u[1]*v[2] - u[2]*v[1],
+      u[2]*v[0] - u[0]*v[2],
+      u[0]*v[1] - u[1]*v[0]
+        };
+  }
+
+
+
   template <typename T, unsigned dim, class tag>
   inline
-  MLN_PROMOTE(T)
+  MLN_PROMOTE(T,T)
   sum(const internal::vec_base<T, dim, tag>& x)
   {
-    MLN_PROMOTE(T) res = x[0];
+    MLN_PROMOTE(T,T) res = x[0];
     for (unsigned i = 1; i < dim; ++i)
       res += x[i];
     return res;
@@ -180,10 +218,10 @@ namespace mln
 
   template <typename T, unsigned dim, class tag>
   inline
-  MLN_PROMOTE(T)
+  MLN_PROMOTE(T,T)
   prod(const internal::vec_base<T, dim, tag>& x)
   {
-    MLN_PROMOTE(T) res = x[0];
+    MLN_PROMOTE(T,T) res = x[0];
     for (unsigned i = 1; i < dim; ++i)
       res *= x[i];
     return res;

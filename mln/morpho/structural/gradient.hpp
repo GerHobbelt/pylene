@@ -120,6 +120,26 @@ namespace mln
                  NormFunction norm = NormFunction ());
 
 
+      template <class I, class SE, class Compare, class NormFunction, class O>
+      void
+      internal_gradient(const Image<I>& input,
+                        const StructuringElement<SE>& se,
+                        Compare cmp,
+                        NormFunction norm,
+                        Image<O>& out);
+
+      /// \ingroup morpho
+      /// \overload void internal_gradient(const Image<I>&, const StructuringElement<SE>&, Compare cmp, NormFunction, Image<O>&)
+      template <class I, class SE,
+                class Compare = productorder_less<mln_value(I)>,
+                class NormFunction = mln::functional::l2norm_t<mln_value(I)> >
+      mln_ch_value(I, typename std::result_of<NormFunction(mln_value(I))>::type)
+        internal_gradient(const Image<I>& input,
+                 const StructuringElement<SE>& se,
+                 Compare cmp = Compare (),
+                 NormFunction norm = NormFunction ());
+
+
       /*************************/
       /***  Implementation   ***/
       /*************************/
@@ -148,6 +168,15 @@ namespace mln
           transform(d-ima, norm, out);
         }
 
+        template <class I, class SE, class Compare, class Norm, class J>
+        void
+        internal_gradient(const I& ima, const SE& nbh, Compare cmp, Norm norm, J& out)
+        {
+          auto d = morpho::structural::erode(ima, nbh, cmp);
+
+          transform(ima - d, norm, out);
+        }
+
 
       }
 
@@ -159,14 +188,12 @@ namespace mln
                Norm norm,
                Image<O>& output)
       {
-        mln::trace::entering("mln::morpho::gradient");
+        mln_entering("mln::morpho::gradient");
 
         const I& ima = exact(ima_);
         const SE& se = exact(se_);
         O& out = exact(output);
         mln::morpho::structural::impl::gradient(ima, se, cmp, norm, out);
-
-        mln::trace::exiting();
       }
 
 
@@ -195,14 +222,12 @@ namespace mln
                         Norm norm,
                         Image<O>& output)
       {
-        mln::trace::entering("mln::morpho::external_gradient");
+        mln_entering("mln::morpho::external_gradient");
 
         const I& ima = exact(ima_);
         const SE& se = exact(se_);
         O& out = exact(output);
         mln::morpho::structural::impl::external_gradient(ima, se, cmp, norm, out);
-
-        mln::trace::exiting();
       }
 
 
@@ -222,6 +247,41 @@ namespace mln
 
         return out;
       }
+
+      template <class I, class SE, class Compare, class Norm, class O>
+      void
+      internal_gradient(const Image<I>& ima_,
+                        const StructuringElement<SE>& se_,
+                        Compare cmp,
+                        Norm norm,
+                        Image<O>& output)
+      {
+        mln_entering("mln::morpho::internal_gradient");
+
+        const I& ima = exact(ima_);
+        const SE& se = exact(se_);
+        O& out = exact(output);
+        mln::morpho::structural::impl::internal_gradient(ima, se, cmp, norm, out);
+      }
+
+
+      template <class I, class SE, class Compare, class NormFunction>
+      mln_ch_value(I, typename std::result_of<NormFunction(mln_value(I))>::type)
+        internal_gradient(const Image<I>& ima_,
+                          const StructuringElement<SE>& se,
+                          Compare cmp, NormFunction norm)
+      {
+        const I& ima = exact(ima_);
+
+        typedef mln_value(I) V;
+        typedef typename std::result_of<NormFunction(V)>::type result_type;
+
+        mln_ch_value(I, result_type) out = imchvalue<result_type> (ima);
+        mln::morpho::structural::internal_gradient(ima, se, cmp, norm, out);
+
+        return out;
+      }
+
 
 
     }

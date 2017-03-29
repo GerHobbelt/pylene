@@ -33,7 +33,7 @@ namespace mln
           else
             {
               isw->m_cs->clear();
-              return isw->m_cs->gcount() / size;
+              return (unsigned)(isw->m_cs->gcount() / size);
             }
         }
 
@@ -41,8 +41,9 @@ namespace mln
         int seek(fi_handle isw_, long offset, int origin)
         {
           istream_wrapper* isw = (istream_wrapper*) isw_;
-          if (origin == SEEK_SET) offset += isw->m_offset;
-          isw->m_cs->seekg(offset, (std::ios_base::seekdir) origin);
+		  std::istream::off_type off = offset;
+          if (origin == SEEK_SET) off += isw->m_offset;
+          isw->m_cs->seekg(off, (std::ios_base::seekdir) origin);
           return (*isw->m_cs) ? 0 : -1;
         }
 
@@ -50,7 +51,7 @@ namespace mln
         long tell(fi_handle isw_)
         {
           istream_wrapper* isw = (istream_wrapper*) isw_;
-          return isw->m_cs->tellg() - isw->m_offset;
+          return (long)(isw->m_cs->tellg() - isw->m_offset);
         }
 
       private:
@@ -84,8 +85,9 @@ namespace mln
         int seek(fi_handle osw_, long offset, int origin)
         {
           ostream_wrapper* osw = (ostream_wrapper*) osw_;
-          if (origin == SEEK_SET) offset += osw->m_offset;
-          osw->m_cs->seekp(offset, (std::ios_base::seekdir) origin);
+		  std::ostream::off_type off = offset;
+          if (origin == SEEK_SET) off += osw->m_offset;
+          osw->m_cs->seekp(off, (std::ios_base::seekdir) origin);
           return (osw->m_cs) ? 0 : -1;
         }
 
@@ -93,7 +95,7 @@ namespace mln
         long tell(fi_handle osw_)
         {
           ostream_wrapper* osw = (ostream_wrapper*) osw_;
-          return osw->m_cs->tellp() - osw->m_offset;
+          return (long)(osw->m_cs->tellp() - osw->m_offset);
         }
 
 

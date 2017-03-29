@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(graph_iteration)
     g.vertex(p) = 'a' + (nv++ % 26);
 
   mln_foreach(point2d p, g.edges())
-    g.edge(p) = ne++;
+    g.edge(p) = float(ne++);
 
   {
     std::cout << "Vertex list: ";
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(graph_nbh)
     g.vertex(p) = 'a' + (nv++ % 26);
 
   mln_foreach(point2d p, g.edges())
-    g.edge(p) = ne++;
+    g.edge(p) = float(ne++);
 
   {
     std::cout << "Vertex list: " << std::endl;

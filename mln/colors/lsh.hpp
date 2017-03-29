@@ -72,14 +72,14 @@ namespace mln
     T min, med, max;
     int lambda;
     std::tie(min, med, max, lambda) = internal::get_MinMedMax(v[0],v[1],v[2]);
-    float L = (min + max + med) / 3.0;
+    float L = (min + max + med) / 3.0f;
     float S = 1.5f * (L > med ? (max-L) : (L-min));
-    float H = k * (lambda + 0.5 - ((lambda % 2 == 0) ? 1 : -1) * (max + min - 2*med) / (2*S));
+    float H = k * (lambda + 0.5f - ((lambda % 2 == 0) ? 1 : -1) * (max + min - 2*med) / (2*S));
 
     lsh<T> out;
-    out[0] = L;
-    out[1] = std::floor(S);
-    out[2] = (int)std::floor(H) % Hnv;
+    out[0] = static_cast<T>(L);
+    out[1] = static_cast<T>(std::floor(S));
+    out[2] = static_cast<T>((int)std::floor(H) % Hnv);
     return out;
   }
 
@@ -96,8 +96,8 @@ namespace mln
     int lambda = h / (int) k;
     int m = lambda % 2 == 0 ? 1 : -1;
     float phi = h / k - lambda;
-    float s1_3 = s * (1.0/3), s2_3 = s * (2.0/3);
-    float c = m * (phi - 0.5);
+    float s1_3 = s * (1.0f/3), s2_3 = s * (2.0f/3);
+    float c = m * (phi - 0.5f);
 
     float maxi_ = (c <= 0) ? (l + s2_3) : (l + s1_3 + s2_3 * (((lambda+1)%2) - m * phi));
     float mini_ = (c >= 0) ? (l - s2_3) : (l - s1_3 - s2_3 * (lambda%2 + m * phi));

@@ -1,7 +1,12 @@
 #ifndef TRACE_HPP
 # define TRACE_HPP
 
-//# include <boost/current_function.hpp>
+# ifdef _MSC_VER
+#  pragma warning( push )
+#  pragma warning( disable : 4996 )  // MSVC unsafe getenv
+# endif
+
+
 # include <ctime>
 # include <cstdlib>
 # include <iostream>
@@ -98,5 +103,9 @@ namespace mln
 
   }
 }
+
+# ifdef _MSVC_VER
+#  pragma warning(pop)
+# endif
 
 #endif // ! TRACE_HPP

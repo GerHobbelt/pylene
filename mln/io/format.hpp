@@ -43,7 +43,7 @@ namespace mln
       {
 	std::ostringstream s;
 	format(s, v);
-	return s.tellp();
+	return static_cast<int>(s.tellp());
       }
 
     };

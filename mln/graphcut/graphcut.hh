@@ -609,7 +609,7 @@ namespace mln
 
       typedef internal::graphcut_graph_t<node_t, std::pair<W,W>, N>  G;
 
-      trace::entering("mln::graphcut::graphcut");
+      mln_entering("mln::graphcut::graphcut");
 
       G graph(ima.domain(), nbh);
 
@@ -843,8 +843,6 @@ namespace mln
       }
 
       std::cout << "Maxflow: " << maxflow << std::endl;
-
-      trace::exiting();
       return maxflow;
     }
 

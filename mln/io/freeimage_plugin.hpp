@@ -73,7 +73,7 @@ namespace mln
     {
     public:
       freeimage_writer_plugin(std::ostream& os, FREE_IMAGE_FORMAT fif = FIF_TIFF);
-      ~freeimage_writer_plugin();
+      ~freeimage_writer_plugin() override;
 
       //virtual bool support_streaming() const;
       virtual void write_next_pixel(void* src) final;
@@ -832,8 +832,8 @@ namespace mln
 
       bool res = FreeImage_SaveToHandle(m_fif, m_dib, &fio, handle, 0);
       FreeImage_Unload(m_dib);
-      if (!res)
-        throw MLNIOException("Unable to save the image.");
+      //if (!res)
+      //throw MLNIOException("Unable to save the image.");
     }
 
 

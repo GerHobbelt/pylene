@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(ppm)
   image2d<rgb8> ref(5, 5);
 
   mln_foreach(const image2d<rgb8>::pixel_type& pix, ref.pixels()) {
-    pix.val()[0] = pix.point()[0];
-    pix.val()[1] = pix.point()[1];
+    pix.val()[0] = uint8(pix.point()[0]);
+    pix.val()[1] = uint8(pix.point()[1]);
   }
 
   io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);
@@ -97,8 +97,8 @@ BOOST_AUTO_TEST_CASE(slow_ppm)
   image2d<rgb8> ref(5, 5);
 
   mln_foreach(const image2d<rgb8>::pixel_type& pix, ref.pixels()) {
-    pix.val()[0] = pix.point()[0];
-    pix.val()[1] = pix.point()[1];
+    pix.val()[0] = uint8(pix.point()[0]);
+    pix.val()[1] = uint8(pix.point()[1]);
   }
 
   io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);

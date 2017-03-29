@@ -187,8 +187,8 @@ namespace mln {
   public:
     constexpr UInt() = default;
     constexpr UInt(enc x) : m_x(x) {}
-    constexpr operator enc& ()          { return m_x; }
-//operator enc  () const     { return m_x; }
+    constexpr operator enc& ()         { return m_x; }
+    //operator enc  () const     { return m_x; }
     constexpr operator unsigned () const { return m_x; }
 
   private:
@@ -204,7 +204,7 @@ namespace mln {
   public:
     constexpr Int() = default;
     constexpr Int(enc x) : m_x(x) {}
-    constexpr operator enc& ()           { return m_x; }
+    constexpr operator enc& ()          { return m_x; }
 //    operator enc  () const     { return m_x; }
     constexpr operator int () const { return m_x; }
 

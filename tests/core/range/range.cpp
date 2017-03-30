@@ -1,6 +1,6 @@
 #include <array>
 #include <mln/core/range/range.hpp>
-#include <mln/core/forall.hpp>
+#include <mln/core/image/image.hpp>
 
 #define BOOST_TEST_MODULE Core
 #include <boost/test/unit_test.hpp>
@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(stdrange_compatibility)
 
   using namespace mln;
 
-  std::array<int, 4> x = {2, 5, 15, 22};
+  std::array<int, 4> x = {{2, 5, 15, 22}};
 
   BOOST_CHECK_EQUAL(rng::size(x), 4);
 

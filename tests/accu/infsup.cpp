@@ -13,7 +13,6 @@ BOOST_AUTO_TEST_CASE(Infsup)
   using namespace mln::accu;
 
   typedef vec3i Vec;
-  typedef productorder_less<Vec> Compare;
 
   // product order comparison
   {
@@ -39,9 +38,7 @@ BOOST_AUTO_TEST_CASE(Infsup)
     BOOST_CHECK_EQUAL( extractor::max(acc), Vec(4,-1,-3));
   }
 
-  // defaut comparison on generic vectors is lexicographical
-  // This must not compile and generate an error message
-  /*
+  // colors are partially ordered
   {
     typedef rgb<int> Vec;
     accumulators::infsup<Vec> acc;
@@ -50,8 +47,22 @@ BOOST_AUTO_TEST_CASE(Infsup)
     acc.take(Vec(4,-1,-3));
     acc.take(Vec(-2,-5,7));
 
-    BOOST_CHECK_EQUAL( extractor::inf(acc), Vec(-2,-5,7));
-    BOOST_CHECK_EQUAL( extractor::sup(acc), Vec(4,-1,-3));
+    BOOST_CHECK_EQUAL( extractor::inf(acc), Vec(-2,-5,-3));
+    BOOST_CHECK_EQUAL( extractor::sup(acc), Vec(4,-1,7));
+  }
+
+  // colors are not totally ordered => this does not compile
+  /*
+  {
+    typedef rgb<int> Vec;
+    accumulators::minmax<Vec> acc;
+
+    acc.take(Vec(4,-5,6));
+    acc.take(Vec(4,-1,-3));
+    acc.take(Vec(-2,-5,7));
+
+    BOOST_CHECK_EQUAL( extractor::min(acc), Vec(-2,-5,-3));
+    BOOST_CHECK_EQUAL( extractor::max(acc), Vec(4,-1,6));
   }
   */
 }

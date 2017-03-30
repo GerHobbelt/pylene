@@ -2,8 +2,6 @@ add_executable(bench_iterator ../bench_iterator.cpp)
 add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 
-add_executable(array std/array.cpp)
-
 set(test_prefix "UTCore_")
 add_executable(${test_prefix}win2d win2d.cpp)
 

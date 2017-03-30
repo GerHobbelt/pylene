@@ -1,8 +1,6 @@
 #ifndef MLN_CORE_WRT_OFFSET_HPP
 # define MLN_CORE_WRT_OFFSET_HPP
 
-//# include <mln/core/range.hpp>
-//#include <mln/core/std/array.hpp>
 # include <mln/core/image/image.hpp>
 # include <mln/core/range/range.hpp>
 # include <array>

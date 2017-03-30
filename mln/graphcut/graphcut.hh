@@ -51,8 +51,8 @@ namespace mln
 	  bool
 	  operator < (const edge_t& other) const
 	  {
-	    return this->type < other.type or
-	      this->type == other.type and this->p == other.p;
+	    return (this->type < other.type) or
+              (this->type == other.type and this->p == other.p);
 	  }
 	};
 
@@ -772,7 +772,7 @@ namespace mln
 	      }
 	    }
 
-	    W v = (getedge(p, q) -= delta);
+	    getedge(p, q) -= delta;
 	    getedge(q, p) += delta;
 	    //std::cout << "e(" << p << "," << q << "):" << getedge(p,q) << std::endl;
 	  }

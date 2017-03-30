@@ -124,11 +124,11 @@ namespace mln {
       BOOST_CONCEPT_USAGE(check_border)
       {
         mln_value(J) val;
-        J f = *((J*)0);
         J g(f, mln::init ());
         J h(f, f.border());
         J i(f, f.border(), val);
       }
+      J f;
     };
 
     template <class J>
@@ -137,10 +137,10 @@ namespace mln {
       BOOST_CONCEPT_USAGE(check_border)
       {
         mln_value(J) val;
-        J f = *((J*)0);
         J g(f, mln::init ());
         J h(f, val);
       }
+      J f;
     };
 
     template <class J>

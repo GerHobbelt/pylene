@@ -75,7 +75,7 @@ namespace mln
         //                                                     std::forward<Expr>(expr))
 
         return proto::make_expr<tag::aggregate, typename accu::accu_of<Feature, V>::type, Expr>
-          (accu::make_accumulator(feature, *(V*)NULL),
+          (accu::make_accumulator(feature, V()),
            std::forward<Expr>(expr));
       }
 

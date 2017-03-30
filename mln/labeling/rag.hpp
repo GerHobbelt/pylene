@@ -48,7 +48,6 @@ namespace mln
       Label
       rag(const I& ima, const N& nbh, Graph& graph, Label lbl, J&& out)
       {
-        typedef mln_value(I) V;
         typedef mln_point(I) P;
 
         const Label bg = value_traits<Label>::max();

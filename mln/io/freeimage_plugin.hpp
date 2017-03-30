@@ -832,6 +832,7 @@ namespace mln
 
       bool res = FreeImage_SaveToHandle(m_fif, m_dib, &fio, handle, 0);
       FreeImage_Unload(m_dib);
+      (void) res;
       //if (!res)
       //throw MLNIOException("Unable to save the image.");
     }

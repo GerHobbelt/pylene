@@ -278,7 +278,7 @@ namespace mln
       vec_base(const vec_base<U, dim, tag>& other)
       {
         //std::copy(other.v_, other.v_ + dim, v_);
-        for (int i = 0; i < dim; ++i)
+        for (unsigned i = 0; i < dim; ++i)
           v_[i] = static_cast<T>(other.v_[i]);
       }
 
@@ -287,8 +287,8 @@ namespace mln
       explicit
       vec_base(const vec_base<U, dim, other_tag>& other)
       {
-		 for (int i = 0; i < dim; ++i)
-			v_[i] = static_cast<T>(other.v_[i]);
+        for (unsigned i = 0; i < dim; ++i)
+          v_[i] = static_cast<T>(other.v_[i]);
       }
 
 

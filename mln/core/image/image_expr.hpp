@@ -10,6 +10,7 @@
 
 # include <mln/core/image/morphers/zip_image.hpp>
 # include <mln/core/image/morphers/transformed_image.hpp>
+# include <mln/core/internal/intseq.hpp>
 
 namespace mln
 {

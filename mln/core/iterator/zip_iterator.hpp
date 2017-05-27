@@ -30,7 +30,7 @@ namespace mln
 
       template <typename Iterator>
       typename Iterator::reference
-      operator () (Iterator& it) const
+      operator () (const Iterator& it) const
       {
 	return *it;
       }

@@ -9,14 +9,14 @@ namespace mln {
   template <typename E>
   struct Object;
 
-  template <typename E>		E&	  exact(Object<E>& object);
-  template <typename E>		const E&  exact(const Object<E>& object);
-  template <typename E>		E*	  exact(Object<E>* object);
-  template <typename E>		const E*  exact(const Object<E>* object);
-  template <typename E>		E&&	  exact(Object<E>&& object);
-  template <typename E>		const E&& exact(const Object<E>&& object);
-  template <typename E>		E&&	  move_exact(Object<E>& object);
-  template <typename E>		const E&& move_exact(const Object<E>& object);
+  template <typename E>                 E&	  exact(Object<E>& object);
+  template <typename E>                 const E&  exact(const Object<E>& object);
+  template <typename E>	constexpr	E*	  exact(Object<E>* object);
+  template <typename E>	constexpr 	const E*  exact(const Object<E>* object);
+  template <typename E>                 E&&	  exact(Object<E>&& object);
+  template <typename E>                 const E&& exact(const Object<E>&& object);
+  template <typename E>                 E&&	  move_exact(Object<E>& object);
+  template <typename E>                 const E&& move_exact(const Object<E>& object);
 
 
   namespace internal
@@ -59,14 +59,14 @@ namespace mln {
 
   template <typename E>
   inline
-  E* exact(Object<E>* object)
+  constexpr E* exact(Object<E>* object)
   {
     return static_cast<E*>(object);
   }
 
   template <typename E>
   inline
-  const E* exact(const Object<E>* object)
+  constexpr const E* exact(const Object<E>* object)
   {
     return static_cast<const E*>(object);
   }

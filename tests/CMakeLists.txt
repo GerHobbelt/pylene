@@ -35,5 +35,5 @@ add_subdirectory(labeling)
 add_subdirectory(graph)
 add_subdirectory(graphcut)
 add_subdirectory(transform)
-
+add_subdirectory(kernelv3)
 

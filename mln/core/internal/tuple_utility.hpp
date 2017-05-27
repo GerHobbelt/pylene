@@ -2,8 +2,7 @@
 # define TUPLE_UTILITY_HPP
 
 # include <tuple>
-# include <iostream>
-# include <mln/core/internal/intseq.hpp>
+# include <utility>
 
 namespace mln
 {
@@ -13,11 +12,11 @@ namespace mln
 
 
     template < class F, class... TTypes>
-    std::tuple< typename F::template apply<TTypes&>::type... >
+    auto
     tuple_transform(std::tuple<TTypes...>& t, F f);
 
     template < class F, class... TTypes>
-    std::tuple< typename F::template apply<const TTypes&>::type... >
+    auto
     tuple_transform(const std::tuple<TTypes...>& t, F f);
 
     template < class F, class... TTypes>
@@ -39,188 +38,45 @@ namespace mln
     namespace impl
     {
 
-      // template <class THead, class... TTypes>
-      // using head_t = THead;
-
-      // template <class THead, class... TTail>
-      // using tail_t = std::tuple<TTail...>;
-
-      // template <int N, class F, class... TTypes>
-      // struct tuple_transform_helper;
-
-      // template <int N, class F, class Head, class... TTypes>
-      // struct tuple_transform_helper<N, F, Head, TTypes...> : tuple_transform_helper<N-1, F, TTypes...>
-      // {
-      // };
-
-      // template <class F, class Head, class... TTypes>
-      // struct tuple_transform_helper<0, F, Head, TTypes...>
-      // {
-      //   typedef std::tuple< typename F::template apply<Head&>::type,
-      //   		    typename F::template apply<TTypes&>::type... > type;
-      // };
-
-      // template <class F>
-      // struct tuple_transform_helper<0, F>
-      // {
-      //   typedef std::tuple<> type;
-      // };
-
-      // template <int N, class F, class... TTypes>
-      // struct const_tuple_transform_helper;
-
-      // template <int N, class F, class Head, class... TTypes>
-      // struct const_tuple_transform_helper<N, F, Head, TTypes...> :
-      //   const_tuple_transform_helper<N-1, F, TTypes...>
-      // {
-      // };
-
-      // template <class F, class Head, class... TTypes>
-      // struct const_tuple_transform_helper<0, F, Head, TTypes...>
-      // {
-      //   typedef std::tuple< typename F::template apply<const Head&>::type,
-      //   		    typename F::template apply<const TTypes&>::type... > type;
-      // };
-
-      // template <class F>
-      // struct const_tuple_transform_helper<0, F>
-      // {
-      //   typedef std::tuple<> type;
-      // };
-
-
-      // Transform: terminal case
-      // template <int N, class F, class... TTypes>
-      // std::tuple<>
-      // tuple_transform(const std::tuple<TTypes...>&, F,
-      //   	      typename std::enable_if<N == sizeof...(TTypes)>::type* = 0)
-      // {
-      //   return std::tuple<>();
-      // }
-
-
-      template <class F, class...>
-      struct tuple_transform_helper;
-
-      template <class F, class...>
-      struct const_tuple_transform_helper;
-
-
-      template <class F, int... I, class... TTypes>
-      struct tuple_transform_helper<F, intseq<I...>, TTypes...>
+      // Ensure that: F(x) -> T& will store T& (make_tuple stores T)
+      // and F(x) -> T will store T (forward_as_tuple stores dangling T&&)
+      template <class F, class Tuple, std::size_t... Ints>
+      std::tuple< std::result_of_t<F(std::tuple_element_t<Ints,
+                                     std::remove_reference_t<Tuple>>)>... >
+      tuple_transform_helper(F f, Tuple&& t, std::index_sequence<Ints...>)
       {
-        typedef std::tuple<
-          typename std::result_of<F(TTypes&)>::type...
-          > result_type;
-
-        result_type
-        operator() (std::tuple<TTypes...>& t, F f)
-        {
-          return result_type(f(std::get<I>(t))...);
-        }
-      };
-
-
-      template <class F, int... I, class... TTypes>
-      struct const_tuple_transform_helper<F, intseq<I...>, TTypes...>
-      {
-        typedef std::tuple<
-          typename std::result_of<F(const TTypes&)>::type...
-          > result_type;
-
-        result_type
-        operator() (const std::tuple<TTypes...>& t, F f)
-        {
-          return result_type(f(std::get<I>(t))...);
-        }
-      };
-
-
-
-
-      // // Transform: rec case (non-const)
-      // template <int N, class F, class... TTypes>
-      // typename tuple_transform_helper<N, F, TTypes...>::type
-      // tuple_transform(std::tuple<TTypes...>& t, F f,
-      //   	      typename std::enable_if<N != sizeof...(TTypes)>::type* = 0)
-      // {
-      //   typedef typename std::tuple_element<N, std::tuple<TTypes...> >::type _head;
-      //   typedef typename F::template apply<_head&>::type THead;
-
-      //   std::tuple<THead> head(f(std::get<N>(t)));
-      //   auto tail = tuple_transform<N+1>(t, f);
-      //   auto x = std::tuple_cat(head, tail);
-      //   return x;
-      // }
-
-      // // Transform: rec case (const)
-      // template <int N, class F, class... TTypes>
-      // typename const_tuple_transform_helper<N, F, TTypes...>::type
-      // tuple_transform(const std::tuple<TTypes...>& t, F f,
-      //   	      typename std::enable_if<N != sizeof...(TTypes)>::type* = 0)
-      // {
-      //   typedef typename std::tuple_element<N, std::tuple<TTypes...> >::type _head;
-      //   typedef typename F::template apply<const _head&>::type THead;
-
-      //   std::tuple<THead> head(f(std::get<N>(t)));
-      //   auto tail = tuple_transform<N+1>(t, f);
-      //   auto x = std::tuple_cat(head, tail);
-      //   return x;
-      // }
-
-      // For each: terminal case
-      template <int N, class F, class... TTypes>
-      void
-      tuple_for_each(const std::tuple<TTypes...>&, F,
-		     typename std::enable_if<N == sizeof...(TTypes)>::type* = 0)
-      {
+        return std::forward_as_tuple(f(std::get<Ints>(std::forward<Tuple>(t)))...);
       }
 
-      // For each: rec case (non-const)
-      template <int N, class F, class... TTypes>
+      template <class F, class Tuple, std::size_t... Ints>
       void
-      tuple_for_each(std::tuple<TTypes...>& t, F f,
-		     typename std::enable_if<N != sizeof...(TTypes)>::type* = 0)
+      tuple_foreach_helper(F f, Tuple&& t, std::index_sequence<Ints...>)
       {
-	f(std::get<N>(t));
-	tuple_for_each<N+1>(t, f);
+        (void) std::initializer_list<int> {
+          (f(std::get<Ints>(std::forward<Tuple>(t))), 0)...
+        };
       }
-
-      // For each: rec case (const)
-      template <int N, class F, class... TTypes>
-      void
-      tuple_for_each(const std::tuple<TTypes...>& t, F f,
-		     typename std::enable_if<N != sizeof...(TTypes)>::type* = 0)
-      {
-	f(std::get<N>(t));
-	tuple_for_each<N+1>(t, f);
-      }
-
     }
 
     template <class F, class... TTypes>
-    std::tuple< typename F::template apply<TTypes&>::type... >
+    auto
     tuple_transform(std::tuple<TTypes...>& t, F f)
     {
-      typedef typename int_list_seq<sizeof...(TTypes)>::type S;
-      return impl::tuple_transform_helper<F, S, TTypes...> () (t, f);
+      return impl::tuple_transform_helper(f, t, std::make_index_sequence<sizeof...(TTypes)> ());
     }
 
     template <class F, class... TTypes>
-    std::tuple< typename F::template apply<const TTypes&>::type... >
+    auto
     tuple_transform(const std::tuple<TTypes...>& t, F f)
     {
-      typedef typename int_list_seq<sizeof...(TTypes)>::type S;
-      return impl::const_tuple_transform_helper<F, S, TTypes...> () (t, f);
+      return impl::tuple_transform_helper(f, t, std::make_index_sequence<sizeof...(TTypes)> ());
     }
-
-
 
     template <class F, class... TTypes>
     std::tuple<TTypes...>&
     tuple_for_each(std::tuple<TTypes...>& t, F f)
     {
-      impl::tuple_for_each<0>(t, f);
+      impl::tuple_foreach_helper(f, t, std::make_index_sequence<sizeof...(TTypes)> ());
       return t;
     }
 
@@ -228,7 +84,7 @@ namespace mln
     const std::tuple<TTypes...>&
     tuple_for_each(const std::tuple<TTypes...>& t, F f)
     {
-      impl::tuple_for_each<0>(t, f);
+      impl::tuple_foreach_helper(f, t, std::make_index_sequence<sizeof...(TTypes)> ());
       return t;
     }
 

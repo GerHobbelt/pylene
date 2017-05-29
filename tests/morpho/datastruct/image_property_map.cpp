@@ -3,7 +3,7 @@
 #include <mln/core/foreach.hpp>
 #include <mln/core/forall.hpp>
 #include <mln/core/algorithm/iota.hpp>
-
+#include <array>
 
 #define BOOST_TEST_MODULE Morpho
 #include <boost/test/unit_test.hpp>

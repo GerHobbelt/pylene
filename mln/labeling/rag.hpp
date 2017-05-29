@@ -48,7 +48,6 @@ namespace mln
       Label
       rag(const I& ima, const N& nbh, Graph& graph, Label lbl, J&& out)
       {
-        typedef mln_value(I) V;
         typedef mln_point(I) P;
 
         const Label bg = value_traits<Label>::max();
@@ -134,7 +133,7 @@ namespace mln
 
             if (removed) {
 	      tomerge.push_back(v);
-	      int n = tomerge.size();
+	      int n = (int)tomerge.size();
 	      for (int i = 0; i < n; ++i)
 		for (int j = i+1; j < n; ++j)
 		  if (tomerge[i] != tomerge[j])

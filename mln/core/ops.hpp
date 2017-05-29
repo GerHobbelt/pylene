@@ -92,6 +92,10 @@ namespace mln
   * \brief A function object for the mixed <em>greater equal</em> comparison operation.
   */
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4800 )
+#endif
+
   template <typename U, typename V = U>
   struct add : std::binary_function<U, V, typename std::common_type<U,V>::type>
   {

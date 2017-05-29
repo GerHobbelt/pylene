@@ -193,7 +193,7 @@ namespace mln
         par.back() = 1;         // par points to the new index
         ++k;
 
-        for (int i = par.size() - 2; i >= 0; --i)
+        for (int i = (int)par.size() - 2; i >= 0; --i)
           {
             if (dist[i] == dist[par[i]])
               {
@@ -222,7 +222,7 @@ namespace mln
         // Insert in S and set pmap relation
         {
           unsigned p = 0;
-          unsigned i = sz-1;
+          unsigned i = (unsigned)sz - 1;
           mln_foreach(auto px, data->m_pmap.pixels())
             {
               data->m_S[i] = px.index();

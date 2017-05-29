@@ -1,6 +1,6 @@
 #include <array>
 #include <mln/core/range/zip.hpp>
-#include <mln/core/forall.hpp>
+#include <mln/core/image/image.hpp>
 
 #define BOOST_TEST_MODULE Core
 #include <boost/test/unit_test.hpp>

@@ -54,6 +54,7 @@ namespace mln
           namespace ker = mln::kernel;
           (void) __is_incremental__;
           (void) __op__;
+          (void) cmp; // FIXME: should not be ignored
 
           ker::Aggregate<typename OpTraits::incremental_aggregate_type> A;
           ker::Point p;

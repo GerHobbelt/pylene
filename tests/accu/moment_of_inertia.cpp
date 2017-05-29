@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(Moment_of_inertia)
         acc.take(point2d{i,j});
     res1 = acc.to_result();
 
-    double tmp = 2 * (n+1) * sum_of_square(n/2);
+    double tmp = 2 * (n+1) * sum_of_square(n / 2.f);
     double ref = (tmp + tmp) / sqr(sqr(n+1));
     BOOST_CHECK_EQUAL(res1, ref);
   }
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(Moment_of_inertia)
         acc.take(point2d{i,j});
 
     double res2 = acc.to_result();
-    double tmp = 2 * (n+1) * sum_of_square(n/2);
+    double tmp = 2 * (n+1) * sum_of_square(n / 2.f);
     double ref = (tmp + tmp) / sqr(sqr(double(n+1)));
     BOOST_CHECK_CLOSE(res2, ref, 1);
     BOOST_CHECK_CLOSE(res1, res2, 1);

@@ -6,6 +6,10 @@
 # include <mln/core/value/indexer.hpp>
 # include <mln/accu/accumulators/infsup.hpp>
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4800 )
+#endif
+
 /// FIXME: use indexer / rename has histogram
 
 namespace mln

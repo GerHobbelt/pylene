@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(graph_iteration)
   }
 
   mln_foreach(const auto& p, g.edges())
-    g.edge(p) = ne++;
+    g.edge(p) = static_cast<float>(ne++);
 
   {
     std::cout << "Vertex list: ";
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(graph_nbh)
     g.vertex(p) = 'a' + (nv++ % 26);
 
   mln_foreach(const auto& e, g.edges())
-    g.edge(e) = ne++;
+    g.edge(e) = static_cast<float>(ne++);
 
 
   {
@@ -128,8 +128,8 @@ BOOST_AUTO_TEST_CASE(graph_nbh)
     using namespace mln;
 
     image2d<float> ori(5,5);
-    fill(ori, 0.0);
-    fill(ori | sbox2d({0,0},{5,5},{2,2}), 0.7);
+    fill(ori, 0.0f);
+    fill(ori | sbox2d({0,0},{5,5},{2,2}), 0.7f);
 
 
     image2d<bool> out(5,5);

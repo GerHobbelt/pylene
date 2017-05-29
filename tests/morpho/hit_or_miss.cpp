@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(hit_or_miss)
   BOOST_CHECK( all(out == out2) );
 
   auto out3 = morpho::hit_or_miss(imcast<uint8>(ima), win1, win2);
-  BOOST_CHECK( all(out == out3) );
+  BOOST_CHECK( all(imcast<uint8>(out) == out3) );
 }
 
 

@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(filtered_byval_writing)
   image2d<int> ima(dom);
 
   iota(ima, 0);
-  auto x = imfilter(ima, [](float x) { return x > 10; });
+  auto x = imfilter(ima, [](int x) { return x > 10; });
 
   fill(x, 10);
 

@@ -173,6 +173,10 @@ namespace mln {
   /******************************************/
   /****          implementation          ****/
   /******************************************/
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
+#endif
 
   template <unsigned nbits>
   struct UInt
@@ -183,8 +187,8 @@ namespace mln {
   public:
     constexpr UInt() = default;
     constexpr UInt(enc x) : m_x(x) {}
-    constexpr operator enc& ()          { return m_x; }
-//operator enc  () const     { return m_x; }
+    constexpr operator enc& ()         { return m_x; }
+    //operator enc  () const     { return m_x; }
     constexpr operator unsigned () const { return m_x; }
 
   private:
@@ -200,7 +204,7 @@ namespace mln {
   public:
     constexpr Int() = default;
     constexpr Int(enc x) : m_x(x) {}
-    constexpr operator enc& ()           { return m_x; }
+    constexpr operator enc& ()          { return m_x; }
 //    operator enc  () const     { return m_x; }
     constexpr operator int () const { return m_x; }
 
@@ -208,6 +212,9 @@ namespace mln {
     enc m_x;
   };
 
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
 } // end of namespace mln
 

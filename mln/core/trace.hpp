@@ -1,25 +1,28 @@
 #ifndef TRACE_HPP
 # define TRACE_HPP
 
-//# include <boost/current_function.hpp>
+# ifdef _MSC_VER
+#  pragma warning( push )
+#  pragma warning( disable : 4996 )  // MSVC unsafe getenv
+# endif
+
+
 # include <ctime>
 # include <cstdlib>
 # include <iostream>
 # include <stack>
 # include <string>
 # include <thread>
-
-#if MLN_HAS_TBB
-# include <tbb/combinable.h>
-# include <tbb/tick_count.h>
-#else
 # include <chrono>
-#endif
 
-# define mln_entering(NAME) \
-  mln::trace::entering(NAME);
+# define mln_entering(NAME)                                     \
+  mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
 
-# define mln_exiting()  mln::trace::exiting();
+# define mln_exiting() ;
+
+# define mln_scoped_entering(NAME)                              \
+  mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
+
 
 namespace mln
 {
@@ -27,119 +30,82 @@ namespace mln
   namespace trace
   {
 
-#if MLN_HAS_TBB
-    struct trace_t
-    {
-      explicit trace_t(const std::string& fun)
-	: fname (fun)
-      {
-	clock = tbb::tick_count::now();
-      }
-
-      std::string       fname;
-      tbb::tick_count   clock;
-    };
-
-    static tbb::combinable< std::stack<trace_t> > callstacks;
-    //static std::stack<trace_t> callstack;
     static bool verbose = (std::getenv("TRACE") != NULL);
-    //static std::mutex stack_mutex;
+    static thread_local int __stack_depth = 0;
 
-    static inline
-    void entering(const std::string& fname)
+    struct scoped_trace
     {
-      if (verbose) {
-        //std::lock_guard<std::mutex> lock(stack_mutex);
-        std::stack<trace_t>& callstack = callstacks.local();
-        callstack.emplace(fname);
+      scoped_trace(const std::string& desc);
+      scoped_trace(const scoped_trace&) = delete;
+      scoped_trace& operator= (const scoped_trace&) = delete;
+      ~scoped_trace();
 
-	std::clog << std::string(callstack.size(), ' ')
-                  << "#" << std::this_thread::get_id() << " - "
-                  << fname << std::endl;
-      }
-    };
+    private:
+      void entering();
+      void exiting();
 
-
-    static inline
-    void exiting()
-    {
-      if (verbose) {
-        //std::lock_guard<std::mutex> lock(stack_mutex);
-        std::stack<trace_t>& callstack = callstacks.local();
-	trace_t tr = callstack.top();
-	std::clog << std::string(callstack.size(), ' ')
-                  << "#" << std::this_thread::get_id() << " - "
-                  << tr.fname
-		  << " in " << (tbb::tick_count::now() - tr.clock).seconds() << std::endl;
-
-        callstack.pop();
-      }
+      int         m_depth;
+      std::string m_desc;
+      std::chrono::time_point<std::chrono::system_clock>   m_clock;
     };
 
     inline
-    void warn(const std::string& msg)
+    scoped_trace::scoped_trace(const std::string& desc)
+      : m_depth (__stack_depth++),
+        m_desc(desc),
+        m_clock(std::chrono::system_clock::now())
     {
-      if (verbose)
-        std::clog << std::string(callstacks.local().size(), ' ')
-                  << "#" << std::this_thread::get_id() << " - "
-                  << msg << std::endl;
+      entering();
     }
-#else
 
-    struct trace_t
+    inline
+    scoped_trace::~scoped_trace()
     {
-      explicit trace_t(const std::string& fun)
-	: fname (fun)
-      {
-	clock = std::chrono::system_clock::now();
-      }
+      exiting();
+      --__stack_depth;
+    }
 
-      std::string       fname;
-      std::chrono::time_point<std::chrono::system_clock>   clock;
-    };
-
-    static std::stack<trace_t> callstack;
-    static bool verbose = (std::getenv("TRACE") != NULL);
-
-    static inline
-    void entering(const std::string& fname)
+    inline
+    void
+    scoped_trace::entering()
     {
       if (verbose) {
-        callstack.emplace(fname);
-
-	std::clog << std::string(callstack.size(), ' ')
-                  << "#" << std::this_thread::get_id() << " - "
-                  << fname << std::endl;
+        for (int k = 0; k < m_depth; ++k)
+          std::clog.put(' ');
+	std::clog << "#" << std::this_thread::get_id() << " - " << m_desc << std::endl;
       }
-    };
+    }
 
-
-    static inline
-    void exiting()
+    inline
+    void
+    scoped_trace::exiting()
     {
       if (verbose) {
-	trace_t tr = callstack.top();
-        std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - tr.clock);
-	std::clog << std::string(callstack.size(), ' ')
-                  << "#" << std::this_thread::get_id() << " - "
-                  << tr.fname
+        for (int k = 0; k < m_depth; ++k)
+          std::clog.put(' ');
+        std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_clock);
+	std::clog << "#" << std::this_thread::get_id() << " - " << m_desc
 		  << " in " << duration.count() << "ms" << std::endl;
-
-        callstack.pop();
       }
-    };
+    }
 
     inline
     void warn(const std::string& msg)
     {
-      if (verbose)
-        std::clog << std::string(callstack.size(), ' ')
-                  << "#" << std::this_thread::get_id() << " - "
+      if (verbose) {
+        for (int k = 0; k < __stack_depth; ++k)
+          std::clog.put(' ');
+
+        std::clog << "#" << std::this_thread::get_id() << " - "
                   << msg << std::endl;
+      }
     }
 
-#endif
   }
 }
+
+# ifdef _MSVC_VER
+#  pragma warning(pop)
+# endif
 
 #endif // ! TRACE_HPP

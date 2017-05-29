@@ -85,14 +85,13 @@ namespace mln
               Compare cmp,
               Image<O>& output)
       {
-        mln::trace::entering("mln::morpho::opening");
+        mln_entering("mln::morpho::opening");
 
         const I& ima = exact(ima_);
         const SE& se = exact(se_);
         O& out = exact(output);
         mln::morpho::structural::impl::opening(ima, se, cmp, out);
 
-        mln::trace::exiting();
         return out;
       }
 

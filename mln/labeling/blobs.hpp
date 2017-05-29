@@ -34,7 +34,6 @@ namespace mln
 	Label
 	blobs_no_boundcheck(const I& ima, Neighborhood nbh, Label lbl, O& out)
 	{
-	  typedef mln_value(I) V;
 	  typedef mln_point(I) P;
 
 	  mln_entering("mln::labeling::impl::generic::blobs_no_boundcheck");
@@ -76,7 +75,6 @@ namespace mln
 	Label
 	blobs_boundcheck(const I& ima, Neighborhood nbh, Label lbl, O& out)
 	{
-	  typedef mln_value(I) V;
 	  typedef mln_point(I) P;
 
 	  mln_entering("mln::labeling::impl::generic::blobs_boundcheck");
@@ -123,7 +121,6 @@ namespace mln
     blobs(const Image<I>& ima_, Neighborhood nbh, Label lbl)
     {
       typedef mln_value(I) V;
-      typedef mln_point(I) P;
       static_assert(std::is_same<V, bool>::value, "Only supports binary image (type: bool)");
 
       mln_entering("mln::labeling::blobs");

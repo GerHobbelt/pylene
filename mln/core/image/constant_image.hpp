@@ -78,6 +78,12 @@ namespace mln
       V	    m_value;
     };
 
+
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4521) // multiple copy constructors specified
+#endif
+
     template <class I>
     struct pixel_t : Pixel< pixel_t<I> >
     {
@@ -159,7 +165,9 @@ namespace mln
       V		      m_value;
     };
 
-
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
     typedef pixel_t<constant_image>		pixel_type;
     typedef pixel_t<const constant_image>	const_pixel_type;

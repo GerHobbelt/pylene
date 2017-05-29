@@ -723,7 +723,7 @@ namespace mln
     typename component_tree<P, AssociativeMap>::size_type
     component_tree<P, AssociativeMap>::size() const
     {
-      return m_data->m_nodes.size();
+      return static_cast<typename component_tree<P, AssociativeMap>::size_type>(m_data->m_nodes.size());
     }
 
     template <class P, class AssociativeMap>

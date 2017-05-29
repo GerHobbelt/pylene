@@ -51,8 +51,8 @@ namespace mln
 	  bool
 	  operator < (const edge_t& other) const
 	  {
-	    return this->type < other.type or
-	      this->type == other.type and this->p == other.p;
+	    return (this->type < other.type) or
+              (this->type == other.type and this->p == other.p);
 	  }
 	};
 
@@ -609,7 +609,7 @@ namespace mln
 
       typedef internal::graphcut_graph_t<node_t, std::pair<W,W>, N>  G;
 
-      trace::entering("mln::graphcut::graphcut");
+      mln_entering("mln::graphcut::graphcut");
 
       G graph(ima.domain(), nbh);
 
@@ -772,7 +772,7 @@ namespace mln
 	      }
 	    }
 
-	    W v = (getedge(p, q) -= delta);
+	    getedge(p, q) -= delta;
 	    getedge(q, p) += delta;
 	    //std::cout << "e(" << p << "," << q << "):" << getedge(p,q) << std::endl;
 	  }
@@ -843,8 +843,6 @@ namespace mln
       }
 
       std::cout << "Maxflow: " << maxflow << std::endl;
-
-      trace::exiting();
       return maxflow;
     }
 

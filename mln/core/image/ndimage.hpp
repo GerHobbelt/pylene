@@ -389,7 +389,7 @@ namespace mln
     {
       difference_type idx = 0;
       for (unsigned i = 0; i < dim; ++i)
-        idx += p[i] * strides_[i];
+        idx += static_cast<difference_type>(p[i] * strides_[i]);
       return idx;
     }
 
@@ -502,8 +502,8 @@ namespace mln
         char* ptr = buffer;
         unsigned nlines = 1;
         for (unsigned i = 0; i < dim-1; ++i)
-          nlines *= shape[i];
-        unsigned nelements = shape[dim-1];
+          nlines *= static_cast<unsigned>(shape[i]);
+        unsigned nelements = static_cast<unsigned>(shape[dim-1]);
 
         if (dim > 1) {
           for (unsigned i = 0; i < nlines; ++i, ptr += strides[dim-2]) {
@@ -526,8 +526,8 @@ namespace mln
       char* ptr = buffer;
       unsigned nlines = 1;
       for (unsigned i = 0; i < dim-1; ++i)
-        nlines *= shape[i];
-      unsigned nelements = shape[dim-1];
+        nlines *= static_cast<unsigned>(shape[i]);
+      unsigned nelements = static_cast<unsigned>(shape[dim-1]);
       if (dim == 1) {
         for (unsigned k = 0; k < nelements; ++k)
           ((T*)ptr + k)->~T();
@@ -828,6 +828,7 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at_index(size_type i) const
   {
     const_pixel_type pix;
+
     pix.m_ima  = (const E*)this;
     pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);
     pix.m_point = this->point_at_index(i);
@@ -865,7 +866,7 @@ namespace mln
     point_type  q = p - domain_.pmin;
     for (unsigned i = 0; i < dim; ++i)
       idx += q[i] * m_index_strides[i];
-    return idx;
+    return static_cast<typename ndimage_base<T,dim,E>::size_type>(idx);
   }
 
   template <typename T, unsigned dim, typename E>
@@ -875,15 +876,15 @@ namespace mln
   {
     point_type p = domain_.pmin - border_;
 
-    int diff = idx - m_index_first;
+    int diff = static_cast<int>(idx) - static_cast<int>(m_index_first);
     for (unsigned i = 0; i < dim; ++i) {
-      diff += m_index_strides[i] * border_;
+      diff += static_cast<int>(m_index_strides[i] * border_);
     }
 
     for (unsigned i = 0; i < dim; ++i) {
       std::div_t q = std::div(diff,  (int)m_index_strides[i]);
       if (q.rem < 0) {
-        q.rem += m_index_strides[i];
+        q.rem += static_cast<int>(m_index_strides[i]);
         q.quot -= 1;
       }
       p[i] += q.quot;
@@ -901,7 +902,7 @@ namespace mln
   {
     difference_type idx = 0;
     for (unsigned i = 0; i < dim; ++i)
-      idx += p[i] * m_index_strides[i];
+      idx += static_cast<int>(p[i] * m_index_strides[i]);
     return idx;
   }
 

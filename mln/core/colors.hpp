@@ -3,7 +3,7 @@
 
 # include <mln/core/value/int.hpp>
 # include <mln/core/ops.hpp>
-# include <mln/core/vec_base.hpp>
+# include <mln/core/vec.hpp>
 # include <mln/core/image/morphers/transformed_image.hpp>
 
 namespace mln

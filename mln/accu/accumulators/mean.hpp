@@ -27,11 +27,9 @@ namespace mln
     {
 
       template <typename A>
-      inline
+	  inline
       auto
-      mean(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), std::declval<features::mean<>> ()));
-
+      mean(const Accumulator<A>& acc);
     }
 
 
@@ -86,7 +84,6 @@ namespace mln
       inline
       auto
       mean(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), std::declval<features::mean<>> ()))
       {
         return extract(exact(acc), features::mean<> ());
       }
@@ -117,7 +114,7 @@ namespace mln
           if (v == 0)
             return extractor::sum(accu);
           else
-            return extractor::sum(accu) / extractor::count(accu);
+            return static_cast<SumType>(extractor::sum(accu) / extractor::count(accu));
         }
       };
 

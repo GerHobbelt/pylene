@@ -17,6 +17,9 @@ namespace mln
   template <class SiteSet, class WeightSet, class category>
   struct dyn_wneighborhood;
 
+  template <class SiteSet, class WeightSet, class category>
+  dyn_wneighborhood<SiteSet, WeightSet, category>
+  make_dynamic_wneighborhood(const SiteSet& pset, const WeightSet& wset, category);
 
   /******************************************/
   /****          Implementation          ****/
@@ -78,6 +81,14 @@ namespace mln
     const SiteSet   dpoints;
     const WeightSet weights;
   };
+
+  template <class SiteSet, class WeightSet, class category>
+  dyn_wneighborhood<SiteSet, WeightSet, category>
+  make_dynamic_wneighborhood(const SiteSet& pset, const WeightSet& wset, category)
+  {
+    return {pset, wset};
+  }
+
 }
 
 #endif // ! MLN_CORE_NEIGHBORHOOD_DYN_WNEIGHBORHOOD_HPP

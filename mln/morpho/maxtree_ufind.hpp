@@ -45,8 +45,8 @@ namespace mln
     {
       static
       inline
-      std::size_t
-      zfind_root(image2d<std::size_t>& parent, std::size_t p)
+      unsigned
+      zfind_root(image2d<unsigned>& parent, unsigned p)
       {
         if (parent[p] == p)
           return p;
@@ -57,10 +57,10 @@ namespace mln
 
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
-    std::pair< image2d<std::size_t>, std::vector<std::size_t> >
+    std::pair< image2d<unsigned>, std::vector<unsigned> >
     maxtree(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
   {
-    image2d<std::size_t> parent, zpar;
+    image2d<unsigned> parent, zpar;
     image2d<bool> deja_vu;
     resize(parent, ima);
     resize(zpar, ima);
@@ -68,12 +68,12 @@ namespace mln
 
     //extension::fill(deja_vu, false);
 
-    std::vector<std::size_t> S = sort_indexes(ima, cmp);
+    std::vector<unsigned> S = sort_indexes(ima, cmp);
     auto offsets = wrt_delta_index(ima, nbh.dpoints);
 
     for (int i = S.size()-1; i >= 0; --i)
       {
-	std::size_t p = S[i];
+	unsigned p = S[i];
         //std::cout << "Processing:" << p << " @ " << (int) ima[p] << std::endl;
 	// make set
 	{
@@ -84,10 +84,10 @@ namespace mln
 
 	for (unsigned k = 0; k < offsets.size(); ++k)
 	  {
-	    std::size_t q = p + offsets[k];
+	    unsigned q = p + offsets[k];
 	    if (deja_vu[q])
 	      {
-                std::size_t r = internal::zfind_root(zpar, q);
+                unsigned r = internal::zfind_root(zpar, q);
 		if (r != p) // make union
 		  {
 		    parent[r] = p;
@@ -99,9 +99,9 @@ namespace mln
       }
 
     // canonization
-    for (std::size_t p: S)
+    for (unsigned p: S)
       {
-	std::size_t q = parent[p];
+	unsigned q = parent[p];
 	if (ima[parent[q]] == ima[q])
 	  parent[p] = parent[q];
       }

@@ -2,7 +2,7 @@
 # if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 # warning "This should not be included directly. Include <mln/core/vec.hpp> instead."
 # elif defined(_MSC_VER)
-# pragma message "This should not be included directly. Include <mln/core/vec.hpp> instead."
+# pragma message("This should not be included directly. Include <mln/core/vec.hpp> instead.")
 # endif
 # include <mln/core/vec.hpp>
 #endif
@@ -17,7 +17,6 @@
 # include <boost/utility.hpp>
 # include <type_traits>
 # include <iostream>
-# include <array>
 
 
 // FIXME:
@@ -278,7 +277,9 @@ namespace mln
       template <typename U>
       vec_base(const vec_base<U, dim, tag>& other)
       {
-        std::copy(other.v_, other.v_ + dim, v_);
+        //std::copy(other.v_, other.v_ + dim, v_);
+        for (unsigned i = 0; i < dim; ++i)
+          v_[i] = static_cast<T>(other.v_[i]);
       }
 
 
@@ -286,14 +287,14 @@ namespace mln
       explicit
       vec_base(const vec_base<U, dim, other_tag>& other)
       {
-        std::copy(other.v_, other.v_ + dim, v_);
+        for (unsigned i = 0; i < dim; ++i)
+          v_[i] = static_cast<T>(other.v_[i]);
       }
 
 
       void set_all(const T& v)
       {
-        for (unsigned i = 0; i < dim; ++i)
-          v_[i] = v;
+        std::fill(v_, v_ + dim, v);
       }
 
       template <typename U>
@@ -353,19 +354,15 @@ namespace mln
       VEC_BASE_GEN_EXT_OP(is_additive_ext, -=)
       VEC_BASE_GEN_EXT_OP(is_additive_ext, +=)
 
-
-
-      vec_base< decltype(- std::declval<T>()), dim, tag>
+      vec_base< decltype(+ std::declval<T>()), dim, tag>
       operator - () const
       {
-        typedef vec_base< decltype(- std::declval<T>()), dim, tag> R;
+        typedef vec_base< decltype(+ std::declval<T>()), dim, tag> R;
         R out;
         for (unsigned i = 0; i < dim; ++i)
           out.v_[i] = -v_[i];
         return out;
       }
-
-
 
       /* RELATIONAL */
       template <typename U>
@@ -464,12 +461,21 @@ namespace mln
         return v_[N];
       }
 
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
+#endif
+
       template <unsigned N>
       constexpr
       T& get()
       {
         return v_[N];
       }
+
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
     private:
       template <size_t N, class T2, unsigned dim2, typename tag2>
@@ -602,3 +608,4 @@ namespace boost
 # endif
 
 #endif
+

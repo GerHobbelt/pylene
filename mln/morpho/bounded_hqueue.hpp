@@ -199,14 +199,14 @@ namespace mln
   {
     mln_precondition(m_q == NULL);
 
-    unsigned nelements = std::accumulate(histo, histo + nLevel, 0u);
+    size_t nelements = std::accumulate(histo, histo + nLevel, size_t(0));
     m_q = m_allocator.allocate(nelements);
     m_end = m_q + nelements;
     unsigned n = 0;
     for (std::size_t i = 0; i < nLevel; ++i)
       {
 	m_head[i] = m_tail[i] = m_q + n;
-	n += histo[i];
+	n += static_cast<unsigned>(histo[i]);
       }
   }
 

@@ -34,7 +34,8 @@ namespace mln
     site_type           site()  const;
     distance_type	offset() const;
     image_type&         image() const;
-    size_type		index() const { return m_index; }
+    size_type		index() const { return static_cast<size_type>(m_index); }
+
 
     template <typename, unsigned, typename> friend struct ndimage_pixel;
     template <typename, unsigned, typename> friend struct ndimage_base;

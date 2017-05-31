@@ -63,8 +63,10 @@
 
 
 # define __mln_forall__1(p, ...)                                        \
-  for (p.__outer_init(); !p.__outer_finished(); p.__outer_next())       \
-   for (p.__inner_init(); !p.__inner_finished(); p.__inner_next())
+  if (bool __mln_has_been_broken = false) {} else                       \
+    for (p.__outer_init(); !p.__outer_finished() and (!__mln_has_been_broken); p.__outer_next()) \
+      for (p.__inner_init(), __mln_has_been_broken = true; !p.__inner_finished(); \
+           p.__inner_next(), __mln_has_been_broken = false)
 
 # define mln_forall(...)                                                \
   BOOST_PP_IF( BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 1),  \

@@ -3,6 +3,7 @@
 
 # include <type_traits>
 # include <tuple>
+# include <mln/core/assert.hpp>
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/internal/tuple_utility.hpp>
 # include <boost/mpl/fold.hpp>
@@ -89,14 +90,18 @@ namespace mln
 
     bool __inner_finished() const
     {
-      return std::get<0>(m_iterator_tuple).__inner_finished();
+      bool is_finished = false;
+      internal::tuple_for_each(m_iterator_tuple, [&is_finished](const auto& x) { is_finished |= x.__inner_finished(); });
+      return is_finished;
     }
 
     bool __outer_finished() const
     {
-      return std::get<0>(m_iterator_tuple).__outer_finished();
+      bool finished = std::get<0>(m_iterator_tuple).__outer_finished();
+      if (MLN_HAS_DEBUG && finished)
+        internal::tuple_for_each(m_iterator_tuple, [](const auto& x) { mln_assertion(x.__outer_finished()); });
+      return finished;
     }
-
 
     reference dereference() const
     {

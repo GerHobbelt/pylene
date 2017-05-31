@@ -32,7 +32,6 @@ namespace mln
     reference	        val() const;
     site_type           point()  const;
     site_type           site()  const;
-    distance_type	offset() const;
     image_type&         image() const;
     size_type		index() const { return static_cast<size_type>(m_index); }
 
@@ -43,8 +42,6 @@ namespace mln
   private:
     friend struct internal::iterator_core_access;
 
-    char* &                     get_value() { return m_ptr; }
-    const char*                 get_value() const { return m_ptr; }
     size_t&                     get_index() { return m_index; }
     size_t                      get_index() const { return m_index; }
     mln::point<int, dim>&	get_point() { return m_point; }
@@ -60,8 +57,7 @@ namespace mln
     }
 
 
-  public:
-    //private:
+  private:
     image_type*                 m_ima;
     char*                       m_ptr; // redoundance with m_ima->m_ptr but helps vectorization
 
@@ -107,13 +103,6 @@ namespace mln
   ndimage_pixel<T,dim,I>::site() const
   {
     return m_point;
-  }
-
-  template <typename T, unsigned dim, typename I>
-  typename ndimage_pixel<T,dim,I>::distance_type
-  ndimage_pixel<T,dim,I>::offset() const
-  {
-    return m_offset;
   }
 
   template <typename T, unsigned dim, typename I>

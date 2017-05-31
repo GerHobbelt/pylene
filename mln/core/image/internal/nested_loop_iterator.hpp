@@ -333,69 +333,39 @@ namespace mln
     }
 
 
-
-    template <size_t dim>
-    struct strided_index_visitor
+    template <size_t dim, class T, T last_delta>
+    struct strided_visitor
     {
-      strided_index_visitor() = default;
+      strided_visitor() = default;
 
-      strided_index_visitor(size_t index, const std::array<ptrdiff_t, dim>& delta_indexes)
-	: m_init_index(index),
-          m_delta_indexes(delta_indexes)
+      strided_visitor(T init_value, const std::array<T, dim>& deltas)
+	: m_init_value(init_value),
+          m_deltas(deltas)
       {
       }
 
-      void initialize(size_t& index)
+      template <class U>
+      void initialize(U& value)
       {
-	index = m_init_index;
+	value = m_init_value;
       }
 
-      template <size_t n>
-      void next(size_t& index)
+      template <size_t n, class U>
+      std::enable_if_t<(n < dim-1)> next(U& value)
       {
-	mln_precondition(index + m_delta_indexes[n] > 0);
-	index += m_delta_indexes[n];
+        value += m_deltas[n];
       }
+
+      template <size_t n, class U>
+      std::enable_if_t<(n == dim-1)> next(U& value)
+      {
+        value += last_delta;
+      }
+
 
     private:
-      size_t				m_init_index;
-      std::array<std::ptrdiff_t, dim>	m_delta_indexes;
-    };
-
-    template <size_t dim, std::ptrdiff_t lastOffset>
-    struct strided_offset_visitor
-    {
-      typedef std::ptrdiff_t offset_t;
-      enum { ndim = dim };
-
-      strided_offset_visitor() = default;
-
-      strided_offset_visitor(std::ptrdiff_t start, const std::array<std::ptrdiff_t, dim>& delta_offsets)
-	: m_init_offset(start),
-          m_delta_offsets(delta_offsets)
-      {
-      }
-
-      void initialize(offset_t& ptr)
-      {
-	ptr = m_init_offset;
-      }
-
-      template <size_t n>
-      std::enable_if_t<(n < dim-1)> next(offset_t& ptr)
-      {
-	ptr += m_delta_offsets[n];
-      }
-
-      template <size_t n>
-      std::enable_if_t<(n == dim-1)> next(offset_t& ptr)
-      {
-	ptr += lastOffset;
-      }
-
-    private:
-      std::ptrdiff_t			m_init_offset;
-      std::array<std::ptrdiff_t, dim>	m_delta_offsets;
+      T                   m_init_value;
+      std::array<T, dim>  m_deltas;
     };
 
 
@@ -520,8 +490,8 @@ namespace mln
 
         if (n != 0 and m_pv.template finished<n>(get_point(m_s)))
           {
-            m_pv.template init<n>(get_point(m_s));
             this->next_<n-1>();
+            m_pv.template init<n>(get_point(m_s));
           }
       }
 

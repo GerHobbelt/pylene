@@ -99,7 +99,7 @@ namespace mln
     {
       bool finished = std::get<0>(m_iterator_tuple).__outer_finished();
       if (MLN_HAS_DEBUG && finished)
-        internal::tuple_for_each(m_iterator_tuple, [](const auto& x) { mln_assertion(x.__outer_finished()); });
+        internal::tuple_for_each(m_iterator_tuple, [](const auto& x) { (void)x; mln_assertion(x.__outer_finished()); });
       return finished;
     }
 

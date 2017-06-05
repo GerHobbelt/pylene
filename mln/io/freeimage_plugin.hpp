@@ -6,7 +6,10 @@
 # include <mln/core/grays.hpp>
 # include <mln/core/colors.hpp>
 # include <mln/colors/rgba.hpp>
+
+# include <cstring>
 # include <unordered_map>
+
 # include <FreeImage.h>
 
 namespace mln

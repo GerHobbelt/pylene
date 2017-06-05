@@ -69,12 +69,15 @@ namespace internal
 
 # define mln_foreach(p, COL)						\
   MLN_DECL_VAR(_mln_range_, COL)                                        \
+  MLN_DECL_VAR(__mln_has_been_broken, false)                            \
   for (auto _mln_it_ = mln::internal::iter_outer_init(mln::rng::iter(_mln_range_.get())); \
-       !_mln_it_.__outer_finished();                                    \
-         _mln_it_.__outer_next())                                       \
-    for (_mln_it_.__inner_init(); !_mln_it_.__inner_finished(); _mln_it_.__inner_next()) \
-      MLN_DECL_VAR(_mln_stop_, false)                                   \
-        for(p = *_mln_it_; !_mln_stop_.get(); _mln_stop_.set(true))
+       !__mln_has_been_broken.get() && !_mln_it_.__outer_finished();    \
+       __mln_has_been_broken.get() ? (void)0 : _mln_it_.__outer_next()) \
+    for (_mln_it_.__inner_init();                                       \
+         !__mln_has_been_broken.get() && !_mln_it_.__inner_finished();  \
+         __mln_has_been_broken.get() ? (void)0 : _mln_it_.__inner_next()) \
+      if (__mln_has_been_broken.set(true)) {} else                          \
+for (p = *_mln_it_; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))
 
 
 # define mln_reverse_foreach(p, COL)						\

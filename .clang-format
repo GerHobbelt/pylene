@@ -21,6 +21,10 @@ BraceWrapping:
         BeforeElse: true
 
 NamespaceIndentation: All
+#FixNamespaceComments: true
 
-# Template
+AlwaysBreakAfterReturnType: All
 AlwaysBreakTemplateDeclarations: true
+
+# For loop
+ForEachMacros: ['mln_forall', 'mln_foreach']

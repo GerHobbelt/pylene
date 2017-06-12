@@ -8,6 +8,8 @@ add_executable(${test_prefix}win2d win2d.cpp)
 # test Domain
 add_executable(${test_prefix}box domain/box.cpp)
 
+# test loop
+add_executable(${test_prefix}forloop forloop.cpp)
 
 # test Range
 add_executable(${test_prefix}range range/range.cpp)

@@ -387,8 +387,9 @@ namespace mln
                      typename DereferencePolicy::template reference<InternalStruct> >,
       public internal::iterator_core_access
     {
-      typedef typename DereferencePolicy::template reference<InternalStruct> reference;
-      typedef std::true_type has_NL;
+      using reference = typename DereferencePolicy::template reference<InternalStruct>;
+      using has_NL = std::true_type;
+      using is_multidimensional = std::true_type;
 
       nested_loop_iterator() = default;
 
@@ -461,15 +462,15 @@ namespace mln
         m_iv.initialize(get_index(m_s));
       }
 
-    void __outer_next()
-    {
-      next_<ndim-2>();
-    }
+      void __outer_next()
+      {
+        next_<ndim-2>();
+      }
 
-    bool __outer_finished() const
-    {
-      return m_pv.template finished<0>(get_point(m_s));
-    }
+      bool __outer_finished() const
+      {
+        return m_pv.template finished<0>(get_point(m_s));
+      }
 
 
   public:

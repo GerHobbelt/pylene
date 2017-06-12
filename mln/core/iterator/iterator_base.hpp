@@ -24,7 +24,6 @@ namespace mln
       Reference x_;
     };
 
-
     template <typename T>
     struct make_pointer
     {
@@ -45,28 +44,26 @@ namespace mln
   ///
   /// Helper class for iterators
   ///
-  template <typename Derived, typename Value,
-            typename Reference = Value&>
+  template <typename Derived, typename Value, typename Reference = Value&>
   struct iterator_base : Iterator<Derived>
   {
-    typedef Derived iterator;
-    typedef Derived const_iterator;
-    typedef std::false_type has_NL;
-
-    typedef typename std::remove_const<Value>::type value_type;
-    typedef Reference reference;
-    typedef typename std::conditional< std::is_reference<Reference>::value,
-				       typename std::remove_reference<Reference>::type*,
-				       internal::pointer_wrapper<Reference> >::type pointer;
+    using is_multidimensional = std::false_type;
+    using iterator = Derived;
+    using const_iterator = Derived;
+    using has_NL = std::false_type;
+    using value_type = std::remove_const_t<Value>;
+    using reference = Reference;
+    using pointer = std::conditional_t<std::is_reference<Reference>::value, std::remove_reference_t<Reference>*,
+                                       internal::pointer_wrapper<Reference>>;
 
     Derived& iter()
     {
-      return *(this->derived());
+      return *(exact(this));
     }
 
     Derived iter() const
     {
-      return *(this->derived());
+      return *(exact(this));
     }
 
 
@@ -77,58 +74,46 @@ namespace mln
       // member (e.g. the image pointer in pixels), thus we should
       // assert this:
       // mln_precondition(not this->derived()->finished());
-      return this->derived()->dereference();
+      return exact(this)->dereference();
     }
 
     pointer
     operator-> () const
     {
-      return internal::make_pointer<reference>::foo(this->derived()->dereference());
+      return internal::make_pointer<reference>::foo(exact(this)->dereference());
     }
+  };
 
-    void set_dejavu_(bool)
+  template <typename Derived, typename Value,
+            typename Reference = Value&>
+  struct multidimensional_iterator_base : iterator_base<Derived, Value, Reference>
+  {
+    using is_multidimensional = std::true_type;
+
+
+    void init()
     {
+      exact(this)->__outer_init();
+      if (not exact(this)->__outer_finished())
+        exact(this)->__inner_init();
     }
 
-    void __inner_init()
+    void next()
     {
+      exact(this)->__inner_next();
+      if (exact(this)->__inner_finished())
+        {
+          exact(this)->__outer_next();
+          if (not exact(this)->__outer_finished())
+            exact(this)->__inner_init();
+        }
     }
 
-    void __inner_next()
+    bool finished() const
     {
-      exact(this)->next();
+      return exact(this)->__outer_finished();
     }
 
-    bool __inner_finished() const
-    {
-      return exact(this)->finished();
-    }
-
-    void __outer_init()
-    {
-      exact(this)->init();
-    }
-
-    void __outer_next()
-    {
-    }
-
-    bool __outer_finished() const
-    {
-      return exact(this)->finished();
-    }
-
-
-  private:
-    const Derived* derived() const
-    {
-      return static_cast<const Derived*>(this);
-    }
-
-    Derived* derived()
-    {
-      return static_cast<Derived*>(this);
-    }
   };
 
 } // end of namespace mln

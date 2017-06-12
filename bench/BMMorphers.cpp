@@ -32,6 +32,7 @@ BENCHMARK_F(BMMorphers, Threshold_Count_CStyle_Uint8)(benchmark::State& st) {
   while (st.KeepRunning()) {
     benchmark::DoNotOptimize(count = threshold1(input, (uint8)128));
   }
+  std::cout << count << "\n";
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
@@ -61,6 +62,7 @@ BENCHMARK_F(BMMorphers, Threshold_Count_PixelIterator_Uint8)(benchmark::State& s
   while (st.KeepRunning()) {
     benchmark::DoNotOptimize(count = threshold3(input, (uint8)128));
   }
+  std::cout << count << "\n";
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
@@ -70,6 +72,7 @@ BENCHMARK_F(BMMorphers, Threshold_Count_Morpher1)(benchmark::State& st) {
   while (st.KeepRunning()) {
     count = threshold4(input, (uint8)128);
   }
+  std::cout << count << "\n";
   st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 

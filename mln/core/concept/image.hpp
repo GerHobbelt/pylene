@@ -7,10 +7,7 @@
 # include <mln/core/concept/extension.hpp>
 
 # include <mln/core/image_traits.hpp>
-
 # include <boost/concept_check.hpp>
-# include <boost/static_assert.hpp>
-
 
 namespace mln {
 

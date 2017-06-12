@@ -65,7 +65,8 @@ namespace mln {
     void
     copy(const I& input, J&& output)
     {
-      mln_viter(vin, vout, input, output);
+      mln_viter(vin, input);
+      mln_viter(vout, output);
 
       mln_forall(vin, vout)
         *vout = (mln_value(I)) *vin;

@@ -23,7 +23,8 @@ BraceWrapping:
 NamespaceIndentation: All
 #FixNamespaceComments: true
 
-AlwaysBreakAfterReturnType: All
+AlwaysBreakAfterReturnType: TopLevel
+AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakTemplateDeclarations: true
 
 # For loop

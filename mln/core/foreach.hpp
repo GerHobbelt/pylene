@@ -3,15 +3,18 @@
 
 # include <utility>
 # include <mln/core/range/iter.hpp>
+# include <mln/core/iterator/iterator_utils.hpp>
 
 namespace mln
 {
 
   namespace internal
   {
+    template <typename T, typename = typename std::is_convertible<T, bool>::type>
+    struct false_var_t;
 
     template <typename T>
-    struct false_var_t
+    struct false_var_t<T, std::true_type>
     {
       false_var_t(T&& v) : x_{std::forward<T>(v)} {}
 
@@ -21,6 +24,14 @@ namespace mln
 
       T x_;
     };
+
+    template <typename T>
+    struct false_var_t<T, std::false_type> : false_var_t<T, std::true_type>
+    {
+      using false_var_t<T, std::true_type>::false_var_t;
+      operator T& () { return this->x_; }
+    };
+
 
     template <class T>
     false_var_t<T>
@@ -41,44 +52,32 @@ namespace mln
 /****         mln_foreach macro         ****/
 /******************************************/
 
-/*
-# define mln_foreach(p, COL)						\
-  __mln_should_copy_col_local__(COL, _mln_range_)			\
-  MLN_DECL_VAR(_mln_it_, mln::rng::iter(_mln_range_.get()))		\
-  MLN_DECL_VAR(_mln_continue_, true)					\
-  for (_mln_it_.get().init();						\
-       _mln_continue_.get() and !_mln_it_.get().finished();		\
-       _mln_continue_.get() ? _mln_it_.get().next() : (void) 0)		\
-    if (_mln_continue_.set(false)) {} else				\
-      for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true))
-*/
-
 namespace mln
 {
-namespace internal
-{
-  template <class T>
-  T&&
-  iter_outer_init(T&& x)
+  namespace internal
   {
-    x.__outer_init();
-    return std::forward<T>(x);
+    template <class T>
+    T&& iter_outer_init(T&& x)
+    {
+      mln::outer_init(x);
+      return std::forward<T>(x);
+    }
   }
 }
-}
 
-# define mln_foreach(p, COL)						\
-  MLN_DECL_VAR(_mln_range_, COL)                                        \
-  MLN_DECL_VAR(__mln_has_been_broken, false)                            \
-  for (auto _mln_it_ = mln::internal::iter_outer_init(mln::rng::iter(_mln_range_.get())); \
-       !__mln_has_been_broken.get() && !_mln_it_.__outer_finished();    \
-       __mln_has_been_broken.get() ? (void)0 : _mln_it_.__outer_next()) \
-    for (_mln_it_.__inner_init();                                       \
-         !__mln_has_been_broken.get() && !_mln_it_.__inner_finished();  \
-         __mln_has_been_broken.get() ? (void)0 : _mln_it_.__inner_next()) \
-      if (__mln_has_been_broken.set(true)) {} else                          \
-for (p = *_mln_it_; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))
-
+#define mln_foreach(p, COL)                                                                                            \
+  MLN_DECL_VAR(_mln_range_, COL)                                                                                       \
+  MLN_DECL_VAR(__mln_has_been_broken, false)                                                                           \
+  for (auto _mln_it_ = mln::internal::iter_outer_init(mln::rng::iter(_mln_range_.get()));                              \
+       !__mln_has_been_broken.get() && !mln::outer_finished(_mln_it_);                                                 \
+       __mln_has_been_broken.get() ? (void)0 : mln::outer_next(_mln_it_))                                              \
+    for (mln::inner_init(_mln_it_); !__mln_has_been_broken.get() && !mln::inner_finished(_mln_it_);                    \
+         __mln_has_been_broken.get() ? (void)0 : mln::inner_next(_mln_it_))                                            \
+      if (__mln_has_been_broken.set(true))                                                                             \
+      {                                                                                                                \
+      }                                                                                                                \
+      else                                                                                                             \
+        for (p = *_mln_it_; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))
 
 # define mln_reverse_foreach(p, COL)						\
   MLN_DECL_VAR(_mln_range_, COL)                                        \

@@ -6,7 +6,6 @@
 # include <iomanip>
 
 # include <mln/core/domain/box.hpp>
-# include <mln/core/macros.hpp>
 # include <mln/core/value/value_traits.hpp>
 # include <mln/core/grays.hpp>
 # include <mln/io/format.hpp>

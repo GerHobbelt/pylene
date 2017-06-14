@@ -1,5 +1,5 @@
 #SUBDIRS(labeling)
-#find_package(benchmark)
+find_package(benchmark)
 
 
 
@@ -10,11 +10,18 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
   link_libraries(-lpthread)
 endif()
 
+
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   message("compiler id is " ${CMAKE_CXX_COMPILER_ID})
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize")
+  #link_libraries(benchmark::benchmark)
+  link_libraries(-lbenchmark)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(STANDALONE_COMPILE_FLAGS "-fopt-info-vec-all")
+else ()
+   set(STANDALONE_COMPILE_FLAGS " ")
+   link_libraries(Shlwapi.lib benchmark::benchmark)
 endif ()
 
 set(src_standalone
@@ -24,8 +31,7 @@ set(src_standalone
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-#link_libraries(benchmark::benchmark)
-link_libraries(-lbenchmark)
+
 
 add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_standalone.cpp)
 add_executable(BMRotation       BMRotation.cpp)

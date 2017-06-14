@@ -58,12 +58,12 @@ namespace mln
 
     Derived& iter()
     {
-      return *(exact(this));
+      return *(mln::exact(this));
     }
 
     Derived iter() const
     {
-      return *(exact(this));
+      return *(mln::exact(this));
     }
 
 
@@ -74,46 +74,14 @@ namespace mln
       // member (e.g. the image pointer in pixels), thus we should
       // assert this:
       // mln_precondition(not this->derived()->finished());
-      return exact(this)->dereference();
+      return mln::exact(this)->dereference();
     }
 
     pointer
     operator-> () const
     {
-      return internal::make_pointer<reference>::foo(exact(this)->dereference());
+      return internal::make_pointer<reference>::foo(mln::exact(this)->dereference());
     }
-  };
-
-  template <typename Derived, typename Value,
-            typename Reference = Value&>
-  struct multidimensional_iterator_base : iterator_base<Derived, Value, Reference>
-  {
-    using is_multidimensional = std::true_type;
-
-
-    void init()
-    {
-      exact(this)->__outer_init();
-      if (not exact(this)->__outer_finished())
-        exact(this)->__inner_init();
-    }
-
-    void next()
-    {
-      exact(this)->__inner_next();
-      if (exact(this)->__inner_finished())
-        {
-          exact(this)->__outer_next();
-          if (not exact(this)->__outer_finished())
-            exact(this)->__inner_init();
-        }
-    }
-
-    bool finished() const
-    {
-      return exact(this)->__outer_finished();
-    }
-
   };
 
 } // end of namespace mln

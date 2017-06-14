@@ -22,7 +22,7 @@ namespace mln
     auto dispatch(X& x, std::false_type __is_pixel, std::false_type __is_iterator) const
     {
       (void) __is_pixel; (void) __is_iterator;
-      return exact(this)->__bind_point(x);
+      return mln::exact(this)->__bind_point(x);
     }
 
     /// \brief Overload if x is a point rvalue
@@ -30,7 +30,7 @@ namespace mln
     auto dispatch(X&& x, std::false_type __is_pixel, std::false_type __is_iterator) const
     {
       (void) __is_pixel; (void) __is_iterator;
-      return exact(this)->__process_point(x);
+      return mln::exact(this)->__process_point(x);
     }
 
     /// \brief Overload if x is a pixel lvalue
@@ -38,7 +38,7 @@ namespace mln
     auto dispatch(X& x, std::true_type __is_pixel, std::false_type __is_iterator) const
     {
       (void) __is_pixel; (void) __is_iterator;
-      return exact(this)->__bind_pixel(x);
+      return mln::exact(this)->__bind_pixel(x);
     }
 
         /// \brief Overload if x is a pixel lvalue
@@ -55,7 +55,7 @@ namespace mln
     auto dispatch_iterator(X& x, std::false_type __is_pixel_iterator) const
     {
       (void) __is_pixel_iterator;
-      return exact(this)->__bind_point_iterator(x);
+      return mln::exact(this)->__bind_point_iterator(x);
     }
 
     /// \brief Overload if x is a pixel iterator
@@ -63,7 +63,7 @@ namespace mln
     auto dispatch_iterator (X& x, std::true_type __is_pixel_iterator) const
     {
       (void) __is_pixel_iterator;
-      return exact(this)->__bind_pixel_iterator(x);
+      return mln::exact(this)->__bind_pixel_iterator(x);
     }
 
   public:

@@ -956,7 +956,7 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_value_range
   ndimage_base<T,dim,E>::values () const
   {
-    return const_value_range(exact(*this));
+    return const_value_range(*this);
   }
 
   template <typename T, unsigned dim, typename E>

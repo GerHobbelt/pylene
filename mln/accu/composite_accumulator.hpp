@@ -175,7 +175,7 @@ namespace mln
       template <typename Other>
       void take(const Accumulator<Other>& other)
       {
-        boost::fusion::for_each(m_accus, internal::accu_take<Other>(exact(other)));
+        boost::fusion::for_each(m_accus, internal::accu_take<Other>(mln::exact(other)));
       }
 
 
@@ -197,7 +197,7 @@ namespace mln
 
       const E& to_result() const
       {
-        return exact(*this);
+        return mln::exact(*this);
       }
 
     private:
@@ -220,7 +220,7 @@ namespace mln
 
       ResultType to_result() const
       {
-        return extract(exact(*this), Feature() );
+        return extract(mln::exact(*this), Feature() );
       }
     };
 

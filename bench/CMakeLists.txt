@@ -15,26 +15,25 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   message("compiler id is " ${CMAKE_CXX_COMPILER_ID})
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize")
-  #link_libraries(benchmark::benchmark)
-  link_libraries(-lbenchmark)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(STANDALONE_COMPILE_FLAGS "-fopt-info-vec-all")
 else ()
    set(STANDALONE_COMPILE_FLAGS " ")
-   link_libraries(Shlwapi.lib benchmark::benchmark)
 endif ()
 
 set(src_standalone
-  BMNeighborhood_standalone.cpp
+  BMErosion.cpp
   standalone.cpp
   )
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
+link_libraries(benchmark::benchmark)
 
-
-add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_standalone.cpp)
+add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
+add_executable(BMNeighborhood   BMNeighborhood.cpp)
 add_executable(BMRotation       BMRotation.cpp)
 add_executable(BMMorphers       BMMorphers.cpp   standalone.cpp)
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
 target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
+target_link_libraries(BMErosion ${FreeImage_LIBRARIES})

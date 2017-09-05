@@ -15,7 +15,7 @@ erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& o
   mln_forall(px,pxout)
   {
     uint8 min = 255;
-#pragma clang loop vectorize(enable)
+    //#pragma clang loop vectorize(enable)
     mln_simple_forall(nx)
       min = std::min(min, nx->val());
     pxout->val() = min;

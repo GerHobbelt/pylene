@@ -116,12 +116,7 @@ namespace mln
     /// * `VVis::next<n>(VVis::arg)`
     /// The type of `s.get_value()` must be convertible to `VVis::arg`
     /// \{
-    template <size_t dim, std::ptrdiff_t lastOffset> struct strided_offset_visitor;
-    /// \}
-
     struct no_op_visitor;
-
-    template <size_t dim> struct strided_index_visitor;
     /// \}
 
     /********************/

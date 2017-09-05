@@ -14,7 +14,7 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   message("compiler id is " ${CMAKE_CXX_COMPILER_ID})
-  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize")
+  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(STANDALONE_COMPILE_FLAGS "-fopt-info-vec-all")
 else ()

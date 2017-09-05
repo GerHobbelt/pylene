@@ -768,7 +768,7 @@ namespace mln
   ndimage_base<T,dim,E>::operator[] (size_type i)
   {
     mln_precondition(vbox_.has(point_at_index(i)));
-    return *(m_ptr_origin + i);
+    return m_ptr_origin[i];
   }
 
   template <typename T, unsigned dim, typename E>
@@ -777,7 +777,7 @@ namespace mln
   ndimage_base<T,dim,E>::operator[] (size_type i) const
   {
     mln_precondition(vbox_.has(point_at_index(i)));
-    return *(m_ptr_origin + i);
+    return m_ptr_origin[i];
   }
 
   template <typename T, unsigned dim, typename E>
@@ -786,11 +786,10 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at(const point_type& p)
   {
     pixel_type pix;
-    pix.m_ima  = (E*)this;
-    pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);  //+ pix.index_);
+    pix.m_ima  = this->exact();
+    pix.m_ptr = m_ptr_origin;
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
-    pix.m_offset = pix.m_index * sizeof(T);
     return pix;
   }
 
@@ -800,11 +799,10 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at(const point_type& p) const
   {
     const_pixel_type pix;
-    pix.m_ima  = (const E*)this;
-    pix.m_ptr  = reinterpret_cast<char*>(m_ptr_origin);
+    pix.m_ima  = this->exact();
+    pix.m_ptr  = m_ptr_origin;
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
-    pix.m_offset = pix.m_index * sizeof(T);
     return pix;
   }
 
@@ -814,11 +812,10 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at_index(size_type i)
   {
     pixel_type pix;
-    pix.m_ima  = (E*)this;
-    pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);
+    pix.m_ima  = this->exact();
+    pix.m_ptr = m_ptr_origin;
     pix.m_point = this->point_at_index(i);
     pix.m_index = i;
-    pix.m_offset = i * sizeof(T);
     return pix;
   }
 
@@ -828,12 +825,10 @@ namespace mln
   ndimage_base<T,dim,E>::pixel_at_index(size_type i) const
   {
     const_pixel_type pix;
-
-    pix.m_ima  = (const E*)this;
-    pix.m_ptr = reinterpret_cast<char*>(m_ptr_origin);
+    pix.m_ima  = this->exact();
+    pix.m_ptr = m_ptr_origin;
     pix.m_point = this->point_at_index(i);
     pix.m_index = i;
-    pix.m_offset = i * sizeof(T);
     return pix;
   }
 

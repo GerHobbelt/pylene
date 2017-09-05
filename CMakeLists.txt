@@ -48,6 +48,7 @@ elseif (MSVC)
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 endif()
 
+
 # default buidling type
 if (NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type selected, default to Release")

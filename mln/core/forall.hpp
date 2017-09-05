@@ -24,10 +24,16 @@ namespace mln
 {
   namespace details
   {
-    template <class... ITypes>
-    auto make_forall_iterator(ITypes&... iterators)
+    template <class IType1, class IType2, class... ITypes>
+    auto make_forall_iterator(IType1& it1, IType2& it2, ITypes&... iterators)
     {
-      return make_zip_iterator(iterators...);
+      return make_zip_iterator(it1, it2, iterators...);
+    }
+
+    template <class IType>
+    IType& make_forall_iterator(IType& it)
+    {
+      return it;
     }
   }
 }
@@ -46,6 +52,9 @@ namespace mln
         {                                                                                                              \
         }                                                                                                              \
         else
+
+#define mln_simple_forall(p)                    \
+  for (p.init(); !p.finished(); p.next())
 
 /******************************************/
 /****             mln_iter             ****/

@@ -368,9 +368,7 @@ namespace mln
 	Image& ima = m_pix().image();
 	for (unsigned i = 0; i < N; ++i) {
 	  m_index_set[i] = ima.delta_index( m_site_set[i]);
-	  m_offset_set[i] = ima.delta_offset( m_site_set[i]);
 	}
-
       }
 
       void init() { m_i = 0; }
@@ -382,11 +380,11 @@ namespace mln
       dereference() const
       {
         mln_precondition(m_i < N);
-	return {m_pix().image(),
-            (char*)(&(m_pix().val())) + m_offset_set[m_i],
+        auto* ptr = &(m_pix().val());
+        auto dindex = m_index_set[m_i];
+        return {m_pix().image(), ptr + dindex,
             m_pix().point() + m_site_set[m_i],
-            m_pix().index() + m_index_set[m_i]
-            };
+            m_pix().index() + dindex};
       }
 
     private:
@@ -394,7 +392,6 @@ namespace mln
 
       S              m_site_set;
       I              m_index_set;
-      O              m_offset_set;
       Pixel          m_pixel;
       unsigned       m_i;
     };

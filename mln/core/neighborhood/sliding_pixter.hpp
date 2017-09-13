@@ -117,44 +117,73 @@ namespace mln
     /****          Pixter Types: Spe for indexable images       ****/
     /***************************************************************/
 
-    template <class PixelProxy, class SiteSet>
-    struct sliding_pixter_base<PixelProxy, SiteSet, std::true_type /* __is_indexable */, void>
+    template <class SiteSet>
+    struct sliding_pixter_container_base
     {
     private:
       using Point          = typename SiteSet::value_type;
       using IndexContainer = boost::container::small_vector<int, 25>;
       using SiteContainer  = boost::container::small_vector<Point, 25>;
+
+    public:
+      sliding_pixter_container_base(std::size_t size)
+        : m_size(size), m_site_set(size), m_index_set(size)
+      {
+      }
+
+    protected:
+      const int          m_size;
+      SiteContainer      m_site_set;
+      IndexContainer     m_index_set;
+    };
+
+    template <class Point, std::size_t N>
+    struct sliding_pixter_container_base<std::array<Point, N>>
+    {
+    public:
+      sliding_pixter_container_base(std::size_t) {}
+
+    protected:
+      using IndexContainer = std::array<int, 25>;
+      using SiteContainer  = std::array<Point, 25>;
+
+
+      static constexpr int m_size = N;
+      SiteContainer        m_site_set;
+      IndexContainer       m_index_set;
+    };
+
+
+    template <class PixelProxy, class SiteSet>
+    struct sliding_pixter_base<PixelProxy, SiteSet, std::true_type /* __is_indexable */, void>
+      : sliding_pixter_container_base<SiteSet>
+    {
+    private:
       using Image = spixter_image_t<PixelProxy>;
 
     public:
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const PixelProxy& px, const SiteSet& s)
-	: m_pixel (px),
-          m_size ((int)rng::size(s)),
-          m_site_set (m_size),
-          m_index_set(m_size),
+	: sliding_pixter_container_base<SiteSet>(rng::size(s)),
+          m_pixel (px),
           m_i (0)
       {
 	Image& ima = m_pixel.get().image();
         auto it = rng::iter(s);
         it.init();
-	for (int i = 0; i < m_size; ++i, it.next()) {
-          m_site_set[i] = *it;
-	  m_index_set[i] = ima.delta_index(m_site_set[i]);
+	for (int i = 0; i < this->m_size; ++i, it.next()) {
+          this->m_site_set[i] = *it;
+	  this->m_index_set[i] = ima.delta_index(*it);
         }
       }
 
       void init() { m_i = 0; }
       void next() { ++m_i; }
-      bool finished() const { return m_i >= m_size; }
-
+      bool finished() const { return m_i >= this->m_size; }
 
     protected:
       const PixelProxy   m_pixel;
-      const int          m_size;
-      SiteContainer      m_site_set;
-      IndexContainer     m_index_set;
       int                m_i;
     };
 

@@ -24,6 +24,7 @@ endif ()
 set(src_standalone
   BMErosion.cpp
   standalone.cpp
+  BMNeighborhood.cpp
   )
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
@@ -31,7 +32,7 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 link_libraries(benchmark)
 
 add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
-add_executable(BMNeighborhood   BMNeighborhood.cpp)
+add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_executable(BMRotation       BMRotation.cpp)
 add_executable(BMMorphers       BMMorphers.cpp   standalone.cpp)
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})

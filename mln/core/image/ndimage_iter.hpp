@@ -3,7 +3,6 @@
 
 # include <mln/core/image/internal/nested_loop_iterator.hpp>
 # include <mln/core/image/ndimage_pixel.hpp>
-# include <mln/core/stride_utils.hpp>
 
 namespace mln
 {
@@ -102,7 +101,7 @@ namespace mln
     using reverse_iterator =
         internal::nested_loop_iterator<internal::domain_point_visitor_backward<P>,
                                        internal::no_op_visitor,
-                                       internal::strided_visitor<ndim, int, 1>,
+                                       internal::strided_visitor<ndim, int, -1>,
                                        pixel_t,
                                        internal::deref_return_structure_policy>;
     using const_iterator = iterator;

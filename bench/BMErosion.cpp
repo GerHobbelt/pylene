@@ -27,7 +27,7 @@ void
 erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   (void) f; (void) out;
-  //mln::morpho::structural::erode(f, winc8, out, std::less<mln::uint8>());
+  mln::morpho::structural::erode(f, winc8, out, std::less<mln::uint8>());
 }
 
 

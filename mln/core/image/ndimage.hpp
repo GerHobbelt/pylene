@@ -20,12 +20,7 @@ namespace mln
   template <typename T, unsigned dim, typename E> struct ndimage_base;
 
   // FWD
-  //template <typename I, typename T> struct ndimage_iter;
-  //template <typename I, typename T> struct ndimage_rev_iter;
-  //template <typename T, unsigned dim, typename I> struct ndimage_pixel_iterator;
-  //template <typename T, unsigned dim, typename I> struct ndimage_rev_pixel_iterator;
   template <typename T, unsigned dim, typename I> struct ndimage_pixel;
-  template <typename T, unsigned dim, typename E> struct ndimage_base;
 
 
   /******************************************/
@@ -186,6 +181,9 @@ namespace mln
 
     typedef T*                  pointer;
     typedef const T*            const_pointer;
+
+    // Extension
+    typedef internal::ndimage_extension<T, dim> extension_type;
     /// \}
 
 
@@ -310,6 +308,21 @@ namespace mln
     const_pixel_range           pixels() const;
     /// \}
 
+    /// \name Index-related methods
+    /// \{
+
+    /// \copydoc image::index_of_point(const point_type&) const
+    size_type       index_of_point(const point_type& p) const;
+
+    /// \copydoc image::point_at_index(size_type i) const
+    point_type		point_at_index(size_type i) const;
+
+    /// \copydoc image::delta_index(const point_type&) const
+    difference_type delta_index(const point_type& p) const;
+
+    /// \}
+
+
     /// \name Concrete-related Image Methods
     /// \{
 
@@ -341,61 +354,28 @@ namespace mln
     /// \}
 
 
-
-
-    /// \name Index-related methods
-    /// \{
-
-    /// \copydoc image::index_of_point(const point_type&) const
-    size_type       index_of_point(const point_type& p) const;
-
-    /// \copydoc image::point_at_index(size_type i) const
-    point_type		point_at_index(size_type i) const;
-
-    /// \copydoc image::delta_index(const point_type&) const
-    difference_type delta_index(const point_type& p) const;
-
-    /// \}
-
-
-
     // As a Raw Image
     const std::size_t*       strides() const;
-    int border() const { return border_; }
+    int border() const { return m_border; }
 
 
     // Specialized algorithm
     template <typename T_, unsigned dim_, typename E_, typename Domain_>
     friend typename std::enable_if<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>::type
     make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
-    // template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    // friend E_ make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
-    // template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    // friend typename E_ make_subimage(ndimage_base<T_, dim_, E_>&&, const Domain_& domain);
-
 
     // As an Indexable Image
     const size_t*	index_strides() const     { return &m_index_strides[0]; }
-
-    // template <typename O>
-    // bool friend_index_compatible(ndimage_base self, const Image<O>& other) const;
-
-
-
-
 
 
     difference_type delta_offset(const point_type& p) const
     {
       difference_type idx = 0;
       for (unsigned i = 0; i < dim; ++i)
-        idx += static_cast<difference_type>(p[i] * strides_[i]);
+        idx += static_cast<difference_type>(p[i] * m_strides[i]);
       return idx;
     }
 
-
-    // Extension
-    typedef internal::ndimage_extension<T, dim> extension_type;
     extension_type extension() const;
 
   private:
@@ -411,27 +391,24 @@ namespace mln
 
 
   protected:
-    friend struct ndimage_pixel<T, dim, E>;
-    friend struct ndimage_pixel<const T, dim, const E>;
     template <typename, typename, unsigned, typename> friend struct indexible_ndimage_base;
     template <typename, typename> friend struct ndimage_value_range;
     template <typename, typename> friend struct ndimage_pixel_range;
 
     void resize_(const domain_type& domain, unsigned border = 3, T v = T());
 
-    domain_type	domain_;	///< Domain of image
+    domain_type	m_domain;	///< Domain of image
     //#ifndef MLN_NDEBUG
     domain_type vbox_;
     //#endif
 
-    std::array<size_t, dim>	strides_;	///< Strides in bytes
-    std::shared_ptr< internal::ndimage_data<T, dim> > data_;
-    int		border_;
-  public:
-    char*	ptr_;           ///< Pointer to the first element in the domain
-    char*	last_;          ///< Pointer to the last element in the domain (not past-the-end)
+    std::array<size_t, dim>	m_strides;	///< Strides in bytes
+    std::shared_ptr< internal::ndimage_data<T, dim> > m_data;
+    int                                 m_border;
+    char*                               m_ptr;           ///< Pointer to the first element in the domain
+    char*                               m_last;          ///< Pointer to the last element in the domain (not past-the-end)
 
-    T*					m_ptr_origin;		///< Pointer to the first element
+    T*					m_ptr_origin;		///< Pointer to the first element (pmin)
     std::array<std::size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
     size_t				m_index_first;          ///< index of pmin
     size_t				m_index_last;           ///< index of pmax-1
@@ -545,38 +522,38 @@ namespace mln
 
   template <typename T, unsigned dim, typename E>
   ndimage_base<T,dim,E>::ndimage_base(unsigned border)
-    : domain_ (), border_ (border), ptr_ (NULL)
+    : m_domain (), m_border (border), m_ptr (NULL)
   {
     for (unsigned i = 0; i < dim; ++i){
-      mln_postcondition(domain_.pmin[i] == 0);
-      mln_postcondition(domain_.pmax[i] == 0);
+      mln_postcondition(m_domain.pmin[i] == 0);
+      mln_postcondition(m_domain.pmax[i] == 0);
     }
   }
 
   template <typename T, unsigned dim, typename E>
   ndimage_base<T,dim,E>::ndimage_base(const domain_type& domain, unsigned border, T v)
-    : domain_ (domain),
-      border_ (border)
+    : m_domain (domain),
+      m_border (border)
   {
-    resize_(domain_, border, v);
+    resize_(m_domain, border, v);
   }
 
   template <typename T, unsigned dim, typename E>
   template <typename U, typename E2>
   ndimage_base<T,dim,E>::ndimage_base(const ndimage_base<U, dim, E2>& g, unsigned border, T v)
-    : domain_ (g.domain()),
-      border_ (border)
+    : m_domain (g.domain()),
+      m_border (border)
   {
-    resize_(domain_, border_, v);
+    resize_(m_domain, m_border, v);
   }
 
   template <typename T, unsigned dim, typename E>
   template <typename U, typename E2>
   ndimage_base<T,dim,E>::ndimage_base(const ndimage_base<U, dim, E2>& g, mln::init)
-    : domain_ (g.domain()),
-      border_ (g.border())
+    : m_domain (g.domain()),
+      m_border (g.border())
   {
-    resize_(domain_, border_, T());
+    resize_(m_domain, m_border, T());
   }
 
   template <typename T, unsigned dim, typename E>
@@ -586,13 +563,13 @@ namespace mln
                                              const size_t* strides)
   {
     E image_;
-    image_.domain_ = domain;
-    image_.border_ = 0;
+    image_.m_domain = domain;
+    image_.m_border = 0;
 
     MLN_EVAL_IF_DEBUG(image_.vbox_ = domain);
-    std::copy(strides, strides + dim, image_.strides_.begin());
+    std::copy(strides, strides + dim, image_.m_strides.begin());
 
-    if (image_.strides_[dim-1] % sizeof(T) != 0) {
+    if (image_.m_strides[dim-1] % sizeof(T) != 0) {
       throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
     }
 
@@ -601,18 +578,18 @@ namespace mln
     image_.m_index_strides[dim-1] = 1;
     image_.m_index_first = 0;
     image_.m_index_last = sz[dim-1] - 1;
-    image_.ptr_ = (char*)buffer;
-    image_.last_ = (char*)buffer + (sz[dim-1] - 1) * image_.strides_[dim-1];
+    image_.m_ptr = (char*)buffer;
+    image_.m_last = (char*)buffer + (sz[dim-1] - 1) * image_.m_strides[dim-1];
 
     for (int i = dim-2; i >= 0; --i)
       {
-        if (image_.strides_[i] % sizeof(T) != 0) {
+        if (image_.m_strides[i] % sizeof(T) != 0) {
           throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
         }
 
-        image_.m_index_strides[i] = image_.strides_[i] / sizeof(T);
+        image_.m_index_strides[i] = image_.m_strides[i] / sizeof(T);
         image_.m_index_last  += (sz[i] - 1) * image_.m_index_strides[i];
-        image_.last_ += (sz[i] - 1) * image_.strides_[i];
+        image_.m_last += (sz[i] - 1) * image_.m_strides[i];
       }
 
     return image_;
@@ -679,23 +656,23 @@ namespace mln
 
     // Compute strides size (in bytes)
     // The row stride is 16 bytes aligned
-    data_.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border, v));
-    std::copy(data_->strides, data_->strides + dim, strides_.begin());
+    m_data.reset(new internal::ndimage_data<T, dim>(&(sz[0]), border, v));
+    std::copy(m_data->strides, m_data->strides + dim, m_strides.begin());
 
     // Compute pointer at (0,0)
-    m_ptr_origin = (T*)data_->buffer;
+    m_ptr_origin = (T*)m_data->buffer;
     m_index_strides[dim-1] = 1;
-    m_index_first = border_;
-    m_index_last  = border_ + sz[dim-1] - 1;
-    ptr_  = data_->buffer + border * strides_[dim-1];
-    last_ = data_->buffer + (border + sz[dim-1] - 1) * strides_[dim-1];
+    m_index_first = m_border;
+    m_index_last  = m_border + sz[dim-1] - 1;
+    m_ptr  = m_data->buffer + border * m_strides[dim-1];
+    m_last = m_data->buffer + (border + sz[dim-1] - 1) * m_strides[dim-1];
     for (int i = dim-2; i >= 0; --i)
       {
-        m_index_strides[i] = strides_[i] / sizeof(T);
-        m_index_first += border_ * m_index_strides[i];
-        m_index_last  += (border_ + sz[i] - 1) * m_index_strides[i];
-        ptr_ += border * strides_[i];
-        last_ += (border + sz[i] - 1) * strides_[i];
+        m_index_strides[i] = m_strides[i] / sizeof(T);
+        m_index_first += m_border * m_index_strides[i];
+        m_index_last  += (m_border + sz[i] - 1) * m_index_strides[i];
+        m_ptr += border * m_strides[i];
+        m_last += (border + sz[i] - 1) * m_strides[i];
       }
   }
 
@@ -704,15 +681,15 @@ namespace mln
   void
   ndimage_base<T,dim,E>::resize(const domain_type& domain, unsigned border, T v)
   {
-    if (not (domain == domain_) or (int)border != border_)
+    if (not (domain == m_domain) or (int)border != m_border)
       {
-        domain_ = domain;
-        border_ = border;
-        resize_(domain_, border, v);
+        m_domain = domain;
+        m_border = border;
+        resize_(m_domain, border, v);
       }
     else
       {
-        std::fill((T*) ptr_, ((T*)last_) + 1, v);
+        std::fill((T*) m_ptr, ((T*)m_last) + 1, v);
       }
   }
 
@@ -723,9 +700,9 @@ namespace mln
   {
     mln_precondition(vbox_.has(p));
 
-    char* ptr = ptr_;
+    char* ptr = m_ptr;
     for (unsigned i = 0; i < dim; ++i)
-      ptr += (p[i] - domain_.pmin[i]) * strides_[i];
+      ptr += (p[i] - m_domain.pmin[i]) * m_strides[i];
     return * (T*)ptr;
   }
 
@@ -737,9 +714,9 @@ namespace mln
   {
     mln_precondition(vbox_.has(p));
 
-    char* ptr = ptr_;
+    char* ptr = m_ptr;
     for (unsigned i = 0; i < dim; ++i)
-      ptr += (p[i] - domain_.pmin[i]) * strides_[i];
+      ptr += (p[i] - m_domain.pmin[i]) * m_strides[i];
     return * (const T*)ptr;
   }
 
@@ -749,7 +726,7 @@ namespace mln
   T&
   ndimage_base<T,dim,E>::operator() (const site_type& p)
   {
-    mln_precondition(domain_.has(p));
+    mln_precondition(m_domain.has(p));
     return at(p);
   }
 
@@ -758,7 +735,7 @@ namespace mln
   const T&
   ndimage_base<T,dim,E>::operator() (const site_type& p) const
   {
-    mln_precondition(domain_.has(p));
+    mln_precondition(m_domain.has(p));
     return at(p);
   }
 
@@ -839,7 +816,7 @@ namespace mln
   typename ndimage_base<T,dim,E>::pixel_type
   ndimage_base<T,dim,E>::pixel(const point_type& p)
   {
-    mln_precondition(domain_.has(p));
+    mln_precondition(m_domain.has(p));
     return pixel_at(p);
   }
 
@@ -848,7 +825,7 @@ namespace mln
   typename ndimage_base<T,dim,E>::const_pixel_type
   ndimage_base<T,dim,E>::pixel(const point_type& p) const
   {
-    mln_precondition(domain_.has(p));
+    mln_precondition(m_domain.has(p));
     return pixel_at(p);
   }
 
@@ -858,7 +835,7 @@ namespace mln
   ndimage_base<T,dim,E>::index_of_point(const point_type& p) const
   {
     std::size_t idx = m_index_first;
-    point_type  q = p - domain_.pmin;
+    point_type  q = p - m_domain.pmin;
     for (unsigned i = 0; i < dim; ++i)
       idx += q[i] * m_index_strides[i];
     return static_cast<typename ndimage_base<T,dim,E>::size_type>(idx);
@@ -869,11 +846,11 @@ namespace mln
   typename ndimage_base<T,dim,E>::point_type
   ndimage_base<T,dim,E>::point_at_index(size_type idx) const
   {
-    point_type p = domain_.pmin - border_;
+    point_type p = m_domain.pmin - m_border;
 
     int diff = static_cast<int>(idx) - static_cast<int>(m_index_first);
     for (unsigned i = 0; i < dim; ++i) {
-      diff += static_cast<int>(m_index_strides[i] * border_);
+      diff += static_cast<int>(m_index_strides[i] * m_border);
     }
 
     for (unsigned i = 0; i < dim; ++i) {
@@ -906,7 +883,7 @@ namespace mln
   // T&
   // ndimage_base<T,dim,E>::element (difference_type n)
   // {
-  //   return *reinterpret_cast<T*>(ptr_+n);
+  //   return *reinterpret_cast<T*>(m_ptr+n);
   // }
 
   // template <typename T, unsigned dim, typename E>
@@ -914,7 +891,7 @@ namespace mln
   // const T&
   // ndimage_base<T,dim,E>::element (difference_type n) const
   // {
-  //   return *reinterpret_cast<const T*>(ptr_+n);
+  //   return *reinterpret_cast<const T*>(m_ptr+n);
   // }
 
 
@@ -922,7 +899,7 @@ namespace mln
   const size_t*
   ndimage_base<T,dim,E>::strides () const
   {
-    return &strides_[0];
+    return &m_strides[0];
   }
 
 
@@ -932,7 +909,7 @@ namespace mln
   // {
   //   ptrdiff_t x = 0;
   //   for (unsigned i = 0; i < dim; ++i)
-  //     x += p[i] * strides_[i];
+  //     x += p[i] * m_strides[i];
   //   return x;
   // }
 
@@ -941,7 +918,7 @@ namespace mln
   const typename ndimage_base<T,dim,E>::domain_type&
   ndimage_base<T,dim,E>::domain () const
   {
-    return domain_;
+    return m_domain;
   }
 
   /* -- Value range -- */
@@ -983,7 +960,7 @@ namespace mln
   typename ndimage_base<T,dim,E>::extension_type
   ndimage_base<T,dim,E>::extension () const
   {
-    return extension_type(ptr_, &strides_[0], domain_.shape(), border_);
+    return extension_type(m_ptr, &m_strides[0], m_domain.shape(), m_border);
   }
 
   template <unsigned d, typename T1, typename E1, typename T2, typename E2>

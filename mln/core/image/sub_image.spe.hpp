@@ -37,10 +37,10 @@ namespace mln
                 const Domain& domain)
   {
     E other(exact(image));
-    other.domain_ = domain;
-    other.border_ = image.border_; // FIXME
-    other.ptr_ = (char*) &image(domain.pmin);
-    other.last_ = (char*) &image(domain.pmax - 1);
+    other.m_domain = domain;
+    other.m_border = image.m_border; // FIXME
+    other.m_ptr = (char*) &image(domain.pmin);
+    other.m_last = (char*) &image(domain.pmax - 1);
     other.m_ptr_origin = image.m_ptr_origin;
     other.m_index_first = image.index_of_point(domain.pmin);
     other.m_index_last = image.index_of_point(domain.pmax - 1);

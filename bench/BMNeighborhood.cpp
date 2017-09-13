@@ -3,7 +3,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/core/neighborhood/sliding_viter.hpp>
+//#include <mln/core/neighborhood/sliding_viter.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/core/algorithm/iota.hpp>
 
@@ -39,6 +39,7 @@ BENCHMARK_F(Bench_Neighborhood, pixter)(benchmark::State& st)
   (void) u;
 }
 
+/*
 BENCHMARK_F(Bench_Neighborhood, viter)(benchmark::State& st)
 {
   double u;
@@ -55,6 +56,7 @@ BENCHMARK_F(Bench_Neighborhood, viter)(benchmark::State& st)
   std::cout << u << std::endl;
   (void) u;
 }
+*/
 
 BENCHMARK_F(Bench_Neighborhood, piter)(benchmark::State& st)
 {

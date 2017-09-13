@@ -6,7 +6,7 @@
 # include <mln/core/range/iterator_range.hpp>
 # include <mln/core/neighborhood/sliding_pixter.hpp>
 # include <mln/core/neighborhood/sliding_piter.hpp>
-# include <mln/core/utils/iterator_proxy.hpp>
+# include <mln/core/utils/wrapper.hpp>
 
 namespace mln
 {
@@ -32,21 +32,21 @@ namespace mln
     auto
     __process_point(const point_type& p) const
     {
-      return make_iterator_range( sliding_piter<point_type, SiteSet>(p, mln::exact(this)->dpoints) );
+      return make_iterator_range( make_sliding_piter(make_value_wrapper(p), mln::exact(this)->dpoints) );
     }
 
     template <typename P>
     auto
     __bind_point(P& p) const
     {
-      return make_iterator_range( sliding_piter<const P*, SiteSet>(&p, mln::exact(this)->dpoints) );
+      return make_iterator_range( make_sliding_piter(std::cref(p), mln::exact(this)->dpoints) );
     }
 
     template <typename PointIterator>
     auto
     __bind_point_iterator(const PointIterator& p) const
     {
-      return make_iterator_range( sliding_piter<PointIterator, SiteSet>(p, mln::exact(this)->dpoints) );
+      return make_iterator_range( make_sliding_piter(make_iterator_proxy(p), mln::exact(this)->dpoints) );
     }
 
     template <typename Px>

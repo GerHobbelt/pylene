@@ -6,7 +6,7 @@
 # include <mln/core/range/iterator_range.hpp>
 # include <mln/core/neighborhood/sliding_wpixter.hpp>
 # include <mln/core/neighborhood/sliding_wpiter.hpp>
-# include <mln/core/utils/iterator_proxy.hpp>
+# include <mln/core/utils/wrapper.hpp>
 
 namespace mln
 {

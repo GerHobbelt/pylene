@@ -89,7 +89,7 @@ namespace mln
 
       static const int N = Nbh::static_size;
 
-      typedef iterator_range< sliding_piter<const point2d*, std::array<point2d, N> > >  nbh_range;
+      typedef iterator_range< sliding_piter<std::reference_wrapper<const point2d>, std::array<point2d, N> > >  nbh_range;
       typedef decltype( std::bind(&box2d::has, (const box2d*) NULL, std::placeholders::_1) ) domain_has_p_t;
 
 
@@ -551,7 +551,7 @@ namespace mln
     undirected_graph_image2d<Vtype, Etype, Nbh>::edges(const point2d& v) const
     {
       mln_precondition(_is_vertex(v));
-      sliding_piter<const point2d*, std::array<point2d, N> > eit(&v, m_enbh);
+      auto eit = make_sliding_piter(std::cref(v), m_enbh);
       auto myrng = make_iterator_range(eit);
       return rng::filter(std::move(myrng), std::bind(&box2d::has, &m_domain, std::placeholders::_1));
     }
@@ -562,7 +562,7 @@ namespace mln
     undirected_graph_image2d<Vtype, Etype, Nbh>::adjacent_vertices(const point2d& v) const
     {
       mln_precondition(_is_vertex(v));
-      sliding_piter<const point2d*, std::array<point2d, N> > vit(&v, m_vnbh);
+      auto vit = make_sliding_piter(std::cref(v), m_vnbh);
       auto myrng = make_iterator_range(vit);
       return rng::filter(std::move(myrng), std::bind(&box2d::has, &m_domain, std::placeholders::_1));
     }

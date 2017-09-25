@@ -10,11 +10,8 @@ namespace mln
 
   namespace internal
   {
-    template <typename T, typename = typename std::is_convertible<T, bool>::type>
-    struct false_var_t;
-
     template <typename T>
-    struct false_var_t<T, std::true_type>
+    struct false_var_t
     {
       false_var_t(T&& v) : x_{std::forward<T>(v)} {}
 
@@ -24,14 +21,6 @@ namespace mln
 
       T x_;
     };
-
-    template <typename T>
-    struct false_var_t<T, std::false_type> : false_var_t<T, std::true_type>
-    {
-      using false_var_t<T, std::true_type>::false_var_t;
-      operator T& () { return this->x_; }
-    };
-
 
     template <class T>
     false_var_t<T>

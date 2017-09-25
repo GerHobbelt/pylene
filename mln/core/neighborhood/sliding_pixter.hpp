@@ -126,9 +126,13 @@ namespace mln
       using SiteContainer  = boost::container::small_vector<Point, 25>;
 
     public:
-      sliding_pixter_container_base(std::size_t size)
-        : m_size(size), m_site_set(size), m_index_set(size)
+      sliding_pixter_container_base(const SiteSet& s)
+        : m_size(rng::size(s)), m_site_set(m_size), m_index_set(m_size)
       {
+        auto it = rng::iter(s);
+        it.init();
+	for (int i = 0; i < m_size; ++i, it.next())
+          this->m_site_set[i] = *it;
       }
 
     protected:
@@ -141,15 +145,15 @@ namespace mln
     struct sliding_pixter_container_base<std::array<Point, N>>
     {
     public:
-      sliding_pixter_container_base(std::size_t) {}
+      sliding_pixter_container_base(const std::array<Point, N>& s) : m_site_set(s) {}
 
     protected:
-      using IndexContainer = std::array<int, 25>;
-      using SiteContainer  = std::array<Point, 25>;
+      using IndexContainer = std::array<int, N>;
+      using SiteContainer  = std::array<Point, N>;
 
 
       static constexpr int m_size = N;
-      SiteContainer        m_site_set;
+      const SiteContainer& m_site_set;
       IndexContainer       m_index_set;
     };
 
@@ -165,17 +169,13 @@ namespace mln
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const PixelProxy& px, const SiteSet& s)
-	: sliding_pixter_container_base<SiteSet>(rng::size(s)),
+	: sliding_pixter_container_base<SiteSet>(s),
           m_pixel (px),
           m_i (0)
       {
 	Image& ima = m_pixel.get().image();
-        auto it = rng::iter(s);
-        it.init();
-	for (int i = 0; i < this->m_size; ++i, it.next()) {
-          this->m_site_set[i] = *it;
-	  this->m_index_set[i] = ima.delta_index(*it);
-        }
+	for (int i = 0; i < this->m_size; ++i)
+          this->m_index_set[i] = ima.delta_index(this->m_site_set[i]);
       }
 
       void init() { m_i = 0; }

@@ -16,7 +16,7 @@ long bench_pixter(const image2d<int>& ima)
   long u = 0;
   mln_forall(px)
     mln_forall(nx)
-    u += nx->val();
+      u += nx->val();
 
   return u;
 }
@@ -37,20 +37,22 @@ long bench_piter(const image2d<int>& ima)
 long bench_indexes(const image2d<int>& ima)
 {
   std::size_t idx = ima.index_of_point(ima.domain().pmin);
-  auto w = wrt_delta_index(ima, c8_t::dpoints);
+  auto offsets = wrt_delta_index(ima, c8_t::dpoints);
   mln_iter(p, ima.domain());
   mln_iter(n, c8(p));
 
   long u = 0;
-  unsigned nrows = ima.nrows();
-  unsigned ncols = ima.ncols();
-  for (unsigned i = 0; i < nrows; ++i)
+  int nrows = ima.nrows();
+  int ncols = ima.ncols();
+  for (int i = 0; i < nrows; ++i)
   {
-    for (unsigned j = 0; j < ncols; ++j)
+    for (int j = 0; j < ncols; ++j)
     {
-      std::size_t p = idx + j; // * ima.index_strides()[1];
-      mln_foreach (auto k, w)
-        u += ima[p + k];
+      int p = idx + j; // * ima.index_strides()[1];
+      int sum = 0;
+      for (int offset : offsets)
+        sum += ima[p + offset];
+      u += sum;
     }
     idx += ima.index_strides()[0];
   }
@@ -61,22 +63,22 @@ long bench_indexes(const image2d<int>& ima)
 long bench_pointers(const image2d<int>& ima)
 {
   constexpr int sz = 8;
-  auto dpoints = c8_t::dpoints;
 
-  const char* ptr2 = (char*)&ima(ima.domain().pmin);
-  const size_t strides[2] = {ima.strides()[0], ima.strides()[1]};
-  const point2d pmax = ima.domain().shape();
-  ptrdiff_t offsets[8];
-  wrt_offset(ima, dpoints, offsets);
+  const size_t stride = ima.index_strides()[0];
+  int nrows = ima.nrows();
+  int ncols = ima.ncols();
+  auto offsets = wrt_delta_index(ima, c8_t::dpoints);
 
   long u = 0;
-  for (int x = 0; x < pmax[0]; ++x, ptr2 += strides[0])
-  {
-    const char* ptr = ptr2;
-    for (int y = 0; y < pmax[1]; ++y, ptr += strides[1])
-      for (int k = 0; k < sz; ++k)
-        u += *(const int*)(ptr + offsets[k]);
-  }
+  const int* lineptr = &ima(ima.domain().pmin);
+  for (int y = 0; y < nrows; ++y, lineptr += stride)
+    for (int x = 0; x < ncols; ++x)
+      {
+        int sum = 0;
+        for (int k = 0; k < sz; ++k)
+          sum += lineptr[x + offsets[k]];
+        u += sum;
+      }
 
   return u;
 }

@@ -6,6 +6,7 @@
 # include <mln/core/assert.hpp>
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/internal/tuple_utility.hpp>
+# include <boost/hana/and.hpp>
 
 namespace mln
 {
@@ -26,6 +27,8 @@ namespace mln
 
   namespace details
   {
+    template <class... T>
+    using conjunction = std::integral_constant<bool, boost::hana::and_(T::value...)>;
 
     template <bool IsMultiDimensional, class... IteratorTypes>
     struct zip_iterator_base;
@@ -39,7 +42,7 @@ namespace mln
       using IteratorTuple = std::tuple<IteratorTypes...>;
       using value_type = std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>;
       using reference = value_type;
-      using has_NL = std::conjunction<typename std::remove_reference_t<IteratorTypes>::has_NL...>;
+      using has_NL = conjunction<typename std::remove_reference_t<IteratorTypes>::has_NL...>;
       using is_multidimensional = std::false_type;
 
       zip_iterator_base() = default;
@@ -143,9 +146,9 @@ namespace mln
 
   template <class... TTypes>
   struct zip_iterator<std::tuple<TTypes...>>
-    : details::zip_iterator_base<std::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::value, TTypes...>
+    : details::zip_iterator_base<details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::value, TTypes...>
   {
-    using is_multidimensional = typename std::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::type;
+    using is_multidimensional = typename details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::type;
     using details::zip_iterator_base<is_multidimensional::value, TTypes...>::zip_iterator_base;
   };
 

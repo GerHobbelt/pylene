@@ -170,12 +170,11 @@ namespace mln
 
       sliding_pixter_base(const PixelProxy& px, const SiteSet& s)
 	: sliding_pixter_container_base<SiteSet>(s),
-          m_pixel (px),
-          m_i (0)
+          m_image (px.get().image()),
+          m_pixel(px)
       {
-	Image& ima = m_pixel.get().image();
-	for (int i = 0; i < this->m_size; ++i)
-          this->m_index_set[i] = ima.delta_index(this->m_site_set[i]);
+        for (int i = 0; i < this->m_size; ++i)
+          this->m_index_set[i] = m_image.delta_index(this->m_site_set[i]);
       }
 
       void init() { m_i = 0; }
@@ -183,6 +182,7 @@ namespace mln
       bool finished() const { return m_i >= this->m_size; }
 
     protected:
+      Image&             m_image;
       const PixelProxy   m_pixel;
       int                m_i;
     };
@@ -207,38 +207,40 @@ namespace mln
       index_pixel<Image>
       dereference() const
       {
-        return {this->m_pixel.get().image(),
-                this->m_pixel.get().point() + this->m_site_set[this->m_i],
-                this->m_pixel.get().index() + this->m_index_set[this->m_i]};
+        return {this->m_image,
+            this->m_pixel.get().point() + this->m_site_set[this->m_i],
+            this->m_pixel.get().index() + this->m_index_set[this->m_i] };
       }
     };
 
-    // Specialization for indexable images raw.
-    // with a dynamic siteset
-    template <class PixelProxy, class SiteSet>
-    struct sliding_pixter_base<PixelProxy, SiteSet, std::true_type /* __is_indexable */, raw_image_tag> :
-      sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>,
-      iterator_base< sliding_pixter<PixelProxy, SiteSet>,
-                     pointer_pixel< spixter_image_t<PixelProxy> >,
-                     pointer_pixel< spixter_image_t<PixelProxy> > >
-    {
-    private:
-      using base = sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>;
-      using Image = spixter_image_t<PixelProxy>;
 
-    public:
-      using base::base;
+    // // Specialization for indexable images raw.
+    // // with a dynamic siteset
+    // template <class PixelProxy, class SiteSet>
+    // struct sliding_pixter_base<PixelProxy, SiteSet, std::true_type /* __is_indexable */, raw_image_tag> :
+    //   sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>,
+    //   iterator_base< sliding_pixter<PixelProxy, SiteSet>,
+    //                  pointer_pixel< spixter_image_t<PixelProxy> >,
+    //                  pointer_pixel< spixter_image_t<PixelProxy> > >
+    // {
+    // private:
+    //   using base = sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>;
+    //   using Image = spixter_image_t<PixelProxy>;
 
-      pointer_pixel<Image>
-      dereference() const
-      {
-        auto index = this->m_index_set[this->m_i];
-        return {this->m_pixel.get().image(),
-                &(this->m_pixel.get().val()) + index,
-                this->m_pixel.get().point() + this->m_site_set[this->m_i],
-                this->m_pixel.get().index() + index};
-      }
-    };
+    // public:
+    //   using base::base;
+
+    //   pointer_pixel<Image>
+    //   dereference() const
+    //   {
+    //     auto index = this->m_index_set[this->m_i];
+    //     return {this->m_pixel.get().image(),
+    //             &(this->m_pixel.get().val()) + index,
+    //             this->m_pixel.get().point() + this->m_site_set[this->m_i],
+    //             this->m_pixel.get().index() + index};
+    //   }
+    // };
+
   }
 
   template <class PixelProxy, class SiteSet>

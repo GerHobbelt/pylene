@@ -101,8 +101,7 @@ namespace mln {
   {
     BOOST_CONCEPT_USAGE(ImageWithExtension)
     {
-      typedef typename I::extension_type extension;
-      BOOST_CONCEPT_ASSERT((Extension<extension>));
+      BOOST_CONCEPT_ASSERT((Extension<typename I::extension_type>));
     }
   };
 

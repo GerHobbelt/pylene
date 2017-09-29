@@ -1,5 +1,11 @@
 #include <benchmark/benchmark.h>
 
+#include <boost/concept/assert.hpp>
+// redefine concept assert, suppress the warning etc.
+#undef BOOST_CONCEPT_ASSERT
+#define BOOST_CONCEPT_ASSERT(Model)
+#include <boost/concept_check.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/neighb2d.hpp>
@@ -8,6 +14,22 @@
 //#include <mln/core/neighborhood/sliding_viter.hpp>
 using namespace mln;
 
+long bench_pixter_0(const image2d<int>& ima)
+{
+  mln_pixter(px, ima);
+  mln_iter(nx, c8(px));
+  auto offsets = wrt_delta_index(ima, c8_t::dpoints);
+
+  long u = 0;
+  for (mln::outer_init(px); !mln::outer_finished(px); mln::outer_next(px))
+    for (mln::inner_init(px); !mln::inner_finished(px); mln::inner_next(px))
+      //mln_simple_forall(nx) u += nx->val();
+      for (auto dx : offsets) u += (&(px->val()))[dx];
+
+  return u;
+}
+
+
 long bench_pixter(const image2d<int>& ima)
 {
   mln_pixter(px, ima);
@@ -15,7 +37,7 @@ long bench_pixter(const image2d<int>& ima)
 
   long u = 0;
   mln_forall(px)
-    mln_forall(nx)
+    mln_simple_forall(nx)
       u += nx->val();
 
   return u;

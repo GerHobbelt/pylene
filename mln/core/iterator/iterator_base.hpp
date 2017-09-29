@@ -56,11 +56,6 @@ namespace mln
     using pointer = std::conditional_t<std::is_reference<Reference>::value, std::remove_reference_t<Reference>*,
                                        internal::pointer_wrapper<Reference>>;
 
-    Derived& iter()
-    {
-      return *(mln::exact(this));
-    }
-
     Derived iter() const
     {
       return *(mln::exact(this));

@@ -127,7 +127,7 @@ namespace mln
 
     public:
       sliding_pixter_container_base(const SiteSet& s)
-        : m_size(rng::size(s)), m_site_set(m_size), m_index_set(m_size)
+        : m_size(static_cast<int>(rng::size(s))), m_site_set(m_size), m_index_set(m_size)
       {
         auto it = rng::iter(s);
         it.init();

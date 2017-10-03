@@ -6,7 +6,10 @@
 # include <mln/core/assert.hpp>
 # include <mln/core/iterator/iterator_base.hpp>
 # include <mln/core/internal/tuple_utility.hpp>
-# include <boost/hana/and.hpp>
+
+# ifndef _MSC_VER
+#  include <boost/hana/and.hpp>
+# endif
 
 namespace mln
 {
@@ -27,8 +30,13 @@ namespace mln
 
   namespace details
   {
+    #ifndef _MSC_VER
     template <class... T>
     using conjunction = std::integral_constant<bool, boost::hana::and_(T::value...)>;
+    #else
+    template <class... T>
+    using conjunction = std::conjunction<T...>;
+    #endif
 
     template <bool IsMultiDimensional, class... IteratorTypes>
     struct zip_iterator_base;

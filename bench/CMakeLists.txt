@@ -1,5 +1,5 @@
 #SUBDIRS(labeling)
-#find_package(benchmark)
+find_package(benchmark)
 
 
 
@@ -31,8 +31,8 @@ set(src_standalone
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-#link_libraries(benchmark::benchmark)
-link_libraries(-lbenchmark)
+link_libraries(benchmark::benchmark)
+#link_libraries(-lbenchmark)
 
 add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
 add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)

@@ -34,10 +34,13 @@ namespace mln
 
       ndimage_pixel_base(T* ptr) : m_ptr(ptr) {}
 
-      template <class U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
-      ndimage_pixel_base(const ndimage_pixel_base<U, 0>& other) : m_ptr(other.m_ptr)
+
+      template <class U>
+      ndimage_pixel_base(const ndimage_pixel_base<U, 0>& other)
+        : m_ptr(other.m_ptr), m_index(other.m_index)
       {
       }
+
 
       reference val() const { return m_ptr[m_index]; }
       size_type index() const { return static_cast<size_type>(m_index); }
@@ -79,12 +82,19 @@ namespace mln
     };
 
     template <typename T, unsigned dim>
-    struct ndimage_pixel_base : ndimage_pixel_base<void, dim>,
-      ndimage_pixel_base<T,0>
+    struct ndimage_pixel_base : ndimage_pixel_base<void, dim>, ndimage_pixel_base<T, 0>
     {
       friend struct internal::iterator_core_access;
 
-      using ndimage_pixel_base<T, 0>::ndimage_pixel_base;
+      ndimage_pixel_base() = default;
+      ndimage_pixel_base(T* ptr) : ndimage_pixel_base<T,0>(ptr) {}
+
+      template <class U>
+      ndimage_pixel_base(const ndimage_pixel_base<U, dim>& other)
+          : ndimage_pixel_base<void, dim>(other), ndimage_pixel_base<T, 0>(other)
+      {
+      }
+
     };
   }
 
@@ -100,7 +110,8 @@ namespace mln
     /// \brief Copy / copy conversion constructor
     template <class U, class J, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
     ndimage_pixel(const ndimage_pixel<U, dim, J>& pix)
-      : details::ndimage_pixel_base<T, dim>(pix), m_ima(pix.m_ima)
+      : details::ndimage_pixel_base<T, dim>(static_cast<const details::ndimage_pixel_base<U, dim>&>(pix)),
+        m_ima(pix.m_ima)
     {
     }
 

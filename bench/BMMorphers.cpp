@@ -1,96 +1,115 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/utils/ptroffset.hpp>
-#include <mln/io/imread.hpp>
-#include <benchmark/benchmark.h>
-#include "standalone.hpp"
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/algorithm/copy.hpp>
+#include <mln/accu/accumulators/sum.hpp>
 using namespace mln;
 
-struct BMMorphers : public benchmark::Fixture
+// Threshold A la C
+unsigned
+threshold1(const image2d<uint8>& f, uint8 v)
 {
-  const char* filename = MLN_IMG_PATH "/lena.ppm";
+  using T = uint8;
 
-  BMMorphers()
-  {
-    io::imread(filename, m_input);
-    int nr = m_input.nrows();
-    int nc = m_input.ncols();
-    resize(m_output, m_input);
-    m_bytes = nr * nc * sizeof(rgb8);
+  int nr = f.nrows();
+  int nc = f.ncols();
+  const char* ptr_in = (const char*) &f({0,0});
+  unsigned count = 0;
+  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+
+  for (int i = 0; i < nr; ++i) {
+    for (int j = 0; j < nc; ++j) {
+      count += *(const T*)ptr_in < v;
+      ptr_in = ptr_offset(ptr_in, sizeof(T));
+    }
+    ptr_in = ptr_offset(ptr_in, istride);
   }
-
-
-  image2d<rgb8> m_input;
-  image2d<bool> m_output;
-  std::size_t   m_bytes;
-};
-
-
-
-BENCHMARK_F(BMMorphers, Threshold_Count_CStyle_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  unsigned count;
-  while (st.KeepRunning()) {
-    benchmark::DoNotOptimize(count = threshold1(input, (uint8)128));
-  }
-  std::cout << count << "\n";
-  st.SetBytesProcessed(st.iterations() * m_bytes);
+  return count;
 }
 
-BENCHMARK_F(BMMorphers, Threshold_Count_CStyle2_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  unsigned count;
-  while (st.KeepRunning()) {
-    benchmark::DoNotOptimize(count = threshold1_bis(input, (uint8)128));
-  }
-  std::cout << count << "\n";
-  st.SetBytesProcessed(st.iterations() * m_bytes);
-}
+unsigned
+threshold1_bis(const image2d<uint8>& f, uint8 v)
+{
+  using T = uint8;
 
-BENCHMARK_F(BMMorphers, Threshold_Count_ValueIterator_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  unsigned count;
-  while (st.KeepRunning()) {
-    benchmark::DoNotOptimize(count = threshold2(input, (uint8)128));
-  }
-    std::cout << count << "\n";
-  st.SetBytesProcessed(st.iterations() * m_bytes);
-}
+  int nr = f.nrows();
+  int nc = f.ncols();
+  const char* ptr_in = (const char*) &f({0,0});
+  unsigned count = 0;
+  int istride = (int)(f.strides()[0] - nc * sizeof(T));
 
-BENCHMARK_F(BMMorphers, Threshold_Count_PixelIterator_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  unsigned count;
-  while (st.KeepRunning()) {
-    benchmark::DoNotOptimize(count = threshold3(input, (uint8)128));
+  for (int i = 0; i < nr; ++i) {
+    int remain = nc;
+    while (remain > 0) {
+      uint8 localcount = 0;
+      for (int k = 0; k < std::min(remain, 256); ++k)
+        {
+          localcount += *(const T*)ptr_in < v;
+          ptr_in = ptr_offset(ptr_in, sizeof(T));
+        }
+      count += localcount;
+      remain -= 256;
+    }
+    ptr_in = ptr_offset(ptr_in, istride);
   }
-  std::cout << count << "\n";
-  st.SetBytesProcessed(st.iterations() * m_bytes);
-}
-
-BENCHMARK_F(BMMorphers, Threshold_Count_Morpher1)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  unsigned count;
-  while (st.KeepRunning()) {
-    count = threshold4(input, (uint8)128);
-  }
-  std::cout << count << "\n";
-  st.SetBytesProcessed(st.iterations() * m_bytes);
-}
-
-BENCHMARK_F(BMMorphers, Threshold_Out_Native)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  while (st.KeepRunning()) {
-    threshold5(input, m_output, (uint8)128);
-  }
-  st.SetBytesProcessed(st.iterations() * m_bytes);
-}
-
-BENCHMARK_F(BMMorphers, Threshold_Out_Morpher)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  while (st.KeepRunning()) {
-    threshold6(input, m_output, (uint8)128);
-  }
-  st.SetBytesProcessed(st.iterations() * m_bytes);
+  return count;
 }
 
 
-BENCHMARK_MAIN();
+unsigned
+threshold2(const image2d<uint8>& f, uint8 v)
+{
+  unsigned count = 0;
+  mln_foreach(auto val, f.values()) {
+    count += (val < v);
+  }
+  return count;
+}
+
+unsigned
+threshold3(const image2d<uint8>& f, uint8 v)
+{
+  unsigned count = 0;
+  mln_foreach(auto px, f.pixels()) {
+    count += (px.val() < v);
+  }
+  return count;
+}
+
+unsigned
+threshold4(const image2d<uint8>& f, uint8 v)
+{
+  return accumulate(f < v, accu::accumulators::sum<unsigned> ());
+}
+
+void
+threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
+{
+  using T = uint8;
+
+  int nr = f.nrows();
+  int nc = f.ncols();
+  const char* ptr_in = (const char*) &f({0,0});
+  char* ptr_out = (char*) &out({0,0});
+  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+
+  for (int i = 0; i < nr; ++i) {
+    for (int j = 0; j < nc; ++j) {
+      *ptr_out = *(const T*)ptr_in < v;
+      ptr_in = ptr_offset(ptr_in, sizeof(T));
+      ptr_out = ptr_offset(ptr_out, sizeof(T));
+    }
+    ptr_in = ptr_offset(ptr_in, istride);
+    ptr_out = ptr_offset(ptr_out, istride);
+  }
+}
+
+
+void
+threshold6(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
+{
+  copy(f < v, out);
+}
+
+
+

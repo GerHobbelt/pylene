@@ -129,10 +129,10 @@ namespace mln
       //   return call(x, typename int_list_seq<sizeof...(ArgType)>::type ());
       // }
 
-      template <class TTuple, int... N>
+      template <class TTuple, std::size_t... N>
       inline
       typename std::result_of<const Function(ArgType&&...)>::type
-      call(TTuple&& x, intseq<N...>) const
+      call(TTuple&& x, std::index_sequence<N...>) const
       {
         return f(std::get<N>(std::move(x))...);
       }
@@ -141,7 +141,7 @@ namespace mln
       typename std::result_of<const Function(ArgType&&...)>::type
       operator() (std::tuple<ArgType...>&& x) const
       {
-        return call(std::move(x), typename int_list_seq<sizeof...(ArgType)>::type ());
+        return call(std::move(x), std::make_index_sequence<sizeof...(ArgType)> ());
       }
 
 

@@ -78,7 +78,7 @@ namespace mln
 
 
         std::sort(edges.begin(), edges.end(),
-                  [distance,&f](std::tuple<index_t, index_t, distance_t> v1,
+                  [](std::tuple<index_t, index_t, distance_t> v1,
                                 std::tuple<index_t, index_t, distance_t> v2) {
                     return std::get<2>(v1) < std::get<2>(v2);
                   });

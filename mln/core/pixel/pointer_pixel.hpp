@@ -36,11 +36,12 @@ namespace mln
     using image_type = Image;
     using reference  = mln_reference(Image);
     using value_type = std::remove_reference_t<reference>;
+    using pointer_type = value_type*;
 
 
     pointer_pixel() : m_image(nullptr) {}
 
-    pointer_pixel(Image& image, char* ptr, const point_type& point, size_type index)
+    pointer_pixel(Image& image, pointer_type ptr, const point_type& point, size_type index)
       : m_image(&image), m_ptr(ptr), m_point(point), m_index(index)
     {
     }
@@ -56,7 +57,7 @@ namespace mln
     }
 
     image_type&         image() const { mln_precondition(m_image); return *m_image; }
-    reference           val() const   { mln_precondition(m_image); return *reinterpret_cast<value_type*>(m_ptr); }
+    reference           val() const   { mln_precondition(m_image); return *m_ptr; }
     site_type           point() const { mln_precondition(m_image); return m_point; }
     site_type           site() const { mln_precondition(m_image); return m_point; }
     size_type		index() const { mln_precondition(m_image); return m_index; }
@@ -76,7 +77,7 @@ namespace mln
 
   private:
     image_type*         m_image;
-    char*               m_ptr;
+    pointer_type        m_ptr;
     site_type           m_point;
     size_type		m_index;
   };

@@ -6,141 +6,126 @@
 namespace mln
 {
 
-  template <typename T, unsigned dim, typename I>
-  struct ndimage_pixel : Pixel< ndimage_pixel<T, dim, I> >
+  /// \brief Pixel type definition of nd-images
+  template <class T, unsigned dim, class E>
+  struct ndimage_pixel;
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
+
+  namespace details
   {
-    typedef mln::point<short, dim>              site_type;
-    typedef site_type				point_type;
-    typedef typename std::remove_const<T>::type value_type;
-    typedef T&                                  reference;
-    typedef ptrdiff_t                           distance_type;
-    typedef I                                   image_type;
-    typedef typename I::size_type		size_type;
 
-    ndimage_pixel() : ima_ (NULL) {}
+    template <typename T, unsigned dim>
+    struct ndimage_pixel_base;
 
-    ndimage_pixel(image_type* ima) : ima_ (ima) {}
-
-
-    /// \brief Copy constructor.
-    ndimage_pixel(const ndimage_pixel& pix) = default;
-
-    /// \brief Interopability constructor from the pixel type to the const one.
-    template <typename U, typename Other>
-    ndimage_pixel(const ndimage_pixel<U, dim, Other>& pix,
-                  typename std::enable_if< std::is_convertible<U*,T*>::value, void*>::type = NULL);
-
-
-    /// \brief Assignment operator
-    ndimage_pixel&      operator= (const ndimage_pixel& other);
-
-
-    reference	        val() const;
-    site_type           point()  const;
-    site_type           site()  const;
-    distance_type	offset() const;
-    image_type&         image() const;
-    size_type		index() const { return static_cast<size_type>(index_); }
-
-    template <typename, unsigned, typename> friend struct ndimage_pixel;
-    template <typename, unsigned, typename> friend struct ndimage_base;
-
-  private:
-    friend struct internal::iterator_core_access;
-
-    char* &		get_value() { return ptr_; }
-    site_type&		get_point() { return point_; }
-    size_t&		get_index() { return index_; }
-    const char*         get_value() const { return ptr_; }
-    const site_type&    get_point() const { return point_; }
-    size_t		get_index() const { return index_; }
-
-    template <typename U, typename Other>
-    typename std::enable_if< std::is_convertible<U*,T*>::value, bool>::type
-    equal(const ndimage_pixel<U, dim, Other>& other) const
+    template <typename T>
+    struct ndimage_pixel_base<T, 0>
     {
-      return this->ptr_ == other.ptr_;
+      using value_type = std::remove_const_t<T>;
+      using reference = T&;
+      using distance_type = std::ptrdiff_t;
+      using size_type = unsigned;
+      using pointer_type = T*;
+
+      ndimage_pixel_base() = default;
+
+      ndimage_pixel_base(T* ptr) : m_ptr(ptr) {}
+
+
+      template <class U>
+      ndimage_pixel_base(const ndimage_pixel_base<U, 0>& other)
+        : m_ptr(other.m_ptr), m_index(other.m_index)
+      {
+      }
+
+
+      reference val() const { return m_ptr[m_index]; }
+      size_type index() const { return static_cast<size_type>(m_index); }
+
+    protected:
+      template <typename, unsigned>
+      friend struct ndimage_pixel_base;
+
+      template <typename, unsigned, typename>
+      friend struct mln::ndimage_base;
+
+      std::nullptr_t get_offset() const { return nullptr; }
+      int get_index() const { return m_index; }
+      int& get_index() { return m_index; }
+
+    private:
+      T* m_ptr;
+      int m_index;
+    };
+
+    template <unsigned dim>
+    struct ndimage_pixel_base<void, dim>
+    {
+      using site_type = mln::point<short, dim>;
+      using point_type = site_type;
+
+      site_type point() const { return m_point; }
+      site_type site() const { return m_point; }
+
+    protected:
+      template <typename, unsigned, typename>
+      friend struct mln::ndimage_base;
+
+      auto& get_point() { return m_point; }
+      auto  get_point() const { return m_point; }
+
+    private:
+      mln::point<int, dim> m_point;
+    };
+
+    template <typename T, unsigned dim>
+    struct ndimage_pixel_base : ndimage_pixel_base<void, dim>, ndimage_pixel_base<T, 0>
+    {
+      friend struct internal::iterator_core_access;
+
+      ndimage_pixel_base() = default;
+      ndimage_pixel_base(T* ptr) : ndimage_pixel_base<T,0>(ptr) {}
+
+      template <class U>
+      ndimage_pixel_base(const ndimage_pixel_base<U, dim>& other)
+          : ndimage_pixel_base<void, dim>(other), ndimage_pixel_base<T, 0>(other)
+      {
+      }
+
+    };
+  }
+
+  template <class T, unsigned dim, class I>
+  struct ndimage_pixel : details::ndimage_pixel_base<T, dim>, Pixel<ndimage_pixel<T, dim, I>>
+  {
+    typedef I image_type;
+
+    ndimage_pixel() = default;
+
+    ndimage_pixel(image_type* ima, T* ptr) : details::ndimage_pixel_base<T, dim>(ptr), m_ima(ima) {}
+
+    /// \brief Copy / copy conversion constructor
+    template <class U, class J, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
+    ndimage_pixel(const ndimage_pixel<U, dim, J>& pix)
+      : details::ndimage_pixel_base<T, dim>(static_cast<const details::ndimage_pixel_base<U, dim>&>(pix)),
+        m_ima(pix.m_ima)
+    {
     }
 
+    image_type& image() const { return *m_ima; }
 
   private:
-    image_type*         ima_;
-    site_type           point_;
-    char*               ptr_;
-    size_t		index_;
+    template <class, unsigned, class>
+    friend struct ndimage_pixel;
+
+    template <class, unsigned, class>
+    friend struct ndimage_base;
+
+    image_type* m_ima;
   };
-
-/******************************************/
-/****          Implementation          ****/
-/******************************************/
-
-
-  template <typename T, unsigned dim, typename I>
-  template <typename U, typename Other>
-  inline
-  ndimage_pixel<T, dim, I>::ndimage_pixel(const ndimage_pixel<U, dim, Other>& pix,
-                                          typename std::enable_if< std::is_convertible<U*,T*>::value, void*>::type)
-    : ima_ (pix.ima_),
-      point_ (pix.point_),
-      ptr_ (pix.ptr_),
-      index_ (pix.index_)
-  {
-  }
-
-  template <typename T, unsigned dim, typename I>
-  inline
-  ndimage_pixel<T, dim, I>&
-  ndimage_pixel<T, dim, I>::operator= (const ndimage_pixel& other)
-  {
-    //mln_precondition(other.ima_ == ima_);
-    ima_ = other.ima_;
-    point_ = other.point_;
-    ptr_ = other.ptr_;
-    index_ = other.index_;
-    return *this;
-  }
-
-  template <typename T, unsigned dim, typename I>
-  inline
-  typename ndimage_pixel<T,dim,I>::reference
-  ndimage_pixel<T,dim,I>::val() const
-  {
-    return *reinterpret_cast<T*>(ptr_);
-  }
-
-  template <typename T, unsigned dim, typename I>
-  inline
-  typename ndimage_pixel<T,dim,I>::site_type
-  ndimage_pixel<T,dim,I>::point() const
-  {
-    return point_;
-  }
-
-  template <typename T, unsigned dim, typename I>
-  inline
-  typename ndimage_pixel<T,dim,I>::site_type
-  ndimage_pixel<T,dim,I>::site() const
-  {
-    return point_;
-  }
-
-  template <typename T, unsigned dim, typename I>
-  inline
-  typename ndimage_pixel<T,dim,I>::distance_type
-  ndimage_pixel<T,dim,I>::offset() const
-  {
-    mln_precondition(ima_ != NULL && ptr_ != NULL);
-    return static_cast<char*>(ptr_) - ima_->ptr_;
-  }
-
-  template <typename T, unsigned dim, typename I>
-  inline
-  typename ndimage_pixel<T,dim,I>::image_type&
-  ndimage_pixel<T,dim,I>::image() const
-  {
-    mln_precondition(ima_ != NULL);
-    return *ima_;
-  }
 
 
 }

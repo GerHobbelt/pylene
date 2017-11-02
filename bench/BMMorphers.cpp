@@ -1,120 +1,115 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/utils/ptroffset.hpp>
-#include <mln/io/imread.hpp>
-#include <benchmark/benchmark.h>
-
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/algorithm/copy.hpp>
+#include <mln/accu/accumulators/sum.hpp>
 using namespace mln;
 
-struct BMMorphers : public benchmark::Fixture
-{
-  const char* filename = MLN_IMG_PATH "/lena.ppm";
-
-  BMMorphers()
-    {
-      io::imread(filename, m_input);
-      int nr = m_input.nrows();
-      int nc = m_input.ncols();
-      resize(m_output, m_input);
-      m_bytes = nr * nc * sizeof(rgb8);
-    }
-
-
-  image2d<rgb8> m_input;
-  image2d<bool> m_output;
-  std::size_t   m_bytes;
-};
-
 // Threshold A la C
-template <class T>
 unsigned
-__attribute__ ((noinline)) 
-threshold1(const image2d<T>& f, image2d<bool>& out, T v)
+threshold1(const image2d<uint8>& f, uint8 v)
 {
-  int istride = f.strides()[0];
-  int ostride = out.strides()[0];
+  using T = uint8;
+
   int nr = f.nrows();
   int nc = f.ncols();
-  const T* ptr_in = & f({0,0});
-  bool*    ptr_out = &out({0,0});
+  const char* ptr_in = (const char*) &f({0,0});
   unsigned count = 0;
+  int istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i) {
     for (int j = 0; j < nc; ++j) {
-      //ptr_out[j] = ptr_in[j] < v;
-      count += ptr_in[j] < v;
+      count += *(const T*)ptr_in < v;
+      ptr_in = ptr_offset(ptr_in, sizeof(T));
     }
     ptr_in = ptr_offset(ptr_in, istride);
-    //ptr_out = ptr_offset(ptr_out, ostride);
   }
   return count;
 }
 
-// Threshold A la C
-template <class T>
 unsigned
-__attribute__ ((noinline))
-threshold2(const image2d<T>& f, image2d<bool>& out, T v)
+threshold1_bis(const image2d<uint8>& f, uint8 v)
 {
-  int istride[2] = {(int)f.strides()[0], (int)f.strides()[1]};
-  int ostride[2] = {(int)out.strides()[0], (int)out.strides()[1]};
+  using T = uint8;
+
   int nr = f.nrows();
   int nc = f.ncols();
-  const T* ptr_in = & f({0,0});
-  bool*    ptr_out = &out({0,0});
+  const char* ptr_in = (const char*) &f({0,0});
   unsigned count = 0;
+  int istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i) {
-    auto in = ptr_in;
-    auto out = ptr_out;
-    for (int j = 0; j < nc; ++j) {
-      count += *in < v;
-      //*out = *in < v;
-      //out = ptr_offset(out, ostride[1]);
-      in = ptr_offset(in, istride[1]);
+    int remain = nc;
+    while (remain > 0) {
+      uint8 localcount = 0;
+      for (int k = 0; k < std::min(remain, 256); ++k)
+        {
+          localcount += *(const T*)ptr_in < v;
+          ptr_in = ptr_offset(ptr_in, sizeof(T));
+        }
+      count += localcount;
+      remain -= 256;
     }
-    ptr_in = ptr_offset(ptr_in, istride[0]);
-    //ptr_out = ptr_offset(ptr_out, ostride[0]);
+    ptr_in = ptr_offset(ptr_in, istride);
   }
   return count;
 }
 
-template <class T>
+
 unsigned
-__attribute__ ((noinline))
-threshold3(const image2d<T>& f, image2d<bool>& out, T v)
+threshold2(const image2d<uint8>& f, uint8 v)
 {
-  auto g = f < v;
   unsigned count = 0;
-  mln_foreach(auto v, g.values()) {
-    count += (bool)v;
+  mln_foreach(auto val, f.values()) {
+    count += (val < v);
   }
   return count;
 }
 
-
-BENCHMARK_F(BMMorphers, Threshold_CStyle_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  while (st.KeepRunning()) {
-    benchmark::DoNotOptimize(threshold1(input, m_output, (uint8)128));
+unsigned
+threshold3(const image2d<uint8>& f, uint8 v)
+{
+  unsigned count = 0;
+  mln_foreach(auto px, f.pixels()) {
+    count += (px.val() < v);
   }
-  st.SetBytesProcessed(st.iterations() * m_bytes);
+  return count;
 }
 
-BENCHMARK_F(BMMorphers, Threshold_CStyle2_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  while (st.KeepRunning()) {
-    benchmark::DoNotOptimize(threshold2(input, m_output, (uint8)128));
+unsigned
+threshold4(const image2d<uint8>& f, uint8 v)
+{
+  return accumulate(f < v, accu::accumulators::sum<unsigned> ());
+}
+
+void
+threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
+{
+  using T = uint8;
+
+  int nr = f.nrows();
+  int nc = f.ncols();
+  const char* ptr_in = (const char*) &f({0,0});
+  char* ptr_out = (char*) &out({0,0});
+  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+
+  for (int i = 0; i < nr; ++i) {
+    for (int j = 0; j < nc; ++j) {
+      *ptr_out = *(const T*)ptr_in < v;
+      ptr_in = ptr_offset(ptr_in, sizeof(T));
+      ptr_out = ptr_offset(ptr_out, sizeof(T));
+    }
+    ptr_in = ptr_offset(ptr_in, istride);
+    ptr_out = ptr_offset(ptr_out, istride);
   }
-  st.SetBytesProcessed(st.iterations() * m_bytes);
 }
 
 
-BENCHMARK_F(BMMorphers, Threshold_Morpher_Uint8)(benchmark::State& st) {
-  auto input = eval(red(m_input));
-  while (st.KeepRunning()) {
-    threshold3(input, m_output, (uint8)128);
-  }
-  st.SetBytesProcessed(st.iterations() * m_bytes);
+void
+threshold6(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
+{
+  copy(f < v, out);
 }
 
-BENCHMARK_MAIN();
+
+

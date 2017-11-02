@@ -36,8 +36,7 @@ namespace mln
 
       template <typename A>
       auto
-      sum(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::sum<>> ()) );
+      sum(const Accumulator<A>& acc);
 
     }
 
@@ -80,7 +79,6 @@ namespace mln
       template <typename A>
       auto
       sum(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::sum<>> ()) )
       {
         return extract(exact(acc), features::sum<> ());
       }

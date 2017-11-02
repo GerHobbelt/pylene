@@ -9,13 +9,8 @@ find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)
 
-if(TBB_FOUND)
-        MESSAGE (STATUS "TBB found in ${TBB_INSTALL_DIR} + ${TBB_LIBRARY_DIRS}")
-endif()
-
 # CONFIGURATION OPTIONS
 set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
-
 
 
 # add source directory to find mln path
@@ -43,10 +38,11 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -ggdb")
-elseif (MSVC)  
+elseif (MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX " )
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 endif()
+
 
 # default buidling type
 if (NOT CMAKE_BUILD_TYPE)

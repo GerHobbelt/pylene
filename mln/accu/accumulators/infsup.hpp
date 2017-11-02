@@ -38,14 +38,12 @@ namespace mln
     {
 
       template <typename A>
-      auto
-      inf(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::inf<>> ()));
+	  auto
+	  inf(const Accumulator<A>& acc);
 
       template <typename A>
-      auto
-      sup(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::sup<>> ()));
+	  auto
+	  sup(const Accumulator<A>& acc);
 
     }
 
@@ -146,9 +144,8 @@ namespace mln
     {
 
       template <typename A>
-      auto
-      inf(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::inf<>> ()) )
+	  auto
+	  inf(const Accumulator<A>& acc)
       {
         return extract(exact(acc), features::inf<> ());
       }
@@ -156,7 +153,6 @@ namespace mln
       template <typename A>
       auto
       sup(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::sup<>> ()) )
       {
         return extract(exact(acc), features::sup<> ());
       }

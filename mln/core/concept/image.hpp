@@ -7,10 +7,7 @@
 # include <mln/core/concept/extension.hpp>
 
 # include <mln/core/image_traits.hpp>
-
 # include <boost/concept_check.hpp>
-# include <boost/static_assert.hpp>
-
 
 namespace mln {
 
@@ -104,8 +101,7 @@ namespace mln {
   {
     BOOST_CONCEPT_USAGE(ImageWithExtension)
     {
-      typedef typename I::extension_type extension;
-      BOOST_CONCEPT_ASSERT((Extension<extension>));
+      BOOST_CONCEPT_ASSERT((Extension<typename I::extension_type>));
     }
   };
 
@@ -124,11 +120,11 @@ namespace mln {
       BOOST_CONCEPT_USAGE(check_border)
       {
         mln_value(J) val;
-        J g(f, mln::init ());
-        J h(f, f.border());
-        J i(f, f.border(), val);
+        J g(m_ima, mln::init ());
+        J h(m_ima, m_ima.border());
+        J i(m_ima, m_ima.border(), val);
       }
-      J f;
+      J m_ima;
     };
 
     template <class J>
@@ -137,10 +133,10 @@ namespace mln {
       BOOST_CONCEPT_USAGE(check_border)
       {
         mln_value(J) val;
-        J g(f, mln::init ());
-        J h(f, val);
+        J g(m_ima, mln::init ());
+        J h(m_ima, val);
       }
-      J f;
+      J m_ima;
     };
 
     template <class J>

@@ -2,7 +2,7 @@
 #include <functional>
 #include <mln/core/neighborhood/sliding_pixter.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/utils/iterator_proxy.hpp>
+#include <mln/core/utils/wrapper.hpp>
 
 #define BOOST_TEST_MODULE Core
 #include <tests/test.hpp>

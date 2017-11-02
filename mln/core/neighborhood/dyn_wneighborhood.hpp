@@ -6,7 +6,7 @@
 # include <mln/core/range/iterator_range.hpp>
 # include <mln/core/neighborhood/sliding_wpixter.hpp>
 # include <mln/core/neighborhood/sliding_wpiter.hpp>
-# include <mln/core/utils/iterator_proxy.hpp>
+# include <mln/core/utils/wrapper.hpp>
 
 namespace mln
 {
@@ -36,35 +36,35 @@ namespace mln
     auto
     __process_point(const point_type& p) const
     {
-      return make_iterator_range( make_sliding_wpiter(p, exact(this)->dpoints, exact(this)->weights) );
+      return make_iterator_range( make_sliding_wpiter(p, mln::exact(this)->dpoints, mln::exact(this)->weights) );
     }
 
     template <typename P>
     auto
     __bind_point(P& p) const
     {
-      return make_iterator_range( make_sliding_wpiter(std::cref(p), exact(this)->dpoints, exact(this)->weights) );
+      return make_iterator_range( make_sliding_wpiter(std::cref(p), mln::exact(this)->dpoints, mln::exact(this)->weights) );
     }
 
     template <typename PointIterator>
     auto
     __bind_point_iterator(const PointIterator& p) const
     {
-      return make_iterator_range( make_sliding_wpiter(make_iterator_proxy(p), exact(this)->dpoints, exact(this)->weights) );
+      return make_iterator_range( make_sliding_wpiter(make_iterator_proxy(p), mln::exact(this)->dpoints, mln::exact(this)->weights) );
     }
 
     template <typename Px>
     auto
     __bind_pixel(Px& px) const
     {
-      return make_iterator_range( make_sliding_wpixter(std::cref(px), exact(this)->dpoints, exact(this)->weights) );
+      return make_iterator_range( make_sliding_wpixter(std::cref(px), mln::exact(this)->dpoints, mln::exact(this)->weights) );
     }
 
     template <typename Px>
     auto
     __bind_pixel_iterator(const Px& px) const
     {
-      return make_iterator_range( make_sliding_wpixter(make_iterator_proxy(px), exact(this)->dpoints, exact(this)->weights) );
+      return make_iterator_range( make_sliding_wpixter(make_iterator_proxy(px), mln::exact(this)->dpoints, mln::exact(this)->weights) );
     }
 
   };

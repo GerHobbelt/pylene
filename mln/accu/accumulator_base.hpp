@@ -51,7 +51,7 @@ namespace mln
 
       result_type to_result() const
       {
-        return extract(exact(*this), feature ());
+        return extract(mln::exact(*this), feature ());
       }
 
     };

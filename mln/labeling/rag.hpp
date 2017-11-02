@@ -57,17 +57,17 @@ namespace mln
 
         P* queue = new P[ima.domain().size()];
 
-        unsigned qstart = 0, qend = 0;
+        unsigned qend = 0;
         unsigned fstart = ima.domain().size();
         unsigned fend = ima.domain().size();
 
-        auto qpush = [&queue, &qstart, &qend] (const P& p) { queue[qend++] = p; };
-        auto qpop = [&queue, &qstart, &qend] () -> P { return queue[--qend]; };
-        auto qempty = [&queue, &qstart, &qend] () -> bool { return qend == 0; };
+        auto qpush = [&queue, &qend] (const P& p) { queue[qend++] = p; };
+        auto qpop = [&queue, &qend] () -> P { return queue[--qend]; };
+        auto qempty = [&qend] () -> bool { return qend == 0; };
 
-        auto fpush = [&queue, &fstart, &fend] (const P& p) { queue[--fstart] = p; };
-        auto fpop =  [&queue, &fstart, &fend] () -> P { return queue[--fend]; };
-        auto fempty = [&queue, &fstart, &fend] () -> bool { return fend == fstart; };
+        auto fpush = [&queue, &fstart] (const P& p) { queue[--fstart] = p; };
+        auto fpop =  [&queue, &fend] () -> P { return queue[--fend]; };
+        auto fempty = [&fstart, &fend] () -> bool { return fend == fstart; };
 
         P q;
         mln_iter(n, nbh(q));

@@ -38,8 +38,7 @@ namespace mln
 
       template <typename A>
       auto
-      max(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::max<>> ()) );
+      max(const Accumulator<A>& acc);
     }
 
     /******************************************/
@@ -95,7 +94,6 @@ namespace mln
       template <typename A>
       auto
       max(const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval<features::max<>> ()) )
       {
         return extract(exact(acc), features::max<> ());
       }

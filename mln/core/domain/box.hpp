@@ -44,7 +44,7 @@ namespace mln
 
     strided_box() = default;
     strided_box(const point_type& pmin, const point_type& pmax, const point_type& strides);
-
+    
     bool	has(const point_type& p) const;
     point_type  shape()	const;
     bool        empty()	const;

@@ -26,5 +26,5 @@ BOOST_AUTO_TEST_CASE(range_filter)
   BOOST_CHECK(x.has(point2d{1,1}));
   BOOST_CHECK(not x.has(point2d{0,1}));
   BOOST_CHECK(not x.has(point2d{1,0}));
-  BOOST_CHECK(sz == 33);
+  BOOST_CHECK_EQUAL(sz, 33);
 }

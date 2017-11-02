@@ -32,12 +32,14 @@ BOOST_AUTO_TEST_CASE(filtered_bypix)
 
   {
     mln_foreach(const Pix& pix, ima.pixels())
+    {
       if (pix.val() > 10)
         BOOST_CHECK_EQUAL(pix.val(), x(pix.point()));
       else {
         BOOST_CHECK(!x.domain().has(pix.point()));
         BOOST_CHECK_EQUAL(pix.val(), x.at(pix.point()));
       }
+    }
   }
 
   {
@@ -99,9 +101,7 @@ BOOST_AUTO_TEST_CASE(filtered_bypix_writing)
   auto x = imfilter(ima, [](const Pix& px) { return px.val() > 10; });
 
   fill(x, 10);
-
-  io::imprint(ima);
-
+  BOOST_CHECK(all(ima <= 10));
 }
 
 BOOST_AUTO_TEST_CASE(filtered_byval_writing)
@@ -115,9 +115,7 @@ BOOST_AUTO_TEST_CASE(filtered_byval_writing)
   auto x = imfilter(ima, [](int x) { return x > 10; });
 
   fill(x, 10);
-
-  io::imprint(ima);
-
+  BOOST_CHECK(all(ima <= 10));
 }
 
 
@@ -151,8 +149,27 @@ BOOST_AUTO_TEST_CASE(filtered_chaining)
     }
   }
 
+  const image2d<int> before = clone(ima);
   fill(u, 1);
-  io::imprint(ima);
+  {
+    mln_pixter(px, ima);
+    mln_pixter(px_before, before);
+    mln_forall(px, px_before)
+    {
+      if (px_before->val() > 10 and px_before->val() < 15)
+        BOOST_CHECK_EQUAL(px->val(), 1);
+      else {
+        BOOST_CHECK(!u.domain().has(px->point()));
+        BOOST_CHECK_EQUAL(px->val(), px_before->val());
+      }
+    }
+  }
+  {
+    mln_foreach(const auto& pix, u.pixels()) {
+      BOOST_CHECK_EQUAL(pix.val(), ima(pix.point()));
+    }
+  }
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

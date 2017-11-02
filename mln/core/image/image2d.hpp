@@ -106,8 +106,8 @@ namespace mln {
       return base::at(typename base::point_type(nrows, ncols));
     }
 
-    unsigned nrows() const { return this->domain_.pmax[0] - this->domain_.pmin[0]; }
-    unsigned ncols() const { return this->domain_.pmax[1] - this->domain_.pmin[1]; }
+    unsigned nrows() const { return this->m_domain.pmax[0] - this->m_domain.pmin[0]; }
+    unsigned ncols() const { return this->m_domain.pmax[1] - this->m_domain.pmin[1]; }
 
   };
 

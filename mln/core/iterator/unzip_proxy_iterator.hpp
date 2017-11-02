@@ -49,21 +49,17 @@ namespace mln
     {
     }
 
-    void init()
-    {
-      x_.init();
-    }
-
-    void next()
-    {
-      if (!deja_vu_)
-	{
-	  x_.next();
-	  deja_vu_ = true;
-	}
-    }
-
+    void init() { x_.init(); }
+    void next() { if (!deja_vu_) { x_.next(); deja_vu_ = true; } }
     bool finished() const { return x_.finished(); }
+
+    void __inner_init() { x_.__inner_init(); }
+    void __outer_init() { x_.__outer_init(); }
+    void __inner_next() { if (!deja_vu_) { x_.__inner_next(); deja_vu_ = true; } }
+    void __outer_next() { if (!deja_vu_) { x_.__outer_next(); deja_vu_ = true; } }
+    bool __inner_finished() const { return x_.__inner_finished(); }
+    bool __outer_finished() const { return x_.__outer_finished(); }
+
     typename Iterator_::reference dereference() const { return *x_; }
 
     void set_dejavu_(bool v)
@@ -139,6 +135,15 @@ namespace mln
     void next() { zip_->next(); }
     bool finished() const { return zip_->finished(); }
     reference dereference() const { return std::get<n>(zip_->dereference()); }
+
+    void __inner_init() { zip_->__inner_init(); }
+    void __outer_init() { zip_->__outer_init(); }
+    void __inner_next() { zip_->__inner_next(); }
+    void __outer_next() { zip_->__outer_next(); }
+    bool __inner_finished() const { return zip_->__inner_finished(); }
+    bool __outer_finished() const { return zip_->__outer_finished(); }
+
+
 
     void set_dejavu_(bool v)
     {

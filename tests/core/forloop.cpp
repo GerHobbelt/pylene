@@ -7,7 +7,7 @@
 BOOST_AUTO_TEST_CASE(foreach_break)
 {
   mln::box2d box = {{-1, -1}, {5, 5}};
-  mln::point2d p;
+  mln::point2d p = {0, 0};
   mln_foreach (p, box)
     if (p[0] == 2)
       break;
@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(foreach_break)
 BOOST_AUTO_TEST_CASE(foreach_0)
 {
   mln::box2d box = {{-1, -1}, {5, 5}};
-  mln::point2d p;
+  mln::point2d p = {0, 0};
 
   int y = -1;
   int x = -1;
@@ -48,7 +48,8 @@ BOOST_AUTO_TEST_CASE(forall_0)
   mln::box2d box = {{-1, -1}, {5, 5}};
   auto p = mln::rng::iter(box);
   mln_forall (p)
-    ;
+  {
+  }
 
   BOOST_CHECK((*p > mln::point2d{4,4}));
 }

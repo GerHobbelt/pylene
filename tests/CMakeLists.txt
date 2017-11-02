@@ -22,12 +22,14 @@ else(WIN32)
     )
 endif(WIN32)
 
-macro(add_core_test Testname Exename)
-add_test(NAME ${Testname} COMMAND ${Exename} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-add_dependencies(check ${Exename})
+# Register an executable test
+# Executable: The name of the executable (default: ${Prefix}${TestName})
+# Source: The source files to compile (default: ${Prefix}${TestName}.cpp)
+macro(add_core_test Executable Source)
+add_executable(${Executable} ${Source})
+add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+add_dependencies(check ${Executable})
 endmacro(add_core_test)
-
-message(STATUS "-- *** ${Boost_PROGRAM_OPTIONS_LIBRARIES} ${FreeImage_LIBRARIES}")
 
 add_subdirectory(core)
 add_subdirectory(draw)

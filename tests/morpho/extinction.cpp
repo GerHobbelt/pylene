@@ -27,7 +27,25 @@ BOOST_AUTO_TEST_CASE(extinction_0)
   BOOST_CHECK(equal(E, ref));
 }
 
-BOOST_AUTO_TEST_CASE(extinction_1)
+BOOST_AUTO_TEST_CASE(extinction_flatzone)
+{
+  image2d<uint8> ima = { {0,3,2},
+                         {2,2,3},
+                         {2,1,1} };
+
+  // The algorithm does not propagate value in
+  // the flat-zone minima
+  image2d<uint8> ref = { {3,0,1},
+                         {0,0,0},
+                         {0,0,1} };
+
+  auto E = morpho::extinction(ima, c4);
+  BOOST_CHECK(equal(E, ref));
+}
+
+
+/*
+BOOST_AUTO_TEST_CASE(extinction_FlatZone)
 {
   image2d<uint8> ima = { {0,3,2},
                          {2,2,3},
@@ -40,7 +58,7 @@ BOOST_AUTO_TEST_CASE(extinction_1)
   auto E = morpho::extinction(ima, c4);
   BOOST_CHECK(equal(E, ref));
 }
-
+*/
 
 
 BOOST_AUTO_TEST_SUITE_END()

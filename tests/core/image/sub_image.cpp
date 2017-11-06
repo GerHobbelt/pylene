@@ -91,8 +91,13 @@ BOOST_AUTO_TEST_CASE(sub_domain)
 
 }
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(sub_domain_failure, 1)
 
+
+// This should throw because
+// where(ima < 20) is not included in where(ima > 10)
+// This test is disabled because Boost Unit Test does not
+// support checking for failure (assert)
+/*
 BOOST_AUTO_TEST_CASE(sub_domain_failure)
 {
   using namespace mln;
@@ -100,28 +105,10 @@ BOOST_AUTO_TEST_CASE(sub_domain_failure)
   image2d<int> ima(5,5);
   iota(ima, 0);
   fill(ima | where(ima > 10), 42);
-  // This should throw because
-  // where(ima < 20) is not included in where(ima > 10)
   {
     iota(ima, 0);
     fill((ima | where(ima > 10)) | where(ima < 20), 44);
   }
-}
-
-
-/*
-BOOST_AUTO_TEST_CASE(mask)
-{
-  using namespace mln;
-
-  image2d<int> ima(5,5);
-  iota(ima, 0);
-  fill(ima | (ima > 12), 12);
-  fill(ima | (ima < 5) , 5);
-
-
-  static_assert( std::is_same< decltype(ima | box2d()), image2d<int> >::value, "");
-  io::imprint(ima);
 }
 */
 

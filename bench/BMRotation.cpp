@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#define __attribute__(A) __declspec A
+#endif 
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
@@ -32,8 +36,8 @@ void rotate_ptr(const image2d<T>& f, image2d<T>& out)
 
   int nr = f.nrows();
   int nc = f.ncols();
-  int istride = f.strides()[0];
-  int ostride = out.strides()[0];
+  int istride = static_cast<int>(f.strides()[0]);
+  int ostride = static_cast<int>(out.strides()[0]);
   const T* ptr_in = & f({0,0});
 
   for (int i = 0; i < nr; ++i) {

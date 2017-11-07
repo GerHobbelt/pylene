@@ -29,7 +29,7 @@ struct iterator_test
     auto&& rng = ima.values();
     auto&& it = rng.riter();
     it.init();
-    for (int i = values.size() - 1; i >= 0; --i)
+    for (int i = static_cast<int>(values.size()) - 1; i >= 0; --i)
       {
         BOOST_CHECK_EQUAL(*it, values[i]);
         it.next();
@@ -62,7 +62,7 @@ struct iterator_test
     auto pit = ima.domain().riter();
     it.init();
     pit.init();
-    for (int i = values.size() - 1; i >= 0; --i)
+    for (int i = static_cast<int>(values.size()) - 1; i >= 0; --i)
       {
         BOOST_CHECK_EQUAL(it->point(), *pit);
         BOOST_CHECK_EQUAL(it->val(), values[i]);

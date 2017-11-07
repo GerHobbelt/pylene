@@ -58,7 +58,7 @@ long bench_piter(const image2d<int>& ima)
 
 long bench_indexes(const image2d<int>& ima)
 {
-  std::size_t idx = ima.index_of_point(ima.domain().pmin);
+  int idx = static_cast<int>(ima.index_of_point(ima.domain().pmin));
   auto offsets = wrt_delta_index(ima, c8_t::dpoints);
   mln_iter(p, ima.domain());
   mln_iter(n, c8(p));
@@ -76,7 +76,7 @@ long bench_indexes(const image2d<int>& ima)
         sum += ima[p + offset];
       u += sum;
     }
-    idx += ima.index_strides()[0];
+    idx += static_cast<int>(ima.index_strides()[0]);
   }
   return u;
 }

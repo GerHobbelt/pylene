@@ -1,27 +1,25 @@
 #include <mln/accu/accumulators/sum.hpp>
 
-#define BOOST_TEST_MODULE Accu
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
-
-BOOST_AUTO_TEST_CASE(Sum)
+TEST(Accu, Sum)
 {
   using namespace mln::accu;
 
- accumulators::sum<unsigned> acc;
- accumulators::sum<unsigned> acc2;
+  accumulators::sum<unsigned> acc;
+  accumulators::sum<unsigned> acc2;
 
- acc.take(12);
- acc.take(13);
+  acc.take(12);
+  acc.take(13);
 
- BOOST_CHECK_EQUAL( extractor::sum(acc), 25);
+  ASSERT_EQ(extractor::sum(acc), 25);
 
- acc.untake(10);
+  acc.untake(10);
 
- BOOST_CHECK_EQUAL( extractor::sum(acc), 15);
+  ASSERT_EQ(extractor::sum(acc), 15);
 
- acc2.take(69);
- acc2.take(acc);
+  acc2.take(69);
+  acc2.take(acc);
 
- BOOST_CHECK_EQUAL( extractor::sum(acc2), 84);
+  ASSERT_EQ(extractor::sum(acc2), 84);
 }

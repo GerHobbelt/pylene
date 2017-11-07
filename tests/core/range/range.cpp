@@ -1,32 +1,29 @@
-#include <array>
-#include <mln/core/range/range.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/range/range.hpp>
 
-#define BOOST_TEST_MODULE Core
-#include <boost/test/unit_test.hpp>
+#include <array>
 
+#include <gtest/gtest.h>
 
-
-BOOST_AUTO_TEST_CASE(stdrange_compatibility)
+TEST(Core, stdrange_compatibility)
 {
 
   using namespace mln;
 
   std::array<int, 4> x = {{2, 5, 15, 22}};
 
-  BOOST_CHECK_EQUAL(rng::size(x), 4);
+  ASSERT_EQ(rng::size(x), 4);
 
   {
     int i = 0;
-    mln_foreach(int v, x)
-      BOOST_CHECK_EQUAL(v, x[i++]);
+    mln_foreach (int v, x)
+      ASSERT_EQ(v, x[i++]);
   }
 
   {
     int i = 0;
     mln_iter(pv, x);
-    mln_forall(pv)
-      BOOST_CHECK_EQUAL(*pv, x[i++]);
+    mln_forall (pv)
+      ASSERT_EQ(*pv, x[i++]);
   }
-
 }

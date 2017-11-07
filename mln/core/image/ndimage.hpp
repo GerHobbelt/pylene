@@ -522,7 +522,7 @@ namespace mln
 
   template <typename T, unsigned dim, typename E>
   ndimage_base<T,dim,E>::ndimage_base(unsigned border)
-    : m_domain (), m_border (border), m_ptr (NULL)
+    : m_domain (), m_border (border), m_ptr (NULL), m_last(NULL)
   {
     for (unsigned i = 0; i < dim; ++i){
       mln_postcondition(m_domain.pmin[i] == 0);

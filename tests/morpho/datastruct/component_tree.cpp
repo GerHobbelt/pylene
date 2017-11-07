@@ -1,22 +1,17 @@
+#include <mln/core/forall.hpp>
+#include <mln/core/foreach.hpp>
+#include <mln/morpho/datastruct/component_tree.hpp>
+
 #include <array>
 #include <iostream>
 
-
-#include <mln/morpho/datastruct/component_tree.hpp>
-#include <mln/core/foreach.hpp>
-#include <mln/core/forall.hpp>
-
-
-#define BOOST_TEST_MODULE Morpho
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(component_tree_structure)
+#include <gtest/gtest.h>
 
 using namespace mln;
-typedef morpho::component_tree<char, std::array<char, 256> > tree_t;
+typedef morpho::component_tree<char, std::array<char, 256>> tree_t;
 
-
-tree_t make_tree()
+tree_t
+make_tree()
 {
   tree_t tree;
 
@@ -31,15 +26,9 @@ tree_t make_tree()
   //   / \       |
   //  f  g,h     k
 
-  data->m_nodes = {
-    { 0, 6, 1, 0, 11}, // sentinel
-    { 0, 0, 2, 0, 0},
-    { 1, 1, 3, 5, 3},
-    { 2, 2, 4, 4, 5},
-    { 2, 3, 5, 5, 6},
-    { 1, 4, 6, 0, 8},
-    { 5, 5, 0, 0, 10}
-  };
+  data->m_nodes = {{0, 6, 1, 0, 11}, // sentinel
+                   {0, 0, 2, 0, 0},  {1, 1, 3, 5, 3}, {2, 2, 4, 4, 5},
+                   {2, 3, 5, 5, 6},  {1, 4, 6, 0, 8}, {5, 5, 0, 0, 10}};
 
   data->m_S = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'};
 
@@ -53,8 +42,7 @@ tree_t make_tree()
   return tree.get_subtree(1);
 }
 
-
-BOOST_AUTO_TEST_CASE(component_tree_forward_iteration)
+TEST(Morpho, component_tree_forward_iteration)
 {
   tree_t tree = make_tree();
 
@@ -62,34 +50,33 @@ BOOST_AUTO_TEST_CASE(component_tree_forward_iteration)
   mln_iter(p, tree.pset());
   p.init();
 
-  mln_foreach(auto x, tree.nodes())
+  mln_foreach (auto x, tree.nodes())
+  {
+    ASSERT_TRUE(x.id() == n++);
+    std::cout << "== Node: " << x.id() << std::endl;
+    std::cout << "{ first child: " << x.get_first_child_id() << " next sibling: " << x.get_next_sibling_id()
+              << " parent: " << x.get_parent_id() << " }" << std::endl;
+    std::cout << "Children: ";
+    mln_foreach (auto y, x.children())
+      std::cout << y.id() << ",";
+    std::cout << std::endl;
+    std::cout << "Proper pset: ";
+    mln_foreach (auto y, x.proper_pset())
     {
-      BOOST_CHECK(x.id() == n++);
-      std::cout << "== Node: " << x.id() << std::endl;
-      std::cout << "{ first child: " << x.get_first_child_id()
-		<< " next sibling: " << x.get_next_sibling_id()
-		<< " parent: " << x.get_parent_id() << " }" << std::endl;
-      std::cout << "Children: ";
-      mln_foreach(auto y, x.children())
-	std::cout << y.id() << ",";
-      std::cout << std::endl;
-      std::cout << "Proper pset: ";
-      mln_foreach(auto y, x.proper_pset())
-	{
-	  BOOST_CHECK_EQUAL(y, *p);
-	  std::cout << y << ",";
-	  p.next();
-	}
-      std::cout << std::endl;
-      std::cout << "Full pset: ";
-      mln_foreach(auto y, x.pset())
-	std::cout << y << ",";
-      std::cout << std::endl;
+      ASSERT_EQ(y, *p);
+      std::cout << y << ",";
+      p.next();
     }
-  BOOST_CHECK_EQUAL(n, 7);
+    std::cout << std::endl;
+    std::cout << "Full pset: ";
+    mln_foreach (auto y, x.pset())
+      std::cout << y << ",";
+    std::cout << std::endl;
+  }
+  ASSERT_EQ(n, 7);
 }
 
-BOOST_AUTO_TEST_CASE(component_tree_backward_iteration)
+TEST(Morpho, component_tree_backward_iteration)
 {
   tree_t tree = make_tree();
 
@@ -97,26 +84,25 @@ BOOST_AUTO_TEST_CASE(component_tree_backward_iteration)
   auto p = tree.pset().riter();
   p.init();
   mln_reverse_foreach(auto x, tree.nodes())
+  {
+    ASSERT_TRUE(x.id() == n--);
+    std::cout << "== Node: " << x.id() << std::endl;
+    std::cout << "Proper pset: ";
+    mln_reverse_foreach(auto y, x.proper_pset())
     {
-      BOOST_CHECK(x.id() == n--);
-      std::cout << "== Node: " << x.id() << std::endl;
-      std::cout << "Proper pset: ";
-      mln_reverse_foreach(auto y, x.proper_pset())
-	{
-	  BOOST_CHECK_EQUAL(y, *p);
-	  std::cout << y << ",";
-	  p.next();
-	}
-      std::cout << std::endl;
-      std::cout << "Full pset: ";
-      mln_reverse_foreach(auto y, x.pset())
-	std::cout << y << ",";
-      std::cout << std::endl;
+      ASSERT_EQ(y, *p);
+      std::cout << y << ",";
+      p.next();
     }
-  BOOST_CHECK_EQUAL(n, 0);
+    std::cout << std::endl;
+    std::cout << "Full pset: ";
+    mln_reverse_foreach(auto y, x.pset()) std::cout << y << ",";
+    std::cout << std::endl;
+  }
+  ASSERT_EQ(n, 0);
 }
 
-BOOST_AUTO_TEST_CASE(component_tree_subtree)
+TEST(Morpho, component_tree_subtree)
 {
   tree_t tree = make_tree();
   tree = tree.get_subtree(2);
@@ -125,34 +111,28 @@ BOOST_AUTO_TEST_CASE(component_tree_subtree)
   mln_iter(p, tree.pset());
   p.init();
 
-  mln_foreach(auto x, tree.nodes())
+  mln_foreach (auto x, tree.nodes())
+  {
+    std::cout << "== Node: " << x.id() << std::endl;
+    std::cout << "{ first child: " << x.get_first_child_id() << " next sibling: " << x.get_next_sibling_id()
+              << " parent: " << x.get_parent_id() << " }" << std::endl;
+    std::cout << "Children: ";
+    mln_foreach (auto y, x.children())
+      std::cout << y.id() << ",";
+    std::cout << std::endl;
+    std::cout << "Proper pset: ";
+    mln_foreach (auto y, x.proper_pset())
     {
-      std::cout << "== Node: " << x.id() << std::endl;
-      std::cout << "{ first child: " << x.get_first_child_id()
-		<< " next sibling: " << x.get_next_sibling_id()
-		<< " parent: " << x.get_parent_id() << " }" << std::endl;
-      std::cout << "Children: ";
-      mln_foreach(auto y, x.children())
-	std::cout << y.id() << ",";
-      std::cout << std::endl;
-      std::cout << "Proper pset: ";
-      mln_foreach(auto y, x.proper_pset())
-	{
-	  BOOST_CHECK_EQUAL(y, *p);
-	  std::cout << y << ",";
-	  p.next();
-	}
-      std::cout << std::endl;
-      std::cout << "Full pset: ";
-      mln_foreach(auto y, x.pset())
-	std::cout << y << ",";
-      std::cout << std::endl;
-      n++;
+      ASSERT_EQ(y, *p);
+      std::cout << y << ",";
+      p.next();
     }
-  BOOST_CHECK_EQUAL(n, 3);
+    std::cout << std::endl;
+    std::cout << "Full pset: ";
+    mln_foreach (auto y, x.pset())
+      std::cout << y << ",";
+    std::cout << std::endl;
+    n++;
+  }
+  ASSERT_EQ(n, 3);
 }
-
-
-BOOST_AUTO_TEST_SUITE_END()
-
-

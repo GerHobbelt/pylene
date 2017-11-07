@@ -1,20 +1,19 @@
+#include <mln/core/algorithm/iota.hpp>
+#include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/range/algorithm/generate.hpp>
-#include <mln/core/algorithm/iota.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/alphatree/alphatree.hpp>
-#include <mln/morpho/datastruct/checktree.hpp>
 #include <mln/morpho/component_tree/graphviz.hpp>
-#include <mln/core/grays.hpp>
+#include <mln/morpho/datastruct/checktree.hpp>
 
-
-#define BOOST_TEST_MODULE Morpho
-#include <tests/test.hpp>
 #include <random>
 
+#include <gtest/gtest.h>
+
 /*
-BOOST_AUTO_TEST_CASE(AlphaTree)
+TEST(Morpho, AlphaTree)
 {
   using namespace mln;
   typedef uint8 V;
@@ -39,7 +38,7 @@ BOOST_AUTO_TEST_CASE(AlphaTree)
 }
 */
 
-BOOST_AUTO_TEST_CASE(AlphaTree_2)
+TEST(Morpho, AlphaTree_2)
 {
   using namespace mln;
   typedef uint8 V;
@@ -47,10 +46,9 @@ BOOST_AUTO_TEST_CASE(AlphaTree_2)
 
   io::imread(MLN_IMG_PATH "fly.pgm", ima);
 
-
-  typedef morpho::component_tree< unsigned, image2d<unsigned> > tree_t;
-  tree_t                                tree;
-  property_map<tree_t, int>             vmap;
+  typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
+  tree_t tree;
+  property_map<tree_t, int> vmap;
 
   std::tie(tree, vmap) = morpho::alphatree_indexes(ima, c4);
 
@@ -61,5 +59,4 @@ BOOST_AUTO_TEST_CASE(AlphaTree_2)
     std::ofstream out("out.dot");
     morpho::write_graphviz(out, tree, vmap);
   }
-
 }

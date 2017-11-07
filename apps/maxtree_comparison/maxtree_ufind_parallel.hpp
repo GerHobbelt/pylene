@@ -9,8 +9,8 @@
 # include <mln/core/wrt_offset.hpp>
 
 # include <mln/io/imprint.hpp>
-# include <mln/morpho/merge_tree.hpp>
-# include <mln/morpho/canonize.hpp>
+# include "merge_tree.hpp"
+# include "canonize.hpp"
 # include <alloca.h>
 
 # include <tbb/parallel_reduce.h>

@@ -1,7 +1,4 @@
-#SUBDIRS(labeling)
 find_package(benchmark)
-
-
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
@@ -13,14 +10,15 @@ endif()
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  message("compiler id is " ${CMAKE_CXX_COMPILER_ID})
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(STANDALONE_COMPILE_FLAGS "-fopt-info")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 else ()
-   set(STANDALONE_COMPILE_FLAGS " ")
+  # W4141: 'inline' : utilisé plusieurs fois in benchmark.h
+  set(STANDALONE_COMPILE_FLAGS " ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4141")
 endif ()
 
 set(src_standalone

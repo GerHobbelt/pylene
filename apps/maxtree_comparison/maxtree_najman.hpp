@@ -6,7 +6,7 @@
 # include <mln/core/extension/fill.hpp>
 # include <mln/core/algorithm/sort_indexes.hpp>
 # include <mln/core/wrt_offset.hpp>
-# include <mln/morpho/canonize.hpp>
+# include "canonize.hpp"
 
 namespace mln
 {

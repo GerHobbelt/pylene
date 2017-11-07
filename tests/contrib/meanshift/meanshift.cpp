@@ -2,13 +2,14 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-int main(int argc, const char** argv)
+int
+main(int argc, const char** argv)
 {
   if (argc < 5)
-    {
-      std::cerr << "Usage: " << argv[0] << " input.ppm hs hr output.hpp\n";
-      std::exit(1);
-    }
+  {
+    std::cerr << "Usage: " << argv[0] << " input.ppm hs hr output.hpp\n";
+    std::exit(1);
+  }
 
   using namespace mln;
 

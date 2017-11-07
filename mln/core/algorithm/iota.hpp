@@ -1,10 +1,7 @@
 #ifndef MLN_CORE_ALGORITHM_IOTA_HPP
 # define MLN_CORE_ALGORITHM_IOTA_HPP
 
-# include <mln/core/concept/image.hpp>
-# include <boost/range/algorithm_ext/iota.hpp>
-
-
+# include <mln/core/image/image.hpp>
 
 namespace mln {
 

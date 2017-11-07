@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(mumford_shah_gray)
    shp[0].m_v_sum_ext_sqr = 0;
 
    {
-     int k = 1, w = 99, h = 97, glint = 130, glext = 0;
+     int k = 1, w = 99, h = 97, glext = 0;
      shp[k].m_e_length = w * 2 + h * 2;
      shp[k].m_v_n_int = (w-10) * 2 * 5 + (h-10) * 2 * 5 + 25 * 4;
      shp[k].m_v_n_ext = w * 2 * 5 + h * 2 * 5 + 25 * 4;
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(mumford_shah_gray)
    }
 
    {
-     int k = 2, w = 89, h = 78, glint = 252, glext = 130;
+     int k = 2, w = 89, h = 78, glint = 252;
      shp[k].m_e_length = w * 2 + h * 2;
      shp[k].m_v_n_int = (w-10) * 2 * 5 + (h-10) * 2 * 5 + 25 * 4;
      shp[k].m_v_n_ext = w * 2 * 5 + h * 2 * 5 + 25 * 4;

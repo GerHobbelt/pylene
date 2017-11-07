@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/win2d.hpp>
 #include <mln/core/wrt_offset.hpp>
@@ -43,7 +47,7 @@ erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
 
-  int stride = f.strides()[0];
+  int stride = static_cast<int>(f.strides()[0]);
   int nr = f.nrows();
   int nc = f.ncols();
 
@@ -75,11 +79,11 @@ erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<mln::ui
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
 
-  int stride = f.strides()[0];
+  int stride = static_cast<int>(f.strides()[0]);
   int nr = f.nrows();
   int nc = f.ncols();
 
-  auto applyLine = [nc, offsets](const uint8* __restrict__ inlineptr, uint8* __restrict__ outlineptr) {
+  auto applyLine = [nc, offsets, sz](const uint8* __restrict__ inlineptr, uint8* __restrict__ outlineptr) {
     for (int x = 0; x < nc; ++x)
     {
       uint8 min = 255;

@@ -12,12 +12,14 @@ BOOST_AUTO_TEST_CASE(LSH)
   typedef vec3i V;
   {
     rgb8 v = {0,0,0};
-    BOOST_CHECK_EQUAL((V) v, (V) lsh2rgb(rgb2lsh(v)));
+    auto res = lsh2rgb(rgb2lsh(v));
+    BOOST_CHECK_EQUAL((V) v, (V) res);
   }
 
   {
     rgb8 v = {255,255,255};
-    BOOST_CHECK_EQUAL( (V) v,  (V) lsh2rgb(rgb2lsh(v)));
+    auto res = lsh2rgb(rgb2lsh(v));
+    BOOST_CHECK_EQUAL( (V) v,  (V) res);
   }
 
   /* FIXME: rounding problems

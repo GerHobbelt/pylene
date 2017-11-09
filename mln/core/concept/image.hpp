@@ -7,6 +7,8 @@
 # include <mln/core/concept/extension.hpp>
 
 # include <mln/core/image_traits.hpp>
+# include <mln/core/image/image.hpp>
+
 # include <boost/concept_check.hpp>
 
 namespace mln {

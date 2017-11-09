@@ -2,10 +2,10 @@ add_executable(bench_iterator ../bench_iterator.cpp)
 add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 set(test_prefix "UTCore_")
-#add_core_test(${test_prefix}win2d win2d.cpp)
+add_core_test(${test_prefix}win2d win2d.cpp)
 
 # test Domain
-#add_core_test(${test_prefix}box domain/box.cpp)
+add_core_test(${test_prefix}box domain/box.cpp)
 
 # test loop
 #add_core_test(${test_prefix}forloop forloop.cpp)

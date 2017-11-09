@@ -5,6 +5,7 @@
 # include <mln/core/ops.hpp>
 # include <boost/utility/enable_if.hpp>
 # include <iostream>
+
 namespace mln
 {
   /// \defgroup ima_ops Image operators

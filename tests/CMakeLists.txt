@@ -35,7 +35,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 macro(add_core_test Executable Source)
 add_executable(${Executable} ${Source})
 add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-target_link_libraries(${Executable} ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${Executable} ${GTEST_BOTH_LIBRARIES} pthread)
 add_dependencies(check ${Executable})
 endmacro(add_core_test)
 

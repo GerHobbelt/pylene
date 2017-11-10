@@ -1,81 +1,78 @@
-#include <mln/core/image/image2d.hpp>
 #include <mln/core/algorithm/iota.hpp>
-
-#define BOOST_TEST_MODULE Core
-#include <boost/test/unit_test.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/io/imprint.hpp>
 
-BOOST_AUTO_TEST_CASE(Where_binary)
+#include <gtest/gtest.h>
+
+TEST(Core, Where_binary)
 {
-  using namespace mln;
+    using namespace mln;
 
-  image2d<int> ima(5,5);
+    image2d<int> ima(5, 5);
 
-  iota(ima, 0);
-  auto d = where(ima < 10);
+    iota(ima, 0);
+    auto d = where(ima < 10);
 
-  mln_foreach(const point2d& p, d)
+    mln_foreach (const point2d& p, d)
     {
-      BOOST_CHECK(d.has(p));
-      BOOST_CHECK(ima(p) < 10);
+        ASSERT_TRUE(d.has(p));
+        ASSERT_TRUE(ima(p) < 10);
     }
 
-  mln_foreach(const auto& px, ima.pixels())
+    mln_foreach (const auto& px, ima.pixels())
     {
-      if (px.val() >= 10)
-        BOOST_CHECK(not d.has(px.point()));
-      else
-        BOOST_CHECK(d.has(px.point()));
+        if (px.val() >= 10)
+            ASSERT_TRUE(not d.has(px.point()));
+        else
+            ASSERT_TRUE(d.has(px.point()));
     }
 }
 
-BOOST_AUTO_TEST_CASE(Where_vfunction)
+TEST(Core, Where_vfunction)
 {
-  using namespace mln;
+    using namespace mln;
 
-  image2d<int> ima(5,5);
+    image2d<int> ima(5, 5);
 
-  iota(ima, 0);
-  auto d = where(ima, [] (long x) { return x < 10; });
+    iota(ima, 0);
+    auto d = where(ima, [](long x) { return x < 10; });
 
-  mln_foreach(const point2d& p, d)
+    mln_foreach (const point2d& p, d)
     {
-      BOOST_CHECK(d.has(p));
-      BOOST_CHECK(ima(p) < 10);
+        ASSERT_TRUE(d.has(p));
+        ASSERT_TRUE(ima(p) < 10);
     }
 
-  mln_foreach(const auto& px, ima.pixels())
+    mln_foreach (const auto& px, ima.pixels())
     {
-      if (px.val() >= 10)
-        BOOST_CHECK(not d.has(px.point()));
-      else
-        BOOST_CHECK(d.has(px.point()));
+        if (px.val() >= 10)
+            ASSERT_TRUE(not d.has(px.point()));
+        else
+            ASSERT_TRUE(d.has(px.point()));
     }
 }
 
-
-
-BOOST_AUTO_TEST_CASE(Where_pixfunction)
+TEST(Core, Where_pixfunction)
 {
-  using namespace mln;
+    using namespace mln;
 
-  typedef  image2d<int> I;
-  image2d<int> ima(5,5);
+    typedef image2d<int> I;
+    image2d<int> ima(5, 5);
 
-  iota(ima, 0);
-  auto d = where(ima, [] (const mln_pixel(const I)& x) { return x.val() < 10; });
+    iota(ima, 0);
+    auto d = where(ima, [](const mln_pixel(const I) & x) { return x.val() < 10; });
 
-  mln_foreach(const point2d& p, d)
+    mln_foreach (const point2d& p, d)
     {
-      BOOST_CHECK(d.has(p));
-      BOOST_CHECK(ima(p) < 10);
+        ASSERT_TRUE(d.has(p));
+        ASSERT_TRUE(ima(p) < 10);
     }
 
-  mln_foreach(const auto& px, ima.pixels())
+    mln_foreach (const auto& px, ima.pixels())
     {
-      if (px.val() >= 10)
-        BOOST_CHECK(not d.has(px.point()));
-      else
-        BOOST_CHECK(d.has(px.point()));
+        if (px.val() >= 10)
+            ASSERT_TRUE(not d.has(px.point()));
+        else
+            ASSERT_TRUE(d.has(px.point()));
     }
 }

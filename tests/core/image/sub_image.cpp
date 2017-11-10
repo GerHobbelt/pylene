@@ -96,6 +96,9 @@ TEST(Core, SubImage_sub_domain)
 // where(ima < 20) is not included in where(ima > 10)
 // This test is disabled because Boost Unit Test does not
 // support checking for failure (assert)
+
+// FIXME : this test fails to pass (it doesn't throw)
+
 /*
 TEST(Core, SubImage_sub_domain_failure)
 {

@@ -2,6 +2,7 @@
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/timer.hpp>
+
 #include <mln/core/domain/box.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/ndimage.hpp>

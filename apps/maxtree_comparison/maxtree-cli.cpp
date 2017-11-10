@@ -1,6 +1,6 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/morpho/maxtree_pqueue_parallel.hpp>
+#include "maxtree_pqueue_parallel.hpp"
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 

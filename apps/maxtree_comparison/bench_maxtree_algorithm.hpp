@@ -14,11 +14,11 @@
 # include <mln/core/value/int.hpp>
 # include <mln/io/imread.hpp>
 
-#include <mln/morpho/maxtree_najman.hpp>
-#include <mln/morpho/maxtree_ufind_parallel.hpp>
-#include <mln/morpho/maxtree_hqueue_parallel.hpp>
-#include <mln/morpho/maxtree_pqueue_parallel.hpp>
-#include <mln/morpho/maxtree_ufindrank_parallel.hpp>
+#include "maxtree_najman.hpp"
+#include "maxtree_ufind_parallel.hpp"
+#include "maxtree_hqueue_parallel.hpp"
+#include "maxtree_pqueue_parallel.hpp"
+#include "maxtree_ufindrank_parallel.hpp"
 #include <boost/program_options.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <mln/io/imprint.hpp>

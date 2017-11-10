@@ -25,6 +25,7 @@ if (TBB_FOUND AND MLN_USE_TBB)
   link_directories(${TBB_LIBRARY_DIRS})
   link_libraries(${TBB_LIBRARIES})
 else()
+  set(MLN_USE_TBB OFF)
   add_definitions(-DMLN_NO_TBB)
 endif()
 

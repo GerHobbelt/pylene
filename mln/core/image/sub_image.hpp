@@ -3,6 +3,7 @@
 
 # include <type_traits>
 
+# include <mln/core/image/image.hpp>
 # include <mln/core/image_base.hpp>
 # include <mln/core/iterator/transform_iterator.hpp>
 # include <mln/core/range/range_traits.hpp>

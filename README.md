@@ -12,6 +12,7 @@ Milena with the following objectives:
 
 # Requirements
 Pylene is developed in modern C++. You need a modern C++ compatible compiler:
+
 * GCC 7
 * Clang 4
 * Microsoft Visual Studio 2017
@@ -20,10 +21,16 @@ External dependancies:
 [FreeImage](www.freeimage.sourceforge.net) (only for IO)
 
 # Status
-* GCC 7.2 <img src="http://teamcity.lrde.epita.fr/app/rest/builds/buildType:(id:Olena_PyleneArchLinuxReleaseGcc)/statusIcon"/>
-* Clang 5.0 <img src="http://teamcity.lrde.epita.fr/app/rest/builds/buildType:(id:Olena_PyleneArchLinuxReleaseClang)/statusIcon"/>
+* GCC 7.2
+<a href="http://teamcity.lrde.epita.fr/viewType.html?buildTypeId=Olena_PyleneArchLinuxReleaseGcc&guest=1">
+<img src="http://teamcity.lrde.epita.fr/app/rest/builds/buildType:(id:Olena_PyleneArchLinuxReleaseGcc)/statusIcon"/>
+</a>
+* Clang 5.0
+<a href="http://teamcity.lrde.epita.fr/viewType.html?buildTypeId=Olena_PyleneArchLinuxReleaseClang&guest=1">
+<img src="http://teamcity.lrde.epita.fr/app/rest/builds/buildType:(id:Olena_PyleneArchLinuxReleaseClang)/statusIcon"/>
+</a>
 
 # Documentation
 
-Link to the [C++ Documentation](http://buildfarm.lrde.epita.fr/repository/download/Olena_PyleneDocumentation/.lastSuccessful/documentation.zip!/index.html)
+Link to the [C++ Documentation](http://buildfarm.lrde.epita.fr/repository/download/Olena_PyleneDocumentation/.lastSuccessful/documentation.zip!/index.html?guest=1)
 

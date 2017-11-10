@@ -1,6 +1,5 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/sort_indexes.hpp>
-#include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 
 #include <gtest/gtest.h>

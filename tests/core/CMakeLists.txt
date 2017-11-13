@@ -1,4 +1,4 @@
-add_executable(bench_iterator ../bench_iterator.cpp)
+add_executable(bench_iterator ../bench_iterator.cpp ../helpers.hpp)
 add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 set(test_prefix "UTCore_")

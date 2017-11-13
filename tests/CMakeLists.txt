@@ -46,8 +46,8 @@ add_subdirectory(accu)
 #add_subdirectory(colors)
 #add_subdirectory(morpho)
 #add_subdirectory(labeling)
-#add_subdirectory(graph)
-#add_subdirectory(graphcut)
-#add_subdirectory(transform)
+add_subdirectory(graph)
+add_subdirectory(graphcut)
+add_subdirectory(transform)
 
 

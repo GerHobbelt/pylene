@@ -1,7 +1,7 @@
 #ifndef MLN_COLORS_LSH_HPP
 # define MLN_COLORS_LSH_HPP
 
-# include <mln/core/vec_base.hpp>
+# include <mln/core/vec.hpp>
 # include <mln/core/colors.hpp>
 
 // FIXME: optimize this out (slow because of floats and saturations)

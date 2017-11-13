@@ -1,9 +1,9 @@
 set(test_prefix "UTMorpho_")
 
-#add_subdirectory(datastruct)
+add_subdirectory(datastruct)
 add_subdirectory(maxtree)
-#add_subdirectory(alphatree)
-#add_subdirectory(component_tree)
+add_subdirectory(alphatree)
+add_subdirectory(component_tree)
 
 if (TBB_FOUND)
   add_core_test(${test_prefix}maxtree_tbb      maxtree.cpp)

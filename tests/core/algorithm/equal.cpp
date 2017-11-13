@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Algorithm, Equal)
+TEST(Core, Algorithm_Equal)
 {
     using namespace mln;
 

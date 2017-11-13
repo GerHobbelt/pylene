@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Core, Sliding_wpixter_binding_lvalue)
+TEST(Core, Neighborhood_Sliding_wpixter_binding_lvalue)
 {
     using namespace mln;
 
@@ -56,7 +56,7 @@ TEST(Core, Sliding_wpixter_binding_lvalue)
     }
 }
 
-TEST(Core, Sliding_wpixter_binding_iterator)
+TEST(Core, Neighborhood_Sliding_wpixter_binding_iterator)
 {
     using namespace mln;
 

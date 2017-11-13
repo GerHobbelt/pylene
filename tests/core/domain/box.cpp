@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(CoreBox, box2d_general)
+TEST(Core, Domain_box2d_general)
 {
     using namespace mln;
     {
@@ -19,7 +19,7 @@ TEST(CoreBox, box2d_general)
     }
 }
 
-TEST(CoreBox, box2d_forward)
+TEST(Core, Domain_box2d_forward)
 {
     using namespace mln;
 
@@ -40,7 +40,7 @@ TEST(CoreBox, box2d_forward)
     }
 }
 
-TEST(CoreBox, box2d_backward)
+TEST(Core, Domain_box2d_backward)
 {
     using namespace mln;
 
@@ -61,7 +61,7 @@ TEST(CoreBox, box2d_backward)
     }
 }
 
-TEST(CoreBox, strided_box2d_forward)
+TEST(Core, Domain_strided_box2d_forward)
 {
     using namespace mln;
 
@@ -82,7 +82,7 @@ TEST(CoreBox, strided_box2d_forward)
     ASSERT_TRUE(p.finished());
 }
 
-TEST(CoreBox, strided_box2d_backward)
+TEST(Core, Domain_strided_box2d_backward)
 {
     using namespace mln;
 

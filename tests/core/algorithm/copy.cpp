@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Algorithm, Copy)
+TEST(Core, Algorithm_Copy)
 {
     using namespace mln;
 

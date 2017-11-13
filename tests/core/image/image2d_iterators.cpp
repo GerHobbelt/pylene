@@ -84,25 +84,25 @@ struct iterator_test_empty_domain : iterator_test
 {
 };
 
-TEST(Core, empty_domain_iterator_test_empty_domain_forward_viter)
+TEST(Core, Image2d_empty_domain_iterator_test_forward_viter)
 {
     iterator_test_empty_domain it{};
     it.test_forward_viter();
 }
 
-TEST(Core, empty_domain_iterator_test_empty_domain_backward_viter)
+TEST(Core, Image2d_empty_domain_iterator_test_backward_viter)
 {
     iterator_test_empty_domain it{};
     it.test_backward_viter();
 }
 
-TEST(Core, empty_domain_iterator_test_empty_domain_forward_pixter)
+TEST(Core, Image2d_empty_domain_iterator_test_forward_pixter)
 {
     iterator_test_empty_domain it{};
     it.test_forward_pixter();
 }
 
-TEST(Core, empty_domain_iterator_test_empty_domain_backward_pixter)
+TEST(Core, Image2d_empty_domain_iterator_test_backward_pixter)
 {
     iterator_test_empty_domain it{};
     it.test_backward_pixter();
@@ -123,25 +123,25 @@ struct iterator_test_zero_origin_domain : iterator_test
     }
 };
 
-TEST(Core, zero_origin_domain_iterator_test_zero_origin_domain_forward_viter)
+TEST(Core, Image2d_iterator_test_zero_origin_domain_forward_viter)
 {
     iterator_test_zero_origin_domain it{};
     it.test_forward_viter();
 }
 
-TEST(Core, zero_origin_domain_iterator_test_zero_origin_domain_backward_viter)
+TEST(Core, Image2d_iterator_test_zero_origin_domain_backward_viter)
 {
     iterator_test_zero_origin_domain it{};
     it.test_backward_viter();
 }
 
-TEST(Core, zero_origin_domain_iterator_test_zero_origin_domain_forward_pixter)
+TEST(Core, Image2d_iterator_test_zero_origin_domain_forward_pixter)
 {
     iterator_test_zero_origin_domain it{};
     it.test_forward_pixter();
 }
 
-TEST(Core, zero_origin_domain_iterator_test_zero_origin_domain_backward_pixter)
+TEST(Core, Image2d_iterator_test_zero_origin_domain_backward_pixter)
 {
     iterator_test_zero_origin_domain it{};
     it.test_backward_pixter();

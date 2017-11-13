@@ -1,5 +1,4 @@
 #include <mln/colors/lsh.hpp>
-#include <mln/core/colors.hpp>
 
 #include <gtest/gtest.h>
 

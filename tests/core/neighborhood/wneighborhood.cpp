@@ -61,7 +61,7 @@ TEST(Core, WNeighborhood_binding_pixel_lvalue)
     test_pixel_lvalue(f);
 }
 
-TEST(Core, binding_const_pixel_lvalue)
+TEST(Core, Neighborhood_binding_const_pixel_lvalue)
 {
     const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
     test_pixel_lvalue(f);
@@ -170,7 +170,7 @@ TEST(Core, WNeighborhood_binding_pixiterator_lvalue)
     test_pixiterator_lvalue(f);
 }
 
-TEST(Core, binding_const_pixiterator_lvalue)
+TEST(Core, Neighborhood_binding_const_pixiterator_lvalue)
 {
     const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
     test_pixiterator_lvalue(f);
@@ -226,7 +226,7 @@ TEST(Core, WNeighborhood_binding_piterator_lvalue)
     test_piterator_lvalue(f);
 }
 
-TEST(Core, binding_const_piterator_lvalue)
+TEST(Core, Neighborhood_binding_const_piterator_lvalue)
 {
     const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
     test_piterator_lvalue(f);

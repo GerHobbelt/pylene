@@ -20,10 +20,9 @@ int main(int argc, char** argv)
 {
   if (argc < 9)
     {
-      std::cerr << "Usage: " << argv[0] << "tree image.tiff λ ε γ t₁ t₂ spectra.csv\n"
+      std::cerr << "Usage: " << argv[0] << "tree image.tiff λ ε t₁ t₂ spectra.csv\n"
                 << " λ:\t Grain filter before anything else (number of 2F) (consider: 20-50, *20*) \n"
                 << " ε:\t The delta level considered when fetching the neighborhood of a node in MSER (consider 5-20, *10*)\n"
-                << " γ:\t Not used anymore.\n"
                 << " t₁:\t Threshold above which node having a MSER value greater that t₁ are removed (consider 0.7-2.0, *1.0*)\n"
                 << " t₂:\t Threshold below which node having an extinction value lesser than t₂ are removed (consider 0-t₁, *0.2*).\n";
       std::exit(1);
@@ -35,10 +34,9 @@ int main(int argc, char** argv)
   const char* img_path = argv[2];
   unsigned grain = std::atoi(argv[3]);
   int eps = std::atoi(argv[4]);
-  int areaAS = std::atoi(argv[5]);
-  float threshold1 = std::atof(argv[6]);
-  float threshold2 = std::atof(argv[7]);
-  const char* out_path = argv[8];
+  float threshold1 = std::atof(argv[5]);
+  float threshold2 = std::atof(argv[6]);
+  const char* out_path = argv[7];
 
   typedef morpho::component_tree<unsigned, image2d<unsigned> > tree_t;
   tree_t tree;

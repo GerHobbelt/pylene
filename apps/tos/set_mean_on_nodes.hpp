@@ -54,7 +54,7 @@ namespace mln
     typedef typename std::conditional<std::is_scalar<V>::value,
 				      accu::accumulators::mean<V>,
 				      accu::accumulators::mean<V, vec3u> >::type Acc;
-    trace::entering("mln::set_mean_on_node");
+    mln_entering("mln::set_mean_on_node");
 
     assert(ima.domain() == K.domain());
 
@@ -87,7 +87,6 @@ namespace mln
 	    mean[k] = mean[parent[k]];
 	}
     }
-    trace::exiting();
     return mean;
   }
 
@@ -109,7 +108,7 @@ namespace mln
     typedef typename std::conditional<std::is_scalar<V>::value,
 				      accu::accumulators::mean<V>,
 				      accu::accumulators::mean<V, vec3u> >::type Acc;
-    trace::entering("mln::set_mean_on_node");
+    mln_entering("mln::set_mean_on_node");
 
     assert(ima.domain() == K.domain());
 
@@ -143,7 +142,6 @@ namespace mln
 	    mean[k] = mean[parent[k]];
 	}
     }
-    trace::exiting();
     return mean;
   }
 

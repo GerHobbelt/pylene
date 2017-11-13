@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Algorithm, Paste)
+TEST(Core, Algorithm_Paste)
 {
     using namespace mln;
 

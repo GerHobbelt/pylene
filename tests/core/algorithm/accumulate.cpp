@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Algorithm, Accumulate_1)
+TEST(Core, Algorithm_Accumulate_1)
 {
     using namespace mln;
 
@@ -28,7 +28,7 @@ TEST(Algorithm, Accumulate_1)
     }
 }
 
-TEST(Algorithm, Accumulate_2)
+TEST(Core, Algorithm_Accumulate_2)
 {
     using namespace mln;
 
@@ -42,7 +42,7 @@ TEST(Algorithm, Accumulate_2)
     }
 }
 
-TEST(Algorithm, Accumulate_3)
+TEST(Core, Algorithm_Accumulate_3)
 {
     using namespace mln;
 

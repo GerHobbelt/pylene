@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Algorithm, Fill)
+TEST(Core, Algorithm_Fill)
 {
     using namespace mln;
 

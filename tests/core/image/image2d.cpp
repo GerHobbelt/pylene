@@ -11,7 +11,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Core, _image2d_extension_fill)
+TEST(Core, Image2d_Extension_Fill)
 {
     using namespace mln;
 
@@ -43,7 +43,7 @@ TEST(Core, _image2d_extension_fill)
     }
 }
 
-TEST(Core, _image2d_extension_mirror)
+TEST(Core, Image2d_Extension_mirror)
 {
     using namespace mln;
 
@@ -68,7 +68,7 @@ TEST(Core, _image2d_extension_mirror)
     }
 }
 
-TEST(Core, _image2d_from_buffer)
+TEST(Core, Image2d_From_Buffer)
 {
     using namespace mln;
     int buffer[12];

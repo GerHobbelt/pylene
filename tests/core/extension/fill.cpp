@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Extension, Fill)
+TEST(Core, Extension_Fill)
 {
     using namespace mln;
 

@@ -38,7 +38,7 @@ operator<<(std::ostream& ss, const rgb& x)
     return ss << boost::make_tuple(x.r, x.g, x.b);
 }
 
-TEST(Core, LValueOperator)
+TEST(Core, Image2d_LValueOperator)
 {
     using namespace mln;
     image2d<rgb> ima(5, 5);
@@ -53,7 +53,7 @@ TEST(Core, LValueOperator)
     ASSERT_TRUE(all(ima == douze));
 }
 
-TEST(Core, Operators)
+TEST(Core, Image2d_Operators)
 {
     using namespace mln;
 
@@ -70,7 +70,7 @@ TEST(Core, Operators)
     ASSERT_TRUE(all(-ima == ref));
 }
 
-TEST(Core, MixedOperator)
+TEST(Core, Image2d_MixedOperator)
 {
     using namespace mln;
 
@@ -86,7 +86,7 @@ TEST(Core, MixedOperator)
     ASSERT_TRUE(all((x + y) == (2 * y)));
 }
 
-TEST(Core, WhereOperator)
+TEST(Core, Image2d_WhereOperator)
 {
     using namespace mln;
 

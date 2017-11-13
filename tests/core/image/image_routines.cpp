@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Core, Where_binary)
+TEST(Core, Image2d_Where_binary)
 {
     using namespace mln;
 
@@ -28,7 +28,7 @@ TEST(Core, Where_binary)
     }
 }
 
-TEST(Core, Where_vfunction)
+TEST(Core, Image2d_Where_vfunction)
 {
     using namespace mln;
 
@@ -52,7 +52,7 @@ TEST(Core, Where_vfunction)
     }
 }
 
-TEST(Core, Where_pixfunction)
+TEST(Core, Image2d_Where_pixfunction)
 {
     using namespace mln;
 

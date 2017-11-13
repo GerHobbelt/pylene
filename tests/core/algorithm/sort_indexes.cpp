@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Algorithm, Sort_indexes_fast)
+TEST(Core, Algorithm_Sort_indexes_fast)
 {
     using namespace mln;
 

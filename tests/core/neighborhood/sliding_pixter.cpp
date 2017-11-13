@@ -46,13 +46,13 @@ test_lvalue(I& f)
     }
 }
 
-TEST(Core, Sliding_pixter_binding_lvalue)
+TEST(Core, Neighborhood_Sliding_pixter_binding_lvalue)
 {
     mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
     test_lvalue(f);
 }
 
-TEST(Core, Sliding_pixter_binding_const_lvalue)
+TEST(Core, Neighborhood_Sliding_pixter_binding_const_lvalue)
 {
     const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
     test_lvalue(f);
@@ -101,14 +101,14 @@ test_iterator(I& f)
     }
 }
 
-TEST(Core, Sliding_pixter_binding_iterator)
+TEST(Core, Neighborhood_Sliding_pixter_binding_iterator)
 {
     mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
 
     test_iterator(f);
 }
 
-TEST(Core, Sliding_pixter_binding_const_iterator)
+TEST(Core, Neighborhood_Sliding_pixter_binding_const_iterator)
 {
     const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
     test_iterator(f);
@@ -156,7 +156,7 @@ test_IndexableButNotRaw(I& f)
     }
 }
 
-TEST(Core, Sliding_pixter_IndexableButNotRaw)
+TEST(Core, Neighborhood_Sliding_pixter_IndexableButNotRaw)
 {
     using namespace mln;
     image2d<int> f0 = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
@@ -210,7 +210,7 @@ test_AccessibleButNotIndexable(I& f)
     }
 }
 
-TEST(Core, Sliding_pixter_AccessibleButNotIndexable)
+TEST(Core, Neighborhood_Sliding_pixter_AccessibleButNotIndexable)
 {
     using namespace mln;
 

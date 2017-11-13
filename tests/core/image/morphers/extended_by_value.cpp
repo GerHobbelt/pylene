@@ -7,60 +7,60 @@
 
 TEST(Core, value_extension_lvalue)
 {
-    using namespace mln;
+  using namespace mln;
 
-    box2d dom{{-1, -2}, {3, 3}};
-    image2d<int> ima(dom);
+  box2d dom{{-1, -2}, {3, 3}};
+  image2d<int> ima(dom);
 
-    iota(ima, 0);
-    auto x = extend_by_value(ima, 69);
+  iota(ima, 0);
+  auto x = extend_by_value(ima, 69);
 
-    {
-        mln_pixter(p, q, ima, x);
-        mln_forall (p, q)
-            ASSERT_EQ(p->val(), q->val());
-    }
+  {
+    mln_pixter(p, q, ima, x);
+    mln_forall (p, q)
+      ASSERT_EQ(p->val(), q->val());
+  }
 
-    {
-        mln_pixter(p, x);
-        mln_iter(q, c8(p));
-        mln_forall (p)
-            mln_forall (q)
-            {
-                if (!x.domain().has(q->point()))
-                    ASSERT_EQ(q->val(), 69);
-                else
-                    ASSERT_EQ(&q->val(), &ima(q->point()));
-            }
-    }
+  {
+    mln_pixter(p, x);
+    mln_iter(q, c8(p));
+    mln_forall (p)
+      mln_forall (q)
+      {
+        if (!x.domain().has(q->point()))
+          ASSERT_EQ(q->val(), 69);
+        else
+          ASSERT_EQ(&q->val(), &ima(q->point()));
+      }
+  }
 }
 
 TEST(Core, value_extension_rvalue)
 {
-    using namespace mln;
+  using namespace mln;
 
-    box2d dom{{-1, -2}, {3, 3}};
-    image2d<int> ima(dom);
+  box2d dom{{-1, -2}, {3, 3}};
+  image2d<int> ima(dom);
 
-    iota(ima, 0);
-    auto x = extend_by_value(ima, 69);
+  iota(ima, 0);
+  auto x = extend_by_value(ima, 69);
 
-    {
-        mln_pixter(p, q, ima, x);
-        mln_forall (p, q)
-            ASSERT_EQ(p->val(), q->val());
-    }
+  {
+    mln_pixter(p, q, ima, x);
+    mln_forall (p, q)
+      ASSERT_EQ(p->val(), q->val());
+  }
 
-    {
-        mln_pixter(p, x);
-        mln_iter(q, c8(p));
-        mln_forall (p)
-            mln_forall (q)
-            {
-                if (!x.domain().has(q->point()))
-                    ASSERT_EQ(q->val(), 69);
-                else
-                    ASSERT_EQ(&q->val(), &ima(q->point()));
-            }
-    }
+  {
+    mln_pixter(p, x);
+    mln_iter(q, c8(p));
+    mln_forall (p)
+      mln_forall (q)
+      {
+        if (!x.domain().has(q->point()))
+          ASSERT_EQ(q->val(), 69);
+        else
+          ASSERT_EQ(&q->val(), &ima(q->point()));
+      }
+  }
 }

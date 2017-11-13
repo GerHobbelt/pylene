@@ -15,30 +15,30 @@ using namespace mln;
 
 TEST(Morpho, opening_closing_opening_0)
 {
-    image2d<uint8> ima;
-    io::imread(MLN_IMG_PATH "small.pgm", ima);
+  image2d<uint8> ima;
+  io::imread(MLN_IMG_PATH "small.pgm", ima);
 
-    auto win = make_rectangle2d(3, 3);
-    {
-        auto out1 = morpho::structural::opening(ima, win);
-        auto out2 = morpho::structural::closing(ima, win);
+  auto win = make_rectangle2d(3, 3);
+  {
+    auto out1 = morpho::structural::opening(ima, win);
+    auto out2 = morpho::structural::closing(ima, win);
 
-        ASSERT_TRUE(all(out1 <= ima)); // anti-extensive
-        ASSERT_TRUE(all(out2 >= ima)); // extensive
-    }
+    ASSERT_TRUE(all(out1 <= ima)); // anti-extensive
+    ASSERT_TRUE(all(out2 >= ima)); // extensive
+  }
 }
 
 TEST(Morpho, opening_closing_opening_1)
 {
-    image2d<uint8> ima;
-    io::imread(MLN_IMG_PATH "small.pgm", ima);
+  image2d<uint8> ima;
+  io::imread(MLN_IMG_PATH "small.pgm", ima);
 
-    auto comp = [](uint8 x) -> uint8 { return 255 - x; };
-    auto win = make_rectangle2d(3, 3);
-    {
-        auto out1 = morpho::structural::opening(imtransform(ima, comp), win);
-        auto out2 = morpho::structural::closing(ima, win);
+  auto comp = [](uint8 x) -> uint8 { return 255 - x; };
+  auto win = make_rectangle2d(3, 3);
+  {
+    auto out1 = morpho::structural::opening(imtransform(ima, comp), win);
+    auto out2 = morpho::structural::closing(ima, win);
 
-        MLN_CHECK_IMEQUAL(out1, imtransform(out2, comp)); // duality
-    }
+    MLN_CHECK_IMEQUAL(out1, imtransform(out2, comp)); // duality
+  }
 }

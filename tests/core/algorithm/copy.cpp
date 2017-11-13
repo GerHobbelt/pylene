@@ -9,12 +9,12 @@
 
 TEST(Core, Algorithm_Copy)
 {
-    using namespace mln;
+  using namespace mln;
 
-    image2d<uint8> ima(10, 10);
-    image2d<uint8> out(10, 10);
-    iota(ima, 0);
-    copy(ima, out);
+  image2d<uint8> ima(10, 10);
+  image2d<uint8> out(10, 10);
+  iota(ima, 0);
+  copy(ima, out);
 
-    ASSERT_TRUE(equal(ima, out));
+  ASSERT_TRUE(equal(ima, out));
 }

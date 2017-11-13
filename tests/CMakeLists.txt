@@ -17,7 +17,9 @@ else(WIN32)
     )
 endif(WIN32)
 
+find_package(Threads REQUIRED)
 find_package(GTest REQUIRED)
+
 include_directories(${GTEST_INCLUDE_DIRS})
 
 # Register an executable test

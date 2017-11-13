@@ -40,23 +40,23 @@ TEST(Morpho, AlphaTree)
 
 TEST(Morpho, AlphaTree_2)
 {
-    using namespace mln;
-    typedef uint8 V;
-    image2d<V> ima;
+  using namespace mln;
+  typedef uint8 V;
+  image2d<V> ima;
 
-    io::imread(MLN_IMG_PATH "fly.pgm", ima);
+  io::imread(MLN_IMG_PATH "fly.pgm", ima);
 
-    typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-    tree_t tree;
-    property_map<tree_t, int> vmap;
+  typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
+  tree_t tree;
+  property_map<tree_t, int> vmap;
 
-    std::tie(tree, vmap) = morpho::alphatree_indexes(ima, c4);
+  std::tie(tree, vmap) = morpho::alphatree_indexes(ima, c4);
 
-    morpho::internal::checktree(tree);
-    std::cout << "Size: " << tree.realsize() << std::endl;
+  morpho::internal::checktree(tree);
+  std::cout << "Size: " << tree.realsize() << std::endl;
 
-    {
-        std::ofstream out("out.dot");
-        morpho::write_graphviz(out, tree, vmap);
-    }
+  {
+    std::ofstream out("out.dot");
+    morpho::write_graphviz(out, tree, vmap);
+  }
 }

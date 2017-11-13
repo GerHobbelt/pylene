@@ -9,32 +9,32 @@
 
 TEST(Labeling, blobs_fast)
 {
-    using namespace mln;
+  using namespace mln;
 
-    image2d<uint8> ima(5, 5);
-    iota(ima, 0);
+  image2d<uint8> ima(5, 5);
+  iota(ima, 0);
 
-    image2d<bool> mask = eval(ima % 2 == 0);
+  image2d<bool> mask = eval(ima % 2 == 0);
 
-    image2d<uint8> lbl;
-    unsigned nlabel;
-    std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8());
-    ASSERT_EQ(nlabel, 13);
+  image2d<uint8> lbl;
+  unsigned nlabel;
+  std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8());
+  ASSERT_EQ(nlabel, 13);
 }
 
 TEST(Labeling, blobs_custom)
 {
-    using namespace mln;
+  using namespace mln;
 
-    image2d<uint8> ima(5, 5);
-    iota(ima, 0);
+  image2d<uint8> ima(5, 5);
+  iota(ima, 0);
 
-    image2d<uint8> lbl;
-    unsigned nlabel;
+  image2d<uint8> lbl;
+  unsigned nlabel;
 
-    std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c4, uint8());
-    ASSERT_EQ(nlabel, 13);
+  std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c4, uint8());
+  ASSERT_EQ(nlabel, 13);
 
-    std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c8, uint8());
-    ASSERT_EQ(nlabel, 1);
+  std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c8, uint8());
+  ASSERT_EQ(nlabel, 1);
 }

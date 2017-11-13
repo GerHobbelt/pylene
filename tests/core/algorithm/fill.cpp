@@ -8,12 +8,12 @@
 
 TEST(Core, Algorithm_Fill)
 {
-    using namespace mln;
+  using namespace mln;
 
-    image2d<uint8> ima(10, 10);
-    fill(ima, 69);
+  image2d<uint8> ima(10, 10);
+  fill(ima, 69);
 
-    mln_viter(v, ima);
-    mln_forall (v)
-        ASSERT_TRUE(*v == 69);
+  mln_viter(v, ima);
+  mln_forall (v)
+    ASSERT_TRUE(*v == 69);
 }

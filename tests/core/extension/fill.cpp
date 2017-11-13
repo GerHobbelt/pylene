@@ -11,14 +11,14 @@
 
 TEST(Core, Extension_Fill)
 {
-    using namespace mln;
+  using namespace mln;
 
-    image2d<uint8> ima(10, 10);
-    iota(ima, 0);
-    image2d<uint8> out = clone(ima);
+  image2d<uint8> ima(10, 10);
+  iota(ima, 0);
+  image2d<uint8> out = clone(ima);
 
-    extension::fill(ima, 42);
+  extension::fill(ima, 42);
 
-    io::imprint_with_border(ima);
-    ASSERT_TRUE(all(ima == out));
+  io::imprint_with_border(ima);
+  ASSERT_TRUE(all(ima == out));
 }

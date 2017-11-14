@@ -1,5 +1,6 @@
-#include <iostream>
 #include <mln/io/registration.hpp>
+
+#include <iostream>
 
 int
 main()

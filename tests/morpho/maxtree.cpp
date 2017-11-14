@@ -4,14 +4,7 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/range/algorithm/generate.hpp>
 #include <mln/io/imprint.hpp>
-#include <mln/morpho/maxtree1d.hpp>
-#include <mln/morpho/maxtree_hqueue_parallel.hpp>
-#include <mln/morpho/maxtree_najman.hpp>
-#include <mln/morpho/maxtree_pqueue_2.hpp>
-#include <mln/morpho/maxtree_pqueue_parallel.hpp>
-#include <mln/morpho/maxtree_ufind.hpp>
-#include <mln/morpho/maxtree_ufind_parallel.hpp>
-#include <mln/morpho/maxtree_ufindrank_parallel.hpp>
+
 #include <tbb/task_scheduler_init.h>
 
 #include <random>

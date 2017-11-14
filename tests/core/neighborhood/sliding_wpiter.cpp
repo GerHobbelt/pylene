@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Core, Neighborhood_Sliding_wpiter_binding_lvalue)
+TEST(Core, Sliding_wpiter_binding_lvalue)
 {
   using namespace mln;
 
@@ -48,7 +48,7 @@ TEST(Core, Neighborhood_Sliding_wpiter_binding_lvalue)
   }
 }
 
-TEST(Core, Neighborhood_Sliding_wpiter_binding_rvalue)
+TEST(Core, Sliding_wpiter_binding_rvalue)
 {
   using namespace mln;
 
@@ -90,7 +90,7 @@ TEST(Core, Neighborhood_Sliding_wpiter_binding_rvalue)
   }
 }
 
-TEST(Core, Neighborhood_Sliding_wpiter_binding_iterator)
+TEST(Core, Sliding_wpiter_binding_iterator)
 {
   using namespace mln;
 

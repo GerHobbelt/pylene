@@ -6,10 +6,9 @@
 #include <mln/io/imprint.hpp>
 #include <mln/morpho/maxtree_hqueue.hpp>
 
-#define BOOST_TEST_MODULE Morpho
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
-BOOST_AUTO_TEST_CASE(maxtree_ufind)
+TEST(Morpho, maxtree_ufind)
 {
   using namespace mln;
 

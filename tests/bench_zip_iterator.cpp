@@ -12,9 +12,6 @@
 #include <mln/core/wrt_offset.hpp>
 #include <mln/io/imprint.hpp>
 
-//#include <mln/core/forall.hpp>
-//#include <mln/core/pix_range_iterator_proxy.hpp>
-
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/accu/accumulators/min.hpp>
 #include <mln/kernel/kernel.hpp>

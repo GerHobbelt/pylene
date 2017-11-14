@@ -3,16 +3,15 @@
 #include <mln/core/neighb2d.hpp>
 
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/value/int.hpp>
 #include <mln/io/imprint.hpp>
 #include <mln/morpho/maxtree_ufind.hpp>
 
-#define BOOST_TEST_MODULE Morpho
-#include <boost/test/unit_test.hpp>
-
-#include <mln/core/value/int.hpp>
 #include <random>
 
-BOOST_AUTO_TEST_CASE(maxtree_ufind)
+#include <gtest/gtest.h>
+
+TEST(Morpho, maxtree_ufind)
 {
   using namespace mln;
 

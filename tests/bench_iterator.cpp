@@ -1,9 +1,11 @@
-#include <algorithm>
-#include <boost/timer.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/wrt_offset.hpp>
+
+#include <boost/timer.hpp>
+
+#include <algorithm>
 #include <numeric>
 
 using namespace mln;

@@ -28,7 +28,7 @@ namespace mln
     static_assert(std::is_integral<V>::value,
                   "V must be an integral type.");
 
-    trace::entering("mln::compute_curvature");
+    mln_entering("mln::compute_curvature");
 
     auto domain = ima.domain();
     domain.pmin *= 2;
@@ -98,7 +98,6 @@ namespace mln
 	}
       }
 
-    trace::exiting();
     mln_postcondition(all(curv >= 0));
     return curv;
   }

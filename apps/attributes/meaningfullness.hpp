@@ -377,7 +377,7 @@ namespace mln
     image2d<uint8> ima = to_uint8::foo(ima_);
 
 
-    trace::entering("mln::curvature_on_edge");
+    mln_entering("mln::curvature_on_edge");
 
     auto domain = ima.domain();
     domain.pmin *= 2;
@@ -465,7 +465,6 @@ namespace mln
 	}
       }
 
-    trace::exiting();
     mln_postcondition(all(curv >= 0));
 
 
@@ -494,7 +493,7 @@ namespace mln
     image2d<float> curv = curvature_on_edge(ima);
     image2d<unsigned>& parent = const_cast<image2d<unsigned>&>(parent_);
 
-    trace::entering("mln::compute_energy");
+    mln_entering("mln::compute_energy");
 
     internal::energy_t<V>::alpha = alpha;
     internal::energy_t<V>::beta = beta;
@@ -559,7 +558,6 @@ namespace mln
 
 
 
-    typedef iterator_range< stditerator<std::vector<point2d>::const_iterator> > Vec;
     typedef dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag> Nbh;
     std::vector<point2d> dpoints;
     for (int i = -eps*2; i <= eps*2; i += 2)
@@ -694,8 +692,6 @@ namespace mln
 	else
 	  energy[x] = energy[parent[x]];
     }
-
-    trace::exiting();
 
     if (feedback != NULL)
       *feedback = acc;

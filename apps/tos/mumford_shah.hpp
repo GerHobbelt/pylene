@@ -230,7 +230,7 @@ namespace mln
     typedef typename std::make_signed<Vec>::type vec_t;
     //static_assert(std::is_same<vec_t, int>::value, "here!");
 
-    trace::entering("mln::curvature_on_edge");
+    mln_entering("mln::curvature_on_edge");
 
 
     //auto norm = [] (const Vec& x) -> int { return std::abs(x[0] + x[1] + x[2]); };
@@ -317,7 +317,6 @@ namespace mln
 	}
       }
 
-    trace::exiting();
     mln_postcondition(all(curv >= 0));
     //io::imsave(curv, "/tmp/curvature.tiff");
     return curv;
@@ -338,7 +337,7 @@ namespace mln
     image2d<float> curv = curvature_on_edge(ima);
     image2d<unsigned>& parent = const_cast<image2d<unsigned>&>(parent_);
 
-    trace::entering("mln::compute_energy");
+    mln_entering("mln::compute_energy");
 
     image2d< internal::energy_t<V> > acc;
     resize(acc, K);
@@ -393,7 +392,6 @@ namespace mln
 
 
 
-    typedef iterator_range< stditerator<std::vector<point2d>::const_iterator> > Vec;
     typedef dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag> Nbh;
     std::vector<point2d> dpoints;
     for (int i = -eps*2; i <= eps*2; i += 2)
@@ -528,8 +526,6 @@ namespace mln
 	else
 	  energy[x] = energy[parent[x]];
     }
-
-    trace::exiting();
 
     if (feedback != NULL)
       *feedback = acc;

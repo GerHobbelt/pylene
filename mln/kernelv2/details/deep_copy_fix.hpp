@@ -1,3 +1,8 @@
+#ifndef MLN_KERNELV2_DETAILS_DEEPCOPYFIX_HPP
+#define MLN_KERNELV2_DETAILS_DEEPCOPYFIX_HPP
+
+#include <mln/kernelv2/details/expressions.hpp>
+
 #include <boost/proto/deep_copy.hpp>
 
 namespace boost
@@ -45,3 +50,5 @@ namespace boost
     }
   }
 }
+
+#endif // MLN_KERNELV2_DETAILS_DEEPCOPYFIX_HPP

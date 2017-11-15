@@ -2,6 +2,8 @@
 #define MLN_CORE_BOX_ITER_H
 
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
+#include <mln/core/point.hpp>
+
 
 namespace mln
 {

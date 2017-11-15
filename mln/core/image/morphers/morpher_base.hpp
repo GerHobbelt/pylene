@@ -1,8 +1,8 @@
 #ifndef MORPHER_BASE_HPP
 #define MORPHER_BASE_HPP
 
-#include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/details/morpher_core_access.hpp>
+#include <mln/core/image_base.hpp>
 #include <mln/core/pixel_utility.hpp>
 
 //

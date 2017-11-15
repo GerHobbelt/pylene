@@ -2,6 +2,7 @@
 #define MLN_CORE_VEC_COMPARE_HPP
 
 #include <mln/core/value/value_traits.hpp>
+#include <mln/core/vec_base.hpp>
 
 namespace mln
 {

@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_IMAGE_IMAGE2D_HPP
 #define MLN_CORE_IMAGE_IMAGE2D_HPP
 
-#include <mln/core/ch_value.hpp>
+#include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage.hpp>
 
 namespace mln

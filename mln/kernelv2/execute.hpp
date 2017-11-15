@@ -6,6 +6,7 @@
 #include <mln/kernelv2/details/expressions_traits.hpp>
 #include <mln/kernelv2/details/inner_context.hpp>
 #include <mln/kernelv2/details/pixter_wrapper.hpp>
+#include <mln/kernelv2/types.hpp>
 
 namespace mln
 {

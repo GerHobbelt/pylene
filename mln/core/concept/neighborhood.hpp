@@ -5,6 +5,7 @@
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/object.hpp>
 #include <mln/core/concept/pixel.hpp>
+#include <mln/core/neighborhood/neighborhood_traits.hpp>
 
 namespace mln
 {

@@ -1,6 +1,8 @@
 #ifndef MLN_CORE_RANGE_HAS_HPP
 #define MLN_CORE_RANGE_HAS_HPP
 
+#include <mln/core/range/iter.hpp>
+
 namespace mln
 {
 

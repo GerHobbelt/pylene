@@ -1,12 +1,13 @@
 #ifndef MLN_CORE_IMAGE_INTERNAL_NESTED_LOOP_ITERATOR_HPP
 #define MLN_CORE_IMAGE_INTERNAL_NESTED_LOOP_ITERATOR_HPP
 
+#include <mln/core/assert.hpp>
+#include <mln/core/iterator/iterator_base.hpp>
+#include <mln/core/literal/vectorial.hpp>
+
 #include <array>
 #include <type_traits>
 #include <utility>
-
-#include <mln/core/iterator/iterator_base.hpp>
-#include <mln/core/literal/vectorial.hpp>
 
 namespace mln
 {

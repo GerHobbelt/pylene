@@ -6,6 +6,8 @@
 #ifndef MLN_CORE_CH_VALUE_HPP
 #define MLN_CORE_CH_VALUE_HPP
 
+#include <mln/core/image_traits.hpp>
+
 /// \file
 /// \brief Meta-Function to transform images.
 

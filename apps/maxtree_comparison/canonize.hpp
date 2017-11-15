@@ -1,7 +1,7 @@
 #ifndef CANONIZE_HPP
 # define CANONIZE_HPP
 
-# include <mln/morpho/maxtree_routines.hpp>
+# include "maxtree_routines.hpp"
 
 namespace mln
 {

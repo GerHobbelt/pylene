@@ -30,21 +30,12 @@ add_executable(maxtree_parallel_ufind_line	bench_parallel_ufind_line.cpp)
 add_executable(maxtree_parallel_ufindrank	bench_parallel_ufindrank.cpp)
 add_executable(maxtree_parallel_hqueue		bench_parallel_hqueue.cpp)
 add_executable(maxtree_parallel_pqueue		bench_parallel_pqueue.cpp)
-add_executable(maxtree_parallel_pqueue_2	bench_parallel_pqueue_2.cpp)
-#add_executable(maxtree_parallel_pqueue_3	bench_parallel_pqueue_3.cpp)
-
 
 target_link_libraries(maxtree_parallel_ufind		${FreeImage_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_ufind_line	${FreeImage_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_ufindrank	${FreeImage_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_hqueue		${FreeImage_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 target_link_libraries(maxtree_parallel_pqueue		${FreeImage_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-target_link_libraries(maxtree_parallel_pqueue_2		${FreeImage_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-#target_link_libraries(maxtree_parallel_pqueue_3		-lfreeimage ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-
-add_executable(bench_maxtree		bench_maxtree.cpp)
-target_link_libraries(bench_maxtree	${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(maxtree-cli		maxtree-cli.cpp)
 target_link_libraries(maxtree-cli	${FreeImage_LIBRARIES})

@@ -32,8 +32,8 @@
 # endif
 
 # include <mln/core/value/indexer.hpp>
-# include <mln/morpho/bounded_hqueue.hpp>
 # include <mln/core/image/image2d.hpp>
+# include "bounded_hqueue.hpp"
 # include <queue>
 # include <vector>
 

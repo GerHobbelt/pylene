@@ -11,20 +11,20 @@ add_core_test(${test_prefix}box domain/box.cpp)
 add_core_test(${test_prefix}forloop forloop.cpp)
 
 # test Range
-add_core_test(${test_prefix}range range/range.cpp)
-add_core_test(${test_prefix}range_filter range/filter.cpp)
-add_core_test(${test_prefix}range_zip range/zip.cpp)
+add_core_test(${test_prefix}range               range/range.cpp)
+add_core_test(${test_prefix}range_filter        range/filter.cpp)
+add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
 # test Images
-add_core_test(${test_prefix}image2d   image/image2d.cpp)
+add_core_test(${test_prefix}image2d             image/image2d.cpp)
 add_core_test(${test_prefix}image2d_iterators   image/image2d_iterators.cpp)
 add_core_test(${test_prefix}extended_by_value_image image/morphers/extended_by_value.cpp)
-add_core_test(${test_prefix}transformed_image image/morphers/transformed_image.cpp)
-add_core_test(${test_prefix}filtered_image image/morphers/filtered_image.cpp)
-add_core_test(${test_prefix}zip_image image/zip_image.cpp)
-add_core_test(${test_prefix}sub_image image/sub_image.cpp)
-add_core_test(${test_prefix}image_ops image/image_ops.cpp)
-add_core_test(${test_prefix}image_routines image/image_routines.cpp)
+add_core_test(${test_prefix}transformed_image   image/morphers/transformed_image.cpp)
+add_core_test(${test_prefix}filtered_image      image/morphers/filtered_image.cpp)
+add_core_test(${test_prefix}zip_image           image/zip_image.cpp)
+add_core_test(${test_prefix}sub_image           image/sub_image.cpp)
+add_core_test(${test_prefix}image_ops           image/image_ops.cpp)
+add_core_test(${test_prefix}image_routines      image/image_routines.cpp)
 
 # test Neighborhood
 add_core_test(${test_prefix}sliding_pixter   neighborhood/sliding_pixter.cpp)

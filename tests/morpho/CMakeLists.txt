@@ -5,9 +5,6 @@ add_subdirectory(maxtree)
 add_subdirectory(alphatree)
 add_subdirectory(component_tree)
 
-if (TBB_FOUND)
-  add_core_test(${test_prefix}maxtree_tbb      maxtree.cpp)
-endif(TBB_FOUND)
 
 add_core_test(${test_prefix}saturate         saturate.cpp)
 add_core_test(${test_prefix}dilate           dilate.cpp)

@@ -1,13 +1,13 @@
 #ifndef MUMFORD_SHAH_ON_TREE_HPP
-# define MUMFORD_SHAH_ON_TREE_HPP
+#define MUMFORD_SHAH_ON_TREE_HPP
 
-# include <mln/morpho/component_tree/accumulate.hpp>
-# include <mln/morpho/component_tree/reconstruction.hpp>
-# include <mln/morpho/component_tree/filtering.hpp>
-# include <mln/accu/accumulators/variance.hpp>
-# include <mln/accu/accumulators/mean.hpp>
-# include <mln/accu/accumulators/accu_as_it.hpp>
-# include <apps/attributes/gradient_magnitude.hpp>
+#include <apps/attributes/gradient_magnitude.hpp>
+#include <mln/accu/accumulators/accu_as_it.hpp>
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/accu/accumulators/variance.hpp>
+#include <mln/morpho/component_tree/accumulate.hpp>
+#include <mln/morpho/component_tree/filtering.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
 
 /// \brief Perform the MS simplification
 ///
@@ -16,10 +16,7 @@
 /// \param lambda Mumford-shash regularization parameter
 template <class T, class I>
 void
-mumford_shah_on_tree(T& tree,
-                     I& F,
-                     double lambda);
-
+mumford_shah_on_tree(T& tree, I& F, double lambda);
 
 /***************************************/
 /*** Implementation                 ****/
@@ -27,34 +24,26 @@ mumford_shah_on_tree(T& tree,
 
 namespace internal
 {
-  typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned> > tree_t;
+  typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 
-  tree_t::vertex_id_t
-  find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar,
-                 tree_t::vertex_id_t x)
+  tree_t::vertex_id_t find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar, tree_t::vertex_id_t x)
   {
     if (newpar[x] == tree_t::npos()) // x is alive
       return x;
     else
       return newpar[x] = find_canonical(newpar, newpar[x]);
   }
-
 }
-
 
 template <class T, class I>
 void
-mumford_shah_on_tree(T& tree,
-                     I& F,
-                     double lambda)
+mumford_shah_on_tree(T& tree, I& F, double lambda)
 {
   using namespace mln;
-  typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned> > tree_t;
+  typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 
-  auto A = morpho::vaccumulate_proper(tree, F,
-                                      accu::accumulators::accu_as_it<
-                                        accu::accumulators::variance< rgb8, rgb<double>, rgb<double> >
-                                      > ());
+  auto A = morpho::vaccumulate_proper(
+      tree, F, accu::accumulators::accu_as_it<accu::accumulators::variance<rgb8, rgb<double>, rgb<double>>>());
   auto B = compute_attribute_on_contour(tree, F, accu::features::count<>());
 
   // Sort the node by gradient
@@ -62,13 +51,10 @@ mumford_shah_on_tree(T& tree,
   std::vector<tree_t::vertex_id_t> S;
   S.reserve(tree.size());
 
-  mln_foreach(tree_t::node_type x, tree.nodes_without_root())
+  mln_foreach (tree_t::node_type x, tree.nodes_without_root())
     S.push_back(x.id());
 
-  std::sort(S.begin(), S.end(), [&mgrad](tree_t::vertex_id_t x, tree_t::vertex_id_t y) {
-      return mgrad[x] > mgrad[y];
-    });
-
+  std::sort(S.begin(), S.end(), [&mgrad](tree_t::vertex_id_t x, tree_t::vertex_id_t y) { return mgrad[x] > mgrad[y]; });
 
   // Energy function
   auto denergy = [lambda, &A, &B](tree_t::node_type x, tree_t::node_type q) {
@@ -77,9 +63,9 @@ mumford_shah_on_tree(T& tree,
 
     tmp.take(A[x]);
     double after = (tmp.to_result() * accu::extractor::count(tmp));
-    //std::cout << "before: " << before << " after: " << after << std::endl;
+    // std::cout << "before: " << before << " after: " << after << std::endl;
     double delta = -lambda * B[x] + (after - before);
-    //std::cout << "delta: " << delta << std::endl;
+    // std::cout << "delta: " << delta << std::endl;
     return delta;
   };
 
@@ -91,31 +77,28 @@ mumford_shah_on_tree(T& tree,
   property_map<tree_t, tree_t::vertex_id_t> newpar(tree, tree_t::npos());
 
   for (tree_t::vertex_id_t i : S)
-    {
-      tree_t::node_type x = tree.get_node(i);
-      tree_t::node_type q = tree.get_node(::internal::find_canonical(newpar, x.get_parent_id()));
+  {
+    tree_t::node_type x = tree.get_node(i);
+    tree_t::node_type q = tree.get_node(::internal::find_canonical(newpar, x.get_parent_id()));
 
-      if (denergy(x,q) < 0)
-        {
-          alive[x] = false;
-          A[q].take(A[x]);
-          newpar[x] = q.id();
-          --k;
-        }
+    if (denergy(x, q) < 0)
+    {
+      alive[x] = false;
+      A[q].take(A[x]);
+      newpar[x] = q.id();
+      --k;
     }
+  }
 
   std::cout << "After: " << k << std::endl;
-
 
   {
     morpho::filter_direct_inplace(tree, alive);
     tree.shrink_to_fit();
 
-    auto vmap = morpho::vaccumulate_proper(tree, F, accu::features::mean<> ());
+    auto vmap = morpho::vaccumulate_proper(tree, F, accu::features::mean<>());
     morpho::reconstruction(tree, vmap, F);
   }
-
 }
-
 
 #endif // ! MUMFORD_SHAH_ON_TREE_HPP

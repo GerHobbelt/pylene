@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP
-# define MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP
+#define MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP
 
-# include <mln/core/image/morphers/transformed_image.hpp>
+#include <mln/core/image/morphers/transformed_image.hpp>
 
 namespace mln
 {
@@ -17,16 +17,13 @@ namespace mln
   using casted_image = internal::transformed_image<I, internal::cast_to<V>, false>;
 
   template <class V, class I>
-  casted_image<const I&, V>
-  imcast(const Image<I>& ima);
+  casted_image<const I&, V> imcast(const Image<I>& ima);
 
   template <class V, class I>
-  casted_image<I&, V>
-  imcast(Image<I>& ima);
+  casted_image<I&, V> imcast(Image<I>& ima);
 
   template <class V, class I>
-  casted_image<I, V>
-  imcast(Image<I>&& ima);
+  casted_image<I, V> imcast(Image<I>&& ima);
 
   /******************************************/
   /****          Implementation          ****/
@@ -38,35 +35,30 @@ namespace mln
     struct cast_to
     {
       template <typename T>
-      V
-      operator() (const T& v) const
+      V operator()(const T& v) const
       {
-	return static_cast<V>(v);
+        return static_cast<V>(v);
       }
     };
   }
 
   template <class V, class I>
-  casted_image<const I&, V>
-  imcast(const Image<I>& ima)
+  casted_image<const I&, V> imcast(const Image<I>& ima)
   {
-    return casted_image<const I&, V> (exact(ima), internal::cast_to<V> ());
+    return casted_image<const I&, V>(exact(ima), internal::cast_to<V>());
   }
 
   template <class V, class I>
-  casted_image<I&, V>
-  imcast(Image<I>& ima)
+  casted_image<I&, V> imcast(Image<I>& ima)
   {
-    return casted_image<I&, V> (exact(ima), internal::cast_to<V> ());
+    return casted_image<I&, V>(exact(ima), internal::cast_to<V>());
   }
 
   template <class V, class I>
-  casted_image<I, V>
-  imcast(Image<I>&& ima)
+  casted_image<I, V> imcast(Image<I>&& ima)
   {
-    return casted_image<I, V> (move_exact(ima), internal::cast_to<V> ());
+    return casted_image<I, V>(move_exact(ima), internal::cast_to<V>());
   }
-
 }
 
 #endif // ! MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP

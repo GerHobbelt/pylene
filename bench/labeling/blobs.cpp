@@ -1,15 +1,17 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/labeling/blobs.hpp>
-#include <mln/core/neighb2d.hpp>
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/core/algorithm/transform.hpp>
+#include <mln/labeling/blobs.hpp>
 
-int main(int argc, const char* argv[])
+int
+main(int argc, const char* argv[])
 {
   using namespace mln;
-  if (argc != 3) {
+  if (argc != 3)
+  {
     std::cerr << "Usage: " << argv[0] << " input.pbm output.tiff" << std::endl;
     abort();
   }
@@ -27,5 +29,4 @@ int main(int argc, const char* argv[])
 
     io::imsave(transform(out, [](unsigned x) -> float { return x; }), argv[2]);
   }
-
 }

@@ -1,30 +1,25 @@
 #include "compute_g2.hpp"
 
-# include <mln/morpho/component_tree/accumulate.hpp>
-# include <mln/morpho/component_tree/compute_depth.hpp>
-# include <apps/g2/accu/lca.hpp>
-# include <tbb/parallel_for.h>
+#include <apps/g2/accu/lca.hpp>
+#include <mln/morpho/component_tree/accumulate.hpp>
+#include <mln/morpho/component_tree/compute_depth.hpp>
+#include <tbb/parallel_for.h>
 
 namespace mln
 {
 
-  property_map<tree_t, typename tree_t::node_type>
-  smallest_enclosing_shape(const tree_t& t1,
-			   const tree_t& t2,
-			   const property_map<tree_t, unsigned>& d2)
+  property_map<tree_t, typename tree_t::node_type> smallest_enclosing_shape(const tree_t& t1, const tree_t& t2,
+                                                                            const property_map<tree_t, unsigned>& d2)
   {
     mln_entering("smallest_enclosing_shape");
-    accu::least_common_ancestor<unsigned, image2d<unsigned> >  acc(t2, d2);
+    accu::least_common_ancestor<unsigned, image2d<unsigned>> acc(t2, d2);
     auto tmp = morpho::accumulate(t1, acc);
     mln_exiting();
     return tmp;
   }
 
-
-  void
-  compute_g2_precomputation(const tree_t* trees, int NTREE,
-                            property_map<tree_t, unsigned>* d,
-                            property_map<tree_t, tree_t::node_type>* SES)
+  void compute_g2_precomputation(const tree_t* trees, int NTREE, property_map<tree_t, unsigned>* d,
+                                 property_map<tree_t, tree_t::node_type>* SES)
   {
     mln_entering("G2 - precomputation");
 
@@ -37,23 +32,21 @@ namespace mln
 
     // 1. Compute the smallest enclosing shape each VS each tree
     // {
-    tbb::parallel_for(0, (int)NTREE, [&SES,&trees,&d,NTREE](int i) {
-        for (int j = 0; j < NTREE; ++j)
-          if (i != j)
-            SES[i * NTREE + j] = smallest_enclosing_shape(trees[i], trees[j], d[j]);
-      });
+    tbb::parallel_for(0, (int)NTREE, [&SES, &trees, &d, NTREE](int i) {
+      for (int j = 0; j < NTREE; ++j)
+        if (i != j)
+          SES[i * NTREE + j] = smallest_enclosing_shape(trees[i], trees[j], d[j]);
+    });
     // }
 
     mln_exiting();
   }
 
-
-
   /*
   std::tuple<Graph,
-	     property_map<tree_t, Graph::vertex_descriptor>,
-	     property_map<tree_t, Graph::vertex_descriptor>,
-	     property_map<tree_t, Graph::vertex_descriptor> >
+             property_map<tree_t, Graph::vertex_descriptor>,
+             property_map<tree_t, Graph::vertex_descriptor>,
+             property_map<tree_t, Graph::vertex_descriptor> >
   compute_g2(const tree_t& t1,
              const tree_t& t2,
              const tree_t& t3)
@@ -214,27 +207,27 @@ namespace mln
       Graph::out_edge_iterator e1, e2, next, eend;
       boost::tie(v,vend) = boost::vertices(graph);
       for (; v != vend; ++v)
-      	{
-      	  std::tie(e1, eend) = boost::out_edges(*v, graph);
-      	  for (next = e1; e1 != eend; e1 = next)
-      	    {
-      	      Graph::vertex_descriptor v1 = boost::target(*e1, graph);
-      	      ++next;
-      	      e2 = boost::out_edges(*v, graph).first;
-      	      for (; e2 != eend; ++e2)
+        {
+          std::tie(e1, eend) = boost::out_edges(*v, graph);
+          for (next = e1; e1 != eend; e1 = next)
+            {
+              Graph::vertex_descriptor v1 = boost::target(*e1, graph);
+              ++next;
+              e2 = boost::out_edges(*v, graph).first;
+              for (; e2 != eend; ++e2)
                 if (vecprod_isless(gdepth[v1], gdepth[boost::target(*e2, graph)]))
                   {
                     //std::cout << "Remove: " << *e1 << std::endl;
                     boost::remove_edge(*e1, graph);
                     break;
                   }
-      	    }
-      	  // std::tie(e1, eend) = boost::out_edges(*v, graph);
-	  // std::cout << "--";
-	  // for (; e1 != eend; ++e1)
-	  //    std::cout << *e1;
-	  // std::cout << std::endl;
-      	}
+            }
+          // std::tie(e1, eend) = boost::out_edges(*v, graph);
+          // std::cout << "--";
+          // for (; e1 != eend; ++e1)
+          //    std::cout << *e1;
+          // std::cout << std::endl;
+        }
     }
 
 
@@ -250,18 +243,10 @@ namespace mln
   }
   */
 
+  // Explicit definition
+  template std::tuple<Graph<2>, std::array<tlink_t, 2>> compute_g2<2>(const tree_t* trees);
 
- // Explicit definition
- template
- std::tuple<Graph<2>, std::array<tlink_t, 2> >
- compute_g2<2>(const tree_t* trees);
+  template std::tuple<Graph<3>, std::array<tlink_t, 3>> compute_g2<3>(const tree_t* trees);
 
- template
- std::tuple<Graph<3>, std::array<tlink_t, 3> >
- compute_g2<3>(const tree_t* trees);
-
- template
- std::tuple<Graph<4>, std::array<tlink_t, 4> >
- compute_g2<4>(const tree_t* trees);
-
+  template std::tuple<Graph<4>, std::array<tlink_t, 4>> compute_g2<4>(const tree_t* trees);
 }

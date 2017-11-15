@@ -1,26 +1,25 @@
 
+#include <mln/colors/literal.hpp>
+#include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/core/colors.hpp>
-#include <mln/colors/literal.hpp>
 
+#include <mln/data/stretch.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/maxtree/maxtree.hpp>
-#include <mln/data/stretch.hpp>
 
+#include "brush.hpp"
 #include <QApplication>
 #include <QtGui>
-#include <mln/qt/imageviewer.hpp>
-#include <apps/tos/topology.hpp>
 #include <apps/tos/Kinterpolate.hpp>
-#include "brush.hpp"
-
+#include <apps/tos/topology.hpp>
+#include <mln/qt/imageviewer.hpp>
 
 using namespace mln;
 
-typedef morpho::component_tree<unsigned, image2d<unsigned> > tree_t;
+typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
 
 ///
 ///
@@ -29,37 +28,40 @@ typedef morpho::component_tree<unsigned, image2d<unsigned> > tree_t;
 /// \param markers__ The image with markers
 /// \param[out] out The image to store the result in.
 void
-segmentation(const tree_t& tree,
-             const image2d<rgb8>& f,
-             const image2d<rgb8>& markers__,
-             image2d<rgb8>& out)
+segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8>& markers__, image2d<rgb8>& out)
 {
-  enum colortag { BLANC = 0, ROUGE = 1, NOIR = 2 };
+  enum colortag
+  {
+    BLANC = 0,
+    ROUGE = 1,
+    NOIR = 2
+  };
 
-  auto markers = imtransform(markers__,
-                             [](const rgb8& v) -> uint8 {
-                               if (v == colors::literal::red) return NOIR;
-                               else if (v == colors::literal::blue) return ROUGE;
-                               else return BLANC;
-                             });
+  auto markers = imtransform(markers__, [](const rgb8& v) -> uint8 {
+    if (v == colors::literal::red)
+      return NOIR;
+    else if (v == colors::literal::blue)
+      return ROUGE;
+    else
+      return BLANC;
+  });
 
   property_map<tree_t, uint8> tags(tree, BLANC);
-  mln_foreach(auto px, markers.pixels())
-    {
-      tree_t::node_type x = tree.get_node_at(px.index());
-      colortag v = (colortag)px.val();
+  mln_foreach (auto px, markers.pixels())
+  {
+    tree_t::node_type x = tree.get_node_at(px.index());
+    colortag v = (colortag)px.val();
 
-      if (K1::is_face_2(px.point()) and v != BLANC)
-        {
-          if (tags[x] == BLANC)
-            tags[x] = v;
-          else if (tags[x] != v)
-            tags[x] = NOIR; // Ambuiguity => set background
-        }
+    if (K1::is_face_2(px.point()) and v != BLANC)
+    {
+      if (tags[x] == BLANC)
+        tags[x] = v;
+      else if (tags[x] != v)
+        tags[x] = NOIR; // Ambuiguity => set background
     }
+  }
 
   tags[tree.get_root()] = NOIR; // Root is background
-
 
   {
     image2d<uint8> markers = imchvalue<uint8>(markers__);
@@ -67,10 +69,11 @@ segmentation(const tree_t& tree,
     io::imsave(markers, "/tmp/markers.tiff");
   }
 
-
   // Propagate up
-  mln_reverse_foreach(auto x, tree.nodes()) {
-    if (tags[x] != BLANC) {
+  mln_reverse_foreach(auto x, tree.nodes())
+  {
+    if (tags[x] != BLANC)
+    {
       auto q = x.parent();
       if (tags[q] == BLANC) // Ok propagate color
         tags[q] = tags[x];
@@ -80,7 +83,8 @@ segmentation(const tree_t& tree,
   }
 
   // Propagate down
-  mln_foreach(auto x, tree.nodes_without_root()) {
+  mln_foreach (auto x, tree.nodes_without_root())
+  {
     auto q = x.parent();
     mln_assertion(tags[q] != BLANC);
     if (tags[x] == BLANC)
@@ -96,24 +100,24 @@ segmentation(const tree_t& tree,
   //
   {
     mln_pixter(pxin, pxout, f, out);
-    mln_forall(pxin, pxout)
-      {
-        auto x = tree.get_node_at(pxin->index());
-        if (tags[x] == NOIR)
-          pxout->val() = 192 + pxin->val() / 4;
-        else
-          pxout->val() = pxin->val();
-      }
+    mln_forall (pxin, pxout)
+    {
+      auto x = tree.get_node_at(pxin->index());
+      if (tags[x] == NOIR)
+        pxout->val() = 192 + pxin->val() / 4;
+      else
+        pxout->val() = pxin->val();
+    }
   }
-
-
 }
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
   QApplication a(argc, argv);
 
-  if (argc < 3) {
+  if (argc < 3)
+  {
     std::cout << "Usage: " << argv[0] << " saliency(float) original.ppm" << std::endl;
     std::exit(1);
   }
@@ -123,7 +127,6 @@ int main(int argc, char** argv)
 
   tree_t tree = morpho::mintree_indexes(sal, c4);
 
-
   image2d<rgb8> ima;
   io::imread(argv[2], ima);
 
@@ -131,17 +134,14 @@ int main(int argc, char** argv)
   ima = Kadjust_to(ima, sal.domain());
 
   mln_pixter(px1, px2, ima, sal2);
-  mln_forall(px1, px2)
+  mln_forall (px1, px2)
     if (px2->val())
       px1->val() = px2->val();
-
 
   QMainWindow win;
   qt::ImageViewer* viewer = new qt::ImageViewer(ima);
 
-  auto callback = std::bind(segmentation, tree, ima,
-                            std::placeholders::_1,
-                            std::placeholders::_2);
+  auto callback = std::bind(segmentation, tree, ima, std::placeholders::_1, std::placeholders::_2);
 
   QGraphicsScene* scene = viewer->getScene();
   MyBrush brush(viewer, callback);
@@ -153,24 +153,17 @@ int main(int argc, char** argv)
   QAction* action3 = toolbar->addAction("Run");
   QAction* action4 = toolbar->addAction("Revert");
   QAction* action5 = toolbar->addAction("Reload");
-  QObject::connect(action1, SIGNAL(triggered()),
-                   &brush, SLOT(setColor1()));
-  QObject::connect(action2, SIGNAL(triggered()),
-                   &brush, SLOT(setColor2()));
-  QObject::connect(action3, SIGNAL(triggered()),
-                   &brush, SLOT(run()));
-  QObject::connect(action4, SIGNAL(triggered()),
-                   &brush, SLOT(revert()));
-  QObject::connect(action5, SIGNAL(triggered()),
-                   &brush, SLOT(reload()));
-
+  QObject::connect(action1, SIGNAL(triggered()), &brush, SLOT(setColor1()));
+  QObject::connect(action2, SIGNAL(triggered()), &brush, SLOT(setColor2()));
+  QObject::connect(action3, SIGNAL(triggered()), &brush, SLOT(run()));
+  QObject::connect(action4, SIGNAL(triggered()), &brush, SLOT(revert()));
+  QObject::connect(action5, SIGNAL(triggered()), &brush, SLOT(reload()));
 
   QActionGroup agroup(&win);
   agroup.addAction(action1);
   agroup.addAction(action2);
   action1->setCheckable(true);
   action2->setCheckable(true);
-
 
   win.setCentralWidget(viewer);
   win.addToolBar(toolbar);
@@ -182,7 +175,7 @@ int main(int argc, char** argv)
   // m_scene->addItem(&item);
 
   // QGraphicsView* view = new QGraphicsView(m_scene);
-  // QMainWindow win; 
+  // QMainWindow win;
   // win.setCentralWidget(view);
   // win.show();
 

@@ -1,20 +1,23 @@
 #ifndef MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP
-# define MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP
+#define MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP
 
-# include <mln/core/concept/object.hpp>
-# include <mln/core/concept/check.hpp>
-# include <boost/concept_check.hpp>
-# include <mln/core/concept/pixel.hpp>
+#include <boost/concept_check.hpp>
+#include <mln/core/concept/check.hpp>
+#include <mln/core/concept/object.hpp>
+#include <mln/core/concept/pixel.hpp>
 
 namespace mln
 {
 
   /// \brief Neighborhood Concept
-  template <class N> struct Neighborhood;
-  template <class N> struct Neighborhood_;
+  template <class N>
+  struct Neighborhood;
+  template <class N>
+  struct Neighborhood_;
 
   /// \brief Weighted Neighborhood Concept
-  template <class N> struct WNeighborhood;
+  template <class N>
+  struct WNeighborhood;
 
   template <class N>
   struct WNeighborhood : Object<N>
@@ -28,10 +31,7 @@ namespace mln
   template <class N>
   struct Neighborhood : WNeighborhood<N>
   {
-    BOOST_CONCEPT_USAGE(Neighborhood)
-    {
-      BOOST_CONCEPT_ASSERT((Neighborhood_<N>));
-    }
+    BOOST_CONCEPT_USAGE(Neighborhood) { BOOST_CONCEPT_ASSERT((Neighborhood_<N>)); }
 
   protected:
     Neighborhood() = default;
@@ -39,15 +39,11 @@ namespace mln
     Neighborhood(Neighborhood&&) = default;
   };
 
-
-
-
   template <class N>
   struct Neighborhood_
   {
     typedef neighborhood_traits<N> traits;
     typedef typename traits::category category;
-
 
     // Neighborhood should be SCARY, i.e. they are not
     // bound a point type but to a class of type e.g
@@ -61,10 +57,10 @@ namespace mln
 
       // nbh(p) with p a rvalue e.g
       {
-        // auto r = nbh(P());
-        // typedef decltype(r) R;
-        // FIXME: check that R is forward range
-        // FIXME: check that R value type is convertible to p;
+          // auto r = nbh(P());
+          // typedef decltype(r) R;
+          // FIXME: check that R is forward range
+          // FIXME: check that R value type is convertible to p;
       }
 
       // nbh(p) with p a lvalue e.g
@@ -80,7 +76,6 @@ namespace mln
       // 	auto r = nbh(pix);
       // 	typedef decltype(r) R;
       // }
-
     }
 
   private:
@@ -88,8 +83,6 @@ namespace mln
     // P p;
     // pixel_archetype<P> pix;
   };
-
-
 }
 
 #endif // ! MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP

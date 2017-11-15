@@ -1,13 +1,15 @@
 #ifndef MLN_COLORS_YCBCR_HPP
-# define MLN_COLORS_YCBCR_HPP
+#define MLN_COLORS_YCBCR_HPP
 
-# include <mln/core/vec_base.hpp>
-# include <mln/core/colors.hpp>
+#include <mln/core/colors.hpp>
+#include <mln/core/vec_base.hpp>
 
 namespace mln
 {
 
-  struct ycbcr_tag {};
+  struct ycbcr_tag
+  {
+  };
 
   template <typename T>
   using ycbcr = internal::vec_base<T, 3, ycbcr_tag>;
@@ -26,7 +28,6 @@ namespace mln
       static const bool is_less_than_comparable = true;
       static const bool is_equality_comparable = true;
     };
-
   }
 
   /// \brief Perform the conversion from RGB to YCbCr colorspace
@@ -43,45 +44,35 @@ namespace mln
   template <typename T>
   rgb<T> ycbcr2rgb(const ycbcr<T>& v);
 
-
   /*********************/
   /*** Implementation **/
   /*********************/
 
   template <typename T>
-  inline
-  ycbcr<T>
-  rgb2ycbcr(const rgb<T>& v)
+  inline ycbcr<T> rgb2ycbcr(const rgb<T>& v)
   {
     static constexpr double bias =
-      std::is_integral<T>::value ?
-      (((double) value_traits<T>::min() + (double) value_traits<T>::max()) / 2) : 0;
+        std::is_integral<T>::value ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
 
-    T y  = 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2];
+    T y = 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2];
     T cb = -0.1687 * v[0] - 0.3313 * v[1] + 0.5 * v[2] + bias;
     T cr = 0.5 * v[0] - 0.4187 * v[1] - 0.0813 * v[2] + bias;
 
-    return {y,cb,cr};
+    return {y, cb, cr};
   }
 
-
   template <typename T>
-  inline
-  rgb<T>
-  ycbcr2rgb(const ycbcr<T>& v)
+  inline rgb<T> ycbcr2rgb(const ycbcr<T>& v)
   {
     static constexpr double bias =
-      std::is_integral<T>::value ?
-      (((double) value_traits<T>::min() + (double) value_traits<T>::max()) / 2) : 0;
+        std::is_integral<T>::value ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
 
-    T r = v[0] + 1.402  * (v[2] - bias);
+    T r = v[0] + 1.402 * (v[2] - bias);
     T g = v[0] - 0.34454 * (v[1] - bias) - 0.71414 * (v[2] - bias);
     T b = v[0] + 1.772 * (v[1] - bias);
 
-    return {r,g,b};
+    return {r, g, b};
   }
-
 }
-
 
 #endif // ! MLN_COLORS_YCBCR_HPP

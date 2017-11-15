@@ -1,11 +1,11 @@
 #ifndef MLN_MORPHO_RANK_FILTER_HPP
-# define MLN_MORPHO_RANK_FILTER_HPP
+#define MLN_MORPHO_RANK_FILTER_HPP
 
-# include <mln/core/image/image.hpp>
-# include <mln/core/extension/extension.hpp>
-# include <mln/morpho/se/se.hpp>
-# include <mln/kernelv2/kernel.hpp>
-# include <mln/accu/accumulators/h_rank.hpp>
+#include <mln/accu/accumulators/h_rank.hpp>
+#include <mln/core/extension/extension.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/kernelv2/kernel.hpp>
+#include <mln/morpho/se/se.hpp>
 
 /// \file
 
@@ -32,17 +32,12 @@ namespace mln
     /// \param out (optional) Output image 𝑔 so store the result.
     /// \tparam Ratio A std::ratio type that defines the rank of the filtered value.
     template <class Ratio, class I, class SE, class OutputImage>
-    OutputImage&
-    rank_filter(const Image<I>& ima,
-                const StructuringElement<SE>& se,
-                Image<OutputImage>& out);
+    OutputImage& rank_filter(const Image<I>& ima, const StructuringElement<SE>& se, Image<OutputImage>& out);
 
     /// \ingroup morpho
     /// \overload  OutputImage& rank_filter(const Image<I>&, const StructuringElement<SE>&, Image<OutputImage>&);
     template <class Ratio, class I, class SE>
-    mln_concrete(I)
-    rank_filter(const Image<I>& ima,
-                const StructuringElement<SE>& se);
+    mln_concrete(I) rank_filter(const Image<I>& ima, const StructuringElement<SE>& se);
 
     /******************************************/
     /****          Implementation          ****/
@@ -56,13 +51,11 @@ namespace mln
       /// This specialization is used when:
       /// * The SE is incremental
       /// * The feature has the `untake` method
-      template <class Ratio,class I, class SE, class J>
-      void
-      rank_filter(const I& ima, const SE& nbh, J& out,
-                  std::true_type __is_incremental__)
+      template <class Ratio, class I, class SE, class J>
+      void rank_filter(const I& ima, const SE& nbh, J& out, std::true_type __is_incremental__)
       {
         namespace ker = mln::kernel;
-        (void) __is_incremental__;
+        (void)__is_incremental__;
 
         typedef accu::accumulators::h_rank<mln_value(I), Ratio> ACCU;
         ker::Aggregate<ACCU> A;
@@ -70,7 +63,7 @@ namespace mln
         ker::Neighbor n;
         auto f = ker::make_image_expr<0>(ima);
         auto g = ker::make_image_expr<1>(out);
-        auto expr = kernel::declare(g(p) = A (f(n)));
+        auto expr = kernel::declare(g(p) = A(f(n)));
         ker::execute_incremental(expr, nbh);
       }
 
@@ -78,12 +71,10 @@ namespace mln
       /// This specialization is used when:
       /// * Either the SE is not incremental or nor the feature has the `untake` method.
       template <class Ratio, class I, class SE, class J>
-      void
-      rank_filter(const I& ima, const SE& nbh, J& out,
-                  std::false_type __is_incremental__)
+      void rank_filter(const I& ima, const SE& nbh, J& out, std::false_type __is_incremental__)
       {
         namespace ker = mln::kernel;
-        (void) __is_incremental__;
+        (void)__is_incremental__;
 
         typedef accu::accumulators::h_rank<mln_value(I), Ratio> ACCU;
         ker::Aggregate<ACCU> A;
@@ -92,17 +83,14 @@ namespace mln
         auto f = ker::make_image_expr<0>(ima);
         auto g = ker::make_image_expr<1>(out);
 
-        auto expr = kernel::declare(g(p) = A (f(n)));
+        auto expr = kernel::declare(g(p) = A(f(n)));
         ker::execute(expr, nbh);
       }
 
     } // end of namespace mln::morpho::impl
 
     template <class Ratio, class I, class SE, class OutputImage>
-    OutputImage&
-    rank_filter(const Image<I>& ima_,
-                const StructuringElement<SE>& se_,
-                Image<OutputImage>& output_)
+    OutputImage& rank_filter(const Image<I>& ima_, const StructuringElement<SE>& se_, Image<OutputImage>& output_)
     {
       mln_entering("mln::morpho::rank_filter");
 
@@ -111,32 +99,28 @@ namespace mln
       const SE& se = exact(se_);
       OutputImage& out = exact(output_);
 
-      static_assert(has_extension::value,
-                    "You must ensure that the image has an extension wide enough to hold the SE");
+      static_assert(has_extension::value, "You must ensure that the image has an extension wide enough to hold the SE");
 
       using is_se_incremental = typename neighborhood_traits<SE>::is_incremental;
       using is_image_incremental = typename iterator_traits<mln_pxter(I)>::has_NL;
-      using is_incremental = std::integral_constant<
-        bool, is_se_incremental::value  and is_image_incremental::value>;
+      using is_incremental = std::integral_constant<bool, is_se_incremental::value and is_image_incremental::value>;
 
       if (extension::need_adjust(ima, se))
-        {
-          mln::trace::warn("You must ensure that the image has an extension wide enough to hold the SE");
-          std::abort();
-        }
+      {
+        mln::trace::warn("You must ensure that the image has an extension wide enough to hold the SE");
+        std::abort();
+      }
       else
-        {
-          impl::rank_filter<Ratio>(ima, se, out, is_incremental ());
-        }
+      {
+        impl::rank_filter<Ratio>(ima, se, out, is_incremental());
+      }
 
       mln_exiting();
       return out;
     }
 
     template <class Ratio, class I, class SE>
-    mln_concrete(I)
-    rank_filter(const Image<I>& ima,
-                const StructuringElement<SE>& se)
+    mln_concrete(I) rank_filter(const Image<I>& ima, const StructuringElement<SE>& se)
     {
       mln_concrete(I) out = imconcretize(exact(ima));
       rank_filter<Ratio>(ima, se, out);
@@ -145,6 +129,6 @@ namespace mln
 
   } // end of namespace mln::morpho
 
-}// end of namespace mln
+} // end of namespace mln
 
 #endif // ! MLN_MORPHO_RANK_FILTER_HPP

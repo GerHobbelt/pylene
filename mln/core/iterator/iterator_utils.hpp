@@ -2,9 +2,9 @@
 // Copyright (c) DxO Labs 2003-2017, this copyright cannot be removed or concealed.
 //---------------------------------------------------------------------------------
 #ifndef MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP
-# define MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP
+#define MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP
 
-# include <mln/core/concept/iterator.hpp>
+#include <mln/core/concept/iterator.hpp>
 
 namespace mln
 {
@@ -26,7 +26,6 @@ namespace mln
 
   template <class Iter>
   bool outer_finished(const Iterator<Iter>& it);
-
 
   namespace details
   {
@@ -106,39 +105,38 @@ namespace mln
   template <class Iter>
   void inner_init(Iterator<Iter>& it)
   {
-    details::inner_init(exact(it), typename Iter::is_multidimensional ());
+    details::inner_init(exact(it), typename Iter::is_multidimensional());
   }
 
   template <class Iter>
   void inner_next(Iterator<Iter>& it)
   {
-    details::inner_next(exact(it), typename Iter::is_multidimensional ());
+    details::inner_next(exact(it), typename Iter::is_multidimensional());
   }
 
   template <class Iter>
   bool inner_finished(const Iterator<Iter>& it)
   {
-    return details::inner_finished(exact(it), typename Iter::is_multidimensional ());
+    return details::inner_finished(exact(it), typename Iter::is_multidimensional());
   }
 
   template <class Iter>
   void outer_init(Iterator<Iter>& it)
   {
-    details::outer_init(exact(it), typename Iter::is_multidimensional ());
+    details::outer_init(exact(it), typename Iter::is_multidimensional());
   }
 
   template <class Iter>
   void outer_next(Iterator<Iter>& it)
   {
-    details::outer_next(exact(it), typename Iter::is_multidimensional ());
+    details::outer_next(exact(it), typename Iter::is_multidimensional());
   }
 
   template <class Iter>
   bool outer_finished(const Iterator<Iter>& it)
   {
-    return details::outer_finished(exact(it), typename Iter::is_multidimensional ());
+    return details::outer_finished(exact(it), typename Iter::is_multidimensional());
   }
-
 }
 
 #endif // ! MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP

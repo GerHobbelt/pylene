@@ -1,8 +1,8 @@
 #ifndef MLN_CORE_IREF_HPP
-# define MLN_CORE_IREF_HPP
+#define MLN_CORE_IREF_HPP
 
-# include <memory>
-# include <mln/core/assert.hpp>
+#include <memory>
+#include <mln/core/assert.hpp>
 
 namespace mln
 {
@@ -15,7 +15,6 @@ namespace mln
   /// * copy assignable
   template <class I>
   struct iref;
-
 
   /// \brief Specialization for a reference to temporary image
   /// The temporary image is copied and destroyed when iref is destroyed.
@@ -33,12 +32,14 @@ namespace mln
     iref(I& x) : m_ptr(&x) {}
     iref(I&& x) = delete;
 
-    I& get() {
+    I& get()
+    {
       mln_precondition(m_ptr != nullptr);
       return *m_ptr;
     }
 
-    const I& get() const {
+    const I& get() const
+    {
       mln_precondition(m_ptr != nullptr);
       return *m_ptr;
     }
@@ -53,7 +54,9 @@ namespace mln
     iref() = default;
 
     template <class U>
-    iref(U&& x) : m_x(std::forward<U>(x)) {}
+    iref(U&& x) : m_x(std::forward<U>(x))
+    {
+    }
 
     I& get() { return m_x; }
     const I& get() const { return m_x; }
@@ -61,7 +64,6 @@ namespace mln
   private:
     I m_x;
   };
-
 }
 
 #endif // !MLN_CORE_IREF_HPP

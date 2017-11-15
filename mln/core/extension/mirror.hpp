@@ -1,9 +1,9 @@
 #ifndef MLN_CORE_EXTENSION_MIRROR_HPP
-# define MLN_CORE_EXTENSION_MIRROR_HPP
+#define MLN_CORE_EXTENSION_MIRROR_HPP
 
-# include <mln/core/image/image.hpp>
-# include <mln/core/extension/extension_traits.hpp>
-# include <mln/core/trace.hpp>
+#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/trace.hpp>
 namespace mln
 {
   namespace extension
@@ -15,14 +15,12 @@ namespace mln
     template <typename I>
     I&& mirror(Image<I>&& ima);
 
-/******************************************/
-/****          Implementation          ****/
-/******************************************/
-
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
 
     template <typename I>
-    const I&
-    mirror(const Image<I>& ima)
+    const I& mirror(const Image<I>& ima)
     {
       static_assert(image_has_extension<I>::value, "Image must have an extension.");
       static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
@@ -34,8 +32,7 @@ namespace mln
     }
 
     template <typename I>
-    I&&
-    mirror(Image<I>&& ima)
+    I&& mirror(Image<I>&& ima)
     {
       static_assert(image_has_extension<I>::value, "Image must have an extension.");
       static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
@@ -47,10 +44,7 @@ namespace mln
       return move_exact(ima);
     }
 
-
-
   } // end of namespace mln::extension
 } // end of namespace mln
-
 
 #endif // ! MLN_CORE_EXTENSION_FILL_HPP

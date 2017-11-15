@@ -8,17 +8,17 @@
 
 #include <iostream>
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
   using namespace mln;
 
   if (argc < 5)
-    {
-      std::cerr << "Usage: " << argv[0] << " input(gray) markers(gray) connectivity output(gray)"
-                << std::endl
-                << "connectivity: 4 / 8" << std::endl;
-      std::exit(1);
-    }
+  {
+    std::cerr << "Usage: " << argv[0] << " input(gray) markers(gray) connectivity output(gray)" << std::endl
+              << "connectivity: 4 / 8" << std::endl;
+    std::exit(1);
+  }
 
   image2d<uint8> ima;
   image2d<uint8> markers;

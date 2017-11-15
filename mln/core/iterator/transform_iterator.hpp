@@ -1,16 +1,14 @@
 #ifndef MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
-# define MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
+#define MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
 
-# include <mln/core/iterator/iterator_base.hpp>
-# include <type_traits>
+#include <mln/core/iterator/iterator_base.hpp>
+#include <type_traits>
 
 namespace mln
 {
 
   template <class Iter, class UnaryFunction>
   struct transform_iterator;
-
-
 
   namespace details
   {
@@ -40,8 +38,7 @@ namespace mln
       transform_iterator_base(const Iter& it, const UnaryFunction& f) : it_(it), f_(f) {}
 
       template <class Iterator2, class UnaryFunction2>
-      transform_iterator_base(const transform_iterator<Iterator2, UnaryFunction2>& other)
-          : it_(other.it_), f_(other.f_)
+      transform_iterator_base(const transform_iterator<Iterator2, UnaryFunction2>& other) : it_(other.it_), f_(other.f_)
       {
       }
 
@@ -89,12 +86,11 @@ namespace mln
   };
 
   template <typename Iterator, typename UnaryFunction>
-  transform_iterator<Iterator, UnaryFunction>
-  make_transform_iterator(const Iterator& it, const UnaryFunction& f)
+  transform_iterator<Iterator, UnaryFunction> make_transform_iterator(const Iterator& it, const UnaryFunction& f)
   {
     return transform_iterator<Iterator, UnaryFunction>(it, f);
   }
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
+#endif //! MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP

@@ -1,43 +1,41 @@
 #ifndef MLN_CORE_IMAGE_NDIMAGE_HH
-# define MLN_CORE_IMAGE_NDIMAGE_HH
+#define MLN_CORE_IMAGE_NDIMAGE_HH
 
 /// \file
 
-# include <mln/core/image/image.hpp>
-# include <mln/core/domain/box.hpp>
-# include <mln/core/memory.hpp>
-# include <mln/core/assert.hpp>
-# include <mln/core/image_traits.hpp>
-# include <mln/core/image_category.hpp>
-# include <mln/core/image/ndimage_iter.hpp>
-
-
+#include <mln/core/assert.hpp>
+#include <mln/core/domain/box.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/image/ndimage_iter.hpp>
+#include <mln/core/image_category.hpp>
+#include <mln/core/image_traits.hpp>
+#include <mln/core/memory.hpp>
 
 namespace mln
 {
 
   /// \brief base class for ndimage
-  template <typename T, unsigned dim, typename E> struct ndimage_base;
+  template <typename T, unsigned dim, typename E>
+  struct ndimage_base;
 
   // FWD
-  template <typename T, unsigned dim, typename I> struct ndimage_pixel;
-
+  template <typename T, unsigned dim, typename I>
+  struct ndimage_pixel;
 
   /******************************************/
   /****              Traits              ****/
   /******************************************/
 
-
   template <typename T, unsigned dim, typename E>
-  struct image_traits< ndimage_base<T, dim, E> >
+  struct image_traits<ndimage_base<T, dim, E>>
   {
-    typedef raw_image_tag               category;
-    typedef std::true_type              accessible;
-    typedef std::true_type		indexable;
-    typedef std::true_type		concrete;
-    typedef std::true_type		shallow_copy;
-    typedef std::true_type		has_border;
-    typedef mln::extension::border_extension_tag        extension;
+    typedef raw_image_tag category;
+    typedef std::true_type accessible;
+    typedef std::true_type indexable;
+    typedef std::true_type concrete;
+    typedef std::true_type shallow_copy;
+    typedef std::true_type has_border;
+    typedef mln::extension::border_extension_tag extension;
   };
 
   /******************************************/
@@ -59,7 +57,7 @@ namespace mln
 
       // These elements are used to free memory
       size_t nbytes;
-      char*  buffer;
+      char* buffer;
 
     private:
       ndimage_data(const ndimage_data&);
@@ -73,10 +71,9 @@ namespace mln
 
     public:
       typedef T value_type;
-      typedef std::true_type    support_fill;
-      typedef std::true_type   support_mirror;
-      typedef std::false_type   support_periodize;
-
+      typedef std::true_type support_fill;
+      typedef std::true_type support_mirror;
+      typedef std::false_type support_periodize;
 
       ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border);
       void fill(const T& v);
@@ -84,129 +81,115 @@ namespace mln
 
     private:
       template <unsigned d>
-      typename std::enable_if<(d < dim)>::type
-      _fill(char* ptr, const T& v);
+      typename std::enable_if<(d < dim)>::type _fill(char* ptr, const T& v);
 
       template <unsigned d>
-      typename std::enable_if<(d == dim)>::type
-      _fill(char* ptr, const T& v);
+      typename std::enable_if<(d == dim)>::type _fill(char* ptr, const T& v);
 
       template <unsigned d>
-      typename std::enable_if<(d < dim)>::type
-      _fillall(char* ptr, const T& v);
+      typename std::enable_if<(d < dim)>::type _fillall(char* ptr, const T& v);
 
       template <unsigned d>
-      typename std::enable_if<(d == dim)>::type
-      _fillall(char* ptr, const T& v);
+      typename std::enable_if<(d == dim)>::type _fillall(char* ptr, const T& v);
 
       template <unsigned d>
-      typename std::enable_if<(d < dim)>::type
-      _mirror(char* ptr);
+      typename std::enable_if<(d < dim)>::type _mirror(char* ptr);
 
       template <unsigned d>
-      typename std::enable_if<(d == dim)>::type
-      _mirror(char* ptr);
-
+      typename std::enable_if<(d == dim)>::type _mirror(char* ptr);
 
       template <unsigned d>
-      typename std::enable_if<(d < dim)>::type
-      _copy_line(char* src, char* dest);
+      typename std::enable_if<(d < dim)>::type _copy_line(char* src, char* dest);
 
       template <unsigned d>
-      typename std::enable_if<(d == dim)>::type
-      _copy_line(char* src, char* dest);
-
+      typename std::enable_if<(d == dim)>::type _copy_line(char* src, char* dest);
 
     private:
-      size_t              m_strides[dim];
-      P                   m_shp;
-      char*               m_ptr;
-      int                 m_border;
+      size_t m_strides[dim];
+      P m_shp;
+      char* m_ptr;
+      int m_border;
     };
 
-
   } // end of namespace mln::internal
-
 
   template <typename T, unsigned dim, typename E>
   struct ndimage_base
 #ifndef MLN_DOXYGEN
-    : image_base<E, point<short, dim>, T,
-                 ndimage_pixel<T, dim, E>,
-                 ndimage_pixel<const T, dim, const E> >
+      : image_base<E, point<short, dim>, T, ndimage_pixel<T, dim, E>, ndimage_pixel<const T, dim, const E>>
 #endif
   {
   private:
-    typedef ndimage_base<T, dim, E>                             this_type;
+    typedef ndimage_base<T, dim, E> this_type;
 
     template <class, unsigned, class>
     friend struct ndimage_base;
 
     template <unsigned d, typename T1, typename E1, typename T2, typename E2>
-    friend
-    bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self,
-                                const ndimage_base<T2, d, E2>& other);
+    friend bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self, const ndimage_base<T2, d, E2>& other);
 
   public:
     /// \name Image point/value/pixel types
     /// \{
 
     /// \copydoc image::site_type
-    typedef point<short,dim>                                    site_type;
+    typedef point<short, dim> site_type;
 
     /// \copydoc image::point_type
-    typedef point<short,dim>                                    point_type;
+    typedef point<short, dim> point_type;
 
     /// \copydoc image::pixel_type
-    typedef ndimage_pixel<T, dim, E>                            pixel_type;
+    typedef ndimage_pixel<T, dim, E> pixel_type;
 
     /// \copydoc image::const_pixel_type
-    typedef ndimage_pixel<const T, dim, const E>                const_pixel_type;
+    typedef ndimage_pixel<const T, dim, const E> const_pixel_type;
 
     /// \copydoc image::value_type
-    typedef T                   value_type;
+    typedef T value_type;
 
     /// \copydoc image::reference
-    typedef T&                  reference;
+    typedef T& reference;
 
     /// \copydoc image::const_reference
-    typedef const T&            const_reference;
+    typedef const T& const_reference;
 
     /// \copydoc image::difference_type
-    typedef int                 difference_type;
+    typedef int difference_type;
 
     /// \copydoc image::size_type
-    typedef unsigned            size_type;
-    typedef unsigned            index_type;
+    typedef unsigned size_type;
+    typedef unsigned index_type;
 
-    typedef T*                  pointer;
-    typedef const T*            const_pointer;
+    typedef T* pointer;
+    typedef const T* const_pointer;
 
     // Extension
     typedef internal::ndimage_extension<T, dim> extension_type;
     /// \}
 
-
     /// \name Image Ranges Types
     /// \{
 
     /// \copydoc image::domain_type
-    typedef box<short, dim>                                             domain_type;
+    typedef box<short, dim> domain_type;
 
     /// \copydoc image::value_range
-    typedef ndimage_value_range<this_type, T>                           value_range;
+    typedef ndimage_value_range<this_type, T> value_range;
 
     /// \copydoc image::const_value_range
-    typedef ndimage_value_range<const this_type, const T>               const_value_range;
+    typedef ndimage_value_range<const this_type, const T> const_value_range;
 
     /// \copydoc image::pixel_range
-    typedef ndimage_pixel_range<this_type, T>                           pixel_range;
+    typedef ndimage_pixel_range<this_type, T> pixel_range;
 
     /// \copydoc image::const_pixel_range
-    typedef ndimage_pixel_range<const this_type, const T>               const_pixel_range;
+    typedef ndimage_pixel_range<const this_type, const T> const_pixel_range;
     /// \}
 
-    enum { ndim = dim};
+    enum
+    {
+      ndim = dim
+    };
 
     // As an Image
     // Constructors
@@ -223,35 +206,31 @@ namespace mln
 
     /// \brief Constructors from external sources
     /// \{
-    static
-    E
-    from_buffer(void* buffer, const domain_type& domain, bool copy = false);
+    static E from_buffer(void* buffer, const domain_type& domain, bool copy = false);
 
-    static
-    E
-    from_buffer(void* buffer, const domain_type& domain, const size_t* strides, bool copy = false);
+    static E from_buffer(void* buffer, const domain_type& domain, const size_t* strides, bool copy = false);
     /// \}
 
     /// \name Accession Operators
     /// \{
 
     /// \copydoc image::operator()(const site_type& p) const
-    reference		operator() (const site_type& p);
+    reference operator()(const site_type& p);
 
     /// \copydoc image::operator()(const site_type& p) const
-    const_reference	operator() (const site_type& p) const;
+    const_reference operator()(const site_type& p) const;
 
     /// \copydoc image::operator[](size_type i) const
-    reference		operator[] (size_type i);
+    reference operator[](size_type i);
 
     /// \copydoc image::operator[](size_type i) const
-    const_reference	operator[] (size_type i) const;
+    const_reference operator[](size_type i) const;
 
     /// \copydoc image::at(const site_type& p) const
-    reference		at (const site_type& p);
+    reference at(const site_type& p);
 
     /// \copydoc image::at(const site_type& p) const
-    const_reference	at (const site_type& p) const;
+    const_reference at(const site_type& p) const;
 
     /// \}
 
@@ -259,69 +238,66 @@ namespace mln
     /// \{
 
     /// \copydoc image::pixel_at(const point_type&) const
-    pixel_type          pixel_at(const point_type& p);
+    pixel_type pixel_at(const point_type& p);
 
     /// \copydoc image::pixel_at(const point_type&) const
-    const_pixel_type    pixel_at(const point_type& p) const;
+    const_pixel_type pixel_at(const point_type& p) const;
 
     /// \copydoc image::pixel_at_index(size_type) const
-    pixel_type          pixel_at_index(size_type i);
+    pixel_type pixel_at_index(size_type i);
 
     /// \copydoc image::pixel_at_index(size_type) const
-    const_pixel_type    pixel_at_index(size_type i) const;
-
-
-    /// \copydoc image::pixel(const point_type&) const
-    pixel_type          pixel(const point_type& p);
+    const_pixel_type pixel_at_index(size_type i) const;
 
     /// \copydoc image::pixel(const point_type&) const
-    const_pixel_type    pixel(const point_type& p) const;
+    pixel_type pixel(const point_type& p);
+
+    /// \copydoc image::pixel(const point_type&) const
+    const_pixel_type pixel(const point_type& p) const;
 
     /// \}
 
-
-    typedef typename value_range::iterator                      value_iterator;
-    typedef typename value_range::reverse_iterator              reverse_value_iterator;
-    typedef typename const_value_range::iterator                const_value_iterator;
-    typedef typename const_value_range::reverse_iterator		const_reverse_value_iterator;
-    typedef typename pixel_range::iterator                      pixel_iterator;
-    typedef typename pixel_range::reverse_iterator              reverse_pixel_iterator;
-    typedef typename const_pixel_range::iterator                const_pixel_iterator;
-    typedef typename const_pixel_range::reverse_iterator		const_reverse_pixel_iterator;
+    typedef typename value_range::iterator value_iterator;
+    typedef typename value_range::reverse_iterator reverse_value_iterator;
+    typedef typename const_value_range::iterator const_value_iterator;
+    typedef typename const_value_range::reverse_iterator const_reverse_value_iterator;
+    typedef typename pixel_range::iterator pixel_iterator;
+    typedef typename pixel_range::reverse_iterator reverse_pixel_iterator;
+    typedef typename const_pixel_range::iterator const_pixel_iterator;
+    typedef typename const_pixel_range::reverse_iterator const_reverse_pixel_iterator;
 
     /// \name Image Ranges
     /// \{
 
     /// \copydoc image::domain()
-    const domain_type&          domain() const;
+    const domain_type& domain() const;
 
     /// \copydoc image::values()
-    value_range                 values();
+    value_range values();
 
     /// \copydoc image::values() const
-    const_value_range           values() const;
+    const_value_range values() const;
 
     /// \copydoc image::pixels()
-    pixel_range                 pixels();
+    pixel_range pixels();
 
     /// \copydoc image::pixels() const
-    const_pixel_range           pixels() const;
+    const_pixel_range pixels() const;
     /// \}
 
     /// \name Index-related methods
     /// \{
 
     /// \copydoc image::index_of_point(const point_type&) const
-    size_type       index_of_point(const point_type& p) const;
+    size_type index_of_point(const point_type& p) const;
 
     /// \copydoc image::point_at_index(size_type i) const
-    point_type		point_at_index(size_type i) const;
+    point_type point_at_index(size_type i) const;
 
     /// \copydoc image::delta_index(const point_type&) const
     difference_type delta_index(const point_type& p) const;
 
     /// \}
-
 
     /// \name Concrete-related Image Methods
     /// \{
@@ -353,20 +329,19 @@ namespace mln
     }
     /// \}
 
-
     // As a Raw Image
-    const std::size_t*       strides() const;
+    const std::size_t* strides() const;
     int border() const { return m_border; }
-
 
     // Specialized algorithm
     template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    friend typename std::enable_if<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>::type
-    make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
+    friend
+        typename std::enable_if<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value,
+                                E_>::type
+        make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
 
     // As an Indexable Image
-    const size_t*	index_strides() const     { return &m_index_strides[0]; }
-
+    const size_t* index_strides() const { return &m_index_strides[0]; }
 
     difference_type delta_offset(const point_type& p) const
     {
@@ -379,67 +354,58 @@ namespace mln
     extension_type extension() const;
 
   private:
-    static
-    E
-    from_buffer_copy_(void* buffer, const domain_type& domain, const size_t* strides);
+    static E from_buffer_copy_(void* buffer, const domain_type& domain, const size_t* strides);
 
-    static
-    E
-    from_buffer_extern_(void* buffer, const domain_type& domain, const size_t* strides);
-
-
-
+    static E from_buffer_extern_(void* buffer, const domain_type& domain, const size_t* strides);
 
   protected:
-    template <typename, typename, unsigned, typename> friend struct indexible_ndimage_base;
-    template <typename, typename> friend struct ndimage_value_range;
-    template <typename, typename> friend struct ndimage_pixel_range;
+    template <typename, typename, unsigned, typename>
+    friend struct indexible_ndimage_base;
+    template <typename, typename>
+    friend struct ndimage_value_range;
+    template <typename, typename>
+    friend struct ndimage_pixel_range;
 
     void resize_(const domain_type& domain, unsigned border = 3, T v = T());
 
-    domain_type	m_domain;	///< Domain of image
+    domain_type m_domain; ///< Domain of image
     //#ifndef MLN_NDEBUG
     domain_type vbox_;
     //#endif
 
-    std::array<size_t, dim>	m_strides;	///< Strides in bytes
-    std::shared_ptr< internal::ndimage_data<T, dim> > m_data;
-    int                                 m_border;
-    char*                               m_ptr;           ///< Pointer to the first element in the domain
-    char*                               m_last;          ///< Pointer to the last element in the domain (not past-the-end)
+    std::array<size_t, dim> m_strides; ///< Strides in bytes
+    std::shared_ptr<internal::ndimage_data<T, dim>> m_data;
+    int m_border;
+    char* m_ptr;  ///< Pointer to the first element in the domain
+    char* m_last; ///< Pointer to the last element in the domain (not past-the-end)
 
-    T*					m_ptr_origin;		///< Pointer to the first element (pmin)
-    std::array<std::size_t, dim>	m_index_strides;	///< Strides in number of elements (including the border)
-    size_t				m_index_first;          ///< index of pmin
-    size_t				m_index_last;           ///< index of pmax-1
+    T* m_ptr_origin;                              ///< Pointer to the first element (pmin)
+    std::array<std::size_t, dim> m_index_strides; ///< Strides in number of elements (including the border)
+    size_t m_index_first;                         ///< index of pmin
+    size_t m_index_last;                          ///< index of pmax-1
   };
 
   /******************************/
   /** Free function Impl        */
   /******************************/
 
-
   template <typename T>
-  struct image3d : ndimage_base<T, 3, image3d<T> >
+  struct image3d : ndimage_base<T, 3, image3d<T>>
   {
   protected:
-    typedef ndimage_base<T, 3, image3d<T> > base;
+    typedef ndimage_base<T, 3, image3d<T>> base;
     typedef typename base::domain_type domain_type;
 
   public:
-    explicit image3d (unsigned border = 3) : base (border) {}
+    explicit image3d(unsigned border = 3) : base(border) {}
 
-    explicit image3d(const domain_type& domain, unsigned border = 3)
-      : base(domain, border)
-    {
-    }
+    explicit image3d(const domain_type& domain, unsigned border = 3) : base(domain, border) {}
 
     image3d(short nslices, short nrows, short ncols, unsigned border = 3)
-      : base( (box<short,3>) {{0,0,0},{nslices, nrows, ncols}}, border)
+        : base((box<short, 3>){{0, 0, 0}, {nslices, nrows, ncols}}, border)
     {
     }
   };
-
 
   namespace internal
   {
@@ -449,118 +415,117 @@ namespace mln
       for (unsigned i = 0; i < dim; ++i)
         shape[i] = shape_[i] + 2 * border;
 
-      strides[dim-1] = sizeof(T);
+      strides[dim - 1] = sizeof(T);
 
       // Each row / page ... are 16 bytes aligned
       unsigned ndim = dim;
 
 #ifdef MLN_128B_ALIGNMENT
       if (ndim >= 2)
-        {
-          strides[dim-2] = ((shape[dim-1] * sizeof(T)) & ~(size_t)15) + (size_t) 16;
-          for (int i = dim-3; i >= 0; --i)
-            strides[i] = shape[i+1] * strides[i+1];
-        }
+      {
+        strides[dim - 2] = ((shape[dim - 1] * sizeof(T)) & ~(size_t)15) + (size_t)16;
+        for (int i = dim - 3; i >= 0; --i)
+          strides[i] = shape[i + 1] * strides[i + 1];
+      }
 #else
       if (ndim >= 2)
-        {
-          strides[dim-2] = shape[dim-1] * sizeof(T);
-          for (int i = dim-3; i >= 0; --i)
-            strides[i] = shape[i+1] * strides[i+1];
-        }
+      {
+        strides[dim - 2] = shape[dim - 1] * sizeof(T);
+        for (int i = dim - 3; i >= 0; --i)
+          strides[i] = shape[i + 1] * strides[i + 1];
+      }
 #endif
 
       // Allocate data
       nbytes = shape[0] * strides[0];
-      buffer = (char*) mln::aligned_malloc(nbytes, border * sizeof(T));
+      buffer = (char*)mln::aligned_malloc(nbytes, border * sizeof(T));
 
       // Construct
       {
         char* ptr = buffer;
         unsigned nlines = 1;
-        for (unsigned i = 0; i < dim-1; ++i)
+        for (unsigned i = 0; i < dim - 1; ++i)
           nlines *= static_cast<unsigned>(shape[i]);
-        unsigned nelements = static_cast<unsigned>(shape[dim-1]);
+        unsigned nelements = static_cast<unsigned>(shape[dim - 1]);
 
-        if (dim > 1) {
-          for (unsigned i = 0; i < nlines; ++i, ptr += strides[dim-2]) {
-            T* p_ = (T*) ptr;
+        if (dim > 1)
+        {
+          for (unsigned i = 0; i < nlines; ++i, ptr += strides[dim - 2])
+          {
+            T* p_ = (T*)ptr;
             for (unsigned j = 0; j < nelements; ++j, ++p_)
               new (p_) T(v);
           }
-        } else {
-          T* p_ = (T*) ptr;
+        }
+        else
+        {
+          T* p_ = (T*)ptr;
           for (unsigned j = 0; j < nelements; ++j, ++p_)
             new (p_) T(v);
         }
       }
     }
 
-
     template <typename T, unsigned dim>
     ndimage_data<T, dim>::~ndimage_data()
     {
       char* ptr = buffer;
       unsigned nlines = 1;
-      for (unsigned i = 0; i < dim-1; ++i)
+      for (unsigned i = 0; i < dim - 1; ++i)
         nlines *= static_cast<unsigned>(shape[i]);
-      unsigned nelements = static_cast<unsigned>(shape[dim-1]);
-      if (dim == 1) {
+      unsigned nelements = static_cast<unsigned>(shape[dim - 1]);
+      if (dim == 1)
+      {
         for (unsigned k = 0; k < nelements; ++k)
           ((T*)ptr + k)->~T();
         //    std::destroy( (T*)ptr, (T*) ptr + nelements);
-      } else {
-        for (unsigned i = 0; i < nlines; ++i, ptr += strides[dim-2])
+      }
+      else
+      {
+        for (unsigned i = 0; i < nlines; ++i, ptr += strides[dim - 2])
           for (unsigned k = 0; k < nelements; ++k)
             ((T*)ptr + k)->~T();
-        //std::destroy((T*)ptr, (T*)ptr + nelements);
+        // std::destroy((T*)ptr, (T*)ptr + nelements);
       }
       mln::aligned_free(buffer);
     }
   }
 
-
   template <typename T, unsigned dim, typename E>
-  ndimage_base<T,dim,E>::ndimage_base(unsigned border)
-    : m_domain (), m_border (border), m_ptr (NULL), m_last(NULL)
+  ndimage_base<T, dim, E>::ndimage_base(unsigned border) : m_domain(), m_border(border), m_ptr(NULL), m_last(NULL)
   {
-    for (unsigned i = 0; i < dim; ++i){
+    for (unsigned i = 0; i < dim; ++i)
+    {
       mln_postcondition(m_domain.pmin[i] == 0);
       mln_postcondition(m_domain.pmax[i] == 0);
     }
   }
 
   template <typename T, unsigned dim, typename E>
-  ndimage_base<T,dim,E>::ndimage_base(const domain_type& domain, unsigned border, T v)
-    : m_domain (domain),
-      m_border (border)
+  ndimage_base<T, dim, E>::ndimage_base(const domain_type& domain, unsigned border, T v)
+      : m_domain(domain), m_border(border)
   {
     resize_(m_domain, border, v);
   }
 
   template <typename T, unsigned dim, typename E>
   template <typename U, typename E2>
-  ndimage_base<T,dim,E>::ndimage_base(const ndimage_base<U, dim, E2>& g, unsigned border, T v)
-    : m_domain (g.domain()),
-      m_border (border)
+  ndimage_base<T, dim, E>::ndimage_base(const ndimage_base<U, dim, E2>& g, unsigned border, T v)
+      : m_domain(g.domain()), m_border(border)
   {
     resize_(m_domain, m_border, v);
   }
 
   template <typename T, unsigned dim, typename E>
   template <typename U, typename E2>
-  ndimage_base<T,dim,E>::ndimage_base(const ndimage_base<U, dim, E2>& g, mln::init)
-    : m_domain (g.domain()),
-      m_border (g.border())
+  ndimage_base<T, dim, E>::ndimage_base(const ndimage_base<U, dim, E2>& g, mln::init)
+      : m_domain(g.domain()), m_border(g.border())
   {
     resize_(m_domain, m_border, T());
   }
 
   template <typename T, unsigned dim, typename E>
-  E
-  ndimage_base<T,dim,E>::from_buffer_extern_(void* buffer,
-                                             const domain_type& domain,
-                                             const size_t* strides)
+  E ndimage_base<T, dim, E>::from_buffer_extern_(void* buffer, const domain_type& domain, const size_t* strides)
   {
     E image_;
     image_.m_domain = domain;
@@ -569,55 +534,50 @@ namespace mln
     MLN_EVAL_IF_DEBUG(image_.vbox_ = domain);
     std::copy(strides, strides + dim, image_.m_strides.begin());
 
-    if (image_.m_strides[dim-1] % sizeof(T) != 0) {
+    if (image_.m_strides[dim - 1] % sizeof(T) != 0)
+    {
       throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
     }
 
     point<size_t, dim> sz = domain.shape();
     image_.m_ptr_origin = (T*)buffer;
-    image_.m_index_strides[dim-1] = 1;
+    image_.m_index_strides[dim - 1] = 1;
     image_.m_index_first = 0;
-    image_.m_index_last = sz[dim-1] - 1;
+    image_.m_index_last = sz[dim - 1] - 1;
     image_.m_ptr = (char*)buffer;
-    image_.m_last = (char*)buffer + (sz[dim-1] - 1) * image_.m_strides[dim-1];
+    image_.m_last = (char*)buffer + (sz[dim - 1] - 1) * image_.m_strides[dim - 1];
 
-    for (int i = dim-2; i >= 0; --i)
+    for (int i = dim - 2; i >= 0; --i)
+    {
+      if (image_.m_strides[i] % sizeof(T) != 0)
       {
-        if (image_.m_strides[i] % sizeof(T) != 0) {
-          throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
-        }
-
-        image_.m_index_strides[i] = image_.m_strides[i] / sizeof(T);
-        image_.m_index_last  += (sz[i] - 1) * image_.m_index_strides[i];
-        image_.m_last += (sz[i] - 1) * image_.m_strides[i];
+        throw std::runtime_error("The padding of the image is not compatible with the size of the element.");
       }
+
+      image_.m_index_strides[i] = image_.m_strides[i] / sizeof(T);
+      image_.m_index_last += (sz[i] - 1) * image_.m_index_strides[i];
+      image_.m_last += (sz[i] - 1) * image_.m_strides[i];
+    }
 
     return image_;
   }
 
   template <typename T, unsigned dim, typename E>
-  E
-  ndimage_base<T,dim,E>::from_buffer_copy_(void* buffer,
-                                           const domain_type& domain,
-                                           const size_t* strides)
+  E ndimage_base<T, dim, E>::from_buffer_copy_(void* buffer, const domain_type& domain, const size_t* strides)
   {
     E in = from_buffer_extern_(buffer, domain, strides);
 
     E out(domain);
 
     mln_pixter(pin, pout, in, out);
-    mln_forall(pin, pout)
+    mln_forall (pin, pout)
       pout->val() = pin->val();
 
     return out;
   }
 
   template <typename T, unsigned dim, typename E>
-  E
-  ndimage_base<T,dim,E>::from_buffer(void* buffer,
-                                     const domain_type& domain,
-                                     const size_t* strides,
-                                     bool copy)
+  E ndimage_base<T, dim, E>::from_buffer(void* buffer, const domain_type& domain, const size_t* strides, bool copy)
   {
     if (copy)
       return from_buffer_copy_(buffer, domain, strides);
@@ -625,27 +585,21 @@ namespace mln
       return from_buffer_extern_(buffer, domain, strides);
   }
 
-
-
   template <typename T, unsigned dim, typename E>
-  E
-  ndimage_base<T,dim,E>::from_buffer(void* buffer,
-                                     const domain_type& domain,
-                                     bool copy)
+  E ndimage_base<T, dim, E>::from_buffer(void* buffer, const domain_type& domain, bool copy)
   {
     point<size_t, dim> sz = domain.shape();
     size_t strides[dim];
 
-    strides[dim-1] = sizeof(T);
-    for (int i = dim-2; i >= 0; --i)
-      strides[i] = strides[i+1] * sz[i+1];
+    strides[dim - 1] = sizeof(T);
+    for (int i = dim - 2; i >= 0; --i)
+      strides[i] = strides[i + 1] * sz[i + 1];
 
     return from_buffer(buffer, domain, strides, copy);
   }
 
   template <typename T, unsigned dim, typename E>
-  void
-  ndimage_base<T,dim,E>::resize_(const domain_type& domain, unsigned border, T v)
+  void ndimage_base<T, dim, E>::resize_(const domain_type& domain, unsigned border, T v)
   {
     site_type shp = domain.shape();
     point<size_t, dim> sz;
@@ -661,109 +615,91 @@ namespace mln
 
     // Compute pointer at (0,0)
     m_ptr_origin = (T*)m_data->buffer;
-    m_index_strides[dim-1] = 1;
+    m_index_strides[dim - 1] = 1;
     m_index_first = m_border;
-    m_index_last  = m_border + sz[dim-1] - 1;
-    m_ptr  = m_data->buffer + border * m_strides[dim-1];
-    m_last = m_data->buffer + (border + sz[dim-1] - 1) * m_strides[dim-1];
-    for (int i = dim-2; i >= 0; --i)
-      {
-        m_index_strides[i] = m_strides[i] / sizeof(T);
-        m_index_first += m_border * m_index_strides[i];
-        m_index_last  += (m_border + sz[i] - 1) * m_index_strides[i];
-        m_ptr += border * m_strides[i];
-        m_last += (border + sz[i] - 1) * m_strides[i];
-      }
+    m_index_last = m_border + sz[dim - 1] - 1;
+    m_ptr = m_data->buffer + border * m_strides[dim - 1];
+    m_last = m_data->buffer + (border + sz[dim - 1] - 1) * m_strides[dim - 1];
+    for (int i = dim - 2; i >= 0; --i)
+    {
+      m_index_strides[i] = m_strides[i] / sizeof(T);
+      m_index_first += m_border * m_index_strides[i];
+      m_index_last += (m_border + sz[i] - 1) * m_index_strides[i];
+      m_ptr += border * m_strides[i];
+      m_last += (border + sz[i] - 1) * m_strides[i];
+    }
   }
 
-
   template <typename T, unsigned dim, typename E>
-  void
-  ndimage_base<T,dim,E>::resize(const domain_type& domain, unsigned border, T v)
+  void ndimage_base<T, dim, E>::resize(const domain_type& domain, unsigned border, T v)
   {
-    if (not (domain == m_domain) or (int)border != m_border)
-      {
-        m_domain = domain;
-        m_border = border;
-        resize_(m_domain, border, v);
-      }
+    if (not(domain == m_domain) or (int) border != m_border)
+    {
+      m_domain = domain;
+      m_border = border;
+      resize_(m_domain, border, v);
+    }
     else
-      {
-        std::fill((T*) m_ptr, ((T*)m_last) + 1, v);
-      }
+    {
+      std::fill((T*)m_ptr, ((T*)m_last) + 1, v);
+    }
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  T&
-  ndimage_base<T,dim,E>::at (const site_type& p)
+  inline T& ndimage_base<T, dim, E>::at(const site_type& p)
   {
     mln_precondition(vbox_.has(p));
 
     char* ptr = m_ptr;
     for (unsigned i = 0; i < dim; ++i)
       ptr += (p[i] - m_domain.pmin[i]) * m_strides[i];
-    return * (T*)ptr;
+    return *(T*)ptr;
   }
 
-
   template <typename T, unsigned dim, typename E>
-  inline
-  const T&
-  ndimage_base<T,dim,E>::at (const site_type& p) const
+  inline const T& ndimage_base<T, dim, E>::at(const site_type& p) const
   {
     mln_precondition(vbox_.has(p));
 
     char* ptr = m_ptr;
     for (unsigned i = 0; i < dim; ++i)
       ptr += (p[i] - m_domain.pmin[i]) * m_strides[i];
-    return * (const T*)ptr;
+    return *(const T*)ptr;
   }
 
-
   template <typename T, unsigned dim, typename E>
-  inline
-  T&
-  ndimage_base<T,dim,E>::operator() (const site_type& p)
+  inline T& ndimage_base<T, dim, E>::operator()(const site_type& p)
   {
     mln_precondition(m_domain.has(p));
     return at(p);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  const T&
-  ndimage_base<T,dim,E>::operator() (const site_type& p) const
+  inline const T& ndimage_base<T, dim, E>::operator()(const site_type& p) const
   {
     mln_precondition(m_domain.has(p));
     return at(p);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  T&
-  ndimage_base<T,dim,E>::operator[] (size_type i)
+  inline T& ndimage_base<T, dim, E>::operator[](size_type i)
   {
     mln_precondition(vbox_.has(point_at_index(i)));
     return m_ptr_origin[i];
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  const T&
-  ndimage_base<T,dim,E>::operator[] (size_type i) const
+  inline const T& ndimage_base<T, dim, E>::operator[](size_type i) const
   {
     mln_precondition(vbox_.has(point_at_index(i)));
     return m_ptr_origin[i];
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::pixel_type
-  ndimage_base<T,dim,E>::pixel_at(const point_type& p)
+  inline typename ndimage_base<T, dim, E>::pixel_type ndimage_base<T, dim, E>::pixel_at(const point_type& p)
   {
     pixel_type pix;
-    pix.m_ima  = this->exact();
+    pix.m_ima = this->exact();
     pix.m_ptr = m_ptr_origin;
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
@@ -771,25 +707,21 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::const_pixel_type
-  ndimage_base<T,dim,E>::pixel_at(const point_type& p) const
+  inline typename ndimage_base<T, dim, E>::const_pixel_type ndimage_base<T, dim, E>::pixel_at(const point_type& p) const
   {
     const_pixel_type pix;
-    pix.m_ima  = this->exact();
-    pix.m_ptr  = m_ptr_origin;
+    pix.m_ima = this->exact();
+    pix.m_ptr = m_ptr_origin;
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
     return pix;
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::pixel_type
-  ndimage_base<T,dim,E>::pixel_at_index(size_type i)
+  inline typename ndimage_base<T, dim, E>::pixel_type ndimage_base<T, dim, E>::pixel_at_index(size_type i)
   {
     pixel_type pix;
-    pix.m_ima  = this->exact();
+    pix.m_ima = this->exact();
     pix.m_ptr = m_ptr_origin;
     pix.m_point = this->point_at_index(i);
     pix.m_index = i;
@@ -797,65 +729,56 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::const_pixel_type
-  ndimage_base<T,dim,E>::pixel_at_index(size_type i) const
+  inline typename ndimage_base<T, dim, E>::const_pixel_type ndimage_base<T, dim, E>::pixel_at_index(size_type i) const
   {
     const_pixel_type pix;
-    pix.m_ima  = this->exact();
+    pix.m_ima = this->exact();
     pix.m_ptr = m_ptr_origin;
     pix.m_point = this->point_at_index(i);
     pix.m_index = i;
     return pix;
   }
 
-
-
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::pixel_type
-  ndimage_base<T,dim,E>::pixel(const point_type& p)
+  inline typename ndimage_base<T, dim, E>::pixel_type ndimage_base<T, dim, E>::pixel(const point_type& p)
   {
     mln_precondition(m_domain.has(p));
     return pixel_at(p);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::const_pixel_type
-  ndimage_base<T,dim,E>::pixel(const point_type& p) const
+  inline typename ndimage_base<T, dim, E>::const_pixel_type ndimage_base<T, dim, E>::pixel(const point_type& p) const
   {
     mln_precondition(m_domain.has(p));
     return pixel_at(p);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::size_type
-  ndimage_base<T,dim,E>::index_of_point(const point_type& p) const
+  inline typename ndimage_base<T, dim, E>::size_type ndimage_base<T, dim, E>::index_of_point(const point_type& p) const
   {
     std::size_t idx = m_index_first;
-    point_type  q = p - m_domain.pmin;
+    point_type q = p - m_domain.pmin;
     for (unsigned i = 0; i < dim; ++i)
       idx += q[i] * m_index_strides[i];
-    return static_cast<typename ndimage_base<T,dim,E>::size_type>(idx);
+    return static_cast<typename ndimage_base<T, dim, E>::size_type>(idx);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::point_type
-  ndimage_base<T,dim,E>::point_at_index(size_type idx) const
+  inline typename ndimage_base<T, dim, E>::point_type ndimage_base<T, dim, E>::point_at_index(size_type idx) const
   {
     point_type p = m_domain.pmin - m_border;
 
     int diff = static_cast<int>(idx) - static_cast<int>(m_index_first);
-    for (unsigned i = 0; i < dim; ++i) {
+    for (unsigned i = 0; i < dim; ++i)
+    {
       diff += static_cast<int>(m_index_strides[i] * m_border);
     }
 
-    for (unsigned i = 0; i < dim; ++i) {
-      std::div_t q = std::div(diff,  (int)m_index_strides[i]);
-      if (q.rem < 0) {
+    for (unsigned i = 0; i < dim; ++i)
+    {
+      std::div_t q = std::div(diff, (int)m_index_strides[i]);
+      if (q.rem < 0)
+      {
         q.rem += static_cast<int>(m_index_strides[i]);
         q.quot -= 1;
       }
@@ -868,9 +791,8 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::difference_type
-  ndimage_base<T,dim,E>::delta_index(const point_type& p) const
+  inline typename ndimage_base<T, dim, E>::difference_type
+  ndimage_base<T, dim, E>::delta_index(const point_type& p) const
   {
     difference_type idx = 0;
     for (unsigned i = 0; i < dim; ++i)
@@ -894,14 +816,11 @@ namespace mln
   //   return *reinterpret_cast<const T*>(m_ptr+n);
   // }
 
-
   template <typename T, unsigned dim, typename E>
-  const size_t*
-  ndimage_base<T,dim,E>::strides () const
+  const size_t* ndimage_base<T, dim, E>::strides() const
   {
     return &m_strides[0];
   }
-
 
   // template <typename T, unsigned dim, typename E>
   // ptrdiff_t
@@ -914,9 +833,7 @@ namespace mln
   // }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  const typename ndimage_base<T,dim,E>::domain_type&
-  ndimage_base<T,dim,E>::domain () const
+  inline const typename ndimage_base<T, dim, E>::domain_type& ndimage_base<T, dim, E>::domain() const
   {
     return m_domain;
   }
@@ -924,100 +841,81 @@ namespace mln
   /* -- Value range -- */
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::const_value_range
-  ndimage_base<T,dim,E>::values () const
+  inline typename ndimage_base<T, dim, E>::const_value_range ndimage_base<T, dim, E>::values() const
   {
     return const_value_range(*this);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::value_range
-  ndimage_base<T,dim,E>::values ()
+  inline typename ndimage_base<T, dim, E>::value_range ndimage_base<T, dim, E>::values()
   {
     return value_range(*this);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::const_pixel_range
-  ndimage_base<T,dim,E>::pixels () const
+  inline typename ndimage_base<T, dim, E>::const_pixel_range ndimage_base<T, dim, E>::pixels() const
   {
     return const_pixel_range(*this);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::pixel_range
-  ndimage_base<T,dim,E>::pixels ()
+  inline typename ndimage_base<T, dim, E>::pixel_range ndimage_base<T, dim, E>::pixels()
   {
     return pixel_range(*this);
   }
 
   template <typename T, unsigned dim, typename E>
-  inline
-  typename ndimage_base<T,dim,E>::extension_type
-  ndimage_base<T,dim,E>::extension () const
+  inline typename ndimage_base<T, dim, E>::extension_type ndimage_base<T, dim, E>::extension() const
   {
     return extension_type(m_ptr, &m_strides[0], m_domain.shape(), m_border);
   }
 
   template <unsigned d, typename T1, typename E1, typename T2, typename E2>
-  inline
-  bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self,
-                              const ndimage_base<T2, d, E2>& other)
+  inline bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self, const ndimage_base<T2, d, E2>& other)
   {
-    return
-      (self.index_of_point(self.domain().pmin) ==
-       other.index_of_point(other.domain().pmin)) and
-      (self.m_index_strides == other.m_index_strides);
+    return (self.index_of_point(self.domain().pmin) == other.index_of_point(other.domain().pmin)) and
+           (self.m_index_strides == other.m_index_strides);
   }
-
-
 
   /******************************************/
   /****     Extension implementation     ****/
   /******************************************/
-
 
   namespace internal
   {
 
     template <typename T, unsigned dim>
     ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border)
-      : m_shp (shp), m_border (border)
+        : m_shp(shp), m_border(border)
     {
       m_ptr = ptr;
-      for (unsigned i = 0; i < dim; ++i) {
+      for (unsigned i = 0; i < dim; ++i)
+      {
         m_strides[i] = strides[i];
         m_ptr -= m_strides[i] * border;
       }
     }
 
     template <typename T, unsigned dim>
-    void
-    ndimage_extension<T, dim>::fill(const T& v)
+    void ndimage_extension<T, dim>::fill(const T& v)
     {
       _fill<0>(m_ptr, v);
     }
 
     template <typename T, unsigned dim>
-    void
-    ndimage_extension<T, dim>::mirror()
+    void ndimage_extension<T, dim>::mirror()
     {
       _mirror<0>(m_ptr);
     }
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type
-    ndimage_extension<T, dim>::_mirror(char* ptr)
+    typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_mirror(char* ptr)
     {
       char* pori = ptr + m_border * m_strides[d];
       char* p = pori;
       for (int i = 0; i < m_shp[d]; ++i, p += m_strides[d])
-        _mirror<d+1>(p);
+        _mirror<d + 1>(p);
 
       char* src1 = pori;
       char* dest1 = pori - m_strides[d];
@@ -1025,92 +923,80 @@ namespace mln
       char* src2 = dest2 - m_strides[d];
 
       for (int i = 0; i < m_border; ++i)
-        {
-          _copy_line<d+1>(src1, dest1);
-          _copy_line<d+1>(src2, dest2);
-          src1 += m_strides[d];
-          dest1 -= m_strides[d];
-          src2 -= m_strides[d];
-          dest2 += m_strides[d];
-        }
+      {
+        _copy_line<d + 1>(src1, dest1);
+        _copy_line<d + 1>(src2, dest2);
+        src1 += m_strides[d];
+        dest1 -= m_strides[d];
+        src2 -= m_strides[d];
+        dest2 += m_strides[d];
+      }
     }
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type
-    ndimage_extension<T, dim>::_mirror(char* ptr)
+    typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_mirror(char* ptr)
     {
-      (void) ptr;
+      (void)ptr;
     }
-
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type
-    ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
+    typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
     {
       for (int k = 0; k < m_shp[d] + 2 * m_border; ++k)
-        {
-          _copy_line<d+1>(src, dest);
-          src += m_strides[d];
-          dest += m_strides[d];
-        }
+      {
+        _copy_line<d + 1>(src, dest);
+        src += m_strides[d];
+        dest += m_strides[d];
+      }
     }
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type
-    ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
+    typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
     {
       *(reinterpret_cast<T*>(dest)) = *(reinterpret_cast<T*>(src));
     }
 
-
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type
-    ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
+    typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
     {
       for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
-        _fillall<d+1>(ptr, v);
+        _fillall<d + 1>(ptr, v);
 
       for (int i = 0; i < m_shp[d]; ++i, ptr += m_strides[d])
-        _fill<d+1>(ptr, v);
+        _fill<d + 1>(ptr, v);
 
       for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
-        _fillall<d+1>(ptr, v);
+        _fillall<d + 1>(ptr, v);
     }
-
-      template <typename T, unsigned dim>
-      template <unsigned d>
-      typename std::enable_if<(d == dim)>::type
-      ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
-      {
-        (void) ptr;
-        (void) v;
-      }
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type
-    ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+    typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
     {
-      for (int i = 0; i < m_shp[d] + (2*m_border); ++i, ptr += m_strides[d])
-        _fillall<d+1>(ptr, v);
+      (void)ptr;
+      (void)v;
     }
 
-      template <typename T, unsigned dim>
-      template <unsigned d>
-      typename std::enable_if<(d == dim)>::type
-      ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
-      {
-        *(reinterpret_cast<T*>(ptr)) = v;
-      }
+    template <typename T, unsigned dim>
+    template <unsigned d>
+    typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+    {
+      for (int i = 0; i < m_shp[d] + (2 * m_border); ++i, ptr += m_strides[d])
+        _fillall<d + 1>(ptr, v);
+    }
 
+    template <typename T, unsigned dim>
+    template <unsigned d>
+    typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+    {
+      *(reinterpret_cast<T*>(ptr)) = v;
+    }
   }
 
 } // end of namespace mln
-
-
 
 #endif // !MLN_CORE_IMAGE_NDIMAGE_HH

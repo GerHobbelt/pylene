@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
-# define MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
+#define MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
 
-# include <mln/core/range/range.hpp>
+#include <mln/core/range/range.hpp>
 
 namespace mln
 {
@@ -12,7 +12,7 @@ namespace mln
     void generate(Range&& rng, Generator f)
     {
       mln_iter(vin, rng);
-      mln_forall(vin)
+      mln_forall (vin)
         *vin = f();
     }
 
@@ -20,4 +20,4 @@ namespace mln
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
+#endif //! MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP

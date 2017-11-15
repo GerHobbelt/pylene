@@ -1,9 +1,9 @@
 #ifndef MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
-# define MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
+#define MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
 
-# include <mln/core/concept/object.hpp>
-# include <mln/core/concept/check.hpp>
-# include <boost/concept_check.hpp>
+#include <boost/concept_check.hpp>
+#include <mln/core/concept/check.hpp>
+#include <mln/core/concept/object.hpp>
 
 namespace mln
 {
@@ -16,7 +16,7 @@ namespace mln
   protected:
     AccumulatorLike() = default;
     AccumulatorLike(const AccumulatorLike&) = default;
-    AccumulatorLike& operator= (const AccumulatorLike&) = default;
+    AccumulatorLike& operator=(const AccumulatorLike&) = default;
   };
 
   /// \brief Concept for accumulator objects
@@ -42,18 +42,15 @@ namespace mln
     BOOST_CONCEPT_USAGE(FeatureSet)
     {
       typedef typename E::features features __mln__attribute__((unused));
-      check_inner_struct_apply<E> ();
+      check_inner_struct_apply<E>();
     }
   };
-
-
 
   template <typename Acc>
   struct Accumulator_
   {
-    typedef typename Acc::argument_type    argument_type;
-    typedef typename Acc::result_type      result_type;
-
+    typedef typename Acc::argument_type argument_type;
+    typedef typename Acc::result_type result_type;
 
     BOOST_CONCEPT_USAGE(Accumulator_)
     {
@@ -64,11 +61,11 @@ namespace mln
     }
 
   private:
-    Acc           accu, accu2;
+    Acc accu, accu2;
     argument_type x;
-    result_type   res;
+    result_type res;
   };
 
 } // end of namespace mln
 
-#endif //!MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
+#endif //! MLN_ACCU_CONCEPT_ACCUMULATOR_HPP

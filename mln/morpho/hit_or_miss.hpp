@@ -1,13 +1,12 @@
 #ifndef MLN_MORPHO_HIT_OR_MISS_HPP
-# define MLN_MORPHO_HIT_OR_MISS_HPP
+#define MLN_MORPHO_HIT_OR_MISS_HPP
 
-# include <mln/core/image/image.hpp>
-# include <mln/morpho/structural/dilate.hpp>
-# include <mln/morpho/structural/erode.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/morpho/structural/dilate.hpp>
+#include <mln/morpho/structural/erode.hpp>
 
 /// \file
 /// \ingroup morpho
-
 
 namespace mln
 {
@@ -36,38 +35,28 @@ namespace mln
     /// \param se_miss  Structuring element for background
     /// \param out (optional) Output image 𝑔 so store the result.
     template <class I, class SEh, class SEm, class OutputImage>
-    OutputImage&
-    hit_or_miss(const Image<I>& input,
-                const StructuringElement<SEh>& se_hit,
-                const StructuringElement<SEm>& se_miss,
-                Image<OutputImage>& out);
+    OutputImage& hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                             const StructuringElement<SEm>& se_miss, Image<OutputImage>& out);
 
     /// \ingroup morpho
-    /// \overload  OutputImage& hit_or_miss(const Image<I>&, const StructuringElement<SEh>&, const StructuringElement<SEm>&, Image<OutputImage>&);
+    /// \overload  OutputImage& hit_or_miss(const Image<I>&, const StructuringElement<SEh>&, const
+    /// StructuringElement<SEm>&, Image<OutputImage>&);
     template <class I, class SEh, class SEm>
-    mln_concrete(I)
-    hit_or_miss(const Image<I>& input,
-                const StructuringElement<SEh>& se_hit,
-                const StructuringElement<SEm>& se_miss);
+    mln_concrete(I) hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                                const StructuringElement<SEm>& se_miss);
 
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
-
 
     namespace impl
     {
 
       // Gray level impl
       template <class I, class SEh, class SEm, class OutputImage, typename V>
-      OutputImage&
-      unconstrained_hit_or_miss(const I& f,
-                                const SEh& seh,
-                                const SEm& sem,
-                                OutputImage& out,
-                                V __v__)
+      OutputImage& unconstrained_hit_or_miss(const I& f, const SEh& seh, const SEm& sem, OutputImage& out, V __v__)
       {
-        (void) __v__;
+        (void)__v__;
         mln_entering("mln::morpho::hit_or_miss(generic)");
 
         auto ero = morpho::structural::erode(f, seh);
@@ -83,14 +72,9 @@ namespace mln
 
       // Boolean case
       template <class I, class SEh, class SEm, class OutputImage>
-      OutputImage&
-      unconstrained_hit_or_miss(const I& f,
-                                const SEh& seh,
-                                const SEm& sem,
-                                OutputImage& out,
-                                bool __v__)
+      OutputImage& unconstrained_hit_or_miss(const I& f, const SEh& seh, const SEm& sem, OutputImage& out, bool __v__)
       {
-        (void) __v__;
+        (void)__v__;
         mln_entering("mln::morpho::hit_or_miss(boolean)");
 
         auto ero = morpho::structural::erode(f, seh);
@@ -102,35 +86,25 @@ namespace mln
         mln_exiting();
         return out;
       }
-
-
-
     }
 
     template <class I, class SEh, class SEm, class OutputImage>
-    OutputImage&
-    hit_or_miss(const Image<I>& input,
-                const StructuringElement<SEh>& se_hit,
-                const StructuringElement<SEm>& se_miss,
-                Image<OutputImage>& out)
+    OutputImage& hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                             const StructuringElement<SEm>& se_miss, Image<OutputImage>& out)
     {
-      impl::unconstrained_hit_or_miss(exact(input), exact(se_hit), exact(se_miss), exact(out), mln_value(I) ());
+      impl::unconstrained_hit_or_miss(exact(input), exact(se_hit), exact(se_miss), exact(out), mln_value(I)());
       return exact(out);
     }
 
     template <class I, class SEh, class SEm>
-    mln_concrete(I)
-    hit_or_miss(const Image<I>& input,
-                const StructuringElement<SEh>& se_hit,
-                const StructuringElement<SEm>& se_miss)
+    mln_concrete(I) hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                                const StructuringElement<SEm>& se_miss)
     {
       const I& f = exact(input);
       mln_concrete(I) out = imconcretize(f);
-      impl::unconstrained_hit_or_miss(f, exact(se_hit), exact(se_miss), out, mln_value(I) ());
+      impl::unconstrained_hit_or_miss(f, exact(se_hit), exact(se_miss), out, mln_value(I)());
       return out;
     }
-
-
 
   } // end of namespace mln::morpho
 

@@ -1,5 +1,5 @@
 #ifndef MLN_CORE_DONTCARE_HPP
-# define MLN_CORE_DONTCARE_HPP
+#define MLN_CORE_DONTCARE_HPP
 
 /// \file Dontcare type (a dummy type used in metaprogramming)
 
@@ -13,17 +13,12 @@ namespace mln
   {
 
     template <class... T>
-    constexpr
-    dontcare_t(T...)
-    {
-    };
+    constexpr dontcare_t(T...){};
 
     template <class... T>
-    void
-    operator() (T...) const
+    void operator()(T...) const
     {
     }
-
   };
 
   namespace
@@ -33,4 +28,4 @@ namespace mln
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_DONTCARE_HPP
+#endif //! MLN_CORE_DONTCARE_HPP

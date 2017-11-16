@@ -1,9 +1,7 @@
 #ifndef MLN_CORE_ALGORITHM_IMFILL_HPP
 # define MLN_CORE_ALGORITHM_IMFILL_HPP
 
-# include <mln/core/concept/image.hpp>
-# include <boost/range/algorithm/fill.hpp>
-
+# include <mln/core/image/image.hpp>
 
 namespace mln {
 

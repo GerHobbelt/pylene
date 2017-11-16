@@ -228,9 +228,6 @@ namespace mln
     {
       mln_entering("mln::morpho::filter_direct_and_reconstruct");
 
-      typedef component_tree<P, Amap> tree_t;
-      typedef typename tree_t::vertex_id_t vertex_id_t;
-
       //ValueMap vmap = value_map;
       property_map<component_tree<P, Amap>, typename ValueMap::value_type> vmap(tree);
 
@@ -246,7 +243,6 @@ namespace mln
           px.val() = vmap[x];
         }
 
-      mln_exiting();
     }
 
     template <class P, class Amap, class PredicateMap, class ValueMap>
@@ -257,9 +253,6 @@ namespace mln
     {
       mln_entering("mln::morpho::filter_direct");
 
-      typedef component_tree<P, Amap> tree_t;
-      typedef typename tree_t::vertex_id_t vertex_id_t;
-
       property_map<component_tree<P, Amap>, typename ValueMap::value_type> vmap(tree);
 
       mln_foreach(auto x, tree.nodes())
@@ -268,7 +261,6 @@ namespace mln
         else
           vmap[x] = value_map[x];
 
-      mln_exiting();
       return vmap;
     }
 

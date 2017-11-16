@@ -2,6 +2,7 @@
 # define SIMPLIFY_HPP
 
 #include <vector>
+#include <set>
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/extension/fill.hpp>

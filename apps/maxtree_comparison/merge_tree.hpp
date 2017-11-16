@@ -2,7 +2,7 @@
 # define MLN_CORE_MORPHO_MERGE_TREE_HPP
 
 # include <thread>
-# include <mln/morpho/maxtree_routines.hpp>
+# include "maxtree_routines.hpp"
 
 namespace mln
 {

@@ -7,8 +7,8 @@
 # include <mln/core/algorithm/sort_sites.hpp>
 # include <mln/core/wrt_offset.hpp>
 
-# include <mln/morpho/merge_tree.hpp>
-# include <mln/morpho/canonize.hpp>
+# include "merge_tree.hpp"
+# include "canonize.hpp"
 
 # include <tbb/parallel_reduce.h>
 # include <tbb/parallel_for.h>

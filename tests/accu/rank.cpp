@@ -2,17 +2,14 @@
 #include <mln/core/value/int.hpp>
 #include <ratio>
 
-#define BOOST_TEST_MODULE Accu
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
-
-BOOST_AUTO_TEST_CASE(Rank)
+TEST(Accu, Rank)
 {
   using namespace mln::accu;
   using mln::uint8;
 
-  typedef std::ratio<1,2> R;
-
+  typedef std::ratio<1, 2> R;
 
   {
     accumulators::h_rank<uint8, R> acc;
@@ -20,7 +17,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(1);
     acc.take(2);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), 1);
+    ASSERT_EQ(extractor::h_rank<R>(acc), 1);
   }
 
   {
@@ -29,7 +26,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(1);
     acc.take(0);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), 1);
+    ASSERT_EQ(extractor::h_rank<R>(acc), 1);
   }
 
   {
@@ -39,7 +36,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(1);
     acc.take(0);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), 1);
+    ASSERT_EQ(extractor::h_rank<R>(acc), 1);
   }
 
   {
@@ -49,7 +46,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(1);
     acc.take(2);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), 2);
+    ASSERT_EQ(extractor::h_rank<R>(acc), 2);
   }
 
   {
@@ -61,7 +58,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(3);
     acc.take(0);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), 2);
+    ASSERT_EQ(extractor::h_rank<R>(acc), 2);
   }
 
   {
@@ -73,7 +70,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(6);
     acc.untake(3);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), 5);
+    ASSERT_EQ(extractor::h_rank<R>(acc), 5);
   }
 
   {
@@ -83,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(1);
     acc.take(0);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), true);
+    ASSERT_EQ(extractor::h_rank<R>(acc), true);
   }
 
   {
@@ -93,7 +90,6 @@ BOOST_AUTO_TEST_CASE(Rank)
     acc.take(1);
     acc.take(0);
 
-    BOOST_CHECK_EQUAL(extractor::h_rank<R>(acc), true);
+    ASSERT_EQ(extractor::h_rank<R>(acc), true);
   }
-
 }

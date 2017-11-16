@@ -35,6 +35,7 @@
 # include <mln/morpho/tos/pset.hpp>
 # include <mln/morpho/tos/pset_priority.hpp>
 
+# include <vector>
 
 namespace mln
 {

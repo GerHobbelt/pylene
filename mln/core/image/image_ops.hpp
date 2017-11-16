@@ -1,10 +1,14 @@
 #ifndef MLN_CORE_IMAGE_IMAGE_OPS_HPP
 # define MLN_CORE_IMAGE_IMAGE_OPS_HPP
 
-# include <mln/core/image/image_expr.hpp>
+# include <mln/core/image/image.hpp>
 # include <mln/core/ops.hpp>
+
 # include <boost/utility/enable_if.hpp>
+
+# include <type_traits>
 # include <iostream>
+
 namespace mln
 {
   /// \defgroup ima_ops Image operators

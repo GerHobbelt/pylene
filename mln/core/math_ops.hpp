@@ -8,6 +8,7 @@
 */
 
 # include <utility>
+# include <cstdlib>
 # include <cmath>
 
 namespace mln

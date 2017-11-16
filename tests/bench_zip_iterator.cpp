@@ -14,7 +14,7 @@
 
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/accu/accumulators/min.hpp>
-#include <mln/kernel/kernel.hpp>
+#include <mln/kernelv2/kernel.hpp>
 
 #include <boost/range/numeric.hpp>
 #include <boost/timer.hpp>
@@ -258,15 +258,16 @@ test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
   extension::fill(b, std::numeric_limits<int>::max());
 
   {
-    const kernel::image<0> f{};
-    const kernel::image<1> out{};
-    using kernel::placeholders::n;
-    using kernel::placeholders::p;
+    auto f = kernel::make_image_expr<0>(a);
+    auto out = kernel::make_image_expr<1>(b);
+    kernel::Point p;
+    kernel::Neighbor n;
+
     const kernel::Aggregate<mln::accu::features::min<>> Min = {};
 
-    auto expr = (out(p) = Min(f(n)));
+    auto expr = kernel::declare(out(p) = Min(f(n)));
 
-    kernel::execute(expr, c8, a, b);
+    kernel::execute(expr, c8);
   }
 }
 
@@ -280,17 +281,17 @@ test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
   extension::fill(b, std::numeric_limits<int>::max());
 
   {
-    const kernel::image<0> f{};
-    const kernel::image<1> out{};
-    using kernel::placeholders::n;
-    using kernel::placeholders::p;
+    auto f = kernel::make_image_expr<0>(a);
+    auto out = kernel::make_image_expr<1>(b);
+    kernel::Point p;
+    kernel::Neighbor n;
 
     const kernel::Aggregate<mln::accu::features::min<>> Min = {};
     const kernel::Aggregate<mln::accu::features::max<>> Max = {};
 
-    auto expr = (out(p) = Max(f(n)) - Min(f(n)));
+    auto expr = kernel::declare(out(p) = Max(f(n)) - Min(f(n)));
 
-    kernel::execute(expr, c8, a, b);
+    kernel::execute(expr, c8);
   }
 }
 

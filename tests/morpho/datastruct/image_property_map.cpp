@@ -1,19 +1,18 @@
+#include <mln/core/algorithm/iota.hpp>
+#include <mln/core/forall.hpp>
+#include <mln/core/foreach.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
 #include <mln/morpho/datastruct/image_property_map.hpp>
-#include <mln/core/foreach.hpp>
-#include <mln/core/forall.hpp>
-#include <mln/core/algorithm/iota.hpp>
+
 #include <array>
 
-#define BOOST_TEST_MODULE Morpho
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(property_image)
+#include <gtest/gtest.h>
 
 using namespace mln;
-typedef morpho::component_tree<char, std::array<char, 256> > tree_t;
+typedef morpho::component_tree<char, std::array<char, 256>> tree_t;
 
-tree_t make_tree()
+tree_t
+make_tree()
 {
   tree_t tree;
 
@@ -28,15 +27,9 @@ tree_t make_tree()
   //   / \       |
   //  f  g,h     k
 
-  data->m_nodes = {
-    { 0, 6, 1, 0, 11}, // sentinel
-    { 0, 0, 2, 0, 0},
-    { 1, 1, 3, 5, 3},
-    { 2, 2, 4, 4, 5},
-    { 2, 3, 5, 5, 6},
-    { 1, 4, 6, 0, 8},
-    { 5, 5, 0, 0, 10}
-  };
+  data->m_nodes = {{0, 6, 1, 0, 11}, // sentinel
+                   {0, 0, 2, 0, 0},  {1, 1, 3, 5, 3}, {2, 2, 4, 4, 5},
+                   {2, 3, 5, 5, 6},  {1, 4, 6, 0, 8}, {5, 5, 0, 0, 10}};
 
   data->m_S = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'};
 
@@ -50,8 +43,7 @@ tree_t make_tree()
   return tree.get_subtree(1);
 }
 
-
-BOOST_AUTO_TEST_CASE(property_image)
+TEST(Morpho, property_image)
 {
   tree_t tree = make_tree();
   property_map<tree_t, int> vmap(tree);
@@ -63,15 +55,15 @@ BOOST_AUTO_TEST_CASE(property_image)
     int i = 0;
     mln_pixter(px, ima);
     mln_iter(nit, tree.nodes());
-    mln_forall(px, nit)
+    mln_forall (px, nit)
     {
-      BOOST_CHECK_EQUAL(px->val(), i++);
-      BOOST_CHECK(px->point() == *nit);
+      ASSERT_EQ(px->val(), i++);
+      ASSERT_TRUE(px->point() == *nit);
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(property_image_nbh)
+TEST(Morpho, property_image_nbh)
 {
   tree_t tree = make_tree();
   property_map<tree_t, int> vmap(tree);
@@ -80,28 +72,20 @@ BOOST_AUTO_TEST_CASE(property_image_nbh)
   iota(ima, 1);
 
   {
-    std::vector<unsigned> voisins[7] = {
-      {},
-      {2,5},
-      {1,3,4},
-      {2},
-      {2},
-      {1,6},
-      {5}
-    };
+    std::vector<unsigned> voisins[7] = {{}, {2, 5}, {1, 3, 4}, {2}, {2}, {1, 6}, {5}};
 
     morpho::tree_neighb_t nbh;
     {
       mln_pixter(px, ima);
       mln_iter(nx, nbh(px));
       int i = 1;
-      mln_forall(px)
+      mln_forall (px)
       {
         unsigned j = 0;
-        mln_forall(nx)
+        mln_forall (nx)
         {
-          BOOST_CHECK_EQUAL(nx->val(), voisins[i][j]);
-          BOOST_CHECK_EQUAL(nx->point().id(), voisins[i][j]);
+          ASSERT_EQ(nx->val(), voisins[i][j]);
+          ASSERT_EQ(nx->point().id(), voisins[i][j]);
           ++j;
         }
         ++i;
@@ -112,22 +96,17 @@ BOOST_AUTO_TEST_CASE(property_image_nbh)
       mln_piter(p, ima);
       mln_iter(n, nbh(p));
       int i = 1;
-      mln_forall(p)
+      mln_forall (p)
       {
         unsigned j = 0;
-        mln_forall(n)
+        mln_forall (n)
         {
-          BOOST_CHECK_EQUAL(ima(*n), voisins[i][j]);
-          BOOST_CHECK(n->id() == voisins[i][j]);
+          ASSERT_EQ(ima(*n), voisins[i][j]);
+          ASSERT_TRUE(n->id() == voisins[i][j]);
           ++j;
         }
         ++i;
       }
     }
-
   }
 }
-
-
-
-BOOST_AUTO_TEST_SUITE_END()

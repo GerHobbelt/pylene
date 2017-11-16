@@ -1,5 +1,9 @@
-/build
+/build*
+/cmake-build-*
 /doc/build
 /doc/html
 /doc/doxyxml
-
+.vscode
+.vs
+.idea
+*.pyc

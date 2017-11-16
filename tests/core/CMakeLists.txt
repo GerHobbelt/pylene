@@ -1,4 +1,4 @@
-add_executable(bench_iterator ../bench_iterator.cpp)
+add_executable(bench_iterator ../bench_iterator.cpp ../helpers.hpp)
 add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
 set(test_prefix "UTCore_")
@@ -14,7 +14,6 @@ add_core_test(${test_prefix}forloop forloop.cpp)
 add_core_test(${test_prefix}range               range/range.cpp)
 add_core_test(${test_prefix}range_filter        range/filter.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
-
 
 # test Images
 add_core_test(${test_prefix}image2d             image/image2d.cpp)
@@ -38,6 +37,8 @@ add_core_test(${test_prefix}extension_fill     extension/fill.cpp)
 
 # test Value
 add_core_test(${test_prefix}value_int          value/int.cpp)
+
+# test Vec
 add_core_test(${test_prefix}vec_math_ops       vec/vec_math_ops.cpp)
 
 # test Algorithms

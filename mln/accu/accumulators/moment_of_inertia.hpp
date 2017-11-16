@@ -2,6 +2,7 @@
 # define MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
 
 # include <mln/core/math_ops.hpp>
+# include <mln/core/value/value_traits.hpp>
 # include <mln/accu/accumulators/sum.hpp>
 # include <mln/accu/accumulators/count.hpp>
 # include <mln/accu/accumulators/mean.hpp>

@@ -4,8 +4,7 @@
 #include <iostream>
 #include <mln/io/imsave.hpp>
 
-inline void
-brush(QPixmap* pixmap, const QPointF& position, QColor color, int r)
+inline void brush(QPixmap* pixmap, const QPointF& position, QColor color, int r)
 {
   QPainter painter(pixmap);
   painter.setBrush(color);
@@ -22,8 +21,7 @@ MyBrush::MyBrush(mln::qt::ImageViewer* viewer, callback_fun_t callback)
   m_ori = mln::clone(viewer->getView());
 }
 
-bool
-MyBrush::eventFilter(QObject* obj, QEvent* ev)
+bool MyBrush::eventFilter(QObject* obj, QEvent* ev)
 {
   (void)obj;
   if (m_active and ev->type() == QEvent::GraphicsSceneMouseMove)
@@ -38,28 +36,24 @@ MyBrush::eventFilter(QObject* obj, QEvent* ev)
   return false;
 }
 
-void
-MyBrush::setColor1()
+void MyBrush::setColor1()
 {
   m_active = true;
   m_color = Qt::red;
 }
 
-void
-MyBrush::setColor2()
+void MyBrush::setColor2()
 {
   m_active = true;
   m_color = Qt::blue;
 }
 
-void
-MyBrush::setRadius(int k)
+void MyBrush::setRadius(int k)
 {
   m_radius = k;
 }
 
-void
-MyBrush::run()
+void MyBrush::run()
 {
   std::cout << "Running." << std::endl;
   std::cout << "Reject value: " << m_reject_value << std::endl;
@@ -71,28 +65,24 @@ MyBrush::run()
   m_viewer->update();
 }
 
-void
-MyBrush::revert()
+void MyBrush::revert()
 {
   m_pixmap->setPixmap(m_ima);
 }
 
-void
-MyBrush::reload()
+void MyBrush::reload()
 {
   m_viewer->getView() = mln::clone(m_ori);
   m_viewer->update();
   m_ima = m_pixmap->pixmap(); // FLUSH THE MARKERS
 }
 
-void
-MyBrush::set_reject_value(const QString& v)
+void MyBrush::set_reject_value(const QString& v)
 {
   m_reject_value = v.toFloat();
 }
 
-void
-MyBrush::set_ambiguity_policy(int index)
+void MyBrush::set_ambiguity_policy(int index)
 {
   QComboBox* combo = qobject_cast<QComboBox*>(sender());
   if (combo == NULL)

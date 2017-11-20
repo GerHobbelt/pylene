@@ -109,7 +109,7 @@ namespace mln
       composite_feature<typename boost::mpl::copy<
           typename fsetA::features,
           boost::mpl::inserter<typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2>>>::type>
-      operator&(const FeatureSet<fsetA>&, const FeatureSet<fsetB>&)
+          operator&(const FeatureSet<fsetA>&, const FeatureSet<fsetB>&)
       {
         return composite_feature<typename boost::mpl::copy<
             typename fsetA::features,

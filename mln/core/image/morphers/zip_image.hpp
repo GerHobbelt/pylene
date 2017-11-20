@@ -5,6 +5,7 @@
 #include <mln/core/internal/tuple_utility.hpp>
 #include <mln/core/range/transform.hpp>
 #include <mln/core/range/zip.hpp>
+
 #include <tuple>
 
 namespace mln
@@ -387,7 +388,7 @@ namespace mln
     zip_image(Images&&... images) : m_images(std::forward_as_tuple(images...)) {}
 
     friend internal::initializer<mln_concrete(zip_image), typename internal::image_init_from<zip_image>::type>
-    imconcretize(const zip_image& f)
+        imconcretize(const zip_image& f)
     {
       using mln::imchvalue;
       return std::move(imchvalue<value_type>(std::get<0>(f.m_images)));
@@ -395,7 +396,7 @@ namespace mln
 
     template <typename V>
     friend internal::initializer<mln_ch_value(zip_image, V), typename internal::image_init_from<zip_image>::type>
-    imchvalue(const zip_image& f)
+        imchvalue(const zip_image& f)
     {
       using mln::imchvalue;
       return std::move(imchvalue<V>(std::get<0>(f.m_images)));

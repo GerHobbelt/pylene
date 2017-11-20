@@ -9,6 +9,9 @@
 #include <QWidget>
 #include <vector>
 
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/point.hpp>
+
 /// \brief Abstract class for attributes
 class Attribute : public QObject
 {

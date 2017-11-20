@@ -2,7 +2,7 @@
 #define MLN_CORE_RANGE_HPP
 
 #include <boost/range.hpp>
-#include <mln/core/range/range_category.hpp>
+#include <mln/core/range/category.hpp>
 
 namespace mln
 {

@@ -82,10 +82,11 @@ namespace mln
 
     template <typename T, typename V, class is_face_2_t = internal::Yes, typename Compare = std::less<V>,
               typename SumType = rgb<std::size_t>>
-    image2d<T>
-    area_filter(const image2d<T>& ima, const image2d<V>& K, const image2d<typename image2d<V>::size_type>& parent,
-                const std::vector<typename image2d<V>::size_type>& S, unsigned lambda,
-                const is_face_2_t& is_face2 = is_face_2_t(), const SumType& = SumType(), const Compare& cmp = Compare())
+    image2d<T> area_filter(const image2d<T>& ima, const image2d<V>& K,
+                           const image2d<typename image2d<V>::size_type>& parent,
+                           const std::vector<typename image2d<V>::size_type>& S, unsigned lambda,
+                           const is_face_2_t& is_face2 = is_face_2_t(), const SumType& = SumType(),
+                           const Compare& cmp = Compare())
     {
       typedef typename image2d<V>::size_type size_type;
 

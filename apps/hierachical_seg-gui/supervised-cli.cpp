@@ -11,16 +11,15 @@
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 
-#include "myheap.hpp"
+#include <apps/supervised-gui/myheap.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 
 using namespace mln;
 
 typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
 
-property_map<tree_t, float>
-run_djikstra(const tree_t& tree, property_map<tree_t, uint8>& colormap, const property_map<tree_t, rgb<int>>& vmap,
-             int color)
+property_map<tree_t, float> run_djikstra(const tree_t& tree, property_map<tree_t, uint8>& colormap,
+                                         const property_map<tree_t, rgb<int>>& vmap, int color)
 {
   property_map<tree_t, float> distancemap(tree, value_traits<float>::max());
   property_map<tree_t, int> posmap(tree, -1);
@@ -67,8 +66,7 @@ run_djikstra(const tree_t& tree, property_map<tree_t, uint8>& colormap, const pr
   return distancemap;
 }
 
-image2d<rgb8>
-segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const image2d<rgb8>& markers__)
+image2d<rgb8> segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const image2d<rgb8>& markers__)
 {
   image2d<uint8> markers_ = transform(markers__, [](const rgb8& v) -> uint8 {
     if (v == colors::literal::red)
@@ -155,8 +153,7 @@ segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const image2d<rgb8>
   return Kadjust_to(rec, ima_.domain());
 }
 
-image2d<bool>
-segmentation(const tree_t& tree, const image2d<rgb8>& ima_, const image2d<uint8>& markers__)
+image2d<bool> segmentation(const tree_t& tree, const image2d<rgb8>& ima_, const image2d<uint8>& markers__)
 {
   image2d<uint8> markers_ = transform(markers__, [](const uint8& v) -> uint8 {
     if (v == 0)
@@ -203,8 +200,7 @@ segmentation(const tree_t& tree, const image2d<rgb8>& ima_, const image2d<uint8>
   return Kadjust_to(color, ima_.domain());
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 5)
   {

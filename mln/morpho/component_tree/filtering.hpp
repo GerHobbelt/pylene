@@ -39,7 +39,8 @@ namespace mln
     /// remain.
     template <class P, class Amap, class PredicateMap, class ValueMap>
     property_map<component_tree<P, Amap>, typename ValueMap::value_type>
-    filter_direct(const component_tree<P, Amap>& tree, const PredicateMap& predicate_map, const ValueMap& value_map);
+        filter_direct(const component_tree<P, Amap>& tree, const PredicateMap& predicate_map,
+                      const ValueMap& value_map);
 
     template <class P, class Amap, class PredicateMap, class ValueMap, class OutputImage>
     void filter_direct_and_reconstruct(const component_tree<P, Amap>& tree, const PredicateMap& predicate_map,
@@ -218,7 +219,7 @@ namespace mln
 
     template <class P, class Amap, class PredicateMap, class ValueMap>
     property_map<component_tree<P, Amap>, typename ValueMap::value_type>
-    filter_direct(const component_tree<P, Amap>& tree, const PredicateMap& predicate_map, const ValueMap& value_map)
+        filter_direct(const component_tree<P, Amap>& tree, const PredicateMap& predicate_map, const ValueMap& value_map)
     {
       mln_entering("mln::morpho::filter_direct");
 

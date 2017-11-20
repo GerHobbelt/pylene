@@ -1,6 +1,8 @@
 #ifndef MLN_CORE_IMAGE_INTERNAL_REINDEX_HPP
 #define MLN_CORE_IMAGE_INTERNAL_REINDEX_HPP
 
+#include <mln/core/image/image.hpp>
+
 namespace mln
 {
 

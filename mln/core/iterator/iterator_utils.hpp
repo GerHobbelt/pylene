@@ -6,6 +6,8 @@
 
 #include <mln/core/concept/iterator.hpp>
 
+#include <type_traits>
+
 namespace mln
 {
 

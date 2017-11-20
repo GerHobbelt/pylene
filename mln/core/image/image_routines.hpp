@@ -9,6 +9,7 @@
 
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/or.hpp>
+
 #include <type_traits>
 
 namespace mln
@@ -89,7 +90,7 @@ namespace mln
   template <typename InputImage>
   inline typename std::enable_if<!image_traits<InputImage>::concrete::value,
                                  mln_concrete(typename std::remove_reference<InputImage>::type)>::type
-  eval(InputImage&& ima)
+      eval(InputImage&& ima)
   {
     return clone(std::forward<InputImage>(ima));
   }

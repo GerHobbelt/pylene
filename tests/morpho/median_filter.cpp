@@ -14,8 +14,7 @@
 
 using namespace mln;
 
-image2d<uint8>
-naive_median(const image2d<uint8>& f, rect2d win, int sz)
+image2d<uint8> naive_median(const image2d<uint8>& f, rect2d win, int sz)
 {
   mln_entering("naive_median");
 

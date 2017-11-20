@@ -1,9 +1,11 @@
-#ifndef APPS_ATTTRIBUTES_MSER_HPP
-#define APPS_ATTTRIBUTES_MSER_HPP
+#ifndef APPS_ATTRIBUTES_MSER_HPP
+#define APPS_ATTRIBUTES_MSER_HPP
 
-#include <cstdlib>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
+
+#include <cstdlib>
+#include <vector>
 
 enum eMSER_attribute
 {
@@ -27,37 +29,37 @@ enum eMSER_attribute
 /// \return
 ///
 template <typename V, typename T, class Distance>
-mln::image2d<float>
-compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                       const std::vector<unsigned>& S, typename std::result_of<Distance(V, V)>::type eps,
-                       eMSER_attribute amser = MSER_DIFF, Distance dist = Distance());
+mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K,
+                                           const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                                           typename std::result_of<Distance(V, V)>::type eps,
+                                           eMSER_attribute amser = MSER_DIFF, Distance dist = Distance());
 
 template <typename V, typename T, typename T2>
-mln::image2d<float>
-compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                       const std::vector<unsigned>& S, T2 eps, eMSER_attribute amser = MSER_DIFF);
+mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K,
+                                           const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, T2 eps,
+                                           eMSER_attribute amser = MSER_DIFF);
 
 /********************/
 /** Implementation **/
 /********************/
 
 template <typename V, typename T, typename T2>
-mln::image2d<float>
-compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                       const std::vector<unsigned>& S, T2 eps, eMSER_attribute amser)
+mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K,
+                                           const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, T2 eps,
+                                           eMSER_attribute amser)
 {
   auto fun = [](V x, V y) { return std::abs(x - y); };
   return compute_MSER_attribute(f, K, parent, S, eps, amser, fun);
 }
 
 template <typename V, typename T, class Distance>
-mln::image2d<float>
-compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                       const std::vector<unsigned>& S, typename std::result_of<Distance(V, V)>::type eps,
-                       eMSER_attribute amser, Distance dist)
+mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K,
+                                           const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                                           typename std::result_of<Distance(V, V)>::type eps, eMSER_attribute amser,
+                                           Distance dist)
 {
   using namespace mln;
-  trace::entering("compute_MSER_attribute");
+  mln_entering("compute_MSER_attribute");
 
   // compute area
   image2d<unsigned> area;
@@ -115,7 +117,7 @@ compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K, const
         break;
       case MSER_RATIO:
         mser[x] = //(float) area[x] / area[y]; break;
-            // mser[x] = std::max(10.0f, (float) (area[y] - maxarea[x]) / area[x]); break;
+                  // mser[x] = std::max(10.0f, (float) (area[y] - maxarea[x]) / area[x]); break;
             mser[x] = (float)(area[smally] - area[x]) / (area[y] - area[x]);
         break;
       case MSER_NORM:
@@ -130,8 +132,8 @@ compute_MSER_attribute(const mln::image2d<V>& f, const mln::image2d<T>& K, const
       mser[S[0]] = 1;
   }
 
-  trace::exiting();
+  mln_exiting();
   return mser;
 }
 
-#endif // ! APPS_ATTTRIBUTES_MSER_HPP
+#endif // ! APPS_ATTRIBUTES_MSER_HPP

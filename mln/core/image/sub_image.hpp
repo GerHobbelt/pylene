@@ -47,19 +47,19 @@ namespace mln
   // Ima | mask
   template <typename I, typename J>
   sub_image<const I&, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(const Image<I>& ima, const Image<J>& mask);
+      make_subimage(const Image<I>& ima, const Image<J>& mask);
 
   template <typename I, typename J>
   sub_image<I&, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(Image<I>& ima, const Image<J>& mask);
+      make_subimage(Image<I>& ima, const Image<J>& mask);
 
   template <typename I, typename J>
   sub_image<const I, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(const Image<I>&& ima, const Image<J>& mask);
+      make_subimage(const Image<I>&& ima, const Image<J>& mask);
 
   template <typename I, typename J>
   sub_image<I, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(Image<I>&& ima, const Image<J>& mask);
+      make_subimage(Image<I>&& ima, const Image<J>& mask);
   /// \}
 
   // Ima | {domain, mask}
@@ -130,7 +130,7 @@ namespace mln
 
   template <typename I, typename J>
   sub_image<const I&, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(const Image<I>& ima, const Image<J>& mask)
+      make_subimage(const Image<I>& ima, const Image<J>& mask)
   {
     static_assert(std::is_convertible<mln_value(J), bool>::value, "J's value type must be convertible to bool.");
     return make_subimage(exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J>(exact(mask))));
@@ -138,7 +138,7 @@ namespace mln
 
   template <typename I, typename J>
   sub_image<I&, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(Image<I>& ima, const Image<J>& mask)
+      make_subimage(Image<I>& ima, const Image<J>& mask)
   {
     static_assert(std::is_convertible<mln_value(J), bool>::value, "J's value type must be convertible to bool.");
     return make_subimage(exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J>(exact(mask))));
@@ -146,7 +146,7 @@ namespace mln
 
   template <typename I, typename J>
   sub_image<const I, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(const Image<I>&& ima, const Image<J>& mask)
+      make_subimage(const Image<I>&& ima, const Image<J>& mask)
   {
     static_assert(std::is_convertible<mln_value(J), bool>::value, "J's value type must be convertible to bool.");
     return make_subimage(move_exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J>(exact(mask))));
@@ -154,7 +154,7 @@ namespace mln
 
   template <typename I, typename J>
   sub_image<I, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
-  make_subimage(Image<I>&& ima, const Image<J>& mask)
+      make_subimage(Image<I>&& ima, const Image<J>& mask)
   {
     static_assert(std::is_convertible<mln_value(J), bool>::value, "J's value type must be convertible to bool.");
     return make_subimage(move_exact(ima), rng::filter(exact(mask).domain(), internal::is_in_mask<J>(exact(mask))));

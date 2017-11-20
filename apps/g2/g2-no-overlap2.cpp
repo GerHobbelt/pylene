@@ -8,12 +8,11 @@
 
 #include <mln/data/stretch.hpp>
 
-#include <mln/morpho/tos/ctos.hpp>
-//#include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/tos/ctos.hpp>
 
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/accu/accumulators/mean.hpp>
@@ -27,8 +26,7 @@
 #include <apps/tos/topology.hpp>
 #include <boost/format.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cerr << "Usage: " << argv[0] << " input.tiff channel1.tree channel1.csv channel2.tree channel2.csv\n";
   std::exit(1);
@@ -48,8 +46,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 6)
     usage(argv);

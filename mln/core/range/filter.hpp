@@ -3,6 +3,8 @@
 
 #include <mln/core/iterator/filter_iterator.hpp>
 
+#include <utility>
+
 namespace mln
 {
 

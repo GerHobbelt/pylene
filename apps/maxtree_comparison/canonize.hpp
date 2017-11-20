@@ -3,6 +3,8 @@
 
 #include "maxtree_routines.hpp"
 
+#include <mln/core/image/image2d.hpp>
+
 namespace mln
 {
   namespace morpho

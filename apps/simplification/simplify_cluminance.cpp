@@ -16,8 +16,7 @@
 #include "simplify.hpp"
 #include <apps/tos/addborder.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(gray) eps output.tiff [tolerance]" << std::endl
             << "Perform a simplification of the ToS by removing overlapping"
@@ -34,8 +33,7 @@ usage(char** argv)
   std::terminate();
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

@@ -1,6 +1,8 @@
 #ifndef MLN_CORE_UTILS_WRAPPER_HPP
 #define MLN_CORE_UTILS_WRAPPER_HPP
 
+#include <utility>
+
 /// \brief Set of classes used to manage plain value, reference_wrapper and iterator
 /// through a single interface
 

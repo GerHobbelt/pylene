@@ -148,8 +148,7 @@ namespace mln
     return out;
   }
 }
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(color) output[wo ext] lambda [lambda_2...]" << std::endl
             << "Perform a simplification of the ToS by removing non significant"
@@ -160,8 +159,7 @@ usage(char** argv)
   std::terminate();
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   static const bool use_tos = true;
 

@@ -1,8 +1,9 @@
 #ifndef MLN_CORE_IREF_HPP
 #define MLN_CORE_IREF_HPP
 
-#include <memory>
 #include <mln/core/assert.hpp>
+
+#include <memory>
 
 namespace mln
 {

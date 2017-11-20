@@ -17,16 +17,14 @@
 #include "saliency.hpp"
 #include <boost/program_options.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << argv[0] << " method input.tiff output.tiff" << std::endl
             << "method = (mser|meaningfullness)" << std::endl;
   std::terminate();
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
   namespace po = boost::program_options;

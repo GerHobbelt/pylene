@@ -9,8 +9,7 @@
 
 #include <gtest/gtest.h>
 
-mln::image2d<int>
-make_image()
+mln::image2d<int> make_image()
 {
   mln::image2d<int> x(5, 5);
   mln::iota(x, 0);
@@ -32,8 +31,7 @@ struct red : std::unary_function<rgb&, int&>
   const int& operator()(const rgb& x) const { return x.r; }
 };
 
-std::ostream&
-operator<<(std::ostream& ss, const rgb& x)
+std::ostream& operator<<(std::ostream& ss, const rgb& x)
 {
   return ss << boost::make_tuple(x.r, x.g, x.b);
 }

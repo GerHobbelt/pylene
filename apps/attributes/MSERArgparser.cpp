@@ -15,8 +15,7 @@ MSERArgParser::MSERArgParser() : m_desc("MSER options")
       "a1", po::value<float>()->default_value(0.0005), "A1 Penalty term: P = a0.exp(a1 * area)");
 }
 
-boost::program_options::options_description&
-MSERArgParser::description()
+boost::program_options::options_description& MSERArgParser::description()
 {
   return m_desc;
 }

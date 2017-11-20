@@ -16,8 +16,7 @@
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/transform/chamfer_distance_transform.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc != 6)
   {

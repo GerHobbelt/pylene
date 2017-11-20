@@ -3,6 +3,8 @@
 
 #include <boost/range/category.hpp>
 
+#include <type_traits>
+
 namespace mln
 {
 

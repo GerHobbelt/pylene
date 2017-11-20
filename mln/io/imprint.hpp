@@ -45,7 +45,7 @@ namespace mln
       template <typename Image, typename Domain>
       typename std::enable_if<std::is_convertible<typename image_traits<Image>::category, forward_image_tag>::value,
                               void>::type
-      imprint(const Image& ima, Domain domain, std::ostream& os)
+          imprint(const Image& ima, Domain domain, std::ostream& os)
       {
         (void)domain;
         typedef typename Image::const_pixel_type pixel_t;
@@ -58,7 +58,7 @@ namespace mln
 
       template <typename Image, typename P>
       typename std::enable_if<image_traits<Image>::accessible::value, void>::type
-      imprint(const Image& ima, box<P, 2> domain, std::ostream& os)
+          imprint(const Image& ima, box<P, 2> domain, std::ostream& os)
       {
         typedef typename Image::value_type V;
 
@@ -88,7 +88,7 @@ namespace mln
 
       template <typename Image, typename P>
       typename std::enable_if<image_traits<Image>::accessible::value, void>::type
-      imprint_with_border(const Image& ima, box<P, 2> domain, std::ostream& os)
+          imprint_with_border(const Image& ima, box<P, 2> domain, std::ostream& os)
       {
         typedef typename Image::value_type V;
 

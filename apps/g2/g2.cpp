@@ -29,7 +29,6 @@
 #include <boost/graph/random_spanning_tree.hpp>
 #include <boost/graph/transpose_graph.hpp>
 #include <boost/property_map/function_property_map.hpp>
-//#include <boost/random/mersenne_twister.hpp>
 
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/pattern_spectra.hpp>
@@ -92,8 +91,7 @@ namespace mln
 }
 
 template <class WeightPropertyMap>
-void
-make_minimum_spanning_tree(Graph& g, const WeightPropertyMap& weights)
+void make_minimum_spanning_tree(Graph& g, const WeightPropertyMap& weights)
 {
   mln_entering("Minimum Spanning tree computation");
   Graph tg;
@@ -116,8 +114,7 @@ make_minimum_spanning_tree(Graph& g, const WeightPropertyMap& weights)
 
 template <class WeightPropertyMap,
           class Compare = std::less<typename boost::property_traits<WeightPropertyMap>::value_type>>
-void
-make_shortest_path_dag(Graph& g, const WeightPropertyMap& weights, Compare cmp = Compare())
+void make_shortest_path_dag(Graph& g, const WeightPropertyMap& weights, Compare cmp = Compare())
 {
   mln_entering("Minimum Spanning tree computation");
   Graph tg;
@@ -146,8 +143,7 @@ make_shortest_path_dag(Graph& g, const WeightPropertyMap& weights, Compare cmp =
 }
 
 template <class WeightPropertyMap, class Function>
-float
-compute_graph_energy(const Graph& g, const WeightPropertyMap& w, Function f, float init)
+float compute_graph_energy(const Graph& g, const WeightPropertyMap& w, Function f, float init)
 {
   Graph::edge_iterator it, end;
   std::tie(it, end) = boost::edges(g);
@@ -156,8 +152,7 @@ compute_graph_energy(const Graph& g, const WeightPropertyMap& w, Function f, flo
   return res;
 }
 
-boost::vector_property_map<unsigned>
-compute_graph_depth(const Graph& g)
+boost::vector_property_map<unsigned> compute_graph_depth(const Graph& g)
 {
   boost::vector_property_map<unsigned> depth(boost::num_vertices(g));
   // auto viz_ = boost::record_distances(depth, boost::on_tree_edge ());
@@ -180,9 +175,8 @@ compute_graph_depth(const Graph& g)
 }
 
 template <class ValueMap, class BinaryFunction, class ValueType>
-mln::image2d<ValueType>
-write_vmap_to_image(const Graph& g, const mln::image2d<mln::vec3u>& pixmap, const ValueMap& vmap, BinaryFunction op,
-                    ValueType init)
+mln::image2d<ValueType> write_vmap_to_image(const Graph& g, const mln::image2d<mln::vec3u>& pixmap,
+                                            const ValueMap& vmap, BinaryFunction op, ValueType init)
 {
   (void)g;
 
@@ -228,8 +222,7 @@ write_vmap_to_image(const Graph& g, const mln::image2d<mln::vec3u>& pixmap, cons
 
 // }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 3)
   {

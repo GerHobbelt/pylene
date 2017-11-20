@@ -9,10 +9,6 @@
 #include <mln/morpho/filtering.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/addborder.hpp>
-//#include <apps/tos/objdetection.hpp>
-//#include <apps/attributes/MSER.hpp>
 #include "attributes/area.hpp"
 #include "attributes/gray.hpp"
 #include "attributes/meaningfullness.hpp"
@@ -20,12 +16,13 @@
 #include "dispatcher.hpp"
 #include "plotwindow.hpp"
 #include "qattribute.hpp"
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
 #include <mln/qt/imageviewer.hpp>
 
 #include <apps/saliency/extinction.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

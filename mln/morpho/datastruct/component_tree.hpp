@@ -603,14 +603,14 @@ namespace mln
 
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::node_range
-    component_tree<P, AssociativeMap>::nodes(bool ignore_root) const
+        component_tree<P, AssociativeMap>::nodes(bool ignore_root) const
     {
       return node_range(this, m_root, ignore_root);
     }
 
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::node_range
-    component_tree<P, AssociativeMap>::nodes_without_root() const
+        component_tree<P, AssociativeMap>::nodes_without_root() const
     {
       return node_range(this, m_root, true);
     }
@@ -623,7 +623,7 @@ namespace mln
 
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::node_type
-    component_tree<P, AssociativeMap>::get_node(vertex_id_t v) const
+        component_tree<P, AssociativeMap>::get_node(vertex_id_t v) const
     {
       mln_precondition(v < size());
 
@@ -632,14 +632,14 @@ namespace mln
 
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::vertex_id_t
-    component_tree<P, AssociativeMap>::get_node_id(const point_type& p) const
+        component_tree<P, AssociativeMap>::get_node_id(const point_type& p) const
     {
       return m_data->m_pmap[p];
     }
 
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::node_type
-    component_tree<P, AssociativeMap>::get_node_at(const point_type& p) const
+        component_tree<P, AssociativeMap>::get_node_at(const point_type& p) const
     {
       return node_type(this, m_data->m_pmap[p]);
     }
@@ -656,7 +656,7 @@ namespace mln
 
     template <class P, class AssociativeMap>
     inline const typename component_tree<P, AssociativeMap>::_data_t*
-    component_tree<P, AssociativeMap>::_get_data() const
+        component_tree<P, AssociativeMap>::_get_data() const
     {
       return m_data.get();
     }
@@ -669,7 +669,7 @@ namespace mln
 
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::vertex_id_t
-    component_tree<P, AssociativeMap>::get_root_id() const
+        component_tree<P, AssociativeMap>::get_root_id() const
     {
       return m_root;
     }

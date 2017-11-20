@@ -54,9 +54,9 @@ namespace mln
 
 #define mln_simple_forall(p) for (p.init(); !p.finished(); p.next())
 
-  /******************************************/
-  /****             mln_iter             ****/
-  /******************************************/
+/******************************************/
+/****             mln_iter             ****/
+/******************************************/
 
 #define mln_iter(p, range) auto p = mln::rng::iter(range);
 
@@ -92,9 +92,9 @@ namespace mln
 #define mln_pixter(...)                                                                                                \
   __mln_pixter_impl__(BOOST_PP_DIV(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2), BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
-  /******************************************/
-  /****             mln_piter             ****/
-  /******************************************/
+/******************************************/
+/****             mln_piter             ****/
+/******************************************/
 
 #define mln_piter(p, ima) auto p = ima.domain().iter();
 

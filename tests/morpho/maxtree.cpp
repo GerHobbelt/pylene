@@ -40,8 +40,7 @@ namespace mln
 }
 
 template <typename V, typename size_type>
-bool
-iscanonized(const mln::image2d<V>& ima, const mln::image2d<size_type>& parent)
+bool iscanonized(const mln::image2d<V>& ima, const mln::image2d<size_type>& parent)
 {
   mln_pixter(px, parent);
   mln_forall (px)
@@ -57,8 +56,7 @@ iscanonized(const mln::image2d<V>& ima, const mln::image2d<size_type>& parent)
 }
 
 template <typename V>
-bool
-iscanonized(const mln::image2d<V>& ima, const mln::image2d<mln::morpho::maxtree_node>& tree)
+bool iscanonized(const mln::image2d<V>& ima, const mln::image2d<mln::morpho::maxtree_node>& tree)
 {
   mln_pixter(px, tree);
   mln_forall (px)
@@ -73,8 +71,7 @@ iscanonized(const mln::image2d<V>& ima, const mln::image2d<mln::morpho::maxtree_
   return true;
 }
 
-bool
-check_S(const mln::image2d<mln::morpho::maxtree_node>& tree, unsigned root)
+bool check_S(const mln::image2d<mln::morpho::maxtree_node>& tree, unsigned root)
 {
   using namespace mln;
   image2d<bool> dejavu;
@@ -91,8 +88,7 @@ check_S(const mln::image2d<mln::morpho::maxtree_node>& tree, unsigned root)
   return true;
 }
 
-mln::image2d<std::size_t>
-pt2idx(const mln::image2d<mln::point2d>& parent)
+mln::image2d<std::size_t> pt2idx(const mln::image2d<mln::point2d>& parent)
 {
   mln::image2d<std::size_t> out;
   mln::resize(out, parent);
@@ -104,8 +100,7 @@ pt2idx(const mln::image2d<mln::point2d>& parent)
 }
 
 template <typename V, typename StrictWeakOrdering>
-void
-runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
+void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
 {
   using namespace mln;
 

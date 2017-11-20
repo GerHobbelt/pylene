@@ -59,11 +59,11 @@ namespace mln
   {
   };
 
-  /******************************************************/
-  /**                HELPER MACROS                     **/
-  /******************************************************/
+/******************************************************/
+/**                HELPER MACROS                     **/
+/******************************************************/
 
-  // Consider perfect forwarding here.
+// Consider perfect forwarding here.
 
 #define MLN_IMMORPHER_FORWARD_IF_0_(COND, F, RETURN, CV)                                                               \
   typename std::enable_if<COND, RETURN>::type F() CV { return morpher_core_access::get_ima(this).F(); }

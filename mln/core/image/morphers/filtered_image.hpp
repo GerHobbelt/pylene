@@ -299,7 +299,7 @@ namespace mln
     filtered_image(I&& ima, const Predicate& pred) : filtered_image_base<I, Predicate>(std::forward<I>(ima), pred) {}
 
     friend internal::initializer<mln_concrete(filtered_image), typename internal::image_init_from<filtered_image>::type>
-    imconcretize(const filtered_image& f)
+        imconcretize(const filtered_image& f)
     {
       sub_image<I, domain_t> sub(f.m_ima, {f.m_ima, f.m_pred});
       return std::move(imconcretize(sub));
@@ -308,7 +308,7 @@ namespace mln
     template <typename V>
     friend internal::initializer<mln_ch_value(filtered_image, V),
                                  typename internal::image_init_from<filtered_image>::type>
-    imchvalue(const filtered_image& f)
+        imchvalue(const filtered_image& f)
     {
       sub_image<I, domain_t> sub(f.m_ima, {f.m_ima, f.m_pred});
       return std::move(imchvalue<V>(sub));

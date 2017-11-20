@@ -18,9 +18,8 @@ enum e_output_mode
 /// \brief Export a shape in dot as a cluster containing all points
 /// of the shape as node.
 template <typename shape_t>
-std::string
-export_shape_as_cluster(int id, const shape_t& shp, std::ostream& dotsream, mln::image2d<bool>& deja_vu,
-                        bool summary = true);
+std::string export_shape_as_cluster(int id, const shape_t& shp, std::ostream& dotsream, mln::image2d<bool>& deja_vu,
+                                    bool summary = true);
 
 /// \brief Export a shape in dot as node containing the image of the
 /// shape.
@@ -28,22 +27,20 @@ export_shape_as_cluster(int id, const shape_t& shp, std::ostream& dotsream, mln:
 /// Note: the image is exported as pbm (shape_id.pbm) and has to be
 /// converted to png before dottififcation
 template <typename shape_t>
-std::string
-export_shape_as_image(int id, const shape_t& shp, const mln::box2d& domain, std::ostream& dotsream,
-                      const std::string& dirname = "./");
+std::string export_shape_as_image(int id, const shape_t& shp, const mln::box2d& domain, std::ostream& dotsream,
+                                  const std::string& dirname = "./");
 
 template <typename shape_t, typename V>
-void
-save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vector<shape_t>& shapes,
-           const mln::image2d<V>& ima, const std::string& filename);
+void save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vector<shape_t>& shapes,
+                const mln::image2d<V>& ima, const std::string& filename);
 
 /**************************/
 /** Implementation        */
 /**************************/
 
 template <typename shape_t>
-std::string
-export_shape_as_cluster(int id, const shape_t& shp, std::ostream& dotsream, mln::image2d<bool>& deja_vu, bool summary)
+std::string export_shape_as_cluster(int id, const shape_t& shp, std::ostream& dotsream, mln::image2d<bool>& deja_vu,
+                                    bool summary)
 {
   using namespace mln;
 
@@ -97,9 +94,8 @@ export_shape_as_cluster(int id, const shape_t& shp, std::ostream& dotsream, mln:
 }
 
 template <typename shape_t>
-std::string
-export_shape_as_image(int id, const shape_t& shp, const mln::box2d& domain, std::ostream& dotsream,
-                      const std::string& dirname)
+std::string export_shape_as_image(int id, const shape_t& shp, const mln::box2d& domain, std::ostream& dotsream,
+                                  const std::string& dirname)
 {
   // New cluster
   dotsream << "  subgraph cluster" << id << "{" << std::endl << "label=\"" << shp << "\";" << std::endl;
@@ -119,9 +115,8 @@ export_shape_as_image(int id, const shape_t& shp, const mln::box2d& domain, std:
 }
 
 template <typename shape_t, typename V>
-void
-save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vector<shape_t>& shapes,
-           const mln::image2d<V>& ima, const std::string& filename, const std::string& dirname)
+void save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vector<shape_t>& shapes,
+                const mln::image2d<V>& ima, const std::string& filename, const std::string& dirname)
 {
   std::ofstream file(filename);
   mln::image2d<bool> deja_vu;

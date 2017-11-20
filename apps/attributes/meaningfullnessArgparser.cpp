@@ -11,8 +11,7 @@ MeaningFullNessArgParser::MeaningFullNessArgParser() : m_desc("MeaningFullNess A
       "eps", po::value<int>()->default_value(5), "Radius for external/internal region");
 }
 
-boost::program_options::options_description&
-MeaningFullNessArgParser::description()
+boost::program_options::options_description& MeaningFullNessArgParser::description()
 {
   return m_desc;
 }

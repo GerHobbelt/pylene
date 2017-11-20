@@ -10,7 +10,7 @@ namespace mln
     struct dontcare
     {
       template <typename T>
-      dontcare(T){};
+      dontcare(T&&){};
     };
   }
 }

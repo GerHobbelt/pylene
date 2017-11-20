@@ -2,6 +2,7 @@
 #include "compute_attribute.hpp"
 #include "thicken.hpp"
 #include "topology.hpp"
+
 #include <boost/format.hpp>
 #include <libgen.h>
 #include <mln/core/algorithm/clone.hpp>
@@ -17,8 +18,7 @@
 #include <mln/morpho/tos/immerse.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-void
-usage(int argc, char** argv)
+void usage(int argc, char** argv)
 {
   if (argc < 6 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
       (argv[2] != std::string("min") && argv[2] != std::string("max")))
@@ -293,8 +293,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

@@ -15,7 +15,7 @@ namespace mln
     std::pair<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
               property_map<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
                            typename std::result_of<Distance(mln_value(I), mln_value(I))>::type>>
-    alphatree_indexes(const Image<I>& f, const Neighborhood<N>& nbh, Distance d = Distance());
+        alphatree_indexes(const Image<I>& f, const Neighborhood<N>& nbh, Distance d = Distance());
 
     /*******************************/
     /***   Implementation        ***/
@@ -36,7 +36,7 @@ namespace mln
     std::pair<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
               property_map<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
                            typename std::result_of<Distance(mln_value(I), mln_value(I))>::type>>
-    alphatree_indexes(const Image<I>& f_, const Neighborhood<N>& nbh_, Distance distance)
+        alphatree_indexes(const Image<I>& f_, const Neighborhood<N>& nbh_, Distance distance)
     {
       mln_entering("mln::morpho::alphatree_indexes");
 

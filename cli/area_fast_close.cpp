@@ -7,8 +7,7 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/morpho/algebraic_filter.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

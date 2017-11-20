@@ -23,8 +23,8 @@ using namespace mln;
 // Global
 image2d<rgb8> original;
 
-property_map<tree_t, uint8>
-labelize_tree(const tree_t& tree, const image2d<uint8>& markers, unsigned labelization_policy)
+property_map<tree_t, uint8> labelize_tree(const tree_t& tree, const image2d<uint8>& markers,
+                                          unsigned labelization_policy)
 {
   property_map<tree_t, uint8> colormap(tree, NONE);
 
@@ -79,9 +79,8 @@ labelize_tree(const tree_t& tree, const image2d<uint8>& markers, unsigned labeli
   return colormap;
 }
 
-image2d<rgb8>
-segmentation(const tree_t& tree, const property_map<tree_t, rgb<int>>& vmap, const image2d<rgb8>& ori,
-             const image2d<rgb8>& markers__, float reject = 0.5, unsigned policy = 0)
+image2d<rgb8> segmentation(const tree_t& tree, const property_map<tree_t, rgb<int>>& vmap, const image2d<rgb8>& ori,
+                           const image2d<rgb8>& markers__, float reject = 0.5, unsigned policy = 0)
 {
   mln_entering("Running the classification");
 
@@ -212,8 +211,7 @@ segmentation(const tree_t& tree, const property_map<tree_t, rgb<int>>& vmap, con
   return output;
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   QApplication a(argc, argv);
 

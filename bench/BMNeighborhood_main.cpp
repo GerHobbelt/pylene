@@ -1,22 +1,17 @@
-#include <benchmark/benchmark.h>
 
+#include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-//#include <mln/core/neighborhood/sliding_viter.hpp>
-#include <mln/core/algorithm/iota.hpp>
+
+#include <benchmark/benchmark.h>
 
 using namespace mln;
 
-long
-bench_pixter_0(const image2d<int>& ima);
-long
-bench_pixter(const image2d<int>& ima);
-long
-bench_piter(const image2d<int>& ima);
-long
-bench_indexes(const image2d<int>& ima);
-long
-bench_pointers(const image2d<int>& ima);
+long bench_pixter_0(const image2d<int>& ima);
+long bench_pixter(const image2d<int>& ima);
+long bench_piter(const image2d<int>& ima);
+long bench_indexes(const image2d<int>& ima);
+long bench_pointers(const image2d<int>& ima);
 
 class Bench_Neighborhood : public benchmark::Fixture
 {

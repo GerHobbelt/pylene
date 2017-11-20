@@ -1,6 +1,7 @@
 #ifndef GET_BORDER_FROM_NBH_CPP
 #define GET_BORDER_FROM_NBH_CPP
 
+#include <mln/core/foreach.hpp>
 #include <mln/core/point.hpp>
 
 namespace mln

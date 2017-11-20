@@ -13,10 +13,10 @@ namespace mln
   {
 
     template <class... T>
-    constexpr dontcare_t(T...){};
+    constexpr dontcare_t(T&&...){};
 
     template <class... T>
-    void operator()(T...) const
+    void operator()(T&&...) const
     {
     }
   };

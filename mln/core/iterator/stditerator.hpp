@@ -1,8 +1,9 @@
 #ifndef STDITERATOR_HPP
 #define STDITERATOR_HPP
 
-#include <iterator>
 #include <mln/core/iterator/iterator_base.hpp>
+
+#include <iterator>
 #include <type_traits>
 
 namespace mln

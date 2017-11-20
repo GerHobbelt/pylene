@@ -28,7 +28,7 @@ namespace mln
     ///
     template <typename I, typename Neighborhood, class Distance>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
-    ToSdistance(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, Distance dist);
+        ToSdistance(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, Distance dist);
 
     /*********************************/
     /***  Implementation	  ****/
@@ -82,7 +82,7 @@ namespace mln
 
     template <typename I, typename Neighborhood, class Distance>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
-    ToSdistance(const Image<I>& ima_, const Neighborhood& nbh, mln_point(I) pmin, Distance dist)
+        ToSdistance(const Image<I>& ima_, const Neighborhood& nbh, mln_point(I) pmin, Distance dist)
     {
       using namespace mln::morpho::tos;
 

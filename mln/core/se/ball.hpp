@@ -2,6 +2,7 @@
 #define MLN_CORE_SE_BALL_HPP
 
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
+
 #include <vector>
 
 namespace mln

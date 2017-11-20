@@ -21,7 +21,8 @@ namespace mln
   ///
   template <class P, class AMap, class I>
   property_map<morpho::component_tree<P, AMap>, float>
-  compute_meaningfullness_external_energy(const morpho::component_tree<P, AMap>& tree, const Image<I>& vmap, int eps);
+      compute_meaningfullness_external_energy(const morpho::component_tree<P, AMap>& tree, const Image<I>& vmap,
+                                              int eps);
 
   /// \brief generic function to compute a contextual energy
   /// This function supposes a tree computed with 0 and 1-faces. The accumulation
@@ -40,8 +41,8 @@ namespace mln
   ///         accumulation on thes internal/external/whole regions.
   template <class P, class I, class AccuLike>
   property_map<morpho::component_tree<P, image2d<P>>, vec<typename accu::result_of<AccuLike, mln_value(I)>::type, 3>>
-  compute_regional_energy(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
-                          const AccumulatorLike<AccuLike>& accu, int eps);
+      compute_regional_energy(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
+                              const AccumulatorLike<AccuLike>& accu, int eps);
 
   /*********************/
   /** Implementation ***/
@@ -49,8 +50,8 @@ namespace mln
 
   template <class P, class I, class AccuLike>
   property_map<morpho::component_tree<P, image2d<P>>, vec<typename accu::result_of<AccuLike, mln_value(I)>::type, 3>>
-  compute_regional_energy(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
-                          const AccumulatorLike<AccuLike>& accu_, int eps)
+      compute_regional_energy(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
+                              const AccumulatorLike<AccuLike>& accu_, int eps)
   {
     mln_entering("mln::compute_regional_energy");
 
@@ -169,7 +170,8 @@ namespace mln
 
   template <class P, class AMap, class I>
   property_map<morpho::component_tree<P, AMap>, float>
-  compute_meaningfullness_external_energy(const morpho::component_tree<P, AMap>& tree, const Image<I>& vmap, int eps)
+      compute_meaningfullness_external_energy(const morpho::component_tree<P, AMap>& tree, const Image<I>& vmap,
+                                              int eps)
   {
     auto attrmap = compute_regional_energy(tree, vmap, accu::features::variance<double>(), eps);
 

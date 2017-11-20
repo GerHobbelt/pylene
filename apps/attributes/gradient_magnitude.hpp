@@ -12,7 +12,7 @@ namespace mln
 
   template <class P, class AMap, class V>
   property_map<morpho::component_tree<P, AMap>, float>
-  compute_gradient_magnitude(const morpho::component_tree<P, AMap>& tree, const image2d<V>& f)
+      compute_gradient_magnitude(const morpho::component_tree<P, AMap>& tree, const image2d<V>& f)
   {
     mln_entering("mln::compute_gradient_magnitude");
 

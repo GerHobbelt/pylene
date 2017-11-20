@@ -20,7 +20,7 @@ namespace mln
     /// \param cmp A strict weak order on values
     template <typename I, typename N, typename StrictWeakOrdering = std::less<mln_value(I)>>
     component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp = StrictWeakOrdering());
+        maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp = StrictWeakOrdering());
 
     ///
     /// \brief Compute a mintree as a component tree where nodes
@@ -39,7 +39,7 @@ namespace mln
 
     template <typename I, typename N, typename StrictWeakOrdering>
     component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp)
+        maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp)
     {
       mln_entering("mln::morpho::maxtree_indexes");
       auto res = impl::maxtree_queue_indexes(exact(ima), exact(nbh), cmp);

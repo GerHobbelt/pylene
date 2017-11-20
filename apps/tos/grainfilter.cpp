@@ -13,8 +13,7 @@
 #include <mln/morpho/filtering.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-void
-usage(int argc, char** argv)
+void usage(int argc, char** argv)
 {
   if (argc < 3)
   {
@@ -26,8 +25,7 @@ usage(int argc, char** argv)
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

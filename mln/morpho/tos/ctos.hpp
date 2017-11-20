@@ -30,20 +30,20 @@ namespace mln
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>,
               typename Equiv = internal::equiv<Compare>, bool use_priority = false>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq);
+        cToS(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq);
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>,
               typename Equiv = internal::equiv<Compare>>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
+        cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare());
+        cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare());
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_pinf(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp = Compare());
+        cToS_pinf(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp = Compare());
 
     /***********************************************/
     /* Same as before but using priority proagation */
@@ -52,16 +52,17 @@ namespace mln
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>,
               typename Equiv = internal::equiv<Compare>>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_priority(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq);
+        cToS_priority(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp,
+                      const Equiv& eq);
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>,
               typename Equiv = internal::equiv<Compare>>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
+        cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
 
     template <typename I, typename Neighborhood, typename Compare = std::less<mln_value(I)>>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare());
+        cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp = Compare());
 
     /********************/
     /** Implementation **/
@@ -88,14 +89,14 @@ namespace mln
 
     template <typename I, typename Neighborhood, typename Compare, typename Equiv, bool use_priority>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq)
+        cToS(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq)
     {
       return impl::parallel::cToS(ima, nbh, pmin, cmp, eq);
     }
 
     template <typename I, typename Neighborhood, typename Compare, typename Equiv>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& equiv)
+        cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& equiv)
     {
       mln_point(I) pmin = exact(ima).domain().pmin;
       return impl::parallel::cToS(ima, nbh, pmin, cmp, equiv);
@@ -103,7 +104,7 @@ namespace mln
 
     template <typename I, typename Neighborhood, typename Compare>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp)
+        cToS(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp)
     {
       mln_point(I) pmin = exact(ima).domain().pmin;
       return impl::parallel::cToS(ima, nbh, pmin, cmp, internal::equiv<Compare>(cmp));
@@ -111,22 +112,22 @@ namespace mln
 
     template <typename I, typename Neighborhood, typename Compare>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_pinf(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp)
+        cToS_pinf(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp)
     {
       return impl::parallel::cToS(ima, nbh, pmin, cmp, internal::equiv<Compare>(cmp));
     }
 
     template <typename I, typename Neighborhood, typename Compare, typename Equiv>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_priority(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp,
-                  const Equiv& equiv)
+        cToS_priority(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp,
+                      const Equiv& equiv)
     {
       return impl::parallel::cToS<I, Neighborhood, Compare, Equiv, true>(ima, nbh, pmin, cmp, equiv);
     }
 
     template <typename I, typename Neighborhood, typename Compare, typename Equiv>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& equiv)
+        cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp, const Equiv& equiv)
     {
       mln_point(I) pmin = exact(ima).domain().pmin;
       return impl::parallel::cToS<I, Neighborhood, Compare, Equiv, true>(ima, nbh, pmin, cmp, equiv);
@@ -134,7 +135,7 @@ namespace mln
 
     template <typename I, typename Neighborhood, typename Compare>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp)
+        cToS_priority(const Image<I>& ima, const Neighborhood& nbh, const Compare& cmp)
     {
       mln_point(I) pmin = exact(ima).domain().pmin;
       return impl::parallel::cToS<I, Neighborhood, Compare, internal::equiv<Compare>, true>(

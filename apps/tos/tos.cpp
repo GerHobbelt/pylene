@@ -20,8 +20,7 @@
 
 namespace po = boost::program_options;
 
-po::variables_map
-usage(int argc, char** argv)
+po::variables_map usage(int argc, char** argv)
 {
 
   po::options_description desc("Allowed options");
@@ -131,8 +130,7 @@ namespace mln
 }
 
 template <typename V, typename Compare = std::less<V>>
-std::tuple<V, V, V>
-minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())
+std::tuple<V, V, V> minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())
 {
   if (cmp(x, y))
   {
@@ -154,8 +152,7 @@ minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

@@ -25,8 +25,7 @@
 #include <apps/tos/croutines.hpp>
 
 // Compute the depth attribute of each graph node
-boost::vector_property_map<unsigned>
-compute_graph_depth(const MyGraph& g)
+boost::vector_property_map<unsigned> compute_graph_depth(const MyGraph& g)
 {
   mln_entering("Compute graph depth");
 
@@ -49,8 +48,7 @@ compute_graph_depth(const MyGraph& g)
 
 // Compute the per-pixel attribute and reconstruct
 template <class ValueMap>
-void
-write_vmap_to_image(const tree_t* t, const tlink_t* tlink, const ValueMap& vmap, mln::image2d<mln::uint16>& out)
+void write_vmap_to_image(const tree_t* t, const tlink_t* tlink, const ValueMap& vmap, mln::image2d<mln::uint16>& out)
 {
   mln_foreach (auto px, out.pixels())
   {
@@ -68,7 +66,7 @@ write_vmap_to_image(const tree_t* t, const tlink_t* tlink, const ValueMap& vmap,
 /// \brief Remove non-2F from the tree
 template <class P>
 mln::morpho::component_tree<P, mln::image2d<P>>
-tree_keep_2F(const mln::morpho::component_tree<P, mln::image2d<P>>& tree)
+    tree_keep_2F(const mln::morpho::component_tree<P, mln::image2d<P>>& tree)
 {
   using namespace mln;
   morpho::component_tree<P, image2d<P>> out;
@@ -109,8 +107,7 @@ tree_keep_2F(const mln::morpho::component_tree<P, mln::image2d<P>>& tree)
   return out.get_subtree(tree.get_root_id());
 }
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0]
             << " input[rgb] α₀ α₁ λ output[rgb]\n"
@@ -120,8 +117,7 @@ usage(char** argv)
   std::exit(1);
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 5)
     usage(argv);

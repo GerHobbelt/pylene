@@ -5,6 +5,8 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
 
+#include <vector>
+
 namespace mln
 {
 

@@ -32,7 +32,7 @@ namespace mln
 
         template <typename I, typename Neighborhood, typename Compare, typename Equiv, bool use_priority = false>
         morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-        cToS(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq);
+            cToS(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq);
 
         /************************************/
         /**     Implementation             **/
@@ -51,7 +51,7 @@ namespace mln
 
         template <typename I, typename Neighborhood, typename Compare, typename Equiv, bool use_priority>
         morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-        cToS(const Image<I>& ima_, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq)
+            cToS(const Image<I>& ima_, const Neighborhood& nbh, mln_point(I) pmin, const Compare& cmp, const Equiv& eq)
         {
           mln_entering("mln::morpho::impl::serial::ctos");
           using namespace mln::morpho::tos;

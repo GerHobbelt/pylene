@@ -3,6 +3,7 @@
 
 #include <mln/core/assert.hpp>
 #include <mln/core/concept/pixel.hpp>
+#include <mln/core/image_traits.hpp>
 
 namespace mln
 {

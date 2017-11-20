@@ -27,8 +27,7 @@ typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
 /// \param f The original image to filter out
 /// \param markers__ The image with markers
 /// \param[out] out The image to store the result in.
-void
-segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8>& markers__, image2d<rgb8>& out)
+void segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8>& markers__, image2d<rgb8>& out)
 {
   enum colortag
   {
@@ -111,8 +110,7 @@ segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8>& ma
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   QApplication a(argc, argv);
 

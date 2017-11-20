@@ -1,7 +1,9 @@
 #ifndef MLN_CORE_PIXEL_UTILITY_HPP
 #define MLN_CORE_PIXEL_UTILITY_HPP
 
+#include <mln/core/concept/pixel.hpp>
 #include <mln/core/image/morphers/details/morpher_core_access.hpp>
+#include <mln/core/image_traits.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 
 namespace mln
@@ -50,9 +52,9 @@ namespace mln
     };
   }
 
-    /******************************************/
-    /****          HELPER MACROS          *****/
-    /******************************************/
+/******************************************/
+/****          HELPER MACROS          *****/
+/******************************************/
 
 #define MLN_PIXMORPHER_FORWARD_IF_0_(COND, F, RETURN, CV)                                                              \
   typename std::enable_if<COND, RETURN>::type F() CV { return morpher_core_access::get_pix(this).F(); }

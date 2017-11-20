@@ -12,9 +12,21 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_1)
 {
   using namespace mln;
 
-  image2d<bool> f = {{0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {0, 1, 1, 1, 0}, {0, 1, 1, 1, 0}, {0, 0, 0, 0, 0}};
+  image2d<bool> f = {
+      {0, 0, 0, 0, 0}, //
+      {0, 1, 1, 1, 0}, //
+      {0, 1, 1, 1, 0}, //
+      {0, 1, 1, 1, 0}, //
+      {0, 0, 0, 0, 0}  //
+  };
 
-  image2d<int> ref = {{0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {0, 1, 2, 1, 0}, {0, 1, 1, 1, 0}, {0, 0, 0, 0, 0}};
+  image2d<int> ref = {
+      {0, 0, 0, 0, 0}, //
+      {0, 1, 1, 1, 0}, //
+      {0, 1, 2, 1, 0}, //
+      {0, 1, 1, 1, 0}, //
+      {0, 0, 0, 0, 0}  //
+  };
 
   auto res = transform::chamfer_distance_transform(f, c4);
 
@@ -26,10 +38,20 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_2)
   using namespace mln;
 
   image2d<bool> f = {
-      {1, 0, 0, 0, 0, 1}, {0, 1, 1, 1, 1, 0}, {0, 1, 1, 1, 1, 0}, {0, 1, 1, 1, 1, 0}, {1, 0, 0, 0, 0, 1}};
+      {1, 0, 0, 0, 0, 1}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {1, 0, 0, 0, 0, 1}  //
+  };
 
   image2d<int> ref = {
-      {1, 0, 0, 0, 0, 1}, {0, 1, 1, 1, 1, 0}, {0, 1, 2, 2, 1, 0}, {0, 1, 1, 1, 1, 0}, {1, 0, 0, 0, 0, 1}};
+      {1, 0, 0, 0, 0, 1}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {0, 1, 2, 2, 1, 0}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {1, 0, 0, 0, 0, 1}  //
+  };
 
   auto res = transform::chamfer_distance_transform(f, c4);
 
@@ -41,10 +63,21 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_3)
 {
   using namespace mln;
 
-  image2d<int> f = {{1, 0, 0, 0, 0, 1}, {0, 1, 1, 1, 1, 0}, {0, 1, 1, 1, 1, 0}, {0, 1, 1, 1, 1, 0}, {1, 0, 0, 0, 0, 1}};
+  image2d<int> f = {
+      {1, 0, 0, 0, 0, 1}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {1, 0, 0, 0, 0, 1}  //
+  };
 
   image2d<int> ref = {
-      {1, 0, 0, 0, 0, 1}, {0, 1, 1, 1, 1, 0}, {0, 1, 2, 2, 1, 0}, {0, 1, 1, 1, 1, 0}, {1, 0, 0, 0, 0, 1}};
+      {1, 0, 0, 0, 0, 1}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {0, 1, 2, 2, 1, 0}, //
+      {0, 1, 1, 1, 1, 0}, //
+      {1, 0, 0, 0, 0, 1}  //
+  };
 
   transform::chamfer_distance_transform(f, c4, f);
 
@@ -55,11 +88,25 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_distance_transform)
 {
   using namespace mln;
 
-  image2d<int> f = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}};
+  image2d<int> f = {
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}  //
+  };
 
-  image2d<int> ref = {{1, 1, 1, 1, 1, 1, 1}, {1, 2, 2, 2, 2, 2, 1}, {1, 2, 3, 3, 3, 2, 1}, {1, 2, 3, 4, 3, 2, 1},
-                      {1, 2, 3, 3, 3, 2, 1}, {1, 2, 2, 2, 2, 2, 1}, {1, 1, 1, 1, 1, 1, 1}};
+  image2d<int> ref = {
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 2, 2, 2, 2, 2, 1}, //
+      {1, 2, 3, 3, 3, 2, 1}, //
+      {1, 2, 3, 4, 3, 2, 1}, //
+      {1, 2, 3, 3, 3, 2, 1}, //
+      {1, 2, 2, 2, 2, 2, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}  //
+  };
 
   auto res = transform::chamfer_distance_transform(f, c4);
 
@@ -70,15 +117,27 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_distance_transform)
 {
   using namespace mln;
 
-  image2d<int> f = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}};
+  image2d<int> f = {
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}  //
+  };
 
   int maxv = value_traits<int>::max();
 
-  image2d<int> ref = {{maxv, maxv, maxv, maxv, maxv, maxv, maxv}, {maxv, maxv, maxv, maxv, maxv, maxv, maxv},
-                      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, {maxv, maxv, maxv, maxv, maxv, maxv, maxv},
-                      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, {maxv, maxv, maxv, maxv, maxv, maxv, maxv},
-                      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}};
+  image2d<int> ref = {
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, //
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, //
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, //
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, //
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, //
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}, //
+      {maxv, maxv, maxv, maxv, maxv, maxv, maxv}  //
+  };
 
   auto res = transform::chamfer_distance_transform(f, c4, true);
 
@@ -89,13 +148,25 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_weighted_distance_transfor
 {
   using namespace mln;
 
-  image2d<int> f = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 0, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}};
+  image2d<int> f = {
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 0, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}  //
+  };
 
-  image2d<float> ref = {{1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 1.0f},
-                        {1.0f, 2.0f, 1.5f, 1.0f, 1.5f, 2.0f, 1.0f}, {1.0f, 2.0f, 1.0f, 0.0f, 1.0f, 2.0f, 1.0f},
-                        {1.0f, 2.0f, 1.5f, 1.0f, 1.5f, 2.0f, 1.0f}, {1.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 1.0f},
-                        {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}};
+  image2d<float> ref = {
+      {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}, //
+      {1.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 1.0f}, //
+      {1.0f, 2.0f, 1.5f, 1.0f, 1.5f, 2.0f, 1.0f}, //
+      {1.0f, 2.0f, 1.0f, 0.0f, 1.0f, 2.0f, 1.0f}, //
+      {1.0f, 2.0f, 1.5f, 1.0f, 1.5f, 2.0f, 1.0f}, //
+      {1.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 1.0f}, //
+      {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}  //
+  };
 
   constexpr std::array<point2d, 8> siteset = {
       {{-1, -1}, {-1, +0}, {-1, 1}, {+0, -1}, {+0, 1}, {+1, -1}, {+1, +0}, {+1, 1}}};
@@ -112,14 +183,24 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
 {
   using namespace mln;
 
-  image2d<int> f = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 0, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}};
+  image2d<int> f = {
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 0, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}  //
+  };
 
   image2d<float> ref = {
-      {4.5f, 4.0f, 3.5f, 3.0f, 3.5f, 4.0f, 4.5f}, {4.0f, 3.0f, 2.5f, 2.0f, 2.5f, 3.0f, 4.0f},
-      {3.5f, 2.5f, 1.5f, 1.0f, 1.5f, 2.5f, 3.5f}, {3.0f, 2.0f, 1.0f, 0.0f, 1.0f, 2.0f, 3.0f},
-      {3.5f, 2.5f, 1.5f, 1.0f, 1.5f, 2.5f, 3.5f}, {4.0f, 3.0f, 2.5f, 2.0f, 2.5f, 3.0f, 4.0f},
-      {4.5f, 4.0f, 3.5f, 3.0f, 3.5f, 4.0f, 4.5f},
+      {4.5f, 4.0f, 3.5f, 3.0f, 3.5f, 4.0f, 4.5f}, //
+      {4.0f, 3.0f, 2.5f, 2.0f, 2.5f, 3.0f, 4.0f}, //
+      {3.5f, 2.5f, 1.5f, 1.0f, 1.5f, 2.5f, 3.5f}, //
+      {3.0f, 2.0f, 1.0f, 0.0f, 1.0f, 2.0f, 3.0f}, //
+      {3.5f, 2.5f, 1.5f, 1.0f, 1.5f, 2.5f, 3.5f}, //
+      {4.0f, 3.0f, 2.5f, 2.0f, 2.5f, 3.0f, 4.0f}, //
+      {4.5f, 4.0f, 3.5f, 3.0f, 3.5f, 4.0f, 4.5f}, //
   };
 
   constexpr std::array<point2d, 8> siteset = {
@@ -137,13 +218,26 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
 {
   using namespace mln;
 
-  image2d<int> f = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 0, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}};
+  image2d<int> f = {
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 0, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}, //
+      {1, 1, 1, 1, 1, 1, 1}  //
+  };
 
   constexpr int a = 5, b = 7, c = 11;
-  image2d<int> ref = {{21, 18, 16, 15, 16, 18, 21}, {18, 14, 11, 10, 11, 14, 18}, {16, 11, 7, 5, 7, 11, 16},
-                      {15, 10, 5, 0, 5, 10, 15},    {16, 11, 7, 5, 7, 11, 16},    {18, 14, 11, 10, 11, 14, 18},
-                      {21, 18, 16, 15, 16, 18, 21}};
+  image2d<int> ref = {
+      {21, 18, 16, 15, 16, 18, 21}, //
+      {18, 14, 11, 10, 11, 14, 18}, //
+      {16, 11, 7, 5, 7, 11, 16},    //
+      {15, 10, 5, 0, 5, 10, 15},    //
+      {16, 11, 7, 5, 7, 11, 16},    //
+      {18, 14, 11, 10, 11, 14, 18}, //
+      {21, 18, 16, 15, 16, 18, 21}  //
+  };
 
   constexpr std::array<point2d, 16> siteset = {{{-2, -1},
                                                 {-2, +1},

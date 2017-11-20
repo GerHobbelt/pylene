@@ -1,11 +1,12 @@
 #ifndef MLN_CORE_ALGORITHM_SORT_SITES_HPP
 #define MLN_CORE_ALGORITHM_SORT_SITES_HPP
 
-#include <algorithm>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <algorithm>
 #include <vector>
 
 // FIXME: Speed up HQ version

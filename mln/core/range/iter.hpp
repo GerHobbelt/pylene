@@ -4,6 +4,8 @@
 #include <mln/core/iterator/stditerator.hpp>
 #include <mln/core/range/range_traits.hpp>
 
+#include <type_traits>
+
 namespace mln
 {
 

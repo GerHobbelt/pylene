@@ -2,6 +2,7 @@
 #define MLN_CORE_CONCEPT_CHECK_HPP
 
 #include <boost/concept_check.hpp>
+
 #include <string>
 #include <type_traits>
 

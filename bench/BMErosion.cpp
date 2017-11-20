@@ -9,8 +9,7 @@
 
 using namespace mln;
 
-void
-erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   mln_pixter(px, f);
   mln_pixter(pxout, out);
@@ -25,16 +24,14 @@ erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& o
   }
 }
 
-void
-erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   (void)f;
   (void)out;
   mln::morpho::structural::erode(f, winc8, out, std::less<mln::uint8>());
 }
 
-void
-erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   constexpr int sz = 9;
   auto dpoints = winc8_t::dpoints;
@@ -63,8 +60,7 @@ erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out
   }
 }
 
-void
-erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   constexpr int sz = 9;
   auto dpoints = winc8_t::dpoints;

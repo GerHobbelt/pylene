@@ -7,8 +7,8 @@ namespace mln
   {
 
     QtImageBase::QtImageBase(int nrows, int ncols, int border)
-        : m_view(nrows, ncols, border),
-          m_qima((uchar*)&m_view(m_view.domain().pmin), ncols, nrows, m_view.strides()[0], QImage::Format_RGB888)
+        : m_view(nrows, ncols, border), m_qima((unsigned char*)&m_view(m_view.domain().pmin), ncols, nrows,
+                                               m_view.strides()[0], QImage::Format_RGB888)
     {
     }
 
@@ -22,8 +22,8 @@ namespace mln
 
     void QtImageBase::update()
     {
-      m_qima = QImage((uchar*)&m_view(m_view.domain().pmin), m_view.ncols(), m_view.nrows(), m_view.strides()[0],
-                      QImage::Format_RGB888);
+      m_qima = QImage((unsigned char*)&m_view(m_view.domain().pmin), m_view.ncols(), m_view.nrows(),
+                      m_view.strides()[0], QImage::Format_RGB888);
     }
 
     QVector<QRgb> QtImageBase::default_lut8;

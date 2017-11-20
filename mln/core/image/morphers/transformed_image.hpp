@@ -32,17 +32,17 @@ namespace mln
   transformed_image<I&, UnaryFunction> imtransform(Image<I>& ima, const UnaryFunction& f);
 }
 
-  /******************************************/
-  /****           HELPER MACROS          ****/
-  /******************************************/
+/******************************************/
+/****           HELPER MACROS          ****/
+/******************************************/
 
-  // template <typename I>
-  // transformed_image<I, BOOST_PP_TUPLE_REM () F, false>
-  // NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)
-  // {
-  //   BOOST_PP_TUPLE_REM () F f;
-  //   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f);
-  // }
+// template <typename I>
+// transformed_image<I, BOOST_PP_TUPLE_REM () F, false>
+// NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)
+// {
+//   BOOST_PP_TUPLE_REM () F f;
+//   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f);
+// }
 
 #define MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_TEMPLATE_2(NAME, TYPE, F)                                                   \
   namespace mln                                                                                                        \
@@ -274,7 +274,7 @@ namespace mln
 
       friend internal::initializer<mln_concrete(transformed_image),
                                    typename internal::image_init_from<transformed_image>::type>
-      imconcretize(const transformed_image& f)
+          imconcretize(const transformed_image& f)
       {
         using mln::imchvalue;
         return std::move(imchvalue<value_type>(f.m_ima));
@@ -283,7 +283,7 @@ namespace mln
       template <typename V>
       friend internal::initializer<mln_ch_value(transformed_image, V),
                                    typename internal::image_init_from<transformed_image>::type>
-      imchvalue(const transformed_image& f)
+          imchvalue(const transformed_image& f)
       {
         using mln::imchvalue;
         return std::move(imchvalue<V>(f.m_ima));
@@ -369,14 +369,14 @@ namespace mln
 
       template <typename dummy = reference, typename image_type = image_t>
       typename std::enable_if<image_traits<this_t>::indexable::value, dummy>::type
-      operator[](typename image_type::size_type i)
+          operator[](typename image_type::size_type i)
       {
         return m_fun(this->m_ima[i]);
       }
 
       template <typename dummy = const_reference, typename image_type = image_t>
       typename std::enable_if<image_traits<this_t>::indexable::value, dummy>::type
-      operator[](typename image_type::size_type i) const
+          operator[](typename image_type::size_type i) const
       {
         return m_fun(this->m_ima[i]);
       }

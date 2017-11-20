@@ -9,8 +9,6 @@
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/immerse.hpp>
 
-//#include <mln/core/internal/nested_loop_iterator.hpp>
-
 #include <apps/tos/addborder.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -71,8 +69,7 @@ struct params_t
 //   Vec m_from, m_to;
 // };
 
-void
-showstat(const ublas::triangular_matrix<bool, ublas::upper>& mat)
+void showstat(const ublas::triangular_matrix<bool, ublas::upper>& mat)
 {
   int n = mat.size1();
 
@@ -142,10 +139,9 @@ showstat(const ublas::triangular_matrix<bool, ublas::upper>& mat)
 }
 
 template <class shape_t>
-void
-filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_matrix<bool, ublas::upper>& mat,
-             const ublas::triangular_matrix<bool, ublas::upper>& clos, const mln::image2d<mln::rgb8>& f,
-             const std::vector<int>& grains, bool display)
+void filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_matrix<bool, ublas::upper>& mat,
+                  const ublas::triangular_matrix<bool, ublas::upper>& clos, const mln::image2d<mln::rgb8>& f,
+                  const std::vector<int>& grains, bool display)
 {
   // shapes are supposed to be sorted by size increasing
   using namespace mln;
@@ -260,9 +256,8 @@ filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_matrix
 }
 
 template <class LowerCompare, class UpperCompare>
-void
-compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params_t(), LowerCompare cmp_1 = LowerCompare(),
-        UpperCompare cmp_2 = UpperCompare())
+void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params_t(),
+             LowerCompare cmp_1 = LowerCompare(), UpperCompare cmp_2 = UpperCompare())
 {
   using namespace mln;
   typedef rgb8 Vec;
@@ -490,8 +485,7 @@ compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params_t(),
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
   namespace po = boost::program_options;

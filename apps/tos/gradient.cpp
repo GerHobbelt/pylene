@@ -4,15 +4,13 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-void
-usage(char* argv[])
+void usage(char* argv[])
 {
   std::cerr << "usage: " << argv[0] << " input.ppm size output.ppm" << std::endl;
   std::abort();
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc != 4)
     usage(argv);

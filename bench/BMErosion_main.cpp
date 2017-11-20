@@ -1,9 +1,12 @@
-#include "BMErosion.hpp"
-#include <benchmark/benchmark.h>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <benchmark/benchmark.h>
+
+#include "BMErosion.hpp"
+
 using namespace mln;
 
 struct BMErosion : public benchmark::Fixture

@@ -14,8 +14,7 @@
 #include <boost/format.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(gray) output[wo ext] [lambda [lambda_2...]]" << std::endl
             << "Perform a simplification of the ToS by removing non significant"
@@ -45,8 +44,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 4)
     usage(argv);

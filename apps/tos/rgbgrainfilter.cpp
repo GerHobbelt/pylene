@@ -15,8 +15,7 @@
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-void
-usage(int argc, char** argv)
+void usage(int argc, char** argv)
 {
   std::string type, merge;
   if (argc < 5)
@@ -39,8 +38,7 @@ kill:
 }
 
 template <typename V, typename Compare = std::less<V>>
-std::tuple<V, V, V>
-minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())
+std::tuple<V, V, V> minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())
 {
   if (cmp(x, y))
   {
@@ -131,8 +129,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

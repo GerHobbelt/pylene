@@ -13,7 +13,7 @@ namespace mln
 
     template <typename I, typename Label, typename AccuLike>
     std::vector<typename accu::result_of<AccuLike, mln_point(I)>::type>
-    p_accumulate(const Image<I>& lbl, Label nlabels, const AccumulatorLike<AccuLike>& accu_)
+        p_accumulate(const Image<I>& lbl, Label nlabels, const AccumulatorLike<AccuLike>& accu_)
     {
       static_assert(std::is_same<mln_value(I), Label>::value, "Image value type and Label type must match.");
 
@@ -44,7 +44,7 @@ namespace mln
 
     template <typename I, typename J, typename Label, typename AccuLike>
     std::vector<typename accu::result_of<AccuLike, mln_value(J)>::type>
-    v_accumulate(const Image<I>& lbl_, const Image<J>& f_, Label nlabels, const AccumulatorLike<AccuLike>& accu_)
+        v_accumulate(const Image<I>& lbl_, const Image<J>& f_, Label nlabels, const AccumulatorLike<AccuLike>& accu_)
     {
       static_assert(std::is_same<mln_value(I), Label>::value, "Image value type and Label type must match.");
 

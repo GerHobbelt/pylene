@@ -237,7 +237,7 @@ namespace mln
 
   template <typename U, typename V>
   typename std::enable_if<std::is_arithmetic<U>::value and std::is_arithmetic<V>::value, bool>::type
-  vecprod_isless(const U& u, const V& v)
+      vecprod_isless(const U& u, const V& v)
   {
     return u < v;
   }
@@ -253,7 +253,7 @@ namespace mln
 
   template <typename U, typename V>
   typename std::enable_if<std::is_arithmetic<U>::value and std::is_arithmetic<V>::value, bool>::type
-  vecprod_islessequal(const U& u, const V& v)
+      vecprod_islessequal(const U& u, const V& v)
   {
     return u <= v;
   }

@@ -1,7 +1,10 @@
 #ifndef UNZIP_PROXY_ITERATOR_HPP
 #define UNZIP_PROXY_ITERATOR_HPP
 
+#include <mln/core/concept/pixel.hpp>
+#include <mln/core/image_traits.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
+
 #include <type_traits>
 
 namespace mln

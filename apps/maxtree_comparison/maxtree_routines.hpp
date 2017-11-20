@@ -1,6 +1,9 @@
 #ifndef MAXTREE_ROUTINES_HPP
 #define MAXTREE_ROUTINES_HPP
 
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/point.hpp>
+
 namespace mln
 {
 

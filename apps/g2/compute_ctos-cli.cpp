@@ -3,8 +3,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

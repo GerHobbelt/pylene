@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
 #define MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
 
+#include <mln/core/forall.hpp>
 #include <mln/core/range/range.hpp>
 
 namespace mln

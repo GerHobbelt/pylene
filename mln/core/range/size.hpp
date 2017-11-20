@@ -2,6 +2,8 @@
 #define RANGE_SIZE_HPP
 
 #include <mln/core/range/range.hpp>
+
+#include <cstddef>
 #include <type_traits>
 
 namespace mln

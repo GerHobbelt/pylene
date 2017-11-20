@@ -16,8 +16,7 @@
 #include <mln/morpho/datastruct/checktree.hpp>
 #include <mln/morpho/extinction.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 9)
   {

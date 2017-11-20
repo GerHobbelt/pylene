@@ -1,10 +1,11 @@
 #ifndef MLN_CORE_ALGORITHM_SORT_INDEXES_HPP
 #define MLN_CORE_ALGORITHM_SORT_INDEXES_HPP
 
-#include <algorithm>
 #include <mln/core/image/image.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <algorithm>
 #include <type_traits>
 #include <vector>
 

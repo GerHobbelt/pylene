@@ -6,8 +6,7 @@
 #include <mln/io/imsave.hpp>
 #include <mln/labeling/blobs.hpp>
 
-int
-main(int argc, const char* argv[])
+int main(int argc, const char* argv[])
 {
   using namespace mln;
   if (argc != 3)

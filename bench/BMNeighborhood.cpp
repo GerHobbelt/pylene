@@ -1,4 +1,3 @@
-#include <benchmark/benchmark.h>
 
 #include <boost/concept/assert.hpp>
 // redefine concept assert, suppress the warning etc.
@@ -11,11 +10,11 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/wrt_offset.hpp>
 
-//#include <mln/core/neighborhood/sliding_viter.hpp>
+#include <benchmark/benchmark.h>
+
 using namespace mln;
 
-long
-bench_pixter_0(const image2d<int>& ima)
+long bench_pixter_0(const image2d<int>& ima)
 {
   mln_pixter(px, ima);
   mln_iter(nx, c8(px));
@@ -31,8 +30,7 @@ bench_pixter_0(const image2d<int>& ima)
   return u;
 }
 
-long
-bench_pixter(const image2d<int>& ima)
+long bench_pixter(const image2d<int>& ima)
 {
   mln_pixter(px, ima);
   mln_iter(nx, c8(px));
@@ -44,8 +42,7 @@ bench_pixter(const image2d<int>& ima)
   return u;
 }
 
-long
-bench_piter(const image2d<int>& ima)
+long bench_piter(const image2d<int>& ima)
 {
   mln_iter(p, ima.domain());
   mln_iter(n, c8(p));
@@ -58,8 +55,7 @@ bench_piter(const image2d<int>& ima)
   return u;
 }
 
-long
-bench_indexes(const image2d<int>& ima)
+long bench_indexes(const image2d<int>& ima)
 {
   int idx = static_cast<int>(ima.index_of_point(ima.domain().pmin));
   auto offsets = wrt_delta_index(ima, c8_t::dpoints);
@@ -84,8 +80,7 @@ bench_indexes(const image2d<int>& ima)
   return u;
 }
 
-long
-bench_pointers(const image2d<int>& ima)
+long bench_pointers(const image2d<int>& ima)
 {
   constexpr int sz = 8;
 

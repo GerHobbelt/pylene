@@ -13,7 +13,6 @@ namespace mln
     image2d<V> meanshift(const image2d<V>& f, float hs, float hr)
     {
       int SR = 5;      // Spatial window radius
-      int CR = 10;     // Color window radius
       int NITER = 30;  // Maximal number of iteration
       float eps = 0.1; //
       double hs2 = hs * hs;

@@ -12,7 +12,6 @@
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/routines.hpp>
 #include <mln/morpho/tos/tos.hpp>
-//#include <apps/tos/objdetection.hpp>
 
 #include "to_elipse.hpp"
 #include <apps/attributes/MSER.hpp>
@@ -21,8 +20,7 @@
 #include <apps/saliency/saliency.hpp>
 #include <boost/format.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(gray) output[wo ext] ε grain [λ₁ [λ₂...]]" << std::endl
             << "Perform a simplification of the ToS by removing non significant"
@@ -58,8 +56,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 5)
     usage(argv);

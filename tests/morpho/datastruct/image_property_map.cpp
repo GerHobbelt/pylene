@@ -11,8 +11,7 @@
 using namespace mln;
 typedef morpho::component_tree<char, std::array<char, 256>> tree_t;
 
-tree_t
-make_tree()
+tree_t make_tree()
 {
   tree_t tree;
 
@@ -27,9 +26,15 @@ make_tree()
   //   / \       |
   //  f  g,h     k
 
-  data->m_nodes = {{0, 6, 1, 0, 11}, // sentinel
-                   {0, 0, 2, 0, 0},  {1, 1, 3, 5, 3}, {2, 2, 4, 4, 5},
-                   {2, 3, 5, 5, 6},  {1, 4, 6, 0, 8}, {5, 5, 0, 0, 10}};
+  data->m_nodes = {
+      {0, 6, 1, 0, 11}, // sentinel
+      {0, 0, 2, 0, 0},  //
+      {1, 1, 3, 5, 3},  //
+      {2, 2, 4, 4, 5},  //
+      {2, 3, 5, 5, 6},  //
+      {1, 4, 6, 0, 8},  //
+      {5, 5, 0, 0, 10}  //
+  };
 
   data->m_S = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'};
 

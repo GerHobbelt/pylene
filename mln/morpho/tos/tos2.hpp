@@ -58,11 +58,12 @@ namespace mln
     template <typename I, typename Domain, typename Neighborhood, typename Compare = std::less<mln_value(I)>,
               typename Equiv = internal::equiv<Compare>>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
-    subToS(const Image<I>& ima, const Domain& subdomain, const Neighborhood& nbh, const Compare& cmp, const Equiv& eq);
+        subToS(const Image<I>& ima, const Domain& subdomain, const Neighborhood& nbh, const Compare& cmp,
+               const Equiv& eq);
 
     template <typename I, typename Domain, typename Neighborhood, typename Compare = std::less<mln_value(I)>>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
-    subToS(const Image<I>& ima, const Domain& subdomain, const Neighborhood& nbh, const Compare& cmp = Compare());
+        subToS(const Image<I>& ima, const Domain& subdomain, const Neighborhood& nbh, const Compare& cmp = Compare());
 
     /********************/
     /** Implementation **/
@@ -97,8 +98,8 @@ namespace mln
     template <typename I, typename Domain, typename Neighborhood, typename Compare = std::less<mln_value(I)>,
               typename Equiv = internal::equiv<Compare>>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
-    subToS(const Image<I>& ima_, const image2d<bool>& mask, const Domain& subdomain, const Neighborhood& nbh,
-           const Compare& cmp, const Equiv& eq)
+        subToS(const Image<I>& ima_, const image2d<bool>& mask, const Domain& subdomain, const Neighborhood& nbh,
+               const Compare& cmp, const Equiv& eq)
     {
       using namespace mln::morpho::tos;
 
@@ -214,8 +215,8 @@ namespace mln
 
     template <typename I, typename Domain, typename Neighborhood, typename Compare = std::less<mln_value(I)>>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
-    subToS(const Image<I>& ima, const image2d<bool>& mask, const Domain& subdomain, const Neighborhood& nbh,
-           const Compare& cmp = Compare())
+        subToS(const Image<I>& ima, const image2d<bool>& mask, const Domain& subdomain, const Neighborhood& nbh,
+               const Compare& cmp = Compare())
     {
       return subToS(ima, mask, subdomain, nbh, cmp, internal::equiv<Compare>(cmp));
     }

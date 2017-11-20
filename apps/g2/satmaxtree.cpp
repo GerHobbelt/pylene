@@ -11,7 +11,7 @@ namespace mln
 
   std::pair<morpho::component_tree<unsigned, image2d<unsigned>>,
             property_map<morpho::component_tree<unsigned, image2d<unsigned>>, uint16>>
-  satmaxtree(const image2d<uint16>& f, point2d pmin)
+      satmaxtree(const image2d<uint16>& f, point2d pmin)
   {
     mln_entering("mln::satmaxtree");
 
@@ -71,7 +71,7 @@ namespace mln
   }
 
   morpho::component_tree<unsigned, image2d<unsigned>>
-  tree_keep_2F(const morpho::component_tree<unsigned, image2d<unsigned>>& tree)
+      tree_keep_2F(const morpho::component_tree<unsigned, image2d<unsigned>>& tree)
   {
     typedef unsigned P;
     morpho::component_tree<P, image2d<P>> out;

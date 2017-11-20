@@ -4,6 +4,12 @@
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+
+#include "topology.hpp"
+
+#include <vector>
 
 namespace mln
 {
@@ -29,9 +35,9 @@ namespace mln
     template <typename V, typename T, typename Accumulator2F = accu::NoOpAccumulator,
               typename Accumulator1F = accu::NoOpAccumulator>
     std::pair<image2d<Accumulator2F>, image2d<Accumulator1F>>
-    tos_compute_attribute(const image2d<V>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S,
-                          const image2d<T>& ori, Accumulator2F acc2f = Accumulator2F(),
-                          Accumulator1F acc1f = Accumulator1F())
+        tos_compute_attribute(const image2d<V>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                              const image2d<T>& ori, Accumulator2F acc2f = Accumulator2F(),
+                              Accumulator1F acc1f = Accumulator1F())
     {
       static constexpr bool use_acc1f = !std::is_same<Accumulator1F, accu::NoOpAccumulator>::value;
       static constexpr bool use_acc2f = !std::is_same<Accumulator2F, accu::NoOpAccumulator>::value;
@@ -65,6 +71,7 @@ namespace mln
 
       // Compute appear/vanish for edges
       // and 2-face attributes
+
       for (int i = S.size() - 1; i >= 0; --i)
       {
         unsigned p = S[i];

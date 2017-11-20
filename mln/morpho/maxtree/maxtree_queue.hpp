@@ -25,7 +25,7 @@ namespace mln
 
       template <typename I, typename Neighborhood, typename StrictWeakOrdering>
       component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-      maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
+          maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
       {
         typedef typename I::size_type size_type;
         typedef mln_value(I) V;

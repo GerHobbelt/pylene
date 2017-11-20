@@ -15,8 +15,7 @@
 /// \param[inout] F The input image (interpolated to match tree's domain)
 /// \param lambda Mumford-shash regularization parameter
 template <class T, class I>
-void
-mumford_shah_on_tree(T& tree, I& F, double lambda);
+void mumford_shah_on_tree(T& tree, I& F, double lambda);
 
 /***************************************/
 /*** Implementation                 ****/
@@ -36,8 +35,7 @@ namespace internal
 }
 
 template <class T, class I>
-void
-mumford_shah_on_tree(T& tree, I& F, double lambda)
+void mumford_shah_on_tree(T& tree, I& F, double lambda)
 {
   using namespace mln;
   typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;

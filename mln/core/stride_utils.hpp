@@ -1,6 +1,8 @@
 #ifndef STRIDE_UTILS_HPP
 #define STRIDE_UTILS_HPP
 
+#include <cstddef>
+
 namespace mln
 {
 

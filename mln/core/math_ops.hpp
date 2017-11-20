@@ -222,9 +222,9 @@ namespace mln
     struct linfdist_t;
   };
 
-    /********************************/
-    /*** Implementation            **/
-    /********************************/
+/********************************/
+/*** Implementation            **/
+/********************************/
 
 #define MLN_GEN_CODE(FUN, TYPE, OP)                                                                                    \
   inline TYPE FUN(TYPE x) { return OP; }

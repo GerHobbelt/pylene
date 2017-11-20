@@ -3,12 +3,12 @@
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
+
 #include <vector>
 
 template <typename V, typename T, class Compare = std::less<V>>
-mln::image2d<V>
-extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-           const std::vector<unsigned>& S, Compare cmp = Compare());
+mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                           const std::vector<unsigned>& S, Compare cmp = Compare());
 
 /************************************/
 /**    Implementation		   **/
@@ -31,15 +31,14 @@ namespace internal
 }
 
 template <typename V, typename T, class Compare>
-mln::image2d<V>
-extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-           const std::vector<unsigned>& S, Compare cmp)
+mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                           const std::vector<unsigned>& S, Compare cmp)
 {
   using namespace mln;
 
   static const unsigned UNDEF = -1;
 
-  trace::entering("extinction");
+  mln_entering("extinction");
 
   // Retrieve the list of nodes
   // and sort them
@@ -131,7 +130,7 @@ extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2
 
   // std::cout << "Setting glob minimum " << m << " : " << extmap[m] << std::endl;
 
-  trace::exiting();
+  mln_exiting();
   return extmap;
 }
 

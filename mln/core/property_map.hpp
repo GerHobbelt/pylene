@@ -1,6 +1,8 @@
 #ifndef MLN_CORE_PROPERTY_MAP_HPP
 #define MLN_CORE_PROPERTY_MAP_HPP
 
+#include <type_traits>
+
 namespace mln
 {
 

@@ -10,8 +10,7 @@
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cerr << "Usage: " << argv[0]
             << "(K0|K1) depth.tiff out.tree out.tiff [colorimg]\n"
@@ -22,8 +21,7 @@ usage(char** argv)
   std::exit(1);
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 5)
     usage(argv);

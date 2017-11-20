@@ -71,8 +71,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, const char** argv)
+int main(int argc, const char** argv)
 {
   using namespace mln;
   typedef UInt<9> uint9;

@@ -198,7 +198,7 @@ namespace mln
       template <typename Vtype, typename Etype, unsigned dim>
       template <unsigned d>
       inline typename std::enable_if<d != dim - 1>::type
-      undirected_graph_ndimage_data<Vtype, Etype, dim>::m_construct_rec(char* ptr, const Vtype& v, const Etype& e)
+          undirected_graph_ndimage_data<Vtype, Etype, dim>::m_construct_rec(char* ptr, const Vtype& v, const Etype& e)
       {
         m_construct_rec<d + 1>(ptr, v, e);
         ptr += m_vstrides[d];
@@ -220,7 +220,7 @@ namespace mln
       template <typename Vtype, typename Etype, unsigned dim>
       template <unsigned d>
       inline typename std::enable_if<d == dim - 1>::type
-      undirected_graph_ndimage_data<Vtype, Etype, dim>::m_construct_rec(char* ptr, const Vtype& v, const Etype& e)
+          undirected_graph_ndimage_data<Vtype, Etype, dim>::m_construct_rec(char* ptr, const Vtype& v, const Etype& e)
       {
         m_valloca.construct(reinterpret_cast<Vtype*>(ptr), v);
         ptr += sizeof(AVtype);
@@ -236,7 +236,7 @@ namespace mln
       template <typename Vtype, typename Etype, unsigned dim>
       template <unsigned d>
       inline typename std::enable_if<d != dim - 1>::type
-      undirected_graph_ndimage_data<Vtype, Etype, dim>::m_destruct_rec(char* ptr)
+          undirected_graph_ndimage_data<Vtype, Etype, dim>::m_destruct_rec(char* ptr)
       {
         m_destruct_rec<d + 1>(ptr);
         ptr += m_vstrides[d];
@@ -254,7 +254,7 @@ namespace mln
       template <typename Vtype, typename Etype, unsigned dim>
       template <unsigned d>
       inline typename std::enable_if<d == dim - 1>::type
-      undirected_graph_ndimage_data<Vtype, Etype, dim>::m_destruct_rec(char* ptr)
+          undirected_graph_ndimage_data<Vtype, Etype, dim>::m_destruct_rec(char* ptr)
       {
         m_valloca.destroy(reinterpret_cast<Vtype*>(ptr));
         ptr += sizeof(AVtype);
@@ -485,14 +485,14 @@ namespace mln
 
     template <typename Vtype, typename Etype, typename Nbh>
     inline typename undirected_graph_image2d<Vtype, Etype, Nbh>::vertices_range
-    undirected_graph_image2d<Vtype, Etype, Nbh>::vertices() const
+        undirected_graph_image2d<Vtype, Etype, Nbh>::vertices() const
     {
       return strided_box<short, 2>(m_domain.pmin, m_domain.pmax, point2d{2, 2});
     }
 
     template <typename Vtype, typename Etype, typename Nbh>
     inline typename undirected_graph_image2d<Vtype, Etype, Nbh>::edges_range
-    undirected_graph_image2d<Vtype, Etype, Nbh>::edges() const
+        undirected_graph_image2d<Vtype, Etype, Nbh>::edges() const
     {
       return make_iterator_range(
           edges_iterator(mln::internal::point_structure<short, 2>(),
@@ -502,7 +502,7 @@ namespace mln
 
     template <typename Vtype, typename Etype, typename Nbh>
     inline typename undirected_graph_image2d<Vtype, Etype, Nbh>::adjacency_edge_range
-    undirected_graph_image2d<Vtype, Etype, Nbh>::edges(const point2d& v) const
+        undirected_graph_image2d<Vtype, Etype, Nbh>::edges(const point2d& v) const
     {
       mln_precondition(_is_vertex(v));
       auto eit = make_sliding_piter(std::cref(v), m_enbh);
@@ -512,7 +512,7 @@ namespace mln
 
     template <typename Vtype, typename Etype, typename Nbh>
     inline typename undirected_graph_image2d<Vtype, Etype, Nbh>::adjacency_edge_range
-    undirected_graph_image2d<Vtype, Etype, Nbh>::adjacent_vertices(const point2d& v) const
+        undirected_graph_image2d<Vtype, Etype, Nbh>::adjacent_vertices(const point2d& v) const
     {
       mln_precondition(_is_vertex(v));
       auto vit = make_sliding_piter(std::cref(v), m_vnbh);

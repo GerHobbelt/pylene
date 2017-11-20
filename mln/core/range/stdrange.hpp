@@ -1,6 +1,10 @@
 #ifndef STDRANGE_HPP
 #define STDRANGE_HPP
 
+#include <mln/core/iterator/stditerator.hpp>
+
+#include <utility>
+
 namespace mln
 {
 

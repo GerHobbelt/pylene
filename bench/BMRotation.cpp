@@ -2,10 +2,11 @@
 #define __attribute__(A) __declspec A
 #endif
 
-#include <benchmark/benchmark.h>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <benchmark/benchmark.h>
 
 using namespace mln;
 
@@ -29,8 +30,7 @@ struct BMRotation : public benchmark::Fixture
 };
 
 template <class T>
-__attribute__((noinline)) void
-rotate_ptr(const image2d<T>& f, image2d<T>& out)
+__attribute__((noinline)) void rotate_ptr(const image2d<T>& f, image2d<T>& out)
 {
 
   int nr = f.nrows();
@@ -52,8 +52,7 @@ rotate_ptr(const image2d<T>& f, image2d<T>& out)
 }
 
 template <class T>
-__attribute__((noinline)) void
-rotate_p(const image2d<T>& f, image2d<T>& out)
+__attribute__((noinline)) void rotate_p(const image2d<T>& f, image2d<T>& out)
 {
   mln_foreach (point2d p, f.domain())
   {
@@ -63,8 +62,7 @@ rotate_p(const image2d<T>& f, image2d<T>& out)
 }
 
 template <class T>
-__attribute__((noinline)) void
-rotate_pix(const image2d<T>& f, image2d<T>& out)
+__attribute__((noinline)) void rotate_pix(const image2d<T>& f, image2d<T>& out)
 {
   mln_foreach (auto px, f.pixels())
   {

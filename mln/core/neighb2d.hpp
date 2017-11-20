@@ -1,9 +1,10 @@
 #ifndef MLN_CORE_NEIGHB2D_HPP
 #define MLN_CORE_NEIGHB2D_HPP
 
-#include <array>
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/point.hpp>
+
+#include <array>
 
 namespace mln
 {

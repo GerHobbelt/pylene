@@ -13,9 +13,8 @@
  *
  **/
 template <typename T, typename V>
-mln::image2d<float>
-saliencymap(const mln::image2d<V>& attr, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-            const std::vector<unsigned>& S);
+mln::image2d<float> saliencymap(const mln::image2d<V>& attr, const mln::image2d<T>& K,
+                                const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S);
 
 /**
  * \brief Helper function to compute a saliency map from tagged nodes.
@@ -26,9 +25,8 @@ saliencymap(const mln::image2d<V>& attr, const mln::image2d<T>& K, const mln::im
  * Thus it can then be used for \see saliencymap.
  */
 template <typename T, typename V>
-mln::image2d<V>
-collapse_zero_nodes(const mln::image2d<V>& attr, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                    const std::vector<unsigned>& S);
+mln::image2d<V> collapse_zero_nodes(const mln::image2d<V>& attr, const mln::image2d<T>& K,
+                                    const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S);
 
 /***********************/
 /* Implementation     **/
@@ -39,9 +37,8 @@ namespace internal
 }
 
 template <typename T, typename V>
-mln::image2d<float>
-saliencymap(const mln::image2d<V>& attr, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-            const std::vector<unsigned>& S)
+mln::image2d<float> saliencymap(const mln::image2d<V>& attr, const mln::image2d<T>& K,
+                                const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S)
 {
   static_assert(std::is_convertible<V, float>::value, "Attribute value type must be convertible to float");
 
@@ -97,9 +94,8 @@ saliencymap(const mln::image2d<V>& attr, const mln::image2d<T>& K, const mln::im
 }
 
 template <typename T, typename V>
-void
-collapse_zero_nodes(const mln::image2d<V>& attr, mln::image2d<T>& K, mln::image2d<unsigned>& parent,
-                    const std::vector<unsigned>& S)
+void collapse_zero_nodes(const mln::image2d<V>& attr, mln::image2d<T>& K, mln::image2d<unsigned>& parent,
+                         const std::vector<unsigned>& S)
 {
   using namespace mln;
 

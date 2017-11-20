@@ -17,8 +17,7 @@ typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
 ///
 /// \param tree The component tree of the saliency map
 /// \param markers The image with markers
-image2d<bool>
-segmentation(const tree_t& tree, const image2d<uint8>& markers__)
+image2d<bool> segmentation(const tree_t& tree, const image2d<uint8>& markers__)
 {
   enum colortag
   {
@@ -87,8 +86,7 @@ segmentation(const tree_t& tree, const image2d<uint8>& markers__)
   return out;
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc != 4)
   {

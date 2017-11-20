@@ -27,7 +27,7 @@
 #define INDEX_HPP
 
 #include <mln/core/value/value_traits.hpp>
-//# include <boost/operators.hpp>
+
 #include <functional>
 
 namespace mln

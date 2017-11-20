@@ -12,8 +12,7 @@
 #include <map>
 #include <mln/io/imsave.hpp>
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(color) segmentatio.tiff" << std::endl << std::endl;
   std::terminate();
@@ -61,8 +60,7 @@ namespace mln
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 3)
     usage(argv);

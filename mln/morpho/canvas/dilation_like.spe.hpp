@@ -3,6 +3,7 @@
 
 #include <mln/core/algorithm/transpose.hpp>
 #include <mln/core/win2d.hpp>
+#include <mln/morpho/canvas/dilation_like.hpp>
 
 namespace mln
 {
@@ -22,7 +23,7 @@ namespace mln
         // might be costly due to cycle detection.
         template <class I, class Compare, class J, class OpTraits>
         typename std::enable_if<std::is_same<typename I::domain_type, box2d>::value>::type
-        dilation_like(const Image<I>& ima_, const rect2d& nbh, Compare cmp, Image<J>& output, OpTraits __op__)
+            dilation_like(const Image<I>& ima_, const rect2d& nbh, Compare cmp, Image<J>& output, OpTraits __op__)
         {
           box2d r = nbh.dpoints;
           const I& ima = exact(ima_);

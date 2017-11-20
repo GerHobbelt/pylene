@@ -34,62 +34,62 @@ namespace mln
   using std::logical_not;
   using std::negate;
 
-  /**
-   * \struct add
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed addition arithmetic operation.
-   *
-   * \struct substract
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed substraction arithmetic operation.
-   *
-   * \struct multiplies
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed multiplication arithmetic operation.
-   *
-   * \struct devides
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed division arithmetic operation.
-   *
-   * \struct modulo
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed division arithmetic operation.
-   *
-   * \struct equals_to
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed equality comparison operation.
-   *
-   * \struct not_equals_to
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed inequality comparison operation.
-   *
-   * \struct less_than
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed <em>lesser than</em> comparison operation.
-   *
-   * \struct greater_than
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed <em>greater than</em> comparison operation.
-   *
-   * \struct less_equal
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed <em>lesser equal</em> comparison operation.
-   *
-   * \struct greater_equal
-   * \tparam U
-   * \tparam V
-   * \brief A function object for the mixed <em>greater equal</em> comparison operation.
-   */
+/**
+ * \struct add
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed addition arithmetic operation.
+ *
+ * \struct substract
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed substraction arithmetic operation.
+ *
+ * \struct multiplies
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed multiplication arithmetic operation.
+ *
+ * \struct devides
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed division arithmetic operation.
+ *
+ * \struct modulo
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed division arithmetic operation.
+ *
+ * \struct equals_to
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed equality comparison operation.
+ *
+ * \struct not_equals_to
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed inequality comparison operation.
+ *
+ * \struct less_than
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed <em>lesser than</em> comparison operation.
+ *
+ * \struct greater_than
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed <em>greater than</em> comparison operation.
+ *
+ * \struct less_equal
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed <em>lesser equal</em> comparison operation.
+ *
+ * \struct greater_equal
+ * \tparam U
+ * \tparam V
+ * \brief A function object for the mixed <em>greater equal</em> comparison operation.
+ */
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4800)

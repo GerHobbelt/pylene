@@ -107,7 +107,7 @@ namespace mln
   template <typename I, typename Scalar>                                                                               \
   typename boost::lazy_enable_if_c<!is_a<Scalar, Image>::value,                                                        \
                                    internal::binary_image_scalar_expr_helper<I, Scalar, Obj>>::type                    \
-  Name(const Image<I>& ima, const Scalar& x)                                                                           \
+      Name(const Image<I>& ima, const Scalar& x)                                                                       \
   {                                                                                                                    \
     typedef Obj<typename I::value_type, Scalar> O;                                                                     \
     return make_binary_image_scalar_expr<O, I, Scalar>(I(exact(ima)), x, O());                                         \
@@ -116,7 +116,7 @@ namespace mln
   template <typename I, typename Scalar>                                                                               \
   typename boost::lazy_enable_if_c<!is_a<Scalar, Image>::value,                                                        \
                                    internal::binary_scalar_image_expr_helper<I, Scalar, Obj>>::type                    \
-  Name(const Scalar& x, const Image<I>& ima)                                                                           \
+      Name(const Scalar& x, const Image<I>& ima)                                                                       \
   {                                                                                                                    \
     typedef Obj<Scalar, typename I::value_type> O;                                                                     \
     return make_binary_scalar_image_expr<O, Scalar, I>(x, I(exact(ima)), O());                                         \
@@ -183,7 +183,7 @@ namespace mln
   typename boost::lazy_enable_if_c<
       is_a<Image1, Image>::value and is_a<Image2, Image>::value,
       internal::ternary_image_image_image_expr_helper<I, Image1, Image2, conditional_ternary>>::type
-  where(const Image<I>& f, Image1&& g, Image2&& h)
+      where(const Image<I>& f, Image1&& g, Image2&& h)
   {
     return make_ternary_image_image_image_expr(I(exact(f)), std::forward<Image1>(g), std::forward<Image2>(h),
                                                conditional_ternary());
@@ -193,7 +193,7 @@ namespace mln
   typename boost::lazy_enable_if_c<
       is_a<Image1, Image>::value and !is_a<Scalar, Image>::value,
       internal::ternary_image_image_scalar_expr_helper<I, Image1, Scalar, conditional_ternary>>::type
-  where(const Image<I>& f, Image1&& g, const Scalar& s)
+      where(const Image<I>& f, Image1&& g, const Scalar& s)
   {
     return make_ternary_image_image_scalar_expr(I(exact(f)), std::forward<Image1>(g), s, conditional_ternary());
   }
@@ -202,7 +202,7 @@ namespace mln
   typename boost::lazy_enable_if_c<
       is_a<Image1, Image>::value and !is_a<Scalar, Image>::value,
       internal::ternary_image_scalar_image_expr_helper<I, Scalar, Image1, conditional_ternary>>::type
-  where(const Image<I>& f, const Scalar& s, Image1&& g)
+      where(const Image<I>& f, const Scalar& s, Image1&& g)
   {
     return make_ternary_image_scalar_image_expr(I(exact(f)), s, std::forward<Image1>(g), conditional_ternary());
   }
@@ -211,7 +211,7 @@ namespace mln
   typename boost::lazy_enable_if_c<
       !is_a<Scalar1, Image>::value and !is_a<Scalar2, Image>::value,
       internal::ternary_image_scalar_scalar_expr_helper<I, Scalar1, Scalar2, conditional_ternary>>::type
-  where(const Image<I>& f, const Scalar1& s1, const Scalar2& s2)
+      where(const Image<I>& f, const Scalar1& s1, const Scalar2& s2)
   {
     return make_ternary_image_scalar_scalar_expr(I(exact(f)), s1, s2, conditional_ternary());
   }

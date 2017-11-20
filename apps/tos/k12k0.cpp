@@ -3,8 +3,7 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-void
-usage(int argc, char** argv)
+void usage(int argc, char** argv)
 {
   if (argc < 3)
   {
@@ -13,8 +12,7 @@ usage(int argc, char** argv)
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
   usage(argc, argv);

@@ -7,8 +7,7 @@
 #include <mln/core/win2d.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

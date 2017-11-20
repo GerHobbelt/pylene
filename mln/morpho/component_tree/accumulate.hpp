@@ -16,46 +16,46 @@ namespace mln
 
     template <class P, class AssociativeMap, class I>
     property_map<component_tree<P, AssociativeMap>, mln_value(I)>
-    make_attribute_map_from_image(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima);
+        make_attribute_map_from_image(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima);
 
     template <class P, class AssociativeMap, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, P>::type>
-    accumulate(const component_tree<P, AssociativeMap>& ctree, const AccumulatorLike<Accu>& accu,
-               bool require_ordering = false);
+        accumulate(const component_tree<P, AssociativeMap>& ctree, const AccumulatorLike<Accu>& accu,
+                   bool require_ordering = false);
 
     template <class P, class AssociativeMap, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, P>::type>
-    accumulate_proper(const component_tree<P, AssociativeMap>& ctree, const AccumulatorLike<Accu>& accu);
+        accumulate_proper(const component_tree<P, AssociativeMap>& ctree, const AccumulatorLike<Accu>& accu);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_value(I)>::type>
-    vaccumulate(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima, const AccumulatorLike<Accu>& accu,
-                bool require_ordering = false);
+        vaccumulate(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
+                    const AccumulatorLike<Accu>& accu, bool require_ordering = false);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_value(I)>::type>
-    vaccumulate_proper(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
-                       const AccumulatorLike<Accu>& accu);
+        vaccumulate_proper(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
+                           const AccumulatorLike<Accu>& accu);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_point(I)>::type>
-    paccumulate(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima, const AccumulatorLike<Accu>& accu,
-                bool require_ordering = false);
+        paccumulate(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
+                    const AccumulatorLike<Accu>& accu, bool require_ordering = false);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_point(I)>::type>
-    paccumulate_proper(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
-                       const AccumulatorLike<Accu>& accu);
+        paccumulate_proper(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
+                           const AccumulatorLike<Accu>& accu);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_cpixel(I)>::type>
-    pixaccumulate(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
-                  const AccumulatorLike<Accu>& accu, bool require_ordering = true);
+        pixaccumulate(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
+                      const AccumulatorLike<Accu>& accu, bool require_ordering = true);
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_cpixel(I)>::type>
-    pixaccumulate_proper(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
-                         const AccumulatorLike<Accu>& accu);
+        pixaccumulate_proper(const component_tree<P, AssociativeMap>& ctree, const Image<I>& ima,
+                             const AccumulatorLike<Accu>& accu);
 
     /********************************/
     /*** Implementation		  ***/
@@ -134,7 +134,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, P>::type>
-    accumulate(const component_tree<P, AssociativeMap>& tree, const AccumulatorLike<Accu>& accu_, bool require_order)
+        accumulate(const component_tree<P, AssociativeMap>& tree, const AccumulatorLike<Accu>& accu_,
+                   bool require_order)
     {
       mln_entering("mln::morpho::accumulate");
       auto acc = accu::make_accumulator(exact(accu_), P());
@@ -158,7 +159,7 @@ namespace mln
 
     template <class P, class AssociativeMap, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, P>::type>
-    accumulate_proper(const component_tree<P, AssociativeMap>& tree, const AccumulatorLike<Accu>& accu_)
+        accumulate_proper(const component_tree<P, AssociativeMap>& tree, const AccumulatorLike<Accu>& accu_)
     {
       mln_entering("mln::morpho::accumulate");
       auto acc = accu::make_accumulator(exact(accu_), P());
@@ -175,8 +176,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_value(I)>::type>
-    vaccumulate(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_, const AccumulatorLike<Accu>& accu_,
-                bool require_order)
+        vaccumulate(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_,
+                    const AccumulatorLike<Accu>& accu_, bool require_order)
     {
       mln_entering("mln::morpho::vaccumulate");
       auto acc = accu::make_accumulator(exact(accu_), mln_value(I)());
@@ -203,8 +204,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_value(I)>::type>
-    vaccumulate_proper(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima,
-                       const AccumulatorLike<Accu>& accu_)
+        vaccumulate_proper(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima,
+                           const AccumulatorLike<Accu>& accu_)
     {
       mln_entering("mln::morpho::vaccumulate_proper");
       auto acc = accu::make_accumulator(exact(accu_), mln_value(I)());
@@ -222,8 +223,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_point(I)>::type>
-    paccumulate(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_, const AccumulatorLike<Accu>& accu_,
-                bool require_order)
+        paccumulate(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_,
+                    const AccumulatorLike<Accu>& accu_, bool require_order)
     {
       mln_entering("mln::morpho::paccumulate");
       auto acc = accu::make_accumulator(exact(accu_), mln_point(I)());
@@ -251,8 +252,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_point(I)>::type>
-    paccumulate_proper(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima,
-                       const AccumulatorLike<Accu>& accu_)
+        paccumulate_proper(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima,
+                           const AccumulatorLike<Accu>& accu_)
     {
       mln_entering("mln::morpho::paccumulate_proper");
       auto acc = accu::make_accumulator(exact(accu_), mln_point(I)());
@@ -270,8 +271,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_cpixel(I)>::type>
-    pixaccumulate(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_,
-                  const AccumulatorLike<Accu>& accu_, bool require_order)
+        pixaccumulate(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_,
+                      const AccumulatorLike<Accu>& accu_, bool require_order)
     {
       mln_entering("mln::morpho::pixaccumulate");
       auto acc = accu::make_accumulator(exact(accu_), mln_cpixel(I)());
@@ -299,8 +300,8 @@ namespace mln
 
     template <class P, class AssociativeMap, class I, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, mln_cpixel(I)>::type>
-    pixaccumulate_proper(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima,
-                         const AccumulatorLike<Accu>& accu_)
+        pixaccumulate_proper(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima,
+                             const AccumulatorLike<Accu>& accu_)
     {
       mln_entering("mln::morpho::pixaccumulate_proper");
       auto acc = accu::make_accumulator(exact(accu_), mln_cpixel(I)());
@@ -318,7 +319,7 @@ namespace mln
 
     template <class P, class AssociativeMap, class I>
     property_map<component_tree<P, AssociativeMap>, mln_value(I)>
-    make_attribute_map_from_image(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_)
+        make_attribute_map_from_image(const component_tree<P, AssociativeMap>& tree, const Image<I>& ima_)
     {
       mln_entering("mln::morpho::make_attribute_map_from_image");
 

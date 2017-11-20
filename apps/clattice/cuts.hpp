@@ -8,9 +8,8 @@
 #include <mln/morpho/saturate.hpp>
 
 template <typename R, typename V, class NbhFg, class NbhBg, typename shape_t, typename Compare>
-void
-cut_and_get_shapes(const mln::image2d<R>& ima, const NbhFg& nbhBg, const NbhBg& nbhFg, V lambda, Compare cmp,
-                   shape_set<shape_t>& shapes)
+void cut_and_get_shapes(const mln::image2d<R>& ima, const NbhFg& nbhBg, const NbhBg& nbhFg, V lambda, Compare cmp,
+                        shape_set<shape_t>& shapes)
 {
   using namespace mln;
 

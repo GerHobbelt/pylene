@@ -1,6 +1,8 @@
 #ifndef MLN_MORPHO_BOUNDED_HQUEUE_HPP
 #define MLN_MORPHO_BOUNDED_HQUEUE_HPP
 
+#include <mln/core/assert.hpp>
+
 #include <array>
 #include <memory>
 #include <numeric>
@@ -187,8 +189,8 @@ namespace mln
   }
 
   template <typename T, std::size_t nLevel, typename Allocator, bool queue>
-  inline void
-  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if<(nLevel > 16)>::type>::init(const size_t* histo)
+  inline void bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if<(nLevel > 16)>::type>::init(
+      const size_t* histo)
   {
     mln_precondition(m_q == NULL);
 
@@ -204,8 +206,8 @@ namespace mln
   }
 
   template <typename T, std::size_t nLevel, typename Allocator, bool queue>
-  inline bool
-  bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if<(nLevel > 16)>::type>::empty(unsigned level) const
+  inline bool bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if<(nLevel > 16)>::type>::empty(
+      unsigned level) const
   {
     mln_precondition(level < nLevel);
     return m_head[level] == m_tail[level];

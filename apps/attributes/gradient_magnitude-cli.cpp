@@ -14,8 +14,7 @@
 #include "gradient_magnitude.hpp"
 #include <fstream>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc != 6)
   {

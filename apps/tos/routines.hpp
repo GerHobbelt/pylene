@@ -15,23 +15,20 @@
 /// K and parent image are modified to reflect the level lines
 /// removal.
 template <typename T, typename V>
-void
-attributefilter_inplace(const mln::image2d<V>& A, mln::image2d<T>& K, mln::image2d<unsigned>& parent,
-                        const std::vector<unsigned>& S, float threshold);
+void attributefilter_inplace(const mln::image2d<V>& A, mln::image2d<T>& K, mln::image2d<unsigned>& parent,
+                             const std::vector<unsigned>& S, float threshold);
 
 /// \brief Compute a grain filter inplace.
 /// \param pointfilter A function P -> bool used to filter
 ///                    points to counted (e.g K1::is_face_2)
 template <typename T, class F>
-void
-grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, float threshold,
-                    F pointfilter);
+void grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                         float threshold, F pointfilter);
 
 /// \brief Compute a grain filter inplace.
 template <typename T>
-void
-grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
-                    float threshold);
+void grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                         float threshold);
 
 /// \brief Compute attribute per node
 ///
@@ -44,43 +41,42 @@ grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const st
 /// \param eq Equivalence relation on K s.t. y = parent(x) ^ eq(K(x), K(y)) => x,y are in the same node
 template <typename V, typename T, class AccuLike, class Filter, class Equiv = std::equal_to<T>>
 mln::image2d<typename mln::accu::result_of<AccuLike, V>::type>
-compute_attribute_per_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                           const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu,
-                           Filter pointfilter, Equiv eq = Equiv());
+    compute_attribute_per_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                               const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu,
+                               Filter pointfilter, Equiv eq = Equiv());
 
 template <typename V, typename T, class Filter, class Equiv = std::equal_to<T>>
 mln::image2d<typename mln::accu::result_of<mln::accu::features::mean<>, V>::type>
-compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                     const std::vector<unsigned>& S, Filter pointfilter, Equiv eq = Equiv());
+    compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                         const std::vector<unsigned>& S, Filter pointfilter, Equiv eq = Equiv());
 
 template <typename V, typename T>
 mln::image2d<typename mln::accu::result_of<mln::accu::features::mean<>, V>::type>
-compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                     const std::vector<unsigned>& S);
+    compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                         const std::vector<unsigned>& S);
 
 template <typename V>
-mln::image2d<unsigned>
-compute_depth(const mln::image2d<V>& K, const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S);
+mln::image2d<unsigned> compute_depth(const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
+                                     const std::vector<unsigned>& S);
 
 /// \brief Compute attribute per node
 /// The attribute is computed for each node but does
 /// consider the subtree of each node.
 template <typename V, typename T, class AccuLike, class Filter, class Equiv = std::equal_to<T>>
 mln::image2d<typename mln::accu::result_of<AccuLike, V>::type>
-attribute_compute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                  const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu, Filter pointfilter,
-                  Equiv eq = Equiv());
+    attribute_compute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                      const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu, Filter pointfilter,
+                      Equiv eq = Equiv());
 
 /// \brief Low Level tos manipulation routines
 /// \{
 
 template <typename V>
-std::vector<unsigned>
-get_real_nodes(const mln::image2d<V>& K, const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S);
+std::vector<unsigned> get_real_nodes(const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
+                                     const std::vector<unsigned>& S);
 
 template <typename T>
-unsigned
-get_canonical(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, unsigned x);
+unsigned get_canonical(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, unsigned x);
 
 /// \brief Least common ancestor
 /// Note that depth of root SHALL be 0.
@@ -88,8 +84,7 @@ get_canonical(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, un
 /// lca(x, -1) = x
 /// lca(-1, x) = x
 /// \param x, y must be canonical elements
-unsigned
-lca(const mln::image2d<unsigned>& depth, const mln::image2d<unsigned>& parent, unsigned x, unsigned y);
+unsigned lca(const mln::image2d<unsigned>& depth, const mln::image2d<unsigned>& parent, unsigned x, unsigned y);
 /// \}
 
 /*********************************/
@@ -97,9 +92,8 @@ lca(const mln::image2d<unsigned>& depth, const mln::image2d<unsigned>& parent, u
 /*********************************/
 
 template <typename T, typename V>
-void
-attributefilter_inplace(const mln::image2d<V>& A, mln::image2d<T>& K, mln::image2d<unsigned>& parent,
-                        const std::vector<unsigned>& S, float threshold)
+void attributefilter_inplace(const mln::image2d<V>& A, mln::image2d<T>& K, mln::image2d<unsigned>& parent,
+                             const std::vector<unsigned>& S, float threshold)
 {
   using namespace mln;
   trace::entering("Attribute filter");
@@ -123,9 +117,8 @@ attributefilter_inplace(const mln::image2d<V>& A, mln::image2d<T>& K, mln::image
 }
 
 template <typename T, class F>
-void
-grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, float threshold,
-                    F pointfilter)
+void grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                         float threshold, F pointfilter)
 {
   using namespace mln;
 
@@ -146,8 +139,8 @@ grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const st
 }
 
 template <typename T>
-void
-grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, float threshold)
+void grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
+                         float threshold)
 {
   using namespace mln;
 
@@ -167,9 +160,9 @@ grainfilter_inplace(mln::image2d<T>& K, mln::image2d<unsigned>& parent, const st
 
 template <typename V, typename T, class AccuLike, class Filter, class Equiv>
 mln::image2d<typename mln::accu::result_of<AccuLike, V>::type>
-compute_attribute_per_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                           const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu_,
-                           Filter pointfilter, Equiv eq)
+    compute_attribute_per_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                               const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu_,
+                               Filter pointfilter, Equiv eq)
 {
   using namespace mln;
   trace::entering("attribute_compute_per_node");
@@ -219,9 +212,9 @@ compute_attribute_per_node(const mln::image2d<V>& f, const mln::image2d<T>& K, c
 
 template <typename V, typename T, class AccuLike, class Filter, class Equiv>
 mln::image2d<typename mln::accu::result_of<AccuLike, V>::type>
-attribute_compute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                  const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu_, Filter pointfilter,
-                  Equiv eq)
+    attribute_compute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                      const std::vector<unsigned>& S, const mln::AccumulatorLike<AccuLike>& accu_, Filter pointfilter,
+                      Equiv eq)
 {
   using namespace mln;
   trace::entering("attribute_compute");
@@ -267,23 +260,23 @@ attribute_compute(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln:
 
 template <typename V, typename T, class Filter, class Equiv>
 mln::image2d<typename mln::accu::result_of<mln::accu::features::mean<>, V>::type>
-compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                     const std::vector<unsigned>& S, Filter pointfilter, Equiv eq)
+    compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                         const std::vector<unsigned>& S, Filter pointfilter, Equiv eq)
 {
   return compute_attribute_per_node(f, K, parent, S, mln::accu::features::mean<>(), pointfilter, eq);
 }
 
 template <typename V, typename T>
 mln::image2d<typename mln::accu::result_of<mln::accu::features::mean<>, V>::type>
-compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                     const std::vector<unsigned>& S)
+    compute_mean_on_node(const mln::image2d<V>& f, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                         const std::vector<unsigned>& S)
 {
   return compute_attribute_per_node(f, K, parent, S, mln::accu::features::mean<>(), [](mln::point2d) { return true; });
 }
 
 template <typename T>
-mln::image2d<unsigned>
-compute_depth(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S)
+mln::image2d<unsigned> compute_depth(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                                     const std::vector<unsigned>& S)
 {
   mln::image2d<unsigned> depth;
   mln::resize(depth, K);
@@ -304,16 +297,15 @@ compute_depth(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, co
 }
 
 template <typename T>
-inline unsigned
-get_canonical(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, unsigned x)
+inline unsigned get_canonical(const mln::image2d<T>& K, const mln::image2d<unsigned>& parent, unsigned x)
 {
   unsigned q = parent[x];
   return K[x] == K[q] ? q : x;
 }
 
 template <typename V>
-std::vector<unsigned>
-get_real_nodes(const mln::image2d<V>& K, const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S)
+std::vector<unsigned> get_real_nodes(const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
+                                     const std::vector<unsigned>& S)
 {
   std::vector<unsigned> R;
   R.reserve(S.size());

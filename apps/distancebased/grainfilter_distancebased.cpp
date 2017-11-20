@@ -20,15 +20,13 @@
 
 #include "compute_tree_distance.hpp"
 
-void
-usage(char** argv)
+void usage(char** argv)
 {
   std::cout << argv[0] << " input output[wo extension] λ₁ [λ₂ [λ₃ ...] ]" << std::endl;
   std::terminate();
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 4)
     usage(argv);

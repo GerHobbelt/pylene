@@ -1,13 +1,13 @@
 #ifndef MLN_CORE_VALUE_INDEXER_HPP
 #define MLN_CORE_VALUE_INDEXER_HPP
 
-#include <functional>
-#include <type_traits>
-
 #include <mln/core/assert.hpp>
 #include <mln/core/value/index.hpp>
 #include <mln/core/value/int.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <functional>
+#include <type_traits>
 
 namespace mln
 {

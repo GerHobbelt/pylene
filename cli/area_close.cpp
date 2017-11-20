@@ -12,8 +12,7 @@
 #include <iostream>
 #include <mln/io/imprint.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

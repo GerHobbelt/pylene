@@ -9,10 +9,9 @@
 #include <mln/core/neighb2d.hpp>
 
 #include <apps/tos/Kinterpolate.hpp>
-#include <mln/morpho/component_tree/io.hpp>
-//#include <mln/morpho/component_tree/graphviz.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
+#include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/extinction.hpp>
 
@@ -25,8 +24,7 @@
 #include "cMeaningFullNess.hpp"
 #include <fstream>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc != 11)
   {

@@ -6,8 +6,7 @@
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/structural/gradient.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

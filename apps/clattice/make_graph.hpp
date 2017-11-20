@@ -23,7 +23,7 @@ namespace mln
   template <typename shape_t>
   std::pair<boost::numeric::ublas::triangular_matrix<bool, boost::numeric::ublas::upper>,
             boost::numeric::ublas::triangular_matrix<bool, boost::numeric::ublas::upper>>
-  graph_transitive_reduction(std::vector<shape_t>& vs);
+      graph_transitive_reduction(std::vector<shape_t>& vs);
 
   /******************/
   /* Implementation */
@@ -33,7 +33,7 @@ namespace mln
   template <typename shape_t>
   std::pair<boost::numeric::ublas::triangular_matrix<bool, boost::numeric::ublas::upper>,
             boost::numeric::ublas::triangular_matrix<bool, boost::numeric::ublas::upper>>
-  graph_transitive_reduction(std::vector<shape_t>& vs)
+      graph_transitive_reduction(std::vector<shape_t>& vs)
   {
 
     // mln_precondition( pt_cmp(point2d(0,0), point2d(0,1)) );

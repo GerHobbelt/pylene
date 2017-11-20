@@ -55,8 +55,7 @@ namespace mln
   }
 }
 
-void
-usage(int argc, char** argv)
+void usage(int argc, char** argv)
 {
   if (argc < 4 or (argv[1] != std::string("mintree") && argv[1] != std::string("tos")) or
       (argv[2] != std::string("min") && argv[2] != std::string("max")))
@@ -69,8 +68,7 @@ usage(int argc, char** argv)
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 

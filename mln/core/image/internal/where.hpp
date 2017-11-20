@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_IMAGE_INTERNAL_WHERE_HPP
 #define MLN_CORE_IMAGE_INTERNAL_WHERE_HPP
 
+#include <mln/core/image/image.hpp>
 #include <mln/core/iref.hpp>
 #include <mln/core/iterator/filter_iterator.hpp>
 #include <mln/core/iterator/transform_iterator.hpp>
@@ -82,7 +83,7 @@ namespace mln
 
   template <class V, class I, class Predicate>
   sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>>
-  make_image_from_domain(const internal::where_t<I, Predicate>& domain)
+      make_image_from_domain(const internal::where_t<I, Predicate>& domain)
   {
     typedef sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>> OutputImage;
     return OutputImage(imchvalue<V>(domain.image()), domain);
@@ -90,7 +91,7 @@ namespace mln
 
   template <class V, class I, class Predicate>
   sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>>
-  make_image_from_domain(const internal::where_t<I, Predicate>& domain, const V& v)
+      make_image_from_domain(const internal::where_t<I, Predicate>& domain, const V& v)
   {
     typedef sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>> OutputImage;
     return OutputImage(imchvalue<V>(domain.image()).init(v), domain);
@@ -98,7 +99,7 @@ namespace mln
 
   template <class V, class I>
   sub_image<mln_ch_value(I, V), internal::where_binary_t<I>>
-  make_image_from_domain(const internal::where_binary_t<I>& domain)
+      make_image_from_domain(const internal::where_binary_t<I>& domain)
   {
     typedef sub_image<mln_ch_value(I, V), internal::where_binary_t<I>> OutputImage;
     return OutputImage(imchvalue<V>(domain.image()), domain);
@@ -106,7 +107,7 @@ namespace mln
 
   template <class V, class I>
   sub_image<mln_ch_value(I, V), internal::where_binary_t<I>>
-  make_image_from_domain(const internal::where_binary_t<I>& domain, const V& v)
+      make_image_from_domain(const internal::where_binary_t<I>& domain, const V& v)
   {
     typedef sub_image<mln_ch_value(I, V), internal::where_binary_t<I>> OutputImage;
     return OutputImage(imchvalue<V>(domain.image()).init(v), domain);

@@ -1,15 +1,13 @@
 #include "libtos.hpp"
 
-template void
-grainfilter_inplace<mln::uint8>(mln::image2d<mln::uint8>& K, mln::image2d<unsigned>& parent,
-                                const std::vector<unsigned>& S, float threshold);
+template void grainfilter_inplace<mln::uint8>(mln::image2d<mln::uint8>& K, mln::image2d<unsigned>& parent,
+                                              const std::vector<unsigned>& S, float threshold);
 
 template void grainfilter_inplace<mln::UInt<9>>(mln::image2d<mln::UInt<9>>& K, mln::image2d<unsigned>& parent,
                                                 const std::vector<unsigned>& S, float threshold);
 
-template void
-grainfilter_inplace<unsigned>(mln::image2d<unsigned>& K, mln::image2d<unsigned>& parent, const std::vector<unsigned>& S,
-                              float threshold);
+template void grainfilter_inplace<unsigned>(mln::image2d<unsigned>& K, mln::image2d<unsigned>& parent,
+                                            const std::vector<unsigned>& S, float threshold);
 namespace mln
 {
 

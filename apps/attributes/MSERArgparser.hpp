@@ -28,9 +28,9 @@ private:
 /*****************************/
 
 template <typename V, typename T>
-mln::image2d<float>
-MSERArgParser::run(const boost::program_options::variables_map& vm, const mln::image2d<V>& f, const mln::image2d<T>& K,
-                   const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S)
+mln::image2d<float> MSERArgParser::run(const boost::program_options::variables_map& vm, const mln::image2d<V>& f,
+                                       const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
+                                       const std::vector<unsigned>& S)
 {
   std::string smode = vm["mode"].as<std::string>();
   eMSER_attribute mode;

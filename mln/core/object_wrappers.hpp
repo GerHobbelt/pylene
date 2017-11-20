@@ -1,6 +1,8 @@
 #ifndef MLN_CORE_OBJECT_WRAPPERS_HPP
 #define MLN_CORE_OBJECT_WRAPPERS_HPP
 
+#include <utility>
+
 // Uniform object holders to mimics reference wrapper.
 
 namespace mln

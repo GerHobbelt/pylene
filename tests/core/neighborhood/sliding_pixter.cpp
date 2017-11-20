@@ -7,8 +7,7 @@
 #include <gtest/gtest.h>
 
 template <class I>
-void
-test_lvalue(I& f)
+void test_lvalue(I& f)
 {
   using namespace mln;
   using pset_t = std::array<point2d, 3>;
@@ -48,19 +47,24 @@ test_lvalue(I& f)
 
 TEST(Core, Sliding_pixter_binding_lvalue)
 {
-  mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_lvalue(f);
 }
 
 TEST(Core, Sliding_pixter_binding_const_lvalue)
 {
-  const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  const mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_lvalue(f);
 }
 
 template <class I>
-void
-test_iterator(I& f)
+void test_iterator(I& f)
 {
   using namespace mln;
   using pset_t = std::array<point2d, 3>;
@@ -103,20 +107,25 @@ test_iterator(I& f)
 
 TEST(Core, Sliding_pixter_binding_iterator)
 {
-  mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
 
   test_iterator(f);
 }
 
 TEST(Core, Sliding_pixter_binding_const_iterator)
 {
-  const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  const mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_iterator(f);
 }
 
 template <class I>
-void
-test_IndexableButNotRaw(I& f)
+void test_IndexableButNotRaw(I& f)
 {
   using namespace mln;
 
@@ -159,7 +168,10 @@ test_IndexableButNotRaw(I& f)
 TEST(Core, Sliding_pixter_IndexableButNotRaw)
 {
   using namespace mln;
-  image2d<int> f0 = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  image2d<int> f0 = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   f0.extension().fill(0);
 
   auto fun = [](int x) { return 2 * x; };
@@ -171,8 +183,7 @@ TEST(Core, Sliding_pixter_IndexableButNotRaw)
 }
 
 template <class I>
-void
-test_AccessibleButNotIndexable(I& f)
+void test_AccessibleButNotIndexable(I& f)
 {
   using namespace mln;
   using pset_t = std::array<point2d, 3>;
@@ -214,8 +225,14 @@ TEST(Core, Sliding_pixter_AccessibleButNotIndexable)
 {
   using namespace mln;
 
-  image2d<int> f0 = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
-  image2d<bool> mask = {{0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}};
+  image2d<int> f0 = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
+  image2d<bool> mask = {
+      {0, 0, 1, 0, 0}, //
+      {0, 0, 1, 0, 0}  //
+  };
 
   auto f = f0 | where(mask);
   auto const_f = f0 | where(mask);

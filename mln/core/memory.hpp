@@ -1,8 +1,9 @@
 #ifndef MLN_MEMORY_HH
 #define MLN_MEMORY_HH
 
-#include <cstdlib>
 #include <mln/core/assert.hpp>
+
+#include <cstdlib>
 
 namespace mln
 {

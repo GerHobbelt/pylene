@@ -7,8 +7,7 @@
 #include <mln/accu/accumulators/accu_as_it.hpp>
 #include <mln/accu/accumulators/variance.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc != 4)
   {

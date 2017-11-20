@@ -8,8 +8,9 @@
 
 /// \file
 
-#include <cstddef>
 #include <mln/core/image/image.hpp>
+
+#include <cstddef>
 
 namespace mln
 {
@@ -35,9 +36,9 @@ namespace mln
     typedef ConstPointer const_pointer;
   };
 
-  /******************************************/
-  /****   Image Documentation Methods   *****/
-  /******************************************/
+/******************************************/
+/****   Image Documentation Methods   *****/
+/******************************************/
 #ifdef MLN_DOXYGEN
 
   /// \brief Documentation class.

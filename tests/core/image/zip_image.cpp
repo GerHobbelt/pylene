@@ -7,8 +7,7 @@
 
 #include <gtest/gtest.h>
 
-mln::image2d<int>
-make_image()
+mln::image2d<int> make_image()
 {
   mln::image2d<int> x(5, 5);
   mln::iota(x, 0);

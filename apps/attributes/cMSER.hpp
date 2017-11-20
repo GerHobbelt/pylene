@@ -22,14 +22,15 @@ namespace mln
 
   template <class P, class Amap, class ValuePropertyMap, class AreaPropertyMap, class Distance>
   property_map<morpho::component_tree<P, Amap>, float>
-  compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap, const AreaPropertyMap& amap,
-               float eps, eMSER_attribute amser = MSER_DIFF, eMSER_accum_type fsum = MSER_ABSOLUTE,
-               Distance dist = Distance());
+      compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap,
+                   const AreaPropertyMap& amap, float eps, eMSER_attribute amser = MSER_DIFF,
+                   eMSER_accum_type fsum = MSER_ABSOLUTE, Distance dist = Distance());
 
   template <class P, class Amap, class ValuePropertyMap, class AreaPropertyMap>
   property_map<morpho::component_tree<P, Amap>, float>
-  compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap, const AreaPropertyMap& amap,
-               float eps, eMSER_attribute amser = MSER_DIFF, eMSER_accum_type fsum = MSER_ABSOLUTE);
+      compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap,
+                   const AreaPropertyMap& amap, float eps, eMSER_attribute amser = MSER_DIFF,
+                   eMSER_accum_type fsum = MSER_ABSOLUTE);
 
   /**********************/
   /**  Implementation  **/
@@ -37,8 +38,8 @@ namespace mln
 
   template <class P, class Amap, class ValuePropertyMap, class AreaPropertyMap, class Distance>
   property_map<morpho::component_tree<P, Amap>, float>
-  compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap, const AreaPropertyMap& amap,
-               float eps, eMSER_attribute amser, eMSER_accum_type fsum, Distance dist)
+      compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap,
+                   const AreaPropertyMap& amap, float eps, eMSER_attribute amser, eMSER_accum_type fsum, Distance dist)
   {
     mln_entering("mln::compute_MSER");
 
@@ -101,8 +102,8 @@ namespace mln
 
   template <class P, class Amap, class ValuePropertyMap, class AreaPropertyMap>
   property_map<morpho::component_tree<P, Amap>, float>
-  compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap, const AreaPropertyMap& amap,
-               float eps, eMSER_attribute amser, eMSER_accum_type fsum)
+      compute_MSER(const morpho::component_tree<P, Amap>& tree, const ValuePropertyMap& vmap,
+                   const AreaPropertyMap& amap, float eps, eMSER_attribute amser, eMSER_accum_type fsum)
   {
     typedef typename ValuePropertyMap::value_type V;
     auto dist = [](V x, V y) -> float { return l2norm(x - y); };

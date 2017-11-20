@@ -9,7 +9,7 @@ namespace mln
   /// \brief Transform a ToS in order to keep only the 2 faces in the tree
   template <typename T>
   std::tuple<image2d<T>, image2d<unsigned>, std::vector<unsigned>>
-  remove_01face_from_tos(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& s);
+      remove_01face_from_tos(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& s);
 
   /********************************/
   /*** Implementation           ***/
@@ -17,7 +17,7 @@ namespace mln
 
   template <typename T>
   std::tuple<image2d<T>, image2d<unsigned>, std::vector<unsigned>>
-  remove_01face_from_tos(const image2d<T>& K_, const image2d<unsigned>& parent_, const std::vector<unsigned>& S_)
+      remove_01face_from_tos(const image2d<T>& K_, const image2d<unsigned>& parent_, const std::vector<unsigned>& S_)
   {
     box2d dom = K_.domain();
     dom.pmax = (dom.pmax + 1) / 2;

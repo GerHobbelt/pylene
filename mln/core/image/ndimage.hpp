@@ -11,6 +11,8 @@
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
 
+#include <type_traits>
+
 namespace mln
 {
 
@@ -792,7 +794,7 @@ namespace mln
 
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::difference_type
-  ndimage_base<T, dim, E>::delta_index(const point_type& p) const
+      ndimage_base<T, dim, E>::delta_index(const point_type& p) const
   {
     difference_type idx = 0;
     for (unsigned i = 0; i < dim; ++i)

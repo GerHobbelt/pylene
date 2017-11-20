@@ -1,12 +1,8 @@
 #ifndef COMPOSITE_ACCUMULATOR_HPP
 #define COMPOSITE_ACCUMULATOR_HPP
 
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/set.hpp>
-#include <mln/accu/concept/accumulator.hpp>
-#include <mln/accu/feature.hpp>
-//# include <boost/mpl/set10.hpp>
 #include <boost/fusion/mpl.hpp>
+#include <boost/mpl/assert.hpp>
 #include <boost/mpl/copy.hpp>
 #include <boost/mpl/empty.hpp>
 #include <boost/mpl/fold.hpp>
@@ -17,7 +13,10 @@
 #include <boost/mpl/protect.hpp>
 #include <boost/mpl/quote.hpp>
 #include <boost/mpl/remove_if.hpp>
+#include <boost/mpl/set.hpp>
 #include <boost/mpl/transform.hpp>
+#include <mln/accu/concept/accumulator.hpp>
+#include <mln/accu/feature.hpp>
 
 namespace mln
 {
@@ -177,7 +176,7 @@ namespace mln
       template <typename Feature>
       friend typename boost::lazy_enable_if_c<internal::acculist_has_feature<acculist, Feature>::value,
                                               internal::acculist_get_feature<acculist, Feature>>::type
-      extract(const composite_accumulator_base& accu, Feature feat)
+          extract(const composite_accumulator_base& accu, Feature feat)
       {
         auto res = boost::fusion::find_if<internal::accu_has_feature<Feature>>(accu.m_accus);
 

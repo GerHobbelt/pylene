@@ -16,7 +16,10 @@ TEST(Core, Sliding_wpixter_binding_lvalue)
   pset_t pset{{{0, -1}, {0, 0}, {0, 1}}};
   wset_t wset{{-1, 0, 1}};
 
-  image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
 
   auto px = f.pixel_at({0, 2});
   auto it = make_sliding_wpixter(std::cref(px), pset, wset);
@@ -65,7 +68,10 @@ TEST(Core, Sliding_wpixter_binding_iterator)
   pset_t pset{{{0, -1}, {0, 0}, {0, 1}}};
   wset_t wset{{-1, 0, 1}};
 
-  image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   f.extension().fill(0);
 
   mln_pixter(px, f);

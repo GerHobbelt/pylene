@@ -1,11 +1,12 @@
 #ifndef MLN_CORE_VALUE_INT_HPP
 #define MLN_CORE_VALUE_INT_HPP
 
-#include <boost/integer.hpp>
-#include <cstdint>
-
 #include <mln/core/value/index.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <boost/integer.hpp>
+
+#include <cstdint>
 
 namespace mln
 {
@@ -165,9 +166,9 @@ namespace mln
     value_type inv(index_type i) const { return i; }
   };
 
-  /******************************************/
-  /****          implementation          ****/
-  /******************************************/
+/******************************************/
+/****          implementation          ****/
+/******************************************/
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable : 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'

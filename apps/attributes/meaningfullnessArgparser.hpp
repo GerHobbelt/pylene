@@ -30,10 +30,9 @@ private:
 /*****************************/
 
 template <typename V, typename T>
-mln::image2d<float>
-MeaningFullNessArgParser::run(const boost::program_options::variables_map& vm, const mln::image2d<V>& f,
-                              const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
-                              const std::vector<unsigned>& S)
+mln::image2d<float> MeaningFullNessArgParser::run(const boost::program_options::variables_map& vm,
+                                                  const mln::image2d<V>& f, const mln::image2d<T>& K,
+                                                  const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S)
 {
   float a0 = vm["a0"].as<float>();
   float a1 = vm["a1"].as<float>();

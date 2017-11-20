@@ -6,11 +6,11 @@
 #ifndef MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 #define MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 
-#include <functional>
-#include <type_traits>
-
 #include <mln/core/image/morphers/transformed_image.hpp>
 #include <mln/core/image/morphers/zip_image.hpp>
+
+#include <functional>
+#include <type_traits>
 
 namespace mln
 {
@@ -178,7 +178,7 @@ namespace mln
 
   template <typename TernaryFunction, typename I1, typename I2, typename I3>
   ternary_image_image_image_expr<TernaryFunction, I1, I2, I3>
-  make_ternary_image_image_image_expr(I1&& ima1, I2&& ima2, I3&& ima3, const TernaryFunction& f)
+      make_ternary_image_image_image_expr(I1&& ima1, I2&& ima2, I3&& ima3, const TernaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
@@ -190,7 +190,7 @@ namespace mln
 
   template <typename TernaryFunction, typename I1, typename I2, typename S>
   ternary_image_image_scalar_expr<TernaryFunction, I1, I2, S>
-  make_ternary_image_image_scalar_expr(I1&& ima1, I2&& ima2, const S& s, const TernaryFunction& f)
+      make_ternary_image_image_scalar_expr(I1&& ima1, I2&& ima2, const S& s, const TernaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
@@ -202,7 +202,7 @@ namespace mln
 
   template <typename TernaryFunction, typename I1, typename S, typename I2>
   ternary_image_scalar_image_expr<TernaryFunction, I1, S, I2>
-  make_ternary_image_scalar_image_expr(I1&& ima1, const S& s, I2&& ima2, const TernaryFunction& f)
+      make_ternary_image_scalar_image_expr(I1&& ima1, const S& s, I2&& ima2, const TernaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
@@ -214,7 +214,7 @@ namespace mln
 
   template <typename TernaryFunction, typename I1, typename S1, typename S2>
   ternary_image_scalar_scalar_expr<TernaryFunction, I1, S1, S2>
-  make_ternary_image_scalar_scalar_expr(I1&& ima1, const S1& s1, const S2& s2, const TernaryFunction& f)
+      make_ternary_image_scalar_scalar_expr(I1&& ima1, const S1& s1, const S2& s2, const TernaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     auto fun = std::bind(f, std::placeholders::_1, s1, s2);

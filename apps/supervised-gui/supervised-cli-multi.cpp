@@ -22,8 +22,7 @@
 
 using namespace mln;
 
-property_map<tree_t, uint8>
-labelize_tree(const tree_t& tree, const image2d<uint8>& markers, int nlabels)
+property_map<tree_t, uint8> labelize_tree(const tree_t& tree, const image2d<uint8>& markers, int nlabels)
 {
   typedef Eigen::VectorXi MyVec;
 
@@ -47,9 +46,8 @@ labelize_tree(const tree_t& tree, const image2d<uint8>& markers, int nlabels)
   return colormap;
 }
 
-image2d<uint8>
-segmentation(const tree_t& tree, const property_map<tree_t, rgb<int>>& vmap, const image2d<uint8>& markers_, int nlabel,
-             float reject = 0.5)
+image2d<uint8> segmentation(const tree_t& tree, const property_map<tree_t, rgb<int>>& vmap,
+                            const image2d<uint8>& markers_, int nlabel, float reject = 0.5)
 {
 
   image2d<uint8> markers = Kadjust_to(markers_, tree._get_data()->m_pmap.domain(), "zero");
@@ -83,8 +81,7 @@ segmentation(const tree_t& tree, const property_map<tree_t, rgb<int>>& vmap, con
   return output;
 }
 
-image2d<rgb8>
-recons(const image2d<uint8>& lbl, const image2d<rgb8>& ori, int nlabel)
+image2d<rgb8> recons(const image2d<uint8>& lbl, const image2d<rgb8>& ori, int nlabel)
 {
   // 4. Reconstruction
   accu::accumulators::mean<rgb8> m[nlabel + 1];
@@ -101,8 +98,7 @@ recons(const image2d<uint8>& lbl, const image2d<rgb8>& ori, int nlabel)
   return rec;
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 6)
   {

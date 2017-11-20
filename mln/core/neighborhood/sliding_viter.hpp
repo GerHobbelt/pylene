@@ -5,6 +5,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/range/range.hpp>
+#include <mln/core/utils/wrapper.hpp>
 
 namespace mln
 {
@@ -58,7 +59,8 @@ namespace mln
     /********************************************************************/
 
     template <class Pixel, class SiteSet>
-    struct sliding_viter_base<Pixel, SiteSet, std::enable_if_t<!image_traits<image_t<Pixel>>::indexable::value>>
+    struct sliding_viter_base<Pixel, SiteSet,
+                              std::enable_if_t<!image_traits<typename Image<Pixel>::image_type>::indexable::value>>
         : iterator_base<sliding_viter<Pixel, SiteSet>, typename unwrap_t<Pixel>::value_type,
                         typename unwrap_t<Pixel>::reference>
     {
@@ -70,7 +72,7 @@ namespace mln
       void next() { m_pset_iter.next(); }
       bool finished() const { return m_pset_iter.finished(); }
 
-      unwrap_t<Pixel>::reference dereference() const
+      typename unwrap_t<Pixel>::reference dereference() const
       {
         auto& f = unwrap(m_pixel).image();
         return f(unwrap(m_pixel).point() + *m_pset_iter);
@@ -87,7 +89,8 @@ namespace mln
 
     // Specialization for indexable images
     template <class Pixel, class SiteSet>
-    struct sliding_viter_base<Pixel, SiteSet, std::enable_if_t<image_traits<image_t<Pixel>>::indexable::value>>
+    struct sliding_viter_base<Pixel, SiteSet,
+                              std::enable_if_t<image_traits<typename Image<Pixel>::image_type>::indexable::value>>
         : iterator_base<sliding_viter<Pixel, SiteSet>, typename unwrap_t<Pixel>::value_type,
                         typename unwrap_t<Pixel>::reference>
     {
@@ -99,16 +102,16 @@ namespace mln
       sliding_viter_base(const Pixel& px, const SiteSet& s)
           : m_pixel(px), m_size(rng::size(s)), m_index_set(m_size), m_i(0)
       {
-        Image& ima = px->image();
+        Image<Pixel>& ima = px->image();
         mln_foreach (auto p, s)
-          m_index_set.push_back(ima.delta_index(s[i]));
+          m_index_set.push_back(ima.delta_index(s[m_i]));
       }
 
       void init() { m_i = 0; }
       void next() { ++m_i; }
       bool finished() const { return m_i >= m_size; }
 
-      typename Image::reference dereference() const
+      typename Image<Pixel>::reference dereference() const
       {
         auto& f = unwrap(m_pixel).image();
         return f[m_index_set[m_i]];

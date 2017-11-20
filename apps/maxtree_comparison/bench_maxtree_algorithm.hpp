@@ -3,11 +3,6 @@
 
 #define MLN_MAXBIT 32
 
-#include <iostream>
-#include <random>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/tick_count.h>
-
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
@@ -22,6 +17,9 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/program_options.hpp>
 #include <mln/io/imprint.hpp>
+
+#include <iostream>
+#include <random>
 
 #define NTEST 3
 
@@ -47,8 +45,7 @@ MAXTREE_ALGO(meta_serial_union_find_rank, mln::morpho::impl::serial::maxtree_ufi
 MAXTREE_ALGO(meta_parallel_union_find_rank, mln::morpho::impl::parallel::maxtree_ufindrank)
 
 template <typename V, class Algorithm>
-void
-bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, int ntest)
+void bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, int ntest)
 {
   using namespace tbb;
   task_scheduler_init ts(nthread);
@@ -65,8 +62,7 @@ bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, int nte
 }
 
 template <typename V>
-mln::image2d<V>
-addnoise(const mln::image2d<mln::uint8>& ima)
+mln::image2d<V> addnoise(const mln::image2d<mln::uint8>& ima)
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -85,8 +81,7 @@ addnoise(const mln::image2d<mln::uint8>& ima)
   return out;
 }
 
-mln::image2d<mln::uint8>
-resizetile(const mln::image2d<mln::uint8>& ima, unsigned size)
+mln::image2d<mln::uint8> resizetile(const mln::image2d<mln::uint8>& ima, unsigned size)
 {
   if (size == 0)
     return ima;
@@ -104,8 +99,7 @@ resizetile(const mln::image2d<mln::uint8>& ima, unsigned size)
 }
 
 template <typename Algorithm>
-void
-run_test(int argc, char** argv, Algorithm algo)
+void run_test(int argc, char** argv, Algorithm algo)
 {
   namespace po = boost::program_options;
   po::options_description desc(std::string("Usage: ") + argv[0] + " inputfile\nAllowed options");

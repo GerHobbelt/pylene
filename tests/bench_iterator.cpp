@@ -10,8 +10,7 @@
 
 using namespace mln;
 
-double
-test_viter(const image2d<int>& ima)
+double test_viter(const image2d<int>& ima)
 {
   double v = 0;
   mln_foreach (auto& x, ima.values())
@@ -21,8 +20,7 @@ test_viter(const image2d<int>& ima)
   return v;
 }
 
-double
-test_pixter(const image2d<int>& ima)
+double test_pixter(const image2d<int>& ima)
 {
   double v = 0;
   mln_foreach (auto& x, ima.pixels())
@@ -31,8 +29,7 @@ test_pixter(const image2d<int>& ima)
   return v;
 }
 
-double
-test_piter(const image2d<int>& ima)
+double test_piter(const image2d<int>& ima)
 {
   double v = 0;
   mln_foreach (auto p, ima.domain())
@@ -42,8 +39,7 @@ test_piter(const image2d<int>& ima)
   return v;
 }
 
-double
-test_native(const int* ima2, int nrows, int ncols)
+double test_native(const int* ima2, int nrows, int ncols)
 {
   double v = 0;
   int end = nrows * ncols;
@@ -53,8 +49,7 @@ test_native(const int* ima2, int nrows, int ncols)
   return v;
 }
 
-double
-test_nbh_pixter(const image2d<int>& ima)
+double test_nbh_pixter(const image2d<int>& ima)
 {
   double u = 0;
   image2d<int>::const_pixel_range::iterator px = ima.pixels().iter();
@@ -67,8 +62,7 @@ test_nbh_pixter(const image2d<int>& ima)
   return u;
 }
 
-double
-test_nbh_piter(const image2d<int>& ima)
+double test_nbh_piter(const image2d<int>& ima)
 {
   double u = 0;
   auto p = ima.domain().iter();
@@ -81,8 +75,7 @@ test_nbh_piter(const image2d<int>& ima)
   return u;
 }
 
-double
-test_nbh_index(const image2d<int>& ima)
+double test_nbh_index(const image2d<int>& ima)
 {
   double u = 0;
   std::size_t idx = ima.index_of_point(ima.domain().pmin);
@@ -108,8 +101,7 @@ test_nbh_index(const image2d<int>& ima)
   return u;
 }
 
-double
-test_native_nbh(const image2d<int>& ima)
+double test_native_nbh(const image2d<int>& ima)
 {
   double r2 = 0;
 
@@ -134,15 +126,13 @@ test_native_nbh(const image2d<int>& ima)
 }
 
 template <typename T>
-void
-iota(image2d<T>& ima, T v)
+void iota(image2d<T>& ima, T v)
 {
   mln_foreach (auto& x, ima.values())
     x = v++;
 }
 
-void
-display()
+void display()
 {
   const int nrows = 5, ncols = 5;
   image2d<int> ima(nrows, ncols);
@@ -170,8 +160,7 @@ display()
   }
 }
 
-void
-display_nbh()
+void display_nbh()
 {
   const int nrows = 5, ncols = 5;
   image2d<int> ima(nrows, ncols);
@@ -205,8 +194,7 @@ display_nbh()
   }
 }
 
-int
-main()
+int main()
 {
 
   const int nrows = 1000, ncols = 10000;

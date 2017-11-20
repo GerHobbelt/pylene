@@ -2,10 +2,9 @@
 #define SHAPE_HPP
 
 #include <functional>
-#include <type_traits>
-//# include <vector>
 #include <mln/core/domain/box.hpp>
 #include <ostream>
+#include <type_traits>
 #include <unordered_set>
 
 #include <boost/dynamic_bitset.hpp>
@@ -29,12 +28,10 @@ template <typename V, class LowerCompare, class UpperCompare>
 struct shape;
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-is_shape_included(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b);
+bool is_shape_included(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b);
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-is_shape_equal(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b);
+bool is_shape_equal(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b);
 
 template <typename V, class LowerCompare, class UpperCompare>
 struct shape
@@ -115,8 +112,7 @@ template <typename shape_t>
 using shape_set = std::unordered_set<shape_t>;
 
 template <typename V, class LowerCompare, class UpperCompare>
-void
-prettyprint_shape(const shape<V, LowerCompare, UpperCompare>& shp, const mln::box2d& domain);
+void prettyprint_shape(const shape<V, LowerCompare, UpperCompare>& shp, const mln::box2d& domain);
 
 namespace std
 {
@@ -162,8 +158,7 @@ namespace impl
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-is_shape_included(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b)
+bool is_shape_included(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b)
 {
   // Heuristique 1.
   // A c B => |A| < |B| et bbox(A) c bbox(B)
@@ -191,8 +186,7 @@ is_shape_included(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, 
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-is_shape_equal(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b)
+bool is_shape_equal(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b)
 {
   // Heuristique 1.
   // A = B => |A| = |B| et bbox(A) = bbox(B)
@@ -253,8 +247,7 @@ shape<V, LowerCompare, UpperCompare>::shape(shape&& other)
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-shape<V, LowerCompare, UpperCompare>&
-shape<V, LowerCompare, UpperCompare>::operator=(shape&& other)
+shape<V, LowerCompare, UpperCompare>& shape<V, LowerCompare, UpperCompare>::operator=(shape&& other)
 {
   m_type = other.m_type;
   m_level_1 = other.m_level_1;
@@ -275,8 +268,7 @@ shape<V, LowerCompare, UpperCompare>::operator=(shape&& other)
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-void
-shape<V, LowerCompare, UpperCompare>::init()
+void shape<V, LowerCompare, UpperCompare>::init()
 {
   m_set.resize(m_size);
   m_set.reset();
@@ -287,8 +279,7 @@ shape<V, LowerCompare, UpperCompare>::init()
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-void
-shape<V, LowerCompare, UpperCompare>::add_point(const mln::point2d& p)
+void shape<V, LowerCompare, UpperCompare>::add_point(const mln::point2d& p)
 {
   size_t x = p[0] * m_nc + p[1];
 
@@ -302,8 +293,7 @@ shape<V, LowerCompare, UpperCompare>::add_point(const mln::point2d& p)
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-void
-shape<V, LowerCompare, UpperCompare>::set_level(V level, LowerCompare)
+void shape<V, LowerCompare, UpperCompare>::set_level(V level, LowerCompare)
 {
   m_type = LOWER;
   m_level_1 = level;
@@ -311,86 +301,76 @@ shape<V, LowerCompare, UpperCompare>::set_level(V level, LowerCompare)
 
 template <typename V, class LowerCompare, class UpperCompare>
 template <typename dummy>
-void
-shape<V, LowerCompare, UpperCompare>::set_level(V level, UpperCompare, typename std::enable_if<hasUL, dummy>::type*)
+void shape<V, LowerCompare, UpperCompare>::set_level(V level, UpperCompare,
+                                                     typename std::enable_if<hasUL, dummy>::type*)
 {
   m_type = UPPER;
   m_level_2 = level;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-shape<V, LowerCompare, UpperCompare>::operator==(const shape& other) const
+bool shape<V, LowerCompare, UpperCompare>::operator==(const shape& other) const
 {
   return is_shape_equal(*this, other);
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-shape<V, LowerCompare, UpperCompare>::isupper() const
+bool shape<V, LowerCompare, UpperCompare>::isupper() const
 {
   return (m_type & UPPER) != 0;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-shape<V, LowerCompare, UpperCompare>::islower() const
+bool shape<V, LowerCompare, UpperCompare>::islower() const
 {
   return (m_type & LOWER) != 0;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-shape<V, LowerCompare, UpperCompare>::isleq() const
+bool shape<V, LowerCompare, UpperCompare>::isleq() const
 {
   return (m_type & LEQ) != 0;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-bool
-shape<V, LowerCompare, UpperCompare>::isgeq() const
+bool shape<V, LowerCompare, UpperCompare>::isgeq() const
 {
   return (m_type & GEQ) != 0;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-V
-shape<V, LowerCompare, UpperCompare>::upper_level() const
+V shape<V, LowerCompare, UpperCompare>::upper_level() const
 {
   return m_level_2;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-V
-shape<V, LowerCompare, UpperCompare>::lower_level() const
+V shape<V, LowerCompare, UpperCompare>::lower_level() const
 {
   return m_level_1;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-unsigned
-shape<V, LowerCompare, UpperCompare>::size() const
+unsigned shape<V, LowerCompare, UpperCompare>::size() const
 {
   return m_count;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-const mln::box2d&
-shape<V, LowerCompare, UpperCompare>::bbox() const
+const mln::box2d& shape<V, LowerCompare, UpperCompare>::bbox() const
 {
   return m_bbox;
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
 boost::iterator_range<typename shape<V, LowerCompare, UpperCompare>::set_iterator>
-shape<V, LowerCompare, UpperCompare>::pset() const
+    shape<V, LowerCompare, UpperCompare>::pset() const
 {
   return boost::make_iterator_range(set_iterator(&m_set, m_nc, m_first), set_iterator(&m_set, m_nc, m_set.npos));
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-void
-shape<V, LowerCompare, UpperCompare>::update_with(const shape& other) const
+void shape<V, LowerCompare, UpperCompare>::update_with(const shape& other) const
 {
   mln_precondition(this->m_type != NONE and other.m_type != NONE);
 
@@ -421,8 +401,7 @@ shape<V, LowerCompare, UpperCompare>::update_with(const shape& other) const
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-std::ostream&
-operator<<(std::ostream& os, const shape<V, LowerCompare, UpperCompare>& shp)
+std::ostream& operator<<(std::ostream& os, const shape<V, LowerCompare, UpperCompare>& shp)
 {
   os << "==Info== Size:" << shp.size();
   if (shp.islower())
@@ -439,8 +418,7 @@ operator<<(std::ostream& os, const shape<V, LowerCompare, UpperCompare>& shp)
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
-void
-prettyprint_shape(const shape<V, LowerCompare, UpperCompare>& shp, const mln::box2d& domain)
+void prettyprint_shape(const shape<V, LowerCompare, UpperCompare>& shp, const mln::box2d& domain)
 {
   using namespace mln;
   using mln::io::format;

@@ -3,6 +3,7 @@
 
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image_category.hpp>
+
 #include <type_traits>
 
 #define mln_value(I) typename std::remove_reference<I>::type::value_type

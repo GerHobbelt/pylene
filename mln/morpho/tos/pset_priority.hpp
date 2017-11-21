@@ -24,9 +24,9 @@
 // executable file might be covered by the GNU General Public License.
 
 #ifndef MLN_MOPRHO_TOS_PSET_PRIORITY_HPP
-# define MLN_MOPRHO_TOS_PSET_PRIORITY_HPP
+#define MLN_MOPRHO_TOS_PSET_PRIORITY_HPP
 
-# include <set>
+#include <set>
 
 namespace mln
 {
@@ -34,100 +34,82 @@ namespace mln
   namespace morpho
   {
 
-    //bool Enable = has_indexer<typename I::value_type, Compare>::value  >
-    template <typename I,
-	      typename Compare = std::less<typename I::value_type>,
-	      bool Enable = false>
+    // bool Enable = has_indexer<typename I::value_type, Compare>::value  >
+    template <typename I, typename Compare = std::less<typename I::value_type>, bool Enable = false>
     struct pset_priority;
-
 
     template <typename I, typename Compare>
     struct pset_priority<I, Compare, false>
     {
-      typedef typename I::value_type	key_type;
-      typedef typename I::size_type	value_type;
+      typedef typename I::value_type key_type;
+      typedef typename I::size_type value_type;
 
       struct cmp_t
       {
-	bool operator () (const value_type& a, const value_type& b)
-	{
-	  return m_cmp(m_ima[a], m_ima[b]);
-	}
+        bool operator()(const value_type& a, const value_type& b) { return m_cmp(m_ima[a], m_ima[b]); }
 
-	bool cmpkey (const key_type& x, const value_type& b)
-	{
-	  return m_cmp(x, m_ima[b]);
-	}
+        bool cmpkey(const key_type& x, const value_type& b) { return m_cmp(x, m_ima[b]); }
 
-	const I& m_ima;
-	Compare  m_cmp;
+        const I& m_ima;
+        Compare m_cmp;
       };
 
-      pset_priority(const I& ima, const Compare& cmp = Compare() );
+      pset_priority(const I& ima, const Compare& cmp = Compare());
 
       void insert(const value_type& v);
       bool empty() const;
 
-
       /// \brief returns the next point \p k such that level(p) <= level(k)
       /// If there is point \p k such that level(p) == level(k) then k is returned
       /// Otherwise it returns the point at highest priority (rend())
-      bool		has_next(const value_type& v) const;
-      value_type	pop_next(const value_type& p);
+      bool has_next(const value_type& v) const;
+      value_type pop_next(const value_type& p);
 
       /// \brief returns the next point \p k such that level(p) < level(k)
-      bool		has_previous(const value_type& v) const;
-      value_type	pop_previous(const value_type& p);
+      bool has_previous(const value_type& v) const;
+      value_type pop_previous(const value_type& p);
 
     private:
-      std::multiset<value_type, cmp_t>		m_set;
+      std::multiset<value_type, cmp_t> m_set;
     };
 
     /*************************/
     /**  Implementation     **/
     /*************************/
 
-
-
     template <typename I, typename Compare>
-    pset_priority<I, Compare, false>::pset_priority(const I& ima, const Compare& cmp)
-      : m_set(cmp_t {ima, cmp} )
+    pset_priority<I, Compare, false>::pset_priority(const I& ima, const Compare& cmp) : m_set(cmp_t{ima, cmp})
     {
     }
 
     template <typename I, typename Compare>
-    void
-    pset_priority<I, Compare, false>::insert(const value_type& v)
+    void pset_priority<I, Compare, false>::insert(const value_type& v)
     {
       m_set.insert(v);
     }
 
     template <typename I, typename Compare>
-    bool
-    pset_priority<I, Compare, false>::empty() const
+    bool pset_priority<I, Compare, false>::empty() const
     {
       return m_set.empty();
     }
 
     template <typename I, typename Compare>
-    bool
-    pset_priority<I, Compare, false>::has_previous(const value_type& p) const
+    bool pset_priority<I, Compare, false>::has_previous(const value_type& p) const
     {
       mln_precondition(!empty());
       return m_set.key_comp()(*(m_set.begin()), p);
     }
 
     template <typename I, typename Compare>
-    bool
-    pset_priority<I, Compare, false>::has_next(const value_type& p) const
+    bool pset_priority<I, Compare, false>::has_next(const value_type& p) const
     {
       mln_precondition(!empty());
       return !m_set.key_comp()(*(m_set.rbegin()), p);
     }
 
     template <typename I, typename Compare>
-    typename I::size_type
-    pset_priority<I, Compare, false>::pop_previous(const value_type& p)
+    typename I::size_type pset_priority<I, Compare, false>::pop_previous(const value_type& p)
     {
       mln_precondition(has_previous(p));
       auto x = m_set.lower_bound(p);
@@ -139,26 +121,22 @@ namespace mln
     }
 
     template <typename I, typename Compare>
-    typename I::size_type
-    pset_priority<I, Compare, false>::pop_next(const value_type& p)
+    typename I::size_type pset_priority<I, Compare, false>::pop_next(const value_type& p)
     {
       mln_precondition(has_next(p));
       auto x = m_set.lower_bound(p); // level(p) <= level(x)
       mln_assertion(x != m_set.end());
 
       if (not m_set.key_comp()(p, *x)) // then level(x) == level(p)
-	;
-      else // level(p) < level(x) => get the highest priority 
-	x = --m_set.end();
+        ;
+      else // level(p) < level(x) => get the highest priority
+        x = --m_set.end();
 
       value_type v = *x;
       m_set.erase(x);
       return v;
     }
-
   }
-
 }
-
 
 #endif // ! MLN_MOPRHO_TOS_PSET_PRIORITY_HPP

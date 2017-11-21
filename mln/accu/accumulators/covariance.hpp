@@ -1,11 +1,11 @@
 #ifndef MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP
-# define MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP
+#define MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP
 
-# include <mln/accu/accumulators/sum.hpp>
-# include <mln/accu/accumulators/count.hpp>
-# include <mln/accu/accumulators/mean.hpp>
-# include <boost/type_traits/promote.hpp>
-# include <Eigen/Dense>
+#include <Eigen/Dense>
+#include <boost/type_traits/promote.hpp>
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/accu/accumulators/sum.hpp>
 
 namespace mln
 {
@@ -20,176 +20,156 @@ namespace mln
       /// \f[
       /// V(X) = E(\norm X - E(X) \norm_2^2)
       /// \f]
-      template <typename T,
-                typename SumType = typename boost::promote<typename T::value_type>::type,
+      template <typename T, typename SumType = typename boost::promote<typename T::value_type>::type,
                 typename SumSqrType = SumType>
       struct covariance;
-  }
+    }
 
     namespace features
     {
-      template <typename SumType = void,
-                typename SumSqrType = SumType>
+      template <typename SumType = void, typename SumSqrType = SumType>
       struct covariance;
     }
 
-  namespace features
-  {
-    namespace internal
+    namespace features
     {
+      namespace internal
+      {
+        template <typename SumType, typename SumSqrType>
+        struct meta_covariance
+        {
+          template <typename T>
+          using type = accu::accumulators::covariance<T, SumType, SumSqrType>;
+        };
+
+        template <>
+        struct meta_covariance<void, void>
+        {
+          template <typename T>
+          using type = accu::accumulators::covariance<T>;
+        };
+      }
+
       template <typename SumType, typename SumSqrType>
-      struct meta_covariance
+      struct covariance : simple_feature_facade<covariance<SumType, SumSqrType>,
+                                                internal::meta_covariance<SumType, SumSqrType>::template type>
       {
-        template <typename T>
-        using type = accu::accumulators::covariance<T, SumType, SumSqrType>;
-      };
-
-      template <>
-      struct meta_covariance<void, void>
-      {
-        template <typename T>
-        using type = accu::accumulators::covariance<T>;
       };
     }
 
-    template <typename SumType,
-              typename SumSqrType>
-    struct covariance : simple_feature_facade< covariance<SumType, SumSqrType>,
-                                               internal::meta_covariance<SumType, SumSqrType>::template type>
+    namespace extractor
     {
-    };
-  }
 
-  namespace extractor
-  {
-
-    template <typename A>
-    inline
-    auto
-    covariance(const Accumulator<A>& acc)
-      -> decltype(extract(exact(acc), features::covariance<> ()))
-    {
-      return extract(exact(acc), features::covariance<> ());
+      template <typename A>
+      inline auto covariance(const Accumulator<A>& acc) -> decltype(extract(exact(acc), features::covariance<>()))
+      {
+        return extract(exact(acc), features::covariance<>());
+      }
     }
 
-  }
-
-  namespace accumulators
-  {
-
-    template <typename T, typename SumType, typename SumSqrType>
-    struct covariance : accumulator_base< covariance<T, SumType, SumSqrType>,
-                                          T,
-                                          Eigen::Matrix<double,
-                                                        value_traits<T>::ndim,
-                                                        value_traits<T>::ndim>,
-                                          features::covariance<> >
+    namespace accumulators
     {
-    private:
-      enum { ndim = value_traits<T>::ndim };
-      typedef Eigen::Array<SumType, ndim, 1>           vec_t;
-      typedef Eigen::Array<SumSqrType, ndim, ndim>     matrix_t;
 
-    public:
-      typedef Eigen::Array<double, ndim, 1>     mean_result_type;
-      typedef T                                 argument_type;
-      typedef Eigen::Array<double, ndim, ndim>  result_type;
-
-      //typedef boost::mpl::set< features::covariance<>, features::covariance<SumType> > provides;
-
-      covariance()
-        : m_count {0},
-        m_sum {vec_t::Zero()},
-        m_S {matrix_t::Zero()}
+      template <typename T, typename SumType, typename SumSqrType>
+      struct covariance : accumulator_base<covariance<T, SumType, SumSqrType>, T,
+                                           Eigen::Matrix<double, value_traits<T>::ndim, value_traits<T>::ndim>,
+                                           features::covariance<>>
       {
-      }
+      private:
+        enum
+        {
+          ndim = value_traits<T>::ndim
+        };
+        typedef Eigen::Array<SumType, ndim, 1> vec_t;
+        typedef Eigen::Array<SumSqrType, ndim, ndim> matrix_t;
 
-      void init()
-      {
-        m_count = 0;
-        m_sum = vec_t::Zero();
-        m_S  = matrix_t::Zero();
-      }
+      public:
+        typedef Eigen::Array<double, ndim, 1> mean_result_type;
+        typedef T argument_type;
+        typedef Eigen::Array<double, ndim, ndim> result_type;
 
-      void take(const argument_type& arg)
-      {
-        m_count += 1;
+        // typedef boost::mpl::set< features::covariance<>, features::covariance<SumType> > provides;
 
-        for (int i = 0; i < ndim; ++i) {
-          m_sum(i) += SumType(arg[i]);
-          for (int j = i; j < ndim; ++j)
-            m_S(i,j) += SumSqrType(arg[i]) * SumSqrType(arg[j]);
+        covariance() : m_count{0}, m_sum{vec_t::Zero()}, m_S{matrix_t::Zero()} {}
+
+        void init()
+        {
+          m_count = 0;
+          m_sum = vec_t::Zero();
+          m_S = matrix_t::Zero();
         }
-      }
 
-      void untake(const argument_type& arg)
-      {
-        m_count -= 1;
+        void take(const argument_type& arg)
+        {
+          m_count += 1;
 
-        for (int i = 0; i < ndim; ++i) {
-          m_sum(i) -= SumType(arg[i]);
-          for (int j = i; j < ndim; ++j)
-            m_S(i,j) -= SumSqrType(arg[i]) * SumSqrType(arg[j]);
+          for (int i = 0; i < ndim; ++i)
+          {
+            m_sum(i) += SumType(arg[i]);
+            for (int j = i; j < ndim; ++j)
+              m_S(i, j) += SumSqrType(arg[i]) * SumSqrType(arg[j]);
+          }
         }
-      }
 
-      void take(const covariance& other)
-      {
-        m_count += other.m_count;
-        m_sum += other.m_sum;
-        m_S += other.m_S;
-      }
+        void untake(const argument_type& arg)
+        {
+          m_count -= 1;
 
-      void untake(const covariance& other)
-      {
-        m_count -= other.m_count;
-        m_sum -= other.m_sum;
-        m_S -= other.m_S;
-      }
+          for (int i = 0; i < ndim; ++i)
+          {
+            m_sum(i) -= SumType(arg[i]);
+            for (int j = i; j < ndim; ++j)
+              m_S(i, j) -= SumSqrType(arg[i]) * SumSqrType(arg[j]);
+          }
+        }
 
-      template <class ST1, class ST2>
-      friend
-      result_type extract(const covariance& accu, features::covariance<ST1, ST2> )
-      {
-        if (accu.m_count == 0)
-          return result_type::Zero();
+        void take(const covariance& other)
+        {
+          m_count += other.m_count;
+          m_sum += other.m_sum;
+          m_S += other.m_S;
+        }
 
-        double n = accu.m_count;
-        result_type COV;
-        for (int i = 0; i < ndim; ++i)
-          for (int j = i; j < ndim; ++j)
-            COV(i,j) = (COV(j,i) = (accu.m_S(i,j) / n) - (accu.m_sum(i) * accu.m_sum(j)) / sqr(n));
+        void untake(const covariance& other)
+        {
+          m_count -= other.m_count;
+          m_sum -= other.m_sum;
+          m_S -= other.m_S;
+        }
 
-        return COV;
-      }
+        template <class ST1, class ST2>
+        friend result_type extract(const covariance& accu, features::covariance<ST1, ST2>)
+        {
+          if (accu.m_count == 0)
+            return result_type::Zero();
 
-      template <class S>
-      friend
-      mean_result_type
-      extract(const covariance& accu, features::mean<S>)
-      {
-        if (accu.m_count == 0)
-          return mean_result_type::Zero();
+          double n = accu.m_count;
+          result_type COV;
+          for (int i = 0; i < ndim; ++i)
+            for (int j = i; j < ndim; ++j)
+              COV(i, j) = (COV(j, i) = (accu.m_S(i, j) / n) - (accu.m_sum(i) * accu.m_sum(j)) / sqr(n));
 
-        return accu.m_sum / (double)accu.m_count;
-      }
+          return COV;
+        }
 
-      friend
-      unsigned extract(const covariance& accu, features::count<> )
-      {
-        return accu.m_count;
-      }
+        template <class S>
+        friend mean_result_type extract(const covariance& accu, features::mean<S>)
+        {
+          if (accu.m_count == 0)
+            return mean_result_type::Zero();
 
-    private:
-      unsigned        m_count;
-      vec_t           m_sum;
-      matrix_t        m_S;
-    };
+          return accu.m_sum / (double)accu.m_count;
+        }
 
+        friend unsigned extract(const covariance& accu, features::count<>) { return accu.m_count; }
+
+      private:
+        unsigned m_count;
+        vec_t m_sum;
+        matrix_t m_S;
+      };
+    }
   }
-
-  }
-
 }
 
 #endif // ! MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP_HPP

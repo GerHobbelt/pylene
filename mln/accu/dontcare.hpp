@@ -1,5 +1,5 @@
 #ifndef DONTCARE_HPP
-# define DONTCARE_HPP
+#define DONTCARE_HPP
 
 namespace mln
 {
@@ -10,14 +10,9 @@ namespace mln
     struct dontcare
     {
       template <typename T>
-      dontcare(T )
-      {
-      };
+      dontcare(T&&){};
     };
-
-
   }
-
 }
 
 #endif // ! DONTCARE_HPP

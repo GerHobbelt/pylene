@@ -1,10 +1,10 @@
 #ifndef MLN_DATA_STRETCH_HPP
-# define MLN_DATA_STRETCH_HPP
+#define MLN_DATA_STRETCH_HPP
 
-# include <mln/core/image/image.hpp>
-# include <mln/core/algorithm/transform.hpp>
-# include <mln/core/algorithm/accumulate.hpp>
-# include <mln/accu/accumulators/minmax.hpp>
+#include <mln/accu/accumulators/minmax.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {
@@ -19,7 +19,6 @@ namespace mln
     /// V and not vectorial type.
     template <class V, class I>
     mln_ch_value(I, V) stretch(const Image<I>& f);
-
 
     template <class I, class J>
     J& stretch_to(const Image<I>& f, Image<J>& out);
@@ -36,21 +35,19 @@ namespace mln
     {
       typedef mln_value(J) V;
 
-      static_assert(std::is_convertible<mln_value(I), V>::value,
-                    "The image value type must be convertible to V");
-      static_assert(std::is_arithmetic<V>::value,
-                    "V must be arithmetic");
+      static_assert(std::is_convertible<mln_value(I), V>::value, "The image value type must be convertible to V");
+      static_assert(std::is_arithmetic<V>::value, "V must be arithmetic");
 
       mln_entering("mln::data:stretch");
 
       double m, M;
-      std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)> ());
+      std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)>());
 
       double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
       double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;
 
       double r = (y - x) / (M - m);
-      transform(f, [m,x,r](mln_value(I) v) -> V { return static_cast<V>(x + (v - m) * r); }, out);
+      transform(f, [m, x, r](mln_value(I) v) -> V { return static_cast<V>(x + (v - m) * r); }, out);
       mln_exiting();
       return exact(out);
     }
@@ -62,33 +59,27 @@ namespace mln
       return move_exact(out);
     }
 
-
     template <class V, class I>
     mln_ch_value(I, V) stretch(const Image<I>& f)
     {
-      static_assert(std::is_convertible<mln_value(I), V>::value,
-                    "The image value type must be convertible to V");
-      static_assert(std::is_arithmetic<V>::value,
-                    "V must be arithmetic");
+      static_assert(std::is_convertible<mln_value(I), V>::value, "The image value type must be convertible to V");
+      static_assert(std::is_arithmetic<V>::value, "V must be arithmetic");
 
       mln_entering("mln::data:stretch");
 
       double m, M;
-      std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)> ());
+      std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)>());
 
       double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
       double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;
 
       double r = (y - x) / (M - m);
-      mln_ch_value(I, V) out = transform(f, [m,x,r](mln_value(I) v) -> V { return static_cast<V>(x + (v - m) * r); });
+      mln_ch_value(I, V) out = transform(f, [m, x, r](mln_value(I) v) -> V { return static_cast<V>(x + (v - m) * r); });
       mln_exiting();
 
       return out;
     }
-
-
   }
-
 }
 
 #endif // ! MLN_DATA_STRETCH_HPP

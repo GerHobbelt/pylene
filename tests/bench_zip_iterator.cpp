@@ -14,7 +14,7 @@
 
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/accu/accumulators/min.hpp>
-#include <mln/kernel/kernel.hpp>
+#include <mln/kernelv2/kernel.hpp>
 
 #include <boost/range/numeric.hpp>
 #include <boost/timer.hpp>
@@ -22,27 +22,23 @@
 
 using namespace mln;
 
-const int&
-access_point(const image2d<int>& a, point2d p)
+const int& access_point(const image2d<int>& a, point2d p)
 {
   const int& x = a(p);
   asm("");
   return x;
 }
 
-const int&
-access_index(const image2d<int>& a, std::size_t i)
+const int& access_index(const image2d<int>& a, std::size_t i)
 {
   const int& x = a[i];
   asm("");
   return x;
 }
 
-double
-test_native(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_native(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
 
-double
-test_native(const image2d<int>& a, const image2d<int>& b)
+double test_native(const image2d<int>& a, const image2d<int>& b)
 {
   const size_t* strides = a.strides();
   const char* ptra = (const char*)&(a(point2d{0, 0}));
@@ -60,22 +56,18 @@ test_native(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double
-test_iterator(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_iterator(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
 
-double
-test_iterator(const image2d<int>& a, const image2d<int>& b)
+double test_iterator(const image2d<int>& a, const image2d<int>& b)
 {
   double v = range::inner_product(a.values(), b.values(), 0.0);
 
   return v;
 }
 
-double
-test_zip(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_zip(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
 
-double
-test_zip(const image2d<int>& a, const image2d<int>& b)
+double test_zip(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
 
@@ -86,11 +78,9 @@ test_zip(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double
-test_zip_pix(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_zip_pix(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
 
-double
-test_zip_pix(const image2d<int>& a, const image2d<int>& b)
+double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
 {
   auto ima = imzip(a, b);
   typedef typename decltype(ima)::const_pixel_type pixel_t;
@@ -99,11 +89,9 @@ test_zip_pix(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double
-test_for(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_for(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
 
-double
-test_for(const image2d<int>& a, const image2d<int>& b)
+double test_for(const image2d<int>& a, const image2d<int>& b)
 {
   double v = 0;
   mln_viter(x, y, a, b);
@@ -114,11 +102,9 @@ test_for(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double
-test_for_pixel(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_for_pixel(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
 
-double
-test_for_pixel(const image2d<int>& a, const image2d<int>& b)
+double test_for_pixel(const image2d<int>& a, const image2d<int>& b)
 {
   double v = 0;
 
@@ -129,11 +115,9 @@ test_for_pixel(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-void
-test_dilation_native(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_dilation_native(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
 
-void
-test_dilation_native(const image2d<int>& a, image2d<int>& b)
+void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
@@ -158,11 +142,9 @@ test_dilation_native(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void
-test_dilation_pixel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_dilation_pixel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
 
-void
-test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
+void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
@@ -178,10 +160,8 @@ test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void
-test_dilation_point(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
-void
-test_dilation_point(const image2d<int>& a, image2d<int>& b)
+void test_dilation_point(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_dilation_point(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
@@ -197,10 +177,8 @@ test_dilation_point(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void
-test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
-void
-test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
+void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
@@ -221,10 +199,8 @@ test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void
-test_dilation_index(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
-void
-test_dilation_index(const image2d<int>& a, image2d<int>& b)
+void test_dilation_index(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_dilation_index(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
@@ -248,49 +224,46 @@ test_dilation_index(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void
-test_dilation_kernel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_dilation_kernel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
 
-void
-test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
+void test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
 {
   // fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   {
-    const kernel::image<0> f{};
-    const kernel::image<1> out{};
-    using kernel::placeholders::n;
-    using kernel::placeholders::p;
+    auto f = kernel::make_image_expr<0>(a);
+    auto out = kernel::make_image_expr<1>(b);
+    kernel::Point p;
+    kernel::Neighbor n;
+
     const kernel::Aggregate<mln::accu::features::min<>> Min = {};
 
-    auto expr = (out(p) = Min(f(n)));
+    auto expr = kernel::declare(out(p) = Min(f(n)));
 
-    kernel::execute(expr, c8, a, b);
+    kernel::execute(expr, c8);
   }
 }
 
-void
-test_extgrad_kernel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+void test_extgrad_kernel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
 
-void
-test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
+void test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
 {
   // fill(b, std::numeric_limits<int>::max());
   extension::fill(b, std::numeric_limits<int>::max());
 
   {
-    const kernel::image<0> f{};
-    const kernel::image<1> out{};
-    using kernel::placeholders::n;
-    using kernel::placeholders::p;
+    auto f = kernel::make_image_expr<0>(a);
+    auto out = kernel::make_image_expr<1>(b);
+    kernel::Point p;
+    kernel::Neighbor n;
 
     const kernel::Aggregate<mln::accu::features::min<>> Min = {};
     const kernel::Aggregate<mln::accu::features::max<>> Max = {};
 
-    auto expr = (out(p) = Max(f(n)) - Min(f(n)));
+    auto expr = kernel::declare(out(p) = Max(f(n)) - Min(f(n)));
 
-    kernel::execute(expr, c8, a, b);
+    kernel::execute(expr, c8);
   }
 }
 
@@ -316,8 +289,7 @@ void test_dilation_extfor(const image2d<int>& a, image2d<int>& b)
 }
 */
 
-int
-main()
+int main()
 {
   int NTEST = 50;
 

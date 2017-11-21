@@ -1,7 +1,7 @@
 #ifndef MLN_IO_EXCEPTION_HPP
-# define MLN_IO_EXCEPTION_HPP
+#define MLN_IO_EXCEPTION_HPP
 
-# include <exception>
+#include <exception>
 
 namespace mln
 {
@@ -12,13 +12,8 @@ namespace mln
     class MLNIOException : public std::runtime_error
     {
     public:
-      MLNIOException(const std::string& what_arg) :
-	std::runtime_error(what_arg)
-      {
-      }
+      MLNIOException(const std::string& what_arg) : std::runtime_error(what_arg) {}
     };
-
   }
-
 }
 #endif

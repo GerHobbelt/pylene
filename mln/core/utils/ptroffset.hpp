@@ -1,7 +1,7 @@
 #ifndef MLN_CORE_UTILS_PTROFFSET_HPP
-# define MLN_CORE_UTILS_PTROFFSET_HPP
+#define MLN_CORE_UTILS_PTROFFSET_HPP
 
-# include <cstddef>
+#include <cstddef>
 
 namespace mln
 {
@@ -10,9 +10,9 @@ namespace mln
   template <class T>
   T* ptr_offset(T* x, std::ptrdiff_t offset)
   {
-    return (T*)( ((char*)x) + offset);
+    return (T*)(((char*)x) + offset);
   }
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_UTILS_PTROFFSET_HPP
+#endif //! MLN_CORE_UTILS_PTROFFSET_HPP

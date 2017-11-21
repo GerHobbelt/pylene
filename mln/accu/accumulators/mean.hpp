@@ -1,9 +1,9 @@
 #ifndef MLN_ACCU_ACCUMULATOTS_MEAN_HPP
-# define MLN_ACCU_ACCUMULATOTS_MEAN_HPP
+#define MLN_ACCU_ACCUMULATOTS_MEAN_HPP
 
-# include <mln/accu/accumulators/sum.hpp>
-# include <mln/accu/accumulators/count.hpp>
-# include <mln/accu/composite_accumulator.hpp>
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/accu/accumulators/sum.hpp>
+#include <mln/accu/composite_accumulator.hpp>
 
 namespace mln
 {
@@ -13,7 +13,7 @@ namespace mln
 
     namespace accumulators
     {
-      template <typename T, typename SumType = decltype( std::declval<T>() + std::declval<T>() )  >
+      template <typename T, typename SumType = decltype(std::declval<T>() + std::declval<T>())>
       struct mean;
     }
 
@@ -27,16 +27,13 @@ namespace mln
     {
 
       template <typename A>
-	  inline
-      auto
-      mean(const Accumulator<A>& acc);
+      inline auto mean(const Accumulator<A>& acc);
     }
-
 
     namespace features
     {
       template <typename SumType>
-      struct mean : simple_feature< mean<SumType> >
+      struct mean : simple_feature<mean<SumType>>
       {
         template <typename T>
         struct apply
@@ -45,15 +42,14 @@ namespace mln
         };
 
         template <typename T>
-        accumulators::mean<T, SumType>
-        make() const
+        accumulators::mean<T, SumType> make() const
         {
           return accumulators::mean<T, SumType>();
         }
       };
 
       template <>
-      struct mean<void> : simple_feature< mean<void> >
+      struct mean<void> : simple_feature<mean<void>>
       {
         template <typename T>
         struct apply
@@ -62,53 +58,42 @@ namespace mln
         };
 
         template <typename T>
-        accumulators::mean<T>
-        make() const
+        accumulators::mean<T> make() const
         {
           return accumulators::mean<T>();
         }
       };
 
       template <typename SumType>
-      struct depends< mean<SumType> >
+      struct depends<mean<SumType>>
       {
-        typedef boost::mpl::set< sum<SumType>, count<> > type;
+        typedef boost::mpl::set<sum<SumType>, count<>> type;
       };
-
     }
 
     namespace extractor
     {
 
       template <typename A>
-      inline
-      auto
-      mean(const Accumulator<A>& acc)
+      inline auto mean(const Accumulator<A>& acc)
       {
-        return extract(exact(acc), features::mean<> ());
+        return extract(exact(acc), features::mean<>());
       }
-
     }
-
 
     namespace accumulators
     {
 
       template <typename T, typename SumType>
-      struct mean : composite_accumulator_facade< mean<T, SumType>, T,  SumType, features::mean<SumType> >
+      struct mean : composite_accumulator_facade<mean<T, SumType>, T, SumType, features::mean<SumType>>
       {
-        typedef T       argument_type;
+        typedef T argument_type;
         typedef SumType result_type;
-        typedef boost::mpl::set< features::mean<>, features::mean<SumType> > provides;
+        typedef boost::mpl::set<features::mean<>, features::mean<SumType>> provides;
 
-        friend
-        SumType extract(const mean& accu, features::mean<SumType> )
-        {
-          return extract(accu, features::mean<>() );
-        }
+        friend SumType extract(const mean& accu, features::mean<SumType>) { return extract(accu, features::mean<>()); }
 
-        friend
-        SumType extract(const mean& accu, features::mean<> )
+        friend SumType extract(const mean& accu, features::mean<>)
         {
           auto v = extractor::count(accu);
           if (v == 0)
@@ -117,11 +102,8 @@ namespace mln
             return static_cast<SumType>(extractor::sum(accu) / extractor::count(accu));
         }
       };
-
     }
-
   }
-
 }
 
 #endif // ! MLN_ACCU_ACCUMULATOTS_MEAN_HPP

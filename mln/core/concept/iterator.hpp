@@ -1,9 +1,9 @@
 #ifndef MLN_CORE_CONCEPT_ITERATOR_HPP
-# define MLN_CORE_CONCEPT_ITERATOR_HPP
+#define MLN_CORE_CONCEPT_ITERATOR_HPP
 
-# include <mln/core/concept/object.hpp>
-# include <mln/core/concept/check.hpp>
-# include <boost/concept_check.hpp>
+#include <boost/concept_check.hpp>
+#include <mln/core/concept/check.hpp>
+#include <mln/core/concept/object.hpp>
 
 namespace mln
 {
@@ -21,10 +21,7 @@ namespace mln
   template <typename I>
   struct Iterator : Object<I>
   {
-    BOOST_CONCEPT_USAGE(Iterator)
-    {
-      BOOST_CONCEPT_ASSERT((details::Iterator<I>));
-    }
+    BOOST_CONCEPT_USAGE(Iterator) { BOOST_CONCEPT_ASSERT((details::Iterator<I>)); }
   };
 
   namespace details
@@ -84,4 +81,4 @@ namespace mln
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_CONCEPT_ITERATOR_HPP
+#endif //! MLN_CORE_CONCEPT_ITERATOR_HPP

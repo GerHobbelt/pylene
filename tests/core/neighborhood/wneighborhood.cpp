@@ -7,8 +7,7 @@
 #include <gtest/gtest.h>
 
 template <class I>
-void
-test_pixel_lvalue(I& f)
+void test_pixel_lvalue(I& f)
 {
   using namespace mln;
 
@@ -57,18 +56,23 @@ test_pixel_lvalue(I& f)
 
 TEST(Core, WNeighborhood_binding_pixel_lvalue)
 {
-  mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_pixel_lvalue(f);
 }
 
 TEST(Core, binding_const_pixel_lvalue)
 {
-  const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  const mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_pixel_lvalue(f);
 }
 
-void
-test_point_lvalue()
+void test_point_lvalue()
 {
   using namespace mln;
 
@@ -115,8 +119,7 @@ TEST(Core, WNeighborhood_binding_point_lvalue)
 }
 
 template <class I>
-void
-test_pixiterator_lvalue(I& f)
+void test_pixiterator_lvalue(I& f)
 {
   using namespace mln;
 
@@ -166,19 +169,24 @@ test_pixiterator_lvalue(I& f)
 
 TEST(Core, WNeighborhood_binding_pixiterator_lvalue)
 {
-  mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_pixiterator_lvalue(f);
 }
 
 TEST(Core, binding_const_pixiterator_lvalue)
 {
-  const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  const mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_pixiterator_lvalue(f);
 }
 
 template <class I>
-void
-test_piterator_lvalue(I& f)
+void test_piterator_lvalue(I& f)
 {
   using namespace mln;
 
@@ -222,12 +230,18 @@ test_piterator_lvalue(I& f)
 
 TEST(Core, WNeighborhood_binding_piterator_lvalue)
 {
-  mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_piterator_lvalue(f);
 }
 
 TEST(Core, binding_const_piterator_lvalue)
 {
-  const mln::image2d<int> f = {{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
+  const mln::image2d<int> f = {
+      {0, 1, 2, 3, 4}, //
+      {5, 6, 7, 8, 9}  //
+  };
   test_piterator_lvalue(f);
 }

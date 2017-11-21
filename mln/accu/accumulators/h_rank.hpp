@@ -1,10 +1,10 @@
 #ifndef MLN_ACCU_ACCUMULATORS_H_RANK_HPP
-# define MLN_ACCU_ACCUMULATORS_H_RANK_HPP
+#define MLN_ACCU_ACCUMULATORS_H_RANK_HPP
 
-# include <mln/accu/accumulator_base.hpp>
-# include <mln/core/value/value_traits.hpp>
-# include <mln/core/value/indexer.hpp>
-# include <array>
+#include <array>
+#include <mln/accu/accumulator_base.hpp>
+#include <mln/core/value/indexer.hpp>
+#include <mln/core/value/value_traits.hpp>
 
 /// \file
 
@@ -50,7 +50,7 @@ namespace mln
     {
 
       template <class Ratio>
-      struct h_rank : simple_feature< h_rank<Ratio> >
+      struct h_rank : simple_feature<h_rank<Ratio>>
       {
         template <typename T>
         struct apply
@@ -59,48 +59,43 @@ namespace mln
         };
 
         template <typename T>
-        accumulators::h_rank<T, Ratio>
-        make() const
+        accumulators::h_rank<T, Ratio> make() const
         {
-          return accumulators::h_rank<T, Ratio> ();
+          return accumulators::h_rank<T, Ratio>();
         }
       };
-
     }
 
     namespace extractor
     {
 
       template <typename Ratio, typename A>
-      auto
-      h_rank (const Accumulator<A>& acc)
-        -> decltype( extract(exact(acc), std::declval< features::h_rank<Ratio> > ()) )
+      auto h_rank(const Accumulator<A>& acc) -> decltype(extract(exact(acc), std::declval<features::h_rank<Ratio>>()))
       {
-        return extract(exact(acc), features::h_rank<Ratio> ());
+        return extract(exact(acc), features::h_rank<Ratio>());
       }
-
     }
 
     namespace accumulators
     {
       // Generic impl for low-quantized types
       template <class T, class Ratio>
-      struct h_rank : accumulator_base< h_rank<T, Ratio>, T, T, features::h_rank<Ratio> >
+      struct h_rank : accumulator_base<h_rank<T, Ratio>, T, T, features::h_rank<Ratio>>
       {
         typedef T argument_type;
         typedef T result_type;
-        typedef boost::mpl::set< features::h_rank<Ratio> > provides;
+        typedef boost::mpl::set<features::h_rank<Ratio>> provides;
         typedef std::true_type has_untake;
 
         static_assert(std::is_unsigned<T>::value, "T must be unsigned");
         static_assert(value_traits<T>::quant <= 16, "T must be low quantized");
         static_assert(Ratio::num < Ratio::den, "Invalid ratio (must be [0,1)");
 
-        h_rank() :
-          m_hist {{0,}},
-          m_count {0},
-          m_cumsum {0},
-          m_current {0}
+        h_rank()
+            : m_hist{{
+                  0,
+              }},
+              m_count{0}, m_cumsum{0}, m_current{0}
         {
         }
 
@@ -142,19 +137,15 @@ namespace mln
           m_update();
         }
 
-
-        friend result_type extract(const h_rank& accu, features::h_rank<Ratio>)
-        {
-          return accu.m_current;
-        }
-
+        friend result_type extract(const h_rank& accu, features::h_rank<Ratio>) { return accu.m_current; }
 
       private:
         void m_update()
         {
           unsigned P = m_count * Ratio::num / Ratio::den;
-          if (m_cumsum <= P) {
-            mln_assertion(m_current < (int) (m_hist.size() - 1));
+          if (m_cumsum <= P)
+          {
+            mln_assertion(m_current < (int)(m_hist.size() - 1));
             while (m_hist[++m_current] == 0)
               ;
             m_cumsum += m_hist[m_current];
@@ -162,7 +153,8 @@ namespace mln
 
           unsigned Q = m_count - P;
           unsigned EQ = m_count - m_cumsum + m_hist[m_current]; // P[y >= r]
-          if (EQ < Q) {
+          if (EQ < Q)
+          {
             mln_assertion(m_current > 0);
             m_cumsum -= m_hist[m_current];
             while (m_hist[--m_current] == 0)
@@ -170,7 +162,7 @@ namespace mln
           }
 
           mln_assertion(m_cumsum > P);
-          mln_assertion( (m_count - m_cumsum + m_hist[m_current]) >= Q );
+          mln_assertion((m_count - m_cumsum + m_hist[m_current]) >= Q);
         }
 
         void m_update_full()
@@ -178,14 +170,14 @@ namespace mln
           unsigned P = m_count * Ratio::num / Ratio::den;
           m_cumsum = m_hist[0];
           m_current = 0;
-          while (m_cumsum <= P) {
+          while (m_cumsum <= P)
+          {
             ++m_current;
             m_cumsum += m_hist[m_current];
           }
 
           mln_assertion(m_cumsum > P);
         }
-
 
       private:
         std::array<unsigned, indexer<T, std::less<T>>::nvalues> m_hist;
@@ -194,24 +186,18 @@ namespace mln
         int m_current;     // Current position of the rank value r
       };
 
-
       // Impl for boolean
       template <class Ratio>
-      struct h_rank<bool, Ratio> : accumulator_base< h_rank<bool, Ratio>, bool, bool, features::h_rank<Ratio> >
+      struct h_rank<bool, Ratio> : accumulator_base<h_rank<bool, Ratio>, bool, bool, features::h_rank<Ratio>>
       {
         typedef bool argument_type;
         typedef bool result_type;
-        typedef boost::mpl::set< features::h_rank<Ratio> > provides;
+        typedef boost::mpl::set<features::h_rank<Ratio>> provides;
         typedef std::true_type has_untake;
-
 
         static_assert(Ratio::num < Ratio::den, "Invalid ratio (must be [0,1)");
 
-        h_rank() :
-          m_count {0},
-          m_false {0}
-        {
-        }
+        h_rank() : m_count{0}, m_false{0} {}
 
         void init()
         {
@@ -241,23 +227,17 @@ namespace mln
           --m_count;
         }
 
-
         friend result_type extract(const h_rank& accu, features::h_rank<Ratio>)
         {
-          return not ( (accu.m_count * Ratio::num / Ratio::den) < accu.m_false );
+          return not((accu.m_count * Ratio::num / Ratio::den) < accu.m_false);
         }
 
-
       private:
-        unsigned m_count;  // Number of value in the set
-        unsigned m_false;  // Number of false value in the set
+        unsigned m_count; // Number of value in the set
+        unsigned m_false; // Number of false value in the set
       };
-
-
     }
-
   }
-
 }
 
-# endif //! MLN_ACCU_ACCUMULATORS_H_RANK_HPP
+#endif //! MLN_ACCU_ACCUMULATORS_H_RANK_HPP

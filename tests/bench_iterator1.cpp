@@ -5,10 +5,10 @@
 
 #include <mln/core/domain/box.hpp>
 #include <mln/core/grays.hpp>
-#include <mln/core/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
-void
-bench_home(mln::box3d b)
+#include <numeric>
+void bench_home(mln::box3d b)
 {
   boost::timer t;
 
@@ -23,8 +23,7 @@ bench_home(mln::box3d b)
 }
 
 template <typename T>
-void
-bench_home_ima(const mln::image3d<T>& ima)
+void bench_home_ima(const mln::image3d<T>& ima)
 {
   boost::timer t;
 
@@ -39,8 +38,7 @@ bench_home_ima(const mln::image3d<T>& ima)
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
 }
 
-void
-bench_spe(mln::box3d b)
+void bench_spe(mln::box3d b)
 {
   boost::timer t;
 
@@ -55,8 +53,7 @@ bench_spe(mln::box3d b)
 }
 
 template <typename T>
-void
-bench_boost_ima(const mln::image3d<T>& ima)
+void bench_boost_ima(const mln::image3d<T>& ima)
 {
   boost::timer t;
 
@@ -72,8 +69,7 @@ bench_boost_ima(const mln::image3d<T>& ima)
 }
 
 template <typename T>
-void
-bench_fwd_ima(const mln::image3d<T>& ima)
+void bench_fwd_ima(const mln::image3d<T>& ima)
 {
   boost::timer t;
 
@@ -86,8 +82,7 @@ bench_fwd_ima(const mln::image3d<T>& ima)
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
 }
 
-void
-bench_std(mln::box3d b)
+void bench_std(mln::box3d b)
 {
   boost::timer t;
 
@@ -102,8 +97,7 @@ bench_std(mln::box3d b)
 }
 
 template <typename T>
-void
-bench_std_ima(const mln::image3d<T>& ima)
+void bench_std_ima(const mln::image3d<T>& ima)
 {
   boost::timer t;
 
@@ -118,8 +112,7 @@ bench_std_ima(const mln::image3d<T>& ima)
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
 }
 
-int
-main()
+int main()
 {
 
   mln::box3d b = {{3, 18, 25}, {3000, 450, 79}};

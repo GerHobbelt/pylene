@@ -1,11 +1,12 @@
 #ifndef MLN_CORE_ALGORITHM_COPY_HPP
-# define MLN_CORE_ALGORITHM_COPY_HPP
+#define MLN_CORE_ALGORITHM_COPY_HPP
 
-# include <mln/core/assert.hpp>
-# include <mln/core/concept/image.hpp>
+#include <mln/core/assert.hpp>
+#include <mln/core/concept/image.hpp>
 /// \file
 
-namespace mln {
+namespace mln
+{
 
   /*
   // \brief Copy an image to memory pointed by the iterator \p it.
@@ -41,17 +42,12 @@ namespace mln {
   /// \todo add specialization for raw images
   ///
   template <typename InputImage, typename OutputImage>
-  OutputImage&
-  copy(const Image<InputImage>& input, Image<OutputImage>& output);
-
+  OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output);
 
   /// \overload
   /// \ingroup Algorithms
   template <typename InputImage, typename OutputImage>
-  OutputImage&&
-  copy(const Image<InputImage>& input, Image<OutputImage>&& output);
-
-
+  OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output);
 
   /******************************************/
   /****          Implementation          ****/
@@ -61,22 +57,17 @@ namespace mln {
   {
 
     template <typename I, typename J>
-    inline
-    void
-    copy(const I& input, J&& output)
+    inline void copy(const I& input, J&& output)
     {
       mln_viter(vin, vout, input, output);
 
-      mln_forall(vin, vout)
-        *vout = (mln_value(I)) *vin;
+      mln_forall (vin, vout)
+        *vout = (mln_value(I)) * vin;
     }
-
   }
 
-
   template <typename InputImage, typename OutputImage>
-  OutputImage&
-  copy(const Image<InputImage>& input, Image<OutputImage>& output)
+  OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output)
   {
     static_assert(std::is_convertible<mln_value(InputImage), mln_value(OutputImage)>::value,
                   "The input image value type must be convertible to the output image value type");
@@ -86,8 +77,7 @@ namespace mln {
   }
 
   template <typename InputImage, typename OutputImage>
-  OutputImage&&
-  copy(const Image<InputImage>& input, Image<OutputImage>&& output)
+  OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output)
   {
     static_assert(std::is_convertible<mln_value(InputImage), mln_value(OutputImage)>::value,
                   "The input image value type must be convertible to the output image value type");
@@ -96,8 +86,6 @@ namespace mln {
     return move_exact(output);
   }
 
-
 } // end of namespace mln
 
-
-#endif //!MLN_CORE_ALGORITHM_COPY_HPP
+#endif //! MLN_CORE_ALGORITHM_COPY_HPP

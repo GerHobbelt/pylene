@@ -62,8 +62,8 @@ add_definitions(-D BOOST_PP_VARIADICS=1)
 
 
 # Subdirectories
-add_subdirectory(tests EXCLUDE_FROM_ALL)
-add_subdirectory(bench EXCLUDE_FROM_ALL)
+add_subdirectory(tests)
+add_subdirectory(bench)
 add_subdirectory(apps EXCLUDE_FROM_ALL)
 add_subdirectory(cli EXCLUDE_FROM_ALL)
 

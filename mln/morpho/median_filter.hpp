@@ -1,8 +1,8 @@
 #ifndef MLN_MORPHO_MEDIAN_FILTER_HPP
-# define MLN_MORPHO_MEDIAN_FILTER_HPP
+#define MLN_MORPHO_MEDIAN_FILTER_HPP
 
-# include <mln/morpho/rank_filter.hpp>
-# include <ratio>
+#include <mln/morpho/rank_filter.hpp>
+#include <ratio>
 
 /// \file
 
@@ -11,7 +11,6 @@ namespace mln
 
   namespace morpho
   {
-
 
     /// \ingroup morpho
     /// \brief Median filter
@@ -31,39 +30,27 @@ namespace mln
     /// \param se  Structuring element
     /// \param out (optional) Output image 𝑔 so store the result.
     template <class I, class SE, class OutputImage>
-    OutputImage&
-    median_filter(const Image<I>& ima,
-                  const StructuringElement<SE>& se,
-                  Image<OutputImage>& out);
+    OutputImage& median_filter(const Image<I>& ima, const StructuringElement<SE>& se, Image<OutputImage>& out);
 
     /// \ingroup morpho
     /// \overload  OutputImage& median_filter(const Image<I>&, const StructuringElement<SE>&, Image<OutputImage>&);
     template <class I, class SE>
-    mln_concrete(I)
-    median_filter(const Image<I>& ima,
-                  const StructuringElement<SE>& se);
-
+    mln_concrete(I) median_filter(const Image<I>& ima, const StructuringElement<SE>& se);
 
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
 
-
     template <class I, class SE, class OutputImage>
-    OutputImage&
-    median_filter(const Image<I>& ima,
-                  const StructuringElement<SE>& se,
-                  Image<OutputImage>& out)
+    OutputImage& median_filter(const Image<I>& ima, const StructuringElement<SE>& se, Image<OutputImage>& out)
     {
-      return rank_filter< std::ratio<1,2> >(ima,se,out);
+      return rank_filter<std::ratio<1, 2>>(ima, se, out);
     }
 
     template <class I, class SE>
-    mln_concrete(I)
-    median_filter(const Image<I>& ima,
-                  const StructuringElement<SE>& se)
+    mln_concrete(I) median_filter(const Image<I>& ima, const StructuringElement<SE>& se)
     {
-      return rank_filter< std::ratio<1,2> >(ima, se);
+      return rank_filter<std::ratio<1, 2>>(ima, se);
     }
 
   } // end of namespace mln::morpho

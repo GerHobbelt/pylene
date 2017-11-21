@@ -1,8 +1,9 @@
 #ifndef VALUE_TRAITS_HPP
-# define VALUE_TRAITS_HPP
+#define VALUE_TRAITS_HPP
 
-# include <functional>
-# include <limits>
+#include <functional>
+#include <limits>
+#include <type_traits>
 
 namespace mln
 {
@@ -16,14 +17,10 @@ namespace mln
   template <typename U, typename V = U>
   struct lexicographicalorder_less;
 
-
-
-  template <typename V, typename Ordering = productorder_less<V>,
-            class Enable = void>
+  template <typename V, typename Ordering = productorder_less<V>, class Enable = void>
   struct value_traits
   {
-    static_assert(!std::is_same<Enable, void>::value,
-		  "You must specialize this trait for your types.");
+    static_assert(!std::is_same<Enable, void>::value, "You must specialize this trait for your types.");
   };
 
   // Default traits for std::greater
@@ -36,9 +33,7 @@ namespace mln
     static constexpr V max() { return value_traits<V, std::less<V>, Enable>::min(); }
     static constexpr V inf() { return value_traits<V, std::less<V>, Enable>::sup(); }
     static constexpr V sup() { return value_traits<V, std::less<V>, Enable>::inf(); }
-
   };
-
 
   // Specialization for primitive types
   template <typename V>
@@ -54,17 +49,15 @@ namespace mln
 
   template <typename V>
   struct value_traits<V, productorder_less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits<V, std::less<V> >
+      : value_traits<V, std::less<V>>
   {
   };
 
   template <typename V>
   struct value_traits<V, lexicographicalorder_less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits<V, std::less<V> >
+      : value_traits<V, std::less<V>>
   {
   };
-
-
 }
 
 #endif // ! VALUE_TRAITS_HPP

@@ -24,18 +24,17 @@
 // executable file might be covered by the GNU General Public License.
 
 #ifndef PQUEUE_FAST_HPP
-# define PQUEUE_FAST_HPP
+#define PQUEUE_FAST_HPP
 
+#ifndef PQUEUE_FAST_SWITCH_HQUEUE_NBITS
+#define PQUEUE_FAST_SWITCH_HQUEUE_NBITS 18
+#endif
 
-# ifndef PQUEUE_FAST_SWITCH_HQUEUE_NBITS
-#  define PQUEUE_FAST_SWITCH_HQUEUE_NBITS 18
-# endif
-
-# include <mln/core/value/indexer.hpp>
-# include <mln/core/image/image2d.hpp>
-# include "bounded_hqueue.hpp"
-# include <queue>
-# include <vector>
+#include "bounded_hqueue.hpp"
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/value/indexer.hpp>
+#include <queue>
+#include <vector>
 
 namespace mln
 {
@@ -46,75 +45,71 @@ namespace mln
     namespace internal
     {
       template <typename V, typename Compare>
-      struct pqueue_cmp_t {
-	const image2d<V>& m_ima;
-	Compare m_cmp;
+      struct pqueue_cmp_t
+      {
+        const image2d<V>& m_ima;
+        Compare m_cmp;
 
-	pqueue_cmp_t(const image2d<V>& ima, const Compare& cmp)
-	  : m_ima(ima), m_cmp(cmp)
-	{
-	}
+        pqueue_cmp_t(const image2d<V>& ima, const Compare& cmp) : m_ima(ima), m_cmp(cmp) {}
 
-	bool operator() (std::size_t p, std::size_t q) {
-	  return m_cmp(m_ima[p], m_ima[q]);
-	}
+        bool operator()(std::size_t p, std::size_t q) { return m_cmp(m_ima[p], m_ima[q]); }
       };
     }
 
-    template<typename V, typename Compare, typename Enable = void>
-    struct priority_queue_ima :
-      public std::priority_queue<typename image2d<V>::size_type,
-				 std::vector<typename image2d<V>::size_type>,
-				 internal::pqueue_cmp_t<V, Compare> >
+    template <typename V, typename Compare, typename Enable = void>
+    struct priority_queue_ima
+        : public std::priority_queue<typename image2d<V>::size_type, std::vector<typename image2d<V>::size_type>,
+                                     internal::pqueue_cmp_t<V, Compare>>
     {
       typedef typename image2d<V>::size_type size_type;
 
-      typedef std::priority_queue<size_type, std::vector<size_type>, internal::pqueue_cmp_t<V, Compare> > base;
+      typedef std::priority_queue<size_type, std::vector<size_type>, internal::pqueue_cmp_t<V, Compare>> base;
 
-      priority_queue_ima(const image2d<V>& ima, Compare cmp)
-	: base ( internal::pqueue_cmp_t<V, Compare> {ima, cmp} )
+      priority_queue_ima(const image2d<V>& ima, Compare cmp) : base(internal::pqueue_cmp_t<V, Compare>{ima, cmp})
       {
-	this->c.reserve(ima.domain().size());
+        this->c.reserve(ima.domain().size());
       }
     };
 
-
-    template<typename V, typename Compare>
-    struct priority_queue_ima<V, Compare, typename std::enable_if< (value_traits<V>::quant < PQUEUE_FAST_SWITCH_HQUEUE_NBITS) >::type>
+    template <typename V, typename Compare>
+    struct priority_queue_ima<V, Compare,
+                              typename std::enable_if<(value_traits<V>::quant < PQUEUE_FAST_SWITCH_HQUEUE_NBITS)>::type>
     {
       typedef typename image2d<V>::size_type size_type;
 
-      priority_queue_ima(const image2d<V>& ima, Compare)
-	: m_ima(ima)
+      priority_queue_ima(const image2d<V>& ima, Compare) : m_ima(ima)
       {
-	i = value_traits<index_type>::min();
-	{
-	  std::size_t hist[nlevels] = {0,};
+        i = value_traits<index_type>::min();
+        {
+          std::size_t hist[nlevels] = {
+              0,
+          };
 
-	  mln_pixter(px, ima);
-	  mln_forall(px)
-	  {
-	    index_type l = h(px->val());
-	    ++hist[l];
-	  }
-	  m_hq.init(hist);
-	}
+          mln_pixter(px, ima);
+          mln_forall (px)
+          {
+            index_type l = h(px->val());
+            ++hist[l];
+          }
+          m_hq.init(hist);
+        }
       }
 
       size_type top() const { return m_hq.top_at_level(i); }
       size_type pop()
       {
-	size_type x = m_hq.pop_at_level(i);
-	while (i > value_traits<index_type>::min() and m_hq.empty(i))
-	  --i;
-	return x;
+        size_type x = m_hq.pop_at_level(i);
+        while (i > value_traits<index_type>::min() and m_hq.empty(i))
+          --i;
+        return x;
       }
 
-      void push(size_type p) {
-	index_type x = h(m_ima[p]);
-	m_hq.push_at_level(p, x);
-	if (x > i)
-	  i = x;
+      void push(size_type p)
+      {
+        index_type x = h(m_ima[p]);
+        m_hq.push_at_level(p, x);
+        if (x > i)
+          i = x;
       }
 
       bool empty() const { return m_hq.empty(i); }
@@ -127,12 +122,7 @@ namespace mln
       index_type i;
       bounded_hqueue<size_type, nlevels, std::allocator<size_type>, true> m_hq;
     };
-
-
-
   }
-
 }
-
 
 #endif // ! PQUEUE_FAST_HPP

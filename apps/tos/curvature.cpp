@@ -4,14 +4,13 @@
 
 #include "curvature.hpp"
 
-
 int main(int argc, char** argv)
 {
   if (argc != 3)
-    {
-      std::cerr << "Usage: " << argv[0] << "input.ppm output.tiff" << std::endl; 
-      std::terminate();
-    }
+  {
+    std::cerr << "Usage: " << argv[0] << "input.ppm output.tiff" << std::endl;
+    std::terminate();
+  }
 
   using namespace mln;
 
@@ -20,5 +19,4 @@ int main(int argc, char** argv)
 
   image2d<float> out = curvature(input);
   io::imsave(out, argv[2]);
-
 }

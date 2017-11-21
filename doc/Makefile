@@ -1,5 +1,5 @@
 doc:
-	sphinx-build -b html source build
+	/usr/local/bin/sphinx-build -b html source build
 
 doxy:
 	doxygen

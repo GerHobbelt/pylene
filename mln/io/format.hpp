@@ -1,10 +1,10 @@
 #ifndef MLN_IO_FORMAT_HPP
-# define MLN_IO_FORMAT_HPP
+#define MLN_IO_FORMAT_HPP
 
-# include <iostream>
-# include <mln/core/grays.hpp>
-# include <cmath>
-# include <sstream>
+#include <cmath>
+#include <iostream>
+#include <mln/core/grays.hpp>
+#include <sstream>
 
 namespace mln
 {
@@ -13,10 +13,7 @@ namespace mln
   {
 
     template <typename T>
-    inline
-    std::ostream&
-    format(std::ostream& os, const T& v);
-
+    inline std::ostream& format(std::ostream& os, const T& v);
 
     /// \brief Retrieve the maximum width of the a type
     template <class T, class enable = void>
@@ -27,34 +24,28 @@ namespace mln
     /****************************/
 
     template <typename T>
-    inline
-    std::ostream&
-    format(std::ostream& os, const T& v)
+    inline std::ostream& format(std::ostream& os, const T& v)
     {
       return os << v;
     }
 
     template <class T, class enable>
-    struct frmt_max_width
-      : std::integral_constant<int, 0>
+    struct frmt_max_width : std::integral_constant<int, 0>
     {
-      int
-      operator() (const T& v) const
+      int operator()(const T& v) const
       {
-	std::ostringstream s;
-	format(s, v);
-	return static_cast<int>(s.tellp());
+        std::ostringstream s;
+        format(s, v);
+        return static_cast<int>(s.tellp());
       }
-
     };
 
     template <class T>
-    struct frmt_max_width<T, typename std::enable_if< std::is_integral<T>::value >::type >
-      : std::integral_constant<int, (int) (1 + value_traits<T>::quant / 3.3219280948873622)>
+    struct frmt_max_width<T, typename std::enable_if<std::is_integral<T>::value>::type>
+        : std::integral_constant<int, (int)(1 + value_traits<T>::quant / 3.3219280948873622)>
     {
 
-      int
-      operator() (double v) const
+      int operator()(double v) const
       {
         if (v < 0)
           return (int)(std::log10(std::abs(v))) + 2;
@@ -63,19 +54,10 @@ namespace mln
         else
           return 1;
       }
-
     };
 
-
-    inline
-    std::ostream&
-    format(std::ostream& os, const uint8& v)
-    {
-      return os << (int)v;
-    }
-
+    inline std::ostream& format(std::ostream& os, const uint8& v) { return os << (int)v; }
   }
-
 }
 
 #endif // ! MLN_IO_FORMAT_HPP

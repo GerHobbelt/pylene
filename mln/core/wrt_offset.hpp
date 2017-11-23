@@ -28,11 +28,11 @@ namespace mln
   {
     const I& ima = exact(ima_);
     const size_t* strides = ima.strides();
-    for (unsigned j = 0; j < N; ++j)
+    for (size_t j = 0; j < N; ++j)
     {
       out[j] = 0;
-      for (int i = 0; i < I::ndim; ++i)
-        out[j] += strides[i] * dpoints[j][i];
+      for (size_t i = 0; i < I::ndim; ++i)
+        out[j] += static_cast<typename I::difference_type>(strides[i] * dpoints[j][i]);
     }
   }
 

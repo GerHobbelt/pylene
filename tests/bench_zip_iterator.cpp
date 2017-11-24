@@ -39,6 +39,8 @@ using namespace mln;
 #define NO_INLINE
 #endif
 
+namespace
+{
 #if (!defined(__GNUC__) && !defined(__clang__)) || defined(__pnacl__) || defined(EMSCRIPTN)
 #define HAS_NO_INLINE_ASSEMBLY
 NO_INLINE void UseCharPointer(char const volatile*);
@@ -49,8 +51,6 @@ void UseCharPointer(char const volatile*) {}
 // expression from being optimized away by the compiler. This function is
 // intended to add little to no overhead.
 // See: https://youtu.be/nXaxk27zwlk?t=2441
-namespace
-{
 #ifndef HAS_NO_INLINE_ASSEMBLY
   template <class Tp>
   ALWAYS_INLINE void DoNotOptimize(Tp const& value)

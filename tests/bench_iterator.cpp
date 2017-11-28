@@ -78,13 +78,13 @@ double test_nbh_piter(const image2d<int>& ima)
 double test_nbh_index(const image2d<int>& ima)
 {
   double u = 0;
-  std::size_t idx = ima.index_of_point(ima.domain().pmin);
+  auto idx = ima.index_of_point(ima.domain().pmin);
   auto w = wrt_delta_index(ima, c8_t::dpoints);
 
   // std::cout << ima.index_strides()[0] << "," << ima.index_strides()[1] << std::endl;
 
-  unsigned nrows = ima.nrows();
-  unsigned ncols = ima.ncols();
+  auto nrows = ima.nrows();
+  auto ncols = ima.ncols();
   for (unsigned i = 0; i < nrows; ++i)
   {
     for (unsigned j = 0; j < ncols; ++j)
@@ -92,10 +92,10 @@ double test_nbh_index(const image2d<int>& ima)
       std::size_t p = idx + j; // * ima.index_strides()[1];
       mln_foreach (auto k, w)
       {
-        u += ima[p + k];
+        u += ima[static_cast<image2d<int>::size_type>(p + k)];
       }
     }
-    idx += ima.index_strides()[0];
+    idx += static_cast<unsigned>(ima.index_strides()[0]);
   }
 
   return u;

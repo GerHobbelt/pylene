@@ -22,21 +22,78 @@
 
 using namespace mln;
 
+// Code from google benchmark
+
+#if defined(_MSC_VER)
+#include <intrin.h> // for _ReadWriteBarrier
+#endif
+
+#if defined(__GNUC__)
+#define ALWAYS_INLINE __attribute__((always_inline))
+#define NO_INLINE __attribute__((noinline))
+#elif defined(_MSC_VER) && !defined(__clang__)
+#define ALWAYS_INLINE __forceinline
+#define NO_INLINE __declspec(noinline)
+#else
+#define ALWAYS_INLINE
+#define NO_INLINE
+#endif
+
+namespace
+{
+#if (!defined(__GNUC__) && !defined(__clang__)) || defined(__pnacl__) || defined(EMSCRIPTN)
+#define HAS_NO_INLINE_ASSEMBLY
+NO_INLINE void UseCharPointer(char const volatile*);
+void UseCharPointer(char const volatile*) {}
+#endif
+
+// The DoNotOptimize(...) function can be used to prevent a value or
+// expression from being optimized away by the compiler. This function is
+// intended to add little to no overhead.
+// See: https://youtu.be/nXaxk27zwlk?t=2441
+#ifndef HAS_NO_INLINE_ASSEMBLY
+  template <class Tp>
+  ALWAYS_INLINE void DoNotOptimize(Tp const& value)
+  {
+// Clang doesn't like the 'X' constraint on `value` and certain GCC versions
+// don't like the 'g' constraint. Attempt to placate them both.
+#if defined(__clang__)
+    asm volatile("" : : "g"(value) : "memory");
+#else
+    asm volatile("" : : "i,r,m"(value) : "memory");
+#endif
+  }
+#elif defined(_MSC_VER)
+  template <class Tp>
+  ALWAYS_INLINE void DoNotOptimize(Tp const& value)
+  {
+    UseCharPointer(&reinterpret_cast<char const volatile&>(value));
+    _ReadWriteBarrier();
+  }
+#else
+  template <class Tp>
+  BENCHMARK_ALWAYS_INLINE void DoNotOptimize(Tp const& value)
+  {
+    UseCharPointer(&reinterpret_cast<char const volatile&>(value));
+  }
+#endif
+}
+
 const int& access_point(const image2d<int>& a, point2d p)
 {
   const int& x = a(p);
-  asm("");
+  ::DoNotOptimize(x);
   return x;
 }
 
 const int& access_index(const image2d<int>& a, std::size_t i)
 {
-  const int& x = a[i];
-  asm("");
+  const int& x = a[static_cast<image2d<int>::size_type>(i)];
+  ::DoNotOptimize(x);
   return x;
 }
 
-double test_native(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+NO_INLINE double test_native(const image2d<int>& a, const image2d<int>& b);
 
 double test_native(const image2d<int>& a, const image2d<int>& b)
 {
@@ -56,7 +113,7 @@ double test_native(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double test_iterator(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+NO_INLINE double test_iterator(const image2d<int>& a, const image2d<int>& b);
 
 double test_iterator(const image2d<int>& a, const image2d<int>& b)
 {
@@ -65,7 +122,7 @@ double test_iterator(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double test_zip(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+NO_INLINE double test_zip(const image2d<int>& a, const image2d<int>& b);
 
 double test_zip(const image2d<int>& a, const image2d<int>& b)
 {
@@ -78,7 +135,7 @@ double test_zip(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double test_zip_pix(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+double test_zip_pix(const image2d<int>& a, const image2d<int>& b);
 
 double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
 {
@@ -89,7 +146,7 @@ double test_zip_pix(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double test_for(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+NO_INLINE double test_for(const image2d<int>& a, const image2d<int>& b);
 
 double test_for(const image2d<int>& a, const image2d<int>& b)
 {
@@ -102,7 +159,7 @@ double test_for(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-double test_for_pixel(const image2d<int>& a, const image2d<int>& b) __attribute__((noinline));
+NO_INLINE double test_for_pixel(const image2d<int>& a, const image2d<int>& b);
 
 double test_for_pixel(const image2d<int>& a, const image2d<int>& b)
 {
@@ -115,7 +172,7 @@ double test_for_pixel(const image2d<int>& a, const image2d<int>& b)
   return v;
 }
 
-void test_dilation_native(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_dilation_native(const image2d<int>& a, image2d<int>& b);
 
 void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 {
@@ -142,7 +199,7 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void test_dilation_pixel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_dilation_pixel(const image2d<int>& a, image2d<int>& b);
 
 void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
 {
@@ -160,7 +217,7 @@ void test_dilation_pixel(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void test_dilation_point(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_dilation_point(const image2d<int>& a, image2d<int>& b);
 void test_dilation_point(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
@@ -177,7 +234,7 @@ void test_dilation_point(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b);
 void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
@@ -199,21 +256,21 @@ void test_dilation_pixel_2(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void test_dilation_index(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_dilation_index(const image2d<int>& a, image2d<int>& b);
 void test_dilation_index(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
-  std::size_t idx = a.index_of_point(a.domain().pmin);
+  auto idx = a.index_of_point(a.domain().pmin);
   auto w = wrt_delta_index(a, c8_t::dpoints);
 
-  unsigned nrows = a.nrows();
-  unsigned ncols = a.ncols();
-  for (unsigned i = 0; i < nrows; ++i, idx += a.index_strides()[0])
+  auto nrows = a.nrows();
+  auto ncols = a.ncols();
+  for (unsigned i = 0; i < nrows; ++i, idx += static_cast<unsigned>(a.index_strides()[0]))
   {
     for (unsigned j = 0; j < ncols; ++j)
     {
-      unsigned p = idx + j;
+      auto p = idx + j;
       int tmp = value_traits<int>::max();
       for (unsigned k = 0; k < 8; k++)
       {
@@ -224,7 +281,7 @@ void test_dilation_index(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void test_dilation_kernel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_dilation_kernel(const image2d<int>& a, image2d<int>& b);
 
 void test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
 {
@@ -245,7 +302,7 @@ void test_dilation_kernel(const image2d<int>& a, image2d<int>& b)
   }
 }
 
-void test_extgrad_kernel(const image2d<int>& a, image2d<int>& b) __attribute__((noinline));
+NO_INLINE void test_extgrad_kernel(const image2d<int>& a, image2d<int>& b);
 
 void test_extgrad_kernel(const image2d<int>& a, image2d<int>& b)
 {

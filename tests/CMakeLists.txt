@@ -22,11 +22,12 @@ find_package(GTest REQUIRED)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
-# Register an executable test
+# Register an executable test: add_core_test(Exe Source1 [Source2...])
 # Executable: The name of the executable (default: ${Prefix}${TestName})
-# Source: The source files to compile (default: ${Prefix}${TestName}.cpp)
-macro(add_core_test Executable Source)
-add_executable(${Executable} ${Source})
+# Sources: The source files to compile (default: ${Prefix}${TestName}.cpp)
+macro(add_core_test Executable)
+set(Sources ${ARGN})
+add_executable(${Executable} ${Sources})
 add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 if (WIN32)
   target_link_libraries(${Executable} ${GTEST_BOTH_LIBRARIES})

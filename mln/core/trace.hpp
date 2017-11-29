@@ -7,10 +7,9 @@
 # endif
 
 
-# include <ctime>
+# include <mln/core/config.hpp>
 # include <cstdlib>
 # include <iostream>
-# include <stack>
 # include <string>
 # include <thread>
 # include <chrono>
@@ -35,64 +34,70 @@ namespace mln
 
     struct scoped_trace
     {
-      scoped_trace(const std::string& desc);
+      explicit scoped_trace(const char* desc);
+      explicit scoped_trace(const std::string& desc);
       scoped_trace(const scoped_trace&) = delete;
       scoped_trace& operator= (const scoped_trace&) = delete;
       ~scoped_trace();
 
     private:
-      void entering();
-      void exiting();
+      template <class T = void> void entering(const char* desc) __mln__attribute__((noinline));
+      template <class T = void> void exiting() __mln__attribute__((noinline));
 
       int         m_depth;
       std::string m_desc;
-      std::chrono::time_point<std::chrono::system_clock>   m_clock;
+      std::chrono::time_point<std::chrono::system_clock> m_clock;
     };
 
-    inline
-    scoped_trace::scoped_trace(const std::string& desc)
-      : m_depth (__stack_depth++),
-        m_desc(desc),
-        m_clock(std::chrono::system_clock::now())
+    inline scoped_trace::scoped_trace(const char* desc)
     {
-      entering();
+      if (verbose)
+        entering(desc);
     }
 
-    inline
-    scoped_trace::~scoped_trace()
+    inline scoped_trace::scoped_trace(const std::string& desc)
     {
-      exiting();
+      if (verbose)
+        entering(desc.c_str());
+    }
+
+    inline scoped_trace::~scoped_trace()
+    {
+      if (verbose)
+        exiting();
+    }
+
+
+    template <class T>
+    void scoped_trace::entering(const char* desc)
+    {
+      m_depth = __stack_depth++;
+      m_desc = desc;
+      m_clock = std::chrono::system_clock::now();
+
+      for (int k = 0; k < m_depth; ++k)
+        std::clog.put(' ');
+      std::clog << "#" << std::this_thread::get_id() << " - " << m_desc << std::endl;
+    }
+
+    template <class T>
+    void scoped_trace::exiting()
+    {
       --__stack_depth;
+      for (int k = 0; k < m_depth; ++k)
+        std::clog.put(' ');
+      auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_clock);
+      std::clog << "#" << std::this_thread::get_id() << " - " << m_desc << " in " << duration.count() << "ms"
+                << std::endl;
     }
 
-    inline
-    void
-    scoped_trace::entering()
+    namespace impl
     {
-      if (verbose) {
-        for (int k = 0; k < m_depth; ++k)
-          std::clog.put(' ');
-	std::clog << "#" << std::this_thread::get_id() << " - " << m_desc << std::endl;
-      }
-    }
+      template <class T = void> void warn(const char* msg) __attribute__((noinline));
 
-    inline
-    void
-    scoped_trace::exiting()
-    {
-      if (verbose) {
-        for (int k = 0; k < m_depth; ++k)
-          std::clog.put(' ');
-        std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_clock);
-	std::clog << "#" << std::this_thread::get_id() << " - " << m_desc
-		  << " in " << duration.count() << "ms" << std::endl;
-      }
-    }
-
-    inline
-    void warn(const std::string& msg)
-    {
-      if (verbose) {
+      template <class T>
+      void warn(const char* msg)
+      {
         for (int k = 0; k < __stack_depth; ++k)
           std::clog.put(' ');
 
@@ -101,6 +106,17 @@ namespace mln
       }
     }
 
+    inline void warn(const char* msg)
+    {
+      if (verbose)
+        impl::warn(msg);
+    }
+
+    inline void warn(const std::string& msg)
+    {
+      if (verbose)
+        impl::warn(msg.c_str());
+    }
   }
 }
 

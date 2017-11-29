@@ -49,6 +49,6 @@ TEST(Morpho, median_filter_median_filter_0)
     auto win = make_rectangle2d(7, 7);
     auto out = morpho::median_filter(ima, win);
     auto out2 = naive_median(ima, win, 49);
-    MLN_CHECK_IMEQUAL(out2, out);
+    ASSERT_IMAGES_EQ(out2, out);
   }
 }

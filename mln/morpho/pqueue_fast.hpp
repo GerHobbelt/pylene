@@ -45,12 +45,12 @@ namespace mln
 
     namespace internal
     {
-      template <typename V, typename Compare>
+      template <class I, typename Compare>
       struct pqueue_cmp_t {
-	const image2d<V>& m_ima;
+	const I& m_ima;
 	Compare m_cmp;
 
-	pqueue_cmp_t(const image2d<V>& ima, const Compare& cmp)
+	pqueue_cmp_t(const I& ima, const Compare& cmp)
 	  : m_ima(ima), m_cmp(cmp)
 	{
 	}
@@ -61,30 +61,32 @@ namespace mln
       };
     }
 
-    template<typename V, typename Compare, typename Enable = void>
+    template<class I, typename Compare, typename Enable = void>
     struct priority_queue_ima :
-      public std::priority_queue<typename image2d<V>::size_type,
-				 std::vector<typename image2d<V>::size_type>,
-				 internal::pqueue_cmp_t<V, Compare> >
+      public std::priority_queue<typename I::size_type,
+				 std::vector<typename I::size_type>,
+				 internal::pqueue_cmp_t<I, Compare> >
     {
-      typedef typename image2d<V>::size_type size_type;
+      typedef typename I::size_type size_type;
+      using V = mln_value(I);
 
-      typedef std::priority_queue<size_type, std::vector<size_type>, internal::pqueue_cmp_t<V, Compare> > base;
+      typedef std::priority_queue<size_type, std::vector<size_type>, internal::pqueue_cmp_t<I, Compare> > base;
 
-      priority_queue_ima(const image2d<V>& ima, Compare cmp)
-	: base ( internal::pqueue_cmp_t<V, Compare> {ima, cmp} )
+      priority_queue_ima(const I& ima, Compare cmp)
+	: base ( internal::pqueue_cmp_t<I, Compare> {ima, cmp} )
       {
 	this->c.reserve(ima.domain().size());
       }
     };
 
-
-    template<typename V, typename Compare>
-    struct priority_queue_ima<V, Compare, typename std::enable_if< (value_traits<V>::quant < PQUEUE_FAST_SWITCH_HQUEUE_NBITS) >::type>
+    template <typename I, typename Compare>
+    struct priority_queue_ima<I, Compare, typename std::enable_if<(value_traits<mln_value(I)>::quant <
+                                                                   PQUEUE_FAST_SWITCH_HQUEUE_NBITS)>::type>
     {
-      typedef typename image2d<V>::size_type size_type;
+      typedef typename I::size_type size_type;
+      using V = mln_value(I);
 
-      priority_queue_ima(const image2d<V>& ima, Compare)
+      priority_queue_ima(const I& ima, Compare)
 	: m_ima(ima)
       {
 	i = value_traits<index_type>::min();
@@ -122,7 +124,7 @@ namespace mln
     private:
       typedef typename indexer<V, Compare>::index_type index_type;
       static constexpr std::size_t nlevels = (std::size_t)1 << value_traits<index_type>::quant;
-      const image2d<V>& m_ima;
+      const I& m_ima;
       indexer<V, Compare> h;
       index_type i;
       bounded_hqueue<size_type, nlevels, std::allocator<size_type>, true> m_hq;

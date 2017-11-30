@@ -4,7 +4,7 @@
 # include <mln/core/image/image.hpp>
 # include <mln/core/image/morphers/casted_image.hpp>
 # include <mln/core/neighb2d.hpp>
-# include <mln/morpho/datastruct/component_tree.hpp>
+# include <mln/core/neighb3d.hpp>
 # include <mln/morpho/maxtree/maxtree.hpp>
 # include <mln/morpho/tos/private/immersion.hpp>
 # include <mln/morpho/tos/private/propagation.hpp>
@@ -48,7 +48,8 @@ namespace mln
 
           mln_ch_value(J, bool) is2F = imchvalue<bool>(pmap).init(false);
           auto dom = is2F.domain();
-          fill(is2F | sbox2d{dom.pmin, dom.pmax, {2,2}}, true);
+          mln_point(J) step = 2; // {2,2} or {2,2,2}
+          fill(is2F | make_strided_box(dom.pmin, dom.pmax, step), true);
 
           for (unsigned p = 0; p < S.size(); ++p)
             {
@@ -66,7 +67,9 @@ namespace mln
       morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
       tos(const Image<I>& ima, mln_point(I) pmin, int processing_flags)
       {
-        static_assert(std::is_same<mln_point(I), point2d>::value, "Must be a 2D image");
+        static_assert(std::is_same<mln_point(I), point2d>::value or
+                      std::is_same<mln_point(I), point3d>::value,
+                      "Input must be a 2D or 3D image");
         using P = typename I::size_type;
 
         mln_entering("mln::morpho::tos");
@@ -77,16 +80,17 @@ namespace mln
         auto ord = morpho::tos::impl::propagation(g, pmin * 2, max_depth, nullptr);
 
         // 2. Build the tree
+        using nbh_t = std::conditional_t<(I::ndim == 2), c4_t, c6_t>;
         component_tree<P, mln_ch_value(I, unsigned)> tree;
         {
           if (max_depth < value_traits<uint16>::max())
           {
-            tree = morpho::maxtree_indexes(imcast<uint16>(ord), c4);
+            tree = morpho::maxtree_indexes(imcast<uint16>(ord), nbh_t());
           }
           else
           {
             mln::trace::warn("Max depth > 16bits, slow version");
-            tree = morpho::maxtree_indexes(ord, c4);
+            tree = morpho::maxtree_indexes(ord, nbh_t());
           }
         }
 

@@ -3,6 +3,7 @@
 
 # include <mln/core/image/image2d.hpp>
 # include <mln/core/neighb2d.hpp>
+# include <mln/core/neighb3d.hpp>
 # include <mln/core/trace.hpp>
 # include <mln/core/extension/fill.hpp>
 # include <mln/core/wrt_offset.hpp>
@@ -17,36 +18,43 @@ namespace mln
       namespace impl
       {
 
-        template <class V>
-        image2d<int>
-        propagation(const image2d<irange<V>>& f,
-                    point2d start_point,
+        template <class I>
+        mln_ch_value(I, int)
+        propagation(const Image<I>& f,
+                    mln_point(I) start_point,
                     int& max_depth,
                     std::vector<unsigned>* sorted_indexes = nullptr);
 
 
-        template <class V, bool compute_indexes>
-        image2d<int>
-        __propagation(const image2d<irange<V>>& f,
-                      point2d start_point,
+        template <class I, bool compute_indexes>
+        mln_ch_value(I, int)
+        __propagation(const Image<I>& f_,
+                      mln_point(I) start_point,
                       int& max_depth,
                       std::vector<unsigned>* sorted_indexes)
         {
           mln_entering("mln::morpho::tos::impl::propagation");
 
-          using P = typename image2d<V>::size_type;
+          using range_t = mln_value(I);
+          using V = typename range_t::value_type;
+          using P = typename I::size_type;
+          using connectivity_t = std::conditional_t<(I::ndim == 2), c4_t, c6_t>;
 
           enum { UNPROCESSED = -1, PROCESSED = 0 };
 
+          const auto& f = exact(f_);
+
           // Ord will hold the depth of the pixel during
           // the propagation, i.e. when it is poped from the queue
-          image2d<int> ord = imchvalue<int>(f).init(UNPROCESSED).adjust(c4);
+          connectivity_t conn;
+
+          mln_ch_value(I, int) ord = imchvalue<int>(f).init(UNPROCESSED).adjust(conn);
           extension::fill(ord, PROCESSED);
 
           if (compute_indexes)
             sorted_indexes->reserve(ord.domain().size());
 
-          pset<image2d<V>> queue(f);
+          pset<mln_ch_value(I, V)> queue(f);
 
           auto p = f.index_of_point(start_point);
           V previous_level = f[p].lower;
@@ -56,7 +64,7 @@ namespace mln
           if (compute_indexes)
             sorted_indexes->push_back(p);
 
-          auto dindexes = wrt_delta_index(f, c4.dpoints);
+          auto dindexes = wrt_delta_index(f, conn.dpoints);
           int depth = 0;
           while (!queue.empty())
             {
@@ -99,17 +107,17 @@ namespace mln
           return ord;
         }
 
-        template <class V>
-        image2d<int>
-        propagation(const image2d<irange<V>>& f,
-                    point2d start_point,
+        template <class I>
+        mln_ch_value(I, int)
+        propagation(const Image<I>& f,
+                    mln_point(I) start_point,
                     int& max_depth,
                     std::vector<unsigned>* sorted_indexes)
         {
           if (sorted_indexes == nullptr)
-            return __propagation<V, false>(f, start_point, max_depth, sorted_indexes);
+            return __propagation<I, false>(f, start_point, max_depth, sorted_indexes);
           else
-            return __propagation<V, true>(f, start_point, max_depth, sorted_indexes);
+            return __propagation<I, true>(f, start_point, max_depth, sorted_indexes);
         }
 
 

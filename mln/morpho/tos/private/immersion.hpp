@@ -16,7 +16,7 @@ namespace mln
       namespace impl
       {
 
-        /// \brief Immerse an 2d image into twice-as-big 2d image
+        /// \brief Immerse a 2d or 3d image into twice-as-big 2d image
         /// where the in-between pixel are intervals.
         ///
         /// Given 4 pixels:
@@ -40,11 +40,92 @@ namespace mln
         /****          Implementation          ****/
         /******************************************/
 
+
+        template <int dim, class O>
+        std::enable_if_t<(dim < (O::ndim - 1))>
+        interpolation(O& output, mln_point(O) pmin, mln_point(O) pmax)
+        {
+          using P = mln_point(O);
+          mln::box<typename P::value_type, P::ndim> dom = {pmin, pmax};
+          mln_foreach(auto p, dom)
+            {
+              auto prev = p;
+              auto next = p;
+              prev[dim]--;
+              next[dim]++;
+              output(p) = output(prev).extend(output(next));
+            }
+        }
+
+        template <int dim, class O>
+        std::enable_if_t<dim == (O::ndim - 1)>
+        interpolation(O& output, mln_point(O) p, mln_point(O))
+        {
+          auto prev = p;
+          auto next = p;
+          prev[dim]--;
+          next[dim]++;
+          output(p) = output(prev).extend(output(next));
+        }
+
+        template <int dim, class I, class O>
+        std::enable_if_t<dim == O::ndim>
+        immersion(const I& input, O& output, mln_point(I) pmin, mln_point(I))
+        {
+          output(pmin) = input(pmin / 2);
+        }
+
+        template <int dim, class I, class O>
+        std::enable_if_t<(dim < O::ndim)>
+        immersion(const I& input, O& output, mln_point(I) pmin, mln_point(I) pmax)
+        {
+          immersion<dim+1>(input, output, pmin, pmax);
+
+          for (int i = pmin[dim] + 2, end = pmax[dim]; i < end; i += 2)
+            {
+              pmin[dim] = i;
+              pmax[dim] = (i+1);
+              immersion<dim+1>(input, output, pmin, pmax);
+
+              pmin[dim] = (i-1);
+              pmax[dim] = i;
+              interpolation<dim>(output, pmin, pmax);
+            }
+        }
+
         template <class I>
-        mln_ch_value(I, irange<mln_value(I)>)
+	mln_ch_value(I, irange<mln_value(I)>)
         immersion(const Image<I>& ima_)
         {
-          static_assert(std::is_same<typename I::domain_type, box2d>::value, "Only box2d handled");
+          static_assert(image_traits<I>::accessible::value,
+                        "Image must be accessible i.e. 'ima(p)'");
+
+          mln_entering("mln::morpho::tos - immersion");
+
+          using V = mln_value(I);
+          using R = irange<V>;
+
+	  const I& ima = exact(ima_);
+
+
+          auto output_domain = ima.domain();
+	  output_domain.pmin = output_domain.pmin * 2;
+	  output_domain.pmax = output_domain.pmax * 2 - 1;
+
+	  mln_ch_value(I, R) out(output_domain);
+
+          immersion<0>(ima, out, output_domain.pmin, output_domain.pmax);
+          return out;
+        }
+
+
+
+        /*
+        template <class I>
+        mln_ch_value(I, irange<mln_value(I)>)
+        immersion_impl(const Image<I>& ima_, box3d)
+        {
+          static_assert(std::is_same<typename I::domain_type, box3d>::value, "Only box3d handled");
           static_assert(image_traits<I>::accessible::value,
                         "Image must be accessible i.e. 'ima(p)'");
 
@@ -70,6 +151,7 @@ namespace mln
 	  mln_foreach(point2d p, reduced_input_domain)
           {
             V a = ima(p);
+            V b = ima(p + P{0, 1});
             V b = ima(p + P{0, 1});
             V c = ima(p + P{1, 0});
             V d = ima(p + P{1, 1});
@@ -114,6 +196,7 @@ namespace mln
 
           return out;
         }
+        */
 
       } // end of namespace mln::morpho::tos::impl
     } // end of namespace mln::morpho::tos

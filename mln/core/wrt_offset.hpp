@@ -48,13 +48,8 @@ namespace mln {
 		       std::array<typename I::difference_type, N>& out)
   {
     const I& ima = exact(ima_);
-    const size_t* strides = ima.index_strides();
     for (unsigned j = 0; j < N; ++j)
-      {
-        out[j] = 0;
-        for (int i = 0; i < I::ndim; ++i)
-          out[j] += static_cast<typename I::difference_type>(strides[i] * dpoints[j][i]);
-      }
+      out[j] = ima.delta_index(dpoints[j]);
   }
 
   template <typename I, typename SiteSet, typename OutputIterator>

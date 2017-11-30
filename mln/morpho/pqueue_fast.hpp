@@ -91,7 +91,7 @@ namespace mln
       {
 	i = value_traits<index_type>::min();
 	{
-	  std::size_t hist[nlevels] = {0,};
+          std::vector<std::size_t> hist(nlevels, 0);
 
 	  mln_pixter(px, ima);
 	  mln_forall(px)
@@ -99,7 +99,7 @@ namespace mln
 	    index_type l = h(px->val());
 	    ++hist[l];
 	  }
-	  m_hq.init(hist);
+	  m_hq.init(&hist[0]);
 	}
       }
 

@@ -41,7 +41,7 @@ namespace mln
 	//vec_t v_pqueue; v_pqueue.reserve(ima.domain().size());
 	//auto fcmp = [&ima, cmp] (size_type x, size_type y) { return cmp(ima[x], ima[y]); };
 	std::stack<size_type, vec_t> stack(std::move(v_stack));
-	priority_queue_ima<V, StrictWeakOrdering> pqueue(ima, cmp);
+	priority_queue_ima<image2d<V>, StrictWeakOrdering> pqueue(ima, cmp);
 
 	  //std::priority_queue<size_type, vec_t, decltype(fcmp)>
 	  //pqueue(fcmp, std::move(v_pqueue));

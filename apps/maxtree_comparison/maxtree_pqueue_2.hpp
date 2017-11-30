@@ -43,7 +43,7 @@ namespace mln
 	v_stack.reserve(std::min<std::size_t>(ima.domain().size(), nlevels));
 
 	std::stack<size_type, vec_t> stack(std::move(v_stack));
-	priority_queue_ima<V, StrictWeakOrdering> pqueue(ima, cmp);
+	priority_queue_ima<image2d<V>, StrictWeakOrdering> pqueue(ima, cmp);
 	auto nbh_delta_indexes = wrt_delta_index(ima, Neighborhood::dpoints);
 
 

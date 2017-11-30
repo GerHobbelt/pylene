@@ -1,19 +1,19 @@
 #ifndef MLN_MORPHO_TOS_PRIVATE_PROPAGATION_HPP
 # define MLN_MORPHO_TOS_PRIVATE_PROPAGATION_HPP
 
-# include <mln/core/image/image2d.hpp>
-# include <mln/core/neighb2d.hpp>
-# include <mln/core/neighb3d.hpp>
-# include <mln/core/trace.hpp>
-# include <mln/core/extension/fill.hpp>
-# include <mln/core/wrt_offset.hpp>
-# include "pset.hpp"
+#include <mln/core/image/image.hpp>
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/neighb3d.hpp>
+#include <mln/core/trace.hpp>
+#include <mln/core/wrt_offset.hpp>
+#include <mln/morpho/tos/private/pset.hpp>
 
 namespace mln
 {
   namespace morpho
   {
-    namespace tos
+    namespace ToS
     {
       namespace impl
       {
@@ -25,13 +25,17 @@ namespace mln
                     int& max_depth,
                     std::vector<unsigned>* sorted_indexes = nullptr);
 
+        /******************************************/
+        /****          Implementation          ****/
+        /******************************************/
+
 
         template <class I, bool compute_indexes>
         mln_ch_value(I, int)
-        __propagation(const Image<I>& f_,
-                      mln_point(I) start_point,
-                      int& max_depth,
-                      std::vector<unsigned>* sorted_indexes)
+        propagation_impl(const Image<I>& f_,
+                         mln_point(I) start_point,
+                         int& max_depth,
+                         std::vector<unsigned>* sorted_indexes)
         {
           mln_entering("mln::morpho::tos::impl::propagation");
 
@@ -115,9 +119,9 @@ namespace mln
                     std::vector<unsigned>* sorted_indexes)
         {
           if (sorted_indexes == nullptr)
-            return __propagation<I, false>(f, start_point, max_depth, sorted_indexes);
+            return propagation_impl<I, false>(f, start_point, max_depth, sorted_indexes);
           else
-            return __propagation<I, true>(f, start_point, max_depth, sorted_indexes);
+            return propagation_impl<I, true>(f, start_point, max_depth, sorted_indexes);
         }
 
 

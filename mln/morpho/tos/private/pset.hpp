@@ -9,7 +9,7 @@ namespace mln
 {
   namespace morpho
   {
-    namespace tos
+    namespace ToS
     {
       namespace impl
       {

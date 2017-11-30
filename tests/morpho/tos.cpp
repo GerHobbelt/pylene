@@ -4,7 +4,7 @@
 
 #include <mln/morpho/tos/private/immersion.hpp>
 #include <mln/morpho/tos/private/propagation.hpp>
-#include <mln/morpho/tos/v2/tos.hpp>
+#include <mln/morpho/tos/tos.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/accu/accumulators/max.hpp>
 
@@ -23,9 +23,9 @@ void test_propagation(const mln::Image<I>& f, const mln::Image<J>& ref)
   using P = typename I::size_type;
   std::vector<P> indexes;
   int max_depth;
-  auto g = mln::morpho::tos::impl::immersion(f);
+  auto g = mln::morpho::ToS::impl::immersion(f);
   mln_point(I) pmin = 0;
-  auto ord = mln::morpho::tos::impl::propagation(g, pmin, max_depth, &indexes);
+  auto ord = mln::morpho::ToS::impl::propagation(g, pmin, max_depth, &indexes);
 
   int expected_max_depth = mln::accumulate(ref, mln::accu::features::max<>());
 
@@ -40,7 +40,7 @@ void test_construction(const mln::Image<I>& f,
                        const mln::Image<J>& ref_parent,
                        const mln::Image<J>& ref_roots)
 {
-  auto tree = mln::morpho::__2::tos(f);
+  auto tree = mln::morpho::tos(f);
 
   mln_ch_value(J, mln_point(J)) roots;
   auto par = tree_as_parent_image(tree, roots);
@@ -54,13 +54,13 @@ TEST(ToSImmersion, twodimensional)
   const mln::image2d<mln::uint8> f = { {0, 1, 2},
                                        {3, 0, 1} };
 
-  using R = mln::morpho::tos::irange<mln::uint8>;
+  using R = mln::morpho::ToS::impl::irange<mln::uint8>;
 
   const mln::image2d<R> ref = { { {0,0}, {0,1}, {1,1}, {1,2}, {2,2} },
                                 { {0,3}, {0,3}, {0,1}, {0,2}, {1,2} },
                                 { {3,3}, {0,3}, {0,0}, {0,1}, {1,1} } };
 
-  auto g = mln::morpho::tos::impl::immersion(f);
+  auto g = mln::morpho::ToS::impl::immersion(f);
   ASSERT_IMAGES_EQ(ref, g);
 }
 
@@ -73,7 +73,7 @@ TEST(ToSImmersion, threedimensional)
        {0, 0, 2}},
   };
 
-  using R = mln::morpho::tos::irange<mln::uint8>;
+  using R = mln::morpho::ToS::impl::irange<mln::uint8>;
 
   const mln::image3d<R> ref = {
     { { {0,0}, {0,1}, {1,1}, {1,2}, {2,2} },
@@ -87,7 +87,7 @@ TEST(ToSImmersion, threedimensional)
       { {0,0}, {0,0}, {0,0}, {0,2}, {2,2} } },
   };
 
-  auto g = mln::morpho::tos::impl::immersion(f);
+  auto g = mln::morpho::ToS::impl::immersion(f);
   ASSERT_IMAGES_EQ(ref, g);
 }
 

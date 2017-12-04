@@ -56,6 +56,9 @@ namespace mln
     point_type strides;
   };
 
+  template <typename T, unsigned dim>
+  strided_box<T, dim> make_strided_box(point<T, dim> pmin, point<T, dim> pmax, point<T, dim> step);
+
   //
   // \pre \tparam T must be an integral type
   template <typename T, unsigned dim>
@@ -197,8 +200,8 @@ namespace mln
   /// Traits
 
   /// Forward
-  template <typename>
-  struct image2d;
+  template <typename> struct image2d;
+  template <typename> struct image3d;
 
   template <>
   struct image_from_domain<box2d>
@@ -211,12 +214,32 @@ namespace mln
   };
 
   template <>
+  struct image_from_domain<box3d>
+  {
+    template <typename T>
+    struct apply
+    {
+      typedef image3d<T> type;
+    };
+  };
+
+  template <>
   struct image_from_domain<sbox2d>
   {
     template <typename T>
     struct apply
     {
       typedef image2d<T> type;
+    };
+  };
+
+  template <>
+  struct image_from_domain<sbox3d>
+  {
+    template <typename T>
+    struct apply
+    {
+      typedef image3d<T> type;
     };
   };
 
@@ -337,6 +360,15 @@ namespace mln
   {
     return pmin != other.pmin or pmax != other.pmax or strides != other.strides;
   }
+
+
+  template <typename T, unsigned dim>
+  strided_box<T, dim>
+  make_strided_box(point<T, dim> pmin, point<T, dim> pmax, point<T, dim> step)
+  {
+    return {pmin, pmax, step};
+  }
+
 }
 
 #endif

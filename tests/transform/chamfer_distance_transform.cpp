@@ -30,7 +30,7 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_1)
 
   auto res = transform::chamfer_distance_transform(f, c4);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }
 
 TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_2)
@@ -55,7 +55,7 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_2)
 
   auto res = transform::chamfer_distance_transform(f, c4);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }
 
 // Input and output are the same image
@@ -81,7 +81,7 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_3)
 
   transform::chamfer_distance_transform(f, c4, f);
 
-  MLN_CHECK_IMEQUAL(f, ref);
+  ASSERT_IMAGES_EQ(f, ref);
 }
 
 TEST(Transform, chamfer_distance_transform_bg_is_zero_distance_transform)
@@ -110,7 +110,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_distance_transform)
 
   auto res = transform::chamfer_distance_transform(f, c4);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }
 
 TEST(Transform, chamfer_distance_transform_bg_is_one_distance_transform)
@@ -141,7 +141,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_distance_transform)
 
   auto res = transform::chamfer_distance_transform(f, c4, true);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }
 
 TEST(Transform, chamfer_distance_transform_bg_is_zero_weighted_distance_transform_float)
@@ -168,15 +168,18 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_weighted_distance_transfor
       {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}  //
   };
 
-  constexpr std::array<point2d, 8> siteset = {
-      {{-1, -1}, {-1, +0}, {-1, 1}, {+0, -1}, {+0, 1}, {+1, -1}, {+1, +0}, {+1, 1}}};
+  constexpr std::array<point2d, 8> siteset = {{{-1, -1}, {-1, +0}, {-1, 1},
+                                               {+0, -1},           {+0, 1},
+                                               {+1, -1}, {+1, +0}, {+1, 1}}};
 
-  constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f, 1.0f, 1.0f, 1.5f, 1.0f, 1.5f}};
+  constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f,
+                                             1.0f,       1.0f,
+                                             1.5f, 1.0f, 1.5f}};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
   image2d<float> res = transform::chamfer_distance_transform<float>(f, nbh);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }
 
 TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform_float)
@@ -211,7 +214,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
   image2d<float> res = transform::chamfer_distance_transform<float>(f, nbh, true);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }
 
 TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform_int_approx_5x5)
@@ -239,27 +242,16 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
       {21, 18, 16, 15, 16, 18, 21}  //
   };
 
-  constexpr std::array<point2d, 16> siteset = {{{-2, -1},
-                                                {-2, +1},
-                                                {-1, -2},
-                                                {-1, -1},
-                                                {-1, +0},
-                                                {-1, +1},
-                                                {-1, +2},
-                                                {+0, -1},
-                                                {+0, +1},
-                                                {+1, -2},
-                                                {+1, -1},
-                                                {+1, +0},
-                                                {+1, +1},
-                                                {+1, +2},
-                                                {+2, -1},
-                                                {+2, +1}}};
+  constexpr std::array<point2d, 16> siteset = {{         {-2, -1},         {-2, +1},
+                                                {-1, -2},{-1, -1},{-1, +0},{-1, +1},{-1, +2},
+                                                         {+0, -1},         {+0, +1},
+                                                {+1, -2},{+1, -1},{+1, +0},{+1, +1},{+1, +2},
+                                                         {+2, -1},         {+2, +1}}};
 
   constexpr std::array<int, 16> weights = {{c, c, c, b, a, b, c, a, a, c, b, a, b, c, c, c}};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
   image2d<int> res = transform::chamfer_distance_transform(f, nbh, true);
 
-  MLN_CHECK_IMEQUAL(res, ref);
+  ASSERT_IMAGES_EQ(res, ref);
 }

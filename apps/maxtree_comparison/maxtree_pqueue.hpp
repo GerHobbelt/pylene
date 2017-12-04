@@ -36,10 +36,9 @@ namespace mln
         typedef std::vector<size_type> vec_t;
         vec_t v_stack;
         v_stack.reserve(std::min<std::size_t>(ima.domain().size(), nlevels));
-        // vec_t v_pqueue; v_pqueue.reserve(ima.domain().size());
-        // auto fcmp = [&ima, cmp] (size_type x, size_type y) { return cmp(ima[x], ima[y]); };
+
         std::stack<size_type, vec_t> stack(std::move(v_stack));
-        priority_queue_ima<V, StrictWeakOrdering> pqueue(ima, cmp);
+        priority_queue_ima<image2d<V>, StrictWeakOrdering> pqueue(ima, cmp);
 
         // std::priority_queue<size_type, vec_t, decltype(fcmp)>
         // pqueue(fcmp, std::move(v_pqueue));
@@ -61,18 +60,7 @@ namespace mln
 
           // Get min element and reserve queue
           size_type pmin = ima.index_of_point(ima.domain().pmin);
-          // V vmin = ima[pmin];
           {
-            // mln_pixter(px, ima);
-            // mln_forall(px)
-            // {
-            //   if (cmp(px->val(), vmin))
-            // 	{
-            // 	  vmin = px->val();
-            // 	  pmin = px->index();
-            // 	}
-            // }
-
             pqueue.push(pmin);
             stack.push(pmin);
             if (use_dejavu)
@@ -158,7 +146,7 @@ namespace mln
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
-    maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+        maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       typedef typename image2d<V>::size_type size_type;
       image2d<size_type> parent;

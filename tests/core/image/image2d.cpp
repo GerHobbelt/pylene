@@ -79,5 +79,5 @@ TEST(Core, Image2d_From_Buffer)
 
   iota(ref, 1);
 
-  MLN_CHECK_IMEQUAL(ima, ref);
+  ASSERT_IMAGES_EQ(ima, ref);
 }

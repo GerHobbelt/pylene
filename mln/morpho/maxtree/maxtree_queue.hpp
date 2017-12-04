@@ -4,11 +4,9 @@
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/value/value_traits.hpp>
-
+#include <mln/core/wrt_offset.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
 #include <mln/morpho/pqueue_fast.hpp>
-
-#include <mln/core/wrt_offset.hpp>
 
 #include <queue>
 #include <stack>
@@ -25,7 +23,7 @@ namespace mln
 
       template <typename I, typename Neighborhood, typename StrictWeakOrdering>
       component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-          maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
+      maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
       {
         typedef typename I::size_type size_type;
         typedef mln_value(I) V;
@@ -78,7 +76,7 @@ namespace mln
         // 2. Create auxiliary structure for the computation
         // {
         mln_ch_value(I, bool) deja_vu = imchvalue<bool>(ima).adjust(nbh).init(false);
-        priority_queue_ima<V, StrictWeakOrdering> pqueue(ima, cmp);
+        priority_queue_ima<I, StrictWeakOrdering> pqueue(ima, cmp);
 
         extension::fill(deja_vu, true);
         // }

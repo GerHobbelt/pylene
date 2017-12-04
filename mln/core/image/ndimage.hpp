@@ -391,24 +391,6 @@ namespace mln
   /** Free function Impl        */
   /******************************/
 
-  template <typename T>
-  struct image3d : ndimage_base<T, 3, image3d<T>>
-  {
-  protected:
-    typedef ndimage_base<T, 3, image3d<T>> base;
-    typedef typename base::domain_type domain_type;
-
-  public:
-    explicit image3d(unsigned border = 3) : base(border) {}
-
-    explicit image3d(const domain_type& domain, unsigned border = 3) : base(domain, border) {}
-
-    image3d(short nslices, short nrows, short ncols, unsigned border = 3)
-        : base((box<short, 3>){{0, 0, 0}, {nslices, nrows, ncols}}, border)
-    {
-    }
-  };
-
   namespace internal
   {
     template <typename T, unsigned dim>

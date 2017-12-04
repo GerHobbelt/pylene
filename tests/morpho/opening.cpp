@@ -39,6 +39,6 @@ TEST(Morpho, opening_closing_opening_1)
     auto out1 = morpho::structural::opening(imtransform(ima, comp), win);
     auto out2 = morpho::structural::closing(ima, win);
 
-    MLN_CHECK_IMEQUAL(out1, imtransform(out2, comp)); // duality
+    ASSERT_IMAGES_EQ(out1, imtransform(out2, comp)); // duality
   }
 }

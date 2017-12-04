@@ -25,5 +25,5 @@ TEST(Morpho, erode_0)
   out1 = morpho::structural::dilate(ima, win);
   out2 = morpho::structural::erode(imtransform(ima, comp), win);
 
-  MLN_CHECK_IMEQUAL(out2, imtransform(out1, comp));
+  ASSERT_IMAGES_EQ(out2, imtransform(out1, comp));
 }

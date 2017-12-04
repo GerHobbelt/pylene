@@ -33,7 +33,7 @@ The are basically three functions:
 
 * :cpp:func:`mln::morpho::maxtree_indexes`
 * :cpp:func:`mln::morpho::mintree_indexes`
-* :cpp:func:`mln::morpho::cToS`
+* :cpp:func:`mln::morpho::tos`
 
 
 .. code::
@@ -120,8 +120,8 @@ Tree traversal examples
 
       tree_t::node_type n = t.get_node_at(p)
       while (n.id() != tree_t.npos()) {
-      // do something with n
-      n = n.parent();
+        // do something with n
+        n = n.parent();
       }
 
 
@@ -320,7 +320,7 @@ The method will proceed as follows:
 
 1. Compute the |tos| of the input image::
 
-    auto t = mln::morpho::cToS(f, mln::c4);
+    auto t = mln::morpho::tos(f);
 
 2. The |tos| uses a special representation that needs to double the
    size of the image by adding intermediate pixels. We thus need to

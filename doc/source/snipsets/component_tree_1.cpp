@@ -6,6 +6,7 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+#include <mln/morpho/tos/tos.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
@@ -20,8 +21,8 @@ main()
   mln::io::imread("images/roadsigns.png", f);
 
   // Compute the ToS
-  auto t = mln::morpho::cToS(f, mln::c4);
-  typedef decltype(t) tree_t;
+  auto t = mln::morpho::tos(f);
+  using tree_t = decltype(t);
 
   // Set f to the right size
   mln::image2d<uint8> f2;

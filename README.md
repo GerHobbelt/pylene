@@ -1,6 +1,6 @@
 # What is Pylene ?
 
-Pylene is a fork of [Milena](www.lrde.epita.fr/olena), an image processing
+Pylene is a fork of [Milena](http://www.lrde.epita.fr/olena), an image processing
 library targeting genericity and efficiency. Pylene is a modernized version of
 Milena with the following objectives:
 

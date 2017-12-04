@@ -36,9 +36,7 @@ endif()
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++14 -Werror")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -ggdb")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 elseif (MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX " )
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
@@ -62,8 +60,9 @@ add_definitions(-D BOOST_PP_VARIADICS=1)
 
 
 # Subdirectories
-add_subdirectory(tests)
-add_subdirectory(bench)
+add_subdirectory(doc EXCLUDE_FROM_ALL)
+add_subdirectory(tests EXCLUDE_FROM_ALL)
+add_subdirectory(bench EXCLUDE_FROM_ALL)
 add_subdirectory(apps EXCLUDE_FROM_ALL)
 add_subdirectory(cli EXCLUDE_FROM_ALL)
 

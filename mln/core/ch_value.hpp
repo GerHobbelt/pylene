@@ -11,8 +11,8 @@
 /// \file
 /// \brief Meta-Function to transform images.
 
-#define mln_ch_value(I, V) typename image_ch_value<typename std::decay<I>::type, V>::type
-#define mln_concrete(I) typename image_concrete<typename std::decay<I>::type>::type
+#define mln_ch_value(I, V) typename mln::image_ch_value<typename std::decay<I>::type, V>::type
+#define mln_concrete(I) typename mln::image_concrete<typename std::decay<I>::type>::type
 
 namespace mln
 {

@@ -29,9 +29,15 @@ namespace mln
             return {std::min(lower, other.lower), std::max(upper, other.upper)};
           }
 
-          bool operator==(const irange& other) const { return (lower == other.lower) and (upper == other.upper); }
+          bool operator==(const irange& other) const
+          {
+            return (lower == other.lower) && (upper == other.upper);
+          }
 
-          bool operator!=(const irange& other) const { return (lower != other.lower) or (upper != other.upper); }
+          bool operator!=(const irange& other) const
+          {
+            return !(*this == other);
+          }
 
           V lower, upper;
         };

@@ -2,8 +2,8 @@
 #define TESTS_HELPERS_H
 
 #include <mln/core/image/image.hpp>
-#include <gtest/gtest.h>
 #include <mln/io/imprint.hpp>
+#include <gtest/gtest.h>
 
 
 /// \brief Compare if two images are equals
@@ -23,10 +23,10 @@ bool compare(const mln::Image<I>& f, const mln::Image<J>& g);
 /******************************************/
 
 template <class I, class J>
-bool compare(const mln::Image<I>& f, const mln::Image<J>& g)
+bool compare(const mln::Image<I>& reference, const mln::Image<J>& input)
 {
-  mln_pixter(px1, mln::exact(f));
-  mln_pixter(px2, mln::exact(g));
+  mln_pixter(px1, mln::exact(reference));
+  mln_pixter(px2, mln::exact(input));
 
   mln_forall (px1, px2)
     {
@@ -41,13 +41,13 @@ bool compare(const mln::Image<I>& f, const mln::Image<J>& g)
 namespace impl
 {
   template <class I, class J>
-  std::string err_compare_msg(const mln::Image<I>& f, const mln::Image<J>& g)
+  std::string err_compare_msg(const mln::Image<I>& reference, const mln::Image<J>& input)
   {
     std::stringstream msg;
     msg << "The following images differs:\n";
-    mln::io::imprint(f, msg);
+    mln::io::imprint(f, msg, "reference");
     msg << " and\n:";
-    mln::io::imprint(g, msg);
+    mln::io::imprint(g, msg, "input");
     return msg.str();
   }
 }

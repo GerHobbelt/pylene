@@ -1,38 +1,40 @@
 #ifndef APPS_TOSGUI_ATTRIBUTE_HPP
-# define APPS_TOSGUI_ATTRIBUTE_HPP
+#define APPS_TOSGUI_ATTRIBUTE_HPP
 
-# include <QString>
-# include <QLabel>
-# include <QWidget>
-# include <QLayoutItem>
-# include <QMap>
-# include <vector>
-# include "qattribute.hpp"
+#include "qattribute.hpp"
+#include <QLabel>
+#include <QLayoutItem>
+#include <QMap>
+#include <QString>
+#include <QWidget>
+#include <vector>
+
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/point.hpp>
 
 /// \brief Abstract class for attributes
 class Attribute : public QObject
 {
   Q_OBJECT;
+
 public:
   struct Parameter
   {
-    enum etype { VALUE = 0, CHOICE = 1};
+    enum etype
+    {
+      VALUE = 0,
+      CHOICE = 1
+    };
 
     Parameter() = default;
 
-    Parameter(QLabel* lbl, QWidget* w)
-      : label (lbl), obj (new QWidgetItem(w))
-    {
-    }
+    Parameter(QLabel* lbl, QWidget* w) : label(lbl), obj(new QWidgetItem(w)) {}
 
-    Parameter(QLabel* lbl, QLayoutItem* w)
-      : label (lbl), obj (w)
-    {
-    }
+    Parameter(QLabel* lbl, QLayoutItem* w) : label(lbl), obj(w) {}
 
-    QLabel*  label;
+    QLabel* label;
     QLayoutItem* obj;
-    //etype    type;
+    // etype    type;
 
     // ~Parameter()
     // {
@@ -57,7 +59,6 @@ signals:
   void nodeSelected(const mln::point2d&);
   void nodeSelected(const mln::image2d<bool>&);
 
-
 protected:
   void setSignals(mln::QAttributeBase* attribute);
 
@@ -65,11 +66,7 @@ protected slots:
   void onNodeSelected(const mln::point2d&);
   void onNodeSelected(const mln::image2d<bool>&);
 
-  virtual
-  void showinfo(const mln::point2d&)
-  {
-  }
-
+  virtual void showinfo(const mln::point2d&) {}
 };
 
 #endif // ! APPS_TOSGUI_ATTRIBUTE_HPP

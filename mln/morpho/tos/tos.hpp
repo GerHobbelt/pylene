@@ -22,9 +22,14 @@ namespace mln
       tos_ensure_component_root_on_2face = 0x01,
     };
 
+    /// \brief Compute the tree of shapes.
+    /// \param[in] input Input image
+    /// \param[in] start_point Root point
+    /// \param[in] processing_flags Extra options to control tree construction.
+    /// \return A component tree encoding the tree of shapes.
     template <typename I>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-    tos(const Image<I>& ima, mln_point(I) start_point, int processing_flags = 0);
+    tos(const Image<I>& input, mln_point(I) start_point, int processing_flags = 0);
 
     template <typename I>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
@@ -109,4 +114,4 @@ namespace mln
   } // end of namespace mln::morpho
 } // end of namespace mln
 
-#endif //! MLN_MORPHO_TOS_V2_TOS_HPP
+#endif //! MLN_MORPHO_TOS_TOS_HPP

@@ -1,5 +1,9 @@
 #ifndef MLN_CORE_RANGE_HAS_HPP
-# define MLN_CORE_RANGE_HAS_HPP
+#define MLN_CORE_RANGE_HAS_HPP
+
+#include <mln/core/range/iter.hpp>
+
+#include <utility>
 
 namespace mln
 {
@@ -20,40 +24,31 @@ namespace mln
       template <typename R, typename T, typename = void>
       struct has_lookup
       {
-	static
-	bool has(const R& rng, const T& val)
-	{
-	  auto it = rng::iter(rng);
-	  for (it.init(); !it.finished(); it.next())
-	    if (*it == val)
+        static bool has(const R& rng, const T& val)
+        {
+          auto it = rng::iter(rng);
+          for (it.init(); !it.finished(); it.next())
+            if (*it == val)
               return true;
-	  return false;
-	}
+          return false;
+        }
       };
-
 
       template <typename R, typename T>
       struct has_lookup<R, T, decltype(std::declval<R>().has(std::declval<T>()), (void)0)>
       {
-        static
-        bool has(const R& rng, const T& val)
-        {
-          return rng.has(val);
-        }
+        static bool has(const R& rng, const T& val) { return rng.has(val); }
       };
-
     }
 
     template <typename Range, typename T>
-    inline
-    bool has(const Range& rng, const T& val)
+    inline bool has(const Range& rng, const T& val)
     {
       return internal::has_lookup<Range, T>::has(rng, val);
     }
-    
 
   } // end of namespace mln::rng
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_RANGE_HAS_HPP
+#endif //! MLN_CORE_RANGE_HAS_HPP

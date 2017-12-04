@@ -1,15 +1,15 @@
 #ifndef COMPUTE_TREE_DISTANCE_HPP
-# define COMPUTE_TREE_DISTANCE_HPP
+#define COMPUTE_TREE_DISTANCE_HPP
 
-# include <mln/core/image/image.hpp>
-# include <mln/core/value/value_traits.hpp>
-# include <mln/core/wrt_offset.hpp>
-# include <mln/core/extension/fill.hpp>
-# include <mln/morpho/tos/irange.hpp>
-# include <mln/morpho/tos/immerse.hpp>
-# include <mln/morpho/tos/pset.hpp>
-# include <mln/morpho/tos/pset_priority.hpp>
-# include <mln/morpho/tos/tos.hpp>
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/value/value_traits.hpp>
+#include <mln/core/wrt_offset.hpp>
+#include <mln/morpho/tos/immerse.hpp>
+#include <mln/morpho/tos/irange.hpp>
+#include <mln/morpho/tos/pset.hpp>
+#include <mln/morpho/tos/pset_priority.hpp>
+#include <mln/morpho/tos/tos.hpp>
 
 namespace mln
 {
@@ -26,14 +26,9 @@ namespace mln
     ///
     /// \return
     ///
-    template <typename I,
-	      typename Neighborhood,
-	      class Distance>
-    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
-    ToSdistance(const Image<I>& ima,
-		const Neighborhood& nbh,
-		mln_point(I) pmin,
-		Distance dist);
+    template <typename I, typename Neighborhood, class Distance>
+    std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
+        ToSdistance(const Image<I>& ima, const Neighborhood& nbh, mln_point(I) pmin, Distance dist);
 
     /*********************************/
     /***  Implementation	  ****/
@@ -44,58 +39,50 @@ namespace mln
       template <typename V>
       void fillhole(image2d<bool>& mask, unsigned x, image2d<V>& lpar, V val)
       {
-	static std::vector<unsigned> pqueue;
+        static std::vector<unsigned> pqueue;
 
-	pqueue.reserve(lpar.domain().size());
-	pqueue.push_back(x);
+        pqueue.reserve(lpar.domain().size());
+        pqueue.push_back(x);
 
-	auto dindexes = wrt_delta_index(mask, c4.dpoints);
-	while (!pqueue.empty())
-	  {
-	    x = pqueue.back();
-	    pqueue.pop_back();
-	    for (int n: dindexes)
-	      {
-		unsigned q = n + x;
-		if (mask[q]) {
-		  pqueue.push_back(q);
-		  mask[q] = false;
-		  lpar[q] = val;
-		}
-	      }
-	  }
+        auto dindexes = wrt_delta_index(mask, c4.dpoints);
+        while (!pqueue.empty())
+        {
+          x = pqueue.back();
+          pqueue.pop_back();
+          for (int n : dindexes)
+          {
+            unsigned q = n + x;
+            if (mask[q])
+            {
+              pqueue.push_back(q);
+              mask[q] = false;
+              lpar[q] = val;
+            }
+          }
+        }
       }
 
       template <typename V>
       struct projection;
 
-
-
       template <>
       struct projection<rgb8>
       {
-	rgb8
-	operator () (const tos::irange<rgb8>& rng, rgb8 x) const
-	{
-	  for (int i = 0; i < 3; ++i)
-	    if (x[i] < rng.lower[i]) x[i] = rng.lower[i];
-	    else if (x[i] > rng.upper[i]) x[i] = rng.upper[i];
-	  return x;
-	}
+        rgb8 operator()(const tos::irange<rgb8>& rng, rgb8 x) const
+        {
+          for (int i = 0; i < 3; ++i)
+            if (x[i] < rng.lower[i])
+              x[i] = rng.lower[i];
+            else if (x[i] > rng.upper[i])
+              x[i] = rng.upper[i];
+          return x;
+        }
       };
-
     }
 
-
-
-    template <typename I,
-	      typename Neighborhood,
-	      class Distance>
-    std::tuple< mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type> >
-    ToSdistance(const Image<I>& ima_,
-		const Neighborhood& nbh,
-		mln_point(I) pmin,
-		Distance dist)
+    template <typename I, typename Neighborhood, class Distance>
+    std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
+        ToSdistance(const Image<I>& ima_, const Neighborhood& nbh, mln_point(I) pmin, Distance dist)
     {
       using namespace mln::morpho::tos;
 
@@ -109,10 +96,9 @@ namespace mln
 
       const I& ima = exact(ima_);
 
-
       // f: image of interval in Khalimsky space
       // K: image of value in Khalimsky that tells at which a level a point is inserted
-      mln_ch_value(I, R) f = tos::internal::immerse(ima, productorder_less<V> ());
+      mln_ch_value(I, R) f = tos::internal::immerse(ima, productorder_less<V>());
       mln_concrete(I) K;
       mln_ch_value(I, size_type) parent, zpar;
       mln_concrete(I) lpar;
@@ -129,54 +115,54 @@ namespace mln
 
       // Step 1: propagation
       {
-	std::vector<size_type> W;
-	std::vector<unsigned> vdist;
-	W.reserve(f.domain().size());
-	vdist.resize(f.domain().size());
+        std::vector<size_type> W;
+        std::vector<unsigned> vdist;
+        W.reserve(f.domain().size());
+        vdist.resize(f.domain().size());
 
-	size_type p = f.index_of_point(pmin);
-	W.push_back(p);
-	parent[p] = PROCESSED;
-	K[p] = f[p].lower;
+        size_type p = f.index_of_point(pmin);
+        W.push_back(p);
+        parent[p] = PROCESSED;
+        K[p] = f[p].lower;
 
-	image2d<bool> mask;
-	resize(mask, f);
-	extension::fill(mask, false);
+        image2d<bool> mask;
+        resize(mask, f);
+        extension::fill(mask, false);
 
-	morpho::internal::projection<V> proj;
+        morpho::internal::projection<V> proj;
 
-	while (!W.empty())
-	  {
-	    // retrieve the closest point in the que from the current level
-	    {
-	      std::transform(W.begin(), W.end(), vdist.begin(),
-			     [dist, proj, &lpar, &f](unsigned x) { return dist(proj(f[x], lpar[x]), lpar[x]); });
-	      auto it = std::min_element(vdist.begin(), vdist.begin() + W.size());
-	      int i = it - vdist.begin();
-	      p = W[i];
-	      W[i] = W.back();
-	      W.pop_back();
+        while (!W.empty())
+        {
+          // retrieve the closest point in the que from the current level
+          {
+            std::transform(W.begin(), W.end(), vdist.begin(),
+                           [dist, proj, &lpar, &f](unsigned x) { return dist(proj(f[x], lpar[x]), lpar[x]); });
+            auto it = std::min_element(vdist.begin(), vdist.begin() + W.size());
+            int i = it - vdist.begin();
+            p = W[i];
+            W[i] = W.back();
+            W.pop_back();
 
-	      K[p] = (vdist[i] == 0) ? lpar[p] : proj(f[p], lpar[p]);
-	    }
+            K[p] = (vdist[i] == 0) ? lpar[p] : proj(f[p], lpar[p]);
+          }
 
-	    V curlevel = K[p];
-	    S.push_back(p);
-	    copy(parent != PROCESSED, mask);
-	    morpho::internal::fillhole(mask, p, lpar, curlevel);
-	    parent[p] = PROCESSED;
+          V curlevel = K[p];
+          S.push_back(p);
+          copy(parent != PROCESSED, mask);
+          morpho::internal::fillhole(mask, p, lpar, curlevel);
+          parent[p] = PROCESSED;
 
-	    mln_foreach (int k, dindexes)
-	      {
-		size_type q = p + k;
-		if (parent[q] == UNPROCESSED)
-		  {
-		    parent[q] = INQUEUE;
-		    //std::cout << "Insert:" << q << " @ " << K[q] << std::endl;
-		    W.push_back(q);
-		  }
-	      }
-	  }
+          mln_foreach (int k, dindexes)
+          {
+            size_type q = p + k;
+            if (parent[q] == UNPROCESSED)
+            {
+              parent[q] = INQUEUE;
+              // std::cout << "Insert:" << q << " @ " << K[q] << std::endl;
+              W.push_back(q);
+            }
+          }
+        }
       }
 
       // 2nd step: union-find
@@ -188,69 +174,63 @@ namespace mln
 
       std::equal_to<V> eq;
 
-      int spos = S.size()-1;
-      for (int i = S.size()-1; i >= 0; --i)
-	{
-	  size_type p = S[i];
-	  parent[p] = p;
-	  zpar[p] = p;
+      int spos = S.size() - 1;
+      for (int i = S.size() - 1; i >= 0; --i)
+      {
+        size_type p = S[i];
+        parent[p] = p;
+        zpar[p] = p;
 
-	  size_type rp = p;
-	  bool face2 = is_face_2(K.point_at_index(p));
+        size_type rp = p;
+        bool face2 = is_face_2(K.point_at_index(p));
 
-	  mln_foreach (int k, dindexes)
-	    {
-	      size_type q = p + k;
-	      if (zpar[q] != UNPROCESSED)
-		{
-		  size_type r = morpho::internal::zfind_root(zpar, q);
-		  if (r != rp) { // MERGE r and p
-		    if (eq(K[p], K[r]) and !face2 and is_face_2(K.point_at_index(r)))
-		      {
-			parent[rp] = r;
-			zpar[rp] = r;
-			face2 = true;
-			S[spos--] = rp;
-			rp = r;
-		      }
-		    else
-		      {
-			parent[r] = rp;
-			zpar[r] = rp;
-			S[spos--] = r;
-		      }
-		  }
-		}
-	    }
-	}
+        mln_foreach (int k, dindexes)
+        {
+          size_type q = p + k;
+          if (zpar[q] != UNPROCESSED)
+          {
+            size_type r = morpho::internal::zfind_root(zpar, q);
+            if (r != rp)
+            { // MERGE r and p
+              if (eq(K[p], K[r]) and !face2 and is_face_2(K.point_at_index(r)))
+              {
+                parent[rp] = r;
+                zpar[rp] = r;
+                face2 = true;
+                S[spos--] = rp;
+                rp = r;
+              }
+              else
+              {
+                parent[r] = rp;
+                zpar[r] = rp;
+                S[spos--] = r;
+              }
+            }
+          }
+        }
+      }
       S[0] = morpho::internal::zfind_root(zpar, S[0]);
 
       // 3rd step: canonicalization
       for (size_type p : S)
-	{
-	  size_type q = parent[p];
-	  if (eq(K[q], K[parent[q]]))
-	    parent[p] = parent[q];
-	  //mln_assertion(K1::is_face_2(K.point_at_index(parent[p])));
-	}
-
+      {
+        size_type q = parent[p];
+        if (eq(K[q], K[parent[q]]))
+          parent[p] = parent[q];
+        // mln_assertion(K1::is_face_2(K.point_at_index(parent[p])));
+      }
 
       mln_postcondition(S.size() == K.domain().size());
       mln_postcondition(S.size() == parent.domain().size());
       // All done !
       return std::make_tuple(std::move(K), std::move(parent), std::move(S));
     }
-
   }
-
 }
 
+#ifndef MLN_INCLUDE_ONLY
 
-
-
-
-# ifndef MLN_INCLUDE_ONLY
-
-# endif // ! MLN_INCLUDE_ONLY
+#endif // ! MLN_INCLUDE_ONLY
 
 #endif // ! COMPUTE_TREE_DISTANCE_HPP

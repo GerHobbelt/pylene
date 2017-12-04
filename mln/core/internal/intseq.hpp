@@ -1,5 +1,5 @@
 #ifndef MLN_CORE_INTERNAL_INTSEQ_HPP
-# define MLN_CORE_INTERNAL_INTSEQ_HPP
+#define MLN_CORE_INTERNAL_INTSEQ_HPP
 
 /// \file
 /// \brief Static integer sequence generator
@@ -26,10 +26,9 @@ namespace mln
   /// \brief Integer sequence type generator
   /// \see intseq
   template <int N, int... I>
-  struct int_list_seq : int_list_seq<N-1, N-1, I...>
+  struct int_list_seq : int_list_seq<N - 1, N - 1, I...>
   {
   };
-
 
   template <int... I>
   struct int_list_seq<0, I...>
@@ -39,6 +38,4 @@ namespace mln
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_INTERNAL_INTSEQ_HPP
-
-
+#endif //! MLN_CORE_INTERNAL_INTSEQ_HPP

@@ -1,7 +1,8 @@
 #ifndef MLN_CORE_RANGE_ALGORITHM_ACCUMULATE_HPP
-# define MLN_CORE_RANGE_ALGORITHM_ACCUMULATE_HPP
+#define MLN_CORE_RANGE_ALGORITHM_ACCUMULATE_HPP
 
-# include <mln/core/range/range.hpp>
+#include <mln/core/forall.hpp>
+#include <mln/core/range/range.hpp>
 
 namespace mln
 {
@@ -12,7 +13,7 @@ namespace mln
     T accumulate(const Range1& rng, T init)
     {
       mln_iter(vin, rng);
-      mln_forall(vin)
+      mln_forall (vin)
         init = init + *vin;
       return init;
     }
@@ -21,7 +22,7 @@ namespace mln
     T accumulate(const Range1& rng, T init, BinaryOperation op)
     {
       mln_iter(vin, rng);
-      mln_forall(vin)
+      mln_forall (vin)
         init = op(init, *vin);
       return init;
     }
@@ -29,4 +30,4 @@ namespace mln
   } // end of namespace mln::range
 } // end of namespace mln
 
-#endif //!MLN_CORE_RANGE_ALGORITHM_ACCUMULATE_HPP
+#endif //! MLN_CORE_RANGE_ALGORITHM_ACCUMULATE_HPP

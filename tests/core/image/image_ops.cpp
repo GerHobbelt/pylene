@@ -9,8 +9,7 @@
 
 #include <gtest/gtest.h>
 
-mln::image2d<int>
-make_image()
+mln::image2d<int> make_image()
 {
   mln::image2d<int> x(5, 5);
   mln::iota(x, 0);
@@ -32,8 +31,7 @@ struct red : std::unary_function<rgb&, int&>
   const int& operator()(const rgb& x) const { return x.r; }
 };
 
-std::ostream&
-operator<<(std::ostream& ss, const rgb& x)
+std::ostream& operator<<(std::ostream& ss, const rgb& x)
 {
   return ss << boost::make_tuple(x.r, x.g, x.b);
 }
@@ -101,6 +99,8 @@ TEST(Core, Image2d_WhereOperator)
   auto f4 = where(x > 12, (uint8)0, (uint8)1); // RValue image + Scalar + Scalar
 
   ASSERT_TRUE(all(f1 >= 12));
-  ASSERT_TRUE((std::is_same<mln_reference(decltype(f1)), const uint8&>()));
+  // MSVC : uint8&, clang/gcc : const uint8&
+  ASSERT_TRUE((std::is_same<mln_reference(decltype(f1)), const uint8&>() ||
+               std::is_same<mln_reference(decltype(f1)), uint8&>()));
   ASSERT_TRUE((std::is_same<mln_reference(decltype(f2)), uint8&>()));
 }

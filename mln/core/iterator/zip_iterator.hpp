@@ -1,15 +1,16 @@
 #ifndef ZIP_ITERATOP_HPP
-# define ZIP_ITERATOP_HPP
+#define ZIP_ITERATOP_HPP
 
-# include <type_traits>
-# include <tuple>
-# include <mln/core/assert.hpp>
-# include <mln/core/iterator/iterator_base.hpp>
-# include <mln/core/internal/tuple_utility.hpp>
+#include <mln/core/assert.hpp>
+#include <mln/core/internal/tuple_utility.hpp>
+#include <mln/core/iterator/iterator_base.hpp>
 
-# ifndef _MSC_VER
-#  include <boost/hana/and.hpp>
-# endif
+#include <tuple>
+#include <type_traits>
+
+#ifndef _MSC_VER
+#include <boost/hana/and.hpp>
+#endif
 
 namespace mln
 {
@@ -23,29 +24,28 @@ namespace mln
     return zip_iterator<std::tuple<TTypes&&...>>(std::forward_as_tuple(iterators...));
   }
 
-
   /********************/
   /* Implementation   */
   /********************/
 
   namespace details
   {
-    #ifndef _MSC_VER
+#ifndef _MSC_VER
     template <class... T>
     using conjunction = std::integral_constant<bool, boost::hana::and_(T::value...)>;
-    #else
+#else
     template <class... T>
     using conjunction = std::conjunction<T...>;
-    #endif
+#endif
 
     template <bool IsMultiDimensional, class... IteratorTypes>
     struct zip_iterator_base;
 
     template <class... IteratorTypes>
     struct zip_iterator_base<false, IteratorTypes...>
-      : iterator_base< zip_iterator< std::tuple<IteratorTypes...> >,
-		     std::tuple< typename std::remove_reference_t<IteratorTypes>::reference... >,
-		     std::tuple< typename std::remove_reference_t<IteratorTypes>::reference... > >
+        : iterator_base<zip_iterator<std::tuple<IteratorTypes...>>,
+                        std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>,
+                        std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>>
     {
       using IteratorTuple = std::tuple<IteratorTypes...>;
       using value_type = std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>;
@@ -57,11 +57,9 @@ namespace mln
       zip_iterator_base(const IteratorTuple& tuple) : m_iterator_tuple(tuple) {}
 
       template <class OtherIteratorTuple>
-      zip_iterator_base(const zip_iterator<OtherIteratorTuple>& other)
-        : m_iterator_tuple (other.m_iterator_tuple)
+      zip_iterator_base(const zip_iterator<OtherIteratorTuple>& other) : m_iterator_tuple(other.m_iterator_tuple)
       {
       }
-
 
       void init()
       {
@@ -92,18 +90,17 @@ namespace mln
       }
 
       template <class dummy = bool>
-      typename std::enable_if<has_NL::value, dummy>::type
-      NL() const
+      typename std::enable_if<has_NL::value, dummy>::type NL() const
       {
         return std::get<0>(m_iterator_tuple).NL();
       }
 
     protected:
-      template <typename> friend struct zip_iterator;
+      template <typename>
+      friend struct zip_iterator;
 
       IteratorTuple m_iterator_tuple;
     };
-
 
     template <class... Iterators>
     struct zip_iterator_base<true, Iterators...> : zip_iterator_base<false, Iterators...>
@@ -133,12 +130,14 @@ namespace mln
         internal::tuple_for_each(this->m_iterator_tuple, [](auto& x) { x.__outer_next(); });
       }
 
-
       bool __inner_finished() const
       {
         bool finished = std::get<0>(this->m_iterator_tuple).__inner_finished();
         if (MLN_HAS_DEBUG && finished)
-          internal::tuple_for_each(this->m_iterator_tuple, [](const auto& x) { (void)x; mln_assertion(x.__inner_finished()); });
+          internal::tuple_for_each(this->m_iterator_tuple, [](const auto& x) {
+            (void)x;
+            mln_assertion(x.__inner_finished());
+          });
         return finished;
       }
 
@@ -146,7 +145,10 @@ namespace mln
       {
         bool finished = std::get<0>(this->m_iterator_tuple).__outer_finished();
         if (MLN_HAS_DEBUG && finished)
-          internal::tuple_for_each(this->m_iterator_tuple, [](const auto& x) { (void)x; mln_assertion(x.__outer_finished()); });
+          internal::tuple_for_each(this->m_iterator_tuple, [](const auto& x) {
+            (void)x;
+            mln_assertion(x.__outer_finished());
+          });
         return finished;
       }
     };
@@ -154,12 +156,13 @@ namespace mln
 
   template <class... TTypes>
   struct zip_iterator<std::tuple<TTypes...>>
-    : details::zip_iterator_base<details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::value, TTypes...>
+      : details::zip_iterator_base<
+            details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::value, TTypes...>
   {
-    using is_multidimensional = typename details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::type;
+    using is_multidimensional =
+        typename details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::type;
     using details::zip_iterator_base<is_multidimensional::value, TTypes...>::zip_iterator_base;
   };
-
 }
 
 #endif // ! ZIP_ITERATOP_HPP

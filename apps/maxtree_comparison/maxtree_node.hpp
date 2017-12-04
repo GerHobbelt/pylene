@@ -1,5 +1,5 @@
 #ifndef MLN_MORPHO_MAXTREE_NODE_HPP
-# define MLN_MORPHO_MAXTREE_NODE_HPP
+#define MLN_MORPHO_MAXTREE_NODE_HPP
 
 namespace mln
 {
@@ -14,11 +14,9 @@ namespace mln
       size_type m_parent;
       size_type m_prev;
       size_type m_next;
-      double	m_pos;
+      double m_pos;
     };
-
   }
-
 }
 
 #endif // ! MLN_MORPHO_MAXTREE_NODE_HPP

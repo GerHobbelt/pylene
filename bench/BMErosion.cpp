@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-# define __restrict__ __restrict
+#define __restrict__ __restrict
 #endif
 
 #include <mln/core/image/image2d.hpp>
@@ -9,34 +9,29 @@
 
 using namespace mln;
 
-void
-erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   mln_pixter(px, f);
   mln_pixter(pxout, out);
   mln_iter(nx, winc8(px));
 
-  mln_forall(px,pxout)
+  mln_forall (px, pxout)
   {
     uint8 min = 255;
     //#pragma clang loop vectorize(enable)
-    mln_simple_forall(nx)
-      min = std::min(min, nx->val());
+    mln_simple_forall(nx) min = std::min(min, nx->val());
     pxout->val() = min;
   }
 }
 
-
-void
-erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
-  (void) f; (void) out;
+  (void)f;
+  (void)out;
   mln::morpho::structural::erode(f, winc8, out, std::less<mln::uint8>());
 }
 
-
-void
-erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   constexpr int sz = 9;
   auto dpoints = winc8_t::dpoints;
@@ -65,10 +60,7 @@ erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out
   }
 }
 
-
-
-void
-erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
+void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
   constexpr int sz = 9;
   auto dpoints = winc8_t::dpoints;

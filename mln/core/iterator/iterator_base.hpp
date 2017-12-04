@@ -1,15 +1,17 @@
 #ifndef MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
-# define MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
+#define MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
 
-# include <mln/core/concept/iterator.hpp>
-# include <mln/core/iterator/iterator_traits.hpp>
-# include <memory>
-# include <type_traits>
+#include <memory>
+#include <mln/core/concept/iterator.hpp>
+#include <mln/core/iterator/iterator_traits.hpp>
+#include <type_traits>
 
 namespace mln
 {
 
-  struct use_default {};
+  struct use_default
+  {
+  };
 
   namespace internal
   {
@@ -17,9 +19,10 @@ namespace mln
     template <typename Reference>
     struct pointer_wrapper
     {
-      explicit pointer_wrapper(Reference x) : x_ (x) {}
+      explicit pointer_wrapper(Reference x) : x_(x) {}
       Reference* operator->() { return std::addressof(x_); }
-      operator Reference* () { return std::addressof(x_); }
+      operator Reference*() { return std::addressof(x_); }
+
     private:
       Reference x_;
     };
@@ -28,18 +31,16 @@ namespace mln
     struct make_pointer
     {
       typedef pointer_wrapper<T> type;
-      static pointer_wrapper<T> foo(T x) { return pointer_wrapper<T> (x); }
+      static pointer_wrapper<T> foo(T x) { return pointer_wrapper<T>(x); }
     };
 
     template <typename T>
     struct make_pointer<T&>
     {
       typedef T* type;
-      static T* foo(T& x) { return std::addressof (x); }
+      static T* foo(T& x) { return std::addressof(x); }
     };
-
   };
-
 
   ///
   /// Helper class for iterators
@@ -56,14 +57,9 @@ namespace mln
     using pointer = std::conditional_t<std::is_reference<Reference>::value, std::remove_reference_t<Reference>*,
                                        internal::pointer_wrapper<Reference>>;
 
-    Derived iter() const
-    {
-      return *(mln::exact(this));
-    }
+    Derived iter() const { return *(mln::exact(this)); }
 
-
-    reference
-    operator* () const
+    reference operator*() const
     {
       // It may not be necessary to start iteration to have valid
       // member (e.g. the image pointer in pixels), thus we should
@@ -72,13 +68,9 @@ namespace mln
       return mln::exact(this)->dereference();
     }
 
-    pointer
-    operator-> () const
-    {
-      return internal::make_pointer<reference>::foo(mln::exact(this)->dereference());
-    }
+    pointer operator->() const { return internal::make_pointer<reference>::foo(mln::exact(this)->dereference()); }
   };
 
 } // end of namespace mln
 
-#endif //!MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
+#endif //! MLN_CORE_ITERATOR_ITERATOR_BASE_HPP

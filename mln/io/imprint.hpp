@@ -1,16 +1,16 @@
 #ifndef MLN_IO_IMPRINT_HPP
-# define MLN_IO_IMPRINT_HPP
+#define MLN_IO_IMPRINT_HPP
 
-# include <type_traits>
-# include <iostream>
-# include <iomanip>
+#include <iomanip>
+#include <iostream>
+#include <type_traits>
 
-# include <mln/core/domain/box.hpp>
-# include <mln/core/value/value_traits.hpp>
-# include <mln/core/grays.hpp>
-# include <mln/io/format.hpp>
+#include <mln/core/domain/box.hpp>
+#include <mln/core/grays.hpp>
+#include <mln/core/value/value_traits.hpp>
+#include <mln/io/format.hpp>
 
-# include <cmath>
+#include <cmath>
 
 namespace mln
 {
@@ -24,8 +24,6 @@ namespace mln
     template <typename I>
     void imprint_with_border(const Image<I>& ima, std::ostream& os = std::cout);
 
-
-
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
@@ -34,32 +32,30 @@ namespace mln
     {
 
       template <typename Image, typename Domain>
-      typename std::enable_if< image_traits<Image>::accessible, void>::type
+      std::enable_if_t<image_traits<Image>::accessible>
       imprint(const Image& ima, Domain domain, std::ostream& os)
       {
-        for (auto p : domain) {
+        for (auto p : domain)
+        {
           os << '{' << p << ",";
           format(os, ima(p)) << "}," << std::endl;
         }
       }
 
-
       template <typename Image, typename Domain>
-      typename std::enable_if< std::is_convertible<typename image_traits<Image>::category,
-                                                   forward_image_tag>::value, void>::type
+      std::enable_if_t<std::is_convertible<typename image_traits<Image>::category, forward_image_tag>::value>
       imprint(const Image& ima, Domain domain, std::ostream& os)
       {
-        (void) domain;
-        typedef typename Image::const_pixel_type pixel_t;
-        mln_foreach (const pixel_t& pix, ima.pixels()) {
+        (void)domain;
+        mln_foreach (const auto& pix, ima.pixels())
+        {
           os << '{' << pix.point() << ",";
           format(os, pix.val()) << "}," << std::endl;
         }
       }
 
-
       template <typename Image, typename P>
-      typename std::enable_if< image_traits<Image>::accessible::value, void>::type
+      std::enable_if_t<image_traits<Image>::accessible::value>
       imprint(const Image& ima, box<P, 2> domain, std::ostream& os)
       {
         typedef typename Image::value_type V;
@@ -69,15 +65,17 @@ namespace mln
 
         int wtext = 0;
         frmt_max_width<V> frmter;
-        mln_foreach(V v, ima.values())
+        mln_foreach (V v, ima.values())
           wtext = std::max(wtext, frmter(v));
 
         os << domain << "(" << typeid(V).name() << ")" << std::endl;
         os.width(4);
 
         mln_point(Image) p;
-        for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0]) {
-          for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1]) {
+        for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0])
+        {
+          for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1])
+          {
             os << std::setw(wtext);
             format(os, ima(p)) << " ";
           }
@@ -118,7 +116,7 @@ namespace mln
       }
 
       template <typename Image, typename P>
-      typename std::enable_if< image_traits<Image>::accessible::value, void>::type
+      std::enable_if_t< image_traits<Image>::accessible::value>
       imprint_with_border(const Image& ima, box<P, 2> domain, std::ostream& os)
       {
         typedef typename Image::value_type V;
@@ -128,7 +126,7 @@ namespace mln
 
         int wtext = 0;
         frmt_max_width<V> frmter;
-        mln_foreach(V v, ima.values())
+        mln_foreach (V v, ima.values())
           wtext = std::max(wtext, frmter(v));
 
         os << domain << "(" << typeid(V).name() << ")" << std::endl;
@@ -136,8 +134,10 @@ namespace mln
 
         mln_point(Image) p;
         int border = ima.border();
-        for (p[0] = domain.pmin[0]-border; p[0] < domain.pmax[0]+border; ++p[0]) {
-          for (p[1] = domain.pmin[1]-border; p[1] < domain.pmax[1]+border; ++p[1]) {
+        for (p[0] = domain.pmin[0] - border; p[0] < domain.pmax[0] + border; ++p[0])
+        {
+          for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1])
+          {
             os << std::setw(wtext);
             format(os, ima.at(p)) << " ";
           }
@@ -158,7 +158,6 @@ namespace mln
     {
       internal::imprint_with_border(exact(ima), exact(ima).domain(), os);
     }
-
   }
 }
 

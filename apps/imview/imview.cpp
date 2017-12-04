@@ -1,8 +1,8 @@
 #include <QApplication>
 
-#include <mln/qt/imageviewer.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
+#include <mln/qt/imageviewer.hpp>
 
 #include <QtGui>
 
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   // m_scene->addItem(&item);
 
   // QGraphicsView* view = new QGraphicsView(m_scene);
-  // QMainWindow win; 
+  // QMainWindow win;
   // win.setCentralWidget(view);
   // win.show();
 

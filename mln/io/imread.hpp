@@ -1,10 +1,10 @@
 #ifndef MLN_IO_IMREAD_HH
-# define MLN_IO_IMREAD_HH
+#define MLN_IO_IMREAD_HH
 
-# include <mln/core/trace.hpp>
-# include <mln/io/loader.hpp>
-# include <mln/io/freeimage_plugin.hpp>
-# include <fstream>
+#include <fstream>
+#include <mln/core/trace.hpp>
+#include <mln/io/freeimage_plugin.hpp>
+#include <mln/io/loader.hpp>
 
 namespace mln
 {
@@ -22,7 +22,6 @@ namespace mln
     template <typename I>
     void imread(std::istream& path, Image<I>& out, bool permissive = false);
 
-
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
@@ -37,7 +36,6 @@ namespace mln
       mln_exiting();
     }
 
-
     template <typename I>
     void imread(const std::string& path, Image<I>& out, bool permissive)
     {
@@ -48,7 +46,6 @@ namespace mln
       mln_exiting();
     }
 
-
   } /*end of namespace mln::io */
 } /* end of namespace mln */
-# endif
+#endif

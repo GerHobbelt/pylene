@@ -6,9 +6,7 @@
 namespace mln
 {
 
-
-  QAttributeBase::QAttributeBase(const QwtText& name)
-    : QwtPlot(name)
+  QAttributeBase::QAttributeBase(const QwtText& name) : QwtPlot(name)
   {
     m_curve = new QwtPlotCurve("Energy");
     m_curve->setSamples(m_data);
@@ -18,18 +16,16 @@ namespace mln
     std::cout << this->canvas() << std::endl;
 
     picker = new QwtPlotPicker(this->canvas());
-    picker->setStateMachine(new  QwtPickerTrackerMachine);
+    picker->setStateMachine(new QwtPickerTrackerMachine);
     picker->setTrackerMode(QwtPicker::AlwaysOn);
     picker->setRubberBand(QwtPicker::VLineRubberBand);
     picker->setEnabled(true);
     this->canvas()->installEventFilter(this);
   }
 
-  void
-  QAttributeBase::keyReleaseEvent(QKeyEvent* event)
+  void QAttributeBase::keyReleaseEvent(QKeyEvent* event)
   {
     if (event->key() == Qt::Key_F)
       this->showFilteringWindow();
   }
-
 }

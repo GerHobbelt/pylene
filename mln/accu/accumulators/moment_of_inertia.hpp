@@ -1,13 +1,13 @@
 #ifndef MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
-# define MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
+#define MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
 
-# include <mln/core/math_ops.hpp>
-# include <mln/core/value/value_traits.hpp>
-# include <mln/accu/accumulators/sum.hpp>
-# include <mln/accu/accumulators/count.hpp>
-# include <mln/accu/accumulators/mean.hpp>
-# include <mln/accu/composite_accumulator.hpp>
-# include <boost/type_traits/promote.hpp>
+#include <boost/type_traits/promote.hpp>
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/accu/accumulators/sum.hpp>
+#include <mln/accu/composite_accumulator.hpp>
+#include <mln/core/math_ops.hpp>
+#include <mln/core/value/value_traits.hpp>
 
 /// \file
 /// \brief Moment of inertia accumulator.
@@ -32,19 +32,15 @@ namespace mln
       ///  \mu_{pq} = \sum_{x} \sum_{y} (x - \bar{x})^p(y -
       /// \bar{y})^q
       /// \f]
-      template <typename T,
-                typename SumType = typename boost::promote<T>::type,
-                typename SumSqrType = SumType>
+      template <typename T, typename SumType = typename boost::promote<T>::type, typename SumSqrType = SumType>
       struct moment_of_inertia;
     }
 
     namespace features
     {
-      template <typename SumType = void,
-                typename SumSqrType = SumType>
+      template <typename SumType = void, typename SumSqrType = SumType>
       struct moment_of_inertia;
     }
-
 
     namespace features
     {
@@ -65,12 +61,10 @@ namespace mln
         };
       }
 
-      template <typename SumType,
-                typename SumSqrType>
-      struct moment_of_inertia : simple_feature_facade<
-        moment_of_inertia<SumType, SumSqrType>,
-        internal::meta_moment_of_inertia<SumType, SumSqrType>::template type
-        >
+      template <typename SumType, typename SumSqrType>
+      struct moment_of_inertia
+          : simple_feature_facade<moment_of_inertia<SumType, SumSqrType>,
+                                  internal::meta_moment_of_inertia<SumType, SumSqrType>::template type>
       {
       };
     }
@@ -79,41 +73,30 @@ namespace mln
     {
 
       template <typename A>
-      inline
-      auto
-      moment_of_inertia(const Accumulator<A>& acc)
-        -> decltype(extract(exact(acc), features::moment_of_inertia<> ()))
+      inline auto moment_of_inertia(const Accumulator<A>& acc)
+          -> decltype(extract(exact(acc), features::moment_of_inertia<>()))
       {
-        return extract(exact(acc), features::moment_of_inertia<> ());
+        return extract(exact(acc), features::moment_of_inertia<>());
       }
-
     }
 
     namespace accumulators
     {
 
       template <typename T, typename SumType, typename SumSqrType>
-      struct moment_of_inertia : accumulator_base< moment_of_inertia<T, SumType, SumSqrType>,
-                                          T,
-                                          double,
-                                          features::moment_of_inertia<> >
+      struct moment_of_inertia
+          : accumulator_base<moment_of_inertia<T, SumType, SumSqrType>, T, double, features::moment_of_inertia<>>
       {
-        typedef T       argument_type;
-        typedef double  result_type;
+        typedef T argument_type;
+        typedef double result_type;
 
-
-        moment_of_inertia()
-          : m_count {0},
-            m_sum {},
-            m_sum_sqr {}
-        {
-        }
+        moment_of_inertia() : m_count{0}, m_sum{}, m_sum_sqr{} {}
 
         void init()
         {
           m_count = 0;
-          m_sum = SumType ();
-          m_sum_sqr = SumSqrType ();
+          m_sum = SumType();
+          m_sum_sqr = SumSqrType();
         }
 
         void take(const argument_type& arg)
@@ -146,10 +129,8 @@ namespace mln
           m_sum_sqr -= other.m_sum_sqr;
         }
 
-
         template <class ST1, class ST2>
-        friend
-        result_type extract(const moment_of_inertia& accu, features::moment_of_inertia<ST1, ST2> )
+        friend result_type extract(const moment_of_inertia& accu, features::moment_of_inertia<ST1, ST2>)
         {
           using mln::sum;
 
@@ -166,29 +147,17 @@ namespace mln
             return inertia / std::pow(n, 1.0 + 2.0 / value_traits<typename moment_of_inertia::argument_type>::ndim);
         }
 
-        friend
-        unsigned extract(const moment_of_inertia& accu, features::count<> )
-        {
-          return accu.m_count;
-        }
+        friend unsigned extract(const moment_of_inertia& accu, features::count<>) { return accu.m_count; }
 
-        friend
-        SumType
-        extract(const moment_of_inertia& accu, features::mean<> )
-        {
-          return accu.m_sum / accu.m_count;
-        }
+        friend SumType extract(const moment_of_inertia& accu, features::mean<>) { return accu.m_sum / accu.m_count; }
 
       private:
-        unsigned        m_count;
-        SumType         m_sum;
-        SumSqrType      m_sum_sqr;
+        unsigned m_count;
+        SumType m_sum;
+        SumSqrType m_sum_sqr;
       };
-
     }
-
   }
-
 }
 
 #endif // ! MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP

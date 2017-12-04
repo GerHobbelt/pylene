@@ -1,9 +1,9 @@
 #ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP
-# define MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP
+#define MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP
 
-# include <mln/core/range/range.hpp>
-# include <mln/core/iterator/iterator_base.hpp>
-# include <mln/core/utils/wrapper.hpp>
+#include <mln/core/iterator/iterator_base.hpp>
+#include <mln/core/range/range.hpp>
+#include <mln/core/utils/wrapper.hpp>
 
 namespace mln
 {
@@ -33,15 +33,12 @@ namespace mln
   /******************************************/
 
   template <class PointProxy, class SiteSet>
-  struct sliding_piter :
-    iterator_base< sliding_piter<PointProxy, SiteSet>, typename SiteSet::value_type, typename SiteSet::value_type>
+  struct sliding_piter
+      : iterator_base<sliding_piter<PointProxy, SiteSet>, typename SiteSet::value_type, typename SiteSet::value_type>
   {
     using reference = typename SiteSet::value_type;
 
-    sliding_piter(const PointProxy& p, const SiteSet& s)
-      : m_point (p), m_it (rng::iter(s))
-    {
-    }
+    sliding_piter(const PointProxy& p, const SiteSet& s) : m_point(p), m_it(rng::iter(s)) {}
 
     void init() { m_it.init(); }
     void next() { m_it.next(); }
@@ -58,7 +55,6 @@ namespace mln
   {
     return {p, s};
   }
-
 }
 
 #endif // ! MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP

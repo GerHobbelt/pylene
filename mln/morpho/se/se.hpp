@@ -1,7 +1,7 @@
 #ifndef MLN_MORPHO_SE_SE_HPP
-# define MLN_MORPHO_SE_SE_HPP
+#define MLN_MORPHO_SE_SE_HPP
 
-# include <mln/morpho/concept/se.hpp>
+#include <mln/morpho/concept/se.hpp>
 
 namespace mln
 {
@@ -15,4 +15,4 @@ namespace mln
 
 } // end of namespace mln
 
-#endif //!MLN_MORPHO_SE_SE_HPP
+#endif //! MLN_MORPHO_SE_SE_HPP

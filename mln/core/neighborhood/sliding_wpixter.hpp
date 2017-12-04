@@ -1,10 +1,10 @@
 #ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
-# define MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
+#define MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
 
-# include <mln/core/range/range.hpp>
-# include <mln/core/image/image.hpp>
-# include <mln/core/iterator/iterator_base.hpp>
-# include <mln/core/neighborhood/sliding_pixter.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/iterator/iterator_base.hpp>
+#include <mln/core/neighborhood/sliding_pixter.hpp>
+#include <mln/core/range/range.hpp>
 
 namespace mln
 {
@@ -32,8 +32,7 @@ namespace mln
   struct sliding_wpixter;
 
   template <class Pixel, class SiteSet, class WeightSet>
-  auto
-  make_sliding_wpixter(const Pixel& px, const SiteSet& pset, const WeightSet& wset)
+  auto make_sliding_wpixter(const Pixel& px, const SiteSet& pset, const WeightSet& wset)
   {
     return sliding_wpixter<Pixel, SiteSet, WeightSet>(px, pset, wset);
   }
@@ -57,23 +56,21 @@ namespace mln
   };
 
   template <class Pixel, class SiteSet, class WeightSet>
-  struct sliding_wpixter
-    : iterator_base< sliding_wpixter<Pixel, SiteSet, WeightSet>,
-                     wpixel< typename iterator_traits< sliding_pixter<Pixel, SiteSet> >::value_type,
-                             typename range_value<WeightSet>::type >,
-                     wpixel< typename iterator_traits< sliding_pixter<Pixel, SiteSet> >::value_type,
-                             typename range_value<WeightSet>::type > >
+  struct sliding_wpixter : iterator_base<sliding_wpixter<Pixel, SiteSet, WeightSet>,
+                                         wpixel<typename iterator_traits<sliding_pixter<Pixel, SiteSet>>::value_type,
+                                                typename range_value<WeightSet>::type>,
+                                         wpixel<typename iterator_traits<sliding_pixter<Pixel, SiteSet>>::value_type,
+                                                typename range_value<WeightSet>::type>>
   {
   private:
-    using Px = typename iterator_traits< sliding_pixter<Pixel, SiteSet> >::value_type;
+    using Px = typename iterator_traits<sliding_pixter<Pixel, SiteSet>>::value_type;
     using W = typename range_value<WeightSet>::type;
 
   public:
     sliding_wpixter() = default;
 
     sliding_wpixter(const Pixel& px, const SiteSet& pset, const WeightSet& wset)
-      : m_sliding_pixter(px, pset),
-        m_wset_iter(rng::iter(wset))
+        : m_sliding_pixter(px, pset), m_wset_iter(rng::iter(wset))
     {
     }
 
@@ -89,23 +86,15 @@ namespace mln
       m_wset_iter.next();
     }
 
-    bool finished() const
-    {
-      return m_sliding_pixter.finished();
-    }
+    bool finished() const { return m_sliding_pixter.finished(); }
 
-    wpixel<Px, W>
-    dereference() const
-    {
-      return {*m_sliding_pixter, *m_wset_iter};
-    }
+    wpixel<Px, W> dereference() const { return {*m_sliding_pixter, *m_wset_iter}; }
 
   private:
     sliding_pixter<Pixel, SiteSet> m_sliding_pixter;
     typename range_const_iterator<WeightSet>::type m_wset_iter;
   };
 
-
 } // end of namespace mln
 
-#endif //!MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
+#endif //! MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP

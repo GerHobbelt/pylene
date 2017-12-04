@@ -1,7 +1,7 @@
 #ifndef MLN_ACCU_ACCUMULATOR_BASE_HPP
-# define MLN_ACCU_ACCUMULATOR_BASE_HPP
+#define MLN_ACCU_ACCUMULATOR_BASE_HPP
 
-# include <mln/accu/accumulator.hpp>
+#include <mln/accu/accumulator.hpp>
 
 namespace mln
 {
@@ -9,14 +9,9 @@ namespace mln
   namespace accu
   {
 
-
     // \brief A base class for adaptable accumulator
     template <typename E, typename ArgumentType, typename ResultType, typename Feature>
     struct accumulator_base;
-
-
-
-
 
     /*********************/
     /** Implementation   */
@@ -26,12 +21,11 @@ namespace mln
     struct accumulator_base : Accumulator<E>
     {
       typedef ArgumentType argument_type;
-      typedef ResultType   result_type;
-      typedef Feature	   feature;
+      typedef ResultType result_type;
+      typedef Feature feature;
       typedef boost::mpl::set<Feature> provides;
 
-      typedef std::false_type          has_untake;
-
+      typedef std::false_type has_untake;
 
       // You mut implement the following function
       // void init()
@@ -43,21 +37,11 @@ namespace mln
       // bool stop()
       // void untake(const argument_type&)
 
-      constexpr bool stop() const
-      {
-        return false;
-      }
+      constexpr bool stop() const { return false; }
 
-
-      result_type to_result() const
-      {
-        return extract(mln::exact(*this), feature ());
-      }
-
+      result_type to_result() const { return extract(mln::exact(*this), feature()); }
     };
-
   }
-
 }
 
 #endif // ! MLN_ACCU_ACCUMULATOR_BASE_HPP

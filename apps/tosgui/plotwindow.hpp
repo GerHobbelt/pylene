@@ -1,23 +1,24 @@
 #ifndef PLOTWINDOW_HPP
-# define PLOTWINDOW_HPP
+#define PLOTWINDOW_HPP
 
-# include <QMainWindow>
-# include <QGroupBox>
-# include <QVBoxLayout>
-# include <QComboBox>
-# include <QFormLayout>
-# include <QPushButton>
-# include <QAction>
-# include <QMenu>
-# include <QCheckBox>
-# include <vector>
-# include "attribute.hpp"
+#include "attribute.hpp"
+#include <QAction>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QMainWindow>
+#include <QMenu>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <vector>
 
 /// \brief define a the window class that holds the attribute plots
 /// and allows to select attributes to plot.
 class PlotWindow : public QMainWindow
 {
   Q_OBJECT;
+
 public:
   PlotWindow();
 
@@ -44,15 +45,12 @@ private slots:
   /// The mask is a boolean image
   void onNodeSelected(const mln::image2d<bool>& pts);
 
-
 private:
   /// \brief initialize the window, menu...
   void init();
   void createMenus();
   void createActions();
-  void displayPlot(int idxAttribute,
-		   bool new_plot = false,
-		   bool force_run = false);
+  void displayPlot(int idxAttribute, bool new_plot = false, bool force_run = false);
 
 private slots:
   void onAttributeSelected(int i);
@@ -60,23 +58,24 @@ private slots:
   void rm_last_plot();
 
 protected:
-  bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject* obj, QEvent* event);
 
 private:
   QVBoxLayout* m_layout;
-  QGroupBox*   m_attribute_panel;
-  QComboBox*   m_attribute_selector;
+  QGroupBox* m_attribute_panel;
+  QComboBox* m_attribute_selector;
   QFormLayout* m_options_panel;
   QPushButton* m_options_btncpt;
-  QCheckBox*   m_attribute_runnew;
+  QCheckBox* m_attribute_runnew;
 
-  QMenu*       m_display_menu;
-  QAction*     m_action_rm_plot;
+  QMenu* m_display_menu;
+  QAction* m_action_rm_plot;
 
-  mln::point2d      m_current_selected_point;
-  bool	            m_has_selected_point;
+  mln::point2d m_current_selected_point;
+  bool m_has_selected_point;
+
 private:
-  std::vector<Attribute*>		m_attributes;
+  std::vector<Attribute*> m_attributes;
 };
 
 #endif // ! PLOTWINDOW_HPP

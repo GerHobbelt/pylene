@@ -116,7 +116,11 @@ struct iterator_test_zero_origin_domain : iterator_test
 {
   iterator_test_zero_origin_domain()
   {
-    ima = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+    ima = {
+        {0, 1, 2, 3},  //
+        {4, 5, 6, 7},  //
+        {8, 9, 10, 11} //
+    };
     indexes = {33, 34, 35, 36, 43, 44, 45, 46, 53, 54, 55, 56};
     values.resize(12);
     std::iota(values.begin(), values.end(), 0);

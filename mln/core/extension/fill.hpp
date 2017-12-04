@@ -1,8 +1,8 @@
 #ifndef MLN_CORE_EXTENSION_FILL_HPP
-# define MLN_CORE_EXTENSION_FILL_HPP
+#define MLN_CORE_EXTENSION_FILL_HPP
 
-# include <mln/core/image/image.hpp>
-# include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {
@@ -15,14 +15,12 @@ namespace mln
     template <typename I>
     I&& fill(Image<I>&& ima, mln_value(I) v);
 
-/******************************************/
-/****          Implementation          ****/
-/******************************************/
-
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
 
     template <typename I>
-    const I&
-    fill(const Image<I>& ima, mln_value(I) v)
+    const I& fill(const Image<I>& ima, mln_value(I) v)
     {
       static_assert(image_has_extension<I>::value, "Image must have an extension.");
       static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
@@ -33,8 +31,7 @@ namespace mln
     }
 
     template <typename I>
-    I&&
-    fill(Image<I>&& ima, mln_value(I) v)
+    I&& fill(Image<I>&& ima, mln_value(I) v)
     {
       static_assert(image_has_extension<I>::value, "Image must have an extension.");
       static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
@@ -44,10 +41,7 @@ namespace mln
       return move_exact(ima);
     }
 
-
-
   } // end of namespace mln::extension
 } // end of namespace mln
-
 
 #endif // ! MLN_CORE_EXTENSION_FILL_HPP

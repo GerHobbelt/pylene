@@ -8,6 +8,7 @@ DerivePointerAlignment: false
 PointerAlignment: Left
 # 120 cols
 ColumnLimit: 120
+Cpp11BracedListStyle: true
 # break brace style
 BreakBeforeBraces: Custom
 BraceWrapping:
@@ -22,9 +23,9 @@ BraceWrapping:
         BeforeElse: true
 
 NamespaceIndentation: All
-#FixNamespaceComments: true
+FixNamespaceComments: true
 
-AlwaysBreakAfterReturnType: TopLevel
+IndentWrappedFunctionNames: true
 AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakTemplateDeclarations: true
 

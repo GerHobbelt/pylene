@@ -1,9 +1,10 @@
 #ifndef MLN_CORE_ALGORITHM_PASTE_HPP
-# define MLN_CORE_ALGORITHM_PASTE_HPP
+#define MLN_CORE_ALGORITHM_PASTE_HPP
 
-# include <mln/core/concept/image.hpp>
+#include <mln/core/concept/image.hpp>
 
-namespace mln {
+namespace mln
+{
 
   /// \brief \p paste copy each pixel from the input image to the output image.
   ///
@@ -28,19 +29,16 @@ namespace mln {
   /// \tparam InputImage is a model of the Forward Image.
   /// \tparam OutputImage is a model of the Writable Point-Accessible Image
   template <typename InputImage, typename OutputImage>
-  OutputImage&
-  paste(const Image<InputImage>& input, Image<OutputImage>& output);
+  OutputImage& paste(const Image<InputImage>& input, Image<OutputImage>& output);
 
   /// \ingroup Algorithms
   /// \overload
   template <typename InputImage, typename OutputImage>
-  OutputImage&&
-  paste(const Image<InputImage>& input, Image<OutputImage>&& output);
+  OutputImage&& paste(const Image<InputImage>& input, Image<OutputImage>&& output);
 
-
-/******************************************/
-/****          Implementation          ****/
-/******************************************/
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
 
   namespace impl
   {
@@ -48,15 +46,13 @@ namespace mln {
     void paste(const I& ima, J& out)
     {
       mln_pixter(px, ima);
-      mln_forall(px)
+      mln_forall (px)
         out(px->point()) = px->val();
     }
-
   }
 
   template <typename InputImage, typename OutputImage>
-  OutputImage&
-  paste(const Image<InputImage>& input, Image<OutputImage>& output_)
+  OutputImage& paste(const Image<InputImage>& input, Image<OutputImage>& output_)
 
   {
     impl::paste(exact(input), exact(output_));
@@ -64,14 +60,12 @@ namespace mln {
   }
 
   template <typename InputImage, typename OutputImage>
-  OutputImage&&
-  paste(const Image<InputImage>& input_, Image<OutputImage>&& output_)
+  OutputImage&& paste(const Image<InputImage>& input_, Image<OutputImage>&& output_)
   {
     paste(input_, output_);
     return move_exact(output_);
   }
 
-
 } // end of namespace mln
 
-#endif //!MLN_CORE_ALGORITHM_IMFILL_HPP
+#endif //! MLN_CORE_ALGORITHM_IMFILL_HPP

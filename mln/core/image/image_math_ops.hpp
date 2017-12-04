@@ -1,8 +1,9 @@
 #ifndef MLN_CORE_IMAGE_IMAGE_MATH_OPS_HPP
-# define MLN_CORE_IMAGE_IMAGE_MATH_OPS_HPP
+#define MLN_CORE_IMAGE_IMAGE_MATH_OPS_HPP
 
-# include <mln/core/image/image_expr.hpp>
-# include <mln/core/math_ops.hpp>
+#include <mln/core/image/image_expr.hpp>
+#include <mln/core/image/image_ops.hpp>
+#include <mln/core/math_ops.hpp>
 
 namespace mln
 {

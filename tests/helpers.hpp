@@ -45,9 +45,9 @@ namespace impl
   {
     std::stringstream msg;
     msg << "The following images differs:\n";
-    mln::io::imprint(f, msg, "reference");
+    mln::io::imprint(reference, msg);
     msg << " and\n:";
-    mln::io::imprint(g, msg, "input");
+    mln::io::imprint(input, msg);
     return msg.str();
   }
 }

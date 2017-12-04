@@ -1,27 +1,23 @@
 #ifndef TRACE_HPP
-# define TRACE_HPP
+#define TRACE_HPP
 
-# ifdef _MSC_VER
-#  pragma warning( push )
-#  pragma warning( disable : 4996 )  // MSVC unsafe getenv
-# endif
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996) // MSVC unsafe getenv
+#endif
 
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <string>
+#include <thread>
 
-# include <mln/core/config.hpp>
-# include <cstdlib>
-# include <iostream>
-# include <string>
-# include <thread>
-# include <chrono>
+#define mln_entering(NAME) mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
 
-# define mln_entering(NAME)                                     \
-  mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
+#define mln_exiting() ;
 
-# define mln_exiting() ;
-
-# define mln_scoped_entering(NAME)                              \
-  mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
-
+#define mln_scoped_entering(NAME) mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
 
 namespace mln
 {
@@ -37,17 +33,18 @@ namespace mln
       explicit scoped_trace(const char* desc);
       explicit scoped_trace(const std::string& desc);
       scoped_trace(const scoped_trace&) = delete;
-      scoped_trace& operator= (const scoped_trace&) = delete;
+      scoped_trace& operator=(const scoped_trace&) = delete;
       ~scoped_trace();
 
     private:
       template <class T = void> void entering(const char* desc) __mln__attribute__((noinline));
       template <class T = void> void exiting() __mln__attribute__((noinline));
 
-      int         m_depth;
+      int m_depth;
       std::string m_desc;
       std::chrono::time_point<std::chrono::system_clock> m_clock;
     };
+
 
     inline scoped_trace::scoped_trace(const char* desc)
     {
@@ -55,11 +52,13 @@ namespace mln
         entering(desc);
     }
 
+
     inline scoped_trace::scoped_trace(const std::string& desc)
     {
       if (verbose)
         entering(desc.c_str());
     }
+
 
     inline scoped_trace::~scoped_trace()
     {
@@ -101,10 +100,10 @@ namespace mln
         for (int k = 0; k < __stack_depth; ++k)
           std::clog.put(' ');
 
-        std::clog << "#" << std::this_thread::get_id() << " - "
-                  << msg << std::endl;
+        std::clog << "#" << std::this_thread::get_id() << " - " << msg << std::endl;
       }
     }
+
 
     inline void warn(const char* msg)
     {
@@ -117,11 +116,12 @@ namespace mln
       if (verbose)
         impl::warn(msg.c_str());
     }
+
   }
 }
 
-# ifdef _MSVC_VER
-#  pragma warning(pop)
-# endif
+#ifdef _MSVC_VER
+#pragma warning(pop)
+#endif
 
 #endif // ! TRACE_HPP

@@ -1,16 +1,15 @@
 #ifndef MLN_QT_IMAGEVIEWER_HPP
-# define MLN_QT_IMAGEVIEWER_HPP
+#define MLN_QT_IMAGEVIEWER_HPP
 
-# include <QGraphicsScene>
-# include <QGraphicsView>
-# include <QGraphicsPixmapItem>
-# include <mln/qt/qtimage.hpp>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <mln/qt/qtimage.hpp>
 
 namespace mln
 {
   namespace qt
   {
-
 
     class ImageViewerEventHandler; // Fwd declaration
 
@@ -25,13 +24,12 @@ namespace mln
       virtual ~ImageViewer();
 
       void reset();
-      image2d<rgb8>&		getView();
-      const image2d<rgb8>&	getView() const;
-      QGraphicsScene*           getScene();
-      const QGraphicsScene*     getScene() const;
-      QGraphicsPixmapItem*           getPixmap();
-      const QGraphicsPixmapItem*     getPixmap() const;
-
+      image2d<rgb8>& getView();
+      const image2d<rgb8>& getView() const;
+      QGraphicsScene* getScene();
+      const QGraphicsScene* getScene() const;
+      QGraphicsPixmapItem* getPixmap();
+      const QGraphicsPixmapItem* getPixmap() const;
 
     private:
       void _init(QtImageBase* ima);
@@ -39,10 +37,10 @@ namespace mln
     private:
       friend class ImageViewerEventHandler;
 
-      QGraphicsPixmapItem                       m_pixmap;
-      QGraphicsScene*                           m_scene;
-      QtImageBase*                              m_ima;
-      ImageViewerEventHandler*                  m_ev_hdler;
+      QGraphicsPixmapItem m_pixmap;
+      QGraphicsScene* m_scene;
+      QtImageBase* m_ima;
+      ImageViewerEventHandler* m_ev_hdler;
 
     protected:
       virtual bool eventFilter(QObject* obj, QEvent* event);
@@ -65,22 +63,18 @@ namespace mln
       void onzoom(const QRectF& rect);
     };
 
-
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
 
     template <typename V>
-    ImageViewer::ImageViewer(const image2d<V>& ima, QWidget* parent)
-      : QGraphicsView(parent)
+    ImageViewer::ImageViewer(const image2d<V>& ima, QWidget* parent) : QGraphicsView(parent)
     {
       _init(new QtImage<V>(ima));
     }
-
-
 
   } // end of namespace mln::qt
 
 } // end of namespace mln
 
-#endif //!MLN_QT_IMAGEVIEWER_HPP
+#endif //! MLN_QT_IMAGEVIEWER_HPP

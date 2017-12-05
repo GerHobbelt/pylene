@@ -29,7 +29,7 @@ using namespace mln;
 #endif
 
 #if defined(__GNUC__)
-#define ALWAYS_INLINE __attribute__((always_inline))
+#define ALWAYS_INLINE __attribute__((always_inline)) inline
 #define NO_INLINE __attribute__((noinline))
 #elif defined(_MSC_VER) && !defined(__clang__)
 #define ALWAYS_INLINE __forceinline

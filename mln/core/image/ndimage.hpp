@@ -338,9 +338,8 @@ namespace mln
     // Specialized algorithm
     template <typename T_, unsigned dim_, typename E_, typename Domain_>
     friend
-        typename std::enable_if<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value,
-                                E_>::type
-        make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
+    std::enable_if_t<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>
+    make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
 
     // As an Indexable Image
     const size_t* index_strides() const { return &m_index_strides[0]; }
@@ -354,6 +353,15 @@ namespace mln
     }
 
     extension_type extension() const;
+
+    /// \brief Inflate (or reduce, if the value is negative) the domain size by
+    /// a given amount, by reducing (inflating) the border.
+    ///
+    /// \note No memory reallocation is performed by the method
+    ///
+    /// \param[in] delta The domain inflation value. It can be negative.
+    /// \precondition -amin(shape() / 2) <= delta <= border
+    void inflate_domain(int delta);
 
   private:
     static E from_buffer_copy_(void* buffer, const domain_type& domain, const size_t* strides);
@@ -784,13 +792,28 @@ namespace mln
     return idx;
   }
 
-  // template <typename T, unsigned dim, typename E>
-  // inline
-  // T&
-  // ndimage_base<T,dim,E>::element (difference_type n)
-  // {
-  //   return *reinterpret_cast<T*>(m_ptr+n);
-  // }
+  template <typename T, unsigned dim, typename E>
+  inline void ndimage_base<T,dim,E>::inflate_domain(int delta)
+  {
+    mln_precondition(delta <= m_border);
+    for (unsigned k = 0; k < dim; ++k)
+      mln_precondition((m_domain.pmin[k] - delta) <= (m_domain.pmax[k] + delta));
+
+    m_domain.pmin -= delta;
+    m_domain.pmax += delta;
+    m_border -= delta;
+
+
+    for (unsigned k = 0; k < dim; ++k)
+      {
+        m_ptr  -= delta * m_strides[k];
+        m_last += delta * m_strides[k];
+        m_index_first -= delta * m_index_strides[k];
+        m_index_last  += delta * m_index_strides[k];
+      }
+  }
+
+
 
   // template <typename T, unsigned dim, typename E>
   // inline

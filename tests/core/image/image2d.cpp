@@ -1,8 +1,10 @@
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/extension/mirror.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
 #include <mln/io/imprint.hpp>
 
 #include <numeric>
@@ -11,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(Core, Image2d_Extension_Fill)
+TEST(UTImage2D, Extension_Fill)
 {
   using namespace mln;
 
@@ -43,7 +45,7 @@ TEST(Core, Image2d_Extension_Fill)
   }
 }
 
-TEST(Core, Image2d_Extension_mirror)
+TEST(UTImage2D, Extension_mirror)
 {
   using namespace mln;
 
@@ -68,7 +70,7 @@ TEST(Core, Image2d_Extension_mirror)
   }
 }
 
-TEST(Core, Image2d_From_Buffer)
+TEST(UTImage2D, From_Buffer)
 {
   using namespace mln;
   int buffer[12];
@@ -80,4 +82,41 @@ TEST(Core, Image2d_From_Buffer)
   iota(ref, 1);
 
   ASSERT_IMAGES_EQ(ima, ref);
+}
+
+TEST(UTImage2D, inflate_domain)
+{
+  const int border = 3;
+  const mln::box2d original_domain = {{0,0}, {10,10}};
+  const mln::box2d inflated_domain = {{-2,-2}, {12, 12}};
+
+  const int inside_value = 42;
+  const int outside_value = -42;
+
+  mln::image2d<int> f(original_domain, border, inside_value);
+  mln::image2d<int> ref(inflated_domain, border, outside_value);
+  mln::extension::fill(f, outside_value);
+  mln::extension::fill(ref, outside_value);
+  mln::fill(ref | original_domain, inside_value);
+
+  f.inflate_domain(2);
+  ASSERT_TRUE(ref.domain() == f.domain());
+  ASSERT_EQ(1, f.border());
+  ASSERT_IMAGES_EQ(ref, f);
+}
+
+TEST(UTImage2D, deflated_domain)
+{
+  const int border = 3;
+  const mln::box2d original_domain = {{0,0}, {10,10}};
+  const mln::box2d inflated_domain = {{2,2}, {8, 8}};
+
+  mln::image2d<int> f(original_domain, border);
+  mln::iota(f, 0);
+  auto ref = f | inflated_domain;
+
+  f.inflate_domain(-2);
+  ASSERT_TRUE(ref.domain() == f.domain());
+  ASSERT_EQ(5, f.border());
+  ASSERT_IMAGES_EQ(ref, f);
 }

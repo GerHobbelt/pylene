@@ -42,7 +42,7 @@ namespace mln
           using range_t = mln_value(I);
           using V = typename range_t::value_type;
           using P = typename I::size_type;
-          using connectivity_t = std::conditional_t<(I::ndim == 2), c4_t, c6_t>;
+          using connectivity_t = std::conditional_t<std::is_same<mln_point(I),mln::point2d>::value, c4_t, c6_t>;
 
           enum { UNPROCESSED = -1, PROCESSED = 0 };
 

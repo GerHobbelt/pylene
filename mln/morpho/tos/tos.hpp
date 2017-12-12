@@ -84,7 +84,7 @@ namespace mln
       auto ord = morpho::ToS::impl::propagation(g, pmin * 2, max_depth, nullptr);
 
       // 2. Build the tree
-      using nbh_t = std::conditional_t<(I::ndim == 2), c4_t, c6_t>;
+      using nbh_t = std::conditional_t<std::is_same<mln_point(I),mln::point2d>::value, c4_t, c6_t>;
       component_tree<P, mln_ch_value(I, unsigned)> tree;
       {
         if (max_depth < value_traits<uint16>::max())

@@ -47,7 +47,7 @@ namespace mln
 
     template <class I, class J, class N, class Compare>
     mln_concrete(I)
-        closing_by_reconstruction(const Image<I>& f_, const Image<J>& markers_, const Neighborhood<N>& nbh, Compare cmp)
+    closing_by_reconstruction(const Image<I>& f_, const Image<J>& markers_, const Neighborhood<N>& nbh, Compare cmp)
     {
       static_assert(std::is_convertible<mln_value(J), mln_value(I)>::value,
                     "Marker image value type must be convertible to f's value type.");

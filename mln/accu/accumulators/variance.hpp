@@ -6,6 +6,7 @@
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/accu/composite_accumulator.hpp>
+#include <mln/core/math_ops.hpp>
 
 namespace mln
 {

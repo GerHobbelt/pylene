@@ -24,11 +24,16 @@ enum se_type
 };
 
 
+int tolower_safe(int c)
+{
+  return std::tolower(static_cast<unsigned char>(c));
+}
+
 std::istream& operator>> (std::istream& in, se_type& se)
 {
   std::string token;
   in >> token;
-  std::transform(token.begin(), token.end(), token.begin(), static_cast<int(*)(int)>(std::tolower));
+  std::transform(token.begin(), token.end(), token.begin(), tolower_safe);
   if (token == "square")
     se = kSquare;
   else if (token == "disc")
@@ -52,7 +57,7 @@ std::istream& operator>> (std::istream& in, morpho_op_type& se)
 {
   std::string token;
   in >> token;
-  std::transform(token.begin(), token.end(), token.begin(), static_cast<int(*)(int)>(std::tolower));
+  std::transform(token.begin(), token.end(), token.begin(), tolower_safe);
   if (token == "erosion")
     se = kErosion;
   else if (token == "dilation")

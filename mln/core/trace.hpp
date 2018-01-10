@@ -13,11 +13,13 @@
 #include <string>
 #include <thread>
 
-#define mln_entering(NAME) mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
+#define mln_concat(A,B) A ## B
+#define mln_entering_expand(NAME,COUNTER) mln::trace::scoped_trace mln_concat(__mln_trace, COUNTER) (NAME);
+#define mln_entering(NAME) mln_entering_expand(NAME, __COUNTER__)
 
 #define mln_exiting() ;
 
-#define mln_scoped_entering(NAME) mln::trace::scoped_trace __mln_trace__COUNTER__(NAME);
+#define mln_scoped_entering(NAME) mln_entering_expand(NAME, __COUNTER__)
 
 namespace mln
 {

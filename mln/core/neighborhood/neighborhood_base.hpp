@@ -12,8 +12,9 @@ namespace mln
   template <class Nbh, class tag>
   struct neighborhood_base : Neighborhood<Nbh>
   {
-    typedef tag category;
-    typedef std::false_type is_incremental;
+    using category = tag;
+    using is_incremental = std::false_type;
+    using is_decomposable = std::false_type;
 
   private:
     /// \brief Overload if x is a point lvalue

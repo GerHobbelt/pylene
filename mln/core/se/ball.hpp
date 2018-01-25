@@ -23,7 +23,7 @@ namespace mln
     /****          Implementation          ****/
     /******************************************/
 
-    struct ball2d : dyn_neighborhood_base<std::vector<point2d>, dynamic_neighborhood_tag, ball2d>
+    struct ball2d : dyn_neighborhood_base<dynamic_neighborhood_tag, ball2d>
     {
       using is_incremental = std::true_type;
 
@@ -79,6 +79,8 @@ namespace mln
       inc_type inc() const { return m_inc; }
 
       dec_type dec() const { return m_dec; }
+
+      const auto& offsets() const { return dpoints; }
 
       const std::vector<point2d> dpoints;
 

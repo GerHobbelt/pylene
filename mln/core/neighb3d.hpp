@@ -10,18 +10,22 @@ namespace mln {
 
   namespace {
 
-    struct c6_t : dyn_neighborhood_base<std::array<point3d, 6>, constant_neighborhood_tag,  c6_t>
+    struct c6_t : dyn_neighborhood_base<constant_neighborhood_tag,  c6_t>
     {
       static const int static_size = 6;
       static const std::array<point3d, 6> dpoints;
+
+      const auto& offsets() const { return dpoints; }
     };
     const std::array<point3d, 6> c6_t::dpoints = {
         {{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}, {0, 0, 1}, {0, 1, 0}, {1, 0, 0}}};
 
-    struct c26_t : dyn_neighborhood_base< std::array<point3d, 26>,  constant_neighborhood_tag, c8_t >
+    struct c26_t : dyn_neighborhood_base<constant_neighborhood_tag, c8_t>
     {
       static const int static_size = 26;
       static const std::array<point3d, 26> dpoints;
+
+      const auto& offsets() const { return dpoints; }
     };
 
     const std::array<point3d, 26> c26_t::dpoints = {{{-1, -1, -1},

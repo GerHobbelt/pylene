@@ -27,8 +27,9 @@ namespace mln
   namespace
   {
 
-    struct winc4_t : dyn_neighborhood_base<std::array<point2d, 5>, constant_neighborhood_tag, winc4_t>
+    struct winc4_t : dyn_neighborhood_base<constant_neighborhood_tag, winc4_t>
     {
+      constexpr const std::array<point2d, 5>& offsets() { return dpoints; }
       static const int static_size = 5;
       static const std::array<point2d, 5> dpoints;
     };
@@ -37,8 +38,9 @@ namespace mln
 
     static const winc4_t winc4{};
 
-    struct winc8_t : dyn_neighborhood_base<std::array<point2d, 9>, constant_neighborhood_tag, winc8_t>
+    struct winc8_t : dyn_neighborhood_base<constant_neighborhood_tag, winc8_t>
     {
+      constexpr const std::array<point2d, 9>& offsets() { return dpoints; }
       static const int static_size = 9;
       static const std::array<point2d, 9> dpoints;
     };
@@ -48,8 +50,9 @@ namespace mln
 
     static const winc8_t winc8{};
 
-    struct winc2_v_t : dyn_neighborhood_base<std::array<point2d, 3>, constant_neighborhood_tag, winc2_v_t>
+    struct winc2_v_t : dyn_neighborhood_base<constant_neighborhood_tag, winc2_v_t>
     {
+      constexpr const std::array<point2d, 3>& offsets() { return dpoints; }
       static const int static_size = 3;
       static const std::array<point2d, 3> dpoints;
     };
@@ -58,8 +61,9 @@ namespace mln
 
     static const winc2_v_t winc2_v{};
 
-    struct winc2_h_t : dyn_neighborhood_base<std::array<point2d, 3>, constant_neighborhood_tag, winc2_h_t>
+    struct winc2_h_t : dyn_neighborhood_base<constant_neighborhood_tag, winc2_h_t>
     {
+      constexpr const std::array<point2d, 3>& offsets() { return dpoints; }
       static const int static_size = 3;
       static const std::array<point2d, 3> dpoints;
     };
@@ -73,7 +77,7 @@ namespace mln
   /***  Implementation     **/
   /**************************/
 
-  struct rect2d : dyn_neighborhood_base<box2d, dynamic_neighborhood_tag, rect2d>
+  struct rect2d : dyn_neighborhood_base<dynamic_neighborhood_tag, rect2d>
   {
     typedef std::true_type is_incremental;
     typedef std::false_type is_separable;
@@ -99,6 +103,8 @@ namespace mln
       b.pmax[1] = b.pmin[1] + 1;
       return b;
     }
+
+    const box2d& offsets() const { return dpoints; }
 
     const box2d dpoints;
   };

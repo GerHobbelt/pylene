@@ -1,6 +1,6 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/se/ball.hpp>
+#include <mln/core/se/disc.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
@@ -18,7 +18,7 @@ TEST(Morpho, erode_0)
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
   image2d<uint8> out1, out2;
-  auto win = se::make_ball2d(3);
+  mln::se::disc win(3);
 
   auto comp = [](uint8 x) -> uint8 { return 255 - x; };
 

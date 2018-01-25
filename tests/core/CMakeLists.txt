@@ -48,3 +48,6 @@ add_core_test(${test_prefix}paste              algorithm/paste.cpp)
 add_core_test(${test_prefix}equal              algorithm/equal.cpp)
 add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
+
+# test SE
+add_core_test(${test_prefix}disc             se/disc.cpp)

@@ -6,32 +6,68 @@
 #include <mln/io/imread.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 
+#include <mln/core/se/disc.hpp>
 #include <tests/helpers.hpp>
 
 #include <gtest/gtest.h>
 
 using namespace mln;
 
-TEST(Morpho, dilation_dilate_0)
+
+TEST(Dilation, Disc_euclidean)
+{
+  mln::box2d domain{ {0,0}, {21, 21}};
+  mln::image2d<mln::uint8> input(domain, 0);
+
+  const mln::image2d<mln::uint8> ref = {
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+      {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+      {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+      {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  };
+
+  input.at(10, 10) = 1;
+  auto output = mln::morpho::structural::dilate(input, mln::se::disc(9, 0));
+  ASSERT_IMAGES_EQ(ref, output);
+}
+
+TEST(Morpho, Generic_wide_enough_extension)
 {
   image2d<uint8> ima;
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
   { // Fast: border wide enough
-    auto win = make_rectangle2d(7, 7);
-    auto out = morpho::structural::dilate(ima, win);
+    mln::se::disc se(3, 0);
+    auto out = morpho::structural::dilate(ima, se);
     ASSERT_TRUE(all(out >= ima)); // extensive
   }
 }
 
 // Border is not wide enough => use morpher for bound checking
-TEST(Morpho, dilation_dilate_1)
+TEST(Dilation, Generic_with_too_small_extension)
 {
   image2d<uint8> ima;
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
-  auto win = make_rectangle2d(9, 9);
-  auto out = morpho::structural::dilate(ima, win);
+  mln::se::disc se(4, 0);
+  auto out = morpho::structural::dilate(ima, se);
   ASSERT_TRUE(all(out >= ima)); // extensive
 }
 

@@ -34,18 +34,47 @@ namespace mln
 
   template <class PointProxy, class SiteSet>
   struct sliding_piter
-      : iterator_base<sliding_piter<PointProxy, SiteSet>, typename SiteSet::value_type, typename SiteSet::value_type>
+      : iterator_base<sliding_piter<PointProxy, SiteSet>,
+                      typename SiteSet::value_type,
+                      typename SiteSet::value_type>
   {
     using reference = typename SiteSet::value_type;
 
-    sliding_piter(const PointProxy& p, const SiteSet& s) : m_point(p), m_it(rng::iter(s)) {}
+    sliding_piter(const PointProxy& p, const SiteSet& s) : m_set(s), m_point(p), m_it(rng::iter(m_set)) {}
+
+    sliding_piter(const sliding_piter& other)
+        : m_set(other.m_set), m_point(other.m_point), m_it(rng::iter(m_set))
+    {
+    }
+
+
+    sliding_piter(sliding_piter&& other)
+        : m_set(std::move(other.m_set)), m_point(std::move(other.m_point)), m_it(rng::iter(m_set))
+    {
+    }
+
+    sliding_piter& operator= (const sliding_piter& other)
+    {
+      m_set = other.m_set;
+      m_point = other.m_point;
+      m_it = rng::iter(m_set);
+    }
+
+    sliding_piter& operator= (sliding_piter&& other)
+    {
+      m_set = std::move(other.m_set);
+      m_point = std::move(other.m_point);
+      m_it = rng::iter(m_set);
+    }
+
 
     void init() { m_it.init(); }
     void next() { m_it.next(); }
     bool finished() const { return m_it.finished(); }
-    reference dereference() const { return m_point.get() + *m_it; }
+    reference dereference() const {  return m_point.get() + *m_it; }
 
   private:
+    SiteSet m_set;
     const PointProxy m_point;
     typename range_const_iterator<SiteSet>::type m_it;
   };

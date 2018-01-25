@@ -55,7 +55,7 @@ namespace mln
       int get_border_from_nbh(const Neighborhood& nbh, const point<T, dim>&)
       {
         unsigned b = 0;
-        mln_foreach (auto dp, nbh.dpoints)
+        mln_foreach (auto dp, nbh.offsets())
           for (unsigned i = 0; i < dim; ++i)
             b = std::max<unsigned>(b, std::abs(dp[i]));
         return b;
@@ -65,7 +65,8 @@ namespace mln
     template <typename Neighborhood>
     int get_border_from_nbh(const Neighborhood& nbh)
     {
-      return dispatch::get_border_from_nbh(nbh, typename Neighborhood::point_type());
+      using P = typename std::remove_reference_t<decltype(nbh.offsets())>::value_type;
+      return dispatch::get_border_from_nbh(nbh, P());
     }
   }
 }

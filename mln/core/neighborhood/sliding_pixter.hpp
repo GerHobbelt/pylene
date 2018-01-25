@@ -88,7 +88,30 @@ namespace mln
 
     public:
       sliding_pixter_base() = default;
-      sliding_pixter_base(const PixelProxy& p, const SiteSet& s) : m_pixel(p), m_pset_iter(rng::iter(s)) {}
+      sliding_pixter_base(const PixelProxy& p, const SiteSet& s) : m_set(s), m_pixel(p), m_pset_iter(rng::iter(m_set)) {}
+      sliding_pixter_base(const sliding_pixter_base& other)
+          : m_set(other.m_set), m_pixel(other.m_pixel), m_pset_iter(rng::iter(m_set))
+      {
+      }
+
+      sliding_pixter_base(sliding_pixter_base& other)
+        : m_set(std::move(other.m_set)), m_pixel(std::move(other.m_pixel)), m_pset_iter(rng::iter(m_set))
+      {
+      }
+
+      sliding_pixter_base& operator=(const sliding_pixter_base& other)
+      {
+        m_set = other.m_set;
+        m_pixel = other.m_pixel;
+        m_pset_iter = rng::iter(m_set);
+      }
+
+      sliding_pixter_base& operator=(sliding_pixter_base&& other)
+      {
+        m_set = std::move(other.m_set);
+        m_pixel = std::move(other.m_pixel);
+        m_pset_iter = rng::iter(m_set);
+      }
 
       void init() { m_pset_iter.init(); }
       void next() { m_pset_iter.next(); }
@@ -97,6 +120,7 @@ namespace mln
       point_pixel<Image> dereference() const { return {m_pixel.get().image(), m_pixel.get().point() + *m_pset_iter}; }
 
     private:
+      SiteSet m_set;
       PixelProxy m_pixel;
       typename range_const_iterator<SiteSet>::type m_pset_iter;
     };

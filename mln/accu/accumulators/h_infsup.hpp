@@ -93,6 +93,7 @@ namespace mln
 
         void untake(const T& x)
         {
+          mln_precondition(m_count > 0);
           mln_precondition(m_hist[x] > 0);
           --m_hist[x];
           --m_count;

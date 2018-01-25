@@ -1,5 +1,5 @@
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/morpho/structural/erode.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/opening.hpp>
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 
 
 
-  auto nbh = mln::make_rectangle2d(size, size);
+  mln::se::rect2d nbh(size, size);
 
   switch (vm["operator"].as<morpho_op_type>())
   {

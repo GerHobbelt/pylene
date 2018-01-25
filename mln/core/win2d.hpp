@@ -13,17 +13,6 @@
 namespace mln
 {
 
-  ///
-  /// \brief Define a dynamic rectangular window
-  ///
-  struct rect2d;
-
-  /// \defgroup Free functions
-  /// \{
-  rect2d make_rectangle2d(unsigned height, unsigned width);
-  rect2d make_rectangle2d(unsigned height, unsigned width, point2d center);
-  /// \}
-
   namespace
   {
 
@@ -73,67 +62,6 @@ namespace mln
     static const winc2_h_t winc2_h{};
   }
 
-  /**************************/
-  /***  Implementation     **/
-  /**************************/
-
-  struct rect2d : dyn_neighborhood_base<dynamic_neighborhood_tag, rect2d>
-  {
-    typedef std::true_type is_incremental;
-    typedef std::false_type is_separable;
-
-    typedef dyn_neighborhood<box2d, dynamic_neighborhood_tag> dec_type;
-    typedef dyn_neighborhood<box2d, dynamic_neighborhood_tag> inc_type;
-
-    rect2d() = default;
-
-    rect2d(const box2d& r) : dpoints(r) {}
-
-    inc_type inc() const
-    {
-      box2d b = this->dpoints;
-      b.pmin[1] = b.pmax[1] - 1;
-      return b;
-    }
-
-    dec_type dec() const
-    {
-      box2d b = this->dpoints;
-      b.pmin[1] -= 1;
-      b.pmax[1] = b.pmin[1] + 1;
-      return b;
-    }
-
-    const box2d& offsets() const { return dpoints; }
-
-    const box2d dpoints;
-  };
-
-  inline rect2d make_rectangle2d(unsigned height, unsigned width)
-  {
-    mln_precondition(height % 2 == 1);
-    mln_precondition(width % 2 == 1);
-    int h = height / 2;
-    int w = width / 2;
-    box2d b = {point2d(-h, -w), point2d(h + 1, w + 1)};
-    return b;
-  }
-
-  inline rect2d make_rectangle2d(unsigned height, unsigned width, point2d center)
-  {
-    mln_precondition(height % 2 == 1);
-    mln_precondition(width % 2 == 1);
-    unsigned h = height / 2;
-    unsigned w = width / 2;
-    point2d uleft = center;
-    point2d lright = center;
-    uleft[0] -= h;
-    uleft[1] -= w;
-    lright[0] += h + 1;
-    lright[1] += w + 1;
-    box2d b = {uleft, lright};
-    return b;
-  }
 }
 
 #endif // !  MLN_CORE_WIN2D_HPP

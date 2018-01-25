@@ -2,7 +2,7 @@
 #define MLN_MORPHO_CANVAS_DILATION_LIKE_SPE_HPP
 
 #include <mln/core/algorithm/transpose.hpp>
-#include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/morpho/canvas/dilation_like.hpp>
 
 namespace mln
@@ -23,9 +23,9 @@ namespace mln
         // might be costly due to cycle detection.
         template <class I, class Compare, class J, class OpTraits>
         typename std::enable_if<std::is_same<typename I::domain_type, box2d>::value>::type
-            dilation_like(const Image<I>& ima_, const rect2d& nbh, Compare cmp, Image<J>& output, OpTraits __op__)
+        dilation_like(const Image<I>& ima_, const se::rect2d& nbh, Compare cmp, Image<J>& output, OpTraits __op__)
         {
-          box2d r = nbh.dpoints;
+          box2d r = nbh.offsets();
           const I& ima = exact(ima_);
 
           if (r.shape()[0] == 1)
@@ -34,7 +34,7 @@ namespace mln
           }
           else if (r.shape()[1] == 1)
           {
-            rect2d h0{box2d{{0, r.pmin[0]}, {1, r.pmax[0]}}};
+            se::rect2d h0(r.pmax[0] - r.pmin[0], 1);
             mln_concrete(I) tmp = transpose(ima);
             mln_concrete(I) out = imconcretize(tmp);
             morpho::canvas::dilation_like(tmp, h0, cmp, out, __op__);
@@ -43,8 +43,8 @@ namespace mln
           else
           {
 
-            rect2d h0{box2d{{0, r.pmin[0]}, {1, r.pmax[0]}}};
-            rect2d h1{box2d{{0, r.pmin[1]}, {1, r.pmax[1]}}};
+            se::rect2d h0(r.pmax[0] - r.pmin[0], 1);
+            se::rect2d h1(r.pmax[1] - r.pmin[1], 1);
 
             image2d<mln_value(I)> f;
             {

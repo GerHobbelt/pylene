@@ -59,7 +59,7 @@ Example 1 : Dilation by a square on a gray-level image
 
    // Define a square SE of size 21x21
    auto input = ...;
-   auto rect = mln::make_rectangle2d(21,21);
+   mln::se::rect2d rect(21,21);
    auto output = mln::morpho::structural::dilate(input, rect);
 
 

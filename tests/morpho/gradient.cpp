@@ -2,12 +2,13 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/structural/gradient.hpp>
 
 #include <gtest/gtest.h>
+
 
 using namespace mln;
 
@@ -17,7 +18,7 @@ TEST(Morpho, gradient_gradient_0)
   iota(ima, 10);
 
   { // Fast: border wide enough
-    auto win = make_rectangle2d(1, 3);
+    mln::se::rect2d win(3,1);
     auto out = morpho::structural::gradient(ima, win);
 
     static_assert(std::is_same<decltype(out)::value_type, int>::value, "Error integral promotion should give int.");
@@ -31,7 +32,7 @@ TEST(Morpho, gradient_gradient_1)
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
   { // Fast: border wide enough
-    auto win = make_rectangle2d(7, 7);
+    mln::se::rect2d win(7, 7);
     auto out = morpho::structural::gradient(ima, win);
   }
 }
@@ -44,7 +45,7 @@ TEST(Morpho, gradient_gradient_2)
   io::imread(MLN_IMG_PATH "small.pgm", ima);
   io::imread(MLN_IMG_PATH "small.pgm", ima2);
 
-  auto win = make_rectangle2d(3, 3);
+  mln::se::rect2d win(3, 3);
   auto out1 = morpho::structural::gradient(ima, win);
   auto out2 = morpho::structural::gradient(ima2, win);
   ASSERT_TRUE(all(out1 == out2));
@@ -57,7 +58,7 @@ TEST(Morpho, gradient_gradient_3)
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
   // Morpher has no extension
-  auto win = make_rectangle2d(3, 3);
+  mln::se::rect2d win(3, 3);
   auto out = morpho::structural::gradient(ima > 128, win);
 }
 
@@ -67,7 +68,7 @@ TEST(Morpho, gradient_gradient_4)
   image2d<uint8> ima;
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
-  auto win = make_rectangle2d(3, 3);
+  mln::se::rect2d win(3, 3);
   image2d<uint8> out;
   resize(out, ima).init(0);
   auto tmp = out | where(ima > 128);
@@ -82,7 +83,7 @@ TEST(Morpho, gradient_gradient_5)
   io::imread(MLN_IMG_PATH "small.ppm", ima);
   io::imread(MLN_IMG_PATH "small.ppm", ima2);
 
-  auto win = make_rectangle2d(3, 3);
+  mln::se::rect2d win(3, 3);
   auto out1 = morpho::structural::gradient(ima, win);
   auto out2 = morpho::structural::gradient(ima2, win);
   ASSERT_TRUE(all(out1 == out2));

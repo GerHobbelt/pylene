@@ -5,6 +5,7 @@ add_subdirectory(maxtree)
 add_subdirectory(alphatree)
 add_subdirectory(component_tree)
 
+add_core_test(${test_prefix}running_max_1d   running_max_1d.cpp)
 add_core_test(${test_prefix}saturate         saturate.cpp)
 add_core_test(${test_prefix}dilate           dilate.cpp)
 add_core_test(${test_prefix}erode            erode.cpp)

@@ -3,8 +3,10 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/win2d.hpp>
+#include <mln/core/algorithm/iota.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/structural/dilate.hpp>
+#include <mln/morpho/canvas/private/dilation_by_periodic_line.hpp>
 
 #include <mln/core/se/disc.hpp>
 #include <tests/helpers.hpp>
@@ -13,6 +15,52 @@
 
 using namespace mln;
 
+void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
+{
+  mln_assertion((dp >= mln::point2d{0,0}));
+
+  mln::image2d<mln::uint8> input(5, 9);
+  mln::iota(input, 0);
+
+  // Generate ref
+  mln::image2d<mln::uint8> ref = mln::clone(input);
+  for (int i = 0; i < k; ++i)
+    mln_foreach(auto p, ref.domain())
+      if (ref.domain().has(p + dp))
+        ref(p) = ref(p + dp);
+
+  // Run algo
+  mln::se::periodic_line2d line(dp, k);
+  auto sup = [](auto x, auto y) { return std::max(x,y); };
+  mln::morpho::internal::dilation_by_periodic_line(input, line, sup, 0);
+  ASSERT_IMAGES_EQ(ref, input);
+}
+
+
+TEST(Dilation, PeriodicLine2d_horizontal)
+{
+  test_dilation_by_periodic_line(mln::point2d{0,1}, 3);
+}
+
+TEST(Dilation, PeriodicLine2d_vertical)
+{
+  test_dilation_by_periodic_line(mln::point2d{1,0}, 3);
+}
+
+TEST(Dilation, PeriodicLine2d_diagonal)
+{
+  test_dilation_by_periodic_line(mln::point2d{1,-1}, 2);
+}
+
+TEST(Dilation, PeriodicLine2d_horizontal_knightmove)
+{
+  test_dilation_by_periodic_line(mln::point2d{1,-2}, 2);
+}
+
+TEST(Dilation, PeriodicLine2d_vertical_knightmove)
+{
+  test_dilation_by_periodic_line(mln::point2d{2,-1}, 2);
+}
 
 TEST(Dilation, Disc_euclidean)
 {

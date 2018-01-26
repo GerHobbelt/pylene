@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <mln/core/config.hpp>
 
 #define mln_concat(A,B) A ## B
 #define mln_entering_expand(NAME,COUNTER) mln::trace::scoped_trace mln_concat(__mln_trace, COUNTER) (NAME);

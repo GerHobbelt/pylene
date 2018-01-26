@@ -53,19 +53,37 @@ namespace mln
       namespace internal
       {
 
-        template <class I, class SE, class Compare>
-        struct dilate_traits
+        template <class T, class Compare>
+        struct dilate_traits_base
         {
-          using support_incremental =
-              std::integral_constant<bool, std::is_integral<mln_value(I)>::value and
-                                               std::is_same<Compare, productorder_less<mln_value(I)>>::value and
-                                               (value_traits<mln_value(I)>::quant <= 16)>;
+          dilate_traits_base(Compare cmp) : accu_sup(cmp), m_cmp(std::move(cmp)) {}
 
-          using aggregate_type = accu::accumulators::sup<mln_value(I), Compare>;
-          using incremental_aggregate_type = accu::accumulators::h_sup<mln_value(I)>;
+          const mln::accu::accumulators::sup<T, Compare> accu_sup;
+          auto sup(T x, T y) const { return mln::sup(x, y, m_cmp); }
+          static constexpr T zero() { return value_traits<T, Compare>::inf(); }
 
-          static constexpr mln_value(I) zero() { return value_traits<mln_value(I), Compare>::inf(); }
+        private:
+          Compare m_cmp;
         };
+
+        template <class T, class Compare, class Enable = void>
+        struct dilate_traits : dilate_traits_base<T, Compare>
+        {
+          using dilate_traits_base<T, Compare>::dilate_traits_base;
+          using support_incremental = std::false_type;
+        };
+
+        template <class T>
+        struct dilate_traits<T, productorder_less<T>, std::enable_if_t<std::is_integral<T>::value>>
+          : dilate_traits_base<T, productorder_less<T>>
+        {
+          using support_incremental = std::true_type;
+
+          dilate_traits(productorder_less<T> cmp) : dilate_traits_base<T, productorder_less<T>>(cmp) {}
+
+          const mln::accu::accumulators::h_sup<T> accu_hsup;
+        };
+
       }
 
       template <class I, class SE, class OutputImage, class Compare>
@@ -74,7 +92,8 @@ namespace mln
       {
         mln_entering("mln::morpho::structural::dilate");
 
-        morpho::canvas::dilation_like(ima, nbh, cmp, output, internal::dilate_traits<I, SE, Compare>());
+        internal::dilate_traits<mln_value(I), Compare> __op__(cmp);
+        morpho::canvas::dilation_like(ima, nbh, output, __op__);
 
         mln_exiting();
         return exact(output);

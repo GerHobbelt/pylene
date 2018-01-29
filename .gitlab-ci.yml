@@ -1,0 +1,82 @@
+stages:
+    - build
+    - test
+    - deploy
+
+
+.job-build-linux-base: &distcheck-linux-base
+    stage: test
+    image: carlinet/buildimage
+    script:
+        - mkdir build && cd build
+        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake --build . --target check
+
+
+distcheck-linux-gcc-release:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+
+distcheck-linux-clang-release:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+
+distcheck-linux-gcc-debug:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+
+distcheck-linux-clang-debug:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+
+build-doc-images:
+    image: carlinet/buildimage
+    stage: build
+    script:
+        - mkdir build && cd build
+        - cmake .. -DCMAKE_BUILD_TYPE=Release
+        - cmake --build . --target build-images
+    artifacts:
+        paths:
+            - doc/source/images
+
+
+#################
+# Documentation #
+#################
+
+.documentation-base:  &documentation-base
+    image: carlinet/doc-image
+    stage: test
+    script:
+        - cd doc
+        - doxygen
+        - sphinx-build -b html source ../public
+    artifacts:
+        name: "documentation"
+        paths:
+            - public/
+
+# Generate doc only
+documentation:
+    <<: *documentation-base
+    except:
+    - dev
+
+# Deploy
+pages:
+    <<: *documentation-base
+    only:
+    - dev

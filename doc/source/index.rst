@@ -13,7 +13,8 @@ Contents:
 
    Introduction <intro>
    tutorial
-   Réference <reference>
+   Reference <reference>
+   Rumination <ruminations>
 
 
 Indices and tables
@@ -22,5 +23,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
 
 

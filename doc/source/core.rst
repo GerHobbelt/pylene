@@ -9,3 +9,4 @@ Structural Elements
 
    core/se/disc
    core/se/rectangle
+   core/se/periodic_lines

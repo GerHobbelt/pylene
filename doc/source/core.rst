@@ -8,3 +8,4 @@ Structural Elements
    :maxdepth: 1
 
    core/se/disc
+   core/se/rectangle

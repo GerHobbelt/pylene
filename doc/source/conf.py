@@ -28,7 +28,8 @@ import pylene_lexer
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'breathe', "ext.conceptdoc"]
+extensions = ['sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'breathe', "ext.conceptdoc",
+              'matplotlib.sphinxext.plot_directive']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -254,6 +255,10 @@ breathe_default_project = "Pylene"
 breathe_path = os.path.realpath("../doxyxml/")
 
 
+# Matplotlib
+plot_include_source = False
+plot_html_show_formats = False
+plot_formats = [ ("png", 150) ]
 
 # Substitution
 rst_prolog = """

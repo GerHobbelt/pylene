@@ -3,10 +3,11 @@ stages:
     - test
     - deploy
 
+image: carlinet/buildimage
+
 
 .job-build-linux-base: &distcheck-linux-base
     stage: test
-    image: carlinet/buildimage
     script:
         - mkdir build && cd build
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
@@ -42,7 +43,6 @@ distcheck-linux-clang-debug:
         CC: "clang"
 
 build-doc-images:
-    image: carlinet/buildimage
     stage: build
     script:
         - mkdir build && cd build
@@ -58,7 +58,6 @@ build-doc-images:
 #################
 
 .documentation-base:  &documentation-base
-    image: carlinet/doc-image
     stage: test
     script:
         - cd doc

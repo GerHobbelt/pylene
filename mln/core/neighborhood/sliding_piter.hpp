@@ -58,6 +58,7 @@ namespace mln
       m_set = other.m_set;
       m_point = other.m_point;
       m_it = rng::iter(m_set);
+      return *this;
     }
 
     sliding_piter& operator= (sliding_piter&& other)
@@ -65,6 +66,7 @@ namespace mln
       m_set = std::move(other.m_set);
       m_point = std::move(other.m_point);
       m_it = rng::iter(m_set);
+      return *this;
     }
 
 

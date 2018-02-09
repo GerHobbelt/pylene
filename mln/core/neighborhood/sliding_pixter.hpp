@@ -104,6 +104,7 @@ namespace mln
         m_set = other.m_set;
         m_pixel = other.m_pixel;
         m_pset_iter = rng::iter(m_set);
+        return *this;
       }
 
       sliding_pixter_base& operator=(sliding_pixter_base&& other)
@@ -111,6 +112,7 @@ namespace mln
         m_set = std::move(other.m_set);
         m_pixel = std::move(other.m_pixel);
         m_pset_iter = rng::iter(m_set);
+        return *this;
       }
 
       void init() { m_pset_iter.init(); }

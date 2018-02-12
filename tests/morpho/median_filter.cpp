@@ -1,7 +1,7 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/median_filter.hpp>
 
@@ -14,7 +14,7 @@
 
 using namespace mln;
 
-image2d<uint8> naive_median(const image2d<uint8>& f, rect2d win, int sz)
+image2d<uint8> naive_median(const image2d<uint8>& f, se::rect2d win, int sz)
 {
   mln_entering("naive_median");
 
@@ -45,7 +45,7 @@ TEST(Morpho, median_filter_median_filter_0)
   io::imread(MLN_IMG_PATH "lena.pgm", ima);
 
   { // Fast: border wide enough
-    auto win = make_rectangle2d(7, 7);
+    mln::se::rect2d win(7, 7);
     auto out = morpho::median_filter(ima, win);
     auto out2 = naive_median(ima, win, 49);
     ASSERT_IMAGES_EQ(out2, out);

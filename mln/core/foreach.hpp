@@ -50,18 +50,19 @@ namespace mln
   namespace internal
   {
     template <class T>
-    T&& iter_outer_init(T&& x)
+    T& iter_outer_init(T& x)
     {
       mln::outer_init(x);
-      return std::forward<T>(x);
+      return x;
     }
   }
 }
 
 #define mln_foreach(p, COL)                                                                                            \
   MLN_DECL_VAR(_mln_range_, COL)                                                                                       \
+  MLN_DECL_VAR(_mln_it_proxy_, mln::rng::iter(_mln_range_.get()))                                                      \
   MLN_DECL_VAR(__mln_has_been_broken, false)                                                                           \
-  for (auto _mln_it_ = mln::internal::iter_outer_init(mln::rng::iter(_mln_range_.get()));                              \
+  for (auto& _mln_it_ = mln::internal::iter_outer_init(_mln_it_proxy_.get());                                          \
        !__mln_has_been_broken.get() && !mln::outer_finished(_mln_it_);                                                 \
        __mln_has_been_broken.get() ? (void)0 : mln::outer_next(_mln_it_))                                              \
     for (mln::inner_init(_mln_it_); !__mln_has_been_broken.get() && !mln::inner_finished(_mln_it_);                    \

@@ -51,20 +51,36 @@ namespace mln
 
       namespace internal
       {
-
-        template <class I, class SE, class Compare>
-        struct erode_traits
+        template <class T, class Compare>
+        struct erode_traits_base
         {
-          using support_incremental =
-              std::integral_constant<bool, std::is_integral<mln_value(I)>::value and
-                                               std::is_same<Compare, productorder_less<mln_value(I)>>::value and
-                                               (value_traits<mln_value(I)>::quant <= 16)>;
+          erode_traits_base(Compare cmp) : accu_sup(cmp), m_cmp(std::move(cmp)) {}
 
-          using aggregate_type = accu::accumulators::inf<mln_value(I), Compare>;
-          using incremental_aggregate_type = accu::accumulators::h_inf<mln_value(I)>;
+          const mln::accu::accumulators::inf<T, Compare> accu_sup;
+          auto sup(T x, T y) const { return mln::inf(x, y, m_cmp); }
+          static constexpr T zero() { return value_traits<T, Compare>::sup(); }
 
-          static constexpr mln_value(I) zero() { return value_traits<mln_value(I), Compare>::sup(); }
+        private:
+          Compare m_cmp;
         };
+
+        template <class T, class Compare, class Enable = void>
+        struct erode_traits : erode_traits_base<T, Compare>
+        {
+          using erode_traits_base<T, Compare>::erode_traits_base;
+          using support_incremental = std::false_type;
+        };
+
+        template <class T>
+        struct erode_traits<T, productorder_less<T>, std::enable_if_t<std::is_integral<T>::value>>
+          : erode_traits_base<T, productorder_less<T>>
+        {
+          using support_incremental = std::true_type;
+
+          erode_traits(productorder_less<T> cmp) : erode_traits_base<T, productorder_less<T>>(cmp) {}
+          const mln::accu::accumulators::h_inf<T> accu_hsup;
+        };
+
       }
 
       template <class I, class SE, class OutputImage, class Compare>
@@ -73,7 +89,8 @@ namespace mln
       {
         mln_entering("mln::morpho::structural::erode");
 
-        morpho::canvas::dilation_like(ima, nbh, cmp, output, internal::erode_traits<I, SE, Compare>());
+        internal::erode_traits<mln_value(I), Compare> __op__(cmp);
+        morpho::canvas::dilation_like(ima, nbh, output, __op__);
 
         mln_exiting();
         return exact(output);

@@ -2,7 +2,7 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/structural/closing.hpp>
 #include <mln/morpho/structural/opening.hpp>
@@ -18,7 +18,7 @@ TEST(Morpho, opening_closing_opening_0)
   image2d<uint8> ima;
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
-  auto win = make_rectangle2d(3, 3);
+  mln::se::rect2d win(3, 3);
   {
     auto out1 = morpho::structural::opening(ima, win);
     auto out2 = morpho::structural::closing(ima, win);
@@ -34,7 +34,7 @@ TEST(Morpho, opening_closing_opening_1)
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
   auto comp = [](uint8 x) -> uint8 { return 255 - x; };
-  auto win = make_rectangle2d(3, 3);
+  mln::se::rect2d win(3, 3);
   {
     auto out1 = morpho::structural::opening(imtransform(ima, comp), win);
     auto out2 = morpho::structural::closing(ima, win);

@@ -11,7 +11,7 @@
 namespace mln
 {
 
-  template <class SiteSet, class category, class E>
+  template <class category, class E>
   struct dyn_neighborhood_base;
 
   template <class SiteSet, class category>
@@ -21,48 +21,50 @@ namespace mln
   /****          Implementation          ****/
   /******************************************/
 
-  template <class SiteSet, class category, class E>
+  template <class category, class E>
   struct dyn_neighborhood_base : neighborhood_base<E, category>
   {
   public:
-    typedef typename range_value<SiteSet>::type point_type;
-    typedef typename range_value<SiteSet>::type site_type;
-
-    auto __process_point(const point_type& p) const
+    template <typename P>
+    auto __process_point(const P& p) const
     {
-      return make_sliding_piter(make_value_wrapper(p), mln::exact(this)->dpoints);
+      return make_sliding_piter(make_value_wrapper(p), mln::exact(this)->offsets());
     }
 
     template <typename P>
     auto __bind_point(P& p) const
     {
-      return make_sliding_piter(std::cref(p), mln::exact(this)->dpoints);
+      return make_sliding_piter(std::cref(p), mln::exact(this)->offsets());
     }
 
     template <typename PointIterator>
     auto __bind_point_iterator(const PointIterator& p) const
     {
-      return make_sliding_piter(make_iterator_proxy(p), mln::exact(this)->dpoints);
+      return make_sliding_piter(make_iterator_proxy(p), mln::exact(this)->offsets());
     }
 
     template <typename Px>
     auto __bind_pixel(Px& px) const
     {
-      return make_sliding_pixter(std::cref(px), mln::exact(this)->dpoints);
+      return make_sliding_pixter(std::cref(px), mln::exact(this)->offsets());
     }
 
     template <typename Px>
     auto __bind_pixel_iterator(const Px& px) const
     {
-      return make_sliding_pixter(make_iterator_proxy(px), mln::exact(this)->dpoints);
+      return make_sliding_pixter(make_iterator_proxy(px), mln::exact(this)->offsets());
     }
   };
 
   template <class SiteSet, class category>
-  struct dyn_neighborhood : dyn_neighborhood_base<SiteSet, category, dyn_neighborhood<SiteSet, category>>
+  struct dyn_neighborhood : dyn_neighborhood_base<category, dyn_neighborhood<SiteSet, category>>
   {
     dyn_neighborhood(const SiteSet& pset) : dpoints{pset} {}
+    dyn_neighborhood(SiteSet&& pset) : dpoints(std::move(pset)) {}
 
+    const SiteSet& offsets() const { return dpoints; }
+
+  private:
     const SiteSet dpoints;
   };
 }

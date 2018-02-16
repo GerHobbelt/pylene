@@ -25,6 +25,7 @@ set(src_standalone
   BMErosion.cpp
   BMMorphers.cpp
   BMNeighborhood.cpp
+  BMReference.cpp
   )
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
@@ -36,6 +37,8 @@ add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
 add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_executable(BMRotation       BMRotation.cpp)
 add_executable(BMMorphers       BMMorphers.cpp   BMMorphers_main.cpp)
+add_executable(BMReference BMReference_main.cpp BMReference.cpp)
+target_link_libraries(BMReference ${FreeImage_LIBRARIES})
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
 target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
 target_link_libraries(BMErosion ${FreeImage_LIBRARIES})

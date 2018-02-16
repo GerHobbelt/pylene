@@ -14,6 +14,7 @@ add_core_test(${test_prefix}opening          opening.cpp)
 add_core_test(${test_prefix}extinction       extinction.cpp)
 add_core_test(${test_prefix}median_filter    median_filter.cpp)
 add_core_test(${test_prefix}hit_or_miss      hit_or_miss.cpp)
+add_core_test(${test_prefix}watershed        watershed.cpp)
 add_core_test(${test_prefix}ToS              tos.cpp tos_tests_helper.cpp)
 
 target_link_libraries(${test_prefix}saturate    ${FreeImage_LIBRARIES})
@@ -22,4 +23,4 @@ target_link_libraries(${test_prefix}erode       ${FreeImage_LIBRARIES})
 target_link_libraries(${test_prefix}gradient    ${FreeImage_LIBRARIES})
 target_link_libraries(${test_prefix}opening     ${FreeImage_LIBRARIES})
 target_link_libraries(${test_prefix}median_filter ${FreeImage_LIBRARIES})
-
+target_link_libraries(${test_prefix}watershed    ${FreeImage_LIBRARIES})

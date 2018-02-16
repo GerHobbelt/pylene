@@ -40,10 +40,15 @@ add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_executable(BMRotation       BMRotation.cpp)
 add_executable(BMDilation       BMDilation.cpp)
 add_executable(BMMorphers       BMMorphers.cpp   BMMorphers_main.cpp)
+<<<<<<< 7f3366ba21b6f59f88b70ad00faaf9959c34306f
 add_executable(BMReference_Linear BMReference_Linear_main.cpp BMReference_Linear.cpp)
 add_executable(BMReference_Neighborhood BMReference_Neighborhood_main.cpp BMReference_Neighborhood.cpp)
 target_link_libraries(BMReference_Neighborhood ${FreeImage_LIBRARIES})
 target_link_libraries(BMReference_Linear ${FreeImage_LIBRARIES})
+=======
+add_executable(BMReference BMReference_main.cpp BMReference.cpp)
+target_link_libraries(BMReference ${FreeImage_LIBRARIES})
+>>>>>>> Add linear reference benchmark
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
 target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
 target_link_libraries(BMErosion ${FreeImage_LIBRARIES})

@@ -26,7 +26,38 @@ void Mult_Inplace_C(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Threshold_Pylene(mln::image2d<mln::uint8>& img)
+void Mult_Pylene(mln::image2d<mln::uint8>& img)
+{
+  mln::image2d<mln::uint8> new_img(0,0);
+  mln::resize(new_img, img);
+  mln_foreach(auto p, img.pixels())
+  {
+    new_img(p.point()) = p.val() * 2;
+  }
+}
+
+void Mult_C(mln::image2d<mln::uint8>& img)
+{
+  int nrow = img.nrows();
+  int ncol = img.ncols();
+  std::ptrdiff_t stride = img.strides()[0];
+
+  mln::image2d<mln::uint8> new_img(0,0);
+  mln::resize(new_img, img);
+  mln::uint8* buffer_new = &new_img.at(0,0);
+  mln::uint8* buffer = &img.at(0,0);
+  for (int i = 0; i < nrow; i++)
+  {
+    for (int j = 0; j < ncol; j++)
+    {
+      buffer_new[j] = buffer[j] * 2; 
+    }
+    buffer += stride;
+    buffer_new += stride;
+  }
+}
+
+void Threshold_Inplace_Pylene(mln::image2d<mln::uint8>& img)
 {
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
@@ -43,7 +74,7 @@ void Threshold_Pylene(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Threshold_C(mln::image2d<mln::uint8>& img)
+void Threshold_Inplace_C(mln::image2d<mln::uint8>& img)
 {
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
@@ -68,7 +99,56 @@ void Threshold_C(mln::image2d<mln::uint8>& img)
   }
 }
 
-void LUT_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+void Threshold_Pylene(mln::image2d<mln::uint8>& img)
+{
+  mln::uint8 threshold = ~0 >> 1;
+  mln::uint8 maxi = ~0;
+  mln::image2d<mln::uint8> new_img(0,0);
+  mln::resize(new_img, img);
+  mln_foreach(auto p, img.pixels())
+  {
+    if (p.val() < threshold)
+    {
+      new_img(p.point()) = 0;
+    }
+    else
+    {
+      new_img(p.point()) = maxi;
+    }
+  }
+}
+
+void Threshold_C(mln::image2d<mln::uint8>& img)
+{
+  mln::uint8 threshold = ~0 >> 1;
+  mln::uint8 maxi = ~0;
+  int nrow = img.nrows();
+  int ncol = img.ncols();
+  std::ptrdiff_t stride = img.strides()[0];
+
+  mln::image2d<mln::uint8> new_img(0,0);
+  mln::resize(new_img, img);
+  mln::uint8* buffer_new = &new_img.at(0,0);
+  mln::uint8* buffer = &img.at(0,0);
+  for (int i = 0; i < nrow; i++)
+  {
+    for (int j = 0; j < ncol; j++)
+    {
+      if (buffer[j] < threshold)
+      {
+        buffer_new[j] = 0;
+      }
+      else
+      {
+        buffer_new[j] = maxi;
+      }
+    }
+    buffer += stride;
+    buffer_new += stride;
+  }
+}
+
+void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
 {
   mln_foreach(auto p, img.pixels())
   {
@@ -76,7 +156,7 @@ void LUT_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
   }
 }
 
-void LUT_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+void LUT_Inplace_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
 {
   int nrow = img.nrows();
   int ncol = img.ncols();
@@ -89,5 +169,36 @@ void LUT_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
       buffer[j] = LUT[buffer[j]];
     }
     buffer += stride;
+  }
+}
+
+void LUT_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+{
+  mln::image2d<mln::uint8> new_img(0,0);
+  mln::resize(new_img, img);
+  mln_foreach(auto p, img.pixels())
+  {
+    new_img(p.point()) = LUT[p.val()];
+  }
+}
+
+void LUT_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+{
+  int nrow = img.nrows();
+  int ncol = img.ncols();
+  std::ptrdiff_t stride = img.strides()[0];
+
+  mln::image2d<mln::uint8> new_img(0,0);
+  mln::resize(new_img, img);
+  mln::uint8* buffer_new = &new_img.at(0,0);
+  mln::uint8* buffer = &img.at(0,0);
+  for (int i = 0; i < nrow; i++)
+  {
+    for (int j = 0; j < ncol; j++)
+    {
+      buffer_new[j] = LUT[buffer[j]];
+    }
+    buffer += stride;
+    buffer_new += stride;
   }
 }

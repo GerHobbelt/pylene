@@ -1,5 +1,7 @@
 #include <mln/core/image/image2d.hpp>
 
+#include <vector>
+
 void Mult_Inplace_Pylene(mln::image2d<mln::uint8>& img)
 {
   mln_foreach(auto p, img.pixels())
@@ -61,6 +63,30 @@ void Threshold_C(mln::image2d<mln::uint8>& img)
       {
         buffer[j] = maxi;
       }
+    }
+    buffer += stride;
+  }
+}
+
+void LUT_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+{
+  mln_foreach(auto p, img.pixels())
+  {
+    p.val() = LUT[p.val()];
+  }
+}
+
+void LUT_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+{
+  int nrow = img.nrows();
+  int ncol = img.ncols();
+  std::ptrdiff_t stride = img.strides()[0];
+  mln::uint8* buffer = &img.at(0,0);
+  for (int i = 0; i < nrow; i++)
+  {
+    for (int j = 0; j < ncol; j++)
+    {
+      buffer[j] = LUT[buffer[j]];
     }
     buffer += stride;
   }

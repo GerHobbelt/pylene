@@ -2,6 +2,7 @@
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
+<<<<<<< b55a16c08e174c3d7d40e6287a9d1b592fed1484
 #include <mln/core/extension/fill.hpp>
 
 void Sum_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
@@ -14,6 +15,8 @@ void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new
 void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Anisotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+=======
+>>>>>>> Add new benchmark neighborhood for reference
 
 class Bench_Ref_Neighborhood : public benchmark::Fixture
 {
@@ -52,59 +55,7 @@ protected:
   }
 
 private:
-  int info[3];
   mln::image2d<mln::uint8> ima;
-  mln::image2d<mln::uint8> out_ima;
 };
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Sum_C)(benchmark::State& st)
-{
-  Do_1(st, Sum_C);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Sum_Pylene)(benchmark::State& st)
-{
-  Do_0(st, Sum_Pylene);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Average_C)(benchmark::State& st)
-{
-  Do_1(st, Average_C);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Average_Pylene)(benchmark::State& st)
-{
-  Do_0(st, Average_Pylene);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_C)(benchmark::State& st)
-{
-  Do_1(st, Erosion_C);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_Pylene)(benchmark::State& st)
-{
-  Do_0(st, Erosion_Pylene);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_C)(benchmark::State& st)
-{
-  Do_1(st, Isotropic_Diffusion_C);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_Pylene)(benchmark::State& st)
-{
-  Do_0(st, Isotropic_Diffusion_Pylene);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_C)(benchmark::State& st)
-{
-  Do_1(st,Anisotropic_Diffusion_C);
-}
-
-BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_Pylene)(benchmark::State& st)
-{
-  Do_0(st,Anisotropic_Diffusion_Pylene);
-}
 
 BENCHMARK_MAIN();

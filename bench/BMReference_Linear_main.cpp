@@ -21,7 +21,7 @@ void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& 
 void LUT_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT);
 void LUT_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT);
 
-class Bench_Ref : public benchmark::Fixture
+class Bench_Ref_Linear : public benchmark::Fixture
 {
   const char* filename = MLN_IMG_PATH "/lena.ppm";
 
@@ -63,62 +63,62 @@ private:
   std::vector<mln::uint8> LUT;
 };
 
-BENCHMARK_F(Bench_Ref, Mult_Inplace_C)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C)(benchmark::State& st)
 {
   Do_0(st, Mult_Inplace_C);
 }
 
-BENCHMARK_F(Bench_Ref, Mult_Inplace_Pylene)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_Pylene)(benchmark::State& st)
 {
   Do_0(st, Mult_Inplace_Pylene);
 }
 
-BENCHMARK_F(Bench_Ref, Mult_C)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Mult_C)(benchmark::State& st)
 {
   Do_0(st, Mult_C);
 }
 
-BENCHMARK_F(Bench_Ref, Mult_Pylene)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Mult_Pylene)(benchmark::State& st)
 {
   Do_0(st, Mult_Pylene);
 }
 
-BENCHMARK_F(Bench_Ref, Threshold_Inplace_C)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C)(benchmark::State& st)
 {
   Do_0(st, Threshold_Inplace_C);
 }
 
-BENCHMARK_F(Bench_Ref, Threshold_Inplace_Pylene)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_Pylene)(benchmark::State& st)
 {
   Do_0(st, Threshold_Inplace_Pylene);
 }
 
-BENCHMARK_F(Bench_Ref, Threshold_C)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Threshold_C)(benchmark::State& st)
 {
   Do_0(st, Threshold_C);
 }
 
-BENCHMARK_F(Bench_Ref, Threshold_Pylene)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Pylene)(benchmark::State& st)
 {
   Do_0(st, Threshold_Pylene);
 }
 
-BENCHMARK_F(Bench_Ref, LUT_Inplace_C)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C)(benchmark::State& st)
 {
   Do_1(st, LUT_Inplace_C);
 }
 
-BENCHMARK_F(Bench_Ref, LUT_Inplace_Pylene)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_Pylene)(benchmark::State& st)
 {
   Do_1(st, LUT_Inplace_Pylene);
 }
 
-BENCHMARK_F(Bench_Ref, LUT_C)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
 {
   Do_1(st, LUT_C);
 }
 
-BENCHMARK_F(Bench_Ref, LUT_Pylene)(benchmark::State& st)
+BENCHMARK_F(Bench_Ref_Linear, LUT_Pylene)(benchmark::State& st)
 {
   Do_1(st, LUT_Pylene);
 }

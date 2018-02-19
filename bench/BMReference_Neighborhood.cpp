@@ -80,13 +80,12 @@ void Average_C(mln::image2d<mln::uint8>& img)
   {
     for (int j = 0; j < ncol; j++)
     {
-      unsigned int tmp = 0;
       for (int k = -1; k <= 1; k++)
         for (int l = -1; l <= 1; l++)
         {
-          tmp += buffer[j + k * stride + l];
+          buffer_new[j] += buffer[j + k * stride + l];
         }
-      buffer_new[j] = tmp / 9;
+      buffer_new[j] /= 9;
     }
     buffer += stride;
     buffer_new += stride;

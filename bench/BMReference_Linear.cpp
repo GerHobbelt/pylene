@@ -28,9 +28,11 @@ void Mult_Inplace_C(mln::image2d<mln::uint8>& img)
 
 void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln_foreach(auto p, img.pixels())
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_forall(pxIn, pxOut)
   {
-    new_img(p.point()) = p.val() * 2;
+    pxOut->val() = pxIn->val() * 2;
   }
 }
 
@@ -99,15 +101,17 @@ void Threshold_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& n
 {
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
-  mln_foreach(auto p, img.pixels())
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_forall(pxIn, pxOut)
   {
-    if (p.val() < threshold)
+    if (pxIn->val() < threshold)
     {
-      new_img(p.point()) = 0;
+      pxOut->val() = 0;
     }
     else
     {
-      new_img(p.point()) = maxi;
+      pxOut->val() = maxi;
     }
   }
 }
@@ -142,9 +146,10 @@ void Threshold_C(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_im
 
 void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
 {
-  mln_foreach(auto p, img.pixels())
+  mln_pixter(px, img)
+  mln_forall(px)
   {
-    p.val() = LUT[p.val()];
+    px->val() = LUT[px->val()];
   }
 }
 
@@ -166,9 +171,11 @@ void LUT_Inplace_C(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
 
 void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, std::vector<mln::uint8>& LUT)
 {
-  mln_foreach(auto p, img.pixels())
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_forall(pxIn, pxOut)
   {
-    new_img(p.point()) = LUT[p.val()];
+    pxOut->val() = LUT[pxIn->val()];
   }
 }
 

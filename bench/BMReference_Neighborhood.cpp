@@ -2,11 +2,8 @@
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/neighb2d.hpp>
 
-void Sum_Pylene(mln::image2d<mln::uint8>& img)
+void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln::image2d<mln::uint8> new_img(0,0);
-  mln::resize(new_img, img);
-  mln::extension::fill(img, 0);
   mln_iter(p, img.domain())
   mln_iter(n, mln::c8(p));
 
@@ -21,12 +18,8 @@ void Sum_Pylene(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Sum_C(mln::image2d<mln::uint8>& img)
+void Sum_C(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln::image2d<mln::uint8> new_img(0,0);
-  mln::resize(new_img, img);
-  mln::extension::fill(img, 0);
-
   int nrow = img.nrows();
   int ncol = img.ncols();
   std::ptrdiff_t stride = img.strides()[0];
@@ -49,12 +42,8 @@ void Sum_C(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Average_Pylene(mln::image2d<mln::uint8>& img)
+void Average_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln::image2d<mln::uint8> new_img(0,0);
-  mln::resize(new_img, img);
-  mln::extension::fill(img, 0);
-  
   mln_iter(p, img.domain())
   mln_iter(n, mln::c8(p));
 
@@ -69,12 +58,8 @@ void Average_Pylene(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Average_C(mln::image2d<mln::uint8>& img)
+void Average_C(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln::image2d<mln::uint8> new_img(0,0);
-  mln::resize(new_img, img);
-  mln::extension::fill(img, 0);
-
   int nrow = img.nrows();
   int ncol = img.ncols();
   std::ptrdiff_t stride = img.strides()[0];

@@ -4,17 +4,18 @@
 
 void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln_iter(p, img.domain())
-  mln_iter(n, mln::c8(p));
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_iter(n, mln::c8(pxIn));
 
-  mln_forall(p)
+  mln_forall(pxIn, pxOut)
   {
     unsigned int tmp = 0;
     mln_forall(n)
     {
-      tmp += img.at(*n);
+      tmp += n->val();
     }
-    new_img(*p) = tmp;
+    pxOut->val() = tmp;
   }
 }
 
@@ -44,17 +45,18 @@ void Sum_C(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 
 void Average_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
-  mln_iter(p, img.domain())
-  mln_iter(n, mln::c8(p));
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_iter(n, mln::c8(pxIn));
 
-  mln_forall(p)
+  mln_forall(pxIn, pxOut)
   {
     unsigned int tmp = 0;
     mln_forall(n)
     {
-      tmp += img.at(*n);
+      tmp += n->val();
     }
-    new_img(*p) = tmp / 8;
+    pxOut->val() = tmp / 8;
   }
 }
 

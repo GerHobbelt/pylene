@@ -3,6 +3,10 @@
 Opening by reconstruction
 =========================
 
+Include :file:`<mln/morpho/opening_by_reconstruction.hpp>`
+
+.. cpp:namespace:: mln::morpho
+
 .. cpp:function:: \
    template <class InputImage1, class InputImage2, class Neighborhood> \
    concrete_t<InputImage1> opening_by_reconstruction(const InputImage1& f, const InputImage2& markers, const Neighborhood& nbh)

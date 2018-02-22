@@ -1,6 +1,10 @@
 Closing
 =======
 
+Include :file:`<mln/morpho/structural/closing.hpp>`
+
+.. cpp:namespace:: mln::morpho::structural
+
 #. .. cpp:function:: \
       template <class InputImage, class StructuringElement> \
       concrete_t<InputImage> closing(const InputImage& ima, const StructuringElement& se)

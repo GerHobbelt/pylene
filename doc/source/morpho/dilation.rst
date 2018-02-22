@@ -1,5 +1,12 @@
+.. _dilation:
+
 Dilation
 ========
+
+Include :file:`<mln/morpho/structural/dilate.hpp>`
+
+.. cpp:namespace:: mln::morpho::structural
+
 
 #. .. cpp:function:: \
       template <class InputImage, class StructuringElement> \

@@ -93,6 +93,8 @@ namespace mln
     extended_by_value_image_pixel() = default;
     extended_by_value_image_pixel(const extended_by_value_image_pixel&) = default;
 
+    extended_by_value_image_pixel(Morpher* ima) : m_ima(ima) {}
+
     extended_by_value_image_pixel(Morpher& ima, const Pix& pix) : m_ima(&ima), m_pix(pix) {}
 
     // Conversion non-const -> const pixel

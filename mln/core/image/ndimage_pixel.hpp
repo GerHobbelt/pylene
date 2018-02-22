@@ -100,7 +100,7 @@ namespace mln
 
     ndimage_pixel() = default;
 
-    ndimage_pixel(image_type* ima, T* ptr) : details::ndimage_pixel_base<T, dim>(ptr), m_ima(ima) {}
+    ndimage_pixel(image_type* ima, T* ptr = nullptr) : details::ndimage_pixel_base<T, dim>(ptr), m_ima(ima) {}
 
     /// \brief Copy / copy conversion constructor
     template <class U, class J, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>

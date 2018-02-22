@@ -1,6 +1,10 @@
 Opening
 =======
 
+Include :file:`<mln/morpho/structural/opening.hpp>`
+
+.. cpp:namespace:: mln::morpho::structural
+
 #. .. cpp:function:: \
       template <class InputImage, class StructuringElement> \
       concrete_t<InputImage> opening(const InputImage& ima, const StructuringElement& se)

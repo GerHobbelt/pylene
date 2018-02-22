@@ -1,6 +1,8 @@
 Erosion
 =======
 
+Include :file:`<mln/morpho/structural/erode.hpp>`
+
 #. .. cpp:function:: \
       template <class InputImage, class StructuringElement> \
       concrete_t<InputImage> erode(const InputImage& ima, const StructuringElement& se)

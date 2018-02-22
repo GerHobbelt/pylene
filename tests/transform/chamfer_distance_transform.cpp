@@ -28,7 +28,7 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_1)
       {0, 0, 0, 0, 0}  //
   };
 
-  auto res = transform::chamfer_distance_transform(f, c4);
+  auto res = transforms::chamfer_distance_transform(f, c4);
 
   ASSERT_IMAGES_EQ(res, ref);
 }
@@ -53,7 +53,7 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_2)
       {1, 0, 0, 0, 0, 1}  //
   };
 
-  auto res = transform::chamfer_distance_transform(f, c4);
+  auto res = transforms::chamfer_distance_transform(f, c4);
 
   ASSERT_IMAGES_EQ(res, ref);
 }
@@ -79,7 +79,7 @@ TEST(Transform, chamfer_distance_transform_chamfer_distance_transform_3)
       {1, 0, 0, 0, 0, 1}  //
   };
 
-  transform::chamfer_distance_transform(f, c4, f);
+  transforms::chamfer_distance_transform(f, c4, f);
 
   ASSERT_IMAGES_EQ(f, ref);
 }
@@ -108,7 +108,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_distance_transform)
       {1, 1, 1, 1, 1, 1, 1}  //
   };
 
-  auto res = transform::chamfer_distance_transform(f, c4);
+  auto res = transforms::chamfer_distance_transform(f, c4);
 
   ASSERT_IMAGES_EQ(res, ref);
 }
@@ -139,7 +139,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_distance_transform)
       {maxv, maxv, maxv, maxv, maxv, maxv, maxv}  //
   };
 
-  auto res = transform::chamfer_distance_transform(f, c4, true);
+  auto res = transforms::chamfer_distance_transform(f, c4, true);
 
   ASSERT_IMAGES_EQ(res, ref);
 }
@@ -177,7 +177,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_weighted_distance_transfor
                                              1.5f, 1.0f, 1.5f}};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
-  image2d<float> res = transform::chamfer_distance_transform<float>(f, nbh);
+  image2d<float> res = transforms::chamfer_distance_transform<float>(f, nbh);
 
   ASSERT_IMAGES_EQ(res, ref);
 }
@@ -212,7 +212,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
   constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f, 1.0f, 1.0f, 1.5f, 1.0f, 1.5f}};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
-  image2d<float> res = transform::chamfer_distance_transform<float>(f, nbh, true);
+  image2d<float> res = transforms::chamfer_distance_transform<float>(f, nbh, true);
 
   ASSERT_IMAGES_EQ(res, ref);
 }
@@ -251,7 +251,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
   constexpr std::array<int, 16> weights = {{c, c, c, b, a, b, c, a, a, c, b, a, b, c, c, c}};
 
   auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
-  image2d<int> res = transform::chamfer_distance_transform(f, nbh, true);
+  image2d<int> res = transforms::chamfer_distance_transform(f, nbh, true);
 
   ASSERT_IMAGES_EQ(res, ref);
 }

@@ -26,6 +26,8 @@ set(src_standalone
   BMMorphers.cpp
   BMNeighborhood.cpp
   BMReference.cpp
+  BMReference_Linear.cpp
+  BMReference_Neighborhood.cpp
   )
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})

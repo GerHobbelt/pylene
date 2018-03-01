@@ -8,6 +8,8 @@ void Sum_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Average_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Average_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
+void Erosion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 
 class Bench_Ref_Neighborhood : public benchmark::Fixture
 {
@@ -68,6 +70,16 @@ BENCHMARK_F(Bench_Ref_Neighborhood, Average_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Neighborhood, Average_Pylene)(benchmark::State& st)
 {
   Do_0(st, Average_Pylene);
+}
+
+BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_C)(benchmark::State& st)
+{
+  Do_1(st, Erosion_C);
+}
+
+BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_Pylene)(benchmark::State& st)
+{
+  Do_0(st, Erosion_Pylene);
 }
 
 BENCHMARK_MAIN();

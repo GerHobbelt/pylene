@@ -93,6 +93,8 @@ void Erosion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new
       if (n->val() < mini)
         mini = n->val();
     }
+    if (pxIn->val() < mini)
+      mini = pxIn->val();
     pxOut->val() = mini;
   }
 }
@@ -102,7 +104,7 @@ void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   int nrow = info[0];
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
-  
+
   for (int i = 0; i < nrow; i++)
   {
     for (int j = 0; j < ncol; j++)

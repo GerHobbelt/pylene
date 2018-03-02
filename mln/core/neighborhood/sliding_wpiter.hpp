@@ -71,7 +71,7 @@ namespace mln
       m_wset_iter.next();
     }
     bool finished() const { return m_pset_iter.finished(); }
-    wpoint<P, W> dereference() const { return {static_cast<P>(m_p) + *m_pset_iter, *m_wset_iter}; }
+    wpoint<P, W> dereference() const { return {m_p.get() + *m_pset_iter, *m_wset_iter}; }
 
   private:
     Point m_p;

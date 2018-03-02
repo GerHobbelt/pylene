@@ -97,13 +97,13 @@ NO_INLINE double test_native(const image2d<int>& a, const image2d<int>& b);
 
 double test_native(const image2d<int>& a, const image2d<int>& b)
 {
-  const size_t* strides = a.strides();
+  std::ptrdiff_t stride = a.byte_stride();
   const char* ptra = (const char*)&(a(point2d{0, 0}));
   const char* ptrb = (const char*)&(b(point2d{0, 0}));
 
   double v = 0;
   unsigned nrows = a.nrows(), ncols = a.ncols();
-  for (unsigned i = 0; i < nrows; ++i, ptra += strides[0], ptrb += strides[0])
+  for (unsigned i = 0; i < nrows; ++i, ptra += stride, ptrb += stride)
   {
     const int *pa = (const int*)ptra, *pb = (const int*)ptrb;
     for (unsigned j = 0; j < ncols; ++j, ++pa, ++pb)
@@ -178,14 +178,14 @@ void test_dilation_native(const image2d<int>& a, image2d<int>& b)
 {
   extension::fill(b, std::numeric_limits<int>::max());
 
-  const size_t* strides = a.strides();
+  std::ptrdiff_t stride = a.byte_stride();
   const char* ptra = (const char*)&(a(point2d{0, 0}));
   char* ptrb = (char*)&(b(point2d{0, 0}));
 
   unsigned nrows = a.nrows(), ncols = a.ncols();
   auto offsets = wrt_offset(a, c8_t::dpoints);
 
-  for (unsigned i = 0; i < nrows; ++i, ptra += strides[0], ptrb += strides[0])
+  for (unsigned i = 0; i < nrows; ++i, ptra += stride, ptrb += stride)
   {
     const int* pa = (const int*)ptra;
     int* pb = (int*)ptrb;
@@ -266,9 +266,9 @@ void test_dilation_index(const image2d<int>& a, image2d<int>& b)
 
   auto nrows = a.nrows();
   auto ncols = a.ncols();
-  for (unsigned i = 0; i < nrows; ++i, idx += static_cast<unsigned>(a.index_strides()[0]))
+  for (int i = 0; i < nrows; ++i, idx += a.stride())
   {
-    for (unsigned j = 0; j < ncols; ++j)
+    for (int j = 0; j < ncols; ++j)
     {
       auto p = idx + j;
       int tmp = value_traits<int>::max();

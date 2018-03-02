@@ -34,35 +34,31 @@ namespace mln
 
     auto __process_point(const point_type& p) const
     {
-      return make_iterator_range(make_sliding_wpiter(p, mln::exact(this)->dpoints, mln::exact(this)->weights));
+      return make_sliding_wpiter(make_value_wrapper(p), mln::exact(this)->dpoints, mln::exact(this)->weights);
     }
 
     template <typename P>
     auto __bind_point(P& p) const
     {
-      return make_iterator_range(
-          make_sliding_wpiter(std::cref(p), mln::exact(this)->dpoints, mln::exact(this)->weights));
+      return make_sliding_wpiter(std::cref(p), mln::exact(this)->dpoints, mln::exact(this)->weights);
     }
 
     template <typename PointIterator>
     auto __bind_point_iterator(const PointIterator& p) const
     {
-      return make_iterator_range(
-          make_sliding_wpiter(make_iterator_proxy(p), mln::exact(this)->dpoints, mln::exact(this)->weights));
+      return make_sliding_wpiter(make_iterator_proxy(p), mln::exact(this)->dpoints, mln::exact(this)->weights);
     }
 
     template <typename Px>
     auto __bind_pixel(Px& px) const
     {
-      return make_iterator_range(
-          make_sliding_wpixter(std::cref(px), mln::exact(this)->dpoints, mln::exact(this)->weights));
+      return make_sliding_wpixter(std::cref(px), mln::exact(this)->dpoints, mln::exact(this)->weights);
     }
 
     template <typename Px>
     auto __bind_pixel_iterator(const Px& px) const
     {
-      return make_iterator_range(
-          make_sliding_wpixter(make_iterator_proxy(px), mln::exact(this)->dpoints, mln::exact(this)->weights));
+      return make_sliding_wpixter(make_iterator_proxy(px), mln::exact(this)->dpoints, mln::exact(this)->weights);
     }
   };
 

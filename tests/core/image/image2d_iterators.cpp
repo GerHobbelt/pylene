@@ -86,25 +86,25 @@ struct iterator_test_empty_domain : iterator_test
 
 TEST(Core, Image2d_empty_domain_iterator_test_forward_viter)
 {
-  iterator_test_empty_domain it{};
+  iterator_test_empty_domain it;
   it.test_forward_viter();
 }
 
 TEST(Core, Image2d_empty_domain_iterator_test_backward_viter)
 {
-  iterator_test_empty_domain it{};
+  iterator_test_empty_domain it;
   it.test_backward_viter();
 }
 
 TEST(Core, Image2d_empty_domain_iterator_test_forward_pixter)
 {
-  iterator_test_empty_domain it{};
+  iterator_test_empty_domain it;
   it.test_forward_pixter();
 }
 
 TEST(Core, Image2d_empty_domain_iterator_test_backward_pixter)
 {
-  iterator_test_empty_domain it{};
+  iterator_test_empty_domain it;
   it.test_backward_pixter();
 }
 
@@ -121,7 +121,7 @@ struct iterator_test_zero_origin_domain : iterator_test
         {4, 5, 6, 7},  //
         {8, 9, 10, 11} //
     };
-    indexes = {33, 34, 35, 36, 43, 44, 45, 46, 53, 54, 55, 56};
+    indexes = {0, 1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23};
     values.resize(12);
     std::iota(values.begin(), values.end(), 0);
   }
@@ -148,5 +148,50 @@ TEST(Core, Image2d_iterator_test_zero_origin_domain_forward_pixter)
 TEST(Core, Image2d_iterator_test_zero_origin_domain_backward_pixter)
 {
   iterator_test_zero_origin_domain it{};
+  it.test_backward_pixter();
+}
+
+
+/******************************************/
+/****         Origin at (-2,1)         ****/
+/******************************************/
+
+struct iterator_test_nonzero_origin_domain : iterator_test
+{
+  iterator_test_nonzero_origin_domain()
+  {
+    box2d domain = {{-2,1}, {1, 5}};
+    ima.resize(domain);
+    int i = 0;
+    mln_foreach(auto p, domain)
+      ima(p) = i++;
+
+    indexes = {-19, -18, -17, -16, -9, -8, -7, -6, 1, 2, 3, 4};
+    values.resize(12);
+    std::iota(values.begin(), values.end(), 0);
+  }
+};
+
+TEST(Core, Image2d_iterator_test_nonzero_origin_domain_forward_viter)
+{
+  iterator_test_nonzero_origin_domain it{};
+  it.test_forward_viter();
+}
+
+TEST(Core, Image2d_iterator_test_nonzero_origin_domain_backward_viter)
+{
+  iterator_test_nonzero_origin_domain it{};
+  it.test_backward_viter();
+}
+
+TEST(Core, Image2d_iterator_test_nonzero_origin_domain_forward_pixter)
+{
+  iterator_test_nonzero_origin_domain it{};
+  it.test_forward_pixter();
+}
+
+TEST(Core, Image2d_iterator_test_nonzero_origin_domain_backward_pixter)
+{
+  iterator_test_nonzero_origin_domain it{};
   it.test_backward_pixter();
 }

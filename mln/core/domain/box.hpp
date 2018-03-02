@@ -5,6 +5,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
 #include <mln/core/point.hpp>
+#include <mln/core/imageformat.hpp>
 
 #if MLN_HAS_TBB
 #include <tbb/tbb_stddef.h>
@@ -177,13 +178,13 @@ namespace mln
 
   typedef box<short, 1> box1d;
   typedef box<float, 1> box1df;
-  typedef box<short, 2> box2d;
+  typedef box<int, 2> box2d;
   typedef box<float, 2> box2df;
-  typedef box<short, 3> box3d;
+  typedef box<int, 3> box3d;
 
-  typedef strided_box<short, 1> sbox1d;
-  typedef strided_box<short, 2> sbox2d;
-  typedef strided_box<short, 3> sbox3d;
+  typedef strided_box<int, 1> sbox1d;
+  typedef strided_box<int, 2> sbox2d;
+  typedef strided_box<int, 3> sbox3d;
 
   template <typename T, unsigned dim>
   inline std::ostream& operator<<(std::ostream& s, const box<T, dim>& b)
@@ -196,52 +197,6 @@ namespace mln
   {
     return s << "[" << b.pmin << " ... " << b.pmax << "..." << b.strides << "]";
   }
-
-  /// Traits
-
-  /// Forward
-  template <typename> struct image2d;
-  template <typename> struct image3d;
-
-  template <>
-  struct image_from_domain<box2d>
-  {
-    template <typename T>
-    struct apply
-    {
-      typedef image2d<T> type;
-    };
-  };
-
-  template <>
-  struct image_from_domain<box3d>
-  {
-    template <typename T>
-    struct apply
-    {
-      typedef image3d<T> type;
-    };
-  };
-
-  template <>
-  struct image_from_domain<sbox2d>
-  {
-    template <typename T>
-    struct apply
-    {
-      typedef image2d<T> type;
-    };
-  };
-
-  template <>
-  struct image_from_domain<sbox3d>
-  {
-    template <typename T>
-    struct apply
-    {
-      typedef image3d<T> type;
-    };
-  };
 
   template <typename T, unsigned dim>
   struct grain_box : box<T, dim>

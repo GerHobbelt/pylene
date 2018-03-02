@@ -136,7 +136,7 @@ namespace mln
     {
     private:
       using Point = typename SiteSet::value_type;
-      using IndexContainer = boost::container::small_vector<int, 25>;
+      using IndexContainer = boost::container::small_vector<std::ptrdiff_t, 25>;
       using SiteContainer = boost::container::small_vector<Point, 25>;
 
     public:
@@ -162,7 +162,7 @@ namespace mln
       sliding_pixter_container_base(const std::array<Point, N>& s) : m_site_set(s) {}
 
     protected:
-      using IndexContainer = std::array<int, N>;
+      using IndexContainer = std::array<std::ptrdiff_t, N>;
       using SiteContainer = std::array<Point, N>;
 
       static constexpr int m_size = N;
@@ -208,14 +208,16 @@ namespace mln
     private:
       using base = sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>;
       using Image = spixter_image_t<PixelProxy>;
+      using index_t = typename index_pixel<Image>::index_type;
 
     public:
       using base::base;
 
       index_pixel<Image> dereference() const
       {
-        return {this->m_image, this->m_pixel.get().point() + this->m_site_set[this->m_i],
-                this->m_pixel.get().index() + this->m_index_set[this->m_i]};
+        return {this->m_image,
+            this->m_pixel.get().point() + this->m_site_set[this->m_i],
+            static_cast<index_t>(this->m_pixel.get().index() + this->m_index_set[this->m_i])};
       }
     };
 

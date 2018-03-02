@@ -60,14 +60,12 @@ namespace mln
     typedef mln_concrete(I) type;
   };
 
-  namespace internal
+  template <class I, class V>
+  struct image_ch_value<extended_by_value_image<I>, V>
   {
-    template <typename I>
-    struct image_init_from<extended_by_value_image<I>>
-    {
-      typedef typename image_init_from<typename std::decay<I>::type>::type type;
-    };
-  }
+    typedef mln_ch_value(I, V) type;
+  };
+
 
   /*****************************/
   /**** Implementation       ***/
@@ -205,15 +203,13 @@ namespace mln
 
     extended_by_value_image(I&& ima, const value_type& val) : m_ima(std::forward<I>(ima)), m_val(val) {}
 
-    friend internal::initializer<mln_concrete(I), typename internal::image_init_from<extended_by_value_image>::type>
-        imconcretize(const extended_by_value_image& f)
+    friend auto imconcretize(const extended_by_value_image& f)
     {
       return std::move(imconcretize(f.m_ima));
     }
 
     template <typename V>
-    friend internal::initializer<mln_ch_value(I, V), typename internal::image_init_from<extended_by_value_image>::type>
-        imchvalue(const extended_by_value_image& f)
+    friend auto imchvalue(const extended_by_value_image& f)
     {
       return std::move(imchvalue<V>(f.m_ima));
     }
@@ -255,17 +251,13 @@ namespace mln
     template <typename = void>
     typename std::enable_if<image_traits<image_t>::accessible::value, pixel_type>::type pixel(const point_type& p)
     {
-      // FIXME: this is wrong: it depends if we are in the domain or not
-      mln_precondition(false);
       return {*this, m_ima.pixel(p)};
     }
 
     template <typename = void>
     typename std::enable_if<image_traits<image_t>::accessible::value, const_pixel_type>::type
-        pixel(const point_type& p) const
+    pixel(const point_type& p) const
     {
-      // FIXME: this is wrong: it depends if we are in the domain or not
-      mln_precondition(false);
       return {*this, m_ima.pixel(p)};
     }
 

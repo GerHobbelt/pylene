@@ -83,9 +83,16 @@ namespace mln
   template <class I0, class... I>
   struct image_concrete<zip_image<I0, I...>>
   {
-    typedef std::tuple<typename std::decay<mln_value(I0)>::type, typename std::decay<mln_value(I)>::type...> vtype;
-    typedef mln_ch_value(I0, vtype) type;
+    using value_type = std::tuple<std::decay_t<mln_value(I0)>, std::decay_t<mln_value(I)>...>;
+    using type = mln_ch_value(I0, value_type);
   };
+
+  template <class V, class I0, class... I>
+  struct image_ch_value<zip_image<I0, I...>, V>
+  {
+    using type = mln_ch_value(I0, V);
+  };
+
 
   namespace internal
   {
@@ -244,6 +251,43 @@ namespace mln
     };
 
     template <typename P>
+    struct meta_access_pixel_at
+    {
+      template <typename I>
+      struct apply
+      {
+        typedef mln_pixel(I) type;
+      };
+
+      template <typename I>
+      mln_pixel(I) operator()(I& ima) const
+      {
+        return ima.pixel_at(m_p);
+      }
+
+      const P& m_p;
+    };
+
+    template <typename P>
+    struct meta_const_access_pixel_at
+    {
+      template <typename I>
+      struct apply
+      {
+        typedef mln_cpixel(I) type;
+      };
+
+      template <typename I>
+      mln_cpixel(I) operator()(const I& ima) const
+      {
+        return ima.pixel_at(m_p);
+      }
+
+      const P& m_p;
+    };
+
+
+    template <typename P>
     struct meta_at
     {
       template <typename I>
@@ -387,16 +431,14 @@ namespace mln
 
     zip_image(Images&&... images) : m_images(std::forward_as_tuple(images...)) {}
 
-    friend internal::initializer<mln_concrete(zip_image), typename internal::image_init_from<zip_image>::type>
-        imconcretize(const zip_image& f)
+    friend auto imconcretize(const zip_image& f)
     {
       using mln::imchvalue;
       return std::move(imchvalue<value_type>(std::get<0>(f.m_images)));
     }
 
     template <typename V>
-    friend internal::initializer<mln_ch_value(zip_image, V), typename internal::image_init_from<zip_image>::type>
-        imchvalue(const zip_image& f)
+    friend auto imchvalue(const zip_image& f)
     {
       using mln::imchvalue;
       return std::move(imchvalue<V>(std::get<0>(f.m_images)));
@@ -458,6 +500,18 @@ namespace mln
     const_pixel_type pixel(const point_type& p) const
     {
       auto t = internal::tuple_transform(m_images, internal::meta_const_access_pixel<point_type>{p});
+      return const_pixel_type(t, this);
+    }
+
+    pixel_type pixel_at(const point_type& p)
+    {
+      auto t = internal::tuple_transform(m_images, internal::meta_access_pixel_at<point_type>{p});
+      return pixel_type(t, this);
+    }
+
+    const_pixel_type pixel_at(const point_type& p) const
+    {
+      auto t = internal::tuple_transform(m_images, internal::meta_const_access_pixel_at<point_type>{p});
       return const_pixel_type(t, this);
     }
 

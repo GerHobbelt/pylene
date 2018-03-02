@@ -61,57 +61,6 @@ namespace mln
   template <class I, class Domain>
   struct sub_image;
 
-  template <class I>
-  struct image_from_domain<internal::where_binary_t<I>>
-  {
-    template <typename V>
-    struct apply
-    {
-      typedef sub_image<mln_ch_value(I, V), internal::where_binary_t<I>> type;
-    };
-  };
-
-  template <class I, class Predicate>
-  struct image_from_domain<internal::where_t<I, Predicate>>
-  {
-    template <typename V>
-    struct apply
-    {
-      typedef sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>> type;
-    };
-  };
-
-  template <class V, class I, class Predicate>
-  sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>>
-      make_image_from_domain(const internal::where_t<I, Predicate>& domain)
-  {
-    typedef sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>> OutputImage;
-    return OutputImage(imchvalue<V>(domain.image()), domain);
-  }
-
-  template <class V, class I, class Predicate>
-  sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>>
-      make_image_from_domain(const internal::where_t<I, Predicate>& domain, const V& v)
-  {
-    typedef sub_image<mln_ch_value(I, V), internal::where_t<I, Predicate>> OutputImage;
-    return OutputImage(imchvalue<V>(domain.image()).init(v), domain);
-  }
-
-  template <class V, class I>
-  sub_image<mln_ch_value(I, V), internal::where_binary_t<I>>
-      make_image_from_domain(const internal::where_binary_t<I>& domain)
-  {
-    typedef sub_image<mln_ch_value(I, V), internal::where_binary_t<I>> OutputImage;
-    return OutputImage(imchvalue<V>(domain.image()), domain);
-  }
-
-  template <class V, class I>
-  sub_image<mln_ch_value(I, V), internal::where_binary_t<I>>
-      make_image_from_domain(const internal::where_binary_t<I>& domain, const V& v)
-  {
-    typedef sub_image<mln_ch_value(I, V), internal::where_binary_t<I>> OutputImage;
-    return OutputImage(imchvalue<V>(domain.image()).init(v), domain);
-  }
 
   /******************************************/
   /****          Implementation          ****/

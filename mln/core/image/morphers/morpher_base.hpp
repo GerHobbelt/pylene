@@ -134,8 +134,11 @@ namespace mln
       typedef typename I::point_type point_type;
 
     public:
-      typedef typename I::size_type size_type;
-      typedef typename I::difference_type difference_type;
+      using index_type = typename I::index_type;
+      using size_type [[deprecated]] = index_type;
+      using difference_type [[deprecated]] = index_type;
+
+
       typedef typename image_reference<I>::type reference;
       typedef typename image_const_reference<I>::type const_reference;
 

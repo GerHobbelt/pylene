@@ -40,7 +40,7 @@ namespace mln
   struct value_wrapper
   {
     using type = T;
-    using reference = T&;
+    using reference = const T&;
 
     value_wrapper(const T& v) : m_x(v) {}
     value_wrapper(T&& v) : m_x(std::move(v)) {}
@@ -59,7 +59,7 @@ namespace mln
   }
 
   template <class T>
-  value_wrapper<T> make_value_wrapper(T&& x)
+  value_wrapper<std::remove_reference_t<T>> make_value_wrapper(T&& x)
   {
     return {std::move(x)};
   }

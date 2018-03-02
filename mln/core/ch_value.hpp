@@ -17,26 +17,13 @@
 namespace mln
 {
 
-  template <typename Domain>
-  struct image_from_domain;
-
-  template <typename V, class Domain, class... TArgs>
-  typename image_from_domain<Domain>::template apply<V>::type make_image_from_domain(const Domain& dom, TArgs&&... args)
-  {
-    typedef typename image_from_domain<Domain>::template apply<V>::type OutputImage;
-    return OutputImage(dom, std::forward<TArgs>(args)...);
-  }
-
   template <typename Image>
-  struct image_concrete : image_from_domain<typename Image::domain_type>::template apply<mln_value(Image)>
-  {
-  };
+  struct image_concrete;
 
   // If no specialization get concrete image from domain
   template <typename Image, typename V>
-  struct image_ch_value : image_ch_value<typename image_concrete<Image>::type, V>
-  {
-  };
+  struct image_ch_value;
+
 }
 
 #endif // !MLN_CORE_CH_VALUE_HPP

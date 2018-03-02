@@ -61,7 +61,7 @@ namespace mln
 
     BOOST_CONCEPT_USAGE(Image_)
     {
-      check(std::is_base_of<Image<I>, I>());
+      check(mln::is_a<I, Image>());
       // FIXME: to relax, an image can return an rvalue for the domain
       // const domain_type& (I::*method) () const = &I::domain;
       // (void) method;
@@ -139,9 +139,9 @@ namespace mln
     {
       BOOST_CONCEPT_USAGE(check_indexable)
       {
-        typedef typename I::size_type size_type;
-        void (I::*ptr)(size_type) = &I::reindex;
-        (void)ptr;
+        //typedef typename I::size_type size_type;
+        //void (I::*ptr)(size_type) = &I::reindex;
+        //(void)ptr;
       }
     };
 
@@ -162,26 +162,33 @@ namespace mln
 
     BOOST_CONCEPT_USAGE(AccessibleImage)
     {
-      typedef typename I::point_type point_type;
-      typedef typename I::reference reference;
-      typedef typename I::const_reference const_reference;
-      typedef typename I::pixel_type pixel_type;
-      typedef typename I::const_pixel_type const_pixel_type;
+      using point_type = typename I::point_type;
+      using reference = typename I::reference;
+      using const_reference = typename I::const_reference;
+      using pixel_type = typename I::pixel_type;
+      using const_pixel_type = typename I::const_pixel_type;
 
-      reference (I::*ptr)(const point_type&) = &I::operator();
-      const_reference (I::*ptr2)(const point_type&) const = &I::operator();
-      reference (I::*ptr3)(const point_type&) = &I::at;
-      const_reference (I::*ptr4)(const point_type&) const = &I::at;
-      pixel_type (I::*ptr5)(const point_type&) = &I::pixel;
-      const_pixel_type (I::*ptr6)(const point_type&) const = &I::pixel;
+      point_type p;
 
-      (void)ptr;
-      (void)ptr2;
-      (void)ptr3;
-      (void)ptr4;
-      (void)ptr5;
-      (void)ptr6;
+      reference val0 = f(p);
+      const_reference val1 = cf(p);
+      reference val2 = f.at(p);
+      const_reference val3 = cf.at(p);
+
+      pixel_type px0 = f.pixel(p);
+      const_pixel_type px1 = cf.pixel(p);
+
+      (void) val0;
+      (void) val1;
+      (void) val2;
+      (void) val3;
+
+      (void) px0;
+      (void) px1;
     }
+
+    I f;
+    const I cf;
   };
 
   template <typename I>
@@ -194,24 +201,27 @@ namespace mln
 
     BOOST_CONCEPT_USAGE(IndexableImage)
     {
-      typedef typename I::size_type size_type;
-      typedef typename I::difference_type difference_type;
-      typedef typename I::reference reference;
-      typedef typename I::const_reference const_reference;
-      typedef typename I::point_type point_type;
+      using index_type = typename I::index_type;
+      using P = typename I::point_type;
+      using reference = typename I::reference;
+      using const_reference = typename I::const_reference;
 
-      reference (I::*ptr)(size_type) = &I::operator[];
-      const_reference (I::*ptr2)(size_type) const = &I::operator[];
-      size_type (I::*ptr3)(const point_type&) const = &I::index_of_point;
-      point_type (I::*ptr4)(size_type) const = &I::point_at_index;
-      difference_type (I::*ptr5)(const point_type&) const = &I::delta_index;
 
-      (void)ptr;
-      (void)ptr2;
-      (void)ptr3;
-      (void)ptr4;
-      (void)ptr5;
+      index_type idx;
+      P p;
+
+      reference       val0 = f[idx];
+      const_reference val1 = cf[idx];
+
+      p = cf.point_at_index(idx);
+      idx = cf.index_of_point(p);
+      idx = cf.delta_index(p);
+      (void) val0;
+      (void) val1;
     }
+
+    I f;
+    const I cf;
   };
 
   template <typename I>
@@ -269,8 +279,10 @@ namespace mln
       check(std::is_same<typename const_pixel_iterator::value_type, const_pixel_type>());
       // "Pixel Iterator's value type is expected to be the image const pixel type");
 
-      check(std::is_same<typename pixel_type::image_type, I>());
-      check(std::is_same<typename const_pixel_type::image_type, const I>());
+      // Too strong:
+
+      // check(std::is_same<typename pixel_type::image_type, I>());
+      // check(std::is_same<typename const_pixel_type::image_type, const I>());
 
       check(std::is_convertible<value_iterator, const_value_iterator>());
       check(std::is_convertible<pixel_iterator, const_pixel_iterator>());

@@ -58,7 +58,7 @@ TEST(Core, Sliding_wpiter_binding_rvalue)
   wset_t wset{{-1, 0, 1}};
 
   point2d p{0, 0};
-  auto it = make_sliding_wpiter(p, pset, wset);
+  auto it = make_sliding_wpiter(make_value_wrapper(p), pset, wset);
 
   {
     it.init();

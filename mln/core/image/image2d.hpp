@@ -1,97 +1,168 @@
-#ifndef MLN_CORE_IMAGE_IMAGE2D_HPP
-#define MLN_CORE_IMAGE_IMAGE2D_HPP
+#pragma once
 
-#include <mln/core/image/image.hpp>
-#include <mln/core/image/ndimage.hpp>
+#include "private/ndimage_interleaved.hpp"
+
 
 namespace mln
 {
 
-  // FWD declaration
-  template <typename T>
-  struct image2d;
-
-  // Specialization of traits
-  template <typename T>
-  struct image_traits<image2d<T>> : image_traits<ndimage_base<T, 2, image2d<T>>>
-  {
-  };
-
-  template <typename T, typename V>
-  struct image_ch_value<image2d<T>, V>
-  {
-    typedef image2d<V> type;
-  };
-
-  ///
-  /// \brief The standard 2D image type.
-  ///
-  /// \p image2d is a type to represent 2d image. They are implemented with contiguous
-  /// data buffer to allow pointer arithmetic. However data are not contiguous in this buffer
-  /// since each row is aligned on a 128-bits boundary to get performance. \p image2d are soft image
-  /// since two images can share the same buffer of data to avoid uncessary copies.
-  ///
-  /// \p image2d models a Writable Point-Accessible Image concept.
-  /// See \see image2d \see image3d
-  template <typename T>
-  struct image2d : ndimage_base<T, 2, image2d<T>>
+  template <class V>
+  class image2d_interleaved : public ndimage_interleaved<2, V>
   {
   private:
-    typedef ndimage_base<T, 2, image2d<T>> base_type;
-    typedef ndimage_base<T, 2, image2d<T>> base;
-
+    using base = ndimage_interleaved<2, V>;
   public:
-    typedef typename base_type::domain_type domain_type;
-
+    using domain_type = typename base::domain_type;
     using base::base;
 
-    image2d(short nrows, short ncols, unsigned border = 3, const T& init = T())
-      : base(box<short, 2>{{0, 0}, {nrows, ncols}}, border, init)
-    {
-    }
+    image2d_interleaved(int height, int width, int border = 3);
+    image2d_interleaved(int height, int width, int border, V val);
+    image2d_interleaved(std::initializer_list<std::initializer_list<V>> l, int border = 3);
 
-    /// \brief Initialization constructor
-    /// \{
-    template <typename U>
-    image2d(const image2d<U>& f, mln::init) : base(f, mln::init())
-    {
-    }
-
-    template <typename U>
-    image2d(const image2d<U>& f, unsigned border, const T& v = T()) : base(f, border, v)
-    {
-    }
-    /// \}
-
-    image2d(std::initializer_list<std::initializer_list<T>> l, unsigned border = 3)
-    {
-      mln_precondition(l.size() != 0);
-      mln_precondition((l.begin())->size() != 0);
-
-      auto nr = l.size();
-      auto nc = (l.begin()->size());
-      this->resize(domain_type{{0, 0}, {(short)nr, (short)nc}}, border);
-
-      mln_iter(v, this->values());
-      v.init();
-      for (const std::initializer_list<T>& row : l)
-      {
-        mln_assertion(row.size() == nc);
-        for (const T *val = row.begin(); val != row.end(); ++val, v.next())
-          *v = *val;
-      }
-    }
+    image2d_interleaved(ndimage_interleaved<2, V>&&);
+    image2d_interleaved(const ndimage_interleaved<2, V>&);
 
     using base::at;
 
-    T& at(short nrows, short ncols) { return base::at(typename base::point_type(nrows, ncols)); }
+    V& at(int row, int col);
+    const V& at(int row, int col) const;
 
-    const T& at(short nrows, short ncols) const { return base::at(typename base::point_type(nrows, ncols)); }
+    static image2d_interleaved from_buffer(void* buffer, const domain_type& domain);
+    static image2d_interleaved from_buffer(void* buffer, const domain_type& domain, const std::size_t* byte_strides);
 
-    unsigned nrows() const { return this->m_domain.pmax[0] - this->m_domain.pmin[0]; }
-    unsigned ncols() const { return this->m_domain.pmax[1] - this->m_domain.pmin[1]; }
+    int nrows() const;
+    int ncols() const;
+    int width() const;
+    int height() const;
   };
 
-} // end of namespace mln
+  template <class V>
+  using image2d = image2d_interleaved<V>;
 
-#endif //! MLN_CORE_IMAGE_IMAGE2D_HPP
+  /******************************************/
+  /****             Traits               ****/
+  /******************************************/
+
+  template <class V>
+  struct image_traits<image2d_interleaved<V>> : image_traits<ndimage_interleaved<2, V>>
+  {
+  };
+
+  template <class V>
+  struct image_concrete<image2d_interleaved<V>>
+  {
+    using type = ndimage_interleaved<2, V>;
+  };
+
+
+  template <class V, class U>
+  struct image_ch_value<image2d_interleaved<V>, U>
+  {
+    using type = ndimage_interleaved<2, U>;
+  };
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
+  template <class V>
+  image2d_interleaved<V>::image2d_interleaved(ndimage_interleaved<2, V>&& other)
+    : base(std::move(other))
+  {
+  }
+
+  template <class V>
+  image2d_interleaved<V>::image2d_interleaved(const ndimage_interleaved<2, V>& other)
+    : base(other)
+  {
+  }
+
+
+  template <class V>
+  image2d_interleaved<V>::image2d_interleaved(int height, int width, int border)
+    : base(domain_type{{0,0}, {height, width}}, border)
+  {
+  }
+
+  template <class V>
+  image2d_interleaved<V>::image2d_interleaved(int height, int width, int border, V val)
+    : base(domain_type{{0,0}, {height, width}}, border, val)
+  {
+  }
+
+  template <class V>
+  image2d_interleaved<V>::image2d_interleaved(std::initializer_list<std::initializer_list<V>> l, int border)
+  {
+    mln_precondition(l.size() != 0);
+    mln_precondition((l.begin())->size() != 0);
+
+    int nr = static_cast<int>(l.size());
+    int nc = static_cast<int>(l.begin()->size());
+    this->resize(domain_type{{0, 0}, {nr, nc}}, border);
+
+    mln_iter(v, this->values());
+    v.init();
+    for (const std::initializer_list<V>& row : l)
+    {
+      mln_assertion(row.size() == nc);
+      for (const V *val = row.begin(); val != row.end(); ++val, v.next())
+        *v = *val;
+    }
+  }
+
+  template <class V>
+  V& image2d_interleaved<V>::at(int row, int col)
+  {
+    return base::at({row, col});
+  }
+
+  template <class V>
+  const V& image2d_interleaved<V>::at(int row, int col) const
+  {
+    return base::at({row, col});
+  }
+
+  template <class V>
+  int image2d_interleaved<V>::height() const
+  {
+    return this->dim(0);
+  }
+
+  template <class V>
+  int image2d_interleaved<V>::nrows() const
+  {
+    return this->dim(0);
+  }
+
+  template <class V>
+  int image2d_interleaved<V>::width() const
+  {
+    return this->dim(1);
+  }
+
+  template <class V>
+  int image2d_interleaved<V>::ncols() const
+  {
+    return this->dim(1);
+  }
+
+  template <class V>
+  image2d_interleaved<V>
+  image2d_interleaved<V>::from_buffer(void* buffer, const domain_type& domain)
+  {
+    image2d_interleaved f;
+    f.__from_buffer(buffer, domain);
+    return f;
+  }
+
+  template <class V>
+  image2d_interleaved<V>
+  image2d_interleaved<V>::from_buffer(void* buffer, const domain_type& domain, const std::size_t byte_strides[])
+  {
+    image2d_interleaved f;
+    f.__from_buffer(buffer, domain, byte_strides);
+    return f;
+  }
+
+}
+

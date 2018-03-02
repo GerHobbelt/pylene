@@ -13,6 +13,13 @@ namespace mln
     return (T*)(((char*)x) + offset);
   }
 
+
+  template <class T>
+  T* ptr_offset(std::uintptr_t x, std::ptrdiff_t offset)
+  {
+    return reinterpret_cast<T*>(x + offset);
+  }
+
 } // end of namespace mln
 
 #endif //! MLN_CORE_UTILS_PTROFFSET_HPP

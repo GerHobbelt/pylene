@@ -6,6 +6,8 @@
 namespace mln
 {
 
+  /*
+
   // Specialization for ndimage | box
   // fwd decl
   template <typename, unsigned, typename>
@@ -24,10 +26,13 @@ namespace mln
   typename std::enable_if<std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, E>::type
       make_subimage(ndimage_base<T, dim, E>&&, const Domain& domain);
 
+  */
+
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
+  /*
   template <typename T, unsigned dim, typename E, typename Domain>
   inline typename std::enable_if<std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value,
                                  E>::type
@@ -59,6 +64,8 @@ namespace mln
   {
     return make_subimage(image, domain);
   }
+
+  */
 
 } // end of namespace mln
 

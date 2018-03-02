@@ -23,7 +23,7 @@ BraceWrapping:
         BeforeElse: true
 
 NamespaceIndentation: All
-FixNamespaceComments: true
+#FixNamespaceComments: true
 
 IndentWrappedFunctionNames: true
 AllowShortFunctionsOnASingleLine: Inline

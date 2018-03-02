@@ -19,21 +19,27 @@ namespace mln
   template <class Domain, class V>
   struct image_traits<constant_image<Domain, V>>
   {
-    typedef std::false_type concrete;
+    typedef std::true_type concrete;
     typedef forward_image_tag category;
     typedef std::true_type accessible;
     typedef std::true_type indexable;
     typedef mln::extension::value_extension_tag extension;
   };
 
-  namespace internal
+
+  template <class Domain, class V>
+  struct image_concrete<constant_image<Domain, V>>
   {
-    template <class Domain, class V>
-    struct image_init_from<constant_image<Domain, V>>
-    {
-      typedef Domain type;
-    };
-  }
+    // FIXME: should be a writable image, but need a mechanism: Domain -> Default Image For Domain
+    using type = constant_image<Domain, V>;
+  };
+
+  template <class Domain, class V, class U>
+  struct image_ch_value<constant_image<Domain, V>, U>
+  {
+    // FIXME: should be a writable image
+    using type = constant_image<Domain, U>;
+  };
 
   /******************************************/
   /****          Implementation          ****/
@@ -56,6 +62,7 @@ namespace mln
 
     typedef unsigned size_type;
     typedef int difference_type;
+    using index_type = int;
 
     struct const_value_iterator : iterator_base<const_value_iterator, V, V>
     {
@@ -167,18 +174,14 @@ namespace mln
       typedef std::false_type support_periodize;
     };
 
+    template <class U>
+    constant_image(const constant_image<Domain, U>& other, mln::init) : m_domain(other.domain()) {}
+
+    template <class U>
+    constant_image(const constant_image<Domain, U>& other, V value) : m_domain(other.domain()), m_value(value) {}
+
+
     constant_image(const Domain& dom, V value) : m_domain(dom), m_value(value) {}
-
-    friend internal::initializer<mln_concrete(constant_image), Domain> imconcretize(const constant_image& f)
-    {
-      return {f.m_domain};
-    }
-
-    template <typename T>
-    friend internal::initializer<mln_ch_value(constant_image, T), Domain> imchvalue(const constant_image& f)
-    {
-      return {f.m_domain};
-    }
 
     const domain_type& domain() const { return m_domain; }
 

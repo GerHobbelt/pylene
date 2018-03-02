@@ -16,7 +16,8 @@ namespace mln
   {
     using point_type = mln_point(Image);
     using site_type = mln_point(Image);
-    using size_type = typename Image::size_type;
+    using size_type [[deprecated]] = typename Image::size_type;
+    using index_type = typename Image::index_type;
     using image_type = Image;
     using reference = mln_reference(Image);
     using value_type = mln_value(Image);

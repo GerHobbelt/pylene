@@ -15,7 +15,7 @@ TEST(Core, Extension_Fill)
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  image2d<uint8> out = clone(ima);
+  auto out = clone(ima);
 
   extension::fill(ima, 42);
 

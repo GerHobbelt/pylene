@@ -85,9 +85,9 @@ double test_nbh_index(const image2d<int>& ima)
 
   auto nrows = ima.nrows();
   auto ncols = ima.ncols();
-  for (unsigned i = 0; i < nrows; ++i)
+  for (int i = 0; i < nrows; ++i)
   {
-    for (unsigned j = 0; j < ncols; ++j)
+    for (int j = 0; j < ncols; ++j)
     {
       std::size_t p = idx + j; // * ima.index_strides()[1];
       mln_foreach (auto k, w)
@@ -95,7 +95,7 @@ double test_nbh_index(const image2d<int>& ima)
         u += ima[static_cast<image2d<int>::size_type>(p + k)];
       }
     }
-    idx += static_cast<unsigned>(ima.index_strides()[0]);
+    idx += ima.stride();
   }
 
   return u;
@@ -109,15 +109,15 @@ double test_native_nbh(const image2d<int>& ima)
   auto dpoints = c8_t::dpoints;
 
   const char* ptr2 = (char*)&ima(ima.domain().pmin);
-  const size_t* strides = ima.strides();
+  std::ptrdiff_t stride = ima.byte_stride();
   const point2d pmax = ima.domain().shape();
   ptrdiff_t offsets[8];
   wrt_offset(ima, dpoints, offsets);
 
-  for (int x = 0; x < pmax[0]; ++x, ptr2 += strides[0])
+  for (int x = 0; x < pmax[0]; ++x, ptr2 += stride)
   {
     const char* ptr = ptr2;
-    for (int y = 0; y < pmax[1]; ++y, ptr += strides[1])
+    for (int y = 0; y < pmax[1]; ++y, ptr += sizeof(int))
       for (int k = 0; k < sz; ++k)
         r2 += *(const int*)(ptr + offsets[k]);
   }

@@ -85,7 +85,7 @@ namespace mln
   template <typename I>                                                                                                \
   unary_image_expr<Obj<typename I::value_type>, I> Name(I&& ima)                                                       \
   {                                                                                                                    \
-    BOOST_CONCEPT_ASSERT((Image < typename std::remove_reference<I>::type));                                           \
+    BOOST_CONCEPT_ASSERT((Image<typename std::remove_reference<I>::type>)); \
     return make_unary_image_expr(std::forward<I>(ima), Obj<typename I::reference>());                                  \
   }
 

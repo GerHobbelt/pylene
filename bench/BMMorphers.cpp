@@ -9,51 +9,44 @@ using namespace mln;
 // Threshold A la C
 unsigned threshold1(const image2d<uint8>& f, uint8 v)
 {
-  using T = uint8;
-
   int nr = f.nrows();
   int nc = f.ncols();
-  const char* ptr_in = (const char*)&f({0, 0});
+  auto lineptr = f.buffer();
   unsigned count = 0;
-  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+  auto stride = f.stride();
 
   for (int i = 0; i < nr; ++i)
   {
     for (int j = 0; j < nc; ++j)
-    {
-      count += *(const T*)ptr_in < v;
-      ptr_in = ptr_offset(ptr_in, sizeof(T));
-    }
-    ptr_in = ptr_offset(ptr_in, istride);
+      count += lineptr[j] < v;
+    lineptr += stride;
   }
   return count;
 }
 
 unsigned threshold1_bis(const image2d<uint8>& f, uint8 v)
 {
-  using T = uint8;
 
   int nr = f.nrows();
   int nc = f.ncols();
-  const char* ptr_in = (const char*)&f({0, 0});
+  const mln::uint8* lineptr = f.buffer();
+  const auto stride = f.stride();
   unsigned count = 0;
-  int istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i)
   {
     int remain = nc;
+    auto bucket_buffer = lineptr;
     while (remain > 0)
     {
       uint8 localcount = 0;
       for (int k = 0; k < std::min(remain, 256); ++k)
-      {
-        localcount += *(const T*)ptr_in < v;
-        ptr_in = ptr_offset(ptr_in, sizeof(T));
-      }
+        localcount += bucket_buffer[k] < v;
       count += localcount;
       remain -= 256;
+      bucket_buffer += 256;
     }
-    ptr_in = ptr_offset(ptr_in, istride);
+    lineptr += stride;
   }
   return count;
 }
@@ -85,24 +78,21 @@ unsigned threshold4(const image2d<uint8>& f, uint8 v)
 
 void threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
 {
-  using T = uint8;
+  const int nr = f.nrows();
+  const int nc = f.ncols();
+  const auto istride = f.stride();
+  const auto ostride = out.stride();
 
-  int nr = f.nrows();
-  int nc = f.ncols();
-  const char* ptr_in = (const char*)&f({0, 0});
-  char* ptr_out = (char*)&out({0, 0});
-  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+  const mln::uint8* i_lineptr = f.buffer();
+  bool* o_lineptr = out.buffer();
 
   for (int i = 0; i < nr; ++i)
   {
     for (int j = 0; j < nc; ++j)
-    {
-      *ptr_out = *(const T*)ptr_in < v;
-      ptr_in = ptr_offset(ptr_in, sizeof(T));
-      ptr_out = ptr_offset(ptr_out, sizeof(T));
-    }
-    ptr_in = ptr_offset(ptr_in, istride);
-    ptr_out = ptr_offset(ptr_out, istride);
+      o_lineptr[j] = i_lineptr[j] < v;
+
+    i_lineptr += istride;
+    o_lineptr += ostride;
   }
 }
 

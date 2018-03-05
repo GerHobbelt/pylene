@@ -42,7 +42,7 @@ void erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
 
-  int stride = static_cast<int>(f.strides()[0]);
+  auto stride = f.stride();
   int nr = f.nrows();
   int nc = f.ncols();
 
@@ -71,7 +71,7 @@ void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<ml
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
 
-  int stride = static_cast<int>(f.strides()[0]);
+  auto stride = f.stride();
   int nr = f.nrows();
   int nc = f.ncols();
 

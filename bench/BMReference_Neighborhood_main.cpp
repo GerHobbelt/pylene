@@ -33,10 +33,10 @@ class Bench_Ref_Neighborhood : public benchmark::Fixture
   }
 
 protected:
-  void Do_0(benchmark::State& st, void (*func)(mln::image2d<mln::uint8>& ))
+  void Do_0(benchmark::State& st, void (*func)(mln::image2d<mln::uint8>& , mln::image2d<mln::uint8>& ))
   {
     while (st.KeepRunning())
-      func(ima);
+      func(ima, out_ima);
 
     st.SetBytesProcessed(st.iterations() * ima.domain().size() * sizeof(int));
   }
@@ -52,6 +52,7 @@ protected:
 private:
   int info[3];
   mln::image2d<mln::uint8> ima;
+  mln::image2d<mln::uint8> out_ima;
 };
 
 BENCHMARK_F(Bench_Ref_Neighborhood, Sum_C)(benchmark::State& st)

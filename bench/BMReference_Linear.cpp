@@ -1,5 +1,7 @@
 #include <mln/core/image/image2d.hpp>
 
+#include <vector>
+
 void Mult_Inplace_Pylene(mln::image2d<mln::uint8>& img)
 {
   mln_foreach(auto p, img.pixels())
@@ -23,9 +25,6 @@ void Mult_Inplace_C(std::ptrdiff_t*  info, mln::uint8* buffer)
   }
 }
 
-<<<<<<< ef6117d369703325e7ce38e2554a9833e8708920
-void Threshold_Pylene(mln::image2d<mln::uint8>& img)
-=======
 void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
@@ -53,7 +52,6 @@ void Mult_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new)
 }
 
 void Threshold_Inplace_Pylene(mln::image2d<mln::uint8>& img)
->>>>>>> Correct C benchmark reference optimization
 {
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
@@ -70,11 +68,7 @@ void Threshold_Inplace_Pylene(mln::image2d<mln::uint8>& img)
   }
 }
 
-<<<<<<< ef6117d369703325e7ce38e2554a9833e8708920
-void Threshold_C(mln::image2d<mln::uint8>& img)
-=======
 void Threshold_Inplace_C(std::ptrdiff_t* info, mln::uint8* buffer)
->>>>>>> Correct C benchmark reference optimization
 {
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
@@ -96,8 +90,6 @@ void Threshold_Inplace_C(std::ptrdiff_t* info, mln::uint8* buffer)
     }
     buffer += stride;
   }
-<<<<<<< ef6117d369703325e7ce38e2554a9833e8708920
-=======
 }
 
 void Threshold_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
@@ -192,5 +184,4 @@ void LUT_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new, mln
     buffer += stride;
     buffer_new += stride;
   }
->>>>>>> Correct C benchmark reference optimization
 }

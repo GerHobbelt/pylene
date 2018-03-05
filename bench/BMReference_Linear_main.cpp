@@ -4,6 +4,8 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/io/imread.hpp>
 
+#include <vector>
+
 void Mult_Inplace_C(std::ptrdiff_t* info, mln::uint8* buffer);
 void Mult_Inplace_Pylene(mln::image2d<mln::uint8>& img);
 void Mult_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new);
@@ -103,6 +105,8 @@ protected:
 private:
   std::ptrdiff_t info[3];
   mln::image2d<mln::uint8> ima;
+  mln::image2d<mln::uint8> out_ima;
+  std::vector<mln::uint8> LUT;
 };
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C)(benchmark::State& st)

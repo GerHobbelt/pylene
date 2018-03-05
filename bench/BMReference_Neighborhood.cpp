@@ -122,3 +122,44 @@ void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
     buffer_new += stride;
   } 
 }
+
+void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_iter(n, mln::c4(pxIn));
+
+  mln_forall(pxIn, pxOut)
+  {
+    int tmp = 0;
+    mln_forall(n)
+    {
+      tmp += n->val();
+    }
+    pxOut->val() = pxIn->val() + 0.125 * (tmp - 4 * pxIn->val());
+  }
+}
+
+void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
+{
+  int nrow = info[0];
+  int ncol = info[1];
+  std::ptrdiff_t stride = info[2];
+
+  for (int i = 0; i < nrow; i++)
+  {
+    for (int j = 0; j < ncol; j++)
+    {
+      int tmp = 0;
+      for (int k = -1; k <= 1; k++)
+        for (int l = -1; l <= 1; l++)
+        {
+          if (!(j && k))
+            tmp += buffer[j + k * stride + l];
+        }
+      buffer_new[j] = buffer[j] + 0.125 * (tmp - 4 * buffer[j]);
+    }
+    buffer += stride;
+    buffer_new += stride;
+  } 
+}

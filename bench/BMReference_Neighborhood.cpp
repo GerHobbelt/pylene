@@ -12,7 +12,7 @@ void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img
 
   mln_forall(pxIn, pxOut)
   {
-    unsigned int tmp = 0;
+    int tmp = 0;
     mln_forall(n)
     {
       tmp += n->val();
@@ -26,16 +26,25 @@ void Sum_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   int nrow = info[0];
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
+
+  std::array<std::ptrdiff_t, 8> offset;
+  offset[0] = -stride -1;
+  offset[1] = -stride;
+  offset[2] = -stride + 1;
+  offset[3] = -1;
+  offset[4] = 1;
+  offset[5] = stride -1;
+  offset[6] = stride;
+  offset[7] = stride + 1;
+
   for (int i = 0; i < nrow; i++)
   {
     for (int j = 0; j < ncol; j++)
     {
-      for (int k = -1; k <= 1; k++)
-        for (int l = -1; l <= 1; l++)
-        {
-          if (l || k)
-            buffer_new[j] += buffer[j + k * stride + l];
-        }
+      for (int k = 0; k <= 7; k++)
+      {
+        buffer_new[j] += buffer[j + offset[k]];
+      }
     }
     buffer += stride;
     buffer_new += stride;
@@ -64,16 +73,25 @@ void Average_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   int nrow = info[0];
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
+
+  std::array<std::ptrdiff_t, 8> offset;
+  offset[0] = -stride -1;
+  offset[1] = -stride;
+  offset[2] = -stride + 1;
+  offset[3] = -1;
+  offset[4] = 1;
+  offset[5] = stride -1;
+  offset[6] = stride;
+  offset[7] = stride +1;
+
   for (int i = 0; i < nrow; i++)
   {
     for (int j = 0; j < ncol; j++)
     {
-      for (int k = -1; k <= 1; k++)
-        for (int l = -1; l <= 1; l++)
-        {
-          if (k || l)
-            buffer_new[j] += buffer[j + k * stride + l];
-        }
+      for (int k = 0; k <= 7; k++)
+      {
+        buffer_new[j] += buffer[j + offset[k]];
+      }
       buffer_new[j] /= 8;
     }
     buffer += stride;
@@ -107,17 +125,26 @@ void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
 
+  std::array<std::ptrdiff_t, 8> offset;
+  offset[0] = -stride -1;
+  offset[1] = -stride;
+  offset[2] = -stride + 1;
+  offset[3] = -1;
+  offset[4] = 1;
+  offset[5] = stride -1;
+  offset[6] = stride;
+  offset[7] = stride +1;
+
   for (int i = 0; i < nrow; i++)
   {
     for (int j = 0; j < ncol; j++)
     {
       mln::uint8 mini = ~0;
-      for (int k = -1; k <= 1; k++)
-        for (int l = -1; l <= 1; l++)
-        {
-          if (mini > buffer[j + k * stride + l])
-            mini = buffer[j + k * stride + l];
-        }
+      for (int k = 0; k <= 7; k++)
+      {
+        if (mini > buffer[j + offset[k]])
+          mini = buffer[j + offset[k]];
+      }
       buffer_new[j] = mini;
     }
     buffer += stride;
@@ -138,7 +165,7 @@ void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln:
     {
       tmp += n->val();
     }
-    pxOut->val() = pxIn->val() + 0.125 * (tmp - 4 * pxIn->val());
+    pxOut->val() = pxIn->val() + (tmp - 4 * pxIn->val()) / 8;
   }
 }
 
@@ -148,18 +175,20 @@ void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
 
+  std::array<std::ptrdiff_t, 4> offset;
+  offset[0] = -1 * stride;
+  offset[1] = -1;
+  offset[2] = 1;
+  offset[3] = 1 * stride;
+
   for (int i = 0; i < nrow; i++)
   {
     for (int j = 0; j < ncol; j++)
     {
       int tmp = 0;
-      for (int k = -1; k <= 1; k++)
-        for (int l = -1; l <= 1; l++)
-        {
-          if (!(j && k))
-            tmp += buffer[j + k * stride + l];
-        }
-      buffer_new[j] = buffer[j] + 0.125 * (tmp - 4 * buffer[j]);
+      for (int k = 0; k <= 3; k++)
+        tmp += buffer[j + offset[k]];
+      buffer_new[j] = buffer[j] + (tmp - 4 * buffer[j]) / 8;
     }
     buffer += stride;
     buffer_new += stride;
@@ -169,9 +198,10 @@ void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new
 // Here Quadratic flux function is used for anisotropic diffusion
 // The constant 0.35 (K) determines the edge-strenght to consider
 // as a valid region boundary, it is a free parameter.
-constexpr double Flux_Function(double gradient)
+constexpr float Flux_Function(float gradient)
 {
-  return 1.0 / (1.0 + pow(gradient / 0.35, 2));
+  float tmp = gradient / 0.35f;
+  return 1.0f / (1.0f + tmp * tmp);
 }
 
 void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
@@ -182,13 +212,14 @@ void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<ml
 
   mln_forall(pxIn, pxOut)
   {
-    double tmp = 0;
+    float tmp = 0;
+    mln::uint8 cached_val = pxIn->val();
     mln_forall(n)
     {
-      double gradient = n->val() - pxIn->val();
+      float gradient = n->val() - cached_val;
       tmp += gradient * Flux_Function(gradient);
     }
-    pxOut->val() = pxIn->val() + 0.125 * tmp;
+    pxOut->val() = cached_val + 0.125 * tmp;
   }
 }
 
@@ -198,21 +229,24 @@ void Anisotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_n
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
 
+  std::array<std::ptrdiff_t, 4> offset;
+  offset[0] = -1 * stride;
+  offset[1] = -1;
+  offset[2] = 1;
+  offset[3] = 1 * stride;
+
   for (int i = 0; i < nrow; i++)
   {
     for (int j = 0; j < ncol; j++)
     {
-      int tmp = 0;
-      for (int k = -1; k <= 1; k++)
-        for (int l = -1; l <= 1; l++)
-        {
-          if (!(j && k))
-          {
-            double gradient = buffer[j + l + k * stride] - buffer[j];
-            tmp += gradient * Flux_Function(gradient);
-          }
-        }
-      buffer_new[j] = buffer[j] + 0.125 * tmp;
+      float tmp = 0;
+      mln::uint8 cached_val = buffer[j];
+      for (int k = 0; k <= 3; k++)
+      {
+        float gradient = buffer[j + offset[k]] - cached_val;
+        tmp += gradient * Flux_Function(gradient);
+      }
+      buffer_new[j] = cached_val + 0.125f * tmp;
     }
     buffer += stride;
     buffer_new += stride;

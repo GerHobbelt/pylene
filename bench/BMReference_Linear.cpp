@@ -145,7 +145,7 @@ void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& 
   }
 }
 
-void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* LUT)
+void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uint8* __restrict LUT)
 {
   const int nrow = info[0];
   const int ncol = info[1];
@@ -170,7 +170,7 @@ void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img
   }
 }
 
-void LUT_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new, mln::uint8* LUT)
+void LUT_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uint8* __restrict buffer_new, mln::uint8* LUT)
 {
   int nrow = info[0];
   int ncol = info[1];

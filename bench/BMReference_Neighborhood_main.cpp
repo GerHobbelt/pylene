@@ -12,6 +12,8 @@ void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Erosion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Anisotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
+void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 
 class Bench_Ref_Neighborhood : public benchmark::Fixture
 {
@@ -93,6 +95,16 @@ BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_Pylene)(benchmark::State& st)
 {
   Do_0(st, Isotropic_Diffusion_Pylene);
+}
+
+BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_C)(benchmark::State& st)
+{
+  Do_1(st,Anisotropic_Diffusion_C);
+}
+
+BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_Pylene)(benchmark::State& st)
+{
+  Do_0(st,Anisotropic_Diffusion_Pylene);
 }
 
 BENCHMARK_MAIN();

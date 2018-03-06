@@ -2,6 +2,8 @@
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/neighb2d.hpp>
 
+#include <cmath>
+
 void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
@@ -162,4 +164,57 @@ void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new
     buffer += stride;
     buffer_new += stride;
   } 
+}
+
+// Here Quadratic flux function is used for anisotropic diffusion
+// The constant 0.35 (K) determines the edge-strenght to consider
+// as a valid region boundary, it is a free parameter.
+constexpr double Flux_Function(double gradient)
+{
+  return 1.0 / (1.0 + pow(gradient / 0.35, 2));
+}
+
+void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  mln_pixter(pxIn, img);
+  mln_pixter(pxOut, new_img);
+  mln_iter(n, mln::c4(pxIn));
+
+  mln_forall(pxIn, pxOut)
+  {
+    double tmp = 0;
+    mln_forall(n)
+    {
+      double gradient = n->val() - pxIn->val();
+      tmp += gradient * Flux_Function(gradient);
+    }
+    pxOut->val() = pxIn->val() + 0.125 * tmp;
+  }
+}
+
+void Anisotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
+{
+  int nrow = info[0];
+  int ncol = info[1];
+  std::ptrdiff_t stride = info[2];
+
+  for (int i = 0; i < nrow; i++)
+  {
+    for (int j = 0; j < ncol; j++)
+    {
+      int tmp = 0;
+      for (int k = -1; k <= 1; k++)
+        for (int l = -1; l <= 1; l++)
+        {
+          if (!(j && k))
+          {
+            double gradient = buffer[j + l + k * stride] - buffer[j];
+            tmp += gradient * Flux_Function(gradient);
+          }
+        }
+      buffer_new[j] = buffer[j] + 0.125 * tmp;
+    }
+    buffer += stride;
+    buffer_new += stride;
+  }
 }

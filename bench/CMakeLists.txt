@@ -10,7 +10,7 @@ endif()
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
+  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info -fcoroutines-ts -std=c++17 -stdlib=libc++ -g")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(STANDALONE_COMPILE_FLAGS "-fopt-info")
@@ -32,8 +32,12 @@ set(src_standalone
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-link_libraries(benchmark::benchmark)
+link_libraries(/home/virgile/myusr2/lib/libbenchmark.a)
 #link_libraries(-lbenchmark)
+link_libraries(-lc++abi)
+
+link_libraries(-lstdc++)
+include_directories(range/include)
 
 add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
 add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)
@@ -44,7 +48,6 @@ add_executable(BMReference_Linear BMReference_Linear_main.cpp BMReference_Linear
 add_executable(BMReference_Neighborhood BMReference_Neighborhood_main.cpp BMReference_Neighborhood.cpp)
 target_link_libraries(BMReference_Neighborhood ${FreeImage_LIBRARIES})
 target_link_libraries(BMReference_Linear ${FreeImage_LIBRARIES})
-target_link_libraries(BMReference ${FreeImage_LIBRARIES})
 target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
 target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
 target_link_libraries(BMErosion ${FreeImage_LIBRARIES})

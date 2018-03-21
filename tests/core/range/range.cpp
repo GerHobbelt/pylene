@@ -12,7 +12,7 @@ TEST(Core, stdrange_compatibility)
 
   std::array<int, 4> x = {{2, 5, 15, 22}};
 
-  ASSERT_EQ(rng::size(x), 4);
+  ASSERT_EQ(rng::size(x), 4u);
 
   {
     int i = 0;

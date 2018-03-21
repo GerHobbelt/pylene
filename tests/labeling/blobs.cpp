@@ -19,7 +19,7 @@ TEST(Labeling, blobs_fast)
   image2d<uint8> lbl;
   unsigned nlabel;
   std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8());
-  ASSERT_EQ(nlabel, 13);
+  ASSERT_EQ(nlabel, 13u);
 }
 
 TEST(Labeling, blobs_custom)
@@ -33,8 +33,8 @@ TEST(Labeling, blobs_custom)
   unsigned nlabel;
 
   std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c4, uint8());
-  ASSERT_EQ(nlabel, 13);
+  ASSERT_EQ(nlabel, 13u);
 
   std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c8, uint8());
-  ASSERT_EQ(nlabel, 1);
+  ASSERT_EQ(nlabel, 1u);
 }

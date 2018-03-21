@@ -15,7 +15,7 @@ TEST(Value, Integers)
   Int<14> z = 12;
   y += z;
   ++y;
-  ASSERT_EQ(y, 31);
+  ASSERT_EQ(y, 31u);
 
   Int<7> zz = x + z;
   ASSERT_EQ(zz, 25);

@@ -13,23 +13,23 @@ TEST(Accu, Mean)
   acc.take(5);
   acc.take(15);
 
-  ASSERT_EQ(extractor::sum(acc), 20);
-  ASSERT_EQ(extractor::count(acc), 2);
-  ASSERT_EQ(extractor::mean(acc), 10);
+  ASSERT_EQ(extractor::sum(acc), 20u);
+  ASSERT_EQ(extractor::count(acc), 2u);
+  ASSERT_EQ(extractor::mean(acc), 10u);
 
   acc.untake(10);
 
-  ASSERT_EQ(extractor::sum(acc), 10);
-  ASSERT_EQ(extractor::count(acc), 1);
-  ASSERT_EQ(extractor::mean(acc), 10);
+  ASSERT_EQ(extractor::sum(acc), 10u);
+  ASSERT_EQ(extractor::count(acc), 1u);
+  ASSERT_EQ(extractor::mean(acc), 10u);
 
   acc2.take(20);
   acc2.take(40);
   acc2.take(acc);
 
-  ASSERT_EQ(extractor::sum(acc2), 70);
-  ASSERT_EQ(extractor::count(acc2), 3);
-  ASSERT_EQ(extractor::mean(acc2), 23);
+  ASSERT_EQ(extractor::sum(acc2), 70u);
+  ASSERT_EQ(extractor::count(acc2), 3u);
+  ASSERT_EQ(extractor::mean(acc2), 23u);
 }
 
 TEST(Accu, Mean_vec)
@@ -44,12 +44,12 @@ TEST(Accu, Mean_vec)
   acc.take(rgb8{(uint8)255, (uint8)5, (uint8)255});
 
   ASSERT_EQ(extractor::sum(acc), (rgb<int>{260, 10, 510}));
-  ASSERT_EQ(extractor::count(acc), 2);
+  ASSERT_EQ(extractor::count(acc), 2u);
   ASSERT_EQ(extractor::mean(acc), (rgb8{(uint8)130, (uint8)5, (uint8)255}));
 
   acc.untake(rgb8{(uint8)10, (uint8)10, (uint8)10});
 
   ASSERT_EQ(extractor::sum(acc), (rgb<int>{250, 0, 500}));
-  ASSERT_EQ(extractor::count(acc), 1);
+  ASSERT_EQ(extractor::count(acc), 1u);
   ASSERT_EQ(extractor::mean(acc), (rgb<int>{250, 0, 500}));
 }

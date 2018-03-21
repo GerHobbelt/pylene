@@ -89,7 +89,7 @@ TEST(Morpho, property_image_nbh)
         unsigned j = 0;
         mln_forall (nx)
         {
-          ASSERT_EQ(nx->val(), voisins[i][j]);
+          ASSERT_EQ(static_cast<unsigned>(nx->val()), voisins[i][j]);
           ASSERT_EQ(nx->point().id(), voisins[i][j]);
           ++j;
         }
@@ -106,7 +106,7 @@ TEST(Morpho, property_image_nbh)
         unsigned j = 0;
         mln_forall (n)
         {
-          ASSERT_EQ(ima(*n), voisins[i][j]);
+          ASSERT_EQ(static_cast<unsigned>(ima(*n)), voisins[i][j]);
           ASSERT_TRUE(n->id() == voisins[i][j]);
           ++j;
         }

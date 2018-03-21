@@ -44,9 +44,8 @@ endif ()
 
 
 link_libraries(benchmark::benchmark)
-include_directories(~/dev/range-v3/include)
-
-
+link_libraries(Mln)
+#link_libraries(-lbenchmark)
 
 add_library(BMTest test_coro.cpp)
 add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)

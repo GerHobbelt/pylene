@@ -12,9 +12,23 @@ find_package(Qt4)
 # CONFIGURATION OPTIONS
 set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
+# Proper project creation
+set(MLN_INCLUDE_DIR "${PROJECT_SOURCE_DIR}")
+if(MSVC OR APPLE)
+  #dummy static project not linked anywere needed so that a vcxproj is generated with the sources in the solution
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  file(GLOB_RECURSE MLN_SOURCES  "${MLN_INCLUDE_DIR}/*.hpp")
+  add_library(Mln_srcs STATIC ${MLN_SOURCES})
+  set_target_properties(Mln_srcs PROPERTIES LINKER_LANGUAGE CXX)
+  target_compile_features(Mln_srcs PUBLIC cxx_std_14)
+  target_include_directories(Mln_srcs PUBLIC ${MLN_INCLUDE_DIR})
+  source_group(TREE ${MLN_INCLUDE_DIR} FILES ${MLN_SOURCES})
+endif()
 
-# add source directory to find mln path
-include_directories("${PROJECT_SOURCE_DIR}")
+add_library(Mln INTERFACE)
+target_compile_features(Mln INTERFACE cxx_std_14)
+target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
+
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${FreeImage_INCLUDE_DIRS})
 link_directories(${FreeImage_LIBRARY_DIR})
@@ -38,7 +52,7 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++17 -Werror")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 elseif (MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX " )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /W4 /wd4244 /wd4127 /permissive- /std:c++14" )
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 endif()
 

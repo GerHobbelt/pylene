@@ -774,7 +774,7 @@ namespace mln
         q.rem += static_cast<int>(m_index_strides[i]);
         q.quot -= 1;
       }
-      p[i] += q.quot;
+      p[i] += static_cast<short>(q.quot);
       diff = q.rem;
     }
 

@@ -114,12 +114,12 @@ namespace mln
     {
       BOOST_CONCEPT_USAGE(check_border)
       {
-        mln_value(J) val;
         J g(m_ima, mln::init());
         J h(m_ima, m_ima.border());
-        J i(m_ima, m_ima.border(), val);
+        J i(m_ima, m_ima.border(), m_value);
       }
       J m_ima;
+      mln_value(J) m_value;
     };
 
     template <class J>
@@ -127,11 +127,11 @@ namespace mln
     {
       BOOST_CONCEPT_USAGE(check_border)
       {
-        mln_value(J) val;
         J g(m_ima, mln::init());
-        J h(m_ima, val);
+        J h(m_ima, m_value);
       }
       J m_ima;
+      mln_value(J) m_value;
     };
 
     template <class J>
@@ -207,15 +207,19 @@ namespace mln
       using const_reference = typename I::const_reference;
 
 
-      index_type idx;
-      P p;
+      index_type idx {};
+      P p {};
 
       reference       val0 = f[idx];
       const_reference val1 = cf[idx];
 
       p = cf.point_at_index(idx);
       idx = cf.index_of_point(p);
-      idx = cf.delta_index(p);
+
+      // Delta_index is too specific e.g. image formed by array of values
+      // Rethink-about that
+
+      // idx = cf.delta_index(p);
       (void) val0;
       (void) val1;
     }

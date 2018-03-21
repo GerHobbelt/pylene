@@ -63,10 +63,10 @@ namespace mln
         std::ios state(NULL);
         state.copyfmt(os);
 
-        int wtext = 0;
-        frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
+        int wtext = 5;
+        // frmt_max_width<V> frmter;
+        // mln_foreach (V v, ima.values())
+        //   wtext = std::max(wtext, frmter(v));
 
         os << domain << "(" << typeid(V).name() << ")" << std::endl;
         os.width(4);

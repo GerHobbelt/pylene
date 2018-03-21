@@ -84,7 +84,7 @@ namespace mln
       typedef decltype(std::bind(&box2d::has, (const box2d*)NULL, std::placeholders::_1)) domain_has_p_t;
 
     public:
-      typedef strided_box<short, 2> vertices_range;
+      typedef sbox2d vertices_range;
       typedef iterator_range<edges_iterator> edges_range;
       typedef mln::filtered_range<nbh_range, domain_has_p_t> adjacency_vertex_range;
       typedef adjacency_vertex_range adjacency_edge_range;
@@ -487,7 +487,7 @@ namespace mln
     inline typename undirected_graph_image2d<Vtype, Etype, Nbh>::vertices_range
         undirected_graph_image2d<Vtype, Etype, Nbh>::vertices() const
     {
-      return strided_box<short, 2>(m_domain.pmin, m_domain.pmax, point2d{2, 2});
+      return sbox2d(m_domain.pmin, m_domain.pmax, point2d{2, 2});
     }
 
     template <typename Vtype, typename Etype, typename Nbh>

@@ -56,7 +56,7 @@ namespace mln
           }
         };
 
-        struct vertices_iterator : iterator_base<vertices_iterator, point2d, const point2d&>
+        struct vertices_iterator : iterator_base<vertices_iterator, point2d, point2d>
         {
           vertices_iterator(const sbox2d& domain, const point2d& psrc, const point2d& psink)
               : m_src(psrc), m_sink(psink), m_domain_it(domain.iter())
@@ -86,7 +86,7 @@ namespace mln
 
           bool finished() const { return m_status > 2; }
 
-          const point2d& dereference() const
+          point2d dereference() const
           {
             mln_precondition(not finished());
             switch (m_status)

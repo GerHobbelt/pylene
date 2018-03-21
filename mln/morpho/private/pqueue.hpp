@@ -15,7 +15,7 @@ namespace mln
       class pqueue_fifo
       {
         using key_type = mln_value(I);
-        using value_type = mln_point(I);
+        using value_type = typename I::small_point_type;
 
       public:
         template <class J>
@@ -64,7 +64,7 @@ namespace mln
 
 
       template <class I>
-      std::pair<mln_value(I), mln_point(I)> pqueue_fifo<I>::top() const
+      std::pair<mln_value(I), typename I::small_point_type> pqueue_fifo<I>::top() const
       {
         return m_delegate.top();
       }

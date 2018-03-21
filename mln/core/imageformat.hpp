@@ -8,7 +8,7 @@
 namespace mln
 {
 
-  enum class sample_t
+  enum class sample_type_id_t
   {
     BIT,
     INT8,
@@ -35,38 +35,37 @@ namespace mln
 
 
   template <class T>
-  struct sample_type_of : std::integral_constant<sample_t, sample_t::OTHER> {};
+  struct sample_type_id_of : std::integral_constant<sample_type_id_t, sample_type_id_t::OTHER> {};
 
   template <>
-  struct sample_type_of<mln::int8> : std::integral_constant<sample_t, sample_t::INT8> {};
+  struct sample_type_id_of<mln::int8> : std::integral_constant<sample_type_id_t, sample_type_id_t::INT8> {};
 
   template <>
-  struct sample_type_of<mln::uint8> : std::integral_constant<sample_t, sample_t::UINT8> {};
+  struct sample_type_id_of<mln::uint8> : std::integral_constant<sample_type_id_t, sample_type_id_t::UINT8> {};
 
   template <>
-  struct sample_type_of<mln::int16> : std::integral_constant<sample_t, sample_t::INT16> {};
+  struct sample_type_id_of<mln::int16> : std::integral_constant<sample_type_id_t, sample_type_id_t::INT16> {};
 
   template <>
-  struct sample_type_of<mln::uint16> : std::integral_constant<sample_t, sample_t::UINT16> {};
+  struct sample_type_id_of<mln::uint16> : std::integral_constant<sample_type_id_t, sample_type_id_t::UINT16> {};
 
   template <>
-  struct sample_type_of<mln::int32> : std::integral_constant<sample_t, sample_t::INT32> {};
+  struct sample_type_id_of<mln::int32> : std::integral_constant<sample_type_id_t, sample_type_id_t::INT32> {};
 
   template <>
-  struct sample_type_of<mln::uint32> : std::integral_constant<sample_t, sample_t::UINT32> {};
+  struct sample_type_id_of<mln::uint32> : std::integral_constant<sample_type_id_t, sample_type_id_t::UINT32> {};
 
   template <>
-  struct sample_type_of<mln::int64> : std::integral_constant<sample_t, sample_t::INT64> {};
+  struct sample_type_id_of<mln::int64> : std::integral_constant<sample_type_id_t, sample_type_id_t::INT64> {};
 
   template <>
-  struct sample_type_of<mln::uint64> : std::integral_constant<sample_t, sample_t::UINT64> {};
+  struct sample_type_id_of<mln::uint64> : std::integral_constant<sample_type_id_t, sample_type_id_t::UINT64> {};
 
   template <>
-  struct sample_type_of<float> : std::integral_constant<sample_t, sample_t::FLOAT> {};
+  struct sample_type_id_of<float> : std::integral_constant<sample_type_id_t, sample_type_id_t::FLOAT> {};
 
   template <>
-  struct sample_type_of<double> : std::integral_constant<sample_t, sample_t::DOUBLE> {};
-
+  struct sample_type_id_of<double> : std::integral_constant<sample_type_id_t, sample_type_id_t::DOUBLE> {};
 
 } // end of namespace mln
 

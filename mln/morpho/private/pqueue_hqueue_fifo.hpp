@@ -12,7 +12,7 @@ namespace mln
       class pqueue_hqueue_fifo
       {
         using key_type = mln_value(I);
-        using value_type = mln_point(I);
+        using value_type = typename I::small_point_type;
 
       public:
         template <class J>
@@ -109,7 +109,7 @@ namespace mln
       }
 
       template <class I>
-      std::pair<mln_value(I), mln_point(I)>
+      std::pair<mln_value(I), typename I::small_point_type>
       pqueue_hqueue_fifo<I>::top() const
       {
         mln_precondition(m_queues[m_current_level].size > 0);

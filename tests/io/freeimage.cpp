@@ -12,6 +12,7 @@
 #endif
 
 #include <gtest/gtest.h>
+#include <tests/helpers.hpp>
 
 TEST(IO, FreeImage_pgm)
 {
@@ -22,10 +23,10 @@ TEST(IO, FreeImage_pgm)
 
   iota(ref, 1);
   io::imread(MLN_IMG_PATH "/iota2d.pgm", ima);
-  ASSERT_TRUE(equal(ima, ref));
+  ASSERT_IMAGES_EQ(ref, ima);
   io::imsave(ref, "test.tiff");
   io::imread("test.tiff", ima);
-  ASSERT_TRUE(equal(ima, ref));
+  ASSERT_IMAGES_EQ(ref, ima);
 }
 
 TEST(IO, FreeImage_ppm)
@@ -35,17 +36,18 @@ TEST(IO, FreeImage_ppm)
   image2d<rgb8> ima;
   image2d<rgb8> ref(5, 5);
 
-  mln_foreach (const image2d<rgb8>::pixel_type& pix, ref.pixels())
+  mln_foreach (auto pix, ref.pixels())
   {
     pix.val()[0] = uint8(pix.point()[0]);
     pix.val()[1] = uint8(pix.point()[1]);
+    pix.val()[2] = 0;
   }
 
   io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);
-  ASSERT_TRUE(equal(ima, ref));
+  ASSERT_IMAGES_EQ(ref, ima);
   io::imsave(ima, "test.tiff");
   io::imread("test.tiff", ima);
-  ASSERT_TRUE(equal(ima, ref));
+  ASSERT_IMAGES_EQ(ref, ima);
 }
 
 TEST(IO, FreeImage_pbm)
@@ -72,13 +74,13 @@ TEST(IO, FreeImage_slow_pgm)
 
   iota(ref, 1);
   io::imread(MLN_IMG_PATH "/iota2d.pgm", ima);
-  ASSERT_TRUE(equal(ima, ref));
+  ASSERT_IMAGES_EQ(ref, ima);
 
   auto tmp = 2u * ref;
   io::imsave(imcast<uint32>(tmp), "test.tiff");
   image2d<unsigned> ima2;
   io::imread("test.tiff", ima2);
-  ASSERT_TRUE(equal(ima2, tmp));
+  ASSERT_IMAGES_EQ(tmp, ima2);
 }
 
 TEST(IO, FreeImage_slow_ppm)
@@ -92,6 +94,7 @@ TEST(IO, FreeImage_slow_ppm)
   {
     pix.val()[0] = uint8(pix.point()[0]);
     pix.val()[1] = uint8(pix.point()[1]);
+    pix.val()[2] = 0;
   }
 
   io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);

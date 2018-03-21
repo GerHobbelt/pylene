@@ -22,18 +22,18 @@ namespace mln
     {
 
       template <typename I, typename Neighborhood, typename StrictWeakOrdering>
-      component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+      component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
       maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
       {
-        typedef typename I::size_type size_type;
         typedef mln_value(I) V;
+        using P = typename I::index_type;
 
         // 1. Create the component tree
         // Allocate enough memory to prevent reallocation
         // {
         typedef mln_ch_value(I, unsigned) map_t;
         typedef morpho::internal::component_tree_node node_t;
-        typedef component_tree<size_type, map_t> tree_t;
+        typedef component_tree<P, map_t> tree_t;
 
         tree_t ctree;
 
@@ -41,34 +41,37 @@ namespace mln
         auto& S = ctree._get_data()->m_S;
         auto& pmap = ctree._get_data()->m_pmap;
 
-        size_type sz = ima.domain().size();
+        unsigned sz = ima.domain().size();
 
         nodes.resize(sz + 1);             // grow from the back
         S.resize(sz);                     //
-        pmap = imchvalue<size_type>(ima); //
+        pmap = imchvalue<unsigned>(ima);  //
 
-        size_type spos = sz;
+        unsigned spos = sz;
         // }
 
         // 1.b some methods to handle the nodes array like a stack
         // {
-        size_type stack_top_position = 0;
-        size_type npos = 1; // The current nodes vector size
+        unsigned stack_top_position = 0;
+        unsigned npos = 1; // The current nodes vector size
+        std::vector<V> node_levels;
 
         auto stack_empty = [&stack_top_position]() { return stack_top_position == 0; };
-        auto stack_top = [&nodes, &stack_top_position]() -> node_t& {
-          mln_precondition(stack_top_position != 0);
-          return nodes[stack_top_position];
-        };
-        auto stack_push = [&nodes, &stack_top_position, &npos](const node_t& x) {
+        auto stack_push = [&nodes, &node_levels, &stack_top_position, &npos](V level, const node_t& x) {
           mln_assertion(stack_top_position < npos);
+          node_levels.push_back(level);
           nodes[npos] = x;
           nodes[npos].m_parent = stack_top_position;
           stack_top_position = npos++;
         };
-        auto stack_pop = [&nodes, &stack_top_position]() {
+        auto stack_pop = [&nodes, &node_levels, &stack_top_position]() {
           mln_precondition(stack_top_position != 0);
           stack_top_position = nodes[stack_top_position].m_parent;
+          node_levels.pop_back();
+        };
+
+        auto stack_top_level = [&node_levels] () {
+          return node_levels.back();
         };
 
         // }
@@ -83,9 +86,9 @@ namespace mln
 
         // 3. Initialization
         {
-          size_type pmin = ima.index_of_point(ima.domain().pmin);
+          P pmin = ima.index_of_point(ima.domain().pmin);
           pqueue.push(pmin);
-          stack_push(node_t{0, 0, 0, npos, pmin});
+          stack_push(ima[pmin], node_t{0, 0, 0, npos, 0});
           deja_vu[pmin] = true;
         }
 
@@ -99,8 +102,8 @@ namespace mln
         while (!pqueue.empty())
         {
         flood:
-          size_type p = pqueue.top();
-          // size_type repr = stack.top();
+          P p = pqueue.top();
+          // index_type repr = stack.top();
           // mln_assertion(not cmp(ima[p], ima[repr]) and not cmp(ima[repr], ima[p]));
 
           V clevel = ima[p];
@@ -114,9 +117,10 @@ namespace mln
             {
               pqueue.push(q);
               deja_vu[q] = true;
+              auto lvl = ima[q];
               if (cmp(clevel, ima[q]))
               {
-                stack_push(node_t{0, 0, 0, npos, q});
+                stack_push(lvl, node_t{0, 0, 0, npos, 0});
                 goto flood;
               }
             }
@@ -137,15 +141,17 @@ namespace mln
 
           if (cmp(ima[pqueue.top()], clevel))
           {
-            size_type next = pqueue.top();
-            size_type current = stack_top_position;
+            const P next = pqueue.top();
+            const auto next_level = ima[next];
 
+            unsigned current = stack_top_position;
             stack_pop();
             nodes[current].m_point_index = spos;
 
-            while (!stack_empty() and cmp(ima[next], ima[stack_top().m_point_index]))
+
+            while (!stack_empty() and cmp(next_level, stack_top_level()))
             {
-              size_type q = stack_top_position;
+              unsigned q = stack_top_position;
               nodes[current].m_parent = q; // no-op
               nodes[current].m_prev = nodes[q].m_next_sibling;
               nodes[nodes[q].m_next_sibling].m_next = current;
@@ -154,17 +160,19 @@ namespace mln
               current = stack_top_position;
               stack_pop();
             }
-            if (stack_empty() or cmp(ima[stack_top().m_point_index], ima[next]))
-              stack_push(node_t{0, 0, 0, npos, next});
 
-            size_type q = stack_top_position;
+            if (stack_empty() or cmp(stack_top_level(), next_level))
+              stack_push(next_level, node_t{0, 0, 0, npos, 0});
+
+            unsigned q = stack_top_position;
             nodes[current].m_parent = q; // no-op
             nodes[current].m_prev = nodes[q].m_next_sibling;
             nodes[nodes[q].m_next_sibling].m_next = current;
             nodes[q].m_next_sibling = nodes[current].m_next_sibling;
           }
         }
-        mln_assertion(stack_top().m_parent == 0);
+        mln_assertion(nodes[stack_top_position].m_parent == 0);
+
         // Handle the root
         nodes[stack_top_position].m_point_index = 0;
 

@@ -9,9 +9,9 @@ namespace mln
   class NDImageInterface
   {
   public:
-    using index_type = int;
-    using size_type [[deprecated]] = int;
-    using difference_type [[deprecated]] = int;
+    using index_type = std::ptrdiff_t;
+    using size_type [[deprecated]] = index_type;
+    using difference_type [[deprecated]] = index_type;
 
     virtual ~NDImageInterface() = default;
 
@@ -24,7 +24,7 @@ namespace mln
     int get_vdim() const { return this->nchannels(); }
 
     /// Get the type of pixel sample
-    virtual sample_t sample_type() const = 0;
+    virtual sample_type_id_t sample_type_id() const = 0;
     /// \}
 
     /// Domain related information
@@ -57,11 +57,10 @@ namespace mln
     /// \}
 
   private:
-    virtual void* __buffer(int k = 0) = 0;
-    virtual const void* __buffer(int k = 0) const = 0;
+    virtual void* __buffer(int k = 0) const = 0;
   };
 
-  template <int N, class T>
+  template <int N, class T = void>
   class ImageNdInterface;
 
 
@@ -71,7 +70,8 @@ namespace mln
   public:
     enum { pdim = N };
     using domain_type = mln::box<int, N>;
-    using point_type = mln::point<short, N>;
+    using point_type = mln::point<std::ptrdiff_t, N>;
+    using small_point_type = mln::point<short, N>;
     using site_type [[deprecated]] = point_type;
 
     virtual const domain_type& domain() const = 0;
@@ -80,14 +80,13 @@ namespace mln
   template <int N, class T>
   class ImageNdInterface : public ImageNdInterface<N, void>
   {
+    using base = NDImageInterface;
   public:
-    /// Get a typed-pointer to the k-th buffer.
-    virtual T* buffer(int k = 0) = 0;
-    virtual const T* buffer(int k = 0) const = 0;
+    using sample_type = T;
 
-  private:
-    void* __buffer(int k = 0) final { return static_cast<void*>(this->buffer(k)); }
-    const void* __buffer(int k = 0) const final { return static_cast<const void*>(this->buffer(k)); }
+    /// Get a typed-pointer to the k-th buffer.
+    T* buffer(int k = 0) { return reinterpret_cast<T*>(this->base::buffer(k)); }
+    const T* buffer(int k = 0) const { return reinterpret_cast<const T*>(this->base::buffer(k)); }
   };
 
 

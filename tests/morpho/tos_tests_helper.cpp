@@ -7,7 +7,7 @@
 
 template <class ParentImageType>
 ParentImageType
-tree_as_parent_image(const mln::morpho::component_tree<unsigned, mln_ch_value(ParentImageType, unsigned)>& tree,
+tree_as_parent_image(const mln::morpho::component_tree<typename ParentImageType::index_type, mln_ch_value(ParentImageType, unsigned)>& tree,
                      ParentImageType& rootimage)
 {
   using tree_t = std::decay_t<decltype(tree)>;
@@ -36,10 +36,6 @@ tree_as_parent_image(const mln::morpho::component_tree<unsigned, mln_ch_value(Pa
   return parent;
 }
 
-using tree_2d_t = mln::morpho::component_tree<unsigned, mln::image2d<unsigned>>;
-using par_2d_t = mln::image2d<mln::point2d>;
-using tree_3d_t = mln::morpho::component_tree<unsigned, mln::image3d<unsigned>>;
-using par_3d_t = mln::image3d<mln::point3d>;
 
 
 // Explicit instanciation

@@ -25,7 +25,7 @@ TEST(Morpho, component_tree_io)
     morpho::save(ctree, stream);
   }
 
-  morpho::component_tree<unsigned, image2d<unsigned>> tree2;
+  morpho::component_tree<image2d<uint8>::index_type, image2d<unsigned>> tree2;
   {
     std::ifstream stream("tree.out", std::ios_base::binary);
     morpho::load(stream, tree2);

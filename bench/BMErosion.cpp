@@ -75,7 +75,7 @@ void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<ml
   int nr = f.nrows();
   int nc = f.ncols();
 
-  auto applyLine = [nc, offsets, sz](const uint8* __restrict__ inlineptr, uint8* __restrict__ outlineptr) {
+  auto applyLine = [nc, offsets](const uint8* __restrict__ inlineptr, uint8* __restrict__ outlineptr) {
     for (int x = 0; x < nc; ++x)
     {
       uint8 min = 255;

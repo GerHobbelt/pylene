@@ -18,7 +18,7 @@ namespace mln
     private:
       using image_t = E;
       using pixel_t = ndimage_pixel_base<V, N>;
-      using point_t = point<int, N>;
+      using point_t = point<std::ptrdiff_t, N>;
 
       friend struct ndimage_value_range<N, const V, const E>;
 
@@ -43,6 +43,8 @@ namespace mln
 
       const_iterator iter() const
       {
+
+
         auto shp = m_ima->domain().shape();
 
         std::array<std::ptrdiff_t, N> delta_index_strides;
@@ -51,9 +53,10 @@ namespace mln
         for (unsigned i = 0; i < N - 1; ++i)
           delta_index_strides[i] = m_ima->m_strides[i] - (m_ima->m_strides[i + 1] * shp[i + 1]);
 
+
         auto index_first = m_ima->index_of_point(m_ima->domain().pmin);
 
-        return const_iterator(pixel_t(m_ima->m_ptr), internal::make_point_visitor_forward(shp),
+        return const_iterator(pixel_t(reinterpret_cast<V*>(m_ima->m_ptr)), internal::make_point_visitor_forward(point_t(shp)),
                               internal::no_op_visitor(),
                               internal::strided_visitor<N, std::ptrdiff_t, 1>(index_first, delta_index_strides));
       }
@@ -71,8 +74,8 @@ namespace mln
         auto index_last = m_ima->index_of_point(m_ima->domain().pmax - 1);
 
         return const_reverse_iterator(
-            pixel_t(m_ima->m_ptr), internal::make_point_visitor_backward(shp), internal::no_op_visitor(),
-            internal::strided_visitor<N, std::ptrdiff_t, -1>(index_last, delta_index_strides));
+          pixel_t(reinterpret_cast<V*>(m_ima->m_ptr)), internal::make_point_visitor_backward(point_t(shp)), internal::no_op_visitor(),
+          internal::strided_visitor<N, std::ptrdiff_t, -1>(index_last, delta_index_strides));
       }
 
     private:
@@ -89,7 +92,7 @@ namespace mln
     private:
       using image_t = E;
       using pixel_t = ndimage_pixel<N, V, E>;
-      using point_t = point<int, N>;
+      using point_t = point<std::ptrdiff_t, N>;
 
       template <int M, class V2, class E2>
       friend struct ndimage_pixel_range;
@@ -125,8 +128,8 @@ namespace mln
 
         auto index_first = m_ima->index_of_point(m_ima->domain().pmin);
 
-        return const_iterator(pixel_t(m_ima, m_ima->m_ptr),
-                              internal::make_point_visitor_forward(m_ima->domain().pmin, m_ima->domain().pmax),
+        return const_iterator(pixel_t(m_ima, reinterpret_cast<V*>(m_ima->m_ptr)),
+                              internal::make_point_visitor_forward(point_t(m_ima->domain().pmin), point_t(m_ima->domain().pmax)),
                               internal::no_op_visitor(),
                               internal::strided_visitor<N, std::ptrdiff_t, 1>(index_first, delta_index_strides));
       }
@@ -143,8 +146,8 @@ namespace mln
 
         auto index_last = m_ima->index_of_point(m_ima->domain().pmax - 1);
 
-        return const_reverse_iterator(pixel_t(m_ima, m_ima->m_ptr),
-                                      internal::make_point_visitor_backward(m_ima->domain().pmin, m_ima->domain().pmax),
+        return const_reverse_iterator(pixel_t(m_ima, reinterpret_cast<V*>(m_ima->m_ptr)),
+                                      internal::make_point_visitor_backward(point_t(m_ima->domain().pmin), point_t(m_ima->domain().pmax)),
                                       internal::no_op_visitor(), internal::strided_visitor<N, std::ptrdiff_t, -1>(
                                                                      index_last, delta_index_strides));
       }

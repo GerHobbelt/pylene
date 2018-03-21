@@ -26,8 +26,9 @@ namespace mln
     }
   }
 
-  template <typename I, size_t N>
-  inline void wrt_offset(const Image<I>& ima_, const std::array<mln_point(I), N>& dpoints,
+  template <typename I, size_t N, typename P>
+  inline void wrt_offset(const Image<I>& ima_,
+                         const std::array<P, N>& dpoints,
                          std::array<typename I::difference_type, N>& out)
   {
     const I& ima = exact(ima_);
@@ -44,8 +45,8 @@ namespace mln
     }
   }
 
-  template <typename I, size_t N>
-  inline void wrt_delta_index(const Image<I>& ima_, const std::array<mln_point(I), N>& dpoints,
+  template <typename I, size_t N, typename P>
+  inline void wrt_delta_index(const Image<I>& ima_, const std::array<P, N>& dpoints,
                               std::array<typename I::difference_type, N>& out)
   {
     const I& ima = exact(ima_);
@@ -62,21 +63,22 @@ namespace mln
       *out = ima.delta_index(*it);
   }
 
-  template <typename Image, size_t N>
-  std::array<typename Image::difference_type, N> wrt_offset(const Image& ima,
-                                                            const std::array<typename Image::point_type, N>& dpoints)
+  template <typename Image, size_t N, typename P>
+  std::array<typename Image::index_type, N>
+  wrt_offset(const Image& ima,
+             const std::array<P, N>& dpoints)
   {
-    std::array<typename Image::difference_type, N> out;
-    wrt_offset(ima, dpoints, out);
+    std::array<typename Image::index_type, N> out;
+    wrt_offset(ima, dpoints, out.begin());
     return out;
   }
 
-  template <typename Image, size_t N>
-  std::array<typename Image::difference_type, N>
-      wrt_delta_index(const Image& ima, const std::array<typename Image::point_type, N>& dpoints)
+  template <typename Image, size_t N, typename P>
+  std::array<typename Image::index_type, N>
+  wrt_delta_index(const Image& ima, const std::array<P, N>& dpoints)
   {
-    std::array<typename Image::difference_type, N> out;
-    wrt_delta_index(ima, dpoints, out);
+    std::array<typename Image::index_type, N> out;
+    wrt_delta_index(ima, dpoints, out.begin());
     return out;
   }
 

@@ -104,7 +104,7 @@ namespace mln
     v.init();
     for (const std::initializer_list<V>& row : l)
     {
-      mln_assertion(row.size() == nc);
+      mln_assertion(static_cast<int>(row.size()) == nc);
       for (const V *val = row.begin(); val != row.end(); ++val, v.next())
         *v = *val;
     }

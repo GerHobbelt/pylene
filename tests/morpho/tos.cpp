@@ -20,7 +20,7 @@ using mln::uint8;
 template <class I, class J>
 void test_propagation(const mln::Image<I>& f, const mln::Image<J>& ref)
 {
-  using P = typename I::size_type;
+  using P = typename I::index_type;
   std::vector<P> indexes;
   int max_depth;
   auto g = mln::morpho::ToS::impl::immersion(f);

@@ -1,12 +1,11 @@
 #pragma once
 
 #include "ndimage.hpp"
-#include <mln/core/utils/ptroffset.hpp>
 
 namespace mln
 {
 
-  template <int N, class U, layout_t L>
+  template <int N, class V, layout_t L>
   class ndimage;
 
   namespace details
@@ -35,37 +34,37 @@ namespace mln
 
       ndimage_pixel_base() = default;
 
-      ndimage_pixel_base(std::uintptr_t ptr) : m_ptr(ptr) {}
+      ndimage_pixel_base(T* ptr) : m_ptr(ptr) {}
 
       template <class U>
       ndimage_pixel_base(const ndimage_pixel_base<U, 0>& other) : m_ptr(other.m_ptr), m_index(other.m_index)
       {
       }
 
-      reference  val() const { return *(mln::ptr_offset<T>(m_ptr, m_index * sizeof(T))); }
+      reference  val() const { return m_ptr[m_index]; }
       index_type index() const { return m_index; }
 
     protected:
       template <typename, int>
       friend struct ndimage_pixel_base;
 
-      template <int N, class U, layout_t L>
-      friend class ndimage;
+      template <int M, class V, layout_t L>
+      friend class mln::ndimage;
 
       std::nullptr_t get_offset() const { return nullptr; }
       std::ptrdiff_t get_index() const { return m_index; }
       std::ptrdiff_t& get_index() { return m_index; }
 
     private:
-      std::uintptr_t m_ptr;
+      T* m_ptr;
       std::ptrdiff_t m_index;
     };
 
     template <int N>
     struct ndimage_pixel_base<void, N>
     {
-      using site_type = mln::point<short, N>;
-      using point_type = site_type;
+      using point_type = mln::point<std::ptrdiff_t, N>;
+      using site_type [[deprecated]] = point_type;
 
       site_type point() const { return m_point; }
       site_type site() const { return m_point; }
@@ -76,10 +75,10 @@ namespace mln
       auto get_point() const { return m_point; }
 
       template <int M, class V, layout_t L>
-      friend class ndimage;
+      friend class mln::ndimage;
 
     private:
-      mln::point<int, N> m_point;
+      point_type m_point;
     };
 
     template <typename T, int N>
@@ -88,7 +87,7 @@ namespace mln
       friend struct internal::iterator_core_access;
 
       ndimage_pixel_base() = default;
-      ndimage_pixel_base(std::uintptr_t ptr) : ndimage_pixel_base<T, 0>(ptr) {}
+      ndimage_pixel_base(T* ptr) : ndimage_pixel_base<T, 0>(ptr) {}
 
       template <class U>
       ndimage_pixel_base(const ndimage_pixel_base<U, N>& other)
@@ -104,7 +103,7 @@ namespace mln
 
       ndimage_pixel() = default;
 
-      ndimage_pixel(image_type* ima, std::uintptr_t ptr = 0) : details::ndimage_pixel_base<V, N>(ptr), m_ima(ima) {}
+      ndimage_pixel(image_type* ima, V* ptr = nullptr) : details::ndimage_pixel_base<V, N>(ptr), m_ima(ima) {}
 
       /// \brief Copy / copy conversion constructor
       template <class U, class J, typename = std::enable_if_t<std::is_convertible<U*, V*>::value>>

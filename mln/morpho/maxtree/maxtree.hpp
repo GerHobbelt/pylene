@@ -19,8 +19,8 @@ namespace mln
     /// \param nbh The neighborhood
     /// \param cmp A strict weak order on values
     template <typename I, typename N, typename StrictWeakOrdering = std::less<mln_value(I)>>
-    component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-        maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp = StrictWeakOrdering());
+    component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
+    maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp = StrictWeakOrdering());
 
     ///
     /// \brief Compute a mintree as a component tree where nodes
@@ -30,16 +30,16 @@ namespace mln
     /// \param nbh The neighborhood
     /// \param cmp A strict weak order on values
     template <typename I, typename N>
-    component_tree<typename I::size_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>& ima,
-                                                                                     const Neighborhood<N>& nbh);
+    component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
+    mintree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh);
 
     /*****************************/
     /**  Implementation		**/
     /*****************************/
 
     template <typename I, typename N, typename StrictWeakOrdering>
-    component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-        maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp)
+    component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
+    maxtree_indexes(const Image<I>& ima, const Neighborhood<N>& nbh, StrictWeakOrdering cmp)
     {
       mln_entering("mln::morpho::maxtree_indexes");
       auto res = impl::maxtree_queue_indexes(exact(ima), exact(nbh), cmp);
@@ -48,7 +48,7 @@ namespace mln
     }
 
     template <typename I, typename N>
-    component_tree<typename I::size_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>& ima,
+    component_tree<typename I::index_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>& ima,
                                                                                      const Neighborhood<N>& nbh)
     {
       mln_entering("mln::morpho::mintree_indexes");

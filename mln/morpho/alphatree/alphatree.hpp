@@ -12,10 +12,10 @@ namespace mln
   {
 
     template <class I, class N, class Distance = functional::l2dist_t<mln_value(I)>>
-    std::pair<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
-              property_map<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
+    std::pair<morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>,
+              property_map<morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>,
                            typename std::result_of<Distance(mln_value(I), mln_value(I))>::type>>
-        alphatree_indexes(const Image<I>& f, const Neighborhood<N>& nbh, Distance d = Distance());
+    alphatree_indexes(const Image<I>& f, const Neighborhood<N>& nbh, Distance d = Distance());
 
     /*******************************/
     /***   Implementation        ***/
@@ -33,18 +33,18 @@ namespace mln
     }
 
     template <class I, class N, class Distance>
-    std::pair<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
-              property_map<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
+    std::pair<morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>,
+              property_map<morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>,
                            typename std::result_of<Distance(mln_value(I), mln_value(I))>::type>>
-        alphatree_indexes(const Image<I>& f_, const Neighborhood<N>& nbh_, Distance distance)
+    alphatree_indexes(const Image<I>& f_, const Neighborhood<N>& nbh_, Distance distance)
     {
       mln_entering("mln::morpho::alphatree_indexes");
 
       const I& f = exact(f_);
       const N& nbh = exact(nbh_);
 
-      typedef typename I::size_type index_t;
-      typedef morpho::component_tree<index_t, mln_ch_value(I, index_t)> tree_t;
+      typedef typename I::index_type index_t;
+      typedef morpho::component_tree<index_t, mln_ch_value(I, unsigned)> tree_t;
       typedef typename std::result_of<Distance(mln_value(I), mln_value(I))>::type distance_t;
 
       std::vector<std::tuple<index_t, index_t, distance_t>> edges;

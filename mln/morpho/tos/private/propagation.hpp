@@ -23,7 +23,7 @@ namespace mln
         propagation(const Image<I>& f,
                     mln_point(I) start_point,
                     int& max_depth,
-                    std::vector<unsigned>* sorted_indexes = nullptr);
+                    std::vector<typename I::index_type>* sorted_indexes = nullptr);
 
         /******************************************/
         /****          Implementation          ****/
@@ -35,14 +35,15 @@ namespace mln
         propagation_impl(const Image<I>& f_,
                          mln_point(I) start_point,
                          int& max_depth,
-                         std::vector<unsigned>* sorted_indexes)
+                         std::vector<typename I::index_type>* sorted_indexes)
         {
           mln_entering("mln::morpho::tos::impl::propagation");
 
           using range_t = mln_value(I);
           using V = typename range_t::value_type;
           using P = typename I::size_type;
-          using connectivity_t = std::conditional_t<std::is_same<mln_point(I),mln::point2d>::value, c4_t, c6_t>;
+          using point_t = mln_point(I);
+          using connectivity_t = std::conditional_t<point_t::ndim == 2, c4_t, c6_t>;
 
           enum { UNPROCESSED = -1, PROCESSED = 0 };
 
@@ -116,14 +117,13 @@ namespace mln
         propagation(const Image<I>& f,
                     mln_point(I) start_point,
                     int& max_depth,
-                    std::vector<unsigned>* sorted_indexes)
+                    std::vector<typename I::index_type>* sorted_indexes)
         {
           if (sorted_indexes == nullptr)
             return propagation_impl<I, false>(f, start_point, max_depth, sorted_indexes);
           else
             return propagation_impl<I, true>(f, start_point, max_depth, sorted_indexes);
         }
-
 
       } // end of namespace mln::morpho::tos::impl
     }   // end of namespace mln::morpho::tos

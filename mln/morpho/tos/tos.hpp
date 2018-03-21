@@ -28,11 +28,11 @@ namespace mln
     /// \param[in] processing_flags Extra options to control tree construction.
     /// \return A component tree encoding the tree of shapes.
     template <typename I>
-    morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
     tos(const Image<I>& input, mln_point(I) start_point, int processing_flags = 0);
 
     template <typename I>
-    morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
     tos(const Image<I>& ima);
 
     /******************************************/
@@ -51,7 +51,7 @@ namespace mln
 
         mln_ch_value(J, bool) is2F = imchvalue<bool>(pmap).init(false);
         auto dom = is2F.domain();
-        mln_point(J) step = 2; // {2,2} or {2,2,2}
+        decltype(dom.pmin) step = 2; // {2,2} or {2,2,2}
         fill(is2F | make_strided_box(dom.pmin, dom.pmax, step), true);
 
         for (unsigned p = 0; p < S.size(); ++p)
@@ -69,12 +69,13 @@ namespace mln
     }
 
     template <typename I>
-    morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
+    morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)>
     tos(const Image<I>& ima, mln_point(I) pmin, int processing_flags)
     {
-      static_assert(std::is_same<mln_point(I), point2d>::value or std::is_same<mln_point(I), point3d>::value,
+      using point_t = mln_point(I);
+      static_assert(point_t::ndim == 2 or point_t::ndim == 3,
                     "Input must be a 2D or 3D image");
-      using P = typename I::size_type;
+      using P = typename I::index_type;
 
       mln_entering("mln::morpho::tos");
 
@@ -84,7 +85,7 @@ namespace mln
       auto ord = morpho::ToS::impl::propagation(g, pmin * 2, max_depth, nullptr);
 
       // 2. Build the tree
-      using nbh_t = std::conditional_t<std::is_same<mln_point(I),mln::point2d>::value, c4_t, c6_t>;
+      using nbh_t = std::conditional_t<point_t::ndim == 2, c4_t, c6_t>;
       component_tree<P, mln_ch_value(I, unsigned)> tree;
       {
         if (max_depth < value_traits<uint16>::max())
@@ -106,7 +107,7 @@ namespace mln
     }
 
     template <typename I>
-    morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)> tos(const Image<I>& ima)
+    morpho::component_tree<typename I::index_type, mln_ch_value(I, unsigned)> tos(const Image<I>& ima)
     {
       return tos(ima, exact(ima).domain().pmin);
     }

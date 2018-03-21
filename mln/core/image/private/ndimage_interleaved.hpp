@@ -44,6 +44,14 @@ namespace mln
     using type = ndimage_interleaved<N, U>;
   };
 
+  /******************************************/
+  /****    Specialized free functions    ****/
+  /******************************************/
+
+  template <int N, class V, class T>
+  ndimage_interleaved<N, V> make_subimage(const ndimage_interleaved<N, V>& f, const mln::box<T, unsigned(N)>& domain);  // Force N to be non-deduced from domain
+
+
   /*****************************************************************************************/
   /****              Defintition  of  __ndimage<N, T, layout_t::INTERLEAVED, vdim>      ****/
   /*****************************************************************************************/
@@ -86,9 +94,6 @@ namespace mln
     void resize(const domain_type& domain, int border, T values[]);
 
 
-
-    T* buffer(int k = 0) final;
-    const T* buffer(int k = 0) const final;
     int nbuffers() const final;
     int nchannels() const final;
     layout_t layout() const final;
@@ -98,13 +103,18 @@ namespace mln
   protected:
     void __from_buffer(void* buffer, const domain_type& domain);
     void __from_buffer(void* buffer, const domain_type& domain, const std::size_t strides[]);
+    void clip(const domain_type& domain, bool extended_by_image);
 
+    template <int M, class U, layout_t L, int d>
+    friend class __ndimage;
 
   private:
+    void* __buffer(int k = 0) const final;
     void __init(T* buffer);
 
   protected:
-    std::uintptr_t m_ptr = 0; // Pointer adress to origin (0,0). The pointer adress may not be legal
+    // Pointer adress to origin (0,0). The pointer adress may not be legal if (0,0) does not belong to the virtual domain
+    T* m_ptr = 0;
   };
 
   /*****************************************************************************************/
@@ -123,10 +133,9 @@ namespace mln
     using base = ndimage_base<N, V, layout_t::INTERLEAVED>;
     using this_type = ndimage<N, V, layout_t::INTERLEAVED>;
 
-  protected:
-    using sample_t = typename base::sample_t;
-
   public:
+    using sample_type = typename base::sample_type;
+
     using domain_type = typename base::domain_type;
 
     /// \copydoc image::pixel_type
@@ -144,9 +153,6 @@ namespace mln
     /// \copydoc image::const_reference
     using const_reference = const V&;
 
-    /// \copydoc image::size_type
-    using index_type = int;
-
     // Extension
     using extension_type = details::ndimage_extension<N, V>;
     /// \}
@@ -154,10 +160,10 @@ namespace mln
 
     /// \name Image Ranges Types
     /// \{
-    friend class details::ndimage_value_range<N, V, this_type>;
-    friend class details::ndimage_value_range<N, const V, const this_type>;
-    friend class details::ndimage_pixel_range<N, V, this_type>;
-    friend class details::ndimage_pixel_range<N, const V, const this_type>;
+    friend struct details::ndimage_value_range<N, V, this_type>;
+    friend struct details::ndimage_value_range<N, const V, const this_type>;
+    friend struct details::ndimage_pixel_range<N, V, this_type>;
+    friend struct details::ndimage_pixel_range<N, const V, const this_type>;
 
 
     /// \copydoc image::value_range
@@ -192,6 +198,13 @@ namespace mln
     ndimage(const __ndimage<N, void, layout_t::UNKNOWN, 0>& other, int border);
     ndimage(const __ndimage<N, void, layout_t::UNKNOWN, 0>& other, int border, V init);
     // \}
+
+    /// Image resizeing
+    /// \{
+    void resize(const domain_type& domain);
+    void resize(const domain_type& domain, int border);
+    void resize(const domain_type& domain, int border, V init);
+    /// \}
 
     /// \brief Constructors from external sources
     /// \{
@@ -260,16 +273,16 @@ namespace mln
     const_pixel_range pixels() const;
     /// \}
 
-
-    void resize(const domain_type& domain);
-    void resize(const domain_type& domain, int border);
-    void resize(const domain_type& domain, int border, V init);
-
-
     /// Return the extension of the image
     extension_type extension() const;
 
 
+    /// Return a view over a subdomain
+    ndimage subimage(const domain_type& domain, bool extended_by_image) const;
+
+
+    V* buffer(int k = 0);
+    const V* buffer(int k = 0) const;
   };
 
 
@@ -323,13 +336,8 @@ namespace mln
   template <int N, class T, int vdim>
   void __ndimage<N, T, layout_t::INTERLEAVED, vdim>::__init(T* buffer)
   {
-    auto delta_origin = - this->m_virtual_domain.pmin;
-    std::ptrdiff_t diff_origin = 0;
-
-    for (int k = 0; k < N; ++k)
-      diff_origin += this->m_strides[k] * delta_origin[k] * vdim;
-
-    m_ptr = reinterpret_cast<std::uintptr_t>(buffer) + (diff_origin * sizeof(T));
+    std::ptrdiff_t diff_origin = -this->m_first_index;
+    m_ptr = buffer + (vdim * diff_origin);
   }
 
   template <int N, class T, int vdim>
@@ -351,6 +359,12 @@ namespace mln
 
     this->base::__from_buffer(domain, strides);
     this->__init(static_cast<T*>(buffer));
+  }
+
+  template <int N, class T, int vdim>
+  void __ndimage<N, T, layout_t::INTERLEAVED, vdim>::clip(const domain_type& domain, bool extended_by_image)
+  {
+    this->base::clip(domain, extended_by_image);
   }
 
   template <int N, class T, int vdim>
@@ -377,21 +391,12 @@ namespace mln
   }
 
   template <int N, class T, int vdim>
-  T* __ndimage<N, T, layout_t::INTERLEAVED, vdim>::buffer(int k)
+  void* __ndimage<N, T, layout_t::INTERLEAVED, vdim>::__buffer(int k) const
   {
     (void)k;
     mln_precondition(k == 0);
     auto idx = this->index_of_point(this->m_domain.pmin);
-    return ptr_offset<T>(m_ptr, (sizeof(T) * vdim) * idx);
-  }
-
-  template <int N, class T, int vdim>
-  const T* __ndimage<N, T, layout_t::INTERLEAVED, vdim>::buffer(int k) const
-  {
-    (void)k;
-    mln_precondition(k == 0);
-    auto idx = this->index_of_point(this->m_domain.pmin);
-    return ptr_offset<const T>(m_ptr, (sizeof(T) * vdim) * idx);
+    return reinterpret_cast<void*>(m_ptr + idx * vdim);
   }
 
   template <int N, class T, int vdim>
@@ -438,7 +443,7 @@ namespace mln
 
   template <int N, class V>
   ndimage<N, V, layout_t::INTERLEAVED>::ndimage(const domain_type& domain, int border, V init)
-    : base(domain, border, reinterpret_cast<sample_t*>(&init))
+    : base(domain, border, reinterpret_cast<sample_type*>(&init))
   {
   }
   template <int N, class V>
@@ -455,7 +460,7 @@ namespace mln
 
   template <int N, class V>
   ndimage<N, V, layout_t::INTERLEAVED>::ndimage(const __ndimage<N, void, layout_t::UNKNOWN, 0>& other, int border, V init)
-    : base(other, border, reinterpret_cast<sample_t*>(&init))
+    : base(other, border, reinterpret_cast<sample_type*>(&init))
   {
   }
 
@@ -478,9 +483,18 @@ namespace mln
   }
 
   template <int N, class V>
+  ndimage<N, V, layout_t::INTERLEAVED>
+  ndimage<N, V, layout_t::INTERLEAVED>::subimage(const domain_type& domain, bool extended_by_image) const
+  {
+    ndimage output(*this);
+    output.clip(domain, extended_by_image);
+    return output;
+  }
+
+  template <int N, class V>
   void ndimage<N, V, layout_t::INTERLEAVED>::resize(const domain_type& domain,  int border, V init)
   {
-    base::resize(domain, border, reinterpret_cast<sample_t*>(&init));
+    base::resize(domain, border, reinterpret_cast<sample_type*>(&init));
   }
 
   template <int N, class V>
@@ -496,15 +510,27 @@ namespace mln
   }
 
   template <int N, class V>
+  V* ndimage<N, V, layout_t::INTERLEAVED>::buffer(int k)
+  {
+    return reinterpret_cast<V*>(this->base::buffer(k));
+  }
+
+  template <int N, class V>
+  const V* ndimage<N, V, layout_t::INTERLEAVED>::buffer(int k) const
+  {
+    return reinterpret_cast<const V*>(this->base::buffer(k));
+  }
+
+  template <int N, class V>
   V& ndimage<N, V, layout_t::INTERLEAVED>::operator[] (__index_type i)
   {
-    return *(ptr_offset<V>(this->m_ptr, sizeof(V) * i));
+    return reinterpret_cast<V*>(this->m_ptr)[i];
   }
 
   template <int N, class V>
   const V& ndimage<N, V, layout_t::INTERLEAVED>::operator[] (__index_type i) const
   {
-    return *(ptr_offset<V>(this->m_ptr, sizeof(V) * i));
+    return reinterpret_cast<V*>(this->m_ptr)[i];
   }
 
   template <int N, class V>
@@ -524,13 +550,15 @@ namespace mln
     template <int N, class V>
   V& ndimage<N, V, layout_t::INTERLEAVED>::at(const __point_type& p)
   {
-    auto i = this->index_of_point(p);
+    mln_precondition(this->m_virtual_domain.has(p));
+    auto i =  this->index_of_point(p);
     return (*this)[i];
   }
 
   template <int N, class V>
   const V& ndimage<N, V, layout_t::INTERLEAVED>::at(const __point_type& p) const
   {
+    mln_precondition(this->m_virtual_domain.has(p));
     auto i = this->index_of_point(p);
     return (*this)[i];
   }
@@ -540,8 +568,9 @@ namespace mln
   details::ndimage_pixel<N, V, ndimage<N, V, layout_t::INTERLEAVED>>
   ndimage<N, V, layout_t::INTERLEAVED>::pixel_at(const __point_type& p)
   {
+    mln_precondition(this->m_virtual_domain.has(p));
     pixel_type pix(this->exact());
-    pix.m_ptr = this->m_ptr;
+    pix.m_ptr = reinterpret_cast<V*>(this->m_ptr);
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
     return pix;
@@ -551,8 +580,9 @@ namespace mln
   details::ndimage_pixel<N, const V, const ndimage<N, V, layout_t::INTERLEAVED>>
   ndimage<N, V, layout_t::INTERLEAVED>::pixel_at(const __point_type& p) const
   {
+    mln_precondition(this->m_virtual_domain.has(p));
     const_pixel_type pix(this->exact());
-    pix.m_ptr = this->m_ptr;
+    pix.m_ptr =  reinterpret_cast<const V*>(this->m_ptr);
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
     return pix;
@@ -563,7 +593,7 @@ namespace mln
   ndimage<N, V, layout_t::INTERLEAVED>::pixel_at_index(__index_type i)
   {
     pixel_type pix(this->exact());
-    pix.m_ptr = this->m_ptr;
+    pix.m_ptr = reinterpret_cast<V*>(this->m_ptr);
     pix.m_point = this->point_at_index(i);
     pix.m_index = i;
     return pix;
@@ -574,7 +604,7 @@ namespace mln
   ndimage<N, V, layout_t::INTERLEAVED>::pixel_at_index(__index_type i) const
   {
     const_pixel_type pix(this->exact());
-    pix.m_ptr = this->m_ptr;
+    pix.m_ptr = reinterpret_cast<const V*>(this->m_ptr);
     pix.m_point = this->point_at_index(i);
     pix.m_index = i;
     return pix;
@@ -585,7 +615,7 @@ namespace mln
   details::ndimage_pixel<N, V, ndimage<N, V, layout_t::INTERLEAVED>>
   ndimage<N, V, layout_t::INTERLEAVED>::pixel(const __point_type& p)
   {
-    mln_precondition(m_domain.has(p));
+    mln_precondition(this->m_domain.has(p));
     return pixel_at(p);
   }
 
@@ -593,7 +623,7 @@ namespace mln
   details::ndimage_pixel<N, const V, const ndimage<N, V, layout_t::INTERLEAVED>>
   ndimage<N, V, layout_t::INTERLEAVED>::pixel(const __point_type& p) const
   {
-    mln_precondition(m_domain.has(p));
+    mln_precondition(this->m_domain.has(p));
     return pixel_at(p);
   }
 
@@ -601,7 +631,7 @@ namespace mln
   details::ndimage_extension<N, V>
   ndimage<N, V, layout_t::INTERLEAVED>::extension() const
   {
-    details::ndimage_extension<N, V> e(this->m_domain, this->m_virtual_domain, this->m_strides, mln::ptr_offset<V>(this->m_ptr, this->m_first_index * sizeof(V)));
+    details::ndimage_extension<N, V> e(this->m_domain, this->m_virtual_domain, this->m_strides, reinterpret_cast<V*>(this->m_ptr) + this->m_first_index);
     return e;
   }
 
@@ -632,6 +662,13 @@ namespace mln
   ndimage<N, V, layout_t::INTERLEAVED>::pixels() const
   {
     return const_pixel_range(this);
+  }
+
+  template <int N, class V, class T>
+  ndimage_interleaved<N, V> make_subimage(const ndimage_interleaved<N, V>& f, const mln::box<T, unsigned(N)>& domain)
+  {
+    const bool extended_by_image = false;
+    return f.subimage(domain, extended_by_image);
   }
 
 }

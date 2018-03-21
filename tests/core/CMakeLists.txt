@@ -17,6 +17,7 @@ add_core_test(${test_prefix}range_zip           range/zip.cpp)
 # test Images
 add_core_test(${test_prefix}image2d             image/image2d.cpp)
 add_core_test(${test_prefix}image2d_iterators   image/image2d_iterators.cpp)
+add_core_test(${test_prefix}image2d_planar      image/image2d_planar.cpp)
 add_core_test(${test_prefix}extended_by_value_image image/morphers/extended_by_value.cpp)
 add_core_test(${test_prefix}transformed_image   image/morphers/transformed_image.cpp)
 add_core_test(${test_prefix}filtered_image      image/morphers/filtered_image.cpp)

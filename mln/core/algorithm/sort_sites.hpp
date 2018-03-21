@@ -24,7 +24,7 @@ namespace mln
   /// order for \p point2d)
   ///
   template <typename I, typename BinaryFunction = std::less<mln_value(I)>>
-  std::vector<typename I::site_type> sort_sites(const Image<I>& input, BinaryFunction cmp = BinaryFunction());
+  std::vector<typename I::small_point_type> sort_sites(const Image<I>& input, BinaryFunction cmp = BinaryFunction());
 
   /****************/
   /* Implem       */
@@ -33,7 +33,7 @@ namespace mln
   namespace impl
   {
     template <typename I, typename Compare>
-    std::vector<typename I::site_type> sort_sites(const I& input, Compare, std::true_type _use_indexer_)
+    std::vector<typename I::small_point_type> sort_sites(const I& input, Compare, std::true_type _use_indexer_)
     {
       typedef indexer<mln_value(I), Compare> Indexer;
       typedef typename Indexer::index_type index_t;
@@ -62,7 +62,8 @@ namespace mln
         assert(count == input.domain().size());
       }
 
-      std::vector<typename I::site_type> v;
+
+      std::vector<typename I::small_point_type> v;
       v.resize(input.domain().size());
       {
         mln_pixter(px, input);
@@ -74,13 +75,13 @@ namespace mln
     }
 
     template <typename I, typename StrictWeakOrdering>
-    std::vector<typename I::site_type> sort_sites(const I& input, StrictWeakOrdering cmp, std::false_type _use_indexer_)
+    std::vector<typename I::small_point_type> sort_sites(const I& input, StrictWeakOrdering cmp, std::false_type _use_indexer_)
     {
       mln_entering("mln::sort_sites (std sort)");
 
       (void)_use_indexer_;
 
-      std::vector<mln_point(I)> v;
+      std::vector<typename I::small_point_type> v;
       v.reserve(input.domain().size());
       mln_piter(p, input);
       mln_forall (p)
@@ -97,7 +98,7 @@ namespace mln
   } // end of namespace mln::impl
 
   template <typename I, typename Compare>
-  std::vector<typename I::site_type> sort_sites(const Image<I>& input, Compare cmp)
+  std::vector<typename I::small_point_type> sort_sites(const Image<I>& input, Compare cmp)
   {
     constexpr bool _is_low_quant = value_traits<mln_value(I)>::quant <= 16;
     constexpr bool _has_indexer = has_indexer<mln_value(I), Compare>::value;

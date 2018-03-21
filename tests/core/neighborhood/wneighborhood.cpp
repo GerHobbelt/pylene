@@ -173,6 +173,7 @@ TEST(Core, WNeighborhood_binding_pixiterator_lvalue)
       {0, 1, 2, 3, 4}, //
       {5, 6, 7, 8, 9}  //
   };
+  f.extension().fill(0);
   test_pixiterator_lvalue(f);
 }
 
@@ -182,6 +183,7 @@ TEST(Core, binding_const_pixiterator_lvalue)
       {0, 1, 2, 3, 4}, //
       {5, 6, 7, 8, 9}  //
   };
+  f.extension().fill(0);
   test_pixiterator_lvalue(f);
 }
 

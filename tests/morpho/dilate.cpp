@@ -69,7 +69,7 @@ TEST(Dilation, PeriodicLine2d_vertical_knightmove)
 TEST(Dilation, Disc_approximated)
 {
   mln::box2d domain{ {0,0}, {21, 21}};
-  mln::image2d<mln::uint8> input(domain, 0);
+  mln::image2d<mln::uint8> input(domain, 3, 0);
 
   const mln::image2d<mln::uint8> ref = {
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
@@ -103,7 +103,7 @@ TEST(Dilation, Disc_approximated)
 TEST(Dilation, Disc_euclidean)
 {
   mln::box2d domain{ {0,0}, {21, 21}};
-  mln::image2d<mln::uint8> input(domain, 0);
+  mln::image2d<mln::uint8> input(domain, 3, 0);
 
   const mln::image2d<mln::uint8> ref = {
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -137,7 +137,7 @@ TEST(Dilation, Disc_euclidean)
 TEST(Dilation, Rectangle2d)
 {
   mln::box2d domain{ {0,0}, {21, 21}};
-  mln::image2d<mln::uint8> input(domain, 0);
+  mln::image2d<mln::uint8> input(domain, 3, 0);
   input.at(10,10) = 1;
 
   const mln::image2d<mln::uint8> ref = {

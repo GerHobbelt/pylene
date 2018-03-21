@@ -36,9 +36,10 @@ namespace mln
   };
 
 
-  /*******************************************************/
-  /****      Second level base class: N is known      ****/
-  /*******************************************************/
+  /**************************************************************/
+  /****      Second level base class: N is known             ****/
+  /****      Definition of ndimage<N, void, UNKNOWN, 0>      ****/
+  /**************************************************************/
 
   /// Second level base class
   /// It precises domain-related functionalities
@@ -70,7 +71,6 @@ namespace mln
     /// \copydoc image::index_of_point(const point_type&) const
     __index_type index_of_point(const __point_type& p) const
     {
-      mln_precondition(m_virtual_domain.has(p));
       __index_type index = 0;
       for (int k = 0; k < N; ++k)
         index += p[k] * m_strides[k];
@@ -137,6 +137,17 @@ namespace mln
       this->m_first_index = this->index_of_point(this->m_virtual_domain.pmin);
     }
 
+    void clip(const domain_type& domain, bool extended_by_image)
+    {
+      m_domain = domain;
+      if (!extended_by_image)
+      {
+        m_virtual_domain = domain;
+        m_border = 0;
+      }
+      m_first_index = this->index_of_point(m_virtual_domain.pmin);
+    }
+
   private:
     void __init_strides()
     {
@@ -147,8 +158,8 @@ namespace mln
     }
 
   protected:
-    domain_type m_domain = {{0,0},{0,0}};
-    domain_type m_virtual_domain = {{0,0}, {0,0}};
+    domain_type m_domain = domain_type();
+    domain_type m_virtual_domain = domain_type();
     std::ptrdiff_t m_strides[N];
 
     int m_border; // This is not the real border (just a hint)
@@ -220,11 +231,12 @@ namespace mln
       return N;
     }
 
-    sample_t sample_type() const final { return sample_type_of<T>::value; }
+    sample_type_id_t sample_type_id() const final { return sample_type_id_of<T>::value; }
 
   protected:
     void __from_buffer(const domain_type& domain) { this->base1::__from_buffer(domain); }
     void __from_buffer(const domain_type& domain, std::ptrdiff_t strides[]) { this->base1::__from_buffer(domain, strides); }
+    void clip(const domain_type& domain, bool extended_by_image) { this->base1::clip(domain, extended_by_image); }
   };
 
 
@@ -239,22 +251,20 @@ namespace mln
   {
   private:
     using base = __ndimage<N, V, layout, 1>;
-  protected:
-    using sample_t = V;
   public:
     using base::base;
+    enum { vdim = 1 };
   };
 
 
-  template <int N, class T, layout_t layout, int M, class tag>
+  template <int N, class T, layout_t layout, unsigned M, class tag>
   class ndimage_base<N, mln::internal::vec_base<T, M, tag>, layout>  : public __ndimage<N, T, layout, M>
   {
   private:
     using base = __ndimage<N, T, layout, M>;
-  protected:
-    using sample_t = T;
   public:
     using base::base;
+    enum { vdim = M };
   };
 
   namespace details
@@ -265,7 +275,7 @@ namespace mln
     {
       ~ndimage_data()
       {
-        delete [] buffer;
+        delete buffer;
       }
 
       ndimage_data(std::size_t size, int nchannels, layout_t layout)
@@ -285,7 +295,7 @@ namespace mln
 
         buffer = alloc.allocate(alloc_size);
 
-        if (layout == layout_t::PLANAR)
+        if (layout == layout_t::PLANAR || nchannels == 1)
         {
           T* ptr = buffer;
           for (int i = 0; i < nchannels; ++i, ptr += size)

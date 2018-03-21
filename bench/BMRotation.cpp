@@ -20,7 +20,8 @@ struct BMRotation : public benchmark::Fixture
 
     short nr = m_input.domain().shape()[0];
     short nc = m_input.domain().shape()[1];
-    m_output = image2d<rgb8>(box2d{{(short)(-nc + 1), 0}, {1, nr}});
+    mln::box2d domain = { {0,0}, {nc, nr} };
+    m_output.resize(domain);
     m_bytes = nr * nc * sizeof(rgb8);
   }
 
@@ -37,7 +38,7 @@ __attribute__((noinline)) void rotate_ptr(const image2d<T>& f, image2d<T>& out)
   int nc = f.ncols();
   auto istride = f.stride();
   auto ostride = out.stride();
-  const T* ptr_in = f.buffer();
+  const T* ptr_in = reinterpret_cast<const T*>(f.buffer());
 
   for (int i = 0; i < nr; ++i)
   {
@@ -54,9 +55,10 @@ __attribute__((noinline)) void rotate_ptr(const image2d<T>& f, image2d<T>& out)
 template <class T>
 __attribute__((noinline)) void rotate_p(const image2d<T>& f, image2d<T>& out)
 {
-  mln_foreach (point2d p, f.domain())
+  using P = typename image2d<T>::point_type;
+  mln_foreach (auto p, f.domain())
   {
-    point2d q{(short)(-p[1]), p[0]};
+    P q = {p[1], p[0]};
     out(q) = f(p);
   }
 }
@@ -66,7 +68,8 @@ __attribute__((noinline)) void rotate_pix(const image2d<T>& f, image2d<T>& out)
 {
   mln_foreach (auto px, f.pixels())
   {
-    point2d q{(short)(-px.point()[1]), px.point()[0]};
+    using P = typename image2d<T>::point_type;
+    P q = {px.point()[1], px.point()[0]};
     out(q) = px.val();
   }
 }

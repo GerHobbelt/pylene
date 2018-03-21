@@ -75,6 +75,7 @@ namespace mln
       typedef typename ValueMap::const_reference const_reference;
       typedef typename tree_t::node_type point_type;
       typedef typename tree_t::vertex_id_t size_type;
+      typedef typename tree_t::vertex_id_t index_type;
       typedef void difference_type;
       typedef image_tree_property_map_pixel<self_t> pixel_type;
       typedef image_tree_property_map_pixel<const self_t> const_pixel_type;

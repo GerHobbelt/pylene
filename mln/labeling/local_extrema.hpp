@@ -53,7 +53,9 @@ namespace mln
       {
         using Label_t = mln_value(O);
         constexpr Label_t kUnseen = static_cast<Label_t>(-1);
-        mln_ch_value(I, mln_point(I)) parent = imchvalue<mln_point(I)>(input);
+        using SP = typename I::small_point_type;
+        using P = typename I::point_type;
+        mln_ch_value(I, SP) parent = imchvalue<SP>(input);
 
         mln_pixter(pxIn, input);
         mln_pixter(pxOut, output);
@@ -71,7 +73,7 @@ namespace mln
             auto p_input_value = pxIn->val();
 
             // Make set
-            auto root = p;
+            P root = p;
 
             bool is_possible_minimum = true;
             mln_forall(nxIn, nxOut, nxPar)
@@ -91,11 +93,11 @@ namespace mln
               }
               else // Flat zone linking
               {
-                const auto n_root = zfindroot(parent, nxPar->val());
+                const P n_root = zfindroot(parent, nxPar->val());
                 if (n_root != root)
                 {
                   is_possible_minimum &= output(n_root);
-                  auto roots = std::minmax(root, n_root);
+                  auto roots = std::minmax<P>(root, n_root);
                   parent(roots.second) = roots.first;
                   root = roots.first;
                 }

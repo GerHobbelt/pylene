@@ -12,15 +12,15 @@ TEST(Accu, Sum)
   acc.take(12);
   acc.take("blabla");
 
-  ASSERT_EQ(extractor::count(acc), 2);
+  ASSERT_EQ(extractor::count(acc), 2u);
 
   acc.untake(13);
 
-  ASSERT_EQ(extractor::count(acc), 1);
+  ASSERT_EQ(extractor::count(acc), 1u);
 
   acc2.take(69);
   acc.take(69);
   acc2.take(acc);
 
-  ASSERT_EQ(extractor::count(acc2), 3);
+  ASSERT_EQ(extractor::count(acc2), 3u);
 }

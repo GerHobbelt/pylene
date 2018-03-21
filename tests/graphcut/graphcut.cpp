@@ -17,7 +17,7 @@ TEST(GraphCut, graph_iteration)
 
   typedef mln::graphcut::internal::graphcut_graph_t<char, float, c4_t> graph_t;
   graph_t g(b, c4);
-  unsigned nv = 0, ne = 0;
+  int nv = 0, ne = 0;
 
   mln_foreach (point2d p, g.vertices())
   {

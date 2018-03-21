@@ -11,7 +11,7 @@ struct iterator_test
 {
   image2d<int> ima;
   std::vector<int> values;
-  std::vector<int> indexes;
+  std::vector<unsigned> indexes;
 
   void test_forward_viter()
   {

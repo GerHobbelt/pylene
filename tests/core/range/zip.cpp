@@ -14,7 +14,7 @@ TEST(Core, ziprange)
   std::array<int, 4> x{{2, 5, 15, 22}};
   std::array<int, 4> y{{-2, -5, -15, -22}};
 
-  ASSERT_EQ(rng::size(x), 4);
+  ASSERT_EQ(rng::size(x), 4u);
 
   auto z = rng::zip(x, y);
 

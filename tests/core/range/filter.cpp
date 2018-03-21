@@ -25,5 +25,5 @@ TEST(Core, range_filter)
   ASSERT_TRUE(x.has(point2d{1, 1}));
   ASSERT_TRUE(not x.has(point2d{0, 1}));
   ASSERT_TRUE(not x.has(point2d{1, 0}));
-  ASSERT_EQ(sz, 33);
+  ASSERT_EQ(sz, 33u);
 }

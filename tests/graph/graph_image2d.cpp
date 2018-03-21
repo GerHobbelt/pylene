@@ -52,7 +52,7 @@ TEST(Graph, graph_iteration)
   box2d b({-2, -3}, {3, 4});
 
   mln::graph::undirected_graph_image2d<char, float, c4_t> g(b, c4);
-  unsigned nv = 0, ne = 0;
+  int nv = 0, ne = 0;
 
   mln_foreach (point2d p, g.vertices())
     g.vertex(p) = 'a' + (nv++ % 26);

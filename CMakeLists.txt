@@ -4,7 +4,7 @@ project(MILENA)
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-find_package(Boost 1.42 COMPONENTS program_options unit_test_framework REQUIRED)
+find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)

@@ -3,6 +3,7 @@
 /doc/build
 /doc/html
 /doc/doxyxml
+/doc/source/images/*.png
 .vscode
 .vs
 .idea

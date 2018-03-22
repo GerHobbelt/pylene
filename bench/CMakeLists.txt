@@ -30,6 +30,7 @@ set(src_standalone
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
 link_libraries(benchmark::benchmark)
+link_libraries(Mln)
 #link_libraries(-lbenchmark)
 
 add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)

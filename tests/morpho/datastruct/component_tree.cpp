@@ -78,7 +78,7 @@ TEST(Morpho, component_tree_forward_iteration)
       std::cout << y << ",";
     std::cout << std::endl;
   }
-  ASSERT_EQ(n, 7);
+  ASSERT_EQ(n, 7u);
 }
 
 TEST(Morpho, component_tree_backward_iteration)
@@ -104,7 +104,7 @@ TEST(Morpho, component_tree_backward_iteration)
     mln_reverse_foreach(auto y, x.pset()) std::cout << y << ",";
     std::cout << std::endl;
   }
-  ASSERT_EQ(n, 0);
+  ASSERT_EQ(n, 0u);
 }
 
 TEST(Morpho, component_tree_subtree)
@@ -139,5 +139,5 @@ TEST(Morpho, component_tree_subtree)
     std::cout << std::endl;
     n++;
   }
-  ASSERT_EQ(n, 3);
+  ASSERT_EQ(n, 3u);
 }

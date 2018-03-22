@@ -34,7 +34,7 @@ namespace mln
 
       line2d_iterator(const point2d& pbegin, const point2d& pend) : m_pbegin(pbegin), m_pend(pend)
       {
-        point2d dp = pend - pbegin;
+        point2d dp = m_pend - m_pbegin;
         m_octhan = false;
         if (std::abs(dp[1]) < std::abs(dp[0]))
         {

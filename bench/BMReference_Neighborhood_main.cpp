@@ -5,15 +5,20 @@
 #include <mln/core/extension/fill.hpp>
 
 void Sum_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
-void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Sum_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Sum_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Average_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
-void Average_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Average_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Average_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
-void Erosion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Erosion_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Erosion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
-void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Isotropic_Diffusion_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void Anisotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new);
-void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Anisotropic_Diffusion_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 
 class Bench_Ref_Neighborhood : public benchmark::Fixture
 {
@@ -35,7 +40,7 @@ class Bench_Ref_Neighborhood : public benchmark::Fixture
   }
 
 protected:
-  void Do_0(benchmark::State& st, void (*func)(mln::image2d<mln::uint8>& , mln::image2d<mln::uint8>& ))
+  void Do_0(benchmark::State& st, void (*func)(const mln::image2d<mln::uint8>& , mln::image2d<mln::uint8>& ))
   {
     while (st.KeepRunning())
       func(ima, out_ima);
@@ -67,6 +72,11 @@ BENCHMARK_F(Bench_Ref_Neighborhood, Sum_Pylene)(benchmark::State& st)
   Do_0(st, Sum_Pylene);
 }
 
+BENCHMARK_F(Bench_Ref_Neighborhood, Sum_New)(benchmark::State& st)
+{
+  Do_0(st, Sum_New);
+}
+
 BENCHMARK_F(Bench_Ref_Neighborhood, Average_C)(benchmark::State& st)
 {
   Do_1(st, Average_C);
@@ -75,6 +85,11 @@ BENCHMARK_F(Bench_Ref_Neighborhood, Average_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Neighborhood, Average_Pylene)(benchmark::State& st)
 {
   Do_0(st, Average_Pylene);
+}
+
+BENCHMARK_F(Bench_Ref_Neighborhood, Average_New)(benchmark::State& st)
+{
+  Do_0(st, Average_New);
 }
 
 BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_C)(benchmark::State& st)
@@ -87,6 +102,12 @@ BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_Pylene)(benchmark::State& st)
   Do_0(st, Erosion_Pylene);
 }
 
+BENCHMARK_F(Bench_Ref_Neighborhood, Erosion_New)(benchmark::State& st)
+{
+  Do_0(st, Erosion_New);
+}
+
+
 BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_C)(benchmark::State& st)
 {
   Do_1(st, Isotropic_Diffusion_C);
@@ -97,6 +118,12 @@ BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_Pylene)(benchmark::State
   Do_0(st, Isotropic_Diffusion_Pylene);
 }
 
+BENCHMARK_F(Bench_Ref_Neighborhood, Isotropic_Diffusion_New)(benchmark::State& st)
+{
+  Do_0(st, Isotropic_Diffusion_New);
+}
+
+
 BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_C)(benchmark::State& st)
 {
   Do_1(st,Anisotropic_Diffusion_C);
@@ -106,5 +133,11 @@ BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_Pylene)(benchmark::Stat
 {
   Do_0(st,Anisotropic_Diffusion_Pylene);
 }
+
+BENCHMARK_F(Bench_Ref_Neighborhood,Anisotropic_Diffusion_New)(benchmark::State& st)
+{
+  Do_0(st,Anisotropic_Diffusion_New);
+}
+
 
 BENCHMARK_MAIN();

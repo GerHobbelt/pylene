@@ -8,19 +8,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
 endif()
 
 
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info -fcoroutines-ts -std=c++17 -stdlib=libc++ -g")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(STANDALONE_COMPILE_FLAGS "-fopt-info")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-else ()
-  # W4141: 'inline' : utilisé plusieurs fois in benchmark.h
-  set(STANDALONE_COMPILE_FLAGS " ")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4141")
-endif ()
-
 set(src_standalone
   BMErosion.cpp
   BMMorphers.cpp
@@ -28,23 +15,46 @@ set(src_standalone
   BMReference.cpp
   BMReference_Linear.cpp
   BMReference_Neighborhood.cpp
+  test_coro.cpp
   )
 
-set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-link_libraries(/home/virgile/myusr2/lib/libbenchmark.a)
-#link_libraries(-lbenchmark)
-link_libraries(-lc++abi)
 
-link_libraries(-lstdc++)
-include_directories(range/include)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
+
+  set(STANDALONE_CORO_COMPILE_FLAGS "${STANDALONE_COMPILE_FLAGS} -fcoroutines-ts -stdlib=libc++ -fno-exceptions")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+
+  set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+  set_source_files_properties(test_coro.cpp PROPERTIES COMPILE_FLAGS "${STANDALONE_CORO_COMPILE_FLAGS}")
+  link_libraries(-lc++)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(STANDALONE_COMPILE_FLAGS "-g -fopt-info-vec -fopt-info-vec-missed ")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+  set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+else ()
+  # W4141: 'inline' : utilisé plusieurs fois in benchmark.h
+  set(STANDALONE_COMPILE_FLAGS " ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4141")
+  set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+endif ()
+
+
+
+link_libraries(benchmark::benchmark)
+include_directories(~/dev/range-v3/include)
+
+
+
+add_library(BMTest test_coro.cpp)
 add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
 add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_executable(BMRotation       BMRotation.cpp)
 add_executable(BMDilation       BMDilation.cpp)
 add_executable(BMMorphers       BMMorphers.cpp   BMMorphers_main.cpp)
-add_executable(BMReference_Linear BMReference_Linear_main.cpp BMReference_Linear.cpp)
+add_executable(BMReference_Linear BMReference_Linear_main.cpp BMReference_Linear.cpp test_coro.cpp)
 add_executable(BMReference_Neighborhood BMReference_Neighborhood_main.cpp BMReference_Neighborhood.cpp)
 target_link_libraries(BMReference_Neighborhood ${FreeImage_LIBRARIES})
 target_link_libraries(BMReference_Linear ${FreeImage_LIBRARIES})

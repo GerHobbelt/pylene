@@ -1,10 +1,10 @@
 #include <mln/core/image/image2d.hpp>
-
 #include <vector>
+#include "range2d.hpp"
 
-#include <experimental/coroutine>
-#include "range/v3/experimental/utility/generator.hpp"
-using ranges::experimental::generator;
+// #include <experimental/coroutine>
+// #include "range/v3/experimental/utility/generator.hpp"
+// using ranges::experimental::generator;
 
 void Mult_Inplace_Pylene(mln::image2d<mln::uint8>& img)
 {
@@ -23,11 +23,26 @@ void Mult_Inplace_C(std::ptrdiff_t*  info, mln::uint8* buffer)
   {
     for (int j = 0; j < ncol; j++)
     {
-      buffer[j] *= 2; 
+      buffer[j] *= 2;
     }
     buffer += stride;
   }
 }
+
+void Mult_Inplace_NewWithValues(mln::image2d<mln::uint8>& img)
+{
+  auto rng = values_of(img);
+  mln_foreach2(auto& v, rng)
+    v *= 2;
+}
+
+void Mult_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img)
+{
+  auto rng = pixels_of(img);
+  mln_foreach2(auto pix, rng)
+      pix.val() *= 2;
+}
+
 
 void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
@@ -38,6 +53,27 @@ void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_im
     pxOut->val() = pxIn->val() * 2;
   }
 }
+
+void Mult_Pylene_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  auto inRng = values_of(img);
+  auto outRng = values_of(new_img);
+  mln_foreach2((auto&& [vin, vout]), ranges::view::zip(inRng, outRng))
+    vout = vin * 2;
+}
+
+
+void Mult_Pylene_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  auto inRng = pixels_of(img);
+  auto outRng = pixels_of(new_img);
+  mln_foreach2((auto [pxin, pxout]), ranges::view::zip(inRng, outRng))
+    pxin.val() = pxout.val() * 2;
+}
+
+
+
+
 
 void Mult_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new)
 {
@@ -140,7 +176,7 @@ void Threshold_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_ne
   }
 }
 
-void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& LUT)
+void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
 {
   mln_pixter(px, img)
   mln_forall(px)
@@ -149,7 +185,7 @@ void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, std::vector<mln::uint8>& 
   }
 }
 
-void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uint8* __restrict LUT)
+void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, const mln::uint8* __restrict LUT)
 {
   const int nrow = info[0];
   const int ncol = info[1];
@@ -164,7 +200,7 @@ void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uin
   }
 }
 
-void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, std::vector<mln::uint8>& LUT)
+void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, const mln::uint8 LUT[])
 {
   mln_pixter(pxIn, img);
   mln_pixter(pxOut, new_img);
@@ -174,7 +210,7 @@ void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img
   }
 }
 
-void LUT_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uint8* __restrict buffer_new, mln::uint8* LUT)
+void LUT_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uint8* __restrict buffer_new, const mln::uint8 LUT[])
 {
   int nrow = info[0];
   int ncol = info[1];
@@ -190,6 +226,7 @@ void LUT_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::uint8* __re
   }
 }
 
+/*
 generator<mln::uint8*> iter_array(mln::uint8* array, int width, int height, std::ptrdiff_t stride)
 { 
   for (int y = 0; y < height; y++)
@@ -224,3 +261,4 @@ void LUT_Inplace_Cor(std::ptrdiff_t* info, mln::uint8* __restrict buffer, mln::u
     *p = LUT[*p];
   }
 }
+*/

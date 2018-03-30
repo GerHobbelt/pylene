@@ -4,7 +4,10 @@
 
 #include <cmath>
 
-void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+#include "range2d.hpp"
+#include "win3x3.hpp"
+
+void Sum_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
   mln_pixter(pxOut, new_img);
@@ -21,37 +24,50 @@ void Sum_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img
   }
 }
 
-void Sum_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
+void Sum_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  auto rngIn = pixels_of(img);
+  auto rngOut = pixels_of(new_img);
+
+  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  {
+    int tmp = 0;
+    for(auto nx : win3x3(pxIn))
+      tmp += nx.val();
+    pxOut.val() = tmp;
+  }
+}
+
+void Sum_C(int* info, mln::uint8* __restrict buffer, mln::uint8* __restrict buffer_new)
 {
   int nrow = info[0];
   int ncol = info[1];
   std::ptrdiff_t stride = info[2];
-
-  std::array<std::ptrdiff_t, 8> offset;
-  offset[0] = -stride -1;
-  offset[1] = -stride;
-  offset[2] = -stride + 1;
-  offset[3] = -1;
-  offset[4] = 1;
-  offset[5] = stride -1;
-  offset[6] = stride;
-  offset[7] = stride + 1;
-
   for (int i = 0; i < nrow; i++)
   {
-    for (int j = 0; j < ncol; j++)
+    std::array<const mln::uint8*, 8> nbhs;
+    nbhs[0] = buffer + -stride -1;
+    nbhs[1] = buffer + -stride;
+    nbhs[2] = buffer + -stride + 1;
+    nbhs[3] = buffer + -1;
+    nbhs[4] = buffer + 1;
+    nbhs[5] = buffer + stride -1;
+    nbhs[6] = buffer + stride;
+    nbhs[7] = buffer + stride + 1;
+
+    for (int j = 0; j < ncol; ++j)
     {
-      for (int k = 0; k <= 7; k++)
-      {
-        buffer_new[j] += buffer[j + offset[k]];
-      }
+      mln::uint8 tmp = 0;
+      for (int k = 0; k < 8; ++k)
+        tmp += nbhs[k][j];
+      buffer_new[j] = tmp;
     }
     buffer += stride;
     buffer_new += stride;
   }
 }
 
-void Average_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+void Average_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
   mln_pixter(pxOut, new_img);
@@ -59,12 +75,26 @@ void Average_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new
 
   mln_forall(pxIn, pxOut)
   {
-    unsigned int tmp = 0;
+    int tmp = 0;
     mln_forall(n)
     {
       tmp += n->val();
     }
     pxOut->val() = tmp / 8;
+  }
+}
+
+void Average_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  auto rngIn = pixels_of(img);
+  auto rngOut = pixels_of(new_img);
+
+  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  {
+    int tmp = 0;
+    for(auto nx : win3x3(pxIn))
+      tmp += nx.val();
+    pxOut.val() = tmp / 8;
   }
 }
 
@@ -88,18 +118,17 @@ void Average_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   {
     for (int j = 0; j < ncol; j++)
     {
-      for (int k = 0; k <= 7; k++)
-      {
-        buffer_new[j] += buffer[j + offset[k]];
-      }
-      buffer_new[j] /= 8;
+      int tmp = 0;
+      for (int k = 0; k < 8; k++)
+        tmp += buffer[j + offset[k]];
+      buffer_new[j] = tmp / 8;
     }
     buffer += stride;
     buffer_new += stride;
   }
 }
 
-void Erosion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+void Erosion_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
   mln_pixter(pxOut, new_img);
@@ -116,6 +145,20 @@ void Erosion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new
     if (pxIn->val() < mini)
       mini = pxIn->val();
     pxOut->val() = mini;
+  }
+}
+
+void Erosion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  auto rngIn = pixels_of(img);
+  auto rngOut = pixels_of(new_img);
+
+  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  {
+    mln::uint8 tmp = 255;
+    for(auto nx : win3x3(pxIn))
+      tmp = std::min(tmp, nx.val());
+    pxOut.val() = tmp;
   }
 }
 
@@ -139,20 +182,17 @@ void Erosion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   {
     for (int j = 0; j < ncol; j++)
     {
-      mln::uint8 mini = ~0;
-      for (int k = 0; k <= 7; k++)
-      {
-        if (mini > buffer[j + offset[k]])
-          mini = buffer[j + offset[k]];
-      }
+      mln::uint8 mini = 255;
+      for (int k = 0; k < 8; k++)
+        mini = std::min(mini, buffer[j + offset[k]]);
       buffer_new[j] = mini;
     }
     buffer += stride;
     buffer_new += stride;
-  } 
+  }
 }
 
-void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+void Isotropic_Diffusion_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
   mln_pixter(pxOut, new_img);
@@ -166,6 +206,21 @@ void Isotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln:
       tmp += n->val();
     }
     pxOut->val() = pxIn->val() + (tmp - 4 * pxIn->val()) / 8;
+  }
+}
+
+void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+
+  auto rngIn = pixels_of(img);
+  auto rngOut = pixels_of(new_img);
+
+  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  {
+    int tmp = 0;
+    for(auto nx : c4(pxIn))
+      tmp += nx.val();
+    pxOut.val() = pxIn.val() + (tmp - 4 * pxIn.val()) / 8;
   }
 }
 
@@ -192,7 +247,7 @@ void Isotropic_Diffusion_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new
     }
     buffer += stride;
     buffer_new += stride;
-  } 
+  }
 }
 
 // Here Quadratic flux function is used for anisotropic diffusion
@@ -204,7 +259,7 @@ constexpr float Flux_Function(float gradient)
   return 1.0f / (1.0f + tmp * tmp);
 }
 
-void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+void Anisotropic_Diffusion_Pylene(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
   mln_pixter(pxOut, new_img);
@@ -220,6 +275,25 @@ void Anisotropic_Diffusion_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<ml
       tmp += gradient * Flux_Function(gradient);
     }
     pxOut->val() = cached_val + 0.125 * tmp;
+  }
+}
+
+void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+
+  auto rngIn = pixels_of(img);
+  auto rngOut = pixels_of(new_img);
+
+  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  {
+    float tmp = 0;
+    auto vin = pxIn.val();
+    for(auto nx : c4(pxIn))
+    {
+      float gradient = nx.val() - vin;
+      tmp += gradient * Flux_Function(gradient);
+    }
+    pxOut.val() = vin + 0.125f * tmp;
   }
 }
 

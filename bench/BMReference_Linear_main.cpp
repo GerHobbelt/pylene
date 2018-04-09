@@ -44,7 +44,7 @@ class Bench_Ref_Linear : public benchmark::Fixture
 
     srand(time(nullptr));
     mln::uint8 maxi = ~0;
-    for (mln::uint8 i = 0; i < maxi; i++)
+    for (int i = 0; i < maxi; i++)
     {
       LUT.push_back(rand());
     }

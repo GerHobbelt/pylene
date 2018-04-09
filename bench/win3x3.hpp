@@ -8,8 +8,8 @@
 
 
 
-template <class Pix, class NbhTraits>
-class nbh_facade : public ranges::view_facade<nbh_facade<Pix, NbhTraits>, ranges::finite>
+template <class PixelCursor, class NbhTraits>
+class nbh_facade : public ranges::view_facade<nbh_facade<PixelCursor, NbhTraits>, ranges::finite>
 {
   static constexpr std::size_t N = NbhTraits::dpoints.size();
   friend ranges::range_access;
@@ -18,46 +18,52 @@ class nbh_facade : public ranges::view_facade<nbh_facade<Pix, NbhTraits>, ranges
     friend ranges::range_access;
   public:
     cursor() = default;
-    cursor(const std::array<std::ptrdiff_t, N>* offsets,
-           const Pix* pix)
-      : m_offsets(offsets), m_pix(pix)
+    cursor(const PixelCursor& cursor)
+      : m_cursor(cursor)
       {}
 
-    auto& val() const { return m_pix->image()[m_pix->index() + (*m_offsets)[m_i]] ; }
-    mln::point2d point() const { return m_pix->point() + NbhTraits::dpoints[m_i]; }
-
-
   private:
-    const cursor& read() const { return *this; }
+    auto read() const
+    {
+      auto cur =  m_cursor;
+      cur.advance(NbhTraits::dpoints[m_i][1], NbhTraits::dpoints[m_i][0]);
+      return cur;
+    }
     bool equal(const ranges::default_sentinel& ) const { return m_i == NbhTraits::dpoints.size(); }
     void next() { m_i++; }
 
-    const std::array<std::ptrdiff_t, N>*   m_offsets;
-    const Pix*                             m_pix;
+    //const std::array<std::ptrdiff_t, N>*   m_offsets;
+    PixelCursor                            m_cursor;
     int m_i = 0;
   };
 
 
   cursor begin_cursor() const
   {
-    return cursor(&m_offsets, m_pix);
+    return cursor(m_pix);
   }
 
 public:
   nbh_facade() = default;
 
-  nbh_facade(const Pix& pix)
-    : m_pix(&pix)
+  nbh_facade(const PixelCursor& pix)
+    : m_pix(pix)
   {
-    auto& ima = pix.image();
-    for (std::size_t i = 0; i < N; ++i)
-      m_offsets[i] = ima.delta_index(NbhTraits::dpoints[i]);
+    // auto& ima = pix.image();
+    // for (std::size_t i = 0; i < N; ++i)
+    //   m_offsets[i] = ima.delta_index(NbhTraits::dpoints[i]);
+  }
+
+  nbh_facade& operator() (const PixelCursor& pix)
+  {
+    m_pix = pix;
+    return *this;
   }
 
 
 private:
-  std::array<std::ptrdiff_t, N> m_offsets;
-  const Pix*                    m_pix = nullptr;
+  //std::array<std::ptrdiff_t, N>        m_offsets;
+  PixelCursor                          m_pix;
 };
 
 
@@ -76,6 +82,9 @@ class win3x3 : public nbh_facade<Pix, win3x3_traits>
 public:
   win3x3(const Pix& pix) : nbh_facade<Pix, win3x3_traits>(pix) {};
 };
+
+
+
 
 
 struct c4_traits

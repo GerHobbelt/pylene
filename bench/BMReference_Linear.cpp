@@ -43,7 +43,6 @@ void Mult_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img)
       pix.val() *= 2;
 }
 
-
 void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   mln_pixter(pxIn, img);
@@ -54,7 +53,7 @@ void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_im
   }
 }
 
-void Mult_Pylene_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+void Mult_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   auto inRng = values_of(img);
   auto outRng = values_of(new_img);
@@ -62,18 +61,13 @@ void Mult_Pylene_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::
     vout = vin * 2;
 }
 
-
-void Mult_Pylene_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+void Mult_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
 {
   auto inRng = pixels_of(img);
   auto outRng = pixels_of(new_img);
-  mln_foreach2((auto [pxin, pxout]), ranges::view::zip(inRng, outRng))
-    pxin.val() = pxout.val() * 2;
+  mln_foreach2((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
+    pxout.val() = pxin.val() * 2;
 }
-
-
-
-
 
 void Mult_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new)
 {
@@ -105,6 +99,34 @@ void Threshold_Inplace_Pylene(mln::image2d<mln::uint8>& img)
     {
       p.val() = maxi;
     }
+  }
+}
+
+void Threshold_Inplace_NewWithValues(mln::image2d<mln::uint8>& img)
+{
+  mln::uint8 threshold = ~0 >> 1;
+  mln::uint8 maxi = ~0;
+  auto rng = values_of(img);
+  mln_foreach2(auto& v, rng)
+  {
+    if (v < threshold)
+      v = 0;
+    else
+      v = maxi;
+  }
+}
+
+void Threshold_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img)
+{
+  mln::uint8 threshold = ~0 >> 1;
+  mln::uint8 maxi = ~0;
+  auto rng = pixels_of(img);
+  mln_foreach2(auto px, rng)
+  {
+    if (px.val() < threshold)
+      px.val() = 0;
+    else
+      px.val() = maxi;
   }
 }
 
@@ -151,6 +173,36 @@ void Threshold_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& n
   }
 }
 
+void Threshold_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  mln::uint8 threshold = ~0 >> 1;
+  mln::uint8 maxi = ~0;
+  auto inRng = values_of(img);
+  auto outRng = values_of(new_img);
+  mln_foreach2((auto && [ vin, vout ]), ranges::view::zip(inRng, outRng))
+  {
+    if (vin < threshold)
+      vout = 0;
+    else
+      vout = maxi;
+  }
+}
+
+void Threshold_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img)
+{
+  mln::uint8 threshold = ~0 >> 1;
+  mln::uint8 maxi = ~0;
+  auto inRng = pixels_of(img);
+  auto outRng = pixels_of(new_img);
+  mln_foreach2((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
+  {
+    if (pxin.val() < threshold)
+      pxout.val() = 0;
+    else
+      pxout.val() = maxi;
+  }
+}
+
 void Threshold_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new)
 {
   mln::uint8 threshold = ~0 >> 1;
@@ -185,6 +237,24 @@ void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
   }
 }
 
+void LUT_Inplace_NewWithValues(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
+{
+  auto rng = values_of(img);
+  mln_foreach2(auto& v, rng)
+  {
+    v = LUT[v];
+  }
+}
+
+void LUT_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
+{
+  auto rng = pixels_of(img);
+  mln_foreach2(auto px, rng)
+  {
+    px.val() = LUT[px.val()];
+  }
+}
+
 void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* __restrict buffer, const mln::uint8* __restrict LUT)
 {
   const int nrow = info[0];
@@ -207,6 +277,26 @@ void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img
   mln_forall(pxIn, pxOut)
   {
     pxOut->val() = LUT[pxIn->val()];
+  }
+}
+
+void LUT_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, const mln::uint8 LUT[])
+{
+  auto inRng = values_of(img);
+  auto outRng = values_of(new_img);
+  mln_foreach2((auto && [ vin, vout ]), ranges::view::zip(inRng, outRng))
+  {
+    vout = LUT[vin];
+  }
+}
+
+void LUT_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, const mln::uint8 LUT[])
+{
+  auto inRng = pixels_of(img);
+  auto outRng = pixels_of(new_img);
+  mln_foreach2((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
+  {
+    pxout.val() = LUT[pxin.val()];
   }
 }
 

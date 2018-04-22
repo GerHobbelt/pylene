@@ -13,18 +13,25 @@ void Mult_Inplace_NewWithValues(mln::image2d<mln::uint8>& img);
 void Mult_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img);
 void Mult_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Mult_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
-void Mult_Pylene_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
-void Mult_Pylene_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
-
+void Mult_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Mult_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 
 void Threshold_Inplace_C(std::ptrdiff_t* info, mln::uint8* buffer);
 void Threshold_Inplace_Pylene(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_NewWithValues(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img);
 void Threshold_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new);
 void Threshold_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Threshold_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
+void Threshold_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img);
 void LUT_Inplace_C(std::ptrdiff_t* info, mln::uint8* buffer, const mln::uint8* LUT);
 void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, const mln::uint8* LUT);
+void LUT_Inplace_NewWithValues(mln::image2d<mln::uint8>& img, const mln::uint8* LUT);
+void LUT_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img, const mln::uint8* LUT);
 void LUT_C(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* buffer_new, const mln::uint8* LUT);
 void LUT_Pylene(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, const mln::uint8* LUT);
+void LUT_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, const mln::uint8* LUT);
+void LUT_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_img, const mln::uint8* LUT);
 
 // void Mult_Inplace_Cor(std::ptrdiff_t* info, mln::uint8* buffer);
 // void LUT_Inplace_Cor(std::ptrdiff_t* info, mln::uint8* buffer, mln::uint8* LUT);
@@ -156,12 +163,12 @@ BENCHMARK_F(Bench_Ref_Linear, Mult_Pylene)(benchmark::State& st)
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_NewWithValues)(benchmark::State& st)
 {
-  Do_Pylene_2(st, Mult_Pylene_NewWithValues);
+  Do_Pylene_2(st, Mult_NewWithValues);
 }
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_NewWithPixels)(benchmark::State& st)
 {
-  Do_Pylene_2(st, Mult_Pylene_NewWithPixels);
+  Do_Pylene_2(st, Mult_NewWithPixels);
 }
 
 BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C)(benchmark::State& st)
@@ -174,6 +181,16 @@ BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_Pylene)(benchmark::State& st)
   Do_Pylene_0(st, Threshold_Inplace_Pylene);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_NewWithValues)(benchmark::State& st)
+{
+  Do_Pylene_0(st, Threshold_Inplace_NewWithValues);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_NewWithPixels)(benchmark::State& st)
+{
+  Do_Pylene_0(st, Threshold_Inplace_NewWithPixels);
+}
+
 BENCHMARK_F(Bench_Ref_Linear, Threshold_C)(benchmark::State& st)
 {
   Do_C_2(st, Threshold_C);
@@ -182,6 +199,16 @@ BENCHMARK_F(Bench_Ref_Linear, Threshold_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Linear, Threshold_Pylene)(benchmark::State& st)
 {
   Do_Pylene_2(st, Threshold_Pylene);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_NewWithValues)(benchmark::State& st)
+{
+  Do_Pylene_2(st, Threshold_NewWithValues);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_NewWithPixels)(benchmark::State& st)
+{
+  Do_Pylene_2(st, Threshold_NewWithPixels);
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C)(benchmark::State& st)
@@ -194,6 +221,16 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_Pylene)(benchmark::State& st)
   Do_Pylene_1(st, LUT_Inplace_Pylene);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_NewWithValues)(benchmark::State& st)
+{
+  Do_Pylene_1(st, LUT_Inplace_NewWithValues);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_NewWithPixels)(benchmark::State& st)
+{
+  Do_Pylene_1(st, LUT_Inplace_NewWithPixels);
+}
+
 BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
 {
   Do_C_3(st, LUT_C);
@@ -202,6 +239,16 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Linear, LUT_Pylene)(benchmark::State& st)
 {
   Do_Pylene_3(st, LUT_Pylene);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_NewWithValues)(benchmark::State& st)
+{
+  Do_Pylene_3(st, LUT_NewWithValues);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_NewWithPixels)(benchmark::State& st)
+{
+  Do_Pylene_3(st, LUT_NewWithPixels);
 }
 
 // BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_Cor)(benchmark::State& st)

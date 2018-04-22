@@ -57,7 +57,7 @@ void Sum_C(int* info, mln::uint8* __restrict buffer, mln::uint8* __restrict buff
 
     for (int j = 0; j < ncol; ++j)
     {
-      mln::uint8 tmp = 0;
+      int tmp = 0;
       for (int k = 0; k < 8; ++k)
         tmp += nbhs[k][j];
       buffer_new[j] = tmp;

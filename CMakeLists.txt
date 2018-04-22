@@ -29,6 +29,13 @@ add_library(Mln INTERFACE)
 # target_compile_features(Mln INTERFACE cxx_std_14)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
 
+# including the range-v3 lib
+if(MSVC)
+  include_directories(external/range-v3-VS2015/include)
+else()
+  include_directories(external/range-v3/include)
+endif()
+
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${FreeImage_INCLUDE_DIRS})
 link_directories(${FreeImage_LIBRARY_DIR})

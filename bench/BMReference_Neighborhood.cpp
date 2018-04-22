@@ -31,9 +31,10 @@ void Sum_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_
 
   mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
-    pxOut.val() = 0;
+    int tmp = 0;
     for(auto nx : win3x3(pxIn))
-      pxOut.val() += nx.val();
+      tmp += nx.val();
+    pxOut.val() = tmp;
   }
 }
 
@@ -90,10 +91,10 @@ void Average_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& 
 
   mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
-    pxOut.val() = 0;
+    int tmp = 0;
     for(auto nx : win3x3(pxIn))
-      pxOut.val() += nx.val();
-    pxOut.val() /= 8;
+      tmp += nx.val();
+    pxOut.val() = tmp / 8;
   }
 }
 
@@ -117,10 +118,10 @@ void Average_C(int* info, mln::uint8* buffer, mln::uint8* buffer_new)
   {
     for (int j = 0; j < ncol; j++)
     {
-      buffer_new[j] = 0;
+      int tmp = 0;
       for (int k = 0; k < 8; k++)
-        buffer_new[j] += buffer[j + offset[k]];
-      buffer_new[j] /= 8;
+        tmp += buffer[j + offset[k]];
+      buffer_new[j] = tmp / 8;
     }
     buffer += stride;
     buffer_new += stride;

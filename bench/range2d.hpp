@@ -1,6 +1,6 @@
 #pragma once
 #include <range/v3/view_facade.hpp>
-#include <range/v3/span.hpp>
+#include <range/v3/view/counted.hpp>
 #include <range/v3/view/zip.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
 
@@ -68,7 +68,7 @@ class value_range2d_outer : public ranges::view_facade<value_range2d_outer<T>, r
 
   struct cursor
   {
-    auto read() const { return ranges::make_span(m_lineptr, m_width); }
+    auto read() const { return ranges::counted_view(m_lineptr, m_width); }
     bool equal(const cursor& other) const { return m_lineptr == other.m_lineptr; }
     void next() { m_lineptr += m_stride; }
 

@@ -95,7 +95,11 @@ namespace mln
 
     namespace impl
     {
+#ifdef _MSC_VER
+		template <class T = void> __declspec(noinline) void warn(const char* msg);
+#else
       template <class T = void> void warn(const char* msg) __attribute__((noinline));
+#endif
 
       template <class T>
       void warn(const char* msg)
@@ -111,13 +115,13 @@ namespace mln
     inline void warn(const char* msg)
     {
       if (verbose)
-        impl::warn(msg);
+        impl::warn<void>(msg);
     }
 
     inline void warn(const std::string& msg)
     {
       if (verbose)
-        impl::warn(msg.c_str());
+        impl::warn<void>(msg.c_str());
     }
 
   }

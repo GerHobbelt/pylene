@@ -153,4 +153,10 @@ RANGES_RE_ENABLE_WARNINGS
 
 RANGES_SATISFY_BOOST_RANGE(::ranges::v3::zip_view)
 
+template<typename...Rngs>
+struct IsSegmentedRange<::ranges::v3::zip_view<Rngs...>> : std::true_type
+{
+    //static_assert(dependant_false<Rngs...>::value, "boom");
+};
+
 #endif

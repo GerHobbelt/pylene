@@ -33,11 +33,25 @@
 #include <range/v3/utility/tuple_algorithm.hpp>
 #include <range/v3/utility/static_const.hpp>
 #include <range/v3/view/all.hpp>
+#include <range/v3/view/single.hpp>
+
+struct segmented_range_base
+{};
+
+template<typename Rng>
+struct IsSegmentedRange : std::is_base_of<segmented_range_base, std::remove_reference_t<Rng>>
+{
+};
 
 namespace ranges
 {
     inline namespace v3
     {
+
+        namespace view
+        {
+            struct zip_fn;
+        }
         /// \cond
         namespace detail
         {
@@ -92,7 +106,7 @@ namespace ranges
             };
             RANGES_INLINE_VARIABLE(distance_to_, distance_to)
 
-            struct _min_
+            struct _min_z
             {
                 template<typename T, typename U>
                 constexpr auto operator()(T const &t, U const &u) const ->
@@ -101,7 +115,7 @@ namespace ranges
                     return t < u ? t : u;
                 }
             };
-            RANGES_INLINE_VARIABLE(_min_, min_)
+            RANGES_INLINE_VARIABLE(_min_z, min_)
 
             struct _max_
             {
@@ -171,18 +185,33 @@ namespace ranges
                     common_type_t<range_difference_type_t<Rngs>...>;
                 using single_pass =
                     meta::or_c<(bool) SinglePass<iterator_t<Rngs>>()...>;
-                using value_type =
-                    detail::decay_t<decltype(invoke(fun_, copy_tag{}, iterator_t<Rngs>{}...))>;
+                //using value_type = ranges::single_view<std::pair<int,int>>;
+                //    detail::decay_t<decltype(invoke(fun_, copy_tag{}, iterator_t<Rngs>{}...))>;
 
                 cursor() = default;
                 cursor(fun_ref_ fun, std::tuple<iterator_t<Rngs>...> its)
                   : fun_(std::move(fun)), its_(std::move(its))
                 {}
-                auto read() const
-                RANGES_DECLTYPE_AUTO_RETURN_NOEXCEPT
-                (
-                    tuple_apply(fun_, its_)
-                )
+                auto read_(std::false_type /* are_all_segmented_rng */) const noexcept
+                {
+                    // return tuple_apply(fun_, its_);
+                    return std::apply(fun_, its_);
+                }
+                auto read_(std::true_type /* are_all_segmented_rng */) const noexcept
+                {
+                    //int i = tuple_apply(view::zip_fn(), tuple_apply(fun_, its_));
+                    //int j = tuple_apply(fun_, its_);
+                    //return tuple_apply(view::zip_fn(), tuple_apply(fun_, its_));
+                    return std::apply(view::zip_fn(), std::apply(fun_, its_));
+                    //ranges::view::single_fn fun;
+                    //return fun(std::make_pair(0, 1));
+                }
+
+                auto read() const noexcept 
+                {
+                    return read_(typename std::conjunction<IsSegmentedRange<Rngs>...>());
+                }
+                
                 void next()
                 {
                     tuple_for_each(its_, detail::inc);
@@ -417,5 +446,13 @@ namespace ranges
 
 RANGES_SATISFY_BOOST_RANGE(::ranges::v3::iter_zip_with_view)
 RANGES_SATISFY_BOOST_RANGE(::ranges::v3::zip_with_view)
+
+template <typename...>
+struct dependant_false : std::false_type {};
+template<typename Fun, typename...Rngs>
+struct IsSegmentedRange<::ranges::v3::iter_zip_with_view<Fun, Rngs...>> : std::true_type
+{
+    static_assert(dependant_false<Fun, Rngs...>::value, "boom");
+};
 
 #endif

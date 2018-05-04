@@ -4,6 +4,9 @@
 #include <range/v3/view/zip.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
 
+#include <range/v3/view/single.hpp>
+#include <type_traits>
+
 #define mln_foreach2(PROTECTED_DECL, RNG)                               \
   for (auto&& __mln_inner_rng : RNG)                                    \
     for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : forward_to_zip(__mln_inner_rng))
@@ -62,7 +65,7 @@ struct image2d_view
 
 
 template <class T>
-class value_range2d_outer : public ranges::view_facade<value_range2d_outer<T>, ranges::finite>
+class value_range2d_outer : public ranges::view_facade<value_range2d_outer<T>, ranges::finite>, segmented_range_base
 {
   friend ranges::range_access;
 
@@ -175,7 +178,7 @@ private:
 
 
 template <class T>
-class pixel_range2d_outer : public ranges::view_facade<pixel_range2d_outer<T>, ranges::finite>
+class pixel_range2d_outer : public ranges::view_facade<pixel_range2d_outer<T>, ranges::finite>, segmented_range_base
 {
   friend ranges::range_access;
 
@@ -230,37 +233,19 @@ pixel_range2d_outer<T> pixels_of(mln::image2d<T>& ima)
 
 // New implementation
 
-template <class T = void>
-struct is_rng
+template <class Rng, typename = std::enable_if_t<!IsSegmentedRange<Rng>::value>>
+auto Rng_Specify(Rng&& rng)
 {
-  static const bool value = false;
-};
-
-template <class U>
-struct is_rng<pixel_range2d_outer<U>>
-{
-  static const bool value = true;
-};
-
-template <class U>
-struct is_rng<value_range2d_outer<U>>
-{
-  static const bool value = true;
-};
-
-#include <vector>
-
-template <class T, typename std::enable_if<!is_rng<T>::value>::type* = nullptr>
-auto Rng_Specify(T& rng)
-{
-  return std::vector<T>(1, rng);
+  return ranges::single_view(std::forward<Rng>(rng));
 }
 
-template <class T, typename std::enable_if<is_rng<T>::value>::type* = nullptr>
-auto Rng_Specify(T& rng)
+template <class Rng, typename = std::enable_if_t<IsSegmentedRange<Rng>::value>>
+decltype(auto) Rng_Specify(Rng&& rng)
 {
-  return rng;
+  return std::forward<Rng>(rng);
 }
+
+
 
 #define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
   for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \

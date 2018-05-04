@@ -32,14 +32,14 @@ void Mult_Inplace_C(std::ptrdiff_t*  info, mln::uint8* buffer)
 void Mult_Inplace_NewWithValues(mln::image2d<mln::uint8>& img)
 {
   auto rng = values_of(img);
-  mln_foreach2(auto& v, rng)
+  mln_foreach_new(auto& v, rng)
     v *= 2;
 }
 
 void Mult_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img)
 {
   auto rng = pixels_of(img);
-  mln_foreach2(auto pix, rng)
+  mln_foreach_new(auto pix, rng)
       pix.val() *= 2;
 }
 
@@ -57,7 +57,11 @@ void Mult_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>&
 {
   auto inRng = values_of(img);
   auto outRng = values_of(new_img);
-  mln_foreach2((auto&& [vin, vout]), ranges::view::zip(inRng, outRng))
+
+  //mln_foreach_new((std::pair<int,int> x), ranges::view::zip(inRng, outRng))
+  //  x.first = x.second;
+
+  mln_foreach_new((auto&& [vin, vout]), ranges::view::zip(inRng, outRng))
     vout = vin * 2;
 }
 
@@ -65,7 +69,7 @@ void Mult_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>&
 {
   auto inRng = pixels_of(img);
   auto outRng = pixels_of(new_img);
-  mln_foreach2((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
+  mln_foreach_new((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
     pxout.val() = pxin.val() * 2;
 }
 
@@ -107,7 +111,7 @@ void Threshold_Inplace_NewWithValues(mln::image2d<mln::uint8>& img)
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
   auto rng = values_of(img);
-  mln_foreach2(auto& v, rng)
+  mln_foreach_new(auto& v, rng)
   {
     if (v < threshold)
       v = 0;
@@ -121,7 +125,7 @@ void Threshold_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img)
   mln::uint8 threshold = ~0 >> 1;
   mln::uint8 maxi = ~0;
   auto rng = pixels_of(img);
-  mln_foreach2(auto px, rng)
+  mln_foreach_new(auto px, rng)
   {
     if (px.val() < threshold)
       px.val() = 0;
@@ -179,7 +183,7 @@ void Threshold_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::ui
   mln::uint8 maxi = ~0;
   auto inRng = values_of(img);
   auto outRng = values_of(new_img);
-  mln_foreach2((auto && [ vin, vout ]), ranges::view::zip(inRng, outRng))
+  mln_foreach_new((auto && [ vin, vout ]), ranges::view::zip(inRng, outRng))
   {
     if (vin < threshold)
       vout = 0;
@@ -194,7 +198,7 @@ void Threshold_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::ui
   mln::uint8 maxi = ~0;
   auto inRng = pixels_of(img);
   auto outRng = pixels_of(new_img);
-  mln_foreach2((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
+  mln_foreach_new((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
   {
     if (pxin.val() < threshold)
       pxout.val() = 0;
@@ -240,7 +244,7 @@ void LUT_Inplace_Pylene(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
 void LUT_Inplace_NewWithValues(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
 {
   auto rng = values_of(img);
-  mln_foreach2(auto& v, rng)
+  mln_foreach_new(auto& v, rng)
   {
     v = LUT[v];
   }
@@ -249,7 +253,7 @@ void LUT_Inplace_NewWithValues(mln::image2d<mln::uint8>& img, const mln::uint8 L
 void LUT_Inplace_NewWithPixels(mln::image2d<mln::uint8>& img, const mln::uint8 LUT[])
 {
   auto rng = pixels_of(img);
-  mln_foreach2(auto px, rng)
+  mln_foreach_new(auto px, rng)
   {
     px.val() = LUT[px.val()];
   }
@@ -284,7 +288,7 @@ void LUT_NewWithValues(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& 
 {
   auto inRng = values_of(img);
   auto outRng = values_of(new_img);
-  mln_foreach2((auto && [ vin, vout ]), ranges::view::zip(inRng, outRng))
+  mln_foreach_new((auto && [ vin, vout ]), ranges::view::zip(inRng, outRng))
   {
     vout = LUT[vin];
   }
@@ -294,7 +298,7 @@ void LUT_NewWithPixels(mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& 
 {
   auto inRng = pixels_of(img);
   auto outRng = pixels_of(new_img);
-  mln_foreach2((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
+  mln_foreach_new((auto[pxin, pxout]), ranges::view::zip(inRng, outRng))
   {
     pxout.val() = LUT[pxin.val()];
   }

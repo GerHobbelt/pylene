@@ -228,7 +228,40 @@ pixel_range2d_outer<T> pixels_of(mln::image2d<T>& ima)
   return pixel_range2d_outer<T>(view);
 }
 
+// New implementation
 
+template <class T = void>
+struct is_rng
+{
+  static const bool value = false;
+};
 
+template <class U>
+struct is_rng<pixel_range2d_outer<U>>
+{
+  static const bool value = true;
+};
 
+template <class U>
+struct is_rng<value_range2d_outer<U>>
+{
+  static const bool value = true;
+};
 
+#include <vector>
+
+template <class T, typename std::enable_if<!is_rng<T>::value>::type* = nullptr>
+auto Rng_Specify(T& rng)
+{
+  return std::vector<T>(1, rng);
+}
+
+template <class T, typename std::enable_if<is_rng<T>::value>::type* = nullptr>
+auto Rng_Specify(T& rng)
+{
+  return rng;
+}
+
+#define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
+  for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \
+    for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : __mln_inner_rng)

@@ -194,15 +194,15 @@ namespace ranges
                 {}
                 auto read_(std::false_type /* are_all_segmented_rng */) const noexcept
                 {
-                    // return tuple_apply(fun_, its_);
-                    return std::apply(fun_, its_);
+                    return tuple_apply(fun_, its_);
+                    //return std::apply(fun_, its_);
                 }
                 auto read_(std::true_type /* are_all_segmented_rng */) const noexcept
                 {
                     //int i = tuple_apply(view::zip_fn(), tuple_apply(fun_, its_));
                     //int j = tuple_apply(fun_, its_);
-                    //return tuple_apply(view::zip_fn(), tuple_apply(fun_, its_));
-                    return std::apply(view::zip_fn(), std::apply(fun_, its_));
+                    return tuple_apply(view::zip_fn(), tuple_apply(fun_, its_));
+                    //return std::apply(view::zip_fn(), std::apply(fun_, its_));
                     //ranges::view::single_fn fun;
                     //return fun(std::make_pair(0, 1));
                 }

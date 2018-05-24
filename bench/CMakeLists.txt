@@ -61,3 +61,13 @@ target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
 target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
 target_link_libraries(BMErosion ${FreeImage_LIBRARIES})
 target_link_libraries(BMDilation ${FreeImage_LIBRARIES})
+
+# Test of the new design
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_executable(test_new_design test_new_design.cpp)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+include_directories("${CMAKE_SOURCE_DIR}/googletest/include")
+
+target_link_libraries(test_new_design gtest)

@@ -116,6 +116,7 @@ namespace ranges
 
         namespace view
         {
+            /* Forwarded the reference
             struct zip_fn
             {
                 template<typename ...Rngs>
@@ -144,6 +145,7 @@ namespace ranges
             /// \relates zip_fn
             /// \ingroup group-views
             RANGES_INLINE_VARIABLE(zip_fn, zip)
+            */
         }
         /// @}
     }

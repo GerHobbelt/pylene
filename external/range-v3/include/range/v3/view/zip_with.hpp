@@ -50,7 +50,35 @@ namespace ranges
 
         namespace view
         {
-            struct zip_fn;
+            /* Forward reference */
+            struct zip_fn
+            {
+                template<typename ...Rngs>
+                using Concept = meta::and_<InputRange<Rngs>...>;
+
+                template<typename...Rngs,
+                    CONCEPT_REQUIRES_(Concept<Rngs...>())>
+                zip_view<all_t<Rngs>...> operator()(Rngs &&... rngs) const
+                {
+                    CONCEPT_ASSERT(meta::and_<Range<Rngs>...>());
+                    return zip_view<all_t<Rngs>...>{all(static_cast<Rngs&&>(rngs))...};
+                }
+
+            #ifndef RANGES_DOXYGEN_INVOKED
+                template<typename...Rngs,
+                    CONCEPT_REQUIRES_(!Concept<Rngs...>())>
+                void operator()(Rngs &&...) const
+                {
+                    CONCEPT_ASSERT_MSG(meta::and_<InputRange<Rngs>...>(),
+                        "All of the objects passed to view::zip must model the InputRange "
+                        "concept");
+                }
+            #endif
+            };
+
+            /// \relates zip_fn
+            /// \ingroup group-views
+            RANGES_INLINE_VARIABLE(zip_fn, zip)
         }
         /// \cond
         namespace detail

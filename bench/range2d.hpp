@@ -8,6 +8,8 @@
 #include <range/v3/view/single.hpp>
 #include <type_traits>
 
+#include <mln/core/foreach.hpp>
+
 #define mln_foreach2(PROTECTED_DECL, RNG)                               \
   for (auto&& __mln_inner_rng : RNG)                                    \
     for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : forward_to_zip(__mln_inner_rng))
@@ -259,6 +261,17 @@ decltype(auto) Rng_Specify(Rng&& rng)
 }
 
 #define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
+  MLN_DECL_VAR(__mln_has_been_broken, false)                                                                           \
   for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \
-    for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : __mln_inner_rng)
-      
+    if (__mln_has_been_broken.get())                                                                                   \
+      break;                                                                                                           \
+    else                                                                                                               \
+      for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : __mln_inner_rng)                                                   \
+        if (__mln_has_been_broken.get())                                                                               \
+          break;                                                                                                       \
+        else                                                                                                           \
+          if (__mln_has_been_broken.set(true))                                                                         \
+          {                                                                                                            \
+          }                                                                                                            \
+          else                                                                                                         \
+            for ( ; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))

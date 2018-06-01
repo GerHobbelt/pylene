@@ -29,7 +29,7 @@ void Sum_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& new_
   auto rngIn = pixels_of(img);
   auto rngOut = pixels_of(new_img);
 
-  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  mln_foreach_new((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
     int tmp = 0;
     for(auto nx : win3x3(pxIn))
@@ -89,7 +89,7 @@ void Average_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& 
   auto rngIn = pixels_of(img);
   auto rngOut = pixels_of(new_img);
 
-  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  mln_foreach_new((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
     int tmp = 0;
     for(auto nx : win3x3(pxIn))
@@ -151,7 +151,7 @@ void Erosion_New(const mln::image2d<mln::uint8>& img, mln::image2d<mln::uint8>& 
   auto rngIn = pixels_of(img);
   auto rngOut = pixels_of(new_img);
 
-  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  mln_foreach_new((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
     mln::uint8 tmp = pxIn.val();
     for(auto nx : win3x3(pxIn))
@@ -215,7 +215,7 @@ void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& img, mln::image2d<m
   auto rngIn = pixels_of(img);
   auto rngOut = pixels_of(new_img);
 
-  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  mln_foreach_new((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
     int tmp = 0;
     for(auto nx : c4(pxIn))
@@ -284,7 +284,7 @@ void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& img, mln::image2d
   auto rngIn = pixels_of(img);
   auto rngOut = pixels_of(new_img);
 
-  mln_foreach2((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
+  mln_foreach_new((auto [pxIn, pxOut]), ranges::view::zip(rngIn, rngOut))
   {
     float tmp = 0;
     auto vin = pxIn.val();

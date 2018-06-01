@@ -214,10 +214,6 @@ private:
   image2d_view<T> m_ima;
 };
 
-
-
-
-
 template <class T>
 pixel_range2d_outer<const T> pixels_of(const mln::image2d<T>& ima)
 {
@@ -232,7 +228,23 @@ pixel_range2d_outer<T> pixels_of(mln::image2d<T>& ima)
   return pixel_range2d_outer<T>(view);
 }
 
-// New implementation
+template <class T>
+struct value_range2d : segmented_range_base
+{
+public:
+  value_range2d() = default;
+  value_range2d(image2d_view<T> f)
+    : m_ima(std::move(f))
+  {}
+
+  T* begin() { return m_ima.buffer; }
+  T* end() { return m_ima.buffer + m_ima.height * m_ima.stride; }
+
+  value_range2d_outer<T> outer() { return value_range2d_outer<T>(m_ima); }
+
+private:
+  image2d_view<T> m_ima;
+};
 
 template <class Rng, typename = std::enable_if_t<!IsSegmentedRange<Rng>::value>>
 auto Rng_Specify(Rng&& rng)
@@ -246,8 +258,7 @@ decltype(auto) Rng_Specify(Rng&& rng)
   return std::forward<Rng>(rng);
 }
 
-
-
 #define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
   for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \
     for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : __mln_inner_rng)
+      

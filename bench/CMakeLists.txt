@@ -62,8 +62,6 @@ target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
 target_link_libraries(BMErosion ${FreeImage_LIBRARIES})
 target_link_libraries(BMDilation ${FreeImage_LIBRARIES})
 
-add_executable(quick_test test.cpp)
-
 # Test of the new design
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})

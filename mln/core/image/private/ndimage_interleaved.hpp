@@ -280,6 +280,9 @@ namespace mln
     /// Return a view over a subdomain
     ndimage subimage(const domain_type& domain, bool extended_by_image) const;
 
+    /// Return a slice of the image
+    template <class U = void, class = std::enable_if_t<N == 3, U>>
+    ndimage<N-1, V, layout_t::INTERLEAVED> slice(int z) const;
 
     V* buffer(int k = 0);
     const V* buffer(int k = 0) const;
@@ -488,6 +491,25 @@ namespace mln
   {
     ndimage output(*this);
     output.clip(domain, extended_by_image);
+    return output;
+  }
+
+  template <int N, class V>
+  template <class U, class>
+  ndimage<N-1, V, layout_t::INTERLEAVED>
+  ndimage<N, V, layout_t::INTERLEAVED>::slice(int z) const
+  {
+    using O = ndimage<N-1, V, layout_t::INTERLEAVED>;
+    typename O::point_type pmin = {this->m_domain.pmin[1], this->m_domain.pmin[2]};
+    typename O::point_type pmax = {this->m_domain.pmax[1], this->m_domain.pmax[2]};
+    typename O::domain_type domain(pmin, pmax);
+
+    std::size_t strides[2] = { this->byte_stride(1), this->byte_stride(2) };
+
+    V* buffer = const_cast<V*>(this->buffer());
+    buffer += z * this->m_strides[0];
+
+    auto output = ndimage<N-1, V, layout_t::INTERLEAVED>::from_buffer(static_cast<void*>(buffer), domain, strides);
     return output;
   }
 

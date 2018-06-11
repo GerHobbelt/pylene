@@ -68,7 +68,7 @@ struct image2d_view
 
 
 template <class T>
-class value_range2d_outer : public ranges::view_facade<value_range2d_outer<T>, ranges::finite>, segmented_range_base
+class value_range2d_outer : public ranges::view_facade<value_range2d_outer<T>, ranges::finite>
 {
   friend ranges::range_access;
 
@@ -103,20 +103,6 @@ public:
 private:
   image2d_view<T> m_ima;
 };
-
-template <class T>
-value_range2d_outer<const T> values_of(const mln::image2d<T>& ima)
-{
-  image2d_view<const T> view(ima);
-  return value_range2d_outer<const T>(view);
-}
-
-template <class T>
-value_range2d_outer<T> values_of(mln::image2d<T>& ima)
-{
-  image2d_view<T> view(ima);
-  return value_range2d_outer<T>(view);
-}
 
 
 
@@ -181,7 +167,7 @@ private:
 
 
 template <class T>
-class pixel_range2d_outer : public ranges::view_facade<pixel_range2d_outer<T>, ranges::finite>, segmented_range_base
+class pixel_range2d_outer : public ranges::view_facade<pixel_range2d_outer<T>, ranges::finite>
 {
   friend ranges::range_access;
 
@@ -217,21 +203,26 @@ private:
 };
 
 template <class T>
-pixel_range2d_outer<const T> pixels_of(const mln::image2d<T>& ima)
+struct pixel_range2d : public segmented_range_base
 {
-  image2d_view<const T> view(ima);
-  return pixel_range2d_outer<const T>(view);
-}
+public:
+  pixel_range2d() = default;
+  pixel_range2d(image2d_view<T> f)
+    : m_ima(std::move(f))
+  {}
+
+  T* begin() const { return m_ima.buffer; }
+  T* end() const { return m_ima.buffer + m_ima.height * m_ima.stride; }
+  
+
+  pixel_range2d_outer<T> outer() const { return pixel_range2d_outer<T>(m_ima); }
+
+private:
+  image2d_view<T> m_ima;
+};
 
 template <class T>
-pixel_range2d_outer<T> pixels_of(mln::image2d<T>& ima)
-{
-  image2d_view<T> view(ima);
-  return pixel_range2d_outer<T>(view);
-}
-
-template <class T>
-struct value_range2d : segmented_range_base
+struct value_range2d : public segmented_range_base
 {
 public:
   value_range2d() = default;
@@ -239,30 +230,58 @@ public:
     : m_ima(std::move(f))
   {}
 
-  T* begin() { return m_ima.buffer; }
-  T* end() { return m_ima.buffer + m_ima.height * m_ima.stride; }
+  T* begin() const { return m_ima.buffer; }
+  T* end() const { return m_ima.buffer + m_ima.height * m_ima.stride; }
 
-  value_range2d_outer<T> outer() { return value_range2d_outer<T>(m_ima); }
+  value_range2d_outer<T> outer() const { return value_range2d_outer<T>(m_ima); }
 
 private:
   image2d_view<T> m_ima;
 };
 
-template <class Rng, typename = std::enable_if_t<!IsSegmentedRange<Rng>::value>>
+template <class Rng, typename = std::enable_if_t<!IsSegmentedRange<std::remove_reference_t<Rng>>::value>>
 auto Rng_Specify(Rng&& rng)
 {
   return ranges::single_view(std::forward<Rng>(rng));
 }
 
-template <class Rng, typename = std::enable_if_t<IsSegmentedRange<Rng>::value>>
+template <class Rng, typename = std::enable_if_t<IsSegmentedRange<std::decay_t<Rng>>::value>>
 decltype(auto) Rng_Specify(Rng&& rng)
 {
-  return std::forward<Rng>(rng);
+  return rng.outer();
+}
+
+template <class T>
+value_range2d<const T> values_of(const mln::image2d<T>& ima)
+{
+  image2d_view<const T> view(ima);
+  return value_range2d<const T>(view);
+}
+
+template <class T>
+value_range2d<T> values_of(mln::image2d<T>& ima)
+{
+  image2d_view<T> view(ima);
+  return value_range2d<T>(view);
+}
+
+template <class T>
+pixel_range2d<const T> pixels_of(const mln::image2d<T>& ima)
+{
+  image2d_view<const T> view(ima);
+  return pixel_range2d<const T>(view);
+}
+
+template <class T>
+pixel_range2d<T> pixels_of(mln::image2d<T>& ima)
+{
+  image2d_view<T> view(ima);
+  return pixel_range2d<T>(view);
 }
 
 #define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
   MLN_DECL_VAR(__mln_has_been_broken, false)                                                                           \
-  for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \
+  for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                               \
     if (__mln_has_been_broken.get())                                                                                   \
       break;                                                                                                           \
     else                                                                                                               \
@@ -270,8 +289,4 @@ decltype(auto) Rng_Specify(Rng&& rng)
         if (__mln_has_been_broken.get())                                                                               \
           break;                                                                                                       \
         else                                                                                                           \
-          if (__mln_has_been_broken.set(true))                                                                         \
-          {                                                                                                            \
-          }                                                                                                            \
-          else                                                                                                         \
-            for ( ; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))
+            for (__mln_has_been_broken.set(true) ; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))

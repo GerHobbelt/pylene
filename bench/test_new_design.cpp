@@ -65,8 +65,8 @@ TEST(NewDesignChangeVal_Multiple_Iterator, CanChangeVal)
 
   int i = 0;
 
-  auto rng = values_of<mln::uint8>(g);
-  auto rng1 = values_of<mln::uint8>(h);
+  auto rng = values_of(g);
+  auto rng1 = values_of(h);
   mln_foreach_new((auto&& [v, v1]), ranges::view::zip(rng, rng1))
   {
     v = i;
@@ -112,6 +112,56 @@ TEST(NewDesignChangePix_Multiple_Iterator, CanChangePix)
   {
     EXPECT_EQ(f_px->val(), g_px->val());
     EXPECT_EQ(f_px->val(), h_px->val());
+  }
+}
+
+TEST(NewDesignVal_IterWithoutMacro, Not_On_Stride)
+{
+  int width = 5;
+  int height = 5;
+  mln::image2d<mln::uint8> f(width, height);
+  mln::image2d<mln::uint8> g(width, height);
+  mln::iota(g, 0);
+
+  int i = 0;
+
+  auto rng = values_of(f);
+  for (auto& val: rng)
+  {
+    val = i++;
+  }
+  EXPECT_EQ(width * height, i);
+
+  mln_pixter(f_px, f);
+  mln_pixter(g_px, g);
+  mln_forall(f_px, g_px)
+  {
+    EXPECT_EQ(f_px->val(), g_px->val());
+  }
+}
+
+TEST(NewDesignPix_IterWithoutMacro, Not_On_Stride)
+{
+  int width = 5;
+  int height = 5;
+  mln::image2d<mln::uint8> f(width, height);
+  mln::image2d<mln::uint8> g(width, height);
+  mln::iota(g, 0);
+
+  int i = 0;
+
+  auto rng = pixels_of(f);
+  for (auto& pix: rng)
+  {
+    pix.val() = i++;
+  }
+  EXPECT_EQ(width * height, i);
+
+  mln_pixter(f_px, f);
+  mln_pixter(g_px, g);
+  mln_forall(f_px, g_px)
+  {
+    EXPECT_EQ(f_px->val(), g_px->val());
   }
 }
 

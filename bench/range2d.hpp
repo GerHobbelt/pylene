@@ -3,37 +3,24 @@
 #include <range/v3/view/counted.hpp>
 #include <range/v3/span.hpp>
 #include <range/v3/view/zip.hpp>
-#include <boost/preprocessor/punctuation/remove_parens.hpp>
-
 #include <range/v3/view/single.hpp>
-#include <type_traits>
+
+#include <boost/preprocessor/punctuation/remove_parens.hpp>
 
 #include <mln/core/foreach.hpp>
 #include <mln/core/image/image2d.hpp>
 
-#define mln_foreach2(PROTECTED_DECL, RNG)                               \
-  for (auto&& __mln_inner_rng : RNG)                                    \
-    for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : forward_to_zip(__mln_inner_rng))
-
-
-// template<class Tuple, std::size_t... I>
-// auto forward_to_zip_impl(Tuple&& rngs, std::index_sequence<I...>)
-// {
-//   return ranges::view::zip(std::get<I>(std::forward<Tuple>(rngs))...);
-// }
-
-
-template<class Rng1, class Rng2>
-auto forward_to_zip(ranges::common_pair<Rng1, Rng2> rngs)
-{
-  return ranges::view::zip(rngs.first, rngs.second);
-}
-
-template<class Other>
-decltype(auto) forward_to_zip(Other&& rng)
-{
-  return std::forward<Other>(rng);
-}
+#define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
+  MLN_DECL_VAR(__mln_has_been_broken, false)                                                                           \
+  for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \
+    if (__mln_has_been_broken.get())                                                                                   \
+      break;                                                                                                           \
+    else                                                                                                               \
+      for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : __mln_inner_rng)                                                   \
+        if (__mln_has_been_broken.get())                                                                               \
+          break;                                                                                                       \
+        else                                                                                                           \
+            for (__mln_has_been_broken.set(true) ; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))
 
 template <class T>
 struct image2d_view
@@ -65,8 +52,6 @@ struct image2d_view
   int width;
   int height;
 };
-
-
 
 template <class T>
 class value_range2d_outer : public ranges::view_facade<value_range2d_outer<T>, ranges::finite>
@@ -104,9 +89,6 @@ public:
 private:
   image2d_view<T> m_ima;
 };
-
-
-
 
 template <class T>
 class pixel_range2d_inner : public ranges::view_facade<pixel_range2d_inner<T>, ranges::finite>
@@ -164,8 +146,6 @@ private:
   T*               m_lineptr;
   int              m_y;
 };
-
-
 
 template <class T>
 class pixel_range2d_outer : public ranges::view_facade<pixel_range2d_outer<T>, ranges::finite>
@@ -325,15 +305,3 @@ pixel_range2d<T> pixels_of(mln::image2d<T>& ima)
   image2d_view<T> view(ima);
   return pixel_range2d<T>(view);
 }
-
-#define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
-  MLN_DECL_VAR(__mln_has_been_broken, false)                                                                           \
-  for (auto&& __mln_inner_rng : Rng_Specify(RNG))                                                                      \
-    if (__mln_has_been_broken.get())                                                                                   \
-      break;                                                                                                           \
-    else                                                                                                               \
-      for (BOOST_PP_REMOVE_PARENS(PROTECTED_DECL) : __mln_inner_rng)                                                   \
-        if (__mln_has_been_broken.get())                                                                               \
-          break;                                                                                                       \
-        else                                                                                                           \
-            for (__mln_has_been_broken.set(true) ; __mln_has_been_broken.get(); __mln_has_been_broken.set(false))

@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include <mln/core/foreach.hpp>
+#include <mln/core/image/image2d.hpp>
 
 #define mln_foreach2(PROTECTED_DECL, RNG)                               \
   for (auto&& __mln_inner_rng : RNG)                                    \
@@ -203,87 +204,42 @@ private:
 };
 
 template <class T>
-struct pixel_range2d : public segmented_range_base
+struct pixel_range2d : public segmented_range_base, ranges::view_facade<pixel_range2d<T>, ranges::finite>
 {
+  friend ranges::range_access;
+
 public:
+  struct cursor
+  {
+    cursor() = default;
+    cursor(image2d_view<T> ima, int x_, int y_)
+      : m_ima(ima), x(x_), y(y_), ptr(ima.buffer)
+      {
+      }
+
+    void next() { if (++x == m_ima.width) { x = 0; ++y; ptr += m_ima.stride; } }
+    auto& read() const { return *this; }
+    bool equal(const cursor& other) const { return y == other.y && x == other.x; }
+
+    // Pixel interface
+    T& val() const { return ptr[x]; }
+    mln::point2d point() const { return {static_cast<short int>(y), static_cast<short int>(x)}; }
+    const image2d_view<T>& image() const { return *m_ima; }
+
+  private:
+    image2d_view<T> m_ima;
+    std::ptrdiff_t x;
+    int y;
+     T* ptr;
+  };
+
   pixel_range2d() = default;
   pixel_range2d(image2d_view<T> f)
     : m_ima(std::move(f))
   {}
 
-  class linear_iterator : public std::iterator<std::input_iterator_tag, T>
-  {
-    image2d_view<T> m_ima;
-    std::ptrdiff_t index_x;
-    std::ptrdiff_t index_y;
-  public:
-    linear_iterator(image2d_view<T> view)
-      : m_ima(view)
-      , index_x(0)
-      , index_y(0)
-    {}
-
-    linear_iterator(image2d_view<T> view, std::ptrdiff_t i_x, std::ptrdiff_t i_y)
-      : m_ima(view)
-      , index_x(i_x)
-      , index_y(i_y)
-    {}
-
-    image2d_view<T> getView() const { return m_ima; }
-    std::ptrdiff_t getIndexX() const { return index_x; }
-    std::ptrdiff_t getIndexY() const { return index_y; }
-
-    linear_iterator& operator++()
-    {
-      index_x++;
-      if (index_x == m_ima.width)
-      {
-        index_x = 0;
-        index_y++;
-      }
-      return *this;
-    }
-
-    bool operator==(const linear_iterator& other) const
-    {
-      return m_ima.buffer == other.getView().buffer
-              && index_x == other.getIndexX()
-              && index_y == other.getIndexY();
-    }
-
-    bool operator!=(const linear_iterator& other) const {return !operator==(other); }
-
-    class pixel_interface
-    {
-      image2d_view<T> m_ima;
-      std::ptrdiff_t m_x;
-      std::ptrdiff_t m_y;
-    public:
-      pixel_interface(image2d_view<T> view, std::ptrdiff_t i_x, std::ptrdiff_t i_y)
-        : m_ima(view)
-        , m_x(i_x)
-        , m_y(i_y)
-      {}
-
-      T& val() const { return m_ima.buffer[m_x + m_y * m_ima.stride]; }
-      mln::point2d point() const { return {m_y, m_x}; }
-      const image2d_view<T>& image() const { return m_ima; }
-    };
-
-    pixel_interface operator*() {return pixel_interface(m_ima, index_x, index_y); }
-  };
-
-  /* Les lignes commentées ci-dessous sont les bonnes version des méthodes begin et end
-  mais elles empêchent la classe de correspondre au concept InputRange, les autres méthodes
-  renvoyant un pointeur ne posent pas se problème */
-
-  //linear_iterator begin() const { return linear_iterator(m_ima); }
-  //linear_iterator end() const { return linear_iterator(m_ima, 0, m_ima.height); }
-
-  T* begin() { return nullptr; }
-  T* end() { return nullptr; }
-
-  /*********************************************/
+  cursor begin_cursor() { return cursor(m_ima, 0, 0); }
+  cursor end_cursor() { return cursor(m_ima, 0, m_ima.height); }
 
   pixel_range2d_outer<T> outer() const { return pixel_range2d_outer<T>(m_ima); }
 
@@ -294,67 +250,35 @@ private:
 template <class T>
 struct value_range2d : public segmented_range_base, ranges::view_facade<value_range2d<T>, ranges::finite>
 {
+  friend ranges::range_access;
+
 public:
+  struct cursor
+  {
+    cursor() = default;
+    cursor(image2d_view<T> ima, int x_, int y_)
+      : m_ima(ima), x(x_), y(y_), ptr(ima.buffer)
+      {
+      }
+
+    void next() { if (++x == m_ima.width) { x = 0; ++y; ptr += m_ima.stride; } }
+    auto& read() const { return ptr[x]; }
+    bool equal(const cursor& other) const { return y == other.y && x == other.x; }
+
+  private:
+    image2d_view<T> m_ima;
+    std::ptrdiff_t x;
+    int y;
+     T* ptr;
+  };
+
   value_range2d() = default;
   value_range2d(image2d_view<T> f)
     : m_ima(std::move(f))
   {}
 
-  class linear_iterator : public std::iterator<std::input_iterator_tag, T>
-  {
-    image2d_view<T> m_ima;
-    std::ptrdiff_t index_x;
-    std::ptrdiff_t index_y;
-  public:
-    linear_iterator(image2d_view<T> view)
-      : m_ima(view)
-      , index_x(0)
-      , index_y(0)
-    {}
-
-    linear_iterator(image2d_view<T> view, std::ptrdiff_t i_x, std::ptrdiff_t i_y)
-      : m_ima(view)
-      , index_x(i_x)
-      , index_y(i_y)
-    {}
-
-    image2d_view<T> getView() const { return m_ima; }
-    std::ptrdiff_t getIndexX() const { return index_x; }
-    std::ptrdiff_t getIndexY() const { return index_y; }
-
-    linear_iterator& operator++()
-    {
-      index_x++;
-      if (index_x == m_ima.width)
-      {
-        index_x = 0;
-        index_y++;
-      }
-      return *this;
-    }
-
-    bool operator==(const linear_iterator& other) const
-    {
-      return m_ima.buffer == other.getView().buffer
-              && index_x == other.getIndexX()
-              && index_y == other.getIndexY();
-    }
-
-    bool operator!=(const linear_iterator& other) const {return !operator==(other); }
-    T& operator*() {return *(m_ima.buffer + index_x + index_y * m_ima.stride); }
-  };
-
-  /* Les lignes commentées ci-dessous sont les bonnes version des méthodes begin et end
-  mais elles empêchent la classe de correspondre au concept InputRange, les autres méthodes
-  renvoyant un pointeur ne posent pas se problème */
-
-  //linear_iterator begin() const { return linear_iterator(m_ima); }
-  //linear_iterator end() const { return linear_iterator(m_ima, 0, m_ima.height); }
-
-  T* begin() { return nullptr; }
-  T* end() { return nullptr; }
-
-  /*****************************************************************/
+  cursor begin_cursor() { return cursor(m_ima, 0, 0); }
+  cursor end_cursor() { return cursor(m_ima, 0, m_ima.height); }
 
   value_range2d_outer<T> outer() const { return value_range2d_outer<T>(m_ima); }
 

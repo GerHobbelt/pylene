@@ -44,6 +44,24 @@ struct IsSegmentedRange : std::is_base_of<segmented_range_base, std::remove_refe
 {
 };
 
+/*
+struct my_funtor_t() {
+
+  template<typename... Ts>
+  constexpr decltype(auto) operator()(Ts&&... args) const;
+
+  // ...
+}
+
+inline constexpr auto my_functor_t my_funtor{};
+
+template<typename... Ts>
+  constexpr decltype(auto) my_functor_t::operator()(Ts&&... args) const {
+    // ...
+    return 0;
+  }
+*/
+
 namespace ranges
 {
   inline namespace v3
@@ -83,7 +101,6 @@ namespace ranges
 
     namespace detail
     {
-        struct indirect_zip_fn_outer;
         struct indirect_zip_fn_zip
             {
                 // tuple value
@@ -139,7 +156,28 @@ namespace ranges
                 )
             };
 
-     
+        struct indirect_zip_fn_outer
+        {
+          // tuple value
+                template<typename ...Its, typename = std::enable_if_t<sizeof...(Its) != 2>>
+                    //CONCEPT_REQUIRES_(sizeof...(Its) != 2)>
+                void operator()(copy_tag, Its...) const;
+
+                // tuple reference
+                template<typename ...Its,  typename = std::enable_if_t<sizeof...(Its) != 2>>
+                    //CONCEPT_REQUIRES_(sizeof...(Its) != 2)>
+                auto operator()(Its const &... its) const;
+
+                // pair value
+                template<typename It1, typename It2>
+                void operator()(copy_tag, It1, It2) const;
+
+                // pair reference
+                template<typename It1, typename It2>
+                auto operator()(It1 const &it1, It2 const &it2) const
+                -> iter_zip_with_view<indirect_zip_fn_zip, decltype(it1.outer()), decltype(it2.outer())>;
+        };
+
       struct equal_to_
       {
         template <typename T, typename U>
@@ -379,42 +417,35 @@ namespace ranges
 
     namespace detail
     {
-       struct indirect_zip_fn_outer
-            {
                 // tuple value
-                template<typename ...Its,
-                    CONCEPT_REQUIRES_(/*meta::and_<Readable<Its>...>() && */sizeof...(Its) != 2)>
-                [[noreturn]] auto operator()(copy_tag, Its...) const
+                template<typename ...Its, typename>
+                void indirect_zip_fn_outer::operator()(copy_tag, Its...) const
                 {
                     RANGES_EXPECT(false);
                 }
 
                 // tuple reference
-                template<typename ...Its,
-                    CONCEPT_REQUIRES_(/*meta::and_<Readable<Its>...>() && */sizeof...(Its) != 2)>
-                auto operator()(Its const &... its) const
-                RANGES_DECLTYPE_AUTO_RETURN
-                (
-                    iter_zip_with_view(indirect_zip_fn_zip(),its.outer()...)
-                )
+                template<typename ...Its, typename>
+                auto indirect_zip_fn_outer::operator()(Its const &... its) const
+                {
+                    return iter_zip_with_view(indirect_zip_fn_zip(), its.outer()...);
+                }
 
                 // pair value
-                template<typename It1, typename It2/*,
-                    CONCEPT_REQUIRES_(Readable<It1>() && Readable<It2>())*/>
-                [[noreturn]] auto operator()(copy_tag, It1, It2) const
+                template<typename It1, typename It2>
+                 void indirect_zip_fn_outer::operator()(copy_tag, It1, It2) const
                 {
                     RANGES_EXPECT(false);
                 }
 
                 // pair reference
-                template<typename It1, typename It2/*,
-                    CONCEPT_REQUIRES_(Readable<It1>() && Readable<It2>())*/>
-                auto operator()(It1 const &it1, It2 const &it2) const
+                template<typename It1, typename It2>
+                auto indirect_zip_fn_outer::operator()(It1 const &it1, It2 const &it2) const
                 -> iter_zip_with_view<indirect_zip_fn_zip, decltype(it1.outer()), decltype(it2.outer())>
                 {
                     return iter_zip_with_view(indirect_zip_fn_zip(), it1.outer(), it2.outer());
                 }
-            };
+            
 
     }
 

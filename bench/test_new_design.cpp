@@ -4,6 +4,8 @@
 
 #include "range2d.hpp"
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 TEST(NewDesignChangeVal, CanChangeVal)
@@ -162,6 +164,86 @@ TEST(NewDesignPix_IterWithoutMacro, Not_On_Stride)
   mln_forall(f_px, g_px)
   {
     EXPECT_EQ(f_px->val(), g_px->val());
+  }
+}
+
+TEST(NewDesignVal_ZipSegAndNotSeg, CanChangeVal)
+{
+  int width = 5;
+  int height = 5;
+  mln::image2d<mln::uint8> f(width, height);
+  auto g = std::vector<mln::uint8>(width * height, 0);
+  mln::image2d<mln::uint8> h(width, height);
+
+  mln::fill(f, 0);
+  mln::iota(h, 0);
+
+  int i = 0;
+
+  auto rng = values_of(f);
+  mln_foreach_new((auto&& [val, val1]), ranges::view::zip(rng, g))
+  {
+    val = i;
+    val1 = i++;
+  }
+
+  mln_pixter(f_px, f);
+  mln_pixter(h_px, h);
+  mln_forall(f_px, h_px)
+  {
+    EXPECT_EQ(f_px->val(), h_px->val());
+  }
+
+  mln::uint8* f_buf = &f.at(0,0);
+  mln::uint8* g_buf = &g[0];
+  std::ptrdiff_t offset = 0;
+  for (unsigned int i = 0; i < f.nrows(); i++)
+  {
+    for (unsigned int j = 0; j < f.ncols(); j++)
+    {
+      EXPECT_EQ(g_buf[i * f.ncols() + j], f_buf[i * f.ncols() + j + offset]);
+    }
+    offset += f.index_strides()[0] - f.ncols();
+  }
+}
+
+TEST(NewDesignPix_ZipSegAndNotSeg, CanChangePix)
+{
+  int width = 5;
+  int height = 5;
+  mln::image2d<mln::uint8> f(width, height);
+  auto g = std::vector<mln::uint8>(width * height, 0);
+  mln::image2d<mln::uint8> h(width, height);
+
+  mln::fill(f, 0);
+  mln::iota(h, 0);
+
+  int i = 0;
+
+  auto rng = pixels_of(f);
+  mln_foreach_new((auto&& [pix, val1]), ranges::view::zip(rng, g))
+  {
+    pix.val() = i;
+    val1 = i++;
+  }
+
+  mln_pixter(f_px, f);
+  mln_pixter(h_px, h);
+  mln_forall(f_px, h_px)
+  {
+    EXPECT_EQ(f_px->val(), h_px->val());
+  }
+
+  mln::uint8* f_buf = &f.at(0,0);
+  mln::uint8* g_buf = &g[0];
+  std::ptrdiff_t offset = 0;
+  for (unsigned int i = 0; i < f.nrows(); i++)
+  {
+    for (unsigned int j = 0; j < f.ncols(); j++)
+    {
+      EXPECT_EQ(g_buf[i * f.ncols() + j], f_buf[i * f.ncols() + j + offset]);
+    }
+    offset += f.index_strides()[0] - f.ncols();
   }
 }
 

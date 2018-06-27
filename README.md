@@ -9,7 +9,6 @@ Milena with the following objectives:
 * Genericity: write algorithms that are able to run on many kind of images with, yet, zero-cost abstraction.
 * Interopability: run pylene algorithms on image coming from external libraries (even on your own image type).
 
-
 # Requirements
 Pylene is developed in modern C++. You need a modern C++ compatible compiler:
 
@@ -31,3 +30,8 @@ External dependancies:
 # Documentation
 
 Link to the [C++ Documentation](http://olena.pages.lrde.epita.fr/pylene/)
+
+## Presentations
+Other resources (mind the dates, the library probably has changed since then):
+
+* [A Modern C++ Library for Generic and Efficient Image Processing (GTGDMM'18)](https://www.lrde.epita.fr/dload/presentations/2018-06-19-geraud.2018.gtgdmmm.pdf)

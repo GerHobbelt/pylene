@@ -500,17 +500,20 @@ namespace mln
   ndimage<N, V, layout_t::INTERLEAVED>::slice(int z) const
   {
     using O = ndimage<N-1, V, layout_t::INTERLEAVED>;
+    typename O::point_type vpmin = {this->m_virtual_domain.pmin[1], this->m_virtual_domain.pmin[2]};
+    typename O::point_type vpmax = {this->m_virtual_domain.pmax[1], this->m_virtual_domain.pmax[2]};
     typename O::point_type pmin = {this->m_domain.pmin[1], this->m_domain.pmin[2]};
     typename O::point_type pmax = {this->m_domain.pmax[1], this->m_domain.pmax[2]};
+
+    typename O::domain_type vdomain(vpmin, vpmax);
     typename O::domain_type domain(pmin, pmax);
 
     std::size_t strides[2] = { this->byte_stride(1), this->byte_stride(2) };
 
-    V* buffer = const_cast<V*>(this->buffer());
-    buffer += z * this->m_strides[0];
+    V* buffer = const_cast<V*>(&this->at({z,vpmin[0], vpmin[1]}));
 
-    auto output = ndimage<N-1, V, layout_t::INTERLEAVED>::from_buffer(static_cast<void*>(buffer), domain, strides);
-    return output;
+    auto output = ndimage<N-1, V, layout_t::INTERLEAVED>::from_buffer(static_cast<void*>(buffer), vdomain, strides);
+    return output.subimage(domain, true);
   }
 
   template <int N, class V>
@@ -536,7 +539,7 @@ namespace mln
   {
     return reinterpret_cast<V*>(this->base::buffer(k));
   }
-
+  
   template <int N, class V>
   const V* ndimage<N, V, layout_t::INTERLEAVED>::buffer(int k) const
   {

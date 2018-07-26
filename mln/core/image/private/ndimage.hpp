@@ -88,7 +88,7 @@ namespace mln
         p[i] += q.quot;
         diff = q.rem;
       }
-      p[N - 1] = diff;
+      p[N - 1] += diff;
       mln_postcondition(m_virtual_domain.has(p));
       return p;
     }
@@ -119,6 +119,30 @@ namespace mln
     std::ptrdiff_t stride(int k = 0) const { return this->m_strides[k]; }
 
   protected:
+    void clip(const domain_type& domain, bool extended_by_image)
+    {
+      m_domain = domain;
+
+
+      if (!extended_by_image)
+      {
+        m_virtual_domain = domain;
+        m_border = 0;
+      }
+      else
+      {
+        m_border = std::numeric_limits<int>::max();
+        for (int k = 0; k < N; ++k)
+        {
+          int b = std::min(m_domain.pmin[k] - m_virtual_domain.pmin[k], m_virtual_domain.pmax[k] - m_domain.pmax[k]);
+          if (b < m_border)
+            m_border = b;
+        }
+      }
+
+      m_first_index = this->index_of_point(m_virtual_domain.pmin);
+    }
+
     void __from_buffer(const domain_type& domain)
     {
       this->m_domain = domain;
@@ -132,21 +156,12 @@ namespace mln
     {
       this->m_domain = domain;
       this->m_virtual_domain = domain;
+      this->m_border = 0;
       for (int k = 0; k < N; ++k)
         this->m_strides[k] = strides[k];
       this->m_first_index = this->index_of_point(this->m_virtual_domain.pmin);
     }
 
-    void clip(const domain_type& domain, bool extended_by_image)
-    {
-      m_domain = domain;
-      if (!extended_by_image)
-      {
-        m_virtual_domain = domain;
-        m_border = 0;
-      }
-      m_first_index = this->index_of_point(m_virtual_domain.pmin);
-    }
 
   private:
     void __init_strides()

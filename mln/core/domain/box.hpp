@@ -6,6 +6,7 @@
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
 #include <mln/core/point.hpp>
 #include <mln/core/imageformat.hpp>
+#include <algorithm>
 
 #if MLN_HAS_TBB
 #include <tbb/tbb_stddef.h>
@@ -166,6 +167,14 @@ namespace mln
         else if (pmin[i] == pmax[i]) // empty <=> pmin = pmax
           return pmin == pmax;
       return true;
+    }
+
+
+    point_type clamp(point_type p) const
+    {
+      for (unsigned i = 0; i < dim; ++i)
+        p[i] = std::clamp(p[i], pmin[i], T(pmax[i] - 1));
+      return p;
     }
 
     bool operator==(const box& other) const { return pmin == other.pmin and pmax == other.pmax; }

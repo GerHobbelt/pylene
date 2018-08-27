@@ -105,10 +105,10 @@ namespace mln
         // they are close enough to use them. So:
         // k0(r) = a0 * t + b0
         // k2(r) = a2 * t + b2
-        const float a0 = 0.22498089194617754;
-        const float b0 = -0.74997778133276127;
-        const float a2 = 0.092868889904065763;
-        const float b2 = 0.03471904979442568;
+        const float a0 = 0.22498089194617754f;
+        const float b0 = -0.74997778133276127f;
+        const float a2 = 0.092868889904065763f;
+        const float b2 = 0.03471904979442568f;
 
         k0 = (radius < 11) ? (1 + (radius+1) % 2) : static_cast<int>(std::round(a0 * radius + b0));
         k2 = (radius < 7) ? 0 : static_cast<int>(std::round(a2 * radius + b2));

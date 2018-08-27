@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.8.2)
 project(MILENA)
 
 # Add FindTBB directory to CMake's module path
@@ -26,8 +26,8 @@ if(MSVC OR APPLE)
 endif()
 
 add_library(Mln INTERFACE)
-# target_compile_features(Mln INTERFACE cxx_std_14)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
+
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${FreeImage_INCLUDE_DIRS})
@@ -47,14 +47,26 @@ if (UNIX AND NOT APPLE)
    link_libraries(rt)
 endif()
 
+# Compiler configurations
+target_compile_features(Mln INTERFACE cxx_std_17)
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wextra -Wall -std=c++14 -Werror")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-elseif (MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /W4 /wd4244 /wd4127 /permissive- /std:c++14" )
-  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+  add_compile_options("-Wextra" "-Wall" "-Werror")
 endif()
+
+
+#### MSVC Compiler Configuration
+if (MSVC)
+  add_compile_options("/wd4458" # masque le membre de classe
+                      "/wd4456" # masque la déclaration locale précédente
+                      "/wd5030" # l'attribut 'noinline' n'est pas reconnu
+                      "/wd4457" # la déclaration de '?' masque le paramètre de fonction
+  )
+  add_compile_options("/WX" "/W4" "/wd4244" "/wd4127" "/permissive-")
+  add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
+  add_compile_definitions(_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  add_compile_definitions(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+endif(MSVC)
 
 
 # default buidling type

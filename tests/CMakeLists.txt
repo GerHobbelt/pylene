@@ -26,20 +26,11 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # Executable: The name of the executable (default: ${Prefix}${TestName})
 # Sources: The source files to compile (default: ${Prefix}${TestName}.cpp)
 macro(add_core_test Executable)
-
-  set(Sources ${ARGN})
-
-  add_executable(${Executable} ${Sources})
-  add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-  target_link_libraries(${Executable} Mln)
-  if (WIN32)
-    target_link_libraries(${Executable} ${GTEST_BOTH_LIBRARIES})
-  else (WIN32)
-    target_link_libraries(${Executable} ${GTEST_BOTH_LIBRARIES} pthread)
-  endif (WIN32)
-
-  add_dependencies(check ${Executable})
+set(Sources ${ARGN})
+add_executable(${Executable} ${Sources})
+add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+target_link_libraries(${Executable} Mln GTest::GTest GTest::Main)
+add_dependencies(check ${Executable})
 endmacro(add_core_test)
 
 add_subdirectory(accu)

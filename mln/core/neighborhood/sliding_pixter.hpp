@@ -94,7 +94,7 @@ namespace mln
       {
       }
 
-      sliding_pixter_base(sliding_pixter_base& other)
+      sliding_pixter_base(sliding_pixter_base&& other)
         : m_set(std::move(other.m_set)), m_pixel(std::move(other.m_pixel)), m_pset_iter(rng::iter(m_set))
       {
       }

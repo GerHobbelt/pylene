@@ -23,7 +23,7 @@ struct rgb
   bool operator==(const rgb& other) const { return r == other.r and g == other.g and b == other.b; }
 };
 
-struct red : std::unary_function<rgb&, int&>
+struct red
 {
 
   int& operator()(rgb& x) const { return x.r; }

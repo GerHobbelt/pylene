@@ -66,8 +66,7 @@ TEST(Core, SubImage_sub_domain_with_box)
     fill(ima | box2d{{1, 1}, {4, 4}} | box2d{{1, 1}, {2, 3}}, 42);
     MLN_CHECK_IMEQUAL(ima, ref);
   }
-
-  static_assert(std::is_same<decltype(ima | box2d()), image2d<int>>::value, "");
+  static_assert(std::is_same<decltype(ima | box2d()), image2d<int>>::value);
 }
 
 TEST(Core, SubImage_sub_domain)

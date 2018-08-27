@@ -254,7 +254,7 @@ namespace mln
 
           adjacency_edge_iterator(const inner_iterator& inner, const sbox2d& domain, const point2d& psrc,
                                   const point2d& psink, const point2d& v)
-              : m_src(psrc), m_sink(psink), m_inner_it(inner), m_domain_it(domain.iter()), m_point(&v)
+            : m_src(psrc), m_sink(psink), m_inner_it(inner), m_domain_it(domain.iter()), m_point(&v), m_edge()
           {
           }
 

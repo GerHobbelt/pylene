@@ -151,7 +151,7 @@ namespace mln
         }
 
         // This is the version for regular 2D domain with periodic_line
-        template <class I, class Compare, class J, class OpTraits>
+        template <class I, class J, class OpTraits>
         void dilation_dispatch_2(const I& input, const se::periodic_line2d& line, J& output, OpTraits __op__, box2d __domain__)
         {
           (void) __domain__;

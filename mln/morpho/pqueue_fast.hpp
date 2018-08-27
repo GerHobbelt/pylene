@@ -22,12 +22,13 @@ namespace mln
       template <class I, typename Compare>
       struct pqueue_cmp_t
       {
+        using size_type = typename I::size_type;
         const I& m_ima;
         Compare m_cmp;
 
         pqueue_cmp_t(const I& ima, const Compare& cmp) : m_ima(ima), m_cmp(cmp) {}
 
-        bool operator()(std::size_t p, std::size_t q) { return m_cmp(m_ima[p], m_ima[q]); }
+        bool operator()(size_type p, size_type q) { return m_cmp(m_ima[p], m_ima[q]); }
       };
     }
 

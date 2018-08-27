@@ -13,15 +13,16 @@ Milena with the following objectives:
 Pylene is developed in modern C++. You need a modern C++ compatible compiler:
 
 * GCC 7
-* Clang 5
+* Clang 6
 * Microsoft Visual Studio 2017
 
 External dependancies:
 [FreeImage](www.freeimage.sourceforge.net) (only for IO)
 
 # Status
-* GCC 7.2
-* Clang 5.0
+* GCC 8.2.0
+* Clang 6.0.1
+* MSVC 15.8.1
 
 [![pipeline status](https://gitlab.lrde.epita.fr/olena/pylene/badges/dev/pipeline.svg)](https://gitlab.lrde.epita.fr/olena/pylene/commits/dev)
 

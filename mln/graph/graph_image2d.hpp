@@ -62,7 +62,7 @@ namespace mln
       inline std::array<P, N> arr_x2(const std::array<P, N>& arr)
       {
         std::array<P, N> out;
-        for (unsigned i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < N; ++i)
           out[i] = arr[i] * 2;
         return out;
       }

@@ -113,7 +113,7 @@ namespace mln
     std::pair<mln_ch_value(I, Label), Label> blobs(const Image<I>& ima_, Neighborhood nbh, Label lbl)
     {
       typedef mln_value(I) V;
-      static_assert(std::is_same<V, bool>::value, "Only supports binary image (type: bool)");
+      static_assert(std::is_convertible<V, bool>::value, "Only supports binary image (type: bool)");
 
       mln_entering("mln::labeling::blobs");
 

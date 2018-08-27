@@ -96,79 +96,79 @@ namespace mln
 #endif
 
   template <typename U, typename V = U>
-  struct add : std::binary_function<U, V, typename std::common_type<U, V>::type>
+  struct add
   {
     typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x + y; }
   };
 
   template <typename U, typename V = U>
-  struct substract : std::binary_function<U, V, typename std::common_type<U, V>::type>
+  struct substract
   {
     typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x - y; }
   };
 
   template <typename U, typename V = U>
-  struct multiplies : std::binary_function<U, V, typename std::common_type<U, V>::type>
+  struct multiplies
   {
     typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x * y; }
   };
 
   template <typename U, typename V = U>
-  struct devides : std::binary_function<U, V, typename std::common_type<U, V>::type>
+  struct devides
   {
     typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x / y; }
   };
 
   template <typename U, typename V = U>
-  struct modulo : std::binary_function<U, V, typename std::common_type<U, V>::type>
+  struct modulo
   {
     typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x % y; }
   };
 
   template <typename U, typename V = U>
-  struct equal_to : std::binary_function<U, V, bool>
+  struct equal_to
   {
     bool operator()(const U& x, const V& y) const { return x == y; }
   };
 
   template <typename U, typename V = U>
-  struct not_equal_to : std::binary_function<U, V, bool>
+  struct not_equal_to
   {
     bool operator()(const U& x, const V& y) const { return x != y; }
   };
 
   template <typename U, typename V = U>
-  struct less_than : std::binary_function<U, V, bool>
+  struct less_than
   {
     bool operator()(const U& x, const V& y) const { return x < y; }
   };
 
   template <typename U, typename V = U>
-  struct greater_than : std::binary_function<U, V, bool>
+  struct greater_than
   {
     bool operator()(const U& x, const V& y) const { return x > y; }
   };
 
   template <typename U, typename V = U>
-  struct less_equal : std::binary_function<U, V, bool>
+  struct less_equal
   {
     bool operator()(const U& x, const V& y) const { return x <= y; }
   };
 
   template <typename U, typename V = U>
-  struct greater_equal : std::binary_function<U, V, bool>
+  struct greater_equal
   {
     bool operator()(const U& x, const V& y) const { return x >= y; }
   };
 
   template <typename U, typename V = U>
-  struct logical_and : std::binary_function<U, V, bool>
+  struct logical_and
   {
     bool operator()(const U& x, const V& y) const { return x && y; }
   };
 
   template <typename U, typename V = U>
-  struct logical_or : std::binary_function<U, V, bool>
+  struct logical_or
   {
     bool operator()(const U& x, const V& y) const { return x || y; }
   };
@@ -263,7 +263,7 @@ namespace mln
   {
 
     template <class U, class V = U>
-    struct max_t : std::binary_function<U, V, typename std::common_type<U, V>::type>
+    struct max_t
     {
       typedef typename std::common_type<U, V>::type R;
 
@@ -271,7 +271,7 @@ namespace mln
     };
 
     template <class U, class V = U>
-    struct min_t : std::binary_function<U, V, typename std::common_type<U, V>::type>
+    struct min_t
     {
       typedef typename std::common_type<U, V>::type R;
 
@@ -279,7 +279,7 @@ namespace mln
     };
 
     template <class U, class V = U>
-    struct inf_t : std::binary_function<U, V, typename std::common_type<U, V>::type>
+    struct inf_t
     {
       typedef typename std::common_type<U, V>::type R;
 
@@ -287,7 +287,7 @@ namespace mln
     };
 
     template <class U, class V = U>
-    struct sup_t : std::binary_function<U, V, typename std::common_type<U, V>::type>
+    struct sup_t
     {
       typedef typename std::common_type<U, V>::type R;
 

@@ -40,8 +40,8 @@ namespace mln
       ~scoped_trace();
 
     private:
-      template <class T = void> void entering(const char* desc) __mln__attribute__((noinline));
-      template <class T = void> void exiting() __mln__attribute__((noinline));
+      template <class T = void> [[gnu::noinline]] void entering(const char* desc);
+      template <class T = void> [[gnu::noinline]] void exiting();
 
       int m_depth;
       std::string m_desc;
@@ -95,9 +95,8 @@ namespace mln
 
     namespace impl
     {
-      template <class T = void> void warn(const char* msg) __attribute__((noinline));
-
-      template <class T>
+      template <class T = void>
+      [[gnu::noinline]]
       void warn(const char* msg)
       {
         for (int k = 0; k < __stack_depth; ++k)

@@ -94,7 +94,7 @@ namespace mln
                 const auto n_root = zfindroot(parent, nxPar->val());
                 if (n_root != root)
                 {
-                  is_possible_minimum &= output(n_root);
+                  is_possible_minimum = is_possible_minimum && output(n_root);
                   auto roots = std::minmax(root, n_root);
                   parent(roots.second) = roots.first;
                   root = roots.first;

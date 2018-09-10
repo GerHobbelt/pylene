@@ -58,7 +58,7 @@ namespace mln
       static_assert(std::is_convertible<mln_value(I), bool>::value,
                     "Input image value type must be convertible to bool");
 
-      static_assert(std::is_same<mln_value(J), bool>::value, "Output image value type must be bool");
+      static_assert(std::is_convertible<bool, mln_value(J)>::value, "Output image value type must be bool");
 
       mln::fill(out, true);
       extension::fill(out, false);

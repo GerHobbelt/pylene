@@ -2,6 +2,7 @@
 #define MLN_CORE_MORPHO_SATURATE_HPP
 
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/extension/extension.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <queue>
@@ -61,8 +62,17 @@ namespace mln
       static_assert(std::is_convertible<bool, mln_value(J)>::value, "Output image value type must be bool");
 
       mln::fill(out, true);
-      extension::fill(out, false);
-      impl::saturate(ima, nbh, out, pinf);
+
+      if (!mln::extension::need_adjust(out, nbh))
+      {
+        extension::fill(out, false);
+        impl::saturate(ima, nbh, out, pinf);
+      }
+      else
+      {
+        auto tmp = mln::extension::add_value_extension(out, false);
+        impl::saturate(ima, nbh, tmp, pinf);
+      }
     }
 
     template <typename I, typename N>
@@ -73,18 +83,8 @@ namespace mln
 
       const I& ima = exact(ima_);
 
-      int status;
-      mln_ch_value(I, bool) out = imchvalue<bool>(ima).adjust(nbh).init(true).get_status(status);
-
-      if (status == 0)
-      {
-        extension::fill(out, false);
-        impl::saturate(ima, nbh, out, pinf);
-      }
-      else
-      {
-        std::abort();
-      }
+      mln_ch_value(I, bool) out = imchvalue<bool>(ima).adjust(nbh).init(true);
+      mln::morpho::saturate(ima, nbh, pinf, out);
       return out;
     }
   }

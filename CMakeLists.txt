@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.8.2)
 project(MILENA)
 
 # Add FindTBB directory to CMake's module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_BINARY_DIR}")
 
 find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)
+find_package(range-v3)
 
 # CONFIGURATION OPTIONS
 set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
@@ -20,13 +21,13 @@ if(MSVC OR APPLE)
   file(GLOB_RECURSE MLN_SOURCES  "${MLN_INCLUDE_DIR}/*.hpp")
   add_library(Mln_srcs EXCLUDE_FROM_ALL STATIC ${MLN_SOURCES})
   set_target_properties(Mln_srcs PROPERTIES LINKER_LANGUAGE CXX)
-  # target_compile_features(Mln_srcs PUBLIC cxx_std_14)
   target_include_directories(Mln_srcs PUBLIC ${MLN_INCLUDE_DIR})
   source_group(TREE ${MLN_INCLUDE_DIR} FILES ${MLN_SOURCES})
 endif()
 
 add_library(Mln INTERFACE)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
+target_include_directories(Mln INTERFACE $<TARGET_PROPERTY:range-v3::range-v3,INTERFACE_INCLUDE_DIRECTORIES>)
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

@@ -11,6 +11,9 @@ add_core_test(${test_prefix}forloop forloop.cpp)
 
 # test Range
 add_core_test(${test_prefix}range               range/range.cpp)
+add_core_test(${test_prefix}range_foreach       range/foreach.cpp)
+add_core_test(${test_prefix}range_multi_indices       range/multi_indices.cpp)
+add_core_test(${test_prefix}range_multi_span    range/multi_span.cpp)
 add_core_test(${test_prefix}range_filter        range/filter.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
 

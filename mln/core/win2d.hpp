@@ -18,7 +18,7 @@ namespace mln
 
     struct winc4_t : dyn_neighborhood_base<constant_neighborhood_tag, winc4_t>
     {
-      constexpr const std::array<point2d, 5>& offsets() { return dpoints; }
+      constexpr const std::array<point2d, 5>& offsets() const { return dpoints; }
       static const int static_size = 5;
       static const std::array<point2d, 5> dpoints;
     };
@@ -29,7 +29,7 @@ namespace mln
 
     struct winc8_t : dyn_neighborhood_base<constant_neighborhood_tag, winc8_t>
     {
-      constexpr const std::array<point2d, 9>& offsets() { return dpoints; }
+      constexpr const std::array<point2d, 9>& offsets() const { return dpoints; }
       static const int static_size = 9;
       static const std::array<point2d, 9> dpoints;
     };
@@ -41,7 +41,7 @@ namespace mln
 
     struct winc2_v_t : dyn_neighborhood_base<constant_neighborhood_tag, winc2_v_t>
     {
-      constexpr const std::array<point2d, 3>& offsets() { return dpoints; }
+      constexpr const std::array<point2d, 3>& offsets() const { return dpoints; }
       static const int static_size = 3;
       static const std::array<point2d, 3> dpoints;
     };
@@ -52,7 +52,7 @@ namespace mln
 
     struct winc2_h_t : dyn_neighborhood_base<constant_neighborhood_tag, winc2_h_t>
     {
-      constexpr const std::array<point2d, 3>& offsets() { return dpoints; }
+      constexpr const std::array<point2d, 3>& offsets() const { return dpoints; }
       static const int static_size = 3;
       static const std::array<point2d, 3> dpoints;
     };

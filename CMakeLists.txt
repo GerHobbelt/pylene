@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8.2)
-project(MILENA)
+project(PYLENE)
 
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_BINARY_DIR}")
@@ -8,10 +8,14 @@ find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)
-find_package(range-v3)
+find_package(range-v3 REQUIRED)
 
 # CONFIGURATION OPTIONS
 set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
+option(PYLENE_ENABLE_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
+option(PYLENE_ENABLE_TESTS      "Require Google Test library. Set to YES to enable the compilation of tests." YES)
+
+
 
 # Proper project creation
 set(MLN_INCLUDE_DIR "${PROJECT_SOURCE_DIR}")
@@ -87,9 +91,14 @@ add_definitions(-D BOOST_PP_VARIADICS=1)
 
 
 # Subdirectories
+if (PYLENE_ENABLE_BENCHMARKS)
+  add_subdirectory(bench EXCLUDE_FROM_ALL)
+endif()
+if (PYLENE_ENABLE_TESTS)
+  add_subdirectory(tests EXCLUDE_FROM_ALL)
+endif()
+
 add_subdirectory(doc EXCLUDE_FROM_ALL)
-add_subdirectory(tests EXCLUDE_FROM_ALL)
-add_subdirectory(bench EXCLUDE_FROM_ALL)
 add_subdirectory(apps EXCLUDE_FROM_ALL)
 add_subdirectory(cli EXCLUDE_FROM_ALL)
 

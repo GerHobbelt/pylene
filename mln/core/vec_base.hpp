@@ -281,6 +281,12 @@ namespace mln
       const T* begin() const { return v_; }
       const T* end() const { return v_ + dim; }
 
+      constexpr const T& back() const{ return v_[dim - 1]; }
+      constexpr T& back() { return v_[dim - 1];}
+
+      constexpr const T& front() const { return v_[0]; }
+      constexpr T& front() { return v_[0]; }
+
       reverse_iterator rbegin() { return reverse_iterator(v_ + dim); }
       reverse_iterator rend() { return reverse_iterator(v_); }
       const_reverse_iterator rbegin() const { return const_reverse_iterator(v_ + dim); }

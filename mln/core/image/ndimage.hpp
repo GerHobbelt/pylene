@@ -10,6 +10,8 @@
 #include <mln/core/image_category.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
+#include <mln/core/rangev3/multi_span.hpp>
+#include <mln/core/image/private/ndimage_pixel.hpp>
 
 #include <type_traits>
 
@@ -176,16 +178,20 @@ namespace mln
     typedef box<short, dim> domain_type;
 
     /// \copydoc image::value_range
-    typedef ndimage_value_range<this_type, T> value_range;
+    [[deprecated]] typedef ndimage_value_range<this_type, T> value_range;
+    using new_value_range = ranges::multi_span<T, dim>;
 
     /// \copydoc image::const_value_range
-    typedef ndimage_value_range<const this_type, const T> const_value_range;
+    [[deprecated]] typedef ndimage_value_range<const this_type, const T> const_value_range;
+    using new_const_value_range = ranges::multi_span<const T, dim>;
 
     /// \copydoc image::pixel_range
-    typedef ndimage_pixel_range<this_type, T> pixel_range;
+    [[deprecated]] typedef ndimage_pixel_range<this_type, T> pixel_range;
+    using new_pixel_range = details::ndpix_range<T, dim>;
 
     /// \copydoc image::const_pixel_range
-    typedef ndimage_pixel_range<const this_type, const T> const_pixel_range;
+    [[deprecated]] typedef ndimage_pixel_range<const this_type, const T> const_pixel_range;
+    using new_const_pixel_range = details::ndpix_range<const T, dim>;
     /// \}
 
     enum
@@ -259,14 +265,14 @@ namespace mln
 
     /// \}
 
-    typedef typename value_range::iterator value_iterator;
-    typedef typename value_range::reverse_iterator reverse_value_iterator;
-    typedef typename const_value_range::iterator const_value_iterator;
-    typedef typename const_value_range::reverse_iterator const_reverse_value_iterator;
-    typedef typename pixel_range::iterator pixel_iterator;
-    typedef typename pixel_range::reverse_iterator reverse_pixel_iterator;
-    typedef typename const_pixel_range::iterator const_pixel_iterator;
-    typedef typename const_pixel_range::reverse_iterator const_reverse_pixel_iterator;
+    [[deprecated]] typedef typename value_range::iterator value_iterator;
+    [[deprecated]] typedef typename value_range::reverse_iterator reverse_value_iterator;
+    [[deprecated]] typedef typename const_value_range::iterator const_value_iterator;
+    [[deprecated]] typedef typename const_value_range::reverse_iterator const_reverse_value_iterator;
+    [[deprecated]] typedef typename pixel_range::iterator pixel_iterator;
+    [[deprecated]] typedef typename pixel_range::reverse_iterator reverse_pixel_iterator;
+    [[deprecated]] typedef typename const_pixel_range::iterator const_pixel_iterator;
+    [[deprecated]] typedef typename const_pixel_range::reverse_iterator const_reverse_pixel_iterator;
 
     /// \name Image Ranges
     /// \{
@@ -275,16 +281,20 @@ namespace mln
     const domain_type& domain() const;
 
     /// \copydoc image::values()
-    value_range values();
+    [[deprecated]] value_range values();
+    new_value_range new_values();
 
     /// \copydoc image::values() const
-    const_value_range values() const;
+    [[deprecated]] const_value_range values() const;
+    new_const_value_range new_values() const;
 
     /// \copydoc image::pixels()
-    pixel_range pixels();
+    [[deprecated]] pixel_range pixels();
+    new_pixel_range new_pixels();
 
     /// \copydoc image::pixels() const
-    const_pixel_range pixels() const;
+    [[deprecated]] const_pixel_range pixels() const;
+    new_const_pixel_range new_pixels() const;
     /// \}
 
     /// \name Index-related methods
@@ -368,6 +378,10 @@ namespace mln
 
     static E from_buffer_extern_(void* buffer, const domain_type& domain, const size_t* strides);
 
+    /// Unchecked access to a location (can lead to an out-of-range address)
+    T* __at(const site_type& p) const;
+
+
   protected:
     template <typename, typename, unsigned, typename>
     friend struct indexible_ndimage_base;
@@ -390,7 +404,7 @@ namespace mln
     char* m_last; ///< Pointer to the last element in the domain (not past-the-end)
 
     T* m_ptr_origin;                              ///< Pointer to the first element (pmin)
-    std::array<std::size_t, dim> m_index_strides; ///< Strides in number of elements (including the border)
+    std::array<std::ptrdiff_t, dim> m_index_strides; ///< Strides in number of elements (including the border)
     size_t m_index_first;                         ///< index of pmin
     size_t m_index_last;                          ///< index of pmax-1
   };
@@ -638,25 +652,26 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
-  inline T& ndimage_base<T, dim, E>::at(const site_type& p)
+  inline T* ndimage_base<T, dim, E>::__at(const site_type& p) const
   {
-    mln_precondition(vbox_.has(p));
-
     char* ptr = m_ptr;
     for (unsigned i = 0; i < dim; ++i)
       ptr += (p[i] - m_domain.pmin[i]) * m_strides[i];
-    return *(T*)ptr;
+    return reinterpret_cast<T*>(ptr);
+  }
+
+  template <typename T, unsigned dim, typename E>
+  inline T& ndimage_base<T, dim, E>::at(const site_type& p)
+  {
+    mln_precondition(vbox_.has(p));
+    return *__at(p);
   }
 
   template <typename T, unsigned dim, typename E>
   inline const T& ndimage_base<T, dim, E>::at(const site_type& p) const
   {
     mln_precondition(vbox_.has(p));
-
-    char* ptr = m_ptr;
-    for (unsigned i = 0; i < dim; ++i)
-      ptr += (p[i] - m_domain.pmin[i]) * m_strides[i];
-    return *(const T*)ptr;
+    return *__at(p);
   }
 
   template <typename T, unsigned dim, typename E>
@@ -853,6 +868,20 @@ namespace mln
     return const_value_range(*this);
   }
 
+
+  template <typename T, unsigned dim, typename E>
+  ranges::multi_span<T, dim> ndimage_base<T, dim, E>::new_values()
+  {
+    return {reinterpret_cast<T*>(m_ptr), m_domain.extents(), m_index_strides};
+  }
+
+  template <typename T, unsigned dim, typename E>
+  ranges::multi_span<const T, dim> ndimage_base<T, dim, E>::new_values() const
+  {
+    return {reinterpret_cast<const T*>(m_ptr), m_domain.extents(), m_index_strides};
+  }
+
+
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::value_range ndimage_base<T, dim, E>::values()
   {
@@ -864,6 +893,21 @@ namespace mln
   {
     return const_pixel_range(*this);
   }
+
+  template <typename T, unsigned dim, typename E>
+  details::ndpix_range<T, dim> ndimage_base<T, dim, E>::new_pixels()
+  {
+    T* ptr = this->__at(mln::literal::zero);
+    return details::ndpix_range<T, dim>(m_index_strides, m_domain.pmin, m_domain.pmax, ptr);
+  }
+
+  template <typename T, unsigned dim, typename E>
+  details::ndpix_range<const T, dim> ndimage_base<T, dim, E>::new_pixels() const
+  {
+    const T* ptr = this->__at(mln::literal::zero);
+    return details::ndpix_range<const T, dim>(m_index_strides, m_domain.pmin, m_domain.pmax, ptr);
+  }
+
 
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::pixel_range ndimage_base<T, dim, E>::pixels()

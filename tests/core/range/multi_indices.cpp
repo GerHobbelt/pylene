@@ -120,11 +120,14 @@ TYPED_TEST(MultiIndicesTest, origin_centered_backward)
   std::vector<vec_t> ref_ = generate_backward_reference(this->zero, this->to);
   typename TestFixture::range_type rng(this->to_);
 
-  auto ref = this->to_container(ref_);
-  auto res = this->rng_to_container(rng.reversed());
-  auto res2 = this->rng_to_container_row_wise(rng.reversed());
-  ASSERT_EQ(ref, res);
-  ASSERT_EQ(ref, res2);
+  if constexpr (TestFixture::Rank > 1)
+  {
+    auto ref = this->to_container(ref_);
+    auto res = this->rng_to_container(rng.reversed());
+    auto res2 = this->rng_to_container_row_wise(rng.reversed());
+    ASSERT_EQ(ref, res);
+    ASSERT_EQ(ref, res2);
+  }
 }
 
 
@@ -146,10 +149,13 @@ TYPED_TEST(MultiIndicesTest, backward)
   std::vector<vec_t> ref_ = generate_backward_reference(this->from, this->to);
   typename TestFixture::range_type rng(this->from_, this->to_);
 
-  auto ref = this->to_container(ref_);
-  auto res = this->rng_to_container(rng.reversed());
-  auto res2 = this->rng_to_container_row_wise(rng.reversed());
-  ASSERT_EQ(ref, res);
-  ASSERT_EQ(ref, res2);
+  if constexpr (TestFixture::Rank > 1)
+  {
+    auto ref = this->to_container(ref_);
+    auto res = this->rng_to_container(rng.reversed());
+    auto res2 = this->rng_to_container_row_wise(rng.reversed());
+    ASSERT_EQ(ref, res);
+    ASSERT_EQ(ref, res2);
+  }
 }
 

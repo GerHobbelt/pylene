@@ -56,7 +56,7 @@ endif()
 target_compile_features(Mln INTERFACE cxx_std_17)
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-  add_compile_options("-Wextra" "-Wall" "-Werror")
+  add_compile_options("-Wextra" "-Wall" "-Werror" "-Wno-deprecated-declarations")
 endif()
 
 

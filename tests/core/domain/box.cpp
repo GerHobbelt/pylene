@@ -40,6 +40,26 @@ TEST(Core, Domain_box2d_forward)
   }
 }
 
+TEST(Core, Domain_box2d_forward_new)
+{
+  using namespace mln;
+
+  box2d b({2, 3}, {6, 8});
+
+  int i = 2, j = 3;
+  for (point2d p : b)
+  {
+    ASSERT_EQ(p[0], i);
+    ASSERT_EQ(p[1], j);
+    ASSERT_TRUE(b.has(p));
+    if (++j == 8)
+    {
+      j = 3;
+      ++i;
+    }
+  }
+}
+
 TEST(Core, Domain_box2d_backward)
 {
   using namespace mln;
@@ -49,6 +69,26 @@ TEST(Core, Domain_box2d_backward)
   point2d p;
   int i = 5, j = 7;
   mln_foreach (p, b.riter())
+  {
+    ASSERT_EQ(p[0], i);
+    ASSERT_EQ(p[1], j);
+    ASSERT_TRUE(b.has(p));
+    if (--j < 3)
+    {
+      j = 7;
+      --i;
+    }
+  }
+}
+
+TEST(Core, Domain_box2d_backward_new)
+{
+  using namespace mln;
+
+  box2d b({2, 3}, {6, 8});
+
+  int i = 5, j = 7;
+  for (point2d p : b.reversed())
   {
     ASSERT_EQ(p[0], i);
     ASSERT_EQ(p[1], j);

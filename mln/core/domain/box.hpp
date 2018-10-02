@@ -5,6 +5,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
 #include <mln/core/point.hpp>
+#include <mln/core/rangev3/multi_indices.hpp>
 
 #if MLN_HAS_TBB
 #include <tbb/tbb_stddef.h>
@@ -62,7 +63,7 @@ namespace mln
   //
   // \pre \tparam T must be an integral type
   template <typename T, unsigned dim>
-  struct box
+  struct box : ranges::details::multi_indices_facade<dim, box<T,dim>>
   {
     typedef point<T, dim> point_type;
     typedef point<T, dim> value_type;
@@ -97,6 +98,14 @@ namespace mln
     {
       mln_precondition(__is_valid());
       return pmax - pmin;
+    }
+
+    std::array<std::size_t, dim> extents() const
+    {
+      std::array<std::size_t, dim> r;
+      for (unsigned i = 0; i < dim; ++i)
+        r[i] = pmax[i] - pmin[i];
+      return r;
     }
 
     bool empty() const
@@ -170,6 +179,10 @@ namespace mln
     bool operator==(const box& other) const { return pmin == other.pmin and pmax == other.pmax; }
 
     bool operator!=(const box& other) const { return pmin != other.pmin or pmax != other.pmax; }
+
+    point_type __from() const { return pmin; }
+    point_type __to() const { return pmax; }
+
 
     point_type pmin;
     point_type pmax;

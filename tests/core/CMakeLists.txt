@@ -1,6 +1,3 @@
-add_executable(bench_iterator ../bench_iterator.cpp ../helpers.hpp)
-add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
-
 set(test_prefix "UTCore_")
 
 # test Domain
@@ -52,5 +49,5 @@ add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 
 # test SE
-add_core_test(${test_prefix}disc             se/disc.cpp)
+add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)

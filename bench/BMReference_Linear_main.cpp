@@ -25,6 +25,14 @@ void Threshold_C(const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int 
 void LUT_C      (const mln::uint8* LUT,
                  const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
 
+void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img);
+void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
+
+void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
+void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
+
 
 
 class Bench_Ref_Linear : public benchmark::Fixture
@@ -96,6 +104,18 @@ BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace)(benchmark::State& st)
   runit(st, Mult_Inplace);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Values)(benchmark::State& st)
+{
+  runit(st, Mult_Inplace_New_Values);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Pixels)(benchmark::State& st)
+{
+  runit(st, Mult_Inplace_New_Pixels);
+}
+
+
+
 
 
 
@@ -119,6 +139,15 @@ BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace)(benchmark::State& st)
   runit(st, Threshold_Inplace_C);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Values)(benchmark::State& st)
+{
+  runit(st, Threshold_Inplace_New_Values);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Pixels)(benchmark::State& st)
+{
+  runit(st, Threshold_Inplace_New_Pixels);
+}
 
 
 
@@ -141,6 +170,17 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace(m_lut.data(), args...);}));
 }
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Values)(benchmark::State& st)
+{
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Values(m_lut.data(), args...);}));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels)(benchmark::State& st)
+{
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels(m_lut.data(), args...);}));
+}
+
 
 
 

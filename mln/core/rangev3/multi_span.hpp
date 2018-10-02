@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <mln/core/rangev3/private/multi_view_facade.hpp>
+#include <mln/core/assert.hpp>
 #include <range/v3/span.hpp>
 #include <range/v3/view/reverse.hpp>
 #include <array>
@@ -12,153 +12,60 @@ namespace mln::ranges
   template <class T, std::size_t Rank>
   class multi_span;
 
-  template <class T, std::size_t Rank>
-  class reversed_multi_span;
-
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
-
-  /// Implement a multidimentional span with rows beings span (contiguous elements)
-  template <class T, std::size_t Rank>
-  class multi_span : public ::ranges::view_facade<multi_span<T, Rank>>, public multidimensional_range_base
+  // Specialization for 1D span. Since 1D span are bidirectional
+  // the reversed version is not required.
+  template <class T>
+  class multi_span<T, 1> : public ::ranges::span<T>
   {
-    friend ::ranges::range_access;
+  public:
+    multi_span() = default;
 
-    class row_wise : public ::ranges::view_facade<row_wise>
+    multi_span(T* pointer, std::array<std::size_t, 1> counts, [[maybe_unused]] std::array<std::ptrdiff_t, 1> stride)
+        : ::ranges::span<T>(pointer, counts[0])
     {
-      friend ::ranges::range_access;
+      mln_assertion(stride[0] == 1);
+    }
+  };
 
-      struct cursor : details::forward_multidimensional_cursor_facade<Rank-1, cursor>
+
+
+  namespace details
+  {
+    /// Implement a multidimentional span with rows beings span (contiguous elements)
+    template <class T, std::size_t Rank>
+    struct multi_span
+    {
+      struct cursor
       {
-        ::ranges::span<T> read() const { return {m_ptr.back(), static_cast<std::ptrdiff_t>(m_count.back())}; }
+        T&                __read() const { return *(m_ptr.back()); };
+        T&                __rread() const { return *(m_ptr.back()); };
+        ::ranges::span<T> __read_row() const { return {m_ptr[Rank - 2], static_cast<std::ptrdiff_t>(m_count.back())}; }
+
+        ::ranges::reverse_view<::ranges::span<T>> __read_rrow() const
+        {
+          auto line = ::ranges::make_span(m_ptr[Rank - 2] - m_count.back() + 1, m_ptr[Rank - 2] + 1);
+          return ::ranges::view::reverse(line);
+        }
+
         bool __is_at_end(std::size_t k) const { return m_i[k] == m_count[k]; }
+        bool __is_at_rend(std::size_t k) const { return m_i[k] == m_count[k]; }
+
         void __next(std::size_t k)
         {
           m_i[k]++;
           m_ptr[k] += m_stride[k];
         }
-        void __reset_to_begin(std::size_t k)
-        {
-          assert(k >= 1);
-          m_ptr[k] = m_ptr[k-1];
-          m_i[k] = 0;
-        }
 
-        using base = details::forward_multidimensional_cursor_facade<Rank-1, cursor>;
-        using base::next;
-        using base::equal;
-
-        cursor() = default;
-        cursor(T* pointer, std::array<std::size_t, Rank> count, std::array<std::ptrdiff_t, Rank> strides)
-            : m_count(count), m_stride(strides)
-        {
-          m_ptr.fill(pointer);
-          m_i.fill(0);
-        }
-
-
-      private:
-        std::array<std::size_t, Rank>           m_count;
-        std::array<std::ptrdiff_t, Rank>        m_stride;
-        std::array<T*, Rank-1>                  m_ptr;
-        std::array<std::size_t, Rank-1>         m_i;
-      };
-
-    public:
-      row_wise() = default;
-      row_wise(T* pointer, std::array<std::size_t, Rank> count, std::array<std::ptrdiff_t, Rank> strides)
-        : m_ptr(pointer), m_count(count), m_stride(strides)
-      {
-      }
-
-      cursor begin_cursor() const { return {m_ptr, m_count, m_stride}; }
-
-    private:
-      T* m_ptr;
-      std::array<std::size_t, Rank>     m_count;
-      std::array<std::ptrdiff_t, Rank>  m_stride;
-    };
-
-    struct cursor : details::forward_multidimensional_cursor_facade<Rank, cursor>
-    {
-      T& read() const { return *(m_ptr[Rank-1]); }
-      bool __is_at_end(std::size_t k) const { return m_i[k] == m_count[k]; }
-      void __next(std::size_t k)
-      {
-        m_i[k]++;
-        m_ptr[k] += m_stride[k];
-      }
-      void __reset_to_begin(std::size_t k)
-      {
-        assert(k >= 1);
-        m_i[k] = 0;
-        m_ptr[k] = m_ptr[k - 1];
-      }
-
-      using base = details::forward_multidimensional_cursor_facade<Rank, cursor>;
-      using base::next;
-      using base::equal;
-
-      cursor() = default;
-      cursor(T* pointer,
-             std::array<std::size_t, Rank>    count,
-             std::array<std::ptrdiff_t, Rank> strides)
-        : m_count(count), m_stride(strides)
-      {
-        m_ptr.fill(pointer);
-        m_i.fill(0);
-      }
-
-    private:
-      std::array<std::size_t, Rank>             m_count;
-      std::array<std::ptrdiff_t, Rank>          m_stride;
-      std::array<T*, Rank>                      m_ptr;
-      std::array<std::size_t, Rank>             m_i;
-    };
-
-  public:
-    multi_span() = default;
-    multi_span(T* pointer,
-               std::array<std::size_t, Rank>      count,
-               std::array<std::ptrdiff_t, Rank>   strides)
-      : m_ptr(pointer),  m_count(count), m_stride(strides)
-    {
-    }
-
-    cursor begin_cursor() const { return {m_ptr, m_count, m_stride}; }
-    row_wise rows() const { return {m_ptr, m_count, m_stride}; }
-    reversed_multi_span<T, Rank> reversed() const { return {m_ptr, m_count, m_stride}; }
-
-  private:
-    T* m_ptr;
-    std::array<std::size_t, Rank>      m_count;
-    std::array<std::ptrdiff_t, Rank>   m_stride;
-  };
-
-
-  template <class T, std::size_t Rank>
-  class reversed_multi_span : public ::ranges::view_facade<reversed_multi_span<T, Rank>>, public multidimensional_range_base
-  {
-    friend ::ranges::range_access;
-
-    class row_wise : public ::ranges::view_facade<row_wise>
-    {
-      friend ::ranges::range_access;
-
-      struct cursor : details::forward_multidimensional_cursor_facade<Rank-1, cursor>
-      {
-        ::ranges::reverse_view<::ranges::span<T>> read() const { return
-            ::ranges::view::reverse(::ranges::make_span(m_ptr.back(), static_cast<std::ptrdiff_t>(m_count.back())));
-        }
-
-        bool __is_at_end(std::size_t k) const { return m_i[k] == m_count[k]; }
-        void __next(std::size_t k)
+        void __rnext(std::size_t k)
         {
           m_i[k]++;
           m_ptr[k] -= m_stride[k];
         }
+
         void __reset_to_begin(std::size_t k)
         {
           assert(k >= 1);
@@ -166,101 +73,59 @@ namespace mln::ranges
           m_i[k] = 0;
         }
 
-        using base = details::forward_multidimensional_cursor_facade<Rank-1, cursor>;
-        using base::next;
-        using base::equal;
+        void __reset_to_rbegin(std::size_t k)
+        {
+          assert(k >= 1);
+          m_ptr[k] = m_ptr[k-1];
+          m_i[k] = 0;
+        }
 
         cursor() = default;
-        cursor(T* pointer, std::array<std::size_t, Rank> count, std::array<std::ptrdiff_t, Rank> strides)
-            : m_count(count), m_stride(strides)
+        cursor(const multi_span& sp, bool forward = true)
+          : m_count(sp.m_count), m_stride(sp.m_stride)
         {
-          // Go to the last row
-          for (std::size_t k = 0; k < Rank-1; ++k)
-            pointer += (m_count[k] - 1) * m_stride[k];
+          T* pointer = sp.m_ptr;
+          if (!forward) // Go to the last element
+          {
+            for (std::size_t k = 0; k < Rank; ++k)
+              pointer += (m_count[k] - 1) * m_stride[k];
+          }
           m_ptr.fill(pointer);
           m_i.fill(0);
         }
 
-
       private:
         std::array<std::size_t, Rank>           m_count;
         std::array<std::ptrdiff_t, Rank>        m_stride;
-        std::array<T*, Rank-1>                  m_ptr;
-        std::array<std::size_t, Rank-1>         m_i;
+        std::array<T*, Rank>                    m_ptr;
+        std::array<std::size_t, Rank>           m_i;
       };
 
-    public:
-      row_wise() = default;
-      row_wise(T* pointer, std::array<std::size_t, Rank> count, std::array<std::ptrdiff_t, Rank> strides)
-        : m_ptr(pointer), m_count(count), m_stride(strides)
-      {
-      }
-
-      cursor begin_cursor() const { return {m_ptr, m_count, m_stride}; }
+      multi_span() = default;
+      multi_span(T* pointer,
+                 std::array<std::size_t, Rank>      count,
+                 std::array<std::ptrdiff_t, Rank>   strides)
+        : m_ptr(pointer),  m_count(count), m_stride(strides)
+        {
+        }
 
     private:
       T* m_ptr;
-      std::array<std::size_t, Rank>     m_count;
-      std::array<std::ptrdiff_t, Rank>  m_stride;
+      std::array<std::size_t, Rank>      m_count;
+      std::array<std::ptrdiff_t, Rank>   m_stride;
     };
+  }
 
-    struct cursor : details::forward_multidimensional_cursor_facade<Rank, cursor>
-    {
-      T& read() const { return *(m_ptr.back()); }
-      bool __is_at_end(std::size_t k) const { return m_i[k] == m_count[k]; }
-      void __next(std::size_t k)
-      {
-        m_i[k]++;
-        m_ptr[k] -= m_stride[k];
-      }
-      void __reset_to_begin(std::size_t k)
-      {
-        assert(k >= 1);
-        m_i[k] = 0;
-        m_ptr[k] = m_ptr[k - 1];
-      }
-
-      using base = details::forward_multidimensional_cursor_facade<Rank, cursor>;
-      using base::next;
-      using base::equal;
-
-      cursor() = default;
-      cursor(T* pointer,
-             std::array<std::size_t, Rank>    count,
-             std::array<std::ptrdiff_t, Rank> strides)
-        : m_count(count), m_stride(strides)
-      {
-        // Goto last element
-        for (std::size_t k = 0; k < Rank; ++k)
-          pointer += (count[k] - 1) * strides[k];
-
-        m_ptr.fill(pointer);
-        m_i.fill(0);
-      }
-
-    private:
-      std::array<std::size_t, Rank>             m_count;
-      std::array<std::ptrdiff_t, Rank>          m_stride;
-      std::array<T*, Rank>                      m_ptr;
-      std::array<std::size_t, Rank>             m_i;
-    };
-
+  template <class T, std::size_t Rank>
+  class multi_span : public details::multi_view_decorator<Rank, details::multi_span<T, Rank>>
+  {
+    using base = details::multi_view_decorator<Rank, details::multi_span<T, Rank>>;
   public:
-    reversed_multi_span() = default;
-    reversed_multi_span(T* pointer,
-               std::array<std::size_t, Rank>      count,
-               std::array<std::ptrdiff_t, Rank>   strides)
-      : m_ptr(pointer),  m_count(count), m_stride(strides)
+    multi_span() = default;
+    multi_span(T* pointer, std::array<std::size_t, Rank> count, std::array<std::ptrdiff_t, Rank> strides)
+        : base(details::multi_span<T, Rank>(pointer, count, strides))
     {
     }
-
-    cursor begin_cursor() const { return {m_ptr, m_count, m_stride}; }
-    row_wise rows() const { return {m_ptr, m_count, m_stride}; }
-
-
-  private:
-    T* m_ptr;
-    std::array<std::size_t, Rank>      m_count;
-    std::array<std::ptrdiff_t, Rank>   m_stride;
   };
+
 }

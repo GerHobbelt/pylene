@@ -1,9 +1,9 @@
+#include <mln/core/domain/box.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/range/zip.hpp>
 #include <mln/core/rangev3/multi_indices.hpp>
-#include <mln/core/domain/box.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
 #include <mln/core/rangev3/rows.hpp>
+#include <mln/core/rangev3/view/zip.hpp>
 
 #include <array>
 #include <iostream>

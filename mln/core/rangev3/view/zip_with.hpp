@@ -125,8 +125,8 @@ namespace mln::ranges::view
       std::tuple<::ranges::sentinel_t<Rngs>...> ends_;
 
     public:
-      sentinel() = default;
-      sentinel(::ranges::sentinel_t<Rngs>... rngs) : ends_(rngs...) {}
+      constexpr sentinel() = default;
+      constexpr sentinel(::ranges::sentinel_t<Rngs>... rngs) : ends_(rngs...) {}
     };
 
     struct cursor
@@ -137,10 +137,10 @@ namespace mln::ranges::view
       std::tuple<::ranges::iterator_t<Rngs>...> begins_;
 
     public:
-      cursor() = default;
-      explicit cursor(fun_ref_ f, ::ranges::iterator_t<Rngs>... its) : fun_(f), begins_(its...) {}
+      constexpr cursor() = default;
+      constexpr explicit cursor(fun_ref_ f, ::ranges::iterator_t<Rngs>... its) : fun_(f), begins_(its...) {}
 
-      auto read() const
+      constexpr auto read() const
       {
         return std::apply(fun_, details::tuple_transform(begins_, [](const auto& rng_it) { return *rng_it; }));
       }
@@ -152,50 +152,50 @@ namespace mln::ranges::view
         }));
       }
 
-      bool equal(cursor const& rhs) const
+      constexpr bool equal(cursor const& rhs) const
       {
         return details::tuple_any(details::tuple_zip_two_with(begins_, rhs.begins_, [](auto&& lhs, auto&& rhs) {
           return std::forward<decltype(lhs)>(lhs) == std::forward<decltype(rhs)>(rhs);
         }));
       }
 
-      void next()
+      constexpr void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
       }
 
-      void prev()
+      constexpr void prev()
       {
         std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
       }
     };
 
-    cursor begin_cursor()
+    constexpr cursor begin_cursor()
     {
       return std::make_from_tuple<cursor>(std::tuple_cat(
           std::make_tuple(f_), details::tuple_transform(rngs_, [](const auto& rng) { return std::begin(rng); })));
     }
-    sentinel end_cursor()
+    constexpr sentinel end_cursor()
     {
       return std::make_from_tuple<sentinel>(
           details::tuple_transform(rngs_, [](const auto& rng) { return std::end(rng); }));
     }
-    cursor begin_cursor() const
+    constexpr cursor begin_cursor() const
     {
       return std::make_from_tuple<cursor>(std::tuple_cat(
           std::make_tuple(f_), details::tuple_transform(rngs_, [](const auto& rng) { return std::begin(rng); })));
     }
-    sentinel end_cursor() const
+    constexpr sentinel end_cursor() const
     {
       return std::make_from_tuple<sentinel>(
           details::tuple_transform(rngs_, [](const auto& rng) { return std::end(rng); }));
     }
 
   public:
-    zip_with_view() = default;
+    constexpr zip_with_view() = default;
     constexpr explicit zip_with_view(Fun f, Rngs... rngs) : f_(std::move(f)), rngs_(std::move(rngs)...) {}
 
-    auto rows() const
+    constexpr auto rows() const
     {
       // return a range of range of tuple of row
       return std::apply(
@@ -213,7 +213,7 @@ namespace mln::ranges::view
   };
 
   template <typename Fun, typename... Rngs>
-  auto zip_with(Fun f, Rngs... rngs)
+  constexpr auto zip_with(Fun f, Rngs... rngs)
   {
     return zip_with_view<Fun, Rngs...>(std::move(f), std::move(rngs)...);
   }

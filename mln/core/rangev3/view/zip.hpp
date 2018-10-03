@@ -23,15 +23,15 @@ namespace mln::ranges::view
   template <typename... Rngs>
   struct zip_view : zip_with_view<details::make_tuple_functor_t, Rngs...>
   {
-    zip_view() : zip_with_view<details::make_tuple_functor_t, Rngs...>() {}
-    zip_view(Rngs... rngs)
+    constexpr zip_view() : zip_with_view<details::make_tuple_functor_t, Rngs...>() {}
+    constexpr zip_view(Rngs... rngs)
         : zip_with_view<details::make_tuple_functor_t, Rngs...>(details::make_tuple_functor, std::move(rngs)...)
     {
     }
   };
 
   template <typename... Rngs>
-  auto zip(Rngs... rngs)
+  constexpr auto zip(Rngs... rngs)
   {
     return zip_view<Rngs...>(std::move(rngs)...);
   }

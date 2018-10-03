@@ -25,6 +25,8 @@ void Threshold_C(const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int 
 void LUT_C      (const mln::uint8* LUT,
                  const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
 
+void Mult_Zip   (const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
 void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
@@ -92,6 +94,11 @@ BENCHMARK_F(Bench_Ref_Linear, Mult_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Linear, Mult)(benchmark::State& st)
 {
   runit(st, Mult);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Zip)(benchmark::State& st)
+{
+  runit(st, Mult_Zip);
 }
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C)(benchmark::State& st)

@@ -1,3 +1,10 @@
+variables:
+    CONAN_PROFILE: "gcc-release"                                            # profile to use with conan
+    CONAN_PRIVATE_REMOTE_NAME: "dutiona-lrde"                               # Conan remote name
+    CONAN_PRIVATE_REMOTE_URL: "https://api.bintray.com/conan/dutiona/lrde"  # Conan remote name
+    CONAN_USER: "dutiona"                                                   # Conan user name
+    CONAN_API_KEY: "e2a665548385e82bf1ecbb4739d3582b83b8235f"
+
 stages:
     - build
     - test
@@ -10,9 +17,14 @@ image: carlinet/buildimage
     stage: test
     script:
         - mkdir build && cd build
-        - conan install ..
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build . --target check
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan user
+              -p $CONAN_API_KEY
+              -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
+        - conan remote list
+        - conan install .. --build missing -pr $CONAN_PROFILE
+        - cmake ..
+        - cmake --build . --config $PYLENE_CONFIGURATION --target check
 
 
 distcheck-linux-gcc-release:
@@ -21,6 +33,7 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
+        CONAN_PROFILE: "gcc-release"
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -28,6 +41,7 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
+        CONAN_PROFILE: "clang-release"
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base
@@ -35,6 +49,7 @@ distcheck-linux-gcc-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
+        CONAN_PROFILE: "gcc-debug"
 
 distcheck-linux-clang-debug:
     <<: *distcheck-linux-base
@@ -42,14 +57,20 @@ distcheck-linux-clang-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
+        CONAN_PROFILE: "clang-debug"
 
 build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install ..
-        - cmake .. -DCMAKE_BUILD_TYPE=Release
-        - cmake --build . --target build-images
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan user
+              -p $CONAN_API_KEY
+              -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
+        - conan remote list
+        - conan install .. --build missing -pr $CONAN_PROFILE
+        - cmake ..
+        - cmake --build . --config Release --target build-images
     artifacts:
         paths:
             - doc/source/images

@@ -30,4 +30,4 @@ AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakTemplateDeclarations: true
 
 # For loop
-ForEachMacros: ['mln_forall', 'mln_foreach']
+ForEachMacros: ['mln_forall', 'mln_foreach', 'mln_foreach_new']

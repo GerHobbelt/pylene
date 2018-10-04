@@ -37,7 +37,7 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        BENCHMARK: "True"
+        BENCHMARK: "False"
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -45,7 +45,7 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        BENCHMARK: "True"
+        BENCHMARK: "False"
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base

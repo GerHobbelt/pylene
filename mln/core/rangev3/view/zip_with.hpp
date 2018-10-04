@@ -152,21 +152,9 @@ namespace mln::ranges::view
         }));
       }
 
-      constexpr bool equal(cursor const& rhs) const
-      {
-        return details::tuple_any(details::tuple_zip_two_with(begins_, rhs.begins_, [](auto&& lhs, auto&& rhs) {
-          return std::forward<decltype(lhs)>(lhs) == std::forward<decltype(rhs)>(rhs);
-        }));
-      }
-
       constexpr void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      }
-
-      constexpr void prev()
-      {
-        std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
       }
     };
 

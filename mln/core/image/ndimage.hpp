@@ -7,11 +7,11 @@
 #include <mln/core/domain/box.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage_iter.hpp>
+#include <mln/core/image/private/ndimage_pixel.hpp>
 #include <mln/core/image_category.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
 #include <mln/core/rangev3/multi_span.hpp>
-#include <mln/core/image/private/ndimage_pixel.hpp>
 
 #include <type_traits>
 
@@ -115,7 +115,7 @@ namespace mln
       int m_border;
     };
 
-  } // end of namespace mln::internal
+  } // namespace internal
 
   template <typename T, unsigned dim, typename E>
   struct ndimage_base
@@ -347,12 +347,11 @@ namespace mln
 
     // Specialized algorithm
     template <typename T_, unsigned dim_, typename E_, typename Domain_>
-    friend
-    std::enable_if_t<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>
-    make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
+    friend std::enable_if_t<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>
+        make_subimage(ndimage_base<T_, dim_, E_>&, const Domain_& domain);
 
     // As an Indexable Image
-    const size_t* index_strides() const { return &m_index_strides[0]; }
+    const std::ptrdiff_t* index_strides() const { return &m_index_strides[0]; }
 
     difference_type delta_offset(const point_type& p) const
     {
@@ -381,7 +380,6 @@ namespace mln
     /// Unchecked access to a location (can lead to an out-of-range address)
     T* __at(const site_type& p) const;
 
-
   protected:
     template <typename, typename, unsigned, typename>
     friend struct indexible_ndimage_base;
@@ -403,10 +401,10 @@ namespace mln
     char* m_ptr;  ///< Pointer to the first element in the domain
     char* m_last; ///< Pointer to the last element in the domain (not past-the-end)
 
-    T* m_ptr_origin;                              ///< Pointer to the first element (pmin)
+    T* m_ptr_origin;                                 ///< Pointer to the first element (pmin)
     std::array<std::ptrdiff_t, dim> m_index_strides; ///< Strides in number of elements (including the border)
-    size_t m_index_first;                         ///< index of pmin
-    size_t m_index_last;                          ///< index of pmax-1
+    size_t m_index_first;                            ///< index of pmin
+    size_t m_index_last;                             ///< index of pmax-1
   };
 
   /******************************/
@@ -495,7 +493,7 @@ namespace mln
       }
       mln::aligned_free(buffer);
     }
-  }
+  } // namespace internal
 
   template <typename T, unsigned dim, typename E>
   ndimage_base<T, dim, E>::ndimage_base(unsigned border) : m_domain(), m_border(border), m_ptr(NULL), m_last(NULL)
@@ -808,7 +806,7 @@ namespace mln
   }
 
   template <typename T, unsigned dim, typename E>
-  inline void ndimage_base<T,dim,E>::inflate_domain(int delta)
+  inline void ndimage_base<T, dim, E>::inflate_domain(int delta)
   {
     mln_precondition(delta <= m_border);
     for (unsigned k = 0; k < dim; ++k)
@@ -818,17 +816,14 @@ namespace mln
     m_domain.pmax += delta;
     m_border -= delta;
 
-
     for (unsigned k = 0; k < dim; ++k)
-      {
-        m_ptr  -= delta * m_strides[k];
-        m_last += delta * m_strides[k];
-        m_index_first -= delta * m_index_strides[k];
-        m_index_last  += delta * m_index_strides[k];
-      }
+    {
+      m_ptr -= delta * m_strides[k];
+      m_last += delta * m_strides[k];
+      m_index_first -= delta * m_index_strides[k];
+      m_index_last += delta * m_index_strides[k];
+    }
   }
-
-
 
   // template <typename T, unsigned dim, typename E>
   // inline
@@ -868,7 +863,6 @@ namespace mln
     return const_value_range(*this);
   }
 
-
   template <typename T, unsigned dim, typename E>
   ranges::multi_span<T, dim> ndimage_base<T, dim, E>::new_values()
   {
@@ -880,7 +874,6 @@ namespace mln
   {
     return {reinterpret_cast<const T*>(m_ptr), m_domain.extents(), m_index_strides};
   }
-
 
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::value_range ndimage_base<T, dim, E>::values()
@@ -907,7 +900,6 @@ namespace mln
     const T* ptr = this->__at(mln::literal::zero);
     return details::ndpix_range<const T, dim>(m_index_strides, m_domain.pmin, m_domain.pmax, ptr);
   }
-
 
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::pixel_range ndimage_base<T, dim, E>::pixels()
@@ -1046,7 +1038,7 @@ namespace mln
     {
       *(reinterpret_cast<T*>(ptr)) = v;
     }
-  }
+  } // namespace internal
 
 } // end of namespace mln
 

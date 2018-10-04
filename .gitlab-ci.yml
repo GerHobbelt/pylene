@@ -1,5 +1,4 @@
 variables:
-    CONAN_PROFILE: "gcc-release"                                            # profile to use with conan
     CONAN_PRIVATE_REMOTE_NAME: "dutiona-lrde"                               # Conan remote name
     CONAN_PRIVATE_REMOTE_URL: "https://api.bintray.com/conan/dutiona/lrde"  # Conan remote name
     CONAN_USER: "dutiona"                                                   # Conan user name
@@ -22,7 +21,7 @@ image: carlinet/buildimage
               -p $CONAN_API_KEY
               -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
         - conan remote list
-        - conan install .. --build missing -pr $CONAN_PROFILE
+        - conan install .. --build missing
         - cmake ..
         - cmake --build . --config $PYLENE_CONFIGURATION --target check
 
@@ -33,7 +32,6 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        CONAN_PROFILE: "gcc-release"
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -41,7 +39,6 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        CONAN_PROFILE: "clang-release"
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base
@@ -49,7 +46,6 @@ distcheck-linux-gcc-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
-        CONAN_PROFILE: "gcc-debug"
 
 distcheck-linux-clang-debug:
     <<: *distcheck-linux-base
@@ -57,7 +53,6 @@ distcheck-linux-clang-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
-        CONAN_PROFILE: "clang-debug"
 
 build-doc-images:
     stage: build
@@ -68,7 +63,7 @@ build-doc-images:
               -p $CONAN_API_KEY
               -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
         - conan remote list
-        - conan install .. --build missing -pr $CONAN_PROFILE
+        - conan install .. --build missing
         - cmake ..
         - cmake --build . --config Release --target build-images
     artifacts:

@@ -1,4 +1,5 @@
 find_package(benchmark)
+find_package(Threads)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
@@ -24,7 +25,7 @@ set(src_standalone
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-link_libraries(benchmark::benchmark)
+link_libraries(benchmark::benchmark Threads::Threads)
 link_libraries(Mln)
 #link_libraries(-lbenchmark)
 

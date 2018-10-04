@@ -1,7 +1,0 @@
-[requires]
-range-v3/0.3.6@ericniebler/stable
-
-[generators]
-cmake_find_package
-
-

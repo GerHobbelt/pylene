@@ -31,7 +31,7 @@ endif()
 
 add_library(Mln INTERFACE)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
-target_include_directories(Mln INTERFACE $<TARGET_PROPERTY:range-v3::range-v3,INTERFACE_INCLUDE_DIRECTORIES>)
+target_link_libraries(Mln INTERFACE range-v3::range-v3)
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

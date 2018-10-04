@@ -21,7 +21,7 @@ image: carlinet/buildimage
               -p $CONAN_API_KEY
               -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
         - conan remote list
-        - conan install .. --build missing -o benchmark:$BENCHMARK
+        - conan install .. --build missing -o benchmark=$BENCHMARK
         - cmake ..
         - cmake --build . --config $PYLENE_CONFIGURATION --target check
 
@@ -67,7 +67,7 @@ build-doc-images:
               -p $CONAN_API_KEY
               -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
         - conan remote list
-        - conan install .. --build missing -o benchmark:False
+        - conan install .. --build missing -o benchmark=False
         - cmake ..
         - cmake --build . --config Release --target build-images
     artifacts:

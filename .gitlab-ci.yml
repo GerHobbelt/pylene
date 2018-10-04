@@ -32,7 +32,7 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        BENCKMARK: True
+        BENCKMARK: "True"
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -40,7 +40,7 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        BENCKMARK: True
+        BENCKMARK: "True"
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base
@@ -48,7 +48,7 @@ distcheck-linux-gcc-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
-        BENCKMARK: False
+        BENCKMARK: "False"
 
 distcheck-linux-clang-debug:
     <<: *distcheck-linux-base
@@ -56,7 +56,7 @@ distcheck-linux-clang-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
-        BENCKMARK: False
+        BENCKMARK: "False"
 
 build-doc-images:
     stage: build

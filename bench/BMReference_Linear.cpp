@@ -51,10 +51,10 @@ void Mult_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obu
   }
 }
 
-void Mult_Zip(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Mult_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-  auto zipped_imgs = mln::ranges::view::zip(in.new_values(), out.new_values());
-  for (auto&& r : mln::ranges::rows(zipped_imgs))
+  auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
+  for (auto&& r : mln::ranges::rows(zipped_values))
   {
     for (auto&& [in_v, out_v] : r)
     {
@@ -62,6 +62,19 @@ void Mult_Zip(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
     }
   }
 }
+
+void Mult_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+{
+  auto zipped_pixels = mln::ranges::view::zip(in.new_pixels(), out.new_pixels());
+  for (auto&& r : mln::ranges::rows(zipped_pixels))
+  {
+    for (auto&& [in_p, out_p] : r)
+    {
+      out_p.val() = in_p.val() * 2;
+    }
+  }
+}
+
 
 void Threshold_Inplace(mln::image2d<mln::uint8>& img)
 {

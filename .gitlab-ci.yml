@@ -7,10 +7,15 @@ variables:
 stages:
     - build
     - test
+    - bench
     - deploy
 
 image: carlinet/buildimage
 
+
+########
+# Test #
+########
 
 .job-build-linux-base: &distcheck-linux-base
     stage: test
@@ -75,6 +80,41 @@ build-doc-images:
             - doc/source/images
 
 
+#########
+# Bench #
+#########
+
+.job-bench-linux-base: &distbench-linux-base
+    stage: bench
+    script:
+        - mkdir build && cd build
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan user
+              -p $CONAN_API_KEY
+              -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
+        - conan remote list
+        - conan install .. --build missing -o benchmark=$BENCHMARK
+        - cmake ..
+        - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks-compile
+        - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks
+
+distbench-linux-gcc-release:
+    <<: *distbench-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+        BENCHMARK: "True"
+
+distbench-linux-clang-release:
+    <<: *distbench-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+        BENCHMARK: "True"
+
+
 #################
 # Documentation #
 #################
@@ -94,10 +134,13 @@ build-doc-images:
 documentation:
     <<: *documentation-base
     except:
-    - dev
+        - dev
 
-# Deploy
+
+##########
+# Deploy #
+##########
 pages:
     <<: *documentation-base
     only:
-    - dev
+        - dev

@@ -21,7 +21,7 @@ image: carlinet/buildimage
               -p $CONAN_API_KEY
               -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
         - conan remote list
-        - conan install .. --build missing
+        - conan install .. --build missing -o benchmark:$BENCHMARK
         - cmake ..
         - cmake --build . --config $PYLENE_CONFIGURATION --target check
 
@@ -32,6 +32,7 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
+        BENCKMARK: True
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -39,6 +40,7 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
+        BENCKMARK: True
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base
@@ -46,6 +48,7 @@ distcheck-linux-gcc-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
+        BENCKMARK: False
 
 distcheck-linux-clang-debug:
     <<: *distcheck-linux-base
@@ -53,6 +56,7 @@ distcheck-linux-clang-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
+        BENCKMARK: False
 
 build-doc-images:
     stage: build
@@ -63,7 +67,7 @@ build-doc-images:
               -p $CONAN_API_KEY
               -r $CONAN_PRIVATE_REMOTE_NAME $CONAN_USER
         - conan remote list
-        - conan install .. --build missing
+        - conan install .. --build missing -o benchmark:False
         - cmake ..
         - cmake --build . --config Release --target build-images
     artifacts:

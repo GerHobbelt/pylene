@@ -55,14 +55,18 @@ void Mult_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obu
 
 void Mult_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-  auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
+
+  [[maybe_unused]] auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
+  // FIXME: new_values multi_span is not detected as a range but as a container
+  /*
   for (auto&& r : mln::ranges::rows(zipped_values))
   {
-    for (auto&& [in_v, out_v] : r)
+    for (auto&& e : r)
     {
-      out_v = in_v * 2;
+      std::get<0>(e) = std::get<1>(e) * 2;
     }
   }
+  */
 }
 
 void Mult_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)

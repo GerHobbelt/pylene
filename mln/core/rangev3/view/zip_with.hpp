@@ -187,12 +187,10 @@ namespace mln::ranges::view
     {
       // return a range of range of tuple of row
       return std::apply(
-          [](auto&... rng) {
-            // rng is a range of tuple of line
+          [](auto&... rng) { // rng is a range of tuple of line
             return ::ranges::view::zip_with(
                 [](auto&&... rows) {
-                  // transform a tuple of line into a line of tuple
-                  return ::ranges::view::zip(rows...);
+                  return ::ranges::view::zip(rows...); // transform a tuple of line into a line of tuple
                 },
                 rng.rows()...); // rng.rows() return a tuple of line
           },

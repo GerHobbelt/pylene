@@ -1,5 +1,5 @@
-find_package(benchmark)
-find_package(Threads)
+find_package(benchmark REQUIRED)
+find_package(Threads REQUIRED)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
@@ -36,7 +36,7 @@ macro(add_benchmark Executable Sources)
     string(REPLACE " " ";" SOURCES_LIST ${Sources})
     add_executable(BM${Executable}.exe EXCLUDE_FROM_ALL ${SOURCES_LIST})
 
-    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads ${FreeImage_LIBRARIES})
+    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads)
     target_include_directories(BM${Executable}.exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks-compile BM${Executable}.exe)

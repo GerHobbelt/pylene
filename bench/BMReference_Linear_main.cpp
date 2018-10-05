@@ -36,7 +36,7 @@ void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& im
 
 class Bench_Ref_Linear : public benchmark::Fixture
 {
-  const char* filename = "/home/edwin/Images/test/DXO_0328_DxO.jpg";
+  const char* filename = "../../img/exif.jpg";
 
   virtual void SetUp(const benchmark::State&) override
   {

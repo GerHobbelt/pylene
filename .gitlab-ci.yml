@@ -1,4 +1,6 @@
 variables:
+    CONAN_PUBLIC_REPO_URL: "https://api.bintray.com/conan/bincrafters/public-conan"
+    CONAN_PUBLIC_REPO_NAME: "public-conan"
     CONAN_PRIVATE_REMOTE_NAME: "dutiona-lrde"                               # Conan remote name
     CONAN_PRIVATE_REMOTE_URL: "https://api.bintray.com/conan/dutiona/lrde"  # Conan remote name
     CONAN_USER: "dutiona"                                                   # Conan user name
@@ -21,6 +23,7 @@ image: carlinet/buildimage
     stage: test
     script:
         - mkdir build && cd build
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan user
               -p $CONAN_API_KEY
@@ -67,6 +70,7 @@ build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan user
               -p $CONAN_API_KEY
@@ -88,6 +92,7 @@ build-doc-images:
     stage: bench
     script:
         - mkdir build && cd build
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan user
               -p $CONAN_API_KEY

@@ -4,9 +4,9 @@ project(PYLENE)
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_BINARY_DIR}")
 
-find_package(Boost 1.65 COMPONENTS program_options REQUIRED)
+find_package(boost_program_options REQUIRED)
 find_package(range-v3 REQUIRED)
-find_package(FreeImage REQUIRED)
+find_package(freeimage REQUIRED)
 
 find_package(TBB)
 find_package(Qt4)
@@ -32,13 +32,7 @@ endif()
 
 add_library(Mln INTERFACE)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
-target_link_libraries(Mln INTERFACE range-v3::range-v3 freeimage::freeimage)
-
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(${FreeImage_INCLUDE_DIRS})
-link_directories(${FreeImage_LIBRARY_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+target_link_libraries(Mln INTERFACE boost_program_options::boost_program_options range-v3::range-v3 freeimage::freeimage)
 
 if (TBB_FOUND AND MLN_USE_TBB)
   include_directories(${TBB_INCLUDE_DIRS})

@@ -4,21 +4,12 @@ add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
-if (WIN32)
-  get_filename_component(FREEIMAGE_LIB_BASE_NAME ${FreeImage_LIBRARIES} NAME_WE)
-  get_filename_component(FREEIMAGE_LIB_PATH ${FreeImage_LIBRARIES} PATH)
-  add_custom_target(check
-    COMMAND ${CMAKE_COMMAND} -E copy "${FREEIMAGE_LIB_PATH}/${FREEIMAGE_LIB_BASE_NAME}.dll" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>"
+add_custom_target(check
     COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>
     )
-else(WIN32)
-  add_custom_target(check
-    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>
-    )
-endif(WIN32)
 
 find_package(Threads REQUIRED)
-find_package(GTest REQUIRED)
+find_package(gtest REQUIRED)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
@@ -29,7 +20,7 @@ macro(add_core_test Executable)
 set(Sources ${ARGN})
 add_executable(${Executable} ${Sources})
 add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-target_link_libraries(${Executable} Mln GTest::GTest GTest::Main)
+target_link_libraries(${Executable} Mln gtest::gtest)
 add_dependencies(check ${Executable})
 endmacro(add_core_test)
 

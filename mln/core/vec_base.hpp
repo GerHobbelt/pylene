@@ -101,7 +101,7 @@
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
   typename std::enable_if<vec_base_traits<tag>::TraitName,                                                             \
                           vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>>::type inline            \
-  operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                          \
+      operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                      \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
     R r;                                                                                                               \
@@ -115,7 +115,7 @@
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
   typename boost::lazy_enable_if_c<vec_base_traits<tag>::TraitName && std::is_convertible<U, T>::value,                \
                                    vec_base_helper<std::common_type<T, U>, dim, tag>>::type inline                     \
-  operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                              \
+      operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                          \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
     R r;                                                                                                               \
@@ -127,7 +127,7 @@
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
   typename boost::lazy_enable_if_c<vec_base_traits<tag>::TraitName && std::is_convertible<U, T>::value,                \
                                    vec_base_helper<std::common_type<T, U>, dim, tag>>::type inline                     \
-  operator Op(const U& y, const vec_base<T, dim, tag>& x)                                                              \
+      operator Op(const U& y, const vec_base<T, dim, tag>& x)                                                          \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
     R r;                                                                                                               \
@@ -281,8 +281,8 @@ namespace mln
       const T* begin() const { return v_; }
       const T* end() const { return v_ + dim; }
 
-      constexpr const T& back() const{ return v_[dim - 1]; }
-      constexpr T& back() { return v_[dim - 1];}
+      constexpr const T& back() const { return v_[dim - 1]; }
+      constexpr T& back() { return v_[dim - 1]; }
 
       constexpr const T& front() const { return v_[0]; }
       constexpr T& front() { return v_[0]; }
@@ -406,7 +406,7 @@ namespace mln
         return v_[N];
       }
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(push)
 #pragma warning(disable : 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
 #endif
@@ -417,7 +417,7 @@ namespace mln
         return v_[N];
       }
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(pop)
 #endif
 
@@ -482,8 +482,8 @@ namespace mln
     {
       return std::move<T&>(vec.v_[N]);
     }
-  }
-}
+  } // namespace internal
+} // namespace mln
 
 /*********************************/
 /**          Traits              */
@@ -519,7 +519,7 @@ namespace std
   {
     typedef mln::internal::vec_base<typename std::common_type<T1, T2>::type, dim, Tag> type;
   };
-}
+} // namespace std
 
 namespace boost
 {
@@ -528,7 +528,7 @@ namespace boost
   {
     typedef mln::internal::vec_base<typename boost::promote<T>::type, dim, tag> type;
   };
-}
+} // namespace boost
 
 #ifdef _MSC_VER
 #pragma warning(default : 4701)

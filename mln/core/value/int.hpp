@@ -169,7 +169,7 @@ namespace mln
 /******************************************/
 /****          implementation          ****/
 /******************************************/
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(push)
 #pragma warning(disable : 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
 #endif
@@ -208,7 +208,7 @@ namespace mln
     enc m_x;
   };
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(pop)
 #endif
 

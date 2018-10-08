@@ -24,7 +24,10 @@ image: carlinet/buildimage
         - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan remote list
-        - conan install .. --build missing -o benchmark=$BENCHMARK
+        - conan install ..
+                --build missing                 # (attempt to) build eventual missing libraries
+                -o benchmark=$BENCHMARK         # enable/disable benchmark
+                -s compiler.libcxx=libstdc++11  # set correct c-runtime abi
         - cmake ..
         - cmake --build . --config $PYLENE_CONFIGURATION --target check
 
@@ -68,7 +71,10 @@ build-doc-images:
         - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan remote list
-        - conan install .. --build missing -o benchmark=False
+        - conan install ..
+                --build missing                 # (attempt to) build eventual missing libraries
+                -o benchmark=$BENCHMARK         # enable/disable benchmark
+                -s compiler.libcxx=libstdc++11  # set correct c-runtime abi
         - cmake ..
         - cmake --build . --config Release --target build-images
     artifacts:
@@ -87,7 +93,10 @@ build-doc-images:
         - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan remote list
-        - conan install .. --build missing -o benchmark=$BENCHMARK
+        - conan install ..
+                --build missing                 # (attempt to) build eventual missing libraries
+                -o benchmark=$BENCHMARK         # enable/disable benchmark
+                -s compiler.libcxx=libstdc++11  # set correct c-runtime abi
         - cmake ..
         - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks-compile
         - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks

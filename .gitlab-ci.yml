@@ -1,18 +1,32 @@
+variables:
+    CONAN_PUBLIC_REPO_NAME: "public-conan"
+    CONAN_PUBLIC_REPO_URL: "https://api.bintray.com/conan/bincrafters/public-conan"
+    CONAN_PRIVATE_REMOTE_NAME: "dutiona-lrde"
+    CONAN_PRIVATE_REMOTE_URL: "https://api.bintray.com/conan/dutiona/lrde"
+
 stages:
     - build
     - test
+    - bench
     - deploy
 
 image: carlinet/buildimage
 
 
+########
+# Test #
+########
+
 .job-build-linux-base: &distcheck-linux-base
     stage: test
     script:
         - mkdir build && cd build
-        - conan install ..
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build . --target check
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan remote list
+        - conan install .. --build missing -o benchmark=$BENCHMARK
+        - cmake ..
+        - cmake --build . --config $PYLENE_CONFIGURATION --target check
 
 
 distcheck-linux-gcc-release:
@@ -21,6 +35,7 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
+        BENCHMARK: "False"
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -28,6 +43,7 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
+        BENCHMARK: "False"
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base
@@ -35,6 +51,7 @@ distcheck-linux-gcc-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
+        BENCHMARK: "False"
 
 distcheck-linux-clang-debug:
     <<: *distcheck-linux-base
@@ -42,17 +59,54 @@ distcheck-linux-clang-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
+        BENCHMARK: "False"
 
 build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install ..
-        - cmake .. -DCMAKE_BUILD_TYPE=Release
-        - cmake --build . --target build-images
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan remote list
+        - conan install .. --build missing -o benchmark=False
+        - cmake ..
+        - cmake --build . --config Release --target build-images
     artifacts:
         paths:
             - doc/source/images
+
+
+#########
+# Bench #
+#########
+
+.job-bench-linux-base: &distbench-linux-base
+    stage: bench
+    script:
+        - mkdir build && cd build
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan remote list
+        - conan install .. --build missing -o benchmark=$BENCHMARK
+        - cmake ..
+        - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks-compile
+        - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks
+
+distbench-linux-gcc-release:
+    <<: *distbench-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+        BENCHMARK: "True"
+
+distbench-linux-clang-release:
+    <<: *distbench-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+        BENCHMARK: "True"
 
 
 #################
@@ -74,10 +128,13 @@ build-doc-images:
 documentation:
     <<: *documentation-base
     except:
-    - dev
+        - dev
 
-# Deploy
+
+##########
+# Deploy #
+##########
 pages:
     <<: *documentation-base
     only:
-    - dev
+        - dev

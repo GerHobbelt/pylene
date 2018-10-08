@@ -36,7 +36,7 @@ macro(add_benchmark Executable Sources)
     string(REPLACE " " ";" SOURCES_LIST ${Sources})
     add_executable(BM${Executable}.exe EXCLUDE_FROM_ALL ${SOURCES_LIST})
 
-    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads freeimage::freeimage)
+    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads)
     target_include_directories(BM${Executable}.exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks-compile BM${Executable}.exe)

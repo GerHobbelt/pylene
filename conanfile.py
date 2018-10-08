@@ -24,5 +24,6 @@ class Pylene(ConanFile):
                                         str(self.settings.build_type).lower())
 
         self.requires("range-v3/0.3.6@ericniebler/stable")
+        self.requires("gtest/1.8.1@bincrafters/stable")
         if self.options.benchmark:
             self.requires("benchmark/1.4.1@dutiona/{}".format(tag))

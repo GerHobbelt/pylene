@@ -2,6 +2,10 @@ find_package(benchmark REQUIRED)
 find_package(Threads REQUIRED)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
+# Download file dependency
+# Big images are stored at https://www.lrde.epita.fr/~mroynard/big_images/
+file(DOWNLOAD "https://www.lrde.epita.fr/~mroynard/big_images/Space1_20MB.jpg" "${CMAKE_BINARY_DIR}/bench/Space1_20MB.jpg")
+
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
@@ -36,7 +40,7 @@ macro(add_benchmark Executable Sources)
     string(REPLACE " " ";" SOURCES_LIST ${Sources})
     add_executable(BM${Executable}.exe EXCLUDE_FROM_ALL ${SOURCES_LIST})
 
-    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads)
+    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads ${FreeImage_LIBRARIES})
     target_include_directories(BM${Executable}.exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks-compile BM${Executable}.exe)

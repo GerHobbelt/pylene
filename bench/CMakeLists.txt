@@ -30,34 +30,34 @@ set(src_standalone
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
 
-add_custom_target(benchmarks-compile ALL COMMENT "Build all the benchmarks.")
+add_custom_target(benchmarks ALL COMMENT "Build all the benchmarks.")
 
-add_custom_target(benchmarks
+add_custom_target(benchmarks-run
         DEPENDS benchmarks-compile
         COMMENT "Build and run all the benchmarks.")
 
-macro(add_benchmark Executable Sources)
-    string(REPLACE " " ";" SOURCES_LIST ${Sources})
-    add_executable(BM${Executable}.exe EXCLUDE_FROM_ALL ${SOURCES_LIST})
+macro(add_benchmark Executable)
+    set(Sources ${ARGN})
+    add_executable(BM${Executable} EXCLUDE_FROM_ALL ${Sources})
 
-    target_link_libraries(BM${Executable}.exe PRIVATE Mln benchmark::benchmark Threads::Threads ${FreeImage_LIBRARIES})
-    target_include_directories(BM${Executable}.exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark Threads::Threads ${FreeImage_LIBRARIES})
+    target_include_directories(BM${Executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-    add_dependencies(benchmarks-compile BM${Executable}.exe)
+    add_dependencies(benchmarks BM${Executable})
 
-    add_custom_target(BM${Executable}
-        COMMAND BM${Executable}.exe
-        DEPENDS BM${Executable}.exe
+    add_custom_target(BM${Executable}_run
+        COMMAND BM${Executable}
+        DEPENDS BM${Executable}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bench
         USES_TERMINAL)
         
-    add_dependencies(benchmarks BM${Executable})
+    add_dependencies(benchmarks-run BM${Executable}_run)
 endmacro(add_benchmark)
 
-add_benchmark(Erosion                 "BMErosion.cpp BMErosion_main.cpp")
-add_benchmark(Neighborhood            "BMNeighborhood.cpp BMNeighborhood_main.cpp")
-add_benchmark(Rotation                "BMRotation.cpp")
-add_benchmark(Dilation                "BMDilation.cpp")
-add_benchmark(Morphers                "BMMorphers.cpp BMMorphers_main.cpp")
-add_benchmark(Reference_Linear        "BMReference_Linear.cpp BMReference_Linear_main.cpp")
-add_benchmark(Reference_Neighborhood  "BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp")
+add_benchmark(Erosion                 BMErosion.cpp BMErosion_main.cpp)
+add_benchmark(Neighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
+add_benchmark(Rotation                BMRotation.cpp)
+add_benchmark(Dilation                BMDilation.cpp)
+add_benchmark(Morphers                BMMorphers.cpp BMMorphers_main.cpp)
+add_benchmark(Reference_Linear        BMReference_Linear.cpp BMReference_Linear_main.cpp)
+add_benchmark(Reference_Neighborhood  BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp)

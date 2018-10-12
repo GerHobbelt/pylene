@@ -36,7 +36,7 @@ void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& im
 
 class Bench_Ref_Linear : public benchmark::Fixture
 {
-  const char* filename = "../../img/exif.jpg";
+  const char* filename = "Space1_20MB.jpg";
 
   virtual void SetUp(const benchmark::State&) override
   {

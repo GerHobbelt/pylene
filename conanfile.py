@@ -23,9 +23,7 @@ class Pylene(ConanFile):
             tag = "stable-{}-{}".format(self.settings.compiler,
                                         str(self.settings.build_type).lower())
 
-        self.requires("boost_program_options/1.66.0@bincrafters/stable")
         self.requires("range-v3/0.3.6@ericniebler/stable")
         self.requires("gtest/1.8.1@bincrafters/stable")
-        self.requires("freeimage/3.18.0@dutiona/{}".format(tag))
         if self.options.benchmark:
-            self.requires("benchmark/1.4.1@dutiona/{}".format(tag))
+            self.requires("benchmark/1.4.1@dutiona/stable")

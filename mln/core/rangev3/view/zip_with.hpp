@@ -147,6 +147,7 @@ namespace mln::ranges::view
 
       constexpr bool equal(const sentinel& s) const
       {
+        // return std::get<0>(begins_) == std::get<0>(s.ends_);
         return details::tuple_any(details::tuple_zip_two_with(begins_, s.ends_, [](auto&& lhs, auto&& rhs) {
           return std::forward<decltype(lhs)>(lhs) == std::forward<decltype(rhs)>(rhs);
         }));

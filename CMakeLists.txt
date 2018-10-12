@@ -3,6 +3,7 @@ project(PYLENE)
 
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_BINARY_DIR}")
+include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 
 find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)

@@ -1,5 +1,4 @@
 find_package(benchmark REQUIRED)
-find_package(Threads REQUIRED)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 # Download file dependency
@@ -40,7 +39,7 @@ macro(add_benchmark Executable)
     set(Sources ${ARGN})
     add_executable(BM${Executable} EXCLUDE_FROM_ALL ${Sources})
 
-    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark Threads::Threads ${FreeImage_LIBRARIES})
+    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark ${FreeImage_LIBRARIES})
 
     add_dependencies(benchmarks BM${Executable})
 

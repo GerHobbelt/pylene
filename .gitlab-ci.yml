@@ -13,6 +13,26 @@ stages:
 image: carlinet/buildimage
 
 
+
+build-doc-images:
+    stage: build
+    script:
+        - mkdir build && cd build
+        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
+        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
+        - conan remote list
+        - conan install ..
+                --build missing
+                -o benchmark=False
+                -s compiler.libcxx=libstdc++11
+        - cmake -DPYLENE_ENABLE_BENCHMARKS=NO ..
+        - cmake --build .
+                --config Release
+                --target build-images
+    artifacts:
+        paths:
+            - doc/source/images
+
 ########
 # Test #
 ########
@@ -24,9 +44,14 @@ image: carlinet/buildimage
         - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan remote list
-        - conan install .. --build missing -o benchmark=$BENCHMARK -s compiler.libcxx=libstdc++11
+        - conan install ..
+                --build missing
+                -o benchmark=False
+                -s compiler.libcxx=libstdc++11
         - cmake ..
-        - cmake --build . --config $PYLENE_CONFIGURATION --target check
+        - cmake --build .
+                --config $PYLENE_CONFIGURATION
+                --target check
 
 
 distcheck-linux-gcc-release:
@@ -35,7 +60,6 @@ distcheck-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        BENCHMARK: "False"
 
 distcheck-linux-clang-release:
     <<: *distcheck-linux-base
@@ -43,7 +67,6 @@ distcheck-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        BENCHMARK: "False"
 
 distcheck-linux-gcc-debug:
     <<: *distcheck-linux-base
@@ -51,7 +74,6 @@ distcheck-linux-gcc-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
-        BENCHMARK: "False"
 
 distcheck-linux-clang-debug:
     <<: *distcheck-linux-base
@@ -59,21 +81,6 @@ distcheck-linux-clang-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
-        BENCHMARK: "False"
-
-build-doc-images:
-    stage: build
-    script:
-        - mkdir build && cd build
-        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
-        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
-        - conan remote list
-        - conan install .. --build missing -o benchmark=False -s compiler.libcxx=libstdc++11
-        - cmake ..
-        - cmake --build . --config Release --target build-images
-    artifacts:
-        paths:
-            - doc/source/images
 
 
 #########
@@ -87,11 +94,18 @@ build-doc-images:
         - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
         - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
         - conan remote list
-        - conan install .. --build missing -o benchmark=$BENCHMARK -s compiler.libcxx=libstdc++11
+        - conan install ..
+                --build missing
+                -o benchmark=True
+                -s compiler.libcxx=libstdc++11
         - cmake ..
-        - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks-compile
-        # FIXME : Disable benchmark execution for now
-        # - cmake --build . --config $PYLENE_CONFIGURATION --target benchmarks
+        - cmake --build .
+                --config $PYLENE_CONFIGURATION
+                --target benchmarks
+        - cmake --build .
+                --config $PYLENE_CONFIGURATION
+                --target benchmarks-run
+                -- -j1  # Force serial execution
 
 distbench-linux-gcc-release:
     <<: *distbench-linux-base
@@ -99,7 +113,6 @@ distbench-linux-gcc-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        BENCHMARK: "True"
 
 distbench-linux-clang-release:
     <<: *distbench-linux-base
@@ -107,7 +120,6 @@ distbench-linux-clang-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        BENCHMARK: "True"
 
 
 #################

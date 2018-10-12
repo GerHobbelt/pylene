@@ -18,7 +18,7 @@ else(WIN32)
 endif(WIN32)
 
 find_package(Threads REQUIRED)
-find_package(gtest REQUIRED)
+find_package(GTest REQUIRED)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
@@ -29,7 +29,7 @@ macro(add_core_test Executable)
   set(Sources ${ARGN})
   add_executable(${Executable} ${Sources})
   add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-  target_link_libraries(${Executable} Mln gtest::gtest Threads::Threads)
+  target_link_libraries(${Executable} Mln GTest::GTest GTest::Main)
   add_dependencies(check ${Executable})
 endmacro(add_core_test)
 

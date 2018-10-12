@@ -12,9 +12,11 @@ namespace mln::ranges::view
     struct make_tuple_functor_t
     {
       template <typename... Rngs>
-      decltype(auto) operator()(Rngs&&... rngs) const
+      std::tuple<Rngs...> operator()(Rngs&&... rngs) const
       {
-        return std::make_tuple(std::forward<Rngs>(rngs)...);
+        // Not "std::tie" because may be prvalue
+        // Not "std::forward_as_reference" because may hold dangling reference if xvalue
+        return {std::forward<Rngs>(rngs)...};
       }
     };
     constexpr inline make_tuple_functor_t make_tuple_functor{};

@@ -2,8 +2,10 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/range/zip.hpp>
 #include <mln/core/rangev3/multi_indices.hpp>
+#include <mln/core/rangev3/multi_span.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
+#include <range/v3/to_container.hpp>
 
 #include <array>
 #include <iostream>
@@ -42,7 +44,7 @@ TEST(Core, ziprange)
   }
 }
 
-TEST(Code, zip_multirow)
+TEST(Core, zip_readonly)
 {
 
   mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
@@ -55,7 +57,7 @@ TEST(Code, zip_multirow)
   }
 }
 
-TEST(Code, zip_multirow_rowwise)
+TEST(Core, zip_readonly_rowwise)
 {
 
   mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
@@ -63,11 +65,61 @@ TEST(Code, zip_multirow_rowwise)
   mln::box2d multi_ind2 = {{2, 3}, {4, 6}};
 
   const auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
-  for (auto&& r : mln::ranges::rows(zipped_rows))
+  for (auto&& r : zipped_rows.rows())
   {
     for(auto&& e : r)
     {
       std::cout << std::get<0>(e) << " " << std::get<1>(e) << " " << std::get<2>(e) << '\n';
     }
   }
+}
+
+TEST(Core, zip_write)
+{
+  std::vector<int> a1 = {1, 2, 3, 6, 5, 4};
+  std::vector<int> a2 = {1, 2, 3, 6, 5, 4};
+
+  mln::ranges::multi_span<int, 2> sp1(a1.data(), {2,3}, {3,1});
+  mln::ranges::multi_span<int, 2> sp2(a2.data(), {2,3}, {3,1});
+
+  mln::box2d ind0 = {{1, 1}, {3, 4}};
+  auto z = mln::ranges::view::zip(sp1, sp2, ind0);
+  for (auto [x, y, p] : z)
+  {
+    x = p[0]; // By ref
+    y = p[1]; // By ref
+    p[0] = 42; // No effect
+  }
+
+  std::vector<int> ref1 = {1, 1, 1, 2, 2, 2};
+  std::vector<int> ref2 = {1, 2, 3, 1, 2, 3};
+  EXPECT_EQ(ref1, a1);
+  EXPECT_EQ(ref2, a2);
+}
+
+
+TEST(Core, zip_write_rowwise)
+{
+  std::vector<int> a1 = {1, 2, 3, 6, 5, 4};
+  std::vector<int> a2 = {1, 2, 3, 6, 5, 4};
+
+  mln::ranges::multi_span<int, 2> sp1(a1.data(), {2,3}, {3,1});
+  mln::ranges::multi_span<int, 2> sp2(a2.data(), {2,3}, {3,1});
+
+  mln::box2d ind0 = {{1, 1}, {3, 4}};
+  auto z = mln::ranges::view::zip(sp1, sp2, ind0);
+  for (auto&& r : z.rows())
+  {
+    for (auto [x, y, p] : r)
+    {
+      x = p[0];  // By ref
+      y = p[1];  // By ref
+      p[0] = 42; // No effect
+    }
+  }
+
+  std::vector<int> ref1 = {1, 1, 1, 2, 2, 2};
+  std::vector<int> ref2 = {1, 2, 3, 1, 2, 3};
+  EXPECT_EQ(ref1, a1);
+  EXPECT_EQ(ref2, a2);
 }

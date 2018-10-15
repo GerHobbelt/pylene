@@ -145,7 +145,6 @@ namespace mln::ranges::details
       Cursor_ m_cursor;
     };
 
-    // Note: for decorator, we use the pointer-interconvertible objects rule between a member and the class
     const R* exact() const { return reinterpret_cast<const R*>(this); }
     cursor begin_cursor() const { return  typename R::cursor(*exact(), forward); }
 

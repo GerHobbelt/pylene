@@ -5,12 +5,11 @@ project(PYLENE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 
-# find_package(boost_program_options REQUIRED)
-find_package(range-v3 REQUIRED)
+find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
-
 find_package(TBB)
 find_package(Qt4)
+find_package(range-v3 REQUIRED)
 
 # CONFIGURATION OPTIONS
 set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
@@ -35,10 +34,10 @@ add_library(Mln INTERFACE)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
 target_link_libraries(Mln INTERFACE range-v3)
 
-
-
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${FreeImage_INCLUDE_DIRS})
 link_directories(${FreeImage_LIBRARY_DIR})
+link_directories(${Boost_LIBRARY_DIRS})
 
 if (TBB_FOUND AND MLN_USE_TBB)
   include_directories(${TBB_INCLUDE_DIRS})

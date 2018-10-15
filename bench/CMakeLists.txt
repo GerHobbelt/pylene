@@ -47,7 +47,7 @@ macro(add_benchmark Executable)
     add_custom_target(BM${Executable}_run
         COMMAND BM${Executable}
         DEPENDS BM${Executable}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bench
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         USES_TERMINAL)
         
     add_dependencies(benchmarks-run BM${Executable}_run)

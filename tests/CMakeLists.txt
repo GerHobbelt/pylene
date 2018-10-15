@@ -30,7 +30,7 @@ macro(add_core_test Executable)
   set(Sources ${ARGN})
   add_executable(${Executable} ${Sources})
   add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-  target_link_libraries(${Executable} PRIVATE Mln GTest::GTest GTest::Main)
+  target_link_libraries(${Executable} PRIVATE Mln GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
   add_dependencies(check ${Executable})
 endmacro(add_core_test)
 

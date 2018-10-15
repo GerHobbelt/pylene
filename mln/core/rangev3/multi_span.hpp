@@ -32,6 +32,8 @@ namespace mln::ranges
     }
   };
 
+
+
   /// Implement a multidimentional span with rows beings span (contiguous elements)
   template <class T, std::size_t Rank>
   class multi_span : public details::multi_view_facade<Rank, multi_span<T, Rank>>

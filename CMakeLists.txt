@@ -34,6 +34,7 @@ add_library(Mln INTERFACE)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
 target_link_libraries(Mln INTERFACE range-v3)
 
+
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${FreeImage_INCLUDE_DIRS})
 link_directories(${FreeImage_LIBRARY_DIR})

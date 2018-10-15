@@ -57,7 +57,7 @@ Reversible Range
 
     .. rubric:: valid expression
 
-    - :cpp:expr:`mln::ranges::view::reverse(r)` where r is a :cpp:concept:`ReversibleRange`.
+    - :cpp:expr:`mln::ranges::view::reverse(r)` where ``r`` is a :cpp:concept:`ReversibleRange`.
 
 
 

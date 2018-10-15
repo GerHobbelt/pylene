@@ -1,29 +1,30 @@
 #include <benchmark/benchmark.h>
 
-#include <mln/core/image/image2d.hpp>
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 
 #include <vector>
 
-void Mult_Inplace       (mln::image2d<mln::uint8>& img);
-void Threshold_Inplace  (mln::image2d<mln::uint8>& img);
-void LUT_Inplace        (const mln::uint8* LUT, mln::image2d<mln::uint8>& img);
+void Mult_Inplace(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace(mln::image2d<mln::uint8>& img);
+void LUT_Inplace(const mln::uint8* LUT, mln::image2d<mln::uint8>& img);
 
-
-void Mult_Inplace_C     (mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
+void Mult_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
 void Threshold_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
-void LUT_Inplace_C      (const mln::uint8* LUT,
-                         mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
+void LUT_Inplace_C(const mln::uint8* LUT, mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
 
-void Mult       (const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
-void Threshold  (const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
-void LUT        (const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Mult(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Threshold(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void LUT(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 
-void Mult_C     (const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
+void Mult_C(const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
 void Threshold_C(const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
-void LUT_C      (const mln::uint8* LUT,
-                 const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
+void LUT_C(const mln::uint8* LUT, const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height,
+           std::ptrdiff_t stride);
+
+void Mult_New_Values(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Mult_New_Pixels(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 
 void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img);
@@ -33,11 +34,9 @@ void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
 
-
-
 class Bench_Ref_Linear : public benchmark::Fixture
 {
-  const char* filename = "/home/edwin/Images/test/DXO_0328_DxO.jpg";
+  const char* filename = "Space1_20MB.jpg";
 
   virtual void SetUp(const benchmark::State&) override
   {
@@ -71,8 +70,14 @@ protected:
 
   void runit(benchmark::State& st, fun1_t f) { runit_impl(st, std::bind(f, m_input)); }
   void runit(benchmark::State& st, fun2_t f) { runit_impl(st, std::bind(f, m_input, m_output)); }
-  void runit(benchmark::State& st, fun3_t f) { runit_impl(st, std::bind(f, &m_input.at(0,0), m_width, m_height, m_stride)); }
-  void runit(benchmark::State& st, fun4_t f) { runit_impl(st, std::bind(f, &m_input.at(0,0), &m_output.at(0,0), m_width, m_height, m_stride)); }
+  void runit(benchmark::State& st, fun3_t f)
+  {
+    runit_impl(st, std::bind(f, &m_input.at(0, 0), m_width, m_height, m_stride));
+  }
+  void runit(benchmark::State& st, fun4_t f)
+  {
+    runit_impl(st, std::bind(f, &m_input.at(0, 0), &m_output.at(0, 0), m_width, m_height, m_stride));
+  }
 
 protected:
   int m_width;
@@ -94,6 +99,16 @@ BENCHMARK_F(Bench_Ref_Linear, Mult)(benchmark::State& st)
   runit(st, Mult);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, Mult_New_Values)(benchmark::State& st)
+{
+  runit(st, Mult_New_Values);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_New_Pixels)(benchmark::State& st)
+{
+  runit(st, Mult_New_Pixels);
+}
+
 BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_C);
@@ -113,11 +128,6 @@ BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Pixels)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_New_Pixels);
 }
-
-
-
-
-
 
 BENCHMARK_F(Bench_Ref_Linear, Threshold_C)(benchmark::State& st)
 {
@@ -149,39 +159,34 @@ BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Pixels)(benchmark::State& st
   runit(st, Threshold_Inplace_New_Pixels);
 }
 
-
-
 BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
 {
-  runit(st, fun4_t([&](auto&&... args) { LUT_C(m_lut.data(), args...);}));
+  runit(st, fun4_t([&](auto&&... args) { LUT_C(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT)(benchmark::State& st)
 {
-  runit(st, fun2_t([&](auto&&... args) { LUT(m_lut.data(), args...);}));
+  runit(st, fun2_t([&](auto&&... args) { LUT(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C)(benchmark::State& st)
 {
-  runit(st, fun3_t([&](auto&&... args) { LUT_Inplace_C(m_lut.data(), args...);}));
+  runit(st, fun3_t([&](auto&&... args) { LUT_Inplace_C(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace)(benchmark::State& st)
 {
-  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace(m_lut.data(), args...);}));
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Values)(benchmark::State& st)
 {
-  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Values(m_lut.data(), args...);}));
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Values(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels)(benchmark::State& st)
 {
-  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels(m_lut.data(), args...);}));
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels(m_lut.data(), args...); }));
 }
-
-
-
 
 BENCHMARK_MAIN();

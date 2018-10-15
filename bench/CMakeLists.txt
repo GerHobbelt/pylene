@@ -1,6 +1,10 @@
-find_package(benchmark)
+find_package(benchmark REQUIRED)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
+# Download file dependency
+# Big images are stored at https://www.lrde.epita.fr/~mroynard/big_images/
+file(DOWNLOAD "https://www.lrde.epita.fr/~mroynard/big_images/Space1_20MB.jpg" "${CMAKE_BINARY_DIR}/bench/Space1_20MB.jpg")
+
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
@@ -24,22 +28,34 @@ set(src_standalone
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-link_libraries(benchmark::benchmark)
-link_libraries(Mln)
-#link_libraries(-lbenchmark)
 
-add_executable(BMErosion        BMErosion.cpp BMErosion_main.cpp)
-add_executable(BMNeighborhood   BMNeighborhood.cpp BMNeighborhood_main.cpp)
-add_executable(BMRotation       BMRotation.cpp)
-add_executable(BMDilation       BMDilation.cpp)
-add_executable(BMMorphers       BMMorphers.cpp   BMMorphers_main.cpp)
-add_executable(BMReference_Linear BMReference_Linear.cpp BMReference_Linear_main.cpp)
-add_executable(BMReference_Neighborhood BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp)
+add_custom_target(benchmarks ALL COMMENT "Build all the benchmarks.")
 
+add_custom_target(benchmarks-run
+        DEPENDS benchmarks
+        COMMENT "Build and run all the benchmarks.")
 
-target_link_libraries(BMRotation ${FreeImage_LIBRARIES})
-target_link_libraries(BMMorphers ${FreeImage_LIBRARIES})
-target_link_libraries(BMErosion ${FreeImage_LIBRARIES})
-target_link_libraries(BMDilation ${FreeImage_LIBRARIES})
-target_link_libraries(BMReference_Linear ${FreeImage_LIBRARIES})
-target_link_libraries(BMReference_Neighborhood ${FreeImage_LIBRARIES})
+macro(add_benchmark Executable)
+    set(Sources ${ARGN})
+    add_executable(BM${Executable} EXCLUDE_FROM_ALL ${Sources})
+
+    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark ${FreeImage_LIBRARIES})
+
+    add_dependencies(benchmarks BM${Executable})
+
+    add_custom_target(BM${Executable}_run
+        COMMAND BM${Executable}
+        DEPENDS BM${Executable}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        USES_TERMINAL)
+        
+    add_dependencies(benchmarks-run BM${Executable}_run)
+endmacro(add_benchmark)
+
+add_benchmark(Erosion                 BMErosion.cpp BMErosion_main.cpp)
+add_benchmark(Neighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
+add_benchmark(Rotation                BMRotation.cpp)
+add_benchmark(Dilation                BMDilation.cpp)
+add_benchmark(Morphers                BMMorphers.cpp BMMorphers_main.cpp)
+add_benchmark(Reference_Linear        BMReference_Linear.cpp BMReference_Linear_main.cpp)
+add_benchmark(Reference_Neighborhood  BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp)

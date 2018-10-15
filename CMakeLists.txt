@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8.2)
 project(PYLENE)
 
 # Add FindTBB directory to CMake's module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" "${CMAKE_CURRENT_BINARY_DIR}")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 
 find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
@@ -32,7 +32,7 @@ endif()
 
 add_library(Mln INTERFACE)
 target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
-target_include_directories(Mln INTERFACE $<TARGET_PROPERTY:range-v3::range-v3,INTERFACE_INCLUDE_DIRECTORIES>)
+target_link_libraries(Mln INTERFACE range-v3)
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})

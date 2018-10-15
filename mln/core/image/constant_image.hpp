@@ -33,7 +33,7 @@ namespace mln
     {
       typedef Domain type;
     };
-  }
+  } // namespace internal
 
   /******************************************/
   /****          Implementation          ****/
@@ -70,7 +70,7 @@ namespace mln
       V m_value;
     };
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(push)
 #pragma warning(disable : 4521) // multiple copy constructors specified
 #endif
@@ -143,7 +143,7 @@ namespace mln
       V m_value;
     };
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(pop)
 #endif
 
@@ -230,6 +230,6 @@ namespace mln
     Domain m_domain;
     V m_value;
   };
-}
+} // namespace mln
 
 #endif // ! MLN_CORE_IMAGE_CONSTANT_IMAGE_HPP

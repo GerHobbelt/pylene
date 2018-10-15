@@ -1,19 +1,38 @@
 Core Module
-==============================
+===========
+
+
+Images
+******
+
+
+Ranges
+******
+
+:doc:`core/ranges` extensions for ranges with new concepts and helper functions.
 
 .. toctree::
    :hidden:
 
    core/ranges
 
-Images
-******
+.. topic:: Concepts
+
+   * :cpp:concept:`Segmented Range <mln::ranges::SegmentedRange>`
+   * :cpp:concept:`Reversible Range <mln::ranges::ReversibleRange>`
 
 
-:doc:`Ranges <core/ranges>`
-***************************
+.. topic:: Utilities
 
-Extensions for ranges with new concepts and helper functions.
+   * :cpp:func:`mln::ranges::rows`
+   * :c:macro:`mln_foreach`
+
+.. topic:: Views
+
+   * :doc:`core/ranges/reverse`
+   * :doc:`core/ranges/transform`
+
+
 
 
 Structural Elements

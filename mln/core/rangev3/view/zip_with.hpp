@@ -4,6 +4,7 @@
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/utils/blank.hpp>
 #include <range/v3/view/zip.hpp>
+#include <range/v3/view/all.hpp>
 #include <range/v3/view_facade.hpp>
 
 #include <iterator>
@@ -16,7 +17,7 @@ namespace mln::ranges::view
 
   // Forward declaration of zip_with
   template <typename Fun, typename... Rngs>
-  constexpr auto zip_with(Fun f, Rngs... rngs);
+  auto zip_with(Fun f, Rngs&&... rngs);
 
   template <typename Fun, typename... Rngs>
   struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>,
@@ -38,8 +39,8 @@ namespace mln::ranges::view
       std::tuple<::ranges::sentinel_t<Rngs>...> ends_;
 
     public:
-      constexpr sentinel() = default;
-      constexpr sentinel(::ranges::sentinel_t<Rngs>... rngs) : ends_(rngs...) {}
+      sentinel() = default;
+      sentinel(::ranges::sentinel_t<Rngs>... rngs) : ends_(rngs...) {}
     };
 
     struct cursor
@@ -50,16 +51,16 @@ namespace mln::ranges::view
       std::tuple<::ranges::iterator_t<Rngs>...> begins_;
 
     public:
-      constexpr cursor() = default;
-      constexpr explicit cursor(fun_ref_ f, ::ranges::iterator_t<Rngs>... its) : fun_(f), begins_(its...) {}
+      cursor() = default;
+      explicit cursor(fun_ref_ f, ::ranges::iterator_t<Rngs>... its) : fun_(f), begins_(its...) {}
 
-      constexpr auto read() const
+      auto read() const
       {
         auto f = [this](const auto&... it) { return this->fun_(*it...); };
         return std::apply(f, begins_);
       }
 
-      constexpr bool equal(const sentinel& s) const
+      bool equal(const sentinel& s) const
       {
         return std::get<0>(begins_) == std::get<0>(s.ends_);
         // return details::tuple_any(details::tuple_zip_two_with(begins_, s.ends_, [](auto&& lhs, auto&& rhs) {
@@ -67,40 +68,40 @@ namespace mln::ranges::view
         // }));
       }
 
-      constexpr void next()
+      void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
       }
     };
 
 
-    constexpr cursor begin_cursor()
+    cursor begin_cursor()
     {
       auto f = [this] (auto&&... args) { return cursor(this->f_, ::ranges::begin(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
-    constexpr sentinel end_cursor()
+    sentinel end_cursor()
     {
       auto f = [] (auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
-    constexpr cursor begin_cursor() const
+    cursor begin_cursor() const
     {
       auto f = [this] (auto&&... args) { return cursor(this->f_, ::ranges::begin(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
-    constexpr sentinel end_cursor() const
+    sentinel end_cursor() const
     {
       auto f = [] (auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
 
   public:
-    constexpr zip_with_view() = default;
-    constexpr explicit zip_with_view(Fun f, Rngs... rngs) : f_(std::move(f)), rngs_(std::move(rngs)...) {}
+    zip_with_view() = default;
+    explicit zip_with_view(Fun f, Rngs... rngs) : f_(std::move(f)), rngs_(std::move(rngs)...) {}
 
     // Fixme: enable this function only if all zipped ranges are segmented
-    constexpr auto rows() const
+    auto rows() const
     {
       // Zip function for rows
       auto row_zipper = [fun = this->f_](auto&&... rows) { return zip_with(fun, std::forward<decltype(rows)>(rows)...); };
@@ -111,9 +112,9 @@ namespace mln::ranges::view
   };
 
   template <typename Fun, typename... Rngs>
-  constexpr auto zip_with(Fun f, Rngs... rngs)
+  auto zip_with(Fun f, Rngs&&... rngs)
   {
-    return zip_with_view<Fun, Rngs...>(std::move(f), std::move(rngs)...);
+    return zip_with_view<Fun, ::ranges::view::all_t<Rngs>...>(std::move(f), ::ranges::view::all(std::forward<Rngs>(rngs))...);
   }
 
 } // namespace mln::ranges::view

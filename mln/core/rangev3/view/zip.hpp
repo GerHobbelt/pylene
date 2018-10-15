@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mln/core/rangev3/view/zip_with.hpp>
-
 #include <tuple>
 
 namespace mln::ranges::view
@@ -19,23 +18,22 @@ namespace mln::ranges::view
         return {std::forward<Rngs>(rngs)...};
       }
     };
-    constexpr inline make_tuple_functor_t make_tuple_functor{};
   } // namespace details
 
   template <typename... Rngs>
   struct zip_view : zip_with_view<details::make_tuple_functor_t, Rngs...>
   {
-    constexpr zip_view() : zip_with_view<details::make_tuple_functor_t, Rngs...>() {}
-    constexpr zip_view(Rngs... rngs)
-        : zip_with_view<details::make_tuple_functor_t, Rngs...>(details::make_tuple_functor, std::move(rngs)...)
+    zip_view() : zip_with_view<details::make_tuple_functor_t, Rngs...>() {}
+    zip_view(Rngs... rngs)
+      : zip_with_view<details::make_tuple_functor_t, Rngs...>(details::make_tuple_functor_t(), std::move(rngs)...)
     {
     }
   };
 
   template <typename... Rngs>
-  constexpr auto zip(Rngs... rngs)
+  auto zip(Rngs&&... rngs)
   {
-    return zip_view<Rngs...>(std::move(rngs)...);
+    return zip_view<::ranges::view::all_t<Rngs>...>(::ranges::view::all(std::forward<Rngs>(rngs))...);
   }
 
 } // namespace mln::ranges::view

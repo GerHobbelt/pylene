@@ -44,37 +44,68 @@ TEST(Core, ziprange)
   }
 }
 
-TEST(Core, zip_readonly)
+TEST(Core, zip_container)
+{
+  std::vector<int> ref = {0, 1, 2, 3, 4};
+  std::vector<int> a = {0, 1, 2, 3, 4};
+  std::vector<int> b = {0, 0, 0, 0, 0};
+
+  for (auto [vin, vout] : mln::ranges::view::zip(a, b))
+    vout = vin;
+
+  EXPECT_EQ(ref, a);
+  EXPECT_EQ(ref, b);
+}
+
+TEST(Core, zip_view_readonly)
 {
 
   mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
   mln::box2d multi_ind1 = {{1, 2}, {3, 5}};
   mln::box2d multi_ind2 = {{2, 3}, {4, 6}};
 
-  for (auto&& e : mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2))
+  std::vector<mln::point2d> ref = {
+    {0,0}, {0,1}, {0,2},
+    {1,0}, {1,1}, {1,2},
+    {2,0}, {2,1}, {2,2}
+  };
+
+  auto refv = std::begin(ref);
+  for (auto [v1, v2, v3] : mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2))
   {
-    std::cout << std::get<0>(e) << " " << std::get<1>(e) << " " << std::get<2>(e) << '\n';
+    ASSERT_EQ(*refv, v1);
+    ASSERT_EQ((*refv + mln::point2d{1,2}), v2);
+    ASSERT_EQ((*refv + mln::point2d{2,3}), v3);
+    refv++;
   }
 }
 
-TEST(Core, zip_readonly_rowwise)
+TEST(Core, zip_view_readonly_rowwise)
 {
 
   mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
   mln::box2d multi_ind1 = {{1, 2}, {3, 5}};
   mln::box2d multi_ind2 = {{2, 3}, {4, 6}};
+  std::vector<mln::point2d> ref = {
+    {0,0}, {0,1}, {0,2},
+    {1,0}, {1,1}, {1,2},
+  };
 
+  auto refv = std::begin(ref);
   const auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
-  for (auto&& r : zipped_rows.rows())
+  for (auto&& row : zipped_rows.rows())
   {
-    for(auto&& e : r)
+    for(auto [v1, v2, v3] : row)
     {
-      std::cout << std::get<0>(e) << " " << std::get<1>(e) << " " << std::get<2>(e) << '\n';
+      ASSERT_EQ(*refv, v1);
+      ASSERT_EQ((*refv + mln::point2d{1,2}), v2);
+      ASSERT_EQ((*refv + mln::point2d{2,3}), v3);
+      refv++;
     }
   }
 }
 
-TEST(Core, zip_write)
+TEST(Core, zip_view_write)
 {
   std::vector<int> a1 = {1, 2, 3, 6, 5, 4};
   std::vector<int> a2 = {1, 2, 3, 6, 5, 4};
@@ -98,7 +129,7 @@ TEST(Core, zip_write)
 }
 
 
-TEST(Core, zip_write_rowwise)
+TEST(Core, zip_view_write_rowwise)
 {
   std::vector<int> a1 = {1, 2, 3, 6, 5, 4};
   std::vector<int> a2 = {1, 2, 3, 6, 5, 4};
@@ -122,4 +153,35 @@ TEST(Core, zip_write_rowwise)
   std::vector<int> ref2 = {1, 2, 3, 1, 2, 3};
   EXPECT_EQ(ref1, a1);
   EXPECT_EQ(ref2, a2);
+}
+
+TEST(Core, zip_segmented_and_nonsegmented)
+{
+  mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
+
+  std::vector<mln::point2d> ref = {
+    {0,0}, {0,1}, {0,2},
+    {1,0}, {1,1}, {1,2},
+  };
+
+
+  for (auto [v1, v2] : mln::ranges::view::zip(ref, multi_ind0))
+    ASSERT_EQ(v1, v2);
+}
+
+
+TEST(Core, zip_segmented_and_nonsegmented_rowwise)
+{
+  mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
+
+  std::vector<mln::point2d> ref = {
+    {0,0}, {0,1}, {0,2},
+    {1,0}, {1,1}, {1,2},
+  };
+
+
+  auto zipped =  mln::ranges::view::zip(ref, multi_ind0);
+  for (auto&& row : mln::ranges::rows(zipped))
+    for (auto [v1, v2] : row)
+      ASSERT_EQ(v1, v2);
 }

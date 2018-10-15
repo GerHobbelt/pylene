@@ -1,5 +1,4 @@
 find_package(benchmark REQUIRED)
-find_package(Threads REQUIRED)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 # Download file dependency
@@ -33,14 +32,14 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 add_custom_target(benchmarks ALL COMMENT "Build all the benchmarks.")
 
 add_custom_target(benchmarks-run
-        DEPENDS benchmarks-compile
+        DEPENDS benchmarks
         COMMENT "Build and run all the benchmarks.")
 
 macro(add_benchmark Executable)
     set(Sources ${ARGN})
     add_executable(BM${Executable} EXCLUDE_FROM_ALL ${Sources})
 
-    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark Threads::Threads ${FreeImage_LIBRARIES})
+    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark ${FreeImage_LIBRARIES})
     target_include_directories(BM${Executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks BM${Executable})

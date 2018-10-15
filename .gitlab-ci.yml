@@ -102,10 +102,10 @@ distcheck-linux-clang-debug:
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target benchmarks
-        # FIXME : Disable benchmark execution for now
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target benchmarks-run
+                -- -j1  # Force serial execution
 
 distbench-linux-gcc-release:
     <<: *distbench-linux-base

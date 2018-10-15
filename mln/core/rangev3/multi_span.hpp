@@ -4,8 +4,9 @@
 #include <range/v3/span.hpp>
 #include <range/v3/view/reverse.hpp>
 
-#include <array>
+#include <mln/core/assert.hpp>
 
+#include <array>
 
 namespace mln::ranges
 {
@@ -30,8 +31,6 @@ namespace mln::ranges
       mln_assertion(stride[0] == 1);
     }
   };
-
-
 
   /// Implement a multidimentional span with rows beings span (contiguous elements)
   template <class T, std::size_t Rank>

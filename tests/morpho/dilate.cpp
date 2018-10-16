@@ -11,7 +11,7 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 
 #include <gtest/gtest.h>
 

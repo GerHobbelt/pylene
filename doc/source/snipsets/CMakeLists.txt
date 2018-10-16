@@ -35,7 +35,7 @@ add_custom_target(build-images
   DEPENDS "${DOCUMENTATION_IMAGES}")
 
 link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE} ${FreeImage_LIBRARY})
-link_libraries(Mln)
+link_libraries(Pylene::Pylene)
 
 add_executable(erosion-cli erosion-cli.cpp)
 add_executable(staff_lines staff_lines.cpp)

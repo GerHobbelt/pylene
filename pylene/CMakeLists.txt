@@ -77,6 +77,11 @@ install(EXPORT PyleneTargets
   )
 install(DIRECTORY include/mln
   DESTINATION include)
+
+install(DIRECTORY
+  ${CMAKE_SOURCE_DIR}/cmake/
+  DESTINATION .)
+
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake

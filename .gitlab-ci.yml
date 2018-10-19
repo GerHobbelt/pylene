@@ -25,7 +25,7 @@ build-doc-images:
                 --build missing
                 -o benchmark=False
                 -s compiler.libcxx=libstdc++11
-        - cmake -DPYLENE_ENABLE_BENCHMARKS=NO ..
+        - cmake -DPYLENE_BUILD_BENCHMARKS=NO ..
         - cmake --build .
                 --config Release
                 --target build-images

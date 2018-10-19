@@ -1,6 +1,6 @@
 include(CMakePackageConfigHelpers)
 
-find_package(Boost 1.42 REQUIRED)
+find_package(Boost 1.58 REQUIRED)
 find_package(range-v3 REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
@@ -77,10 +77,6 @@ install(EXPORT PyleneTargets
   )
 install(DIRECTORY include/mln
   DESTINATION include)
-
-install(DIRECTORY
-  ${CMAKE_SOURCE_DIR}/cmake/
-  DESTINATION .)
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake

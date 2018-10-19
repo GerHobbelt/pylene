@@ -28,6 +28,7 @@ class Pylene(ConanFile):
     def package(self):
         cmake = self.get_cmake_config()
         cmake.install()
+        self.copy("*", dst="", src="cmake")
 
 
     def package_info(self):

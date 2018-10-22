@@ -9,7 +9,7 @@
 
 #include <numeric>
 
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 
 #include <gtest/gtest.h>
 

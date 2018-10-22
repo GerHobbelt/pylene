@@ -5,7 +5,7 @@
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
 
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 
 #include <gtest/gtest.h>
 

@@ -1,4 +1,5 @@
 project(PyleneTest)
+cmake_minimum_required(VERSION 3.8.2)
 
 include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 

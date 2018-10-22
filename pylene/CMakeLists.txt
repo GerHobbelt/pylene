@@ -1,7 +1,7 @@
 include(CMakePackageConfigHelpers)
 
 find_package(Boost 1.58 REQUIRED)
-find_package(range-v3 REQUIRED)
+find_package(range-v3 0.3.7 REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 

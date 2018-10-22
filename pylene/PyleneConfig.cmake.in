@@ -1,5 +1,5 @@
 include(CMakeFindDependencyMacro)
-find_dependency(Boost 1.42 REQUIRED)
-find_dependency(range-v3 REQUIRED)
+find_dependency(Boost 1.58)
+find_dependency(range-v3 0.3.7)
 
 include("${CMAKE_CURRENT_LIST_DIR}/PyleneTargets.cmake")

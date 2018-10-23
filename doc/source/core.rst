@@ -2,19 +2,25 @@ Core Module
 ===========
 
 
-Images
-******
 
-
-Ranges
-******
-
-:doc:`core/ranges` extensions for ranges with new concepts and helper functions.
 
 .. toctree::
    :hidden:
 
    core/ranges
+   core/se
+   core/algorithms
+
+
+
+
+.. raw:: html
+
+         <h2>Ranges</h2>
+
+
+:doc:`core/ranges` extensions for ranges with new concepts and helper functions.
+
 
 .. topic:: Concepts
 
@@ -31,16 +37,26 @@ Ranges
 
    * :doc:`core/ranges/reverse`
    * :doc:`core/ranges/transform`
+   * :doc:`core/ranges/filter`
 
 
 
 
-Structural Elements
-*******************
 
-.. toctree::
-   :maxdepth: 1
+.. raw:: html
 
-   core/se/disc
-   core/se/rectangle
-   core/se/periodic_lines
+         <h2>Structural Elements</h2>
+
+
+* :doc:`core/se/disc`
+* :doc:`core/se/rectangle`
+* :doc:`core/se/periodic_lines`
+
+
+
+.. raw:: html
+
+         <h2>Algorithms</h2>
+
+
+Foundamental and core :doc:`algorithms <core/algorithms>` for image manipulation.

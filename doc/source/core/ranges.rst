@@ -107,3 +107,4 @@ Views
 
    ranges/reverse
    ranges/transform
+   ranges/filter

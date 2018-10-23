@@ -3,7 +3,7 @@
 #include <mln/morpho/watershed.hpp>
 
 #include <gtest/gtest.h>
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 
 
 using namespace mln;

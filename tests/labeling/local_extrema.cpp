@@ -4,7 +4,7 @@
 
 
 #include <gtest/gtest.h>
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 #include <mln/labeling/local_extrema.hpp>
 using namespace mln;
 

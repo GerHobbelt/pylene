@@ -7,7 +7,7 @@
 #include <mln/morpho/structural/closing.hpp>
 #include <mln/morpho/structural/opening.hpp>
 
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 
 #include <gtest/gtest.h>
 

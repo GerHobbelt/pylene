@@ -37,9 +37,10 @@ add_custom_target(benchmarks-run
 
 macro(add_benchmark Executable)
     set(Sources ${ARGN})
-    add_executable(BM${Executable} EXCLUDE_FROM_ALL ${Sources})
+    add_executable(BM${Executable} ${Sources})
 
-    target_link_libraries(BM${Executable} PRIVATE Mln benchmark::benchmark ${FreeImage_LIBRARIES})
+    target_link_libraries(BM${Executable} PRIVATE Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
+    target_include_directories(BM${Executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks BM${Executable})
 
@@ -48,7 +49,7 @@ macro(add_benchmark Executable)
         DEPENDS BM${Executable}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         USES_TERMINAL)
-        
+
     add_dependencies(benchmarks-run BM${Executable}_run)
 endmacro(add_benchmark)
 

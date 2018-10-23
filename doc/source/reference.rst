@@ -4,11 +4,11 @@ Reference
 
 .. toctree::
    :maxdepth: 2
+   :titlesonly:
 
    concept
    images
    core
-   algorithms
    labeling
    morpho
 

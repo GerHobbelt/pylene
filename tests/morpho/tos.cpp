@@ -9,7 +9,7 @@
 #include <mln/accu/accumulators/max.hpp>
 
 #include <gtest/gtest.h>
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 #include <algorithm>
 #include "tos_tests_helper.hpp"
 

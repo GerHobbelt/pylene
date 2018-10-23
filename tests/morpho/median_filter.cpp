@@ -5,7 +5,7 @@
 #include <mln/io/imread.hpp>
 #include <mln/morpho/median_filter.hpp>
 
-#include <tests/helpers.hpp>
+#include <helpers.hpp>
 
 #include <algorithm>
 #include <vector>

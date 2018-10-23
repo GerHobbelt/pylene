@@ -1,12 +1,11 @@
 #pragma once
 
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
+#include <mln/core/assert.hpp>
 #include <range/v3/span.hpp>
 #include <range/v3/view/reverse.hpp>
-
-#include <mln/core/assert.hpp>
-
 #include <array>
+
 
 namespace mln::ranges
 {
@@ -113,4 +112,4 @@ namespace mln::ranges
     std::array<std::ptrdiff_t, Rank> m_stride;
   };
 
-} // namespace mln::ranges
+}

@@ -1,6 +1,11 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/neighb2d.hpp>
+#include <mln/core/neighborhood/c8.hpp>
+
+#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/rangev3/foreach.hpp>
+
 #include <cmath>
 
 void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
@@ -17,6 +22,20 @@ void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output
     pxOut->val() = tmp;
   }
 }
+
+void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      int tmp = 0;
+      for (auto nx : mln::c8_new(pxIn))
+        tmp += nx.val();
+      pxOut.val() = tmp;
+    }
+}
+
 
 
 void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
@@ -44,6 +63,20 @@ void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer,
     obuffer += stride;
   }
 }
+
+void Average_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      int tmp = 0;
+      for (auto nx : mln::c8_new(pxIn))
+        tmp += nx.val();
+      pxOut.val() = tmp / 8;
+    }
+}
+
 
 void Average(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
 {
@@ -105,6 +138,20 @@ void Erosion(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
   }
 }
 
+void Erosion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      mln::uint8 mini = pxIn.val();
+      for (auto nx : mln::c8_new(pxIn))
+        if (nx.val() < mini)
+          mini = nx.val();
+      pxOut.val() = mini;
+    }
+}
+
 void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
 {
   for (int i = 0; i < height; i++)
@@ -144,6 +191,19 @@ void Isotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<mln
       tmp += nx->val();
     pxOut->val() = pxIn->val() + (tmp - 4 * pxIn->val()) / 8;
   }
+}
+
+void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      int tmp = 0;
+      for (auto nx : mln::c8_new(pxIn))
+        tmp += nx.val();
+      pxOut.val() = pxIn.val() + (tmp - 4 * pxIn.val()) / 8;
+    }
 }
 
 void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
@@ -194,6 +254,23 @@ void Anisotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<m
     }
     pxOut->val() = cached_val + 0.125f * tmp;
   }
+}
+
+void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      float tmp = 0;
+      mln::uint8 vin = pxIn.val();
+      for (auto nx : mln::c8_new(pxIn))
+      {
+        float gradient = nx.val() - vin;
+        tmp += gradient * Flux_Function(gradient);
+      }
+      pxOut.val() = vin + 0.125f * tmp;
+    }
 }
 
 void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)

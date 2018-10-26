@@ -32,7 +32,8 @@ namespace mln
   template <class N>
   struct Neighborhood : WNeighborhood<N>
   {
-    BOOST_CONCEPT_USAGE(Neighborhood) { BOOST_CONCEPT_ASSERT((Neighborhood_<N>)); }
+    // Destructor non-trivial
+    //BOOST_CONCEPT_USAGE(Neighborhood) { BOOST_CONCEPT_ASSERT((Neighborhood_<N>)); }
 
   protected:
     Neighborhood() = default;

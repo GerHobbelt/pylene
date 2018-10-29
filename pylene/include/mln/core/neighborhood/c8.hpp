@@ -9,14 +9,18 @@ namespace mln
 {
   struct c8_new_t : neighborhood_facade<c8_new_t>
   {
+  private:
+    using point_t = point<std::ptrdiff_t, 2>;
+
+  public:
     using category        = constant_neighborhood_tag;
     using is_incremental  = std::false_type;
     using is_decomposable = std::false_type;
 
-    constexpr ::ranges::span<const point2d, 8> offsets() const { return ::ranges::span<const point2d, 8>(m_offsets.data(), 8); }
+    static constexpr ::ranges::span<const point_t, 8> offsets() { return ::ranges::span<const point_t, 8>(m_offsets.data(), 8); }
 
   private:
-    static inline constexpr std::array<point2d, 8> m_offsets = {{
+    static inline constexpr std::array<point_t, 8> m_offsets = {{
         {-1, -1}, {-1, +0}, {-1, +1}, // _
         {+0, -1}, {+0, +1},           // _
         {+1, -1}, {+1, +0}, {+1, +1}  // _

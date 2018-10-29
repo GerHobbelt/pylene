@@ -44,7 +44,7 @@ namespace mln::details
   {
     using typename ndpix_base<T, N>::point_type;
 
-    void advance(point_type dp)
+    void advance(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)
         this->m_lineptr += m_info->stride[k] * dp[k];
@@ -60,7 +60,7 @@ namespace mln::details
   {
     using typename ndpix_base<T, N>::point_type;
 
-    void advance(point_type dp)
+    void advance(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)
         this->m_lineptr += m_info.stride[k] * dp[k];

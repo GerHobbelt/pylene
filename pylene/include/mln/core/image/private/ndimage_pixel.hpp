@@ -29,12 +29,10 @@ namespace mln::details
     using value_type = std::remove_const_t<T>;
     using reference = T&;
 
-    ndpix_base() = default;
-
     T& val()            const { return m_lineptr[m_point[N-1]]; }
     point_type point()  const { return m_point; }
 
-  public:
+
     T*                               m_lineptr;
     point_type                       m_point;
   };
@@ -44,6 +42,10 @@ namespace mln::details
   {
     using typename ndpix_base<T, N>::point_type;
 
+    // Overwrite value_type/reference for cursor
+    using value_type = ndpix;
+    using reference = ndpix;
+
     void advance(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)
@@ -51,8 +53,17 @@ namespace mln::details
       this->m_point += dp;
     }
 
-  public:
     const ndimage_info<T, N>*        m_info;
+
+  private:
+    friend ::ranges::range_access;
+    // Do not return by const& because reverse iterator does not support stashing
+    // (It creates a copy and return *it)
+    ndpix read() const { return *this; }
+
+    void next() { this->m_point[N-1]++; }
+    void prev() { this->m_point[N-1]--; }
+    bool equal(const ndpix& other) const { return this->m_point[N-1] == other.m_point[N-1]; }
   };
 
   template <class T, std::size_t N>
@@ -78,32 +89,24 @@ namespace mln::details
   {
     using point_type = mln::point<std::ptrdiff_t, N>;
 
+  public:
     struct row_t : public ndpix<T, N>, ::ranges::view_facade<row_t>
     {
       friend ::ranges::range_access;
     private:
-      struct cursor : public ndpix<T, N>
-      {
-        using value_type = ndpix<T, N>;
-        using reference = ndpix<T, N>;
+      using cursor_t = ndpix<T, N>;
 
-        ndpix<T, N> read() const { return *this; } // Do not return by const& (reverse iterator does not support stashing)
-        void next() { this->m_point[N - 1]++; }
-        void prev() { this->m_point[N - 1]--; }
-        bool equal(const cursor& other) const { return this->m_point[N - 1] == other.m_point[N - 1]; }
-      };
-
-      cursor begin_cursor() const
+      cursor_t begin_cursor() const
       {
-        row_t tmp = *this;
+        cursor_t tmp = *this;
         tmp.m_point[N-1] = this->m_info->from[N-1];
-        return cursor{tmp};
+        return tmp;
       }
-      cursor end_cursor() const
+      cursor_t end_cursor() const
       {
-        row_t tmp = *this;
+        cursor_t tmp = *this;
         tmp.m_point[N-1] = this->m_info->to[N-1];
-        return cursor{tmp};
+        return tmp;
       }
 
     public:

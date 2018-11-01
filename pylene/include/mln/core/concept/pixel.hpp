@@ -10,10 +10,16 @@ namespace mln
   template <typename Pix>
   struct Pixel
   {
+  };
 
-    BOOST_CONCEPT_USAGE(Pixel)
+  template <typename Pix>
+  struct Pixel_
+  {
+
+
+    BOOST_CONCEPT_USAGE(Pixel_)
     {
-      check(std::is_base_of<Pixel, Pix>());
+      check(std::is_base_of<Pixel<Pix>, Pix>());
 
       typedef typename Pix::value_type value_type;
       typedef typename Pix::reference reference;
@@ -31,13 +37,14 @@ namespace mln
       //(void)method3;
       //(void)method4;
 
-      // site() and point() aliase each others
+      // site() and point() aliase each othersx
       //check(std::is_same<point_type, site_type>());
 
       // value_type should not be a reference
       check_false(std::is_reference<value_type>());
     }
   };
+
 
   template <class P, class V = int, class I = void*, class Ref = void>
   struct pixel_archetype : Pixel<pixel_archetype<P, V, I>>

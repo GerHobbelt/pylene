@@ -19,6 +19,29 @@ namespace mln::ranges::view
   template <typename Fun, typename... Rngs>
   auto zip_with(Fun f, Rngs&&... rngs);
 
+  namespace details
+  {
+
+    template <class Fun>
+    struct row_zipper
+    {
+      ::ranges::semiregular_t<Fun> f_;
+
+      row_zipper() = default;
+      row_zipper(Fun f) : f_ {std::move(f)}
+      {
+      }
+
+      template <class... TArgs>
+      auto operator() (TArgs&&... rows) const
+      {
+        return zip_with(f_, std::forward<TArgs>(rows)...);
+      }
+    };
+
+  }
+
+
   template <typename Fun, typename... Rngs>
   struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>,
                          std::conditional_t<std::conjunction_v<is_multidimensional_range<Rngs>...>,
@@ -104,7 +127,9 @@ namespace mln::ranges::view
     auto rows() const
     {
       // Zip function for rows
+      // Using this lambda is not regular so we cheat for optimization
       auto row_zipper = [fun = this->f_](auto&&... rows) { return zip_with(fun, std::forward<decltype(rows)>(rows)...); };
+      //details::row_zipper zipper(this->f_);
 
       // Apply row-zipper on each range
       return std::apply([row_zipper](const auto&... rng) { return zip_with(row_zipper, rng.rows()...); }, rngs_);

@@ -79,7 +79,7 @@ namespace mln::ranges::details
         cursor() = default;
         cursor(Cursor_ cursor) : m_cursor(cursor) {}
 
-        private:
+      private:
         Cursor_ m_cursor;
       };
 

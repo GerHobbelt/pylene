@@ -6,16 +6,16 @@ if(Qt4_FOUND)
 
 
   QT4_WRAP_CPP(dispsaliency_HEADERS_MOC
-    ${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hpp
+    ${CMAKE_HOME_DIRECTORY}/pylene/include/mln/qt/imageviewer.hpp
     dispsaliency.hpp
     )
 
-  QT4_GENERATE_MOC(${CMAKE_HOME_DIRECTORY}/mln/qt/imageviewer.hxx
+  QT4_GENERATE_MOC(${CMAKE_HOME_DIRECTORY}/pylene/include/mln/qt/imageviewer.hxx
     ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
 
   add_executable(dispsaliency dispsaliency.cpp
     ${dispsaliency_HEADERS_MOC}
-    ${CMAKE_HOME_DIRECTORY}/mln/qt/qtimage.cpp
+    ${CMAKE_HOME_DIRECTORY}/pylene/include/mln/qt/qtimage.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp
     )
 

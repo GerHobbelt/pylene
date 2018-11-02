@@ -1,9 +1,3 @@
-variables:
-    CONAN_PUBLIC_REPO_NAME: "public-conan"
-    CONAN_PUBLIC_REPO_URL: "https://api.bintray.com/conan/bincrafters/public-conan"
-    CONAN_PRIVATE_REMOTE_NAME: "dutiona-lrde"
-    CONAN_PRIVATE_REMOTE_URL: "https://api.bintray.com/conan/dutiona/lrde"
-
 stages:
     - build
     - test
@@ -18,14 +12,8 @@ build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
-        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
-        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
-        - conan remote list
-        - conan install ..
-                --build missing
-                -o benchmark=False
-                -s compiler.libcxx=libstdc++11
-        - cmake -DPYLENE_BUILD_BENCHMARKS=NO ..
+        - conan install .. -pr buildfarm
+        - cmake -DPYLENE_BUILD_BENCHMARKS=NO .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build .
                 --config Release
                 --target build-images
@@ -41,14 +29,8 @@ build-doc-images:
     stage: test
     script:
         - mkdir build && cd build
-        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
-        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
-        - conan remote list
-        - conan install ..
-                --build missing
-                -o benchmark=False
-                -s compiler.libcxx=libstdc++11
-        - cmake ..
+        - conan install .. -pr buildfarm
+        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target check
@@ -91,14 +73,8 @@ distcheck-linux-clang-debug:
     stage: bench
     script:
         - mkdir build && cd build
-        - conan remote add $CONAN_PUBLIC_REPO_NAME $CONAN_PUBLIC_REPO_URL
-        - conan remote add $CONAN_PRIVATE_REMOTE_NAME $CONAN_PRIVATE_REMOTE_URL
-        - conan remote list
-        - conan install ..
-                --build missing
-                -o benchmark=True
-                -s compiler.libcxx=libstdc++11
-        - cmake ..
+        - conan install .. -pr buildfarm
+        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target benchmarks

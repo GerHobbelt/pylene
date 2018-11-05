@@ -10,7 +10,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(STANDALONE_COMPILE_FLAGS "-fopt-info")
+  set(STANDALONE_COMPILE_FLAGS "-fopt-info -ftree-vectorize -ftree-vectorizer-verbose=2")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 else ()
   # W4141: 'inline' : utilisé plusieurs fois in benchmark.h

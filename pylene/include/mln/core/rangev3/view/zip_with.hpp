@@ -2,6 +2,7 @@
 
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/utils/blank.hpp>
 
 #include <range/v3/detail/satisfy_boost_range.hpp>
@@ -114,8 +115,11 @@ namespace mln::ranges
     {
     }
 
-    // Fixme: enable this function only if all zipped ranges are segmented
+    template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
     auto rows() const;
+
+    template <typename U = void, typename = std::enable_if_t<std::conjunction_v<has_reverse_method<Rngs>...>, U>>
+    auto reversed() const;
   };
 
   namespace view
@@ -154,6 +158,7 @@ namespace mln::ranges
 
 
   template <typename Fun, typename... Rngs>
+  template <typename U, typename>
   auto zip_with_view<Fun, Rngs...>::rows() const
   {
     // Zip function for rows
@@ -163,6 +168,20 @@ namespace mln::ranges
 
     // Apply row-zipper on each range
     return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
+  }
+
+  template <typename Fun, typename... Rngs>
+  template <typename U, typename>
+  auto zip_with_view<Fun, Rngs...>::reversed() const
+  {
+    // Zip function for rows
+    auto row_zipper = [fun = this->f_](auto&&... rows) {
+      return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
+    };
+
+    // Apply row-zipper on each range
+    return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.reversed()...); },
+                      rngs_);
   }
 
 } // namespace mln::ranges

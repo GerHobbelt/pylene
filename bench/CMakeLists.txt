@@ -45,7 +45,7 @@ macro(add_benchmark Executable)
     add_dependencies(benchmarks BM${Executable})
 
     add_custom_target(BM${Executable}_run
-        COMMAND BM${Executable} --benchmark_out_format=csv --benchmark_out=BM${Executable}.csv
+        COMMAND BM${Executable} --benchmark_out_format=json --benchmark_out=BM${Executable}.json
         DEPENDS BM${Executable}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         USES_TERMINAL)

@@ -85,7 +85,7 @@ distcheck-linux-clang-debug:
     artifacts:
          name: "benchmark-results"
          paths:
-             - build/bench/*.csv
+             - build/bench/*.json
 
 distbench-linux-gcc-release:
     <<: *distbench-linux-base

@@ -80,6 +80,11 @@ namespace mln::ranges
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
       }
+
+      void prev()
+      {
+        std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
+      }
     };
 
     cursor begin_cursor()

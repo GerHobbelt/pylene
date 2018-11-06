@@ -20,6 +20,4 @@ namespace mln::ranges::view
     return ::ranges::view::reverse(std::forward<R>(rng));
   }
 
-}
-
-
+} // namespace mln::ranges::view

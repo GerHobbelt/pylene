@@ -80,11 +80,6 @@ namespace mln::ranges
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
       }
-
-      void prev()
-      {
-        std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
-      }
     };
 
     cursor begin_cursor()
@@ -122,9 +117,6 @@ namespace mln::ranges
 
     template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
     auto rows() const;
-
-    template <typename U = void, typename = std::enable_if_t<std::conjunction_v<has_reverse_method<Rngs>...>, U>>
-    auto reversed() const;
   };
 
   namespace view
@@ -173,20 +165,6 @@ namespace mln::ranges
 
     // Apply row-zipper on each range
     return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
-  }
-
-  template <typename Fun, typename... Rngs>
-  template <typename U, typename>
-  auto zip_with_view<Fun, Rngs...>::reversed() const
-  {
-    // Zip function for rows
-    auto row_zipper = [fun = this->f_](auto&&... rows) {
-      return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
-    };
-
-    // Apply row-zipper on each range
-    return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.reversed()...); },
-                      rngs_);
   }
 
 } // namespace mln::ranges

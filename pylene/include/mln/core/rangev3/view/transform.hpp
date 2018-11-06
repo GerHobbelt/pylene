@@ -33,8 +33,8 @@ namespace mln::ranges
 
   template <typename Rng, typename Fun>
   struct iter_transform_view
-      : ::ranges::iter_transform_view<Rng, Fun>,
-        std::conditional_t<is_multidimensional_range_v<Rng>, multidimensional_range_base, mln::details::blank>
+    : ::ranges::iter_transform_view<Rng, Fun>,
+      std::conditional_t<is_multidimensional_range_v<Rng>, multidimensional_range_base, mln::details::blank>
   {
   private:
     // Very bad way to access the private member
@@ -53,7 +53,7 @@ namespace mln::ranges
     template <class U = int, class = std::enable_if_t<has_reverse_method_v<Rng>, U>>
     auto reversed() const
     {
-      return ::ranges::view::transform(this->base().reversed(), fun());
+      return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), fun());
     }
   };
 
@@ -62,7 +62,7 @@ namespace mln::ranges
   {
     transform_view() = default;
     transform_view(Rng rng, Fun fun)
-        : iter_transform_view<Rng, ::ranges::indirected<Fun>>{std::move(rng), ::ranges::indirect(std::move(fun))}
+      : iter_transform_view<Rng, ::ranges::indirected<Fun>>{std::move(rng), ::ranges::indirect(std::move(fun))}
     {
     }
   };
@@ -118,7 +118,7 @@ namespace mln::ranges
 
     /// \relates transform_fn
     /// \ingroup group-views
-    RANGES_INLINE_VARIABLE(::ranges::view::view<transform_fn>, transform)
+    RANGES_INLINE_VARIABLE(transform_fn, transform)
   } // namespace view
 
 } // namespace mln::ranges

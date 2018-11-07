@@ -109,6 +109,11 @@ namespace mln::ranges
 
   public:
     zip_with_view() = default;
+    explicit zip_with_view(Rngs... rngs)
+      : f_(Fun{})
+      , rngs_(std::move(rngs)...)
+    {
+    }
     explicit zip_with_view(Fun f, Rngs... rngs)
       : f_(std::move(f))
       , rngs_(std::move(rngs)...)

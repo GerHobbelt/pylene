@@ -4,7 +4,7 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
-#include <mln/morpho/tos/ctos.hpp>
+#include <mln/morpho/tos/tos.hpp>
 
 namespace mln
 {
@@ -24,7 +24,7 @@ namespace mln
     //   std::cin >> pmin[0] >> pmin[1];
     //   pmin *= 2;
     // }
-    T tree = morpho::cToS_pinf(f, c4, pmin);
+    T tree = morpho::tos(f, pmin);
 
     image2d<uint16> F = immerse_k1(f, 69);
     property_map<T, uint16> vmap = morpho::make_attribute_map_from_image(tree, F);

@@ -4,7 +4,7 @@
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/morpho/tos/ctos.hpp>
+#include <mln/morpho/tos/tos.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/task_scheduler_init.h>
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     // 1. Compute the marginal ToS and filter them if necessary.
     tree_t t[NTREE];
     tbb::parallel_for(0, (int)NTREE, [&t, &f, a0](int i) {
-      t[i] = morpho::cToS(imtransform(f, [i](value_t x) { return x[i]; }), c4);
+      t[i] = morpho::tos(imtransform(f, [i](value_t x) { return x[i]; }));
       if (a0 > 0)
       {
         grain_filter_inplace(t[i], a0);

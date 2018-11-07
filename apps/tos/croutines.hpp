@@ -7,6 +7,7 @@
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
+#include <mln/core/neighb2d.hpp>
 
 namespace mln
 {

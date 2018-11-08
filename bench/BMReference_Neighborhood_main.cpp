@@ -28,7 +28,7 @@ void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* _
 
 class Bench_Ref_Neighborhood : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "/lena.ppm";
+  static constexpr const char* filename = "Space1_20MB.jpg";
 
   virtual void SetUp(const benchmark::State&) override
   {

@@ -34,8 +34,8 @@ namespace mln
     {
       return it;
     }
-  }
-}
+  } // namespace details
+} // namespace mln
 
 #define mln_forall(...)                                                                                                \
   MLN_DECL_VAR(__mln_it, mln::details::make_forall_iterator(__VA_ARGS__))                                              \
@@ -55,7 +55,7 @@ namespace mln
 #define mln_simple_forall(p) for (p.init(); !p.finished(); p.next())
 
 /******************************************/
-/****             mln_iter             ****/
+/****        mln_iter/mln_riter        ****/
 /******************************************/
 
 #define mln_iter(p, range) auto p = mln::rng::iter(range);
@@ -63,7 +63,7 @@ namespace mln
 #define mln_riter(p, range) auto p = mln::rng::riter(range);
 
 /******************************************/
-/****            mln_viter            *****/
+/****      mln_viter/mln_rviter       *****/
 /******************************************/
 
 // DATA is pair of sequences (ids, images)
@@ -77,8 +77,18 @@ namespace mln
 #define mln_viter(...)                                                                                                 \
   __mln_viter_impl__(BOOST_PP_DIV(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2), BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
+#define __mln_rviter_decl__(z, i, DATA)                                                                                \
+  auto BOOST_PP_SEQ_ELEM(i, BOOST_PP_TUPLE_ELEM(0, DATA)) =                                                            \
+      mln::rng::riter((BOOST_PP_SEQ_ELEM(i, BOOST_PP_TUPLE_ELEM(1, DATA))).values());
+
+#define __mln_rviter_impl__(ARGC, ARGV)                                                                                \
+  BOOST_PP_REPEAT(ARGC, __mln_viter_decl__, (BOOST_PP_SEQ_FIRST_N(ARGC, ARGV), BOOST_PP_SEQ_REST_N(ARGC, ARGV)))
+
+#define mln_rviter(...)                                                                                                \
+  __mln_rviter_impl__(BOOST_PP_DIV(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2), BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+
 /******************************************/
-/****            mln_pixter           *****/
+/****      mln_pixter/mln_rpixter     *****/
 /******************************************/
 
 // DATA is pair of sequences (ids, images)
@@ -92,10 +102,22 @@ namespace mln
 #define mln_pixter(...)                                                                                                \
   __mln_pixter_impl__(BOOST_PP_DIV(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2), BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
+#define __mln_rpixter_decl__(z, i, DATA)                                                                               \
+  auto BOOST_PP_SEQ_ELEM(i, BOOST_PP_TUPLE_ELEM(0, DATA)) =                                                            \
+      mln::rng::riter((BOOST_PP_SEQ_ELEM(i, BOOST_PP_TUPLE_ELEM(1, DATA))).pixels());
+
+#define __mln_rpixter_impl__(ARGC, ARGV)                                                                               \
+  BOOST_PP_REPEAT(ARGC, __mln_rpixter_decl__, (BOOST_PP_SEQ_FIRST_N(ARGC, ARGV), BOOST_PP_SEQ_REST_N(ARGC, ARGV)))
+
+#define mln_rpixter(...)                                                                                               \
+  __mln_rpixter_impl__(BOOST_PP_DIV(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 2), BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+
 /******************************************/
-/****             mln_piter             ****/
+/****       mln_piter/mln_rpiter       ****/
 /******************************************/
 
 #define mln_piter(p, ima) auto p = ima.domain().iter();
+
+#define mln_rpiter(p, ima) auto p = ima.domain().riter();
 
 #endif // !MLN_CORE_FORALL_HPP

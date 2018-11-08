@@ -8,7 +8,7 @@ Core Module
    :hidden:
 
    core/ranges
-   core/se
+   core/neighborhood
    core/algorithms
 
 
@@ -45,12 +45,24 @@ Core Module
 
 .. raw:: html
 
-         <h2>Structural Elements</h2>
+         <h2>Neighborhoods and Structural Elements</h2>
 
+:doc:`core/neighborhood`  are the fundamental tools for local image processing.
 
-* :doc:`core/se/disc`
-* :doc:`core/se/rectangle`
-* :doc:`core/se/periodic_lines`
+.. topic:: Concepts
+
+   * :cpp:concept:`mln::StructuringElement`
+
+* 2D Neighborhood
+
+  * :doc:`core/neighborhood/c4`
+  * :doc:`core/neighborhood/c8`
+
+* 2D Structuring Elements
+
+  * :doc:`core/se/disc`
+  * :doc:`core/se/rectangle`
+  * :doc:`core/se/periodic_lines`
 
 
 

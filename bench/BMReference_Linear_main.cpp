@@ -40,7 +40,6 @@ void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
 
-// TODO : all non-inplace function with new values/new pixels
 // TODO : (another PR) reversed bench (with mult, mult_c, new values, new pixels)
 
 class Bench_Ref_Linear : public benchmark::Fixture

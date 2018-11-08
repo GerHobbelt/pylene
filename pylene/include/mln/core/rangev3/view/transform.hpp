@@ -118,7 +118,7 @@ namespace mln::ranges
 
     /// \relates transform_fn
     /// \ingroup group-views
-    RANGES_INLINE_VARIABLE(transform_fn, transform)
+    RANGES_INLINE_VARIABLE(::ranges::view::view<transform_fn>, transform)
   } // namespace view
 
 } // namespace mln::ranges

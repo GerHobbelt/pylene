@@ -7,7 +7,6 @@
 #include <range/v3/to_container.hpp>
 #include <range/v3/view/single.hpp>
 
-#include <iostream>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -25,8 +24,9 @@ TEST(Range, reversed_with_bidirectional_range)
 TEST(Range, reversed_with_reversible_range)
 {
   mln::ranges::multi_indices<2>   ids({3, 4});
-  std::vector<std::array<int, 2>> ref = {{2, 3}, {2, 2}, {2, 1}, {2, 0}, {1, 3}, {1, 2},
-                                         {1, 1}, {1, 0}, {0, 3}, {0, 2}, {0, 1}, {0, 0}};
+  std::vector<std::array<int, 2>> ref = {{2, 3}, {2, 2}, {2, 1}, {2, 0}, //
+                                         {1, 3}, {1, 2}, {1, 1}, {1, 0}, //
+                                         {0, 3}, {0, 2}, {0, 1}, {0, 0}};
 
   auto res = mln::ranges::view::reverse(ids);
   ASSERT_EQ(ref, ::ranges::to_vector(res));
@@ -63,15 +63,15 @@ TEST(Range, reversed_transformed_bidirectional_range)
 TEST(Range, reversed_transformed_reversible_range)
 {
   mln::ranges::multi_indices<2>   ids({3, 4});
-  std::vector<std::array<int, 2>> ref  = {{4, 9}, {4, 4}, {4, 1}, {4, 0}, {1, 9}, {1, 4},
-                                         {1, 1}, {1, 0}, {0, 9}, {0, 4}, {0, 1}, {0, 0}};
+  std::vector<std::array<int, 2>> ref  = {{4, 9}, {4, 4}, {4, 1}, {4, 0}, //
+                                         {1, 9}, {1, 4}, {1, 1}, {1, 0}, //
+                                         {0, 9}, {0, 4}, {0, 1}, {0, 0}};
   auto                            pow2 = mln::ranges::view::transform(ids, [](auto vals) {
     return std::array<int, 2>{vals[0] * vals[0], vals[1] * vals[1]};
   });
   auto                            res  = mln::ranges::view::reverse(pow2);
   ASSERT_EQ(ref, ::ranges::to_vector(res));
 }
-
 
 TEST(Range, reversed_zipped_range)
 {

@@ -35,7 +35,7 @@ void Mult_Inplace_New_Pixels_Reversed(mln::image2d<mln::uint8>& img)
 
 void Mult_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
 {
-  buffer += (width - 1) * stride;
+  buffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
   {
     for (int x = width - 1; x >= 0; --x)
@@ -57,8 +57,8 @@ void Mult_Reversed(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>&
 void Mult_C_Reversed(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer, int width, int height,
                      std::ptrdiff_t stride)
 {
-  ibuffer += (width - 1) * stride;
-  obuffer += (width - 1) * stride;
+  ibuffer += (height - 1) * stride;
+  obuffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
   {
     for (int x = width - 1; x >= 0; --x)
@@ -130,7 +130,7 @@ void Threshold_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std
 {
   constexpr mln::uint8 t = 128;
 
-  buffer += (width - 1) * stride;
+  buffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
   {
     for (int x = width - 1; x >= 0; --x)
@@ -144,8 +144,8 @@ void Threshold_C_Reversed(const mln::uint8* __restrict__ ibuffer, mln::uint8* __
 {
   constexpr mln::uint8 t = 128;
 
-  ibuffer += (width - 1) * stride;
-  obuffer += (width - 1) * stride;
+  ibuffer += (height - 1) * stride;
+  obuffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
   {
     for (int x = width - 1; x >= 0; --x)
@@ -223,7 +223,7 @@ void LUT_Inplace_New_Pixels_Reversed(const mln::uint8 LUT[], mln::image2d<mln::u
 
 void LUT_Inplace_C_Reversed(const mln::uint8* LUT, mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
 {
-  buffer += (width - 1) * stride;
+  buffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
   {
     for (int x = width - 1; x >= 0; --x)
@@ -245,8 +245,8 @@ void LUT_Reversed(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input,
 void LUT_C_Reversed(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer,
                     int width, int height, std::ptrdiff_t stride)
 {
-  ibuffer += (width - 1) * stride;
-  obuffer += (width - 1) * stride;
+  ibuffer += (height - 1) * stride;
+  obuffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
   {
     for (int x = width - 1; x >= 0; --x)

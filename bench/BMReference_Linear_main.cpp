@@ -133,6 +133,7 @@ protected:
   std::vector<mln::uint8>  m_lut;
 };
 
+
 BENCHMARK_F(Bench_Ref_Linear, Mult_C)(benchmark::State& st)
 {
   runit(st, Mult_C);
@@ -252,6 +253,9 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels(m_lut.data(), args...); }));
 }
+
+
+// Reversed
 
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_C_Reversed)(benchmark::State& st)

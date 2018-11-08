@@ -26,6 +26,12 @@ void LUT_C(const mln::uint8* LUT, const mln::uint8* ibuffer, mln::uint8* obuffer
 void Mult_New_Values(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 void Mult_New_Pixels(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 
+void Threshold_New_Values(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Threshold_New_Pixels(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
+void LUT_New_Values(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void LUT_New_Pixels(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
 void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
@@ -142,6 +148,16 @@ BENCHMARK_F(Bench_Ref_Linear, Threshold)(benchmark::State& st)
   runit(st, Threshold);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Values)(benchmark::State& st)
+{
+  runit(st, Threshold_New_Values);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Pixels)(benchmark::State& st)
+{
+  runit(st, Threshold_New_Pixels);
+}
+
 BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_C);
@@ -170,6 +186,16 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Linear, LUT)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_New_Values)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_New_Values(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_New_Pixels)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_New_Pixels(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C)(benchmark::State& st)

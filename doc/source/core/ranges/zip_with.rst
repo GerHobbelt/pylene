@@ -24,18 +24,19 @@ Include :file:`<mln/core/ranges/view/zip_with.hpp>`
    Reversible     X          
    Bidirectional  X          
    Random Access  X          
-   Contiguous     X          X
+   Contiguous     X          
    =============  =========  ======================
 
    **Examples**::
 
      mln::box2d box1 = {{0,0}, {2,3}};
      mln::box2d box2 = {{1,1}, {3,4}};
-     mln_foreach(auto p, ranges::view::zip_with([](auto a, auto b){ return a[0]*b[0] + a[1]*b[1]; }, box1, box2))
+     auto zipper = [](auto a, auto b){ return a[0]*b[0] + a[1]*b[1]; }
+     mln_foreach(auto p, ranges::view::zip_with(zipper, box1, box2))
        std::cout << p << ",";
 
    Outputs:
 
    .. code-block:: text
 
-     (0,0),(0,2),(0,6),(2,0),(2,2),(2,6)
+     (0,0),(0,2),(0,6),(2,0),(2,2),(2,6),

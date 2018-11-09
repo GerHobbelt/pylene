@@ -13,7 +13,7 @@ Include :file:`<mln/core/ranges/view/transform.hpp>`
    :param f: Function to apply on each element
 
    `transform` returns a view of the input range where *f* is applied to
-   element. This view preserves the following properties:
+   the elements. This view preserves the following properties:
 
   
    =============  ===  ================

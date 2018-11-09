@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
 #include <range/v3/view_facade.hpp>
 
 namespace mln::ranges::details
@@ -34,15 +34,15 @@ namespace mln::ranges::details
       /*********************************************/
       /**** multi_view_facade::row_wise::cursor ****/
       /*********************************************/
-      class cursor : public forward_multidimensional_cursor_facade<Rank-1, cursor>
+      class cursor : public forward_multidimensional_cursor_facade<Rank - 1, cursor>
       {
         friend ::ranges::range_access;
         using Cursor_ = typename R::cursor;
-        using base = forward_multidimensional_cursor_facade<Rank-1, cursor>;
+        using base    = forward_multidimensional_cursor_facade<Rank - 1, cursor>;
 
 
-        using base::next;
         using base::equal;
+        using base::next;
         decltype(auto) read() const
         {
           if constexpr (forward)
@@ -77,9 +77,12 @@ namespace mln::ranges::details
         }
 
         cursor() = default;
-        cursor(Cursor_ cursor) : m_cursor(cursor) {}
+        cursor(Cursor_ cursor)
+          : m_cursor(cursor)
+        {
+        }
 
-        private:
+      private:
         Cursor_ m_cursor;
       };
 
@@ -87,7 +90,10 @@ namespace mln::ranges::details
 
     public:
       row_wise() = default;
-      row_wise(R r) : m_r(std::move(r)) {}
+      row_wise(R r)
+        : m_r(std::move(r))
+      {
+      }
 
     private:
       R m_r;
@@ -99,11 +105,11 @@ namespace mln::ranges::details
     class cursor : public forward_multidimensional_cursor_facade<Rank, cursor>
     {
       friend ::ranges::range_access;
-      using base = forward_multidimensional_cursor_facade<Rank, cursor>;
+      using base    = forward_multidimensional_cursor_facade<Rank, cursor>;
       using Cursor_ = typename R::cursor;
 
-      using base::next;
       using base::equal;
+      using base::next;
       decltype(auto) read() const
       {
         if constexpr (forward)
@@ -114,46 +120,48 @@ namespace mln::ranges::details
 
 
     public:
-        bool __is_at_end(std::size_t k) const
-        {
-          if constexpr (forward)
-            return m_cursor.__is_at_end(k);
-          else
-            return m_cursor.__is_at_rend(k);
-        }
+      bool __is_at_end(std::size_t k) const
+      {
+        if constexpr (forward)
+          return m_cursor.__is_at_end(k);
+        else
+          return m_cursor.__is_at_rend(k);
+      }
 
-        void __next(std::size_t k)
-        {
-          if constexpr (forward)
-            m_cursor.__next(k);
-          else
-            m_cursor.__rnext(k);
-        }
+      void __next(std::size_t k)
+      {
+        if constexpr (forward)
+          m_cursor.__next(k);
+        else
+          m_cursor.__rnext(k);
+      }
 
-        void __reset_to_begin(std::size_t k)
-        {
-          if constexpr (forward)
-            m_cursor.__reset_to_begin(k);
-          else
-            m_cursor.__reset_to_rbegin(k);
-        }
+      void __reset_to_begin(std::size_t k)
+      {
+        if constexpr (forward)
+          m_cursor.__reset_to_begin(k);
+        else
+          m_cursor.__reset_to_rbegin(k);
+      }
 
-        cursor() = default;
-        cursor(Cursor_ cursor) : m_cursor(cursor) {}
+      cursor() = default;
+      cursor(Cursor_ cursor)
+        : m_cursor(cursor)
+      {
+      }
 
     private:
       Cursor_ m_cursor;
     };
 
     const R* exact() const { return reinterpret_cast<const R*>(this); }
-    cursor begin_cursor() const { return  typename R::cursor(*exact(), forward); }
+    cursor   begin_cursor() const { return typename R::cursor(*exact(), forward); }
 
 
   public:
-    row_wise rows() const { return row_wise(*exact()); }
+    row_wise                                rows() const { return row_wise(*exact()); }
     multi_view_decorator<Rank, R, !forward> reversed() const { return *exact(); }
   };
-
 
 
   /******************************************/
@@ -167,17 +175,25 @@ namespace mln::ranges::details
   {
     friend ::ranges::range_access;
     using Cursor_ = typename R::cursor;
+
   public:
     struct cursor : public Cursor_
     {
       cursor() = default;
-      cursor(const multi_view_decorator& x, bool fwd) : Cursor_(x.m_range, fwd) {}
+      cursor(const multi_view_decorator& x, bool fwd)
+        : Cursor_(x.m_range, fwd)
+      {
+      }
     };
 
-    multi_view_decorator(R rng) : m_range(rng) {}
+    multi_view_decorator() = default;
+    multi_view_decorator(R rng)
+      : m_range(rng)
+    {
+    }
 
   private:
     R m_range;
   };
 
-}
+} // namespace mln::ranges::details

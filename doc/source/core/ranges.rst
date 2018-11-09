@@ -108,3 +108,5 @@ Views
    ranges/reverse
    ranges/transform
    ranges/filter
+   ranges/zip
+   ranges/zip_with

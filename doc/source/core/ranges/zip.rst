@@ -22,7 +22,7 @@ Include :file:`<mln/core/ranges/view/zip.hpp>`
    Reversible     X          
    Bidirectional  X          
    Random Access  X          
-   Contiguous     X          X
+   Contiguous     X          
    =============  =========  ================
 
    **Examples**::

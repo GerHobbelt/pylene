@@ -53,12 +53,12 @@ Core Module
 
    * :cpp:concept:`mln::StructuringElement`
 
-* 2D Neighborhood
+* Predefined Neighborhood
 
   * :doc:`core/neighborhood/c4`
   * :doc:`core/neighborhood/c8`
 
-* 2D Structuring Elements
+* Predefined Structuring Elements
 
   * :doc:`core/se/disc`
   * :doc:`core/se/rectangle`

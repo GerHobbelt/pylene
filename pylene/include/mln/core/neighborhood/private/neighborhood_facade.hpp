@@ -40,14 +40,14 @@ namespace mln
     }
 
     template <class P, std::enable_if_t<!is_a<P, Pixel>::value, int> = 0>
-    auto before()(const P& point) const
+    auto before(const P& point) const
     {
       return ::ranges::view::transform(static_cast<const N*>(this)->before_offsets(),
                                        [point](P offset) -> P { return point + offset; });
     }
 
     template <class P, std::enable_if_t<!is_a<P, Pixel>::value, int> = 0>
-    auto after()(const P& point) const
+    auto after(const P& point) const
     {
       return ::ranges::view::transform(static_cast<const N*>(this)->after_offsets(),
                                        [point](P offset) -> P { return point + offset; });

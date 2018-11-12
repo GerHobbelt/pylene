@@ -22,10 +22,10 @@ void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img)
 
 void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img)
 {
-  auto z = img.new_pixels();
-  for (auto r : z.rows())
-    for (auto&& px : r)
-      px.val() *= 2;
+  mln_foreach_new (auto&& px, img.new_pixels())
+  {
+    px.val() *= 2;
+  }
 }
 
 void Mult_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)

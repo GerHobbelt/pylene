@@ -63,7 +63,6 @@ void Mult_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obu
 
 void Mult_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-
   auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
   for (auto&& r : zipped_values.rows())
   {
@@ -153,6 +152,34 @@ void Threshold(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out
   }
 }
 
+void Threshold_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+{
+  constexpr mln::uint8 t = 128;
+
+  auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
+  for (auto&& r : zipped_values.rows())
+  {
+    for (auto&& [in_v, out_v] : r)
+    {
+      out_v = in_v < t ? 0 : 255;
+    }
+  }
+}
+
+void Threshold_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+{
+  constexpr mln::uint8 t = 128;
+
+  auto zipped_pixels = mln::ranges::view::zip(in.new_pixels(), out.new_pixels());
+  for (auto&& r : zipped_pixels.rows())
+  {
+    for (auto&& [in_p, out_p] : r)
+    {
+      out_p.val() = in_p.val() < t ? 0 : 255;
+    }
+  }
+}
+
 void LUT_Inplace(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
 {
   mln_pixter(px, img);
@@ -207,5 +234,29 @@ void LUT_C(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffer, mln::u
       obuffer[x] = LUT[ibuffer[x]];
     ibuffer += stride;
     obuffer += stride;
+  }
+}
+
+void LUT_New_Values(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto zipped_values = mln::ranges::view::zip(input.new_values(), output.new_values());
+  for (auto&& r : zipped_values.rows())
+  {
+    for (auto&& [in_v, out_v] : r)
+    {
+      out_v = LUT[in_v];
+    }
+  }
+}
+
+void LUT_New_Pixels(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto zipped_pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for (auto&& r : zipped_pixels.rows())
+  {
+    for (auto&& [in_p, out_p] : r)
+    {
+      out_p.val() = LUT[in_p.val()];
+    }
   }
 }

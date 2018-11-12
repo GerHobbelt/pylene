@@ -11,7 +11,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(STANDALONE_COMPILE_FLAGS "-g -fopt-info -fopt-info-vec-missed")
+  set(STANDALONE_COMPILE_FLAGS "-g -fopt-info -fopt-info-vec-missed -ftree-vectorize -ftree-vectorizer-verbose=2")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 else ()
   # W4141: 'inline' : utilisé plusieurs fois in benchmark.h
@@ -46,7 +46,7 @@ macro(add_benchmark Executable)
     add_dependencies(benchmarks BM${Executable})
 
     add_custom_target(BM${Executable}_run
-        COMMAND BM${Executable}
+        COMMAND BM${Executable} --benchmark_out_format=json --benchmark_out=BM${Executable}.json
         DEPENDS BM${Executable}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         USES_TERMINAL)

@@ -26,6 +26,12 @@ void LUT_C(const mln::uint8* LUT, const mln::uint8* ibuffer, mln::uint8* obuffer
 void Mult_New_Values(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 void Mult_New_Pixels(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 
+void Threshold_New_Values(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Threshold_New_Pixels(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
+void LUT_New_Values(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void LUT_New_Pixels(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
 void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
@@ -33,6 +39,8 @@ void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& im
 void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
+
+// TODO : (another PR) reversed bench (with mult, mult_c, new values, new pixels)
 
 class Bench_Ref_Linear : public benchmark::Fixture
 {
@@ -51,7 +59,7 @@ class Bench_Ref_Linear : public benchmark::Fixture
       m_lut[i] = i;
 
     m_height = m_input.nrows();
-    m_width = m_input.ncols();
+    m_width  = m_input.ncols();
     m_stride = m_input.strides()[0];
   }
 
@@ -80,13 +88,13 @@ protected:
   }
 
 protected:
-  int m_width;
-  int m_height;
+  int            m_width;
+  int            m_height;
   std::ptrdiff_t m_stride;
 
   mln::image2d<mln::uint8> m_input;
   mln::image2d<mln::uint8> m_output;
-  std::vector<mln::uint8> m_lut;
+  std::vector<mln::uint8>  m_lut;
 };
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_C)(benchmark::State& st)
@@ -139,6 +147,16 @@ BENCHMARK_F(Bench_Ref_Linear, Threshold)(benchmark::State& st)
   runit(st, Threshold);
 }
 
+BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Values)(benchmark::State& st)
+{
+  runit(st, Threshold_New_Values);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Pixels)(benchmark::State& st)
+{
+  runit(st, Threshold_New_Pixels);
+}
+
 BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_C);
@@ -167,6 +185,16 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
 BENCHMARK_F(Bench_Ref_Linear, LUT)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_New_Values)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_New_Values(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_New_Pixels)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_New_Pixels(m_lut.data(), args...); }));
 }
 
 BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C)(benchmark::State& st)

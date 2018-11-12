@@ -12,7 +12,7 @@ Include :file:`<mln/core/ranges/view/reverse.hpp>`
 
    If the expression :cpp:expr:`r.reversed()` is valid, then it is
    returned. Otherwise, `r` must be a :cpp:concept:`std::BidirectionalRange`
-   and the function returns ``::ranges::view::reverse(rng)``.
+   and the function returns ``::ranges::view::reverse(rng)``. This view preserves the following properties:
 
    =============  ===  ================
     Properties    *r*  *reverse(r)*

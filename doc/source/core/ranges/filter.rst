@@ -13,7 +13,7 @@ Include :file:`<mln/core/ranges/view/filter.hpp>`
    :param f: Predicate to apply on each element
 
    `filter` returns a view of the input range with elements that satisfies the predicate *f* i.e.  :math:`\{v \in
-   \mathcal{R} \mid f(v)\}` This view preserves the following properties:
+   \mathcal{R} \mid f(v)\}`. This view preserves the following properties:
 
 
    =============  ===  ================

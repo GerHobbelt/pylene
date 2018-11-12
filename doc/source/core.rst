@@ -38,6 +38,8 @@ Core Module
    * :doc:`core/ranges/reverse`
    * :doc:`core/ranges/transform`
    * :doc:`core/ranges/filter`
+   * :doc:`core/ranges/zip`
+   * :doc:`core/ranges/zip_with`
 
 
 

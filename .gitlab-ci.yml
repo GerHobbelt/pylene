@@ -82,6 +82,10 @@ distcheck-linux-clang-debug:
                 --config $PYLENE_CONFIGURATION
                 --target benchmarks-run
                 -- -j1  # Force serial execution
+    artifacts:
+         name: "benchmark-results"
+         paths:
+             - build/bench/*.json
 
 distbench-linux-gcc-release:
     <<: *distbench-linux-base

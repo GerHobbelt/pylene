@@ -58,5 +58,5 @@ add_benchmark(Neighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp
 add_benchmark(Rotation                BMRotation.cpp)
 add_benchmark(Dilation                BMDilation.cpp)
 add_benchmark(Morphers                BMMorphers.cpp BMMorphers_main.cpp)
-add_benchmark(Reference_Linear        BMReference_Linear.cpp BMReference_Linear_main.cpp)
+add_benchmark(Reference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)
 add_benchmark(Reference_Neighborhood  BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp)

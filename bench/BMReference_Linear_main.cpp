@@ -40,7 +40,43 @@ void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
 
-// TODO : (another PR) reversed bench (with mult, mult_c, new values, new pixels)
+
+void Mult_Inplace_Reversed(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_Reversed(mln::image2d<mln::uint8>& img);
+void LUT_Inplace_Reversed(const mln::uint8* LUT, mln::image2d<mln::uint8>& img);
+
+void Mult_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
+void Threshold_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
+void LUT_Inplace_C_Reversed(const mln::uint8* LUT, mln::uint8* buffer, int width, int height, std::ptrdiff_t stride);
+
+void Mult_Reversed(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Threshold_Reversed(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void LUT_Reversed(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
+void Mult_C_Reversed(const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
+void Threshold_C_Reversed(const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height, std::ptrdiff_t stride);
+void LUT_C_Reversed(const mln::uint8* LUT, const mln::uint8* ibuffer, mln::uint8* obuffer, int width, int height,
+                    std::ptrdiff_t stride);
+
+void Mult_New_Values_Reversed(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Mult_New_Pixels_Reversed(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
+void Threshold_New_Values_Reversed(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+void Threshold_New_Pixels_Reversed(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
+
+void LUT_New_Values_Reversed(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input,
+                             mln::image2d<mln::uint8>& output);
+void LUT_New_Pixels_Reversed(const mln::uint8* LUT, const mln::image2d<mln::uint8>& input,
+                             mln::image2d<mln::uint8>& output);
+
+void Mult_Inplace_New_Values_Reversed(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_New_Values_Reversed(mln::image2d<mln::uint8>& img);
+void LUT_Inplace_New_Values_Reversed(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
+
+void Mult_Inplace_New_Pixels_Reversed(mln::image2d<mln::uint8>& img);
+void Threshold_Inplace_New_Pixels_Reversed(mln::image2d<mln::uint8>& img);
+void LUT_Inplace_New_Pixels_Reversed(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
+
 
 class Bench_Ref_Linear : public benchmark::Fixture
 {
@@ -96,6 +132,7 @@ protected:
   mln::image2d<mln::uint8> m_output;
   std::vector<mln::uint8>  m_lut;
 };
+
 
 BENCHMARK_F(Bench_Ref_Linear, Mult_C)(benchmark::State& st)
 {
@@ -216,5 +253,130 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels(m_lut.data(), args...); }));
 }
+
+
+// Reversed
+
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_C_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_C_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_New_Values_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_New_Values_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_New_Pixels_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_New_Pixels_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_Inplace_C_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_Inplace_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Values_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_Inplace_New_Values_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Pixels_Reversed)(benchmark::State& st)
+{
+  runit(st, Mult_Inplace_New_Pixels_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_C_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_C_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Values_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_New_Values_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Pixels_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_New_Pixels_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_Inplace_C_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_Inplace_C_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Values_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_Inplace_New_Values_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Pixels_Reversed)(benchmark::State& st)
+{
+  runit(st, Threshold_Inplace_New_Pixels_Reversed);
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_C_Reversed)(benchmark::State& st)
+{
+  runit(st, fun4_t([&](auto&&... args) { LUT_C_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Reversed)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_New_Values_Reversed)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_New_Values_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_New_Pixels_Reversed)(benchmark::State& st)
+{
+  runit(st, fun2_t([&](auto&&... args) { LUT_New_Pixels_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C_Reversed)(benchmark::State& st)
+{
+  runit(st, fun3_t([&](auto&&... args) { LUT_Inplace_C_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_Reversed)(benchmark::State& st)
+{
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Values_Reversed)(benchmark::State& st)
+{
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Values_Reversed(m_lut.data(), args...); }));
+}
+
+BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels_Reversed)(benchmark::State& st)
+{
+  runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels_Reversed(m_lut.data(), args...); }));
+}
+
 
 BENCHMARK_MAIN();

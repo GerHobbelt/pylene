@@ -47,4 +47,4 @@ AllowShortLoopsOnASingleLine: false
 MaxEmptyLinesToKeep: 2
 
 # For loop
-ForEachMacros: ['mln_forall', 'mln_foreach', 'mln_foreach_new']
+ForEachMacros: ['mln_forall', 'mln_foreach', 'mln_foreach_new', 'mln_reverse_foreach']

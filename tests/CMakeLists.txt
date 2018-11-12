@@ -9,11 +9,11 @@ if (WIN32)
   get_filename_component(FREEIMAGE_LIB_PATH ${FreeImage_LIBRARIES} PATH)
   add_custom_target(check
     COMMAND ${CMAKE_COMMAND} -E copy "${FREEIMAGE_LIB_PATH}/${FREEIMAGE_LIB_BASE_NAME}.dll" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>"
-    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>
+    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --schedule-random --output-on-failure
     )
 else(WIN32)
   add_custom_target(check
-    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>
+    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --schedule-random --output-on-failure
     )
 endif(WIN32)
 
@@ -29,7 +29,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 macro(add_core_test Executable)
   set(Sources ${ARGN})
   add_executable(${Executable} ${Sources})
-  add_test(NAME ${Executable} COMMAND ${Executable} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+  add_test(NAME ${Executable} COMMAND ${Executable} --gtest_output=xml:${Executable}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
   target_link_libraries(${Executable} PRIVATE Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
   add_dependencies(check ${Executable})
 endmacro(add_core_test)

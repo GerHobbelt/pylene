@@ -4,6 +4,7 @@
 /doc/html
 /doc/doxyxml
 /doc/source/images/*.png
+/test_package/build
 .vscode
 .vs
 .idea

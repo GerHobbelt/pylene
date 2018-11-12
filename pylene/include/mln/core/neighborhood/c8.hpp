@@ -2,8 +2,9 @@
 
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/point.hpp>
-#include <range/v3/span.hpp>
+
 #include <array>
+#include <range/v3/span.hpp>
 
 namespace mln
 {
@@ -13,9 +14,10 @@ namespace mln
     using point_t = point<std::ptrdiff_t, 2>;
 
   public:
-    using category        = constant_neighborhood_tag;
-    using is_incremental  = std::false_type;
-    using is_decomposable = std::false_type;
+    using category     = constant_neighborhood_tag;
+    using incremental  = std::false_type;
+    using decomposable = std::false_type;
+    using separable    = std::false_type;
 
     static constexpr ::ranges::span<const point_t, 8> offsets() { return {m_offsets.data(), 8}; }
     static constexpr ::ranges::span<const point_t, 4> before_offsets() { return {m_offsets.data(), 4}; }
@@ -29,6 +31,5 @@ namespace mln
       }};
   };
 
-
   static constexpr inline c8_new_t c8_new = {};
-}
+} // namespace mln

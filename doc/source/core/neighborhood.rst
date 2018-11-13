@@ -8,7 +8,7 @@ Neighborhood, Sliding Windows and Structuring Elements
 Overview
 ********
 
-Neighborhoods, Structuring Elements (SE), Windows are objects that
+*Neighborhoods*, *Structuring Elements* (SE), *Windows* are objects that
 enable to iterate locally on the pixels of an image around a given
 anchor. There are all the same concept but differ in semantics:
 
@@ -90,23 +90,23 @@ Structuring Element
   .. rubric:: Valid Expressions
     :class: concept-expr
 
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
-  |    Expression     | Return type |                                                         Semantics                                                          |
-  +===================+=============+============================================================================================================================+
-  | ``se(p)``         | *undefined* | Return a :cpp:concept:`Forward Range` of points centered in                                                                |
-  |                   |             | the point `p`.                                                                                                             |
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se(px)``        | *undefined* | Return a :cpp:concept:`Forward Range` of pixels centered in                                                                |
-  |                   |             | the pixel `px`.                                                                                                            |
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.before(p)``  | *undefined* | Return a :cpp:concept:`Forward Range` of points before `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q < p \}`)                      |
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.before(px)`` | *undefined* | Return a :cpp:concept:`Forward Range` of points before `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() < px.point() \}`) |
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.after(p)``   | *undefined* | Return a :cpp:concept:`Forward Range` of points after `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q > p \}`)                       |
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.after(px)``  | *undefined* | Return a :cpp:concept:`Forward Range` of points after `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() > px.point() \}`)  |
-  +-------------------+-------------+----------------------------------------------------------------------------------------------------------------------------+
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
+  |    Expression     |  Return type   |                                                         Semantics                                                          |
+  +===================+================+============================================================================================================================+
+  | ``se(p)``         | *impl-defined* | Return a :cpp:concept:`Forward Range` of points centered in                                                                |
+  |                   |                | the point `p`.                                                                                                             |
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
+  | ``se(px)``        | *impl-defined* | Return a :cpp:concept:`Forward Range` of pixels centered in                                                                |
+  |                   |                | the pixel `px`.                                                                                                            |
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
+  | ``se.before(p)``  | *impl-defined* | Return a :cpp:concept:`Forward Range` of points before `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q < p \}`)                      |
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
+  | ``se.before(px)`` | *impl-defined* | Return a :cpp:concept:`Forward Range` of points before `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() < px.point() \}`) |
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
+  | ``se.after(p)``   | *impl-defined* | Return a :cpp:concept:`Forward Range` of points after `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q > p \}`)                       |
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
+  | ``se.after(px)``  | *impl-defined* | Return a :cpp:concept:`Forward Range` of points after `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() > px.point() \}`)  |
+  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
 
 
 
@@ -148,7 +148,7 @@ Structuring Element Properties
 
     Return *true* if the *se* is decomposable, *false* otherwise. 
 
-  .. cpp:function:: undefined decompose() const 
+  .. cpp:function:: impl_defined decompose() const 
 
     Return a list of simpler SE. If ``decompose()`` is called while ``is_decomposable()`` returns *false*, a runtime exception is raised.
 
@@ -169,7 +169,7 @@ Structuring Element Properties
 
     Return *true* if the *se* is separable, *false* otherwise. 
 
-  .. cpp:function:: undefined separate() const
+  .. cpp:function:: impl_defined separate() const
 
     Return a list of simpler SE. If ``separate()`` is called while ``is_seperable()`` returns *false*, a runtime exception is raised.
 
@@ -223,8 +223,8 @@ Predefined Neighborhoods
   .. toctree::
     :maxdepth: 1
 
-    4-connected (2D) <neighborhood/c4>
-    8-connected (2D) <neighborhood/c8>
+    neighborhood/c4
+    neighborhood/c8
 
 
 Predefined Structuring Elements

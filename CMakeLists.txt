@@ -92,8 +92,6 @@ add_subdirectory(tests EXCLUDE_FROM_ALL)
 if (PYLENE_BUILD_BENCHMARKS)
   add_subdirectory(bench EXCLUDE_FROM_ALL)
 endif()
-
-add_subdirectory(bench EXCLUDE_FROM_ALL)
 add_subdirectory(apps EXCLUDE_FROM_ALL)
 add_subdirectory(cli EXCLUDE_FROM_ALL)
 

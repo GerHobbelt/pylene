@@ -16,6 +16,10 @@ add_core_test(${test_prefix}range_filter        range/filter.cpp)
 add_core_test(${test_prefix}range_reverse       range/reverse.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
+# test Views
+add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
+
+
 # test Images
 add_core_test(${test_prefix}image2d             image/image2d.cpp)
 add_core_test(${test_prefix}image2d_iterators   image/image2d_iterators.cpp)

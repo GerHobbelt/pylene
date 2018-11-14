@@ -22,10 +22,17 @@
 
 namespace mln
 {
-  struct image_dynamic_tag
+  template <class I>
+  using pixel_t = std::conditional_t<std::is_const_v<I>, typename I::new_const_pixel_type, typename I::new_pixel_type>;
+
+
+  template <class I, class V>
+  using ch_value_t = typename I::template ch_value_type<V>;
+
+  struct [[deprecated]] image_dynamic_tag
   {
   };
-  struct image_static_tag
+  struct [[deprecated]] image_static_tag
   {
   };
 
@@ -34,7 +41,7 @@ namespace mln
   struct Image;
 
   template <typename I>
-  struct image_traits : image_traits<typename std::decay<I>::type>
+  struct image_traits  : image_traits<typename std::decay<I>::type>
   {
   };
 
@@ -214,7 +221,7 @@ namespace mln
   };
 
 #define MLN_GENERATE_META_IMAGE_OPERATORS(meta_op, op)                                                                 \
-  struct meta_op                                                                                                       \
+  struct meta_op                                                                                         \
   {                                                                                                                    \
     template <typename Image>                                                                                          \
     struct apply                                                                                                       \

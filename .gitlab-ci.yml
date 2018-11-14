@@ -10,7 +10,7 @@ image: carlinet/buildimage
     stage: test
     script:
         - mkdir build && cd build
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_BUILD_BENCHMARKS=OFF
         - cmake --build . --target check
 
 
@@ -46,7 +46,7 @@ build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
-        - cmake .. -DCMAKE_BUILD_TYPE=Release
+        - cmake .. -DCMAKE_BUILD_TYPE=Release -DPYLENE_BUILD_BENCHMARKS=OFF
         - cmake --build . --target build-images
     artifacts:
         paths:

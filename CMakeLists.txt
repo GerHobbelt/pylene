@@ -11,6 +11,7 @@ find_package(Qt4)
 
 # CONFIGURATION OPTIONS
 set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
+option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 
 # Proper project creation
 set(MLN_INCLUDE_DIR "${PROJECT_SOURCE_DIR}")
@@ -88,6 +89,10 @@ add_definitions(-D BOOST_PP_VARIADICS=1)
 # Subdirectories
 add_subdirectory(doc EXCLUDE_FROM_ALL)
 add_subdirectory(tests EXCLUDE_FROM_ALL)
+if (PYLENE_BUILD_BENCHMARKS)
+  add_subdirectory(bench EXCLUDE_FROM_ALL)
+endif()
+
 add_subdirectory(bench EXCLUDE_FROM_ALL)
 add_subdirectory(apps EXCLUDE_FROM_ALL)
 add_subdirectory(cli EXCLUDE_FROM_ALL)

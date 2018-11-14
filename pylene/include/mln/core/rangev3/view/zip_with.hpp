@@ -19,7 +19,6 @@
 
 namespace mln::ranges
 {
-
   template <typename Fun, typename... Rngs>
   struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>,
                          std::conditional_t<std::conjunction_v<is_multidimensional_range<Rngs>...>,

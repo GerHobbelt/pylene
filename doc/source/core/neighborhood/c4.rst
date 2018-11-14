@@ -1,0 +1,32 @@
+4-Connection (2D)
+#################
+
+4-connected neighborhood over a 2D grid.
+
+
+.. figure:: /figures/core/c4.svg
+    :alt: 4-connected
+    :align: center
+    
+    Center and its 4-connected points
+
+
+.. rubric:: Properties
+
+
++---------------+----------+
+|   Property    |          |
++===============+==========+
+| Category      | *static* |
++---------------+----------+
+| Incremental   |          |
++---------------+----------+
+| Decomposabale |          |
++---------------+----------+
+| Separable     |          |
++---------------+----------+
+
+
+.. topic:: See also
+
+    * :doc:`c8`

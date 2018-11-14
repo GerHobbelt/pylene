@@ -1,6 +1,12 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/neighb2d.hpp>
+#include <mln/core/neighborhood/c8.hpp>
+#include <mln/core/neighborhood/c4.hpp>
+
+#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/rangev3/foreach.hpp>
+
 #include <cmath>
 
 void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
@@ -17,6 +23,20 @@ void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output
     pxOut->val() = tmp;
   }
 }
+
+void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      int tmp = 0;
+      for (auto nx : mln::c8_new(pxIn))
+        tmp += nx.val();
+      pxOut.val() = tmp;
+    }
+}
+
 
 
 void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
@@ -36,14 +56,34 @@ void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer,
     for (int j = 0; j < width; ++j)
     {
       int tmp = 0;
-      for (int k = 0; k < 8; ++k)
-        tmp += nbhs[k][j];
+      tmp += nbhs[0][j];
+      tmp += nbhs[1][j];
+      tmp += nbhs[2][j];
+      tmp += nbhs[3][j];
+      tmp += nbhs[4][j];
+      tmp += nbhs[5][j];
+      tmp += nbhs[6][j];
+      tmp += nbhs[7][j];
       obuffer[j] = tmp;
     }
     ibuffer += stride;
     obuffer += stride;
   }
 }
+
+void Average_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      int tmp = 0;
+      for (auto nx : mln::c8_new(pxIn))
+        tmp += nx.val();
+      pxOut.val() = tmp / 8;
+    }
+}
+
 
 void Average(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
 {
@@ -78,8 +118,14 @@ void Average_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuf
     for (int j = 0; j < width; j++)
     {
       int tmp = 0;
-      for (int k = 0; k < 8; k++)
-        tmp += ibuffer[j + offset[k]];
+      tmp += ibuffer[j + offset[0]];
+      tmp += ibuffer[j + offset[1]];
+      tmp += ibuffer[j + offset[2]];
+      tmp += ibuffer[j + offset[3]];
+      tmp += ibuffer[j + offset[4]];
+      tmp += ibuffer[j + offset[5]];
+      tmp += ibuffer[j + offset[6]];
+      tmp += ibuffer[j + offset[7]];
       obuffer[j] = tmp / 8;
     }
     ibuffer += stride;
@@ -105,6 +151,20 @@ void Erosion(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
   }
 }
 
+void Erosion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      mln::uint8 mini = pxIn.val();
+      for (auto nx : mln::c8_new(pxIn))
+        if (nx.val() < mini)
+          mini = nx.val();
+      pxOut.val() = mini;
+    }
+}
+
 void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
 {
   for (int i = 0; i < height; i++)
@@ -121,9 +181,16 @@ void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuf
     for (int j = 0; j < width; j++)
     {
       mln::uint8 mini = ibuffer[j];
-      for (int k = 0; k < 8; k++)
-        if (nbhs[k][j] < mini)
-          mini = nbhs[k][j]; // std::min prevent gcc vectorization
+
+      if (nbhs[0][j] < mini) mini = nbhs[0][j]; // std::min prevent gcc vectorization
+      if (nbhs[1][j] < mini) mini = nbhs[1][j]; // std::min prevent gcc vectorization
+      if (nbhs[2][j] < mini) mini = nbhs[2][j]; // std::min prevent gcc vectorization
+      if (nbhs[3][j] < mini) mini = nbhs[3][j]; // std::min prevent gcc vectorization
+      if (nbhs[4][j] < mini) mini = nbhs[4][j]; // std::min prevent gcc vectorization
+      if (nbhs[5][j] < mini) mini = nbhs[5][j]; // std::min prevent gcc vectorization
+      if (nbhs[6][j] < mini) mini = nbhs[6][j]; // std::min prevent gcc vectorization
+      if (nbhs[7][j] < mini) mini = nbhs[7][j]; // std::min prevent gcc vectorization
+
       obuffer[j] = mini;
     }
     ibuffer += stride;
@@ -146,6 +213,19 @@ void Isotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<mln
   }
 }
 
+void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      int tmp = 0;
+      for (auto nx : mln::c4_new(pxIn))
+        tmp += nx.val();
+      pxOut.val() = pxIn.val() + (tmp - 4 * pxIn.val()) / 8;
+    }
+}
+
 void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
 {
   std::array<std::ptrdiff_t, 4> offset;
@@ -159,6 +239,7 @@ void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __r
     for (int j = 0; j < width; j++)
     {
       int tmp = 0;
+//#pragma clang loop unroll(full)
       for (int k = 0; k <= 3; k++)
         tmp += ibuffer[j + offset[k]];
       obuffer[j] = ibuffer[j] + (tmp - 4 * ibuffer[j]) / 8;
@@ -196,6 +277,23 @@ void Anisotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<m
   }
 }
 
+void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+{
+  auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  for(auto rows : pixels.rows())
+    for (auto&& [pxIn, pxOut] : rows)
+    {
+      float tmp = 0;
+      mln::uint8 vin = pxIn.val();
+      for (auto nx : mln::c4_new(pxIn))
+      {
+        float gradient = nx.val() - vin;
+        tmp += gradient * Flux_Function(gradient);
+      }
+      pxOut.val() = vin + 0.125f * tmp;
+    }
+}
+
 void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride)
 {
   std::array<std::ptrdiff_t, 4> offset;
@@ -204,15 +302,18 @@ void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* _
   offset[2] = 1;
   offset[3] = 1 * stride;
 
+//#pragma clang loop vectorize(disable)
   for (int i = 0; i < height; i++)
   {
+//#pragma clang loop vectorize(enable)
     for (int j = 0; j < width; j++)
     {
       float tmp = 0;
-      mln::uint8 cached_val = ibuffer[j];
-      for (int k = 0; k <= 3; k++)
+      auto ptr = ibuffer + j;
+      mln::uint8 cached_val = ptr[0];
+      for (auto off : offset)
       {
-        float gradient = ibuffer[j + offset[k]] - cached_val;
+        float gradient = ptr[off] - cached_val;
         tmp += gradient * Flux_Function(gradient);
       }
       obuffer[j] = cached_val + 0.125f * tmp;

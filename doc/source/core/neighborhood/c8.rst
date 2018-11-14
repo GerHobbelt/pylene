@@ -1,0 +1,32 @@
+8-Connection (2D)
+#################
+
+8-connected neighborhood over a 2D grid.
+
+
+.. figure:: /figures/core/c8.svg
+    :alt: 8-connected
+    :align: center
+
+    Center and its 8-connected points
+
+
+.. rubric:: Properties
+
+
++---------------+----------+
+|   Property    |          |
++===============+==========+
+| Category      | *static* |
++---------------+----------+
+| Incremental   |          |
++---------------+----------+
+| Decomposabale |          |
++---------------+----------+
+| Separable     |          |
++---------------+----------+
+
+
+.. topic:: See also
+
+    * :doc:`c4`

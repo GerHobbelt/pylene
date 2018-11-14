@@ -28,6 +28,8 @@ add_core_test(${test_prefix}image_ops           image/image_ops.cpp)
 add_core_test(${test_prefix}image_routines      image/image_routines.cpp)
 
 # test Neighborhood
+add_core_test(${test_prefix}c4               neighborhood/c4.cpp)
+add_core_test(${test_prefix}c8               neighborhood/c8.cpp)
 add_core_test(${test_prefix}sliding_pixter   neighborhood/sliding_pixter.cpp)
 add_core_test(${test_prefix}sliding_wpiter   neighborhood/sliding_wpiter.cpp)
 add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)

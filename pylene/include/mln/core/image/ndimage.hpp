@@ -143,10 +143,12 @@ namespace mln
     typedef point<short, dim> point_type;
 
     /// \copydoc image::pixel_type
-    typedef ndimage_pixel<T, dim, E> pixel_type;
+    [[deprecated]] typedef ndimage_pixel<T, dim, E> pixel_type;
+    using new_pixel_type = details::ndpixel<T, dim>;
 
     /// \copydoc image::const_pixel_type
-    typedef ndimage_pixel<const T, dim, const E> const_pixel_type;
+    [[deprecated]] typedef ndimage_pixel<const T, dim, const E> const_pixel_type;
+    using new_const_pixel_type = details::ndpixel<const T, dim>;
 
     /// \copydoc image::value_type
     typedef T value_type;
@@ -246,22 +248,28 @@ namespace mln
     /// \{
 
     /// \copydoc image::pixel_at(const point_type&) const
-    pixel_type pixel_at(const point_type& p);
+    [[deprecated]] pixel_type pixel_at(const point_type& p);
+    new_pixel_type new_pixel_at(const point_type& p);
 
     /// \copydoc image::pixel_at(const point_type&) const
-    const_pixel_type pixel_at(const point_type& p) const;
+    [[deprecated]] const_pixel_type pixel_at(const point_type& p) const;
+    new_const_pixel_type new_pixel_at(const point_type& p) const;
 
     /// \copydoc image::pixel_at_index(size_type) const
-    pixel_type pixel_at_index(size_type i);
+    [[deprecated]] pixel_type pixel_at_index(size_type i);
+    //new_pixel_type new_pixel_at_index(size_type i);
 
     /// \copydoc image::pixel_at_index(size_type) const
-    const_pixel_type pixel_at_index(size_type i) const;
+    [[deprecated]] const_pixel_type pixel_at_index(size_type i) const;
+    //new_const_pixel_type new_pixel_at_index(size_type i) const;
 
     /// \copydoc image::pixel(const point_type&) const
-    pixel_type pixel(const point_type& p);
+    [[deprecated]] pixel_type pixel(const point_type& p);
+    //new_pixel_type new_pixel(const point_type& p);
 
     /// \copydoc image::pixel(const point_type&) const
-    const_pixel_type pixel(const point_type& p) const;
+    [[deprecated]] const_pixel_type pixel(const point_type& p) const;
+    //new_const_pixel_type new_pixel(const point_type& p) const;
 
     /// \}
 
@@ -726,6 +734,38 @@ namespace mln
     pix.m_ptr   = m_ptr_origin;
     pix.m_point = p;
     pix.m_index = this->index_of_point(p);
+    return pix;
+  }
+
+  template <typename T, unsigned dim, typename E>
+  details::ndpixel<const T, dim> ndimage_base<T, dim, E>::new_pixel_at(const point_type& p) const
+  {
+    T* ptr = this->__at(mln::literal::zero);
+
+    details::ndpixel<const T, dim> pix;
+    pix.m_info.stride = m_index_strides;
+    pix.m_info.from = m_domain.pmin;
+    pix.m_info.to = m_domain.pmax;
+    pix.m_info.buffer = ptr;
+    pix.m_lineptr = ptr;
+    pix.m_point = mln::literal::zero;
+    pix.advance(p);
+    return pix;
+  }
+
+  template <typename T, unsigned dim, typename E>
+  details::ndpixel<T, dim> ndimage_base<T, dim, E>::new_pixel_at(const point_type& p)
+  {
+    T* ptr = this->__at(mln::literal::zero);
+
+    details::ndpixel<T, dim> pix;
+    pix.m_info.stride = m_index_strides;
+    pix.m_info.from = m_domain.pmin;
+    pix.m_info.to = m_domain.pmax;
+    pix.m_info.buffer = ptr;
+    pix.m_lineptr = ptr;
+    pix.m_point = mln::literal::zero;
+    pix.advance(p);
     return pix;
   }
 

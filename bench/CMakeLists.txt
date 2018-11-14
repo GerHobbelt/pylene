@@ -1,4 +1,5 @@
 find_package(benchmark REQUIRED)
+find_package(GTest REQUIRED)
 
 add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 # Download file dependency
@@ -60,3 +61,6 @@ add_benchmark(Dilation                BMDilation.cpp)
 add_benchmark(Morphers                BMMorphers.cpp BMMorphers_main.cpp)
 add_benchmark(Reference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)
 add_benchmark(Reference_Neighborhood  BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp)
+
+add_executable(UTReference_Neighborhood BMReference_Neighborhood.cpp BMReference_Neighborhood_test.cpp)
+target_link_libraries(UTReference_Neighborhood Pylene::Pylene GTest::Main GTest::GTest ${FreeImage_LIBRARIES})

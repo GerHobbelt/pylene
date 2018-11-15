@@ -59,3 +59,8 @@ add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 # test SE
 add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
+
+# test Concepts
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
+  add_core_test(${test_prefix}concept            concept/stl.cpp)
+endif()

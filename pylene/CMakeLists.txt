@@ -44,6 +44,11 @@ target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 # Compiler configurations
 target_compile_features(Pylene INTERFACE cxx_std_17)
 
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
+  target_compile_options(Pylene INTERFACE -fconcepts)
+endif()
+
+
 
 # IDE configuration
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

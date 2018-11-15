@@ -71,6 +71,14 @@ namespace mln::details
   {
     using typename ndpix_base<T, N>::point_type;
 
+    ndpixel() = default;
+
+    ndpixel(const ndpix<T, N>& other)
+      : ndpix_base<T, N> {other}
+      , m_info{*(other.m_info)}
+    {
+    }
+
     void advance(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)

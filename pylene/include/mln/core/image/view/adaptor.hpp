@@ -8,12 +8,12 @@ namespace mln
 
   // Identity pixel adaptor
   template <class Pixel>
-  class pixel_adaptor
+  struct pixel_adaptor
   {
-    using point_type = typename Pixel::point_type;
-    using site_type  = point_type;
-    using value_type = typename Pixel::value_type;
-    using reference  = typename Pixel::reference;
+    using point_type               = typename Pixel::point_type;
+    using site_type [[deprecated]] = point_type;
+    using value_type               = typename Pixel::value_type;
+    using reference                = typename Pixel::reference;
 
     decltype(auto) val() const { return m_pix.val(); }
     auto           point() const { return m_pix.point(); }
@@ -24,6 +24,10 @@ namespace mln
       : m_pix{std::move(px)}
     {
     }
+
+  protected:
+    Pixel&       base() { return m_pix; }
+    const Pixel& base() const { return m_pix; }
 
   private:
     Pixel m_pix;
@@ -55,7 +59,6 @@ namespace mln
     /// Type definitions
     /// \{
     using reference                      = typename I::reference;
-    using const_reference [[deprecated]] = typename I::const_reference;
     using value_type                     = typename I::value_type;
     using point_type                     = typename I::point_type;
     using domain_type                    = typename I::domain_type;
@@ -78,12 +81,6 @@ namespace mln
       using pixel_adaptor<typename I::new_pixel_type>::pixel_adaptor;
     };
 
-    struct new_const_pixel_type : pixel_adaptor<typename I::new_const_pixel_type>
-    {
-      using pixel_adaptor<typename I::new_const_pixel_type>::pixel_adaptor;
-    };
-
-
 
     image_adaptor() = default;
     image_adaptor(I ima)
@@ -92,19 +89,11 @@ namespace mln
     }
 
     auto domain() const { return m_ima.domain(); }
-    auto new_values() const { return m_ima.new_values(); }
     auto new_values() { return m_ima.new_values(); }
-    auto new_pixels() const { return m_ima.new_pixels(); }
     auto new_pixels() { return m_ima.new_pixels(); }
 
     template <typename dummy = reference>
     std::enable_if_t<accessible::value, dummy> operator()(point_type p)
-    {
-      return m_ima(p);
-    }
-
-    template <typename dummy = const_reference>
-    std::enable_if_t<accessible::value, dummy> operator()(point_type p) const
     {
       return m_ima(p);
     }
@@ -115,32 +104,14 @@ namespace mln
       return m_ima.at(p);
     }
 
-    template <typename dummy = const_reference>
-    std::enable_if_t<accessible::value, dummy> at(point_type p) const
-    {
-      return m_ima.at(p);
-    }
-
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel(point_type p)
     {
       return m_ima.new_pixel(p);
     }
 
-    template <typename dummy = new_const_pixel_type>
-    std::enable_if_t<accessible::value, dummy> new_pixel(point_type p) const
-    {
-      return m_ima.new_pixel(p);
-    }
-
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel_at(point_type p)
-    {
-      return m_ima.new_pixel_at(p);
-    }
-
-    template <typename dummy = new_const_pixel_type>
-    std::enable_if_t<accessible::value, dummy> new_pixel_at(point_type p) const
     {
       return m_ima.new_pixel_at(p);
     }
@@ -154,13 +125,7 @@ namespace mln
     }
 
     template <typename dummy = I>
-    std::enable_if_t<indexable::value, const_reference> operator[](typename dummy::size_type i) const
-    {
-      return m_ima[i];
-    }
-
-    template <typename dummy = I>
-    std::enable_if_t<indexable::value, typename dummy::size_type> index_of_point(point_type p)
+    std::enable_if_t<indexable::value, typename dummy::size_type> index_of_point(point_type p) const
     {
       return m_ima.index_of_point(p);
     }

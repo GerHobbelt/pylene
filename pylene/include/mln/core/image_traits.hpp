@@ -23,7 +23,7 @@
 namespace mln
 {
   template <class I>
-  using pixel_t = std::conditional_t<std::is_const_v<I>, typename I::new_const_pixel_type, typename I::new_pixel_type>;
+  using pixel_t = typename I::new_pixel_type;
 
 
   template <class I, class V>

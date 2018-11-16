@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 
-namespace concepts = mln::concepts::stl::core;
+namespace concepts = mln::core::concepts::stl;
 
 struct same_test
 {
@@ -53,3 +53,5 @@ TEST(Core, Concept_Stl_CommonReference)
   static_assert(!concepts::CommonReference<A, B>);
   static_assert(concepts::CommonReference<B, C>);
 }
+
+// TODO : moar tests

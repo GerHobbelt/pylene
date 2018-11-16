@@ -1,6 +1,6 @@
 #pragma once
 
-#include <range/v3/utility/common_type.hpp>
+#include <range/v3/all.hpp>
 
 #include <functional>
 #include <iterator>
@@ -8,34 +8,64 @@
 #include <utility>
 
 
-namespace mln::concepts::stl::core
+namespace mln::core::concepts::stl
 {
-  using ::ranges::common_reference;
-  using ::ranges::common_reference_t;
 
 
   // Same
   namespace detail
   {
 
-    // clang-format off
+    using ::ranges::begin;
+    using ::ranges::common_reference_t;
+    using ::ranges::difference_type_t;
+    using ::ranges::disable_sized_range;
+    using ::ranges::disable_sized_sentinel;
+    using ::ranges::end;
+    using ::ranges::equal_to;
+    using ::ranges::ident;
+    using ::ranges::iter_common_reference_t;
+    using ::ranges::iter_swap;
+    using ::ranges::iterator_category_t;
+    using ::ranges::iterator_t;
+    using ::ranges::less;
+    using ::ranges::projected;
+    using ::ranges::reference_t;
+    using ::ranges::rvalue_reference_t;
+    using ::ranges::sentinel_t;
+    using ::ranges::size;
+    using ::ranges::value_type_t;
+    using ::ranges::detail::view_predicate_;
 
-    template <typename T, typename U>
-    concept bool SameHelper = std::is_same_v<T, U>;
+    template <typename R>
+    inline constexpr auto disable_sized_range_v = disable_sized_range<R>::value;
 
-    // clang-format on
+    template <typename S, typename I>
+    inline constexpr auto disable_sized_sentinel_v = disable_sized_sentinel<S, I>::value;
+
+    template <typename T>
+    inline constexpr auto view_predicate_v_ = view_predicate_<T>::value;
+
+    template <typename T>
+    struct remove_cvref
+    {
+      using type = std::remove_cv_t<std::remove_reference_t<T>>;
+    };
+    template <typename T>
+    using remove_cvref_t = typename remove_cvref<T>::type;
+
 
   } // namespace detail
+
 
   inline namespace core_language
   {
 
     // clang-format off
 
+    // Same
     template <typename T, typename U>
-    concept bool Same =
-      detail::SameHelper<T, U> &&
-      detail::SameHelper<U, T>;
+    concept bool Same = std::is_same_v<T, U>;
 
 
     // DerivedFrom
@@ -57,9 +87,9 @@ namespace mln::concepts::stl::core
     // CommonReference
     template <typename T, typename U>
     concept bool CommonReference =
-      Same<common_reference_t<T, U>, common_reference_t<U, T>> &&
-      ConvertibleTo<T, common_reference_t<T, U>> &&
-      ConvertibleTo<U, common_reference_t<T, U>>;
+      Same<detail::common_reference_t<T, U>, detail::common_reference_t<U, T>> &&
+      ConvertibleTo<T, detail::common_reference_t<T, U>> &&
+      ConvertibleTo<U, detail::common_reference_t<T, U>>;
 
 
     // Common
@@ -71,7 +101,7 @@ namespace mln::concepts::stl::core
       CommonReference<std::add_lvalue_reference_t<const T>, std::add_lvalue_reference_t<const U>> &&
       CommonReference<
         std::add_lvalue_reference_t<std::common_type_t<T, U>>,
-        common_reference_t<std::add_lvalue_reference_t<const T>, std::add_lvalue_reference_t<const U>>>;
+        detail::common_reference_t<std::add_lvalue_reference_t<const T>, std::add_lvalue_reference_t<const U>>>;
 
 
     // Integral
@@ -99,7 +129,7 @@ namespace mln::concepts::stl::core
       std::is_lvalue_reference_v<Lhs> &&
       CommonReference<const std::remove_reference_t<Lhs>&, const std::remove_reference_t<Rhs>&> &&
       requires(Lhs lhs, Rhs&& rhs) {
-        { lhs = std::forward<Rhs>(rhs) } -> Lhs;
+        { lhs = std::forward<Rhs>(rhs) } -> Same<Lhs>&&;
       };
 
 
@@ -184,24 +214,24 @@ namespace mln::concepts::stl::core
     // Boolean
     template <typename B>
     concept bool Boolean =
-      //object::Movable<common::remove_cvref_t<B>> &&
+      Movable<detail::remove_cvref_t<B>> &&
       ConvertibleTo<const std::remove_reference_t<B>&, bool> &&
       requires( const std::remove_reference_t<B>& b1,
                 const std::remove_reference_t<B>& b2,
                 const bool a) {
-        { !b1 }       ->  ConvertibleTo<bool>;
-        { b1 && a }   ->  Same<bool>;
-        { b1 || a }   ->  Same<bool>;
-        { b1 && b2 }  ->  Same<bool>;
-        { a && b2 }   ->  Same<bool>;
-        { b1 || b2 }  ->  Same<bool>;
-        { a || b2 }   ->  Same<bool>;
-        { b1 == b2 }  ->  ConvertibleTo<bool>;
-        { b1 == a }   ->  ConvertibleTo<bool>;
-        { a == b2 }   ->  ConvertibleTo<bool>;
-        { b1 != b2 }  ->  ConvertibleTo<bool>;
-        { b1 != a }   ->  ConvertibleTo<bool>;
-        { a != b2 }   ->  ConvertibleTo<bool>;
+        { !b1 }       ->  ConvertibleTo<bool>&&;
+        { b1 && a }   ->  Same<bool>&&;
+        { b1 || a }   ->  Same<bool>&&;
+        { b1 && b2 }  ->  Same<bool>&&;
+        { a && b2 }   ->  Same<bool>&&;
+        { b1 || b2 }  ->  Same<bool>&&;
+        { a || b2 }   ->  Same<bool>&&;
+        { b1 == b2 }  ->  ConvertibleTo<bool>&&;
+        { b1 == a }   ->  ConvertibleTo<bool>&&;
+        { a == b2 }   ->  ConvertibleTo<bool>&&;
+        { b1 != b2 }  ->  ConvertibleTo<bool>&&;
+        { b1 != a }   ->  ConvertibleTo<bool>&&;
+        { a != b2 }   ->  ConvertibleTo<bool>&&;
       };
 
 
@@ -210,10 +240,10 @@ namespace mln::concepts::stl::core
     concept bool __WeaklyEqualityComparableWith = // exposition only
       requires( const std::remove_reference_t<T>& t,
                 const std::remove_reference_t<U>& u) {
-        {t == u} -> Boolean;
-        {t != u} -> Boolean;
-        {u == t} -> Boolean;
-        {u != t} -> Boolean;
+        {t == u} -> Boolean&&;
+        {t != u} -> Boolean&&;
+        {u == t} -> Boolean&&;
+        {u != t} -> Boolean&&;
       };
 
 
@@ -231,7 +261,7 @@ namespace mln::concepts::stl::core
         const std::remove_reference_t<T>&,
         const std::remove_reference_t<U>&> &&
       EqualityComparable<
-        common_reference_t<
+        detail::common_reference_t<
           const std::remove_reference_t<T>&,
           const std::remove_reference_t<U>&>> &&
       __WeaklyEqualityComparableWith<T, U>;
@@ -243,10 +273,10 @@ namespace mln::concepts::stl::core
       EqualityComparable<T> &&
       requires( const std::remove_reference_t<T>& a,
                 const std::remove_reference_t<T>& b) {
-        { a < b }   -> Boolean;
-        { a > b }   -> Boolean;
-        { a <= b }  -> Boolean;
-        { a >= b }  -> Boolean;
+        { a < b }   -> Boolean&&;
+        { a > b }   -> Boolean&&;
+        { a <= b }  -> Boolean&&;
+        { a >= b }  -> Boolean&&;
       };
 
 
@@ -259,20 +289,20 @@ namespace mln::concepts::stl::core
         const std::remove_reference_t<T>&,
         const std::remove_reference_t<U>&> &&
       StrictTotallyOrdered<
-        common_reference_t<
+        detail::common_reference_t<
           const std::remove_reference_t<T>&,
           const std::remove_reference_t<U>&>> &&
       EqualityComparableWith<T, U> &&
       requires( const std::remove_reference_t<T>& t,
                 const std::remove_reference_t<U>& u) {
-        { t < u }   -> Boolean;
-        { t > u }   -> Boolean;
-        { t <= u }  -> Boolean;
-        { t >= u }  -> Boolean;
-        { u < t }   -> Boolean;
-        { u > t }   -> Boolean;
-        { u <= t }  -> Boolean;
-        { u >= t }  -> Boolean;
+        { t < u }   -> Boolean&&;
+        { t > u }   -> Boolean&&;
+        { t <= u }  -> Boolean&&;
+        { t >= u }  -> Boolean&&;
+        { u < t }   -> Boolean&&;
+        { u > t }   -> Boolean&&;
+        { u <= t }  -> Boolean&&;
+        { u >= t }  -> Boolean&&;
       };
 
     // clang-format on
@@ -358,10 +388,10 @@ namespace mln::concepts::stl::core
         const std::remove_reference_t<T>&,
         const std::remove_reference_t<U>&> &&
       Predicate<R,
-        common_reference_t<
+        detail::common_reference_t<
           const std::remove_reference_t<T>&,
           const std::remove_reference_t<U>&>,
-        common_reference_t<
+        detail::common_reference_t<
           const std::remove_reference_t<T>&,
           const std::remove_reference_t<U>&>> &&
       Predicate<R, T, U> &&
@@ -377,36 +407,55 @@ namespace mln::concepts::stl::core
   } // namespace callable
 
 
+  inline namespace random_number_generator
+  {
+
+    // clang-format off
+
+    template <typename G>
+    concept bool UniformRandomNumberGenerator =
+      Invocable<G&> &&
+      UnsignedIntegral<std::invoke_result_t<G&>> &&
+      requires {
+        { G::min() } -> Same<std::invoke_result_t<G&>>&&;
+        { G::max() } -> Same<std::invoke_result_t<G&>>&&;
+      };
+
+    // clang-format on
+
+  } // namespace random_number_generator
+
+
   inline namespace iterator
   {
 
     // clang-format off
 
-
     // Readable
     template <typename In>
     concept bool Readable =
       requires {
-        typename In::value_type;
-        typename In::reference;
-        typename In::rvalue_reference;
+        typename detail::value_type_t<In>;
+        typename detail::reference_t<In>;
+        typename detail::rvalue_reference_t<In>;
       } &&
-      CommonReference<typename In::reference&&, typename In::value_type&> &&
-      CommonReference<typename In::reference&&, typename In::rvalue_reference&&> &&
-      CommonReference<typename In::rvalue_reference&&, const typename In::value_type&>;
+      CommonReference<detail::reference_t<In>&&, detail::value_type_t<In>&> &&
+      CommonReference<detail::reference_t<In>&&, detail::rvalue_reference_t<In>&&> &&
+      CommonReference<detail::rvalue_reference_t<In>&&, const detail::value_type_t<In>&>;
 
 
     // Writable
     template <typename Out, typename T>
     concept bool Writable =
       requires {
-        typename Out::reference;
+        typename detail::reference_t<Out>;
       } &&
       requires(Out&& o, T&& t) {
         *o = std::forward<T>(t);
         *std::forward<Out>(o) = std::forward<T>(t);
-        const_cast<const typename Out::reference&&>(*o) = std::forward<T>(t);
-        const_cast<const typename Out::reference&&>(*std::forward<Out>(o)) = std::forward<T>(t);
+        const_cast<const detail::reference_t<Out>&&>(*o) = std::forward<T>(t);
+        const_cast<const detail::reference_t<Out>&&>(*std::forward<Out>(o)) = std::forward<T>(t);
+        /* none of the four expressions above are required to be equality-preserving */
       };
 
 
@@ -415,11 +464,11 @@ namespace mln::concepts::stl::core
     concept bool WeaklyIncrementable =
       Semiregular<I> &&
       requires {
-        typename I::difference_type;
+        typename detail::difference_type_t<I>;
       } &&
-      SignedIntegral<typename I::difference_type> &&
+      SignedIntegral<detail::difference_type_t<I>> &&
       requires(I i) {
-        { ++i } ->  Same<I&>;  /* not required to be equality preserving */
+        { ++i } ->  Same<I>&;  /* not required to be equality preserving */
         { i++ }                /* not required to be equality preserving */
       };
 
@@ -430,7 +479,7 @@ namespace mln::concepts::stl::core
       Regular<I> &&
       WeaklyIncrementable<I> &&
       requires(I i) {
-        { i++ } ->  Same<I&&>;
+        { i++ } ->  Same<I>&&;
       };
 
 
@@ -439,7 +488,7 @@ namespace mln::concepts::stl::core
     concept bool Iterator =
       WeaklyIncrementable<I> &&
       requires(I i) {
-        { *i }  ->  auto&&;
+        { *i }  ->  auto&&; // Requires: i is dereferenceable
       };
 
 
@@ -452,16 +501,13 @@ namespace mln::concepts::stl::core
 
 
     // SizedSentinel
-    template<typename S, typename I>
-    inline constexpr bool disable_sized_sentinel = false; /* can be specialized */
-
     template <typename S, typename I>
     concept bool SizedSentinel =
       Sentinel<S, I> &&
-      !disable_sized_sentinel<std::remove_cv_t<S>, std::remove_cv_t<I>> &&
+      !detail::disable_sized_sentinel_v<std::remove_cv_t<S>, std::remove_cv_t<I>> &&
       requires(const I& i, const S& s) {
-        { s - i } ->  Same<typename I::difference_type&&>;
-        { i - s } ->  Same<typename I::difference_type&&>;
+        { s - i } ->  Same<detail::difference_type_t<I>>&&;
+        { i - s } ->  Same<detail::difference_type_t<I>>&&;
       };
 
 
@@ -471,9 +517,9 @@ namespace mln::concepts::stl::core
       Iterator<I> &&
       Readable<I> &&
       requires {
-        typename I::iterator_category;
+        typename detail::iterator_category_t<I>;
       } &&
-      DerivedFrom<typename I::iterator_category, std::input_iterator_tag>;
+      DerivedFrom<detail::iterator_category_t<I>, std::input_iterator_tag>;
 
 
     // OutputIterator
@@ -490,7 +536,7 @@ namespace mln::concepts::stl::core
     template <typename I>
     concept bool ForwardIterator =
       InputIterator<I> &&
-      DerivedFrom<typename I::iterator_category, std::forward_iterator_tag> &&
+      DerivedFrom<detail::iterator_category_t<I>, std::forward_iterator_tag> &&
       Incrementable<I> &&
       Sentinel<I, I>;
 
@@ -499,10 +545,10 @@ namespace mln::concepts::stl::core
     template <typename I>
     concept bool BidirectionalIterator =
       ForwardIterator<I> &&
-      DerivedFrom<typename I::iterator_category, std::bidirectional_iterator_tag> &&
+      DerivedFrom<detail::iterator_category_t<I>, std::bidirectional_iterator_tag> &&
       requires(I i) {
-        { --i } ->  Same<I&>;
-        { i-- } ->  Same<I&&>;
+        { --i } ->  Same<I>&;
+        { i-- } ->  Same<I>&&;
       };
 
 
@@ -510,20 +556,257 @@ namespace mln::concepts::stl::core
     template <typename I>
     concept bool RandomAccessIterator =
       BidirectionalIterator<I> &&
-      DerivedFrom<typename I::iterator_category, std::random_access_iterator_tag> &&
+      DerivedFrom<detail::iterator_category_t<I>, std::random_access_iterator_tag> &&
       StrictTotallyOrdered<I> &&
       SizedSentinel<I, I> &&
-      requires(I i, const I j, const typename I::difference_type n) {
-        { i += n }  ->  Same<I&>;
-        { j + n }   ->  Same<I&&>;
-        { n + j }   ->  Same<I&&>;
-        { i -= n }  ->  Same<I&>;
-        { j - n }   ->  Same<I&&>;
-        { j[n] }    ->  Same<typename I::reference>;
+      requires(I i, const I j, const detail::difference_type_t<I> n) {
+        { i += n }  ->  Same<I>&;
+        { j + n }   ->  Same<I>&&;
+        { n + j }   ->  Same<I>&&;
+        { i -= n }  ->  Same<I>&;
+        { j - n }   ->  Same<I>&&;
+        { j[n] }    ->  Same<detail::reference_t<I>>;
       };
 
     // clang-format on
 
   } // namespace iterator
 
-} // namespace mln::concepts::stl::core
+
+  inline namespace indirect_callable
+  {
+    // clang-format off
+
+    // IndirectUnaryInvocable
+    template <typename F, typename I>
+    concept bool IndirectUnaryInvocable =
+      Readable<I> &&
+      CopyConstructible<F> &&
+      Invocable<F&, detail::value_type_t<I>&> &&
+      Invocable<F&, detail::reference_t<I>> &&
+      Invocable<F&, detail::iter_common_reference_t<I>> &&
+      CommonReference<
+        std::invoke_result_t<F&, detail::value_type_t<I>&>,
+        std::invoke_result_t<F&, detail::reference_t<I>&&>>;
+
+
+    // IndirectRegularUnaryInvocable
+    template <typename F, typename I>
+    concept bool IndirectRegularUnaryInvocable =
+      Readable<I> &&
+      CopyConstructible<F> &&
+      RegularInvocable<F&, detail::value_type_t<I>&> &&
+      RegularInvocable<F&, detail::reference_t<I>> &&
+      RegularInvocable<F&, detail::iter_common_reference_t<I>> &&
+      CommonReference<
+        std::invoke_result_t<F&, detail::value_type_t<I>&>,
+        std::invoke_result_t<F&, detail::reference_t<I>&&>>;
+
+
+    // IndirectUnaryPredicate
+    template <typename F, typename I>
+    concept bool IndirectUnaryPredicate =
+      Readable<I> &&
+      CopyConstructible<F> &&
+      Predicate<F&, detail::value_type_t<I>&> &&
+      Predicate<F&, detail::reference_t<I>> &&
+      Predicate<F&, detail::iter_common_reference_t<I>>;
+
+
+    // IndirectRelation
+    template <typename F, typename I1, typename I2 = I1>
+    concept bool IndirectRelation =
+      Readable<I1> &&
+      Readable<I2> &&
+      CopyConstructible<F> &&
+      Relation<F&, detail::value_type_t<I1>&, detail::value_type_t<I2>&> &&
+      Relation<F&, detail::value_type_t<I1>&, detail::reference_t<I2>> &&
+      Relation<F&, detail::reference_t<I1>, detail::value_type_t<I2>&> &&
+      Relation<F&, detail::reference_t<I1>, detail::reference_t<I2>> &&
+      Relation<F&, detail::iter_common_reference_t<I1>, detail::iter_common_reference_t<I2>>;
+
+
+    // IndirectStrictWeakOrder
+    template <typename F, typename I1, typename I2 = I1>
+    concept bool IndirectStrictWeakOrder =
+      Readable<I1> &&
+      Readable<I2> &&
+      CopyConstructible<F> &&
+      StrictWeakOrder<F&, detail::value_type_t<I1>&, detail::value_type_t<I2>&> &&
+      StrictWeakOrder<F&, detail::value_type_t<I1>&, detail::reference_t<I2>> &&
+      StrictWeakOrder<F&, detail::reference_t<I1>, detail::value_type_t<I2>&> &&
+      StrictWeakOrder<F&, detail::reference_t<I1>, detail::reference_t<I2>> &&
+      StrictWeakOrder<F&, detail::iter_common_reference_t<I1>, detail::iter_common_reference_t<I2>>;
+
+    // clang-format on
+
+  } // namespace indirect_callable
+
+
+  namespace common_algorithm
+  {
+
+    // clang-format off
+    
+    // IndirectlyMovable
+    template <typename In, typename Out>
+    concept bool IndirectlyMovable =
+      Readable<In> &&
+      Writable<Out, detail::rvalue_reference_t<In>>;
+
+
+    // IndirectlyMovableStorable
+    template <typename In, typename Out>
+    concept bool IndirectlyMovableStorable =
+      IndirectlyMovable<In, Out> &&
+      Writable<Out, detail::value_type_t<In>> &&
+      Movable<detail::value_type_t<In>> &&
+      Constructible<detail::value_type_t<In>, detail::rvalue_reference_t<In>> &&
+      Assignable<detail::value_type_t<In>&, detail::rvalue_reference_t<In>>;
+
+
+    // IndirectlyCopyable
+    template <typename In, typename Out>
+    concept bool IndirectlyCopyable =
+      Readable<In> &&
+      Writable<Out, detail::reference_t<In>>;
+
+
+    // IndirectlyCopyableStorable
+    template <typename In, typename Out>
+    concept bool IndirectlyCopyableStorable =
+      IndirectlyCopyable<In, Out> &&
+      Writable<Out, const detail::value_type_t<In>&> &&
+      Copyable<detail::value_type_t<In>> &&
+      Constructible<detail::value_type_t<In>, detail::reference_t<In>> &&
+      Assignable<detail::value_type_t<In>&, detail::reference_t<In>>;
+
+    
+    // IndirectlySwappable
+    template <typename I1, typename I2 = I1>
+    concept bool IndirectlySwappable =
+      Readable<I1> && Readable<I2> &&
+      requires(I1&& i1, I2&& i2) {
+        detail::iter_swap(std::forward<I1>(i1), std::forward<I2>(i2));
+        detail::iter_swap(std::forward<I2>(i2), std::forward<I1>(i1));
+        detail::iter_swap(std::forward<I1>(i1), std::forward<I1>(i1));
+        detail::iter_swap(std::forward<I2>(i2), std::forward<I2>(i2));
+      };
+
+    
+    // IndirectlyComparable
+    template <typename I1, typename I2, typename R = detail::equal_to,
+              typename P1 = detail::ident, typename P2 = detail::ident>
+    concept bool IndirectlyComparable =
+      IndirectRelation<R, detail::projected<I1, P1>, detail::projected<I2, P2>>;
+
+
+    // Permutable
+    template <typename I>
+    concept bool Permutable =
+      ForwardIterator<I> &&
+      IndirectlyMovableStorable<I, I> &&
+      IndirectlySwappable<I, I>;
+    
+
+    // Mergeable
+    template <typename I1, typename I2, typename Out, typename R = detail::less,
+              typename P1 = detail::ident, typename P2 = detail::ident>
+    concept bool Mergeable =
+      InputIterator<I1> &&
+      InputIterator<I2> &&
+      WeaklyIncrementable<Out> &&
+      IndirectlyCopyable<I1, Out> &&
+      IndirectlyCopyable<I2, Out> &&
+      IndirectStrictWeakOrder<R, detail::projected<I1, P1>, detail::projected<I2, P2>>;
+
+
+    // Sortable
+    template <typename I, typename R = detail::less, typename P = detail::ident>
+    concept bool Sortable =
+      Permutable<I> &&
+      IndirectStrictWeakOrder<R, detail::projected<I, P>>;
+
+    // clang-format on
+
+  } // namespace common_algorithm
+
+
+  inline namespace ranges
+  {
+
+    // clang-format off
+
+    // Range
+    template <typename T>
+    concept bool Range =
+      requires(T&& t) {
+        detail::begin(t); /* not necessarily equality-preserving (see below) */
+        detail::end(t);
+      };
+
+
+    // SizedRange
+    template <typename T>
+    concept bool SizedRange =
+      Range<T> &&
+      !detail::disable_sized_range_v<std::remove_cv_t<std::remove_reference_t<T>>> &&
+      requires(T& t) {
+        { detail::size(t) } -> ConvertibleTo<detail::difference_type_t<detail::iterator_t<T>>>;
+      };
+
+
+    // View
+    template <typename T>
+    concept bool View =
+      Range<T> &&
+      Semiregular<T> && 
+      detail::view_predicate_v_<T>;
+
+
+    // BoundedRange
+    template <typename T>
+    concept bool BoundedRange =
+      Range<T> &&
+      Same<detail::iterator_t<T>, detail::sentinel_t<T>>;
+
+
+    // InputRange
+    template <typename T>
+    concept bool InputRange =
+      Range<T> &&
+      InputIterator<detail::iterator_t<T>>;
+
+
+    // OutputRange
+    template <typename R, typename T>
+    concept bool OutputRange =
+      Range<R> &&
+      OutputIterator<detail::iterator_t<R>, T>;
+
+
+    // ForwardRange
+    template <typename T>
+    concept bool ForwardRange =
+      InputRange<T> &&
+      ForwardIterator<detail::iterator_t<T>>;
+
+
+    // BidirectionalRange
+    template <typename T>
+    concept bool BidirectionalRange =
+      ForwardRange<T> &&
+      BidirectionalIterator<detail::iterator_t<T>>;
+
+
+    // RandomAccessRange
+    template <typename T>
+    concept bool RandomAccessRange =
+      BidirectionalRange<T> &&
+      RandomAccessIterator<detail::iterator_t<T>>;
+
+    // clang-format on
+
+  } // namespace ranges
+
+} // namespace mln::core::concepts::stl

@@ -62,5 +62,7 @@ add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
 
 # test Concepts
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
-  add_core_test(${test_prefix}concept            concept/stl.cpp)
+  add_core_test(${test_prefix}concept_stl      concept/fundamentals.cpp)
+  add_core_test(${test_prefix}concept_values   concept/values.cpp)
+  add_core_test(${test_prefix}concept_points   concept/points.cpp)
 endif()

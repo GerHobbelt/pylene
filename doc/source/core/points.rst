@@ -3,7 +3,7 @@ Points
 ======
 
 
-Way of locating a  value inside an image.
+Way of locating a value inside an image.
 
 
 

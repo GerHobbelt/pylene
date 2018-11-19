@@ -9,6 +9,7 @@ Core Module
 
    core/values
    core/points
+   core/pixels
    core/ranges
    core/neighborhood
    core/algorithms
@@ -18,8 +19,10 @@ Core Module
 
 
 
-Values
-------
+.. raw:: html
+
+         <h2>Values</h2>
+
 
 :doc:`core/values` are the fundamentals tools to model values held by images.
 
@@ -27,19 +30,28 @@ Values
 .. topic:: Concepts
 
    * :ref:`Value <concept-values-Value>`
-   * :ref:`SemiregularValue <concept-values-SemiregularValue>`
-   * :ref:`RegularValue <concept-values-RegularValue>`
-   * :ref:`StrictTotallyOrderedRegularValue <concept-values-StrictTotallyOrderedRegularValue>`
+   * :ref:`ComparableValue <concept-values-ComparableValue>`
+   * :ref:`OrderedValue <concept-values-OrderedValue>`
 
 .. topic:: Predefined values
 
    * :doc:`core/values/rgba`
 
+.. topic:: Utilities
+
+   TODO channel utilities
+..   * :cpp:func:`is_multichannel`
+..   * :cpp:func:`dynamic_channel_get`
+..   * :cpp:func:`dynamic_channel_size`
+..   * :cpp:func:`static_channel_get`
+..   * :cpp:func:`static_channel_size`
 
 
 
-Points
-------
+.. raw:: html
+
+         <h2>Points</h2>
+
 
 :doc:`core/points` are the fundamentals tools for locating a value inside an images.
 
@@ -56,8 +68,29 @@ Points
 
 
 
-Ranges
-------
+.. raw:: html
+
+         <h2>Pixels</h2>
+
+
+:doc:`core/pixels` are the fundamentals tools when browsing an images to access both the point and the value.
+
+
+.. topic:: Concepts
+
+   * :ref:`Pixel <concept-pixels-Pixel>`
+
+.. topic:: Predefined points
+
+   * :doc:`core/pixels/ndpixel`
+
+
+
+
+.. raw:: html
+
+         <h2>Ranges</h2>
+
 
 :doc:`core/ranges` extensions for ranges with new concepts and helper functions.
 
@@ -84,9 +117,10 @@ Ranges
 
 
 
+.. raw:: html
 
-Neighborhoods and Structural Elements
--------------------------------------
+         <h2>Neighborhoods and Structural Elements</h2>
+
 
 :doc:`core/neighborhood`  are the fundamental tools for local image processing.
 
@@ -107,8 +141,10 @@ Neighborhoods and Structural Elements
 
 
 
-Algorithms
-----------
+
+.. raw:: html
+
+         <h2>Algorithms</h2>
 
 
 Foundamental and core :doc:`algorithms <core/algorithms>` for image manipulation.
@@ -116,8 +152,10 @@ Foundamental and core :doc:`algorithms <core/algorithms>` for image manipulation
 
 
 
-STL
----
+.. raw:: html
+
+         <h2>STL</h2>
+
 
 :doc:`core/stl` are the fundamentals concepts of the C++ standard library that we are building our concept upon. They are our building blocks.
 

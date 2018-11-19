@@ -1,5 +1,6 @@
 #pragma once
 
+// FIXME : reduce to needed headers
 #include <range/v3/all.hpp>
 
 #include <functional>
@@ -17,25 +18,28 @@ namespace mln::core::concepts::stl
   {
 
     using ::ranges::begin;
-    using ::ranges::common_reference_t;
-    using ::ranges::difference_type_t;
+
     using ::ranges::disable_sized_range;
     using ::ranges::disable_sized_sentinel;
     using ::ranges::end;
     using ::ranges::equal_to;
     using ::ranges::ident;
-    using ::ranges::iter_common_reference_t;
     using ::ranges::iter_swap;
-    using ::ranges::iterator_category_t;
-    using ::ranges::iterator_t;
     using ::ranges::less;
     using ::ranges::projected;
+    using ::ranges::size;
+    using ::ranges::detail::view_predicate_;
+
+    using ::ranges::common_reference_t;
+    using ::ranges::difference_type_t;
+    using ::ranges::iter_common_reference_t;
+    using ::ranges::iterator_category_t;
+    using ::ranges::iterator_t;
     using ::ranges::reference_t;
     using ::ranges::rvalue_reference_t;
     using ::ranges::sentinel_t;
-    using ::ranges::size;
     using ::ranges::value_type_t;
-    using ::ranges::detail::view_predicate_;
+
 
     template <typename R>
     inline constexpr auto disable_sized_range_v = disable_sized_range<R>::value;

@@ -7,27 +7,22 @@ namespace mln::core::concepts
 
   // clang-format off
 
-  // SemiregularValue
-  template <typename SemiregVal>
-  concept bool SemiregularValue = stl::Semiregular<SemiregVal>;
-
-
   // Value
   template <typename Val>
-  concept bool Value = SemiregularValue<Val>;
+  concept bool Value = stl::Semiregular<Val>;
 
 
-  // RegularValue
+  // ComparableValue
   template <typename RegVal>
-  concept bool RegularValue =
-    SemiregularValue<RegVal> &&
+  concept bool ComparableValue =
+    Value<RegVal> &&
     stl::Regular<RegVal>;
 
 
-  // StrictTotallyOrderedRegularValue
+  // OrderedValue
   template <typename STORegVal>
-  concept bool StrictTotallyOrderedRegularValue =
-    RegularValue<STORegVal> &&
+  concept bool OrderedValue =
+    ComparableValue<STORegVal> &&
     stl::StrictTotallyOrdered<STORegVal>;
 
   // clang-format on

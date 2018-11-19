@@ -50,7 +50,7 @@ Point
     - :cpp:expr:`lhs <= rhs` return-type models :cpp:concept:`Boolean (stl) <stl::Boolean>`.
     - :cpp:expr:`lhs >= rhs` return-type models :cpp:concept:`Boolean (stl) <stl::Boolean>`.
 
-    **Possible implementation**
+    **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/points.hpp
        :language: cpp

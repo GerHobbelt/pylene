@@ -7,12 +7,11 @@ namespace mln::core::concepts
 
   // clang-format off
 
-  // SemiregularValue
+  // Point
   template<typename Pnt>
   concept bool Point =
     stl::Regular<Pnt> &&
     stl::StrictTotallyOrdered<Pnt>;
-
 
   // clang-format on
 

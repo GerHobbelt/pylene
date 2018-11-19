@@ -25,72 +25,56 @@ Value
 
 Let `Val` be a type that models :cpp:concept:`Value (details) <Value>`.
 
-Then `Val` also models :ref:`SemiregularValue <concept-values-SemiregularValue>`
+Then `Val` also models :cpp:concept:`Semiregular (stl) <stl::Semiregular>`
 
 .. _concept-values-Value-expressions:
 .. rubric:: Expressions
 
-Let `Val` inherit all valid expressions defined for :ref:`SemiregularValue <concept-values-SemiregularValue-expressions>`.
+Let : 
+    - ``val`` be an instance of `Val`.
+    - ``val_cpy`` be an instance of `Val`.
+    - ``cval`` be an instance of `const Val`.
 
 Then ``numeric_limits<Val>`` must be specialized and well-behaved.
 See the `reference documentation <https://en.cppreference.com/w/cpp/types/numeric_limits>`_ for details about the specialization.
 
-
-
-.. _concept-values-SemiregularValue:
-
-SemiregularValue
-################
-
-Let `SemiregVal` be a type that models :cpp:concept:`SemiregularValue (details) <SemiregularValue>`.
-
-Then `SemiregVal` also models : :cpp:concept:`Semiregular (stl) <stl::Semiregular>`.
-
-.. _concept-values-SemiregularValue-expressions:
-.. rubric:: Expressions
-
-Let : 
-    - ``val`` be an instance of `SemiregVal`.
-    - ``val_cpy`` be an instance of `SemiregVal`.
-    - ``cval`` be an instance of `const SemiregVal`.
-
 Then we have the following valid expressions :
 
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-|       Expression        |    Return type     | Pre-condition | Post-condition |                    Description                    |
-+=========================+====================+===============+================+===================================================+
-| ``val()``               | `SemiregVal`       | none          | none           | Constructs a value ``val`` of type `SemiregVal`   |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``cval()``              | `const SemiregVal` | none          | none           | Constructs a value ``cval`` of type `SemiregVal`  |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``val_cpy(val)``        | `SemiregVal`       | none          | none           | Copy-constructs a value ``val_cpy`` from ``val``  |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``val_cpy(cval)``       | `SemiregVal`       | none          | none           | Copy-constructs a value ``val_cpy`` from ``cval`` |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``val_cpy(move(val))``  | `SemiregVal`       | none          | none           | Move-constructs a value ``val_cpy`` from ``val``  |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``val_cpy = val``       | `SemiregVal&`      | none          | none           | Assign ``val`` to ``val_cpy``                     |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``val_cpy = cval``      | `SemiregVal&`      | none          | none           | Assign ``cval`` to ``val_cpy``                    |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
-| ``val_cpy = move(val)`` | `SemiregVal&`      | none          | none           | Move-assign ``val`` to ``val_cpy``                |
-+-------------------------+--------------------+---------------+----------------+---------------------------------------------------+
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+|       Expression        | Return type | Pre-condition | Post-condition |                    Description                    |
++=========================+=============+===============+================+===================================================+
+| ``val()``               | `Val`       | none          | none           | Constructs a value ``val`` of type `Val`          |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``cval()``              | `const Val` | none          | none           | Constructs a value ``cval`` of type `Val`         |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``val_cpy(val)``        | `Val`       | none          | none           | Copy-constructs a value ``val_cpy`` from ``val``  |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``val_cpy(cval)``       | `Val`       | none          | none           | Copy-constructs a value ``val_cpy`` from ``cval`` |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``val_cpy(move(val))``  | `Val`       | none          | none           | Move-constructs a value ``val_cpy`` from ``val``  |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``val_cpy = val``       | `Val&`      | none          | none           | Assign ``val`` to ``val_cpy``                     |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``val_cpy = cval``      | `Val&`      | none          | none           | Assign ``cval`` to ``val_cpy``                    |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
+| ``val_cpy = move(val)`` | `Val&`      | none          | none           | Move-assign ``val`` to ``val_cpy``                |
++-------------------------+-------------+---------------+----------------+---------------------------------------------------+
 
 
 
-.. _concept-values-RegularValue:
+.. _concept-values-ComparableValue:
 
-RegularValue
-############
+ComparableValue
+###############
 
-Let `RegVal` be a type that models :cpp:concept:`RegularValue (details) <RegularValue>`.
+Let `RegVal` be a type that models :cpp:concept:`ComparableValue (details) <ComparableValue>`.
 
-Let `RegVal` also models :ref:`SemiregularValue <concept-values-SemiregularValue>` and :cpp:concept:`Regular (stl) <stl::Regular>`.
+Let `RegVal` also models :ref:`Value <concept-values-Value>` and :cpp:concept:`Regular (stl) <stl::Regular>`.
 
-.. _concept-values-RegularValue-expressions:
+.. _concept-values-ComparableValue-expressions:
 .. rubric:: Expressions
 
-Let `RegVal` inherit all valid expressions defined for :ref:`SemiregularValue <concept-values-SemiregularValue-expressions>`.
+Let `RegVal` inherit all valid expressions defined for :ref:`Value <concept-values-Value-expressions>`.
 
 Let : 
     - ``lhs`` be an instance of `const RegVal`.
@@ -112,19 +96,19 @@ Then we have the following valid expressions :
 
 
 
-.. _concept-values-StrictTotallyOrderedRegularValue:
+.. _concept-values-OrderedValue:
 
-StrictTotallyOrderedRegularValue
-################################
+OrderedValue
+############
 
-Let `STORegVal` be a type that models :cpp:concept:`StrictTotallyOrderedRegularValue (details) <StrictTotallyOrderedRegularValue>`.
+Let `STORegVal` be a type that models :cpp:concept:`OrderedValue (details) <OrderedValue>`.
 
-Let `STORegVal` also models :ref:`RegularValue <concept-values-RegularValue>` and :cpp:concept:`StrictTotallyOrdered (stl) <stl::StrictTotallyOrdered>`.
+Let `STORegVal` also models :ref:`ComparableValue <concept-values-ComparableValue>` and :cpp:concept:`StrictTotallyOrdered (stl) <stl::StrictTotallyOrdered>`.
 
-.. _concept-values-StrictTotallyOrderedRegularValue-expressions:
+.. _concept-values-OrderedValue-expressions:
 .. rubric:: Expressions
 
-Let `STORegVal` inherit all valid expressions defined for :ref:`RegularValue <concept-values-RegularValue-expressions>`.
+Let `STORegVal` inherit all valid expressions defined for :ref:`ComparableValue <concept-values-ComparableValue-expressions>`.
 
 Let : 
     - ``lhs`` be an instance of `const STORegVal`.

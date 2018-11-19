@@ -38,15 +38,6 @@ TEST(Core, Concept_Value)
   static_assert(concepts::Value<Empty>);
 }
 
-
-TEST(Core, Concept_SemiregularValue)
-{
-  static_assert(concepts::SemiregularValue<int>);
-  static_assert(concepts::SemiregularValue<RGB>);
-  static_assert(concepts::SemiregularValue<Empty>);
-}
-
-
 struct RGBA : RGB
 {
   int a;
@@ -61,12 +52,12 @@ bool operator!=(const RGBA& lhs, const RGBA& rhs)
   return !(lhs == rhs);
 }
 
-TEST(Core, Concept_RegularValue)
+TEST(Core, Concept_ComparableValue)
 {
-  static_assert(concepts::RegularValue<int>);
-  static_assert(!concepts::RegularValue<RGB>);
-  static_assert(!concepts::RegularValue<Empty>);
-  static_assert(concepts::RegularValue<RGBA>);
+  static_assert(concepts::ComparableValue<int>);
+  static_assert(!concepts::ComparableValue<RGB>);
+  static_assert(!concepts::ComparableValue<Empty>);
+  static_assert(concepts::ComparableValue<RGBA>);
 }
 
 
@@ -92,11 +83,11 @@ bool operator>=(const RGBAB& lhs, const RGBAB& rhs)
   return !(lhs < rhs);
 }
 
-TEST(Core, Concept_StrictTotallyOrderedRegularValue)
+TEST(Core, Concept_OrderedValue)
 {
-  static_assert(concepts::StrictTotallyOrderedRegularValue<int>);
-  static_assert(!concepts::StrictTotallyOrderedRegularValue<RGB>);
-  static_assert(!concepts::StrictTotallyOrderedRegularValue<Empty>);
-  static_assert(!concepts::StrictTotallyOrderedRegularValue<RGBA>);
-  static_assert(concepts::StrictTotallyOrderedRegularValue<RGBAB>);
+  static_assert(concepts::OrderedValue<int>);
+  static_assert(!concepts::OrderedValue<RGB>);
+  static_assert(!concepts::OrderedValue<Empty>);
+  static_assert(!concepts::OrderedValue<RGBA>);
+  static_assert(concepts::OrderedValue<RGBAB>);
 }

@@ -48,6 +48,9 @@ namespace mln
     /// \{
     struct new_pixel_type : pixel_adaptor<pixel_t<I>>, Pixel<new_pixel_type>
     {
+      using reference  = transform_view::reference;
+      using value_type = transform_view::value_type;
+
       new_pixel_type() = default;
       new_pixel_type(F fun, pixel_t<I> px)
         : new_pixel_type::pixel_adaptor{px}
@@ -55,7 +58,7 @@ namespace mln
       {
       }
 
-      decltype(auto) val() const { return std::invoke(f, this->base().val()); }
+      reference val() const { return std::invoke(f, this->base().val()); }
 
     private:
       fun_t f;
@@ -98,21 +101,20 @@ namespace mln
     template <typename dummy = reference>
     std::enable_if_t<accessible::value, dummy> at(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
-      return std::invoke(f, this->base()(p));
+      return std::invoke(f, this->base().at(p));
     }
 
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel(point_type p)
     {
       mln_precondition(this->base().domain().has(p));
-      return {f, this->base().pixel(p)};
+      return {f, this->base().new_pixel(p)};
     }
 
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel_at(point_type p)
     {
-      return {f, this->base().pixel_at(p)};
+      return {f, this->base().new_pixel_at(p)};
     }
 
     template <typename dummy = I>
@@ -124,26 +126,28 @@ namespace mln
   };
 
   template <class I1, class I2, class F>
-  class transform2_view : public image_adaptor<I1>, public New_Image<transform2_view<I1, I2, F>>
+  class transform2_view : public New_Image<transform2_view<I1, I2, F>>
   {
     using fun_t = F; // FIXME something with semiregular_t<F> ?
+    I1 m_ima1;
+    I2 m_ima2;
     fun_t f;
-    I2 ima2;
 
   public:
     /// Type definitions
     /// \{
     using reference                      = std::invoke_result_t<F&, typename I1::reference, typename I2::reference>;
     using value_type                     = std::decay_t<reference>;
-    using point_type                     = typename I::point_type;
+    using point_type                     = typename I1::point_type;
+    using domain_type                    = typename I1::domain_type;
     /// \}
 
 
     /// Traits & Image Properties
     /// \{
-    using accessible     = typename I::accessible;
-    using indexable      = std::false_type;                        // Preservative behavior
-    using extension_category = mln::extension::none_extension_tag; // FIXME: should be improved
+    using accessible         = std::bool_constant<I1::accessible::value && I2::accessible::value>;
+    using indexable          = std::false_type;                    // Preservative behavior
+    using extension_category = mln::extension::none_extension_tag; // Preservative behavior (may be too preservative)
 
     using concrete_type  = ch_value_t<I1, value_type>;
 
@@ -162,6 +166,14 @@ namespace mln
     /// \{
     struct new_pixel_type : Pixel<new_pixel_type>
     {
+    public:
+
+      using point_type               = typename transform2_view::point_type;
+      using site_type [[deprecated]] = point_type;
+      using value_type               = typename transform2_view::value_type;
+      using reference                = typename transform2_view::reference;
+
+
       new_pixel_type() = default;
       new_pixel_type(fun_t fun, pixel_t<I1> px1, pixel_t<I2> px2)
         : m_pix1{std::move(px1)}
@@ -170,20 +182,14 @@ namespace mln
       {
       }
 
-      using point_type               = typename Pixel::point_type;
-      using site_type [[deprecated]] = point_type;
-      using value_type               = typename Pixel::value_type;
-      using reference                = typename Pixel::reference;
 
-      decltype(auto) val() const { return std::invoke(f, m_pix1.val(), m_pix2.val()); }
+      reference      val() const { return std::invoke(f, m_pix1.val(), m_pix2.val()); }
       auto           point() const { return m_pix1.point(); }
       void           advance(point_type p)
       {
         m_pix1.advance(p);
         m_pix2.advance(p);
       }
-
-      decltype(auto) val() const { return std::invoke(f, this->base().val()); }
 
     private:
       fun_t f;
@@ -193,10 +199,9 @@ namespace mln
     /// \}
 
 
-
-
-    transform_view(I ima, F fun)
-      : transform_view::image_adaptor{std::move(ima)}
+    transform2_view(I1 ima1, I2 ima2, F fun)
+      : m_ima1{std::move(ima1)}
+      , m_ima2{std::move(ima2)}
       , f{std::move(fun)}
     {
     }
@@ -209,48 +214,44 @@ namespace mln
       return imchvalue<U>(this->base());
     }
 
-    auto new_values() { return mln::ranges::view::transform(this->base().new_values(), f); }
+    auto new_values() { return mln::ranges::view::transform(m_ima1.new_values(), m_ima2.new_values(), f); }
 
     auto new_pixels()
     {
-      using R = decltype(this->base().new_pixels());
-      auto pxwrapper = [fun = this->f](::ranges::range_value_t<R> px) { return new_pixel_type{fun, std::move(px)}; };
-      return mln::ranges::view::transform(this->base().new_pixels(), pxwrapper);
+      using R1 = decltype(m_ima1.new_pixels());
+      using R2 = decltype(m_ima2.new_pixels());
+      auto pxwrapper = [fun = this->f](::ranges::range_reference_t<R1> px1, ::ranges::range_reference_t<R2> px2) {
+        return new_pixel_type{fun, std::move(px1), std::move(px2)};
+      };
+      return mln::ranges::view::transform(m_ima1.new_pixels(), m_ima2.new_pixels(), pxwrapper);
     }
 
     template <typename dummy = reference>
     std::enable_if_t<accessible::value, dummy> operator()(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
-      return std::invoke(f, this->base()(p));
+      mln_precondition(m_ima1.domain().has(p));
+      mln_precondition(m_ima2.domain().has(p));
+      return std::invoke(f, m_ima1.at(p), m_ima2.at(p));
     }
 
     template <typename dummy = reference>
     std::enable_if_t<accessible::value, dummy> at(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
-      return std::invoke(f, this->base()(p));
+      return std::invoke(f, m_ima1.at(p), m_ima2.at(p));
     }
 
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel(point_type p)
     {
       mln_precondition(this->base().domain().has(p));
-      return {f, this->base().pixel(p)};
+      return {f, m_ima1.new_pixel(p), m_ima2.new_pixel(p) };
     }
 
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel_at(point_type p)
     {
-      return {f, this->base().pixel_at(p)};
+      return {f, m_ima1.new_pixel_at(p), m_ima2.new_pixel_at(p)};
     }
-
-    template <typename dummy = I>
-    std::enable_if_t<indexable::value, reference> operator[](typename dummy::size_type i)
-    {
-      return std::invoke(f, this->base()[i]);
-    }
-
   };
 
 
@@ -265,6 +266,17 @@ namespace mln
 
       // FIXME: make ima a view first ?
       return { std::move(ima), std::move(f) };
+    }
+
+
+    template <class I1, class I2, class UnaryFunction>
+    transform2_view<I1, I2, UnaryFunction> transform(I1 ima1, I2 ima2, UnaryFunction f)
+    {
+      static_assert(mln::is_a<I1, New_Image>());
+      static_assert(mln::is_a<I2, New_Image>());
+
+      // FIXME: make ima a view first ?
+      return { std::move(ima1), std::move(ima2), std::move(f) };
     }
   } // namespace view
 

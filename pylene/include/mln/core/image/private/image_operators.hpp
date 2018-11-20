@@ -12,19 +12,30 @@ namespace mln
   template <class I>                                                                                                   \
   auto op(const New_Image<I>& ima)                                                                                     \
   {                                                                                                                    \
-    return view::transform(static_cast<const I&>(ima), f);            \
+    return view::transform(static_cast<const I&>(ima), f);                                                             \
   }
 
 
-
-
-
-
-
-
-
-
-
+#define MLN_PRIVATE_DEFINE_BINARY_OPERATOR(op, f)                                                                      \
+  template <class I1, class I2>                                                                                        \
+  auto op(const New_Image<I1>& ima1, const New_Image<I2>& ima2)                                                        \
+  {                                                                                                                    \
+    return view::transform(static_cast<const I1&>(ima1), static_cast<const I2&>(ima2), f);                             \
+  }                                                                                                                    \
+                                                                                                                       \
+  template <class I, class Scalar>                                                                                     \
+  auto op(const New_Image<I>& ima1, Scalar s, std::enable_if_t<!is_a<Scalar, New_Image>::value>* = nullptr)            \
+  {                                                                                                                    \
+    auto g = [f_ = f, s](auto&& arg) { return f_(arg, s); };                                                           \
+    return view::transform(static_cast<const I&>(ima1), g);                                                            \
+  }                                                                                                                    \
+                                                                                                                       \
+  template <class Scalar, class I>                                                                                     \
+  auto op(Scalar s, const New_Image<I>& ima2, std::enable_if_t<!is_a<Scalar, New_Image>::value>* = nullptr)            \
+  {                                                                                                                    \
+    auto g = [f_ = f, s](auto&& arg) { return f_(s, arg); };                                                           \
+    return view::transform(static_cast<const I&>(ima2), g);                                                            \
+  }
 
 
   // MLN_PRIVATE_DEFINE_UNARY_OPERATOR(operator-, std::negate<>());
@@ -32,6 +43,20 @@ namespace mln
 
   MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_unary_minus, std::negate<>());
   MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_lnot, std::logical_not<>());
+
+
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_eq, std::equal_to<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_neq, std::not_equal_to<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lt, std::less<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gt, std::greater<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lte, std::less_equal<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gte, std::greater_equal<>());
+
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_land, std::logical_and<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lor, std::logical_or<>());
+
+
+
 
 
   // FIXME: deprecated => replace with algorithm all_of
@@ -65,5 +90,6 @@ namespace mln
 
 
 
-#undef PRIVATE_DEFINE_UNARY_OPERATOR
+#undef MLN_PRIVATE_DEFINE_UNARY_OPERATOR
+#undef MLN_PRIVATE_DEFINE_BINARY_OPERATOR
 }

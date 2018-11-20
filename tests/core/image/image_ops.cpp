@@ -83,7 +83,7 @@ TEST(Core, Image2d_Operators_New)
   mln_foreach_new(auto& v, ref.new_values())
     v = i--;
 
-  ASSERT_TRUE(new_all(new_unary_minus(ima) == ref));
+  ASSERT_TRUE(new_all(new_eq(new_unary_minus(ima), ref)));
 }
 
 

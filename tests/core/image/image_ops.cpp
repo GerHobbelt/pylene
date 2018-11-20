@@ -3,6 +3,9 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/image_ops.hpp>
+#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/rangev3/foreach.hpp>
+
 #include <mln/io/imprint.hpp>
 
 #include <boost/tuple/tuple_io.hpp>
@@ -67,6 +70,23 @@ TEST(Core, Image2d_Operators)
 
   ASSERT_TRUE(all(-ima == ref));
 }
+
+TEST(Core, Image2d_Operators_New)
+{
+  using namespace mln;
+
+  image2d<int> ima(5, 5);
+  image2d<int> ref(5, 5);
+
+  iota(ima, 0);
+  int i = 0;
+  mln_foreach_new(auto& v, ref.new_values())
+    v = i--;
+
+  ASSERT_TRUE(new_all(new_unary_minus(ima) == ref));
+}
+
+
 
 TEST(Core, Image2d_MixedOperator)
 {

@@ -22,10 +22,6 @@
 
 namespace mln
 {
-  template <class I>
-  using pixel_t = typename I::new_pixel_type;
-
-
   template <class I, class V>
   using ch_value_t = typename I::template ch_value_type<V>;
 

@@ -50,25 +50,90 @@ namespace mln
     };
   }
 
-  MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_unary_minus, std::negate<>());
-  MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_lnot, std::logical_not<>());
+  MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_unary_minus,    std::negate<>());
+  MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_lnot,           std::logical_not<>());
 
 
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_eq, std::equal_to<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_neq, std::not_equal_to<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lt, std::less<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gt, std::greater<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lte, std::less_equal<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gte, std::greater_equal<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_land, std::logical_and<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lor, std::logical_or<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_eq,    std::equal_to<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_neq,   std::not_equal_to<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lt,    std::less<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gt,    std::greater<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lte,   std::less_equal<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gte,   std::greater_equal<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_land,  std::logical_and<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lor,   std::logical_or<>());
 
 
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_plus, details::to_common_type<std::plus<>>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_minus, details::to_common_type<std::minus<>>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_multiplies, details::to_common_type<std::multiplies<>>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_devides, details::to_common_type<std::divides<>>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_modulus, details::to_common_type<std::modulus<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_plus,          details::to_common_type<std::plus<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_minus,         details::to_common_type<std::minus<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_multiplies,    details::to_common_type<std::multiplies<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_devides,       details::to_common_type<std::divides<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_modulus,       details::to_common_type<std::modulus<>>());
+
+
+  namespace details
+  {
+    template <class ICond, class ITrue, class IFalse, class = void>
+    struct where_fn;
+
+
+    template <class ICond, class ITrue, class IFalse>
+    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<is_a<ITrue, Image>::value && is_a<IFalse, New_Image>::value>>
+    {
+      auto operator() (const ICond& cond, ITrue iftrue, IFalse iffalse) const
+      {
+        auto g = [](bool vcond, auto&& vtrue, auto&& vfalse) -> decltype(auto) {
+          return (vcond) ? std::forward<decltype(vtrue)>(vtrue) : std::forward<decltype(vfalse)>(vfalse);
+        };
+
+        // FIXME: to be implemented with imzip
+        return;
+      }
+    };
+
+    template <class ICond, class ITrue, class IFalse>
+    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<!is_a<ITrue, Image>::value && is_a<IFalse, New_Image>::value>>
+    {
+      auto operator() (const ICond& cond, ITrue vtrue, IFalse iffalse) const
+      {
+        auto g = [vtrue](bool vcond, auto&& vfalse) {
+          return (vcond) ? (vtrue) : std::forward<decltype(vfalse)>(vfalse);
+        };
+
+        return view::transform(cond, std::move(iffalse), g);
+      }
+    };
+
+    template <class ICond, class ITrue, class IFalse>
+    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<is_a<ITrue, Image>::value && !is_a<IFalse, New_Image>::value>>
+    {
+      auto operator() (const ICond& cond, ITrue iftrue, IFalse vfalse) const
+      {
+        auto g = [vfalse](bool vcond, auto&& vtrue) {
+          return (vcond) ? std::forward<decltype(vtrue)>(vtrue) : (vfalse);
+        };
+
+        return view::transform(cond, std::move(iftrue), g);
+      }
+    };
+
+
+    template <class ICond, class ITrue, class IFalse>
+    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<!is_a<ITrue, Image>::value && !is_a<IFalse, New_Image>::value>>
+    {
+      auto operator() (const ICond& cond, ITrue vtrue, IFalse vfalse) const
+      {
+        auto g = [vtrue, vfalse](bool vcond) { return (vcond) ? vtrue : vfalse; };
+        return view::transform(cond, g);
+      }
+    };
+  }
+
+  template <class ICond, class ITrue, class IFalse>
+  auto where(const New_Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  {
+    return details::where_fn<ICond, ITrue, IFalse>() (static_cast<const ICond&>(cond), std::move(iftrue), std::move(iffalse));
+  }
 
 
   // FIXME: deprecated => replace with algorithm all_of

@@ -22,6 +22,10 @@ namespace mln
     using value_type                     = std::decay_t<reference>;
     using point_type                     = typename I::point_type;
 
+    static_assert(!(std::is_rvalue_reference_v<reference> && !std::is_reference_v<typename I::reference>),
+                  "The transformed image returns a temporary and the mapping function is a projection.\n"
+                  "This is building a dangling reference.");
+
     using concrete_type  = ch_value_t<I, value_type>;
 
     template <class V>
@@ -46,13 +50,13 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : pixel_adaptor<pixel_t<I>>, Pixel<new_pixel_type>
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, Pixel<new_pixel_type>
     {
       using reference  = transform_view::reference;
       using value_type = transform_view::value_type;
 
       new_pixel_type() = default;
-      new_pixel_type(F fun, pixel_t<I> px)
+      new_pixel_type(F fun, image_pixel_t<I> px)
         : new_pixel_type::pixel_adaptor{px}
         , f{fun}
       {
@@ -175,7 +179,7 @@ namespace mln
 
 
       new_pixel_type() = default;
-      new_pixel_type(fun_t fun, pixel_t<I1> px1, pixel_t<I2> px2)
+      new_pixel_type(fun_t fun, image_pixel_t<I1> px1, image_pixel_t<I2> px2)
         : m_pix1{std::move(px1)}
         , m_pix2{std::move(px2)}
         , f{std::move(fun)}
@@ -193,8 +197,8 @@ namespace mln
 
     private:
       fun_t f;
-      pixel_t<I1> m_pix1;
-      pixel_t<I2> m_pix2;
+      image_pixel_t<I1> m_pix1;
+      image_pixel_t<I2> m_pix2;
     };
     /// \}
 

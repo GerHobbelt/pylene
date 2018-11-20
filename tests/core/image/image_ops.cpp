@@ -4,7 +4,6 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/image_ops.hpp>
 #include <mln/core/image/private/image_operators.hpp>
-#include <mln/core/rangev3/foreach.hpp>
 
 #include <mln/io/imprint.hpp>
 
@@ -71,23 +70,6 @@ TEST(Core, Image2d_Operators)
   ASSERT_TRUE(all(-ima == ref));
 }
 
-TEST(Core, Image2d_Operators_New)
-{
-  using namespace mln;
-
-  image2d<int> ima(5, 5);
-  image2d<int> ref(5, 5);
-
-  iota(ima, 0);
-  int i = 0;
-  mln_foreach_new(auto& v, ref.new_values())
-    v = i--;
-
-  ASSERT_TRUE(new_all(new_eq(new_unary_minus(ima), ref)));
-}
-
-
-
 TEST(Core, Image2d_MixedOperator)
 {
   using namespace mln;
@@ -99,8 +81,6 @@ TEST(Core, Image2d_MixedOperator)
   iota(y, 0);
 
   ASSERT_TRUE((std::is_same<typename decltype(x + x)::value_type, char>()));
-  ASSERT_TRUE((std::is_same<typename decltype(x + y)::value_type, typename std::common_type<char, short>::type>()));
-
   ASSERT_TRUE(all((x + y) == (2 * y)));
 }
 
@@ -121,4 +101,60 @@ TEST(Core, Image2d_WhereOperator)
   ASSERT_TRUE(all(f1 >= 12));
   ASSERT_TRUE((std::is_same<mln_reference(decltype(f1)), const uint8&>()));
   ASSERT_TRUE((std::is_same<mln_reference(decltype(f2)), uint8&>()));
+}
+
+
+TEST(Core, UnaryOperator)
+{
+  using namespace mln;
+
+  image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
+  image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
+
+  auto g = new_unary_minus(ima);
+  ASSERT_TRUE(new_all(new_eq(g, ref)));
+}
+
+TEST(Core, BinaryOperator_SameTypes)
+{
+  using namespace mln;
+
+  image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
+  image2d<uint8_t> ref = {{2, 4, 6}, {8, 10, 12}};
+
+  auto g1 = new_plus(ima, ima);
+  auto g2 = new_multiplies(uint8_t(2), ima);
+  auto g3 = new_multiplies(ima, uint8_t(2));
+
+  ASSERT_TRUE((std::is_same<decltype(g1)::value_type, uint8_t>::value));
+  ASSERT_TRUE((std::is_same<decltype(g2)::value_type, uint8_t>::value));
+  ASSERT_TRUE((std::is_same<decltype(g3)::value_type, uint8_t>::value));
+
+  ASSERT_TRUE(new_all(new_eq(g1, ref)));
+  ASSERT_TRUE(new_all(new_eq(g2, ref)));
+  ASSERT_TRUE(new_all(new_eq(g3, ref)));
+}
+
+TEST(Core, BinaryOperators_MixedTypes)
+{
+  using namespace mln;
+
+  image2d<uint8_t>  ima1 = {{1, 2, 3}, {4, 5, 6}};
+  image2d<uint16_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
+  image2d<uint16_t> ref = {{2, 4, 6}, {8, 10, 12}};
+
+  auto g1 = new_plus(ima1, ima2);
+  auto g2 = new_multiplies(uint16_t(2), ima1);
+  auto g3 = new_multiplies(ima1, uint16_t(2));
+
+  using RType = std::common_type_t<uint8_t, uint16_t>;
+  static_assert(std::is_same<RType, int>());
+
+  ASSERT_TRUE((std::is_same<decltype(g1)::value_type, RType>::value));
+  ASSERT_TRUE((std::is_same<decltype(g2)::value_type, RType>::value));
+  ASSERT_TRUE((std::is_same<decltype(g3)::value_type, RType>::value));
+
+  ASSERT_TRUE(new_all(new_eq(g1, ref)));
+  ASSERT_TRUE(new_all(new_eq(g2, ref)));
+  ASSERT_TRUE(new_all(new_eq(g3, ref)));
 }

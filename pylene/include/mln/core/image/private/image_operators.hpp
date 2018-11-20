@@ -37,9 +37,18 @@ namespace mln
     return view::transform(static_cast<const I&>(ima2), g);                                                            \
   }
 
-
-  // MLN_PRIVATE_DEFINE_UNARY_OPERATOR(operator-, std::negate<>());
-  // MLN_PRIVATE_DEFINE_UNARY_OPERATOR(lnot, std::logical_not<>());
+  namespace details
+  {
+    template <class Base>
+    struct to_common_type : Base
+    {
+      template <class U, class V>
+      std::common_type_t<U, V> operator()(U&& x, V&& y) const
+      {
+        return static_cast<const Base&>(*this) (std::forward<U>(x), std::forward<V>(y));
+      }
+    };
+  }
 
   MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_unary_minus, std::negate<>());
   MLN_PRIVATE_DEFINE_UNARY_OPERATOR(new_lnot, std::logical_not<>());
@@ -51,12 +60,15 @@ namespace mln
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gt, std::greater<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lte, std::less_equal<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gte, std::greater_equal<>());
-
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_land, std::logical_and<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lor, std::logical_or<>());
 
 
-
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_plus, details::to_common_type<std::plus<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_minus, details::to_common_type<std::minus<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_multiplies, details::to_common_type<std::multiplies<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_devides, details::to_common_type<std::divides<>>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_modulus, details::to_common_type<std::modulus<>>());
 
 
   // FIXME: deprecated => replace with algorithm all_of

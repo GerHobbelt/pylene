@@ -3,7 +3,7 @@ Pixels
 ======
 
 
-Information about the couple (Point, Value) when browsing an image.
+Information about the couple (Point, Value&) when browsing an image.
 
 
 
@@ -88,6 +88,11 @@ Then we have the following valid expressions :
 +-------------------------+--------------+---------------+----------------+---------------------------------------------------+
 | ``cpix.point()``        | `point_type` | none          | none           | Access the point of the pixel ``pix``             |
 +-------------------------+--------------+---------------+----------------+---------------------------------------------------+
+
+A pixel really just is a tool that stores a point and the reference to the value accessed by this point.
+There is no difference in semantic between a mutable pixel and a constant pixel. The const-ness is carried by the value type.
+If the `value_type` is constant then the value returned by `value()` (which returns a `reference`) will not be mutable.
+
 
 
 

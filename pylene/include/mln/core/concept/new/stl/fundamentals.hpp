@@ -9,7 +9,7 @@
 #include <utility>
 
 
-namespace mln::core::concepts::stl
+namespace mln::concepts::stl
 {
 
 
@@ -40,6 +40,11 @@ namespace mln::core::concepts::stl
     using ::ranges::sentinel_t;
     using ::ranges::value_type_t;
 
+    using ::ranges::bidirectional_iterator_tag;
+    using ::ranges::forward_iterator_tag;
+    using ::ranges::input_iterator_tag;
+    using ::ranges::random_access_iterator_tag;
+
 
     template <typename R>
     inline constexpr auto disable_sized_range_v = disable_sized_range<R>::value;
@@ -58,6 +63,20 @@ namespace mln::core::concepts::stl
     template <typename T>
     using remove_cvref_t = typename remove_cvref<T>::type;
 
+
+    auto iterator_category_converter(std::input_iterator_tag) -> std::input_iterator_tag;
+    auto iterator_category_converter(std::output_iterator_tag) -> std::output_iterator_tag;
+    auto iterator_category_converter(std::forward_iterator_tag) -> std::forward_iterator_tag;
+    auto iterator_category_converter(std::bidirectional_iterator_tag) -> std::bidirectional_iterator_tag;
+    auto iterator_category_converter(std::random_access_iterator_tag) -> std::random_access_iterator_tag;
+
+    auto iterator_category_converter(input_iterator_tag) -> std::input_iterator_tag;
+    auto iterator_category_converter(forward_iterator_tag) -> std::forward_iterator_tag;
+    auto iterator_category_converter(bidirectional_iterator_tag) -> std::bidirectional_iterator_tag;
+    auto iterator_category_converter(random_access_iterator_tag) -> std::random_access_iterator_tag;
+
+    template <typename ItTag>
+    using iterator_category_converter_t = decltype(iterator_category_converter(std::declval<ItTag>()));
 
   } // namespace detail
 
@@ -523,7 +542,9 @@ namespace mln::core::concepts::stl
       requires {
         typename detail::iterator_category_t<I>;
       } &&
-      DerivedFrom<detail::iterator_category_t<I>, std::input_iterator_tag>;
+      DerivedFrom<
+        detail::iterator_category_converter_t<detail::iterator_category_t<I>>,
+        std::input_iterator_tag>;
 
 
     // OutputIterator
@@ -540,7 +561,9 @@ namespace mln::core::concepts::stl
     template <typename I>
     concept bool ForwardIterator =
       InputIterator<I> &&
-      DerivedFrom<detail::iterator_category_t<I>, std::forward_iterator_tag> &&
+      DerivedFrom<
+        detail::iterator_category_converter_t<detail::iterator_category_t<I>>,
+        std::forward_iterator_tag> &&
       Incrementable<I> &&
       Sentinel<I, I>;
 
@@ -549,7 +572,9 @@ namespace mln::core::concepts::stl
     template <typename I>
     concept bool BidirectionalIterator =
       ForwardIterator<I> &&
-      DerivedFrom<detail::iterator_category_t<I>, std::bidirectional_iterator_tag> &&
+      DerivedFrom<
+        detail::iterator_category_converter_t<detail::iterator_category_t<I>>,
+        std::bidirectional_iterator_tag> &&
       requires(I i) {
         { --i } ->  Same<I>&;
         { i-- } ->  Same<I>&&;
@@ -560,7 +585,9 @@ namespace mln::core::concepts::stl
     template <typename I>
     concept bool RandomAccessIterator =
       BidirectionalIterator<I> &&
-      DerivedFrom<detail::iterator_category_t<I>, std::random_access_iterator_tag> &&
+      DerivedFrom<
+        detail::iterator_category_converter_t<detail::iterator_category_t<I>>,
+        std::random_access_iterator_tag> &&
       StrictTotallyOrdered<I> &&
       SizedSentinel<I, I> &&
       requires(I i, const I j, const detail::difference_type_t<I> n) {
@@ -813,4 +840,4 @@ namespace mln::core::concepts::stl
 
   } // namespace ranges
 
-} // namespace mln::core::concepts::stl
+} // namespace mln::concepts::stl

@@ -1,6 +1,6 @@
-============
-STL Concepts
-============
+=============
+STL (details)
+=============
 
 
 
@@ -9,7 +9,7 @@ STL Concepts
 
 
 
-.. cpp:namespace:: mln::core::concepts::stl
+.. cpp:namespace:: mln::concepts::stl
 
 
 
@@ -263,7 +263,7 @@ InvocableR
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/stl/fundamentals.hpp
        :language: cpp
-       :lines: 359-362
+       :lines: 382-385
 
 
 RegularInvocable
@@ -285,7 +285,7 @@ RegularInvocableR
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/stl/fundamentals.hpp
        :language: cpp
-       :lines: 371-372
+       :lines: 394-395
 
 
 Predicate

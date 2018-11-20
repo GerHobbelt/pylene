@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 
-namespace concepts = mln::core::concepts;
+namespace concepts = mln::concepts;
 
 struct A
 {

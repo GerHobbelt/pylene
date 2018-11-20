@@ -16,7 +16,7 @@ Concepts
 --------
 
 
-.. cpp:namespace:: mln::core::concepts
+.. cpp:namespace:: mln::concepts
 
 
 .. _concept-pixels-Pixel:
@@ -49,8 +49,6 @@ Then we can define :
 .. rubric:: Expressions
 
 Let : 
-    - ``pix`` be an instance of `Pix`.
-    - ``pix_cpy`` be an instance of `Pix`.
     - ``cpix`` be an instance of `const Pix`.
     - ``lhs`` be an instance of `const Pix`.
     - ``rhs`` be an instance of `const Pix`.
@@ -60,29 +58,9 @@ Then we have the following valid expressions :
 +-------------------------+--------------+---------------+----------------+---------------------------------------------------+
 |       Expression        | Return type  | Pre-condition | Post-condition |                    Description                    |
 +=========================+==============+===============+================+===================================================+
-| ``pix()``               | `Pix`        | none          | none           | Constructs a pixel ``pix`` of type `Pix`          |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``cpix()``              | `const Pix`  | none          | none           | Constructs a pixel ``cpix`` of type `Pix`         |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``pix_cpy(pix)``        | `Pix`        | none          | none           | Copy-constructs a pixel ``pix_cpy`` from ``pix``  |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``pix_cpy(cpix)``       | `Pix`        | none          | none           | Copy-constructs a pixel ``pix_cpy`` from ``cpix`` |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``pix_cpy(move(pix))``  | `Pix`        | none          | none           | Move-constructs a pixel ``pix_cpy`` from ``pix``  |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``pix_cpy = pix``       | `Pix&`       | none          | none           | Assign ``pix`` to ``pix_cpy``                     |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``pix_cpy = cpix``      | `Pix&`       | none          | none           | Assign ``cpix`` to ``pix_cpy``                    |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``pix_cpy = move(pix)`` | `Pix&`       | none          | none           | Move-assign ``pix`` to ``pix_cpy``                |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
 | ``lhs == rhs``          | `bool`       | none          | none           | Compare wether two pixels are equal               |
 +-------------------------+--------------+---------------+----------------+---------------------------------------------------+
 | ``lhs != rhs``          | `bool`       | none          | none           | Compare wether two pixels are different           |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``rhs == lhs``          | `bool`       | none          | none           | Compare wether two pixels are equal               |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``rhs != lhs``          | `bool`       | none          | none           | Compare wether two pixels are different           |
 +-------------------------+--------------+---------------+----------------+---------------------------------------------------+
 | ``cpix.value()``        | `reference`  | none          | none           | Access the value of the pixel ``pix``             |
 +-------------------------+--------------+---------------+----------------+---------------------------------------------------+
@@ -96,7 +74,7 @@ If the `value_type` is constant then the value returned by `value()` (which retu
 
 
 
-Predefined points
+Predefined pixels
 -----------------
 
 .. toctree::

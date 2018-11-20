@@ -2,7 +2,7 @@
 
 #include <mln/core/concept/new/stl/fundamentals.hpp>
 
-namespace mln::core::concepts
+namespace mln::concepts
 {
 
   // clang-format off
@@ -27,4 +27,4 @@ namespace mln::core::concepts
 
   // clang-format on
 
-} // namespace mln::core::concepts
+} // namespace mln::concepts

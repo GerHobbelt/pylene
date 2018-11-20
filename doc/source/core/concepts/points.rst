@@ -8,7 +8,7 @@ Points (details)
 
 
 
-.. cpp:namespace:: mln::core::concepts
+.. cpp:namespace:: mln::concepts
 
 
 Point

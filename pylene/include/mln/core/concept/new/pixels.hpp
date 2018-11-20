@@ -7,7 +7,7 @@
 
 #include <type_traits>
 
-namespace mln::core::concepts
+namespace mln::concepts
 {
 
   // clang-format off
@@ -32,4 +32,4 @@ namespace mln::core::concepts
 
   // clang-format on
 
-} // namespace mln::core::concepts
+} // namespace mln::concepts

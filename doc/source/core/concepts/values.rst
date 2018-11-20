@@ -8,7 +8,7 @@ Values (detail)
 
 
 
-.. cpp:namespace:: mln::core::concepts
+.. cpp:namespace:: mln::concepts
 
 
 Value

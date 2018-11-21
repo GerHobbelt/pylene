@@ -27,7 +27,7 @@ namespace mln::ranges
   private:
     friend ::ranges::range_access;
 
-    ::ranges::semiregular_t<Fun> f_;
+    ::ranges::semiregular_t<Fun> fun_;
     std::tuple<Rngs...>          rngs_;
 
     struct cursor;
@@ -63,8 +63,8 @@ namespace mln::ranges
 
       auto read() const
       {
-        auto f = [this](const auto&... it) { return this->fun_(*it...); };
-        return std::apply(f, begins_);
+        auto fun = [this](const auto&... it) { return this->fun_(*it...); };
+        return std::apply(fun, begins_);
       }
 
       bool equal(const sentinel& s) const
@@ -83,10 +83,10 @@ namespace mln::ranges
 
     cursor begin_cursor()
     {
-      auto f = [this](auto&&... args) {
-        return cursor(this->f_, ::ranges::begin(std::forward<decltype(args)>(args))...);
+      auto fun = [this](auto&&... args) {
+        return cursor(this->fun_, ::ranges::begin(std::forward<decltype(args)>(args))...);
       };
-      return std::apply(f, rngs_);
+      return std::apply(fun, rngs_);
     }
     sentinel end_cursor()
     {
@@ -95,26 +95,26 @@ namespace mln::ranges
     }
     cursor begin_cursor() const
     {
-      auto f = [this](auto&&... args) {
-        return cursor(this->f_, ::ranges::begin(std::forward<decltype(args)>(args))...);
+      auto fun = [this](auto&&... args) {
+        return cursor(this->fun_, ::ranges::begin(std::forward<decltype(args)>(args))...);
       };
-      return std::apply(f, rngs_);
+      return std::apply(fun, rngs_);
     }
     sentinel end_cursor() const
     {
-      auto f = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
-      return std::apply(f, rngs_);
+      auto fun = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
+      return std::apply(fun, rngs_);
     }
 
   public:
     zip_with_view() = default;
     explicit zip_with_view(Rngs... rngs)
-      : f_(Fun{})
+      : fun_(Fun{})
       , rngs_(std::move(rngs)...)
     {
     }
     explicit zip_with_view(Fun f, Rngs... rngs)
-      : f_(std::move(f))
+      : fun_(std::move(f))
       , rngs_(std::move(rngs)...)
     {
     }
@@ -163,7 +163,7 @@ namespace mln::ranges
   auto zip_with_view<Fun, Rngs...>::rows() const
   {
     // Zip function for rows
-    auto row_zipper = [fun = this->f_](auto&&... rows) {
+    auto row_zipper = [fun = this->fun_](auto&&... rows) {
       return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
     };
 

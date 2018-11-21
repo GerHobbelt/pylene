@@ -5,8 +5,7 @@ Include :file:`<mln/core/ranges/view/zip.hpp>`
 
 .. cpp:namespace:: mln::ranges
 
-.. cpp:function:: \
-   auto view::zip(Ranges... rngs)
+.. cpp:function:: auto view::zip(Ranges... rngs)
 
    :param rngs: Input ranges
 
@@ -23,22 +22,29 @@ Include :file:`<mln/core/ranges/view/zip.hpp>`
    Bidirectional  X          
    Random Access  X          
    Contiguous     X          
+   Writable       X          X
    =============  =========  ================
 
-   **Examples**::
 
-     mln::box2d box1 = {{0,0}, {2,3}};
-     mln::box2d box2 = {{1,1}, {3,4}};
-     mln_foreach(auto [p1, p2], ranges::view::zip(box1, box2))
-       std::cout << "[" << p1 << ", " << p2 << "]\n";
+   **Examples**
 
-   Outputs:
+    * Browse 2 set of coordinates at the same time:
+       
+       .. code-block:: cpp
 
-   .. code-block:: text
+          mln::box2d box1 = {{0,0}, {2,3}};
+          mln::box2d box2 = {{1,1}, {3,4}};
+          mln_foreach(auto [p1, p2], ranges::view::zip(box1, box2))
+            std::cout << "[" << p1 << ", " << p2 << "]\n";
 
-     [(0,0), (1,1)]
-     [(0,1), (1,2)]
-     [(0,2), (1,3)]
-     [(1,0), (2,1)]
-     [(1,1), (2,2)]
-     [(1,2), (2,3)]
+
+       Outputs:
+
+          .. code-block:: text
+
+             [(0,0), (1,1)]
+             [(0,1), (1,2)]
+             [(0,2), (1,3)]
+             [(1,0), (2,1)]
+             [(1,1), (2,2)]
+             [(1,2), (2,3)]

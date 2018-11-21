@@ -11,6 +11,7 @@ Core Module
    core/points
    core/pixels
    core/domains
+   core/indexes
    core/ranges
    core/neighborhood
    core/algorithms
@@ -53,7 +54,7 @@ Core Module
          <h2>Points</h2>
 
 
-:doc:`core/points` are the fundamentals tools for locating a value inside an images.
+:doc:`core/points` are the fundamentals tools to locate a value inside an images.
 
 
 .. topic:: Concepts
@@ -103,6 +104,21 @@ Core Module
 
    * :doc:`core/domains/box2d`
    * :doc:`core/domains/box3d`
+
+
+
+
+.. raw:: html
+
+         <h2>Indexes</h2>
+
+
+:doc:`core/indexes` are the lowest level tools to locate a value inside an images.
+
+
+.. topic:: Concepts
+
+   * :ref:`Index <concept-indexes-Index>`
 
 
 

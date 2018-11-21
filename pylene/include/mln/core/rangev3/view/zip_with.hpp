@@ -133,7 +133,7 @@ namespace mln::ranges
       using Concept = ::meta::and_<::meta::and_<::ranges::InputRange<Rngs>...>, ::ranges::CopyConstructible<Fun>,
                                    ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rngs>&&...>>;
 
-      template <typename... Rngs, typename Fun /*, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())*/>
+      template <typename... Rngs, typename Fun, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())>
       auto operator()(Fun fun, Rngs&&... rngs) const
       {
         return zip_with_view<Fun, ::ranges::view::all_t<Rngs>...>{std::move(fun),

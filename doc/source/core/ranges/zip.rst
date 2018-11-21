@@ -18,7 +18,7 @@ Include :file:`<mln/core/ranges/view/zip.hpp>`
    =============  =========  ================
    Segmented      X          X
    Forward        X          X
-   Reversible     X          
+   Reversible     X          X
    Bidirectional  X          
    Random Access  X          
    Contiguous     X          

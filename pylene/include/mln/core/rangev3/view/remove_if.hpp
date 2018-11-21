@@ -2,9 +2,13 @@
 #pragma once
 
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <mln/core/rangev3/private/reversible_range.hpp>
+
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
+
 #include <mln/core/utils/blank.hpp>
+
 #include <range/v3/view/remove_if.hpp>
 
 namespace mln::ranges
@@ -51,7 +55,7 @@ namespace mln::ranges
       return view::transform(this->base().rows(), f);
     }
 
-    template <class U = void, class = std::enable_if_t<has_reverse_method_v<Rng>, U>>
+    template <class U = void, class = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
     {
       return remove_if_view<decltype(this->base().reversed()), Pred>(this->base().reversed(), this->get_pred());

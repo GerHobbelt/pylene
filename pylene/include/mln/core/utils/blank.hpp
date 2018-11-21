@@ -7,4 +7,4 @@ namespace mln::details
   struct blank
   {
   };
-}
+} // namespace mln::details

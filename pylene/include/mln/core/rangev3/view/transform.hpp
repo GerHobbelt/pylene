@@ -13,12 +13,15 @@
 
 #pragma once
 
-#include <range/v3/view/all.hpp>
-#include <range/v3/view/transform.hpp>
 
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <mln/core/rangev3/private/reversible_range.hpp>
+
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/utils/blank.hpp>
+
+#include <range/v3/view/all.hpp>
+#include <range/v3/view/transform.hpp>
 
 namespace mln::ranges
 {
@@ -59,7 +62,7 @@ namespace mln::ranges
                                        [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
     }
 
-    template <class U = int, class = std::enable_if_t<has_reverse_method_v<Rng>, U>>
+    template <class U = int, class = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
     {
       return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), fun());

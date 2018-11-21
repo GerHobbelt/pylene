@@ -3,12 +3,12 @@
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
+#include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/utils/blank.hpp>
 
 #include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/range_concepts.hpp>
 #include <range/v3/view/all.hpp>
-#include <range/v3/view/zip.hpp>
 #include <range/v3/view_facade.hpp>
 
 #include <iterator>
@@ -121,6 +121,8 @@ namespace mln::ranges
 
     template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
     auto rows() const;
+
+    auto reversed() const;
   };
 
   namespace view
@@ -131,7 +133,7 @@ namespace mln::ranges
       using Concept = ::meta::and_<::meta::and_<::ranges::InputRange<Rngs>...>, ::ranges::CopyConstructible<Fun>,
                                    ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rngs>&&...>>;
 
-      template <typename... Rngs, typename Fun, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())>
+      template <typename... Rngs, typename Fun /*, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())*/>
       auto operator()(Fun fun, Rngs&&... rngs) const
       {
         return zip_with_view<Fun, ::ranges::view::all_t<Rngs>...>{std::move(fun),
@@ -167,8 +169,20 @@ namespace mln::ranges
       return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
     };
 
-    // Apply row-zipper on each range
+    // Apply row-zipper on each range after segmentation
     return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
+  }
+
+
+  template <typename Fun, typename... Rngs>
+  auto zip_with_view<Fun, Rngs...>::reversed() const
+  {
+    auto reverse_row_zipper = [fun = this->fun_](auto&&... rows) {
+      return view::zip_with(fun, view::reverse(std::forward<decltype(rows)>(rows))...);
+    };
+
+    // Apply reverse-row-zipper on each range
+    return std::apply(reverse_row_zipper, rngs_);
   }
 
 } // namespace mln::ranges

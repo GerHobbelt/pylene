@@ -20,6 +20,7 @@ namespace mln::ranges
   template <class R, typename = std::enable_if_t<!is_multidimensional_range_v<std::remove_reference_t<R>>>>
   auto rows(R&& rng)
   {
+    static_assert(::ranges::Range<R>(), "The input is not a range.");
     return ::ranges::single_view(std::forward<R>(rng));
   }
 }

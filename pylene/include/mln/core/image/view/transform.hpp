@@ -159,12 +159,6 @@ namespace mln
     using ch_value_type = ch_value_t<I1, V>;
     /// \}
 
-  private:
-    // FIXME may be a simpler way ?
-    // note that pixels() can return a proxy convertible to the pixel_type ? Or does it?
-    // using pixel_range_base_type = decltype(std::declval<I&>.pixels());
-    // using pixel_proxy_base_type = ::ranges::range_value_t<pixel_proxy_base_type>;
-
   public:
     /// Pixel type definitions
     /// \{
@@ -202,6 +196,7 @@ namespace mln
     };
     /// \}
 
+    transform2_view() = default;
 
     transform2_view(I1 ima1, I2 ima2, F fun)
       : m_ima1{std::move(ima1)}
@@ -217,6 +212,8 @@ namespace mln
     {
       return imchvalue<U>(this->base());
     }
+
+    auto domain() const { return m_ima1.domain(); }
 
     auto new_values() { return mln::ranges::view::transform(m_ima1.new_values(), m_ima2.new_values(), f); }
 
@@ -247,7 +244,8 @@ namespace mln
     template <typename dummy = new_pixel_type>
     std::enable_if_t<accessible::value, dummy> new_pixel(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
+      mln_precondition(m_ima1.domain().has(p));
+      mln_precondition(m_ima2.domain().has(p));
       return {f, m_ima1.new_pixel(p), m_ima2.new_pixel(p) };
     }
 

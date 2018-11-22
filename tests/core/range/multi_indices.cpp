@@ -46,6 +46,7 @@ public:
   using range_type = mln::ranges::multi_indices<Rank, T>;
 
   static_assert(Rank == 1 || mln::ranges::is_multidimensional_range<range_type>::value);
+  static_assert(::ranges::Range<range_type>());
 
   MultiIndicesTest()
   {

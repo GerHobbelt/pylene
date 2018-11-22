@@ -131,6 +131,14 @@ namespace mln::ranges
         void __reset_to_begin(std::size_t k) { m_x[k] = m_from[k]; }
         void __reset_to_rbegin(std::size_t k) { m_x[k] = m_to[k]; }
 
+        bool __equal(const cursor& other) const
+        {
+          for (std::size_t k = 0; k < Rank; ++k)
+            if (m_x[k] != other.m_x[k])
+              return false;
+          return true;
+        }
+
         cursor() = default;
         cursor(const multi_indices_facade& sp, bool forward = true) : m_from(sp.__from()), m_to(sp.__to())
         {

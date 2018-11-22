@@ -79,6 +79,8 @@ namespace mln::ranges
         m_i[k] = 0;
       }
 
+      bool __equal(const cursor& other) const { return m_ptr.back() == other.m_ptr.back(); }
+
       cursor() = default;
       cursor(const multi_span& sp, bool forward = true) : m_count(sp.m_count), m_stride(sp.m_stride)
       {

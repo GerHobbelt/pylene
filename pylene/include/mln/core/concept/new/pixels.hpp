@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/stl/fundamentals.hpp>
+#include <mln/core/concept/new/cmcstl2.hpp>
 
 #include <mln/core/concept/new/points.hpp>
 #include <mln/core/concept/new/values.hpp>

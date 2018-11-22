@@ -61,6 +61,8 @@ namespace mln::ranges
       {
       }
 
+      // See https://github.com/ericniebler/stl2/issues/381#issuecomment-285908567
+      // why we can't use std::pair/tuple (the const-ness of operator= is in cause)
       auto read() const
       {
         auto f = [this](const auto&... it) { return this->fun_(*it...); };
@@ -75,10 +77,12 @@ namespace mln::ranges
         // }));
       }
 
+      bool equal(const cursor& other) const { return std::get<0>(begins_) == std::get<0>(other.begins_); }
+
       void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      }
+      } 
     };
 
     cursor begin_cursor()

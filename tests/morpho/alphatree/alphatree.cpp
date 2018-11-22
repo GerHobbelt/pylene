@@ -12,6 +12,8 @@
 
 #include <gtest/gtest.h>
 
+#define MLN_IMG_PATH "../../img"
+
 /*
 TEST(Morpho, AlphaTree)
 {
@@ -42,13 +44,13 @@ TEST(Morpho, AlphaTree_2)
 {
   using namespace mln;
   typedef uint8 V;
-  image2d<V> ima;
+  image2d<V>    ima;
 
   io::imread(MLN_IMG_PATH "fly.pgm", ima);
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-  tree_t tree;
-  property_map<tree_t, int> vmap;
+  tree_t                                                      tree;
+  property_map<tree_t, int>                                   vmap;
 
   std::tie(tree, vmap) = morpho::alphatree_indexes(ima, c4);
 

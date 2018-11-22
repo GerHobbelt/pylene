@@ -8,10 +8,11 @@ unsigned threshold1_bis(const mln::image2d<mln::uint8>& f, mln::uint8 v);
 unsigned threshold2(const mln::image2d<mln::uint8>& f, mln::uint8 v);
 unsigned threshold3(const mln::image2d<mln::uint8>& f, mln::uint8 v);
 unsigned threshold4(const mln::image2d<mln::uint8>& f, mln::uint8 v);
-void threshold5(const mln::image2d<mln::uint8>& f, mln::image2d<bool>& out, mln::uint8 v);
-void threshold6(const mln::image2d<mln::uint8>& f, mln::image2d<bool>& out, mln::uint8 v);
+void     threshold5(const mln::image2d<mln::uint8>& f, mln::image2d<bool>& out, mln::uint8 v);
+void     threshold6(const mln::image2d<mln::uint8>& f, mln::image2d<bool>& out, mln::uint8 v);
 
 using namespace mln;
+#define MLN_IMG_PATH "../../img"
 
 struct BMMorphers : public benchmark::Fixture
 {
@@ -29,7 +30,7 @@ struct BMMorphers : public benchmark::Fixture
 protected:
   void Do_0(benchmark::State& st, unsigned (*func)(const image2d<mln::uint8>&, mln::uint8))
   {
-    auto input = eval(red(m_input));
+    auto     input = eval(red(m_input));
     unsigned count;
     while (st.KeepRunning())
       count = func(input, 128);
@@ -50,7 +51,7 @@ protected:
 private:
   image2d<rgb8> m_input;
   image2d<bool> m_output;
-  std::size_t m_bytes;
+  std::size_t   m_bytes;
 };
 
 BENCHMARK_F(BMMorphers, Threshold_Count_CStyle_Uint8)(benchmark::State& st)

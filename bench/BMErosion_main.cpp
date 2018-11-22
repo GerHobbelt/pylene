@@ -25,7 +25,7 @@ struct BMErosion : public benchmark::Fixture
 
   image2d<uint8> m_input;
   image2d<uint8> m_output;
-  std::size_t m_bytes;
+  std::size_t    m_bytes;
 };
 
 BENCHMARK_F(BMErosion, Erosion_CStyle_Uint8)(benchmark::State& st)

@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#define MLN_IMG_PATH "../../img"
+
 TEST(Morpho, saturate)
 {
 

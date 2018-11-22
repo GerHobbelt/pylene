@@ -10,14 +10,14 @@
 #include <mln/morpho/structural/dilate.hpp>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 class BMDilation : public benchmark::Fixture
 {
 public:
   BMDilation()
   {
-    io::imread(MLN_IMG_PATH "/lena.pgm", m_input);
+    io::imread(MLN_IMG_PATH "lena.pgm", m_input);
     int nr = m_input.nrows();
     int nc = m_input.ncols();
     resize(m_output, m_input);

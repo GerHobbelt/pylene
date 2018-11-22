@@ -8,10 +8,11 @@
 #include "BMErosion.hpp"
 
 using namespace mln;
+#define MLN_IMG_PATH "../../img/"
 
 struct BMErosion : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "/lena.pgm";
+  const char* filename = MLN_IMG_PATH "lena.pgm";
 
   BMErosion()
   {

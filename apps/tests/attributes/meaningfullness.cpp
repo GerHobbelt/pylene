@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 TEST(TOS, meaningfullness_app)
 {
@@ -17,7 +17,7 @@ TEST(TOS, meaningfullness_app)
 
   image2d<uint8> ima;
 
-  io::imread(MLN_IMG_PATH "/squares.pgm", ima);
+  io::imread(MLN_IMG_PATH "squares.pgm", ima);
 
   typedef UInt<9>       V;
   image2d<V>            K;

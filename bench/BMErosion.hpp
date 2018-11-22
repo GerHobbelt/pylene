@@ -1,7 +1,5 @@
 #include <mln/core/image/image2d.hpp>
 
-#define MLN_IMG_PATH "../../img"
-
 void erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out);
 
 void erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out);

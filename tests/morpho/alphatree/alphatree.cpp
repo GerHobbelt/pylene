@@ -12,7 +12,7 @@
 
 #include <gtest/gtest.h>
 
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 /*
 TEST(Morpho, AlphaTree)
@@ -45,6 +45,7 @@ TEST(Morpho, AlphaTree_2)
   using namespace mln;
   typedef uint8 V;
   image2d<V>    ima;
+
 
   io::imread(MLN_IMG_PATH "fly.pgm", ima);
 

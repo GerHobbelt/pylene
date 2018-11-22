@@ -13,7 +13,6 @@
 #include <benchmark/benchmark.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
 
 long bench_pixter_0(const image2d<int>& ima)
 {

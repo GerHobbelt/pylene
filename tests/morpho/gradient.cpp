@@ -11,7 +11,7 @@
 
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 TEST(Morpho, gradient_gradient_0)
 {

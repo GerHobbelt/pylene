@@ -5,7 +5,6 @@
 #include <mln/core/utils/ptroffset.hpp>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
 
 // Threshold A la C
 unsigned threshold1(const image2d<uint8>& f, uint8 v)

@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
 {

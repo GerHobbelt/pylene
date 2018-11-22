@@ -12,11 +12,11 @@ void     threshold5(const mln::image2d<mln::uint8>& f, mln::image2d<bool>& out, 
 void     threshold6(const mln::image2d<mln::uint8>& f, mln::image2d<bool>& out, mln::uint8 v);
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 struct BMMorphers : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "/lena.ppm";
+  const char* filename = MLN_IMG_PATH "lena.ppm";
 
   BMMorphers()
   {

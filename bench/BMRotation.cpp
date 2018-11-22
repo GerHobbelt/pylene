@@ -9,11 +9,11 @@
 #include <benchmark/benchmark.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img"
+#define MLN_IMG_PATH "../../img/"
 
 struct BMRotation : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "/lena.ppm";
+  const char* filename = MLN_IMG_PATH "lena.ppm";
 
   BMRotation()
   {

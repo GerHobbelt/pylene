@@ -26,6 +26,7 @@ namespace mln
     using value_type = std::tuple<image_value_t<Images>...>;
     using point_type = image_point_t<I0>;
     using concrete_type  = ch_value_t<I0, value_type>;
+    using domain_type = typename I0::domain_type;
 
     template <class V>
     using ch_value_type = ch_value_t<I0, V>;

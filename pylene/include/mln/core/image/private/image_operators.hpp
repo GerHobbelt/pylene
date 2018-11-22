@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/view/zip.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <functional>
 
@@ -58,8 +59,8 @@ namespace mln
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_neq,   std::not_equal_to<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lt,    std::less<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gt,    std::greater<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lte,   std::less_equal<>());
-  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_gte,   std::greater_equal<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_le,    std::less_equal<>());
+  MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_ge,    std::greater_equal<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_land,  std::logical_and<>());
   MLN_PRIVATE_DEFINE_BINARY_OPERATOR(new_lor,   std::logical_or<>());
 
@@ -82,12 +83,11 @@ namespace mln
     {
       auto operator() (const ICond& cond, ITrue iftrue, IFalse iffalse) const
       {
-        auto g = [](bool vcond, auto&& vtrue, auto&& vfalse) -> decltype(auto) {
-          return (vcond) ? std::forward<decltype(vtrue)>(vtrue) : std::forward<decltype(vfalse)>(vfalse);
+        auto g = [](auto tuple_ternary_expr) -> decltype(auto) {
+          return (std::get<0>(tuple_ternary_expr)) ? std::get<1>(tuple_ternary_expr) : std::get<2>(tuple_ternary_expr);
         };
 
-        // FIXME: to be implemented with imzip
-        return;
+        return view::transform(view::zip(cond, iftrue, iffalse), g);
       }
     };
 
@@ -130,7 +130,7 @@ namespace mln
   }
 
   template <class ICond, class ITrue, class IFalse>
-  auto where(const New_Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  auto new_where(const New_Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
   {
     return details::where_fn<ICond, ITrue, IFalse>() (static_cast<const ICond&>(cond), std::move(iftrue), std::move(iffalse));
   }

@@ -122,7 +122,7 @@ namespace mln
     }
 
     template <typename dummy = I>
-    std::enable_if_t<indexable::value, reference> operator[](typename dummy::size_type i)
+    reference operator[](typename dummy::size_type i)
     {
       return std::invoke(f, this->base()[i]);
     }

@@ -119,7 +119,7 @@ namespace mln
     /// Indexable-image related methods
     /// \{
     template <typename dummy = I>
-    std::enable_if_t<indexable::value, reference> operator[](typename dummy::size_type i)
+    reference operator[](typename dummy::size_type i)
     {
       return m_ima[i];
     }
@@ -137,7 +137,7 @@ namespace mln
     }
 
     template <typename dummy = I>
-    std::enable_if_t<indexable::value, point_type> point_at_index(typename dummy::size_type i) const
+    reference point_at_index(typename dummy::size_type i) const
     {
       return m_ima.point_at_index(i);
     }

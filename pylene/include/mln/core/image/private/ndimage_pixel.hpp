@@ -163,6 +163,11 @@ namespace mln::details
       bool __is_at_end(std::size_t k) const { return this->m_point[k] == this->m_info->to[k]; }
       bool __is_at_rend(std::size_t k) const { return this->m_point[k] == this->m_info->from[k] - 1; }
 
+      bool __equal(const cursor& other) const
+      {
+        return this->m_lineptr == other.m_lineptr && this->m_point.back() == other.m_point.back();
+      }
+
       cursor() = default;
       cursor(const ndpix_range& r, bool forward = true)
       {

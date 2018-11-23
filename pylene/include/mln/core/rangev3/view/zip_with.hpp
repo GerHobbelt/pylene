@@ -61,6 +61,8 @@ namespace mln::ranges
       {
       }
 
+      // See https://github.com/ericniebler/stl2/issues/381#issuecomment-285908567
+      // why we can't use std::pair/tuple (the const-ness of operator= is in cause)
       auto read() const
       {
         auto fun = [this](const auto&... it) { return this->fun_(*it...); };
@@ -74,6 +76,8 @@ namespace mln::ranges
         //   return std::forward<decltype(lhs)>(lhs) == std::forward<decltype(rhs)>(rhs);
         // }));
       }
+
+      bool equal(const cursor& other) const { return std::get<0>(begins_) == std::get<0>(other.begins_); }
 
       void next()
       {

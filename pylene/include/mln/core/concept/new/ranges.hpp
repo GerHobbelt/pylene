@@ -13,17 +13,17 @@ namespace mln::concepts
   // SegmentedRange
   template<typename Rng>
   concept bool SegmentedRange = 
-    stl::Range<Rng> &&
+    stl::ForwardRange<Rng> &&
     std::is_base_of_v<mln::ranges::multidimensional_range_base, Rng> &&
     requires(const Rng crng) {
-        { crng.rows() } -> stl::Range&&;
+        { crng.rows() } -> stl::ForwardRange&&;
     };
 
 
   // ReversibleRange
   template<typename Rng>
   concept bool ReversibleRange = 
-    stl::Range<Rng> &&
+    stl::ForwardRange<Rng> &&
     requires(const Rng crng) {
         { crng.reversed() } -> stl::Range&&;
     };

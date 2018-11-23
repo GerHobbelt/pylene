@@ -43,7 +43,7 @@ TEST(Core, Image2d_LValueOperator)
   using namespace mln;
   image2d<rgb> ima(5, 5);
 
-  rgb zero = {0, 0, 0};
+  rgb zero  = {0, 0, 0};
   rgb douze = {12, 0, 0};
   fill(ima, zero);
 
@@ -74,7 +74,7 @@ TEST(Core, Image2d_MixedOperator)
 {
   using namespace mln;
 
-  image2d<char> x(5, 5);
+  image2d<char>  x(5, 5);
   image2d<short> y(5, 5);
 
   iota(x, 0);
@@ -141,7 +141,7 @@ TEST(Core, BinaryOperators_MixedTypes)
 
   image2d<uint8_t>  ima1 = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint16_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
-  image2d<uint16_t> ref = {{2, 4, 6}, {8, 10, 12}};
+  image2d<uint16_t> ref  = {{2, 4, 6}, {8, 10, 12}};
 
   auto g1 = new_plus(ima1, ima2);
   auto g2 = new_multiplies(uint16_t(2), ima1);
@@ -168,23 +168,20 @@ TEST(Core, Where)
   image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> y = {{4, 5, 6}, {1, 2, 3}};
 
-  auto f1 = where(x > 3, x, uint8_t(12)); // RValue image + LValue image + scalar
-  // auto f2 = where(x > 3, x, y);               // RValue image + LValue image + LValue image
-  auto f3 = where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
-  auto f4 = where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
-
+  auto f1 = new_where(new_gt(x, 3), x, uint8_t(12));       // RValue image + LValue image + scalar
+  auto f2 = new_where(new_gt(x, 3), x, y);                 // RValue image + LValue image + LValue image
+  auto f3 = new_where(new_gt(x, 3), uint8_t(12), x);       // RValue image + Scalar + LValue image
+  auto f4 = new_where(new_gt(x, 3), uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
 
   // FIXME: Use concept checking
 
-  //image_reference_t<decltype(f4)> val = "aze";
+  static_assert(std::is_same<image_reference_t<decltype(f1)>, uint8_t>());
+  static_assert(std::is_same<image_reference_t<decltype(f2)>, uint8_t&>());
+  static_assert(std::is_same<image_reference_t<decltype(f3)>, uint8_t>());
+  static_assert(std::is_same<image_reference_t<decltype(f4)>, uint8_t>());
 
-  //static_assert(std::is_same<image_reference_t<decltype(f4)>, uint8_t&>());
-  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f1)>, const uint8_t&>()));
-  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f3)>, const uint8_t&>()));
-  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f4)>, uint8_t&>()));
+  // FIXME: doesn't compile
 
-  // ASSERT_TRUE(all(f1 >= 12));
-  // ASSERT_TRUE((std::is_same<mln_reference(decltype(f1)), const uint8&>()));
-  // ASSERT_TRUE((std::is_same<mln_reference(decltype(f2)), uint8&>()));
-
+  // fill(f2, 0);
+  // ASSERT_TRUE(new_all(new_le(f2, 3)));
 }

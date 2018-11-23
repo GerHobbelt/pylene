@@ -50,7 +50,11 @@ TEST(Core, zip_container)
   std::vector<int> a   = {0, 1, 2, 3, 4};
   std::vector<int> b   = {0, 0, 0, 0, 0};
 
-  for (auto [vin, vout] : mln::ranges::view::zip(a, b))
+  auto rng = mln::ranges::view::zip(a, b);
+  static_assert(::ranges::ForwardRange<decltype(rng)>());
+  static_assert(::ranges::OutputRange<decltype(rng), std::tuple<int, int>>());
+
+  for (auto [vin, vout] : rng)
     vout = vin;
 
   EXPECT_EQ(ref, a);
@@ -70,8 +74,12 @@ TEST(Core, zip_view_readonly)
       {2, 0}, {2, 1}, {2, 2}  //
   };
 
+
+  auto rng = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
+  static_assert(::ranges::ForwardRange<decltype(rng)>());
+
   auto refv = std::begin(ref);
-  for (auto [v1, v2, v3] : mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2))
+  for (auto [v1, v2, v3] : rng)
   {
     ASSERT_EQ(*refv, v1);
     ASSERT_EQ((*refv + mln::point2d{1, 2}), v2);
@@ -93,6 +101,10 @@ TEST(Core, zip_view_readonly_rowwise)
 
   auto       refv        = std::begin(ref);
   const auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
+
+  // Concept check
+  static_assert(::ranges::ForwardRange<decltype(zipped_rows)>());
+
   for (auto&& row : zipped_rows.rows())
   {
     for (auto [v1, v2, v3] : row)
@@ -115,6 +127,10 @@ TEST(Core, zip_view_write)
 
   mln::box2d ind0 = {{1, 1}, {3, 4}};
   auto       z    = mln::ranges::view::zip(sp1, sp2, ind0);
+
+  // Concept check
+  static_assert(::ranges::ForwardRange<decltype(z)>());
+
   for (auto [x, y, p] : z)
   {
     x    = p[0]; // By ref
@@ -139,6 +155,9 @@ TEST(Core, zip_view_write_rowwise)
 
   mln::box2d ind0 = {{1, 1}, {3, 4}};
   auto       z    = mln::ranges::view::zip(sp1, sp2, ind0);
+
+  static_assert(::ranges::ForwardRange<decltype(z)>());
+
   for (auto&& r : z.rows())
   {
     for (auto [x, y, p] : r)
@@ -163,8 +182,11 @@ TEST(Core, zip_segmented_and_nonsegmented)
       {0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2},
   };
 
+  auto z = mln::ranges::view::zip(ref, multi_ind0);
+  static_assert(::ranges::ForwardRange<decltype(z)>());
 
-  for (auto [v1, v2] : mln::ranges::view::zip(ref, multi_ind0))
+
+  for (auto [v1, v2] : z)
     ASSERT_EQ(v1, v2);
 }
 
@@ -179,8 +201,10 @@ TEST(Core, zip_segmented_and_nonsegmented_rowwise)
   };
 
 
-  auto zipped = mln::ranges::view::zip(ref, multi_ind0);
-  for (auto&& row : mln::ranges::rows(zipped))
+  auto z = mln::ranges::view::zip(ref, multi_ind0);
+  static_assert(::ranges::ForwardRange<decltype(z)>());
+
+  for (auto&& row : mln::ranges::rows(z))
     for (auto [v1, v2] : row)
       ASSERT_EQ(v1, v2);
 }

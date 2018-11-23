@@ -2,6 +2,10 @@
 #define MLN_CORE_ALGORITHM_IMFILL_HPP
 
 #include <mln/core/image/image.hpp>
+#include <mln/core/rangev3/rows.hpp>
+
+#include <range/v3/algorithm/fill.hpp>
+#include <algorithm>
 
 namespace mln
 {
@@ -25,6 +29,10 @@ namespace mln
   /// \ingroup Algorithms
   template <typename OutputImage, typename Value>
   OutputImage&& fill(Image<OutputImage>&& output, const Value& val);
+
+
+  template <class I, class Value>
+  std::enable_if_t<!is_a<I, Image>::value> fill(const New_Image<I>& f, const Value& v);
 
   /******************************************/
   /****          Implementation          ****/
@@ -55,6 +63,18 @@ namespace mln
     impl::fill(output, val);
     return output;
   }
+
+
+  template <class I, class Value>
+  std::enable_if_t<!is_a<I, Image>::value>
+  fill(const New_Image<I>& f_, const Value& v)
+  {
+    I f = static_cast<const I&>(f_);
+
+    for (auto row : ranges::rows(f.new_values()))
+      ::ranges::fill(row, v);
+  }
+
 
 } // end of namespace mln
 

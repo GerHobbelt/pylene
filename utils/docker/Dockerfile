@@ -12,7 +12,8 @@ RUN pacman -Sy --noconfirm \
     make \
     mpfr \
     intel-tbb \
-    qt5-base
+    qt5-base \
+    ninja
 
 # For documentation
 RUN pacman -Sy --noconfirm \

@@ -51,6 +51,8 @@ namespace mln::ranges::details
             return m_cursor.__read_rrow();
         }
 
+        bool equal(const cursor& other) const { return m_cursor.__equal(other.m_cursor); }
+
       public:
         bool __is_at_end(std::size_t k) const
         {
@@ -118,6 +120,7 @@ namespace mln::ranges::details
           return m_cursor.__rread();
       }
 
+      bool equal(const cursor& other) const { return m_cursor.__equal(other.m_cursor); }
 
     public:
       bool __is_at_end(std::size_t k) const

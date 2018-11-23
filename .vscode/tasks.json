@@ -52,8 +52,22 @@
             "problemMatcher": "$gcc"
         },
         {
+            "label": "only-build-check-remote",
+            "type": "shell",
+            "command": "ssh node7 'cd /work/mroynard/lrde/pylene/build-remote && cmake --build . --target check --config Debug -- -j12'",
+            "group": "build",
+            "problemMatcher": "$gcc"
+        },
+        {
             "label": "build-benchmarks-remote-release",
             "dependsOn": "configure-remote-release",
+            "type": "shell",
+            "command": "ssh node7 'cd /work/mroynard/lrde/pylene/build-remote-release && cmake --build . --target benchmarks --config Release -- -j12'",
+            "group": "build",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "only-build-benchmarks-remote-release",
             "type": "shell",
             "command": "ssh node7 'cd /work/mroynard/lrde/pylene/build-remote-release && cmake --build . --target benchmarks --config Release -- -j12'",
             "group": "build",

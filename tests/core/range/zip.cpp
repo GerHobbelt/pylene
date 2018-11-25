@@ -99,8 +99,8 @@ TEST(Core, zip_view_readonly_rowwise)
       {1, 0}, {1, 1}, {1, 2}, //
   };
 
-  auto       refv        = std::begin(ref);
-  const auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
+  auto refv        = std::begin(ref);
+  auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
 
   // Concept check
   static_assert(::ranges::ForwardRange<decltype(zipped_rows)>());

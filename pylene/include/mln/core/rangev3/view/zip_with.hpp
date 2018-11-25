@@ -97,6 +97,9 @@ namespace mln::ranges
       auto f = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
+
+    // Disable const view (do not make sense)
+    /*
     cursor begin_cursor() const
     {
       auto f = [this](auto&&... args) {
@@ -109,6 +112,7 @@ namespace mln::ranges
       auto f = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
+    */
 
   public:
     zip_with_view() = default;

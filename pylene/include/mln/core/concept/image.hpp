@@ -15,6 +15,9 @@ namespace mln
 {
 
   template <typename I>
+  struct New_Image;
+
+  template <typename I>
   struct Image;
   template <typename I>
   struct Image_;
@@ -28,6 +31,12 @@ namespace mln
   struct AccessibleImage;
   template <typename I>
   struct ImageWithExtension;
+
+  template <typename I>
+  struct New_Image
+  {
+  };
+
 
   template <typename I>
   struct Image : Object_<I>

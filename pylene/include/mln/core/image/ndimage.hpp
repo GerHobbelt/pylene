@@ -120,7 +120,8 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   struct ndimage_base
 #ifndef MLN_DOXYGEN
-    : image_base<E, point<short, dim>, T, ndimage_pixel<T, dim, E>, ndimage_pixel<const T, dim, const E>>
+    : image_base<E, point<short, dim>, T, ndimage_pixel<T, dim, E>, ndimage_pixel<const T, dim, const E>>,
+      New_Image<E>
 #endif
   {
   private:
@@ -133,6 +134,15 @@ namespace mln
     friend bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self, const ndimage_base<T2, d, E2>& other);
 
   public:
+    using category = raw_image_tag;
+    using accessible = std::true_type;
+    using indexable = std::true_type;
+    using concrete = std::true_type;
+    using shallow_copy [[deprecated]] = std::true_type;
+    using has_border [[deprecated]] = std::true_type;
+    using extension_category = mln::extension::border_extension_tag;
+    using concrete_type = E;
+
     /// \name Image point/value/pixel types
     /// \{
 
@@ -265,11 +275,11 @@ namespace mln
 
     /// \copydoc image::pixel(const point_type&) const
     [[deprecated]] pixel_type pixel(const point_type& p);
-    //new_pixel_type new_pixel(const point_type& p);
+    new_pixel_type new_pixel(const point_type& p);
 
     /// \copydoc image::pixel(const point_type&) const
     [[deprecated]] const_pixel_type pixel(const point_type& p) const;
-    //new_const_pixel_type new_pixel(const point_type& p) const;
+    new_const_pixel_type new_pixel(const point_type& p) const;
 
     /// \}
 
@@ -767,6 +777,20 @@ namespace mln
     pix.m_point = mln::literal::zero;
     pix.advance(p);
     return pix;
+  }
+
+  template <typename T, unsigned dim, typename E>
+  details::ndpixel<const T, dim> ndimage_base<T, dim, E>::new_pixel(const point_type& p) const
+  {
+    mln_precondition(m_domain.has(p));
+    return this->new_pixel_at(p);
+  }
+
+  template <typename T, unsigned dim, typename E>
+  details::ndpixel<T, dim> ndimage_base<T, dim, E>::new_pixel(const point_type& p)
+  {
+    mln_precondition(m_domain.has(p));
+    return this->new_pixel_at(p);
   }
 
   template <typename T, unsigned dim, typename E>

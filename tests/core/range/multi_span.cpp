@@ -38,6 +38,7 @@ public:
   using range_type = mln::ranges::multi_span<T, Rank>;
 
   static_assert(Rank == 1 || mln::ranges::is_multidimensional_range<range_type>::value);
+  static_assert(::ranges::OutputRange<range_type, const T&>());
 
   MultiSpanTest()
   {

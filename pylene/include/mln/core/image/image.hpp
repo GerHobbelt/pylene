@@ -16,6 +16,8 @@
 #include <mln/core/image/morphers/morpher_base.hpp>
 #include <mln/core/image_base.hpp>
 
+#include <mln/core/image/private/image_traits.hpp>
+
 #include <mln/core/image/image_expr.hpp>
 #include <mln/core/image/image_math_ops.hpp>
 #include <mln/core/image/image_ops.hpp>

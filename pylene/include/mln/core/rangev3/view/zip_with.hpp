@@ -3,12 +3,12 @@
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
+#include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/utils/blank.hpp>
 
 #include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/range_concepts.hpp>
 #include <range/v3/view/all.hpp>
-#include <range/v3/view/zip.hpp>
 #include <range/v3/view_facade.hpp>
 
 #include <iterator>
@@ -27,7 +27,7 @@ namespace mln::ranges
   private:
     friend ::ranges::range_access;
 
-    ::ranges::semiregular_t<Fun> f_;
+    ::ranges::semiregular_t<Fun> fun_;
     std::tuple<Rngs...>          rngs_;
 
     struct cursor;
@@ -61,10 +61,12 @@ namespace mln::ranges
       {
       }
 
+      // See https://github.com/ericniebler/stl2/issues/381#issuecomment-285908567
+      // why we can't use std::pair/tuple (the const-ness of operator= is in cause)
       auto read() const
       {
-        auto f = [this](const auto&... it) { return this->fun_(*it...); };
-        return std::apply(f, begins_);
+        auto fun = [this](const auto&... it) { return this->fun_(*it...); };
+        return std::apply(fun, begins_);
       }
 
       bool equal(const sentinel& s) const
@@ -75,52 +77,60 @@ namespace mln::ranges
         // }));
       }
 
+      bool equal(const cursor& other) const { return std::get<0>(begins_) == std::get<0>(other.begins_); }
+
       void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      }
+      } 
     };
 
     cursor begin_cursor()
     {
-      auto f = [this](auto&&... args) {
-        return cursor(this->f_, ::ranges::begin(std::forward<decltype(args)>(args))...);
+      auto fun = [this](auto&&... args) {
+        return cursor(this->fun_, ::ranges::begin(std::forward<decltype(args)>(args))...);
       };
-      return std::apply(f, rngs_);
+      return std::apply(fun, rngs_);
     }
     sentinel end_cursor()
     {
       auto f = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
+
+    // Disable const view (do not make sense)
+    /*
     cursor begin_cursor() const
     {
-      auto f = [this](auto&&... args) {
-        return cursor(this->f_, ::ranges::begin(std::forward<decltype(args)>(args))...);
+      auto fun = [this](auto&&... args) {
+        return cursor(this->fun_, ::ranges::begin(std::forward<decltype(args)>(args))...);
       };
-      return std::apply(f, rngs_);
+      return std::apply(fun, rngs_);
     }
     sentinel end_cursor() const
     {
-      auto f = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
-      return std::apply(f, rngs_);
+      auto fun = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
+      return std::apply(fun, rngs_);
     }
+    */
 
   public:
     zip_with_view() = default;
     explicit zip_with_view(Rngs... rngs)
-      : f_(Fun{})
+      : fun_(Fun{})
       , rngs_(std::move(rngs)...)
     {
     }
     explicit zip_with_view(Fun f, Rngs... rngs)
-      : f_(std::move(f))
+      : fun_(std::move(f))
       , rngs_(std::move(rngs)...)
     {
     }
 
     template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
     auto rows() const;
+
+    auto reversed() const;
   };
 
   namespace view
@@ -163,12 +173,24 @@ namespace mln::ranges
   auto zip_with_view<Fun, Rngs...>::rows() const
   {
     // Zip function for rows
-    auto row_zipper = [fun = this->f_](auto&&... rows) {
+    auto row_zipper = [fun = this->fun_](auto&&... rows) {
       return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
     };
 
-    // Apply row-zipper on each range
+    // Apply row-zipper on each range after segmentation
     return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
+  }
+
+
+  template <typename Fun, typename... Rngs>
+  auto zip_with_view<Fun, Rngs...>::reversed() const
+  {
+    auto reverse_row_zipper = [fun = this->fun_](auto&&... rows) {
+      return view::zip_with(fun, view::reverse(std::forward<decltype(rows)>(rows))...);
+    };
+
+    // Apply reverse-row-zipper on each range
+    return std::apply(reverse_row_zipper, rngs_);
   }
 
 } // namespace mln::ranges

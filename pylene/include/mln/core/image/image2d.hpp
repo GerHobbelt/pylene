@@ -43,6 +43,9 @@ namespace mln
   public:
     typedef typename base_type::domain_type domain_type;
 
+    template <class V>
+    using ch_value_type = image2d<V>;
+
     using base::base;
 
     // Required because of a MS bug

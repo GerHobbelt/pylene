@@ -16,6 +16,10 @@ add_core_test(${test_prefix}range_filter        range/filter.cpp)
 add_core_test(${test_prefix}range_reverse       range/reverse.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
+# test Views
+add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
+
+
 # test Images
 add_core_test(${test_prefix}image2d             image/image2d.cpp)
 add_core_test(${test_prefix}image2d_iterators   image/image2d_iterators.cpp)
@@ -55,3 +59,14 @@ add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 # test SE
 add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
+
+# test Concepts
+# Add concepts support for gcc > 7.2 with -fconcepts
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
+  add_core_test(${test_prefix}concept_values   concept/values.cpp)
+  add_core_test(${test_prefix}concept_points   concept/points.cpp)
+  add_core_test(${test_prefix}concept_pixels   concept/pixels.cpp)
+  add_core_test(${test_prefix}concept_domains  concept/domains.cpp)
+  add_core_test(${test_prefix}concept_indexes  concept/indexes.cpp)
+  add_core_test(${test_prefix}concept_ranges   concept/ranges.cpp)
+endif()

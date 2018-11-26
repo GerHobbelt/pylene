@@ -19,7 +19,7 @@ Pixel
     #. Refines the :cpp:concept:`Regular (stl) <stl::Regular>` concept.
     #. ``Pix::value_type`` models the :cpp:concept:`Value <Value>` concept, is non-const and is not a reference.
     #. ``Pix::point_type`` models the :cpp:concept:`Point <Point>` concept.
-    #. ``Pix`` provide methods ``value`` and ``point``.
+    #. ``Pix`` provides methods ``value`` and ``point``.
 
     **Notation**
 

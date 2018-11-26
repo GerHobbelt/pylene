@@ -1,9 +1,11 @@
+======
 Ranges
-######
+======
 
 Collections of elements are designed in accordance with the `Range TS
 <https://en.cppreference.com/w/cpp/experimental/ranges>`_.  The library extends those concepts with two concepts and
-helpers functions. Range-related functions, concepts and views are in the namespace ``mln::ranges``
+helpers functions. Range-related functions and views are in the namespace ``mln::ranges`` whereas concepts are in the
+namespace ``mln::concepts``.
 
 
 
@@ -11,18 +13,48 @@ helpers functions. Range-related functions, concepts and views are in the namesp
    :local:
 
 
-.. cpp:namespace:: mln::ranges
-
 Concepts
-********
+--------
 
-Segmented (Multidimensional) Range
-==================================
 
-.. cpp:concept:: template <typename R> SegmentedRange
+.. cpp:namespace:: mln::concepts
 
-    A segmented (multidimentional) range is hierarchical and provides a way to iterate over the last level of the hierarchy.
 
+.. _concept-ranges-SegmentedRange:
+
+SegmentedRange (Multidimensional)
+#################################
+
+Let `SegRng` be a type that models :cpp:concept:`SegmentedRange (details) <SegmentedRange>`.
+
+The `SegRng` also models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+
+.. _concept-ranges-SegmentedRange-types:
+.. rubric:: Types
+
+Let `SegRng` inherit all types defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+
+.. _concept-ranges-SegmentedRange-expressions:
+.. rubric:: Expressions
+
+Let `SegRng` inherit all valid expressions defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+
+Let :
+    - ``crng`` be an instance of `const SegRng`.
+
+Then we have the following valid expressions :
+
++-----------------------------------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
+|                  Expression                   |           Return type            | Pre-condition | Post-condition |                                Description                                |
++===============================================+==================================+===============+================+===========================================================================+
+| ``is_base_of_v<multidimensional_range_base>`` | ``bool``                         | none          | none           | Must return ``true``.                                                     |
++-----------------------------------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
+| ``crng.rows()``                               | ``/* implementation defined */`` | none          | none           | Return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`. |
++-----------------------------------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
+
+.. rubric:: Description
+
+A segmented (multidimentional) range is hierarchical and provides a way to iterate over the last level of the hierarchy.
 
     .. list-table:: Normal range vs hierarchical range traversal. Left: a single range (hence iterator) traverses a
                     non-contiguous range. Right: a hierarchical range, here a range of contiguous range.
@@ -32,38 +64,59 @@ Segmented (Multidimensional) Range
           - .. image:: /figures/core/segmented_rng.svg
                 :width: 99%
 
+Example:
 
-
-    .. rubric:: valid expressions
-
-    - :cpp:expr:`r.rows()`, with return type a range of range of :cpp:expr:`R::value_type`.
-
-
-Example::
-
+.. code-block:: cpp
+    
     for (auto&& row : rng.rows())
-        for (auto v : row)
-            // Usage of v
+      for (auto v : row)
+        // Usage of v
 
 
-Reversible Range
-================
+.. _concept-ranges-ReversibleRange:
 
-.. cpp:concept:: template <typename R> ReversibleRange
+ReversibleRange
+###############
+ 
+Let `RevRng` be a type that models :cpp:concept:`ReversibleRange (details) <ReversibleRange>`.
 
-    A reversible range that can be traversed forward and backward. This is not
-    as strict as :cpp:concept:`BidirectionalRange` that requires bidirectional
-    iterators).
+The `RevRng` also models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
 
-    .. rubric:: valid expression
+.. _concept-ranges-ReversibleRange-types:
+.. rubric:: Types
 
-    - :cpp:expr:`mln::ranges::view::reverse(r)` where ``r`` is a :cpp:concept:`ReversibleRange`.
+Let `RevRng` inherit all types defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+
+.. _concept-ranges-ReversibleRange-expressions:
+.. rubric:: Expressions
+
+Let `RevRng` inherit all valid expressions defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+
+Let :
+    - ``crng`` be an instance of `const RevRng`.
+
+Then we have the following valid expressions :
+
++---------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
+|     Expression      |           Return type            | Pre-condition | Post-condition |                                Description                                |
++=====================+==================================+===============+================+===========================================================================+
+| ``crng.reversed()`` | ``/* implementation defined */`` | none          | none           | Return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`. |
++---------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
+
+.. rubric:: Description
+ 
+A reversible range that can be traversed forward and backward. This is not as strict as :cpp:concept:`BidirectionalRange`
+that requires bidirectional iterators.
 
 
 
 
 Utilities for generic programming
-*********************************
+---------------------------------
+
+
+.. cpp:namespace:: mln::ranges
+
 
 .. cpp:function:: auto rows(Range rng)
 
@@ -100,8 +153,10 @@ Utilities for generic programming
        // Usage of v1 and v2
 
 
-Views
-*****
+
+
+Predifined Views
+----------------
 
 .. toctree::
 
@@ -110,3 +165,13 @@ Views
    ranges/filter
    ranges/zip
    ranges/zip_with
+
+
+
+
+Concepts detail
+---------------
+
+.. toctree::
+   
+   concepts/ranges

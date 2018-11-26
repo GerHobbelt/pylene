@@ -55,17 +55,17 @@ Let :
 
 Then we have the following valid expressions :
 
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-|       Expression        | Return type  | Pre-condition | Post-condition |                    Description                    |
-+=========================+==============+===============+================+===================================================+
-| ``lhs == rhs``          | `bool`       | none          | none           | Compare wether two pixels are equal               |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``lhs != rhs``          | `bool`       | none          | none           | Compare wether two pixels are different           |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``cpix.value()``        | `reference`  | none          | none           | Access the value of the pixel ``pix``             |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
-| ``cpix.point()``        | `point_type` | none          | none           | Access the point of the pixel ``pix``             |
-+-------------------------+--------------+---------------+----------------+---------------------------------------------------+
++------------------+----------------+---------------+----------------+-----------------------------------------+
+|    Expression    |  Return type   | Pre-condition | Post-condition |               Description               |
++==================+================+===============+================+=========================================+
+| ``lhs == rhs``   | ``bool``       | none          | none           | Compare wether two pixels are equal     |
++------------------+----------------+---------------+----------------+-----------------------------------------+
+| ``lhs != rhs``   | ``bool``       | none          | none           | Compare wether two pixels are different |
++------------------+----------------+---------------+----------------+-----------------------------------------+
+| ``cpix.value()`` | ``reference``  | none          | none           | Access the value of the pixel ``pix``   |
++------------------+----------------+---------------+----------------+-----------------------------------------+
+| ``cpix.point()`` | ``point_type`` | none          | none           | Access the point of the pixel ``pix``   |
++------------------+----------------+---------------+----------------+-----------------------------------------+
 
 A pixel really just is a tool that stores a point and the reference to the value accessed by this point.
 There is no difference in semantic between a mutable pixel and a constant pixel. The const-ness is carried by the value type.

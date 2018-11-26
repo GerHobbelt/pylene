@@ -105,8 +105,8 @@ Then we have the following valid expressions :
 
 .. rubric:: Description
  
-A reversible range that can be traversed forward and backward. This is not as strict as :cpp:concept:`BidirectionalRange`
-that requires bidirectional iterators.
+A reversible range that can be traversed forward and backward. This is not as strict as
+:cpp:concept:`BidirectionalRange (stl) <stl::BidirectionalRange>` that requires bidirectional iterators.
 
 
 

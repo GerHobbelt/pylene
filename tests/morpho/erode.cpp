@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
+#define MLN_IMG_PATH "../../img/"
 
 // Check that dilation/erosion are adjunctions
 TEST(Morpho, erode_0)
@@ -18,7 +19,7 @@ TEST(Morpho, erode_0)
   io::imread(MLN_IMG_PATH "small.pgm", ima);
 
   image2d<uint8> out1, out2;
-  mln::se::disc win(3);
+  mln::se::disc  win(3);
 
   auto comp = [](uint8 x) -> uint8 { return 255 - x; };
 

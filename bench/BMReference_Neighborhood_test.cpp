@@ -20,13 +20,18 @@ void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d
 void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 
 
+void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+           std::ptrdiff_t stride);
+void Average_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+               std::ptrdiff_t stride);
+void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+               std::ptrdiff_t stride);
+void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+                           std::ptrdiff_t stride);
+void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width,
+                             int height, std::ptrdiff_t stride);
 
-void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Average_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-
+#define MLN_IMG_PATH "../../img/"
 
 class TestNeighborhood : public ::testing::Test
 {
@@ -55,9 +60,9 @@ protected:
   mln::image2d<mln::uint8> run_with(fun2_t f) const;
 
 private:
-  int m_w, m_h;
-  std::ptrdiff_t m_stride;
-  mln::uint8* m_ibuffer;
+  int                      m_w, m_h;
+  std::ptrdiff_t           m_stride;
+  mln::uint8*              m_ibuffer;
   mln::image2d<mln::uint8> m_input;
 };
 
@@ -82,7 +87,7 @@ mln::image2d<mln::uint8> TestNeighborhood::run_with(fun2_t f) const
 
 TEST_F(TestNeighborhood, Sum)
 {
-  auto ref = this->run_with(Sum_C);
+  auto ref  = this->run_with(Sum_C);
   auto ima1 = this->run_with(Sum_New);
   auto ima2 = this->run_with(Sum);
 
@@ -93,7 +98,7 @@ TEST_F(TestNeighborhood, Sum)
 
 TEST_F(TestNeighborhood, Average)
 {
-  auto ref = this->run_with(Average_C);
+  auto ref  = this->run_with(Average_C);
   auto ima1 = this->run_with(Average_New);
   auto ima2 = this->run_with(Average);
 
@@ -104,7 +109,7 @@ TEST_F(TestNeighborhood, Average)
 
 TEST_F(TestNeighborhood, Erosion)
 {
-  auto ref = this->run_with(Erosion_C);
+  auto ref  = this->run_with(Erosion_C);
   auto ima1 = this->run_with(Erosion_New);
   auto ima2 = this->run_with(Erosion);
 
@@ -114,7 +119,7 @@ TEST_F(TestNeighborhood, Erosion)
 
 TEST_F(TestNeighborhood, Isotropic_Diffusion)
 {
-  auto ref = this->run_with(Isotropic_Diffusion_C);
+  auto ref  = this->run_with(Isotropic_Diffusion_C);
   auto ima1 = this->run_with(Isotropic_Diffusion_New);
   auto ima2 = this->run_with(Isotropic_Diffusion);
 
@@ -124,7 +129,7 @@ TEST_F(TestNeighborhood, Isotropic_Diffusion)
 
 TEST_F(TestNeighborhood, Anisotropic_Diffusion)
 {
-  auto ref = this->run_with(Anisotropic_Diffusion_C);
+  auto ref  = this->run_with(Anisotropic_Diffusion_C);
   auto ima1 = this->run_with(Anisotropic_Diffusion_New);
   auto ima2 = this->run_with(Anisotropic_Diffusion);
 

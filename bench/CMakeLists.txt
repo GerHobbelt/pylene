@@ -1,7 +1,6 @@
 find_package(benchmark REQUIRED)
 find_package(GTest REQUIRED)
 
-add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 # Download file dependency
 # Big images are stored at https://www.lrde.epita.fr/~mroynard/big_images/
 file(DOWNLOAD "https://www.lrde.epita.fr/~mroynard/big_images/Space1_20MB.jpg" "${CMAKE_BINARY_DIR}/bench/Space1_20MB.jpg")

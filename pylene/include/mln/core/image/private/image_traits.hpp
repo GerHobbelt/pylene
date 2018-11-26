@@ -12,7 +12,4 @@ namespace mln
   template <class I>
   using image_value_t = typename I::value_type;
 
-  template <class I>
-  using image_point_t = typename I::point_type;
-
-}
+} // namespace mln

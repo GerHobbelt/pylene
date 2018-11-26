@@ -1,24 +1,13 @@
-/// \file
-// Range v3 library
-//
-//  Copyright Eric Niebler 2013-present
-//
-//  Use, modification and distribution is subject to the
-//  Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)
-//
-// Project home: https://github.com/ericniebler/range-v3
-//
-
 #pragma once
 
-#include <range/v3/view/all.hpp>
-#include <range/v3/view/transform.hpp>
 
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <mln/core/rangev3/private/reversible_range.hpp>
+
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/utils/blank.hpp>
+
+#include <range/v3/view/transform.hpp>
 
 namespace mln::ranges
 {
@@ -28,6 +17,15 @@ namespace mln::ranges
     struct iter_transform_view_public : ::ranges::view_adaptor<iter_transform_view_public<Rng, Fun>, Rng>
     {
       ::ranges::semiregular_t<Fun> fun_;
+    };
+
+
+    template <typename Rng1, typename Rng2, typename Fun>
+    struct iter_transform2_view_public
+    {
+      ::ranges::semiregular_t<Fun> fun_;
+      Rng1                         rng1_;
+      Rng2                         rng2_;
     };
   } // namespace detail
 
@@ -50,7 +48,7 @@ namespace mln::ranges
                                        [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
     }
 
-    template <class U = int, class = std::enable_if_t<has_reverse_method_v<Rng>, U>>
+    template <class U = int, class = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
     {
       return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), fun());
@@ -67,6 +65,60 @@ namespace mln::ranges
     }
   };
 
+
+  template <typename Rng1, typename Rng2, typename Fun>
+  struct iter_transform2_view
+    : ::ranges::iter_transform2_view<Rng1, Rng2, Fun>,
+      std::conditional_t<is_multidimensional_range_v<Rng1> && is_multidimensional_range_v<Rng2>,
+                         multidimensional_range_base, mln::details::blank>
+  {
+    static constexpr bool is_md_rng = is_multidimensional_range_v<Rng1> && is_multidimensional_range_v<Rng2>;
+
+  private:
+    // Very bad way to access the private member
+    decltype(auto) rng1() const
+    {
+      return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng1_;
+    }
+    decltype(auto) rng2() const
+    {
+      return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng2_;
+    }
+    auto fun() const
+    {
+      return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->fun_;
+    }
+
+  public:
+    using ::ranges::iter_transform2_view<Rng1, Rng2, Fun>::iter_transform2_view;
+
+    template <class U = void, class = std::enable_if_t<is_md_rng, U>>
+    auto rows() const
+    {
+      return ::ranges::view::transform(rng1().rows(), rng2().rows(), [fun_ = fun()](auto row1, auto row2) {
+        return ::ranges::view::iter_transform(row1, row2, fun_);
+      });
+    }
+
+    template <class U = void, class = std::enable_if_t<has_reverse_method_v<Rng1> && has_reverse_method_v<Rng2>, U>>
+    auto reversed() const
+    {
+      return iter_transform2_view<decltype(rng1().reversed()), decltype(rng2().reversed()), Fun>(
+          rng1().reversed(), rng2().reversed(), fun());
+    }
+  };
+
+  template <typename Rng1, typename Rng2, typename Fun>
+  struct transform2_view : iter_transform2_view<Rng1, Rng2, ::ranges::indirected<Fun>>
+  {
+    transform2_view() = default;
+    transform2_view(Rng1 rng1, Rng2 rng2, Fun fun)
+      : iter_transform2_view<Rng1, Rng2, ::ranges::indirected<Fun>>{std::move(rng1), std::move(rng2),
+                                                                    ::ranges::indirect(std::move(fun))}
+    {
+    }
+  };
+
   namespace view
   {
 
@@ -79,20 +131,39 @@ namespace mln::ranges
           RANGES_DECLTYPE_AUTO_RETURN(::ranges::make_pipeable(std::bind(transform, std::placeholders::_1,
                                                                         ::ranges::protect(std::move(fun)))))
 
-              public :
-          // Don't forget to update view::for_each whenever this set
-          // of concepts changes
-          template <typename Rng, typename Fun>
-          using Concept =
-              ::meta::and_<::ranges::InputRange<Rng>, ::ranges::CopyConstructible<Fun>,
-                           ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rng>>,
-                           ::meta::not_<::ranges::Same<
-                               void, ::ranges::concepts::Invocable::result_t<Fun&, ::ranges::range_reference_t<Rng>>>>>;
+              ;
+
+    public:
+      // Don't forget to update view::for_each whenever this set
+      // of concepts changes
+      template <typename Rng, typename Fun>
+      using Concept =
+          ::meta::and_<::ranges::InputRange<Rng>, ::ranges::CopyConstructible<Fun>,
+                       ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rng>>,
+                       ::meta::not_<::ranges::Same<
+                           void, ::ranges::concepts::Invocable::result_t<Fun&, ::ranges::range_reference_t<Rng>>>>>;
+
+
+      template <typename Rng1, typename Rng2, typename Fun>
+      using Concept2 =
+          meta::and_<::ranges::InputRange<Rng1>, ::ranges::InputRange<Rng2>, ::ranges::CopyConstructible<Fun>,
+                     ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rng1>, ::ranges::range_reference_t<Rng2>>,
+                     meta::not_<::ranges::Same<
+                         void, ::ranges::concepts::Invocable::result_t<Fun&, ::ranges::range_reference_t<Rng1>,
+                                                                       ::ranges::range_reference_t<Rng2>>>>>;
 
       template <typename Rng, typename Fun, CONCEPT_REQUIRES_(Concept<Rng, Fun>())>
       transform_view<::ranges::view::all_t<Rng>, Fun> operator()(Rng&& rng, Fun fun) const
       {
         return {::ranges::view::all(static_cast<Rng&&>(rng)), std::move(fun)};
+      }
+
+      template <typename Rng1, typename Rng2, typename Fun, CONCEPT_REQUIRES_(Concept2<Rng1, Rng2, Fun>())>
+      transform2_view<::ranges::view::all_t<Rng1>, ::ranges::view::all_t<Rng2>, Fun>
+          operator()(Rng1&& rng1, Rng2&& rng2, Fun fun) const
+      {
+        return {::ranges::view::all(static_cast<Rng1&&>(rng1)), ::ranges::view::all(static_cast<Rng2&&>(rng2)),
+                std::move(fun)};
       }
 
 #ifndef RANGES_DOXYGEN_INVOKED
@@ -112,6 +183,29 @@ namespace mln::ranges
                 void, ::ranges::concepts::Invocable::result_t<Fun&, ::ranges::range_reference_t<Rng>>>>(),
             "The function passed to view::transform must return non-void when called "
             "with an argument of the range's reference type.");
+      }
+
+      template <typename Rng1, typename Rng2, typename Fun, CONCEPT_REQUIRES_(!Concept2<Rng1, Rng2, Fun>())>
+      void operator()(Rng1&&, Rng2&&, Fun) const
+      {
+        CONCEPT_ASSERT_MSG(::ranges::InputRange<Rng1>(),
+                           "The first object on which view::transform operates must be a model of the "
+                           "InputRange concept.");
+        CONCEPT_ASSERT_MSG(::ranges::InputRange<Rng2>(),
+                           "The second object on which view::transform operates must be a model of the "
+                           "InputRange concept.");
+        CONCEPT_ASSERT_MSG(::ranges::CopyConstructible<Fun>(),
+                           "The function passed to view::transform must be CopyConstructible.");
+        CONCEPT_ASSERT_MSG(
+            ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rng1>, ::ranges::range_reference_t<Rng2>>(),
+            "The function passed to view::transform must be callable with arguments "
+            "of the ranges' reference types.");
+        CONCEPT_ASSERT_MSG(
+            meta::not_<
+                ::ranges::Same<void, ::ranges::concepts::Invocable::result_t<Fun&, ::ranges::range_reference_t<Rng1>,
+                                                                             ::ranges::range_reference_t<Rng2>>>>(),
+            "The function passed to view::transform must return non-void when called "
+            "with arguments of the ranges' reference types.");
       }
 #endif
     };

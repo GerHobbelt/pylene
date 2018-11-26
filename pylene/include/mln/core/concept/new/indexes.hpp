@@ -7,9 +7,11 @@ namespace mln::concepts
 
   // clang-format off
 
+#ifdef CONCEPT_TS_ENABLED
   // Index
   template<typename Idx>
   concept bool Index = stl::Integral<Idx>;
+#endif
 
   // clang-format on
 

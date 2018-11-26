@@ -12,6 +12,7 @@ namespace mln::concepts
 
   // clang-format off
 
+#ifdef CONCEPT_TS_ENABLED
   // Pixel
   template<typename Pix>
   concept bool Pixel = 
@@ -29,6 +30,7 @@ namespace mln::concepts
         { cpix.point() } -> stl::Same<typename Pix::point_type>&&;
         { cpix.value() } -> stl::Same<typename Pix::reference>&&;
     };
+#endif
 
   // clang-format on
 

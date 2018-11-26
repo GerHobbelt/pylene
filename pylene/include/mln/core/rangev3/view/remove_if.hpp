@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <mln/core/rangev3/private/multidimensional_range.hpp>

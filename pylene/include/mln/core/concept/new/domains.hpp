@@ -12,6 +12,7 @@ namespace mln::concepts
 
   // clang-format off
 
+#ifdef CONCEPT_TS_ENABLED
   // Domain
   template<typename Dom>
   concept bool Domain = 
@@ -31,6 +32,7 @@ namespace mln::concepts
         { cdom.is_discrete() }      -> stl::Boolean&&;
         { cdom.points() }           -> stl::BidirectionalRange&&;
     };
+#endif
 
   // clang-format on
 

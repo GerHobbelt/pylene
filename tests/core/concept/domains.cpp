@@ -42,6 +42,5 @@ TEST(Core, Concept_Domain)
   static_assert(!concepts::Domain<int>);
   static_assert(!concepts::Domain<double>);
   static_assert(!concepts::Domain<A>);
-  // FIXME
-  // static_assert(concepts::Domain<domain_test>);
+  static_assert(concepts::Domain<domain_test>);
 }

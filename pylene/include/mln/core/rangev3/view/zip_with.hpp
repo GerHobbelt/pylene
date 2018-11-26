@@ -82,7 +82,7 @@ namespace mln::ranges
       void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      }
+      } 
     };
 
     cursor begin_cursor()
@@ -97,6 +97,9 @@ namespace mln::ranges
       auto f = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(f, rngs_);
     }
+
+    // Disable const view (do not make sense)
+    /*
     cursor begin_cursor() const
     {
       auto fun = [this](auto&&... args) {
@@ -109,6 +112,7 @@ namespace mln::ranges
       auto fun = [](auto&&... args) { return sentinel(::ranges::end(std::forward<decltype(args)>(args))...); };
       return std::apply(fun, rngs_);
     }
+    */
 
   public:
     zip_with_view() = default;

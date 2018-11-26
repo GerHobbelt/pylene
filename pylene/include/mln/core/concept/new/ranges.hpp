@@ -26,7 +26,7 @@ namespace mln::concepts
   concept bool ReversibleRange = 
     stl::ForwardRange<Rng> &&
     requires(const Rng crng) {
-        { crng.reversed() } -> stl::Range&&;
+        { crng.reversed() } -> stl::ForwardRange&&;
     };
 #endif
 

@@ -58,4 +58,4 @@ Pixel
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/pixels.hpp
        :language: cpp
-       :lines: 16-31
+       :lines: 17-32

@@ -60,4 +60,4 @@ Domain
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/domains.hpp
        :language: cpp
-       :lines: 16-33
+       :lines: 17-34

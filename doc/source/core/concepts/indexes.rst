@@ -42,4 +42,4 @@ Index
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/indexes.hpp
        :language: cpp
-       :lines: 11-12
+       :lines: 12-13

@@ -80,7 +80,7 @@ namespace mln
     template <class ICond, class ITrue, class IFalse>
     struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<is_a<ITrue, Image>::value && is_a<IFalse, New_Image>::value>>
     {
-      auto operator()(const ICond& cond, ITrue iftrue, IFalse iffalse) const
+      auto operator()(const ICond& /*cond*/, ITrue /*iftrue*/, IFalse /*iffalse*/) const
       {
         auto g = [](bool vcond, auto&& vtrue, auto&& vfalse) -> decltype(auto) {
           return (vcond) ? std::forward<decltype(vtrue)>(vtrue) : std::forward<decltype(vfalse)>(vfalse);

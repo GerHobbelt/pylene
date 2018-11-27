@@ -6,6 +6,9 @@ namespace mln
   template <class I, class V>
   using ch_value_t = typename I::template ch_value_type<V>;
 
+  template <class I>
+  using concrete_t = typename I::concrete_type;
+
 
   template <class I>
   using image_pixel_t = typename I::new_pixel_type;

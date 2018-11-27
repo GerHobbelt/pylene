@@ -14,6 +14,38 @@ find_package(TBB)
 find_package(Qt4)
 find_package(range-v3 REQUIRED)
 
+
+# CONFIGURE COMPILER LAUNCHERS
+
+option(USE_CCACHE "Use ccache as compiler launcher" ON)
+option(USE_DISTCC "Use ccache as compiler launcher" OFF)
+
+if(USE_CCACHE AND USE_DISTCC)
+    message(FATAL_ERROR "You can't use both distcc and ccache at the same time. Please chose one.")
+endif(USE_CCACHE AND USE_DISTCC)
+
+# ccache
+if(USE_CCACHE)
+    find_program(CCACHE_FOUND ccache)
+    if(CCACHE_FOUND)
+        message(STATUS "ccache found")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    endif(CCACHE_FOUND)
+endif(USE_CCACHE)
+
+# distcc
+if(USE_DISTCC)
+    find_program(DISTCC_FOUND distcc)
+    if(DISTCC_FOUND)
+        message(STATUS "distcc found")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE distcc)
+        # distcc doesn't replace the linker
+        # set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK distcc)
+    endif(DISTCC_FOUND)
+endif(USE_DISTCC)
+
+
 # CONFIGURATION OPTIONS
 
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)

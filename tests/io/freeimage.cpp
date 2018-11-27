@@ -7,11 +7,9 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-#ifndef MLN_IMG_PATH
-#error "MLN_IMG_PATH must be defined."
-#endif
-
 #include <gtest/gtest.h>
+
+#define MLN_IMG_PATH "../../img/"
 
 TEST(IO, FreeImage_pgm)
 {
@@ -21,7 +19,7 @@ TEST(IO, FreeImage_pgm)
   image2d<uint8> ref(5, 5);
 
   iota(ref, 1);
-  io::imread(MLN_IMG_PATH "/iota2d.pgm", ima);
+  io::imread(MLN_IMG_PATH "iota2d.pgm", ima);
   ASSERT_TRUE(equal(ima, ref));
   io::imsave(ref, "test.tiff");
   io::imread("test.tiff", ima);
@@ -41,7 +39,7 @@ TEST(IO, FreeImage_ppm)
     pix.val()[1] = uint8(pix.point()[1]);
   }
 
-  io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);
+  io::imread(MLN_IMG_PATH "iota2d.ppm", ima);
   ASSERT_TRUE(equal(ima, ref));
   io::imsave(ima, "test.tiff");
   io::imread("test.tiff", ima);
@@ -71,7 +69,7 @@ TEST(IO, FreeImage_slow_pgm)
   image2d<uint8> ref(5, 5);
 
   iota(ref, 1);
-  io::imread(MLN_IMG_PATH "/iota2d.pgm", ima);
+  io::imread(MLN_IMG_PATH "iota2d.pgm", ima);
   ASSERT_TRUE(equal(ima, ref));
 
   auto tmp = 2u * ref;
@@ -94,7 +92,7 @@ TEST(IO, FreeImage_slow_ppm)
     pix.val()[1] = uint8(pix.point()[1]);
   }
 
-  io::imread(MLN_IMG_PATH "/iota2d.ppm", ima);
+  io::imread(MLN_IMG_PATH "iota2d.ppm", ima);
   ASSERT_TRUE(equal(ima, ref));
 
   auto tmp = 2u * ref;

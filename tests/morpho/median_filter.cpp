@@ -13,6 +13,7 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
+#define MLN_IMG_PATH "../../img/"
 
 image2d<uint8> naive_median(const image2d<uint8>& f, se::rect2d win, int sz)
 {
@@ -46,8 +47,8 @@ TEST(Morpho, median_filter_median_filter_0)
 
   { // Fast: border wide enough
     mln::se::rect2d win(7, 7);
-    auto out = morpho::median_filter(ima, win);
-    auto out2 = naive_median(ima, win, 49);
+    auto            out  = morpho::median_filter(ima, win);
+    auto            out2 = naive_median(ima, win, 49);
     ASSERT_IMAGES_EQ(out2, out);
   }
 }

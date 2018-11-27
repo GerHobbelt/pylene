@@ -71,6 +71,14 @@ namespace mln::details
   {
     using typename ndpix_base<T, N>::point_type;
 
+    ndpixel() = default;
+
+    ndpixel(const ndpix<T, N>& other)
+      : ndpix_base<T, N> {other}
+      , m_info{*(other.m_info)}
+    {
+    }
+
     void advance(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)
@@ -154,6 +162,11 @@ namespace mln::details
 
       bool __is_at_end(std::size_t k) const { return this->m_point[k] == this->m_info->to[k]; }
       bool __is_at_rend(std::size_t k) const { return this->m_point[k] == this->m_info->from[k] - 1; }
+
+      bool __equal(const cursor& other) const
+      {
+        return this->m_lineptr == other.m_lineptr && this->m_point.back() == other.m_point.back();
+      }
 
       cursor() = default;
       cursor(const ndpix_range& r, bool forward = true)

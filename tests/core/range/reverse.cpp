@@ -4,6 +4,7 @@
 #include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
+
 #include <range/v3/to_container.hpp>
 #include <range/v3/view/single.hpp>
 
@@ -73,13 +74,27 @@ TEST(Range, reversed_transformed_reversible_range)
   ASSERT_EQ(ref, ::ranges::to_vector(res));
 }
 
-TEST(Range, reversed_zipped_range)
+TEST(Range, zipped_reversed_range)
 {
   std::vector<int>                  v   = {1, 2, 3, 4, 5};
   std::vector<int>                  w   = {10, 20, 30, 40, 50};
   std::vector<std::tuple<int, int>> ref = {{5, 50}, {4, 40}, {3, 30}, {2, 20}, {1, 10}};
+
   auto tmp     = mln::ranges::view::zip(mln::ranges::view::reverse(v), mln::ranges::view::reverse(w));
   auto tmp_vec = ::ranges::to_vector(tmp);
   std::vector<std::tuple<int, int>> res = {tmp_vec.begin(), tmp_vec.end()};
+  ASSERT_EQ(ref, res);
+}
+
+
+TEST(Core, reversed_zipped_container)
+{
+  std::vector<int>                  v   = {1, 2, 3, 4, 5};
+  std::vector<int>                  w   = {10, 20, 30, 40, 50};
+  std::vector<std::tuple<int, int>> ref = {{5, 50}, {4, 40}, {3, 30}, {2, 20}, {1, 10}};
+
+  auto                              tmp     = mln::ranges::view::reverse(mln::ranges::view::zip(v, w));
+  auto                              tmp_vec = ::ranges::to_vector(tmp);
+  std::vector<std::tuple<int, int>> res     = {tmp_vec.begin(), tmp_vec.end()};
   ASSERT_EQ(ref, res);
 }

@@ -64,7 +64,7 @@ Lazy images operators
 ---------------------
 
 Arithmetical, logical and comparison operations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. topic:: Notations
 

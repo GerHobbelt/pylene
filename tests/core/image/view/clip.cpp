@@ -4,8 +4,6 @@
 
 #include <mln/core/algorithm/fill.hpp>
 
-#include <mln/core/rangev3/foreach.hpp>
-
 #include <gtest/gtest.h>
 #include <helpers.hpp>
 
@@ -60,7 +58,7 @@ TEST(View, clip_twice)
 
 
   auto A = mln::view::clip(ima, domain_a);
-  auto B = mln::view::clip(ima, domain_b);
+  auto B = mln::view::clip(A, domain_b);
   fill(B, 42);
 
   for (auto p : B.domain())

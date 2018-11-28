@@ -85,6 +85,8 @@ endif()
 # Subdirectories
 add_subdirectory(pylene)
 
+add_subdirectory(fixtures)
+
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   if (PYLENE_BUILD_BENCHMARKS)
     add_subdirectory(bench EXCLUDE_FROM_ALL)

@@ -1,0 +1,23 @@
+#include <fixtures/ImagePath/image_path.hpp>
+
+#include <string>
+#include <string_view>
+
+
+namespace fixtures::ImagePath
+{
+
+  std::string_view get_image_path()
+  {
+    using namespace std::literals;
+
+    static const auto image_path = "@CMAKE_SOURCE_DIR@/img/"sv;
+    return image_path;
+  }
+
+  std::string concat_with_filename(std::string_view filename)
+  {
+    return std::string{get_image_path()} + std::string{filename};
+  }
+
+} // namespace fixtures::ImagePath

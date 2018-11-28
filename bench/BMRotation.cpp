@@ -6,14 +6,15 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <benchmark/benchmark.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 struct BMRotation : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "lena.ppm";
+  std::string filename = fixtures::ImagePath::concat_with_filename("lena.ppm");
 
   BMRotation()
   {

@@ -3,7 +3,7 @@
 #include <mln/io/imread.hpp>
 
 #include "../tests/helpers.hpp"
-
+#include <fixtures/ImagePath/image_path.hpp>
 
 #include <gtest/gtest.h>
 
@@ -31,11 +31,10 @@ void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __r
 void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width,
                              int height, std::ptrdiff_t stride);
 
-#define MLN_IMG_PATH "../../img/"
 
 class TestNeighborhood : public ::testing::Test
 {
-  static constexpr const char* filename = MLN_IMG_PATH "lena.ppm";
+  static std::string filename = fixtures::ImagePath::concat_with_filename("lena.ppm");
 
   virtual void SetUp() override
   {

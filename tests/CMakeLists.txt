@@ -18,7 +18,6 @@ else(WIN32)
 endif(WIN32)
 
 find_package(Threads REQUIRED)
-#find_package(gtest REQUIRED)
 find_package(GTest REQUIRED)
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -30,7 +29,7 @@ macro(add_core_test Executable)
   set(Sources ${ARGN})
   add_executable(${Executable} ${Sources})
   add_test(NAME ${Executable} COMMAND ${Executable} --gtest_output=xml:${Executable}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-  target_link_libraries(${Executable} PRIVATE Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
+  target_link_libraries(${Executable} PRIVATE Fixtures::ImagePath Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
 
   add_dependencies(check ${Executable})
 endmacro(add_core_test)

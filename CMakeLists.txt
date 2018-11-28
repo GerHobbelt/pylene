@@ -21,7 +21,7 @@ option(USE_CCACHE "Use ccache as compiler launcher" ON)
 option(USE_DISTCC "Use ccache as compiler launcher" OFF)
 
 if(USE_CCACHE AND USE_DISTCC)
-    message(FATAL_ERROR "You can't use both distcc and ccache at the same time. Please chose one.")
+    message(FATAL_ERROR "You can't use both distcc and ccache at the same time. Please choose either one.")
 endif(USE_CCACHE AND USE_DISTCC)
 
 # ccache
@@ -40,7 +40,7 @@ if(USE_DISTCC)
     if(DISTCC_FOUND)
         message(STATUS "distcc found")
         set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE distcc)
-        # distcc doesn't replace the linker
+        # distcc doesn't offload the linker
         # set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK distcc)
     endif(DISTCC_FOUND)
 endif(USE_DISTCC)

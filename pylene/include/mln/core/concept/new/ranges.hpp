@@ -10,7 +10,7 @@ namespace mln::concepts
 
   // clang-format off
 
-#ifdef CONCEPT_TS_ENABLED
+#ifdef PYLENE_CONCEPT_TS_ENABLED
   // SegmentedRange
   template<typename Rng>
   concept bool SegmentedRange = 
@@ -28,7 +28,7 @@ namespace mln::concepts
     requires(const Rng crng) {
         { crng.reversed() } -> stl::ForwardRange&&;
     };
-#endif
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 

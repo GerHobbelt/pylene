@@ -7,17 +7,17 @@
 #include <mln/morpho/structural/closing.hpp>
 #include <mln/morpho/structural/opening.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
 #include <helpers.hpp>
 
 #include <gtest/gtest.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 TEST(Morpho, opening_closing_opening_0)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(3, 3);
   {
@@ -32,7 +32,7 @@ TEST(Morpho, opening_closing_opening_0)
 TEST(Morpho, opening_closing_opening_1)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   auto            comp = [](uint8 x) -> uint8 { return 255 - x; };
   mln::se::rect2d win(3, 3);

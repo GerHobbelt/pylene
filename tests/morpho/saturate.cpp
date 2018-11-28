@@ -5,9 +5,10 @@
 #include <mln/io/imread.hpp>
 #include <mln/morpho/saturate.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <gtest/gtest.h>
 
-#define MLN_IMG_PATH "../../img/"
 
 TEST(Morpho, saturate)
 {
@@ -15,7 +16,7 @@ TEST(Morpho, saturate)
   using namespace mln;
 
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "squares.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("squares.pgm"), ima);
 
   image2d<bool> out = morpho::saturate(ima == 154, c4, point2d{0, 0});
   ASSERT_TRUE(all(out == (lor(lor(ima == 154, ima == 251), ima == 12))));

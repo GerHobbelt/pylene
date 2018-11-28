@@ -5,6 +5,7 @@
 #include <mln/io/imread.hpp>
 #include <mln/morpho/median_filter.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
 #include <helpers.hpp>
 
 #include <algorithm>
@@ -13,7 +14,6 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 image2d<uint8> naive_median(const image2d<uint8>& f, se::rect2d win, int sz)
 {
@@ -43,7 +43,7 @@ image2d<uint8> naive_median(const image2d<uint8>& f, se::rect2d win, int sz)
 TEST(Morpho, median_filter_median_filter_0)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "lena.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("lena.pgm"), ima);
 
   { // Fast: border wide enough
     mln::se::rect2d win(7, 7);

@@ -39,7 +39,7 @@ macro(add_benchmark Executable)
     set(Sources ${ARGN})
     add_executable(BM${Executable} ${Sources})
 
-    target_link_libraries(BM${Executable} PRIVATE Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
+    target_link_libraries(BM${Executable} PRIVATE Fixtures::ImagePath Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
     target_include_directories(BM${Executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks BM${Executable})

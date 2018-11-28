@@ -3,16 +3,17 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <benchmark/benchmark.h>
 
 #include "BMErosion.hpp"
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 struct BMErosion : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "lena.pgm";
+  std::string filename = fixtures::ImagePath::concat_with_filename("lena.pgm");
 
   BMErosion()
   {

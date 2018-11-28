@@ -9,15 +9,16 @@
 #include <mln/core/se/rect2d.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 class BMDilation : public benchmark::Fixture
 {
 public:
   BMDilation()
   {
-    io::imread(MLN_IMG_PATH "lena.pgm", m_input);
+    io::imread(fixtures::ImagePath::concat_with_filename("lena.pgm"), m_input);
     int nr = m_input.nrows();
     int nc = m_input.ncols();
     resize(m_output, m_input);

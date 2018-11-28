@@ -11,12 +11,13 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
 #include <helpers.hpp>
 
 #include <gtest/gtest.h>
 
+
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
 {
@@ -171,7 +172,7 @@ TEST(Dilation, Rectangle2d)
 TEST(Dilation, Generic_with_wide_enough_extension)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   { // Fast: border wide enough
     mln::se::disc se(3, 0);
@@ -184,7 +185,7 @@ TEST(Dilation, Generic_with_wide_enough_extension)
 TEST(Dilation, Generic_with_too_small_extension)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::disc se(4, 0);
   auto          out = morpho::structural::dilate(ima, se);
@@ -195,7 +196,7 @@ TEST(Dilation, Generic_with_too_small_extension)
 TEST(Dilation, Square_on_a_vmorph)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(3, 3);
   auto            out = morpho::structural::dilate(ima > 128, win);
@@ -205,7 +206,7 @@ TEST(Dilation, Square_on_a_vmorph)
 TEST(Dilation, Unregular_domain)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(3, 3);
   auto            out = clone(ima);
@@ -219,7 +220,7 @@ TEST(Dilation, Unregular_domain)
 TEST(Dilation, Custom_cmp_function)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(5, 5);
   auto            out = morpho::structural::dilate(ima, win, std::greater<uint8>());
@@ -258,7 +259,7 @@ TEST(Dilation, Binary)
 TEST(Dilation, Binary_2)
 {
   image2d<bool> ima;
-  io::imread(MLN_IMG_PATH "tiny.pbm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("tiny.pbm"), ima);
 
   mln::se::rect2d win(3, 3);
   auto            out = morpho::structural::dilate(ima, win);
@@ -269,7 +270,7 @@ TEST(Dilation, Binary_2)
 TEST(Dilation, RGB)
 {
   image2d<rgb8> ima;
-  io::imread(MLN_IMG_PATH "small.ppm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
 
   mln::se::rect2d win(5, 5);
   auto            out = morpho::structural::dilate(ima, win);

@@ -6,13 +6,15 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <benchmark/benchmark.h>
 
 using namespace mln;
 
 struct BMRotation : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "/lena.ppm";
+  std::string filename = fixtures::ImagePath::concat_with_filename("lena.ppm");
 
   BMRotation()
   {
@@ -21,23 +23,23 @@ struct BMRotation : public benchmark::Fixture
     short nr = m_input.domain().shape()[0];
     short nc = m_input.domain().shape()[1];
     m_output = image2d<rgb8>(box2d{{(short)(-nc + 1), 0}, {1, nr}});
-    m_bytes = nr * nc * sizeof(rgb8);
+    m_bytes  = nr * nc * sizeof(rgb8);
   }
 
   image2d<rgb8> m_input;
   image2d<rgb8> m_output;
-  std::size_t m_bytes;
+  std::size_t   m_bytes;
 };
 
 template <class T>
 __attribute__((noinline)) void rotate_ptr(const image2d<T>& f, image2d<T>& out)
 {
 
-  int nr = f.nrows();
-  int nc = f.ncols();
-  int istride = static_cast<int>(f.strides()[0]);
-  int ostride = static_cast<int>(out.strides()[0]);
-  const T* ptr_in = &f({0, 0});
+  int      nr      = f.nrows();
+  int      nc      = f.ncols();
+  int      istride = static_cast<int>(f.strides()[0]);
+  int      ostride = static_cast<int>(out.strides()[0]);
+  const T* ptr_in  = &f({0, 0});
 
   for (int i = 0; i < nr; ++i)
   {
@@ -45,7 +47,7 @@ __attribute__((noinline)) void rotate_ptr(const image2d<T>& f, image2d<T>& out)
     for (int j = 0; j < nc; ++j)
     {
       *ptr_out = ptr_in[j];
-      ptr_out = (T*)((char*)ptr_out - ostride);
+      ptr_out  = (T*)((char*)ptr_out - ostride);
     }
     ptr_in = (T*)((char*)ptr_in + istride);
   }

@@ -1,7 +1,6 @@
 find_package(benchmark REQUIRED)
 find_package(GTest REQUIRED)
 
-add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 # Download file dependency
 # Big images are stored at https://www.lrde.epita.fr/~mroynard/big_images/
 file(DOWNLOAD "https://www.lrde.epita.fr/~mroynard/big_images/Space1_20MB.jpg" "${CMAKE_BINARY_DIR}/bench/Space1_20MB.jpg")
@@ -40,7 +39,7 @@ macro(add_benchmark Executable)
     set(Sources ${ARGN})
     add_executable(BM${Executable} ${Sources})
 
-    target_link_libraries(BM${Executable} PRIVATE Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
+    target_link_libraries(BM${Executable} PRIVATE Fixtures::ImagePath Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
     target_include_directories(BM${Executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     add_dependencies(benchmarks BM${Executable})

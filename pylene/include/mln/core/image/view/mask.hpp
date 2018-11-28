@@ -2,9 +2,8 @@
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
-#include <mln/core/rangev3/view/filter.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/image/private/where.hpp>
+#include <range/v3/view_facade.hpp>
 #include <type_traits>
 
 namespace mln
@@ -13,7 +12,7 @@ namespace mln
   template <class I, class M>
   class mask_view : public image_adaptor<I>, public New_Image<mask_view<I, M>>
   {
-    M m_mask;
+    mutable M m_mask;
 
   public:
     /// Type definitions
@@ -22,7 +21,7 @@ namespace mln
     using typename mask_view::image_adaptor::value_type;
     using typename mask_view::image_adaptor::new_pixel_type;
     using typename mask_view::image_adaptor::reference;
-    //using domain_type    = where_t<M>;
+    using domain_type    = mln::ranges::where_t<M>;
     using concrete_type  = mask_view<concrete_t<I>, M>;
 
     template <class V>
@@ -45,6 +44,98 @@ namespace mln
     static_assert(I::accessible::value,
                   "Image must be pw-accessible.");
 
+  private:
+    class value_range_t : public ::ranges::view_facade<value_range_t>
+    {
+      friend ::ranges::range_access;
+      using ima_value_range_t = decltype(std::declval<I&>().new_values());
+      using mask_value_range_t = decltype(std::declval<M&>().new_values());
+
+      struct cursor
+      {
+        ::ranges::iterator_t<ima_value_range_t> m_ima_it;
+        ::ranges::iterator_t<mask_value_range_t> m_mask_it;
+        ::ranges::sentinel_t<mask_value_range_t> m_mask_end;
+
+        image_reference_t<I> read() const { return *m_ima_it; }
+        bool                 equal(const cursor& other) const { return m_mask_it == other.m_mask_it; }
+        bool                 equal(::ranges::default_sentinel) const { return m_mask_it == m_mask_end; }
+        void                 next()
+        {
+          do
+          {
+            ++m_ima_it;
+            ++m_mask_it;
+          } while (m_mask_it != m_mask_end && !(*m_mask_it));
+        }
+      };
+
+      cursor begin_cursor()
+      {
+        cursor c = { ::ranges::begin(m_ima_values), ::ranges::begin(m_mask_values), ::ranges::end(m_mask_values) };
+        if (!(*c.m_mask_it))
+          c.next();
+        return c;
+      }
+
+    public:
+      value_range_t() = default;
+      value_range_t(ima_value_range_t v, mask_value_range_t m)
+        : m_ima_values {std::move(v)},
+          m_mask_values {std::move(m)}
+      {
+      }
+
+    private:
+      ima_value_range_t  m_ima_values;
+      mask_value_range_t m_mask_values;
+    };
+
+    class pixel_range_t : public ::ranges::view_facade<pixel_range_t>
+    {
+      friend ::ranges::range_access;
+      using ima_pixel_range_t = decltype(std::declval<I&>().new_pixels());
+      using mask_value_range_t = decltype(std::declval<M&>().new_values());
+
+      struct cursor
+      {
+        ::ranges::iterator_t<ima_pixel_range_t> m_ima_it;
+        ::ranges::iterator_t<mask_value_range_t> m_mask_it;
+        ::ranges::sentinel_t<mask_value_range_t> m_mask_end;
+
+        new_pixel_type       read() const { return { (*m_ima_it) }; }
+        bool                 equal(const cursor& other) const { return m_mask_it == other.m_mask_it; }
+        bool                 equal(::ranges::default_sentinel) const { return m_mask_it == m_mask_end; }
+        void                 next()
+        {
+          do
+          {
+            ++m_ima_it;
+            ++m_mask_it;
+          } while (m_mask_it != m_mask_end && !(*m_mask_it));
+        }
+      };
+
+      cursor begin_cursor()
+      {
+        cursor c = { ::ranges::begin(m_ima_pixels), ::ranges::begin(m_mask_values), ::ranges::end(m_mask_values) };
+        if (!(*c.m_mask_it))
+          c.next();
+        return c;
+      }
+
+    public:
+      pixel_range_t() = default;
+      pixel_range_t(ima_pixel_range_t v, mask_value_range_t m)
+        : m_ima_pixels {std::move(v)},
+          m_mask_values {std::move(m)}
+      {
+      }
+
+    private:
+      ima_pixel_range_t  m_ima_pixels;
+      mask_value_range_t m_mask_values;
+    };
 
   public:
 
@@ -80,29 +171,11 @@ namespace mln
       return { *this };
     }
 
-    //domain_type domain() const { return where(m_mask); }
+    ranges::where_t<M> domain() const { return { m_mask }; }
 
-    auto domain() {
-      return mln::ranges::view::transform(
-        mln::ranges::view::filter(m_mask.new_pixels(), [](const auto& px) { return px.val(); }),
-        [] (const auto& px) { return px.point(); });
-    }
+    value_range_t new_values() { return {this->base().new_values(), m_mask.new_values()}; }
 
-    auto new_values()
-    {
-      auto zz = mln::ranges::view::zip(this->base().new_values(), m_mask.new_values());
-      return mln::ranges::view::transform(
-        mln::ranges::view::filter(zz, [](auto vtuple) { return std::get<1>(vtuple); }),
-        [](auto vtuple) -> decltype(auto) { return std::get<0>(vtuple); });
-    }
-
-    auto new_pixels()
-    {
-      auto zz = mln::ranges::view::zip(this->base().new_pixels(), m_mask.new_values());
-      return mln::ranges::view::transform(
-        mln::ranges::view::filter(zz, [](auto vtuple) { return std::get<1>(vtuple); }),
-        [](auto vtuple) -> new_pixel_type { return { std::get<0>(vtuple) }; });
-    }
+    pixel_range_t new_pixels() { return {this->base().new_pixels(), m_mask.new_values()}; }
 
     reference operator()(point_type p)
     {

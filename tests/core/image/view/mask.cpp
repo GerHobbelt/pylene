@@ -32,9 +32,9 @@ TEST(View, mask)
     ASSERT_EQ(42, ima(p));
     ASSERT_EQ(42, z(p));
   }
-
   ASSERT_TRUE(mln::new_all(mln::new_eq(ima, ref)));
 }
+
 
 
 TEST(View, mask_twice)

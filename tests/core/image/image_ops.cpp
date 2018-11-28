@@ -4,6 +4,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/image_ops.hpp>
 #include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/private/where.hpp>
 
 #include <mln/io/imprint.hpp>
 
@@ -160,10 +161,9 @@ TEST(Core, BinaryOperators_MixedTypes)
 }
 
 
-TEST(Core, Where)
+TEST(Core, IfElse)
 {
   using namespace mln;
-
 
   image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> y = {{4, 5, 6}, {1, 2, 3}};
@@ -184,3 +184,24 @@ TEST(Core, Where)
   fill(f2, 0);
   ASSERT_TRUE(new_all(new_le(f2,3)));
 }
+
+TEST(Core, Where)
+{
+  mln::image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
+
+  auto y = mln::new_modulus(x, 2);
+  auto z = mln::new_where(y);
+
+  static_assert(::ranges::ForwardRange<decltype(z)>());
+
+
+  for (auto p : z)
+    ASSERT_EQ(1, x(p) % 2);
+
+  for (auto p : x.domain())
+    if (x(p) % 2 == 1)
+    {
+      ASSERT_TRUE(z.has(p));
+    }
+}
+

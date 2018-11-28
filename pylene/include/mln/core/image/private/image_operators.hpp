@@ -24,15 +24,15 @@ namespace mln
     return view::transform(static_cast<const I1&>(ima1), static_cast<const I2&>(ima2), f);                             \
   }                                                                                                                    \
                                                                                                                        \
-  template <class I, class Scalar>                                                                                     \
-  auto op(const New_Image<I>& ima1, Scalar s, std::enable_if_t<!is_a<Scalar, New_Image>::value>* = nullptr)            \
+  template <class I, class Scalar, class = std::enable_if_t<!is_a<Scalar, New_Image>::value>>                          \
+  auto op(const New_Image<I>& ima1, Scalar s)                                                                          \
   {                                                                                                                    \
     auto g = [f_ = f, s](auto&& arg) { return f_(arg, s); };                                                           \
     return view::transform(static_cast<const I&>(ima1), g);                                                            \
   }                                                                                                                    \
                                                                                                                        \
-  template <class Scalar, class I>                                                                                     \
-  auto op(Scalar s, const New_Image<I>& ima2, std::enable_if_t<!is_a<Scalar, New_Image>::value>* = nullptr)            \
+  template <class Scalar, class I, class = std::enable_if_t<!is_a<Scalar, New_Image>::value>>                          \
+  auto op(Scalar s, const New_Image<I>& ima2)                                                                          \
   {                                                                                                                    \
     auto g = [f_ = f, s](auto&& arg) { return f_(s, arg); };                                                           \
     return view::transform(static_cast<const I&>(ima2), g);                                                            \

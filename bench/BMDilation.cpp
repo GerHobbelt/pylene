@@ -9,16 +9,16 @@
 #include <mln/core/se/rect2d.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 
-using namespace mln;
+#include <fixtures/ImagePath/image_path.hpp>
 
+using namespace mln;
 
 class BMDilation : public benchmark::Fixture
 {
 public:
   BMDilation()
   {
-    const char* filename = MLN_IMG_PATH "/lena.pgm";
-    io::imread(filename, m_input);
+    io::imread(fixtures::ImagePath::concat_with_filename("lena.pgm"), m_input);
     int nr = m_input.nrows();
     int nc = m_input.ncols();
     resize(m_output, m_input);
@@ -36,26 +36,26 @@ public:
 protected:
   image2d<uint8> m_input;
   image2d<uint8> m_output;
-  std::size_t m_bytes;
+  std::size_t    m_bytes;
 };
 
 BENCHMARK_DEFINE_F(BMDilation, EuclideanDisc_naive)(benchmark::State& st)
 {
-  int radius = st.range(0);
+  int           radius = st.range(0);
   mln::se::disc se(radius, 0);
   this->run(st, se, std::less<mln::uint8>());
 }
 
 BENCHMARK_DEFINE_F(BMDilation, EuclideanDisc_incremental)(benchmark::State& st)
 {
-  int radius = st.range(0);
+  int           radius = st.range(0);
   mln::se::disc se(radius, 0);
   this->run(st, se);
 }
 
 BENCHMARK_DEFINE_F(BMDilation, ApproximatedDisc)(benchmark::State& st)
 {
-  int radius = st.range(0);
+  int           radius = st.range(0);
   mln::se::disc se(radius);
   this->run(st, se);
 }
@@ -63,7 +63,7 @@ BENCHMARK_DEFINE_F(BMDilation, ApproximatedDisc)(benchmark::State& st)
 
 BENCHMARK_DEFINE_F(BMDilation, Square)(benchmark::State& st)
 {
-  int width = 2 * st.range(0) + 1;
+  int             width = 2 * st.range(0) + 1;
   mln::se::rect2d se(width, width);
   this->run(st, se);
 }

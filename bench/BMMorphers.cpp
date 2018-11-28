@@ -11,11 +11,11 @@ unsigned threshold1(const image2d<uint8>& f, uint8 v)
 {
   using T = uint8;
 
-  int nr = f.nrows();
-  int nc = f.ncols();
-  const char* ptr_in = (const char*)&f({0, 0});
-  unsigned count = 0;
-  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+  int         nr      = f.nrows();
+  int         nc      = f.ncols();
+  const char* ptr_in  = (const char*)&f({0, 0});
+  unsigned    count   = 0;
+  int         istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i)
   {
@@ -33,11 +33,11 @@ unsigned threshold1_bis(const image2d<uint8>& f, uint8 v)
 {
   using T = uint8;
 
-  int nr = f.nrows();
-  int nc = f.ncols();
-  const char* ptr_in = (const char*)&f({0, 0});
-  unsigned count = 0;
-  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+  int         nr      = f.nrows();
+  int         nc      = f.ncols();
+  const char* ptr_in  = (const char*)&f({0, 0});
+  unsigned    count   = 0;
+  int         istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i)
   {
@@ -87,21 +87,21 @@ void threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
 {
   using T = uint8;
 
-  int nr = f.nrows();
-  int nc = f.ncols();
-  const char* ptr_in = (const char*)&f({0, 0});
-  char* ptr_out = (char*)&out({0, 0});
-  int istride = (int)(f.strides()[0] - nc * sizeof(T));
+  int         nr      = f.nrows();
+  int         nc      = f.ncols();
+  const char* ptr_in  = (const char*)&f({0, 0});
+  char*       ptr_out = (char*)&out({0, 0});
+  int         istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i)
   {
     for (int j = 0; j < nc; ++j)
     {
       *ptr_out = *(const T*)ptr_in < v;
-      ptr_in = ptr_offset(ptr_in, sizeof(T));
-      ptr_out = ptr_offset(ptr_out, sizeof(T));
+      ptr_in   = ptr_offset(ptr_in, sizeof(T));
+      ptr_out  = ptr_offset(ptr_out, sizeof(T));
     }
-    ptr_in = ptr_offset(ptr_in, istride);
+    ptr_in  = ptr_offset(ptr_in, istride);
     ptr_out = ptr_offset(ptr_out, istride);
   }
 }

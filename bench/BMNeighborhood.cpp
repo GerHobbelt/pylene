@@ -57,19 +57,19 @@ long bench_piter(const image2d<int>& ima)
 
 long bench_indexes(const image2d<int>& ima)
 {
-  int idx = static_cast<int>(ima.index_of_point(ima.domain().pmin));
+  int  idx     = static_cast<int>(ima.index_of_point(ima.domain().pmin));
   auto offsets = wrt_delta_index(ima, c8_t::dpoints);
   mln_iter(p, ima.domain());
   mln_iter(n, c8(p));
 
-  long u = 0;
-  int nrows = ima.nrows();
-  int ncols = ima.ncols();
+  long u     = 0;
+  int  nrows = ima.nrows();
+  int  ncols = ima.ncols();
   for (int i = 0; i < nrows; ++i)
   {
     for (int j = 0; j < ncols; ++j)
     {
-      int p = idx + j; // * ima.index_strides()[1];
+      int p   = idx + j; // * ima.index_strides()[1];
       int sum = 0;
       for (int offset : offsets)
         sum += ima[p + offset];
@@ -84,12 +84,12 @@ long bench_pointers(const image2d<int>& ima)
 {
   constexpr int sz = 8;
 
-  const size_t stride = ima.index_strides()[0];
-  int nrows = ima.nrows();
-  int ncols = ima.ncols();
-  auto offsets = wrt_delta_index(ima, c8_t::dpoints);
+  const size_t stride  = ima.index_strides()[0];
+  int          nrows   = ima.nrows();
+  int          ncols   = ima.ncols();
+  auto         offsets = wrt_delta_index(ima, c8_t::dpoints);
 
-  long u = 0;
+  long       u       = 0;
   const int* lineptr = &ima(ima.domain().pmin);
   for (int y = 0; y < nrows; ++y, lineptr += stride)
     for (int x = 0; x < ncols; ++x)

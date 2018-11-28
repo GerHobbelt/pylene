@@ -5,6 +5,7 @@
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
 #include <helpers.hpp>
 
 #include <gtest/gtest.h>
@@ -15,10 +16,10 @@ using namespace mln;
 TEST(Morpho, erode_0)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   image2d<uint8> out1, out2;
-  mln::se::disc win(3);
+  mln::se::disc  win(3);
 
   auto comp = [](uint8 x) -> uint8 { return 255 - x; };
 

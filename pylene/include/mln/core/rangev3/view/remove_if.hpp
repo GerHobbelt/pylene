@@ -3,6 +3,7 @@
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/private/reversible_range.hpp>
 
+#include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
@@ -79,7 +80,12 @@ namespace mln::ranges
           ::meta::and_<::ranges::InputRange<Rng>, ::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>>>;
 
       template <typename Rng, typename Pred, CONCEPT_REQUIRES_(Constraint<Rng, Pred>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires mln::concepts::stl::InputRange<Rng>
+#endif
       RANGES_CXX14_CONSTEXPR auto operator()(Rng&& rng, Pred pred) const
+          // clang-format on
           RANGES_DECLTYPE_AUTO_RETURN_NOEXCEPT(remove_if_view<::ranges::view::all_t<Rng>, Pred>{
               ::ranges::view::all(static_cast<Rng&&>(rng)), std::move(pred)})
 

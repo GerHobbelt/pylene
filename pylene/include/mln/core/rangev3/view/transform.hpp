@@ -9,6 +9,8 @@
 
 #include <range/v3/view/transform.hpp>
 
+#include <mln/core/concept/new/concepts.hpp>
+
 namespace mln::ranges
 {
   namespace detail
@@ -153,14 +155,25 @@ namespace mln::ranges
                                                                        ::ranges::range_reference_t<Rng2>>>>>;
 
       template <typename Rng, typename Fun, CONCEPT_REQUIRES_(Concept<Rng, Fun>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires mln::concepts::stl::InputRange<Rng>
+#endif
       transform_view<::ranges::view::all_t<Rng>, Fun> operator()(Rng&& rng, Fun fun) const
+      // clang-format on
       {
         return {::ranges::view::all(static_cast<Rng&&>(rng)), std::move(fun)};
       }
 
       template <typename Rng1, typename Rng2, typename Fun, CONCEPT_REQUIRES_(Concept2<Rng1, Rng2, Fun>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires mln::concepts::stl::InputRange<Rng1> && mln::concepts::stl::InputRange<Rng2>
+      
+#endif
       transform2_view<::ranges::view::all_t<Rng1>, ::ranges::view::all_t<Rng2>, Fun>
-          operator()(Rng1&& rng1, Rng2&& rng2, Fun fun) const
+        operator()(Rng1&& rng1, Rng2&& rng2, Fun fun) const
+      // clang-format on
       {
         return {::ranges::view::all(static_cast<Rng1&&>(rng1)), ::ranges::view::all(static_cast<Rng2&&>(rng2)),
                 std::move(fun)};

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
@@ -82,7 +83,7 @@ namespace mln::ranges
       void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      } 
+      }
     };
 
     cursor begin_cursor()
@@ -135,6 +136,15 @@ namespace mln::ranges
 
   namespace view
   {
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    namespace detail
+    {
+      template <typename... Rngs>
+      concept bool InputRanges = std::conjunction_v<mln::concepts::stl::InputRange<Rngs>...>;
+    }
+#endif
+
     struct zip_with_fn
     {
       template <typename Fun, typename... Rngs>
@@ -142,7 +152,13 @@ namespace mln::ranges
                                    ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rngs>&&...>>;
 
       template <typename... Rngs, typename Fun, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      // FIXME : fix multi_indice_facade not an input range
+      // requires detail::InputRanges<Rngs...>
+#endif
       auto operator()(Fun fun, Rngs&&... rngs) const
+      // clang-format on
       {
         return zip_with_view<Fun, ::ranges::view::all_t<Rngs>...>{std::move(fun),
                                                                   ::ranges::view::all(static_cast<Rngs&&>(rngs))...};

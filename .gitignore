@@ -10,3 +10,4 @@
 .idea
 *.pyc
 compile_commands.json
+/venv_*/

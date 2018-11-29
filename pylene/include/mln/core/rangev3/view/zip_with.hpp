@@ -83,7 +83,7 @@ namespace mln::ranges
       void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      }
+      } 
     };
 
     cursor begin_cursor()

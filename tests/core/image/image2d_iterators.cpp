@@ -159,6 +159,13 @@ struct new_iterator_test
   image2d<int>     ima;
   std::vector<int> values;
 
+  void concept_check()
+  {
+    static_assert(::ranges::OutputRange<decltype(ima.new_values()), const int&>());
+    static_assert(::ranges::ForwardRange<decltype(std::as_const(ima).new_values())>());
+    static_assert(::ranges::ForwardRange<decltype(ima.new_pixels())>());
+  }
+
   void test_forward_value_range()
   {
     auto rng = std::as_const(ima).new_values();

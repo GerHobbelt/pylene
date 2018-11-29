@@ -44,7 +44,7 @@ namespace mln
 
     assert(ima.domain() == K.domain());
 
-    image2d<V> mean;
+    image2d<V>   mean;
     image2d<Acc> accus;
 
     resize(accus, ima);
@@ -92,7 +92,7 @@ namespace mln
 
     assert(ima.domain() == K.domain());
 
-    image2d<V> mean;
+    image2d<V>   mean;
     image2d<Acc> accus;
 
     resize(accus, ima);

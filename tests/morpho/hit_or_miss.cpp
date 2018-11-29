@@ -25,7 +25,7 @@ TEST(Morpho, hit_or_miss)
 
   auto win1 = se::make_se(w1);
   auto win2 = se::make_se(w2);
-  auto out = morpho::hit_or_miss(ima, win1, win2);
+  auto out  = morpho::hit_or_miss(ima, win1, win2);
   auto out2 = morpho::hit_or_miss(lnot(ima), win2, win1);
 
   ASSERT_TRUE(all(out == out2));

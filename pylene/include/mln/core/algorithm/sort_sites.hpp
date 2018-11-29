@@ -36,14 +36,14 @@ namespace mln
     std::vector<typename I::site_type> sort_sites(const I& input, Compare, std::true_type _use_indexer_)
     {
       typedef indexer<mln_value(I), Compare> Indexer;
-      typedef typename Indexer::index_type index_t;
+      typedef typename Indexer::index_type   index_t;
 
       mln_entering("mln::sort_sites (couting sort)");
       (void)_use_indexer_;
       Indexer f;
 
-      static constexpr std::size_t nvalues = 1 << value_traits<index_t>::quant;
-      unsigned h[nvalues] = {
+      static constexpr std::size_t nvalues    = 1 << value_traits<index_t>::quant;
+      unsigned                     h[nvalues] = {
           0,
       };
       {
@@ -52,11 +52,11 @@ namespace mln
           ++h[f(*v)];
 
         unsigned count = 0;
-        index_t i = value_traits<index_t>::min();
+        index_t  i     = value_traits<index_t>::min();
         do
         {
           unsigned tmp = h[i];
-          h[i] = count;
+          h[i]         = count;
           count += tmp;
         } while (i++ < value_traits<index_t>::max());
         assert(count == input.domain().size());
@@ -100,7 +100,7 @@ namespace mln
   std::vector<typename I::site_type> sort_sites(const Image<I>& input, Compare cmp)
   {
     constexpr bool _is_low_quant = value_traits<mln_value(I)>::quant <= 16;
-    constexpr bool _has_indexer = has_indexer<mln_value(I), Compare>::value;
+    constexpr bool _has_indexer  = has_indexer<mln_value(I), Compare>::value;
 
     std::integral_constant<bool, _is_low_quant and _has_indexer> _use_indexer;
     return impl::sort_sites(exact(input), cmp, _use_indexer);

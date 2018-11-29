@@ -16,17 +16,16 @@ std::size_t number_from_vec_t(vec_t x)
 
 TEST(Range, transform_on_containers)
 {
-  std::vector<int> v = {2,3};
-  auto rng = mln::ranges::view::transform(v, [](int x) { return x*2; });
+  std::vector<int> v   = {2, 3};
+  auto             rng = mln::ranges::view::transform(v, [](int x) { return x * 2; });
 
-  ASSERT_EQ(std::vector({4,6}), ::ranges::to_vector(rng));
+  ASSERT_EQ(std::vector({4, 6}), ::ranges::to_vector(rng));
 }
-
 
 
 TEST(Range, transform_2d_readonly)
 {
-  mln::ranges::multi_indices<2> ind({3,4});
+  mln::ranges::multi_indices<2> ind({3, 4});
 
   std::size_t n = 0;
   for (auto v : mln::ranges::view::transform(ind, number_from_vec_t))
@@ -38,10 +37,10 @@ TEST(Range, transform_2d_readonly)
 
 TEST(Range, transform_2d_readonly_rowwise)
 {
-  mln::ranges::multi_indices<2> ind({3,4});
+  mln::ranges::multi_indices<2> ind({3, 4});
 
-  std::size_t n = 0;
-  auto rng = mln::ranges::view::transform(ind, number_from_vec_t);
+  std::size_t n   = 0;
+  auto        rng = mln::ranges::view::transform(ind, number_from_vec_t);
   for (auto row : rng.rows())
     for (auto v : row)
       n += v;
@@ -51,12 +50,12 @@ TEST(Range, transform_2d_readonly_rowwise)
 
 TEST(Range, transform_2d_write)
 {
-  std::vector<std::pair<int,int>> buffer(12, std::make_pair(0,0));
-  mln::ranges::multi_span<std::pair<int,int>, 2> sp(buffer.data(), {3,4}, {4,1});
+  std::vector<std::pair<int, int>>                buffer(12, std::make_pair(0, 0));
+  mln::ranges::multi_span<std::pair<int, int>, 2> sp(buffer.data(), {3, 4}, {4, 1});
 
   {
     std::size_t i = 0;
-    for (auto& v : mln::ranges::view::transform(sp, &std::pair<int,int>::first))
+    for (auto& v : mln::ranges::view::transform(sp, &std::pair<int, int>::first))
       v = i++;
   }
 
@@ -69,12 +68,12 @@ TEST(Range, transform_2d_write)
 
 TEST(Range, transform_2d_write_row_wise)
 {
-  std::vector<std::pair<int,int>> buffer(12, std::make_pair(0,0));
-  mln::ranges::multi_span<std::pair<int,int>, 2> sp(buffer.data(), {3,4}, {4,1});
+  std::vector<std::pair<int, int>>                buffer(12, std::make_pair(0, 0));
+  mln::ranges::multi_span<std::pair<int, int>, 2> sp(buffer.data(), {3, 4}, {4, 1});
 
   {
-    auto rng = mln::ranges::view::transform(sp, &std::pair<int,int>::first);
-    std::size_t i = 0;
+    auto        rng = mln::ranges::view::transform(sp, &std::pair<int, int>::first);
+    std::size_t i   = 0;
     for (auto row : rng.rows())
       for (int& v : row)
         v = i++;

@@ -62,7 +62,7 @@ namespace mln
       for (int i = 0; i < NTREE; ++i)
       {
         tree_t::vertex_id_t n = t[i].get_node_id(px->index());
-        gnode[i] = tlink[i][n];
+        gnode[i]              = tlink[i][n];
       }
 
       for (int i = 0; i < NTREE; ++i)

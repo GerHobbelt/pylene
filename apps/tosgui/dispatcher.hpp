@@ -32,21 +32,23 @@ namespace mln
     void doNodeSection(qt::ImageViewer*);
     void doFiltering(std::pair<qt::ImageViewer*, image2d<rgb8>>& obj);
 
-    const image2d<unsigned>& m_parent;
+    const image2d<unsigned>&     m_parent;
     const std::vector<unsigned>& m_S;
-    std::vector<point2d> m_leaves;
-    bool m_leaf_attach;
+    std::vector<point2d>         m_leaves;
+    bool                         m_leaf_attach;
 
     image2d<bool> m_mask_selection;
     // std::vector<QAttributeBase*> m_attributes;
-    PlotWindow* m_pltwin;
-    std::vector<qt::ImageViewer*> m_windows;
+    PlotWindow*                                             m_pltwin;
+    std::vector<qt::ImageViewer*>                           m_windows;
     std::vector<std::pair<qt::ImageViewer*, image2d<rgb8>>> m_fwins;
   };
 
   template <typename V>
   QDispatcher::QDispatcher(const image2d<V>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S)
-      : QObject(), m_parent(parent), m_S(S)
+    : QObject()
+    , m_parent(parent)
+    , m_S(S)
   {
     resize(m_mask_selection, parent).init(true);
     m_leaves.reserve(m_S.size());

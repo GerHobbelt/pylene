@@ -18,8 +18,8 @@ int main(int argc, char** argv)
   using namespace mln;
 
   std::string oname = argv[2];
-  int pos = oname.rfind('.');
-  std::string fmt = oname.substr(0, pos) + "-%i" + oname.substr(pos);
+  int         pos   = oname.rfind('.');
+  std::string fmt   = oname.substr(0, pos) + "-%i" + oname.substr(pos);
 
   try
   {

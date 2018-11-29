@@ -1,13 +1,17 @@
-#include <algorithm>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/maxtree/maxtree.hpp>
+
+#include <fixtures/ImagePath/image_path.hpp>
+
+#include <algorithm>
 #include <sstream>
 
 #include <gtest/gtest.h>
+
 
 TEST(Morpho, component_tree_io)
 {
@@ -15,7 +19,7 @@ TEST(Morpho, component_tree_io)
   using namespace mln;
 
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   auto ctree = morpho::maxtree_indexes(ima, c4);
 

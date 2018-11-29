@@ -22,7 +22,7 @@ namespace mln
   template <typename N>
   struct neighborhood_traits
   {
-    typedef typename N::category category;
+    typedef typename N::category       category;
     typedef typename N::is_incremental is_incremental;
   };
 

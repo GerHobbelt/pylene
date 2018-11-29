@@ -17,7 +17,7 @@ void test_pixel_lvalue(I& f)
   wset_t wset{{-1, 0, 1}};
 
   dyn_wneighborhood<pset_t, wset_t, constant_neighborhood_tag> nbh(pset, wset);
-  auto px = f.pixel_at({0, 2});
+  auto                                                         px = f.pixel_at({0, 2});
   mln_iter(nx, nbh(px));
   {
     nx.init();
@@ -82,7 +82,7 @@ void test_point_lvalue()
   wset_t wset{{-1, 0, 1}};
 
   dyn_wneighborhood<pset_t, wset_t, constant_neighborhood_tag> nbh(pset, wset);
-  point2d p{0, 2};
+  point2d                                                      p{0, 2};
   mln_iter(n, nbh(p));
   {
     n.init();

@@ -18,15 +18,27 @@ namespace mln
     typedef StandardRange base;
 
   public:
-    stdrange(const StandardRange& r) : base(r) {}
+    stdrange(const StandardRange& r)
+      : base(r)
+    {
+    }
 
-    stdrange(StandardRange&& r) : base(std::move(r)) {}
+    stdrange(StandardRange&& r)
+      : base(std::move(r))
+    {
+    }
 
-    stdrange(const stdrange& r) : base(static_cast<const base&>(r)) {}
+    stdrange(const stdrange& r)
+      : base(static_cast<const base&>(r))
+    {
+    }
 
-    stdrange(stdrange&& r) : base(static_cast<base&&>(r)) {}
+    stdrange(stdrange&& r)
+      : base(static_cast<base&&>(r))
+    {
+    }
 
-    typedef stditerator<typename StandardRange::iterator> iterator;
+    typedef stditerator<typename StandardRange::iterator>       iterator;
     typedef stditerator<typename StandardRange::const_iterator> const_iterator;
 
     iterator iter() { iterator(base::begin(), base::end()); }

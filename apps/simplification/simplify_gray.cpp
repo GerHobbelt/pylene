@@ -46,13 +46,13 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima_);
   ima = addborder(ima_);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
 
   I f = transform(ima, [](uint8 v) -> V { return v * 2; });
 
-  image2d<V> K;
-  image2d<unsigned> parent;
+  image2d<V>            K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   std::tie(K, parent, S) = morpho::ToS(f, c4);

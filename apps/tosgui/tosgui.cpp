@@ -33,13 +33,13 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima);
 
   typedef UInt<9> V;
-  image2d<uint8> bima = addborder(ima);
-  image2d<uint8> f = interpolate_k1(bima);
-  image2d<V> ima_ = transform(bima, [](uint8 x) -> V { return x * 2; });
+  image2d<uint8>  bima = addborder(ima);
+  image2d<uint8>  f    = interpolate_k1(bima);
+  image2d<V>      ima_ = transform(bima, [](uint8 x) -> V { return x * 2; });
 
-  image2d<UInt<9>> K;
+  image2d<UInt<9>>      K;
   std::vector<unsigned> S;
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
 
   point2d pmin;
   if (argc > 2)
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
   QApplication a(argc, argv);
 
   // Create image to display
-  auto Kui8 = transform(K, [](const UInt<9>& v) -> uint8 { return v / 2; });
+  auto            Kui8 = transform(K, [](const UInt<9>& v) -> uint8 { return v / 2; });
   qt::ImageViewer w1(Kui8);
   qt::ImageViewer w2(Kui8);
 
@@ -65,10 +65,10 @@ int main(int argc, char** argv)
   w2.show();
 
   // Create plot window
-  PlotWindow win;
-  AreaAttribute<V> area(K, parent, S);
-  GrayLevelAttribute<V> graylevel(K, parent, S);
-  MSERAttribute<V> mser(K, parent, S);
+  PlotWindow                         win;
+  AreaAttribute<V>                   area(K, parent, S);
+  GrayLevelAttribute<V>              graylevel(K, parent, S);
+  MSERAttribute<V>                   mser(K, parent, S);
   MeaningFullnessAttribute<uint8, V> meaningfness(bima, K, parent, S);
 
   win.register_attribute(&area);

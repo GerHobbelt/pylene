@@ -45,16 +45,16 @@ namespace mln
         mln_precondition(width >= 0 && "A negative width was given.");
         mln_precondition(height >= 0 && "A negative height was given.");
 
-        int xoffset = width / 2;
-        int yoffset = height / 2;
+        int xoffset    = width / 2;
+        int yoffset    = height / 2;
         m_dpoints.pmin = {static_cast<short>(-yoffset), static_cast<short>(-xoffset)};
-        m_dpoints.pmax = {static_cast<short>(yoffset+1), static_cast<short>(xoffset+1)};
+        m_dpoints.pmax = {static_cast<short>(yoffset + 1), static_cast<short>(xoffset + 1)};
       }
 
       /// \brief A WNeighborhood to be added when used incrementally
       inc_type inc() const
       {
-        box2d b = this->m_dpoints;
+        box2d b   = this->m_dpoints;
         b.pmin[1] = b.pmax[1] - 1;
         return b;
       }
@@ -78,10 +78,10 @@ namespace mln
       /// line of length \p Height corresponding to the SE decomposition.
       std::array<periodic_line2d, 2> decompose() const
       {
-        const int v = m_dpoints.pmax[0] - 1;
-        const int h = m_dpoints.pmax[1] - 1;
-        periodic_line2d hline(point2d{0,1}, h);
-        periodic_line2d vline(point2d{1,0}, v);
+        const int       v = m_dpoints.pmax[0] - 1;
+        const int       h = m_dpoints.pmax[1] - 1;
+        periodic_line2d hline(point2d{0, 1}, h);
+        periodic_line2d vline(point2d{1, 0}, v);
 
         return {{hline, vline}};
       }

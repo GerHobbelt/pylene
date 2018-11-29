@@ -15,14 +15,21 @@ namespace mln
   struct point_pixel : Pixel<point_pixel<Image>>
   {
     using point_type = mln_point(Image);
-    using site_type = mln_point(Image);
+    using site_type  = mln_point(Image);
     using image_type = Image;
-    using reference = mln_reference(Image);
+    using reference  = mln_reference(Image);
     using value_type = mln_value(Image);
 
-    point_pixel() : m_image(nullptr) {}
+    point_pixel()
+      : m_image(nullptr)
+    {
+    }
 
-    point_pixel(Image& image, const point_type& point) : m_image(&image), m_point(point) {}
+    point_pixel(Image& image, const point_type& point)
+      : m_image(&image)
+      , m_point(point)
+    {
+    }
 
     point_pixel(const point_pixel&) = default;
 
@@ -30,7 +37,8 @@ namespace mln
     template <class I2>
     point_pixel(const point_pixel<I2>& other,
                 std::enable_if_t<std::is_convertible<I2*, Image*>::value, void*> = nullptr)
-        : m_image(other.m_image), m_point(other.m_point)
+      : m_image(other.m_image)
+      , m_point(other.m_point)
     {
     }
 
@@ -40,7 +48,7 @@ namespace mln
       return *m_image;
     }
     constexpr int weight() const { return 1; }
-    reference val() const
+    reference     val() const
     {
       mln_precondition(m_image);
       return m_image->at(m_point);
@@ -58,7 +66,7 @@ namespace mln
 
   private:
     image_type* m_image;
-    site_type m_point;
+    site_type   m_point;
   };
 
 } // end of namespace mln

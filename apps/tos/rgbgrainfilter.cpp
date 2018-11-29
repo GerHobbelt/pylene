@@ -69,8 +69,8 @@ namespace mln
     mln_precondition(parent.domain() == K.domain());
 
     typedef rgb<unsigned> SumType;
-    image2d<SumType> sum;
-    image2d<unsigned> count;
+    image2d<SumType>      sum;
+    image2d<unsigned>     count;
     resize(count, K, K.border(), 0);
     resize(sum, K, K.border(), SumType());
 
@@ -90,7 +90,7 @@ namespace mln
     image2d<V> out;
     resize(out, ima, ima.border(), literal::zero);
     unsigned p = S[0];
-    out[p] = sum[p] / count[p];
+    out[p]     = sum[p] / count[p];
     for (unsigned p : S)
     {
       unsigned q = parent[p];
@@ -112,14 +112,14 @@ namespace mln
   template <typename T>
   image2d<T> interpolate_k1(const image2d<T>& ima)
   {
-    image2d<T> out(2 * ima.nrows() - 1, 2 * ima.ncols() - 1);
+    image2d<T>      out(2 * ima.nrows() - 1, 2 * ima.ncols() - 1);
     typedef point2d P;
     mln_foreach (point2d p, ima.domain())
     {
       T a = ima.at(p), b = ima.at(p + P{0, 1}), c = ima.at(p + P{1, 0}), d = ima.at(p + P{1, 1});
 
-      point2d q = 2 * p;
-      out.at(q) = ima.at(p);
+      point2d q           = 2 * p;
+      out.at(q)           = ima.at(p);
       out.at(q + P{0, 1}) = (a + b) / 2;
       out.at(q + P{1, 0}) = (a + c) / 2;
       out.at(q + P{1, 1}) = (a + b + c + d) / 4;
@@ -140,17 +140,17 @@ int main(int argc, char** argv)
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
-  I rr = addborder(r);
-  I gg = addborder(g);
-  I bb = addborder(b);
+  I                  r  = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g  = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b  = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  rr = addborder(r);
+  I                  gg = addborder(g);
+  I                  bb = addborder(b);
 
-  image2d<V> rK, gK, bK;
-  image2d<unsigned> rparent, gparent, bparent;
+  image2d<V>            rK, gK, bK;
+  image2d<unsigned>     rparent, gparent, bparent;
   std::vector<unsigned> rS, gS, bS;
 
   std::tie(rK, rparent, rS) = morpho::ToS(rr, c4);
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
   auto b_area = morpho::area_compute(bK, bparent, bS); //, K1::is_face_2);
 
   image2d<unsigned> area;
-  std::string merge = std::string(argv[2]);
+  std::string       merge = std::string(argv[2]);
   if (merge == "max")
   {
     area = transform(imzip(r_area, g_area, b_area), [](const std::tuple<unsigned, unsigned, unsigned>& x) {
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
   }
   else if (merge == "grad")
   {
-    int size = 7;
+    int  size   = 7;
     auto grad_r = interpolate_k1(gradient(rr, size));
     auto grad_g = interpolate_k1(gradient(gg, size));
     auto grad_b = interpolate_k1(gradient(bb, size));
@@ -216,8 +216,8 @@ int main(int argc, char** argv)
 
   io::imsave(transform(area, [](unsigned x) -> float { return x; }), "area.tiff");
 
-  image2d<unsigned> K;
-  image2d<unsigned> parent;
+  image2d<unsigned>     K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   bool use_tos = argv[1] == std::string("tos");
@@ -227,7 +227,7 @@ int main(int argc, char** argv)
   else
     K = area, std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(area, c8, std::greater<unsigned>());
 
-  auto ima2 = addborder(ima, lexicographicalorder_less<rgb8>()); // add border with median w.r.t < lexico
+  auto          ima2 = addborder(ima, lexicographicalorder_less<rgb8>()); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent).init(rgb8{0, 0, 255});
 
@@ -236,16 +236,16 @@ int main(int argc, char** argv)
 
   for (int i = 5; i < argc; ++i)
   {
-    int fvalue = std::atoi(argv[i]);
+    int           fvalue = std::atoi(argv[i]);
     image2d<rgb8> out, out2;
     if (use_tos)
     {
-      out = morpho::area_filter(tmp, K, parent, S, fvalue, K2::is_face_2);
+      out  = morpho::area_filter(tmp, K, parent, S, fvalue, K2::is_face_2);
       out2 = setmean_on_nodes(out, K, parent, S, K2::is_face_2);
     }
     else
     {
-      out = morpho::area_filter(tmp, K, parent, S, fvalue, K1::is_face_2, rgb<unsigned>(), std::greater<unsigned>());
+      out  = morpho::area_filter(tmp, K, parent, S, fvalue, K1::is_face_2, rgb<unsigned>(), std::greater<unsigned>());
       out2 = setmean_on_nodes(out, K, parent, S, K1::is_face_2);
     }
     image2d<rgb8> under, under2;

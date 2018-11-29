@@ -20,7 +20,7 @@ void erode_c8_mlnstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint
     uint8 min = 255;
     //#pragma clang loop vectorize(enable)
     mln_simple_forall(nx) min = std::min(min, nx->val());
-    pxout->val() = min;
+    pxout->val()              = min;
   }
 }
 
@@ -33,23 +33,23 @@ void erode_c8_kernel(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>
 
 void erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
-  constexpr int sz = 9;
-  auto dpoints = winc8_t::dpoints;
+  constexpr int sz      = 9;
+  auto          dpoints = winc8_t::dpoints;
 
   const uint8* __restrict__ inptr = &f({0, 0});
-  uint8* __restrict__ outptr = &out({0, 0});
+  uint8* __restrict__ outptr      = &out({0, 0});
 
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
 
   int stride = static_cast<int>(f.strides()[0]);
-  int nr = f.nrows();
-  int nc = f.ncols();
+  int nr     = f.nrows();
+  int nc     = f.ncols();
 
   for (int y = 0; y < nr; ++y)
   {
-    const uint8* inlineptr = inptr + stride * y;
-    uint8* outlineptr = outptr + stride * y;
+    const uint8* inlineptr  = inptr + stride * y;
+    uint8*       outlineptr = outptr + stride * y;
     for (int x = 0; x < nc; ++x)
     {
       uint8 min = 255;
@@ -62,18 +62,18 @@ void erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>
 
 void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>& out)
 {
-  constexpr int sz = 9;
-  auto dpoints = winc8_t::dpoints;
+  constexpr int sz      = 9;
+  auto          dpoints = winc8_t::dpoints;
 
   const uint8* __restrict__ inptr = &f({0, 0});
-  uint8* __restrict__ outptr = &out({0, 0});
+  uint8* __restrict__ outptr      = &out({0, 0});
 
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
 
   int stride = static_cast<int>(f.strides()[0]);
-  int nr = f.nrows();
-  int nc = f.ncols();
+  int nr     = f.nrows();
+  int nc     = f.ncols();
 
   auto applyLine = [nc, offsets](const uint8* __restrict__ inlineptr, uint8* __restrict__ outlineptr) {
     for (int x = 0; x < nc; ++x)
@@ -87,8 +87,8 @@ void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<ml
 
   for (int y = 0; y < nr; ++y)
   {
-    const uint8* inlineptr = inptr + stride * y;
-    uint8* outlineptr = outptr + stride * y;
+    const uint8* inlineptr  = inptr + stride * y;
+    uint8*       outlineptr = outptr + stride * y;
     applyLine(inlineptr, outlineptr);
   }
 }

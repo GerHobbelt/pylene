@@ -44,13 +44,13 @@ namespace mln
     // the concrete image of I rather than this morpher, as long as concretization
     // does not impose any property about this extension.
 
-    typedef std::false_type concrete;
+    typedef std::false_type                                                                                    concrete;
     typedef typename std::common_type<typename image_traits<image_t>::category, bidirectional_image_tag>::type category;
     typedef typename image_traits<image_t>::accessible accessible;
 
     // we can check if an index belongs to a domain using ima.domain().has(ima.point_at_index(i))
     // but this is not efficient. We better use points directly.
-    typedef std::false_type indexable;
+    typedef std::false_type                     indexable;
     typedef mln::extension::value_extension_tag extension;
   };
 
@@ -85,35 +85,43 @@ namespace mln
 
   public:
     typedef typename Pix::value_type value_type;
-    typedef typename Pix::reference reference;
+    typedef typename Pix::reference  reference;
     typedef typename Pix::point_type point_type;
-    typedef typename Pix::site_type site_type;
-    typedef Morpher image_type;
+    typedef typename Pix::site_type  site_type;
+    typedef Morpher                  image_type;
 
-    extended_by_value_image_pixel() = default;
+    extended_by_value_image_pixel()                                     = default;
     extended_by_value_image_pixel(const extended_by_value_image_pixel&) = default;
 
-    extended_by_value_image_pixel(Morpher* ima) : m_ima(ima) {}
+    extended_by_value_image_pixel(Morpher* ima)
+      : m_ima(ima)
+    {
+    }
 
-    extended_by_value_image_pixel(Morpher& ima, const Pix& pix) : m_ima(&ima), m_pix(pix) {}
+    extended_by_value_image_pixel(Morpher& ima, const Pix& pix)
+      : m_ima(&ima)
+      , m_pix(pix)
+    {
+    }
 
     // Conversion non-const -> const pixel
     template <typename Morpher2, typename Pix2>
     extended_by_value_image_pixel(
         const extended_by_value_image_pixel<Morpher2, Pix2>& other,
         typename std::enable_if<std::is_convertible<Morpher2*, Morpher*>::value>::type* = NULL)
-        : m_ima(other.m_ima), m_pix(other.m_pix)
+      : m_ima(other.m_ima)
+      , m_pix(other.m_pix)
     {
     }
 
-    reference val() const { return m_pix.val(); }
-    point_type point() const { return m_pix.point(); }
-    site_type site() const { return m_pix.site(); }
+    reference   val() const { return m_pix.val(); }
+    point_type  point() const { return m_pix.point(); }
+    site_type   site() const { return m_pix.site(); }
     image_type& image() const { return *m_ima; }
 
   private:
     Morpher* m_ima;
-    Pix m_pix;
+    Pix      m_pix;
   };
 
   /******************************************/
@@ -122,9 +130,9 @@ namespace mln
 
   template <typename Morpher, typename PixelIterator>
   struct extended_by_value_image_pixel_iterator
-      : iterator_base<extended_by_value_image_pixel_iterator<Morpher, PixelIterator>,
-                      extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>,
-                      extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>>
+    : iterator_base<extended_by_value_image_pixel_iterator<Morpher, PixelIterator>,
+                    extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>,
+                    extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type>>
   {
   private:
     typedef extended_by_value_image_pixel<Morpher, typename PixelIterator::value_type> pixel_type;
@@ -134,22 +142,27 @@ namespace mln
   public:
     typedef typename PixelIterator::has_NL has_NL;
 
-    extended_by_value_image_pixel_iterator() = default;
+    extended_by_value_image_pixel_iterator()                                              = default;
     extended_by_value_image_pixel_iterator(const extended_by_value_image_pixel_iterator&) = default;
 
-    extended_by_value_image_pixel_iterator(Morpher& ima, const PixelIterator& it) : m_ima(&ima), m_it(it) {}
+    extended_by_value_image_pixel_iterator(Morpher& ima, const PixelIterator& it)
+      : m_ima(&ima)
+      , m_it(it)
+    {
+    }
 
     template <typename Morpher2, typename PixelIterator2>
     extended_by_value_image_pixel_iterator(
         const extended_by_value_image_pixel_iterator<Morpher2, PixelIterator2>& other,
         typename std::enable_if<std::is_convertible<Morpher2*, Morpher*>::value>::type* = NULL)
-        : m_ima(other.m_ima), m_it(other.m_it)
+      : m_ima(other.m_ima)
+      , m_it(other.m_it)
     {
     }
 
-    void init() { m_it.init(); }
-    void next() { m_it.next(); }
-    bool finished() const { return m_it.finished(); }
+    void       init() { m_it.init(); }
+    void       next() { m_it.next(); }
+    bool       finished() const { return m_it.finished(); }
     pixel_type dereference() const { return pixel_type(*m_ima, *m_it); }
 
     template <class dummy = bool>
@@ -159,7 +172,7 @@ namespace mln
     }
 
   private:
-    Morpher* m_ima;
+    Morpher*      m_ima;
     PixelIterator m_it;
   };
 
@@ -169,25 +182,25 @@ namespace mln
 
   template <typename I>
   struct extended_by_value_image
-      : morpher_base<extended_by_value_image<I>, I, typename std::remove_reference<I>::type::point_type,
-                     typename std::remove_reference<I>::type::value_type>
+    : morpher_base<extended_by_value_image<I>, I, typename std::remove_reference<I>::type::point_type,
+                   typename std::remove_reference<I>::type::value_type>
   {
   private:
     typedef typename std::remove_reference<I>::type image_t;
-    typedef extended_by_value_image<I> this_t;
+    typedef extended_by_value_image<I>              this_t;
     friend struct morpher_core_access;
 
   public:
-    typedef typename image_t::point_type point_type;
-    typedef typename image_t::domain_type domain_type;
-    typedef typename image_t::value_type value_type;
-    typedef typename image_reference<image_t>::type reference;
+    typedef typename image_t::point_type                  point_type;
+    typedef typename image_t::domain_type                 domain_type;
+    typedef typename image_t::value_type                  value_type;
+    typedef typename image_reference<image_t>::type       reference;
     typedef typename image_const_reference<image_t>::type const_reference;
 
-    typedef extended_by_value_image_pixel<this_t, typename image_pixel<image_t>::type> pixel_type;
+    typedef extended_by_value_image_pixel<this_t, typename image_pixel<image_t>::type>             pixel_type;
     typedef extended_by_value_image_pixel<const this_t, typename image_const_pixel<image_t>::type> const_pixel_type;
 
-    typedef typename image_value_range<image_t>::type value_range;
+    typedef typename image_value_range<image_t>::type       value_range;
     typedef typename image_const_value_range<image_t>::type const_value_range;
 
     typedef extended_by_value_image_pixel_iterator<
@@ -198,12 +211,16 @@ namespace mln
         const this_t, typename range_iterator<typename image_const_pixel_range<image_t>::type>::type>
         const_pixel_range_iterator;
 
-    typedef iterator_range<pixel_range_iterator> pixel_range;
+    typedef iterator_range<pixel_range_iterator>       pixel_range;
     typedef iterator_range<const_pixel_range_iterator> const_pixel_range;
 
     typedef by_value_extension<value_type> extension_type;
 
-    extended_by_value_image(I&& ima, const value_type& val) : m_ima(std::forward<I>(ima)), m_val(val) {}
+    extended_by_value_image(I&& ima, const value_type& val)
+      : m_ima(std::forward<I>(ima))
+      , m_val(val)
+    {
+    }
 
     friend internal::initializer<mln_concrete(I), typename internal::image_init_from<extended_by_value_image>::type>
         imconcretize(const extended_by_value_image& f)
@@ -290,12 +307,15 @@ namespace mln
   template <typename V>
   struct by_value_extension
   {
-    typedef V value_type;
-    typedef std::true_type support_fill;
+    typedef V               value_type;
+    typedef std::true_type  support_fill;
     typedef std::false_type support_mirror;
     typedef std::false_type support_periodize;
 
-    by_value_extension(V& val) : m_val(val) {}
+    by_value_extension(V& val)
+      : m_val(val)
+    {
+    }
 
     void fill(const V& val) { m_val = val; }
 

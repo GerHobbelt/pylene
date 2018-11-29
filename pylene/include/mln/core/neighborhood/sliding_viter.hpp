@@ -61,12 +61,16 @@ namespace mln
     template <class Pixel, class SiteSet>
     struct sliding_viter_base<Pixel, SiteSet,
                               std::enable_if_t<!image_traits<typename Image<Pixel>::image_type>::indexable::value>>
-        : iterator_base<sliding_viter<Pixel, SiteSet>, typename unwrap_t<Pixel>::value_type,
-                        typename unwrap_t<Pixel>::reference>
+      : iterator_base<sliding_viter<Pixel, SiteSet>, typename unwrap_t<Pixel>::value_type,
+                      typename unwrap_t<Pixel>::reference>
     {
     public:
       sliding_viter_base() = default;
-      sliding_viter_base(const Pixel& p, const SiteSet& s) : m_pixel(p), m_pset_iter(rng::iter(s)) {}
+      sliding_viter_base(const Pixel& p, const SiteSet& s)
+        : m_pixel(p)
+        , m_pset_iter(rng::iter(s))
+      {
+      }
 
       void init() { m_pset_iter.init(); }
       void next() { m_pset_iter.next(); }
@@ -79,7 +83,7 @@ namespace mln
       }
 
     private:
-      Pixel m_pixel;
+      Pixel                                        m_pixel;
       typename range_const_iterator<SiteSet>::type m_pset_iter;
     };
 
@@ -91,8 +95,8 @@ namespace mln
     template <class Pixel, class SiteSet>
     struct sliding_viter_base<Pixel, SiteSet,
                               std::enable_if_t<image_traits<typename Image<Pixel>::image_type>::indexable::value>>
-        : iterator_base<sliding_viter<Pixel, SiteSet>, typename unwrap_t<Pixel>::value_type,
-                        typename unwrap_t<Pixel>::reference>
+      : iterator_base<sliding_viter<Pixel, SiteSet>, typename unwrap_t<Pixel>::value_type,
+                      typename unwrap_t<Pixel>::reference>
     {
     private:
       using Container = boost::container::small_vector<int, 25>;
@@ -100,7 +104,10 @@ namespace mln
     public:
       sliding_viter_base() = default;
       sliding_viter_base(const Pixel& px, const SiteSet& s)
-          : m_pixel(px), m_size(rng::size(s)), m_index_set(m_size), m_i(0)
+        : m_pixel(px)
+        , m_size(rng::size(s))
+        , m_index_set(m_size)
+        , m_i(0)
       {
         Image<Pixel>& ima = px->image();
         mln_foreach (auto p, s)
@@ -118,10 +125,10 @@ namespace mln
       }
 
     private:
-      const Pixel m_pixel;
-      const unsigned m_size;
+      const Pixel     m_pixel;
+      const unsigned  m_size;
       const Container m_index_set;
-      unsigned m_i;
+      unsigned        m_i;
     };
   }
 
@@ -135,7 +142,10 @@ namespace mln
                   "accessible <ima(p)> nor indexable <ima[i]>");
 
   public:
-    sliding_viter(const Pixel& px, const SiteSet& s) : internal::sliding_viter_base<Pixel, SiteSet>(px, s) {}
+    sliding_viter(const Pixel& px, const SiteSet& s)
+      : internal::sliding_viter_base<Pixel, SiteSet>(px, s)
+    {
+    }
   };
 }
 

@@ -14,10 +14,13 @@ namespace mln
     template <typename T>
     struct false_var_t
     {
-      false_var_t(T&& v) : x_{std::forward<T>(v)} {}
+      false_var_t(T&& v)
+        : x_{std::forward<T>(v)}
+      {
+      }
 
-      constexpr operator bool() const { return false; }
-      T& get() { return x_; }
+      constexpr    operator bool() const { return false; }
+      T&           get() { return x_; }
       false_var_t& set(const T& v)
       {
         x_ = v;

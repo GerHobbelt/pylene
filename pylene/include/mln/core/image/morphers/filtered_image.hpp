@@ -32,10 +32,10 @@ namespace mln
     typedef typename std::remove_reference<I>::type image_t;
 
   public:
-    typedef std::false_type concrete;
+    typedef std::false_type                                                                                    concrete;
     typedef typename std::common_type<typename image_traits<image_t>::category, bidirectional_image_tag>::type category;
-    typedef std::true_type accessible;
-    typedef std::false_type indexable;
+    typedef std::true_type                     accessible;
+    typedef std::false_type                    indexable;
     typedef mln::extension::none_extension_tag extension;
   };
 
@@ -63,7 +63,7 @@ namespace mln
 
   template <typename I, class Predicate>
   struct filtered_image_base<I, Predicate, true>
-      : morpher_base<filtered_image<I, Predicate>, I, mln_point(I), mln_value(I)>
+    : morpher_base<filtered_image<I, Predicate>, I, mln_point(I), mln_value(I)>
   {
   private:
     typedef typename std::remove_reference<I>::type image_t;
@@ -89,18 +89,20 @@ namespace mln
   public:
     typedef internal::where_t<const image_t&, Predicate> domain_type;
 
-    typedef typename image_t::point_type point_type;
-    typedef typename image_reference<image_t>::type reference;
-    typedef typename image_const_reference<image_t>::type const_reference;
-    typedef rebinded_pixel<self_t, typename image_t::pixel_type> pixel_type;
+    typedef typename image_t::point_type                                     point_type;
+    typedef typename image_reference<image_t>::type                          reference;
+    typedef typename image_const_reference<image_t>::type                    const_reference;
+    typedef rebinded_pixel<self_t, typename image_t::pixel_type>             pixel_type;
     typedef rebinded_pixel<const self_t, typename image_t::const_pixel_type> const_pixel_type;
-    typedef iterator_range<value_iterator> value_range;
-    typedef iterator_range<const_value_iterator> const_value_range;
-    typedef iterator_range<pixel_iterator> pixel_range;
-    typedef iterator_range<const_pixel_iterator> const_pixel_range;
+    typedef iterator_range<value_iterator>                                   value_range;
+    typedef iterator_range<const_value_iterator>                             const_value_range;
+    typedef iterator_range<pixel_iterator>                                   pixel_range;
+    typedef iterator_range<const_pixel_iterator>                             const_pixel_range;
 
     filtered_image_base(I&& ima, const Predicate& pred)
-        : m_ima(std::forward<I>(ima)), m_pred(pred), m_domain(m_ima, m_pred)
+      : m_ima(std::forward<I>(ima))
+      , m_pred(pred)
+      , m_domain(m_ima, m_pred)
     {
     }
 
@@ -166,14 +168,14 @@ namespace mln
     pixel_type pixel_at(const point_type& p) { return pixel_type(static_cast<self_t&>(*this), m_ima.pixel_at(p)); }
 
   protected:
-    I m_ima;
-    Predicate m_pred;
+    I           m_ima;
+    Predicate   m_pred;
     domain_type m_domain;
   };
 
   template <typename I, class Predicate>
   struct filtered_image_base<I, Predicate, false>
-      : morpher_base<filtered_image<I, Predicate>, I, mln_point(I), mln_value(I)>
+    : morpher_base<filtered_image<I, Predicate>, I, mln_point(I), mln_value(I)>
   {
   private:
     typedef typename std::remove_reference<I>::type image_t;
@@ -188,9 +190,12 @@ namespace mln
     struct pixel_predicate_t
     {
       typedef typename image_const_pixel_iterator<image_t>::type::reference pixel_t;
-      typedef typename image_pixel_iterator<image_t>::type::reference const_pixel_t;
+      typedef typename image_pixel_iterator<image_t>::type::reference       const_pixel_t;
 
-      pixel_predicate_t(const Predicate& pred) : m_pred(pred) {}
+      pixel_predicate_t(const Predicate& pred)
+        : m_pred(pred)
+      {
+      }
 
       bool operator()(const pixel_t& pix) { return m_pred(pix.val()); }
 
@@ -211,18 +216,20 @@ namespace mln
   public:
     typedef internal::where_t<const image_t&, Predicate> domain_type;
 
-    typedef typename image_t::point_type point_type;
-    typedef typename image_reference<image_t>::type reference;
-    typedef typename image_const_reference<image_t>::type const_reference;
-    typedef rebinded_pixel<self_t, typename image_t::pixel_type> pixel_type;
+    typedef typename image_t::point_type                                     point_type;
+    typedef typename image_reference<image_t>::type                          reference;
+    typedef typename image_const_reference<image_t>::type                    const_reference;
+    typedef rebinded_pixel<self_t, typename image_t::pixel_type>             pixel_type;
     typedef rebinded_pixel<const self_t, typename image_t::const_pixel_type> const_pixel_type;
-    typedef iterator_range<value_iterator> value_range;
-    typedef iterator_range<const_value_iterator> const_value_range;
-    typedef iterator_range<pixel_iterator> pixel_range;
-    typedef iterator_range<const_pixel_iterator> const_pixel_range;
+    typedef iterator_range<value_iterator>                                   value_range;
+    typedef iterator_range<const_value_iterator>                             const_value_range;
+    typedef iterator_range<pixel_iterator>                                   pixel_range;
+    typedef iterator_range<const_pixel_iterator>                             const_pixel_range;
 
     filtered_image_base(I&& ima, const Predicate& pred)
-        : m_ima(std::forward<I>(ima)), m_pred(pred), m_domain(m_ima, m_pred)
+      : m_ima(std::forward<I>(ima))
+      , m_pred(pred)
+      , m_domain(m_ima, m_pred)
     {
     }
 
@@ -280,8 +287,8 @@ namespace mln
     pixel_type pixel_at(const point_type& p) { return pixel_type(static_cast<self_t&>(*this), m_ima.pixel_at(p)); }
 
   protected:
-    I m_ima;
-    Predicate m_pred;
+    I           m_ima;
+    Predicate   m_pred;
     domain_type m_domain;
   };
 
@@ -290,13 +297,16 @@ namespace mln
   {
   private:
     typedef filtered_image_base<I, Predicate> base;
-    typedef internal::where_t<I, Predicate> domain_t;
+    typedef internal::where_t<I, Predicate>   domain_t;
 
   public:
     typedef typename base::domain_type domain_type;
 
   public:
-    filtered_image(I&& ima, const Predicate& pred) : filtered_image_base<I, Predicate>(std::forward<I>(ima), pred) {}
+    filtered_image(I&& ima, const Predicate& pred)
+      : filtered_image_base<I, Predicate>(std::forward<I>(ima), pred)
+    {
+    }
 
     friend internal::initializer<mln_concrete(filtered_image), typename internal::image_init_from<filtered_image>::type>
         imconcretize(const filtered_image& f)

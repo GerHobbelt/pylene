@@ -31,9 +31,9 @@ int main(int argc, char** argv)
   image2d<uint8> ima = addborder(f);
   image2d<uint8> Ima = immerse_k1(ima);
 
-  typedef image2d<uint8>::size_type size_type;
+  typedef image2d<uint8>::size_type                             size_type;
   typedef morpho::component_tree<size_type, image2d<size_type>> tree_t;
-  tree_t tree;
+  tree_t                                                        tree;
   tree = morpho::cToS(ima, c4);
   // tree._reorder_pset();
 
@@ -43,8 +43,8 @@ int main(int argc, char** argv)
 
   auto areamap = morpho::paccumulate(tree, Ima, accu, false);
 
-  unsigned lambda = std::atoi(argv[2]);
-  auto criterion = make_functional_property_map<tree_t::node_type>(
+  unsigned lambda    = std::atoi(argv[2]);
+  auto     criterion = make_functional_property_map<tree_t::node_type>(
       [&areamap, lambda](tree_t::node_type x) { return areamap[x] >= lambda; });
 
   image2d<uint8> out;

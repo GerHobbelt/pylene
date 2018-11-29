@@ -18,13 +18,19 @@ namespace mln
       struct accu_as_it : Accumulator<accu_as_it<Accu>>
       {
         typedef typename Accu::argument_type argument_type;
-        typedef Accu result_type;
+        typedef Accu                         result_type;
 
         accu_as_it() = default;
 
-        accu_as_it(const Accu& x) : m_accu(x) {}
+        accu_as_it(const Accu& x)
+          : m_accu(x)
+        {
+        }
 
-        accu_as_it(Accu&& x) : m_accu(std::move(x)) {}
+        accu_as_it(Accu&& x)
+          : m_accu(std::move(x))
+        {
+        }
 
         void init() { m_accu.init(); }
 

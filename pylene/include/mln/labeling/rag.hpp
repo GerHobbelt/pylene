@@ -25,7 +25,7 @@ namespace mln
       template <typename Label>
       struct rag_graph
       {
-        typedef boost::property<vertex_label_t, Label> Vproperty;
+        typedef boost::property<vertex_label_t, Label>                                         Vproperty;
         typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty> type;
       };
     }
@@ -46,23 +46,23 @@ namespace mln
       {
         typedef mln_point(I) P;
 
-        const Label bg = value_traits<Label>::max();
+        const Label bg      = value_traits<Label>::max();
         const Label INFRONT = lbl;
 
         extension::fill(out, INFRONT);
 
         P* queue = new P[ima.domain().size()];
 
-        unsigned qend = 0;
+        unsigned qend   = 0;
         unsigned fstart = ima.domain().size();
-        unsigned fend = ima.domain().size();
+        unsigned fend   = ima.domain().size();
 
-        auto qpush = [&queue, &qend](const P& p) { queue[qend++] = p; };
-        auto qpop = [&queue, &qend]() -> P { return queue[--qend]; };
+        auto qpush  = [&queue, &qend](const P& p) { queue[qend++] = p; };
+        auto qpop   = [&queue, &qend]() -> P { return queue[--qend]; };
         auto qempty = [&qend]() -> bool { return qend == 0; };
 
-        auto fpush = [&queue, &fstart](const P& p) { queue[--fstart] = p; };
-        auto fpop = [&queue, &fend]() -> P { return queue[--fend]; };
+        auto fpush  = [&queue, &fstart](const P& p) { queue[--fstart] = p; };
+        auto fpop   = [&queue, &fend]() -> P { return queue[--fend]; };
         auto fempty = [&fstart, &fend]() -> bool { return fend == fstart; };
 
         P q;
@@ -99,7 +99,7 @@ namespace mln
         graph = Graph(lbl);
 
         // Add vertices to the graph
-        typename boost::graph_traits<Graph>::vertex_iterator vi, vi_end;
+        typename boost::graph_traits<Graph>::vertex_iterator                vi, vi_end;
         std::vector<typename boost::graph_traits<Graph>::vertex_descriptor> lbl2vertex;
         lbl2vertex.resize(lbl + 1 - INFRONT);
 
@@ -113,9 +113,9 @@ namespace mln
         std::vector<Label> tomerge;
         while (not fempty())
         {
-          q = fpop();
-          Label& v = out(q);
-          bool removed = false;
+          q              = fpop();
+          Label& v       = out(q);
+          bool   removed = false;
           tomerge.clear();
           mln_forall (n)
           {
@@ -180,8 +180,8 @@ namespace mln
 
       mln_entering("mln::labeling::rag");
 
-      const I& ima = exact(ima_);
-      const Label bg = value_traits<Label>::max();
+      const I&    ima = exact(ima_);
+      const Label bg  = value_traits<Label>::max();
 
       int status;
       mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).init(bg).get_status(status);

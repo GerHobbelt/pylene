@@ -74,7 +74,10 @@ namespace mln
       template <typename Compare>
       struct equiv
       {
-        equiv(const Compare& cmp) : m_cmp(cmp) {}
+        equiv(const Compare& cmp)
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         bool operator()(const T& x, const T& y) const

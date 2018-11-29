@@ -13,8 +13,9 @@ namespace mln
 
   template <class P, class Amap>
   typename morpho::component_tree<P, Amap>::node_type
-  lca(const morpho::component_tree<P, Amap>& tree, const property_map<morpho::component_tree<P, Amap>, unsigned>& depth,
-      typename morpho::component_tree<P, Amap>::node_type x, typename morpho::component_tree<P, Amap>::node_type y);
+      lca(const morpho::component_tree<P, Amap>&                         tree,
+          const property_map<morpho::component_tree<P, Amap>, unsigned>& depth,
+          typename morpho::component_tree<P, Amap>::node_type x, typename morpho::component_tree<P, Amap>::node_type y);
 
   /// \brief generic function to compute an attribute on contour
   /// The tree must contains the 2F/1F
@@ -23,12 +24,12 @@ namespace mln
   /// \param accu The accumulator (-like) to compute.
   template <class P, class I, class AccuLike>
   property_map<morpho::component_tree<P, image2d<P>>, typename accu::result_of<AccuLike, mln_value(I)>::type>
-  compute_attribute_on_contour(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
-                               const AccumulatorLike<AccuLike>& accu);
+      compute_attribute_on_contour(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
+                                   const AccumulatorLike<AccuLike>& accu);
 
   template <class P, class VMap>
   image2d<typename VMap::value_type> set_value_on_contour(const morpho::component_tree<P, image2d<P>>& tree,
-                                                          const VMap& vmap);
+                                                          const VMap&                                  vmap);
 
   template <class P>
   void grain_filter_inplace(morpho::component_tree<P, image2d<P>>& tree, unsigned alpha);
@@ -39,8 +40,9 @@ namespace mln
 
   template <class P, class Amap>
   typename morpho::component_tree<P, Amap>::node_type
-  lca(const morpho::component_tree<P, Amap>& tree, const property_map<morpho::component_tree<P, Amap>, unsigned>& depth,
-      typename morpho::component_tree<P, Amap>::node_type x, typename morpho::component_tree<P, Amap>::node_type y)
+      lca(const morpho::component_tree<P, Amap>&                         tree,
+          const property_map<morpho::component_tree<P, Amap>, unsigned>& depth,
+          typename morpho::component_tree<P, Amap>::node_type x, typename morpho::component_tree<P, Amap>::node_type y)
   {
     if (x.id() == tree.npos())
       return y;
@@ -64,23 +66,23 @@ namespace mln
 
   template <class P, class I, class AccuLike>
   property_map<morpho::component_tree<P, image2d<P>>, typename accu::result_of<AccuLike, mln_value(I)>::type>
-  compute_attribute_on_contour(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
-                               const AccumulatorLike<AccuLike>& acc_)
+      compute_attribute_on_contour(const morpho::component_tree<P, image2d<P>>& tree, const Image<I>& valuemap,
+                                   const AccumulatorLike<AccuLike>& acc_)
   {
     mln_entering("mln::compute_attribute_on_contour");
 
     mln_precondition(tree._get_data()->m_pmap.border() >= 1);
 
-    typedef morpho::component_tree<P, image2d<P>> tree_t;
-    typedef typename tree_t::node_type node_type;
+    typedef morpho::component_tree<P, image2d<P>>                  tree_t;
+    typedef typename tree_t::node_type                             node_type;
     typedef typename accu::result_of<AccuLike, mln_value(I)>::type R;
 
-    const I& f = exact(valuemap);
-    auto acc = accu::make_accumulator(exact(acc_), mln_value(I)());
+    const I& f   = exact(valuemap);
+    auto     acc = accu::make_accumulator(exact(acc_), mln_value(I)());
     acc.init();
 
     property_map<tree_t, decltype(acc)> accmap(tree, acc);
-    property_map<tree_t, unsigned> depth = morpho::compute_depth(tree);
+    property_map<tree_t, unsigned>      depth = morpho::compute_depth(tree);
 
     {
       mln_pixter(px, f);
@@ -94,7 +96,7 @@ namespace mln
           {
             // if nx is in the extension -> nq = tree.nend()
             node_type nq = tree.get_node_at(nx->index());
-            int d = (nq.id() == tree.npos()) ? -1 : depth[nq];
+            int       d  = (nq.id() == tree.npos()) ? -1 : depth[nq];
             for (node_type x = np; (int)depth[x] > d and x.id() != tree.npos(); x = x.parent())
               accmap[x].take(nx->val());
           }
@@ -131,13 +133,13 @@ namespace mln
 
   template <class P, class VMap>
   image2d<typename VMap::value_type> set_value_on_contour(const morpho::component_tree<P, image2d<P>>& tree,
-                                                          const VMap& vmap)
+                                                          const VMap&                                  vmap)
   {
     mln_entering("set_value_on_countour");
 
-    typedef typename VMap::value_type V;
+    typedef typename VMap::value_type             V;
     typedef morpho::component_tree<P, image2d<P>> tree_t;
-    typedef typename tree_t::node_type node_t;
+    typedef typename tree_t::node_type            node_t;
 
     image2d<V> saliency;
     resize(saliency, tree._get_data()->m_pmap).init(0);
@@ -154,7 +156,7 @@ namespace mln
         {
           node_t x = tree.get_node_at(px->index());
           node_t y = tree.get_node_at(qx->index());
-          V m = qx->val();
+          V      m = qx->val();
           while (depth[y] < depth[x])
           {
             m = std::max(m, vmap[x]);

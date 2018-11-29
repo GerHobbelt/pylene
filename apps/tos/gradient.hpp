@@ -11,7 +11,7 @@ namespace mln
   template <typename T>
   struct Minmax : Accumulator<Minmax<T>>
   {
-    typedef T argument_type;
+    typedef T               argument_type;
     typedef std::pair<T, T> result_type;
 
     void init()

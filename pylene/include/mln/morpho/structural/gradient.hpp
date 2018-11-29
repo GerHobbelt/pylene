@@ -157,9 +157,9 @@ namespace mln
       {
         mln_entering("mln::morpho::gradient");
 
-        const I& ima = exact(ima_);
-        const SE& se = exact(se_);
-        O& out = exact(output);
+        const I&  ima = exact(ima_);
+        const SE& se  = exact(se_);
+        O&        out = exact(output);
         mln::morpho::structural::impl::gradient(ima, se, cmp, norm, out);
       }
 
@@ -184,9 +184,9 @@ namespace mln
       {
         mln_entering("mln::morpho::external_gradient");
 
-        const I& ima = exact(ima_);
-        const SE& se = exact(se_);
-        O& out = exact(output);
+        const I&  ima = exact(ima_);
+        const SE& se  = exact(se_);
+        O&        out = exact(output);
         mln::morpho::structural::impl::external_gradient(ima, se, cmp, norm, out);
       }
 
@@ -211,9 +211,9 @@ namespace mln
       {
         mln_entering("mln::morpho::internal_gradient");
 
-        const I& ima = exact(ima_);
-        const SE& se = exact(se_);
-        O& out = exact(output);
+        const I&  ima = exact(ima_);
+        const SE& se  = exact(se_);
+        O&        out = exact(output);
         mln::morpho::structural::impl::internal_gradient(ima, se, cmp, norm, out);
       }
 

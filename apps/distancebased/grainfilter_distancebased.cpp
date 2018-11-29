@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   if (argc < 4)
     usage(argv);
 
-  const char* infname = argv[1];
+  const char* infname  = argv[1];
   const char* outfname = argv[2];
 
   using namespace mln;
@@ -40,13 +40,13 @@ int main(int argc, char** argv)
   io::imread(infname, input);
 
   typedef lexicographicalorder_less<rgb8> Compare;
-  Compare cmp;
+  Compare                                 cmp;
 
   image2d<rgb8> Ori = addborder(input, cmp);
-  image2d<rgb8> f = interpolate_k1(Ori);
+  image2d<rgb8> f   = interpolate_k1(Ori);
 
-  image2d<rgb8> K;
-  image2d<unsigned> parent;
+  image2d<rgb8>         K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   auto dist = [](rgb8 x, rgb8 y) { return l1norm(x - y); };

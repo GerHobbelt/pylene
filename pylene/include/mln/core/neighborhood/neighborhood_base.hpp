@@ -12,8 +12,8 @@ namespace mln
   template <class Nbh, class tag>
   struct neighborhood_base : Neighborhood<Nbh>
   {
-    using category = tag;
-    using is_incremental = std::false_type;
+    using category        = tag;
+    using is_incremental  = std::false_type;
     using is_decomposable = std::false_type;
 
   private:

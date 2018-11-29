@@ -10,7 +10,7 @@ namespace mln
   struct iterator_traits
   {
     typedef typename I::value_type value_type;
-    typedef typename I::reference reference;
+    typedef typename I::reference  reference;
 
     typedef typename I::has_NL has_NL;
   };

@@ -1,10 +1,10 @@
 #ifndef MLN_MORPHO_CANVAS_DILATION_LIKE_HPP
 #define MLN_MORPHO_CANVAS_DILATION_LIKE_HPP
 
+#include <mln/core/algorithm/copy.hpp>
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/algorithm/copy.hpp>
 #include <mln/kernelv2/kernel.hpp>
 #include <mln/morpho/se/se.hpp>
 
@@ -44,19 +44,18 @@ namespace mln
         /// * The SE is incremental
         /// * The feature has the `untake` method
         template <class I, class SE, class J, class OpTraits>
-        void dilate_like_1(const I& ima, const SE& nbh, J& out, OpTraits __op__,
-                           std::true_type __is_incremental__)
+        void dilate_like_1(const I& ima, const SE& nbh, J& out, OpTraits __op__, std::true_type __is_incremental__)
         {
           namespace ker = mln::kernel;
           (void)__is_incremental__;
 
-          auto hsup = __op__.accu_hsup;
+          auto                           hsup = __op__.accu_hsup;
           ker::Aggregate<decltype(hsup)> A(hsup);
-          ker::Point p;
-          ker::Neighbor n;
-          auto f = ker::make_image_expr<0>(ima);
-          auto g = ker::make_image_expr<1>(out);
-          auto expr = kernel::declare(g(p) = A(f(n)));
+          ker::Point                     p;
+          ker::Neighbor                  n;
+          auto                           f    = ker::make_image_expr<0>(ima);
+          auto                           g    = ker::make_image_expr<1>(out);
+          auto                           expr = kernel::declare(g(p) = A(f(n)));
           ker::execute_incremental(expr, nbh);
         }
 
@@ -69,12 +68,12 @@ namespace mln
           namespace ker = mln::kernel;
           (void)__is_incremental__;
 
-          auto sup = __op__.accu_sup;
+          auto                          sup = __op__.accu_sup;
           ker::Aggregate<decltype(sup)> A(sup);
-          ker::Point p;
-          ker::Neighbor n;
-          auto f = ker::make_image_expr<0>(ima);
-          auto g = ker::make_image_expr<1>(out);
+          ker::Point                    p;
+          ker::Neighbor                 n;
+          auto                          f = ker::make_image_expr<0>(ima);
+          auto                          g = ker::make_image_expr<1>(out);
 
           auto expr = kernel::declare(g(p) = A(f(n)));
           ker::execute(expr, nbh);
@@ -87,8 +86,8 @@ namespace mln
 
           mln_value(I) v = __op__.zero();
 
-          using is_se_incremental = typename neighborhood_traits<SE>::is_incremental;
-          using is_accu_incremental = typename OpTraits::support_incremental;
+          using is_se_incremental    = typename neighborhood_traits<SE>::is_incremental;
+          using is_accu_incremental  = typename OpTraits::support_incremental;
           using is_image_incremental = typename iterator_traits<mln_pxter(I)>::has_NL;
           using is_incremental =
               std::integral_constant<bool, is_se_incremental::value and is_accu_incremental::value and
@@ -119,8 +118,8 @@ namespace mln
           (void)__has_extension__;
           mln::trace::warn("Slow version because input image has no extension.");
 
-          using is_se_incremental = typename neighborhood_traits<SE>::is_incremental;
-          using is_accu_incremental = typename OpTraits::support_incremental;
+          using is_se_incremental    = typename neighborhood_traits<SE>::is_incremental;
+          using is_accu_incremental  = typename OpTraits::support_incremental;
           using is_image_incremental = typename iterator_traits<mln_pxter(I)>::has_NL;
           using is_incremental =
               std::integral_constant<bool, is_se_incremental::value and is_accu_incremental::value and
@@ -146,18 +145,19 @@ namespace mln
         template <class I, class SE, class J, class OpTraits, class Domain>
         void dilation_dispatch_2(const I& input, const SE& se, J& output, OpTraits __op__, Domain __domain__)
         {
-          (void) __domain__;
+          (void)__domain__;
           impl::dilate_like_0(input, se, output, __op__, typename image_has_extension<I>::type());
         }
 
         // This is the version for regular 2D domain with periodic_line
         template <class I, class J, class OpTraits>
-        void dilation_dispatch_2(const I& input, const se::periodic_line2d& line, J& output, OpTraits __op__, box2d __domain__)
+        void dilation_dispatch_2(const I& input, const se::periodic_line2d& line, J& output, OpTraits __op__,
+                                 box2d __domain__)
         {
-          (void) __domain__;
-          (void) input;
+          (void)__domain__;
+          (void)input;
           mln::copy(input, output);
-          auto sup = [__op__](auto x, auto y) { return __op__.sup(x,y); };
+          auto sup = [__op__](auto x, auto y) { return __op__.sup(x, y); };
           mln::morpho::internal::dilation_by_periodic_line(output, line, sup, __op__.zero());
         }
 
@@ -166,7 +166,7 @@ namespace mln
         template <class I, class SE, class OpTraits, class Domain>
         void dilation_dispatch_2_inplace(I& f, const SE& se, OpTraits __op__, Domain __domain__)
         {
-          (void) __domain__;
+          (void)__domain__;
           // Fixme how to avoid copy and just swap images between iterations ?
           mln_concrete(I) temporary = imconcretize(f);
           impl::dilate_like_0(f, se, temporary, __op__, typename image_has_extension<I>::type());
@@ -177,8 +177,8 @@ namespace mln
         template <class I, class OpTraits>
         void dilation_dispatch_2_inplace(I& f, const se::periodic_line2d& line, OpTraits __op__, box2d __domain__)
         {
-          (void) __domain__;
-          auto sup = [__op__](auto x, auto y) { return __op__.sup(x,y); };
+          (void)__domain__;
+          auto sup = [__op__](auto x, auto y) { return __op__.sup(x, y); };
           mln::morpho::internal::dilation_by_periodic_line(f, line, sup, __op__.zero());
         }
 
@@ -188,8 +188,7 @@ namespace mln
         void dilation_dispatch_1(const I& ima, const SE& nbh, J& output, OpTraits __op__,
                                  std::false_type __is_decomposable)
         {
-          mln_entering("mln::morpho::canvas::dilation (not-decomposed)")
-          (void) __is_decomposable;
+          mln_entering("mln::morpho::canvas::dilation (not-decomposed)")(void) __is_decomposable;
           dilation_dispatch_2(ima, nbh, output, __op__, ima.domain());
         }
 
@@ -197,11 +196,10 @@ namespace mln
         void dilation_dispatch_1(const I& input, const SE& nbh, J& output, OpTraits __op__,
                                  std::true_type __is_decomposable)
         {
-          (void) __is_decomposable;
+          (void)__is_decomposable;
           if (nbh.decomposable())
           {
-            mln_entering("mln::morpho::canvas::dilation (decomposed)")
-            auto ses = nbh.decompose();
+            mln_entering("mln::morpho::canvas::dilation (decomposed)") auto ses = nbh.decompose();
             mln::copy(input, output);
             for (auto&& se : ses)
               dilation_dispatch_2_inplace(output, se, __op__, output.domain());
@@ -209,7 +207,7 @@ namespace mln
           else
           {
             mln_entering("mln::morpho::canvas::dilation (not-decomposed)")
-            dilation_dispatch_2(input, nbh, output, __op__, output.domain());
+                dilation_dispatch_2(input, nbh, output, __op__, output.domain());
           }
         }
       }

@@ -28,18 +28,24 @@ namespace mln
   template <class Image>
   struct pointer_pixel : Pixel<pointer_pixel<Image>>
   {
-    using point_type = mln_point(Image);
-    using site_type = mln_point(Image);
-    using size_type = typename Image::size_type;
-    using image_type = Image;
-    using reference = mln_reference(Image);
-    using value_type = std::remove_reference_t<reference>;
+    using point_type   = mln_point(Image);
+    using site_type    = mln_point(Image);
+    using size_type    = typename Image::size_type;
+    using image_type   = Image;
+    using reference    = mln_reference(Image);
+    using value_type   = std::remove_reference_t<reference>;
     using pointer_type = value_type*;
 
-    pointer_pixel() : m_image(nullptr) {}
+    pointer_pixel()
+      : m_image(nullptr)
+    {
+    }
 
     pointer_pixel(Image& image, pointer_type ptr, const point_type& point, size_type index)
-        : m_image(&image), m_ptr(ptr), m_point(point), m_index(index)
+      : m_image(&image)
+      , m_ptr(ptr)
+      , m_point(point)
+      , m_index(index)
     {
     }
 
@@ -49,7 +55,10 @@ namespace mln
     template <class I2>
     pointer_pixel(const pointer_pixel<I2>& other,
                   std::enable_if_t<std::is_convertible<I2*, Image*>::value, void*> = nullptr)
-        : m_image(other.m_image), m_ptr(other.m_ptr), m_point(other.m_point), m_index(other.m_index)
+      : m_image(other.m_image)
+      , m_ptr(other.m_ptr)
+      , m_point(other.m_point)
+      , m_index(other.m_index)
     {
     }
 
@@ -84,18 +93,18 @@ namespace mln
     // Enable this pixel to be compliant as an internal structure used for iterating
     friend struct internal::iterator_core_access;
 
-    char*& get_value() { return m_ptr; }
-    site_type& get_point() { return m_point; }
-    size_type& get_index() { return m_index; }
-    const char* get_value() const { return m_ptr; }
+    char*&           get_value() { return m_ptr; }
+    site_type&       get_point() { return m_point; }
+    size_type&       get_index() { return m_index; }
+    const char*      get_value() const { return m_ptr; }
     const site_type& get_point() const { return m_point; }
-    size_type get_index() const { return m_index; }
+    size_type        get_index() const { return m_index; }
 
   private:
-    image_type* m_image;
+    image_type*  m_image;
     pointer_type m_ptr;
-    site_type m_point;
-    size_type m_index;
+    site_type    m_point;
+    size_type    m_index;
   };
 
 } // end of namespace mln

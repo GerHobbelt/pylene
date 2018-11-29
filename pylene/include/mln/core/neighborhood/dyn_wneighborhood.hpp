@@ -68,11 +68,15 @@ namespace mln
 
   template <class SiteSet, class WeightSet, class category>
   struct dyn_wneighborhood
-      : dyn_wneighborhood_base<SiteSet, WeightSet, category, dyn_wneighborhood<SiteSet, WeightSet, category>>
+    : dyn_wneighborhood_base<SiteSet, WeightSet, category, dyn_wneighborhood<SiteSet, WeightSet, category>>
   {
-    dyn_wneighborhood(const SiteSet& pset, const WeightSet& wset) : dpoints{pset}, weights{wset} {}
+    dyn_wneighborhood(const SiteSet& pset, const WeightSet& wset)
+      : dpoints{pset}
+      , weights{wset}
+    {
+    }
 
-    const SiteSet dpoints;
+    const SiteSet   dpoints;
     const WeightSet weights;
   };
 

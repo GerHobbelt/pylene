@@ -22,7 +22,7 @@ namespace mln
 
     struct child_t
     {
-      unsigned first_child = -1;
+      unsigned first_child  = -1;
       unsigned next_sibling = -1;
     };
 
@@ -30,7 +30,7 @@ namespace mln
 
     // Copy node indexes and set child relation
     std::vector<unsigned> nodes;
-    image2d<child_t> crel;
+    image2d<child_t>      crel;
     resize(crel, K);
 
     for (unsigned x : S)
@@ -56,20 +56,20 @@ namespace mln
     // the root of the "node component" is actually the
     // node with minimal energy
     static const unsigned UNSEEN = -1;
-    image2d<unsigned> par, zpar;
-    image2d<unsigned> area;
-    image2d<unsigned> pmin;
+    image2d<unsigned>     par, zpar;
+    image2d<unsigned>     area;
+    image2d<unsigned>     pmin;
     resize(zpar, K);
     resize(par, K).init(UNSEEN);
     resize(area, K);
     resize(pmin, K);
 
     unsigned num_node_deleted = 0;
-    unsigned num_node_kept = 0;
+    unsigned num_node_kept    = 0;
 
     for (unsigned x : nodes)
     {
-      par[x] = x;
+      par[x]  = x;
       zpar[x] = x;
       area[x] = 1;
       pmin[x] = x;
@@ -82,7 +82,7 @@ namespace mln
           unsigned y = zfindroot(zpar, q);
           if (y != x)
           {
-            par[y] = x; // Caution: we choose y as the root (since energy[y] < energy[x])
+            par[y]  = x; // Caution: we choose y as the root (since energy[y] < energy[x])
             zpar[y] = x;
             area[x] += area[y];
             pmin[x] = pmin[y];
@@ -102,7 +102,7 @@ namespace mln
               {
                 if (energy[pmin[y]] < energy[pmin[x]])
                   pmin[x] = pmin[y];
-                par[y] = x;
+                par[y]  = x;
                 zpar[y] = x;
                 area[x] += area[y];
               }
@@ -120,7 +120,7 @@ namespace mln
         if (area[x] < seuil)
         {
           energy[x] = energy[par[x]];
-          pmin[x] = pmin[par[x]];
+          pmin[x]   = pmin[par[x]];
         }
       }
     }
@@ -135,7 +135,7 @@ namespace mln
           K[x] = K[parent[x]];
         else if (x != pmin[x])
         { // not a local mimimum
-          K[x] = K[parent[x]];
+          K[x]      = K[parent[x]];
           energy[x] = energy[pmin[x]];
           num_node_deleted++;
         }

@@ -51,11 +51,11 @@ namespace mln
       {
         unsigned appear;
         unsigned vanish;
-        float value;
+        float    value;
       };
 
       box2d domain = K.domain();
-      domain.pmax = domain.pmax * 2 - 1;
+      domain.pmax  = domain.pmax * 2 - 1;
       image2d<edge_attribute> e;
 
       edge_attribute default_value = {UNACTIVE, UNACTIVE, 0.0};
@@ -74,10 +74,10 @@ namespace mln
 
       for (int i = S.size() - 1; i >= 0; --i)
       {
-        unsigned p = S[i];
+        unsigned p  = S[i];
         unsigned rp = K[parent[p]] == K[p] ? parent[p] : p;
 
-        point2d p_ = K.point_at_index(p);
+        point2d p_  = K.point_at_index(p);
         point2d p2_ = 2 * p_;
 
         if (K1::is_face_2(p_))
@@ -91,8 +91,8 @@ namespace mln
             if (e.at(*n2).appear == UNACTIVE)
             {
               e.at(*n2).appear = rp;
-              vec3i grad = (vec3i)ori.at(*n) - (vec3i)ori[p];
-              e.at(*n2).value = (grad * grad).sum();
+              vec3i grad       = (vec3i)ori.at(*n) - (vec3i)ori[p];
+              e.at(*n2).value  = (grad * grad).sum();
             }
             else
               e.at(*n2).vanish = rp;
@@ -108,8 +108,8 @@ namespace mln
             if (e.at(*n2).appear == UNACTIVE)
             {
               e.at(*n2).appear = rp;
-              vec3i grad = (vec3i)ori.at(*n) - (vec3i)ori[p];
-              e.at(*n2).value = (grad * grad).sum();
+              vec3i grad       = (vec3i)ori.at(*n) - (vec3i)ori[p];
+              e.at(*n2).value  = (grad * grad).sum();
             }
             else
               e.at(*n2).vanish = rp;
@@ -124,8 +124,8 @@ namespace mln
             if (e.at(*n2).appear == UNACTIVE)
             {
               e.at(*n2).appear = rp;
-              vec3i grad = (vec3i)ori.at(*n) - (vec3i)ori[p];
-              e.at(*n2).value = (grad * grad).sum();
+              vec3i grad       = (vec3i)ori.at(*n) - (vec3i)ori[p];
+              e.at(*n2).value  = (grad * grad).sum();
             }
             else
               e.at(*n2).vanish = rp;
@@ -147,10 +147,10 @@ namespace mln
           int step = i % 2 == 0 ? 2 : 4;
           for (short j = pmin[1] - (i % 2 == 0); j < pmax[1] + 1; j += step) // foreach edges
           {
-            point2d p{i, j};
-            unsigned cur_node = e.at(p).appear;
+            point2d  p{i, j};
+            unsigned cur_node  = e.at(p).appear;
             unsigned last_node = e.at(p).vanish;
-            float val = e.at(p).value;
+            float    val       = e.at(p).value;
             assert(cur_node != UNACTIVE);
             if (last_node == UNACTIVE)
               im_acc1f[cur_node].take(val);

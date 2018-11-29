@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   io::imread(argv[1], F);
   io::imread(argv[2], M);
 
-  se::ball2d b = se::make_ball2d(5.3);
+  se::ball2d    b = se::make_ball2d(5.3);
   image2d<bool> M2;
   M2 = morpho::structural::external_gradient(M != rgb8(literal::zero), b, productorder_less<bool>(),
                                              [](int x) -> bool { return x != 0; });

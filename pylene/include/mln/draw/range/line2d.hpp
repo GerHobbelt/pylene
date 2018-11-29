@@ -13,7 +13,7 @@ namespace mln
 
     struct line2d_iterator;
     typedef iterator_range<line2d_iterator> line2d_range;
-    line2d_range line2d(const point2d& pbegin, const point2d& pend);
+    line2d_range                            line2d(const point2d& pbegin, const point2d& pend);
 
     /*******************/
     /** Implementation */
@@ -32,20 +32,22 @@ namespace mln
     {
       line2d_iterator() {}
 
-      line2d_iterator(const point2d& pbegin, const point2d& pend) : m_pbegin(pbegin), m_pend(pend)
+      line2d_iterator(const point2d& pbegin, const point2d& pend)
+        : m_pbegin(pbegin)
+        , m_pend(pend)
       {
         point2d dp = m_pend - m_pbegin;
-        m_octhan = false;
+        m_octhan   = false;
         if (std::abs(dp[1]) < std::abs(dp[0]))
         {
           std::swap(dp[1], dp[0]);
           m_octhan = true;
         }
 
-        m_sy = internal::sgn(dp[0]);
-        m_sx = internal::sgn(dp[1]);
-        m_dy = std::abs(dp[0]);
-        m_dx = std::abs(dp[1]);
+        m_sy  = internal::sgn(dp[0]);
+        m_sx  = internal::sgn(dp[1]);
+        m_dy  = std::abs(dp[0]);
+        m_dx  = std::abs(dp[1]);
         m_ddy = 2 * m_dy;
         m_ddx = 2 * m_dx;
         mln_assertion(m_dy <= m_dx);
@@ -88,18 +90,18 @@ namespace mln
       }
 
     private:
-      bool m_octhan;
+      bool    m_octhan;
       point2d m_pbegin;
       point2d m_pend;
       point2d m_p;
-      int m_sx;
-      int m_sy;
-      int m_dx;
-      int m_dy;
-      int m_ddx;
-      int m_ddy;
-      int m_e;
-      int m_i;
+      int     m_sx;
+      int     m_sy;
+      int     m_dx;
+      int     m_dy;
+      int     m_ddx;
+      int     m_ddy;
+      int     m_e;
+      int     m_i;
     };
 
     inline line2d_range line2d(const point2d& pbegin, const point2d& pend)

@@ -24,9 +24,13 @@ namespace mln
       {
         using size_type = typename I::size_type;
         const I& m_ima;
-        Compare m_cmp;
+        Compare  m_cmp;
 
-        pqueue_cmp_t(const I& ima, const Compare& cmp) : m_ima(ima), m_cmp(cmp) {}
+        pqueue_cmp_t(const I& ima, const Compare& cmp)
+          : m_ima(ima)
+          , m_cmp(cmp)
+        {
+        }
 
         bool operator()(size_type p, size_type q) { return m_cmp(m_ima[p], m_ima[q]); }
       };
@@ -41,20 +45,23 @@ namespace mln
 
       typedef std::priority_queue<size_type, std::vector<size_type>, internal::pqueue_cmp_t<I, Compare>> base;
 
-      priority_queue_ima(const I& ima, Compare cmp) : base(internal::pqueue_cmp_t<I, Compare>{ima, cmp})
+      priority_queue_ima(const I& ima, Compare cmp)
+        : base(internal::pqueue_cmp_t<I, Compare>{ima, cmp})
       {
         this->c.reserve(ima.domain().size());
       }
     };
 
     template <typename I, typename Compare>
-    struct priority_queue_ima<I, Compare, typename std::enable_if<(value_traits<mln_value(I)>::quant <
-                                                                   PQUEUE_FAST_SWITCH_HQUEUE_NBITS)>::type>
+    struct priority_queue_ima<
+        I, Compare,
+        typename std::enable_if<(value_traits<mln_value(I)>::quant < PQUEUE_FAST_SWITCH_HQUEUE_NBITS)>::type>
     {
       typedef typename I::size_type size_type;
       using V = mln_value(I);
 
-      priority_queue_ima(const I& ima, Compare) : m_ima(ima)
+      priority_queue_ima(const I& ima, Compare)
+        : m_ima(ima)
       {
         i = value_traits<index_type>::min();
         {
@@ -91,10 +98,10 @@ namespace mln
 
     private:
       typedef typename indexer<V, Compare>::index_type index_type;
-      static constexpr std::size_t nlevels = (std::size_t)1 << value_traits<index_type>::quant;
-      const I& m_ima;
-      indexer<V, Compare> h;
-      index_type i;
+      static constexpr std::size_t                     nlevels = (std::size_t)1 << value_traits<index_type>::quant;
+      const I&                                         m_ima;
+      indexer<V, Compare>                              h;
+      index_type                                       i;
       bounded_hqueue<size_type, nlevels, std::allocator<size_type>, true> m_hq;
     };
   }

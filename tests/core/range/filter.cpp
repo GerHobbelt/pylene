@@ -19,7 +19,7 @@ TEST(Core, range_filter)
   using namespace mln;
 
   box2d a({0, 0}, {6, 11});
-  auto x = rng::filter(a, [](point2d p) { return (p[0] % 2) == (p[1] % 2); }); // chess board
+  auto  x = rng::filter(a, [](point2d p) { return (p[0] % 2) == (p[1] % 2); }); // chess board
 
   unsigned sz = 0;
   mln_foreach (point2d p, x)
@@ -39,7 +39,7 @@ TEST(Core, range_filter)
 TEST(Range, filter_2d_readonly)
 {
   std::vector<mln::point2d> ref = {{0, 0}, {0, 2}, {1, 1}, {1, 3}, {2, 0}, {2, 2}};
-  mln::box2d box = {{0,0}, {3,4}};
+  mln::box2d                box = {{0, 0}, {3, 4}};
 
   auto chessboard_pred = [](auto p) { return (p[0] % 2) == (p[1] % 2); };
 
@@ -53,12 +53,12 @@ TEST(Range, filter_2d_readonly)
 TEST(Range, filter_2d_readonly_rowwise)
 {
   std::vector<mln::point2d> ref = {{0, 0}, {0, 2}, {1, 1}, {1, 3}, {2, 0}, {2, 2}};
-  mln::box2d box = {{0,0}, {3,4}};
+  mln::box2d                box = {{0, 0}, {3, 4}};
 
   auto chessboard_pred = [](auto p) { return (p[0] % 2) == (p[1] % 2); };
 
   std::vector<mln::point2d> res;
-  auto rng = mln::ranges::view::filter(box, chessboard_pred);
+  auto                      rng = mln::ranges::view::filter(box, chessboard_pred);
   for (auto row : rng.rows())
     for (auto p : row)
       res.push_back(p);
@@ -78,8 +78,8 @@ TEST(Range, filter_2d_write)
 
 
   // make res
-  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3,4}, {4,1});
-  auto pred = [](int val) { return val % 2 == 0; };
+  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3, 4}, {4, 1});
+  auto                            pred = [](int val) { return val % 2 == 0; };
   for (auto& val : mln::ranges::view::filter(sp, pred))
     val = 42;
 
@@ -99,13 +99,12 @@ TEST(Range, filter_2d_write_rowwise)
 
 
   // make res
-  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3,4}, {4,1});
-  auto pred = [](int val) { return val % 2 == 0; };
-  auto rng = mln::ranges::view::filter(sp, pred);
+  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3, 4}, {4, 1});
+  auto                            pred = [](int val) { return val % 2 == 0; };
+  auto                            rng  = mln::ranges::view::filter(sp, pred);
   for (auto row : rng.rows())
     for (int& val : row)
       val = 42;
 
   ASSERT_EQ(ref, buffer);
 }
-

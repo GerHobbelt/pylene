@@ -19,7 +19,7 @@ TEST(Core, ZipImage_Mixed_writable)
 {
   using namespace mln;
 
-  image2d<int> ima(5, 5);
+  image2d<int>    ima(5, 5);
   image2d<uint16> ima2(5, 5);
   iota(ima, 0);
   iota(ima2, 1);
@@ -38,7 +38,7 @@ TEST(Core, ZipImage_Value_Iteration_1)
 {
   using namespace mln;
 
-  image2d<int> a(5, 5);
+  image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
 
   auto x = imzip(a, b);
@@ -51,10 +51,10 @@ TEST(Core, ZipImage_Pixel_Iteration_1)
 {
   using namespace mln;
 
-  image2d<int> a(5, 5);
+  image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
 
-  auto x = imzip(a, b);
+  auto                                                           x = imzip(a, b);
   typedef zip_image<image2d<int>&, image2d<uint16>&>::pixel_type pixel_t;
   range::for_each(x.pixels(), [](pixel_t x) { x.val() = std::make_tuple(2, 4); });
 
@@ -66,7 +66,7 @@ TEST(Core, ZipImage_Value_Iteration_2)
 {
   using namespace mln;
 
-  image2d<int> a(5, 5);
+  image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
   iota(a, 0);
   iota(b, 0);
@@ -89,7 +89,7 @@ TEST(Core, ZipImage_Temporary_usage)
 {
   using namespace mln;
   image2d<int> ima(5, 5);
-  auto x = imzip(ima, make_image());
+  auto         x = imzip(ima, make_image());
 
   mln_foreach (auto w, x.values())
     std::get<0>(w) = std::get<1>(w);

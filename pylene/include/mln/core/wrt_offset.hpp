@@ -11,9 +11,9 @@ namespace mln
   template <typename I, typename SiteSet, typename STLOutputIterator>
   inline void wrt_offset(const Image<I>& ima_, const SiteSet& dpoints, STLOutputIterator out)
   {
-    const I& ima = exact(ima_);
+    const I&      ima     = exact(ima_);
     const size_t* strides = ima.strides();
-    auto it = rng::iter(dpoints);
+    auto          it      = rng::iter(dpoints);
     for (it.init(); !it.finished(); it.next(), ++out)
     {
       *out = 0;
@@ -26,7 +26,7 @@ namespace mln
   inline void wrt_offset(const Image<I>& ima_, const std::array<mln_point(I), N>& dpoints,
                          std::array<typename I::difference_type, N>& out)
   {
-    const I& ima = exact(ima_);
+    const I&      ima     = exact(ima_);
     const size_t* strides = ima.strides();
     for (size_t j = 0; j < N; ++j)
     {
@@ -48,9 +48,9 @@ namespace mln
   template <typename I, typename SiteSet, typename OutputIterator>
   inline void wrt_delta_index(const Image<I>& ima_, const SiteSet& dpoints, OutputIterator out)
   {
-    const I& ima = exact(ima_);
+    const I&      ima     = exact(ima_);
     const size_t* strides = ima.index_strides();
-    auto it = rng::iter(dpoints);
+    auto          it      = rng::iter(dpoints);
     for (it.init(); !it.finished(); it.next(), ++out)
     {
       *out = 0;
@@ -60,7 +60,7 @@ namespace mln
   }
 
   template <typename Image, size_t N>
-  std::array<typename Image::difference_type, N> wrt_offset(const Image& ima,
+  std::array<typename Image::difference_type, N> wrt_offset(const Image&                                     ima,
                                                             const std::array<typename Image::point_type, N>& dpoints)
   {
     std::array<typename Image::difference_type, N> out;

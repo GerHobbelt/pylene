@@ -20,7 +20,7 @@ namespace mln
   inline void compute_delta_strides(const SizeType* strides, const CoordType* shape, DifferenceType* out)
   {
     SizeType offset = strides[ndim - 1];
-    out[ndim - 1] = strides[ndim - 1];
+    out[ndim - 1]   = strides[ndim - 1];
     for (int i = ndim - 2; i >= 0; --i)
     {
       offset *= (shape[i + 1] - 1);
@@ -33,7 +33,7 @@ namespace mln
   inline void compute_negative_delta_strides(const SizeType* strides, const CoordType* shape, DifferenceType* out)
   {
     SizeType offset = strides[ndim - 1];
-    out[ndim - 1] = -static_cast<DifferenceType>(strides[ndim - 1]);
+    out[ndim - 1]   = -static_cast<DifferenceType>(strides[ndim - 1]);
     for (int i = ndim - 2; i >= 0; --i)
     {
       offset *= (shape[i + 1] - 1);

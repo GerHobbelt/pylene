@@ -1,8 +1,8 @@
 #ifndef MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP
-# define MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP
+#define MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP
 
-# include <mln/core/image/image.hpp>
-# include <vector>
+#include <mln/core/image/image.hpp>
+#include <vector>
 
 namespace mln
 {
@@ -20,7 +20,7 @@ namespace mln
         class pset_hqueue
         {
         public:
-          using Key = mln_value(I);
+          using Key   = mln_value(I);
           using Point = typename I::size_type;
           static_assert(std::is_unsigned<Key>::value, "Key must an unsigned type.");
 
@@ -33,22 +33,22 @@ namespace mln
           /// \brief Return the closest level pair (key,point) such that:
           /// * there is a pair (l₁,p₁) in the set with l₁ ≥ level then (l₁,p₁)
           /// * there is a pair (l₁,p₂) in the set with l₂ < level then (l₂,p₂)
-          std::pair<Key, Point> pop(Key level);
+          std::pair<Key, Point>  pop(Key level);
           std::pair<bool, Point> try_pop(Key level);
 
           /// \brief Return true if the set is empty
           bool empty() const;
 
         private:
-          static constexpr Point npos = value_traits<Point>::max();
-          static constexpr int nlevel = (1 << value_traits<Key>::quant);
+          static constexpr Point npos   = value_traits<Point>::max();
+          static constexpr int   nlevel = (1 << value_traits<Key>::quant);
           static_assert(nlevel < value_traits<int>::max(), "Incompatible type.");
 
           Point pop_at_level(int level);
 
-          std::vector<Point>            m_head; ///< Vector of queue heads
-          mln_ch_value(I, Point)        m_next;
-          unsigned                      m_size = 0;
+          std::vector<Point> m_head; ///< Vector of queue heads
+          mln_ch_value(I, Point) m_next;
+          unsigned m_size = 0;
         };
 
         /******************************************/
@@ -58,8 +58,8 @@ namespace mln
         template <class I>
         template <class J>
         pset_hqueue<I>::pset_hqueue(const Image<J>& ima)
-          : m_head(nlevel, (Point)npos),
-            m_next(exact(ima), mln::init())
+          : m_head(nlevel, (Point)npos)
+          , m_next(exact(ima), mln::init())
         {
         }
 
@@ -72,24 +72,22 @@ namespace mln
         template <class I>
         void pset_hqueue<I>::insert(Key level, Point p)
         {
-          m_next[p] = m_head[level];
+          m_next[p]     = m_head[level];
           m_head[level] = p;
           m_size++;
         }
 
         template <class I>
-        typename I::size_type
-        pset_hqueue<I>::pop_at_level(int level)
+        typename I::size_type pset_hqueue<I>::pop_at_level(int level)
         {
-          Point p = m_head[level];
+          Point p       = m_head[level];
           m_head[level] = m_next[p];
           m_size--;
           return p;
         }
 
         template <class I>
-        std::pair<bool, typename I::size_type>
-        pset_hqueue<I>::try_pop(Key level)
+        std::pair<bool, typename I::size_type> pset_hqueue<I>::try_pop(Key level)
         {
           if (m_head[level] != npos)
             return std::make_pair(true, pop_at_level(level));
@@ -98,8 +96,7 @@ namespace mln
         }
 
         template <class I>
-        std::pair<mln_value(I), typename I::size_type>
-        pset_hqueue<I>::pop(Key level)
+        std::pair<mln_value(I), typename I::size_type> pset_hqueue<I>::pop(Key level)
         {
           mln_precondition(m_size > 0);
 

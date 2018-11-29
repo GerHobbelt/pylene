@@ -56,11 +56,15 @@ namespace mln
         template <class T, class Compare>
         struct dilate_traits_base
         {
-          dilate_traits_base(Compare cmp) : accu_sup(cmp), m_cmp(std::move(cmp)) {}
+          dilate_traits_base(Compare cmp)
+            : accu_sup(cmp)
+            , m_cmp(std::move(cmp))
+          {
+          }
 
           const mln::accu::accumulators::sup<T, Compare> accu_sup;
-          auto sup(T x, T y) const { return mln::sup(x, y, m_cmp); }
-          static constexpr T zero() { return value_traits<T, Compare>::inf(); }
+          auto                                           sup(T x, T y) const { return mln::sup(x, y, m_cmp); }
+          static constexpr T                             zero() { return value_traits<T, Compare>::inf(); }
 
         private:
           Compare m_cmp;
@@ -79,11 +83,13 @@ namespace mln
         {
           using support_incremental = std::true_type;
 
-          dilate_traits(productorder_less<T> cmp) : dilate_traits_base<T, productorder_less<T>>(cmp) {}
+          dilate_traits(productorder_less<T> cmp)
+            : dilate_traits_base<T, productorder_less<T>>(cmp)
+          {
+          }
 
           const mln::accu::accumulators::h_sup<T> accu_hsup;
         };
-
       }
 
       template <class I, class SE, class OutputImage, class Compare>

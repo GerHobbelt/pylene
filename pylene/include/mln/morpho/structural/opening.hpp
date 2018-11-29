@@ -73,9 +73,9 @@ namespace mln
       {
         mln_entering("mln::morpho::opening");
 
-        const I& ima = exact(ima_);
-        const SE& se = exact(se_);
-        O& out = exact(output);
+        const I&  ima = exact(ima_);
+        const SE& se  = exact(se_);
+        O&        out = exact(output);
         mln::morpho::structural::impl::opening(ima, se, cmp, out);
 
         return out;

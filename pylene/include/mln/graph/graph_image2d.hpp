@@ -45,11 +45,11 @@ namespace mln
         typedef typename std::aligned_storage<sizeof(Vtype), m_alignment>::type AVtype;
         typedef typename std::aligned_storage<sizeof(Etype), m_alignment>::type AEtype;
 
-        size_t m_shape[dim];
-        size_t m_estrides[dim];
-        size_t m_vstrides[dim];
-        size_t m_nbytes;
-        char* m_buffer;
+        size_t                m_shape[dim];
+        size_t                m_estrides[dim];
+        size_t                m_vstrides[dim];
+        size_t                m_nbytes;
+        char*                 m_buffer;
         std::allocator<Vtype> m_valloca;
         std::allocator<Etype> m_ealloca;
       };
@@ -84,10 +84,10 @@ namespace mln
       typedef decltype(std::bind(&box2d::has, (const box2d*)NULL, std::placeholders::_1)) domain_has_p_t;
 
     public:
-      typedef strided_box<short, 2> vertices_range;
-      typedef iterator_range<edges_iterator> edges_range;
+      typedef strided_box<short, 2>                          vertices_range;
+      typedef iterator_range<edges_iterator>                 edges_range;
       typedef mln::filtered_range<nbh_range, domain_has_p_t> adjacency_vertex_range;
-      typedef adjacency_vertex_range adjacency_edge_range;
+      typedef adjacency_vertex_range                         adjacency_edge_range;
 
       // typedef ...		    adjacency_vertex_range;
       // typedef ...		    adjacency_edge_range;
@@ -96,23 +96,23 @@ namespace mln
                                const Etype& e = Etype());
 
       vertices_range vertices() const;
-      edges_range edges() const;
+      edges_range    edges() const;
 
       point2d source(const point2d& e) const;
       point2d target(const point2d& e) const;
 
-      adjacency_edge_range edges(const point2d& v) const;
+      adjacency_edge_range   edges(const point2d& v) const;
       adjacency_vertex_range adjacent_vertices(const point2d& v) const;
 
       const Vtype& vertex(const point2d& v) const;
-      Vtype& vertex(const point2d& v);
+      Vtype&       vertex(const point2d& v);
       const Etype& edge(const point2d& e) const;
-      Etype& edge(const point2d& e);
+      Etype&       edge(const point2d& e);
 
       const Vtype& vertex_at(const point2d& v) const;
-      Vtype& vertex_at(const point2d& v);
+      Vtype&       vertex_at(const point2d& v);
       const Etype& edge_at(const point2d& e) const;
-      Etype& edge_at(const point2d& e);
+      Etype&       edge_at(const point2d& e);
 
     protected:
       static bool _is_edge(const point2d&);
@@ -128,9 +128,9 @@ namespace mln
     private:
       std::shared_ptr<internal::undirected_graph_ndimage_data<Vtype, Etype, 2>> m_data;
 
-      char* m_ptr_first;    ///< Pointer to the beginning of the buffer (outside domain if there's a border)
-      char* m_ptr_pmin;     ///< Pointer to the vertex at pmin
-      char* m_ptr_origin;   ///< Pointer to the vertex at (0,0)
+      char*  m_ptr_first;   ///< Pointer to the beginning of the buffer (outside domain if there's a border)
+      char*  m_ptr_pmin;    ///< Pointer to the vertex at pmin
+      char*  m_ptr_origin;  ///< Pointer to the vertex at (0,0)
       size_t m_vstrides[2]; ///< Strides between a vertex line and an edge line
       size_t m_estrides[2]; ///< Strides between an edge line and a vertex line
       size_t m_strides[2];  ///< Strides between a vertex line and the next vertex line (ie vstride + estride)
@@ -175,7 +175,7 @@ namespace mln
 
         for (int i = dim - 2; i >= 0; --i)
         {
-          m_shape[i] = shape_[i] + 2 * border;
+          m_shape[i]    = shape_[i] + 2 * border;
           m_vstrides[i] = m_shape[i + 1] * m_vstrides[i + 1] + (m_shape[i + 1] - 1) * m_estrides[i + 1];
           m_estrides[i] = (2 * m_shape[i + 1] - 1) * m_estrides[i + 1];
         }
@@ -276,8 +276,16 @@ namespace mln
           dim = P::ndim
         };
 
-        graph_edge_visitor_forward() : pmin_(), pmax_() {}
-        graph_edge_visitor_forward(const P& pmin, const P& pmax) : pmin_(pmin), pmax_(pmax) {}
+        graph_edge_visitor_forward()
+          : pmin_()
+          , pmax_()
+        {
+        }
+        graph_edge_visitor_forward(const P& pmin, const P& pmax)
+          : pmin_(pmin)
+          , pmax_(pmax)
+        {
+        }
 
         void initialize(P& point) const
         {
@@ -331,11 +339,11 @@ namespace mln
       m_vstrides[1] = m_data->m_vstrides[1];
       m_estrides[0] = m_data->m_estrides[0];
       m_estrides[1] = m_data->m_estrides[1];
-      m_strides[0] = m_data->m_estrides[0] + m_data->m_vstrides[0];
-      m_strides[1] = m_data->m_estrides[1] + m_data->m_vstrides[1];
+      m_strides[0]  = m_data->m_estrides[0] + m_data->m_vstrides[0];
+      m_strides[1]  = m_data->m_estrides[1] + m_data->m_vstrides[1];
 
       m_ptr_first = m_data->m_buffer;
-      m_ptr_pmin = m_ptr_first;
+      m_ptr_pmin  = m_ptr_first;
       m_ptr_pmin += border * m_vstrides[0] + (border - 1) * m_estrides[0];
       m_ptr_pmin += border * m_vstrides[1] + (border - 1) * m_estrides[1];
       m_ptr_origin = m_ptr_pmin;
@@ -351,7 +359,7 @@ namespace mln
     {
       mln_precondition(m_domain.has(e));
       mln_precondition(_is_edge(e));
-      int x = e[0], y = e[1];
+      int                         x = e[0], y = e[1];
       typedef point2d::value_type T;
 
       if (x % 2 == 1)
@@ -505,7 +513,7 @@ namespace mln
         undirected_graph_image2d<Vtype, Etype, Nbh>::edges(const point2d& v) const
     {
       mln_precondition(_is_vertex(v));
-      auto eit = make_sliding_piter(std::cref(v), m_enbh);
+      auto eit   = make_sliding_piter(std::cref(v), m_enbh);
       auto myrng = make_iterator_range(eit);
       return rng::filter(std::move(myrng), std::bind(&box2d::has, &m_domain, std::placeholders::_1));
     }
@@ -515,7 +523,7 @@ namespace mln
         undirected_graph_image2d<Vtype, Etype, Nbh>::adjacent_vertices(const point2d& v) const
     {
       mln_precondition(_is_vertex(v));
-      auto vit = make_sliding_piter(std::cref(v), m_vnbh);
+      auto vit   = make_sliding_piter(std::cref(v), m_vnbh);
       auto myrng = make_iterator_range(vit);
       return rng::filter(std::move(myrng), std::bind(&box2d::has, &m_domain, std::placeholders::_1));
     }

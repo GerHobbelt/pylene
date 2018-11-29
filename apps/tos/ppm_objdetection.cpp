@@ -61,26 +61,26 @@ int main(int argc, char** argv)
   if (argc < 9)
     usage(argv);
 
-  const char* infname = argv[1];
+  const char* infname  = argv[1];
   const char* outfname = argv[2];
-  float alpha = std::atof(argv[3]);
-  float beta = std::atof(argv[4]);
-  float gamma = std::atof(argv[5]);
-  int eps = std::atof(argv[6]);
-  int grain = std::atoi(argv[7]);
+  float       alpha    = std::atof(argv[3]);
+  float       beta     = std::atof(argv[4]);
+  float       gamma    = std::atof(argv[5]);
+  int         eps      = std::atof(argv[6]);
+  int         grain    = std::atoi(argv[7]);
 
   using namespace mln;
   image2d<rgb8> ima;
   io::imread(argv[1], ima);
 
   typedef UInt<9> V;
-  image2d<rgb8> bima = addborder(ima, lexicographicalorder_less<rgb8>());
-  image2d<rgb8> f = interpolate_k1(bima);
-  image2d<rgb8> f2 = interpolate_k1(f);
+  image2d<rgb8>   bima = addborder(ima, lexicographicalorder_less<rgb8>());
+  image2d<rgb8>   f    = interpolate_k1(bima);
+  image2d<rgb8>   f2   = interpolate_k1(f);
 
-  image2d<unsigned> K;
+  image2d<unsigned>     K;
   std::vector<unsigned> S;
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
   colorToSGrad(ima, K, parent, S);
 
   if (grain != 0)
@@ -100,17 +100,17 @@ int main(int argc, char** argv)
   // Retrieve the extinction values for each node.
   // Non minima nodes are set to 0
   auto extmap = extinction(energy, K, parent, S);
-  auto sal = saliencymap(extmap, K, parent, S);
+  auto sal    = saliencymap(extmap, K, parent, S);
 
   io::imsave(sal, (boost::format("%s-saliency.tiff") % argv[2]).str().c_str());
 
-  auto realnodes = get_real_nodes(K, parent, S);
+  auto          realnodes = get_real_nodes(K, parent, S);
   image2d<bool> mask;
   resize(mask, K).init(false);
   for (unsigned x : realnodes)
     mask[x] = true;
 
-  std::pair<float, float> en_minmax = accumulate(energy | mask, accu::features::minmax<>());
+  std::pair<float, float> en_minmax  = accumulate(energy | mask, accu::features::minmax<>());
   std::pair<float, float> ext_minmax = accumulate(extmap | mask, accu::features::minmax<>());
 
   std::cout << "Some statistics:" << std::endl
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
   {
     float lambda = std::atof(argv[i]);
 
-    auto cK = clone(K);
+    auto cK      = clone(K);
     auto cParent = clone(parent);
 
     // Filter out the minima that are not enough meaningfull
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
 
     // Subsample
     {
-      box2d d = out.domain();
+      box2d  d = out.domain();
       sbox2d sub_domain{d.pmin + 4, d.pmax - 4, {4, 4}};
       copy(out | sub_domain, final);
     }

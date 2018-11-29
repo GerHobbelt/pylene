@@ -44,7 +44,7 @@ TEST(Core, Image2d_LValueOperator)
   using namespace mln;
   image2d<rgb> ima(5, 5);
 
-  rgb zero = {0, 0, 0};
+  rgb zero  = {0, 0, 0};
   rgb douze = {12, 0, 0};
   fill(ima, zero);
 
@@ -75,7 +75,7 @@ TEST(Core, Image2d_MixedOperator)
 {
   using namespace mln;
 
-  image2d<char> x(5, 5);
+  image2d<char>  x(5, 5);
   image2d<short> y(5, 5);
 
   iota(x, 0);

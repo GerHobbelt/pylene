@@ -59,8 +59,14 @@ namespace mln
   template <class SiteSet, class category>
   struct dyn_neighborhood : dyn_neighborhood_base<category, dyn_neighborhood<SiteSet, category>>
   {
-    dyn_neighborhood(const SiteSet& pset) : dpoints{pset} {}
-    dyn_neighborhood(SiteSet&& pset) : dpoints(std::move(pset)) {}
+    dyn_neighborhood(const SiteSet& pset)
+      : dpoints{pset}
+    {
+    }
+    dyn_neighborhood(SiteSet&& pset)
+      : dpoints(std::move(pset))
+    {
+    }
 
     const SiteSet& offsets() const { return dpoints; }
 

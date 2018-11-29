@@ -54,15 +54,15 @@ namespace mln
                                                                 StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       image2d<unsigned> parent, zpar;
-      image2d<bool> deja_vu;
+      image2d<bool>     deja_vu;
       resize(parent, ima);
       resize(zpar, ima);
       resize(deja_vu, ima, ima.border(), false);
 
       // extension::fill(deja_vu, false);
 
-      std::vector<unsigned> S = sort_indexes(ima, cmp);
-      auto offsets = wrt_delta_index(ima, nbh.dpoints);
+      std::vector<unsigned> S       = sort_indexes(ima, cmp);
+      auto                  offsets = wrt_delta_index(ima, nbh.dpoints);
 
       for (int i = S.size() - 1; i >= 0; --i)
       {
@@ -70,8 +70,8 @@ namespace mln
         // std::cout << "Processing:" << p << " @ " << (int) ima[p] << std::endl;
         // make set
         {
-          parent[p] = p;
-          zpar[p] = p;
+          parent[p]  = p;
+          zpar[p]    = p;
           deja_vu[p] = true;
         }
 
@@ -84,7 +84,7 @@ namespace mln
             if (r != p) // make union
             {
               parent[r] = p;
-              zpar[r] = p;
+              zpar[r]   = p;
             }
           }
         }

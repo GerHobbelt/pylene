@@ -33,16 +33,16 @@ int main(int argc, char** argv)
 
   using namespace mln;
 
-  const char* tree_path = argv[1];
-  const char* img_path = argv[2];
-  unsigned grain = std::atoi(argv[3]);
-  int eps = std::atoi(argv[4]);
-  float threshold1 = std::atof(argv[5]);
-  float threshold2 = std::atof(argv[6]);
-  const char* out_path = argv[7];
+  const char* tree_path  = argv[1];
+  const char* img_path   = argv[2];
+  unsigned    grain      = std::atoi(argv[3]);
+  int         eps        = std::atoi(argv[4]);
+  float       threshold1 = std::atof(argv[5]);
+  float       threshold2 = std::atof(argv[6]);
+  const char* out_path   = argv[7];
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-  tree_t tree;
+  tree_t                                                      tree;
   {
     std::ifstream f(tree_path, std::ios::binary);
     morpho::load(f, tree);
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
     image2d<uint16> tmp;
     resize(tmp, ima);
     auto& attr = nmser.get_vmap();
-    auto pred = [&attr, threshold2](const tree_t::node_type& x) { return threshold2 < attr[x]; };
+    auto  pred = [&attr, threshold2](const tree_t::node_type& x) { return threshold2 < attr[x]; };
     morpho::filter_direct_and_reconstruct(tree, make_functional_property_map<tree_t::node_type>(pred), vmap, tmp);
     io::imsave(tmp, "selection.tiff");
   }

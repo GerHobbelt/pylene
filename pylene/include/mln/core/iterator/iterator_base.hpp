@@ -19,9 +19,12 @@ namespace mln
     template <typename Reference>
     struct pointer_wrapper
     {
-      explicit pointer_wrapper(Reference x) : x_(x) {}
+      explicit pointer_wrapper(Reference x)
+        : x_(x)
+      {
+      }
       Reference* operator->() { return std::addressof(x_); }
-      operator Reference*() { return std::addressof(x_); }
+                 operator Reference*() { return std::addressof(x_); }
 
     private:
       Reference x_;
@@ -31,14 +34,14 @@ namespace mln
     struct make_pointer
     {
       typedef pointer_wrapper<T> type;
-      static pointer_wrapper<T> foo(T x) { return pointer_wrapper<T>(x); }
+      static pointer_wrapper<T>  foo(T x) { return pointer_wrapper<T>(x); }
     };
 
     template <typename T>
     struct make_pointer<T&>
     {
       typedef T* type;
-      static T* foo(T& x) { return std::addressof(x); }
+      static T*  foo(T& x) { return std::addressof(x); }
     };
   };
 
@@ -49,11 +52,11 @@ namespace mln
   struct iterator_base : Iterator<Derived>
   {
     using is_multidimensional = std::false_type;
-    using iterator = Derived;
-    using const_iterator = Derived;
-    using has_NL = std::false_type;
-    using value_type = std::remove_const_t<Value>;
-    using reference = Reference;
+    using iterator            = Derived;
+    using const_iterator      = Derived;
+    using has_NL              = std::false_type;
+    using value_type          = std::remove_const_t<Value>;
+    using reference           = Reference;
     using pointer = std::conditional_t<std::is_reference<Reference>::value, std::remove_reference_t<Reference>*,
                                        internal::pointer_wrapper<Reference>>;
 

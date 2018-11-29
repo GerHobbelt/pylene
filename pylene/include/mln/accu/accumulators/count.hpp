@@ -70,12 +70,15 @@ namespace mln
       template <typename CountType>
       struct count : accumulator_base<count<CountType>, dontcare, CountType, features::count<>>
       {
-        typedef dontcare argument_type;
-        typedef CountType result_type;
+        typedef dontcare                           argument_type;
+        typedef CountType                          result_type;
         typedef boost::mpl::set<features::count<>> provides;
-        typedef std::true_type has_untake;
+        typedef std::true_type                     has_untake;
 
-        count() : m_count(0) {}
+        count()
+          : m_count(0)
+        {
+        }
 
         void init() { m_count = 0; }
 

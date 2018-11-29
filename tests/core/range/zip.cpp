@@ -247,7 +247,8 @@ TEST(Core, zip_segmented_and_nonsegmented)
   mln::box2d multi_ind0 = {{0, 0}, {2, 3}};
 
   std::vector<mln::point2d> ref = {
-      {0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2},
+      {0, 0}, {0, 1}, {0, 2}, //
+      {1, 0}, {1, 1}, {1, 2}, //
   };
 
   auto z = mln::ranges::view::zip(ref, multi_ind0);
@@ -255,7 +256,7 @@ TEST(Core, zip_segmented_and_nonsegmented)
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
   static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(z)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(z)>);
   static_assert(mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
@@ -281,7 +282,7 @@ TEST(Core, zip_segmented_and_nonsegmented_rowwise)
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
   static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(z)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(z)>);
   static_assert(mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());

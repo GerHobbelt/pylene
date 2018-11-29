@@ -3,7 +3,6 @@
 #include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
-#include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/utils/blank.hpp>
 
@@ -126,6 +125,7 @@ namespace mln::ranges
     {
     }
 
+    template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
     auto rows() const;
 
     auto reversed() const;
@@ -185,6 +185,7 @@ namespace mln::ranges
 
 
   template <typename Fun, typename... Rngs>
+  template <typename U, typename>
   auto zip_with_view<Fun, Rngs...>::rows() const
   {
     // Zip function for rows
@@ -193,8 +194,7 @@ namespace mln::ranges
     };
 
     // Apply rows-row-zipper on each range after segmentation
-    return std::apply(
-        [row_zipper](const auto&... rng) { return view::zip_with(row_zipper, mln::ranges::rows(rng)...); }, rngs_);
+    return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
   }
 
 

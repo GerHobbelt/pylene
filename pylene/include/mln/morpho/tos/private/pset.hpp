@@ -1,9 +1,9 @@
 #ifndef MLN_MORPHO_TOS_PRIVATE_PSET_HPP
-# define MLN_MORPHO_TOS_PRIVATE_PSET_HPP
+#define MLN_MORPHO_TOS_PRIVATE_PSET_HPP
 
-# include <mln/core/image/image.hpp>
-# include "pset_hqueue.hpp"
-# include "pset_redblacktree.hpp"
+#include "pset_hqueue.hpp"
+#include "pset_redblacktree.hpp"
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {
@@ -14,11 +14,11 @@ namespace mln
       namespace impl
       {
         enum class pset_impl
-          {
-            kAuto,
-            kHqueues,
-            kRedBlackTree,
-          };
+        {
+          kAuto,
+          kHqueues,
+          kRedBlackTree,
+        };
 
         /// \brief A point set allows to keep a ordered set of points or indexes
         /// sorted by a given key (generally the pixel value)
@@ -30,7 +30,7 @@ namespace mln
         class pset
         {
         public:
-          using Key = mln_value(I);
+          using Key   = mln_value(I);
           using Point = typename I::size_type;
 
           template <class J>
@@ -51,13 +51,16 @@ namespace mln
           bool empty() const;
 
         private:
-          static constexpr pset_impl kSelectedImplementation = (kImplementation != pset_impl::kAuto) ? kImplementation :
-            ((mln::value_traits<Key>::quant <= 16) ? pset_impl::kHqueues : pset_impl::kRedBlackTree);
+          static constexpr pset_impl kSelectedImplementation =
+              (kImplementation != pset_impl::kAuto)
+                  ? kImplementation
+                  : ((mln::value_traits<Key>::quant <= 16) ? pset_impl::kHqueues : pset_impl::kRedBlackTree);
 
-          using ConcreteImageType = mln_concrete(I);
-          using hqueue_impl_t = impl::pset_hqueue<ConcreteImageType>;
+          using ConcreteImageType   = mln_concrete(I);
+          using hqueue_impl_t       = impl::pset_hqueue<ConcreteImageType>;
           using redblacktree_impl_t = impl::pset_redblacktree<ConcreteImageType>;
-          using delegate_t = std::conditional_t<kSelectedImplementation == pset_impl::kHqueues, hqueue_impl_t, redblacktree_impl_t>;
+          using delegate_t =
+              std::conditional_t<kSelectedImplementation == pset_impl::kHqueues, hqueue_impl_t, redblacktree_impl_t>;
           delegate_t m_delegate;
         };
 
@@ -79,15 +82,13 @@ namespace mln
         }
 
         template <class I, pset_impl kImplementation>
-        std::pair<mln_value(I), typename I::size_type>
-        pset<I, kImplementation>::pop(Key level)
+        std::pair<mln_value(I), typename I::size_type> pset<I, kImplementation>::pop(Key level)
         {
           return m_delegate.pop(level);
         }
 
         template <class I, pset_impl kImplementation>
-        std::pair<bool, typename I::size_type>
-        pset<I, kImplementation>::try_pop(Key level)
+        std::pair<bool, typename I::size_type> pset<I, kImplementation>::try_pop(Key level)
         {
           return m_delegate.try_pop(level);
         }
@@ -100,8 +101,8 @@ namespace mln
         }
 
       } // end of namespace mln::morpho::tos::impl
-    } // end of namespace mln::morpho::tos
-  } // end of namespace mln::morpho
+    }   // end of namespace mln::morpho::tos
+  }     // end of namespace mln::morpho
 } // end of namespace mln
 
-#endif //!MLN_MORPHO_TOS_PRIVATE_PSET_HPP
+#endif //! MLN_MORPHO_TOS_PRIVATE_PSET_HPP

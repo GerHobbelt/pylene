@@ -41,7 +41,7 @@ namespace mln
         static std::size_t size(const R& rng)
         {
           std::size_t sz = 0;
-          auto it = rng::iter(rng);
+          auto        it = rng::iter(rng);
           for (it.init(); !it.finished(); it.next())
             ++sz;
           return sz;

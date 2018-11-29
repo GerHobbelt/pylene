@@ -16,7 +16,7 @@ namespace mln
     {
       constexpr const std::array<point2d, 4>& offsets() const { return dpoints; }
 
-      static const int static_size = 4;
+      static const int                    static_size = 4;
       static const std::array<point2d, 4> dpoints;
     };
     const std::array<point2d, 4> c4_t::dpoints = {{{-1, 0}, {0, -1}, {0, 1}, {1, 0}}};
@@ -25,7 +25,7 @@ namespace mln
     {
       constexpr const std::array<point2d, 8>& offsets() const { return dpoints; }
 
-      static const int static_size = 8;
+      static const int                    static_size = 8;
       static const std::array<point2d, 8> dpoints;
     };
 
@@ -36,7 +36,7 @@ namespace mln
     {
       constexpr const std::array<point2d, 2>& offsets() const { return dpoints; }
 
-      static const int static_size = 2;
+      static const int                    static_size = 2;
       static const std::array<point2d, 2> dpoints;
     };
     const std::array<point2d, 2> c2_v_t::dpoints = {{{-1, 0}, {1, 0}}};
@@ -45,14 +45,14 @@ namespace mln
     {
       constexpr const std::array<point2d, 2>& offsets() const { return dpoints; }
 
-      static const int static_size = 2;
+      static const int                    static_size = 2;
       static const std::array<point2d, 2> dpoints;
     };
     const std::array<point2d, 2> c2_h_t::dpoints = {{{0, -1}, {0, 1}}};
   }
 
-  static const c4_t c4{};
-  static const c8_t c8{};
+  static const c4_t   c4{};
+  static const c8_t   c8{};
   static const c2_v_t c2_v{};
   static const c2_h_t c2_h{};
 

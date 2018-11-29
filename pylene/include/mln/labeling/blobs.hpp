@@ -35,7 +35,7 @@ namespace mln
 
           mln_entering("mln::labeling::impl::generic::blobs_no_boundcheck");
 
-          Label bg = lbl;
+          Label          bg = lbl;
           std::vector<P> queue;
           queue.reserve(ima.domain().size());
 
@@ -118,7 +118,7 @@ namespace mln
       mln_entering("mln::labeling::blobs");
 
       const I& ima = exact(ima_);
-      Label bg = lbl;
+      Label    bg  = lbl;
 
       int status;
       mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).init(bg).get_status(status);

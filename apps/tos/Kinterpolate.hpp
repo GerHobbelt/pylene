@@ -54,8 +54,8 @@ namespace mln
     {
       U a = ima.at(p), b = ima.at(p + point2d{0, 1}), c = ima.at(p + point2d{1, 0}), d = ima.at(p + point2d{1, 1});
 
-      point2d q = 2 * p;
-      out.at(q) = 2 * ima.at(p);
+      point2d q                 = 2 * p;
+      out.at(q)                 = 2 * ima.at(p);
       out.at(q + point2d{0, 1}) = (a + b);
       out.at(q + point2d{1, 0}) = (a + c);
       out.at(q + point2d{1, 1}) = med4x2(a, b, c, d);
@@ -66,14 +66,14 @@ namespace mln
   template <typename T>
   image2d<T> interpolate_k1(const image2d<T>& ima)
   {
-    image2d<T> out(2 * ima.nrows() - 1, 2 * ima.ncols() - 1);
+    image2d<T>      out(2 * ima.nrows() - 1, 2 * ima.ncols() - 1);
     typedef point2d P;
     mln_foreach (point2d p, ima.domain())
     {
       T a = ima.at(p), b = ima.at(p + P{0, 1}), c = ima.at(p + P{1, 0}), d = ima.at(p + P{1, 1});
 
-      point2d q = 2 * p;
-      out.at(q) = ima.at(p);
+      point2d q           = 2 * p;
+      out.at(q)           = ima.at(p);
       out.at(q + P{0, 1}) = (a + b) / 2;
       out.at(q + P{1, 0}) = (a + c) / 2;
       out.at(q + P{1, 1}) = (a + b + c + d) / 4;
@@ -91,8 +91,8 @@ namespace mln
     const I& ima = exact(ima_);
 
     box2d dom = ima.domain();
-    dom.pmin = dom.pmin * 2;
-    dom.pmax = dom.pmax * 2 - 1;
+    dom.pmin  = dom.pmin * 2;
+    dom.pmax  = dom.pmax * 2 - 1;
 
     image2d<mln_value(I)> out(dom, 3, v);
 
@@ -104,7 +104,7 @@ namespace mln
   template <typename T>
   image2d<T> unimmerse_k1(const image2d<T>& ima)
   {
-    sbox2d dom(ima.domain().pmin, ima.domain().pmax, point2d{2, 2});
+    sbox2d     dom(ima.domain().pmin, ima.domain().pmax, point2d{2, 2});
     image2d<T> out((ima.nrows() + 1) / 2, (ima.ncols() + 1) / 2);
 
     copy(ima | dom, out);
@@ -115,8 +115,8 @@ namespace mln
   image2d<T> Kadjust_to(const image2d<T>& ima, box2d domain, const std::string& method)
   {
     point2d shp0 = ima.domain().shape();
-    point2d shp = domain.shape();
-    sbox2d subdomain;
+    point2d shp  = domain.shape();
+    sbox2d  subdomain;
 
     std::function<image2d<T>(const image2d<T>&)> callback;
     if (method == "zero")

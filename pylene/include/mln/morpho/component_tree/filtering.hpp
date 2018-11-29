@@ -58,7 +58,7 @@ namespace mln
       template <class P, class Amap, class Criterion>
       void prune_inplace(component_tree<P, Amap>& tree, const Criterion& pred)
       {
-        typedef component_tree<P, Amap> tree_t;
+        typedef component_tree<P, Amap>      tree_t;
         typedef typename tree_t::vertex_id_t vertex_id_t;
 
         auto data = tree._get_data();
@@ -76,7 +76,7 @@ namespace mln
             auto end = x.next_sibling();
             for (; x != end; x = x.next_node())
             {
-              alive[x] = false;
+              alive[x]                       = false;
               data->m_nodes[x.id()].m_parent = q;
             }
           }
@@ -87,12 +87,12 @@ namespace mln
         }
 
         // backward update next-sibling and the dble-linked list
-        mln_reverse_foreach(auto x, tree.nodes())
+        mln_reverse_foreach (auto x, tree.nodes())
         {
           vertex_id_t snext = x.get_next_sibling_id();
           if (not alive[snext])
           {
-            snext = data->m_nodes[snext].m_next;
+            snext                                = data->m_nodes[snext].m_next;
             data->m_nodes[x.id()].m_next_sibling = snext;
           }
 
@@ -133,12 +133,12 @@ namespace mln
       mln_entering("mln::morpho::filter_max_inplace");
 
       typedef component_tree<P, Amap> tree_t;
-      auto data = tree._get_data();
+      auto                            data = tree._get_data();
 
       property_map<tree_t, bool> active(tree, true);
-      mln_reverse_foreach(const typename tree_t::node_type& n, tree.nodes())
+      mln_reverse_foreach (const typename tree_t::node_type& n, tree.nodes())
       {
-        active[n] = active[n] or pred[n];
+        active[n]          = active[n] or pred[n];
         active[n.parent()] = active[n.parent()] or active[n];
       }
 
@@ -151,7 +151,7 @@ namespace mln
     {
       mln_entering("mln::morpho::filter_direct_inplace");
 
-      typedef component_tree<P, Amap> tree_t;
+      typedef component_tree<P, Amap>      tree_t;
       typedef typename tree_t::vertex_id_t vertex_id_t;
 
       auto data = tree._get_data();
@@ -165,12 +165,12 @@ namespace mln
       }
 
       // Backward: set other relation
-      mln_reverse_foreach(auto x, tree.nodes())
+      mln_reverse_foreach (auto x, tree.nodes())
       {
         vertex_id_t nexts = x.get_next_sibling_id();
         if (not pred[nexts])
         {
-          nexts = data->m_nodes[nexts].m_next;
+          nexts                                = data->m_nodes[nexts].m_next;
           data->m_nodes[x.id()].m_next_sibling = nexts;
         }
         if (not pred[x.id()])
@@ -212,7 +212,7 @@ namespace mln
 
       mln_foreach (auto px, out.pixels())
       {
-        auto x = tree.get_node_at(px.index());
+        auto x   = tree.get_node_at(px.index());
         px.val() = vmap[x];
       }
     }

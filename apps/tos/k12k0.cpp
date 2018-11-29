@@ -20,9 +20,9 @@ int main(int argc, char** argv)
   image2d<rgb8> ima, k0;
   io::imread(argv[1], ima);
 
-  box2d d1 = ima.domain();
+  box2d  d1 = ima.domain();
   sbox2d d0(d1.pmin, d1.pmax, point2d{2, 2});
-  box2d d = {{0, 0}, d0.shape()};
+  box2d  d = {{0, 0}, d0.shape()};
   k0.resize(d);
   copy(ima | d0, k0);
 

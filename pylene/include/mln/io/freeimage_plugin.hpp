@@ -26,15 +26,15 @@ namespace mln
 
       virtual void open(std::istream& s) final;
       // virtual bool support_streaming() const;
-      virtual void read_next_pixel(void* out) final;
-      virtual void read_next_line(void* out) final;
+      virtual void                       read_next_pixel(void* out) final;
+      virtual void                       read_next_line(void* out) final;
       virtual std::function<void(void*)> get_read_next_pixel_method() const final;
       virtual std::function<void(void*)> get_read_next_line_method() const final;
 
       virtual std::type_index get_value_type_id() const final;
 
       virtual box2d get_domain() const final;
-      virtual int get_bpp() const final;
+      virtual int   get_bpp() const final;
 
     private:
       void _load();
@@ -63,16 +63,16 @@ namespace mln
       std::function<void(void*)> m_read_next_pixel;
       std::function<void(void*)> m_read_next_line;
 
-      box2d m_domain;
+      box2d             m_domain;
       FREE_IMAGE_FORMAT m_fif;
-      FIBITMAP* m_dib;
-      char* m_ptr;
-      std::type_index m_vtype;
-      RGBQUAD* m_palette;
-      unsigned pitch;       // Size in byte of the scanline (padding inc.)
-      unsigned byteperline; // Size in byte of the line (without padding)
-      int bpp;              // Size in byte of the pixel (1/4/8bits bitmap => 1 bpp, 16bits -> 2bpp...)
-      int x, y;             // internally used by read/write to store current position
+      FIBITMAP*         m_dib;
+      char*             m_ptr;
+      std::type_index   m_vtype;
+      RGBQUAD*          m_palette;
+      unsigned          pitch;       // Size in byte of the scanline (padding inc.)
+      unsigned          byteperline; // Size in byte of the line (without padding)
+      int               bpp;         // Size in byte of the pixel (1/4/8bits bitmap => 1 bpp, 16bits -> 2bpp...)
+      int               x, y;        // internally used by read/write to store current position
     };
 
     class freeimage_writer_plugin : public PluginWriter2D
@@ -82,8 +82,8 @@ namespace mln
       ~freeimage_writer_plugin() override;
 
       // virtual bool support_streaming() const;
-      virtual void write_next_pixel(void* src) final;
-      virtual void write_next_line(void* src) final;
+      virtual void                       write_next_pixel(void* src) final;
+      virtual void                       write_next_line(void* src) final;
       virtual std::function<void(void*)> get_write_next_pixel_method() const final;
       virtual std::function<void(void*)> get_write_next_line_method() const final;
 
@@ -108,24 +108,30 @@ namespace mln
       std::function<void(void*)> m_write_next_line;
 
       internal::ostream_wrapper m_osw;
-      unsigned m_nrows;
-      unsigned m_ncols;
-      FREE_IMAGE_FORMAT m_fif;
-      FIBITMAP* m_dib;
-      std::type_index m_vtype;
-      char* m_ptr;
-      unsigned pitch;       // Size in byte of the scanline (padding inc.)
-      unsigned byteperline; // Size in byte of the line (without padding)
-      unsigned psz;         // Size in byte of a pixel
-      unsigned bpp;         // Size in bit of the pixel
-      unsigned x, y;        // internally used by read/write to store current position
+      unsigned                  m_nrows;
+      unsigned                  m_ncols;
+      FREE_IMAGE_FORMAT         m_fif;
+      FIBITMAP*                 m_dib;
+      std::type_index           m_vtype;
+      char*                     m_ptr;
+      unsigned                  pitch;       // Size in byte of the scanline (padding inc.)
+      unsigned                  byteperline; // Size in byte of the line (without padding)
+      unsigned                  psz;         // Size in byte of a pixel
+      unsigned                  bpp;         // Size in bit of the pixel
+      unsigned                  x, y;        // internally used by read/write to store current position
     };
 
     /************************/
     /*** Implementation   ***/
     /************************/
 
-    inline freeimage_reader_plugin::freeimage_reader_plugin() : m_dib(NULL), m_vtype(typeid(void)), x(0), y(0) {}
+    inline freeimage_reader_plugin::freeimage_reader_plugin()
+      : m_dib(NULL)
+      , m_vtype(typeid(void))
+      , x(0)
+      , y(0)
+    {
+    }
 
     inline box2d freeimage_reader_plugin::get_domain() const { return m_domain; }
 
@@ -146,7 +152,7 @@ namespace mln
       mln_precondition(m_dib == NULL);
 
       internal::istream_wrapper isw(is);
-      fi_handle handle = (fi_handle)&isw;
+      fi_handle                 handle = (fi_handle)&isw;
 
       FreeImageIO fio = {internal::istream_wrapper::read, NULL, internal::istream_wrapper::seek,
                          internal::istream_wrapper::tell};
@@ -175,11 +181,11 @@ namespace mln
       pitch = FreeImage_GetPitch(m_dib);
       m_ptr = (char*)FreeImage_GetBits(m_dib) + pitch * (m_domain.pmax[0] - 1);
 
-      FREE_IMAGE_TYPE type = FreeImage_GetImageType(m_dib);
-      int bppp = FreeImage_GetBPP(m_dib);
-      int colortype = FreeImage_GetColorType(m_dib);
-      bpp = bppp / 8;
-      m_palette = FreeImage_GetPalette(m_dib);
+      FREE_IMAGE_TYPE type      = FreeImage_GetImageType(m_dib);
+      int             bppp      = FreeImage_GetBPP(m_dib);
+      int             colortype = FreeImage_GetColorType(m_dib);
+      bpp                       = bppp / 8;
+      m_palette                 = FreeImage_GetPalette(m_dib);
 
       switch (type)
       {
@@ -222,7 +228,7 @@ namespace mln
       // because the underlying FreeImage value type is the same as our.
       if (type != FIT_BITMAP or bppp == 8)
       {
-        m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_gray, this, std::placeholders::_1);
+        m_read_next_line  = std::bind(&freeimage_reader_plugin::read_next_line_gray, this, std::placeholders::_1);
         m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_gray, this, std::placeholders::_1);
       }
 
@@ -238,7 +244,7 @@ namespace mln
           m_vtype = typeid(bool);
           if (colortype == FIC_MINISBLACK)
           {
-            m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_bool, this, std::placeholders::_1);
+            m_read_next_line  = std::bind(&freeimage_reader_plugin::read_next_line_bool, this, std::placeholders::_1);
             m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_bool, this, std::placeholders::_1);
           }
           else
@@ -268,8 +274,8 @@ namespace mln
         case 24:
           if (colortype == FIC_RGB)
           {
-            m_vtype = typeid(rgb8);
-            m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_rgb8, this, std::placeholders::_1);
+            m_vtype           = typeid(rgb8);
+            m_read_next_line  = std::bind(&freeimage_reader_plugin::read_next_line_rgb8, this, std::placeholders::_1);
             m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_rgb8, this, std::placeholders::_1);
             break;
           }
@@ -277,8 +283,8 @@ namespace mln
         case 32:
           if (colortype == FIC_RGBALPHA)
           {
-            m_vtype = typeid(colors::rgba8);
-            m_read_next_line = std::bind(&freeimage_reader_plugin::read_next_line_rgba8, this, std::placeholders::_1);
+            m_vtype           = typeid(colors::rgba8);
+            m_read_next_line  = std::bind(&freeimage_reader_plugin::read_next_line_rgba8, this, std::placeholders::_1);
             m_read_next_pixel = std::bind(&freeimage_reader_plugin::read_next_pixel_rgba8, this, std::placeholders::_1);
             break;
           }
@@ -350,7 +356,7 @@ namespace mln
       mln_precondition(m_dib != NULL);
 
       char* out = (char*)out_;
-      *out = ((m_ptr[x] & (0x80 >> y)) != 0);
+      *out      = ((m_ptr[x] & (0x80 >> y)) != 0);
 
       if (++y == 8)
       {
@@ -380,7 +386,7 @@ namespace mln
       mln_precondition(m_dib != NULL);
 
       char* out = (char*)out_;
-      *out = ((m_ptr[x] & (0x80 >> y)) == 0);
+      *out      = ((m_ptr[x] & (0x80 >> y)) == 0);
 
       if (++y == 8)
       {
@@ -417,8 +423,8 @@ namespace mln
     // It may be 1,4 or 8 bits images
     inline void freeimage_reader_plugin::read_next_line_gray_palette(void* out)
     {
-      rgb8* buffer = (rgb8*)out;
-      uint8* ptr = (uint8*)m_ptr;
+      rgb8*  buffer = (rgb8*)out;
+      uint8* ptr    = (uint8*)m_ptr;
       for (int y = 0; y < m_domain.pmax[1]; ++y, ++ptr)
       {
         buffer[y][0] = m_palette[*ptr].rgbRed;
@@ -430,11 +436,11 @@ namespace mln
 
     inline void freeimage_reader_plugin::read_next_pixel_gray_palette(void* out)
     {
-      rgb8* pxout = (rgb8*)out;
-      uint8* ptr = (uint8*)m_ptr;
-      (*pxout)[0] = m_palette[*ptr].rgbRed;
-      (*pxout)[1] = m_palette[*ptr].rgbGreen;
-      (*pxout)[2] = m_palette[*ptr].rgbBlue;
+      rgb8*  pxout = (rgb8*)out;
+      uint8* ptr   = (uint8*)m_ptr;
+      (*pxout)[0]  = m_palette[*ptr].rgbRed;
+      (*pxout)[1]  = m_palette[*ptr].rgbGreen;
+      (*pxout)[2]  = m_palette[*ptr].rgbBlue;
 
       if (++y == m_domain.pmax[1])
       {
@@ -449,7 +455,7 @@ namespace mln
     inline void freeimage_reader_plugin::read_next_line_rgb(void* out)
     {
       colortype* buffer = (colortype*)out;
-      FI_type* ptr = (FI_type*)m_ptr;
+      FI_type*   ptr    = (FI_type*)m_ptr;
       for (int y = 0; y < m_domain.pmax[1]; ++y, ++ptr)
       {
         buffer[y][0] = ptr->red;
@@ -475,10 +481,10 @@ namespace mln
     inline void freeimage_reader_plugin::read_next_pixel_rgb(void* out)
     {
       colortype* pixel = (colortype*)out;
-      FI_type* ptr = (FI_type*)(m_ptr);
-      (*pixel)[0] = ptr[y].red;
-      (*pixel)[1] = ptr[y].green;
-      (*pixel)[2] = ptr[y].blue;
+      FI_type*   ptr   = (FI_type*)(m_ptr);
+      (*pixel)[0]      = ptr[y].red;
+      (*pixel)[1]      = ptr[y].green;
+      (*pixel)[2]      = ptr[y].blue;
 
       if (++y == m_domain.pmax[1])
       {
@@ -506,7 +512,7 @@ namespace mln
     inline void freeimage_reader_plugin::read_next_line_rgba(void* out)
     {
       colortype* buffer = (colortype*)out;
-      FI_type* ptr = (FI_type*)m_ptr;
+      FI_type*   ptr    = (FI_type*)m_ptr;
       for (int y = 0; y < m_domain.pmax[1]; ++y, ++ptr)
       {
         buffer[y][0] = ptr->red;
@@ -534,11 +540,11 @@ namespace mln
     inline void freeimage_reader_plugin::read_next_pixel_rgba(void* out)
     {
       colortype* pixel = (colortype*)out;
-      FI_type* ptr = (FI_type*)(m_ptr);
-      (*pixel)[0] = ptr[y].red;
-      (*pixel)[1] = ptr[y].green;
-      (*pixel)[2] = ptr[y].blue;
-      (*pixel)[3] = ptr[y].alpha;
+      FI_type*   ptr   = (FI_type*)(m_ptr);
+      (*pixel)[0]      = ptr[y].red;
+      (*pixel)[1]      = ptr[y].green;
+      (*pixel)[2]      = ptr[y].blue;
+      (*pixel)[3]      = ptr[y].alpha;
 
       if (++y == m_domain.pmax[1])
       {
@@ -550,10 +556,10 @@ namespace mln
     inline void freeimage_reader_plugin::read_next_pixel_rgba8(void* out)
     {
       colors::rgba8* pixel = (colors::rgba8*)out;
-      (*pixel)[0] = m_ptr[y * bpp + FI_RGBA_RED];
-      (*pixel)[1] = m_ptr[y * bpp + FI_RGBA_GREEN];
-      (*pixel)[2] = m_ptr[y * bpp + FI_RGBA_BLUE];
-      (*pixel)[3] = m_ptr[y * bpp + FI_RGBA_ALPHA];
+      (*pixel)[0]          = m_ptr[y * bpp + FI_RGBA_RED];
+      (*pixel)[1]          = m_ptr[y * bpp + FI_RGBA_GREEN];
+      (*pixel)[2]          = m_ptr[y * bpp + FI_RGBA_BLUE];
+      (*pixel)[3]          = m_ptr[y * bpp + FI_RGBA_ALPHA];
       if (++y == m_domain.pmax[1])
       {
         y = 0;
@@ -586,7 +592,12 @@ namespace mln
     /******************************************/
 
     inline freeimage_writer_plugin::freeimage_writer_plugin(std::ostream& os, FREE_IMAGE_FORMAT fif)
-        : m_osw(os), m_nrows(0), m_ncols(0), m_fif(fif), m_dib(NULL), m_vtype(typeid(void))
+      : m_osw(os)
+      , m_nrows(0)
+      , m_ncols(0)
+      , m_fif(fif)
+      , m_dib(NULL)
+      , m_vtype(typeid(void))
     {
       if (m_fif == FIF_UNKNOWN || !FreeImage_FIFSupportsWriting(m_fif))
         throw MLNIOException("File format not supported for writing.");
@@ -627,7 +638,7 @@ namespace mln
     inline bool freeimage_writer_plugin::can_write(std::type_index type) const
     {
       FREE_IMAGE_TYPE fit;
-      unsigned bpp;
+      unsigned        bpp;
       _get_fit_and_bpp_from_type(fit, bpp, type);
 
       // This test fails even for legit format e.g. rgbf32
@@ -639,17 +650,17 @@ namespace mln
     inline void freeimage_writer_plugin::_allocate()
     {
       FREE_IMAGE_TYPE fit;
-      unsigned red_mask = 0;
-      unsigned green_mask = 0;
-      unsigned blue_mask = 0;
+      unsigned        red_mask   = 0;
+      unsigned        green_mask = 0;
+      unsigned        blue_mask  = 0;
 
       mln_precondition(m_dib == NULL);
 
       if (m_vtype == typeid(rgb8) or m_vtype == typeid(colors::rgba8))
       {
-        red_mask = FI_RGBA_RED_MASK;
+        red_mask   = FI_RGBA_RED_MASK;
         green_mask = FI_RGBA_GREEN_MASK;
-        blue_mask = FI_RGBA_BLUE_MASK;
+        blue_mask  = FI_RGBA_BLUE_MASK;
       }
 
       _get_fit_and_bpp_from_type(fit, bpp, m_vtype);
@@ -671,22 +682,22 @@ namespace mln
       if (m_vtype == typeid(bool))
       {
         m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_bool, this, std::placeholders::_1);
-        m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_bool, this, std::placeholders::_1);
+        m_write_next_line  = std::bind(&freeimage_writer_plugin::write_next_line_bool, this, std::placeholders::_1);
       }
       else if (m_vtype == typeid(rgb8))
       {
         m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_rgb8, this, std::placeholders::_1);
-        m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_rgb8, this, std::placeholders::_1);
+        m_write_next_line  = std::bind(&freeimage_writer_plugin::write_next_line_rgb8, this, std::placeholders::_1);
       }
       else if (m_vtype == typeid(colors::rgba8))
       {
         m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_rgba8, this, std::placeholders::_1);
-        m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_rgba8, this, std::placeholders::_1);
+        m_write_next_line  = std::bind(&freeimage_writer_plugin::write_next_line_rgba8, this, std::placeholders::_1);
       }
       else
       {
         m_write_next_pixel = std::bind(&freeimage_writer_plugin::write_next_pixel_gray, this, std::placeholders::_1);
-        m_write_next_line = std::bind(&freeimage_writer_plugin::write_next_line_gray, this, std::placeholders::_1);
+        m_write_next_line  = std::bind(&freeimage_writer_plugin::write_next_line_gray, this, std::placeholders::_1);
       }
 
       // Set the palette
@@ -703,19 +714,19 @@ namespace mln
       }
 
       // Compute some image properties
-      pitch = FreeImage_GetPitch(m_dib);
+      pitch       = FreeImage_GetPitch(m_dib);
       byteperline = FreeImage_GetLine(m_dib);
-      psz = byteperline / m_ncols;
-      m_ptr = (char*)(FreeImage_GetBits(m_dib) + (m_nrows - 1) * pitch);
-      x = 0;
-      y = 0;
+      psz         = byteperline / m_ncols;
+      m_ptr       = (char*)(FreeImage_GetBits(m_dib) + (m_nrows - 1) * pitch);
+      x           = 0;
+      y           = 0;
     }
 
     inline void freeimage_writer_plugin::set_domain(const box2d& dom)
     {
       point2d shp = dom.shape();
-      m_nrows = shp[0];
-      m_ncols = shp[1];
+      m_nrows     = shp[0];
+      m_ncols     = shp[1];
       if (m_ncols > 0 and m_nrows > 0 and m_vtype != typeid(void))
         this->_allocate();
     }
@@ -752,7 +763,7 @@ namespace mln
     {
       mln_precondition(m_dib != NULL);
 
-      char* src = (char*)src_;
+      char*    src = (char*)src_;
       unsigned y, z;
       for (y = 0, z = 0; (y + 8) < m_ncols; ++z)
         for (int b = 7; b >= 0; --b, ++y)
@@ -812,19 +823,19 @@ namespace mln
       rgb8* buffer = (rgb8*)src;
       for (unsigned y = 0; y < m_ncols; y++)
       {
-        m_ptr[y * psz + FI_RGBA_RED] = buffer[y][0];
+        m_ptr[y * psz + FI_RGBA_RED]   = buffer[y][0];
         m_ptr[y * psz + FI_RGBA_GREEN] = buffer[y][1];
-        m_ptr[y * psz + FI_RGBA_BLUE] = buffer[y][2];
+        m_ptr[y * psz + FI_RGBA_BLUE]  = buffer[y][2];
       }
       m_ptr -= pitch;
     }
 
     inline void freeimage_writer_plugin::write_next_pixel_rgb8(void* src)
     {
-      rgb8* pixel = (rgb8*)src;
-      m_ptr[y * psz + FI_RGBA_RED] = (*pixel)[0];
+      rgb8* pixel                    = (rgb8*)src;
+      m_ptr[y * psz + FI_RGBA_RED]   = (*pixel)[0];
       m_ptr[y * psz + FI_RGBA_GREEN] = (*pixel)[1];
-      m_ptr[y * psz + FI_RGBA_BLUE] = (*pixel)[2];
+      m_ptr[y * psz + FI_RGBA_BLUE]  = (*pixel)[2];
 
       if (++y == m_ncols)
       {
@@ -840,9 +851,9 @@ namespace mln
       colors::rgba8* buffer = (colors::rgba8*)src;
       for (unsigned y = 0; y < m_ncols; y++)
       {
-        m_ptr[y * psz + FI_RGBA_RED] = buffer[y][0];
+        m_ptr[y * psz + FI_RGBA_RED]   = buffer[y][0];
         m_ptr[y * psz + FI_RGBA_GREEN] = buffer[y][1];
-        m_ptr[y * psz + FI_RGBA_BLUE] = buffer[y][2];
+        m_ptr[y * psz + FI_RGBA_BLUE]  = buffer[y][2];
         m_ptr[y * psz + FI_RGBA_ALPHA] = buffer[y][3];
       }
       m_ptr -= pitch;
@@ -850,10 +861,10 @@ namespace mln
 
     inline void freeimage_writer_plugin::write_next_pixel_rgba8(void* src)
     {
-      colors::rgba8* pixel = (colors::rgba8*)src;
-      m_ptr[y * psz + FI_RGBA_RED] = (*pixel)[0];
+      colors::rgba8* pixel           = (colors::rgba8*)src;
+      m_ptr[y * psz + FI_RGBA_RED]   = (*pixel)[0];
       m_ptr[y * psz + FI_RGBA_GREEN] = (*pixel)[1];
-      m_ptr[y * psz + FI_RGBA_BLUE] = (*pixel)[2];
+      m_ptr[y * psz + FI_RGBA_BLUE]  = (*pixel)[2];
       m_ptr[y * psz + FI_RGBA_ALPHA] = (*pixel)[3];
 
       if (++y == m_ncols)

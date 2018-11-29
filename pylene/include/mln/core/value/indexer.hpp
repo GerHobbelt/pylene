@@ -53,9 +53,9 @@ namespace mln
     static_assert(value_traits<V>::quant < value_traits<std::size_t>::quant, "The type is not indexable");
 
     typedef Index<V, std::less<V>> index_type;
-    typedef V value_type;
-    static const bool inversible = true;
-    static const std::size_t nvalues = value_traits<V>::max() + 1;
+    typedef V                      value_type;
+    static const bool              inversible = true;
+    static const std::size_t       nvalues    = value_traits<V>::max() + 1;
 
     index_type operator()(value_type x) const { return index_type(x); }
     value_type inv(index_type i) const { return i; }
@@ -68,8 +68,8 @@ namespace mln
     static_assert(value_traits<V>::quant <= value_traits<std::size_t>::quant, "The type is not indexable");
 
     typedef Index<V, std::greater<V>> index_type;
-    typedef V value_type;
-    static const bool inversible = true;
+    typedef V                         value_type;
+    static const bool                 inversible = true;
 
     index_type operator()(value_type x) const { return index_type(x); }
     value_type inv(index_type i) const { return i; }
@@ -88,8 +88,8 @@ namespace mln
 
   public:
     typedef Index<enc, std::less<enc>> index_type;
-    typedef V value_type;
-    static const bool inversible = true;
+    typedef V                          value_type;
+    static const bool                  inversible = true;
 
     index_type operator()(value_type x) const { return x - value_traits<V>::min(); }
     value_type inv(index_type i) const { return i + value_traits<V>::min(); }
@@ -104,8 +104,8 @@ namespace mln
 
   public:
     typedef Index<enc, std::greater<enc>> index_type;
-    typedef V value_type;
-    static const bool inversible = true;
+    typedef V                             value_type;
+    static const bool                     inversible = true;
 
     index_type operator()(value_type x) const { return x - value_traits<V>::min(); }
     value_type inv(index_type i) const { return i + value_traits<V>::min(); }

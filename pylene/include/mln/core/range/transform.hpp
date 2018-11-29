@@ -16,12 +16,16 @@ namespace mln
     typedef typename std::remove_reference<InputRange>::type R;
 
   public:
-    typedef transform_iterator<typename R::iterator, UnaryFunction> iterator;
+    typedef transform_iterator<typename R::iterator, UnaryFunction>       iterator;
     typedef transform_iterator<typename R::const_iterator, UnaryFunction> const_iterator;
-    typedef typename iterator::value_type value_type;
-    typedef typename iterator::reference reference;
+    typedef typename iterator::value_type                                 value_type;
+    typedef typename iterator::reference                                  reference;
 
-    transformed_range(InputRange&& rng, const UnaryFunction& fun) : m_rng(std::forward<InputRange>(rng)), m_fun(fun) {}
+    transformed_range(InputRange&& rng, const UnaryFunction& fun)
+      : m_rng(std::forward<InputRange>(rng))
+      , m_fun(fun)
+    {
+    }
 
     transformed_range(const transformed_range&) = default;
 
@@ -30,7 +34,8 @@ namespace mln
     transformed_range(const transformed_range<R2, F2>& other,
                       typename std::enable_if<std::is_convertible<R2, InputRange>::value &&
                                               std::is_convertible<F2, UnaryFunction>::value>::type* = NULL)
-        : m_rng(other.m_rng), m_fun(other.m_fun)
+      : m_rng(other.m_rng)
+      , m_fun(other.m_fun)
     {
     }
 
@@ -41,7 +46,7 @@ namespace mln
     std::size_t size() const { return m_rng.size(); }
 
   private:
-    InputRange m_rng;
+    InputRange    m_rng;
     UnaryFunction m_fun;
   };
 

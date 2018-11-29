@@ -58,12 +58,12 @@ namespace mln
         (void)__is_incremental__;
 
         typedef accu::accumulators::h_rank<mln_value(I), Ratio> ACCU;
-        ker::Aggregate<ACCU> A;
-        ker::Point p;
-        ker::Neighbor n;
-        auto f = ker::make_image_expr<0>(ima);
-        auto g = ker::make_image_expr<1>(out);
-        auto expr = kernel::declare(g(p) = A(f(n)));
+        ker::Aggregate<ACCU>                                    A;
+        ker::Point                                              p;
+        ker::Neighbor                                           n;
+        auto                                                    f    = ker::make_image_expr<0>(ima);
+        auto                                                    g    = ker::make_image_expr<1>(out);
+        auto                                                    expr = kernel::declare(g(p) = A(f(n)));
         ker::execute_incremental(expr, nbh);
       }
 
@@ -77,11 +77,11 @@ namespace mln
         (void)__is_incremental__;
 
         typedef accu::accumulators::h_rank<mln_value(I), Ratio> ACCU;
-        ker::Aggregate<ACCU> A;
-        ker::Point p;
-        ker::Neighbor n;
-        auto f = ker::make_image_expr<0>(ima);
-        auto g = ker::make_image_expr<1>(out);
+        ker::Aggregate<ACCU>                                    A;
+        ker::Point                                              p;
+        ker::Neighbor                                           n;
+        auto                                                    f = ker::make_image_expr<0>(ima);
+        auto                                                    g = ker::make_image_expr<1>(out);
 
         auto expr = kernel::declare(g(p) = A(f(n)));
         ker::execute(expr, nbh);
@@ -95,13 +95,13 @@ namespace mln
       mln_entering("mln::morpho::rank_filter");
 
       using has_extension = typename image_has_extension<I>::type;
-      const I& ima = exact(ima_);
-      const SE& se = exact(se_);
-      OutputImage& out = exact(output_);
+      const I&     ima    = exact(ima_);
+      const SE&    se     = exact(se_);
+      OutputImage& out    = exact(output_);
 
       static_assert(has_extension::value, "You must ensure that the image has an extension wide enough to hold the SE");
 
-      using is_se_incremental = typename neighborhood_traits<SE>::is_incremental;
+      using is_se_incremental    = typename neighborhood_traits<SE>::is_incremental;
       using is_image_incremental = typename iterator_traits<mln_pxter(I)>::has_NL;
       using is_incremental = std::integral_constant<bool, is_se_incremental::value and is_image_incremental::value>;
 

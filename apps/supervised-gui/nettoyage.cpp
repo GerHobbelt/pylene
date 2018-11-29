@@ -13,8 +13,7 @@
 
 namespace po = boost::program_options;
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 
@@ -50,10 +49,10 @@ main(int argc, char** argv)
 
   io::imread(vm["mask.pbm"].as<std::string>(), mask);
   io::imread(vm["input.ppm"].as<std::string>(), f);
-  uint16 nlabel;
+  uint16          nlabel;
   image2d<uint16> lbl;
 
-  mask = eval(lnot(mask));
+  mask                  = eval(lnot(mask));
   std::tie(lbl, nlabel) = labeling::blobs(mask, c8, (uint16)0);
 
   auto res = labeling::p_accumulate(lbl, nlabel, accu::features::count<>());

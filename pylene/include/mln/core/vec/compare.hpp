@@ -91,7 +91,7 @@ namespace mln
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;
-    static constexpr unsigned ndim = dim;
+    static constexpr unsigned ndim  = dim;
 
     static constexpr Vec min() { return __check(), Vec(value_traits<U>::min()); }
 
@@ -110,7 +110,7 @@ namespace mln
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;
-    static constexpr unsigned ndim = dim;
+    static constexpr unsigned ndim  = dim;
 
     static constexpr Vec min() { return Vec(value_traits<U>::min()); }
 
@@ -129,7 +129,7 @@ namespace mln
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;
-    static constexpr unsigned ndim = dim;
+    static constexpr unsigned ndim  = dim;
 
     static constexpr Vec min() { return Vec(value_traits<U>::min()); }
 

@@ -55,13 +55,13 @@ namespace mln
   {
     mln_entering("mln::compute_regional_energy");
 
-    typedef morpho::component_tree<P, image2d<P>> tree_t;
-    typedef typename tree_t::node_type node_type;
-    typedef typename tree_t::vertex_id_t vertex_id_t;
+    typedef morpho::component_tree<P, image2d<P>>                  tree_t;
+    typedef typename tree_t::node_type                             node_type;
+    typedef typename tree_t::vertex_id_t                           vertex_id_t;
     typedef typename accu::result_of<AccuLike, mln_value(I)>::type R;
 
     const I& vmap = exact(valuemap);
-    auto acc = accu::make_accumulator(exact(accu_), mln_value(I)());
+    auto     acc  = accu::make_accumulator(exact(accu_), mln_value(I)());
 
     typedef decltype(acc) Accu;
 
@@ -114,7 +114,7 @@ namespace mln
 
     // Compute external region attribute
     {
-      property_map<tree_t, bool> dejavu(tree, false);
+      property_map<tree_t, bool>                       dejavu(tree, false);
       std::vector<std::pair<vertex_id_t, vertex_id_t>> branches;
 
       mln_pixter(px, vmap);

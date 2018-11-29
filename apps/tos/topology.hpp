@@ -43,8 +43,8 @@ namespace mln
     static_assert(std::is_same<mln_value(I), bool>::value, "Bool required for image type");
 
     const I& ima = exact(ima_);
-    auto shp = ima.domain().shape();
-    int nr = shp[0], nc = shp[1];
+    auto     shp = ima.domain().shape();
+    int      nr = shp[0], nc = shp[1];
 
     for (int j = 0; j < nc + 4; j++)
       std::cout << "#";

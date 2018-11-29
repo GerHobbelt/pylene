@@ -87,8 +87,8 @@ namespace mln
       template <typename T, typename SumType>
       struct mean : composite_accumulator_facade<mean<T, SumType>, T, SumType, features::mean<SumType>>
       {
-        typedef T argument_type;
-        typedef SumType result_type;
+        typedef T                                                          argument_type;
+        typedef SumType                                                    result_type;
         typedef boost::mpl::set<features::mean<>, features::mean<SumType>> provides;
 
         friend SumType extract(const mean& accu, features::mean<SumType>) { return extract(accu, features::mean<>()); }

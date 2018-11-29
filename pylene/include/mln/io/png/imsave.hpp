@@ -33,26 +33,26 @@ namespace mln
           else
             throw MLNIOException("Unhandled image type.");
 
-          int h = ima.domain().shape()[0], w = ima.domain().shape()[1];
+          int       h = ima.domain().shape()[0], w = ima.domain().shape()[1];
           FIBITMAP* dib;
           if (std::is_same<V, rgb8>::value)
             dib = FreeImage_AllocateT(fit, w, h, sizeof(V) * 8, 0xFF000000, 0x00FF00, 0xFF000000);
           else if (std::is_same<V, bool>::value)
           {
-            dib = FreeImage_AllocateT(fit, w, h, 1);
+            dib          = FreeImage_AllocateT(fit, w, h, 1);
             RGBQUAD* pal = FreeImage_GetPalette(dib);
             mln_assertion(pal != NULL);
-            pal[1].rgbRed = 0xFF;
+            pal[1].rgbRed   = 0xFF;
             pal[1].rgbGreen = 0XFF;
-            pal[1].rgbBlue = 0xFF;
+            pal[1].rgbBlue  = 0xFF;
             mln_assertion(FreeImage_GetColorType(dib) == FIC_MINISBLACK);
           }
           else
             dib = FreeImage_AllocateT(fit, w, h, sizeof(V) * 8);
 
           const size_t* strides = ima.strides();
-          const char* ptr = (const char*)&ima(ima.domain().pmin);
-          unsigned bpp = sizeof(V);
+          const char*   ptr     = (const char*)&ima(ima.domain().pmin);
+          unsigned      bpp     = sizeof(V);
           for (int y = h - 1; y >= 0; --y, ptr += strides[0])
           {
             BYTE* bits = FreeImage_GetScanLine(dib, y);

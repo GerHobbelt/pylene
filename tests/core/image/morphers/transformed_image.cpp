@@ -10,7 +10,7 @@ TEST(Core, TransformedImage_transform_byval_rvalue)
 {
   using namespace mln;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);
@@ -45,7 +45,7 @@ TEST(Core, TransformedImage_transform_byval_chain)
 {
   using namespace mln;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);
@@ -82,7 +82,7 @@ TEST(Core, TransformedImage_transform_byval_lvalue)
 
   typedef std::pair<int, int> V;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d      dom{{-1, -2}, {3, 3}};
   image2d<V> ima(dom);
 
   {

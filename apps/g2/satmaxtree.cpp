@@ -26,9 +26,9 @@ namespace mln
     // }
     T tree = morpho::cToS_pinf(f, c4, pmin);
 
-    image2d<uint16> F = immerse_k1(f, 69);
+    image2d<uint16>         F    = immerse_k1(f, 69);
     property_map<T, uint16> vmap = morpho::make_attribute_map_from_image(tree, F);
-    vmap[tree.npos()] = 0;
+    vmap[tree.npos()]            = 0;
 
     auto predfun = [&vmap, &tree](const T::vertex_id_t& n) {
       return vmap[n] > vmap[tree.get_node(n).parent()] or tree.get_node(n).get_parent_id() == tree.npos();
@@ -38,7 +38,7 @@ namespace mln
     // Subtractive
     {
       property_map<T, unsigned> delta(tree, 0);
-      unsigned n = 0;
+      unsigned                  n = 0;
       mln_foreach (auto x, tree.nodes_without_root())
       {
         delta[x] = delta[x.parent()];
@@ -73,7 +73,7 @@ namespace mln
   morpho::component_tree<unsigned, image2d<unsigned>>
       tree_keep_2F(const morpho::component_tree<unsigned, image2d<unsigned>>& tree)
   {
-    typedef unsigned P;
+    typedef unsigned                      P;
     morpho::component_tree<P, image2d<P>> out;
 
     auto newdata = out._get_data();
@@ -95,12 +95,12 @@ namespace mln
     unsigned j = 0;
     for (unsigned i = 0; i < olddata->m_S.size(); ++i)
     {
-      P p = olddata->m_S[i];
+      P       p  = olddata->m_S[i];
       point2d pt = olddata->m_pmap.point_at_index(p);
       if (K1::is_face_2(pt))
       {
         newdata->m_S[j] = newdata->m_pmap.index_of_point(pt / 2);
-        auto node = tree.get_node_at(p);
+        auto node       = tree.get_node_at(p);
         if (node.get_first_point_id() == i)
           newdata->m_nodes[node.id()].m_point_index = j;
         ++j;

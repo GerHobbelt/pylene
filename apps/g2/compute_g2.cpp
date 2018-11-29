@@ -13,7 +13,7 @@ namespace mln
   {
     mln_entering("smallest_enclosing_shape");
     accu::least_common_ancestor<unsigned, image2d<unsigned>> acc(t2, d2);
-    auto tmp = morpho::accumulate(t1, acc);
+    auto                                                     tmp = morpho::accumulate(t1, acc);
     mln_exiting();
     return tmp;
   }

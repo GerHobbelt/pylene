@@ -17,7 +17,7 @@ namespace mln
     };
 
     static const zero_t zero = {};
-    static const one_t one = {};
+    static const one_t  one  = {};
 
   } // end of namespace mln::literal
 

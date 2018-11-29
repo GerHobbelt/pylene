@@ -24,27 +24,27 @@ namespace mln
   struct WNeighborhood : Object<N>
   {
   protected:
-    WNeighborhood() = default;
+    WNeighborhood()                     = default;
     WNeighborhood(const WNeighborhood&) = default;
-    WNeighborhood(WNeighborhood&&) = default;
+    WNeighborhood(WNeighborhood&&)      = default;
   };
 
   template <class N>
   struct Neighborhood : WNeighborhood<N>
   {
     // Destructor non-trivial
-    //BOOST_CONCEPT_USAGE(Neighborhood) { BOOST_CONCEPT_ASSERT((Neighborhood_<N>)); }
+    // BOOST_CONCEPT_USAGE(Neighborhood) { BOOST_CONCEPT_ASSERT((Neighborhood_<N>)); }
 
   protected:
-    Neighborhood() = default;
+    Neighborhood()                    = default;
     Neighborhood(const Neighborhood&) = default;
-    Neighborhood(Neighborhood&&) = default;
+    Neighborhood(Neighborhood&&)      = default;
   };
 
   template <class N>
   struct Neighborhood_
   {
-    typedef neighborhood_traits<N> traits;
+    typedef neighborhood_traits<N>    traits;
     typedef typename traits::category category;
 
     // Neighborhood should be SCARY, i.e. they are not

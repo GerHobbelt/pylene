@@ -35,8 +35,8 @@ namespace mln
     template <typename Neighborhood, typename SiteSetGenerator>
     int get_border_from_nbh(const Neighborhood& nbh, const SiteSetGenerator& make_win)
     {
-      unsigned b = 1;
-      auto cwin = make_win(1);
+      unsigned b    = 1;
+      auto     cwin = make_win(1);
       mln_foreach (auto dp, nbh.dpoints)
         while (not cwin.has(dp))
           cwin = make_win(++b);

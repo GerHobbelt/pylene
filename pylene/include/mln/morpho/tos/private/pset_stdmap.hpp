@@ -1,8 +1,8 @@
 #ifndef MLN_MORPHO_TOS_PRIVATE_PSET_SET_HPP
-# define MLN_MORPHO_TOS_PRIVATE_PSET_SET_HPP
+#define MLN_MORPHO_TOS_PRIVATE_PSET_SET_HPP
 
-# include <mln/core/image/image.hpp>
-# include <map>
+#include <map>
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {
@@ -20,7 +20,7 @@ namespace mln
         class pset_set
         {
         public:
-          using Key = mln_value(I);
+          using Key   = mln_value(I);
           using Point = typename I::size_type;
 
           template <class J>
@@ -50,7 +50,7 @@ namespace mln
 
         template <class I>
         template <class J>
-        pset_set<I>::pset_set(const Image<J>& )
+        pset_set<I>::pset_set(const Image<J>&)
         {
         }
 
@@ -68,8 +68,7 @@ namespace mln
 
 
         template <class I>
-        std::pair<bool, typename I::size_type>
-        pset_set<I>::try_pop(Key level)
+        std::pair<bool, typename I::size_type> pset_set<I>::try_pop(Key level)
         {
           auto it = m_set.find(level);
           if (it == m_set.end())
@@ -81,8 +80,7 @@ namespace mln
         }
 
         template <class I>
-        std::pair<mln_value(I), typename I::size_type>
-        pset_set<I>::pop(Key level)
+        std::pair<mln_value(I), typename I::size_type> pset_set<I>::pop(Key level)
         {
           assert(!m_set.empty());
 

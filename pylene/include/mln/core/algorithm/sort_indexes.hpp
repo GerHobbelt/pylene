@@ -42,10 +42,10 @@ namespace mln
     void sort_indexes(const I& input, OutputIterator v, StrictWeakOrdering, use_counting_sort_tag)
     {
       typedef typename Indexer::index_type index_t;
-      Indexer f;
+      Indexer                              f;
 
-      static constexpr std::size_t nvalues = 1 << value_traits<index_t>::quant;
-      unsigned h[nvalues] = {
+      static constexpr std::size_t nvalues    = 1 << value_traits<index_t>::quant;
+      unsigned                     h[nvalues] = {
           0,
       };
       {
@@ -54,11 +54,11 @@ namespace mln
           ++h[f(*v)];
 
         unsigned count = 0;
-        index_t i = value_traits<index_t>::min();
+        index_t  i     = value_traits<index_t>::min();
         do
         {
           unsigned tmp = h[i];
-          h[i] = count;
+          h[i]         = count;
           count += tmp;
         } while (i++ < value_traits<index_t>::max());
         assert(count == input.domain().size());
@@ -76,13 +76,13 @@ namespace mln
     void sort_indexes(const I& input, size_type* v, StrictWeakOrdering, use_radix_sort_tag)
     {
       typedef typename Indexer::index_type index_t;
-      Indexer f;
+      Indexer                              f;
 
       std::size_t n = input.domain().size();
 
-      static constexpr std::size_t nvalues = 1 << 16;
-      static constexpr std::size_t nvalues2 = 1 << (value_traits<index_t>::quant - 16);
-      unsigned h[nvalues] = {
+      static constexpr std::size_t nvalues    = 1 << 16;
+      static constexpr std::size_t nvalues2   = 1 << (value_traits<index_t>::quant - 16);
+      unsigned                     h[nvalues] = {
           0,
       };
       unsigned h2[nvalues2] = {
@@ -104,24 +104,24 @@ namespace mln
 
         {
           unsigned count = 0;
-          index_t i((unsigned)(value_traits<index_t>::min()) & 0x0000FFFF);
-          index_t j((unsigned)(value_traits<index_t>::max()) & 0x0000FFFF);
+          index_t  i((unsigned)(value_traits<index_t>::min()) & 0x0000FFFF);
+          index_t  j((unsigned)(value_traits<index_t>::max()) & 0x0000FFFF);
           do
           {
             unsigned tmp = h[i];
-            h[i] = count;
+            h[i]         = count;
             count += tmp;
           } while (i++ < j);
         }
 
         {
           unsigned count = 0;
-          index_t i(((unsigned)(value_traits<index_t>::min()) >> 16) & 0x0000FFFF);
-          index_t j(((unsigned)(value_traits<index_t>::max()) >> 16) & 0x0000FFFF);
+          index_t  i(((unsigned)(value_traits<index_t>::min()) >> 16) & 0x0000FFFF);
+          index_t  j(((unsigned)(value_traits<index_t>::max()) >> 16) & 0x0000FFFF);
           do
           {
             unsigned tmp = h2[i];
-            h2[i] = count;
+            h2[i]        = count;
             count += tmp;
           } while (i++ < j);
         }
@@ -163,9 +163,9 @@ namespace mln
             for (std::size_t i = 0; i < n; ++i)
             {
               std::size_t p = buffer[i];
-              unsigned x = f(input[p]);
-              x = (x >> shft) & 0x0000FFFF;
-              v[h2[x]++] = p;
+              unsigned    x = f(input[p]);
+              x             = (x >> shft) & 0x0000FFFF;
+              v[h2[x]++]    = p;
             }
             break;
           }

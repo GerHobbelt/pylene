@@ -40,13 +40,13 @@ namespace mln
     strided_box() = default;
     strided_box(const point_type& pmin, const point_type& pmax, const point_type& strides);
 
-    bool has(const point_type& p) const;
+    bool       has(const point_type& p) const;
     point_type shape() const;
-    bool empty() const;
-    unsigned size() const;
-    bool __is_valid() const;
+    bool       empty() const;
+    unsigned   size() const;
+    bool       __is_valid() const;
 
-    iterator iter() const;
+    iterator         iter() const;
     reverse_iterator riter() const;
 
     bool operator==(const strided_box& other) const;
@@ -63,7 +63,7 @@ namespace mln
   //
   // \pre \tparam T must be an integral type
   template <typename T, unsigned dim>
-  struct box : ranges::details::multi_indices_facade<dim, box<T,dim>>
+  struct box : ranges::details::multi_indices_facade<dim, box<T, dim>>
   {
     typedef point<T, dim> point_type;
     typedef point<T, dim> value_type;
@@ -78,12 +78,16 @@ namespace mln
     typedef internal::nested_loop_iterator<internal::domain_point_visitor_backward<point<T, dim>>,
                                            internal::no_op_visitor, internal::no_op_visitor,
                                            internal::point_structure<T, dim>, internal::deref_return_point_policy>
-        reverse_iterator;
+                             reverse_iterator;
     typedef reverse_iterator const_reverse_iterator;
 
     box() = default;
 
-    constexpr box(const point_type& pmin_, const point_type& pmax_) : pmin(pmin_), pmax(pmax_) {}
+    constexpr box(const point_type& pmin_, const point_type& pmax_)
+      : pmin(pmin_)
+      , pmax(pmax_)
+    {
+    }
 
     bool has(const point_type& p) const
     {
@@ -145,10 +149,10 @@ namespace mln
     box(box& r, tbb::split)
     {
       mln_precondition(r.is_divisible());
-      pmin = r.pmin;
-      pmax = r.pmax;
+      pmin      = r.pmin;
+      pmax      = r.pmax;
       r.pmax[0] = r.pmin[0] + (pmax[0] - pmin[0]) / 2;
-      pmin[0] = r.pmax[0];
+      pmin[0]   = r.pmax[0];
     }
 
 #endif
@@ -213,8 +217,10 @@ namespace mln
   /// Traits
 
   /// Forward
-  template <typename> struct image2d;
-  template <typename> struct image3d;
+  template <typename>
+  struct image2d;
+  template <typename>
+  struct image3d;
 
   template <>
   struct image_from_domain<box2d>
@@ -263,10 +269,15 @@ namespace mln
     typedef box<T, dim> base;
 
   public:
-    grain_box() = default;
+    grain_box()                 = default;
     grain_box(const grain_box&) = default;
 
-    grain_box(const box<T, dim>& b, unsigned grain = 1) : base(b), m_grain(grain) { mln_assertion(grain > 0); }
+    grain_box(const box<T, dim>& b, unsigned grain = 1)
+      : base(b)
+      , m_grain(grain)
+    {
+      mln_assertion(grain > 0);
+    }
 
     bool is_divisible() const
     {
@@ -276,7 +287,11 @@ namespace mln
 
 #if MLN_HAS_TBB
 
-    grain_box(grain_box& r, tbb::split) : base(r, tbb::split()), m_grain(r.m_grain) {}
+    grain_box(grain_box& r, tbb::split)
+      : base(r, tbb::split())
+      , m_grain(r.m_grain)
+    {
+    }
 
 #endif
 
@@ -296,7 +311,8 @@ namespace mln
 
   template <typename T, unsigned dim>
   strided_box<T, dim>::strided_box(const point_type& pmin_, const point_type& pmax_, const point_type& strides_)
-      : pmin(pmin_), strides(strides_)
+    : pmin(pmin_)
+    , strides(strides_)
   {
     mln_precondition(pmin_ <= pmax_);
     for (unsigned i = 0; i < dim; ++i)
@@ -376,12 +392,10 @@ namespace mln
 
 
   template <typename T, unsigned dim>
-  strided_box<T, dim>
-  make_strided_box(point<T, dim> pmin, point<T, dim> pmax, point<T, dim> step)
+  strided_box<T, dim> make_strided_box(point<T, dim> pmin, point<T, dim> pmax, point<T, dim> step)
   {
     return {pmin, pmax, step};
   }
-
 }
 
 #endif

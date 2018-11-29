@@ -46,8 +46,8 @@ namespace mln::ranges
     template <class U = void, class = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
     auto rows() const
     {
-      return ::ranges::view::transform(this->base().rows(),
-                                       [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
+      return ::ranges::view::transform(
+          this->base().rows(), [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
     }
 
     template <class U = int, class = std::enable_if_t<is_reversible_range_v<Rng>, U>>

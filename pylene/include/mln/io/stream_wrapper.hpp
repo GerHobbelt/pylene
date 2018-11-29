@@ -15,7 +15,7 @@ namespace mln
       {
         istream_wrapper(std::istream& is)
         {
-          m_cs = &is;
+          m_cs     = &is;
           m_offset = is.tellg();
         }
 
@@ -36,7 +36,7 @@ namespace mln
 
         static int seek(fi_handle isw_, long offset, int origin)
         {
-          istream_wrapper* isw = (istream_wrapper*)isw_;
+          istream_wrapper*       isw = (istream_wrapper*)isw_;
           std::istream::off_type off = offset;
           if (origin == SEEK_SET)
             off += isw->m_offset;
@@ -51,7 +51,7 @@ namespace mln
         }
 
       private:
-        std::istream* m_cs;
+        std::istream*          m_cs;
         std::istream::off_type m_offset;
       };
 
@@ -60,7 +60,7 @@ namespace mln
 
         ostream_wrapper(std::ostream& os)
         {
-          m_cs = &os;
+          m_cs     = &os;
           m_offset = os.tellp();
         }
 
@@ -75,7 +75,7 @@ namespace mln
 
         static int seek(fi_handle osw_, long offset, int origin)
         {
-          ostream_wrapper* osw = (ostream_wrapper*)osw_;
+          ostream_wrapper*       osw = (ostream_wrapper*)osw_;
           std::ostream::off_type off = offset;
           if (origin == SEEK_SET)
             off += osw->m_offset;
@@ -90,7 +90,7 @@ namespace mln
         }
 
       private:
-        std::ostream* m_cs;
+        std::ostream*          m_cs;
         std::ostream::off_type m_offset;
       };
 

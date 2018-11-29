@@ -24,7 +24,13 @@ namespace mln
     static constexpr ::ranges::span<const point_t, 2> after_offsets() { return {m_offsets.data() + 2, 2}; }
 
   private:
-    static inline constexpr std::array<point_t, 4> m_offsets = {{{-1, 0}, {0, -1}, {0, 1}, {1, 0}}};
+    // clang-format off
+    static inline constexpr std::array<point_t, 4> m_offsets = {{
+                 {-1, 0},
+        {0, -1},          {0, 1},
+                 {1, 0}
+      }};
+    // clang-format on
   };
 
   static constexpr inline c4_new_t c4_new = {};

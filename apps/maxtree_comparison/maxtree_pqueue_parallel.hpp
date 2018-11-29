@@ -29,12 +29,15 @@ namespace mln
       struct MaxTreeAlgorithmPQ
       {
         typedef typename image2d<V>::size_type size_type;
-        static constexpr std::size_t UNINITIALIZED = std::numeric_limits<size_type>::max();
-        static constexpr size_type INQUEUE = 0;
-        static constexpr bool use_dejavu = true;
+        static constexpr std::size_t           UNINITIALIZED = std::numeric_limits<size_type>::max();
+        static constexpr size_type             INQUEUE       = 0;
+        static constexpr bool                  use_dejavu    = true;
 
         MaxTreeAlgorithmPQ(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
-            : m_ima(ima), m_nbh(nbh), m_cmp(cmp), m_has_previous(false)
+          : m_ima(ima)
+          , m_nbh(nbh)
+          , m_cmp(cmp)
+          , m_has_previous(false)
         {
           if (!use_dejavu)
           {
@@ -55,15 +58,18 @@ namespace mln
         }
 
         MaxTreeAlgorithmPQ(MaxTreeAlgorithmPQ& other, tbb::split)
-            : m_ima(other.m_ima), m_nbh(other.m_nbh), m_cmp(other.m_cmp), m_parent(other.m_parent),
-              m_has_previous(false)
+          : m_ima(other.m_ima)
+          , m_nbh(other.m_nbh)
+          , m_cmp(other.m_cmp)
+          , m_parent(other.m_parent)
+          , m_has_previous(false)
         {
           m_nsplit = 0;
         }
 
         void operator()(const box2d& domain)
         {
-          image2d<V> ima = m_ima | domain;
+          image2d<V>         ima    = m_ima | domain;
           image2d<size_type> parent = m_parent | domain;
 
           {
@@ -81,7 +87,7 @@ namespace mln
           else
           {
             m_current_domain = domain;
-            m_has_previous = true;
+            m_has_previous   = true;
           }
         }
 
@@ -98,14 +104,14 @@ namespace mln
         }
 
       public:
-        const image2d<V>& m_ima;
-        Neighborhood m_nbh;
+        const image2d<V>&  m_ima;
+        Neighborhood       m_nbh;
         StrictWeakOrdering m_cmp;
 
-        image2d<size_type> m_parent;
-        bool m_has_previous;
-        box2d m_current_domain;
-        unsigned m_nsplit;
+        image2d<size_type>     m_parent;
+        bool                   m_has_previous;
+        box2d                  m_current_domain;
+        unsigned               m_nsplit;
         std::vector<size_type> m_S;
       };
 
@@ -113,16 +119,17 @@ namespace mln
       {
         template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
         std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
-        maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+            maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh,
+                           StrictWeakOrdering cmp = StrictWeakOrdering())
         {
-          typedef typename image2d<V>::size_type size_type;
+          typedef typename image2d<V>::size_type                        size_type;
           MaxTreeAlgorithmPQ<V, Neighborhood, StrictWeakOrdering, true> algo(ima, nbh, cmp);
-          int grain = std::max(ima.nrows() / 64, 1u);
+          int                                                           grain = std::max(ima.nrows() / 64, 1u);
           std::cout << "Grain: " << grain << std::endl;
           tbb::parallel_reduce(grain_box2d(ima.domain(), grain), algo, tbb::auto_partitioner());
 
           std::cout << "Number of split: " << algo.m_nsplit << std::endl;
-          image2d<size_type>& parent = algo.m_parent;
+          image2d<size_type>&    parent = algo.m_parent;
           std::vector<size_type> S(ima.domain().size());
           canonize(ima, parent, &S[0]);
 
@@ -135,7 +142,8 @@ namespace mln
 
         template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
         std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
-        maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+            maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh,
+                           StrictWeakOrdering cmp = StrictWeakOrdering())
         {
 
           MaxTreeAlgorithmPQ<V, Neighborhood, StrictWeakOrdering, false> algo(ima, nbh, cmp);

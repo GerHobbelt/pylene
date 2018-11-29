@@ -41,19 +41,19 @@ namespace mln
     typedef image_traits<I> traits;
 
     typedef typename traits::accessible accessible;
-    typedef typename traits::category category;
-    typedef typename traits::concrete concrete;
-    typedef typename traits::indexable indexable;
-    typedef typename traits::extension extension;
+    typedef typename traits::category   category;
+    typedef typename traits::concrete   concrete;
+    typedef typename traits::indexable  indexable;
+    typedef typename traits::extension  extension;
 
-    typedef typename I::value_type value;
-    typedef typename I::reference reference;
-    typedef typename I::const_reference const_reference;
-    typedef typename I::pixel_type pixel;
+    typedef typename I::value_type       value;
+    typedef typename I::reference        reference;
+    typedef typename I::const_reference  const_reference;
+    typedef typename I::pixel_type       pixel;
     typedef typename I::const_pixel_type const_pixel;
 
-    typedef typename I::site_type site_type;
-    typedef typename I::point_type point_type;
+    typedef typename I::site_type   site_type;
+    typedef typename I::point_type  point_type;
     typedef typename I::domain_type domain_type;
 
     BOOST_CONCEPT_ASSERT((Pixel<pixel>));
@@ -76,7 +76,7 @@ namespace mln
       check(std::is_convertible<pixel, const_pixel>());
 
       {
-        mln_concrete(I) __ima2 = imconcretize(ima);
+        mln_concrete(I) __ima2      = imconcretize(ima);
         mln_ch_value(I, int) __ima3 = imchvalue<int>(ima);
       }
 
@@ -162,17 +162,17 @@ namespace mln
 
     BOOST_CONCEPT_USAGE(AccessibleImage)
     {
-      typedef typename I::point_type point_type;
-      typedef typename I::reference reference;
-      typedef typename I::const_reference const_reference;
-      typedef typename I::pixel_type pixel_type;
+      typedef typename I::point_type       point_type;
+      typedef typename I::reference        reference;
+      typedef typename I::const_reference  const_reference;
+      typedef typename I::pixel_type       pixel_type;
       typedef typename I::const_pixel_type const_pixel_type;
 
-      reference (I::*ptr)(const point_type&) = &I::operator();
-      const_reference (I::*ptr2)(const point_type&) const = &I::operator();
-      reference (I::*ptr3)(const point_type&) = &I::at;
-      const_reference (I::*ptr4)(const point_type&) const = &I::at;
-      pixel_type (I::*ptr5)(const point_type&) = &I::pixel;
+      reference (I::*ptr)(const point_type&)               = &I::             operator();
+      const_reference (I::*ptr2)(const point_type&) const  = &I::operator();
+      reference (I::*ptr3)(const point_type&)              = &I::at;
+      const_reference (I::*ptr4)(const point_type&) const  = &I::at;
+      pixel_type (I::*ptr5)(const point_type&)             = &I::pixel;
       const_pixel_type (I::*ptr6)(const point_type&) const = &I::pixel;
 
       (void)ptr;
@@ -194,16 +194,16 @@ namespace mln
 
     BOOST_CONCEPT_USAGE(IndexableImage)
     {
-      typedef typename I::size_type size_type;
+      typedef typename I::size_type       size_type;
       typedef typename I::difference_type difference_type;
-      typedef typename I::reference reference;
+      typedef typename I::reference       reference;
       typedef typename I::const_reference const_reference;
-      typedef typename I::point_type point_type;
+      typedef typename I::point_type      point_type;
 
-      reference (I::*ptr)(size_type) = &I::operator[];
-      const_reference (I::*ptr2)(size_type) const = &I::operator[];
-      size_type (I::*ptr3)(const point_type&) const = &I::index_of_point;
-      point_type (I::*ptr4)(size_type) const = &I::point_at_index;
+      reference (I::*ptr)(size_type)                      = &I::             operator[];
+      const_reference (I::*ptr2)(size_type) const         = &I::operator[];
+      size_type (I::*ptr3)(const point_type&) const       = &I::index_of_point;
+      point_type (I::*ptr4)(size_type) const              = &I::point_at_index;
       difference_type (I::*ptr5)(const point_type&) const = &I::delta_index;
 
       (void)ptr;
@@ -224,20 +224,20 @@ namespace mln
 
     BOOST_CONCEPT_USAGE(IterableImage)
     {
-      typedef typename I::value_type value_type;
-      typedef typename I::reference reference;
-      typedef typename I::const_reference const_reference;
-      typedef typename I::pixel_type pixel_type;
+      typedef typename I::value_type       value_type;
+      typedef typename I::reference        reference;
+      typedef typename I::const_reference  const_reference;
+      typedef typename I::pixel_type       pixel_type;
       typedef typename I::const_pixel_type const_pixel_type;
 
-      typedef typename I::value_range value_range;
+      typedef typename I::value_range       value_range;
       typedef typename I::const_value_range const_value_range;
-      typedef typename I::pixel_range pixel_range;
+      typedef typename I::pixel_range       pixel_range;
       typedef typename I::const_pixel_range const_pixel_range;
 
-      value_range (I::*ptr1)() = &I::values;
+      value_range (I::*ptr1)()             = &I::values;
       const_value_range (I::*ptr2)() const = &I::values;
-      pixel_range (I::*ptr3)() = &I::pixels;
+      pixel_range (I::*ptr3)()             = &I::pixels;
       const_pixel_range (I::*ptr4)() const = &I::pixels;
 
       (void)ptr1;
@@ -245,9 +245,9 @@ namespace mln
       (void)ptr3;
       (void)ptr4;
 
-      typedef typename value_range::iterator value_iterator;
+      typedef typename value_range::iterator       value_iterator;
       typedef typename const_value_range::iterator const_value_iterator;
-      typedef typename pixel_range::iterator pixel_iterator;
+      typedef typename pixel_range::iterator       pixel_iterator;
       typedef typename const_pixel_range::iterator const_pixel_iterator;
 
       check(std::is_convertible<typename value_iterator::value_type, value_type>());

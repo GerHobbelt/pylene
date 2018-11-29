@@ -23,7 +23,7 @@ namespace mln
       void debug_image(Expr&& x)
       {
         typedef details::image_usage_traits<Expr, k> traits;
-        typedef typename traits::type I;
+        typedef typename traits::type                I;
 
         std::cout << "Image " << k << " {\n"
                   << "  adress: " << &(details::get_image<k>(std::forward<Expr>(x))) << "\n"

@@ -189,7 +189,8 @@ namespace mln::ranges
   auto zip_with_view<Fun, Rngs...>::rows() const
   {
     // Zip function for rows
-    auto row_zipper = [fun = this->fun_](auto&&... rows) {
+    auto row_zipper = [fun = this->fun_](auto&&... rows)
+    {
       return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
     };
 

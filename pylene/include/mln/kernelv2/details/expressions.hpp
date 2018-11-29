@@ -23,7 +23,7 @@ namespace mln
       {
       };
 
-      typedef proto::expr<tag::point, proto::term<dummy_t>> point_expr;
+      typedef proto::expr<tag::point, proto::term<dummy_t>>    point_expr;
       typedef proto::expr<tag::neighbor, proto::term<dummy_t>> neighbor_expr;
 
       template <class I, int k>

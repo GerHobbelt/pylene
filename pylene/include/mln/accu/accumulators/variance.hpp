@@ -79,12 +79,17 @@ namespace mln
 
         // typedef boost::mpl::set< features::variance<>, features::variance<SumType> > provides;
 
-        variance() : m_count{0}, m_sum{}, m_sum_sqr{} {}
+        variance()
+          : m_count{0}
+          , m_sum{}
+          , m_sum_sqr{}
+        {
+        }
 
         void init()
         {
-          m_count = 0;
-          m_sum = SumType();
+          m_count   = 0;
+          m_sum     = SumType();
           m_sum_sqr = result_type();
         }
 
@@ -131,8 +136,8 @@ namespace mln
         friend SumType extract(const variance& accu, features::mean<>) { return accu.m_sum / accu.m_count; }
 
       private:
-        unsigned m_count;
-        SumType m_sum;
+        unsigned    m_count;
+        SumType     m_sum;
         result_type m_sum_sqr;
       };
     }

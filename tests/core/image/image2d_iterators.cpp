@@ -9,14 +9,14 @@ using namespace mln;
 
 struct iterator_test
 {
-  image2d<int> ima;
-  std::vector<int> values;
+  image2d<int>          ima;
+  std::vector<int>      values;
   std::vector<unsigned> indexes;
 
   void test_forward_viter()
   {
     auto&& rng = ima.values();
-    auto&& it = rng.iter();
+    auto&& it  = rng.iter();
     it.init();
     for (unsigned i = 0; i < values.size(); ++i)
     {
@@ -29,7 +29,7 @@ struct iterator_test
   void test_backward_viter()
   {
     auto&& rng = ima.values();
-    auto&& it = rng.riter();
+    auto&& it  = rng.riter();
     it.init();
     for (int i = static_cast<int>(values.size()) - 1; i >= 0; --i)
     {
@@ -42,8 +42,8 @@ struct iterator_test
   void test_forward_pixter()
   {
     auto&& rng = ima.pixels();
-    auto&& it = rng.iter();
-    auto pit = ima.domain().iter();
+    auto&& it  = rng.iter();
+    auto   pit = ima.domain().iter();
     it.init();
     pit.init();
     for (unsigned i = 0; i < values.size(); ++i)
@@ -60,8 +60,8 @@ struct iterator_test
   void test_backward_pixter()
   {
     auto&& rng = ima.pixels();
-    auto&& it = rng.riter();
-    auto pit = ima.domain().riter();
+    auto&& it  = rng.riter();
+    auto   pit = ima.domain().riter();
     it.init();
     pit.init();
     for (int i = static_cast<int>(values.size()) - 1; i >= 0; --i)
@@ -152,19 +152,18 @@ TEST(Core, Image2d_iterator_test_zero_origin_domain_backward_pixter)
 }
 
 
-
 //// NEW
 
 struct new_iterator_test
 {
-  image2d<int> ima;
+  image2d<int>     ima;
   std::vector<int> values;
 
   void test_forward_value_range()
   {
     auto rng = std::as_const(ima).new_values();
-    auto it = values.begin();
-    mln_foreach_new(int v, rng)
+    auto it  = values.begin();
+    mln_foreach_new (int v, rng)
       ASSERT_EQ(*it++, v);
     ASSERT_EQ(values.end(), it);
   }
@@ -172,8 +171,8 @@ struct new_iterator_test
   void test_backward_value_range()
   {
     auto rng = std::as_const(ima).new_values();
-    auto it = values.rbegin();
-    mln_foreach_new(int v, rng.reversed())
+    auto it  = values.rbegin();
+    mln_foreach_new (int v, rng.reversed())
       ASSERT_EQ(*it++, v);
     ASSERT_EQ(values.rend(), it);
   }
@@ -188,7 +187,7 @@ struct new_iterator_test
     {
       auto vit = values.begin();
       pit.init();
-      mln_foreach_new(auto&& px, rng)
+      mln_foreach_new (auto&& px, rng)
       {
         ASSERT_EQ(*vit++, px.val());
         ASSERT_EQ(*pit, px.point());
@@ -201,7 +200,7 @@ struct new_iterator_test
     {
       auto vit = values.begin();
       pit.init();
-      mln_foreach_new(auto&& px, rng)
+      mln_foreach_new (auto&& px, rng)
       {
         ASSERT_EQ(*vit++, px.val());
         ASSERT_EQ(*pit, px.point());
@@ -221,7 +220,7 @@ struct new_iterator_test
     {
       auto vit = values.rbegin();
       pit.init();
-      for(auto&& px : rng.reversed())
+      for (auto&& px : rng.reversed())
       {
         ASSERT_EQ(*vit++, px.val());
         ASSERT_EQ(*pit, px.point());
@@ -234,7 +233,7 @@ struct new_iterator_test
     {
       auto vit = values.rbegin();
       pit.init();
-      mln_foreach_new(auto&& px, rng.reversed())
+      mln_foreach_new (auto&& px, rng.reversed())
       {
         ASSERT_EQ(*vit++, px.val());
         ASSERT_EQ(*pit, px.point());
@@ -244,7 +243,6 @@ struct new_iterator_test
       ASSERT_TRUE(pit.finished());
     }
   }
-
 };
 
 /******************************************/
@@ -321,4 +319,3 @@ TEST(Core, Image2d_new_iterator_test_zero_origin_domain_backward_pixter)
   new_iterator_test_zero_origin_domain it{};
   it.test_backward_pixel_range();
 }
-

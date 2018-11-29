@@ -113,10 +113,10 @@ namespace mln
           status(S.back()) = PASS;
 
           // Reverse, canonize and call on_finish
-          mln_reverse_foreach(p, S)
+          mln_reverse_foreach (p, S)
           {
             mln_point(I) q = par(p);
-            par(p) = par(q);
+            par(p)         = par(q);
             assert(status(par(p)));
 
             viz.on_finish(p, par(p));
@@ -132,7 +132,7 @@ namespace mln
         mln_ch_value(I, mln_point(I))
             unionfind_facade(const I& input, const N& nbh, StopCriterion term, Compare cmp, uf_visitor viz)
         {
-          mln_ch_value(I, mln_point(I)) par = imchvalue<mln_point(I)>(input);
+          mln_ch_value(I, mln_point(I)) par     = imchvalue<mln_point(I)>(input);
           mln_ch_value(I, unsigned char) status = imchvalue<unsigned char>(input).init(NONE);
 
           if (not extension::need_adjust(status, nbh))

@@ -41,12 +41,12 @@ namespace mln
 
           if (cmp(f(mp), f(mq)))
           { // mp is the minimum
-            amin(q) = mp;
+            amin(q)        = mp;
             extinction(mq) = f(q) - f(mq);
           }
           else
           { // mq is the minimum
-            amin(q) = mq;
+            amin(q)        = mq;
             extinction(mp) = f(q) - f(mp);
           }
         }
@@ -68,7 +68,7 @@ namespace mln
       const I& ima = exact(ima_);
       const N& nbh = exact(nbh_);
 
-      mln_concrete(I) extinction = imconcretize(ima);
+      mln_concrete(I) extinction         = imconcretize(ima);
       mln_ch_value(I, mln_point(I)) amin = imchvalue<mln_point(I)>(ima);
 
       internal::extinction_dynamic_ufind_visitor<I, Compare> viz = {ima, amin, extinction, cmp};
@@ -78,7 +78,7 @@ namespace mln
       {
         mln_viter(v, par);
         v.init();
-        mln_point(I) root = *v;
+        mln_point(I) root      = *v;
         extinction(amin(root)) = ima(root) - ima(amin(root));
       }
 

@@ -28,15 +28,15 @@ int main(int argc, char** argv)
 
   using namespace mln;
 
-  const char* tree_path = argv[1];
-  const char* img_path = argv[2];
-  unsigned grain = std::atoi(argv[3]);
-  float threshold1 = std::atof(argv[4]);
+  const char* tree_path   = argv[1];
+  const char* img_path    = argv[2];
+  unsigned    grain       = std::atoi(argv[3]);
+  float       threshold1  = std::atof(argv[4]);
   const char* output_tree = argv[5];
   const char* output_path = argv[6];
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-  tree_t tree;
+  tree_t                                                      tree;
   {
     std::ifstream f(tree_path, std::ios::binary);
     morpho::load(f, tree);

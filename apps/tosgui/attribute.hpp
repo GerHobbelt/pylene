@@ -22,17 +22,25 @@ public:
   {
     enum etype
     {
-      VALUE = 0,
+      VALUE  = 0,
       CHOICE = 1
     };
 
     Parameter() = default;
 
-    Parameter(QLabel* lbl, QWidget* w) : label(lbl), obj(new QWidgetItem(w)) {}
+    Parameter(QLabel* lbl, QWidget* w)
+      : label(lbl)
+      , obj(new QWidgetItem(w))
+    {
+    }
 
-    Parameter(QLabel* lbl, QLayoutItem* w) : label(lbl), obj(w) {}
+    Parameter(QLabel* lbl, QLayoutItem* w)
+      : label(lbl)
+      , obj(w)
+    {
+    }
 
-    QLabel* label;
+    QLabel*      label;
     QLayoutItem* obj;
     // etype    type;
 

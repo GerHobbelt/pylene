@@ -29,10 +29,10 @@ namespace mln
 
 #ifdef MLN_IO_USE_DEMANGLING
         char* realname;
-        int stat;
+        int   stat;
 
         realname = abi::__cxa_demangle(name, NULL, NULL, &stat);
-        res = (realname != NULL) ? realname : name;
+        res      = (realname != NULL) ? realname : name;
         free(realname);
 #else
         res = name;

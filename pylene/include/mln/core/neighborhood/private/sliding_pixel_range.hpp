@@ -18,7 +18,10 @@ namespace mln::details
     {
       Pixel m_pix;
       adaptor() = default;
-      adaptor(Pixel px) : m_pix(std::move(px)) {}
+      adaptor(Pixel px)
+        : m_pix(std::move(px))
+      {
+      }
 
       Pixel read(::ranges::iterator_t<Rng> it) const
       {
@@ -28,21 +31,20 @@ namespace mln::details
       }
     };
 
-    adaptor begin_adaptor() const { return {m_pix}; }
+    adaptor                begin_adaptor() const { return {m_pix}; }
     ::ranges::adaptor_base end_adaptor() const { return {}; }
 
 
   public:
     sliding_pixel_range(Pixel px, Rng rng)
-      : sliding_pixel_range::view_adaptor { std::move(rng) },
-        m_pix { std::move(px) }
-      {
-      }
+      : sliding_pixel_range::view_adaptor{std::move(rng)}
+      , m_pix{std::move(px)}
+    {
+    }
 
     sliding_pixel_range() = default;
 
     CONCEPT_REQUIRES(::ranges::SizedRange<Rng const>())
     constexpr auto size() const { return ::ranges::size(this->base()); }
   };
-
 }

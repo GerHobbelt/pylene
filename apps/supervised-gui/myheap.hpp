@@ -8,12 +8,14 @@ struct myheap
 {
 private:
   typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
-  typedef mln::property_map<tree_t, float> distance_map_t;
-  typedef mln::property_map<tree_t, int> position_map_t;
+  typedef mln::property_map<tree_t, float>                              distance_map_t;
+  typedef mln::property_map<tree_t, int>                                position_map_t;
 
 public:
   myheap(const tree_t& tree, const distance_map_t& distancemap, position_map_t& positionmap)
-      : m_tree(tree), m_dmap(distancemap), m_pos(positionmap)
+    : m_tree(tree)
+    , m_dmap(distancemap)
+    , m_pos(positionmap)
   {
   }
 
@@ -33,7 +35,7 @@ public:
     tree_t::vertex_id_t p = m_array.back();
     m_array.pop_back();
     m_pos[m_array.front()] = 0;
-    m_pos[p] = -1;
+    m_pos[p]               = -1;
     if (not m_array.empty())
       heapify(0);
 
@@ -43,8 +45,8 @@ public:
   // H
   void heapify(unsigned i)
   {
-    tree_t::vertex_id_t p = m_array[i];
-    unsigned sz = m_array.size();
+    tree_t::vertex_id_t p  = m_array[i];
+    unsigned            sz = m_array.size();
     assert(m_pos[p] != -1);
     while (true)
     {
@@ -56,25 +58,25 @@ public:
       if (minpos == i)
         break;
       std::swap(m_array[i], m_array[minpos]);
-      m_pos[m_array[i]] = i;
+      m_pos[m_array[i]]      = i;
       m_pos[m_array[minpos]] = minpos;
-      i = minpos;
+      i                      = minpos;
     }
   }
 
   void update(const tree_t::node_type& p)
   {
-    int i = m_pos[p];
+    int   i        = m_pos[p];
     float myweight = m_dmap[p];
     mln_assertion(0 <= i and i < (int)m_array.size());
     while (i > 0 and myweight < m_dmap[m_array[PAR(i)]])
     {
-      m_array[i] = m_array[PAR(i)];
+      m_array[i]        = m_array[PAR(i)];
       m_pos[m_array[i]] = i;
-      i = PAR(i);
+      i                 = PAR(i);
     }
     m_array[i] = p.id();
-    m_pos[p] = i;
+    m_pos[p]   = i;
   }
 
   bool empty() const { return m_array.empty(); }
@@ -86,9 +88,9 @@ private:
   static unsigned LCHILD(unsigned i) { return 2 * i + 1; }
   static unsigned RCHILD(unsigned i) { return 2 * i + 2; }
 
-  const tree_t& m_tree;
-  const distance_map_t& m_dmap;
-  position_map_t& m_pos;
+  const tree_t&                    m_tree;
+  const distance_map_t&            m_dmap;
+  position_map_t&                  m_pos;
   std::vector<tree_t::vertex_id_t> m_array;
 };
 

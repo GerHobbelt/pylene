@@ -7,8 +7,8 @@ namespace mln
   {
 
     QtImageBase::QtImageBase(int nrows, int ncols, int border)
-        : m_view(nrows, ncols, border), m_qima((unsigned char*)&m_view(m_view.domain().pmin), ncols, nrows,
-                                               m_view.strides()[0], QImage::Format_RGB888)
+      : m_view(nrows, ncols, border)
+      , m_qima((unsigned char*)&m_view(m_view.domain().pmin), ncols, nrows, m_view.strides()[0], QImage::Format_RGB888)
     {
     }
 

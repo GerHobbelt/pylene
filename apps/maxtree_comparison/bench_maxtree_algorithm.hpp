@@ -51,8 +51,8 @@ void bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, in
   task_scheduler_init ts(nthread);
 
   typedef typename mln::image2d<V>::size_type size_type;
-  mln::image2d<size_type> parent;
-  std::vector<size_type> S;
+  mln::image2d<size_type>                     parent;
+  std::vector<size_type>                      S;
 
   auto t0 = tick_count::now();
   for (int i = 0; i < ntest; ++i)
@@ -64,10 +64,10 @@ void bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, in
 template <typename V>
 mln::image2d<V> addnoise(const mln::image2d<mln::uint8>& ima)
 {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  int bshft = mln::value_traits<V>::quant - 8;
-  int sigma = (1 << (bshft - 1));
+  std::random_device                 rd;
+  std::mt19937                       gen(rd());
+  int                                bshft = mln::value_traits<V>::quant - 8;
+  int                                sigma = (1 << (bshft - 1));
   std::uniform_int_distribution<int> sampler(-sigma, sigma);
 
   mln::image2d<V> out = mln::transform(ima, [&sampler, &gen, bshft](mln::uint8 v) {
@@ -87,7 +87,7 @@ mln::image2d<mln::uint8> resizetile(const mln::image2d<mln::uint8>& ima, unsigne
     return ima;
 
   unsigned nc = ima.ncols(), nr = ima.nrows();
-  float q = (float)nc / nr;
+  float    q = (float)nc / nr;
   unsigned r = std::sqrt(size / q);
   unsigned c = r * q;
 

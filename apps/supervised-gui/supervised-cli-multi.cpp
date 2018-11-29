@@ -38,7 +38,7 @@ property_map<tree_t, uint8> labelize_tree(const tree_t& tree, const image2d<uint
   mln_foreach (auto x, tree.nodes())
   {
     MyVec::Index maxpos;
-    int maxv = count[x].maxCoeff(&maxpos);
+    int          maxv = count[x].maxCoeff(&maxpos);
     if (maxv != 0)
       colormap[x] = maxpos;
   }
@@ -127,13 +127,13 @@ int main(int argc, char** argv)
     grain_filter_inplace(tree, grain);
   }
 
-  image2d<rgb8> F = Kadjust_to(ima, tree._get_data()->m_pmap.domain());
+  image2d<rgb8>                  F    = Kadjust_to(ima, tree._get_data()->m_pmap.domain());
   property_map<tree_t, rgb<int>> vmap = morpho::vaccumulate_proper(tree, F, accu::features::mean<>());
 
   image2d<uint8> res;
-  image2d<rgb8> seg;
-  int nlabel = accumulate(markers, accu::features::max<>());
-  res = segmentation(tree, vmap, markers, nlabel);
+  image2d<rgb8>  seg;
+  int            nlabel = accumulate(markers, accu::features::max<>());
+  res                   = segmentation(tree, vmap, markers, nlabel);
   for (int i = 1; i <= nlabel; ++i)
   {
     auto clo = morpho::area_closing(res == i, c4, grain);

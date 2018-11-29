@@ -30,9 +30,9 @@ namespace mln
     template <typename I>
     struct Iterator
     {
-      using value_type = typename I::value_type;
-      using reference = typename I::reference;
-      using has_NL = typename I::has_NL;
+      using value_type          = typename I::value_type;
+      using reference           = typename I::reference;
+      using has_NL              = typename I::has_NL;
       using is_multidimensional = typename I::is_multidimensional;
 
       BOOST_CONCEPT_USAGE(Iterator)
@@ -61,12 +61,12 @@ namespace mln
     {
       BOOST_CONCEPT_USAGE(MultiDimensionalIterator)
       {
-        void (I::*__inner_init)() = &I::__inner_init;
-        void (I::*__inner_next)() = &I::__inner_next;
+        void (I::*__inner_init)()           = &I::__inner_init;
+        void (I::*__inner_next)()           = &I::__inner_next;
         bool (I::*__inner_finished)() const = &I::__inner_finished;
 
-        void (I::*__outer_init)() = &I::__outer_init;
-        void (I::*__outer_next)() = &I::__outer_next;
+        void (I::*__outer_init)()           = &I::__outer_init;
+        void (I::*__outer_next)()           = &I::__outer_next;
         bool (I::*__outer_finished)() const = &I::__outer_finished;
 
         (void)__inner_init;

@@ -23,7 +23,7 @@ namespace mln
   void reconstruct_marginal(const tree_t& t1, const tree_t& t2, const tree_t& t3, const AMap& val1, const AMap& val2,
                             const AMap& val3, const Graph& graph, image2d<rgb8>& out)
   {
-    auto glinks = boost::get(&graph_content::tlinks, graph);
+    auto          glinks     = boost::get(&graph_content::tlinks, graph);
     const tree_t* t_array[3] = {&t1, &t2, &t3};
     // const AMap* val_array[3] = {&val1, &val2, &val3};
 
@@ -32,7 +32,7 @@ namespace mln
                                             property_map<tree_t, bool>(t2, false),
                                             property_map<tree_t, bool>(t3, false)};
 
-    BOOST_FOREACH (typename Graph::vertex_descriptor v, boost::vertices(graph))
+    BOOST_FOREACH(typename Graph::vertex_descriptor v, boost::vertices(graph))
     {
       for (int i = 0; i < 3; ++i)
         if (glinks[v][i] != t_array[i]->nend())
@@ -51,14 +51,14 @@ namespace mln
 
   {
     // 1. Reconstruct the per-node new values.
-    auto glinks = boost::get(&graph_content::tlinks, g);
+    auto          glinks     = boost::get(&graph_content::tlinks, g);
     const tree_t* t_array[3] = {&t1, &t2, &t3};
 
     property_map<tree_t, bool> active[3] = {property_map<tree_t, bool>(t1, false),
                                             property_map<tree_t, bool>(t2, false),
                                             property_map<tree_t, bool>(t3, false)};
 
-    BOOST_FOREACH (typename Graph::vertex_descriptor v, boost::vertices(fg))
+    BOOST_FOREACH(typename Graph::vertex_descriptor v, boost::vertices(fg))
     {
       for (int i = 0; i < 3; ++i)
         if (glinks[v][i] != t_array[i]->nend())
@@ -82,7 +82,7 @@ namespace mln
     mln_forall (pxin, pxout)
     {
       vec3u p = pxin->val();
-      rgb8 v = {vmap[p[0]][0], vmap[p[1]][1], vmap[p[2]][2]};
+      rgb8  v = {vmap[p[0]][0], vmap[p[1]][1], vmap[p[2]][2]};
 
       // if (p[0] != (unsigned) -1) {
       //   v[0] = vmap[p[0]][0];

@@ -15,7 +15,7 @@ namespace mln
     {
       ndim = Image::point_type::ndim
     };
-    typedef typename exact_type<Image>::type E;
+    typedef typename exact_type<Image>::type     E;
     typedef ndimage_pixel<Value, Image::ndim, E> pixel_t;
 
     template <typename J, typename V>
@@ -33,13 +33,19 @@ namespace mln
                                        internal::strided_visitor<ndim, int, -1>, pixel_t,
                                        internal::deref_return_value_policy>;
 
-    using const_iterator = iterator;
+    using const_iterator         = iterator;
     using const_reverse_iterator = reverse_iterator;
 
-    ndimage_value_range(Image& ima) : ima_(&ima) {}
+    ndimage_value_range(Image& ima)
+      : ima_(&ima)
+    {
+    }
 
     // interop
-    ndimage_value_range(const typename Image::value_range& other) : ima_(other.ima_) {}
+    ndimage_value_range(const typename Image::value_range& other)
+      : ima_(other.ima_)
+    {
+    }
 
     const_iterator iter() const
     {
@@ -84,7 +90,7 @@ namespace mln
     {
       ndim = Image::point_type::ndim
     };
-    typedef typename exact_type<Image>::type E;
+    typedef typename exact_type<Image>::type     E;
     typedef ndimage_pixel<Value, Image::ndim, E> pixel_t;
 
     template <typename I, typename V>
@@ -101,18 +107,24 @@ namespace mln
         internal::nested_loop_iterator<internal::domain_point_visitor_backward<P>, internal::no_op_visitor,
                                        internal::strided_visitor<ndim, int, -1>, pixel_t,
                                        internal::deref_return_structure_policy>;
-    using const_iterator = iterator;
+    using const_iterator         = iterator;
     using const_reverse_iterator = reverse_iterator;
 
-    ndimage_pixel_range(Image& ima) : ima_(&ima) {}
+    ndimage_pixel_range(Image& ima)
+      : ima_(&ima)
+    {
+    }
 
-    ndimage_pixel_range(const typename Image::pixel_range& other) : ima_(other.ima_) {}
+    ndimage_pixel_range(const typename Image::pixel_range& other)
+      : ima_(other.ima_)
+    {
+    }
 
     const_iterator iter() const
     {
       P pmin = ima_->domain().pmin;
       P pmax = ima_->domain().pmax;
-      P shp = pmax - pmin;
+      P shp  = pmax - pmin;
 
       std::array<int, ndim> delta_index_strides;
       delta_index_strides[ndim - 1] = 1;
@@ -130,7 +142,7 @@ namespace mln
     {
       P pmin = ima_->domain().pmin;
       P pmax = ima_->domain().pmax;
-      P shp = pmax - pmin;
+      P shp  = pmax - pmin;
 
       std::array<int, ndim> delta_index_strides;
       delta_index_strides[ndim - 1] = -11;

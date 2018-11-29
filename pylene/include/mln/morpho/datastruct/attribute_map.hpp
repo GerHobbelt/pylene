@@ -14,17 +14,24 @@ namespace mln
     typedef morpho::component_tree<P, AssociativeMap> tree_t;
 
   public:
-    typedef typename tree_t::vertex_id_t key_type;
-    typedef V value_type;
-    typedef typename std::vector<V>::reference reference;
+    typedef typename tree_t::vertex_id_t             key_type;
+    typedef V                                        value_type;
+    typedef typename std::vector<V>::reference       reference;
     typedef typename std::vector<V>::const_reference const_reference;
 
     property_map() = default;
 
-    property_map(const tree_t& tree) : m_data(tree._get_data()), m_root(tree.get_root_id()), m_val(tree.size()) {}
+    property_map(const tree_t& tree)
+      : m_data(tree._get_data())
+      , m_root(tree.get_root_id())
+      , m_val(tree.size())
+    {
+    }
 
     property_map(const tree_t& tree, const V& init)
-        : m_data(tree._get_data()), m_root(tree.get_root_id()), m_val(tree.size(), init)
+      : m_data(tree._get_data())
+      , m_root(tree.get_root_id())
+      , m_val(tree.size(), init)
     {
     }
 
@@ -54,8 +61,8 @@ namespace mln
 
   private:
     const typename tree_t::_data_t* m_data;
-    typename tree_t::vertex_id_t m_root;
-    std::vector<V> m_val;
+    typename tree_t::vertex_id_t    m_root;
+    std::vector<V>                  m_val;
   };
 }
 

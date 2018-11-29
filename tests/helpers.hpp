@@ -1,9 +1,9 @@
 #ifndef TESTS_HELPERS_H
 #define TESTS_HELPERS_H
 
+#include <gtest/gtest.h>
 #include <mln/core/image/image.hpp>
 #include <mln/io/imprint.hpp>
-#include <gtest/gtest.h>
 
 
 /// \brief Compare if two images are equals
@@ -29,10 +29,10 @@ bool compare(const mln::Image<I>& reference, const mln::Image<J>& input)
   mln_pixter(px2, mln::exact(input));
 
   mln_forall (px1, px2)
-    {
-      if (px1->point() != px2->point() or px1->val() != px2->val())
-        return false;
-    }
+  {
+    if (px1->point() != px2->point() or px1->val() != px2->val())
+      return false;
+  }
   if (px1.finished() && px2.finished())
     return true;
   return false;

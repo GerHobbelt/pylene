@@ -79,7 +79,7 @@ mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::
       { // canonical propagate to parent
         unsigned y = parent[x];
         unsigned a = area[x];
-        V v = f[x];
+        V        v = f[x];
         while (parent[y] != y and dist(v, f[y]) < eps)
         {
           y = parent[y];
@@ -100,8 +100,8 @@ mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::
       if (K[parent[x]] == K[x]) // not a canonical element
         continue;
 
-      V v = f[x];
-      unsigned y = parent[x];
+      V        v      = f[x];
+      unsigned y      = parent[x];
       unsigned smally = parent[x];
       while (dist(v, f[y]) < eps and y != parent[y])
       {

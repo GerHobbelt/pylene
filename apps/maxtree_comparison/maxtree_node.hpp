@@ -8,13 +8,13 @@ namespace mln
   {
     struct maxtree_node
     {
-      typedef unsigned size_type;
+      typedef unsigned      size_type;
       static const unsigned Nil = -1;
 
       size_type m_parent;
       size_type m_prev;
       size_type m_next;
-      double m_pos;
+      double    m_pos;
     };
   }
 }

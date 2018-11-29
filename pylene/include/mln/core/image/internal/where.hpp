@@ -130,17 +130,22 @@ namespace mln
       typedef transform_iterator<filter_iterator<mln_cpxter(I), Predicate>, internal::meta_get_pixel_point> iterator;
       typedef iterator const_iterator;
 
-      where_t() = default;
+      where_t()               = default;
       where_t(const where_t&) = default;
-      where_t(where_t&&) = default;
+      where_t(where_t&&)      = default;
 
-      where_t(I&& ima, const Predicate& pred) : m_ima(std::forward<I>(ima)), m_pred(pred) {}
+      where_t(I&& ima, const Predicate& pred)
+        : m_ima(std::forward<I>(ima))
+        , m_pred(pred)
+      {
+      }
 
       template <class J, class Pred2>
       where_t(const where_t<J, Pred2>& other,
               typename std::enable_if<(std::is_convertible<J, I>::value and
                                        std::is_convertible<Pred2, Predicate>::value)>::type* = NULL)
-          : m_ima(other.m_ima), m_pred(other.m_pred)
+        : m_ima(other.m_ima)
+        , m_pred(other.m_pred)
       {
       }
 
@@ -156,7 +161,7 @@ namespace mln
 
     private:
       mln::iref<I&&> m_ima;
-      Predicate m_pred;
+      Predicate      m_pred;
     };
 
     // Specialization when the Predicate uses values as argument.
@@ -178,17 +183,22 @@ namespace mln
       typedef transform_iterator<filter_iterator<mln_cpxter(I), predicate_t>, internal::meta_get_pixel_point> iterator;
       typedef iterator const_iterator;
 
-      where_t() = default;
+      where_t()               = default;
       where_t(const where_t&) = default;
-      where_t(where_t&&) = default;
+      where_t(where_t&&)      = default;
 
-      where_t(I&& ima, const Predicate& pred) : m_ima(std::forward<I>(ima)), m_pred{pred} {}
+      where_t(I&& ima, const Predicate& pred)
+        : m_ima(std::forward<I>(ima))
+        , m_pred{pred}
+      {
+      }
 
       template <class J, class Pred2>
       where_t(const where_t<J, Pred2>& other,
               typename std::enable_if<(std::is_convertible<J, I>::value and
                                        std::is_convertible<Pred2, Predicate>::value)>::type* = NULL)
-          : m_ima(other.m_ima), m_pred(other.m_pred)
+        : m_ima(other.m_ima)
+        , m_pred(other.m_pred)
       {
       }
 
@@ -204,7 +214,7 @@ namespace mln
 
     private:
       mln::iref<I&&> m_ima;
-      predicate_t m_pred;
+      predicate_t    m_pred;
     };
 
     template <typename I>
@@ -216,7 +226,10 @@ namespace mln
 
       where_binary_t() = default;
 
-      where_binary_t(I&& ima) : m_ima(std::forward<I>(ima)) {}
+      where_binary_t(I&& ima)
+        : m_ima(std::forward<I>(ima))
+      {
+      }
 
       iterator iter() const
       {

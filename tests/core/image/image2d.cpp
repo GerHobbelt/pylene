@@ -60,10 +60,10 @@ TEST(UTImage2D, Extension_mirror)
     mln_foreach (point2d p, dom)
     {
       point2d q = p % 10;
-      q[0] = q[0] < 0 ? q[0] + 10 : q[0];
-      q[1] = q[1] < 0 ? q[1] + 10 : q[1]; // because c++ modulo rounds toward 0 (also for neg)
-      q[0] = q[0] < 5 ? q[0] : 9 - q[0];
-      q[1] = q[1] < 5 ? q[1] : 9 - q[1];
+      q[0]      = q[0] < 0 ? q[0] + 10 : q[0];
+      q[1]      = q[1] < 0 ? q[1] + 10 : q[1]; // because c++ modulo rounds toward 0 (also for neg)
+      q[0]      = q[0] < 5 ? q[0] : 9 - q[0];
+      q[1]      = q[1] < 5 ? q[1] : 9 - q[1];
 
       ASSERT_TRUE(ima.at(p) == ima.at(q));
     }
@@ -86,11 +86,11 @@ TEST(UTImage2D, From_Buffer)
 
 TEST(UTImage2D, inflate_domain)
 {
-  const int border = 3;
-  const mln::box2d original_domain = {{0,0}, {10,10}};
-  const mln::box2d inflated_domain = {{-2,-2}, {12, 12}};
+  const int        border          = 3;
+  const mln::box2d original_domain = {{0, 0}, {10, 10}};
+  const mln::box2d inflated_domain = {{-2, -2}, {12, 12}};
 
-  const int inside_value = 42;
+  const int inside_value  = 42;
   const int outside_value = -42;
 
   mln::image2d<int> f(original_domain, border, inside_value);
@@ -107,9 +107,9 @@ TEST(UTImage2D, inflate_domain)
 
 TEST(UTImage2D, deflated_domain)
 {
-  const int border = 3;
-  const mln::box2d original_domain = {{0,0}, {10,10}};
-  const mln::box2d inflated_domain = {{2,2}, {8, 8}};
+  const int        border          = 3;
+  const mln::box2d original_domain = {{0, 0}, {10, 10}};
+  const mln::box2d inflated_domain = {{2, 2}, {8, 8}};
 
   mln::image2d<int> f(original_domain, border);
   mln::iota(f, 0);

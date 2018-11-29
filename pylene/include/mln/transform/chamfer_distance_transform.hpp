@@ -57,7 +57,7 @@ namespace mln
 
       using distance_t = DistanceType;
 
-      const I& f = exact(f_);
+      const I& f   = exact(f_);
       const N& nbh = exact(nbh_);
 
       if (background_is_object)
@@ -115,7 +115,7 @@ namespace mln
     mln_ch_value(I, DistanceType)
         chamfer_distance_transform(const Image<I>& f_, const Neighborhood<N>& nbh_, bool background_is_object)
     {
-      const I& f = exact(f_);
+      const I& f   = exact(f_);
       const N& nbh = exact(nbh_);
 
       mln_ch_value(I, DistanceType) out = imchvalue<DistanceType>(f);

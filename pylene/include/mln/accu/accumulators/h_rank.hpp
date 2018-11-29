@@ -82,28 +82,30 @@ namespace mln
       template <class T, class Ratio>
       struct h_rank : accumulator_base<h_rank<T, Ratio>, T, T, features::h_rank<Ratio>>
       {
-        typedef T argument_type;
-        typedef T result_type;
+        typedef T                                        argument_type;
+        typedef T                                        result_type;
         typedef boost::mpl::set<features::h_rank<Ratio>> provides;
-        typedef std::true_type has_untake;
+        typedef std::true_type                           has_untake;
 
         static_assert(std::is_unsigned<T>::value, "T must be unsigned");
         static_assert(value_traits<T>::quant <= 16, "T must be low quantized");
         static_assert(Ratio::num < Ratio::den, "Invalid ratio (must be [0,1)");
 
         h_rank()
-            : m_hist{{
-                  0,
-              }},
-              m_count{0}, m_cumsum{0}, m_current{0}
+          : m_hist{{
+                0,
+            }}
+          , m_count{0}
+          , m_cumsum{0}
+          , m_current{0}
         {
         }
 
         void init()
         {
           m_hist.fill(0);
-          m_count = 0;
-          m_cumsum = 0;
+          m_count   = 0;
+          m_cumsum  = 0;
           m_current = 0;
         }
 
@@ -151,7 +153,7 @@ namespace mln
             m_cumsum += m_hist[m_current];
           }
 
-          unsigned Q = m_count - P;
+          unsigned Q  = m_count - P;
           unsigned EQ = m_count - m_cumsum + m_hist[m_current]; // P[y >= r]
           if (EQ < Q)
           {
@@ -168,8 +170,8 @@ namespace mln
         void m_update_full()
         {
           unsigned P = m_count * Ratio::num / Ratio::den;
-          m_cumsum = m_hist[0];
-          m_current = 0;
+          m_cumsum   = m_hist[0];
+          m_current  = 0;
           while (m_cumsum <= P)
           {
             ++m_current;
@@ -181,23 +183,27 @@ namespace mln
 
       private:
         std::array<unsigned, indexer<T, std::less<T>>::nvalues> m_hist;
-        unsigned m_count;  // Number of value in the set
-        unsigned m_cumsum; // Number of value in the set less or equal to r
-        int m_current;     // Current position of the rank value r
+        unsigned                                                m_count; // Number of value in the set
+        unsigned m_cumsum;  // Number of value in the set less or equal to r
+        int      m_current; // Current position of the rank value r
       };
 
       // Impl for boolean
       template <class Ratio>
       struct h_rank<bool, Ratio> : accumulator_base<h_rank<bool, Ratio>, bool, bool, features::h_rank<Ratio>>
       {
-        typedef bool argument_type;
-        typedef bool result_type;
+        typedef bool                                     argument_type;
+        typedef bool                                     result_type;
         typedef boost::mpl::set<features::h_rank<Ratio>> provides;
-        typedef std::true_type has_untake;
+        typedef std::true_type                           has_untake;
 
         static_assert(Ratio::num < Ratio::den, "Invalid ratio (must be [0,1)");
 
-        h_rank() : m_count{0}, m_false{0} {}
+        h_rank()
+          : m_count{0}
+          , m_false{0}
+        {
+        }
 
         void init()
         {

@@ -16,8 +16,8 @@ TEST(GraphCut, graph_iteration)
   box2d b({-1, -2}, {2, 3});
 
   typedef mln::graphcut::internal::graphcut_graph_t<char, float, c4_t> graph_t;
-  graph_t g(b, c4);
-  int nv = 0, ne = 0;
+  graph_t                                                              g(b, c4);
+  int                                                                  nv = 0, ne = 0;
 
   mln_foreach (point2d p, g.vertices())
   {
@@ -61,8 +61,8 @@ TEST(GraphCut, graph_nbh)
   box2d b({-1, -2}, {2, 3});
 
   typedef mln::graphcut::internal::graphcut_graph_t<char, float, c4_t> graph_t;
-  graph_t g(b, c4);
-  unsigned nv = 0, ne = 0;
+  graph_t                                                              g(b, c4);
+  unsigned                                                             nv = 0, ne = 0;
 
   mln_foreach (point2d p, g.vertices())
     g.vertex(p) = 'a' + (nv++ % 26);
@@ -83,7 +83,7 @@ TEST(GraphCut, graph_nbh)
   }
 
   typedef graph_t::edge_type edge_t;
-  auto printe = [](const edge_t& x) { std::cout << x.type << '|' << x.p; };
+  auto                       printe = [](const edge_t& x) { std::cout << x.type << '|' << x.p; };
   {
     std::cout << "Vertex list (adj edges): " << std::endl;
     mln_foreach (point2d p, g.vertices())

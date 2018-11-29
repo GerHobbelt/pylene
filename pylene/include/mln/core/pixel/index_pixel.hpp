@@ -15,16 +15,21 @@ namespace mln
   struct index_pixel : Pixel<index_pixel<Image>>
   {
     using point_type = mln_point(Image);
-    using site_type = mln_point(Image);
-    using size_type = typename Image::size_type;
+    using site_type  = mln_point(Image);
+    using size_type  = typename Image::size_type;
     using image_type = Image;
-    using reference = mln_reference(Image);
+    using reference  = mln_reference(Image);
     using value_type = mln_value(Image);
 
-    index_pixel() : m_image(nullptr) {}
+    index_pixel()
+      : m_image(nullptr)
+    {
+    }
 
     index_pixel(Image& image, const point_type& point, size_type index)
-        : m_image(&image), m_point(point), m_index(index)
+      : m_image(&image)
+      , m_point(point)
+      , m_index(index)
     {
     }
 
@@ -34,7 +39,9 @@ namespace mln
     template <class I2>
     index_pixel(const index_pixel<I2>& other,
                 std::enable_if_t<std::is_convertible<I2*, Image*>::value, void*> = nullptr)
-        : m_image(other.m_image), m_point(other.m_point), m_index(other.m_index)
+      : m_image(other.m_image)
+      , m_point(other.m_point)
+      , m_index(other.m_index)
     {
     }
 
@@ -67,8 +74,8 @@ namespace mln
 
   private:
     image_type* m_image;
-    site_type m_point;
-    size_type m_index;
+    site_type   m_point;
+    size_type   m_index;
   };
 
 } // end of namespace mln

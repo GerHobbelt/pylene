@@ -2,8 +2,8 @@
 
 #include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
+#include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/utils/blank.hpp>
 
@@ -21,9 +21,7 @@
 namespace mln::ranges
 {
   template <typename Fun, typename... Rngs>
-  struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>,
-                         std::conditional_t<std::conjunction_v<is_multidimensional_range<Rngs>...>,
-                                            multidimensional_range_base, mln::details::blank>
+  struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>
   {
   private:
     friend ::ranges::range_access;
@@ -83,7 +81,7 @@ namespace mln::ranges
       void next()
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      } 
+      }
     };
 
     cursor begin_cursor()
@@ -128,7 +126,6 @@ namespace mln::ranges
     {
     }
 
-    template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
     auto rows() const;
 
     auto reversed() const;
@@ -141,8 +138,10 @@ namespace mln::ranges
     namespace detail
     {
       template <typename... Rngs>
-      concept bool InputRanges = std::conjunction_v<mln::concepts::stl::InputRange<Rngs>...>;
-    }
+      // clang-format off
+      concept bool InputRanges = (mln::concepts::stl::InputRange<Rngs> && ...);
+      // clang-format on
+    } // namespace detail
 #endif
 
     struct zip_with_fn
@@ -154,8 +153,9 @@ namespace mln::ranges
       template <typename... Rngs, typename Fun, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
       // clang-format off
-      // FIXME : fix multi_indice_facade not an input range
-      // requires detail::InputRanges<Rngs...>
+      requires detail::InputRanges<Rngs...> &&
+               mln::concepts::stl::CopyConstructible<Fun> &&
+               mln::concepts::stl::CopyConstructible<Fun&, ::ranges::range_reference_t<Rngs>&&...>
 #endif
       auto operator()(Fun fun, Rngs&&... rngs) const
       // clang-format on
@@ -185,17 +185,16 @@ namespace mln::ranges
 
 
   template <typename Fun, typename... Rngs>
-  template <typename U, typename>
   auto zip_with_view<Fun, Rngs...>::rows() const
   {
     // Zip function for rows
-    auto row_zipper = [fun = this->fun_](auto&&... rows)
-    {
+    auto row_zipper = [fun = this->fun_](auto&&... rows) {
       return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
     };
 
-    // Apply row-zipper on each range after segmentation
-    return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
+    // Apply rows-row-zipper on each range after segmentation
+    return std::apply(
+        [row_zipper](const auto&... rng) { return view::zip_with(row_zipper, mln::ranges::rows(rng)...); }, rngs_);
   }
 
 

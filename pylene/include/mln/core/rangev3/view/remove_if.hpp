@@ -30,9 +30,7 @@ namespace mln::ranges
   } // namespace details
 
   template <typename Rng, typename Pred>
-  struct remove_if_view
-    : ::ranges::remove_if_view<Rng, Pred>,
-      std::conditional_t<is_multidimensional_range_v<Rng>, multidimensional_range_base, mln::details::blank>
+  struct remove_if_view : ::ranges::remove_if_view<Rng, Pred>
   {
   private:
     using base_t = ::ranges::remove_if_view<Rng, Pred>;
@@ -82,14 +80,13 @@ namespace mln::ranges
       template <typename Rng, typename Pred, CONCEPT_REQUIRES_(Constraint<Rng, Pred>())>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
       // clang-format off
-      requires mln::concepts::stl::InputRange<Rng>
+      requires mln::concepts::stl::InputRange<Rng> &&
+               mln::concepts::stl::IndirectUnaryPredicate<Pred, ::ranges::iterator_t<Rng>>
 #endif
       RANGES_CXX14_CONSTEXPR auto operator()(Rng&& rng, Pred pred) const
           // clang-format on
           RANGES_DECLTYPE_AUTO_RETURN_NOEXCEPT(remove_if_view<::ranges::view::all_t<Rng>, Pred>{
-              ::ranges::view::all(static_cast<Rng&&>(rng)), std::move(pred)})
-
-              ; //
+              ::ranges::view::all(static_cast<Rng&&>(rng)), std::move(pred)});
 
       template <typename Rng, typename Pred, CONCEPT_REQUIRES_(!Constraint<Rng, Pred>())>
       void operator()(Rng&&, Pred) const

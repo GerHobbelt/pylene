@@ -15,7 +15,6 @@ namespace mln::concepts
   template<typename Rng>
   concept bool SegmentedRange = 
     stl::ForwardRange<Rng> &&
-    std::is_base_of_v<mln::ranges::multidimensional_range_base, Rng> &&
     requires(const Rng crng) {
         { crng.rows() } -> stl::ForwardRange&&;
     };

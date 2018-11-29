@@ -23,9 +23,7 @@ namespace mln::ranges
   } // namespace detail
 
   template <typename Rng, typename Fun>
-  struct iter_transform_view
-    : ::ranges::iter_transform_view<Rng, Fun>,
-      std::conditional_t<is_multidimensional_range_v<Rng>, multidimensional_range_base, mln::details::blank>
+  struct iter_transform_view : ::ranges::iter_transform_view<Rng, Fun>
   {
   private:
     // Very bad way to access the private member
@@ -85,9 +83,12 @@ namespace mln::ranges
 
       template <typename Rng, typename Fun, CONCEPT_REQUIRES_(Concept<Rng, Fun>())>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-      // clang-format off
-      requires mln::concepts::stl::InputRange<Rng>
-#endif
+          // clang-format off
+      requires mln::concepts::stl::InputRange<Rng> &&
+               mln::concepts::stl::CopyConstructible<Fun> &&
+               mln::concepts::stl::Invocable<Fun&, ::ranges::range_reference_t<Rng>> &&
+               not mln::concepts::stl::Same<void, std::invoke_result_t<Fun&, ::ranges::range_reference_t<Rng>>>
+#endif // PYLENE_CONCEPT_TS_ENABLED
       transform_view<::ranges::view::all_t<Rng>, Fun> operator()(Rng&& rng, Fun fun) const
       // clang-format on
       {

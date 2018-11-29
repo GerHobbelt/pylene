@@ -17,7 +17,6 @@ SegmentedRange
 .. cpp:concept:: template <typename SegRng> SegmentedRange
 
     #. Refines the :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` concept.
-    #. ``SegRng`` must derive from ``multidimensional_range_base``.
     #. ``SegRng`` provides the method ``rows``.
 
     **Notation**
@@ -27,8 +26,6 @@ SegmentedRange
     **Valid Expressions**
 
     - All expression from :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` are valid.
-
-    - :cpp:expr:`std::is_base_of_v<mln::ranges::multidimensional_range_base, SegRng>` returns ``true``.
 
     - :cpp:expr:`crng.rows()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
 

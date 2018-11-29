@@ -19,8 +19,7 @@ namespace mln::ranges::details
   /******************************************/
 
   template <std::size_t Rank, typename R, bool forward>
-  class multi_view_facade : public ::ranges::view_facade<multi_view_facade<Rank, R, forward>>,
-                            public multidimensional_range_base
+  class multi_view_facade : public ::ranges::view_facade<multi_view_facade<Rank, R, forward>>
   {
     friend ::ranges::range_access;
 

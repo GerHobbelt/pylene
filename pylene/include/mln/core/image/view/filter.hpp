@@ -18,34 +18,34 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using reference                      = std::invoke_result_t<F&, typename I::reference>;
-    using value_type                     = std::decay_t<reference>;
-    using point_type                     = typename I::point_type;
+    using reference  = std::invoke_result_t<F&, typename I::reference>;
+    using value_type = std::decay_t<reference>;
+    using point_type = typename I::point_type;
 
-    using concrete_type  = void; // This image has no automatic concrete type
+    using concrete_type = void; // This image has no automatic concrete type
 
     template <class V>
-    using ch_value_type = void;  // This image has no automatic concrete type
+    using ch_value_type = void; // This image has no automatic concrete type
 
     using typename filter_view::image_adaptor::new_pixel_type;
     /// \}
 
     /// Traits & Image Properties
     /// \{
-    using accessible     = typename I::accessible;
-    using indexable      = std::false_type;                             // May be too restrictive
-    using extension_category = mln::extension::none_extension_tag;      // May be too restrictive (might be extended by image)
+    using accessible = typename I::accessible;
+    using indexable  = std::false_type; // May be too restrictive
+    using extension_category =
+        mln::extension::none_extension_tag; // May be too restrictive (might be extended by image)
     /// \}
 
 
   private:
-
     struct pix_filter_fn
     {
       fun_t f;
 
       template <class Pix>
-      bool operator() (const Pix& px) const
+      bool operator()(const Pix& px) const
       {
         return f(px.val());
       }
@@ -67,7 +67,7 @@ namespace mln
       return mln::ranges::view::filter(this->base().domain(), g);
     }
 
-    //using domain_type = decltype(domain());
+    // using domain_type = decltype(domain());
 
     auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
 
@@ -81,7 +81,8 @@ namespace mln
     template <typename dummy = reference>
     std::enable_if_t<accessible::value, dummy> operator()(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
+      // FIXME: with I = mln::image2d<int> has no member named 'has', from tests/core/image/view/filter.cpp:71:
+      // (ASSERT_EQ(pix.val(), u(pix.point()));) mln_precondition(this->base().domain().has(p));
       mln_precondition(std::invoke(f, this->base().at(p)));
       return this->base().at(p);
     }
@@ -118,8 +119,8 @@ namespace mln
       static_assert(mln::is_a<I, New_Image>());
       static_assert(std::is_invocable_r<bool, P, image_reference_t<I>>());
 
-      return { std::move(ima), std::move(predicate) };
+      return {std::move(ima), std::move(predicate)};
     }
-  }
+  } // namespace view
 
-}
+} // namespace mln

@@ -15,13 +15,16 @@ namespace mln
   template <class Iterator>
   struct iterator_proxy_wrapper
   {
-    using type = typename Iterator::value_type;
+    using type      = typename Iterator::value_type;
     using reference = typename Iterator::reference;
 
-    iterator_proxy_wrapper(Iterator& ref) : m_x(&ref) {}
+    iterator_proxy_wrapper(Iterator& ref)
+      : m_x(&ref)
+    {
+    }
     iterator_proxy_wrapper(Iterator&& ref) = delete;
 
-    operator reference() const { return *(*m_x); }
+              operator reference() const { return *(*m_x); }
     reference get() const { return *(*m_x); }
 
   private:
@@ -39,13 +42,19 @@ namespace mln
   template <class T>
   struct value_wrapper
   {
-    using type = T;
+    using type      = T;
     using reference = T&;
 
-    value_wrapper(const T& v) : m_x(v) {}
-    value_wrapper(T&& v) : m_x(std::move(v)) {}
+    value_wrapper(const T& v)
+      : m_x(v)
+    {
+    }
+    value_wrapper(T&& v)
+      : m_x(std::move(v))
+    {
+    }
 
-    operator reference() const { return m_x; }
+              operator reference() const { return m_x; }
     reference get() const { return m_x; }
 
   private:

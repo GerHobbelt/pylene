@@ -28,7 +28,7 @@ namespace mln
       mln_entering("mln::io::imsave");
 
       freeimage_writer_plugin plugin(os, fif);
-      Saver2D<I> saver;
+      Saver2D<I>              saver;
       saver.save(ima, &plugin, false);
 
       mln_exiting();
@@ -42,7 +42,7 @@ namespace mln
       else
       {
         FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(path.c_str());
-        std::ofstream os(path, std::ios::binary);
+        std::ofstream     os(path, std::ios::binary);
 
         if (fif == FIF_UNKNOWN)
           imsave(ima, os);

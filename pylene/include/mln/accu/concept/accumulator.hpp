@@ -14,7 +14,7 @@ namespace mln
   struct AccumulatorLike : Object<Acc>
   {
   protected:
-    AccumulatorLike() = default;
+    AccumulatorLike()                       = default;
     AccumulatorLike(const AccumulatorLike&) = default;
     AccumulatorLike& operator=(const AccumulatorLike&) = default;
   };
@@ -50,7 +50,7 @@ namespace mln
   struct Accumulator_
   {
     typedef typename Acc::argument_type argument_type;
-    typedef typename Acc::result_type result_type;
+    typedef typename Acc::result_type   result_type;
 
     BOOST_CONCEPT_USAGE(Accumulator_)
     {
@@ -61,9 +61,9 @@ namespace mln
     }
 
   private:
-    Acc accu, accu2;
+    Acc           accu, accu2;
     argument_type x;
-    result_type res;
+    result_type   res;
   };
 
 } // end of namespace mln

@@ -30,7 +30,7 @@ property_map<tree_t, uint8> labelize_tree(const tree_t& tree, const image2d<uint
 
   if ((labelization_policy & AMBIGUITY_MASK) != AMBIGUITY_AS_MAJORITY)
   {
-    int ambiguity_policy = labelization_policy & AMBIGUITY_MASK;
+    int   ambiguity_policy = labelization_policy & AMBIGUITY_MASK;
     uint8 dummy_label;
     switch (ambiguity_policy)
     {
@@ -186,7 +186,7 @@ image2d<rgb8> segmentation(const tree_t& tree, const property_map<tree_t, rgb<in
     mln_pixter(pxin, pxout, ori, out);
     mln_forall (pxin, pxout)
     {
-      auto x = tree.get_node_at(pxin->index());
+      auto  x     = tree.get_node_at(pxin->index());
       uint8 color = cmap[x];
       if (color == REJECTED)
         pxout->val() = rgb8{0, 0, 128};
@@ -231,21 +231,21 @@ int main(int argc, char** argv)
 
   io::imread(argv[2], original);
 
-  QMainWindow win;
+  QMainWindow      win;
   qt::ImageViewer* viewer = new qt::ImageViewer(original);
 
-  image2d<rgb8> F = Kadjust_to(original, tree._get_data()->m_pmap.domain());
+  image2d<rgb8>                  F    = Kadjust_to(original, tree._get_data()->m_pmap.domain());
   property_map<tree_t, rgb<int>> vmap = morpho::vaccumulate_proper(tree, F, accu::features::mean<>());
 
   std::function<image2d<rgb8>(const image2d<rgb8>&, float, unsigned)> callback =
       std::bind(segmentation, tree, vmap, F, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
   QGraphicsScene* scene = viewer->getScene();
-  MyBrush brush(viewer, callback);
+  MyBrush         brush(viewer, callback);
   scene->installEventFilter(&brush);
 
-  QToolBar* toolbar = new QToolBar(&win);
-  QLineEdit* threshold_widget = new QLineEdit("0.5");
+  QToolBar*  toolbar                   = new QToolBar(&win);
+  QLineEdit* threshold_widget          = new QLineEdit("0.5");
   QComboBox* ambiguity_policy_selector = new QComboBox;
   ambiguity_policy_selector->addItem("FOREGROUND", QVariant(AMBIGUITY_AS_FOREGROUND));
   ambiguity_policy_selector->addItem("BACKGROUND", QVariant(AMBIGUITY_AS_BACKGROUND));

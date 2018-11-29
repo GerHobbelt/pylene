@@ -200,7 +200,10 @@ namespace mln
       typedef P point_type;
 
       origin_point_visitor_forward() = default;
-      origin_point_visitor_forward(const P& pmax) : pmax_(pmax) {}
+      origin_point_visitor_forward(const P& pmax)
+        : pmax_(pmax)
+      {
+      }
 
       void initialize(P& point) const { point.set_all(0); }
       template <size_t n>
@@ -229,7 +232,10 @@ namespace mln
       typedef P point_type;
 
       origin_point_visitor_backward() = default;
-      origin_point_visitor_backward(const P& pmax) : pmax_(pmax) {}
+      origin_point_visitor_backward(const P& pmax)
+        : pmax_(pmax)
+      {
+      }
 
       void initialize(P& point) const
       {
@@ -263,7 +269,11 @@ namespace mln
       typedef P point_type;
 
       domain_point_visitor_backward() = default;
-      domain_point_visitor_backward(const P& pmin, const P& pmax) : pmin_(pmin), pmax_(pmax) {}
+      domain_point_visitor_backward(const P& pmin, const P& pmax)
+        : pmin_(pmin)
+        , pmax_(pmax)
+      {
+      }
 
       void initialize(P& point) const
       {
@@ -298,7 +308,11 @@ namespace mln
       typedef P point_type;
 
       domain_point_visitor_forward() = default;
-      domain_point_visitor_forward(const P& pmin, const P& pmax) : pmin_(pmin), pmax_(pmax) {}
+      domain_point_visitor_forward(const P& pmin, const P& pmax)
+        : pmin_(pmin)
+        , pmax_(pmax)
+      {
+      }
 
       void initialize(P& point) const { point = pmin_; }
       template <size_t n>
@@ -330,7 +344,9 @@ namespace mln
 
       strided_domain_point_visitor_backward() = default;
       strided_domain_point_visitor_backward(const P& pmin, const P& pmax, const P& strides)
-          : pmin_(pmin), pmax_(pmax), strides_(strides)
+        : pmin_(pmin)
+        , pmax_(pmax)
+        , strides_(strides)
       {
         mln_precondition((pmax - pmin).as_vec() % strides.as_vec() == P(literal::zero).as_vec());
       }
@@ -370,7 +386,9 @@ namespace mln
 
       strided_domain_point_visitor_forward() = default;
       strided_domain_point_visitor_forward(const P& pmin, const P& pmax, const P& strides)
-          : pmin_(pmin), pmax_(pmax), strides_(strides)
+        : pmin_(pmin)
+        , pmax_(pmax)
+        , strides_(strides)
       {
       }
 
@@ -441,7 +459,11 @@ namespace mln
     {
       strided_visitor() = default;
 
-      strided_visitor(T init_value, const std::array<T, dim>& deltas) : m_init_value(init_value), m_deltas(deltas) {}
+      strided_visitor(T init_value, const std::array<T, dim>& deltas)
+        : m_init_value(init_value)
+        , m_deltas(deltas)
+      {
+      }
 
       template <class U>
       void initialize(U& value)
@@ -462,7 +484,7 @@ namespace mln
       }
 
     private:
-      T m_init_value;
+      T                  m_init_value;
       std::array<T, dim> m_deltas;
     };
 
@@ -482,21 +504,24 @@ namespace mln
     template <typename PointVisitor, typename OffsetVisitor, typename IndexVisitor, typename InternalStruct,
               typename DereferencePolicy>
     struct nested_loop_iterator
-        : iterator_base<
-              nested_loop_iterator<PointVisitor, OffsetVisitor, IndexVisitor, InternalStruct, DereferencePolicy>,
-              typename DereferencePolicy::template value_type<InternalStruct>,
-              typename DereferencePolicy::template reference<InternalStruct>>,
-          public internal::iterator_core_access
+      : iterator_base<
+            nested_loop_iterator<PointVisitor, OffsetVisitor, IndexVisitor, InternalStruct, DereferencePolicy>,
+            typename DereferencePolicy::template value_type<InternalStruct>,
+            typename DereferencePolicy::template reference<InternalStruct>>,
+        public internal::iterator_core_access
     {
-      using reference = typename DereferencePolicy::template reference<InternalStruct>;
-      using has_NL = std::true_type;
+      using reference           = typename DereferencePolicy::template reference<InternalStruct>;
+      using has_NL              = std::true_type;
       using is_multidimensional = std::true_type;
 
       nested_loop_iterator() = default;
 
       nested_loop_iterator(const InternalStruct s, const PointVisitor& pv, const OffsetVisitor& vv,
                            const IndexVisitor& iv)
-          : m_s(s), m_pv(pv), m_vv(vv), m_iv(iv)
+        : m_s(s)
+        , m_pv(pv)
+        , m_vv(vv)
+        , m_iv(iv)
       {
       }
 
@@ -509,7 +534,10 @@ namespace mln
           typename std::enable_if<std::is_convertible<PointVisitor, PointVisitor2>::value and
                                   std::is_convertible<OffsetVisitor2, OffsetVisitor>::value and
                                   std::is_convertible<InternalStruct2, InternalStruct>::value>::type* = NULL)
-          : m_s(other.m_s), m_pv(other.m_pv), m_vv(other.m_vv), m_iv(other.m_iv)
+        : m_s(other.m_s)
+        , m_pv(other.m_pv)
+        , m_vv(other.m_vv)
+        , m_iv(other.m_iv)
       {
       }
 
@@ -581,9 +609,9 @@ namespace mln
 
     public:
       InternalStruct m_s;
-      PointVisitor m_pv;
-      OffsetVisitor m_vv;
-      IndexVisitor m_iv;
+      PointVisitor   m_pv;
+      OffsetVisitor  m_vv;
+      IndexVisitor   m_iv;
     };
   }
 }

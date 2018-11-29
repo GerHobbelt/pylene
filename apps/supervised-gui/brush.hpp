@@ -24,17 +24,17 @@ public slots:
   void set_ambiguity_policy(int x);
 
 private:
-  mln::qt::ImageViewer* m_viewer;
-  callback_fun_t m_callback;
-  QGraphicsScene* m_scene;
-  QGraphicsPixmapItem* m_pixmap;
-  QPixmap m_ima;
+  mln::qt::ImageViewer*   m_viewer;
+  callback_fun_t          m_callback;
+  QGraphicsScene*         m_scene;
+  QGraphicsPixmapItem*    m_pixmap;
+  QPixmap                 m_ima;
   mln::image2d<mln::rgb8> m_ori;
-  bool m_active;
-  QColor m_color;
-  int m_radius;
-  float m_reject_value;
-  int m_policy;
+  bool                    m_active;
+  QColor                  m_color;
+  int                     m_radius;
+  float                   m_reject_value;
+  int                     m_policy;
 };
 
 #endif //! BRUSH_HPP

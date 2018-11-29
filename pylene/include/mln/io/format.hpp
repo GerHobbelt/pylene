@@ -42,7 +42,7 @@ namespace mln
 
     template <class T>
     struct frmt_max_width<T, typename std::enable_if<std::is_integral<T>::value>::type>
-        : std::integral_constant<int, (int)(1 + value_traits<T>::quant / 3.3219280948873622)>
+      : std::integral_constant<int, (int)(1 + value_traits<T>::quant / 3.3219280948873622)>
     {
 
       int operator()(double v) const

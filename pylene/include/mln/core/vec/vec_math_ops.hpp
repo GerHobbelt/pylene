@@ -102,9 +102,9 @@ namespace mln
   inline auto l2dist_sqr(const internal::vec_base<T, dim, tag>& x, const internal::vec_base<T, dim, tag>& y)
       -> decltype(l2norm_sqr(x - y));
 
-/*****************************/
-/**   Implementation       ***/
-/*****************************/
+  /*****************************/
+  /**   Implementation       ***/
+  /*****************************/
 
 #define MLN_GEN_CODE(FUN)                                                                                              \
   template <class T, unsigned dim, class tag>                                                                          \
@@ -138,7 +138,7 @@ namespace mln
       pow(const internal::vec_base<U, dim, tag>& x, V exp)
   {
     typedef decltype(pow(std::declval<U>(), std::declval<V>())) R;
-    internal::vec_base<R, dim, tag> res;
+    internal::vec_base<R, dim, tag>                             res;
     for (unsigned i = 0; i < dim; ++i)
       res[i] = pow(x[i], exp);
     return res;

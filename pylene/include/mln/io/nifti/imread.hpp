@@ -26,7 +26,7 @@ namespace mln
       {
         mln_entering("mln::io::nifti::imread");
         nifti_reader_plugin plugin;
-        Loader2D<I> loader;
+        Loader2D<I>         loader;
         loader.load(path, out, &plugin, permissive);
         mln_exiting();
       }

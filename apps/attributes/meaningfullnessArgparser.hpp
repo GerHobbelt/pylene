@@ -34,10 +34,10 @@ mln::image2d<float> MeaningFullNessArgParser::run(const boost::program_options::
                                                   const mln::image2d<V>& f, const mln::image2d<T>& K,
                                                   const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S)
 {
-  float a0 = vm["a0"].as<float>();
-  float a1 = vm["a1"].as<float>();
+  float a0    = vm["a0"].as<float>();
+  float a1    = vm["a1"].as<float>();
   float alpha = vm["alpha"].as<float>();
-  int eps = vm["eps"].as<int>();
+  int   eps   = vm["eps"].as<int>();
 
   std::cout << "a0: " << a0 << std::endl;
   std::cout << "a1: " << a1 << std::endl;

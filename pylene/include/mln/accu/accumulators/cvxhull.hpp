@@ -71,9 +71,9 @@ namespace mln
       template <typename P>
       struct cvxhull : accumulator_base<cvxhull<P>, P, std::vector<P>, features::cvxhull>
       {
-        typedef P argument_type;
-        typedef std::vector<P> result_type;
-        typedef features::cvxhull feature;
+        typedef P                        argument_type;
+        typedef std::vector<P>           result_type;
+        typedef features::cvxhull        feature;
         typedef boost::mpl::set<feature> provides;
 
         cvxhull() {}
@@ -107,7 +107,7 @@ namespace mln
         void take(const Accumulator<A>& other)
         {
           std::vector<P>& ovec = extractor::pvector(other);
-          std::vector<P> aux(m_points.size() + ovec.size());
+          std::vector<P>  aux(m_points.size() + ovec.size());
           std::merge(m_points.begin(), m_points.end(), ovec.begin(), ovec.end(), aux.begin());
           m_points = aux;
         }
@@ -122,7 +122,7 @@ namespace mln
 
       private:
         std::vector<P> m_points;
-        bool m_newline;
+        bool           m_newline;
       };
     }
   }

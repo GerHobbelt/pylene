@@ -31,7 +31,7 @@ namespace mln
     {
       mln_entering("mln::io::imread");
       freeimage_reader_plugin plugin;
-      Loader2D<I> loader;
+      Loader2D<I>             loader;
       loader.load(stream, out, &plugin, permissive);
       mln_exiting();
     }
@@ -41,7 +41,7 @@ namespace mln
     {
       mln_entering("mln::io::imread");
       freeimage_reader_plugin plugin;
-      Loader2D<I> loader;
+      Loader2D<I>             loader;
       loader.load(path, out, &plugin, permissive);
       mln_exiting();
     }

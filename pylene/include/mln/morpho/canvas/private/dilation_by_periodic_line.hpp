@@ -1,10 +1,10 @@
 #ifndef MLN_MORPHO_CANVAS_PRIVATE_DILATION_BY_PERIODIC_LINE_HPP
 #define MLN_MORPHO_CANVAS_PRIVATE_DILATION_BY_PERIODIC_LINE_HPP
 
+#include "running_max_1d.hpp"
 #include <mln/core/domain/box.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
 #include <mln/core/trace.hpp>
-#include "running_max_1d.hpp"
 
 namespace mln
 {
@@ -24,11 +24,11 @@ namespace mln
         const int dy = period[0];
         const int dx = period[1];
 
-        const auto height = domain.pmax[0] - src_point[0];
-        const auto width = dx > 0 ? (domain.pmax[1] - src_point[1]) : (src_point[1] - domain.pmin[1] + 1);
-        const int nx = dx != 0 ? ((width - 1) / std::abs(dx)) : std::numeric_limits<int>::max();
-        const int ny = dy != 0 ? ((height - 1) / std::abs(dy)) : std::numeric_limits<int>::max();
-        const std::size_t n = std::min(nx, ny) + 1;
+        const auto        height = domain.pmax[0] - src_point[0];
+        const auto        width  = dx > 0 ? (domain.pmax[1] - src_point[1]) : (src_point[1] - domain.pmin[1] + 1);
+        const int         nx     = dx != 0 ? ((width - 1) / std::abs(dx)) : std::numeric_limits<int>::max();
+        const int         ny     = dy != 0 ? ((height - 1) / std::abs(dy)) : std::numeric_limits<int>::max();
+        const std::size_t n      = std::min(nx, ny) + 1;
 
         point2d p = src_point;
         for (std::size_t i = 0; i < n; ++i, p += period)
@@ -54,7 +54,7 @@ namespace mln
       {
         mln_entering("mln::morpho::internal::dilation_by_periodic_line");
         auto domain = f.domain();
-        using V = mln_value(I);
+        using V     = mln_value(I);
 
         auto period = line.period();
 
@@ -63,11 +63,11 @@ namespace mln
 
         mln_assertion(dy >= 0);
 
-        int buffer_size = std::max(domain.shape()[0], domain.shape()[1]);
-        auto p = std::make_unique<V[]>(buffer_size); // temporary 1D-line
-        auto g = std::make_unique<V[]>(buffer_size); // Max-forward integral over the line
-        auto h = std::make_unique<V[]>(buffer_size); // Max-backward integral over the line
-        int k = line.repetition();
+        int  buffer_size = std::max(domain.shape()[0], domain.shape()[1]);
+        auto p           = std::make_unique<V[]>(buffer_size); // temporary 1D-line
+        auto g           = std::make_unique<V[]>(buffer_size); // Max-forward integral over the line
+        auto h           = std::make_unique<V[]>(buffer_size); // Max-backward integral over the line
+        int  k           = line.repetition();
 
         // Process row-wise
         if (dx != 0)
@@ -80,7 +80,7 @@ namespace mln
             int x = x0 + (dx > 0 ? i : -i);
             for (int y = domain.pmin[0]; y < domain.pmax[0]; ++y)
             {
-              point2d origin = {(short)y, (short)x};
+              point2d     origin = {(short)y, (short)x};
               std::size_t n;
               copy_to_periodic_line(f, domain, origin, period, p.get(), n);
               mln::morpho::internal::running_max_1d(p.get(), g.get(), h.get(), (int)n, 2 * k + 1, -k, sup, zero);
@@ -93,15 +93,15 @@ namespace mln
         if (dy != 0)
         {
           // We always process from the top border (because dy > 0)
-          auto y0 = domain.pmin[0];
-          int xstart = (dx > 0) ? domain.pmin[1] + dx : domain.pmin[1];
-          int xend = (dx >= 0) ? domain.pmax[1] : domain.pmax[1] + dx;
+          auto y0     = domain.pmin[0];
+          int  xstart = (dx > 0) ? domain.pmin[1] + dx : domain.pmin[1];
+          int  xend   = (dx >= 0) ? domain.pmax[1] : domain.pmax[1] + dx;
           for (int i = 0; i < dy; ++i)
           {
             int y = y0 + i;
             for (int x = xstart; x < xend; ++x)
             {
-              point2d origin = {(short)y, (short)x};
+              point2d     origin = {(short)y, (short)x};
               std::size_t n;
               copy_to_periodic_line(f, domain, origin, period, p.get(), n);
               mln::morpho::internal::running_max_1d(p.get(), g.get(), h.get(), (int)n, 2 * k + 1, -k, sup, zero);

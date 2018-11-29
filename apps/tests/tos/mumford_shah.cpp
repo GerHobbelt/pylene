@@ -7,9 +7,10 @@
 
 #include <apps/tos/mumford_shah.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <gtest/gtest.h>
 
-#define MLN_IMG_PATH "../../img/"
 
 TEST(TOS, mumford_shah_gray)
 {
@@ -17,7 +18,7 @@ TEST(TOS, mumford_shah_gray)
 
   image2d<uint8> ima;
 
-  io::imread(MLN_IMG_PATH "squares.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("squares.pgm"), ima);
 
   typedef UInt<9>       V;
   image2d<V>            K;

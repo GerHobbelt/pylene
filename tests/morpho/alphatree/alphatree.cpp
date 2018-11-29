@@ -8,6 +8,8 @@
 #include <mln/morpho/component_tree/graphviz.hpp>
 #include <mln/morpho/datastruct/checktree.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <random>
 
 #include <gtest/gtest.h>
@@ -47,7 +49,7 @@ TEST(Morpho, AlphaTree_2)
   image2d<V>    ima;
 
 
-  io::imread(MLN_IMG_PATH "fly.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("fly.pgm"), ima);
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
   tree_t                                                      tree;

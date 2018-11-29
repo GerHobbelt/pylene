@@ -119,7 +119,10 @@ namespace mln
     {
       typedef typename I::point_type P;
 
-      is_in_mask(const I& ima) : m_mask(ima) {}
+      is_in_mask(const I& ima)
+        : m_mask(ima)
+      {
+      }
 
       bool operator()(const P& p) const { return m_mask(p); }
 
@@ -194,11 +197,11 @@ namespace mln
   {
     typedef typename std::remove_reference<Image>::type I;
 
-    typedef std::true_type accessible;
+    typedef std::true_type    accessible;
     typedef forward_image_tag category; // FIXME: category depends on domain category
     typedef std::integral_constant<bool, not std::is_reference<Image>::value and image_traits<I>::concrete::value>
-        concrete;
-    typedef std::false_type indexable; // FIXME: depends
+                                               concrete;
+    typedef std::false_type                    indexable; // FIXME: depends
     typedef mln::extension::none_extension_tag extension;
   };
 
@@ -238,7 +241,7 @@ namespace mln
 
   private:
     typedef typename std::remove_reference<I>::type image_t;
-    typedef sub_image<I, Domain> self_t;
+    typedef sub_image<I, Domain>                    self_t;
 
     static_assert(std::is_convertible<typename range_value<Domain>::type, typename image_t::point_type>::value,
                   "Domain's site type must be convertible to image's site type.");
@@ -247,12 +250,15 @@ namespace mln
     //                std::reference_wrapper<image_t>,
     //                std::reference_wrapper<const image_t> >::value, "pas conv");
 
-    typedef transform_iterator<typename Domain::iterator, std::reference_wrapper<image_t>> value_iterator;
+    typedef transform_iterator<typename Domain::iterator, std::reference_wrapper<image_t>>       value_iterator;
     typedef transform_iterator<typename Domain::iterator, std::reference_wrapper<const image_t>> const_value_iterator;
 
     struct pix_fun_t
     {
-      pix_fun_t(image_t& ima) : m_ima(&ima) {}
+      pix_fun_t(image_t& ima)
+        : m_ima(&ima)
+      {
+      }
 
       typename image_pixel<image_t>::type operator()(const mln_point(I) & p) const { return m_ima->pixel(p); }
 
@@ -263,9 +269,15 @@ namespace mln
 
     struct const_pix_fun_t
     {
-      const_pix_fun_t(const image_t& ima) : m_ima(&ima) {}
+      const_pix_fun_t(const image_t& ima)
+        : m_ima(&ima)
+      {
+      }
 
-      const_pix_fun_t(const pix_fun_t& other) : m_ima(other.m_ima) {}
+      const_pix_fun_t(const pix_fun_t& other)
+        : m_ima(other.m_ima)
+      {
+      }
 
       typename image_const_pixel<image_t>::type operator()(const mln_point(I) & p) const { return m_ima->pixel(p); }
 
@@ -278,36 +290,42 @@ namespace mln
         const_pixel_iterator;
 
   public:
-    typedef typename range_value<Domain>::type point_type;
-    typedef typename image_value<image_t>::type value_type;
-    typedef typename image_reference<image_t>::type reference;
+    typedef typename range_value<Domain>::type            point_type;
+    typedef typename image_value<image_t>::type           value_type;
+    typedef typename image_reference<image_t>::type       reference;
     typedef typename image_const_reference<image_t>::type const_reference;
-    typedef Domain domain_type;
+    typedef Domain                                        domain_type;
 
-    typedef rebinded_pixel<self_t, typename image_pixel<image_t>::type> pixel_type;
+    typedef rebinded_pixel<self_t, typename image_pixel<image_t>::type>             pixel_type;
     typedef rebinded_pixel<const self_t, typename image_const_pixel<image_t>::type> const_pixel_type;
 
-    typedef iterator_range<value_iterator> value_range;
+    typedef iterator_range<value_iterator>       value_range;
     typedef iterator_range<const_value_iterator> const_value_range;
-    typedef iterator_range<pixel_iterator> pixel_range;
+    typedef iterator_range<pixel_iterator>       pixel_range;
     typedef iterator_range<const_pixel_iterator> const_pixel_range;
 
     template <class, class>
     friend struct sub_image;
 
-    sub_image(I&& ima, const Domain& domain) : m_ima(std::forward<I>(ima)), m_domain(domain) {}
+    sub_image(I&& ima, const Domain& domain)
+      : m_ima(std::forward<I>(ima))
+      , m_domain(domain)
+    {
+    }
 
     sub_image() = default;
 
     template <typename OtherImage, typename OtherDomain>
     sub_image(const sub_image<OtherImage, OtherDomain>& other, mln::init)
-        : m_ima(imchvalue<value_type>(other.m_ima)), m_domain(other.m_domain)
+      : m_ima(imchvalue<value_type>(other.m_ima))
+      , m_domain(other.m_domain)
     {
     }
 
     template <typename OtherImage, typename OtherDomain>
     sub_image(const sub_image<OtherImage, OtherDomain>& other, const value_type& v)
-        : m_ima(imchvalue<value_type>(other.m_ima).init(v)), m_domain(other.m_domain)
+      : m_ima(imchvalue<value_type>(other.m_ima).init(v))
+      , m_domain(other.m_domain)
     {
     }
 
@@ -372,7 +390,7 @@ namespace mln
     }
 
   private:
-    I m_ima;
+    I      m_ima;
     Domain m_domain;
   };
 

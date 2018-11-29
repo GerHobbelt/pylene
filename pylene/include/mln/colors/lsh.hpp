@@ -23,12 +23,12 @@ namespace mln
     template <>
     struct vec_base_traits<lsh_tag>
     {
-      static const bool is_additive = true;
-      static const bool is_additive_ext = true;
-      static const bool is_multiplicative = false;
-      static const bool is_multiplicative_ext = true;
+      static const bool is_additive             = true;
+      static const bool is_additive_ext         = true;
+      static const bool is_multiplicative       = false;
+      static const bool is_multiplicative_ext   = true;
       static const bool is_less_than_comparable = true;
-      static const bool is_equality_comparable = true;
+      static const bool is_equality_comparable  = true;
     };
   }
 
@@ -71,14 +71,14 @@ namespace mln
   template <typename T>
   inline lsh<T> rgb2lsh(const rgb<T>& v)
   {
-    static constexpr float k = (1 << value_traits<T>::quant) / 6;
-    static constexpr int Hnv = (int)k * 6;
+    static constexpr float k   = (1 << value_traits<T>::quant) / 6;
+    static constexpr int   Hnv = (int)k * 6;
 
-    T min, med, max;
+    T   min, med, max;
     int lambda;
     std::tie(min, med, max, lambda) = internal::get_MinMedMax(v[0], v[1], v[2]);
-    float L = (min + max + med) / 3.0f;
-    float S = 1.5f * (L > med ? (max - L) : (L - min));
+    float L                         = (min + max + med) / 3.0f;
+    float S                         = 1.5f * (L > med ? (max - L) : (L - min));
     float H = k * (lambda + 0.5f - ((lambda % 2 == 0) ? 1 : -1) * (max + min - 2 * med) / (2 * S));
 
     lsh<T> out;
@@ -95,15 +95,15 @@ namespace mln
 
     T l = v[0], s = v[1], h = v[2];
 
-    int lambda = h / (int)k;
-    int m = lambda % 2 == 0 ? 1 : -1;
-    float phi = h / k - lambda;
+    int   lambda = h / (int)k;
+    int   m      = lambda % 2 == 0 ? 1 : -1;
+    float phi    = h / k - lambda;
     float s1_3 = s * (1.0f / 3), s2_3 = s * (2.0f / 3);
     float c = m * (phi - 0.5f);
 
     float maxi_ = (c <= 0) ? (l + s2_3) : (l + s1_3 + s2_3 * (((lambda + 1) % 2) - m * phi));
     float mini_ = (c >= 0) ? (l - s2_3) : (l - s1_3 - s2_3 * (lambda % 2 + m * phi));
-    float med_ = l - m * s1_3 + m * s2_3 * phi;
+    float med_  = l - m * s1_3 + m * s2_3 * phi;
 
     T max = std::max(0, std::min(255, (int)(maxi_ + 0.5)));
     T med = std::max(0, std::min(255, (int)(med_ + 0.5)));

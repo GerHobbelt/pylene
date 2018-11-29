@@ -26,12 +26,12 @@ namespace mln
         typedef typename I::size_type size_type;
 
         typedef typename indexer<V, StrictWeakOrdering>::index_type level_t;
-        typedef size_type elt_type; // either point or index
-        static constexpr std::size_t nlevels = 1ul << value_traits<level_t>::quant;
-        static constexpr bool use_dejavu = true;
+        typedef size_type                                           elt_type; // either point or index
+        static constexpr std::size_t                                nlevels    = 1ul << value_traits<level_t>::quant;
+        static constexpr bool                                       use_dejavu = true;
 
         static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
-        static constexpr size_type INQUEUE = 0;
+        static constexpr size_type INQUEUE       = 0;
 
         level_t flood(level_t level)
         {
@@ -69,7 +69,7 @@ namespace mln
                 level_t newlevel = m_h(m_ima[q]);
                 if (!m_has_repr[newlevel])
                 {
-                  m_repr[newlevel] = q;
+                  m_repr[newlevel]     = q;
                   m_has_repr[newlevel] = true;
                 }
                 // std::cout << "++ push: " << q << " @ " << (int)newlevel << std::endl;
@@ -122,10 +122,10 @@ namespace mln
           }
 
           m_first_index = m_ima.index_of_point(m_ima.domain().pmin);
-          m_last_index = m_ima.index_of_point(m_ima.domain().pmax) - ima.index_strides()[0];
+          m_last_index  = m_ima.index_of_point(m_ima.domain().pmax) - ima.index_strides()[0];
 
           // Get min element and reserve queue
-          size_t pmin = ima.index_of_point(ima.domain().pmin);
+          size_t  pmin = ima.index_of_point(ima.domain().pmin);
           level_t vmin = value_traits<level_t>::max();
           {
             std::vector<std::size_t> h(nlevels, 0);
@@ -149,7 +149,7 @@ namespace mln
           // Start flooding
           // std::cout << (int) vmin << "@" << pmin << std::endl;
           m_q.push_at_level(pmin, vmin);
-          m_repr[vmin] = pmin;
+          m_repr[vmin]     = pmin;
           m_has_repr[vmin] = true;
           if (use_dejavu)
             m_deja_vu[pmin] = true;
@@ -170,7 +170,7 @@ namespace mln
       private:
         typedef mln_ch_value(I, bool) J;
 
-        StrictWeakOrdering m_cmp;
+        StrictWeakOrdering             m_cmp;
         indexer<V, StrictWeakOrdering> m_h;
 
         const I& m_ima;
@@ -179,11 +179,11 @@ namespace mln
         std::array<typename I::difference_type, Neighborhood::static_size> m_nbh_delta_indexes;
 
         bounded_hqueue<size_type, nlevels> m_q;
-        bool m_has_repr[nlevels];
-        elt_type m_repr[nlevels];
-        size_type* m_out;
-        size_type m_first_index;
-        size_type m_last_index;
+        bool                               m_has_repr[nlevels];
+        elt_type                           m_repr[nlevels];
+        size_type*                         m_out;
+        size_type                          m_first_index;
+        size_type                          m_last_index;
       };
 
     } // end of namespace mln::morpho::internal

@@ -21,9 +21,9 @@ namespace mln
       virtual ~QtImageBase() = default;
 
       const image2d<rgb8>& getView() const;
-      image2d<rgb8>& getView();
-      const QImage& getQImage() const;
-      QImage& getQImage();
+      image2d<rgb8>&       getView();
+      const QImage&        getQImage() const;
+      QImage&              getQImage();
 
       virtual void reset() = 0;
 
@@ -31,7 +31,7 @@ namespace mln
 
     protected:
       image2d<rgb8> m_view;
-      QImage m_qima;
+      QImage        m_qima;
 
       static QVector<QRgb> default_lut8;
     };
@@ -91,7 +91,9 @@ namespace mln
     }
 
     template <typename V>
-    QtImage<V>::QtImage(const image2d<V>& ima) : QtImageBase(ima.nrows(), ima.ncols(), ima.border()), m_ima(ima)
+    QtImage<V>::QtImage(const image2d<V>& ima)
+      : QtImageBase(ima.nrows(), ima.ncols(), ima.border())
+      , m_ima(ima)
     {
       reindex(this->m_view, m_ima);
 

@@ -22,9 +22,15 @@ namespace mln
 
     object_wrapper() = default;
 
-    object_wrapper(const T& x) : m_x(x) {}
+    object_wrapper(const T& x)
+      : m_x(x)
+    {
+    }
 
-    object_wrapper(T&& x) : m_x(std::move(x)) {}
+    object_wrapper(T&& x)
+      : m_x(std::move(x))
+    {
+    }
 
     object_wrapper& operator=(const T& x)
     {

@@ -7,6 +7,8 @@
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/structural/gradient.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <gtest/gtest.h>
 
 
@@ -30,7 +32,7 @@ TEST(Morpho, gradient_gradient_0)
 TEST(Morpho, gradient_gradient_1)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   { // Fast: border wide enough
     mln::se::rect2d win(7, 7);
@@ -43,8 +45,8 @@ TEST(Morpho, gradient_gradient_2)
 {
   image2d<uint8> ima(0);
   image2d<uint8> ima2;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
-  io::imread(MLN_IMG_PATH "small.pgm", ima2);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima2);
 
   mln::se::rect2d win(3, 3);
   auto            out1 = morpho::structural::gradient(ima, win);
@@ -56,7 +58,7 @@ TEST(Morpho, gradient_gradient_2)
 TEST(Morpho, gradient_gradient_3)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   // Morpher has no extension
   mln::se::rect2d win(3, 3);
@@ -67,7 +69,7 @@ TEST(Morpho, gradient_gradient_3)
 TEST(Morpho, gradient_gradient_4)
 {
   image2d<uint8> ima;
-  io::imread(MLN_IMG_PATH "small.pgm", ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(3, 3);
   image2d<uint8>  out;
@@ -81,8 +83,8 @@ TEST(Morpho, gradient_gradient_5)
 {
   image2d<rgb8> ima;
   image2d<rgb8> ima2(0);
-  io::imread(MLN_IMG_PATH "small.ppm", ima);
-  io::imread(MLN_IMG_PATH "small.ppm", ima2);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
+  io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima2);
 
   mln::se::rect2d win(3, 3);
   auto            out1 = morpho::structural::gradient(ima, win);

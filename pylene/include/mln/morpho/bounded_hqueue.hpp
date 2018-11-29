@@ -23,15 +23,15 @@ namespace mln
 
     bool empty(unsigned l) const;
     void push_at_level(const T& x, unsigned l);
-    T top_at_level(unsigned l) const;
-    T pop_at_level(unsigned l);
+    T    top_at_level(unsigned l) const;
+    T    pop_at_level(unsigned l);
 
   private:
     std::array<T*, nLevel> m_head;
     std::array<T*, nLevel> m_tail;
-    Allocator m_allocator;
-    T* m_q;
-    T* m_end;
+    Allocator              m_allocator;
+    T*                     m_q;
+    T*                     m_end;
   };
 
   template <typename T, std::size_t nLevel, typename Allocator, bool queue>
@@ -45,15 +45,15 @@ namespace mln
 
     bool empty(unsigned l) const;
     void push_at_level(const T& x, unsigned l);
-    T top_at_level(unsigned l) const;
-    T pop_at_level(unsigned l);
+    T    top_at_level(unsigned l) const;
+    T    pop_at_level(unsigned l);
 
   private:
     std::vector<T*> m_head;
     std::vector<T*> m_tail;
-    Allocator m_allocator;
-    T* m_q;
-    T* m_end;
+    Allocator       m_allocator;
+    T*              m_q;
+    T*              m_end;
   };
 
   /********************/
@@ -62,13 +62,14 @@ namespace mln
 
   template <typename T, std::size_t nLevel, typename Allocator, bool queue, typename Enable>
   inline bounded_hqueue<T, nLevel, Allocator, queue, Enable>::bounded_hqueue()
-      : m_head{{
-            NULL,
-        }},
-        m_tail{{
-            NULL,
-        }},
-        m_q(NULL), m_end(NULL)
+    : m_head{{
+          NULL,
+      }}
+    , m_tail{{
+          NULL,
+      }}
+    , m_q(NULL)
+    , m_end(NULL)
   {
   }
 
@@ -96,9 +97,9 @@ namespace mln
     mln_precondition(m_q == NULL);
 
     unsigned nelements = std::accumulate(histo, histo + nLevel, 0u);
-    m_q = m_allocator.allocate(nelements);
-    m_end = m_q + nelements;
-    unsigned n = 0;
+    m_q                = m_allocator.allocate(nelements);
+    m_end              = m_q + nelements;
+    unsigned n         = 0;
     for (unsigned i = 0; i < nLevel; ++i)
     {
       m_head[i] = m_tail[i] = m_q + n;
@@ -163,7 +164,8 @@ namespace mln
 
   template <typename T, std::size_t nLevel, typename Allocator, bool queue>
   inline bounded_hqueue<T, nLevel, Allocator, queue, typename std::enable_if<(nLevel > 16)>::type>::bounded_hqueue()
-      : m_q(NULL), m_end(NULL)
+    : m_q(NULL)
+    , m_end(NULL)
   {
     m_head.resize(nLevel);
     m_tail.resize(nLevel);
@@ -195,9 +197,9 @@ namespace mln
     mln_precondition(m_q == NULL);
 
     size_t nelements = std::accumulate(histo, histo + nLevel, size_t(0));
-    m_q = m_allocator.allocate(nelements);
-    m_end = m_q + nelements;
-    unsigned n = 0;
+    m_q              = m_allocator.allocate(nelements);
+    m_end            = m_q + nelements;
+    unsigned n       = 0;
     for (std::size_t i = 0; i < nLevel; ++i)
     {
       m_head[i] = m_tail[i] = m_q + n;

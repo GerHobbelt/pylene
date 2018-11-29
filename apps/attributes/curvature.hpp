@@ -52,8 +52,8 @@ namespace mln
                      ima.at(p + point2d{1, 1}) - 2 * ima.at(p) - 2 * ima.at(p + point2d{0, 1})) /
                     2.0;
 
-        float den = (sqr(ux) + sqr(uy));
-        point2d p_ = p * 2 + point2d{0, 1};
+        float   den = (sqr(ux) + sqr(uy));
+        point2d p_  = p * 2 + point2d{0, 1};
         if (den != 0)
           curv.at(p_) = std::abs(uxx * sqr(uy) - 2 * uxy * ux * uy + uyy * sqr(ux)) / (den * std::sqrt(den));
         else
@@ -79,8 +79,8 @@ namespace mln
                      ima.at(p + point2d{1, 1})) /
                     2.0;
 
-        float den = (sqr(ux) + sqr(uy));
-        point2d p_ = p * 2 + point2d{1, 0};
+        float   den = (sqr(ux) + sqr(uy));
+        point2d p_  = p * 2 + point2d{1, 0};
         if (den != 0)
           curv.at(p_) = std::abs(uxx * sqr(uy) - 2 * uxy * ux * uy + uyy * sqr(ux)) / (den * std::sqrt(den));
         else

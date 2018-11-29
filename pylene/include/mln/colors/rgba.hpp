@@ -22,12 +22,12 @@ namespace mln
     template <>
     struct vec_base_traits<mln::colors::rgba_tag>
     {
-      static const bool is_additive = true;
-      static const bool is_additive_ext = true;
-      static const bool is_multiplicative = false;
-      static const bool is_multiplicative_ext = true;
+      static const bool is_additive             = true;
+      static const bool is_additive_ext         = true;
+      static const bool is_multiplicative       = false;
+      static const bool is_multiplicative_ext   = true;
       static const bool is_less_than_comparable = false;
-      static const bool is_equality_comparable = true;
+      static const bool is_equality_comparable  = true;
     };
   }
 
@@ -36,7 +36,7 @@ namespace mln
     template <typename T>
     using rgba = internal::vec_base<T, 4, rgba_tag>;
 
-    typedef rgba<uint8> rgba8;
+    typedef rgba<uint8>  rgba8;
     typedef rgba<uint16> rgba16;
   }
 }

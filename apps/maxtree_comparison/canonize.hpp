@@ -18,7 +18,9 @@ namespace mln
         typedef typename image2d<V>::size_type size_type;
 
         Canonizer(const image2d<V>& ima, image2d<size_type>& parent, size_type* S)
-            : m_ima(ima), m_parent(parent), m_out(S)
+          : m_ima(ima)
+          , m_parent(parent)
+          , m_out(S)
         {
           resize(m_dejavu, m_ima).init(false);
           // m_back = S + ima.domain().size();
@@ -61,9 +63,9 @@ namespace mln
         //   m_dejavu[p] = true;
         // }
 
-        const image2d<V>& m_ima;
+        const image2d<V>&   m_ima;
         image2d<size_type>& m_parent;
-        size_type* m_out;
+        size_type*          m_out;
         // size_type*		m_front;
         // size_type*		m_back;
         image2d<bool> m_dejavu;

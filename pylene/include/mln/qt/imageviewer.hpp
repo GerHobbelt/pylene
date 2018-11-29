@@ -23,12 +23,12 @@ namespace mln
 
       virtual ~ImageViewer();
 
-      void reset();
-      image2d<rgb8>& getView();
-      const image2d<rgb8>& getView() const;
-      QGraphicsScene* getScene();
-      const QGraphicsScene* getScene() const;
-      QGraphicsPixmapItem* getPixmap();
+      void                       reset();
+      image2d<rgb8>&             getView();
+      const image2d<rgb8>&       getView() const;
+      QGraphicsScene*            getScene();
+      const QGraphicsScene*      getScene() const;
+      QGraphicsPixmapItem*       getPixmap();
       const QGraphicsPixmapItem* getPixmap() const;
 
     private:
@@ -37,9 +37,9 @@ namespace mln
     private:
       friend class ImageViewerEventHandler;
 
-      QGraphicsPixmapItem m_pixmap;
-      QGraphicsScene* m_scene;
-      QtImageBase* m_ima;
+      QGraphicsPixmapItem      m_pixmap;
+      QGraphicsScene*          m_scene;
+      QtImageBase*             m_ima;
       ImageViewerEventHandler* m_ev_hdler;
 
     protected:
@@ -68,7 +68,8 @@ namespace mln
     /******************************************/
 
     template <typename V>
-    ImageViewer::ImageViewer(const image2d<V>& ima, QWidget* parent) : QGraphicsView(parent)
+    ImageViewer::ImageViewer(const image2d<V>& ima, QWidget* parent)
+      : QGraphicsView(parent)
     {
       _init(new QtImage<V>(ima));
     }

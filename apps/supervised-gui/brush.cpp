@@ -15,8 +15,15 @@ inline void brush(QPixmap* pixmap, const QPointF& position, QColor color, int r)
 }
 
 MyBrush::MyBrush(mln::qt::ImageViewer* viewer, callback_fun_t callback)
-    : m_viewer(viewer), m_callback(callback), m_scene(viewer->getScene()), m_pixmap(viewer->getPixmap()),
-      m_ima(m_pixmap->pixmap()), m_active(false), m_radius(5), m_reject_value(0.5), m_policy(0)
+  : m_viewer(viewer)
+  , m_callback(callback)
+  , m_scene(viewer->getScene())
+  , m_pixmap(viewer->getPixmap())
+  , m_ima(m_pixmap->pixmap())
+  , m_active(false)
+  , m_radius(5)
+  , m_reject_value(0.5)
+  , m_policy(0)
 {
   m_ori = mln::clone(viewer->getView());
 }
@@ -39,13 +46,13 @@ bool MyBrush::eventFilter(QObject* obj, QEvent* ev)
 void MyBrush::setColor1()
 {
   m_active = true;
-  m_color = Qt::red;
+  m_color  = Qt::red;
 }
 
 void MyBrush::setColor2()
 {
   m_active = true;
-  m_color = Qt::blue;
+  m_color  = Qt::blue;
 }
 
 void MyBrush::setRadius(int k)
@@ -61,7 +68,7 @@ void MyBrush::run()
   m_viewer->notify();
 
   mln::image2d<mln::rgb8>& view = m_viewer->getView();
-  view = m_callback(view, m_reject_value, m_policy);
+  view                          = m_callback(view, m_reject_value, m_policy);
   m_viewer->update();
 }
 
@@ -89,6 +96,6 @@ void MyBrush::set_ambiguity_policy(int index)
     return;
 
   QVariant data = combo->itemData(index);
-  m_policy = m_policy & ~AMBIGUITY_MASK;
+  m_policy      = m_policy & ~AMBIGUITY_MASK;
   m_policy |= data.toUInt();
 }

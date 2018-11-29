@@ -15,19 +15,19 @@
 namespace mln
 {
 
-  static const rect2d qcmbox = make_rectangle2d(15, 41);
-  static constexpr float qcmboxvdist = 50.2;
-  static constexpr int qcmboxhdist = 60;
-  static constexpr int qcmcolhdist = 481;
-  static constexpr point2d pref = {168, 2389};
+  static const rect2d      qcmbox      = make_rectangle2d(15, 41);
+  static constexpr float   qcmboxvdist = 50.2;
+  static constexpr int     qcmboxhdist = 60;
+  static constexpr int     qcmcolhdist = 481;
+  static constexpr point2d pref        = {168, 2389};
 
-  static constexpr char REPA = 0x01;
-  static constexpr char REPB = 0x02;
-  static constexpr char REPC = 0x04;
-  static constexpr char REPD = 0x08;
-  static constexpr char REPE = 0x10;
-  static constexpr char REPALL = 0x1F;
-  static unsigned detection_threshold = 200;
+  static constexpr char REPA                = 0x01;
+  static constexpr char REPB                = 0x02;
+  static constexpr char REPC                = 0x04;
+  static constexpr char REPD                = 0x08;
+  static constexpr char REPE                = 0x10;
+  static constexpr char REPALL              = 0x1F;
+  static unsigned       detection_threshold = 200;
 
   image2d<rgb8> imdebug;
 
@@ -40,7 +40,7 @@ namespace mln
 
     mln_foreach (auto pxin, x.pixels())
     {
-      point2d p = pxin.point();
+      point2d p          = pxin.point();
       out.at(p[1], p[0]) = pxin.val();
     }
 
@@ -52,13 +52,13 @@ namespace mln
     mln_entering("Offset detection");
     // rect2d se = make_rectangle2d(21, 51);
 
-    box2d dom = {{125, 2300}, {250, 2470}};
+    box2d         dom = {{125, 2300}, {250, 2470}};
     image2d<bool> bin(dom);
     copy((f < 150) | dom, bin);
 
     // auto markers = morpho::opening(f, se);
     rect2d se = make_rectangle2d(21, 51);
-    bin = morpho::structural::opening(bin, se);
+    bin       = morpho::structural::opening(bin, se);
 
     // auto sub = bin | dom;
     mln_foreach (auto px, bin.pixels())
@@ -95,9 +95,9 @@ namespace mln
   template <class I>
   char detect_question(const I& bin, point2d pos)
   {
-    char response1 = 0;
-    char response2 = 0;
-    point2d p = pos;
+    char    response1 = 0;
+    char    response2 = 0;
+    point2d p         = pos;
 
     for (int i = 0; i < 5; ++i, p[1] += qcmboxhdist)
       if (is_plain(bin, p))
@@ -130,8 +130,8 @@ namespace mln
 
     // Login
     {
-      point2d plogin = point2d{228, 1895} + offset;
-      point2df p = plogin;
+      point2d  plogin = point2d{228, 1895} + offset;
+      point2df p      = plogin;
       for (int j = 0; j < 6; ++j, p[1] += qcmboxhdist)
       {
         p[0] = plogin[0];
@@ -217,13 +217,13 @@ int main(int argc, char** argv)
     mln_entering("Conversion B&W") image2d<rgb8> ima;
     io::imread(vm["input"].as<std::string>(), ima);
 
-    f = transform(ima, [](const rgb8& v) -> uint8 { return sum(v) / 3; });
+    f       = transform(ima, [](const rgb8& v) -> uint8 { return sum(v) / 3; });
     imdebug = ima;
     copy(f, imdebug);
     mln_exiting();
   }
 
-  point2d ref = detect_offset(f);
+  point2d ref    = detect_offset(f);
   point2d offset = ref - pref;
 
   detect_all(f, offset);

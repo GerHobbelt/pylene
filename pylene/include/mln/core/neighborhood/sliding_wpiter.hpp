@@ -46,9 +46,9 @@ namespace mln
 
   template <class Point, class SiteSet, class WeightSet>
   struct sliding_wpiter
-      : iterator_base<sliding_wpiter<Point, SiteSet, WeightSet>,
-                      wpoint<typename range_value<SiteSet>::type, typename range_value<WeightSet>::type>,
-                      wpoint<typename range_value<SiteSet>::type, typename range_value<WeightSet>::type>>
+    : iterator_base<sliding_wpiter<Point, SiteSet, WeightSet>,
+                    wpoint<typename range_value<SiteSet>::type, typename range_value<WeightSet>::type>,
+                    wpoint<typename range_value<SiteSet>::type, typename range_value<WeightSet>::type>>
   {
   private:
     using W = typename range_value<WeightSet>::type;
@@ -56,7 +56,9 @@ namespace mln
 
   public:
     sliding_wpiter(const Point& p, const SiteSet& pset, const WeightSet& wset)
-        : m_p(p), m_pset_iter(rng::iter(pset)), m_wset_iter(rng::iter(wset))
+      : m_p(p)
+      , m_pset_iter(rng::iter(pset))
+      , m_wset_iter(rng::iter(wset))
     {
     }
 
@@ -70,12 +72,12 @@ namespace mln
       m_pset_iter.next();
       m_wset_iter.next();
     }
-    bool finished() const { return m_pset_iter.finished(); }
+    bool         finished() const { return m_pset_iter.finished(); }
     wpoint<P, W> dereference() const { return {static_cast<P>(m_p) + *m_pset_iter, *m_wset_iter}; }
 
   private:
-    Point m_p;
-    typename range_const_iterator<SiteSet>::type m_pset_iter;
+    Point                                          m_p;
+    typename range_const_iterator<SiteSet>::type   m_pset_iter;
     typename range_const_iterator<WeightSet>::type m_wset_iter;
   };
 }

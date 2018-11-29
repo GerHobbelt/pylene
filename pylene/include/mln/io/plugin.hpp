@@ -47,24 +47,24 @@ namespace mln
   class PluginReader2D : public PluginReader
   {
   public:
-    virtual box2d get_domain() const = 0;
+    virtual box2d                      get_domain() const                = 0;
     virtual std::function<void(void*)> get_read_next_line_method() const = 0;
   };
 
   class PluginWriter : public Plugin
   {
   public:
-    virtual void write_next_pixel(void* src) = 0;
-    virtual std::function<void(void*)> get_write_next_pixel_method() const = 0;
-    virtual bool can_write(std::type_index type) const = 0;
-    virtual void set_value_type(std::type_index) = 0;
+    virtual void                       write_next_pixel(void* src)           = 0;
+    virtual std::function<void(void*)> get_write_next_pixel_method() const   = 0;
+    virtual bool                       can_write(std::type_index type) const = 0;
+    virtual void                       set_value_type(std::type_index)       = 0;
   };
 
   class PluginWriter2D : public PluginWriter
   {
   public:
-    virtual void set_domain(const box2d& b) = 0;
-    virtual void write_next_line(void* src) = 0;
+    virtual void                       set_domain(const box2d& b)         = 0;
+    virtual void                       write_next_line(void* src)         = 0;
     virtual std::function<void(void*)> get_write_next_line_method() const = 0;
   };
 

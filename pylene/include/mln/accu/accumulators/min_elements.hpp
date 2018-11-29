@@ -39,7 +39,10 @@ namespace mln
       template <typename Compare>
       struct minimal_elements : simple_feature<minimal_elements<Compare>>
       {
-        minimal_elements(const Compare& cmp = Compare()) : m_cmp(cmp) {}
+        minimal_elements(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         struct apply
@@ -85,11 +88,14 @@ namespace mln
       template <typename T, typename Compare>
       struct minimal_elements : accumulator_base<minimal_elements<T, Compare>, T, T, features::minimal_elements<>>
       {
-        typedef T argument_type;
+        typedef T              argument_type;
         typedef std::vector<T> return_type;
         // typedef features::min<> feature;
 
-        minimal_elements(const Compare& cmp = Compare()) : m_cmp(cmp) {}
+        minimal_elements(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+        {
+        }
 
         void init() { m_val.clear(); }
 
@@ -101,7 +107,7 @@ namespace mln
               return;
             else if (m_cmp(v, x)) // new minimal element
             {
-              x = v;
+              x        = v;
               inserted = true;
             }
 
@@ -121,7 +127,7 @@ namespace mln
 
       private:
         std::vector<T> m_val;
-        Compare m_cmp;
+        Compare        m_cmp;
       };
     }
   }

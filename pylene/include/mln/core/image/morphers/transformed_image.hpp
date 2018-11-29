@@ -32,17 +32,17 @@ namespace mln
   transformed_image<I&, UnaryFunction> imtransform(Image<I>& ima, const UnaryFunction& f);
 }
 
-/******************************************/
-/****           HELPER MACROS          ****/
-/******************************************/
+  /******************************************/
+  /****           HELPER MACROS          ****/
+  /******************************************/
 
-// template <typename I>
-// transformed_image<I, BOOST_PP_TUPLE_REM () F, false>
-// NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)
-// {
-//   BOOST_PP_TUPLE_REM () F f;
-//   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f);
-// }
+  // template <typename I>
+  // transformed_image<I, BOOST_PP_TUPLE_REM () F, false>
+  // NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)
+  // {
+  //   BOOST_PP_TUPLE_REM () F f;
+  //   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f);
+  // }
 
 #define MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_TEMPLATE_2(NAME, TYPE, F)                                                   \
   namespace mln                                                                                                        \
@@ -141,17 +141,17 @@ namespace mln
 
   public:
     typedef typename std::common_type<typename image_traits<image_t>::category, random_access_image_tag>::type category;
-    typedef std::false_type concrete;
+    typedef std::false_type                                                                                    concrete;
     typedef typename image_traits<image_t>::accessible accessible;
-    typedef typename image_traits<image_t>::indexable indexable;
-    typedef mln::extension::none_extension_tag extension; // FIXME
+    typedef typename image_traits<image_t>::indexable  indexable;
+    typedef mln::extension::none_extension_tag         extension; // FIXME
   };
 
   template <class I, class UnaryFunction, bool b>
   struct image_concrete<internal::transformed_image<I, UnaryFunction, b>>
   {
     typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type __vtype;
-    typedef typename std::decay<__vtype>::type value_type;
+    typedef typename std::decay<__vtype>::type                             value_type;
 
     typedef mln_ch_value(typename std::remove_reference<I>::type, value_type) type;
   };
@@ -178,27 +178,33 @@ namespace mln
     template <typename I>
     struct transformed_image_helper<I, std::true_type>
     {
-      transformed_image_helper(I&& f) : m_ima{std::forward<I>(f)} {}
+      transformed_image_helper(I&& f)
+        : m_ima{std::forward<I>(f)}
+      {
+      }
       I m_ima;
     };
 
     template <typename I>
     struct transformed_image_helper<I, std::false_type>
     {
-      transformed_image_helper(I&& f) : m_ima{std::forward<I>(f)} {}
+      transformed_image_helper(I&& f)
+        : m_ima{std::forward<I>(f)}
+      {
+      }
       mutable I m_ima;
     };
 
     // With a value transformation: V -> W
     template <typename I, class UnaryFunction>
     struct transformed_image<I, UnaryFunction, false>
-        : morpher_base<
-              transformed_image<I, UnaryFunction, false>, I, mln_point(I),
-              typename std::remove_reference<typename std::result_of<UnaryFunction(mln_reference(I))>::type>::type>,
-          transformed_image_helper<I>
+      : morpher_base<
+            transformed_image<I, UnaryFunction, false>, I, mln_point(I),
+            typename std::remove_reference<typename std::result_of<UnaryFunction(mln_reference(I))>::type>::type>,
+        transformed_image_helper<I>
     {
     private:
-      typedef typename std::remove_reference<I>::type image_t;
+      typedef typename std::remove_reference<I>::type    image_t;
       typedef transformed_image<I, UnaryFunction, false> this_t;
       friend struct mln::morpher_core_access;
       typedef typename std::result_of<UnaryFunction(mln_reference(I))>::type _result_type;
@@ -227,48 +233,62 @@ namespace mln
     private:
       struct val_fun_t
       {
-        reference operator()(mln_reference(I) v) const { return m_fun(std::forward<mln_reference(I)>(v)); }
+        reference             operator()(mln_reference(I) v) const { return m_fun(std::forward<mln_reference(I)>(v)); }
         mutable UnaryFunction m_fun;
       };
 
       struct const_val_fun_t
       {
-        const_val_fun_t(const UnaryFunction& fun) : m_fun(fun) {}
+        const_val_fun_t(const UnaryFunction& fun)
+          : m_fun(fun)
+        {
+        }
 
-        const_val_fun_t(const val_fun_t& other) : m_fun(other.m_fun) {}
+        const_val_fun_t(const val_fun_t& other)
+          : m_fun(other.m_fun)
+        {
+        }
 
-        const_reference operator()(mln_reference(I) v) const { return m_fun(std::forward<mln_reference(I)>(v)); }
+        const_reference       operator()(mln_reference(I) v) const { return m_fun(std::forward<mln_reference(I)>(v)); }
         mutable UnaryFunction m_fun;
       };
 
       struct pix_fun_t
       {
         pixel_type operator()(const mln_pixel(I) & px) const { return pixel_type(px, m_ima); }
-        this_t* m_ima;
+        this_t*    m_ima;
       };
 
       struct const_pix_fun_t
       {
-        const_pix_fun_t(const this_t* ima) : m_ima(ima) {}
+        const_pix_fun_t(const this_t* ima)
+          : m_ima(ima)
+        {
+        }
 
-        const_pix_fun_t(const pix_fun_t& other) : m_ima(other.m_ima) {}
+        const_pix_fun_t(const pix_fun_t& other)
+          : m_ima(other.m_ima)
+        {
+        }
 
         const_pixel_type operator()(const mln_pixel(I) & px) const { return const_pixel_type(px, m_ima); }
-        const this_t* m_ima;
+        const this_t*    m_ima;
       };
 
     public:
       // Ranges
       // \{
-      typedef transformed_range<typename image_value_range<image_t>::type, val_fun_t> value_range;
+      typedef transformed_range<typename image_value_range<image_t>::type, val_fun_t>       value_range;
       typedef transformed_range<typename image_value_range<image_t>::type, const_val_fun_t> const_value_range;
-      typedef transformed_range<typename image_pixel_range<image_t>::type, pix_fun_t> pixel_range;
+      typedef transformed_range<typename image_pixel_range<image_t>::type, pix_fun_t>       pixel_range;
       typedef transformed_range<typename image_pixel_range<image_t>::type, const_pix_fun_t> const_pixel_range;
       // \}
 
       transformed_image() = default;
 
-      transformed_image(I&& ima, const UnaryFunction& f) : transformed_image_helper<I>(std::forward<I>(ima)), m_fun(f)
+      transformed_image(I&& ima, const UnaryFunction& f)
+        : transformed_image_helper<I>(std::forward<I>(ima))
+        , m_fun(f)
       {
       }
 
@@ -391,15 +411,19 @@ namespace mln
 
     template <typename I, class UnaryFunction>
     struct transformed_image<I, UnaryFunction, false>::pixel_type
-        : morpher_pixel_base<typename transformed_image<I, UnaryFunction, false>::pixel_type, mln_pixel(I)>
+      : morpher_pixel_base<typename transformed_image<I, UnaryFunction, false>::pixel_type, mln_pixel(I)>
     {
       friend struct mln::morpher_core_access;
       friend struct const_pixel_type;
-      typedef transformed_image<I, UnaryFunction, false> image_type;
-      typedef typename transformed_image<I, UnaryFunction, false>::reference reference;
+      typedef transformed_image<I, UnaryFunction, false>                      image_type;
+      typedef typename transformed_image<I, UnaryFunction, false>::reference  reference;
       typedef typename transformed_image<I, UnaryFunction, false>::value_type value_type;
 
-      pixel_type(const mln_pixel(I) & px, image_type* ima) : m_pix(px), m_ima(ima) {}
+      pixel_type(const mln_pixel(I) & px, image_type* ima)
+        : m_pix(px)
+        , m_ima(ima)
+      {
+      }
 
       reference val() const { return m_ima->m_fun(m_pix.val()); }
 
@@ -412,17 +436,25 @@ namespace mln
 
     template <typename I, class UnaryFunction>
     struct transformed_image<I, UnaryFunction, false>::const_pixel_type
-        : morpher_pixel_base<typename transformed_image<I, UnaryFunction, false>::const_pixel_type, mln_pixel(I)>
+      : morpher_pixel_base<typename transformed_image<I, UnaryFunction, false>::const_pixel_type, mln_pixel(I)>
     {
       friend struct mln::morpher_core_access;
-      typedef const transformed_image<I, UnaryFunction, false> image_type;
-      typedef typename transformed_image<I, UnaryFunction, false>::value_type value_type;
+      typedef const transformed_image<I, UnaryFunction, false>                     image_type;
+      typedef typename transformed_image<I, UnaryFunction, false>::value_type      value_type;
       typedef typename transformed_image<I, UnaryFunction, false>::const_reference reference;
 
-      const_pixel_type(const mln_pixel(I) & px, image_type* ima) : m_pix(px), m_ima(ima) {}
+      const_pixel_type(const mln_pixel(I) & px, image_type* ima)
+        : m_pix(px)
+        , m_ima(ima)
+      {
+      }
 
       // Interop
-      const_pixel_type(const pixel_type& other) : m_pix(other.m_pix), m_ima(other.m_ima) {}
+      const_pixel_type(const pixel_type& other)
+        : m_pix(other.m_pix)
+        , m_ima(other.m_ima)
+      {
+      }
 
       reference val() const { return m_ima->m_fun(m_pix.val()); }
 

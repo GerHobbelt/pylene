@@ -29,8 +29,14 @@ namespace mln
   template <class I>
   struct iref<I&>
   {
-    iref() : m_ptr(nullptr) {}
-    iref(I& x) : m_ptr(&x) {}
+    iref()
+      : m_ptr(nullptr)
+    {
+    }
+    iref(I& x)
+      : m_ptr(&x)
+    {
+    }
     iref(I&& x) = delete;
 
     I& get()
@@ -55,11 +61,12 @@ namespace mln
     iref() = default;
 
     template <class U>
-    iref(U&& x) : m_x(std::forward<U>(x))
+    iref(U&& x)
+      : m_x(std::forward<U>(x))
     {
     }
 
-    I& get() { return m_x; }
+    I&       get() { return m_x; }
     const I& get() const { return m_x; }
 
   private:

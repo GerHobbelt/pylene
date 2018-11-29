@@ -16,19 +16,19 @@ namespace mln
     template <class P, std::enable_if_t<is_a<P, Pixel>::value, long> = 0>
     auto operator()(const P& pixel) const
     {
-      return details::sliding_pixel_range {pixel, static_cast<const N*>(this)->offsets() };
+      return details::sliding_pixel_range{pixel, static_cast<const N*>(this)->offsets()};
     }
 
     template <class P, std::enable_if_t<is_a<P, Pixel>::value, long> = 0>
     auto before(const P& pixel) const
     {
-      return details::sliding_pixel_range {pixel, static_cast<const N*>(this)->before_offsets() };
+      return details::sliding_pixel_range{pixel, static_cast<const N*>(this)->before_offsets()};
     }
 
     template <class P, std::enable_if_t<is_a<P, Pixel>::value, long> = 0>
     auto after(const P& pixel) const
     {
-      return details::sliding_pixel_range {pixel, static_cast<const N*>(this)->after_offsets() };
+      return details::sliding_pixel_range{pixel, static_cast<const N*>(this)->after_offsets()};
     }
 
 
@@ -52,7 +52,5 @@ namespace mln
       return ::ranges::view::transform(static_cast<const N*>(this)->after_offsets(),
                                        [point](P offset) -> P { return point + offset; });
     }
-
   };
-
 }

@@ -60,13 +60,22 @@ namespace mln
 
       public:
         resizer_base(OutputImage& out, const R& ref)
-            : m_output(out), m_ref(ref), m_has_hook(true), m_failed(false), m_has_init(false)
+          : m_output(out)
+          , m_ref(ref)
+          , m_has_hook(true)
+          , m_failed(false)
+          , m_has_init(false)
         {
         }
 
         resizer_base(resizer_base&& other)
-            : m_output(other.m_output), m_ref(other.m_ref), m_has_hook(true), m_failed(other.m_failed),
-              m_has_init(other.m_has_init), m_init(other.m_init), m_border(other.m_border)
+          : m_output(other.m_output)
+          , m_ref(other.m_ref)
+          , m_has_hook(true)
+          , m_failed(other.m_failed)
+          , m_has_init(other.m_has_init)
+          , m_init(other.m_init)
+          , m_border(other.m_border)
         {
           other.m_has_hook = false;
         }
@@ -76,7 +85,7 @@ namespace mln
         resizer_base& init(const mln_value(OutputImage) & v)
         {
           m_has_init = true;
-          m_init = v;
+          m_init     = v;
           return *this;
         }
 
@@ -153,7 +162,7 @@ namespace mln
 
       protected:
         OutputImage& m_output;
-        const R& m_ref;
+        const R&     m_ref;
 
         bool m_has_hook;
         bool m_failed;
@@ -166,7 +175,7 @@ namespace mln
       struct resizer_by_domain : resizer_base<OutputImage, InputDomain>
       {
         resizer_by_domain(OutputImage& out, const InputDomain& domain)
-            : resizer_base<OutputImage, InputDomain>(out, domain)
+          : resizer_base<OutputImage, InputDomain>(out, domain)
         {
           this->m_border = -1;
         }
@@ -175,7 +184,8 @@ namespace mln
       template <class OutputImage, class InputImage>
       struct resizer_by_image : resizer_base<OutputImage, InputImage>
       {
-        resizer_by_image(OutputImage& out, const InputImage& ref) : resizer_base<OutputImage, InputImage>(out, ref)
+        resizer_by_image(OutputImage& out, const InputImage& ref)
+          : resizer_base<OutputImage, InputImage>(out, ref)
         {
           __init_border();
         }
@@ -208,7 +218,10 @@ namespace mln
                                         impl::resizer_by_domain<OutputImage, InputImageOrInputDomain>>::type base;
 
     public:
-      resizer(OutputImage& out, const InputImageOrInputDomain& ref) : base(out, ref) {}
+      resizer(OutputImage& out, const InputImageOrInputDomain& ref)
+        : base(out, ref)
+      {
+      }
     };
 
   } // end of namespace mln::internal

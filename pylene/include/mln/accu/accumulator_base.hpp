@@ -20,9 +20,9 @@ namespace mln
     template <typename E, typename ArgumentType, typename ResultType, typename Feature>
     struct accumulator_base : Accumulator<E>
     {
-      typedef ArgumentType argument_type;
-      typedef ResultType result_type;
-      typedef Feature feature;
+      typedef ArgumentType             argument_type;
+      typedef ResultType               result_type;
+      typedef Feature                  feature;
       typedef boost::mpl::set<Feature> provides;
 
       typedef std::false_type has_untake;

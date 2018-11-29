@@ -100,13 +100,13 @@ namespace mln
   {
     typedef E exact_type;
 
-    E* exact() { return static_cast<E*>(this); }
+    E*       exact() { return static_cast<E*>(this); }
     const E* exact() const { return static_cast<const E*>(this); }
 
   protected:
     Object(const Object&) = default;
-    Object(Object&&) = default;
-    Object() = default;
+    Object(Object&&)      = default;
+    Object()              = default;
     Object& operator=(Object&&) = default;
     Object& operator=(const Object&) = default;
   };

@@ -21,7 +21,10 @@ namespace mln
   template <class T>
   struct always_t
   {
-    constexpr always_t(T x = T()) : m_x(x) {}
+    constexpr always_t(T x = T())
+      : m_x(x)
+    {
+    }
 
     template <class... TArgs>
     constexpr T operator()(TArgs...) const
@@ -35,15 +38,21 @@ namespace mln
 
   struct yes_t : always_t<bool>
   {
-    constexpr yes_t() : always_t<bool>(true) {}
+    constexpr yes_t()
+      : always_t<bool>(true)
+    {
+    }
   };
 
   struct no_t : always_t<bool>
   {
-    constexpr no_t() : always_t<bool>(false) {}
+    constexpr no_t()
+      : always_t<bool>(false)
+    {
+    }
   };
 
-  static constexpr no_t no;
+  static constexpr no_t  no;
   static constexpr yes_t yes;
 }
 

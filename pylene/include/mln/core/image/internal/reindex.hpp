@@ -34,9 +34,9 @@ namespace mln
     inline void reindex(Image<I>& ima, const Image<J>& ima2_, std::true_type __are_indexable__)
     {
       (void)__are_indexable__;
-      const J& ima2 = exact(ima2_);
-      auto domain = ima2.domain();
-      auto p = domain.iter();
+      const J& ima2   = exact(ima2_);
+      auto     domain = ima2.domain();
+      auto     p      = domain.iter();
       p.init();
       exact(ima).reindex(ima2.index_of_point(*p));
     }

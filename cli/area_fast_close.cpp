@@ -22,7 +22,7 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima);
 
   image2d<uint8> out;
-  unsigned lambda = std::atoi(argv[3]);
+  unsigned       lambda = std::atoi(argv[3]);
 
   if (argv[2][0] == '4')
     out = morpho::area_closing(ima, c4, lambda);

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   image2d<rgb8> f;
   io::imread(argv[1], f);
 
-  image2d<uint16> depth;
+  image2d<uint16>  depth;
   image2d<uint16>* depthptr = (argc > 3) ? &depth : NULL;
 
   auto tree = compute_ctos(f, depthptr);

@@ -19,7 +19,7 @@ namespace mln
         template <class Expr, int k>
         struct eval<Expr, tag::image_call_p<k>>
         {
-          typedef typename proto::result_of::value<Expr>::type type_;
+          typedef typename proto::result_of::value<Expr>::type      type_;
           typedef typename std::remove_reference<type_>::type::type I;
           typedef mln_reference(I) result_type;
 
@@ -29,7 +29,7 @@ namespace mln
         template <class Expr, int k>
         struct eval<Expr, tag::image_call_n<k>>
         {
-          typedef typename proto::result_of::value<Expr>::type type_;
+          typedef typename proto::result_of::value<Expr>::type      type_;
           typedef typename std::remove_reference<type_>::type::type I;
           typedef mln_reference(I) result_type;
 
@@ -39,9 +39,9 @@ namespace mln
         template <class Expr>
         struct eval<Expr, tag::aggregate>
         {
-          typedef typename proto::result_of::left<Expr>::type accu_expr;
+          typedef typename proto::result_of::left<Expr>::type       accu_expr;
           typedef typename proto::result_of::value<accu_expr>::type accu;
-          typedef typename accu::result_type result_type;
+          typedef typename accu::result_type                        result_type;
 
           result_type operator()(Expr x, eval_context) const { return proto::value(proto::left(x)).to_result(); }
         };

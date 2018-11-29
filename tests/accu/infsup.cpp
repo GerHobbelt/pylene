@@ -38,7 +38,7 @@ TEST(Accu, Infsup)
 
   // colors are partially ordered
   {
-    typedef rgb<int> Vec;
+    typedef rgb<int>          Vec;
     accumulators::infsup<Vec> acc;
 
     acc.take(Vec(4, -5, 6));

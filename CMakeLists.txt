@@ -15,11 +15,36 @@ find_package(Qt4)
 find_package(range-v3 REQUIRED)
 
 
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif(CCACHE_FOUND)
+# CONFIGURE COMPILER LAUNCHERS
+
+option(USE_CCACHE "Use ccache as compiler launcher" ON)
+option(USE_DISTCC "Use ccache as compiler launcher" OFF)
+
+if(USE_CCACHE AND USE_DISTCC)
+    message(FATAL_ERROR "You can't use both distcc and ccache at the same time. Please choose either one.")
+endif(USE_CCACHE AND USE_DISTCC)
+
+# ccache
+if(USE_CCACHE)
+    find_program(CCACHE_FOUND ccache)
+    if(CCACHE_FOUND)
+        message(STATUS "ccache found")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    endif(CCACHE_FOUND)
+endif(USE_CCACHE)
+
+# distcc
+if(USE_DISTCC)
+    find_program(DISTCC_FOUND distcc)
+    if(DISTCC_FOUND)
+        message(STATUS "distcc found")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE distcc)
+        # distcc doesn't offload the linker
+        # set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK distcc)
+    endif(DISTCC_FOUND)
+endif(USE_DISTCC)
+
 
 # CONFIGURATION OPTIONS
 
@@ -59,6 +84,8 @@ endif()
 
 # Subdirectories
 add_subdirectory(pylene)
+
+add_subdirectory(fixtures)
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   if (PYLENE_BUILD_BENCHMARKS)

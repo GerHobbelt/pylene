@@ -25,10 +25,10 @@ namespace mln
     boost::vector_property_map<unsigned> depth(boost::num_vertices(g));
 
     auto one = [](mln::dontcare_t) -> int { return 1; };
-    auto w = boost::make_function_property_map<typename MyGraph::edge_descriptor, int, decltype(one)>(one);
+    auto w   = boost::make_function_property_map<typename MyGraph::edge_descriptor, int, decltype(one)>(one);
 
     typename MyGraph::vertex_descriptor root = boost::vertex(0, g);
-    depth[root] = 0;
+    depth[root]                              = 0;
 
     MyGraph gT;
     boost::transpose_graph(g, gT);
@@ -55,9 +55,9 @@ namespace mln
       ValueType w = init;
       for (int i = 0; i < NTREE; ++i)
       {
-        tree_t::node_type tnode = t[i].get_node_at(px->index());
+        tree_t::node_type                   tnode = t[i].get_node_at(px->index());
         typename MyGraph::vertex_descriptor gnode = tlink[i][tnode];
-        w = op(w, vmap[gnode]);
+        w                                         = op(w, vmap[gnode]);
       }
       px->val() = w;
     }
@@ -83,7 +83,7 @@ namespace mln
     });
 
     /// Compute the graph
-    Graph<NTREE> g2;
+    Graph<NTREE>                                                                 g2;
     std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
     std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
@@ -97,7 +97,7 @@ namespace mln
     write_vmap_to_image(g2, t, &tlink[0], gdepth, functional::max_t<unsigned>(), uint16(0), maxdepth);
 
     /// Compute the saturated maxtree
-    tree_t tw;
+    tree_t                       tw;
     property_map<tree_t, uint16> depth2;
     std::tie(tw, depth2) = satmaxtree(maxdepth, pmin);
 
@@ -134,7 +134,7 @@ namespace mln
     });
 
     /// Compute the graph
-    Graph<NTREE> g2;
+    Graph<NTREE>                                                                 g2;
     std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
     std::tie(g2, tlink) = compute_g2<NTREE>(t);
 

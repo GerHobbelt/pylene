@@ -60,23 +60,26 @@ namespace mln
       template <typename E, typename T, typename F>
       struct h_infsup_base<E, T, F,
                            typename std::enable_if<std::is_integral<T>::value and value_traits<T>::quant <= 16>::type>
-          : accumulator_base<E, T, T, F>
+        : accumulator_base<E, T, T, F>
       {
-        typedef T argument_type;
-        typedef T result_type;
+        typedef T                                                                                   argument_type;
+        typedef T                                                                                   result_type;
         typedef boost::mpl::set<features::h_sup, features::h_inf, features::inf<>, features::sup<>> provides;
 
         h_infsup_base()
-            : m_inf(value_traits<T>::sup()), m_sup(value_traits<T>::inf()), m_count(0), m_hist{{
-                                                                                            0,
-                                                                                        }}
+          : m_inf(value_traits<T>::sup())
+          , m_sup(value_traits<T>::inf())
+          , m_count(0)
+          , m_hist{{
+                0,
+            }}
         {
         }
 
         void init()
         {
-          m_inf = value_traits<T>::sup();
-          m_sup = value_traits<T>::inf();
+          m_inf   = value_traits<T>::sup();
+          m_sup   = value_traits<T>::inf();
           m_count = 0;
           m_hist.fill(0);
         }
@@ -127,9 +130,9 @@ namespace mln
         friend T extract(const h_infsup_base& accu, features::sup<>) { return accu.m_sup; }
 
       protected:
-        T m_inf;
-        T m_sup;
-        unsigned m_count;
+        T                                                       m_inf;
+        T                                                       m_sup;
+        unsigned                                                m_count;
         std::array<unsigned, indexer<T, std::less<T>>::nvalues> m_hist;
       };
 

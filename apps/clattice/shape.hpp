@@ -38,11 +38,11 @@ struct shape
 {
   enum
   {
-    NONE = 0,
+    NONE  = 0,
     LOWER = 1,
     UPPER = 2,
-    LEQ = 4,
-    GEQ = 8
+    LEQ   = 4,
+    GEQ   = 8
   };
 
 private:
@@ -57,7 +57,7 @@ public:
   shape(const shape&) = delete;
   shape(shape&&);
   shape& operator=(const shape&) = delete;
-  shape& operator=(shape&&);
+  shape& operator                =(shape&&);
 
   bool operator==(const shape&) const;
 
@@ -65,8 +65,8 @@ public:
   bool isupper() const;
   bool isleq() const;
   bool isgeq() const;
-  V lower_level() const;
-  V upper_level() const;
+  V    lower_level() const;
+  V    upper_level() const;
 
   void set_level(V level, LowerCompare cmp);
 
@@ -76,7 +76,7 @@ public:
   void init();
   void add_point(const mln::point2d& p);
 
-  unsigned size() const;
+  unsigned          size() const;
   const mln::box2d& bbox() const;
 
   // Update a shape with another shape which is equal.
@@ -93,17 +93,17 @@ private:
   friend bool is_shape_equal<>(const shape<V, LowerCompare, UpperCompare>& a,
                                const shape<V, LowerCompare, UpperCompare>& b);
 
-  mutable int m_type;
-  mutable V m_level_1;
-  mutable V m_level_2;
+  mutable int          m_type;
+  mutable V            m_level_1;
+  mutable V            m_level_2;
   mutable LowerCompare m_cmp_1;
   mutable UpperCompare m_cmp_2;
 
   const size_t m_size; ///< Number of points in the domain Ω
   const size_t m_nc;   ///< Number of columns
 
-  mln::box2d m_bbox;                          ///< BBox of the set
-  boost::dynamic_bitset<> m_set;              ///< BitSet of points
+  mln::box2d                         m_bbox;  ///< BBox of the set
+  boost::dynamic_bitset<>            m_set;   ///< BitSet of points
   boost::dynamic_bitset<>::size_type m_first; ///< First point in the set
   boost::dynamic_bitset<>::size_type m_count; ///< Number of points in the set
 };
@@ -127,10 +127,12 @@ namespace std
 
 template <typename V, class LowerCompare, class UpperCompare>
 struct shape<V, LowerCompare, UpperCompare>::set_iterator
-    : boost::iterator_facade<shape::set_iterator, mln::point2d, boost::forward_traversal_tag, mln::point2d>
+  : boost::iterator_facade<shape::set_iterator, mln::point2d, boost::forward_traversal_tag, mln::point2d>
 {
   set_iterator(const boost::dynamic_bitset<>* bset, int ncols, boost::dynamic_bitset<>::size_type first)
-      : m_bset(bset), m_nc(ncols), m_cur(first)
+    : m_bset(bset)
+    , m_nc(ncols)
+    , m_cur(first)
   {
   }
 
@@ -144,8 +146,8 @@ private:
   mln::point2d dereference() const { return {(short)(m_cur / m_nc), (short)(m_cur % m_nc)}; }
 
 private:
-  const boost::dynamic_bitset<>* m_bset;
-  int m_nc;
+  const boost::dynamic_bitset<>*     m_bset;
+  int                                m_nc;
   boost::dynamic_bitset<>::size_type m_cur;
 };
 
@@ -218,7 +220,10 @@ bool is_shape_equal(const shape<V, LowerCompare, UpperCompare>& a, const shape<V
 
 template <typename V, class LowerCompare, class UpperCompare>
 shape<V, LowerCompare, UpperCompare>::shape(V x, LowerCompare, int sz, int ncols)
-    : m_type(LOWER), m_level_1(x), m_size(sz), m_nc(ncols)
+  : m_type(LOWER)
+  , m_level_1(x)
+  , m_size(sz)
+  , m_nc(ncols)
 {
   init();
 }
@@ -227,21 +232,31 @@ template <typename V, class LowerCompare, class UpperCompare>
 template <class dummy>
 shape<V, LowerCompare, UpperCompare>::shape(V x, UpperCompare, int sz, int ncols,
                                             typename std::enable_if<hasUL, dummy>::type*)
-    : m_type(UPPER), m_level_2(x), m_size(sz), m_nc(ncols)
+  : m_type(UPPER)
+  , m_level_2(x)
+  , m_size(sz)
+  , m_nc(ncols)
 {
   init();
 }
 
 template <typename V, class LowerCompare, class UpperCompare>
 shape<V, LowerCompare, UpperCompare>::shape(shape&& other)
-    : m_type(other.m_type), m_level_1(other.m_level_1), m_level_2(other.m_level_2), m_cmp_1(other.m_cmp_1),
-      m_cmp_2(other.m_cmp_2), m_size(other.m_size), m_nc(other.m_nc), m_bbox(other.m_bbox), m_first(other.m_first),
-      m_count(other.m_count)
+  : m_type(other.m_type)
+  , m_level_1(other.m_level_1)
+  , m_level_2(other.m_level_2)
+  , m_cmp_1(other.m_cmp_1)
+  , m_cmp_2(other.m_cmp_2)
+  , m_size(other.m_size)
+  , m_nc(other.m_nc)
+  , m_bbox(other.m_bbox)
+  , m_first(other.m_first)
+  , m_count(other.m_count)
 {
   m_set.swap(other.m_set);
 
   other.m_set.clear();
-  other.m_type = NONE;
+  other.m_type  = NONE;
   other.m_first = m_set.npos;
   other.m_count = 0;
 }
@@ -249,18 +264,18 @@ shape<V, LowerCompare, UpperCompare>::shape(shape&& other)
 template <typename V, class LowerCompare, class UpperCompare>
 shape<V, LowerCompare, UpperCompare>& shape<V, LowerCompare, UpperCompare>::operator=(shape&& other)
 {
-  m_type = other.m_type;
+  m_type    = other.m_type;
   m_level_1 = other.m_level_1;
   m_level_2 = other.m_level_2;
-  m_cmp_1 = other.m_cmp_1;
-  m_cmp_2 = other.m_cmp_2;
-  m_bbox = other.m_bbox;
-  m_first = other.m_first;
-  m_count = other.m_count;
+  m_cmp_1   = other.m_cmp_1;
+  m_cmp_2   = other.m_cmp_2;
+  m_bbox    = other.m_bbox;
+  m_first   = other.m_first;
+  m_count   = other.m_count;
   m_set.swap(other.m_set);
 
   other.m_set.clear();
-  other.m_type = NONE;
+  other.m_type  = NONE;
   other.m_first = m_set.npos;
   other.m_count = 0;
 
@@ -272,8 +287,8 @@ void shape<V, LowerCompare, UpperCompare>::init()
 {
   m_set.resize(m_size);
   m_set.reset();
-  m_first = m_set.npos;
-  m_count = 0;
+  m_first     = m_set.npos;
+  m_count     = 0;
   m_bbox.pmin = mln::value_traits<mln::point2d, mln::productorder_less<mln::point2d>>::sup();
   m_bbox.pmax = mln::value_traits<mln::point2d, mln::productorder_less<mln::point2d>>::inf();
 }
@@ -295,7 +310,7 @@ void shape<V, LowerCompare, UpperCompare>::add_point(const mln::point2d& p)
 template <typename V, class LowerCompare, class UpperCompare>
 void shape<V, LowerCompare, UpperCompare>::set_level(V level, LowerCompare)
 {
-  m_type = LOWER;
+  m_type    = LOWER;
   m_level_1 = level;
 }
 
@@ -304,7 +319,7 @@ template <typename dummy>
 void shape<V, LowerCompare, UpperCompare>::set_level(V level, UpperCompare,
                                                      typename std::enable_if<hasUL, dummy>::type*)
 {
-  m_type = UPPER;
+  m_type    = UPPER;
   m_level_2 = level;
 }
 

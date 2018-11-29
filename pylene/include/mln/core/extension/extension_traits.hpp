@@ -38,8 +38,8 @@ namespace mln
   template <typename E>
   struct extension_traits
   {
-    typedef typename E::support_fill support_fill;
-    typedef typename E::support_mirror support_mirror;
+    typedef typename E::support_fill      support_fill;
+    typedef typename E::support_mirror    support_mirror;
     typedef typename E::support_periodize support_periodize;
   };
 

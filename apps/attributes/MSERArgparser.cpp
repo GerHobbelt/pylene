@@ -1,7 +1,8 @@
 #include "MSERArgparser.hpp"
 #include <boost/program_options.hpp>
 
-MSERArgParser::MSERArgParser() : m_desc("MSER options")
+MSERArgParser::MSERArgParser()
+  : m_desc("MSER options")
 {
   namespace po = boost::program_options;
 

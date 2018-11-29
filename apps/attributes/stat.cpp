@@ -17,12 +17,12 @@ int main(int argc, char** argv)
 
   using namespace mln;
 
-  const char* tree_path = argv[1];
-  const char* img_path = argv[2];
+  const char* tree_path   = argv[1];
+  const char* img_path    = argv[2];
   const char* output_path = argv[3];
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-  tree_t tree;
+  tree_t                                                      tree;
   morpho::load(tree_path, tree);
 
   image2d<float> ima;
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   ima = Kadjust_to(ima, tree._get_data()->m_pmap.domain());
 
   auto attr = accu::accumulators::accu_as_it<accu::accumulators::variance<float>>();
-  auto res = morpho::vaccumulate(tree, ima, attr);
+  auto res  = morpho::vaccumulate(tree, ima, attr);
   auto res2 = morpho::vaccumulate_proper(tree, ima, attr);
 
   {

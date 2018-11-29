@@ -15,7 +15,7 @@ tree_t make_tree()
   tree_t tree;
 
   tree_t::_data_t* data = tree._get_data();
-  data->m_pset_ordered = true;
+  data->m_pset_ordered  = true;
 
   // We encode this tree
   //                   E
@@ -39,10 +39,10 @@ tree_t make_tree()
 
   data->m_pmap['a'] = data->m_pmap['b'] = data->m_pmap['c'] = 1;
   data->m_pmap['d'] = data->m_pmap['e'] = 2;
-  data->m_pmap['f'] = 3;
+  data->m_pmap['f']                     = 3;
   data->m_pmap['g'] = data->m_pmap['h'] = 4;
   data->m_pmap['i'] = data->m_pmap['j'] = 5;
-  data->m_pmap['k'] = 6;
+  data->m_pmap['k']                     = 6;
 
   return tree.get_subtree(1);
 }
@@ -86,14 +86,14 @@ TEST(Morpho, component_tree_backward_iteration)
   tree_t tree = make_tree();
 
   unsigned n = 6;
-  auto p = tree.pset().riter();
+  auto     p = tree.pset().riter();
   p.init();
-  mln_reverse_foreach(auto x, tree.nodes())
+  mln_reverse_foreach (auto x, tree.nodes())
   {
     ASSERT_TRUE(x.id() == n--);
     std::cout << "== Node: " << x.id() << std::endl;
     std::cout << "Proper pset: ";
-    mln_reverse_foreach(auto y, x.proper_pset())
+    mln_reverse_foreach (auto y, x.proper_pset())
     {
       ASSERT_EQ(y, *p);
       std::cout << y << ",";
@@ -101,7 +101,8 @@ TEST(Morpho, component_tree_backward_iteration)
     }
     std::cout << std::endl;
     std::cout << "Full pset: ";
-    mln_reverse_foreach(auto y, x.pset()) std::cout << y << ",";
+    mln_reverse_foreach (auto y, x.pset())
+      std::cout << y << ",";
     std::cout << std::endl;
   }
   ASSERT_EQ(n, 0u);
@@ -110,7 +111,7 @@ TEST(Morpho, component_tree_backward_iteration)
 TEST(Morpho, component_tree_subtree)
 {
   tree_t tree = make_tree();
-  tree = tree.get_subtree(2);
+  tree        = tree.get_subtree(2);
 
   unsigned n = 0;
   mln_iter(p, tree.pset());

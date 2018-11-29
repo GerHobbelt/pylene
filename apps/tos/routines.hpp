@@ -168,7 +168,7 @@ mln::image2d<typename mln::accu::result_of<AccuLike, V>::type>
   trace::entering("attribute_compute_per_node");
 
   typedef typename mln::accu::result_of<AccuLike, V>::type R;
-  auto accu = accu::make_accumulator<AccuLike, V>(exact(accu_));
+  auto                                                     accu = accu::make_accumulator<AccuLike, V>(exact(accu_));
 
   accu.init();
 
@@ -220,7 +220,7 @@ mln::image2d<typename mln::accu::result_of<AccuLike, V>::type>
   trace::entering("attribute_compute");
 
   typedef typename mln::accu::result_of<AccuLike, V>::type R;
-  auto accu = accu::make_accumulator<AccuLike, V>(exact(accu_));
+  auto                                                     accu = accu::make_accumulator<AccuLike, V>(exact(accu_));
 
   accu.init();
 

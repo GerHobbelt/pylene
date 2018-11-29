@@ -68,7 +68,9 @@ namespace mln
     template <typename V>
     struct MaxtreeCanonizationAlgorithm
     {
-      MaxtreeCanonizationAlgorithm(const image2d<V>& ima, image2d<std::size_t>& parent) : m_ima(ima), m_parent(parent)
+      MaxtreeCanonizationAlgorithm(const image2d<V>& ima, image2d<std::size_t>& parent)
+        : m_ima(ima)
+        , m_parent(parent)
       {
       }
 
@@ -79,7 +81,7 @@ namespace mln
           p = internal::zfind_repr(m_ima, m_parent, p);
       }
 
-      const image2d<V>& m_ima;
+      const image2d<V>&     m_ima;
       image2d<std::size_t>& m_parent;
     };
   }

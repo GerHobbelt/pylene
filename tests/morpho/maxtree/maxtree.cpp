@@ -14,10 +14,10 @@ TEST(Morpho, Maxtree)
 {
   using namespace mln;
   typedef uint8 V;
-  image2d<V> ima(500, 500);
+  image2d<V>    ima(500, 500);
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
+  std::random_device                 rd;
+  std::mt19937                       gen(rd());
   std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
   range::generate(ima.values(), [&sampler, &gen]() { return sampler(gen); });
 

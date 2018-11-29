@@ -59,7 +59,7 @@ namespace mln
     out[S[0]] = ima[S[0]];
     for (unsigned i : S)
     {
-      point2d p = K.point_at_index(i);
+      point2d p  = K.point_at_index(i);
       point2d pp = p / 2;
 
       if (area[i] > grain and K1::is_face_2(p))
@@ -70,7 +70,7 @@ namespace mln
 
     // 3: retrieve 2-faces
     image2d<V> output;
-    box2d d = out.domain();
+    box2d      d = out.domain();
     resize(output, ima);
     copy(out | sbox2d(d.pmin, d.pmax, point2d{2, 2}), output);
 
@@ -87,18 +87,18 @@ int main(int argc, char** argv)
   image2d<rgb8> ima;
   io::imread(argv[1], ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
 
   I rr = addborder(r);
   I gg = addborder(g);
   I bb = addborder(b);
 
-  image2d<V> Kr, Kg, Kb;
-  image2d<unsigned> parentr, parentg, parentb;
+  image2d<V>            Kr, Kg, Kb;
+  image2d<unsigned>     parentr, parentg, parentb;
   std::vector<unsigned> Sr, Sg, Sb;
 
   std::tie(Kr, parentr, Sr) = morpho::ToS(rr, c4);
@@ -107,10 +107,10 @@ int main(int argc, char** argv)
 
   for (int i = 3; i < argc; ++i)
   {
-    unsigned lambda = std::atoi(argv[i]);
-    image2d<V> outr = grainfilter(rr, Kr, parentr, Sr, lambda);
-    image2d<V> outg = grainfilter(gg, Kg, parentg, Sg, lambda);
-    image2d<V> outb = grainfilter(bb, Kb, parentb, Sb, lambda);
+    unsigned   lambda = std::atoi(argv[i]);
+    image2d<V> outr   = grainfilter(rr, Kr, parentr, Sr, lambda);
+    image2d<V> outg   = grainfilter(gg, Kg, parentg, Sg, lambda);
+    image2d<V> outb   = grainfilter(bb, Kb, parentb, Sb, lambda);
 
     image2d<rgb8> res = transform(imzip(outr, outg, outb), [](const std::tuple<V, V, V>& x) {
       return rgb8{(uint8)(std::get<0>(x) / 2), (uint8)(std::get<1>(x) / 2), (uint8)(std::get<2>(x) / 2)};

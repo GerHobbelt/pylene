@@ -1,8 +1,8 @@
 #include <benchmark/benchmark.h>
 
+#include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
-#include <mln/core/extension/fill.hpp>
 
 void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 void Average(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
@@ -17,13 +17,16 @@ void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d
 void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output);
 
 
-
-void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Average_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height, std::ptrdiff_t stride);
-
+void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+           std::ptrdiff_t stride);
+void Average_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+               std::ptrdiff_t stride);
+void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+               std::ptrdiff_t stride);
+void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
+                           std::ptrdiff_t stride);
+void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width,
+                             int height, std::ptrdiff_t stride);
 
 
 class Bench_Ref_Neighborhood : public benchmark::Fixture
@@ -32,7 +35,7 @@ class Bench_Ref_Neighborhood : public benchmark::Fixture
 
   virtual void SetUp(const benchmark::State&) override
   {
-    mln::image2d<mln::rgb8> tmp(0,0);
+    mln::image2d<mln::rgb8> tmp(0, 0);
     mln::io::imread(filename, tmp);
 
     mln::resize(m_input, tmp);
@@ -40,11 +43,11 @@ class Bench_Ref_Neighborhood : public benchmark::Fixture
     mln::copy(mln::red(tmp), m_input);
     mln::extension::fill(m_input, 0);
 
-    m_h = m_input.nrows();
-    m_w = m_input.ncols();
-    m_stride = m_input.strides()[0];
-    m_ibuffer = &m_input.at(0,0);
-    m_obuffer = &m_output.at(0,0);
+    m_h       = m_input.nrows();
+    m_w       = m_input.ncols();
+    m_stride  = m_input.strides()[0];
+    m_ibuffer = &m_input.at(0, 0);
+    m_obuffer = &m_output.at(0, 0);
   }
 
 protected:
@@ -62,10 +65,10 @@ protected:
   void runit(benchmark::State& st, fun2_t f) { run_impl(st, std::bind(f, m_ibuffer, m_obuffer, m_w, m_h, m_stride)); }
 
 private:
-  int m_w, m_h;
-  std::ptrdiff_t m_stride;
-  mln::uint8* m_ibuffer;
-  mln::uint8* m_obuffer;
+  int                      m_w, m_h;
+  std::ptrdiff_t           m_stride;
+  mln::uint8*              m_ibuffer;
+  mln::uint8*              m_obuffer;
   mln::image2d<mln::uint8> m_input;
   mln::image2d<mln::uint8> m_output;
 };

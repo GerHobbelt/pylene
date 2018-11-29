@@ -35,8 +35,8 @@ TEST(Accu, Moment_of_inertia)
         acc.take(point2d{i, j});
 
     double res2 = acc.to_result();
-    double tmp = 2 * (n + 1) * sum_of_square(n / 2.f);
-    double ref = (tmp + tmp) / sqr(sqr(double(n + 1)));
+    double tmp  = 2 * (n + 1) * sum_of_square(n / 2.f);
+    double ref  = (tmp + tmp) / sqr(sqr(double(n + 1)));
     ASSERT_TRUE(std::abs(res2 - ref) <= 1);
     ASSERT_TRUE(std::abs(res1 - res2) <= 1);
   }

@@ -19,6 +19,6 @@ TEST(Core, Algorithm_Equal)
   ASSERT_TRUE(equal(ima, out));
 
   point2d p = {2, 3};
-  out(p) = 12;
+  out(p)    = 12;
   ASSERT_TRUE(not equal(ima, out));
 }

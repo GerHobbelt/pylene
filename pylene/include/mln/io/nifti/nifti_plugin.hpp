@@ -21,11 +21,11 @@ namespace mln
 
       virtual bool support_istream() const final { return false; }
 
-      virtual void open(std::istream&) final;
-      virtual void open(const char* filename) final;
+      virtual void            open(std::istream&) final;
+      virtual void            open(const char* filename) final;
       virtual std::type_index get_value_type_id() const final;
-      virtual int get_bpp() const final;
-      virtual box2d get_domain() const final;
+      virtual int             get_bpp() const final;
+      virtual box2d           get_domain() const final;
 
       virtual std::function<void(void*)> get_read_next_pixel_method() const final;
       virtual std::function<void(void*)> get_read_next_line_method() const final;
@@ -35,23 +35,26 @@ namespace mln
       void read_next_pixel_(void* out);
 
     protected:
-      nifti_image* m_nim;
-      int m_bpp;
-      box2d m_domain;
+      nifti_image*    m_nim;
+      int             m_bpp;
+      box2d           m_domain;
       std::type_index m_vtype;
 
       std::function<void(void*)> m_read_next_line;
       std::function<void(void*)> m_read_next_pixel;
-      char* m_ptr;
-      int x, y;
-      unsigned m_stride;
+      char*                      m_ptr;
+      int                        x, y;
+      unsigned                   m_stride;
     };
 
     /******************************/
     /***  Implementation        ***/
     /******************************/
 
-    inline nifti_reader_plugin::nifti_reader_plugin() : m_vtype(typeid(void)) {}
+    inline nifti_reader_plugin::nifti_reader_plugin()
+      : m_vtype(typeid(void))
+    {
+    }
 
     nifti_reader_plugin::~nifti_reader_plugin()
     {
@@ -113,19 +116,19 @@ namespace mln
         goto error;
       }
 
-      m_read_next_line = std::bind(&nifti_reader_plugin::read_next_line_, this, std::placeholders::_1);
+      m_read_next_line  = std::bind(&nifti_reader_plugin::read_next_line_, this, std::placeholders::_1);
       m_read_next_pixel = std::bind(&nifti_reader_plugin::read_next_pixel_, this, std::placeholders::_1);
 
       m_domain.pmin = {0, 0};
       m_domain.pmax = {m_nim->ny, m_nim->nx};
-      x = 0;
+      x             = 0;
 
       nifti_image_load(m_nim);
 
       // FIXME: Should we go to the end
       // Maybe there is a bit for the orientation
       m_stride = m_bpp * m_domain.pmax[1];
-      m_ptr = (char*)m_nim->data;
+      m_ptr    = (char*)m_nim->data;
       m_ptr += (m_domain.pmax[0] - 1) * m_stride;
 
       return;

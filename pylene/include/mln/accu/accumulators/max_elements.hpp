@@ -46,7 +46,10 @@ namespace mln
       template <typename Compare>
       struct maximal_elements : simple_feature<maximal_elements<Compare>>
       {
-        maximal_elements(const Compare& cmp = Compare()) : m_cmp(cmp) {}
+        maximal_elements(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         struct apply
@@ -92,11 +95,14 @@ namespace mln
       template <typename T, typename Compare>
       struct maximal_elements : accumulator_base<maximal_elements<T, Compare>, T, T, features::maximal_elements<>>
       {
-        typedef T argument_type;
+        typedef T              argument_type;
         typedef std::vector<T> return_type;
         // typedef features::max<> feature;
 
-        maximal_elements(const Compare& cmp = Compare()) : m_cmp(cmp) {}
+        maximal_elements(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+        {
+        }
 
         void init() { m_val.clear(); }
 
@@ -108,7 +114,7 @@ namespace mln
               return;
             else if (m_cmp(x, v)) // new maximal element
             {
-              x = v;
+              x        = v;
               inserted = true;
             }
 
@@ -128,7 +134,7 @@ namespace mln
 
       private:
         std::vector<T> m_val;
-        Compare m_cmp;
+        Compare        m_cmp;
       };
     }
   }

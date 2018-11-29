@@ -21,36 +21,36 @@ namespace mln
     template <>
     struct vec_base_traits<rgb_tag>
     {
-      static const bool is_additive = true;
-      static const bool is_additive_ext = true;
-      static const bool is_multiplicative = false;
-      static const bool is_multiplicative_ext = true;
+      static const bool is_additive             = true;
+      static const bool is_additive_ext         = true;
+      static const bool is_multiplicative       = false;
+      static const bool is_multiplicative_ext   = true;
       static const bool is_less_than_comparable = false;
-      static const bool is_equality_comparable = true;
+      static const bool is_equality_comparable  = true;
     };
 
     template <>
     struct vec_base_traits<bgr_tag>
     {
-      static const bool is_additive = true;
-      static const bool is_additive_ext = true;
-      static const bool is_multiplicative = false;
-      static const bool is_multiplicative_ext = true;
+      static const bool is_additive             = true;
+      static const bool is_additive_ext         = true;
+      static const bool is_multiplicative       = false;
+      static const bool is_multiplicative_ext   = true;
       static const bool is_less_than_comparable = false;
-      static const bool is_equality_comparable = true;
+      static const bool is_equality_comparable  = true;
     };
   }
 
   template <typename T>
   using rgb = internal::vec_base<T, 3, rgb_tag>;
 
-  typedef rgb<uint8> rgb8;
+  typedef rgb<uint8>  rgb8;
   typedef rgb<uint16> rgb16;
 
   template <typename T>
   using bgr = internal::vec_base<T, 3, bgr_tag>;
 
-  typedef bgr<uint8> bgr8;
+  typedef bgr<uint8>  bgr8;
   typedef bgr<uint16> bgr16;
 
   template <class I>

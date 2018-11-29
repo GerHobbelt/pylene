@@ -30,7 +30,7 @@ namespace mln
     /// \param nbh The neighborhood
     /// \param cmp A strict weak order on values
     template <typename I, typename N>
-    component_tree<typename I::size_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>& ima,
+    component_tree<typename I::size_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>&        ima,
                                                                                      const Neighborhood<N>& nbh);
 
     /*****************************/
@@ -48,7 +48,7 @@ namespace mln
     }
 
     template <typename I, typename N>
-    component_tree<typename I::size_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>& ima,
+    component_tree<typename I::size_type, mln_ch_value(I, unsigned)> mintree_indexes(const Image<I>&        ima,
                                                                                      const Neighborhood<N>& nbh)
     {
       mln_entering("mln::morpho::mintree_indexes");

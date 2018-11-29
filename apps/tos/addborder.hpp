@@ -27,7 +27,7 @@ namespace mln
       copy(ima, out | box);
     }
 
-    V median;
+    V        median;
     unsigned ncols = ima.ncols(), nrows = ima.nrows();
     {
       std::vector<V> border;
@@ -58,13 +58,13 @@ namespace mln
     {
       for (unsigned i = 0; i < ncols + 2; ++i)
       {
-        out.at(0, i) = median;
+        out.at(0, i)         = median;
         out.at(nrows + 1, i) = median;
       }
 
       for (unsigned i = 1; i < nrows + 1; ++i)
       {
-        out.at(i, 0) = median;
+        out.at(i, 0)         = median;
         out.at(i, ncols + 1) = median;
       }
     }
@@ -89,8 +89,8 @@ namespace mln
                                                   const Compare& cmp = Compare())
   {
 
-    const M& mask = exact(mask_);
-    image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
+    const M&      mask = exact(mask_);
+    image2d<V>    out(ima.nrows() + 2, ima.ncols() + 2);
     image2d<bool> omask(ima.nrows() + 2, ima.ncols() + 2);
 
     std::vector<V> border;
@@ -105,8 +105,8 @@ namespace mln
           omask(n + point2d{1, 1}) = true;
         }
         point2d q = p + point2d{1, 1};
-        omask(q) = true;
-        out(q) = ima(p);
+        omask(q)  = true;
+        out(q)    = ima(p);
       }
 
     std::partial_sort(border.begin(), border.begin() + border.size() / 2 + 1, border.end(), cmp);
@@ -119,7 +119,7 @@ namespace mln
           if (!mask.domain().has(n) or !mask(n))
           {
             point2d q = n + point2d{1, 1};
-            out(q) = median;
+            out(q)    = median;
           }
       }
 

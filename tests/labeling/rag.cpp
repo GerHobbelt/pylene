@@ -16,12 +16,12 @@ TEST(Labeling, rag_test_1)
   ima.at(4, 0) = true;
   ima.at(4, 4) = true;
 
-  typedef boost::property<labeling::vertex_label_t, uint8> Vproperty;
+  typedef boost::property<labeling::vertex_label_t, uint8>                               Vproperty;
   typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty> Graph;
 
   image2d<uint8> lbl;
-  unsigned nlabel;
-  Graph graph;
+  unsigned       nlabel;
+  Graph          graph;
   std::tie(lbl, nlabel) = labeling::rag(ima, c4, graph, uint8());
 
   io::imprint(lbl);
@@ -48,12 +48,12 @@ TEST(Labeling, rag_test_2)
   ima.at(4, 0) = true;
   ima.at(4, 4) = true;
 
-  typedef boost::property<labeling::vertex_label_t, uint8> Vproperty;
+  typedef boost::property<labeling::vertex_label_t, uint8>                               Vproperty;
   typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty> Graph;
 
   image2d<uint8> lbl;
-  unsigned nlabel;
-  Graph graph;
+  unsigned       nlabel;
+  Graph          graph;
   std::tie(lbl, nlabel) = labeling::rag(ima, c8, graph, uint8());
 
   io::imprint(lbl);

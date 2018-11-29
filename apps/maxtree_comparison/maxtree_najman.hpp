@@ -28,7 +28,7 @@ namespace mln
       template <typename size_type>
       struct aux_data
       {
-        unsigned rank;
+        unsigned  rank;
         size_type zpar;
       };
 
@@ -56,12 +56,12 @@ namespace mln
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
-    maxtree_najman(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+        maxtree_najman(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       typedef typename image2d<V>::size_type size_type;
-      static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
-      image2d<size_type> parent;
-      image2d<size_type> lowestNode;
+      static constexpr size_type             UNINITIALIZED = std::numeric_limits<size_type>::max();
+      image2d<size_type>                     parent;
+      image2d<size_type>                     lowestNode;
       image2d<internal::aux_data<size_type>> ttree;
       image2d<internal::aux_data<size_type>> tnode;
 
@@ -73,8 +73,8 @@ namespace mln
 
       /* coucou */
 
-      std::vector<size_type> S = sort_indexes(ima, cmp);
-      auto offsets = wrt_delta_index(ima, nbh.dpoints);
+      std::vector<size_type> S       = sort_indexes(ima, cmp);
+      auto                   offsets = wrt_delta_index(ima, nbh.dpoints);
       std::cout << S.size() << std::endl;
       int j = S.size();
       for (int i = S.size() - 1; i >= 0; --i)
@@ -83,7 +83,7 @@ namespace mln
         // std::cout << "Processing:" << p << " @ " << (int) ima[p] << std::endl;
         // make set
         {
-          parent[p] = p;
+          parent[p]     = p;
           ttree[p].zpar = p;
           tnode[p].zpar = p;
           lowestNode[p] = p;
@@ -93,8 +93,8 @@ namespace mln
         size_type curNode = internal::zfindroot(tnode, lowestNode[curTree]); // zpar of p
         for (unsigned k = 0; k < offsets.size(); ++k)
         {
-          size_type q = p + offsets[k];
-          bool processed = (parent[q] != UNINITIALIZED);
+          size_type q         = p + offsets[k];
+          bool      processed = (parent[q] != UNINITIALIZED);
           if (processed)
           {
             size_type adjTree = internal::zfindroot(ttree, q);
@@ -104,17 +104,17 @@ namespace mln
               // std::cout << "Mergin: " << root[r] << "->" << p << std::endl;
               if (ima[curNode] == ima[adjNode])
               {
-                size_type tmp = internal::mergeset(tnode, adjNode, curNode);
-                S[--j] = (tmp == curNode) ? adjNode : curNode;
+                size_type tmp   = internal::mergeset(tnode, adjNode, curNode);
+                S[--j]          = (tmp == curNode) ? adjNode : curNode;
                 parent[adjNode] = parent[curNode] = tmp;
-                curNode = tmp;
+                curNode                           = tmp;
               }
               else
               {
                 parent[adjNode] = curNode;
-                S[--j] = adjNode;
+                S[--j]          = adjNode;
               }
-              curTree = internal::mergeset(ttree, adjTree, curTree);
+              curTree             = internal::mergeset(ttree, adjTree, curTree);
               lowestNode[curTree] = curNode;
             }
           }

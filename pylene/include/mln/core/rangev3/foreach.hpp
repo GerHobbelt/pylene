@@ -1,8 +1,7 @@
 #pragma once
 
-#include <mln/core/rangev3/rows.hpp>
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
-
+#include <mln/core/rangev3/rows.hpp>
 
 
 /// \brief The macro defines mln_foreach(RANGE_DECLARATION, RANGE_EXPRESSION) as equivalent to:
@@ -25,7 +24,7 @@
   {                                                                                                                    \
   }                                                                                                                    \
   else                                                                                                                 \
-    for (auto&& __mln_inner_rng : mln::ranges::rows(RNG))               \
+    for (auto&& __mln_inner_rng : mln::ranges::rows(RNG))                                                              \
       if (__mln_has_been_broken)                                                                                       \
         break;                                                                                                         \
       else                                                                                                             \

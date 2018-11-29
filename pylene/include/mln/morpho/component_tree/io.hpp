@@ -85,7 +85,7 @@ namespace mln
 
       unsigned nnodes;
       unsigned npoints;
-      int ordered;
+      int      ordered;
       unsigned root;
 
       s >> nnodes;

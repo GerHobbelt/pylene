@@ -19,7 +19,7 @@ void cut_and_get_shapes(const mln::image2d<R>& ima, const NbhFg& nbhBg, const Nb
   auto input = imtransform(ima, [cmp, lambda](const R& x) { return cmp(x, lambda); });
 
   // Labelisation
-  L nlabel;
+  L          nlabel;
   image2d<L> imlabel;
   std::tie(imlabel, nlabel) = labeling::blobs(input, nbhFg, L());
 

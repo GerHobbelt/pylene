@@ -49,10 +49,10 @@ namespace mln
   std::vector<point2d> convexhull(const std::vector<point2d>& points)
   {
     std::vector<point2d> cvx_hull;
-    std::vector<float> angles(points.size());
+    std::vector<float>   angles(points.size());
 
-    int i = 0;
-    int n = points.size();
+    int     i = 0;
+    int     n = points.size();
     point2d start, p;
 
     if (n == 0)
@@ -79,9 +79,9 @@ namespace mln
       p = cvx_hull.back();
       while (i < n)
       {
-        auto it = get_max_angles(points.begin() + i, points.end(), p, angles.begin() + i);
+        auto     it  = get_max_angles(points.begin() + i, points.end(), p, angles.begin() + i);
         unsigned pos = (it - angles.begin());
-        p = points[pos];
+        p            = points[pos];
         cvx_hull.push_back(p);
         i = pos + 1;
       }
@@ -104,10 +104,10 @@ namespace mln
     {
       while (i > 0)
       {
-        auto it = get_max_angles(points.begin(), points.begin() + i, p, angles.begin());
-        int pos = (it - angles.begin());
-        i = pos;
-        p = points[i];
+        auto it  = get_max_angles(points.begin(), points.begin() + i, p, angles.begin());
+        int  pos = (it - angles.begin());
+        i        = pos;
+        p        = points[i];
         cvx_hull.push_back(p);
         // std::cout << "insert: " << i << "," << p << std::endl;
       }

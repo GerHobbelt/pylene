@@ -12,7 +12,7 @@ class Pylene(ConanFile):
         True, False], "boost_program_options": [True, False]}
     default_options = "gtest=False", "benchmark=False", "freeimage=False", "boost_program_options=False"
     generators = "cmake_paths"
-    exports_sources = [ "pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE" ]
+    exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     def get_cmake_config(self):
         cmake = CMake(self)
@@ -24,15 +24,13 @@ class Pylene(ConanFile):
         cmake = self.get_cmake_config()
         cmake.build()
 
-
     def package(self):
         cmake = self.get_cmake_config()
         cmake.install()
         self.copy("*", dst="", src="cmake")
 
-
     def package_info(self):
-        if self.settings.compiler in [ "gcc", "clang" ]:
+        if self.settings.compiler in ["gcc", "clang"]:
             self.cpp_info.cppflags = ["-std=c++17"]
 
     # Requirements part of the INTERFACE
@@ -50,5 +48,3 @@ class Pylene(ConanFile):
 
         if self.options.benchmark:
             self.requires("benchmark/1.4.1@dutiona/stable")
-
-

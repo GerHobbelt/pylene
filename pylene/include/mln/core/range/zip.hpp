@@ -63,12 +63,15 @@ namespace mln
         const_iterator_tuple;
 
   public:
-    typedef zip_iterator<iterator_tuple> iterator;
+    typedef zip_iterator<iterator_tuple>       iterator;
     typedef zip_iterator<const_iterator_tuple> const_iterator;
-    typedef typename iterator::value_type value_type;
-    typedef typename iterator::reference reference;
+    typedef typename iterator::value_type      value_type;
+    typedef typename iterator::reference       reference;
 
-    zip_range(const std::tuple<TRanges...>& rng) : m_rng(rng) {}
+    zip_range(const std::tuple<TRanges...>& rng)
+      : m_rng(rng)
+    {
+    }
 
     zip_range(const zip_range&) = default;
 
@@ -76,7 +79,7 @@ namespace mln
     template <typename R2>
     zip_range(const zip_range<R2>& other,
               typename std::enable_if<std::is_convertible<R2, RangeTuple>::value>::type* = NULL)
-        : m_rng(other.m_rng)
+      : m_rng(other.m_rng)
     {
     }
 

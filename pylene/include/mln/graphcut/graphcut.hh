@@ -47,7 +47,7 @@ namespace mln
 
         struct edge_type
         {
-          edge_t type;
+          edge_t  type;
           point2d p;
 
           bool operator<(const edge_t& other) const
@@ -59,7 +59,9 @@ namespace mln
         struct vertices_iterator : iterator_base<vertices_iterator, point2d, const point2d&>
         {
           vertices_iterator(const sbox2d& domain, const point2d& psrc, const point2d& psink)
-              : m_src(psrc), m_sink(psink), m_domain_it(domain.iter())
+            : m_src(psrc)
+            , m_sink(psink)
+            , m_domain_it(domain.iter())
           {
           }
 
@@ -101,19 +103,22 @@ namespace mln
           }
 
         private:
-          const point2d m_src;
-          const point2d m_sink;
+          const point2d    m_src;
+          const point2d    m_sink;
           sbox2d::iterator m_domain_it;
-          int m_status; // 0-> SRC, 1-> domain, 2-> sink
+          int              m_status; // 0-> SRC, 1-> domain, 2-> sink
         };
 
         struct edges_iterator : iterator_base<edges_iterator, edge_type, const edge_type&>
         {
           typedef typename graph::undirected_graph_image2d<Vtype, Etype, Nbh>::edges_range graph_edges_range;
-          typedef typename graph_edges_range::iterator graph_edges_iterator;
+          typedef typename graph_edges_range::iterator                                     graph_edges_iterator;
 
           edges_iterator(const graph_edges_range& edges, const sbox2d& domain)
-              : m_edges(edges), m_domain(domain), m_edges_it(m_edges.iter()), m_domain_it(m_domain.iter())
+            : m_edges(edges)
+            , m_domain(domain)
+            , m_edges_it(m_edges.iter())
+            , m_domain_it(m_domain.iter())
           {
           }
 
@@ -121,7 +126,7 @@ namespace mln
           {
             m_domain_it.init();
             m_e.type = SOURCE_EDGE;
-            m_e.p = *m_domain_it;
+            m_e.p    = *m_domain_it;
           }
 
           void next()
@@ -139,7 +144,7 @@ namespace mln
               {
                 m_edges_it.init();
                 m_e.type = NORMAL_EDGE;
-                m_e.p = *m_edges_it;
+                m_e.p    = *m_edges_it;
               }
               break;
             case NORMAL_EDGE:
@@ -152,7 +157,7 @@ namespace mln
               {
                 m_domain_it.init();
                 m_e.type = SINK_EDGE;
-                m_e.p = *m_domain_it;
+                m_e.p    = *m_domain_it;
               }
               break;
             case SINK_EDGE:
@@ -171,10 +176,10 @@ namespace mln
 
         private:
           const graph_edges_range m_edges;
-          const sbox2d m_domain;
-          graph_edges_iterator m_edges_it;
-          sbox2d::iterator m_domain_it;
-          edge_type m_e;
+          const sbox2d            m_domain;
+          graph_edges_iterator    m_edges_it;
+          sbox2d::iterator        m_domain_it;
+          edge_type               m_e;
         };
 
         struct adjacency_vertex_iterator : iterator_base<adjacency_vertex_iterator, point2d, point2d>
@@ -183,7 +188,11 @@ namespace mln
 
           adjacency_vertex_iterator(const inner_iterator& inner, const sbox2d& domain, const point2d& psrc,
                                     const point2d& psink, const point2d& v)
-              : m_src(psrc), m_sink(psink), m_inner_it(inner), m_domain_it(domain.iter()), m_point(&v)
+            : m_src(psrc)
+            , m_sink(psink)
+            , m_inner_it(inner)
+            , m_domain_it(domain.iter())
+            , m_point(&v)
           {
           }
 
@@ -239,13 +248,13 @@ namespace mln
           bool finished() const { return m_status > 3; }
 
         private:
-          const point2d m_src;
-          const point2d m_sink;
-          inner_iterator m_inner_it;
+          const point2d    m_src;
+          const point2d    m_sink;
+          inner_iterator   m_inner_it;
           sbox2d::iterator m_domain_it;
 
           const point2d* m_point;
-          int m_status; // 0 (SINK or SOURCE), 1 -> (INNER) SINK, 2-> (INNER) Nbh, 3 -> (INNER) SOURCE
+          int            m_status; // 0 (SINK or SOURCE), 1 -> (INNER) SINK, 2-> (INNER) Nbh, 3 -> (INNER) SOURCE
         };
 
         struct adjacency_edge_iterator : iterator_base<adjacency_edge_iterator, edge_type, const edge_type&>
@@ -254,7 +263,12 @@ namespace mln
 
           adjacency_edge_iterator(const inner_iterator& inner, const sbox2d& domain, const point2d& psrc,
                                   const point2d& psink, const point2d& v)
-            : m_src(psrc), m_sink(psink), m_inner_it(inner), m_domain_it(domain.iter()), m_point(&v), m_edge()
+            : m_src(psrc)
+            , m_sink(psink)
+            , m_inner_it(inner)
+            , m_domain_it(domain.iter())
+            , m_point(&v)
+            , m_edge()
           {
           }
 
@@ -270,7 +284,7 @@ namespace mln
             else
             {
               m_edge.type = SOURCE_EDGE;
-              m_edge.p = *m_point;
+              m_edge.p    = *m_point;
             }
           }
 
@@ -290,7 +304,7 @@ namespace mln
               m_inner_it.init();
               ++m_status;
               m_edge.type = NORMAL_EDGE;
-              m_edge.p = *m_inner_it;
+              m_edge.p    = *m_inner_it;
               break;
             case 2:
               m_inner_it.next();
@@ -298,7 +312,7 @@ namespace mln
               {
                 ++m_status;
                 m_edge.type = SINK_EDGE;
-                m_edge.p = *m_point;
+                m_edge.p    = *m_point;
               }
               else
                 m_edge.p = *m_inner_it;
@@ -317,20 +331,20 @@ namespace mln
           bool finished() const { return m_status > 3; }
 
         private:
-          const point2d m_src;
-          const point2d m_sink;
-          inner_iterator m_inner_it;
+          const point2d    m_src;
+          const point2d    m_sink;
+          inner_iterator   m_inner_it;
           sbox2d::iterator m_domain_it;
 
           const point2d* m_point;
-          int m_status; // 0 (SINK or SOURCE), 1 -> (INNER) SINK, 2-> (INNER) Nbh, 3 -> (INNER) SOURCE
-          edge_type m_edge;
+          int            m_status; // 0 (SINK or SOURCE), 1 -> (INNER) SINK, 2-> (INNER) Nbh, 3 -> (INNER) SOURCE
+          edge_type      m_edge;
         };
 
-        typedef iterator_range<vertices_iterator> vertices_range;
-        typedef iterator_range<edges_iterator> edges_range;
+        typedef iterator_range<vertices_iterator>         vertices_range;
+        typedef iterator_range<edges_iterator>            edges_range;
         typedef iterator_range<adjacency_vertex_iterator> adjacency_vertex_range;
-        typedef iterator_range<adjacency_edge_iterator> adjacency_edge_range;
+        typedef iterator_range<adjacency_edge_iterator>   adjacency_edge_range;
 
         typedef point2d vertex_type;
 
@@ -338,7 +352,9 @@ namespace mln
         const point2d SINK;
 
         graphcut_graph_t(const box2d& domain, const Nbh& nbh)
-            : base(domain, nbh), SOURCE((domain.pmin - 1) * 2), SINK(domain.pmax * 2)
+          : base(domain, nbh)
+          , SOURCE((domain.pmin - 1) * 2)
+          , SINK(domain.pmax * 2)
         {
           m_src.resize(domain);
           m_sink.resize(domain);
@@ -550,7 +566,7 @@ namespace mln
       template <typename DataFidelityFunction, typename RegularityFunction, typename V>
       struct default_cmp
       {
-        typedef typename std::result_of<DataFidelityFunction(bool, V)>::type W1;
+        typedef typename std::result_of<DataFidelityFunction(bool, V)>::type  W1;
         typedef typename std::result_of<RegularityFunction(bool, bool)>::type W2;
 
         typedef typename std::common_type<W1, W2>::type W;
@@ -563,7 +579,7 @@ namespace mln
     double graphcut(const image2d<V>& ima, image2d<bool>& f, const N& nbh, DataFidelityFunction d, RegularityFunction v,
                     const Compare& cmp)
     {
-      typedef typename std::result_of<DataFidelityFunction(bool, V)>::type W1;
+      typedef typename std::result_of<DataFidelityFunction(bool, V)>::type  W1;
       typedef typename std::result_of<RegularityFunction(bool, bool)>::type W2;
 
       typedef typename std::common_type<W1, W2>::type W;
@@ -572,7 +588,7 @@ namespace mln
       {
         point2d par;
         point2d zpar;
-        bool active; // active means also INQUEUE
+        bool    active; // active means also INQUEUE
       };
 
       // a node x is free iif x != SINK, SOURCE, x.par = x, x.zpar = x , not(x.active)
@@ -593,14 +609,14 @@ namespace mln
           switch (e.type)
           {
           case G::SOURCE_EDGE:
-            w = d(false, ima(graph.target(e) / 2));
+            w             = d(false, ima(graph.target(e) / 2));
             graph.edge(e) = {w, 0};
             break;
           case G::NORMAL_EDGE:
             graph.edge(e) = {w2, w2};
             break;
           case G::SINK_EDGE:
-            w = d(true, ima(graph.source(e) / 2));
+            w             = d(true, ima(graph.source(e) / 2));
             graph.edge(e) = {w, 0};
             break;
           }
@@ -613,7 +629,7 @@ namespace mln
       active.push(graph.SOURCE);
       active.push(graph.SINK);
       graph.vertex(graph.SOURCE).active = true;
-      graph.vertex(graph.SINK).active = true;
+      graph.vertex(graph.SINK).active   = true;
 
       auto getedge = [&graph](const point2d& p, const point2d& q) -> W& {
         return (p < q) ? graph.edge(p, q).first : graph.edge(p, q).second;
@@ -625,13 +641,13 @@ namespace mln
         return (r == graph.SOURCE) ? getedge(p, q) : getedge(q, p);
       };
 
-      double maxflow = 0;
+      double               maxflow = 0;
       std::vector<point2d> orphans;
 
       point2d oldp, p, zp, q, zq;
       oldp = graph.SOURCE;
-      p = graph.SOURCE;
-      zp = graph.SOURCE;
+      p    = graph.SOURCE;
+      zp   = graph.SOURCE;
       mln_iter(qit, graph.adjacent_vertices(p));
       qit.init();
       while (true)
@@ -643,7 +659,7 @@ namespace mln
           if (active.front() != p)
           {
             // std::cout << "oldp: " << p << std::endl;
-            p = active.front();
+            p  = active.front();
             zp = graph.vertex(p).zpar;
             // std::cout << "Get " << p << "from active list. (zpar=" << zp << ")" << std::endl;
             qit.init();
@@ -668,7 +684,7 @@ namespace mln
               zq = graph.vertex(q).zpar;
               if (zq == q and zq != graph.SOURCE and zq != graph.SINK) // q is a free node, add it as an an active node
               {
-                bool inqueue = graph.vertex(q).active;
+                bool inqueue    = graph.vertex(q).active;
                 graph.vertex(q) = {p, zp, true};
                 if (!inqueue)
                   active.push(q);
@@ -706,8 +722,8 @@ namespace mln
             {
               // std::cout << x << "-->" << y << std::endl;
               delta = std::min(delta, tree_cap(y, x));
-              x = y;
-              y = graph.vertex(x).par;
+              x     = y;
+              y     = graph.vertex(x).par;
             }
           }
           delta = std::min(delta, tree_cap(p, q));
@@ -766,19 +782,19 @@ namespace mln
 
           for (unsigned i = 0; i < orphans.size(); ++i)
           {
-            p = orphans[i];
+            p         = orphans[i];
             node_t& x = graph.vertex(p);
             // std::cout << " -- Proc orphan " << p << "(par=" << x.par << ",zpar=" << x.zpar << ")" << std::endl;
             bool adopted = false;
             mln_forall (qit)
             {
-              const point2d& q = *qit;
-              bool orphan = internal::is_orphan(graph, q);
-              node_t& y = graph.vertex(q);
+              const point2d& q      = *qit;
+              bool           orphan = internal::is_orphan(graph, q);
+              node_t&        y      = graph.vertex(q);
               if (!orphan and x.zpar == y.zpar and cmp(tree_cap(q, p), 0) > 0)
               {
                 // std::cout << "    adopted by" << q << "(par=" << y.par << ",zpar=" << y.zpar << ")" << std::endl;
-                x.par = q; // y adopt x
+                x.par   = q; // y adopt x
                 adopted = true;
                 break;
               }
@@ -788,7 +804,7 @@ namespace mln
               mln_forall (qit)
               {
                 const point2d& q = *qit;
-                node_t& y = graph.vertex(q);
+                node_t&        y = graph.vertex(q);
                 if (x.zpar == y.zpar)
                 {
                   if (cmp(tree_cap(q, p), 0) > 0)
@@ -809,8 +825,8 @@ namespace mln
               }
 
               // p becomes a free node
-              x.par = p;
-              x.zpar = p;
+              x.par    = p;
+              x.zpar   = p;
               x.active = false;
             }
           }

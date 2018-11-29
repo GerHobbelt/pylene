@@ -27,11 +27,12 @@ namespace mln
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<std::size_t>, std::vector<std::size_t>>
-    maxtree_ufindbyrank(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
+        maxtree_ufindbyrank(const image2d<V>& ima, const Neighborhood& nbh,
+                            StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       image2d<std::size_t> parent, zpar, root;
-      image2d<unsigned> rank;
-      image2d<bool> deja_vu;
+      image2d<unsigned>    rank;
+      image2d<bool>        deja_vu;
       resize(parent, ima);
       resize(zpar, ima);
       resize(root, ima);
@@ -40,8 +41,8 @@ namespace mln
 
       extension::fill(deja_vu, false);
 
-      std::vector<std::size_t> S = sort_indexes(ima, cmp);
-      auto offsets = wrt_delta_index(ima, nbh.dpoints);
+      std::vector<std::size_t> S       = sort_indexes(ima, cmp);
+      auto                     offsets = wrt_delta_index(ima, nbh.dpoints);
 
       for (int i = S.size() - 1; i >= 0; --i)
       {
@@ -49,9 +50,9 @@ namespace mln
         // std::cout << "Processing:" << p << " @ " << (int) ima[p] << std::endl;
         // make set
         {
-          parent[p] = p;
-          zpar[p] = p;
-          root[p] = p;
+          parent[p]  = p;
+          zpar[p]    = p;
+          root[p]    = p;
           deja_vu[p] = true;
         }
 
@@ -70,7 +71,7 @@ namespace mln
               { // we merge p to r
                 zpar[x] = r;
                 root[r] = p;
-                x = r;
+                x       = r;
               }
               else if (rank[r] < rank[p])
               { // merge r to p

@@ -1,9 +1,9 @@
 #ifndef MLN_CORE_SE_DISC_HPP
-# define MLN_CORE_SE_DISC_HPP
+#define MLN_CORE_SE_DISC_HPP
 
-# include <mln/core/neighborhood/neighborhood_base.hpp>
-# include <mln/core/se/periodic_line2d.hpp>
-# include <vector>
+#include <mln/core/neighborhood/neighborhood_base.hpp>
+#include <mln/core/se/periodic_line2d.hpp>
+#include <vector>
 
 /// \file
 
@@ -24,10 +24,10 @@ namespace mln
       : dyn_neighborhood_base<dynamic_neighborhood_tag, disc>
 #endif
     {
-      using is_incremental = std::true_type;
+      using is_incremental  = std::true_type;
       using is_decomposable = std::true_type;
-      using dec_type = dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag>;
-      using inc_type = dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag>;
+      using dec_type        = dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag>;
+      using inc_type        = dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag>;
 
 
       /// Constructor
@@ -52,7 +52,7 @@ namespace mln
       dec_type dec() const;
 
       /// \brief Return the radius of the disc.
-      float   radius() const { return m_radius; }
+      float radius() const { return m_radius; }
 
       // protected to allow testing
       static std::array<int, 3> _compute_decomposition_coeff(int radius, int nlines);
@@ -67,25 +67,19 @@ namespace mln
     /****          Implementation          ****/
     /******************************************/
 
-    inline
-    disc::disc(float radius, int approximation)
-      : m_radius(radius),
-        m_nlines(approximation)
+    inline disc::disc(float radius, int approximation)
+      : m_radius(radius)
+      , m_nlines(approximation)
     {
       assert(m_radius >= 0);
       assert(m_nlines == 0 || m_nlines == 2 || m_nlines == 4 || m_nlines == 8);
     }
 
-    inline
-    bool disc::decomposable() const
-    {
-      return m_nlines > 0;
-    }
+    inline bool disc::decomposable() const { return m_nlines > 0; }
 
-    inline
-    std::array<int, 3> disc::_compute_decomposition_coeff(int radius, int nlines)
+    inline std::array<int, 3> disc::_compute_decomposition_coeff(int radius, int nlines)
     {
-      (void) nlines;
+      (void)nlines;
       // We decompose a disc of radius r
       // D = k₁ * Lθ₁ + k₂ * Lθ₂ + ... + kₙ * Lθₙ
       // with k₁ = k₂ = kₙ
@@ -110,7 +104,7 @@ namespace mln
         const float a2 = 0.092868889904065763f;
         const float b2 = 0.03471904979442568f;
 
-        k0 = (radius < 11) ? (1 + (radius+1) % 2) : static_cast<int>(std::round(a0 * radius + b0));
+        k0 = (radius < 11) ? (1 + (radius + 1) % 2) : static_cast<int>(std::round(a0 * radius + b0));
         k2 = (radius < 7) ? 0 : static_cast<int>(std::round(a2 * radius + b2));
 
         // Compute the missing value k1
@@ -128,8 +122,7 @@ namespace mln
       return {{k0, k1, k2}};
     }
 
-    inline
-    std::vector<periodic_line2d> disc::decompose() const
+    inline std::vector<periodic_line2d> disc::decompose() const
     {
       mln_precondition(m_nlines > 0);
 
@@ -139,7 +132,7 @@ namespace mln
       std::array<int, 3> k = _compute_decomposition_coeff(static_cast<int>(m_radius), m_nlines);
 
 
-      const point2d se[] = {{0,1}, {1,0}, {1, 1}, {1, -1}, {1, 2}, {2, 1}, {2, -1}, {1, -2}};
+      const point2d se[] = {{0, 1}, {1, 0}, {1, 1}, {1, -1}, {1, 2}, {2, 1}, {2, -1}, {1, -2}};
       lines.push_back(periodic_line2d(se[0], k[0]));
       lines.push_back(periodic_line2d(se[1], k[0]));
 
@@ -160,13 +153,12 @@ namespace mln
       return lines;
     }
 
-    inline
-    std::vector<point2d> disc::offsets() const
+    inline std::vector<point2d> disc::offsets() const
     {
       typedef point2d::value_type P;
 
-      int r = static_cast<int>(m_radius);
-      int extent = 2 * r + 1;
+      int   r          = static_cast<int>(m_radius);
+      int   extent     = 2 * r + 1;
       float radius_sqr = m_radius * m_radius;
 
       std::vector<point2d> dpoints;
@@ -174,7 +166,7 @@ namespace mln
 
       for (int i = -r; i <= r; ++i)
         for (int j = -r; j <= r; ++j)
-          if (i*i + j*j <= radius_sqr)
+          if (i * i + j * j <= radius_sqr)
           {
             point2d p = {(P)i, (P)j};
             dpoints.push_back(p);
@@ -182,20 +174,19 @@ namespace mln
       return dpoints;
     }
 
-    inline
-    disc::dec_type disc::dec() const
+    inline disc::dec_type disc::dec() const
     {
       typedef point2d::value_type P;
-      const int r = static_cast<int>(m_radius);
-      const int extent = 2 * r + 1;
-      const float radius_sqr = m_radius * m_radius;
+      const int                   r          = static_cast<int>(m_radius);
+      const int                   extent     = 2 * r + 1;
+      const float                 radius_sqr = m_radius * m_radius;
 
       std::vector<point2d> vdec;
       vdec.reserve(extent);
       for (int y = -r; y <= r; ++y)
       {
         for (int x = -r; x <= 0; ++x)
-          if (y*y + x*x <= radius_sqr)
+          if (y * y + x * x <= radius_sqr)
           {
             point2d p = {(P)y, (P)(x - 1)}; // before begin of the line
             vdec.push_back(p);
@@ -205,20 +196,19 @@ namespace mln
       return dec_type(std::move(vdec));
     }
 
-    inline
-    disc::inc_type disc::inc() const
+    inline disc::inc_type disc::inc() const
     {
       typedef point2d::value_type P;
-      const int r = static_cast<int>(m_radius);
-      const int extent = 2 * r + 1;
-      const float radius_sqr = m_radius * m_radius;
+      const int                   r          = static_cast<int>(m_radius);
+      const int                   extent     = 2 * r + 1;
+      const float                 radius_sqr = m_radius * m_radius;
 
       std::vector<point2d> vinc;
       vinc.reserve(extent);
       for (int y = -r; y <= r; ++y)
       {
         for (int x = r; x >= 0; --x)
-          if (y*y + x*x <= radius_sqr)
+          if (y * y + x * x <= radius_sqr)
           {
             point2d p = {(P)y, (P)x}; // last point of the line
             vinc.push_back(p);
@@ -279,4 +269,4 @@ namespace mln
   } // end of namespace mln::se
 } // end of namespace mln
 
-#endif //!MLN_CORE_SE_DISC_HPP
+#endif //! MLN_CORE_SE_DISC_HPP

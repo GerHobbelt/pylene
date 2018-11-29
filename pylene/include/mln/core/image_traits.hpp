@@ -98,13 +98,13 @@ namespace mln
 
   template <typename Image>
   struct image_has_extension
-      : std::is_convertible<typename image_traits<Image>::extension, mln::extension::custom_extension_tag>
+    : std::is_convertible<typename image_traits<Image>::extension, mln::extension::custom_extension_tag>
   {
   };
 
   template <typename Image>
   struct image_has_border
-      : std::is_convertible<typename image_traits<Image>::extension, mln::extension::border_extension_tag>
+    : std::is_convertible<typename image_traits<Image>::extension, mln::extension::border_extension_tag>
   {
   };
 

@@ -1,5 +1,5 @@
-#include <mln/core/se/rect2d.hpp>
 #include <gtest/gtest.h>
+#include <mln/core/se/rect2d.hpp>
 
 TEST(Core, Rect2d)
 {

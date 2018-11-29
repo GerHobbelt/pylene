@@ -12,7 +12,10 @@ namespace mln
     class MLNIOException : public std::runtime_error
     {
     public:
-      MLNIOException(const std::string& what_arg) : std::runtime_error(what_arg) {}
+      MLNIOException(const std::string& what_arg)
+        : std::runtime_error(what_arg)
+      {
+      }
     };
   }
 }

@@ -23,16 +23,21 @@ namespace mln
                                          typename Iterator_::reference>
   {
     typedef typename Iterator_::value_type value_type;
-    typedef typename Iterator_::reference reference;
+    typedef typename Iterator_::reference  reference;
 
     filter_iterator() {}
 
-    filter_iterator(const Iterator_& iterator, const Predicate& pred) : m_it(iterator), m_pred(pred) {}
+    filter_iterator(const Iterator_& iterator, const Predicate& pred)
+      : m_it(iterator)
+      , m_pred(pred)
+    {
+    }
 
     template <typename Other>
     filter_iterator(const filter_iterator<Other, Predicate>& other,
                     typename std::enable_if<std::is_convertible<Other, Iterator_>::value>::type* = NULL)
-        : m_it(other.m_it), m_pred(other.m_pred)
+      : m_it(other.m_it)
+      , m_pred(other.m_pred)
     {
     }
 

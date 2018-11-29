@@ -54,12 +54,12 @@ namespace mln
                              const image2d<unsigned>& parent, const image2d<unsigned>& depth)
     {
       std::vector<unsigned> v;
-      unsigned minp = K[x] == K[parent[x]] ? parent[x] : x;
-      unsigned mindepth = depth[minp];
+      unsigned              minp     = K[x] == K[parent[x]] ? parent[x] : x;
+      unsigned              mindepth = depth[minp];
       v.push_back(minp);
 
       const N& nbh = exact(nbh_);
-      point2d p = K.point_at_index(x);
+      point2d  p   = K.point_at_index(x);
       mln_foreach (const point2d& n, nbh(p))
       {
         if (K.domain().has(n))
@@ -77,7 +77,7 @@ namespace mln
           if (depth[rq] < mindepth)
           {
             mindepth = depth[rq];
-            minp = rq;
+            minp     = rq;
           }
         }
       }
@@ -89,14 +89,14 @@ namespace mln
         for (unsigned& x : v)
           if (depth[x] > mindepth)
           {
-            x = parent[x];
+            x     = parent[x];
             modif = true;
           }
           else if (depth[x] == mindepth and x != minp)
           {
             x = parent[x];
             mindepth--;
-            minp = x;
+            minp  = x;
             modif = true;
           }
       } while (modif);
@@ -154,7 +154,7 @@ namespace mln
     mln_forall (px)
     {
       unsigned i = px->index();
-      px->val() = (K[i] == K[parent[i]]) ? parent[i] : i;
+      px->val()  = (K[i] == K[parent[i]]) ? parent[i] : i;
     }
 
     // Nbh
@@ -167,8 +167,8 @@ namespace mln
       if (not K1::is_face_2(K.point_at_index(x)))
         continue;
 
-      unsigned anc = internal::common_ancestor(x, win, K, parent, depth);
-      enc[x] = internal::common_ancestor(enc[x], anc, parent, depth);
+      unsigned anc   = internal::common_ancestor(x, win, K, parent, depth);
+      enc[x]         = internal::common_ancestor(enc[x], anc, parent, depth);
       enc[parent[x]] = internal::common_ancestor(enc[parent[x]], enc[x], parent, depth);
     }
 
@@ -235,7 +235,7 @@ namespace mln
         while (p != anc and areas[p] * areafactor < areas[x])
         {
           active[p] = false;
-          p = parent[p];
+          p         = parent[p];
         }
       }
     }
@@ -287,7 +287,7 @@ namespace mln
 
       unsigned y = parent[x];
       unsigned z = alive[y]; // last ancestor alive
-      alive[x] = pred(x, z) ? x : z;
+      alive[x]   = pred(x, z) ? x : z;
     }
 
     // Simplify
@@ -326,12 +326,12 @@ namespace mln
   {
     // Smallest enclosing shape
     image2d<unsigned> depth = compute_depth(K, parent, S);
-    image2d<unsigned> enc = smallest_enclosing_shape(K, parent, S, eps, &depth);
+    image2d<unsigned> enc   = smallest_enclosing_shape(K, parent, S, eps, &depth);
 
     // Attribute
     struct attr_t
     {
-      std::set<point2d> ext;
+      std::set<point2d>     ext;
       std::vector<unsigned> inter;
 
       std::ostream& pprint(std::ostream& os)
@@ -345,7 +345,7 @@ namespace mln
 
     // Set a fake root
     unsigned ROOT = (unsigned)-1;
-    parent[S[0]] = ROOT;
+    parent[S[0]]  = ROOT;
 
     image2d<attr_t> attr;
     resize(attr, K);
@@ -361,7 +361,7 @@ namespace mln
       mln_foreach (const point2d& p, p_)
       {
         unsigned pnode = parent.index_of_point(p);
-        pnode = realnode(pnode);
+        pnode          = realnode(pnode);
 
         mln_foreach (const point2d& n, n_)
         {
@@ -383,8 +383,8 @@ namespace mln
           // n ∈ Ext(S, ε) with S ∈ [Sp  → Sq[
           // n ∈ S' with S' ∈ [Sq  → root [ (but ENCLOSING(S) is enough)
           // ∀ (S,S') n ∈ Ext(S, ε) ⋂ S' ≠ ∅
-          unsigned x = pnode;
-          bool inserted = false;
+          unsigned x        = pnode;
+          bool     inserted = false;
           while (x != qnode and !inserted)
           {
             std::tie(std::ignore, inserted) = attr[x].ext.insert(n);
@@ -471,7 +471,7 @@ namespace mln
     int nactive = 0;
     int nbefore = 0;
 
-    point2d p = K.point_at_index(S[0]);
+    point2d p  = K.point_at_index(S[0]);
     out(p / 2) = f(p / 2);
     for (unsigned x : S)
     {
@@ -512,7 +512,7 @@ namespace mln
     resize(active, K).init(false);
 
     image2d<unsigned> enc = smallest_enclosing_shape(K, parent, S, eps);
-    active[S[0]] = true;
+    active[S[0]]          = true;
     // std::cout << "Activate: " << S[0] << std::endl;
     unsigned root_connection = 0;
     for (unsigned i = 1; i < S.size(); ++i)
@@ -551,7 +551,7 @@ namespace mln
     resize(out, f);
     int nactive = 0;
 
-    point2d p = K.point_at_index(S[0]);
+    point2d p  = K.point_at_index(S[0]);
     out(p / 2) = f(p / 2);
     for (unsigned x : S)
     {

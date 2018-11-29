@@ -84,7 +84,7 @@ mln::image2d<float> saliencymap(const mln::image2d<V>& attr, const mln::image2d<
       float sal = attr[y];
       while (parent[y] != z)
       {
-        y = parent[y];
+        y   = parent[y];
         sal = std::max(attr[y], sal);
       }
       out[q] = std::max(out[q], sal / amax);

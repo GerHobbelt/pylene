@@ -107,9 +107,9 @@ namespace mln
 
   void QDispatcher::doFiltering(std::pair<qt::ImageViewer*, image2d<rgb8>>& obj)
   {
-    qt::ImageViewer* win = obj.first;
-    image2d<rgb8>& view = obj.first->getView();
-    image2d<rgb8>& mean = obj.second;
+    qt::ImageViewer* win  = obj.first;
+    image2d<rgb8>&   view = obj.first->getView();
+    image2d<rgb8>&   mean = obj.second;
     win->reset();
 
     for (unsigned x : m_S)

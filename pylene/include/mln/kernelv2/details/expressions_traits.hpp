@@ -26,7 +26,7 @@ namespace mln
     namespace details
     {
       namespace proto = boost::proto;
-      namespace mpl = boost::mpl;
+      namespace mpl   = boost::mpl;
 
       /// \brief Get expression traits
       /// It defines:
@@ -84,12 +84,12 @@ namespace mln
       template <class Expr, int i>
       struct image_usage_traits<Expr, i, tag::image_call_p<i>>
       {
-        typedef typename proto::result_of::value<Expr>::type type_;
+        typedef typename proto::result_of::value<Expr>::type       type_;
         typedef typename std::remove_reference<type_>::type::type& type;
 
         // typedef typename std::add_lvalue_reference<typename std::remove_reference<type_>::type::type>::type type;
         //        typedef typename std::remove_reference<type_>::type::type & type;
-        typedef mpl::true_ point;
+        typedef mpl::true_  point;
         typedef mpl::false_ neighbor;
       };
 
@@ -102,13 +102,13 @@ namespace mln
       template <class Expr, int i>
       struct image_usage_traits<Expr, i, tag::image_call_n<i>>
       {
-        typedef typename proto::result_of::value<Expr>::type type_;
+        typedef typename proto::result_of::value<Expr>::type       type_;
         typedef typename std::remove_reference<type_>::type::type& type;
 
         // typedef typename std::add_lvalue_reference<typename std::remove_reference<type_>::type::type>::type type;
 
         typedef mpl::false_ point;
-        typedef mpl::true_ neighbor;
+        typedef mpl::true_  neighbor;
       };
 
       template <class Expr>
@@ -120,7 +120,7 @@ namespace mln
       template <class Expr, int i>
       struct image_usage_traits<Expr, i, proto::tag::terminal>
       {
-        typedef mpl::void_ type;
+        typedef mpl::void_  type;
         typedef mpl::false_ point;
         typedef mpl::false_ neighbor;
       };
@@ -128,7 +128,7 @@ namespace mln
       template <class Expr, int i, int k>
       struct image_usage_traits<Expr, i, tag::image_call_n<k>>
       {
-        typedef mpl::void_ type;
+        typedef mpl::void_  type;
         typedef mpl::false_ point;
         typedef mpl::false_ neighbor;
       };
@@ -136,7 +136,7 @@ namespace mln
       template <class Expr, int i, int k>
       struct image_usage_traits<Expr, i, tag::image_call_p<k>>
       {
-        typedef mpl::void_ type;
+        typedef mpl::void_  type;
         typedef mpl::false_ point;
         typedef mpl::false_ neighbor;
       };
@@ -154,13 +154,13 @@ namespace mln
 
       template <class Expr, int... k>
       struct expression_traits_base_<Expr, intseq<k...>>
-          : expression_traits_base<Expr, expression_traits<typename proto::result_of::child_c<Expr, k>::type>...>
+        : expression_traits_base<Expr, expression_traits<typename proto::result_of::child_c<Expr, k>::type>...>
       {
       };
 
       template <class Expr, class Tag>
       struct expression_traits
-          : expression_traits_base_<Expr, typename int_list_seq<proto::arity_of<Expr>::value>::type>
+        : expression_traits_base_<Expr, typename int_list_seq<proto::arity_of<Expr>::value>::type>
       {
       };
 
@@ -183,13 +183,13 @@ namespace mln
 
       template <class Expr, int i, int... k>
       struct image_usage_traits_base_<Expr, i, intseq<k...>>
-          : image_usage_traits_base<Expr, image_usage_traits<typename proto::result_of::child_c<Expr, k>::type, i>...>
+        : image_usage_traits_base<Expr, image_usage_traits<typename proto::result_of::child_c<Expr, k>::type, i>...>
       {
       };
 
       template <class Expr, int i, class Tag>
       struct image_usage_traits
-          : image_usage_traits_base_<Expr, i, typename int_list_seq<proto::arity_of<Expr>::value>::type>
+        : image_usage_traits_base_<Expr, i, typename int_list_seq<proto::arity_of<Expr>::value>::type>
       {
       };
 
@@ -202,7 +202,7 @@ namespace mln
       struct image_list_traits_base<Expr, intseq<k...>>
       {
         typedef std::tuple<typename image_usage_traits<Expr, k>::type...> type;
-        typedef zip_image<typename image_usage_traits<Expr, k>::type...> zip_image_type;
+        typedef zip_image<typename image_usage_traits<Expr, k>::type...>  zip_image_type;
       };
 
       template <class Expr>
@@ -236,18 +236,18 @@ namespace mln
 
       template <int k>
       struct image_getter
-          : proto::or_<
-                proto::when<proto::basic_expr<tag::image_call_p<k>, proto::term<proto::_>>, proto::_value>,
-                proto::when<proto::basic_expr<tag::image_call_n<k>, proto::term<proto::_>>, proto::_value>,
-                proto::when<proto::basic_expr<proto::_, proto::term<proto::_>>, mpl::void_()>,
-                proto::when<
-                    proto::if_<mpl::and_<mpl::greater<proto::arity_of<proto::_>, mpl::int_<0>>,
-                                         mpl::not_<boost::is_same<image_getter<k>(proto::_child0), mpl::void_>>>()>,
-                    image_getter<k>(proto::_child0)>,
-                proto::when<
-                    proto::if_<mpl::and_<mpl::greater<proto::arity_of<proto::_>, mpl::int_<1>>,
-                                         mpl::not_<boost::is_same<image_getter<k>(proto::_child1), mpl::void_>>>()>,
-                    image_getter<k>(proto::_child1)>>
+        : proto::or_<
+              proto::when<proto::basic_expr<tag::image_call_p<k>, proto::term<proto::_>>, proto::_value>,
+              proto::when<proto::basic_expr<tag::image_call_n<k>, proto::term<proto::_>>, proto::_value>,
+              proto::when<proto::basic_expr<proto::_, proto::term<proto::_>>, mpl::void_()>,
+              proto::when<
+                  proto::if_<mpl::and_<mpl::greater<proto::arity_of<proto::_>, mpl::int_<0>>,
+                                       mpl::not_<boost::is_same<image_getter<k>(proto::_child0), mpl::void_>>>()>,
+                  image_getter<k>(proto::_child0)>,
+              proto::when<
+                  proto::if_<mpl::and_<mpl::greater<proto::arity_of<proto::_>, mpl::int_<1>>,
+                                       mpl::not_<boost::is_same<image_getter<k>(proto::_child1), mpl::void_>>>()>,
+                  image_getter<k>(proto::_child1)>>
       {
       };
 
@@ -257,7 +257,7 @@ namespace mln
         template <class Expr>
         typename std::enable_if<image_usage_traits<Expr, k>::neighbor::value,
                                 typename image_usage_traits<Expr, k>::type>::type
-        operator()(Expr&& x) const
+            operator()(Expr&& x) const
         {
           return (image_getter<k>()(std::forward<Expr>(x))).get();
         }
@@ -265,7 +265,7 @@ namespace mln
         template <class Expr>
         typename std::enable_if<not image_usage_traits<Expr, k>::neighbor::value,
                                 null_image_t<typename image_usage_traits<Expr, 0>::type>>::type
-        operator()(Expr&& x) const
+            operator()(Expr&& x) const
         {
           typedef null_image_t<typename image_usage_traits<Expr, 0>::type> R;
           return R((image_getter<0>()(std::forward<Expr>(x))).get().domain(), dontcare);
@@ -320,7 +320,7 @@ namespace mln
 
       template <class Expr, int... k>
       typename image_used_by_neighbor_list_traits<Expr>::zip_image_type
-      get_image_used_by_neighbor_list_helper2(Expr&& x, intseq<k...>)
+          get_image_used_by_neighbor_list_helper2(Expr&& x, intseq<k...>)
       {
         return imzip(image_used_by_neighbor_getter<k>()(std::forward<Expr>(x))...);
       }

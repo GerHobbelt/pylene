@@ -12,7 +12,7 @@ TEST(Core, Algorithm_Sort_indexes_fast)
   iota(ima, 0);
 
   typedef typename image2d<uint8>::size_type size_type;
-  std::vector<size_type> offset = sort_indexes(ima);
+  std::vector<size_type>                     offset = sort_indexes(ima);
   for (auto x : offset)
     std::cout << x << std::endl;
 }

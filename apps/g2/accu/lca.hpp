@@ -18,14 +18,16 @@ namespace mln
     {
     private:
       typedef morpho::component_tree<P, Amap> tree_t;
-      typedef property_map<tree_t, unsigned> amap_t;
+      typedef property_map<tree_t, unsigned>  amap_t;
 
     public:
-      typedef P argument_type;
+      typedef P                          argument_type;
       typedef typename tree_t::node_type result_type;
 
       least_common_ancestor(const tree_t& tree, const amap_t& depth)
-          : m_tree(tree), m_depth(depth), m_current(m_tree.nend())
+        : m_tree(tree)
+        , m_depth(depth)
+        , m_current(m_tree.nend())
       {
       }
 
@@ -34,7 +36,7 @@ namespace mln
       void take(const argument_type& x)
       {
         result_type xnode = m_tree.get_node_at(x);
-        m_current = lca(m_tree, m_depth, m_current, xnode);
+        m_current         = lca(m_tree, m_depth, m_current, xnode);
       }
 
       void take(const least_common_ancestor& other) { m_current = lca(m_tree, m_depth, m_current, other.m_current); }

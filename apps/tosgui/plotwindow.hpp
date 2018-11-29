@@ -62,17 +62,17 @@ protected:
 
 private:
   QVBoxLayout* m_layout;
-  QGroupBox* m_attribute_panel;
-  QComboBox* m_attribute_selector;
+  QGroupBox*   m_attribute_panel;
+  QComboBox*   m_attribute_selector;
   QFormLayout* m_options_panel;
   QPushButton* m_options_btncpt;
-  QCheckBox* m_attribute_runnew;
+  QCheckBox*   m_attribute_runnew;
 
-  QMenu* m_display_menu;
+  QMenu*   m_display_menu;
   QAction* m_action_rm_plot;
 
   mln::point2d m_current_selected_point;
-  bool m_has_selected_point;
+  bool         m_has_selected_point;
 
 private:
   std::vector<Attribute*> m_attributes;

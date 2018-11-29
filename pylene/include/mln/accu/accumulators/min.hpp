@@ -43,7 +43,10 @@ namespace mln
       template <typename Compare>
       struct min : simple_feature<min<Compare>>
       {
-        min(const Compare& cmp) : m_cmp(cmp) {}
+        min(const Compare& cmp)
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         struct apply
@@ -93,7 +96,11 @@ namespace mln
         typedef T return_type;
         // typedef features::min<> feature;
 
-        min(const Compare& cmp = Compare()) : m_val(value_traits<T, Compare>::max()), m_cmp(cmp) {}
+        min(const Compare& cmp = Compare())
+          : m_val(value_traits<T, Compare>::max())
+          , m_cmp(cmp)
+        {
+        }
 
         void init() { m_val = value_traits<T, Compare>::max(); }
 
@@ -114,7 +121,7 @@ namespace mln
         friend T extract(const min& accu, features::min<>) { return accu.m_val; }
 
       private:
-        T m_val;
+        T       m_val;
         Compare m_cmp;
       };
     }

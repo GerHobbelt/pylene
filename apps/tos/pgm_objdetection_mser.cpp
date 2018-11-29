@@ -61,11 +61,11 @@ int main(int argc, char** argv)
   if (argc < 5)
     usage(argv);
 
-  const char* infname = argv[1];
+  const char* infname  = argv[1];
   const char* outfname = argv[2];
   // float beta = std::atof(argv[3]);
   // float gamma = std::atof(argv[4]);
-  int eps = std::atof(argv[3]);
+  int eps   = std::atof(argv[3]);
   int grain = std::atoi(argv[4]);
 
   using namespace mln;
@@ -73,13 +73,13 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima);
 
   typedef UInt<9> V;
-  image2d<uint8> bima = addborder(ima);
-  image2d<V> ima_ = transform(bima, [](uint8 x) -> V { return x * 2; });
-  image2d<uint8> f = interpolate_k1(bima);
+  image2d<uint8>  bima = addborder(ima);
+  image2d<V>      ima_ = transform(bima, [](uint8 x) -> V { return x * 2; });
+  image2d<uint8>  f    = interpolate_k1(bima);
 
-  image2d<V> K;
+  image2d<V>            K;
   std::vector<unsigned> S;
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
 
   std::tie(K, parent, S) = morpho::ToS(ima_, c4);
 
@@ -96,17 +96,17 @@ int main(int argc, char** argv)
   // Retrieve the extinction values for each node.
   // Non minima nodes are set to 0
   auto extmap = extinction(energy, K, parent, S);
-  auto sal = saliencymap(extmap, K, parent, S);
+  auto sal    = saliencymap(extmap, K, parent, S);
 
   io::imsave(sal, (boost::format("%s-saliency.tiff") % argv[2]).str().c_str());
 
-  auto realnodes = get_real_nodes(K, parent, S);
+  auto          realnodes = get_real_nodes(K, parent, S);
   image2d<bool> mask;
   resize(mask, K).init(false);
   for (unsigned x : realnodes)
     mask[x] = true;
 
-  std::pair<float, float> en_minmax = accumulate(energy | mask, accu::features::minmax<>());
+  std::pair<float, float> en_minmax  = accumulate(energy | mask, accu::features::minmax<>());
   std::pair<float, float> ext_minmax = accumulate(extmap | mask, accu::features::minmax<>());
 
   std::cout << "Some statistics:" << std::endl
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
   {
     float lambda = std::atof(argv[i]);
 
-    auto cK = clone(K);
+    auto cK      = clone(K);
     auto cParent = clone(parent);
 
     // Filter out the minima that are not enough meaningfull
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 
     // Subsample
     {
-      box2d d = out.domain();
+      box2d  d = out.domain();
       sbox2d sub_domain{d.pmin + 2, d.pmax - 2, {2, 2}};
       copy(out | sub_domain, final);
     }

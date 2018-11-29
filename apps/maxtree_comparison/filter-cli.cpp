@@ -3,8 +3,7 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 
   if (argc < 6)
@@ -22,7 +21,7 @@ main(int argc, char** argv)
   using namespace mln;
   typedef uint8 V;
 
-  image2d<V> f(0);
+  image2d<V>        f(0);
   image2d<unsigned> par(0);
   image2d<unsigned> S(0);
 
@@ -34,7 +33,7 @@ main(int argc, char** argv)
   resize(area, f).init(0);
 
   // Accumulate
-  mln_reverse_foreach(unsigned i, S.values())
+  mln_reverse_foreach (unsigned i, S.values())
   {
     area[i]++;
     area[par[i]] += area[i];

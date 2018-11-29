@@ -62,7 +62,7 @@ namespace mln
     auto equiv = [](const T& x, const T& y) { return !(x < y) and !(y < x); };
     for (unsigned i : S)
     {
-      point2d p = K.point_at_index(i);
+      point2d p  = K.point_at_index(i);
       point2d pp = p / 2;
       if (equiv(K[parent[i]], K[i]))
         area[i] = area[parent[i]];
@@ -75,7 +75,7 @@ namespace mln
 
     // 3: retrieve 2-faces
     image2d<V> output;
-    box2d d = out.domain();
+    box2d      d = out.domain();
     resize(output, ima);
     copy(out | sbox2d(d.pmin, d.pmax, point2d{2, 2}), output);
 
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
   usage(argc, argv);
 
   bool lsh = false;
-  int pos = 1;
+  int  pos = 1;
   if (argv[1] == std::string("--lsh"))
   {
     lsh = true;
@@ -116,8 +116,8 @@ int main(int argc, char** argv)
   image2d<rgb8> ima = addborder(ima_, [](const rgb8& x, const rgb8& y) { return x.as_vec() < y.as_vec(); });
 
   typedef vec<UInt<9>, 3> V; // vec are comparable by default with a lexocgraphical order
-  typedef image2d<V> I;
-  I f;
+  typedef image2d<V>      I;
+  I                       f;
   if (not lsh)
   {
     f = transform(ima, [](rgb8 v) -> V {
@@ -135,16 +135,16 @@ int main(int argc, char** argv)
     }); // Note we on need the third dim to x2
   }
 
-  image2d<V> K;
-  image2d<unsigned> parent;
+  image2d<V>            K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   std::tie(K, parent, S) = morpho::ToS(f, c4);
 
   for (int i = pos + 2; i < argc; ++i)
   {
-    unsigned lambda = std::atoi(argv[i]);
-    image2d<V> out = grainfilter(f, K, parent, S, lambda);
+    unsigned   lambda = std::atoi(argv[i]);
+    image2d<V> out    = grainfilter(f, K, parent, S, lambda);
 
     image2d<rgb8> res;
     if (not lsh)

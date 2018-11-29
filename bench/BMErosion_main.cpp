@@ -3,6 +3,8 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <benchmark/benchmark.h>
 
 #include "BMErosion.hpp"
@@ -11,7 +13,7 @@ using namespace mln;
 
 struct BMErosion : public benchmark::Fixture
 {
-  const char* filename = MLN_IMG_PATH "/lena.pgm";
+  std::string filename = fixtures::ImagePath::concat_with_filename("lena.pgm");
 
   BMErosion()
   {
@@ -25,7 +27,7 @@ struct BMErosion : public benchmark::Fixture
 
   image2d<uint8> m_input;
   image2d<uint8> m_output;
-  std::size_t m_bytes;
+  std::size_t    m_bytes;
 };
 
 BENCHMARK_F(BMErosion, Erosion_CStyle_Uint8)(benchmark::State& st)

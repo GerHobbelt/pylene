@@ -5,7 +5,9 @@ namespace mln::ranges
 {
 
   // Every class that inherits from this, is a segmented range
-  struct multidimensional_range_base {};
+  struct multidimensional_range_base
+  {
+  };
 
 
   template <class T>

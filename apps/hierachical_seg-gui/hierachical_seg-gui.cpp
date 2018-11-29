@@ -33,7 +33,7 @@ void segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8
   {
     BLANC = 0,
     ROUGE = 1,
-    NOIR = 2
+    NOIR  = 2
   };
 
   auto markers = imtransform(markers__, [](const rgb8& v) -> uint8 {
@@ -49,7 +49,7 @@ void segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8
   mln_foreach (auto px, markers.pixels())
   {
     tree_t::node_type x = tree.get_node_at(px.index());
-    colortag v = (colortag)px.val();
+    colortag          v = (colortag)px.val();
 
     if (K1::is_face_2(px.point()) and v != BLANC)
     {
@@ -69,7 +69,7 @@ void segmentation(const tree_t& tree, const image2d<rgb8>& f, const image2d<rgb8
   }
 
   // Propagate up
-  mln_reverse_foreach(auto x, tree.nodes())
+  mln_reverse_foreach (auto x, tree.nodes())
   {
     if (tags[x] != BLANC)
     {
@@ -129,28 +129,28 @@ int main(int argc, char** argv)
   io::imread(argv[2], ima);
 
   auto sal2 = data::stretch<uint8>(sal);
-  ima = Kadjust_to(ima, sal.domain());
+  ima       = Kadjust_to(ima, sal.domain());
 
   mln_pixter(px1, px2, ima, sal2);
   mln_forall (px1, px2)
     if (px2->val())
       px1->val() = px2->val();
 
-  QMainWindow win;
+  QMainWindow      win;
   qt::ImageViewer* viewer = new qt::ImageViewer(ima);
 
   auto callback = std::bind(segmentation, tree, ima, std::placeholders::_1, std::placeholders::_2);
 
   QGraphicsScene* scene = viewer->getScene();
-  MyBrush brush(viewer, callback);
+  MyBrush         brush(viewer, callback);
   scene->installEventFilter(&brush);
 
   QToolBar* toolbar = new QToolBar(&win);
-  QAction* action1 = toolbar->addAction("Bg");
-  QAction* action2 = toolbar->addAction("Fg");
-  QAction* action3 = toolbar->addAction("Run");
-  QAction* action4 = toolbar->addAction("Revert");
-  QAction* action5 = toolbar->addAction("Reload");
+  QAction*  action1 = toolbar->addAction("Bg");
+  QAction*  action2 = toolbar->addAction("Fg");
+  QAction*  action3 = toolbar->addAction("Run");
+  QAction*  action4 = toolbar->addAction("Revert");
+  QAction*  action5 = toolbar->addAction("Reload");
   QObject::connect(action1, SIGNAL(triggered()), &brush, SLOT(setColor1()));
   QObject::connect(action2, SIGNAL(triggered()), &brush, SLOT(setColor2()));
   QObject::connect(action3, SIGNAL(triggered()), &brush, SLOT(run()));

@@ -16,11 +16,15 @@ namespace mln
       struct accu_if : accumulator_base<accu_if<Accu, Predicate, ArgType>, ArgType, typename Accu::result_type,
                                         typename Accu::feature>
       {
-        typedef ArgType argument_type;
+        typedef ArgType                    argument_type;
         typedef typename Accu::result_type result_type;
-        typedef typename Accu::feature feature;
+        typedef typename Accu::feature     feature;
 
-        accu_if(const Accu& accu = Accu(), const Predicate& pred = Predicate()) : m_accu(accu), m_pred(pred) {}
+        accu_if(const Accu& accu = Accu(), const Predicate& pred = Predicate())
+          : m_accu(accu)
+          , m_pred(pred)
+        {
+        }
 
         void init() { m_accu.init(); }
 
@@ -39,7 +43,7 @@ namespace mln
         }
 
       private:
-        Accu m_accu;
+        Accu      m_accu;
         Predicate m_pred;
       };
     }

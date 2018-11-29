@@ -43,7 +43,7 @@ namespace mln
 
       if (p == q) // p is a node
       {
-        q = parent[p];
+        q           = parent[p];
         mindepth[q] = std::min(mindepth[q], mindepth[p]);
         if (depth[p] <= validdepth[p]) // Then p is a kept
         {
@@ -79,7 +79,7 @@ namespace mln
   image2d<unsigned> thicken_tdn(const image2d<V>& ima, image2d<unsigned>& parent, const std::vector<unsigned>& S,
                                 const Nbh& nbh = c4)
   {
-    image2d<unsigned> depth;
+    image2d<unsigned>         depth;
     static constexpr unsigned UNDEF = value_traits<unsigned>::max();
     resize(depth, ima).init(UNDEF);
 
@@ -120,7 +120,7 @@ namespace mln
           while (outdepth[x] > d)
           {
             outdepth[x] = d;
-            x = parent[x];
+            x           = parent[x];
           }
         }
       }

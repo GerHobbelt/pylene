@@ -29,10 +29,10 @@ int main(int argc, char** argv)
   using namespace mln;
   namespace po = boost::program_options;
 
-  MSERArgParser mseroptions;
+  MSERArgParser            mseroptions;
   MeaningFullNessArgParser meaningfullness_options;
-  po::options_description mserdesc = mseroptions.description();
-  po::options_description meaningfullness_desc = meaningfullness_options.description();
+  po::options_description  mserdesc             = mseroptions.description();
+  po::options_description  meaningfullness_desc = meaningfullness_options.description();
 
   po::options_description hidden;
   hidden.add_options()("method", po::value<std::string>()->required(),
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 
   try
   {
-    po::variables_map vm;
+    po::variables_map       vm;
     po::command_line_parser parser(argc, argv);
     po::store(parser.options(hidden).positional(pd).allow_unregistered().run(), vm);
     vm.notify();
@@ -67,22 +67,22 @@ int main(int argc, char** argv)
     io::imread(ifname.c_str(), ima_);
     ima = addborder(ima_);
 
-    typedef UInt<9> V;
+    typedef UInt<9>    V;
     typedef image2d<V> I;
 
     I f = transform(ima, [](uint8 v) -> V { return v * 2; });
 
-    image2d<V> K;
-    image2d<unsigned> parent;
+    image2d<V>            K;
+    image2d<unsigned>     parent;
     std::vector<unsigned> S;
     std::tie(K, parent, S) = morpho::ToS(f, c4);
 
     // Run the method
-    std::string method = vm["method"].as<std::string>();
+    std::string    method = vm["method"].as<std::string>();
     image2d<float> attr;
     if (method == "mser")
     {
-      po::variables_map vm;
+      po::variables_map       vm;
       po::command_line_parser parser(argc, argv);
       po::store(parser.options(hidden.add(mserdesc)).positional(pd).run(), vm);
       vm.notify();
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     }
     else if (method == "meaningfullness")
     {
-      po::variables_map vm;
+      po::variables_map       vm;
       po::command_line_parser parser(argc, argv);
       po::store(parser.options(hidden.add(meaningfullness_desc)).positional(pd).run(), vm);
       vm.notify();

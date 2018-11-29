@@ -59,11 +59,11 @@ namespace mln
   {
   };
 
-/******************************************************/
-/**                HELPER MACROS                     **/
-/******************************************************/
+  /******************************************************/
+  /**                HELPER MACROS                     **/
+  /******************************************************/
 
-// Consider perfect forwarding here.
+  // Consider perfect forwarding here.
 
 #define MLN_IMMORPHER_FORWARD_IF_0_(COND, F, RETURN, CV)                                                               \
   typename std::enable_if<COND, RETURN>::type F() CV { return morpher_core_access::get_ima(this).F(); }
@@ -103,13 +103,13 @@ namespace mln
     {
     private:
       friend struct mln::morpher_core_access;
-      typedef I image_t;
+      typedef I       image_t;
       typedef Derived derived_t;
 
     public:
       typedef mln_point(I) point_type;
       typedef mln_point(I) site_type;
-      typedef typename image_reference<I>::type reference;
+      typedef typename image_reference<I>::type       reference;
       typedef typename image_const_reference<I>::type const_reference;
 
       MLN_IMMORPHER_FORWARD_1(operator(), reference, const point_type&);
@@ -129,14 +129,14 @@ namespace mln
     {
     private:
       friend struct mln::morpher_core_access;
-      typedef I image_t;
-      typedef Derived derived_t;
+      typedef I                      image_t;
+      typedef Derived                derived_t;
       typedef typename I::point_type point_type;
 
     public:
-      typedef typename I::size_type size_type;
-      typedef typename I::difference_type difference_type;
-      typedef typename image_reference<I>::type reference;
+      typedef typename I::size_type                   size_type;
+      typedef typename I::difference_type             difference_type;
+      typedef typename image_reference<I>::type       reference;
       typedef typename image_const_reference<I>::type const_reference;
 
       MLN_IMMORPHER_FORWARD_1(operator[], reference, size_type);
@@ -155,19 +155,19 @@ namespace mln
   private:
     friend struct mln::morpher_core_access;
     typedef typename std::remove_reference<I>::type image_t;
-    typedef Derived derived_t;
+    typedef Derived                                 derived_t;
 
   public:
-    typedef typename image_t::value_type value_type;
-    typedef typename image_t::reference reference;
+    typedef typename image_t::value_type      value_type;
+    typedef typename image_t::reference       reference;
     typedef typename image_t::const_reference const_reference;
-    typedef typename image_t::site_type site_type;
-    typedef typename image_t::point_type point_type;
+    typedef typename image_t::site_type       site_type;
+    typedef typename image_t::point_type      point_type;
 
-    typedef typename image_t::domain_type domain_type;
-    typedef typename image_value_range<image_t>::type value_range;
+    typedef typename image_t::domain_type                   domain_type;
+    typedef typename image_value_range<image_t>::type       value_range;
     typedef typename image_const_value_range<image_t>::type const_value_range;
-    typedef typename image_pixel_range<image_t>::type pixel_range;
+    typedef typename image_pixel_range<image_t>::type       pixel_range;
     typedef typename image_const_pixel_range<image_t>::type const_pixel_range;
 
     auto domain() const -> decltype(morpher_core_access::get_ima(this).domain())
@@ -181,7 +181,7 @@ namespace mln
     MLN_IMMORPHER_FORWARD_CONST_0(pixels, const_pixel_range);
 
   protected:
-    image_t& get_morphed() { return morpher_core_access::get_ima_(this); }
+    image_t&       get_morphed() { return morpher_core_access::get_ima_(this); }
     const image_t& get_morphed() const { return morpher_core_access::get_ima_(this); }
   };
 

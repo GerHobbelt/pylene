@@ -23,7 +23,7 @@ namespace mln
     mln_entering("mln::transpose");
 
     const I& ima = exact(ima_);
-    J& out = exact(out_);
+    J&       out = exact(out_);
 
     mln_foreach (point2d p, ima.domain())
       out(point2d{p[1], p[0]}) = ima(p);
@@ -53,7 +53,7 @@ namespace mln
   {
     const I& ima = exact(ima_);
 
-    box2d dom = ima.domain();
+    box2d dom  = ima.domain();
     box2d dom2 = {{dom.pmin[1], dom.pmin[0]}, {dom.pmax[1], dom.pmax[0]}};
 
     image2d<mln_value(I)> out = internal::transpose_init_out(ima, dom2, typename image_traits<I>::extension());

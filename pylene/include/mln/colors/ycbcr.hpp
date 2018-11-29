@@ -21,12 +21,12 @@ namespace mln
     template <>
     struct vec_base_traits<ycbcr_tag>
     {
-      static const bool is_additive = true;
-      static const bool is_additive_ext = true;
-      static const bool is_multiplicative = false;
-      static const bool is_multiplicative_ext = true;
+      static const bool is_additive             = true;
+      static const bool is_additive_ext         = true;
+      static const bool is_multiplicative       = false;
+      static const bool is_multiplicative_ext   = true;
       static const bool is_less_than_comparable = true;
-      static const bool is_equality_comparable = true;
+      static const bool is_equality_comparable  = true;
     };
   }
 
@@ -54,7 +54,7 @@ namespace mln
     static constexpr double bias =
         std::is_integral<T>::value ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
 
-    T y = 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2];
+    T y  = 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2];
     T cb = -0.1687 * v[0] - 0.3313 * v[1] + 0.5 * v[2] + bias;
     T cr = 0.5 * v[0] - 0.4187 * v[1] - 0.0813 * v[2] + bias;
 

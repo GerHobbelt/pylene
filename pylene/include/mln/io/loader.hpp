@@ -29,7 +29,7 @@ namespace mln
       void load(const std::string& filename, Image<I>& ima, PluginReader* plugin, bool permissive);
 
     protected:
-      void m_check_value_type_compatible() const;
+      void         m_check_value_type_compatible() const;
       virtual bool is_value_type_convertible(std::type_index x, std::type_index y) const;
       virtual bool is_value_type_convertible_from(std::type_index src_type) const;
 
@@ -37,8 +37,8 @@ namespace mln
       virtual void m_load();
 
       PluginReader* m_plugin;
-      I* m_ima;
-      bool m_permissive;
+      I*            m_ima;
+      bool          m_permissive;
     };
 
     // Generic 2D loader
@@ -67,8 +67,8 @@ namespace mln
     template <class I>
     void Loader<I>::load(std::istream& s, Image<I>& ima, PluginReader* plugin, bool permissive)
     {
-      m_plugin = plugin;
-      m_ima = &(exact(ima));
+      m_plugin     = plugin;
+      m_ima        = &(exact(ima));
       m_permissive = permissive;
 
       m_plugin->initialize();
@@ -83,8 +83,8 @@ namespace mln
     {
       if (not plugin->support_istream())
       {
-        m_plugin = plugin;
-        m_ima = &(exact(ima));
+        m_plugin     = plugin;
+        m_ima        = &(exact(ima));
         m_permissive = permissive;
 
         m_plugin->initialize();
@@ -110,7 +110,7 @@ namespace mln
       template <typename VIN, typename VOUT>
       void value_convert(void* buffer_in, void* buffer_out, std::size_t n)
       {
-        VIN* in = (VIN*)buffer_in;
+        VIN*  in  = (VIN*)buffer_in;
         VOUT* out = (VOUT*)buffer_out;
         std::copy(in, in + n, out);
       }
@@ -200,8 +200,8 @@ namespace mln
 
       if (sidx != tidx and from_to) // need to convert
       {
-        int bpp = m_plugin->get_bpp();
-        int bytes = bpp / 8 + (bpp % 8 != 0);
+        int   bpp    = m_plugin->get_bpp();
+        int   bytes  = bpp / 8 + (bpp % 8 != 0);
         void* valptr = std::malloc(bytes);
 
         mln_pixter(px, *m_ima);
@@ -238,7 +238,7 @@ namespace mln
     void Loader2D<I, category>::m_resize()
     {
       PluginReader2D* plug = static_cast<PluginReader2D*>(this->m_plugin);
-      box2d dom = plug->get_domain();
+      box2d           dom  = plug->get_domain();
       this->m_ima->resize(dom);
     }
 
@@ -246,7 +246,7 @@ namespace mln
     void Loader2D<I, raw_image_tag>::m_resize()
     {
       PluginReader2D* plug = static_cast<PluginReader2D*>(this->m_plugin);
-      box2d dom = plug->get_domain();
+      box2d           dom  = plug->get_domain();
       this->m_ima->resize(dom, this->m_ima->border());
     }
 
@@ -254,9 +254,9 @@ namespace mln
     void Loader2D<I, raw_image_tag>::m_load()
     {
       PluginReader2D* plug = static_cast<PluginReader2D*>(this->m_plugin);
-      box2d dom = this->m_ima->domain();
-      point2d p = dom.pmin;
-      point2d q = dom.pmax;
+      box2d           dom  = this->m_ima->domain();
+      point2d         p    = dom.pmin;
+      point2d         q    = dom.pmax;
 
       std::function<void(void*)> read_next_line = plug->get_read_next_line_method();
 
@@ -268,9 +268,9 @@ namespace mln
 
       if (sidx != tidx and from_to) // we need to convert the value type
       {
-        int bpp = plug->get_bpp();
-        std::size_t n = q[1] - p[1];
-        void* buffer = std::malloc(bpp * n);
+        int         bpp    = plug->get_bpp();
+        std::size_t n      = q[1] - p[1];
+        void*       buffer = std::malloc(bpp * n);
 
         for (; p[0] != q[0]; ++p[0])
         {

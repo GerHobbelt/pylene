@@ -11,10 +11,10 @@ TEST(Core, Domain_box2d_general)
   }
 
   {
-    short minp = -(1 << 15);
-    short maxp = (1 << 15) - 1;
-    unsigned n = (1 << 16) - 1;
-    box2d a({minp, minp}, {maxp, maxp});
+    short    minp = -(1 << 15);
+    short    maxp = (1 << 15) - 1;
+    unsigned n    = (1 << 16) - 1;
+    box2d    a({minp, minp}, {maxp, maxp});
     ASSERT_EQ(a.size(), n * n);
   }
 }
@@ -26,7 +26,7 @@ TEST(Core, Domain_box2d_forward)
   box2d b({2, 3}, {6, 8});
 
   point2d p;
-  int i = 2, j = 3;
+  int     i = 2, j = 3;
   mln_foreach (p, b)
   {
     ASSERT_EQ(p[0], i);
@@ -67,7 +67,7 @@ TEST(Core, Domain_box2d_backward)
   box2d b({2, 3}, {6, 8});
 
   point2d p;
-  int i = 5, j = 7;
+  int     i = 5, j = 7;
   mln_foreach (p, b.riter())
   {
     ASSERT_EQ(p[0], i);

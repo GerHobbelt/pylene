@@ -29,7 +29,9 @@ namespace mln
         typedef mln::accu::accumulators::min<mln_value(J), Compare> accu_t;
 
         closing_by_rec_ufind_visitor(const J& markers, mln_ch_value(I, accu_t) & accus, mln_concrete(I) & output)
-            : m_markers(markers), m_accu(accus), m_out(output)
+          : m_markers(markers)
+          , m_accu(accus)
+          , m_out(output)
         {
         }
 
@@ -47,7 +49,7 @@ namespace mln
 
     template <class I, class J, class N, class Compare>
     mln_concrete(I)
-    closing_by_reconstruction(const Image<I>& f_, const Image<J>& markers_, const Neighborhood<N>& nbh, Compare cmp)
+        closing_by_reconstruction(const Image<I>& f_, const Image<J>& markers_, const Neighborhood<N>& nbh, Compare cmp)
     {
       static_assert(std::is_convertible<mln_value(J), mln_value(I)>::value,
                     "Marker image value type must be convertible to f's value type.");
@@ -57,8 +59,8 @@ namespace mln
 
       mln_entering("mln::morpho::closing_by_reconstruction");
       typedef mln::accu::accumulators::min<mln_value(J), Compare> accu_t;
-      const I& f = exact(f_);
-      const J& markers = exact(markers_);
+      const I&                                                    f       = exact(f_);
+      const J&                                                    markers = exact(markers_);
 
       // assert that f <= markers
       mln_precondition(all(imtransform(imzip(f, markers), [cmp](std::tuple<mln_value(I), mln_value(J)> v) {

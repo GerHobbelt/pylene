@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 
   if (argc == 5)
   {
-    image2d<rgb16> out;
+    image2d<rgb16>  out;
     image2d<uint16> f;
 
     for (int i = 2; i < 5; ++i)
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   else if (argc == 6)
   {
     image2d<colors::rgba16> out;
-    image2d<uint16> f;
+    image2d<uint16>         f;
 
     for (int i = 2; i < 6; ++i)
     {

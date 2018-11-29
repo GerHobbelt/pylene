@@ -19,10 +19,10 @@ namespace mln
   template <class Domain, class V>
   struct image_traits<constant_image<Domain, V>>
   {
-    typedef std::false_type concrete;
-    typedef forward_image_tag category;
-    typedef std::true_type accessible;
-    typedef std::true_type indexable;
+    typedef std::false_type                     concrete;
+    typedef forward_image_tag                   category;
+    typedef std::true_type                      accessible;
+    typedef std::true_type                      indexable;
     typedef mln::extension::value_extension_tag extension;
   };
 
@@ -46,28 +46,32 @@ namespace mln
     typedef typename range_iterator<Domain>::type piter;
 
   public:
-    typedef Domain domain_type;
+    typedef Domain                             domain_type;
     typedef typename range_value<Domain>::type point_type;
-    typedef point_type site_type;
+    typedef point_type                         site_type;
 
     typedef V value_type;
     typedef V reference;
     typedef V const_reference;
 
     typedef unsigned size_type;
-    typedef int difference_type;
+    typedef int      difference_type;
 
     struct const_value_iterator : iterator_base<const_value_iterator, V, V>
     {
-      const_value_iterator(const piter& x, const V& value) : m_x(x), m_value(value) {}
+      const_value_iterator(const piter& x, const V& value)
+        : m_x(x)
+        , m_value(value)
+      {
+      }
       void init() { m_x.init(); }
       void next() { m_x.next(); }
       bool finished() const { return m_x.finished(); }
-      V dereference() const { return m_value; }
+      V    dereference() const { return m_value; }
 
     private:
       piter m_x;
-      V m_value;
+      V     m_value;
     };
 
 #if defined(WIN32) && !defined(__MINGW32__)
@@ -82,33 +86,45 @@ namespace mln
       friend struct pixel_t;
 
       typedef typename constant_image::point_type point_type;
-      typedef point_type site_type;
-      typedef I image_type;
-      typedef V value_type;
-      typedef V reference;
-      typedef unsigned size_type;
+      typedef point_type                          site_type;
+      typedef I                                   image_type;
+      typedef V                                   value_type;
+      typedef V                                   reference;
+      typedef unsigned                            size_type;
 
       pixel_t() = default;
-      pixel_t(const pixel_t& other) : m_ima(other.m_ima), m_p(other.m_p), m_value(other.m_value) {}
+      pixel_t(const pixel_t& other)
+        : m_ima(other.m_ima)
+        , m_p(other.m_p)
+        , m_value(other.m_value)
+      {
+      }
 
       template <class dummy = void>
       pixel_t(const pixel_t<typename std::remove_const<I>::type>& other,
               typename std::enable_if<std::is_const<I>::value, dummy>::type* = NULL)
-          : m_ima(other.m_ima), m_p(other.m_p), m_value(other.m_value)
+        : m_ima(other.m_ima)
+        , m_p(other.m_p)
+        , m_value(other.m_value)
       {
       }
 
-      pixel_t(I* ima, const point_type& p, const V& val) : m_ima(ima), m_p(p), m_value(val) {}
-      point_type point() const { return m_p; }
-      point_type site() const { return m_p; }
-      V val() const { return m_value; }
-      I& image() const { return *m_ima; }
+      pixel_t(I* ima, const point_type& p, const V& val)
+        : m_ima(ima)
+        , m_p(p)
+        , m_value(val)
+      {
+      }
+      point_type          point() const { return m_p; }
+      point_type          site() const { return m_p; }
+      V                   val() const { return m_value; }
+      I&                  image() const { return *m_ima; }
       constexpr size_type index() const { return 0; }
 
     private:
-      I* m_ima;
+      I*         m_ima;
       point_type m_p;
-      V m_value;
+      V          m_value;
     };
 
     template <class I>
@@ -122,37 +138,49 @@ namespace mln
 
     public:
       pixel_iterator_t() = default;
-      pixel_iterator_t(const pixel_iterator_t& other) : m_ima(other.m_ima), m_x(other.m_x), m_value(other.m_value) {}
+      pixel_iterator_t(const pixel_iterator_t& other)
+        : m_ima(other.m_ima)
+        , m_x(other.m_x)
+        , m_value(other.m_value)
+      {
+      }
 
       template <class dummy = void>
       pixel_iterator_t(const pixel_iterator_t<typename std::remove_const<I>::type>& other,
                        typename std::enable_if<std::is_const<I>::value, dummy>::type* = NULL)
-          : m_ima(other.m_ima), m_x(other.m_x), m_value(other.m_value)
+        : m_ima(other.m_ima)
+        , m_x(other.m_x)
+        , m_value(other.m_value)
       {
       }
 
-      pixel_iterator_t(I* ima, const piter& x, const V& val) : m_ima(ima), m_x(x), m_value(val) {}
-      void init() { m_x.init(); }
-      void next() { m_x.next(); }
+      pixel_iterator_t(I* ima, const piter& x, const V& val)
+        : m_ima(ima)
+        , m_x(x)
+        , m_value(val)
+      {
+      }
+      void       init() { m_x.init(); }
+      void       next() { m_x.next(); }
       pixel_t<I> dereference() const { return pixel_t<I>(m_ima, *m_x, m_value); }
-      bool finished() const { return m_x.finished(); }
+      bool       finished() const { return m_x.finished(); }
 
     private:
-      I* m_ima;
+      I*    m_ima;
       piter m_x;
-      V m_value;
+      V     m_value;
     };
 
 #if defined(WIN32) && !defined(__MINGW32__)
 #pragma warning(pop)
 #endif
 
-    typedef pixel_t<constant_image> pixel_type;
+    typedef pixel_t<constant_image>       pixel_type;
     typedef pixel_t<const constant_image> const_pixel_type;
 
-    typedef iterator_range<const_value_iterator> value_range;
-    typedef iterator_range<const_value_iterator> const_value_range;
-    typedef iterator_range<pixel_iterator_t<constant_image>> pixel_range;
+    typedef iterator_range<const_value_iterator>                   value_range;
+    typedef iterator_range<const_value_iterator>                   const_value_range;
+    typedef iterator_range<pixel_iterator_t<constant_image>>       pixel_range;
     typedef iterator_range<pixel_iterator_t<const constant_image>> const_pixel_range;
 
     /************************************/
@@ -161,13 +189,17 @@ namespace mln
 
     struct extension_type
     {
-      typedef V value_type;
+      typedef V               value_type;
       typedef std::false_type support_fill;
       typedef std::false_type support_mirror;
       typedef std::false_type support_periodize;
     };
 
-    constant_image(const Domain& dom, V value) : m_domain(dom), m_value(value) {}
+    constant_image(const Domain& dom, V value)
+      : m_domain(dom)
+      , m_value(value)
+    {
+    }
 
     friend internal::initializer<mln_concrete(constant_image), Domain> imconcretize(const constant_image& f)
     {
@@ -228,7 +260,7 @@ namespace mln
 
   private:
     Domain m_domain;
-    V m_value;
+    V      m_value;
   };
 } // namespace mln
 

@@ -6,13 +6,12 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/morpho/tos/tos.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/tos/tos.hpp>
 
-int
-main()
+int main()
 {
   using mln::uint8;
 
@@ -20,7 +19,7 @@ main()
   mln::io::imread("images/roadsigns.png", f);
 
   // Compute the ToS
-  auto t = mln::morpho::tos(f);
+  auto t       = mln::morpho::tos(f);
   using tree_t = decltype(t);
 
   // Set f to the right size
@@ -33,8 +32,8 @@ main()
     for (unsigned i = 0; i < f2.nrows(); i += 2)
       for (unsigned j = 0; j < f2.ncols(); j += 2)
       {
-        f2.at(i, j + 1) = f2.at(i, j);
-        f2.at(i + 1, j) = f2.at(i, j);
+        f2.at(i, j + 1)     = f2.at(i, j);
+        f2.at(i + 1, j)     = f2.at(i, j);
         f2.at(i + 1, j + 1) = f2.at(i, j);
       }
   }
@@ -48,11 +47,11 @@ main()
   // Predicate: keep the node if it fits 95% of the bbox
   // and its size is less than 100000px
   auto pred = [&prop_map, &var_map](tree_t::vertex_id_t x) {
-    mln::point2d pmin = mln::accu::extractor::inf(prop_map[x]);
-    mln::point2d pmax = mln::accu::extractor::sup(prop_map[x]);
-    unsigned sz = mln::accu::extractor::count(prop_map[x]);
-    unsigned area_bbox = (pmax[0] - pmin[0] + 1) * (pmax[1] - pmin[1] + 1);
-    double var = var_map[x];
+    mln::point2d pmin      = mln::accu::extractor::inf(prop_map[x]);
+    mln::point2d pmax      = mln::accu::extractor::sup(prop_map[x]);
+    unsigned     sz        = mln::accu::extractor::count(prop_map[x]);
+    unsigned     area_bbox = (pmax[0] - pmin[0] + 1) * (pmax[1] - pmin[1] + 1);
+    double       var       = var_map[x];
     return sz > (0.95 * area_bbox) and sz > 10000 and sz < 1000000 and var > 250;
   };
 

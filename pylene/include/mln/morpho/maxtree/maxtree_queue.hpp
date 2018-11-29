@@ -23,7 +23,7 @@ namespace mln
 
       template <typename I, typename Neighborhood, typename StrictWeakOrdering>
       component_tree<typename I::size_type, mln_ch_value(I, unsigned)>
-      maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
+          maxtree_queue_indexes(const I& ima, const Neighborhood& nbh, StrictWeakOrdering cmp)
       {
         typedef typename I::size_type size_type;
         typedef mln_value(I) V;
@@ -33,13 +33,13 @@ namespace mln
         // {
         typedef mln_ch_value(I, unsigned) map_t;
         typedef morpho::internal::component_tree_node node_t;
-        typedef component_tree<size_type, map_t> tree_t;
+        typedef component_tree<size_type, map_t>      tree_t;
 
         tree_t ctree;
 
         auto& nodes = ctree._get_data()->m_nodes;
-        auto& S = ctree._get_data()->m_S;
-        auto& pmap = ctree._get_data()->m_pmap;
+        auto& S     = ctree._get_data()->m_S;
+        auto& pmap  = ctree._get_data()->m_pmap;
 
         size_type sz = ima.domain().size();
 
@@ -53,18 +53,18 @@ namespace mln
         // 1.b some methods to handle the nodes array like a stack
         // {
         size_type stack_top_position = 0;
-        size_type npos = 1; // The current nodes vector size
+        size_type npos               = 1; // The current nodes vector size
 
         auto stack_empty = [&stack_top_position]() { return stack_top_position == 0; };
-        auto stack_top = [&nodes, &stack_top_position]() -> node_t& {
+        auto stack_top   = [&nodes, &stack_top_position]() -> node_t& {
           mln_precondition(stack_top_position != 0);
           return nodes[stack_top_position];
         };
         auto stack_push = [&nodes, &stack_top_position, &npos](const node_t& x) {
           mln_assertion(stack_top_position < npos);
-          nodes[npos] = x;
+          nodes[npos]          = x;
           nodes[npos].m_parent = stack_top_position;
-          stack_top_position = npos++;
+          stack_top_position   = npos++;
         };
         auto stack_pop = [&nodes, &stack_top_position]() {
           mln_precondition(stack_top_position != 0);
@@ -107,7 +107,7 @@ namespace mln
 
           mln_foreach (auto k, nbh_delta_indexes)
           {
-            auto q = p + k;
+            auto q         = p + k;
             bool processed = deja_vu[q];
 
             if (!processed)
@@ -128,7 +128,7 @@ namespace mln
 
           pqueue.pop();
           S[--spos] = p;
-          pmap[p] = stack_top_position;
+          pmap[p]   = stack_top_position;
 
           // If this is the last point at this
           // level: insert the node
@@ -137,7 +137,7 @@ namespace mln
 
           if (cmp(ima[pqueue.top()], clevel))
           {
-            size_type next = pqueue.top();
+            size_type next    = pqueue.top();
             size_type current = stack_top_position;
 
             stack_pop();
@@ -145,11 +145,11 @@ namespace mln
 
             while (!stack_empty() and cmp(ima[next], ima[stack_top().m_point_index]))
             {
-              size_type q = stack_top_position;
-              nodes[current].m_parent = q; // no-op
-              nodes[current].m_prev = nodes[q].m_next_sibling;
+              size_type q                           = stack_top_position;
+              nodes[current].m_parent               = q; // no-op
+              nodes[current].m_prev                 = nodes[q].m_next_sibling;
               nodes[nodes[q].m_next_sibling].m_next = current;
-              nodes[q].m_next_sibling = nodes[current].m_next_sibling;
+              nodes[q].m_next_sibling               = nodes[current].m_next_sibling;
 
               current = stack_top_position;
               stack_pop();
@@ -157,11 +157,11 @@ namespace mln
             if (stack_empty() or cmp(ima[stack_top().m_point_index], ima[next]))
               stack_push(node_t{0, 0, 0, npos, next});
 
-            size_type q = stack_top_position;
-            nodes[current].m_parent = q; // no-op
-            nodes[current].m_prev = nodes[q].m_next_sibling;
+            size_type q                           = stack_top_position;
+            nodes[current].m_parent               = q; // no-op
+            nodes[current].m_prev                 = nodes[q].m_next_sibling;
             nodes[nodes[q].m_next_sibling].m_next = current;
-            nodes[q].m_next_sibling = nodes[current].m_next_sibling;
+            nodes[q].m_next_sibling               = nodes[current].m_next_sibling;
           }
         }
         mln_assertion(stack_top().m_parent == 0);

@@ -105,8 +105,8 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
   using namespace mln;
 
   typedef typename image2d<V>::size_type size_type;
-  image2d<size_type> parent1, parent;
-  std::vector<size_type> S1, S;
+  image2d<size_type>                     parent1, parent;
+  std::vector<size_type>                 S1, S;
   std::tie(parent1, S1) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
   unify_parent(ima, S1, parent1);
 
@@ -184,7 +184,7 @@ void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
 
   {
     image2d<morpho::maxtree_node> tree;
-    unsigned root;
+    unsigned                      root;
     std::tie(tree, root) = morpho::maxtree_pqueue_2(ima, c4, cmp);
     ASSERT_TRUE(iscanonized(ima, tree));
     ASSERT_TRUE(check_S(tree, root));
@@ -206,10 +206,10 @@ TEST(Morpho, Maxtree)
 {
   using namespace mln;
   typedef UInt<8> V;
-  image2d<V> ima(300, 100);
+  image2d<V>      ima(300, 100);
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
+  std::random_device                 rd;
+  std::mt19937                       gen(rd());
   std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
   range::generate(ima.values(), [&sampler, &gen]() { return sampler(gen); });
 

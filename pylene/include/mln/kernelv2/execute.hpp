@@ -29,7 +29,7 @@ namespace mln
     {
       const N& nbh = exact(nbh_);
 
-      typedef typename details::image_list_traits<Expr&>::zip_image_type Z_1;
+      typedef typename details::image_list_traits<Expr&>::zip_image_type                  Z_1;
       typedef typename details::image_used_by_neighbor_list_traits<Expr&>::zip_image_type Z_2;
 
       Z_1 f = details::get_image_list2(x);

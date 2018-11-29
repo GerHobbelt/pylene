@@ -34,11 +34,14 @@ namespace mln
 
   template <typename Iterator_>
   struct proxy_iterator
-      : iterator_base<proxy_iterator<Iterator_>, typename Iterator_::value_type, typename Iterator_::reference>
+    : iterator_base<proxy_iterator<Iterator_>, typename Iterator_::value_type, typename Iterator_::reference>
   {
     proxy_iterator() = default;
 
-    proxy_iterator(const Iterator_& x) : x_(x) {}
+    proxy_iterator(const Iterator_& x)
+      : x_(x)
+    {
+    }
 
     void init() { x_.init(); }
     void next()
@@ -78,7 +81,7 @@ namespace mln
 
   private:
     Iterator_ x_;
-    bool deja_vu_;
+    bool      deja_vu_;
   };
 
   template <typename Iterator>
@@ -94,7 +97,7 @@ namespace mln
     struct is_boost_tuple_base
     {
       template <typename... U>
-      static constexpr std::true_type check(std::tuple<U...>);
+      static constexpr std::true_type  check(std::tuple<U...>);
       static constexpr std::false_type check(...);
 
       typedef decltype(check(std::declval<T>())) type;
@@ -129,11 +132,14 @@ namespace mln
 
     unzip_proxy_iterator() = default;
 
-    unzip_proxy_iterator(ZipIterator& zip) : zip_(&zip) {}
+    unzip_proxy_iterator(ZipIterator& zip)
+      : zip_(&zip)
+    {
+    }
 
-    void init() { zip_->init(); }
-    void next() { zip_->next(); }
-    bool finished() const { return zip_->finished(); }
+    void      init() { zip_->init(); }
+    void      next() { zip_->next(); }
+    bool      finished() const { return zip_->finished(); }
     reference dereference() const { return std::get<n>(zip_->dereference()); }
 
     void __inner_init() { zip_->__inner_init(); }
@@ -160,7 +166,7 @@ namespace mln
 
     public:
       typedef typename pixel_t::point_type point_type;
-      typedef typename pixel_t::site_type site_type;
+      typedef typename pixel_t::site_type  site_type;
 
       typedef typename std::remove_reference<typename std::tuple_element<n, typename pixel_t::value_type>::type>::type
           value_type;
@@ -170,14 +176,17 @@ namespace mln
       typedef typename std::remove_reference<
           typename std::tuple_element<n, typename pixel_t::image_type::image_tuple_t>::type>::type image_type;
 
-      unzip_pixel_proxy_base(TuplePixel&& pixel) : tuple_pix_(pixel) {}
+      unzip_pixel_proxy_base(TuplePixel&& pixel)
+        : tuple_pix_(pixel)
+      {
+      }
 
       // unzip_pixel_proxy(const unzip_pixel_proxy&) = delete;
       // unzip_pixel_proxy& operator=(const unzip_pixel_proxy&) = delete;
 
-      reference val() const { return std::get<n>(tuple_pix_.val()); }
-      point_type point() const { return tuple_pix_.point(); }
-      point_type site() const { return tuple_pix_.point(); }
+      reference   val() const { return std::get<n>(tuple_pix_.val()); }
+      point_type  point() const { return tuple_pix_.point(); }
+      point_type  site() const { return tuple_pix_.point(); }
       image_type& image() const { return std::get<n>(tuple_pix_.image().images()); }
 
     protected:
@@ -185,7 +194,7 @@ namespace mln
     };
 
     template <size_t n, typename TuplePixel,
-              bool indexable =
+              bool   indexable =
                   image_traits<typename unzip_pixel_proxy_base<n, TuplePixel>::image_type>::indexable::value>
     struct unzip_pixel_proxy;
 
@@ -193,7 +202,10 @@ namespace mln
     struct unzip_pixel_proxy<n, TuplePixel, false> : unzip_pixel_proxy_base<n, TuplePixel>,
                                                      Pixel<unzip_pixel_proxy<n, TuplePixel>>
     {
-      unzip_pixel_proxy(TuplePixel&& pixel) : unzip_pixel_proxy_base<n, TuplePixel>(std::forward<TuplePixel>(pixel)) {}
+      unzip_pixel_proxy(TuplePixel&& pixel)
+        : unzip_pixel_proxy_base<n, TuplePixel>(std::forward<TuplePixel>(pixel))
+      {
+      }
     };
 
     template <size_t n, typename TuplePixel>
@@ -201,9 +213,12 @@ namespace mln
                                                     Pixel<unzip_pixel_proxy<n, TuplePixel>>
     {
       typedef typename unzip_pixel_proxy_base<n, TuplePixel>::image_type image_type;
-      typedef typename image_type::size_type size_type;
+      typedef typename image_type::size_type                             size_type;
 
-      unzip_pixel_proxy(TuplePixel&& pixel) : unzip_pixel_proxy_base<n, TuplePixel>(std::forward<TuplePixel>(pixel)) {}
+      unzip_pixel_proxy(TuplePixel&& pixel)
+        : unzip_pixel_proxy_base<n, TuplePixel>(std::forward<TuplePixel>(pixel))
+      {
+      }
 
       size_type index() const
       {
@@ -241,11 +256,14 @@ namespace mln
 
     unzip_proxy_pixel_iterator() = default;
 
-    unzip_proxy_pixel_iterator(ZipIterator& zip) : zip_(&zip) {}
+    unzip_proxy_pixel_iterator(ZipIterator& zip)
+      : zip_(&zip)
+    {
+    }
 
-    void init() { zip_->init(); }
-    void next() { zip_->next(); }
-    bool finished() const { return zip_->finished(); }
+    void      init() { zip_->init(); }
+    void      next() { zip_->next(); }
+    bool      finished() const { return zip_->finished(); }
     reference dereference() const { return reference(zip_->dereference()); }
 
     void set_dejavu_(bool v) { zip_->set_dejavu_(v); }

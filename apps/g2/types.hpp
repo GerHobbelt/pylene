@@ -30,17 +30,17 @@ template <unsigned NTREE>
 struct graph_content
 {
   std::array<tree_t::node_type, NTREE> tlinks;
-  tree_t::node_type ulink;         // A unique link among one of the three trees
-  mln::vec<unsigned, NTREE> depth; // The depth of the SES in the trees.
-  mln::vec<unsigned, NTREE> senc;  // The id of the smallest enclosing shape (⊆) in each tree
-                                   // tlinks[i] ≠ None ⇒ senc[i] = tlinks[i].id()
+  tree_t::node_type                    ulink; // A unique link among one of the three trees
+  mln::vec<unsigned, NTREE>            depth; // The depth of the SES in the trees.
+  mln::vec<unsigned, NTREE>            senc;  // The id of the smallest enclosing shape (⊆) in each tree
+                                              // tlinks[i] ≠ None ⇒ senc[i] = tlinks[i].id()
 };
 
 template <unsigned NTREE>
 using Graph = boost::adjacency_list<boost::setS, boost::vecS, boost::directedS, graph_content<NTREE>>;
 
 typedef mln::property_map<tree_t, Graph<2>::vertex_descriptor> tlink_t;
-typedef Graph<NTREE> MyGraph;
-typedef graph_content<NTREE> my_graph_content;
+typedef Graph<NTREE>                                           MyGraph;
+typedef graph_content<NTREE>                                   my_graph_content;
 
 #endif // ! TYPES_HPP

@@ -1,12 +1,12 @@
-#include <mln/core/image/image2d.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/io/imsave.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/io/imprint.hpp>
+#include <mln/io/imsave.hpp>
 
 
 int main()
 {
-  mln::image2d<mln::uint8> f(5,5);
+  mln::image2d<mln::uint8> f(5, 5);
 
   mln::iota(f, 0);
 

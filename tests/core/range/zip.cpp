@@ -107,7 +107,7 @@ TEST(Core, zip_view_readonly_rowwise)
 
   for (auto&& row : zipped_rows.rows())
   {
-    for (auto [v1, v2, v3] : row)
+    for (auto[v1, v2, v3] : row)
     {
       ASSERT_EQ(*refv, v1);
       ASSERT_EQ((*refv + mln::point2d{1, 2}), v2);
@@ -160,7 +160,7 @@ TEST(Core, zip_view_write_rowwise)
 
   for (auto&& r : z.rows())
   {
-    for (auto [x, y, p] : r)
+    for (auto[x, y, p] : r)
     {
       x    = p[0]; // By ref
       y    = p[1]; // By ref

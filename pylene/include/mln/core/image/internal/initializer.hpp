@@ -50,10 +50,16 @@ namespace mln
     {
     private:
       static constexpr bool has_border = image_has_border<OutputImage>::value;
-      using has_border_t = image_has_border<OutputImage>;
+      using has_border_t               = image_has_border<OutputImage>;
 
     public:
-      initializer(const InputImageOrDomain& ref) : m_ref(ref), m_status(nullptr), m_has_init(false) { __init_border(); }
+      initializer(const InputImageOrDomain& ref)
+        : m_ref(ref)
+        , m_status(nullptr)
+        , m_has_init(false)
+      {
+        __init_border();
+      }
 
       initializer(initializer&&) = default;
       initializer& operator=(initializer&&) = default;
@@ -61,7 +67,7 @@ namespace mln
       initializer& init(const mln_value(OutputImage) & v)
       {
         m_has_init = true;
-        m_init = v;
+        m_init     = v;
         return *this;
       }
 
@@ -96,7 +102,7 @@ namespace mln
 
       initializer& get_status(int& status)
       {
-        m_status = &status;
+        m_status  = &status;
         *m_status = 0;
         return *this;
       }
@@ -204,8 +210,8 @@ namespace mln
 
     protected:
       InputImageOrDomain m_ref;
-      int* m_status;
-      bool m_has_init;
+      int*               m_status;
+      bool               m_has_init;
       mln_value(OutputImage) m_init;
       int m_border;
     };

@@ -43,21 +43,25 @@ namespace mln
 
     template <class... IteratorTypes>
     struct zip_iterator_base<false, IteratorTypes...>
-        : iterator_base<zip_iterator<std::tuple<IteratorTypes...>>,
-                        std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>,
-                        std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>>
+      : iterator_base<zip_iterator<std::tuple<IteratorTypes...>>,
+                      std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>,
+                      std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>>
     {
-      using IteratorTuple = std::tuple<IteratorTypes...>;
-      using value_type = std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>;
-      using reference = value_type;
-      using has_NL = conjunction<typename std::remove_reference_t<IteratorTypes>::has_NL...>;
+      using IteratorTuple       = std::tuple<IteratorTypes...>;
+      using value_type          = std::tuple<typename std::remove_reference_t<IteratorTypes>::reference...>;
+      using reference           = value_type;
+      using has_NL              = conjunction<typename std::remove_reference_t<IteratorTypes>::has_NL...>;
       using is_multidimensional = std::false_type;
 
       zip_iterator_base() = default;
-      zip_iterator_base(const IteratorTuple& tuple) : m_iterator_tuple(tuple) {}
+      zip_iterator_base(const IteratorTuple& tuple)
+        : m_iterator_tuple(tuple)
+      {
+      }
 
       template <class OtherIteratorTuple>
-      zip_iterator_base(const zip_iterator<OtherIteratorTuple>& other) : m_iterator_tuple(other.m_iterator_tuple)
+      zip_iterator_base(const zip_iterator<OtherIteratorTuple>& other)
+        : m_iterator_tuple(other.m_iterator_tuple)
       {
       }
 
@@ -156,8 +160,8 @@ namespace mln
 
   template <class... TTypes>
   struct zip_iterator<std::tuple<TTypes...>>
-      : details::zip_iterator_base<
-            details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::value, TTypes...>
+    : details::zip_iterator_base<
+          details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::value, TTypes...>
   {
     using is_multidimensional =
         typename details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::type;

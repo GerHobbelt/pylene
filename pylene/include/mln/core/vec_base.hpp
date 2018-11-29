@@ -104,7 +104,7 @@
       operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                      \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
-    R r;                                                                                                               \
+    R                                                                           r;                                     \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = x[i] Op y[i];                                                                                             \
     return r;                                                                                                          \
@@ -118,7 +118,7 @@
       operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                          \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
-    R r;                                                                                                               \
+    R                                                                           r;                                     \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = x[i] Op y;                                                                                                \
     return r;                                                                                                          \
@@ -130,7 +130,7 @@
       operator Op(const U& y, const vec_base<T, dim, tag>& x)                                                          \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
-    R r;                                                                                                               \
+    R                                                                           r;                                     \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = y Op x[i];                                                                                                \
     return r;                                                                                                          \
@@ -181,15 +181,15 @@ namespace mln
       friend struct vec_base;
 
     public:
-      typedef T value_type;
-      typedef T* pointer;
-      typedef T& reference;
-      typedef T* iterator;
-      typedef const T* const_iterator;
-      typedef std::reverse_iterator<T*> reverse_iterator;
+      typedef T                               value_type;
+      typedef T*                              pointer;
+      typedef T&                              reference;
+      typedef T*                              iterator;
+      typedef const T*                        const_iterator;
+      typedef std::reverse_iterator<T*>       reverse_iterator;
       typedef std::reverse_iterator<const T*> const_reverse_iterator;
-      typedef size_t size_type;
-      typedef ptrdiff_t difference_type;
+      typedef size_t                          size_type;
+      typedef ptrdiff_t                       difference_type;
 
       enum
       {
@@ -208,25 +208,32 @@ namespace mln
       }
 
       constexpr vec_base(const literal::zero_t&)
-          : v_{
-                0,
-            }
+        : v_{
+              0,
+          }
       {
       }
 
-      constexpr vec_base(const literal::one_t&) : vec_base(1) {}
+      constexpr vec_base(const literal::one_t&)
+        : vec_base(1)
+      {
+      }
 
       // explicit
-      constexpr vec_base(const T& x) : vec_base(x, typename genseq<dim>::type()) {}
+      constexpr vec_base(const T& x)
+        : vec_base(x, typename genseq<dim>::type())
+      {
+      }
 
       template <typename dummy = void>
-      constexpr vec_base(const T& x, const T& y, typename std::enable_if<dim == 2, dummy>::type* = NULL) : v_{x, y}
+      constexpr vec_base(const T& x, const T& y, typename std::enable_if<dim == 2, dummy>::type* = NULL)
+        : v_{x, y}
       {
       }
 
       template <typename dummy = void>
       constexpr vec_base(const T& x, const T& y, const T& z, typename std::enable_if<dim == 3, dummy>::type* = NULL)
-          : v_{x, y, z}
+        : v_{x, y, z}
       {
       }
 
@@ -276,19 +283,19 @@ namespace mln
         return *reinterpret_cast<const vec_base<T, dim, generic_vector_tag>*>(this);
       }
 
-      T* begin() { return v_; }
-      T* end() { return v_ + dim; }
+      T*       begin() { return v_; }
+      T*       end() { return v_ + dim; }
       const T* begin() const { return v_; }
       const T* end() const { return v_ + dim; }
 
       constexpr const T& back() const { return v_[dim - 1]; }
-      constexpr T& back() { return v_[dim - 1]; }
+      constexpr T&       back() { return v_[dim - 1]; }
 
       constexpr const T& front() const { return v_[0]; }
-      constexpr T& front() { return v_[0]; }
+      constexpr T&       front() { return v_[0]; }
 
-      reverse_iterator rbegin() { return reverse_iterator(v_ + dim); }
-      reverse_iterator rend() { return reverse_iterator(v_); }
+      reverse_iterator       rbegin() { return reverse_iterator(v_ + dim); }
+      reverse_iterator       rend() { return reverse_iterator(v_); }
       const_reverse_iterator rbegin() const { return const_reverse_iterator(v_ + dim); }
       const_reverse_iterator rend() const { return const_reverse_iterator(v_); }
 
@@ -309,7 +316,7 @@ namespace mln
       vec_base<decltype(+std::declval<T>()), dim, tag> operator-() const
       {
         typedef vec_base<decltype(+std::declval<T>()), dim, tag> R;
-        R out;
+        R                                                        out;
         for (unsigned i = 0; i < dim; ++i)
           out.v_[i] = -v_[i];
         return out;
@@ -430,7 +437,8 @@ namespace mln
       friend constexpr T2&& get(vec_base<T2, dim2, tag2>&&);
 
       template <int... N>
-      constexpr vec_base(const T& x, Seq<N...>) : v_{__copy<N>(x)...}
+      constexpr vec_base(const T& x, Seq<N...>)
+        : v_{__copy<N>(x)...}
       {
       }
 
@@ -457,12 +465,12 @@ namespace mln
     template <>
     struct vec_base_traits<generic_vector_tag>
     {
-      static const bool is_additive = true;
-      static const bool is_additive_ext = true;
-      static const bool is_multiplicative = true;
-      static const bool is_multiplicative_ext = true;
+      static const bool is_additive             = true;
+      static const bool is_additive_ext         = true;
+      static const bool is_multiplicative       = true;
+      static const bool is_multiplicative_ext   = true;
       static const bool is_less_than_comparable = true;
-      static const bool is_equality_comparable = true;
+      static const bool is_equality_comparable  = true;
     };
 
     template <size_t N, class T, unsigned dim, typename tag>

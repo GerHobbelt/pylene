@@ -27,8 +27,8 @@ namespace mln
     mln_precondition(ima.domain().size() == S.size());
 
     image2d<bool> deja_vu;
-    point2d pmin = ima.domain().pmin;
-    point2d pmax = ima.domain().pmax;
+    point2d       pmin = ima.domain().pmin;
+    point2d       pmax = ima.domain().pmax;
 
     io::imprint(ima);
     resize(deja_vu, ima);
@@ -79,17 +79,17 @@ int main(int argc, char** argv)
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
-  I rr = addborder(r);
-  I gg = addborder(g);
-  I bb = addborder(b);
+  I                  r  = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g  = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b  = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  rr = addborder(r);
+  I                  gg = addborder(g);
+  I                  bb = addborder(b);
 
-  image2d<V> rK, gK, bK;
-  image2d<unsigned> rparent, gparent, bparent;
+  image2d<V>            rK, gK, bK;
+  image2d<unsigned>     rparent, gparent, bparent;
   std::vector<unsigned> rS, gS, bS;
 
   std::tie(rK, rparent, rS) = morpho::ToS(rr, c4);
@@ -126,8 +126,8 @@ int main(int argc, char** argv)
   // io::imsave(b_area, "blue.tiff");
 
   //++io::imprint(area);
-  image2d<unsigned> K;
-  image2d<unsigned> parent;
+  image2d<unsigned>     K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   bool use_tos = argv[1] == std::string("tos");
@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     K = area, std::tie(parent, S) = morpho::impl::serial::maxtree_pqueue(area, c4, std::greater<unsigned>());
 
   std::cout << "S.size(): " << S.size() << std::endl;
-  auto ima2 = addborder(ima); // add border with median w.r.t < lexico
+  auto          ima2 = addborder(ima); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent, parent.border(), rgb8{0, 0, 255});
 

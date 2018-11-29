@@ -40,11 +40,11 @@ namespace mln
     {
       mln_entering("mln::morpho::alphatree_indexes");
 
-      const I& f = exact(f_);
+      const I& f   = exact(f_);
       const N& nbh = exact(nbh_);
 
-      typedef typename I::size_type index_t;
-      typedef morpho::component_tree<index_t, mln_ch_value(I, index_t)> tree_t;
+      typedef typename I::size_type                                               index_t;
+      typedef morpho::component_tree<index_t, mln_ch_value(I, index_t)>           tree_t;
       typedef typename std::result_of<Distance(mln_value(I), mln_value(I))>::type distance_t;
 
       std::vector<std::tuple<index_t, index_t, distance_t>> edges;
@@ -70,14 +70,14 @@ namespace mln
       }
 
       // 2nd step: make the tree
-      tree_t tree;
+      tree_t                           tree;
       property_map<tree_t, distance_t> vmap;
       {
         mln_ch_value(I, unsigned) zpar;
-        std::vector<unsigned> par;
-        std::vector<unsigned> vzpar;
+        std::vector<unsigned>   par;
+        std::vector<unsigned>   vzpar;
         std::vector<distance_t> dist;
-        std::size_t sz = f.domain().size();
+        std::size_t             sz = f.domain().size();
 
         par.resize(sz);
         vzpar.resize(sz);
@@ -89,20 +89,20 @@ namespace mln
         mln_foreach (auto px, zpar.pixels())
         {
           px.val() = k;
-          par[k] = k;
+          par[k]   = k;
           vzpar[k] = k;
-          dist[k] = 0;
+          dist[k]  = 0;
           ++k;
         }
 
         // 2.2 union find
         for (auto e : edges)
         {
-          index_t x, y;
+          index_t    x, y;
           distance_t d;
           std::tie(x, y, d) = e;
-          unsigned rx = (zpar[x] = internal::_zfindroot(vzpar, zpar[x]));
-          unsigned ry = (zpar[y] = internal::_zfindroot(vzpar, zpar[y]));
+          unsigned rx       = (zpar[x] = internal::_zfindroot(vzpar, zpar[x]));
+          unsigned ry       = (zpar[y] = internal::_zfindroot(vzpar, zpar[y]));
 
           // std::cout << "Process: " << x << " " << y << " dist: " << d << "\n"
           //           << "   " << (int)f[x] << "  " << (int)f[y] << "\n";
@@ -152,7 +152,7 @@ namespace mln
         }
 
         // 2.4 Build the tree from the parent image
-        auto data = tree._get_data();
+        auto  data  = tree._get_data();
         auto& nodes = data->m_nodes;
         data->m_nodes.resize(nnodes + 1);
         data->m_S.resize(sz);
@@ -177,8 +177,8 @@ namespace mln
             (unsigned)sz    // point index (End of Buffer)
         };
 
-        vmap[1] = dist.back(); // set the root value
-        par.back() = 1;        // par points to the new index
+        vmap[1]    = dist.back(); // set the root value
+        par.back() = 1;           // par points to the new index
         ++k;
 
         for (int i = (int)par.size() - 2; i >= 0; --i)
@@ -190,19 +190,19 @@ namespace mln
           }
 
           // Insert the node in child of par[i]
-          unsigned q = par[par[i]];
-          unsigned next = nodes[q].m_next;
+          unsigned q        = par[par[i]];
+          unsigned next     = nodes[q].m_next;
           nodes[k].m_parent = q; // set parent
           // insert in the dble linked list
           nodes[next].m_prev = k;
-          nodes[q].m_next = k;
-          nodes[k].m_prev = q;
-          nodes[k].m_next = next;
+          nodes[q].m_next    = k;
+          nodes[k].m_prev    = q;
+          nodes[k].m_next    = next;
           // insert in the skip list
           nodes[k].m_next_sibling = next;
 
           // update par
-          par[i] = k;
+          par[i]  = k;
           vmap[k] = dist[i];
           ++k;
         }
@@ -213,8 +213,8 @@ namespace mln
           unsigned i = (unsigned)sz - 1;
           mln_foreach (auto px, data->m_pmap.pixels())
           {
-            data->m_S[i] = px.index();
-            px.val() = par[p];
+            data->m_S[i]                = px.index();
+            px.val()                    = par[p];
             nodes[par[p]].m_point_index = i;
             ++p;
             --i;

@@ -17,12 +17,18 @@ namespace mln
 
     stditerator() {}
 
-    stditerator(const Iterator_& begin, const Iterator_& end) : begin_(begin), end_(end) {}
+    stditerator(const Iterator_& begin, const Iterator_& end)
+      : begin_(begin)
+      , end_(end)
+    {
+    }
 
     template <typename Iterator2>
     stditerator(const stditerator<Iterator2>& other,
                 typename std::enable_if<std::is_convertible<Iterator2, Iterator_>::value>::type* = NULL)
-        : cur_(other.cur_), begin_(other.begin_), end_(other.end_)
+      : cur_(other.cur_)
+      , begin_(other.begin_)
+      , end_(other.end_)
     {
     }
 

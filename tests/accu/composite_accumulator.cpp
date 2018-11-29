@@ -75,10 +75,10 @@ namespace mln
   template <typename T>                                                                                                \
   struct accu##N : composite_accumulator_facade<accu##N<T>, T, T, features::f##N>                                      \
   {                                                                                                                    \
-    typedef T argument_type;                                                                                           \
+    typedef T                               argument_type;                                                             \
     typedef boost::mpl::set<features::f##N> provides;                                                                  \
-    void init(){};                                                                                                     \
-    void take(const T&){};                                                                                             \
+    void                                    init(){};                                                                  \
+    void                                    take(const T&){};                                                          \
     template <typename Other>                                                                                          \
     void take(const Accumulator<Other>&)                                                                               \
     {                                                                                                                  \
@@ -99,7 +99,7 @@ TEST(Accu, Features)
 {
   using namespace mln::accu;
 
-  typedef boost::mpl::set<features::f1> Set;
+  typedef boost::mpl::set<features::f1>                     Set;
   typedef typename internal::resolve_dependances<Set>::type Features;
 
   static_assert(boost::mpl::has_key<Features, features::f1>::value, "");

@@ -63,7 +63,8 @@ namespace mln
     struct Aggregate
     {
       template <typename... TParams>
-      Aggregate(TParams&&... params) : feature(std::forward<TParams>(params)...)
+      Aggregate(TParams&&... params)
+        : feature(std::forward<TParams>(params)...)
       {
       }
 
@@ -71,7 +72,7 @@ namespace mln
       details::aggregate_expr<Feature, Expr> operator()(Expr&& expr) const
       {
         typedef typename proto::result_of::eval<Expr, details::kernel_abstract_context>::type V_;
-        typedef typename std::decay<V_>::type V;
+        typedef typename std::decay<V_>::type                                                 V;
         // return details::aggregate_expr<Feature, Expr>::make(accu::make_accumulator(feature, *(V*)NULL),
         //                                                     std::forward<Expr>(expr))
 

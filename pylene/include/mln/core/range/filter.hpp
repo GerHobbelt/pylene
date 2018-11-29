@@ -15,12 +15,16 @@ namespace mln
     typedef typename std::remove_reference<InputRange>::type R;
 
   public:
-    typedef filter_iterator<typename R::iterator, Predicate> iterator;
+    typedef filter_iterator<typename R::iterator, Predicate>       iterator;
     typedef filter_iterator<typename R::const_iterator, Predicate> const_iterator;
-    typedef typename iterator::value_type value_type;
-    typedef typename iterator::reference reference;
+    typedef typename iterator::value_type                          value_type;
+    typedef typename iterator::reference                           reference;
 
-    filtered_range(InputRange&& rng, const Predicate& pred) : m_rng(std::forward<InputRange>(rng)), m_pred(pred) {}
+    filtered_range(InputRange&& rng, const Predicate& pred)
+      : m_rng(std::forward<InputRange>(rng))
+      , m_pred(pred)
+    {
+    }
 
     const_iterator iter() const { return const_iterator(m_rng.iter(), m_pred); }
 
@@ -30,7 +34,7 @@ namespace mln
 
   private:
     InputRange m_rng;
-    Predicate m_pred;
+    Predicate  m_pred;
   };
 
   namespace rng

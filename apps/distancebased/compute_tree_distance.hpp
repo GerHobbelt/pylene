@@ -87,12 +87,12 @@ namespace mln
       using namespace mln::morpho::tos;
 
       typedef mln_value(I) V;
-      typedef irange<V> R;
+      typedef irange<V>             R;
       typedef typename I::size_type size_type;
 
       static constexpr size_type UNPROCESSED = value_traits<size_type>::max();
-      static constexpr size_type PROCESSED = 0;
-      static constexpr size_type INQUEUE = 1;
+      static constexpr size_type PROCESSED   = 0;
+      static constexpr size_type INQUEUE     = 1;
 
       const I& ima = exact(ima_);
 
@@ -116,14 +116,14 @@ namespace mln
       // Step 1: propagation
       {
         std::vector<size_type> W;
-        std::vector<unsigned> vdist;
+        std::vector<unsigned>  vdist;
         W.reserve(f.domain().size());
         vdist.resize(f.domain().size());
 
         size_type p = f.index_of_point(pmin);
         W.push_back(p);
         parent[p] = PROCESSED;
-        K[p] = f[p].lower;
+        K[p]      = f[p].lower;
 
         image2d<bool> mask;
         resize(mask, f);
@@ -138,9 +138,9 @@ namespace mln
             std::transform(W.begin(), W.end(), vdist.begin(),
                            [dist, proj, &lpar, &f](unsigned x) { return dist(proj(f[x], lpar[x]), lpar[x]); });
             auto it = std::min_element(vdist.begin(), vdist.begin() + W.size());
-            int i = it - vdist.begin();
-            p = W[i];
-            W[i] = W.back();
+            int  i  = it - vdist.begin();
+            p       = W[i];
+            W[i]    = W.back();
             W.pop_back();
 
             K[p] = (vdist[i] == 0) ? lpar[p] : proj(f[p], lpar[p]);
@@ -178,11 +178,11 @@ namespace mln
       for (int i = S.size() - 1; i >= 0; --i)
       {
         size_type p = S[i];
-        parent[p] = p;
-        zpar[p] = p;
+        parent[p]   = p;
+        zpar[p]     = p;
 
-        size_type rp = p;
-        bool face2 = is_face_2(K.point_at_index(p));
+        size_type rp    = p;
+        bool      face2 = is_face_2(K.point_at_index(p));
 
         mln_foreach (int k, dindexes)
         {
@@ -195,15 +195,15 @@ namespace mln
               if (eq(K[p], K[r]) and !face2 and is_face_2(K.point_at_index(r)))
               {
                 parent[rp] = r;
-                zpar[rp] = r;
-                face2 = true;
-                S[spos--] = rp;
-                rp = r;
+                zpar[rp]   = r;
+                face2      = true;
+                S[spos--]  = rp;
+                rp         = r;
               }
               else
               {
                 parent[r] = rp;
-                zpar[r] = rp;
+                zpar[r]   = rp;
                 S[spos--] = r;
               }
             }

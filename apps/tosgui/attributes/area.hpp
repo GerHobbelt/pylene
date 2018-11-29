@@ -10,7 +10,10 @@ class AreaAttribute : public Attribute
 {
 public:
   AreaAttribute(const mln::image2d<V>& K_, const mln::image2d<unsigned>& parent_, const std::vector<unsigned>& S_)
-      : K(K_), parent(parent_), S(S_), m_attribute(NULL)
+    : K(K_)
+    , parent(parent_)
+    , S(S_)
+    , m_attribute(NULL)
   {
   }
 
@@ -52,11 +55,11 @@ public:
   virtual mln::QAttributeBase* getPlot(const QString&) { return m_attribute; }
 
 private:
-  const mln::image2d<V>& K;
+  const mln::image2d<V>&        K;
   const mln::image2d<unsigned>& parent;
-  const std::vector<unsigned>& S;
+  const std::vector<unsigned>&  S;
 
-  mln::image2d<unsigned> m_area;
+  mln::image2d<unsigned>     m_area;
   mln::QAttribute<unsigned>* m_attribute;
 };
 

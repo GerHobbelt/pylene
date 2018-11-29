@@ -15,8 +15,15 @@ class MeaningFullnessAttribute : public Attribute
 public:
   MeaningFullnessAttribute(const mln::image2d<T>& ima_, const mln::image2d<V>& K_,
                            const mln::image2d<unsigned>& parent_, const std::vector<unsigned>& S_)
-      : ima(ima_), K(K_), parent(parent_), S(S_), m_attribute_1(NULL), m_attribute_2(NULL), m_attribute_3(NULL),
-        m_attribute_4(NULL), m_attribute_5(NULL)
+    : ima(ima_)
+    , K(K_)
+    , parent(parent_)
+    , S(S_)
+    , m_attribute_1(NULL)
+    , m_attribute_2(NULL)
+    , m_attribute_3(NULL)
+    , m_attribute_4(NULL)
+    , m_attribute_5(NULL)
   {
     Parameter p1(new QLabel("epsilon"), new QLineEdit("5"));
     Parameter p2(new QLabel("alpha (Eint)"), new QLineEdit("0.3"));
@@ -58,8 +65,8 @@ protected slots:
 
   virtual void showinfo(const mln::point2d& node)
   {
-    float Vin = m_acc(node).cvar(m_acc(node).m_v_sum_int, m_acc(node).m_v_sum_int_sqr, m_acc(node).m_v_n_int);
-    float Vout = m_acc(node).cvar(m_acc(node).m_v_sum_ext, m_acc(node).m_v_sum_ext_sqr, m_acc(node).m_v_n_ext);
+    float Vin    = m_acc(node).cvar(m_acc(node).m_v_sum_int, m_acc(node).m_v_sum_int_sqr, m_acc(node).m_v_n_int);
+    float Vout   = m_acc(node).cvar(m_acc(node).m_v_sum_ext, m_acc(node).m_v_sum_ext_sqr, m_acc(node).m_v_n_ext);
     float Vtotal = m_acc(node).cvar(m_acc(node).m_v_sum_ext + m_acc(node).m_v_sum_int,
                                     m_acc(node).m_v_sum_ext_sqr + m_acc(node).m_v_sum_int_sqr,
                                     m_acc(node).m_v_n_ext + m_acc(node).m_v_n_int);
@@ -101,9 +108,9 @@ protected slots:
 public:
   virtual void run()
   {
-    int eps = ((const QLineEdit*)(m_params["eps"].obj->widget()))->text().toInt();
+    int   eps   = ((const QLineEdit*)(m_params["eps"].obj->widget()))->text().toInt();
     float alpha = ((const QLineEdit*)(m_params["alpha"].obj->widget()))->text().toFloat();
-    float beta = ((const QLineEdit*)(m_params["beta"].obj->widget()))->text().toFloat();
+    float beta  = ((const QLineEdit*)(m_params["beta"].obj->widget()))->text().toFloat();
     float gamma = ((const QLineEdit*)(m_params["gamma"].obj->widget()))->text().toFloat();
 
     if (m_attribute_1 == NULL)
@@ -135,7 +142,7 @@ public:
     if (eps != m_eps) // recompute: eps has changed
     {
       m_energy = mln::meaningfullness(ima, K, parent, S, m_acc, alpha, beta, gamma, eps);
-      m_eps = eps;
+      m_eps    = eps;
 
       // Compute aux data
       {
@@ -195,20 +202,20 @@ public:
   }
 
 private:
-  const mln::image2d<T>& ima;
-  const mln::image2d<V>& K;
+  const mln::image2d<T>&        ima;
+  const mln::image2d<V>&        K;
   const mln::image2d<unsigned>& parent;
-  const std::vector<unsigned>& S;
+  const std::vector<unsigned>&  S;
 
   QMap<QString, Parameter> m_params;
-  int m_eps;
+  int                      m_eps;
 
   mln::image2d<mln::internal::energy_t<T>> m_acc;
-  mln::image2d<float> m_con;
-  mln::image2d<float> m_curv;
-  mln::image2d<float> m_ext;
-  mln::image2d<float> m_energy;
-  mln::image2d<float> m_extinction;
+  mln::image2d<float>                      m_con;
+  mln::image2d<float>                      m_curv;
+  mln::image2d<float>                      m_ext;
+  mln::image2d<float>                      m_energy;
+  mln::image2d<float>                      m_extinction;
 
   mln::QAttribute<float>* m_attribute_1;
   mln::QAttribute<float>* m_attribute_2;

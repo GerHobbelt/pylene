@@ -6,7 +6,8 @@
 namespace mln
 {
 
-  QAttributeBase::QAttributeBase(const QwtText& name) : QwtPlot(name)
+  QAttributeBase::QAttributeBase(const QwtText& name)
+    : QwtPlot(name)
   {
     m_curve = new QwtPlotCurve("Energy");
     m_curve->setSamples(m_data);

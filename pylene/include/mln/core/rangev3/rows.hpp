@@ -12,7 +12,7 @@ namespace mln::ranges
   /// \p rows(rng) returns \p rng.rows() if \p rng is multi-dimensional, \p {rng} otherwise.
 
   template <class R, typename = std::enable_if_t<is_multidimensional_range_v<std::remove_reference_t<R>>>>
-  decltype(auto) rows(R&& rng)  // decltype for perfect forwarding
+  decltype(auto) rows(R&& rng) // decltype for perfect forwarding
   {
     return rng.rows();
   }

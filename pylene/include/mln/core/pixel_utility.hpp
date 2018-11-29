@@ -52,9 +52,9 @@ namespace mln
     };
   }
 
-/******************************************/
-/****          HELPER MACROS          *****/
-/******************************************/
+    /******************************************/
+    /****          HELPER MACROS          *****/
+    /******************************************/
 
 #define MLN_PIXMORPHER_FORWARD_IF_0_(COND, F, RETURN, CV)                                                              \
   typename std::enable_if<COND, RETURN>::type F() CV { return morpher_core_access::get_pix(this).F(); }
@@ -85,7 +85,7 @@ namespace mln
     {
     private:
       friend struct mln::morpher_core_access;
-      typedef Pix pixel_t;
+      typedef Pix     pixel_t;
       typedef Derived derived_t;
 
     public:
@@ -100,22 +100,22 @@ namespace mln
   {
   private:
     friend struct morpher_core_access;
-    typedef Pix pixel_t;
+    typedef Pix     pixel_t;
     typedef Derived derived_t;
 
   public:
     typedef typename Pix::value_type value_type;
     typedef typename Pix::point_type point_type;
-    typedef typename Pix::site_type site_type;
-    typedef typename Pix::reference reference;
-    typedef Morpher image_type;
+    typedef typename Pix::site_type  site_type;
+    typedef typename Pix::reference  reference;
+    typedef Morpher                  image_type;
 
     MLN_PIXMORPHER_FORWARD_CONST_0(val, reference);
     MLN_PIXMORPHER_FORWARD_CONST_0(point, point_type);
     MLN_PIXMORPHER_FORWARD_CONST_0(site, site_type);
 
   protected:
-    Pix& get_morphed() { return morpher_core_access::get_pix_(this); }
+    Pix&       get_morphed() { return morpher_core_access::get_pix_(this); }
     const Pix& get_morphed() const { return morpher_core_access::get_pix_(this); }
   };
 
@@ -125,17 +125,22 @@ namespace mln
 
   template <typename I, typename PixelType>
   struct rebinded_pixel
-      : morpher_pixel_base<rebinded_pixel<I, PixelType>, typename std::remove_reference<PixelType>::type, I>
+    : morpher_pixel_base<rebinded_pixel<I, PixelType>, typename std::remove_reference<PixelType>::type, I>
   {
-    rebinded_pixel() = default;
+    rebinded_pixel()                      = default;
     rebinded_pixel(const rebinded_pixel&) = default;
-    rebinded_pixel(I& ima, const PixelType& pix) : m_ima(&ima), m_pix(pix) {}
+    rebinded_pixel(I& ima, const PixelType& pix)
+      : m_ima(&ima)
+      , m_pix(pix)
+    {
+    }
 
     template <typename J, typename Pixel2>
     rebinded_pixel(const rebinded_pixel<J, Pixel2>& other,
                    typename std::enable_if<std::is_convertible<J*, I*>::value and
                                            std::is_convertible<Pixel2, PixelType>::value>::type* = NULL)
-        : m_ima(other.m_ima), m_pix(other.m_pix)
+      : m_ima(other.m_ima)
+      , m_pix(other.m_pix)
     {
     }
 
@@ -146,14 +151,14 @@ namespace mln
 
     template <typename, typename>
     friend struct rebinded_pixel;
-    I* m_ima;
+    I*        m_ima;
     PixelType m_pix;
   };
 
   template <typename I, typename PixelIterator>
   struct rebind_pixel_iterator
-      : iterator_base<rebind_pixel_iterator<I, PixelIterator>, rebinded_pixel<I, typename PixelIterator::value_type>,
-                      rebinded_pixel<I, typename PixelIterator::reference>>
+    : iterator_base<rebind_pixel_iterator<I, PixelIterator>, rebinded_pixel<I, typename PixelIterator::value_type>,
+                    rebinded_pixel<I, typename PixelIterator::reference>>
   {
   private:
     typedef rebinded_pixel<I, typename PixelIterator::reference> pixel_t;
@@ -163,14 +168,19 @@ namespace mln
 
     rebind_pixel_iterator(const rebind_pixel_iterator& other) = default;
 
-    rebind_pixel_iterator(I& ima, const PixelIterator& pixter) : m_ima(&ima), m_pixter(pixter) {}
+    rebind_pixel_iterator(I& ima, const PixelIterator& pixter)
+      : m_ima(&ima)
+      , m_pixter(pixter)
+    {
+    }
 
     template <typename J, typename PixelIterator2>
     rebind_pixel_iterator(
         const rebind_pixel_iterator<J, PixelIterator2>& other,
         typename std::enable_if<std::is_convertible<J*, I*>::value and
                                 std::is_convertible<PixelIterator2, PixelIterator>::value>::type* = NULL)
-        : m_ima(other.m_ima), m_pixter(other.m_pixter)
+      : m_ima(other.m_ima)
+      , m_pixter(other.m_pixter)
     {
     }
 
@@ -185,7 +195,7 @@ namespace mln
   private:
     template <typename, typename>
     friend struct rebind_pixel_iterator;
-    I* m_ima;
+    I*            m_ima;
     PixelIterator m_pixter;
   };
 

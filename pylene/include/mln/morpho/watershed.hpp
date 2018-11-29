@@ -1,13 +1,13 @@
 #ifndef MLN_MORPHO_WATERSHED_HPP
-# define MLN_MORPHO_WATERSHED_HPP
+#define MLN_MORPHO_WATERSHED_HPP
 
-# include <mln/core/trace.hpp>
-# include <mln/core/image/image.hpp>
-# include <mln/core/neighborhood/neighborhood.hpp>
-# include <mln/core/extension/extension.hpp>
-# include <mln/core/extension/fill.hpp>
-# include <mln/morpho/private/pqueue.hpp>
-# include <mln/labeling/local_extrema.hpp>
+#include <mln/core/extension/extension.hpp>
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/neighborhood/neighborhood.hpp>
+#include <mln/core/trace.hpp>
+#include <mln/labeling/local_extrema.hpp>
+#include <mln/morpho/private/pqueue.hpp>
 
 namespace mln
 {
@@ -30,7 +30,7 @@ namespace mln
       int watershed(const I& input, const N& nbh, O& output)
       {
         using Label_t = mln_value(O);
-        using V = mln_value(I);
+        using V       = mln_value(I);
 
 
         // 1. Labelize minima (note that output in initialized to -1)
@@ -38,7 +38,7 @@ namespace mln
 
 
         constexpr int kUnlabeled = -2;
-        constexpr int kInqueue = -1;
+        constexpr int kInqueue   = -1;
         constexpr int kWaterline = 0;
 
         // 2. inset neighbors inqueue
@@ -51,12 +51,12 @@ namespace mln
 
           mln_pixter(px, output);
           mln_iter(nx, nbh(px));
-          mln_forall(px)
+          mln_forall (px)
           {
             if (px->val() == 0)
             {
               bool is_local_min_neighbor = false;
-              mln_forall(nx)
+              mln_forall (nx)
                 if (nx->val() > 0) // p is neighbhor to a local minimum
                 {
                   is_local_min_neighbor = true;
@@ -94,16 +94,16 @@ namespace mln
             pqueue.pop();
 
             // Check if there is a single marked neighbor
-            Label_t common_label = kWaterline;
-            bool has_single_adjacent_marker = false;
-            mln_forall(nxOut)
+            Label_t common_label               = kWaterline;
+            bool    has_single_adjacent_marker = false;
+            mln_forall (nxOut)
             {
               int nlbl = nxOut->val();
               if (nlbl <= 0)
                 continue;
               else if (common_label == kWaterline)
               {
-                common_label = nlbl;
+                common_label               = nlbl;
                 has_single_adjacent_marker = true;
               }
               else if (nlbl != common_label)
@@ -123,8 +123,8 @@ namespace mln
               // If a single label, it gets labeled
               // Add neighbors in the queue
               pxOut.val() = common_label;
-              pxIn = input.pixel(p);
-              mln_forall(nxIn, nxOut)
+              pxIn        = input.pixel(p);
+              mln_forall (nxIn, nxOut)
               {
                 auto nlbl = nxOut->val();
                 if (nlbl == kUnlabeled)
@@ -139,7 +139,7 @@ namespace mln
 
         // 3. Label all unlabeled pixels
         {
-          mln_foreach(auto px, output.pixels())
+          mln_foreach (auto px, output.pixels())
             if (px.val() < 0)
               px.val() = kWaterline;
         }
@@ -161,11 +161,11 @@ namespace mln
       const N& nbh = exact(nbh_);
 
       constexpr Label_t kUninitialized = -1;
-      mln_ch_value(I, Label_t) output = imchvalue<Label_t>(ima).adjust(nbh).init(kUninitialized);
+      mln_ch_value(I, Label_t) output  = imchvalue<Label_t>(ima).adjust(nbh).init(kUninitialized);
       if (extension::need_adjust(output, nbh))
       {
         auto out = extension::add_value_extension(output, kUninitialized);
-        nlabel = details::watershed(ima, nbh, out);
+        nlabel   = details::watershed(ima, nbh, out);
       }
       else
       {
@@ -179,4 +179,4 @@ namespace mln
   } // end of namespace mln::morpho
 } // end of namespace mln
 
-#endif //!MLN_MORPHO_WATERSHED_HPP
+#endif //! MLN_MORPHO_WATERSHED_HPP

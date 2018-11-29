@@ -45,7 +45,7 @@ void mumford_shah_on_tree(T& tree, I& F, double lambda)
   auto B = compute_attribute_on_contour(tree, F, accu::features::count<>());
 
   // Sort the node by gradient
-  auto mgrad = compute_gradient_magnitude(tree, F); // note: minima = strong gradient
+  auto                             mgrad = compute_gradient_magnitude(tree, F); // note: minima = strong gradient
   std::vector<tree_t::vertex_id_t> S;
   S.reserve(tree.size());
 
@@ -56,7 +56,7 @@ void mumford_shah_on_tree(T& tree, I& F, double lambda)
 
   // Energy function
   auto denergy = [lambda, &A, &B](tree_t::node_type x, tree_t::node_type q) {
-    auto tmp = A[q];
+    auto   tmp    = A[q];
     double before = (tmp.to_result() * accu::extractor::count(tmp));
 
     tmp.take(A[x]);
@@ -70,8 +70,8 @@ void mumford_shah_on_tree(T& tree, I& F, double lambda)
   // Minimization glutone
   std::cout << "Before: " << tree.size() << std::endl;
 
-  unsigned k = tree.size();
-  property_map<tree_t, bool> alive(tree, true);
+  unsigned                                  k = tree.size();
+  property_map<tree_t, bool>                alive(tree, true);
   property_map<tree_t, tree_t::vertex_id_t> newpar(tree, tree_t::npos());
 
   for (tree_t::vertex_id_t i : S)

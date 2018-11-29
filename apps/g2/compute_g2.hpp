@@ -51,10 +51,10 @@ namespace mln
     //    Compute the smallest enclosing shape each VS each tree
     // {
     typedef property_map<tree_t, unsigned> depth_attribute_t;
-    depth_attribute_t d[NTREE];
+    depth_attribute_t                      d[NTREE];
 
     typedef property_map<tree_t, tree_t::node_type> tree_assoc_t;
-    tree_assoc_t SES[NTREE][NTREE];
+    tree_assoc_t                                    SES[NTREE][NTREE];
 
     compute_g2_precomputation(trees, NTREE, d, (tree_assoc_t*)SES);
     // }
@@ -68,7 +68,7 @@ namespace mln
     for (unsigned i = 0; i < NTREE; ++i)
       std::cerr << "T" << i << ": " << trees[i].realsize() << std::endl;
 
-    typedef Graph<NTREE> MyGraph;
+    typedef Graph<NTREE>         MyGraph;
     typedef graph_content<NTREE> my_graph_content;
 
     MyGraph graph(trees[0].realsize());
@@ -77,29 +77,29 @@ namespace mln
     // For now, the graph is nor reduced, it does not matter.
     //{
     typedef property_map<tree_t, typename MyGraph::vertex_descriptor> graph_assoc_t;
-    std::array<graph_assoc_t, NTREE> tlink;
+    std::array<graph_assoc_t, NTREE>                                  tlink;
     for (unsigned i = 0; i < NTREE; ++i)
       tlink[i] = graph_assoc_t(trees[i]);
 
-    auto glink = boost::get(&my_graph_content::tlinks, graph);
-    auto ulink = boost::get(&my_graph_content::ulink, graph);
+    auto glink  = boost::get(&my_graph_content::tlinks, graph);
+    auto ulink  = boost::get(&my_graph_content::ulink, graph);
     auto gdepth = boost::get(&my_graph_content::depth, graph);
-    auto senc = boost::get(&my_graph_content::senc, graph);
+    auto senc   = boost::get(&my_graph_content::senc, graph);
 
     // Handle root seperatly
     typename MyGraph::vertex_descriptor v;
-    typename MyGraph::vertex_iterator vcur, vend;
+    typename MyGraph::vertex_iterator   vcur, vend;
 
     // Root
     {
       std::tie(vcur, vend) = boost::vertices(graph);
-      v = *vcur++;
+      v                    = *vcur++;
       for (unsigned i = 0; i < NTREE; ++i)
       {
         tlink[i][trees[i].get_root_id()] = v;
-        glink[v][i] = trees[i].get_root();
-        gdepth[v][i] = 0;
-        senc[v][i] = trees[i].get_root_id();
+        glink[v][i]                      = trees[i].get_root();
+        gdepth[v][i]                     = 0;
+        senc[v][i]                       = trees[i].get_root_id();
       }
       ulink[v] = trees[0].get_root();
     }
@@ -107,16 +107,16 @@ namespace mln
     // First tree : Special case since every node must be inserted
     mln_foreach (auto node, trees[0].nodes_without_root())
     {
-      v = *vcur++;
-      glink[v][0] = node; // Set graph -> tree link
-      senc[v][0] = node.id();
+      v            = *vcur++;
+      glink[v][0]  = node; // Set graph -> tree link
+      senc[v][0]   = node.id();
       gdepth[v][0] = d[0][senc[v][0]];
-      ulink[v] = node;
+      ulink[v]     = node;
 
       for (unsigned i = 1; i < NTREE; ++i)
       {
-        glink[v][i] = trees[i].nend();
-        senc[v][i] = SES[0][i][node].id();
+        glink[v][i]  = trees[i].nend();
+        senc[v][i]   = SES[0][i][node].id();
         gdepth[v][i] = d[i][senc[v][i]];
       }
 
@@ -146,16 +146,16 @@ namespace mln
           for (unsigned j = 0; j < NTREE; ++j)
             if (i != j)
             {
-              glink[v][j] = trees[j].nend();
-              senc[v][j] = SES[i][j][node].id();
+              glink[v][j]  = trees[j].nend();
+              senc[v][j]   = SES[i][j][node].id();
               gdepth[v][j] = d[j][senc[v][j]];
             }
           ulink[v] = node;
         }
-        senc[v][i] = node.id();
-        gdepth[v][i] = d[i][node];
-        glink[v][i] = node; // Set graph -> tree link
-        tlink[i][node] = v; // Set tree -> graph link
+        senc[v][i]     = node.id();
+        gdepth[v][i]   = d[i][node];
+        glink[v][i]    = node; // Set graph -> tree link
+        tlink[i][node] = v;    // Set tree -> graph link
       }
     }
     mln_exiting();
@@ -170,7 +170,7 @@ namespace mln
         for (unsigned i = 0; i < NTREE; ++i)
         {
           tree_t::vertex_id_t par;
-          tree_t::node_type s = glink[*cur][i];
+          tree_t::node_type   s = glink[*cur][i];
           if (s != trees[i].nend())
             par = s.get_parent_id();
           else
@@ -184,7 +184,7 @@ namespace mln
 
     // 3. Reduction step
     {
-      typename MyGraph::vertex_iterator v, vend;
+      typename MyGraph::vertex_iterator   v, vend;
       typename MyGraph::out_edge_iterator e1, e2, next, eend;
       boost::tie(v, vend) = boost::vertices(graph);
       for (; v != vend; ++v)

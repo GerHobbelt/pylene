@@ -1,11 +1,11 @@
 #include <mln/core/rangev3/multi_span.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
-#include <range/v3/view/indices.hpp>
-#include <range/v3/to_container.hpp>
-#include <numeric>
-#include <vector>
 #include <gtest/gtest.h>
+#include <numeric>
+#include <range/v3/to_container.hpp>
+#include <range/v3/view/indices.hpp>
+#include <vector>
 
 using vec_t = std::array<std::ptrdiff_t, 4>;
 
@@ -18,14 +18,14 @@ template <class T>
 void iota(T* ptr, vec_t count, vec_t stride)
 {
   vec_t v;
-  int i = 0;
+  int   i = 0;
   for (v[0] = 0; v[0] < count[0]; ++v[0])
     for (v[1] = 0; v[1] < count[1]; ++v[1])
       for (v[2] = 0; v[2] < count[2]; ++v[2])
         for (v[3] = 0; v[3] < count[3]; ++v[3])
         {
           std::ptrdiff_t offset = std::inner_product(v.begin(), v.end(), stride.begin(), std::ptrdiff_t(0));
-          ptr[offset] = i++;
+          ptr[offset]           = i++;
         }
 }
 
@@ -34,24 +34,24 @@ class MultiSpanTest : public ::testing::Test
 {
 public:
   static constexpr std::size_t Rank = std::tuple_size<value_type>::value;
-  using T = typename value_type::value_type;
-  using range_type = mln::ranges::multi_span<T, Rank>;
+  using T                           = typename value_type::value_type;
+  using range_type                  = mln::ranges::multi_span<T, Rank>;
 
   static_assert(Rank == 1 || mln::ranges::is_multidimensional_range<range_type>::value);
 
   MultiSpanTest()
   {
-    constexpr int pad = 3;
-    m_count_vec = {1, 1, 1, 1};
-    m_stride_vec = {0, 0, 0, 0};
-    m_stride[Rank-1] = 1;
-    m_count[Rank-1] = 2 * (Rank-1) + 1;
-    m_size = m_count[Rank-1];
+    constexpr int pad  = 3;
+    m_count_vec        = {1, 1, 1, 1};
+    m_stride_vec       = {0, 0, 0, 0};
+    m_stride[Rank - 1] = 1;
+    m_count[Rank - 1]  = 2 * (Rank - 1) + 1;
+    m_size             = m_count[Rank - 1];
 
-    for (std::size_t k = Rank-1; k-- > 0;)
+    for (std::size_t k = Rank - 1; k-- > 0;)
     {
-      m_count[k] = 2 * k + 1;
-      m_stride[k] = m_stride[k+1] * (m_count[k+1] + pad);
+      m_count[k]  = 2 * k + 1;
+      m_stride[k] = m_stride[k + 1] * (m_count[k + 1] + pad);
       m_size *= m_count[k];
     }
     m_data.resize(m_stride[0] * (m_count[0] + pad));
@@ -59,8 +59,7 @@ public:
   }
 
   template <class R>
-  static
-  std::vector<T> rng_to_container_row_wise(R rng)
+  static std::vector<T> rng_to_container_row_wise(R rng)
   {
     std::vector<T> data;
     for (auto&& rows : mln::ranges::rows(rng))
@@ -70,8 +69,7 @@ public:
   }
 
   template <class R>
-  static
-  std::vector<T> rng_to_container(R rng)
+  static std::vector<T> rng_to_container(R rng)
   {
     std::vector<T> data;
     for (auto v : rng)
@@ -79,15 +77,17 @@ public:
     return data;
   }
 
-  std::size_t                       m_size;
-  std::vector<T>                    m_data;
-  union {
-    std::array<std::size_t, Rank>     m_count;
-    vec_t                             m_count_vec;
+  std::size_t    m_size;
+  std::vector<T> m_data;
+  union
+  {
+    std::array<std::size_t, Rank> m_count;
+    vec_t                         m_count_vec;
   };
-  union {
-    std::array<std::ptrdiff_t, Rank>  m_stride;
-    vec_t                             m_stride_vec;
+  union
+  {
+    std::array<std::ptrdiff_t, Rank> m_stride;
+    vec_t                            m_stride_vec;
   };
 };
 
@@ -99,8 +99,8 @@ TYPED_TEST(MultiSpanTest, forward)
 {
   typename TestFixture::range_type rng(this->m_data.data(), this->m_count, this->m_stride);
 
-  auto ref = ::ranges::to_vector(::ranges::view::indices(int(this->m_size)));
-  auto vrng = this->rng_to_container(rng);
+  auto ref   = ::ranges::to_vector(::ranges::view::indices(int(this->m_size)));
+  auto vrng  = this->rng_to_container(rng);
   auto vrng2 = this->rng_to_container_row_wise(rng);
   ASSERT_EQ(ref, vrng);
   ASSERT_EQ(ref, vrng2);
@@ -111,10 +111,9 @@ TYPED_TEST(MultiSpanTest, backward)
 {
   typename TestFixture::range_type rng(this->m_data.data(), this->m_count, this->m_stride);
 
-  auto ref = ::ranges::to_vector(::ranges::view::reverse(::ranges::view::indices(int(this->m_size))));
-  auto vrng = this->rng_to_container(rng.reversed());
+  auto ref   = ::ranges::to_vector(::ranges::view::reverse(::ranges::view::indices(int(this->m_size))));
+  auto vrng  = this->rng_to_container(rng.reversed());
   auto vrng2 = this->rng_to_container_row_wise(rng.reversed());
   ASSERT_EQ(ref, vrng);
   ASSERT_EQ(ref, vrng2);
 }
-

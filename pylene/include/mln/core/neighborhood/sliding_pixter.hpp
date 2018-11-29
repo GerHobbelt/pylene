@@ -71,7 +71,7 @@ namespace mln
     // \tparam Pixel must be a pointer to a pixel or a pixel iterator.
     template <class PixelProxy, class SiteSet,
               class __is_indexable = typename image_traits<internal::spixter_image_t<PixelProxy>>::indexable,
-              class __category = typename image_traits<internal::spixter_image_t<PixelProxy>>::category>
+              class __category     = typename image_traits<internal::spixter_image_t<PixelProxy>>::category>
     struct sliding_pixter_base;
 
     /********************************************************************/
@@ -80,37 +80,46 @@ namespace mln
 
     template <class PixelProxy, class SiteSet, class __category>
     struct sliding_pixter_base<PixelProxy, SiteSet, std::false_type /* __is_indexable */, __category>
-        : iterator_base<sliding_pixter<PixelProxy, SiteSet>, point_pixel<spixter_image_t<PixelProxy>>,
-                        point_pixel<spixter_image_t<PixelProxy>>>
+      : iterator_base<sliding_pixter<PixelProxy, SiteSet>, point_pixel<spixter_image_t<PixelProxy>>,
+                      point_pixel<spixter_image_t<PixelProxy>>>
     {
     private:
       using Image = spixter_image_t<PixelProxy>;
 
     public:
       sliding_pixter_base() = default;
-      sliding_pixter_base(const PixelProxy& p, const SiteSet& s) : m_set(s), m_pixel(p), m_pset_iter(rng::iter(m_set)) {}
+      sliding_pixter_base(const PixelProxy& p, const SiteSet& s)
+        : m_set(s)
+        , m_pixel(p)
+        , m_pset_iter(rng::iter(m_set))
+      {
+      }
       sliding_pixter_base(const sliding_pixter_base& other)
-          : m_set(other.m_set), m_pixel(other.m_pixel), m_pset_iter(rng::iter(m_set))
+        : m_set(other.m_set)
+        , m_pixel(other.m_pixel)
+        , m_pset_iter(rng::iter(m_set))
       {
       }
 
       sliding_pixter_base(sliding_pixter_base&& other)
-        : m_set(std::move(other.m_set)), m_pixel(std::move(other.m_pixel)), m_pset_iter(rng::iter(m_set))
+        : m_set(std::move(other.m_set))
+        , m_pixel(std::move(other.m_pixel))
+        , m_pset_iter(rng::iter(m_set))
       {
       }
 
       sliding_pixter_base& operator=(const sliding_pixter_base& other)
       {
-        m_set = other.m_set;
-        m_pixel = other.m_pixel;
+        m_set       = other.m_set;
+        m_pixel     = other.m_pixel;
         m_pset_iter = rng::iter(m_set);
         return *this;
       }
 
       sliding_pixter_base& operator=(sliding_pixter_base&& other)
       {
-        m_set = std::move(other.m_set);
-        m_pixel = std::move(other.m_pixel);
+        m_set       = std::move(other.m_set);
+        m_pixel     = std::move(other.m_pixel);
         m_pset_iter = rng::iter(m_set);
         return *this;
       }
@@ -122,8 +131,8 @@ namespace mln
       point_pixel<Image> dereference() const { return {m_pixel.get().image(), m_pixel.get().point() + *m_pset_iter}; }
 
     private:
-      SiteSet m_set;
-      PixelProxy m_pixel;
+      SiteSet                                      m_set;
+      PixelProxy                                   m_pixel;
       typename range_const_iterator<SiteSet>::type m_pset_iter;
     };
 
@@ -135,13 +144,15 @@ namespace mln
     struct sliding_pixter_container_base
     {
     private:
-      using Point = typename SiteSet::value_type;
+      using Point          = typename SiteSet::value_type;
       using IndexContainer = boost::container::small_vector<int, 25>;
-      using SiteContainer = boost::container::small_vector<Point, 25>;
+      using SiteContainer  = boost::container::small_vector<Point, 25>;
 
     public:
       sliding_pixter_container_base(const SiteSet& s)
-          : m_size(static_cast<int>(rng::size(s))), m_site_set(m_size), m_index_set(m_size)
+        : m_size(static_cast<int>(rng::size(s)))
+        , m_site_set(m_size)
+        , m_index_set(m_size)
       {
         auto it = rng::iter(s);
         it.init();
@@ -150,8 +161,8 @@ namespace mln
       }
 
     protected:
-      const int m_size;
-      SiteContainer m_site_set;
+      const int      m_size;
+      SiteContainer  m_site_set;
       IndexContainer m_index_set;
     };
 
@@ -159,20 +170,23 @@ namespace mln
     struct sliding_pixter_container_base<std::array<Point, N>>
     {
     public:
-      sliding_pixter_container_base(const std::array<Point, N>& s) : m_site_set(s) {}
+      sliding_pixter_container_base(const std::array<Point, N>& s)
+        : m_site_set(s)
+      {
+      }
 
     protected:
       using IndexContainer = std::array<int, N>;
-      using SiteContainer = std::array<Point, N>;
+      using SiteContainer  = std::array<Point, N>;
 
       static constexpr int m_size = N;
       const SiteContainer& m_site_set;
-      IndexContainer m_index_set;
+      IndexContainer       m_index_set;
     };
 
     template <class PixelProxy, class SiteSet>
     struct sliding_pixter_base<PixelProxy, SiteSet, std::true_type /* __is_indexable */, void>
-        : sliding_pixter_container_base<SiteSet>
+      : sliding_pixter_container_base<SiteSet>
     {
     private:
       using Image = spixter_image_t<PixelProxy>;
@@ -181,7 +195,9 @@ namespace mln
       sliding_pixter_base() = default;
 
       sliding_pixter_base(const PixelProxy& px, const SiteSet& s)
-          : sliding_pixter_container_base<SiteSet>(s), m_image(px.get().image()), m_pixel(px)
+        : sliding_pixter_container_base<SiteSet>(s)
+        , m_image(px.get().image())
+        , m_pixel(px)
       {
         for (int i = 0; i < this->m_size; ++i)
           this->m_index_set[i] = m_image.delta_index(this->m_site_set[i]);
@@ -192,21 +208,21 @@ namespace mln
       bool finished() const { return m_i >= this->m_size; }
 
     protected:
-      Image& m_image;
+      Image&           m_image;
       const PixelProxy m_pixel;
-      int m_i;
+      int              m_i;
     };
 
     // Specialization for indexable images NOT raw.
     // with a dynamic siteset
     template <class PixelProxy, class SiteSet, class __category>
     struct sliding_pixter_base<PixelProxy, SiteSet, std::true_type /* __is_indexable */, __category>
-        : sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>,
-          iterator_base<sliding_pixter<PixelProxy, SiteSet>, index_pixel<spixter_image_t<PixelProxy>>,
-                        index_pixel<spixter_image_t<PixelProxy>>>
+      : sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>,
+        iterator_base<sliding_pixter<PixelProxy, SiteSet>, index_pixel<spixter_image_t<PixelProxy>>,
+                      index_pixel<spixter_image_t<PixelProxy>>>
     {
     private:
-      using base = sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>;
+      using base  = sliding_pixter_base<PixelProxy, SiteSet, std::true_type, void>;
       using Image = spixter_image_t<PixelProxy>;
 
     public:
@@ -257,7 +273,8 @@ namespace mln
                   "accessible <ima(p)> nor indexable <ima[i]>");
 
   public:
-    sliding_pixter(const PixelProxy& px, const SiteSet& s) : internal::sliding_pixter_base<PixelProxy, SiteSet>(px, s)
+    sliding_pixter(const PixelProxy& px, const SiteSet& s)
+      : internal::sliding_pixter_base<PixelProxy, SiteSet>(px, s)
     {
     }
   };

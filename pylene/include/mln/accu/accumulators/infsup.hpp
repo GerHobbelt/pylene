@@ -50,7 +50,10 @@ namespace mln
       template <typename Compare>
       struct inf : simple_feature<inf<Compare>>
       {
-        inf(const Compare& cmp) : m_cmp(cmp) {}
+        inf(const Compare& cmp)
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         struct apply
@@ -89,7 +92,10 @@ namespace mln
       template <typename Compare>
       struct sup : simple_feature<sup<Compare>>
       {
-        sup(const Compare& cmp) : m_cmp(cmp) {}
+        sup(const Compare& cmp)
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         struct apply
@@ -148,12 +154,14 @@ namespace mln
       template <typename T, typename Compare>
       struct infsup : Accumulator<infsup<T, Compare>>
       {
-        typedef T argument_type;
-        typedef std::pair<T, T> result_type;
+        typedef T                                                 argument_type;
+        typedef std::pair<T, T>                                   result_type;
         typedef boost::mpl::set<features::inf<>, features::sup<>> provides;
 
         infsup(const Compare& cmp = Compare())
-            : m_inf(value_traits<T, Compare>::sup()), m_sup(value_traits<T, Compare>::inf()), m_cmp(cmp)
+          : m_inf(value_traits<T, Compare>::sup())
+          , m_sup(value_traits<T, Compare>::inf())
+          , m_cmp(cmp)
         {
         }
 
@@ -178,8 +186,8 @@ namespace mln
           using mln::sup;
           T vinf = extractor::inf(other);
           T vsup = extractor::sup(other);
-          m_inf = inf(m_inf, vinf, m_cmp);
-          m_sup = sup(m_sup, vsup, m_cmp);
+          m_inf  = inf(m_inf, vinf, m_cmp);
+          m_sup  = sup(m_sup, vsup, m_cmp);
         }
 
         std::pair<T, T> to_result() const { return std::make_pair(m_inf, m_sup); }
@@ -189,8 +197,8 @@ namespace mln
         friend T extract(const infsup& accu, features::sup<>) { return accu.m_sup; }
 
       private:
-        T m_inf;
-        T m_sup;
+        T       m_inf;
+        T       m_sup;
         Compare m_cmp;
       };
 
@@ -200,7 +208,11 @@ namespace mln
         typedef T argument_type;
         typedef T result_type;
 
-        inf(const Compare& cmp = Compare()) : m_cmp(cmp), m_inf(value_traits<T, Compare>::sup()) {}
+        inf(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+          , m_inf(value_traits<T, Compare>::sup())
+        {
+        }
 
         void init() { m_inf = value_traits<T, Compare>::sup(); }
 
@@ -215,7 +227,7 @@ namespace mln
         {
           using mln::inf;
           T vinf = extractor::inf(other);
-          m_inf = inf(m_inf, vinf, m_cmp);
+          m_inf  = inf(m_inf, vinf, m_cmp);
         }
 
         template <class dummy = bool>
@@ -228,7 +240,7 @@ namespace mln
 
       private:
         Compare m_cmp;
-        T m_inf;
+        T       m_inf;
       };
 
       template <typename T, typename Compare>
@@ -237,7 +249,11 @@ namespace mln
         typedef T argument_type;
         typedef T result_type;
 
-        sup(const Compare& cmp = Compare()) : m_cmp(cmp), m_sup(value_traits<T, Compare>::inf()) {}
+        sup(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+          , m_sup(value_traits<T, Compare>::inf())
+        {
+        }
 
         void init() { m_sup = value_traits<T, Compare>::inf(); }
 
@@ -252,7 +268,7 @@ namespace mln
         {
           using mln::sup;
           T vsup = extractor::sup(other);
-          m_sup = sup(m_sup, vsup, m_cmp);
+          m_sup  = sup(m_sup, vsup, m_cmp);
         }
 
         template <class dummy = bool>
@@ -265,7 +281,7 @@ namespace mln
 
       private:
         Compare m_cmp;
-        T m_sup;
+        T       m_sup;
       };
     }
   }

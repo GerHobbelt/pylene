@@ -13,7 +13,10 @@ namespace mln
     typedef I const_iterator;
 
     iterator_range() = default;
-    explicit iterator_range(const iterator& x) : iter_(x) {}
+    explicit iterator_range(const iterator& x)
+      : iter_(x)
+    {
+    }
 
     iterator iter() const { return iter_; }
 
@@ -35,14 +38,18 @@ namespace mln
     typedef Iterator2 reverse_iterator;
     typedef Iterator2 const_reverse_iterator;
 
-    bidirectional_iterator_range(const iterator& x, const reverse_iterator& y) : iter_(x), riter_(y) {}
+    bidirectional_iterator_range(const iterator& x, const reverse_iterator& y)
+      : iter_(x)
+      , riter_(y)
+    {
+    }
 
     iterator iter() const { return iter_; }
 
     reverse_iterator riter() const { return riter_; }
 
   private:
-    iterator iter_;
+    iterator         iter_;
     reverse_iterator riter_;
   };
 

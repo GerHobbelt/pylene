@@ -17,12 +17,15 @@ namespace mln
   template <class F, class ArgType>
   struct functional_property_map
   {
-    typedef typename std::result_of<F(ArgType)>::type reference;
+    typedef typename std::result_of<F(ArgType)>::type       reference;
     typedef typename std::result_of<const F(ArgType)>::type const_reference;
-    typedef typename std::decay<reference>::type value_type;
-    typedef ArgType key_type;
+    typedef typename std::decay<reference>::type            value_type;
+    typedef ArgType                                         key_type;
 
-    functional_property_map(const F& fun) : f(fun) {}
+    functional_property_map(const F& fun)
+      : f(fun)
+    {
+    }
 
     template <class... T>
     typename std::result_of<const F(T...)>::type operator[](T&&... args) const

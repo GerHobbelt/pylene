@@ -74,7 +74,7 @@ void Mult_New_Values_Reversed(const mln::image2d<mln::uint8>& input, mln::image2
                                               mln::ranges::view::reverse(output.new_values()));
   for (auto&& r : zipped_values.rows())
   {
-    for (auto&& [in_v, out_v] : r)
+    for (auto && [ in_v, out_v ] : r)
     {
       out_v = in_v * 2;
     }
@@ -87,7 +87,7 @@ void Mult_New_Pixels_Reversed(const mln::image2d<mln::uint8>& input, mln::image2
                                               mln::ranges::view::reverse(output.new_pixels()));
   for (auto&& r : zipped_pixels.rows())
   {
-    for (auto&& [in_p, out_p] : r)
+    for (auto && [ in_p, out_p ] : r)
     {
       out_p.val() = in_p.val() * 2;
     }
@@ -174,7 +174,7 @@ void Threshold_New_Values_Reversed(const mln::image2d<mln::uint8>& input, mln::i
                                               mln::ranges::view::reverse(output.new_values()));
   for (auto&& r : zipped_values.rows())
   {
-    for (auto&& [in_v, out_v] : r)
+    for (auto && [ in_v, out_v ] : r)
     {
       out_v = in_v < t ? 0 : 255;
     }
@@ -189,7 +189,7 @@ void Threshold_New_Pixels_Reversed(const mln::image2d<mln::uint8>& input, mln::i
                                               mln::ranges::view::reverse(output.new_pixels()));
   for (auto&& r : zipped_pixels.rows())
   {
-    for (auto&& [in_p, out_p] : r)
+    for (auto && [ in_p, out_p ] : r)
     {
       out_p.val() = in_p.val() < t ? 0 : 255;
     }
@@ -263,7 +263,7 @@ void LUT_New_Values_Reversed(const mln::uint8 LUT[], const mln::image2d<mln::uin
                                               mln::ranges::view::reverse(output.new_values()));
   for (auto&& r : zipped_values.rows())
   {
-    for (auto&& [in_v, out_v] : r)
+    for (auto && [ in_v, out_v ] : r)
     {
       out_v = LUT[in_v];
     }
@@ -277,7 +277,7 @@ void LUT_New_Pixels_Reversed(const mln::uint8 LUT[], const mln::image2d<mln::uin
                                               mln::ranges::view::reverse(output.new_pixels()));
   for (auto&& r : zipped_pixels.rows())
   {
-    for (auto&& [in_p, out_p] : r)
+    for (auto && [ in_p, out_p ] : r)
     {
       out_p.val() = LUT[in_p.val()];
     }

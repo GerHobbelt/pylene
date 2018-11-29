@@ -32,13 +32,13 @@ namespace mln
     {
       mln_entering("mln::morpho::cut_and_reconstruct");
 
-      typedef component_tree<P, Amap> tree_t;
-      typedef typename tree_t::vertex_id_t vertex_id_t;
+      typedef component_tree<P, Amap>       tree_t;
+      typedef typename tree_t::vertex_id_t  vertex_id_t;
       typedef typename ValueMap::value_type V;
 
       property_map<tree_t, V> vmap(tree);
-      vertex_id_t r = tree.get_root_id();
-      vmap[r] = value_map[r];
+      vertex_id_t             r = tree.get_root_id();
+      vmap[r]                   = value_map[r];
 
       mln_foreach (auto x, tree.nodes_without_root())
         if (pred[x.parent()])
@@ -52,7 +52,7 @@ namespace mln
 
       mln_foreach (auto px, out.pixels())
       {
-        auto x = tree.get_node_at(px.index());
+        auto x   = tree.get_node_at(px.index());
         px.val() = vmap[x];
       }
 
@@ -62,7 +62,7 @@ namespace mln
     template <class P, class Amap, class CriterionMap>
     void cut_inplace(component_tree<P, Amap>& tree, const CriterionMap& pred)
     {
-      typedef component_tree<P, Amap> tree_t;
+      typedef component_tree<P, Amap>      tree_t;
       typedef typename tree_t::vertex_id_t vertex_id_t;
 
       mln_entering("mln::morpho::cut_inplace");
@@ -89,12 +89,12 @@ namespace mln
       }
 
       // backward update next-sibling and the dble-linked list
-      mln_reverse_foreach(auto x, tree.nodes())
+      mln_reverse_foreach (auto x, tree.nodes())
       {
         typename tree_t::node_type snext = x.next_sibling();
         if (pred[snext.parent()])
         { // snext is removed
-          vertex_id_t snextid = data->m_nodes[snext.id()].m_next;
+          vertex_id_t snextid                  = data->m_nodes[snext.id()].m_next;
           data->m_nodes[x.id()].m_next_sibling = snextid;
         }
 

@@ -29,7 +29,7 @@ namespace mln
   {
     typedef accu::accumulators::mean<V, vec3u> Acc;
 
-    image2d<V> mean;
+    image2d<V>   mean;
     image2d<Acc> accus;
 
     resize(accus, ima);
@@ -74,17 +74,17 @@ int main(int argc, char** argv)
   image2d<rgb8> ima;
   io::imread(argv[1], ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
-  I rr = addborder(r);
-  I gg = addborder(g);
-  I bb = addborder(b);
+  I                  r  = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g  = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b  = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  rr = addborder(r);
+  I                  gg = addborder(g);
+  I                  bb = addborder(b);
 
-  image2d<V> rK, gK, bK;
-  image2d<unsigned> rparent, gparent, bparent;
+  image2d<V>            rK, gK, bK;
+  image2d<unsigned>     rparent, gparent, bparent;
   std::vector<unsigned> rS, gS, bS;
   std::tie(rK, rparent, rS) = morpho::ToS(rr, c4);
   std::tie(gK, gparent, gS) = morpho::ToS(gg, c4);
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
   auto g_area = morpho::area_compute(gK, gparent, gS, K1::is_face_2);
   auto b_area = morpho::area_compute(bK, bparent, bS, K1::is_face_2);
 
-  int size = 7;
+  int  size   = 7;
   auto grad_r = interpolate_k1(gradient(rr, size));
   auto grad_g = interpolate_k1(gradient(gg, size));
   auto grad_b = interpolate_k1(gradient(bb, size));
@@ -116,9 +116,9 @@ int main(int argc, char** argv)
     }
   }
 
-  image2d<unsigned> K;
+  image2d<unsigned>     K;
   std::vector<unsigned> S;
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
   std::tie(K, parent, S) = morpho::ToS(area, c4);
 
   auto Area = morpho::area_compute(K, parent, S, K1::is_face_2);
@@ -127,19 +127,19 @@ int main(int argc, char** argv)
 
   auto Kui8 = transform(K, [maxarea](const unsigned& v) -> uint8 { return (float)v / maxarea * 255; });
 
-  auto f = interpolate_k1(addborder(ima, mln::lexicographicalorder_less<rgb8>()));
+  auto                              f = interpolate_k1(addborder(ima, mln::lexicographicalorder_less<rgb8>()));
   image2d<internal::energy_t<rgb8>> imacc;
-  image2d<float> energy = compute_energy(f, K, parent, S, imacc);
-  image2d<float> cenergy = close(energy, K, parent, S);
+  image2d<float>                    energy  = compute_energy(f, K, parent, S, imacc);
+  image2d<float>                    cenergy = close(energy, K, parent, S);
 
   qt::ImageViewer w1(Kui8);
   w1.show();
 
-  auto f2 = interpolate_k1(f);
+  auto            f2 = interpolate_k1(f);
   qt::ImageViewer w2(f2);
   w2.show();
 
-  auto mean = set_mean_on_node(f2, K, S, parent);
+  auto            mean = set_mean_on_node(f2, K, S, parent);
   qt::ImageViewer w3(f2);
   w3.show();
 
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
 
 #define IF_NOT_NULL(v, XEXPR) ((v) == 0) ? 0 : (XEXPR);
 
-  auto attr5 = transform(imacc, [](const internal::energy_t<rgb8>& x) -> float {
+  auto              attr5 = transform(imacc, [](const internal::energy_t<rgb8>& x) -> float {
     return IF_NOT_NULL(x.m_e_length, x.alpha * x.m_e_sumcurv / x.m_e_length);
   });
   QAttribute<float> wattr5(attr5, parent, QString("Internal Energy (sum_curv / e_length)"));
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
   QAttribute<float> wattr6(attr6, parent, QString("External Energy"));
   wattr6.show();
 
-  auto attr7 = transform(imacc, [](const internal::energy_t<rgb8>& x) -> float {
+  auto              attr7 = transform(imacc, [](const internal::energy_t<rgb8>& x) -> float {
     return IF_NOT_NULL(x.m_e_length, x.beta / x.m_e_length);
   });
   QAttribute<float> wattr7(attr7, parent, QString("Constraint Energy"));

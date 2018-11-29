@@ -16,8 +16,8 @@ int main(int argc, const char** argv)
 
   io::imread(argv[1], f);
 
-  float hs = std::atof(argv[2]);
-  float hr = std::atof(argv[3]);
+  float         hs  = std::atof(argv[2]);
+  float         hr  = std::atof(argv[3]);
   image2d<rgb8> out = contrib::meanshift(f, hs, hr);
 
   io::imsave(out, argv[4]);

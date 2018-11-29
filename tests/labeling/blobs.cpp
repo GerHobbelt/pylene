@@ -17,7 +17,7 @@ TEST(Labeling, blobs_fast)
   image2d<bool> mask = eval(ima % 2 == 0);
 
   image2d<uint8> lbl;
-  unsigned nlabel;
+  unsigned       nlabel;
   std::tie(lbl, nlabel) = labeling::blobs(mask, c4, uint8());
   ASSERT_EQ(nlabel, 13u);
 }
@@ -30,7 +30,7 @@ TEST(Labeling, blobs_custom)
   iota(ima, 0);
 
   image2d<uint8> lbl;
-  unsigned nlabel;
+  unsigned       nlabel;
 
   std::tie(lbl, nlabel) = labeling::blobs(ima % 2 == 0, c4, uint8());
   ASSERT_EQ(nlabel, 13u);

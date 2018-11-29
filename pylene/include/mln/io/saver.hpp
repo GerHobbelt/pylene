@@ -95,10 +95,10 @@ namespace mln
     {
       (void)permissive;
 
-      PluginWriter2D* plug = static_cast<PluginWriter2D*>(plugin);
+      PluginWriter2D*            plug       = static_cast<PluginWriter2D*>(plugin);
       std::function<void(void*)> write_line = plug->get_write_next_line_method();
 
-      point2d p = ima.domain().pmin;
+      point2d p    = ima.domain().pmin;
       point2d pmax = ima.domain().pmax;
 
       for (; p[0] != pmax[0]; ++p[0])

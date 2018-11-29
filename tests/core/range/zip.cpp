@@ -50,7 +50,7 @@ TEST(Core, zip_container)
   std::vector<int> a   = {0, 1, 2, 3, 4};
   std::vector<int> b   = {0, 0, 0, 0, 0};
 
-  for (auto [vin, vout] : mln::ranges::view::zip(a, b))
+  for (auto[vin, vout] : mln::ranges::view::zip(a, b))
     vout = vin;
 
   EXPECT_EQ(ref, a);
@@ -71,7 +71,7 @@ TEST(Core, zip_view_readonly)
   };
 
   auto refv = std::begin(ref);
-  for (auto [v1, v2, v3] : mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2))
+  for (auto[v1, v2, v3] : mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2))
   {
     ASSERT_EQ(*refv, v1);
     ASSERT_EQ((*refv + mln::point2d{1, 2}), v2);
@@ -95,7 +95,7 @@ TEST(Core, zip_view_readonly_rowwise)
   const auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
   for (auto&& row : zipped_rows.rows())
   {
-    for (auto [v1, v2, v3] : row)
+    for (auto[v1, v2, v3] : row)
     {
       ASSERT_EQ(*refv, v1);
       ASSERT_EQ((*refv + mln::point2d{1, 2}), v2);
@@ -115,7 +115,7 @@ TEST(Core, zip_view_write)
 
   mln::box2d ind0 = {{1, 1}, {3, 4}};
   auto       z    = mln::ranges::view::zip(sp1, sp2, ind0);
-  for (auto [x, y, p] : z)
+  for (auto[x, y, p] : z)
   {
     x    = p[0]; // By ref
     y    = p[1]; // By ref
@@ -141,7 +141,7 @@ TEST(Core, zip_view_write_rowwise)
   auto       z    = mln::ranges::view::zip(sp1, sp2, ind0);
   for (auto&& r : z.rows())
   {
-    for (auto [x, y, p] : r)
+    for (auto[x, y, p] : r)
     {
       x    = p[0]; // By ref
       y    = p[1]; // By ref
@@ -164,7 +164,7 @@ TEST(Core, zip_segmented_and_nonsegmented)
   };
 
 
-  for (auto [v1, v2] : mln::ranges::view::zip(ref, multi_ind0))
+  for (auto[v1, v2] : mln::ranges::view::zip(ref, multi_ind0))
     ASSERT_EQ(v1, v2);
 }
 
@@ -181,6 +181,6 @@ TEST(Core, zip_segmented_and_nonsegmented_rowwise)
 
   auto zipped = mln::ranges::view::zip(ref, multi_ind0);
   for (auto&& row : mln::ranges::rows(zipped))
-    for (auto [v1, v2] : row)
+    for (auto[v1, v2] : row)
       ASSERT_EQ(v1, v2);
 }

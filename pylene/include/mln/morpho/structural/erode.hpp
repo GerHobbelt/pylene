@@ -54,11 +54,15 @@ namespace mln
         template <class T, class Compare>
         struct erode_traits_base
         {
-          erode_traits_base(Compare cmp) : accu_sup(cmp), m_cmp(std::move(cmp)) {}
+          erode_traits_base(Compare cmp)
+            : accu_sup(cmp)
+            , m_cmp(std::move(cmp))
+          {
+          }
 
           const mln::accu::accumulators::inf<T, Compare> accu_sup;
-          auto sup(T x, T y) const { return mln::inf(x, y, m_cmp); }
-          static constexpr T zero() { return value_traits<T, Compare>::sup(); }
+          auto                                           sup(T x, T y) const { return mln::inf(x, y, m_cmp); }
+          static constexpr T                             zero() { return value_traits<T, Compare>::sup(); }
 
         private:
           Compare m_cmp;
@@ -77,10 +81,12 @@ namespace mln
         {
           using support_incremental = std::true_type;
 
-          erode_traits(productorder_less<T> cmp) : erode_traits_base<T, productorder_less<T>>(cmp) {}
+          erode_traits(productorder_less<T> cmp)
+            : erode_traits_base<T, productorder_less<T>>(cmp)
+          {
+          }
           const mln::accu::accumulators::h_inf<T> accu_hsup;
         };
-
       }
 
       template <class I, class SE, class OutputImage, class Compare>

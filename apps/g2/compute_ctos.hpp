@@ -16,7 +16,7 @@ namespace mln
   /// \param input The input image
   /// \param[out] depth if not NULL, store the depth image inside.
   morpho::component_tree<unsigned, image2d<unsigned>> compute_ctos(const image2d<rgb8>& input,
-                                                                   image2d<uint16>* depth = nullptr);
+                                                                   image2d<uint16>*     depth = nullptr);
 
   morpho::component_tree<unsigned, image2d<unsigned>>
       compute_ctos_from_maxtrees(const image2d<rgb8>& input, image2d<uint16>* imdepth, bool mintree = false);

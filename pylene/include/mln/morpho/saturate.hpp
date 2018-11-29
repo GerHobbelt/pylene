@@ -29,7 +29,7 @@ namespace mln
       void saturate(const Image<I>& ima_, const N& nbh, Image<J>& out_, const mln_point(I) & pinf)
       {
         const I& ima = exact(ima_);
-        J& out = exact(out_);
+        J&       out = exact(out_);
 
         std::queue<mln_point(I)> queue;
 

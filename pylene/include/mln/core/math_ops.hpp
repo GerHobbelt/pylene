@@ -14,150 +14,150 @@
 namespace mln
 {
   /* Element wise operators */
-  int sqr(int x);
-  long sqr(long n);
-  long long sqr(long long n);
-  unsigned int sqr(unsigned int x);
-  unsigned long sqr(unsigned long n);
+  int                sqr(int x);
+  long               sqr(long n);
+  long long          sqr(long long n);
+  unsigned int       sqr(unsigned int x);
+  unsigned long      sqr(unsigned long n);
   unsigned long long sqr(unsigned long long n);
-  float sqr(float x);
-  double sqr(double x);
-  long double sqr(long double x);
+  float              sqr(float x);
+  double             sqr(double x);
+  long double        sqr(long double x);
 
-  int abs(int x);
-  long abs(long n);
-  long long abs(long long n);
-  unsigned int abs(unsigned int x);
-  unsigned long abs(unsigned long n);
+  int                abs(int x);
+  long               abs(long n);
+  long long          abs(long long n);
+  unsigned int       abs(unsigned int x);
+  unsigned long      abs(unsigned long n);
   unsigned long long abs(unsigned long long n);
-  float abs(float x);
-  double abs(double x);
-  long double abs(long double x);
+  float              abs(float x);
+  double             abs(double x);
+  long double        abs(long double x);
 
   using std::cbrt;
   using std::pow;
   using std::sqrt;
 
   /* Reduction operators */
-  int sum(int x);
-  long sum(long n);
-  long long sum(long long n);
-  unsigned int sum(unsigned int x);
-  unsigned long sum(unsigned long n);
+  int                sum(int x);
+  long               sum(long n);
+  long long          sum(long long n);
+  unsigned int       sum(unsigned int x);
+  unsigned long      sum(unsigned long n);
   unsigned long long sum(unsigned long long n);
-  float sum(float x);
-  double sum(double x);
-  long double sum(long double x);
+  float              sum(float x);
+  double             sum(double x);
+  long double        sum(long double x);
 
-  int prod(int x);
-  long prod(long n);
-  long long prod(long long n);
-  unsigned int prod(unsigned int x);
-  unsigned long prod(unsigned long n);
+  int                prod(int x);
+  long               prod(long n);
+  long long          prod(long long n);
+  unsigned int       prod(unsigned int x);
+  unsigned long      prod(unsigned long n);
   unsigned long long prod(unsigned long long n);
-  float prod(float x);
-  double prod(double x);
-  long double prod(long double x);
+  float              prod(float x);
+  double             prod(double x);
+  long double        prod(long double x);
 
-  int minimum(int x);
-  long minimum(long n);
-  long long minimum(long long n);
-  unsigned int minimum(unsigned int x);
-  unsigned long minimum(unsigned long n);
+  int                minimum(int x);
+  long               minimum(long n);
+  long long          minimum(long long n);
+  unsigned int       minimum(unsigned int x);
+  unsigned long      minimum(unsigned long n);
   unsigned long long minimum(unsigned long long n);
-  float minimum(float x);
-  double minimum(double x);
-  long double minimum(long double x);
+  float              minimum(float x);
+  double             minimum(double x);
+  long double        minimum(long double x);
 
-  int maximum(int x);
-  long maximum(long n);
-  long long maximum(long long n);
-  unsigned int maximum(unsigned int x);
-  unsigned long maximum(unsigned long n);
+  int                maximum(int x);
+  long               maximum(long n);
+  long long          maximum(long long n);
+  unsigned int       maximum(unsigned int x);
+  unsigned long      maximum(unsigned long n);
   unsigned long long maximum(unsigned long long n);
-  float maximum(float x);
-  double maximum(double x);
-  long double maximum(long double x);
+  float              maximum(float x);
+  double             maximum(double x);
+  long double        maximum(long double x);
 
-  int l0norm(int x);
-  long l0norm(long n);
-  long long l0norm(long long n);
-  unsigned int l0norm(unsigned int x);
-  unsigned long l0norm(unsigned long n);
+  int                l0norm(int x);
+  long               l0norm(long n);
+  long long          l0norm(long long n);
+  unsigned int       l0norm(unsigned int x);
+  unsigned long      l0norm(unsigned long n);
   unsigned long long l0norm(unsigned long long n);
-  float l0norm(float x);
-  double l0norm(double x);
-  long double l0norm(long double x);
+  float              l0norm(float x);
+  double             l0norm(double x);
+  long double        l0norm(long double x);
 
-  int l1norm(int x);
-  long l1norm(long n);
-  long long l1norm(long long n);
-  unsigned int l1norm(unsigned int x);
-  unsigned long l1norm(unsigned long n);
+  int                l1norm(int x);
+  long               l1norm(long n);
+  long long          l1norm(long long n);
+  unsigned int       l1norm(unsigned int x);
+  unsigned long      l1norm(unsigned long n);
   unsigned long long l1norm(unsigned long long n);
-  float l1norm(float x);
-  double l1norm(double x);
-  long double l1norm(long double x);
+  float              l1norm(float x);
+  double             l1norm(double x);
+  long double        l1norm(long double x);
 
-  int l2norm(int x);
-  long l2norm(long n);
-  long long l2norm(long long n);
-  unsigned int l2norm(unsigned int x);
-  unsigned long l2norm(unsigned long n);
+  int                l2norm(int x);
+  long               l2norm(long n);
+  long long          l2norm(long long n);
+  unsigned int       l2norm(unsigned int x);
+  unsigned long      l2norm(unsigned long n);
   unsigned long long l2norm(unsigned long long n);
-  float l2norm(float x);
-  double l2norm(double x);
-  long double l2norm(long double x);
+  float              l2norm(float x);
+  double             l2norm(double x);
+  long double        l2norm(long double x);
 
-  int l2dist(int x, int y);
-  long l2dist(long x, long y);
-  long long l2dist(long long x, long long y);
-  unsigned int l2dist(unsigned int x, unsigned int y);
-  unsigned long l2dist(unsigned long x, unsigned long y);
+  int                l2dist(int x, int y);
+  long               l2dist(long x, long y);
+  long long          l2dist(long long x, long long y);
+  unsigned int       l2dist(unsigned int x, unsigned int y);
+  unsigned long      l2dist(unsigned long x, unsigned long y);
   unsigned long long l2dist(unsigned long long x, unsigned long long y);
-  float l2dist(float x, float y);
-  double l2dist(double x, double y);
-  long double l2dist(long double x, long double y);
+  float              l2dist(float x, float y);
+  double             l2dist(double x, double y);
+  long double        l2dist(long double x, long double y);
 
-  int l1dist(int x, int y);
-  long l1dist(long x, long y);
-  long long l1dist(long long x, long long y);
-  unsigned int l1dist(unsigned int x, unsigned int y);
-  unsigned long l1dist(unsigned long x, unsigned long y);
+  int                l1dist(int x, int y);
+  long               l1dist(long x, long y);
+  long long          l1dist(long long x, long long y);
+  unsigned int       l1dist(unsigned int x, unsigned int y);
+  unsigned long      l1dist(unsigned long x, unsigned long y);
   unsigned long long l1dist(unsigned long long x, unsigned long long y);
-  float l1dist(float x, float y);
-  double l1dist(double x, double y);
-  long double l1dist(long double x, long double y);
+  float              l1dist(float x, float y);
+  double             l1dist(double x, double y);
+  long double        l1dist(long double x, long double y);
 
-  int l2norm_sqr(int x);
-  long l2norm_sqr(long n);
-  long long l2norm_sqr(long long n);
-  unsigned int l2norm_sqr(unsigned int x);
-  unsigned long l2norm_sqr(unsigned long n);
+  int                l2norm_sqr(int x);
+  long               l2norm_sqr(long n);
+  long long          l2norm_sqr(long long n);
+  unsigned int       l2norm_sqr(unsigned int x);
+  unsigned long      l2norm_sqr(unsigned long n);
   unsigned long long l2norm_sqr(unsigned long long n);
-  float l2norm_sqr(float x);
-  double l2norm_sqr(double x);
-  long double l2norm_sqr(long double x);
+  float              l2norm_sqr(float x);
+  double             l2norm_sqr(double x);
+  long double        l2norm_sqr(long double x);
 
-  int l2dist_sqr(int x, int y);
-  long l2dist_sqr(long x, long y);
-  long long l2dist_sqr(long long x, long long y);
-  unsigned int l2dist_sqr(unsigned int x, unsigned int y);
-  unsigned long l2dist_sqr(unsigned long x, unsigned long y);
+  int                l2dist_sqr(int x, int y);
+  long               l2dist_sqr(long x, long y);
+  long long          l2dist_sqr(long long x, long long y);
+  unsigned int       l2dist_sqr(unsigned int x, unsigned int y);
+  unsigned long      l2dist_sqr(unsigned long x, unsigned long y);
   unsigned long long l2dist_sqr(unsigned long long x, unsigned long long y);
-  float l2dist_sqr(float x, float y);
-  double l2dist_sqr(double x, double y);
-  long double l2dist_sqr(long double x, long double y);
+  float              l2dist_sqr(float x, float y);
+  double             l2dist_sqr(double x, double y);
+  long double        l2dist_sqr(long double x, long double y);
 
-  int linfnorm(int x);
-  long linfnorm(long n);
-  long long linfnorm(long long n);
-  unsigned int linfnorm(unsigned int x);
-  unsigned long linfnorm(unsigned long n);
+  int                linfnorm(int x);
+  long               linfnorm(long n);
+  long long          linfnorm(long long n);
+  unsigned int       linfnorm(unsigned int x);
+  unsigned long      linfnorm(unsigned long n);
   unsigned long long linfnorm(unsigned long long n);
-  float linfnorm(float x);
-  double linfnorm(double x);
-  long double linfnorm(long double x);
+  float              linfnorm(float x);
+  double             linfnorm(double x);
+  long double        linfnorm(long double x);
 
   template <unsigned p>
   int lpnorm(int x);
@@ -222,9 +222,9 @@ namespace mln
     struct linfdist_t;
   };
 
-/********************************/
-/*** Implementation            **/
-/********************************/
+    /********************************/
+    /*** Implementation            **/
+    /********************************/
 
 #define MLN_GEN_CODE(FUN, TYPE, OP)                                                                                    \
   inline TYPE FUN(TYPE x) { return OP; }
@@ -243,7 +243,7 @@ namespace mln
     struct FUN##_t                                                                                                     \
     {                                                                                                                  \
       typedef decltype(FUN(std::declval<T>())) result_type;                                                            \
-      auto operator()(const T& x) const -> decltype(FUN(x)) { return FUN(x); }                                         \
+      auto                                     operator()(const T& x) const -> decltype(FUN(x)) { return FUN(x); }     \
     };                                                                                                                 \
     template <>                                                                                                        \
     struct FUN##_t<void>                                                                                               \

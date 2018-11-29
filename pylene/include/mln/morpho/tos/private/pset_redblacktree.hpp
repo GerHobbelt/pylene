@@ -1,8 +1,8 @@
 #ifndef MLN_MORPHO_TOS_PRIVATE_PSET_REDBLACKTREE_HPP
-# define MLN_MORPHO_TOS_PRIVATE_PSET_REDBLACKTREE_HPP
+#define MLN_MORPHO_TOS_PRIVATE_PSET_REDBLACKTREE_HPP
 
-# include <mln/core/image/image.hpp>
-# include <boost/intrusive/set.hpp>
+#include <boost/intrusive/set.hpp>
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {
@@ -23,7 +23,7 @@ namespace mln
         class pset_redblacktree
         {
         public:
-          using Key = mln_value(I);
+          using Key   = mln_value(I);
           using Point = typename I::size_type;
 
           template <class J>
@@ -44,14 +44,13 @@ namespace mln
           bool empty() const;
 
         private:
-          using node_t = pset_node<Key, Point>;
+          using node_t       = pset_node<Key, Point>;
           using key_getter_t = typename node_t::keyer;
 
-          mln_ch_value(I, node_t)       m_allocated_nodes;
-          boost::intrusive::multiset<node_t,
-                                     boost::intrusive::constant_time_size<false>,
-                                     boost::intrusive::key_of_value<key_getter_t>
-                                     > m_set;
+          mln_ch_value(I, node_t) m_allocated_nodes;
+          boost::intrusive::multiset<node_t, boost::intrusive::constant_time_size<false>,
+                                     boost::intrusive::key_of_value<key_getter_t>>
+              m_set;
         };
 
         /******************************************/
@@ -59,20 +58,17 @@ namespace mln
         /******************************************/
 
         template <class Key, class Point>
-        struct pset_node : boost::intrusive::set_base_hook<boost::intrusive::optimize_size<true> >
+        struct pset_node : boost::intrusive::set_base_hook<boost::intrusive::optimize_size<true>>
         {
           Key   level;
           Point p;
 
-          friend bool operator< (const pset_node& a, const pset_node& b)
-          {
-            return a.value < b.value;
-          }
+          friend bool operator<(const pset_node& a, const pset_node& b) { return a.value < b.value; }
 
           struct keyer
           {
             using type = Key;
-            Key operator() (const pset_node& node) { return node.level; }
+            Key operator()(const pset_node& node) { return node.level; }
           };
         };
 
@@ -93,15 +89,14 @@ namespace mln
         void pset_redblacktree<I>::insert(Key level, Point p)
         {
           node_t& node = m_allocated_nodes[p];
-          node.level = level;
-          node.p = p;
+          node.level   = level;
+          node.p       = p;
           m_set.insert(node);
         }
 
 
         template <class I>
-        std::pair<bool, typename I::size_type>
-        pset_redblacktree<I>::try_pop(Key level)
+        std::pair<bool, typename I::size_type> pset_redblacktree<I>::try_pop(Key level)
         {
           auto it = m_set.find(level);
           if (it == m_set.end())
@@ -113,8 +108,7 @@ namespace mln
         }
 
         template <class I>
-        std::pair<mln_value(I), typename I::size_type>
-        pset_redblacktree<I>::pop(Key level)
+        std::pair<mln_value(I), typename I::size_type> pset_redblacktree<I>::pop(Key level)
         {
           assert(!m_set.empty());
 

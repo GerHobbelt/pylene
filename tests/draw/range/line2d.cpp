@@ -7,7 +7,7 @@ TEST(Draw, line2d)
 {
   using namespace mln;
   {
-    auto r = draw::line2d({0, 0}, {4, 11});
+    auto     r = draw::line2d({0, 0}, {4, 11});
     unsigned i = 0;
     mln_foreach (point2d p, r)
     {

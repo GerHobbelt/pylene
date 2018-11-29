@@ -63,8 +63,8 @@ namespace mln
 
       template <typename SumType, typename SumSqrType>
       struct moment_of_inertia
-          : simple_feature_facade<moment_of_inertia<SumType, SumSqrType>,
-                                  internal::meta_moment_of_inertia<SumType, SumSqrType>::template type>
+        : simple_feature_facade<moment_of_inertia<SumType, SumSqrType>,
+                                internal::meta_moment_of_inertia<SumType, SumSqrType>::template type>
       {
       };
     }
@@ -85,17 +85,22 @@ namespace mln
 
       template <typename T, typename SumType, typename SumSqrType>
       struct moment_of_inertia
-          : accumulator_base<moment_of_inertia<T, SumType, SumSqrType>, T, double, features::moment_of_inertia<>>
+        : accumulator_base<moment_of_inertia<T, SumType, SumSqrType>, T, double, features::moment_of_inertia<>>
       {
-        typedef T argument_type;
+        typedef T      argument_type;
         typedef double result_type;
 
-        moment_of_inertia() : m_count{0}, m_sum{}, m_sum_sqr{} {}
+        moment_of_inertia()
+          : m_count{0}
+          , m_sum{}
+          , m_sum_sqr{}
+        {
+        }
 
         void init()
         {
-          m_count = 0;
-          m_sum = SumType();
+          m_count   = 0;
+          m_sum     = SumType();
           m_sum_sqr = SumSqrType();
         }
 
@@ -137,7 +142,7 @@ namespace mln
           if (accu.m_count == 0)
             return 0;
 
-          result_type n = accu.m_count;
+          result_type n       = accu.m_count;
           result_type inertia = sum(accu.m_sum_sqr - sqr(accu.m_sum) / n);
 
           constexpr unsigned dim = value_traits<typename moment_of_inertia::argument_type>::ndim;
@@ -152,8 +157,8 @@ namespace mln
         friend SumType extract(const moment_of_inertia& accu, features::mean<>) { return accu.m_sum / accu.m_count; }
 
       private:
-        unsigned m_count;
-        SumType m_sum;
+        unsigned   m_count;
+        SumType    m_sum;
         SumSqrType m_sum_sqr;
       };
     }

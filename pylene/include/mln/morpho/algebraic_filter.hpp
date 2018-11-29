@@ -57,7 +57,7 @@ namespace mln
       typedef mln::accu::accumulators::count<typename I::size_type> ACCU;
 
       mln_ch_value(I, ACCU) accu_img = imchvalue<ACCU>(ima);
-      mln_concrete(I) out = clone(ima);
+      mln_concrete(I) out            = clone(ima);
 
       internal::attribute_and_reconstruct_ufind_visitor<I, ACCU> viz{accu_img, out};
       mln::morpho::canvas::unionfind(

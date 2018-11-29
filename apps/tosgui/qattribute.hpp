@@ -45,8 +45,8 @@ namespace mln
     virtual void showFilteringWindow() = 0;
     virtual void keyReleaseEvent(QKeyEvent* event);
 
-    QwtPlotPicker* picker;
-    QwtPlotCurve* m_curve;
+    QwtPlotPicker*   picker;
+    QwtPlotCurve*    m_curve;
     QVector<QPointF> m_data;
   };
 
@@ -65,13 +65,13 @@ namespace mln
     virtual void onSliderReleased(int x);
     virtual void showFilteringWindow();
 
-    const image2d<V>& m_attr;
+    const image2d<V>&        m_attr;
     const image2d<unsigned>& m_parent;
-    unsigned m_current;
-    unsigned m_num_nodes;
+    unsigned                 m_current;
+    unsigned                 m_num_nodes;
 
     std::pair<V, V> m_minmax;
-    QSlider* m_slider;
+    QSlider*        m_slider;
   };
 
   /**************************/
@@ -80,11 +80,14 @@ namespace mln
 
   template <typename V>
   QAttribute<V>::QAttribute(const image2d<V>& attr, const image2d<unsigned>& parent, const QwtText& name)
-      : QAttributeBase(name), m_attr(attr), m_parent(parent), m_current(-1)
+    : QAttributeBase(name)
+    , m_attr(attr)
+    , m_parent(parent)
+    , m_current(-1)
   {
     auto acc = accumulate(m_attr, accu::features::min<>() & accu::features::max<>());
 
-    m_minmax.first = accu::extractor::min(acc);
+    m_minmax.first  = accu::extractor::min(acc);
     m_minmax.second = accu::extractor::max(acc);
   }
 
@@ -92,8 +95,8 @@ namespace mln
   void QAttribute<V>::plotNode(const point2d& p)
   {
     mln::trace::entering("QAttribute::plotNode");
-    unsigned x = m_parent.index_of_point(p);
-    m_current = x;
+    unsigned x  = m_parent.index_of_point(p);
+    m_current   = x;
     m_num_nodes = 1;
 
     unsigned q = x;
@@ -151,7 +154,7 @@ namespace mln
     {
       if (event->type() == QEvent::MouseButtonPress)
       {
-        QPoint p = static_cast<QMouseEvent*>(event)->pos();
+        QPoint   p = static_cast<QMouseEvent*>(event)->pos();
         unsigned i = std::max<int>(0, this->invTransform(QwtPlot::xBottom, p.x()));
 
         unsigned x = m_current;
@@ -159,7 +162,7 @@ namespace mln
           x = m_parent[x];
 
         point2d q = m_parent.point_at_index(x);
-        emit nodeSelected(q);
+        emit    nodeSelected(q);
         std::cout << "Selected " << q << std::endl;
         return false;
       }
@@ -174,7 +177,7 @@ namespace mln
     int lambda = m_slider->value();
     std::cout << "Filtering with lambda < " << lambda << std::endl;
     image2d<bool> mask = eval(m_attr < (V)lambda);
-    emit nodeSelected(mask);
+    emit          nodeSelected(mask);
   }
 }
 #endif // ! QATTRIBUTE_HPP

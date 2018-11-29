@@ -1,6 +1,6 @@
 #pragma once
-#include <range/v3/range_fwd.hpp>
 #include <meta/meta.hpp>
+#include <range/v3/range_fwd.hpp>
 
 #include <iostream>
 
@@ -19,7 +19,7 @@ namespace mln::ranges::details
 
     void next()
     {
-      this->__next(::meta::int_<Rank-1>());
+      this->__next(::meta::int_<Rank - 1>());
 
       /*
       std::size_t k;
@@ -41,7 +41,6 @@ namespace mln::ranges::details
     bool equal(::ranges::default_sentinel) const { return this->derived()->__is_at_end(0); }
 
   private:
-
     template <int k>
     void __next(::meta::int_<k>)
     {
@@ -55,7 +54,7 @@ namespace mln::ranges::details
         this->derived()->__next(k);
         if (this->derived()->__is_at_end(k))
         {
-          this->__next(::meta::int_<k-1>());
+          this->__next(::meta::int_<k - 1>());
           this->derived()->__reset_to_begin(k);
         }
       }

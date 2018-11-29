@@ -16,7 +16,7 @@ TEST(Core, Sliding_wpiter_binding_lvalue)
   wset_t wset{{-1, 0, 1}};
 
   point2d p{0, 0};
-  auto it = make_sliding_wpiter(std::cref(p), pset, wset);
+  auto    it = make_sliding_wpiter(std::cref(p), pset, wset);
 
   {
     it.init();
@@ -58,7 +58,7 @@ TEST(Core, Sliding_wpiter_binding_rvalue)
   wset_t wset{{-1, 0, 1}};
 
   point2d p{0, 0};
-  auto it = make_sliding_wpiter(p, pset, wset);
+  auto    it = make_sliding_wpiter(p, pset, wset);
 
   {
     it.init();
@@ -100,8 +100,8 @@ TEST(Core, Sliding_wpiter_binding_iterator)
   wset_t wset{{-1, 0, 1}};
 
   std::array<point2d, 2> domain{{{0, 0}, {1, 0}}};
-  auto p = rng::iter(domain);
-  auto it = make_sliding_wpiter(make_iterator_proxy(p), pset, wset);
+  auto                   p  = rng::iter(domain);
+  auto                   it = make_sliding_wpiter(make_iterator_proxy(p), pset, wset);
   p.init();
   {
     it.init();

@@ -174,8 +174,8 @@ TEST(Core, Sliding_pixter_IndexableButNotRaw)
   };
   f0.extension().fill(0);
 
-  auto fun = [](int x) { return 2 * x; };
-  auto f = imtransform(f0, fun);
+  auto       fun     = [](int x) { return 2 * x; };
+  auto       f       = imtransform(f0, fun);
   const auto const_f = imtransform(f0, fun);
 
   test_IndexableButNotRaw(f);
@@ -234,7 +234,7 @@ TEST(Core, Sliding_pixter_AccessibleButNotIndexable)
       {0, 0, 1, 0, 0}  //
   };
 
-  auto f = f0 | where(mask);
+  auto f       = f0 | where(mask);
   auto const_f = f0 | where(mask);
   test_AccessibleButNotIndexable(f);
   test_AccessibleButNotIndexable(const_f);

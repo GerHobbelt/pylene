@@ -22,15 +22,15 @@ namespace mln
       check(std::is_base_of<Pixel<Pix>, Pix>());
 
       typedef typename Pix::value_type value_type;
-      typedef typename Pix::reference reference;
+      typedef typename Pix::reference  reference;
       typedef typename Pix::point_type point_type;
-      //typedef typename Pix::site_type site_type;
-      //typedef typename Pix::image_type image_type;
+      // typedef typename Pix::site_type site_type;
+      // typedef typename Pix::image_type image_type;
 
-      reference (Pix::*method1)() const = &Pix::val;
+      reference (Pix::*method1)() const  = &Pix::val;
       point_type (Pix::*method2)() const = &Pix::point;
-      //site_type (Pix::*method3)() const = &Pix::site;
-      //image_type& (Pix::*method4)() const = &Pix::image;
+      // site_type (Pix::*method3)() const = &Pix::site;
+      // image_type& (Pix::*method4)() const = &Pix::image;
 
       (void)method1;
       (void)method2;
@@ -38,7 +38,7 @@ namespace mln
       //(void)method4;
 
       // site() and point() aliase each othersx
-      //check(std::is_same<point_type, site_type>());
+      // check(std::is_same<point_type, site_type>());
 
       // value_type should not be a reference
       check_false(std::is_reference<value_type>());
@@ -54,16 +54,16 @@ namespace mln
       operator V() const { return std::declval<V>(); }
     };
 
-    typedef P point_type;
-    typedef P site_type;
-    typedef V value_type;
-    typedef I image_type;
+    typedef P                                                                                       point_type;
+    typedef P                                                                                       site_type;
+    typedef V                                                                                       value_type;
+    typedef I                                                                                       image_type;
     typedef typename std::conditional<std::is_same<Ref, void>::value, default_reference, Ref>::type reference;
 
     reference val() const { return make_object<reference>(); }
-    P point() const { return make_object<P>(); }
-    P site() const { return make_object<P>(); }
-    I& image() const { return make_object<I&>(); }
+    P         point() const { return make_object<P>(); }
+    P         site() const { return make_object<P>(); }
+    I&        image() const { return make_object<I&>(); }
   };
 
 } // end of namespace mln

@@ -12,7 +12,7 @@ TEST(Core, FilteredImage_filtered_bypix)
 
   typedef image2d<int> I;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   typedef I::const_pixel_type Pix;
@@ -45,7 +45,7 @@ TEST(Core, FilteredImage_filtered_byval)
 
   typedef image2d<int> I;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   typedef I::const_pixel_type Pix;
@@ -80,7 +80,7 @@ TEST(Core, FilteredImage_filtered_bypix_writing)
 
   typedef image2d<int> I;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   typedef I::const_pixel_type Pix;
@@ -96,7 +96,7 @@ TEST(Core, FilteredImage_filtered_byval_writing)
 {
   using namespace mln;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);
@@ -110,7 +110,7 @@ TEST(Core, FilteredImage_filtered_chaining)
 {
   using namespace mln;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);

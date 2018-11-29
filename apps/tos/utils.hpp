@@ -20,10 +20,10 @@ namespace mln
       remove_01face_from_tos(const image2d<T>& K_, const image2d<unsigned>& parent_, const std::vector<unsigned>& S_)
   {
     box2d dom = K_.domain();
-    dom.pmax = (dom.pmax + 1) / 2;
+    dom.pmax  = (dom.pmax + 1) / 2;
 
-    image2d<T> K(dom);
-    image2d<unsigned> parent(dom);
+    image2d<T>            K(dom);
+    image2d<unsigned>     parent(dom);
     std::vector<unsigned> S;
     S.reserve(dom.size());
 

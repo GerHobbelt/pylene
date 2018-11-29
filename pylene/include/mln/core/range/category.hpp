@@ -78,7 +78,7 @@ namespace mln
       }
 
       typedef decltype(test<Range>((Range*)NULL)) T;
-      static const bool value = T::value;
+      static const bool                           value = T::value;
     };
 
     template <typename Range, bool use_default>

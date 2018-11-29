@@ -23,10 +23,10 @@ namespace mln
 
       (void)_nbh;
 
-      point2d p_ = domain.pmin;
-      point2d q_ = domain.pmin;
-      p_[0] = domain.pmax[0] - 1;
-      q_[0] = domain.pmax[0];
+      point2d p_  = domain.pmin;
+      point2d q_  = domain.pmin;
+      p_[0]       = domain.pmax[0] - 1;
+      q_[0]       = domain.pmax[0];
       size_type p = ima.index_of_point(p_);
       size_type q = ima.index_of_point(q_);
 
@@ -60,8 +60,8 @@ namespace mln
             else
             {
               parent[x] = y;
-              x = y;
-              y = z;
+              x         = y;
+              y         = z;
             }
           }
         }
@@ -76,10 +76,10 @@ namespace mln
       mln_precondition(!domain.empty());
       (void)_nbh;
 
-      point2d p_ = domain.pmin;
-      point2d q_ = domain.pmin;
-      p_[0] = domain.pmax[0] - 1;
-      q_[0] = domain.pmax[0];
+      point2d p_  = domain.pmin;
+      point2d q_  = domain.pmin;
+      p_[0]       = domain.pmax[0] - 1;
+      q_[0]       = domain.pmax[0];
       size_type p = ima.index_of_point(p_);
       size_type q = ima.index_of_point(q_);
 
@@ -117,8 +117,8 @@ namespace mln
                 else
                 {
                   parent[x] = y;
-                  x = y;
-                  y = z;
+                  x         = y;
+                  y         = z;
                 }
               }
             }
@@ -134,10 +134,10 @@ namespace mln
       typedef typename image2d<V>::size_type size_type;
       mln_precondition(!domain.empty());
 
-      point2d p_ = domain.pmin;
-      point2d q_ = domain.pmin;
-      p_[0] = domain.pmax[0] - 1;
-      q_[0] = domain.pmax[0];
+      point2d p_  = domain.pmin;
+      point2d q_  = domain.pmin;
+      p_[0]       = domain.pmax[0] - 1;
+      q_[0]       = domain.pmax[0];
       size_type p = ima.index_of_point(p_);
       size_type q = ima.index_of_point(q_);
 
@@ -145,10 +145,10 @@ namespace mln
         assert(pos[x] > (unsigned)i);
         for (int j = pos[x] - 1; j >= i; --j)
         {
-          S[j + 1] = S[j];
+          S[j + 1]      = S[j];
           pos[S[j + 1]] = j + 1;
         }
-        S[i] = x;
+        S[i]   = x;
         pos[x] = i;
       };
 
@@ -188,8 +188,8 @@ namespace mln
               if (pos[x] < pos[y])
                 move_insert_at(y, pos[x]);
               parent[x] = y;
-              x = y;
-              y = z;
+              x         = y;
+              y         = z;
             }
           }
         }

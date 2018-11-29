@@ -12,7 +12,7 @@ TEST(Core, Algorithm_Paste)
 {
   using namespace mln;
 
-  box2d b = {{1, 1}, {3, 3}};
+  box2d          b = {{1, 1}, {3, 3}};
   image2d<uint8> ima(b);
   image2d<uint8> out(15, 15);
   fill(ima, 69);

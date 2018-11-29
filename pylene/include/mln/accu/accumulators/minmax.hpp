@@ -43,7 +43,10 @@ namespace mln
       template <typename Compare>
       struct minmax : simple_feature<minmax<Compare>>
       {
-        minmax(const Compare& cmp = Compare()) : m_cmp(cmp) {}
+        minmax(const Compare& cmp = Compare())
+          : m_cmp(cmp)
+        {
+        }
 
         template <typename T>
         struct apply
@@ -94,12 +97,14 @@ namespace mln
       template <typename T, typename Compare>
       struct minmax : Accumulator<minmax<T, Compare>>
       {
-        typedef T argument_type;
-        typedef std::pair<T, T> result_type;
+        typedef T                                                                     argument_type;
+        typedef std::pair<T, T>                                                       result_type;
         typedef boost::mpl::set<features::min<>, features::max<>, features::minmax<>> provides;
 
         minmax(const Compare& cmp = Compare())
-            : m_min(value_traits<T, Compare>::max()), m_max(value_traits<T, Compare>::min()), m_cmp(cmp)
+          : m_min(value_traits<T, Compare>::max())
+          , m_max(value_traits<T, Compare>::min())
+          , m_cmp(cmp)
         {
         }
 
@@ -140,8 +145,8 @@ namespace mln
         std::pair<T, T> to_result() const { return std::make_pair(m_min, m_max); }
 
       private:
-        T m_min;
-        T m_max;
+        T       m_min;
+        T       m_max;
         Compare m_cmp;
       };
     }

@@ -14,7 +14,7 @@ namespace mln
     template <class E>
     struct FillableExtension
     {
-      typedef extension_traits<E> traits;
+      typedef extension_traits<E>           traits;
       typedef typename traits::support_fill support_fill;
 
       BOOST_CONCEPT_USAGE(FillableExtension)
@@ -30,7 +30,7 @@ namespace mln
     template <class E>
     struct MirrorableExtension
     {
-      typedef extension_traits<E> traits;
+      typedef extension_traits<E>             traits;
       typedef typename traits::support_mirror support_mirror;
 
       BOOST_CONCEPT_USAGE(MirrorableExtension)
@@ -45,7 +45,7 @@ namespace mln
     template <class E>
     struct PeriodizableExtension
     {
-      typedef extension_traits<E> traits;
+      typedef extension_traits<E>                traits;
       typedef typename traits::support_periodize support_periodize;
 
       BOOST_CONCEPT_USAGE(PeriodizableExtension)
@@ -102,8 +102,8 @@ namespace mln
   {
     typedef extension_traits<E> traits;
 
-    typedef typename traits::support_fill support_fill;
-    typedef typename traits::support_mirror support_mirror;
+    typedef typename traits::support_fill      support_fill;
+    typedef typename traits::support_mirror    support_mirror;
     typedef typename traits::support_periodize support_periodize;
 
   private:

@@ -249,27 +249,27 @@ namespace mln
 
     /// \copydoc image::pixel_at(const point_type&) const
     [[deprecated]] pixel_type pixel_at(const point_type& p);
-    new_pixel_type new_pixel_at(const point_type& p);
+    new_pixel_type            new_pixel_at(const point_type& p);
 
     /// \copydoc image::pixel_at(const point_type&) const
     [[deprecated]] const_pixel_type pixel_at(const point_type& p) const;
-    new_const_pixel_type new_pixel_at(const point_type& p) const;
+    new_const_pixel_type            new_pixel_at(const point_type& p) const;
 
     /// \copydoc image::pixel_at_index(size_type) const
     [[deprecated]] pixel_type pixel_at_index(size_type i);
-    //new_pixel_type new_pixel_at_index(size_type i);
+    // new_pixel_type new_pixel_at_index(size_type i);
 
     /// \copydoc image::pixel_at_index(size_type) const
     [[deprecated]] const_pixel_type pixel_at_index(size_type i) const;
-    //new_const_pixel_type new_pixel_at_index(size_type i) const;
+    // new_const_pixel_type new_pixel_at_index(size_type i) const;
 
     /// \copydoc image::pixel(const point_type&) const
     [[deprecated]] pixel_type pixel(const point_type& p);
-    //new_pixel_type new_pixel(const point_type& p);
+    // new_pixel_type new_pixel(const point_type& p);
 
     /// \copydoc image::pixel(const point_type&) const
     [[deprecated]] const_pixel_type pixel(const point_type& p) const;
-    //new_const_pixel_type new_pixel(const point_type& p) const;
+    // new_const_pixel_type new_pixel(const point_type& p) const;
 
     /// \}
 
@@ -744,11 +744,11 @@ namespace mln
 
     details::ndpixel<const T, dim> pix;
     pix.m_info.stride = m_index_strides;
-    pix.m_info.from = m_domain.pmin;
-    pix.m_info.to = m_domain.pmax;
+    pix.m_info.from   = m_domain.pmin;
+    pix.m_info.to     = m_domain.pmax;
     pix.m_info.buffer = ptr;
-    pix.m_lineptr = ptr;
-    pix.m_point = mln::literal::zero;
+    pix.m_lineptr     = ptr;
+    pix.m_point       = mln::literal::zero;
     pix.advance(p);
     return pix;
   }
@@ -760,11 +760,11 @@ namespace mln
 
     details::ndpixel<T, dim> pix;
     pix.m_info.stride = m_index_strides;
-    pix.m_info.from = m_domain.pmin;
-    pix.m_info.to = m_domain.pmax;
+    pix.m_info.from   = m_domain.pmin;
+    pix.m_info.to     = m_domain.pmax;
     pix.m_info.buffer = ptr;
-    pix.m_lineptr = ptr;
-    pix.m_point = mln::literal::zero;
+    pix.m_lineptr     = ptr;
+    pix.m_point       = mln::literal::zero;
     pix.advance(p);
     return pix;
   }

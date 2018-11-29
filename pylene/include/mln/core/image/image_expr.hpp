@@ -103,7 +103,10 @@ namespace mln
     {
       func_call_from_tupleargs() = default;
 
-      func_call_from_tupleargs(const Function& f_) : f(f_) {}
+      func_call_from_tupleargs(const Function& f_)
+        : f(f_)
+      {
+      }
 
       // template <class TTuple, int... N>
       // inline
@@ -194,7 +197,7 @@ namespace mln
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
-    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
+    auto z  = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
     auto f2 = std::bind(f, std::placeholders::_1, std::placeholders::_2, s);
     internal::func_call_from_tupleargs<decltype(f2), mln_reference(I1), mln_reference(I2)> fun(f2);
     return ternary_image_image_scalar_expr<TernaryFunction, I1, I2, S>(std::move(z), fun);
@@ -206,7 +209,7 @@ namespace mln
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
-    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
+    auto z  = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
     auto f2 = std::bind(f, std::placeholders::_1, s, std::placeholders::_2);
     internal::func_call_from_tupleargs<decltype(f2), mln_reference(I1), mln_reference(I2)> fun(f2);
     return ternary_image_scalar_image_expr<TernaryFunction, I1, S, I2>(std::move(z), fun);

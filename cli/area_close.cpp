@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   image2d<uint8> ima;
   io::imread(argv[1], ima);
 
-  typedef image2d<uint8>::size_type size_type;
+  typedef image2d<uint8>::size_type                     size_type;
   morpho::component_tree<size_type, image2d<size_type>> tree;
 
   if (argv[2][0] == '4')
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
   auto areamap = morpho::paccumulate(tree, ima, accu::features::count<>());
 
   unsigned lambda = std::atoi(argv[3]);
-  auto criterion =
+  auto     criterion =
       make_functional_property_map<size_type>([&areamap, lambda](size_type x) { return areamap[x] >= lambda; });
 
   morpho::filter_direct_inplace(tree, criterion);

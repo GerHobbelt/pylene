@@ -77,9 +77,9 @@ namespace mln
       struct component_tree_data
       {
         std::vector<component_tree_node> m_nodes; // A sorted vector of nodes
-        std::vector<P> m_S;                       // A sorted vector of points
-        AssociativeMap m_pmap;                    // An associative structure P -> node_id_t
-        bool m_pset_ordered = false;
+        std::vector<P>                   m_S;     // A sorted vector of points
+        AssociativeMap                   m_pmap;  // An associative structure P -> node_id_t
+        bool                             m_pset_ordered = false;
       };
     }
 
@@ -88,7 +88,7 @@ namespace mln
     {
       typedef unsigned vertex_id_t;
       typedef unsigned size_type;
-      typedef P point_type;
+      typedef P        point_type;
 
       component_tree();
 
@@ -109,13 +109,13 @@ namespace mln
       struct node_reverse_iterator;
       struct node_range;
 
-      size_type size() const;
-      size_type realsize() const;
-      node_type get_node(vertex_id_t v) const;
-      node_type get_node_at(const point_type& p) const;
+      size_type      size() const;
+      size_type      realsize() const;
+      node_type      get_node(vertex_id_t v) const;
+      node_type      get_node_at(const point_type& p) const;
       component_tree get_subtree(vertex_id_t v) const;
-      node_range nodes(bool ignore_root = false) const;
-      node_range nodes_without_root() const;
+      node_range     nodes(bool ignore_root = false) const;
+      node_range     nodes_without_root() const;
 
       ///  \brief Shrink the nodes vector to free space.
       ///
@@ -140,7 +140,7 @@ namespace mln
 
       vertex_id_t get_node_id(const point_type& p) const;
       vertex_id_t get_root_id() const;
-      node_type get_root() const;
+      node_type   get_root() const;
 
       /// \{
       bool operator==(const component_tree& other) const;
@@ -158,7 +158,7 @@ namespace mln
       ///        interface. Fix it.
       void _reorder_pset();
 
-      _data_t* _get_data();
+      _data_t*       _get_data();
       const _data_t* _get_data() const;
       /// \}
 
@@ -167,7 +167,7 @@ namespace mln
 
     private:
       std::shared_ptr<_data_t> m_data;
-      vertex_id_t m_root; // The root node index;
+      vertex_id_t              m_root; // The root node index;
     };
 
     /*************************************************/
@@ -176,7 +176,12 @@ namespace mln
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::pset_iterator : mln::iterator_base<pset_iterator, P, const P&>
     {
-      pset_iterator(const _data_t* data, size_type begin, size_type end) : m_data(data), m_begin(begin), m_end(end) {}
+      pset_iterator(const _data_t* data, size_type begin, size_type end)
+        : m_data(data)
+        , m_begin(begin)
+        , m_end(end)
+      {
+      }
 
       void init() { m_cur = m_begin; }
 
@@ -187,18 +192,20 @@ namespace mln
       const P& dereference() const { return m_data->m_S[m_cur]; }
 
     private:
-      const _data_t* m_data; // Pointer to component tree data
-      size_type m_begin;     // Start position
-      size_type m_end;       // Past the end position
-      size_type m_cur;       // Current position
+      const _data_t* m_data;  // Pointer to component tree data
+      size_type      m_begin; // Start position
+      size_type      m_end;   // Past the end position
+      size_type      m_cur;   // Current position
     };
 
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::pset_reverse_iterator
-        : mln::iterator_base<pset_reverse_iterator, P, const P&>
+      : mln::iterator_base<pset_reverse_iterator, P, const P&>
     {
       pset_reverse_iterator(const _data_t* data, size_type begin, size_type end)
-          : m_data(data), m_begin(begin), m_end(end)
+        : m_data(data)
+        , m_begin(begin)
+        , m_end(end)
       {
       }
 
@@ -211,27 +218,28 @@ namespace mln
       const P& dereference() const { return m_data->m_S[m_cur - 1]; }
 
     private:
-      const _data_t* m_data; // Pointer to component tree data
-      size_type m_begin;     // Start position
-      size_type m_end;       // Past-the-end forward position
-      size_type m_cur;       // Current position
+      const _data_t* m_data;  // Pointer to component tree data
+      size_type      m_begin; // Start position
+      size_type      m_end;   // Past-the-end forward position
+      size_type      m_cur;   // Current position
     };
 
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::pset_range
     {
-      typedef pset_iterator iterator;
-      typedef pset_iterator const_iterator;
+      typedef pset_iterator         iterator;
+      typedef pset_iterator         const_iterator;
       typedef pset_reverse_iterator reverse_iterator;
       typedef pset_reverse_iterator const_reverse_iterator;
 
-      pset_range(const _data_t* data, vertex_id_t id) : m_data(data)
+      pset_range(const _data_t* data, vertex_id_t id)
+        : m_data(data)
       {
         mln_precondition(id < m_data->m_nodes.size());
 
-        auto x = m_data->m_nodes[id];
+        auto x  = m_data->m_nodes[id];
         m_begin = x.m_point_index;
-        m_end = m_data->m_nodes[x.m_next_sibling].m_point_index;
+        m_end   = m_data->m_nodes[x.m_next_sibling].m_point_index;
       }
 
       iterator iter() const { return iterator(m_data, m_begin, m_end); }
@@ -239,26 +247,27 @@ namespace mln
       reverse_iterator riter() const { return reverse_iterator(m_data, m_begin, m_end); }
 
     private:
-      const _data_t* m_data; // Pointer to component tree data
-      size_type m_begin;     // Start position
-      size_type m_end;       // Past-the-end position
+      const _data_t* m_data;  // Pointer to component tree data
+      size_type      m_begin; // Start position
+      size_type      m_end;   // Past-the-end position
     };
 
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::proper_pset_range
     {
-      typedef pset_iterator iterator;
-      typedef pset_iterator const_iterator;
+      typedef pset_iterator         iterator;
+      typedef pset_iterator         const_iterator;
       typedef pset_reverse_iterator reverse_iterator;
       typedef pset_reverse_iterator const_reverse_iterator;
 
-      proper_pset_range(const _data_t* data, vertex_id_t id) : m_data(data)
+      proper_pset_range(const _data_t* data, vertex_id_t id)
+        : m_data(data)
       {
         mln_precondition(id < m_data->m_nodes.size());
 
-        auto x = m_data->m_nodes[id];
+        auto x  = m_data->m_nodes[id];
         m_begin = x.m_point_index;
-        m_end = m_data->m_nodes[x.m_next].m_point_index;
+        m_end   = m_data->m_nodes[x.m_next].m_point_index;
       }
 
       iterator iter() const { return iterator(m_data, m_begin, m_end); }
@@ -266,9 +275,9 @@ namespace mln
       reverse_iterator riter() const { return reverse_iterator(m_data, m_begin, m_end); }
 
     private:
-      const _data_t* m_data; // Pointer to component tree data
-      size_type m_begin;     // Start position
-      size_type m_end;       // Past-the-end position
+      const _data_t* m_data;  // Pointer to component tree data
+      size_type      m_begin; // Start position
+      size_type      m_end;   // Past-the-end position
     };
 
     /*************************************************/
@@ -277,14 +286,16 @@ namespace mln
 
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::children_iterator
-        : mln::iterator_base<children_iterator, node_type, node_type>
+      : mln::iterator_base<children_iterator, node_type, node_type>
     {
       children_iterator() = default;
 
-      children_iterator(const component_tree* tree, vertex_id_t x) : m_tree(tree), m_data(tree->_get_data())
+      children_iterator(const component_tree* tree, vertex_id_t x)
+        : m_tree(tree)
+        , m_data(tree->_get_data())
       {
         m_begin = m_data->m_nodes[x].m_next;
-        m_end = m_data->m_nodes[x].m_next_sibling;
+        m_end   = m_data->m_nodes[x].m_next_sibling;
       }
 
       void init() { m_cur = m_begin; }
@@ -297,10 +308,10 @@ namespace mln
 
     private:
       const component_tree* m_tree;
-      const _data_t* m_data; // Pointer to component tree data
-      vertex_id_t m_begin;   // Start position
-      vertex_id_t m_end;     // Past the end position
-      vertex_id_t m_cur;     // Current position
+      const _data_t*        m_data;  // Pointer to component tree data
+      vertex_id_t           m_begin; // Start position
+      vertex_id_t           m_end;   // Past the end position
+      vertex_id_t           m_cur;   // Current position
     };
 
     template <class P, class AssociativeMap>
@@ -309,13 +320,17 @@ namespace mln
       typedef children_iterator iterator;
       typedef children_iterator const_iterator;
 
-      children_range(const component_tree* tree, vertex_id_t id) : m_tree(tree), m_node_id(id) {}
+      children_range(const component_tree* tree, vertex_id_t id)
+        : m_tree(tree)
+        , m_node_id(id)
+      {
+      }
 
       const_iterator iter() const { return iterator(m_tree, m_node_id); }
 
     private:
       const component_tree* m_tree;
-      vertex_id_t m_node_id; // Vertex id
+      vertex_id_t           m_node_id; // Vertex id
     };
 
     /****************************************************/
@@ -327,9 +342,17 @@ namespace mln
     {
       typedef component_tree<P, AssociativeMap> tree_t;
 
-      node_type() : m_tree(NULL) {}
+      node_type()
+        : m_tree(NULL)
+      {
+      }
 
-      node_type(const component_tree* tree, vertex_id_t id) : m_tree(tree), m_data(tree->m_data.get()), m_node_id(id) {}
+      node_type(const component_tree* tree, vertex_id_t id)
+        : m_tree(tree)
+        , m_data(tree->m_data.get())
+        , m_node_id(id)
+      {
+      }
 
       bool operator==(const node_type& other) const { return m_node_id == other.m_node_id; }
 
@@ -465,9 +488,9 @@ namespace mln
       }
 
     private:
-      const component_tree* m_tree; // Pointer to the component tree
-      const _data_t* m_data;        // Pointer to component tree data
-      vertex_id_t m_node_id;        // Current vertex position
+      const component_tree* m_tree;    // Pointer to the component tree
+      const _data_t*        m_data;    // Pointer to component tree data
+      vertex_id_t           m_node_id; // Current vertex position
     };
 
     /****************************************************/
@@ -480,10 +503,11 @@ namespace mln
       node_iterator() = default;
 
       node_iterator(const component_tree* tree, vertex_id_t id, bool ignore_root = false)
-          : m_tree(tree), m_data(m_tree->m_data.get())
+        : m_tree(tree)
+        , m_data(m_tree->m_data.get())
       {
         m_begin = ignore_root ? m_data->m_nodes[id].m_next : id;
-        m_end = m_data->m_nodes[id].m_next_sibling;
+        m_end   = m_data->m_nodes[id].m_next_sibling;
       }
 
       void init() { m_current = m_begin; }
@@ -496,23 +520,24 @@ namespace mln
 
     private:
       const component_tree* m_tree;
-      const _data_t* m_data;
-      vertex_id_t m_begin;
-      vertex_id_t m_end;
-      vertex_id_t m_current;
+      const _data_t*        m_data;
+      vertex_id_t           m_begin;
+      vertex_id_t           m_end;
+      vertex_id_t           m_current;
     };
 
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::node_reverse_iterator
-        : iterator_base<node_reverse_iterator, node_type, node_type>
+      : iterator_base<node_reverse_iterator, node_type, node_type>
     {
       node_reverse_iterator() = default;
 
       node_reverse_iterator(const component_tree* tree, vertex_id_t id, bool ignore_root = false)
-          : m_tree(tree), m_data(m_tree->m_data.get())
+        : m_tree(tree)
+        , m_data(m_tree->m_data.get())
       {
         m_begin = m_data->m_nodes[m_data->m_nodes[id].m_next_sibling].m_prev;
-        m_end = ignore_root ? id : m_data->m_nodes[id].m_prev;
+        m_end   = ignore_root ? id : m_data->m_nodes[id].m_prev;
       }
 
       void init() { m_current = m_begin; }
@@ -525,22 +550,24 @@ namespace mln
 
     private:
       const component_tree* m_tree;
-      const _data_t* m_data;
-      vertex_id_t m_begin;
-      vertex_id_t m_end;
-      vertex_id_t m_current;
+      const _data_t*        m_data;
+      vertex_id_t           m_begin;
+      vertex_id_t           m_end;
+      vertex_id_t           m_current;
     };
 
     template <class P, class AssociativeMap>
     struct component_tree<P, AssociativeMap>::node_range
     {
-      typedef node_iterator const_iterator;
-      typedef node_iterator iterator;
+      typedef node_iterator         const_iterator;
+      typedef node_iterator         iterator;
       typedef node_reverse_iterator reverse_iterator;
       typedef node_reverse_iterator const_reverse_iterator;
 
       node_range(const component_tree* tree, vertex_id_t id, bool ignore_root = false)
-          : m_tree(tree), m_node_id(id), m_ignore_root(ignore_root)
+        : m_tree(tree)
+        , m_node_id(id)
+        , m_ignore_root(ignore_root)
       {
       }
 
@@ -562,8 +589,8 @@ namespace mln
 
     private:
       const component_tree* m_tree;
-      vertex_id_t m_node_id;
-      bool m_ignore_root;
+      vertex_id_t           m_node_id;
+      bool                  m_ignore_root;
     };
 
     /***************************************/
@@ -571,13 +598,16 @@ namespace mln
     /***************************************/
 
     template <class P, class AssociativeMap>
-    inline component_tree<P, AssociativeMap>::component_tree() : m_data(new _data_t()), m_root(0)
+    inline component_tree<P, AssociativeMap>::component_tree()
+      : m_data(new _data_t())
+      , m_root(0)
     {
     }
 
     template <class P, class AssociativeMap>
     inline component_tree<P, AssociativeMap>::component_tree(const _data_t* data, vertex_id_t root)
-        : m_data(const_cast<_data_t*>(data)), m_root(root)
+      : m_data(const_cast<_data_t*>(data))
+      , m_root(root)
     {
     }
 
@@ -590,8 +620,8 @@ namespace mln
     template <class P, class AssociativeMap>
     inline typename component_tree<P, AssociativeMap>::size_type component_tree<P, AssociativeMap>::realsize() const
     {
-      size_type n = 1;
-      unsigned next = m_data->m_nodes[m_root].m_next;
+      size_type n    = 1;
+      unsigned  next = m_data->m_nodes[m_root].m_next;
       while (next != npos())
       {
         next = m_data->m_nodes[next].m_next;
@@ -650,7 +680,7 @@ namespace mln
       mln_precondition(v < size());
 
       component_tree x = *this;
-      x.m_root = v;
+      x.m_root         = v;
       return x;
     }
 
@@ -704,11 +734,11 @@ namespace mln
       mln_ch_value(AssociativeMap, P) next;
       resize(next, m_data->m_pmap);
 
-      mln_reverse_foreach(auto p, m_data->m_S)
+      mln_reverse_foreach (auto p, m_data->m_S)
       {
         unsigned k = m_data->m_pmap[p];
-        next[p] = nmap[k];
-        nmap[k] = p;
+        next[p]    = nmap[k];
+        nmap[k]    = p;
       }
 
       unsigned spos = 0;
@@ -744,11 +774,11 @@ namespace mln
         int i = 1;
         mln_foreach (auto x, this->nodes())
         {
-          nvec[i].m_parent = newidx[x.get_parent_id()];
-          nvec[i].m_prev = i - 1;
-          nvec[i].m_next = i + 1;
+          nvec[i].m_parent       = newidx[x.get_parent_id()];
+          nvec[i].m_prev         = i - 1;
+          nvec[i].m_next         = i + 1;
           nvec[i].m_next_sibling = newidx[x.get_next_sibling_id()];
-          nvec[i].m_point_index = x.get_first_point_id();
+          nvec[i].m_point_index  = x.get_first_point_id();
           i++;
         }
 

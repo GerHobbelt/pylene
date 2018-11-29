@@ -63,7 +63,7 @@ namespace mln
         auto dil = morpho::structural::dilate(f, sem);
 
         mln_value(I) z = literal::zero;
-        auto res = where(dil < ero, ero - dil, z);
+        auto res       = where(dil < ero, ero - dil, z);
         copy(res, out);
 
         mln_exiting();
@@ -100,7 +100,7 @@ namespace mln
     mln_concrete(I) hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
                                 const StructuringElement<SEm>& se_miss)
     {
-      const I& f = exact(input);
+      const I& f          = exact(input);
       mln_concrete(I) out = imconcretize(f);
       impl::unconstrained_hit_or_miss(f, exact(se_hit), exact(se_miss), out, mln_value(I)());
       return out;

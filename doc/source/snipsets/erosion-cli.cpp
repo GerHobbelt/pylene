@@ -1,18 +1,18 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/se/rect2d.hpp>
-#include <mln/morpho/structural/erode.hpp>
-#include <mln/morpho/structural/dilate.hpp>
-#include <mln/morpho/structural/opening.hpp>
 #include <mln/morpho/structural/closing.hpp>
+#include <mln/morpho/structural/dilate.hpp>
+#include <mln/morpho/structural/erode.hpp>
+#include <mln/morpho/structural/opening.hpp>
 
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-#include <cctype>
-#include <string>
 #include <algorithm>
 #include <boost/program_options.hpp>
+#include <cctype>
 #include <iostream>
+#include <string>
 
 namespace po = boost::program_options;
 
@@ -29,7 +29,7 @@ int tolower_safe(int c)
   return std::tolower(static_cast<unsigned char>(c));
 }
 
-std::istream& operator>> (std::istream& in, se_type& se)
+std::istream& operator>>(std::istream& in, se_type& se)
 {
   std::string token;
   in >> token;
@@ -41,7 +41,7 @@ std::istream& operator>> (std::istream& in, se_type& se)
   else if (token == "diamond")
     se = kDiamond;
   else
-    throw po::invalid_option_value ("Invalid SE");
+    throw po::invalid_option_value("Invalid SE");
   return in;
 }
 
@@ -53,7 +53,7 @@ enum morpho_op_type
   kClosing
 };
 
-std::istream& operator>> (std::istream& in, morpho_op_type& se)
+std::istream& operator>>(std::istream& in, morpho_op_type& se)
 {
   std::string token;
   in >> token;
@@ -67,40 +67,32 @@ std::istream& operator>> (std::istream& in, morpho_op_type& se)
   else if (token == "closing")
     se = kClosing;
   else
-    throw po::invalid_option_value ("Invalid Operator");
+    throw po::invalid_option_value("Invalid Operator");
   return in;
 }
 
 
 struct exec_params_type
 {
-  se_type se;
+  se_type        se;
   morpho_op_type op;
-  int size;
+  int            size;
 };
 
 
 int main(int argc, char** argv)
 {
-  po::options_description desc("Allowed options");
+  po::options_description            desc("Allowed options");
   po::positional_options_description p;
-  p.add("operator", 1)
-    .add("se", 1)
-    .add("size", 1)
-    .add("input", 1)
-    .add("output", 1);
+  p.add("operator", 1).add("se", 1).add("size", 1).add("input", 1).add("output", 1);
 
-  desc.add_options()
-    ("help", "produce help message")
-    ("operator", po::value<morpho_op_type>()->required(), "")
-    ("se", po::value<se_type>()->required(), "")
-    ("size", po::value<int>()->required(), "Size of the SE.")
-    ("input", po::value<std::string>()->required(), "Input image (8u or rgb8)")
-    ("output", po::value<std::string>()->required(), "Output image (8u or rgb8)")
-    ;
+  desc.add_options()("help", "produce help message")("operator", po::value<morpho_op_type>()->required(), "")(
+      "se", po::value<se_type>()->required(), "")("size", po::value<int>()->required(), "Size of the SE.")(
+      "input", po::value<std::string>()->required(),
+      "Input image (8u or rgb8)")("output", po::value<std::string>()->required(), "Output image (8u or rgb8)");
 
   po::variables_map vm;
-  int size;
+  int               size;
   try
   {
     po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -114,18 +106,18 @@ int main(int argc, char** argv)
   }
   catch (...)
   {
-    std::cout << "Usage: " << argv[0] << " [-h,--help] OPERATOR SE size input output\n"
-      "OPERATOR\t Morphological operation to perform [erosion | dilation]\n"
-      "SE\t Structuring element to use [square | disc | diamond]\n"
-      "size\t Size of the SE\n"
-      "input\t Input image (u8)\n"
-      "output\t Output image (u8)\n";
+    std::cout << "Usage: " << argv[0]
+              << " [-h,--help] OPERATOR SE size input output\n"
+                 "OPERATOR\t Morphological operation to perform [erosion | dilation]\n"
+                 "SE\t Structuring element to use [square | disc | diamond]\n"
+                 "size\t Size of the SE\n"
+                 "input\t Input image (u8)\n"
+                 "output\t Output image (u8)\n";
     return 1;
   }
 
   mln::image2d<mln::uint8> input, output;
   mln::io::imread(vm["input"].as<std::string>(), input);
-
 
 
   mln::se::rect2d nbh(size, size);

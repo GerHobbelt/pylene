@@ -168,15 +168,17 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_weighted_distance_transfor
       {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}  //
   };
 
-  constexpr std::array<point2d, 8> siteset = {{{-1, -1}, {-1, +0}, {-1, 1},
-                                               {+0, -1},           {+0, 1},
-                                               {+1, -1}, {+1, +0}, {+1, 1}}};
+  // clang-format off
+  constexpr std::array<point2d, 8> siteset = {{{-1, -1}, {-1, +0}, {-1, +1},
+                                               {+0, -1},           {+0, +1},
+                                               {+1, -1}, {+1, +0}, {+1, +1}}};
+  // clang-format on
 
-  constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f,
-                                             1.0f,       1.0f,
+  constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f, //
+                                             1.0f, /* */ 1.0f, //
                                              1.5f, 1.0f, 1.5f}};
 
-  auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
+  auto           nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
   image2d<float> res = transforms::chamfer_distance_transform<float>(f, nbh);
 
   ASSERT_IMAGES_EQ(res, ref);
@@ -206,12 +208,17 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
       {4.5f, 4.0f, 3.5f, 3.0f, 3.5f, 4.0f, 4.5f}, //
   };
 
-  constexpr std::array<point2d, 8> siteset = {
-      {{-1, -1}, {-1, +0}, {-1, 1}, {+0, -1}, {+0, 1}, {+1, -1}, {+1, +0}, {+1, 1}}};
+  // clang-format off
+  constexpr std::array<point2d, 8> siteset = {{{-1, -1}, {-1, +0}, {-1, +1},
+                                               {+0, -1},           {+0, +1},
+                                               {+1, -1}, {+1, +0}, {+1, +1}}};
+  // clang-format on
 
-  constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f, 1.0f, 1.0f, 1.5f, 1.0f, 1.5f}};
+  constexpr std::array<float, 8> weights = {{1.5f, 1.0f, 1.5f, //
+                                             1.0f, /* */ 1.0f, //
+                                             1.5f, 1.0f, 1.5f}};
 
-  auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
+  auto           nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
   image2d<float> res = transforms::chamfer_distance_transform<float>(f, nbh, true);
 
   ASSERT_IMAGES_EQ(res, ref);
@@ -232,7 +239,7 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
   };
 
   constexpr int a = 5, b = 7, c = 11;
-  image2d<int> ref = {
+  image2d<int>  ref = {
       {21, 18, 16, 15, 16, 18, 21}, //
       {18, 14, 11, 10, 11, 14, 18}, //
       {16, 11, 7, 5, 7, 11, 16},    //
@@ -241,16 +248,23 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
       {18, 14, 11, 10, 11, 14, 18}, //
       {21, 18, 16, 15, 16, 18, 21}  //
   };
+  // clang-format off
+  constexpr std::array<point2d, 16> siteset = {{          {-2, -1},           {-2, +1},
+                                                {-1, -2}, {-1, -1}, {-1, +0}, {-1, +1}, {-1, +2},
+                                                          {+0, -1},           {+0, +1},
+                                                {+1, -2}, {+1, -1}, {+1, +0}, {+1, +1}, {+1, +2},
+                                                          {+2, -1},           {+2, +1}          }};
+  // clang-format on
 
-  constexpr std::array<point2d, 16> siteset = {{         {-2, -1},         {-2, +1},
-                                                {-1, -2},{-1, -1},{-1, +0},{-1, +1},{-1, +2},
-                                                         {+0, -1},         {+0, +1},
-                                                {+1, -2},{+1, -1},{+1, +0},{+1, +1},{+1, +2},
-                                                         {+2, -1},         {+2, +1}}};
+  // clang-format off
+  constexpr std::array<int, 16> weights = {{   c,    c,
+                                            c, b, a, b, c,
+                                               a,    a,
+                                            c, b, a, b, c,
+                                               c,    c   }};
+  // clang-format on
 
-  constexpr std::array<int, 16> weights = {{c, c, c, b, a, b, c, a, a, c, b, a, b, c, c, c}};
-
-  auto nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
+  auto         nbh = make_dynamic_wneighborhood(siteset, weights, constant_neighborhood_tag());
   image2d<int> res = transforms::chamfer_distance_transform(f, nbh, true);
 
   ASSERT_IMAGES_EQ(res, ref);

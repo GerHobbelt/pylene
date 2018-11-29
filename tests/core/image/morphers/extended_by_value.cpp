@@ -9,7 +9,7 @@ TEST(Core, value_extension_lvalue)
 {
   using namespace mln;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);
@@ -39,7 +39,7 @@ TEST(Core, value_extension_rvalue)
 {
   using namespace mln;
 
-  box2d dom{{-1, -2}, {3, 3}};
+  box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);

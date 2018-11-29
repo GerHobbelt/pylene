@@ -71,32 +71,37 @@ namespace mln
     {
 
       template <typename T, typename SumType, typename SumSqrType>
-      struct covariance : accumulator_base<covariance<T, SumType, SumSqrType>, T,
-                                           Eigen::Matrix<double, value_traits<T>::ndim, value_traits<T>::ndim>,
-                                           features::covariance<>>
+      struct covariance
+        : accumulator_base<covariance<T, SumType, SumSqrType>, T,
+                           Eigen::Matrix<double, value_traits<T>::ndim, value_traits<T>::ndim>, features::covariance<>>
       {
       private:
         enum
         {
           ndim = value_traits<T>::ndim
         };
-        typedef Eigen::Array<SumType, ndim, 1> vec_t;
+        typedef Eigen::Array<SumType, ndim, 1>       vec_t;
         typedef Eigen::Array<SumSqrType, ndim, ndim> matrix_t;
 
       public:
-        typedef Eigen::Array<double, ndim, 1> mean_result_type;
-        typedef T argument_type;
+        typedef Eigen::Array<double, ndim, 1>    mean_result_type;
+        typedef T                                argument_type;
         typedef Eigen::Array<double, ndim, ndim> result_type;
 
         // typedef boost::mpl::set< features::covariance<>, features::covariance<SumType> > provides;
 
-        covariance() : m_count{0}, m_sum{vec_t::Zero()}, m_S{matrix_t::Zero()} {}
+        covariance()
+          : m_count{0}
+          , m_sum{vec_t::Zero()}
+          , m_S{matrix_t::Zero()}
+        {
+        }
 
         void init()
         {
           m_count = 0;
-          m_sum = vec_t::Zero();
-          m_S = matrix_t::Zero();
+          m_sum   = vec_t::Zero();
+          m_S     = matrix_t::Zero();
         }
 
         void take(const argument_type& arg)
@@ -143,7 +148,7 @@ namespace mln
           if (accu.m_count == 0)
             return result_type::Zero();
 
-          double n = accu.m_count;
+          double      n = accu.m_count;
           result_type COV;
           for (int i = 0; i < ndim; ++i)
             for (int j = i; j < ndim; ++j)
@@ -165,7 +170,7 @@ namespace mln
 
       private:
         unsigned m_count;
-        vec_t m_sum;
+        vec_t    m_sum;
         matrix_t m_S;
       };
     }

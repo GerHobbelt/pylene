@@ -27,21 +27,21 @@ int main(int argc, char** argv)
   using namespace mln;
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-  typedef rgb8 V;
+  typedef rgb8                                                V;
 
   std::string outname = argv[5];
-  std::string stem = outname.substr(0, outname.rfind('.'));
+  std::string stem    = outname.substr(0, outname.rfind('.'));
 
   image2d<V> f;
   io::imread(argv[1], f);
 
-  tree_t tree;
+  tree_t                       tree;
   property_map<tree_t, double> vmap;
 
   std::tie(tree, vmap) = morpho::alphatree_indexes(f, c4);
 
   auto infsup = morpho::vaccumulate(tree, f, accu::accumulators::infsup<V>());
-  auto bvmap = make_functional_property_map<tree_t::node_type>(
+  auto bvmap  = make_functional_property_map<tree_t::node_type>(
       [&infsup](const tree_t::node_type& x) { return l2dist(infsup[x].first, infsup[x].second); });
   auto bvmap2 = make_functional_property_map<unsigned>(
       [&infsup](unsigned x) { return l2dist(infsup[x].first, infsup[x].second); });
@@ -54,8 +54,8 @@ int main(int argc, char** argv)
   image2d<V> out;
   resize(out, f);
 
-  auto avmap = morpho::vaccumulate(tree, f, accu::features::mean<>());
-  auto mc = morpho::paccumulate(tree, f, accu::accumulators::mean<point2df>());
+  auto avmap   = morpho::vaccumulate(tree, f, accu::features::mean<>());
+  auto mc      = morpho::paccumulate(tree, f, accu::accumulators::mean<point2df>());
   auto areamap = morpho::accumulate(tree, accu::features::count<>());
 
   morpho::reconstruction(tree, avmap, out);
@@ -64,12 +64,12 @@ int main(int argc, char** argv)
   io::imsave(out, "/tmp/alpha.tiff");
 
   // Get the seeds.
-  unsigned area_threshold = std::atoi(argv[3]);
+  unsigned                    area_threshold = std::atoi(argv[3]);
   property_map<tree_t, uint8> active(tree, true);
-  std::vector<unsigned> seeds;
+  std::vector<unsigned>       seeds;
 
   // Backward
-  mln_reverse_foreach(auto x, tree.nodes())
+  mln_reverse_foreach (auto x, tree.nodes())
   {
     if (not active[x])
       active[x.parent()] = false;

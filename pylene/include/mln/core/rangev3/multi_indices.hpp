@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <array>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
+#include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/reverse.hpp>
-#include <array>
 
 namespace mln::ranges
 {
@@ -32,12 +32,12 @@ namespace mln::ranges
       struct cursor
       {
         using value_t = decltype(E().__from());
-        using T = typename value_t::value_type;
+        using T       = typename value_t::value_type;
 
         value_t read() const { return {x}; }
-        void next() { ++x; }
-        void prev() { --x; }
-        bool equal(const cursor& other) const { return x == other.x; }
+        void    next() { ++x; }
+        void    prev() { --x; }
+        bool    equal(const cursor& other) const { return x == other.x; }
 
         T x;
       };
@@ -48,7 +48,6 @@ namespace mln::ranges
     public:
       cursor begin_cursor() const { return cursor{__from()[0]}; }
       cursor end_cursor() const { return cursor{__to()[0]}; }
-
     };
 
 
@@ -71,15 +70,19 @@ namespace mln::ranges
         using value_t = decltype(E().__from());
 
         row_t() = default;
-        row_t(value_t from, std::size_t size) : m_x(from), m_size(size) {}
+        row_t(value_t from, std::size_t size)
+          : m_x(from)
+          , m_size(size)
+        {
+        }
 
       private:
         struct cursor
         {
           value_t read() const { return m_x; }
-          void next() { m_x.back()++; }
-          void prev() { m_x.back()--; }
-          bool equal(const cursor& other) const { return m_x.back() == other.m_x.back(); }
+          void    next() { m_x.back()++; }
+          void    prev() { m_x.back()--; }
+          bool    equal(const cursor& other) const { return m_x.back() == other.m_x.back(); }
 
           value_t m_x;
         };
@@ -93,7 +96,7 @@ namespace mln::ranges
         }
 
       protected:
-        value_t m_x;
+        value_t     m_x;
         std::size_t m_size = 0;
       };
       /**************************************************************/
@@ -105,7 +108,7 @@ namespace mln::ranges
         using value_t = decltype(E().__from());
 
         value_t __read() const { return m_x; }
-        row_t __read_row() const { return row_t(m_x, static_cast<std::size_t>(m_to.back() - m_from.back())); }
+        row_t   __read_row() const { return row_t(m_x, static_cast<std::size_t>(m_to.back() - m_from.back())); }
 
         value_t __rread() const
         {
@@ -132,7 +135,9 @@ namespace mln::ranges
         void __reset_to_rbegin(std::size_t k) { m_x[k] = m_to[k]; }
 
         cursor() = default;
-        cursor(const multi_indices_facade& sp, bool forward = true) : m_from(sp.__from()), m_to(sp.__to())
+        cursor(const multi_indices_facade& sp, bool forward = true)
+          : m_from(sp.__from())
+          , m_to(sp.__to())
         {
           m_x = forward ? m_from : m_to;
         }
@@ -157,16 +162,24 @@ namespace mln::ranges
 
   public:
     multi_indices() = default;
-    multi_indices(value_t from, value_t to) : m_from(from), m_to(to) {}
-    multi_indices(value_t to) : m_to(to) {}
+    multi_indices(value_t from, value_t to)
+      : m_from(from)
+      , m_to(to)
+    {
+    }
+    multi_indices(value_t to)
+      : m_to(to)
+    {
+    }
 
 
     value_t __from() const { return m_from; }
     value_t __to() const { return m_to; }
 
   private:
-    value_t m_from = {0, };
+    value_t m_from = {
+        0,
+    };
     value_t m_to;
   };
-
 }

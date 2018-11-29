@@ -48,7 +48,11 @@ namespace mln
   struct wpixel : Px
   {
     constexpr wpixel() = default;
-    constexpr wpixel(const Px& px, const W& w) : Px(px), m_w(w) {}
+    constexpr wpixel(const Px& px, const W& w)
+      : Px(px)
+      , m_w(w)
+    {
+    }
     constexpr const W& weight() const { return m_w; }
 
   private:
@@ -64,13 +68,14 @@ namespace mln
   {
   private:
     using Px = typename iterator_traits<sliding_pixter<Pixel, SiteSet>>::value_type;
-    using W = typename range_value<WeightSet>::type;
+    using W  = typename range_value<WeightSet>::type;
 
   public:
     sliding_wpixter() = default;
 
     sliding_wpixter(const Pixel& px, const SiteSet& pset, const WeightSet& wset)
-        : m_sliding_pixter(px, pset), m_wset_iter(rng::iter(wset))
+      : m_sliding_pixter(px, pset)
+      , m_wset_iter(rng::iter(wset))
     {
     }
 
@@ -91,7 +96,7 @@ namespace mln
     wpixel<Px, W> dereference() const { return {*m_sliding_pixter, *m_wset_iter}; }
 
   private:
-    sliding_pixter<Pixel, SiteSet> m_sliding_pixter;
+    sliding_pixter<Pixel, SiteSet>                 m_sliding_pixter;
     typename range_const_iterator<WeightSet>::type m_wset_iter;
   };
 

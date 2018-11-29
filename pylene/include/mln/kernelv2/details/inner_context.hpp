@@ -62,7 +62,7 @@ namespace mln
 
           void operator()(Expr& x, inner_context& ctx) const
           {
-            auto& accu = proto::value(proto::left(x));
+            auto&                    accu = proto::value(proto::left(x));
             eval_context<PVal, NVal> ctx2 = {ctx.pvals, ctx.nvals};
 
             F()(accu, proto::eval(proto::right(x), ctx2));

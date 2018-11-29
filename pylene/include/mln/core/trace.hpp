@@ -10,12 +10,12 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <mln/core/config.hpp>
 #include <string>
 #include <thread>
-#include <mln/core/config.hpp>
 
-#define mln_concat(A,B) A ## B
-#define mln_entering_expand(NAME,COUNTER) mln::trace::scoped_trace mln_concat(__mln_trace, COUNTER) (NAME);
+#define mln_concat(A, B) A##B
+#define mln_entering_expand(NAME, COUNTER) mln::trace::scoped_trace mln_concat(__mln_trace, COUNTER)(NAME);
 #define mln_entering(NAME) mln_entering_expand(NAME, __COUNTER__)
 
 #define mln_exiting() ;
@@ -28,7 +28,7 @@ namespace mln
   namespace trace
   {
 
-    static bool verbose = (std::getenv("TRACE") != NULL);
+    static bool             verbose       = (std::getenv("TRACE") != NULL);
     static thread_local int __stack_depth = 0;
 
     struct scoped_trace
@@ -40,11 +40,13 @@ namespace mln
       ~scoped_trace();
 
     private:
-      template <class T = void> [[gnu::noinline]] void entering(const char* desc);
-      template <class T = void> [[gnu::noinline]] void exiting();
+      template <class T = void>
+      [[gnu::noinline]] void entering(const char* desc);
+      template <class T = void>
+      [[gnu::noinline]] void exiting();
 
-      int m_depth;
-      std::string m_desc;
+      int                                                m_depth;
+      std::string                                        m_desc;
       std::chrono::time_point<std::chrono::system_clock> m_clock;
     };
 
@@ -74,7 +76,7 @@ namespace mln
     void scoped_trace::entering(const char* desc)
     {
       m_depth = __stack_depth++;
-      m_desc = desc;
+      m_desc  = desc;
       m_clock = std::chrono::system_clock::now();
 
       for (int k = 0; k < m_depth; ++k)
@@ -96,8 +98,7 @@ namespace mln
     namespace impl
     {
       template <class T = void>
-      [[gnu::noinline]]
-      void warn(const char* msg)
+      [[gnu::noinline]] void warn(const char* msg)
       {
         for (int k = 0; k < __stack_depth; ++k)
           std::clog.put(' ');
@@ -118,7 +119,6 @@ namespace mln
       if (verbose)
         impl::warn(msg.c_str());
     }
-
   }
 }
 

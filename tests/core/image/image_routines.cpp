@@ -57,7 +57,7 @@ TEST(Core, Image2d_Where_pixfunction)
   using namespace mln;
 
   typedef image2d<int> I;
-  image2d<int> ima(5, 5);
+  image2d<int>         ima(5, 5);
 
   iota(ima, 0);
   auto d = where(ima, [](const mln_pixel(const I) & x) { return x.val() < 10; });

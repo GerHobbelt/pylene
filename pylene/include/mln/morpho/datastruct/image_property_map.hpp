@@ -26,25 +26,25 @@ namespace mln
   template <class P, class AMap, class ValueMap>
   struct image_traits<morpho::image_tree_property_map<P, AMap, ValueMap>>
   {
-    typedef std::true_type accessible;
-    typedef random_access_image_tag category;
-    typedef std::false_type concrete; // depend
-    typedef std::true_type indexable;
+    typedef std::true_type                accessible;
+    typedef random_access_image_tag       category;
+    typedef std::false_type               concrete; // depend
+    typedef std::true_type                indexable;
     typedef extension::none_extension_tag extension;
-    typedef std::false_type shallow_copy;
+    typedef std::false_type               shallow_copy;
   };
 
   template <class P, class AMap, class ValueMap>
   struct image_concrete<morpho::image_tree_property_map<P, AMap, ValueMap>>
   {
     typedef property_map<morpho::component_tree<P, AMap>, typename ValueMap::value_type> NewValueMap;
-    typedef morpho::image_tree_property_map<P, AMap, NewValueMap> type;
+    typedef morpho::image_tree_property_map<P, AMap, NewValueMap>                        type;
   };
 
   template <class P, class AMap, class ValueMap, typename V>
   struct image_ch_value<morpho::image_tree_property_map<P, AMap, ValueMap>, V>
   {
-    typedef property_map<morpho::component_tree<P, AMap>, V> NewValueMap;
+    typedef property_map<morpho::component_tree<P, AMap>, V>      NewValueMap;
     typedef morpho::image_tree_property_map<P, AMap, NewValueMap> type;
   };
 
@@ -56,13 +56,13 @@ namespace mln
 
     template <class P, class AMap, class ValueMap>
     struct image_tree_property_map
-        : image_base<image_tree_property_map<P, AMap, ValueMap>, typename component_tree<P, AMap>::node_type,
-                     typename ValueMap::value_type>
+      : image_base<image_tree_property_map<P, AMap, ValueMap>, typename component_tree<P, AMap>::node_type,
+                   typename ValueMap::value_type>
     {
     private:
-      typedef component_tree<P, AMap> tree_t;
+      typedef component_tree<P, AMap>    tree_t;
       typedef typename tree_t::node_type node_t;
-      typedef image_tree_property_map self_t;
+      typedef image_tree_property_map    self_t;
 
       struct fun_viter;
       struct fun_cviter;
@@ -70,13 +70,13 @@ namespace mln
       struct fun_cpixter;
 
     public:
-      typedef typename ValueMap::value_type value_type;
-      typedef typename ValueMap::reference reference;
-      typedef typename ValueMap::const_reference const_reference;
-      typedef typename tree_t::node_type point_type;
-      typedef typename tree_t::vertex_id_t size_type;
-      typedef void difference_type;
-      typedef image_tree_property_map_pixel<self_t> pixel_type;
+      typedef typename ValueMap::value_type               value_type;
+      typedef typename ValueMap::reference                reference;
+      typedef typename ValueMap::const_reference          const_reference;
+      typedef typename tree_t::node_type                  point_type;
+      typedef typename tree_t::vertex_id_t                size_type;
+      typedef void                                        difference_type;
+      typedef image_tree_property_map_pixel<self_t>       pixel_type;
       typedef image_tree_property_map_pixel<const self_t> const_pixel_type;
 
       template <class ImTreePropMap>
@@ -88,9 +88,9 @@ namespace mln
       // Ranges & iterators
       typedef typename tree_t::node_range domain_type;
 
-      typedef transformed_range<domain_type, fun_viter> value_range;
-      typedef transformed_range<domain_type, fun_cviter> const_value_range;
-      typedef transformed_range<domain_type, fun_pixter> pixel_range;
+      typedef transformed_range<domain_type, fun_viter>   value_range;
+      typedef transformed_range<domain_type, fun_cviter>  const_value_range;
+      typedef transformed_range<domain_type, fun_pixter>  pixel_range;
       typedef transformed_range<domain_type, fun_cpixter> const_pixel_range;
 
       image_tree_property_map(const tree_t& tree, const ValueMap& vmap);
@@ -105,36 +105,36 @@ namespace mln
       /// \}
 
       // Acces
-      reference operator()(const node_t& node);
-      const_reference operator()(const node_t& node) const;
-      reference at(const node_t& node);
-      const_reference at(const node_t& node) const;
-      reference operator[](size_type index);
-      const_reference operator[](size_type index) const;
-      pixel_type pixel(const node_t& node);
+      reference        operator()(const node_t& node);
+      const_reference  operator()(const node_t& node) const;
+      reference        at(const node_t& node);
+      const_reference  at(const node_t& node) const;
+      reference        operator[](size_type index);
+      const_reference  operator[](size_type index) const;
+      pixel_type       pixel(const node_t& node);
       const_pixel_type pixel(const node_t& node) const;
 
-      node_t point_at_index(size_type index) const;
+      node_t    point_at_index(size_type index) const;
       size_type index_of_point(const node_t& node) const;
 
       /// This function does not make sense on a Tree Property Map.
       /// It's here to fulfill the concept requirement.
       difference_type delta_index(const node_t& node) const;
-      void reindex(size_type index);
+      void            reindex(size_type index);
 
       // Range & iterator
-      domain_type domain() const;
-      value_range values();
+      domain_type       domain() const;
+      value_range       values();
       const_value_range values() const;
-      pixel_range pixels();
+      pixel_range       pixels();
       const_pixel_range pixels() const;
 
       // Specific.
       const ValueMap& get_vmap() const;
-      ValueMap& get_vmap();
+      ValueMap&       get_vmap();
 
     private:
-      tree_t m_tree;
+      tree_t   m_tree;
       ValueMap m_vmap;
     };
 
@@ -155,10 +155,15 @@ namespace mln
       friend typename ImTreePropMap::const_pixel_type;
 
       image_tree_property_map_pixel() = default;
-      image_tree_property_map_pixel(ImTreePropMap* ima, size_type node_id) : m_ima(ima), m_index(node_id) {}
+      image_tree_property_map_pixel(ImTreePropMap* ima, size_type node_id)
+        : m_ima(ima)
+        , m_index(node_id)
+      {
+      }
 
       image_tree_property_map_pixel(const typename ImTreePropMap::pixel_type& other)
-          : m_ima(other.m_ima), m_index(other.m_index)
+        : m_ima(other.m_ima)
+        , m_index(other.m_index)
       {
       }
 
@@ -174,7 +179,7 @@ namespace mln
 
     private:
       image_type* m_ima;
-      size_type m_index;
+      size_type   m_index;
     };
 
     template <class P, class AMap, class ValueMap>
@@ -189,8 +194,12 @@ namespace mln
     struct image_tree_property_map<P, AMap, ValueMap>::fun_cviter
     {
       fun_cviter() = default;
-      fun_cviter(const self_t* self) : m_this(self){};
-      fun_cviter(const fun_viter& other) : m_this(other.m_this) {}
+      fun_cviter(const self_t* self)
+        : m_this(self){};
+      fun_cviter(const fun_viter& other)
+        : m_this(other.m_this)
+      {
+      }
 
       const_reference operator()(const point_type& node) const { return m_this->m_vmap[node]; }
 
@@ -209,8 +218,12 @@ namespace mln
     struct image_tree_property_map<P, AMap, ValueMap>::fun_cpixter
     {
       fun_cpixter() = default;
-      fun_cpixter(const self_t* self) : m_this(self){};
-      fun_cpixter(const fun_pixter& other) : m_this(other.m_this) {}
+      fun_cpixter(const self_t* self)
+        : m_this(self){};
+      fun_cpixter(const fun_pixter& other)
+        : m_this(other.m_this)
+      {
+      }
 
       const_pixel_type operator()(const point_type& node) const { return const_pixel_type(m_this, node.id()); }
 
@@ -219,7 +232,8 @@ namespace mln
 
     template <class P, class AMap, class ValueMap>
     image_tree_property_map<P, AMap, ValueMap>::image_tree_property_map(const tree_t& tree, const ValueMap& vmap)
-        : m_tree(tree), m_vmap(vmap)
+      : m_tree(tree)
+      , m_vmap(vmap)
     {
     }
 
@@ -227,7 +241,8 @@ namespace mln
     template <class OtherVMap>
     image_tree_property_map<P, AMap, ValueMap>::image_tree_property_map(
         const image_tree_property_map<P, AMap, OtherVMap>& other, const value_type& v)
-        : m_tree(other.m_tree), m_vmap(m_tree, v)
+      : m_tree(other.m_tree)
+      , m_vmap(m_tree, v)
     {
     }
 
@@ -235,20 +250,21 @@ namespace mln
     template <class OtherVMap>
     image_tree_property_map<P, AMap, ValueMap>::image_tree_property_map(
         const image_tree_property_map<P, AMap, OtherVMap>& other, mln::init)
-        : m_tree(other.m_tree), m_vmap(m_tree)
+      : m_tree(other.m_tree)
+      , m_vmap(m_tree)
     {
     }
 
     template <class P, class AMap, class ValueMap>
     inline typename image_tree_property_map<P, AMap, ValueMap>::reference image_tree_property_map<P, AMap, ValueMap>::
-        operator()(const node_t& node)
+                                                                          operator()(const node_t& node)
     {
       return m_vmap[node];
     }
 
     template <class P, class AMap, class ValueMap>
     typename image_tree_property_map<P, AMap, ValueMap>::const_reference image_tree_property_map<P, AMap, ValueMap>::
-        operator()(const node_t& node) const
+                                                                         operator()(const node_t& node) const
     {
       return m_vmap[node];
     }
@@ -268,14 +284,14 @@ namespace mln
 
     template <class P, class AMap, class ValueMap>
     typename image_tree_property_map<P, AMap, ValueMap>::reference image_tree_property_map<P, AMap, ValueMap>::
-        operator[](size_type index)
+                                                                   operator[](size_type index)
     {
       return m_vmap[index];
     }
 
     template <class P, class AMap, class ValueMap>
     typename image_tree_property_map<P, AMap, ValueMap>::const_reference image_tree_property_map<P, AMap, ValueMap>::
-        operator[](size_type index) const
+                                                                         operator[](size_type index) const
     {
       return m_vmap[index];
     }
@@ -416,21 +432,24 @@ namespace mln
 
       template <class NodeType>
       struct tree_nbh_piter
-          : tree_nbh_iter_helper<NodeType>,
-            iterator_base<tree_nbh_piter<NodeType>, typename tree_nbh_iter_helper<NodeType>::value_type,
-                          typename tree_nbh_iter_helper<NodeType>::value_type>
+        : tree_nbh_iter_helper<NodeType>,
+          iterator_base<tree_nbh_piter<NodeType>, typename tree_nbh_iter_helper<NodeType>::value_type,
+                        typename tree_nbh_iter_helper<NodeType>::value_type>
       {
         typedef typename tree_nbh_iter_helper<NodeType>::value_type node_type;
-        typedef typename node_type::tree_t tree_t;
-        typedef node_type value_type;
+        typedef typename node_type::tree_t                          tree_t;
+        typedef node_type                                           value_type;
 
         tree_nbh_piter() = default;
 
-        tree_nbh_piter(const NodeType& x) : m_x(x) {}
+        tree_nbh_piter(const NodeType& x)
+          : m_x(x)
+        {
+        }
 
         void init()
         {
-          m_started = (this->__get(m_x).get_parent_id() == node_type::tree_t::npos());
+          m_started    = (this->__get(m_x).get_parent_id() == node_type::tree_t::npos());
           m_child_iter = this->__get(m_x).children().iter();
           m_child_iter.init();
         }
@@ -447,28 +466,31 @@ namespace mln
         node_type dereference() const { return m_started ? (*m_child_iter) : this->__get(m_x).parent(); }
 
       private:
-        NodeType m_x; // A node or a node iterator
-        bool m_started;
+        NodeType                           m_x; // A node or a node iterator
+        bool                               m_started;
         typename tree_t::children_iterator m_child_iter;
       };
 
       template <class NodePixelType>
       struct tree_nbh_pixter
-          : tree_nbh_iter_helper<NodePixelType>,
-            iterator_base<tree_nbh_pixter<NodePixelType>, typename tree_nbh_iter_helper<NodePixelType>::value_type,
-                          typename tree_nbh_iter_helper<NodePixelType>::value_type>
+        : tree_nbh_iter_helper<NodePixelType>,
+          iterator_base<tree_nbh_pixter<NodePixelType>, typename tree_nbh_iter_helper<NodePixelType>::value_type,
+                        typename tree_nbh_iter_helper<NodePixelType>::value_type>
       {
         typedef typename tree_nbh_iter_helper<NodePixelType>::value_type value_type;
-        typedef typename value_type::point_type node_type;
-        typedef typename node_type::tree_t tree_t;
+        typedef typename value_type::point_type                          node_type;
+        typedef typename node_type::tree_t                               tree_t;
 
         tree_nbh_pixter() = default;
-        tree_nbh_pixter(const NodePixelType& x) : m_x(x) {}
+        tree_nbh_pixter(const NodePixelType& x)
+          : m_x(x)
+        {
+        }
 
         void init()
         {
-          auto x = this->__get(m_x).point();
-          m_started = (x.get_parent_id() == node_type::tree_t::npos());
+          auto x       = this->__get(m_x).point();
+          m_started    = (x.get_parent_id() == node_type::tree_t::npos());
           m_child_iter = x.children().iter();
           m_child_iter.init();
         }
@@ -490,8 +512,8 @@ namespace mln
         }
 
       private:
-        NodePixelType m_x; // A node or a node iterator
-        bool m_started;
+        NodePixelType                      m_x; // A node or a node iterator
+        bool                               m_started;
         typename tree_t::children_iterator m_child_iter;
       };
     }

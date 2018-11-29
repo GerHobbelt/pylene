@@ -32,10 +32,10 @@ boost::vector_property_map<unsigned> compute_graph_depth(const MyGraph& g)
   boost::vector_property_map<unsigned> depth(boost::num_vertices(g));
 
   auto one = [](mln::dontcare_t) -> int { return 1; };
-  auto w = boost::make_function_property_map<MyGraph::edge_descriptor, int, decltype(one)>(one);
+  auto w   = boost::make_function_property_map<MyGraph::edge_descriptor, int, decltype(one)>(one);
 
   MyGraph::vertex_descriptor root = boost::vertex(0, g);
-  depth[root] = 0;
+  depth[root]                     = 0;
 
   MyGraph gT;
   boost::transpose_graph(g, gT);
@@ -55,9 +55,9 @@ void write_vmap_to_image(const tree_t* t, const tlink_t* tlink, const ValueMap& 
     unsigned w = 0;
     for (int i = 0; i < NTREE; ++i)
     {
-      tree_t::node_type tnode = t[i].get_node_at(px.index());
+      tree_t::node_type          tnode = t[i].get_node_at(px.index());
       MyGraph::vertex_descriptor gnode = tlink[i][tnode];
-      w = std::max(w, vmap[gnode]);
+      w                                = std::max(w, vmap[gnode]);
     }
     px.val() = w;
   }
@@ -90,12 +90,12 @@ mln::morpho::component_tree<P, mln::image2d<P>>
   unsigned j = 0;
   for (unsigned i = 0; i < olddata->m_S.size(); ++i)
   {
-    P p = olddata->m_S[i];
+    P       p  = olddata->m_S[i];
     point2d pt = olddata->m_pmap.point_at_index(p);
     if (K1::is_face_2(pt))
     {
       newdata->m_S[j] = newdata->m_pmap.index_of_point(pt / 2);
-      auto node = tree.get_node_at(p);
+      auto node       = tree.get_node_at(p);
       if (node.get_first_point_id() == i)
         newdata->m_nodes[node.id()].m_point_index = j;
       ++j;
@@ -122,10 +122,10 @@ int main(int argc, char** argv)
   if (argc < 5)
     usage(argv);
 
-  const char* input_path = argv[1];
-  int a0 = std::atoi(argv[2]);
-  int a1 = std::atoi(argv[3]);
-  int lambda = std::atoi(argv[4]);
+  const char* input_path  = argv[1];
+  int         a0          = std::atoi(argv[2]);
+  int         a1          = std::atoi(argv[3]);
+  int         lambda      = std::atoi(argv[4]);
   const char* output_path = argv[5];
 
   tbb::task_scheduler_init init;
@@ -155,13 +155,13 @@ int main(int argc, char** argv)
     });
 
     // 2. Compute the Gos.
-    MyGraph g2;
+    MyGraph                                                                      g2;
     std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
     std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
     // 3. Compute the depth image
-    boost::vector_property_map<unsigned> gdepth = compute_graph_depth(g2);
-    image2d<uint16> imdepth = imchvalue<uint16>(F);
+    boost::vector_property_map<unsigned> gdepth  = compute_graph_depth(g2);
+    image2d<uint16>                      imdepth = imchvalue<uint16>(F);
 
     write_vmap_to_image(t, &tlink[0], gdepth, imdepth);
 
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
 
     // 4. Compute the saturated maxtree
     std::tie(T, std::ignore) = satmaxtree(imdepth);
-    T = tree_keep_2F(T);
+    T                        = tree_keep_2F(T);
   }
 
   // Mumford-shah + simplification

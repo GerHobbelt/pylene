@@ -18,11 +18,11 @@ namespace mln
       static_assert(std::is_same<mln_value(I), Label>::value, "Image value type and Label type must match.");
 
       const I& ima = exact(lbl);
-      auto acc = accu::make_accumulator(exact(accu_), mln_point(I)());
+      auto     acc = accu::make_accumulator(exact(accu_), mln_point(I)());
       acc.init();
 
       typedef decltype(acc) Accu;
-      std::vector<Accu> accumulators(nlabels + 1, acc);
+      std::vector<Accu>     accumulators(nlabels + 1, acc);
 
       // accumulate
       {
@@ -33,7 +33,7 @@ namespace mln
 
       // extract results
       typedef typename accu::result_of<AccuLike, mln_point(I)>::type R;
-      std::vector<R> results(nlabels + 1);
+      std::vector<R>                                                 results(nlabels + 1);
       {
         for (unsigned i = 0; i <= nlabels; ++i)
           results[i] = accumulators[i].to_result();
@@ -49,12 +49,12 @@ namespace mln
       static_assert(std::is_same<mln_value(I), Label>::value, "Image value type and Label type must match.");
 
       const I& lbl = exact(lbl_);
-      const J& f = exact(f_);
-      auto acc = accu::make_accumulator(exact(accu_), mln_value(J)());
+      const J& f   = exact(f_);
+      auto     acc = accu::make_accumulator(exact(accu_), mln_value(J)());
       acc.init();
 
       typedef decltype(acc) Accu;
-      std::vector<Accu> accumulators(nlabels + 1, acc);
+      std::vector<Accu>     accumulators(nlabels + 1, acc);
 
       // accumulate
       {
@@ -65,7 +65,7 @@ namespace mln
 
       // extract results
       typedef typename accu::result_of<AccuLike, mln_value(J)>::type R;
-      std::vector<R> results(nlabels + 1);
+      std::vector<R>                                                 results(nlabels + 1);
       {
         for (unsigned i = 0; i <= nlabels; ++i)
           results[i] = accumulators[i].to_result();

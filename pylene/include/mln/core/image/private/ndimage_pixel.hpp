@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <mln/core/concept/pixel.hpp>
 #include <array>
+#include <mln/core/concept/pixel.hpp>
+#include <mln/core/rangev3/private/multi_view_facade.hpp>
 
 // Note: because of the CRTP, we do not want this to be inner class of ndimage<T, N, E>
 // (E is a non-dependant template parameter).
@@ -15,26 +15,26 @@ namespace mln::details
   struct ndimage_info
   {
     using point_type = mln::point<std::ptrdiff_t, N>;
-    std::array<std::ptrdiff_t, N> stride;   // Strides
-    point_type from;                        // Start domain point
-    point_type to;                          // Past-the-end domain point
-    T* buffer;                              // Pointer to (0,0)
+    std::array<std::ptrdiff_t, N> stride; // Strides
+    point_type                    from;   // Start domain point
+    point_type                    to;     // Past-the-end domain point
+    T*                            buffer; // Pointer to (0,0)
   };
 
   template <class T, std::size_t N>
   struct ndpix_base : Pixel<ndpix_base<T, N>>
   {
     using point_type = typename ndimage_info<T, N>::point_type;
-    using site_type = point_type;
+    using site_type  = point_type;
     using value_type = std::remove_const_t<T>;
-    using reference = T&;
+    using reference  = T&;
 
-    T& val()            const { return m_lineptr[m_point[N-1]]; }
-    point_type point()  const { return m_point; }
+    T&         val() const { return m_lineptr[m_point[N - 1]]; }
+    point_type point() const { return m_point; }
 
 
-    T*                               m_lineptr;
-    point_type                       m_point;
+    T*         m_lineptr;
+    point_type m_point;
   };
 
   template <class T, std::size_t N>
@@ -44,7 +44,7 @@ namespace mln::details
 
     // Overwrite value_type/reference for cursor
     using value_type = ndpix;
-    using reference = ndpix;
+    using reference  = ndpix;
 
     void advance(const point_type& dp)
     {
@@ -53,7 +53,7 @@ namespace mln::details
       this->m_point += dp;
     }
 
-    const ndimage_info<T, N>*        m_info;
+    const ndimage_info<T, N>* m_info;
 
   private:
     friend ::ranges::range_access;
@@ -61,9 +61,9 @@ namespace mln::details
     // (It creates a copy and return *it)
     ndpix read() const { return *this; }
 
-    void next() { this->m_point[N-1]++; }
-    void prev() { this->m_point[N-1]--; }
-    bool equal(const ndpix& other) const { return this->m_point[N-1] == other.m_point[N-1]; }
+    void next() { this->m_point[N - 1]++; }
+    void prev() { this->m_point[N - 1]--; }
+    bool equal(const ndpix& other) const { return this->m_point[N - 1] == other.m_point[N - 1]; }
   };
 
   template <class T, std::size_t N>
@@ -79,9 +79,8 @@ namespace mln::details
     }
 
   public:
-    ndimage_info<T, N>        m_info;
+    ndimage_info<T, N> m_info;
   };
-
 
 
   template <class T, std::size_t N>
@@ -93,36 +92,40 @@ namespace mln::details
     struct row_t : public ndpix<T, N>, ::ranges::view_facade<row_t>
     {
       friend ::ranges::range_access;
+
     private:
       using cursor_t = ndpix<T, N>;
 
       cursor_t begin_cursor() const
       {
-        cursor_t tmp = *this;
-        tmp.m_point[N-1] = this->m_info->from[N-1];
+        cursor_t tmp       = *this;
+        tmp.m_point[N - 1] = this->m_info->from[N - 1];
         return tmp;
       }
       cursor_t end_cursor() const
       {
-        cursor_t tmp = *this;
-        tmp.m_point[N-1] = this->m_info->to[N-1];
+        cursor_t tmp       = *this;
+        tmp.m_point[N - 1] = this->m_info->to[N - 1];
         return tmp;
       }
 
     public:
       row_t() = default;
-      row_t(const ndpix<T, N>& px) : ndpix<T,N>(px) {}
+      row_t(const ndpix<T, N>& px)
+        : ndpix<T, N>(px)
+      {
+      }
     };
 
   public:
     struct cursor : ndpix<T, N>
     {
       using value_type = ndpix<T, N>;
-      using reference = const ndpix<T, N>&;
+      using reference  = const ndpix<T, N>&;
 
-      const ndpix<T,N>& __read() const { return *this; }
-      const ndpix<T,N>& __rread() const { return *this; }
-      row_t __read_row() const { return row_t(*this); }
+      const ndpix<T, N>&            __read() const { return *this; }
+      const ndpix<T, N>&            __rread() const { return *this; }
+      row_t                         __read_row() const { return row_t(*this); }
       ::ranges::reverse_view<row_t> __read_rrow() const { return ::ranges::view::reverse(row_t(*this)); }
 
       void __next(std::size_t k)
@@ -158,7 +161,7 @@ namespace mln::details
       cursor() = default;
       cursor(const ndpix_range& r, bool forward = true)
       {
-        this->m_info = &r.m_info;
+        this->m_info  = &r.m_info;
         this->m_point = forward ? this->m_info->from : (this->m_info->to - 1);
         this->__update_lineptr();
       }
@@ -174,16 +177,12 @@ namespace mln::details
 
     ndpix_range() = default;
 
-    ndpix_range(const std::array<std::ptrdiff_t, N>& strides,
-                const point_type& from,
-                const point_type& to,
-                T* ptr)
-        : m_info{strides, from, to, ptr}
+    ndpix_range(const std::array<std::ptrdiff_t, N>& strides, const point_type& from, const point_type& to, T* ptr)
+      : m_info{strides, from, to, ptr}
     {
     }
 
   private:
     ndimage_info<T, N> m_info;
   };
-
 }

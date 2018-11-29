@@ -110,9 +110,9 @@ TEST(Range, filter_2d_write)
   static_assert(mln::concepts::stl::OutputRange<decltype(rng), int>);
 #else
   static_assert(::ranges::ForwardRange<decltype(sp)>());
-  static_assert(mln::concepts::stl::OutputRange<decltype(sp), int>);
+  static_assert(::ranges::OutputRange<decltype(sp), int>());
   static_assert(::ranges::ForwardRange<decltype(rng)>());
-  static_assert(mln::concepts::stl::OutputRange<decltype(rng), int>);
+  static_assert(::ranges::OutputRange<decltype(rng), int>());
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto& val : rng)
@@ -146,9 +146,9 @@ TEST(Range, filter_2d_write_rowwise)
   static_assert(mln::concepts::stl::OutputRange<decltype(rng), int>);
 #else
   static_assert(::ranges::ForwardRange<decltype(sp)>());
-  static_assert(mln::concepts::stl::OutputRange<decltype(sp), int>);
+  static_assert(::ranges::OutputRange<decltype(sp), int>());
   static_assert(::ranges::ForwardRange<decltype(rng)>());
-  static_assert(mln::concepts::stl::OutputRange<decltype(rng), int>);
+  static_assert(::ranges::OutputRange<decltype(rng), int>());
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto row : rng.rows())

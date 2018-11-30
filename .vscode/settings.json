@@ -1,6 +1,4 @@
 {
-    "C_Cpp.intelliSenseEngineFallback": "Disabled",
-    "C_Cpp.configurationWarnings": "Disabled",
     "files.associations": {
         "tuple": "cpp",
         "slist": "cpp",

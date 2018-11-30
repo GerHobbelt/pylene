@@ -17,17 +17,11 @@ namespace mln::concepts
   template<typename Dom>
   concept bool Domain = 
     stl::ForwardRange<Dom> &&
-    requires {
-        typename Dom::point_type;
-    } &&
-    Point<typename Dom::point_type> &&
-    !std::is_const_v<typename Dom::codomain_type> &&
-    !std::is_reference_v<typename Dom::codomain_type> &&
-    requires(const Dom cdom, const typename Dom::point_type& p) {
-        { cdom.has(p) }             -> bool&&;
-        { cdom.empty() }            -> bool&&;
-        { cdom.continuous() }       -> bool&&;
-        { cdom.discrete() }         -> bool&&;
+    Point<typename Dom::value_type> &&
+    requires(const Dom cdom, typename Dom::value_type p) {
+        { cdom.has(p) }             -> bool;
+        { cdom.empty() }            -> bool;
+        { cdom.size() }             -> stl::UnsignedIntegral&&;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

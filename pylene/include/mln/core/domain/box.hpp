@@ -45,9 +45,6 @@ namespace mln
     bool       empty() const;
     unsigned   size() const;
 
-    bool discrete() const;
-
-    bool continuous() const;
     bool __is_valid() const;
 
     iterator         iter() const;
@@ -133,10 +130,6 @@ namespace mln
         sz *= pmax[i] - pmin[i];
       return sz;
     }
-
-    bool discrete() const { return true; }
-
-    bool continuous() const { return false; }
 
     iterator iter() const
     {
@@ -367,20 +360,8 @@ namespace mln
   inline bool strided_box<T, dim>::empty() const
   {
     for (unsigned i = 0; i < dim; ++i)
-      if (pmax[i] < pmin[i] + strides)
+      if (pmax[i] < pmin[i] + strides[i])
         return true;
-    return false;
-  }
-
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::discrete() const
-  {
-    return true;
-  }
-
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::continuous() const
-  {
     return false;
   }
 

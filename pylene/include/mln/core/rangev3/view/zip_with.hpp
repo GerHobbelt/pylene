@@ -90,16 +90,18 @@ namespace mln::ranges
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
       }
 
-
+      /*
 #ifdef PYLENE_CONCEPT_TS_ENABLED
       // clang-format off
       void prev() requires (mln::concepts::stl::BidirectionalRange<Rngs> && ...)
       // clang-format on
 #else
-      template <typename U = void, typename = std::enable_if_t<std::conjunction_v<
-                                       std::bool_constant<static_cast<bool>(::ranges::BidirectionalRange<Rngs>())>...>>>
+      template <typename U = void, typename = std::enable_if_t<(::ranges::BidirectionalRange<Rngs>() && ...)>>
+
       void prev()
-#endif
+      #endif
+      */
+      void prev()
       {
         std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
       }

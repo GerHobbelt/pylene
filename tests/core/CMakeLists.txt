@@ -59,5 +59,11 @@ add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
+  add_core_test(${test_prefix}concept_values   concept/values.cpp)
+  add_core_test(${test_prefix}concept_points   concept/points.cpp)
+  add_core_test(${test_prefix}concept_pixels   concept/pixels.cpp)
+  add_core_test(${test_prefix}concept_domains  concept/domains.cpp)
+  add_core_test(${test_prefix}concept_indexes  concept/indexes.cpp)
   add_core_test(${test_prefix}concept_ranges   concept/ranges.cpp)
+  add_core_test(${test_prefix}concept_images   concept/images.cpp)
 endif()

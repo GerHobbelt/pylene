@@ -7,9 +7,118 @@ Core Module
 .. toctree::
    :hidden:
 
+   core/values
+   core/points
+   core/pixels
+   core/domains
+   core/indexes
    core/ranges
    core/neighborhood
    core/algorithms
+   core/stl
+
+
+
+
+.. raw:: html
+
+         <h2>Values</h2>
+
+
+:doc:`core/values` are the fundamentals tools to model values held by images.
+
+
+.. topic:: Concepts
+
+   * :ref:`Value <concept-values-Value>`
+   * :ref:`ComparableValue <concept-values-ComparableValue>`
+   * :ref:`OrderedValue <concept-values-OrderedValue>`
+
+.. topic:: Predefined values
+
+   * :doc:`core/values/rgba`
+
+.. topic:: Utilities
+
+   TODO channel utilities
+..   * :cpp:func:`is_multichannel`
+..   * :cpp:func:`dynamic_channel_get`
+..   * :cpp:func:`dynamic_channel_size`
+..   * :cpp:func:`static_channel_get`
+..   * :cpp:func:`static_channel_size`
+
+
+
+.. raw:: html
+
+         <h2>Points</h2>
+
+
+:doc:`core/points` are the fundamentals tools to locate a value inside an images.
+
+
+.. topic:: Concepts
+
+   * :ref:`Point <concept-points-Point>`
+
+.. topic:: Predefined points
+
+   * :doc:`core/points/point2d`
+   * :doc:`core/points/point3d`
+
+
+
+
+.. raw:: html
+
+         <h2>Pixels</h2>
+
+
+:doc:`core/pixels` are the fundamentals tools when browsing an images to access both the point and the value.
+
+
+.. topic:: Concepts
+
+   * :ref:`Pixel <concept-pixels-Pixel>`
+
+.. topic:: Predefined points
+
+   * :doc:`core/pixels/ndpixel`
+
+
+
+
+.. raw:: html
+
+         <h2>Domains</h2>
+
+
+:doc:`core/domains` are the fundamental tools when expressing the valid set of points for an image.
+
+
+.. topic:: Concepts
+
+   * :ref:`Domain <concept-domains-Domain>`
+
+.. topic:: Predefined domains
+
+   * :doc:`core/domains/box2d`
+   * :doc:`core/domains/box3d`
+
+
+
+
+.. raw:: html
+
+         <h2>Indexes</h2>
+
+
+:doc:`core/indexes` are the lowest level tools to locate a value inside an images.
+
+
+.. topic:: Concepts
+
+   * :ref:`Index <concept-indexes-Index>`
 
 
 

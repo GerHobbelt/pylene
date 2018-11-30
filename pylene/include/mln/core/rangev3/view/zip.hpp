@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/concept/new/concepts.hpp>
-#include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/zip_with.hpp>
+
+#include <mln/core/concept/new/concepts.hpp>
 
 #include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/range_fwd.hpp>

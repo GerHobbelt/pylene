@@ -3,9 +3,10 @@
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/private/reversible_range.hpp>
 
-#include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
+
+#include <mln/core/concept/new/concepts.hpp>
 
 #include <mln/core/utils/blank.hpp>
 
@@ -44,8 +45,14 @@ namespace mln::ranges
   public:
     using base_t::base_t;
 
-    template <class U = void, class = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
+    auto rows() const requires mln::concepts::SegmentedRange<Rng>
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
     auto rows() const
+#endif
     {
       auto f = [this](auto row) {
         return remove_if_view<decltype(row), Pred>(std::forward<decltype(row)>(row), this->get_pred());
@@ -53,8 +60,14 @@ namespace mln::ranges
       return view::transform(this->base().rows(), f);
     }
 
-    template <class U = void, class = std::enable_if_t<is_reversible_range_v<Rng>, U>>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
+    auto reversed() const requires mln::concepts::ReversibleRange<Rng>
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
+#endif
     {
       return remove_if_view<decltype(this->base().reversed()), Pred>(this->base().reversed(), this->get_pred());
     }

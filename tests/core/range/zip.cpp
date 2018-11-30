@@ -257,7 +257,6 @@ TEST(Core, zip_segmented_and_nonsegmented)
   static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
   static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
   static_assert(mln::concepts::stl::ForwardRange<decltype(z)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(z)>());
@@ -283,7 +282,6 @@ TEST(Core, zip_segmented_and_nonsegmented_rowwise)
   static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
   static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
   static_assert(mln::concepts::stl::ForwardRange<decltype(z)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(z)>());

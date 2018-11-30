@@ -3,13 +3,12 @@
 
 #include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/private/reversible_range.hpp>
-
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/utils/blank.hpp>
 
-#include <range/v3/view/transform.hpp>
-
 #include <mln/core/concept/new/concepts.hpp>
+
+#include <range/v3/view/transform.hpp>
 
 namespace mln::ranges
 {
@@ -32,14 +31,14 @@ namespace mln::ranges
   public:
     using ::ranges::iter_transform_view<Rng, Fun>::iter_transform_view;
 
-    template <class U = void, class = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
+    template <typename U = void, typename = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
     auto rows() const
     {
       return ::ranges::view::transform(this->base().rows(),
                                        [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
     }
 
-    template <class U = int, class = std::enable_if_t<is_reversible_range_v<Rng>, U>>
+    template <typename U = void, typename = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
     {
       return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), fun());

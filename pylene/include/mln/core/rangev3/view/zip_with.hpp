@@ -96,7 +96,8 @@ namespace mln::ranges
       void prev() requires (mln::concepts::stl::BidirectionalRange<Rngs> && ...)
       // clang-format on
 #else
-      template <typename U = void, typename = std::enable_if_t<(::ranges::BidirectionalRange<Rngs>() && ...)>>
+      template <typename U = void, typename = std::enable_if_t<std::conjunction_v<
+                                       std::bool_constant<static_cast<bool>(::ranges::BidirectionalRange<Rngs>())>...>>>
       void prev()
 #endif
       {

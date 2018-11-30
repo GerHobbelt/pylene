@@ -44,7 +44,11 @@ namespace mln
     point_type shape() const;
     bool       empty() const;
     unsigned   size() const;
-    bool       __is_valid() const;
+
+    bool discrete() const;
+
+    bool continuous() const;
+    bool __is_valid() const;
 
     iterator         iter() const;
     reverse_iterator riter() const;
@@ -130,6 +134,10 @@ namespace mln
       return sz;
     }
 
+    bool discrete() const { return true; }
+
+    bool continuous() const { return false; }
+
     iterator iter() const
     {
       mln_precondition(__is_valid());
@@ -197,6 +205,7 @@ namespace mln
   typedef box<short, 2> box2d;
   typedef box<float, 2> box2df;
   typedef box<short, 3> box3d;
+  typedef box<float, 3> box3df;
 
   typedef strided_box<short, 1> sbox1d;
   typedef strided_box<short, 2> sbox2d;
@@ -304,6 +313,7 @@ namespace mln
   typedef grain_box<short, 2> grain_box2d;
   typedef grain_box<float, 2> grain_box2df;
   typedef grain_box<short, 3> grain_box3d;
+  typedef grain_box<float, 3> grain_box3df;
 
   /**************************/
   /** Implementation        */
@@ -363,6 +373,18 @@ namespace mln
   }
 
   template <typename T, unsigned dim>
+  inline bool strided_box<T, dim>::discrete() const
+  {
+    return true;
+  }
+
+  template <typename T, unsigned dim>
+  inline bool strided_box<T, dim>::continuous() const
+  {
+    return false;
+  }
+
+  template <typename T, unsigned dim>
   inline typename strided_box<T, dim>::iterator strided_box<T, dim>::iter() const
   {
     return iterator(internal::point_structure<T, dim>(),
@@ -396,6 +418,6 @@ namespace mln
   {
     return {pmin, pmax, step};
   }
-}
+} // namespace mln
 
 #endif

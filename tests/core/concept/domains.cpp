@@ -11,14 +11,6 @@
 namespace concepts = mln::concepts;
 
 
-struct domain_test : mln::box2d
-{
-  using codomain_type = double;
-
-  bool is_discrete() const { return true; }
-  bool is_continuous() const { return false; }
-};
-
 struct A
 {
 };
@@ -28,5 +20,19 @@ TEST(Core, Concept_Domain)
   static_assert(!concepts::Domain<int>);
   static_assert(!concepts::Domain<double>);
   static_assert(!concepts::Domain<A>);
-  static_assert(concepts::Domain<domain_test>);
+  static_assert(concepts::Domain<mln::box1d>);
+  static_assert(concepts::Domain<mln::box1df>);
+  static_assert(concepts::Domain<mln::box2d>);
+  static_assert(concepts::Domain<mln::box2df>);
+  static_assert(concepts::Domain<mln::box3d>);
+  static_assert(concepts::Domain<mln::box3df>);
+  static_assert(concepts::Domain<mln::sbox1d>);
+  static_assert(concepts::Domain<mln::sbox2d>);
+  static_assert(concepts::Domain<mln::sbox3d>);
+  static_assert(concepts::Domain<mln::grain_box1d>);
+  static_assert(concepts::Domain<mln::grain_box1df>);
+  static_assert(concepts::Domain<mln::grain_box2d>);
+  static_assert(concepts::Domain<mln::grain_box2df>);
+  static_assert(concepts::Domain<mln::grain_box3d>);
+  static_assert(concepts::Domain<mln::grain_box3df>);
 }

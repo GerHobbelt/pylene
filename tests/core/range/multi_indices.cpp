@@ -1,4 +1,5 @@
 #include <mln/core/rangev3/multi_indices.hpp>
+#include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
 #include <mln/core/concept/new/concepts.hpp>
@@ -46,7 +47,7 @@ public:
   using T                           = typename value_type::value_type;
   using range_type                  = mln::ranges::multi_indices<Rank, T>;
 
-  static_assert(Rank == 1 || mln::ranges::is_multidimensional_range<range_type>::value);
+  static_assert(Rank == 1 || mln::ranges::is_segmented_range<range_type>::value);
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::stl::ForwardRange<range_type>);
 #else

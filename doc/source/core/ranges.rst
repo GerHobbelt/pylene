@@ -22,8 +22,8 @@ Concepts
 
 .. _concept-ranges-SegmentedRange:
 
-SegmentedRange (Multidimensional)
-#################################
+Segmented (Multidimensional) Range
+##################################
 
 Let `SegRng` be a type that models :cpp:concept:`SegmentedRange (details) <SegmentedRange>`.
 
@@ -73,8 +73,8 @@ Example:
 
 .. _concept-ranges-ReversibleRange:
 
-ReversibleRange
-###############
+Reversible Range
+################
  
 Let `RevRng` be a type that models :cpp:concept:`ReversibleRange (details) <ReversibleRange>`.
 

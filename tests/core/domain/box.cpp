@@ -7,6 +7,8 @@
 
 namespace concepts = mln::concepts;
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+
 static_assert(concepts::Domain<mln::box1d>);
 static_assert(concepts::Domain<mln::box1df>);
 static_assert(concepts::Domain<mln::box2d>);
@@ -14,11 +16,9 @@ static_assert(concepts::Domain<mln::box2df>);
 static_assert(concepts::Domain<mln::box3d>);
 static_assert(concepts::Domain<mln::box3df>);
 
-/*
-static_assert(concepts::Domain<mln::sbox1d>);
-static_assert(concepts::Domain<mln::sbox2d>);
-static_assert(concepts::Domain<mln::sbox3d>);
-*/
+// static_assert(concepts::Domain<mln::sbox1d>);
+// static_assert(concepts::Domain<mln::sbox2d>);
+// static_assert(concepts::Domain<mln::sbox3d>);
 
 static_assert(concepts::Domain<mln::grain_box1d>);
 static_assert(concepts::Domain<mln::grain_box1df>);
@@ -27,6 +27,7 @@ static_assert(concepts::Domain<mln::grain_box2df>);
 static_assert(concepts::Domain<mln::grain_box3d>);
 static_assert(concepts::Domain<mln::grain_box3df>);
 
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
 TEST(Core, Domain_box2d_general)
 {

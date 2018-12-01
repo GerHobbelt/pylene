@@ -19,7 +19,8 @@ namespace mln::concepts
       { rng.rows() } -> stl::ForwardRange&&;
       requires stl::Same<
         stl::iter_value_t<stl::iterator_t<Rng>>,
-        stl::iter_value_t<stl::iterator_t<stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>>
+        stl::iter_value_t<stl::iterator_t<
+          stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>>
     };
 
 

@@ -21,15 +21,16 @@ SegmentedRange
 
     **Notation**
 
-    .. cpp:var:: const SegRng crng
+    .. cpp:var:: SegRng rng
 
     **Valid Expressions**
 
     - All expression from :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` are valid.
 
-    - :cpp:expr:`crng.rows()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`rng.rows()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`stl::iter_value_t<stl::iterator_t<stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>` must be the same as :cpp:expr:`stl::iter_value_t<stl::iterator_t<SegRng>>`.
 
-    **Implementation**d
+    **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
        :language: cpp
@@ -46,15 +47,16 @@ ReversibleRange
 
     **Notation**
 
-    .. cpp:var:: const RevRng crng
+    .. cpp:var:: RevRng rng
 
     **Valid Expressions**
 
     - All expression from :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` are valid.
 
-    - :cpp:expr:`crng.reversed()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`rng.reversed()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`stl::iter_value_t<stl::iterator_t<decltype(rng.reversed())>>>` must be the same as :cpp:expr:`stl::iter_value_t<stl::iterator_t<RevRng>>`.
 
-    **Implementation**d
+    **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
        :language: cpp

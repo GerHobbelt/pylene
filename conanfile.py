@@ -36,6 +36,7 @@ class Pylene(ConanFile):
     # Requirements part of the INTERFACE
     def requirements(self):
         self.requires("range-v3/0.4.0@ericniebler/stable")
+        self.requires("cmcstl2/0.1@dutiona/testing")
 
         if self.options.freeimage:
             self.requires("freeimage/3.18.0@dutiona/stable")

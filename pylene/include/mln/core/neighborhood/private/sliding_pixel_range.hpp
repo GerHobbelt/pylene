@@ -1,12 +1,15 @@
 #pragma once
 #include <meta/meta.hpp>
 #include <range/v3/view_adaptor.hpp>
+#include <range/v3/range_concepts.hpp>
 
 namespace mln::details
 {
   template <class Pixel, class Rng>
   struct sliding_pixel_range : ::ranges::view_adaptor<sliding_pixel_range<Pixel, Rng>, Rng>
   {
+    static_assert(::ranges::View<Rng>());
+
   private:
     friend ::ranges::range_access;
     Pixel m_pix;

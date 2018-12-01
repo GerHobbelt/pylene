@@ -19,22 +19,7 @@ namespace mln::ranges::details
 
     void next()
     {
-      this->__next(::meta::int_<Rank - 1>());
-
-      /*
-      std::size_t k;
-      for (k = Rank; k-- > 0;)
-      {
-        this->derived()->__next(k);
-        if (!this->derived()->__is_at_end(k))
-        {
-          // unstack
-          while (++k < Rank)
-            this->derived()->__reset_to_begin(k);
-          return;
-        }
-      }
-      */
+      this->__next(::meta::int_<Rank-1>());
     }
 
 

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <array>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
+
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/reverse.hpp>
+
+#include <array>
 
 namespace mln::ranges
 {
@@ -133,6 +134,14 @@ namespace mln::ranges
         void __rnext(std::size_t k) { m_x[k]--; }
         void __reset_to_begin(std::size_t k) { m_x[k] = m_from[k]; }
         void __reset_to_rbegin(std::size_t k) { m_x[k] = m_to[k]; }
+
+        bool __equal(const cursor& other) const
+        {
+          for (std::size_t k = 0; k < Rank; ++k)
+            if (m_x[k] != other.m_x[k])
+              return false;
+          return true;
+        }
 
         cursor() = default;
         cursor(const multi_indices_facade& sp, bool forward = true)

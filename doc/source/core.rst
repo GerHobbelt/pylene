@@ -44,10 +44,10 @@ Core Module
 
 
 
-
 .. raw:: html
 
          <h2>Neighborhoods and Structural Elements</h2>
+
 
 :doc:`core/neighborhood`  are the fundamental tools for local image processing.
 
@@ -55,16 +55,17 @@ Core Module
 
    * :cpp:concept:`mln::StructuringElement`
 
-* Predefined Neighborhood
+.. topic::  Predefined Neighborhood
 
   * :doc:`core/neighborhood/c4`
   * :doc:`core/neighborhood/c8`
 
-* Predefined Structuring Elements
+.. topic::  Predefined Structuring Elements
 
   * :doc:`core/se/disc`
   * :doc:`core/se/rectangle`
   * :doc:`core/se/periodic_lines`
+
 
 
 
@@ -74,3 +75,13 @@ Core Module
 
 
 Foundamental and core :doc:`algorithms <core/algorithms>` for image manipulation.
+
+
+
+
+.. raw:: html
+
+         <h2>STL</h2>
+
+
+:doc:`core/stl` are the fundamentals concepts of the C++ standard library that we are building our concept upon. They are our building blocks.

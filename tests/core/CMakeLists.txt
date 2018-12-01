@@ -55,3 +55,9 @@ add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 # test SE
 add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
+
+# test Concepts
+# Add concepts support for gcc > 7.2 with -fconcepts
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
+  add_core_test(${test_prefix}concept_ranges   concept/ranges.cpp)
+endif()

@@ -1,10 +1,12 @@
 #pragma once
 
-#include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/zip_with.hpp>
+
+#include <mln/core/concept/new/concepts.hpp>
 
 #include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/range_fwd.hpp>
+#include <range/v3/utility/common_tuple.hpp>
 #include <range/v3/view/all.hpp>
 
 #include <tuple>
@@ -17,13 +19,24 @@ namespace mln::ranges
   {
     struct make_tuple_functor_t
     {
-      template <typename... Rngs>
-      std::tuple<Rngs...> operator()(Rngs&&... rngs) const
+      // See https://github.com/ericniebler/stl2/issues/381#issuecomment-285908567
+      // why we can't use std::pair/tuple (the const-ness of operator= is in cause)
+      template <typename... V>
+      ::ranges::common_tuple<V...> operator()(V&&... vals) const
       {
         // Not "std::tie" because may be prvalue
         // Not "std::forward_as_reference" because may hold dangling reference if xvalue
-        return {std::forward<Rngs>(rngs)...};
+        return ::ranges::common_tuple<V...>{std::forward<V>(vals)...};
       }
+
+      // Do not use common_pair that do not overload std::get stuffs
+      // template <typename V1, typename V2>
+      // ::ranges::common_pair<V1, V2> operator()(V1&& a, V2&& b) const
+      // {
+      //   // Not "std::tie" because may be prvalue
+      //   // Not "std::forward_as_reference" because may hold dangling reference if xvalue
+      //   return {std::forward<V1>(a), std::forward<V2>(b)};
+      // }
     };
 
     constexpr const inline make_tuple_functor_t make_tuple_functor{};
@@ -50,9 +63,13 @@ namespace mln::ranges
       using Concept = ::meta::and_<::ranges::InputRange<Rngs>...>;
 
       template <typename... Rngs, CONCEPT_REQUIRES_(Concept<Rngs...>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires detail::InputRanges<Rngs...>
+#endif
       zip_view<::ranges::view::all_t<Rngs>...> operator()(Rngs&&... rngs) const
+      // clang-format on
       {
-        CONCEPT_ASSERT(meta::and_<::ranges::Range<Rngs>...>());
         return zip_view<::ranges::view::all_t<Rngs>...>{::ranges::view::all(static_cast<Rngs&&>(rngs))...};
       }
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
-#include <mln/core/rangev3/private/reversible_range.hpp>
+#include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
 #include <mln/core/concept/new/concepts.hpp>
@@ -48,7 +47,7 @@ namespace mln::ranges
     auto rows() const requires mln::concepts::SegmentedRange<Rng>
     // clang-format on
 #else
-    template <typename U = void, typename = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
+    template <typename U = void, typename = std::enable_if_t<is_segmented_range_v<Rng>, U>>
     auto rows() const
 #endif
     {

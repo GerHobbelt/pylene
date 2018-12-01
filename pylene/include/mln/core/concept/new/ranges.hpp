@@ -2,7 +2,7 @@
 
 #include <mln/core/concept/new/cmcstl2.hpp>
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <range/v3/utility/iterator_traits.hpp>
 
 
 namespace mln::concepts
@@ -15,8 +15,11 @@ namespace mln::concepts
   template<typename Rng>
   concept bool SegmentedRange = 
     stl::ForwardRange<Rng> &&
-    requires(const Rng crng) {
-        { crng.rows() } -> stl::ForwardRange&&;
+    requires(Rng rng) {
+      { rng.rows() } -> stl::ForwardRange&&;
+      requires stl::Same<
+        stl::iter_value_t<stl::iterator_t<Rng>>,
+        stl::iter_value_t<stl::iterator_t<stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>>
     };
 
 
@@ -24,8 +27,11 @@ namespace mln::concepts
   template<typename Rng>
   concept bool ReversibleRange = 
     stl::ForwardRange<Rng> &&
-    requires(const Rng crng) {
-        { crng.reversed() } -> stl::ForwardRange&&;
+    requires(Rng rng) {
+      { rng.reversed() } -> stl::ForwardRange&&;
+      requires stl::Same<
+        stl::iter_value_t<stl::iterator_t<Rng>>,
+        stl::iter_value_t<stl::iterator_t<decltype(rng.reversed())>>>
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

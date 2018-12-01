@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
+
 #include <range/v3/view_facade.hpp>
 
 namespace mln::ranges::details

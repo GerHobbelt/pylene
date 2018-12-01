@@ -62,7 +62,7 @@ Then we have the following valid expressions :
 +------------------+----------------+---------------+----------------+-----------------------------------------+
 | ``lhs != rhs``   | ``bool``       | none          | none           | Compare wether two pixels are different |
 +------------------+----------------+---------------+----------------+-----------------------------------------+
-| ``cpix.value()`` | ``reference``  | none          | none           | Access the value of the pixel ``pix``   |
+| ``cpix.val()``   | ``reference``  | none          | none           | Access the value of the pixel ``pix``   |
 +------------------+----------------+---------------+----------------+-----------------------------------------+
 | ``cpix.point()`` | ``point_type`` | none          | none           | Access the point of the pixel ``pix``   |
 +------------------+----------------+---------------+----------------+-----------------------------------------+

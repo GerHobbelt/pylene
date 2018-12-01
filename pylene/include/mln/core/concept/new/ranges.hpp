@@ -16,13 +16,10 @@ namespace mln::concepts
   concept bool SegmentedRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
-        { rng.rows() } -> stl::ForwardRange&&;
-        // FIXME
-        /*
-        requires stl::Same<
-        ::ranges::value_type_t<Rng>,
-        ::ranges::value_type_t<::ranges::value_type_t<decltype(rng.rows())>>>;
-        */
+      { rng.rows() } -> stl::ForwardRange&&;
+      requires stl::Same<
+        stl::iter_value_t<stl::iterator_t<Rng>>,
+        stl::iter_value_t<stl::iterator_t<stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>>
     };
 
 
@@ -31,7 +28,10 @@ namespace mln::concepts
   concept bool ReversibleRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
-        { rng.reversed() } -> stl::ForwardRange&&;
+      { rng.reversed() } -> stl::ForwardRange&&;
+      requires stl::Same<
+        stl::iter_value_t<stl::iterator_t<Rng>>,
+        stl::iter_value_t<stl::iterator_t<decltype(rng.reversed())>>>
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

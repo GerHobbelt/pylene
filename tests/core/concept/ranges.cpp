@@ -18,7 +18,14 @@ static_assert(concepts::stl::RandomAccessRange<mock_randomaccess_rng>);
 
 struct mock_segmented_range : mock_randomaccess_rng
 {
-  mock_randomaccess_rng rows();
+  struct row_t
+  {
+    using value_type = mock_randomaccess_rng;
+    using reference  = mock_randomaccess_rng&;
+    mock_randomaccess_rng* begin();
+    mock_randomaccess_rng* end();
+  };
+  row_t rows();
 };
 
 struct mock_reversible_range : mock_randomaccess_rng
@@ -28,7 +35,14 @@ struct mock_reversible_range : mock_randomaccess_rng
 
 struct mock_segmented_and_reversible_range : mock_randomaccess_rng
 {
-  mock_randomaccess_rng rows();
+  struct row_t
+  {
+    using value_type = mock_randomaccess_rng;
+    using reference  = mock_randomaccess_rng&;
+    mock_randomaccess_rng* begin();
+    mock_randomaccess_rng* end();
+  };
+  row_t                 rows();
   mock_randomaccess_rng reversed();
 };
 

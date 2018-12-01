@@ -25,7 +25,19 @@
         "sstream": "cpp",
         "string": "cpp",
         "utility": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "deque": "cpp",
+        "iterator": "cpp",
+        "regex": "cpp",
+        "set": "cpp",
+        "string_view": "cpp",
+        "unordered_set": "cpp",
+        "bitset": "cpp",
+        "memory": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3"
 }

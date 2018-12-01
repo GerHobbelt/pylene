@@ -260,6 +260,9 @@ TEST(Core, zip_segmented_and_nonsegmented)
   static_assert(concepts::SegmentedRange<decltype(multi_ind0)>);
   static_assert(concepts::ReversibleRange<decltype(multi_ind0)>);
   static_assert(concepts::stl::ForwardRange<decltype(z)>);
+  // FIXME: explicit instanciation lead to compile error instead of just failing the assert
+  // static_assert(not concepts::SegmentedRange<decltype(z)>);
+  // static_assert(not concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(z)>());
@@ -285,6 +288,9 @@ TEST(Core, zip_segmented_and_nonsegmented_rowwise)
   static_assert(concepts::SegmentedRange<decltype(multi_ind0)>);
   static_assert(concepts::ReversibleRange<decltype(multi_ind0)>);
   static_assert(concepts::stl::ForwardRange<decltype(z)>);
+  // FIXME: explicit instanciation lead to compile error instead of just failing the assert
+  // static_assert(not concepts::SegmentedRange<decltype(z)>);
+  // static_assert(not concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(z)>());

@@ -1,10 +1,5 @@
 #include <mln/core/concept/new/domains.hpp>
 
-#include <mln/core/domain/box.hpp>
-
-#include <tuple>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 
@@ -14,28 +9,34 @@ struct A
 {
 };
 
+struct mock_domain
+{
+  struct point_t
+  {
+  };
+
+  using value_type = point_t;
+  using reference  = point_t&;
+
+  point_t* begin();
+  point_t* end();
+
+  bool     has(point_t) const;
+  bool     empty() const;
+  unsigned size() const;
+};
+
+bool operator==(const mock_domain::point_t&, const mock_domain::point_t&);
+bool operator!=(const mock_domain::point_t&, const mock_domain::point_t&);
+bool operator<(const mock_domain::point_t&, const mock_domain::point_t&);
+bool operator<=(const mock_domain::point_t&, const mock_domain::point_t&);
+bool operator>(const mock_domain::point_t&, const mock_domain::point_t&);
+bool operator>=(const mock_domain::point_t&, const mock_domain::point_t&);
+
+
 TEST(Core, Concept_Domain)
 {
   static_assert(!concepts::Domain<int>);
-  static_assert(!concepts::Domain<double>);
   static_assert(!concepts::Domain<A>);
-  static_assert(concepts::Domain<mln::box1d>);
-  static_assert(concepts::Domain<mln::box1df>);
-  static_assert(concepts::Domain<mln::box2d>);
-  static_assert(concepts::Domain<mln::box2df>);
-  static_assert(concepts::Domain<mln::box3d>);
-  static_assert(concepts::Domain<mln::box3df>);
-
-  /*
-  static_assert(concepts::Domain<mln::sbox1d>);
-  static_assert(concepts::Domain<mln::sbox2d>);
-  static_assert(concepts::Domain<mln::sbox3d>);
-  */
-
-  static_assert(concepts::Domain<mln::grain_box1d>);
-  static_assert(concepts::Domain<mln::grain_box1df>);
-  static_assert(concepts::Domain<mln::grain_box2d>);
-  static_assert(concepts::Domain<mln::grain_box2df>);
-  static_assert(concepts::Domain<mln::grain_box3d>);
-  static_assert(concepts::Domain<mln::grain_box3df>);
+  static_assert(concepts::Domain<mock_domain>);
 }

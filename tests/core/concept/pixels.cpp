@@ -19,16 +19,16 @@ struct Pix
   using reference  = int&;
 
   point_type point() const { return pnt; }
-  reference  value() const { return *val; }
+  reference  val() const { return *v; }
 
 private:
   int  pnt;
-  int* val;
+  int* v;
 };
 
 bool operator==(const Pix& lhs, const Pix& rhs)
 {
-  return std::tie(lhs.pnt, *lhs.val) == std::tie(rhs.pnt, *rhs.val);
+  return std::tie(lhs.pnt, *lhs.v) == std::tie(rhs.pnt, *rhs.v);
 }
 
 bool operator!=(const Pix& lhs, const Pix& rhs)

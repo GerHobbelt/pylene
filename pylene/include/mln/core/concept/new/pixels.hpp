@@ -28,7 +28,7 @@ namespace mln::concepts
     !std::is_reference_v<typename Pix::value_type> &&
     requires(const Pix cpix) {
       { cpix.point() } -> stl::Same<typename Pix::point_type>&&;
-      { cpix.value() } -> stl::Same<typename Pix::reference>&&;
+      { cpix.val() } -> stl::Same<typename Pix::reference>&&;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

@@ -18,17 +18,17 @@ namespace mln::concepts
   concept bool Pixel = 
     stl::Regular<Pix> &&
     requires {
-        typename Pix::value_type;
-        typename Pix::point_type;
-        typename Pix::reference;
+      typename Pix::value_type;
+      typename Pix::point_type;
+      typename Pix::reference;
     } &&
     Value<typename Pix::value_type> &&
     Point<typename Pix::point_type> &&
     !std::is_const_v<typename Pix::value_type> &&
     !std::is_reference_v<typename Pix::value_type> &&
     requires(const Pix cpix) {
-        { cpix.point() } -> stl::Same<typename Pix::point_type>&&;
-        { cpix.value() } -> stl::Same<typename Pix::reference>&&;
+      { cpix.point() } -> stl::Same<typename Pix::point_type>&&;
+      { cpix.value() } -> stl::Same<typename Pix::reference>&&;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

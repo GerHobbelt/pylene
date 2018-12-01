@@ -19,9 +19,9 @@ namespace mln::concepts
     stl::ForwardRange<Dom> &&
     Point<typename Dom::value_type> &&
     requires(const Dom cdom, typename Dom::value_type p) {
-        { cdom.has(p) }             -> bool;
-        { cdom.empty() }            -> bool;
-        { cdom.size() }             -> stl::UnsignedIntegral&&;
+      { cdom.has(p) }   -> bool;
+      { cdom.empty() }  -> bool;
+      { cdom.size() }   -> stl::UnsignedIntegral&&;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

@@ -33,7 +33,7 @@ SegmentedRange
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
        :language: cpp
-       :lines: 15-21
+       :lines: 15-23
 
 
 ReversibleRange
@@ -58,4 +58,4 @@ ReversibleRange
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
        :language: cpp
-       :lines: 25-30
+       :lines: 27-35

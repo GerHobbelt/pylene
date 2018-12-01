@@ -44,13 +44,13 @@ namespace mln::concepts
     !std::is_reference_v<typename Ima::value_type> &&
     requires(   const Ima cima, typename Ima::domain_type d,
                 typename Ima::index_type k, typename Ima::point_type p) {
-        { cima[k] }                 -> typename Ima::reference&&;
-        { cima.pixels() }           -> stl::ForwardRange&&;
-        { cima.values() }           -> stl::ForwardRange&&;
-        { cima.domain() }           -> typename Ima::domain_type&&;
-        { cima.point_of_index(k) }  -> typename Ima::point_type&&;
-        { cima.index_at_point(p) }  -> typename Ima::index_type&&;
-        { cima.delta_index(p) }     -> typename Ima::difference_type&&;
+      { cima[k] }                 -> typename Ima::reference&&;
+      { cima.pixels() }           -> stl::ForwardRange&&;
+      { cima.values() }           -> stl::ForwardRange&&;
+      { cima.domain() }           -> typename Ima::domain_type&&;
+      { cima.point_of_index(k) }  -> typename Ima::point_type&&;
+      { cima.index_at_point(p) }  -> typename Ima::index_type&&;
+      { cima.delta_index(p) }     -> typename Ima::difference_type&&;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

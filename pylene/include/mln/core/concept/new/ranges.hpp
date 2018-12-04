@@ -11,16 +11,30 @@ namespace mln::concepts
   // clang-format off
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+
+  // RangeValueSame
+  template <typename Rng, typename V>
+  concept bool RangeValueTypeSameAs =
+    stl::Same<
+      stl::iter_value_t<stl::iterator_t<Rng>>,
+      stl::iter_value_t<stl::iterator_t<V>>>;
+  
+  // RangeValueConvertibleTo
+  template <typename Rng, typename V>
+  concept bool RangeValueTypeConvertibleTo =
+    stl::ConvertibleTo<
+      stl::iter_value_t<stl::iterator_t<Rng>>,
+      stl::iter_value_t<stl::iterator_t<V>>>;
+
   // SegmentedRange
   template<typename Rng>
   concept bool SegmentedRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
       { rng.rows() } -> stl::ForwardRange&&;
-      requires stl::Same<
-        stl::iter_value_t<stl::iterator_t<Rng>>,
-        stl::iter_value_t<stl::iterator_t<
-          stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>>
+      requires RangeValueTypeSameAs<
+        stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>,
+        Rng>;
     };
 
 
@@ -30,9 +44,7 @@ namespace mln::concepts
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
       { rng.reversed() } -> stl::ForwardRange&&;
-      requires stl::Same<
-        stl::iter_value_t<stl::iterator_t<Rng>>,
-        stl::iter_value_t<stl::iterator_t<decltype(rng.reversed())>>>
+      requires RangeValueTypeSameAs<decltype(rng.reversed()), Rng>;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

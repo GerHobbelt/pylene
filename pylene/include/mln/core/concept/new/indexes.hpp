@@ -10,7 +10,7 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Index
   template<typename Idx>
-  concept bool Index = stl::Integral<Idx>;
+  concept bool Index = stl::SignedIntegral<Idx>;
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on

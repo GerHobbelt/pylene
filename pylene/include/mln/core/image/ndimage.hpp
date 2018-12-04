@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_NDIMAGE_HH
-#define MLN_CORE_IMAGE_NDIMAGE_HH
+#pragma once
 
 /// \file
 
@@ -134,14 +133,14 @@ namespace mln
     friend bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self, const ndimage_base<T2, d, E2>& other);
 
   public:
-    using category = raw_image_tag;
-    using accessible = std::true_type;
-    using indexable = std::true_type;
-    using concrete = std::true_type;
-    using shallow_copy [[deprecated]] = std::true_type;
-    using has_border [[deprecated]] = std::true_type;
-    using extension_category = mln::extension::border_extension_tag;
-    using concrete_type = E;
+    using category                   = raw_image_tag;
+    using accessible                 = std::true_type;
+    using indexable                  = std::true_type;
+    using concrete                   = std::true_type;
+    using shallow_copy[[deprecated]] = std::true_type;
+    using has_border[[deprecated]]   = std::true_type;
+    using extension_category         = mln::extension::border_extension_tag;
+    using concrete_type              = E;
 
     /// \name Image point/value/pixel types
     /// \{
@@ -275,11 +274,11 @@ namespace mln
 
     /// \copydoc image::pixel(const point_type&) const
     [[deprecated]] pixel_type pixel(const point_type& p);
-    new_pixel_type new_pixel(const point_type& p);
+    new_pixel_type            new_pixel(const point_type& p);
 
     /// \copydoc image::pixel(const point_type&) const
     [[deprecated]] const_pixel_type pixel(const point_type& p) const;
-    new_const_pixel_type new_pixel(const point_type& p) const;
+    new_const_pixel_type            new_pixel(const point_type& p) const;
 
     /// \}
 
@@ -1113,5 +1112,3 @@ namespace mln
   } // namespace internal
 
 } // end of namespace mln
-
-#endif // !MLN_CORE_IMAGE_NDIMAGE_HH

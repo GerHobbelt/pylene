@@ -14,13 +14,12 @@ struct mock_image
 {
 };
 
-template <concepts::Pixel Pix>
-void foo(Pix)
-{
-}
-
 TEST(Pixel, NdPixel)
 {
   auto pix = mln::ndimage_pixel<int, 3, mock_image>{};
+  
+#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(concepts::Pixel<decltype(pix)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
 }

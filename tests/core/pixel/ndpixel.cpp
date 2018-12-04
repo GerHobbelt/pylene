@@ -16,7 +16,7 @@ struct mock_image
 
 TEST(Pixel, NdPixel)
 {
-  auto pix = mln::ndimage_pixel<int, 3, mock_image>{};
+  [[maybe_unused]] auto pix = mln::ndimage_pixel<int, 3, mock_image>{};
   
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(concepts::Pixel<decltype(pix)>);

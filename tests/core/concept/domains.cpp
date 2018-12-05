@@ -11,27 +11,27 @@ struct A
 
 struct mock_domain
 {
-  struct point_t
+  struct mock_point
   {
   };
 
-  using value_type = point_t;
-  using reference  = point_t&;
+  using value_type = mock_point;
+  using reference  = mock_point&;
 
-  point_t* begin();
-  point_t* end();
+  value_type* begin();
+  value_type* end();
 
-  bool     has(point_t) const;
+  bool     has(value_type) const;
   bool     empty() const;
   unsigned size() const;
 };
 
-bool operator==(const mock_domain::point_t&, const mock_domain::point_t&);
-bool operator!=(const mock_domain::point_t&, const mock_domain::point_t&);
-bool operator<(const mock_domain::point_t&, const mock_domain::point_t&);
-bool operator<=(const mock_domain::point_t&, const mock_domain::point_t&);
-bool operator>(const mock_domain::point_t&, const mock_domain::point_t&);
-bool operator>=(const mock_domain::point_t&, const mock_domain::point_t&);
+bool operator==(const mock_domain::mock_point&, const mock_domain::mock_point&);
+bool operator!=(const mock_domain::mock_point&, const mock_domain::mock_point&);
+bool operator<(const mock_domain::mock_point&, const mock_domain::mock_point&);
+bool operator<=(const mock_domain::mock_point&, const mock_domain::mock_point&);
+bool operator>(const mock_domain::mock_point&, const mock_domain::mock_point&);
+bool operator>=(const mock_domain::mock_point&, const mock_domain::mock_point&);
 
 
 TEST(Core, Concept_Domain)

@@ -61,24 +61,24 @@ TEST(Core, Concept_ComparableValue)
 }
 
 
-struct RGBAB : RGBA
+struct RGBAD : RGBA
 {
-  int b;
+  int d;
 };
 
-bool operator<(const RGBAB& lhs, const RGBAB& rhs)
+bool operator<(const RGBAD& lhs, const RGBAD& rhs)
 {
-  return std::tie(lhs.r, lhs.g, lhs.b, lhs.a, lhs.b) < std::tie(rhs.r, rhs.g, rhs.b, rhs.a, rhs.b);
+  return std::tie(lhs.r, lhs.g, lhs.b, lhs.a, lhs.d) < std::tie(rhs.r, rhs.g, rhs.b, rhs.a, rhs.d);
 }
-bool operator>(const RGBAB& lhs, const RGBAB& rhs)
+bool operator>(const RGBAD& lhs, const RGBAD& rhs)
 {
   return rhs < lhs;
 }
-bool operator<=(const RGBAB& lhs, const RGBAB& rhs)
+bool operator<=(const RGBAD& lhs, const RGBAD& rhs)
 {
   return !(lhs > rhs);
 }
-bool operator>=(const RGBAB& lhs, const RGBAB& rhs)
+bool operator>=(const RGBAD& lhs, const RGBAD& rhs)
 {
   return !(lhs < rhs);
 }
@@ -89,5 +89,5 @@ TEST(Core, Concept_OrderedValue)
   static_assert(!concepts::OrderedValue<RGB>);
   static_assert(!concepts::OrderedValue<Empty>);
   static_assert(!concepts::OrderedValue<RGBA>);
-  static_assert(concepts::OrderedValue<RGBAB>);
+  static_assert(concepts::OrderedValue<RGBAD>);
 }

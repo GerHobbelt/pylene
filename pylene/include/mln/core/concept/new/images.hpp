@@ -50,7 +50,6 @@ namespace mln::concepts
     Point<image_point_t<Ima>> &&
     Value<image_value_t<Ima>> &&
     Domain<image_domain_t<Ima>> &&
-    Index<image_index_t<Ima>> &&
     stl::Same<image_point_t<Ima>, typename image_pixel_t<Ima>::point_type> &&
     stl::Same<image_value_t<Ima>, typename image_pixel_t<Ima>::value_type> &&
     stl::Same<image_reference_t<Ima>, typename image_pixel_t<Ima>::reference> &&
@@ -58,7 +57,7 @@ namespace mln::concepts
 		stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&&> &&
 		stl::CommonReference<image_value_t<Ima>&&, const image_value_t<Ima>&> &&
     requires(Ima ima, image_domain_t<Ima> d, image_point_t<Ima> p) {
-      { ima.concretize() }  -> Image&&; // Image builder (FIXME: improve builder design)
+      { ima.concretize() }  -> image_concrete_t<Ima>; // Image builder (FIXME: improve builder design)
       { ima.domain() }      -> image_domain_t<Ima>;
       { ima.new_pixels() }  -> stl::ForwardRange&&;
       { ima.new_values() }  -> stl::ForwardRange&&;

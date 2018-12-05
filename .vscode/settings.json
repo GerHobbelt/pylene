@@ -48,7 +48,11 @@
         "__string": "cpp",
         "__tuple": "cpp",
         "atomic": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "complex": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp",
+        "valarray": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3"
 }

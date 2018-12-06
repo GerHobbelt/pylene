@@ -139,7 +139,7 @@ namespace mln
   template <class T, unsigned dim, class I1, class I2>
   bool operator==(const ndimage_pixel<T, dim, I1>& lhs, const ndimage_pixel<T, dim, I2>& rhs)
   {
-    return lhs.val() == rhs.val() && lhs.point() == lhs.point();
+    return lhs.val() == rhs.val() && lhs.point() == rhs.point();
   }
 
   template <class T, unsigned dim, class I1, class I2>

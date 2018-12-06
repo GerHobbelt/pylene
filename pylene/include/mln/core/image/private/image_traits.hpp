@@ -14,7 +14,7 @@ namespace mln
   using image_value_t = typename I::value_type;
 
   template <class I>
-  using image_point_t = typename I::point_type;
+  using image_point_t = typename I::new_point_type;
 
   template <class I>
   using image_domain_t = typename I::domain_type;
@@ -53,4 +53,5 @@ namespace mln
   // Category trait
   template <class I>
   using image_category_t = typename I::category_type;
+
 } // namespace mln

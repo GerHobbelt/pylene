@@ -10,6 +10,9 @@
 #include <mln/core/image_category.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
+
+#include <mln/core/concept/new/values.hpp>
+
 #include <mln/core/rangev3/multi_span.hpp>
 
 #include <type_traits>
@@ -124,7 +127,7 @@ namespace mln
 #endif
   {
   private:
-    typedef ndimage_base<T, dim, E> this_type;
+    using this_type = ndimage_base<T, dim, E>;
 
     template <class, unsigned, class>
     friend struct ndimage_base;
@@ -133,76 +136,80 @@ namespace mln
     friend bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self, const ndimage_base<T2, d, E2>& other);
 
   public:
-    using category                   = raw_image_tag;
+    using category[[deprecated]]     = raw_image_tag;
+    using category_type              = category;
     using accessible                 = std::true_type;
     using indexable                  = std::true_type;
-    using concrete                   = std::true_type;
+    using concrete[[deprecated]]     = std::true_type;
     using shallow_copy[[deprecated]] = std::true_type;
     using has_border[[deprecated]]   = std::true_type;
     using extension_category         = mln::extension::border_extension_tag;
     using concrete_type              = E;
+    template <concepts::Value Val>
+    using ch_value_type = typename image_ch_value<E, Val>::type;
 
     /// \name Image point/value/pixel types
     /// \{
 
     /// \copydoc image::site_type
-    typedef point<short, dim> site_type;
+    using site_type[[deprecated]] = point<short, dim>;
 
     /// \copydoc image::point_type
-    typedef point<short, dim> point_type;
+    using point_type[[deprecated]] = point<short, dim>;
+    using new_point_type           = point<std::ptrdiff_t, dim>;
 
     /// \copydoc image::pixel_type
-    [[deprecated]] typedef ndimage_pixel<T, dim, E> pixel_type;
-    using new_pixel_type = details::ndpixel<T, dim>;
+    using pixel_type[[deprecated]] = ndimage_pixel<T, dim, E>;
+    using new_pixel_type           = details::ndpixel<T, dim>;
 
     /// \copydoc image::const_pixel_type
-    [[deprecated]] typedef ndimage_pixel<const T, dim, const E> const_pixel_type;
-    using new_const_pixel_type = details::ndpixel<const T, dim>;
+    using const_pixel_type[[deprecated]] = ndimage_pixel<const T, dim, const E>;
+    using new_const_pixel_type           = details::ndpixel<const T, dim>;
 
     /// \copydoc image::value_type
-    typedef T value_type;
+    using value_type = T;
 
     /// \copydoc image::reference
-    typedef T& reference;
+    using reference = T&;
 
     /// \copydoc image::const_reference
-    typedef const T& const_reference;
+    using const_reference = const T&;
 
     /// \copydoc image::difference_type
-    typedef int difference_type;
+    using difference_type[[deprecated]] = int;
 
     /// \copydoc image::size_type
-    typedef unsigned size_type;
-    typedef unsigned index_type;
+    using size_type[[deprecated]] = unsigned;
+    using index_type              = unsigned;
 
-    typedef T*       pointer;
-    typedef const T* const_pointer;
+    using pointer       = T*;
+    using const_pointer = const T*;
 
     // Extension
-    typedef internal::ndimage_extension<T, dim> extension_type;
+    using extension_type = internal::ndimage_extension<T, dim>;
     /// \}
 
     /// \name Image Ranges Types
     /// \{
 
     /// \copydoc image::domain_type
-    typedef box<short, dim> domain_type;
+    using domain_type = box<short, dim>;
 
     /// \copydoc image::value_range
-    [[deprecated]] typedef ndimage_value_range<this_type, T> value_range;
-    using new_value_range = ranges::multi_span<T, dim>;
+    using value_range[[deprecated]] = ndimage_value_range<this_type, T>;
+    using new_value_range           = ranges::multi_span<T, dim>;
 
     /// \copydoc image::const_value_range
-    [[deprecated]] typedef ndimage_value_range<const this_type, const T> const_value_range;
-    using new_const_value_range = ranges::multi_span<const T, dim>;
+    using const_value_range[[deprecated]] = ndimage_value_range<const this_type, const T>;
+    using new_const_value_range           = ranges::multi_span<const T, dim>;
 
     /// \copydoc image::pixel_range
-    [[deprecated]] typedef ndimage_pixel_range<this_type, T> pixel_range;
-    using new_pixel_range = details::ndpix_range<T, dim>;
+    using pixel_range[[deprecated]] = ndimage_pixel_range<this_type, T>;
+    using new_pixel_range           = details::ndpix_range<T, dim>;
 
     /// \copydoc image::const_pixel_range
-    [[deprecated]] typedef ndimage_pixel_range<const this_type, const T> const_pixel_range;
-    using new_const_pixel_range = details::ndpix_range<const T, dim>;
+    using const_pixel_range[[deprecated]] = ndimage_pixel_range<const this_type, const T>;
+    using new_const_pixel_range           = details::ndpix_range<const T, dim>;
     /// \}
 
     enum
@@ -282,14 +289,14 @@ namespace mln
 
     /// \}
 
-    [[deprecated]] typedef typename value_range::iterator               value_iterator;
-    [[deprecated]] typedef typename value_range::reverse_iterator       reverse_value_iterator;
-    [[deprecated]] typedef typename const_value_range::iterator         const_value_iterator;
-    [[deprecated]] typedef typename const_value_range::reverse_iterator const_reverse_value_iterator;
-    [[deprecated]] typedef typename pixel_range::iterator               pixel_iterator;
-    [[deprecated]] typedef typename pixel_range::reverse_iterator       reverse_pixel_iterator;
-    [[deprecated]] typedef typename const_pixel_range::iterator         const_pixel_iterator;
-    [[deprecated]] typedef typename const_pixel_range::reverse_iterator const_reverse_pixel_iterator;
+    using value_iterator[[deprecated]]               = typename value_range::iterator;
+    using reverse_value_iterator[[deprecated]]       = typename value_range::reverse_iterator;
+    using const_value_iterator[[deprecated]]         = typename const_value_range::iterator;
+    using const_reverse_value_iterator[[deprecated]] = typename const_value_range::reverse_iterator;
+    using pixel_iterator[[deprecated]]               = typename pixel_range::iterator;
+    using reverse_pixel_iterator[[deprecated]]       = typename pixel_range::reverse_iterator;
+    using const_pixel_iterator[[deprecated]]         = typename const_pixel_range::iterator;
+    using const_reverse_pixel_iterator[[deprecated]] = typename const_pixel_range::reverse_iterator;
 
     /// \name Image Ranges
     /// \{
@@ -330,6 +337,13 @@ namespace mln
 
     /// \name Concrete-related Image Methods
     /// \{
+
+    // FIXME: to implement
+    concrete_type concretize() const;
+
+    // FIXME: to implement
+    template <concepts::Value Val>
+    ch_value_type<Val> ch_value() const;
 
     /// \brief Resize the image to fit \p domain.
     ///

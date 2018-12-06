@@ -4,6 +4,10 @@
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/images.hpp>
 
+#include <mln/core/domain/private/domain_traits.hpp>
+#include <mln/core/image/private/image_traits.hpp>
+#include <mln/core/image/private/pixel_traits.hpp>
+
 #include <type_traits>
 
 
@@ -14,11 +18,11 @@ namespace mln::concepts::archetype
   struct image_archetype final
   {
     using new_pixel_type = pixel_archetype;
-    using value_type     = pixel_archetype::value_type;
-    using reference      = pixel_archetype::reference;
-    using point_type     = domain_archetype::value_type;
+    using value_type     = pixel_value_t<pixel_archetype>;
+    using reference      = pixel_reference_t<pixel_archetype>;
+    using new_point_type = domain_point_t<domain_archetype>;
     using domain_type    = domain_archetype;
-    using category_type  = new_forward_image_tag;
+    using category_type  = forward_image_tag;
     using concrete_type  = image_archetype;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -59,10 +63,10 @@ namespace mln::concepts::archetype
 
     struct value_range_archetype final
     {
-      using value_type = image_archetype::value_type;
-      using reference  = image_archetype::reference;
-      image_archetype::value_type* begin();
-      image_archetype::value_type* end();
+      using value_type = image_value_t<image_archetype>;
+      using reference  = image_reference_t<image_archetype>;
+      image_value_t<image_archetype>* begin();
+      image_value_t<image_archetype>* end();
     };
 
     value_range_archetype new_values();

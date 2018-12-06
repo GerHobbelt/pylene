@@ -48,9 +48,9 @@ struct mock_image
   using new_pixel_type = mock_pixel;
   using value_type     = mock_pixel::value_type;
   using reference      = mock_pixel::reference;
-  using point_type     = mock_domain::value_type;
+  using new_point_type = mock_domain::value_type;
   using domain_type    = mock_domain;
-  using category_type  = mln::new_forward_image_tag;
+  using category_type  = mln::forward_image_tag;
   using concrete_type  = mock_image;
 
   template <concepts::Value Val>

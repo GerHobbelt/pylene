@@ -26,6 +26,8 @@ add_core_test(${test_prefix}zip_image               image/zip_image.cpp)
 add_core_test(${test_prefix}sub_image               image/sub_image.cpp)
 add_core_test(${test_prefix}image_ops               image/image_ops.cpp)
 add_core_test(${test_prefix}image_routines          image/image_routines.cpp)
+add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
+add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)
 
 # test Neighborhood
 add_core_test(${test_prefix}c4               neighborhood/c4.cpp)

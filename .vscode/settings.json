@@ -55,7 +55,8 @@
         "valarray": "cpp",
         "chrono": "cpp",
         "ratio": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "thread": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3",
     "C_Cpp.configurationWarnings": "Disabled"

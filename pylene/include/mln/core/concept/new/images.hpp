@@ -13,6 +13,7 @@
 
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/private/image_traits.hpp>
+#include <mln/core/image/private/pixel_traits.hpp>
 #include <mln/core/image_category.hpp>
 
 
@@ -32,7 +33,7 @@ namespace mln::concepts
   concept Image =
     // FIXME : inheritance from New_Image required for the moment
     stl::Semiregular<Ima> &&
-    stl::DerivedFrom<image_category_t<Ima>, new_forward_image_tag> &&
+    stl::DerivedFrom<image_category_t<Ima>, forward_image_tag> &&
     requires {
       typename image_pixel_t<Ima>;
       typename image_point_t<Ima>;
@@ -51,9 +52,9 @@ namespace mln::concepts
     Point<image_point_t<Ima>> &&
     Value<image_value_t<Ima>> &&
     Domain<image_domain_t<Ima>> &&
-    stl::Same<image_point_t<Ima>, typename image_pixel_t<Ima>::point_type> &&
-    stl::Same<image_value_t<Ima>, typename image_pixel_t<Ima>::value_type> &&
-    stl::Same<image_reference_t<Ima>, typename image_pixel_t<Ima>::reference> &&
+    stl::Same<image_point_t<Ima>, pixel_point_t<image_pixel_t<Ima>>> &&
+    stl::Same<image_value_t<Ima>, pixel_value_t<image_pixel_t<Ima>>> &&
+    stl::Same<image_reference_t<Ima>, pixel_reference_t<image_pixel_t<Ima>>> &&
     stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&> &&
 		stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&&> &&
 		stl::CommonReference<image_value_t<Ima>&&, const image_value_t<Ima>&> &&
@@ -113,7 +114,7 @@ namespace mln::concepts
   template <typename Ima>
     concept BidirectionalImage =
       Image<Ima> &&
-      stl::DerivedFrom<image_category_t<Ima>, new_bidirectional_image_tag> &&
+      stl::DerivedFrom<image_category_t<Ima>, bidirectional_image_tag> &&
       requires (Ima ima) {
         { ima.new_pixels() }  -> ReversibleRange&&;
         { ima.new_values() }  -> ReversibleRange&&;
@@ -126,7 +127,7 @@ namespace mln::concepts
     IndexableImage<Ima> &&
     AccessibleImage<Ima> &&
     BidirectionalImage<Ima> &&
-    stl::DerivedFrom<image_category_t<Ima>, new_raw_image_tag> &&
+    stl::DerivedFrom<image_category_t<Ima>, raw_image_tag> &&
     requires (Ima ima, const Ima cima, int dim) {
       { ima.data() }        -> image_value_t<Ima>*;
       { cima.strides(dim) } -> std::size_t;

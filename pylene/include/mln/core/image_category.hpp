@@ -4,6 +4,16 @@
 namespace mln
 {
 
+  struct new_forward_image_tag
+  {
+  };
+  struct new_bidirectional_image_tag : new_forward_image_tag
+  {
+  };
+  struct new_raw_image_tag : new_bidirectional_image_tag
+  {
+  };
+
   struct forward_image_tag
   {
   };

@@ -46,39 +46,11 @@ namespace mln
   inline constexpr auto image_accessible_v = image_accessible_t<I>::value;
 
 
-  // Reversible trait
-  template <class I>
-  using image_reversible_t = typename I::reversible;
-  template <class I>
-  inline constexpr auto image_reversible_v = image_reversible_t<I>::value;
-
-
-  // Random access trait
-  template <class I>
-  using image_random_access_t = typename I::random_access;
-  template <class I>
-  inline constexpr auto image_random_access_v = image_random_access_t<I>::value;
-
-
   // Change value type trait
-  template <class I>
-  using image_changeable_value_t = typename I::changeable_value;
-  template <class I>
-  inline constexpr auto image_changeable_value_v = image_changeable_value_t<I>::value;
   template <class I, class V>
-  using image_changed_value_t = typename I::template changed_value_type<V>;
+  using image_ch_value_t = typename I::template ch_value_type<V>;
 
-
-  // Writable trait
+  // Category trait
   template <class I>
-  using image_writable_t = typename I::writable;
-  template <class I>
-  inline constexpr auto image_writable_v = image_writable_t<I>::value;
-
-
-  // Raw trait
-  template <class I>
-  using image_raw_t = typename I::raw;
-  template <class I>
-  inline constexpr auto image_raw_v = image_raw_t<I>::value;
+  using image_category_t = typename I::category_type;
 } // namespace mln

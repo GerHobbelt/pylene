@@ -50,21 +50,24 @@ struct mock_image
   using reference      = mock_pixel::reference;
   using point_type     = mock_domain::value_type;
   using domain_type    = mock_domain;
+  using category_type  = mln::new_forward_image_tag;
   using concrete_type  = mock_image;
+
+  template <concepts::Value Val>
+  using ch_value_type = mock_image;
 
   // additional traits
   using extension_category = mln::extension::none_extension_tag;
   using indexable          = std::false_type;
   using accessible         = std::false_type;
-  using reversible         = std::false_type;
-  using random_access      = std::false_type;
-  using changeable_value   = std::false_type;
-  using writable           = std::false_type;
+  using bidirectional      = std::false_type;
   using raw                = std::false_type;
 
 
-  concrete_type concretize() const;
-  domain_type   domain() const;
+  template <concepts::Value Val>
+  ch_value_type<Val> ch_value() const;
+  concrete_type      concretize() const;
+  domain_type        domain() const;
 
   struct mock_pixel_rng
   {
@@ -120,6 +123,12 @@ bool operator!=(const mock_image::mock_pixel& lhs, const mock_image::mock_pixel&
   return !(lhs == rhs);
 }
 
+
+template <typename Ima>
+requires concepts::Image<Ima> void foo(Ima)
+{
+}
+
 TEST(Core, Concept_Image)
 {
   static_assert(concepts::Domain<mock_image::mock_domain>);
@@ -129,11 +138,5 @@ TEST(Core, Concept_Image)
   static_assert(concepts::Image<mock_image>);
 }
 
-/*
-template <typename Ima>
-requires concepts::Image<Ima> void foo(Ima)
-{
-}
-*/
 
 // TODO check all images properties

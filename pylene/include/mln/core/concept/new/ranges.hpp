@@ -49,3 +49,6 @@ namespace mln::concepts
   // clang-format on
 
 } // namespace mln::concepts
+
+// Validate concept
+#include <mln/core/concept/new/archetype/range.hpp>

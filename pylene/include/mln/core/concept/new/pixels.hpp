@@ -30,8 +30,13 @@ namespace mln::concepts
       { cpix.point() } -> stl::Same<typename Pix::point_type>&&;
       { cpix.val() } -> stl::Same<typename Pix::reference>&&;
     };
+
+    // TODO writable pixel + output/input pixel aliases
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 
 } // namespace mln::concepts
+
+// Validate concept
+#include <mln/core/concept/new/archetype/pixel.hpp>

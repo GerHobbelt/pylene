@@ -11,8 +11,17 @@
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
+#ifdef concept
+#define __concept
+#undef concept
+#endif
 
 #include <stl2/concepts.hpp>
+
+#ifdef __concept
+#define concept concept bool
+#undef __concept
+#endif
 
 namespace mln::concepts::stl
 {

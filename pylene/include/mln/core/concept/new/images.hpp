@@ -26,7 +26,7 @@ namespace mln::concepts
 
   // Image
   template<typename Ima>
-  concept bool Image = 
+  concept Image = 
     // FIXME : inheritance from New_Image required for the moment
     stl::Semiregular<Ima> &&
     requires {
@@ -57,7 +57,7 @@ namespace mln::concepts
 		stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&&> &&
 		stl::CommonReference<image_value_t<Ima>&&, const image_value_t<Ima>&> &&
     requires(Ima ima, image_domain_t<Ima> d, image_point_t<Ima> p) {
-      { ima.concretize() }  -> image_concrete_t<Ima>; // Image builder (FIXME: improve builder design)
+      { ima.concretize() }  -> stl::ConvertibleTo<image_concrete_t<Ima>>&&; // Image builder (FIXME: improve builder design)
       { ima.domain() }      -> image_domain_t<Ima>;
       { ima.new_pixels() }  -> stl::ForwardRange&&;
       { ima.new_values() }  -> stl::ForwardRange&&;
@@ -69,7 +69,7 @@ namespace mln::concepts
 
   // IndexableImage
   template <typename Ima, typename V = int>
-  concept bool IndexableImage =
+  concept IndexableImage =
     Image<Ima, V> &&
     requires {
       typename image_index_t<Ima>;
@@ -85,7 +85,7 @@ namespace mln::concepts
 
   // AccessibleImage
   template <typename Ima>
-  concept bool AccessibleImage =
+  concept AccessibleImage =
     Image<Ima> &&
     image_accessible_v<Ima> &&
     requires (Ima ima, image_point_t<Ima> p) {
@@ -97,7 +97,7 @@ namespace mln::concepts
 
   // ReversibleImage
   template <typename Ima>
-    concept bool ReversibleImage =
+    concept ReversibleImage =
       Image<Ima> &&
       image_reversible_v<Ima> &&
       requires (Ima ima) {
@@ -108,7 +108,7 @@ namespace mln::concepts
 
   // Random_accessImage
   template <typename Ima>
-  concept bool RandomAccessImage =
+  concept RandomAccessImage =
     IndexableImage<Ima> &&
     AccessibleImage<Ima> &&
     ReversibleImage<Ima> &&
@@ -121,7 +121,7 @@ namespace mln::concepts
 
   // ExtendedImage
   template <typename Ima>
-  concept bool ExtendedImage =
+  concept ExtendedImage =
     Image<Ima> &&
     requires {
       typename image_extension_t<Ima>;
@@ -134,7 +134,7 @@ namespace mln::concepts
 
   // ValueChImage
   template <typename Ima, typename Val>
-  concept bool ChValueImage =
+  concept ChValueImage =
     Image<Ima> &&
     stl::Regular<Val> &&
     requires {
@@ -148,7 +148,7 @@ namespace mln::concepts
 
   // RawImage
   template <typename Ima>
-  concept bool RawImage =
+  concept RawImage =
     Image<Ima> &&
     image_raw_v<Ima> &&
     requires (Ima ima) {

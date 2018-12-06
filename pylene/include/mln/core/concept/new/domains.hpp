@@ -15,7 +15,7 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Domain
   template<typename Dom>
-  concept bool Domain = 
+  concept Domain = 
     stl::ForwardRange<Dom> &&
     Point<typename Dom::value_type> &&
     requires(const Dom cdom, typename Dom::value_type p) {

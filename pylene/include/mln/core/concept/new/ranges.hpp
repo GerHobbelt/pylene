@@ -14,17 +14,17 @@ namespace mln::concepts
 
   // RangeValueSame
   template <typename Rng, typename V>
-  concept bool RangeValueTypeSameAs =
+  concept RangeValueTypeSameAs =
     stl::Same<stl::iter_value_t<stl::iterator_t<Rng>>, V>;
   
   // RangeValueConvertibleTo
   template <typename Rng, typename V>
-  concept bool RangeValueTypeConvertibleTo =
+  concept RangeValueTypeConvertibleTo =
     stl::ConvertibleTo<stl::iter_value_t<stl::iterator_t<Rng>>, V>;
 
   // SegmentedRange
   template<typename Rng>
-  concept bool SegmentedRange = 
+  concept SegmentedRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
       { rng.rows() } -> stl::ForwardRange&&;
@@ -36,7 +36,7 @@ namespace mln::concepts
 
   // ReversibleRange
   template<typename Rng>
-  concept bool ReversibleRange = 
+  concept ReversibleRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
       { rng.reversed() } -> stl::ForwardRange&&;

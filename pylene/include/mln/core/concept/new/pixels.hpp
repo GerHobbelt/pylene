@@ -15,7 +15,7 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Pixel
   template<typename Pix>
-  concept bool Pixel = 
+  concept Pixel = 
     stl::Regular<Pix> &&
     requires {
       typename Pix::value_type;

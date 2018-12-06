@@ -10,7 +10,7 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Point
   template<typename Pnt>
-  concept bool Point =
+  concept Point =
     stl::Regular<Pnt> &&
     stl::StrictTotallyOrdered<Pnt>;
 #endif // PYLENE_CONCEPT_TS_ENABLED

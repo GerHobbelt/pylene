@@ -10,19 +10,19 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Value
   template <typename Val>
-  concept bool Value = stl::Semiregular<Val>;
+  concept Value = stl::Semiregular<Val>;
 
 
   // ComparableValue
   template <typename RegVal>
-  concept bool ComparableValue =
+  concept ComparableValue =
     Value<RegVal> &&
     stl::Regular<RegVal>;
 
 
   // OrderedValue
   template <typename STORegVal>
-  concept bool OrderedValue =
+  concept OrderedValue =
     ComparableValue<STORegVal> &&
     stl::StrictTotallyOrdered<STORegVal>;
 #endif // PYLENE_CONCEPT_TS_ENABLED

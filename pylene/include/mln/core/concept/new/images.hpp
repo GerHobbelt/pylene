@@ -76,7 +76,8 @@ namespace mln::concepts
   concept WritableImage =
     Image<WIma> &&
     requires(WIma ima) {
-      { ima.new_pixels() }  -> stl::OutputRange<image_value_t<WIma>>&&;
+      // FIXME : Writable Pixel
+      // { ima.new_pixels() }  -> stl::OutputRange<image_value_t<WIma>>&&;
       { ima.new_values() }  -> stl::OutputRange<image_value_t<WIma>>&&;
     };
 
@@ -167,7 +168,7 @@ namespace mln::concepts
     BidirectionalImage<Ima> &&
     stl::DerivedFrom<image_category_t<Ima>, raw_image_tag> &&
     requires (Ima ima, const Ima cima, int dim) {
-      { ima.data() }        -> image_value_t<Ima>*;
+      { ima.data() }        -> stl::ConvertibleTo<const image_value_t<Ima>*>&&;
       { cima.strides(dim) } -> std::size_t;
     };
 
@@ -175,7 +176,9 @@ namespace mln::concepts
   // WritableRawImage
   template<typename WIma>
   concept WritableRawImage =
-    WritableImage<WIma> &&
+    WritableIndexableImage<WIma> &&
+    WritableAccessibleImage<WIma> &&
+    WritableBidirectionalImage<WIma> &&
     RawImage<WIma> &&
     requires(WIma ima, image_value_t<WIma> v) {
       { *(ima.data()) = v };

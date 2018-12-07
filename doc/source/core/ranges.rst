@@ -38,8 +38,7 @@ Let `SegRng` inherit all types defined for :cpp:concept:`ForwardRange (stl) <stl
 .. rubric:: Expressions
 
 Let `SegRng` inherit all valid expressions defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
-
-Let :
+Let:
     - ``rng`` be an instance of `SegRng`.
 
 Then we have the following valid expressions :
@@ -90,8 +89,7 @@ Let `RevRng` inherit all types defined for :cpp:concept:`ForwardRange (stl) <stl
 .. rubric:: Expressions
 
 Let `RevRng` inherit all valid expressions defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
-
-Let :
+Let:
     - ``rng`` be an instance of `RevRng`.
 
 Then we have the following valid expressions :

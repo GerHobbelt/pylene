@@ -168,8 +168,8 @@ Core Module
 
 .. topic:: Concepts
 
-   * :cpp:concept:`Segmented Range <mln::ranges::SegmentedRange>`
-   * :cpp:concept:`Reversible Range <mln::ranges::ReversibleRange>`
+   * :ref:`Segmented Range <concept-ranges-SegmentedRange>`
+   * :ref:`Reversible Range <concept-ranges-ReversibleRange>`
 
 
 .. topic:: Utilities

@@ -145,7 +145,11 @@ namespace mln
     using has_border[[deprecated]]   = std::true_type;
     using extension_category         = mln::extension::border_extension_tag;
     using concrete_type              = E;
+#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
+#else
+    template <typename Val>
+#endif // PYLENE_CONCEPT_TS_ENABLED
     using ch_value_type = typename image_ch_value<E, Val>::type;
 
     /// \name Image point/value/pixel types
@@ -342,7 +346,11 @@ namespace mln
     concrete_type concretize() const;
 
     // FIXME: to implement
+#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
+#else
+    template <typename Val>
+#endif // PYLENE_CONCEPT_TS_ENABLED
     ch_value_type<Val> ch_value() const;
 
     /// \brief Resize the image to fit \p domain.

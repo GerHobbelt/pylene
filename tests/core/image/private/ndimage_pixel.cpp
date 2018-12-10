@@ -12,9 +12,7 @@ namespace concepts = mln::concepts;
 
 TEST(Pixel, NdPixel)
 {
-  [[maybe_unused]] auto pix = mln::details::ndpixel<int, 3>{};
-
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::Pixel<decltype(pix)>);
+  static_assert(concepts::Pixel<mln::details::ndpixel<int, 3>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 }

@@ -4,13 +4,13 @@
 #include <mln/core/concept/new/domains.hpp>
 
 
-namespace mln::concepts::archetype
+namespace mln::archetypes
 {
 
-  struct domain_archetype final
+  struct Domain final
   {
-    using value_type = point_archetype;
-    using reference  = point_archetype&;
+    using value_type = Point;
+    using reference  = Point&;
 
     value_type* begin();
     value_type* end();
@@ -21,7 +21,7 @@ namespace mln::concepts::archetype
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(Domain<domain_archetype>, "domain_archetype does not model the Domain concept!");
+  static_assert(mln::concepts::Domain<Domain>, "Domain archetype does not model the Domain concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-} // namespace mln::concepts::archetype
+} // namespace mln::archetypes

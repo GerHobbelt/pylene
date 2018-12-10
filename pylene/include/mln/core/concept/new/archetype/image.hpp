@@ -11,37 +11,35 @@
 #include <type_traits>
 
 
-namespace mln::concepts::archetype
+namespace mln::archetypes
 {
-  struct image_archetype;
+  struct Image;
 
-  struct image_archetype final
+  struct Image
   {
-    using new_pixel_type = pixel_archetype;
-    using value_type     = pixel_value_t<pixel_archetype>;
-    using reference      = pixel_reference_t<pixel_archetype>;
-    using new_point_type = domain_point_t<domain_archetype>;
-    using domain_type    = domain_archetype;
+    using new_pixel_type = Pixel;
+    using value_type     = pixel_value_t<Pixel>;
+    using reference      = pixel_reference_t<Pixel>;
+    using new_point_type = domain_point_t<Domain>;
+    using domain_type    = Domain;
     using category_type  = forward_image_tag;
-    using concrete_type  = image_archetype;
+    using concrete_type  = Image;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    template <Value Val>
+    template <mln::concepts::Value Val>
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    using ch_value_type = image_archetype;
+    using ch_value_type = Image;
 
     // additional traits
     using extension_category = mln::extension::none_extension_tag;
     using indexable          = std::false_type;
     using accessible         = std::false_type;
-    using bidirectional      = std::false_type;
-    using raw                = std::false_type;
 
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    template <Value Val>
+    template <mln::concepts::Value Val>
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
@@ -50,30 +48,274 @@ namespace mln::concepts::archetype
     domain_type        domain() const;
 
 
-    struct pixel_range_archetype final
+    struct PixelRange
     {
-      using value_type = new_pixel_type;
-      using reference  = new_pixel_type&;
+      using value_type = image_pixel_t<Image>;
+      using reference  = image_pixel_t<Image>&;
+
       new_pixel_type* begin();
       new_pixel_type* end();
     };
 
-    pixel_range_archetype new_pixels();
+    PixelRange new_pixels();
 
 
-    struct value_range_archetype final
+    struct ValueRange
     {
-      using value_type = image_value_t<image_archetype>;
-      using reference  = image_reference_t<image_archetype>;
-      image_value_t<image_archetype>* begin();
-      image_value_t<image_archetype>* end();
+      using value_type = image_value_t<Image>;
+      using reference  = image_reference_t<Image>;
+
+      image_value_t<Image>* begin();
+      image_value_t<Image>* end();
     };
 
-    value_range_archetype new_values();
+    ValueRange new_values();
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(Image<image_archetype>, "image_archetype does not model the Image concept!");
-#endif // #ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::Image<Image>, "Image archetype does not model the Image concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
-} // namespace mln::concepts::archetype
+
+  struct OutputImage final : Image
+  {
+    using new_pixel_type = OutputPixel;
+
+    struct OutputPixelRange final
+    {
+      using value_type = image_pixel_t<OutputImage>;
+      using reference  = image_pixel_t<OutputImage>&;
+
+      new_pixel_type* begin();
+      new_pixel_type* end();
+    };
+
+    OutputPixelRange new_pixels();
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::Image<OutputImage> && mln::concepts::OutputImage<OutputImage>,
+                "OuputImage archetype does not model the OuputImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct InputImage : Image
+  {
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::InputImage<InputImage>, "InputImage archetype does not model the InputImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct ForwardImage final : InputImage
+  {
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::ForwardImage<ForwardImage>,
+                "ForwardImage archetype does not model the ForwardImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct IndexableImage : Image
+  {
+    using index_type = int;
+    using indexable  = std::true_type;
+
+    image_reference_t<IndexableImage> operator[](image_index_t<IndexableImage>) const;
+    image_point_t<IndexableImage>     point_of_index(image_index_t<IndexableImage>) const;
+    image_index_t<IndexableImage>     index_at_point(image_point_t<IndexableImage>) const;
+    image_index_t<IndexableImage>     delta_index(image_point_t<IndexableImage>) const;
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::IndexableImage<IndexableImage>,
+                "IndexableImage archetype does not model the IndexableImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct OutputIndexableImage final : IndexableImage
+  {
+    using IndexableImage::                  operator[];
+    image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>);
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::IndexableImage<OutputIndexableImage> && mln::concepts::OutputImage<OutputIndexableImage>,
+                "OutputIndexableImage archetype does not model the OutputImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct AccessibleImage : Image
+  {
+    using accessible = std::true_type;
+
+    image_reference_t<AccessibleImage> operator()(image_point_t<AccessibleImage>) const;
+    image_reference_t<AccessibleImage> at(image_point_t<AccessibleImage>) const;
+    image_pixel_t<AccessibleImage>     new_pixel(image_point_t<AccessibleImage>) const;
+    image_pixel_t<AccessibleImage>     new_pixel_at(image_point_t<AccessibleImage>) const;
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::AccessibleImage<AccessibleImage>,
+                "AccessibleImage archetype does not model the AccessibleImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct OutputAccessibleImage final : AccessibleImage
+  {
+    using AccessibleImage::                  operator();
+    image_reference_t<OutputAccessibleImage> operator[](image_point_t<OutputAccessibleImage>);
+
+    using AccessibleImage::at;
+    image_reference_t<OutputAccessibleImage> at(image_point_t<OutputAccessibleImage>);
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::AccessibleImage<OutputAccessibleImage> &&
+                    mln::concepts::OutputImage<OutputAccessibleImage>,
+                "OutputAccessibleImage archetype does not model the OutputImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct BidirectionalImage : Image
+  {
+    using category_type = bidirectional_image_tag;
+
+    struct ReversiblePixelRange final : Image::PixelRange
+    {
+      Image::PixelRange reversed();
+    };
+
+    ReversiblePixelRange new_pixels();
+
+    struct ReversibleValueRange final : Image::ValueRange
+    {
+      Image::ValueRange reversed();
+    };
+
+    ReversibleValueRange new_values();
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::BidirectionalImage<BidirectionalImage>,
+                "BidirectionalImage archetype does not model the BidirectionalImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct OutputBidirectionalImage : BidirectionalImage
+  {
+    using new_pixel_type = OutputPixel;
+
+    struct OutputPixelRange
+    {
+      using value_type = image_pixel_t<OutputBidirectionalImage>;
+      using reference  = image_pixel_t<OutputBidirectionalImage>&;
+
+      new_pixel_type* begin();
+      new_pixel_type* end();
+    };
+
+    struct ReversibleOutputPixelRange final : OutputPixelRange
+    {
+      OutputPixelRange reversed();
+    };
+
+    ReversibleOutputPixelRange new_pixels();
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::BidirectionalImage<OutputBidirectionalImage> &&
+                    mln::concepts::OutputImage<OutputBidirectionalImage>,
+                "OutputBidirectionalImage archetype does not model the OutputImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct RawImage : Image
+  {
+    using category_type = raw_image_tag;
+    using index_type    = int;
+    using indexable     = std::true_type;
+    using accessible    = std::true_type;
+
+    image_reference_t<RawImage> operator[](image_index_t<RawImage>) const;
+    image_point_t<RawImage>     point_of_index(image_index_t<RawImage>) const;
+    image_index_t<RawImage>     index_at_point(image_point_t<RawImage>) const;
+    image_index_t<RawImage>     delta_index(image_point_t<RawImage>) const;
+
+    image_reference_t<RawImage> operator()(image_point_t<RawImage>) const;
+    image_reference_t<RawImage> at(image_point_t<RawImage>) const;
+    image_pixel_t<RawImage>     new_pixel(image_point_t<RawImage>) const;
+    image_pixel_t<RawImage>     new_pixel_at(image_point_t<RawImage>) const;
+
+
+    struct ReversiblePixelRange final : Image::PixelRange
+    {
+      Image::PixelRange reversed();
+    };
+
+    ReversiblePixelRange new_pixels();
+
+    struct ReversibleValueRange final : Image::ValueRange
+    {
+      Image::ValueRange reversed();
+    };
+
+    ReversibleValueRange new_values();
+
+
+    const image_value_t<RawImage>* data() const;
+    std::size_t                    strides(int) const;
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::RawImage<RawImage>, "RawImage archetype does not model the RawImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct OutputRawImage final : RawImage
+  {
+    using new_pixel_type = OutputPixel;
+
+    using RawImage::                  operator[];
+    image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>);
+
+    using RawImage::                  operator();
+    image_reference_t<OutputRawImage> operator[](image_point_t<OutputRawImage>);
+
+    using RawImage::at;
+    image_reference_t<OutputRawImage> at(image_point_t<OutputRawImage>);
+
+    // Need to be redefined as pixel_type has changed
+    image_pixel_t<OutputRawImage> new_pixel(image_point_t<OutputRawImage>) const;
+    image_pixel_t<OutputRawImage> new_pixel_at(image_point_t<OutputRawImage>) const;
+
+
+    struct OutputPixelRange
+    {
+      using value_type = image_pixel_t<OutputRawImage>;
+      using reference  = image_pixel_t<OutputRawImage>&;
+
+      new_pixel_type* begin();
+      new_pixel_type* end();
+    };
+
+    struct ReversibleOutputPixelRange final : OutputPixelRange
+    {
+      OutputPixelRange reversed();
+    };
+
+    ReversibleOutputPixelRange new_pixels();
+
+
+    using RawImage::data;
+    image_value_t<OutputRawImage>* data();
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::RawImage<OutputRawImage> && mln::concepts::OutputImage<OutputRawImage>,
+                "OutputRawImage archetype does not model the OutputImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+} // namespace mln::archetypes

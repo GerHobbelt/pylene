@@ -3,43 +3,43 @@
 #include <mln/core/concept/new/values.hpp>
 
 
-namespace mln::concepts::archetype
+namespace mln::archetypes
 {
 
-  struct value_archetype final
+  struct Value final
   {
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(Value<value_archetype>, "value_archetype does not model the Value concept!");
+  static_assert(mln::concepts::Value<Value>, "Value archetype does not model the Value concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct comparable_value_archetype final
+  struct ComparableValue final
   {
   };
-  bool operator==(const comparable_value_archetype&, const comparable_value_archetype&);
-  bool operator!=(const comparable_value_archetype&, const comparable_value_archetype&);
+  bool operator==(const ComparableValue&, const ComparableValue&);
+  bool operator!=(const ComparableValue&, const ComparableValue&);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(ComparableValue<comparable_value_archetype>,
-                "comparable_value_archetype does not model the ComparableValue concept!");
+  static_assert(mln::concepts::ComparableValue<ComparableValue>,
+                "ComparableValue archetype does not model the ComparableValue concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct ordered_value_archetype final
+  struct OrderedValue final
   {
   };
-  bool operator==(const ordered_value_archetype&, const ordered_value_archetype&);
-  bool operator!=(const ordered_value_archetype&, const ordered_value_archetype&);
-  bool operator<(const ordered_value_archetype&, const ordered_value_archetype&);
-  bool operator>(const ordered_value_archetype&, const ordered_value_archetype&);
-  bool operator<=(const ordered_value_archetype&, const ordered_value_archetype&);
-  bool operator>=(const ordered_value_archetype&, const ordered_value_archetype&);
+  bool operator==(const OrderedValue&, const OrderedValue&);
+  bool operator!=(const OrderedValue&, const OrderedValue&);
+  bool operator<(const OrderedValue&, const OrderedValue&);
+  bool operator>(const OrderedValue&, const OrderedValue&);
+  bool operator<=(const OrderedValue&, const OrderedValue&);
+  bool operator>=(const OrderedValue&, const OrderedValue&);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(OrderedValue<ordered_value_archetype>,
-                "ordered_value_archetype does not model the OrderedValue concept!");
+  static_assert(mln::concepts::OrderedValue<OrderedValue>,
+                "OrderedValue archetype does not model the OrderedValue concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-} // namespace mln::concepts::archetype
+} // namespace mln::archetypes

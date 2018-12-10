@@ -3,13 +3,13 @@
 #include <mln/core/concept/new/indexes.hpp>
 
 
-namespace mln::concepts::archetype
+namespace mln::archetypes
 {
 
-  using index_archetype = int;
+  using Index = int;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(Index<index_archetype>, "index_archetype does not model the Index concept!");
+  static_assert(mln::concepts::Index<Index>, "Index archetype does not model the Index concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-} // namespace mln::concepts::archetype
+} // namespace mln::archetypes

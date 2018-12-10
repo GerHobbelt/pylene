@@ -1,7 +1,7 @@
 #include <mln/core/concept/new/images.hpp>
 
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/ndimage.hpp>
+#include <mln/core/image/image3d.hpp>
 
 #include <type_traits>
 
@@ -11,14 +11,17 @@
 namespace concepts = mln::concepts;
 
 
-TEST(Core, Image_NdImage)
+TEST(Core, Image_Image2D)
 {
-
-  using tested_image_type = mln::ndimage_base<int, 3, mln::image2d<int>>;
-
-  [[maybe_unused]] auto img = tested_image_type{};
-
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  // static_assert(concepts::Image<decltype(img)>);
+  static_assert(concepts::Image<mln::image2d<int>>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
+}
+
+
+TEST(Core, Image_Image3D)
+{
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::Image<mln::image3d<int>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 }

@@ -5,6 +5,8 @@
 #include <mln/core/concept/new/points.hpp>
 #include <mln/core/concept/new/values.hpp>
 
+#include <mln/core/image/private/pixel_traits.hpp>
+
 #include <type_traits>
 
 namespace mln::concepts
@@ -18,20 +20,38 @@ namespace mln::concepts
   concept Pixel = 
     stl::Regular<Pix> &&
     requires {
-      typename Pix::value_type;
-      typename Pix::point_type;
-      typename Pix::reference;
+      typename pixel_value_t<Pix>;
+      typename pixel_reference_t<Pix>;
+      typename pixel_point_t<Pix>;
     } &&
-    Value<typename Pix::value_type> &&
-    Point<typename Pix::point_type> &&
-    !std::is_const_v<typename Pix::value_type> &&
-    !std::is_reference_v<typename Pix::value_type> &&
+    Value<pixel_value_t<Pix>> &&
+    Point<pixel_point_t<Pix>> &&
+    !std::is_const_v<pixel_value_t<Pix>> &&
+    !std::is_reference_v<pixel_value_t<Pix>> &&
     requires(const Pix cpix) {
-      { cpix.point() } -> stl::Same<typename Pix::point_type>&&;
-      { cpix.val() } -> stl::Same<typename Pix::reference>&&;
+      { cpix.point() } -> stl::Same<pixel_point_t<Pix>>&&;
+      { cpix.val() }   -> stl::Same<pixel_reference_t<Pix>>&&;
     };
 
-    // TODO writable pixel + output/input pixel aliases
+
+  namespace detail
+  {
+
+    // WritablePixel
+    template <typename Pix>
+    concept WritablePixel =
+      Pixel<Pix> &&
+      requires(Pix pix, pixel_value_t<Pix> v) {
+        { pix.val() = v };
+      };
+  
+  } // namespace mln::concepts::detail
+
+
+  // OutputPixel
+  template <typename Pix>
+  concept OutputPixel = detail::WritablePixel<Pix>;
+
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on

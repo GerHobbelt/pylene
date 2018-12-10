@@ -11,7 +11,7 @@
 namespace concepts = mln::concepts;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-template <concepts::Image Ima>
+template <concepts::IndexableImage Ima>
 void foo(Ima)
 {
 }
@@ -25,7 +25,7 @@ TEST(Core, Image_Image2D)
   foo(mln::image2d<int>{});
 
   static_assert(concepts::Image<mln::image2d<int>>);
-  // static_assert(concepts::IndexableImage<mln::image2d<int>>);
+  static_assert(concepts::IndexableImage<mln::image2d<int>>);
   // static_assert(concepts::AccessibleImage<mln::image2d<int>>);
   // static_assert(concepts::BidirectionalImage<mln::image2d<int>>);
   // static_assert(concepts::RawImage<mln::image2d<int>>);

@@ -108,8 +108,8 @@ namespace mln::concepts
     image_indexable_v<Ima> &&
     requires (const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
       { cima[k] }                    -> image_reference_t<Ima>;
-      { cima.new_point_of_index(k) } -> image_point_t<Ima>;
-      { cima.index_at_point(p) }     -> image_index_t<Ima>;
+      { cima.new_point_at_index(k) } -> image_point_t<Ima>;
+      { cima.new_index_of_point(p) } -> image_index_t<Ima>;
       { cima.delta_index(p) }        -> image_index_t<Ima>;
     };
 

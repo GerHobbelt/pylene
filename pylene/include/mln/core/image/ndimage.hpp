@@ -184,7 +184,7 @@ namespace mln
 
     /// \copydoc image::size_type
     using size_type[[deprecated]] = unsigned;
-    using index_type              = unsigned;
+    using index_type              = int;
 
     using pointer       = T*;
     using const_pointer = const T*;
@@ -251,10 +251,12 @@ namespace mln
     const_reference operator()(const site_type& p) const;
 
     /// \copydoc image::operator[](size_type i) const
-    reference operator[](size_type i);
+    [[deprecated]] reference operator[](size_type i);
+    reference                operator[](index_type i);
 
     /// \copydoc image::operator[](size_type i) const
-    const_reference operator[](size_type i) const;
+    [[deprecated]] const_reference operator[](size_type i) const;
+    reference                      operator[](index_type i) const;
 
     /// \copydoc image::at(const site_type& p) const
     reference at(const site_type& p);
@@ -329,7 +331,8 @@ namespace mln
     /// \{
 
     /// \copydoc image::index_of_point(const point_type&) const
-    size_type index_of_point(const point_type& p) const;
+    [[deprecated]] size_type index_of_point(const point_type& p) const;
+    index_type               new_index_of_point(const new_point_type& p) const;
 
     /// \copydoc image::point_at_index(size_type i) const
     [[deprecated]] point_type point_at_index(size_type i) const;

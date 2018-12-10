@@ -39,11 +39,11 @@ __attribute__((noinline)) void rotate_ptr(const image2d<T>& f, image2d<T>& out)
   int      nc      = f.ncols();
   int      istride = static_cast<int>(f.strides()[0]);
   int      ostride = static_cast<int>(out.strides()[0]);
-  const T* ptr_in  = &f({0, 0});
+  const T* ptr_in  = &f(point2d{0, 0});
 
   for (int i = 0; i < nr; ++i)
   {
-    T* ptr_out = &out({0, (short)i});
+    T* ptr_out = &out(point2d{0, (short)i});
     for (int j = 0; j < nc; ++j)
     {
       *ptr_out = ptr_in[j];

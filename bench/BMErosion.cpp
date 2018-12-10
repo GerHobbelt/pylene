@@ -36,8 +36,8 @@ void erode_c8_cstyle(const mln::image2d<mln::uint8>& f, mln::image2d<mln::uint8>
   constexpr int sz      = 9;
   auto          dpoints = winc8_t::dpoints;
 
-  const uint8* __restrict__ inptr = &f({0, 0});
-  uint8* __restrict__ outptr      = &out({0, 0});
+  const uint8* __restrict__ inptr = &f(mln::point2d{0, 0});
+  uint8* __restrict__ outptr      = &out(mln::point2d{0, 0});
 
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);
@@ -65,8 +65,8 @@ void erode_c8_cstyle_restrict(const mln::image2d<mln::uint8>& f, mln::image2d<ml
   constexpr int sz      = 9;
   auto          dpoints = winc8_t::dpoints;
 
-  const uint8* __restrict__ inptr = &f({0, 0});
-  uint8* __restrict__ outptr      = &out({0, 0});
+  const uint8* __restrict__ inptr = &f(mln::point2d{0, 0});
+  uint8* __restrict__ outptr      = &out(mln::point2d{0, 0});
 
   ptrdiff_t offsets[sz];
   wrt_offset(f, dpoints, offsets);

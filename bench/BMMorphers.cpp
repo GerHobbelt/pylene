@@ -13,7 +13,7 @@ unsigned threshold1(const image2d<uint8>& f, uint8 v)
 
   int         nr      = f.nrows();
   int         nc      = f.ncols();
-  const char* ptr_in  = (const char*)&f({0, 0});
+  const char* ptr_in  = (const char*)&f(point2d{0, 0});
   unsigned    count   = 0;
   int         istride = (int)(f.strides()[0] - nc * sizeof(T));
 
@@ -35,7 +35,7 @@ unsigned threshold1_bis(const image2d<uint8>& f, uint8 v)
 
   int         nr      = f.nrows();
   int         nc      = f.ncols();
-  const char* ptr_in  = (const char*)&f({0, 0});
+  const char* ptr_in  = (const char*)&f(point2d{0, 0});
   unsigned    count   = 0;
   int         istride = (int)(f.strides()[0] - nc * sizeof(T));
 
@@ -89,8 +89,8 @@ void threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
 
   int         nr      = f.nrows();
   int         nc      = f.ncols();
-  const char* ptr_in  = (const char*)&f({0, 0});
-  char*       ptr_out = (char*)&out({0, 0});
+  const char* ptr_in  = (const char*)&f(point2d{0, 0});
+  char*       ptr_out = (char*)&out(point2d{0, 0});
   int         istride = (int)(f.strides()[0] - nc * sizeof(T));
 
   for (int i = 0; i < nr; ++i)

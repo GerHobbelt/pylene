@@ -31,7 +31,7 @@ void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
   for (int i = 0; i < k; ++i)
     mln_foreach (auto p, ref.domain())
       if (ref.domain().has(p + dp))
-        ref(p) = ref(p + dp);
+        ref(p) = ref(mln::point2d(p + dp));
 
   // Run algo
   mln::se::periodic_line2d line(dp, k);

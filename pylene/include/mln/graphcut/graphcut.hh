@@ -389,9 +389,15 @@ namespace mln
         Etype& edge_at(const edge_type& e)
         {
           if (e.type == SOURCE_EDGE)
-            return m_src.at(e.p / 2);
+          {
+            point2d pnt = e.p / 2;
+            return m_src.at(pnt);
+          }
           else if (e.type == SINK_EDGE)
-            return m_sink.at(e.p / 2);
+          {
+            point2d pnt = e.p / 2;
+            return m_sink.at(pnt);
+          }
           else
             return base::edge_at(e.p);
         }
@@ -573,7 +579,7 @@ namespace mln
 
         int operator()(W x, W y) const { return (y < x) - (x < y); }
       };
-    }
+    } // namespace internal
 
     template <typename V, class N, class DataFidelityFunction, class RegularityFunction, class Compare>
     double graphcut(const image2d<V>& ima, image2d<bool>& f, const N& nbh, DataFidelityFunction d, RegularityFunction v,
@@ -609,16 +615,24 @@ namespace mln
           switch (e.type)
           {
           case G::SOURCE_EDGE:
-            w             = d(false, ima(graph.target(e) / 2));
-            graph.edge(e) = {w, 0};
+          {
+            typename image2d<V>::site_type pnt = graph.target(e) / 2;
+            w                                  = d(false, ima(pnt));
+            graph.edge(e)                      = {w, 0};
             break;
+          }
           case G::NORMAL_EDGE:
+          {
             graph.edge(e) = {w2, w2};
             break;
+          }
           case G::SINK_EDGE:
-            w             = d(true, ima(graph.source(e) / 2));
-            graph.edge(e) = {w, 0};
+          {
+            typename image2d<V>::site_type pnt = graph.source(e) / 2;
+            w                                  = d(true, ima(pnt));
+            graph.edge(e)                      = {w, 0};
             break;
+          }
           }
 
         mln_foreach (const point2d& p, graph.vertices())
@@ -845,7 +859,7 @@ namespace mln
       std::cout << "Maxflow: " << maxflow << std::endl;
       return maxflow;
     }
-  }
-}
+  } // namespace graphcut
+} // namespace mln
 
 #endif // ! GRAPHCUT_HH

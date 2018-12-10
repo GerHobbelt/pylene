@@ -171,13 +171,15 @@ namespace mln
     using new_const_pixel_type           = details::ndpixel<const T, dim>;
 
     /// \copydoc image::value_type
-    using value_type = T;
+    using value_type[[deprecated]] = T;
+    using new_value_type           = pixel_value_t<new_pixel_type>;
 
     /// \copydoc image::reference
-    using reference = T&;
+    using reference[[deprecated]]     = T&;
+    using new_reference[[deprecated]] = pixel_reference_t<new_pixel_type>;
 
     /// \copydoc image::const_reference
-    using const_reference = const T&;
+    using const_reference[[deprecated]] = const T&;
 
     /// \copydoc image::difference_type
     using difference_type[[deprecated]] = int;
@@ -245,24 +247,28 @@ namespace mln
     /// \{
 
     /// \copydoc image::operator()(const site_type& p) const
-    reference operator()(const site_type& p);
+    [[deprecated]] reference operator()(const site_type& p);
+    new_reference            operator()(const new_point_type& p);
 
     /// \copydoc image::operator()(const site_type& p) const
-    const_reference operator()(const site_type& p) const;
+    [[deprecated]] const_reference operator()(const site_type& p) const;
+    new_reference                  operator()(const new_point_type& p) const;
 
     /// \copydoc image::operator[](size_type i) const
     [[deprecated]] reference operator[](size_type i);
-    reference                operator[](index_type i);
+    new_reference            operator[](index_type i);
 
     /// \copydoc image::operator[](size_type i) const
     [[deprecated]] const_reference operator[](size_type i) const;
-    reference                      operator[](index_type i) const;
+    new_reference                  operator[](index_type i) const;
 
     /// \copydoc image::at(const site_type& p) const
-    reference at(const site_type& p);
+    [[deprecated]] reference at(const site_type& p);
+    new_reference            at(const new_point_type& p);
 
     /// \copydoc image::at(const site_type& p) const
-    const_reference at(const site_type& p) const;
+    [[deprecated]] const_reference at(const site_type& p) const;
+    new_reference                  at(const new_point_type& p) const;
 
     /// \}
 
@@ -270,12 +276,14 @@ namespace mln
     /// \{
 
     /// \copydoc image::pixel_at(const point_type&) const
-    [[deprecated]] pixel_type pixel_at(const point_type& p);
-    new_pixel_type            new_pixel_at(const point_type& p);
+    [[deprecated]] pixel_type     pixel_at(const point_type& p);
+    [[deprecated]] new_pixel_type new_pixel_at(const point_type& p);
+    new_pixel_type                new_pixel_at(const new_point_type& p);
 
     /// \copydoc image::pixel_at(const point_type&) const
-    [[deprecated]] const_pixel_type pixel_at(const point_type& p) const;
-    new_const_pixel_type            new_pixel_at(const point_type& p) const;
+    [[deprecated]] const_pixel_type     pixel_at(const point_type& p) const;
+    [[deprecated]] new_const_pixel_type new_pixel_at(const point_type& p) const;
+    new_pixel_type                      new_pixel_at(const new_point_type& p) const;
 
     /// \copydoc image::pixel_at_index(size_type) const
     [[deprecated]] pixel_type pixel_at_index(size_type i);
@@ -286,12 +294,14 @@ namespace mln
     // new_const_pixel_type new_pixel_at_index(size_type i) const;
 
     /// \copydoc image::pixel(const point_type&) const
-    [[deprecated]] pixel_type pixel(const point_type& p);
-    new_pixel_type            new_pixel(const point_type& p);
+    [[deprecated]] pixel_type     pixel(const point_type& p);
+    [[deprecated]] new_pixel_type new_pixel(const point_type& p);
+    new_pixel_type                new_pixel(const new_point_type& p);
 
     /// \copydoc image::pixel(const point_type&) const
-    [[deprecated]] const_pixel_type pixel(const point_type& p) const;
-    new_const_pixel_type            new_pixel(const point_type& p) const;
+    [[deprecated]] const_pixel_type     pixel(const point_type& p) const;
+    [[deprecated]] new_const_pixel_type new_pixel(const point_type& p) const;
+    new_pixel_type                      new_pixel(const new_point_type& p) const;
 
     /// \}
 

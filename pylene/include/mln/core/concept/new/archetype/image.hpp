@@ -18,8 +18,8 @@ namespace mln::archetypes
   struct Image
   {
     using new_pixel_type = Pixel;
-    using value_type     = pixel_value_t<Pixel>;
-    using reference      = pixel_reference_t<Pixel>;
+    using new_value_type = pixel_value_t<Pixel>;
+    using new_reference  = pixel_reference_t<Pixel>;
     using new_point_type = domain_point_t<Domain>;
     using domain_type    = Domain;
     using category_type  = forward_image_tag;
@@ -80,6 +80,7 @@ namespace mln::archetypes
   struct OutputImage final : Image
   {
     using new_pixel_type = OutputPixel;
+    using new_reference  = pixel_reference_t<OutputPixel>;
 
 
     struct OutputPixelRange final
@@ -139,7 +140,7 @@ namespace mln::archetypes
   struct OutputIndexableImage final : IndexableImage
   {
     using new_pixel_type = OutputPixel;
-    using reference      = pixel_reference_t<OutputPixel>;
+    using new_reference  = pixel_reference_t<OutputPixel>;
 
     image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>) const;
     image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>);
@@ -183,7 +184,7 @@ namespace mln::archetypes
   struct OutputAccessibleImage final : AccessibleImage
   {
     using new_pixel_type = OutputPixel;
-    using reference      = pixel_reference_t<OutputPixel>;
+    using new_reference  = pixel_reference_t<OutputPixel>;
 
     image_reference_t<OutputAccessibleImage> operator()(image_point_t<OutputAccessibleImage>) const;
     image_reference_t<OutputAccessibleImage> operator()(image_point_t<OutputAccessibleImage>);
@@ -243,7 +244,7 @@ namespace mln::archetypes
   struct OutputBidirectionalImage : BidirectionalImage
   {
     using new_pixel_type = OutputPixel;
-    using reference      = pixel_reference_t<OutputPixel>;
+    using new_reference  = pixel_reference_t<OutputPixel>;
 
     struct OutputPixelRange
     {
@@ -315,7 +316,7 @@ namespace mln::archetypes
   struct OutputRawImage final : RawImage
   {
     using new_pixel_type = OutputPixel;
-    using reference      = pixel_reference_t<OutputPixel>;
+    using new_reference  = pixel_reference_t<OutputPixel>;
 
     image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>) const;
     image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>);

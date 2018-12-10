@@ -59,9 +59,9 @@ namespace mln
         std::enable_if_t<dim == (O::ndim - 1)> immersion(const I& input, O& output, mln_point(I) pmin,
                                                          mln_point(I) pmax)
         {
-          auto q = pmin / 2;
-          auto p = pmin;
-          auto a = input(q);
+          mln_point(I) q = pmin / 2;
+          auto p         = pmin;
+          auto a         = input(q);
 
           output(p) = a;
           for (int i = pmin[dim] + 2; i < pmax[dim]; i += 2)
@@ -120,9 +120,9 @@ namespace mln
           return out;
         }
 
-      } // end of namespace mln::morpho::tos::impl
-    }   // end of namespace mln::morpho::tos
-  }     // end of namespace mln::morpho
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
 } // end of namespace mln
 
 

@@ -1,3 +1,4 @@
+#include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/pixels.hpp>
 
 #include <tuple>
@@ -5,40 +6,25 @@
 #include <gtest/gtest.h>
 
 
-namespace concepts = mln::concepts;
+namespace concepts   = mln::concepts;
+namespace archetypes = mln::archetypes;
 
 
 struct A
 {
 };
 
-struct Pix
-{
-  using value_type = int;
-  using point_type = int;
-  using reference  = int&;
-
-  point_type point() const { return pnt; }
-  reference  val() const { return *v; }
-
-private:
-  int  pnt;
-  int* v;
-};
-
-bool operator==(const Pix& lhs, const Pix& rhs)
-{
-  return std::tie(lhs.pnt, *lhs.v) == std::tie(rhs.pnt, *rhs.v);
-}
-
-bool operator!=(const Pix& lhs, const Pix& rhs)
-{
-  return !(lhs == rhs);
-}
-
 TEST(Core, Concept_Pixel)
 {
   static_assert(!concepts::Pixel<int>);
   static_assert(!concepts::Pixel<A>);
-  static_assert(concepts::Pixel<Pix>);
+  static_assert(concepts::Pixel<archetypes::Pixel>);
+}
+
+TEST(Core, Concept_OutputPixel)
+{
+  static_assert(!concepts::OutputPixel<int>);
+  static_assert(!concepts::OutputPixel<A>);
+  static_assert(!concepts::OutputPixel<archetypes::Pixel>);
+  static_assert(concepts::OutputPixel<archetypes::OutputPixel>);
 }

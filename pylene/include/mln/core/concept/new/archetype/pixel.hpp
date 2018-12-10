@@ -12,7 +12,7 @@ namespace mln::archetypes
   {
     using value_type = Value;
     using point_type = Point;
-    using reference  = Value&;
+    using reference  = const value_type&;
 
     point_type point() const;
     reference  val() const;
@@ -28,8 +28,9 @@ namespace mln::archetypes
 
   struct OutputPixel final : Pixel
   {
-    using Pixel::val;
-    reference val();
+    using reference = value_type&;
+
+    reference val() const;
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED

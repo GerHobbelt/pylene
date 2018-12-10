@@ -52,16 +52,16 @@ namespace mln::concepts
     Point<image_point_t<Ima>> &&
     Value<image_value_t<Ima>> &&
     Domain<image_domain_t<Ima>> &&
-    stl::Same<image_point_t<Ima>, pixel_point_t<image_pixel_t<Ima>>> &&
-    stl::Same<image_value_t<Ima>, pixel_value_t<image_pixel_t<Ima>>> &&
-    stl::Same<image_reference_t<Ima>, pixel_reference_t<image_pixel_t<Ima>>> &&
+    stl::Same<pixel_point_t<image_pixel_t<Ima>>, image_point_t<Ima>> &&
+    stl::Same<pixel_value_t<image_pixel_t<Ima>>, image_value_t<Ima>> &&
+    stl::ConvertibleTo<pixel_reference_t<image_pixel_t<Ima>>, image_reference_t<Ima>> &&
     stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&> &&
 		stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&&> &&
 		stl::CommonReference<image_value_t<Ima>&&, const image_value_t<Ima>&> &&
     requires(Ima ima, const Ima cima, image_domain_t<Ima> d, image_point_t<Ima> p) {
       { cima.template ch_value<mln::archetypes::Value>() }
                             -> stl::ConvertibleTo<image_ch_value_t<Ima, mln::archetypes::Value>>&&; // Image builder (FIXME: improve builder design)
-      { cima.concretize() } -> stl::ConvertibleTo<image_concrete_t<Ima>>&&;                             // Image builder (FIXME: improve builder design)
+      { cima.concretize() } -> stl::ConvertibleTo<image_concrete_t<Ima>>&&;                         // Image builder (FIXME: improve builder design)
       { cima.domain() }     -> image_domain_t<Ima>;
       { ima.new_pixels() }  -> stl::ForwardRange&&;
       { ima.new_values() }  -> stl::ForwardRange&&;
@@ -78,6 +78,7 @@ namespace mln::concepts
     template<typename WIma>
     concept WritableImage =
       Image<WIma> &&
+      OutputPixel<image_pixel_t<WIma>> &&
       requires(WIma ima) {
         { ima.new_values() }  -> stl::OutputRange<image_value_t<WIma>>&&;
         // Check Writability of each pixel of the range
@@ -106,10 +107,10 @@ namespace mln::concepts
     } &&
     image_indexable_v<Ima> &&
     requires (const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
-      { cima[k] }                -> image_reference_t<Ima>;
-      { cima.point_of_index(k) } -> image_point_t<Ima>;
-      { cima.index_at_point(p) } -> image_index_t<Ima>;
-      { cima.delta_index(p) }    -> image_index_t<Ima>;
+      { cima[k] }                    -> image_reference_t<Ima>;
+      { cima.new_point_of_index(k) } -> image_point_t<Ima>;
+      { cima.index_at_point(p) }     -> image_index_t<Ima>;
+      { cima.delta_index(p) }        -> image_index_t<Ima>;
     };
 
 
@@ -122,7 +123,7 @@ namespace mln::concepts
       WritableImage<WIma> &&
       IndexableImage<WIma> &&
       requires(WIma ima, image_index_t<WIma> k, image_value_t<WIma> v) {
-        { ima[k] = v };
+        { ima[k] = v } -> image_reference_t<WIma>;
       };
     
   } // namespace detail
@@ -150,8 +151,8 @@ namespace mln::concepts
       detail::WritableImage<WIma> &&
       AccessibleImage<WIma> &&
       requires(WIma ima, image_point_t<WIma> p, image_value_t<WIma> v) {
-        { ima(p) = v };
-        { ima.at(p) = v };
+        { ima(p) = v }    -> image_reference_t<WIma>;
+        { ima.at(p) = v } -> image_reference_t<WIma>;
       };
   
   } // namespace detail
@@ -205,6 +206,7 @@ namespace mln::concepts
       WritableBidirectionalImage<WIma> &&
       RawImage<WIma> &&
       requires(WIma ima, image_value_t<WIma> v) {
+        { ima.data() }        -> stl::ConvertibleTo<image_value_t<WIma>*>&&;
         { *(ima.data()) = v };
       };
   

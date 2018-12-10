@@ -16,15 +16,15 @@ namespace mln::concepts
   {
 
     // RangeValueSame
-    template <typename Rng, typename V>
+    template <typename Rng, typename Val>
     concept RangeValueTypeSameAs =
-      stl::Same<stl::iter_value_t<stl::iterator_t<Rng>>, V>;
+      stl::Same< stl::iter_value_t<stl::iterator_t<Rng>>, Val>;
     
 
     // RangeValueConvertibleTo
-    template <typename Rng, typename V>
+    template <typename Rng, typename Val>
     concept RangeValueTypeConvertibleTo =
-      stl::ConvertibleTo<stl::iter_value_t<stl::iterator_t<Rng>>, V>;
+      stl::ConvertibleTo<stl::iter_value_t<stl::iterator_t<Rng>>, Val>;
 
   }
 

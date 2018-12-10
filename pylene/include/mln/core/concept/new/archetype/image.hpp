@@ -81,13 +81,14 @@ namespace mln::archetypes
   {
     using new_pixel_type = OutputPixel;
 
+
     struct OutputPixelRange final
     {
       using value_type = image_pixel_t<OutputImage>;
       using reference  = image_pixel_t<OutputImage>&;
 
-      new_pixel_type* begin();
-      new_pixel_type* end();
+      value_type* begin();
+      value_type* end();
     };
 
     OutputPixelRange new_pixels();
@@ -124,7 +125,7 @@ namespace mln::archetypes
     using indexable  = std::true_type;
 
     image_reference_t<IndexableImage> operator[](image_index_t<IndexableImage>) const;
-    image_point_t<IndexableImage>     point_of_index(image_index_t<IndexableImage>) const;
+    image_point_t<IndexableImage>     new_point_of_index(image_index_t<IndexableImage>) const;
     image_index_t<IndexableImage>     index_at_point(image_point_t<IndexableImage>) const;
     image_index_t<IndexableImage>     delta_index(image_point_t<IndexableImage>) const;
   };
@@ -137,13 +138,29 @@ namespace mln::archetypes
 
   struct OutputIndexableImage final : IndexableImage
   {
-    using IndexableImage::                  operator[];
+    using new_pixel_type = OutputPixel;
+    using reference      = pixel_reference_t<OutputPixel>;
+
+    image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>) const;
     image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>);
+
+
+    struct OutputPixelRange final
+    {
+      using value_type = image_pixel_t<OutputIndexableImage>;
+      using reference  = image_pixel_t<OutputIndexableImage>&;
+
+      value_type* begin();
+      value_type* end();
+    };
+
+    OutputPixelRange new_pixels();
   };
+
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::IndexableImage<OutputIndexableImage> && mln::concepts::OutputImage<OutputIndexableImage>,
-                "OutputIndexableImage archetype does not model the OutputImage concept!");
+                "OutputIndexableImage archetype does not model the OutputImageconcept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
@@ -165,14 +182,32 @@ namespace mln::archetypes
 
   struct OutputAccessibleImage final : AccessibleImage
   {
-    using AccessibleImage::                  operator();
-    image_reference_t<OutputAccessibleImage> operator[](image_point_t<OutputAccessibleImage>);
+    using new_pixel_type = OutputPixel;
+    using reference      = pixel_reference_t<OutputPixel>;
 
-    using AccessibleImage::at;
+    image_reference_t<OutputAccessibleImage> operator()(image_point_t<OutputAccessibleImage>) const;
+    image_reference_t<OutputAccessibleImage> operator()(image_point_t<OutputAccessibleImage>);
+
+    image_reference_t<OutputAccessibleImage> at(image_point_t<OutputAccessibleImage>) const;
     image_reference_t<OutputAccessibleImage> at(image_point_t<OutputAccessibleImage>);
+
+    image_pixel_t<OutputAccessibleImage> new_pixel(image_point_t<OutputAccessibleImage>) const;
+    image_pixel_t<OutputAccessibleImage> new_pixel_at(image_point_t<OutputAccessibleImage>) const;
+
+    struct OutputPixelRange final
+    {
+      using value_type = image_pixel_t<OutputAccessibleImage>;
+      using reference  = image_pixel_t<OutputAccessibleImage>&;
+
+      value_type* begin();
+      value_type* end();
+    };
+
+    OutputPixelRange new_pixels();
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+
   static_assert(mln::concepts::AccessibleImage<OutputAccessibleImage> &&
                     mln::concepts::OutputImage<OutputAccessibleImage>,
                 "OutputAccessibleImage archetype does not model the OutputImage concept!");
@@ -199,6 +234,7 @@ namespace mln::archetypes
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+
   static_assert(mln::concepts::BidirectionalImage<BidirectionalImage>,
                 "BidirectionalImage archetype does not model the BidirectionalImage concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
@@ -207,14 +243,15 @@ namespace mln::archetypes
   struct OutputBidirectionalImage : BidirectionalImage
   {
     using new_pixel_type = OutputPixel;
+    using reference      = pixel_reference_t<OutputPixel>;
 
     struct OutputPixelRange
     {
       using value_type = image_pixel_t<OutputBidirectionalImage>;
       using reference  = image_pixel_t<OutputBidirectionalImage>&;
 
-      new_pixel_type* begin();
-      new_pixel_type* end();
+      value_type* begin();
+      value_type* end();
     };
 
     struct ReversibleOutputPixelRange final : OutputPixelRange
@@ -240,7 +277,7 @@ namespace mln::archetypes
     using accessible    = std::true_type;
 
     image_reference_t<RawImage> operator[](image_index_t<RawImage>) const;
-    image_point_t<RawImage>     point_of_index(image_index_t<RawImage>) const;
+    image_point_t<RawImage>     new_point_of_index(image_index_t<RawImage>) const;
     image_index_t<RawImage>     index_at_point(image_point_t<RawImage>) const;
     image_index_t<RawImage>     delta_index(image_point_t<RawImage>) const;
 
@@ -270,6 +307,7 @@ namespace mln::archetypes
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+
   static_assert(mln::concepts::RawImage<RawImage>, "RawImage archetype does not model the RawImage concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
@@ -277,14 +315,15 @@ namespace mln::archetypes
   struct OutputRawImage final : RawImage
   {
     using new_pixel_type = OutputPixel;
+    using reference      = pixel_reference_t<OutputPixel>;
 
-    using RawImage::                  operator[];
+    image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>) const;
     image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>);
 
-    using RawImage::                  operator();
-    image_reference_t<OutputRawImage> operator[](image_point_t<OutputRawImage>);
+    image_reference_t<OutputRawImage> operator()(image_point_t<OutputRawImage>) const;
+    image_reference_t<OutputRawImage> operator()(image_point_t<OutputRawImage>);
 
-    using RawImage::at;
+    image_reference_t<OutputRawImage> at(image_point_t<OutputRawImage>) const;
     image_reference_t<OutputRawImage> at(image_point_t<OutputRawImage>);
 
     // Need to be redefined as pixel_type has changed
@@ -297,8 +336,8 @@ namespace mln::archetypes
       using value_type = image_pixel_t<OutputRawImage>;
       using reference  = image_pixel_t<OutputRawImage>&;
 
-      new_pixel_type* begin();
-      new_pixel_type* end();
+      value_type* begin();
+      value_type* end();
     };
 
     struct ReversibleOutputPixelRange final : OutputPixelRange

@@ -32,7 +32,7 @@ namespace mln::details
     using value_type = std::remove_const_t<T>;
     using reference  = T&;
 
-    T&         val() const { return m_lineptr[m_point[N - 1]]; }
+    reference  val() const { return m_lineptr[m_point[N - 1]]; }
     point_type point() const { return m_point; }
 
     T*         m_lineptr;

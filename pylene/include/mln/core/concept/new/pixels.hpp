@@ -41,8 +41,8 @@ namespace mln::concepts
     template <typename Pix>
     concept WritablePixel =
       Pixel<Pix> &&
-      requires(Pix pix, pixel_value_t<Pix> v) {
-        { pix.val() = v };
+      requires(const Pix cpix, pixel_value_t<Pix> v) {
+        { cpix.val() = v }; // Not deep-const, view-semantic.
       };
   
   } // namespace mln::concepts::detail

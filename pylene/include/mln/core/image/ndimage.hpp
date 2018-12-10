@@ -332,7 +332,8 @@ namespace mln
     size_type index_of_point(const point_type& p) const;
 
     /// \copydoc image::point_at_index(size_type i) const
-    point_type point_at_index(size_type i) const;
+    [[deprecated]] point_type point_at_index(size_type i) const;
+    new_point_type            new_point_at_index(index_type i) const;
 
     /// \copydoc image::delta_index(const point_type&) const
     difference_type delta_index(const point_type& p) const;

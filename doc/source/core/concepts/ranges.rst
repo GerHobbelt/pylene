@@ -17,26 +17,24 @@ SegmentedRange
 .. cpp:concept:: template <typename SegRng> SegmentedRange
 
     #. Refines the :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` concept.
-    #. ``SegRng`` must derive from ``multidimensional_range_base``.
     #. ``SegRng`` provides the method ``rows``.
 
     **Notation**
 
-    .. cpp:var:: const SegRng crng
+    .. cpp:var:: SegRng rng
 
     **Valid Expressions**
 
     - All expression from :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` are valid.
 
-    - :cpp:expr:`std::is_base_of_v<mln::ranges::multidimensional_range_base, SegRng>` returns ``true``.
+    - :cpp:expr:`rng.rows()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`stl::iter_value_t<stl::iterator_t<stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>>>` must be the same as :cpp:expr:`stl::iter_value_t<stl::iterator_t<SegRng>>`.
 
-    - :cpp:expr:`crng.rows()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
-
-    **Implementation**d
+    **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
        :language: cpp
-       :lines: 15-21
+       :lines: 15-23
 
 
 ReversibleRange
@@ -49,16 +47,17 @@ ReversibleRange
 
     **Notation**
 
-    .. cpp:var:: const RevRng crng
+    .. cpp:var:: RevRng rng
 
     **Valid Expressions**
 
     - All expression from :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>` are valid.
 
-    - :cpp:expr:`crng.reversed()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`rng.reversed()` return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
+    - :cpp:expr:`stl::iter_value_t<stl::iterator_t<decltype(rng.reversed())>>>` must be the same as :cpp:expr:`stl::iter_value_t<stl::iterator_t<RevRng>>`.
 
-    **Implementation**d
+    **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
        :language: cpp
-       :lines: 25-30
+       :lines: 27-35

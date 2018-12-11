@@ -22,8 +22,8 @@ Concepts
 
 .. _concept-ranges-SegmentedRange:
 
-SegmentedRange (Multidimensional)
-#################################
+Segmented (Multidimensional) Range
+##################################
 
 Let `SegRng` be a type that models :cpp:concept:`SegmentedRange (details) <SegmentedRange>`.
 
@@ -38,19 +38,17 @@ Let `SegRng` inherit all types defined for :cpp:concept:`ForwardRange (stl) <stl
 .. rubric:: Expressions
 
 Let `SegRng` inherit all valid expressions defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
-
-Let :
-    - ``crng`` be an instance of `const SegRng`.
+Let:
+    - ``rng`` be an instance of `SegRng`.
 
 Then we have the following valid expressions :
 
-+-----------------------------------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
-|                  Expression                   |           Return type            | Pre-condition | Post-condition |                                Description                                |
-+===============================================+==================================+===============+================+===========================================================================+
-| ``is_base_of_v<multidimensional_range_base>`` | ``bool``                         | none          | none           | Must return ``true``.                                                     |
-+-----------------------------------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
-| ``crng.rows()``                               | ``/* implementation defined */`` | none          | none           | Return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`. |
-+-----------------------------------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
++----------------+------------------------------------------------------------------------+---------------+----------------+------------------------------------------------------------------------------------------------------+
+|   Expression   |                              Return type                               | Pre-condition | Post-condition |                                             Description                                              |
++================+========================================================================+===============+================+======================================================================================================+
+| ``rng.rows()`` | - models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`         | none          | none           | Return a range of sub-range  where each sub-range is a "line" from the original non-segmented range. |
+|                | - The subrange's `value_type` must be the same as `SegRng::value_type` |               |                |                                                                                                      |
++----------------+------------------------------------------------------------------------+---------------+----------------+------------------------------------------------------------------------------------------------------+
 
 .. rubric:: Description
 
@@ -75,8 +73,8 @@ Example:
 
 .. _concept-ranges-ReversibleRange:
 
-ReversibleRange
-###############
+Reversible Range
+################
  
 Let `RevRng` be a type that models :cpp:concept:`ReversibleRange (details) <ReversibleRange>`.
 
@@ -91,17 +89,17 @@ Let `RevRng` inherit all types defined for :cpp:concept:`ForwardRange (stl) <stl
 .. rubric:: Expressions
 
 Let `RevRng` inherit all valid expressions defined for :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`.
-
-Let :
-    - ``crng`` be an instance of `const RevRng`.
+Let:
+    - ``rng`` be an instance of `RevRng`.
 
 Then we have the following valid expressions :
 
-+---------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
-|     Expression      |           Return type            | Pre-condition | Post-condition |                                Description                                |
-+=====================+==================================+===============+================+===========================================================================+
-| ``crng.reversed()`` | ``/* implementation defined */`` | none          | none           | Return-type models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`. |
-+---------------------+----------------------------------+---------------+----------------+---------------------------------------------------------------------------+
++--------------------+------------------------------------------------------------------------------+---------------+----------------+----------------------------------------------------------------------------------------------------+
+|     Expression     |                                 Return type                                  | Pre-condition | Post-condition |                                            Description                                             |
++====================+==============================================================================+===============+================+====================================================================================================+
+| ``rng.reversed()`` | - models :cpp:concept:`ForwardRange (stl) <stl::ForwardRange>`               | none          | none           | Return a range whose forward browsing is done in the reverse order comparing to the orignal range. |
+|                    | - The returned range's `value_type` must be the same as `SegRng::value_type` |               |                |                                                                                                    |
++--------------------+------------------------------------------------------------------------------+---------------+----------------+----------------------------------------------------------------------------------------------------+
 
 .. rubric:: Description
  

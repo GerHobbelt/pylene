@@ -9,10 +9,19 @@
 #include <meta/meta.hpp>
 
 
-#ifdef CONCEPT_TS_ENABLED
+#ifdef PYLENE_CONCEPT_TS_ENABLED
 
+#ifdef concept
+#define __concept_bool
+#undef concept
+#endif
 
 #include <stl2/concepts.hpp>
+
+#ifdef __concept_bool
+#define concept concept bool
+#undef __concept_bool
+#endif
 
 namespace mln::concepts::stl
 {
@@ -71,4 +80,4 @@ namespace std::experimental::ranges
   } // namespace v1
 } // namespace std::experimental::ranges
 
-#endif
+#endif // PYLENE_CONCEPT_TS_ENABLED

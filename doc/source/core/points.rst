@@ -55,17 +55,6 @@ Then we have the following valid expressions :
 
 
 
-Predefined points
------------------
-
-.. toctree::
-
-   points/point2d
-   points/point3d
-
-
-
-
 Concepts detail
 ---------------
 

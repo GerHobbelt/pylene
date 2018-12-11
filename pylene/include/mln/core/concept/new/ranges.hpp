@@ -2,7 +2,7 @@
 
 #include <mln/core/concept/new/cmcstl2.hpp>
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
+#include <range/v3/utility/iterator_traits.hpp>
 
 
 namespace mln::concepts
@@ -10,26 +10,53 @@ namespace mln::concepts
 
   // clang-format off
 
-#ifdef CONCEPT_TS_ENABLED
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+
+  namespace detail
+  {
+
+    // RangeValueSame
+    template <typename Rng, typename Val>
+    concept RangeValueTypeSameAs =
+      stl::Same< stl::iter_value_t<stl::iterator_t<Rng>>, Val>;
+    
+
+    // RangeValueConvertibleTo
+    template <typename Rng, typename Val>
+    concept RangeValueTypeConvertibleTo =
+      stl::ConvertibleTo<stl::iter_value_t<stl::iterator_t<Rng>>, Val>;
+
+  }
+
+
   // SegmentedRange
   template<typename Rng>
-  concept bool SegmentedRange = 
+  concept SegmentedRange = 
     stl::ForwardRange<Rng> &&
-    std::is_base_of_v<mln::ranges::multidimensional_range_base, Rng> &&
-    requires(const Rng crng) {
-        { crng.rows() } -> stl::ForwardRange&&;
+    requires(Rng rng) {
+      { rng.rows() } -> stl::ForwardRange&&;
+      requires detail::RangeValueTypeSameAs<
+        stl::iter_value_t<stl::iterator_t<decltype(rng.rows())>>,
+        stl::iter_value_t<stl::iterator_t<Rng>>>;
     };
 
 
   // ReversibleRange
   template<typename Rng>
-  concept bool ReversibleRange = 
+  concept ReversibleRange = 
     stl::ForwardRange<Rng> &&
-    requires(const Rng crng) {
-        { crng.reversed() } -> stl::ForwardRange&&;
+    requires(Rng rng) {
+      { rng.reversed() } -> stl::ForwardRange&&;
+      requires detail::RangeValueTypeSameAs<
+        decltype(rng.reversed()),
+        stl::iter_value_t<stl::iterator_t<Rng>>>;
     };
-#endif
+
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 
 } // namespace mln::concepts
+
+// Validate concept
+#include <mln/core/concept/new/archetype/range.hpp>

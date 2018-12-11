@@ -1,10 +1,11 @@
 #pragma once
 
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/utils/blank.hpp>
+
+#include <mln/core/concept/new/concepts.hpp>
 
 #include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/range_concepts.hpp>
@@ -20,9 +21,7 @@
 namespace mln::ranges
 {
   template <typename Fun, typename... Rngs>
-  struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>,
-                         std::conditional_t<std::conjunction_v<is_multidimensional_range<Rngs>...>,
-                                            multidimensional_range_base, mln::details::blank>
+  struct zip_with_view : ::ranges::view_facade<zip_with_view<Fun, Rngs...>, ::ranges::finite>
   {
   private:
     friend ::ranges::range_access;
@@ -79,10 +78,33 @@ namespace mln::ranges
 
       bool equal(const cursor& other) const { return std::get<0>(begins_) == std::get<0>(other.begins_); }
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      void next() requires (mln::concepts::stl::ForwardRange<Rngs> && ...)
+      // clang-format on
+#else
+      template <typename U = void, typename = std::enable_if_t<(::ranges::ForwardRange<Rngs>() && ...)>>
       void next()
+#endif
       {
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
-      } 
+      }
+
+      /*
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      void prev() requires (mln::concepts::stl::BidirectionalRange<Rngs> && ...)
+      // clang-format on
+#else
+      template <typename U = void, typename = std::enable_if_t<(::ranges::BidirectionalRange<Rngs>() && ...)>>
+
+      void prev()
+      #endif
+      */
+      void prev()
+      {
+        std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
+      }
     };
 
     cursor begin_cursor()
@@ -127,14 +149,39 @@ namespace mln::ranges
     {
     }
 
-    template <typename U = void, typename = std::enable_if_t<std::conjunction_v<is_multidimensional_range<Rngs>...>, U>>
-    auto rows() const;
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
+    auto rows() const requires (mln::concepts::SegmentedRange<Rngs> && ...);
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<(is_segmented_range_v<Rngs> && ...), U>>
+    auto rows() const;
+#endif
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
+    auto reversed() const requires (mln::concepts::ReversibleRange<Rngs> && ...);
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<(is_reversible_range_v<Rngs> && ...), U>>
     auto reversed() const;
+#endif
   };
 
   namespace view
   {
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    namespace detail
+    {
+      template <typename... Rngs>
+      // clang-format off
+      concept InputRanges = (mln::concepts::stl::InputRange<Rngs> && ...);
+      // clang-format on
+    } // namespace detail
+#endif
+
     struct zip_with_fn
     {
       template <typename Fun, typename... Rngs>
@@ -142,7 +189,14 @@ namespace mln::ranges
                                    ::ranges::Invocable<Fun&, ::ranges::range_reference_t<Rngs>&&...>>;
 
       template <typename... Rngs, typename Fun, CONCEPT_REQUIRES_(Concept<Fun, Rngs...>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires detail::InputRanges<Rngs...> &&
+               mln::concepts::stl::CopyConstructible<Fun> &&
+               mln::concepts::stl::CopyConstructible<Fun&, ::ranges::range_reference_t<Rngs>&&...>
+#endif
       auto operator()(Fun fun, Rngs&&... rngs) const
+      // clang-format on
       {
         return zip_with_view<Fun, ::ranges::view::all_t<Rngs>...>{std::move(fun),
                                                                   ::ranges::view::all(static_cast<Rngs&&>(rngs))...};
@@ -169,26 +223,36 @@ namespace mln::ranges
 
 
   template <typename Fun, typename... Rngs>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  // clang-format off
+      auto zip_with_view<Fun, Rngs...>::rows() const requires (mln::concepts::SegmentedRange<Rngs> && ...)
+  // clang-format on
+#else
   template <typename U, typename>
   auto zip_with_view<Fun, Rngs...>::rows() const
+#endif
   {
     // Zip function for rows
-    auto row_zipper = [fun = this->fun_](auto&&... rows)
-    {
+    auto row_zipper = [fun = this->fun_](auto&&... rows) {
       return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
     };
 
-    // Apply row-zipper on each range after segmentation
+    // Apply rows-row-zipper on each range after segmentation
     return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
   }
 
 
   template <typename Fun, typename... Rngs>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  // clang-format off
+      auto zip_with_view<Fun, Rngs...>::reversed() const requires (mln::concepts::ReversibleRange<Rngs> && ...)
+  // clang-format on
+#else
+  template <typename U, typename>
   auto zip_with_view<Fun, Rngs...>::reversed() const
+#endif
   {
-    auto reverse_row_zipper = [fun = this->fun_](auto&&... rows) {
-      return view::zip_with(fun, view::reverse(std::forward<decltype(rows)>(rows))...);
-    };
+    auto reverse_row_zipper = [fun = this->fun_](const auto&... rng) { return view::zip_with(fun, rng.reversed()...); };
 
     // Apply reverse-row-zipper on each range
     return std::apply(reverse_row_zipper, rngs_);

@@ -7,14 +7,17 @@ namespace mln::concepts
 
   // clang-format off
 
-#ifdef CONCEPT_TS_ENABLED
+#ifdef PYLENE_CONCEPT_TS_ENABLED
   // Point
   template<typename Pnt>
-  concept bool Point =
+  concept Point =
     stl::Regular<Pnt> &&
     stl::StrictTotallyOrdered<Pnt>;
-#endif
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 
 } // namespace mln::concepts
+
+// Validate concept
+#include <mln/core/concept/new/archetype/point.hpp>

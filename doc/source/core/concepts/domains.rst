@@ -18,7 +18,6 @@ Domain
 
     #. Refines the :cpp:concept:`Regular <stl::Regular>` concept.
     #. ``Dom::point_type`` models :cpp:concept:`Point <Point>` concept.
-    #. ``Dom::codomain_type`` models :cpp:concept:`Value <Value>` concept, is non-const and is not a reference.
     #. ``Dom`` provides methods `has`, `shape`, `empty`, `is_continuous`, `is_discrete` and `points`.
 
     **Notation**
@@ -52,12 +51,10 @@ Domain
 
     - :cpp:expr:`cdom.has(p)` return-type models :cpp:concept:`Boolean <stl::Boolean>`.
     - :cpp:expr:`cdom.empty()` return-type models :cpp:concept:`Boolean <stl::Boolean>`.
-    - :cpp:expr:`cdom.is_continuous()` return-type models :cpp:concept:`Boolean <stl::Boolean>`.
-    - :cpp:expr:`cdom.is_discrete()` return-type models :cpp:concept:`Boolean <stl::Boolean>`.
-    - :cpp:expr:`cdom.points()` return-type models :cpp:concept:`BidirectionalRange <stl::BidirectionalRange>`.
+    - :cpp:expr:`cdom.size()` return-type models :cpp:concept:`UnsignedIntegral <stl::UnsignedIntegral>`.
 
     **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/domains.hpp
        :language: cpp
-       :lines: 17-34
+       :lines: 17-25

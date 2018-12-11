@@ -53,8 +53,9 @@ namespace mln::concepts
     Value<image_value_t<Ima>> &&
     Domain<image_domain_t<Ima>> &&
     stl::ConvertibleTo<pixel_point_t<image_pixel_t<Ima>>, image_point_t<Ima>> &&
-    stl::Same<pixel_value_t<image_pixel_t<Ima>>, image_value_t<Ima>> &&
     stl::ConvertibleTo<pixel_reference_t<image_pixel_t<Ima>>, image_reference_t<Ima>> &&
+    // Here we don't want a convertible constraint as value_type is the decayed type and should really be the same
+    stl::Same<pixel_value_t<image_pixel_t<Ima>>, image_value_t<Ima>> && 
     stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&> &&
 		stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&&> &&
 		stl::CommonReference<image_value_t<Ima>&&, const image_value_t<Ima>&> &&
@@ -107,7 +108,7 @@ namespace mln::concepts
     } &&
     image_indexable_v<Ima> &&
     requires (Ima ima, const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
-      { ima[k] }                  -> image_reference_t<Ima>;
+      { ima[k] }                  -> image_reference_t<Ima>; // For concrete image it returns a const_reference
       { cima.point_at_index(k) }  -> image_point_t<Ima>;
       { cima.index_of_point(p) }  -> image_index_t<Ima>;
       { cima.delta_index(p) }     -> image_index_t<Ima>;
@@ -135,10 +136,10 @@ namespace mln::concepts
     Image<Ima> &&
     image_accessible_v<Ima> &&
     requires (Ima ima, image_point_t<Ima> p) {
-      { ima(p) }              -> image_reference_t<Ima>;
-      { ima.at(p) }           -> image_reference_t<Ima>;
-      { ima.new_pixel(p) }    -> image_pixel_t<Ima>;
-      { ima.new_pixel_at(p) } -> image_pixel_t<Ima>;
+      { ima(p) }              -> image_reference_t<Ima>; // For concrete image it returns a const_reference
+      { ima.at(p) }           -> image_reference_t<Ima>; // idem
+      { ima.new_pixel(p) }    -> image_pixel_t<Ima>; // For concrete image pixel may propagate constness
+      { ima.new_pixel_at(p) } -> image_pixel_t<Ima>; // idem
     };
 
 
@@ -189,7 +190,7 @@ namespace mln::concepts
     BidirectionalImage<Ima> &&
     stl::DerivedFrom<image_category_t<Ima>, raw_image_tag> &&
     requires (Ima ima, const Ima cima, int dim) {
-      { ima.data() }        -> stl::ConvertibleTo<const image_value_t<Ima>*>&&;
+      { ima.data() }        -> stl::ConvertibleTo<const image_value_t<Ima>*>&&; // data() may be proxied by a view
       { cima.strides(dim) } -> std::ptrdiff_t;
     };
 

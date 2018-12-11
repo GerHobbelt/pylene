@@ -20,7 +20,7 @@ namespace mln::archetypes
     using new_pixel_type = Pixel;
     using value_type = pixel_value_t<Pixel>;
     using reference  = pixel_reference_t<Pixel>;
-    using new_point_type = domain_point_t<Domain>;
+    using point_type = domain_point_t<Domain>;
     using domain_type    = Domain;
     using category_type  = forward_image_tag;
     using concrete_type  = Image;
@@ -136,8 +136,8 @@ namespace mln::archetypes
     using indexable  = std::true_type;
 
     image_reference_t<IndexableImage> operator[](image_index_t<IndexableImage>) const;
-    image_point_t<IndexableImage>     new_point_at_index(image_index_t<IndexableImage>) const;
-    image_index_t<IndexableImage>     new_index_of_point(image_point_t<IndexableImage>) const;
+    image_point_t<IndexableImage>     point_at_index(image_index_t<IndexableImage>) const;
+    image_index_t<IndexableImage>     index_of_point(image_point_t<IndexableImage>) const;
     image_index_t<IndexableImage>     delta_index(image_point_t<IndexableImage>) const;
   };
 
@@ -288,8 +288,8 @@ namespace mln::archetypes
     using accessible    = std::true_type;
 
     image_reference_t<RawImage> operator[](image_index_t<RawImage>) const;
-    image_point_t<RawImage>     new_point_at_index(image_index_t<RawImage>) const;
-    image_index_t<RawImage>     new_index_of_point(image_point_t<RawImage>) const;
+    image_point_t<RawImage>     point_at_index(image_index_t<RawImage>) const;
+    image_index_t<RawImage>     index_of_point(image_point_t<RawImage>) const;
     image_index_t<RawImage>     delta_index(image_point_t<RawImage>) const;
 
     image_reference_t<RawImage> operator()(image_point_t<RawImage>) const;

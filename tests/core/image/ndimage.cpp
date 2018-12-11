@@ -11,7 +11,7 @@
 namespace concepts = mln::concepts;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-template <concepts::BidirectionalImage Ima>
+template <concepts::AccessibleImage Ima>
 void foo(Ima)
 {
 }

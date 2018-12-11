@@ -52,7 +52,7 @@ namespace mln::concepts
     Point<image_point_t<Ima>> &&
     Value<image_value_t<Ima>> &&
     Domain<image_domain_t<Ima>> &&
-    stl::Same<pixel_point_t<image_pixel_t<Ima>>, image_point_t<Ima>> &&
+    stl::ConvertibleTo<pixel_point_t<image_pixel_t<Ima>>, image_point_t<Ima>> &&
     stl::Same<pixel_value_t<image_pixel_t<Ima>>, image_value_t<Ima>> &&
     stl::ConvertibleTo<pixel_reference_t<image_pixel_t<Ima>>, image_reference_t<Ima>> &&
     stl::CommonReference<image_reference_t<Ima>&&, image_value_t<Ima>&> &&
@@ -106,11 +106,11 @@ namespace mln::concepts
       typename image_index_t<Ima>;
     } &&
     image_indexable_v<Ima> &&
-    requires (const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
-      { cima[k] }                    -> image_reference_t<Ima>;
-      { cima.new_point_at_index(k) } -> image_point_t<Ima>;
-      { cima.new_index_of_point(p) } -> image_index_t<Ima>;
-      { cima.delta_index(p) }        -> image_index_t<Ima>;
+    requires (Ima ima, const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
+      { ima[k] }                  -> image_reference_t<Ima>;
+      { cima.point_at_index(k) }  -> image_point_t<Ima>;
+      { cima.index_of_point(p) }  -> image_index_t<Ima>;
+      { cima.delta_index(p) }     -> image_index_t<Ima>;
     };
 
 
@@ -134,11 +134,11 @@ namespace mln::concepts
   concept AccessibleImage =
     Image<Ima> &&
     image_accessible_v<Ima> &&
-    requires (const Ima cima, image_point_t<Ima> p) {
-      { cima(p) }              -> image_reference_t<Ima>;
-      { cima.at(p) }           -> image_reference_t<Ima>;
-      { cima.new_pixel(p) }    -> image_pixel_t<Ima>;
-      { cima.new_pixel_at(p) } -> image_pixel_t<Ima>;
+    requires (Ima ima, image_point_t<Ima> p) {
+      { ima(p) }              -> image_reference_t<Ima>;
+      { ima.at(p) }           -> image_reference_t<Ima>;
+      { ima.new_pixel(p) }    -> image_pixel_t<Ima>;
+      { ima.new_pixel_at(p) } -> image_pixel_t<Ima>;
     };
 
 
@@ -188,8 +188,8 @@ namespace mln::concepts
     AccessibleImage<Ima> &&
     BidirectionalImage<Ima> &&
     stl::DerivedFrom<image_category_t<Ima>, raw_image_tag> &&
-    requires (const Ima cima, int dim) {
-      { cima.data() }       -> stl::ConvertibleTo<const image_value_t<Ima>*>&&;
+    requires (Ima ima, const Ima cima, int dim) {
+      { ima.data() }        -> stl::ConvertibleTo<const image_value_t<Ima>*>&&;
       { cima.strides(dim) } -> std::size_t;
     };
 

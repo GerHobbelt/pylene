@@ -245,22 +245,22 @@ namespace mln
     /// \{
 
     /// \copydoc image::operator()(const site_type& p) const
-    [[deprecated]] reference operator()(const site_type& p);
+    reference operator()(const site_type& p);
 
     /// \copydoc image::operator()(const site_type& p) const
-    [[deprecated]] const_reference operator()(const site_type& p) const;
+    const_reference operator()(const site_type& p) const;
 
     /// \copydoc image::operator[](size_type i) const
-    [[deprecated]] reference operator[](size_type i);
+    reference operator[](size_type i);
 
     /// \copydoc image::operator[](size_type i) const
-    [[deprecated]] const_reference operator[](size_type i) const;
+    const_reference operator[](size_type i) const;
 
     /// \copydoc image::at(const site_type& p) const
-    [[deprecated]] reference at(const site_type& p);
+    reference at(const site_type& p);
 
     /// \copydoc image::at(const site_type& p) const
-    [[deprecated]] const_reference at(const site_type& p) const;
+    const_reference at(const site_type& p) const;
 
     /// \}
 
@@ -342,16 +342,28 @@ namespace mln
     /// \name Concrete-related Image Methods
     /// \{
 
-    // FIXME: to implement
-    concrete_type concretize() const;
+    const concrete_type concretize() const { return *static_cast<const concrete_type*>(this); }
+    concrete_type       concretize() { return *static_cast<concrete_type*>(this); }
 
-    // FIXME: to implement
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    ch_value_type<Val> ch_value() const;
+    const ch_value_type<Val> ch_value() const
+    {
+      return {concretize(), mln::init()};
+    }
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    template <concepts::Value Val>
+#else
+    template <typename Val>
+#endif // PYLENE_CONCEPT_TS_ENABLED
+    ch_value_type<Val> ch_value()
+    {
+      return {concretize(), mln::init()};
+    }
 
     /// \brief Resize the image to fit \p domain.
     ///
@@ -382,10 +394,11 @@ namespace mln
 
     // As a Raw Image
     const std::size_t* strides() const;
-    std::ptrdiff_t     strides(int d) const;
-    const_pointer      data() const;
-    pointer            data();
     int                border() const { return m_border; }
+
+    std::ptrdiff_t strides(int d) const { return m_strides[static_cast<size_t>(d)]; }
+    const_pointer  data() const { return reinterpret_cast<const_pointer>(m_data->buffer); }
+    pointer        data() { return reinterpret_cast<pointer>(m_data->buffer); }
 
     // Specialized algorithm
     template <typename T_, unsigned dim_, typename E_, typename Domain_>

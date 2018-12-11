@@ -83,7 +83,7 @@ namespace mln::concepts
       requires(WIma ima) {
         { ima.new_values() }  -> stl::OutputRange<image_value_t<WIma>>&&;
         // Check Writability of each pixel of the range
-        requires OutputPixel<stl::iter_value_t<stl::iterator_t<decltype(ima.new_pixels())>>>;
+        requires OutputPixel<std::common_type_t<image_pixel_t<WIma>, stl::iter_value_t<stl::iterator_t<decltype(ima.new_pixels())>>>>;
       };
 
   } // namespace detail

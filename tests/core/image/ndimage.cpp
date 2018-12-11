@@ -50,8 +50,7 @@ TEST(Core, Image_OutputImage2D)
 {
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
-  // foo(mln::image2d<int>{});
-  // bar(mln::details::ndpix<int, 2>{});
+  foo(mln::image2d<int>{});
 
   // static_assert(concepts::OutputImage<mln::image2d<int>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED

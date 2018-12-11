@@ -39,7 +39,7 @@ namespace mln
     other.m_domain      = domain;
     other.m_border      = image.m_border; // FIXME
     other.m_ptr         = (char*)&image(domain.pmin);
-    other.m_last        = (char*)&image(typename Domain_::point_type(domain.pmax - 1));
+    other.m_last        = (char*)&image(domain.pmax - 1);
     other.m_ptr_origin  = image.m_ptr_origin;
     other.m_index_first = image.index_of_point(domain.pmin);
     other.m_index_last  = image.index_of_point(domain.pmax - 1);

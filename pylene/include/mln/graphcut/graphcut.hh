@@ -389,15 +389,9 @@ namespace mln
         Etype& edge_at(const edge_type& e)
         {
           if (e.type == SOURCE_EDGE)
-          {
-            point2d pnt = e.p / 2;
-            return m_src.at(pnt);
-          }
+            return m_src.at(e.p / 2);
           else if (e.type == SINK_EDGE)
-          {
-            point2d pnt = e.p / 2;
-            return m_sink.at(pnt);
-          }
+            return m_sink.at(e.p / 2);
           else
             return base::edge_at(e.p);
         }
@@ -616,9 +610,8 @@ namespace mln
           {
           case G::SOURCE_EDGE:
           {
-            typename image2d<V>::site_type pnt = graph.target(e) / 2;
-            w                                  = d(false, ima(pnt));
-            graph.edge(e)                      = {w, 0};
+            w             = d(false, ima(graph.target(e) / 2));
+            graph.edge(e) = {w, 0};
             break;
           }
           case G::NORMAL_EDGE:
@@ -628,9 +621,8 @@ namespace mln
           }
           case G::SINK_EDGE:
           {
-            typename image2d<V>::site_type pnt = graph.source(e) / 2;
-            w                                  = d(true, ima(pnt));
-            graph.edge(e)                      = {w, 0};
+            w             = d(true, ima(graph.source(e) / 2));
+            graph.edge(e) = {w, 0};
             break;
           }
           }

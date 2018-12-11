@@ -72,7 +72,7 @@ long bench_indexes(const image2d<int>& ima)
       int p   = idx + j; // * ima.index_strides()[1];
       int sum = 0;
       for (int offset : offsets)
-        sum += ima[image2d<int>::size_type(p + offset)];
+        sum += ima[p + offset];
       u += sum;
     }
     idx += static_cast<int>(ima.index_strides()[0]);

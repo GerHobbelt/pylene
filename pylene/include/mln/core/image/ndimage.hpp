@@ -171,12 +171,10 @@ namespace mln
     using new_const_pixel_type           = details::ndpixel<const T, dim>;
 
     /// \copydoc image::value_type
-    using value_type[[deprecated]] = T;
-    using new_value_type           = pixel_value_t<new_pixel_type>;
+    using value_type = T;
 
     /// \copydoc image::reference
-    using reference[[deprecated]]     = T&;
-    using new_reference[[deprecated]] = pixel_reference_t<new_pixel_type>;
+    using reference = T&;
 
     /// \copydoc image::const_reference
     using const_reference[[deprecated]] = const T&;
@@ -248,27 +246,27 @@ namespace mln
 
     /// \copydoc image::operator()(const site_type& p) const
     [[deprecated]] reference operator()(const site_type& p);
-    new_reference            operator()(const new_point_type& p);
+    reference                operator()(const new_point_type& p);
 
     /// \copydoc image::operator()(const site_type& p) const
     [[deprecated]] const_reference operator()(const site_type& p) const;
-    new_reference                  operator()(const new_point_type& p) const;
+    reference                      operator()(const new_point_type& p) const;
 
     /// \copydoc image::operator[](size_type i) const
     [[deprecated]] reference operator[](size_type i);
-    new_reference            operator[](index_type i);
+    reference                operator[](index_type i);
 
     /// \copydoc image::operator[](size_type i) const
     [[deprecated]] const_reference operator[](size_type i) const;
-    new_reference                  operator[](index_type i) const;
+    reference                      operator[](index_type i) const;
 
     /// \copydoc image::at(const site_type& p) const
     [[deprecated]] reference at(const site_type& p);
-    new_reference            at(const new_point_type& p);
+    reference                at(const new_point_type& p);
 
     /// \copydoc image::at(const site_type& p) const
     [[deprecated]] const_reference at(const site_type& p) const;
-    new_reference                  at(const new_point_type& p) const;
+    reference                      at(const new_point_type& p) const;
 
     /// \}
 

@@ -8,10 +8,10 @@ namespace mln
   using image_pixel_t = typename I::new_pixel_type;
 
   template <class I>
-  using image_reference_t = typename I::new_reference;
+  using image_reference_t = typename I::reference;
 
   template <class I>
-  using image_value_t = typename I::new_value_type;
+  using image_value_t = typename I::value_type;
 
   template <class I>
   using image_point_t = typename I::new_point_type;

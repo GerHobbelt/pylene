@@ -29,8 +29,8 @@ namespace mln::concepts
     !std::is_const_v<pixel_value_t<Pix>> &&
     !std::is_reference_v<pixel_value_t<Pix>> &&
     requires(const Pix cpix) {
-      { cpix.point() } -> stl::Same<pixel_point_t<Pix>>&&;
-      { cpix.val() }   -> stl::Same<pixel_reference_t<Pix>>&&;
+      { cpix.point() } -> stl::ConvertibleTo<pixel_point_t<Pix>>&&;
+      { cpix.val() }   -> stl::ConvertibleTo<pixel_reference_t<Pix>>&&;
     };
 
 
@@ -38,11 +38,12 @@ namespace mln::concepts
   {
 
     // WritablePixel
-    template <typename Pix>
+    template <typename WPix>
     concept WritablePixel =
-      Pixel<Pix> &&
-      requires(const Pix cpix, pixel_value_t<Pix> v) {
-        { cpix.val() = v }; // Not deep-const, view-semantic.
+      Pixel<WPix> &&
+      requires(const WPix cpix, pixel_value_t<WPix> v) {
+        // Not deep-const, view-semantic.
+        { cpix.val() = v }  -> stl::ConvertibleTo<pixel_reference_t<WPix>>&&;
       };
   
   } // namespace mln::concepts::detail

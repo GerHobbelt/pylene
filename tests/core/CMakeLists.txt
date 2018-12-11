@@ -37,9 +37,6 @@ add_core_test(${test_prefix}sliding_wpiter   neighborhood/sliding_wpiter.cpp)
 add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)
 add_core_test(${test_prefix}wneighborhood    neighborhood/wneighborhood.cpp)
 
-# test Pixel
-add_core_test(${test_prefix}pixel_ndpixel      pixel/ndpixel.cpp)
-
 # test Extension
 add_core_test(${test_prefix}extension_fill     extension/fill.cpp)
 

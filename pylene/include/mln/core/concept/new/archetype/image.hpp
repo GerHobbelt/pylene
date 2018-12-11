@@ -77,7 +77,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputImage final : Image
+  struct OutputImage : Image
   {
     using new_pixel_type = OutputPixel;
     using new_reference  = pixel_reference_t<OutputPixel>;
@@ -117,6 +117,16 @@ namespace mln::archetypes
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::ForwardImage<ForwardImage>,
                 "ForwardImage archetype does not model the ForwardImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+
+  struct OutputForwardImage final : OutputImage
+  {
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::ForwardImage<OutputForwardImage> && mln::concepts::OutputImage<OutputForwardImage>,
+                "OutputForwardImage archetype does not model the OutputImage concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
@@ -161,7 +171,7 @@ namespace mln::archetypes
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::IndexableImage<OutputIndexableImage> && mln::concepts::OutputImage<OutputIndexableImage>,
-                "OutputIndexableImage archetype does not model the OutputImageconcept!");
+                "OutputIndexableImage archetype does not model the OutputImage concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
@@ -358,4 +368,22 @@ namespace mln::archetypes
                 "OutputRawImage archetype does not model the OutputImage concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
+
+  struct ExtendedImage : Image
+  {
+    struct Extension
+    {
+    };
+
+    using extension_type = Extension;
+
+    using extension_category = mln::extension::custom_extension_tag;
+
+    image_extension_t<ExtendedImage> extension() const;
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::ExtendedImage<ExtendedImage>,
+                "ExtendedImage archetype does not model the ExtendedImage concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
 } // namespace mln::archetypes

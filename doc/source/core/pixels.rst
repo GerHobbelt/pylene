@@ -74,16 +74,6 @@ If the `value_type` is constant then the value returned by `value()` (which retu
 
 
 
-Predefined pixels
------------------
-
-.. toctree::
-
-   pixels/ndpixel
-
-
-
-
 Concepts detail
 ---------------
 

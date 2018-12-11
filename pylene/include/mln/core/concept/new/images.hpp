@@ -217,10 +217,14 @@ namespace mln::concepts
   // Usage: RawImage<I> && OutputImage<I>
   template <typename Ima>
   concept OutputImage =
-    (Image<Ima> && detail::WritableImage<Ima>) ||                           // alias for Image and ForwardImage
-    (IndexableImage<Ima> && detail::WritableIndexableImage<Ima>) ||
-    (AccessibleImage<Ima> && detail::WritableAccessibleImage<Ima>) ||
-    (BidirectionalImage<Ima> && detail::WritableBidirectionalImage<Ima>) ||
+    (Image<Ima>&& detail::WritableImage<Ima> && not IndexableImage<Ima> && not AccessibleImage<Ima> &&
+      not BidirectionalImage<Ima> && not RawImage<Ima>) ||
+    (IndexableImage<Ima> && detail::WritableIndexableImage<Ima> && not AccessibleImage<Ima> &&
+      not BidirectionalImage<Ima> && not RawImage<Ima>) ||
+    (AccessibleImage<Ima> && detail::WritableAccessibleImage<Ima> && not IndexableImage<Ima> &&
+      not BidirectionalImage<Ima> && not RawImage<Ima>) ||
+    (BidirectionalImage<Ima> && detail::WritableBidirectionalImage<Ima> && not IndexableImage<Ima> &&
+      not AccessibleImage<Ima> && not RawImage<Ima>) ||
     (RawImage<Ima> && detail::WritableRawImage<Ima>);
 
 

@@ -62,11 +62,6 @@ Core Module
 
    * :ref:`Point <concept-points-Point>`
 
-.. topic:: Predefined points
-
-   * :doc:`core/points/point2d`
-   * :doc:`core/points/point3d`
-
 
 
 
@@ -82,10 +77,6 @@ Core Module
 
    * :ref:`Pixel <concept-pixels-Pixel>`
 
-.. topic:: Predefined points
-
-   * :doc:`core/pixels/ndpixel`
-
 
 
 
@@ -100,11 +91,6 @@ Core Module
 .. topic:: Concepts
 
    * :ref:`Domain <concept-domains-Domain>`
-
-.. topic:: Predefined domains
-
-   * :doc:`core/domains/box2d`
-   * :doc:`core/domains/box3d`
 
 
 

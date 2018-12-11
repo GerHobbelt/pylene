@@ -70,16 +70,6 @@ Then we have the following valid expressions :
 
 
 
-Predefined domains
-------------------
-
-.. toctree::
-
-   domains/box2d
-   domains/box3d
-
-
-
 
 Concepts detail
 ---------------

@@ -18,9 +18,9 @@ namespace mln::archetypes
   struct Image
   {
     using new_pixel_type = Pixel;
-    using value_type = pixel_value_t<Pixel>;
-    using reference  = pixel_reference_t<Pixel>;
-    using point_type = domain_point_t<Domain>;
+    using value_type     = pixel_value_t<Pixel>;
+    using reference      = pixel_reference_t<Pixel>;
+    using point_type     = domain_point_t<Domain>;
     using domain_type    = Domain;
     using category_type  = forward_image_tag;
     using concrete_type  = Image;
@@ -80,7 +80,7 @@ namespace mln::archetypes
   struct OutputImage : Image
   {
     using new_pixel_type = OutputPixel;
-    using reference  = pixel_reference_t<OutputPixel>;
+    using reference      = pixel_reference_t<OutputPixel>;
 
 
     struct OutputPixelRange final
@@ -150,7 +150,7 @@ namespace mln::archetypes
   struct OutputIndexableImage final : IndexableImage
   {
     using new_pixel_type = OutputPixel;
-    using reference  = pixel_reference_t<OutputPixel>;
+    using reference      = pixel_reference_t<OutputPixel>;
 
     image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>) const;
     image_reference_t<OutputIndexableImage> operator[](image_index_t<OutputIndexableImage>);
@@ -194,7 +194,7 @@ namespace mln::archetypes
   struct OutputAccessibleImage final : AccessibleImage
   {
     using new_pixel_type = OutputPixel;
-    using reference  = pixel_reference_t<OutputPixel>;
+    using reference      = pixel_reference_t<OutputPixel>;
 
     image_reference_t<OutputAccessibleImage> operator()(image_point_t<OutputAccessibleImage>) const;
     image_reference_t<OutputAccessibleImage> operator()(image_point_t<OutputAccessibleImage>);
@@ -254,7 +254,7 @@ namespace mln::archetypes
   struct OutputBidirectionalImage : BidirectionalImage
   {
     using new_pixel_type = OutputPixel;
-    using reference  = pixel_reference_t<OutputPixel>;
+    using reference      = pixel_reference_t<OutputPixel>;
 
     struct OutputPixelRange
     {
@@ -314,7 +314,7 @@ namespace mln::archetypes
 
 
     const image_value_t<RawImage>* data() const;
-    std::size_t                    strides(int) const;
+    std::ptrdiff_t                 strides(int) const;
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -326,7 +326,7 @@ namespace mln::archetypes
   struct OutputRawImage final : RawImage
   {
     using new_pixel_type = OutputPixel;
-    using reference  = pixel_reference_t<OutputPixel>;
+    using reference      = pixel_reference_t<OutputPixel>;
 
     image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>) const;
     image_reference_t<OutputRawImage> operator[](image_index_t<OutputRawImage>);

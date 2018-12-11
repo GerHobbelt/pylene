@@ -182,8 +182,9 @@ namespace mln
     using difference_type[[deprecated]] = int;
 
     /// \copydoc image::size_type
+    // FIXME: switch to signed when concept is consolidated
     using size_type[[deprecated]] = unsigned;
-    using index_type              = int;
+    using index_type              = size_type;
 
     using pointer       = T*;
     using const_pointer = const T*;
@@ -251,11 +252,9 @@ namespace mln
 
     /// \copydoc image::operator[](size_type i) const
     [[deprecated]] reference operator[](size_type i);
-    reference                operator[](index_type i);
 
     /// \copydoc image::operator[](size_type i) const
     [[deprecated]] const_reference operator[](size_type i) const;
-    reference                      operator[](index_type i) const;
 
     /// \copydoc image::at(const site_type& p) const
     [[deprecated]] reference at(const site_type& p);
@@ -383,6 +382,9 @@ namespace mln
 
     // As a Raw Image
     const std::size_t* strides() const;
+    std::ptrdiff_t     strides(int d) const;
+    const_pointer      data() const;
+    pointer            data();
     int                border() const { return m_border; }
 
     // Specialized algorithm
@@ -443,8 +445,8 @@ namespace mln
 
     T*                              m_ptr_origin;    ///< Pointer to the first element (pmin)
     std::array<std::ptrdiff_t, dim> m_index_strides; ///< Strides in number of elements (including the border)
-    size_t                          m_index_first;   ///< index of pmin
-    size_t                          m_index_last;    ///< index of pmax-1
+    size_type                       m_index_first;   ///< index of pmin
+    size_type                       m_index_last;    ///< index of pmax-1
   };
 
   /******************************/

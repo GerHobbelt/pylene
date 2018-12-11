@@ -190,7 +190,7 @@ namespace mln::concepts
     stl::DerivedFrom<image_category_t<Ima>, raw_image_tag> &&
     requires (Ima ima, const Ima cima, int dim) {
       { ima.data() }        -> stl::ConvertibleTo<const image_value_t<Ima>*>&&;
-      { cima.strides(dim) } -> std::size_t;
+      { cima.strides(dim) } -> std::ptrdiff_t;
     };
 
 

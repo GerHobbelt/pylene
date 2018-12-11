@@ -14,7 +14,6 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 image2d<uint8> naive_median(const image2d<uint8>& f, se::rect2d win, int sz)
 {

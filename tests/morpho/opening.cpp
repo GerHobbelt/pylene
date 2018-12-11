@@ -13,7 +13,6 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 TEST(Morpho, opening_closing_opening_0)
 {

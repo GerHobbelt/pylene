@@ -11,7 +11,6 @@
 #include <gtest/gtest.h>
 
 using namespace mln;
-#define MLN_IMG_PATH "../../img/"
 
 // Check that dilation/erosion are adjunctions
 TEST(Morpho, erode_0)

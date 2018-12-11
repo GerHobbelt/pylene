@@ -1,7 +1,8 @@
-#ifndef MLN_CORE_IMAGE_NDIMAGE_PIXEL_HPP
-#define MLN_CORE_IMAGE_NDIMAGE_PIXEL_HPP
+#pragma once
 
 #include <mln/core/image/ndimage.hpp>
+
+#include <type_traits>
 
 namespace mln
 {
@@ -100,7 +101,7 @@ namespace mln
       {
       }
     };
-  }
+  } // namespace details
 
   template <class T, unsigned dim, class I>
   struct ndimage_pixel : details::ndimage_pixel_base<T, dim>, Pixel<ndimage_pixel<T, dim, I>>
@@ -134,6 +135,17 @@ namespace mln
 
     image_type* m_ima;
   };
-}
 
-#endif
+  template <class T, unsigned dim, class I1, class I2>
+  bool operator==(const ndimage_pixel<T, dim, I1>& lhs, const ndimage_pixel<T, dim, I2>& rhs)
+  {
+    return lhs.val() == rhs.val() && lhs.point() == rhs.point();
+  }
+
+  template <class T, unsigned dim, class I1, class I2>
+  bool operator!=(const ndimage_pixel<T, dim, I1>& lhs, const ndimage_pixel<T, dim, I2>& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+} // namespace mln

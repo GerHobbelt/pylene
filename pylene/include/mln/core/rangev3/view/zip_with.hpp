@@ -176,7 +176,7 @@ namespace mln::ranges
     {
       template <typename... Rngs>
       // clang-format off
-      concept bool InputRanges = (mln::concepts::stl::InputRange<Rngs> && ...);
+      concept InputRanges = (mln::concepts::stl::InputRange<Rngs> && ...);
       // clang-format on
     } // namespace detail
 #endif

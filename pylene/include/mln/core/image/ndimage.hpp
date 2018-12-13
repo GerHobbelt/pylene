@@ -342,27 +342,16 @@ namespace mln
     /// \name Concrete-related Image Methods
     /// \{
 
-    const concrete_type concretize() const { return *static_cast<const concrete_type*>(this); }
-    concrete_type       concretize() { return *static_cast<concrete_type*>(this); }
+    concrete_type concretize() const { return imconcretize(*this); }
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    const ch_value_type<Val> ch_value() const
+    ch_value_type<Val> ch_value() const
     {
-      return {concretize(), mln::init()};
-    }
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    template <concepts::Value Val>
-#else
-    template <typename Val>
-#endif // PYLENE_CONCEPT_TS_ENABLED
-    ch_value_type<Val> ch_value()
-    {
-      return {concretize(), mln::init()};
+      return imchvalue<Val>(*this);
     }
 
     /// \brief Resize the image to fit \p domain.

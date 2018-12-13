@@ -18,7 +18,7 @@ namespace mln::concepts
   // Pixel
   template<typename Pix>
   concept Pixel = 
-    stl::Regular<Pix> &&
+    stl::Semiregular<Pix> &&
     requires {
       typename pixel_value_t<Pix>;
       typename pixel_reference_t<Pix>;

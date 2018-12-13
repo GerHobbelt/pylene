@@ -40,16 +40,16 @@ namespace mln::details
   };
 
   template <class T, std::size_t N,
-            typename = std::void_t<decltype(std::declval<typename ndpix_base<T, N>::reference>() ==
-                                            std::declval<typename ndpix_base<T, N>::reference>())>>
+            typename =
+                std::void_t<decltype(std::declval<ndpix_base<T, N>>().val() == std::declval<ndpix_base<T, N>>().val())>>
   bool operator==(const ndpix_base<T, N>& lhs, const ndpix_base<T, N>& rhs)
   {
     return lhs.val() == rhs.val() && lhs.point() == rhs.point();
   }
 
   template <class T, std::size_t N,
-            typename = std::void_t<decltype(std::declval<typename ndpix_base<T, N>::reference>() !=
-                                            std::declval<typename ndpix_base<T, N>::reference>())>>
+            typename =
+                std::void_t<decltype(std::declval<ndpix_base<T, N>>().val() != std::declval<ndpix_base<T, N>>().val())>>
   bool operator!=(const ndpix_base<T, N>& lhs, const ndpix_base<T, N>& rhs)
   {
     return !(lhs == rhs);

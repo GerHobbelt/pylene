@@ -24,7 +24,7 @@ namespace mln
     void           advance(point_type p) { m_pix.advance(p); }
 
     pixel_adaptor() = default;
-    explicit pixel_adaptor(Pixel px)
+    pixel_adaptor(Pixel px)
       : m_pix{std::move(px)}
     {
     }
@@ -37,33 +37,30 @@ namespace mln
     Pixel m_pix;
   };
 
+
   template <class LhsPix, class RhsPix,
-            typename = std::void_t<decltype(std::declval<typename pixel_adaptor<LhsPix>::reference>() ==
-                                            std::declval<typename RhsPix::reference>())>>
+            class = std::void_t<decltype(std::declval<pixel_adaptor<LhsPix>>().val() == std::declval<RhsPix>().val())>>
   bool operator==(const pixel_adaptor<LhsPix>& lhs, const RhsPix& rhs)
   {
     return lhs.val() == rhs.val() && lhs.point() == rhs.point();
   }
 
   template <class LhsPix, class RhsPix,
-            typename = std::void_t<decltype(std::declval<typename RhsPix::reference>() ==
-                                            std::declval<typename pixel_adaptor<LhsPix>::reference>())>>
+            class = std::void_t<decltype(std::declval<RhsPix>().val() == std::declval<pixel_adaptor<LhsPix>>().val())>>
   bool operator==(const LhsPix& lhs, const pixel_adaptor<RhsPix>& rhs)
   {
     return rhs == lhs;
   }
 
   template <class LhsPix, class RhsPix,
-            typename = std::void_t<decltype(std::declval<typename pixel_adaptor<LhsPix>::reference>() !=
-                                            std::declval<typename RhsPix::reference>())>>
+            class = std::void_t<decltype(std::declval<pixel_adaptor<LhsPix>>().val() != std::declval<RhsPix>().val())>>
   bool operator!=(const pixel_adaptor<LhsPix>& lhs, const RhsPix& rhs)
   {
     return !(lhs == rhs);
   }
 
   template <class LhsPix, class RhsPix,
-            typename = std::void_t<decltype(std::declval<typename RhsPix::reference>() !=
-                                            std::declval<typename pixel_adaptor<LhsPix>::reference>())>>
+            class = std::void_t<decltype(std::declval<RhsPix>().val() != std::declval<pixel_adaptor<LhsPix>>().val())>>
   bool operator!=(const LhsPix& lhs, const pixel_adaptor<RhsPix>& rhs)
   {
     return !(rhs == lhs);
@@ -157,8 +154,8 @@ namespace mln
 
     /// Indexable-image related methods
     /// \{
-    template <typename dummy = I>
-    std::enable_if_t<indexable::value, reference> operator[](image_index_t<dummy> i)
+    template <typename dummy = I, typename Ret = reference>
+    std::enable_if_t<indexable::value, Ret> operator[](image_index_t<dummy> i)
     {
       return m_ima[i];
     }
@@ -169,8 +166,8 @@ namespace mln
       return m_ima.index_of_point(p);
     }
 
-    template <typename dummy = I>
-    std::enable_if_t<indexable::value, point_type> point_at_index(image_index_t<dummy> i) const
+    template <typename dummy = I, typename Ret = point_type>
+    std::enable_if_t<indexable::value, Ret> point_at_index(image_index_t<dummy> i) const
     {
       return m_ima.point_at_index(i);
     }
@@ -212,14 +209,15 @@ namespace mln
 
     /// Raw-image related methods
     /// \{
-    template <typename Ret = decltype(std::declval<I>().data())>
-    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, Ret> data() const
+    template <typename dummy = I>
+    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, decltype(std::declval<dummy>().data())>
+        data() const
     {
       return m_ima.data();
     }
 
-    template <typename Ret = decltype(std::declval<I>().data())>
-    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, Ret> data()
+    template <typename dummy = I>
+    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, decltype(std::declval<dummy>().data())> data()
     {
       return m_ima.data();
     }

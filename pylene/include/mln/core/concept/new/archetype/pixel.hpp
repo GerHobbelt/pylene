@@ -18,9 +18,6 @@ namespace mln::archetypes
     reference  val() const;
   };
 
-  bool operator==(const Pixel& lhs, const Pixel& rhs);
-  bool operator!=(const Pixel& lhs, const Pixel& rhs);
-
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::Pixel<Pixel>, "Pixel archetype does not model the Pixel concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED

@@ -56,7 +56,9 @@
         "chrono": "cpp",
         "ratio": "cpp",
         "system_error": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3",
     "C_Cpp.configurationWarnings": "Disabled"

@@ -18,15 +18,15 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using reference                      = std::invoke_result_t<F&, typename I::reference>;
-    using value_type                     = std::decay_t<reference>;
-    using point_type                     = typename I::point_type;
+    using reference  = std::invoke_result_t<F&, typename I::reference>;
+    using value_type = std::decay_t<reference>;
+    using point_type = typename I::point_type;
 
     static_assert(!(std::is_rvalue_reference_v<reference> && !std::is_reference_v<typename I::reference>),
                   "The transformed image returns a temporary and the mapping function is a projection.\n"
                   "This is building a dangling reference.");
 
-    using concrete_type  = ch_value_t<I, value_type>;
+    using concrete_type = ch_value_t<I, value_type>;
 
     template <class V>
     using ch_value_type = ch_value_t<I, V>;
@@ -36,8 +36,8 @@ namespace mln
 
     /// Traits & Image Properties
     /// \{
-    using accessible     = typename I::accessible;
-    using indexable      = typename I::indexable;
+    using accessible         = typename I::accessible;
+    using indexable          = typename I::indexable;
     using extension_category = mln::extension::none_extension_tag; // FIXME: should be improved
     /// \}
 
@@ -70,8 +70,6 @@ namespace mln
     /// \}
 
 
-
-
     transform_view(I ima, F fun)
       : transform_view::image_adaptor{std::move(ima)}
       , f{std::move(fun)}
@@ -90,7 +88,7 @@ namespace mln
 
     auto new_pixels()
     {
-      using R = decltype(this->base().new_pixels());
+      using R        = decltype(this->base().new_pixels());
       auto pxwrapper = [fun = this->f](::ranges::range_value_t<R> px) { return new_pixel_type{fun, std::move(px)}; };
       return mln::ranges::view::transform(this->base().new_pixels(), pxwrapper);
     }
@@ -126,24 +124,23 @@ namespace mln
     {
       return std::invoke(f, this->base()[i]);
     }
-
   };
 
   template <class I1, class I2, class F>
   class transform2_view : public New_Image<transform2_view<I1, I2, F>>
   {
     using fun_t = F; // FIXME something with semiregular_t<F> ?
-    I1 m_ima1;
-    I2 m_ima2;
+    I1    m_ima1;
+    I2    m_ima2;
     fun_t f;
 
   public:
     /// Type definitions
     /// \{
-    using reference                      = std::invoke_result_t<F&, typename I1::reference, typename I2::reference>;
-    using value_type                     = std::decay_t<reference>;
-    using point_type                     = typename I1::point_type;
-    using domain_type                    = typename I1::domain_type;
+    using reference   = std::invoke_result_t<F&, typename I1::reference, typename I2::reference>;
+    using value_type  = std::decay_t<reference>;
+    using point_type  = typename I1::point_type;
+    using domain_type = typename I1::domain_type;
     /// \}
 
 
@@ -153,7 +150,7 @@ namespace mln
     using indexable          = std::false_type;                    // Preservative behavior
     using extension_category = mln::extension::none_extension_tag; // Preservative behavior (may be too preservative)
 
-    using concrete_type  = ch_value_t<I1, value_type>;
+    using concrete_type = ch_value_t<I1, value_type>;
 
     template <class V>
     using ch_value_type = ch_value_t<I1, V>;
@@ -165,11 +162,10 @@ namespace mln
     struct new_pixel_type : Pixel<new_pixel_type>
     {
     public:
-
-      using point_type               = typename transform2_view::point_type;
-      using site_type [[deprecated]] = point_type;
-      using value_type               = typename transform2_view::value_type;
-      using reference                = typename transform2_view::reference;
+      using point_type              = typename transform2_view::point_type;
+      using site_type[[deprecated]] = point_type;
+      using value_type              = typename transform2_view::value_type;
+      using reference               = typename transform2_view::reference;
 
 
       new_pixel_type() = default;
@@ -181,16 +177,16 @@ namespace mln
       }
 
 
-      reference      val() const { return std::invoke(f, m_pix1.val(), m_pix2.val()); }
-      auto           point() const { return m_pix1.point(); }
-      void           advance(point_type p)
+      reference val() const { return std::invoke(f, m_pix1.val(), m_pix2.val()); }
+      auto      point() const { return m_pix1.point(); }
+      void      advance(point_type p)
       {
         m_pix1.advance(p);
         m_pix2.advance(p);
       }
 
     private:
-      fun_t f;
+      fun_t             f;
       image_pixel_t<I1> m_pix1;
       image_pixel_t<I2> m_pix2;
     };
@@ -219,8 +215,8 @@ namespace mln
 
     auto new_pixels()
     {
-      using R1 = decltype(m_ima1.new_pixels());
-      using R2 = decltype(m_ima2.new_pixels());
+      using R1       = decltype(m_ima1.new_pixels());
+      using R2       = decltype(m_ima2.new_pixels());
       auto pxwrapper = [fun = this->f](::ranges::range_reference_t<R1> px1, ::ranges::range_reference_t<R2> px2) {
         return new_pixel_type{fun, std::move(px1), std::move(px2)};
       };
@@ -246,7 +242,7 @@ namespace mln
     {
       mln_precondition(m_ima1.domain().has(p));
       mln_precondition(m_ima2.domain().has(p));
-      return {f, m_ima1.new_pixel(p), m_ima2.new_pixel(p) };
+      return {f, m_ima1.new_pixel(p), m_ima2.new_pixel(p)};
     }
 
     template <typename dummy = new_pixel_type>
@@ -255,7 +251,6 @@ namespace mln
       return {f, m_ima1.new_pixel_at(p), m_ima2.new_pixel_at(p)};
     }
   };
-
 
 
   namespace view
@@ -267,7 +262,7 @@ namespace mln
 
 
       // FIXME: make ima a view first ?
-      return { std::move(ima), std::move(f) };
+      return {std::move(ima), std::move(f)};
     }
 
 
@@ -277,8 +272,8 @@ namespace mln
       static_assert(mln::is_a<I1, New_Image>());
       static_assert(mln::is_a<I2, New_Image>());
 
-      // FIXME: make ima a view first ?
-      return { std::move(ima1), std::move(ima2), std::move(f) };
+      // FIXME: make ima1 and ima2 a view first ?
+      return {std::move(ima1), std::move(ima2), std::move(f)};
     }
   } // namespace view
 

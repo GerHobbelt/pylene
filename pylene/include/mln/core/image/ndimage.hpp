@@ -342,14 +342,14 @@ namespace mln
     /// \name Concrete-related Image Methods
     /// \{
 
-    concrete_type concretize() const { return imconcretize(*this); }
+    auto concretize() const { return imconcretize(*this); }
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    ch_value_type<Val> ch_value() const
+    auto ch_value() const
     {
       return imchvalue<Val>(*this);
     }

@@ -24,7 +24,7 @@ namespace mln
     void           advance(point_type p) { m_pix.advance(p); }
 
     pixel_adaptor() = default;
-    pixel_adaptor(Pixel px)
+    explicit pixel_adaptor(Pixel px)
       : m_pix{std::move(px)}
     {
     }
@@ -35,21 +35,39 @@ namespace mln
 
   private:
     Pixel m_pix;
-    /*
-      public:
-        template <class LhsPix, class PixRhs>
-        friend bool operator==(const pixel_adaptor<LhsPix>& lhs, const pixel_adaptor<PixRhs>& rhs)
-        {
-          return lhs.base() == rhs.base();
-        }
-
-        template <class Pix>
-        friend bool operator!=(const pixel_adaptor<Pix>& lhs, const pixel_adaptor<Pix>& rhs)
-        {
-          return !(lhs == rhs);
-        }
-    */
   };
+
+  template <class LhsPix, class RhsPix,
+            typename = std::void_t<decltype(std::declval<typename pixel_adaptor<LhsPix>::reference>() ==
+                                            std::declval<typename RhsPix::reference>())>>
+  bool operator==(const pixel_adaptor<LhsPix>& lhs, const RhsPix& rhs)
+  {
+    return lhs.val() == rhs.val() && lhs.point() == rhs.point();
+  }
+
+  template <class LhsPix, class RhsPix,
+            typename = std::void_t<decltype(std::declval<typename RhsPix::reference>() ==
+                                            std::declval<typename pixel_adaptor<LhsPix>::reference>())>>
+  bool operator==(const LhsPix& lhs, const pixel_adaptor<RhsPix>& rhs)
+  {
+    return rhs == lhs;
+  }
+
+  template <class LhsPix, class RhsPix,
+            typename = std::void_t<decltype(std::declval<typename pixel_adaptor<LhsPix>::reference>() !=
+                                            std::declval<typename RhsPix::reference>())>>
+  bool operator!=(const pixel_adaptor<LhsPix>& lhs, const RhsPix& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  template <class LhsPix, class RhsPix,
+            typename = std::void_t<decltype(std::declval<typename RhsPix::reference>() !=
+                                            std::declval<typename pixel_adaptor<LhsPix>::reference>())>>
+  bool operator!=(const LhsPix& lhs, const pixel_adaptor<RhsPix>& rhs)
+  {
+    return !(rhs == lhs);
+  }
 
 
   namespace detail

@@ -17,8 +17,11 @@ TEST(Core, Concept_Image)
   static_assert(concepts::Image<archetypes::InputImage>);
   static_assert(concepts::Image<archetypes::IndexableImage>);
   static_assert(concepts::Image<archetypes::AccessibleImage>);
+  static_assert(concepts::Image<archetypes::IndexableAndAccessibleImage>);
   static_assert(concepts::Image<archetypes::BidirectionalImage>);
   static_assert(concepts::Image<archetypes::RawImage>);
+  static_assert(concepts::Image<archetypes::ConcreteImage>);
+  static_assert(concepts::Image<archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_ForwardImage)
@@ -28,8 +31,11 @@ TEST(Core, Concept_ForwardImage)
   static_assert(concepts::ForwardImage<archetypes::InputImage>);
   static_assert(concepts::ForwardImage<archetypes::IndexableImage>);
   static_assert(concepts::ForwardImage<archetypes::AccessibleImage>);
+  static_assert(concepts::ForwardImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(concepts::ForwardImage<archetypes::BidirectionalImage>);
   static_assert(concepts::ForwardImage<archetypes::RawImage>);
+  static_assert(concepts::ForwardImage<archetypes::ConcreteImage>);
+  static_assert(concepts::ForwardImage<archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_InputImage)
@@ -39,8 +45,11 @@ TEST(Core, Concept_InputImage)
   static_assert(concepts::InputImage<archetypes::InputImage>);
   static_assert(concepts::InputImage<archetypes::IndexableImage>);
   static_assert(concepts::InputImage<archetypes::AccessibleImage>);
+  static_assert(concepts::InputImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(concepts::InputImage<archetypes::BidirectionalImage>);
   static_assert(concepts::InputImage<archetypes::RawImage>);
+  static_assert(concepts::InputImage<archetypes::ConcreteImage>);
+  static_assert(concepts::InputImage<archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_IndexableImage)
@@ -50,6 +59,7 @@ TEST(Core, Concept_IndexableImage)
   static_assert(not concepts::IndexableImage<archetypes::InputImage>);
   static_assert(concepts::IndexableImage<archetypes::IndexableImage>);
   static_assert(not concepts::IndexableImage<archetypes::AccessibleImage>);
+  static_assert(concepts::IndexableImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(not concepts::IndexableImage<archetypes::BidirectionalImage>);
   static_assert(concepts::IndexableImage<archetypes::RawImage>);
 }
@@ -61,8 +71,21 @@ TEST(Core, Concept_AccessibleImage)
   static_assert(not concepts::AccessibleImage<archetypes::InputImage>);
   static_assert(not concepts::AccessibleImage<archetypes::IndexableImage>);
   static_assert(concepts::AccessibleImage<archetypes::AccessibleImage>);
+  static_assert(concepts::AccessibleImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(not concepts::AccessibleImage<archetypes::BidirectionalImage>);
   static_assert(concepts::AccessibleImage<archetypes::RawImage>);
+}
+
+TEST(Core, Concept_IndexableAndAccessibleImage)
+{
+  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::Image>);
+  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::ForwardImage>);
+  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::InputImage>);
+  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::IndexableImage>);
+  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::AccessibleImage>);
+  static_assert(concepts::IndexableAndAccessibleImage<archetypes::IndexableAndAccessibleImage>);
+  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::BidirectionalImage>);
+  static_assert(concepts::IndexableAndAccessibleImage<archetypes::RawImage>);
 }
 
 TEST(Core, Concept_BidirectionalImage)
@@ -72,6 +95,7 @@ TEST(Core, Concept_BidirectionalImage)
   static_assert(not concepts::BidirectionalImage<archetypes::InputImage>);
   static_assert(not concepts::BidirectionalImage<archetypes::IndexableImage>);
   static_assert(not concepts::BidirectionalImage<archetypes::AccessibleImage>);
+  static_assert(not concepts::BidirectionalImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(concepts::BidirectionalImage<archetypes::BidirectionalImage>);
   static_assert(concepts::BidirectionalImage<archetypes::RawImage>);
 }
@@ -83,20 +107,24 @@ TEST(Core, Concept_RawImage)
   static_assert(not concepts::RawImage<archetypes::InputImage>);
   static_assert(not concepts::RawImage<archetypes::IndexableImage>);
   static_assert(not concepts::RawImage<archetypes::AccessibleImage>);
+  static_assert(not concepts::RawImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(not concepts::RawImage<archetypes::BidirectionalImage>);
   static_assert(concepts::RawImage<archetypes::RawImage>);
+  static_assert(concepts::ForwardImage<archetypes::ConcreteImage>);
+  static_assert(concepts::ForwardImage<archetypes::ViewImage>);
 }
 
-TEST(Core, Concept_ExtendedImage)
+TEST(Core, Concept_WithExtensionImage)
 {
-  static_assert(not concepts::ExtendedImage<archetypes::Image>);
-  static_assert(not concepts::ExtendedImage<archetypes::ForwardImage>);
-  static_assert(not concepts::ExtendedImage<archetypes::InputImage>);
-  static_assert(not concepts::ExtendedImage<archetypes::IndexableImage>);
-  static_assert(not concepts::ExtendedImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::ExtendedImage<archetypes::BidirectionalImage>);
-  static_assert(not concepts::ExtendedImage<archetypes::RawImage>);
-  static_assert(concepts::ExtendedImage<archetypes::ExtendedImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::Image>);
+  static_assert(not concepts::WithExtensionImage<archetypes::ForwardImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::InputImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::IndexableImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::AccessibleImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::IndexableAndAccessibleImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::BidirectionalImage>);
+  static_assert(not concepts::WithExtensionImage<archetypes::RawImage>);
+  static_assert(concepts::WithExtensionImage<archetypes::WithExtensionImage>);
 }
 
 TEST(Core, Concept_OutputImage) // ForwardImage, InputImage
@@ -106,6 +134,8 @@ TEST(Core, Concept_OutputImage) // ForwardImage, InputImage
   static_assert(concepts::Image<archetypes::InputImage> && not concepts::OutputImage<archetypes::InputImage>);
   static_assert(concepts::Image<archetypes::IndexableImage> && not concepts::OutputImage<archetypes::IndexableImage>);
   static_assert(concepts::Image<archetypes::AccessibleImage> && not concepts::OutputImage<archetypes::AccessibleImage>);
+  static_assert(concepts::Image<archetypes::IndexableAndAccessibleImage> &&
+                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(concepts::Image<archetypes::BidirectionalImage> &&
                 not concepts::OutputImage<archetypes::BidirectionalImage>);
   static_assert(concepts::Image<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
@@ -117,6 +147,8 @@ TEST(Core, Concept_OutputImage) // ForwardImage, InputImage
                 concepts::OutputImage<archetypes::OutputIndexableImage>);
   static_assert(concepts::Image<archetypes::OutputAccessibleImage> &&
                 concepts::OutputImage<archetypes::OutputAccessibleImage>);
+  static_assert(concepts::Image<archetypes::OutputIndexableAndAccessibleImage> &&
+                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
   static_assert(concepts::Image<archetypes::OutputBidirectionalImage> &&
                 concepts::OutputImage<archetypes::OutputBidirectionalImage>);
   static_assert(concepts::Image<archetypes::OutputRawImage> && concepts::OutputImage<archetypes::OutputRawImage>);
@@ -133,6 +165,8 @@ TEST(Core, Concept_OutputIndexableImage)
                 not concepts::OutputImage<archetypes::IndexableImage>);
   static_assert(not concepts::IndexableImage<archetypes::AccessibleImage> &&
                 not concepts::OutputImage<archetypes::AccessibleImage>);
+  static_assert(concepts::IndexableImage<archetypes::IndexableAndAccessibleImage> &&
+                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(not concepts::IndexableImage<archetypes::BidirectionalImage> &&
                 not concepts::OutputImage<archetypes::BidirectionalImage>);
   static_assert(concepts::IndexableImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
@@ -145,6 +179,8 @@ TEST(Core, Concept_OutputIndexableImage)
                 concepts::OutputImage<archetypes::OutputIndexableImage>);
   static_assert(not concepts::IndexableImage<archetypes::OutputAccessibleImage> &&
                 concepts::OutputImage<archetypes::OutputAccessibleImage>);
+  static_assert(concepts::IndexableImage<archetypes::OutputIndexableAndAccessibleImage> &&
+                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
   static_assert(not concepts::IndexableImage<archetypes::OutputBidirectionalImage> &&
                 concepts::OutputImage<archetypes::OutputBidirectionalImage>);
   static_assert(concepts::IndexableImage<archetypes::OutputRawImage> &&
@@ -162,6 +198,8 @@ TEST(Core, Concept_OutputAccessibleImage)
                 not concepts::OutputImage<archetypes::IndexableImage>);
   static_assert(concepts::AccessibleImage<archetypes::AccessibleImage> &&
                 not concepts::OutputImage<archetypes::AccessibleImage>);
+  static_assert(concepts::AccessibleImage<archetypes::IndexableAndAccessibleImage> &&
+                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(not concepts::AccessibleImage<archetypes::BidirectionalImage> &&
                 not concepts::OutputImage<archetypes::BidirectionalImage>);
   static_assert(concepts::AccessibleImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
@@ -174,6 +212,8 @@ TEST(Core, Concept_OutputAccessibleImage)
                 concepts::OutputImage<archetypes::OutputIndexableImage>);
   static_assert(concepts::AccessibleImage<archetypes::OutputAccessibleImage> &&
                 concepts::OutputImage<archetypes::OutputAccessibleImage>);
+  static_assert(concepts::AccessibleImage<archetypes::OutputIndexableAndAccessibleImage> &&
+                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
   static_assert(not concepts::AccessibleImage<archetypes::OutputBidirectionalImage> &&
                 concepts::OutputImage<archetypes::OutputBidirectionalImage>);
   static_assert(concepts::AccessibleImage<archetypes::OutputRawImage> &&
@@ -191,6 +231,8 @@ TEST(Core, Concept_OutputBidirectionalImage)
                 not concepts::OutputImage<archetypes::IndexableImage>);
   static_assert(not concepts::BidirectionalImage<archetypes::AccessibleImage> &&
                 not concepts::OutputImage<archetypes::AccessibleImage>);
+  static_assert(not concepts::BidirectionalImage<archetypes::IndexableAndAccessibleImage> &&
+                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(concepts::BidirectionalImage<archetypes::BidirectionalImage> &&
                 not concepts::OutputImage<archetypes::BidirectionalImage>);
   static_assert(concepts::BidirectionalImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
@@ -203,6 +245,8 @@ TEST(Core, Concept_OutputBidirectionalImage)
                 concepts::OutputImage<archetypes::OutputIndexableImage>);
   static_assert(not concepts::BidirectionalImage<archetypes::OutputAccessibleImage> &&
                 concepts::OutputImage<archetypes::OutputAccessibleImage>);
+  static_assert(not concepts::BidirectionalImage<archetypes::OutputIndexableAndAccessibleImage> &&
+                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
   static_assert(concepts::BidirectionalImage<archetypes::OutputBidirectionalImage> &&
                 concepts::OutputImage<archetypes::OutputBidirectionalImage>);
   static_assert(concepts::BidirectionalImage<archetypes::OutputRawImage> &&
@@ -219,6 +263,8 @@ TEST(Core, Concept_OutputRawImage)
                 not concepts::OutputImage<archetypes::IndexableImage>);
   static_assert(not concepts::RawImage<archetypes::AccessibleImage> &&
                 not concepts::OutputImage<archetypes::AccessibleImage>);
+  static_assert(not concepts::RawImage<archetypes::IndexableAndAccessibleImage> &&
+                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
   static_assert(not concepts::RawImage<archetypes::BidirectionalImage> &&
                 not concepts::OutputImage<archetypes::BidirectionalImage>);
   static_assert(concepts::RawImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
@@ -230,7 +276,37 @@ TEST(Core, Concept_OutputRawImage)
                 concepts::OutputImage<archetypes::OutputIndexableImage>);
   static_assert(not concepts::RawImage<archetypes::OutputAccessibleImage> &&
                 concepts::OutputImage<archetypes::OutputAccessibleImage>);
+  static_assert(not concepts::RawImage<archetypes::OutputIndexableAndAccessibleImage> &&
+                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
   static_assert(not concepts::RawImage<archetypes::OutputBidirectionalImage> &&
                 concepts::OutputImage<archetypes::OutputBidirectionalImage>);
   static_assert(concepts::RawImage<archetypes::OutputRawImage> && concepts::OutputImage<archetypes::OutputRawImage>);
+}
+
+TEST(Core, Concept_ConcreteImage)
+{
+  static_assert(not concepts::ConcreteImage<archetypes::Image>);
+  static_assert(not concepts::ConcreteImage<archetypes::ForwardImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::InputImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::IndexableImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::AccessibleImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::IndexableAndAccessibleImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::BidirectionalImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::RawImage>);
+  static_assert(concepts::ConcreteImage<archetypes::ConcreteImage>);
+  static_assert(not concepts::ConcreteImage<archetypes::ViewImage>);
+}
+
+TEST(Core, Concept_ViewImage)
+{
+  static_assert(concepts::ViewImage<archetypes::Image>);
+  static_assert(concepts::ViewImage<archetypes::ForwardImage>);
+  static_assert(concepts::ViewImage<archetypes::InputImage>);
+  static_assert(concepts::ViewImage<archetypes::IndexableImage>);
+  static_assert(concepts::ViewImage<archetypes::AccessibleImage>);
+  static_assert(concepts::ViewImage<archetypes::IndexableAndAccessibleImage>);
+  static_assert(concepts::ViewImage<archetypes::BidirectionalImage>);
+  static_assert(concepts::ViewImage<archetypes::RawImage>);
+  static_assert(not concepts::ViewImage<archetypes::ConcreteImage>);
+  static_assert(concepts::ViewImage<archetypes::ViewImage>);
 }

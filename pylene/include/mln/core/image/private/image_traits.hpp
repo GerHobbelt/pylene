@@ -54,4 +54,9 @@ namespace mln
   template <class I>
   using image_category_t = typename I::category_type;
 
+  // View trait
+  template <class I>
+  using image_view_t = typename I::view;
+  template <class I>
+  inline constexpr auto image_view_v = image_view_t<I>::value;
 } // namespace mln

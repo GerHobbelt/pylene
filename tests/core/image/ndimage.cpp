@@ -10,13 +10,19 @@
 
 namespace concepts = mln::concepts;
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+template <concepts::Image Ima>
+void foo(Ima) {}
+#endif
 
 TEST(Core, Image_Image2D)
 {
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+  foo(mln::image2d<int>{});
   static_assert(concepts::Image<mln::image2d<int>>);
   static_assert(concepts::IndexableImage<mln::image2d<int>>);
   static_assert(concepts::AccessibleImage<mln::image2d<int>>);
+  static_assert(concepts::IndexableAndAccessibleImage<mln::image2d<int>>);
   static_assert(concepts::BidirectionalImage<mln::image2d<int>>);
   static_assert(concepts::RawImage<mln::image2d<int>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
@@ -29,6 +35,7 @@ TEST(Core, Image_Image3D)
   static_assert(concepts::Image<mln::image3d<int>>);
   static_assert(concepts::IndexableImage<mln::image3d<int>>);
   static_assert(concepts::AccessibleImage<mln::image3d<int>>);
+  static_assert(concepts::IndexableAndAccessibleImage<mln::image3d<int>>);
   static_assert(concepts::BidirectionalImage<mln::image3d<int>>);
   static_assert(concepts::RawImage<mln::image3d<int>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED

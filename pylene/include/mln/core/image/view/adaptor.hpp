@@ -77,18 +77,17 @@ namespace mln
     template <class I>
     struct image_adaptor_base_indexable<I, std::enable_if_t<I::indexable::value>>
     {
-      using size_type[[deprecated]]       = image_index_t<I>;
-      using index_type                    = size_type;
-      using difference_type[[deprecated]] = typename I::difference_type;
+      using size_type[[deprecated]] = image_index_t<I>;
+      using index_type              = size_type;
     };
 
     template <class I, class = void>
-    struct image_adaptor_base_extended
+    struct image_adaptor_base_with_extension
     {
     };
 
     template <class I>
-    struct image_adaptor_base_extended<
+    struct image_adaptor_base_with_extension<
         I, std::enable_if_t<not std::is_same_v<image_extension_category_t<I>, mln::extension::none_extension_tag>>>
     {
       using extension_type = image_extension_t<I>;
@@ -97,7 +96,7 @@ namespace mln
 
 
   template <class I>
-  struct image_adaptor : detail::image_adaptor_base_indexable<I>, detail::image_adaptor_base_extended<I>
+  struct image_adaptor : detail::image_adaptor_base_indexable<I>, detail::image_adaptor_base_with_extension<I>
   {
   public:
     /// Type definitions
@@ -113,6 +112,7 @@ namespace mln
     /// \{
     using accessible         = image_accessible_t<I>;
     using indexable          = image_indexable_t<I>;
+    using view               = std::true_type;
     using extension_category = image_extension_category_t<I>;
     using category_type      = image_category_t<I>;
     using concrete_type      = image_concrete_t<I>;
@@ -130,7 +130,6 @@ namespace mln
     // Image proxy //
     /////////////////
 
-    image_adaptor() = default;
     image_adaptor(I ima)
       : m_ima(std::move(ima))
     {
@@ -154,28 +153,10 @@ namespace mln
 
     /// Indexable-image related methods
     /// \{
-    template <typename dummy = I, typename Ret = reference>
-    std::enable_if_t<indexable::value, Ret> operator[](image_index_t<dummy> i)
+    template <typename dummy = I>
+    reference operator[](image_index_t<dummy> i)
     {
       return m_ima[i];
-    }
-
-    template <typename dummy = I>
-    std::enable_if_t<indexable::value, image_index_t<dummy>> index_of_point(point_type p) const
-    {
-      return m_ima.index_of_point(p);
-    }
-
-    template <typename dummy = I, typename Ret = point_type>
-    std::enable_if_t<indexable::value, Ret> point_at_index(image_index_t<dummy> i) const
-    {
-      return m_ima.point_at_index(i);
-    }
-
-    template <typename dummy = I>
-    std::enable_if_t<indexable::value, image_index_t<dummy>> delta_index(point_type p) const
-    {
-      return m_ima.delta_index(p);
     }
     /// \}
 
@@ -207,17 +188,39 @@ namespace mln
     }
     /// \}
 
+
+    /// IndexableAndAccessible-image related methods
+    /// \{
+    template <typename dummy = I>
+    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> index_of_point(point_type p) const
+    {
+      return m_ima.index_of_point(p);
+    }
+
+    template <typename dummy = I, typename = std::enable_if_t<(indexable::value && accessible::value)>>
+    point_type point_at_index(image_index_t<dummy> i) const
+    {
+      return m_ima.point_at_index(i);
+    }
+
+    template <typename dummy = I>
+    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> delta_index(point_type p) const
+    {
+      return m_ima.delta_index(p);
+    }
+    /// \}
+
+
     /// Raw-image related methods
     /// \{
     template <typename dummy = I>
-    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, decltype(std::declval<dummy>().data())>
-        data() const
+    decltype(std::declval<dummy>().data()) data() const
     {
       return m_ima.data();
     }
 
     template <typename dummy = I>
-    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, decltype(std::declval<dummy>().data())> data()
+    decltype(std::declval<dummy>().data()) data()
     {
       return m_ima.data();
     }
@@ -229,7 +232,8 @@ namespace mln
     }
     /// \}
 
-    /// Extended-image related methods
+
+    /// WithExtension-image related methods
     /// \{
     template <typename dummy = I>
     std::enable_if_t<not std::is_same_v<extension_category, mln::extension::none_extension_tag>,

@@ -24,15 +24,15 @@
 namespace mln::concepts
 {
 
-  // clang-format off
+// clang-format off
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
   // Image
   template<typename Ima>
   concept Image =
-    // FIXME : inheritance from New_Image required for the moment
-    stl::Semiregular<Ima> &&
+    // FIXME: inheritance from New_Image required for the moment
+    stl::Movable<Ima> &&  // Minimum constraint on image object
     stl::DerivedFrom<image_category_t<Ima>, forward_image_tag> &&
     requires {
       typename image_pixel_t<Ima>;
@@ -47,6 +47,7 @@ namespace mln::concepts
       typename image_accessible_t<Ima>;
       typename image_extension_category_t<Ima>;
       typename image_category_t<Ima>;
+      typename image_view_t<Ima>;
     } &&
     Pixel<image_pixel_t<Ima>> &&
     Point<image_point_t<Ima>> &&
@@ -110,11 +111,8 @@ namespace mln::concepts
       typename image_index_t<Ima>;
     } &&
     image_indexable_v<Ima> &&
-    requires (Ima ima, const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
-      { ima[k] }                  -> image_reference_t<Ima>; // For concrete image it returns a const_reference
-      { cima.point_at_index(k) }  -> image_point_t<Ima>;
-      { cima.index_of_point(p) }  -> image_index_t<Ima>;
-      { cima.delta_index(p) }     -> image_index_t<Ima>;
+    requires (Ima ima, image_index_t<Ima> k) {
+      { ima[k] }  -> image_reference_t<Ima>; // For concrete image it returns a const_reference
     };
 
 
@@ -162,6 +160,31 @@ namespace mln::concepts
   } // namespace detail
 
 
+  // IndexableAndAccessibleImage
+  template <typename Ima>
+  concept IndexableAndAccessibleImage =
+    IndexableImage<Ima> &&
+    AccessibleImage<Ima> &&
+    requires (const Ima cima, image_index_t<Ima> k, image_point_t<Ima> p) {
+      { cima.point_at_index(k) }  -> image_point_t<Ima>;
+      { cima.index_of_point(p) }  -> image_index_t<Ima>;
+      { cima.delta_index(p) }     -> image_index_t<Ima>;
+    };
+
+
+  namespace detail
+  {
+
+    // WritableIndexableAndAccessibleImage
+    template<typename WIma>
+    concept WritableIndexableAndAccessibleImage =
+      IndexableAndAccessibleImage<WIma> &&
+      detail::WritableImage<WIma> &&
+      detail::WritableIndexableImage<WIma>;
+    
+  } // namespace detail
+
+
   // BidirectionalImage (not in STL term)
   template <typename Ima>
   concept BidirectionalImage =
@@ -188,8 +211,7 @@ namespace mln::concepts
   // RawImage (not contiguous, stride = padding)
   template <typename Ima>
   concept RawImage =
-    IndexableImage<Ima> &&
-    AccessibleImage<Ima> &&
+    IndexableAndAccessibleImage<Ima> &&
     BidirectionalImage<Ima> &&
     stl::DerivedFrom<image_category_t<Ima>, raw_image_tag> &&
     requires (Ima ima, const Ima cima, int dim) {
@@ -205,8 +227,7 @@ namespace mln::concepts
     template<typename WIma>
     concept WritableRawImage =
       WritableImage<WIma> &&
-      WritableIndexableImage<WIma> &&
-      WritableAccessibleImage<WIma> &&
+      WritableIndexableAndAccessibleImage<WIma> &&
       WritableBidirectionalImage<WIma> &&
       RawImage<WIma> &&
       requires(WIma ima, image_value_t<WIma> v) {
@@ -221,20 +242,18 @@ namespace mln::concepts
   // Usage: RawImage<I> && OutputImage<I>
   template <typename Ima>
   concept OutputImage =
-    (not IndexableImage<Ima> && not AccessibleImage<Ima> && not BidirectionalImage<Ima> && not RawImage<Ima> &&
-      detail::WritableImage<Ima>) ||
-    (not AccessibleImage<Ima> && not BidirectionalImage<Ima> && not RawImage<Ima> &&
-      detail::WritableIndexableImage<Ima>) ||
-    (not IndexableImage<Ima> && not BidirectionalImage<Ima> && not RawImage<Ima> &&
-      detail::WritableAccessibleImage<Ima>) ||
-    (not IndexableImage<Ima> && not AccessibleImage<Ima> && not RawImage<Ima> &&
-      detail::WritableBidirectionalImage<Ima> ) ||
-    (detail::WritableRawImage<Ima>);
+    (not ForwardImage<Ima> || (ForwardImage<Ima> && detail::WritableImage<Ima>)) &&
+    (not IndexableImage<Ima> || (IndexableImage<Ima> && detail::WritableIndexableImage<Ima>)) &&
+    (not AccessibleImage<Ima> || (AccessibleImage<Ima> && detail::WritableAccessibleImage<Ima>)) &&
+    (not IndexableAndAccessibleImage<Ima> ||
+      (IndexableAndAccessibleImage<Ima> && detail::WritableIndexableAndAccessibleImage<Ima>)) &&
+    (not BidirectionalImage<Ima> || (BidirectionalImage<Ima> && detail::WritableBidirectionalImage<Ima>)) &&
+    (not RawImage<Ima> || (RawImage<Ima> && detail::WritableRawImage<Ima>));
 
 
-  // ExtendedImage
+  // WithExtensionImage
   template <typename Ima>
-  concept ExtendedImage =
+  concept WithExtensionImage =
     Image<Ima> &&
     requires {
       typename image_extension_t<Ima>;
@@ -245,7 +264,19 @@ namespace mln::concepts
     };
 
 
-// TODO: think about ViewImage vs. ConcreteImage
+  // ConcreteImage
+  template <typename Ima>
+  concept ConcreteImage =
+    Image<Ima> &&
+    stl::Semiregular<Ima> &&  // A concrete image is default constructible
+    not image_view_v<Ima>;
+  
+
+  // ViewImage
+  template <typename Ima>
+  concept ViewImage =
+    Image<Ima> &&
+    image_view_v<Ima>;
 
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

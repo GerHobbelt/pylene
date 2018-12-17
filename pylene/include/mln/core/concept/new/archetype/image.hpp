@@ -91,9 +91,9 @@ namespace mln::archetypes
     using view = std::true_type;
 
     ViewImage()                 = delete;
-    ViewImage(const ViewImage&) = delete;
+    ViewImage(const ViewImage&) = default;
     ViewImage(ViewImage&&)      = default;
-    ViewImage& operator=(const ViewImage&) = delete;
+    ViewImage& operator=(const ViewImage&) = default;
     ViewImage& operator=(ViewImage&&) = default;
   };
 

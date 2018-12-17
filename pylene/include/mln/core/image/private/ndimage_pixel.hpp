@@ -32,6 +32,18 @@ namespace mln::details
     using value_type = std::remove_const_t<T>;
     using reference  = T&;
 
+    ndpix_base(T* ptr, point_type pnt)
+      : m_lineptr(ptr)
+      , m_point(pnt)
+    {
+    }
+
+    ndpix_base()                  = default;
+    ndpix_base(const ndpix_base&) = default;
+    ndpix_base(ndpix_base&&)      = default;
+    ndpix_base& operator=(const ndpix_base&) = default;
+    ndpix_base& operator=(ndpix_base&&) = default;
+
     reference  val() const { return m_lineptr[m_point[N - 1]]; }
     point_type point() const { return m_point; }
 

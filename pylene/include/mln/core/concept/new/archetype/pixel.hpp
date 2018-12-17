@@ -14,6 +14,12 @@ namespace mln::archetypes
     using point_type = Point;
     using reference  = const value_type&;
 
+    Pixel()             = delete;
+    Pixel(const Pixel&) = default;
+    Pixel(Pixel&&)      = default;
+    Pixel& operator=(const Pixel&) = default;
+    Pixel& operator=(Pixel&&) = default;
+
     point_type point() const;
     reference  val() const;
   };

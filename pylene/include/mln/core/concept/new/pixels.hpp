@@ -18,7 +18,8 @@ namespace mln::concepts
   // Pixel
   template<typename Pix>
   concept Pixel = 
-    stl::Semiregular<Pix> &&
+    stl::Movable<Pix> &&  // Minimum constraint on pixel object
+    stl::Copyable<Pix> && // Do not requires DefaultConstructible
     requires {
       typename pixel_value_t<Pix>;
       typename pixel_reference_t<Pix>;

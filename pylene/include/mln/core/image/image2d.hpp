@@ -37,8 +37,8 @@ namespace mln
   struct image2d : ndimage_base<T, 2, image2d<T>>
   {
   private:
-    typedef ndimage_base<T, 2, image2d<T>> base_type;
-    typedef ndimage_base<T, 2, image2d<T>> base;
+    using base_type = ndimage_base<T, 2, image2d<T>>;
+    using base      = ndimage_base<T, 2, image2d<T>>;
 
   public:
     typedef typename base_type::domain_type domain_type;
@@ -47,10 +47,6 @@ namespace mln
     using ch_value_type = image2d<V>;
 
     using base::base;
-
-    // Required because of a MS bug
-    // (https://developercommunity.visualstudio.com/content/problem/47799/vc-default-constructor-deleted.html)
-    image2d() = default;
 
     image2d(short nrows, short ncols, unsigned border = 3, const T& init = T())
       : base(box<short, 2>{{0, 0}, {nrows, ncols}}, border, init)
@@ -86,7 +82,7 @@ namespace mln
       for (const std::initializer_list<T>& row : l)
       {
         mln_assertion(row.size() == nc);
-        for (const T *val = row.begin(); val != row.end(); ++val, v.next())
+        for (const T* val = row.begin(); val != row.end(); ++val, v.next())
           *v = *val;
       }
     }

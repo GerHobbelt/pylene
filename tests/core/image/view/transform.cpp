@@ -41,7 +41,7 @@ TEST(Core, TransformedImage_transform_byval_rvalue)
     
     #ifdef PYLENE_CONCEPT_TS_ENABLED
     // bar(std::decay_t<decltype(out)>::new_pixel_type{});
-    // foo(out);
+    foo(out);
     #endif // PYLENE_CONCEPT_TS_ENABLED
 
     // Test pixel iteration

@@ -24,7 +24,7 @@
 namespace mln::concepts
 {
 
-// clang-format off
+  // clang-format off
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
@@ -33,6 +33,7 @@ namespace mln::concepts
   concept Image =
     // FIXME: inheritance from New_Image required for the moment
     stl::Movable<Ima> &&  // Minimum constraint on image object
+    stl::Copyable<Ima> && // Do not requires DefaultConstructible
     stl::DerivedFrom<image_category_t<Ima>, forward_image_tag> &&
     requires {
       typename image_pixel_t<Ima>;

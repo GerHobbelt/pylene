@@ -101,9 +101,7 @@ namespace mln
 
 
   template <class I>
-  struct image_adaptor : detail::image_adaptor_base_indexable<I>,
-                         detail::image_adaptor_base_with_extension<I>,
-                         New_Image<I>
+  struct image_adaptor : detail::image_adaptor_base_indexable<I>, detail::image_adaptor_base_with_extension<I>
   {
   public:
     /// Type definitions

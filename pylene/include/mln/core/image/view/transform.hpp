@@ -11,7 +11,7 @@ namespace mln
 
 
   template <class I, class F>
-  class transform_view : public image_adaptor<I>
+  class transform_view : public image_adaptor<I>, public New_Image<transform_view<I, F>>
   {
     using fun_t = F;
     fun_t fun_;
@@ -118,7 +118,7 @@ namespace mln
       return mln::ranges::view::transform(this->base().new_pixels(), pxwrapper);
     }
 
-    decltype(auto) concretize() const { return imchvalue_new<value_type>(this->base()); }
+    decltype(auto) concretize() const { return this->base().template ch_value<value_type>(); }
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
@@ -127,7 +127,7 @@ namespace mln
 #endif
     decltype(auto) ch_value() const
     {
-      return imchvalue_new<Val>(this->base());
+      return this->base().template ch_value<Val>();
     }
 
 

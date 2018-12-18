@@ -67,6 +67,19 @@ distcheck-linux-clang-debug:
         CXX: "clang++"
         CC: "clang"
 
+# distcheck-linux-gcc-asan:
+#     <<: *distcheck-linux-base
+#     variables:
+#         PYLENE_CONFIGURATION: "Asan"
+#         CXX: "g++"
+#         CC: "gcc"
+# 
+# distcheck-linux-clang-asan:
+#     <<: *distcheck-linux-base
+#     variables:
+#         PYLENE_CONFIGURATION: "Asan"
+#         CXX: "clang++"
+#         CC: "clang"
 
 #########
 # Bench #

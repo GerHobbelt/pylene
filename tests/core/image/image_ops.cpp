@@ -111,6 +111,8 @@ TEST(Core, UnaryOperator)
   image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
   image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
 
+  // FIXME?: ?segfault?
+
   auto g = new_unary_minus(ima);
   ASSERT_TRUE(new_all(new_eq(g, ref)));
 }
@@ -168,22 +170,16 @@ TEST(Core, Where)
   image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> y = {{4, 5, 6}, {1, 2, 3}};
 
-  auto f1 = where(x > 3, x, uint8_t(12)); // RValue image + LValue image + scalar
-  // auto f2 = where(x > 3, x, y);               // RValue image + LValue image + LValue image
-  auto f3 = where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
-  auto f4 = where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
+  auto                  f1 = where(x > 3, x, uint8_t(12));       // RValue image + LValue image + scalar
+  [[maybe_unused]] auto f2 = where(x > 3, x, y);                 // RValue image + LValue image + LValue image
+  auto                  f3 = where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
+  auto                  f4 = where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
 
 
   // FIXME: Use concept checking
 
-  // image_reference_t<decltype(f4)> val = "aze";
-
-  // static_assert(std::is_same<image_reference_t<decltype(f4)>, uint8_t&>());
+  static_assert(std::is_same<image_reference_t<decltype(f4)>, uint8_t&>());
   ASSERT_TRUE((std::is_same<image_reference_t<decltype(f1)>, const uint8_t&>()));
   ASSERT_TRUE((std::is_same<image_reference_t<decltype(f3)>, const uint8_t&>()));
   ASSERT_TRUE((std::is_same<image_reference_t<decltype(f4)>, uint8_t&>()));
-
-  // ASSERT_TRUE(all(f1 >= 12));
-  // ASSERT_TRUE((std::is_same<mln_reference(decltype(f1)), const uint8&>()));
-  // ASSERT_TRUE((std::is_same<mln_reference(decltype(f2)), uint8&>()));
 }

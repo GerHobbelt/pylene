@@ -1,5 +1,8 @@
 #pragma once
 
+// FIXME: backward compatibility
+#include <mln/core/image_traits.hpp> // image_ch_value_t
+
 namespace mln
 {
 
@@ -47,8 +50,9 @@ namespace mln
 
 
   // Change value type trait
-  template <class I, class V>
-  using image_ch_value_t = typename I::template ch_value_type<V>;
+  // FIXME: defined in mln/core/image_traits
+  // template <class I, class V>
+  // using image_ch_value_t = typename I::template ch_value_type<V>;
 
   // Category trait
   template <class I>

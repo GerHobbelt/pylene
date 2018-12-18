@@ -3,6 +3,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
+
 #include <type_traits>
 
 namespace mln
@@ -10,7 +11,7 @@ namespace mln
 
 
   template <class I, class F>
-  class transform_view : public image_adaptor<I>, public New_Image<transform_view<I, F>>
+  class transform_view : public image_adaptor<I>
   {
     using fun_t = F;
     fun_t fun_;
@@ -18,27 +19,32 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using reference  = std::invoke_result_t<F&, typename I::reference>;
-    using value_type = std::decay_t<reference>;
-    using point_type = typename I::point_type;
+    using reference   = std::invoke_result_t<F&, image_reference_t<I>>;
+    using value_type  = std::remove_cv_t<std::remove_reference_t<reference>>;
+    using point_type  = image_point_t<I>;
+    using domain_type = image_domain_t<I>;
 
-    static_assert(!(std::is_rvalue_reference_v<reference> && !std::is_reference_v<typename I::reference>),
+    static_assert(!(std::is_rvalue_reference_v<reference> && !std::is_reference_v<image_reference_t<I>>),
                   "The transformed image returns a temporary and the mapping function is a projection.\n"
                   "This is building a dangling reference.");
 
-    using concrete_type = ch_value_t<I, value_type>;
+    using concrete_type = image_ch_value_t<I, value_type>;
 
-    template <class V>
-    using ch_value_type = ch_value_t<I, V>;
+    template <typename V>
+    using ch_value_type = image_ch_value_t<I, V>;
 
     /// \}
 
 
     /// Traits & Image Properties
     /// \{
-    using accessible         = typename I::accessible;
-    using indexable          = typename I::indexable;
-    using extension_category = mln::extension::none_extension_tag; // FIXME: should be improved
+    using accessible         = image_accessible_t<I>;
+    using indexable          = image_indexable_t<I>;
+    using view               = std::true_type;
+    using extension_category = image_extension_category_t<I>;
+    // Transform doesn't preserve contiguity, so it decays from raw_image_tag
+    using category_type = std::conditional_t<std::is_base_of_v<raw_image_tag, image_category_t<I>>,
+                                             bidirectional_image_tag, image_category_t<I>>;
     /// \}
 
   private:
@@ -82,6 +88,10 @@ namespace mln
     /// \}
 
 
+    /////////////////
+    // Image proxy //
+    /////////////////
+
     transform_view(I ima, F fun)
       : transform_view::image_adaptor{std::move(ima)}
       , fun_{std::move(fun)}
@@ -99,15 +109,6 @@ namespace mln
     {
     }
 
-
-    decltype(auto) concretize() const { return imchvalue<value_type>(this->base()); }
-
-    template <class U>
-    decltype(auto) ch_value() const
-    {
-      return imchvalue<U>(this->base());
-    }
-
     auto new_values() { return mln::ranges::view::transform(this->base().new_values(), fun_); }
 
     auto new_pixels()
@@ -117,43 +118,71 @@ namespace mln
       return mln::ranges::view::transform(this->base().new_pixels(), pxwrapper);
     }
 
-    template <typename dummy = reference>
-    std::enable_if_t<accessible::value, dummy> operator()(point_type p)
+    decltype(auto) concretize() const { return imchvalue_new<value_type>(this->base()); }
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    template <concepts::Value Val>
+#else
+    template <typename Val>
+#endif
+    decltype(auto) ch_value() const
     {
-      mln_precondition(this->base().domain().has(p));
+      return imchvalue_new<Val>(this->base());
+    }
+
+
+    /// Indexable-image related methods
+    /// \{
+    template <typename dummy = I>
+    reference operator[](image_index_t<dummy> i)
+    {
+      return std::invoke(fun_, this->base()[i]);
+    }
+    /// \}
+
+
+    /// Accessible-image related methods
+    /// \{
+    template <typename Ret = reference>
+    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
+    {
+      mln_precondition(this->domain().has(p));
       return std::invoke(fun_, this->base()(p));
     }
 
-    template <typename dummy = reference>
-    std::enable_if_t<accessible::value, dummy> at(point_type p)
+    template <typename Ret = reference>
+    std::enable_if_t<accessible::value, Ret> at(point_type p)
     {
       return std::invoke(fun_, this->base().at(p));
     }
 
-    template <typename dummy = new_pixel_type>
-    std::enable_if_t<accessible::value, dummy> new_pixel(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
+      mln_precondition(this->domain().has(p));
       return {fun_, this->base().new_pixel(p)};
     }
 
-    template <typename dummy = new_pixel_type>
-    std::enable_if_t<accessible::value, dummy> new_pixel_at(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
     {
       return {fun_, this->base().new_pixel_at(p)};
     }
+    /// \}
 
-    template <typename dummy = I>
-    reference operator[](typename dummy::size_type i)
-    {
-      return std::invoke(fun_, this->base()[i]);
-    }
+
+    /// Raw-image related methods
+    /// \{
+    auto data() const       = delete;
+    auto data()             = delete;
+    auto strides(int) const = delete;
+    /// \}
   };
 
   template <class I1, class I2, class F>
   class transform2_view : public New_Image<transform2_view<I1, I2, F>>
   {
-    using fun_t = F; // FIXME something with semiregular_t<F> ?
+    using fun_t = F;
     I1    m_ima1;
     I2    m_ima2;
     fun_t fun_;
@@ -174,10 +203,10 @@ namespace mln
     using indexable          = std::false_type;                    // Preservative behavior
     using extension_category = mln::extension::none_extension_tag; // Preservative behavior (may be too preservative)
 
-    using concrete_type = ch_value_t<I1, value_type>;
+    using concrete_type = image_ch_value_t<I1, value_type>;
 
     template <class V>
-    using ch_value_type = ch_value_t<I1, V>;
+    using ch_value_type = image_ch_value_t<I1, V>;
     /// \}
 
   public:

@@ -17,7 +17,7 @@ enum B : int
 
 TEST(Core, Concept_Index)
 {
-  // TODO: test signed/unsiegned once  concept is fixed and consolidated
+  // TODO: test signed/unsigned once  concept is fixed and consolidated
   static_assert(concepts::Index<int>);
   static_assert(!concepts::Index<double>);
   static_assert(!concepts::Index<A>);

@@ -18,14 +18,6 @@
 namespace concepts   = mln::concepts;
 namespace archetypes = mln::archetypes;
 
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-template <concepts::ViewImage Ima>
-void foo(Ima)
-{
-}
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
 TEST(Core, TransformedImage_transform_byval_rvalue)
 {
   using namespace mln;

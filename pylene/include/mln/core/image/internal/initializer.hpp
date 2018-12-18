@@ -29,20 +29,11 @@ namespace mln
   {
   };
 
-  template <typename I>
-  struct New_Image;
-
   template <typename V, class I>
   internal::initializer<mln_ch_value(I, V), I> imchvalue(const Image<I>& ref);
 
-  template <typename V, class I>
-  internal::initializer<mln_ch_value(I, V), I> imchvalue_new(const New_Image<I>& ref);
-
   template <class I>
   internal::initializer<mln_concrete(I), I> imconcretize(const Image<I>& ref);
-
-  template <class I>
-  internal::initializer<mln_concrete(I), I> imconcretize_new(const New_Image<I>& ref);
 
   /******************************************/
   /****          Implementation          ****/
@@ -234,24 +225,10 @@ namespace mln
     return internal::initializer<mln_ch_value(I, V), I>(ref);
   }
 
-  template <typename V, class I>
-  internal::initializer<mln_ch_value(I, V), I> imchvalue_new(const New_Image<I>& _ref)
-  {
-    const I& ref = *static_cast<const I*>(&_ref);
-    return internal::initializer<mln_ch_value(I, V), I>(ref);
-  }
-
   template <class I>
   internal::initializer<mln_concrete(I), I> imconcretize(const Image<I>& _ref)
   {
     const I& ref = exact(_ref);
-    return internal::initializer<mln_concrete(I), I>(ref);
-  }
-
-  template <class I>
-  internal::initializer<mln_concrete(I), I> imconcretize_new(const New_Image<I>& _ref)
-  {
-    const I& ref = *static_cast<const I*>(&_ref);
     return internal::initializer<mln_concrete(I), I>(ref);
   }
 

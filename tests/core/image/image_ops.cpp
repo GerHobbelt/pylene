@@ -111,8 +111,6 @@ TEST(Core, UnaryOperator)
   image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
   image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
 
-  // FIXME?: ?segfault?
-
   auto g = new_unary_minus(ima);
   ASSERT_TRUE(new_all(new_eq(g, ref)));
 }

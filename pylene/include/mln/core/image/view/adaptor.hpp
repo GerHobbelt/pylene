@@ -14,10 +14,10 @@ namespace mln
   template <class Pixel>
   struct pixel_adaptor
   {
-    using point_type               = typename Pixel::point_type;
-    using site_type [[deprecated]] = point_type;
-    using value_type               = typename Pixel::value_type;
-    using reference                = typename Pixel::reference;
+    using point_type              = typename Pixel::point_type;
+    using site_type[[deprecated]] = point_type;
+    using value_type              = typename Pixel::value_type;
+    using reference               = typename Pixel::reference;
 
     decltype(auto) val() const { return m_pix.val(); }
     auto           point() const { return m_pix.point(); }
@@ -31,8 +31,8 @@ namespace mln
     // no default constructor as Pixel may not be default constructible
     pixel_adaptor(const pixel_adaptor&) = default;
     pixel_adaptor(pixel_adaptor&&)      = default;
-    pixel_adaptor& operator=(const pixel_adaptor&) = default;
-    pixel_adaptor& operator=(pixel_adaptor&&) = default;
+    pixel_adaptor& operator=(const pixel_adaptor&) = delete;
+    pixel_adaptor& operator=(pixel_adaptor&&) = delete;
 
   protected:
     Pixel&       base() { return m_pix; }
@@ -82,8 +82,8 @@ namespace mln
     template <class I>
     struct image_adaptor_base_indexable<I, std::enable_if_t<I::indexable::value>>
     {
-      using size_type [[deprecated]] = image_index_t<I>;
-      using index_type               = size_type;
+      using size_type[[deprecated]] = image_index_t<I>;
+      using index_type              = size_type;
     };
 
     template <class I, class = void>
@@ -143,8 +143,8 @@ namespace mln
     // no default constructor as I may not be default constructible
     image_adaptor(const image_adaptor<I>&) = default;
     image_adaptor(image_adaptor<I>&&)      = default;
-    image_adaptor<I>& operator=(const image_adaptor<I>&) = default;
-    image_adaptor<I>& operator=(image_adaptor<I>&&) = default;
+    image_adaptor<I>& operator=(const image_adaptor<I>&) = delete;
+    image_adaptor<I>& operator=(image_adaptor<I>&&) = delete;
 
     auto domain() const { return m_ima.domain(); }
     auto new_values() { return m_ima.new_values(); }

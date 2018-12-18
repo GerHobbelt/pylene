@@ -93,8 +93,8 @@ namespace mln::archetypes
     ViewImage()                 = delete;
     ViewImage(const ViewImage&) = default;
     ViewImage(ViewImage&&)      = default;
-    ViewImage& operator=(const ViewImage&) = default;
-    ViewImage& operator=(ViewImage&&) = default;
+    ViewImage& operator=(const ViewImage&) = delete;
+    ViewImage& operator=(ViewImage&&) = delete;
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED

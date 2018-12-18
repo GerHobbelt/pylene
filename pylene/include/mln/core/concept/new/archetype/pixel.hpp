@@ -17,8 +17,8 @@ namespace mln::archetypes
     Pixel()             = delete;
     Pixel(const Pixel&) = default;
     Pixel(Pixel&&)      = default;
-    Pixel& operator=(const Pixel&) = default;
-    Pixel& operator=(Pixel&&) = default;
+    Pixel& operator=(const Pixel&) = delete;
+    Pixel& operator=(Pixel&&) = delete;
 
     point_type point() const;
     reference  val() const;

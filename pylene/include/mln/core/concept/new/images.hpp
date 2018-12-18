@@ -32,8 +32,10 @@ namespace mln::concepts
   template<typename Ima>
   concept Image =
     // FIXME: inheritance from New_Image required for the moment
-    stl::Movable<Ima> &&  // Minimum constraint on image object
-    stl::Copyable<Ima> && // Do not requires DefaultConstructible
+    // Minimum constraint on image object
+    // Do not requires DefaultConstructible
+    stl::CopyConstructible<Ima> &&
+    stl::MoveConstructible<Ima> &&
     stl::DerivedFrom<image_category_t<Ima>, forward_image_tag> &&
     requires {
       typename image_pixel_t<Ima>;

@@ -82,6 +82,21 @@
             "problemMatcher": "$gcc"
         },
         {
+            "label": "build-doc-remote",
+            "dependsOn": "configure-remote",
+            "type": "shell",
+            "command": "ssh node7 'cd /work/mroynard/lrde/pylene/build-remote && source ../venv_python371/bin/activate && cmake --build . --target doc -- -j12'",
+            "group": "build",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "only-build-doc-remote",
+            "type": "shell",
+            "command": "ssh node7 'cd /work/mroynard/lrde/pylene/build-remote && source ../venv_python371/bin/activate && cmake --build . --target doc -- -j12'",
+            "group": "build",
+            "problemMatcher": "$gcc"
+        },
+        {
             "label": "clean-remote",
             "type": "shell",
             "command": "ssh node7 'cd /work/mroynard/lrde/pylene/build-remote && rm -rf CMakeCache.txt CMakeFiles'",

@@ -54,11 +54,11 @@ namespace mln
       operator V() const { return std::declval<V>(); }
     };
 
-    typedef P                                                                                       point_type;
-    typedef P                                                                                       site_type;
-    typedef V                                                                                       value_type;
-    typedef I                                                                                       image_type;
-    typedef typename std::conditional<std::is_same<Ref, void>::value, default_reference, Ref>::type reference;
+    using point_type = P;
+    using site_type  = P;
+    using value_type = V;
+    using image_type = I;
+    using reference  = typename std::conditional<std::is_same<Ref, void>::value, default_reference, Ref>::type;
 
     reference val() const { return make_object<reference>(); }
     P         point() const { return make_object<P>(); }

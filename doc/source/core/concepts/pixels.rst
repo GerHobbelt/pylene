@@ -19,7 +19,7 @@ Pixel
     #. Refines the :cpp:concept:`Regular (stl) <stl::Regular>` concept.
     #. ``Pix::value_type`` models the :cpp:concept:`Value <Value>` concept, is non-const and is not a reference.
     #. ``Pix::point_type`` models the :cpp:concept:`Point <Point>` concept.
-    #. ``Pix`` provide methods ``value`` and ``point``.
+    #. ``Pix`` provides methods ``val`` and ``point``.
 
     **Notation**
 
@@ -51,11 +51,11 @@ Pixel
     - :cpp:expr:`u == t` return-type models :cpp:concept:`template<typename B> Boolean`.
     - :cpp:expr:`u != t` return-type models :cpp:concept:`template<typename B> Boolean`.
 
-    - :cpp:expr:`cpix.value()` returns :cpp:expr:`const reference`.
+    - :cpp:expr:`cpix.val()` returns :cpp:expr:`const reference`.
     - :cpp:expr:`cpix.point()` returns :cpp:expr:`const point_type`.
 
     **Implementation**
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/pixels.hpp
        :language: cpp
-       :lines: 16-31
+       :lines: 17-32

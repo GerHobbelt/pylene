@@ -44,8 +44,13 @@ target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 # Compiler configurations
 target_compile_features(Pylene INTERFACE cxx_std_17)
 
+# Add concepts support for gcc > 7.2 with -fconcepts
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
   target_compile_options(Pylene INTERFACE -fconcepts)
+  find_package(cmcstl2 REQUIRED)
+  target_link_libraries(Pylene INTERFACE stl2)
+  target_compile_definitions(Pylene INTERFACE PYLENE_CONCEPT_TS_ENABLED)
+  target_compile_definitions(Pylene INTERFACE concept="concept bool")
 endif()
 
 

@@ -1,11 +1,12 @@
 #pragma once
 
-#include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/zip_with.hpp>
 
-#include <range/v3/utility/common_tuple.hpp>
+#include <mln/core/concept/new/concepts.hpp>
+
 #include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/range_fwd.hpp>
+#include <range/v3/utility/common_tuple.hpp>
 #include <range/v3/view/all.hpp>
 
 #include <tuple>
@@ -62,9 +63,13 @@ namespace mln::ranges
       using Concept = ::meta::and_<::ranges::InputRange<Rngs>...>;
 
       template <typename... Rngs, CONCEPT_REQUIRES_(Concept<Rngs...>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires detail::InputRanges<Rngs...>
+#endif
       zip_view<::ranges::view::all_t<Rngs>...> operator()(Rngs&&... rngs) const
+      // clang-format on
       {
-        CONCEPT_ASSERT(meta::and_<::ranges::Range<Rngs>...>());
         return zip_view<::ranges::view::all_t<Rngs>...>{::ranges::view::all(static_cast<Rngs&&>(rngs))...};
       }
 

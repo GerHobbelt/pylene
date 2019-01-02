@@ -7,15 +7,15 @@ Include :file:`<mln/labeling/local_extrema.hpp>`
 
 #. .. cpp:function:: \
       template <class Label_t, class I, class N> \
-      ch_value_t<I, Label_t> local_minima(const Image<I>& input, const Neighborhood<N>& nbh, int& nlabel)
+      image_ch_value_t<I, Label_t> local_minima(const Image<I>& input, const Neighborhood<N>& nbh, int& nlabel)
 
 #. .. cpp:function:: \
       template <class Label_t, class I, class N> \
-      ch_value_t<I, Label_t> local_maxima(const Image<I>& input, const Neighborhood<N>& nbh, int& nlabel)
+      image_ch_value_t<I, Label_t> local_maxima(const Image<I>& input, const Neighborhood<N>& nbh, int& nlabel)
 
 #. .. cpp:function:: \
       template <class Label_t, class I, class N, class Compare> \
-      ch_value_t<I, Label_t> local_minima(const Image<I>& input, const Neighborhood<N>& nbh, int& nlabel, Compare cmp)
+      image_ch_value_t<I, Label_t> local_minima(const Image<I>& input, const Neighborhood<N>& nbh, int& nlabel, Compare cmp)
 
       Labelize the local minima (1) or maxima (2) of an image with an optional
       comparaison function ``cmp`` (3).

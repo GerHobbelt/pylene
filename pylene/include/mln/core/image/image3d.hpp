@@ -38,12 +38,13 @@ namespace mln
   struct image3d : ndimage_base<T, 3, image3d<T>>
   {
   private:
-    typedef ndimage_base<T, 3, image3d<T>> base_type;
-    typedef ndimage_base<T, 3, image3d<T>> base;
+    using base_type = ndimage_base<T, 3, image3d<T>>;
+    using base      = ndimage_base<T, 3, image3d<T>>;
 
   public:
-    typedef typename base_type::domain_type domain_type;
+    using domain_type = typename base_type::domain_type;
 
+    using base::base;
 
     explicit image3d(unsigned border = 3)
       : ndimage_base<T, 3, image3d<T>>(border)
@@ -94,7 +95,7 @@ namespace mln
         for (const auto& row : slice)
         {
           mln_assertion(row.size() == nc);
-          for (const T *val = row.begin(); val != row.end(); ++val, v.next())
+          for (const T* val = row.begin(); val != row.end(); ++val, v.next())
             *v = *val;
         }
       }

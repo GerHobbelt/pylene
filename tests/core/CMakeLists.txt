@@ -17,6 +17,7 @@ add_core_test(${test_prefix}range_reverse       range/reverse.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
 # test Views
+add_core_test(${test_prefix}view_adaptor     image/view/adaptor.cpp)
 add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
 add_core_test(${test_prefix}view_zip         image/view/zip.cpp)
 

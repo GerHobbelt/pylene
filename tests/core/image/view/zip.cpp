@@ -3,8 +3,8 @@
 #include <mln/core/grays.hpp>
 
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/view/zip.hpp>
 #include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/zip.hpp>
 #include <range/v3/algorithm/for_each.hpp>
 
 #include <gtest/gtest.h>
@@ -21,7 +21,7 @@ TEST(Core, ZipImage_Mixed_writable)
 {
   using namespace mln;
 
-  image2d<int> ima(5, 5);
+  image2d<int>    ima(5, 5);
   image2d<uint16> ima2(5, 5);
 
   iota(ima, 0);
@@ -37,7 +37,7 @@ TEST(Core, ZipImage_Value_Iteration_1)
 {
   using namespace mln;
 
-  image2d<int> a(5, 5);
+  image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
 
   auto x = view::zip(a, b);
@@ -51,7 +51,7 @@ TEST(Core, ZipImage_Pixel_Iteration_1)
 {
   using namespace mln;
 
-  image2d<int> a(5, 5);
+  image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
 
   auto x = view::zip(a, b);
@@ -65,7 +65,7 @@ TEST(Core, ZipImage_Value_Iteration_2)
 {
   using namespace mln;
 
-  image2d<int> a(5, 5);
+  image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
   iota(a, 0);
   iota(b, 0);
@@ -85,11 +85,10 @@ TEST(Core, ZipImage_Temporary_usage)
   using namespace mln;
 
   image2d<int> ima(5, 5);
-  auto x = view::zip(ima, make_image());
+  auto         x = view::zip(ima, make_image());
 
   mln_foreach_new (auto w, x.new_values())
     std::get<0>(w) = std::get<1>(w);
 
   ASSERT_TRUE(new_all(new_eq(ima, make_image())));
 }
-

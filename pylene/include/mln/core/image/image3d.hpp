@@ -46,11 +46,6 @@ namespace mln
 
     using base::base;
 
-    // FIXME:
-    // Required because of a MS bug
-    // (https://developercommunity.visualstudio.com/content/problem/47799/vc-default-constructor-deleted.html)
-    image3d() = default;
-
     explicit image3d(unsigned border = 3)
       : ndimage_base<T, 3, image3d<T>>(border)
     {

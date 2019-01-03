@@ -48,6 +48,11 @@ namespace mln
 
     using base::base;
 
+    // FIXME:
+    // Required because of a MS bug
+    // (https://developercommunity.visualstudio.com/content/problem/47799/vc-default-constructor-deleted.html)
+    image2d() = default;
+
     image2d(short nrows, short ncols, unsigned border = 3, const T& init = T())
       : base(box<short, 2>{{0, 0}, {nrows, ncols}}, border, init)
     {

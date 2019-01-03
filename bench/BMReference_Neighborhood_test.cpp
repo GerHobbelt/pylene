@@ -34,10 +34,9 @@ void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* _
 
 class TestNeighborhood : public ::testing::Test
 {
-  static std::string filename = fixtures::ImagePath::concat_with_filename("lena.ppm");
-
   virtual void SetUp() override
   {
+    std::string filename = fixtures::ImagePath::concat_with_filename("lena.ppm");
     mln::image2d<mln::rgb8> tmp(0, 0);
     mln::io::imread(filename, tmp);
 

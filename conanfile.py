@@ -48,4 +48,4 @@ class Pylene(ConanFile):
             self.requires("gtest/1.8.1@bincrafters/stable")
 
         if self.options.benchmark:
-            self.requires("benchmark/1.4.1@dutiona/stable")
+            self.requires("benchmark/head@dutiona/stable")

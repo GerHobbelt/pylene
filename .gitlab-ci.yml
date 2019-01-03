@@ -12,7 +12,7 @@ build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. -pr buildfarm
+        - conan install .. -pr buildfarm --build=missing
         - cmake -DPYLENE_BUILD_BENCHMARKS=NO .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build .
                 --config Release
@@ -29,14 +29,16 @@ build-doc-images:
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr buildfarm
+        - conan install .. -pr buildfarm  --build=missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target check
+    dependencies: []
     artifacts:
         reports:
             junit: build/tests/UT*.xml
+
 
 
 distcheck-linux-gcc-release:
@@ -76,15 +78,15 @@ distcheck-linux-clang-debug:
     stage: bench
     script:
         - mkdir build && cd build
-        - conan install .. -pr buildfarm
+        - conan install .. -pr buildfarm  --build=missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake --build . --target fetch-external-data
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
-                --target benchmarks
-        - cmake --build .
-                --config $PYLENE_CONFIGURATION
-                --target benchmarks-run
-                -- -j1  # Force serial execution
+                --target run-all-benchmarks
+        - ctest -L SpeedTests -V
+    when: manual
+    dependencies: []
     artifacts:
          name: "benchmark-results"
          paths:
@@ -115,6 +117,7 @@ distbench-linux-clang-release:
         - cd doc
         - doxygen
         - sphinx-build -b html source ../public
+    dependencies: [build-doc-images]
     artifacts:
         name: "documentation"
         paths:

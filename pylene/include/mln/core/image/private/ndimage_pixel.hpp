@@ -32,6 +32,18 @@ namespace mln::details
     using value_type = std::remove_const_t<T>;
     using reference  = T&;
 
+    ndpix_base(T* ptr, point_type pnt)
+      : m_lineptr(ptr)
+      , m_point(pnt)
+    {
+    }
+
+    ndpix_base()                  = default;
+    ndpix_base(const ndpix_base&) = default;
+    ndpix_base(ndpix_base&&)      = default;
+    ndpix_base& operator=(const ndpix_base&) = default;
+    ndpix_base& operator=(ndpix_base&&) = default;
+
     reference  val() const { return m_lineptr[m_point[N - 1]]; }
     point_type point() const { return m_point; }
 
@@ -39,13 +51,17 @@ namespace mln::details
     point_type m_point;
   };
 
-  template <class T, std::size_t N>
+  template <class T, std::size_t N,
+            typename =
+                std::void_t<decltype(std::declval<ndpix_base<T, N>>().val() == std::declval<ndpix_base<T, N>>().val())>>
   bool operator==(const ndpix_base<T, N>& lhs, const ndpix_base<T, N>& rhs)
   {
     return lhs.val() == rhs.val() && lhs.point() == rhs.point();
   }
 
-  template <class T, std::size_t N>
+  template <class T, std::size_t N,
+            typename =
+                std::void_t<decltype(std::declval<ndpix_base<T, N>>().val() != std::declval<ndpix_base<T, N>>().val())>>
   bool operator!=(const ndpix_base<T, N>& lhs, const ndpix_base<T, N>& rhs)
   {
     return !(lhs == rhs);
@@ -81,13 +97,15 @@ namespace mln::details
     bool equal(const ndpix& other) const { return this->m_point[N - 1] == other.m_point[N - 1]; }
   };
 
-  template <class T, std::size_t N>
+  template <class T, std::size_t N,
+            typename = std::void_t<decltype(std::declval<ndpix<T, N>>().val() == std::declval<ndpix<T, N>>().val())>>
   bool operator==(const ndpix<T, N>& lhs, const ndpix<T, N>& rhs)
   {
     return lhs.val() == rhs.val() && lhs.point() == rhs.point();
   }
 
-  template <class T, std::size_t N>
+  template <class T, std::size_t N,
+            typename = std::void_t<decltype(std::declval<ndpix<T, N>>().val() != std::declval<ndpix<T, N>>().val())>>
   bool operator!=(const ndpix<T, N>& lhs, const ndpix<T, N>& rhs)
   {
     return !(lhs == rhs);

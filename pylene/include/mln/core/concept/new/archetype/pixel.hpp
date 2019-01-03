@@ -14,12 +14,15 @@ namespace mln::archetypes
     using point_type = Point;
     using reference  = const value_type&;
 
+    Pixel()             = delete;
+    Pixel(const Pixel&) = default;
+    Pixel(Pixel&&)      = default;
+    Pixel& operator=(const Pixel&) = delete;
+    Pixel& operator=(Pixel&&) = delete;
+
     point_type point() const;
     reference  val() const;
   };
-
-  bool operator==(const Pixel& lhs, const Pixel& rhs);
-  bool operator!=(const Pixel& lhs, const Pixel& rhs);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::Pixel<Pixel>, "Pixel archetype does not model the Pixel concept!");

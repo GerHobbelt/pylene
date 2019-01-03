@@ -23,7 +23,7 @@ namespace mln
     {
       typedef I type;
     };
-  }
+  } // namespace internal
 
   struct init
   {
@@ -216,7 +216,7 @@ namespace mln
       int m_border;
     };
 
-  } // end of namespace mln::internal
+  } // namespace internal
 
   template <typename V, class I>
   internal::initializer<mln_ch_value(I, V), I> imchvalue(const Image<I>& _ref)

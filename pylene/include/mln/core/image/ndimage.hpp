@@ -141,6 +141,7 @@ namespace mln
     using accessible                 = std::true_type;
     using indexable                  = std::true_type;
     using concrete[[deprecated]]     = std::true_type;
+    using view                       = std::false_type;
     using shallow_copy[[deprecated]] = std::true_type;
     using has_border[[deprecated]]   = std::true_type;
     using extension_category         = mln::extension::border_extension_tag;

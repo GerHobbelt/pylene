@@ -10,12 +10,10 @@
 #include <mln/core/image_traits.hpp>
 
 #include <boost/concept_check.hpp>
+#include <mln/core/concept/new/images.hpp>
 
 namespace mln
 {
-
-  template <typename I>
-  struct New_Image;
 
   template <typename I>
   struct Image;
@@ -31,11 +29,6 @@ namespace mln
   struct AccessibleImage;
   template <typename I>
   struct ImageWithExtension;
-
-  template <typename I>
-  struct New_Image
-  {
-  };
 
 
   template <typename I>

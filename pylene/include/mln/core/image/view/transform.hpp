@@ -11,7 +11,7 @@ namespace mln
 
 
   template <class I, class F>
-  class transform_view : public image_adaptor<I>, public New_Image<transform_view<I, F>>
+  class transform_view : public image_adaptor<I>, public experimental::Image<transform_view<I, F>>
   {
     using fun_t = F;
     fun_t fun_;
@@ -180,7 +180,7 @@ namespace mln
   };
 
   template <class I1, class I2, class F>
-  class transform2_view : public New_Image<transform2_view<I1, I2, F>>
+  class transform2_view : public experimental::Image<transform2_view<I1, I2, F>>
   {
     using fun_t = F;
     I1    m_ima1;
@@ -333,10 +333,8 @@ namespace mln
     template <class I, class UnaryFunction>
     transform_view<I, UnaryFunction> transform(I ima, UnaryFunction fun)
     {
-      static_assert(mln::is_a<I, New_Image>());
+      static_assert(mln::is_a<I, experimental::Image>());
 
-
-      // FIXME: make ima a view first ?
       return {std::move(ima), std::move(fun)};
     }
 
@@ -344,10 +342,9 @@ namespace mln
     template <class I1, class I2, class UnaryFunction>
     transform2_view<I1, I2, UnaryFunction> transform(I1 ima1, I2 ima2, UnaryFunction fun)
     {
-      static_assert(mln::is_a<I1, New_Image>());
-      static_assert(mln::is_a<I2, New_Image>());
+      static_assert(mln::is_a<I1, experimental::Image>());
+      static_assert(mln::is_a<I2, experimental::Image>());
 
-      // FIXME: make ima1 and ima2 a view first ?
       return {std::move(ima1), std::move(ima2), std::move(fun)};
     }
   } // namespace view

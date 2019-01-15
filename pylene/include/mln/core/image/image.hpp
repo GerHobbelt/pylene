@@ -21,6 +21,7 @@
 #include <mln/core/image/image_expr.hpp>
 #include <mln/core/image/image_math_ops.hpp>
 #include <mln/core/image/image_ops.hpp>
+
 #include <mln/core/image/image_routines.hpp>
 #include <mln/core/internal/get_border_from_nbh.hpp>
 

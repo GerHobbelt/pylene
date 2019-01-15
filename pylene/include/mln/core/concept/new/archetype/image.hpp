@@ -17,7 +17,8 @@ namespace mln::archetypes
 
   struct ConcreteImage;
 
-  struct ConcreteImage
+
+  struct ConcreteImage : mln::experimental::Image<ConcreteImage>
   {
     using new_pixel_type = Pixel;
     using value_type     = pixel_value_t<Pixel>;
@@ -86,7 +87,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct ViewImage : ConcreteImage
+  struct ViewImage : ConcreteImage, mln::experimental::Image<ViewImage>
   {
     using view = std::true_type;
 
@@ -102,16 +103,14 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct Image : ViewImage
-  {
-  };
+  using Image = ViewImage;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::Image<Image>, "Image archetype does not model the Image concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputImage : Image
+  struct OutputImage : Image, mln::experimental::Image<OutputImage>
   {
     using new_pixel_type = OutputPixel;
     using reference      = pixel_reference_t<OutputPixel>;
@@ -135,18 +134,14 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct InputImage : Image
-  {
-  };
+  using InputImage = Image;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::InputImage<InputImage>, "InputImage archetype does not model the InputImage concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct ForwardImage final : InputImage
-  {
-  };
+  using ForwardImage = InputImage;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::ForwardImage<ForwardImage>,
@@ -154,9 +149,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputForwardImage final : OutputImage
-  {
-  };
+  using OutputForwardImage = OutputImage;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::ForwardImage<OutputForwardImage> && mln::concepts::OutputImage<OutputForwardImage>,
@@ -164,7 +157,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct IndexableImage : Image
+  struct IndexableImage : Image, mln::experimental::Image<IndexableImage>
   {
     using index_type = int;
     using indexable  = std::true_type;
@@ -178,7 +171,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputIndexableImage final : IndexableImage
+  struct OutputIndexableImage final : IndexableImage, mln::experimental::Image<OutputIndexableImage>
   {
     using new_pixel_type = OutputPixel;
     using reference      = pixel_reference_t<OutputPixel>;
@@ -206,7 +199,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct AccessibleImage : Image
+  struct AccessibleImage : Image, mln::experimental::Image<AccessibleImage>
   {
     using accessible = std::true_type;
 
@@ -222,7 +215,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputAccessibleImage : AccessibleImage
+  struct OutputAccessibleImage : AccessibleImage, mln::experimental::Image<OutputAccessibleImage>
   {
     using new_pixel_type = OutputPixel;
     using reference      = pixel_reference_t<OutputPixel>;
@@ -255,7 +248,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct IndexableAndAccessibleImage : AccessibleImage
+  struct IndexableAndAccessibleImage : AccessibleImage, mln::experimental::Image<IndexableAndAccessibleImage>
   {
     using index_type = int;
     using indexable  = std::true_type;
@@ -273,7 +266,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputIndexableAndAccessibleImage : OutputAccessibleImage
+  struct OutputIndexableAndAccessibleImage : OutputAccessibleImage, mln::experimental::Image<OutputIndexableAndAccessibleImage>
   {
     using index_type = int;
     using indexable  = std::true_type;
@@ -297,20 +290,20 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct BidirectionalImage : Image
+  struct BidirectionalImage : Image, mln::experimental::Image<BidirectionalImage>
   {
     using category_type = bidirectional_image_tag;
 
-    struct ReversiblePixelRange final : Image::PixelRange
+    struct ReversiblePixelRange final : mln::archetypes::Image::PixelRange
     {
-      Image::PixelRange reversed();
+      mln::archetypes::Image::PixelRange reversed();
     };
 
     ReversiblePixelRange new_pixels();
 
-    struct ReversibleValueRange final : Image::ValueRange
+    struct ReversibleValueRange final : mln::archetypes::Image::ValueRange
     {
-      Image::ValueRange reversed();
+      mln::archetypes::Image::ValueRange reversed();
     };
 
     ReversibleValueRange new_values();
@@ -322,7 +315,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputBidirectionalImage : BidirectionalImage
+  struct OutputBidirectionalImage : BidirectionalImage, mln::experimental::Image<OutputBidirectionalImage>
   {
     using new_pixel_type = OutputPixel;
     using reference      = pixel_reference_t<OutputPixel>;
@@ -351,21 +344,21 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct RawImage : IndexableAndAccessibleImage
+  struct RawImage : IndexableAndAccessibleImage, mln::experimental::Image<RawImage>
   {
     using category_type = raw_image_tag;
 
 
-    struct ReversiblePixelRange final : Image::PixelRange
+    struct ReversiblePixelRange final : mln::archetypes::Image::PixelRange
     {
-      Image::PixelRange reversed();
+      mln::archetypes::Image::PixelRange reversed();
     };
 
     ReversiblePixelRange new_pixels();
 
-    struct ReversibleValueRange final : Image::ValueRange
+    struct ReversibleValueRange final : mln::archetypes::Image::ValueRange
     {
-      Image::ValueRange reversed();
+      mln::archetypes::Image::ValueRange reversed();
     };
 
     ReversibleValueRange new_values();
@@ -380,7 +373,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct OutputRawImage final : RawImage
+  struct OutputRawImage final : RawImage, mln::experimental::Image<OutputRawImage>
   {
     using new_pixel_type = OutputPixel;
     using reference      = pixel_reference_t<OutputPixel>;
@@ -426,7 +419,7 @@ namespace mln::archetypes
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  struct WithExtensionImage : Image
+  struct WithExtensionImage : Image, mln::experimental::Image<WithExtensionImage>
   {
     struct Extension
     {

@@ -106,8 +106,8 @@ TEST(GraphCut, graphcut_1)
   using namespace mln;
 
   image2d<bool> ori(5, 5);
-  fill(ori, false);
-  fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), true);
+  mln::fill(ori, false);
+  mln::fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), true);
 
   image2d<bool> out(5, 5);
 
@@ -122,8 +122,8 @@ TEST(GraphCut, graphcut_2)
   using namespace mln;
 
   image2d<float> ori(5, 5);
-  fill(ori, 0.0f);
-  fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), 0.7f);
+  mln::fill(ori, 0.0f);
+  mln::fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), 0.7f);
 
   image2d<bool> out(5, 5);
 

@@ -231,7 +231,7 @@ TEST(Dilation, Custom_cmp_function)
 TEST(Dilation, Binary)
 {
   image2d<bool> ima(11, 11);
-  fill(ima, false);
+  mln::fill(ima, false);
   ima.at(0, 0)   = true;
   ima.at(5, 5)   = true;
   ima.at(10, 10) = true;

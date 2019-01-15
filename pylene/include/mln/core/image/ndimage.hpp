@@ -123,7 +123,7 @@ namespace mln
   struct ndimage_base
 #ifndef MLN_DOXYGEN
     : image_base<E, point<short, dim>, T, ndimage_pixel<T, dim, E>, ndimage_pixel<const T, dim, const E>>,
-      New_Image<E>
+      mln::experimental::Image<E>
 #endif
   {
   private:

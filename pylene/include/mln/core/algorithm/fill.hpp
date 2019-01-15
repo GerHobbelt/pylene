@@ -30,9 +30,11 @@ namespace mln
   template <typename OutputImage, typename Value>
   OutputImage&& fill(Image<OutputImage>&& output, const Value& val);
 
-
-  template <class I, class Value>
-  std::enable_if_t<!is_a<I, Image>::value> fill(const New_Image<I>& f, const Value& v);
+  namespace experimental
+  {
+    template <class OutputImage, class Value>
+    void fill(const Image<OutputImage>& f, const Value& v);
+  }
 
   /******************************************/
   /****          Implementation          ****/
@@ -64,16 +66,18 @@ namespace mln
     return output;
   }
 
-
-  template <class I, class Value>
-  std::enable_if_t<!is_a<I, Image>::value>
-  fill(const New_Image<I>& f_, const Value& v)
+  namespace experimental
   {
-    I f = static_cast<const I&>(f_);
+    template <class OutputImage, class Value>
+    void fill(const Image<OutputImage>& f_, const Value& v)
+    {
+      OutputImage f = static_cast<const OutputImage&>(f_);
 
-    for (auto row : ranges::rows(f.new_values()))
-      ::ranges::fill(row, v);
+      for (auto row : ranges::rows(f.new_values()))
+        ::ranges::fill(row, v);
+    }
   }
+
 
 
 } // end of namespace mln

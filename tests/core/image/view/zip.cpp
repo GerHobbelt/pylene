@@ -16,6 +16,13 @@ mln::image2d<int> make_image()
   return x;
 }
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+template <mln::concepts::ViewImage I>
+void foo(I)
+{
+}
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
 // Test1. Value mixing ziping
 TEST(Core, ZipImage_Mixed_writable)
 {
@@ -31,6 +38,8 @@ TEST(Core, ZipImage_Mixed_writable)
   auto x = view::zip(ima, ima2);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+  foo(x);
+
   static_assert(not concepts::ConcreteImage<decltype(x)>);
   static_assert(concepts::OutputImage<decltype(x)>);
   static_assert(concepts::ViewImage<decltype(x)>);

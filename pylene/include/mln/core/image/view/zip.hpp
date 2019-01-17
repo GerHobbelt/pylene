@@ -102,11 +102,15 @@ namespace mln
     auto domain() const { return std::get<0>(m_images).domain(); }
 
     // FIXME: what to do here ?
-    decltype(auto) concretize() const;
+    concrete_type concretize() const;
 
     // FIXME: what to do here ?
-    template <class V>
-    decltype(auto) ch_value() const;
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    template <concepts::Value V>
+#else
+    template <typename V>
+#endif
+    ch_value_type<V> ch_value() const;
 
     auto new_values()
     {
@@ -150,8 +154,8 @@ namespace mln
     template <typename Ret = new_pixel_type>
     std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
     {
-      auto g_has = [p](auto&&... images) { return (images.has(p) && ...); };
-      return std::apply(g_has, m_images);
+      auto g = [p](auto&&... images) { return new_pixel_type(images.new_pixel_at(p)...); };
+      return std::apply(g, m_images);
     }
     /// \}
 
@@ -159,7 +163,7 @@ namespace mln
     template <typename dummy = bool>
     std::enable_if_t<accessible::value, dummy> all_domain_has(point_type p)
     {
-      auto g_has = [p](auto&&... images) { return (images.has(p) && ...); };
+      auto g_has = [p](auto&&... images) { return (images.domain().has(p) && ...); };
       return std::apply(g_has, m_images);
     }
   };

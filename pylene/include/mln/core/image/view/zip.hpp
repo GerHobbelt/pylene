@@ -14,31 +14,37 @@ namespace mln
   template <class... Images>
   class zip_view : public experimental::Image<zip_view<Images...>>
   {
-    using tuple_t = std::tuple<Images...>;
-    using I0      = std::tuple_element_t<0, tuple_t>;
-
+    using tuple_t         = std::tuple<Images...>;
+    using common_category = std::common_type_t<image_category_t<Images>...>;
 
     tuple_t m_images;
 
   public:
     /// Type definitions
     /// \{
-    using reference     = std::tuple<image_reference_t<Images>...>;
-    using value_type    = std::tuple<image_value_t<Images>...>;
-    using point_type    = image_point_t<I0>;
-    using concrete_type = image_ch_value_t<I0, value_type>;
-    using domain_type   = typename I0::domain_type;
-
-    template <typename V>
-    using ch_value_type = image_ch_value_t<I0, V>;
+    using reference   = std::tuple<image_reference_t<Images>...>;
+    using value_type  = std::tuple<image_value_t<Images>...>;
+    using point_type  = std::common_type_t<image_point_t<Images>...>;
+    using domain_type = std::common_type_t<image_domain_t<Images>...>;
     /// \}
-
 
     /// Traits & Image Properties
     /// \{
-    using accessible         = typename std::conjunction<typename Images::accessible...>::type;
-    using indexable          = std::false_type;                    // Preservative behavior
+    using accessible         = std::conjunction<Images::accessible...>;
+    using indexable          = std::false_type; // Preservative behavior
+    using view               = std::true_type;
     using extension_category = mln::extension::none_extension_tag; // Preservative behavior
+    // Transform doesn't preserve contiguity, so it decays from raw_image_tag
+    using category_type =
+        std::conditional_t<std::is_base_of_v<raw_image_tag, common_category>, bidirectional_image_tag, common_category>;
+    using concrete_type = std::common_type_t<image_ch_value_t<Images, value_type>>;
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    template <concepts::Value V>
+#else
+    template <typename V>
+#endif
+    using ch_value_type = std::common_type_t<image_ch_value_t<Images, V>...>;
     /// \}
 
     static_assert(std::conjunction_v<std::is_same<image_point_t<Images>, point_type>...>,
@@ -50,15 +56,20 @@ namespace mln
     /// \{
     struct new_pixel_type : Pixel<new_pixel_type>
     {
-      using reference  = zip_view::reference;
-      using value_type = zip_view::value_type;
-      using point_type = zip_view::point_type;
+      using reference               = zip_view::reference;
+      using value_type              = zip_view::value_type;
+      using site_type[[deprecated]] = zip_view::point_type;
+      using point_type              = zip_view::point_type;
 
-      new_pixel_type() = default;
       new_pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}
       {
       }
+
+      new_pixel_type(const new_pixel_type&) = default;
+      new_pixel_type(new_pixel_type&&)      = default;
+      new_pixel_type& operator=(const new_pixel_type&) = delete;
+      new_pixel_type& operator=(new_pixel_type&&) = delete;
 
       point_type point() const { return std::get<0>(m_pixels).point(); }
       reference  val() const
@@ -66,7 +77,6 @@ namespace mln
         auto build_value = [](auto&&... pixels) -> reference { return {pixels.val()...}; };
         return std::apply(build_value, m_pixels);
       }
-
       void advance(point_type q)
       {
         auto g = [q](auto&&... pixels) { (pixels.advance(q), ...); };
@@ -78,12 +88,25 @@ namespace mln
     };
     /// \}
 
-    zip_view() = default;
 
     zip_view(Images... images)
       : m_images{std::move(images)...}
     {
     }
+
+    zip_view(const zip_view<Images...>&) = default;
+    zip_view(zip_view<Images...>&&)      = default;
+    zip_view<Images...>& operator=(const zip_view<Images...>&) = delete;
+    zip_view<Images...>& operator=(zip_view<Images...>&&) = delete;
+
+    auto domain() const { return std::get<0>(m_images).domain(); }
+
+    // FIXME: what to do here ?
+    // decltype(auto) concretize() const
+
+    // FIXME: what to do here ?
+    // template <class V>
+    // decltype(auto) ch_value() const
 
     auto domain() const { return std::get<0>(m_images).domain(); }
 
@@ -102,33 +125,37 @@ namespace mln
       return std::apply(g_new_pixels, m_images);
     }
 
-    template <typename dummy = reference>
-    std::enable_if_t<accessible::value, dummy> operator()(point_type p)
+
+    /// Accessible-image related methods
+    /// \{
+    template <typename Ret = reference>
+    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
     {
       mln_precondition(all_domain_has(p));
       return this->at(p);
     }
 
-    template <typename dummy = reference>
-    std::enable_if_t<accessible::value, dummy> at(point_type p)
+    template <typename Ret = reference>
+    std::enable_if_t<accessible::value, Ret> at(point_type p)
     {
       auto g = [p](auto&&... images) { return std::forward_as_tuple(images.at(p)...); };
       return std::apply(g, m_images);
     }
 
-    template <typename dummy = new_pixel_type>
-    std::enable_if_t<accessible::value, dummy> new_pixel(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
       mln_precondition(all_domain_has(p));
       return this->new_pixel_at(p);
     }
 
-    template <typename dummy = new_pixel_type>
-    std::enable_if_t<accessible::value, dummy> new_pixel_at(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
     {
-      auto g = [p](auto&&... images) { return new_pixel_type(images.new_pixel_at(p)...); };
-      return std::apply(g, m_images);
+      auto g_has = [p](auto&&... images) { return (images.has(p) && ...); };
+      return std::apply(g_has, m_images);
     }
+    /// \}
 
   private:
     template <typename dummy = bool>
@@ -145,7 +172,7 @@ namespace mln
     template <class... Images>
     zip_view<Images...> zip(Images... images)
     {
-      static_assert(std::conjunction_v<is_a<Images, New_Image>...>, "All zip arguments must be images.");
+      static_assert(std::conjunction_v<is_a<Images, experimental::Image>...>, "All zip arguments must be images.");
 
       return zip_view<Images...>(std::move(images)...);
     }

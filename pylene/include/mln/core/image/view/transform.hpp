@@ -54,10 +54,10 @@ namespace mln
     /// \{
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, Pixel<new_pixel_type>
     {
-      using point_type              = transform_view::point_type;
-      using site_type[[deprecated]] = transform_view::point_type;
-      using reference               = transform_view::reference;
-      using value_type              = transform_view::value_type;
+      using point_type               = transform_view::point_type;
+      using site_type [[deprecated]] = transform_view::point_type;
+      using reference                = transform_view::reference;
+      using value_type               = transform_view::value_type;
 
       new_pixel_type(fun_t fun, image_pixel_t<I> px)
         : new_pixel_type::pixel_adaptor{px}
@@ -218,10 +218,10 @@ namespace mln
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I1>>, Pixel<new_pixel_type>
     {
     public:
-      using point_type              = transform2_view::point_type;
-      using site_type[[deprecated]] = transform2_view::point_type;
-      using reference               = transform2_view::reference;
-      using value_type              = transform2_view::value_type;
+      using point_type               = transform2_view::point_type;
+      using site_type [[deprecated]] = transform2_view::point_type;
+      using reference                = transform2_view::reference;
+      using value_type               = transform2_view::value_type;
 
 
       new_pixel_type(fun_t fun, image_pixel_t<I1> px1, image_pixel_t<I2> px2)
@@ -331,14 +331,6 @@ namespace mln
     {
       return {fun_, m_ima1.new_pixel_at(p), m_ima2.new_pixel_at(p)};
     }
-    /// \}
-
-
-    /// Raw-image related methods
-    /// \{
-    auto data() const       = delete;
-    auto data()             = delete;
-    auto strides(int) const = delete;
     /// \}
   };
 

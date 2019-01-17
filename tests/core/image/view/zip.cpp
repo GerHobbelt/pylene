@@ -20,6 +20,7 @@ mln::image2d<int> make_image()
 TEST(Core, ZipImage_Mixed_writable)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int>    ima(5, 5);
   image2d<uint16> ima2(5, 5);
@@ -28,14 +29,15 @@ TEST(Core, ZipImage_Mixed_writable)
   iota(ima2, 1);
 
   fill(view::zip(ima, ima2), std::make_tuple(2, 4));
-  ASSERT_TRUE(new_all(new_eq(ima, 2)));
-  ASSERT_TRUE(new_all(new_eq(ima2, 4)));
+  ASSERT_TRUE(mln::experimental::all(ima == 2));
+  ASSERT_TRUE(mln::experimental::all(ima2 == 4));
 }
 
 
 TEST(Core, ZipImage_Value_Iteration_1)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
@@ -43,13 +45,14 @@ TEST(Core, ZipImage_Value_Iteration_1)
   auto x = view::zip(a, b);
   ::ranges::for_each(x.new_values(), [](std::tuple<int&, uint16&> w) { w = std::make_tuple(2, 4); });
 
-  ASSERT_TRUE(new_all(new_eq(a, 2)));
-  ASSERT_TRUE(new_all(new_eq(b, 4)));
+  ASSERT_TRUE(mln::experimental::all(a == 2));
+  ASSERT_TRUE(mln::experimental::all(b == 4));
 }
 
 TEST(Core, ZipImage_Pixel_Iteration_1)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
@@ -57,8 +60,8 @@ TEST(Core, ZipImage_Pixel_Iteration_1)
   auto x = view::zip(a, b);
   ::ranges::for_each(x.new_pixels(), [](auto px) { px.val() = std::make_tuple(2, 4); });
 
-  ASSERT_TRUE(new_all(new_eq(a, 2)));
-  ASSERT_TRUE(new_all(new_eq(b, 4)));
+  ASSERT_TRUE(mln::experimental::all(a == 2));
+  ASSERT_TRUE(mln::experimental::all(b == 4));
 }
 
 TEST(Core, ZipImage_Value_Iteration_2)
@@ -83,6 +86,7 @@ TEST(Core, ZipImage_Value_Iteration_2)
 TEST(Core, ZipImage_Temporary_usage)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int> ima(5, 5);
   auto         x = view::zip(ima, make_image());
@@ -90,5 +94,5 @@ TEST(Core, ZipImage_Temporary_usage)
   mln_foreach_new (auto w, x.new_values())
     std::get<0>(w) = std::get<1>(w);
 
-  ASSERT_TRUE(new_all(new_eq(ima, make_image())));
+  ASSERT_TRUE(mln::experimental::all(b == make_image()));
 }

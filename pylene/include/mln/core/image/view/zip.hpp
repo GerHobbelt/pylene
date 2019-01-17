@@ -30,7 +30,7 @@ namespace mln
 
     /// Traits & Image Properties
     /// \{
-    using accessible         = std::conjunction<Images::accessible...>;
+    using accessible         = std::conjunction<typename Images::accessible...>;
     using indexable          = std::false_type; // Preservative behavior
     using view               = std::true_type;
     using extension_category = mln::extension::none_extension_tag; // Preservative behavior
@@ -56,10 +56,10 @@ namespace mln
     /// \{
     struct new_pixel_type : Pixel<new_pixel_type>
     {
-      using reference               = zip_view::reference;
-      using value_type              = zip_view::value_type;
-      using site_type[[deprecated]] = zip_view::point_type;
-      using point_type              = zip_view::point_type;
+      using reference                = zip_view::reference;
+      using value_type               = zip_view::value_type;
+      using site_type [[deprecated]] = zip_view::point_type;
+      using point_type               = zip_view::point_type;
 
       new_pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}
@@ -107,8 +107,6 @@ namespace mln
     // FIXME: what to do here ?
     // template <class V>
     // decltype(auto) ch_value() const
-
-    auto domain() const { return std::get<0>(m_images).domain(); }
 
     auto new_values()
     {

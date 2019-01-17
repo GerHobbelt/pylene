@@ -94,5 +94,5 @@ TEST(Core, ZipImage_Temporary_usage)
   mln_foreach_new (auto w, x.new_values())
     std::get<0>(w) = std::get<1>(w);
 
-  ASSERT_TRUE(mln::experimental::all(b == make_image()));
+  ASSERT_TRUE(mln::experimental::all(ima == make_image()));
 }

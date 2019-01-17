@@ -28,7 +28,21 @@ TEST(Core, ZipImage_Mixed_writable)
   iota(ima, 0);
   iota(ima2, 1);
 
-  fill(view::zip(ima, ima2), std::make_tuple(2, 4));
+  auto x = view::zip(ima, ima2);
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(not concepts::ConcreteImage<decltype(x)>);
+  static_assert(concepts::OutputImage<decltype(x)>);
+  static_assert(concepts::ViewImage<decltype(x)>);
+  static_assert(not concepts::IndexableImage<decltype(x)>);
+  static_assert(concepts::AccessibleImage<decltype(x)>);
+  static_assert(not concepts::IndexableAndAccessibleImage<decltype(x)>);
+  static_assert(concepts::BidirectionalImage<decltype(x)>);
+  static_assert(not concepts::RawImage<decltype(x)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+  fill(x, std::make_tuple(2, 4));
+
   ASSERT_TRUE(mln::experimental::all(ima == 2));
   ASSERT_TRUE(mln::experimental::all(ima2 == 4));
 }

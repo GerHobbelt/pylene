@@ -88,8 +88,8 @@ TEST(Core, TransformedImage_transform_byval_lvalue)
   {
     auto c1 = imtransform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
     auto c2 = imtransform(ima, [](const std::pair<int, int>& x) -> const int& { return x.second; });
-    fill(ima, std::make_pair(12, 12));
-    fill(c1, 69);
+    mln::fill(ima, std::make_pair(12, 12));
+    mln::fill(c1, 69);
 
     // Test pixel iteration
     // check that properties of pixels are preserved (point + index)

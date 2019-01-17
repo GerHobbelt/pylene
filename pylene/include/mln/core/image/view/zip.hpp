@@ -12,7 +12,7 @@ namespace mln
 
 
   template <class... Images>
-  class zip_view : public New_Image<zip_view<Images...>>
+  class zip_view : public experimental::Image<zip_view<Images...>>
   {
     using tuple_t = std::tuple<Images...>;
     using I0      = std::tuple_element_t<0, tuple_t>;

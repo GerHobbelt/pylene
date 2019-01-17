@@ -15,7 +15,7 @@ TEST(Core, Algorithm_Paste)
   box2d          b = {{1, 1}, {3, 3}};
   image2d<uint8> ima(b);
   image2d<uint8> out(15, 15);
-  fill(ima, 69);
+  mln::fill(ima, 69);
   iota(out, 1);
   paste(ima, out);
   // 1   2  3  4..

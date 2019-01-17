@@ -22,6 +22,8 @@
 
 namespace mln
 {
+  template <class I, class V>
+  using image_ch_value_t = typename I::template ch_value_type<V>;
 
   struct [[deprecated]] image_dynamic_tag
   {
@@ -35,7 +37,7 @@ namespace mln
   struct Image;
 
   template <typename I>
-  struct image_traits  : image_traits<typename std::decay<I>::type>
+  struct image_traits : image_traits<typename std::decay<I>::type>
   {
   };
 
@@ -215,7 +217,7 @@ namespace mln
   };
 
 #define MLN_GENERATE_META_IMAGE_OPERATORS(meta_op, op)                                                                 \
-  struct meta_op                                                                                         \
+  struct meta_op                                                                                                       \
   {                                                                                                                    \
     template <typename Image>                                                                                          \
     struct apply                                                                                                       \
@@ -242,6 +244,6 @@ namespace mln
   MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_value_iterator, image_const_value_iterator)
   MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_pixel_iterator, image_pixel_iterator)
   MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_pixel_iterator, image_const_pixel_iterator)
-}
+} // namespace mln
 
 #endif /* !MLN_CORE_IMAGE_TRAITS_HPP */

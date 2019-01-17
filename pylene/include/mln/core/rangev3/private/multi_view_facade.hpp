@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
+
 #include <range/v3/view_facade.hpp>
 
 namespace mln::ranges::details
@@ -19,8 +19,7 @@ namespace mln::ranges::details
   /******************************************/
 
   template <std::size_t Rank, typename R, bool forward>
-  class multi_view_facade : public ::ranges::view_facade<multi_view_facade<Rank, R, forward>>,
-                            public multidimensional_range_base
+  class multi_view_facade : public ::ranges::view_facade<multi_view_facade<Rank, R, forward>>
   {
     friend ::ranges::range_access;
 

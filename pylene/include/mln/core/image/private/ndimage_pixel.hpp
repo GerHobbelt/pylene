@@ -1,8 +1,11 @@
 #pragma once
 
-#include <array>
 #include <mln/core/concept/pixel.hpp>
+#include <mln/core/point.hpp>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
+#include <mln/core/rangev3/view/reverse.hpp>
+
+#include <array>
 
 // Note: because of the CRTP, we do not want this to be inner class of ndimage<T, N, E>
 // (E is a non-dependant template parameter).
@@ -29,13 +32,41 @@ namespace mln::details
     using value_type = std::remove_const_t<T>;
     using reference  = T&;
 
-    T&         val() const { return m_lineptr[m_point[N - 1]]; }
-    point_type point() const { return m_point; }
+    ndpix_base(T* ptr, point_type pnt)
+      : m_lineptr(ptr)
+      , m_point(pnt)
+    {
+    }
 
+    ndpix_base()                  = default;
+    ndpix_base(const ndpix_base&) = default;
+    ndpix_base(ndpix_base&&)      = default;
+    ndpix_base& operator=(const ndpix_base&) = default;
+    ndpix_base& operator=(ndpix_base&&) = default;
+
+    reference  val() const { return m_lineptr[m_point[N - 1]]; }
+    point_type point() const { return m_point; }
 
     T*         m_lineptr;
     point_type m_point;
   };
+
+  template <class T, std::size_t N,
+            typename =
+                std::void_t<decltype(std::declval<ndpix_base<T, N>>().val() == std::declval<ndpix_base<T, N>>().val())>>
+  bool operator==(const ndpix_base<T, N>& lhs, const ndpix_base<T, N>& rhs)
+  {
+    return lhs.val() == rhs.val() && lhs.point() == rhs.point();
+  }
+
+  template <class T, std::size_t N,
+            typename =
+                std::void_t<decltype(std::declval<ndpix_base<T, N>>().val() != std::declval<ndpix_base<T, N>>().val())>>
+  bool operator!=(const ndpix_base<T, N>& lhs, const ndpix_base<T, N>& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
 
   template <class T, std::size_t N>
   struct ndpix : ndpix_base<T, N>
@@ -66,15 +97,33 @@ namespace mln::details
     bool equal(const ndpix& other) const { return this->m_point[N - 1] == other.m_point[N - 1]; }
   };
 
+  template <class T, std::size_t N,
+            typename = std::void_t<decltype(std::declval<ndpix<T, N>>().val() == std::declval<ndpix<T, N>>().val())>>
+  bool operator==(const ndpix<T, N>& lhs, const ndpix<T, N>& rhs)
+  {
+    return lhs.val() == rhs.val() && lhs.point() == rhs.point();
+  }
+
+  template <class T, std::size_t N,
+            typename = std::void_t<decltype(std::declval<ndpix<T, N>>().val() != std::declval<ndpix<T, N>>().val())>>
+  bool operator!=(const ndpix<T, N>& lhs, const ndpix<T, N>& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+
   template <class T, std::size_t N>
   struct ndpixel : ndpix_base<T, N>
   {
     using typename ndpix_base<T, N>::point_type;
+    using typename ndpix_base<T, N>::site_type;
+    using typename ndpix_base<T, N>::value_type;
+    using typename ndpix_base<T, N>::reference;
 
     ndpixel() = default;
 
     ndpixel(const ndpix<T, N>& other)
-      : ndpix_base<T, N> {other}
+      : ndpix_base<T, N>{other}
       , m_info{*(other.m_info)}
     {
     }
@@ -89,6 +138,18 @@ namespace mln::details
   public:
     ndimage_info<T, N> m_info;
   };
+
+  template <class T, std::size_t N>
+  bool operator==(const ndpixel<T, N>& lhs, const ndpixel<T, N>& rhs)
+  {
+    return lhs.val() == rhs.val() && lhs.point() == rhs.point();
+  }
+
+  template <class T, std::size_t N>
+  bool operator!=(const ndpixel<T, N>& lhs, const ndpixel<T, N>& rhs)
+  {
+    return !(lhs == rhs);
+  }
 
 
   template <class T, std::size_t N>
@@ -198,4 +259,6 @@ namespace mln::details
   private:
     ndimage_info<T, N> m_info;
   };
-}
+
+
+} // namespace mln::details

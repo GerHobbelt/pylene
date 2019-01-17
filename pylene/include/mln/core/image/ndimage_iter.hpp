@@ -1,11 +1,12 @@
-#ifndef MLN_NDIMAGE_RANGE_HH
-#define MLN_NDIMAGE_RANGE_HH
+#pragma once
 
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
 #include <mln/core/image/ndimage_pixel.hpp>
 
 namespace mln
 {
+  template <class T, unsigned dim, class E>
+  struct ndimage_pixel;
 
   template <typename Image, typename Value>
   struct ndimage_value_range
@@ -160,5 +161,4 @@ namespace mln
   private:
     Image* ima_;
   };
-}
-#endif
+} // namespace mln

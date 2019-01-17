@@ -252,40 +252,12 @@ Invocable
     - cf. `reference documentation for Invocable <https://en.cppreference.com/w/cpp/experimental/ranges/concepts/Invocable>`_
 
 
-InvocableR
-##########
-
-.. cpp:concept:: template <typename R, typename F, typename... Args> InvocableR
-
-    #. specifies that a callable type can be invoked with a given set of argument types and return a specified type
-
-    **Implementation**
-
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/stl/fundamentals.hpp
-       :language: cpp
-       :lines: 382-385
-
-
 RegularInvocable
 ################
 
 .. cpp:concept:: template <typename F, typename... Args> RegularInvocable
 
     - cf. `reference documentation for RegularInvocable <https://en.cppreference.com/w/cpp/experimental/ranges/concepts/Invocable>`_
-
-
-RegularInvocableR
-#################
-
-.. cpp:concept:: template <typename R, typename F, typename... Args> RegularInvocableR
-
-    #. specifies that a callable type can be invoked with a given set of argument types and return a specified type
-
-    **Implementation**
-
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/stl/fundamentals.hpp
-       :language: cpp
-       :lines: 394-395
 
 
 Predicate

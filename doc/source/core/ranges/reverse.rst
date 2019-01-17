@@ -5,35 +5,40 @@ Include :file:`<mln/core/ranges/view/reverse.hpp>`
 
 .. cpp:namespace:: mln::ranges
 
-.. cpp:function:: \
-   auto view::reverse(ReversibleRange r)
+.. cpp:function:: auto view::reverse(ReversibleRange r)
 
    :param r: Input range
 
    If the expression :cpp:expr:`r.reversed()` is valid, then it is
-   returned. Otherwise, `r` must be a :cpp:concept:`std::BidirectionalRange`
+   returned. Otherwise, `r` must model the concept :cpp:concept:`BidirectionalRange <std::BidirectionalRange>`
    and the function returns ``::ranges::view::reverse(rng)``. This view preserves the following properties:
 
-   =============  ===  ================
+   =============  ===  ============
     Properties    *r*  *reverse(r)*
-   =============  ===  ================
+   =============  ===  ============
    Segmented      X    X
    Forward        X    X
    Reversible     X    X
    Bidirectional  X    X
    Random Access  X    X
    Contiguous     X    X
-   =============  ===  ================
+   Writable       X    X
+   =============  ===  ============
 
 
-   **Examples**::
+   **Examples**
+   
+   * Browse a box2d's indexes reversly:
 
-     mln::box2d box = {{0,0}, {2,3}};
-     mln_foreach(auto p, ranges::view::reverse(box))
-       std::cout << p << ",";
+      .. code-block:: cpp
 
-   Outputs:
+         mln::box2d box = {{0,0}, {2,3}};
+         mln_foreach(auto p, ranges::view::reverse(box))
+           std::cout << p << ",";
 
-   .. code-block:: text
 
-     (1,2),(1,1),(1,0),(0,2),(0,1),(0,0),
+      Outputs:
+
+         .. code-block:: text
+
+            (1,2),(1,1),(1,0),(0,2),(0,1),(0,0),

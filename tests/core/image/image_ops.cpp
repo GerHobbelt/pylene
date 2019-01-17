@@ -46,12 +46,12 @@ TEST(Core, Image2d_LValueOperator)
 
   rgb zero  = {0, 0, 0};
   rgb douze = {12, 0, 0};
-  fill(ima, zero);
+  mln::fill(ima, zero);
 
   auto x = make_unary_image_expr(ima, red());
   fill(x, 12);
 
-  ASSERT_TRUE(all(ima == douze));
+  ASSERT_TRUE(mln::all(ima == douze));
 }
 
 TEST(Core, Image2d_Operators)
@@ -68,7 +68,7 @@ TEST(Core, Image2d_Operators)
   mln_forall (v)
     *v = i--;
 
-  ASSERT_TRUE(all(-ima == ref));
+  ASSERT_TRUE(mln::all(-ima == ref));
 }
 
 TEST(Core, Image2d_MixedOperator)
@@ -82,7 +82,7 @@ TEST(Core, Image2d_MixedOperator)
   iota(y, 0);
 
   ASSERT_TRUE((std::is_same<typename decltype(x + x)::value_type, char>()));
-  ASSERT_TRUE(all((x + y) == (2 * y)));
+  ASSERT_TRUE(mln::all((x + y) == (2 * y)));
 }
 
 TEST(Core, Image2d_WhereOperator)
@@ -99,7 +99,7 @@ TEST(Core, Image2d_WhereOperator)
   auto f3 = where(x > 12, (uint8)12, x);       // RValue image + Scalar + LValue image
   auto f4 = where(x > 12, (uint8)0, (uint8)1); // RValue image + Scalar + Scalar
 
-  ASSERT_TRUE(all(f1 >= 12));
+  ASSERT_TRUE(mln::all(f1 >= 12));
   ASSERT_TRUE((std::is_same<mln_reference(decltype(f1)), const uint8&>()));
   ASSERT_TRUE((std::is_same<mln_reference(decltype(f2)), uint8&>()));
 }
@@ -108,45 +108,48 @@ TEST(Core, Image2d_WhereOperator)
 TEST(Core, UnaryOperator)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
   image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
 
-  auto g = new_unary_minus(ima);
-  ASSERT_TRUE(new_all(new_eq(g, ref)));
+  auto g = -ima;
+  ASSERT_TRUE(mln::experimental::all(g == ref));
 }
 
 TEST(Core, BinaryOperator_SameTypes)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> ref = {{2, 4, 6}, {8, 10, 12}};
 
-  auto g1 = new_plus(ima, ima);
-  auto g2 = new_multiplies(uint8_t(2), ima);
-  auto g3 = new_multiplies(ima, uint8_t(2));
+  auto g1 = ima + ima;
+  auto g2 = uint8_t(2) * ima;
+  auto g3 = ima * uint8_t(2);
 
   ASSERT_TRUE((std::is_same<decltype(g1)::value_type, uint8_t>::value));
   ASSERT_TRUE((std::is_same<decltype(g2)::value_type, uint8_t>::value));
   ASSERT_TRUE((std::is_same<decltype(g3)::value_type, uint8_t>::value));
 
-  ASSERT_TRUE(new_all(new_eq(g1, ref)));
-  ASSERT_TRUE(new_all(new_eq(g2, ref)));
-  ASSERT_TRUE(new_all(new_eq(g3, ref)));
+  ASSERT_TRUE(mln::experimental::all(g1 == ref));
+  ASSERT_TRUE(mln::experimental::all(g2 == ref));
+  ASSERT_TRUE(mln::experimental::all(g3 == ref));
 }
 
 TEST(Core, BinaryOperators_MixedTypes)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<uint8_t>  ima1 = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint16_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
-  image2d<uint16_t> ref = {{2, 4, 6}, {8, 10, 12}};
+  image2d<uint16_t> ref  = {{2, 4, 6}, {8, 10, 12}};
 
-  auto g1 = new_plus(ima1, ima2);
-  auto g2 = new_multiplies(uint16_t(2), ima1);
-  auto g3 = new_multiplies(ima1, uint16_t(2));
+  auto g1 = ima1 + ima2;
+  auto g2 = uint16_t(2) * ima1;
+  auto g3 = ima1 * uint16_t(2);
 
   using RType = std::common_type_t<uint8_t, uint16_t>;
   static_assert(std::is_same<RType, int>());
@@ -155,34 +158,31 @@ TEST(Core, BinaryOperators_MixedTypes)
   ASSERT_TRUE((std::is_same<decltype(g2)::value_type, RType>::value));
   ASSERT_TRUE((std::is_same<decltype(g3)::value_type, RType>::value));
 
-  ASSERT_TRUE(new_all(new_eq(g1, ref)));
-  ASSERT_TRUE(new_all(new_eq(g2, ref)));
-  ASSERT_TRUE(new_all(new_eq(g3, ref)));
+  ASSERT_TRUE(mln::experimental::all(g1 == ref));
+  ASSERT_TRUE(mln::experimental::all(g2 == ref));
+  ASSERT_TRUE(mln::experimental::all(g3 == ref));
 }
 
 
 TEST(Core, IfElse)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> y = {{4, 5, 6}, {1, 2, 3}};
 
-  auto f1 = new_where(new_gt(x, 3), x, uint8_t(12));      // RValue image + LValue image + scalar
-  auto f2 = new_where(new_gt(x, 3), x, y);                 // RValue image + LValue image + LValue image
-  auto f3 = new_where(new_gt(x, 3), uint8_t(12), x);       // RValue image + Scalar + LValue image
-  auto f4 = new_where(new_gt(x, 3), uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
+  auto                  f1 = mln::experimental::where(x > 3, x, uint8_t(12));       // RValue image + LValue image + scalar
+  // [[maybe_unused]] auto f2 = mln::experimental::where(x > 3, x, y);                 // RValue image + LValue image + LValue image
+  auto                  f3 = mln::experimental::where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
+  auto                  f4 = mln::experimental::where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
 
 
   // FIXME: Use concept checking
 
-  static_assert(std::is_same<image_reference_t<decltype(f1)>, uint8_t>());
-  static_assert(std::is_same<image_reference_t<decltype(f2)>, uint8_t&>());
-  static_assert(std::is_same<image_reference_t<decltype(f3)>, uint8_t>());
-  static_assert(std::is_same<image_reference_t<decltype(f4)>, uint8_t>());
-
-  fill(f2, 0);
-  ASSERT_TRUE(new_all(new_le(f2,3)));
+  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f1)>, uint8_t>()));
+  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f3)>, uint8_t>()));
+  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f4)>, uint8_t>()));
 }
 
 TEST(Core, Where)

@@ -17,9 +17,11 @@ RUN pacman -Sy --noconfirm \
 
 # For documentation
 RUN pacman -Sy --noconfirm \
+    openssl \
     python \
     python-matplotlib \
     python-numpy \
+    python-scipy \
     python-pip \
     doxygen \
     && rm -Rf /var/cache/pacman

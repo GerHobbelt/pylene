@@ -54,4 +54,4 @@ Point
 
     .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/points.hpp
        :language: cpp
-       :lines: 11-14
+       :lines: 12-15

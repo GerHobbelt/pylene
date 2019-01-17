@@ -1,9 +1,11 @@
 #pragma once
 
-#include <mln/core/concept/new/stl/fundamentals.hpp>
+#include <mln/core/concept/new/cmcstl2.hpp>
 
 #include <mln/core/concept/new/points.hpp>
 #include <mln/core/concept/new/values.hpp>
+
+#include <mln/core/domain/private/domain_traits.hpp>
 
 #include <type_traits>
 
@@ -12,26 +14,23 @@ namespace mln::concepts
 
   // clang-format off
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
   // Domain
   template<typename Dom>
-  concept bool Domain = 
-    stl::Regular<Dom> &&
-    requires {
-        typename Dom::point_type;
-        typename Dom::codomain_type;
-    } &&
-    Point<typename Dom::point_type> &&
-    Value<typename Dom::codomain_type> &&
-    !std::is_const_v<typename Dom::codomain_type> &&
-    !std::is_reference_v<typename Dom::codomain_type> &&
-    requires(const Dom cdom, const typename Dom::point_type& p) {
-        { cdom.has(p) }             -> stl::Boolean&&;
-        { cdom.empty() }            -> stl::Boolean&&;
-        { cdom.is_continuous() }    -> stl::Boolean&&;
-        { cdom.is_discrete() }      -> stl::Boolean&&;
-        { cdom.points() }           -> stl::BidirectionalRange&&;
+  concept Domain = 
+    stl::ForwardRange<Dom> &&
+    stl::Same<domain_value_t<Dom>, domain_point_t<Dom>> &&
+    Point<domain_point_t<Dom>> &&
+    requires(const Dom cdom, domain_point_t<Dom> p) {
+      { cdom.has(p) }   -> bool;
+      { cdom.empty() }  -> bool;
+      { cdom.size() }   -> stl::UnsignedIntegral&&;
     };
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 
 } // namespace mln::concepts
+
+// Validate concept
+#include <mln/core/concept/new/archetype/domain.hpp>

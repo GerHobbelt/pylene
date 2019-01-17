@@ -1,10 +1,12 @@
-
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
 #include <mln/core/rangev3/range_traits.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
+
+#include <mln/core/concept/new/concepts.hpp>
+
 #include <mln/core/utils/blank.hpp>
+
 #include <range/v3/view/remove_if.hpp>
 
 namespace mln::ranges
@@ -26,9 +28,7 @@ namespace mln::ranges
   } // namespace details
 
   template <typename Rng, typename Pred>
-  struct remove_if_view
-    : ::ranges::remove_if_view<Rng, Pred>,
-      std::conditional_t<is_multidimensional_range_v<Rng>, multidimensional_range_base, mln::details::blank>
+  struct remove_if_view : ::ranges::remove_if_view<Rng, Pred>
   {
   private:
     using base_t = ::ranges::remove_if_view<Rng, Pred>;
@@ -42,8 +42,14 @@ namespace mln::ranges
   public:
     using base_t::base_t;
 
-    template <class U = void, class = std::enable_if_t<is_multidimensional_range_v<Rng>, U>>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
+    auto rows() const requires mln::concepts::SegmentedRange<Rng>
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<is_segmented_range_v<Rng>, U>>
     auto rows() const
+#endif
     {
       auto f = [this](auto row) {
         return remove_if_view<decltype(row), Pred>(std::forward<decltype(row)>(row), this->get_pred());
@@ -51,8 +57,14 @@ namespace mln::ranges
       return view::transform(this->base().rows(), f);
     }
 
-    template <class U = void, class = std::enable_if_t<has_reverse_method_v<Rng>, U>>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
+    auto reversed() const requires mln::concepts::ReversibleRange<Rng>
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
+#endif
     {
       return remove_if_view<decltype(this->base().reversed()), Pred>(this->base().reversed(), this->get_pred());
     }
@@ -76,11 +88,15 @@ namespace mln::ranges
           ::meta::and_<::ranges::InputRange<Rng>, ::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>>>;
 
       template <typename Rng, typename Pred, CONCEPT_REQUIRES_(Constraint<Rng, Pred>())>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      // clang-format off
+      requires mln::concepts::stl::InputRange<Rng> &&
+               mln::concepts::stl::IndirectUnaryPredicate<Pred, ::ranges::iterator_t<Rng>>
+#endif
       RANGES_CXX14_CONSTEXPR auto operator()(Rng&& rng, Pred pred) const
+          // clang-format on
           RANGES_DECLTYPE_AUTO_RETURN_NOEXCEPT(remove_if_view<::ranges::view::all_t<Rng>, Pred>{
-              ::ranges::view::all(static_cast<Rng&&>(rng)), std::move(pred)})
-
-              ; //
+              ::ranges::view::all(static_cast<Rng&&>(rng)), std::move(pred)});
 
       template <typename Rng, typename Pred, CONCEPT_REQUIRES_(!Constraint<Rng, Pred>())>
       void operator()(Rng&&, Pred) const

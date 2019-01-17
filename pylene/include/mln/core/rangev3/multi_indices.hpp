@@ -1,10 +1,11 @@
 #pragma once
 
-#include <array>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <mln/core/rangev3/private/multidimensional_range.hpp>
+
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/reverse.hpp>
+
+#include <array>
 
 namespace mln::ranges
 {

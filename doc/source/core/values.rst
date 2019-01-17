@@ -58,9 +58,9 @@ Then we have the following valid expressions :
 +----------------+-------------+---------------+----------------+-----------------------------------------+
 |   Expression   | Return type | Pre-condition | Post-condition |               Description               |
 +================+=============+===============+================+=========================================+
-| ``lhs == rhs`` | `bool`      | none          | none           | Compare wether two values are equal     |
+| ``lhs == rhs`` | ``bool``    | none          | none           | Compare wether two values are equal     |
 +----------------+-------------+---------------+----------------+-----------------------------------------+
-| ``lhs != rhs`` | `bool`      | none          | none           | Compare wether two values are different |
+| ``lhs != rhs`` | ``bool``    | none          | none           | Compare wether two values are different |
 +----------------+-------------+---------------+----------------+-----------------------------------------+
 
 
@@ -88,13 +88,13 @@ Then we have the following valid expressions :
 +----------------+-------------+---------------+----------------+---------------------------------+
 |   Expression   | Return type | Pre-condition | Post-condition |           Description           |
 +================+=============+===============+================+=================================+
-| ``lhs < rhs``  | `bool`      | none          | none           | Compare order of the two values |
+| ``lhs < rhs``  | ``bool``    | none          | none           | Compare order of the two values |
 +----------------+-------------+---------------+----------------+---------------------------------+
-| ``lhs > rhs``  | `bool`      | none          | none           | Compare order of the two values |
+| ``lhs > rhs``  | ``bool``    | none          | none           | Compare order of the two values |
 +----------------+-------------+---------------+----------------+---------------------------------+
-| ``lhs <= rhs`` | `bool`      | none          | none           | Compare order of the two values |
+| ``lhs <= rhs`` | ``bool``    | none          | none           | Compare order of the two values |
 +----------------+-------------+---------------+----------------+---------------------------------+
-| ``lhs >= rhs`` | `bool`      | none          | none           | Compare order of the two values |
+| ``lhs >= rhs`` | ``bool``    | none          | none           | Compare order of the two values |
 +----------------+-------------+---------------+----------------+---------------------------------+
 
 

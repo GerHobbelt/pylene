@@ -37,7 +37,7 @@ namespace mln
     // Zip doesn't preserve contiguity, so it decays from raw_image_tag
     using category_type =
         std::conditional_t<std::is_base_of_v<raw_image_tag, common_category>, bidirectional_image_tag, common_category>;
-    using concrete_type = std::common_type_t<image_ch_value_t<Images, value_type>>;
+    using concrete_type = std::common_type_t<image_ch_value_t<Images, value_type>...>;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value V>
@@ -56,10 +56,10 @@ namespace mln
     /// \{
     struct new_pixel_type : Pixel<new_pixel_type>
     {
-      using reference               = zip_view::reference;
-      using value_type              = zip_view::value_type;
-      using site_type[[deprecated]] = zip_view::point_type;
-      using point_type              = zip_view::point_type;
+      using reference                = zip_view::reference;
+      using value_type               = zip_view::value_type;
+      using site_type [[deprecated]] = zip_view::point_type;
+      using point_type               = zip_view::point_type;
 
       new_pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}

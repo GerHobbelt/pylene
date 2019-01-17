@@ -172,10 +172,11 @@ TEST(Core, IfElse)
   image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> y = {{4, 5, 6}, {1, 2, 3}};
 
-  auto                  f1 = mln::experimental::where(x > 3, x, uint8_t(12));       // RValue image + LValue image + scalar
-  // [[maybe_unused]] auto f2 = mln::experimental::where(x > 3, x, y);                 // RValue image + LValue image + LValue image
-  auto                  f3 = mln::experimental::where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
-  auto                  f4 = mln::experimental::where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
+  auto f1 = mln::experimental::where(x > 3, x, uint8_t(12)); // RValue image + LValue image + scalar
+  // [[maybe_unused]] auto f2 = mln::experimental::where(x > 3, x, y);                 // RValue image + LValue image +
+  // LValue image
+  auto f3 = mln::experimental::where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
+  auto f4 = mln::experimental::where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
 
 
   // FIXME: Use concept checking
@@ -187,9 +188,11 @@ TEST(Core, IfElse)
 
 TEST(Core, Where)
 {
+  using namespace mln::experimental::ops;
+
   mln::image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
 
-  auto y = mln::new_modulus(x, 2);
+  auto y = x % 2;
   auto z = mln::new_where(y);
 
   static_assert(::ranges::ForwardRange<decltype(z)>());
@@ -204,4 +207,3 @@ TEST(Core, Where)
       ASSERT_TRUE(z.has(p));
     }
 }
-

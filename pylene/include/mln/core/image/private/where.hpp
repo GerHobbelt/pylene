@@ -11,16 +11,15 @@ namespace mln
     template <class I>
     struct where_t : public ::ranges::view_facade<where_t<I>>
     {
-      static_assert(mln::is_a<I, New_Image>());
-      static_assert(std::is_convertible_v<image_value_t<I>, bool>,
-                    "Image value type must be Boolean.");
+      static_assert(mln::is_a<I, experimental::Image>());
+      static_assert(std::is_convertible_v<image_value_t<I>, bool>, "Image value type must be Boolean.");
 
     private:
       friend ::ranges::range_access;
       using pixel_range_type = decltype(std::declval<I&>().new_pixels());
 
-      I                 m_ima;
-      pixel_range_type  m_pixels;
+      I                m_ima;
+      pixel_range_type m_pixels;
 
       struct cursor
       {
@@ -29,8 +28,8 @@ namespace mln
 
 
         image_point_t<I> read() const { return (*m_it).point(); }
-        bool equal(::ranges::default_sentinel) const { return m_it == m_end; }
-        bool equal(const cursor& other) const { return m_it == other.m_it; }
+        bool             equal(::ranges::default_sentinel) const { return m_it == m_end; }
+        bool             equal(const cursor& other) const { return m_it == other.m_it; }
 
         void next()
         {
@@ -51,7 +50,8 @@ namespace mln
 
     public:
       where_t(I ima)
-        : m_ima(std::move(ima)), m_pixels(m_ima.new_pixels())
+        : m_ima(std::move(ima))
+        , m_pixels(m_ima.new_pixels())
       {
       }
 
@@ -63,8 +63,8 @@ namespace mln
   } // namespace ranges
 
   template <class I>
-  ranges::where_t<I> new_where(const New_Image<I>& ima)
+  ranges::where_t<I> new_where(const experimental::Image<I>& ima)
   {
-    return { static_cast<const I&>(ima) };
+    return {static_cast<const I&>(ima)};
   }
 } // namespace mln

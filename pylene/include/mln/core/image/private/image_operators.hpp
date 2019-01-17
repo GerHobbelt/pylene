@@ -144,42 +144,44 @@ namespace mln::experimental
         return view::transform(cond, g);
       }
     };
-    } // namespace details
+  } // namespace details
 
-    template <class ICond, class ITrue, class IFalse>
-    auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
-    {
-      return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
-                                                       std::move(iffalse));
-    }
-
-
-    // FIXME: deprecated => replace with algorithm all_of
-    template <class I>
-    [[deprecated]] bool all(I ima) {
-      static_assert(mln::is_a<I, Image>());
-      static_assert(std::is_convertible<typename I::reference, bool>());
+  template <class ICond, class ITrue, class IFalse>
+  auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  {
+    return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
+                                                     std::move(iffalse));
+  }
 
 
-      mln_foreach_new (auto&& val, ima.new_values())
-        if (!val)
-          return false;
+  // FIXME: deprecated => replace with algorithm all_of
+  template <class I>
+  [[deprecated]] bool all(I ima)
+  {
+    static_assert(mln::is_a<I, Image>());
+    static_assert(std::is_convertible<typename I::reference, bool>());
 
-      return true;
-    }
+
+    mln_foreach_new (auto&& val, ima.new_values())
+      if (!val)
+        return false;
+
+    return true;
+  }
 
 
-    template <class I>
-    [[deprecated]] bool any(I ima) {
-      static_assert(mln::is_a<I, Image>());
-      static_assert(std::is_convertible<typename I::reference, bool>());
+  template <class I>
+  [[deprecated]] bool any(I ima)
+  {
+    static_assert(mln::is_a<I, Image>());
+    static_assert(std::is_convertible<typename I::reference, bool>());
 
-      mln_foreach_new (auto&& val, ima.new_values())
-        if (val)
-          return true;
+    mln_foreach_new (auto&& val, ima.new_values())
+      if (val)
+        return true;
 
-      return false;
-    }
+    return false;
+  }
 
 
 #undef MLN_PRIVATE_DEFINE_UNARY_OPERATOR

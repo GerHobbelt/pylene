@@ -3,14 +3,15 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/filter.hpp>
+
 #include <type_traits>
+
 
 namespace mln
 {
 
-
   template <class I, class F>
-  class filter_view : public image_adaptor<I>, public New_Image<filter_view<I, F>>
+  class filter_view : public image_adaptor<I>, public experimental::Image<filter_view<I, F>>
   {
     using fun_t = F; // FIXME something with semiregular_t<F> ?
     fun_t f;
@@ -116,7 +117,7 @@ namespace mln
     template <class I, class P>
     filter_view<I, P> filter(I ima, P predicate)
     {
-      static_assert(mln::is_a<I, New_Image>());
+      static_assert(mln::is_a<I, experimental::Image>());
       static_assert(std::is_invocable_r<bool, P, image_reference_t<I>>());
 
       return {std::move(ima), std::move(predicate)};

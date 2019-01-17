@@ -172,9 +172,8 @@ TEST(Core, IfElse)
   image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> y = {{4, 5, 6}, {1, 2, 3}};
 
-  auto f1 = mln::experimental::where(x > 3, x, uint8_t(12)); // RValue image + LValue image + scalar
-  // [[maybe_unused]] auto f2 = mln::experimental::where(x > 3, x, y);                 // RValue image + LValue image +
-  // LValue image
+  auto f1 = mln::experimental::where(x > 3, x, uint8_t(12));       // RValue image + LValue image + scalar
+  auto f2 = mln::experimental::where(x > 3, x, y);                 // RValue image + LValue image + LValue image
   auto f3 = mln::experimental::where(x > 3, uint8_t(12), x);       // RValue image + Scalar + LValue image
   auto f4 = mln::experimental::where(x > 3, uint8_t(0), uint8(1)); // RValue image + Scalar + Scalar
 
@@ -182,6 +181,7 @@ TEST(Core, IfElse)
   // FIXME: Use concept checking
 
   ASSERT_TRUE((std::is_same<image_reference_t<decltype(f1)>, uint8_t>()));
+  ASSERT_TRUE((std::is_same<image_reference_t<decltype(f2)>, uint8_t&>()));
   ASSERT_TRUE((std::is_same<image_reference_t<decltype(f3)>, uint8_t>()));
   ASSERT_TRUE((std::is_same<image_reference_t<decltype(f4)>, uint8_t>()));
 }

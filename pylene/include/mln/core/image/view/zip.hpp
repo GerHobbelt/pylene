@@ -102,11 +102,11 @@ namespace mln
     auto domain() const { return std::get<0>(m_images).domain(); }
 
     // FIXME: what to do here ?
-    // decltype(auto) concretize() const
+    decltype(auto) concretize() const;
 
     // FIXME: what to do here ?
-    // template <class V>
-    // decltype(auto) ch_value() const
+    template <class V>
+    decltype(auto) ch_value() const;
 
     auto new_values()
     {

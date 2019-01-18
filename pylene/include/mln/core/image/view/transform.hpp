@@ -54,10 +54,10 @@ namespace mln
     /// \{
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, Pixel<new_pixel_type>
     {
-      using point_type               = transform_view::point_type;
-      using site_type [[deprecated]] = transform_view::point_type;
-      using reference                = transform_view::reference;
-      using value_type               = transform_view::value_type;
+      using point_type              = transform_view::point_type;
+      using site_type[[deprecated]] = transform_view::point_type;
+      using reference               = transform_view::reference;
+      using value_type              = transform_view::value_type;
 
       new_pixel_type(fun_t fun, image_pixel_t<I> px)
         : new_pixel_type::pixel_adaptor{px}
@@ -215,46 +215,37 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : pixel_adaptor<image_pixel_t<I1>>, Pixel<new_pixel_type>
+    struct new_pixel_type : Pixel<new_pixel_type>
     {
     public:
-      using point_type               = transform2_view::point_type;
-      using site_type [[deprecated]] = transform2_view::point_type;
-      using reference                = transform2_view::reference;
-      using value_type               = transform2_view::value_type;
+      using point_type              = transform2_view::point_type;
+      using site_type[[deprecated]] = transform2_view::point_type;
+      using reference               = transform2_view::reference;
+      using value_type              = transform2_view::value_type;
 
 
       new_pixel_type(fun_t fun, image_pixel_t<I1> px1, image_pixel_t<I2> px2)
-        : new_pixel_type::pixel_adaptor{std::move(px1)}
+        : m_pix1{std::move(px1)}
         , m_pix2{std::move(px2)}
         , fun_{std::move(fun)}
       {
       }
 
-      new_pixel_type(const new_pixel_type& other)
-        : new_pixel_type::pixel_adaptor{other}
-        , m_pix2{other.m_pix2}
-        , fun_(other.fun_)
-      {
-      }
-      new_pixel_type(new_pixel_type&& other)
-        : new_pixel_type::pixel_adaptor{std::move(other)}
-        , m_pix2{std::move(other.m_pix2)}
-        , fun_(std::move(other.fun_))
-      {
-      }
+      new_pixel_type(const new_pixel_type& other) = default;
+      new_pixel_type(new_pixel_type&& other)      = default;
 
-      reference val() const { return std::invoke(fun_, new_pixel_type::pixel_adaptor::val(), m_pix2.val()); }
-      auto      point() const { return new_pixel_type::pixel_adaptor::point(); }
+      reference val() const { return std::invoke(fun_, m_pix1.val(), m_pix2.val()); }
+      auto      point() const { return m_pix1.point(); }
       void      advance(point_type p)
       {
-        new_pixel_type::pixel_adaptor::advance(p);
+        m_pix1.advance(p);
         m_pix2.advance(p);
       }
 
     private:
-      fun_t             fun_;
+      image_pixel_t<I1> m_pix1;
       image_pixel_t<I2> m_pix2;
+      fun_t             fun_;
     };
     /// \}
 
@@ -265,18 +256,8 @@ namespace mln
     {
     }
 
-    transform2_view(const transform2_view& other)
-      : m_ima1(other.m_ima1)
-      , m_ima2(other.m_ima2)
-      , fun_(other.fun_)
-    {
-    }
-    transform2_view(transform2_view&& other)
-      : m_ima1(std::move(other.m_ima1))
-      , m_ima2(std::move(other.m_ima2))
-      , fun_(std::move(other.fun_))
-    {
-    }
+    transform2_view(const transform2_view& other) = default;
+    transform2_view(transform2_view&& other)      = default;
 
 
     decltype(auto) concretize() const { return m_ima1.template ch_value<value_type>(); };
@@ -289,12 +270,21 @@ namespace mln
 
     auto domain() const { return m_ima1.domain(); }
 
-    auto new_values() { return mln::ranges::view::transform(m_ima1.new_values(), m_ima2.new_values(), fun_); }
+    auto new_values()
+    {
+      static_assert(::ranges::ForwardRange<decltype(m_ima1.new_values())>());
+      static_assert(::ranges::ForwardRange<decltype(m_ima2.new_values())>());
+
+      return mln::ranges::view::transform(m_ima1.new_values(), m_ima2.new_values(), fun_);
+    }
 
     auto new_pixels()
     {
-      using R1       = decltype(m_ima1.new_pixels());
-      using R2       = decltype(m_ima2.new_pixels());
+      using R1 = decltype(m_ima1.new_pixels());
+      using R2 = decltype(m_ima2.new_pixels());
+      static_assert(::ranges::ForwardRange<R1>());
+      static_assert(::ranges::ForwardRange<R2>());
+      
       auto pxwrapper = [fun = this->fun_](::ranges::range_reference_t<R1> px1, ::ranges::range_reference_t<R2> px2) {
         return new_pixel_type{fun, std::move(px1), std::move(px2)};
       };
@@ -351,6 +341,11 @@ namespace mln
     {
       static_assert(mln::is_a<I1, experimental::Image>());
       static_assert(mln::is_a<I2, experimental::Image>());
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+      static_assert(mln::concepts::InputImage<I1>);
+      static_assert(mln::concepts::InputImage<I2>);
+#endif
 
       return {std::move(ima1), std::move(ima2), std::move(fun)};
     }

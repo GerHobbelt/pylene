@@ -34,12 +34,20 @@ namespace mln::ranges
   private:
     // Very bad way to access the private member
     auto fun() const { return reinterpret_cast<const detail::iter_transform_view_public<Rng, Fun>*>(this)->fun_; }
+    auto fun() { return reinterpret_cast<detail::iter_transform_view_public<Rng, Fun>*>(this)->fun_; }
 
   public:
     using ::ranges::iter_transform_view<Rng, Fun>::iter_transform_view;
 
     template <typename U = void, typename = std::enable_if_t<is_segmented_range_v<Rng>, U>>
     auto rows() const
+    {
+      return ::ranges::view::transform(this->base().rows(),
+                                       [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
+    }
+
+    template <typename U = void, typename = std::enable_if_t<is_segmented_range_v<Rng>, U>>
+    auto rows()
     {
       return ::ranges::view::transform(this->base().rows(),
                                        [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
@@ -74,13 +82,25 @@ namespace mln::ranges
     {
       return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng1_;
     }
+    decltype(auto) rng1()
+    {
+      return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng1_;
+    }
     decltype(auto) rng2() const
     {
       return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng2_;
     }
+    decltype(auto) rng2()
+    {
+      return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng2_;
+    }
     auto fun() const
     {
       return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->fun_;
+    }
+    auto fun()
+    {
+      return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->fun_;
     }
 
   public:
@@ -89,6 +109,14 @@ namespace mln::ranges
     // FIXME: concept checking
     template <class U = void, class = std::enable_if_t<is_md_rng, U>>
     auto rows() const
+    {
+      return ::ranges::view::transform(rng1().rows(), rng2().rows(), [fun_ = fun()](auto row1, auto row2) {
+        return ::ranges::view::iter_transform(row1, row2, fun_);
+      });
+    }
+
+    template <class U = void, class = std::enable_if_t<is_md_rng, U>>
+    auto rows()
     {
       return ::ranges::view::transform(rng1().rows(), rng2().rows(), [fun_ = fun()](auto row1, auto row2) {
         return ::ranges::view::iter_transform(row1, row2, fun_);

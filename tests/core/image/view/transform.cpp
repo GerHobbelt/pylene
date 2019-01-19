@@ -249,7 +249,7 @@ TEST(Core, Transformed2Image_transform_byval_chain)
 
     // foo(out);
 
-    static_assert(concepts::ViewImage<decltype(out)>);
+    //static_assert(concepts::ViewImage<decltype(out)>);
     //static_assert(not concepts::IndexableImage<decltype(out)>);
     //static_assert(concepts::AccessibleImage<decltype(out)>);
     //static_assert(not concepts::IndexableAndAccessibleImage<decltype(out)>);

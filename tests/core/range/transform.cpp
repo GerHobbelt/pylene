@@ -308,3 +308,25 @@ TEST(Range, transform2_2d_write_row_wise)
     ASSERT_EQ(-2, buffer2[i].second);
   }
 }
+
+
+TEST(Range, transform2_read_chain)
+{
+  std::vector<int> buffer1(12, -1);
+  std::vector<int> buffer2(12, -2);
+
+  mln::ranges::multi_span<int, 2> sp1(buffer1.data(), {3, 4}, {4, 1});
+  mln::ranges::multi_span<int, 2> sp2(buffer2.data(), {3, 4}, {4, 1});
+
+  [[maybe_unused]] auto x = mln::ranges::view::transform(sp1, [](int a) { return a > 3 ? a : 42; });
+  [[maybe_unused]] auto y = mln::ranges::view::transform(x, sp1, [](int a, int b) { return a + b; });
+  [[maybe_unused]] ::ranges::iterator_t<decltype(y)> it = ::ranges::begin(y);
+
+  // FIXME: reproduce bug HERE (const above is important)
+  [[maybe_unused]] const auto z = y;
+  // [[maybe_unused]] ::ranges::iterator_t<decltype(z)> it = ::ranges::begin(z);
+
+  // [[maybe_unused]] auto rng = mln::ranges::view::transform(y, sp2, [](int a, int b) { return a * b; });
+
+  // static_assert(mln::concepts::stl::ForwardRange<decltype(rng)>);
+}

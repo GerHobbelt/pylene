@@ -222,7 +222,9 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 template <concepts::ViewImage I>
-void foo(I){}
+void foo(I)
+{
+}
 #endif
 
 // TODO: add transform2 unit tests
@@ -249,13 +251,13 @@ TEST(Core, Transformed2Image_transform_byval_chain)
 
     // foo(out);
 
-    //static_assert(concepts::ViewImage<decltype(out)>);
-    //static_assert(not concepts::IndexableImage<decltype(out)>);
-    //static_assert(concepts::AccessibleImage<decltype(out)>);
-    //static_assert(not concepts::IndexableAndAccessibleImage<decltype(out)>);
-    //static_assert(concepts::BidirectionalImage<decltype(out)>);
-    //static_assert(not concepts::RawImage<decltype(out)>);
-    //static_assert(not concepts::OutputImage<decltype(out)>);
+    // static_assert(concepts::ViewImage<decltype(out)>);
+    // static_assert(not concepts::IndexableImage<decltype(out)>);
+    // static_assert(concepts::AccessibleImage<decltype(out)>);
+    // static_assert(not concepts::IndexableAndAccessibleImage<decltype(out)>);
+    // static_assert(concepts::BidirectionalImage<decltype(out)>);
+    // static_assert(not concepts::RawImage<decltype(out)>);
+    // static_assert(not concepts::OutputImage<decltype(out)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 

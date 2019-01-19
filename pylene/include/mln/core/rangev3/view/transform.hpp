@@ -33,7 +33,7 @@ namespace mln::ranges
   {
   private:
     // Very bad way to access the private member
-    auto fun() const { return reinterpret_cast<const detail::iter_transform_view_public<Rng, Fun>*>(this)->fun_; }
+    auto cfun() const { return reinterpret_cast<const detail::iter_transform_view_public<Rng, Fun>*>(this)->fun_; }
     auto fun() { return reinterpret_cast<detail::iter_transform_view_public<Rng, Fun>*>(this)->fun_; }
 
   public:
@@ -43,7 +43,7 @@ namespace mln::ranges
     auto rows() const
     {
       return ::ranges::view::transform(this->base().rows(),
-                                       [fun_ = fun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
+                                       [fun_ = cfun()](auto row) { return ::ranges::view::iter_transform(row, fun_); });
     }
 
     template <typename U = void, typename = std::enable_if_t<is_segmented_range_v<Rng>, U>>
@@ -56,7 +56,7 @@ namespace mln::ranges
     template <typename U = void, typename = std::enable_if_t<is_reversible_range_v<Rng>, U>>
     auto reversed() const
     {
-      return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), fun());
+      return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), cfun());
     }
   };
 
@@ -78,7 +78,7 @@ namespace mln::ranges
 
   private:
     // Very bad way to access the private member
-    decltype(auto) rng1() const
+    decltype(auto) crng1() const
     {
       return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng1_;
     }
@@ -86,7 +86,7 @@ namespace mln::ranges
     {
       return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng1_;
     }
-    decltype(auto) rng2() const
+    decltype(auto) crng2() const
     {
       return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng2_;
     }
@@ -94,14 +94,11 @@ namespace mln::ranges
     {
       return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->rng2_;
     }
-    auto fun() const
+    auto cfun() const
     {
       return reinterpret_cast<const detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->fun_;
     }
-    auto fun()
-    {
-      return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->fun_;
-    }
+    auto fun() { return reinterpret_cast<detail::iter_transform2_view_public<Rng1, Rng2, Fun>*>(this)->fun_; }
 
   public:
     using ::ranges::iter_transform2_view<Rng1, Rng2, Fun>::iter_transform2_view;
@@ -110,7 +107,7 @@ namespace mln::ranges
     template <class U = void, class = std::enable_if_t<is_md_rng, U>>
     auto rows() const
     {
-      return ::ranges::view::transform(rng1().rows(), rng2().rows(), [fun_ = fun()](auto row1, auto row2) {
+      return ::ranges::view::transform(crng1().rows(), crng2().rows(), [fun_ = cfun()](auto row1, auto row2) {
         return ::ranges::view::iter_transform(row1, row2, fun_);
       });
     }
@@ -127,8 +124,8 @@ namespace mln::ranges
     template <class U = void, class = std::enable_if_t<is_reversible_range_v<Rng1> && is_reversible_range_v<Rng2>, U>>
     auto reversed() const
     {
-      return iter_transform2_view<decltype(rng1().reversed()), decltype(rng2().reversed()), Fun>(
-          rng1().reversed(), rng2().reversed(), fun());
+      return iter_transform2_view<decltype(crng1().reversed()), decltype(crng2().reversed()), Fun>(
+          crng1().reversed(), crng2().reversed(), cfun());
     }
   };
 

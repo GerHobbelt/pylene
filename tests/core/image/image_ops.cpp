@@ -203,7 +203,7 @@ TEST(Core, Where)
   foo(f1);
   foo(ref_f1);
 
-  
+
   // foo(b);
 #endif
 

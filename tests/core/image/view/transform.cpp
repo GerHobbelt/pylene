@@ -220,13 +220,6 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 }
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-template <concepts::ViewImage I>
-void foo(I)
-{
-}
-#endif
-
 // TODO: add transform2 unit tests
 TEST(Core, Transformed2Image_transform_byval_chain)
 {
@@ -239,48 +232,11 @@ TEST(Core, Transformed2Image_transform_byval_chain)
   iota(ima, 0);
   iota(ima2, 1);
   {
-    [[maybe_unused]] auto x   = view::transform(ima, [](int a) { return a > 3; });
-    [[maybe_unused]] auto y   = view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
+    auto                  x   = view::transform(ima, [](int a) { return a > 3; });
+    auto                  y   = view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
     [[maybe_unused]] auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
 
+    // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
     // [[maybe_unused]] auto z = mln::experimental::all(out);
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(concepts::ConcreteImage<decltype(ima)>);
-    static_assert(concepts::OutputImage<decltype(ima)>);
-
-    // foo(out);
-
-    // static_assert(concepts::ViewImage<decltype(out)>);
-    // static_assert(not concepts::IndexableImage<decltype(out)>);
-    // static_assert(concepts::AccessibleImage<decltype(out)>);
-    // static_assert(not concepts::IndexableAndAccessibleImage<decltype(out)>);
-    // static_assert(concepts::BidirectionalImage<decltype(out)>);
-    // static_assert(not concepts::RawImage<decltype(out)>);
-    // static_assert(not concepts::OutputImage<decltype(out)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
-
-    /*
-      // Test pixel iteration
-      // check that properties of pixels are preserved (point + index)
-      {
-        auto rng = mln::ranges::view::zip(ima.new_pixels(), out.new_pixels());
-        mln_foreach_new ((auto [px1, px2]), rng)
-        {
-          ASSERT_EQ(px1.point(), px2.point());
-          // ASSERT_EQ(px1.index(), px2.index());
-          ASSERT_EQ(4 * px1.val(), px2.val());
-          // ASSERT_EQ(&px2->image(), &out);
-        }
-      }
-
-      // Test value iteration
-      {
-        mln_foreach_new ((auto [v1, v2]), mln::ranges::view::zip(ima.new_values(), out.new_values()))
-          ASSERT_EQ(4 * v1, v2);
-      }
-    }
-    */
   }
 }

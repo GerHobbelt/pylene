@@ -163,13 +163,6 @@ TEST(Core, BinaryOperators_MixedTypes)
   ASSERT_TRUE(mln::experimental::all(g3 == ref));
 }
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-template <mln::concepts::AccessibleImage I>
-void foo(I)
-{
-}
-#endif
-
 TEST(Core, Where)
 {
   using namespace mln;
@@ -199,17 +192,7 @@ TEST(Core, Where)
   static_assert(std::is_same_v<image_reference_t<decltype(f3)>, uint8_t>);
   static_assert(std::is_same_v<image_reference_t<decltype(f4)>, uint8_t>);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  foo(f1);
-  foo(ref_f1);
-
-
-  // foo(b);
-#endif
-
-  // FIXME: compile error
-  [[maybe_unused]] auto b = f1 == ref_f1;
-  // [[maybe_unused]] auto b2 = mln::experimental::all(b);
+  // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
   // ASSERT_TRUE(mln::experimental::all(f1 == ref_f1));
   // ASSERT_TRUE(mln::experimental::all(f2 == ref_f2));
   // ASSERT_TRUE(mln::experimental::all(f3 == ref_f3));
@@ -221,7 +204,7 @@ TEST(Core, Where)
   image2d<uint8_t> ref_y = {{42, 42, 42}, //
                             {1, 2, 3}};
 
-  // FIXME: compile error
+  // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
   // mln::experimental::fill(f2, 42);
 
   // ASSERT_TRUE(mln::experimental::all(x == ref_x));

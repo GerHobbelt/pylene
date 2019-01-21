@@ -156,8 +156,7 @@ namespace mln::experimental
 
   // FIXME: deprecated => replace with algorithm all_of
   template <class I>
-  [[deprecated]] bool all(I ima)
-  {
+  [[deprecated]] bool all(I ima) {
     static_assert(mln::is_a<I, Image>());
     static_assert(std::is_convertible<typename I::reference, bool>());
 
@@ -171,8 +170,7 @@ namespace mln::experimental
 
 
   template <class I>
-  [[deprecated]] bool any(I ima)
-  {
+  [[deprecated]] bool any(I ima) {
     static_assert(mln::is_a<I, Image>());
     static_assert(std::is_convertible<typename I::reference, bool>());
 

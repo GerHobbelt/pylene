@@ -15,6 +15,7 @@ namespace mln
   class zip_view : public experimental::Image<zip_view<Images...>>
   {
     using tuple_t         = std::tuple<Images...>;
+    using I0              = typename std::tuple_element<0, tuple_t>::type;
     using common_category = std::common_type_t<image_category_t<Images>...>;
 
     tuple_t m_images;
@@ -37,14 +38,14 @@ namespace mln
     // Zip doesn't preserve contiguity, so it decays from raw_image_tag
     using category_type =
         std::conditional_t<std::is_base_of_v<raw_image_tag, common_category>, bidirectional_image_tag, common_category>;
-    using concrete_type = std::common_type_t<image_ch_value_t<Images, value_type>...>;
+    using concrete_type = image_ch_value_t<I0, typename I0::value_type>;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value V>
 #else
     template <typename V>
 #endif
-    using ch_value_type = std::common_type_t<image_ch_value_t<Images, V>...>;
+    using ch_value_type = image_ch_value_t<I0, V>;
     /// \}
 
     static_assert(std::conjunction_v<std::is_same<image_point_t<Images>, point_type>...>,
@@ -56,10 +57,10 @@ namespace mln
     /// \{
     struct new_pixel_type : Pixel<new_pixel_type>
     {
-      using reference                = zip_view::reference;
-      using value_type               = zip_view::value_type;
-      using site_type [[deprecated]] = zip_view::point_type;
-      using point_type               = zip_view::point_type;
+      using reference               = zip_view::reference;
+      using value_type              = zip_view::value_type;
+      using site_type[[deprecated]] = zip_view::point_type;
+      using point_type              = zip_view::point_type;
 
       new_pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}
@@ -101,16 +102,17 @@ namespace mln
 
     auto domain() const { return std::get<0>(m_images).domain(); }
 
-    // FIXME: what to do here ?
-    concrete_type concretize() const;
+    decltype(auto) concretize() const { return std::get<0>(m_images).concretize(); }
 
-    // FIXME: what to do here ?
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value V>
 #else
     template <typename V>
 #endif
-    ch_value_type<V> ch_value() const;
+    decltype(auto) ch_value() const
+    {
+      return std::get<0>(m_images).template ch_value<V>();
+    }
 
     auto new_values()
     {

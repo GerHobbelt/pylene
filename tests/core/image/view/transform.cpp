@@ -5,6 +5,7 @@
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/pixels.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/rangev3/foreach.hpp>
@@ -132,7 +133,6 @@ TEST(Core, Transform_Support_Writable)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-
     experimental::fill(c1, 69);
 
     // Does not compile because direct writing a temporary is forbidden by range-v3
@@ -219,4 +219,24 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
   // FIXME: ASSERT_IMAGES_EQ(ref, c);
 }
 
+
 // TODO: add transform2 unit tests
+TEST(Core, Transformed2Image_transform_byval_chain)
+{
+  using namespace mln;
+
+  box2d        dom{{-1, -2}, {3, 3}};
+  image2d<int> ima(dom);
+  image2d<int> ima2(dom);
+
+  iota(ima, 0);
+  iota(ima2, 1);
+  {
+    auto                  x   = view::transform(ima, [](int a) { return a > 3; });
+    auto                  y   = view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
+    [[maybe_unused]] auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
+
+    // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+    // [[maybe_unused]] auto z = mln::experimental::all(out);
+  }
+}

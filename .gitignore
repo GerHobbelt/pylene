@@ -8,4 +8,6 @@
 .vs
 .idea
 *.pyc
+compile_commands.json
 /venv_*/
+/**/.DS_Store

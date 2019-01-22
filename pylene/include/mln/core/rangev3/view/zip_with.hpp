@@ -160,6 +160,15 @@ namespace mln::ranges
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     // clang-format off
+    auto rows() requires (mln::concepts::SegmentedRange<Rngs> && ...);
+    // clang-format on
+#else
+    template <typename U = void, typename = std::enable_if_t<(is_segmented_range_v<Rngs> && ...), U>>
+    auto rows();
+#endif
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
     auto reversed() const requires (mln::concepts::ReversibleRange<Rngs> && ...);
     // clang-format on
 #else
@@ -238,6 +247,26 @@ namespace mln::ranges
 
     // Apply rows-row-zipper on each range after segmentation
     return std::apply([row_zipper](const auto&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
+  }
+
+
+    template <typename Fun, typename... Rngs>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  // clang-format off
+      auto zip_with_view<Fun, Rngs...>::rows() requires (mln::concepts::SegmentedRange<Rngs> && ...)
+  // clang-format on
+#else
+  template <typename U, typename>
+  auto zip_with_view<Fun, Rngs...>::rows()
+#endif
+  {
+    // Zip function for rows
+    auto row_zipper = [fun = this->fun_](auto&&... rows) {
+      return view::zip_with(fun, std::forward<decltype(rows)>(rows)...);
+    };
+
+    // Apply rows-row-zipper on each range after segmentation
+    return std::apply([row_zipper](auto&&... rng) { return view::zip_with(row_zipper, rng.rows()...); }, rngs_);
   }
 
 

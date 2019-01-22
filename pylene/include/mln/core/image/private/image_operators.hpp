@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/view/zip.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
 namespace mln::experimental
@@ -97,14 +98,13 @@ namespace mln::experimental
     template <class ICond, class ITrue, class IFalse>
     struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<is_a<ITrue, Image>::value && is_a<IFalse, Image>::value>>
     {
-      auto operator()(const ICond& /*cond*/, ITrue /*iftrue*/, IFalse /*iffalse*/) const
+      auto operator()(const ICond& cond, ITrue iftrue, IFalse iffalse) const
       {
-        auto g = [](bool vcond, auto&& vtrue, auto&& vfalse) -> decltype(auto) {
-          return (vcond) ? std::forward<decltype(vtrue)>(vtrue) : std::forward<decltype(vfalse)>(vfalse);
+        auto g = [](auto tuple_ternary_expr) -> decltype(auto) {
+          return (std::get<0>(tuple_ternary_expr)) ? std::get<1>(tuple_ternary_expr) : std::get<2>(tuple_ternary_expr);
         };
 
-        // FIXME: to be implemented with imzip
-        return;
+        return view::transform(view::zip(cond, iftrue, iffalse), g);
       }
     };
 
@@ -144,42 +144,42 @@ namespace mln::experimental
         return view::transform(cond, g);
       }
     };
-    } // namespace details
+  } // namespace details
 
-    template <class ICond, class ITrue, class IFalse>
-    auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
-    {
-      return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
-                                                       std::move(iffalse));
-    }
-
-
-    // FIXME: deprecated => replace with algorithm all_of
-    template <class I>
-    [[deprecated]] bool all(I ima) {
-      static_assert(mln::is_a<I, Image>());
-      static_assert(std::is_convertible<typename I::reference, bool>());
+  template <class ICond, class ITrue, class IFalse>
+  auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  {
+    return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
+                                                     std::move(iffalse));
+  }
 
 
-      mln_foreach_new (auto&& val, ima.new_values())
-        if (!val)
-          return false;
+  // FIXME: deprecated => replace with algorithm all_of
+  template <class I>
+  [[deprecated]] bool all(I ima) {
+    static_assert(mln::is_a<I, Image>());
+    static_assert(std::is_convertible<typename I::reference, bool>());
 
-      return true;
-    }
+
+    mln_foreach_new (auto&& val, ima.new_values())
+      if (!val)
+        return false;
+
+    return true;
+  }
 
 
-    template <class I>
-    [[deprecated]] bool any(I ima) {
-      static_assert(mln::is_a<I, Image>());
-      static_assert(std::is_convertible<typename I::reference, bool>());
+  template <class I>
+  [[deprecated]] bool any(I ima) {
+    static_assert(mln::is_a<I, Image>());
+    static_assert(std::is_convertible<typename I::reference, bool>());
 
-      mln_foreach_new (auto&& val, ima.new_values())
-        if (val)
-          return true;
+    mln_foreach_new (auto&& val, ima.new_values())
+      if (val)
+        return true;
 
-      return false;
-    }
+    return false;
+  }
 
 
 #undef MLN_PRIVATE_DEFINE_UNARY_OPERATOR

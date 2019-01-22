@@ -208,8 +208,8 @@ namespace mln
       return m_ima.index_of_point(p);
     }
 
-    template <typename dummy = I, typename = std::enable_if_t<(indexable::value && accessible::value)>>
-    point_type point_at_index(image_index_t<dummy> i) const
+    template <typename dummy = I>
+    point_type point_at_index(std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> i) const
     {
       return m_ima.point_at_index(i);
     }

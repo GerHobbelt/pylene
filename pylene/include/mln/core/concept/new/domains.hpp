@@ -24,7 +24,7 @@ namespace mln::concepts
     requires(const Dom cdom, domain_point_t<Dom> p) {
       { cdom.has(p) }   -> bool;
       { cdom.empty() }  -> bool;
-      { cdom.size() }   -> stl::UnsignedIntegral&&;
+      // { cdom.size() }   -> stl::UnsignedIntegral&&;
     };
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

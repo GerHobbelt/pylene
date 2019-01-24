@@ -15,9 +15,9 @@ namespace mln::archetypes
     value_type* begin();
     value_type* end();
 
-    bool     has(value_type) const;
-    bool     empty() const;
-    unsigned size() const;
+    bool has(value_type) const;
+    bool empty() const;
+    // unsigned size() const;
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED

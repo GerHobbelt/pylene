@@ -64,7 +64,7 @@ namespace mln
 
         mln_value(I) z = literal::zero;
         auto res       = where(dil < ero, ero - dil, z);
-        copy(res, out);
+        mln::copy(res, out);
 
         mln_exiting();
         return out;
@@ -81,7 +81,7 @@ namespace mln
         auto dil = morpho::structural::dilate(f, sem);
 
         auto res = land(ero, lnot(dil));
-        copy(res, out);
+        mln::copy(res, out);
 
         mln_exiting();
         return out;

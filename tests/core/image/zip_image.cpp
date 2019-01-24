@@ -29,7 +29,7 @@ TEST(Core, ZipImage_Mixed_writable)
   // mln_forall(v)
   //   std::cout << std::get<0>(*v) << "," <<  std::get<1>(*v)    << std::endl;
 
-  fill(imzip(ima, ima2), std::make_tuple(2, 4));
+  mln::fill(imzip(ima, ima2), std::make_tuple(2, 4));
   ASSERT_TRUE(all(ima == 2));
   ASSERT_TRUE(all(ima2 == 4));
 }

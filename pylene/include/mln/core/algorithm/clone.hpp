@@ -1,8 +1,7 @@
-#ifndef MLN_CORE_ALGORITHM_CLONE_HPP
-#define MLN_CORE_ALGORITHM_CLONE_HPP
+#pragma once
 
 #include <mln/core/algorithm/copy.hpp>
-#include <mln/core/image/image.hpp>
+
 
 /// \file
 /// \brief Header file for clone algorithm.
@@ -19,7 +18,14 @@ namespace mln
   /// \tparam I The input image type
   /// \param ima The image to clone.
   template <typename I>
-  mln_concrete(I) clone(const Image<I>& ima);
+  [[deprecated]] mln_concrete(I) clone(const Image<I>& ima);
+
+
+  namespace experimental
+  {
+    template <class InputImage>
+    image_concrete_t<InputImage> clone(InputImage input);
+  }
 
   /******************/
   /* Implem         */
@@ -43,7 +49,7 @@ namespace mln
     {
       (void)_use_copy_construction_;
       mln_concrete(Image) x = imconcretize(ima);
-      copy(ima, x);
+      mln::copy(ima, x);
       return x;
     }
   }
@@ -54,6 +60,19 @@ namespace mln
     return impl::clone(exact(ima), check_t < std::is_convertible<I, mln_concrete(I)>::value and
                                        not image_traits<mln_concrete(I)>::shallow_copy::value > ());
   }
-}
 
-#endif // !MLN_CORE_ALGORITHM_CLONE_HPP
+
+  namespace experimental
+  {
+    template <class InputImage>
+    image_concrete_t<InputImage> clone(InputImage input)
+    {
+      static_assert(mln::is_a<InputImage, Image>());
+
+      image_concrete_t<InputImage> out = input.concretize();
+      mln::experimental::copy(std::move(input), out);
+      return out;
+    }
+  } // namespace experimental
+} // namespace mln
+

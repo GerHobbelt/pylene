@@ -85,6 +85,7 @@ distcheck-linux-clang-debug:
                 --config $PYLENE_CONFIGURATION
                 --target run-all-benchmarks
         - ctest -L SpeedTests -V
+    tags: [ "pylene-benchmarks" ]
     when: manual
     dependencies: []
     artifacts:

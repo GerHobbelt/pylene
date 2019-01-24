@@ -84,7 +84,7 @@ TEST(Core, SubImage_sub_domain)
         {42, 42, 42, 42, 42}  //
     };
     iota(ima, 0);
-    fill(ima | where(ima > 10), 42);
+    mln::fill(ima | where(ima > 10), 42);
     MLN_CHECK_IMEQUAL(ima, ref);
   }
 
@@ -98,7 +98,7 @@ TEST(Core, SubImage_sub_domain)
     };
 
     iota(ima, 0);
-    fill((ima | where(ima > 10)) | where(ima > 20), 42);
+    mln::fill((ima | where(ima > 10)) | where(ima > 20), 42);
     MLN_CHECK_IMEQUAL(ima, ref);
   }
 
@@ -111,7 +111,7 @@ TEST(Core, SubImage_sub_domain)
         {20, 21, 22, 23, 24}  //
     };
     iota(ima, 0);
-    fill(ima | where(land(ima > 10, ima < 20)), 42);
+    mln::fill(ima | where(land(ima > 10, ima < 20)), 42);
     MLN_CHECK_IMEQUAL(ima, ref);
   }
 }

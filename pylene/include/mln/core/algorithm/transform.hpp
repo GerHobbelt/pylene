@@ -1,8 +1,10 @@
-#ifndef MLN_CORE_ALGORITHM_TRANSFORM_HPP
-#define MLN_CORE_ALGORITHM_TRANSFORM_HPP
-
+#pragma once
 #include <mln/core/image/image.hpp>
+#include <mln/core/rangev3/rows.hpp>
 #include <mln/core/trace.hpp>
+
+#include <range/v3/algorithm/transform.hpp>
+#include <range/v3/utility/functional.hpp>
 /// \file
 
 namespace mln
@@ -28,20 +30,32 @@ namespace mln
   /// \param output The output image.
   /// \see mln::imtransform
   template <typename InputImage, typename OutputImage, class UnaryFunction>
-  OutputImage& transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>& output);
+  [[deprecated]] OutputImage& transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>& output);
 
   /// \overload
   template <typename InputImage, typename OutputImage, class UnaryFunction>
-  OutputImage&& transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>&& output);
+  [[deprecated]] OutputImage&& transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>&& output);
 
   template <typename InputImage, class UnaryFunction>
-  unary_image_expr<UnaryFunction, InputImage> lazy_transform(InputImage&& input, UnaryFunction f);
+  [[deprecated]] unary_image_expr<UnaryFunction, InputImage> lazy_transform(InputImage&& input, UnaryFunction f);
 
   /// \overload
   template <typename InputImage, class UnaryFunction>
-  mln_ch_value(InputImage,
-               typename std::decay<typename std::result_of<UnaryFunction(mln_value(InputImage))>::type>::type)
+  [[deprecated]] mln_ch_value(
+      InputImage, typename std::decay<typename std::result_of<UnaryFunction(mln_value(InputImage))>::type>::type)
       transform(const Image<InputImage>& input, UnaryFunction f);
+
+
+  namespace experimental
+  {
+    template <class InputImage, class OutputImage, class UnaryFunction>
+    void transform(InputImage in, const Image<OutputImage>& out, UnaryFunction f);
+
+
+    template <class InputImage, class UnaryFunction>
+    image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
+        transform(InputImage in, UnaryFunction f);
+  } // namespace experimental
 
   /******************************************/
   /****          Implementation          ****/
@@ -56,7 +70,7 @@ namespace mln
       mln_forall (vin, vout)
         *vout = f(*vin);
     }
-  }
+  } // namespace impl
 
   template <typename InputImage, typename OutputImage, class UnaryFunction>
   OutputImage& transform(const Image<InputImage>& input, UnaryFunction f, Image<OutputImage>& output)
@@ -92,6 +106,43 @@ namespace mln
   {
     return make_unary_image_expr(std::forward<InputImage>(input), f);
   }
-}
 
-#endif // ! MLN_CORE_ALGORITHM_TRANSFORM_HPP
+
+  namespace experimental
+  {
+    template <class InputImage, class OutputImage, class UnaryFunction>
+    void transform(InputImage in, OutputImage out, UnaryFunction f)
+    {
+      static_assert(mln::is_a<InputImage, Image>());
+      static_assert(::ranges::Invocable<UnaryFunction, image_reference_t<InputImage>>());
+      static_assert(std::is_convertible_v<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>,
+                                          image_value_t<OutputImage>>,
+                    "The result of the function is not implicitely convertible to the output image value type");
+
+      mln_entering("mln::experimental::transform");
+      mln_precondition(in.domain() == out.domain());
+
+      auto input_rows  = ranges::rows(in.new_values());
+      auto output_rows = ranges::rows(out.new_values());
+      for (auto [r1, r2] : ranges::view::zip(input_rows, output_rows))
+        ::ranges::transform(r1, ::ranges::begin(r2), f);
+    }
+
+    template <class InputImage, class UnaryFunction>
+    image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
+        transform(InputImage in, UnaryFunction f)
+    {
+      static_assert(mln::is_a<InputImage, Image>());
+      static_assert(::ranges::Invocable<UnaryFunction, image_reference_t<InputImage>>());
+
+      using R = std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>;
+      using O = image_ch_value_t<InputImage, R>;
+
+      // Check concretizable
+      O out = in.template ch_value<R>();
+      mln::experimental::transform(in, out, f);
+      return out;
+    }
+  } // namespace experimental
+
+} // namespace mln

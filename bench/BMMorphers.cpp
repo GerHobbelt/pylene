@@ -80,7 +80,7 @@ unsigned threshold3(const image2d<uint8>& f, uint8 v)
 
 unsigned threshold4(const image2d<uint8>& f, uint8 v)
 {
-  return accumulate(f < v, accu::accumulators::sum<unsigned>());
+  return mln::accumulate(f < v, accu::accumulators::sum<unsigned>());
 }
 
 void threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
@@ -108,5 +108,5 @@ void threshold5(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
 
 void threshold6(const image2d<uint8>& f, image2d<bool>& out, uint8 v)
 {
-  copy(f < v, out);
+  mln::copy(f < v, out);
 }

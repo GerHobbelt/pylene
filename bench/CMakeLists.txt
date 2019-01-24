@@ -36,6 +36,7 @@ set(src_standalone
   BMNeighborhood.cpp
   BMReference_Neighborhood.cpp
   BMReference_Linear.cpp
+  BMAlgorithms.cpp
   )
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
@@ -44,6 +45,7 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 
 enable_testing()
 
+add_benchmark(BMAlgorithms              BMAlgorithms.cpp BMAlgorithms_main.cpp)
 add_benchmark(BMNeighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_benchmark(BMRotation                BMRotation.cpp)
 add_benchmark(BMDilation                BMDilation.cpp)

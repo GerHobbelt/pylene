@@ -51,7 +51,7 @@ namespace mln
         mln_ch_value(J, bool) is2F = imchvalue<bool>(pmap).init(false);
         auto dom                   = is2F.domain();
         mln_point(J) step          = 2; // {2,2} or {2,2,2}
-        fill(is2F | make_strided_box(dom.pmin, dom.pmax, step), true);
+        mln::fill(is2F | make_strided_box(dom.pmin, dom.pmax, step), true);
 
         for (unsigned p = 0; p < S.size(); ++p)
         {

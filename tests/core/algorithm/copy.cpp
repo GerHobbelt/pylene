@@ -1,4 +1,3 @@
-#include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 
 #include <mln/core/algorithm/copy.hpp>
@@ -18,3 +17,15 @@ TEST(Core, Algorithm_Copy)
 
   ASSERT_TRUE(equal(ima, out));
 }
+
+
+TEST(Core, Algorithm_Exp_Copy)
+{
+  mln::image2d<std::uint8_t> ima(10, 10);
+  mln::image2d<std::uint8_t> out(10, 10);
+  mln::iota(ima, 0);
+  mln::experimental::copy(ima, out);
+
+  ASSERT_TRUE(mln::equal(ima, out));
+}
+

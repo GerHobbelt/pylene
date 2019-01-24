@@ -1,7 +1,6 @@
-#ifndef MLN_CORE_ALGORITHM_IOTA_HPP
-#define MLN_CORE_ALGORITHM_IOTA_HPP
-
+#pragma once
 #include <mln/core/image/image.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
 namespace mln
 {
@@ -19,12 +18,19 @@ namespace mln
   /// \tparam I is a model of the Writable Forward Image.
   /// \tparam Value must be convertible to Image's value type.
   template <typename I, typename Value>
-  I& iota(Image<I>& output, Value val);
+  [[deprecated]] I& iota(Image<I>& output, Value val);
 
   /// \overload
   /// \ingroup Algorithms
   template <typename I, typename Value>
-  I&& iota(Image<I>&& output, Value val);
+  [[deprecated]] I&& iota(Image<I>&& output, Value val);
+
+
+  namespace experimental
+  {
+    template <typename OutputImage, typename Value>
+    void iota(OutputImage output, Value val);
+  }
 
   /******************************************/
   /****          Implementation          ****/
@@ -57,6 +63,22 @@ namespace mln
     return output;
   }
 
+
+
+  namespace experimental
+  {
+    template <typename OutputImage, typename Value>
+    void iota(OutputImage output, Value val)
+    {
+      static_assert(mln::is_a<OutputImage, Image>());
+      static_assert(std::is_convertible_v<Value, image_value_t<OutputImage>>);
+
+      for (auto row : mln::ranges::rows(output.new_values()))
+        for (auto& v : row)
+          v = val++;
+    }
+  } // namespace experimental
+
 } // end of namespace mln
 
-#endif //! MLN_CORE_ALGORITHM_IMFILL_HPP
+

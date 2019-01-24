@@ -48,7 +48,7 @@ TEST(Core, Image2d_LValueOperator)
   mln::fill(ima, zero);
 
   auto x = make_unary_image_expr(ima, red());
-  fill(x, 12);
+  mln::fill(x, 12);
 
   ASSERT_TRUE(mln::all(ima == douze));
 }
@@ -76,7 +76,7 @@ TEST(Core, Image2d_MixedOperator)
 
   image2d<char>  x(5, 5);
   image2d<short> y(5, 5);
-
+  
   iota(x, 0);
   iota(y, 0);
 

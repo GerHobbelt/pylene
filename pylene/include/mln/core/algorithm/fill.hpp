@@ -1,11 +1,12 @@
-#ifndef MLN_CORE_ALGORITHM_IMFILL_HPP
-#define MLN_CORE_ALGORITHM_IMFILL_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
-#include <range/v3/algorithm/fill.hpp>
 #include <algorithm>
+#include <range/v3/algorithm/fill.hpp>
+
+/// \file
 
 namespace mln
 {
@@ -23,18 +24,28 @@ namespace mln
   /// \tparam Value must be convertible to Image's value type.
   /// \ingroup algorithms
   template <typename OutputImage, typename Value>
-  OutputImage& fill(Image<OutputImage>& output, const Value& val);
+  [[deprecated]] OutputImage& fill(Image<OutputImage>& output, const Value& val);
 
   /// \overload
   /// \ingroup Algorithms
   template <typename OutputImage, typename Value>
-  OutputImage&& fill(Image<OutputImage>&& output, const Value& val);
+  [[deprecated]] OutputImage&& fill(Image<OutputImage>&& output, const Value& val);
 
   namespace experimental
   {
+    /// \brief Assigns the value \p val to every element of the image \p ima.
+    ///
+    /// \ingroup Algorithms
+    ///
+    /// \param[out] f The output image.
+    /// \param v The value to assign.
+    ///
+    ///
+    /// \tparam OutputImage is a model of the Writable Forward Image.
+    /// \tparam Value must be convertible to Image's value type.
     template <class OutputImage, class Value>
-    void fill(const Image<OutputImage>& f, const Value& v);
-  }
+    void fill(OutputImage f, const Value& v);
+  } // namespace experimental
 
   /******************************************/
   /****          Implementation          ****/
@@ -49,7 +60,7 @@ namespace mln
       mln_forall (pin)
         *pin = v;
     }
-  }
+  } // namespace impl
 
   template <typename OutputImage, typename Value>
   OutputImage&& fill(Image<OutputImage>&& output_, const Value& val)
@@ -69,17 +80,13 @@ namespace mln
   namespace experimental
   {
     template <class OutputImage, class Value>
-    void fill(const Image<OutputImage>& f_, const Value& v)
+    void fill(OutputImage f, const Value& v)
     {
-      OutputImage f = static_cast<const OutputImage&>(f_);
+      static_assert(mln::is_a<OutputImage, Image>());
 
       for (auto row : ranges::rows(f.new_values()))
         ::ranges::fill(row, v);
     }
-  }
+  } // namespace experimental
 
-
-
-} // end of namespace mln
-
-#endif //! MLN_CORE_ALGORITHM_IMFILL_HPP
+} // namespace mln

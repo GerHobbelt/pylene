@@ -88,7 +88,7 @@ TEST(Core, FilteredImage_filtered_bypix_writing)
   iota(ima, 0);
   auto x = imfilter(ima, [](const Pix& px) { return px.val() > 10; });
 
-  fill(x, 10);
+  mln::fill(x, 10);
   ASSERT_TRUE(all(ima <= 10));
 }
 
@@ -102,7 +102,7 @@ TEST(Core, FilteredImage_filtered_byval_writing)
   iota(ima, 0);
   auto x = imfilter(ima, [](int x) { return x > 10; });
 
-  fill(x, 10);
+  mln::fill(x, 10);
   ASSERT_TRUE(all(ima <= 10));
 }
 
@@ -138,7 +138,7 @@ TEST(Core, FilteredImage_filtered_chaining)
   }
 
   const image2d<int> before = clone(ima);
-  fill(u, 1);
+  mln::fill(u, 1);
   {
     mln_pixter(px, ima);
     mln_pixter(px_before, before);

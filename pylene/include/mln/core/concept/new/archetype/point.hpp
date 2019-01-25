@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/points.hpp>
 
 
@@ -17,8 +18,6 @@ namespace mln::archetypes
   bool operator<=(const Point&, const Point&);
   bool operator>=(const Point&, const Point&);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::Point<Point>, "Point archetype does not model the Point concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Point<Point>, "Point archetype does not model the Point concept!");
 
 } // namespace mln::archetypes

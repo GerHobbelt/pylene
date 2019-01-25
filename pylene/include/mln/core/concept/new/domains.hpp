@@ -17,7 +17,7 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
   // Domain
-  template<typename Dom>
+  template <typename Dom>
   concept Domain = 
     stl::ForwardRange<Dom> &&
     stl::Same<domain_value_t<Dom>, domain_point_t<Dom>> &&
@@ -30,8 +30,8 @@ namespace mln::concepts
 
 
   // SizedDomain
-  template<typename Dom>
-  concept Domain = 
+  template <typename Dom>
+  concept SizedDomain = 
     Domain<Dom> &&
     requires(const Dom cdom) {
       { cdom.size() } -> stl::UnsignedIntegral&&;

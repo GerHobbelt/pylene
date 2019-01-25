@@ -9,7 +9,7 @@ namespace mln::concepts
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Index
-  template<typename Idx>
+  template <typename Idx>
   // FIXME: switch to SignedIntegral when concept is consolidated
   concept Index = /* stl::SignedIntegral<Idx>; */
     stl::Integral<Idx>;

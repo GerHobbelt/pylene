@@ -2,6 +2,7 @@
 
 #include <mln/core/concept/new/archetype/domain.hpp>
 #include <mln/core/concept/new/archetype/pixel.hpp>
+#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/images.hpp>
 
 #include <mln/core/domain/private/domain_traits.hpp>
@@ -81,10 +82,8 @@ namespace mln::archetypes
     ValueRange new_values();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::ConcreteImage<ConcreteImage>,
-                "ConcreteImage archetype does not model the ConcreteImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ConcreteImage<ConcreteImage>,
+                           "ConcreteImage archetype does not model the ConcreteImage concept!");
 
 
   struct ViewImage : ConcreteImage, mln::experimental::Image<ViewImage>
@@ -98,16 +97,13 @@ namespace mln::archetypes
     ViewImage& operator=(ViewImage&&) = delete;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::ViewImage<ViewImage>, "ViewImage archetype does not model the ViewImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ViewImage<ViewImage>,
+                           "ViewImage archetype does not model the ViewImage concept!")
 
 
   using Image = ViewImage;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::Image<Image>, "Image archetype does not model the Image concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Image<Image>, "Image archetype does not model the Image concept!");
 
 
   struct OutputImage : Image, mln::experimental::Image<OutputImage>
@@ -128,33 +124,27 @@ namespace mln::archetypes
     OutputPixelRange new_pixels();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::Image<OutputImage> && mln::concepts::OutputImage<OutputImage>,
-                "OuputImage archetype does not model the OuputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Image<OutputImage>&& mln::concepts::OutputImage<OutputImage>,
+                           "OuputImage archetype does not model the OuputImage concept!");
 
 
   using InputImage = Image;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::InputImage<InputImage>, "InputImage archetype does not model the InputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::InputImage<InputImage>,
+                           "InputImage archetype does not model the InputImage concept!");
 
 
   using ForwardImage = InputImage;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::ForwardImage<ForwardImage>,
-                "ForwardImage archetype does not model the ForwardImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ForwardImage<ForwardImage>,
+                           "ForwardImage archetype does not model the ForwardImage concept!");
 
 
   using OutputForwardImage = OutputImage;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::ForwardImage<OutputForwardImage> && mln::concepts::OutputImage<OutputForwardImage>,
-                "OutputForwardImage archetype does not model the OutputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(
+      mln::concepts::ForwardImage<OutputForwardImage>&& mln::concepts::OutputImage<OutputForwardImage>,
+      "OutputForwardImage archetype does not model the OutputImage concept!");
 
 
   struct IndexableImage : Image, mln::experimental::Image<IndexableImage>
@@ -165,10 +155,8 @@ namespace mln::archetypes
     image_reference_t<IndexableImage> operator[](image_index_t<IndexableImage>) const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::IndexableImage<IndexableImage>,
-                "IndexableImage archetype does not model the IndexableImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::IndexableImage<IndexableImage>,
+                           "IndexableImage archetype does not model the IndexableImage concept!");
 
 
   struct OutputIndexableImage final : IndexableImage, mln::experimental::Image<OutputIndexableImage>
@@ -193,10 +181,9 @@ namespace mln::archetypes
   };
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::IndexableImage<OutputIndexableImage> && mln::concepts::OutputImage<OutputIndexableImage>,
-                "OutputIndexableImage archetype does not model the OutputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(
+      mln::concepts::IndexableImage<OutputIndexableImage>&& mln::concepts::OutputImage<OutputIndexableImage>,
+      "OutputIndexableImage archetype does not model the OutputImage concept!");
 
 
   struct AccessibleImage : Image, mln::experimental::Image<AccessibleImage>
@@ -209,10 +196,8 @@ namespace mln::archetypes
     image_pixel_t<AccessibleImage>     new_pixel_at(image_point_t<AccessibleImage>) const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::AccessibleImage<AccessibleImage>,
-                "AccessibleImage archetype does not model the AccessibleImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::AccessibleImage<AccessibleImage>,
+                           "AccessibleImage archetype does not model the AccessibleImage concept!");
 
 
   struct OutputAccessibleImage : AccessibleImage, mln::experimental::Image<OutputAccessibleImage>
@@ -241,11 +226,9 @@ namespace mln::archetypes
     OutputPixelRange new_pixels();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::AccessibleImage<OutputAccessibleImage> &&
-                    mln::concepts::OutputImage<OutputAccessibleImage>,
-                "OutputAccessibleImage archetype does not model the OutputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(
+      mln::concepts::AccessibleImage<OutputAccessibleImage>&& mln::concepts::OutputImage<OutputAccessibleImage>,
+      "OutputAccessibleImage archetype does not model the OutputImage concept!");
 
 
   struct IndexableAndAccessibleImage : AccessibleImage, mln::experimental::Image<IndexableAndAccessibleImage>
@@ -260,13 +243,13 @@ namespace mln::archetypes
     image_index_t<IndexableAndAccessibleImage> delta_index(image_point_t<IndexableAndAccessibleImage>) const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::IndexableAndAccessibleImage<IndexableAndAccessibleImage>,
-                "IndexableAndAccessibleImage archetype does not model the IndexableAndAccessibleImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(
+      mln::concepts::IndexableAndAccessibleImage<IndexableAndAccessibleImage>,
+      "IndexableAndAccessibleImage archetype does not model the IndexableAndAccessibleImage concept!");
 
 
-  struct OutputIndexableAndAccessibleImage : OutputAccessibleImage, mln::experimental::Image<OutputIndexableAndAccessibleImage>
+  struct OutputIndexableAndAccessibleImage : OutputAccessibleImage,
+                                             mln::experimental::Image<OutputIndexableAndAccessibleImage>
   {
     using index_type = int;
     using indexable  = std::true_type;
@@ -283,11 +266,9 @@ namespace mln::archetypes
         delta_index(image_point_t<OutputIndexableAndAccessibleImage>) const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::IndexableAndAccessibleImage<OutputIndexableAndAccessibleImage> &&
-                    mln::concepts::OutputImage<OutputIndexableAndAccessibleImage>,
-                "OutputIndexableAndAccessibleImage archetype does not model the OutputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::IndexableAndAccessibleImage<OutputIndexableAndAccessibleImage>&&
+                               mln::concepts::OutputImage<OutputIndexableAndAccessibleImage>,
+                           "OutputIndexableAndAccessibleImage archetype does not model the OutputImage concept!");
 
 
   struct BidirectionalImage : Image, mln::experimental::Image<BidirectionalImage>
@@ -309,10 +290,8 @@ namespace mln::archetypes
     ReversibleValueRange new_values();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::BidirectionalImage<BidirectionalImage>,
-                "BidirectionalImage archetype does not model the BidirectionalImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::BidirectionalImage<BidirectionalImage>,
+                           "BidirectionalImage archetype does not model the BidirectionalImage concept!");
 
 
   struct OutputBidirectionalImage : BidirectionalImage, mln::experimental::Image<OutputBidirectionalImage>
@@ -337,11 +316,9 @@ namespace mln::archetypes
     ReversibleOutputPixelRange new_pixels();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::BidirectionalImage<OutputBidirectionalImage> &&
-                    mln::concepts::OutputImage<OutputBidirectionalImage>,
-                "OutputBidirectionalImage archetype does not model the OutputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::BidirectionalImage<OutputBidirectionalImage>&&
+                               mln::concepts::OutputImage<OutputBidirectionalImage>,
+                           "OutputBidirectionalImage archetype does not model the OutputImage concept!");
 
 
   struct RawImage : IndexableAndAccessibleImage, mln::experimental::Image<RawImage>
@@ -368,9 +345,8 @@ namespace mln::archetypes
     std::ptrdiff_t                 strides(int) const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::RawImage<RawImage>, "RawImage archetype does not model the RawImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::RawImage<RawImage>,
+                           "RawImage archetype does not model the RawImage concept!");
 
 
   struct OutputRawImage final : RawImage, mln::experimental::Image<OutputRawImage>
@@ -413,10 +389,8 @@ namespace mln::archetypes
     image_value_t<OutputRawImage>* data();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::RawImage<OutputRawImage> && mln::concepts::OutputImage<OutputRawImage>,
-                "OutputRawImage archetype does not model the OutputImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::RawImage<OutputRawImage>&& mln::concepts::OutputImage<OutputRawImage>,
+                           "OutputRawImage archetype does not model the OutputImage concept!");
 
 
   struct WithExtensionImage : Image, mln::experimental::Image<WithExtensionImage>
@@ -432,9 +406,7 @@ namespace mln::archetypes
     image_extension_t<WithExtensionImage> extension() const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::WithExtensionImage<WithExtensionImage>,
-                "WithExtensionImage archetype does not model the WithExtensionImage concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::WithExtensionImage<WithExtensionImage>,
+                           "WithExtensionImage archetype does not model the WithExtensionImage concept!");
 
 } // namespace mln::archetypes

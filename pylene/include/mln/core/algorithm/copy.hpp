@@ -1,25 +1,16 @@
-#ifndef MLN_CORE_ALGORITHM_COPY_HPP
-#define MLN_CORE_ALGORITHM_COPY_HPP
+#pragma once
 
-#include <mln/core/assert.hpp>
-#include <mln/core/concept/image.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/rangev3/view/zip.hpp>
+
+#include <algorithm>
+#include <range/v3/algorithm/copy.hpp>
 /// \file
 
 namespace mln
 {
 
-  /*
-  // \brief Copy an image to memory pointed by the iterator \p it.
-  //
-  // \param[in] input Input image
-  // \param it Output iterator
-  //
-  // \return it + number of elements in the image.
-  //
-  template <typename I, typename OutputIterator>
-  OutputIterator
-  copy(const Image<I>& input, OutputIterator it);
-  */
 
   /// \brief Copy a source image to an output image regardless domain.
   ///
@@ -42,12 +33,37 @@ namespace mln
   /// \todo add specialization for raw images
   ///
   template <typename InputImage, typename OutputImage>
-  OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output);
+  [[deprecated]] OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output);
 
   /// \overload
   /// \ingroup Algorithms
   template <typename InputImage, typename OutputImage>
-  OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output);
+  [[deprecated]] OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output);
+
+
+  namespace experimental
+  {
+
+    /// \brief Copy the values of a source image to a destination image regardless their domain.
+    ///
+    /// \ingroup Algorithms
+    ///
+    /// The input and output image must have domain of the same size.
+    /// This is equivalent to the following code.
+    ///
+    /// \code
+    /// mln_foreach((auto&& [vin, vout]), ranges::zip(input.values(), output.values()))
+    ///   *vout = *vin;
+    /// \endcode
+    ///
+    /// \param[in] src Input Image
+    /// \param[out] dest Output Image
+    /// \return The image where values have been copied in.
+    ///
+    ///
+    template <class InputImage, class OutputImage>
+    void copy(InputImage src, OutputImage dest);
+  } // namespace experimental
 
   /******************************************/
   /****          Implementation          ****/
@@ -64,7 +80,7 @@ namespace mln
       mln_forall (vin, vout)
         *vout = (mln_value(I)) * vin;
     }
-  }
+  } // namespace impl
 
   template <typename InputImage, typename OutputImage>
   OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output)
@@ -86,6 +102,22 @@ namespace mln
     return move_exact(output);
   }
 
-} // end of namespace mln
 
-#endif //! MLN_CORE_ALGORITHM_COPY_HPP
+  namespace experimental
+  {
+    template <class InputImage, class OutputImage>
+    void copy(InputImage input, OutputImage output)
+    {
+      // FIXME: Add a precondition about the size of the domain ::ranges::size
+      static_assert(mln::is_a<InputImage, Image>());
+      static_assert(mln::is_a<OutputImage, Image>());
+      static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+      auto input_rows  = ranges::rows(input.new_values());
+      auto output_rows = ranges::rows(output.new_values());
+
+      for (auto [r1, r2] : ranges::view::zip(input_rows, output_rows))
+        ::ranges::copy(r1, ::ranges::begin(r2));
+    }
+  } // namespace experimental
+} // namespace mln

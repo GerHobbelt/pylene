@@ -6,9 +6,8 @@ Reference
    :maxdepth: 2
    :titlesonly:
 
-   concept
-   images
+
    core
    labeling
    morpho
-
+   concept

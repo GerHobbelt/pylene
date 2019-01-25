@@ -131,7 +131,7 @@ namespace mln
           auto d = morpho::structural::dilate(ima, nbh, cmp);
           auto e = morpho::structural::erode(ima, nbh, cmp);
 
-          transform(d - e, norm, out);
+          mln::transform(d - e, norm, out);
         }
 
         // Version non-fast dilate - erode
@@ -140,7 +140,7 @@ namespace mln
         {
           auto d = morpho::structural::dilate(ima, nbh, cmp);
 
-          transform(d - ima, norm, out);
+          mln::transform(d - ima, norm, out);
         }
 
         template <class I, class SE, class Compare, class Norm, class J>
@@ -148,7 +148,7 @@ namespace mln
         {
           auto d = morpho::structural::erode(ima, nbh, cmp);
 
-          transform(ima - d, norm, out);
+          mln::transform(ima - d, norm, out);
         }
       }
 

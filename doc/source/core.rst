@@ -15,7 +15,6 @@ Core Module
    core/ranges
    core/images
    core/neighborhood
-   core/algorithms
    core/stl
 
 
@@ -199,15 +198,75 @@ Core Module
 
 
 
-.. raw:: html
 
-         <h2>Algorithms</h2>
+Image primitives
+****************
+
+.. toctree::
+    :hidden:
+
+    core/algorithm/fill
+    core/algorithm/copy
+    core/algorithm/paste
+    core/algorithm/transform
+    core/algorithm/iota
+    core/algorithm/accumulate    
+    core/algorithm/generate  
+
+Fundamental primitives for basic image manipulation. Those are grouped by:
+
+* *Modifying* or *Non-modifying* if they output and write an image
+* *Value* or *Pixel* if the localisation (i.e. point/index) is used for processing
 
 
-Foundamental and core :doc:`algorithms <core/algorithms>` for image manipulation.
+
+.. rubric:: Non-modifying image primitives that operates on values
 
 
++-------------------------------------------+------------------------------------------------------------------------+
+| :doc:`core/algorithm/all_any_none_of`     | checks if a predicate is true for all, any or none of the image values |
++-------------------------------------------+------------------------------------------------------------------------+
+| :doc:`core/algorithm/foreach`             | applies a function to the values of an image                           |
++-------------------------------------------+------------------------------------------------------------------------+
+| `count` `count_if`                        | [TBI] returns the number of values satisfying specific criteria        |
++-------------------------------------------+------------------------------------------------------------------------+
+| `equal`                                   | [TBI] checks if two images have the same values                        |
++-------------------------------------------+------------------------------------------------------------------------+
+| :doc:`core/algorithm/accumulate` (reduce) | sums up values of an image                                             |
++-------------------------------------------+------------------------------------------------------------------------+
 
+
+.. rubric:: Non-modifying image primitives that operates on pixels
+
+
++----------------------------+--------------------------------------------------+
+| :doc:`core/algorithm/sort` | returns a container of image points (or indexes) |
++----------------------------+--------------------------------------------------+
+
+.. rubric:: Modifying image primitives that operates on values
+
+
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/copy`      | copies image values to another image  (without localization) |
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/fill`      | assigns a value to image values                              |
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/clone`     | copies an image in a new image                               |
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/paste`     | copies image pixels to another image (with localization)     |
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/transform` | applies a function to the values of an image                 |
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/generate`  | generate the values of an image by a function                |
++---------------------------------+--------------------------------------------------------------+
+| :doc:`core/algorithm/iota`      | generate the values of an image with increasing value        |
++---------------------------------+--------------------------------------------------------------+
+
+.. rubric:: Modifying image primitives that operates on pixels
+
++-------------------------------------------+---------------------------------------------------------------------+
+| `integrate` (partial sum, inclusive scan) | computes the partial sum of image values (used for integral images) |
++-------------------------------------------+---------------------------------------------------------------------+
 
 .. raw:: html
 
@@ -215,3 +274,5 @@ Foundamental and core :doc:`algorithms <core/algorithms>` for image manipulation
 
 
 :doc:`core/stl` are the fundamentals concepts of the C++ standard library that we are building our concept upon. They are our building blocks.
+
+

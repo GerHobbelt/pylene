@@ -57,11 +57,18 @@ add_core_test(${test_prefix}value_int          value/int.cpp)
 add_core_test(${test_prefix}vec_math_ops       vec/vec_math_ops.cpp)
 
 # test Algorithms
+add_core_test(${test_prefix}all_any_none_of    algorithm/all_any_none_of.cpp)
 add_core_test(${test_prefix}copy               algorithm/copy.cpp)
+add_core_test(${test_prefix}clone              algorithm/clone.cpp)
 add_core_test(${test_prefix}fill               algorithm/fill.cpp)
+add_core_test(${test_prefix}for_each           algorithm/for_each.cpp)
+add_core_test(${test_prefix}iota               algorithm/iota.cpp)
+add_core_test(${test_prefix}generate           algorithm/generate.cpp)
 add_core_test(${test_prefix}paste              algorithm/paste.cpp)
 add_core_test(${test_prefix}equal              algorithm/equal.cpp)
 add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
+add_core_test(${test_prefix}transform          algorithm/transform.cpp)
+add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 
 # test SE

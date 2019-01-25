@@ -1,14 +1,14 @@
 #pragma once
 
+
 #include <mln/core/concept/new/archetype/domain.hpp>
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/images.hpp>
 
-#include <mln/core/domain/private/domain_traits.hpp>
 #include <mln/core/image/private/image_traits.hpp>
 #include <mln/core/image/private/pixel_traits.hpp>
-
+#include <range/v3/range_traits.hpp>
 #include <type_traits>
 
 
@@ -24,7 +24,7 @@ namespace mln::archetypes
     using new_pixel_type = Pixel;
     using value_type     = pixel_value_t<Pixel>;
     using reference      = pixel_reference_t<Pixel>;
-    using point_type     = domain_point_t<Domain>;
+    using point_type     = ::ranges::range_value_t<Domain>;
     using domain_type    = Domain;
     using category_type  = forward_image_tag;
     using concrete_type  = ConcreteImage;

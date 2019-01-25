@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mln/core/domain/private/domain_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
@@ -25,7 +24,7 @@ namespace mln
     using typename clip_view::image_adaptor::value_type;
     using domain_type = D;
 
-    static_assert(std::is_convertible_v<domain_value_t<D>, point_type>,
+    static_assert(std::is_convertible_v<::ranges::range_value_t<D>, point_type>,
                   "Domain value type must be convertible to image point type.");
     /// \}
 
@@ -36,6 +35,7 @@ namespace mln
     using indexable          = image_indexable_t<I>;
     using view               = std::true_type;
     using extension_category = mln::extension::none_extension_tag; // FIXME: should be improved
+    using category_type      = forward_image_tag;                  // FIXME: to preservative
     using concrete_type      = clip_view<image_concrete_t<I>, D>;
 
     template <class V>
@@ -147,8 +147,6 @@ namespace mln
     template <typename dummy = I>
     std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> delta_index(point_type p) const
     {
-      mln_precondition(m_domain.has(p));
-      mln_precondition(this->base().domain().has(p));
       return this->base().delta_index(p);
     }
     /// \}
@@ -165,13 +163,23 @@ namespace mln
 
   namespace view
   {
-    template <class I, class D>
-    clip_view<I, D> clip(I ima, D domain)
-    {
-      static_assert(mln::is_a<I, experimental::Image>());
+    // Clip customization point
+    // if ima.clip(domain) exists and is well-formed, it is used
+    // otherwise the generic morpher is used
 
-      // FIXME: make ima a view first ?
-      return {std::move(ima), std::move(domain)};
+    // Try first, if Substition succeeds, it is a best match
+    template <class I, class D>
+    auto clip(I&& ima, D&& domain) -> decltype(ima.clip(domain))
+    {
+      return ima.clip(std::forward<D>(domain));
+    }
+
+
+    // Used if the previous substition has failed
+    template <class I, class D>
+    clip_view<I, D> clip(const experimental::Image<I>& ima, D domain)
+    {
+      return {static_cast<const I&>(ima), std::forward<D>(domain)};
     }
 
   } // namespace view

@@ -14,7 +14,7 @@ namespace mln
   template <class I, class M>
   class mask_view : public image_adaptor<I>, public experimental::Image<mask_view<I, M>>
   {
-    mutable M m_mask;
+    M m_mask;
 
   public:
     /// Type definitions
@@ -147,14 +147,14 @@ namespace mln
 
     template <class I2, class D2>
     mask_view(const mask_view<I2, D2>& other, mln::init)
-      : mask_view::image_adaptor{static_cast<I>(imchvalue<value_type>(other.base()))}
+      : mask_view::image_adaptor{static_cast<I>(other.base().template ch_value<value_type>())}
       , m_mask{other.m_mask}
     {
     }
 
     template <class I2, class D2>
     mask_view(const mask_view<I2, D2>& other, const value_type& v)
-      : mask_view::image_adaptor{static_cast<I>(imchvalue<value_type>(other.base()).init(v))}
+      : mask_view::image_adaptor{static_cast<I>((other.base().template ch_value<value_type>()).init(v))}
       , m_mask{other.m_mask}
     {
     }

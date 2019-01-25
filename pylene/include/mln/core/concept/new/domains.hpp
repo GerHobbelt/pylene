@@ -15,6 +15,7 @@ namespace mln::concepts
   // clang-format off
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+
   // Domain
   template<typename Dom>
   concept Domain = 
@@ -26,6 +27,16 @@ namespace mln::concepts
       { cdom.empty() }  -> bool;
       // { cdom.size() }   -> stl::UnsignedIntegral&&;
     };
+
+
+  // SizedDomain
+  template<typename Dom>
+  concept Domain = 
+    Domain<Dom> &&
+    requires(const Dom cdom) {
+      { cdom.size() } -> stl::UnsignedIntegral&&;
+    };
+
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on

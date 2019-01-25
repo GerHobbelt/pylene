@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/image/image.hpp>
+#include <mln/core/image/private/filtered.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/filter.hpp>
 
@@ -13,41 +14,11 @@
 
 namespace mln
 {
-  // FIXME: move into a different file
-  // FIXME: use all_t for ima
-  // FIXME: use
-
-  template <typename I, typename F>
-  struct filtered_domain
-  {
-    using value_type = image_value_t<I>;
-    using reference  = image_reference_t<I>;
-
-    filtered_domain(I ima, F f)
-      : rng_(mln::ranges::view::filter(ima.domain(), f))
-      , ima_(ima)
-      , f_(f)
-    {
-    }
-
-    auto begin() { return ::ranges::begin(rng_); }
-    auto end() { return ::ranges::end(rng_); }
-
-    bool has(value_type p) const { return f_(ima_(p)); }
-    bool empty() const { return ::ranges::empty(rng_); }
-    // unsigned size() const { return ::ranges::size(rng_); }
-
-  private:
-    decltype(mln::ranges::view::filter(std::declval<I>().domain(), std::declval<F>())) rng_;
-
-    I ima_;
-    F f_;
-  };
 
   template <class I, class F>
   class filter_view : public image_adaptor<I>, public experimental::Image<filter_view<I, F>>
   {
-    using fun_t = F; // FIXME something with semiregular_t<F> ?
+    using fun_t = F;
     fun_t f;
 
   public:
@@ -57,7 +28,7 @@ namespace mln
     using value_type = std::decay_t<reference>;
     using typename filter_view::image_adaptor::new_pixel_type;
     using typename filter_view::image_adaptor::point_type;
-    using domain_type = filtered_domain<I, F>;
+    using domain_type = detail::filtered<I, F>;
     /// \}
 
     /// Traits & Image Properties
@@ -92,7 +63,7 @@ namespace mln
     {
     }
 
-    domain_type domain() const {return filtered_domain{(this->base(), this->f }; }
+    domain_type domain() const { return detail::filtered{this->base(), this->f}; }
 
 
     auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
@@ -109,8 +80,7 @@ namespace mln
     template <typename Ret = reference>
     std::enable_if_t<accessible::value, Ret> operator()(point_type p)
     {
-      // FIXME: with I = mln::image2d<int> has no member named 'has', from tests/core/image/view/filter.cpp:71:
-      // (ASSERT_EQ(pix.val(), u(pix.point()));) mln_precondition(this->base().domain().has(p));
+      mln_precondition(this->base().domain().has(p));
       mln_precondition(std::invoke(f, this->base()(p)));
       return this->base()(p);
     }

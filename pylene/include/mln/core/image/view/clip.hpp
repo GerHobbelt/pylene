@@ -94,9 +94,7 @@ namespace mln
     template <typename dummy = I>
     reference operator[](image_index_t<dummy> i)
     {
-      mln_precondition(i < m_domain.size());
-      auto p = domain()[i];
-      return this->base()(p);
+      return this->base()[i];
     }
     /// \}
 
@@ -118,7 +116,7 @@ namespace mln
     template <typename Ret = new_pixel_type>
     std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
-      mln_precondition(this->m_domain.has(p));
+      mln_precondition(m_domain.has(p));
       mln_precondition(this->base().domain().has(p));
       return this->base().new_pixel(p);
     }
@@ -135,20 +133,22 @@ namespace mln
     template <typename dummy = I>
     std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> index_of_point(point_type p) const
     {
-      // FIXME: how to implement this here ?
+      mln_precondition(m_domain.has(p));
+      mln_precondition(this->base().domain().has(p));
       return this->base().index_of_point(p);
     }
 
     template <typename dummy = I>
     point_type point_at_index(std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> i) const
     {
-      return domain()[i];
+      return this->base().point_at_index(i);
     }
 
     template <typename dummy = I>
     std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> delta_index(point_type p) const
     {
-      // FIXME: how to implement this here ?
+      mln_precondition(m_domain.has(p));
+      mln_precondition(this->base().domain().has(p));
       return this->base().delta_index(p);
     }
     /// \}

@@ -7,7 +7,7 @@
 namespace mln::archetypes
 {
 
-  struct Domain final
+  struct Domain
   {
     using value_type = Point;
     using reference  = Point&;
@@ -17,11 +17,20 @@ namespace mln::archetypes
 
     bool has(value_type) const;
     bool empty() const;
-    // unsigned size() const;
   };
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::Domain<Domain>, "Domain archetype does not model the Domain concept!");
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
+  struct SizedDomain : Domain
+  {
+    unsigned size() const;
+  };
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::concepts::SizedDomain<SizedDomain>,
+                "SizedDomain archetype does not model the SizedDomain concept!");
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 } // namespace mln::archetypes

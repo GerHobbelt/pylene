@@ -1,6 +1,7 @@
 #ifndef MLN_CORE_IMAGE_TRAITS_HPP
 #define MLN_CORE_IMAGE_TRAITS_HPP
 
+#include <mln/core/concept/object.hpp>
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image_category.hpp>
 
@@ -36,23 +37,42 @@ namespace mln
   template <class I>
   struct Image;
 
-  template <typename I>
-  struct image_traits : image_traits<typename std::decay<I>::type>
+  namespace experimental
   {
+    template <class I>
+    struct Image;
   };
 
   template <typename I>
-  struct image_traits<const I> : image_traits<I>
+  struct [[deprecated]] image_traits;
+
+  namespace details
   {
+    template <typename I, class = void>
+    struct image_traits_helper;
+
+
+    template <typename I>
+    struct image_traits_helper<I, std::enable_if_t<mln::is_a<I, mln::experimental::Image>::value>>
+    {
+      using category   = typename I::category_type;
+      using extension  = typename I::extension_category;
+      using accessible = typename I::accessible;
+      using indexable  = typename I::indexable;
+    };
+
+
+    template <typename I>
+    struct image_traits_helper<I, std::enable_if_t<!mln::is_a<I, mln::experimental::Image>::value>>
+      : image_traits<std::decay_t<I>>
+    {
+    };
+
   };
 
-  template <typename I>
-  struct image_traits<volatile I> : image_traits<I>
-  {
-  };
 
   template <typename I>
-  struct image_traits<const volatile I> : image_traits<I>
+  struct image_traits : details::image_traits_helper<I>
   {
   };
 

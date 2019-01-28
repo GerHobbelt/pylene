@@ -84,7 +84,7 @@ namespace mln
 
     auto new_pixels()
     {
-      auto g = [this](point_type p) -> new_pixel_type { return this->base().pixel_at(p); };
+      auto g = [this](point_type p) -> new_pixel_type { return this->base().new_pixel_at(p); };
       return mln::ranges::view::transform(this->m_domain, g);
     }
 

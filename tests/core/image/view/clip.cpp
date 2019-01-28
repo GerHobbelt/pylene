@@ -105,8 +105,8 @@ TEST(View, clip_other_a_box2d)
 
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-static_assert(mln::concept::AccessibleImage<mln::clip_view<mln::archetypes::AccessibleImage, mln::archetypes::Domain>>);
-static_assert(mln::concept::OutputImage<mln::clip_view<mln::archetypes::OutputAccessibleImage, mln::archetypes::Domain>>);
-static_assert(mln::concept::IndexableAndAccessibleImage<mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>);
+static_assert(mln::concepts::AccessibleImage<mln::clip_view<mln::archetypes::AccessibleImage, mln::archetypes::Domain>>);
+static_assert(mln::concepts::OutputImage<mln::clip_view<mln::archetypes::OutputAccessibleImage, mln::archetypes::Domain>>);
+static_assert(mln::concepts::IndexableAndAccessibleImage<mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

@@ -3,6 +3,9 @@
 #include <mln/core/concept/new/cmcstl2.hpp>
 #include <mln/core/concept/new/points.hpp>
 #include <mln/core/concept/new/values.hpp>
+
+#include <range/v3/range_traits.hpp>
+
 #include <type_traits>
 
 namespace mln::concepts
@@ -14,10 +17,10 @@ namespace mln::concepts
 
   // Domain
   template <typename Dom>
-  concept Domain = 
+  concept Domain =
     stl::ForwardRange<Dom> &&
-    Point<domain_point_t<Dom>> &&
-    requires(const Dom cdom, stl::range_value_t<Dom> p) {
+    Point<::ranges::range_value_t<Dom>> &&
+    requires(const Dom cdom, ::ranges::range_value_t<Dom> p) {
       { cdom.has(p) }   -> bool;
       { cdom.empty() }  -> bool;
       // { cdom.size() }   -> stl::UnsignedIntegral&&;

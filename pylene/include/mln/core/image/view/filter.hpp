@@ -24,10 +24,10 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using reference  = std::invoke_result_t<F&, image_reference_t<I>>;
-    using value_type = std::decay_t<reference>;
     using typename filter_view::image_adaptor::new_pixel_type;
     using typename filter_view::image_adaptor::point_type;
+    using typename filter_view::image_adaptor::reference;
+    using typename filter_view::image_adaptor::value_type;
     using domain_type = detail::filtered<I, F>;
     /// \}
 

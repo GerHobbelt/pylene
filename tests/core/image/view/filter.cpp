@@ -2,6 +2,7 @@
 #include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/filter.hpp>
 
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 
@@ -15,16 +16,15 @@
 
 TEST(View, filter_readonly)
 {
-  using namespace mln;
   using namespace mln::experimental::ops;
 
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
+  mln::box2d        dom = {{-1, -2}, {3, 3}};
+  mln::image2d<int> ima(dom);
 
-  iota(ima, 0);
-  auto x = view::filter(ima, [](int v) { return v > 10; });
+  mln::experimental::iota(ima, 0);
+  auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
-  ASSERT_TRUE(mln::experimental::all(x > 10));
+  ASSERT_TRUE(mln::experimental::all_of(x > 10));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {
@@ -41,31 +41,29 @@ TEST(View, filter_readonly)
 
 TEST(View, filter_writable)
 {
-  using namespace mln;
   using namespace mln::experimental::ops;
 
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
+  mln::box2d        dom{{-1, -2}, {3, 3}};
+  mln::image2d<int> ima(dom);
 
 
-  iota(ima, 0);
-  auto x = view::filter(ima, [](int v) { return v > 10; });
+  mln::experimental::iota(ima, 0);
+  auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
-  fill(x, 10);
-  ASSERT_TRUE(mln::experimental::all(ima <= 10));
+  mln::experimental::fill(x, 10);
+  ASSERT_TRUE(mln::experimental::all_of(ima <= 10));
 }
 
 
 TEST(View, filter_twice)
 {
-  using namespace mln;
   using namespace mln::experimental::ops;
 
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
+  mln::box2d        dom = {{-1, -2}, {3, 3}};
+  mln::image2d<int> ima(dom);
 
-  iota(ima, 0);
-  auto u = view::filter(ima, [](int v) { return v > 10 && v < 15; });
+  mln::experimental::iota(ima, 0);
+  auto u = mln::view::filter(ima, [](int v) { return v > 10 && v < 15; });
 
   // FIXME:
   // auto x = view::filter(ima, [](int v) { return v > 10; });
@@ -91,10 +89,10 @@ TEST(View, filter_twice)
       ASSERT_EQ(pix.val(), ima(pix.point()));
   }
 
-  image2d<int> before = clone(ima);
-  fill(u, 1);
+  mln::image2d<int> before = mln::experimental::clone(ima);
+  mln::experimental::fill(u, 1);
   {
-    mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), u.new_values()))
+    mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), ima.new_values()))
     {
       if (old_v > 10 && old_v < 15)
         ASSERT_EQ(1, new_v);

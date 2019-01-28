@@ -25,13 +25,15 @@ namespace mln
     using typename mask_view::image_adaptor::reference;
     using typename mask_view::image_adaptor::value_type;
     using domain_type = mln::ranges::where_t<M>;
+    /// \}
 
     static_assert(std::is_same_v<typename M::value_type, bool>, "Image value type must be boolean.");
-    /// \}
+    static_assert(image_accessible_v<M>, "The mask must accessible (ima(p) must be valid");
 
 
     /// Traits & Image Properties
     /// \{
+    using category           = forward_image_tag;
     using accessible         = image_accessible_t<I>;
     using indexable          = image_indexable_t<I>;
     using view               = std::true_type;
@@ -40,8 +42,6 @@ namespace mln
 
     template <class V>
     using ch_value_type = mask_view<image_ch_value_t<I, V>, M>;
-
-    static_assert(I::accessible::value, "Image must be pw-accessible.");
     /// \}
 
 
@@ -175,17 +175,8 @@ namespace mln
     pixel_range_t new_pixels() { return {this->base().new_pixels(), m_mask.new_values()}; }
 
 
-    /// Indexable-image related methods
-    /// \{
-    template <typename dummy = I>
-    reference operator[](image_index_t<dummy> i)
-    {
-      return this->base()[i];
-    }
-    /// \}
 
-
-    /// Accessible-image related methods
+    /// Accessible-image related methods (overwritten from adaptor)
     /// \{
     template <typename Ret = reference>
     std::enable_if_t<accessible::value, Ret> operator()(point_type p)
@@ -195,24 +186,12 @@ namespace mln
       return this->base()(p);
     }
 
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> at(point_type p)
-    {
-      return this->base().at(p);
-    }
-
     template <typename Ret = new_pixel_type>
     std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
       mln_precondition(m_mask.domain().has(p));
       mln_precondition(this->base().domain().has(p));
       return this->base().new_pixel(p);
-    }
-
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
-    {
-      return this->base().new_pixel_at(p);
     }
     /// \}
 

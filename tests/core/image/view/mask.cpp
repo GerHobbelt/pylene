@@ -1,9 +1,10 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/mask.hpp>
 
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
-
+#include <mln/core/concept/new/archetype/image.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
 #include <helpers.hpp>
@@ -35,7 +36,7 @@ TEST(View, mask)
     ASSERT_EQ(42, ima(p));
     ASSERT_EQ(42, z(p));
   }
-  ASSERT_TRUE(mln::experimental::all(ima == ref));
+  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
 }
 
 
@@ -65,5 +66,70 @@ TEST(View, mask_twice)
     ASSERT_EQ(42, B(p));
   }
 
-  ASSERT_TRUE(mln::experimental::all(ima == ref));
+  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
 }
+
+
+
+struct mask_archetype : mln::experimental::Image<mask_archetype>
+{
+  using value_type     = bool;
+  using reference      = const bool&;
+  using domain_type    = mln::archetypes::Domain;
+  using point_type     = ::ranges::range_value_t<domain_type>;
+  using category_type  = mln::forward_image_tag;
+  using concrete_type  = mask_archetype;
+
+  struct new_pixel_type
+  {
+    bool val() const;
+    point_type point() const;
+  };
+
+  template <class V>
+  using ch_value_type = mask_archetype;
+
+  // additional traits
+  using extension_category = mln::extension::none_extension_tag;
+  using indexable          = std::false_type;
+  using accessible         = std::true_type;
+  using view               = std::false_type;
+
+
+  domain_type        domain() const;
+  reference          operator()(point_type);
+  reference          at(point_type);
+  new_pixel_type     new_pixel(point_type);
+  new_pixel_type     new_pixel_at(point_type);
+
+  struct pixel_range
+  {
+    const new_pixel_type* begin();
+    const new_pixel_type* end();
+  };
+  pixel_range new_pixels();
+
+
+  struct value_range
+  {
+    const value_type* begin();
+    const value_type* end();
+  };
+
+  value_range new_values();
+};
+
+template <mln::concepts::Image I>
+void foo(I*);
+
+
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+static_assert(mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>);
+static_assert(mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>);
+static_assert(mln::concepts::IndexableAndAccessibleImage<mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>);
+
+static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputAccessibleImage, mask_archetype>>);
+static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>);
+static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>);
+#endif

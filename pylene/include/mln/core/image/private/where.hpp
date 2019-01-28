@@ -18,7 +18,7 @@ namespace mln
       friend ::ranges::range_access;
       using pixel_range_type = decltype(std::declval<I&>().new_pixels());
 
-      I                m_ima;
+      mutable I        m_ima;
       pixel_range_type m_pixels;
 
       struct cursor
@@ -57,14 +57,21 @@ namespace mln
 
       where_t() = default;
 
-      bool has(image_point_t<I> p) { return m_ima(p); }
+      bool has(image_point_t<I> p) const { return m_ima(p); }
+      bool empty() const { return m_ima.domain().empty(); }
     };
 
   } // namespace ranges
 
-  template <class I>
-  ranges::where_t<I> new_where(const experimental::Image<I>& ima)
+
+  namespace experimental
   {
-    return {static_cast<const I&>(ima)};
+
+    template <class I>
+    mln::ranges::where_t<I> where(const experimental::Image<I>& ima)
+    {
+      return {static_cast<const I&>(ima)};
+    }
+
   }
 } // namespace mln

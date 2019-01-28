@@ -220,7 +220,7 @@ TEST(Core, Where)
   mln::image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
 
   auto y = x % 2;
-  auto z = mln::new_where(y);
+  auto z = mln::experimental::where(y);
 
   static_assert(::ranges::ForwardRange<decltype(z)>());
 
@@ -234,3 +234,56 @@ TEST(Core, Where)
       ASSERT_TRUE(z.has(p));
     }
 }
+
+
+struct mask_archetype : mln::experimental::Image<mask_archetype>
+{
+  using value_type     = bool;
+  using reference      = const bool&;
+  using domain_type    = mln::archetypes::Domain;
+  using point_type     = ::ranges::range_value_t<domain_type>;
+  using category_type  = mln::forward_image_tag;
+  using concrete_type  = mask_archetype;
+
+  struct new_pixel_type
+  {
+    bool val() const;
+    point_type point() const;
+  };
+
+  template <class V>
+  using ch_value_type = mask_archetype;
+
+  // additional traits
+  using extension_category = mln::extension::none_extension_tag;
+  using indexable          = std::false_type;
+  using accessible         = std::true_type;
+  using view               = std::false_type;
+
+
+  domain_type        domain() const;
+  reference          operator()(point_type);
+  reference          at(point_type);
+  new_pixel_type     new_pixel(point_type);
+  new_pixel_type     new_pixel_at(point_type);
+
+  struct pixel_range
+  {
+    const new_pixel_type* begin();
+    const new_pixel_type* end();
+  };
+  pixel_range new_pixels();
+
+
+  struct value_range
+  {
+    const value_type* begin();
+    const value_type* end();
+  };
+
+  value_range new_values();
+};
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+static_assert(mln::concepts::Domain<mln::ranges::where_t<mask_archetype>>);
+#endif

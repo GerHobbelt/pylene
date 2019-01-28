@@ -50,7 +50,7 @@ namespace mln
 
     public:
       where_t(I ima)
-        : m_ima(ima)
+        : m_ima(std::move(ima))
         , m_pixels(m_ima.new_pixels())
       {
       }

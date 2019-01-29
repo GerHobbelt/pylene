@@ -7,104 +7,16 @@ Core Module
 .. toctree::
    :hidden:
 
-   core/values
-   core/points
-   core/pixels
-   core/domains
-   core/indexes
-   core/ranges
+
    core/images
+   core/ranges
    core/neighborhood
    core/stl
 
 
 
 
-.. raw:: html
 
-         <h2>Values</h2>
-
-
-:doc:`core/values` are the fundamentals tools to model values held by images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Value <concept-values-Value>`
-   * :ref:`ComparableValue <concept-values-ComparableValue>`
-   * :ref:`OrderedValue <concept-values-OrderedValue>`
-
-.. topic:: Predefined values
-
-   * :doc:`core/values/rgba`
-
-.. topic:: Utilities
-
-   TODO channel utilities
-..   * :cpp:func:`is_multichannel`
-..   * :cpp:func:`dynamic_channel_get`
-..   * :cpp:func:`dynamic_channel_size`
-..   * :cpp:func:`static_channel_get`
-..   * :cpp:func:`static_channel_size`
-
-
-
-.. raw:: html
-
-         <h2>Points</h2>
-
-
-:doc:`core/points` are the fundamentals tools to locate a value inside an images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Point <concept-points-Point>`
-
-
-
-
-.. raw:: html
-
-         <h2>Pixels</h2>
-
-
-:doc:`core/pixels` are the fundamentals tools when browsing an images to access both the point and the value.
-
-
-.. topic:: Concepts
-
-   * :ref:`Pixel <concept-pixels-Pixel>`
-
-
-
-
-.. raw:: html
-
-         <h2>Domains</h2>
-
-
-:doc:`core/domains` are the fundamental tools when expressing the valid set of points for an image.
-
-
-.. topic:: Concepts
-
-   * :ref:`Domain <concept-domains-Domain>`
-
-
-
-
-.. raw:: html
-
-         <h2>Indexes</h2>
-
-
-:doc:`core/indexes` are the lowest level tools to locate a value inside an images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Index <concept-indexes-Index>`
 
 
 
@@ -114,7 +26,8 @@ Core Module
          <h2>Images</h2>
 
 
-:doc:`core/images` represent an image and all its properties.
+See :doc:`core/images` for a description of the image concepts and image basics.
+
 
 
 .. topic:: Concepts
@@ -136,11 +49,69 @@ Core Module
 
    TODO
 
-.. topic:: Images
+.. topic:: Fundamental image types
 
-   * :doc:`core/images/ndimage`
+  +--------------+-------------------------+
+  | `image2d<T>` | Buffer-encoded 2D image |
+  +--------------+-------------------------+
+  | `image3d<T>` | Buffer-encoded 3D image |
+  +--------------+-------------------------+
+  | `ndimage<T>` | Buffer-encoded nD image |
+  +--------------+-------------------------+
+
+.. topic:: Functional image views
+
+  .. table::
+    :widths: auto
+
+    +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | :cpp:func:`view::transform(ima,f) <mln::view::transform>` | Views the image with values applied to a function.                                         |
+    +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::filter(ima, pred)``                               | Views the image restricted to pixels with values passing a predicate.                      |
+    +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::mask(ima, mask)``                                 | Views the image restricted to pixels in a binary mask.                                     |
+    +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::clip(ima, roi)``                                  | Views the image restricted to a sub-region.                                                |
+    +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::zip(ima1, ima2, ..., imaN)``                      | Views a list of images as a single image where values are tuples of the each image values. |
+    +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
+
+.. topic:: Common image operators (views)
+
+  .. table::
+    :widths: auto
+
+    +--------------+-----------------------------------------------------------+
+    | Arithmetical | `a + b`, `a - b`, `a * b`, `a / b`, `a % b`               |
+    +--------------+-----------------------------------------------------------+
+    | Logical      | ``land(a,b)``, ``lor(a,b)``, ``lnot(a)``                  |
+    +--------------+-----------------------------------------------------------+
+    | Comparison   | `a < b`, `a <= b`, `a == b`, `a != b`, `a >= b`, `a > b`  |
+    +--------------+-----------------------------------------------------------+
+    | Conditional  | ``view::ifelse(a,b,c)``                                   |
+    +--------------+-----------------------------------------------------------+
 
 
+.. topic:: Mathematical image operator (views)
+
+  +-------+-------+
+  | FIXME | FIXME |
+  +-------+-------+
+
+.. topic:: Other image operators (views)
+
+  .. table::
+    :widths: auto
+    
+    +---------------------------+---------------------------------------------------+
+    | ``view::cast<V>(ima)``    | Views the image with the values casted into ``V`` |
+    +---------------------------+---------------------------------------------------+
+    | ``view::channel(ima, k)`` | Views the k-th channel of the image               |
+    +---------------------------+---------------------------------------------------+
+    | ``view::red(ima)``        |                                                   |
+    | ``view::green(ima)``      |                                                   |
+    | ``view::blue(ima)``       | Views the red, green or blue channel of the image |
+    +---------------------------+---------------------------------------------------+
 
 
 .. raw:: html
@@ -205,13 +176,17 @@ Image primitives
 .. toctree::
     :hidden:
 
-    core/algorithm/fill
-    core/algorithm/copy
-    core/algorithm/paste
-    core/algorithm/transform
-    core/algorithm/iota
     core/algorithm/accumulate    
+    core/algorithm/all_any_none_of
+    core/algorithm/clone
+    core/algorithm/copy
+    core/algorithm/fill
+    core/algorithm/foreach
     core/algorithm/generate  
+    core/algorithm/iota
+    core/algorithm/paste
+    core/algorithm/sort
+    core/algorithm/transform
 
 Fundamental primitives for basic image manipulation. Those are grouped by:
 

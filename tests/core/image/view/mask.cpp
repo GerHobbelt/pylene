@@ -119,10 +119,6 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   value_range new_values();
 };
 
-template <mln::concepts::Image I>
-void foo(I*);
-
-
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>);

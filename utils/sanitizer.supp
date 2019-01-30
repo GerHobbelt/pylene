@@ -1,0 +1,3 @@
+# FIXME:
+# Suppress memory leaks from tests/UTGraph_image2d
+# src:graph/graph_image2d.cpp

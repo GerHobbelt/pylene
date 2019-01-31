@@ -51,18 +51,24 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 .. topic:: Fundamental image types
 
-  +--------------+-------------------------+
-  | `image2d<T>` | Buffer-encoded 2D image |
-  +--------------+-------------------------+
-  | `image3d<T>` | Buffer-encoded 3D image |
-  +--------------+-------------------------+
-  | `ndimage<T>` | Buffer-encoded nD image |
-  +--------------+-------------------------+
+  .. table::
+    :class: full
+    :widths: auto
+
+    +--------------+-------------------------+
+    | `image2d<T>` | Buffer-encoded 2D image |
+    +--------------+-------------------------+
+    | `image3d<T>` | Buffer-encoded 3D image |
+    +--------------+-------------------------+
+    | `ndimage<T>` | Buffer-encoded nD image |
+    +--------------+-------------------------+
 
 .. topic:: Functional image views
 
   .. table::
     :widths: auto
+    :class: full
+
 
     +-----------------------------------------------------------+--------------------------------------------------------------------------------------------+
     | :cpp:func:`view::transform(ima,f) <mln::view::transform>` | Views the image with values applied to a function.                                         |
@@ -80,6 +86,7 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
   .. table::
     :widths: auto
+    :class: full
 
     +--------------+-----------------------------------------------------------+
     | Arithmetical | `a + b`, `a - b`, `a * b`, `a / b`, `a % b`               |
@@ -102,6 +109,7 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
   .. table::
     :widths: auto
+    :class: full
     
     +---------------------------+---------------------------------------------------+
     | ``view::cast<V>(ima)``    | Views the image with the values casted into ``V`` |
@@ -197,18 +205,21 @@ Fundamental primitives for basic image manipulation. Those are grouped by:
 
 .. rubric:: Non-modifying image primitives that operates on values
 
+.. table::
+  :class: full
+  :widths: auto
 
-+-------------------------------------------+------------------------------------------------------------------------+
-| :doc:`core/algorithm/all_any_none_of`     | checks if a predicate is true for all, any or none of the image values |
-+-------------------------------------------+------------------------------------------------------------------------+
-| :doc:`core/algorithm/foreach`             | applies a function to the values of an image                           |
-+-------------------------------------------+------------------------------------------------------------------------+
-| `count` `count_if`                        | [TBI] returns the number of values satisfying specific criteria        |
-+-------------------------------------------+------------------------------------------------------------------------+
-| `equal`                                   | [TBI] checks if two images have the same values                        |
-+-------------------------------------------+------------------------------------------------------------------------+
-| :doc:`core/algorithm/accumulate` (reduce) | sums up values of an image                                             |
-+-------------------------------------------+------------------------------------------------------------------------+
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/all_any_none_of`     | checks if a predicate is true for all, any or none of the image values |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/foreach`             | applies a function to the values of an image                           |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | `count` `count_if`                        | [TBI] returns the number of values satisfying specific criteria        |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | `equal`                                   | [TBI] checks if two images have the same values                        |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/accumulate` (reduce) | sums up values of an image                                             |
+  +-------------------------------------------+------------------------------------------------------------------------+
 
 
 .. rubric:: Non-modifying image primitives that operates on pixels
@@ -221,21 +232,25 @@ Fundamental primitives for basic image manipulation. Those are grouped by:
 .. rubric:: Modifying image primitives that operates on values
 
 
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/copy`      | copies image values to another image  (without localization) |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/fill`      | assigns a value to image values                              |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/clone`     | copies an image in a new image                               |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/paste`     | copies image pixels to another image (with localization)     |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/transform` | applies a function to the values of an image                 |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/generate`  | generate the values of an image by a function                |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/iota`      | generate the values of an image with increasing value        |
-+---------------------------------+--------------------------------------------------------------+
+.. table::
+  :class: full
+  :widths: auto
+
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/copy`      | copies image values to another image  (without localization) |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/fill`      | assigns a value to image values                              |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/clone`     | copies an image in a new image                               |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/paste`     | copies image pixels to another image (with localization)     |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/transform` | applies a function to the values of an image                 |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/generate`  | generate the values of an image by a function                |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/iota`      | generate the values of an image with increasing value        |
+  +---------------------------------+--------------------------------------------------------------+
 
 .. rubric:: Modifying image primitives that operates on pixels
 

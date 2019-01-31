@@ -18,6 +18,10 @@
     color: black;
 }
 
+.full {
+    width: 100%
+}
+
 /* .rst-content dl:not(.docutils) dt:last-child { */
 /*     margin-bottom: 6px; */
 /* } */

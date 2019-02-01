@@ -9,11 +9,6 @@ Forsee to add pdim (point) and vdim (value) for dimension constant in iamge conc
 .. toctree::
    :hidden:
 
-   values
-   points
-   pixels
-   domains
-   indexes
    view/transform
 
 
@@ -67,30 +62,30 @@ allows to be traversed in the reverse order. In that case, the
 
 Below is an example of image traversal::
 
-    mln::image2d<uint8_t> f = {{1,2,3}, {4,5,6}}; 
+    mln::image2d<uint8_t> f = {{1,2,3}, {4,5,6}};
 
     mln_foreach(auto p, f.domain())
         std::cout << p << ":" << f(p) << "\n";
 
-    
+
     mln_foreach(auto v, f.values())
         std::cout << v << "\n";
 
 
     mln_foreach(auto px, f.pixels())
-        std::cout << px.point() << ":" << px.val() << "\n"; 
+        std::cout << px.point() << ":" << px.val() << "\n";
 
 
     mln_foreach(auto p, mln::ranges::view::reverse(f.domain()))
         std::cout << p << ":" << f(p) << "\n";
 
-    
+
     mln_foreach(auto v, mln::ranges::view::reverse(f.values()))
         std::cout << v << "\n";
 
 
     mln_foreach(auto px, mln::ranges::view::reverse(f.pixels()))
-        std::cout << px.point() << ":" << px.val() << "\n"; 
+        std::cout << px.point() << ":" << px.val() << "\n";
 
 It produces the following output.
 
@@ -143,7 +138,7 @@ It produces the following output.
    [0,0]:1
 
 
-.. note:: Not all image provide the access of the value associated to a point (the `f(p)` syntax). This is available for :cpp:concept:`AccessibleImage` images. 
+.. note:: Not all image provide the access of the value associated to a point (the `f(p)` syntax). This is available for :cpp:concept:`AccessibleImage` images.
 
 .. note::  The macro :c:macro:`mln_foreach` is just a shortcut to iterate over rows in an efficient way.
 
@@ -184,10 +179,11 @@ Because the syntax of a call to a template method is quite cumbersome, free func
     parameterization of the initialization.  So you should not use ``auto`` type deduction for variables.
 
 
-.. topic:: Advanced initialization
+.. rubric:: Advanced initialization
 
 *image initializers* follow the `Named parameter Idiom
-<https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter>`_ and provides additional init parameters. Note that it may fail to fulfill the requirements, so a status code may be queried to check if everything succeeded.
+<https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter>`_ and provides additional init parameters. Note that
+it may fail to fulfill the requirements, so a status code may be queried to check if everything succeeded.
 
 
 
@@ -210,7 +206,7 @@ Example::
         // g1 may not have the adequate extension
 
 
-.. topic:: Initialization constructor
+.. rubric:: Initialization constructor
 
 Advanced initialization require an initialization constructor that enables an image to be initialized from another image
 and deduces the initialization configuration from it.
@@ -235,104 +231,73 @@ Image Concepts
 Image-related Concepts
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* Values
+In the introduction, we have seen that an image *f* is function associating **points** to **values**. **Values** are
+simple :cpp:concept:`std::Regular` types. **Points** are also :cpp:concept:`std::Regular` but are also
+:cpp:concept:`StrictTotallyOrdered` because they are the basis of *domains*.
 
-* Point
+.. cpp:namespace:: mln::concepts
+.. cpp:concept:: template <typename D> Domain
 
-* Domain
+    A *domain* is a :cpp:concept:`std::Range` of *points* which is totally ordered (this ensures a traversal order of
+    pixels). It also supports the following extra-operations.
 
-* Pixel
+    Let `dom` be an instance of `D` and `p` a point of type `range_value_type<Domain>`.
 
-
-
-.. raw:: html
-
-         <h2>Values</h2>
-
-
-:doc:`core/values` are the fundamentals tools to model values held by images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Value <concept-values-Value>`
-   * :ref:`ComparableValue <concept-values-ComparableValue>`
-   * :ref:`OrderedValue <concept-values-OrderedValue>`
-
-.. topic:: Predefined values
-
-   * :doc:`core/values/rgba`
-
-.. topic:: Utilities
-
-   TODO channel utilities
-..   * :cpp:func:`is_multichannel`
-..   * :cpp:func:`dynamic_channel_get`
-..   * :cpp:func:`dynamic_channel_size`
-..   * :cpp:func:`static_channel_get`
-..   * :cpp:func:`static_channel_size`
+    +----------------+------------------------------------------+
+    | ``dom.has(p)`` | Return true is `p` is contained in `dom` |
+    +----------------+------------------------------------------+
 
 
-
-.. raw:: html
-
-         <h2>Points</h2>
+The **pixels** represent a pair *(point, value)*.  They provide an efficient and convenient way to iterate over the
+*domain* and image *values* in the same time.
 
 
-:doc:`core/points` are the fundamentals tools to locate a value inside an images.
+.. cpp:concept:: template <typename P> Pixel
+
+    Represent the pair *(point, value)* of an image. It is a :cpp:concept:`std::SemiRegular` type with
+    the following accessors:
+
+    +-----------------+------------------------------------+
+    | ``pix.val()``   | Get the pixel value                |
+    +-----------------+------------------------------------+
+    | ``pix.point()`` | Get the pixel point localisator    |
+    +-----------------+------------------------------------+
 
 
-.. topic:: Concepts
+    It also provides the following methods:
 
-   * :ref:`Point <concept-points-Point>`
+    .. cpp:function:: void shift(point_type dp)
 
-
-
-
-.. raw:: html
-
-         <h2>Pixels</h2>
+        Move the pixel by a shift `dp`
 
 
-:doc:`core/pixels` are the fundamentals tools when browsing an images to access both the point and the value.
+.. cpp:concept:: template <typename P> IndexablePixel
+
+    Same as :cpp:concept:`Pixel` but enables extra features for pixels of :cpp:concept:`IndexableImage`.
+
+    +-----------------+----------------------------------+
+    | ``pix.index()`` | Get the pixel index localisator  |
+    +-----------------+----------------------------------+
 
 
-.. topic:: Concepts
+    .. cpp:function:: void shift(point_type dp, index_type dk)
 
-   * :ref:`Pixel <concept-pixels-Pixel>`
+        Move the pixel by a shift `dp` with pre-computed index `dk`.
+
+
+.. cpp:concept:: template <typename P> WritablePixel
+
+    Same as :cpp:concept:`Pixel` but supports writing for pixels of :cpp:concept:`OutputImage`.
+
+    **Valid expressions**
+
+    +---------------------------+---------------------+
+    | :cpp:expr:`pix.val() = v` | Write the value `v` |
+    +---------------------------+---------------------+
 
 
 
-
-.. raw:: html
-
-         <h2>Domains</h2>
-
-
-:doc:`core/domains` are the fundamental tools when expressing the valid set of points for an image.
-
-
-.. topic:: Concepts
-
-   * :ref:`Domain <concept-domains-Domain>`
-
-
-
-
-.. raw:: html
-
-         <h2>Indexes</h2>
-
-
-:doc:`core/indexes` are the lowest level tools to locate a value inside an images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Index <concept-indexes-Index>`
-
-
-Image properties
+Image Properties
 ^^^^^^^^^^^^^^^^
 
 Image concepts are *property*-based. An image concept is group of images types sharing some properties.
@@ -348,7 +313,8 @@ Image Indexability
     An image is **indexable** whenever it enables to access values with an index localisator. Usually, accessing through
     an index is faster than accessing by a point.
 Image Writability
-    An image **writable** can be used as an output image to store the result of a processing. Some image are *read-only* as images that compute values on-the-fly and are not buffer-encoded.  
+    An image **writable** can be used as an output image to store the result of a processing. Some image are *read-only*
+    as images that compute values on-the-fly and are not buffer-encoded.
 
 
 
@@ -361,108 +327,300 @@ The figure below illustrates image properties and some of the image concept.
 
 
 
-    
+Image Concept
+^^^^^^^^^^^^^
+
+#. .. cpp:concept:: template <class I>  Image
+#. .. cpp:concept:: template <class I>  InputImage
+#. .. cpp:concept:: template <class I>  ForwardImage
+
+
+    **Image** (also **ForwardImage** and **InputImage**) is the minimal concept for modeling images. It provides *read*
+    access and multi-pass traversal (not that in the STL *input ranges* are not necessary *forward ranges*). Images are
+    :cpp:concept:`std::CopyConstructible` and :cpp:concept:`std::MoveConstructible` so that they can be passed by copy
+    in algorithms or copied in image adapters.
+
+    .. rubric:: `Type definition`
+        :class: concept-typedefs
+
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +---------------------+----------+------------+---------------------------------------+
+        |        Type         |   Abbr   | Definition |             Requirements              |
+        +=====================+==========+============+=======================================+
+        | `point_type`        | ``P``    |            |                                       |
+        +---------------------+----------+------------+---------------------------------------+
+        | `domain_type`       |          |            | A model of :cpp:concept:`Domain`      |
+        +---------------------+----------+------------+---------------------------------------+
+        | `value_type`        | ``V``    |            |                                       |
+        +---------------------+----------+------------+---------------------------------------+
+        | `reference`         | ``VRef`` |            |                                       |
+        +---------------------+----------+------------+---------------------------------------+
+        | `pixel_type`        | ``Pix``  |            | A model of :cpp:concept:`Pixel`       |
+        +---------------------+----------+------------+---------------------------------------+
+        | `concrete_type`     |          |            | A model of :cpp:concept:`OutputImage` |
+        +---------------------+----------+------------+---------------------------------------+
+        | `ch_value_type<V2>` |          |            | A model of :cpp:concept:`OutputImage` |
+        +---------------------+----------+------------+---------------------------------------+
+
+
+    * The type of the domain must be compatible with the image, that is, the type of points of the domain are convertible
+      to image point type
+    * The type of pixel must be compatible with the image typedefs, that is, given a pixel `pix` of type `Pix`,
+      ``pix.val()`` must be convertible to ``VRef`` and  ``pix.point()`` convertible to ``P``
+
+
+    .. rubric:: Traits
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +----------------------+------------------------+---------------------------------------------+
+        |    Type Property     |         Value          |                 Description                 |
+        +======================+========================+=============================================+
+        | `category`           | **forward_image_tag**  | Tag for the traversal category of the image |
+        +----------------------+------------------------+---------------------------------------------+
+        | `extension_category` | **none_extension_tag** | Tag for extension category of the image     |
+        +----------------------+------------------------+---------------------------------------------+
+        | `accessible`         | **std::false_type**    | Tag for the image accessibility property    |
+        +----------------------+------------------------+---------------------------------------------+
+        | `indexable`          | **std::false_type**    | Tag for the image Indexability property     |
+        +----------------------+------------------------+---------------------------------------------+
+
+
+
+    .. rubric:: `Valid expression`
+        :class: concept-expr
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        |       Expression       |           Return Type            | Precondition |                                Sementics                                |
+        +========================+==================================+==============+=========================================================================+
+        | ``ima.domain()``       | ``domain_type``                  |              | The domain of the image.                                                |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        | ``ima.values()``       | :cpp:concept:`std::ForwardRange` |              | A range that allows to traverse image values.                           |
+        |                        |                                  |              | The elements of the range are convertible to ``VRef``.                  |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        | ``ima.pixels()``       | :cpp:concept:`std::ForwardRange` |              | A range that allows to traverse image pixels.                           |
+        |                        |                                  |              | The elements of the range are convertible to ``Pix``.                   |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        | ``ima.concretize()``   | *auto*                           |              | Returns a concrete image initialized from *this*                        |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        | ``ima.ch_value<V2>()`` | *auto*                           |              | Returns a concrete image initialized from *this* with value type ``V2`` |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+
+Output Image Concept
+^^^^^^^^^^^^^^^^^^^^
+
+.. cpp:concept:: template <class I>  OutputImage
+
+    **Output Images** extends the concept :cpp:concept:`InputImage` for images that are **writable**.
+
+
+    .. rubric:: `Type definition`
+        :class: concept-typedefs
+
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +--------------+----------+------------+-----------------------------------------------+
+        |     Type     |   Abbr   | Definition |                 Requirements                  |
+        +==============+==========+============+===============================================+
+        | `reference`  | ``VRef`` |            | An object of type `V` is assignable to `Vref` |
+        +--------------+----------+------------+-----------------------------------------------+
+        | `pixel_type` | ``Pix``  |            | A model of :cpp:concept:`WritablePixel`       |
+        +--------------+----------+------------+-----------------------------------------------+
+
+
+    .. rubric:: `Valid expression`
+        :class: concept-expr
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        |       Expression       |           Return Type            | Precondition |                                Sementics                                |
+        +========================+==================================+==============+=========================================================================+
+        | ``ima.values()``       | :cpp:concept:`std::OutputRange`  |              | A range that allows to traverse image values.                           |
+        |                        |                                  |              | The elements of the range are convertible to ``VRef``.                  |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+        | ``ima.pixels()``       | :cpp:concept:`std::ForwardRange` |              | A range that allows to traverse image pixels.                           |
+        |                        |                                  |              | The elements of the range are convertible to ``Pix``.                   |
+        +------------------------+----------------------------------+--------------+-------------------------------------------------------------------------+
+
+
+Bidirectional Image Concept
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. cpp:concept:: template <class I>  BidirectionalImage
+
+    **Bidirectional Images** extends the concept :cpp:concept:`InputImage` for images that are traversed forward and
+    backward. Traversing in both direction is required by some algorithms like the chamfer distance transform. Note that
+    Bidirectional does not have the same semantic as in the STL. Bidirectional means :cpp:concept:`ReversibleRange`.
+
+    .. rubric:: `Type definition`
+        :class: concept-typedefs
+
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +---------------+------+------------+----------------------------------------------------------------------+
+        |     Type      | Abbr | Definition |                             Requirements                             |
+        +===============+======+============+======================================================================+
+        | `domain_type` |      |            | A model of :cpp:concept:`Domain` and  :cpp:concept:`ReversibleRange` |
+        +---------------+------+------------+----------------------------------------------------------------------+
+
+    .. rubric:: Traits
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +---------------+-----------------------------+---------------------------------------------+
+        | Type Property |            Value            |                 Description                 |
+        +===============+=============================+=============================================+
+        | `category`    | **Bidirectional_image_tag** | Tag for the traversal category of the image |
+        +---------------+-----------------------------+---------------------------------------------+
+
+
+    .. rubric:: `Valid expression`
+        :class: concept-expr
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +------------------+-------------------------------------+--------------+---------------------------------------------------------+
+        |    Expression    |             Return Type             | Precondition |                        Sementics                        |
+        +==================+=====================================+==============+=========================================================+
+        | ``ima.domain()`` | ``domain_type``                     |              | The domain of the image.                                |
+        +------------------+-------------------------------------+--------------+---------------------------------------------------------+
+        | ``ima.values()`` | :cpp:concept:`std::ReversibleRange` |              | A range that allows to traverse image values both ways. |
+        +------------------+-------------------------------------+--------------+---------------------------------------------------------+
+        | ``ima.pixels()`` | :cpp:concept:`std::ReversibleRange` |              | A range that allows to traverse image pixels both ways. |
+        +------------------+-------------------------------------+--------------+---------------------------------------------------------+
+
+
+Accessible Image Concept
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. cpp:concept:: template <class I>  AccessibleImage
+
+    Images that provides the *accessibility** property. Values can be access from any point.
+
+    .. rubric:: Traits
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +----------------------+------------------------+---------------------------------------------+
+        |    Type Property     |         Value          |                 Description                 |
+        +======================+========================+=============================================+
+        | `accessible`         | **std::true_type**     | Tag for the image accessibility property    |
+        +----------------------+------------------------+---------------------------------------------+
+
+
+    .. rubric:: `Valid expression`
+        :class: concept-expr
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +---------------------+-----------------+-------------------------+--------------------------------------+
+        |     Expression      |   Return Type   |      Precondition       |              Sementics               |
+        +=====================+=================+=========================+======================================+
+        | ``ima(p)``          | `I::reference`  | ``ima.domain().has(p)`` | Value access with bound checking.    |
+        +---------------------+-----------------+-------------------------+--------------------------------------+
+        | ``ima.pixel(p)``    | `I::pixel_type` | ``ima.domain().has(p)`` | Pixel access with bound checking.    |
+        +---------------------+-----------------+-------------------------+--------------------------------------+
+        | ``ima.at(p)``       | `I::reference`  |                         | Value access without bound checking. |
+        +---------------------+-----------------+-------------------------+--------------------------------------+
+        | ``ima.pixel_at(p)`` | `I::pixel_type` |                         | Pixel access without bound checking. |
+        +---------------------+-----------------+-------------------------+--------------------------------------+
+
+Indexable Image Concept
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. cpp:concept:: template <class I>  IndexableImage
+
+    **Output Images** extends the concept :cpp:concept:`InputImage` for images that are **writable**.
+
+    Images that provides the *indexability** property. Values can be access through an index. Every point has unique
+    index and index may not be compatible between images. In other words,
+    (p₁ = p₂) ⇏ (ima.index_of_point(p₁) = ima.index_of_point(p₂). 
+
+
+
+    .. rubric:: `Type definition`
+        :class: concept-typedefs
+
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +--------------+----------+------------+-----------------------------------------------+
+        |     Type     |   Abbr   | Definition |                 Requirements                  |
+        +==============+==========+============+===============================================+
+        | `index_type` | ``Idx``  |            | A model of :cpp:concept:`std::Integral`       |
+        +--------------+----------+------------+-----------------------------------------------+
+
+    .. rubric:: Traits
+
+    .. table::
+        :class: full
+        :widths: auto
+
+        +----------------------+------------------------+---------------------------------------------+
+        |    Type Property     |         Value          |                 Description                 |
+        +======================+========================+=============================================+
+        | `indexable`          | **std::true_type**     | Tag for the image Indexability property     |
+        +----------------------+------------------------+---------------------------------------------+
+
+    .. rubric:: `Valid expression`
+       :class: concept-expr
+
+    +------------+-------------+--------------+----------------------------------------------------+
+    | Expression | Return Type | Precondition |                     Sementics                      |
+    +============+=============+==============+====================================================+
+    | ``ima[k]`` | `reference` |              | Returns the value at index *k* (no bound checking) |
+    +------------+-------------+--------------+----------------------------------------------------+
+
+
+    Moreover, if the image is both **Indexable** and **Accessible**, then the following expressions are valid:
+
+    +----------------------------+--------------+--------------+----------------------------------------------------+
+    | ``cima.index_of_point(p)`` | `index_type` |              | Get the index of point *p*                         |
+    +----------------------------+--------------+--------------+----------------------------------------------------+
+    | ``cima.point_at_index(k)`` | `point_type` |              | Get the point at index *p*                         |
+    +----------------------------+--------------+--------------+----------------------------------------------------+
+    | ``cima.delta_index(dp)``   | `index_type` |              | Get the index difference for a shift of *dp*       |
+    +----------------------------+--------------+--------------+----------------------------------------------------+
+
+
+Image Views
+===========
 
 
 
 
+Predefined images types
+=======================
+
+FIXME
 
 
-
-
-
-
-
-
-
-
-
---------
-
-
-.. cpp:namespace:: mln::concepts
-
-.. _concept-images-Image:
-
-Image
-#####
-
-
-.. _concept-images-IndexableImage:
-
-IndexableImage
-##############
-
-
-.. _concept-images-AccessibleImage:
-
-AccessibleImage
-###############
-
-
-.. _concept-images-ReversibleImage:
-
-ReversibleImage
-###############
-
-
-.. _concept-images-RandomAccessImage:
-
-RandomAccessImage
-#################
-
-
-.. _concept-images-ExtendedImage:
-
-ExtendedImage
-#############
-
-
-.. _concept-images-ChValueImage:
-
-ChValueImage
-############
-
-
-.. _concept-images-RawImage:
-
-RawImage
-########
-
-
-.. _concept-images-WritableImage:
-
-WritableImage
-#############
-
-
-.. _concept-images-ViewImage:
-
-ViewImage
-#########
-
-
-.. _concept-images-ConcreteImage:
-
-ConcreteImage
-#############
-
-
-
-
-Predefined images
------------------
-
-.. toctree::
-
-   images/ndimage
-
-
-
-
-Concepts detail
----------------
-
-.. toctree::
-   
-   concepts/images

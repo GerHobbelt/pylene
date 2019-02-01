@@ -29,22 +29,6 @@ Core Module
 See :doc:`core/images` for a description of the image concepts and image basics.
 
 
-
-.. topic:: Concepts
-
-   * :ref:`Image <concept-images-Image>`
-   * :ref:`IndexableImage <concept-images-IndexableImage>`
-   * :ref:`AccessibleImage <concept-images-AccessibleImage>`
-   * :ref:`ReversibleImage <concept-images-ReversibleImage>`
-   * :ref:`RandomAccessImage <concept-images-RandomAccessImage>`
-   * :ref:`ExtendedImage <concept-images-ExtendedImage>`
-   * :ref:`ChValueImage <concept-images-ChValueImage>`
-   * :ref:`RawImage <concept-images-RawImage>`
-   * :ref:`WritableImage <concept-images-WritableImage>`
-   * :ref:`ViewImage <concept-images-ViewImage>`
-   * :ref:`ConcreteImage <concept-images-ConcreteImage>`
-
-
 .. topic:: Utilities
 
    TODO

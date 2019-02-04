@@ -13,14 +13,6 @@
 
 #include <gtest/gtest.h>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-
-template <concepts::Image I>
-void foo(I)
-{
-}
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
 
 TEST(View, filter_readonly)
 {
@@ -33,13 +25,10 @@ TEST(View, filter_readonly)
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  foo(x);
-
   static_assert(concepts::OutputImage<decltype(x)>);
   static_assert(concepts::Image<decltype(x)>);
   static_assert(concepts::ViewImage<decltype(x)>);
-  // FIXME
-  static_assert(not concepts::IndexableAndAccessibleImage<decltype(x)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(x)>);
   static_assert(concepts::BidirectionalImage<decltype(x)>);
   static_assert(not concepts::RawImage<decltype(x)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
@@ -71,15 +60,14 @@ TEST(View, filter_writable)
   mln::experimental::iota(ima, 0);
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
-  /*
-  #ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(concepts::OutputImage<decltype(x)>);
-    static_assert(concepts::ViewImage<decltype(x)>);
-    static_assert(concepts::IndexableAndAccessibleImage<decltype(x)>);
-    static_assert(not concepts::BidirectionalImage<decltype(x)>);
-    static_assert(not concepts::RawImage<decltype(x)>);
-  #endif // PYLENE_CONCEPT_TS_ENABLED
-  */
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(x)>);
+  static_assert(concepts::ViewImage<decltype(x)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(x)>);
+  static_assert(concepts::BidirectionalImage<decltype(x)>);
+  static_assert(not concepts::RawImage<decltype(x)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
 
   mln::experimental::fill(x, 10);
   ASSERT_TRUE(mln::experimental::all_of(ima <= 10));
@@ -94,24 +82,19 @@ TEST(View, filter_twice)
   mln::image2d<int> ima(dom);
 
   mln::experimental::iota(ima, 0);
-  auto u = mln::view::filter(ima, [](int v) { return v > 10 && v < 15; });
 
-  /*
-  #ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(concepts::OutputImage<decltype(u)>);
-    static_assert(concepts::ViewImage<decltype(u)>);
-    static_assert(concepts::IndexableAndAccessibleImage<decltype(u)>);
-    static_assert(not concepts::BidirectionalImage<decltype(u)>);
-    static_assert(not concepts::RawImage<decltype(u)>);
-  #endif // PYLENE_CONCEPT_TS_ENABLED
-  */
+  auto x = mln::view::filter(ima, [](int v) { return v > 10; });
+  auto u = mln::view::filter(x, [](int v) { return v < 15; });
 
-  // FIXME:
-  // auto x = view::filter(ima, [](int v) { return v > 10; });
-  // auto u = view::filter(x, [](int v) { return v < 15; });
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(u)>);
+  static_assert(concepts::ViewImage<decltype(u)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(u)>);
+  static_assert(concepts::BidirectionalImage<decltype(u)>);
+  static_assert(not concepts::RawImage<decltype(u)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
-  // FIXME:
-  // ASSERT_TRUE(mln::experimental::all(land(u > 10, u < 15)));
+  ASSERT_TRUE(mln::experimental::all(land(u > 10, u < 15)));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {
@@ -120,8 +103,7 @@ TEST(View, filter_twice)
     else
       ASSERT_EQ(pix.val(), u.at(pix.point()));
 
-    // FIXME:
-    // ASSERT_TRUE(!u.domain().has(pix.point()));
+    ASSERT_TRUE(!u.domain().has(pix.point()));
   }
 
 

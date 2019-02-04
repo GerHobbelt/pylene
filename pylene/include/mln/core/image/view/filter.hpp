@@ -30,33 +30,35 @@ namespace mln
     using typename filter_view::image_adaptor::reference;
     using typename filter_view::image_adaptor::value_type;
 
-    class domain_type
+    class domain_type : ::ranges::view_base
     {
-      using fun_t  = ::ranges::semiregular_t<F>;
       using pred_t = ::ranges::composed<F, std::reference_wrapper<I>>; // f o I::operator()
       using dom_t  = decltype(std::declval<I*>()->domain());
       using rng_t  = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<pred_t>>;
 
-      pred_t        pred_;
-      mutable rng_t rng_; // domain can be a range, so non-const
+      pred_t        m_pred;
+      dom_t         m_dom;
+      mutable rng_t m_rng; // domain can be a range, so non-const
 
       static_assert(::ranges::ForwardRange<rng_t>());
+      static_assert(::ranges::View<::ranges::view::all_t<dom_t>>());
 
     public:
       using value_type = ::ranges::range_value_t<rng_t>;
       using reference  = ::ranges::range_reference_t<rng_t>;
 
       domain_type(I* ima, F f)
-        : pred_(std::move(f), std::ref(*ima))
-        , rng_(mln::ranges::view::filter(ima->domain(), pred_))
+        : m_pred(std::move(f), std::ref(*ima))
+        , m_dom(ima->domain())
+        , m_rng(mln::ranges::view::filter(::ranges::view::all(m_dom), m_pred))
       {
       }
 
-      auto begin() const { return ::ranges::begin(rng_); }
-      auto end() const { return ::ranges::end(rng_); }
+      auto begin() const { return ::ranges::begin(m_rng); }
+      auto end() const { return ::ranges::end(m_rng); }
 
-      bool has(point_type p) const { return pred_(p); }
-      bool empty() const { return this->begin() == this->end(); /*::ranges::empty(rng_);*/ }
+      bool has(point_type p) const { return m_pred(p); }
+      bool empty() const { return ::ranges::empty(m_rng); }
     };
     /// \}
 
@@ -64,7 +66,7 @@ namespace mln
     /// Traits & Image Properties
     /// \{
     using accessible = image_accessible_t<I>;
-    using indexable  = std::false_type;
+    using indexable  = image_indexable_t<I>;
     using view       = std::true_type;
     // May be too restrictive (might be extended by image)
     using extension_category = mln::extension::none_extension_tag;
@@ -74,8 +76,7 @@ namespace mln
     /// \}
 
     // Checks
-    // FIXME: accessible prerequisite
-    // FIXME: can be indexable
+    PYLENE_CONCEPT_TS_ASSERT(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
 
   private:
     struct pix_filter_fn
@@ -119,6 +120,16 @@ namespace mln
     }
 
 
+    /// Indexable-image related methods
+    /// \{
+    template <typename dummy = I>
+    reference operator[](image_index_t<dummy> i)
+    {
+      return this->base()[i];
+    }
+    /// \}
+
+
     /// Accessible-image related methods
     /// \{
     template <typename Ret = reference>
@@ -144,6 +155,28 @@ namespace mln
     std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
     {
       return this->base().new_pixel_at(p);
+    }
+    /// \}
+
+
+    /// IndexableAndAccessible-image related methods
+    /// \{
+    template <typename dummy = I>
+    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> index_of_point(point_type p) const
+    {
+      return this->base().index_of_point(p);
+    }
+
+    template <typename dummy = I>
+    point_type point_at_index(std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> i) const
+    {
+      return this->base().point_at_index(i);
+    }
+
+    template <typename dummy = I>
+    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> delta_index(point_type p) const
+    {
+      return this->base().delta_index(p);
     }
     /// \}
 

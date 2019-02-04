@@ -13,6 +13,14 @@
 
 #include <gtest/gtest.h>
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+
+template <concepts::Image I>
+void foo(I)
+{
+}
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
 
 TEST(View, filter_readonly)
 {
@@ -25,7 +33,10 @@ TEST(View, filter_readonly)
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+  foo(x);
+
   static_assert(concepts::OutputImage<decltype(x)>);
+  static_assert(concepts::Image<decltype(x)>);
   static_assert(concepts::ViewImage<decltype(x)>);
   static_assert(concepts::IndexableAndAccessibleImage<decltype(x)>);
   static_assert(not concepts::BidirectionalImage<decltype(x)>);

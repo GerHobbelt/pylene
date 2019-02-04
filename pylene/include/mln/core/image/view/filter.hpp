@@ -3,6 +3,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/filter.hpp>
+#include <mln/core/rangev3/view/remove_if.hpp>
 
 #include <range/v3/empty.hpp>
 #include <range/v3/size.hpp>
@@ -31,19 +32,20 @@ namespace mln
     class domain_type
     {
       using fun_t = ::ranges::semiregular_t<F>;
-      using rng_t = decltype(mln::ranges::view::filter(std::declval<I>().domain(), std::declval<fun_t>()));
+      using dom_t = decltype(std::declval<I*>()->domain());
+      using rng_t = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<fun_t>>;
 
       rng_t rng_;
-      I     ima_;
+      I*    ima_;
       fun_t f_;
 
     public:
-      using value_type = image_value_t<I>;
-      using reference  = image_reference_t<I>;
+      // using value_type = ::ranges::range_value_t<rng_t>;
+      // using reference  = ::ranges::range_reference_t<rng_t>;
 
-      domain_type(I ima, F f)
-        : rng_(mln::ranges::view::filter(ima.domain(), std::move(f)))
-        , ima_(std::move(ima))
+      domain_type(I* ima, F f)
+        : rng_(mln::ranges::view::filter(ima->domain(), std::move(f)))
+        , ima_(ima)
         , f_(std::move(f))
       {
       }
@@ -51,7 +53,7 @@ namespace mln
       auto begin() { return ::ranges::begin(rng_); }
       auto end() { return ::ranges::end(rng_); }
 
-      bool has(value_type p) const { return f_(ima_(p)); }
+      bool has(value_type p) const { return f_((*ima_)(p)); }
       bool empty() const { return ::ranges::empty(rng_); }
     };
     /// \}
@@ -91,7 +93,7 @@ namespace mln
     }
 
 
-    domain_type domain() const { return {this->base(), this->f}; }
+    domain_type domain() const { return {&this->base(), this->f}; }
 
     auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
 

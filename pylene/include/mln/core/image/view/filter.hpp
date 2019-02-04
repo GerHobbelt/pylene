@@ -37,8 +37,8 @@ namespace mln
       using dom_t  = decltype(std::declval<I*>()->domain());
       using rng_t  = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<pred_t>>;
 
-      pred_t pred_;
-      mutable rng_t  rng_; // domain can be a range, so non-const
+      pred_t        pred_;
+      mutable rng_t rng_; // domain can be a range, so non-const
 
       static_assert(::ranges::ForwardRange<rng_t>());
 
@@ -47,7 +47,7 @@ namespace mln
       using reference  = ::ranges::range_reference_t<rng_t>;
 
       domain_type(I* ima, F f)
-      : pred_(std::move(f), std::ref(*ima))
+        : pred_(std::move(f), std::ref(*ima))
         , rng_(mln::ranges::view::filter(ima->domain(), pred_))
       {
       }

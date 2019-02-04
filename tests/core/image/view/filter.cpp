@@ -99,13 +99,16 @@ TEST(View, filter_twice)
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {
     if (pix.val() > 10 and pix.val() < 15)
+    {
       ASSERT_EQ(pix.val(), u(pix.point()));
+      ASSERT_TRUE(u.domain().has(pix.point()));
+    }
     else
+    {
       ASSERT_EQ(pix.val(), u.at(pix.point()));
-
-    ASSERT_TRUE(!u.domain().has(pix.point()));
+      ASSERT_TRUE(!u.domain().has(pix.point()));
+    }
   }
-
 
   {
     mln_foreach_new (auto&& pix, u.new_pixels())

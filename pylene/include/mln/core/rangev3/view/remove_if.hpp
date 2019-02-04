@@ -33,9 +33,9 @@ namespace mln::ranges
   private:
     using base_t = ::ranges::remove_if_view<Rng, Pred>;
 
-    ::ranges::semiregular_t<Pred> get_pred() const
-    {
-      return reinterpret_cast<const details::remove_if_view_access<Rng, Pred>*>(this)
+    auto& get_pred() const
+      {
+        return reinterpret_cast<const details::remove_if_view_access<Rng, Pred>*>(this)
           ->details::template remove_if_view_access<Rng, Pred>::box::get();
     }
 

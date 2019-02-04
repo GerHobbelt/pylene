@@ -76,7 +76,6 @@ namespace mln
     // Checks
     // FIXME: accessible prerequisite
     // FIXME: can be indexable
-    static_assert(::ranges::ForwardRange<rng_t>());
 
   private:
     struct pix_filter_fn

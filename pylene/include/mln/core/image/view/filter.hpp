@@ -32,11 +32,13 @@ namespace mln
 
     class domain_type : ::ranges::view_base
     {
-      using pred_t = ::ranges::composed<F, std::reference_wrapper<I>>; // f o I::operator()
+      using pred_t = ::ranges::semiregular_t<F>;
+      using fun_t  = ::ranges::composed<pred_t, std::reference_wrapper<I>>; // f o I::operator()
       using dom_t  = decltype(std::declval<I*>()->domain());
-      using rng_t  = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<pred_t>>;
+      using rng_t  = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<fun_t>>;
 
       pred_t        m_pred;
+      fun_t         m_fun;
       dom_t         m_dom;
       mutable rng_t m_rng; // domain can be a range, so non-const
 
@@ -48,16 +50,17 @@ namespace mln
       using reference  = ::ranges::range_reference_t<rng_t>;
 
       domain_type(I* ima, F f)
-        : m_pred(std::move(f), std::ref(*ima))
+        : m_pred(std::move(f))
+        , m_fun(m_pred, std::ref(*ima))
         , m_dom(ima->domain())
-        , m_rng(mln::ranges::view::filter(::ranges::view::all(m_dom), m_pred))
+        , m_rng(mln::ranges::view::filter(::ranges::view::all(m_dom), m_fun))
       {
       }
 
       auto begin() const { return ::ranges::begin(m_rng); }
       auto end() const { return ::ranges::end(m_rng); }
 
-      bool has(point_type p) const { return m_pred(p); }
+      bool has(point_type p) const { return m_fun(p); }
       bool empty() const { return ::ranges::empty(m_rng); }
     };
     /// \}

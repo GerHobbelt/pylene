@@ -31,6 +31,14 @@ TEST(View, mask)
   auto z = mln::view::mask(ima, mask);
   fill(z, 42);
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(z)>);
+  static_assert(concepts::ViewImage<decltype(z)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(z)>);
+  static_assert(not concepts::BidirectionalImage<decltype(z)>);
+  static_assert(not concepts::RawImage<decltype(z)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
   for (auto p : z.domain())
   {
     ASSERT_EQ(42, ima(p));
@@ -56,9 +64,25 @@ TEST(View, mask_twice)
   auto mask_A = (ima % 2) == 1;
   auto A      = mln::view::mask(ima, mask_A);
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(A)>);
+  static_assert(concepts::ViewImage<decltype(A)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(A)>);
+  static_assert(not concepts::BidirectionalImage<decltype(A)>);
+  static_assert(not concepts::RawImage<decltype(A)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
+
   auto mask_B = (A % 4) == 1;
   auto B      = mln::view::mask(A, mask_B);
   fill(B, 42);
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(B)>);
+  static_assert(concepts::ViewImage<decltype(B)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(B)>);
+  static_assert(not concepts::BidirectionalImage<decltype(B)>);
+  static_assert(not concepts::RawImage<decltype(B)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : B.domain())
   {
@@ -70,19 +94,18 @@ TEST(View, mask_twice)
 }
 
 
-
 struct mask_archetype : mln::experimental::Image<mask_archetype>
 {
-  using value_type     = bool;
-  using reference      = const bool&;
-  using domain_type    = mln::archetypes::Domain;
-  using point_type     = ::ranges::range_value_t<domain_type>;
-  using category_type  = mln::forward_image_tag;
-  using concrete_type  = mask_archetype;
+  using value_type    = bool;
+  using reference     = const bool&;
+  using domain_type   = mln::archetypes::Domain;
+  using point_type    = ::ranges::range_value_t<domain_type>;
+  using category_type = mln::forward_image_tag;
+  using concrete_type = mask_archetype;
 
   struct new_pixel_type
   {
-    bool val() const;
+    bool       val() const;
     point_type point() const;
   };
 
@@ -96,11 +119,11 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   using view               = std::false_type;
 
 
-  domain_type        domain() const;
-  reference          operator()(point_type);
-  reference          at(point_type);
-  new_pixel_type     new_pixel(point_type);
-  new_pixel_type     new_pixel_at(point_type);
+  domain_type    domain() const;
+  reference      operator()(point_type);
+  reference      at(point_type);
+  new_pixel_type new_pixel(point_type);
+  new_pixel_type new_pixel_at(point_type);
 
   struct pixel_range
   {
@@ -123,9 +146,11 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>);
 static_assert(mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>);
-static_assert(mln::concepts::IndexableAndAccessibleImage<mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>);
+static_assert(mln::concepts::IndexableAndAccessibleImage<
+              mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>);
 
 static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputAccessibleImage, mask_archetype>>);
 static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>);
-static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>);
+static_assert(
+    mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>);
 #endif

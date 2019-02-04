@@ -2,6 +2,7 @@
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
+#include <mln/core/image/view/clip.hpp>
 #include <mln/core/rangev3/view/filter.hpp>
 #include <mln/core/rangev3/view/remove_if.hpp>
 
@@ -24,37 +25,38 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using typename filter_view::image_adaptor::new_pixel_type;
+    using new_pixel_type = image_pixel_t<I>;
     using typename filter_view::image_adaptor::point_type;
     using typename filter_view::image_adaptor::reference;
     using typename filter_view::image_adaptor::value_type;
 
     class domain_type
     {
-      using fun_t = ::ranges::semiregular_t<F>;
-      using dom_t = decltype(std::declval<I*>()->domain());
-      using rng_t = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<fun_t>>;
+      using fun_t  = ::ranges::semiregular_t<F>;
+      using pred_t = ::ranges::composed<F, std::reference_wrapper<I>>; // f o I::operator()
+      using dom_t  = decltype(std::declval<I*>()->domain());
+      using rng_t  = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<pred_t>>;
 
-      rng_t rng_;
-      I*    ima_;
-      fun_t f_;
+      pred_t pred_;
+      mutable rng_t  rng_; // domain can be a range, so non-const
+
+      static_assert(::ranges::ForwardRange<rng_t>());
 
     public:
-      // using value_type = ::ranges::range_value_t<rng_t>;
-      // using reference  = ::ranges::range_reference_t<rng_t>;
+      using value_type = ::ranges::range_value_t<rng_t>;
+      using reference  = ::ranges::range_reference_t<rng_t>;
 
       domain_type(I* ima, F f)
-        : rng_(mln::ranges::view::filter(ima->domain(), std::move(f)))
-        , ima_(ima)
-        , f_(std::move(f))
+      : pred_(std::move(f), std::ref(*ima))
+        , rng_(mln::ranges::view::filter(ima->domain(), pred_))
       {
       }
 
-      auto begin() { return ::ranges::begin(rng_); }
-      auto end() { return ::ranges::end(rng_); }
+      auto begin() const { return ::ranges::begin(rng_); }
+      auto end() const { return ::ranges::end(rng_); }
 
-      bool has(value_type p) const { return f_((*ima_)(p)); }
-      bool empty() const { return ::ranges::empty(rng_); }
+      bool has(point_type p) const { return pred_(p); }
+      bool empty() const { return this->begin() == this->end(); /*::ranges::empty(rng_);*/ }
     };
     /// \}
 
@@ -66,11 +68,15 @@ namespace mln
     using view       = std::true_type;
     // May be too restrictive (might be extended by image)
     using extension_category = mln::extension::none_extension_tag;
-    using concrete_type      = void; // This image has no automatic concrete type
+    using concrete_type      = clip_view<image_concrete_t<I>, domain_type>;
     template <class V>
-    using ch_value_type = void; // This image has no automatic concrete type
+    using ch_value_type = clip_view<image_ch_value_t<I, V>, domain_type>;
     /// \}
 
+    // Checks
+    // FIXME: accessible prerequisite
+    // FIXME: can be indexable
+    static_assert(::ranges::ForwardRange<rng_t>());
 
   private:
     struct pix_filter_fn
@@ -92,8 +98,18 @@ namespace mln
     {
     }
 
+    internal::initializer<concrete_type, clip_view<I, domain_type>> concretize() const
+    {
+      return mln::clip_view{this->base(), domain()};
+    }
 
-    domain_type domain() const { return {&this->base(), this->f}; }
+    template <typename V>
+    internal::initializer<ch_value_type<V>, clip_view<I, domain_type>> ch_value() const
+    {
+      return mln::clip_view{this->base(), domain()};
+    }
+
+    domain_type domain() const { return {const_cast<I*>(&this->base()), this->f}; }
 
     auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
 

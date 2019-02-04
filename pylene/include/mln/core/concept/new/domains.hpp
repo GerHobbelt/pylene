@@ -23,7 +23,6 @@ namespace mln::concepts
     requires(const Dom cdom, ::ranges::range_value_t<Dom> p) {
       { cdom.has(p) }   -> bool;
       { cdom.empty() }  -> bool;
-      // { cdom.size() }   -> stl::UnsignedIntegral&&;
     };
 
 

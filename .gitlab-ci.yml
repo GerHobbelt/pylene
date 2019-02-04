@@ -70,6 +70,48 @@ distcheck-linux-clang-debug:
         CC: "clang"
 
 
+#############
+# Sanitizer #
+#############
+
+.job-sanitize-linux-base: &distcheck-sanitize-linux-base
+    stage: test
+    script:
+        - mkdir build && cd build
+        - conan install .. -pr buildfarm  --build=missing
+        - pacman -Sy --noconfirm llvm                       # TO BE DELETED
+        - cmake ..
+                -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+                -DCMAKE_C_FLAGS="-O0 -fno-inline -g3 -fsanitize=address -fsanitize=leak -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftemplate-backtrace-limit=0 -fstack-protector-all"
+                -DCMAKE_CXX_FLAGS="-O0 -fno-inline -g3 -fsanitize=address -fsanitize=leak -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftemplate-backtrace-limit=0 -fstack-protector-all"
+                -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address -fsanitize=leak -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+                -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address -fsanitize=leak -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+                -DCMAKE_MODULE_LINKER_FLAGS="-fsanitize=address -fsanitize=leak -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+        - export ASAN_OPTIONS=check_initialization_order=1:symbolize=1:suppressions=../../utils/sanitizer.supp
+        - export ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)
+        - cmake --build .
+                --config $PYLENE_CONFIGURATION
+                --target check
+    dependencies: []
+    artifacts:
+        reports:
+            junit: build/tests/UT*.xml
+
+
+distcheck-sanitize-linux-gcc-debug:
+    <<: *distcheck-sanitize-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+
+distcheck-sanitize-linux-clang-debug:
+    <<: *distcheck-sanitize-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+
 
 #########
 # Bench #

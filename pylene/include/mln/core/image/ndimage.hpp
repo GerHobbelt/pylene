@@ -417,6 +417,11 @@ namespace mln
     /// \precondition -amin(shape() / 2) <= delta <= border
     void inflate_domain(int delta);
 
+
+
+    /// \brief clip an image to a domain
+    E clip(const domain_type& domain) const;
+
   private:
     static E from_buffer_copy_(void* buffer, const domain_type& domain, const size_t* strides);
 
@@ -1011,12 +1016,28 @@ namespace mln
     return extension_type(m_ptr, &m_strides[0], m_domain.shape(), m_border);
   }
 
+
+  template <typename T, unsigned dim, typename E>
+  E ndimage_base<T, dim, E>::clip(const domain_type& domain) const
+  {
+    E other(exact(*this));
+    other.m_domain      = domain;
+    other.m_border      = this->m_border; // FIXME
+    other.m_ptr         = (char*)&(this->at(domain.pmin));
+    other.m_last        = (char*)&(this->at(domain.pmax - 1));
+    other.m_ptr_origin  = this->m_ptr_origin;
+    other.m_index_first = this->index_of_point(domain.pmin);
+    other.m_index_last  = this->index_of_point(domain.pmax - 1);
+    return other;
+  }
+
   template <unsigned d, typename T1, typename E1, typename T2, typename E2>
   inline bool are_indexes_compatible(const ndimage_base<T1, d, E1>& self, const ndimage_base<T2, d, E2>& other)
   {
     return (self.index_of_point(self.domain().pmin) == other.index_of_point(other.domain().pmin)) and
            (self.m_index_strides == other.m_index_strides);
   }
+
 
   /******************************************/
   /****     Extension implementation     ****/

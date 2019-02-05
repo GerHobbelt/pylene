@@ -113,10 +113,10 @@ namespace mln
       static_assert(mln::is_a<OutputImage, Image>());
       static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
-      auto input_rows  = ranges::rows(input.new_values());
-      auto output_rows = ranges::rows(output.new_values());
+      auto&& ivals = input.new_values();
+      auto&& ovals = output.new_values();
 
-      for (auto [r1, r2] : ranges::view::zip(input_rows, output_rows))
+      for (auto [r1, r2] : ranges::view::zip(ranges::rows(ivals), ranges::rows(ovals)))
         ::ranges::copy(r1, ::ranges::begin(r2));
     }
   } // namespace experimental

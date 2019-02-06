@@ -112,7 +112,7 @@ TEST(View, filter_twice)
     ASSERT_TRUE(v);
   }
 
-  // ASSERT_TRUE(mln::experimental::all_of(u_and));
+  ASSERT_TRUE(mln::experimental::all_of(u_and));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {

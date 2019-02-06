@@ -94,7 +94,10 @@ TEST(View, filter_twice)
   static_assert(not concepts::RawImage<decltype(u)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  // ASSERT_TRUE(mln::experimental::all_of(land(u > 10, u < 15)));
+  auto&& u_sup10 = u > 10;
+  auto&& u_inf15 = u < 15;
+  auto&& u_and   = land(u_sup10, u_inf15);
+  ASSERT_TRUE(mln::experimental::all_of(u_and));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {

@@ -106,6 +106,8 @@ TEST(View, filter_twice)
   }
   auto&& u_and   = land(u_sup10, u_inf15);
   auto&& u_and_v = u_and.new_values();
+  (void)u_and_v;
+  /*
   for (auto&& r : mln::ranges::rows(u_and_v))
   {
     (void)r;
@@ -114,6 +116,7 @@ TEST(View, filter_twice)
     //   ASSERT_TRUE(v);
     // }
   }
+  */
   // mln_foreach_new (auto&& v, u_and.new_values())
   // {
   //   ASSERT_TRUE(v);

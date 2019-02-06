@@ -107,10 +107,10 @@ TEST(View, filter_twice)
     // }
   }
 
-  // mln_foreach_new (auto&& v, u_and.new_values())
-  // {
-  //   ASSERT_TRUE(v);
-  // }
+  mln_foreach_new (auto&& v, u_and.new_values())
+  {
+    ASSERT_TRUE(v);
+  }
 
   // ASSERT_TRUE(mln::experimental::all_of(u_and));
 

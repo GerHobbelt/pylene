@@ -33,9 +33,9 @@ namespace mln::ranges
   private:
     using base_t = ::ranges::remove_if_view<Rng, Pred>;
 
-    auto& get_pred() const
-      {
-        return reinterpret_cast<const details::remove_if_view_access<Rng, Pred>*>(this)
+    auto get_pred() const
+    {
+      return reinterpret_cast<const details::remove_if_view_access<Rng, Pred>*>(this)
           ->details::template remove_if_view_access<Rng, Pred>::box::get();
     }
 
@@ -51,8 +51,8 @@ namespace mln::ranges
     auto rows() const
 #endif
     {
-      auto f = [this](auto row) {
-        return remove_if_view<decltype(row), Pred>(std::forward<decltype(row)>(row), this->get_pred());
+      auto f = [pred_ = this->get_pred()](auto row) {
+        return remove_if_view<decltype(row), Pred>(std::forward<decltype(row)>(row), pred_);
       };
       return view::transform(this->base().rows(), f);
     }

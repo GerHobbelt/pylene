@@ -95,19 +95,9 @@ TEST(View, filter_twice)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   auto&& u_sup10 = u > 10;
-  mln_foreach_new (auto&& v, u_sup10.new_values())
-  {
-    ASSERT_TRUE(v ? true : true);
-  }
   auto&& u_inf15 = u < 15;
-  mln_foreach_new (auto&& v, u_inf15.new_values())
-  {
-    ASSERT_TRUE(v ? true : true);
-  }
   auto&& u_and   = land(u_sup10, u_inf15);
   auto&& u_and_v = u_and.new_values();
-  (void)u_and_v;
-  /*
   for (auto&& r : mln::ranges::rows(u_and_v))
   {
     (void)r;
@@ -116,7 +106,7 @@ TEST(View, filter_twice)
     //   ASSERT_TRUE(v);
     // }
   }
-  */
+
   // mln_foreach_new (auto&& v, u_and.new_values())
   // {
   //   ASSERT_TRUE(v);

@@ -106,8 +106,7 @@ TEST(View, filter_twice)
     else
     {
       ASSERT_EQ(pix.val(), u.at(pix.point()));
-      // FIXME:
-      // ASSERT_TRUE(!u.domain().has(pix.point()));
+      ASSERT_FALSE(u.domain().has(pix.point()));
     }
   }
 

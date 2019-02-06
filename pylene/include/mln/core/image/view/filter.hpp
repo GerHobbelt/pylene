@@ -57,7 +57,7 @@ namespace mln
       auto begin() const { return ::ranges::begin(m_rng); }
       auto end() const { return ::ranges::end(m_rng); }
 
-      bool has(point_type p) const { return m_fun(p); }
+      bool has(point_type p) const { return m_dom.has(p) && m_fun(p); }
       bool empty() const { return ::ranges::empty(m_rng); }
     };
     /// \}

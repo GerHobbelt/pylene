@@ -97,8 +97,11 @@ TEST(View, filter_twice)
   auto&& u_sup10 = u > 10;
   auto&& u_inf15 = u < 15;
   auto&& u_and   = land(u_sup10, u_inf15);
-  // (void)u_and;
-  ASSERT_TRUE(mln::experimental::all_of(u_and));
+  mln_foreach_new (auto&& v, u_and.new_values())
+  {
+    ASSERT_TRUE(v);
+  }
+  // ASSERT_TRUE(mln::experimental::all_of(u_and));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {

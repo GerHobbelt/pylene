@@ -13,7 +13,7 @@ namespace mln::ranges
   /// \p rows(rng) returns \p rng.rows() if \p rng is multi-dimensional, \p {rng} otherwise.
 
   template <class R, std::enable_if_t<is_segmented_range_v<std::remove_reference_t<R>>, void*> = nullptr>
-  auto rows(R&& rng)
+  decltype(auto) rows(R&& rng)
   {
     static_assert(std::is_lvalue_reference<R>(), "Cannot apply on a temporary range.");
     return std::forward<R>(rng).rows();

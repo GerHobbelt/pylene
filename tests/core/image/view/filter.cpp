@@ -134,17 +134,20 @@ TEST(View, filter_twice)
 }
 
 
-inline constexpr const auto archetype_pred = [](auto &&) -> bool { return true; };
+struct archetype_pred_t
+{
+  template <typename T>
+  bool operator()(T&&) const;
+};
 
 PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::AccessibleImage<mln::filter_view<mln::archetypes::AccessibleImage, decltype(archetype_pred)>>), "");
-PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableImage<
-                             mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, decltype(archetype_pred)>>),
-                         "");
-PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
-                             mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, decltype(archetype_pred)>>),
-                         "");
+    (mln::concepts::AccessibleImage<mln::filter_view<mln::archetypes::AccessibleImage, archetype_pred_t>>), "");
 PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::OutputImage<
-        mln::filter_view<mln::archetypes::OutputIndexableAndAccessibleImage, decltype(archetype_pred)>>),
+    (mln::concepts::IndexableImage<mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
     "");
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
+                             mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
+                         "");
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::OutputImage<
+                             mln::filter_view<mln::archetypes::OutputIndexableAndAccessibleImage, archetype_pred_t>>),
+                         "");

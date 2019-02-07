@@ -9,6 +9,8 @@
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
+#include <mln/core/concept/new/concepts.hpp>
+
 #include <helpers.hpp>
 
 #include <gtest/gtest.h>
@@ -131,4 +133,18 @@ TEST(View, filter_twice)
     ASSERT_EQ(px.val(), ima(px.point()));
 }
 
-// TODO: check archetypes
+
+inline constexpr const auto archetype_pred = [](auto &&) -> bool { return true; };
+
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::AccessibleImage<mln::filter_view<mln::archetypes::AccessibleImage, decltype(archetype_pred)>>), "");
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableImage<
+                             mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, decltype(archetype_pred)>>),
+                         "");
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
+                             mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, decltype(archetype_pred)>>),
+                         "");
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::OutputImage<
+        mln::filter_view<mln::archetypes::OutputIndexableAndAccessibleImage, decltype(archetype_pred)>>),
+    "");

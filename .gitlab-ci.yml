@@ -5,6 +5,9 @@ stages:
 
 image: carlinet/buildimage
 
+artifacts:
+    expire_in: 2 days
+
 
 .job-build-linux-base: &distcheck-linux-base
     stage: test

@@ -5,9 +5,6 @@ stages:
 
 image: carlinet/buildimage
 
-artifacts:
-    expire_in: 2 days
-
 
 .job-build-linux-base: &distcheck-linux-base
     stage: test
@@ -54,6 +51,7 @@ build-doc-images:
     artifacts:
         paths:
             - doc/source/images
+        expire_in: 2 days
 
 
 #################
@@ -68,6 +66,7 @@ build-doc-images:
         - sphinx-build -b html source ../public
     artifacts:
         name: "documentation"
+        expire_in: 2 days
         paths:
             - public/
 

@@ -29,7 +29,8 @@ namespace mln
       static_assert(mln::is_a<InputImage, Image>());
       static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());
 
-      for (auto r : ranges::rows(input.new_values()))
+      auto&& vals = input.new_values();
+      for (auto r : ranges::rows(vals))
         if (!::ranges::all_of(r, p))
           return false;
       return true;
@@ -42,7 +43,8 @@ namespace mln
       static_assert(mln::is_a<InputImage, Image>());
       static_assert(std::is_convertible_v<image_reference_t<InputImage>, bool>);
 
-      for (auto r : ranges::rows(input.new_values()))
+      auto&& vals = input.new_values();
+      for (auto r : ranges::rows(vals))
         for (auto&& v : r)
           if (!v)
             return false;

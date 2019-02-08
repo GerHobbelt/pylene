@@ -122,9 +122,9 @@ namespace mln
       mln_entering("mln::experimental::transform");
       mln_precondition(in.domain() == out.domain());
 
-      auto input_rows  = ranges::rows(in.new_values());
-      auto output_rows = ranges::rows(out.new_values());
-      for (auto [r1, r2] : ranges::view::zip(input_rows, output_rows))
+      auto&& ivals = in.new_values();
+      auto&& ovals = out.new_values();
+      for (auto [r1, r2] : ranges::view::zip(ranges::rows(ivals), ranges::rows(ovals)))
         ::ranges::transform(r1, ::ranges::begin(r2), f);
     }
 

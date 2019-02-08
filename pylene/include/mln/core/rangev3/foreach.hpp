@@ -23,8 +23,11 @@
   if (bool __mln_has_been_broken = false; false)                                                                       \
   {                                                                                                                    \
   }                                                                                                                    \
+  else if (auto&& __mln_rng = RNG; false)                                                                              \
+  {                                                                                                                    \
+  }                                                                                                                    \
   else                                                                                                                 \
-    for (auto&& __mln_inner_rng : mln::ranges::rows(RNG))                                                              \
+    for (auto&& __mln_inner_rng : mln::ranges::rows(__mln_rng))                                                        \
       if (__mln_has_been_broken)                                                                                       \
         break;                                                                                                         \
       else                                                                                                             \

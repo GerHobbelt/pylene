@@ -84,7 +84,8 @@ namespace mln
     {
       static_assert(mln::is_a<OutputImage, Image>());
 
-      for (auto row : ranges::rows(f.new_values()))
+      auto&& vals = f.new_values();
+      for (auto row : ranges::rows(vals))
         ::ranges::fill(row, v);
     }
   } // namespace experimental

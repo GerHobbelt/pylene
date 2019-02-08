@@ -15,6 +15,7 @@ namespace mln::ranges
   template <class R, typename = std::enable_if_t<is_segmented_range_v<std::remove_reference_t<R>>>>
   decltype(auto) rows(R&& rng) // decltype for perfect forwarding
   {
+    static_assert(std::is_lvalue_reference<R>(), "Cannot apply on a temporary range.");
     return rng.rows();
   }
 

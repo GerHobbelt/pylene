@@ -18,7 +18,7 @@ namespace mln
       friend ::ranges::range_access;
       using pixel_range_type = decltype(std::declval<I&>().new_pixels());
 
-      mutable I        m_ima;
+      mutable I        m_ima; // required because has/empty required to be const.
       pixel_range_type m_pixels;
 
       struct cursor

@@ -9,7 +9,7 @@ Include :file:`<mln/core/image/view/transform.hpp>`
 #. .. cpp:function:: auto transform(Image ima, Image ima2, BinaryFunction f)
 
     1. Makes a view from `ima` where for each pixel value evals to `out(p) = f(ima(p))`
-    2. Makes a view from `ima` where for each pixel value evals to `out(p) = f(ima(p),ima2(p))`. For this overload, the domain of both image must be equal.
+    2. Makes a view from `ima` where for each pixel value evals to `out(p) = f(ima(p), ima2(p))`. For this overload, the domain of both image must be equal.
     
 
     :param ima: Input range

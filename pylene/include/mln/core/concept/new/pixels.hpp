@@ -16,7 +16,7 @@ namespace mln::concepts
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Pixel
-  template<typename Pix>
+  template <typename Pix>
   concept Pixel = 
     // Minimum constraint on image object
     // Do not requires DefaultConstructible

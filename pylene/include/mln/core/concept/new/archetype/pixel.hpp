@@ -2,6 +2,7 @@
 
 #include <mln/core/concept/new/archetype/point.hpp>
 #include <mln/core/concept/new/archetype/value.hpp>
+#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/pixels.hpp>
 
 
@@ -24,9 +25,7 @@ namespace mln::archetypes
     reference  val() const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::Pixel<Pixel>, "Pixel archetype does not model the Pixel concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Pixel<Pixel>, "Pixel archetype does not model the Pixel concept!");
 
 
   struct OutputPixel final : Pixel
@@ -36,9 +35,7 @@ namespace mln::archetypes
     reference val() const;
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::OutputPixel<OutputPixel>,
-                "OutputPixel archetype does not model the OutputPixel concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::OutputPixel<OutputPixel>,
+                           "OutputPixel archetype does not model the OutputPixel concept!");
 
 } // namespace mln::archetypes

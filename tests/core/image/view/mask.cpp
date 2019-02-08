@@ -143,14 +143,18 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
 };
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-static_assert(mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>);
-static_assert(mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>);
-static_assert(mln::concepts::IndexableAndAccessibleImage<
-              mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>);
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>), "");
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>), "");
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
+                             mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>),
+                         "");
 
-static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputAccessibleImage, mask_archetype>>);
-static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>);
-static_assert(
-    mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>);
-#endif
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputAccessibleImage, mask_archetype>>), "");
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>), "");
+PYLENE_CONCEPT_TS_ASSERT(
+    (mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>),
+    "");

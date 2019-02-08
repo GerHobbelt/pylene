@@ -7,104 +7,16 @@ Core Module
 .. toctree::
    :hidden:
 
-   core/values
-   core/points
-   core/pixels
-   core/domains
-   core/indexes
-   core/ranges
+
    core/images
+   core/ranges
    core/neighborhood
    core/stl
 
 
 
 
-.. raw:: html
 
-         <h2>Values</h2>
-
-
-:doc:`core/values` are the fundamentals tools to model values held by images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Value <concept-values-Value>`
-   * :ref:`ComparableValue <concept-values-ComparableValue>`
-   * :ref:`OrderedValue <concept-values-OrderedValue>`
-
-.. topic:: Predefined values
-
-   * :doc:`core/values/rgba`
-
-.. topic:: Utilities
-
-   TODO channel utilities
-..   * :cpp:func:`is_multichannel`
-..   * :cpp:func:`dynamic_channel_get`
-..   * :cpp:func:`dynamic_channel_size`
-..   * :cpp:func:`static_channel_get`
-..   * :cpp:func:`static_channel_size`
-
-
-
-.. raw:: html
-
-         <h2>Points</h2>
-
-
-:doc:`core/points` are the fundamentals tools to locate a value inside an images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Point <concept-points-Point>`
-
-
-
-
-.. raw:: html
-
-         <h2>Pixels</h2>
-
-
-:doc:`core/pixels` are the fundamentals tools when browsing an images to access both the point and the value.
-
-
-.. topic:: Concepts
-
-   * :ref:`Pixel <concept-pixels-Pixel>`
-
-
-
-
-.. raw:: html
-
-         <h2>Domains</h2>
-
-
-:doc:`core/domains` are the fundamental tools when expressing the valid set of points for an image.
-
-
-.. topic:: Concepts
-
-   * :ref:`Domain <concept-domains-Domain>`
-
-
-
-
-.. raw:: html
-
-         <h2>Indexes</h2>
-
-
-:doc:`core/indexes` are the lowest level tools to locate a value inside an images.
-
-
-.. topic:: Concepts
-
-   * :ref:`Index <concept-indexes-Index>`
 
 
 
@@ -114,33 +26,84 @@ Core Module
          <h2>Images</h2>
 
 
-:doc:`core/images` represent an image and all its properties.
-
-
-.. topic:: Concepts
-
-   * :ref:`Image <concept-images-Image>`
-   * :ref:`IndexableImage <concept-images-IndexableImage>`
-   * :ref:`AccessibleImage <concept-images-AccessibleImage>`
-   * :ref:`ReversibleImage <concept-images-ReversibleImage>`
-   * :ref:`RandomAccessImage <concept-images-RandomAccessImage>`
-   * :ref:`ExtendedImage <concept-images-ExtendedImage>`
-   * :ref:`ChValueImage <concept-images-ChValueImage>`
-   * :ref:`RawImage <concept-images-RawImage>`
-   * :ref:`WritableImage <concept-images-WritableImage>`
-   * :ref:`ViewImage <concept-images-ViewImage>`
-   * :ref:`ConcreteImage <concept-images-ConcreteImage>`
+See :doc:`core/images` for a description of the image concepts and image basics.
 
 
 .. topic:: Utilities
 
    TODO
 
-.. topic:: Images
+.. topic:: Fundamental image types
 
-   * :doc:`core/images/ndimage`
+  .. table::
+    :class: full
+    :widths: auto
+
+    +--------------+-------------------------+
+    | `image2d<T>` | Buffer-encoded 2D image |
+    +--------------+-------------------------+
+    | `image3d<T>` | Buffer-encoded 3D image |
+    +--------------+-------------------------+
+    | `ndimage<T>` | Buffer-encoded nD image |
+    +--------------+-------------------------+
+
+.. topic:: Functional image views
+
+  .. table::
+    :widths: auto
+    :class: full
 
 
+    +------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | :cpp:func:`view::transform(ima, f) <mln::view::transform>` | Views the image with a function applied to the values.                                     |
+    +------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::filter(ima, pred)``                                | Views the image restricted to pixels whose values pass a predicate.                        |
+    +------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::mask(ima, mask)``                                  | Views the image restricted to pixels in a binary mask.                                     |
+    +------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::clip(ima, roi)``                                   | Views the image restricted to a sub-region.                                                |
+    +------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+    | ``view::zip(ima1, ima2, ..., imaN)``                       | Views a list of images as a single image whose values are tuples of the each image values. |
+    +------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+
+.. topic:: Common image operators (views)
+
+  .. table::
+    :widths: auto
+    :class: full
+
+    +--------------+-----------------------------------------------------------+
+    | Arithmetical | `a + b`, `a - b`, `a * b`, `a / b`, `a % b`               |
+    +--------------+-----------------------------------------------------------+
+    | Logical      | ``land(a,b)``, ``lor(a,b)``, ``lnot(a)``                  |
+    +--------------+-----------------------------------------------------------+
+    | Comparison   | `a < b`, `a <= b`, `a == b`, `a != b`, `a >= b`, `a > b`  |
+    +--------------+-----------------------------------------------------------+
+    | Conditional  | ``view::ifelse(a,b,c)``                                   |
+    +--------------+-----------------------------------------------------------+
+
+
+.. topic:: Mathematical image operator (views)
+
+  +-------+-------+
+  | FIXME | FIXME |
+  +-------+-------+
+
+.. topic:: Other image operators (views)
+
+  .. table::
+    :widths: auto
+    :class: full
+    
+    +---------------------------+---------------------------------------------------+
+    | ``view::cast<V>(ima)``    | Views the image with the values casted into ``V`` |
+    +---------------------------+---------------------------------------------------+
+    | ``view::channel(ima, k)`` | Views the k-th channel of the image               |
+    +---------------------------+---------------------------------------------------+
+    | ``view::red(ima)``        |                                                   |
+    | ``view::green(ima)``      |                                                   |
+    | ``view::blue(ima)``       | Views the red, green or blue channel of the image |
+    +---------------------------+---------------------------------------------------+
 
 
 .. raw:: html
@@ -205,13 +168,17 @@ Image primitives
 .. toctree::
     :hidden:
 
-    core/algorithm/fill
-    core/algorithm/copy
-    core/algorithm/paste
-    core/algorithm/transform
-    core/algorithm/iota
     core/algorithm/accumulate    
+    core/algorithm/all_any_none_of
+    core/algorithm/clone
+    core/algorithm/copy
+    core/algorithm/fill
+    core/algorithm/foreach
     core/algorithm/generate  
+    core/algorithm/iota
+    core/algorithm/paste
+    core/algorithm/sort
+    core/algorithm/transform
 
 Fundamental primitives for basic image manipulation. Those are grouped by:
 
@@ -222,18 +189,21 @@ Fundamental primitives for basic image manipulation. Those are grouped by:
 
 .. rubric:: Non-modifying image primitives that operates on values
 
+.. table::
+  :class: full
+  :widths: auto
 
-+-------------------------------------------+------------------------------------------------------------------------+
-| :doc:`core/algorithm/all_any_none_of`     | checks if a predicate is true for all, any or none of the image values |
-+-------------------------------------------+------------------------------------------------------------------------+
-| :doc:`core/algorithm/foreach`             | applies a function to the values of an image                           |
-+-------------------------------------------+------------------------------------------------------------------------+
-| `count` `count_if`                        | [TBI] returns the number of values satisfying specific criteria        |
-+-------------------------------------------+------------------------------------------------------------------------+
-| `equal`                                   | [TBI] checks if two images have the same values                        |
-+-------------------------------------------+------------------------------------------------------------------------+
-| :doc:`core/algorithm/accumulate` (reduce) | sums up values of an image                                             |
-+-------------------------------------------+------------------------------------------------------------------------+
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/all_any_none_of`     | checks if a predicate is true for all, any or none of the image values |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/foreach`             | applies a function to the values of an image                           |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | `count` `count_if`                        | [TBI] returns the number of values satisfying specific criteria        |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | `equal`                                   | [TBI] checks if two images have the same values                        |
+  +-------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/accumulate` (reduce) | sums up values of an image                                             |
+  +-------------------------------------------+------------------------------------------------------------------------+
 
 
 .. rubric:: Non-modifying image primitives that operates on pixels
@@ -246,21 +216,25 @@ Fundamental primitives for basic image manipulation. Those are grouped by:
 .. rubric:: Modifying image primitives that operates on values
 
 
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/copy`      | copies image values to another image  (without localization) |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/fill`      | assigns a value to image values                              |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/clone`     | copies an image in a new image                               |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/paste`     | copies image pixels to another image (with localization)     |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/transform` | applies a function to the values of an image                 |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/generate`  | generate the values of an image by a function                |
-+---------------------------------+--------------------------------------------------------------+
-| :doc:`core/algorithm/iota`      | generate the values of an image with increasing value        |
-+---------------------------------+--------------------------------------------------------------+
+.. table::
+  :class: full
+  :widths: auto
+
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/copy`      | copies image values to another image  (without localization) |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/fill`      | assigns a value to image values                              |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/clone`     | copies an image in a new image                               |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/paste`     | copies image pixels to another image (with localization)     |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/transform` | applies a function to the values of an image                 |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/generate`  | generate the values of an image by a function                |
+  +---------------------------------+--------------------------------------------------------------+
+  | :doc:`core/algorithm/iota`      | generate the values of an image with increasing value        |
+  +---------------------------------+--------------------------------------------------------------+
 
 .. rubric:: Modifying image primitives that operates on pixels
 

@@ -26,7 +26,7 @@ namespace mln::experimental
   struct Image
   {
   };
-}
+} // namespace mln::experimental
 
 namespace mln::concepts
 {
@@ -36,7 +36,7 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
   // Image
-  template<typename I>
+  template <typename I>
   concept Image =
     // Minimum constraint on image object
     // Do not requires DefaultConstructible
@@ -87,7 +87,7 @@ namespace mln::concepts
   {
 
     // WritableImage
-    template<typename I>
+    template <typename I>
     concept WritableImage =
       Image<I> &&
       OutputPixel<image_pixel_t<I>> &&
@@ -130,7 +130,7 @@ namespace mln::concepts
   {
 
     // WritableIndexableImage
-    template<typename I>
+    template <typename I>
     concept WritableIndexableImage =
       WritableImage<I> &&
       IndexableImage<I> &&
@@ -158,7 +158,7 @@ namespace mln::concepts
   {
 
     // WritableAccessibleImage
-    template<typename I>
+    template <typename I>
     concept WritableAccessibleImage =
       detail::WritableImage<I> &&
       AccessibleImage<I> &&
@@ -186,7 +186,7 @@ namespace mln::concepts
   {
 
     // WritableIndexableAndAccessibleImage
-    template<typename I>
+    template <typename I>
     concept WritableIndexableAndAccessibleImage =
       IndexableAndAccessibleImage<I> &&
       detail::WritableImage<I> &&
@@ -210,7 +210,7 @@ namespace mln::concepts
   {
 
     // WritableBidirectionalImage
-    template<typename I>
+    template <typename I>
     concept WritableBidirectionalImage =
       WritableImage<I> &&
       BidirectionalImage<I>;
@@ -234,7 +234,7 @@ namespace mln::concepts
   {
 
     // WritableRawImage
-    template<typename I>
+    template <typename I>
     concept WritableRawImage =
       WritableImage<I> &&
       WritableIndexableAndAccessibleImage<I> &&

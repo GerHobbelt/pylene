@@ -29,7 +29,8 @@ namespace mln
       static_assert(mln::is_a<InputImage, Image>());
       static_assert(::ranges::Invocable<UnaryFunction, image_reference_t<InputImage>>());
 
-      for (auto r : ranges::rows(input.new_values()))
+      auto&& vals = input.new_values();
+      for (auto r : ranges::rows(vals))
         ::ranges::for_each(r, f);
     }
   } // namespace experimental

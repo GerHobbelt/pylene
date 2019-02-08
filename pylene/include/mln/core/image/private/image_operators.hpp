@@ -46,7 +46,7 @@ namespace mln::experimental
   }                                                                                                                    \
                                                                                                                        \
   /* This overload is there to be a best match wrt old API impl */                                                     \
-  template <class A, class B>                                                                                          \
+  template <class A, class B, class = std::enable_if_t<(is_a<A, Image>::value || is_a<B, Image>::value)>>              \
   auto op(const A& lhs, const B& rhs)                                                                                  \
   {                                                                                                                    \
     return mln::experimental::ops::impl::op(lhs, rhs);                                                                 \
@@ -67,7 +67,7 @@ namespace mln::experimental
     } // namespace details
 
     MLN_PRIVATE_DEFINE_UNARY_OPERATOR(operator-, std::negate<>());
-    MLN_PRIVATE_DEFINE_UNARY_OPERATOR(lnot, std::logical_not<>());
+    MLN_PRIVATE_DEFINE_UNARY_OPERATOR(operator!, std::logical_not<>());
 
     MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator==, std::equal_to<>());
     MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator!=, std::not_equal_to<>());
@@ -75,8 +75,8 @@ namespace mln::experimental
     MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator>, std::greater<>());
     MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator<=, std::less_equal<>());
     MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator>=, std::greater_equal<>());
-    MLN_PRIVATE_DEFINE_BINARY_OPERATOR(land, std::logical_and<>());
-    MLN_PRIVATE_DEFINE_BINARY_OPERATOR(lor, std::logical_or<>());
+    MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator&&, std::logical_and<>());
+    MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator||, std::logical_or<>());
 
 
     MLN_PRIVATE_DEFINE_BINARY_OPERATOR(operator+, details::to_common_type<std::plus<>>());
@@ -142,43 +142,41 @@ namespace mln::experimental
         return view::transform(cond, g);
       }
     };
-    } // namespace details
+  } // namespace details
 
-    template <class ICond, class ITrue, class IFalse>
-    auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
-    {
-      return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
-                                                       std::move(iffalse));
-    }
-
-
-    // FIXME: deprecated => replace with algorithm all_of
-    template <class I>
-    [[deprecated]] bool all(I ima)
-    {
-      static_assert(mln::is_a<I, Image>());
-      static_assert(std::is_convertible<typename I::reference, bool>());
-
-      mln_foreach_new (auto&& val, ima.new_values())
-        if (!val)
-          return false;
-
-      return true;
-    }
+  template <class ICond, class ITrue, class IFalse>
+  auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  {
+    return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
+                                                     std::move(iffalse));
+  }
 
 
-    template <class I>
-    [[deprecated]] bool any(I ima)
-    {
-      static_assert(mln::is_a<I, Image>());
-      static_assert(std::is_convertible<typename I::reference, bool>());
+  // FIXME: deprecated => replace with algorithm all_of
+  template <class I>
+  [[deprecated]] bool all(I ima) {
+    static_assert(mln::is_a<I, Image>());
+    static_assert(std::is_convertible<typename I::reference, bool>());
 
-      mln_foreach_new (auto&& val, ima.new_values())
-        if (val)
-          return true;
+    mln_foreach_new (auto&& val, ima.new_values())
+      if (!val)
+        return false;
 
-      return false;
-    }
+    return true;
+  }
+
+
+  template <class I>
+  [[deprecated]] bool any(I ima) {
+    static_assert(mln::is_a<I, Image>());
+    static_assert(std::is_convertible<typename I::reference, bool>());
+
+    mln_foreach_new (auto&& val, ima.new_values())
+      if (val)
+        return true;
+
+    return false;
+  }
 
 
 #undef MLN_PRIVATE_DEFINE_UNARY_OPERATOR

@@ -73,7 +73,8 @@ namespace mln
       static_assert(mln::is_a<OutputImage, Image>());
       static_assert(std::is_convertible_v<Value, image_value_t<OutputImage>>);
 
-      for (auto row : mln::ranges::rows(output.new_values()))
+      auto&& vals = output.new_values();
+      for (auto row : mln::ranges::rows(vals))
         for (auto& v : row)
           v = val++;
     }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mln/core/concept/new/archetype/value.hpp>
+#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/ranges.hpp>
+
 
 namespace mln::archetypes
 {
@@ -16,10 +18,8 @@ namespace mln::archetypes
       value_type* end();
     };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(mln::concepts::stl::RandomAccessRange<RandomAccessRange>,
-                  "RandomAccessRange archetype does not model the stl::RandomAccessRange concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+    PYLENE_CONCEPT_TS_ASSERT(mln::concepts::stl::RandomAccessRange<RandomAccessRange>,
+                             "RandomAccessRange archetype does not model the stl::RandomAccessRange concept!");
 
   } // namespace detail
 
@@ -38,10 +38,8 @@ namespace mln::archetypes
     NestedSegmentedRange rows();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::SegmentedRange<SegmentedRange>,
-                "SegmentedRange archetype does not model the SegmentedRange concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::SegmentedRange<SegmentedRange>,
+                           "SegmentedRange archetype does not model the SegmentedRange concept!");
 
 
   struct ReversibleRange final : detail::RandomAccessRange
@@ -49,10 +47,8 @@ namespace mln::archetypes
     detail::RandomAccessRange reversed();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::ReversibleRange<ReversibleRange>,
-                "reversible_range_archetype does not model the ReversibleRange concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ReversibleRange<ReversibleRange>,
+                           "reversible_range_archetype does not model the ReversibleRange concept!");
 
 
   struct SegmentedAndReversibleRange final : detail::RandomAccessRange
@@ -69,11 +65,9 @@ namespace mln::archetypes
     detail::RandomAccessRange reversed();
   };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::SegmentedRange<SegmentedAndReversibleRange>,
-                "SegmentedAndReversibleRange archetype does not model the SegmentedRange concept!");
-  static_assert(mln::concepts::ReversibleRange<SegmentedAndReversibleRange>,
-                "SegmentedAndReversibleRange archetype does not model the ReversibleRange concept!");
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::SegmentedRange<SegmentedAndReversibleRange>,
+                           "SegmentedAndReversibleRange archetype does not model the SegmentedRange concept!");
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ReversibleRange<SegmentedAndReversibleRange>,
+                           "SegmentedAndReversibleRange archetype does not model the ReversibleRange concept!");
 
 } // namespace mln::archetypes

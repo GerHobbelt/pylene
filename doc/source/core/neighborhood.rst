@@ -1,3 +1,5 @@
+.. _neighborhood 
+
 Neighborhood, Sliding Windows and Structuring Elements
 ######################################################
 

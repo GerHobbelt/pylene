@@ -66,7 +66,8 @@ namespace mln
       static_assert(mln::is_a<InputImage, Image>());
 
       auto a = accu::make_accumulator(exact(accu), image_value_t<InputImage>());
-      for (auto row : mln::ranges::rows(input.new_values()))
+      auto&& vals = input.new_values();
+      for (auto row : mln::ranges::rows(vals))
         for (auto&& v : row)
           a.take(v);
       return ex(a);
@@ -78,7 +79,8 @@ namespace mln
     {
       static_assert(mln::is_a<InputImage, Image>());
 
-      for (auto row : mln::ranges::rows(input.new_values()))
+      auto&& vals = input.new_values();
+      for (auto row : mln::ranges::rows(vals))
         for (auto&& v : row)
           init = op(init, v);
 

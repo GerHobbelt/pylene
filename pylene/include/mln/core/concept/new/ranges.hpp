@@ -30,7 +30,7 @@ namespace mln::concepts
 
 
   // SegmentedRange
-  template<typename Rng>
+  template <typename Rng>
   concept SegmentedRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {
@@ -42,7 +42,7 @@ namespace mln::concepts
 
 
   // ReversibleRange
-  template<typename Rng>
+  template <typename Rng>
   concept ReversibleRange = 
     stl::ForwardRange<Rng> &&
     requires(Rng rng) {

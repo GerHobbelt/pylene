@@ -82,10 +82,9 @@ namespace mln
       static_assert(mln::is_a<OutputImage, Image>());
       static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
-      auto input_rows  = ranges::rows(src.new_pixels());
-
-      for (auto r : input_rows)
-        for (auto px : r)
+      auto&& pixels = src.new_pixels();
+      for (auto row : ranges::rows(pixels))
+        for (auto px : row)
           dest(px.point()) = px.val();
     }
 

@@ -1,30 +1,31 @@
 FROM archimg/base:latest
 RUN pacman -Sy --noconfirm archlinux-keyring
 RUN pacman -Sy --noconfirm \
-    boost \
-    boost-libs \
-    clang \
-    cmake \
-    freeimage \
-    gcc \
-    git \
-    gtest \
-    make \
-    mpfr \
-    intel-tbb \
-    qt5-base \
-    ninja
+  boost \
+  boost-libs \
+  clang \
+  cmake \
+  freeimage \
+  gcc \
+  llvm \
+  git \
+  gtest \
+  make \
+  mpfr \
+  intel-tbb \
+  qt5-base \
+  ninja
 
 # For documentation
 RUN pacman -Sy --noconfirm \
-    openssl \
-    python \
-    python-matplotlib \
-    python-numpy \
-    python-scipy \
-    python-pip \
-    doxygen \
-    && rm -Rf /var/cache/pacman
+  openssl \
+  python \
+  python-matplotlib \
+  python-numpy \
+  python-scipy \
+  python-pip \
+  doxygen \
+  && rm -Rf /var/cache/pacman
 RUN pip install --no-cache-dir sphinx breathe sphinx_rtd_theme pandas conan
 COPY conanfile.py /tmp/
 COPY conan_config /tmp/conan_config

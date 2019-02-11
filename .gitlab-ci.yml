@@ -90,9 +90,9 @@ distcheck-linux-clang-debug:
     when: manual
     dependencies: []
     artifacts:
-         name: "benchmark-results"
-         paths:
-             - build/bench/*.json
+        name: "benchmark-results"
+        paths:
+            - build/bench/*.json
         expire_in: 15 days
 
 distbench-linux-gcc-release:

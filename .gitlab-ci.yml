@@ -20,6 +20,7 @@ build-doc-images:
     artifacts:
         paths:
             - doc/source/images
+        expire_in: 2 days
 
 ########
 # Test #
@@ -38,8 +39,7 @@ build-doc-images:
     artifacts:
         reports:
             junit: build/tests/UT*.xml
-
-
+        expire_in: 15 days
 
 distcheck-linux-gcc-release:
     <<: *distcheck-linux-base
@@ -93,6 +93,7 @@ distcheck-linux-clang-debug:
          name: "benchmark-results"
          paths:
              - build/bench/*.json
+        expire_in: 15 days
 
 distbench-linux-gcc-release:
     <<: *distbench-linux-base
@@ -108,7 +109,6 @@ distbench-linux-clang-release:
         CXX: "clang++"
         CC: "clang"
 
-
 #################
 # Documentation #
 #################
@@ -122,6 +122,7 @@ distbench-linux-clang-release:
     dependencies: [build-doc-images]
     artifacts:
         name: "documentation"
+        expire_in: 2 days
         paths:
             - public/
 

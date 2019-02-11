@@ -1,10 +1,10 @@
-#include <mln/core/rangev3/multi_span.hpp>
-#include <mln/core/rangev3/range_traits.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/multi_span.hpp>
+#include <mln/core/range/range_traits.hpp>
+#include <mln/core/range/rows.hpp>
 
-#include <mln/core/concept/new/concepts.hpp>
+#include <mln/core/concepts/concept.hpp>
 
-#include <range/v3/to_container.hpp>
+#include <range/v3/range/conversion.hpp>
 #include <range/v3/view/indices.hpp>
 
 #include <numeric>
@@ -43,14 +43,12 @@ public:
   using range_type                  = mln::ranges::multi_span<T, Rank>;
 
   static_assert(Rank == 1 || mln::ranges::is_segmented_range<range_type>::value);
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::stl::OutputRange<range_type, const T&>);
   static_assert(mln::concepts::SegmentedRange<range_type>);
   static_assert(mln::concepts::ReversibleRange<range_type>);
 #else
   static_assert(::ranges::ForwardRange<range_type>());
   static_assert(::ranges::OutputRange<range_type, const T&>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
 
   MultiSpanTest()
@@ -113,7 +111,7 @@ TYPED_TEST(MultiSpanTest, forward)
 {
   typename TestFixture::range_type rng(this->m_data.data(), this->m_count, this->m_stride);
 
-  auto ref   = ::ranges::to_vector(::ranges::view::indices(int(this->m_size)));
+  auto ref   = ::ranges::to_vector(::ranges::views::indices(int(this->m_size)));
   auto vrng  = this->rng_to_container(rng);
   auto vrng2 = this->rng_to_container_row_wise(rng);
   ASSERT_EQ(ref, vrng);
@@ -125,7 +123,7 @@ TYPED_TEST(MultiSpanTest, backward)
 {
   typename TestFixture::range_type rng(this->m_data.data(), this->m_count, this->m_stride);
 
-  auto ref   = ::ranges::to_vector(::ranges::view::reverse(::ranges::view::indices(int(this->m_size))));
+  auto ref   = ::ranges::to_vector(::ranges::views::reverse(::ranges::views::indices(int(this->m_size))));
   auto vrng  = this->rng_to_container(rng.reversed());
   auto vrng2 = this->rng_to_container_row_wise(rng.reversed());
   ASSERT_EQ(ref, vrng);

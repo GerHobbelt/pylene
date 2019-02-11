@@ -1,9 +1,9 @@
-#ifndef CANONIZE_HPP
-#define CANONIZE_HPP
+#pragma once
 
 #include "maxtree_routines.hpp"
 
 #include <mln/core/image/image2d.hpp>
+
 
 namespace mln
 {
@@ -22,7 +22,7 @@ namespace mln
           , m_parent(parent)
           , m_out(S)
         {
-          resize(m_dejavu, m_ima).init(false);
+          resize(m_dejavu, m_ima).set_init_value(false);
           // m_back = S + ima.domain().size();
         }
 
@@ -70,7 +70,7 @@ namespace mln
         // size_type*		m_back;
         image2d<bool> m_dejavu;
       };
-    }
+    } // namespace internal
 
     template <typename V>
     void canonize(const image2d<V>& ima, image2d<typename image2d<V>::size_type>& parent,
@@ -96,7 +96,5 @@ namespace mln
           parent[p] = parent[q];
       }
     }
-  }
-}
-
-#endif // ! CANONIZE_HPP
+  } // namespace morpho
+} // namespace mln

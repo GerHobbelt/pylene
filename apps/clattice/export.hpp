@@ -1,12 +1,14 @@
-#ifndef EXPORT_HPP
-#define EXPORT_HPP
+#pragma once
+
+#include "shape.hpp"
+
+#include <mln/io/png/imsave.hpp>
 
 #include <boost/format.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "shape.hpp"
 #include <fstream>
-#include <mln/io/png/imsave.hpp>
+
 
 enum e_output_mode
 {
@@ -143,5 +145,3 @@ void save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vecto
         file << "  \"" << repr[i] << "\" -> \"" << repr[j] << "\";" << std::endl;
   file << "}";
 }
-
-#endif // ! EXPORT_HPP

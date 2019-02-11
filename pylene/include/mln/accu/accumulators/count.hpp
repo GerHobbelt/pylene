@@ -1,11 +1,10 @@
-#ifndef MLN_ACCU_ACCUMULATOTS_COUNT_HPP
-#define MLN_ACCU_ACCUMULATOTS_COUNT_HPP
+#pragma once
 
 /// \file
 /// \brief Header file for counting accumulator.
 
 #include <mln/accu/accumulator_base.hpp>
-#include <mln/accu/dontcare.hpp>
+#include <mln/core/utils/dontcare.hpp>
 #include <utility>
 
 namespace mln
@@ -20,7 +19,7 @@ namespace mln
       ///         and decrementable.
       template <typename CountType = std::size_t>
       struct count;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -52,7 +51,7 @@ namespace mln
           return accumulators::count<CountType>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -62,15 +61,15 @@ namespace mln
       {
         return extract(exact(acc), features::count<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
 
       template <typename CountType>
-      struct count : accumulator_base<count<CountType>, dontcare, CountType, features::count<>>
+      struct count : accumulator_base<count<CountType>, dontcare_t, CountType, features::count<>>
       {
-        typedef dontcare                           argument_type;
+        typedef dontcare_t                         argument_type;
         typedef CountType                          result_type;
         typedef boost::mpl::set<features::count<>> provides;
         typedef std::true_type                     has_untake;
@@ -82,9 +81,9 @@ namespace mln
 
         void init() { m_count = 0; }
 
-        void take(const dontcare&) { ++m_count; }
+        void take(dontcare_t) { ++m_count; }
 
-        void untake(const dontcare&) { --m_count; }
+        void untake(dontcare_t) { --m_count; }
 
         template <typename Other>
         void take(const Accumulator<Other>& other)
@@ -97,8 +96,6 @@ namespace mln
       private:
         CountType m_count;
       };
-    }
-  }
-}
-
-#endif // !MLN_ACCU_ACCUMULATOTS_COUNT_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

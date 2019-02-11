@@ -1,7 +1,7 @@
-#ifndef MLN_APPS_SALIENCY_CLOSURE_HPP
-#define MLN_APPS_SALIENCY_CLOSURE_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
+
 
 template <typename V, class Compare = std::less<unsigned>>
 mln::image2d<float> area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K,
@@ -85,7 +85,7 @@ namespace internal
   }
 
 #endif
-}
+} // namespace internal
 
 template <typename V, class Compare>
 mln::image2d<float> area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K,
@@ -225,5 +225,3 @@ mln::image2d<float> height_close(const mln::image2d<float>& attr, const mln::ima
 
   return out;
 }
-
-#endif // ! MLN_APPS_SALIENCY_CLOSURE_HPP

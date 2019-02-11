@@ -17,62 +17,35 @@ namespace mln
   ///
   /// \tparam I The input image type
   /// \param ima The image to clone.
-  template <typename I>
-  [[deprecated]] mln_concrete(I) clone(const Image<I>& ima);
-
-
-  namespace experimental
-  {
-    template <class InputImage>
-    image_concrete_t<InputImage> clone(InputImage input);
-  }
+  template <class InputImage>
+  image_concrete_t<InputImage> clone(InputImage input);
 
   /******************/
   /* Implem         */
   /******************/
 
-  namespace impl
+  template <class InputImage>
+  image_concrete_t<InputImage> clone(InputImage input)
   {
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
 
-    // Clone by copy construction
-    template <typename Image>
-    mln_concrete(Image) clone(const Image& ima, std::true_type _use_copy_construction_)
-    {
-      (void)_use_copy_construction_;
-      mln_concrete(Image) x(ima);
-      return x;
-    }
-
-    // Clone by deep copy
-    template <typename Image>
-    mln_concrete(Image) clone(const Image& ima, std::false_type _use_copy_construction_)
-    {
-      (void)_use_copy_construction_;
-      mln_concrete(Image) x = imconcretize(ima);
-      mln::copy(ima, x);
-      return x;
-    }
-  }
-
-  template <typename I>
-  mln_concrete(I) clone(const Image<I>& ima)
-  {
-    return impl::clone(exact(ima), check_t < std::is_convertible<I, mln_concrete(I)>::value and
-                                       not image_traits<mln_concrete(I)>::shallow_copy::value > ());
+    image_concrete_t<InputImage> out = input.concretize();
+    mln::copy(std::move(input), out);
+    return out;
   }
 
 
-  namespace experimental
+  namespace parallel
   {
     template <class InputImage>
     image_concrete_t<InputImage> clone(InputImage input)
     {
-      static_assert(mln::is_a<InputImage, Image>());
+      static_assert(mln::is_a<InputImage, mln::details::Image>());
 
       image_concrete_t<InputImage> out = input.concretize();
-      mln::experimental::copy(std::move(input), out);
+      mln::parallel::copy(std::move(input), out);
       return out;
     }
-  } // namespace experimental
-} // namespace mln
+  } // namespace parallel
 
+} // namespace mln

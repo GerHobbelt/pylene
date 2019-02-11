@@ -1,164 +1,214 @@
-#ifndef MLN_MORPHO_CANVAS_UNIONFIND_HPP
-#define MLN_MORPHO_CANVAS_UNIONFIND_HPP
+#pragma once
 
-#include <mln/core/algorithm/sort_sites.hpp>
-#include <mln/core/dontcare.hpp>
-#include <mln/core/extension/extension.hpp>
-#include <mln/core/image/image.hpp>
-#include <mln/core/neighborhood/neighborhood.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/extension/border_management.hpp>
+#include <mln/core/algorithm/sort.hpp>
+
+#include <mln/core/utils/dontcare.hpp> // detail::ignore_t
 #include <mln/core/trace.hpp>
 
-namespace mln
+#include <range/v3/view/reverse.hpp>
+
+namespace mln::morpho::canvas
 {
 
-  namespace morpho
+
+  /// \brief Define a default union-find visitor.
+  struct unionfind_visitor_base
   {
+    using ignore_t = mln::dontcare_t;
 
-    namespace canvas
-    {
+    ///  \brief Called on every point \p during the make-set step.
+    void on_make_set([[maybe_unused]] ignore_t  p) {}
 
-      /// \brief Define a default union-find visitor.
-      struct default_unionfind_visitor
-      {
-        ///  \brief Called on every point \p during the make-set step.
-        void on_make_set(dontcare_t p) { (void)p; }
+    /// \brief Called during the merge-step.
+    /// It returns the new root of the component (either p or q).
+    ///
+    /// Called when a component rooted in \p p merges with a component rooted in \p q through the point \p x.
+    /// The component rooted in p is the last that has been updated (it is initially the current point being process).
+    ///
+    /// IF YOU WANT THE ROOT TO BE A POINT THAT HAS THE MINIMUM VALUE OF THE COMPONENT: RETURN p (it is usually what you
+    /// want).  You want the root to be defined in another way (e.g. to a local maximum or using a rank criterion)
+    ignore_t on_union([[maybe_unused]] ignore_t  p, [[maybe_unused]] ignore_t  rp,
+                      [[maybe_unused]] ignore_t  q, [[maybe_unused]] ignore_t  rq) { return {}; }
 
-        /// \brief Called during the merge-step.
-        ///
-        /// Called when a component rooted in \p p merges with a
-        /// component rooted in \p q, \p q becomes the new root.
-        void on_union(dontcare_t p, dontcare_t q)
-        {
-          (void)p;
-          (void)q;
-        };
+    /// \brief Called at the end of the algorithm for each point
+    ///
+    /// \p p is any point in the domain, \p q is the root of the
+    /// component \p p belongs to.
+    void on_finish([[maybe_unused]] ignore_t  p, [[maybe_unused]] ignore_t  q) {}
 
-        /// \brief Called at the end of the algorithm for each point
-        ///
-        /// \p p is any point in the domain, \p q is the root of the
-        /// component \p p belongs to.
-        void on_finish(dontcare_t p, dontcare_t q)
-        {
-          (void)p;
-          (void)q;
-        };
-      };
 
-      template <class I, class N, class StopCriterion, class Compare = std::less<mln_value(I)>,
-                class uf_visitor = default_unionfind_visitor>
-      mln_ch_value(I, mln_point(I)) unionfind(const Image<I>& input, const Neighborhood<N>& nbh, StopCriterion stop,
-                                              Compare cmp = Compare(), uf_visitor viz = uf_visitor());
+    /// \brief Called after the merge or make_set step on the new root of the component
+    /// Should return true if the component should not merge anymore
+    bool test([[maybe_unused]] ignore_t  p) { return false; }
+  };
 
-      /*********************/
-      /** Implementation  **/
-      /*********************/
+  template <class I, class N, class UFViz, class Compare>
+  void union_find(I input, N nbh, UFViz viz, Compare cmp);
 
-      namespace internal
-      {
-        enum e_unionfind_status
-        {
-          FAIL = 0,
-          PASS = 1,
-          NONE = (unsigned char)-1
-        };
 
-        template <class I>
-        mln_point(I) zfindroot(I& par, const mln_point(I) & p)
-        {
-          mln_point(I) q = par(p);
-          if (q != p)
-            return (par(p) = zfindroot(par, q));
-          else
-            return p;
-        }
 
-        template <class I, class N, class uf_visitor, class Compare, class StopCriterion, class J>
-        void unionfind_impl(const I& input, const N& nbh, StopCriterion term, Compare cmp, uf_visitor viz,
-                            mln_ch_value(I, mln_point(I)) & par, J&& status)
-        {
-          auto S = sort_sites(input, cmp);
+  namespace impl
+  {
+    // Helper functions
+    // Set par(p) = p for each p
+    template <class I>
+    [[gnu::noinline]] void union_find_init_par(I par) noexcept;
 
-          mln_point(I) p;
-          mln_iter(nit, nbh(p));
-          mln_foreach (p, S)
-          {
-            // make-set
-            par(p) = p;
-            viz.on_make_set(p);
-            status(p) = term(p);
 
-            mln_foreach (mln_point(I) n, nit)
-              if (status.at(n) != NONE)
-              {
-                mln_point(I) r = zfindroot(par, n);
-                // merge step
-                if (p != r)
-                {
-                  if (status(r) == PASS) // r pass already, no need to merge.
-                  {
-                    status(p) = PASS;
-                  }
-                  else
-                  {
-                    viz.on_union(r, p);
-                    par(r) = p;
-                    status(p) |= status(r);
-                  }
-                }
-              }
+    // Get the canonical element of the set containing p0 and perform path compression
+    template <class I>
+    [[gnu::noinline]] //
+    image_point_t<I>  //
+    zfindroot(I& par, image_point_t<I> p0) noexcept;
 
-            status(p) = status(p) || term(p);
-          }
-          // Set the root status to PASS
-          status(S.back()) = PASS;
-
-          // Reverse, canonize and call on_finish
-          mln_reverse_foreach (p, S)
-          {
-            mln_point(I) q = par(p);
-            par(p)         = par(q);
-            assert(status(par(p)));
-
-            viz.on_finish(p, par(p));
-          }
-        }
-
-        //
-        // The facade chooses the best way to proceed the union-find
-        // 1. If the input image is able to hold the neighborhood
-        //    nothing special occurs.
-        // 2. Otherwise, a fake extension is added to the status image
-        template <class I, class N, class uf_visitor, class Compare, class StopCriterion>
-        mln_ch_value(I, mln_point(I))
-            unionfind_facade(const I& input, const N& nbh, StopCriterion term, Compare cmp, uf_visitor viz)
-        {
-          mln_ch_value(I, mln_point(I)) par     = imchvalue<mln_point(I)>(input);
-          mln_ch_value(I, unsigned char) status = imchvalue<unsigned char>(input).init(NONE);
-
-          if (not extension::need_adjust(status, nbh))
-            unionfind_impl(input, nbh, term, cmp, viz, par, status);
-          else
-          {
-            mln::trace::warn("Slow version because input image extension is not wide enough.");
-            unionfind_impl(input, nbh, term, cmp, viz, par, extension::add_value_extension(status, NONE));
-          }
-
-          return par;
-        }
-      }
-
-      template <class I, class N, class StopCriterion, class Compare, class uf_visitor>
-      mln_ch_value(I, mln_point(I))
-          unionfind(const Image<I>& input, const Neighborhood<N>& nbh, StopCriterion stop, Compare cmp, uf_visitor viz)
-      {
-        return internal::unionfind_facade(exact(input), exact(nbh), stop, cmp, viz);
-      }
-
-      /*********************************************/
-      /***       Visitors                       ****/
-      /*********************************************/
-    }
+    // Get the canonical element of the set containing p0 and perform path compression
+    // This overload is for set reprensented by a buffer of indexes
+    [[gnu::noinline]] int zfindroot(int* par, int x) noexcept;
   }
-}
 
-#endif // ! MLN_MORPHO_CANVAS_UNIONFIND_HPP
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
+
+  namespace detail
+  {
+    enum class ufstatus : uint8_t
+    {
+      FAIL = 0,
+      PASS = 1,
+      NONE = 255,
+    };
+
+  }
+
+  namespace impl
+  {
+    template <class I>
+    [[gnu::noinline]] image_point_t<I> zfindroot(I& par, image_point_t<I> p0) noexcept
+    {
+      static_assert(mln::is_a<I, mln::details::Image>());
+
+      image_point_t<I> r;
+      // find root
+      {
+        auto p = p0, q = par(p);
+        while (p != q)
+        {
+          p = q;
+          q = par(p);
+        }
+        r = p;
+      }
+
+      // path compression
+      for (auto p = p0; p != r;)
+      {
+        auto q = par(p);
+        par(p) = r;
+        p = q;
+      }
+      return r;
+    }
+
+    template <class P>
+    struct uf_aux_data
+    {
+      P                                           par;
+      mln::morpho::canvas::detail::ufstatus status;
+    };
+
+
+    template <class I, class J, class N, class UFViz>
+    void union_find(I& par, J& status, N nbh, UFViz viz, const std::vector<image_point_t<I>>& S)
+    {
+      using mln::morpho::canvas::detail::ufstatus;
+
+      // Forward pass
+      {
+        mln_entering("Union-find forward pass");
+        for (auto p : ::ranges::views::reverse(S))
+        {
+          par(p) = p;
+          viz.on_make_set(p);
+
+          auto rp = p;
+          ufstatus st = static_cast<ufstatus>(viz.test(p));
+          for (auto n : nbh(p))
+          {
+            if (status.at(n) == ufstatus::NONE) // Out-of-range neighbor
+              continue;
+
+            auto rn = zfindroot(par, n);
+            if (rn == rp) // Already the root
+              continue;
+
+            // Merging with a PASS component => so PASS (no need to merge)
+            if (status(rn) == ufstatus::PASS)
+            {
+              st = ufstatus::PASS;
+              continue;
+            }
+
+            auto new_root  = viz.on_union(p, rp, n, rn);
+            par(rp)        = new_root;
+            par(rn)        = new_root;
+            rp             = new_root;
+          }
+
+          status(p) = static_cast<ufstatus>((bool)(st) || (bool)(viz.test(p)));
+        }
+      }
+
+      // The root status always pass
+      status(S.front()) = ufstatus::PASS;
+
+      // Backward pass
+      {
+        mln_entering("Union-find Backward pass");
+        for (auto p : S)
+        {
+          auto q = par(p);
+          auto r = par(q);
+          par(p) = r;
+          viz.on_finish(p, r);
+        }
+      }
+    }
+
+    template <class I>
+    [[gnu::noinline]] void union_find_init_par(I par) noexcept
+    {
+      mln_foreach(auto px, par.pixels())
+        px.val() = px.point();
+    }
+
+  } // namespace impl
+
+
+
+  template <class I, class N, class UFViz, class Compare>
+  void union_find(I input, N nbh, UFViz viz, Compare cmp)
+  {
+    mln_entering("mln::morpho::canvas::union_find");
+
+    using mln::morpho::canvas::detail::ufstatus;
+    auto S = sort_points(input, cmp);
+
+    using P  = image_point_t<I>;
+    using St = image_ch_value_t<I, ufstatus>;
+
+    // Status image
+    auto bm     = mln::extension::bm::fill(ufstatus::NONE);
+    auto status = bm.create_temporary_image<St>(nbh, input.domain());
+
+    // Parent image
+    image_ch_value_t<I, P> par = imchvalue<P>(input);
+
+    impl::union_find(par, status, nbh, viz, S);
+  }
+
+} // namespace mln::morpho::canvas

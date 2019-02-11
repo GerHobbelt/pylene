@@ -1,9 +1,9 @@
-#ifndef MLN_ACCU_ACCUMULATOTS_MEAN_HPP
-#define MLN_ACCU_ACCUMULATOTS_MEAN_HPP
+#pragma once
 
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/accu/composite_accumulator.hpp>
+
 
 namespace mln
 {
@@ -69,7 +69,7 @@ namespace mln
       {
         typedef boost::mpl::set<sum<SumType>, count<>> type;
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -79,7 +79,7 @@ namespace mln
       {
         return extract(exact(acc), features::mean<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -102,8 +102,6 @@ namespace mln
             return static_cast<SumType>(extractor::sum(accu) / extractor::count(accu));
         }
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATOTS_MEAN_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

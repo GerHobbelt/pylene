@@ -1,11 +1,8 @@
-#ifndef MLN_COLORS_RGBA_HPP
-#define MLN_COLORS_RGBA_HPP
+#pragma once
 
 #include <mln/core/colors.hpp>
-#include <mln/core/image/morphers/transformed_image.hpp>
-#include <mln/core/ops.hpp>
-#include <mln/core/value/int.hpp>
 #include <mln/core/vec_base.hpp>
+
 
 namespace mln
 {
@@ -15,7 +12,7 @@ namespace mln
     struct rgba_tag
     {
     };
-  }
+  } // namespace colors
 
   namespace internal
   {
@@ -29,22 +26,14 @@ namespace mln
       static const bool is_less_than_comparable = false;
       static const bool is_equality_comparable  = true;
     };
-  }
+  } // namespace internal
 
   namespace colors
   {
     template <typename T>
     using rgba = internal::vec_base<T, 4, rgba_tag>;
 
-    typedef rgba<uint8>  rgba8;
-    typedef rgba<uint16> rgba16;
-  }
-}
-
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(red, (mln::colors::rgba8), (mln::getter<0>))
-
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(green, (mln::colors::rgba8), (mln::getter<1>))
-
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(blue, (mln::colors::rgba8), (mln::getter<2>))
-
-#endif // ! MLN_COLORS_RGBA_HPP
+    typedef rgba<std::uint8_t>  rgba8;
+    typedef rgba<std::uint16_t> rgba16;
+  } // namespace colors
+} // namespace mln

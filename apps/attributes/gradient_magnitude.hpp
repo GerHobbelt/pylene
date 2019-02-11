@@ -1,11 +1,12 @@
-#ifndef APPS_ATTRIBUTE_GRADIENT_MAGNITUDE_HPP
-#define APPS_ATTRIBUTE_GRADIENT_MAGNITUDE_HPP
+#pragma once
 
 #include <apps/tos/croutines.hpp>
+
 #include <mln/accu/accumulators/mean.hpp>
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/math_ops.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
 
 namespace mln
 {
@@ -17,7 +18,7 @@ namespace mln
     mln_entering("mln::compute_gradient_magnitude");
 
     image2d<float> grad;
-    resize(grad, f).init(1.0);
+    resize(grad, f).set_init_value(1.0);
 
     box2d  dom = f.domain();
     sbox2d d2f = {dom.pmin - point2d{2, 2}, dom.pmax, point2d{2, 2}};
@@ -36,6 +37,4 @@ namespace mln
     mln_exiting();
     return res;
   }
-}
-
-#endif // ! APPS_ATTRIBUTE_GRADIENT_MAGNITUDE_HPP
+} // namespace mln

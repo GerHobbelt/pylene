@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATOR_BASE_HPP
-#define MLN_ACCU_ACCUMULATOR_BASE_HPP
+#pragma once
 
 #include <mln/accu/accumulator.hpp>
 
@@ -41,7 +40,5 @@ namespace mln
 
       result_type to_result() const { return extract(mln::exact(*this), feature()); }
     };
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATOR_BASE_HPP
+  } // namespace accu
+} // namespace mln

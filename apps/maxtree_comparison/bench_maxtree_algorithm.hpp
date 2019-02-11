@@ -1,25 +1,27 @@
-#ifndef BENCH_MAXTREE_ALGORITHM_HPP
-#define BENCH_MAXTREE_ALGORITHM_HPP
+#pragma once
 
 #define MLN_MAXBIT 32
-
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/core/value/int.hpp>
-#include <mln/io/imread.hpp>
 
 #include "maxtree_hqueue_parallel.hpp"
 #include "maxtree_najman.hpp"
 #include "maxtree_pqueue_parallel.hpp"
 #include "maxtree_ufind_parallel.hpp"
 #include "maxtree_ufindrank_parallel.hpp"
+
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/value/int.hpp>
+#include <mln/io/imprint.hpp>
+#include <mln/io/imread.hpp>
+
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/program_options.hpp>
-#include <mln/io/imprint.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <random>
+
 
 #define NTEST 3
 
@@ -54,11 +56,12 @@ void bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, in
   mln::image2d<size_type>                     parent;
   std::vector<size_type>                      S;
 
-  auto t0 = tick_count::now();
+  auto t0 = std::chrono::steady_clock::now();
   for (int i = 0; i < ntest; ++i)
     std::tie(parent, S) = algo(ima, mln::c4, std::less<V>());
-  auto t1 = tick_count::now();
-  std::cout << "Run in:\t" << (t1 - t0).seconds() / ntest << std::endl;
+  auto t1 = std::chrono::steady_clock::now();
+  std::cout << "Run in:\t" << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() / ntest << " ms"
+            << std::endl;
 }
 
 template <typename V>
@@ -161,5 +164,3 @@ void run_test(int argc, char** argv, Algorithm algo)
     bench_algo(ima, vm["nthread"].as<int>(), algo, vm["ntest"].as<int>());
   }
 }
-
-#endif // ! BENCH_MAXTREE_ALGORITHM_HPP

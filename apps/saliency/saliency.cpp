@@ -1,21 +1,20 @@
+#include "saliency.hpp"
+#include "extinction.hpp"
+
+#include <apps/attributes/MSERArgparser.hpp>
+#include <apps/attributes/meaningfullnessArgparser.hpp>
+#include <apps/tos/addborder.hpp>
+
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include <mln/core/algorithm/transform.hpp>
-
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-#include <apps/tos/addborder.hpp>
-
-#include <apps/attributes/MSERArgparser.hpp>
-#include <apps/attributes/meaningfullnessArgparser.hpp>
-
-#include "extinction.hpp"
-#include "saliency.hpp"
 #include <boost/program_options.hpp>
+
 
 void usage(char** argv)
 {

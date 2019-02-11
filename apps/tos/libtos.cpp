@@ -21,4 +21,4 @@ namespace mln
     //    const c4_t& nbh,
     //    const std::less< UInt<9> >& cmp);
   }
-}
+} // namespace mln

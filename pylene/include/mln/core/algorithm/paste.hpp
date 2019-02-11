@@ -1,6 +1,11 @@
 #pragma once
-#include <mln/core/concept/image.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/canvas/parallel_pointwise.hpp>
+#include <mln/core/algorithm/copy.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/rows.hpp>
+
+#include <mln/core/trace.hpp>
 
 namespace mln
 {
@@ -27,67 +32,128 @@ namespace mln
   /// \pre `output.domain()` includes `input.domain()`
   /// \tparam InputImage is a model of the Forward Image.
   /// \tparam OutputImage is a model of the Writable Point-Accessible Image
-  template <typename InputImage, typename OutputImage>
-  [[deprecated]] OutputImage& paste(const Image<InputImage>& input, Image<OutputImage>& output);
+  template <class InputImage, class OutputImage>
+  void paste(InputImage src, OutputImage dest);
 
-  /// \ingroup Algorithms
-  /// \overload
-  template <typename InputImage, typename OutputImage>
-  [[deprecated]] OutputImage&& paste(const Image<InputImage>& input, Image<OutputImage>&& output);
-
-  namespace experimental
-  {
-    template <class InputImage, class OutputImage>
-    void copy(InputImage src, OutputImage dest);
-  }
+  template <class InputImage, class InputRange, class OutputImage>
+  void paste(InputImage src, InputRange roi, OutputImage dest);
 
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
+  namespace details
+  {
+    template <class I, class D = image_domain_t<I>, class = void>
+    struct is_image_clippable : std::false_type
+    {
+    };
+
+    template <class I, class D>
+    struct is_image_clippable<I, D, std::void_t<decltype(std::declval<I>().clip(std::declval<D>()))>> : std::true_type
+    {
+    };
+
+    template <class I, class D>
+    inline constexpr bool is_image_clippable_v = is_image_clippable<I, D>::value;
+  }
+
   namespace impl
   {
-    template <typename I, typename J>
-    void paste(const I& ima, J& out)
+    // Like paste but allows access to the extension
+    template <class InputImage, class InputRange, class OutputImage>
+    void paste_unsafe(InputImage src, InputRange roi, OutputImage dest)
     {
-      mln_pixter(px, ima);
-      mln_forall (px)
-        out(px->point()) = px->val();
+      mln_foreach(auto p, roi)
+        dest.at(p) = src.at(p);
     }
   }
 
-  template <typename InputImage, typename OutputImage>
-  OutputImage& paste(const Image<InputImage>& input, Image<OutputImage>& output_)
 
+  template <class InputImage, class InputRange, class OutputImage>
+  void paste(InputImage src, InputRange roi, OutputImage dest)
   {
-    impl::paste(exact(input), exact(output_));
-    return exact(output_);
-  }
+    mln_entering("mln::paste");
+    // FIXME: Add a precondition about the domain inclusion
+    // FIXME: check OutputImage is accessible
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<OutputImage, mln::details::Image>());
+    static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
-  template <typename InputImage, typename OutputImage>
-  OutputImage&& paste(const Image<InputImage>& input_, Image<OutputImage>&& output_)
-  {
-    paste(input_, output_);
-    return move_exact(output_);
-  }
-
-  namespace experimental
-  {
-    template <class InputImage, class OutputImage>
-    void paste(InputImage src, OutputImage dest)
+    if constexpr (details::is_image_clippable_v<InputImage, InputRange> && details::is_image_clippable_v<OutputImage, InputRange>)
     {
-      // FIXME: Add a precondition about the domain inclusion
-      // FIXME: cech OutputImage is accessible
-      static_assert(mln::is_a<InputImage, Image>());
-      static_assert(mln::is_a<OutputImage, Image>());
-      static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+      mln::copy(src.clip(roi), dest.clip(roi));
+    }
+    else
+    {
+      mln_foreach(auto p, roi)
+        dest(p) = src(p);
+    }
+  }
 
-      auto&& pixels = src.new_pixels();
+  template <class InputImage, class OutputImage>
+  void paste(InputImage src, OutputImage dest)
+  {
+    mln_entering("mln::paste");
+    // FIXME: Add a precondition about the domain inclusion
+    // FIXME: check OutputImage is accessible
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<OutputImage, mln::details::Image>());
+    static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+    using InputRange = image_domain_t<InputImage>;
+
+    if constexpr (details::is_image_clippable_v<OutputImage, InputRange>)
+    {
+      mln::copy(src, dest.clip(src.domain()));
+    }
+    else
+    {
+      auto&& pixels = src.pixels();
       for (auto row : ranges::rows(pixels))
         for (auto px : row)
           dest(px.point()) = px.val();
     }
+  }
 
-  } // namespace experimental
+  namespace parallel
+  {
+    namespace details
+    {
+      template <class InputImage, class OutputImage>
+      class PasteParallel : public ParallelCanvas2d
+      {
+        InputImage  _in;
+        OutputImage _out;
+
+        static_assert(mln::is_a<InputImage, mln::details::Image>());
+        static_assert(mln::is_a<OutputImage, mln::details::Image>());
+        static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+        void ExecuteTile(mln::box2d b) const final
+        {
+          auto subimage_in  = _in.clip(b);
+          auto subimage_out = _out.clip(b);
+          mln::paste(subimage_in, subimage_out);
+        }
+
+        mln::box2d GetDomain() const final { return _in.domain(); }
+
+      public:
+        PasteParallel(InputImage input, OutputImage output)
+          : _in{input}
+          , _out{output}
+        {
+        }
+      };
+    } // namespace details
+
+    template <class InputImage, class OutputImage>
+    void paste(InputImage src, OutputImage dest)
+    {
+      details::PasteParallel caller(src, dest);
+      parallel_execute2d(caller);
+    }
+  } // namespace parallel
 
 } // namespace mln

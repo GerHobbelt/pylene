@@ -1,21 +1,22 @@
+#include "brush.hpp"
+
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/topology.hpp>
 
 #include <mln/colors/literal.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/data/stretch.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <mln/data/stretch.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/maxtree/maxtree.hpp>
+#include <mln/qt/imageviewer.hpp>
 
-#include "brush.hpp"
 #include <QApplication>
 #include <QtGui>
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/topology.hpp>
-#include <mln/qt/imageviewer.hpp>
+
 
 using namespace mln;
 

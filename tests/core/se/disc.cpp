@@ -1,57 +1,64 @@
-#include <mln/core/image/image2d.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
 
-#include <boost/format.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
+
 #include <gtest/gtest.h>
 
 void naive_dilate(mln::image2d<bool>& f, const mln::se::periodic_line2d& se)
 {
   mln::image2d<bool> g;
-  mln::resize(g, f).init(false);
+  mln::resize(g, f).set_init_value(false);
 
-  mln_pixter(px, f);
-  mln_pixter(pxout, g);
-  mln_iter(nxout, se(pxout));
 
-  mln_forall (px, pxout)
-    if (px->val())
-    {
-      mln_forall (nxout)
-        if (f.domain().has(nxout->point()))
-          nxout->val() = true;
-    }
+  mln_foreach ((auto [pxIn, pxOut]), mln::ranges::view::zip(f.pixels(), g.pixels()))
+    if (pxIn.val())
+      for (auto nxOut : se(pxOut))
+        if (f.domain().has(nxOut.point()))
+          nxOut.val() = true;
+
   f = std::move(g);
 }
 
 
 mln::image2d<bool> draw_ball_by_decomposition(float radius, int extent, int& computed_extent)
 {
-  mln::image2d<bool> f(mln::box2d{{(short)(-extent), (short)(-extent)}, {(short)(extent + 1), (short)(extent + 1)}}, 3,
-                       false);
+  mln::box2d domain({-extent, -extent}, {extent + 1, extent + 1});
 
-  mln::se::disc ball(radius, 8);
-  auto          ses = ball.decompose();
+  mln::image_build_params params;
+  params.init_value = false;
+  params.border     = 3;
 
-  f.at(0, 0) = true;
+  mln::image2d<bool> f(domain, params);
+
+
+  auto ball = mln::se::disc(radius, mln::se::disc::approx::PERIODIC_LINES_8);
+  auto ses  = ball.decompose();
+
+  f({0, 0}) = true;
 
   for (auto line : ses)
     naive_dilate(f, line);
 
   int k = 0;
   for (int i = -extent; i <= extent; ++i)
-    k += f.at(0, i);
+    k += f({i, 0});
   computed_extent = k;
 
   return f;
 }
 
+
 float compute_disc_error(const mln::image2d<bool>& f, float radius)
 {
-  int nerror = 0;
-  mln_pixter(px, f);
+  int  nerror = 0;
+  auto sqr    = [](auto x) { return x * x; };
+
   mln_foreach (auto px, f.pixels())
   {
-    bool ref = l2norm(px.point()) <= radius;
+    bool ref = sqr(px.point().x()) + sqr(px.point().y()) <= sqr(radius);
     nerror += (ref != px.val());
   }
   return nerror / radius;
@@ -91,7 +98,7 @@ TEST(Disc, decomposition_8_check_extent)
 {
   for (int r = 1; r < 200; ++r)
   {
-    auto c      = mln::se::disc::_compute_decomposition_coeff(r, 8);
+    auto c      = mln::se::details::disc_compute_decomposition_coeff(r);
     int  extent = c[0] + 2 * c[1] + 6 * c[2];
     ASSERT_EQ(r, extent);
   }
@@ -101,7 +108,7 @@ TEST(Disc, decomposition_8_check_close_to_best_coef)
 {
   for (int r = 1; r < 200; ++r)
   {
-    auto k = mln::se::disc::_compute_decomposition_coeff(r, 8);
+    auto k = mln::se::details::disc_compute_decomposition_coeff(r);
     ASSERT_NEAR(best_decomposition_coeff[r - 1][0], k[0], 2);
     ASSERT_NEAR(best_decomposition_coeff[r - 1][1], k[1], 3);
     ASSERT_NEAR(best_decomposition_coeff[r - 1][2], k[2], 1);
@@ -123,6 +130,17 @@ TEST(Disc, decomposition_8_errors_does_not_degenerate)
 
 TEST(Disc, euclidean_disc_is_not_decomposable)
 {
-  mln::se::disc d(5, 0);
-  ASSERT_FALSE(d.decomposable());
+  mln::se::disc d(5, mln::se::disc::approx::EXACT);
+  EXPECT_FALSE(d.is_decomposable());
+  EXPECT_ANY_THROW(d.decompose());
 }
+
+TEST(Disc, approx_disc_is_decomposable)
+{
+  mln::se::disc d(5);
+  EXPECT_TRUE(d.is_decomposable());
+  EXPECT_NO_THROW(d.decompose());
+}
+
+static_assert(mln::concepts::DecomposableStructuringElement<mln::se::disc, mln::point2d>);
+#

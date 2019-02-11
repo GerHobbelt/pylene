@@ -1,7 +1,7 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#pragma once
 
 #include <apps/tos/topology.hpp>
+
 
 namespace mln
 {
@@ -45,6 +45,4 @@ namespace mln
 
     return std::make_tuple(std::move(K), std::move(parent), std::move(S));
   }
-}
-
-#endif // ! UTILS_HPP
+} // namespace mln

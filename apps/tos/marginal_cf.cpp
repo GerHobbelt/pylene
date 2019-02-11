@@ -1,16 +1,19 @@
+#include "addborder.hpp"
+#include "topology.hpp"
+
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include "addborder.hpp"
-#include "topology.hpp"
-#include <boost/format.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
 #include <stack>
+
 
 namespace mln
 {
@@ -111,7 +114,7 @@ namespace mln
 
     return out;
   }
-}
+} // namespace mln
 
 void usage(int argc, char** argv)
 {

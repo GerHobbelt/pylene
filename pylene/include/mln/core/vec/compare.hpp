@@ -1,8 +1,9 @@
-#ifndef MLN_CORE_VEC_COMPARE_HPP
-#define MLN_CORE_VEC_COMPARE_HPP
+#pragma once
 
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/vec_base.hpp>
+#include <algorithm>
+
 
 namespace mln
 {
@@ -46,10 +47,10 @@ namespace mln
   template <typename U, typename V>
   struct productorder_less_equal;
 
-  template <typename U, typename V = U>
+  template <typename U, typename V>
   struct productorder_greater;
 
-  template <typename U, typename V = U>
+  template <typename U, typename V>
   struct productorder_greater_equal;
 
 #if 0 // Facade only
@@ -222,6 +223,17 @@ namespace mln
     return veclex_islessequal(v, u);
   }
 
+
+  template <typename U, typename V, unsigned dim, typename tag>
+  struct lexicographicalorder_less<internal::vec_base<U, dim, tag>, internal::vec_base<V, dim, tag>>
+  {
+    bool operator()(const internal::vec_base<U, dim, tag>& u, const internal::vec_base<V, dim, tag>& v) const
+    {
+      return veclex_isless(u, v);
+    }
+  };
+
+
   template <typename U, typename V, unsigned dim, typename tag>
   bool vecprod_isless(const internal::vec_base<U, dim, tag>& u, const internal::vec_base<V, dim, tag>& v)
   {
@@ -235,12 +247,6 @@ namespace mln
     return res;
   }
 
-  template <typename U, typename V>
-  typename std::enable_if<std::is_arithmetic<U>::value and std::is_arithmetic<V>::value, bool>::type
-      vecprod_isless(const U& u, const V& v)
-  {
-    return u < v;
-  }
 
   template <typename U, typename V, unsigned dim, typename tag>
   bool vecprod_islessequal(const internal::vec_base<U, dim, tag>& u, const internal::vec_base<V, dim, tag>& v)
@@ -251,12 +257,6 @@ namespace mln
     return true;
   }
 
-  template <typename U, typename V>
-  typename std::enable_if<std::is_arithmetic<U>::value and std::is_arithmetic<V>::value, bool>::type
-      vecprod_islessequal(const U& u, const V& v)
-  {
-    return u <= v;
-  }
 
   template <typename U, typename V, unsigned dim, typename tag>
   bool vecprod_isgreater(const internal::vec_base<U, dim, tag>& u, const internal::vec_base<V, dim, tag>& v)
@@ -270,32 +270,6 @@ namespace mln
     return vecprod_islessequal(v, u);
   }
 
-  template <typename U, typename V>
-  struct lexicographicalorder_less
-  {
-    bool operator()(const U& u, const V& v) const { return u < v; }
-  };
-
-  template <typename U, typename V, unsigned dim, typename tag>
-  struct lexicographicalorder_less<internal::vec_base<U, dim, tag>, internal::vec_base<V, dim, tag>>
-  {
-    bool operator()(const internal::vec_base<U, dim, tag>& u, const internal::vec_base<V, dim, tag>& v) const
-    {
-      return veclex_isless(u, v);
-    }
-  };
-
-  template <typename U, typename V>
-  struct productorder_less
-  {
-    bool operator()(const U& u, const V& v) const { return vecprod_isless(u, v); }
-  };
-
-  template <typename U, typename V>
-  struct productorder_less_equal
-  {
-    bool operator()(const U& u, const U& v) const { return vecprod_islessequal(u, v); }
-  };
 
   template <typename U, typename V, unsigned dim, typename tag>
   struct productorder_greater<internal::vec_base<U, dim, tag>, internal::vec_base<V, dim, tag>>
@@ -314,6 +288,4 @@ namespace mln
       return vecprod_isgreaterequal(u, v);
     }
   };
-}
-
-#endif // ! MLN_CORE_VEC_COMPARE_HPP
+} // namespace mln

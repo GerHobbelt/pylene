@@ -1,9 +1,10 @@
-#ifndef COLORTOSGRAD_HPP
-#define COLORTOSGRAD_HPP
+#pragma once
 
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
+
 #include <vector>
+
 
 namespace mln
 {
@@ -42,6 +43,4 @@ namespace mln
   /// \param[out] S
   void colorToSGrad_with_mintree(const image2d<rgb8>& ima, image2d<unsigned>& K, image2d<unsigned>& parent,
                                  std::vector<unsigned>& S);
-}
-
-#endif // ! COLORTOSGRAD_HPP
+} // namespace mln

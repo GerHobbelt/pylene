@@ -1,5 +1,4 @@
-#ifndef ACCUMULATOR_HPP
-#define ACCUMULATOR_HPP
+#pragma once
 
 #include <mln/accu/composite_accumulator.hpp>
 #include <mln/accu/concept/accumulator.hpp>
@@ -110,8 +109,12 @@ namespace mln
       typedef typename accu_of<AccuLike, T>::type accu_type;
 
     public:
-      typedef typename std::result_of<Extractor(accu_type)>::type type;
+      typedef typename std::invoke_result<Extractor, accu_type>::type type;
     };
+
+    template <class A, class T, class E = default_extractor>
+    using result_of_t = typename result_of<A, T, E>::type;
+
     /// \}
 
     /*********************/
@@ -135,9 +138,7 @@ namespace mln
     {
       return exact(fs).template make<T>();
     }
-  }
-}
+  } // namespace accu
+} // namespace mln
 
-  /// \}
-
-#endif // ! ACCUMULATOR_HPP
+/// \}

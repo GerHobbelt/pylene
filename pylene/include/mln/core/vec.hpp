@@ -1,12 +1,13 @@
-#ifndef MLN_CORE_VEC_HPP
-#define MLN_CORE_VEC_HPP
+#pragma once
 
 #include <mln/core/value/value_traits.hpp>
-#include <mln/core/vec/compare.hpp>
-#include <mln/core/vec/vec_io.hpp>
-#include <mln/core/vec/vec_math_ops.hpp>
-#include <mln/core/vec/vec_ops.hpp>
+
 #include <mln/core/vec_base.hpp>
+#include <mln/core/vec/compare.hpp>
+#include <mln/core/vec/vec_maths_ops.hpp>
+#include <mln/core/vec/vec_ops.hpp>
+
+
 
 namespace mln
 {
@@ -38,6 +39,4 @@ namespace mln
   typedef vec<double, 1>         vec1d;
   typedef vec<double, 2>         vec2d;
   typedef vec<double, 3>         vec3d;
-}
-
-#endif // ! MLN_CORE_VEC_HPP
+} // namespace mln

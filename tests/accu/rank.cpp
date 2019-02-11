@@ -1,5 +1,5 @@
 #include <mln/accu/accumulators/h_rank.hpp>
-#include <mln/core/value/int.hpp>
+
 #include <ratio>
 
 #include <gtest/gtest.h>
@@ -7,12 +7,11 @@
 TEST(Accu, Rank)
 {
   using namespace mln::accu;
-  using mln::uint8;
 
   typedef std::ratio<1, 2> R;
 
   {
-    accumulators::h_rank<uint8, R> acc;
+    accumulators::h_rank<uint8_t, R> acc;
     acc.take(0);
     acc.take(1);
     acc.take(2);
@@ -21,7 +20,7 @@ TEST(Accu, Rank)
   }
 
   {
-    accumulators::h_rank<uint8, R> acc;
+    accumulators::h_rank<uint8_t, R> acc;
     acc.take(2);
     acc.take(1);
     acc.take(0);
@@ -30,7 +29,7 @@ TEST(Accu, Rank)
   }
 
   {
-    accumulators::h_rank<uint8, R> acc;
+    accumulators::h_rank<uint8_t, R> acc;
     acc.take(2);
     acc.take(1);
     acc.take(1);
@@ -40,7 +39,7 @@ TEST(Accu, Rank)
   }
 
   {
-    accumulators::h_rank<uint8, R> acc;
+    accumulators::h_rank<uint8_t, R> acc;
     acc.take(2);
     acc.take(1);
     acc.take(1);
@@ -50,7 +49,7 @@ TEST(Accu, Rank)
   }
 
   {
-    accumulators::h_rank<uint8, R> acc;
+    accumulators::h_rank<uint8_t, R> acc;
     acc.take(2);
     acc.take(1);
     acc.take(1);
@@ -62,7 +61,7 @@ TEST(Accu, Rank)
   }
 
   {
-    accumulators::h_rank<uint8, R> acc;
+    accumulators::h_rank<uint8_t, R> acc;
     acc.take(1);
     acc.take(2);
     acc.take(3);

@@ -1,8 +1,9 @@
 Periodic Line
 =============
 
-.. doxygenstruct:: mln::se::periodic_line2d
+.. doxygenclass:: mln::se::periodic_line2d
    :members:
+
 
 
 .. rubric:: Performance

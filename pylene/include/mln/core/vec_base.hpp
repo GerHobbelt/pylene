@@ -1,22 +1,15 @@
-#ifndef MLN_CORE_VEC_HPP
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#warning "This should not be included directly. Include <mln/core/vec.hpp> instead."
-#elif defined(_MSC_VER)
-#pragma message("This should not be included directly. Include <mln/core/vec.hpp> instead.")
-#endif
-#include <mln/core/vec.hpp>
-#endif
+#pragma once
 
-#ifndef MLN_INTERNAL_VEC_BASE_HH
-#define MLN_INTERNAL_VEC_BASE_HH
-
-#include <boost/type_traits/promote.hpp>
-#include <boost/utility.hpp>
-#include <iostream>
 #include <mln/core/assert.hpp>
 #include <mln/core/config.hpp>
 #include <mln/core/literal/vectorial.hpp>
+
+#include <boost/type_traits/promote.hpp>
+#include <boost/utility.hpp>
+
+#include <iostream>
 #include <type_traits>
+
 
 // FIXME:
 // replace boost::common_type by c++11 decltype for type broadcasting
@@ -198,7 +191,8 @@ namespace mln
 
       vec_base() = default;
 
-      vec_base(const vec_base&) = default;
+      // Defaulted
+      // vec_base(const vec_base&) = default;
 
       template <class OtherTag>
       explicit vec_base(const vec_base<T, dim, OtherTag>& other)
@@ -227,14 +221,17 @@ namespace mln
 
       template <typename dummy = void>
       constexpr vec_base(const T& x, const T& y, typename std::enable_if<dim == 2, dummy>::type* = NULL)
-        : v_{x, y}
       {
+        v_[0] = x;
+        v_[1] = y;
       }
 
       template <typename dummy = void>
       constexpr vec_base(const T& x, const T& y, const T& z, typename std::enable_if<dim == 3, dummy>::type* = NULL)
-        : v_{x, y, z}
       {
+        v_[0] = x;
+        v_[1] = y;
+        v_[2] = z;
       }
 
       template <typename U>
@@ -448,7 +445,7 @@ namespace mln
         return x;
       }
 
-      T v_[dim];
+      T v_[dim] = {};
     };
 
     VEC_BASE_GEN_EW_OP_EXT(is_additive, +)
@@ -540,6 +537,4 @@ namespace boost
 
 #ifdef _MSC_VER
 #pragma warning(default : 4701)
-#endif
-
 #endif

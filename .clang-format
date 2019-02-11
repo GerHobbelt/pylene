@@ -25,8 +25,7 @@ BraceWrapping:
 NamespaceIndentation: All
 FixNamespaceComments: true
 
-IndentWrappedFunctionNames: true
-# AllowShortFunctionsOnASingleLine: None
+IndentWrappedFunctionNames: false # Do not indent after function def break
 AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakTemplateDeclarations: true
 AlignAfterOpenBracket: Align

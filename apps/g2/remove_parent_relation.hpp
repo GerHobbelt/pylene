@@ -1,9 +1,10 @@
-#ifndef REMOVE_PARENT_RELATION_HPP
-#define REMOVE_PARENT_RELATION_HPP
+#pragma once
 
 #include "types.hpp"
+
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/property_map/vector_property_map.hpp>
+
 
 namespace mln
 {
@@ -155,6 +156,4 @@ namespace mln
       }
     }
   }
-}
-
-#endif // ! REMOVE_PARENT_RELATION_HPP
+} // namespace mln

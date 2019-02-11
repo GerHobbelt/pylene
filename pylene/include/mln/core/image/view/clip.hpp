@@ -1,30 +1,39 @@
 #pragma once
 
+#include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/filter.hpp>
+#include <mln/core/range/view/remove_if.hpp>
+#include <mln/core/range/view/transform.hpp>
+
+#include <range/v3/algorithm/set_algorithm.hpp>
+#include <range/v3/range/primitives.hpp>
 
 #include <type_traits>
-
 
 namespace mln
 {
 
   template <class I, class D>
-  class clip_view : public image_adaptor<I>, public experimental::Image<clip_view<I, D>>
+  class clip_view : public image_adaptor<I>, public mln::details::Image<clip_view<I, D>>
   {
-    D m_domain;
+    D m_subdomain;
+
+    template <class I2, class D2>
+    friend class clip_view;
 
   public:
     /// Type definitions
     /// \{
-    using typename clip_view::image_adaptor::new_pixel_type;
+    using typename clip_view::image_adaptor::pixel_type;
     using typename clip_view::image_adaptor::point_type;
     using typename clip_view::image_adaptor::reference;
     using typename clip_view::image_adaptor::value_type;
     using domain_type = D;
+    /// \}
 
-    static_assert(std::is_convertible_v<::ranges::range_value_t<D>, point_type>,
+    static_assert(std::is_convertible_v<mln::ranges::mdrange_value_t<D>, point_type>,
                   "Domain value type must be convertible to image point type.");
     /// \}
 
@@ -45,47 +54,37 @@ namespace mln
     /// \}
 
   public:
-    clip_view(I ima, D domain)
+    clip_view(I ima, D subdomain)
       : clip_view::image_adaptor{std::move(ima)}
-      , m_domain{std::move(domain)}
+      , m_subdomain{std::move(subdomain)}
     {
-      // FIXME: possibly assert that domain is included in ima.domain()
+      // mln_precondition(::ranges::includes(m_ima.domain(), m_subdomain)); //FIXME
     }
 
     template <class I2, class D2>
-    clip_view(const clip_view<I2, D2>& other, mln::init)
-      : clip_view::image_adaptor{static_cast<I>(other.base().template ch_value<value_type>())}
-      , m_domain{other.m_domain}
+    clip_view(const clip_view<I2, D2>& other, const image_build_params& params)
+      : clip_view::image_adaptor{imchvalue<value_type>(other.base()).set_params(params).build()}
+      , m_subdomain{other.m_subdomain}
     {
     }
 
-    template <class I2, class D2>
-    clip_view(const clip_view<I2, D2>& other, const value_type& v)
-      : clip_view::image_adaptor{static_cast<I>((other.base().template ch_value<value_type>()).init(v))}
-      , m_domain{other.m_domain}
-    {
-    }
-
-    internal::initializer<concrete_type, clip_view> concretize() const { return {*this}; }
+    image_builder<concrete_type, clip_view> concretize() const { return {*this}; }
 
     template <class U>
-    internal::initializer<ch_value_type<U>, clip_view> ch_value() const
-    {
-      return {*this};
-    }
+    image_builder<ch_value_type<U>, clip_view> ch_value() const { return {*this}; }
 
-    const D& domain() const { return this->m_domain; }
+    domain_type domain() const { return m_subdomain; }
 
-    auto new_values()
+    auto values()
     {
       auto g = [this](point_type p) -> reference { return this->base().at(p); };
-      return mln::ranges::view::transform(this->m_domain, g);
+      return mln::ranges::view::transform(m_subdomain, g);
     }
 
-    auto new_pixels()
+    auto pixels()
     {
-      auto g = [this](point_type p) -> new_pixel_type { return this->base().new_pixel_at(p); };
-      return mln::ranges::view::transform(this->m_domain, g);
+      auto g = [this](point_type p) -> pixel_type { return this->base().pixel_at(p); };
+      return mln::ranges::view::transform(m_subdomain, g);
     }
 
 
@@ -104,7 +103,7 @@ namespace mln
     template <typename Ret = reference>
     std::enable_if_t<accessible::value, Ret> operator()(point_type p)
     {
-      mln_precondition(m_domain.has(p));
+      mln_precondition(domain().has(p));
       mln_precondition(this->base().domain().has(p));
       return this->base()(p);
     }
@@ -113,17 +112,17 @@ namespace mln
     {
       return this->base().at(p);
     }
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
-      mln_precondition(m_domain.has(p));
+      mln_precondition(domain().has(p));
       mln_precondition(this->base().domain().has(p));
-      return this->base().new_pixel(p);
+      return this->base().pixel(p);
     }
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return this->base().new_pixel_at(p);
+      return this->base().pixel_at(p);
     }
     /// \}
 
@@ -133,8 +132,6 @@ namespace mln
     template <typename dummy = I>
     std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> index_of_point(point_type p) const
     {
-      mln_precondition(m_domain.has(p));
-      mln_precondition(this->base().domain().has(p));
       return this->base().index_of_point(p);
     }
 
@@ -177,9 +174,9 @@ namespace mln
 
     // Used if the previous substition has failed
     template <class I, class D>
-    clip_view<I, D> clip(const experimental::Image<I>& ima, D domain)
+    clip_view<I, D> clip(const mln::details::Image<I>& ima, D domain)
     {
-      return {static_cast<const I&>(ima), std::forward<D>(domain)};
+      return {static_cast<const I&>(ima), domain};
     }
 
   } // namespace view

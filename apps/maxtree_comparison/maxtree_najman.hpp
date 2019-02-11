@@ -1,12 +1,13 @@
-#ifndef MAXTREE_NAJMAN_HPP
-#define MAXTREE_NAJMAN_HPP
+#pragma once
 
 #include "canonize.hpp"
+
 #include <mln/core/algorithm/sort_indexes.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/sub_image.hpp>
 #include <mln/core/wrt_offset.hpp>
+
 
 namespace mln
 {
@@ -52,7 +53,7 @@ namespace mln
         aux[p].zpar = q;
         return q;
       }
-    }
+    } // namespace internal
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
@@ -65,11 +66,11 @@ namespace mln
       image2d<internal::aux_data<size_type>> ttree;
       image2d<internal::aux_data<size_type>> tnode;
 
-      resize(parent, ima).init(UNINITIALIZED);
+      resize(parent, ima).set_init_value(UNINITIALIZED);
       resize(lowestNode, ima);
       internal::aux_data<size_type> x = {0, 0};
-      resize(ttree, ima).init(x);
-      resize(tnode, ima).init(x);
+      resize(ttree, ima).set_init_value(x);
+      resize(tnode, ima).set_init_value(x);
 
       /* coucou */
 
@@ -129,7 +130,5 @@ namespace mln
       canonize(ima, S, parent);
       return std::make_pair(std::move(parent), std::move(S));
     }
-  }
-}
-
-#endif // ! MAXTREE_NAJMAN_HPP
+  } // namespace morpho
+} // namespace mln

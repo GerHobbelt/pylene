@@ -1,6 +1,8 @@
 #include <mln/contrib/meanshift/meanshift.hpp>
+
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+#include <mln/core/colors.hpp>
 
 int main(int argc, const char** argv)
 {
@@ -10,15 +12,15 @@ int main(int argc, const char** argv)
     std::exit(1);
   }
 
-  using namespace mln;
 
-  image2d<rgb8> f;
 
-  io::imread(argv[1], f);
+  mln::image2d<mln::rgb8> f;
 
-  float         hs  = std::atof(argv[2]);
-  float         hr  = std::atof(argv[3]);
-  image2d<rgb8> out = contrib::meanshift(f, hs, hr);
+  mln::io::imread(argv[1], f);
 
-  io::imsave(out, argv[4]);
+  float hs  = std::atof(argv[2]);
+  float hr  = std::atof(argv[3]);
+  auto  out = mln::contrib::meanshift(f, hs, hr);
+
+  mln::io::imsave(out, argv[4]);
 }

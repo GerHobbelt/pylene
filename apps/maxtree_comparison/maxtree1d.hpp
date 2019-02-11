@@ -1,8 +1,8 @@
-#ifndef MAXTREE1D_HPP
-#define MAXTREE1D_HPP
+#pragma once
 
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 
 namespace mln
 {
@@ -72,11 +72,5 @@ namespace mln
         --sz;
       }
     }
-  }
-}
-
-#ifndef MLN_INCLUDE_ONLY
-
-#endif // ! MLN_INCLUDE_ONLY
-
-#endif // ! MAXTREE1D_HPP
+  } // namespace morpho
+} // namespace mln

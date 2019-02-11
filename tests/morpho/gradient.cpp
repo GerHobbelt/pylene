@@ -1,92 +1,173 @@
+#include <mln/morpho/gradient.hpp>
+
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/grays.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
+#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/image/ndimage.hpp>
+#include <mln/core/image/view/operators.hpp>
+#include <mln/core/image/view/filter.hpp>
 #include <mln/core/se/rect2d.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-#include <mln/morpho/structural/gradient.hpp>
+#include <mln/core/colors.hpp>
+
+#include <functional>
 
 #include <fixtures/ImagePath/image_path.hpp>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
+
+#include <mln/io/imread.hpp>
 #include <gtest/gtest.h>
 
 
 using namespace mln;
 
-TEST(Morpho, gradient_gradient_0)
+TEST(Morpho, gradient_binary)
 {
-  image2d<uint8> ima(10, 10);
-  iota(ima, 10);
+  mln::image2d<bool> ima = {{0, 0, 0, 0, 1, 0, 0},  //
+                                          {0, 0, 0, 0, 1, 0, 0},  //
+                                          {0, 1, 1, 1, 1, 1, 0},  //
+                                          {0, 1, 1, 1, 1, 1, 1},  //
+                                          {0, 1, 1, 1, 1, 1, 0}}; //
 
-  { // Fast: border wide enough
-    mln::se::rect2d win(3, 1);
-    auto            out = morpho::structural::gradient(ima, win);
-
-    static_assert(std::is_same<decltype(out)::value_type, int>::value, "Error integral promotion should give int.");
-    ASSERT_TRUE(all(lor(out == 1, out == 2)));
-  }
-}
-
-TEST(Morpho, gradient_gradient_1)
-{
-  image2d<uint8> ima;
-  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
-
-  { // Fast: border wide enough
-    mln::se::rect2d win(7, 7);
-    auto            out = morpho::structural::gradient(ima, win);
-  }
-}
-
-// Border is not wide enough => call dilate + erode
-TEST(Morpho, gradient_gradient_2)
-{
-  image2d<uint8> ima(0);
-  image2d<uint8> ima2;
-  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
-  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima2);
 
   mln::se::rect2d win(3, 3);
-  auto            out1 = morpho::structural::gradient(ima, win);
-  auto            out2 = morpho::structural::gradient(ima2, win);
-  ASSERT_TRUE(all(out1 == out2));
+
+
+  {
+    mln::image2d<bool> ref = {{0, 0, 0, 1, 1, 1, 0},  //
+                                            {1, 1, 1, 1, 1, 1, 1},  //
+                                            {1, 1, 1, 1, 1, 1, 1},  //
+                                            {1, 1, 0, 0, 0, 1, 1},  //
+                                            {1, 1, 0, 0, 0, 1, 1}}; //
+
+    auto out = mln::morpho::gradient(ima, win);
+    ASSERT_IMAGES_EQ_EXP(out, ref);
+  }
+
+  {
+    mln::image2d<bool> ref = {{0, 0, 0, 1, 0, 1, 0},  //
+                                            {1, 1, 1, 1, 0, 1, 1},  //
+                                            {1, 0, 0, 0, 0, 0, 1},  //
+                                            {1, 0, 0, 0, 0, 0, 0},  //
+                                            {1, 0, 0, 0, 0, 0, 1}}; //
+
+
+    auto out = mln::morpho::external_gradient(ima, win);
+    ASSERT_IMAGES_EQ_EXP(out, ref);
+  }
+
+  {
+  mln::image2d<bool> ref = {{0, 0, 0, 0, 1, 0, 0},  //
+                                          {0, 0, 0, 0, 1, 0, 0},  //
+                                          {0, 1, 1, 1, 1, 1, 0},  //
+                                          {0, 1, 0, 0, 0, 1, 1},  //
+                                          {0, 1, 0, 0, 0, 1, 0}}; //
+
+
+    auto out = mln::morpho::internal_gradient(ima, win);
+    ASSERT_IMAGES_EQ_EXP(out, ref);
+  }
+
 }
 
-// Dilation on a with a vmorph / binary case
-TEST(Morpho, gradient_gradient_3)
+TEST(Morpho, gradient_grayscale)
 {
-  image2d<uint8> ima;
-  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  mln::image2d<uint8_t> ima = {{0, 0, 0, 0, 9, 0, 0},  //
+                                             {0, 0, 0, 0, 9, 0, 0},  //
+                                             {0, 9, 9, 9, 9, 9, 0},  //
+                                             {0, 9, 9, 9, 9, 9, 9},  //
+                                             {0, 9, 9, 9, 9, 9, 0}}; //
+
+
+  mln::se::rect2d win(3, 3);
+
+
+  {
+    mln::image2d<uint8_t> ref = {{0, 0, 0, 9, 9, 9, 0},  //
+                                               {9, 9, 9, 9, 9, 9, 9},  //
+                                               {9, 9, 9, 9, 9, 9, 9},  //
+                                               {9, 9, 0, 0, 0, 9, 9},  //
+                                               {9, 9, 0, 0, 0, 9, 9}}; //
+
+    auto out = mln::morpho::gradient(ima, win);
+    ASSERT_IMAGES_EQ_EXP(out, ref);
+  }
+
+  {
+    mln::image2d<uint8_t> ref = {{0, 0, 0, 9, 0, 9, 0},  //
+                                               {9, 9, 9, 9, 0, 9, 9},  //
+                                               {9, 0, 0, 0, 0, 0, 9},  //
+                                               {9, 0, 0, 0, 0, 0, 0},  //
+                                               {9, 0, 0, 0, 0, 0, 9}}; //
+
+
+    auto out = mln::morpho::external_gradient(ima, win);
+    ASSERT_IMAGES_EQ_EXP(out, ref);
+  }
+
+  {
+    mln::image2d<uint8_t> ref = {{0, 0, 0, 0, 9, 0, 0},  //
+                                               {0, 0, 0, 0, 9, 0, 0},  //
+                                               {0, 9, 9, 9, 9, 9, 0},  //
+                                               {0, 9, 0, 0, 0, 9, 9},  //
+                                               {0, 9, 0, 0, 0, 9, 0}}; //
+
+
+    auto out = mln::morpho::internal_gradient(ima, win);
+    ASSERT_IMAGES_EQ_EXP(out, ref);
+  }
+}
+
+
+// This test is disabled because of a lifetime problem on the filter view (the domain lifetime depends on the image which might be a temporary).
+TEST(Morpho, DISABLED_gradient_on_view)
+{
+  using namespace mln::view::ops;
+  mln::image2d<uint8_t> ima(10, 5);
+  mln::iota(ima, 0);
+
 
   // Morpher has no extension
   mln::se::rect2d win(3, 3);
-  auto            out = morpho::structural::gradient(ima > 128, win);
+
+  constexpr uint8_t _X = 0;
+  mln::image2d<uint8_t> ref = {{_X, _X, _X, _X, _X, _X, _X, _X, _X, _X},
+                                             {_X, _X, _X, _X, _X, _X, _X, _X, _X, _X},
+                                             {_X, _X, _X, _X, _X, _X, 11, 12, 12, 11},
+                                             {11, 12, 12, 12, 12, 20, 21, 22, 22, 21},
+                                             {11, 12, 12, 12, 12, 12, 12, 12, 12, 11}};
+
+  auto gt_than = [](uint8_t x) { return std::bind(std::greater<uint8_t>(), std::placeholders::_1, x); };
+
+  auto tmp = mln::view::filter(ima, gt_than(25));
+  auto out = mln::morpho::gradient(tmp, win);
+
+  // Does not compile because domain differs
+  //ASSERT_IMAGES_EQ_EXP(mln::view::filter(ref, gt_than(0)), out);
+
+  mln::image_build_params init_params;
+  init_params.init_value = _X;
+  mln::image2d<uint8_t> out2(10, 5, init_params);
+
+  //mln::paste(out, out2);
+  ASSERT_IMAGES_EQ_EXP(out2, ref);
 }
 
-// Dilation on a with a vmorph / binary case
-TEST(Morpho, gradient_gradient_4)
-{
-  image2d<uint8> ima;
-  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
-
-  mln::se::rect2d win(3, 3);
-  image2d<uint8>  out;
-  resize(out, ima).init(0);
-  auto tmp = out | where(ima > 128);
-  morpho::structural::gradient(ima | where(ima > 128), win, std::less<uint8>(), functional::l2norm_t<uint8>(), tmp);
-}
 
 // On colors
-TEST(Morpho, gradient_gradient_5)
+TEST(Morpho, gradient_color)
 {
-  image2d<rgb8> ima;
-  image2d<rgb8> ima2(0);
-  io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
-  io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima2);
+  using namespace mln::view::ops;
+
+  mln::image2d<mln::rgb8> ima;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
 
   mln::se::rect2d win(3, 3);
-  auto            out1 = morpho::structural::gradient(ima, win);
-  auto            out2 = morpho::structural::gradient(ima2, win);
-  ASSERT_TRUE(all(out1 == out2));
+  auto grad1 = mln::morpho::gradient(ima, win);
+  auto grad2 = mln::morpho::internal_gradient(ima, win);
+  auto grad3 = mln::morpho::external_gradient(ima, win);
+
+  ASSERT_TRUE(mln::all_of(grad2 <= grad1));
+  ASSERT_TRUE(mln::all_of(grad3 <= grad1));
 }
+

@@ -6,26 +6,24 @@ Include :file:`<mln/core/algorithm/sort.hpp>`
 .. cpp:namespace:: mln
 
 #. .. cpp:function:: void sort_points(InputImage ima, OutputRange&& rng)
-#. .. cpp:function:: void sort_points(InputImage ima, OutputRange&& rng, Compare cmp)
-#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_points(InputImage ima, OutputRange&& rng)
-#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_points(InputImage ima, OutputRange&& rng, Compare cmp)
+                     void sort_points(InputImage ima, OutputRange&& rng, Compare cmp)
+#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_points(InputImage ima)
+                     std::vector<image_point_t<InputImage>> sort_points(InputImage ima, Compare cmp)
 #. .. cpp:function:: void sort_indexes(InputImage ima, OutputRange&& rng)
-#. .. cpp:function:: void sort_indexes(InputImage ima, OutputRange&& rng, Compare cmp)
-#. .. cpp:function:: std::vector<image_point_t<InputImage>> \  
-                     sort_indexes(InputImage ima, OutputRange&& rng)
-#. .. cpp:function:: std::vector<image_point_t<InputImage>> \  
-                    sort_indexes(InputImage ima, OutputRange&& rng, Compare cmp)
+                     void sort_indexes(InputImage ima, OutputRange&& rng, Compare cmp)
+#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_indexes(InputImage ima)
+                     std::vector<image_point_t<InputImage>> sort_indexes(InputImage ima, Compare cmp)
 
 
-    Sort the points (versions 1-4) or the indexes (versions 5-8) of an image w.r.t their values.
+    Sort the points (versions 1-2) or the indexes (versions 3-4) of an image w.r.t their values.
 
     :param ima: The source image
-    :param rng: (versions 1,2,5,6) The destination range where points or indexes are going to be stored.
-    :param cmp: (versions 2,4,6,8) The comparison function between values
+    :param rng: (versions 1,3) The destination range where points or indexes are going to be stored.
+    :param cmp: (optional) The comparison function between values
     :tparam InputImage: A model of :cpp:concept:`InputImage`
     :tparam OutputRange: A model of :cpp:concept:`OutputRange`
     :tparam Compare: A model of :cpp:concept:`Compare`  
-    :return: (versions 3,4,7,8) A `std::vector` with the points or the indexes sorted. 
+    :return: (versions 2-4) A `std::vector` with the points or the indexes sorted. 
 
     
 

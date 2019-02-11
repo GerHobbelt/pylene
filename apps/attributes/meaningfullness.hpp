@@ -1,16 +1,16 @@
-#ifndef APPS_ATTRIBUTES_MEANINGFULLNESS_HPP
-#define MUMFORD_SHAH_HPP
+#pragma once
 
+#include <apps/tos/topology.hpp>
+
+#include <mln/core/colors.hpp>
 #include <mln/core/extension/fill.hpp>
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/vec/vec_functional_ops.hpp>
 #include <mln/core/wrt_offset.hpp>
 
-#include <apps/tos/topology.hpp>
-#include <mln/core/colors.hpp>
-#include <mln/core/math_ops.hpp>
-#include <mln/core/vec/vec_math_ops.hpp>
 
 namespace mln
 {
@@ -322,7 +322,7 @@ namespace mln
       return v[0];
     }
 
-  } // end of namespace internal
+  } // namespace internal
 
   template <typename V>
   auto norm(const V& v) -> typename std::enable_if<std::is_scalar<V>::value, decltype(std::abs(v))>::type
@@ -711,6 +711,4 @@ namespace mln
 
     return imerode;
   }
-}
-
-#endif // ! MUMFORD_SHAH_HPP
+} // namespace mln

@@ -23,12 +23,12 @@
 // exception does not however invalidate any other reasons why the
 // executable file might be covered by the GNU General Public License.
 
-#ifndef INDEX_HPP
-#define INDEX_HPP
+#pragma once
 
 #include <mln/core/value/value_traits.hpp>
 
 #include <functional>
+
 
 namespace mln
 {
@@ -243,6 +243,4 @@ namespace mln
     : value_traits<Index<T, std::greater<T>>, std::less<Index<T, std::greater<T>>>, void>
   {
   };
-}
-
-#endif // ! INDEX_HPP
+} // namespace mln

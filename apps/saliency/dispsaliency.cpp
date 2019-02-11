@@ -1,9 +1,11 @@
+#include "dispsaliency.hpp"
+
 #include <apps/tos/addborder.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
-
-#include "dispsaliency.hpp"
 #include <mln/io/imsave.hpp>
+
 
 int main(int argc, char** argv)
 {

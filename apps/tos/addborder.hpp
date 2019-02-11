@@ -1,9 +1,10 @@
-#ifndef ADDBORDER_HPP
-#define ADDBORDER_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
+
 #include <vector>
+
 
 namespace mln
 {
@@ -24,7 +25,7 @@ namespace mln
       box2d box = ima.domain();
       box.pmin += 1;
       box.pmax += 1;
-      copy(ima, out | box);
+      mln::copy(ima, out | box);
     }
 
     V        median;
@@ -73,22 +74,29 @@ namespace mln
 
   // Add a border with the median computed marginally on each channel.
   template <class V>
-  image2d<V> addborder_marginal(const image2d<V>& ima)
+  typename std::enable_if<not std::is_scalar<V>::value, image2d<V>>::type addborder_marginal(const image2d<V>& ima)
   {
     // const I& ima = exact(ima_);
     image2d<V> out(ima.nrows() + 2, ima.ncols() + 2);
 
     for (unsigned i = 0; i < value_traits<V>::ndim; ++i)
-      copy(addborder(eval(channel(ima, i))), channel(out, i));
+      mln::copy(addborder(eval(channel(ima, i))), channel(out, i));
 
     return out;
   }
+
+
+  template <class V>
+  typename std::enable_if<std::is_scalar<V>::value, image2d<V>>::type addborder_marginal(const image2d<V>& ima)
+  {
+    return addborder(ima);
+  }
+
 
   template <class V, class M, class Compare = std::less<V>>
   std::pair<image2d<V>, image2d<bool>> addborder2(const image2d<V>& ima, const Image<M>& mask_,
                                                   const Compare& cmp = Compare())
   {
-
     const M&      mask = exact(mask_);
     image2d<V>    out(ima.nrows() + 2, ima.ncols() + 2);
     image2d<bool> omask(ima.nrows() + 2, ima.ncols() + 2);
@@ -125,6 +133,4 @@ namespace mln
 
     return std::make_pair(out, omask);
   }
-}
-
-#endif // ! ADDBORDER_HPP
+} // namespace mln

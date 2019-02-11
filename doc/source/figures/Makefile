@@ -8,7 +8,10 @@ all: $(SVGFILES)
 	latexmk -cd -c $<
 
 %.svg: %.pdf
-	pdf2svg $< $@
+	if [ $$(pdfinfo $< | grep Pages | cut -d ':' -f 2) -eq 1 ]; then \
+		pdf2svg $< $@ all; \
+	else pdf2svg $< $*'-%d.svg' all; fi
+	touch $@
 
 
 

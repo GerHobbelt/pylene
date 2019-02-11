@@ -1,11 +1,12 @@
-#ifndef APPS_TOS_ROUTINES_HPP
-#define APPS_TOS_ROUTINES_HPP
+#pragma once
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
+
 #include <vector>
+
 
 /// \file
 /// \brief Common routines used with ToS.
@@ -317,5 +318,3 @@ std::vector<unsigned> get_real_nodes(const mln::image2d<V>& K, const mln::image2
 
   return R;
 }
-
-#endif // !APPS_TOS_ROUTINES_HPP

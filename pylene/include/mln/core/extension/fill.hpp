@@ -1,47 +1,45 @@
-#ifndef MLN_CORE_EXTENSION_FILL_HPP
-#define MLN_CORE_EXTENSION_FILL_HPP
+#pragma once
 
-#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/image/image.hpp>
 
-namespace mln
+
+namespace mln::extension
 {
-  namespace extension
+  template <class InputImage>
+  void fill(const InputImage& f, image_value_t<InputImage> v);
+
+  template <class InputImage>
+  bool try_fill(const InputImage& f, image_value_t<InputImage> v);
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
+  template <typename InputImage>
+  void fill(const InputImage& ima, image_value_t<InputImage> v)
   {
+    static_assert(mln::is_a<InputImage, mln::details::Image>::value);
+    static_assert(image_has_extension_v<InputImage>, "Image must have an extension.");
+    static_assert(image_extension_t<InputImage>::support_fill::value, "Image extension must support filling.");
 
-    template <typename I>
-    const I& fill(const Image<I>& ima, mln_value(I) v);
+    ima.extension().fill(v);
+  }
 
-    template <typename I>
-    I&& fill(Image<I>&& ima, mln_value(I) v);
+  template <class InputImage>
+  bool try_fill(const InputImage& f, image_value_t<InputImage> v)
+  {
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
 
-    /******************************************/
-    /****          Implementation          ****/
-    /******************************************/
+    using I = std::remove_reference_t<InputImage>;
+    if constexpr (image_has_extension_v<I>)
+      if constexpr (image_extension_t<I>::support_fill::value)
+      {
+        f.extension().fill(v);
+        return true;
+      }
+    return false;
+  }
 
-    template <typename I>
-    const I& fill(const Image<I>& ima, mln_value(I) v)
-    {
-      static_assert(image_has_extension<I>::value, "Image must have an extension.");
-      static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
-                    "Image extension must support filling.");
 
-      exact(ima).extension().fill(v);
-      return exact(ima);
-    }
-
-    template <typename I>
-    I&& fill(Image<I>&& ima, mln_value(I) v)
-    {
-      static_assert(image_has_extension<I>::value, "Image must have an extension.");
-      static_assert(extension_traits<typename image_extension_type<I>::type>::support_fill::value,
-                    "Image extension must support filling.");
-
-      exact(ima).extension().fill(v);
-      return move_exact(ima);
-    }
-
-  } // end of namespace mln::extension
-} // end of namespace mln
-
-#endif // ! MLN_CORE_EXTENSION_FILL_HPP
+} // namespace mln::extension

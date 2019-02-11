@@ -1,12 +1,15 @@
-#ifndef APPS_ATTRIBUTES_MSERARGPARSER_HPP
-#define APPS_ATTRIBUTES_MSERARGPARSER_HPP
+#pragma once
 
 #include "MSER.hpp"
 #include "argparser.hpp"
+
 #include <apps/tos/topology.hpp>
+
 #include <boost/program_options/errors.hpp>
 #include <boost/program_options/variables_map.hpp>
+
 #include <string>
+
 
 class MSERArgParser : public AttributeArgParser
 {
@@ -66,5 +69,3 @@ mln::image2d<float> MSERArgParser::run(const boost::program_options::variables_m
   });
   return eval(attr);
 }
-
-#endif // ! APPS_ATTRIBUTES_MSERARGPARSER_HPP

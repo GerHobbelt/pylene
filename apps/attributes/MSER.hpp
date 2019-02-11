@@ -1,5 +1,4 @@
-#ifndef APPS_ATTRIBUTES_MSER_HPP
-#define APPS_ATTRIBUTES_MSER_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
@@ -135,5 +134,3 @@ mln::image2d<float> compute_MSER_attribute(const mln::image2d<V>& f, const mln::
   mln_exiting();
   return mser;
 }
-
-#endif // ! APPS_ATTRIBUTES_MSER_HPP

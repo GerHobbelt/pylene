@@ -1,6 +1,8 @@
 #include "plotwindow.hpp"
+
 #include <QGridLayout>
 #include <QMenuBar>
+
 
 PlotWindow::PlotWindow()
 {

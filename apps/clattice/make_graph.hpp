@@ -1,5 +1,4 @@
-#ifndef MAKE_GRAPH_HPP
-#define MAKE_GRAPH_HPP
+#pragma once
 
 #define BOOST_UBLAS_TYPE_CHECK 0
 
@@ -7,7 +6,9 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
+
 #include <utility>
+
 
 namespace mln
 {
@@ -72,6 +73,4 @@ namespace mln
 
     return std::make_pair(C, R);
   }
-}
-
-#endif // ! MAKE_GRAPH_HPP
+} // namespace mln

@@ -1,5 +1,7 @@
-#ifndef MAXTREE_UFIND_PARALLEL_HPP
-#define MAXTREE_UFIND_PARALLEL_HPP
+#pragma once
+
+#include "canonize.hpp"
+#include "merge_tree.hpp"
 
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/sort_indexes.hpp>
@@ -7,16 +9,14 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/sub_image.hpp>
 #include <mln/core/wrt_offset.hpp>
-
-#include "canonize.hpp"
-#include "merge_tree.hpp"
-#include <alloca.h>
 #include <mln/io/imprint.hpp>
 
+#include <tbb/mutex.h>
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_reduce.h>
 
-#include <tbb/mutex.h>
+#include <alloca.h>
+
 
 namespace mln
 {
@@ -51,7 +51,7 @@ namespace mln
           m_S         = new std::vector<size_type>(n);
 
           resize(m_parent, ima);
-          resize(m_zpar, ima).init(UNINITIALIZED);
+          resize(m_zpar, ima).set_init_value(UNINITIALIZED);
           m_nsplit = 0;
         }
 
@@ -87,7 +87,7 @@ namespace mln
 
           image2d<bool> deja_vu;
           if (use_dejavu)
-            resize(deja_vu, ima).init(false);
+            resize(deja_vu, ima).set_init_value(false);
 
           size_type first_index = ima.index_of_point(ima.domain().pmin);
           size_type last_index  = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
@@ -315,7 +315,7 @@ namespace mln
           canonize(ima, parent, &S[0]);
           return std::make_pair(std::move(parent), std::move(S));
         }
-      }
+      } // namespace parallel
 
       namespace serial
       {
@@ -344,8 +344,8 @@ namespace mln
           canonize(ima, S, algo.m_parent);
           return std::make_pair(std::move(algo.m_parent), std::move(S));
         }
-      }
-    }
+      } // namespace serial
+    }   // namespace impl
 
     // template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
     // image2d<point2d>
@@ -362,7 +362,5 @@ namespace mln
 
     //   return algo.m_parent;
     // }
-  }
-}
-
-#endif // !MLN_MORPHO_MAXTREE_UFIND_PARALLEL_HPP
+  } // namespace morpho
+} // namespace mln

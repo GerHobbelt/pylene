@@ -1,8 +1,11 @@
-#ifndef MLN_CONTRIB_MEANSHIFT_MEANSHIFT_HPP
-#define MLN_CONTRIB_MEANSHIFT_MEANSHIFT_HPP
+#pragma once
 
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/win2d.hpp>
+#include <mln/core/image/ndimage.hpp>
+#include <mln/core/se/rect2d.hpp>
+#include <mln/core/range/foreach.hpp>
+
+#include <mln/core/value/value_traits.hpp>
+#include <mln/core/vec.hpp>
 
 namespace mln
 {
@@ -10,11 +13,11 @@ namespace mln
   {
 
     template <class V>
-    image2d<V> meanshift(const image2d<V>& f, float hs, float hr)
+    mln::image2d<V> meanshift(const mln::image2d<V>& f, float hs, float hr)
     {
       int    SR    = 5;   // Spatial window radius
       int    NITER = 30;  // Maximal number of iteration
-      float  eps   = 0.1; //
+      float  eps   = 0.1f; //
       double hs2   = hs * hs;
       double hr2   = hr * hr;
       double eps2  = eps * eps;
@@ -22,20 +25,16 @@ namespace mln
       typedef vec<double, value_traits<V>::ndim> value_t;
       typedef vec<double, 2>                     site_t;
 
-      image2d<V> out;
+      mln::image2d<V> out;
       resize(out, f);
 
-      rect2d win = make_rectangle2d(2 * SR + 1, 2 * SR + 1);
-
-      point2d x;
-      mln_iter(p__, f.domain());
-      mln_iter(q__, win(x));
+      mln::se::rect2d win(2 * SR + 1, 2 * SR + 1);
 
       auto g = [](double x) -> double { return std::exp(-x); };
-      mln_foreach (point2d p, p__)
+      mln_foreach (auto p, f.domain())
       {
-        site_t  py = p.as_vec();
-        value_t vy = f(p).as_vec();
+        site_t   py = {static_cast<double>(p.x()), static_cast<double>(p.y())};
+        value_t  vy = f(p).as_vec();
 
         bool stop = false;
         for (int i = 0; i <= NITER and (not stop); ++i)
@@ -43,15 +42,16 @@ namespace mln
           site_t  s1 = literal::zero;
           value_t s2 = literal::zero;
           double  s3 = 0;
-          x          = (point2d)py;
-          mln_foreach (point2d q, q__)
+
+          for (auto q : win(p))
           {
             if (f.domain().has(q))
             {
-              double d0 = l2norm_sqr(py - q.as_vec()) / hs2;
+              site_t vq = {static_cast<double>(q.x()), static_cast<double>(q.y())};
+              double d0 = l2norm_sqr(py - vq) / hs2;
               double d1 = l2norm_sqr(vy - f(q).as_vec()) / hr2;
               double d  = g(d0 + d1);
-              s1 += d * q.as_vec();
+              s1 += d * vq.as_vec();
               s2 += d * f(q).as_vec();
               s3 += d;
             }
@@ -76,8 +76,6 @@ namespace mln
       return out;
     }
 
-  } // end of namespace mln::contrib
+  } // namespace contrib
 
-} // end of namespace mln
-
-#endif //! MLN_CONTRIB_MEANSHIFT_MEANSHIFT_HPP
+} // namespace mln

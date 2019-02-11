@@ -1,14 +1,15 @@
-#ifndef APPS_ATTRIBUTES_MEANINGFULLNESSARGPARSER_HPP
-#define APPS_ATTRIBUTES_MEANINGFULLNESSARGPARSER_HPP
-
-#include <boost/program_options/errors.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <string>
-
-#include <apps/tos/topology.hpp>
+#pragma once
 
 #include "argparser.hpp"
 #include "meaningfullness.hpp"
+
+#include <apps/tos/topology.hpp>
+
+#include <boost/program_options/errors.hpp>
+#include <boost/program_options/variables_map.hpp>
+
+#include <string>
+
 
 class MeaningFullNessArgParser : public AttributeArgParser
 {
@@ -45,5 +46,3 @@ mln::image2d<float> MeaningFullNessArgParser::run(const boost::program_options::
   std::cout << "eps: " << eps << std::endl;
   return meaningfullness(f, K, parent, S, alpha, a0, a1, eps);
 }
-
-#endif // ! APPS_ATTRIBUTES_MEANINGFULLNESSARGPARSER_HPP

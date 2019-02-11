@@ -1,11 +1,12 @@
 #include <apps/tos/Kinterpolate.hpp>
+
+#include <mln/accu/accumulators/accu_as_it.hpp>
+#include <mln/accu/accumulators/variance.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 
-#include <mln/accu/accumulators/accu_as_it.hpp>
-#include <mln/accu/accumulators/variance.hpp>
 
 int main(int argc, char** argv)
 {

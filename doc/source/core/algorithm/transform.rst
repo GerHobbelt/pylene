@@ -5,9 +5,9 @@ Include :file:`<mln/core/algorithm/transform.hpp>`
 
 .. cpp:namespace:: mln
 
-#. .. cpp:function:: void transform(InputImage in, OutputImage out, UnaryFunction f)
+#. .. cpp:function:: void transform(InputImage in, OutputImage out, std::UnaryFunction f)
 
-#. .. cpp:function:: image_ch_value_t<InputImage, R> transform(InputImage in, UnaryFunction f)
+#. .. cpp:function:: image_ch_value_t<InputImage, R> transform(InputImage in, std::UnaryFunction f)
 
 
     1) Applies the function `f` to every value of `in` and stores the result in `out`.
@@ -17,6 +17,8 @@ Include :file:`<mln/core/algorithm/transform.hpp>`
 
         for (auto&& [vin, vout] : ranges::zip(in.values(), out.values())
             vout = f(vin);
+
+    This function has a parallel implementation, see following section for an example.
 
     :param in: The input image.
     :param out: The output image.
@@ -46,6 +48,10 @@ Examples
 
     mln::image2d<uint8_t> out = mln::transform(ima, &V::first);
   
+#. Using parallel transform to add one to the values of an image::
+
+    mln::image2d<uint8_t> ima = { {1, 2, 3}, {4, 5, 6} };
+    auto out = mln::parallel::transform(ima, [](uint8_t x) -> uint8_t { return x + 1; });
  
 Complexity
 ----------

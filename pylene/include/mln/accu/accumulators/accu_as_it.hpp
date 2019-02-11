@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATORS_ACCU_AS_IT_HPP
-#define MLN_ACCU_ACCUMULATORS_ACCU_AS_IT_HPP
+#pragma once
 
 #include <mln/accu/accumulator_base.hpp>
 
@@ -49,8 +48,6 @@ namespace mln
       private:
         Accu m_accu;
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATORS_ACCU_AS_IT_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

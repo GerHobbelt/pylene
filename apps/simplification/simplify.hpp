@@ -1,14 +1,16 @@
-#ifndef SIMPLIFY_HPP
-#define SIMPLIFY_HPP
+#pragma once
+
+#include <apps/tos/topology.hpp>
+
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/se/rect2d.hpp>
+#include <mln/core/win2d.hpp>
 
 #include <set>
 #include <vector>
 
-#include <apps/tos/topology.hpp>
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/extension/fill.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/win2d.hpp>
 
 namespace mln
 {
@@ -116,7 +118,7 @@ namespace mln
       }
       return x;
     }
-  }
+  } // namespace internal
 
   template <typename T>
   image2d<unsigned> compute_depth(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S)
@@ -158,7 +160,7 @@ namespace mln
     }
 
     // Nbh
-    rect2d win = make_rectangle2d(2 * eps + 1, 2 * eps + 1);
+    auto win = mln::se::rect2d{2 * eps + 1, 2 * eps + 1};
 
     for (int i = S.size() - 1; i > 0; --i)
     {
@@ -354,7 +356,7 @@ namespace mln
         return (parent[x] == ROOT or K[x] != K[parent[x]]) ? x : parent[x];
       };
 
-      auto se = make_rectangle2d(2 * eps + 1, 2 * eps + 1);
+      auto se = mln::se::rect2d{2 * eps + 1, 2 * eps + 1};
 
       mln_iter(p_, K.domain());
       mln_iter(n_, se(p_));
@@ -578,6 +580,4 @@ namespace mln
 
     return out;
   }
-}
-
-#endif // ! SIMPLIFY_HPP
+} // namespace mln

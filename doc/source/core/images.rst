@@ -6,15 +6,11 @@ Images defined by a vector of point -> value are not accessible (ima(p))
 
 Forsee to add pdim (point) and vdim (value) for dimension constant in iamge concept
 
-.. toctree::
-   :hidden:
-
-   view/transform
-
 
 .. contents::
    :local:
 
+.. cpp:namespace:: mln
 
 Description & Design Overview
 =============================
@@ -172,34 +168,42 @@ Two methods enable to create a new image `g` from a prototype `f`. The second al
 Because the syntax of a call to a template method is quite cumbersome, free functions can be used::
 
     I f = ...;
-    mln::concrete_t<I>            g1 = mln::concretize(f);
-    mln::ch_value_t<I, OtherType> g2 = mln::ch_value<OtherType>(f);
+    mln::concrete_t<I>            g1 = mln::imconcretize(f);
+    mln::ch_value_t<I, OtherType> g2 = mln::imchvalue<OtherType>(f);
 
-.. warning:: The type returned by `concretize` et al. are not images but *image initializers* that support advanced
-    parameterization of the initialization.  So you should not use ``auto`` type deduction for variables.
+.. warning:: The type returned by `concretize` et al. are not images but *image builders* that support advanced
+    parameterization of the initialization.  So you should not use ``auto`` type deduction for variables (or by calling explicitly ``build()`` - see below)::
+ 
+        I f = ...;
+        auto g1 = mln::imconcretize(f).build();
+        auto g2 = mln::imchvalue<OtherType>(f).build();   
 
 
-.. rubric:: Advanced initialization
+.. rubric:: Advanced initialization with image builders
 
-*image initializers* follow the `Named parameter Idiom
+*image builders* (see :doc:`image_builder`) follow the `Named parameter Idiom
 <https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter>`_ and provides additional init parameters. Note that
-it may fail to fulfill the requirements, so a status code may be queried to check if everything succeeded.
+it may fail to fulfill the requirements, so a status code may be queried to check if everything succeeded. 
 
 
 
-+------------------------+---------------------------------------------------------------------------------------------+
-| ``init(v)``            | Requires the image to be set to `v`                                                         |
-+------------------------+---------------------------------------------------------------------------------------------+
-| ``adjust(nbh)``        | Requires the extension of the image to be wide enough to hold the :ref:`neighborhood` `nbh` |
-+------------------------+---------------------------------------------------------------------------------------------+
-| ``get_status(status)`` | Get the status code                                                                         |
-+------------------------+---------------------------------------------------------------------------------------------+
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``set_init_value(v)``   | Requires the image to be set to `v`                                                                      |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``set_border(k)``       | Requires the image to have border of size `k`.                                                           |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``adjust(se)``          | Requires the extension of the image to be wide enough to hold the :cpp:concept:`StructuringElement` `se` |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``get_status(&status)`` | Get the status code                                                                                      |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``build()``             | Build and return the new image.                                                                          |
++-------------------------+----------------------------------------------------------------------------------------------------------+
 
 Example::
 
     I f = ...;
-    int st_code = 0;
-    mln::concrete_t<I> g1 = mln::concretize(f).adjust(mln::c4).get_status(st_code);
+    mln::image_build_error_code st_code;
+    mln::concrete_t<I> g1 = mln::imconcretize(f).adjust(mln::c4).get_status(&st_code);
     if (st_code == 0)
         // run with g1
     else
@@ -213,11 +217,8 @@ and deduces the initialization configuration from it.
 
 It has the form:
 
-``I(const I& other, mln::image_initializer_params_t params)``
-    Initialize from `other` but overrides init-parameters with those from `params`.
-
-
-
+``I(const I& other, mln::image_build_params params)``
+    Initializes from `other` but overrides init-parameters with those from `params`.
 
 
 
@@ -231,11 +232,14 @@ Image Concepts
 Image-related Concepts
 ^^^^^^^^^^^^^^^^^^^^^^
 
+Concepts are defined in the namespace :cpp:expr:`mln::concepts`.
+
 In the introduction, we have seen that an image *f* is function associating **points** to **values**. **Values** are
 simple :cpp:concept:`std::Regular` types. **Points** are also :cpp:concept:`std::Regular` but are also
 :cpp:concept:`StrictTotallyOrdered` because they are the basis of *domains*.
 
-.. cpp:namespace:: mln::concepts
+
+.. cpp:namespace:: mln
 .. cpp:concept:: template <typename D> Domain
 
     A *domain* is a :cpp:concept:`std::Range` of *points* which is totally ordered (this ensures a traversal order of
@@ -330,9 +334,9 @@ The figure below illustrates image properties and some of the image concept.
 Image Concept
 ^^^^^^^^^^^^^
 
-#. .. cpp:concept:: template <class I>  Image
-#. .. cpp:concept:: template <class I>  InputImage
-#. .. cpp:concept:: template <class I>  ForwardImage
+#. .. cpp:concept:: template <typename I> Image
+#. .. cpp:concept:: template <typename I> InputImage
+#. .. cpp:concept:: template <typename I> ForwardImage
 
 
     **Image** (also **ForwardImage** and **InputImage**) is the minimal concept for modeling images. It provides *read*
@@ -611,16 +615,56 @@ Indexable Image Concept
     | ``cima.delta_index(dp)``   | `index_type` |              | Get the index difference for a shift of *dp*       |
     +----------------------------+--------------+--------------+----------------------------------------------------+
 
+Image Traits
+============
+
+.. cpp:namespace:: mln
+
+.. cpp:type:: template <class I> image_concrete_t = I::concrete_type
+              template <class I, class V> image_ch_value_t = I::ch_value_type<V>
+
+              Get the concrete of an image (a type that is writable and can be resized). In the second, it requests an
+              image whose value type is `V`.
+
+.. cpp:type:: template <class I> image_value_t = I::value_type
+              template <class I> image_reference_t = I::reference
+
+              Get the type of the values of an image. *Value type* is the naked type, *reference* is the type returned
+              by the expression `ima(p)` which is generally `T&`.
+
+.. cpp:type:: template <class I> image_domain_t = I::domain_type
+              template <class I> image_point_t = I::point_type
+
+              Get the type of the domain and the type of the points (*points* being the domain values)
+
+
+.. cpp:type:: template <class I> image_index_t = I::index_type
+
+              Get the type of the index of :cpp:concept:`Indexable` images.
+
+
 
 Image Views
 ===========
 
-
+.. toctree::
+   view/cast
+   view/clip
+   view/channel
+   view/filter
+   view/mask
+   view/maths
+   view/operators
+   view/rgb
+   view/transform
+   view/zip
 
 
 Predefined images types
 =======================
 
-FIXME
+.. toctree::
+   images/ndimage
+
 
 

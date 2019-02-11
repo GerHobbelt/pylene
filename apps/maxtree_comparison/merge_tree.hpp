@@ -1,11 +1,11 @@
-#ifndef MLN_CORE_MORPHO_MERGE_TREE_HPP
-#define MLN_CORE_MORPHO_MERGE_TREE_HPP
+#pragma once
 
 #include "maxtree_routines.hpp"
 
 #include <mln/core/neighb2d.hpp>
 
 #include <thread>
+
 
 namespace mln
 {
@@ -200,7 +200,7 @@ namespace mln
     bool check_S(const image2d<size_type>& parent, const size_type* begin, const size_type* end)
     {
       image2d<bool> dejavu;
-      resize(dejavu, parent).init(false);
+      resize(dejavu, parent).set_init_value(false);
 
       dejavu[*begin] = true;
       for (; begin != end; ++begin)
@@ -212,7 +212,5 @@ namespace mln
       }
       return true;
     }
-  }
-}
-
-#endif // !MLN_CORE_MORPHO_MERGE_TREE_HPP
+  } // namespace morpho
+} // namespace mln

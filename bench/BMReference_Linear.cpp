@@ -1,36 +1,31 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/rows.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/image/ndimage.hpp>
 
-#include <vector>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/rows.hpp>
+#include <mln/core/range/view/zip.hpp>
+
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
 
 
-void Mult_Inplace(mln::image2d<mln::uint8>& img)
+void Mult_Inplace_New_Values(mln::image2d<uint8_t>& img)
 {
-  mln_foreach (auto p, img.pixels())
-  {
-    p.val() *= 2;
-  }
-}
-
-void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img)
-{
-  mln_foreach_new (auto& v, img.new_values())
+  mln_foreach (auto& v, img.values())
   {
     v *= 2;
   }
 }
 
-void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img)
+void Mult_Inplace_New_Pixels(mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto&& px, img.new_pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() *= 2;
   }
 }
 
-void Mult_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
+void Mult_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t stride)
 {
   for (int y = 0; y < height; ++y)
   {
@@ -40,17 +35,8 @@ void Mult_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff_t st
   }
 }
 
-void Mult(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
-{
-  mln_pixter(pxIn, in);
-  mln_pixter(pxOut, out);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = pxIn->val() * 2;
-  }
-}
 
-void Mult_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer, int width, int height,
+void Mult_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
             std::ptrdiff_t stride)
 {
   for (int y = 0; y < height; ++y)
@@ -63,63 +49,54 @@ void Mult_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obu
   }
 }
 
-void Mult_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Mult_New_Values(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 {
-  auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
+  auto zipped_values = mln::ranges::view::zip(in.values(), out.values());
   for (auto&& r : zipped_values.rows())
   {
-    for (auto && [ in_v, out_v ] : r)
+    for (auto&& [in_v, out_v] : r)
     {
       out_v = in_v * 2;
     }
   }
 }
 
-void Mult_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Mult_New_Pixels(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 {
-  auto zipped_pixels = mln::ranges::view::zip(in.new_pixels(), out.new_pixels());
+  auto zipped_pixels = mln::ranges::view::zip(in.pixels(), out.pixels());
   for (auto&& r : zipped_pixels.rows())
   {
-    for (auto && [ in_p, out_p ] : r)
+    for (auto&& [in_p, out_p] : r)
     {
       out_p.val() = in_p.val() * 2;
     }
   }
 }
 
-void Threshold_Inplace(mln::image2d<mln::uint8>& img)
+
+void Threshold_Inplace_New_Values(mln::image2d<uint8_t>& img)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
-  mln_foreach (auto p, img.pixels())
-  {
-    p.val() = p.val() < t ? 0 : 255;
-  }
-}
-
-void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img)
-{
-  constexpr mln::uint8 t = 128;
-
-  mln_foreach_new (auto& v, img.new_values())
+  mln_foreach (auto& v, img.values())
   {
     v = v < t ? 0 : 255;
   }
 }
 
-void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img)
+void Threshold_Inplace_New_Pixels(mln::image2d<uint8_t>& img)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
-  mln_foreach_new (auto&& px, img.new_pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() = px.val() < t ? 0 : 255;
   }
 }
 
-void Threshold_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
+void Threshold_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t stride)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   for (int y = 0; y < height; ++y)
   {
@@ -129,10 +106,10 @@ void Threshold_Inplace_C(mln::uint8* buffer, int width, int height, std::ptrdiff
   }
 }
 
-void Threshold_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer, int width, int height,
+void Threshold_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
                  std::ptrdiff_t stride)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   for (int y = 0; y < height; ++y)
   {
@@ -143,71 +120,53 @@ void Threshold_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict_
   }
 }
 
-void Threshold(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
-{
-  constexpr mln::uint8 t = 128;
-  mln_pixter(pxIn, in);
-  mln_pixter(pxOut, out);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = pxIn->val() < t ? 0 : 255;
-  }
-}
 
-void Threshold_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Threshold_New_Values(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
-  auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
+  auto zipped_values = mln::ranges::view::zip(in.values(), out.values());
   for (auto&& r : zipped_values.rows())
   {
-    for (auto && [ in_v, out_v ] : r)
+    for (auto&& [in_v, out_v] : r)
     {
       out_v = in_v < t ? 0 : 255;
     }
   }
 }
 
-void Threshold_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Threshold_New_Pixels(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
-  auto zipped_pixels = mln::ranges::view::zip(in.new_pixels(), out.new_pixels());
+  auto zipped_pixels = mln::ranges::view::zip(in.pixels(), out.pixels());
   for (auto&& r : zipped_pixels.rows())
   {
-    for (auto && [ in_p, out_p ] : r)
+    for (auto&& [in_p, out_p] : r)
     {
       out_p.val() = in_p.val() < t ? 0 : 255;
     }
   }
 }
 
-void LUT_Inplace(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
-{
-  mln_pixter(px, img);
-  mln_forall (px)
-  {
-    px->val() = LUT[px->val()];
-  }
-}
 
-void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
+void LUT_Inplace_New_Values(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto& v, img.new_values())
+  mln_foreach (auto& v, img.values())
   {
     v = LUT[v];
   }
 }
 
-void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
+void LUT_Inplace_New_Pixels(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto&& px, img.new_pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() = LUT[px.val()];
   }
 }
 
-void LUT_Inplace_C(const mln::uint8* LUT, mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
+void LUT_Inplace_C(const uint8_t* LUT, uint8_t* buffer, int width, int height, std::ptrdiff_t stride)
 {
   for (int y = 0; y < height; ++y)
   {
@@ -217,17 +176,8 @@ void LUT_Inplace_C(const mln::uint8* LUT, mln::uint8* buffer, int width, int hei
   }
 }
 
-void LUT(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
-{
-  mln_pixter(pxIn, input);
-  mln_pixter(pxOut, output);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = LUT[pxIn->val()];
-  }
-}
 
-void LUT_C(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer, int width,
+void LUT_C(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width,
            int height, std::ptrdiff_t stride)
 {
   for (int y = 0; y < height; ++y)
@@ -239,24 +189,24 @@ void LUT_C(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffer, mln::u
   }
 }
 
-void LUT_New_Values(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void LUT_New_Values(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output)
 {
-  auto zipped_values = mln::ranges::view::zip(input.new_values(), output.new_values());
+  auto zipped_values = mln::ranges::view::zip(input.values(), output.values());
   for (auto&& r : zipped_values.rows())
   {
-    for (auto && [ in_v, out_v ] : r)
+    for (auto&& [in_v, out_v] : r)
     {
       out_v = LUT[in_v];
     }
   }
 }
 
-void LUT_New_Pixels(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void LUT_New_Pixels(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output)
 {
-  auto zipped_pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
+  auto zipped_pixels = mln::ranges::view::zip(input.pixels(), output.pixels());
   for (auto&& r : zipped_pixels.rows())
   {
-    for (auto && [ in_p, out_p ] : r)
+    for (auto&& [in_p, out_p] : r)
     {
       out_p.val() = LUT[in_p.val()];
     }

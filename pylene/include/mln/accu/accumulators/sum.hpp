@@ -1,11 +1,12 @@
-#ifndef MLN_ACCU_ACCUMULATOTS_SUM_HPP
-#define MLN_ACCU_ACCUMULATOTS_SUM_HPP
+#pragma once
 
 /// \file
 /// FIXME: use literal::zero instead of default initialization
 
 #include <mln/accu/accumulator_base.hpp>
+
 #include <utility>
+
 
 namespace mln
 {
@@ -20,7 +21,7 @@ namespace mln
       /// \tparam SumType The accumulation type (by default, the type of `T + T` w.r.t C++ type promotions)
       template <typename T, typename SumType = decltype(std::declval<T>() + std::declval<T>())>
       struct sum;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -29,7 +30,7 @@ namespace mln
       /// \tparam SumType The accumulation type (`void` will use the default type).
       template <typename SumType = void>
       struct sum;
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -59,13 +60,13 @@ namespace mln
           template <typename T>
           using type = accu::accumulators::sum<T>;
         };
-      }
+      } // namespace internal
 
       template <typename SumType>
       struct sum : simple_feature_facade<sum<SumType>, internal::meta_sum<SumType>::template type>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -75,7 +76,7 @@ namespace mln
       {
         return extract(exact(acc), features::sum<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -110,8 +111,6 @@ namespace mln
       private:
         SumType m_sum;
       };
-    }
-  }
-}
-
-#endif // !MLN_ACCU_ACCUMULATOTS_SUM_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

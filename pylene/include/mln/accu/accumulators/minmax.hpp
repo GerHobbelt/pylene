@@ -1,16 +1,16 @@
-#ifndef MLN_ACCU_ACCUMULATORS_MINMAX_HPP
-#define MLN_ACCU_ACCUMULATORS_MINMAX_HPP
+#pragma once
 
 /// \file
 /// FIXME: use literal::zero instead of default initialization
 
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/core/value/value_traits.hpp>
-#include <utility>
-
 // Import min/max features
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/accu/accumulators/min.hpp>
+
+#include <utility>
+
 
 namespace mln
 {
@@ -79,7 +79,7 @@ namespace mln
           return accumulators::minmax<T>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -89,7 +89,7 @@ namespace mln
       {
         return extract(exact(acc), features::minmax<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -97,9 +97,9 @@ namespace mln
       template <typename T, typename Compare>
       struct minmax : Accumulator<minmax<T, Compare>>
       {
-        typedef T                                                                     argument_type;
-        typedef std::pair<T, T>                                                       result_type;
-        typedef boost::mpl::set<features::min<>, features::max<>, features::minmax<>> provides;
+        using argument_type = T;
+        using result_type   = std::pair<T, T>;
+        using provides      = boost::mpl::set<features::min<>, features::max<>, features::minmax<>>;
 
         minmax(const Compare& cmp = Compare())
           : m_min(value_traits<T, Compare>::max())
@@ -149,8 +149,6 @@ namespace mln
         T       m_max;
         Compare m_cmp;
       };
-    }
-  }
-}
-
-#endif // !MLN_ACCU_ACCUMULATORS_MINMAX_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

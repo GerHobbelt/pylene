@@ -1,166 +1,109 @@
-#ifndef MLN_IO_IMPRINT_HPP
-#define MLN_IO_IMPRINT_HPP
+#pragma once
 
-#include <iomanip>
-#include <iostream>
+#include <mln/core/box.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/range/foreach.hpp>
+
+#include <memory>
 #include <type_traits>
+#include <fmt/format.h>
 
-#include <mln/core/domain/box.hpp>
-#include <mln/core/grays.hpp>
-#include <mln/core/value/value_traits.hpp>
-#include <mln/io/format.hpp>
-
-#include <cmath>
-
-namespace mln
+namespace mln::io
 {
+  /// Display (as characters) an image in the output stream
+  ///
+  /// \param image The image to display
+  /// \param print_border Print the border of the image (only make senses if it has one).
+  template <class I>
+  void imprint(I&& image, bool print_border = false);
 
-  namespace io
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
+  namespace internal
   {
 
-    template <typename I>
-    void imprint(const Image<I>& ima, std::ostream& os = std::cout);
-
-    template <typename I>
-    void imprint_with_border(const Image<I>& ima, std::ostream& os = std::cout);
-
-    /******************************************/
-    /****          Implementation          ****/
-    /******************************************/
-
-    namespace internal
+    /// The class `formatter` is used to type-erase the image value type and
+    /// enabled to use ```print(p)``` where ```print(ima(p))``` is intended.
+    template <class P>
+    class formatter
     {
-
-      template <typename Image, typename Domain>
-      std::enable_if_t<image_traits<Image>::accessible> imprint(const Image& ima, Domain domain, std::ostream& os)
+    public:
+      template <class I>
+      formatter(I&& image)
       {
-        for (auto p : domain)
-        {
-          os << '{' << p << ",";
-          format(os, ima(p)) << "}," << std::endl;
-        }
+        new (&m_impl) impl_t<std::remove_reference_t<I>>(image);
       }
 
-      template <typename Image, typename Domain>
-      std::enable_if_t<std::is_convertible<typename image_traits<Image>::category, forward_image_tag>::value>
-          imprint(const Image& ima, Domain domain, std::ostream& os)
+      std::size_t formatted_size(P p) const { return reinterpret_cast<const impl_base_t*>(&m_impl)->formatted_size(p); }
+      void print(P p, int width) const { reinterpret_cast<const impl_base_t*>(&m_impl)->print(p, width); }
+
+    private:
+      struct impl_base_t
       {
-        (void)domain;
-        mln_foreach (const auto& pix, ima.pixels())
-        {
-          os << '{' << pix.point() << ",";
-          format(os, pix.val()) << "}," << std::endl;
-        }
-      }
+        virtual ~impl_base_t() = default;
+        virtual std::size_t formatted_size(P p) const = 0;
+        virtual void print(P p, int width) const = 0;
 
-      template <typename Image, typename P>
-      std::enable_if_t<image_traits<Image>::accessible::value> imprint(const Image& ima, box<P, 2> domain,
-                                                                       std::ostream& os)
+        const void* m_ima;
+      };
+
+      template <class I>
+      struct impl_t final : impl_base_t
       {
-        typedef typename Image::value_type V;
+        impl_t(I& x) { this->m_ima = (void*)(&x); }
+        ~impl_t() final = default;
+        std::size_t formatted_size(P p) const final { return fmt::formatted_size("{}", at(p)); }
+        void        print(P p, int width) const final { fmt::print("{:>{}d}", at(p), width); }
 
-        std::ios state(NULL);
-        state.copyfmt(os);
+        decltype(auto) at(P p) const { return const_cast<I*>(reinterpret_cast<const I*>(this->m_ima))->at(p); }
+      };
 
-        int               wtext = 0;
-        frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
+      std::aligned_storage_t<sizeof(impl_base_t)> m_impl;
+    };
 
-        os << domain << "(" << typeid(V).name() << ")" << std::endl;
-        os.width(4);
 
-        mln_point(Image) p;
-        for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0])
-        {
-          for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1])
-          {
-            os << std::setw(wtext);
-            format(os, ima(p)) << " ";
-          }
-          os << std::endl;
-        }
-        os.copyfmt(state);
-      }
+    void imprint2d(const formatter<mln::point2d>& fmter, mln::box2d roi);
+    void imprint3d(const formatter<mln::point3d>& fmter, mln::box3d roi);
 
-      template <typename Image, typename P>
-      typename std::enable_if<image_traits<Image>::accessible::value, void>::type
-          imprint(const Image& ima, box<P, 3> domain, std::ostream& os)
-      {
-        typedef typename Image::value_type V;
-
-        std::ios state(NULL);
-        state.copyfmt(os);
-
-        int               wtext = 0;
-        frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
-
-        os << domain << "(" << typeid(V).name() << ")" << std::endl;
-        os.width(4);
-
-        mln_point(Image) p;
-        for (p[0] = domain.pmin[0]; p[0] < domain.pmax[0]; ++p[0])
-        {
-          for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1])
-          {
-            for (p[2] = domain.pmin[2]; p[2] < domain.pmax[2]; ++p[2])
-            {
-              os << std::setw(wtext);
-              format(os, ima(p)) << " ";
-            }
-            os << std::endl;
-          }
-          os << "====== \n";
-        }
-        os.copyfmt(state);
-      }
-
-      template <typename Image, typename P>
-      std::enable_if_t<image_traits<Image>::accessible::value> imprint_with_border(const Image& ima, box<P, 2> domain,
-                                                                                   std::ostream& os)
-      {
-        typedef typename Image::value_type V;
-
-        std::ios state(NULL);
-        state.copyfmt(os);
-
-        int               wtext = 0;
-        frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
-
-        os << domain << "(" << typeid(V).name() << ")" << std::endl;
-        os.width(4);
-
-        mln_point(Image) p;
-        int border = ima.border();
-        for (p[0] = domain.pmin[0] - border; p[0] < domain.pmax[0] + border; ++p[0])
-        {
-          for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1])
-          {
-            os << std::setw(wtext);
-            format(os, ima.at(p)) << " ";
-          }
-          os << std::endl;
-        }
-        os.copyfmt(state);
-      }
+    /// \group imprint overload set based on the type of the domain
+    /// \{
+    template <class I>
+    void imprint(I&& image, const mln::box2d* roi)
+    {
+      imprint2d(std::forward<I>(image), *roi);
     }
 
-    template <typename I>
-    void imprint(const Image<I>& ima, std::ostream& os)
+    template <class I>
+    void imprint(I&& image, const mln::box3d* roi)
     {
-      internal::imprint(exact(ima), exact(ima).domain(), os);
+      imprint3d(std::forward<I>(image), *roi);
     }
 
-    template <typename I>
-    void imprint_with_border(const Image<I>& ima, std::ostream& os)
+    template <class I>
+    void imprint(I&& image, ...)
     {
-      internal::imprint_with_border(exact(ima), exact(ima).domain(), os);
+      mln_foreach(auto px, image.pixels())
+        fmt::print("{{{},{}}}\n", px.point(), px.val());
     }
+    /// \}
+  } // namespace internal
+
+  template <class I>
+  void imprint(I&& image, [[maybe_unused]] bool print_border)
+  {
+    using U = std::remove_reference_t<I>;
+    static_assert(mln::is_a<U, mln::details::Image>());
+    static_assert(fmt::internal::has_formatter<image_value_t<U>, fmt::format_context>(), "The value type has no defined formatting.");
+
+    auto roi = image.domain();
+    if constexpr (std::is_convertible_v<image_extension_category_t<std::remove_reference_t<I>>,
+                  mln::extension::border_extension_tag>)
+      if (print_border)
+        roi.inflate(image.border());
+
+    internal::imprint(std::forward<I>(image), &roi);
   }
-}
 
-#endif
+}

@@ -1,9 +1,10 @@
-#ifndef ACCU_CVXHULL_HPP
-#define ACCU_CVXHULL_HPP
+#pragma once
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/accu/accumulators/cvxhull_impl.hpp>
+#include <mln/core/assert.hpp>
+
 namespace mln
 {
 
@@ -48,7 +49,7 @@ namespace mln
           return accumulators::cvxhull<P>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -63,7 +64,7 @@ namespace mln
       {
         return extract(accu, features::pvector());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -87,7 +88,7 @@ namespace mln
         void take(const P& p)
         {
           mln_precondition(m_points.empty() || m_points.back() < p);
-          if (m_points.empty() or m_points.back()[0] != p[0])
+          if (m_points.empty() or m_points.back().y() != p.y())
           {
             m_points.push_back(p);
             m_newline = true;
@@ -116,16 +117,14 @@ namespace mln
 
         friend std::vector<P> extract(const cvxhull& accu, features::cvxhull)
         {
-          std::vector<P> pts = convexhull(accu.m_points);
+          std::vector<P> pts = convexhull(accu.m_points.data(), accu.m_points.size());
           return pts;
         }
 
       private:
-        std::vector<P> m_points;
+        mutable        std::vector<P> m_points;
         bool           m_newline;
       };
-    }
-  }
-}
-
-#endif // ! ACCU_CVXHULL_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

@@ -1,9 +1,11 @@
-#ifndef KINTERPOLATE_HPP
-#define KINTERPOLATE_HPP
+#pragma once
 
 #include <apps/tos/addborder.hpp>
-#include <exception>
+
 #include <mln/core/image/image2d.hpp>
+
+#include <exception>
+
 
 namespace mln
 {
@@ -107,7 +109,7 @@ namespace mln
     sbox2d     dom(ima.domain().pmin, ima.domain().pmax, point2d{2, 2});
     image2d<T> out((ima.nrows() + 1) / 2, (ima.ncols() + 1) / 2);
 
-    copy(ima | dom, out);
+    mln::copy(ima | dom, out);
     return out;
   }
 
@@ -150,7 +152,7 @@ namespace mln
     }
     else if (shp == shp0 + 2)
     {
-      return addborder(ima, lexicographicalorder_less<T>());
+      return addborder_marginal(ima);
     }
     else if (shp == shp0 * 2 - 1)
     { // immerse_k1
@@ -158,7 +160,7 @@ namespace mln
     }
     else if (shp == (shp0 * 2 + 3))
     { // addborder + callback
-      return callback(addborder(ima, lexicographicalorder_less<T>()));
+      return callback(addborder_marginal(ima));
     }
     else if (shp == (shp0 * 4 - 3))
     { // immerse_k2
@@ -166,7 +168,7 @@ namespace mln
     }
     else if (shp == (shp0 * 4 + 5))
     { // addborder + immerse_k2
-      return callback(callback(addborder(ima, lexicographicalorder_less<T>())));
+      return callback(callback(addborder_marginal(ima)));
     }
     else
     {
@@ -175,9 +177,7 @@ namespace mln
     }
 
     image2d<T> out(domain);
-    copy(ima | subdomain, out);
+    mln::copy(ima | subdomain, out);
     return out;
   }
-}
-
-#endif // ! KINTERPOLATE_HPP
+} // namespace mln

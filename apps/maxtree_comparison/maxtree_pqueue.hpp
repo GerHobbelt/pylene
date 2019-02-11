@@ -1,16 +1,16 @@
-#ifndef MLN_CORE_MORPHO_MAXTREE_PQUEUE_HPP
-#define MLN_CORE_MORPHO_MAXTREE_PQUEUE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/wrt_offset.hpp>
+#include <mln/io/imprint.hpp>
 #include <mln/morpho/pqueue_fast.hpp>
+
 #include <queue>
 #include <stack>
 #include <vector>
 
-#include <mln/io/imprint.hpp>
 
 namespace mln
 {
@@ -54,7 +54,7 @@ namespace mln
         {
           if (use_dejavu)
           {
-            resize(deja_vu, ima).init(false);
+            resize(deja_vu, ima).set_init_value(false);
             extension::fill(deja_vu, true);
           }
 
@@ -142,7 +142,7 @@ namespace mln
           assert((Send + ima.domain().size()) == Send_);
       }
 
-    } // end of namespace mln::morpho::internal
+    } // namespace internal
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
@@ -158,8 +158,6 @@ namespace mln
       return parent;
     }
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
-} // end of namespace mln
-
-#endif // ! MLN_CORE_MORPHO_MAXTREE_PQUEUE_HPP
+} // namespace mln

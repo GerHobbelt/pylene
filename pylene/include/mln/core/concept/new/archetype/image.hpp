@@ -46,9 +46,9 @@ namespace mln::archetypes
 
     struct ConcreteImage
     {
-      using new_pixel_type = Pixel;
-      using value_type     = pixel_value_t<Pixel>;
-      using reference      = pixel_reference_t<Pixel>;
+      using new_pixel_type = archetypes::Pixel;
+      using value_type     = pixel_value_t<archetypes::Pixel>;
+      using reference      = pixel_reference_t<archetypes::Pixel>;
       using point_type     = ::ranges::range_value_t<Domain>;
       using domain_type    = Domain;
       using category_type  = forward_image_tag;
@@ -106,8 +106,8 @@ namespace mln::archetypes
 
     struct OutputImage : Image
     {
-      using new_pixel_type = OutputPixel;
-      using reference      = pixel_reference_t<OutputPixel>;
+      using new_pixel_type = archetypes::OutputPixel;
+      using reference      = pixel_reference_t<archetypes::OutputPixel>;
 
       struct pixel_range
       {
@@ -251,8 +251,8 @@ namespace mln::archetypes
 
     struct OutputBidirectionalImage : BidirectionalImage
     {
-      using new_pixel_type = OutputPixel;
-      using reference      = pixel_reference_t<OutputPixel>;
+      using new_pixel_type = archetypes::OutputPixel;
+      using reference      = pixel_reference_t<archetypes::OutputPixel>;
 
       struct value_range
       {

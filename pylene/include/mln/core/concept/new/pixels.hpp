@@ -9,8 +9,19 @@
 
 #include <type_traits>
 
-namespace mln::concepts
+namespace mln
 {
+  namespace experimental
+  {
+
+    template <class Px>
+    struct Pixel
+    {
+    };
+  }
+
+  namespace concepts
+  {
 
   // clang-format off
 
@@ -20,6 +31,7 @@ namespace mln::concepts
   concept Pixel = 
     // Minimum constraint on image object
     // Do not requires DefaultConstructible
+    std::is_base_of_v<mln::experimental::Pixel<Pix>, Pix> &&
     stl::CopyConstructible<Pix> &&
     stl::MoveConstructible<Pix> &&
     requires {
@@ -31,9 +43,10 @@ namespace mln::concepts
     Point<pixel_point_t<Pix>> &&
     !std::is_const_v<pixel_value_t<Pix>> &&
     !std::is_reference_v<pixel_value_t<Pix>> &&
-    requires(const Pix cpix) {
+    requires(const Pix cpix, Pix pix, pixel_point_t<Pix> p) {
       { cpix.point() } -> stl::ConvertibleTo<pixel_point_t<Pix>>&&;
       { cpix.val() }   -> stl::ConvertibleTo<pixel_reference_t<Pix>>&&;
+      { pix.shift(p) }
     };
 
 
@@ -60,7 +73,6 @@ namespace mln::concepts
 
   // clang-format on
 
-} // namespace mln::concepts
+  } // namespace concepts
 
-// Validate concept
-#include <mln/core/concept/new/archetype/pixel.hpp>
+} // namespace namespacemln

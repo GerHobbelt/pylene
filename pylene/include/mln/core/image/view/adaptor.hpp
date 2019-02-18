@@ -1,8 +1,13 @@
 #pragma once
 
-#include <mln/core/private/traits/pixel.hpp>
-#include <mln/core/private/traits/image.hpp>
+#include <mln/core/concept/new/values.hpp>
+#include <mln/core/concept/new/pixels.hpp>
 
+#include <mln/core/image/image.hpp>
+#include <mln/core/image/private/image_traits.hpp>
+#include <mln/core/image/private/pixel_traits.hpp>
+
+namespace concepts = mln::concepts;
 
 namespace mln
 {
@@ -11,9 +16,10 @@ namespace mln
   template <class Pix>
   struct pixel_adaptor
   {
-    using point_type = typename Pix::point_type;
-    using value_type = typename Pix::value_type;
-    using reference  = typename Pix::reference;
+    using point_type              = typename Pix::point_type;
+    using site_type[[deprecated]] = point_type;
+    using value_type              = typename Pix::value_type;
+    using reference               = typename Pix::reference;
 
     decltype(auto) val() const { return m_pix.val(); }
     auto           point() const { return m_pix.point(); }
@@ -78,7 +84,8 @@ namespace mln
     template <class I>
     struct image_adaptor_base_indexable<I, std::enable_if_t<I::indexable::value>>
     {
-      using index_type = image_index_t<I>;
+      using size_type[[deprecated]] = image_index_t<I>;
+      using index_type              = size_type;
     };
 
     template <class I, class = void>
@@ -101,15 +108,15 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using reference   = image_reference_t<I>;
-    using value_type  = image_value_t<I>;
-    using point_type  = image_point_t<I>;
-    using domain_type = image_domain_t<I>;
+    using reference      = image_reference_t<I>;
+    using value_type     = image_value_t<I>;
+    using point_type     = image_point_t<I>;
+    using domain_type    = image_domain_t<I>;
     /// \}
 
-    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::experimental::Pixel<new_pixel_type>
     {
-      using pixel_type::pixel_adaptor::pixel_adaptor;
+      using new_pixel_type::pixel_adaptor::pixel_adaptor;
     };
 
     /// Traits & Image Properties
@@ -121,7 +128,11 @@ namespace mln
     using category_type      = image_category_t<I>;
     using concrete_type      = image_concrete_t<I>;
 
-    template <class Val>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    template <concepts::Value Val>
+#else
+    template <typename Val>
+#endif
     using ch_value_type = image_ch_value_t<I, Val>;
     /// \}
 
@@ -142,11 +153,15 @@ namespace mln
     image_adaptor<I>& operator=(image_adaptor<I>&&) = delete;
 
     auto domain() const { return m_ima.domain(); }
-    auto values() { return m_ima.values(); }
-    auto pixels() { return m_ima.pixels(); }
+    auto new_values() { return m_ima.new_values(); }
+    auto new_pixels() { return m_ima.new_pixels(); }
     auto concretize() const { return m_ima.concretize(); }
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+    template <concepts::Value Val>
+#else
     template <typename Val>
+#endif
     auto ch_value() const
     {
       return m_ima.template ch_value<Val>();
@@ -177,16 +192,16 @@ namespace mln
       return m_ima.at(p);
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
-      return m_ima.pixel(p);
+      return m_ima.new_pixel(p);
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
     {
-      return m_ima.pixel_at(p);
+      return m_ima.new_pixel_at(p);
     }
     /// \}
 
@@ -228,7 +243,7 @@ namespace mln
     }
 
     template <typename Ret = std::ptrdiff_t>
-    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, Ret> stride(int dim) const
+    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, Ret> strides(int dim) const
     {
       return m_ima.strides(dim);
     }
@@ -243,19 +258,6 @@ namespace mln
         extension() const
     {
       return m_ima.extension();
-    }
-    template <typename dummy = I>
-    std::enable_if_t<not std::is_same_v<extension_category, mln::extension::none_extension_tag>,
-                     image_extension_t<dummy>>
-        extension()
-    {
-      return m_ima.extension();
-    }
-
-    template <typename U = I>
-    auto border() const -> decltype(std::declval<const U>().border())
-    {
-      return m_ima.border();
     }
     /// \}
 

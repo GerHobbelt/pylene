@@ -31,7 +31,7 @@ void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
     for (auto && [ pxIn, pxOut ] : rows)
     {
       int tmp = 0;
-      for (auto nx : mln::c8_new(pxIn))
+      for (auto nx : mln::experimental::c8(pxIn))
         tmp += nx.val();
       pxOut.val() = tmp;
     }
@@ -78,7 +78,7 @@ void Average_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>
     for (auto && [ pxIn, pxOut ] : rows)
     {
       int tmp = 0;
-      for (auto nx : mln::c8_new(pxIn))
+      for (auto nx : mln::experimental::c8(pxIn))
         tmp += nx.val();
       pxOut.val() = tmp / 8;
     }
@@ -159,7 +159,7 @@ void Erosion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>
     for (auto && [ pxIn, pxOut ] : rows)
     {
       mln::uint8 mini = pxIn.val();
-      for (auto nx : mln::c8_new(pxIn))
+      for (auto nx : mln::experimental::c8(pxIn))
         if (nx.val() < mini)
           mini = nx.val();
       pxOut.val() = mini;
@@ -230,7 +230,7 @@ void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d
     for (auto && [ pxIn, pxOut ] : rows)
     {
       int tmp = 0;
-      for (auto nx : mln::c4_new(pxIn))
+      for (auto nx : mln::experimental::c4(pxIn))
         tmp += nx.val();
       pxOut.val() = pxIn.val() + (tmp - 4 * pxIn.val()) / 8;
     }
@@ -296,7 +296,7 @@ void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image
     {
       float      tmp = 0;
       mln::uint8 vin = pxIn.val();
-      for (auto nx : mln::c4_new(pxIn))
+      for (auto nx : mln::experimental::c4(pxIn))
       {
         float gradient = nx.val() - vin;
         tmp += gradient * Flux_Function(gradient);

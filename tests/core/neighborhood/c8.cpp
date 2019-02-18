@@ -5,6 +5,15 @@
 #include <range/v3/to_container.hpp>
 #include <vector>
 
+
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+static_assert(mln::concepts::Neighborhood<mln::experimental::c8_t, mln::point2d>);
+static_assert(not mln::concepts::SeparableStructuringElement<mln::experimental::c8_t, mln::point2d>);
+static_assert(not mln::concepts::DecomposableStructuringElement<mln::experimental::c8_t, mln::point2d>);
+static_assert(not mln::concepts::IncrementalStructuringElement<mln::experimental::c8_t, mln::point2d>);
+#endif
+
+
 TEST(Core, c4_point)
 {
   // clang-format off
@@ -16,7 +25,7 @@ TEST(Core, c4_point)
   // clang-format on
 
   mln::point2d p   = {-1, -1};
-  auto         nbh = ::ranges::to_vector(mln::c8_new(p));
+  auto         nbh = ::ranges::to_vector(mln::experimental::c8(p));
 
   ASSERT_EQ(refs, nbh);
 }
@@ -41,7 +50,7 @@ TEST(Core, c4_pixel)
   std::vector<int> vals = {1, 2, 3, 4, 6, 7, 8, 9};
 
   int i = 0;
-  for (auto&& px : mln::c8_new(pix))
+  for (auto&& px : mln::experimental::c8(pix))
   {
     EXPECT_EQ(vals[i], px.val());
     EXPECT_EQ(points[i], px.point());

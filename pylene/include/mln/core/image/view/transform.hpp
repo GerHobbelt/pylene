@@ -52,7 +52,7 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, Pixel<new_pixel_type>
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::experimental::Pixel<new_pixel_type>
     {
       using point_type              = transform_view::point_type;
       using site_type[[deprecated]] = transform_view::point_type;
@@ -215,7 +215,7 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : Pixel<new_pixel_type>
+    struct new_pixel_type : mln::experimental::Pixel<new_pixel_type>
     {
     public:
       using point_type              = transform2_view::point_type;
@@ -236,10 +236,10 @@ namespace mln
 
       reference val() const { return std::invoke(fun_, m_pix1.val(), m_pix2.val()); }
       auto      point() const { return m_pix1.point(); }
-      void      advance(point_type p)
+      void      shift(point_type p)
       {
-        m_pix1.advance(p);
-        m_pix2.advance(p);
+        m_pix1.shift(p);
+        m_pix2.shift(p);
       }
 
     private:

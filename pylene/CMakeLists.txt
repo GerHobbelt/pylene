@@ -8,7 +8,8 @@ find_package(TBB)
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
 
-add_library(Pylene INTERFACE)
+add_library(Pylene)
+
 if (TBB_FOUND AND PYLENE_USE_TBB)
   target_link_libraries(Pylene INTERFACE tbb)
 else()
@@ -24,33 +25,39 @@ endif()
 
 
 # Set dependancies
-target_include_directories(Pylene INTERFACE
+target_include_directories(Pylene PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include>)
 
-
-target_include_directories(Pylene SYSTEM INTERFACE ${Boost_INCLUDE_DIR})
-target_include_directories(Pylene INTERFACE ${FreeImage_INCLUDE_DIRS})
+target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+target_include_directories(Pylene PUBLIC ${FreeImage_INCLUDE_DIRS})
 set_property(TARGET Pylene APPEND
   PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
-target_link_libraries(Pylene INTERFACE range-v3)
+target_link_libraries(Pylene PUBLIC range-v3)
 
 
 # Set sources
 file(GLOB_RECURSE sources "include/mln/*.hpp")
 target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
+target_sources(Pylene PRIVATE
+  src/core/se/disc.cpp
+  src/core/se/periodic_line2d.cpp
+  src/core/se/rect2d.cpp
+  src/core/trace.cpp
+  )
+
 
 # Compiler configurations
-target_compile_features(Pylene INTERFACE cxx_std_17)
+target_compile_features(Pylene PUBLIC cxx_std_17)
 
 # Add concepts support for gcc > 7.2 with -fconcepts
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
-  target_compile_options(Pylene INTERFACE -fconcepts)
+  target_compile_options(Pylene PUBLIC -fconcepts)
   find_package(cmcstl2 REQUIRED)
-  target_link_libraries(Pylene INTERFACE stl2)
-  target_compile_definitions(Pylene INTERFACE PYLENE_CONCEPT_TS_ENABLED)
-  target_compile_definitions(Pylene INTERFACE concept="concept bool")
+  target_link_libraries(Pylene PUBLIC stl2)
+  target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
+  target_compile_definitions(Pylene PUBLIC concept="concept bool")
 endif()
 
 

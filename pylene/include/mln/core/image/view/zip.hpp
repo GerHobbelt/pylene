@@ -55,7 +55,7 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : Pixel<new_pixel_type>
+    struct new_pixel_type : mln::experimental::Pixel<new_pixel_type>
     {
       using reference               = zip_view::reference;
       using value_type              = zip_view::value_type;
@@ -78,9 +78,9 @@ namespace mln
         auto build_value = [](auto&&... pixels) -> reference { return {pixels.val()...}; };
         return std::apply(build_value, m_pixels);
       }
-      void advance(point_type q)
+      void shift(point_type q)
       {
-        auto g = [q](auto&&... pixels) { (pixels.advance(q), ...); };
+        auto g = [q](auto&&... pixels) { (pixels.shift(q), ...); };
         std::apply(g, m_pixels);
       }
 

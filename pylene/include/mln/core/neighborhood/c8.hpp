@@ -6,9 +6,9 @@
 #include <array>
 #include <range/v3/span.hpp>
 
-namespace mln
+namespace mln::experimental
 {
-  struct c8_new_t : neighborhood_facade<c8_new_t>
+  struct c8_t : neighborhood_facade<c8_t>
   {
   private:
     using point_t = point<std::ptrdiff_t, 2>;
@@ -33,5 +33,5 @@ namespace mln
     // clang-format on
   };
 
-  static constexpr inline c8_new_t c8_new = {};
+  static constexpr inline c8_t c8 = {};
 } // namespace mln

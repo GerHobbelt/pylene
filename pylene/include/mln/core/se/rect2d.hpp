@@ -1,22 +1,86 @@
-#ifndef MLN_CORE_SE_RECT2D_HPP
-#define MLN_CORE_SE_RECT2D_HPP
+#pragma once
 
 #include <mln/core/domain/box.hpp>
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
+#include <mln/core/se/private/se_facade.hpp>
 
+#include <vector>
 /// \file
 
 namespace mln
 {
   namespace se
   {
-
     struct rect2d;
+  }
 
-    /**************************/
-    /***  Implementation     **/
-    /**************************/
+
+  namespace experimental::se
+  {
+
+    /// \brief Define a dynamic rectangular window anchored at (0,0).
+    /// Its width and height are always odd numbers to ensure symmetry.
+    class rect2d : public se_facade<rect2d>
+    {
+    private:
+      using category = dynamic_neighborhood_tag;
+      using incremental = std::true_type;
+      using decomposable = std::true_type;
+      using separable = std::true_type;
+
+    public:
+      /// Construct an empty rectangle
+      rect2d() = default;
+
+      /// Construct a rectangle of size (Width × Height).
+      ///
+      /// \param width The width of the rectangle. If \p width is even, it is
+      /// rounded to the closest lower odd int.
+      /// \param height The height of the rectangle. If \p height is even, it is
+      /// rounded to the closest lower odd int.
+      rect2d(int width, int height);
+
+      /// \brief A WNeighborhood to be added when used incrementally
+      rect2d inc() const;
+
+      /// \brief A WNeighborhood to be substracted when used incrementally
+      rect2d dec() const;
+
+      /// \brief Return a range of SE offsets
+      const mln::box2d& offsets() const { return m_dpoints; }
+
+      /// \brief Return true if decomposable (for any non-empty rectangle)
+      bool is_decomposable() const;
+
+      /// \brief Return true if separable (for any non-empty rectangle)
+      bool is_separable() const;
+
+      /// \brief Return true if incremental (if the width is larger than 1)
+      bool is_incremental() const;
+
+      /// \brief Return an horizontal line of length \p Width and a vertical
+      /// line of length \p Height corresponding to the SE decomposition.
+      std::vector<periodic_line2d> decompose() const;
+
+      /// \brief Return an horizontal line of length \p Width and a vertical
+      /// line of length \p Height.
+      std::vector<periodic_line2d> separate() const;
+
+
+    private:
+      box2d m_dpoints;
+    };
+
+
+  }
+
+  /**************************/
+  /***  Implementation     **/
+  /**************************/
+
+  namespace se
+  {
 
     /// \brief Define a dynamic rectangular window anchored at (0,0).
     /// Its width and height are always odd numbers to ensure symmetry.
@@ -93,4 +157,4 @@ namespace mln
   } // end of namespace mln::se
 } // end of namespace mln
 
-#endif //! MLN_CORE_SE_RECT2D_HPP
+

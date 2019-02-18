@@ -1,7 +1,7 @@
 Periodic Line
 =============
 
-.. doxygenclass:: mln::se::periodic_line2d
+.. doxygenclass:: mln::experimental::se::periodic_line2d
    :members:
 
 

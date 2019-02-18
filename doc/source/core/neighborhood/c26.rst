@@ -43,7 +43,7 @@
 
     Prints:
 
-    .. code-block:: text
+    .. code-block:: txt
 
 
         [-1,-1,-1],

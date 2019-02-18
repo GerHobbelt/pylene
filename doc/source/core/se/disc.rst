@@ -1,7 +1,7 @@
 Disc
 ====
 
-.. doxygenclass:: mln::se::disc
+.. doxygenclass:: mln::experimental::se::disc
    :members:
 
 

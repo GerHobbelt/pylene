@@ -7,7 +7,7 @@
 #include <array>
 #include <range/v3/view/span.hpp>
 
-namespace mln
+namespace mln::experimental
 {
   struct c8_t : neighborhood_facade<c8_t>
   {

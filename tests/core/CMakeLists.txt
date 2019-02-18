@@ -40,7 +40,9 @@ add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.
 
 # test Neighborhood
 add_core_test(${test_prefix}c4               neighborhood/c4.cpp)
+add_core_test(${test_prefix}c6               neighborhood/c6.cpp)
 add_core_test(${test_prefix}c8               neighborhood/c8.cpp)
+add_core_test(${test_prefix}c26              neighborhood/c26.cpp)
 add_core_test(${test_prefix}sliding_pixter   neighborhood/sliding_pixter.cpp)
 add_core_test(${test_prefix}sliding_wpiter   neighborhood/sliding_wpiter.cpp)
 add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)
@@ -71,17 +73,20 @@ add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 
 # test SE
+add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)
 add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
 
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
-  add_core_test(${test_prefix}concept_values   concept/values.cpp)
-  add_core_test(${test_prefix}concept_points   concept/points.cpp)
-  add_core_test(${test_prefix}concept_pixels   concept/pixels.cpp)
-  add_core_test(${test_prefix}concept_domains  concept/domains.cpp)
-  add_core_test(${test_prefix}concept_indexes  concept/indexes.cpp)
-  add_core_test(${test_prefix}concept_ranges   concept/ranges.cpp)
-  add_core_test(${test_prefix}concept_images   concept/images.cpp)
+  add_core_test(${test_prefix}concept_values            concept/values.cpp)
+  add_core_test(${test_prefix}concept_points            concept/points.cpp)
+  add_core_test(${test_prefix}concept_pixels            concept/pixels.cpp)
+  add_core_test(${test_prefix}concept_domains           concept/domains.cpp)
+  add_core_test(${test_prefix}concept_indexes           concept/indexes.cpp)
+  add_core_test(${test_prefix}concept_ranges            concept/ranges.cpp)
+  add_core_test(${test_prefix}concept_images            concept/images.cpp)
+  add_core_test(${test_prefix}concept_se                concept/se.cpp)
+  add_core_test(${test_prefix}concept_neighborhood      concept/neighborhood.cpp)
 endif()

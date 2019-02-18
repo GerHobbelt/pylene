@@ -69,7 +69,7 @@ namespace mln::details
 
 
   template <class T, std::size_t N>
-  struct ndpix : ndpix_base<T, N>
+  struct ndpix : ndpix_base<T, N>, mln::experimental::Pixel<ndpix<T, N>>
   {
     using typename ndpix_base<T, N>::point_type;
 
@@ -77,7 +77,7 @@ namespace mln::details
     using value_type = ndpix;
     using reference  = ndpix;
 
-    void advance(const point_type& dp)
+    void shift(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)
         this->m_lineptr += m_info->stride[k] * dp[k];
@@ -113,7 +113,7 @@ namespace mln::details
 
 
   template <class T, std::size_t N>
-  struct ndpixel : ndpix_base<T, N>
+  struct ndpixel : ndpix_base<T, N>, mln::experimental::Pixel<ndpixel<T, N>>
   {
     using typename ndpix_base<T, N>::point_type;
     using typename ndpix_base<T, N>::site_type;
@@ -128,7 +128,7 @@ namespace mln::details
     {
     }
 
-    void advance(const point_type& dp)
+    void shift(const point_type& dp)
     {
       for (std::size_t k = 0; k < N - 1; ++k)
         this->m_lineptr += m_info.stride[k] * dp[k];

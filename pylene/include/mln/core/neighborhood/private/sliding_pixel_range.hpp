@@ -12,11 +12,11 @@ namespace mln::details
 
   private:
     friend ::ranges::range_access;
-    Pixel m_pix;
+    ::ranges::semiregular_t<Pixel> m_pix;
 
     struct adaptor : ::ranges::adaptor_base
     {
-      Pixel m_pix;
+      ::ranges::semiregular_t<Pixel> m_pix;
       adaptor() = default;
       adaptor(Pixel px)
         : m_pix(std::move(px))
@@ -26,7 +26,7 @@ namespace mln::details
       Pixel read(::ranges::iterator_t<Rng> it) const
       {
         Pixel tmp = m_pix;
-        tmp.advance(*it);
+        tmp.shift(*it);
         return tmp;
       }
     };

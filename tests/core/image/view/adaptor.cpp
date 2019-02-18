@@ -16,11 +16,19 @@ struct identity : mln::image_adaptor<I>, mln::experimental::Image<identity<I>>
 };
 
 
+template <class Pix>
+struct identity_pixel : mln::pixel_adaptor<Pix>, mln::experimental::Pixel<identity_pixel<Pix>>
+{
+  using identity_pixel::pixel_adaptor::pixel_adaptor;
+};
+
+
+
 TEST(Core, ViewAdaptor_Pixel)
 {
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::Pixel<mln::pixel_adaptor<archetypes::Pixel>>);
-  static_assert(concepts::OutputPixel<mln::pixel_adaptor<archetypes::OutputPixel>>);
+  static_assert(concepts::Pixel<identity_pixel<archetypes::Pixel>>);
+  static_assert(concepts::OutputPixel<identity_pixel<archetypes::OutputPixel>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 }
 

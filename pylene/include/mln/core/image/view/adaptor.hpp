@@ -1,6 +1,8 @@
 #pragma once
 
 #include <mln/core/concept/new/values.hpp>
+#include <mln/core/concept/new/pixels.hpp>
+
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/private/image_traits.hpp>
 #include <mln/core/image/private/pixel_traits.hpp>
@@ -11,35 +13,35 @@ namespace mln
 {
 
   // Identity pixel adaptor
-  template <class Pixel>
+  template <class Pix>
   struct pixel_adaptor
   {
-    using point_type              = typename Pixel::point_type;
+    using point_type              = typename Pix::point_type;
     using site_type[[deprecated]] = point_type;
-    using value_type              = typename Pixel::value_type;
-    using reference               = typename Pixel::reference;
+    using value_type              = typename Pix::value_type;
+    using reference               = typename Pix::reference;
 
     decltype(auto) val() const { return m_pix.val(); }
     auto           point() const { return m_pix.point(); }
-    void           advance(point_type p) { m_pix.advance(p); }
+    void           shift(point_type p) { m_pix.shift(p); }
 
-    pixel_adaptor(Pixel px)
+    pixel_adaptor(Pix px)
       : m_pix{std::move(px)}
     {
     }
 
-    // no default constructor as Pixel may not be default constructible
+    // no default constructor as Pix may not be default constructible
     pixel_adaptor(const pixel_adaptor&) = default;
     pixel_adaptor(pixel_adaptor&&)      = default;
     pixel_adaptor& operator=(const pixel_adaptor&) = delete;
     pixel_adaptor& operator=(pixel_adaptor&&) = delete;
 
   protected:
-    Pixel&       base() { return m_pix; }
-    const Pixel& base() const { return m_pix; }
+    Pix&       base() { return m_pix; }
+    const Pix& base() const { return m_pix; }
 
   private:
-    Pixel m_pix;
+    Pix m_pix;
   };
 
 
@@ -110,8 +112,12 @@ namespace mln
     using value_type     = image_value_t<I>;
     using point_type     = image_point_t<I>;
     using domain_type    = image_domain_t<I>;
-    using new_pixel_type = pixel_adaptor<image_pixel_t<I>>;
     /// \}
+
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::experimental::Pixel<new_pixel_type>
+    {
+      using new_pixel_type::pixel_adaptor::pixel_adaptor;
+    };
 
     /// Traits & Image Properties
     /// \{

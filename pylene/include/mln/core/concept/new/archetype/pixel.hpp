@@ -9,33 +9,44 @@
 namespace mln::archetypes
 {
 
-  struct Pixel
+  namespace details
   {
-    using value_type = Value;
-    using point_type = Point;
-    using reference  = const value_type&;
 
-    Pixel()             = delete;
-    Pixel(const Pixel&) = default;
-    Pixel(Pixel&&)      = default;
-    Pixel& operator=(const Pixel&) = delete;
-    Pixel& operator=(Pixel&&) = delete;
+    template <class P, class V>
+    struct PixelT
+    {
+      using value_type = V;
+      using point_type = P;
+      using reference  = const value_type&;
 
-    point_type point() const;
-    reference  val() const;
-  };
+      PixelT()             = delete;
+      PixelT(const PixelT&) = default;
+      PixelT(PixelT&&)      = default;
+      PixelT& operator=(const PixelT&) = delete;
+      PixelT& operator=(PixelT&&) = delete;
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Pixel<Pixel>, "Pixel archetype does not model the Pixel concept!");
+      point_type point() const;
+      reference  val() const;
+      void shift(const P& dp);
+    };
+
+    struct OutputPixel : PixelT<Point, Value>
+    {
+      using reference = Value&;
+
+      reference val() const;
+    };
 
 
-  struct OutputPixel final : Pixel
-  {
-    using reference = value_type&;
+    template <class Pix>
+    struct AsPixel : Pix, mln::experimental::Pixel<AsPixel<Pix>>
+    {
+    };
+  }
 
-    reference val() const;
-  };
-
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::OutputPixel<OutputPixel>,
-                           "OutputPixel archetype does not model the OutputPixel concept!");
+  template <class P, class V = Value>
+  using PixelT = details::AsPixel<details::PixelT<P, V>>;
+  using Pixel = PixelT<Point, Value>;
+  using OutputPixel = details::AsPixel<details::OutputPixel>;
 
 } // namespace mln::archetypes

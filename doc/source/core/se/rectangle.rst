@@ -1,7 +1,7 @@
 Rectangle
 =========
 
-.. doxygenstruct:: mln::se::rect2d
+.. doxygenclass:: mln::experimental::se::rect2d
    :members:
 
 

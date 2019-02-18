@@ -791,7 +791,7 @@ namespace mln
     pix.m_info.buffer = ptr;
     pix.m_lineptr     = ptr;
     pix.m_point       = mln::literal::zero;
-    pix.advance(p);
+    pix.shift(p);
     return pix;
   }
 
@@ -807,7 +807,7 @@ namespace mln
     pix.m_info.buffer = ptr;
     pix.m_lineptr     = ptr;
     pix.m_point       = mln::literal::zero;
-    pix.advance(p);
+    pix.shift(p);
     return pix;
   }
 

@@ -1,4 +1,4 @@
-.. _neighborhood 
+.. _neighborhood:
 
 Neighborhood, Sliding Windows and Structuring Elements
 ######################################################
@@ -59,17 +59,12 @@ Concepts
 Structuring Element
 -------------------
 
-.. cpp:concept:: template <class N> Neighborhood
 
-                 see :cpp:concept:`StructuringElement`
-
-
-
-.. cpp:concept:: template <class SE> StructuringElement
+.. cpp:concept:: template <class SE, class P> StructuringElement
 
 
    +-------------------------------+-------------------------------------------------------------------+
-   |Categorie                      |Operations                                                         |
+   |Category                       |Operations                                                         |
    +===============================+===================================================================+
    |Adaptative SE                  |Iterate over SE whose elements are dependant on the current point  |
    |                               |                                                                   |
@@ -92,52 +87,67 @@ Structuring Element
   .. rubric:: Valid Expressions
     :class: concept-expr
 
+  `p` denotes in instance of `P`, and `px` an instance of type that models :cpp:concept:`Pixel` whose point type is
+  compatible with `P` (for which ``px.shift(p)`` is valid).
+
+  +------------+----------------+-------------------------------------------------------------+
+  | Expression |  Return type   |                          Semantics                          |
+  +============+================+=============================================================+
+  | ``se(p)``  | *impl-defined* | Return a :cpp:concept:`ForwardRange` of points centered in  |
+  |            |                | the point `p`.                                              |
+  +------------+----------------+-------------------------------------------------------------+
+  | ``se(px)`` | *impl-defined* | Return a :cpp:concept:`ForwardRange` of pixels centered in  |
+  |            |                | the pixel `px`.                                             |
+  +------------+----------------+-------------------------------------------------------------+
+
+
+
+  .. rubric:: Type definitions and traits
+    :class: concept-typedefs
+
+  +--------------------+----------------------------+--------------------------------------------------+
+  |        Type        |         Definition         |                     Comment                      |
+  +====================+============================+==================================================+
+  | `SE::category`     |                            | Convertible to `adaptative_neighborhood_tag`     |
+  +--------------------+----------------------------+--------------------------------------------------+
+  | `SE::incremental`  | either `std::true_type` or |                                                  |
+  |                    | `std:false_type`           |                                                  |
+  +--------------------+----------------------------+--------------------------------------------------+
+  | `SE::decomposable` | either `std::true_type` or | Deprecated. Concept checking instead.            |
+  |                    | `std:false_type`           |                                                  |
+  +--------------------+----------------------------+--------------------------------------------------+
+  | `SE::separable`    | either `std::true_type` or | Deprecated. Concept checking instead.            |
+  |                    | `std:false_type`           |                                                  |
+  +--------------------+----------------------------+--------------------------------------------------+
+
+
+Neighborhood
+------------
+
+.. cpp:concept:: template <class N, class P> Neighborhood
+
+  Neighborhood extends the concept of  :cpp:concept:`StructuringElement` but is anchored at origin and
+  provides facilities to iterate before and after the anchor.
+
+
   +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
   |    Expression     |  Return type   |                                                         Semantics                                                          |
   +===================+================+============================================================================================================================+
-  | ``se(p)``         | *impl-defined* | Return a :cpp:concept:`Forward Range` of points centered in                                                                |
-  |                   |                | the point `p`.                                                                                                             |
+  | ``se.before(p)``  | *impl-defined* | Return a :cpp:concept:`ForwardRange` of points before `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q < p \}`)                       |
   +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se(px)``        | *impl-defined* | Return a :cpp:concept:`Forward Range` of pixels centered in                                                                |
-  |                   |                | the pixel `px`.                                                                                                            |
+  | ``se.before(px)`` | *impl-defined* | Return a :cpp:concept:`ForwardRange` of points before `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() < px.point() \}`)  |
   +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.before(p)``  | *impl-defined* | Return a :cpp:concept:`Forward Range` of points before `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q < p \}`)                      |
+  | ``se.after(p)``   | *impl-defined* | Return a :cpp:concept:`ForwardRange` of points after `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q > p \}`)                        |
   +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.before(px)`` | *impl-defined* | Return a :cpp:concept:`Forward Range` of points before `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() < px.point() \}`) |
+  | ``se.after(px)``  | *impl-defined* | Return a :cpp:concept:`ForwardRange` of points after `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() > px.point() \}`)   |
   +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.after(p)``   | *impl-defined* | Return a :cpp:concept:`Forward Range` of points after `p` (:math:`\{ q ∈ \mathcal{B}(p) ∣ q > p \}`)                       |
-  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
-  | ``se.after(px)``  | *impl-defined* | Return a :cpp:concept:`Forward Range` of points after `px` (:math:`\{ qx ∈ \mathcal{B}(px) ∣ qx.point() > px.point() \}`)  |
-  +-------------------+----------------+----------------------------------------------------------------------------------------------------------------------------+
-
-
-
-  .. rubric:: Type definitions
-    :class: concept-typedefs
-
-  +--------------------+----------------------------+----------------------------------------------------------+
-  |        Type        |         Definition         |                         Comment                          |
-  +====================+============================+==========================================================+
-  | `SE::category`     |                            | Convertible to `adaptative_neighborhood_tag`             |
-  +--------------------+----------------------------+----------------------------------------------------------+
-  | `SE::incremental`  | either `std::true_type` or |                                                          |
-  |                    | `std:false_type`           |                                                          |
-  +--------------------+----------------------------+----------------------------------------------------------+
-  | `SE::decomposable` | either `std::true_type` or | [FIXME] This to be deprecated. Concept checking instead. |
-  |                    | `std:false_type`           |                                                          |
-  +--------------------+----------------------------+----------------------------------------------------------+
-  | `SE::separable`    | either `std::true_type` or | [FIXME] This to be deprecated. Concept checking instead. |
-  |                    | `std:false_type`           |                                                          |
-  +--------------------+----------------------------+----------------------------------------------------------+
 
 
 Structuring Element Properties
 ------------------------------
 
 
-.. cpp:concept:: template <class SE> Decomposable
-
-  [FIXME] To be fixed in code
+.. cpp:concept:: template <class SE, class P> Decomposable
 
   A structuring element 𝑩 can be *decomposable* in which case, it has a mathod ``se.decompose()`` that returns a list
   of simpler structuring elements 𝑩₁, 𝑩₂, ..., 𝑩ₙ for which the dilation of an image *f* is:
@@ -152,12 +162,11 @@ Structuring Element Properties
 
   .. cpp:function:: impl_defined decompose() const 
 
-    Return a list of simpler SE. If ``decompose()`` is called while ``is_decomposable()`` returns *false*, a runtime exception is raised.
+    Return a collection of simpler SE. If ``decompose()`` is called while ``is_decomposable()`` returns *false*, a runtime exception is raised.
 
 
-.. cpp:concept:: template <class SE> Separable
+.. cpp:concept:: template <class SE, class P> Separable
 
-  [FIXME] To be fixed in code
 
   A structuring element 𝑲 can be *separable* in which case, it has a mathod ``se.separate()`` that returns a list
   of simpler structuring elements 𝑲₁, 𝑲₂, ..., 𝑲ₙ for which the convolution of an image *f* is:
@@ -173,16 +182,14 @@ Structuring Element Properties
 
   .. cpp:function:: impl_defined separate() const
 
-    Return a list of simpler SE. If ``separate()`` is called while ``is_seperable()`` returns *false*, a runtime exception is raised.
+    Return a collection of simpler SE. If ``separate()`` is called while ``is_seperable()`` returns *false*, a runtime exception is raised.
 
 
 .. cpp:concept:: template <class SE> Incremental
 
-  A SE is said to be *incremental*, if it enables to give the points
-  that are added or removed to the range given a *basic deplacement* of
-  the point, e.g. for `point2d`, the basic deplacement is `(0,1)`.  This
-  is usually used to compute attributes over a sliding SE in linear
-  time.
+  A SE is said to be *incremental*, if it enables to give the points that are added to and removed from the range when the SE
+  is shifted by a *basic deplacement* (e.g. for `point2d`, the basic deplacement is `(0,1)`).  This is usually used to
+  compute attributes over a sliding SE in linear time.
 
 
 
@@ -194,10 +201,6 @@ Structuring Element Properties
 +===================+======+==================+==============================================+
 | `SE::incremental` |      | `std::true_type` |                                              |
 +-------------------+------+------------------+----------------------------------------------+
-| `SE::dec_type`    |      |                  | A model of :cpp:concept:`StructuringElement` |
-+-------------------+------+------------------+----------------------------------------------+
-| `SE::inc_type`    |      |                  | A model of :cpp:concept:`StructuringElement` |
-+-------------------+------+------------------+----------------------------------------------+
 
   .. rubric:: `Valid expression`
      :class: concept-expr
@@ -205,11 +208,11 @@ Structuring Element Properties
 +--------------+----------------+-----------------------------------------------------------+
 |  Expression  |  Return Type   |                         Sementics                         |
 +==============+================+===========================================================+
-| ``se.inc()`` | `SE::inc_type` | A SE equivalent to :math:`\Delta\mathcal{B}^+(p) =        |
+| ``se.inc()`` | *impl-defined* | A SE equivalent to :math:`\Delta\mathcal{B}^+(p) =        |
 |              |                | \mathcal{B}(p) \setminus (\mathcal{B}(p) \cap             |
 |              |                | \mathcal{B}(\mathrm{prev}))`                              |
 +--------------+----------------+-----------------------------------------------------------+
-| ``se.dec()`` | `SE::dec_type` | A SE `s` equivalent to :math:`\Delta\mathcal{B}^-(p) =    |
+| ``se.dec()`` | *impl-defined* | A SE `s` equivalent to :math:`\Delta\mathcal{B}^-(p) =    |
 |              |                | \mathcal{B}(\mathrm{prev}) \setminus (\mathcal{B}(p) \cap |
 |              |                | \mathcal{B}(\mathrm{prev}))`                              |
 +--------------+----------------+-----------------------------------------------------------+
@@ -227,6 +230,8 @@ Predefined Neighborhoods
 
     neighborhood/c4
     neighborhood/c8
+    neighborhood/c6
+    neighborhood/c26
 
 
 Predefined Structuring Elements

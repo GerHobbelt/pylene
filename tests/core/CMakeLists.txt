@@ -17,12 +17,13 @@ add_core_test(${test_prefix}range_reverse       range/reverse.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
 # test Views
-add_core_test(${test_prefix}view_adaptor     image/view/adaptor.cpp)
-add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
-add_core_test(${test_prefix}view_filter      image/view/filter.cpp)
-add_core_test(${test_prefix}view_clip        image/view/clip.cpp)
-add_core_test(${test_prefix}view_mask        image/view/mask.cpp)
-add_core_test(${test_prefix}view_zip         image/view/zip.cpp)
+add_core_test(${test_prefix}view_adaptor                image/view/adaptor.cpp)
+add_core_test(${test_prefix}view_extend_with_value      image/view/extend_with_value.cpp)
+add_core_test(${test_prefix}view_transform              image/view/transform.cpp)
+add_core_test(${test_prefix}view_filter                 image/view/filter.cpp)
+add_core_test(${test_prefix}view_clip                   image/view/clip.cpp)
+add_core_test(${test_prefix}view_mask                   image/view/mask.cpp)
+add_core_test(${test_prefix}view_zip                    image/view/zip.cpp)
 
 
 # test Images

@@ -5,6 +5,7 @@
 #include <mln/core/image/morphers/extended_by_value_image.hpp>
 #include <mln/core/internal/get_border_from_nbh.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
+#include <mln/core/se/se.hpp>
 
 
 namespace mln

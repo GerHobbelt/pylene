@@ -26,6 +26,9 @@ namespace mln
   template <class I, class V>
   using image_ch_value_t = typename I::template ch_value_type<V>;
 
+  template <class I, class V>
+  using ch_value_t = image_ch_value_t<I, V>;
+
   struct [[deprecated]] image_dynamic_tag
   {
   };

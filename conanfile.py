@@ -39,6 +39,7 @@ class Pylene(ConanFile):
         self.requires("range-v3/0.4.0@ericniebler/stable")
         # self.requires("cmcstl2/head@dutiona/testing")
         self.requires("cmcstl2/0.1@dutiona/testing")
+        self.requires("boost/1.69.0@conan/stable")
 
         if self.options.freeimage:
             self.requires("freeimage/3.18.0@dutiona/stable")

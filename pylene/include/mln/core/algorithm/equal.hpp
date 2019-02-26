@@ -3,6 +3,11 @@
 
 #include <mln/core/image/image.hpp>
 
+#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/rangev3/view/zip.hpp>
+
+#include <range/v3/algorithm/equal.hpp>
+
 namespace mln
 {
 
@@ -22,6 +27,25 @@ namespace mln
   template <typename I, typename J>
   bool equal(const Image<I>& ima1, const Image<J>& ima2);
 
+  namespace experimental
+  {
+    /// \brief Compare if two image are equals.
+    ///
+    /// Two image are said equal if their domains
+    /// are equals and have the same values.
+    ///
+    /// \param lhs First image
+    /// \param rhs Second image
+    ///
+    /// \tparam LhsImage must model a Readable Forward Image
+    /// \tparam RhsImage must model a Readable Forward Image
+    ///
+    /// \return True if image are equals.
+    ///
+    template <class LhsImage, class RhsImage>
+    bool equal(LhsImage lhs, RhsImage rhs);
+  } // namespace experimental
+
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -38,6 +62,25 @@ namespace mln
 
     return true;
   };
+
+  namespace experimental
+  {
+    template <class LhsImage, class RhsImage>
+    bool equal(LhsImage lhs, RhsImage rhs)
+    {
+      static_assert(mln::is_a<LhsImage, Image>());
+      static_assert(mln::is_a<RhsImage, Image>());
+
+      auto&& lhs_pixels = lhs.new_pixels();
+      auto&& rhs_pixels = rhs.new_pixels();
+
+      for (auto [lhs_r, rhs_r] : ranges::view::zip(ranges::rows(lhs_pixels), ranges::rows(rhs_pixels)))
+        if (!::ranges::equal(lhs_r, rhs_r))
+          return false;
+
+      return true;
+    }
+  } // namespace experimental
 
 } // end of namespace mln
 

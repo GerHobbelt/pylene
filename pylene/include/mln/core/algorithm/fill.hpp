@@ -3,8 +3,10 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
-#include <algorithm>
 #include <range/v3/algorithm/fill.hpp>
+
+#include <algorithm>
+
 
 /// \file
 

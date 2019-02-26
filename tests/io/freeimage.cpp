@@ -76,7 +76,7 @@ TEST(IO, FreeImage_slow_pgm)
   io::imsave(imcast<uint32>(tmp), "test.tiff");
   image2d<unsigned> ima2;
   io::imread("test.tiff", ima2);
-  ASSERT_TRUE(equal(ima2, tmp));
+  ASSERT_TRUE(mln::equal(ima2, tmp));
 }
 
 TEST(IO, FreeImage_slow_ppm)
@@ -98,7 +98,7 @@ TEST(IO, FreeImage_slow_ppm)
   auto tmp = 2u * ref;
   io::imsave(imcast<rgb8>(tmp), "test.tiff");
   io::imread("test.tiff", ima);
-  ASSERT_TRUE(equal(ima, 2 * ref));
+  ASSERT_TRUE(mln::equal(ima, 2 * ref));
 }
 
 TEST(IO, FreeImage_slow_pbm)
@@ -113,5 +113,5 @@ TEST(IO, FreeImage_slow_pbm)
 
   io::imsave(lnot(ref), "test.tiff");
   io::imread("test.tiff", ima);
-  ASSERT_TRUE(equal(ima, lnot(ref)));
+  ASSERT_TRUE(mln::equal(ima, lnot(ref)));
 }

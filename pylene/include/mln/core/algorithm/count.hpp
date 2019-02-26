@@ -1,34 +1,38 @@
 #pragma once
 
-#include <mln/core/concepts/image.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
-#include <mln/core/range/rows.hpp>
 #include <range/v3/algorithm/count.hpp>
 
 
 namespace mln
 {
 
-
-  template <class InputImage, class Value>
-  std::ptrdiff_t count(InputImage input, const Value& v);
-
+  namespace experimental
+  {
+    template <class InputImage, class Value>
+    auto count(InputImage input, const Value& v);
+  }
 
   /******************/
   /* Implem         */
   /******************/
 
-  template <class InputImage, class Value>
-  std::ptrdiff_t count(InputImage input, const Value& val)
+  namespace experimental
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    template <class InputImage, class Value>
+    auto count(InputImage input, const Value& v)
+    {
+      static_assert(mln::is_a<InputImage, Image>());
 
-    auto&&         vals = input.values();
-    std::ptrdiff_t k    = 0;
+      auto&&         vals = input.new_values();
+      std::ptrdiff_t cmpt = 0;
 
-    for (auto r : ranges::rows(vals))
-      k += ::ranges::count(r, val);
+      for (auto r : ranges::rows(vals))
+        cmpt += ::ranges::count(r, v);
 
-    return k;
-  }
+      return cmpt;
+    }
+  } // namespace experimental
 } // namespace mln

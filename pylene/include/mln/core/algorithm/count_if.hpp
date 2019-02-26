@@ -1,33 +1,39 @@
 #pragma once
 
-#include <mln/core/concepts/image.hpp>
-#include <mln/core/range/rows.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
 #include <range/v3/algorithm/count_if.hpp>
-#include <range/v3/functional/concepts.hpp>
+
 
 namespace mln
 {
 
-  template <class InputImage, class UnaryPredicate>
-  std::ptrdiff_t count_if(InputImage input, UnaryPredicate p);
+  namespace experimental
+  {
+    template <class InputImage, class UnaryPredicate>
+    auto count_if(InputImage input, UnaryPredicate p);
+  }
 
   /******************/
   /* Implem         */
   /******************/
 
-  template <class InputImage, class UnaryPredicate>
-  std::ptrdiff_t count_if(InputImage input, UnaryPredicate p)
+  namespace experimental
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>());
-    static_assert(::ranges::predicate<UnaryPredicate, image_reference_t<InputImage>>);
+    template <class InputImage, class UnaryPredicate>
+    auto count_if(InputImage input, UnaryPredicate p)
+    {
+      static_assert(mln::is_a<InputImage, Image>());
+      static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());
 
-    auto&&         vals = input.values();
-    std::ptrdiff_t k    = 0;
+      auto&&         vals = input.new_values();
+      std::ptrdiff_t cmpt = 0;
 
-    for (auto r : ranges::rows(vals))
-      k += ::ranges::count_if(r, p);
+      for (auto r : ranges::rows(vals))
+        cmpt += ::ranges::count_if(r, std::move(p));
 
-    return k;
-  }
+      return cmpt;
+    }
+  } // namespace experimental
 } // namespace mln

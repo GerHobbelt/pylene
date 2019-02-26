@@ -13,10 +13,10 @@ Pour simplifier le problème, on suppose qu'on a ce type générique d'image:
             // Default constructed empty image
             image2d();
 
-            // Default-initialized image of size: width x height 
+            // Default-initialized image of size: width x height
             image2d(int width, int height);
 
-            // Image of size width x height initialized with \p val 
+            // Image of size width x height initialized with \p val
             image2d(int width, int height, T val);
 
             // Return the range of values
@@ -53,7 +53,7 @@ L'objectif est d'être capable d'appeler cette routine depuis python avec des ty
 Vcsn's approach: JIT
 ====================
 
-.. image:: /figures/rumination/jit.svg
+.. image:: ../figures/rumination/jit.svg
     :width: 75%
     :align: center
 
@@ -77,8 +77,8 @@ L'implementation de l'algorithm `stretch` s'apparente alors à::
     {
         std::type_info t = f.type();
         std::function<any_image(const any_image&)> f = COMPILE(stretch<T>) WITH T=t
-        return fun(f); 
-    }    
+        return fun(f);
+    }
 
 With COMPILE that generates (as text [1]_), compiles the C++ function::
 

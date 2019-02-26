@@ -137,14 +137,12 @@ namespace mln
     template <class I, class SE>
     bool need_adjust(const experimental::Image<I>& ima, const experimental::StructuringElement<SE>& se)
     {
-      return extension::impl::need_adjust(static_cast<const I&>(ima),
-                                          static_cast<const SE&>(se),
-                                          image_extension_category_t<I>(),
-                                          typename SE::category());
+      return extension::impl::need_adjust(static_cast<const I&>(ima), static_cast<const SE&>(se),
+                                          image_extension_category_t<I>(), typename SE::category());
     }
 
 
-  } // end of namespace mln::extension
+  } // namespace extension
 } // end of namespace mln
 
 #endif //! MLN_CORE_EXTENSION_EXTENSION_HPP

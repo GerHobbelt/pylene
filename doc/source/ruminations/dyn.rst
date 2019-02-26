@@ -95,11 +95,11 @@ into a shared library and returns the function as a pointer to function (with dl
 
 
 `any_image` is opaque. It cannot be manipulated in Python, but can only be generated and manipulated to the c++ in the
-c++ workspace. In the Python's workspace, we can only call c++ binded function with this type.
+c++ workspace. In the Python's workspace, we can only call c++ bound function with this type.
 
 The problems here:
 
-* we haven't got numpy bindings
+* we don't have numpy bindings
 * we need to embed a compiler
 
 The pros:
@@ -130,7 +130,7 @@ Thus, to bind the function `stretch`, one would imlement::
     ndarray stretch(ndarray X)
     {
         image2d<double> Y = convert(X);
-        auto Z = strech(Y);
+        auto Z = stretch(Y);
         return as(Z);
     }
 

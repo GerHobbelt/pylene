@@ -31,8 +31,7 @@ namespace mln
   {
     /// \brief Compare if two image are equals.
     ///
-    /// Two image are said equal if their domains
-    /// are equals and have the same values.
+    /// Two image are said equal if they have the same values.
     ///
     /// \param lhs First image
     /// \param rhs Second image
@@ -71,10 +70,10 @@ namespace mln
       static_assert(mln::is_a<LhsImage, Image>());
       static_assert(mln::is_a<RhsImage, Image>());
 
-      auto&& lhs_pixels = lhs.new_pixels();
-      auto&& rhs_pixels = rhs.new_pixels();
+      auto&& lhs_vals = lhs.new_values();
+      auto&& rhs_vals = rhs.new_values();
 
-      for (auto [lhs_r, rhs_r] : ranges::view::zip(ranges::rows(lhs_pixels), ranges::rows(rhs_pixels)))
+      for (auto [lhs_r, rhs_r] : ranges::view::zip(ranges::rows(lhs_vals), ranges::rows(rhs_vals)))
         if (!::ranges::equal(lhs_r, rhs_r))
           return false;
 

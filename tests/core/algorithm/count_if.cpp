@@ -13,7 +13,7 @@ TEST(Core, Algorithm_CountIf)
 
   image2d<int> ima(10, 10);
 
-  iota(ima, 0);
+  mln::iota(ima, 0);
 
   ASSERT_TRUE(count_if(ima, [](auto v) { return v == 1; }) == 1);
 }
@@ -25,7 +25,7 @@ TEST(Core, Algorithm_CountIf42)
 
   image2d<int> ima(3, 3);
 
-  fill(ima, 42);
+  mln::fill(ima, 42);
 
   ASSERT_TRUE(count_if(ima, [](auto v) { return v == 42; }) == 9);
 }

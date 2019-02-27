@@ -12,7 +12,7 @@ namespace mln
   namespace experimental
   {
     template <class InputImage, class Value>
-    auto count(InputImage input, const Value& v);
+    std::ptrdiff_t count(InputImage input, const Value& v);
   }
 
   /******************/
@@ -22,7 +22,7 @@ namespace mln
   namespace experimental
   {
     template <class InputImage, class Value>
-    auto count(InputImage input, const Value& v)
+    std::ptrdiff_t count(InputImage input, const Value& v)
     {
       static_assert(mln::is_a<InputImage, Image>());
 

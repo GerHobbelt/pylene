@@ -5,7 +5,7 @@ Include :file:`<mln/core/algorithm/count.hpp>`
 
 .. cpp:namespace:: mln
 
-.. cpp:function:: std::size_t count(InputImage ima, const Value& v)
+.. cpp:function:: std::ptrdiff_t count(InputImage ima, const Value& v)
 
     Count the number of pixel whose value is `v` in `ima`.
 
@@ -20,7 +20,7 @@ Include :file:`<mln/core/algorithm/count.hpp>`
 Examples
 --------
 
-#. Count in an image::
+#. Count the number of v in an image::
 
     mln::image2d<mln::rgb8> ima = ...;
     mln::rgb8 v = ...;

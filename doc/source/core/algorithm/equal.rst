@@ -8,7 +8,7 @@ Include :file:`<mln/core/algorithm/equal.hpp>`
 .. cpp:function:: bool equal(LhsImage lhs, RhsImage rhs)
 
     Compare the pixels of `lhs` and `rhs`.
-    The result is true if and only if both lhs's values and points correspond to rhs's.
+    The result is true if and only if rhs's values equal lhs's values.
 
     :param lhs: First image to compare
     :param rhs: Second image to compare

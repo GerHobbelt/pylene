@@ -7,9 +7,9 @@ Include :file:`<mln/core/algorithm/count.hpp>`
 
 .. cpp:function:: std::size_t count(InputImage ima, const Value& v)
 
-    Count the `ima`'s pixels whose value is `v`.
+    Count the number of pixel whose value is `v` in `ima`.
 
-    :param ima: The image to be trasversed
+    :param ima: The image to be traversed
     :param v: The value to be counted
     :tparam InputImage: A model of :cpp:concept:`InputImage`
     :tparam Value: A model of :cpp:concept:`Value`

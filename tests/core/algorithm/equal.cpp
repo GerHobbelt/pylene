@@ -13,8 +13,8 @@ TEST(Core, Algorithm_Equal)
   image2d<uint8> ima(10, 10);
   image2d<uint8> out(10, 10);
 
-  iota(ima, 0);
-  iota(out, 0);
+  mln::iota(ima, 0);
+  mln::iota(out, 0);
 
   ASSERT_TRUE(equal(ima, out));
 
@@ -30,8 +30,8 @@ TEST(Core, Algorithm_ExperimentalEqual)
   image2d<uint8> ima(10, 10);
   image2d<uint8> out(10, 10);
 
-  iota(ima, 0);
-  iota(out, 0);
+  mln::iota(ima, 0);
+  mln::iota(out, 0);
 
   ASSERT_TRUE(experimental::equal(ima, out));
 

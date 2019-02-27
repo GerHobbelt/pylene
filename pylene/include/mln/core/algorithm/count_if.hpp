@@ -12,7 +12,7 @@ namespace mln
   namespace experimental
   {
     template <class InputImage, class UnaryPredicate>
-    auto count_if(InputImage input, UnaryPredicate p);
+    std::ptrdiff_t count_if(InputImage input, UnaryPredicate p);
   }
 
   /******************/
@@ -22,7 +22,7 @@ namespace mln
   namespace experimental
   {
     template <class InputImage, class UnaryPredicate>
-    auto count_if(InputImage input, UnaryPredicate p)
+    std::ptrdiff_t count_if(InputImage input, UnaryPredicate p)
     {
       static_assert(mln::is_a<InputImage, Image>());
       static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());

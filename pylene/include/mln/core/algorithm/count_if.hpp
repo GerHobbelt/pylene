@@ -28,12 +28,12 @@ namespace mln
       static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());
 
       auto&&         vals = input.new_values();
-      std::ptrdiff_t cmpt = 0;
+      std::ptrdiff_t k    = 0;
 
       for (auto r : ranges::rows(vals))
-        cmpt += ::ranges::count_if(r, std::move(p));
+        k += ::ranges::count_if(r, std::move(p));
 
-      return cmpt;
+      return k;
     }
   } // namespace experimental
 } // namespace mln

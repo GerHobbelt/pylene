@@ -5,14 +5,14 @@ Include :file:`<mln/core/algorithm/count_if.hpp>`
 
 .. cpp:namespace:: mln
 
-.. cpp:function:: std::ptrdiff_t count_if(InputImage ima, std::UnaryPredicate p)
+.. cpp:function:: std::size_t count_if(InputImage ima, UnaryPredicate p)
 
-    Count the number of pixel whose value verify the predicate `p` in `ima`.
+    Count the `ima`'s pixels whose value verifies the predicate `p`.
 
     :param ima: The image to be trasversed
     :param p: The predicate to verify
     :tparam InputImage: A model of :cpp:concept:`InputImage`
-    :tparam std::UnaryPredicate: A model of :cpp:concept:`std::UnaryPredicate`
+    :tparam UnaryPredicate: A model of :cpp:concept:`stl::UnaryPredicate`
     :return: number of pixels whose value verifies `p` in `ima`
 
     
@@ -20,11 +20,10 @@ Include :file:`<mln/core/algorithm/count_if.hpp>`
 Examples
 --------
 
-#. Counts the number of non-black pixel in an image::
+#. Count in an image::
 
     mln::image2d<mln::rgb8> ima = ...;
-    mln::rgb8 black{0, 0, 0};
-    std::ptrdiff_t nb_black = mln::count_if(ima, [&](mln::rgb8 v){ return v != black; });
+    std::ptrdiff_t nb_black = mln::count_if(ima, [](mln::rgb8 v){ return v == {0, 0, 0}; });
  
  
 Complexity

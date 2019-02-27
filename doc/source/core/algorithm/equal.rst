@@ -5,10 +5,10 @@ Include :file:`<mln/core/algorithm/equal.hpp>`
 
 .. cpp:namespace:: mln
 
-.. cpp:function:: Image{A} Image{B} bool equal(A lhs, B rhs)
+.. cpp:function:: bool equal(LhsImage lhs, RhsImage rhs)
 
     Compare the pixels of `lhs` and `rhs`.
-    The result is true if and only if rhs's values equal lhs's values.
+    The result is true if and only if both lhs's values and points correspond to rhs's.
 
     :param lhs: First image to compare
     :param rhs: Second image to compare

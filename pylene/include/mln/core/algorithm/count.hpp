@@ -27,12 +27,12 @@ namespace mln
       static_assert(mln::is_a<InputImage, Image>());
 
       auto&&         vals = input.new_values();
-      std::ptrdiff_t cmpt = 0;
+      std::ptrdiff_t k    = 0;
 
       for (auto r : ranges::rows(vals))
-        cmpt += ::ranges::count(r, v);
+        k += ::ranges::count(r, v);
 
-      return cmpt;
+      return k;
     }
   } // namespace experimental
 } // namespace mln

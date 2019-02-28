@@ -11,8 +11,8 @@ namespace mln
     template <class SE>
     struct se_traits;
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_MORPHO_SE_SE_HPP

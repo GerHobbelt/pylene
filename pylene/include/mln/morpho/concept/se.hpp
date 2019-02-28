@@ -11,8 +11,8 @@ namespace mln
     template <class SE>
     using StructuringElement = Neighborhood<SE>;
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_MORPHO_CONCEPT_SE_HPP

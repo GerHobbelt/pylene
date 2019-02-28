@@ -46,8 +46,8 @@ namespace mln
       return filtered_range<InputRange, Predicate>(std::forward<InputRange>(rng), pred);
     }
 
-  } // end of namespace mln::rng
+  } // namespace mln::rng
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_CORE_RANGE_FILTER_HPP

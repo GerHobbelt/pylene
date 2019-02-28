@@ -107,6 +107,6 @@ namespace mln
     size_type    m_index;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_PIXEL_POINTER_PIXEL_HPP

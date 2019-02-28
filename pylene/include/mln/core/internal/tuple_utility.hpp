@@ -1,8 +1,8 @@
-#ifndef TUPLE_UTILITY_HPP
-#define TUPLE_UTILITY_HPP
+#pragma once
 
 #include <tuple>
 #include <utility>
+
 
 namespace mln
 {
@@ -49,7 +49,7 @@ namespace mln
         std::initializer_list<int> _dummy = {(f(std::get<k>(tuple)), 0)...};
         (void)_dummy;
       }
-    }
+    } // namespace impl
 
     template <class F, class... TTypes>
     auto tuple_transform(std::tuple<TTypes...>& t, F f)
@@ -74,7 +74,5 @@ namespace mln
     {
       impl::tuple_for_each(t, f, std::make_index_sequence<sizeof...(TTypes)>());
     }
-  }
-}
-
-#endif // ! TUPLE_UTILITY_HPP
+  } // namespace internal
+} // namespace mln

@@ -1,9 +1,10 @@
-#ifndef MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
-#define MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
+#pragma once
 
-#include <boost/concept_check.hpp>
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/object.hpp>
+
+#include <boost/concept_check.hpp>
+
 
 namespace mln
 {
@@ -66,6 +67,4 @@ namespace mln
     result_type   res;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_ACCU_CONCEPT_ACCUMULATOR_HPP
+} // namespace mln

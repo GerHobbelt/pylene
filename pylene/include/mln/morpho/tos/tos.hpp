@@ -110,7 +110,7 @@ namespace mln
       return tos(ima, exact(ima).domain().pmin);
     }
 
-  } // end of namespace mln::morpho
-} // end of namespace mln
+  } // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_TOS_TOS_HPP

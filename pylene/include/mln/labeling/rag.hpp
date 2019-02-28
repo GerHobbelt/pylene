@@ -161,7 +161,7 @@ namespace mln
         return lbl;
       }
 
-    } // end of namespace mln::labeling::impl
+    } // namespace mln::labeling::impl
 
     template <typename I, typename N, typename Graph, typename Label>
     std::pair<mln_ch_value(I, Label), Label> rag(const Image<I>& ima_, const N& nbh, Graph& graph, Label lbl)
@@ -196,8 +196,8 @@ namespace mln
       return std::make_pair(out, lbl);
     }
 
-  } // end of namespace mln::labeling
+  } // namespace mln::labeling
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_LABELING_RAG_HPP

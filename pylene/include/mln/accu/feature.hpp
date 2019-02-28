@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_FEATURE_HPP
-#define MLN_ACCU_FEATURE_HPP
+#pragma once
 
 #include <boost/fusion/container/list.hpp>
 #include <boost/fusion/include/find_if.hpp>
@@ -11,7 +10,9 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/utility/enable_if.hpp>
+
 #include <type_traits>
+
 
 /// Fixme:
 /// Use boost fusion to transmit dynamic data of features when composing
@@ -128,10 +129,8 @@ namespace mln
         typedef boost::mpl::set<> type;
       };
 
-    } // end of namespace mln::accu::features
+    } // namespace features
 
-  } // end of namespace mln::accu
+  } // namespace accu
 
-} // end of namespace mln
-
-#endif //! MLN_ACCU_FEATURE_HPP
+} // namespace mln

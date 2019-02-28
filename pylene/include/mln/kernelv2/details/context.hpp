@@ -60,8 +60,8 @@ namespace mln
         NVTuple nvals;
       };
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
+    } // namespace mln::kernel::details
+  }   // namespace mln::kernel
+} // namespace mln
 
 #endif //! MLN_KERNELV2_DETAILS_CONTEXT_HPP

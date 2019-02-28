@@ -13,6 +13,6 @@ namespace mln
     return (T*)(((char*)x) + offset);
   }
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_UTILS_PTROFFSET_HPP

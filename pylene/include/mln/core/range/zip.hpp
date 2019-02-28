@@ -111,8 +111,8 @@ namespace mln
       return zip_range<T>(std::forward_as_tuple<TRanges&&...>(ranges...));
     }
 
-  } // end of namespace mln::rng
+  } // namespace mln::rng
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_CORE_RANGE_ZIP_HPP

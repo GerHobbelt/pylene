@@ -1,10 +1,10 @@
-#ifndef MLN_COLORS_LSH_HPP
-#define MLN_COLORS_LSH_HPP
+#pragma once
 
 #include <mln/core/colors.hpp>
 #include <mln/core/vec.hpp>
 
 // FIXME: optimize this out (slow because of floats and saturations)
+
 
 namespace mln
 {
@@ -30,7 +30,7 @@ namespace mln
       static const bool is_less_than_comparable = true;
       static const bool is_equality_comparable  = true;
     };
-  }
+  } // namespace internal
 
   template <typename T>
   lsh<T> rgb2lsh(const rgb<T>& v);
@@ -66,7 +66,7 @@ namespace mln
           return std::make_tuple(g, b, r, 5); // g <= b <= r
       }
     }
-  }
+  } // namespace internal
 
   template <typename T>
   inline lsh<T> rgb2lsh(const rgb<T>& v)
@@ -128,6 +128,4 @@ namespace mln
       return rgb<T>();
     }
   }
-}
-
-#endif // ! MLN_COLORS_LSH_HPP
+} // namespace mln

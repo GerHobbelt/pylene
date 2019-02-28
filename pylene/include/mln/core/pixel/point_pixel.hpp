@@ -69,6 +69,6 @@ namespace mln
     site_type   m_point;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_PIXEL_POINT_PIXEL_HPP

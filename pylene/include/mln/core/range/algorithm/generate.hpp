@@ -17,8 +17,8 @@ namespace mln
         *vin = f();
     }
 
-  } // end of namespace mln::range
+  } // namespace mln::range
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP

@@ -53,6 +53,6 @@ namespace mln
     reverse_iterator riter_;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_ITERATOR_RANGE_HPP

@@ -1,10 +1,4 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_HPP
-#warning "This should not be included as a standalone."
-#include <mln/core/image/image.hpp>
-#endif
-
-#ifndef MLN_CORE_CH_VALUE_HPP
-#define MLN_CORE_CH_VALUE_HPP
+#pragma once
 
 #include <mln/core/image_traits.hpp>
 
@@ -37,6 +31,4 @@ namespace mln
   struct image_ch_value : image_ch_value<typename image_concrete<Image>::type, V>
   {
   };
-}
-
-#endif // !MLN_CORE_CH_VALUE_HPP
+} // namespace mln

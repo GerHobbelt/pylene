@@ -74,6 +74,6 @@ namespace mln
     pointer operator->() const { return internal::make_pointer<reference>::foo(mln::exact(this)->dereference()); }
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_ITERATOR_ITERATOR_BASE_HPP

@@ -39,8 +39,8 @@ namespace mln
                                                    Expr, kernel_abstract_context>::type>::type>::type,
           Expr>::type;
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
+    } // namespace mln::kernel::details
+  }   // namespace mln::kernel
+} // namespace mln
 
 #endif //!_MLN_KERNEL_DETAILS_EXPRESSIONS_HPP

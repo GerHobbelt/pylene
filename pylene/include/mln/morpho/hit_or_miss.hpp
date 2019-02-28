@@ -106,8 +106,8 @@ namespace mln
       return out;
     }
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_MORPHO_HIT_OR_MISS_HPP

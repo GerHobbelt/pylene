@@ -121,8 +121,8 @@ namespace mln
       }
 
 
-    } // end of namespace mln::morpho::details
-  }   // end of namespace mln::morpho
-} // end of namespace mln
+    } // namespace mln::morpho::details
+  }   // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_PRIVATE_PQUEUE_HQUEUE_FIFO_HPP

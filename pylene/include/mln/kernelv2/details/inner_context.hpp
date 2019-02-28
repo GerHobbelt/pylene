@@ -89,8 +89,8 @@ namespace mln
         };
       };
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
+    } // namespace mln::kernel::details
+  }   // namespace mln::kernel
+} // namespace mln
 
 #endif //! MLN_KERNELV2_DETAILS_INNER_CONTEXT_HPP

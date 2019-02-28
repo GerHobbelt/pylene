@@ -1,5 +1,5 @@
-#ifndef MLN_CORE_IMAGE_MORPHERS_DETAILS_MORPHER_CORE_ACCESS_HPP
-#define MLN_CORE_IMAGE_MORPHERS_DETAILS_MORPHER_CORE_ACCESS_HPP
+#pragma once
+
 
 namespace mln
 {
@@ -55,6 +55,4 @@ namespace mln
     }
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_MORPHERS_DETAILS_MORPHER_CORE_ACCESS_HPP
+} // namespace mln

@@ -10,6 +10,6 @@ namespace mln
     typedef typename ReversibleRange::reverse_iterator type;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_RANGE_REVERSE_ITERATOR_HPP

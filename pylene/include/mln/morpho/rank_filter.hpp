@@ -87,7 +87,7 @@ namespace mln
         ker::execute(expr, nbh);
       }
 
-    } // end of namespace mln::morpho::impl
+    } // namespace mln::morpho::impl
 
     template <class Ratio, class I, class SE, class OutputImage>
     OutputImage& rank_filter(const Image<I>& ima_, const StructuringElement<SE>& se_, Image<OutputImage>& output_)
@@ -127,8 +127,8 @@ namespace mln
       return out;
     }
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_MORPHO_RANK_FILTER_HPP

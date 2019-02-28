@@ -1,16 +1,15 @@
-#ifndef MLN_CORE_CONCEPT_IMAGE_HPP
-#define MLN_CORE_CONCEPT_IMAGE_HPP
+#pragma once
 
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/extension.hpp>
+#include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/object.hpp>
 #include <mln/core/concept/pixel.hpp>
-
 #include <mln/core/image/image.hpp>
 #include <mln/core/image_traits.hpp>
 
 #include <boost/concept_check.hpp>
-#include <mln/core/concept/new/images.hpp>
+
 
 namespace mln
 {
@@ -279,6 +278,4 @@ namespace mln
     }
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_CONCEPT_IMAGE_HPP
+} // namespace mln

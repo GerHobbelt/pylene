@@ -125,9 +125,9 @@ namespace mln
           return std::make_pair(Key(), (Point)npos);
         }
 
-      } // end of namespace mln::morpho::tos::impl
-    }   // end of namespace mln::morpho::tos
-  }     // end of namespace mln::morpho
-} // end of namespace mln
+      } // namespace mln::morpho::tos::impl
+    }   // namespace mln::morpho::tos
+  }     // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP

@@ -229,7 +229,7 @@ namespace mln
     }
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #undef MLN_PIXMORPHER_FORWARD_0_
 #undef MLN_PIXMORPHER_FORWARD_CONST_0

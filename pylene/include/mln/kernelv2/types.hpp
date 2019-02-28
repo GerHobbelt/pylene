@@ -91,8 +91,8 @@ namespace mln
       return Image<I, k>{std::forward<I>(f)};
     }
 
-  } // end of namespace mln::kernel
+  } // namespace mln::kernel
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_KERNELV2_TYPES_HPP

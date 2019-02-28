@@ -108,7 +108,7 @@ namespace mln
       }
     }
 
-  } // end of namespace mln::io
-} // end of namespace mln
+  } // namespace mln::io
+} // namespace mln
 
 #endif //! MLN_IO_SAVER_HPP

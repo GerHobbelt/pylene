@@ -27,7 +27,7 @@ namespace mln
   template <unsigned nbits>
   struct Int;
 
-} // end of namespace mln
+} // namespace mln
 
 /******************************************/
 /****              traits              ****/
@@ -109,7 +109,7 @@ namespace mln
     static constexpr Int<nbits> sup() { return max(); }
   };
 
-} // end of namespace mln
+} // namespace mln
 
 /******************************************/
 /****     Indexers specialization     *****/
@@ -218,7 +218,7 @@ namespace mln
 #pragma warning(pop)
 #endif
 
-} // end of namespace mln
+} // namespace mln
 
 // Specialization of standards traits with Int and UInt
 

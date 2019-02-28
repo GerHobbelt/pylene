@@ -1,8 +1,8 @@
-#ifndef MLN_CONTRIB_MEANSHIFT_MEANSHIFT_HPP
-#define MLN_CONTRIB_MEANSHIFT_MEANSHIFT_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/win2d.hpp>
+
 
 namespace mln
 {
@@ -76,8 +76,6 @@ namespace mln
       return out;
     }
 
-  } // end of namespace mln::contrib
+  } // namespace contrib
 
-} // end of namespace mln
-
-#endif //! MLN_CONTRIB_MEANSHIFT_MEANSHIFT_HPP
+} // namespace mln

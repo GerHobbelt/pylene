@@ -101,6 +101,6 @@ namespace mln
         typename internal::range_category_helper<Range, internal::has_inner_category_tag<Range>::value>::category type;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_CATEGORY_HPP

@@ -1,5 +1,5 @@
-#ifndef MLN_CORE_EXTENSION_EXTENSION_TRAITS_HPP
-#define MLN_CORE_EXTENSION_EXTENSION_TRAITS_HPP
+#pragma once
+
 
 namespace mln
 {
@@ -29,7 +29,7 @@ namespace mln
     {
     };
 
-  } // end of namespace mln::extension
+  } // namespace extension
 
   /******************************************/
   /****              Traits              ****/
@@ -43,6 +43,4 @@ namespace mln
     typedef typename E::support_periodize support_periodize;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_EXTENSION_EXTENSION_TRAITS_HPP
+} // namespace mln

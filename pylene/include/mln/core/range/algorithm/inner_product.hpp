@@ -29,7 +29,7 @@ namespace mln
       return value;
     }
 
-  } // end of namespace mln::range
-} // end of namespace mln
+  } // namespace mln::range
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_ALGORITHM_INNER_PRODUCT_HPP

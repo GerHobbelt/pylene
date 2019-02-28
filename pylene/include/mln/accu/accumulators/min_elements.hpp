@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATORS_MIN_ELEMENTS_HPP
-#define MLN_ACCU_ACCUMULATORS_MIN_ELEMENTS_HPP
+#pragma once
 
 /// \file
 /// \brief Header file for the minimum accumulator
@@ -7,8 +6,10 @@
 #include <mln/accu/accumulator.hpp>
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 #include <utility>
 #include <vector>
+
 
 namespace mln
 {
@@ -23,7 +24,7 @@ namespace mln
       /// \tparam Compare The comparison function (non strict partial or total order).
       template <typename T, typename Compare = productorder_less_equal<T>>
       struct minimal_elements;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -32,7 +33,7 @@ namespace mln
       /// \tparam Compare The comparison function (`void` results in productorder_less by default).
       template <typename Compare = void>
       struct minimal_elements;
-    }
+    } // namespace features
 
     namespace features
     {
@@ -70,7 +71,7 @@ namespace mln
       struct minimal_elements<void> : simple_feature_facade<minimal_elements<void>, internal::meta_minimal_elements>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -80,7 +81,7 @@ namespace mln
       {
         return extract(exact(acc), features::minimal_elements<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -129,8 +130,6 @@ namespace mln
         std::vector<T> m_val;
         Compare        m_cmp;
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATORS_MIN_ELEMENTS_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

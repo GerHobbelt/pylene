@@ -27,7 +27,7 @@ namespace mln
       return init;
     }
 
-  } // end of namespace mln::range
-} // end of namespace mln
+  } // namespace mln::range
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_ALGORITHM_ACCUMULATE_HPP

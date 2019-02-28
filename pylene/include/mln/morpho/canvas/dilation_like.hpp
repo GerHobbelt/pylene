@@ -136,7 +136,7 @@ namespace mln
           dilate_like_1(extension::add_value_extension(ima, v), nbh, out, __op__, is_incremental());
         }
 
-      } // end of namespace mln::morpho::canvas::impl
+      } // namespace mln::morpho::canvas::impl
 
       namespace overload
       {
@@ -212,11 +212,11 @@ namespace mln
         }
       }
 
-    } // end of namespace mln::morpho::canvas
+    } // namespace mln::morpho::canvas
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 namespace mln
 {
@@ -233,10 +233,10 @@ namespace mln
         overload::dilation_dispatch_1(exact(ima), exact(nbh), exact(output), __op__, typename SE::is_decomposable());
       }
 
-    } // end of namespace mln::morpho::canvas
+    } // namespace mln::morpho::canvas
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_MORPHO_CANVAS_DILATION_LIKE_HPP

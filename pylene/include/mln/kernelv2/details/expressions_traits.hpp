@@ -332,8 +332,8 @@ namespace mln
         return get_image_used_by_neighbor_list_helper2(std::forward<Expr>(x), typename int_list_seq<K>::type());
       }
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
+    } // namespace mln::kernel::details
+  }   // namespace mln::kernel
+} // namespace mln
 
 #endif //! MLN_KERNELV2_DETAILS_EXPRESSIONS_TRAITS_HPP

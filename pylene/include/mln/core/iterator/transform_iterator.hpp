@@ -98,6 +98,6 @@ namespace mln
     return transform_iterator<Iterator, UnaryFunction>(it, f);
   }
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP

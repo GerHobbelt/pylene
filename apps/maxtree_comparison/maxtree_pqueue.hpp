@@ -160,4 +160,4 @@ namespace mln
 
   } // namespace morpho
 
-} // end of namespace mln
+} // namespace mln

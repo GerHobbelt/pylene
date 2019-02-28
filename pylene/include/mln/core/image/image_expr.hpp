@@ -1,16 +1,12 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_HPP
-#warning "You should not include this file directly but <mln/core/image/image.hpp> instead"
+#pragma once
+
 #include <mln/core/image/image.hpp>
-#endif
-
-#ifndef MLN_CORE_IMAGE_IMAGE_EXPR_HPP
-#define MLN_CORE_IMAGE_IMAGE_EXPR_HPP
-
 #include <mln/core/image/morphers/transformed_image.hpp>
 #include <mln/core/image/morphers/zip_image.hpp>
 
 #include <functional>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -19,7 +15,10 @@ namespace mln
   {
     template <typename Function, class... ArgType>
     struct func_call_from_tupleargs;
-  }
+
+    template <typename I, class UnaryFunction, bool use_pix>
+    struct transformed_image;
+  } // namespace internal
 
   template <typename UnaryFunction, typename Image>
   using unary_image_expr = internal::transformed_image<Image, UnaryFunction, false>;
@@ -138,7 +137,7 @@ namespace mln
     private:
       Function f;
     };
-  }
+  } // namespace internal
 
   /******************************************/
   /****         Helper functions         ****/
@@ -223,6 +222,4 @@ namespace mln
     auto fun = std::bind(f, std::placeholders::_1, s1, s2);
     return ternary_image_scalar_scalar_expr<TernaryFunction, I1, S1, S2>(std::forward<I1>(ima1), fun);
   }
-}
-
-#endif // !MLN_CORE_IMAGE_IMAGE_EXPR_HPP
+} // namespace mln

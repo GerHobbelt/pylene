@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP
-#define MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP
+#pragma once
 
 #include <mln/core/image/morphers/transformed_image.hpp>
+
 
 namespace mln
 {
@@ -40,7 +40,7 @@ namespace mln
         return static_cast<V>(v);
       }
     };
-  }
+  } // namespace internal
 
   template <class V, class I>
   casted_image<const I&, V> imcast(const Image<I>& ima)
@@ -59,6 +59,4 @@ namespace mln
   {
     return casted_image<I, V>(move_exact(ima), internal::cast_to<V>());
   }
-}
-
-#endif // ! MLN_CORE_IMAGE_MORPHERS_CASTED_IMAGE_HPP
+} // namespace mln

@@ -1,12 +1,7 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_HPP
-#warning "Should not been included as a standalone"
-#include <mln/core/image/image.hpp>
-#endif
-
-#ifndef MLN_CORE_IMAGE_INTERNAL_INITIALIZER_HPP
-#define MLN_CORE_IMAGE_INTERNAL_INITIALIZER_HPP
+#pragma once
 
 #include <mln/core/image/internal/reindex.hpp>
+
 
 namespace mln
 {
@@ -232,6 +227,4 @@ namespace mln
     return internal::initializer<mln_concrete(I), I>(ref);
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_INTERNAL_INITIALIZER_HPP
+} // namespace mln

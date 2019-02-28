@@ -59,8 +59,8 @@ namespace mln
       return transformed_range<InputRange, UnaryFunction>(rng, fun);
     }
 
-  } // end of namespace mln::rng
+  } // namespace mln::rng
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_CORE_RANGE_TRANSFORM_HPP

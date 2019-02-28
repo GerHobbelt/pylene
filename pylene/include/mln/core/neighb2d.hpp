@@ -56,6 +56,6 @@ namespace mln
   static const c2_v_t c2_v{};
   static const c2_h_t c2_h{};
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_NEIGHB2D_HPP

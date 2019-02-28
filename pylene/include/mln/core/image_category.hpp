@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_IMAGE_CATEGORY_HPP
-#define MLN_CORE_IMAGE_CATEGORY_HPP
+#pragma once
 
 #include <mln/core/concept/new/cmcstl2.hpp>
+
 
 namespace mln
 {
@@ -29,6 +29,4 @@ namespace mln
   static_assert(concepts::stl::DerivedFrom<raw_image_tag, forward_image_tag>);
 #endif
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_CATEGORY_HPP
+} // namespace mln

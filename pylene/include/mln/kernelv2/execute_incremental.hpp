@@ -92,7 +92,7 @@ namespace mln
       mln_exiting();
     }
 
-  } // end of namespace mln::kernel
-} // end of namespace mln
+  } // namespace mln::kernel
+} // namespace mln
 
 #endif //! MLN_KERNELV2_EXECUTE_INCREMENTAL_HPP

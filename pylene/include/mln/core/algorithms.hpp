@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_ALGORITHMS_HPP
-#define MLN_CORE_ALGORITHMS_HPP
+#pragma once
 
 /// \file
 /// \defgroup Algorithms General Image Algorithms.
@@ -11,5 +10,3 @@
 #include <mln/core/algorithm/paste.hpp>
 #include <mln/core/algorithm/transform.hpp>
 /// \}
-
-#endif //! MLN_CORE_ALGORITHMS_HPP

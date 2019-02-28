@@ -30,6 +30,6 @@ namespace mln
     }
   } // namespace experimental
 
-} // end of namespace mln
+} // namespace mln
 
 

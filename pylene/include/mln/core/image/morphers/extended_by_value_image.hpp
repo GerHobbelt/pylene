@@ -1,9 +1,9 @@
-#ifndef EXTENDED_BY_VALUE_IMAGE_HPP
-#define EXTENDED_BY_VALUE_IMAGE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/morpher_base.hpp>
 #include <mln/core/range/iterator_range.hpp>
+
 
 namespace mln
 {
@@ -67,7 +67,7 @@ namespace mln
     {
       typedef typename image_init_from<typename std::decay<I>::type>::type type;
     };
-  }
+  } // namespace internal
 
   /*****************************/
   /**** Implementation       ***/
@@ -340,6 +340,4 @@ namespace mln
   {
     return extended_by_value_image<I>(move_exact(ima), v);
   }
-}
-
-#endif // ! EXTENDED_BY_VALUE_IMAGE_HPP
+} // namespace mln

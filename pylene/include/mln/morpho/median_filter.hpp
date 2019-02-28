@@ -53,8 +53,8 @@ namespace mln
       return rank_filter<std::ratio<1, 2>>(ima, se);
     }
 
-  } // end of namespace mln::morpho
+  } // namespace mln::morpho
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_MORPHO_MEDIAN_FILTER_HPP

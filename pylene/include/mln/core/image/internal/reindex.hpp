@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_INTERNAL_REINDEX_HPP
-#define MLN_CORE_IMAGE_INTERNAL_REINDEX_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 
@@ -46,7 +45,7 @@ namespace mln
     {
       (void)__are_indexable__;
     }
-  }
+  } // namespace impl
 
   template <typename I, typename J>
   void reindex(Image<I>& ima1, const Image<J>& ima2)
@@ -55,6 +54,4 @@ namespace mln
                   image_traits<I>::indexable::value and image_traits<J>::indexable::value > ());
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_INTERNAL_REINDEX_HPP
+} // namespace mln

@@ -176,7 +176,7 @@ namespace mln
     }
 
 
-  } // end of namespace mln::morpho
-} // end of namespace mln
+  } // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_WATERSHED_HPP

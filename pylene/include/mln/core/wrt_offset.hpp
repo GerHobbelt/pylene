@@ -77,6 +77,6 @@ namespace mln
     return out;
   }
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_WRT_OFFSET_HPP

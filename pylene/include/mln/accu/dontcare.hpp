@@ -1,5 +1,4 @@
-#ifndef DONTCARE_HPP
-#define DONTCARE_HPP
+#pragma once
 
 namespace mln
 {
@@ -12,7 +11,5 @@ namespace mln
       template <typename T>
       dontcare(T&&){};
     };
-  }
-}
-
-#endif // ! DONTCARE_HPP
+  } // namespace accu
+} // namespace mln

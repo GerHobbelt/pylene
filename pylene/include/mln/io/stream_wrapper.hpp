@@ -94,8 +94,8 @@ namespace mln
         std::ostream::off_type m_offset;
       };
 
-    } // end of namespace mln::io::internal
-  }   // end of namespace mln::io
-} // end of namespace mln
+    } // namespace mln::io::internal
+  }   // namespace mln::io
+} // namespace mln
 
 #endif //! MLN_IO_STREAM_WRAPPER_HPP

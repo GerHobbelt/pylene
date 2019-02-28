@@ -163,7 +163,7 @@ namespace mln
     }
 
 
-  } // end of namespace mln::labeling
-} // end of namespace mln
+  } // namespace mln::labeling
+} // namespace mln
 
 #endif //! MLN_LABELING_LOCAL_MINIMA_HPP

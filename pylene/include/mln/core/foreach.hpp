@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_FOREACH_HPP
-#define MLN_CORE_FOREACH_HPP
+#pragma once
 
 #include <mln/core/iterator/iterator_utils.hpp>
 #include <mln/core/range/iter.hpp>
 
 #include <utility>
+
 
 namespace mln
 {
@@ -35,8 +35,8 @@ namespace mln
     {
       return false_var_t<T>(std::forward<T>(expr));
     }
-  }
-}
+  } // namespace internal
+} // namespace mln
 
 #define MLN_DECL_VAR(ID, VALUE)                                                                                        \
   if (auto ID = mln::internal::make_local_variable(VALUE))                                                             \
@@ -58,8 +58,8 @@ namespace mln
       mln::outer_init(x);
       return x;
     }
-  }
-}
+  } // namespace internal
+} // namespace mln
 
 #define mln_foreach(p, COL)                                                                                            \
   MLN_DECL_VAR(_mln_range_, COL)                                                                                       \
@@ -87,5 +87,3 @@ namespace mln
     }                                                                                                                  \
     else                                                                                                               \
       for (p = *(_mln_it_.get()); !_mln_continue_.get(); _mln_continue_.set(true))
-
-#endif // ! MLN_CORE_FOREACH_HPP

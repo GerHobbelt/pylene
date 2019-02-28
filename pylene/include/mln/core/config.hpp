@@ -1,4 +1,4 @@
-#ifndef MLN_CORE_CONFIG_HPP
+#pragma once
 
 #include <ciso646> // FOR MSVC alternative operator representations
 
@@ -15,5 +15,3 @@
 #else
 #define __mln__attribute__(A)
 #endif
-
-#endif // !MLN_CORE_CONFIG_HPP

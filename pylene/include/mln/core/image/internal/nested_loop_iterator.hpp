@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_INTERNAL_NESTED_LOOP_ITERATOR_HPP
-#define MLN_CORE_IMAGE_INTERNAL_NESTED_LOOP_ITERATOR_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
@@ -8,6 +7,7 @@
 #include <array>
 #include <type_traits>
 #include <utility>
+
 
 namespace mln
 {
@@ -613,7 +613,5 @@ namespace mln
       OffsetVisitor  m_vv;
       IndexVisitor   m_iv;
     };
-  }
-}
-
-#endif // ! MLN_CORE_IMAGE_INTERNAL_NESTED_LOOP_ITERATOR_HPP
+  } // namespace internal
+} // namespace mln

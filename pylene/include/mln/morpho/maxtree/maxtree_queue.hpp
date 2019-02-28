@@ -184,7 +184,7 @@ namespace mln
         return ctree.get_subtree(stack_top_position);
       }
 
-    } // end of namespace mln::morpho::impl
+    } // namespace mln::morpho::impl
   }
 }
 

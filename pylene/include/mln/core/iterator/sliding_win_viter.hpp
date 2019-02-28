@@ -4,6 +4,6 @@
 namespace mln
 {
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_ITERATOR_SLIDING_WIN_VITER_HPP

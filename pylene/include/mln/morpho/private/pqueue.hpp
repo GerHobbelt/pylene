@@ -68,7 +68,7 @@ namespace mln
         return m_delegate.top();
       }
     }
-  } // end of namespace mln::morpho
-} // end of namespace mln
+  } // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_PRIVATE_PQUEUE_HPP

@@ -110,8 +110,8 @@ namespace mln
         return out;
       }
 
-    } // end of namespace mln::morpho::structural
-  }   // end of namespace mln::morpho
-} // end of namespace mln
+    } // namespace mln::morpho::structural
+  }   // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_STRUCTURAL_ERODE_HPP

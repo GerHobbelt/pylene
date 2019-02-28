@@ -47,8 +47,8 @@ namespace mln
       return internal::has_lookup<Range, T>::has(rng, val);
     }
 
-  } // end of namespace mln::rng
+  } // namespace mln::rng
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_HAS_HPP

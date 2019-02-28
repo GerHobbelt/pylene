@@ -10,6 +10,6 @@ namespace mln
     return c.rend();
   }
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_REND_HPP

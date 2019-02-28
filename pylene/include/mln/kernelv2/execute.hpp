@@ -65,8 +65,8 @@ namespace mln
       }
     }
 
-  } // end of namespace mln::kernel
+  } // namespace mln::kernel
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_KERNELV2_EXECUTE_HPP

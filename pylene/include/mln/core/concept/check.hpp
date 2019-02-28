@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_CONCEPT_CHECK_HPP
-#define MLN_CORE_CONCEPT_CHECK_HPP
+#pragma once
 
 #include <boost/concept_check.hpp>
 
 #include <string>
 #include <type_traits>
+
 
 #define MLN_CONCEPT_ASSERT_IF(TEST, CONCEPT) mln::internal::mln_check_if_<TEST, CONCEPT>();
 
@@ -24,7 +24,7 @@ namespace mln
     {
       mln_check_if_() { BOOST_CONCEPT_ASSERT((T)); }
     };
-  }
+  } // namespace internal
 
   template <bool condition>
   using check_t = std::integral_constant<bool, condition>;
@@ -43,6 +43,4 @@ namespace mln
     return static_cast<T&&>(*(typename std::remove_reference<T>::type*)(0));
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_CONCEPT_CHECK_HPP
+} // namespace mln

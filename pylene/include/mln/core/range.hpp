@@ -19,6 +19,6 @@ namespace mln
   using boost::range_difference;
   using boost::range_reverse_iterator;
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_RANGE_HPP

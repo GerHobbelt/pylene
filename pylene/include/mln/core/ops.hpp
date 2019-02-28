@@ -299,6 +299,6 @@ namespace mln
   /** Aggregation operations  **/
   /*****************************/
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_OPS_HPP

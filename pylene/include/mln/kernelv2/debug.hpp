@@ -53,8 +53,8 @@ namespace mln
       internal::debug_all_image(expr, typename int_list_seq<n::value>::type());
     }
 
-  } // end of namespace mln::kernel
+  } // namespace mln::kernel
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_KERNELV2_DEBUG_HPP

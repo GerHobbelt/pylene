@@ -1,7 +1,4 @@
-#ifndef MLN_CORE_IMAGE_SUB_IMAGE_HPP
-#define MLN_CORE_IMAGE_SUB_IMAGE_HPP
-
-#include <type_traits>
+#pragma once
 
 #include <boost/optional.hpp>
 #include <mln/core/image/image.hpp>
@@ -11,6 +8,9 @@
 #include <mln/core/range/filter.hpp>
 #include <mln/core/range/iterator_range.hpp>
 #include <mln/core/range/range_traits.hpp>
+
+#include <type_traits>
+
 
 namespace mln
 {
@@ -129,7 +129,7 @@ namespace mln
     private:
       const I& m_mask;
     };
-  }
+  } // namespace internal
 
   template <typename I, typename J>
   sub_image<const I&, filtered_range<const typename J::domain_type&, internal::is_in_mask<J>>>
@@ -394,8 +394,6 @@ namespace mln
     Domain m_domain;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #include <mln/core/image/sub_image.spe.hpp>
-
-#endif //! MLN_CORE_IMAGE_SUB_IMAGE_HPP

@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_DONTCARE_HPP
-#define MLN_CORE_DONTCARE_HPP
+#pragma once
 
 /// \file Dontcare type (a dummy type used in metaprogramming)
 
@@ -26,6 +25,4 @@ namespace mln
     static constexpr dontcare_t dontcare = {};
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_DONTCARE_HPP
+} // namespace mln

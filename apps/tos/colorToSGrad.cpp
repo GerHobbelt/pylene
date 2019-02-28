@@ -214,4 +214,4 @@ namespace mln
     K                   = area;
   }
 
-} // end of namespace mln
+} // namespace mln

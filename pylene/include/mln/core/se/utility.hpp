@@ -33,8 +33,8 @@ namespace mln
       return {s};
     }
 
-  } // end of namespace mln::se
+  } // namespace mln::se
 
-} // end of namespace mln
+} // namespace mln
 
 #endif // ! MLN_CORE_SE_UTILITY_HPP

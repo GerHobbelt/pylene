@@ -20,10 +20,10 @@ namespace mln
         return Sup_t<Compare>()(std::forward<Expr>(expr));
       }
 
-    } // end of namespace mln::kernel::aggregate
+    } // namespace mln::kernel::aggregate
 
-  } // end of namespace mln::kernel
+  } // namespace mln::kernel
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_KERNEL_AGGREGATE_SUP_HPP

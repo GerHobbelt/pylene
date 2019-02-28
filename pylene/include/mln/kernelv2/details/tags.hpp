@@ -53,10 +53,10 @@ namespace mln
         return os << "A";
       }
 
-    } // end of namespace mln::kernel::tags
+    } // namespace mln::kernel::tags
 
-  } // end of namespace mln::kernel
+  } // namespace mln::kernel
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_KERNELV2_DETAILS_TAGS_HPP

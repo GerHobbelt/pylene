@@ -100,6 +100,6 @@ namespace mln
     typename range_const_iterator<WeightSet>::type m_wset_iter;
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP

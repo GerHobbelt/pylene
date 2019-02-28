@@ -192,4 +192,4 @@ namespace mln
 
   } // namespace morpho
 
-} // namespace mln
+} // end of namespace mln

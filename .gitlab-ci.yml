@@ -67,7 +67,7 @@ distcheck-linux-clang-debug:
     script:
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data
-        - cmake --build . --target check-internals
+        - ctest -L InternalUnitTests
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target run-all-benchmarks

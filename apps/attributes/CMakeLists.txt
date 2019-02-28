@@ -13,8 +13,4 @@ if (EIGEN3_FOUND)
   add_executable(circularity-cli circularity-cli.cpp circularity.cpp attributes.cpp)
   target_include_directories(circularity-cli PRIVATE ${EIGEN3_INCLUDE_DIR})
   target_link_libraries(circularity-cli PUBLIC ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-  add_dependencies(build-apps circularity-cli)
-endif (EIGEN3_FOUND)
-
-add_dependencies(build-apps stat MSER-cli meaningfullness-cli)
+endif(EIGEN3_FOUND)

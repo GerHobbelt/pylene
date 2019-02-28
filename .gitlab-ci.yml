@@ -6,21 +6,10 @@ stages:
 
 image: carlinet/buildimage
 
+before_script:
+    - mkdir build && cd build
+    - conan install .. -pr buildfarm --build=missing
 
-
-build-doc-images:
-    stage: build
-    script:
-        - mkdir build && cd build
-        - conan install .. -pr buildfarm --build=missing
-        - cmake -DPYLENE_BUILD_BENCHMARKS=NO .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build .
-                --config Release
-                --target build-images
-    artifacts:
-        paths:
-            - doc/source/images
-        expire_in: 2 days
 
 ########
 # Test #
@@ -29,12 +18,10 @@ build-doc-images:
 .job-build-linux-base: &distcheck-linux-base
     stage: test
     script:
-        - mkdir build && cd build
-        - conan install .. -pr buildfarm  --build=missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build .
-                --config $PYLENE_CONFIGURATION
-                --target check
+        - cmake --build apps --config $PYLENE_CONFIGURATION
+        - cmake --build tests --config $PYLENE_CONFIGURATION
+        - ctest -L UnitTests
     dependencies: []
     artifacts:
         reports:
@@ -78,8 +65,6 @@ distcheck-linux-clang-debug:
 .job-bench-linux-base: &distbench-linux-base
     stage: bench
     script:
-        - mkdir build && cd build
-        - conan install .. -pr buildfarm  --build=missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data
         - cmake --build . --target check-internals
@@ -117,10 +102,11 @@ distbench-linux-clang-release:
 .documentation-base:  &documentation-base
     stage: test
     script:
-        - cd doc
-        - doxygen
-        - sphinx-build -b html source ../public
-    dependencies: [build-doc-images]
+        - cmake .. -DCMAKE_BUILD_TYPE=Release
+        - cmake --build .
+                --config Release
+                --target doc
+        - mkdir ../public && mv doc/build/* ../public/
     artifacts:
         name: "documentation"
         expire_in: 2 days

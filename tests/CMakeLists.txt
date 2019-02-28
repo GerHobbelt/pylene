@@ -1,3 +1,7 @@
+project(tests)
+# add link flag to test framework
+
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
 if (WIN32)
@@ -25,8 +29,8 @@ macro(add_core_test Executable)
   set(Sources ${ARGN})
   add_executable(${Executable} ${Sources})
   add_test(NAME ${Executable} COMMAND ${Executable} --gtest_output=xml:${Executable}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-  target_link_libraries(${Executable} PRIVATE Fixtures::ImagePath Fixtures::ImageCompare Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
-
+  target_link_libraries(${Executable} PRIVATE Fixtures::ImagePath Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
+  set_tests_properties(${Executable} PROPERTIES LABELS UnitTests)
   add_dependencies(check ${Executable})
 endmacro(add_core_test)
 

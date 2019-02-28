@@ -1,28 +1,28 @@
-#include "mumford_shah_on_tree.hpp"
-
-#include <apps/g2/compute_g2.hpp>
-#include <apps/g2/satmaxtree.hpp>
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/addborder.hpp>
-#include <apps/tos/croutines.hpp>
-
-#include <mln/core/utils/dontcare.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
+
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-#include <boost/graph/dag_shortest_paths.hpp>
-#include <boost/graph/transpose_graph.hpp>
-#include <boost/property_map/function_property_map.hpp>
-
 #include <tbb/parallel_for.h>
 #include <tbb/task_scheduler_init.h>
 
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+
+#include <boost/graph/dag_shortest_paths.hpp>
+#include <boost/graph/transpose_graph.hpp>
+#include <boost/property_map/function_property_map.hpp>
+#include <mln/core/dontcare.hpp>
+
+#include "mumford_shah_on_tree.hpp"
+#include <apps/g2/compute_g2.hpp>
+#include <apps/g2/satmaxtree.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
+#include <apps/tos/croutines.hpp>
 
 // Compute the depth attribute of each graph node
 boost::vector_property_map<unsigned> compute_graph_depth(const MyGraph& g)

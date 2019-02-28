@@ -1,3 +1,5 @@
+project(tests)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
 if (WIN32)

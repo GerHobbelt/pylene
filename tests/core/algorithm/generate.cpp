@@ -8,7 +8,7 @@ TEST(Core, Algorithm_Generate)
 {
   using namespace mln::experimental::ops;
 
-  // Another impl of mln::experimental::iota
+  // Another impl of mln::iota
   int i = 1;
   auto gen = [&i](){ return i++; };
 

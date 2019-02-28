@@ -5,9 +5,10 @@
 #include <mln/accu/accumulators/infsup.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 
+#include <mln/io/imprint.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/morpho/tos/immerse.hpp>
+#include <mln/morpho/tos/private/immersion.hpp>
 
 #include <apps/tos/addborder.hpp>
 
@@ -242,7 +243,7 @@ void filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_m
       unsigned x = phi(p);
       out(p)     = levels[x];
     }
-    copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
+    mln::copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
     io::imsave(tmp, (boost::format("out-anc-%05i.tiff") % grain).str().c_str());
 
     mln_foreach (point2d p, f.domain())
@@ -250,7 +251,7 @@ void filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_m
       unsigned x = phi(p);
       out(p)     = levels2[x];
     }
-    copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
+    mln::copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
     io::imsave(out, (boost::format("out-cp-%05i.tiff") % grain).str().c_str());
   }
 }
@@ -267,7 +268,7 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
   if (params.subquant)
   {
     resize(f, ima);
-    copy(ima / params.subquant, f);
+    mln::copy(ima / params.subquant, f);
   }
   else
   {
@@ -281,18 +282,17 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
   // 3. Interpolate
 
   // 4. Immerse
-  image2d<morpho::tos::irange<Vec>> F;
+  image2d<morpho::ToS::impl::irange<Vec>> F;
   box2d                             dom = f.domain();
   if (params.immerse)
   {
-    F   = morpho::tos::internal::immerse(f, rng_porder_less<Vec>());
+    F   = morpho::ToS::impl::immerse(f, rng_porder_less<Vec>());
     dom = F.domain();
   }
 
   // 5. Compute Inf/sup
   rgb8                            vmin, vmax;
   typedef productorder_less<rgb8> Compare;
-  Compare                         mycmp;
   std::tie(vmin, vmax) = accumulate(f, accu::accumulators::infsup<rgb8, Compare>());
 
   // Compute value set of inf/sup
@@ -546,7 +546,7 @@ int main(int argc, char** argv)
   }
 
   typedef rgb8                     Vec;
-  typedef morpho::tos::irange<Vec> R;
+  typedef morpho::ToS::impl::irange<Vec> R;
   image2d<rgb8>                    ima;
   image2d<R>                       f;
 

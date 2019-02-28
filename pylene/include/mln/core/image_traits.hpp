@@ -76,6 +76,13 @@ namespace mln
   {
   };
 
+
+  template <typename I>
+  struct image_traits<const I> : image_traits<I>
+  {
+  };
+
+
   //{
   // Type of image (dynamic or static)
   // typedef typename image_traits<I>::category category;

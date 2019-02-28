@@ -4,7 +4,7 @@
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/morpho/tos/ctos.hpp>
+#include <mln/morpho/tos/tos.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/task_scheduler_init.h>
@@ -110,16 +110,18 @@ mln::morpho::component_tree<P, mln::image2d<P>>
 void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0]
-            << " input[rgb] α₀ α₁ λ output[rgb]\n"
+            << " input[rgb] α₀ α₁ λ output[rgb] [output[uint16]]\n"
                "α₀\tGrain filter size before merging trees (0 to disable)\n"
                "α₁\tGrain filter size on the color ToS (0 to disable)\n"
-               "λ\tMumford-shah regularisation weight (e.g. 5000)\n";
+               "λ\tMumford-shah regularisation weight (e.g. 5000)\n"
+               "Ex.\n"
+            << argv[0] << " input.jpg 30 30 6000 simp.tiff label.tiff\n";
   std::exit(1);
 }
 
 int main(int argc, char** argv)
 {
-  if (argc < 5)
+  if (argc < 6)
     usage(argv);
 
   const char* input_path  = argv[1];
@@ -146,7 +148,7 @@ int main(int argc, char** argv)
     // 1. Compute the marginal ToS and filter them if necessary.
     tree_t t[NTREE];
     tbb::parallel_for(0, (int)NTREE, [&t, &f, a0](int i) {
-      t[i] = morpho::cToS(imtransform(f, [i](value_t x) { return x[i]; }), c4);
+      t[i] = morpho::tos(imtransform(f, [i](value_t x) { return x[i]; }));
       if (a0 > 0)
       {
         grain_filter_inplace(t[i], a0);
@@ -184,7 +186,25 @@ int main(int argc, char** argv)
 
     std::cout << "Simplification (number of llines): " << std::endl;
     mumford_shah_on_tree(T, F, lambda);
-    F = Kadjust_to(F, ima.domain());
-    io::imsave(F, output_path);
+    auto output = Kadjust_to(F, ima.domain());
+    io::imsave(output, output_path);
+  }
+
+
+  // Output label image
+  {
+    if (argc > 6)
+    {
+      image2d<uint16>              lbl;
+      property_map<tree_t, uint16> lblmap(T);
+
+      unsigned i = 1;
+      mln_foreach (auto x, T.nodes())
+        lblmap[x] = i++;
+
+      resize(lbl, F);
+      morpho::reconstruction(T, lblmap, lbl);
+      io::imsave(lbl, argv[6]);
+    }
   }
 }

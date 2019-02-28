@@ -82,6 +82,7 @@ distcheck-linux-clang-debug:
         - conan install .. -pr buildfarm  --build=missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data
+        - cmake --build . --target check-internals
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target run-all-benchmarks

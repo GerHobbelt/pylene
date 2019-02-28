@@ -2,10 +2,9 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 
-#include "../tests/helpers.hpp"
-
 #include <fixtures/ImagePath/image_path.hpp>
-#include <fixtures/Neighborhood/neighborhood.hpp>
+#include <helpers.hpp>
+#include <internal/Neighborhood/neighborhood.hpp>
 
 #include <gtest/gtest.h>
 

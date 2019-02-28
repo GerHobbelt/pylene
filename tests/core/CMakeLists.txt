@@ -39,7 +39,6 @@ add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
 add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)
 
 # test Neighborhood
-add_core_test(${test_prefix}algorithms       neighborhood/algorithms.cpp)
 add_core_test(${test_prefix}c4               neighborhood/c4.cpp)
 add_core_test(${test_prefix}c6               neighborhood/c6.cpp)
 add_core_test(${test_prefix}c8               neighborhood/c8.cpp)

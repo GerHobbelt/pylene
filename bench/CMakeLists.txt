@@ -3,7 +3,7 @@ find_package(GTest REQUIRED)
 
 include(CTest)
 include(ExternalData)
-include(BenchmarkMacros.cmake)
+include(BenchmarkMacros)
 
 # Download file dependency
 set(ExternalData_URL_TEMPLATES
@@ -29,6 +29,9 @@ else ()
   set(STANDALONE_COMPILE_FLAGS " ")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4141")
 endif ()
+
+add_subdirectory(internal)
+add_library(Internal::Neighborhood ALIAS Neighborhood)
 
 set(src_standalone
   BMErosion.cpp

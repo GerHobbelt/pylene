@@ -2,7 +2,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 
-#include <fixtures/Neighborhood/neighborhood.hpp>
+#include <internal/Neighborhood/neighborhood.hpp>
 
 #include <benchmark/benchmark.h>
 

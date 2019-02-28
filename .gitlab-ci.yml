@@ -81,7 +81,7 @@ distcheck-linux-clang-debug:
         paths:
             - build/bench/*.json
         reports:
-            junit: build/bench/internal/**/UT*.xml
+            junit: build/bench/internal/UT*.xml
         expire_in: 15 days
 
 distbench-linux-gcc-release:

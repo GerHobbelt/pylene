@@ -9,4 +9,4 @@ target_link_libraries(UTInternal_Neighborhood PRIVATE Neighborhood Fixtures::Ima
 add_test(NAME UTInternal_Neighborhood COMMAND UTInternal_Neighborhood --gtest_output=xml:UTInternal_Neighborhood.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 add_dependencies(check-internals UTInternal_Neighborhood)
-set_tests_properties(UTInternal_Neighborhood PROPERTIES LABELS InternalUnitTests)
+set_tests_properties(UTInternal_Neighborhood PROPERTIES LABELS InternalTests)

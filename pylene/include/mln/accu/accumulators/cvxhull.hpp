@@ -1,9 +1,9 @@
-#ifndef ACCU_CVXHULL_HPP
-#define ACCU_CVXHULL_HPP
+#pragma once
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/accu/accumulators/cvxhull_impl.hpp>
+
 namespace mln
 {
 
@@ -48,7 +48,7 @@ namespace mln
           return accumulators::cvxhull<P>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -63,7 +63,7 @@ namespace mln
       {
         return extract(accu, features::pvector());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -124,8 +124,6 @@ namespace mln
         std::vector<P> m_points;
         bool           m_newline;
       };
-    }
-  }
-}
-
-#endif // ! ACCU_CVXHULL_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

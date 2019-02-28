@@ -3,8 +3,6 @@
 #include "thicken.hpp"
 #include "topology.hpp"
 
-#include <boost/format.hpp>
-#include <libgen.h>
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/iota.hpp>
@@ -17,6 +15,11 @@
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/tos/immerse.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
+#include <libgen.h>
+
 
 void usage(int argc, char** argv)
 {
@@ -300,7 +303,7 @@ namespace mln
       }
     }
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

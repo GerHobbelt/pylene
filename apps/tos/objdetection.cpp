@@ -1,17 +1,17 @@
-#include <mln/core/image/image2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/core/algorithm/paste.hpp>
-
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/mumford_shah.hpp>
 #include <apps/tos/objdetection.hpp>
 #include <apps/tos/set_mean_on_nodes.hpp>
+
+#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+
 #include <boost/format.hpp>
+
 
 namespace mln
 {
@@ -130,7 +130,7 @@ namespace mln
   }
   */
 
-} // end of mln
+} // namespace mln
 
 namespace mln
 {
@@ -147,7 +147,7 @@ namespace mln
         out[x] = x;
     return out;
   }
-}
+} // namespace mln
 void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(color) output[wo ext] lambda [lambda_2...]" << std::endl

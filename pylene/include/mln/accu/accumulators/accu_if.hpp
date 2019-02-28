@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATORS_ACCU_IF_HPP
-#define MLN_ACCU_ACCUMULATORS_ACCU_IF_HPP
+#pragma once
 
 #include <mln/accu/accumulator_base.hpp>
 
@@ -46,8 +45,6 @@ namespace mln
         Accu      m_accu;
         Predicate m_pred;
       };
-    }
-  }
-}
-
-#endif // ! ACCU_IF_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

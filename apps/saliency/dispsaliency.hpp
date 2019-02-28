@@ -1,23 +1,20 @@
-#ifndef DISPSALIENCY_HPP
-#define DISPSALIENCY_HPP
+#pragma once
+
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/accu/accumulators/minmax.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/sub_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imprint.hpp>
+#include <mln/labeling/accumulate.hpp>
+#include <mln/labeling/blobs.hpp>
+#include <mln/qt/imageviewer.hpp>
 
 #include <QObject>
 #include <QSlider>
 #include <QtGui>
 
-#include <mln/accu/accumulators/minmax.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-#include <mln/qt/imageviewer.hpp>
-
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/sub_image.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/accu/accumulators/mean.hpp>
-#include <mln/labeling/accumulate.hpp>
-#include <mln/labeling/blobs.hpp>
-
-#include <mln/io/imprint.hpp>
 
 using namespace mln;
 
@@ -123,5 +120,3 @@ private:
   qt::ImageViewer      m_win;
   QSlider              m_slider;
 };
-
-#endif // ! DISPSALIENCY_HPP

@@ -1,7 +1,7 @@
-#ifndef APPS_G2_COMPUTE_G2_HPP
-#define APPS_G2_COMPUTE_G2_HPP
+#pragma once
 
 #include "types.hpp"
+
 
 namespace mln
 {
@@ -217,6 +217,4 @@ namespace mln
     mln_exiting();
     return std::tie(graph, tlink);
   }
-}
-
-#endif // ! APPS_G2_COMPUTE_G2_HPP
+} // namespace mln

@@ -1,13 +1,3 @@
-#include <mln/core/image/image2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/accu/accumulators/minmax.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-#include <mln/core/algorithm/copy.hpp>
-#include <mln/core/algorithm/transform.hpp>
-
 #include <apps/attributes/meaningfullness.hpp>
 #include <apps/llview/llview.hpp>
 #include <apps/saliency/extinction.hpp>
@@ -16,9 +6,18 @@
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/routines.hpp>
+
+#include <mln/accu/accumulators/minmax.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/algorithm/copy.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
 #include <boost/format.hpp>
+
 
 void usage(char** argv)
 {
@@ -54,7 +53,7 @@ namespace mln
         out[x] = x;
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

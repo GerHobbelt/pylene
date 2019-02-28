@@ -1,11 +1,12 @@
-#ifndef APPS_G2_ROUTINES_HPP
-#define APPS_G2_ROUTINES_HPP
+#pragma once
 
 #include "types.hpp"
-#include <boost/property_map/vector_property_map.hpp>
 
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
+
+#include <boost/property_map/vector_property_map.hpp>
+
 
 namespace mln
 {
@@ -72,6 +73,4 @@ namespace mln
     mln_exiting();
     return output;
   }
-}
-
-#endif // ! APPS_G2_ROUTINES_HPP
+} // namespace mln

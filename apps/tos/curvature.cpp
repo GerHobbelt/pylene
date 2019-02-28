@@ -1,8 +1,9 @@
+#include "curvature.hpp"
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-#include "curvature.hpp"
 
 int main(int argc, char** argv)
 {

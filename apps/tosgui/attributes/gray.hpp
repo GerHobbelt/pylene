@@ -1,9 +1,10 @@
-#ifndef APPS_TOSGUI_ATTRIBUTES_GRAY_HPP
-#define APPS_TOSGUI_ATTRIBUTES_GRAY_HPP
+#pragma once
 
 #include <apps/tosgui/attribute.hpp>
 #include <apps/tosgui/qattribute.hpp>
+
 #include <mln/core/image/image2d.hpp>
+
 
 template <typename V>
 class GrayLevelAttribute : public Attribute
@@ -56,5 +57,3 @@ private:
 
   mln::QAttribute<V>* m_attribute;
 };
-
-#endif // ! APPS_TOSGUI_ATTRIBUTES_GRAY_HPP

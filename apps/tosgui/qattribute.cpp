@@ -1,7 +1,10 @@
 #include "qattribute.hpp"
+
 #include <QEvent>
 #include <QMouseEvent>
+
 #include <qwt_picker_machine.h>
+
 
 namespace mln
 {
@@ -29,4 +32,4 @@ namespace mln
     if (event->key() == Qt::Key_F)
       this->showFilteringWindow();
   }
-}
+} // namespace mln

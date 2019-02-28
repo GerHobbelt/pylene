@@ -1,14 +1,13 @@
-#ifndef MLN_CORE_MORPHO_MAXTREE_HQUEUE_HPP
-#define MLN_CORE_MORPHO_MAXTREE_HQUEUE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/wrt_offset.hpp>
+#include <mln/io/imprint.hpp>
 #include <mln/morpho/bounded_hqueue.hpp>
 
-#include <mln/io/imprint.hpp>
 
 namespace mln
 {
@@ -186,7 +185,7 @@ namespace mln
         size_type                          m_last_index;
       };
 
-    } // end of namespace mln::morpho::internal
+    } // namespace internal
 
     // template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
     // image2d<std::size_t>
@@ -199,8 +198,6 @@ namespace mln
     //   return parent;
     // }
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
 } // end of namespace mln
-
-#endif // ! MLN_CORE_MORPHO_MAXTREE_HQUEUE_HPP

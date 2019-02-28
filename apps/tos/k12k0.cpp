@@ -3,6 +3,7 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
+
 void usage(int argc, char** argv)
 {
   if (argc < 3)

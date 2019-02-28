@@ -1,15 +1,15 @@
 #include "colorToSGrad.hpp"
 
-#include <mln/core/algorithm/transform.hpp>
-
-#include <mln/morpho/filtering.hpp>
-#include <mln/morpho/maxtree_pqueue_parallel.hpp>
-#include <mln/morpho/tos/tos.hpp>
-
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/gradient.hpp>
 #include <apps/tos/topology.hpp>
+
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/morpho/filtering.hpp>
+#include <mln/morpho/maxtree_pqueue_parallel.hpp>
+#include <mln/morpho/tos/tos.hpp>
+
 
 namespace mln
 {

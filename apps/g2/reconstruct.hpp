@@ -1,9 +1,11 @@
-#ifndef RECONSTRUCT_HPP
-#define RECONSTRUCT_HPP
+#pragma once
 
 #include "types.hpp"
-#include <boost/foreach.hpp>
+
 #include <mln/morpho/component_tree/filtering.hpp>
+
+#include <boost/foreach.hpp>
+
 
 namespace mln
 {
@@ -104,6 +106,4 @@ namespace mln
     }
     return out;
   }
-}
-
-#endif // ! RECONSTRUCT_HPP
+} // namespace mln

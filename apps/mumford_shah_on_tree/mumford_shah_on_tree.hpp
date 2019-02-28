@@ -1,14 +1,16 @@
-#ifndef MUMFORD_SHAH_ON_TREE_HPP
-#define MUMFORD_SHAH_ON_TREE_HPP
+#pragma once
 
 #include <apps/attributes/gradient_magnitude.hpp>
 #include <apps/tos/croutines.hpp>
+
 #include <mln/accu/accumulators/accu_as_it.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/variance.hpp>
+#include <mln/core/colors.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
+
 
 /// \brief Perform the MS simplification
 ///
@@ -16,7 +18,8 @@
 /// \param[inout] F The input image (interpolated to match tree's domain)
 /// \param lambda Mumford-shash regularization parameter
 template <class T, class I>
-void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* saliency = NULL, mln::property_map<T, float>* emap = NULL);
+void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* saliency = NULL,
+                          mln::property_map<T, float>* emap = NULL);
 
 
 /***************************************/
@@ -34,16 +37,17 @@ namespace internal
     else
       return newpar[x] = find_canonical(newpar, newpar[x]);
   }
-}
+} // namespace internal
 
 template <class T, class I>
-void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* saliency, mln::property_map<T, float>* emap)
+void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* saliency,
+                          mln::property_map<T, float>* emap)
 {
   using namespace mln;
   typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 
   auto A = morpho::vaccumulate_proper(
-      tree, F, accu::accumulators::accu_as_it<accu::accumulators::variance<rgb8, rgb<double>, rgb<double>>>());
+      tree, F, accu::accumulators::accu_as_it<accu::accumulators::variance<mln::rgb8, rgb<double>, rgb<double>>>());
   auto B = compute_attribute_on_contour(tree, F, accu::features::count<>());
 
   // Sort the node by gradient
@@ -102,7 +106,7 @@ void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* sal
 
   {
     morpho::filter_direct_inplace(tree, alive);
-    //tree.shrink_to_fit();
+    // tree.shrink_to_fit();
 
     auto vmap = morpho::vaccumulate_proper(tree, F, accu::features::mean<>());
     morpho::reconstruction(tree, vmap, F);
@@ -115,5 +119,3 @@ void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* sal
       (*emap)[x] = alive[x] * (A[x].to_result() + lambda * B[x]);
   }
 }
-
-#endif // ! MUMFORD_SHAH_ON_TREE_HPP

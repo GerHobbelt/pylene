@@ -1,11 +1,12 @@
-#ifndef CUTS_HPP
-#define CUTS_HPP
+#pragma once
 
 #include "shape.hpp"
+
 #include <mln/accu/accumulators/infsup.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/labeling/blobs.hpp>
 #include <mln/morpho/saturate.hpp>
+
 
 template <typename R, typename V, class NbhFg, class NbhBg, typename shape_t, typename Compare>
 void cut_and_get_shapes(const mln::image2d<R>& ima, const NbhFg& nbhBg, const NbhBg& nbhFg, V lambda, Compare cmp,
@@ -53,5 +54,3 @@ void cut_and_get_shapes(const mln::image2d<R>& ima, const NbhFg& nbhBg, const Nb
     mln_postcondition(res.first->islower() or res.first->isupper());
   }
 }
-
-#endif // ! CUTS_HPP

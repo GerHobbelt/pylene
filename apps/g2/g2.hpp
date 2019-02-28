@@ -1,4 +1,3 @@
-#ifndef G2_HPP
-#define G2_HPP
+#pragma once
 
-#endif // ! G2_HPP
+#define G2_HPP

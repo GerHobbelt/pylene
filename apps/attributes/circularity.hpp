@@ -1,7 +1,6 @@
-#ifndef APPS_ATTRIBUTES_CIRCULARITY_HPP
-# define APPS_ATTRIBUTES_CIRCULARITY_HPP
+#pragma once
 
-# include "attributes.hpp"
+#include "attributes.hpp"
 
 
 /// \brief Compute the ratio of the principal axes
@@ -12,7 +11,4 @@
 /// C(x) = 0 ⇒ Circle/Square
 /// C(x) → 1 ⇒ Elongated object
 
-mln::property_map<tree_t, float>
-circularity(const tree_t& tree);
-
-#endif // ! APPS_ATTRIBUTES_CIRCULARITY_HPP
+mln::property_map<tree_t, float> circularity(const tree_t& tree);

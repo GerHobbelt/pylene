@@ -1,5 +1,7 @@
 #include "MSERArgparser.hpp"
+
 #include <boost/program_options.hpp>
+
 
 MSERArgParser::MSERArgParser()
   : m_desc("MSER options")

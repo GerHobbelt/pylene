@@ -1,11 +1,11 @@
-#ifndef SET_MEAN_ON_NODES_HPP
-#define SET_MEAN_ON_NODES_HPP
+#pragma once
 
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
 
 #include <vector>
+
 
 namespace mln
 {
@@ -125,6 +125,4 @@ namespace mln
     return mean;
   }
 
-} // end of namespce mln
-
-#endif // ! SET_MEAN_ON_NODES_HPP
+} // namespace mln

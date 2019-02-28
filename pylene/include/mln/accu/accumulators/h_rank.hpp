@@ -1,10 +1,11 @@
-#ifndef MLN_ACCU_ACCUMULATORS_H_RANK_HPP
-#define MLN_ACCU_ACCUMULATORS_H_RANK_HPP
+#pragma once
 
-#include <array>
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <array>
+
 
 /// \file
 
@@ -32,7 +33,7 @@ namespace mln
       /// \note This accumulator is specialized for Boolean type.
       template <class T, class Ratio>
       struct h_rank;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -40,7 +41,7 @@ namespace mln
       /// \tparam Ratio A static std::ratio<Numerator,Denomitator> type.
       template <class Ratio>
       struct h_rank;
-    }
+    } // namespace features
 
     /******************************************/
     /****          Implementation          ****/
@@ -64,7 +65,7 @@ namespace mln
           return accumulators::h_rank<T, Ratio>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -74,7 +75,7 @@ namespace mln
       {
         return extract(exact(acc), features::h_rank<Ratio>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -242,8 +243,6 @@ namespace mln
         unsigned m_count; // Number of value in the set
         unsigned m_false; // Number of false value in the set
       };
-    }
-  }
-}
-
-#endif //! MLN_ACCU_ACCUMULATORS_H_RANK_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

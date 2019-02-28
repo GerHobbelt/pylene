@@ -1,7 +1,7 @@
-#ifndef BRUSH_HPP
-#define BRUSH_HPP
+#pragma once
 
 #include <mln/qt/imageviewer.hpp>
+
 
 class MyBrush : public QObject
 {
@@ -31,5 +31,3 @@ private:
   QColor                                                                        m_color;
   int                                                                           m_radius;
 };
-
-#endif //! BRUSH_HPP

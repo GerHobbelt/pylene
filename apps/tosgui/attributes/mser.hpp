@@ -1,17 +1,18 @@
-#ifndef APPS_TOSGUI_ATTRIBUTES_MSER_HPP
-#define APPS_TOSGUI_ATTRIBUTES_MSER_HPP
+#pragma once
 
 #include <apps/attributes/MSER.hpp>
 #include <apps/saliency/closure.hpp>
 #include <apps/tos/topology.hpp>
 #include <apps/tosgui/attribute.hpp>
 #include <apps/tosgui/qattribute.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/filtering.hpp>
 
 #include <QComboBox>
 #include <QLabel>
 #include <QVBoxLayout>
+
 
 template <typename V>
 class MSERAttribute : public Attribute
@@ -169,5 +170,3 @@ private:
   mln::QAttribute<float>* m_attribute_3;
   mln::QAttribute<float>* m_attribute_4;
 };
-
-#endif

@@ -1,14 +1,14 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/morpho/component_tree/io.hpp>
+#include "mumford_shah_on_tree.hpp"
+
+#include <apps/tos/Kinterpolate.hpp>
 
 #include <mln/accu/accumulators/accu_as_it.hpp>
 #include <mln/accu/accumulators/variance.hpp>
-
+#include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+#include <mln/morpho/component_tree/io.hpp>
 
-#include "mumford_shah_on_tree.hpp"
-#include <apps/tos/Kinterpolate.hpp>
 
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 

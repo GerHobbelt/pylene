@@ -1,7 +1,7 @@
-#ifndef MLN_APPS_TOS_CROUTINES_HPP
-#define MLN_APPS_TOS_CROUTINES_HPP
+#pragma once
 
 #include <apps/tos/topology.hpp>
+
 #include <mln/accu/accumulators/accu_if.hpp>
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/core/image/image2d.hpp>
@@ -175,6 +175,4 @@ namespace mln
     mln_exiting();
     return saliency;
   }
-}
-
-#endif // ! MLN_APPS_TOS_CROUTINES_HPP
+} // namespace mln

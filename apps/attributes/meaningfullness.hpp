@@ -1,16 +1,16 @@
-#ifndef APPS_ATTRIBUTES_MEANINGFULLNESS_HPP
-#define MUMFORD_SHAH_HPP
-
-#include <mln/core/extension/fill.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/core/trace.hpp>
-#include <mln/core/wrt_offset.hpp>
+#pragma once
 
 #include <apps/tos/topology.hpp>
+
 #include <mln/core/colors.hpp>
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/core/math_ops.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/trace.hpp>
 #include <mln/core/vec/vec_math_ops.hpp>
+#include <mln/core/wrt_offset.hpp>
+
 
 namespace mln
 {
@@ -711,6 +711,4 @@ namespace mln
 
     return imerode;
   }
-}
-
-#endif // ! MUMFORD_SHAH_HPP
+} // namespace mln

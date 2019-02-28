@@ -1,11 +1,11 @@
+#include <apps/attributes/meaningfullness.hpp>
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/tos/tos.hpp>
-
-#include <apps/attributes/meaningfullness.hpp>
 
 #include <fixtures/ImagePath/image_path.hpp>
 

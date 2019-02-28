@@ -1,13 +1,14 @@
-#ifndef MUMFORD_SHAH_HPP
-#define MUMFORD_SHAH_HPP
+#pragma once
 
 #include "topology.hpp"
+
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/io/imprint.hpp>
+
 
 namespace mln
 {
@@ -578,6 +579,4 @@ namespace mln
 
     return imerode;
   }
-}
-
-#endif // ! MUMFORD_SHAH_HPP
+} // namespace mln

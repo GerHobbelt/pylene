@@ -1,17 +1,17 @@
-#ifndef MLN_CORE_MORPHO_MAXTREE_PQUEUE_2_HPP
-#define MLN_CORE_MORPHO_MAXTREE_PQUEUE_2_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/wrt_offset.hpp>
+#include <mln/io/imprint.hpp>
 #include <mln/morpho/maxtree_node.hpp>
 #include <mln/morpho/pqueue_fast.hpp>
+
 #include <queue>
 #include <stack>
 #include <vector>
 
-#include <mln/io/imprint.hpp>
 
 namespace mln
 {
@@ -176,7 +176,7 @@ namespace mln
         return root;
       }
 
-    } // end of namespace mln::morpho::internal
+    } // namespace internal
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<maxtree_node>, typename image2d<V>::size_type>
@@ -190,8 +190,6 @@ namespace mln
       return std::make_pair(tree, root);
     }
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
 } // end of namespace mln
-
-#endif // ! MLN_CORE_MORPHO_MAXTREE_PQUEUE_2_HPP

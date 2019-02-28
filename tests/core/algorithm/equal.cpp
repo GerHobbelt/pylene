@@ -13,12 +13,29 @@ TEST(Core, Algorithm_Equal)
   image2d<uint8> ima(10, 10);
   image2d<uint8> out(10, 10);
 
-  iota(ima, 0);
-  iota(out, 0);
+  mln::iota(ima, 0);
+  mln::iota(out, 0);
 
   ASSERT_TRUE(equal(ima, out));
 
   point2d p = {2, 3};
   out(p)    = 12;
   ASSERT_TRUE(not equal(ima, out));
+}
+
+TEST(Core, Algorithm_ExperimentalEqual)
+{
+  using namespace mln;
+
+  image2d<uint8> ima(10, 10);
+  image2d<uint8> out(10, 10);
+
+  mln::iota(ima, 0);
+  mln::iota(out, 0);
+
+  ASSERT_TRUE(experimental::equal(ima, out));
+
+  point2d p = {2, 3};
+  out(p)    = 12;
+  ASSERT_TRUE(not experimental::equal(ima, out));
 }

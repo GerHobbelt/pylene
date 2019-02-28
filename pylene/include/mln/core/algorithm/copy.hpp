@@ -4,8 +4,10 @@
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
-#include <algorithm>
 #include <range/v3/algorithm/copy.hpp>
+
+#include <algorithm>
+
 /// \file
 
 namespace mln

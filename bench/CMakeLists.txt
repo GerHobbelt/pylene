@@ -51,10 +51,7 @@ add_benchmark(BMRotation                BMRotation.cpp)
 add_benchmark(BMDilation                BMDilation.cpp)
 add_benchmark(BMMorphers                BMMorphers.cpp BMMorphers_main.cpp)
 add_benchmark(BMReference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)
-add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood.cpp BMReference_Neighborhood_main.cpp)
-
-add_executable(UTReference_Neighborhood BMReference_Neighborhood.cpp BMReference_Neighborhood_test.cpp)
-target_link_libraries(UTReference_Neighborhood PRIVATE Fixtures::ImagePath Pylene::Pylene GTest::Main GTest::GTest ${FreeImage_LIBRARIES})
+add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 
 
 ExternalData_Add_Target(fetch-external-data)

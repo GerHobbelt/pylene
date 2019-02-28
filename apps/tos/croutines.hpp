@@ -4,9 +4,12 @@
 #include <apps/tos/topology.hpp>
 #include <mln/accu/accumulators/accu_if.hpp>
 #include <mln/accu/accumulators/count.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
+
 
 namespace mln
 {
@@ -32,7 +35,8 @@ namespace mln
                                                           const VMap&                                  vmap);
 
   template <class P>
-  void grain_filter_inplace(morpho::component_tree<P, image2d<P>>& tree, unsigned alpha);
+  void grain_filter_inplace(morpho::component_tree<P, image2d<P>>& tree, unsigned alpha, bool shrink = true);
+
 
   /*******************************/
   /*** Implementation           **/
@@ -113,7 +117,7 @@ namespace mln
   }
 
   template <class P>
-  void grain_filter_inplace(morpho::component_tree<P, image2d<P>>& tree, unsigned alpha)
+  void grain_filter_inplace(morpho::component_tree<P, image2d<P>>& tree, unsigned alpha, bool shrink)
   {
     mln_entering("grain_filter_inplace");
 
@@ -127,7 +131,9 @@ namespace mln
         [alpha, &area](unsigned x) { return area[x] >= alpha; });
 
     morpho::filter_direct_inplace(tree, pred);
-    tree.shrink_to_fit();
+
+    if (shrink)
+      tree.shrink_to_fit();
     mln_exiting();
   }
 

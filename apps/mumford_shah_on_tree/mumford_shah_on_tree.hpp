@@ -2,6 +2,7 @@
 #define MUMFORD_SHAH_ON_TREE_HPP
 
 #include <apps/attributes/gradient_magnitude.hpp>
+#include <apps/tos/croutines.hpp>
 #include <mln/accu/accumulators/accu_as_it.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/variance.hpp>
@@ -15,7 +16,8 @@
 /// \param[inout] F The input image (interpolated to match tree's domain)
 /// \param lambda Mumford-shash regularization parameter
 template <class T, class I>
-void mumford_shah_on_tree(T& tree, I& F, double lambda);
+void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* saliency = NULL, mln::property_map<T, float>* emap = NULL);
+
 
 /***************************************/
 /*** Implementation                 ****/
@@ -35,7 +37,7 @@ namespace internal
 }
 
 template <class T, class I>
-void mumford_shah_on_tree(T& tree, I& F, double lambda)
+void mumford_shah_on_tree(T& tree, I& F, double lambda, mln::image2d<float>* saliency, mln::property_map<T, float>* emap)
 {
   using namespace mln;
   typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
@@ -90,12 +92,27 @@ void mumford_shah_on_tree(T& tree, I& F, double lambda)
 
   std::cout << "After: " << k << std::endl;
 
+  if (saliency != NULL)
+  {
+    auto emap = make_functional_property_map<tree_t::node_type>([&A, &B, &alive, lambda](tree_t::node_type x) -> float {
+      return alive[x] * (A[x].to_result() + lambda * B[x]);
+    });
+    *saliency = set_value_on_contour(tree, emap);
+  }
+
   {
     morpho::filter_direct_inplace(tree, alive);
-    tree.shrink_to_fit();
+    //tree.shrink_to_fit();
 
     auto vmap = morpho::vaccumulate_proper(tree, F, accu::features::mean<>());
     morpho::reconstruction(tree, vmap, F);
+  }
+
+  if (emap != NULL)
+  {
+    *emap = property_map<T, float>(tree);
+    mln_foreach (auto x, tree.nodes())
+      (*emap)[x] = alive[x] * (A[x].to_result() + lambda * B[x]);
   }
 }
 

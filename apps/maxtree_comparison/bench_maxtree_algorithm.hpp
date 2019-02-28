@@ -3,6 +3,8 @@
 
 #define MLN_MAXBIT 32
 
+#include <chrono>
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
@@ -54,11 +56,12 @@ void bench_algo(const mln::image2d<V>& ima, unsigned nthread, Algorithm algo, in
   mln::image2d<size_type>                     parent;
   std::vector<size_type>                      S;
 
-  auto t0 = tick_count::now();
+  auto t0 = std::chrono::steady_clock::now();
   for (int i = 0; i < ntest; ++i)
     std::tie(parent, S) = algo(ima, mln::c4, std::less<V>());
-  auto t1 = tick_count::now();
-  std::cout << "Run in:\t" << (t1 - t0).seconds() / ntest << std::endl;
+  auto t1 = std::chrono::steady_clock::now();
+  std::cout << "Run in:\t" << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() / ntest << " ms"
+            << std::endl;
 }
 
 template <typename V>

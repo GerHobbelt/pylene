@@ -2,8 +2,8 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
-#include <helpers.hpp>
 #include <internal/Neighborhood/neighborhood.hpp>
 
 #include <gtest/gtest.h>

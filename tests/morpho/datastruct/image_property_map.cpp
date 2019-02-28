@@ -8,6 +8,15 @@
 
 #include <gtest/gtest.h>
 
+template <typename I, typename V>
+void __iota(I& ima, V v)
+{
+  mln_viter(vout, ima);
+  mln_forall (vout)
+    *vout = v++;
+}
+
+
 using namespace mln;
 typedef morpho::component_tree<char, std::array<char, 256>> tree_t;
 
@@ -54,7 +63,7 @@ TEST(Morpho, property_image)
   property_map<tree_t, int> vmap(tree);
 
   auto ima = make_image(tree, vmap);
-  iota(ima, 0);
+  __iota(ima, 0);
 
   {
     int i = 0;
@@ -74,7 +83,7 @@ TEST(Morpho, property_image_nbh)
   property_map<tree_t, int> vmap(tree);
 
   auto ima = make_image(tree, vmap);
-  iota(ima, 1);
+  __iota(ima, 1);
 
   {
     std::vector<unsigned> voisins[7] = {{}, {2, 5}, {1, 3, 4}, {2}, {2}, {1, 6}, {5}};

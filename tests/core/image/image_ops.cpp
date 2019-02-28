@@ -61,7 +61,7 @@ TEST(Core, Image2d_Operators)
   image2d<int> ima(5, 5);
   image2d<int> ref(5, 5);
 
-  iota(ima, 0);
+  mln::iota(ima, 0);
   int i = 0;
 
   mln_viter(v, ref);
@@ -78,8 +78,8 @@ TEST(Core, Image2d_MixedOperator)
   image2d<char>  x(5, 5);
   image2d<short> y(5, 5);
   
-  iota(x, 0);
-  iota(y, 0);
+  mln::iota(x, 0);
+  mln::iota(y, 0);
 
   static_assert(std::is_same_v<typename decltype(x + x)::value_type, char>);
 
@@ -92,8 +92,8 @@ TEST(Core, Image2d_WhereOperator)
 
   image2d<uint8_t> x(5, 5);
   image2d<uint8_t> y(5, 5);
-  iota(x, 0);
-  iota(y, 0);
+  mln::iota(x, 0);
+  mln::iota(y, 0);
 
   auto f1 = where(x > 12, x, uint8_t(12));         // RValue image + LValue image + scalar
   auto f2 = where(x > 12, x, y);                   // RValue image + LValue image + LValue image

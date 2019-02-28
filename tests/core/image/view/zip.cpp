@@ -25,8 +25,8 @@ TEST(Core, ZipImage_Mixed_writable)
   image2d<int>    ima(5, 5);
   image2d<uint16> ima2(5, 5);
 
-  iota(ima, 0);
-  iota(ima2, 1);
+  mln::iota(ima, 0);
+  mln::iota(ima2, 1);
 
   auto x = view::zip(ima, ima2);
 
@@ -107,8 +107,8 @@ TEST(Core, ZipImage_Value_Iteration_2)
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
-  iota(a, 0);
-  iota(b, 0);
+  mln::iota(a, 0);
+  mln::iota(b, 0);
 
   auto x = view::zip(a, b);
 #ifdef PYLENE_CONCEPT_TS_ENABLED

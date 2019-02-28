@@ -101,6 +101,7 @@ The problems here:
 
 * we don't have numpy bindings
 * we need to embed a compiler
+* first compilation is slower
 
 The pros:
 
@@ -123,7 +124,7 @@ We have the following utilities (whose implementation is straightforward)::
     image2d<double> convert(ndarray X);
     template <class T> ndarray as(image2d<T> X);
 
-`Convert` would implies a copy, while `as` is just buffer transfer between two image representations.
+`convert` would implies a copy, while `as` is just buffer transfer between two image representations.
 
 Thus, to bind the function `stretch`, one would imlement::
 
@@ -138,9 +139,37 @@ Thus, to bind the function `stretch`, one would imlement::
 
 The problems here:
 
-FIXME
+* Genericity limitation
+* Unavoidable performance loss
 
 The pros:
 
-FIXME
+* ease for python export
 
+
+Type Erasure
+===========================================
+
+.. image:: /figures/rumination/type_erasure.svg
+    :width: 75%
+    :align: center
+
+Starting from a templated class, creating a class having the same properties
+(allowing seamless cast between the two) that isn't templated
+
+
+The problems here:
+
+* massive rework of the library
+* performance loss
+
+The pros:
+
+* ease for python export
+* no compatibility with numpy
+
+
+Olena approach : hybrid method
+===========================================
+
+Through using type erasure

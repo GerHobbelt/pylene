@@ -4,7 +4,7 @@
 #include <mln/core/neighborhood/dyn_wneighborhood.hpp>
 #include <mln/transform/chamfer_distance_transform.hpp>
 
-#include <helpers.hpp>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
 

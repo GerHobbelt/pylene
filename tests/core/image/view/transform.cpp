@@ -1,4 +1,3 @@
-#include <helpers.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
@@ -11,7 +10,7 @@
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
-#include <helpers.hpp>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
 

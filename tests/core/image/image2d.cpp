@@ -7,11 +7,12 @@
 #include <mln/core/extension/mirror.hpp>
 #include <mln/io/imprint.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
+
 #include <numeric>
 
-#include <helpers.hpp>
-
 #include <gtest/gtest.h>
+
 
 TEST(UTImage2D, Extension_Fill)
 {

@@ -20,7 +20,7 @@ function(add_benchmark Executable)
 
   # Create benchmark exe
   add_executable(${Benchmark_NAME} ${Benchmark_SOURCES})
-  target_link_libraries(${Benchmark_NAME} PRIVATE Fixtures::ImagePath Fixtures::Neighborhood Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
+  target_link_libraries(${Benchmark_NAME} PRIVATE Fixtures::ImagePath Internal::Neighborhood Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
   target_include_directories(${Benchmark_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 

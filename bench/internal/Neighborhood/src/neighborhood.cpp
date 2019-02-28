@@ -1,4 +1,4 @@
-#include <fixtures/Neighborhood/neighborhood.hpp>
+#include <internal/Neighborhood/neighborhood.hpp>
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>

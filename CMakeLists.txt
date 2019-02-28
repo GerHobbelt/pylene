@@ -95,6 +95,7 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
 
   include(CTest)
   if (BUILD_TESTING)
+    enable_testing()
     add_subdirectory(tests EXCLUDE_FROM_ALL)
   endif()
 

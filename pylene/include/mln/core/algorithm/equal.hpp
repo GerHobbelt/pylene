@@ -74,6 +74,7 @@ namespace mln
       auto&& rhs_vals = rhs.new_values();
 
       for (auto [lhs_r, rhs_r] : ranges::view::zip(ranges::rows(lhs_vals), ranges::rows(rhs_vals)))
+        // FIXME: with std::equal you gain performances over ranges::equal here
         if (!::ranges::equal(lhs_r, rhs_r))
           return false;
 

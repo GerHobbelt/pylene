@@ -63,6 +63,6 @@ namespace mln
   static const c6_t  c6{};
   static const c26_t c26{};
 
-} // end of namespace mln
+} // namespace mln
 
 #endif //! MLN_CORE_NEIGHB3D_HPP

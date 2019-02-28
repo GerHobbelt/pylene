@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_IMAGE_IMAGE3D_HPP
-#define MLN_CORE_IMAGE_IMAGE3D_HPP
+#pragma once
 
 #include <mln/core/image/ndimage.hpp>
+
 
 namespace mln
 {
@@ -114,7 +114,4 @@ namespace mln
     unsigned ncols() const { return this->m_domain.pmax[2] - this->m_domain.pmin[2]; }
   };
 
-} // end of namespace mln
-
-
-#endif //! MLN_CORE_IMAGE_IMAGE3D_HPP
+} // namespace mln

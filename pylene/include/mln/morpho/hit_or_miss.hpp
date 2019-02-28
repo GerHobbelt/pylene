@@ -1,101 +1,113 @@
-#pragma once
+#ifndef MLN_MORPHO_HIT_OR_MISS_HPP
+#define MLN_MORPHO_HIT_OR_MISS_HPP
 
-
-#include <mln/core/algorithm/copy.hpp>
-#include <mln/core/image/view/operators.hpp>
-#include <mln/morpho/dilation.hpp>
-#include <mln/morpho/erosion.hpp>
-
+#include <mln/core/image/image.hpp>
+#include <mln/morpho/structural/dilate.hpp>
+#include <mln/morpho/structural/erode.hpp>
 
 /// \file
 /// \ingroup morpho
 
-namespace mln::morpho
+namespace mln
 {
 
-  /// \ingroup morpho
-  /// \brief (Unconstrained) Hit-or-miss transform
-  ///
-  /// The hit-or-miss transform is non-linerar filter used to detect
-  /// pattern in images. It is defined as:
-  ///
-  /// \f[
-  /// UHTM_\mathcal{B}(f)(x) =
-  /// \begin{cases}
-  /// \varepsilon_{B_{fg}}(x) - \delta_{B_{bg}}(x) & \mathrm{if} \varepsilon_{B_{fg}}(x) > \delta_{B_{bg}}(x)\newline
-  /// 0 & otherwise
-  /// \end{cases}
-  /// \f]
-  /// where \f$ \mathcal{B} = (B_{fg}, B_{bg}) \f$ is the composite structuring element
-  /// composed by the two disjoint foreground and background SEs.
-  ///
-  /// \param ima Input image 𝑓
-  /// \param se_hit  Structuring element for foreground
-  /// \param se_miss  Structuring element for background
-  /// \param out (optional) Output image 𝑔 so store the result.
-  template <class InputImage, class SEh, class SEm, class OutputImage>
-  void hit_or_miss(InputImage&& input, const SEh& se_hit, const SEm& se_miss, OutputImage&& out);
-
-  template <class I, class SEh, class SEm>
-  image_concrete_t<std::remove_reference_t<I>>
-  hit_or_miss(I&& input, const SEh& se_hit, const SEm& se_miss);
-
-  /******************************************/
-  /****          Implementation          ****/
-  /******************************************/
-
-  namespace impl
+  namespace morpho
   {
 
+    /// \ingroup morpho
+    /// \brief (Unconstrained) Hit-or-miss transform
+    ///
+    /// The hit-or-miss transform is non-linerar filter used to detect
+    /// pattern in images. It is defined as:
+    ///
+    /// \f[
+    /// UHTM_\mathcal{B}(f)(x) =
+    /// \begin{cases}
+    /// \varepsilon_{B_{fg}}(x) - \delta_{B_{bg}}(x) & \mathrm{if} \varepsilon_{B_{fg}}(x) > \delta_{B_{bg}}(x)\newline
+    /// 0 & otherwise
+    /// \end{cases}
+    /// \f]
+    /// where \f$ \mathcal{B} = (B_{fg}, B_{bg}) \f$ is the composite structuring element
+    /// composed by the two disjoint foreground and background SEs.
+    ///
+    /// \param ima Input image 𝑓
+    /// \param se_hit  Structuring element for foreground
+    /// \param se_miss  Structuring element for background
+    /// \param out (optional) Output image 𝑔 so store the result.
     template <class I, class SEh, class SEm, class OutputImage>
-    void hit_or_miss(I& f, const SEh& seh, const SEm& sem, OutputImage& out)
+    OutputImage& hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                             const StructuringElement<SEm>& se_miss, Image<OutputImage>& out);
+
+    /// \ingroup morpho
+    /// \overload  OutputImage& hit_or_miss(const Image<I>&, const StructuringElement<SEh>&, const
+    /// StructuringElement<SEm>&, Image<OutputImage>&);
+    template <class I, class SEh, class SEm>
+    mln_concrete(I) hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                                const StructuringElement<SEm>& se_miss);
+
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
+
+    namespace impl
     {
-      using namespace mln::view::ops;
-      using V = image_value_t<I>;
-      mln_entering("mln::morpho::hit_or_miss");
 
-
-      auto ero = morpho::erosion(f, seh);
-      auto dil = morpho::dilation(f, sem);
-
-      if constexpr (std::is_same_v<V, bool>)
+      // Gray level impl
+      template <class I, class SEh, class SEm, class OutputImage, typename V>
+      OutputImage& unconstrained_hit_or_miss(const I& f, const SEh& seh, const SEm& sem, OutputImage& out, V __v__)
       {
-        auto res = ero and (not dil);
+        (void)__v__;
+        mln_entering("mln::morpho::hit_or_miss(generic)");
+
+        auto ero = morpho::structural::erode(f, seh);
+        auto dil = morpho::structural::dilate(f, sem);
+
+        mln_value(I) z = literal::zero;
+        auto res       = where(dil < ero, ero - dil, z);
         mln::copy(res, out);
+
+        mln_exiting();
+        return out;
       }
-      else
+
+      // Boolean case
+      template <class I, class SEh, class SEm, class OutputImage>
+      OutputImage& unconstrained_hit_or_miss(const I& f, const SEh& seh, const SEm& sem, OutputImage& out, bool __v__)
       {
-        V    zero = {};
-        auto res  = mln::view::ifelse(dil < ero, ero - dil, zero);
+        (void)__v__;
+        mln_entering("mln::morpho::hit_or_miss(boolean)");
+
+        auto ero = morpho::structural::erode(f, seh);
+        auto dil = morpho::structural::dilate(f, sem);
+
+        auto res = land(ero, lnot(dil));
         mln::copy(res, out);
+
+        mln_exiting();
+        return out;
       }
     }
-  }
 
+    template <class I, class SEh, class SEm, class OutputImage>
+    OutputImage& hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                             const StructuringElement<SEm>& se_miss, Image<OutputImage>& out)
+    {
+      impl::unconstrained_hit_or_miss(exact(input), exact(se_hit), exact(se_miss), exact(out), mln_value(I)());
+      return exact(out);
+    }
 
-  template <class I, class SEh, class SEm, class OutputImage>
-  void hit_or_miss(I& f, const SEh& se_hit, const SEm& se_miss, OutputImage& out)
-  {
-    static_assert(mln::is_a<std::remove_reference_t<I>, mln::details::Image>());
-    static_assert(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>());
-    static_assert(mln::is_a<SEh, mln::details::StructuringElement>());
-    static_assert(mln::is_a<SEm, mln::details::StructuringElement>());
+    template <class I, class SEh, class SEm>
+    mln_concrete(I) hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
+                                const StructuringElement<SEm>& se_miss)
+    {
+      const I& f          = exact(input);
+      mln_concrete(I) out = imconcretize(f);
+      impl::unconstrained_hit_or_miss(f, exact(se_hit), exact(se_miss), out, mln_value(I)());
+      return out;
+    }
 
-    impl::hit_or_miss(f, se_hit, se_miss, out);
-  }
+  } // namespace mln::morpho
 
+} // namespace mln
 
-
-  template <class I, class SEh, class SEm>
-  image_concrete_t<std::remove_reference_t<I>> hit_or_miss(I&& f, const SEh& se_hit, const SEm& se_miss)
-  {
-    static_assert(mln::is_a<std::remove_reference_t<I>, mln::details::Image>());
-    static_assert(mln::is_a<SEh, mln::details::StructuringElement>());
-    static_assert(mln::is_a<SEm, mln::details::StructuringElement>());
-
-    auto out = imconcretize(f).build();
-    impl::hit_or_miss(f, se_hit, se_miss, out);
-    return out;
-  }
-
-} // namespace mln::morpho::
+#endif // ! MLN_MORPHO_HIT_OR_MISS_HPP

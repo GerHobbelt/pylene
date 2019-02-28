@@ -167,4 +167,4 @@ namespace mln
 
   } // namespace experimental::se
 
-} // end of namespace mln
+} // namespace mln

@@ -123,7 +123,7 @@ namespace mln
       } // namespace impl
     }   // namespace ToS
   }     // namespace morpho
-} // end of namespace mln
+} // namespace mln
 
 
 #endif //! MLN_MORPHO_TOS_PRIVATE_IMMERSION_HPP

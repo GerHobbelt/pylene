@@ -1,7 +1,7 @@
-#pragma once
+#ifndef MLN_CORE_UTILS_PTROFFSET_HPP
+#define MLN_CORE_UTILS_PTROFFSET_HPP
 
 #include <cstddef>
-
 
 namespace mln
 {
@@ -14,3 +14,5 @@ namespace mln
   }
 
 } // namespace mln
+
+#endif //! MLN_CORE_UTILS_PTROFFSET_HPP

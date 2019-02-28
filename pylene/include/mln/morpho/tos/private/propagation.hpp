@@ -120,9 +120,9 @@ namespace mln
         }
 
 
-      } // end of namespace mln::morpho::tos::impl
-    }   // end of namespace mln::morpho::tos
-  }     // end of namespace mln::morpho
-} // end of namespace mln
+      } // namespace mln::morpho::tos::impl
+    }   // namespace mln::morpho::tos
+  }     // namespace mln::morpho
+} // namespace mln
 
 #endif //! MLN_MORPHO_TOS_PRIVATE_PROPAGATION_HPP

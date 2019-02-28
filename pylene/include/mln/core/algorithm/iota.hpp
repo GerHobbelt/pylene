@@ -37,6 +37,6 @@ namespace mln
         v = val++;
   }
 
-} // end of namespace mln
+} // namespace mln
 
 

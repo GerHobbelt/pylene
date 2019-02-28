@@ -1,13 +1,10 @@
 #include "satmaxtree.hpp"
-
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/topology.hpp>
-
 #include <mln/core/neighb2d.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/tos/tos.hpp>
-
 
 namespace mln
 {
@@ -33,7 +30,7 @@ namespace mln
     property_map<T, uint16> vmap;
     {
       image2d<uint16> F = immerse_k1(f, 69);
-      vmap              = morpho::make_attribute_map_from_image(tree, F);
+      vmap = morpho::make_attribute_map_from_image(tree, F);
       vmap[tree.npos()] = 0;
     }
 
@@ -118,4 +115,4 @@ namespace mln
 
     return out.get_subtree(tree.get_root_id());
   }
-} // namespace mln
+}

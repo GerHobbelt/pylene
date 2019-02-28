@@ -1,27 +1,27 @@
-#pragma once
+#ifndef BENCH_MAXTREE_ALGORITHM_HPP
+#define BENCH_MAXTREE_ALGORITHM_HPP
 
 #define MLN_MAXBIT 32
+
+#include <chrono>
+
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/value/int.hpp>
+#include <mln/io/imread.hpp>
 
 #include "maxtree_hqueue_parallel.hpp"
 #include "maxtree_najman.hpp"
 #include "maxtree_pqueue_parallel.hpp"
 #include "maxtree_ufind_parallel.hpp"
 #include "maxtree_ufindrank_parallel.hpp"
-
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/core/value/int.hpp>
-#include <mln/io/imprint.hpp>
-#include <mln/io/imread.hpp>
-
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/program_options.hpp>
+#include <mln/io/imprint.hpp>
 
-#include <chrono>
 #include <iostream>
 #include <random>
-
 
 #define NTEST 3
 
@@ -164,3 +164,5 @@ void run_test(int argc, char** argv, Algorithm algo)
     bench_algo(ima, vm["nthread"].as<int>(), algo, vm["ntest"].as<int>());
   }
 }
+
+#endif // ! BENCH_MAXTREE_ALGORITHM_HPP

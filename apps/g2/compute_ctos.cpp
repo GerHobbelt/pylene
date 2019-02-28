@@ -1,19 +1,19 @@
 #include "compute_ctos.hpp"
 
-
 namespace mln
 {
-  void export_marginal_depth(const tree_t* t, int sz, std::string stem)
+  void
+  export_marginal_depth(const tree_t* t, int sz, std::string stem)
   {
     image2d<uint16> f;
     resize(f, t[0]._get_data()->m_pmap);
 
     for (int i = 0; i < sz; ++i)
-    {
-      auto depth = morpho::compute_depth(t[i]);
-      morpho::reconstruction(t[i], depth, f);
-      io::imsave(f, (boost::format("%s-%i.tiff") % stem % i).str());
-    }
+      {
+        auto depth = morpho::compute_depth(t[i]);
+        morpho::reconstruction(t[i], depth, f);
+        io::imsave(f, (boost::format("%s-%i.tiff") % stem % i).str());
+      }
   }
 
   tree_t compute_ctos_from_maxtrees(const image2d<rgb8>& input, image2d<uint16>* imdepth, bool mintree)
@@ -64,11 +64,21 @@ namespace mln
   }
 
   // Explicit instanciation.
-  template tree_t compute_ctos<rgb8>(const image2d<rgb8>& input, image2d<uint16>* imdepth, e_ctos_attribute attribute,
-                                     ctos_extra_params_t params);
+  template
+  tree_t
+  compute_ctos<rgb8>(const image2d<rgb8>& input,
+                     image2d<uint16>* imdepth,
+                     e_ctos_attribute attribute,
+                     ctos_extra_params_t params
+                     );
 
   // Explicit instanciation.
-  template tree_t compute_ctos<rgb16>(const image2d<rgb16>& input, image2d<uint16>* imdepth, e_ctos_attribute attribute,
-                                      ctos_extra_params_t params);
+  template
+  tree_t
+  compute_ctos<rgb16>(const image2d<rgb16>& input,
+                      image2d<uint16>* imdepth,
+                      e_ctos_attribute attribute,
+                      ctos_extra_params_t params
+                      );
 
-} // namespace mln
+}

@@ -1,16 +1,15 @@
-#pragma once
-
-#include <apps/tos/topology.hpp>
-
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/extension/fill.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/se/rect2d.hpp>
-#include <mln/core/win2d.hpp>
+#ifndef SIMPLIFY_HPP
+#define SIMPLIFY_HPP
 
 #include <set>
 #include <vector>
 
+#include <apps/tos/topology.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 
 namespace mln
 {
@@ -118,7 +117,7 @@ namespace mln
       }
       return x;
     }
-  } // namespace internal
+  }
 
   template <typename T>
   image2d<unsigned> compute_depth(const image2d<T>& K, const image2d<unsigned>& parent, const std::vector<unsigned>& S)
@@ -580,4 +579,6 @@ namespace mln
 
     return out;
   }
-} // namespace mln
+}
+
+#endif // ! SIMPLIFY_HPP

@@ -7,12 +7,11 @@
 #include <mln/core/extension/mirror.hpp>
 #include <mln/io/imprint.hpp>
 
-#include <fixtures/ImageCompare/image_compare.hpp>
-
 #include <numeric>
 
-#include <gtest/gtest.h>
+#include <helpers.hpp>
 
+#include <gtest/gtest.h>
 
 TEST(UTImage2D, Extension_Fill)
 {
@@ -21,8 +20,8 @@ TEST(UTImage2D, Extension_Fill)
   image2d<int> ima(5, 5);
   image2d<int> ref(5, 5);
 
-  iota(ima, 1);
-  iota(ref, 1);
+  mln::iota(ima, 1);
+  mln::iota(ref, 1);
 
   mln::extension::fill(ima, 69);
   ASSERT_EQ(ima.at(-1, -1), 69);

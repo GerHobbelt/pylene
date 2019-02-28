@@ -23,7 +23,7 @@ TEST(View, filter_readonly)
   mln::box2d        dom = {{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
 
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -59,7 +59,7 @@ TEST(View, filter_writable)
   mln::image2d<int> ima(dom);
 
 
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -83,7 +83,7 @@ TEST(View, filter_twice)
   mln::box2d        dom = {{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
 
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
 
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
   auto u = mln::view::filter(x, [](int v) { return v < 15; });

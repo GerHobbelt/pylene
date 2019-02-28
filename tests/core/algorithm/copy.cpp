@@ -12,7 +12,7 @@ TEST(Core, Algorithm_Copy)
 
   image2d<uint8> ima(10, 10);
   image2d<uint8> out(10, 10);
-  iota(ima, 0);
+  mln::iota(ima, 0);
   copy(ima, out);
 
   ASSERT_TRUE(equal(ima, out));

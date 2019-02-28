@@ -60,7 +60,7 @@ TEST(Core, Algorithm_Accumulate_3)
 TEST(Core, Algorithm_Exp_Accumulate_1)
 {
   mln::image2d<uint8_t> ima(10, 10);
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
 
   // Expected overflow
   {
@@ -78,7 +78,7 @@ TEST(Core, Algorithm_Exp_Accumulate_1)
 TEST(Core, Algorithm_Exp_Accumulate_2)
 {
   mln::image2d<uint8_t> ima(10, 10);
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
 
   // No overflow (uint8 + uint8 -> int)
   {
@@ -90,7 +90,7 @@ TEST(Core, Algorithm_Exp_Accumulate_2)
 TEST(Core, Algorithm_Exp_Accumulate_3)
 {
   mln::image2d<uint8_t> ima(10, 10);
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
 
   // No overflow (uint8 + uint8 -> int)
   {

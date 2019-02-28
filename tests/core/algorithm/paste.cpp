@@ -17,7 +17,7 @@ TEST(Core, Algorithm_Paste)
   image2d<uint8> ima(b);
   image2d<uint8> out(15, 15);
   mln::fill(ima, 69);
-  iota(out, 1);
+  mln::iota(out, 1);
   mln::paste(ima, out);
   // 1   2  3  4..
   // 16  x  x  19

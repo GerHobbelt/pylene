@@ -30,7 +30,7 @@ TEST(Core, c6_point)
 TEST(Core, c6_pixel)
 {
   mln::image3d<int> f(3,3,3);
-  mln::experimental::iota(f, 0);
+  mln::iota(f, 0);
 
 
   mln::point3d p   = {1, 1, 1};

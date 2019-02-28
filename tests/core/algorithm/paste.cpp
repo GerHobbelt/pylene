@@ -1,80 +1,48 @@
-#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/grays.hpp>
+#include <mln/core/image/image2d.hpp>
 
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/image/ndimage.hpp>
+#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/range/algorithm/accumulate.hpp>
+#include <range/v3/numeric/accumulate.hpp>
 
-#include <vector>
-
-#include <tbb/task_scheduler_init.h>
 #include <gtest/gtest.h>
-#include <fixtures/ImageCompare/image_compare.hpp>
 
-TEST(Core, Experimental_Algorithm_Paste_With_Copy)
+TEST(Core, Algorithm_Paste)
 {
-  mln::box2d            b({1, 1}, {3, 3});
-  mln::image2d<uint8_t> ima(b);
-  mln::image2d<uint8_t> out(5, 5);
-  mln::iota(ima, 101);
+  using namespace mln;
+
+  box2d          b = {{1, 1}, {3, 3}};
+  image2d<uint8> ima(b);
+  image2d<uint8> out(15, 15);
+  mln::fill(ima, 69);
   mln::iota(out, 1);
   mln::paste(ima, out);
+  // 1   2  3  4..
+  // 16  x  x  19
+  // 31  x  x  34
+  // 46  47 48 49
+  int r = range::accumulate(out.values(), 0);
 
-  mln::image2d<uint8_t> ref = {{1, 2, 3, 4, 5},        //
-                                             {6, 101, 102, 9, 10},   //
-                                             {11, 103, 104, 14, 15}, //
-                                             {16, 17, 18, 19, 20},   //
-                                             {21, 22, 23, 24, 25}};
-
-  ASSERT_IMAGES_EQ_EXP(out, ref);
+  ASSERT_EQ(r, 225 * 226 / 2 - (17 + 18 + 32 + 33) + 69 * 4);
 }
 
 
-TEST(Core, Experimental_Algorithm_Paste_ROI_copy)
+TEST(Core, Experimental_Algorithm_Paste)
 {
-  mln::box2d roi({1, 1}, {3, 3});
-
-  mln::image2d<uint8_t> ima(5, 5);
-  mln::image2d<uint8_t> out(5, 5);
-
-  mln::iota(ima, 101);
+  mln::box2d          b = {{1, 1}, {3, 3}};
+  mln::image2d<uint8_t> ima(b);
+  mln::image2d<uint8_t> out(15, 15);
+  mln::experimental::fill(ima, 69);
   mln::iota(out, 1);
-  mln::paste(ima, roi, out);
+  mln::experimental::paste(ima, out);
+  // 1   2  3  4..
+  // 16  x  x  19
+  // 31  x  x  34
+  // 46  47 48 49
+  int r = ::ranges::accumulate(out.new_values(), 0);
 
-  mln::image2d<uint8_t> ref = {{1, 2, 3, 4, 5},        //
-                                             {6, 107, 108, 9, 10},   //
-                                             {11, 112, 113, 14, 15}, //
-                                             {16, 17, 18, 19, 20},   //
-                                             {21, 22, 23, 24, 25}};
-
-  ASSERT_IMAGES_EQ_EXP(out, ref);
+  ASSERT_EQ(r, 225 * 226 / 2 - (17 + 18 + 32 + 33) + 69 * 4);
 }
 
-
-TEST(Core, Experimental_Algorithm_Paste_ROI_no_copy)
-{
-  std::vector<mln::point2d> roi = {{1, 1}, {2, 2}, {3, 3}};
-  mln::image2d<uint8_t> ima(5, 5);
-  mln::image2d<uint8_t> out(5, 5);
-
-  mln::iota(ima, 101);
-  mln::iota(out, 1);
-  mln::paste(ima, roi, out);
-
-  mln::image2d<uint8_t> ref = {{1, 2, 3, 4, 5},       //
-                                             {6, 107, 8, 9, 10},    //
-                                             {11, 12, 113, 14, 15}, //
-                                             {16, 17, 18, 119, 20}, //
-                                             {21, 22, 23, 24, 25}};
-
-  ASSERT_IMAGES_EQ_EXP(out, ref);
-}
-
-TEST(Core, Experimental_Algorithm_Paste_Parallel)
-{
-  mln::image2d<uint8_t> ima = {{12, 2, 93}, {24, 75, 6}};
-  mln::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
-
-  tbb::task_scheduler_init init;
-  mln::parallel::paste(ref, ima);
-  ASSERT_IMAGES_EQ_EXP(ima, ref);
-}

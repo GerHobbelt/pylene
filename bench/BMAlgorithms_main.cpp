@@ -1,10 +1,9 @@
-#include <benchmark/benchmark.h>
-
-
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/algorithm/clone.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
+
+#include <benchmark/benchmark.h>
 
 
 void fill_baseline(mln::image2d<mln::uint8>& ima, mln::uint8 v);
@@ -16,6 +15,21 @@ void copy_baseline(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>&
 void copy_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 void copy(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out);
 void copy(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+
+std::ptrdiff_t count_if_baseline(const mln::image2d<mln::uint8>& in);
+std::ptrdiff_t count_if_baseline(const mln::image2d<mln::rgb8>& in);
+std::ptrdiff_t count_if(const mln::image2d<mln::uint8>& in);
+std::ptrdiff_t count_if(const mln::image2d<mln::rgb8>& in);
+
+std::ptrdiff_t count_baseline(const mln::image2d<mln::uint8>& in);
+std::ptrdiff_t count_baseline(const mln::image2d<mln::rgb8>& in);
+std::ptrdiff_t count(const mln::image2d<mln::uint8>& in);
+std::ptrdiff_t count(const mln::image2d<mln::rgb8>& in);
+
+bool equal_baseline(const mln::image2d<mln::uint8>& lhs, const mln::image2d<mln::uint8>& rhs);
+bool equal_baseline(const mln::image2d<mln::rgb8>& lhs, const mln::image2d<mln::rgb8>& rhs);
+bool equal(const mln::image2d<mln::uint8>& lhs, const mln::image2d<mln::uint8>& rhs);
+bool equal(const mln::image2d<mln::rgb8>& lhs, const mln::image2d<mln::rgb8>& rhs);
 
 void paste_baseline(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out);
 void paste_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
@@ -63,6 +77,8 @@ protected:
   mln::image2d<mln::rgb8>  m_input_rgb8;
 };
 
+//////// FILL //////////////////
+
 BENCHMARK_F(Bench, fill_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
@@ -80,17 +96,18 @@ BENCHMARK_F(Bench, fill_buffer2d_uint8)(benchmark::State& st)
 BENCHMARK_F(Bench, fill_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
-    fill_baseline(m_input_rgb8, mln::rgb8{2,3,4});
+    fill_baseline(m_input_rgb8, mln::rgb8{2, 3, 4});
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
 BENCHMARK_F(Bench, fill_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
-    fill(m_input_rgb8, mln::rgb8{2,3,4});
+    fill(m_input_rgb8, mln::rgb8{2, 3, 4});
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+//////// COPY //////////////////
 
 BENCHMARK_F(Bench, copy_buffer2d_uint8_baseline)(benchmark::State& st)
 {
@@ -121,6 +138,96 @@ BENCHMARK_F(Bench, copy_ibuffer2d_rgb8)(benchmark::State& st)
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
     copy(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+//////// COUNT_IF //////////////////
+
+BENCHMARK_F(Bench, count_if_buffer2d_uint8_baseline)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count_if_baseline(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, count_if_buffer2d_uint8)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count_if(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, count_if_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count_if_baseline(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, count_if_ibuffer2d_rgb8)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count_if(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+//////// COUNT //////////////////
+
+BENCHMARK_F(Bench, count_buffer2d_uint8_baseline)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count_baseline(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, count_buffer2d_uint8)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, count_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count_baseline(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, count_ibuffer2d_rgb8)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    count(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+//////// EQUAL //////////////////
+
+BENCHMARK_F(Bench, equal_buffer2d_uint8_baseline)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    equal_baseline(m_input_uint8, m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, equal_buffer2d_uint8)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    equal(m_input_uint8, m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, equal_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    equal_baseline(m_input_rgb8, m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(Bench, equal_ibuffer2d_rgb8)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    equal(m_input_rgb8, m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
@@ -224,7 +331,6 @@ BENCHMARK_F(Bench, for_each_ibuffer2d_rgb8)(benchmark::State& st)
 }
 
 
-
 ///////////   GENERATE /////////////////
 
 BENCHMARK_F(Bench, generate_buffer2d_uint8_baseline)(benchmark::State& st)
@@ -269,6 +375,7 @@ BENCHMARK_F(Bench, accumulate_buffer2d_uint8)(benchmark::State& st)
 }
 
 ///////////   SORT /////////////////
+
 BENCHMARK_F(Bench, sort_points_buffer2d_small_int)(benchmark::State& st)
 {
   while (st.KeepRunning())
@@ -304,8 +411,6 @@ BENCHMARK_F(Bench, sort_points_buffer2d_rgb8_lex)(benchmark::State& st)
     sort_points(m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
-
-
 
 
 BENCHMARK_MAIN();

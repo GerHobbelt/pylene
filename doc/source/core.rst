@@ -172,6 +172,9 @@ Image primitives
     core/algorithm/all_any_none_of
     core/algorithm/clone
     core/algorithm/copy
+    core/algorithm/count
+    core/algorithm/count_if
+    core/algorithm/equal
     core/algorithm/fill
     core/algorithm/foreach
     core/algorithm/generate  
@@ -193,17 +196,17 @@ Fundamental primitives for basic image manipulation. Those are grouped by:
   :class: full
   :widths: auto
 
-  +-------------------------------------------+------------------------------------------------------------------------+
-  | :doc:`core/algorithm/all_any_none_of`     | checks if a predicate is true for all, any or none of the image values |
-  +-------------------------------------------+------------------------------------------------------------------------+
-  | :doc:`core/algorithm/foreach`             | applies a function to the values of an image                           |
-  +-------------------------------------------+------------------------------------------------------------------------+
-  | `count` `count_if`                        | [TBI] returns the number of values satisfying specific criteria        |
-  +-------------------------------------------+------------------------------------------------------------------------+
-  | `equal`                                   | [TBI] checks if two images have the same values                        |
-  +-------------------------------------------+------------------------------------------------------------------------+
-  | :doc:`core/algorithm/accumulate` (reduce) | sums up values of an image                                             |
-  +-------------------------------------------+------------------------------------------------------------------------+
+  +------------------------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/all_any_none_of`                      | checks if a predicate is true for all, any or none of the image values |
+  +------------------------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/foreach`                              | applies a function to the values of an image                           |
+  +------------------------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/count` :doc:`core/algorithm/count_if` | returns the number of values satisfying specific criteria              |
+  +------------------------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/equal`                                | checks if two images have the same values                              |
+  +------------------------------------------------------------+------------------------------------------------------------------------+
+  | :doc:`core/algorithm/accumulate` (reduce)                  | sums up values of an image                                             |
+  +------------------------------------------------------------+------------------------------------------------------------------------+
 
 
 .. rubric:: Non-modifying image primitives that operates on pixels

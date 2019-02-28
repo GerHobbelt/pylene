@@ -4,4 +4,3 @@ int main(int argc, char** argv)
 {
   run_test(argc, argv, meta_serial_najman());
 }
-s

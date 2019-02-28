@@ -1,9 +1,9 @@
-#include "compute_ctos.hpp"
-#include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/colors.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/data/stretch.hpp>
 #include "compute_ctos.hpp"
 #include <apps/tos/croutines.hpp>
 #include <boost/program_options.hpp>
@@ -18,24 +18,25 @@ int main(int argc, char** argv)
   namespace po = boost::program_options;
 
   const char* usage =
-    "Compute the cToS of an image. It ouputs the tree (out.tree)"
-    "and an optional depth image (out.tiff). The tree is computed on "
+    "Compute the cToS of an image. It ouputs the depth image (16bits) "
+    "and a normalized 8bits depth image. The tree is computed on "
     "K1 (doubled-sized image + border) and so is the depth image\n"
+    "To get the MTOS in your code, you just need to compute the maxtree "
+    " of the depth image (16bits).\n"
     "If a grain is given, a grain filter is applied.\n";
 
 
   po::options_description hidden("Allowed options");
   hidden.add_options()
     ("input_path", po::value<std::string>()->required(), "Input file (rgb8)")
-    ("tree_path", po::value<std::string>()->required(), "Output tree")
-    ("depth_path", po::value<std::string>(), "Output depth map (uint16)")
+    ("depth_path", po::value<std::string>()->required(), "Output depth map (uint16)")
+    ("depth_path_8", po::value<std::string>()->required(), "Output depth map (uint8)")
     ;
 
   po::options_description visible("Allowed options");
   visible.add_options()
     ("help", "Help message")
     ("grain,g", po::value<int>(), "Grain filter")
-    ("pmin", po::value< std::vector<int> >()->multitoken(), "Point at infinity (format: 'row col')")
     ("attr,a", po::value<std::string>()->default_value("depth"),
      "The type of attribute used to compute the inclusion map:\n"
      "depth: Length of the path to A\n"
@@ -46,8 +47,8 @@ int main(int argc, char** argv)
 
   po::positional_options_description pd;
   pd.add("input_path", 1)
-    .add("tree_path", 1)
     .add("depth_path", 1)
+    .add("depth_path_8", 1)
     ;
 
   po::options_description all("Allowed options");
@@ -81,7 +82,7 @@ int main(int argc, char** argv)
 
   if (err)
     {
-      std::cerr << "Usage: " << argv[0] << " [options] input.tiff out.tree [depthmap.tiff]\n"
+      std::cerr << "Usage: " << argv[0] << " [options] input.tiff depth16.tiff depth8.png\n"
                 << usage
                 << visible;
       std::exit(1);
@@ -102,23 +103,21 @@ int main(int argc, char** argv)
     params.export_marginal_depth_path = vm["export-mdepth"].as<std::string>();
   }
 
-  if (vm.count("pmin")){
-    std::vector<int> tmp = vm["pmin"].as< std::vector<int> >();
-    params.pmin[0] = tmp[0];
-    params.pmin[1] = tmp[1];
-  }
-
   auto tree = compute_ctos(f, NULL, attr, params);
   if (vm.count("grain"))
     grain_filter_inplace(tree, vm["grain"].as<int>());
 
-  morpho::save(tree, vm["tree_path"].as<std::string>());
+  //morpho::save(tree, vm["tree_path"].as<std::string>());
 
-  if (vm.count("depth_path")) {
+  {
     image2d<uint16> depth;
     depth.resize(tree._get_data()->m_pmap.domain());
     auto dmap = morpho::compute_depth(tree);
     morpho::reconstruction(tree, dmap, depth);
     io::imsave(depth, vm["depth_path"].as<std::string>());
+
+
+    image2d<uint8> depth8 = data::stretch<uint8>(depth);
+    io::imsave(depth8, vm["depth_path_8"].as<std::string>());
   }
 }

@@ -16,7 +16,7 @@
 template <class Vec>
 struct rng_porder_less
 {
-  typedef mln::morpho::tos::irange<Vec> range_t;
+  typedef mln::morpho::ToS::impl::irange<Vec> range_t;
   static constexpr const char*          str = "<";
 
   bool operator()(const range_t& rng, const Vec& v) const { return mln::vecprod_isless(rng.upper, v); }
@@ -29,7 +29,7 @@ struct rng_porder_less
 template <class Vec>
 struct rng_porder_greater
 {
-  typedef mln::morpho::tos::irange<Vec> range_t;
+  typedef mln::morpho::ToS::impl::irange<Vec> range_t;
   static constexpr const char*          str = ">";
 
   bool operator()(const range_t& rng, const Vec& v) const { return mln::vecprod_isgreater(rng.lower, v); }
@@ -42,7 +42,7 @@ struct rng_porder_greater
 template <class Vec>
 struct rng_porder_less_equal
 {
-  typedef mln::morpho::tos::irange<Vec> range_t;
+  typedef mln::morpho::ToS::impl::irange<Vec> range_t;
   static constexpr const char*          str = "<=";
 
   bool operator()(const range_t& rng, const Vec& v) const { return mln::vecprod_islessequal(rng.upper, v); }
@@ -55,7 +55,7 @@ struct rng_porder_less_equal
 template <class Vec>
 struct rng_porder_greater_equal
 {
-  typedef mln::morpho::tos::irange<Vec> range_t;
+  typedef mln::morpho::ToS::impl::irange<Vec> range_t;
   static constexpr const char*          str = ">=";
 
   bool operator()(const range_t& rng, const Vec& v) const { return mln::vecprod_isgreaterequal(rng.lower, v); }
@@ -68,7 +68,7 @@ struct rng_porder_greater_equal
 template <class Vec>
 struct rng_porder_equal_to
 {
-  typedef mln::morpho::tos::irange<Vec> range_t;
+  typedef mln::morpho::ToS::impl::irange<Vec> range_t;
   static constexpr const char*          str = "==";
 
   bool operator()(const range_t& rng, const Vec& v) const
@@ -84,7 +84,7 @@ struct rng_porder_equal_to
 template <class Vec>
 struct rng_porder_not_equal_to
 {
-  typedef mln::morpho::tos::irange<Vec> range_t;
+  typedef mln::morpho::ToS::impl::irange<Vec> range_t;
   static constexpr const char*          str = "!=";
 
   bool operator()(const range_t& rng, const Vec& v) const

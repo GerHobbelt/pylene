@@ -4,7 +4,7 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
-#include <mln/morpho/tos/ctos.hpp>
+#include <mln/morpho/tos/tos.hpp>
 
 namespace mln
 {
@@ -24,11 +24,15 @@ namespace mln
     //   std::cin >> pmin[0] >> pmin[1];
     //   pmin *= 2;
     // }
-    T tree = morpho::cToS_pinf(f, c4, pmin);
+    T tree = morpho::tos(f, pmin);
 
-    image2d<uint16>         F    = immerse_k1(f, 69);
-    property_map<T, uint16> vmap = morpho::make_attribute_map_from_image(tree, F);
-    vmap[tree.npos()]            = 0;
+
+    property_map<T, uint16> vmap;
+    {
+      image2d<uint16> F = immerse_k1(f, 69);
+      vmap = morpho::make_attribute_map_from_image(tree, F);
+      vmap[tree.npos()] = 0;
+    }
 
     auto predfun = [&vmap, &tree](const T::vertex_id_t& n) {
       return vmap[n] > vmap[tree.get_node(n).parent()] or tree.get_node(n).get_parent_id() == tree.npos();
@@ -60,7 +64,7 @@ namespace mln
       mln_foreach (auto x, tree.nodes())
       {
         (void)x;
-        assert(vmap[x] > vmap[x.parent()]);
+        assert(vmap[x] > vmap[x.parent()] or x.get_parent_id() == tree.npos());
         ++n;
       }
       std::cerr << "Number of nodes after: " << n << std::endl;
@@ -85,7 +89,7 @@ namespace mln
     dom.pmin = olddom.pmin / 2;
     dom.pmax = (olddom.pmax + 1) / 2;
     newdata->m_pmap.resize(dom);
-    copy(olddata->m_pmap | sbox2d{olddom.pmin, olddom.pmax, {2, 2}}, newdata->m_pmap);
+    mln::copy(olddata->m_pmap | sbox2d{olddom.pmin, olddom.pmax, {2, 2}}, newdata->m_pmap);
 
     // 2. Copy the node
     newdata->m_nodes = olddata->m_nodes;

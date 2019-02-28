@@ -9,6 +9,7 @@
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/win2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 
 namespace mln
 {
@@ -158,7 +159,7 @@ namespace mln
     }
 
     // Nbh
-    rect2d win = make_rectangle2d(2 * eps + 1, 2 * eps + 1);
+    auto win = mln::se::rect2d{2 * eps + 1, 2 * eps + 1};
 
     for (int i = S.size() - 1; i > 0; --i)
     {
@@ -354,7 +355,7 @@ namespace mln
         return (parent[x] == ROOT or K[x] != K[parent[x]]) ? x : parent[x];
       };
 
-      auto se = make_rectangle2d(2 * eps + 1, 2 * eps + 1);
+      auto se = mln::se::rect2d{2 * eps + 1, 2 * eps + 1};
 
       mln_iter(p_, K.domain());
       mln_iter(n_, se(p_));

@@ -13,9 +13,8 @@ assert(len(sys.argv) > 3)
 # f = open(sys.argv[1])
 # Rrep = [ line.strip() for line in f ]
 # f.close()
-Rrep = [ "bc", "a", "bd", "ac", "c", "b", "c", "c", "ad", "b",
-         "abd", "abd", "b", "c", "a", "a", "ac", "ac", "b", "a",
-         "c", "a", "c", "c", "ab", "ab", "ad", "a", "c", "c" ]
+Rrep = [ "bc", "c", "d", "a", "b", "d", "b", "c", "abd", "abc",
+         "bd", "abd", "b", "a", "b" ]
 
 
 # Import student
@@ -28,14 +27,16 @@ f.close()
 # Get the note
 notes = [ 1 if u == v else 0 if v == "" else -.25 for u,v in zip(Rrep, Srep) ]
 
+
 # Print
-note = 25.0 * sum(notes) / len(notes)
+note = 20.0 * sum(notes) / len(notes)
 note = math.ceil(note * 2) / 2  # arrondi à 0.5
 print "%s,%.01f,%s" % (login, note, sys.argv[2])
 
 ###############################
 ##  Write the image         ###
 ###############################
+
 
 img = plt.imread(sys.argv[2])
 ypixels, xpixels, _ = img.shape
@@ -56,5 +57,5 @@ for k,n in enumerate(notes):
     plt.text(x + 481 * i, 1750 + j * 100, str(n), color="red")
 
 plt.text(180,1000, login + " : " +  str(note), color="red", fontsize=15)
-#plt.show()
+plt.draw()
 plt.savefig(sys.argv[3], dpi=dpi)

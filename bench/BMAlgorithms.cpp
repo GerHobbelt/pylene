@@ -221,11 +221,11 @@ std::ptrdiff_t count_if_baseline(const mln::image2d<mln::rgb8>& in)
 }
 std::ptrdiff_t count_if(const mln::image2d<mln::uint8>& in)
 {
-  return mln::experimental::count_if(in, is_uint8_15);
+  return mln::count_if(in, is_uint8_15);
 }
 std::ptrdiff_t count_if(const mln::image2d<mln::rgb8>& in)
 {
-  return mln::experimental::count_if(in, is_rgb8_black);
+  return mln::count_if(in, is_rgb8_black);
 }
 
 

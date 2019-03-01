@@ -239,11 +239,11 @@ std::ptrdiff_t count_baseline(const mln::image2d<mln::rgb8>& in)
 }
 std::ptrdiff_t count(const mln::image2d<mln::uint8>& in)
 {
-  return mln::experimental::count(in, mln::uint8(15));
+  return mln::count(in, mln::uint8(15));
 }
 std::ptrdiff_t count(const mln::image2d<mln::rgb8>& in)
 {
-  return mln::experimental::count(in, mln::rgb8{0, 0, 0});
+  return mln::count(in, mln::rgb8{0, 0, 0});
 }
 
 

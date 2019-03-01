@@ -51,7 +51,7 @@ TEST(View, clip)
     ASSERT_EQ(42, clipped(p));
   }
 
-  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
+  ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
 
@@ -98,7 +98,7 @@ TEST(View, clip_twice)
     ASSERT_EQ(42, B(p));
   }
 
-  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
+  ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
 
@@ -135,7 +135,7 @@ TEST(View, clip_other_a_box2d)
     ASSERT_EQ(42, clipped(p));
   }
 
-  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
+  ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
 

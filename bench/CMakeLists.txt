@@ -3,6 +3,8 @@ project(bench)
 find_package(benchmark REQUIRED)
 find_package(GTest REQUIRED)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
 include(CTest)
 include(ExternalData)
 include(BenchmarkMacros)
@@ -32,8 +34,23 @@ else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4141")
 endif ()
 
-add_subdirectory(internal)
-add_library(Internal::Neighborhood ALIAS Neighborhood)
+add_library(BenchImpl STATIC
+              include/bench/neighborhood.hpp
+              src/neighborhood.cpp)
+
+target_compile_features(BenchImpl PUBLIC cxx_std_17)
+set_target_properties(BenchImpl PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+target_include_directories(BenchImpl PUBLIC include)
+target_link_libraries(BenchImpl PUBLIC Pylene::Pylene)
+
+target_sources(BenchImpl PUBLIC
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/bench/neighborhood.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/neighborhood.cpp)
+
+if (BUILD_TESTING)
+  include(CTest)
+  add_subdirectory(tests)
+endif()
 
 set(src_standalone
   BMErosion.cpp

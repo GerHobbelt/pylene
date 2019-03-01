@@ -41,7 +41,8 @@ namespace mln
       mln_entering("mln::data:stretch");
 
       double m, M;
-      std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)>());
+      auto   ima_f   = exact(f);
+      std::tie(m, M) = accumulate(ima_f, accu::accumulators::minmax<mln_value(I)>());
 
       double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
       double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;
@@ -68,7 +69,8 @@ namespace mln
       mln_entering("mln::data:stretch");
 
       double m, M;
-      std::tie(m, M) = accumulate(f, accu::accumulators::minmax<mln_value(I)>());
+      auto   ima_f   = exact(f);
+      std::tie(m, M) = accumulate(ima_f, accu::accumulators::minmax<mln_value(I)>());
 
       double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
       double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;

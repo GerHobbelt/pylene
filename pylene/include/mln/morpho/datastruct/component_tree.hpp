@@ -1,13 +1,14 @@
-#ifndef MLN_MORPHO_DATASTRUCT_COMPONENT_TREE_HPP
-#define MLN_MORPHO_DATASTRUCT_COMPONENT_TREE_HPP
+#pragma once
 
-#include <memory>
 #include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <memory>
 #include <vector>
+
 
 namespace mln
 {
@@ -58,7 +59,7 @@ namespace mln
 
       template <class P, class AssociativeMap>
       struct component_tree_data;
-    }
+    } // namespace internal
 
     namespace internal
     {
@@ -81,7 +82,7 @@ namespace mln
         AssociativeMap                   m_pmap;  // An associative structure P -> node_id_t
         bool                             m_pset_ordered = false;
       };
-    }
+    } // namespace internal
 
     template <class P, class AssociativeMap>
     struct component_tree
@@ -806,7 +807,5 @@ namespace mln
 
       mln_exiting();
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_DATASTRUCT_COMPONENT_TREE_HPP
+  } // namespace morpho
+} // namespace mln

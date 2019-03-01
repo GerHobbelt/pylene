@@ -1,9 +1,11 @@
-#ifndef MLN_IO_PNG_IMSAVE_HPP
-#define MLN_IO_PNG_IMSAVE_HPP
+#pragma once
+
+#include <mln/core/grays.hpp>
 
 #include <FreeImage.h>
+
 #include <boost/static_assert.hpp>
-#include <mln/core/grays.hpp>
+
 
 namespace mln
 {
@@ -81,16 +83,14 @@ namespace mln
             throw MLNIOException("Unable to save the image.");
           FreeImage_Unload(dib);
         }
-      }
+      } // namespace internal
 
       template <typename Image>
       void imsave(const Image& ima, const char* path)
       {
         internal::imsave(ima, path, typename image_traits<Image>::category());
       }
-    }
+    } // namespace png
 
-  } // namespace mln::io
+  } // namespace io
 } // namespace mln
-
-#endif //! MLN_IO_PNG_IMSAVE_HPP

@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_NEIGHB2D_HPP
-#define MLN_CORE_NEIGHB2D_HPP
+#pragma once
 
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/point.hpp>
 
 #include <array>
+
 
 namespace mln
 {
@@ -49,7 +49,7 @@ namespace mln
       static const std::array<point2d, 2> dpoints;
     };
     const std::array<point2d, 2> c2_h_t::dpoints = {{{0, -1}, {0, 1}}};
-  }
+  } // namespace
 
   static const c4_t   c4{};
   static const c8_t   c8{};
@@ -57,5 +57,3 @@ namespace mln
   static const c2_h_t c2_h{};
 
 } // namespace mln
-
-#endif //! MLN_CORE_NEIGHB2D_HPP

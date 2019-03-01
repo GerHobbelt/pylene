@@ -1,12 +1,13 @@
-#ifndef MLN_LABELING_BLOBS_HPP
-#define MLN_LABELING_BLOBS_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 #include <type_traits>
 #include <vector>
+
 
 namespace mln
 {
@@ -106,8 +107,8 @@ namespace mln
 
           return lbl;
         }
-      }
-    }
+      } // namespace generic
+    }   // namespace impl
 
     template <typename I, typename Neighborhood, typename Label>
     std::pair<mln_ch_value(I, Label), Label> blobs(const Image<I>& ima_, Neighborhood nbh, Label lbl)
@@ -132,7 +133,5 @@ namespace mln
 
       return std::make_pair(out, lbl);
     }
-  }
-}
-
-#endif // ! MLN_LABELING_BLOBS_HPP
+  } // namespace labeling
+} // namespace mln

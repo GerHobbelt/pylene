@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_BOUNDED_HQUEUE_HPP
-#define MLN_MORPHO_BOUNDED_HQUEUE_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 
@@ -7,6 +6,7 @@
 #include <memory>
 #include <numeric>
 #include <vector>
+
 
 namespace mln
 {
@@ -261,6 +261,4 @@ namespace mln
       return x;
     }
   }
-}
-
-#endif // !MLN_MORPHO_BOUNDED_HQUEUE_HPP
+} // namespace mln

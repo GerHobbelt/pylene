@@ -1,11 +1,10 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_RECONSTRUCTION_HPP
-#define MLN_MORPHO_COMPONENT_TREE_RECONSTRUCTION_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
-
 #include <mln/morpho/datastruct/attribute_map.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -32,7 +31,7 @@ namespace mln
         mln_forall (px)
           px->val() = vmap[tree.get_node_at(px->index())];
       }
-    }
+    } // namespace impl
 
     template <class P, class AMap, class ValueMap, class I>
     void reconstruction(const component_tree<P, AMap>& tree, const ValueMap& vmap, Image<I>& out)
@@ -49,7 +48,5 @@ namespace mln
       impl::reconstruction_index(tree, vmap, exact(out));
       mln_exiting();
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_RECONSTRUCTION_HPP
+  } // namespace morpho
+} // namespace mln

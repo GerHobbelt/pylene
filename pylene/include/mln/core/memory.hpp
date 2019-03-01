@@ -1,9 +1,9 @@
-#ifndef MLN_MEMORY_HH
-#define MLN_MEMORY_HH
+#pragma once
 
 #include <mln/core/assert.hpp>
 
 #include <cstdlib>
+
 
 namespace mln
 {
@@ -41,6 +41,4 @@ namespace mln
       std::free((char*)ptr - *p);
     }
   }
-}
-
-#endif
+} // namespace mln

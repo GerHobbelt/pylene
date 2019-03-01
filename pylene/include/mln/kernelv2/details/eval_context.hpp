@@ -1,5 +1,8 @@
-#ifndef MLN_KERNELV2_DETAILS_EVAL_CONTEXT_HPP
-#define MLN_KERNELV2_DETAILS_EVAL_CONTEXT_HPP
+#pragma once
+
+#include <boost/proto/proto.hpp>
+
+#include <tuple>
 
 namespace mln
 {
@@ -7,6 +10,7 @@ namespace mln
   {
     namespace details
     {
+      namespace proto = boost::proto;
 
       template <class PVTuple, class NVTuple>
       struct eval_context
@@ -50,10 +54,8 @@ namespace mln
         NVTuple nvals;
       };
 
-    } // namespace mln::kernel::details
+    } // namespace details
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNELV2_DETAILS_EVAL_CONTEXT_HPP

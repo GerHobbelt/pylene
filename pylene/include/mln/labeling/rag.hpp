@@ -1,5 +1,4 @@
-#ifndef MLN_LABELING_RAG_HPP
-#define MLN_LABELING_RAG_HPP
+#pragma once
 
 #include <boost/graph/adjacency_list.hpp>
 #include <mln/core/extension/extension.hpp>
@@ -7,8 +6,10 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 #include <utility>
 #include <vector>
+
 
 namespace mln
 {
@@ -28,7 +29,7 @@ namespace mln
         typedef boost::property<vertex_label_t, Label>                                         Vproperty;
         typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty> type;
       };
-    }
+    } // namespace internal
 
     template <typename I, typename N, typename Graph, typename Label = unsigned>
     std::pair<mln_ch_value(I, Label), Label> rag(const Image<I>& ima, const N& nbh, Graph& graph,
@@ -161,7 +162,7 @@ namespace mln
         return lbl;
       }
 
-    } // namespace mln::labeling::impl
+    } // namespace impl
 
     template <typename I, typename N, typename Graph, typename Label>
     std::pair<mln_ch_value(I, Label), Label> rag(const Image<I>& ima_, const N& nbh, Graph& graph, Label lbl)
@@ -196,8 +197,6 @@ namespace mln
       return std::make_pair(out, lbl);
     }
 
-  } // namespace mln::labeling
+  } // namespace labeling
 
 } // namespace mln
-
-#endif //! MLN_LABELING_RAG_HPP

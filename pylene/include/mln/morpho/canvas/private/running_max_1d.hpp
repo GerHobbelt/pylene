@@ -1,8 +1,9 @@
-#ifndef MLN_MORPHO_CANVAS_RUNNING_MAX_1D_HPP
-#define MLN_MORPHO_CANVAS_RUNNING_MAX_1D_HPP
+#pragma once
+
+#include <mln/core/assert.hpp>
 
 #include <algorithm>
-#include <mln/core/assert.hpp>
+
 
 namespace mln
 {
@@ -137,8 +138,6 @@ namespace mln
         }
       }
 
-    } // namespace mln::morpho::internal
-  }   // namespace mln::morpho
+    } // namespace internal
+  }   // namespace morpho
 } // namespace mln
-
-#endif //! MLN_MORPHO_CANVAS_RUNNING_MAX_1D_HPP

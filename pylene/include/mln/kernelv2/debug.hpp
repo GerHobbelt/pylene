@@ -1,9 +1,9 @@
-#ifndef MLN_KERNELV2_DEBUG_HPP
-#define MLN_KERNELV2_DEBUG_HPP
+#pragma once
 
 #include <mln/core/dontcare.hpp>
 #include <mln/kernelv2/details/expressions_traits.hpp>
 #include <mln/kernelv2/kernel.hpp>
+
 
 namespace mln
 {
@@ -39,7 +39,7 @@ namespace mln
       {
         dontcare((debug_image<k>(std::forward<Expr>(expr)), (NULL))...);
       }
-    }
+    } // namespace internal
 
     template <class Expr>
     void debug(Expr&& expr)
@@ -53,8 +53,6 @@ namespace mln
       internal::debug_all_image(expr, typename int_list_seq<n::value>::type());
     }
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNELV2_DEBUG_HPP

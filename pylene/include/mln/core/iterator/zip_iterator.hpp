@@ -1,16 +1,16 @@
-#ifndef ZIP_ITERATOP_HPP
-#define ZIP_ITERATOP_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 #include <mln/core/internal/tuple_utility.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 
-#include <tuple>
-#include <type_traits>
-
 #ifndef _MSC_VER
 #include <boost/hana/and.hpp>
 #endif
+
+#include <tuple>
+#include <type_traits>
+
 
 namespace mln
 {
@@ -156,7 +156,7 @@ namespace mln
         return finished;
       }
     };
-  }
+  } // namespace details
 
   template <class... TTypes>
   struct zip_iterator<std::tuple<TTypes...>>
@@ -167,6 +167,4 @@ namespace mln
         typename details::conjunction<typename std::remove_reference_t<TTypes>::is_multidimensional...>::type;
     using details::zip_iterator_base<is_multidimensional::value, TTypes...>::zip_iterator_base;
   };
-}
-
-#endif // ! ZIP_ITERATOP_HPP
+} // namespace mln

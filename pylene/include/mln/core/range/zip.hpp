@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_RANGE_ZIP_HPP
-#define MLN_CORE_RANGE_ZIP_HPP
+#pragma once
 
 #include <mln/core/internal/tuple_utility.hpp>
 #include <mln/core/iterator/zip_iterator.hpp>
 #include <mln/core/range/range.hpp>
+
 
 namespace mln
 {
@@ -47,7 +47,7 @@ namespace mln
         return rng::iter(range);
       }
     };
-  }
+  } // namespace internal
 
   template <class... TRanges>
   struct zip_range<std::tuple<TRanges...>>
@@ -111,8 +111,6 @@ namespace mln
       return zip_range<T>(std::forward_as_tuple<TRanges&&...>(ranges...));
     }
 
-  } // namespace mln::rng
+  } // namespace rng
 
 } // namespace mln
-
-#endif // ! MLN_CORE_RANGE_ZIP_HPP

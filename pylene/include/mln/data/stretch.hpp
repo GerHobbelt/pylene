@@ -1,10 +1,10 @@
-#ifndef MLN_DATA_STRETCH_HPP
-#define MLN_DATA_STRETCH_HPP
+#pragma once
 
 #include <mln/accu/accumulators/minmax.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image.hpp>
+
 
 namespace mln
 {
@@ -79,7 +79,5 @@ namespace mln
 
       return out;
     }
-  }
-}
-
-#endif // ! MLN_DATA_STRETCH_HPP
+  } // namespace data
+} // namespace mln

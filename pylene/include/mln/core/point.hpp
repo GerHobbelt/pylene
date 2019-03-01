@@ -1,7 +1,7 @@
-#ifndef MLN_POINT_HH
-#define MLN_POINT_HH
+#pragma once
 
 #include <mln/core/vec.hpp>
+
 
 namespace mln
 {
@@ -22,7 +22,7 @@ namespace mln
       static const bool is_less_than_comparable = true;
       static const bool is_equality_comparable  = true;
     };
-  }
+  } // namespace internal
 
   template <typename T, unsigned dim>
   using point = internal::vec_base<T, dim, point_tag>;
@@ -33,6 +33,4 @@ namespace mln
   typedef point<float, 1> point1df;
   typedef point<float, 2> point2df;
   typedef point<float, 3> point3df;
-}
-
-#endif
+} // namespace mln

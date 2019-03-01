@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_NEIGHBORHOOD_TRAITS_HPP
-#define MLN_CORE_NEIGHBORHOOD_NEIGHBORHOOD_TRAITS_HPP
+#pragma once
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -31,6 +31,4 @@ namespace mln
   struct neighborhood_is_constant : std::is_convertible<typename N::category, dynamic_neighborhood_tag>
   {
   };
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_NEIGHBORHOOD_TRAITS_HPP
+} // namespace mln

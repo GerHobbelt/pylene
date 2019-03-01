@@ -1,10 +1,10 @@
-#ifndef MLN_MORPHO_MAXTREE_MAXTREE_HPP
-#define MLN_MORPHO_MAXTREE_MAXTREE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/morpho/maxtree/maxtree_queue.hpp>
+
 
 namespace mln
 {
@@ -56,7 +56,5 @@ namespace mln
       mln_exiting();
       return res;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_MAXTREE_MAXTREE_HPP
+  } // namespace morpho
+} // namespace mln

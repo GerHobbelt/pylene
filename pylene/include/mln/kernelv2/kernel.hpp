@@ -1,11 +1,11 @@
-#ifndef MLN_KERNELV2_KERNEL_HPP
-#define MLN_KERNELV2_KERNEL_HPP
+#pragma once
 
 #include <mln/core/config.hpp>
 #include <mln/kernelv2/details/deep_copy_fix.hpp>
 #include <mln/kernelv2/execute.hpp>
 #include <mln/kernelv2/execute_incremental.hpp>
 #include <mln/kernelv2/types.hpp>
+
 
 namespace mln
 {
@@ -27,8 +27,6 @@ namespace mln
       return proto::deep_copy(std::forward<Expr>(e));
     }
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNELV2_KERNEL_HPP

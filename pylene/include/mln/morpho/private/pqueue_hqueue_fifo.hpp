@@ -1,5 +1,7 @@
-#ifndef MLN_MORPHO_PRIVATE_PQUEUE_HQUEUE_FIFO_HPP
-#define MLN_MORPHO_PRIVATE_PQUEUE_HQUEUE_FIFO_HPP
+#pragma once
+
+#include <type_traits>
+
 
 namespace mln
 {
@@ -121,8 +123,6 @@ namespace mln
       }
 
 
-    } // namespace mln::morpho::details
-  }   // namespace mln::morpho
+    } // namespace details
+  }   // namespace morpho
 } // namespace mln
-
-#endif //! MLN_MORPHO_PRIVATE_PQUEUE_HQUEUE_FIFO_HPP

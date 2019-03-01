@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_WPITER_HPP
-#define MLN_CORE_NEIGHBORHOOD_SLIDING_WPITER_HPP
+#pragma once
 
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/range/range.hpp>
+
 
 namespace mln
 {
@@ -80,6 +80,4 @@ namespace mln
     typename range_const_iterator<SiteSet>::type   m_pset_iter;
     typename range_const_iterator<WeightSet>::type m_wset_iter;
   };
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_SLIDING_WPITER_HPP
+} // namespace mln

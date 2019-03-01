@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_ITERATOR_IMAGE_ACCESS_ITERATOR_HPP
-#define MLN_CORE_ITERATOR_IMAGE_ACCESS_ITERATOR_HPP
+#pragma once
 
 /// \file
 /// \ingroup iterators
@@ -17,6 +16,7 @@
 
 #include <mln/core/image_traits.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
+
 
 namespace mln
 {
@@ -149,6 +149,4 @@ namespace mln
 
     pixel_type m_pix;
   };
-}
-
-#endif // ! MLN_CORE_ITERATOR_IMAGE_ACCESS_ITERATOR_HPP
+} // namespace mln

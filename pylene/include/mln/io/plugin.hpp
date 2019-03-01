@@ -1,12 +1,14 @@
-#ifndef MLN_IO_PLUGIN_HPP
-#define MLN_IO_PLUGIN_HPP
+#pragma once
 
-#include <iosfwd>
 #include <mln/core/domain/box.hpp>
 #include <mln/io/internal/demangle.hpp>
 #include <mln/io/ioexception.hpp>
+
+#include <iosfwd>
 #include <string>
 #include <typeindex>
+
+
 /// \file
 /// \brief File that contains base classes for Plugin Readers et Writters
 
@@ -73,6 +75,4 @@ namespace mln
   /**********************************/
 
   inline void Plugin::initialize() {}
-}
-
-#endif // ! MLN_IO_PLUGIN_HPP
+} // namespace mln

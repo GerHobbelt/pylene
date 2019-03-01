@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_RANGE_ITER_HPP
-#define MLN_CORE_RANGE_ITER_HPP
+#pragma once
 
 #include <mln/core/iterator/stditerator.hpp>
 #include <mln/core/range/range_traits.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -73,7 +73,7 @@ namespace mln
         typename range_reverse_iterator<R>::type x(range.rbegin(), range.rend());
         return x;
       }
-    }
+    } // namespace impl
 
     template <typename R>
     auto iter(R& range)
@@ -98,7 +98,5 @@ namespace mln
     {
       return impl::riter(range, is_mln_range<R>(), is_a<R, Iterator>());
     }
-  }
-}
-
-#endif // ! MLN_CORE_RANGE_ITER_HPP
+  } // namespace rng
+} // namespace mln

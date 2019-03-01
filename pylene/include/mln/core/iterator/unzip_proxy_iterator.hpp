@@ -1,11 +1,11 @@
-#ifndef UNZIP_PROXY_ITERATOR_HPP
-#define UNZIP_PROXY_ITERATOR_HPP
+#pragma once
 
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -116,7 +116,7 @@ namespace mln
     //   typedef typename std::tuple_element<n, Reference>::type	reference;
     //   typedef typename boost::tuples::element<n, Value>::type		value_type;
     // };
-  }
+  } // namespace internal
 
   template <typename ZipIterator, size_t n>
   struct unzip_proxy_iterator : iterator_base<unzip_proxy_iterator<ZipIterator, n>,
@@ -240,7 +240,7 @@ namespace mln
     //   typedef typename std::remove_reference<TuplePixel>
     //   typename std::tuple_element<TuplePixel
     // };
-  }
+  } // namespace internal
 
   template <typename ZipIterator, size_t n>
   struct unzip_proxy_pixel_iterator : iterator_base<unzip_proxy_pixel_iterator<ZipIterator, n>,
@@ -283,6 +283,4 @@ namespace mln
   {
     return unzip_proxy_pixel_iterator<ProxyIterator, n>(x);
   }
-}
-
-#endif // ! UNZIP_PROXY_ITERATOR_HPP
+} // namespace mln

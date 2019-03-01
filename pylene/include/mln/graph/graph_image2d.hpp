@@ -1,11 +1,11 @@
-#ifndef GRAPH_IMAGE2D_HPP
-#define GRAPH_IMAGE2D_HPP
+#pragma once
 
 #include <mln/core/domain/box.hpp>
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/range/filter.hpp>
 #include <mln/core/range/iterator_range.hpp>
+
 
 namespace mln
 {
@@ -66,7 +66,7 @@ namespace mln
           out[i] = arr[i] * 2;
         return out;
       }
-    }
+    } // namespace internal
 
     template <typename Vtype, typename Etype, typename Nbh>
     struct undirected_graph_image2d
@@ -135,8 +135,8 @@ namespace mln
       size_t m_estrides[2]; ///< Strides between an edge line and a vertex line
       size_t m_strides[2];  ///< Strides between a vertex line and the next vertex line (ie vstride + estride)
     };
-  }
-}
+  } // namespace graph
+} // namespace mln
 
 /*
 namespace boost
@@ -320,7 +320,7 @@ namespace mln
         P pmin_;
         P pmax_;
       };
-    }
+    } // namespace internal
 
     template <typename Vtype, typename Etype, typename Nbh>
     undirected_graph_image2d<Vtype, Etype, Nbh>::undirected_graph_image2d(const box2d& domain, const Nbh& nbh,
@@ -527,7 +527,5 @@ namespace mln
       auto myrng = make_iterator_range(vit);
       return rng::filter(std::move(myrng), std::bind(&box2d::has, &m_domain, std::placeholders::_1));
     }
-  }
-}
-
-#endif // ! GRAPH_IMAGE2D_HPP
+  } // namespace graph
+} // namespace mln

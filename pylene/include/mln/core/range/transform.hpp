@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_RANGE_TRANSFORM_HPP
-#define MLN_CORE_RANGE_TRANSFORM_HPP
+#pragma once
 
 #include <mln/core/iterator/transform_iterator.hpp>
+
 
 namespace mln
 {
@@ -59,8 +59,6 @@ namespace mln
       return transformed_range<InputRange, UnaryFunction>(rng, fun);
     }
 
-  } // namespace mln::rng
+  } // namespace rng
 
 } // namespace mln
-
-#endif // ! MLN_CORE_RANGE_TRANSFORM_HPP

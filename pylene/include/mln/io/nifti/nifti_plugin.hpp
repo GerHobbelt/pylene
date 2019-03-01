@@ -1,11 +1,12 @@
-#ifndef MLN_IO_NIFTI_NIFTI_PLUGIN_HPP
-#define MLN_IO_NIFTI_NIFTI_PLUGIN_HPP
+#pragma once
 
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/io/plugin.hpp>
 #include <mln/io/stream_wrapper.hpp>
+
 #include <nifti1_io.h>
+
 
 namespace mln
 {
@@ -172,7 +173,5 @@ namespace mln
         x = 0;
       }
     }
-  }
-}
-
-#endif // ! MLN_IO_NIFTI_NIFTI_PLUGIN_HPP
+  } // namespace io
+} // namespace mln

@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_RANGE_FILTER_HPP
-#define MLN_CORE_RANGE_FILTER_HPP
+#pragma once
 
 #include <mln/core/iterator/filter_iterator.hpp>
 
 #include <utility>
+
 
 namespace mln
 {
@@ -46,8 +46,6 @@ namespace mln
       return filtered_range<InputRange, Predicate>(std::forward<InputRange>(rng), pred);
     }
 
-  } // namespace mln::rng
+  } // namespace rng
 
 } // namespace mln
-
-#endif // ! MLN_CORE_RANGE_FILTER_HPP

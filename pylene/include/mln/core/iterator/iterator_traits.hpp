@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_ITERATOR_ITERATOR_TRAITS_HPP
-#define MLN_CORE_ITERATOR_ITERATOR_TRAITS_HPP
+#pragma once
 
 #include <iterator>
+
 
 namespace mln
 {
@@ -24,5 +24,4 @@ namespace mln
   struct iterator_traits<const T*> : std::iterator_traits<const T*>
   {
   };
-}
-#endif // ! MLN_CORE_ITERATOR_ITERATOR_TRAITS_HPP
+} // namespace mln

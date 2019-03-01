@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_RANGE_ALGORITHM_INNER_PRODUCT_HPP
-#define MLN_CORE_RANGE_ALGORITHM_INNER_PRODUCT_HPP
+#pragma once
 
 #include <mln/core/forall.hpp>
 #include <mln/core/range/range.hpp>
+
 
 namespace mln
 {
@@ -29,7 +29,5 @@ namespace mln
       return value;
     }
 
-  } // namespace mln::range
+  } // namespace range
 } // namespace mln
-
-#endif //! MLN_CORE_RANGE_ALGORITHM_INNER_PRODUCT_HPP

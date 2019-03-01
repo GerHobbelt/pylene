@@ -1,8 +1,9 @@
-#ifndef MLN_CORE_RANGE_HPP
-#define MLN_CORE_RANGE_HPP
+#pragma once
+
+#include <mln/core/range/category.hpp>
 
 #include <boost/range.hpp>
-#include <mln/core/range/category.hpp>
+
 
 namespace mln
 {
@@ -20,5 +21,3 @@ namespace mln
   using boost::range_reverse_iterator;
 
 } // namespace mln
-
-#endif //! MLN_CORE_RANGE_HPP

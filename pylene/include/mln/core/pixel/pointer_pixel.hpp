@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_PIXEL_POINTER_PIXEL_HPP
-#define MLN_CORE_PIXEL_POINTER_PIXEL_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/image_traits.hpp>
+
 
 namespace mln
 {
@@ -23,7 +23,7 @@ namespace mln
   {
     // Fwd declaration.
     struct iterator_core_access;
-  }
+  } // namespace internal
 
   template <class Image>
   struct pointer_pixel : Pixel<pointer_pixel<Image>>
@@ -108,5 +108,3 @@ namespace mln
   };
 
 } // namespace mln
-
-#endif //! MLN_CORE_PIXEL_POINTER_PIXEL_HPP

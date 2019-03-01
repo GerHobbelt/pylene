@@ -1,9 +1,9 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_FILTERING_HPP
-#define MLN_MORPHO_COMPONENT_TREE_FILTERING_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -114,7 +114,7 @@ namespace mln
             v = data->m_nodes[v].m_parent;
         }
       }
-    }
+    } // namespace internal
 
     template <class P, class Amap, class PredicateMap>
     void filter_min_inplace(component_tree<P, Amap>& tree, const PredicateMap& pred)
@@ -233,7 +233,5 @@ namespace mln
 
       return vmap;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_FILTERING_HPP
+  } // namespace morpho
+} // namespace mln

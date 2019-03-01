@@ -1,5 +1,4 @@
-#ifndef MLN_KERNELV2_EXECUTE_HPP
-#define MLN_KERNELV2_EXECUTE_HPP
+#pragma once
 
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/kernelv2/details/eval_context.hpp>
@@ -7,6 +6,7 @@
 #include <mln/kernelv2/details/inner_context.hpp>
 #include <mln/kernelv2/details/pixter_wrapper.hpp>
 #include <mln/kernelv2/types.hpp>
+
 
 namespace mln
 {
@@ -65,8 +65,6 @@ namespace mln
       }
     }
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNELV2_EXECUTE_HPP

@@ -1,5 +1,9 @@
-#ifndef MLN_KERNELV2_DETAILS_EXPRESSIONS_TRAITS_HPP
-#define MLN_KERNELV2_DETAILS_EXPRESSIONS_TRAITS_HPP
+#pragma once
+
+#include <mln/core/dontcare.hpp>
+#include <mln/core/image/constant_image.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/internal/intseq.hpp>
 
 #include <boost/fusion/tuple.hpp>
 #include <boost/mpl/bool.hpp>
@@ -14,10 +18,7 @@
 #include <boost/proto/fusion.hpp>
 #include <boost/proto/proto.hpp>
 #include <boost/type_traits.hpp>
-#include <mln/core/dontcare.hpp>
-#include <mln/core/image/constant_image.hpp>
-#include <mln/core/image/image.hpp>
-#include <mln/core/internal/intseq.hpp>
+
 
 namespace mln
 {
@@ -332,8 +333,6 @@ namespace mln
         return get_image_used_by_neighbor_list_helper2(std::forward<Expr>(x), typename int_list_seq<K>::type());
       }
 
-    } // namespace mln::kernel::details
-  }   // namespace mln::kernel
+    } // namespace details
+  }   // namespace kernel
 } // namespace mln
-
-#endif //! MLN_KERNELV2_DETAILS_EXPRESSIONS_TRAITS_HPP

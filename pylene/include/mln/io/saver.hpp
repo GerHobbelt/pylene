@@ -1,10 +1,10 @@
-#ifndef MLN_IO_SAVER_HPP
-#define MLN_IO_SAVER_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/io/internal/demangle.hpp>
 #include <mln/io/ioexception.hpp>
 #include <mln/io/plugin.hpp>
+
 
 namespace mln
 {
@@ -108,7 +108,5 @@ namespace mln
       }
     }
 
-  } // namespace mln::io
+  } // namespace io
 } // namespace mln
-
-#endif //! MLN_IO_SAVER_HPP

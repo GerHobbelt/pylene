@@ -1,144 +1,137 @@
 #pragma once
 
-
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/value/value_traits.hpp>
 
 #include <type_traits>
 #include <vector>
 
 
-namespace mln::labeling
+namespace mln
 {
 
-  /// \brief labelize connected components of a binary image ima.
-  template <typename Label, class I, class N>
-  image_ch_value_t<I, Label> blobs(I ima, N nbh, int& nlabel);
-
-
-  /******************************************/
-  /****          Implementation          ****/
-  /******************************************/
-
-  namespace impl
+  namespace labeling
   {
 
-    template <typename I, typename N, typename O>
-    [[gnu::noinline]] int blobs_no_boundcheck(I& ima, N nbh, O& out)
+    /// \brief labelize connected components of a binary image ima.
+    template <typename I, typename Neighborhood, typename Label = unsigned>
+    std::pair<mln_ch_value(I, Label), Label> blobs(const Image<I>& ima, Neighborhood nbh, Label lbl = Label());
+
+    /******************************/
+    /*** Implementation         ***/
+    /******************************/
+
+    namespace impl
     {
-      using P     = image_point_t<std::remove_reference_t<I>>;
-      using Label = image_value_t<O>;
-      mln_entering("mln::labeling::blobs (no_boundcheck)");
 
-      constexpr int LBL_MAX = std::numeric_limits<Label>::max();
-
-      int            nlabel = 0;
-      std::vector<P> queue;
-      queue.reserve(ima.domain().size());
-
-      mln::extension::fill(out, LBL_MAX);
-
-      mln_foreach (auto p, ima.domain())
+      namespace generic
       {
-        if (!ima(p) || out(p) > 0)
-          continue;
 
-
-        queue.push_back(p);
-        if (nlabel++ >= LBL_MAX)
-          throw std::runtime_error("Detected overflow in the number of labels.");
-        out(p) = nlabel;
-
-        do
+        template <typename I, typename Neighborhood, typename Label, typename O>
+        Label blobs_no_boundcheck(const I& ima, Neighborhood nbh, Label lbl, O& out)
         {
-          auto q = queue.back();
-          queue.pop_back();
-          for (auto n : nbh(q))
-            if (out.at(n) == 0 && ima(n))
-            {
-              out.at(n) = nlabel;
-              queue.push_back(n);
-            }
-        } while (not queue.empty());
-      }
-      return nlabel;
-    }
+          typedef mln_point(I) P;
 
-    template <typename I, typename N, typename O>
-    [[gnu::noinline]] int blobs_boundcheck(I& ima, N nbh, O& out)
-    {
-      using P               = image_point_t<std::remove_reference_t<I>>;
-      using Label           = image_value_t<O>;
-      constexpr int LBL_MAX = std::numeric_limits<Label>::max();
+          mln_entering("mln::labeling::impl::generic::blobs_no_boundcheck");
 
-      mln_entering("mln::labeling::blobs (boundcheck)");
+          Label          bg = lbl;
+          std::vector<P> queue;
+          queue.reserve(ima.domain().size());
 
-      int            nlabel = 0;
-      std::vector<P> queue;
-      queue.reserve(ima.domain().size());
+          extension::fill(out, value_traits<Label>::max());
 
-      mln::extension::fill(out, LBL_MAX);
+          P q;
+          mln_iter(n, nbh(q));
 
-      auto dom = ima.domain();
-      mln_foreach (auto p, dom)
-      {
-        if (!ima(p) || out(p) > 0)
-          continue;
-
-
-        queue.push_back(p);
-
-        if (nlabel++ >= LBL_MAX)
-          throw std::runtime_error("Detected overflow in the number of labels.");
-
-        out(p) = nlabel;
-        do
-        {
-          auto q = queue.back();
-          queue.pop_back();
-
-          for (auto n : nbh(q))
+          mln_foreach (P p, ima.domain())
           {
-            if (!dom.has(n)) // Bound check
-              continue;
-
-            if (out(n) == 0 && ima(n))
+            if (ima(p) and out(p) == bg)
             {
-              queue.push_back(n);
-              out(n) = nlabel;
+              queue.push_back(p);
+              ++lbl;
+              mln_assertion(lbl <= value_traits<Label>::max());
+              while (not queue.empty())
+              {
+                q = queue.back();
+                queue.pop_back();
+                out(q) = lbl;
+                mln_forall (n)
+                  if (out.at(*n) == bg and ima(*n))
+                    queue.push_back(*n);
+              }
             }
           }
-        } while (not queue.empty());
-      }
-      return nlabel;
+
+          mln_exiting();
+
+          return lbl;
+        }
+
+        template <typename I, typename Neighborhood, typename Label, typename O>
+        Label blobs_boundcheck(const I& ima, Neighborhood nbh, Label lbl, O& out)
+        {
+          typedef mln_point(I) P;
+
+          mln_entering("mln::labeling::impl::generic::blobs_boundcheck");
+
+          Label bg = lbl;
+
+          std::vector<P> queue;
+          queue.reserve(ima.domain().size());
+
+          P q;
+          mln_iter(n, nbh(q));
+
+          mln_foreach (P p, ima.domain())
+          {
+            if (ima(p) and out(p) == bg)
+            {
+              queue.push_back(p);
+              ++lbl;
+              mln_assertion(lbl <= value_traits<Label>::max());
+              while (not queue.empty())
+              {
+                q = queue.back();
+                queue.pop_back();
+                out(q) = lbl;
+                mln_forall (n)
+                  if (ima.domain().has(*n) and ima(*n) and out(*n) == bg)
+                    queue.push_back(*n);
+              }
+            }
+          }
+
+          mln_exiting();
+
+          return lbl;
+        }
+      } // namespace generic
+    }   // namespace impl
+
+    template <typename I, typename Neighborhood, typename Label>
+    std::pair<mln_ch_value(I, Label), Label> blobs(const Image<I>& ima_, Neighborhood nbh, Label lbl)
+    {
+      typedef mln_value(I) V;
+      static_assert(std::is_convertible<V, bool>::value, "Only supports binary image (type: bool)");
+
+      mln_entering("mln::labeling::blobs");
+
+      const I& ima = exact(ima_);
+      Label    bg  = lbl;
+
+      int status;
+      mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).init(bg).get_status(status);
+
+      if (status == 0)
+        lbl = impl::generic::blobs_no_boundcheck(ima, nbh, lbl, out);
+      else
+        lbl = impl::generic::blobs_boundcheck(ima, nbh, lbl, out);
+
+      mln_exiting();
+
+      return std::make_pair(out, lbl);
     }
-  } // namespace impl
-
-
-  /// \brief labelize connected components of a binary image ima.
-  template <typename Label, class I, class N>
-  [[gnu::noinline]] image_ch_value_t<I, Label> blobs(I ima, N nbh, int& nlabel)
-  {
-    static_assert(mln::is_a<I, mln::details::Image>());
-    static_assert(std::is_convertible<image_value_t<I>, bool>::value, "Only supports binary image (type: bool)");
-    static_assert(std::is_integral_v<Label>, "Label value should be integral");
-    static_assert((std::is_signed_v<Label> && sizeof(Label) <= sizeof(int)) ||
-                  (std::is_unsigned_v<Label> && sizeof(Label) < sizeof(int)));
-
-    image_build_error_code     status;
-    image_ch_value_t<I, Label> out = imchvalue<Label>(ima)
-                                         .adjust(nbh)       //
-                                         .set_init_value(0) //
-                                         .get_status(&status);
-    if (status == IMAGE_BUILD_OK)
-      nlabel = impl::blobs_no_boundcheck(ima, nbh, out);
-    else
-      nlabel = impl::blobs_boundcheck(ima, nbh, out);
-
-    return out;
-  }
-
-
-} // namespace mln::labeling
+  } // namespace labeling
+} // namespace mln

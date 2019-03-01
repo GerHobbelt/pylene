@@ -1,8 +1,9 @@
-#ifndef MLN_MORPHO_TOS_PRIVATE_PSET_REDBLACKTREE_HPP
-#define MLN_MORPHO_TOS_PRIVATE_PSET_REDBLACKTREE_HPP
+#pragma once
+
+#include <mln/core/image/image.hpp>
 
 #include <boost/intrusive/set.hpp>
-#include <mln/core/image/image.hpp>
+
 
 namespace mln
 {
@@ -121,9 +122,7 @@ namespace mln
           return std::make_pair(node.level, node.p);
         }
 
-      } // namespace mln::morpho::tos::impl
-    }   // namespace mln::morpho::tos
-  }     // namespace mln::morpho
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
 } // namespace mln
-
-#endif //! MLN_MORPHO_TOS_PRIVATE_PSET_REDBLACKTREE_HPP

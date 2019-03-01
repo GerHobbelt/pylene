@@ -1,5 +1,4 @@
-#ifndef MLN_KERNELV2_EXECUTE_INCREMENTAL_HPP
-#define MLN_KERNELV2_EXECUTE_INCREMENTAL_HPP
+#pragma once
 
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
@@ -7,6 +6,7 @@
 #include <mln/kernelv2/details/expressions_traits.hpp>
 #include <mln/kernelv2/details/inner_context.hpp>
 #include <mln/kernelv2/details/pixter_wrapper.hpp>
+
 
 namespace mln
 {
@@ -92,7 +92,5 @@ namespace mln
       mln_exiting();
     }
 
-  } // namespace mln::kernel
+  } // namespace kernel
 } // namespace mln
-
-#endif //! MLN_KERNELV2_EXECUTE_INCREMENTAL_HPP

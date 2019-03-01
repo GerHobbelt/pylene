@@ -1,9 +1,10 @@
-#ifndef MLN_CORE_WRT_OFFSET_HPP
-#define MLN_CORE_WRT_OFFSET_HPP
+#pragma once
 
-#include <array>
 #include <mln/core/image/image.hpp>
 #include <mln/core/range/range.hpp>
+
+#include <array>
+
 
 namespace mln
 {
@@ -78,5 +79,3 @@ namespace mln
   }
 
 } // namespace mln
-
-#endif //! MLN_CORE_WRT_OFFSET_HPP

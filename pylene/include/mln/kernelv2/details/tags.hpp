@@ -1,7 +1,7 @@
-#ifndef MLN_KERNELV2_DETAILS_TAGS_HPP
-#define MLN_KERNELV2_DETAILS_TAGS_HPP
+#pragma once
 
 #include <iostream>
+
 
 namespace mln
 {
@@ -53,10 +53,8 @@ namespace mln
         return os << "A";
       }
 
-    } // namespace mln::kernel::tags
+    } // namespace tag
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNELV2_DETAILS_TAGS_HPP

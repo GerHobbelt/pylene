@@ -1,11 +1,11 @@
-#ifndef MLN_MORPHO_RANK_FILTER_HPP
-#define MLN_MORPHO_RANK_FILTER_HPP
+#pragma once
 
 #include <mln/accu/accumulators/h_rank.hpp>
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/kernelv2/kernel.hpp>
 #include <mln/morpho/se/se.hpp>
+
 
 /// \file
 
@@ -87,7 +87,7 @@ namespace mln
         ker::execute(expr, nbh);
       }
 
-    } // namespace mln::morpho::impl
+    } // namespace impl
 
     template <class Ratio, class I, class SE, class OutputImage>
     OutputImage& rank_filter(const Image<I>& ima_, const StructuringElement<SE>& se_, Image<OutputImage>& output_)
@@ -127,8 +127,6 @@ namespace mln
       return out;
     }
 
-  } // namespace mln::morpho
+  } // namespace morpho
 
 } // namespace mln
-
-#endif // ! MLN_MORPHO_RANK_FILTER_HPP

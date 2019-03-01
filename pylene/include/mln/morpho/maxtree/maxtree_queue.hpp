@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_MAXTREE_MAXTREE_QUEUE_HPP
-#define MLN_MORPHO_MAXTREE_MAXTREE_QUEUE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
@@ -11,6 +10,7 @@
 #include <queue>
 #include <stack>
 #include <vector>
+
 
 namespace mln
 {
@@ -184,8 +184,6 @@ namespace mln
         return ctree.get_subtree(stack_top_position);
       }
 
-    } // namespace mln::morpho::impl
-  }
-}
-
-#endif // ! MLN_MORPHO_MAXTREE_MAXTREE_QUEUE_HPP
+    } // namespace impl
+  }   // namespace morpho
+} // namespace mln

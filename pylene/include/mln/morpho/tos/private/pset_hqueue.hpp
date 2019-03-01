@@ -1,8 +1,9 @@
-#ifndef MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP
-#define MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
+
 #include <vector>
+
 
 namespace mln
 {
@@ -125,9 +126,7 @@ namespace mln
           return std::make_pair(Key(), (Point)npos);
         }
 
-      } // namespace mln::morpho::tos::impl
-    }   // namespace mln::morpho::tos
-  }     // namespace mln::morpho
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
 } // namespace mln
-
-#endif //! MLN_MORPHO_TOS_PRIVATE_PSET_HQUEUE_HPP

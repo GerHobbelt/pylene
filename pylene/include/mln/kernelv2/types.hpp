@@ -1,7 +1,7 @@
-#ifndef MLN_KERNELV2_TYPES_HPP
-#define MLN_KERNELV2_TYPES_HPP
+#pragma once
 
 #include <mln/kernelv2/details/expressions.hpp>
+
 
 namespace mln
 {
@@ -91,8 +91,6 @@ namespace mln
       return Image<I, k>{std::forward<I>(f)};
     }
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNELV2_TYPES_HPP

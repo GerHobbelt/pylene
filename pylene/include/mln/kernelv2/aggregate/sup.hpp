@@ -1,8 +1,8 @@
-#ifndef MLN_KERNEL_AGGREGATE_SUP_HPP
-#define MLN_KERNEL_AGGREGATE_SUP_HPP
+#pragma once
 
 #include <mln/accu/accumulators/infsup.hpp>
 #include <mln/kernelv2/types.hpp>
+
 
 namespace mln
 {
@@ -20,10 +20,8 @@ namespace mln
         return Sup_t<Compare>()(std::forward<Expr>(expr));
       }
 
-    } // namespace mln::kernel::aggregate
+    } // namespace aggregate
 
-  } // namespace mln::kernel
+  } // namespace kernel
 
 } // namespace mln
-
-#endif //! MLN_KERNEL_AGGREGATE_SUP_HPP

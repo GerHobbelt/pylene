@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_LITERAL_VECTORIAL_HPP
-#define MLN_CORE_LITERAL_VECTORIAL_HPP
+#pragma once
 
 namespace mln
 {
@@ -19,8 +18,6 @@ namespace mln
     static const zero_t zero = {};
     static const one_t  one  = {};
 
-  } // namespace mln::literal
+  } // namespace literal
 
 } // namespace mln
-
-#endif //! MLN_CORE_LITERAL_VECTORIAL_HPP

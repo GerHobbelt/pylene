@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_PIXEL_POINT_PIXEL_HPP
-#define MLN_CORE_PIXEL_POINT_PIXEL_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/image_traits.hpp>
+
 
 namespace mln
 {
@@ -70,5 +70,3 @@ namespace mln
   };
 
 } // namespace mln
-
-#endif //! MLN_CORE_PIXEL_POINT_PIXEL_HPP

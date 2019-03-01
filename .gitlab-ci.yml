@@ -69,8 +69,6 @@ distcheck-linux-clang-debug:
     script:
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data
-        - cmake --build bench --config $PYLENE_CONFIGURATION
-        - ctest -L InternalTests
         - cmake --build .
                 --config $PYLENE_CONFIGURATION
                 --target run-all-benchmarks
@@ -82,8 +80,6 @@ distcheck-linux-clang-debug:
         name: "benchmark-results"
         paths:
             - build/bench/*.json
-        reports:
-            junit: build/bench/internal/UT*.xml
         expire_in: 15 days
 
 distbench-linux-gcc-release:

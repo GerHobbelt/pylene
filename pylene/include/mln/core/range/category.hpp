@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_RANGE_CATEGORY_HPP
-#define MLN_CORE_RANGE_CATEGORY_HPP
+#pragma once
 
 #include <boost/range/category.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -58,7 +58,7 @@ namespace mln
     {
       typedef random_access_range_tag type;
     };
-  }
+  } // namespace internal
 
   namespace internal
   {
@@ -92,7 +92,7 @@ namespace mln
     {
       typedef typename Range::category category;
     };
-  }
+  } // namespace internal
 
   template <typename Range>
   struct range_category
@@ -102,5 +102,3 @@ namespace mln
   };
 
 } // namespace mln
-
-#endif //! MLN_CORE_RANGE_CATEGORY_HPP

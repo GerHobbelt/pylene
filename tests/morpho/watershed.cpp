@@ -2,8 +2,9 @@
 #include <mln/core/neighb2d.hpp>
 #include <mln/morpho/watershed.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
+
 #include <gtest/gtest.h>
-#include <helpers.hpp>
 
 
 using namespace mln;

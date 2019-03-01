@@ -7,7 +7,7 @@
 #include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
-#include <helpers.hpp>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
 

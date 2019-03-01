@@ -5,8 +5,8 @@
 #include <mln/io/imread.hpp>
 #include <mln/morpho/median_filter.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
-#include <helpers.hpp>
 
 #include <algorithm>
 #include <vector>

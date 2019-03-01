@@ -5,8 +5,8 @@
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
-#include <helpers.hpp>
 
 #include <gtest/gtest.h>
 

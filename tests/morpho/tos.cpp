@@ -9,9 +9,11 @@
 #include <mln/morpho/tos/tos.hpp>
 
 #include "tos_tests_helper.hpp"
+#include <fixtures/ImageCompare/image_compare.hpp>
+
 #include <algorithm>
+
 #include <gtest/gtest.h>
-#include <helpers.hpp>
 
 using mln::uint8;
 

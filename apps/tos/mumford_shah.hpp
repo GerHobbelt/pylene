@@ -197,7 +197,7 @@ namespace mln
       return v[0];
     }
 
-  } // end of namespace internal
+  } // namespace internal
 
   template <typename V>
   auto norm(const V& v) -> typename std::enable_if<std::is_scalar<V>::value, decltype(std::abs(v))>::type

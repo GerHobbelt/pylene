@@ -93,9 +93,8 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   endif()
 
 
-  include(CTest)
   if (BUILD_TESTING)
-    enable_testing()
+    include(CTest)
     add_subdirectory(tests EXCLUDE_FROM_ALL)
   endif()
 

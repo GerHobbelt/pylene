@@ -58,7 +58,7 @@ std::vector<mln::point2d> sort_points(const mln::image2d<mln::uint8>& ima);
 std::vector<mln::point2d> sort_points(const mln::image2d<int>& ima);
 std::vector<mln::point2d> sort_points(const mln::image2d<mln::rgb8>& ima);
 
-class Bench : public benchmark::Fixture
+class BMAlgorithms : public benchmark::Fixture
 {
   virtual void SetUp(const benchmark::State&) override
   {
@@ -79,28 +79,28 @@ protected:
 
 //////// FILL //////////////////
 
-BENCHMARK_F(Bench, fill_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, fill_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     fill_baseline(m_input_uint8, 69);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, fill_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, fill_buffer2d_uint8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     fill(m_input_uint8, 69);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, fill_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     fill_baseline(m_input_rgb8, mln::rgb8{2, 3, 4});
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, fill_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     fill(m_input_rgb8, mln::rgb8{2, 3, 4});
@@ -109,7 +109,7 @@ BENCHMARK_F(Bench, fill_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// COPY //////////////////
 
-BENCHMARK_F(Bench, copy_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -117,7 +117,7 @@ BENCHMARK_F(Bench, copy_buffer2d_uint8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, copy_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -125,7 +125,7 @@ BENCHMARK_F(Bench, copy_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
@@ -133,7 +133,7 @@ BENCHMARK_F(Bench, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, copy_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
@@ -143,28 +143,28 @@ BENCHMARK_F(Bench, copy_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// COUNT_IF //////////////////
 
-BENCHMARK_F(Bench, count_if_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_if_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count_if_baseline(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, count_if_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_if_buffer2d_uint8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count_if(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, count_if_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_if_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count_if_baseline(m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, count_if_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_if_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count_if(m_input_rgb8);
@@ -173,28 +173,28 @@ BENCHMARK_F(Bench, count_if_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// COUNT //////////////////
 
-BENCHMARK_F(Bench, count_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count_baseline(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, count_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_buffer2d_uint8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, count_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count_baseline(m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, count_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, count_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     count(m_input_rgb8);
@@ -203,28 +203,28 @@ BENCHMARK_F(Bench, count_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// EQUAL //////////////////
 
-BENCHMARK_F(Bench, equal_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, equal_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     equal_baseline(m_input_uint8, m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, equal_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, equal_buffer2d_uint8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     equal(m_input_uint8, m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, equal_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, equal_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     equal_baseline(m_input_rgb8, m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, equal_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, equal_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     equal(m_input_rgb8, m_input_rgb8);
@@ -233,7 +233,7 @@ BENCHMARK_F(Bench, equal_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// PASTE //////////////////
 
-BENCHMARK_F(Bench, paste_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -241,7 +241,7 @@ BENCHMARK_F(Bench, paste_buffer2d_uint8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, paste_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -249,7 +249,7 @@ BENCHMARK_F(Bench, paste_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
@@ -257,7 +257,7 @@ BENCHMARK_F(Bench, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, paste_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
@@ -267,7 +267,7 @@ BENCHMARK_F(Bench, paste_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// TRANSFORM //////////////////
 
-BENCHMARK_F(Bench, transform_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -275,7 +275,7 @@ BENCHMARK_F(Bench, transform_buffer2d_uint8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, transform_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -283,7 +283,7 @@ BENCHMARK_F(Bench, transform_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, transform_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
@@ -291,7 +291,7 @@ BENCHMARK_F(Bench, transform_ibuffer2d_rgb8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, transform_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
   while (st.KeepRunning())
@@ -302,28 +302,28 @@ BENCHMARK_F(Bench, transform_ibuffer2d_rgb8)(benchmark::State& st)
 
 //////// FOR_EACH //////////////////
 
-BENCHMARK_F(Bench, for_each_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     for_each_baseline(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, for_each_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     for_each(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, for_each_ibuffer2d_rgb8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     for_each_baseline(m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, for_each_ibuffer2d_rgb8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     for_each(m_input_rgb8);
@@ -333,7 +333,7 @@ BENCHMARK_F(Bench, for_each_ibuffer2d_rgb8)(benchmark::State& st)
 
 ///////////   GENERATE /////////////////
 
-BENCHMARK_F(Bench, generate_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, generate_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -341,7 +341,7 @@ BENCHMARK_F(Bench, generate_buffer2d_uint8_baseline)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, generate_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, generate_buffer2d_uint8)(benchmark::State& st)
 {
   mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
   while (st.KeepRunning())
@@ -352,14 +352,14 @@ BENCHMARK_F(Bench, generate_buffer2d_uint8)(benchmark::State& st)
 
 ///////////   ACCUMULATE /////////////////
 
-BENCHMARK_F(Bench, accumulate_buffer2d_uint8_baseline)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, accumulate_buffer2d_uint8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
     accumulate_baseline(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, accumulate_buffer2d_uint8_accu)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, accumulate_buffer2d_uint8_accu)(benchmark::State& st)
 {
   while (st.KeepRunning())
     accumulate_accu(m_input_uint8);
@@ -367,7 +367,7 @@ BENCHMARK_F(Bench, accumulate_buffer2d_uint8_accu)(benchmark::State& st)
 }
 
 
-BENCHMARK_F(Bench, accumulate_buffer2d_uint8)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, accumulate_buffer2d_uint8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     accumulate(m_input_uint8);
@@ -376,14 +376,14 @@ BENCHMARK_F(Bench, accumulate_buffer2d_uint8)(benchmark::State& st)
 
 ///////////   SORT /////////////////
 
-BENCHMARK_F(Bench, sort_points_buffer2d_small_int)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, sort_points_buffer2d_small_int)(benchmark::State& st)
 {
   while (st.KeepRunning())
     sort_points(m_input_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(Bench, sort_points_buffer2d_large_int)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, sort_points_buffer2d_large_int)(benchmark::State& st)
 {
   auto bit_mix = [](mln::rgb8 x) -> int {
     int res = 0;
@@ -405,7 +405,7 @@ BENCHMARK_F(Bench, sort_points_buffer2d_large_int)(benchmark::State& st)
 }
 
 
-BENCHMARK_F(Bench, sort_points_buffer2d_rgb8_lex)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, sort_points_buffer2d_rgb8_lex)(benchmark::State& st)
 {
   while (st.KeepRunning())
     sort_points(m_input_rgb8);

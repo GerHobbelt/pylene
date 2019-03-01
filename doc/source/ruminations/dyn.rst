@@ -160,16 +160,36 @@ Starting from a templated class, creating a class having the same properties
 
 The problems here:
 
-* massive rework of the library
 * performance loss
+* no compatibility with numpy
 
 The pros:
 
+* genericity is kept
 * ease for python export
-* no compatibility with numpy
 
 
 Olena approach : hybrid method
 ===========================================
 
-Through using type erasure
+Through using type erasure, creating a non-templated type, and then changing its
+interface to achieve numpy compatibility (through the ndarray container) in
+order to increase accessibility.
+
+.. image:: /figures/rumination/hybrid_approach.svg
+    :width: 75%
+    :align: center
+
+The problems:
+
+* performance loss
+
+The pros:
+
+* genericity is kept
+* easy export to python
+* compatibility with numpy
+
+This approach is considered mixed because, performance-wise, the JIT approach
+still trumps over this one. Consequently, having a way to work in tandem with
+the JIT compilers (a.k.a. having a separate, JIT-compatible interface).

@@ -1,12 +1,10 @@
 find_package(GTest REQUIRED)
-find_package(fmt 6.0 REQUIRED)
 
-add_library(ImageCompare)
+add_library(ImageCompare INTERFACE)
 
-target_include_directories(ImageCompare PUBLIC include)
-target_link_libraries(ImageCompare PUBLIC Pylene::Pylene GTest::gtest fmt::fmt)
+target_compile_features(ImageCompare INTERFACE cxx_std_17)
+target_include_directories(ImageCompare INTERFACE include)
+target_link_libraries(ImageCompare INTERFACE Pylene::Pylene GTest::GTest)
 
-target_sources(ImageCompare PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/fixtures/ImageCompare/image_compare.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/image_compare.cpp)
-
+target_sources(ImageCompare INTERFACE
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fixtures/ImageCompare/image_compare.hpp)

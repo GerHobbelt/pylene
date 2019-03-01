@@ -1,40 +1,44 @@
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/filter.hpp>
 
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/algorithm/clone.hpp>
-#include <mln/core/image/ndimage.hpp>
-#include <mln/core/image/view/operators.hpp>
-#include <mln/core/range/foreach.hpp>
-#include <mln/core/range/view/zip.hpp>
 
-#include <mln/core/concepts/archetype/image.hpp>
+#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/rangev3/view/zip.hpp>
+
+#include <mln/core/concept/new/concepts.hpp>
+
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
 
 
 TEST(View, filter_readonly)
 {
-  using namespace mln::view::ops;
+  using namespace mln::experimental::ops;
 
-  mln::box2d        dom({-2, -1}, {3, 3});
+  mln::box2d        dom = {{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
 
   mln::iota(ima, 0);
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
-  static_assert(mln::concepts::OutputImage<decltype(x)>);
-  static_assert(mln::concepts::Image<decltype(x)>);
-  static_assert(mln::concepts::ViewImage<decltype(x)>);
-  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(x)>);
-  //static_assert(mln::concepts::BidirectionalImage<decltype(x)>); // FIXME
-  static_assert(not mln::concepts::RawImage<decltype(x)>);
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(x)>);
+  static_assert(concepts::Image<decltype(x)>);
+  static_assert(concepts::ViewImage<decltype(x)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(x)>);
+  static_assert(concepts::BidirectionalImage<decltype(x)>);
+  static_assert(not concepts::RawImage<decltype(x)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  ASSERT_TRUE(mln::all_of(x > 10));
+  ASSERT_TRUE(mln::experimental::all_of(x > 10));
 
-  mln_foreach (auto&& pix, ima.pixels())
+  mln_foreach_new (auto&& pix, ima.new_pixels())
   {
     if (pix.val() > 10)
       ASSERT_EQ(pix.val(), x(pix.point()));
@@ -42,39 +46,41 @@ TEST(View, filter_readonly)
       ASSERT_EQ(pix.val(), x.at(pix.point()));
   }
 
-  mln_foreach (auto&& pix, x.pixels())
+  mln_foreach_new (auto&& pix, x.new_pixels())
     ASSERT_EQ(pix.val(), ima(pix.point()));
 }
 
 
 TEST(View, filter_writable)
 {
-  using namespace mln::view::ops;
+  using namespace mln::experimental::ops;
 
-  mln::box2d        dom({-2, -1}, {3, 3});
+  mln::box2d        dom{{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
 
 
   mln::iota(ima, 0);
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
 
-  static_assert(mln::concepts::OutputImage<decltype(x)>);
-  static_assert(mln::concepts::ViewImage<decltype(x)>);
-  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(x)>);
-  // static_assert(mln::concepts::BidirectionalImage<decltype(x)>);
-  static_assert(not mln::concepts::RawImage<decltype(x)>);
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(x)>);
+  static_assert(concepts::ViewImage<decltype(x)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(x)>);
+  static_assert(concepts::BidirectionalImage<decltype(x)>);
+  static_assert(not concepts::RawImage<decltype(x)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  mln::fill(x, 10);
-  ASSERT_TRUE(mln::all_of(ima <= 10));
+  mln::experimental::fill(x, 10);
+  ASSERT_TRUE(mln::experimental::all_of(ima <= 10));
 }
 
 
 TEST(View, filter_twice)
 {
-  using namespace mln::view::ops;
+  using namespace mln::experimental::ops;
 
-  mln::box2d        dom({-2, -1}, {3, 3});
+  mln::box2d        dom = {{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
 
   mln::iota(ima, 0);
@@ -82,17 +88,17 @@ TEST(View, filter_twice)
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
   auto u = mln::view::filter(x, [](int v) { return v < 15; });
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  static_assert(concepts::OutputImage<decltype(u)>);
+  static_assert(concepts::ViewImage<decltype(u)>);
+  static_assert(concepts::IndexableAndAccessibleImage<decltype(u)>);
+  static_assert(concepts::BidirectionalImage<decltype(u)>);
+  static_assert(not concepts::RawImage<decltype(u)>);
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
-  static_assert(mln::concepts::OutputImage<decltype(u)>);
-  static_assert(mln::concepts::ViewImage<decltype(u)>);
-  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(u)>);
-  // static_assert(mln::concepts::BidirectionalImage<decltype(u)>);
-  static_assert(not mln::concepts::RawImage<decltype(u)>);
+  ASSERT_TRUE(mln::experimental::all_of(u > 10 && u < 15));
 
-
-  ASSERT_TRUE(mln::all_of(u > 10 && u < 15));
-
-  mln_foreach (auto&& pix, ima.pixels())
+  mln_foreach_new (auto&& pix, ima.new_pixels())
   {
     if (pix.val() > 10 and pix.val() < 15)
     {
@@ -107,14 +113,14 @@ TEST(View, filter_twice)
   }
 
   {
-    mln_foreach (auto&& pix, u.pixels())
+    mln_foreach_new (auto&& pix, u.new_pixels())
       ASSERT_EQ(pix.val(), ima(pix.point()));
   }
 
-  mln::image2d<int> before = mln::clone(ima);
-  mln::fill(u, 1);
+  mln::image2d<int> before = mln::experimental::clone(ima);
+  mln::experimental::fill(u, 1);
   {
-    mln_foreach ((auto [old_v, new_v]), mln::ranges::view::zip(before.values(), ima.values()))
+    mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), ima.new_values()))
     {
       if (old_v > 10 && old_v < 15)
         ASSERT_EQ(1, new_v);
@@ -123,7 +129,7 @@ TEST(View, filter_twice)
     }
   }
 
-  mln_foreach (auto&& px, u.pixels())
+  mln_foreach_new (auto&& px, u.new_pixels())
     ASSERT_EQ(px.val(), ima(px.point()));
 }
 
@@ -134,14 +140,14 @@ struct archetype_pred_t
   bool operator()(T&&) const;
 };
 
-static_assert(
+PYLENE_CONCEPT_TS_ASSERT(
     (mln::concepts::AccessibleImage<mln::filter_view<mln::archetypes::AccessibleImage, archetype_pred_t>>), "");
-static_assert(
+PYLENE_CONCEPT_TS_ASSERT(
     (mln::concepts::IndexableImage<mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
     "");
-static_assert((mln::concepts::IndexableAndAccessibleImage<
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
                              mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
                          "");
-static_assert((mln::concepts::OutputImage<
+PYLENE_CONCEPT_TS_ASSERT((mln::concepts::OutputImage<
                              mln::filter_view<mln::archetypes::OutputIndexableAndAccessibleImage, archetype_pred_t>>),
                          "");

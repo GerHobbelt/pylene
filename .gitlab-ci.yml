@@ -21,11 +21,13 @@ before_script:
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build apps --config $PYLENE_CONFIGURATION
         - cmake --build tests --config $PYLENE_CONFIGURATION
+        - cmake --build bench/tests --config $PYLENE_CONFIGURATION
         - ctest -L UnitTests
     dependencies: []
     artifacts:
         reports:
             junit: build/tests/UT*.xml
+            junit: build/bench/tests/UT*.xml
         expire_in: 15 days
 
 distcheck-linux-gcc-release:

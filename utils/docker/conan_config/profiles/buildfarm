@@ -8,5 +8,6 @@ benchmark                       = True
 freeimage                       = False
 gtest                           = False
 boost_program_options           = False
+boost                           = False
 benchmark:shared                = True
 gtest:shared                    = True

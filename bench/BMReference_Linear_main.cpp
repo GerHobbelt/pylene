@@ -78,7 +78,7 @@ void Threshold_Inplace_New_Pixels_Reversed(mln::image2d<mln::uint8>& img);
 void LUT_Inplace_New_Pixels_Reversed(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img);
 
 
-class Bench_Ref_Linear : public benchmark::Fixture
+class BMReferenceLinear : public benchmark::Fixture
 {
   const char* filename = "Space1_20MB.jpg";
 
@@ -134,122 +134,122 @@ protected:
 };
 
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_C)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_C)(benchmark::State& st)
 {
   runit(st, Mult_C);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult)(benchmark::State& st)
 {
   runit(st, Mult);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_New_Values)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_New_Values)(benchmark::State& st)
 {
   runit(st, Mult_New_Values);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_New_Pixels)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_New_Pixels)(benchmark::State& st)
 {
   runit(st, Mult_New_Pixels);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_C)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_C);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace)(benchmark::State& st)
 {
   runit(st, Mult_Inplace);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Values)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_New_Values)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_New_Values);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Pixels)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_New_Pixels)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_New_Pixels);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_C)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_C)(benchmark::State& st)
 {
   runit(st, Threshold_C);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold)(benchmark::State& st)
 {
   runit(st, Threshold);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Values)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_New_Values)(benchmark::State& st)
 {
   runit(st, Threshold_New_Values);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Pixels)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_New_Pixels)(benchmark::State& st)
 {
   runit(st, Threshold_New_Pixels);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_C)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_C);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_C);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Values)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_New_Values)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_New_Values);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Pixels)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_New_Pixels)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_New_Pixels);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_C)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_C)(benchmark::State& st)
 {
   runit(st, fun4_t([&](auto&&... args) { LUT_C(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_New_Values)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_New_Values)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT_New_Values(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_New_Pixels)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_New_Pixels)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT_New_Pixels(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_C)(benchmark::State& st)
 {
   runit(st, fun3_t([&](auto&&... args) { LUT_Inplace_C(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Values)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_New_Values)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Values(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_New_Pixels)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels(m_lut.data(), args...); }));
 }
@@ -258,122 +258,122 @@ BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels)(benchmark::State& st)
 // Reversed
 
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_C_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_C_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_C_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_New_Values_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_New_Values_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_New_Values_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_New_Pixels_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_New_Pixels_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_New_Pixels_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_C_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_C_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_C_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Values_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_New_Values_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_New_Values_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Mult_Inplace_New_Pixels_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Mult_Inplace_New_Pixels_Reversed)(benchmark::State& st)
 {
   runit(st, Mult_Inplace_New_Pixels_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_C_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_C_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_C_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Values_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_New_Values_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_New_Values_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_New_Pixels_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_New_Pixels_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_New_Pixels_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_C_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_C_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_C_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_C_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Values_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_New_Values_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_New_Values_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, Threshold_Inplace_New_Pixels_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, Threshold_Inplace_New_Pixels_Reversed)(benchmark::State& st)
 {
   runit(st, Threshold_Inplace_New_Pixels_Reversed);
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_C_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_C_Reversed)(benchmark::State& st)
 {
   runit(st, fun4_t([&](auto&&... args) { LUT_C_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Reversed)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_New_Values_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_New_Values_Reversed)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT_New_Values_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_New_Pixels_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_New_Pixels_Reversed)(benchmark::State& st)
 {
   runit(st, fun2_t([&](auto&&... args) { LUT_New_Pixels_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_C_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_C_Reversed)(benchmark::State& st)
 {
   runit(st, fun3_t([&](auto&&... args) { LUT_Inplace_C_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_Reversed)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Values_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_New_Values_Reversed)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Values_Reversed(m_lut.data(), args...); }));
 }
 
-BENCHMARK_F(Bench_Ref_Linear, LUT_Inplace_New_Pixels_Reversed)(benchmark::State& st)
+BENCHMARK_F(BMReferenceLinear, LUT_Inplace_New_Pixels_Reversed)(benchmark::State& st)
 {
   runit(st, fun1_t([&](auto&&... args) { LUT_Inplace_New_Pixels_Reversed(m_lut.data(), args...); }));
 }

@@ -1,21 +1,4 @@
 project(tests)
-# add link flag to test framework
-
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-
-if (WIN32)
-  get_filename_component(FREEIMAGE_LIB_BASE_NAME ${FreeImage_LIBRARIES} NAME_WE)
-  get_filename_component(FREEIMAGE_LIB_PATH ${FreeImage_LIBRARIES} PATH)
-  add_custom_target(check
-    COMMAND ${CMAKE_COMMAND} -E copy "${FREEIMAGE_LIB_PATH}/${FREEIMAGE_LIB_BASE_NAME}.dll" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>"
-    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --schedule-random --output-on-failure
-    )
-else(WIN32)
-  add_custom_target(check
-    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --schedule-random --output-on-failure
-    )
-endif(WIN32)
 
 find_package(Threads REQUIRED)
 find_package(GTest REQUIRED)
@@ -25,14 +8,15 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # Register an executable test: add_core_test(Exe Source1 [Source2...])
 # Executable: The name of the executable (default: ${Prefix}${TestName})
 # Sources: The source files to compile (default: ${Prefix}${TestName}.cpp)
-macro(add_core_test Executable)
-  set(Sources ${ARGN})
-  add_executable(${Executable} ${Sources})
-  add_test(NAME ${Executable} COMMAND ${Executable} --gtest_output=xml:${Executable}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-  target_link_libraries(${Executable} PRIVATE Fixtures::ImagePath Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
-  set_tests_properties(${Executable} PROPERTIES LABELS UnitTests)
-  add_dependencies(check ${Executable})
-endmacro(add_core_test)
+function(add_core_test Executable)
+  set(core_test_SOURCES ${ARGN})
+  set(core_test_NAME ${Executable})
+  
+  add_executable(${core_test_NAME} ${core_test_SOURCES})
+  add_test(NAME ${core_test_NAME} COMMAND ${core_test_NAME} --gtest_output=xml:${core_test_NAME}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+  target_link_libraries(${core_test_NAME} PRIVATE Fixtures::ImagePath Fixtures::ImageCompare Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})
+  set_tests_properties(${core_test_NAME} PROPERTIES LABELS UnitTests)
+endfunction(add_core_test)
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

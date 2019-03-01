@@ -1,3 +1,5 @@
+#include <bench/neighborhood.hpp>
+
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
@@ -8,6 +10,7 @@
 #include <mln/core/rangev3/view/zip.hpp>
 
 #include <cmath>
+
 
 void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
 {
@@ -28,7 +31,7 @@ void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for (auto && [ pxIn, pxOut ] : rows)
+    for (auto&& [pxIn, pxOut] : rows)
     {
       int tmp = 0;
       for (auto nx : mln::experimental::c8(pxIn))
@@ -75,7 +78,7 @@ void Average_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for (auto && [ pxIn, pxOut ] : rows)
+    for (auto&& [pxIn, pxOut] : rows)
     {
       int tmp = 0;
       for (auto nx : mln::experimental::c8(pxIn))
@@ -156,7 +159,7 @@ void Erosion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for (auto && [ pxIn, pxOut ] : rows)
+    for (auto&& [pxIn, pxOut] : rows)
     {
       mln::uint8 mini = pxIn.val();
       for (auto nx : mln::experimental::c8(pxIn))
@@ -227,7 +230,7 @@ void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for (auto && [ pxIn, pxOut ] : rows)
+    for (auto&& [pxIn, pxOut] : rows)
     {
       int tmp = 0;
       for (auto nx : mln::experimental::c4(pxIn))
@@ -292,7 +295,7 @@ void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for (auto && [ pxIn, pxOut ] : rows)
+    for (auto&& [pxIn, pxOut] : rows)
     {
       float      tmp = 0;
       mln::uint8 vin = pxIn.val();

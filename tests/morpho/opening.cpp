@@ -7,8 +7,8 @@
 #include <mln/morpho/structural/closing.hpp>
 #include <mln/morpho/structural/opening.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
-#include <helpers.hpp>
 
 #include <gtest/gtest.h>
 

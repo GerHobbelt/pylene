@@ -1,12 +1,11 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
+#include <mln/labeling/local_extrema.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
-#include <helpers.hpp>
-#include <mln/labeling/local_extrema.hpp>
-using namespace mln;
 
 
 TEST(Morpho, local_minima)

@@ -350,11 +350,11 @@ int accumulate_baseline(const mln::image2d<mln::uint8>& ima)
 }
 int accumulate(const mln::image2d<mln::uint8>& ima)
 {
-  return mln::experimental::accumulate(ima, 0, std::plus<>{});
+  return mln::accumulate(ima, 0, std::plus<>{});
 }
 int accumulate_accu(const mln::image2d<mln::uint8>& ima)
 {
-  return mln::experimental::accumulate(ima, mln::accu::features::sum<int>());
+  return mln::accumulate(ima, mln::accu::features::sum<int>());
 }
 
 

@@ -28,7 +28,8 @@ void test_propagation(const mln::Image<I>& f, const mln::Image<J>& ref)
   mln_point(I) pmin = 0;
   auto ord          = mln::morpho::ToS::impl::propagation(g, pmin, max_depth, &indexes);
 
-  int expected_max_depth = mln::accumulate(ref, mln::accu::features::max<>());
+  auto ima_ref            = exact(ref);
+  int  expected_max_depth = mln::accumulate(ima_ref, mln::accu::features::max<>());
 
   ASSERT_IMAGES_EQ(ord, ref);
   ASSERT_EQ(expected_max_depth, max_depth);

@@ -1,8 +1,8 @@
-Pont statique dynamique
+Static-dynamic bridge
 #######################
 
 
-Pour simplifier le problème, on suppose qu'on a ce type générique d'image:
+To simplify this problem, let's assume we are working with this kind of image:
 
 ::
 
@@ -37,14 +37,13 @@ Pour simplifier le problème, on suppose qu'on a ce type générique d'image:
             T*                               m_buffer;
     };
 
-et un algorithme générique::
+And a generic algorithm::
 
     template <class T>
     image2d<float> stretch(const image2d<T>&);
 
 
-
-L'objectif est d'être capable d'appeler cette routine depuis python avec des types natifs::
+The goal is to be able to call this routine with native typing::
 
     f = np.randint((15,10))
     g = pylene.stretch(f)
@@ -70,8 +69,7 @@ where `any_image` is an opaque type roughly defined as::
     };
 
 
-
-L'implementation de l'algorithm `stretch` s'apparente alors à::
+Here, the `stretch` algorithm would be implemented as follows::
 
     any_image stretch(any_image f)
     {

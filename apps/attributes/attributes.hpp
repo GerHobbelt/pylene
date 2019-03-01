@@ -1,8 +1,10 @@
 #pragma once
 
-#include <boost/program_options.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
+#include <boost/program_options.hpp>
+
 
 namespace po = boost::program_options;
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;

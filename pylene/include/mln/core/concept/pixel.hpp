@@ -1,8 +1,9 @@
-#ifndef MLN_CORE_CONCEPT_PIXEL_HPP
-#define MLN_CORE_CONCEPT_PIXEL_HPP
+#pragma once
+
+#include <mln/core/concept/check.hpp>
 
 #include <boost/concept_check.hpp>
-#include <mln/core/concept/check.hpp>
+
 
 namespace mln
 {
@@ -66,6 +67,4 @@ namespace mln
     I&        image() const { return make_object<I&>(); }
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_CONCEPT_PIXEL_HPP
+} // namespace mln

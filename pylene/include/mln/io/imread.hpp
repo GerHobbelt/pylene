@@ -1,12 +1,51 @@
 #pragma once
 
-#include <mln/core/image/ndimage_fwd.hpp>
-#include <string>
+#include <mln/core/trace.hpp>
+#include <mln/io/freeimage_plugin.hpp>
+#include <mln/io/loader.hpp>
+
+#include <fstream>
 
 
-namespace mln::io
+namespace mln
 {
-  mln::ndbuffer_image imread(const std::string& filename);
-  void                imread(const std::string& filename, mln::ndbuffer_image& out);
+  namespace io
+  {
 
-} // namespace mln::io
+    /// \brief Load an image from disk.
+    /// \ingroup io
+    ///
+    /// \param path Path to the image
+    /// \param[out] out Image to be loaded
+    template <typename I>
+    void imread(const std::string& path, Image<I>& out, bool permissive = false);
+
+    template <typename I>
+    void imread(std::istream& path, Image<I>& out, bool permissive = false);
+
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
+
+    template <typename I>
+    void imread(std::istream& stream, Image<I>& out, bool permissive)
+    {
+      mln_entering("mln::io::imread");
+      freeimage_reader_plugin plugin;
+      Loader2D<I>             loader;
+      loader.load(stream, out, &plugin, permissive);
+      mln_exiting();
+    }
+
+    template <typename I>
+    void imread(const std::string& path, Image<I>& out, bool permissive)
+    {
+      mln_entering("mln::io::imread");
+      freeimage_reader_plugin plugin;
+      Loader2D<I>             loader;
+      loader.load(path, out, &plugin, permissive);
+      mln_exiting();
+    }
+
+  } // namespace io
+} // namespace mln

@@ -1,0 +1,58 @@
+#pragma once
+
+
+namespace mln
+{
+
+  struct morpher_core_access
+  {
+    template <typename Morpher>
+    static typename Morpher::image_t& get_ima_(Morpher* morpher)
+    {
+      return static_cast<typename Morpher::derived_t*>(morpher)->m_ima;
+    }
+
+    template <typename Morpher>
+    static const typename Morpher::image_t& get_ima_(const Morpher* morpher)
+    {
+      return static_cast<const typename Morpher::derived_t*>(morpher)->m_ima;
+    }
+
+    template <typename Morpher>
+    static typename Morpher::image_t& get_ima(Morpher* morpher)
+    {
+      return static_cast<typename Morpher::derived_t*>(morpher)->get_morphed();
+    }
+
+    template <typename Morpher>
+    static const typename Morpher::image_t& get_ima(const Morpher* morpher)
+    {
+      return static_cast<const typename Morpher::derived_t*>(morpher)->get_morphed();
+    }
+
+    template <typename PixMorpher>
+    static typename PixMorpher::pixel_t& get_pix_(PixMorpher* morpher)
+    {
+      return static_cast<typename PixMorpher::derived_t*>(morpher)->m_pix;
+    }
+
+    template <typename PixMorpher>
+    static const typename PixMorpher::pixel_t& get_pix_(const PixMorpher* morpher)
+    {
+      return static_cast<const typename PixMorpher::derived_t*>(morpher)->m_pix;
+    }
+
+    template <typename PixMorpher>
+    static typename PixMorpher::pixel_t& get_pix(PixMorpher* morpher)
+    {
+      return static_cast<typename PixMorpher::derived_t*>(morpher)->get_morphed();
+    }
+
+    template <typename PixMorpher>
+    static const typename PixMorpher::pixel_t& get_pix(const PixMorpher* morpher)
+    {
+      return static_cast<const typename PixMorpher::derived_t*>(morpher)->get_morphed();
+    }
+  };
+
+} // namespace mln

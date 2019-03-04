@@ -1,42 +1,22 @@
 #pragma once
 
-#include <mln/core/concepts/range.hpp>
-#include <range/v3/algorithm/for_each.hpp>
+#include <mln/core/forall.hpp>
+#include <mln/core/range/range.hpp>
 
 
-namespace mln::ranges
+namespace mln
 {
 
-  /// \brief Apply a function on each element of a range
-  ///
-  ///
-  /// \param rng range
-  /// \param fun function to apply
-  ///
-  /// \tparam Rng must be a range
-  /// \tparam F   must be invocable with range value type
-  ///
-  ///
-  template <MDRange Rng, class F>
-  void for_each(Rng&& rng, F fun);
-
-
-  /******************************************/
-  /****          implementation          ****/
-  /******************************************/
-
-  template <MDRange Rng, class F>
-  void for_each(Rng&& rng, F fun)
+  namespace range
   {
-    for (auto&& r : rng.rows())
-      ::ranges::for_each(r, fun);
-  }
 
-
-  template <::ranges::cpp20::range Rng, class F>
-  void for_each(Rng&& rng, F fun)
-  {
-    ::ranges::for_each(std::forward<Rng>(rng), fun);
-  }
-
-}
+    template <class InputRange, class Function>
+    Function for_each(InputRange&& rng, Function f)
+    {
+      mln_iter(v, rng);
+      mln_forall (v)
+        f(*v);
+      return f;
+    }
+  } // namespace range
+} // namespace mln

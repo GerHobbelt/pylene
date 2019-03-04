@@ -168,5 +168,5 @@ namespace mln
 
   } // namespace se
 
-} // end of namespace mln
+} // namespace mln
 

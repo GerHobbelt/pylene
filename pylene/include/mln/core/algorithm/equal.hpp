@@ -1,12 +1,11 @@
-#ifndef MLN_CORE_ALGORITHM_EQUAL_HPP
-#define MLN_CORE_ALGORITHM_EQUAL_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
-
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
 #include <range/v3/algorithm/equal.hpp>
+
 
 namespace mln
 {
@@ -82,6 +81,4 @@ namespace mln
     }
   } // namespace experimental
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_ALGORITHM_EQUAL_HPP
+} // namespace mln

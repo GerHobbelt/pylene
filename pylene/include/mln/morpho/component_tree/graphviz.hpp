@@ -1,8 +1,9 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_GRAPHVIZ_HPP
-#define MLN_MORPHO_COMPONENT_TREE_GRAPHVIZ_HPP
+#pragma once
+
+#include <mln/morpho/component_tree/component_tree.hpp>
 
 #include <iosfwd>
-#include <mln/morpho/component_tree/component_tree.hpp>
+
 
 namespace mln
 {
@@ -33,7 +34,5 @@ namespace mln
 
       os << "}" << std::endl;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_GRAPHVIZ_HPP
+  } // namespace morpho
+} // namespace mln

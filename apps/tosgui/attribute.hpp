@@ -1,16 +1,18 @@
-#ifndef APPS_TOSGUI_ATTRIBUTE_HPP
-#define APPS_TOSGUI_ATTRIBUTE_HPP
+#pragma once
 
 #include "qattribute.hpp"
+
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/point.hpp>
+
 #include <QLabel>
 #include <QLayoutItem>
 #include <QMap>
 #include <QString>
 #include <QWidget>
+
 #include <vector>
 
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/point.hpp>
 
 /// \brief Abstract class for attributes
 class Attribute : public QObject
@@ -76,5 +78,3 @@ protected slots:
 
   virtual void showinfo(const mln::point2d&) {}
 };
-
-#endif // ! APPS_TOSGUI_ATTRIBUTE_HPP

@@ -1,5 +1,5 @@
-#ifndef MLN_CORE_ALWAYS_HPP
-#define MLN_CORE_ALWAYS_HPP
+#pragma once
+
 
 namespace mln
 {
@@ -54,6 +54,4 @@ namespace mln
 
   static constexpr no_t  no;
   static constexpr yes_t yes;
-}
-
-#endif // ! MLN_CORE_ALWAYS_HPP
+} // namespace mln

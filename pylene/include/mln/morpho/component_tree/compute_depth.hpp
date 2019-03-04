@@ -1,9 +1,9 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_COMPUTE_DEPTH_HPP
-#define MLN_MORPHO_COMPONENT_TREE_COMPUTE_DEPTH_HPP
+#pragma once
 
 #include <mln/core/trace.hpp>
 #include <mln/morpho/datastruct/attribute_map.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -32,7 +32,5 @@ namespace mln
       mln_exiting();
       return depth;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_COMPUTE_DEPTH_HPP
+  } // namespace morpho
+} // namespace mln

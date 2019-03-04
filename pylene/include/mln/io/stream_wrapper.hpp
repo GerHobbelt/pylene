@@ -1,8 +1,9 @@
-#ifndef MLN_IO_STREAM_WRAPPER_HPP
-#define MLN_IO_STREAM_WRAPPER_HPP
+#pragma once
 
 #include <FreeImage.h>
+
 #include <iosfwd>
+
 
 namespace mln
 {
@@ -94,8 +95,6 @@ namespace mln
         std::ostream::off_type m_offset;
       };
 
-    } // end of namespace mln::io::internal
-  }   // end of namespace mln::io
-} // end of namespace mln
-
-#endif //! MLN_IO_STREAM_WRAPPER_HPP
+    } // namespace internal
+  }   // namespace io
+} // namespace mln

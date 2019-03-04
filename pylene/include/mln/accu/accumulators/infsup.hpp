@@ -1,10 +1,11 @@
-#ifndef MLN_ACCU_ACCUMULATORS_INFSUP_HPP
-#define MLN_ACCU_ACCUMULATORS_INFSUP_HPP
+#pragma once
 
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/core/ops.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 #include <utility>
+
 
 namespace mln
 {
@@ -23,7 +24,7 @@ namespace mln
 
       template <typename T, typename Compare = productorder_less<T>>
       struct inf;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -32,7 +33,7 @@ namespace mln
 
       template <typename Compare = void>
       struct sup;
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -42,7 +43,7 @@ namespace mln
 
       template <typename A>
       auto sup(const Accumulator<A>& acc);
-    }
+    } // namespace extractor
 
     namespace features
     {
@@ -130,7 +131,7 @@ namespace mln
           return accumulators::sup<T>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -146,7 +147,7 @@ namespace mln
       {
         return extract(exact(acc), features::sup<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -283,8 +284,6 @@ namespace mln
         Compare m_cmp;
         T       m_sup;
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATORS_INFSUP_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

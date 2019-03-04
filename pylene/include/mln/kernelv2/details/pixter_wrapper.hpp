@@ -1,5 +1,7 @@
-#ifndef MLN_KERNELV2_DETAILS_PIXTER_WRAPPER_HPP
-#define MLN_KERNELV2_DETAILS_PIXTER_WRAPPER_HPP
+#pragma once
+
+#include <type_traits>
+
 
 namespace mln
 {
@@ -54,8 +56,6 @@ namespace mln
         Pixter* m_pixter;
       };
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
-
-#endif //! MLN_KERNELV2_DETAILS_PIXTER_WRAPPER_HPP
+    } // namespace details
+  }   // namespace kernel
+} // namespace mln

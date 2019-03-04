@@ -1,8 +1,10 @@
-#include <algorithm>
-
 #include "dispatcher.hpp"
+
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/sub_image.hpp>
+
+#include <algorithm>
+
 
 namespace mln
 {
@@ -124,4 +126,4 @@ namespace mln
 
     win->update();
   }
-}
+} // namespace mln

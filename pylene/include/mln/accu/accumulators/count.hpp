@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATOTS_COUNT_HPP
-#define MLN_ACCU_ACCUMULATOTS_COUNT_HPP
+#pragma once
 
 /// \file
 /// \brief Header file for counting accumulator.
@@ -20,7 +19,7 @@ namespace mln
       ///         and decrementable.
       template <typename CountType = std::size_t>
       struct count;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -52,7 +51,7 @@ namespace mln
           return accumulators::count<CountType>();
         }
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -62,7 +61,7 @@ namespace mln
       {
         return extract(exact(acc), features::count<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -97,8 +96,6 @@ namespace mln
       private:
         CountType m_count;
       };
-    }
-  }
-}
-
-#endif // !MLN_ACCU_ACCUMULATOTS_COUNT_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

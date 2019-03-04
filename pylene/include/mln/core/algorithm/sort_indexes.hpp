@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_ALGORITHM_SORT_INDEXES_HPP
-#define MLN_CORE_ALGORITHM_SORT_INDEXES_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/value/indexer.hpp>
@@ -11,6 +10,7 @@
 
 // FIXME: Speed up HQ version
 // FIXME: Radix sort bugs after 32
+
 
 namespace mln
 {
@@ -193,7 +193,7 @@ namespace mln
                 [&input, cmp](size_type x, size_type y) { return cmp(input[x], input[y]); });
     }
 
-  } // end of namespace mln::impl
+  } // namespace impl
 
   template <typename I, typename BinaryFunction>
   std::vector<typename I::size_type> sort_indexes(const Image<I>& input, BinaryFunction cmp)
@@ -222,6 +222,4 @@ namespace mln
     impl::sort_indexes(exact(input), out, cmp, dispatch_tag());
   }
 
-} // end of namespace mln
-
-#endif // !MLN_CORE_ALGORITHM_SORT_INDEXES_HPP
+} // namespace mln

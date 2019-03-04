@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_CUTS_HPP
-#define MLN_MORPHO_COMPONENT_TREE_CUTS_HPP
+#pragma once
 
 /// \file
 /// \brief This file provides some routines to process hirarchical segmentation
@@ -117,7 +116,5 @@ namespace mln
       }
       mln_exiting();
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_CUTS_HPP
+  } // namespace morpho
+} // namespace mln

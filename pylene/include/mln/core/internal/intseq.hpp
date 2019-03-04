@@ -1,5 +1,5 @@
-#ifndef MLN_CORE_INTERNAL_INTSEQ_HPP
-#define MLN_CORE_INTERNAL_INTSEQ_HPP
+#pragma once
+
 
 /// \file
 /// \brief Static integer sequence generator
@@ -36,6 +36,4 @@ namespace mln
     typedef intseq<I...> type;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_INTERNAL_INTSEQ_HPP
+} // namespace mln

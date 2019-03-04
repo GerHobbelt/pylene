@@ -1,9 +1,11 @@
-#ifndef KINTERPOLATE_HPP
-#define KINTERPOLATE_HPP
+#pragma once
 
 #include <apps/tos/addborder.hpp>
-#include <exception>
+
 #include <mln/core/image/image2d.hpp>
+
+#include <exception>
+
 
 namespace mln
 {
@@ -178,6 +180,4 @@ namespace mln
     mln::copy(ima | subdomain, out);
     return out;
   }
-}
-
-#endif // ! KINTERPOLATE_HPP
+} // namespace mln

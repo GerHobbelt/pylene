@@ -1,8 +1,9 @@
-#ifndef MLN_MORPHO_MEDIAN_FILTER_HPP
-#define MLN_MORPHO_MEDIAN_FILTER_HPP
+#pragma once
 
 #include <mln/morpho/rank_filter.hpp>
+
 #include <ratio>
+
 
 /// \file
 
@@ -53,8 +54,6 @@ namespace mln
       return rank_filter<std::ratio<1, 2>>(ima, se);
     }
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
-} // end of namespace mln
-
-#endif // ! MLN_MORPHO_MEDIAN_FILTER_HPP
+} // namespace mln

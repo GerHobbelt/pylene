@@ -1,8 +1,10 @@
 #include "gradient.hpp"
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
 
 void usage(char* argv[])
 {

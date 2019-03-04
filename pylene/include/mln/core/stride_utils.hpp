@@ -1,7 +1,7 @@
-#ifndef STRIDE_UTILS_HPP
-#define STRIDE_UTILS_HPP
+#pragma once
 
 #include <cstddef>
+
 
 namespace mln
 {
@@ -41,6 +41,4 @@ namespace mln
       mln_assertion(out[i] < 0);
     }
   }
-}
-
-#endif // ! STRIDE_UTILS_HPP
+} // namespace mln

@@ -1,10 +1,11 @@
-#ifndef MLN_CORE_MORPHO_SATURATE_HPP
-#define MLN_CORE_MORPHO_SATURATE_HPP
+#pragma once
 
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
+
 #include <queue>
+
 
 namespace mln
 {
@@ -50,7 +51,7 @@ namespace mln
             }
         }
       }
-    }
+    } // namespace impl
 
     template <typename I, typename N, typename J>
     void saturate(const Image<I>& ima, const N& nbh, const mln_point(I) & pinf, Image<J>& out)
@@ -87,7 +88,5 @@ namespace mln
       }
       return out;
     }
-  }
-}
-
-#endif // ! MLN_CORE_MORPHO_SATURATE_HPP
+  } // namespace morpho
+} // namespace mln

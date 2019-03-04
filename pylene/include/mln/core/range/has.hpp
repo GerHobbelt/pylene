@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_RANGE_HAS_HPP
-#define MLN_CORE_RANGE_HAS_HPP
+#pragma once
 
 #include <mln/core/range/iter.hpp>
 
 #include <utility>
+
 
 namespace mln
 {
@@ -39,7 +39,7 @@ namespace mln
       {
         static bool has(const R& rng, const T& val) { return rng.has(val); }
       };
-    }
+    } // namespace internal
 
     template <typename Range, typename T>
     inline bool has(const Range& rng, const T& val)
@@ -47,8 +47,6 @@ namespace mln
       return internal::has_lookup<Range, T>::has(rng, val);
     }
 
-  } // end of namespace mln::rng
+  } // namespace rng
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_RANGE_HAS_HPP
+} // namespace mln

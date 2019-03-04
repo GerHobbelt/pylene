@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATORS_MAX_HPP
-#define MLN_ACCU_ACCUMULATORS_MAX_HPP
+#pragma once
 
 /// \file
 /// \brief Header file for the maximum accumulator
@@ -7,7 +6,9 @@
 #include <mln/accu/accumulator.hpp>
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 #include <utility>
+
 
 namespace mln
 {
@@ -22,7 +23,7 @@ namespace mln
       /// \tparam Compare The comparison function.
       template <typename T, typename Compare = std::less<T>>
       struct max;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -31,7 +32,7 @@ namespace mln
       /// \tparam Compare The comparison function (`void` results in std::less by default).
       template <typename Compare = void>
       struct max;
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -80,7 +81,7 @@ namespace mln
       struct max<void> : simple_feature_facade<max<void>, internal::meta_max>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -90,7 +91,7 @@ namespace mln
       {
         return extract(exact(acc), features::max<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -130,8 +131,6 @@ namespace mln
         T       m_val;
         Compare m_cmp;
       };
-    }
-  }
-}
-
-#endif // !MLN_ACCU_ACCUMULATORS_MAX_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

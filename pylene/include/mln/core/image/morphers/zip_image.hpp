@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_MORPHERS_ZIP_IMAGE_HPP
-#define MLN_CORE_IMAGE_MORPHERS_ZIP_IMAGE_HPP
+#pragma once
 
 #include <mln/core/image/morphers/morpher_base.hpp>
 #include <mln/core/internal/tuple_utility.hpp>
@@ -7,6 +6,7 @@
 #include <mln/core/range/zip.hpp>
 
 #include <tuple>
+
 
 namespace mln
 {
@@ -94,7 +94,7 @@ namespace mln
     {
       typedef typename image_init_from<typename std::decay<I0>::type>::type type;
     };
-  }
+  } // namespace internal
 
   /******************************************/
   /****          Implementation          ****/
@@ -329,7 +329,7 @@ namespace mln
         return px.val();
       }
     };
-  }
+  } // namespace internal
 
   template <class... Images>
   struct zip_image
@@ -595,6 +595,4 @@ namespace mln
     pixel_tuple_t m_pix_tuple;
     image_type*   m_ima;
   };
-}
-
-#endif // ! MLN_CORE_IMAGE_MORPHERS_ZIP_IMAGE_HPP
+} // namespace mln

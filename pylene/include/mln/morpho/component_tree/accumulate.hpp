@@ -1,12 +1,11 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_ACCUMULATE_HPP
-#define MLN_MORPHO_COMPONENT_TREE_ACCUMULATE_HPP
-
-#include <mln/core/image/image.hpp>
-#include <mln/core/trace.hpp>
+#pragma once
 
 #include <mln/accu/accumulator.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/trace.hpp>
 #include <mln/morpho/datastruct/attribute_map.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -130,7 +129,7 @@ namespace mln
         }
         vmap[Tree::npos()] = accmap[Tree::npos()].to_result();
       }
-    }
+    } // namespace impl
 
     template <class P, class AssociativeMap, class Accu>
     property_map<component_tree<P, AssociativeMap>, typename accu::result_of<Accu, P>::type>
@@ -333,7 +332,5 @@ namespace mln
       mln_exiting();
       return vmap;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_ACCUMULATE_HPP
+  } // namespace morpho
+} // namespace mln

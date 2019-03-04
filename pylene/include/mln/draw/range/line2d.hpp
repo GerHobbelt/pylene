@@ -1,9 +1,9 @@
-#ifndef LINE2D_HPP
-#define LINE2D_HPP
+#pragma once
 
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/point.hpp>
 #include <mln/core/range/iterator_range.hpp>
+
 
 namespace mln
 {
@@ -26,7 +26,7 @@ namespace mln
       {
         return (T(0) < val) - (val < T(0));
       }
-    }
+    } // namespace internal
 
     struct line2d_iterator : iterator_base<line2d_iterator, point2d, point2d>
     {
@@ -108,6 +108,5 @@ namespace mln
     {
       return line2d_range(line2d_iterator(pbegin, pend));
     }
-  }
-}
-#endif // ! LINE2D_HPP
+  } // namespace draw
+} // namespace mln

@@ -1,16 +1,14 @@
-#ifndef MLN_MORPHO_TOS_TOS_HPP
-#define MLN_MORPHO_TOS_TOS_HPP
+#pragma once
 
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/casted_image.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/neighb3d.hpp>
-
-#include <mln/core/algorithm/fill.hpp>
-
 #include <mln/morpho/maxtree/maxtree.hpp>
 #include <mln/morpho/tos/private/immersion.hpp>
 #include <mln/morpho/tos/private/propagation.hpp>
+
 
 namespace mln
 {
@@ -65,7 +63,7 @@ namespace mln
           }
         }
       }
-    }
+    } // namespace impl
 
     template <typename I>
     morpho::component_tree<typename I::size_type, mln_ch_value(I, unsigned)> tos(const Image<I>& ima, mln_point(I) pmin,
@@ -110,7 +108,5 @@ namespace mln
       return tos(ima, exact(ima).domain().pmin);
     }
 
-  } // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_TOS_TOS_HPP
+  } // namespace morpho
+} // namespace mln

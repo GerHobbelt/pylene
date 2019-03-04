@@ -1,9 +1,10 @@
-#ifndef ADDBORDER_HPP
-#define ADDBORDER_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
+
 #include <vector>
+
 
 namespace mln
 {
@@ -132,6 +133,4 @@ namespace mln
 
     return std::make_pair(out, omask);
   }
-}
-
-#endif // ! ADDBORDER_HPP
+} // namespace mln

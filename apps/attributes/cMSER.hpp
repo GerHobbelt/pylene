@@ -1,8 +1,8 @@
-#ifndef APPS_ATTRIBUTE_CMSER_HPP
-#define APPS_ATTRIBUTE_CMSER_HPP
+#pragma once
 
 #include <mln/core/trace.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
 
 enum eMSER_attribute
 {
@@ -110,6 +110,4 @@ namespace mln
 
     return compute_MSER(tree, vmap, amap, eps, amser, fsum, dist);
   }
-}
-
-#endif // ! APPS_ATTRIBUTE_CMSER_HPP
+} // namespace mln

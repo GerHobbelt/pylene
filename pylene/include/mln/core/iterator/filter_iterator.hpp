@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_ITERATOR_FILTER_ITERATOR_HPP
-#define MLN_CORE_ITERATOR_FILTER_ITERATOR_HPP
+#pragma once
 
 #include <mln/core/iterator/iterator_base.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -72,6 +72,4 @@ namespace mln
   {
     return filter_iterator<Iterator, Predicate>(it, pred);
   }
-}
-
-#endif // ! MLN_CORE_ITERATOR_FILTER_ITERATOR_HPP
+} // namespace mln

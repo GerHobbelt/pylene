@@ -1,18 +1,18 @@
-#include <mln/core/image/image2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/core/algorithm/paste.hpp>
-#include <mln/core/algorithm/transform.hpp>
-
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/mumford_shah.hpp>
 #include <apps/tos/objdetection.hpp>
 #include <apps/tos/set_mean_on_nodes.hpp>
-#include <boost/format.hpp>
+
+#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
 
 void usage(char** argv)
 {
@@ -42,7 +42,7 @@ namespace mln
         out[x] = x;
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

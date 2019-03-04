@@ -1,10 +1,4 @@
-#ifndef MLN_IO_LOADER_HPP
-#define MLN_IO_LOADER_HPP
-
-#include <algorithm>
-#include <fstream>
-#include <memory>
-#include <type_traits>
+#pragma once
 
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <mln/core/image/image.hpp>
@@ -12,6 +6,12 @@
 #include <mln/io/internal/demangle.hpp>
 #include <mln/io/ioexception.hpp>
 #include <mln/io/plugin.hpp>
+
+#include <algorithm>
+#include <fstream>
+#include <memory>
+#include <type_traits>
+
 
 namespace mln
 {
@@ -155,7 +155,7 @@ namespace mln
 
         return nullptr;
       }
-    }
+    } // namespace internal
 
     template <class I>
     inline bool Loader<I>::is_value_type_convertible(std::type_index sidx, std::type_index tidx) const
@@ -291,7 +291,5 @@ namespace mln
         }
       }
     }
-  }
-}
-
-#endif // ! MLN_IO_LOADER_HPP
+  } // namespace io
+} // namespace mln

@@ -1,11 +1,13 @@
-#ifndef DISPATCHER_HPP
-#define DISPATCHER_HPP
+#pragma once
 
 #include "plotwindow.hpp"
 #include "qattribute.hpp"
+
 #include <mln/qt/imageviewer.hpp>
+
 #include <utility>
 #include <vector>
+
 
 namespace mln
 {
@@ -67,6 +69,4 @@ namespace mln
       }
     }
   }
-}
-
-#endif // ! DISPATCHER_HPP
+} // namespace mln

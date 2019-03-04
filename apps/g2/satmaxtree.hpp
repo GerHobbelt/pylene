@@ -1,8 +1,8 @@
-#ifndef SATMAXTREE_HPP
-#define SATMAXTREE_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
 
 namespace mln
 {
@@ -15,6 +15,4 @@ namespace mln
   /// \brief Remove the 2F in the tree.
   morpho::component_tree<unsigned, image2d<unsigned>>
       tree_keep_2F(const morpho::component_tree<unsigned, image2d<unsigned>>& tree);
-}
-
-#endif // ! SATMAXTREE_HPP
+} // namespace mln

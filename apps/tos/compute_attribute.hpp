@@ -1,5 +1,6 @@
-#ifndef COMPUTE_ATTRIBUTE_HPP
-#define COMPUTE_ATTRIBUTE_HPP
+#pragma once
+
+#include "topology.hpp"
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/algorithm/fill.hpp>
@@ -7,9 +8,8 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 
-#include "topology.hpp"
-
 #include <vector>
+
 
 namespace mln
 {
@@ -27,7 +27,7 @@ namespace mln
 
       void take(const NoOpAccumulator&) {}
     };
-  }
+  } // namespace accu
 
   namespace morpho
   {
@@ -181,11 +181,5 @@ namespace mln
 
       return std::make_pair(im_acc2f, im_acc1f);
     }
-  }
-}
-
-#ifndef MLN_INCLUDE_ONLY
-
-#endif // ! MLN_INCLUDE_ONLY
-
-#endif // ! COMPUTE_ATTRIBUTE_HPP
+  } // namespace morpho
+} // namespace mln

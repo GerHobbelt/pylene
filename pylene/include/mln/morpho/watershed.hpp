@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_WATERSHED_HPP
-#define MLN_MORPHO_WATERSHED_HPP
+#pragma once
 
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/extension/fill.hpp>
@@ -8,6 +7,7 @@
 #include <mln/core/trace.hpp>
 #include <mln/labeling/local_extrema.hpp>
 #include <mln/morpho/private/pqueue.hpp>
+
 
 namespace mln
 {
@@ -146,7 +146,7 @@ namespace mln
 
         return nlabel;
       }
-    }
+    } // namespace details
 
 
     template <class Label_t, class I, class N>
@@ -176,7 +176,5 @@ namespace mln
     }
 
 
-  } // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_WATERSHED_HPP
+  } // namespace morpho
+} // namespace mln

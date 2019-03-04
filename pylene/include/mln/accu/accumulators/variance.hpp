@@ -1,12 +1,13 @@
-#ifndef MLN_ACCU_ACCUMULATORS_VARIANCE_HPP
-#define MLN_ACCU_ACCUMULATORS_VARIANCE_HPP
+#pragma once
 
-#include <boost/type_traits/promote.hpp>
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/accu/composite_accumulator.hpp>
 #include <mln/core/math_ops.hpp>
+
+#include <boost/type_traits/promote.hpp>
+
 
 namespace mln
 {
@@ -23,7 +24,7 @@ namespace mln
       /// \f]
       template <typename T, typename SumType = typename boost::promote<T>::type, typename SumSqrType = SumType>
       struct variance;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -48,14 +49,14 @@ namespace mln
           template <typename T>
           using type = accu::accumulators::variance<T>;
         };
-      }
+      } // namespace internal
 
       template <typename SumType, typename SumSqrType>
       struct variance : simple_feature_facade<variance<SumType, SumSqrType>,
                                               internal::meta_variance<SumType, SumSqrType>::template type>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -65,7 +66,7 @@ namespace mln
       {
         return extract(exact(acc), features::variance<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -140,8 +141,6 @@ namespace mln
         SumType     m_sum;
         result_type m_sum_sqr;
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATORS_VARIANCE_HPP_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

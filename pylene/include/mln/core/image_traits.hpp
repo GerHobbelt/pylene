@@ -1,11 +1,11 @@
-#ifndef MLN_CORE_IMAGE_TRAITS_HPP
-#define MLN_CORE_IMAGE_TRAITS_HPP
+#pragma once
 
 #include <mln/core/concept/object.hpp>
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image_category.hpp>
 
 #include <type_traits>
+
 
 #define mln_value(I) typename std::remove_reference<I>::type::value_type
 #define mln_point(I) typename std::remove_reference<I>::type::point_type
@@ -44,7 +44,7 @@ namespace mln
   };
 
   template <typename I>
-  struct [[deprecated]] image_traits;
+  struct[[deprecated]] image_traits;
 
   namespace details
   {
@@ -68,7 +68,7 @@ namespace mln
     {
     };
 
-  };
+  }; // namespace details
 
 
   template <typename I>
@@ -272,5 +272,3 @@ namespace mln
   MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_pixel_iterator, image_pixel_iterator)
   MLN_GENERATE_META_IMAGE_OPERATORS(image_meta_const_pixel_iterator, image_const_pixel_iterator)
 } // namespace mln
-
-#endif /* !MLN_CORE_IMAGE_TRAITS_HPP */

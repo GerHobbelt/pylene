@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_NEIGHBORHOOD_BASE_HPP
-#define MLN_CORE_NEIGHBORHOOD_NEIGHBORHOOD_BASE_HPP
+#pragma once
 
 #include <mln/core/concept/iterator.hpp>
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/iterator/iterator_traits.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
+
 
 namespace mln
 {
@@ -78,6 +78,4 @@ namespace mln
       return dispatch(std::forward<X>(x), is_a<T, Pixel>(), is_a<T, Iterator>());
     }
   };
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_NEIGHBORHOOD_BASE_HPP
+} // namespace mln

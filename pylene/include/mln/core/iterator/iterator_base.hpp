@@ -1,10 +1,11 @@
-#ifndef MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
-#define MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
+#pragma once
 
-#include <memory>
 #include <mln/core/concept/iterator.hpp>
 #include <mln/core/iterator/iterator_traits.hpp>
+
+#include <memory>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -43,7 +44,7 @@ namespace mln
       typedef T* type;
       static T*  foo(T& x) { return std::addressof(x); }
     };
-  };
+  }; // namespace internal
 
   ///
   /// Helper class for iterators
@@ -74,6 +75,4 @@ namespace mln
     pointer operator->() const { return internal::make_pointer<reference>::foo(mln::exact(this)->dereference()); }
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_ITERATOR_ITERATOR_BASE_HPP
+} // namespace mln

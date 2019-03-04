@@ -1,13 +1,14 @@
-#ifndef MUMFORD_SHAH_HPP
-#define MUMFORD_SHAH_HPP
+#pragma once
 
 #include "topology.hpp"
+
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/io/imprint.hpp>
+
 
 namespace mln
 {
@@ -196,7 +197,7 @@ namespace mln
       return v[0];
     }
 
-  } // end of namespace internal
+  } // namespace internal
 
   template <typename V>
   auto norm(const V& v) -> typename std::enable_if<std::is_scalar<V>::value, decltype(std::abs(v))>::type
@@ -578,6 +579,4 @@ namespace mln
 
     return imerode;
   }
-}
-
-#endif // ! MUMFORD_SHAH_HPP
+} // namespace mln

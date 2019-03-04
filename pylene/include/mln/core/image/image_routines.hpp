@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_ROUTINES_HPP
-#define MLN_CORE_IMAGE_IMAGE_ROUTINES_HPP
+#pragma once
 
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/iref.hpp>
@@ -11,6 +10,7 @@
 #include <boost/mpl/or.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -94,6 +94,4 @@ namespace mln
   {
     return clone(std::forward<InputImage>(ima));
   }
-}
-
-#endif // !MLN_CORE_IMAGE_IMAGE_ROUTINES_HPP
+} // namespace mln

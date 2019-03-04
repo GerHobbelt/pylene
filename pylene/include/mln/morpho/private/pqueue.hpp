@@ -1,7 +1,7 @@
-#ifndef MLN_MORPHO_PRIVATE_PQUEUE_HPP
-#define MLN_MORPHO_PRIVATE_PQUEUE_HPP
+#pragma once
 
 #include <mln/morpho/private/pqueue_hqueue_fifo.hpp>
+
 
 namespace mln
 {
@@ -67,8 +67,6 @@ namespace mln
       {
         return m_delegate.top();
       }
-    }
-  } // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_PRIVATE_PQUEUE_HPP
+    } // namespace details
+  }   // namespace morpho
+} // namespace mln

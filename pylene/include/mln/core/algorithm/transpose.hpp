@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_ALGORITHM_TRANSPOSE_HPP
-#define MLN_CORE_ALGORITHM_TRANSPOSE_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -46,7 +46,7 @@ namespace mln
     {
       return image2d<mln_value(I)>(d, ima.border());
     }
-  }
+  } // namespace internal
 
   template <class I>
   image2d<mln_value(I)> transpose(const Image<I>& ima_)
@@ -61,6 +61,4 @@ namespace mln
     return out;
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_ALGORITHM_TRANSPOSE_HPP
+} // namespace mln

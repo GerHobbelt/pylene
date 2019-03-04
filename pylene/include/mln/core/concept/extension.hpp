@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_CONCEPT_EXTENSION_HPP
-#define MLN_CORE_CONCEPT_EXTENSION_HPP
+#pragma once
 
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/object.hpp>
 #include <mln/core/extension/extension_traits.hpp>
+
 
 namespace mln
 {
@@ -55,7 +55,7 @@ namespace mln
         check(support_periodize());
       }
     };
-  }
+  } // namespace internal
 
   namespace internal
   {
@@ -95,7 +95,7 @@ namespace mln
     {
       static void check() { BOOST_CONCEPT_ASSERT((MirrorableExtension<E>)); }
     };
-  }
+  } // namespace internal
 
   template <typename E>
   struct Extension
@@ -116,6 +116,4 @@ namespace mln
     }
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_CONCEPT_EXTENSION_HPP
+} // namespace mln

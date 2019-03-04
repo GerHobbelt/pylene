@@ -1,9 +1,4 @@
-#ifndef MLN_IO_IMPRINT_HPP
-#define MLN_IO_IMPRINT_HPP
-
-#include <iomanip>
-#include <iostream>
-#include <type_traits>
+#pragma once
 
 #include <mln/core/domain/box.hpp>
 #include <mln/core/grays.hpp>
@@ -11,6 +6,10 @@
 #include <mln/io/format.hpp>
 
 #include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <type_traits>
+
 
 namespace mln
 {
@@ -147,7 +146,7 @@ namespace mln
         }
         os.copyfmt(state);
       }
-    }
+    } // namespace internal
 
     template <typename I>
     void imprint(const Image<I>& ima, std::ostream& os)
@@ -160,7 +159,5 @@ namespace mln
     {
       internal::imprint_with_border(exact(ima), exact(ima).domain(), os);
     }
-  }
-}
-
-#endif
+  } // namespace io
+} // namespace mln

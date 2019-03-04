@@ -1,11 +1,11 @@
-#ifndef THICKEN_HPP
-#define THICKEN_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/io/imprint.hpp>
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
+
 
 namespace mln
 {
@@ -138,6 +138,4 @@ namespace mln
 
     return outdepth;
   }
-}
-
-#endif // ! THICKEN_HPP
+} // namespace mln

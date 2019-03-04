@@ -1,10 +1,11 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_IO_HPP
-#define MLN_MORPHO_COMPONENT_TREE_IO_HPP
+#pragma once
 
-#include <iosfwd>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
+#include <iosfwd>
+
 
 namespace mln
 {
@@ -125,7 +126,5 @@ namespace mln
       std::ofstream f(s);
       save(tree, f);
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_IO_HPP
+  } // namespace morpho
+} // namespace mln

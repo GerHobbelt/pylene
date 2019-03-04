@@ -1,22 +1,16 @@
-#ifndef MLN_CORE_VEC_HPP
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#warning "This should not be included directly. Include <mln/core/vec.hpp> instead."
-#elif defined(_MSC_VER)
-#pragma message("This should not be included directly. Include <mln/core/vec.hpp> instead.")
-#endif
-#include <mln/core/vec.hpp>
-#endif
+#pragma once
 
-#ifndef MLN_INTERNAL_VEC_BASE_HH
-#define MLN_INTERNAL_VEC_BASE_HH
-
-#include <boost/type_traits/promote.hpp>
-#include <boost/utility.hpp>
-#include <iostream>
 #include <mln/core/assert.hpp>
 #include <mln/core/config.hpp>
 #include <mln/core/literal/vectorial.hpp>
+#include <mln/core/vec.hpp>
+
+#include <boost/type_traits/promote.hpp>
+#include <boost/utility.hpp>
+
+#include <iostream>
 #include <type_traits>
+
 
 // FIXME:
 // replace boost::common_type by c++11 decltype for type broadcasting
@@ -540,6 +534,4 @@ namespace boost
 
 #ifdef _MSC_VER
 #pragma warning(default : 4701)
-#endif
-
 #endif

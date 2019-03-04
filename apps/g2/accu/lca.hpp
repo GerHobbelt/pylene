@@ -1,10 +1,11 @@
-#ifndef ACCU_LCA_HPP
-#define ACCU_LCA_HPP
+#pragma once
 
 #include <apps/tos/croutines.hpp>
+
 #include <mln/accu/accumulator.hpp>
 #include <mln/morpho/datastruct/attribute_map.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -49,7 +50,5 @@ namespace mln
 
       result_type m_current;
     };
-  }
-}
-
-#endif // ! ACCU_LCA_HPP
+  } // namespace accu
+} // namespace mln

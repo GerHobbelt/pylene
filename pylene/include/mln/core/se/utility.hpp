@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_SE_UTILITY_HPP
-#define MLN_CORE_SE_UTILITY_HPP
+#pragma once
 
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 
 // Fwd declaration
+
 
 namespace mln
 {
@@ -33,8 +33,6 @@ namespace mln
       return {s};
     }
 
-  } // end of namespace mln::se
+  } // namespace se
 
-} // end of namespace mln
-
-#endif // ! MLN_CORE_SE_UTILITY_HPP
+} // namespace mln

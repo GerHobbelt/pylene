@@ -1,8 +1,9 @@
-#ifndef OBJDETECTION_HPP
-#define OBJDETECTION_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
+
 #include <vector>
+
 
 namespace mln
 {
@@ -158,6 +159,4 @@ namespace mln
     trace::exiting();
   }
 
-} // end of mln
-
-#endif // ! OBJDETECTION_HPP
+} // namespace mln

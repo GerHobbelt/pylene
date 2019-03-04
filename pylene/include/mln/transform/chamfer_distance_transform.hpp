@@ -1,10 +1,10 @@
-#ifndef MLN_TRANSFORM_CHAMFER_DISTANCE_TRANSFORM_HPP
-#define MLN_TRANSFORM_CHAMFER_DISTANCE_TRANSFORM_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -44,7 +44,7 @@ namespace mln
             return x + y;
         }
       };
-    }
+    } // namespace internal
 
     template <class DistanceType, class I, class N, class OutputImage, class SumOp>
     void chamfer_distance_transform(const Image<I>& f_, const Neighborhood<N>& nbh_, OutputImage&& out,
@@ -124,7 +124,5 @@ namespace mln
 
       return out;
     }
-  }
-}
-
-#endif // ! MLN_TRANSFORM_CHAMFER_DISTANCE_TRANSFORM_HPP
+  } // namespace transforms
+} // namespace mln

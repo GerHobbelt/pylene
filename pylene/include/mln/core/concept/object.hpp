@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_CONCEPT_OBJECT_HPP
-#define MLN_CORE_CONCEPT_OBJECT_HPP
+#pragma once
 
 #include <mln/core/config.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -44,7 +44,7 @@ namespace mln
 
       typedef decltype(foo(std::declval<T>())) type;
     };
-  }
+  } // namespace internal
 
   template <typename T, template <typename> class Concept>
   using is_a = typename internal::is_a_helper<T, Concept>::type;
@@ -133,6 +133,4 @@ namespace mln
     typedef const typename E::exact_type type;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_CONCEPT_OBJECT_HPP
+} // namespace mln

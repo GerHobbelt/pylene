@@ -1,7 +1,5 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_PIXTER_HPP
-#define MLN_CORE_NEIGHBORHOOD_SLIDING_PIXTER_HPP
+#pragma once
 
-#include <boost/container/small_vector.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/pixel/index_pixel.hpp>
@@ -9,6 +7,9 @@
 #include <mln/core/pixel/pointer_pixel.hpp>
 #include <mln/core/range/range.hpp>
 #include <mln/core/utils/wrapper.hpp>
+
+#include <boost/container/small_vector.hpp>
+
 
 namespace mln
 {
@@ -41,7 +42,7 @@ namespace mln
   {
     return {pixel, pset};
   }
-}
+} // namespace mln
 
 /******************************************/
 /****          Facade                  ****/
@@ -261,7 +262,7 @@ namespace mln
     //             this->m_pixel.get().index() + index};
     //   }
     // };
-  }
+  } // namespace internal
 
   template <class PixelProxy, class SiteSet>
   struct sliding_pixter : internal::sliding_pixter_base<PixelProxy, SiteSet>
@@ -278,6 +279,4 @@ namespace mln
     {
     }
   };
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_SLIDING_PIXTER_HPP
+} // namespace mln

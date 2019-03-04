@@ -1,5 +1,4 @@
-#ifndef MLN_ACCU_ACCUMULATORS_H_INFSUP_HPP
-#define MLN_ACCU_ACCUMULATORS_H_INFSUP_HPP
+#pragma once
 
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/accu/accumulators/infsup.hpp>
@@ -27,13 +26,13 @@ namespace mln
 
       template <class T>
       struct h_sup;
-    }
+    } // namespace accumulators
 
     namespace features
     {
       struct h_inf;
       struct h_sup;
-    }
+    } // namespace features
 
     /******************************************/
     /****          Implementation          ****/
@@ -49,7 +48,7 @@ namespace mln
       struct h_sup : simple_feature_facade<h_sup, accumulators::h_sup>
       {
       };
-    }
+    } // namespace features
 
     namespace accumulators
     {
@@ -145,8 +144,6 @@ namespace mln
       struct h_sup : h_infsup_base<h_sup<T>, T, features::sup<>>
       {
       };
-    }
-  }
-}
-
-#endif //! MLN_ACCU_ACCUMULATORS_H_INFSUP_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

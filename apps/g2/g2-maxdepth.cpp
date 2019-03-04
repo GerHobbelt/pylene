@@ -1,36 +1,33 @@
+#include "compute_g2.hpp"
+#include "routines.hpp"
+
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
+#include <apps/tos/topology.hpp>
+
+#include <mln/accu/accumulators/accu_if.hpp>
+#include <mln/accu/accumulators/count.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/dontcare.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/morphers/casted_image.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/vec_base.hpp>
-
-#include <tbb/parallel_for.h>
-#include <tbb/task_scheduler_init.h>
-
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/tos/ctos.hpp>
-
-#include <mln/accu/accumulators/accu_if.hpp>
-#include <mln/accu/accumulators/count.hpp>
-
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/addborder.hpp>
-#include <apps/tos/topology.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/graph/dag_shortest_paths.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/transpose_graph.hpp>
 #include <boost/property_map/function_property_map.hpp>
+#include <tbb/parallel_for.h>
+#include <tbb/task_scheduler_init.h>
 
-#include "compute_g2.hpp"
-#include "routines.hpp"
 
 namespace mln
 {
@@ -265,7 +262,7 @@ namespace mln
       // px2->val()[from] = 255;
     }
   }
-}
+} // namespace mln
 
 void usage(char** argv)
 {

@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_RANGE_REND_HPP
-#define MLN_CORE_RANGE_REND_HPP
+#pragma once
 
 namespace mln
 {
@@ -10,6 +9,4 @@ namespace mln
     return c.rend();
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_RANGE_REND_HPP
+} // namespace mln

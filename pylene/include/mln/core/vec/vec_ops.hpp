@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_VEC_VEC_OPS_HPP
-#define MLN_CORE_VEC_VEC_OPS_HPP
+#pragma once
 
 #include <mln/core/vec.hpp>
+
 
 namespace mln
 {
@@ -33,6 +33,4 @@ namespace mln
 
     int m_k;
   };
-}
-
-#endif // ! MLN_CORE_VEC_VEC_OPS_HPP
+} // namespace mln

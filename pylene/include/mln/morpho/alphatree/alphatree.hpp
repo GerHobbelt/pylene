@@ -1,9 +1,9 @@
-#ifndef MLN_MORPHO_ALPHATREE_ALPHATREE_HPP
-#define MLN_MORPHO_ALPHATREE_ALPHATREE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
 
 namespace mln
 {
@@ -30,7 +30,7 @@ namespace mln
         else
           return par[i] = _zfindroot(par, par[i]);
       }
-    }
+    } // namespace internal
 
     template <class I, class N, class Distance>
     std::pair<morpho::component_tree<typename I::size_type, mln_ch_value(I, typename I::size_type)>,
@@ -225,7 +225,5 @@ namespace mln
       mln_exiting();
       return {std::move(tree.get_subtree(1)), std::move(vmap)};
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_ALPHATREE_ALPHATREE_HPP
+  } // namespace morpho
+} // namespace mln

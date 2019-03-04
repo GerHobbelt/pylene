@@ -1,11 +1,12 @@
-#ifndef APPS_ATTRIBUTE_GRADIENT_MAGNITUDE_HPP
-#define APPS_ATTRIBUTE_GRADIENT_MAGNITUDE_HPP
+#pragma once
 
 #include <apps/tos/croutines.hpp>
+
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/math_ops.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
 
 namespace mln
 {
@@ -36,6 +37,4 @@ namespace mln
     mln_exiting();
     return res;
   }
-}
-
-#endif // ! APPS_ATTRIBUTE_GRADIENT_MAGNITUDE_HPP
+} // namespace mln

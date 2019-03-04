@@ -1,11 +1,12 @@
-#ifndef MLN_COLORS_LAB_HPP
-#define MLN_COLORS_LAB_HPP
+#pragma once
 
-#include <cmath>
 #include <mln/colors/xyz.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/vec_base.hpp>
 // FIXME: optimize this out (slow because of floats and saturations)
+
+#include <cmath>
+
 
 namespace mln
 {
@@ -31,7 +32,7 @@ namespace mln
       static const bool is_less_than_comparable = true;
       static const bool is_equality_comparable  = true;
     };
-  }
+  } // namespace internal
 
   template <typename T>
   lab<float> rgb2lab(const rgb<T>& v);
@@ -81,6 +82,4 @@ namespace mln
 
     return xyz2rgb(xyz<float>{X, Y, Z});
   }
-}
-
-#endif // ! MLN_COLORS_LAB_HPP
+} // namespace mln

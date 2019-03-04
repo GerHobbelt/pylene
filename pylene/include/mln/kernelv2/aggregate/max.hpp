@@ -1,8 +1,8 @@
-#ifndef MLN_KERNEL_AGGREGATE_MAX_HPP
-#define MLN_KERNEL_AGGREGATE_MAX_HPP
+#pragma once
 
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/kernel/aggregate.hpp>
+
 
 namespace mln
 {
@@ -20,10 +20,8 @@ namespace mln
         return Max_t<Compare>()(std::forward<Expr>(expr));
       }
 
-    } // end of namespace mln::kernel::aggregate
+    } // namespace aggregate
 
-  } // end of namespace mln::kernel
+  } // namespace kernel
 
-} // end of namespace mln
-
-#endif //! MLN_KERNEL_AGGREGATE_MAX_HPP
+} // namespace mln

@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_ALGORITHM_SORT_SITES_HPP
-#define MLN_CORE_ALGORITHM_SORT_SITES_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
@@ -10,6 +9,7 @@
 #include <vector>
 
 // FIXME: Speed up HQ version
+
 
 namespace mln
 {
@@ -94,7 +94,7 @@ namespace mln
       return v;
     }
 
-  } // end of namespace mln::impl
+  } // namespace impl
 
   template <typename I, typename Compare>
   std::vector<typename I::site_type> sort_sites(const Image<I>& input, Compare cmp)
@@ -106,6 +106,4 @@ namespace mln
     return impl::sort_sites(exact(input), cmp, _use_indexer);
   }
 
-} // end of namespace mln
-
-#endif // !MLN_CORE_ALGORITHM_SORT_SITES_HPP
+} // namespace mln

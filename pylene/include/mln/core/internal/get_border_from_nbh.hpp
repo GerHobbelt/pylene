@@ -1,8 +1,8 @@
-#ifndef GET_BORDER_FROM_NBH_CPP
-#define GET_BORDER_FROM_NBH_CPP
+#pragma once
 
 #include <mln/core/foreach.hpp>
 #include <mln/core/point.hpp>
+
 
 namespace mln
 {
@@ -60,7 +60,7 @@ namespace mln
             b = std::max<unsigned>(b, std::abs(dp[i]));
         return b;
       }
-    }
+    } // namespace dispatch
 
     template <typename Neighborhood>
     int get_border_from_nbh(const Neighborhood& nbh)
@@ -68,7 +68,5 @@ namespace mln
       using P = typename std::remove_reference_t<decltype(nbh.offsets())>::value_type;
       return dispatch::get_border_from_nbh(nbh, P());
     }
-  }
-}
-
-#endif // ! GET_BORDER_FROM_NBH_CPP
+  } // namespace internal
+} // namespace mln

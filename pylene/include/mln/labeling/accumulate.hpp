@@ -1,9 +1,10 @@
-#ifndef ACCUMULATE_HPP
-#define ACCUMULATE_HPP
+#pragma once
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/image/image.hpp>
+
 #include <type_traits>
+
 
 namespace mln
 {
@@ -73,7 +74,5 @@ namespace mln
 
       return results;
     }
-  }
-}
-
-#endif // ! ACCUMULATE_HPP
+  } // namespace labeling
+} // namespace mln

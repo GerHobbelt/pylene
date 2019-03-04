@@ -1,24 +1,24 @@
-#include <mln/colors/lab.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/morphers/casted_image.hpp>
-
-#include <mln/morpho/tos/tos.hpp>
+#include "compute_tree_distance.hpp"
 
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/routines.hpp>
 #include <apps/tos/topology.hpp>
 
+#include <mln/colors/lab.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/tos/tos.hpp>
+
 #include <boost/format.hpp>
+
 #include <iostream>
 #include <string>
 
-#include "compute_tree_distance.hpp"
 
 void usage(char** argv)
 {

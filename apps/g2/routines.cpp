@@ -1,5 +1,7 @@
 #include "routines.hpp"
+
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -76,4 +78,4 @@ namespace mln
 
     mln_exiting();
   }
-}
+} // namespace mln

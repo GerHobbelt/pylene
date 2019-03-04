@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_UTILS_PTROFFSET_HPP
-#define MLN_CORE_UTILS_PTROFFSET_HPP
+#pragma once
 
 #include <cstddef>
+
 
 namespace mln
 {
@@ -13,6 +13,4 @@ namespace mln
     return (T*)(((char*)x) + offset);
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_UTILS_PTROFFSET_HPP
+} // namespace mln

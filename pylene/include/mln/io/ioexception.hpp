@@ -1,7 +1,7 @@
-#ifndef MLN_IO_EXCEPTION_HPP
-#define MLN_IO_EXCEPTION_HPP
+#pragma once
 
 #include <exception>
+
 
 namespace mln
 {
@@ -17,6 +17,5 @@ namespace mln
       {
       }
     };
-  }
-}
-#endif
+  } // namespace io
+} // namespace mln

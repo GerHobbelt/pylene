@@ -1,14 +1,15 @@
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/topology.hpp>
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/topology.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/maxtree/maxtree.hpp>
+
 
 using namespace mln;
 typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;

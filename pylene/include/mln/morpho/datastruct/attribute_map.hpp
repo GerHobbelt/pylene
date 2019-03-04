@@ -1,8 +1,8 @@
-#ifndef MLN_MORPHO_COMPONENT_TREE_ATTRIBUTE_MAP_HPP
-#define MLN_MORPHO_COMPONENT_TREE_ATTRIBUTE_MAP_HPP
+#pragma once
 
 #include <mln/core/property_map.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -64,6 +64,4 @@ namespace mln
     typename tree_t::vertex_id_t    m_root;
     std::vector<V>                  m_val;
   };
-}
-
-#endif // ! MLN_MORPHO_COMPONENT_TREE_ATTRIBUTE_MAP_HPP
+} // namespace mln

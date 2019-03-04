@@ -1,13 +1,12 @@
+#pragma once
+
 // Transformed image is core morpher, include image.hpp to ensure dependencies
 #include <mln/core/image/image.hpp>
-
-#ifndef MLN_CORE_IMAGE_MORPHERS_TRANSFORMED_IMAGE_HPP
-#define MLN_CORE_IMAGE_MORPHERS_TRANSFORMED_IMAGE_HPP
+#include <mln/core/pixel_utility.hpp>
+#include <mln/core/range/transform.hpp>
 
 // FIXME: pixel do not preserve properties
 
-#include <mln/core/pixel_utility.hpp>
-#include <mln/core/range/transform.hpp>
 
 namespace mln
 {
@@ -30,19 +29,19 @@ namespace mln
 
   template <typename I, class UnaryFunction>
   transformed_image<I&, UnaryFunction> imtransform(Image<I>& ima, const UnaryFunction& f);
-}
+} // namespace mln
 
-  /******************************************/
-  /****           HELPER MACROS          ****/
-  /******************************************/
+/******************************************/
+/****           HELPER MACROS          ****/
+/******************************************/
 
-  // template <typename I>
-  // transformed_image<I, BOOST_PP_TUPLE_REM () F, false>
-  // NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)
-  // {
-  //   BOOST_PP_TUPLE_REM () F f;
-  //   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f);
-  // }
+// template <typename I>
+// transformed_image<I, BOOST_PP_TUPLE_REM () F, false>
+// NAME##_helper(I&& ima, BOOST_PP_TUPLE_REM () TYPE *)
+// {
+//   BOOST_PP_TUPLE_REM () F f;
+//   return transformed_image<I, BOOST_PP_TUPLE_REM () F, false>(std::forward<I>(ima), f);
+// }
 
 #define MLN_INTERNAL_IMAGE_LVALUE_OPERATOR_TEMPLATE_2(NAME, TYPE, F)                                                   \
   namespace mln                                                                                                        \
@@ -163,7 +162,7 @@ namespace mln
     {
       typedef typename image_init_from<typename std::decay<I>::type>::type type;
     };
-  }
+  } // namespace internal
 
   /******************************************/
   /****          Implementation          ****/
@@ -464,7 +463,7 @@ namespace mln
       mln_pixel(I) m_pix;
       image_type* m_ima;
     };
-  }
+  } // namespace internal
 
   template <typename I, class UnaryFunction>
   inline transformed_image<I, UnaryFunction> imtransform(Image<I>&& ima, const UnaryFunction& f)
@@ -484,6 +483,4 @@ namespace mln
     return transformed_image<I&, UnaryFunction>(exact(ima), f);
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_MORPHERS_TRANSFORMED_IMAGE_HPP
+} // namespace mln

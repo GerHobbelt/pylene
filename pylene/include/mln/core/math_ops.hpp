@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_MATH_OPS_HPP
-#define MLN_CORE_MATH_OPS_HPP
+#pragma once
 
 /**
  * \file
@@ -10,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <utility>
+
 
 namespace mln
 {
@@ -220,7 +220,7 @@ namespace mln
     struct l2dist_t;
     template <typename T1 = void, typename T2 = T1>
     struct linfdist_t;
-  };
+  }; // namespace functional
 
     /********************************/
     /*** Implementation            **/
@@ -472,6 +472,4 @@ namespace mln
 #undef MLN_FUNCTIONAL_GEN_UNARY_CODE
 #undef MLN_FUNCTIONAL_GEN_BINARY_CODE
 #undef MLN_FUNCTIONAL_GEN_CODE_2
-}
-
-#endif // ! MLN_CORE_MATH_OPS_HPP
+} // namespace mln

@@ -154,7 +154,7 @@ namespace mln
       box2d m_dpoints;
     };
 
-  } // end of namespace mln::se
-} // end of namespace mln
+  } // namespace mln::se
+} // namespace mln
 
 

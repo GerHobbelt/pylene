@@ -1,9 +1,9 @@
-#ifndef MLN_IO_NIFTI_IMREAD_HPP
-#define MLN_IO_NIFTI_IMREAD_HPP
+#pragma once
 
 #include <mln/core/trace.hpp>
 #include <mln/io/loader.hpp>
 #include <mln/io/nifti/nifti_plugin.hpp>
+
 
 namespace mln
 {
@@ -30,8 +30,6 @@ namespace mln
         loader.load(path, out, &plugin, permissive);
         mln_exiting();
       }
-    }
-  }
-}
-
-#endif // ! MLN_IO_NIFTI_IMREAD_HPP
+    } // namespace nifti
+  }   // namespace io
+} // namespace mln

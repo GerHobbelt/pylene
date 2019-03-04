@@ -1,5 +1,4 @@
-#ifndef ACCUMULATOR_HPP
-#define ACCUMULATOR_HPP
+#pragma once
 
 #include <mln/accu/composite_accumulator.hpp>
 #include <mln/accu/concept/accumulator.hpp>
@@ -135,9 +134,7 @@ namespace mln
     {
       return exact(fs).template make<T>();
     }
-  }
-}
+  } // namespace accu
+} // namespace mln
 
-  /// \}
-
-#endif // ! ACCUMULATOR_HPP
+/// \}

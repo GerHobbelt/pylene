@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_PROPERTY_MAP_HPP
-#define MLN_CORE_PROPERTY_MAP_HPP
+#pragma once
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -54,6 +54,4 @@ namespace mln
   {
     return functional_property_map<F, ArgType>(fun);
   }
-}
-
-#endif // ! MLN_CORE_PROPERTY_MAP_HPP
+} // namespace mln

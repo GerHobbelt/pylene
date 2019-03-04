@@ -1,12 +1,15 @@
 #include "addborder.hpp"
 #include "topology.hpp"
-#include <boost/format.hpp>
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <boost/format.hpp>
+
 
 namespace mln
 {
@@ -172,7 +175,7 @@ namespace mln
 
     return mindist;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

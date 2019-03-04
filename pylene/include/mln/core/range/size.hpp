@@ -1,10 +1,10 @@
-#ifndef RANGE_SIZE_HPP
-#define RANGE_SIZE_HPP
+#pragma once
 
 #include <mln/core/range/range.hpp>
 
 #include <cstddef>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -53,14 +53,12 @@ namespace mln
       {
         static std::size_t size(const R& rng) { return rng.size(); }
       };
-    }
+    } // namespace internal
 
     template <typename Range>
     inline std::size_t size(const Range& rng)
     {
       return internal::size_lookup<Range>::size(rng);
     }
-  }
-}
-
-#endif // ! RANGE_SIZE_HPP
+  } // namespace rng
+} // namespace mln

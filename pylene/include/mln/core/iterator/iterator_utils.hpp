@@ -1,12 +1,12 @@
 //---------------------------------------------------------------------------------
 // Copyright (c) DxO Labs 2003-2017, this copyright cannot be removed or concealed.
 //---------------------------------------------------------------------------------
-#ifndef MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP
-#define MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP
+#pragma once
 
 #include <mln/core/concept/iterator.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -102,7 +102,7 @@ namespace mln
     {
       return it.finished();
     }
-  }
+  } // namespace details
 
   template <class Iter>
   void inner_init(Iterator<Iter>& it)
@@ -139,6 +139,4 @@ namespace mln
   {
     return details::outer_finished(exact(it), typename Iter::is_multidimensional());
   }
-}
-
-#endif // ! MLN_CORE_ITERATOR_ITERATOR_UTILS_HPP
+} // namespace mln

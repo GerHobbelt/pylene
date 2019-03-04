@@ -1,9 +1,10 @@
-#ifndef APPS_TOSGUI_ATTRIBUTES_AREA_HPP
-#define APPS_TOSGUI_ATTRIBUTES_AREA_HPP
+#pragma once
 
 #include <apps/tosgui/attribute.hpp>
 #include <apps/tosgui/qattribute.hpp>
+
 #include <mln/core/image/image2d.hpp>
+
 
 template <typename V>
 class AreaAttribute : public Attribute
@@ -62,5 +63,3 @@ private:
   mln::image2d<unsigned>     m_area;
   mln::QAttribute<unsigned>* m_attribute;
 };
-
-#endif // ! APPS_TOSGUI_ATTRIBUTES_AREA_HPP

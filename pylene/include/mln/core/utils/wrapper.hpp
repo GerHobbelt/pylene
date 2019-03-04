@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_UTILS_WRAPPER_HPP
-#define MLN_CORE_UTILS_WRAPPER_HPP
+#pragma once
 
 #include <utility>
+
 
 /// \brief Set of classes used to manage plain value, reference_wrapper and iterator
 /// through a single interface
@@ -78,6 +78,4 @@ namespace mln
 
   template <class Wrapper>
   using unwrap_ref_t = typename Wrapper::reference;
-}
-
-#endif // ! MLN_CORE_UTILS_WRAPPER_HPP
+} // namespace mln

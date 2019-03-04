@@ -1,9 +1,9 @@
-#ifndef MLN_MORPHO_STRUCTURAL_DILATE_HPP
-#define MLN_MORPHO_STRUCTURAL_DILATE_HPP
+#pragma once
 
 #include <mln/accu/accumulators/h_infsup.hpp>
 #include <mln/accu/accumulators/infsup.hpp>
 #include <mln/morpho/canvas/dilation_like.hpp>
+
 
 /// \file
 
@@ -90,7 +90,7 @@ namespace mln
 
           const mln::accu::accumulators::h_sup<T> accu_hsup;
         };
-      }
+      } // namespace internal
 
       template <class I, class SE, class OutputImage, class Compare>
       OutputImage& dilate(const Image<I>& ima, const StructuringElement<SE>& nbh, Image<OutputImage>& output,
@@ -113,8 +113,6 @@ namespace mln
         return out;
       }
 
-    } // end of namespace mln::morpho::structural
-  }   // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_STRUCTURAL_DILATE_HPP
+    } // namespace structural
+  }   // namespace morpho
+} // namespace mln

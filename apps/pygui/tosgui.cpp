@@ -1,7 +1,11 @@
-#include <boost/python.hpp>
 #define PY_ARRAY_UNIQUE_SYMBOL tosgui_ARRAY_API
-#include <numpy/ndarrayobject.h>
+
 #include "tosgui.hpp"
+
+#include <boost/python.hpp>
+
+#include <numpy/ndarrayobject.h>
+
 
 BOOST_PYTHON_MODULE(tosGUI_)
 {

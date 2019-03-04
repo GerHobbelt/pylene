@@ -1,9 +1,10 @@
-#ifndef MLN_MORPHO_TOS_PRIVATE_PSET_HPP
-#define MLN_MORPHO_TOS_PRIVATE_PSET_HPP
+#pragma once
 
 #include "pset_hqueue.hpp"
 #include "pset_redblacktree.hpp"
+
 #include <mln/core/image/image.hpp>
+
 
 namespace mln
 {
@@ -100,9 +101,7 @@ namespace mln
           return m_delegate.empty();
         }
 
-      } // end of namespace mln::morpho::tos::impl
-    }   // end of namespace mln::morpho::tos
-  }     // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_TOS_PRIVATE_PSET_HPP
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
+} // namespace mln

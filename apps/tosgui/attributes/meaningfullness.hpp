@@ -1,12 +1,13 @@
-#ifndef APPS_TOSGUI_ATTRIBUTES_MEANINGFULLNESS_HPP
-#define APPS_TOSGUI_ATTRIBUTES_MEANINGFULLNESS_HPP
+#pragma once
 
 #include <apps/attributes/meaningfullness.hpp>
 #include <apps/saliency/extinction.hpp>
 #include <apps/tosgui/attribute.hpp>
 #include <apps/tosgui/qattribute.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/filtering.hpp>
+
 
 template <typename T, typename V>
 class MeaningFullnessAttribute : public Attribute
@@ -223,5 +224,3 @@ private:
   mln::QAttribute<float>* m_attribute_4;
   mln::QAttribute<float>* m_attribute_5;
 };
-
-#endif // !APPS_TOSGUI_ATTRIBUTES_MEANINGFULLNESS_HPP

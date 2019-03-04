@@ -1,9 +1,10 @@
-#ifndef MLN_KERNEL_DETAILS_EXPRESSIONS_HPP
-#define MLN_KERNEL_DETAILS_EXPRESSIONS_HPP
+#pragma once
 
-#include <boost/proto/proto.hpp>
 #include <mln/accu/accumulator.hpp>
 #include <mln/kernelv2/details/context.hpp>
+
+#include <boost/proto/proto.hpp>
+
 
 namespace mln
 {
@@ -39,8 +40,6 @@ namespace mln
                                                    Expr, kernel_abstract_context>::type>::type>::type,
           Expr>::type;
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
-
-#endif //!_MLN_KERNEL_DETAILS_EXPRESSIONS_HPP
+    } // namespace details
+  }   // namespace kernel
+} // namespace mln

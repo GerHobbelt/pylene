@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_VALUE_INT_HPP
-#define MLN_CORE_VALUE_INT_HPP
+#pragma once
 
 #include <mln/core/value/index.hpp>
 #include <mln/core/value/value_traits.hpp>
@@ -7,6 +6,7 @@
 #include <boost/integer.hpp>
 
 #include <cstdint>
+
 
 namespace mln
 {
@@ -27,7 +27,7 @@ namespace mln
   template <unsigned nbits>
   struct Int;
 
-} // end of namespace mln
+} // namespace mln
 
 /******************************************/
 /****              traits              ****/
@@ -78,7 +78,7 @@ namespace std
   {
     typedef mln::UInt<nbits> type;
   };
-}
+} // namespace std
 
 namespace mln
 {
@@ -109,7 +109,7 @@ namespace mln
     static constexpr Int<nbits> sup() { return max(); }
   };
 
-} // end of namespace mln
+} // namespace mln
 
 /******************************************/
 /****     Indexers specialization     *****/
@@ -218,7 +218,7 @@ namespace mln
 #pragma warning(pop)
 #endif
 
-} // end of namespace mln
+} // namespace mln
 
 // Specialization of standards traits with Int and UInt
 
@@ -255,6 +255,4 @@ namespace std
   struct common_type<V, mln::Int<n>> : common_type<V, typename boost::int_t<n>::least>
   {
   };
-}
-
-#endif //! MLN_CORE_VALUE_INT_HPP
+} // namespace std

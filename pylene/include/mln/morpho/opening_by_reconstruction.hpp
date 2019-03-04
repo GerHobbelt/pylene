@@ -1,7 +1,7 @@
-#ifndef MLN_MORPHO_OPENING_BY_RECONSTRUCTION_HPP
-#define MLN_MORPHO_OPENING_BY_RECONSTRUCTION_HPP
+#pragma once
 
 #include <mln/morpho/closing_by_reconstruction.hpp>
+
 
 namespace mln
 {
@@ -28,7 +28,5 @@ namespace mln
       mln_entering("mln::morpho::opening_by_reconstruction");
       return closing_by_reconstruction(f, markers, nbh, std::greater<mln_value(I)>());
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_OPENING_BY_RECONSTRUCTION_HPP
+  } // namespace morpho
+} // namespace mln

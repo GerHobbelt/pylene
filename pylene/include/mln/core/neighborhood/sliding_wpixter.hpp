@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
-#define MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/neighborhood/sliding_pixter.hpp>
 #include <mln/core/range/range.hpp>
+
 
 namespace mln
 {
@@ -100,6 +100,4 @@ namespace mln
     typename range_const_iterator<WeightSet>::type m_wset_iter;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_NEIGHBORHOOD_SLIDING_WPIXTER_HPP
+} // namespace mln

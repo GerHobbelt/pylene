@@ -1,8 +1,8 @@
-#ifndef CURVATURE_HPP
-#define CURVATURE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
+
 
 namespace mln
 {
@@ -40,6 +40,4 @@ namespace mln
 
     return curv;
   }
-}
-
-#endif // ! CURVATURE_HPP
+} // namespace mln

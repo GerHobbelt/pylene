@@ -1,14 +1,3 @@
-#include <QApplication>
-#include <QtGui>
-
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/morpho/filtering.hpp>
-#include <mln/morpho/tos/tos.hpp>
-
 #include "attributes/area.hpp"
 #include "attributes/gray.hpp"
 #include "attributes/meaningfullness.hpp"
@@ -16,11 +5,22 @@
 #include "dispatcher.hpp"
 #include "plotwindow.hpp"
 #include "qattribute.hpp"
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/addborder.hpp>
-#include <mln/qt/imageviewer.hpp>
 
 #include <apps/saliency/extinction.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
+
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/morpho/filtering.hpp>
+#include <mln/morpho/tos/tos.hpp>
+#include <mln/qt/imageviewer.hpp>
+
+#include <QApplication>
+#include <QtGui>
+
 
 int main(int argc, char** argv)
 {

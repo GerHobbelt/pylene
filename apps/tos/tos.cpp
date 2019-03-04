@@ -1,22 +1,24 @@
+#include "addborder.hpp"
+#include "gradient.hpp"
+#include "set_mean_on_nodes.hpp"
+#include "topology.hpp"
+
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/filtering.hpp>
+#include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-#include "addborder.hpp"
-#include "gradient.hpp"
-#include "set_mean_on_nodes.hpp"
-#include "topology.hpp"
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
+
 #include <libgen.h>
-#include <mln/morpho/maxtree_ufind_parallel.hpp>
+
 
 namespace po = boost::program_options;
 
@@ -127,7 +129,7 @@ namespace mln
 
     return out;
   }
-}
+} // namespace mln
 
 template <typename V, typename Compare = std::less<V>>
 std::tuple<V, V, V> minmedmax(const V& x, const V& y, const V& z, const Compare& cmp = Compare())

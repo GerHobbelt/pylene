@@ -1,18 +1,18 @@
+#include <apps/supervised-gui/myheap.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+
+#include <mln/accu/accumulators/mean.hpp>
 #include <mln/colors/literal.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <mln/accu/accumulators/mean.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 
-#include <apps/supervised-gui/myheap.hpp>
-#include <apps/tos/Kinterpolate.hpp>
 
 using namespace mln;
 

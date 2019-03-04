@@ -1,5 +1,7 @@
-#ifndef MAXTREE_UFINDRANK_PARALLEL_HPP
-#define MAXTREE_UFINDRANK_PARALLEL_HPP
+#pragma once
+
+#include "canonize.hpp"
+#include "merge_tree.hpp"
 
 #include <mln/core/algorithm/sort_sites.hpp>
 #include <mln/core/extension/fill.hpp>
@@ -7,11 +9,9 @@
 #include <mln/core/image/sub_image.hpp>
 #include <mln/core/wrt_offset.hpp>
 
-#include "canonize.hpp"
-#include "merge_tree.hpp"
-
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_reduce.h>
+
 
 namespace mln
 {
@@ -230,7 +230,7 @@ namespace mln
           canonize(ima, parent, &S[0]);
           return std::make_pair(std::move(parent), std::move(S));
         }
-      }
+      } // namespace parallel
 
       namespace serial
       {
@@ -260,8 +260,8 @@ namespace mln
           canonize(ima, S, algo.m_parent);
           return std::make_pair(std::move(algo.m_parent), std::move(S));
         }
-      }
-    }
+      } // namespace serial
+    }   // namespace impl
 
     // template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V> >
     // image2d<point2d>
@@ -278,7 +278,5 @@ namespace mln
 
     //   return algo.m_parent;
     // }
-  }
-}
-
-#endif // !MLN_MORPHO_MAXTREE_UFINDRANK_PARALLEL_HPP
+  } // namespace morpho
+} // namespace mln

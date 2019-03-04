@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_IMAGE_CONSTANT_IMAGE_HPP
-#define MLN_CORE_IMAGE_CONSTANT_IMAGE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/range/iterator_range.hpp>
 #include <mln/core/range/range.hpp>
+
 
 // FIXME: specialize for non bidirectional domain.
 
@@ -263,5 +263,3 @@ namespace mln
     V      m_value;
   };
 } // namespace mln
-
-#endif // ! MLN_CORE_IMAGE_CONSTANT_IMAGE_HPP

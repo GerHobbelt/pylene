@@ -1,11 +1,11 @@
-#ifndef MLN_MORPHO_EXTINCTION_HPP
-#define MLN_MORPHO_EXTINCTION_HPP
+#pragma once
 
 #include <mln/core/always.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/morpho/canvas/unionfind.hpp>
+
 
 namespace mln
 {
@@ -58,7 +58,7 @@ namespace mln
         mln_concrete(I) & extinction;
         Compare cmp;
       };
-    }
+    } // namespace internal
 
     template <class I, class N, class Compare>
     mln_concrete(I) extinction(const Image<I>& ima_, const Neighborhood<N>& nbh_, const Compare& cmp)
@@ -89,7 +89,5 @@ namespace mln
       mln_exiting();
       return extinction;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_EXTINCTION_HPP
+  } // namespace morpho
+} // namespace mln

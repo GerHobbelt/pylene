@@ -1,10 +1,11 @@
-#ifndef MLN_IO_IMREAD_HH
-#define MLN_IO_IMREAD_HH
+#pragma once
 
-#include <fstream>
 #include <mln/core/trace.hpp>
 #include <mln/io/freeimage_plugin.hpp>
 #include <mln/io/loader.hpp>
+
+#include <fstream>
+
 
 namespace mln
 {
@@ -46,6 +47,5 @@ namespace mln
       mln_exiting();
     }
 
-  } /*end of namespace mln::io */
-} /* end of namespace mln */
-#endif
+  } // namespace io
+} // namespace mln

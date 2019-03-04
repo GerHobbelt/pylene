@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_PIXEL_INDEX_PIXEL_HPP
-#define MLN_CORE_PIXEL_INDEX_PIXEL_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/image_traits.hpp>
+
 
 namespace mln
 {
@@ -78,6 +78,4 @@ namespace mln
     size_type   m_index;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_PIXEL_INDEX_PIXEL_HPP
+} // namespace mln

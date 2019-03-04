@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_CANVAS_UNIONFIND_HPP
-#define MLN_MORPHO_CANVAS_UNIONFIND_HPP
+#pragma once
 
 #include <mln/core/algorithm/sort_sites.hpp>
 #include <mln/core/dontcare.hpp>
@@ -7,6 +6,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -145,7 +145,7 @@ namespace mln
 
           return par;
         }
-      }
+      } // namespace internal
 
       template <class I, class N, class StopCriterion, class Compare, class uf_visitor>
       mln_ch_value(I, mln_point(I))
@@ -157,8 +157,6 @@ namespace mln
       /*********************************************/
       /***       Visitors                       ****/
       /*********************************************/
-    }
-  }
-}
-
-#endif // ! MLN_MORPHO_CANVAS_UNIONFIND_HPP
+    } // namespace canvas
+  }   // namespace morpho
+} // namespace mln

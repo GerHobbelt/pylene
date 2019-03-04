@@ -1,20 +1,19 @@
-#ifndef MAXTREE_PQUEUE_PARALLEL_HPP
-#define MAXTREE_PQUEUE_PARALLEL_HPP
-
-#include <mln/core/extension/fill.hpp>
-#include <mln/core/image/image.hpp>
-#include <mln/core/image/sub_image.hpp>
-#include <mln/core/wrt_offset.hpp>
-
-#include <mln/io/imprint.hpp>
+#pragma once
 
 #include "canonize.hpp"
 #include "maxtree_pqueue.hpp"
 #include "maxtree_routines.hpp"
 #include "merge_tree.hpp"
 
+#include <mln/core/extension/fill.hpp>
+#include <mln/core/image/image.hpp>
+#include <mln/core/image/sub_image.hpp>
+#include <mln/core/wrt_offset.hpp>
+#include <mln/io/imprint.hpp>
+
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_reduce.h>
+
 
 namespace mln
 {
@@ -135,7 +134,7 @@ namespace mln
 
           return std::make_pair(std::move(parent), std::move(S));
         }
-      }
+      } // namespace parallel
 
       namespace serial
       {
@@ -151,9 +150,7 @@ namespace mln
           std::cout << "Number of split: " << algo.m_nsplit << std::endl;
           return std::make_pair(std::move(algo.m_parent), std::move(algo.m_S));
         }
-      }
-    }
-  }
-}
-
-#endif // !MLN_MORPHO_MAXTREE_PQUEUE_PARALLEL_HPP
+      } // namespace serial
+    }   // namespace impl
+  }     // namespace morpho
+} // namespace mln

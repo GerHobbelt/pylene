@@ -1,10 +1,10 @@
-#ifndef MLN_MORPHO_CLOSING_BY_RECONSTRUCTION_HPP
-#define MLN_MORPHO_CLOSING_BY_RECONSTRUCTION_HPP
+#pragma once
 
 #include <mln/accu/accumulators/min.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/morpho/canvas/unionfind.hpp>
+
 
 namespace mln
 {
@@ -45,7 +45,7 @@ namespace mln
         mln_ch_value(J, accu_t) & m_accu;
         mln_concrete(I) & m_out;
       };
-    }
+    } // namespace internal
 
     template <class I, class J, class N, class Compare>
     mln_concrete(I)
@@ -79,7 +79,5 @@ namespace mln
       mln_exiting();
       return out;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_CLOSING_BY_RECONSTRUCTION_HPP
+  } // namespace morpho
+} // namespace mln

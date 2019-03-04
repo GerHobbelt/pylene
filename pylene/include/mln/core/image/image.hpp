@@ -1,5 +1,7 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_HPP
-#define MLN_CORE_IMAGE_IMAGE_HPP
+#pragma once
+
+// DO NOT REMOVE (used for checking include order)
+// #define MLN_CORE_IMAGE_IMAGE_HPP
 
 /// \file
 
@@ -29,5 +31,3 @@
 #include <mln/core/image/morphers/filtered_image.hpp>    // Filter by function
 #include <mln/core/image/morphers/transformed_image.hpp> // Map
 #include <mln/core/image/sub_image.hpp>                  // Filter by domain
-
-#endif // !MLN_CORE_IMAGE_IMAGE_HPP

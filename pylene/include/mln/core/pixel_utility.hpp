@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_PIXEL_UTILITY_HPP
-#define MLN_CORE_PIXEL_UTILITY_HPP
+#pragma once
 
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/image/morphers/details/morpher_core_access.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
+
 
 namespace mln
 {
@@ -31,7 +31,7 @@ namespace mln
 
     typedef mln::get_pixel_value meta_get_pixel_value;
     typedef mln::get_pixel_point meta_get_pixel_point;
-  }
+  } // namespace internal
 
   /******************************************/
   /****          Implementation          ****/
@@ -44,17 +44,17 @@ namespace mln
     struct use_pix_helper
     {
       template <typename U>
-      static std::true_type foo(const U&, decltype(std::declval<UnaryFunction>()(std::declval<U>())) * = NULL);
+      static std::true_type foo(const U&, decltype(std::declval<UnaryFunction>()(std::declval<U>()))* = NULL);
 
       static std::false_type foo(...);
 
       typedef decltype(foo(std::declval<mln_pixel(I)>())) type;
     };
-  }
+  } // namespace internal
 
-    /******************************************/
-    /****          HELPER MACROS          *****/
-    /******************************************/
+  /******************************************/
+  /****          HELPER MACROS          *****/
+  /******************************************/
 
 #define MLN_PIXMORPHER_FORWARD_IF_0_(COND, F, RETURN, CV)                                                              \
   typename std::enable_if<COND, RETURN>::type F() CV { return morpher_core_access::get_pix(this).F(); }
@@ -93,7 +93,7 @@ namespace mln
 
       MLN_PIXMORPHER_FORWARD_CONST_0(index, size_type);
     };
-  }
+  } // namespace impl
 
   template <typename Derived, typename Pix, typename Morpher>
   struct morpher_pixel_base : Pixel<Derived>, impl::morpher_pixel_indexable<Derived, Pix, Morpher>
@@ -229,9 +229,7 @@ namespace mln
     }
   };
 
-} // end of namespace mln
+} // namespace mln
 
 #undef MLN_PIXMORPHER_FORWARD_0_
 #undef MLN_PIXMORPHER_FORWARD_CONST_0
-
-#endif //! MLN_CORE_PIXEL_UTILITY_HPP

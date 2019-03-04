@@ -1,9 +1,9 @@
-#ifndef MLN_KERNELV2_DETAILS_DEEPCOPYFIX_HPP
-#define MLN_KERNELV2_DETAILS_DEEPCOPYFIX_HPP
+#pragma once
 
 #include <mln/kernelv2/details/expressions.hpp>
 
 #include <boost/proto/deep_copy.hpp>
+
 
 namespace boost
 {
@@ -47,8 +47,6 @@ namespace boost
           return proto_generator()(expr_type::make(e.proto_base().child0));
         }
       };
-    }
-  }
-}
-
-#endif // MLN_KERNELV2_DETAILS_DEEPCOPYFIX_HPP
+    } // namespace detail
+  }   // namespace proto
+} // namespace boost

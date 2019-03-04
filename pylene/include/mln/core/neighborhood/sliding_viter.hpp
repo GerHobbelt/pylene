@@ -1,11 +1,12 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_VITER_HPP
-#define MLN_CORE_NEIGHBORHOOD_SLIDING_VITER_HPP
+#pragma once
 
-#include <boost/container/small_vector.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/range/range.hpp>
 #include <mln/core/utils/wrapper.hpp>
+
+#include <boost/container/small_vector.hpp>
+
 
 namespace mln
 {
@@ -130,7 +131,7 @@ namespace mln
       const Container m_index_set;
       unsigned        m_i;
     };
-  }
+  } // namespace internal
 
   template <class Pixel, class SiteSet>
   struct sliding_viter : internal::sliding_viter_base<Pixel, SiteSet>
@@ -147,6 +148,4 @@ namespace mln
     {
     }
   };
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_SLIDING_VITER_HPP
+} // namespace mln

@@ -1,7 +1,7 @@
-#ifndef PLOTWINDOW_HPP
-#define PLOTWINDOW_HPP
+#pragma once
 
 #include "attribute.hpp"
+
 #include <QAction>
 #include <QCheckBox>
 #include <QComboBox>
@@ -11,7 +11,9 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QVBoxLayout>
+
 #include <vector>
+
 
 /// \brief define a the window class that holds the attribute plots
 /// and allows to select attributes to plot.
@@ -77,5 +79,3 @@ private:
 private:
   std::vector<Attribute*> m_attributes;
 };
-
-#endif // ! PLOTWINDOW_HPP

@@ -1,16 +1,12 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_HPP
-#warning "Do not include this file directly but <mln/core/image/image.hpp>"
-#include <mln/core/image/image.hpp>
-#endif
+#pragma once
 
-#ifndef MLN_CORE_IMAGE_BASE_HPP
-#define MLN_CORE_IMAGE_BASE_HPP
 
 /// \file
 
 #include <mln/core/image/image.hpp>
 
 #include <cstddef>
+
 
 namespace mln
 {
@@ -165,6 +161,4 @@ namespace mln
   };
 #endif
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_BASE_HPP
+} // namespace mln

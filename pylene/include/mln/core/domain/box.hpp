@@ -1,5 +1,4 @@
-#ifndef MLN_BOX_HH
-#define MLN_BOX_HH
+#pragma once
 
 #include <mln/core/domain/box_iter.hpp>
 #include <mln/core/image/image.hpp>
@@ -10,6 +9,7 @@
 #if MLN_HAS_TBB
 #include <tbb/tbb_stddef.h>
 #endif
+
 
 namespace mln
 {
@@ -400,5 +400,3 @@ namespace mln
     return {pmin, pmax, step};
   }
 } // namespace mln
-
-#endif

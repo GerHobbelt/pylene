@@ -1,10 +1,10 @@
-#ifndef MLN_CORE_IMAGE_MORPHERS_FILTERED_IMAGE_HPP
-#define MLN_CORE_IMAGE_MORPHERS_FILTERED_IMAGE_HPP
+#pragma once
 
 #include <mln/core/image/internal/where.hpp>
 #include <mln/core/image/morphers/morpher_base.hpp>
 #include <mln/core/image/sub_image.hpp>
 #include <mln/core/pixel_utility.hpp>
+
 
 namespace mln
 {
@@ -52,7 +52,7 @@ namespace mln
     {
       typedef typename image_init_from<sub_image<I, internal::where_t<I, Predicate>>>::type type;
     };
-  }
+  } // namespace internal
 
   /******************************************/
   /****          Implementation          ****/
@@ -346,6 +346,4 @@ namespace mln
     return filtered_image<I&, Predicate>(exact(ima), pred);
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_MORPHERS_FILTERED_IMAGE_HPP
+} // namespace mln

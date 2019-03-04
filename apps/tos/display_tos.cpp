@@ -1,20 +1,23 @@
+#include "addborder.hpp"
+#include "topology.hpp"
+
 #include <mln/core/algorithm/copy.hpp>
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/morpho/tos/immerse.hpp>
-
-#include "addborder.hpp"
-#include "topology.hpp"
-#include <boost/format.hpp>
-#include <libgen.h>
-#include <mln/core/algorithm/fill.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/filtering.hpp>
 #include <mln/morpho/maxtree_pqueue_parallel.hpp>
+#include <mln/morpho/tos/immerse.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
+#include <libgen.h>
+
 
 namespace mln
 {
@@ -53,7 +56,7 @@ namespace mln
       Kdisplay(deja_vu_, strides);
     }
   }
-}
+} // namespace mln
 
 void usage(int argc, char** argv)
 {

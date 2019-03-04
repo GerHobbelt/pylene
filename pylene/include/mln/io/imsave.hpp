@@ -1,10 +1,11 @@
-#ifndef MLN_IO_IMSAVE_HPP
-#define MLN_IO_IMSAVE_HPP
+#pragma once
 
-#include <fstream>
 #include <mln/core/trace.hpp>
 #include <mln/io/freeimage_plugin.hpp>
 #include <mln/io/saver.hpp>
+
+#include <fstream>
+
 
 namespace mln
 {
@@ -52,7 +53,5 @@ namespace mln
       }
     }
 
-  } // end of namespace mln::io
-} // end of namespace mln
-
-#endif //! MLN_IO_IMSAVE_HPP
+  } // namespace io
+} // namespace mln

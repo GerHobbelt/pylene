@@ -1,18 +1,18 @@
-#include <mln/core/image/image2d.hpp>
+#include "gradient_magnitude.hpp"
 
+#include <apps/saliency/attribute_on_contour.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/extinction.hpp>
 
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <apps/saliency/attribute_on_contour.hpp>
-#include <apps/tos/Kinterpolate.hpp>
-
-#include "gradient_magnitude.hpp"
 #include <fstream>
+
 
 int main(int argc, char** argv)
 {

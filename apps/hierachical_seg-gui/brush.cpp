@@ -1,7 +1,11 @@
 #include "brush.hpp"
-#include <QtGui>
-#include <iostream>
+
 #include <mln/io/imsave.hpp>
+
+#include <QtGui>
+
+#include <iostream>
+
 
 inline void brush(QPixmap* pixmap, const QPointF& position, QColor color, int r)
 {

@@ -1,7 +1,10 @@
-#ifndef QATTRIBUTE_HPP
-#define QATTRIBUTE_HPP
+#pragma once
 
+#include <mln/accu/accumulators/max.hpp>
+#include <mln/accu/accumulators/min.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/trace.hpp>
 
 #include <QEvent>
 #include <QKeyEvent>
@@ -12,10 +15,6 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
 
-#include <mln/accu/accumulators/max.hpp>
-#include <mln/accu/accumulators/min.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-#include <mln/core/trace.hpp>
 
 namespace mln
 {
@@ -179,5 +178,5 @@ namespace mln
     image2d<bool> mask = eval(m_attr < (V)lambda);
     emit          nodeSelected(mask);
   }
-}
+} // namespace mln
 #endif // ! QATTRIBUTE_HPP

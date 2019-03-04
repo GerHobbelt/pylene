@@ -1,9 +1,10 @@
-#ifndef MLN_CORE_VEC_VEC_IO_HPP
-#define MLN_CORE_VEC_VEC_IO_HPP
+#pragma once
 
 #include <mln/core/vec.hpp>
 #include <mln/io/format.hpp>
+
 #include <sstream>
+
 
 namespace mln
 {
@@ -42,7 +43,5 @@ namespace mln
       os << s.str();
       return os;
     }
-  }
-}
-
-#endif // ! MLN_CORE_VEC_VEC_IO_HPP
+  } // namespace internal
+} // namespace mln

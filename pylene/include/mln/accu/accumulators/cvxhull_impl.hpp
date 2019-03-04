@@ -1,9 +1,10 @@
-#ifndef CONVEXHULL_HPP
-#define CONVEXHULL_HPP
+#pragma once
+
+#include <mln/core/point.hpp>
 
 #include <cmath>
-#include <mln/core/point.hpp>
 #include <vector>
+
 
 namespace mln
 {
@@ -117,6 +118,4 @@ namespace mln
 
     return cvx_hull;
   }
-}
-
-#endif // ! CONVEXHULL_HPP
+} // namespace mln

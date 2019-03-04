@@ -1,9 +1,9 @@
-#ifndef MLN_MORPHO_ALGEBRAIC_FILTER_HPP
-#define MLN_MORPHO_ALGEBRAIC_FILTER_HPP
+#pragma once
 
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/morpho/canvas/unionfind.hpp>
+
 
 namespace mln
 {
@@ -45,7 +45,7 @@ namespace mln
         mln_ch_value(I, Accu) & m_acc_img;
         mln_concrete(I) & m_rec;
       };
-    }
+    } // namespace internal
 
     template <class I, class N, class Compare>
     mln_concrete(I) area_closing(const Image<I>& ima_, const Neighborhood<N>& nbh, unsigned area, Compare cmp)
@@ -74,7 +74,5 @@ namespace mln
       mln_exiting();
       return out;
     }
-  }
-}
-
-#endif // ! MLN_MORPHO_ALGEBRAIC_FILTER_HPP
+  } // namespace morpho
+} // namespace mln

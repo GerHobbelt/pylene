@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_STRUCTURAL_OPENING_HPP
-#define MLN_MORPHO_STRUCTURAL_OPENING_HPP
+#pragma once
 
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image.hpp>
@@ -7,6 +6,7 @@
 #include <mln/morpho/se/se.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
+
 
 /// \file
 
@@ -66,7 +66,7 @@ namespace mln
           auto d = morpho::structural::erode(ima, nbh, cmp);
           morpho::structural::dilate(d, nbh, out, cmp);
         }
-      }
+      } // namespace impl
 
       template <class I, class SE, class Compare, class O>
       O& opening(const Image<I>& ima_, const StructuringElement<SE>& se_, Compare cmp, Image<O>& output)
@@ -91,8 +91,6 @@ namespace mln
 
         return out;
       }
-    }
-  }
-}
-
-#endif // !MLN_MORPHO_STRUCTURAL_OPENING_HPP
+    } // namespace structural
+  }   // namespace morpho
+} // namespace mln

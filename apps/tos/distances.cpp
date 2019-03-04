@@ -1,16 +1,16 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/io/imread.hpp>
-
-#include <mln/accu/accumulators/max.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/shape_similarity.hpp>
 #include <apps/tos/utils.hpp>
 
-#include <map>
+#include <mln/accu/accumulators/max.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <map>
+
 
 void usage(char** argv)
 {
@@ -58,7 +58,7 @@ namespace mln
 
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

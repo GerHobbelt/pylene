@@ -1,7 +1,7 @@
-#ifndef LITERAL_HPP
-#define LITERAL_HPP
+#pragma once
 
 #include <mln/core/colors.hpp>
+
 
 namespace mln
 {
@@ -24,9 +24,7 @@ namespace mln
         constexpr rgb8 cyan{0, 255, 255};
         constexpr rgb8 yellow{255, 255, 0};
         constexpr rgb8 magenta{255, 0, 255};
-      }
-    }
-  }
-}
-
-#endif // ! LITERAL_HPP
+      } // namespace
+    }   // namespace literal
+  }     // namespace colors
+} // namespace mln

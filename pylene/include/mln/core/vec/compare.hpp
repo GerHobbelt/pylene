@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_VEC_COMPARE_HPP
-#define MLN_CORE_VEC_COMPARE_HPP
+#pragma once
 
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/vec_base.hpp>
+
 
 namespace mln
 {
@@ -314,6 +314,4 @@ namespace mln
       return vecprod_isgreaterequal(u, v);
     }
   };
-}
-
-#endif // ! MLN_CORE_VEC_COMPARE_HPP
+} // namespace mln

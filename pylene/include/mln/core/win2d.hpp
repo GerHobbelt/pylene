@@ -1,10 +1,9 @@
-#ifndef MLN_CORE_WIN2D_HPP
-#define MLN_CORE_WIN2D_HPP
-
+#pragma once
 #include <mln/core/assert.hpp>
 #include <mln/core/domain/box.hpp>
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/point.hpp>
+
 
 ///
 /// \file
@@ -60,7 +59,5 @@ namespace mln
     const std::array<point2d, 3> winc2_h_t::dpoints = {{{0, -1}, {0, 0}, {0, 1}}};
 
     static const winc2_h_t winc2_h{};
-  }
-}
-
-#endif // !  MLN_CORE_WIN2D_HPP
+  } // namespace
+} // namespace mln

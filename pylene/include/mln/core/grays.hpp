@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_GRAYS_HH
-#define MLN_CORE_GRAYS_HH
+#pragma once
 
 #include <mln/core/value/int.hpp>
+
 
 /**
    \file This file provides typedefs for commons buitins types
@@ -25,5 +25,3 @@ namespace mln
     MLN_DOUBLE = 0x11
   };
 }
-
-#endif /* !MLN_CORE_GRAYS_HH */

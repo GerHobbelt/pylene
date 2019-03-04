@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_RANGE_RBEGIN_HPP
-#define MLN_CORE_RANGE_RBEGIN_HPP
+#pragma once
 
 namespace mln
 {
@@ -10,6 +9,4 @@ namespace mln
     return c.rbegin();
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_RANGE_RBEGIN_HPP
+} // namespace mln

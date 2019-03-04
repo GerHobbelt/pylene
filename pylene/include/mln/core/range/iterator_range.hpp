@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_RANGE_ITERATOR_RANGE_HPP
-#define MLN_CORE_RANGE_ITERATOR_RANGE_HPP
+#pragma once
 
 #include <mln/core/concept/iterator.hpp>
+
 
 namespace mln
 {
@@ -53,6 +53,4 @@ namespace mln
     reverse_iterator riter_;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_RANGE_ITERATOR_RANGE_HPP
+} // namespace mln

@@ -1,11 +1,11 @@
-#ifndef MLN_CORE_MORPHO_MERGE_TREE_HPP
-#define MLN_CORE_MORPHO_MERGE_TREE_HPP
+#pragma once
 
 #include "maxtree_routines.hpp"
 
 #include <mln/core/neighb2d.hpp>
 
 #include <thread>
+
 
 namespace mln
 {
@@ -212,7 +212,5 @@ namespace mln
       }
       return true;
     }
-  }
-}
-
-#endif // !MLN_CORE_MORPHO_MERGE_TREE_HPP
+  } // namespace morpho
+} // namespace mln

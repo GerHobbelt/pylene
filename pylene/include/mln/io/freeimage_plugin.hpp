@@ -1,5 +1,4 @@
-#ifndef MLN_IO_FREEIMAGE_PLUGIN_HPP
-#define MLN_IO_FREEIMAGE_PLUGIN_HPP
+#pragma once
 
 #include <mln/colors/rgba.hpp>
 #include <mln/core/colors.hpp>
@@ -7,10 +6,11 @@
 #include <mln/io/plugin.hpp>
 #include <mln/io/stream_wrapper.hpp>
 
+#include <FreeImage.h>
+
 #include <cstring>
 #include <unordered_map>
 
-#include <FreeImage.h>
 
 namespace mln
 {
@@ -886,7 +886,5 @@ namespace mln
       mln_precondition(m_dib != NULL);
       m_write_next_pixel(out_);
     }
-  }
-}
-
-#endif // ! MLN_IO_FREEIMAGE_PLUGIN_HPP
+  } // namespace io
+} // namespace mln

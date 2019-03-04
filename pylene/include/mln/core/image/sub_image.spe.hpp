@@ -1,7 +1,7 @@
-#ifndef MLN_CORE_IMAGE_SUB_IMAGE_SPE_HPP
-#define MLN_CORE_IMAGE_SUB_IMAGE_SPE_HPP
+#pragma once
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -33,7 +33,7 @@ namespace mln
 
   template <typename T_, unsigned dim_, typename E_, typename Domain_>
   std::enable_if_t<std::is_convertible<Domain_, typename ndimage_base<T_, dim_, E_>::domain_type>::value, E_>
-  make_subimage(ndimage_base<T_, dim_, E_>& image, const Domain_& domain)
+      make_subimage(ndimage_base<T_, dim_, E_>& image, const Domain_& domain)
   {
     return image.clip(domain);
   }
@@ -41,7 +41,7 @@ namespace mln
 
   template <typename T, unsigned dim, typename E, typename Domain>
   std::enable_if_t<std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, const E>
-  make_subimage(const ndimage_base<T, dim, E>& image, const Domain& domain)
+      make_subimage(const ndimage_base<T, dim, E>& image, const Domain& domain)
   {
     return image.clip(domain);
   }
@@ -49,11 +49,9 @@ namespace mln
 
   template <typename T, unsigned dim, typename E, typename Domain>
   std::enable_if_t<std::is_convertible<Domain, typename ndimage_base<T, dim, E>::domain_type>::value, E>
-  make_subimage(ndimage_base<T, dim, E>&& image, const Domain& domain)
+      make_subimage(ndimage_base<T, dim, E>&& image, const Domain& domain)
   {
     return image.clip(domain);
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_SUB_IMAGE_SPE_HPP
+} // namespace mln

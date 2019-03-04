@@ -1,20 +1,21 @@
-#include <boost/format.hpp>
+#include "addborder.hpp"
+#include "thicken.hpp"
+#include "topology.hpp"
+
 #include <mln/colors/lsh.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
+#include <mln/graphcut/graphcut.hh>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/labeling/blobs.hpp>
-
-#include <mln/graphcut/graphcut.hh>
-
-#include "addborder.hpp"
-#include "thicken.hpp"
-#include "topology.hpp"
 #include <mln/morpho/tos/tos2.hpp>
+
+#include <boost/format.hpp>
+
 
 namespace mln
 {
@@ -69,7 +70,7 @@ namespace mln
     copy(ima | k1tok0dom, out);
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, const char** argv)
 {

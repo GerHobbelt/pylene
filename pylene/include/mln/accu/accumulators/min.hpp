@@ -1,12 +1,13 @@
-#ifndef MLN_ACCU_ACCUMULATORS_MIN_HPP
-#define MLN_ACCU_ACCUMULATORS_MIN_HPP
+#pragma once
 
 /// \file
 /// FIXME: use literal::zero instead of default initialization
 
 #include <mln/accu/accumulator_base.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 #include <utility>
+
 
 namespace mln
 {
@@ -74,7 +75,7 @@ namespace mln
       struct min<void> : simple_feature_facade<min<void>, internal::meta_min>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -84,7 +85,7 @@ namespace mln
       {
         return extract(exact(acc), features::min<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -124,8 +125,6 @@ namespace mln
         T       m_val;
         Compare m_cmp;
       };
-    }
-  }
-}
-
-#endif // !MLN_ACCU_ACCUMULATORS_MIN_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

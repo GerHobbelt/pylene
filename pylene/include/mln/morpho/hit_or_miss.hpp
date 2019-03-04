@@ -1,9 +1,9 @@
-#ifndef MLN_MORPHO_HIT_OR_MISS_HPP
-#define MLN_MORPHO_HIT_OR_MISS_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
+
 
 /// \file
 /// \ingroup morpho
@@ -86,7 +86,7 @@ namespace mln
         mln_exiting();
         return out;
       }
-    }
+    } // namespace impl
 
     template <class I, class SEh, class SEm, class OutputImage>
     OutputImage& hit_or_miss(const Image<I>& input, const StructuringElement<SEh>& se_hit,
@@ -106,8 +106,6 @@ namespace mln
       return out;
     }
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
-} // end of namespace mln
-
-#endif // ! MLN_MORPHO_HIT_OR_MISS_HPP
+} // namespace mln

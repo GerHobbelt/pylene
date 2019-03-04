@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
-#define MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
+#pragma once
 
 #include <mln/core/forall.hpp>
 #include <mln/core/range/range.hpp>
+
 
 namespace mln
 {
@@ -17,8 +17,6 @@ namespace mln
         *vin = f();
     }
 
-  } // end of namespace mln::range
+  } // namespace range
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_RANGE_ALGORITHM_GENERATE_HPP
+} // namespace mln

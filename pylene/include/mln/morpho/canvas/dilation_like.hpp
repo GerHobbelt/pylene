@@ -1,14 +1,13 @@
-#ifndef MLN_MORPHO_CANVAS_DILATION_LIKE_HPP
-#define MLN_MORPHO_CANVAS_DILATION_LIKE_HPP
+#pragma once
 
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/kernelv2/kernel.hpp>
+#include <mln/morpho/canvas/private/dilation_by_periodic_line.hpp>
 #include <mln/morpho/se/se.hpp>
 
-#include <mln/morpho/canvas/private/dilation_by_periodic_line.hpp>
 
 namespace mln
 {
@@ -136,7 +135,7 @@ namespace mln
           dilate_like_1(extension::add_value_extension(ima, v), nbh, out, __op__, is_incremental());
         }
 
-      } // end of namespace mln::morpho::canvas::impl
+      } // namespace impl
 
       namespace overload
       {
@@ -210,13 +209,13 @@ namespace mln
                 dilation_dispatch_2(input, nbh, output, __op__, output.domain());
           }
         }
-      }
+      } // namespace overload
 
-    } // end of namespace mln::morpho::canvas
+    } // namespace canvas
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
-} // end of namespace mln
+} // namespace mln
 
 namespace mln
 {
@@ -233,10 +232,8 @@ namespace mln
         overload::dilation_dispatch_1(exact(ima), exact(nbh), exact(output), __op__, typename SE::is_decomposable());
       }
 
-    } // end of namespace mln::morpho::canvas
+    } // namespace canvas
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_CANVAS_DILATION_LIKE_HPP
+} // namespace mln

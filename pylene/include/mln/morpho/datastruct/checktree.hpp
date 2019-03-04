@@ -1,7 +1,7 @@
-#ifndef MLN_MORPHO_DATASTRUCT_CHECKTREE_HPP
-#define MLN_MORPHO_DATASTRUCT_CHECKTREE_HPP
+#pragma once
 
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -28,8 +28,6 @@ namespace mln
           prec = node;
         }
       }
-    }
-  }
-}
-
-#endif // ! MLN_MORPHO_DATASTRUCT_CHECKTREE_HPP
+    } // namespace internal
+  }   // namespace morpho
+} // namespace mln

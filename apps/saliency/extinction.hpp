@@ -1,10 +1,10 @@
-#ifndef APPS_SALIENCY_EXTINCTION_HPP
-#define APPS_SALIENCY_EXTINCTION_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
 
 #include <vector>
+
 
 template <typename V, typename T, class Compare = std::less<V>>
 mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
@@ -28,7 +28,7 @@ namespace internal
   }
 
 #endif
-}
+} // namespace internal
 
 template <typename V, typename T, class Compare>
 mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
@@ -133,5 +133,3 @@ mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, c
   mln_exiting();
   return extmap;
 }
-
-#endif // ! EXTINCTION_HPP

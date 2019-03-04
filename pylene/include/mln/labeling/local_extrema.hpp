@@ -1,11 +1,11 @@
-#ifndef MLN_LABELING_LOCAL_MINIMA_HPP
-#define MLN_LABELING_LOCAL_MINIMA_HPP
+#pragma once
 
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -128,7 +128,7 @@ namespace mln
                       "Overflow detected (the number of label has exceed the label type capacity");
         return n_label;
       }
-    }
+    } // namespace details
 
     template <class Label_t, class I, class N, class Compare>
     mln_ch_value(I, Label_t) local_minima(const Image<I>& input_, const Neighborhood<N>& nbh_, int& nlabel, Compare cmp)
@@ -163,7 +163,5 @@ namespace mln
     }
 
 
-  } // end of namespace mln::labeling
-} // end of namespace mln
-
-#endif //! MLN_LABELING_LOCAL_MINIMA_HPP
+  } // namespace labeling
+} // namespace mln

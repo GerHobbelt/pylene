@@ -1,9 +1,9 @@
-#ifndef VALUE_TRAITS_HPP
-#define VALUE_TRAITS_HPP
+#pragma once
 
 #include <functional>
 #include <limits>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -58,6 +58,4 @@ namespace mln
     : value_traits<V, std::less<V>>
   {
   };
-}
-
-#endif // ! VALUE_TRAITS_HPP
+} // namespace mln

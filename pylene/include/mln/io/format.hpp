@@ -1,10 +1,11 @@
-#ifndef MLN_IO_FORMAT_HPP
-#define MLN_IO_FORMAT_HPP
+#pragma once
+
+#include <mln/core/grays.hpp>
 
 #include <cmath>
 #include <iostream>
-#include <mln/core/grays.hpp>
 #include <sstream>
+
 
 namespace mln
 {
@@ -57,7 +58,5 @@ namespace mln
     };
 
     inline std::ostream& format(std::ostream& os, const uint8& v) { return os << (int)v; }
-  }
-}
-
-#endif // ! MLN_IO_FORMAT_HPP
+  } // namespace io
+} // namespace mln

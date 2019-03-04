@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_DYN_NEIGHBORHOOD_HPP
-#define MLN_CORE_NEIGHBORHOOD_DYN_NEIGHBORHOOD_HPP
+#pragma once
 
 #include <mln/core/neighborhood/neighborhood_base.hpp>
 #include <mln/core/neighborhood/sliding_piter.hpp>
@@ -7,6 +6,7 @@
 #include <mln/core/range/iterator_range.hpp>
 #include <mln/core/range/range.hpp>
 #include <mln/core/utils/wrapper.hpp>
+
 
 namespace mln
 {
@@ -73,6 +73,4 @@ namespace mln
   private:
     const SiteSet dpoints;
   };
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_DYN_NEIGHBORHOOD_HPP
+} // namespace mln

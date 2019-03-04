@@ -1,11 +1,11 @@
-#ifndef MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP
-#define MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP
+#pragma once
 
-#include <Eigen/Dense>
 #include <boost/type_traits/promote.hpp>
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/sum.hpp>
+
+#include <Eigen/Dense>
 
 namespace mln
 {
@@ -23,7 +23,7 @@ namespace mln
       template <typename T, typename SumType = typename boost::promote<typename T::value_type>::type,
                 typename SumSqrType = SumType>
       struct covariance;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -48,14 +48,14 @@ namespace mln
           template <typename T>
           using type = accu::accumulators::covariance<T>;
         };
-      }
+      } // namespace internal
 
       template <typename SumType, typename SumSqrType>
       struct covariance : simple_feature_facade<covariance<SumType, SumSqrType>,
                                                 internal::meta_covariance<SumType, SumSqrType>::template type>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -65,7 +65,7 @@ namespace mln
       {
         return extract(exact(acc), features::covariance<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -173,8 +173,6 @@ namespace mln
         vec_t    m_sum;
         matrix_t m_S;
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATORS_COVARIANCE_HPP_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

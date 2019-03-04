@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_BOX_ITER_H
-#define MLN_CORE_BOX_ITER_H
+#pragma once
 
 #include <mln/core/image/internal/nested_loop_iterator.hpp>
 #include <mln/core/point.hpp>
+
 
 namespace mln
 {
@@ -30,7 +30,5 @@ namespace mln
 
       mln::point<T, dim> point_;
     };
-  }
-}
-
-#endif // !MLN_CORE_BOX_ITER_H
+  } // namespace internal
+} // namespace mln

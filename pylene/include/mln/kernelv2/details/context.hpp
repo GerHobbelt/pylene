@@ -1,9 +1,11 @@
-#ifndef MLN_KERNELV2_DETAILS_CONTEXT_HPP
-#define MLN_KERNELV2_DETAILS_CONTEXT_HPP
+#pragma once
 
-#include <boost/proto/proto.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/kernelv2/details/tags.hpp>
+
+#include <boost/proto/proto.hpp>
+
+
 namespace mln
 {
   namespace kernel
@@ -60,8 +62,6 @@ namespace mln
         NVTuple nvals;
       };
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
-
-#endif //! MLN_KERNELV2_DETAILS_CONTEXT_HPP
+    } // namespace details
+  }   // namespace kernel
+} // namespace mln

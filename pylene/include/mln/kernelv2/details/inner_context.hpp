@@ -1,7 +1,7 @@
-#ifndef MLN_KERNELV2_DETAILS_INNER_CONTEXT_HPP
-#define MLN_KERNELV2_DETAILS_INNER_CONTEXT_HPP
+#pragma once
 
 #include <mln/kernelv2/details/eval_context.hpp>
+
 
 namespace mln
 {
@@ -89,8 +89,6 @@ namespace mln
         };
       };
 
-    } // end of namespace mln::kernel::details
-  }   // end of namespace mln::kernel
-} // end of namespace mln
-
-#endif //! MLN_KERNELV2_DETAILS_INNER_CONTEXT_HPP
+    } // namespace details
+  }   // namespace kernel
+} // namespace mln

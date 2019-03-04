@@ -1,13 +1,14 @@
-#ifndef TYPES_HPP
-#define TYPES_HPP
+#pragma once
 
-#include <array>
-#include <boost/graph/adjacency_list.hpp>
 #include <mln/colors/rgba.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/vec.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
+#include <boost/graph/adjacency_list.hpp>
+
+#include <array>
 
 #ifndef MLN_INPUT_VALUE_TYPE
 #define MLN_INPUT_VALUE_TYPE mln::rgb8
@@ -42,5 +43,3 @@ using Graph = boost::adjacency_list<boost::setS, boost::vecS, boost::directedS, 
 typedef mln::property_map<tree_t, Graph<2>::vertex_descriptor> tlink_t;
 typedef Graph<NTREE>                                           MyGraph;
 typedef graph_content<NTREE>                                   my_graph_content;
-
-#endif // ! TYPES_HPP

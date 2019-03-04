@@ -1,10 +1,11 @@
-#ifndef APPS_ATTRIBUTE_CMEANINGFULLNESS_HPP
-#define APPS_ATTRIBUTE_CMEANINGFULLNESS_HPP
+#pragma once
 
 #include "curvature.hpp"
+
 #include <apps/g2/accu/lca.hpp>
 #include <apps/tos/croutines.hpp>
 #include <apps/tos/topology.hpp>
+
 #include <mln/accu/accumulator.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/variance.hpp>
@@ -13,6 +14,7 @@
 #include <mln/core/trace.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
+
 
 namespace mln
 {
@@ -181,6 +183,4 @@ namespace mln
 
     return energy;
   }
-}
-
-#endif // ! APPS_ATTRIBUTE_CMEANINGFULLNESS_HPP
+} // namespace mln

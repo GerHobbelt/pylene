@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_EXTENSION_MIRROR_HPP
-#define MLN_CORE_EXTENSION_MIRROR_HPP
+#pragma once
 
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -45,7 +45,5 @@ namespace mln
       return move_exact(ima);
     }
 
-  } // end of namespace mln::extension
-} // end of namespace mln
-
-#endif // ! MLN_CORE_EXTENSION_FILL_HPP
+  } // namespace extension
+} // namespace mln

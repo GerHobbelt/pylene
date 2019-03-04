@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_MATH_OPS_HPP
-#define MLN_CORE_IMAGE_IMAGE_MATH_OPS_HPP
+#pragma once
 
 #include <mln/core/image/image_expr.hpp>
 #include <mln/core/image/image_ops.hpp>
@@ -24,6 +23,4 @@ namespace mln
   MLN_GENERATE_CONST_UNARY_EXPR(l2norm, functional::l2norm_t);
   MLN_GENERATE_CONST_UNARY_EXPR(linfnorm, functional::linfnorm_t);
   MLN_GENERATE_CONST_BINARY_EXPR(l1dist, functional::l1dist_t);
-}
-
-#endif // ! MLN_CORE_IMAGE_IMAGE_MATH_OPS_HPP
+} // namespace mln

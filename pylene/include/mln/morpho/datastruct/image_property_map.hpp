@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_DATASTRUCT_IMAGE_PROPERTY_MAP_HPP
-#define MLN_MORPHO_DATASTRUCT_IMAGE_PROPERTY_MAP_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood_base.hpp>
@@ -7,6 +6,7 @@
 #include <mln/core/range/transform.hpp>
 #include <mln/morpho/datastruct/attribute_map.hpp>
 #include <mln/morpho/datastruct/component_tree.hpp>
+
 
 namespace mln
 {
@@ -21,7 +21,7 @@ namespace mln
 
     template <class P, class AMap, class ValueMap>
     image_tree_property_map<P, AMap, ValueMap> make_image(const component_tree<P, AMap>& tree, const ValueMap& vmap);
-  }
+  } // namespace morpho
 
   template <class P, class AMap, class ValueMap>
   struct image_traits<morpho::image_tree_property_map<P, AMap, ValueMap>>
@@ -516,7 +516,7 @@ namespace mln
         bool                               m_started;
         typename tree_t::children_iterator m_child_iter;
       };
-    }
+    } // namespace internal
 
     // The neighborhood on the tree
     struct tree_neighb_t : neighborhood_base<tree_neighb_t, adaptative_neighborhood_tag>
@@ -561,7 +561,5 @@ namespace mln
         return R{{std::cref(node_iter)}};
       }
     };
-  }
-}
-
-#endif // ! MLN_MORPHO_DATASTRUCT_IMAGE_PROPERTY_MAP_HPP
+  } // namespace morpho
+} // namespace mln

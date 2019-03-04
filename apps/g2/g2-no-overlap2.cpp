@@ -1,30 +1,29 @@
+#include "compute_g2.hpp"
+#include "types.hpp"
+
+#include <apps/attributes/read.hpp>
+#include <apps/llview/cllview.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
+#include <apps/tos/topology.hpp>
+
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/always.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/morphers/casted_image.hpp>
 #include <mln/core/neighb2d.hpp>
-
+#include <mln/data/stretch.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <mln/data/stretch.hpp>
-
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/tos/ctos.hpp>
 
-#include <mln/accu/accumulators/count.hpp>
-#include <mln/accu/accumulators/mean.hpp>
-
-#include "compute_g2.hpp"
-#include "types.hpp"
-#include <apps/attributes/read.hpp>
-#include <apps/llview/cllview.hpp>
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/addborder.hpp>
-#include <apps/tos/topology.hpp>
 #include <boost/format.hpp>
+
 
 void usage(char** argv)
 {
@@ -44,7 +43,7 @@ namespace mln
 
     io::imsave(out, name);
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

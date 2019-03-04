@@ -1,11 +1,12 @@
-#ifndef GRAPHCUT_HH
-#define GRAPHCUT_HH
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/graph/graph_image2d.hpp>
+
 #include <queue>
+
 
 namespace mln
 {
@@ -853,5 +854,3 @@ namespace mln
     }
   } // namespace graphcut
 } // namespace mln
-
-#endif // ! GRAPHCUT_HH

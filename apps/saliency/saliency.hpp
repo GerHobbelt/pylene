@@ -1,12 +1,14 @@
-#ifndef SALIENCY_HPP
-#define SALIENCY_HPP
+#pragma once
 
 #include <apps/simplification/simplify.hpp> // for compute_depth
 #include <apps/tos/topology.hpp>
+
 #include <mln/accu/accumulators/max.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/image/image2d.hpp>
+
 #include <vector>
+
 
 /**
  * \brief Compute a saliency map from an saliency attribute
@@ -109,5 +111,3 @@ void collapse_zero_nodes(const mln::image2d<V>& attr, mln::image2d<T>& K, mln::i
       parent[x] = parent[q];
   }
 }
-
-#endif // ! SALIENCY_HPP

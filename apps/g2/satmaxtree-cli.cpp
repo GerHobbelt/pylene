@@ -1,14 +1,16 @@
+#include "satmaxtree.hpp"
+
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/topology.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include "satmaxtree.hpp"
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/topology.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
+
 
 void usage(char** argv)
 {

@@ -1,5 +1,4 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_OPS_HPP
-#define MLN_CORE_IMAGE_IMAGE_OPS_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/ops.hpp>
@@ -8,6 +7,7 @@
 
 #include <iostream>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -79,7 +79,7 @@ namespace mln
     {
       typedef ternary_image_scalar_scalar_expr<Op, I1, S1, S2> type;
     };
-  }
+  } // namespace internal
 
 #define MLN_GENERATE_LVALUE_UNARY_EXPR(Name, Obj)                                                                      \
   template <typename I>                                                                                                \
@@ -216,6 +216,4 @@ namespace mln
     return make_ternary_image_scalar_scalar_expr(I(exact(f)), s1, s2, conditional_ternary());
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_IMAGE_OPS_HPP
+} // namespace mln

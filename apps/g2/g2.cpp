@@ -1,25 +1,27 @@
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/morphers/casted_image.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/core/vec/vec_io.hpp>
-
-#include <mln/morpho/component_tree/accumulate.hpp>
-#include <mln/morpho/component_tree/graphviz.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/morpho/tos/ctos.hpp>
-
-#include <mln/accu/accumulators/accu_if.hpp>
-#include <mln/accu/accumulators/count.hpp>
+#include "compute_g2.hpp"
+#include "reconstruct.hpp"
+#include "remove_parent_relation.hpp"
+#include "routines.hpp"
 
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/topology.hpp>
 
+#include <mln/accu/accumulators/accu_if.hpp>
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/vec/vec_io.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <fstream>
+#include <mln/morpho/component_tree/accumulate.hpp>
+#include <mln/morpho/component_tree/compute_depth.hpp>
+#include <mln/morpho/component_tree/graphviz.hpp>
+#include <mln/morpho/component_tree/pattern_spectra.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/tos/ctos.hpp>
 
 #include <boost/format.hpp>
 #include <boost/graph/dag_shortest_paths.hpp>
@@ -30,13 +32,8 @@
 #include <boost/graph/transpose_graph.hpp>
 #include <boost/property_map/function_property_map.hpp>
 
-#include <mln/morpho/component_tree/compute_depth.hpp>
-#include <mln/morpho/component_tree/pattern_spectra.hpp>
+#include <fstream>
 
-#include "compute_g2.hpp"
-#include "reconstruct.hpp"
-#include "remove_parent_relation.hpp"
-#include "routines.hpp"
 
 namespace mln
 {
@@ -88,7 +85,7 @@ namespace mln
       outs.close();
     }
   }
-}
+} // namespace mln
 
 template <class WeightPropertyMap>
 void make_minimum_spanning_tree(Graph& g, const WeightPropertyMap& weights)

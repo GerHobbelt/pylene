@@ -1,10 +1,11 @@
-#ifndef MLN_MORPHO_CANVAS_PRIVATE_DILATION_BY_PERIODIC_LINE_HPP
-#define MLN_MORPHO_CANVAS_PRIVATE_DILATION_BY_PERIODIC_LINE_HPP
+#pragma once
 
 #include "running_max_1d.hpp"
+
 #include <mln/core/domain/box.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -111,8 +112,6 @@ namespace mln
         }
       }
 
-    } // end of namespace mln::morpho::internal
-  }   // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_CANVAS_PRIVATE_DILATION_BY_PERIODIC_LINE_HPP
+    } // namespace internal
+  }   // namespace morpho
+} // namespace mln

@@ -1,11 +1,11 @@
-#ifndef MLN_CORE_IMAGE_INTERNAL_WHERE_HPP
-#define MLN_CORE_IMAGE_INTERNAL_WHERE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/iref.hpp>
 #include <mln/core/iterator/filter_iterator.hpp>
 #include <mln/core/iterator/transform_iterator.hpp>
 #include <mln/core/pixel_utility.hpp>
+
 
 namespace mln
 {
@@ -20,7 +20,7 @@ namespace mln
 
     template <typename I>
     struct where_binary_t;
-  }
+  } // namespace internal
 
   /// \brief Return the domain of the image where the predicate is true.
   ///
@@ -245,7 +245,7 @@ namespace mln
     private:
       mln::iref<I&&> m_ima;
     };
-  }
+  } // namespace internal
 
   template <typename I, class Predicate>
   internal::where_t<const I&, Predicate> where(const Image<I>& ima, const Predicate& pred)
@@ -271,6 +271,4 @@ namespace mln
     return internal::where_binary_t<I>(move_exact(ima));
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_INTERNAL_WHERE_HPP
+} // namespace mln

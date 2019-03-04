@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_IMAGE_DMORPH_EXTENDED_BY_VALUE_IMAGE_HPP
-#define MLN_CORE_IMAGE_DMORPH_EXTENDED_BY_VALUE_IMAGE_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/image_base.hpp>
+
 
 namespace mln
 {
@@ -55,6 +55,4 @@ namespace mln
     typedef typename image_const_pixel_range<image_t>::type const_pixel_range;
   };
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_DMORPH_EXTENDED_BY_VALUE_IMAGE_HPP
+} // namespace mln

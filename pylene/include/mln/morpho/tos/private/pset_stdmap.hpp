@@ -1,8 +1,9 @@
-#ifndef MLN_MORPHO_TOS_PRIVATE_PSET_SET_HPP
-#define MLN_MORPHO_TOS_PRIVATE_PSET_SET_HPP
+#pragma once
+
+#include <mln/core/image/image.hpp>
 
 #include <map>
-#include <mln/core/image/image.hpp>
+
 
 namespace mln
 {
@@ -93,9 +94,7 @@ namespace mln
           return res;
         }
 
-      } // end of namespace mln::morpho::tos::impl
-    }   // end of namespace mln::morpho::tos
-  }     // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_TOS_PRIVATE_PSET_SET_HPP
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
+} // namespace mln

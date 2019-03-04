@@ -1,9 +1,9 @@
-#ifndef STDRANGE_HPP
-#define STDRANGE_HPP
+#pragma once
 
 #include <mln/core/iterator/stditerator.hpp>
 
 #include <utility>
+
 
 namespace mln
 {
@@ -58,6 +58,4 @@ namespace mln
   {
     return static_cast<stdrange<StandardRange>&>(x);
   }
-}
-
-#endif // ! STDRANGE_HPP
+} // namespace mln

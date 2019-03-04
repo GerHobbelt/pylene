@@ -1,9 +1,9 @@
-#ifndef MORPHER_BASE_HPP
-#define MORPHER_BASE_HPP
+#pragma once
 
 #include <mln/core/image/morphers/details/morpher_core_access.hpp>
 #include <mln/core/image_base.hpp>
 #include <mln/core/pixel_utility.hpp>
+
 
 //
 // This interface aims at easing the creation of image morpher.
@@ -145,7 +145,7 @@ namespace mln
       MLN_IMMORPHER_FORWARD_CONST_1(delta_index, difference_type, const point_type&);
       MLN_IMMORPHER_FORWARD_CONST_1(point_at_index, point_type, size_type);
     };
-  }
+  } // namespace impl
 
   template <typename Derived, typename I, typename P, typename V>
   struct morpher_base : image_base<Derived, P, V>,
@@ -211,7 +211,7 @@ namespace mln
   // private:
   //   Pixel m_pix;
   // };
-}
+} // namespace mln
 
 #undef MLN_IMMORPHER_FORWARD_0_
 #undef MLN_IMMORPHER_FORWARD_0
@@ -223,5 +223,3 @@ namespace mln
 #undef MLN_IMMORPHER_FORWARD_CONST_1
 #undef MLN_IMMORPHER_FORWARD_IF_1
 #undef MLN_IMMORPHER_FORWARD_IF_CONST_1
-
-#endif // ! MORPHER_BASE_HPP

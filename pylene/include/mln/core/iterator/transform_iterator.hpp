@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
-#define MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
+#pragma once
 
 #include <mln/core/iterator/iterator_base.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -84,7 +84,7 @@ namespace mln
       void __outer_next() { this->it_.__outer_next(); }
       bool __outer_finished() const { return this->it_.__outer_finished(); }
     };
-  }
+  } // namespace details
 
   template <class Iter, class UnaryFunction>
   struct transform_iterator : details::transform_iterator_base<Iter, UnaryFunction>
@@ -98,6 +98,4 @@ namespace mln
     return transform_iterator<Iterator, UnaryFunction>(it, f);
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_ITERATOR_TRANSFORM_ITERATOR_HPP
+} // namespace mln

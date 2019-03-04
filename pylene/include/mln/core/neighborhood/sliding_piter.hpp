@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP
-#define MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP
+#pragma once
 
 #include <mln/core/iterator/iterator_base.hpp>
 #include <mln/core/range/range.hpp>
 #include <mln/core/utils/wrapper.hpp>
+
 
 namespace mln
 {
@@ -93,6 +93,4 @@ namespace mln
   {
     return {p, s};
   }
-}
-
-#endif // ! MLN_CORE_NEIGHBORHOOD_SLIDING_PITER_HPP
+} // namespace mln

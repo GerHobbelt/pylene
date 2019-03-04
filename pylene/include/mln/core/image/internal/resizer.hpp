@@ -1,12 +1,6 @@
-#ifndef MLN_CORE_IMAGE_IMAGE_HPP
-#warning "Should not been included as a standalone"
-#include <mln/core/image/image.hpp>
-#endif
-
-#ifndef MLN_CORE_IMAGE_INTERNAL_RESIZER_HPP
-#define MLN_CORE_IMAGE_INTERNAL_RESIZER_HPP
-
+#pragma once
 #include <mln/core/image/internal/reindex.hpp>
+
 
 namespace mln
 {
@@ -205,7 +199,7 @@ namespace mln
           this->m_border = -1;
         }
       };
-    }
+    } // namespace impl
 
     template <class OutputImage, class InputImageOrInputDomain>
     struct resizer : std::conditional<is_a<InputImageOrInputDomain, Image>::value,
@@ -224,7 +218,7 @@ namespace mln
       }
     };
 
-  } // end of namespace mln::internal
+  } // namespace internal
 
   template <typename I, typename J>
   inline internal::resizer<I, J> resize(Image<I>& ima, const Image<J>& other)
@@ -232,6 +226,4 @@ namespace mln
     return {exact(ima), exact(other)};
   }
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_IMAGE_INTERNAL_RESIZER_HPP
+} // namespace mln

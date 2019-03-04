@@ -1160,4 +1160,4 @@ namespace mln
     }
   } // namespace internal
 
-} // end of namespace mln
+} // namespace mln

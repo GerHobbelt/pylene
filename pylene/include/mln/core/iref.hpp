@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_IREF_HPP
-#define MLN_CORE_IREF_HPP
+#pragma once
 
 #include <mln/core/assert.hpp>
 
 #include <memory>
+
 
 namespace mln
 {
@@ -72,6 +72,4 @@ namespace mln
   private:
     I m_x;
   };
-}
-
-#endif // !MLN_CORE_IREF_HPP
+} // namespace mln

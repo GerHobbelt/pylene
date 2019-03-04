@@ -1,10 +1,9 @@
-#ifndef STDITERATOR_HPP
-#define STDITERATOR_HPP
-
+#pragma once
 #include <mln/core/iterator/iterator_base.hpp>
 
 #include <iterator>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -48,6 +47,4 @@ namespace mln
     Iterator_ begin_;
     Iterator_ end_;
   };
-}
-
-#endif // ! STDITERATOR_HPP
+} // namespace mln

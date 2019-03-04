@@ -1,9 +1,10 @@
-#ifndef RANGE_TRAITS_HPP
-#define RANGE_TRAITS_HPP
+#pragma once
 
 #include <mln/core/concept/iterator.hpp>
 #include <mln/core/iterator/stditerator.hpp>
+
 #include <type_traits>
+
 
 namespace mln
 {
@@ -62,7 +63,7 @@ namespace mln
     struct has_iter_member<R, decltype(std::declval<R>().iter(), (void)0)> : std::true_type
     {
     };
-  }
+  } // namespace impl
 
   template <typename R>
   struct is_mln_range : mln::is_a<typename R::iterator, Iterator>
@@ -204,12 +205,10 @@ namespace mln
       typedef typename iterator_to_range_trait<typename std::iterator_traits<typename R::iterator>::type>::category
           category;
     };
-  }
+  } // namespace internal
 
   template <typename R>
   struct range_traits : internal::range_traits<R, is_mln_range<R>::value>
   {
   };
-}
-
-#endif // ! RANGE_TRAITS_HPP
+} // namespace mln

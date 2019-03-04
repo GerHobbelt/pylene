@@ -1,5 +1,4 @@
-#ifndef COMPUTE_TREE_DISTANCE_HPP
-#define COMPUTE_TREE_DISTANCE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
@@ -10,6 +9,7 @@
 #include <mln/morpho/tos/pset.hpp>
 #include <mln/morpho/tos/pset_priority.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
 
 namespace mln
 {
@@ -78,7 +78,7 @@ namespace mln
           return x;
         }
       };
-    }
+    } // namespace internal
 
     template <typename I, typename Neighborhood, class Distance>
     std::tuple<mln_concrete(I), mln_ch_value(I, typename I::size_type), std::vector<typename I::size_type>>
@@ -226,11 +226,5 @@ namespace mln
       // All done !
       return std::make_tuple(std::move(K), std::move(parent), std::move(S));
     }
-  }
-}
-
-#ifndef MLN_INCLUDE_ONLY
-
-#endif // ! MLN_INCLUDE_ONLY
-
-#endif // ! COMPUTE_TREE_DISTANCE_HPP
+  } // namespace morpho
+} // namespace mln

@@ -1,11 +1,12 @@
-#ifndef MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP
-#define MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP
+#pragma once
 
-#include <boost/concept_check.hpp>
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/object.hpp>
 #include <mln/core/concept/pixel.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
+
+#include <boost/concept_check.hpp>
+
 
 namespace mln
 {
@@ -85,6 +86,4 @@ namespace mln
     // P p;
     // pixel_archetype<P> pix;
   };
-}
-
-#endif // ! MLN_CORE_CONCEPT_NEIGHBORHOOD_HPP
+} // namespace mln

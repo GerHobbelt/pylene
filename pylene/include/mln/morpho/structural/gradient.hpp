@@ -1,5 +1,4 @@
-﻿#ifndef MLN_MORPHO_STRUCTURAL_GRADIENT_HPP
-#define MLN_MORPHO_STRUCTURAL_GRADIENT_HPP
+﻿#pragma once
 
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image.hpp>
@@ -8,6 +7,7 @@
 #include <mln/morpho/se/se.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
+
 
 /// \file
 
@@ -150,7 +150,7 @@ namespace mln
 
           mln::transform(ima - d, norm, out);
         }
-      }
+      } // namespace impl
 
       template <class I, class SE, class Compare, class Norm, class O>
       void gradient(const Image<I>& ima_, const StructuringElement<SE>& se_, Compare cmp, Norm norm, Image<O>& output)
@@ -231,8 +231,6 @@ namespace mln
 
         return out;
       }
-    }
-  }
-}
-
-#endif // !MLN_MORPHO_STRUCTURAL_GRADIENT_HPP
+    } // namespace structural
+  }   // namespace morpho
+} // namespace mln

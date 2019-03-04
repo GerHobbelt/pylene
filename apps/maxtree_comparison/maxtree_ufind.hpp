@@ -1,13 +1,15 @@
-#ifndef MAXTREE_UFIND_HPP
-#define MAXTREE_UFIND_HPP
+#pragma once
 
 #include <mln/core/algorithm/sort_indexes.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/sub_image.hpp>
 #include <mln/core/wrt_offset.hpp>
-//# include <tbb/parallel_reduce.h>
 #include <mln/io/imprint.hpp>
+
+//# include <tbb/parallel_reduce.h>
+
+
 namespace mln
 {
 
@@ -36,7 +38,7 @@ namespace mln
       //   image2d<unsigned> parent;
       //   image2d<unsigned> zpar;
       // };
-    }
+    } // namespace impl
 
     namespace internal
     {
@@ -47,7 +49,7 @@ namespace mln
         else
           return parent[p] = zfind_root(parent, parent[p]);
       }
-    }
+    } // namespace internal
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<unsigned>, std::vector<unsigned>> maxtree(const image2d<V>& ima, const Neighborhood& nbh,
@@ -101,7 +103,5 @@ namespace mln
 
       return std::make_pair(std::move(parent), std::move(S));
     }
-  }
-}
-
-#endif // !MLN_MORPHO_MAXTREE_UFIND_HPP
+  } // namespace morpho
+} // namespace mln

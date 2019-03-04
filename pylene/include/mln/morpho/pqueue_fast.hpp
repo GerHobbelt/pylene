@@ -1,15 +1,17 @@
-#ifndef MLN_MORPHO_PQUEUE_FAST_HPP
-#define MLN_MORPHO_PQUEUE_FAST_HPP
+#pragma once
 
 #ifndef PQUEUE_FAST_SWITCH_HQUEUE_NBITS
 #define PQUEUE_FAST_SWITCH_HQUEUE_NBITS 18
 #endif
 
 #include "bounded_hqueue.hpp"
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/value/indexer.hpp>
+
 #include <queue>
 #include <vector>
+
 
 namespace mln
 {
@@ -34,7 +36,7 @@ namespace mln
 
         bool operator()(size_type p, size_type q) { return m_cmp(m_ima[p], m_ima[q]); }
       };
-    }
+    } // namespace internal
 
     template <class I, typename Compare, typename Enable = void>
     struct priority_queue_ima : public std::priority_queue<typename I::size_type, std::vector<typename I::size_type>,
@@ -104,7 +106,5 @@ namespace mln
       index_type                                       i;
       bounded_hqueue<size_type, nlevels, std::allocator<size_type>, true> m_hq;
     };
-  }
-}
-
-#endif // ! MLN_MORPHO_PQUEUE_FAST_HPP
+  } // namespace morpho
+} // namespace mln

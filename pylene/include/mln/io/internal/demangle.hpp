@@ -1,12 +1,12 @@
-#ifndef DEMANGLE_HPP
-#define DEMANGLE_HPP
-
-#include <string>
+#pragma once
 
 #if (__GNUC__ && __cplusplus && __GNUC__ >= 3)
 #define MLN_IO_USE_DEMANGLING
 #include <cxxabi.h>
 #endif // __GNUC__
+
+#include <string>
+
 
 namespace mln
 {
@@ -39,8 +39,6 @@ namespace mln
 #endif
         return res;
       }
-    }
-  }
-}
-
-#endif // ! DEMANGLE_HPP
+    } // namespace internal
+  }   // namespace io
+} // namespace mln

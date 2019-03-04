@@ -1,13 +1,14 @@
-#ifndef MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
-#define MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
+#pragma once
 
-#include <boost/type_traits/promote.hpp>
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/accu/composite_accumulator.hpp>
 #include <mln/core/math_ops.hpp>
 #include <mln/core/value/value_traits.hpp>
+
+#include <boost/type_traits/promote.hpp>
+
 
 /// \file
 /// \brief Moment of inertia accumulator.
@@ -34,7 +35,7 @@ namespace mln
       /// \f]
       template <typename T, typename SumType = typename boost::promote<T>::type, typename SumSqrType = SumType>
       struct moment_of_inertia;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -59,7 +60,7 @@ namespace mln
           template <typename T>
           using type = accu::accumulators::moment_of_inertia<T>;
         };
-      }
+      } // namespace internal
 
       template <typename SumType, typename SumSqrType>
       struct moment_of_inertia
@@ -67,7 +68,7 @@ namespace mln
                                 internal::meta_moment_of_inertia<SumType, SumSqrType>::template type>
       {
       };
-    }
+    } // namespace features
 
     namespace extractor
     {
@@ -78,7 +79,7 @@ namespace mln
       {
         return extract(exact(acc), features::moment_of_inertia<>());
       }
-    }
+    } // namespace extractor
 
     namespace accumulators
     {
@@ -161,8 +162,6 @@ namespace mln
         SumType    m_sum;
         SumSqrType m_sum_sqr;
       };
-    }
-  }
-}
-
-#endif // ! MLN_ACCU_ACCUMULATORS_MOMENT_OF_INERTIA_HPP
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln

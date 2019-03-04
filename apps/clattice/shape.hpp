@@ -1,14 +1,15 @@
-#ifndef SHAPE_HPP
-#define SHAPE_HPP
+#pragma once
+
+#include <mln/core/domain/box.hpp>
+
+#include <boost/dynamic_bitset.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include <functional>
-#include <mln/core/domain/box.hpp>
 #include <ostream>
 #include <type_traits>
 #include <unordered_set>
 
-#include <boost/dynamic_bitset.hpp>
-#include <boost/range/iterator_range.hpp>
 
 /**
  *
@@ -119,7 +120,7 @@ namespace std
   /// \brief specialization of hash function for the unordered set of
   template <typename V, class LowerCompare, class UpperCompare>
   struct hash<shape<V, LowerCompare, UpperCompare>>;
-}
+} // namespace std
 
 /*************************************/
 /***       Implementation          ***/
@@ -157,7 +158,7 @@ namespace impl
   {
     return vecprod_isgreaterequal(a.pmin, b.pmin) and vecprod_islessequal(a.pmax, b.pmax);
   }
-}
+} // namespace impl
 
 template <typename V, class LowerCompare, class UpperCompare>
 bool is_shape_included(const shape<V, LowerCompare, UpperCompare>& a, const shape<V, LowerCompare, UpperCompare>& b)
@@ -483,6 +484,4 @@ namespace std
       return h;
     }
   };
-}
-
-#endif // ! SHAPE_HPP
+} // namespace std

@@ -1,6 +1,6 @@
 #include "addborder.hpp"
 #include "topology.hpp"
-#include <boost/format.hpp>
+
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
@@ -9,6 +9,9 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
 
 void usage(int argc, char** argv)
 {
@@ -76,7 +79,7 @@ namespace mln
 
     return output;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

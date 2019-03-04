@@ -1,9 +1,10 @@
-#ifndef MLN_CORE_CONCEPT_ITERATOR_HPP
-#define MLN_CORE_CONCEPT_ITERATOR_HPP
+#pragma once
 
-#include <boost/concept_check.hpp>
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/object.hpp>
+
+#include <boost/concept_check.hpp>
+
 
 namespace mln
 {
@@ -16,7 +17,7 @@ namespace mln
 
     template <typename I>
     struct MultiDimensionalIterator;
-  }
+  } // namespace details
 
   template <typename I>
   struct Iterator : Object<I>
@@ -77,8 +78,6 @@ namespace mln
         (void)__outer_finished;
       }
     };
-  }
+  } // namespace details
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_CONCEPT_ITERATOR_HPP
+} // namespace mln

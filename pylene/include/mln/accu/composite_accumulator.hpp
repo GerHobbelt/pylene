@@ -1,5 +1,7 @@
-#ifndef COMPOSITE_ACCUMULATOR_HPP
-#define COMPOSITE_ACCUMULATOR_HPP
+#pragma once
+
+#include <mln/accu/concept/accumulator.hpp>
+#include <mln/accu/feature.hpp>
 
 #include <boost/fusion/mpl.hpp>
 #include <boost/mpl/assert.hpp>
@@ -15,8 +17,7 @@
 #include <boost/mpl/remove_if.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/transform.hpp>
-#include <mln/accu/concept/accumulator.hpp>
-#include <mln/accu/feature.hpp>
+
 
 namespace mln
 {
@@ -155,7 +156,7 @@ namespace mln
 
         typedef decltype(extract(std::declval<accu>(), Feature())) type;
       };
-    }
+    } // namespace internal
 
     template <typename E, typename T, typename FeatureSet>
     struct composite_accumulator_base : Accumulator<E>
@@ -211,7 +212,5 @@ namespace mln
 
       ResultType to_result() const { return extract(mln::exact(*this), Feature()); }
     };
-  }
-}
-
-#endif // ! COMPOSITE_ACCUMULATOR_HPP
+  } // namespace accu
+} // namespace mln

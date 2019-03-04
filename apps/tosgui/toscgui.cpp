@@ -1,24 +1,23 @@
-#include <QApplication>
-#include <QtGui>
-
-#include <mln/accu/accumulators/mean.hpp>
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/io/imread.hpp>
-
-#include <mln/morpho/filtering.hpp>
-#include <mln/morpho/tos/tos.hpp>
+#include "dispatcher.hpp"
+#include "qattribute.hpp"
 
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/gradient.hpp>
 #include <apps/tos/mumford_shah.hpp>
+
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/morpho/filtering.hpp>
+#include <mln/morpho/tos/tos.hpp>
 #include <mln/qt/imageviewer.hpp>
 
-#include "dispatcher.hpp"
-#include "qattribute.hpp"
+#include <QApplication>
+#include <QtGui>
+
 
 namespace mln
 {
@@ -60,7 +59,7 @@ namespace mln
     }
     return mean;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {

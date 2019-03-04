@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_OPS_HPP
-#define MLN_CORE_OPS_HPP
+#pragma once
 
 #include <algorithm>
 #include <functional>
+
 
 /**
  * \file
@@ -182,7 +182,7 @@ namespace mln
       return std::forward<E1>(expr1) ? std::forward<E2>(expr2) : std::forward<E3>(expr3);
     }
   };
-}
+} // namespace mln
 
 // FIXME: get must be imported in the mln namespace to prevent
 // a dependant name lookup that would force the lookup at
@@ -207,7 +207,7 @@ namespace mln
       using std::get;
       return get<N>(std::forward<C>(obj));
     }
-  }
+  } // namespace internal
 
   template <size_t N, class C>
   decltype(auto) get(C&& obj)
@@ -225,7 +225,7 @@ namespace mln
       return get<N>(std::forward<C>(obj));
     }
   };
-}
+} // namespace mln
 
 /****************************/
 /**  Relational operations **/
@@ -293,12 +293,10 @@ namespace mln
 
       R operator()(const U& x, const V& y) const { return sup<R>(x, y); }
     };
-  }
+  } // namespace functional
 
   /*****************************/
   /** Aggregation operations  **/
   /*****************************/
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_OPS_HPP
+} // namespace mln

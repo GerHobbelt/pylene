@@ -1,8 +1,8 @@
-#ifndef MLN_CORE_VEC_VEC_MATH_OPS_HPP
-#define MLN_CORE_VEC_VEC_MATH_OPS_HPP
+#pragma once
 
 #include <mln/core/math_ops.hpp>
 #include <mln/core/vec.hpp>
+
 
 /**
  * \file Define vectorial overloads for fundamental mathematical and
@@ -267,12 +267,10 @@ namespace mln
       res += pow(abs(x[i]), p);
     return pow(res, 1 / p);
   }
-}
+} // namespace mln
 
 #undef MLN_GEN_CODE
 #undef MLN_GEN_BINARY_CODE
 #undef MLN_VEC_PROMOTE_FUN
 #undef MLN_VEC_PROMOTE
 #undef MLN_PROMOTE_FUNCOMP
-
-#endif // ! MLN_CORE_VEC_VEC_MATH_OPS_HPP

@@ -1,7 +1,7 @@
-#ifndef MLN_MOPRHO_TOS_IMPL_IRANGE_HPP
-#define MLN_MOPRHO_TOS_IMPL_IRANGE_HPP
+#pragma once
 
 #include <mln/io/format.hpp>
+
 
 namespace mln
 {
@@ -54,9 +54,7 @@ namespace mln
           format(os, rng.upper);
           return os << ']';
         }
-      }
-    }
-  }
-}
-
-#endif // ! MLN_MOPRHO_TOS_IRANGE_HPP
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
+} // namespace mln

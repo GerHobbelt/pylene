@@ -1,11 +1,11 @@
-#ifndef MLN_CORE_EXTENSION_EXTENSION_HPP
-#define MLN_CORE_EXTENSION_EXTENSION_HPP
+#pragma once
 
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/extended_by_value_image.hpp>
 #include <mln/core/internal/get_border_from_nbh.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
+
 
 namespace mln
 {
@@ -125,7 +125,7 @@ namespace mln
       {
         return (int)internal::get_border_from_nbh(nbh) > (int)ima.border();
       }
-    }
+    } // namespace impl
 
     template <class I, class N>
     bool need_adjust(const Image<I>& ima, const Neighborhood<N>& nbh)
@@ -134,7 +134,5 @@ namespace mln
                                           typename N::category());
     }
 
-  } // end of namespace mln::extension
-} // end of namespace mln
-
-#endif //! MLN_CORE_EXTENSION_EXTENSION_HPP
+  } // namespace extension
+} // namespace mln

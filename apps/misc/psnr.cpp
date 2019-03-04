@@ -6,20 +6,6 @@
 #include <mln/io/imsave.hpp>
 
 
-template <typename I, class AccuLike, class Extractor = mln::accu::default_extractor>
-[[deprecated]] typename mln::accu::result_of<AccuLike, mln_value(I), Extractor>::type
-    __accumulate(const mln::Image<I>& input, const mln::AccumulatorLike<AccuLike>& accu_,
-                 const Extractor& ex = Extractor())
-{
-  const I& ima = exact(input);
-  auto     a   = mln::accu::make_accumulator(exact(accu_), mln_value(I)());
-
-  mln_foreach (const auto& v, ima.values())
-    a.take(v);
-
-  return ex(a);
-}
-
 int main(int argc, char** argv)
 {
   using namespace mln;
@@ -40,7 +26,7 @@ int main(int argc, char** argv)
   auto diff = imtransform(f_ - g_, [](rgb<float> x) -> double { return l2norm_sqr(x); });
 
   auto   dims = f.domain().shape();
-  double sum  = __accumulate(diff, accu::features::sum<double>());
+  double sum  = mln::accumulate(diff, accu::features::sum<double>());
   double MSE  = sum / (3 * dims[0] * dims[1]);
   std::cout << "MSE: " << MSE << "\n";
 

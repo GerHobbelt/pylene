@@ -1,33 +1,35 @@
-#include <iostream>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/colors.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-#include <mln/morpho/component_tree/component_tree.hpp>
-#include <mln/morpho/component_tree/io.hpp>
-#include <mln/morpho/component_tree/accumulate.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/accu/accumulators/mean.hpp>
-// #include <mln/accu/accumulators/accu_if.hpp>
-// #include <mln/accu/accumulators/accu_transform.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/topology.hpp>
+
+// #include <mln/accu/accumulators/accu_if.hpp>
+// #include <mln/accu/accumulators/accu_transform.hpp>
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/core/colors.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/component_tree/accumulate.hpp>
+#include <mln/morpho/component_tree/component_tree.hpp>
+#include <mln/morpho/component_tree/io.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
+
+#include <iostream>
+
 
 int main(int argc, char** argv)
 {
   if (argc < 4)
-    {
-      std::cerr << "Usage: " << argv[0] << " input.tree img(color|gray)  out.tiff \n"
-                << "Reconstruct from a tree. The image may in K0|K1 with(out) border.\n"
-        ;
-      std::exit(1);
-    }
+  {
+    std::cerr << "Usage: " << argv[0] << " input.tree img(color|gray)  out.tiff \n"
+              << "Reconstruct from a tree. The image may in K0|K1 with(out) border.\n";
+    std::exit(1);
+  }
 
   using namespace mln;
 
 
-  morpho::component_tree<unsigned, image2d<unsigned> > tree;
-  image2d<rgb8> ima;
+  morpho::component_tree<unsigned, image2d<unsigned>> tree;
+  image2d<rgb8>                                       ima;
 
   {
     std::ifstream fs(argv[1], std::ios::binary);
@@ -54,7 +56,3 @@ int main(int argc, char** argv)
   image2d<rgb8> final = Kadjust_to(out, ima.domain());
   io::imsave(final, argv[3]);
 }
-
-
-
-

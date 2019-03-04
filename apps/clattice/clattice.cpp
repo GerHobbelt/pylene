@@ -1,26 +1,25 @@
-#include <mln/core/colors.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/accu/accumulators/infsup.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-
-#include <mln/io/imprint.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-#include <mln/morpho/tos/private/immersion.hpp>
-
-#include <apps/tos/addborder.hpp>
-
-#include <boost/dynamic_bitset.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-
 #include "cuts.hpp"
 #include "export.hpp"
 #include "make_graph.hpp"
 #include "relation.hpp"
 #include "shape.hpp"
+
+#include <apps/tos/addborder.hpp>
+
+#include <mln/accu/accumulators/infsup.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/colors.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imprint.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/tos/private/immersion.hpp>
+
+#include <boost/dynamic_bitset.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
+
 
 using namespace boost::numeric;
 
@@ -283,7 +282,7 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
 
   // 4. Immerse
   image2d<morpho::ToS::impl::irange<Vec>> F;
-  box2d                             dom = f.domain();
+  box2d                                   dom = f.domain();
   if (params.immerse)
   {
     F   = morpho::ToS::impl::immerse(f, rng_porder_less<Vec>());
@@ -545,10 +544,10 @@ int main(int argc, char** argv)
       fs::create_directories(params.export_dir);
   }
 
-  typedef rgb8                     Vec;
+  typedef rgb8                           Vec;
   typedef morpho::ToS::impl::irange<Vec> R;
-  image2d<rgb8>                    ima;
-  image2d<R>                       f;
+  image2d<rgb8>                          ima;
+  image2d<R>                             f;
 
   std::string filename = vm["input"].as<std::string>();
   io::imread(filename.c_str(), ima);

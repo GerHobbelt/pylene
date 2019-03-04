@@ -8,7 +8,7 @@
 #include <mln/accu/accumulators/accu_if.hpp>
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/core/algorithm/transform.hpp>
-#include <mln/core/utils/dontcare.hpp>
+#include <mln/core/dontcare.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/morphers/casted_image.hpp>
 #include <mln/core/neighb2d.hpp>

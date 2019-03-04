@@ -1,91 +1,78 @@
 #pragma once
 
 #include <mln/accu/accumulator.hpp>
-#include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/range/foreach.hpp>
-#include <mln/core/range/view/zip.hpp>
 
-#include <algorithm>
 #include <type_traits>
 
 
-namespace mln::labeling
+namespace mln
 {
 
-  /// Compute a geometric feature (on points) on regions defined by labels.
-  template <typename I, typename AccuLike>
-  std::vector<typename accu::result_of<AccuLike, image_point_t<I>>::type>
-  accumulate(I lbl_input, int nlabel, const AccumulatorLike<AccuLike>& accu);
-
-
-  /// Compute a colorimetric feature (on value) on regions defined by labels.
-  template <typename I, typename J, typename AccuLike>
-  std::vector<typename accu::result_of<AccuLike, image_value_t<J>>::type>
-  accumulate_on(I lbl_input, J values, int nlabel, const AccumulatorLike<AccuLike>& accu);
-
-  /******************************************/
-  /****          Implementation          ****/
-  /******************************************/
-
-  /// Compute a geometric feature (on points) on regions defined by labels.
-  template <typename I, typename AccuLike>
-  std::vector<typename accu::result_of<AccuLike, image_point_t<I>>::type>
-  accumulate(I lbl_input, int nlabel, const AccumulatorLike<AccuLike>& accu)
+  namespace labeling
   {
-    static_assert(mln::is_a<I, mln::details::Image>());
 
-    using R = typename accu::result_of<AccuLike, image_point_t<I>>::type;
-
-    auto acc = accu::make_accumulator(exact(accu), image_point_t<I>());
-    acc.init();
-
-    std::vector<decltype(acc)> vec_acc(nlabel + 1, acc);
-    std::vector<R>             results(nlabel + 1);
-
-
+    template <typename I, typename Label, typename AccuLike>
+    std::vector<typename accu::result_of<AccuLike, mln_point(I)>::type>
+        p_accumulate(const Image<I>& lbl, Label nlabels, const AccumulatorLike<AccuLike>& accu_)
     {
-      mln_foreach (auto px, lbl_input.pixels())
+      static_assert(std::is_same<mln_value(I), Label>::value, "Image value type and Label type must match.");
+
+      const I& ima = exact(lbl);
+      auto     acc = accu::make_accumulator(exact(accu_), mln_point(I)());
+      acc.init();
+
+      typedef decltype(acc) Accu;
+      std::vector<Accu>     accumulators(nlabels + 1, acc);
+
+      // accumulate
       {
-        int lbl = px.val();
-        assert(0 <= lbl && lbl <= nlabel);
-        vec_acc[lbl].take(px.point());
+        mln_pixter(px, ima);
+        mln_forall (px)
+          accumulators[px->val()].take(px->point());
       }
+
+      // extract results
+      typedef typename accu::result_of<AccuLike, mln_point(I)>::type R;
+      std::vector<R>                                                 results(nlabels + 1);
+      {
+        for (unsigned i = 0; i <= nlabels; ++i)
+          results[i] = accumulators[i].to_result();
+      }
+
+      return results;
     }
 
-    std::transform(std::begin(vec_acc), std::end(vec_acc), std::begin(results),
-                   [](auto&& acc) { return acc.to_result(); });
-
-    return results;
-  }
-
-  /// Compute a geometric feature (on points) on regions defined by labels.
-  template <typename I, typename J, typename AccuLike>
-  std::vector<typename accu::result_of<AccuLike, image_value_t<J>>::type>
-  accumulate_on(I lbl_input, J values, int nlabel, const AccumulatorLike<AccuLike>& accu)
-  {
-    static_assert(mln::is_a<I, mln::details::Image>());
-    static_assert(mln::is_a<J, mln::details::Image>());
-
-    using R = typename accu::result_of<AccuLike, image_value_t<J>>::type;
-
-    auto acc = accu::make_accumulator(exact(accu), image_value_t<J>());
-    acc.init();
-
-    std::vector<decltype(acc)> vec_acc(nlabel + 1, acc);
-    std::vector<R>             results(nlabel + 1);
-
+    template <typename I, typename J, typename Label, typename AccuLike>
+    std::vector<typename accu::result_of<AccuLike, mln_value(J)>::type>
+        v_accumulate(const Image<I>& lbl_, const Image<J>& f_, Label nlabels, const AccumulatorLike<AccuLike>& accu_)
     {
-      auto zz = mln::ranges::view::zip(lbl_input.values(), values.values());
-      mln_foreach ((auto [lbl, v]), zz)
-      {
-        assert(0 <= lbl && lbl <= nlabel);
-        vec_acc[lbl].take(v);
-      }
-    }
+      static_assert(std::is_same<mln_value(I), Label>::value, "Image value type and Label type must match.");
 
-    std::transform(std::begin(vec_acc), std::end(vec_acc), std::begin(results),
-                   [](auto&& acc) { return acc.to_result(); });
-    return results;
-  }
-} // namespace mln::labeling
+      const I& lbl = exact(lbl_);
+      const J& f   = exact(f_);
+      auto     acc = accu::make_accumulator(exact(accu_), mln_value(J)());
+      acc.init();
+
+      typedef decltype(acc) Accu;
+      std::vector<Accu>     accumulators(nlabels + 1, acc);
+
+      // accumulate
+      {
+        mln_pixter(px1, px2, lbl, f);
+        mln_forall (px1, px2)
+          accumulators[px1->val()].take(px2->val());
+      }
+
+      // extract results
+      typedef typename accu::result_of<AccuLike, mln_value(J)>::type R;
+      std::vector<R>                                                 results(nlabels + 1);
+      {
+        for (unsigned i = 0; i <= nlabels; ++i)
+          results[i] = accumulators[i].to_result();
+      }
+
+      return results;
+    }
+  } // namespace labeling
+} // namespace mln

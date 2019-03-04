@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_TOS_PRIVATE_IMMERSION_HPP
-#define MLN_MORPHO_TOS_PRIVATE_IMMERSION_HPP
+#pragma once
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
@@ -123,7 +122,4 @@ namespace mln
       } // namespace impl
     }   // namespace ToS
   }     // namespace morpho
-} // end of namespace mln
-
-
-#endif //! MLN_MORPHO_TOS_PRIVATE_IMMERSION_HPP
+} // namespace mln

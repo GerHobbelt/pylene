@@ -1,5 +1,4 @@
-#ifndef MLN_MORPHO_TOS_PRIVATE_PROPAGATION_HPP
-#define MLN_MORPHO_TOS_PRIVATE_PROPAGATION_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
@@ -8,6 +7,7 @@
 #include <mln/core/trace.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/morpho/tos/private/pset.hpp>
+
 
 namespace mln
 {
@@ -120,9 +120,7 @@ namespace mln
         }
 
 
-      } // end of namespace mln::morpho::tos::impl
-    }   // end of namespace mln::morpho::tos
-  }     // end of namespace mln::morpho
-} // end of namespace mln
-
-#endif //! MLN_MORPHO_TOS_PRIVATE_PROPAGATION_HPP
+      } // namespace impl
+    }   // namespace ToS
+  }     // namespace morpho
+} // namespace mln

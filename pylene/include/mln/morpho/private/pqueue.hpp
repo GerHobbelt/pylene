@@ -1,103 +1,72 @@
 #pragma once
 
-#include <mln/core/concepts/image.hpp>
+#include <mln/morpho/private/pqueue_hqueue_fifo.hpp>
 
 
-#include <mln/morpho/private/hpqueue.hpp>
-#include <mln/morpho/private/hlinked_lists.hpp>
-#include <mln/morpho/private/hvector.hpp>
-
-namespace mln::morpho::details
+namespace mln
 {
-  enum class pqueue_impl
+  namespace morpho
   {
-    linked_list,
-    vector,
-  };
+    namespace details
+    {
 
-  /// Provides a priority queue of points with a the fifo property
-  template <class I, pqueue_impl impl_selector = pqueue_impl::linked_list, bool reversed = false>
-  class pqueue_fifo
-  {
-    using key_type   = image_value_t<I>;
-    using value_type = image_point_t<I>;
+      /// Provides a priority queue of points with a the fifo property
+      template <class I>
+      class pqueue_fifo
+      {
+        using key_type   = mln_value(I);
+        using value_type = mln_point(I);
 
+      public:
+        template <class J>
+        pqueue_fifo(const Image<J>& f);
 
+        void                            push(const key_type& priority, const value_type& element);
+        void                            pop();
+        std::pair<key_type, value_type> top() const;
+        bool                            empty() const;
 
-  public:
-    template <class J>
-    pqueue_fifo(J&& f);
+      private:
+        static_assert(value_traits<key_type>::quant <= 16, "Only low quantized type supported.");
 
-    void                            push(const key_type& priority, const value_type& element);
-    void                            push_first(const key_type& priority, const value_type& element);
-    void                            pop();
-    std::pair<key_type, value_type> top() const;
-    bool                            empty() const;
-    bool                            has_key(const key_type& priority) const;
+        pqueue_hqueue_fifo<mln_concrete(I)> m_delegate;
+      };
 
-  private:
-    static_assert(!std::is_signed_v<key_type>, "Must not be signed");
-    static_assert(std::numeric_limits<key_type>::digits <= 16, "Only low quantized type supported.");
+      /******************************************/
+      /****          Implementation          ****/
+      /******************************************/
 
-    static constexpr int nvalues = std::numeric_limits<key_type>::max() + 1;
+      template <class I>
+      template <class J>
+      pqueue_fifo<I>::pqueue_fifo(const Image<J>& f)
+        : m_delegate(f)
+      {
+      }
 
-    using impl_t = std::conditional_t<impl_selector == pqueue_impl::linked_list,
-                                      hlinked_lists<nvalues, value_type, image_ch_value_t<I, value_type>>, //
-                                      hvectors<value_type>>;
+      template <class I>
+      void pqueue_fifo<I>::push(const key_type& k, const value_type& v)
+      {
+        m_delegate.push(k, v);
+      }
 
-    detail::hpqueue<nvalues, value_type, impl_t, reversed> m_delegate;
-  };
+      template <class I>
+      void pqueue_fifo<I>::pop()
+      {
+        m_delegate.pop();
+      }
 
-
-  /******************************************/
-  /****          Implementation          ****/
-  /******************************************/
-
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  template <class J>
-  inline pqueue_fifo<I, impl_selector, reverse>::pqueue_fifo(J&& f)
-    : m_delegate{std::forward<J>(f)}
-  {
-  }
-
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  inline void pqueue_fifo<I, impl_selector, reverse>::push(const key_type& k, const value_type& v)
-  {
-    m_delegate.push_last(k, v);
-  }
-
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  inline void pqueue_fifo<I, impl_selector, reverse>::push_first(const key_type& k, const value_type& v)
-  {
-    m_delegate.push_first(k, v);
-  }
+      template <class I>
+      bool pqueue_fifo<I>::empty() const
+      {
+        return m_delegate.empty();
+      }
 
 
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  inline void pqueue_fifo<I, impl_selector, reverse>::pop()
-  {
-    m_delegate.pop();
-  }
-
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  inline bool pqueue_fifo<I, impl_selector, reverse>::empty() const
-  {
-    return m_delegate.empty();
-  }
-
-
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  inline auto pqueue_fifo<I, impl_selector, reverse>::top() const -> std::pair<key_type, value_type>
-  {
-    return m_delegate.top();
-  }
-
-  template <class I, pqueue_impl impl_selector, bool reverse>
-  inline bool pqueue_fifo<I, impl_selector, reverse>::has_key(const key_type& k) const
-  {
-    return m_delegate.has_key(k);
-  }
-
-
-
-} // namespace mln::morpho::details
+      template <class I>
+      std::pair<mln_value(I), mln_point(I)> pqueue_fifo<I>::top() const
+      {
+        return m_delegate.top();
+      }
+    } // namespace details
+  }   // namespace morpho
+} // namespace mln

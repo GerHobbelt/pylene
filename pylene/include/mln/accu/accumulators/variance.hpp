@@ -9,6 +9,9 @@
 #include <boost/type_traits/promote.hpp>
 
 
+#include <boost/type_traits/promote.hpp>
+
+
 namespace mln
 {
 

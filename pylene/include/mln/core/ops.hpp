@@ -7,6 +7,7 @@
 #include <range/v3/detail/adl_get.hpp> // for ADL get(x)
 
 
+
 /**
  * \file
  * \brief Defines the fundamental logical, arithmetic and relational operators:
@@ -209,7 +210,7 @@ namespace mln
       // Force ADL look up
       return ::ranges::detail::adl_get<N>(std::forward<C>(obj));
     }
-  }
+  } // namespace internal
 
   template <size_t N>
   struct getter

@@ -1,9 +1,9 @@
-#ifndef MLN_CORE_NEIGHB3D_HPP
-#define MLN_CORE_NEIGHB3D_HPP
+#pragma once
 
-#include <array>
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/point.hpp>
+
+#include <array>
 
 
 namespace mln
@@ -57,12 +57,10 @@ namespace mln
                                                      {1, 1, -1},
                                                      {1, 1, 0},
                                                      {1, 1, 1}}};
-  }
+  } // namespace
 
 
   static const c6_t  c6{};
   static const c26_t c26{};
 
-} // end of namespace mln
-
-#endif //! MLN_CORE_NEIGHB3D_HPP
+} // namespace mln

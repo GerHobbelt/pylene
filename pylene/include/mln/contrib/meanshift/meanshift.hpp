@@ -7,6 +7,7 @@
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/vec.hpp>
 
+
 namespace mln
 {
   namespace contrib

@@ -71,7 +71,7 @@ TEST(View, filter_writable)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  mln::experimental::fill(x, 10);
+  mln::fill(x, 10);
   ASSERT_TRUE(mln::all_of(ima <= 10));
 }
 
@@ -118,7 +118,7 @@ TEST(View, filter_twice)
   }
 
   mln::image2d<int> before = mln::experimental::clone(ima);
-  mln::experimental::fill(u, 1);
+  mln::fill(u, 1);
   {
     mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), ima.new_values()))
     {

@@ -105,10 +105,11 @@ TEST(Core, SubImage_sub_domain)
     };
 
     iota(ima, 0);
-    auto ima_sup10 = ima > 10;
-    auto ima_sup20 = ima_sup10 > 20;
-    auto mask      = view::mask(ima, ima_sup20);
-    mln::fill(mask, 42);
+    auto ima_sup10  = ima > 10;
+    auto mask_sup10 = view::mask(ima, ima_sup10);
+    auto ima_sup20  = mask_sup10 > 20;
+    auto mask_sup20 = view::mask(mask_sup10, ima_sup20);
+    mln::fill(mask_sup20, 42);
     ASSERT_TRUE(all_of(ima == ref));
   }
 
@@ -121,8 +122,10 @@ TEST(Core, SubImage_sub_domain)
         {20, 21, 22, 23, 24}  //
     };
     iota(ima, 0);
+
     auto ima_sup10_and_inf20 = ima > 10 && ima < 20;
-    auto mask                = view::mask(ima, ima_sup10_and_inf20);
+
+    [[maybe_unused]] auto mask = view::mask(ima, ima_sup10_and_inf20);
 
     // FIXME : migrate rangev3 @HEAD
     // mln::fill(mask, 42);

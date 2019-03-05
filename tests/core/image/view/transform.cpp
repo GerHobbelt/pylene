@@ -113,7 +113,7 @@ TEST(Core, Transform_Support_Writable)
   {
     auto c1 = view::transform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
     auto c2 = view::transform(ima, [](const std::pair<int, int>& x) { return x.second; });
-    experimental::fill(ima, std::make_pair(12, 12));
+    fill(ima, std::make_pair(12, 12));
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     static_assert(concepts::ConcreteImage<decltype(ima)>);
@@ -132,10 +132,10 @@ TEST(Core, Transform_Support_Writable)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-    experimental::fill(c1, 69);
+    fill(c1, 69);
 
     // Does not compile because direct writing a temporary is forbidden by range-v3
-    // experimental::fill(c2, 69);
+    // fill(c2, 69);
 
     // Test pixel iteration
     // check that properties of pixels are preserved (point + index)
@@ -213,7 +213,7 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
   static_assert(concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  mln::experimental::fill(c, 69);
+  mln::fill(c, 69);
 
   // FIXME: ASSERT_IMAGES_EQ(ref, c);
 }

@@ -25,8 +25,7 @@ TEST(Core, Algorithm_Exp_Fill)
   using namespace mln::experimental::ops;
 
   mln::image2d<std::uint8_t> ima(10, 10);
-  mln::experimental::fill(ima, 69);
+  mln::fill(ima, 69);
 
   ASSERT_TRUE(mln::experimental::all(ima == 69));
 }
-

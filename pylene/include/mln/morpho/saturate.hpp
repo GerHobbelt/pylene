@@ -7,6 +7,32 @@
 #include <queue>
 
 
+namespace impl
+{
+  template <typename I, typename V>
+  void fill(I& ima, const V& v)
+  {
+    mln_viter(pin, ima);
+    mln_forall (pin)
+      *pin = v;
+  }
+} // namespace impl
+
+template <typename OutputImage, typename Value>
+OutputImage& __fill(mln::Image<OutputImage>& output_, const Value& val)
+{
+  OutputImage& output = mln::exact(output_);
+  impl::fill(output, val);
+  return output;
+}
+
+template <typename OutputImage, typename Value>
+OutputImage&& __fill(mln::Image<OutputImage>&& output_, const Value& val)
+{
+  __fill(output_, val);
+  return mln::move_exact(output_);
+}
+
 namespace mln
 {
 
@@ -61,7 +87,7 @@ namespace mln
 
       static_assert(std::is_same<mln_value(J), bool>::value, "Output image value type must be bool");
 
-      mln::fill(out, true);
+      __fill(out, true);
       extension::fill(out, false);
       impl::saturate(ima, nbh, out, pinf);
     }

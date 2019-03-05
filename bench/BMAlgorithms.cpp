@@ -179,11 +179,11 @@ void fill_baseline(mln::image2d<mln::rgb8>& ima, mln::rgb8 v)
 }
 void fill(mln::image2d<mln::uint8>& ima, mln::uint8 v)
 {
-  mln::experimental::fill(ima, v);
+  mln::fill(ima, v);
 }
 void fill(mln::image2d<mln::rgb8>& ima, mln::rgb8 v)
 {
-  mln::experimental::fill(ima, v);
+  mln::fill(ima, v);
 }
 
 

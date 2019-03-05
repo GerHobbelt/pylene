@@ -113,7 +113,7 @@ TEST(Core, UnaryOperator)
   image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
 
   auto g = -ima;
-  ASSERT_TRUE(mln::experimental::all(g == ref));
+  ASSERT_TRUE(mln::all_of(g == ref));
 }
 
 TEST(Core, BinaryOperator_SameTypes)
@@ -132,9 +132,9 @@ TEST(Core, BinaryOperator_SameTypes)
   static_assert(std::is_same_v<decltype(g2)::value_type, uint8_t>);
   static_assert(std::is_same_v<decltype(g3)::value_type, uint8_t>);
 
-  ASSERT_TRUE(mln::experimental::all(g1 == ref));
-  ASSERT_TRUE(mln::experimental::all(g2 == ref));
-  ASSERT_TRUE(mln::experimental::all(g3 == ref));
+  ASSERT_TRUE(mln::all_of(g1 == ref));
+  ASSERT_TRUE(mln::all_of(g2 == ref));
+  ASSERT_TRUE(mln::all_of(g3 == ref));
 }
 
 TEST(Core, BinaryOperators_MixedTypes)
@@ -157,9 +157,9 @@ TEST(Core, BinaryOperators_MixedTypes)
   static_assert(std::is_same_v<decltype(g2)::value_type, RType>);
   static_assert(std::is_same_v<decltype(g3)::value_type, RType>);
 
-  ASSERT_TRUE(mln::experimental::all(g1 == ref));
-  ASSERT_TRUE(mln::experimental::all(g2 == ref));
-  ASSERT_TRUE(mln::experimental::all(g3 == ref));
+  ASSERT_TRUE(mln::all_of(g1 == ref));
+  ASSERT_TRUE(mln::all_of(g2 == ref));
+  ASSERT_TRUE(mln::all_of(g3 == ref));
 }
 
 
@@ -193,10 +193,10 @@ TEST(Core, IfElse)
   static_assert(std::is_same_v<image_reference_t<decltype(f4)>, uint8_t>);
 
   // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
-  // ASSERT_TRUE(mln::experimental::all(f1 == ref_f1));
-  // ASSERT_TRUE(mln::experimental::all(f2 == ref_f2));
-  // ASSERT_TRUE(mln::experimental::all(f3 == ref_f3));
-  // ASSERT_TRUE(mln::experimental::all(f4 == ref_f4));
+  // ASSERT_TRUE(mln::all_of(f1 == ref_f1));
+  // ASSERT_TRUE(mln::all_of(f2 == ref_f2));
+  // ASSERT_TRUE(mln::all_of(f3 == ref_f3));
+  // ASSERT_TRUE(mln::all_of(f4 == ref_f4));
 
 
   image2d<uint8_t> ref_x = {{1, 2, 3}, //
@@ -207,8 +207,8 @@ TEST(Core, IfElse)
   // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
   // mln::fill(f2, 42);
 
-  // ASSERT_TRUE(mln::experimental::all(x == ref_x));
-  // ASSERT_TRUE(mln::experimental::all(y == ref_y));
+  // ASSERT_TRUE(mln::all_of(x == ref_x));
+  // ASSERT_TRUE(mln::all_of(y == ref_y));
 }
 
 TEST(Core, Where)

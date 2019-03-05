@@ -1,3 +1,4 @@
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
@@ -27,5 +28,5 @@ TEST(Core, Algorithm_Exp_Fill)
   mln::image2d<std::uint8_t> ima(10, 10);
   mln::fill(ima, 69);
 
-  ASSERT_TRUE(mln::experimental::all(ima == 69));
+  ASSERT_TRUE(mln::all_of(ima == 69));
 }

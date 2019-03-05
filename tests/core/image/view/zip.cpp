@@ -1,3 +1,4 @@
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
@@ -43,8 +44,8 @@ TEST(Core, ZipImage_Mixed_writable)
 
   fill(x, std::make_tuple(2, 4));
 
-  ASSERT_TRUE(mln::experimental::all(ima == 2));
-  ASSERT_TRUE(mln::experimental::all(ima2 == 4));
+  ASSERT_TRUE(mln::all_of(ima == 2));
+  ASSERT_TRUE(mln::all_of(ima2 == 4));
 }
 
 
@@ -71,8 +72,8 @@ TEST(Core, ZipImage_Value_Iteration_1)
 
   ::ranges::for_each(x.new_values(), [](std::tuple<int&, uint16&> w) { w = std::make_tuple(2, 4); });
 
-  ASSERT_TRUE(mln::experimental::all(a == 2));
-  ASSERT_TRUE(mln::experimental::all(b == 4));
+  ASSERT_TRUE(mln::all_of(a == 2));
+  ASSERT_TRUE(mln::all_of(b == 4));
 }
 
 TEST(Core, ZipImage_Pixel_Iteration_1)
@@ -97,8 +98,8 @@ TEST(Core, ZipImage_Pixel_Iteration_1)
 
   ::ranges::for_each(x.new_pixels(), [](auto px) { px.val() = std::make_tuple(2, 4); });
 
-  ASSERT_TRUE(mln::experimental::all(a == 2));
-  ASSERT_TRUE(mln::experimental::all(b == 4));
+  ASSERT_TRUE(mln::all_of(a == 2));
+  ASSERT_TRUE(mln::all_of(b == 4));
 }
 
 TEST(Core, ZipImage_Value_Iteration_2)
@@ -151,5 +152,5 @@ TEST(Core, ZipImage_Temporary_usage)
   mln_foreach_new (auto w, x.new_values())
     std::get<0>(w) = std::get<1>(w);
 
-  ASSERT_TRUE(mln::experimental::all(ima == make_image()));
+  ASSERT_TRUE(mln::all_of(ima == make_image()));
 }

@@ -151,34 +151,6 @@ namespace mln::experimental
                                                      std::move(iffalse));
   }
 
-
-  // FIXME: deprecated => replace with algorithm all_of
-  template <class I>
-  [[deprecated]] bool all(I ima) {
-    static_assert(mln::is_a<I, Image>());
-    static_assert(std::is_convertible<typename I::reference, bool>());
-
-    mln_foreach_new (auto&& val, ima.new_values())
-      if (!val)
-        return false;
-
-    return true;
-  }
-
-
-  template <class I>
-  [[deprecated]] bool any(I ima) {
-    static_assert(mln::is_a<I, Image>());
-    static_assert(std::is_convertible<typename I::reference, bool>());
-
-    mln_foreach_new (auto&& val, ima.new_values())
-      if (val)
-        return true;
-
-    return false;
-  }
-
-
 #undef MLN_PRIVATE_DEFINE_UNARY_OPERATOR
 #undef MLN_PRIVATE_DEFINE_BINARY_OPERATOR
 

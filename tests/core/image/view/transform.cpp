@@ -1,3 +1,4 @@
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
@@ -236,6 +237,6 @@ TEST(Core, Transformed2Image_transform_byval_chain)
     [[maybe_unused]] auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
 
     // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
-    // [[maybe_unused]] auto z = mln::experimental::all(out);
+    // [[maybe_unused]] auto z = mln::all_of(out);
   }
 }

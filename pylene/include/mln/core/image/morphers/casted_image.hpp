@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/image/morphers/transformed_image.hpp>
+#include <mln/core/image/view/transform.hpp>
 
 
 namespace mln
@@ -25,6 +26,15 @@ namespace mln
   template <class V, class I>
   casted_image<I, V> imcast(Image<I>&& ima);
 
+  namespace experimental
+  {
+    template <class I, class V>
+    using casted_image = transform_view<I, internal::cast_to<V>>;
+
+    template <class IntputImage, class V>
+    casted_image<IntputImage, V> imcast(IntputImage ima);
+  } // namespace experimental
+
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -45,18 +55,27 @@ namespace mln
   template <class V, class I>
   casted_image<const I&, V> imcast(const Image<I>& ima)
   {
-    return casted_image<const I&, V>(exact(ima), internal::cast_to<V>());
+    return casted_image<const I&, V>(exact(ima), internal::cast_to<V>{});
   }
 
   template <class V, class I>
   casted_image<I&, V> imcast(Image<I>& ima)
   {
-    return casted_image<I&, V>(exact(ima), internal::cast_to<V>());
+    return casted_image<I&, V>(exact(ima), internal::cast_to<V>{});
   }
 
   template <class V, class I>
   casted_image<I, V> imcast(Image<I>&& ima)
   {
-    return casted_image<I, V>(move_exact(ima), internal::cast_to<V>());
+    return casted_image<I, V>(move_exact(ima), internal::cast_to<V>{});
   }
+
+  namespace experimental
+  {
+    template <class IntputImage, class V>
+    casted_image<IntputImage, V> imcast(IntputImage ima)
+    {
+      return view::transform(std::move(ima), internal::cast_to<V>{});
+    }
+  } // namespace experimental
 } // namespace mln

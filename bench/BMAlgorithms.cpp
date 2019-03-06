@@ -275,11 +275,11 @@ void paste_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& 
 }
 void paste(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-  mln::experimental::paste(in, out);
+  mln::paste(in, out);
 }
 void paste(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out)
 {
-  mln::experimental::paste(in, out);
+  mln::paste(in, out);
 }
 
 

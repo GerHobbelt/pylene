@@ -36,7 +36,7 @@ TEST(Core, Experimental_Algorithm_Paste)
   mln::image2d<uint8_t> out(15, 15);
   mln::fill(ima, 69);
   mln::iota(out, 1);
-  mln::experimental::paste(ima, out);
+  mln::paste(ima, out);
   // 1   2  3  4..
   // 16  x  x  19
   // 31  x  x  34

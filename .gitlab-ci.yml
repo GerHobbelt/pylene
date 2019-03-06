@@ -26,8 +26,7 @@ before_script:
     dependencies: []
     artifacts:
         reports:
-            junit: build/tests/UT*.xml
-            junit: build/bench/tests/UT*.xml
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days
 
 distcheck-linux-gcc-release:

@@ -398,7 +398,7 @@ BENCHMARK_F(BMAlgorithms, sort_points_buffer2d_large_int)(benchmark::State& st)
     return res;
   };
 
-  mln::image2d<int> tmp = mln::experimental::transform(m_input_rgb8, bit_mix);
+  mln::image2d<int> tmp = mln::transform(m_input_rgb8, bit_mix);
   while (st.KeepRunning())
     sort_points(tmp);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);

@@ -73,8 +73,9 @@ namespace mln
       double x = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::min() : 0.0;
       double y = (not std::is_floating_point<V>::value) ? (double)value_traits<V>::max() : 1.0;
 
-      double r               = (y - x) / (M - m);
-      mln_ch_value(I, V) out = transform(f, [m, x, r](mln_value(I) v) -> V { return static_cast<V>(x + (v - m) * r); });
+      double r = (y - x) / (M - m);
+      mln_ch_value(I, V) out =
+          transform(ima_f, [m, x, r](mln_value(I) v) -> V { return static_cast<V>(x + (v - m) * r); });
       mln_exiting();
 
       return out;

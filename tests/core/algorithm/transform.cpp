@@ -15,7 +15,7 @@ TEST(Core, Algorithm_Transform)
 
   mln::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
 
-  auto out = mln::experimental::transform(ima, [](uint8_t x) -> uint8_t { return x + 1; });
+  auto out = mln::transform(ima, [](uint8_t x) -> uint8_t { return x + 1; });
   ASSERT_TRUE(mln::all_of(out == ref));
 }
 
@@ -30,6 +30,6 @@ TEST(Core, Algorithm_Transform_LValue)
   mln::image2d<uint8_t> ref = {{1, 2, 3}, {4, 5, 6}};
 
 
-  mln::image2d<uint8_t> out = mln::experimental::transform(ima, &V::first);
+  mln::image2d<uint8_t> out = mln::transform(ima, &V::first);
   ASSERT_TRUE(mln::all_of(out == ref));
 }

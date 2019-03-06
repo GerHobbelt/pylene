@@ -11,6 +11,36 @@
 
 /// \file
 
+// FIXME:
+namespace impl
+{
+  template <typename I, typename J, class UnaryFunction>
+  void transform(const I& input, UnaryFunction f, J& output)
+  {
+    mln_viter(vin, vout, input, output);
+    mln_forall (vin, vout)
+      *vout = f(*vin);
+  }
+} // namespace impl
+
+template <typename InputImage, typename OutputImage, class UnaryFunction>
+OutputImage& __transform(const mln::Image<InputImage>& input, UnaryFunction f, mln::Image<OutputImage>& output)
+{
+  OutputImage& out = exact(output);
+  mln_entering("mln::transform");
+  impl::transform(exact(input), f, exact(output));
+  mln_exiting();
+  return out;
+}
+
+template <typename InputImage, typename OutputImage, class UnaryFunction>
+OutputImage&& __transform(const mln::Image<InputImage>& input, UnaryFunction f, mln::Image<OutputImage>&& output)
+{
+  __transform(input, f, output);
+  return move_exact(output);
+}
+
+
 namespace mln
 {
 
@@ -131,7 +161,8 @@ namespace mln
           auto d = morpho::structural::dilate(ima, nbh, cmp);
           auto e = morpho::structural::erode(ima, nbh, cmp);
 
-          mln::transform(d - e, norm, out);
+          // FIXME:
+          __transform(d - e, norm, out);
         }
 
         // Version non-fast dilate - erode

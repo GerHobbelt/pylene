@@ -299,11 +299,11 @@ void transform_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb
 }
 void transform(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-  mln::experimental::transform(in, out, plus_one);
+  mln::transform(in, out, plus_one);
 }
 void transform(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out)
 {
-  mln::experimental::transform(in, out, plus_one);
+  mln::transform(in, out, plus_one);
 }
 
 

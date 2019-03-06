@@ -117,7 +117,7 @@ TEST(View, filter_twice)
       ASSERT_EQ(pix.val(), ima(pix.point()));
   }
 
-  mln::image2d<int> before = mln::experimental::clone(ima);
+  mln::image2d<int> before = mln::clone(ima);
   mln::fill(u, 1);
   {
     mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), ima.new_values()))

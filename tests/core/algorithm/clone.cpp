@@ -10,7 +10,7 @@ TEST(Core, Algorithm_Clone)
   using namespace mln::experimental::ops;
 
   const mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
-  auto                        out = mln::experimental::clone(ima);
+  auto                        out = mln::clone(ima);
 
   // Writing does not affect ima
   out({0, 0}) = 69;

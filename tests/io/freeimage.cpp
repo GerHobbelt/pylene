@@ -3,6 +3,7 @@
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/io/imprint.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
@@ -64,6 +65,7 @@ TEST(IO, FreeImage_pbm)
 TEST(IO, FreeImage_slow_pgm)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<uint8> ima;
   image2d<uint8> ref(5, 5);
@@ -72,16 +74,18 @@ TEST(IO, FreeImage_slow_pgm)
   io::imread(fixtures::ImagePath::concat_with_filename("iota2d.pgm"), ima);
   ASSERT_TRUE(equal(ima, ref));
 
-  auto tmp = 2u * ref;
-  io::imsave(imcast<uint32>(tmp), "test.tiff");
+  auto imax2 = 2u * ref;
+  io::experimental::imsave(experimental::imcast<uint32>(imax2), "test.tiff");
+
   image2d<unsigned> ima2;
   io::imread("test.tiff", ima2);
-  ASSERT_TRUE(mln::equal(ima2, tmp));
+  ASSERT_TRUE(mln::equal(ima2, imax2));
 }
 
 TEST(IO, FreeImage_slow_ppm)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<rgb8> ima;
   image2d<rgb8> ref(5, 5);
@@ -96,7 +100,7 @@ TEST(IO, FreeImage_slow_ppm)
   ASSERT_TRUE(equal(ima, ref));
 
   auto tmp = 2u * ref;
-  io::imsave(imcast<rgb8>(tmp), "test.tiff");
+  io::experimental::imsave(experimental::imcast<rgb8>(tmp), "test.tiff");
   io::imread("test.tiff", ima);
   ASSERT_TRUE(mln::equal(ima, 2 * ref));
 }
@@ -104,6 +108,7 @@ TEST(IO, FreeImage_slow_ppm)
 TEST(IO, FreeImage_slow_pbm)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<bool> ima;
   image2d<bool> ref(5, 5);
@@ -111,7 +116,7 @@ TEST(IO, FreeImage_slow_pbm)
   mln_foreach (point2d p, ref.domain())
     ref(p) = ((p[0] % 2) == (p[1] % 2));
 
-  io::imsave(lnot(ref), "test.tiff");
+  io::experimental::imsave(not ref, "test.tiff");
   io::imread("test.tiff", ima);
-  ASSERT_TRUE(mln::equal(ima, lnot(ref)));
+  ASSERT_TRUE(mln::equal(ima, not ref));
 }

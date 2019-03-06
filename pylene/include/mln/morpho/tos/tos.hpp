@@ -114,7 +114,7 @@ namespace mln
       {
         if (max_depth < value_traits<uint16>::max())
         {
-          tree = morpho::maxtree_indexes(imcast<uint16>(ord), nbh_t());
+          tree = morpho::maxtree_indexes(mln::imcast<uint16>(ord), nbh_t());
         }
         else
         {

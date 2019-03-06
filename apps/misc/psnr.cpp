@@ -21,8 +21,8 @@ int main(int argc, char** argv)
   io::imread(argv[1], f);
   io::imread(argv[2], g);
 
-  auto f_   = imcast<rgb<float>>(f);
-  auto g_   = imcast<rgb<float>>(g);
+  auto f_   = mln::imcast<rgb<float>>(f);
+  auto g_   = mln::imcast<rgb<float>>(g);
   auto diff = imtransform(f_ - g_, [](rgb<float> x) -> double { return l2norm_sqr(x); });
 
   auto   dims = f.domain().shape();

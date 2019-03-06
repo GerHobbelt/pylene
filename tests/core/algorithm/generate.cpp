@@ -14,7 +14,7 @@ TEST(Core, Algorithm_Generate)
   auto gen = [&i]() { return i++; };
 
   mln::image2d<uint8_t> out(3, 4);
-  mln::experimental::generate(out, gen);
+  mln::generate(out, gen);
 
   mln::image2d<uint8_t> ref = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
 

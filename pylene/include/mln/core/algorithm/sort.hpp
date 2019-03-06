@@ -2,36 +2,35 @@
 
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/range/foreach.hpp>
+#include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
 
 #include <algorithm>
 #include <numeric>
-#include <range/v3/range/concepts.hpp>
-#include <range/v3/functional/concepts.hpp>
+#include <range/v3/range_concepts.hpp>
+#include <range/v3/utility/functional.hpp>
 #include <vector>
 
-namespace mln
+namespace mln::experimental
 {
 
-  template <class InputImage, ::ranges::cpp20::range R, class Compare = std::less<image_value_t<InputImage>>>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  void sort_indexes(InputImage input, R&& rng, Compare cmp = Compare{});
+  template <class InputImage, class R, class Compare = std::less<image_value_t<InputImage>>>
+  std::enable_if_t<::ranges::Range<R>::value> sort_indexes(InputImage input, R&& rng, Compare cmp = Compare{});
 
 
   template <class InputImage, class Compare = std::less<image_value_t<InputImage>>>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  std::vector<image_index_t<InputImage>> sort_indexes(InputImage input, Compare cmp = Compare{});
+  std::enable_if_t<!::ranges::Range<Compare>::value, std::vector<image_index_t<InputImage>>>
+      sort_indexes(InputImage input, Compare cmp = Compare{});
 
-  template <class InputImage, ::ranges::cpp20::range R, class Compare = std::less<image_value_t<InputImage>>>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  void sort_points(InputImage input, R&& rng, Compare cmp = Compare{});
+  template <class InputImage, class R, class Compare = std::less<image_value_t<InputImage>>>
+  std::enable_if_t<::ranges::Range<R>::value> sort_points(InputImage input, R&& rng, Compare cmp = Compare{});
+
 
   template <class InputImage, class Compare = std::less<image_value_t<InputImage>>>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  std::vector<image_point_t<InputImage>> sort_points(InputImage input, Compare cmp = Compare{});
+  std::enable_if_t<!::ranges::Range<Compare>::value, std::vector<image_point_t<InputImage>>>
+      sort_points(InputImage input, Compare cmp = Compare{});
 
 
   /******************************************/
@@ -79,7 +78,7 @@ namespace mln
       sort_compute_cumulated_histogram(input, histogram, nvalues, proj);
 
       auto out = ::ranges::begin(rng);
-      mln_foreach (auto px, input.pixels())
+      mln_foreach_new (auto px, input.new_pixels())
       {
         std::ptrdiff_t pos = histogram[proj(px.val())]++;
         if constexpr (use_p)
@@ -98,7 +97,7 @@ namespace mln
       // Copy to container
       {
         auto it = ::ranges::begin(rng);
-        mln_foreach (auto px, input.pixels())
+        mln_foreach_new (auto px, input.new_pixels())
         {
           if constexpr (use_p)
             *it = px.point();
@@ -121,14 +120,14 @@ namespace mln
   } // namespace impl
 
 
-  template <class InputImage, ::ranges::cpp20::range R, class Compare>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  void sort_indexes(InputImage input, R&& rng, Compare cmp)
+  template <class InputImage, class R, class Compare>
+  std::enable_if_t<::ranges::Range<R>::value> sort_indexes(InputImage input, R&& rng, Compare cmp)
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>(), "Input is not an image.");
+    static_assert(mln::is_a<InputImage, Image>(), "Input is not an image.");
     static_assert(InputImage::indexable::value, "Input must be indexable.");
-    static_assert(::ranges::cpp20::output_range<R, image_index_t<InputImage>>, "'rng' is not an output range");
-    static_assert(::ranges::cpp20::random_access_range<R>, "'rng' must be random access (e.g. std::vector)");
+    static_assert(::ranges::OutputRange<R, image_index_t<InputImage>>(), "'rng' is not an output range");
+    static_assert(::ranges::RandomAccessRange<R>(), "'rng' must be random access (e.g. std::vector)");
+    static_assert(::ranges::Relation<Compare, image_value_t<InputImage>>());
 
     using V = image_value_t<InputImage>;
 
@@ -141,26 +140,29 @@ namespace mln
       impl::sort_by_quicksort<false>(input, rng, cmp);
   }
 
-  template <class InputImage, class Compare>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  std::vector<image_index_t<InputImage>> sort_indexes(InputImage input, Compare cmp)
+
+  template <class InputImage, class R, class Compare>
+  std::enable_if_t<!::ranges::Range<Compare>::value, std::vector<image_index_t<InputImage>>>
+      sort_indexes(InputImage input, Compare cmp)
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>(), "Input is not an image.");
+    static_assert(mln::is_a<InputImage, Image>(), "Input is not an image.");
     static_assert(InputImage::indexable::value, "Input must be indexable.");
+    static_assert(::ranges::Relation<Compare, image_value_t<InputImage>>());
 
     std::vector<image_index_t<InputImage>> out(input.domain().size());
-    mln::sort_indexes(std::move(input), out, cmp);
+    mln::experimental::sort_indexes(std::move(input), out, cmp);
     return out;
   }
 
-  template <class InputImage, ::ranges::cpp20::range R, class Compare>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  void sort_points(InputImage input, R&& rng, Compare cmp)
+
+  template <class InputImage, class R, class Compare>
+  std::enable_if_t<::ranges::Range<R>::value> sort_points(InputImage input, R&& rng, Compare cmp)
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>(), "Input is not an image.");
+    static_assert(mln::is_a<InputImage, Image>(), "Input is not an image.");
     static_assert(InputImage::accessible::value, "Input must be accessible.");
-    static_assert(::ranges::cpp20::output_range<R, image_point_t<InputImage>>, "'rng' is not an output range");
-    static_assert(::ranges::cpp20::random_access_range<R>, "'rng' must be random access (e.g. std::vector)");
+    static_assert(::ranges::Relation<Compare, image_value_t<InputImage>>());
+    static_assert(::ranges::OutputRange<R, image_point_t<InputImage>>(), "'rng' is not an output range");
+    static_assert(::ranges::RandomAccessRange<R>(), "'rng' must be random access (e.g. std::vector)");
 
     using V = image_value_t<InputImage>;
 
@@ -174,16 +176,17 @@ namespace mln
 
 
   template <class InputImage, class Compare>
-  requires ::ranges::cpp20::strict_weak_order<Compare, image_value_t<InputImage>, image_value_t<InputImage>>
-  std::vector<image_point_t<InputImage>> sort_points(InputImage input, Compare cmp)
+  std::enable_if_t<!::ranges::Range<Compare>::value, std::vector<image_point_t<InputImage>>>
+      sort_points(InputImage input, Compare cmp)
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>(), "Input is not an image.");
+    static_assert(mln::is_a<InputImage, Image>(), "Input is not an image.");
     static_assert(InputImage::accessible::value, "Input must be accessible.");
+    static_assert(::ranges::Relation<Compare, image_value_t<InputImage>>());
 
     std::vector<image_point_t<InputImage>> out(input.domain().size());
-    mln::sort_points(std::move(input), out, cmp);
+    mln::experimental::sort_points(std::move(input), out, cmp);
     return out;
   }
 
 
-} // namespace mln::
+} // namespace mln::experimental

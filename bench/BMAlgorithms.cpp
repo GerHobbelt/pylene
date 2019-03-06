@@ -317,11 +317,11 @@ void for_each_baseline(mln::image2d<mln::rgb8>& in)
 }
 void for_each(mln::image2d<mln::uint8>& in)
 {
-  mln::experimental::for_each(in, plus_one_inplace);
+  mln::for_each(in, plus_one_inplace);
 }
 void for_each(mln::image2d<mln::rgb8>& in)
 {
-  mln::experimental::for_each(in, plus_one_inplace);
+  mln::for_each(in, plus_one_inplace);
 }
 
 
@@ -338,7 +338,7 @@ void generate_baseline(mln::image2d<mln::uint8>& ima)
 }
 void generate(mln::image2d<mln::uint8>& ima)
 {
-  mln::experimental::generate(ima, iota_generator);
+  mln::generate(ima, iota_generator);
 }
 
 

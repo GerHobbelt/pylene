@@ -3,15 +3,15 @@
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/trace.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
-#include <mln/core/trace.hpp>
 
-#include <range/v3/utility/functional.hpp>
-#include <range/v3/range_concepts.hpp>
-#include <vector>
 #include <algorithm>
 #include <numeric>
+#include <range/v3/range_concepts.hpp>
+#include <range/v3/utility/functional.hpp>
+#include <vector>
 
 namespace mln::experimental
 {
@@ -43,11 +43,11 @@ namespace mln::experimental
     void sort_compute_cumulated_histogram(I& input, int* histogram, std::size_t /* nvalues */, Proj proj)
     {
       // Comute histogram
-      mln::experimental::for_each(input, [histogram, proj](image_value_t<I> v) { ++histogram[proj(v)]; });
+      mln::for_each(input, [histogram, proj](image_value_t<I> v) { ++histogram[proj(v)]; });
 
       // Sum up values
       // This is what we should use after getting ride of indexer (and use value set / projection)
-      //std::partial_sum(histogram, histogram + nvalues, histogram);
+      // std::partial_sum(histogram, histogram + nvalues, histogram);
 
       using proj_value_t = typename Proj::index_type;
 
@@ -55,7 +55,7 @@ namespace mln::experimental
       auto i     = value_traits<proj_value_t>::min();
       do
       {
-        int tmp = histogram[i];
+        int tmp      = histogram[i];
         histogram[i] = count;
         count += tmp;
       } while (i++ < value_traits<proj_value_t>::max());
@@ -66,17 +66,19 @@ namespace mln::experimental
     {
       mln_entering("mln::sort (counting sort)");
 
-      using projecter_t = indexer<image_value_t<I>, Compare>;
+      using projecter_t  = indexer<image_value_t<I>, Compare>;
       using proj_value_t = typename projecter_t::index_type;
 
       constexpr std::size_t nvalues = 1 << value_traits<proj_value_t>::quant;
 
       projecter_t proj;
-      int histogram[nvalues] = {0, };
+      int         histogram[nvalues] = {
+          0,
+      };
       sort_compute_cumulated_histogram(input, histogram, nvalues, proj);
 
       auto out = ::ranges::begin(rng);
-      mln_foreach_new(auto px, input.new_pixels())
+      mln_foreach_new (auto px, input.new_pixels())
       {
         std::ptrdiff_t pos = histogram[proj(px.val())]++;
         if constexpr (use_p)
@@ -87,7 +89,6 @@ namespace mln::experimental
     }
 
 
-
     template <bool use_p, class I, class OutputRange, class Compare>
     void sort_by_quicksort(I& input, OutputRange& rng, Compare cmp)
     {
@@ -96,7 +97,7 @@ namespace mln::experimental
       // Copy to container
       {
         auto it = ::ranges::begin(rng);
-        mln_foreach_new(auto px, input.new_pixels())
+        mln_foreach_new (auto px, input.new_pixels())
         {
           if constexpr (use_p)
             *it = px.point();
@@ -108,14 +109,15 @@ namespace mln::experimental
 
       // sort
       if constexpr (use_p) // By point
-        std::sort(::ranges::begin(rng), ::ranges::end(rng), [&input, cmp](const auto& x, const auto& y) { return cmp(input(x), input(y)); });
+        std::sort(::ranges::begin(rng), ::ranges::end(rng),
+                  [&input, cmp](const auto& x, const auto& y) { return cmp(input(x), input(y)); });
       else
-        std::sort(::ranges::begin(rng), ::ranges::end(rng), [&input, cmp](auto x, auto y) { return cmp(input[x], input[y]); });
+        std::sort(::ranges::begin(rng), ::ranges::end(rng),
+                  [&input, cmp](auto x, auto y) { return cmp(input[x], input[y]); });
     }
 
 
-  }
-
+  } // namespace impl
 
 
   template <class InputImage, class R, class Compare>

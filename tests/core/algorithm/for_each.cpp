@@ -15,7 +15,7 @@ TEST(Core, Algorithm_For_Each)
 
   mln::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
 
-  mln::experimental::for_each(ima, [](uint8_t& x) { x += 1; });
+  mln::for_each(ima, [](uint8_t& x) { x += 1; });
   ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
@@ -29,6 +29,6 @@ TEST(Core, Algorithm_For_Each_Side_Effects)
 
   int  sum = 0;
   auto g   = [&sum](uint8_t v) { sum += v; };
-  mln::experimental::for_each(ima, g);
+  mln::for_each(ima, g);
   ASSERT_EQ(6 * 7 / 2, sum);
 }

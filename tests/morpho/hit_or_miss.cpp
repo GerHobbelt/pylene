@@ -30,6 +30,6 @@ TEST(Morpho, hit_or_miss)
 
   ASSERT_TRUE(all(out == out2));
 
-  auto out3 = morpho::hit_or_miss(imcast<uint8>(ima), win1, win2);
-  ASSERT_TRUE(all(imcast<uint8>(out) == out3));
+  auto out3 = morpho::hit_or_miss(mln::imcast<uint8>(ima), win1, win2);
+  ASSERT_TRUE(all(mln::imcast<uint8>(out) == out3));
 }

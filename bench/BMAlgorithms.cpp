@@ -257,11 +257,11 @@ bool equal_baseline(const mln::image2d<mln::rgb8>& lhs, const mln::image2d<mln::
 }
 bool equal(const mln::image2d<mln::uint8>& lhs, const mln::image2d<mln::uint8>& rhs)
 {
-  return mln::experimental::equal(lhs, rhs);
+  return mln::equal(lhs, rhs);
 }
 bool equal(const mln::image2d<mln::rgb8>& lhs, const mln::image2d<mln::rgb8>& rhs)
 {
-  return mln::experimental::equal(lhs, rhs);
+  return mln::equal(lhs, rhs);
 }
 
 

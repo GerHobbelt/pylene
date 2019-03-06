@@ -19,6 +19,17 @@ namespace mln
     template <typename I>
     void imsave(const Image<I>& ima, const std::string& path);
 
+    namespace experimental
+    {
+
+      template <typename InputImage>
+      void imsave(InputImage ima, std::ostream& os, FREE_IMAGE_FORMAT fif = FIF_TIFF);
+
+      template <typename InputImage>
+      void imsave(InputImage ima, const std::string& path);
+
+    } // namespace experimental
+
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
@@ -52,6 +63,39 @@ namespace mln
         os.close();
       }
     }
+
+    namespace experimental
+    {
+      template <typename InputImage>
+      void imsave(InputImage ima, std::ostream& os, FREE_IMAGE_FORMAT fif)
+      {
+        mln_entering("mln::io::imsave");
+
+        freeimage_writer_plugin               plugin(os, fif);
+        Saver2D<std::remove_cv_t<InputImage>> saver;
+        saver.save(ima, &plugin, false);
+
+        mln_exiting();
+      }
+
+      template <typename InputImage>
+      void imsave(InputImage ima, const std::string& path)
+      {
+        if (path == "-")
+          imsave(ima, std::cout);
+        else
+        {
+          FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(path.c_str());
+          std::ofstream     os(path, std::ios::binary);
+
+          if (fif == FIF_UNKNOWN)
+            imsave(ima, os);
+          else
+            imsave(ima, os, fif);
+          os.close();
+        }
+      }
+    } // namespace experimental
 
   } // namespace io
 } // namespace mln

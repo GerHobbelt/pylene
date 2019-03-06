@@ -96,7 +96,7 @@ namespace mln
 
     for (unsigned i = 0; i < lambdas.size(); ++i)
     {
-      out[i] = eval(imcast<float>(imtransform(res[i + 1] - res[i], functional::l2norm_t<>())));
+      out[i] = eval(mln::imcast<float>(imtransform(res[i + 1] - res[i], functional::l2norm_t<>())));
     }
 
     return out;

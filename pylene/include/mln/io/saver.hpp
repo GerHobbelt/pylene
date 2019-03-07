@@ -85,6 +85,8 @@ namespace mln
       (void)permissive;
       std::function<void(void*)> write_next_pixel = plugin->get_write_next_pixel_method();
 
+      // FIXME: Oh my! So dirty!
+      // To be fixed with new io facility based on type-erased image for python
       if constexpr (is_a<I, experimental::Image>{})
       {
         for (auto v : const_cast<I*>(&ima)->new_values())

@@ -1,4 +1,5 @@
 #include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/algorithm/equal.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
@@ -191,11 +192,14 @@ TEST(Core, Transform_Supports_Function)
   static_assert(not concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  // FIXME: ASSERT_IMAGES_EQ(ref, c);
+  // FIXME: migrate rangev3 @HEAD
+  // ASSERT_TRUE(mln::equal(ref, c));
 }
 
 TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
+  using namespace mln::experimental::ops;
+
   typedef std::pair<int, int> V;
 
   mln::box2d      dom{{-1, -2}, {3, 3}};
@@ -216,7 +220,8 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 
   mln::fill(c, 69);
 
-  // FIXME: ASSERT_IMAGES_EQ(ref, c);
+  // FIXME: migrate rangev3 @HEAD
+  // ASSERT_TRUE(mln::equal(ref, c));
 }
 
 
@@ -237,6 +242,7 @@ TEST(Core, Transformed2Image_transform_byval_chain)
     [[maybe_unused]] auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
 
     // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+    // FIXME: migrate rangev3 @HEAD
     // [[maybe_unused]] auto z = mln::all_of(out);
   }
 }

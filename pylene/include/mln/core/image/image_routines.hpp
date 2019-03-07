@@ -13,6 +13,39 @@
 #include <type_traits>
 
 
+// FIXME:
+namespace to_migrate
+{
+  namespace impl
+  {
+    // Clone by copy construction
+    template <typename Image>
+    mln_concrete(Image) clone(const Image& ima, std::true_type _use_copy_construction_)
+    {
+      (void)_use_copy_construction_;
+      mln_concrete(Image) x(ima);
+      return x;
+    }
+
+    // Clone by deep copy
+    template <typename Image>
+    mln_concrete(Image) clone(const Image& ima, std::false_type _use_copy_construction_)
+    {
+      (void)_use_copy_construction_;
+      mln_concrete(Image) x = imconcretize(ima);
+      mln::copy(ima, x);
+      return x;
+    }
+  } // namespace impl
+
+
+  template <typename I>
+  [[deprecated]] mln_concrete(I) __clone(const mln::Image<I>& ima) {
+    return impl::clone(exact(ima), mln::check_t<(std::is_convertible<I, mln_concrete(I)>::value and
+                                                 not mln::image_traits<mln_concrete(I)>::shallow_copy::value)>());
+  }
+} // namespace to_migrate
+
 namespace mln
 {
 
@@ -82,39 +115,6 @@ namespace mln
     // return internal::are_indexes_compatible(exact(f), exact(g));
   }
 
-  // FIXME:
-  namespace detail
-  {
-    namespace impl
-    {
-      // Clone by copy construction
-      template <typename Image>
-      mln_concrete(Image) clone(const Image& ima, std::true_type _use_copy_construction_)
-      {
-        (void)_use_copy_construction_;
-        mln_concrete(Image) x(ima);
-        return x;
-      }
-
-      // Clone by deep copy
-      template <typename Image>
-      mln_concrete(Image) clone(const Image& ima, std::false_type _use_copy_construction_)
-      {
-        (void)_use_copy_construction_;
-        mln_concrete(Image) x = imconcretize(ima);
-        mln::copy(ima, x);
-        return x;
-      }
-    } // namespace impl
-
-
-    template <typename I>
-    [[deprecated]] mln_concrete(I) __clone(const Image<I>& ima) {
-      return impl::clone(exact(ima), check_t < std::is_convertible<I, mln_concrete(I)>::value and
-                                         not image_traits<mln_concrete(I)>::shallow_copy::value > ());
-    }
-  } // namespace detail
-
   template <typename InputImage>
   inline typename std::enable_if<image_traits<InputImage>::concrete::value, InputImage&&>::type eval(InputImage&& ima)
   {
@@ -127,6 +127,6 @@ namespace mln
       eval(InputImage&& ima)
   {
     // FIXME:
-    return detail::__clone(std::forward<InputImage>(ima));
+    return ::to_migrate::__clone(std::forward<InputImage>(ima));
   }
 } // namespace mln

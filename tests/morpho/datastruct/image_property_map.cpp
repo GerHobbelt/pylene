@@ -8,13 +8,17 @@
 
 #include <gtest/gtest.h>
 
-template <typename I, typename V>
-void __iota(I& ima, V v)
+
+// FIXME:
+namespace to_migrate
 {
-  mln_viter(vout, ima);
-  mln_forall (vout)
-    *vout = v++;
-}
+  template <typename I, typename V>
+  [[deprecated]] void __iota(I& ima, V v) {
+    mln_viter(vout, ima);
+    mln_forall (vout)
+      *vout = v++;
+  }
+} // namespace to_migrate
 
 
 using namespace mln;
@@ -63,7 +67,8 @@ TEST(Morpho, property_image)
   property_map<tree_t, int> vmap(tree);
 
   auto ima = make_image(tree, vmap);
-  __iota(ima, 0);
+  // FIXME::
+  ::to_migrate::__iota(ima, 0);
 
   {
     int i = 0;
@@ -83,7 +88,8 @@ TEST(Morpho, property_image_nbh)
   property_map<tree_t, int> vmap(tree);
 
   auto ima = make_image(tree, vmap);
-  __iota(ima, 1);
+  // FIXME:
+  ::to_migrate::__iota(ima, 1);
 
   {
     std::vector<unsigned> voisins[7] = {{}, {2, 5}, {1, 3, 4}, {2}, {2}, {1, 6}, {5}};

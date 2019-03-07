@@ -10,32 +10,34 @@
 #include <mln/morpho/tos/private/propagation.hpp>
 
 
-// FIXME
-namespace impl
+// FIXME:
+namespace to_migrate
 {
-  template <typename I, typename V>
-  void fill(I& ima, const V& v)
+  namespace impl
   {
-    mln_viter(pin, ima);
-    mln_forall (pin)
-      *pin = v;
+    template <typename I, typename V>
+    void fill(I& ima, const V& v)
+    {
+      mln_viter(pin, ima);
+      mln_forall (pin)
+        *pin = v;
+    }
+  } // namespace impl
+
+  template <typename OutputImage, typename Value>
+  [[deprecated]] OutputImage& __fill(mln::Image<OutputImage>& output_, const Value& val) {
+    OutputImage& output = mln::exact(output_);
+    impl::fill(output, val);
+    return output;
   }
-} // namespace impl
 
-template <typename OutputImage, typename Value>
-OutputImage& __fill(mln::Image<OutputImage>& output_, const Value& val)
-{
-  OutputImage& output = mln::exact(output_);
-  impl::fill(output, val);
-  return output;
-}
-
-template <typename OutputImage, typename Value>
-OutputImage&& __fill(mln::Image<OutputImage>&& output_, const Value& val)
-{
-  __fill(output_, val);
-  return mln::move_exact(output_);
-}
+  template <typename OutputImage, typename Value>
+  [[deprecated]] OutputImage&& __fill(mln::Image<OutputImage>&& output_, const Value& val)
+  {
+    __fill(output_, val);
+    return mln::move_exact(output_);
+  }
+} // namespace to_migrate
 
 namespace mln
 {
@@ -77,7 +79,7 @@ namespace mln
         auto dom                   = is2F.domain();
         mln_point(J) step          = 2; // {2,2} or {2,2,2}
         // FIXME
-        __fill(is2F | make_strided_box(dom.pmin, dom.pmax, step), true);
+        ::to_migrate::__fill(is2F | make_strided_box(dom.pmin, dom.pmax, step), true);
 
         for (unsigned p = 0; p < S.size(); ++p)
         {

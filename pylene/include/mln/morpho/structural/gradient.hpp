@@ -12,33 +12,37 @@
 /// \file
 
 // FIXME:
-namespace impl
+namespace to_migrate
 {
-  template <typename I, typename J, class UnaryFunction>
-  void transform(const I& input, UnaryFunction f, J& output)
+  namespace impl
   {
-    mln_viter(vin, vout, input, output);
-    mln_forall (vin, vout)
-      *vout = f(*vin);
+    template <typename I, typename J, class UnaryFunction>
+    void transform(const I& input, UnaryFunction f, J& output)
+    {
+      mln_viter(vin, vout, input, output);
+      mln_forall (vin, vout)
+        *vout = f(*vin);
+    }
+  } // namespace impl
+
+  template <typename InputImage, typename OutputImage, class UnaryFunction>
+  [[deprecated]] OutputImage& __transform(const mln::Image<InputImage>& input, UnaryFunction f,
+                                          mln::Image<OutputImage>& output) {
+    OutputImage& out = exact(output);
+    mln_entering("mln::transform");
+    impl::transform(exact(input), f, exact(output));
+    mln_exiting();
+    return out;
   }
-} // namespace impl
 
-template <typename InputImage, typename OutputImage, class UnaryFunction>
-OutputImage& __transform(const mln::Image<InputImage>& input, UnaryFunction f, mln::Image<OutputImage>& output)
-{
-  OutputImage& out = exact(output);
-  mln_entering("mln::transform");
-  impl::transform(exact(input), f, exact(output));
-  mln_exiting();
-  return out;
-}
-
-template <typename InputImage, typename OutputImage, class UnaryFunction>
-OutputImage&& __transform(const mln::Image<InputImage>& input, UnaryFunction f, mln::Image<OutputImage>&& output)
-{
-  __transform(input, f, output);
-  return move_exact(output);
-}
+  template <typename InputImage, typename OutputImage, class UnaryFunction>
+  [[deprecated]] OutputImage&& __transform(const mln::Image<InputImage>& input, UnaryFunction f,
+                                           mln::Image<OutputImage>&& output)
+  {
+    __transform(input, f, output);
+    return move_exact(output);
+  }
+} // namespace to_migrate
 
 
 namespace mln
@@ -162,7 +166,7 @@ namespace mln
           auto e = morpho::structural::erode(ima, nbh, cmp);
 
           // FIXME:
-          __transform(d - e, norm, out);
+          ::to_migrate::__transform(d - e, norm, out);
         }
 
         // Version non-fast dilate - erode

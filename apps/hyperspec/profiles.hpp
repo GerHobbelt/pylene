@@ -25,6 +25,24 @@
 
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 
+// FIXME:
+namespace to_migrate
+{
+  template <typename I, class AccuLike, class Extractor = mln::accu::default_extractor>
+  [[deprecated]] typename mln::accu::result_of<AccuLike, mln_value(I), Extractor>::type
+      __accumulate(const mln::Image<I>& input, const mln::AccumulatorLike<AccuLike>& accu_,
+                   const Extractor& ex = Extractor())
+  {
+    const I& ima = exact(input);
+    auto     a   = mln::accu::make_accumulator(exact(accu_), mln_value(I)());
+
+    mln_foreach (const auto& v, ima.values())
+      a.take(v);
+
+    return ex(a);
+  }
+} // namespace to_migrate
+
 namespace mln
 {
 
@@ -41,7 +59,8 @@ namespace mln
     float amap_max;
     {
       auto tmp = make_image(tree, amap);
-      amap_max = mln::accumulate(tmp, accu::features::max<>());
+      // FIXME:
+      amap_max = ::to_migrate::__accumulate(tmp, accu::features::max<>());
 
       for (float x = 0.1; x < amap_max; x += 0.1)
         lambdas.push_back(x);

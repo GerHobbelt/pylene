@@ -1,6 +1,8 @@
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
@@ -16,6 +18,8 @@ using namespace mln;
 
 TEST(Morpho, gradient_gradient_0)
 {
+  using namespace mln::experimental::ops;
+
   image2d<uint8> ima(10, 10);
   iota(ima, 10);
 
@@ -24,7 +28,8 @@ TEST(Morpho, gradient_gradient_0)
     auto            out = morpho::structural::gradient(ima, win);
 
     static_assert(std::is_same<decltype(out)::value_type, int>::value, "Error integral promotion should give int.");
-    ASSERT_TRUE(all(lor(out == 1, out == 2)));
+
+    ASSERT_TRUE(all_of(out == 1 || out == 2));
   }
 }
 
@@ -42,6 +47,8 @@ TEST(Morpho, gradient_gradient_1)
 // Border is not wide enough => call dilate + erode
 TEST(Morpho, gradient_gradient_2)
 {
+  using namespace mln::experimental::ops;
+
   image2d<uint8> ima(0);
   image2d<uint8> ima2;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
@@ -50,7 +57,7 @@ TEST(Morpho, gradient_gradient_2)
   mln::se::rect2d win(3, 3);
   auto            out1 = morpho::structural::gradient(ima, win);
   auto            out2 = morpho::structural::gradient(ima2, win);
-  ASSERT_TRUE(all(out1 == out2));
+  ASSERT_TRUE(all_of(out1 == out2));
 }
 
 // Dilation on a with a vmorph / binary case
@@ -80,6 +87,8 @@ TEST(Morpho, gradient_gradient_4)
 // On colors
 TEST(Morpho, gradient_gradient_5)
 {
+  using namespace mln::experimental::ops;
+
   image2d<rgb8> ima;
   image2d<rgb8> ima2(0);
   io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
@@ -88,5 +97,5 @@ TEST(Morpho, gradient_gradient_5)
   mln::se::rect2d win(3, 3);
   auto            out1 = morpho::structural::gradient(ima, win);
   auto            out2 = morpho::structural::gradient(ima2, win);
-  ASSERT_TRUE(all(out1 == out2));
+  ASSERT_TRUE(all_of(out1 == out2));
 }

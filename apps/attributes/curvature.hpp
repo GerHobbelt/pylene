@@ -1,7 +1,9 @@
 #pragma once
 
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/trace.hpp>
 
 
@@ -88,7 +90,10 @@ namespace mln
       }
     }
 
-    mln_postcondition(all(curv >= 0));
+    using namespace mln::experimental::ops;
+
+    mln_postcondition(all_of(curv >= 0));
+
     return curv;
   }
 } // namespace mln

@@ -12,30 +12,6 @@
 namespace mln
 {
   /// \defgroup ima_ops Image operators
-  /// \{
-
-  /// \brief Check if all elements of image eval to true.
-  ///
-  /// \param ima The image to check.
-  /// \return True iif all elements eval to True.
-  ///
-  /// \tparam I The type of image. It must be a model of IterableImage.
-  /// \pre Image's value type must be convertible to bool.
-
-  template <typename I>
-  bool all(const Image<I>& ima);
-
-  /// \brief Check if any element of image eval to true
-  ///
-  /// \param ima The image to check.
-  /// \return True if at least one element evals to True.
-  ///
-  /// \tparam I The type of image. It must be a model of IterableImage.
-  /// \pre Image's value type must be convertible to bool.
-  template <typename I>
-  bool any(const Image<I>& ima);
-
-  /// \}
 
   /******************************************/
   /****          Implementation          ****/
@@ -148,36 +124,6 @@ namespace mln
   // Point-wise logical operators
   MLN_GENERATE_CONST_BINARY_EXPR(land, logical_and);
   MLN_GENERATE_CONST_BINARY_EXPR(lor, logical_or);
-
-  template <typename I>
-  inline bool all(const Image<I>& ima)
-  {
-    BOOST_CONCEPT_ASSERT((IterableImage<I>));
-    static_assert(std::is_convertible<typename I::value_type, bool>::value,
-                  "Image value type must be convertible to bool");
-
-    mln_viter(v, exact(ima));
-    mln_forall (v)
-      if (!*v)
-        return false;
-
-    return true;
-  }
-
-  template <typename I>
-  inline bool any(const Image<I>& ima)
-  {
-    BOOST_CONCEPT_ASSERT((IterableImage<I>));
-    static_assert(std::is_convertible<typename I::value_type, bool>::value,
-                  "Image value type must be convertible to bool");
-
-    mln_viter(v, exact(ima));
-    mln_forall (v)
-      if (*v)
-        return true;
-
-    return false;
-  }
 
   template <class I, class Image1, class Image2>
   typename boost::lazy_enable_if_c<

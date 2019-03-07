@@ -55,6 +55,7 @@ TEST(Core, Image2d_LValueOperator)
 TEST(Core, Image2d_Operators)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int> ima(5, 5);
   image2d<int> ref(5, 5);
@@ -66,12 +67,13 @@ TEST(Core, Image2d_Operators)
   mln_forall (v)
     *v = i--;
 
-  ASSERT_TRUE(mln::all(-ima == ref));
+  ASSERT_TRUE(mln::all_of(-ima == ref));
 }
 
 TEST(Core, Image2d_MixedOperator)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<char>  x(5, 5);
   image2d<short> y(5, 5);
@@ -81,26 +83,29 @@ TEST(Core, Image2d_MixedOperator)
 
   static_assert(std::is_same_v<typename decltype(x + x)::value_type, char>);
 
-  ASSERT_TRUE(mln::all((x + y) == (2 * y)));
+  ASSERT_TRUE(mln::all_of((x + y) == (2 * y)));
 }
 
 TEST(Core, Image2d_WhereOperator)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<uint8_t> x(5, 5);
   image2d<uint8_t> y(5, 5);
   mln::iota(x, 0);
   mln::iota(y, 0);
 
-  auto f1 = where(x > 12, x, uint8_t(12));         // RValue image + LValue image + scalar
-  auto f2 = where(x > 12, x, y);                   // RValue image + LValue image + LValue image
-  auto f3 = where(x > 12, uint8_t(12), x);         // RValue image + Scalar + LValue image
-  auto f4 = where(x > 12, uint8_t(0), uint8_t(1)); // RValue image + Scalar + Scalar
+  auto f1 = experimental::where(x > 12, x, uint8_t(12));         // RValue image + LValue image + scalar
+  auto f2 = experimental::where(x > 12, x, y);                   // RValue image + LValue image + LValue image
+  auto f3 = experimental::where(x > 12, uint8_t(12), x);         // RValue image + Scalar + LValue image
+  auto f4 = experimental::where(x > 12, uint8_t(0), uint8_t(1)); // RValue image + Scalar + Scalar
 
-  ASSERT_TRUE(mln::all(f1 >= 12));
-  static_assert(std::is_same_v<mln_reference(decltype(f1)), const uint8_t&>);
-  static_assert(std::is_same_v<mln_reference(decltype(f2)), uint8_t&>);
+  // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+  // FIXME: migrate rangev3 @HEAD
+  // ASSERT_TRUE(mln::all_of(f1 >= 12));
+  static_assert(std::is_same_v<image_reference_t<decltype(f1)>, uint8_t>);
+  static_assert(std::is_same_v<image_reference_t<decltype(f2)>, uint8_t&>);
 }
 
 
@@ -193,6 +198,7 @@ TEST(Core, IfElse)
   static_assert(std::is_same_v<image_reference_t<decltype(f4)>, uint8_t>);
 
   // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+  // FIXME: migrate rangev3 @HEAD
   // ASSERT_TRUE(mln::all_of(f1 == ref_f1));
   // ASSERT_TRUE(mln::all_of(f2 == ref_f2));
   // ASSERT_TRUE(mln::all_of(f3 == ref_f3));
@@ -205,6 +211,7 @@ TEST(Core, IfElse)
                             {1, 2, 3}};
 
   // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+  // FIXME: migrate rangev3 @HEAD
   // mln::fill(f2, 42);
 
   // ASSERT_TRUE(mln::all_of(x == ref_x));

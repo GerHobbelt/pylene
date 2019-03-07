@@ -73,7 +73,7 @@ namespace mln
 
         freeimage_writer_plugin               plugin(os, fif);
         Saver2D<std::remove_cv_t<InputImage>> saver;
-        saver.save(ima, &plugin, false);
+        saver.save_experimental(ima, &plugin, false);
 
         mln_exiting();
       }

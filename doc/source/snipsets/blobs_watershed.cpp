@@ -1,5 +1,6 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/neighborhood/dyn_wneighborhood.hpp>
 #include <mln/core/se/disc.hpp>
@@ -112,9 +113,10 @@ mln::rgb8 heat_lut(float x)
   }
 }
 
-
 int main(int argc, char** argv)
 {
+  using namespace mln::experimental::ops;
+
   if (argc < 4)
   {
     std::cout << "Usage:" << argv[0] << " input distance output\n";
@@ -136,14 +138,16 @@ int main(int argc, char** argv)
 
   // (3) Run the watershed segmentation
   int  nlabel;
-  auto ws = mln::morpho::watershed<mln::int16>(dinv, mln::c8, nlabel);
+  auto ws = mln::morpho::experimental::watershed<mln::int16>(dinv, mln::c8, nlabel);
 
   // (4) Labelize input
-  auto output = mln::where(ws == 0, 1, mln::where(input, ws, 0));
+  [[maybe_unused]] auto output = mln::experimental::where(ws == 0, 1, mln::experimental::where(input, ws, 0));
 
   // END
   auto d_stretched = mln::data::stretch<float>(d);
 
   mln::io::imsave(mln::transform(d_stretched, heat_lut), argv[2]);
-  mln::io::imsave(mln::transform(output, regions_lut), argv[3]);
+
+  // FIXME: migrate rangev3 @HEAD
+  // mln::io::experimental::imsave(mln::transform(output, regions_lut), argv[3]);
 }

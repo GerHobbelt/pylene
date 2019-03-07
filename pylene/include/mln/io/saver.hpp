@@ -19,9 +19,7 @@ namespace mln
     public:
       virtual ~Saver() = default;
       void save(const Image<I>& ima, PluginWriter* plugin, bool permissive) const;
-
-      template <typename = std::enable_if_t<mln::is_a<I, experimental::Image>{}>>
-      void save(I ima, PluginWriter* plugin, bool permissive) const;
+      void save_experimental(I ima, PluginWriter* plugin, bool permissive) const;
 
     protected:
       virtual void m_set_domain(const I& ima, PluginWriter* plugin) const = 0;
@@ -68,8 +66,7 @@ namespace mln
     }
 
     template <class I>
-    template <typename>
-    void Saver<I>::save(I ima, PluginWriter* plugin, bool permissive) const
+    void Saver<I>::save_experimental(I ima, PluginWriter* plugin, bool permissive) const
     {
       if (not plugin->can_write(typeid(mln_value(I))))
       {

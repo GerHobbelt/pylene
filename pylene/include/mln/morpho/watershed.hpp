@@ -17,6 +17,12 @@ namespace mln
     template <class Label_t, class I, class N>
     mln_ch_value(I, Label_t) watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel);
 
+    namespace experimental
+    {
+      template <class Label_t, class InputImage, class N>
+      mln_ch_value(InputImage, Label_t) watershed(InputImage ima, const Neighborhood<N>& nbh, int& nlabel);
+    }
+
 
     /******************************************/
     /****          Implementation          ****/
@@ -174,6 +180,37 @@ namespace mln
       }
       return output;
     }
+
+    namespace experimental
+    {
+
+      template <class Label_t, class InputImage, class N>
+      mln_ch_value(InputImage, Label_t) watershed(InputImage ima, const Neighborhood<N>& nbh_, int& nlabel)
+      {
+        static_assert(is_a<InputImage, Image>());
+        static_assert(std::is_integral<Label_t>::value, "The label type must integral.");
+        static_assert(std::is_signed<Label_t>::value, "The label type must be signed.");
+
+        mln_entering("mln::morpho::watershed");
+
+        const N& nbh = exact(nbh_);
+
+        constexpr Label_t kUninitialized         = -1;
+        mln_ch_value(InputImage, Label_t) output = imchvalue<Label_t>(ima).adjust(nbh).init(kUninitialized);
+        if (extension::need_adjust(output, nbh))
+        {
+          auto out = extension::add_value_extension(output, kUninitialized);
+          nlabel   = details::watershed(ima, nbh, out);
+        }
+        else
+        {
+          mln::extension::fill(output, kUninitialized);
+          nlabel = details::watershed(ima, nbh, output);
+        }
+        return output;
+      }
+
+    } // namespace experimental
 
 
   } // namespace morpho

@@ -69,6 +69,8 @@ namespace mln
       template <typename InputImage>
       void imsave(InputImage ima, std::ostream& os, FREE_IMAGE_FORMAT fif)
       {
+        static_assert(is_a<InputImage, mln::experimental::Image>());
+
         mln_entering("mln::io::imsave");
 
         freeimage_writer_plugin               plugin(os, fif);
@@ -81,6 +83,8 @@ namespace mln
       template <typename InputImage>
       void imsave(InputImage ima, const std::string& path)
       {
+        static_assert(is_a<InputImage, mln::experimental::Image>());
+
         if (path == "-")
           imsave(ima, std::cout);
         else

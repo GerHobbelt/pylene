@@ -20,7 +20,7 @@ namespace mln
     namespace experimental
     {
       template <class Label_t, class InputImage, class N>
-      mln_ch_value(InputImage, Label_t) watershed(InputImage ima, const Neighborhood<N>& nbh, int& nlabel);
+      image_ch_value_t<InputImage, Label_t> watershed(InputImage ima, const Neighborhood<N>& nbh, int& nlabel);
     }
 
 
@@ -185,7 +185,7 @@ namespace mln
     {
 
       template <class Label_t, class InputImage, class N>
-      mln_ch_value(InputImage, Label_t) watershed(InputImage ima, const Neighborhood<N>& nbh_, int& nlabel)
+      image_ch_value_t<InputImage, Label_t> watershed(InputImage ima, const Neighborhood<N>& nbh_, int& nlabel)
       {
         static_assert(is_a<InputImage, Image>());
         static_assert(std::is_integral<Label_t>::value, "The label type must integral.");

@@ -68,6 +68,8 @@ namespace mln
     template <class I>
     void Saver<I>::save_experimental(I ima, PluginWriter* plugin, bool permissive) const
     {
+      static_assert(is_a<I, mln::experimental::Image>());
+      
       if (not plugin->can_write(typeid(mln_value(I))))
       {
         std::string msg = "The plugin does not support writing " + internal::demangle(typeid(mln_value(I)).name());

@@ -54,7 +54,7 @@ namespace mln
         {
           if (use_dejavu)
           {
-            resize(deja_vu, ima).set_init_value(false);
+            resize(deja_vu, ima).init(false);
             extension::fill(deja_vu, true);
           }
 

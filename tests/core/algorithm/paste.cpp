@@ -31,12 +31,12 @@ TEST(Core, Algorithm_Paste)
 
 TEST(Core, Experimental_Algorithm_Paste)
 {
-  mln::box2d          b = {{1, 1}, {3, 3}};
+  mln::box2d            b = {{1, 1}, {3, 3}};
   mln::image2d<uint8_t> ima(b);
   mln::image2d<uint8_t> out(15, 15);
-  mln::experimental::fill(ima, 69);
+  mln::fill(ima, 69);
   mln::iota(out, 1);
-  mln::experimental::paste(ima, out);
+  mln::paste(ima, out);
   // 1   2  3  4..
   // 16  x  x  19
   // 31  x  x  34
@@ -45,4 +45,3 @@ TEST(Core, Experimental_Algorithm_Paste)
 
   ASSERT_EQ(r, 225 * 226 / 2 - (17 + 18 + 32 + 33) + 69 * 4);
 }
-

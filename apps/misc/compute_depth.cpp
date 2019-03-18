@@ -26,5 +26,5 @@ int main(int argc, char** argv)
   resize(out, tree._get_data()->m_pmap);
   morpho::reconstruction(tree, dmap, out);
 
-  io::imsave(imcast<uint16>(out), argv[2]);
+  io::imsave(mln::imcast<uint16>(out), argv[2]);
 }

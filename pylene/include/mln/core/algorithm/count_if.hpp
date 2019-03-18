@@ -9,31 +9,25 @@
 namespace mln
 {
 
-  namespace experimental
-  {
-    template <class InputImage, class UnaryPredicate>
-    std::ptrdiff_t count_if(InputImage input, UnaryPredicate p);
-  }
+  template <class InputImage, class UnaryPredicate>
+  std::ptrdiff_t count_if(InputImage input, UnaryPredicate p);
 
   /******************/
   /* Implem         */
   /******************/
 
-  namespace experimental
+  template <class InputImage, class UnaryPredicate>
+  std::ptrdiff_t count_if(InputImage input, UnaryPredicate p)
   {
-    template <class InputImage, class UnaryPredicate>
-    std::ptrdiff_t count_if(InputImage input, UnaryPredicate p)
-    {
-      static_assert(mln::is_a<InputImage, Image>());
-      static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());
+    static_assert(mln::is_a<InputImage, Image>());
+    static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());
 
-      auto&&         vals = input.new_values();
-      std::ptrdiff_t k    = 0;
+    auto&&         vals = input.new_values();
+    std::ptrdiff_t k    = 0;
 
-      for (auto r : ranges::rows(vals))
-        k += ::ranges::count_if(r, std::move(p));
+    for (auto r : ranges::rows(vals))
+      k += ::ranges::count_if(r, std::move(p));
 
-      return k;
-    }
-  } // namespace experimental
+    return k;
+  }
 } // namespace mln

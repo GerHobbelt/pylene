@@ -13,6 +13,24 @@
 #include <gtest/gtest.h>
 
 
+// FIXME:
+namespace to_migrate
+{
+  template <typename I>
+  inline bool __all(const mln::Image<I>& ima)
+  {
+    static_assert(std::is_convertible<typename I::value_type, bool>::value,
+                  "Image value type must be convertible to bool");
+
+    mln_viter(v, exact(ima));
+    mln_forall (v)
+      if (!*v)
+        return false;
+
+    return true;
+  }
+} // namespace to_migrate
+
 TEST(Morpho, component_tree_io)
 {
 
@@ -47,5 +65,6 @@ TEST(Morpho, component_tree_io)
                   })));
 
   ASSERT_TRUE(data1->m_S == data2->m_S);
-  ASSERT_TRUE(all(data1->m_pmap == data2->m_pmap));
+  // FIXME:
+  ASSERT_TRUE(::to_migrate::__all(data1->m_pmap == data2->m_pmap));
 }

@@ -323,6 +323,7 @@ TEST(Range, transform_read_chain)
 
 
 // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+// FIXME: migrate rangev3 @HEAD
 /*
 TEST(Range, transform2_read_chain)
 {
@@ -337,6 +338,7 @@ TEST(Range, transform2_read_chain)
 */
 
 // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
+// FIXME: migrate rangev3 @HEAD
 /*
 TEST(Range, range_transform2_read_chain)
 {

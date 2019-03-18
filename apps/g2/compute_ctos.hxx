@@ -257,7 +257,7 @@ namespace mln
         if (maxv > value_traits<uint16>::max())
           std::cerr << "Warning: too many values in the depth (depth image output is wrong)\n";
 
-        maxdepth = eval(imcast<uint16>(maxdepth_));
+        maxdepth = eval(mln::imcast<uint16>(maxdepth_));
       }
       else
       {

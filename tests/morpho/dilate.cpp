@@ -1,8 +1,10 @@
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/win2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/canvas/private/dilation_by_periodic_line.hpp>
@@ -16,6 +18,23 @@
 
 #include <gtest/gtest.h>
 
+// FIXME:
+namespace to_migrate
+{
+  template <typename I>
+  inline bool __all(const mln::Image<I>& ima)
+  {
+    static_assert(std::is_convertible<typename I::value_type, bool>::value,
+                  "Image value type must be convertible to bool");
+
+    mln_viter(v, exact(ima));
+    mln_forall (v)
+      if (!*v)
+        return false;
+
+    return true;
+  }
+} // namespace to_migrate
 
 using namespace mln;
 
@@ -171,25 +190,29 @@ TEST(Dilation, Rectangle2d)
 
 TEST(Dilation, Generic_with_wide_enough_extension)
 {
+  using namespace mln::experimental::ops;
+
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   { // Fast: border wide enough
     mln::se::disc se(3, 0);
     auto          out = morpho::structural::dilate(ima, se);
-    ASSERT_TRUE(all(out >= ima)); // extensive
+    ASSERT_TRUE(all_of(out >= ima)); // extensive
   }
 }
 
 // Border is not wide enough => use morpher for bound checking
 TEST(Dilation, Generic_with_too_small_extension)
 {
+  using namespace mln::experimental::ops;
+
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::disc se(4, 0);
   auto          out = morpho::structural::dilate(ima, se);
-  ASSERT_TRUE(all(out >= ima)); // extensive
+  ASSERT_TRUE(all_of(out >= ima)); // extensive
 }
 
 // Dilation on a with a vmorph / binary case
@@ -200,7 +223,8 @@ TEST(Dilation, Square_on_a_vmorph)
 
   mln::se::rect2d win(3, 3);
   auto            out = morpho::structural::dilate(ima > 128, win);
-  ASSERT_TRUE(all(out >= (ima > 128))); // extensive
+  // FIXME:
+  ASSERT_TRUE(::to_migrate::__all(out >= (ima > 128))); // extensive
 }
 
 TEST(Dilation, Unregular_domain)
@@ -212,19 +236,21 @@ TEST(Dilation, Unregular_domain)
   auto            out = clone(ima);
   auto            tmp = out | where(ima > 128);
   morpho::structural::dilate(ima | where(ima > 128), win, tmp, std::less<uint8>());
-  ASSERT_TRUE(all((out | (ima <= 128)) == (ima | (ima <= 128))));
-  ASSERT_TRUE(all(out >= ima)); // extensive
+  ASSERT_TRUE(::to_migrate::__all((out | (ima <= 128)) == (ima | (ima <= 128))));
+  ASSERT_TRUE(::to_migrate::__all(out >= ima)); // extensive
 }
 
 // Custom comparison function, erosion
 TEST(Dilation, Custom_cmp_function)
 {
+  using namespace mln::experimental::ops;
+
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(5, 5);
   auto            out = morpho::structural::dilate(ima, win, std::greater<uint8>());
-  ASSERT_TRUE(all(out <= ima)); // anti-extensive
+  ASSERT_TRUE(all_of(out <= ima)); // anti-extensive
 }
 
 // Dilation of a binary image
@@ -258,12 +284,14 @@ TEST(Dilation, Binary)
 // Dilation of a bianry image
 TEST(Dilation, Binary_2)
 {
+  using namespace mln::experimental::ops;
+
   image2d<bool> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("tiny.pbm"), ima);
 
   mln::se::rect2d win(3, 3);
   auto            out = morpho::structural::dilate(ima, win);
-  ASSERT_TRUE(all(ima <= out)); // anti-extensive
+  ASSERT_TRUE(all_of(ima <= out)); // anti-extensive
 }
 
 // Dilation of a rgb image
@@ -274,7 +302,8 @@ TEST(Dilation, RGB)
 
   mln::se::rect2d win(5, 5);
   auto            out = morpho::structural::dilate(ima, win);
-  ASSERT_TRUE(all(red(ima) <= red(out)));     // anti-extensive
-  ASSERT_TRUE(all(green(ima) <= green(out))); // anti-extensive
-  ASSERT_TRUE(all(blue(ima) <= blue(out)));   // anti-extensive
+  // FIXME:
+  ASSERT_TRUE(::to_migrate::__all(red(ima) <= red(out)));     // anti-extensive
+  ASSERT_TRUE(::to_migrate::__all(green(ima) <= green(out))); // anti-extensive
+  ASSERT_TRUE(::to_migrate::__all(blue(ima) <= blue(out)));   // anti-extensive
 }

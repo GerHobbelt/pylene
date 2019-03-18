@@ -179,11 +179,11 @@ void fill_baseline(mln::image2d<mln::rgb8>& ima, mln::rgb8 v)
 }
 void fill(mln::image2d<mln::uint8>& ima, mln::uint8 v)
 {
-  mln::experimental::fill(ima, v);
+  mln::fill(ima, v);
 }
 void fill(mln::image2d<mln::rgb8>& ima, mln::rgb8 v)
 {
-  mln::experimental::fill(ima, v);
+  mln::fill(ima, v);
 }
 
 
@@ -221,11 +221,11 @@ std::ptrdiff_t count_if_baseline(const mln::image2d<mln::rgb8>& in)
 }
 std::ptrdiff_t count_if(const mln::image2d<mln::uint8>& in)
 {
-  return mln::experimental::count_if(in, is_uint8_15);
+  return mln::count_if(in, is_uint8_15);
 }
 std::ptrdiff_t count_if(const mln::image2d<mln::rgb8>& in)
 {
-  return mln::experimental::count_if(in, is_rgb8_black);
+  return mln::count_if(in, is_rgb8_black);
 }
 
 
@@ -239,11 +239,11 @@ std::ptrdiff_t count_baseline(const mln::image2d<mln::rgb8>& in)
 }
 std::ptrdiff_t count(const mln::image2d<mln::uint8>& in)
 {
-  return mln::experimental::count(in, mln::uint8(15));
+  return mln::count(in, mln::uint8(15));
 }
 std::ptrdiff_t count(const mln::image2d<mln::rgb8>& in)
 {
-  return mln::experimental::count(in, mln::rgb8{0, 0, 0});
+  return mln::count(in, mln::rgb8{0, 0, 0});
 }
 
 
@@ -257,11 +257,11 @@ bool equal_baseline(const mln::image2d<mln::rgb8>& lhs, const mln::image2d<mln::
 }
 bool equal(const mln::image2d<mln::uint8>& lhs, const mln::image2d<mln::uint8>& rhs)
 {
-  return mln::experimental::equal(lhs, rhs);
+  return mln::equal(lhs, rhs);
 }
 bool equal(const mln::image2d<mln::rgb8>& lhs, const mln::image2d<mln::rgb8>& rhs)
 {
-  return mln::experimental::equal(lhs, rhs);
+  return mln::equal(lhs, rhs);
 }
 
 
@@ -275,11 +275,11 @@ void paste_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& 
 }
 void paste(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-  mln::experimental::paste(in, out);
+  mln::paste(in, out);
 }
 void paste(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out)
 {
-  mln::experimental::paste(in, out);
+  mln::paste(in, out);
 }
 
 
@@ -299,11 +299,11 @@ void transform_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb
 }
 void transform(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
 {
-  mln::experimental::transform(in, out, plus_one);
+  mln::transform(in, out, plus_one);
 }
 void transform(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out)
 {
-  mln::experimental::transform(in, out, plus_one);
+  mln::transform(in, out, plus_one);
 }
 
 
@@ -317,11 +317,11 @@ void for_each_baseline(mln::image2d<mln::rgb8>& in)
 }
 void for_each(mln::image2d<mln::uint8>& in)
 {
-  mln::experimental::for_each(in, plus_one_inplace);
+  mln::for_each(in, plus_one_inplace);
 }
 void for_each(mln::image2d<mln::rgb8>& in)
 {
-  mln::experimental::for_each(in, plus_one_inplace);
+  mln::for_each(in, plus_one_inplace);
 }
 
 
@@ -338,7 +338,7 @@ void generate_baseline(mln::image2d<mln::uint8>& ima)
 }
 void generate(mln::image2d<mln::uint8>& ima)
 {
-  mln::experimental::generate(ima, iota_generator);
+  mln::generate(ima, iota_generator);
 }
 
 
@@ -350,11 +350,11 @@ int accumulate_baseline(const mln::image2d<mln::uint8>& ima)
 }
 int accumulate(const mln::image2d<mln::uint8>& ima)
 {
-  return mln::experimental::accumulate(ima, 0, std::plus<>{});
+  return mln::accumulate(ima, 0, std::plus<>{});
 }
 int accumulate_accu(const mln::image2d<mln::uint8>& ima)
 {
-  return mln::experimental::accumulate(ima, mln::accu::features::sum<int>());
+  return mln::accumulate(ima, mln::accu::features::sum<int>());
 }
 
 

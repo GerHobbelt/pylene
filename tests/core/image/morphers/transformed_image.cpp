@@ -2,7 +2,10 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/morphers/transformed_image.hpp>
+#include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/view/zip.hpp>
 #include <mln/core/neighb2d.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
 #include <gtest/gtest.h>
 
@@ -86,36 +89,31 @@ TEST(Core, TransformedImage_transform_byval_lvalue)
   image2d<V> ima(dom);
 
   {
-    auto c1 = imtransform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
-    auto c2 = imtransform(ima, [](const std::pair<int, int>& x) -> const int& { return x.second; });
+    auto c1 = view::transform(ima, &std::pair<int, int>::first);
+    auto c2 = view::transform(ima, &std::pair<int, int>::second);
     mln::fill(ima, std::make_pair(12, 12));
     mln::fill(c1, 69);
 
     // Test pixel iteration
     // check that properties of pixels are preserved (point + index)
     {
-      mln_pixter(px0, ima);
-      mln_pixter(px1, c1);
-      mln_pixter(px2, c2);
-      mln_forall (px0, px1, px2)
+      auto z = view::zip(ima, c1, c2);
+      for (auto&& z_pix : z.new_pixels())
       {
-        ASSERT_EQ(px1->point(), px0->point());
-        ASSERT_EQ(px1->index(), px0->index());
-        ASSERT_EQ(px1->val(), px0->val().first);
-        ASSERT_EQ(px1->val(), 69);
-        ASSERT_EQ(px2->val(), 12);
+        auto&& [v0, v1, v2] = z_pix.val();
+        ASSERT_EQ(v1, v0.first);
+        ASSERT_EQ(v1, 69);
+        ASSERT_EQ(v2, 12);
       }
     }
 
     // Test value iteration
     {
-      mln_viter(v0, ima);
-      mln_viter(v1, c1);
-      mln_viter(v2, c2);
-      mln_forall (v0, v1, v2)
+      auto z = view::zip(ima, c1, c2);
+      for (auto&& [v0, v1, v2] : z.new_values())
       {
-        ASSERT_EQ(v0->first, *v1);
-        ASSERT_EQ(v0->second, *v2);
+        ASSERT_EQ(v0.first, v1);
+        ASSERT_EQ(v0.second, v2);
       }
     }
   }

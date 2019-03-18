@@ -1,62 +1,31 @@
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/filter.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imprint.hpp>
 
 #include <gtest/gtest.h>
 
-TEST(Core, FilteredImage_filtered_bypix)
-{
-  using namespace mln;
-
-  typedef image2d<int> I;
-
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
-
-  typedef I::const_pixel_type Pix;
-
-  iota(ima, 0);
-  auto x = imfilter(ima, [](const Pix& px) { return px.val() > 10; });
-
-  ASSERT_TRUE(all(x > 10));
-
-  {mln_foreach (const Pix& pix, ima.pixels()){if (pix.val() > 10) ASSERT_EQ(pix.val(), x(pix.point()));
-  else
-  {
-    ASSERT_TRUE(!x.domain().has(pix.point()));
-    ASSERT_EQ(pix.val(), x.at(pix.point()));
-  }
-}
-}
-
-{
-  mln_foreach (const auto& pix, x.pixels())
-  {
-    ASSERT_EQ(pix.val(), ima(pix.point()));
-  }
-}
-}
 
 TEST(Core, FilteredImage_filtered_byval)
 {
   using namespace mln;
-
-  typedef image2d<int> I;
+  using namespace mln::experimental::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
-  typedef I::const_pixel_type Pix;
-
   iota(ima, 0);
-  auto x = imfilter(ima, [](int v) { return v > 10; });
+  auto x = view::filter(ima, [](int v) { return v > 10; });
 
-  ASSERT_TRUE(all(x > 10));
+  ASSERT_TRUE(all_of(x > 10));
 
   {
-    mln_foreach (const Pix& pix, ima.pixels())
+    for (auto&& pix : ima.new_pixels())
+    {
       if (pix.val() > 10)
         ASSERT_EQ(pix.val(), x(pix.point()));
       else
@@ -64,10 +33,11 @@ TEST(Core, FilteredImage_filtered_byval)
         ASSERT_TRUE(!x.domain().has(pix.point()));
         ASSERT_EQ(pix.val(), x.at(pix.point()));
       }
+    }
   }
 
   {
-    mln_foreach (const auto& pix, x.pixels())
+    for (auto&& pix : x.new_pixels())
     {
       ASSERT_EQ(pix.val(), ima(pix.point()));
     }
@@ -77,50 +47,49 @@ TEST(Core, FilteredImage_filtered_byval)
 TEST(Core, FilteredImage_filtered_bypix_writing)
 {
   using namespace mln;
-
-  typedef image2d<int> I;
+  using namespace mln::experimental::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
-  typedef I::const_pixel_type Pix;
-
   iota(ima, 0);
-  auto x = imfilter(ima, [](const Pix& px) { return px.val() > 10; });
+  auto x = view::filter(ima, [](int v) { return v > 10; });
 
   mln::fill(x, 10);
-  ASSERT_TRUE(all(ima <= 10));
+  ASSERT_TRUE(all_of(ima <= 10));
 }
 
 TEST(Core, FilteredImage_filtered_byval_writing)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);
-  auto x = imfilter(ima, [](int x) { return x > 10; });
+  auto x = view::filter(ima, [](int x) { return x > 10; });
 
   mln::fill(x, 10);
-  ASSERT_TRUE(all(ima <= 10));
+  ASSERT_TRUE(all_of(ima <= 10));
 }
 
 TEST(Core, FilteredImage_filtered_chaining)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
 
   iota(ima, 0);
-  auto x = imfilter(ima, [](int v) { return v > 10; });
-  auto u = imfilter(x, [](int v) { return v < 15; });
+  auto x = view::filter(ima, [](int v) { return v > 10; });
+  auto u = view::filter(x, [](int v) { return v < 15; });
 
-  ASSERT_TRUE(all(land(u > 10, u < 15)));
+  ASSERT_TRUE(all_of(u > 10 && u < 15));
 
   {
-    mln_foreach (const auto& pix, ima.pixels())
+    for (auto&& pix : ima.new_pixels())
       if (pix.val() > 10 and pix.val() < 15)
         ASSERT_EQ(pix.val(), u(pix.point()));
       else
@@ -131,7 +100,7 @@ TEST(Core, FilteredImage_filtered_chaining)
   }
 
   {
-    mln_foreach (const auto& pix, u.pixels())
+    for (auto&& pix : u.new_pixels())
     {
       ASSERT_EQ(pix.val(), ima(pix.point()));
     }
@@ -140,21 +109,22 @@ TEST(Core, FilteredImage_filtered_chaining)
   const image2d<int> before = clone(ima);
   mln::fill(u, 1);
   {
-    mln_pixter(px, ima);
-    mln_pixter(px_before, before);
-    mln_forall (px, px_before)
+    auto z = view::zip(ima, before);
+    for (auto&& z_pix : z.new_pixels())
     {
-      if (px_before->val() > 10 and px_before->val() < 15)
-        ASSERT_EQ(px->val(), 1);
+      auto&& [v_ima, v_before] = z_pix.val();
+      if (v_before > 10 and v_before < 15)
+        ASSERT_EQ(v_ima, 1);
       else
       {
-        ASSERT_TRUE(!u.domain().has(px->point()));
-        ASSERT_EQ(px->val(), px_before->val());
+        ASSERT_TRUE(!u.domain().has(z_pix.point()));
+        ASSERT_EQ(v_ima, v_before);
       }
     }
   }
+
   {
-    mln_foreach (const auto& pix, u.pixels())
+    for (auto&& pix : u.new_pixels())
     {
       ASSERT_EQ(pix.val(), ima(pix.point()));
     }

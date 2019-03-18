@@ -1,3 +1,5 @@
+#include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/algorithm/equal.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
@@ -113,7 +115,7 @@ TEST(Core, Transform_Support_Writable)
   {
     auto c1 = view::transform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
     auto c2 = view::transform(ima, [](const std::pair<int, int>& x) { return x.second; });
-    experimental::fill(ima, std::make_pair(12, 12));
+    fill(ima, std::make_pair(12, 12));
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     static_assert(concepts::ConcreteImage<decltype(ima)>);
@@ -132,10 +134,10 @@ TEST(Core, Transform_Support_Writable)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-    experimental::fill(c1, 69);
+    fill(c1, 69);
 
     // Does not compile because direct writing a temporary is forbidden by range-v3
-    // experimental::fill(c2, 69);
+    // fill(c2, 69);
 
     // Test pixel iteration
     // check that properties of pixels are preserved (point + index)
@@ -190,11 +192,14 @@ TEST(Core, Transform_Supports_Function)
   static_assert(not concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  // FIXME: ASSERT_IMAGES_EQ(ref, c);
+  // FIXME: migrate rangev3 @HEAD
+  // ASSERT_TRUE(mln::equal(ref, c));
 }
 
 TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
+  using namespace mln::experimental::ops;
+
   typedef std::pair<int, int> V;
 
   mln::box2d      dom{{-1, -2}, {3, 3}};
@@ -213,9 +218,10 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
   static_assert(concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  mln::experimental::fill(c, 69);
+  mln::fill(c, 69);
 
-  // FIXME: ASSERT_IMAGES_EQ(ref, c);
+  // FIXME: migrate rangev3 @HEAD
+  // ASSERT_TRUE(mln::equal(ref, c));
 }
 
 
@@ -236,6 +242,7 @@ TEST(Core, Transformed2Image_transform_byval_chain)
     [[maybe_unused]] auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
 
     // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
-    // [[maybe_unused]] auto z = mln::experimental::all(out);
+    // FIXME: migrate rangev3 @HEAD
+    // [[maybe_unused]] auto z = mln::all_of(out);
   }
 }

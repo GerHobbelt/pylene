@@ -22,7 +22,7 @@ namespace mln
     template <class I>
     class Loader
     {
-      BOOST_CONCEPT_ASSERT((Image<I>));
+      // BOOST_CONCEPT_ASSERT((Image<I>));
 
     public:
       void load(std::istream& s, Image<I>& ima, PluginReader* plugin, bool permissive);

@@ -9,6 +9,36 @@
 
 #include <gtest/gtest.h>
 
+
+// FIXME:
+namespace to_migrate
+{
+  namespace impl
+  {
+    template <typename I, typename V>
+    void fill(I& ima, const V& v)
+    {
+      mln_viter(pin, ima);
+      mln_forall (pin)
+        *pin = v;
+    }
+  } // namespace impl
+
+  template <typename OutputImage, typename Value>
+  [[deprecated]] OutputImage& __fill(mln::Image<OutputImage>& output_, const Value& val) {
+    OutputImage& output = mln::exact(output_);
+    impl::fill(output, val);
+    return output;
+  }
+
+  template <typename OutputImage, typename Value>
+  [[deprecated]] OutputImage&& __fill(mln::Image<OutputImage>&& output_, const Value& val)
+  {
+    __fill(output_, val);
+    return mln::move_exact(output_);
+  }
+} // namespace to_migrate
+
 TEST(GraphCut, graph_iteration)
 {
   using namespace mln;
@@ -107,7 +137,8 @@ TEST(GraphCut, graphcut_1)
 
   image2d<bool> ori(5, 5);
   mln::fill(ori, false);
-  mln::fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), true);
+  // FIXME:
+  ::to_migrate::__fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), true);
 
   image2d<bool> out(5, 5);
 
@@ -123,7 +154,8 @@ TEST(GraphCut, graphcut_2)
 
   image2d<float> ori(5, 5);
   mln::fill(ori, 0.0f);
-  mln::fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), 0.7f);
+  // FIXME:
+  ::to_migrate::__fill(ori | sbox2d({0, 0}, {5, 5}, {2, 2}), 0.7f);
 
   image2d<bool> out(5, 5);
 

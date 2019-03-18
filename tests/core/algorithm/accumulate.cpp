@@ -17,13 +17,13 @@ TEST(Core, Algorithm_Accumulate_1)
 
   // Expected overflow
   {
-    int res = mln::accumulate(ima, std::plus<uint8>(), 0);
+    int res = mln::accumulate(ima, 0, std::plus<uint8>());
     ASSERT_EQ(res, ((99 * 100) / 2) % 256);
   }
 
   // No overflow
   {
-    int res = mln::accumulate(ima, std::plus<int>(), 0);
+    int res = mln::accumulate(ima, 0, std::plus<int>());
     ASSERT_EQ(res, ((99 * 100) / 2));
   }
 }
@@ -64,13 +64,13 @@ TEST(Core, Algorithm_Exp_Accumulate_1)
 
   // Expected overflow
   {
-    int res = mln::experimental::accumulate(ima, 0, std::plus<uint8_t>());
+    int res = mln::accumulate(ima, 0, std::plus<uint8_t>());
     ASSERT_EQ(res, ((99 * 100) / 2) % 256);
   }
 
   // No overflow
   {
-    int res = mln::experimental::accumulate(ima, 0, std::plus<int>());
+    int res = mln::accumulate(ima, 0, std::plus<int>());
     ASSERT_EQ(res, ((99 * 100) / 2));
   }
 }
@@ -82,7 +82,7 @@ TEST(Core, Algorithm_Exp_Accumulate_2)
 
   // No overflow (uint8 + uint8 -> int)
   {
-    int res = mln::experimental::accumulate(ima, mln::accu::features::sum<>());
+    int res = mln::accumulate(ima, mln::accu::features::sum<>());
     ASSERT_EQ(res, ((99 * 100) / 2));
   }
 }
@@ -94,7 +94,7 @@ TEST(Core, Algorithm_Exp_Accumulate_3)
 
   // No overflow (uint8 + uint8 -> int)
   {
-    auto acc = mln::experimental::accumulate(ima, mln::accu::features::min<>() & mln::accu::features::max<>());
+    auto acc = mln::accumulate(ima, mln::accu::features::min<>() & mln::accu::features::max<>());
     ASSERT_EQ(mln::accu::extractor::min(acc), 0);
     ASSERT_EQ(mln::accu::extractor::max(acc), 99);
   }

@@ -9,30 +9,26 @@
 namespace mln
 {
 
-  namespace experimental
-  {
-    template <class InputImage, class Value>
-    std::ptrdiff_t count(InputImage input, const Value& v);
-  }
+
+  template <class InputImage, class Value>
+  std::ptrdiff_t count(InputImage input, const Value& v);
+
 
   /******************/
   /* Implem         */
   /******************/
 
-  namespace experimental
+  template <class InputImage, class Value>
+  std::ptrdiff_t count(InputImage input, const Value& v)
   {
-    template <class InputImage, class Value>
-    std::ptrdiff_t count(InputImage input, const Value& v)
-    {
-      static_assert(mln::is_a<InputImage, Image>());
+    static_assert(mln::is_a<InputImage, Image>());
 
-      auto&&         vals = input.new_values();
-      std::ptrdiff_t k    = 0;
+    auto&&         vals = input.new_values();
+    std::ptrdiff_t k    = 0;
 
-      for (auto r : ranges::rows(vals))
-        k += ::ranges::count(r, v);
+    for (auto r : ranges::rows(vals))
+      k += ::ranges::count(r, v);
 
-      return k;
-    }
-  } // namespace experimental
+    return k;
+  }
 } // namespace mln

@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     {
       image2d<uint8> g;
       io::imread(argv[i], g);
-      f = eval(imcast<rgb8>(g));
+      f = eval(mln::imcast<rgb8>(g));
     }
 
     tree = compute_ctos(f);

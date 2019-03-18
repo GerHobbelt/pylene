@@ -8,24 +8,18 @@
 
 TEST(Core, Algorithm_Count)
 {
-  using namespace mln;
-  using namespace mln::experimental;
-
-  image2d<int> ima(10, 10);
+  mln::image2d<int> ima(10, 10);
 
   mln::iota(ima, 0);
 
-  ASSERT_TRUE(count(ima, 1) == 1);
+  ASSERT_TRUE(mln::count(ima, 1) == 1);
 }
 
 TEST(Core, Algorithm_Count42)
 {
-  using namespace mln;
-  using namespace mln::experimental;
-
-  image2d<int> ima(3, 3);
+  mln::image2d<int> ima(3, 3);
 
   mln::fill(ima, 42);
 
-  ASSERT_TRUE(count(ima, 42) == 9);
+  ASSERT_TRUE(mln::count(ima, 42) == 9);
 }

@@ -14,15 +14,16 @@ namespace mln
     template <class I>
     class Saver
     {
-      BOOST_CONCEPT_ASSERT((Image<I>));
+      // BOOST_CONCEPT_ASSERT((Image<I>));
 
     public:
       virtual ~Saver() = default;
-      void save(const Image<I>& ima, PluginWriter* plugin, bool permissive);
+      void save(const Image<I>& ima, PluginWriter* plugin, bool permissive) const;
+      void save_experimental(I ima, PluginWriter* plugin, bool permissive) const;
 
     protected:
-      virtual void m_set_domain(const I& ima, PluginWriter* plugin) = 0;
-      virtual void m_save(const I& ima, PluginWriter* plugin, bool permissive);
+      virtual void m_set_domain(const I& ima, PluginWriter* plugin) const = 0;
+      virtual void m_save(const I& ima, PluginWriter* plugin, bool permissive) const;
     };
 
     template <class I, class category = typename image_traits<I>::category>
@@ -31,7 +32,7 @@ namespace mln
       static_assert(std::is_same<typename I::domain_type, box2d>::value, "The domain must be a box2d.");
 
     protected:
-      virtual void m_set_domain(const I& ima, PluginWriter* plugin);
+      void m_set_domain(const I& ima, PluginWriter* plugin) const override;
     };
 
     template <class I>
@@ -40,8 +41,8 @@ namespace mln
       static_assert(std::is_same<typename I::domain_type, box2d>::value, "The domain must be a box2d.");
 
     protected:
-      virtual void m_set_domain(const I& ima, PluginWriter* plugin);
-      virtual void m_save(const I& ima, PluginWriter* plugin, bool permissive);
+      void m_set_domain(const I& ima, PluginWriter* plugin) const override;
+      void m_save(const I& ima, PluginWriter* plugin, bool permissive) const override;
     };
 
     /******************************************/
@@ -49,7 +50,7 @@ namespace mln
     /******************************************/
 
     template <class I>
-    void Saver<I>::save(const Image<I>& ima_, PluginWriter* plugin, bool permissive)
+    void Saver<I>::save(const Image<I>& ima_, PluginWriter* plugin, bool permissive) const
     {
       const I& ima = exact(ima_);
 
@@ -65,33 +66,61 @@ namespace mln
     }
 
     template <class I>
-    void Saver<I>::m_save(const I& ima, PluginWriter* plugin, bool permissive)
+    void Saver<I>::save_experimental(I ima, PluginWriter* plugin, bool permissive) const
+    {
+      static_assert(is_a<I, mln::experimental::Image>());
+      
+      if (not plugin->can_write(typeid(mln_value(I))))
+      {
+        std::string msg = "The plugin does not support writing " + internal::demangle(typeid(mln_value(I)).name());
+        throw MLNIOException(msg);
+      }
+
+      plugin->set_value_type(typeid(mln_value(I)));
+      this->m_set_domain(ima, plugin);
+      this->m_save(ima, plugin, permissive);
+    }
+
+    template <class I>
+    void Saver<I>::m_save(const I& ima, PluginWriter* plugin, bool permissive) const
     {
       (void)permissive;
       std::function<void(void*)> write_next_pixel = plugin->get_write_next_pixel_method();
 
-      mln_foreach (mln_value(I) v, ima.values())
+      // FIXME: Oh my! So dirty!
+      // To be fixed with new io facility based on type-erased image for python
+      if constexpr (is_a<I, experimental::Image>{})
       {
-        write_next_pixel((void*)&v);
+        for (auto v : const_cast<I*>(&ima)->new_values())
+        {
+          write_next_pixel((void*)&v);
+        }
+      }
+      else
+      {
+        mln_foreach (mln_value(I) v, ima.values())
+        {
+          write_next_pixel((void*)&v);
+        }
       }
     }
 
     template <class I, class category>
-    void Saver2D<I, category>::m_set_domain(const I& ima, PluginWriter* plugin)
+    void Saver2D<I, category>::m_set_domain(const I& ima, PluginWriter* plugin) const
     {
       PluginWriter2D* plug = static_cast<PluginWriter2D*>(plugin);
       plug->set_domain(ima.domain());
     }
 
     template <class I>
-    void Saver2D<I, raw_image_tag>::m_set_domain(const I& ima, PluginWriter* plugin)
+    void Saver2D<I, raw_image_tag>::m_set_domain(const I& ima, PluginWriter* plugin) const
     {
       PluginWriter2D* plug = static_cast<PluginWriter2D*>(plugin);
       plug->set_domain(ima.domain());
     }
 
     template <class I>
-    void Saver2D<I, raw_image_tag>::m_save(const I& ima, PluginWriter* plugin, bool permissive)
+    void Saver2D<I, raw_image_tag>::m_save(const I& ima, PluginWriter* plugin, bool permissive) const
     {
       (void)permissive;
 

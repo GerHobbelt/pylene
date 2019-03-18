@@ -33,7 +33,7 @@ namespace mln
   template <typename I>
   struct Image : Object_<I>
   {
-    BOOST_CONCEPT_USAGE(Image) { BOOST_CONCEPT_ASSERT((Image_<I>)); }
+    // BOOST_CONCEPT_USAGE(Image) { BOOST_CONCEPT_ASSERT((Image_<I>)); }
   };
 
   template <typename I>

@@ -1,9 +1,15 @@
-#include <boost/tuple/tuple_io.hpp>
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/zip.hpp>
 #include <mln/core/range/algorithm/for_each.hpp>
+
+#include <range/v3/algorithm/for_each.hpp>
+
+#include <boost/tuple/tuple_io.hpp>
 
 #include <gtest/gtest.h>
 
@@ -18,6 +24,7 @@ mln::image2d<int> make_image()
 TEST(Core, ZipImage_Mixed_writable)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int>    ima(5, 5);
   image2d<uint16> ima2(5, 5);
@@ -28,38 +35,39 @@ TEST(Core, ZipImage_Mixed_writable)
   // mln_viter(v, x);
   // mln_forall(v)
   //   std::cout << std::get<0>(*v) << "," <<  std::get<1>(*v)    << std::endl;
-
-  mln::fill(imzip(ima, ima2), std::make_tuple(2, 4));
-  ASSERT_TRUE(all(ima == 2));
-  ASSERT_TRUE(all(ima2 == 4));
+  auto z = view::zip(ima, ima2);
+  mln::fill(z, std::make_tuple(2, 4));
+  ASSERT_TRUE(all_of(ima == 2));
+  ASSERT_TRUE(all_of(ima2 == 4));
 }
 
 TEST(Core, ZipImage_Value_Iteration_1)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
 
-  auto x = imzip(a, b);
-  range::for_each(x.values(), [](std::tuple<int&, uint16&> w) { w = std::make_tuple(2, 4); });
-  ASSERT_TRUE(all(a == 2));
-  ASSERT_TRUE(all(b == 4));
+  auto x = view::zip(a, b);
+  ::ranges::for_each(x.new_values(), [](auto w) { w = std::make_tuple(2, 4); });
+  ASSERT_TRUE(all_of(a == 2));
+  ASSERT_TRUE(all_of(b == 4));
 }
 
 TEST(Core, ZipImage_Pixel_Iteration_1)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
 
-  auto                                                           x = imzip(a, b);
-  typedef zip_image<image2d<int>&, image2d<uint16>&>::pixel_type pixel_t;
-  range::for_each(x.pixels(), [](pixel_t x) { x.val() = std::make_tuple(2, 4); });
+  auto x = view::zip(a, b);
+  ::ranges::for_each(x.new_pixels(), [](auto x) { x.val() = std::make_tuple(2, 4); });
 
-  ASSERT_TRUE(all(a == 2));
-  ASSERT_TRUE(all(b == 4));
+  ASSERT_TRUE(all_of(a == 2));
+  ASSERT_TRUE(all_of(b == 4));
 }
 
 TEST(Core, ZipImage_Value_Iteration_2)
@@ -71,14 +79,12 @@ TEST(Core, ZipImage_Value_Iteration_2)
   mln::iota(a, 0);
   mln::iota(b, 0);
 
-  const auto tmp = imzip(a, b);
+  auto tmp = view::zip(a, b);
 
   int sum1 = 0;
   {
-    int x, y;
-    mln_foreach (auto w, tmp.values())
+    for (auto&& [x, y] : tmp.new_values())
     {
-      std::tie(x, y) = w;
       sum1 += x + y;
     }
   }
@@ -88,11 +94,16 @@ TEST(Core, ZipImage_Value_Iteration_2)
 TEST(Core, ZipImage_Temporary_usage)
 {
   using namespace mln;
+  using namespace mln::experimental::ops;
+
   image2d<int> ima(5, 5);
-  auto         x = imzip(ima, make_image());
+  auto         tmp = make_image();
+  auto         z   = view::zip(ima, tmp);
 
-  mln_foreach (auto w, x.values())
-    std::get<0>(w) = std::get<1>(w);
+  for (auto&& [x, y] : z.new_values())
+  {
+    x = y;
+  }
 
-  ASSERT_TRUE(all(ima == make_image()));
+  ASSERT_TRUE(all_of(ima == make_image()));
 }

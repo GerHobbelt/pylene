@@ -1,6 +1,38 @@
-#include "lut.hpp"
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/neighborhood/dyn_wneighborhood.hpp>
+#include <mln/core/se/disc.hpp>
+#include <mln/data/stretch.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/structural/dilate.hpp>
+#include <mln/morpho/watershed.hpp>
+#include <mln/transform/chamfer_distance_transform.hpp>
 
-const mln::rgb8 regions_table[] = {
+class c23_t : public mln::dyn_wneighborhood_base<std::array<mln::point2d, 8>, std::array<int, 8>,
+                                                 mln::constant_neighborhood_tag, c23_t>
+{
+public:
+  static constexpr std::array<mln::point2d, 8> dpoints = {
+      {{-1, -1},
+       {-1, +0},
+       {-1, 1}, //
+       {+0, -1},
+       {+0, 1}, //
+       {+1, -1},
+       {+1, +0},
+       {+1, 1}} //
+  };
+
+  static constexpr std::array<int, 8> weights = {{3, 2, 3, 2, 2, 3, 2, 3}};
+};
+
+constexpr std::array<mln::point2d, 8> c23_t::dpoints;
+constexpr std::array<int, 8>          c23_t::weights;
+
+static const std::vector<mln::rgb8> regions_table = {
     {0, 0, 0},       {255, 255, 255}, {0, 127, 255},   {127, 255, 0},   {255, 0, 127},   {148, 148, 148},
     {0, 255, 128},   {128, 0, 255},   {255, 128, 0},   {1, 0, 159},     {0, 159, 1},     {159, 1, 0},
     {96, 254, 255},  {255, 96, 254},  {254, 255, 96},  {21, 125, 126},  {126, 21, 125},  {125, 126, 21},
@@ -46,7 +78,11 @@ const mln::rgb8 regions_table[] = {
     {90, 50, 6},     {113, 15, 221},  {221, 113, 15},  {115, 0, 33},
 };
 
-const std::size_t regions_table_size = sizeof(regions_table) / sizeof(mln::rgb8);
+mln::rgb8 regions_lut(int x)
+{
+  static int sz = static_cast<int>(regions_table.size());
+  return regions_table[x % sz];
+}
 
 mln::rgb8 heat_lut(float x)
 {
@@ -57,29 +93,61 @@ mln::rgb8 heat_lut(float x)
 
   if (x < x0)
   {
-    auto g = static_cast<uint8_t>(x / x0 * 255);
+    auto g = static_cast<mln::uint8>(x / x0 * 255);
     return mln::rgb8{0, g, 255};
   }
   else if (x < x1)
   {
-    auto b = static_cast<uint8_t>((x1 - x) / x0 * 255);
+    auto b = static_cast<mln::uint8>((x1 - x) / x0 * 255);
     return mln::rgb8{0, 255, b};
   }
   else if (x < x2)
   {
-    auto r = static_cast<uint8_t>((x - x1) / x0 * 255);
+    auto r = static_cast<mln::uint8>((x - x1) / x0 * 255);
     return mln::rgb8{r, 255, 0};
   }
   else
   {
-    auto b = static_cast<uint8_t>((1.f - x) / x0 * 255);
+    auto b = static_cast<mln::uint8>((1.f - x) / x0 * 255);
     return mln::rgb8{255, b, 0};
   }
 }
 
-mln::rgb8 regions_lut(int x)
+int main(int argc, char** argv)
 {
-  int      sz = static_cast<int>(regions_table_size);
-  return regions_table[x % sz];
-}
+  using namespace mln::experimental::ops;
 
+  if (argc < 4)
+  {
+    std::cout << "Usage:" << argv[0] << " input distance output\n";
+    std::abort();
+  }
+
+  mln::image2d<mln::uint8> input;
+  mln::io::imread(argv[1], input);
+
+  // BEGIN
+  // (1) Compute the distance transform
+  auto d = mln::transforms::chamfer_distance_transform<mln::uint8>(input, c23_t());
+
+  // Remove non-meaninfull extrema
+  d = mln::morpho::structural::dilate(d, mln::se::disc(5));
+
+  // (2) Inverse the distance
+  auto dinv = mln::transform(d, [](mln::uint8 x) -> mln::uint8 { return mln::value_traits<mln::uint8>::max() - x; });
+
+  // (3) Run the watershed segmentation
+  int  nlabel;
+  auto ws = mln::morpho::experimental::watershed<mln::int16>(dinv, mln::c8, nlabel);
+
+  // (4) Labelize input
+  [[maybe_unused]] auto output = mln::experimental::where(ws == 0, 1, mln::experimental::where(input, ws, 0));
+
+  // END
+  auto d_stretched = mln::data::stretch<float>(d);
+
+  mln::io::imsave(mln::transform(d_stretched, heat_lut), argv[2]);
+
+  // FIXME: migrate rangev3 @HEAD
+  // mln::io::experimental::imsave(mln::transform(output, regions_lut), argv[3]);
+}

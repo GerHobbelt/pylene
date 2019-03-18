@@ -44,7 +44,7 @@ TEST(View, mask)
     ASSERT_EQ(42, ima(p));
     ASSERT_EQ(42, z(p));
   }
-  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
+  ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
 
@@ -90,7 +90,7 @@ TEST(View, mask_twice)
     ASSERT_EQ(42, B(p));
   }
 
-  ASSERT_TRUE(mln::experimental::all_of(ima == ref));
+  ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
 

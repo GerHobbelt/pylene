@@ -22,7 +22,7 @@ before_script:
         - cmake --build apps --config $PYLENE_CONFIGURATION
         - cmake --build tests --config $PYLENE_CONFIGURATION
         - cmake --build bench/tests --config $PYLENE_CONFIGURATION
-        - ctest -L UnitTests
+        - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
     artifacts:
         reports:

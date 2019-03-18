@@ -1,3 +1,4 @@
+#include <mln/colors/rgba.hpp>
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
@@ -66,7 +67,8 @@ class BMAlgorithms : public benchmark::Fixture
 
 
     mln::io::imread(filename, m_input_rgb8);
-    m_input_uint8 = mln::clone(mln::red(m_input_rgb8));
+    auto ima_red  = mln::transform(m_input_rgb8, [](auto& rgb8) -> auto& { return mln::getter<0>{}(rgb8); });
+    m_input_uint8 = mln::clone(ima_red);
 
     m_pixel_count = m_input_rgb8.domain().size();
   }
@@ -398,7 +400,7 @@ BENCHMARK_F(BMAlgorithms, sort_points_buffer2d_large_int)(benchmark::State& st)
     return res;
   };
 
-  mln::image2d<int> tmp = mln::experimental::transform(m_input_rgb8, bit_mix);
+  mln::image2d<int> tmp = mln::transform(m_input_rgb8, bit_mix);
   while (st.KeepRunning())
     sort_points(tmp);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);

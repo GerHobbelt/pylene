@@ -2,6 +2,8 @@
 
 #include <boost/optional.hpp>
 #include <mln/core/image/image.hpp>
+// #include <mln/core/image/private/where.hpp>
+// #include <mln/core/image/view/clip.hpp>
 #include <mln/core/image_base.hpp>
 #include <mln/core/iterator/transform_iterator.hpp>
 #include <mln/core/pixel_utility.hpp>
@@ -74,6 +76,14 @@ namespace mln
 
   template <typename I, typename DomainOrMask>
   auto operator|(Image<I>&& ima, const DomainOrMask& other) -> decltype(make_subimage(move_exact(ima), other));
+
+  /*
+  namespace experimental::ops
+  {
+    template <typename InputImage>
+    auto operator|(InputImage ima, const mln::ranges::where_t<InputImage>& dom);
+  } // namespace experimental::ops
+  */
 
   /******************************************/
   /****          Implementation          ****/
@@ -187,6 +197,19 @@ namespace mln
   {
     return make_subimage(move_exact(ima), other);
   }
+
+  /*
+  namespace experimental::ops
+  {
+    template <typename InputImage>
+    auto operator|(InputImage ima, const mln::ranges::where_t<InputImage>& dom)
+    {
+      static_assert(is_a<InputImage, mln::experimental::Image>());
+
+      return view::clip(std::move(ima), dom);
+    }
+  } // namespace experimental::ops
+  */
 
   /******************************************/
   /****              Traits              ****/

@@ -36,7 +36,7 @@ TEST(View, filter_readonly)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  ASSERT_TRUE(mln::experimental::all_of(x > 10));
+  ASSERT_TRUE(mln::all_of(x > 10));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {
@@ -71,8 +71,8 @@ TEST(View, filter_writable)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
-  mln::experimental::fill(x, 10);
-  ASSERT_TRUE(mln::experimental::all_of(ima <= 10));
+  mln::fill(x, 10);
+  ASSERT_TRUE(mln::all_of(ima <= 10));
 }
 
 
@@ -96,7 +96,7 @@ TEST(View, filter_twice)
   static_assert(not concepts::RawImage<decltype(u)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  ASSERT_TRUE(mln::experimental::all_of(u > 10 && u < 15));
+  ASSERT_TRUE(mln::all_of(u > 10 && u < 15));
 
   mln_foreach_new (auto&& pix, ima.new_pixels())
   {
@@ -117,8 +117,8 @@ TEST(View, filter_twice)
       ASSERT_EQ(pix.val(), ima(pix.point()));
   }
 
-  mln::image2d<int> before = mln::experimental::clone(ima);
-  mln::experimental::fill(u, 1);
+  mln::image2d<int> before = mln::clone(ima);
+  mln::fill(u, 1);
   {
     mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), ima.new_values()))
     {

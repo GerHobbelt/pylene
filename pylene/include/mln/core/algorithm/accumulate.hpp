@@ -2,7 +2,7 @@
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/range/rows.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
 namespace mln
 {
@@ -22,10 +22,10 @@ namespace mln
   typename accu::result_of<AccuLike, image_value_t<InputImage>, Extractor>::type
       accumulate(InputImage input, const AccumulatorLike<AccuLike>& accu, const Extractor& ex)
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<InputImage, experimental::Image>());
 
     auto   a    = accu::make_accumulator(exact(accu), image_value_t<InputImage>());
-    auto&& vals = input.values();
+    auto&& vals = input.new_values();
     for (auto row : mln::ranges::rows(vals))
       for (auto&& v : row)
         a.take(v);
@@ -35,9 +35,9 @@ namespace mln
   template <typename InputImage, class V, class BinaryOperator>
   std::enable_if_t<!is_a<V, AccumulatorLike>::value, V> accumulate(InputImage input, V init, BinaryOperator op)
   {
-    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<InputImage, experimental::Image>());
 
-    auto&& vals = input.values();
+    auto&& vals = input.new_values();
     for (auto row : mln::ranges::rows(vals))
       for (auto&& v : row)
         init = op(init, v);

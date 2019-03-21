@@ -1,9 +1,10 @@
+#include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/rangev3/multi_indices.hpp>
 #include <mln/core/rangev3/multi_span.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
-#include <mln/core/concept/new/concepts.hpp>
+#include <range/v3/algorithm/equal.hpp>
 
 #include <vector>
 
@@ -309,44 +310,49 @@ TEST(Range, transform2_2d_write_row_wise)
   }
 }
 
-
 TEST(Range, transform_read_chain)
 {
-  std::vector<int> buffer1(12, -1);
+  std::vector<int> buffer(12, -1);
 
-  mln::ranges::multi_span<int, 2> sp1(buffer1.data(), {3, 4}, {4, 1});
+  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3, 4}, {4, 1});
 
-  auto                  x = mln::ranges::view::transform(sp1, [](int a) { return a > 3 ? a : 42; });
-  auto                  y = mln::ranges::view::transform(x, [](int a) { return a + 1; });
-  [[maybe_unused]] auto z = mln::ranges::view::transform(y, [](int a) { return a * 2; });
+  auto x = mln::ranges::view::transform(sp, [](int a) { return a > 3 ? a : 42; });
+  auto y = mln::ranges::view::transform(x, [](int a) { return a + 1; });
+  auto z = mln::ranges::view::transform(y, [](int a) { return a * 2; });
+
+  std::vector<int>                buffer_ref(12, 86);
+  mln::ranges::multi_span<int, 2> ref(buffer_ref.data(), {3, 4}, {4, 1});
+
+  ASSERT_TRUE(::ranges::equal(z, ref));
 }
 
-
-// FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
-// FIXME: migrate rangev3 @HEAD
-/*
 TEST(Range, transform2_read_chain)
 {
-  std::vector<int> buffer1(12, -1);
+  std::vector<int> buffer(12, -1);
 
-  mln::ranges::multi_span<int, 2> sp1(buffer1.data(), {3, 4}, {4, 1});
+  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3, 4}, {4, 1});
 
-  [[maybe_unused]] auto x = mln::ranges::view::transform(sp1, [](int a) { return a > 3 ? a : 42; });
-  [[maybe_unused]] auto y = mln::ranges::view::transform(x, sp1, [](int a, int b) { return a + b; });
-  [[maybe_unused]] auto rng = mln::ranges::view::transform(y, [](int a) { return a + 1; });
+  auto x = mln::ranges::view::transform(sp, [](int a) { return a > 3 ? a : 42; });
+  auto y = mln::ranges::view::transform(x, sp, [](int a, int b) { return a + b; });
+  auto z = mln::ranges::view::transform(y, [](int a) { return a + 1; });
+
+  std::vector<int>                buffer_ref(12, 42);
+  mln::ranges::multi_span<int, 2> ref(buffer_ref.data(), {3, 4}, {4, 1});
+
+  ASSERT_TRUE(::ranges::equal(z, ref));
 }
-*/
 
-// FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
-// FIXME: migrate rangev3 @HEAD
-/*
 TEST(Range, range_transform2_read_chain)
 {
-  std::vector<int> buff(12, -1);
+  std::vector<int>    buff(12, -1);
   ::ranges::span<int> sp(buff.data(), 12);
 
   auto x = ::ranges::view::transform(sp, [](int a) { return a > 3 ? a : 42; });
   auto y = ::ranges::view::transform(x, sp, [](int a, int b) { return a + b; });
-  [[maybe_unused]] auto rng = ::ranges::view::transform(y, [](int a) { return a + 1; });
+  auto z = ::ranges::view::transform(y, [](int a) { return a + 1; });
+
+  std::vector<int>    buffer_ref(12, 42);
+  ::ranges::span<int> ref(buffer_ref.data(), 12);
+
+  ASSERT_TRUE(::ranges::equal(z, ref));
 }
-*/

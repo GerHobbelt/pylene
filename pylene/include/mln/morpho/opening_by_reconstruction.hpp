@@ -26,6 +26,7 @@ namespace mln
                     "Images f and marker must have the same point type.");
 
       mln_entering("mln::morpho::opening_by_reconstruction");
+      // FIXME: add experimental version
       return closing_by_reconstruction(f, markers, nbh, std::greater<mln_value(I)>());
     }
   } // namespace morpho

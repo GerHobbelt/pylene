@@ -1,8 +1,7 @@
-#include <mln/core/image/image2d.hpp>
-
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/equal.hpp>
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/image/image2d.hpp>
 
 #include <gtest/gtest.h>
 
@@ -28,4 +27,3 @@ TEST(Core, Algorithm_Exp_Copy)
 
   ASSERT_TRUE(mln::equal(ima, out));
 }
-

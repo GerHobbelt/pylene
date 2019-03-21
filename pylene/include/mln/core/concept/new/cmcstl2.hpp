@@ -1,33 +1,13 @@
 #pragma once
 
-/* DO NOT REMOVE */
-
-// stl2/meta and ranges-v3/meta are not the same but have the same header guard (><)!!.
-// stl2 works with ranges-v3/meta, but ranges-v3 doesn't work with stl2/meta
-// here we force the usage of ranges-v3/meta
-// stl2/meta is in <stl2/meta/meta.hpp>
-#include <meta/meta.hpp>
-
-
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
-#ifdef concept
-#define __concept_bool
-#undef concept
-#endif
-
 #include <stl2/concepts.hpp>
-
-#ifdef __concept_bool
-#define concept concept bool
-#undef __concept_bool
-#endif
 
 namespace mln::concepts::stl
 {
   using namespace __stl2;
 }
-
 
 // Dirty hack to allow proper conversion from ranges iterator iterator tags to __stl2 iterator tags
 #include <range/v3/utility/iterator_concepts.hpp>
@@ -79,5 +59,7 @@ namespace std::experimental::ranges
 
   } // namespace v1
 } // namespace std::experimental::ranges
+
+#define concept META_CONCEPT
 
 #endif // PYLENE_CONCEPT_TS_ENABLED

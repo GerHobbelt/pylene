@@ -50,6 +50,7 @@ namespace mln::ranges
       using fun_ref_ = ::ranges::semiregular_ref_or_val_t<Fun, true>;
       fun_ref_                                  fun_;
       std::tuple<::ranges::iterator_t<Rngs>...> begins_;
+      static inline constexpr const bool        are_bidir_rngs_ = (::ranges::BidirectionalRange<Rngs>() && ...);
 
     public:
       cursor() = default;
@@ -89,21 +90,34 @@ namespace mln::ranges
         std::apply([](auto&... rng_it) { (++rng_it, ...); }, begins_);
       }
 
-      /*
 #ifdef PYLENE_CONCEPT_TS_ENABLED
       // clang-format off
       void prev() requires (mln::concepts::stl::BidirectionalRange<Rngs> && ...)
       // clang-format on
+      {
+        std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
+      }
 #else
+      // Clunky SFINAE doesn't work
+      /*
       template <typename U = void, typename = std::enable_if_t<(::ranges::BidirectionalRange<Rngs>() && ...)>>
-
-      void prev()
-      #endif
-      */
       void prev()
       {
         std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
       }
+      */
+      void prev()
+      {
+        if constexpr (are_bidir_rngs_)
+        {
+          std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
+        }
+        else
+        {
+          static_assert(are_bidir_rngs_, "Cannot traverse non-bidirectional range backward");
+        }
+      }
+#endif
     };
 
     cursor begin_cursor()
@@ -250,7 +264,7 @@ namespace mln::ranges
   }
 
 
-    template <typename Fun, typename... Rngs>
+  template <typename Fun, typename... Rngs>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // clang-format off
       auto zip_with_view<Fun, Rngs...>::rows() requires (mln::concepts::SegmentedRange<Rngs> && ...)

@@ -39,6 +39,10 @@ namespace mln
     auto&& lhs_vals = lhs.new_values();
     auto&& rhs_vals = rhs.new_values();
 
+    using RngLhs = ::ranges::iterator_t<decltype(lhs_vals)>;
+    using RngRhs = ::ranges::iterator_t<decltype(rhs_vals)>;
+    static_assert(::ranges::Comparable<RngLhs, RngRhs, ::ranges::equal_to, ::ranges::ident, ::ranges::ident>());
+
     for (auto [lhs_r, rhs_r] : ranges::view::zip(ranges::rows(lhs_vals), ranges::rows(rhs_vals)))
       // FIXME: with std::equal you gain performances over ranges::equal here
       if (!::ranges::equal(lhs_r, rhs_r))

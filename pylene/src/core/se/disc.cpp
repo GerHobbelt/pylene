@@ -1,7 +1,7 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/core/assert.hpp>
-#include <stdexcept>
 
+#include <stdexcept>
 #include <array>
 
 

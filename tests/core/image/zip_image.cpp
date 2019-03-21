@@ -51,6 +51,7 @@ TEST(Core, ZipImage_Value_Iteration_1)
 
   auto x = view::zip(a, b);
   ::ranges::for_each(x.new_values(), [](auto w) { w = std::make_tuple(2, 4); });
+
   ASSERT_TRUE(all_of(a == 2));
   ASSERT_TRUE(all_of(b == 4));
 }

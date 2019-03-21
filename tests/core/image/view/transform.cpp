@@ -14,6 +14,8 @@
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 
@@ -192,21 +194,20 @@ TEST(Core, Transform_Supports_Function)
   static_assert(not concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  // FIXME: migrate rangev3 @HEAD
-  // ASSERT_TRUE(mln::equal(ref, c));
+  ASSERT_TRUE(mln::equal(ref, c));
 }
 
 TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
   using namespace mln::experimental::ops;
 
-  typedef std::pair<int, int> V;
+  using V = std::pair<int, int>;
 
   mln::box2d      dom{{-1, -2}, {3, 3}};
   mln::image2d<V> ima(dom, 3, std::make_pair(42, 42));
   mln::image2d<V> ref(dom, 3, std::make_pair(69, 42));
 
-  auto c = mln::view::transform(ima, &std::pair<int, int>::first);
+  auto c = mln::view::transform(ima, &V::first);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(concepts::ConcreteImage<decltype(ima)>);
@@ -219,13 +220,9 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   mln::fill(c, 69);
-
-  // FIXME: migrate rangev3 @HEAD
-  // ASSERT_TRUE(mln::equal(ref, c));
+  ASSERT_TRUE(mln::equal(ima, ref));
 }
 
-
-// TODO: add transform2 unit tests
 TEST(Core, Transformed2Image_transform_byval_chain)
 {
   using namespace mln;
@@ -236,13 +233,12 @@ TEST(Core, Transformed2Image_transform_byval_chain)
 
   iota(ima, 0);
   iota(ima2, 1);
-  {
-    auto                  x   = view::transform(ima, [](int a) { return a > 3; });
-    auto                  y   = view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
-    [[maybe_unused]] auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
 
-    // FIXME: issue https://github.com/ericniebler/range-v3/issues/996 with gcc8.2
-    // FIXME: migrate rangev3 @HEAD
-    // [[maybe_unused]] auto z = mln::all_of(out);
-  }
+  auto x   = view::transform(ima, [](int a) { return a > 3; });
+  auto y   = view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
+  auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
+
+  std::vector<int> ref = {3, 4, 5, 6, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39};
+
+  ASSERT_EQ(ref, ::ranges::to_vector(out.new_values()));
 }

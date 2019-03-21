@@ -121,8 +121,8 @@ TEST(Core, SubImage_sub_domain)
         {20, 21, 22, 23, 24}  //
     };
     iota(ima, 0);
-    // mln::fill(view::clip(ima, experimental::where(ima > 10 && ima < 20)), 42);
-    // ASSERT_TRUE(all_of(ima == ref));
+    mln::fill(view::clip(ima, experimental::where(ima > 10 && ima < 20)), 42);
+    ASSERT_TRUE(all_of(ima == ref));
   }
 }
 

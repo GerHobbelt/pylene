@@ -98,8 +98,9 @@ namespace mln::experimental
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse iffalse) const
       {
-        auto g = [](auto tuple_ternary_expr) -> decltype(auto) {
-          return (std::get<0>(tuple_ternary_expr)) ? std::get<1>(tuple_ternary_expr) : std::get<2>(tuple_ternary_expr);
+        auto g = [](auto&& tuple_ternary_expr) -> decltype(auto) {
+          auto&& [im_c, im_t, im_f] = std::forward<decltype(tuple_ternary_expr)>(tuple_ternary_expr);
+          return im_c ? im_t : im_f;
         };
 
         return view::transform(view::zip(cond, iftrue, iffalse), g);

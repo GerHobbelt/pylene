@@ -13,6 +13,15 @@
 #include <type_traits>
 
 
+namespace mln
+{
+  // FIXME: to remove once circular dependency between image/clone/copy is resolved
+  template <typename InputImage, typename OutputImage>
+  [[deprecated]] OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output);
+  template <typename InputImage, typename OutputImage>
+  [[deprecated]] OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output);
+} // namespace mln
+
 // FIXME:
 namespace to_migrate
 {
@@ -48,7 +57,6 @@ namespace to_migrate
 
 namespace mln
 {
-
   /// \defgroup free_functions Free functions
   /// \ingroup image
   /// \{

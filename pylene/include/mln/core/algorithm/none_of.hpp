@@ -2,8 +2,10 @@
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
+
 #include <range/v3/algorithm/none_of.hpp>
 #include <range/v3/utility/functional.hpp>
+
 
 namespace mln
 {

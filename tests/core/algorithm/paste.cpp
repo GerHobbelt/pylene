@@ -1,10 +1,10 @@
-#include <mln/core/grays.hpp>
-#include <mln/core/image/image2d.hpp>
-
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/paste.hpp>
+#include <mln/core/grays.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/core/range/algorithm/accumulate.hpp>
+
 #include <range/v3/numeric/accumulate.hpp>
 
 #include <gtest/gtest.h>

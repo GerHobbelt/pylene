@@ -19,7 +19,7 @@ namespace mln
   /******************/
 
   template <class InputImage, class Value>
-  std::ptrdiff_t count(InputImage input, const Value& v)
+  std::ptrdiff_t count(InputImage input, const Value& val)
   {
     static_assert(mln::is_a<InputImage, Image>());
 
@@ -27,7 +27,7 @@ namespace mln
     std::ptrdiff_t k    = 0;
 
     for (auto r : ranges::rows(vals))
-      k += ::ranges::count(r, v);
+      k += ::ranges::count(r, val);
 
     return k;
   }

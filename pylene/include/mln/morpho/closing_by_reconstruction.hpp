@@ -1,7 +1,10 @@
 #pragma once
 
 #include <mln/accu/accumulators/min.hpp>
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/view/zip.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/morpho/canvas/unionfind.hpp>
 
@@ -63,9 +66,11 @@ namespace mln
       const J&                                                    markers = exact(markers_);
 
       // assert that f <= markers
-      mln_precondition(all(imtransform(imzip(f, markers), [cmp](std::tuple<mln_value(I), mln_value(J)> v) {
-        return not cmp(std::get<1>(v), std::get<0>(v));
-      })));
+      // FIXME:
+      // mln_precondition(all_of(view::transform(view::zip(f, markers), [cmp](std::tuple<mln_value(I), mln_value(J)> v)
+      // {
+      //   return not cmp(std::get<1>(v), std::get<0>(v));
+      // })));
 
       mln_concrete(I) out = clone(f);
       mln_ch_value(I, accu_t) accus;

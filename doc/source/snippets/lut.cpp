@@ -147,7 +147,5 @@ int main(int argc, char** argv)
   auto d_stretched = mln::data::stretch<float>(d);
 
   mln::io::imsave(mln::transform(d_stretched, heat_lut), argv[2]);
-
-  // FIXME: migrate rangev3 @HEAD
-  // mln::io::experimental::imsave(mln::transform(output, regions_lut), argv[3]);
+  mln::io::experimental::imsave(mln::transform(output, regions_lut), argv[3]);
 }

@@ -1,4 +1,5 @@
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/se/utility.hpp>
 #include <mln/io/imread.hpp>
@@ -9,6 +10,8 @@
 
 int main(int argc, char** argv)
 {
+  using namespace mln::experimental::ops;
+
   if (argc < 7)
   {
     std::cerr << "Usage: " << argv[0] << " markers1.pbm markers2.pbm markers.pbm all.pbm lines.pbm\n";
@@ -31,7 +34,7 @@ int main(int argc, char** argv)
     auto                        se_miss      = mln::se::make_se(se_miss_data);
     auto                        output       = mln::morpho::hit_or_miss(input, se_hit, se_miss);
     markers1                                 = output;
-    mln::io::imsave(mln::lnot(markers1), argv[2]);
+    mln::io::experimental::imsave(not markers1, argv[2]);
   }
 
   {
@@ -41,15 +44,18 @@ int main(int argc, char** argv)
     auto                        se_miss      = mln::se::make_se(se_miss_data);
     auto                        output       = mln::morpho::hit_or_miss(input, se_hit, se_miss);
     markers2                                 = output;
-    mln::io::imsave(mln::lnot(markers2), argv[3]);
+    mln::io::experimental::imsave(not markers2, argv[3]);
   }
 
-  auto markers = mln::lor(markers1, markers2);
-  mln::io::imsave(mln::lnot(markers), argv[4]);
+  auto markers  = markers1 || markers2;
+  
+  mln::io::experimental::imsave(not markers, argv[4]);
 
-  auto all_touching = mln::morpho::opening_by_reconstruction(input, markers, mln::c4);
+  // FIXME: add experimental version
+  auto markers_ = mln::lor(markers1, markers2);
+  auto all_touching = mln::morpho::opening_by_reconstruction(input, markers_, mln::c4);
   mln::io::imsave(mln::lnot(all_touching), argv[5]);
 
-  auto lines_only = mln::morpho::opening_by_reconstruction(input, markers, mln::c2_h);
+  auto lines_only = mln::morpho::opening_by_reconstruction(input, markers_, mln::c2_h);
   mln::io::imsave(mln::lnot(lines_only), argv[6]);
 }

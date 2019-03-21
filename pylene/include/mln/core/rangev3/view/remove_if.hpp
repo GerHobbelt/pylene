@@ -84,8 +84,12 @@ namespace mln::ranges
 
     public:
       template <typename Rng, typename Pred>
-      using Constraint =
-          ::meta::and_<::ranges::InputRange<Rng>, ::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>>>;
+      using Constraint = ::meta::and_<::ranges::InputRange<Rng>,
+                                      ::ranges::Predicate<Pred, ::ranges::reference_t<::ranges::iterator_t<Rng>>>
+                                      // FIXME: IndirectPredicate is bugged, see issue #1077
+                                      // https://github.com/ericniebler/range-v3/issues/1077
+                                      // ::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>>
+                                      >;
 
       template <typename Rng, typename Pred, CONCEPT_REQUIRES_(Constraint<Rng, Pred>())>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -103,7 +107,12 @@ namespace mln::ranges
       {
         CONCEPT_ASSERT_MSG(::ranges::InputRange<Rng>(), "The first argument to view::remove_if must be a model of the "
                                                         "InputRange concept");
-        CONCEPT_ASSERT_MSG(::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>>(),
+        CONCEPT_ASSERT_MSG(::meta::and_<::ranges::CopyConstructible<Pred>,
+                                        ::ranges::Predicate<Pred, ::ranges::reference_t<::ranges::iterator_t<Rng>>>
+                                        // FIXME: IndirectPredicate is bugged, see issue #1077
+                                        // https://github.com/ericniebler/range-v3/issues/1077
+                                        //::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>
+                                        >(),
                            "The second argument to view::remove_if must be callable with "
                            "a value of the range, and the return type must be convertible "
                            "to bool");

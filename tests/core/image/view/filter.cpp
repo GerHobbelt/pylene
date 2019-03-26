@@ -1,6 +1,6 @@
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/filter.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
@@ -18,7 +18,7 @@
 
 TEST(View, filter_readonly)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::box2d        dom = {{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
@@ -53,7 +53,7 @@ TEST(View, filter_readonly)
 
 TEST(View, filter_writable)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::box2d        dom{{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
@@ -78,7 +78,7 @@ TEST(View, filter_writable)
 
 TEST(View, filter_twice)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::box2d        dom = {{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);

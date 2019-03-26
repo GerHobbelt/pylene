@@ -2,10 +2,10 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
+#include <mln/core/domain/where.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
-#include <mln/core/image/private/where.hpp>
 #include <mln/core/image/view/clip.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -23,7 +23,7 @@ struct vector_domain : public std::vector<mln::point2d>
 
 TEST(View, clip)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 4, 8, 9}, //
@@ -59,7 +59,7 @@ TEST(View, clip)
 
 TEST(View, clip_twice)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 4, 8, 9}, //
@@ -106,7 +106,7 @@ TEST(View, clip_twice)
 
 TEST(View, clip_other_a_box2d)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 4, 8, 9}, //
@@ -143,7 +143,7 @@ TEST(View, clip_other_a_box2d)
 TEST(Core, Clip_where)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int> ima(5, 5);
 
@@ -163,7 +163,7 @@ TEST(Core, Clip_where)
 TEST(Core, Clip_wherex2_joints)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int> ima(5, 5);
 
@@ -183,7 +183,7 @@ TEST(Core, Clip_wherex2_joints)
 TEST(Core, Clip_where_and)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int> ima(5, 5);
 

@@ -4,7 +4,7 @@
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/io/imprint.hpp>
 
 #include <gtest/gtest.h>
@@ -12,7 +12,7 @@
 TEST(Core, Extension_Fill)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);

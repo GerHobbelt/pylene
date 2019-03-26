@@ -1,14 +1,14 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Iota)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<uint8_t> out(3, 4);
   mln::iota(out, 1);

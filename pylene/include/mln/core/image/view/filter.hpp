@@ -3,13 +3,10 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clip.hpp>
-#include <mln/core/domain/where.hpp>
+#include <mln/core/rangev3/view/filter.hpp>
+#include <mln/core/rangev3/view/remove_if.hpp>
 
-#include <mln/core/range/view/filter.hpp>
-#include <mln/core/range/view/remove_if.hpp>
-
-
-#include <range/v3/range/primitives.hpp>
+#include <range/v3/empty.hpp>
 #include <range/v3/utility/functional.hpp>
 
 #include <type_traits>
@@ -19,7 +16,7 @@ namespace mln
 {
 
   template <class I, class F>
-  class filter_view : public image_adaptor<I>, public details::Image<filter_view<I, F>>
+  class filter_view : public image_adaptor<I>, public experimental::Image<filter_view<I, F>>
   {
     using fun_t = F;
     fun_t f;
@@ -27,11 +24,42 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using pixel_type = image_pixel_t<I>;
+    using new_pixel_type = image_pixel_t<I>;
     using typename filter_view::image_adaptor::point_type;
     using typename filter_view::image_adaptor::reference;
     using typename filter_view::image_adaptor::value_type;
-    using domain_type = mln::ranges::where_t<I, F>;
+
+    class domain_type : ::ranges::view_base
+    {
+      using fun_t = ::ranges::composed<F, std::reference_wrapper<I>>; // f o I::operator()
+      using dom_t = decltype(std::declval<I*>()->domain());
+      using rng_t = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<fun_t>>;
+
+      fun_t         m_fun;
+      dom_t         m_dom;
+      mutable rng_t m_rng; // domain can be a range, so non-const
+
+      static_assert(::ranges::ForwardRange<rng_t>());
+      static_assert(::ranges::View<::ranges::view::all_t<dom_t>>());
+
+    public:
+      using value_type = ::ranges::range_value_t<rng_t>;
+      using reference  = ::ranges::range_reference_t<rng_t>;
+
+      domain_type(I* ima, F f)
+        : m_fun(std::move(f), std::ref(*ima))
+        , m_dom(ima->domain())
+        , m_rng(mln::ranges::view::filter(::ranges::view::all(m_dom), m_fun))
+      {
+      }
+
+      auto begin() const { return ::ranges::begin(m_rng); }
+      auto end() const { return ::ranges::end(m_rng); }
+
+      bool has(point_type p) const { return m_dom.has(p) && m_fun(p); }
+      bool empty() const { return ::ranges::empty(m_rng); }
+    };
+    /// \}
 
 
     /// Traits & Image Properties
@@ -47,7 +75,7 @@ namespace mln
     /// \}
 
     // Checks
-    static_assert(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
+    PYLENE_CONCEPT_TS_ASSERT(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
 
   private:
     struct pix_filter_fn
@@ -69,25 +97,25 @@ namespace mln
     {
     }
 
-    image_builder<concrete_type, clip_view<I, domain_type>> concretize() const
+    internal::initializer<concrete_type, clip_view<I, domain_type>> concretize() const
     {
       return mln::clip_view{this->base(), domain()};
     }
 
     template <typename V>
-    image_builder<ch_value_type<V>, clip_view<I, domain_type>> ch_value() const
+    internal::initializer<ch_value_type<V>, clip_view<I, domain_type>> ch_value() const
     {
       return mln::clip_view{this->base(), domain()};
     }
 
-    domain_type domain() const { return {this->base(), f}; }
+    domain_type domain() const { return {const_cast<I*>(&this->base()), this->f}; }
 
-    auto values() { return mln::ranges::view::filter(this->base().values(), f); }
+    auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
 
-    auto pixels()
+    auto new_pixels()
     {
       auto g = [f_ = this->f](const auto& px) -> bool { return f_(px.val()); };
-      return mln::ranges::view::filter(this->base().pixels(), g);
+      return mln::ranges::view::filter(this->base().new_pixels(), g);
     }
 
 
@@ -115,17 +143,17 @@ namespace mln
     {
       return this->base().at(p);
     }
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
       mln_precondition(domain().has(p));
       mln_precondition(std::invoke(f, this->base().at(p)));
-      return this->base().pixel(p);
+      return this->base().new_pixel(p);
     }
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
+    template <typename Ret = new_pixel_type>
+    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
     {
-      return this->base().pixel_at(p);
+      return this->base().new_pixel_at(p);
     }
     /// \}
 
@@ -166,7 +194,7 @@ namespace mln
     template <class I, class P>
     filter_view<I, P> filter(I ima, P predicate)
     {
-      static_assert(mln::is_a<I, mln::details::Image>());
+      static_assert(mln::is_a<I, experimental::Image>());
       static_assert(std::is_invocable_r<bool, P, image_reference_t<I>>());
 
       return {std::move(ima), std::move(predicate)};

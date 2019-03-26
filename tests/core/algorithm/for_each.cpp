@@ -1,7 +1,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 #include <utility>
 
@@ -9,7 +9,7 @@
 
 TEST(Core, Algorithm_For_Each)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
 
@@ -22,7 +22,7 @@ TEST(Core, Algorithm_For_Each)
 
 TEST(Core, Algorithm_For_Each_Side_Effects)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
 

@@ -2,7 +2,7 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 #include <boost/range/algorithm/count.hpp>
 
@@ -23,7 +23,7 @@ TEST(Core, Algorithm_Fill)
 
 TEST(Core, Algorithm_Exp_Fill)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<std::uint8_t> ima(10, 10);
   mln::fill(ima, 69);

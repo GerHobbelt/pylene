@@ -2,7 +2,7 @@
 
 #include <boost/optional.hpp>
 #include <mln/core/image/image.hpp>
-// #include <mln/core/image/private/where.hpp>
+// #include <mln/core/domain/where.hpp>
 // #include <mln/core/image/view/clip.hpp>
 #include <mln/core/image_base.hpp>
 #include <mln/core/iterator/transform_iterator.hpp>

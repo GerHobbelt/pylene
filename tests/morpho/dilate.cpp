@@ -4,7 +4,7 @@
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/win2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/canvas/private/dilation_by_periodic_line.hpp>
@@ -190,7 +190,7 @@ TEST(Dilation, Rectangle2d)
 
 TEST(Dilation, Generic_with_wide_enough_extension)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
@@ -205,7 +205,7 @@ TEST(Dilation, Generic_with_wide_enough_extension)
 // Border is not wide enough => use morpher for bound checking
 TEST(Dilation, Generic_with_too_small_extension)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
@@ -243,7 +243,7 @@ TEST(Dilation, Unregular_domain)
 // Custom comparison function, erosion
 TEST(Dilation, Custom_cmp_function)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
@@ -284,7 +284,7 @@ TEST(Dilation, Binary)
 // Dilation of a bianry image
 TEST(Dilation, Binary_2)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<bool> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("tiny.pbm"), ima);

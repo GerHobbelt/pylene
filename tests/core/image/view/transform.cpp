@@ -6,8 +6,8 @@
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/pixels.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/adaptor.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
@@ -199,7 +199,7 @@ TEST(Core, Transform_Supports_Function)
 
 TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   using V = std::pair<int, int>;
 

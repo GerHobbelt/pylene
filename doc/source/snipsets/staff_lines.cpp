@@ -1,5 +1,5 @@
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/se/utility.hpp>
 #include <mln/io/imread.hpp>
@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   if (argc < 7)
   {
@@ -47,12 +47,12 @@ int main(int argc, char** argv)
     mln::io::experimental::imsave(not markers2, argv[3]);
   }
 
-  auto markers  = markers1 || markers2;
-  
+  auto markers = markers1 || markers2;
+
   mln::io::experimental::imsave(not markers, argv[4]);
 
   // FIXME: add experimental version
-  auto markers_ = mln::lor(markers1, markers2);
+  auto markers_     = mln::lor(markers1, markers2);
   auto all_touching = mln::morpho::opening_by_reconstruction(input, markers_, mln::c4);
   mln::io::imsave(mln::lnot(all_touching), argv[5]);
 

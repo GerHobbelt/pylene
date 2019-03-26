@@ -1,11 +1,11 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/domain/where.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/image_ops.hpp>
-#include <mln/core/image/private/image_operators.hpp>
-#include <mln/core/image/private/where.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/transform.hpp>
 
 #include <mln/io/imprint.hpp>
@@ -37,7 +37,7 @@ std::ostream& operator<<(std::ostream& ss, const rgb& x)
 TEST(Core, Image2d_LValueOperator)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<rgb> ima(5, 5);
 
@@ -55,7 +55,7 @@ TEST(Core, Image2d_LValueOperator)
 TEST(Core, Image2d_Operators)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int> ima(5, 5);
   image2d<int> ref(5, 5);
@@ -73,7 +73,7 @@ TEST(Core, Image2d_Operators)
 TEST(Core, Image2d_MixedOperator)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<char>  x(5, 5);
   image2d<short> y(5, 5);
@@ -86,31 +86,10 @@ TEST(Core, Image2d_MixedOperator)
   ASSERT_TRUE(mln::all_of((x + y) == (2 * y)));
 }
 
-TEST(Core, Image2d_WhereOperator)
-{
-  using namespace mln;
-  using namespace mln::experimental::ops;
-
-  image2d<uint8_t> x(5, 5);
-  image2d<uint8_t> y(5, 5);
-  mln::iota(x, 0);
-  mln::iota(y, 0);
-
-  auto f1 = experimental::where(x > 12, x, uint8_t(12));         // RValue image + LValue image + scalar
-  auto f2 = experimental::where(x > 12, x, y);                   // RValue image + LValue image + LValue image
-  auto f3 = experimental::where(x > 12, uint8_t(12), x);         // RValue image + Scalar + LValue image
-  auto f4 = experimental::where(x > 12, uint8_t(0), uint8_t(1)); // RValue image + Scalar + Scalar
-
-  ASSERT_TRUE(mln::all_of(f1 >= 12));
-  static_assert(std::is_same_v<image_reference_t<decltype(f1)>, uint8_t>);
-  static_assert(std::is_same_v<image_reference_t<decltype(f2)>, uint8_t&>);
-}
-
-
 TEST(Core, UnaryOperator)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
   image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
@@ -122,7 +101,7 @@ TEST(Core, UnaryOperator)
 TEST(Core, BinaryOperator_SameTypes)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint8_t> ref = {{2, 4, 6}, {8, 10, 12}};
@@ -143,7 +122,7 @@ TEST(Core, BinaryOperator_SameTypes)
 TEST(Core, BinaryOperators_MixedTypes)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8_t>  ima1 = {{1, 2, 3}, {4, 5, 6}};
   image2d<uint16_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
@@ -168,7 +147,7 @@ TEST(Core, BinaryOperators_MixedTypes)
 TEST(Core, IfElse)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8_t> x = {{1, 2, 3}, //
                         {4, 5, 6}};
@@ -184,10 +163,10 @@ TEST(Core, IfElse)
   image2d<uint8_t> ref_f4 = {{1, 1, 1}, //
                              {0, 0, 0}};
 
-  auto f1 = mln::experimental::where(x > 3, x, uint8_t(12));         // RValue image + LValue image + scalar
-  auto f2 = mln::experimental::where(x > 3, x, y);                   // RValue image + LValue image + LValue image
-  auto f3 = mln::experimental::where(x > 3, uint8_t(12), x);         // RValue image + Scalar + LValue image
-  auto f4 = mln::experimental::where(x > 3, uint8_t(0), uint8_t(1)); // RValue image + Scalar + Scalar
+  auto f1 = mln::view::ifelse(x > 3, x, uint8_t(12));         // RValue image + LValue image + scalar
+  auto f2 = mln::view::ifelse(x > 3, x, y);                   // RValue image + LValue image + LValue image
+  auto f3 = mln::view::ifelse(x > 3, uint8_t(12), x);         // RValue image + Scalar + LValue image
+  auto f4 = mln::view::ifelse(x > 3, uint8_t(0), uint8_t(1)); // RValue image + Scalar + Scalar
 
   static_assert(std::is_same_v<image_reference_t<decltype(f1)>, uint8_t>);
   static_assert(std::is_same_v<image_reference_t<decltype(f2)>, uint8_t&>);
@@ -213,7 +192,7 @@ TEST(Core, IfElse)
 
 TEST(Core, Where)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
 

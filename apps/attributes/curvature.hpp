@@ -3,7 +3,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/trace.hpp>
 
 
@@ -90,7 +90,7 @@ namespace mln
       }
     }
 
-    using namespace mln::experimental::ops;
+    using namespace mln::view::ops;
 
     mln_postcondition(all_of(curv >= 0));
 

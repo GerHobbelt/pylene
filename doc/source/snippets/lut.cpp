@@ -1,6 +1,6 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/neighborhood/dyn_wneighborhood.hpp>
 #include <mln/core/se/disc.hpp>
@@ -115,7 +115,7 @@ mln::rgb8 heat_lut(float x)
 
 int main(int argc, char** argv)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   if (argc < 4)
   {
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
   auto ws = mln::morpho::experimental::watershed<mln::int16>(dinv, mln::c8, nlabel);
 
   // (4) Labelize input
-  [[maybe_unused]] auto output = mln::experimental::where(ws == 0, 1, mln::experimental::where(input, ws, 0));
+  auto output = mln::view::ifelse(ws == 0, 1, mln::view::ifelse(input, ws, 0));
 
   // END
   auto d_stretched = mln::data::stretch<float>(d);

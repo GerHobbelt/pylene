@@ -26,14 +26,6 @@ namespace mln
   template <class V, class I>
   casted_image<I, V> imcast(Image<I>&& ima);
 
-  namespace experimental
-  {
-    template <class I, class V>
-    using casted_image = transform_view<I, internal::cast_to<V>>;
-
-    template <class V, class IntputImage>
-    casted_image<IntputImage, V> imcast(IntputImage ima);
-  } // namespace experimental
 
   /******************************************/
   /****          Implementation          ****/
@@ -70,12 +62,4 @@ namespace mln
     return casted_image<I, V>(move_exact(ima), internal::cast_to<V>{});
   }
 
-  namespace experimental
-  {
-    template <class V, class IntputImage>
-    casted_image<IntputImage, V> imcast(IntputImage ima)
-    {
-      return view::transform(std::move(ima), internal::cast_to<V>{});
-    }
-  } // namespace experimental
 } // namespace mln

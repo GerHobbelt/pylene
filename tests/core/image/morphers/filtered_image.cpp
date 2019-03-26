@@ -2,8 +2,8 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
 #include <mln/core/image/view/filter.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imprint.hpp>
 
@@ -13,7 +13,7 @@
 TEST(Core, FilteredImage_filtered_byval)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
@@ -47,7 +47,7 @@ TEST(Core, FilteredImage_filtered_byval)
 TEST(Core, FilteredImage_filtered_bypix_writing)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
@@ -62,7 +62,7 @@ TEST(Core, FilteredImage_filtered_bypix_writing)
 TEST(Core, FilteredImage_filtered_byval_writing)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);
@@ -77,7 +77,7 @@ TEST(Core, FilteredImage_filtered_byval_writing)
 TEST(Core, FilteredImage_filtered_chaining)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   box2d        dom{{-1, -2}, {3, 3}};
   image2d<int> ima(dom);

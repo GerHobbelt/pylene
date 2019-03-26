@@ -2,7 +2,7 @@
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/utils/ptroffset.hpp>
 
 using namespace mln;
@@ -81,7 +81,7 @@ unsigned threshold3(const image2d<uint8>& f, uint8 v)
 
 unsigned threshold4(const image2d<uint8>& f, uint8 v)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   return mln::accumulate(f < v, accu::accumulators::sum<unsigned>());
 }

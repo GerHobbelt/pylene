@@ -1,13 +1,13 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/generate.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Generate)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   // Another impl of mln::iota
   int  i   = 1;

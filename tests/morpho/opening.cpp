@@ -2,7 +2,7 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
@@ -18,7 +18,7 @@ using namespace mln;
 
 TEST(Morpho, opening_closing_opening_0)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);

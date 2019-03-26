@@ -1,8 +1,10 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/private/where.hpp>
 #include <mln/core/image/view/clip.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -136,6 +138,66 @@ TEST(View, clip_other_a_box2d)
   }
 
   ASSERT_TRUE(mln::all_of(ima == ref));
+}
+
+TEST(Core, Clip_where)
+{
+  using namespace mln;
+  using namespace mln::experimental::ops;
+
+  image2d<int> ima(5, 5);
+
+  image2d<int> ref = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 42, 42, 42, 42}, //
+      {42, 42, 42, 42, 42}, //
+      {42, 42, 42, 42, 42}  //
+  };
+
+  mln::iota(ima, 0);
+  mln::fill(view::clip(ima, experimental::where(ima > 10)), 42);
+  ASSERT_TRUE(all_of(ima == ref));
+}
+
+TEST(Core, Clip_wherex2_joints)
+{
+  using namespace mln;
+  using namespace mln::experimental::ops;
+
+  image2d<int> ima(5, 5);
+
+  image2d<int> ref = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 11, 12, 13, 14}, //
+      {15, 16, 17, 18, 19}, //
+      {20, 42, 42, 42, 42}  //
+  };
+
+  mln::iota(ima, 0);
+  mln::fill(view::clip(view::clip(ima, experimental::where(ima > 10)), experimental::where(ima > 20)), 42);
+  ASSERT_TRUE(all_of(ima == ref));
+}
+
+TEST(Core, Clip_where_and)
+{
+  using namespace mln;
+  using namespace mln::experimental::ops;
+
+  image2d<int> ima(5, 5);
+
+  image2d<int> ref = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 42, 42, 42, 42}, //
+      {42, 42, 42, 42, 42}, //
+      {20, 21, 22, 23, 24}  //
+  };
+
+  mln::iota(ima, 0);
+  mln::fill(view::clip(ima, experimental::where(ima > 10 && ima < 20)), 42);
+  ASSERT_TRUE(all_of(ima == ref));
 }
 
 

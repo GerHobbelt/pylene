@@ -2,12 +2,10 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
-#include <mln/core/image/private/where.hpp>
-#include <mln/core/image/view/clip.hpp>
 #include <mln/io/imprint.hpp>
 
 #include <gtest/gtest.h>
+
 
 namespace mln
 {
@@ -71,59 +69,6 @@ TEST(Core, SubImage_sub_domain_with_box)
     MLN_CHECK_IMEQUAL(ima, ref);
   }
   static_assert(std::is_same<decltype(ima | box2d()), image2d<int>>::value);
-}
-
-TEST(Core, SubImage_sub_domain)
-{
-  using namespace mln;
-  using namespace mln::experimental::ops;
-
-  image2d<int> ima(5, 5);
-
-  {
-    image2d<int> ref = {
-        {0, 1, 2, 3, 4},      //
-        {5, 6, 7, 8, 9},      //
-        {10, 42, 42, 42, 42}, //
-        {42, 42, 42, 42, 42}, //
-        {42, 42, 42, 42, 42}  //
-    };
-    iota(ima, 0);
-
-    mln::fill(view::clip(ima, experimental::where(ima > 10)), 42);
-    ASSERT_TRUE(all_of(ima == ref));
-  }
-
-  {
-    image2d<int> ref = {
-        {0, 1, 2, 3, 4},      //
-        {5, 6, 7, 8, 9},      //
-        {10, 11, 12, 13, 14}, //
-        {15, 16, 17, 18, 19}, //
-        {20, 42, 42, 42, 42}  //
-    };
-
-    iota(ima, 0);
-    // FIXME:
-    // here where ima < 20 isn't a sub domain of ima > 10.
-    // Should it be so ? Or should we compute the intersection of both ?
-    // TODO: fix clip_view
-    // mln::fill(view::clip(view::clip(ima, experimental::where(ima > 10)), experimental::where(ima < 20)), 42);
-    // ASSERT_TRUE(all_of(ima == ref));
-  }
-
-  {
-    image2d<int> ref = {
-        {0, 1, 2, 3, 4},      //
-        {5, 6, 7, 8, 9},      //
-        {10, 42, 42, 42, 42}, //
-        {42, 42, 42, 42, 42}, //
-        {20, 21, 22, 23, 24}  //
-    };
-    iota(ima, 0);
-    mln::fill(view::clip(ima, experimental::where(ima > 10 && ima < 20)), 42);
-    ASSERT_TRUE(all_of(ima == ref));
-  }
 }
 
 // This should throw because

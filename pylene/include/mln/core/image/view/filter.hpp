@@ -7,7 +7,6 @@
 #include <mln/core/rangev3/view/remove_if.hpp>
 
 #include <range/v3/empty.hpp>
-#include <range/v3/size.hpp>
 #include <range/v3/utility/functional.hpp>
 
 #include <type_traits>
@@ -135,7 +134,7 @@ namespace mln
     template <typename Ret = reference>
     std::enable_if_t<accessible::value, Ret> operator()(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
+      mln_precondition(domain().has(p));
       mln_precondition(std::invoke(f, this->base()(p)));
       return this->base()(p);
     }
@@ -147,7 +146,7 @@ namespace mln
     template <typename Ret = new_pixel_type>
     std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
     {
-      mln_precondition(this->base().domain().has(p));
+      mln_precondition(domain().has(p));
       mln_precondition(std::invoke(f, this->base().at(p)));
       return this->base().new_pixel(p);
     }

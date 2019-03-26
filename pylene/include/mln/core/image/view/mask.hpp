@@ -1,7 +1,7 @@
 #pragma once
 
+#include <mln/core/domain/where.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/image/private/where.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 
 #include <range/v3/view_facade.hpp>
@@ -173,7 +173,6 @@ namespace mln
     value_range_t new_values() { return {this->base().new_values(), m_mask.new_values()}; }
 
     pixel_range_t new_pixels() { return {this->base().new_pixels(), m_mask.new_values()}; }
-
 
 
     /// Accessible-image related methods (overwritten from adaptor)

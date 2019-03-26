@@ -4,7 +4,7 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -14,7 +14,7 @@
 
 TEST(View, mask)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 7, 8, 9}, //
@@ -50,7 +50,7 @@ TEST(View, mask)
 
 TEST(View, mask_twice)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 7, 8, 9}, //

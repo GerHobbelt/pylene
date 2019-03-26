@@ -3,7 +3,7 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/zip.hpp>
 #include <mln/core/range/algorithm/for_each.hpp>
 
@@ -24,7 +24,7 @@ mln::image2d<int> make_image()
 TEST(Core, ZipImage_Mixed_writable)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int>    ima(5, 5);
   image2d<uint16> ima2(5, 5);
@@ -44,7 +44,7 @@ TEST(Core, ZipImage_Mixed_writable)
 TEST(Core, ZipImage_Value_Iteration_1)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
@@ -59,7 +59,7 @@ TEST(Core, ZipImage_Value_Iteration_1)
 TEST(Core, ZipImage_Pixel_Iteration_1)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int>    a(5, 5);
   image2d<uint16> b(5, 5);
@@ -95,7 +95,7 @@ TEST(Core, ZipImage_Value_Iteration_2)
 TEST(Core, ZipImage_Temporary_usage)
 {
   using namespace mln;
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<int> ima(5, 5);
   auto         tmp = make_image();

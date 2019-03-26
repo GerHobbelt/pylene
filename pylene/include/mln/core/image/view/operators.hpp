@@ -1,11 +1,13 @@
 #pragma once
 
-#include <functional>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/image/view/zip.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
-namespace mln::experimental
+#include <functional>
+
+
+namespace mln::view
 {
   // Prevent ADL on those operators so that A+B uses old API
   // and using mln::experimental::ops A+B uses new API
@@ -14,7 +16,7 @@ namespace mln::experimental
   {
 
 #define MLN_PRIVATE_DEFINE_UNARY_OPERATOR(op, f)                                                                       \
-  template <class I, class = std::enable_if_t<mln::is_a<I, Image>::value>>                                             \
+  template <class I, class = std::enable_if_t<mln::is_a<I, mln::experimental::Image>::value>>                          \
   auto op(const I& ima)                                                                                                \
   {                                                                                                                    \
     return view::transform(static_cast<const I&>(ima), f);                                                             \
@@ -25,20 +27,20 @@ namespace mln::experimental
   namespace impl                                                                                                       \
   {                                                                                                                    \
     template <class I1, class I2>                                                                                      \
-    auto op(const Image<I1>& ima1, const Image<I2>& ima2)                                                              \
+    auto op(const mln::experimental::Image<I1>& ima1, const mln::experimental::Image<I2>& ima2)                        \
     {                                                                                                                  \
       return view::transform(static_cast<const I1&>(ima1), static_cast<const I2&>(ima2), f);                           \
     }                                                                                                                  \
                                                                                                                        \
-    template <class I, class Scalar, class = std::enable_if_t<!is_a<Scalar, Image>::value>>                            \
-    auto op(const Image<I>& ima1, Scalar s)                                                                            \
+    template <class I, class Scalar, class = std::enable_if_t<!is_a<Scalar, mln::experimental::Image>::value>>         \
+    auto op(const mln::experimental::Image<I>& ima1, Scalar s)                                                         \
     {                                                                                                                  \
       auto g = [f_ = f, s](auto&& arg) { return f_(arg, s); };                                                         \
       return view::transform(static_cast<const I&>(ima1), g);                                                          \
     }                                                                                                                  \
                                                                                                                        \
-    template <class Scalar, class I, class = std::enable_if_t<!is_a<Scalar, Image>::value>>                            \
-    auto op(Scalar s, const Image<I>& ima2)                                                                            \
+    template <class Scalar, class I, class = std::enable_if_t<!is_a<Scalar, mln::experimental::Image>::value>>         \
+    auto op(Scalar s, const mln::experimental::Image<I>& ima2)                                                         \
     {                                                                                                                  \
       auto g = [f_ = f, s](auto&& arg) { return f_(s, arg); };                                                         \
       return view::transform(static_cast<const I&>(ima2), g);                                                          \
@@ -46,10 +48,12 @@ namespace mln::experimental
   }                                                                                                                    \
                                                                                                                        \
   /* This overload is there to be a best match wrt old API impl */                                                     \
-  template <class A, class B, class = std::enable_if_t<(is_a<A, Image>::value || is_a<B, Image>::value)>>              \
+  template <class A, class B,                                                                                          \
+            class = std::enable_if_t<(is_a<A, mln::experimental::Image>::value ||                                      \
+                                      is_a<B, mln::experimental::Image>::value)>>                                      \
   auto op(const A& lhs, const B& rhs)                                                                                  \
   {                                                                                                                    \
-    return mln::experimental::ops::impl::op(lhs, rhs);                                                                 \
+    return mln::view::ops::impl::op(lhs, rhs);                                                                         \
   }
 
 
@@ -90,11 +94,13 @@ namespace mln::experimental
   namespace details
   {
     template <class ICond, class ITrue, class IFalse, class = void>
-    struct where_fn;
+    struct ifelse_fn;
 
 
     template <class ICond, class ITrue, class IFalse>
-    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<is_a<ITrue, Image>::value && is_a<IFalse, Image>::value>>
+    struct ifelse_fn<
+        ICond, ITrue, IFalse,
+        std::enable_if_t<is_a<ITrue, mln::experimental::Image>::value && is_a<IFalse, mln::experimental::Image>::value>>
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse iffalse) const
       {
@@ -108,7 +114,9 @@ namespace mln::experimental
     };
 
     template <class ICond, class ITrue, class IFalse>
-    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<!is_a<ITrue, Image>::value && is_a<IFalse, Image>::value>>
+    struct ifelse_fn<ICond, ITrue, IFalse,
+                     std::enable_if_t<!is_a<ITrue, mln::experimental::Image>::value &&
+                                      is_a<IFalse, mln::experimental::Image>::value>>
     {
       auto operator()(const ICond& cond, ITrue vtrue, IFalse iffalse) const
       {
@@ -121,7 +129,9 @@ namespace mln::experimental
     };
 
     template <class ICond, class ITrue, class IFalse>
-    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<is_a<ITrue, Image>::value && !is_a<IFalse, Image>::value>>
+    struct ifelse_fn<ICond, ITrue, IFalse,
+                     std::enable_if_t<is_a<ITrue, mln::experimental::Image>::value &&
+                                      !is_a<IFalse, mln::experimental::Image>::value>>
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse vfalse) const
       {
@@ -135,7 +145,9 @@ namespace mln::experimental
 
 
     template <class ICond, class ITrue, class IFalse>
-    struct where_fn<ICond, ITrue, IFalse, std::enable_if_t<!is_a<ITrue, Image>::value && !is_a<IFalse, Image>::value>>
+    struct ifelse_fn<ICond, ITrue, IFalse,
+                     std::enable_if_t<!is_a<ITrue, mln::experimental::Image>::value &&
+                                      !is_a<IFalse, mln::experimental::Image>::value>>
     {
       auto operator()(const ICond& cond, ITrue vtrue, IFalse vfalse) const
       {
@@ -146,13 +158,13 @@ namespace mln::experimental
   } // namespace details
 
   template <class ICond, class ITrue, class IFalse>
-  auto where(const Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  auto ifelse(const mln::experimental::Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
   {
-    return details::where_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
-                                                     std::move(iffalse));
+    return details::ifelse_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
+                                                      std::move(iffalse));
   }
 
 #undef MLN_PRIVATE_DEFINE_UNARY_OPERATOR
 #undef MLN_PRIVATE_DEFINE_BINARY_OPERATOR
 
-} // namespace mln::experimental
+} // namespace mln::view

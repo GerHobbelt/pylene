@@ -2,7 +2,7 @@
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
@@ -18,7 +18,7 @@ using namespace mln;
 
 TEST(Morpho, gradient_gradient_0)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima(10, 10);
   iota(ima, 10);
@@ -47,7 +47,7 @@ TEST(Morpho, gradient_gradient_1)
 // Border is not wide enough => call dilate + erode
 TEST(Morpho, gradient_gradient_2)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<uint8> ima(0);
   image2d<uint8> ima2;
@@ -87,7 +87,7 @@ TEST(Morpho, gradient_gradient_4)
 // On colors
 TEST(Morpho, gradient_gradient_5)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   image2d<rgb8> ima;
   image2d<rgb8> ima2(0);

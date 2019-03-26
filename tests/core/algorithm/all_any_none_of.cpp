@@ -2,14 +2,14 @@
 #include <mln/core/algorithm/any_of.hpp>
 #include <mln/core/algorithm/none_of.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
+#include <mln/core/image/view/operators.hpp>
 
 #include <gtest/gtest.h>
 
 
 TEST(Core, Algorithm_Any)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   const mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
 
@@ -23,7 +23,7 @@ TEST(Core, Algorithm_Any)
 
 TEST(Core, Algorithm_All)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   const mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
 
@@ -36,7 +36,7 @@ TEST(Core, Algorithm_All)
 
 TEST(Core, Algorithm_None)
 {
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
   const mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
 

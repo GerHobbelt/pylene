@@ -9,14 +9,13 @@
    \draw (C) -- ++(0,-5);
 
    \node[obj] at (1, -1) (Py0) {\tt np.ndarray};
-   \node[obj] at (9, -1) (A) {\tt ndarray};
-   \node[obj] [below right = 0.5cm and 0.5cm of A] (B) {\tt ndimage<>};
+   \node[obj] [below right = 0.5cm and 0.5cm of B] (ndima) {\tt ndimage<>};
    %\node[obj] [below = 0.5cm of B] (C) {\tt ndimage<Tmplt1, Tmplt2>};
-   \node[obj] [below = 0.5cm of B] (C) {\tt ndimage<Tmplt1, Tmplt2, Tmplt3>};
+   \node[obj] [below = 0.5cm of ndima] (ndimatmplt) {\tt ndimage<Tmplt1, Tmplt2, Tmplt3>};
 
-   \draw[<->,dashed] (Py0) -- (A) node[midway,above] {PyBind11};
-    \draw[->,thick] (B) -- (A)  node[midway,above] {};
-    \draw[->,thick] (C) -- (B)  node[midway,above] {};
+   \draw[<->,dashed] (Py0) -- (ndima) node[midway,above] {PyBind11};
+ %   \draw[->,thick] (B) -- (A)  node[midway,above] {};
+    \draw[->,thick] (ndimatmplt) -- (ndima)  node[midway,above] {};
 
 \end{tikzpicture}
 \end{document}

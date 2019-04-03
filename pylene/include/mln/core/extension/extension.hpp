@@ -135,5 +135,15 @@ namespace mln
                                           typename N::category());
     }
 
+    template <class I, class SE>
+    bool need_adjust(const experimental::Image<I>& ima, const experimental::StructuringElement<SE>& se)
+    {
+      return extension::impl::need_adjust(static_cast<const I&>(ima), static_cast<const SE&>(se),
+                                          image_extension_category_t<I>(), typename SE::category());
+    }
+
+
   } // namespace extension
-} // namespace mln
+} // end of namespace mln
+
+#include <mln/core/extension/private/border_management.hpp>

@@ -21,15 +21,13 @@ namespace mln
 
     /// \brief Define a dynamic rectangular window anchored at (0,0).
     /// Its width and height are always odd numbers to ensure symmetry.
-    class rect2d : public se_facade<rect2d>
+    struct rect2d : public se_facade<rect2d>
     {
-    private:
-      using category = dynamic_neighborhood_tag;
-      using incremental = std::true_type;
+      using category     = dynamic_neighborhood_tag;
+      using incremental  = std::true_type;
       using decomposable = std::true_type;
-      using separable = std::true_type;
+      using separable    = std::true_type;
 
-    public:
       /// Construct an empty rectangle
       rect2d() = default;
 
@@ -73,7 +71,7 @@ namespace mln
     };
 
 
-  }
+  } // namespace experimental::se
 
   /**************************/
   /***  Implementation     **/
@@ -154,7 +152,5 @@ namespace mln
       box2d m_dpoints;
     };
 
-  } // namespace mln::se
+  } // namespace se
 } // namespace mln
-
-

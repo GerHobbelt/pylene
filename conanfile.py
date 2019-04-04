@@ -9,10 +9,10 @@ class Pylene(ConanFile):
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type", "cppstd"
     options = {"gtest": [True, False], "benchmark": [True, False], "freeimage": [
-        True, False], "boost": [True, False], "pybind": [True, False]
+        True, False], "boost": [True, False], "pybind": [True, False],
         # TO REMOVE once docker image is fixed with the buildfarm profile updated
         "boost_program_options": [True, False]}
-    default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False", "pybind=False"
+    default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False", "pybind=False",
                        # TO REMOVE once docker image is fixed with the buildfarm profile updated
                        "boost_program_options=False")
     generators = "cmake_paths"

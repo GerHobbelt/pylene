@@ -45,6 +45,9 @@ target_sources(Pylene PRIVATE
   src/core/se/periodic_line2d.cpp
   src/core/se/rect2d.cpp
   src/core/trace.cpp
+
+  src/py/algorithm/stretch.cpp
+  src/py/core/image2d_data.cpp
   )
 
 

@@ -15,7 +15,6 @@ if (${QT4_FOUND})
 
   add_executable(hierarchical_seg-gui  hierachical_seg-gui.cpp brush.cpp
     ${hierarchical_seg-gui_MOC}
-    ${CMAKE_HOME_DIRECTORY}/pylene/include/mln/qt/qtimage.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/imageviewer.moc.cpp)
 
   add_executable(hierarchical_seg-cli  hierachical_seg-cli.cpp)

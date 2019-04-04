@@ -23,11 +23,12 @@ namespace py = pybind11;
 */
 
 
-PYBIND11_MODULE(milena, m)
+PYBIND11_MODULE(PyPylene, m)
 {
-  py::class_<mln::py::image2d<>>(m, "mln::py::image2d", py::buffer_protocol())
+  using namespace mln::py;
+  py::class_<image2d<>>(m, "image2d", py::buffer_protocol())
       .def("__init__",
-           [](mln::py::image2d<>& img, py::buffer b) {
+           [](image2d<>& img, py::buffer b) {
              /* Request a buffer descriptor from Python */
              py::buffer_info info = b.request();
 
@@ -37,17 +38,16 @@ PYBIND11_MODULE(milena, m)
              if (info.ndim != 2)
                throw std::runtime_error("Incompatible buffer dimension!");
 
-             auto tmp = mln::py::image2d<void>::from_buffer(reinterpret_cast<std::byte*>(info.ptr), info.shape[0],
-                                                            info.shape[1], mln::py::Info::INT8_V);
-             new (&img) mln::py::image2d<void>(tmp);
+             auto tmp = image2d<void>::from_buffer(reinterpret_cast<std::byte*>(info.ptr), info.shape[0], info.shape[1],
+                                                   Info::INT8_V);
+             new (&img) image2d<void>(tmp);
            })
 
-      .def_buffer([](mln::py::image2d<void>& img) -> py::buffer_info {
-        return py::buffer_info(
-            img.buffer(), mln::py::Info::dyn_sizeof[img.type().val], sampletypeid_to_numpystr(img.type().val), 2,
-            {img.height(), img.width()},
-            {mln::py::Info::dyn_sizeof[img.type().val] * img.width(), mln::py::Info::dyn_sizeof[img.type().val]});
+      .def_buffer([](image2d<void>& img) -> py::buffer_info {
+        return py::buffer_info(img.buffer(), Info::dyn_sizeof[img.type().val], sampletypeid_to_numpystr(img.type().val),
+                               2, {img.height(), img.width()},
+                               {Info::dyn_sizeof[img.type().val] * img.width(), Info::dyn_sizeof[img.type().val]});
       });
   // FIXME:
-  // m.def("stretch", static_cast <mln::py::image2d <> (*)(const mln::py::image2d <>&)>(&mln::py::stretch));
+  // m.def("stretch", static_cast <image2d <> (*)(const image2d <>&)>(&mln::py::stretch));
 }

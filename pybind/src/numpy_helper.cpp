@@ -1,5 +1,10 @@
 #include <pybind/numpy_helper.hpp>
 
+#include <pybind11/pybind11.h>
+
+using namespace mln::py;
+namespace py = pybind11;
+
 std::string sampletypeid_to_numpystr(Info::type_id sample_type)
 {
   switch (sample_type)

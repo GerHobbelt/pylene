@@ -50,7 +50,7 @@ endif(USE_DISTCC)
 
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
-
+option(PYLENE_BUILD_PYBIND "ON to build the python bindings with pybind11" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -86,6 +86,10 @@ endif()
 add_subdirectory(pylene)
 
 add_subdirectory(fixtures)
+
+if (PYLENE_BUILD_PYBIND)
+  add_subdirectory(pybind)
+endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   if (PYLENE_BUILD_BENCHMARKS)

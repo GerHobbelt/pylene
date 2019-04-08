@@ -1,8 +1,10 @@
 /build*
 /cmake-build-*
+/doc/build
+/doc/html
+/doc/doxyxml
 /doc/source/images/*.png
 /test_package/build
-/doc/source/_build
 .vs
 .idea
 *.pyc
@@ -10,6 +12,3 @@ compile_commands.json
 /venv_*/
 /**/.DS_Store
 .nfs*
-.history
-CMakeUserPresets.json
-.vscode

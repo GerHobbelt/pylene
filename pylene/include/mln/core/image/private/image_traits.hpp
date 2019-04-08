@@ -25,9 +25,6 @@ namespace mln
   template <class I>
   using image_concrete_t = typename I::concrete_type;
 
-  template <class I>
-  using concrete_t = image_concrete_t<I>;
-
 
   // Extension trait
   template <class I>

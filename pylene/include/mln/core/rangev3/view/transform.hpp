@@ -58,12 +58,6 @@ namespace mln::ranges
     {
       return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), cfun());
     }
-
-    template <typename U = void, typename = std::enable_if_t<is_reversible_range_v<Rng>, U>>
-    auto reversed()
-    {
-      return iter_transform_view<decltype(this->base().reversed()), Fun>(this->base().reversed(), cfun());
-    }
   };
 
   template <typename Rng, typename Fun>

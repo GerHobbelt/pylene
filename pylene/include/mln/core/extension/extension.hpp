@@ -5,7 +5,6 @@
 #include <mln/core/image/morphers/extended_by_value_image.hpp>
 #include <mln/core/internal/get_border_from_nbh.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
-#include <mln/core/se/se.hpp>
 
 
 namespace mln
@@ -135,15 +134,5 @@ namespace mln
                                           typename N::category());
     }
 
-    template <class I, class SE>
-    bool need_adjust(const experimental::Image<I>& ima, const experimental::StructuringElement<SE>& se)
-    {
-      return extension::impl::need_adjust(static_cast<const I&>(ima), static_cast<const SE&>(se),
-                                          image_extension_category_t<I>(), typename SE::category());
-    }
-
-
   } // namespace extension
-} // end of namespace mln
-
-#include <mln/core/extension/private/border_management.hpp>
+} // namespace mln

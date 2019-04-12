@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <py/core/image2d_data.hpp>
 #include <py/core/type_info.hpp>
 
@@ -54,6 +53,14 @@ namespace mln::py
       m_data   = std::make_shared<image2d_data<T>>(h * w, val);
       m_buffer = m_data->m_buf;
       std::cout << "initialized a templated img with values\n";
+    }
+
+    template <typename T>
+    image2d<T>* cast_to(void)
+    {
+        if (Trait<T>::value == m_type.val)
+            return static_cast<image2d<T>*>(this);
+        return nullptr;
     }
 
     static image2d from_buffer(std::byte* buffer, std::size_t w, std::size_t h, Info::type_id type)

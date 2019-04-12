@@ -123,7 +123,27 @@ documentation:
 ##########
 # Deploy #
 ##########
+
+variables:
+    PACKAGE_NAME: "pylene" # Conan package name
+    PACKAGE_TAG: "testing" # Conan tag
+    PACKAGE_VERSION: "head" # Version to build
+    CONAN_USER: "carlinet"
+
 pages:
     <<: *documentation-base
     only:
         - dev
+
+
+
+package:
+    stage: deploy
+    dependencies: []
+    script:
+        - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
+        - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
+        - conan create .. --build missing $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+        - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+    only: [ "dev", "development/ranges" ]
+

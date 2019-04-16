@@ -67,6 +67,8 @@ namespace mln
       /// line of length \p Height.
       std::vector<periodic_line2d> separate() const;
 
+      /// \brief Return the extent radius
+      int radial_extent() const;
 
     private:
       box2d m_dpoints;
@@ -137,6 +139,12 @@ namespace mln
 
       /// \brief Return true for any non-empty rectangle
       bool decomposable() const { return !m_dpoints.empty(); }
+
+
+      int radial_extent() const
+      {
+        return std::max(m_dpoints.pmax[1] - m_dpoints.pmin[1], m_dpoints.pmax[0] - m_dpoints.pmin[0]) / 2;
+      }
 
       /// \brief Return an horizontal line of length \p Width and a vertical
       /// line of length \p Height corresponding to the SE decomposition.

@@ -22,7 +22,7 @@ namespace mln
           , m_parent(parent)
           , m_out(S)
         {
-          resize(m_dejavu, m_ima).init(false);
+          resize(m_dejavu, m_ima).set_init_value(false);
           // m_back = S + ima.domain().size();
         }
 

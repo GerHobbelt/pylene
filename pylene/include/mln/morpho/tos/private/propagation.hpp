@@ -50,7 +50,7 @@ namespace mln
           // the propagation, i.e. when it is poped from the queue
           connectivity_t conn;
 
-          mln_ch_value(I, int) ord = imchvalue<int>(f).init(UNPROCESSED).adjust(conn);
+          mln_ch_value(I, int) ord = imchvalue<int>(f).set_init_value(UNPROCESSED).adjust(conn);
           extension::fill(ord, PROCESSED);
 
           if (compute_indexes)

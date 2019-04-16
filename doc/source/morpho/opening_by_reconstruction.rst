@@ -55,7 +55,7 @@ The markers have been obtained with the :cpp:func:`hit_or_miss`.
   (4-connection). All objects that do not touch the staff lines are removed.
 
 .. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 60
+   :lines: 56
    :language: cpp
 
 .. image:: /images/staff_lines.png
@@ -68,7 +68,7 @@ The markers have been obtained with the :cpp:func:`hit_or_miss`.
 
 
 .. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 63
+   :lines: 59
    :language: cpp
 
 .. image:: /images/staff_lines.png

@@ -3,7 +3,6 @@
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/extended_by_value_image.hpp>
-#include <mln/core/internal/get_border_from_nbh.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 
 
@@ -123,7 +122,7 @@ namespace mln
       template <class I, class N>
       bool need_adjust(const I& ima, const N& nbh, border_extension_tag, dynamic_neighborhood_tag)
       {
-        return (int)internal::get_border_from_nbh(nbh) > (int)ima.border();
+        return nbh.radial_extent() > ima.border();
       }
     } // namespace impl
 

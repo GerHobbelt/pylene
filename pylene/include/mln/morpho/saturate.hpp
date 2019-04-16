@@ -104,10 +104,10 @@ namespace mln
 
       const I& ima = exact(ima_);
 
-      int status;
-      mln_ch_value(I, bool) out = imchvalue<bool>(ima).adjust(nbh).init(true).get_status(status);
+      image_build_error_code status;
+      mln_ch_value(I, bool) out = imchvalue<bool>(ima).adjust(nbh).set_init_value(true).get_status(&status);
 
-      if (status == 0)
+      if (status == IMAGE_BUILD_OK)
       {
         extension::fill(out, false);
         impl::saturate(ima, nbh, out, pinf);

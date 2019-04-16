@@ -60,7 +60,7 @@ namespace mln
         template <class J>
         pset_hqueue<I>::pset_hqueue(const Image<J>& ima)
           : m_head(nlevel, (Point)npos)
-          , m_next(exact(ima), mln::init())
+          , m_next(exact(ima), image_build_params{})
         {
         }
 

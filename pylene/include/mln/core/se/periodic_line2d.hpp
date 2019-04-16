@@ -52,6 +52,9 @@ namespace mln
       /// \brief Return the period
       point2d period() const { return m_delta; }
 
+      /// \brief Return the radial extent
+      int radial_extent() const { return m_k; }
+
     private:
       point2d m_delta;
       int     m_k;
@@ -123,6 +126,9 @@ namespace mln
 
       /// \brief Return the period
       point2d period() const { return m_delta; }
+
+      /// \brief Return the extent radius
+      int radial_extent() const { return m_k; }
 
     private:
       point2d m_delta;

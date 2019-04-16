@@ -128,7 +128,7 @@ variables:
     PACKAGE_NAME: "pylene" # Conan package name
     PACKAGE_TAG: "testing" # Conan tag
     PACKAGE_VERSION: "head" # Version to build
-    CONAN_USER: "carlinet"
+    CONAN_USER: "lrde"
 
 pages:
     <<: *documentation-base

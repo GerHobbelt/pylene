@@ -31,7 +31,17 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 .. topic:: Utilities
 
-   TODO
+  .. table::
+    :widths: auto
+    :class: full
+
+    +-------------------------------------------------+------------------------------------------------------------------------------------------+
+    | :cpp:func:`imconcretize(f) <mln::imconcretize>` | Creates a new writable image with the *geometry* of `f`.                                 |
+    +-------------------------------------------------+------------------------------------------------------------------------------------------+
+    | :cpp:func:`imchvalue(f) <mln::imchvalue>`       | Creates a new writable image with the *geomerty* of `f` able to store values of type `U` |
+    +-------------------------------------------------+------------------------------------------------------------------------------------------+
+    | :cpp:func:`resize(g,f) <mln::resize>`           | Resize `g` to the *geometry* of `f`                                                      |
+    +-------------------------------------------------+------------------------------------------------------------------------------------------+
 
 .. topic:: Fundamental image types
 

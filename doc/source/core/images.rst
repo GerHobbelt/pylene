@@ -172,34 +172,42 @@ Two methods enable to create a new image `g` from a prototype `f`. The second al
 Because the syntax of a call to a template method is quite cumbersome, free functions can be used::
 
     I f = ...;
-    mln::concrete_t<I>            g1 = mln::concretize(f);
-    mln::ch_value_t<I, OtherType> g2 = mln::ch_value<OtherType>(f);
+    mln::concrete_t<I>            g1 = mln::imconcretize(f);
+    mln::ch_value_t<I, OtherType> g2 = mln::imchvalue<OtherType>(f);
 
-.. warning:: The type returned by `concretize` et al. are not images but *image initializers* that support advanced
-    parameterization of the initialization.  So you should not use ``auto`` type deduction for variables.
+.. warning:: The type returned by `concretize` et al. are not images but *image builders* that support advanced
+    parameterization of the initialization.  So you should not use ``auto`` type deduction for variables (or by calling explicitly ``build()`` - see below)::
+ 
+        I f = ...;
+        auto g1 = mln::imconcretize(f).build();
+        auto g2 = mln::imchvalue<OtherType>(f).build();   
 
 
-.. rubric:: Advanced initialization
+.. rubric:: Advanced initialization with image builders
 
-*image initializers* follow the `Named parameter Idiom
+*image builders* (see :doc:`image_builder`) follow the `Named parameter Idiom
 <https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter>`_ and provides additional init parameters. Note that
-it may fail to fulfill the requirements, so a status code may be queried to check if everything succeeded.
+it may fail to fulfill the requirements, so a status code may be queried to check if everything succeeded. 
 
 
 
-+------------------------+---------------------------------------------------------------------------------------------+
-| ``init(v)``            | Requires the image to be set to `v`                                                         |
-+------------------------+---------------------------------------------------------------------------------------------+
-| ``adjust(nbh)``        | Requires the extension of the image to be wide enough to hold the :ref:`neighborhood` `nbh` |
-+------------------------+---------------------------------------------------------------------------------------------+
-| ``get_status(status)`` | Get the status code                                                                         |
-+------------------------+---------------------------------------------------------------------------------------------+
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``set_init_value(v)``   | Requires the image to be set to `v`                                                                      |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``set_border(k)``       | Requires the image to have border of size `k`.                                                           |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``adjust(se)``          | Requires the extension of the image to be wide enough to hold the :cpp:concept:`StructuringElement` `se` |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``get_status(&status)`` | Get the status code                                                                                      |
++-------------------------+----------------------------------------------------------------------------------------------------------+
+| ``build()``             | Build and return the new image.                                                                          |
++-------------------------+----------------------------------------------------------------------------------------------------------+
 
 Example::
 
     I f = ...;
-    int st_code = 0;
-    mln::concrete_t<I> g1 = mln::concretize(f).adjust(mln::c4).get_status(st_code);
+    mln::image_build_error_code st_code;
+    mln::concrete_t<I> g1 = mln::imconcretize(f).adjust(mln::c4).get_status(&st_code);
     if (st_code == 0)
         // run with g1
     else
@@ -213,11 +221,8 @@ and deduces the initialization configuration from it.
 
 It has the form:
 
-``I(const I& other, mln::image_initializer_params_t params)``
-    Initialize from `other` but overrides init-parameters with those from `params`.
-
-
-
+``I(const I& other, mln::image_build_params params)``
+    Initializes from `other` but overrides init-parameters with those from `params`.
 
 
 

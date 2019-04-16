@@ -81,4 +81,11 @@ namespace mln::experimental::se
     return !m_dpoints.empty();
   }
 
+  int rect2d::radial_extent() const
+  {
+    return std::max((m_dpoints.pmax[0] - m_dpoints.pmin[0]) / 2,
+                    (m_dpoints.pmax[1] - m_dpoints.pmin[1]) / 2);
+  }
+
+
 } // namespace mln::experimental::se

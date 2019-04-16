@@ -200,7 +200,7 @@ namespace mln
     bool check_S(const image2d<size_type>& parent, const size_type* begin, const size_type* end)
     {
       image2d<bool> dejavu;
-      resize(dejavu, parent).init(false);
+      resize(dejavu, parent).set_init_value(false);
 
       dejavu[*begin] = true;
       for (; begin != end; ++begin)

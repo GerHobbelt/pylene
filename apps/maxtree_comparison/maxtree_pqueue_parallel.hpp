@@ -40,7 +40,7 @@ namespace mln
         {
           if (!use_dejavu)
           {
-            resize(m_parent, ima).init(UNINITIALIZED);
+            resize(m_parent, ima).set_init_value(UNINITIALIZED);
             extension::fill(m_parent, INQUEUE);
           }
           else

@@ -78,6 +78,7 @@ add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)
 add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
+add_core_test(${test_prefix}mask2d             se/mask2d.cpp)
 
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts

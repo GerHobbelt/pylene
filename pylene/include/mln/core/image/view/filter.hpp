@@ -97,13 +97,13 @@ namespace mln
     {
     }
 
-    internal::initializer<concrete_type, clip_view<I, domain_type>> concretize() const
+    image_builder<concrete_type, clip_view<I, domain_type>> concretize() const
     {
       return mln::clip_view{this->base(), domain()};
     }
 
     template <typename V>
-    internal::initializer<ch_value_type<V>, clip_view<I, domain_type>> ch_value() const
+    image_builder<ch_value_type<V>, clip_view<I, domain_type>> ch_value() const
     {
       return mln::clip_view{this->base(), domain()};
     }

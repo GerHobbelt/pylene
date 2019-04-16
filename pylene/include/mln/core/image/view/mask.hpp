@@ -146,27 +146,19 @@ namespace mln
       // FIXME: possibly assert that mask.domain() == ima.domain()
     }
 
+
     template <class I2, class D2>
-    mask_view(const mask_view<I2, D2>& other, mln::init)
-      : mask_view::image_adaptor{static_cast<I>(other.base().template ch_value<value_type>())}
+    mask_view(const mask_view<I2, D2>& other, const image_build_params& params)
+      : mask_view::image_adaptor{ imchvalue<value_type>(other.base()).set_params(params).build() }
       , m_mask{other.m_mask}
     {
     }
 
-    template <class I2, class D2>
-    mask_view(const mask_view<I2, D2>& other, const value_type& v)
-      : mask_view::image_adaptor{static_cast<I>((other.base().template ch_value<value_type>()).init(v))}
-      , m_mask{other.m_mask}
-    {
-    }
 
-    internal::initializer<concrete_type, mask_view> concretize() const { return {*this}; }
+    image_builder<concrete_type, mask_view> concretize() const { return {*this}; }
 
     template <class U>
-    internal::initializer<ch_value_type<U>, mask_view> ch_value() const
-    {
-      return {*this};
-    }
+    image_builder<ch_value_type<U>, mask_view> ch_value() const { return {*this}; }
 
     ranges::where_t<M> domain() const { return {m_mask}; }
 

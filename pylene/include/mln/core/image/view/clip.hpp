@@ -59,8 +59,8 @@ namespace mln
     }
 
     template <class I2, class D2>
-    clip_view(const clip_view<I2, D2>& other, mln::init)
-      : clip_view::image_adaptor{static_cast<I>(other.base().template ch_value<value_type>())}
+    clip_view(const clip_view<I2, D2>& other, const image_build_params& params)
+      : clip_view::image_adaptor{imchvalue<value_type>(other, params).build()}
       , m_subdomain{other.m_subdomain}
     {
     }
@@ -72,13 +72,10 @@ namespace mln
     {
     }
 
-    internal::initializer<concrete_type, clip_view> concretize() const { return {*this}; }
+    image_builder<concrete_type, clip_view> concretize() const { return {*this}; }
 
     template <class U>
-    internal::initializer<ch_value_type<U>, clip_view> ch_value() const
-    {
-      return {*this};
-    }
+    image_builder<ch_value_type<U>, clip_view> ch_value() const { return {*this}; }
 
     domain_type domain() const { return m_subdomain; }
 

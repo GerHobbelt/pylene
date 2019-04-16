@@ -113,7 +113,7 @@ BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     copy_baseline(m_input_uint8, output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -121,7 +121,7 @@ BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8_baseline)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     copy(m_input_uint8, output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -129,7 +129,7 @@ BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     copy_baseline(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -137,7 +137,7 @@ BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8)(benchmark::State& st)
 {
-  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     copy(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -237,7 +237,7 @@ BENCHMARK_F(BMAlgorithms, equal_ibuffer2d_rgb8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     paste_baseline(m_input_uint8, output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -245,7 +245,7 @@ BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8_baseline)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     paste(m_input_uint8, output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -253,7 +253,7 @@ BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     paste_baseline(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -261,7 +261,7 @@ BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8)(benchmark::State& st)
 {
-  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     paste(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -271,7 +271,7 @@ BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     transform_baseline(m_input_uint8, output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -279,7 +279,7 @@ BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_baseline)(benchmark::State& s
 
 BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     transform(m_input_uint8, output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -287,7 +287,7 @@ BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     transform_baseline(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -295,7 +295,7 @@ BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_baseline)(benchmark::State& s
 
 BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8)(benchmark::State& st)
 {
-  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::init());
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     transform(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -337,7 +337,7 @@ BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8)(benchmark::State& st)
 
 BENCHMARK_F(BMAlgorithms, generate_buffer2d_uint8_baseline)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     generate_baseline(output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
@@ -345,7 +345,7 @@ BENCHMARK_F(BMAlgorithms, generate_buffer2d_uint8_baseline)(benchmark::State& st
 
 BENCHMARK_F(BMAlgorithms, generate_buffer2d_uint8)(benchmark::State& st)
 {
-  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::init());
+  mln::image2d<mln::uint8> output_uint8(m_input_uint8, mln::image_build_params{});
   while (st.KeepRunning())
     generate(output_uint8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);

@@ -60,9 +60,11 @@ Hit or miss transform to detect horizontal 1px-thick line, with pattern::
   x x x
 
 
-.. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 29-36
+.. literalinclude:: /snippets/staff_lines.cpp
+   :start-after: #M1_START
+   :end-before: #M1_END
    :language: cpp
+   :dedent: 4
 
 .. image:: /images/staff_lines.png
            :width: 49%
@@ -77,9 +79,11 @@ Hit or miss transform to detect horizontal 2px-thick line, with pattern::
   o o o
   x x x
 
-.. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 29-36
+.. literalinclude:: /snippets/staff_lines.cpp
    :language: cpp
+   :start-after: #M2_START
+   :end-before: #M2_END
+   :dedent: 4
 
 .. image:: /images/staff_lines.png
            :width: 49%
@@ -90,8 +94,8 @@ Hit or miss transform to detect horizontal 2px-thick line, with pattern::
 
 Logical or between the two previous images:
 
-.. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 57
+.. literalinclude:: /snippets/staff_lines.cpp
+   :lines: 50
    :language: cpp
 
 .. image:: /images/staff_lines.png

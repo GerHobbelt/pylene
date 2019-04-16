@@ -7,306 +7,321 @@
 #include <type_traits>
 
 
-namespace concepts   = mln::concepts;
-namespace archetypes = mln::archetypes;
-
 TEST(Core, Concept_Image)
 {
-  static_assert(concepts::Image<archetypes::Image>);
-  static_assert(concepts::Image<archetypes::ForwardImage>);
-  static_assert(concepts::Image<archetypes::InputImage>);
-  static_assert(concepts::Image<archetypes::IndexableImage>);
-  static_assert(concepts::Image<archetypes::AccessibleImage>);
-  static_assert(concepts::Image<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::Image<archetypes::BidirectionalImage>);
-  static_assert(concepts::Image<archetypes::RawImage>);
-  static_assert(concepts::Image<archetypes::ConcreteImage>);
-  static_assert(concepts::Image<archetypes::ViewImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::Image>);
+  static_assert(mln::concepts::Image<mln::archetypes::ForwardImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::RawImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::ConcreteImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_ForwardImage)
 {
-  static_assert(concepts::ForwardImage<archetypes::Image>);
-  static_assert(concepts::ForwardImage<archetypes::ForwardImage>);
-  static_assert(concepts::ForwardImage<archetypes::InputImage>);
-  static_assert(concepts::ForwardImage<archetypes::IndexableImage>);
-  static_assert(concepts::ForwardImage<archetypes::AccessibleImage>);
-  static_assert(concepts::ForwardImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::ForwardImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::ForwardImage<archetypes::RawImage>);
-  static_assert(concepts::ForwardImage<archetypes::ConcreteImage>);
-  static_assert(concepts::ForwardImage<archetypes::ViewImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::Image>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::ForwardImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::RawImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::ConcreteImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_InputImage)
 {
-  static_assert(concepts::InputImage<archetypes::Image>);
-  static_assert(concepts::InputImage<archetypes::ForwardImage>);
-  static_assert(concepts::InputImage<archetypes::InputImage>);
-  static_assert(concepts::InputImage<archetypes::IndexableImage>);
-  static_assert(concepts::InputImage<archetypes::AccessibleImage>);
-  static_assert(concepts::InputImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::InputImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::InputImage<archetypes::RawImage>);
-  static_assert(concepts::InputImage<archetypes::ConcreteImage>);
-  static_assert(concepts::InputImage<archetypes::ViewImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::Image>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::ForwardImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::RawImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::ConcreteImage>);
+  static_assert(mln::concepts::InputImage<mln::archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_IndexableImage)
 {
-  static_assert(not concepts::IndexableImage<archetypes::Image>);
-  static_assert(not concepts::IndexableImage<archetypes::ForwardImage>);
-  static_assert(not concepts::IndexableImage<archetypes::InputImage>);
-  static_assert(concepts::IndexableImage<archetypes::IndexableImage>);
-  static_assert(not concepts::IndexableImage<archetypes::AccessibleImage>);
-  static_assert(concepts::IndexableImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::IndexableImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::IndexableImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::RawImage>);
 }
 
 TEST(Core, Concept_AccessibleImage)
 {
-  static_assert(not concepts::AccessibleImage<archetypes::Image>);
-  static_assert(not concepts::AccessibleImage<archetypes::ForwardImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::InputImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::IndexableImage>);
-  static_assert(concepts::AccessibleImage<archetypes::AccessibleImage>);
-  static_assert(concepts::AccessibleImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::AccessibleImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::RawImage>);
 }
 
 TEST(Core, Concept_IndexableAndAccessibleImage)
 {
-  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::Image>);
-  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::ForwardImage>);
-  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::InputImage>);
-  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::IndexableImage>);
-  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::AccessibleImage>);
-  static_assert(concepts::IndexableAndAccessibleImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::IndexableAndAccessibleImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::IndexableAndAccessibleImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::IndexableAndAccessibleImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::IndexableAndAccessibleImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::IndexableAndAccessibleImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::IndexableAndAccessibleImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::IndexableAndAccessibleImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::IndexableAndAccessibleImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<mln::archetypes::RawImage>);
 }
 
 TEST(Core, Concept_BidirectionalImage)
 {
-  static_assert(not concepts::BidirectionalImage<archetypes::Image>);
-  static_assert(not concepts::BidirectionalImage<archetypes::ForwardImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::InputImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::IndexableImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::BidirectionalImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::BidirectionalImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::AccessibleImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::BidirectionalImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::BidirectionalImage<mln::archetypes::RawImage>);
 }
 
 TEST(Core, Concept_RawImage)
 {
-  static_assert(not concepts::RawImage<archetypes::Image>);
-  static_assert(not concepts::RawImage<archetypes::ForwardImage>);
-  static_assert(not concepts::RawImage<archetypes::InputImage>);
-  static_assert(not concepts::RawImage<archetypes::IndexableImage>);
-  static_assert(not concepts::RawImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::RawImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::RawImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::RawImage<archetypes::RawImage>);
-  static_assert(concepts::ForwardImage<archetypes::ConcreteImage>);
-  static_assert(concepts::ForwardImage<archetypes::ViewImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::AccessibleImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::RawImage<mln::archetypes::RawImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::ConcreteImage>);
+  static_assert(mln::concepts::ForwardImage<mln::archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_WithExtensionImage)
 {
-  static_assert(not concepts::WithExtensionImage<archetypes::Image>);
-  static_assert(not concepts::WithExtensionImage<archetypes::ForwardImage>);
-  static_assert(not concepts::WithExtensionImage<archetypes::InputImage>);
-  static_assert(not concepts::WithExtensionImage<archetypes::IndexableImage>);
-  static_assert(not concepts::WithExtensionImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::WithExtensionImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::WithExtensionImage<archetypes::BidirectionalImage>);
-  static_assert(not concepts::WithExtensionImage<archetypes::RawImage>);
-  static_assert(concepts::WithExtensionImage<archetypes::WithExtensionImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::AccessibleImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::BidirectionalImage>);
+  static_assert(not mln::concepts::WithExtensionImage<mln::archetypes::RawImage>);
+  static_assert(mln::concepts::WithExtensionImage<mln::archetypes::WithExtensionImage>);
 }
 
 TEST(Core, Concept_OutputImage) // ForwardImage, InputImage
 {
-  static_assert(concepts::Image<archetypes::Image> && not concepts::OutputImage<archetypes::Image>);
-  static_assert(concepts::Image<archetypes::ForwardImage> && not concepts::OutputImage<archetypes::ForwardImage>);
-  static_assert(concepts::Image<archetypes::InputImage> && not concepts::OutputImage<archetypes::InputImage>);
-  static_assert(concepts::Image<archetypes::IndexableImage> && not concepts::OutputImage<archetypes::IndexableImage>);
-  static_assert(concepts::Image<archetypes::AccessibleImage> && not concepts::OutputImage<archetypes::AccessibleImage>);
-  static_assert(concepts::Image<archetypes::IndexableAndAccessibleImage> &&
-                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::Image<archetypes::BidirectionalImage> &&
-                not concepts::OutputImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::Image<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::Image> && not mln::concepts::OutputImage<mln::archetypes::Image>);
+  static_assert(mln::concepts::Image<mln::archetypes::ForwardImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::ForwardImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::InputImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::IndexableImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::AccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::IndexableAndAccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::BidirectionalImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::RawImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::RawImage>);
 
-  static_assert(concepts::Image<archetypes::OutputImage> && concepts::OutputImage<archetypes::OutputImage>);
-  static_assert(concepts::Image<archetypes::OutputForwardImage> &&
-                concepts::OutputImage<archetypes::OutputForwardImage>);
-  static_assert(concepts::Image<archetypes::OutputIndexableImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableImage>);
-  static_assert(concepts::Image<archetypes::OutputAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputAccessibleImage>);
-  static_assert(concepts::Image<archetypes::OutputIndexableAndAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
-  static_assert(concepts::Image<archetypes::OutputBidirectionalImage> &&
-                concepts::OutputImage<archetypes::OutputBidirectionalImage>);
-  static_assert(concepts::Image<archetypes::OutputRawImage> && concepts::OutputImage<archetypes::OutputRawImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputForwardImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputForwardImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputIndexableImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputAccessibleImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputIndexableAndAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableAndAccessibleImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputBidirectionalImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputBidirectionalImage>);
+  static_assert(mln::concepts::Image<mln::archetypes::OutputRawImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputRawImage>);
 }
 
 TEST(Core, Concept_OutputIndexableImage)
 {
-  static_assert(not concepts::IndexableImage<archetypes::Image> && not concepts::OutputImage<archetypes::Image>);
-  static_assert(not concepts::IndexableImage<archetypes::ForwardImage> &&
-                not concepts::OutputImage<archetypes::ForwardImage>);
-  static_assert(not concepts::IndexableImage<archetypes::InputImage> &&
-                not concepts::OutputImage<archetypes::InputImage>);
-  static_assert(concepts::IndexableImage<archetypes::IndexableImage> &&
-                not concepts::OutputImage<archetypes::IndexableImage>);
-  static_assert(not concepts::IndexableImage<archetypes::AccessibleImage> &&
-                not concepts::OutputImage<archetypes::AccessibleImage>);
-  static_assert(concepts::IndexableImage<archetypes::IndexableAndAccessibleImage> &&
-                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::IndexableImage<archetypes::BidirectionalImage> &&
-                not concepts::OutputImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::IndexableImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::Image> &&
+                not mln::concepts::OutputImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::ForwardImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::InputImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::IndexableImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::AccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::IndexableAndAccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::BidirectionalImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::RawImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::RawImage>);
 
-  static_assert(not concepts::IndexableImage<archetypes::OutputImage> &&
-                concepts::OutputImage<archetypes::OutputImage>);
-  static_assert(not concepts::IndexableImage<archetypes::OutputForwardImage> &&
-                concepts::OutputImage<archetypes::OutputForwardImage>);
-  static_assert(concepts::IndexableImage<archetypes::OutputIndexableImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableImage>);
-  static_assert(not concepts::IndexableImage<archetypes::OutputAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputAccessibleImage>);
-  static_assert(concepts::IndexableImage<archetypes::OutputIndexableAndAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
-  static_assert(not concepts::IndexableImage<archetypes::OutputBidirectionalImage> &&
-                concepts::OutputImage<archetypes::OutputBidirectionalImage>);
-  static_assert(concepts::IndexableImage<archetypes::OutputRawImage> &&
-                concepts::OutputImage<archetypes::OutputRawImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::OutputImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::OutputForwardImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputForwardImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::OutputIndexableImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::OutputAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputAccessibleImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::OutputIndexableAndAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::IndexableImage<mln::archetypes::OutputBidirectionalImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputBidirectionalImage>);
+  static_assert(mln::concepts::IndexableImage<mln::archetypes::OutputRawImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputRawImage>);
 }
 
 TEST(Core, Concept_OutputAccessibleImage)
 {
-  static_assert(not concepts::AccessibleImage<archetypes::Image> && not concepts::OutputImage<archetypes::Image>);
-  static_assert(not concepts::AccessibleImage<archetypes::ForwardImage> &&
-                not concepts::OutputImage<archetypes::ForwardImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::InputImage> &&
-                not concepts::OutputImage<archetypes::InputImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::IndexableImage> &&
-                not concepts::OutputImage<archetypes::IndexableImage>);
-  static_assert(concepts::AccessibleImage<archetypes::AccessibleImage> &&
-                not concepts::OutputImage<archetypes::AccessibleImage>);
-  static_assert(concepts::AccessibleImage<archetypes::IndexableAndAccessibleImage> &&
-                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::BidirectionalImage> &&
-                not concepts::OutputImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::AccessibleImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::Image> &&
+                not mln::concepts::OutputImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::ForwardImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::InputImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::IndexableImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::AccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::IndexableAndAccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::BidirectionalImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::RawImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::RawImage>);
 
-  static_assert(not concepts::AccessibleImage<archetypes::OutputImage> &&
-                concepts::OutputImage<archetypes::OutputImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::OutputForwardImage> &&
-                concepts::OutputImage<archetypes::OutputForwardImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::OutputIndexableImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableImage>);
-  static_assert(concepts::AccessibleImage<archetypes::OutputAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputAccessibleImage>);
-  static_assert(concepts::AccessibleImage<archetypes::OutputIndexableAndAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
-  static_assert(not concepts::AccessibleImage<archetypes::OutputBidirectionalImage> &&
-                concepts::OutputImage<archetypes::OutputBidirectionalImage>);
-  static_assert(concepts::AccessibleImage<archetypes::OutputRawImage> &&
-                concepts::OutputImage<archetypes::OutputRawImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::OutputImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::OutputForwardImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputForwardImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::OutputIndexableImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::OutputAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputAccessibleImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::OutputIndexableAndAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::AccessibleImage<mln::archetypes::OutputBidirectionalImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputBidirectionalImage>);
+  static_assert(mln::concepts::AccessibleImage<mln::archetypes::OutputRawImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputRawImage>);
 }
 
 TEST(Core, Concept_OutputBidirectionalImage)
 {
-  static_assert(not concepts::BidirectionalImage<archetypes::Image> && not concepts::OutputImage<archetypes::Image>);
-  static_assert(not concepts::BidirectionalImage<archetypes::ForwardImage> &&
-                not concepts::OutputImage<archetypes::ForwardImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::InputImage> &&
-                not concepts::OutputImage<archetypes::InputImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::IndexableImage> &&
-                not concepts::OutputImage<archetypes::IndexableImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::AccessibleImage> &&
-                not concepts::OutputImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::IndexableAndAccessibleImage> &&
-                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::BidirectionalImage<archetypes::BidirectionalImage> &&
-                not concepts::OutputImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::BidirectionalImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::Image> &&
+                not mln::concepts::OutputImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::ForwardImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::InputImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::IndexableImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::AccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::AccessibleImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::IndexableAndAccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::BidirectionalImage<mln::archetypes::BidirectionalImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::BidirectionalImage<mln::archetypes::RawImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::RawImage>);
 
-  static_assert(not concepts::BidirectionalImage<archetypes::OutputImage> &&
-                concepts::OutputImage<archetypes::OutputImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::OutputForwardImage> &&
-                concepts::OutputImage<archetypes::OutputForwardImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::OutputIndexableImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::OutputAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputAccessibleImage>);
-  static_assert(not concepts::BidirectionalImage<archetypes::OutputIndexableAndAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
-  static_assert(concepts::BidirectionalImage<archetypes::OutputBidirectionalImage> &&
-                concepts::OutputImage<archetypes::OutputBidirectionalImage>);
-  static_assert(concepts::BidirectionalImage<archetypes::OutputRawImage> &&
-                concepts::OutputImage<archetypes::OutputRawImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::OutputImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::OutputForwardImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputForwardImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::OutputIndexableImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::OutputAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputAccessibleImage>);
+  static_assert(not mln::concepts::BidirectionalImage<mln::archetypes::OutputIndexableAndAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableAndAccessibleImage>);
+  static_assert(mln::concepts::BidirectionalImage<mln::archetypes::OutputBidirectionalImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputBidirectionalImage>);
+  static_assert(mln::concepts::BidirectionalImage<mln::archetypes::OutputRawImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputRawImage>);
 }
 
 TEST(Core, Concept_OutputRawImage)
 {
-  static_assert(not concepts::RawImage<archetypes::Image> && not concepts::OutputImage<archetypes::Image>);
-  static_assert(not concepts::RawImage<archetypes::ForwardImage> &&
-                not concepts::OutputImage<archetypes::ForwardImage>);
-  static_assert(not concepts::RawImage<archetypes::InputImage> && not concepts::OutputImage<archetypes::InputImage>);
-  static_assert(not concepts::RawImage<archetypes::IndexableImage> &&
-                not concepts::OutputImage<archetypes::IndexableImage>);
-  static_assert(not concepts::RawImage<archetypes::AccessibleImage> &&
-                not concepts::OutputImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::RawImage<archetypes::IndexableAndAccessibleImage> &&
-                not concepts::OutputImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::RawImage<archetypes::BidirectionalImage> &&
-                not concepts::OutputImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::RawImage<archetypes::RawImage> && not concepts::OutputImage<archetypes::RawImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::Image> &&
+                not mln::concepts::OutputImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::ForwardImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::InputImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::IndexableImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::AccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::AccessibleImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::IndexableAndAccessibleImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::BidirectionalImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::RawImage<mln::archetypes::RawImage> &&
+                not mln::concepts::OutputImage<mln::archetypes::RawImage>);
 
-  static_assert(not concepts::RawImage<archetypes::OutputImage> && concepts::OutputImage<archetypes::OutputImage>);
-  static_assert(not concepts::RawImage<archetypes::OutputForwardImage> &&
-                concepts::OutputImage<archetypes::OutputForwardImage>);
-  static_assert(not concepts::RawImage<archetypes::OutputIndexableImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableImage>);
-  static_assert(not concepts::RawImage<archetypes::OutputAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputAccessibleImage>);
-  static_assert(not concepts::RawImage<archetypes::OutputIndexableAndAccessibleImage> &&
-                concepts::OutputImage<archetypes::OutputIndexableAndAccessibleImage>);
-  static_assert(not concepts::RawImage<archetypes::OutputBidirectionalImage> &&
-                concepts::OutputImage<archetypes::OutputBidirectionalImage>);
-  static_assert(concepts::RawImage<archetypes::OutputRawImage> && concepts::OutputImage<archetypes::OutputRawImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::OutputImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::OutputForwardImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputForwardImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::OutputIndexableImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::OutputAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputAccessibleImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::OutputIndexableAndAccessibleImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputIndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::RawImage<mln::archetypes::OutputBidirectionalImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputBidirectionalImage>);
+  static_assert(mln::concepts::RawImage<mln::archetypes::OutputRawImage> &&
+                mln::concepts::OutputImage<mln::archetypes::OutputRawImage>);
 }
 
 TEST(Core, Concept_ConcreteImage)
 {
-  static_assert(not concepts::ConcreteImage<archetypes::Image>);
-  static_assert(not concepts::ConcreteImage<archetypes::ForwardImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::InputImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::IndexableImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::AccessibleImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::BidirectionalImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::RawImage>);
-  static_assert(concepts::ConcreteImage<archetypes::ConcreteImage>);
-  static_assert(not concepts::ConcreteImage<archetypes::ViewImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::Image>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::ForwardImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::InputImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::IndexableImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::AccessibleImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::BidirectionalImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::RawImage>);
+  static_assert(mln::concepts::ConcreteImage<mln::archetypes::ConcreteImage>);
+  static_assert(not mln::concepts::ConcreteImage<mln::archetypes::ViewImage>);
 }
 
 TEST(Core, Concept_ViewImage)
 {
-  static_assert(concepts::ViewImage<archetypes::Image>);
-  static_assert(concepts::ViewImage<archetypes::ForwardImage>);
-  static_assert(concepts::ViewImage<archetypes::InputImage>);
-  static_assert(concepts::ViewImage<archetypes::IndexableImage>);
-  static_assert(concepts::ViewImage<archetypes::AccessibleImage>);
-  static_assert(concepts::ViewImage<archetypes::IndexableAndAccessibleImage>);
-  static_assert(concepts::ViewImage<archetypes::BidirectionalImage>);
-  static_assert(concepts::ViewImage<archetypes::RawImage>);
-  static_assert(not concepts::ViewImage<archetypes::ConcreteImage>);
-  static_assert(concepts::ViewImage<archetypes::ViewImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::Image>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::ForwardImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::InputImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::IndexableImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::AccessibleImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::IndexableAndAccessibleImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::BidirectionalImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::RawImage>);
+  static_assert(not mln::concepts::ViewImage<mln::archetypes::ConcreteImage>);
+  static_assert(mln::concepts::ViewImage<mln::archetypes::ViewImage>);
 }

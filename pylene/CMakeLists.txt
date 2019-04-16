@@ -45,6 +45,7 @@ target_sources(Pylene PRIVATE
   src/core/se/disc.cpp
   src/core/se/periodic_line2d.cpp
   src/core/se/rect2d.cpp
+  src/core/se/mask2d.cpp
   src/core/trace.cpp
 
   src/py/algorithm/stretch.cpp
@@ -60,7 +61,6 @@ target_sources(Pylene-python PRIVATE
 target_include_directories(Pylene-python PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include>)
-
 
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_17)

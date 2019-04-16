@@ -79,7 +79,7 @@ TEST(Morpho, gradient_gradient_4)
 
   mln::se::rect2d win(3, 3);
   image2d<uint8>  out;
-  resize(out, ima).init(0);
+  resize(out, ima).set_init_value(0);
   auto tmp = out | where(ima > 128);
   morpho::structural::gradient(ima | where(ima > 128), win, std::less<uint8>(), functional::l2norm_t<uint8>(), tmp);
 }

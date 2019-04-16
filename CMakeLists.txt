@@ -85,23 +85,21 @@ endif()
 # Subdirectories
 add_subdirectory(pylene)
 
-add_subdirectory(fixtures)
-
 if (PYLENE_BUILD_PYBIND)
   add_subdirectory(pybind)
 endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
+  add_subdirectory(fixtures)
+
   if (PYLENE_BUILD_BENCHMARKS)
     add_subdirectory(bench EXCLUDE_FROM_ALL)
   endif()
-
 
   if (BUILD_TESTING)
     include(CTest)
     add_subdirectory(tests EXCLUDE_FROM_ALL)
   endif()
-
 
   add_subdirectory(doc EXCLUDE_FROM_ALL)
   add_subdirectory(apps EXCLUDE_FROM_ALL)

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mln/core/concept/new/values.hpp>
 #include <mln/core/concept/new/pixels.hpp>
+#include <mln/core/concept/new/values.hpp>
+
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/private/image_traits.hpp>
 #include <mln/core/image/private/pixel_traits.hpp>
 
-namespace concepts = mln::concepts;
 
 namespace mln
 {
@@ -16,10 +16,10 @@ namespace mln
   template <class Pix>
   struct pixel_adaptor
   {
-    using point_type              = typename Pix::point_type;
-    using site_type[[deprecated]] = point_type;
-    using value_type              = typename Pix::value_type;
-    using reference               = typename Pix::reference;
+    using point_type               = typename Pix::point_type;
+    using site_type [[deprecated]] = point_type;
+    using value_type               = typename Pix::value_type;
+    using reference                = typename Pix::reference;
 
     decltype(auto) val() const { return m_pix.val(); }
     auto           point() const { return m_pix.point(); }
@@ -84,8 +84,8 @@ namespace mln
     template <class I>
     struct image_adaptor_base_indexable<I, std::enable_if_t<I::indexable::value>>
     {
-      using size_type[[deprecated]] = image_index_t<I>;
-      using index_type              = size_type;
+      using size_type [[deprecated]] = image_index_t<I>;
+      using index_type               = size_type;
     };
 
     template <class I, class = void>
@@ -108,10 +108,10 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using reference      = image_reference_t<I>;
-    using value_type     = image_value_t<I>;
-    using point_type     = image_point_t<I>;
-    using domain_type    = image_domain_t<I>;
+    using reference   = image_reference_t<I>;
+    using value_type  = image_value_t<I>;
+    using point_type  = image_point_t<I>;
+    using domain_type = image_domain_t<I>;
     /// \}
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::experimental::Pixel<new_pixel_type>

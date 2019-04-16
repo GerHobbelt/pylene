@@ -148,7 +148,7 @@ namespace mln
     typedef typename tree_t::node_type            node_t;
 
     image2d<V> saliency;
-    resize(saliency, tree._get_data()->m_pmap).init(0);
+    resize(saliency, tree._get_data()->m_pmap).set_init_value(0);
 
     auto depth = morpho::compute_depth(tree);
 

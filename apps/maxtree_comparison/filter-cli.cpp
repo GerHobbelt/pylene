@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   io::imread(argv[3], S);
 
   image2d<unsigned> area;
-  resize(area, f).init(0);
+  resize(area, f).set_init_value(0);
 
   // Accumulate
   mln_reverse_foreach (unsigned i, S.values())

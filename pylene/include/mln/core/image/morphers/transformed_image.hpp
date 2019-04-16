@@ -155,15 +155,6 @@ namespace mln
     typedef mln_ch_value(typename std::remove_reference<I>::type, value_type) type;
   };
 
-  namespace internal
-  {
-    template <class I, class UnaryFunction, bool b>
-    struct image_init_from<transformed_image<I, UnaryFunction, b>>
-    {
-      typedef typename image_init_from<typename std::decay<I>::type>::type type;
-    };
-  } // namespace internal
-
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -291,21 +282,18 @@ namespace mln
       {
       }
 
-      friend internal::initializer<mln_concrete(transformed_image),
-                                   typename internal::image_init_from<transformed_image>::type>
-          imconcretize(const transformed_image& f)
+
+      friend auto imconcretize(const transformed_image& f)
       {
         using mln::imchvalue;
-        return std::move(imchvalue<value_type>(f.m_ima));
+        return imchvalue<value_type>(f.m_ima);
       }
 
       template <typename V>
-      friend internal::initializer<mln_ch_value(transformed_image, V),
-                                   typename internal::image_init_from<transformed_image>::type>
-          imchvalue(const transformed_image& f)
+      friend auto imchvalue(const transformed_image& f)
       {
         using mln::imchvalue;
-        return std::move(imchvalue<V>(f.m_ima));
+        return imchvalue<V>(f.m_ima);
       }
 
       const_value_range values() const

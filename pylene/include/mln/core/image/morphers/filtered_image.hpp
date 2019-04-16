@@ -45,15 +45,6 @@ namespace mln
     typedef sub_image<mln_concrete(I), internal::where_t<I, Predicate>> type;
   };
 
-  namespace internal
-  {
-    template <class I, class Predicate>
-    struct image_init_from<filtered_image<I, Predicate>>
-    {
-      typedef typename image_init_from<sub_image<I, internal::where_t<I, Predicate>>>::type type;
-    };
-  } // namespace internal
-
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -308,20 +299,19 @@ namespace mln
     {
     }
 
-    friend internal::initializer<mln_concrete(filtered_image), typename internal::image_init_from<filtered_image>::type>
-        imconcretize(const filtered_image& f)
+    friend auto imconcretize(const filtered_image& f)
     {
+      using mln::imconcretize;
       sub_image<I, domain_t> sub(f.m_ima, {f.m_ima, f.m_pred});
-      return std::move(imconcretize(sub));
+      return imconcretize(sub);
     }
 
     template <typename V>
-    friend internal::initializer<mln_ch_value(filtered_image, V),
-                                 typename internal::image_init_from<filtered_image>::type>
-        imchvalue(const filtered_image& f)
+    friend auto imchvalue(const filtered_image& f)
     {
+      using mln::imchvalue;
       sub_image<I, domain_t> sub(f.m_ima, {f.m_ima, f.m_pred});
-      return std::move(imchvalue<V>(sub));
+      return imchvalue<V>(sub);
     }
   };
 

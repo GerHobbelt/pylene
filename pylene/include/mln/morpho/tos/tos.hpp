@@ -75,7 +75,7 @@ namespace mln
         auto& nodes = tree._get_data()->m_nodes;
         auto& S     = tree._get_data()->m_S;
 
-        mln_ch_value(J, bool) is2F = imchvalue<bool>(pmap).init(false);
+        mln_ch_value(J, bool) is2F = imchvalue<bool>(pmap).set_init_value(false);
         auto dom                   = is2F.domain();
         mln_point(J) step          = 2; // {2,2} or {2,2,2}
         // FIXME

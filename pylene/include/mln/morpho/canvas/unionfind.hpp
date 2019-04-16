@@ -133,7 +133,7 @@ namespace mln
             unionfind_facade(const I& input, const N& nbh, StopCriterion term, Compare cmp, uf_visitor viz)
         {
           mln_ch_value(I, mln_point(I)) par     = imchvalue<mln_point(I)>(input);
-          mln_ch_value(I, unsigned char) status = imchvalue<unsigned char>(input).init(NONE);
+          mln_ch_value(I, unsigned char) status = imchvalue<unsigned char>(input).set_init_value(NONE);
 
           if (not extension::need_adjust(status, nbh))
             unionfind_impl(input, nbh, term, cmp, viz, par, status);

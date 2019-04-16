@@ -60,15 +60,6 @@ namespace mln
     typedef mln_concrete(I) type;
   };
 
-  namespace internal
-  {
-    template <typename I>
-    struct image_init_from<extended_by_value_image<I>>
-    {
-      typedef typename image_init_from<typename std::decay<I>::type>::type type;
-    };
-  } // namespace internal
-
   /*****************************/
   /**** Implementation       ***/
   /*****************************/
@@ -222,17 +213,17 @@ namespace mln
     {
     }
 
-    friend internal::initializer<mln_concrete(I), typename internal::image_init_from<extended_by_value_image>::type>
-        imconcretize(const extended_by_value_image& f)
+    friend auto imconcretize(const extended_by_value_image& f)
     {
-      return std::move(imconcretize(f.m_ima));
+      using mln::imconcretize;
+      return imconcretize(f.m_ima);
     }
 
     template <typename V>
-    friend internal::initializer<mln_ch_value(I, V), typename internal::image_init_from<extended_by_value_image>::type>
-        imchvalue(const extended_by_value_image& f)
+    friend auto imchvalue(const extended_by_value_image& f)
     {
-      return std::move(imchvalue<V>(f.m_ima));
+      using mln::imchvalue;
+      return imchvalue<V>(f.m_ima);
     }
 
     template <typename = void>

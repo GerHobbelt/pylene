@@ -18,6 +18,7 @@ namespace mln
 
       static const int                    static_size = 4;
       static const std::array<point2d, 4> dpoints;
+      static constexpr int radial_extent() { return 1; }
     };
     const std::array<point2d, 4> c4_t::dpoints = {{{-1, 0}, {0, -1}, {0, 1}, {1, 0}}};
 
@@ -27,6 +28,7 @@ namespace mln
 
       static const int                    static_size = 8;
       static const std::array<point2d, 8> dpoints;
+      static constexpr int radial_extent() { return 1; }
     };
 
     const std::array<point2d, 8> c8_t::dpoints = {
@@ -38,6 +40,7 @@ namespace mln
 
       static const int                    static_size = 2;
       static const std::array<point2d, 2> dpoints;
+      static constexpr int radial_extent() { return 1; }
     };
     const std::array<point2d, 2> c2_v_t::dpoints = {{{-1, 0}, {1, 0}}};
 
@@ -47,6 +50,7 @@ namespace mln
 
       static const int                    static_size = 2;
       static const std::array<point2d, 2> dpoints;
+      static constexpr int radial_extent() { return 1; }
     };
     const std::array<point2d, 2> c2_h_t::dpoints = {{{0, -1}, {0, 1}}};
   } // namespace

@@ -75,7 +75,7 @@ namespace mln
       mln_concrete(I) out = clone(f);
       mln_ch_value(I, accu_t) accus;
 
-      resize(accus, f).init(accu_t(cmp));
+      resize(accus, f).set_init_value(accu_t(cmp));
       internal::closing_by_rec_ufind_visitor<I, J, Compare> viz(markers, accus, out);
 
       auto criterion = [&accus, &f, cmp](const mln_point(I) & p) { return not cmp(f(p), accus(p).to_result()); };

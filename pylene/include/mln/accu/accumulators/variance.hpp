@@ -4,7 +4,7 @@
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/accu/composite_accumulator.hpp>
-#include <mln/core/math_ops.hpp>
+#include <mln/core/functional_ops.hpp>
 
 #include <boost/type_traits/promote.hpp>
 

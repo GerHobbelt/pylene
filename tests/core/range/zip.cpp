@@ -13,8 +13,6 @@
 #include <gtest/gtest.h>
 
 
-namespace concepts = mln::concepts;
-
 TEST(Core, ziprange)
 {
 
@@ -56,8 +54,8 @@ TEST(Core, zip_container)
   auto rng = mln::ranges::view::zip(a, b);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::stl::ForwardRange<decltype(rng)>);
-  static_assert(concepts::stl::OutputRange<decltype(rng), std::tuple<int, int>>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(rng)>);
+  static_assert(mln::concepts::stl::OutputRange<decltype(rng), std::tuple<int, int>>);
 #else
   static_assert(::ranges::ForwardRange<decltype(rng)>());
   static_assert(::ranges::OutputRange<decltype(rng), std::tuple<int, int>>());
@@ -86,14 +84,14 @@ TEST(Core, zip_view_readonly)
   auto rng = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::SegmentedRange<decltype(multi_ind0)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind0)>);
-  static_assert(concepts::SegmentedRange<decltype(multi_ind1)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind1)>);
-  static_assert(concepts::SegmentedRange<decltype(multi_ind2)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind2)>);
-  static_assert(concepts::SegmentedRange<decltype(rng)>);
-  static_assert(concepts::ReversibleRange<decltype(rng)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind1)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind1)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind2)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind2)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(multi_ind1)>());
@@ -125,14 +123,14 @@ TEST(Core, zip_view_readonly_rowwise)
   auto zipped_rows = mln::ranges::view::zip(multi_ind0, multi_ind1, multi_ind2);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::SegmentedRange<decltype(multi_ind0)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind0)>);
-  static_assert(concepts::SegmentedRange<decltype(multi_ind1)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind1)>);
-  static_assert(concepts::SegmentedRange<decltype(multi_ind2)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind2)>);
-  static_assert(concepts::SegmentedRange<decltype(zipped_rows)>);
-  static_assert(concepts::ReversibleRange<decltype(zipped_rows)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind1)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind1)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind2)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind2)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(zipped_rows)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(zipped_rows)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(multi_ind1)>());
@@ -165,16 +163,16 @@ TEST(Core, zip_view_write)
   auto       z    = mln::ranges::view::zip(sp1, sp2, ind0);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::stl::ForwardRange<decltype(a1)>);
-  static_assert(concepts::stl::ForwardRange<decltype(a2)>);
-  static_assert(concepts::SegmentedRange<decltype(sp1)>);
-  static_assert(concepts::ReversibleRange<decltype(sp1)>);
-  static_assert(concepts::SegmentedRange<decltype(sp2)>);
-  static_assert(concepts::ReversibleRange<decltype(sp2)>);
-  static_assert(concepts::SegmentedRange<decltype(ind0)>);
-  static_assert(concepts::ReversibleRange<decltype(ind0)>);
-  static_assert(concepts::SegmentedRange<decltype(z)>);
-  static_assert(concepts::ReversibleRange<decltype(z)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(a1)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(a2)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(sp1)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(sp1)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(sp2)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(sp2)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(ind0)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(ind0)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(z)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(a1)>());
   static_assert(::ranges::ForwardRange<decltype(a2)>());
@@ -209,16 +207,16 @@ TEST(Core, zip_view_write_rowwise)
   auto       z    = mln::ranges::view::zip(sp1, sp2, ind0);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::stl::ForwardRange<decltype(a1)>);
-  static_assert(concepts::stl::ForwardRange<decltype(a2)>);
-  static_assert(concepts::SegmentedRange<decltype(sp1)>);
-  static_assert(concepts::ReversibleRange<decltype(sp1)>);
-  static_assert(concepts::SegmentedRange<decltype(sp2)>);
-  static_assert(concepts::ReversibleRange<decltype(sp2)>);
-  static_assert(concepts::SegmentedRange<decltype(ind0)>);
-  static_assert(concepts::ReversibleRange<decltype(ind0)>);
-  static_assert(concepts::SegmentedRange<decltype(z)>);
-  static_assert(concepts::ReversibleRange<decltype(z)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(a1)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(a2)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(sp1)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(sp1)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(sp2)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(sp2)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(ind0)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(ind0)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(z)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(a1)>());
   static_assert(::ranges::ForwardRange<decltype(a2)>());
@@ -257,12 +255,12 @@ TEST(Core, zip_segmented_and_nonsegmented)
   auto z = mln::ranges::view::zip(ref, multi_ind0);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::SegmentedRange<decltype(multi_ind0)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind0)>);
-  static_assert(concepts::stl::ForwardRange<decltype(z)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(z)>);
   // FIXME: explicit instanciation lead to compile error instead of just failing the assert
-  // static_assert(not concepts::SegmentedRange<decltype(z)>);
-  // static_assert(not concepts::ReversibleRange<decltype(z)>);
+  // static_assert(not mln::concepts::SegmentedRange<decltype(z)>);
+  // static_assert(not mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(z)>());
@@ -285,12 +283,12 @@ TEST(Core, zip_segmented_and_nonsegmented_rowwise)
   auto z = mln::ranges::view::zip(ref, multi_ind0);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::SegmentedRange<decltype(multi_ind0)>);
-  static_assert(concepts::ReversibleRange<decltype(multi_ind0)>);
-  static_assert(concepts::stl::ForwardRange<decltype(z)>);
+  static_assert(mln::concepts::SegmentedRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::ReversibleRange<decltype(multi_ind0)>);
+  static_assert(mln::concepts::stl::ForwardRange<decltype(z)>);
   // FIXME: explicit instanciation lead to compile error instead of just failing the assert
-  // static_assert(not concepts::SegmentedRange<decltype(z)>);
-  // static_assert(not concepts::ReversibleRange<decltype(z)>);
+  // static_assert(not mln::concepts::SegmentedRange<decltype(z)>);
+  // static_assert(not mln::concepts::ReversibleRange<decltype(z)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(multi_ind0)>());
   static_assert(::ranges::ForwardRange<decltype(z)>());

@@ -4,11 +4,34 @@ stages:
     - bench
     - deploy
 
-image: carlinet/buildimage
+variables:
+    DOCKER_IMAGE: "${CI_REGISTRY}/olena/pylene/build-toolset"
+    BUILD_DOCKER: 'false'
+    PACKAGE_NAME: "pylene" # Conan package name
+    PACKAGE_TAG: "testing" # Conan tag
+    PACKAGE_VERSION: "head" # Version to build
+    CONAN_USER: "lrde"
 
-before_script:
-    - mkdir build && cd build
-    - conan install .. -pr buildfarm --build=missing
+
+#########
+# Build #
+#########
+.job-build-docker-base: &build-docker-base
+    stage: build
+    script:
+        - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+        - docker build -t ${DOCKER_IMAGE} -f utils/docker/Dockerfile --no-cache .
+        - docker push ${DOCKER_IMAGE}
+
+build-docker-manual:
+    <<: *build-docker-base
+    when: manual
+
+build-docker-automatic:
+    <<: *build-docker-base
+    only:
+        variables:
+            - $BUILD_DOCKER =~ /true/i
 
 
 ########
@@ -16,8 +39,11 @@ before_script:
 ########
 
 .job-build-linux-base: &distcheck-linux-base
+    image: ${DOCKER_IMAGE}
     stage: test
     script:
+        - mkdir build && cd build
+        - conan install .. -pr $BUILD_PROFILE --build missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build apps --config $PYLENE_CONFIGURATION
         - cmake --build tests --config $PYLENE_CONFIGURATION
@@ -29,34 +55,69 @@ before_script:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days
 
-distcheck-linux-gcc-release:
+distcheck-linux-gcc7-release:
     <<: *distcheck-linux-base
     variables:
         PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
+        BUILD_PROFILE: "gcc7"
+        CXX: "g++-7"
+        CC: "gcc-7"
 
-distcheck-linux-clang-release:
+distcheck-linux-gcc7-debug:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        BUILD_PROFILE: "gcc7"
+        CXX: "g++-7"
+        CC: "gcc-7"
+
+distcheck-linux-gcc8-release:
     <<: *distcheck-linux-base
     variables:
         PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
+        BUILD_PROFILE: "gcc8"
+        CXX: "g++-8"
+        CC: "gcc-8"
 
-distcheck-linux-gcc-debug:
+distcheck-linux-gcc8-debug:
     <<: *distcheck-linux-base
     variables:
         PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
+        BUILD_PROFILE: "gcc8"
+        CXX: "g++-8"
+        CC: "gcc-8"
 
-distcheck-linux-clang-debug:
+distcheck-linux-clang6-release:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        BUILD_PROFILE: "clang6"
+        CXX: "clang++-6.0"
+        CC: "clang-6.0"
+
+distcheck-linux-clang6-debug:
     <<: *distcheck-linux-base
     variables:
         PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
+        BUILD_PROFILE: "clang6"
+        CXX: "clang++-6.0"
+        CC: "clang-6.0"
 
+distcheck-linux-clang7-release:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        BUILD_PROFILE: "clang7"
+        CXX: "clang++-7"
+        CC: "clang-7"
+
+distcheck-linux-clang7-debug:
+    <<: *distcheck-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        BUILD_PROFILE: "clang7"
+        CXX: "clang++-7"
+        CC: "clang-7"
 
 
 #########
@@ -64,8 +125,11 @@ distcheck-linux-clang-debug:
 #########
 
 .job-bench-linux-base: &distbench-linux-base
+    image: ${DOCKER_IMAGE}
     stage: bench
     script:
+        - mkdir build && cd build
+        - conan install .. -pr $BUILD_PROFILE --build missing
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data
         - cmake --build .
@@ -81,27 +145,49 @@ distcheck-linux-clang-debug:
             - build/bench/*.json
         expire_in: 15 days
 
-distbench-linux-gcc-release:
+distbench-linux-gcc7-release:
     <<: *distbench-linux-base
     variables:
         PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
+        BUILD_PROFILE: "gcc7"
+        CXX: "g++-7"
+        CC: "gcc-7"
 
-distbench-linux-clang-release:
+distbench-linux-clang6-release:
     <<: *distbench-linux-base
     variables:
         PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
+        BUILD_PROFILE: "clang6"
+        CXX: "clang++-6.0"
+        CC: "clang-6.0"
+
+distbench-linux-gcc8-release:
+    <<: *distbench-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        BUILD_PROFILE: "gcc8"
+        CXX: "g++-8"
+        CC: "gcc-8"
+
+distbench-linux-clang7-release:
+    <<: *distbench-linux-base
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        BUILD_PROFILE: "clang6"
+        CXX: "clang++-7"
+        CC: "clang-7"
+
 
 #################
 # Documentation #
 #################
 
 .documentation-base:  &documentation-base
+    image: ${DOCKER_IMAGE}
     stage: test
     script:
+        - mkdir build && cd build
+        - conan install .. -pr pylene_default --build missing
         - cmake .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build .
                 --config Release
@@ -123,7 +209,20 @@ documentation:
 ##########
 # Deploy #
 ##########
+
 pages:
     <<: *documentation-base
     only:
         - dev
+
+package:
+    image: ${DOCKER_IMAGE}
+    stage: deploy
+    dependencies: []
+    script:
+        - mkdir build && cd build
+        - conan install .. -pr pylene_default --build missing
+        - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
+        - conan create .. --build missing $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+        - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+    only: [ "dev", "development/ranges" ]

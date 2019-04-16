@@ -51,7 +51,7 @@ namespace mln
           m_S         = new std::vector<size_type>(n);
 
           resize(m_parent, ima);
-          resize(m_zpar, ima).init(UNINITIALIZED);
+          resize(m_zpar, ima).set_init_value(UNINITIALIZED);
           m_nsplit = 0;
         }
 
@@ -87,7 +87,7 @@ namespace mln
 
           image2d<bool> deja_vu;
           if (use_dejavu)
-            resize(deja_vu, ima).init(false);
+            resize(deja_vu, ima).set_init_value(false);
 
           size_type first_index = ima.index_of_point(ima.domain().pmin);
           size_type last_index  = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];

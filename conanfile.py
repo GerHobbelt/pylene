@@ -3,7 +3,7 @@ from conans import CMake, ConanFile, tools
 
 class Pylene(ConanFile):
     name = "pylene"
-    version = "2.0"
+    version = "head"
     license = "https://gitlab.lrde.epita.fr/olena/pylene/blob/dev/LICENSE"
     url = "https://gitlab.lrde.epita.fr/olena/pylene"
     description = "C++ Generic Image Processing Library."

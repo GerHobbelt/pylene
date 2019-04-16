@@ -7,8 +7,6 @@
 #include <mln/core/image/view/clip.hpp>
 #include <mln/core/image/view/operators.hpp>
 
-#include <fixtures/ImageCompare/image_compare.hpp>
-
 #include <gtest/gtest.h>
 
 
@@ -40,11 +38,11 @@ TEST(View, clip)
   fill(clipped, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(clipped)>);
-  static_assert(concepts::ViewImage<decltype(clipped)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(clipped)>);
-  static_assert(not concepts::BidirectionalImage<decltype(clipped)>);
-  static_assert(not concepts::RawImage<decltype(clipped)>);
+  static_assert(mln::concepts::OutputImage<decltype(clipped)>);
+  static_assert(mln::concepts::ViewImage<decltype(clipped)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(clipped)>);
+  static_assert(not mln::concepts::BidirectionalImage<decltype(clipped)>);
+  static_assert(not mln::concepts::RawImage<decltype(clipped)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : clipped.domain())
@@ -76,22 +74,22 @@ TEST(View, clip_twice)
   auto A = mln::view::clip(ima, domain_a);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(A)>);
-  static_assert(concepts::ViewImage<decltype(A)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(A)>);
-  static_assert(not concepts::BidirectionalImage<decltype(A)>);
-  static_assert(not concepts::RawImage<decltype(A)>);
+  static_assert(mln::concepts::OutputImage<decltype(A)>);
+  static_assert(mln::concepts::ViewImage<decltype(A)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(A)>);
+  static_assert(not mln::concepts::BidirectionalImage<decltype(A)>);
+  static_assert(not mln::concepts::RawImage<decltype(A)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   auto B = mln::view::clip(A, domain_b);
   fill(B, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(B)>);
-  static_assert(concepts::ViewImage<decltype(B)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(B)>);
-  static_assert(not concepts::BidirectionalImage<decltype(B)>);
-  static_assert(not concepts::RawImage<decltype(B)>);
+  static_assert(mln::concepts::OutputImage<decltype(B)>);
+  static_assert(mln::concepts::ViewImage<decltype(B)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(B)>);
+  static_assert(not mln::concepts::BidirectionalImage<decltype(B)>);
+  static_assert(not mln::concepts::RawImage<decltype(B)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : B.domain())
@@ -123,12 +121,12 @@ TEST(View, clip_other_a_box2d)
   fill(clipped, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(clipped)>);
-  static_assert(not concepts::ViewImage<decltype(clipped)>);
-  static_assert(concepts::ConcreteImage<decltype(clipped)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(clipped)>);
-  static_assert(concepts::BidirectionalImage<decltype(clipped)>);
-  static_assert(concepts::RawImage<decltype(clipped)>);
+  static_assert(mln::concepts::OutputImage<decltype(clipped)>);
+  static_assert(not mln::concepts::ViewImage<decltype(clipped)>);
+  static_assert(mln::concepts::ConcreteImage<decltype(clipped)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(clipped)>);
+  static_assert(mln::concepts::BidirectionalImage<decltype(clipped)>);
+  static_assert(mln::concepts::RawImage<decltype(clipped)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : clipped.domain())
@@ -177,6 +175,27 @@ TEST(Core, Clip_wherex2_joints)
 
   mln::iota(ima, 0);
   mln::fill(view::clip(view::clip(ima, experimental::where(ima > 10)), experimental::where(ima > 20)), 42);
+  ASSERT_TRUE(all_of(ima == ref));
+}
+
+TEST(Core, Clip_wherex2_disjoints)
+{
+  using namespace mln;
+  using namespace mln::view::ops;
+
+  image2d<int> ima(5, 5);
+
+  image2d<int> ref = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 42, 42, 42, 42}, //
+      {42, 42, 42, 42, 42}, //
+      {20, 21, 22, 23, 24}  //
+  };
+
+  mln::iota(ima, 0);
+  auto clipped_ima = view::clip(ima, experimental::where(ima > 10));
+  mln::fill(view::clip(clipped_ima, experimental::where(clipped_ima < 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 

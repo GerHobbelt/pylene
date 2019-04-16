@@ -12,15 +12,10 @@
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
-#include <fixtures/ImageCompare/image_compare.hpp>
-
 #include <vector>
 
 #include <gtest/gtest.h>
 
-
-namespace concepts   = mln::concepts;
-namespace archetypes = mln::archetypes;
 
 TEST(Core, TransformedImage_transform_byval_rvalue)
 {
@@ -34,13 +29,13 @@ TEST(Core, TransformedImage_transform_byval_rvalue)
     auto out = view::transform(ima, [](int x) { return x * 2; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(concepts::ConcreteImage<decltype(ima)>);
-    static_assert(concepts::OutputImage<decltype(ima)>);
-    static_assert(concepts::ViewImage<decltype(out)>);
-    static_assert(concepts::IndexableAndAccessibleImage<decltype(out)>);
-    static_assert(concepts::BidirectionalImage<decltype(out)>);
-    static_assert(not concepts::RawImage<decltype(out)>);
-    static_assert(not concepts::OutputImage<decltype(out)>);
+    static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
+    static_assert(mln::concepts::OutputImage<decltype(ima)>);
+    static_assert(mln::concepts::ViewImage<decltype(out)>);
+    static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(out)>);
+    static_assert(mln::concepts::BidirectionalImage<decltype(out)>);
+    static_assert(not mln::concepts::RawImage<decltype(out)>);
+    static_assert(not mln::concepts::OutputImage<decltype(out)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
     // Test pixel iteration
@@ -77,13 +72,13 @@ TEST(Core, TransformedImage_transform_byval_chain)
     auto out = view::transform(view::transform(ima, [](int x) { return x * 2; }), [](int x) { return x * 2; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(concepts::ConcreteImage<decltype(ima)>);
-    static_assert(concepts::OutputImage<decltype(ima)>);
-    static_assert(concepts::ViewImage<decltype(out)>);
-    static_assert(concepts::IndexableAndAccessibleImage<decltype(out)>);
-    static_assert(concepts::BidirectionalImage<decltype(out)>);
-    static_assert(not concepts::RawImage<decltype(out)>);
-    static_assert(not concepts::OutputImage<decltype(out)>);
+    static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
+    static_assert(mln::concepts::OutputImage<decltype(ima)>);
+    static_assert(mln::concepts::ViewImage<decltype(out)>);
+    static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(out)>);
+    static_assert(mln::concepts::BidirectionalImage<decltype(out)>);
+    static_assert(not mln::concepts::RawImage<decltype(out)>);
+    static_assert(not mln::concepts::OutputImage<decltype(out)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
     // Test pixel iteration
     // check that properties of pixels are preserved (point + index)
@@ -120,19 +115,19 @@ TEST(Core, Transform_Support_Writable)
     fill(ima, std::make_pair(12, 12));
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    static_assert(concepts::ConcreteImage<decltype(ima)>);
-    static_assert(concepts::OutputImage<decltype(ima)>);
-    static_assert(concepts::ViewImage<decltype(c1)>);
-    static_assert(concepts::IndexableAndAccessibleImage<decltype(c1)>);
-    static_assert(concepts::BidirectionalImage<decltype(c1)>);
-    static_assert(not concepts::RawImage<decltype(c1)>);
-    static_assert(concepts::OutputImage<decltype(c1)>);
+    static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
+    static_assert(mln::concepts::OutputImage<decltype(ima)>);
+    static_assert(mln::concepts::ViewImage<decltype(c1)>);
+    static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(c1)>);
+    static_assert(mln::concepts::BidirectionalImage<decltype(c1)>);
+    static_assert(not mln::concepts::RawImage<decltype(c1)>);
+    static_assert(mln::concepts::OutputImage<decltype(c1)>);
 
-    static_assert(concepts::ViewImage<decltype(c2)>);
-    static_assert(concepts::IndexableAndAccessibleImage<decltype(c2)>);
-    static_assert(concepts::BidirectionalImage<decltype(c2)>);
-    static_assert(not concepts::RawImage<decltype(c2)>);
-    static_assert(not concepts::OutputImage<decltype(c2)>);
+    static_assert(mln::concepts::ViewImage<decltype(c2)>);
+    static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(c2)>);
+    static_assert(mln::concepts::BidirectionalImage<decltype(c2)>);
+    static_assert(not mln::concepts::RawImage<decltype(c2)>);
+    static_assert(not mln::concepts::OutputImage<decltype(c2)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
 
@@ -185,13 +180,13 @@ TEST(Core, Transform_Supports_Function)
   auto c = mln::view::transform(ima, times_two);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::ConcreteImage<decltype(ima)>);
-  static_assert(concepts::OutputImage<decltype(ima)>);
-  static_assert(concepts::ViewImage<decltype(c)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(c)>);
-  static_assert(concepts::BidirectionalImage<decltype(c)>);
-  static_assert(not concepts::RawImage<decltype(c)>);
-  static_assert(not concepts::OutputImage<decltype(c)>);
+  static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
+  static_assert(mln::concepts::OutputImage<decltype(ima)>);
+  static_assert(mln::concepts::ViewImage<decltype(c)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(c)>);
+  static_assert(mln::concepts::BidirectionalImage<decltype(c)>);
+  static_assert(not mln::concepts::RawImage<decltype(c)>);
+  static_assert(not mln::concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   ASSERT_TRUE(mln::equal(ref, c));
@@ -210,13 +205,13 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
   auto c = mln::view::transform(ima, &V::first);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::ConcreteImage<decltype(ima)>);
-  static_assert(concepts::OutputImage<decltype(ima)>);
-  static_assert(concepts::ViewImage<decltype(c)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(c)>);
-  static_assert(concepts::BidirectionalImage<decltype(c)>);
-  static_assert(not concepts::RawImage<decltype(c)>);
-  static_assert(concepts::OutputImage<decltype(c)>);
+  static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
+  static_assert(mln::concepts::OutputImage<decltype(ima)>);
+  static_assert(mln::concepts::ViewImage<decltype(c)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(c)>);
+  static_assert(mln::concepts::BidirectionalImage<decltype(c)>);
+  static_assert(not mln::concepts::RawImage<decltype(c)>);
+  static_assert(mln::concepts::OutputImage<decltype(c)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   mln::fill(c, 69);

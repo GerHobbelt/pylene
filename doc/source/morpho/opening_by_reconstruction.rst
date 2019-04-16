@@ -54,8 +54,8 @@ The markers have been obtained with the :cpp:func:`hit_or_miss`.
 * Reconstruction of the objects touching staff lines; with the foundamental SE
   (4-connection). All objects that do not touch the staff lines are removed.
 
-.. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 60
+.. literalinclude:: /snippets/staff_lines.cpp
+   :lines: 56
    :language: cpp
 
 .. image:: /images/staff_lines.png
@@ -67,8 +67,8 @@ The markers have been obtained with the :cpp:func:`hit_or_miss`.
 * Reconstruction of the lines only; with an horizontal SE `x-o-x`.
 
 
-.. literalinclude:: /snipsets/staff_lines.cpp
-   :lines: 63
+.. literalinclude:: /snippets/staff_lines.cpp
+   :lines: 59
    :language: cpp
 
 .. image:: /images/staff_lines.png

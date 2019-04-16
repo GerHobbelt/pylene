@@ -121,10 +121,10 @@ namespace mln
       const I& ima = exact(ima_);
       Label    bg  = lbl;
 
-      int status;
-      mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).init(bg).get_status(status);
+      image_build_error_code status;
+      mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).set_init_value(bg).get_status(&status);
 
-      if (status == 0)
+      if (status == IMAGE_BUILD_OK)
         lbl = impl::generic::blobs_no_boundcheck(ima, nbh, lbl, out);
       else
         lbl = impl::generic::blobs_boundcheck(ima, nbh, lbl, out);

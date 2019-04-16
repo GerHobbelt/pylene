@@ -48,7 +48,7 @@ Example 1: Cell segmentation
 3. Watershed segmentation
 4. Input labelization w.r.t in segmentation labels
 
-.. literalinclude:: /snipsets/blobs_watershed.cpp
+.. literalinclude:: /snippets/blobs_watershed.cpp
    :start-after: BEGIN
    :end-before: END
 

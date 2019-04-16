@@ -24,6 +24,18 @@ namespace mln::concepts
   // clang-format off
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
+  namespace details
+  {
+    template <typename SE>
+    concept DynamicStructuringElement =
+      requires (SE se) {
+      { se.radial_extent() } -> int
+    };
+
+
+    constexpr bool implies(bool a, bool b) { return !a || b; }
+  }
+
 
   template <typename SE, typename P>
   concept StructuringElement =
@@ -37,6 +49,8 @@ namespace mln::concepts
       typename SE::separable;
     } &&
     stl::ConvertibleTo<typename SE::category, mln::adaptative_neighborhood_tag> &&
+    details::implies(stl::ConvertibleTo<typename SE::category, mln::dynamic_neighborhood_tag>,
+                     details::DynamicStructuringElement<SE>) &&
     requires (SE se, P p, mln::archetypes::PixelT<P> px) {
       { se(p) } -> stl::ForwardRange&&;
       { se(px) } -> stl::ForwardRange&&;
@@ -51,6 +65,8 @@ namespace mln::concepts
     concept RangeOfStructuringElement =
       StructuringElement<::ranges::range_value_t<R>, P>;
   }
+
+
 
   template <typename SE, typename P>
   concept DecomposableStructuringElement =

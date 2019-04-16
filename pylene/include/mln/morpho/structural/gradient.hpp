@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <mln/core/algorithm/transform.hpp>
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/math_ops.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/morpho/se/se.hpp>
 #include <mln/morpho/structural/dilate.hpp>

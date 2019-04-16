@@ -1,11 +1,9 @@
-// [legacy]
 #pragma once
-#include <mln/core/concepts/structuring_element.hpp>
-#include <mln/core/private/traits/image.hpp>
-#include <mln/core/concepts/image.hpp>
-
+#include <mln/core/concept/new/se.hpp>
+#include <mln/core/image/private/image_traits.hpp>
 
 #include <any>
+
 
 
 /// \file
@@ -13,21 +11,21 @@
 namespace mln
 {
 
-  /// \brief Structure holding build parameters
+  /// \brief Structure holding building parameters
   /// It is composed of two fields, a border value and
   /// an initialization value.
   struct image_build_params
   {
-    int      border = -1; ///< Border value (-1 for non requested)
-    std::any init_value;  ///< Initialization value (can be empty)
+    int                 border = -1; ///< Border value (-1 for non requested)
+    std::any            init_value;  ///< Initialization value (can be empty)
   };
 
 
   /// \brief Error code returned by \ref image_builder or \ref image_resizer
   enum image_build_error_code
   {
-    IMAGE_BUILD_OK             = 0,
-    IMAGE_BUILD_NO_BORDER      = 0x01,
+    IMAGE_BUILD_OK = 0,
+    IMAGE_BUILD_NO_BORDER = 0x01,
     IMAGE_BUILD_UNSUPPORTED_SE = 0x02,
   };
 
@@ -53,7 +51,7 @@ namespace mln
 
       /// Retrieve the error code in the variable pointed by \p err. If `build()` encounters an error, it will be set
       /// according to the error type.
-      void get_status(image_build_error_code* err);
+      void get_status(image_build_error_code * err);
 
       image_build_params      m_params;
       image_build_error_code  m_status     = IMAGE_BUILD_OK;
@@ -72,6 +70,7 @@ namespace mln
     using base = details::image_builder_base;
 
   public:
+
     /// \brief Create a builder initializing from \p from
     image_builder(const From& from);
 
@@ -82,50 +81,33 @@ namespace mln
     // auto result = image_builder<I>(from)
     // {
     image_builder(const image_builder&) = delete;
-    image_builder(image_builder&&)      = delete;
-    image_builder& operator=(const image_builder&) = delete;
+    image_builder(image_builder&&) = delete;
+    image_builder& operator=(const image_builder&)  = delete;
     image_builder& operator=(image_builder&&) = delete;
     // }
 
     /// Override the initialization parameters with those from \p params.
-    image_builder& set_params(const image_build_params& params)
-    {
-      base::set_params(params);
-      return *this;
-    }
+    image_builder& set_params(const image_build_params& params) { base::set_params(params); return *this; }
 
     /// Override the initialization border parameter with \p border.
     image_builder& set_border(int border)
     {
-      if (!image_has_border_v<I>)
+      if (!image_has_border<I>())
         m_status = IMAGE_BUILD_NO_BORDER;
-      base::set_border(border);
-      return *this;
+      base::set_border(border); return *this;
     }
 
     /// Override the initialization border parameter to be *at least* the radial extent of
     /// \p nbh. If the radial extent is less than the current border initialization parameter, it has no effet.
     template <class SE>
-    image_builder& adjust(const SE& nbh)
-    {
-      base::adjust(nbh);
-      return *this;
-    }
+    image_builder& adjust(const SE& nbh) { base::adjust(nbh); return *this; }
 
     /// Override the initialization value parameter with \p v.
-    image_builder& set_init_value(image_value_t<I> v)
-    {
-      base::set_init_value(v);
-      return *this;
-    }
+    image_builder& set_init_value(image_value_t<I> v) { base::set_init_value(v); return *this; }
 
     /// Retrieve the error code in the variable pointed by \p err. If `build()` encounters an error, it will be set
     /// according to the error type.
-    image_builder& get_status(image_build_error_code* err)
-    {
-      base::get_status(err);
-      return *this;
-    }
+    image_builder& get_status(image_build_error_code* err) { base::get_status(err); return *this; }
 
     /// Build and return the new image
     I build() const;
@@ -143,11 +125,11 @@ namespace mln
   template <class To, class From>
   class image_resizer : protected details::image_builder_base
   {
-    // TODO: static assert that "to.resize(from.domain(), image_build_params)" is well formed (and add a concept for
-    // that)
+    // TODO: static assert that "to.resize(from.domain(), image_build_params)" is well formed (and add a concept for that)
     using base = details::image_builder_base;
 
   public:
+
     /// \brief Create a builder initializing \p to from \p from
     image_resizer(To& to, const From& from);
 
@@ -158,17 +140,13 @@ namespace mln
     // auto result = image_resizer<I>(from)
     // {
     image_resizer(const image_resizer&) = delete;
-    image_resizer(image_resizer&&)      = delete;
-    image_resizer& operator=(const image_resizer&) = delete;
+    image_resizer(image_resizer&&) = delete;
+    image_resizer& operator=(const image_resizer&)  = delete;
     image_resizer& operator=(image_resizer&&) = delete;
     // }
 
     /// Override the initialization parameters with those from \p params.
-    image_resizer& set_params(const image_build_params& params)
-    {
-      base::set_params(params);
-      return *this;
-    }
+    image_resizer& set_params(const image_build_params& params) { base::set_params(params); return *this; }
 
     /// Override the initialization border parameter with \p border.
     image_resizer& set_border(int border)
@@ -183,26 +161,14 @@ namespace mln
     /// Override the initialization border parameter to be *at least* the radial extent of
     /// \p nbh. If the radial extent is less than the current border initialization parameter, it has no effet.
     template <class SE>
-    image_resizer& adjust(const SE& nbh)
-    {
-      base::adjust(nbh);
-      return *this;
-    }
+    image_resizer& adjust(const SE& nbh) { base::adjust(nbh); return *this; }
 
     /// Override the initialization value parameter with \p v.
-    image_resizer& set_init_value(image_value_t<To> v)
-    {
-      base::set_init_value(v);
-      return *this;
-    }
+    image_resizer& set_init_value(image_value_t<To> v) { base::set_init_value(v); return *this; }
 
     /// Retrieve the error code in the variable pointed by \p err. If `build()` encounters an error, it will be set
     /// according to the error type.
-    image_resizer& get_status(image_build_error_code* err)
-    {
-      base::get_status(err);
-      return *this;
-    }
+    image_resizer& get_status(image_build_error_code* err) { base::get_status(err); return *this; }
 
     /// Resize the image
     void resize() const;
@@ -221,7 +187,7 @@ namespace mln
   template <typename V, class I>
   auto imchvalue(const I& ref)
   {
-    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<I, Image>() || mln::is_a<I, experimental::Image>());
     return ref.template ch_value<V>();
   }
 
@@ -230,7 +196,7 @@ namespace mln
   template <class I>
   auto imconcretize(const I& ref)
   {
-    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<I, Image>() || mln::is_a<I, experimental::Image>());
     return ref.concretize();
   }
 
@@ -238,10 +204,11 @@ namespace mln
   template <class To, class From>
   image_resizer<To, From> resize(To& to, const From& from)
   {
-    static_assert(mln::is_a<To, mln::details::Image>());
-    static_assert(mln::is_a<From, mln::details::Image>());
+    static_assert(mln::is_a<To, Image>() || mln::is_a<To, experimental::Image>());
+    static_assert(mln::is_a<From, Image>() || mln::is_a<From, experimental::Image>());
     return {to, from};
   }
+
 
 
   /******************************************/
@@ -251,9 +218,15 @@ namespace mln
   namespace details
   {
 
-    inline void image_builder_base::set_params(const image_build_params& params) { m_params = params; }
+    inline void image_builder_base::set_params(const image_build_params& params)
+    {
+      m_params = params;
+    }
 
-    inline void image_builder_base::set_border(int border) { m_params.border = border; }
+    inline void image_builder_base::set_border(int border)
+    {
+      m_params.border = border;
+    }
 
     template <class T>
     void image_builder_base::set_init_value(T&& v)
@@ -261,12 +234,15 @@ namespace mln
       m_params.init_value = std::forward<T>(v);
     }
 
-    inline void image_builder_base::get_status(image_build_error_code* err) { m_status_ptr = err; }
+    inline void image_builder_base::get_status(image_build_error_code* err)
+    {
+      m_status_ptr = err;
+    }
 
     template <class SE>
     void image_builder_base::adjust(const SE& nbh)
     {
-      static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      static_assert(mln::is_a<SE, experimental::StructuringElement>() || mln::is_a<SE, mln::Neighborhood>());
 
       if constexpr (std::is_convertible_v<typename SE::category, dynamic_neighborhood_tag>)
       {
@@ -286,10 +262,9 @@ namespace mln
   image_builder<I, From>::image_builder(const From& from)
     : m_from{from}
   {
-#ifdef MLN_LEGACY_INIT
+    if constexpr (mln::is_a<From, Image>())
       if constexpr (image_has_border<From>())
         m_params.border = from.border();
-#endif
   }
 
 
@@ -298,10 +273,8 @@ namespace mln
     : base{params}
     , m_from{from}
   {
-#ifdef MLN_LEGACY_INIT
     if constexpr (image_has_border<From>())
       m_params.border = from.border();
-#endif
   }
 
 
@@ -310,8 +283,20 @@ namespace mln
   {
     if (m_status_ptr)
       *m_status_ptr = m_status;
+    I output{m_from, m_params};
 
-    return I{m_from, m_params};
+    // Reindexation (required as ndImage is not cleaned up)
+    // It ensures that both image have the same starting index
+    if constexpr (mln::is_a<I, mln::Image>::value && mln::is_a<From, mln::Image>::value)
+      if constexpr (image_traits<I>::indexable::value && image_traits<From>::indexable::value)
+      {
+        auto&& domain = m_from.domain();
+        auto   p      = domain.iter();
+        p.init();
+        output.reindex(m_from.index_of_point(*p));
+      }
+
+    return output;
   }
 
 
@@ -320,10 +305,9 @@ namespace mln
     : m_to{to}
     , m_from{from}
   {
-#ifdef MLN_LEGACY_INIT
+    if constexpr (mln::is_a<From, Image>())
       if constexpr (image_has_border<From>())
         m_params.border = from.border();
-#endif
   }
 
 
@@ -333,10 +317,8 @@ namespace mln
     , m_to{to}
     , m_from{from}
   {
-#ifdef MLN_LEGACY_INIT
     if constexpr (image_has_border<From>())
       m_params.border = from.border();
-#endif
   }
 
 
@@ -346,7 +328,18 @@ namespace mln
     if (m_status_ptr)
       *m_status_ptr = m_status;
     m_to.resize(m_from.domain(), m_params);
+
+    // Reindexation (required as ndImage is not cleaned up)
+    // It ensures that both image have the same starting index
+    if constexpr (mln::is_a<To, mln::Image>::value && mln::is_a<From, mln::Image>::value)
+      if constexpr (image_traits<To>::indexable::value && image_traits<From>::indexable::value)
+      {
+        auto&& domain = m_from.domain();
+        auto   p      = domain.iter();
+        p.init();
+        m_to.reindex(m_from.index_of_point(*p));
+      }
   }
 
 
-} // namespace mln
+}

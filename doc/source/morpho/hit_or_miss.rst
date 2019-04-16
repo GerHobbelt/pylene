@@ -1,15 +1,13 @@
 Hit or Miss
 ===========
 
+#. .. cpp:function:: \
+      template <class InputImage, class StructuringElement1, class StructuringElement2> \
+      concrete_t<InputImage> hit_or_miss(const InputImage& ima, const StructuringElement1& se_hit, const StructuringElement1& se_miss)
 
-Include :file:`<mln/morpho/hit_or_miss.hpp>`
-
-
-.. cpp:namespace:: mln::morpho
-
-.. cpp:function:: \
-    Image{I} image_concrete_t<I> hit_or_miss(I image, StructuringElement se_hit, StructuringElement se_miss)
-    void hit_or_miss(Image image, StructuringElement se_hit, StructuringElement se_miss, OutputImage out)
+#. .. cpp:function:: \
+      template <class InputImage, class StructuringElement1, class StructuringElement2, class OutputImage> \
+      void hit_or_miss(const InputImage& ima, const StructuringElement1& se_hit, const StructuringElement1& se_miss, OutputImage& output)
 
       The hit-or-miss transform is non-linerar filter used to detect pattern in
       images. It is defined as:
@@ -62,7 +60,7 @@ Hit or miss transform to detect horizontal 1px-thick line, with pattern::
   x x x
 
 
-.. literalinclude:: /snippets/staff_lines.cpp
+.. literalinclude:: /snipsets/staff_lines.cpp
    :start-after: #M1_START
    :end-before: #M1_END
    :language: cpp
@@ -81,7 +79,7 @@ Hit or miss transform to detect horizontal 2px-thick line, with pattern::
   o o o
   x x x
 
-.. literalinclude:: /snippets/staff_lines.cpp
+.. literalinclude:: /snipsets/staff_lines.cpp
    :language: cpp
    :start-after: #M2_START
    :end-before: #M2_END
@@ -94,10 +92,11 @@ Hit or miss transform to detect horizontal 2px-thick line, with pattern::
            :width: 49%
 
 
-Logical or between the two previous images::
+Logical or between the two previous images:
 
-  using mln::view::ops;
-  auto markers = markers1 || markers2;
+.. literalinclude:: /snipsets/staff_lines.cpp
+   :lines: 50
+   :language: cpp
 
 .. image:: /images/staff_lines.png
            :width: 49%

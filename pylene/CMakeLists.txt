@@ -44,9 +44,9 @@ target_sources(Pylene PRIVATE
   src/core/se/disc.cpp
   src/core/se/periodic_line2d.cpp
   src/core/se/rect2d.cpp
+  src/core/se/mask2d.cpp
   src/core/trace.cpp
   )
-
 
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_17)

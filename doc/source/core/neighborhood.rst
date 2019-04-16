@@ -100,6 +100,12 @@ Structuring Element
   |            |                | the pixel `px`.                                             |
   +------------+----------------+-------------------------------------------------------------+
 
+  For dynamic structuring elements:
+
+  +------------------------+-----+---------------------------------------------------------------------+
+  | ``se.radial_extent()`` | int | Returns the radial extent of the SE, the radius of 𝐿∞ disc (square) |
+  +------------------------+-----+---------------------------------------------------------------------+
+
 
 
   .. rubric:: Type definitions and traits
@@ -209,11 +215,11 @@ Structuring Element Properties
 |  Expression  |  Return Type   |                         Sementics                         |
 +==============+================+===========================================================+
 | ``se.inc()`` | *impl-defined* | A SE equivalent to :math:`\Delta\mathcal{B}^+(p) =        |
-|              |                | \mathcal{B}(p) \setminus (\mathcal{B}(p) \cap             |
+|              |                | \mathcal{B}(p) ∖ (\mathcal{B}(p) ∩             |
 |              |                | \mathcal{B}(\mathrm{prev}))`                              |
 +--------------+----------------+-----------------------------------------------------------+
 | ``se.dec()`` | *impl-defined* | A SE `s` equivalent to :math:`\Delta\mathcal{B}^-(p) =    |
-|              |                | \mathcal{B}(\mathrm{prev}) \setminus (\mathcal{B}(p) \cap |
+|              |                | \mathcal{B}(\mathrm{prev}) ∖ (\mathcal{B}(p) ∩ |
 |              |                | \mathcal{B}(\mathrm{prev}))`                              |
 +--------------+----------------+-----------------------------------------------------------+
 
@@ -243,6 +249,7 @@ Predefined Structuring Elements
    se/disc
    se/rectangle
    se/periodic_lines
+   se/mask2d
 
 
 Tools to build custom Neighborhoods and Structuring Elements

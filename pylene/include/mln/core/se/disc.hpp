@@ -58,6 +58,9 @@ namespace mln
       /// \brief Return the radius of the disc.
       float radius() const { return m_radius; }
 
+      /// \brief Return the radial extent of the disc.
+      int radial_extent() const { return static_cast<int>(m_radius); }
+
     private:
       float m_radius;
       int   m_nlines; // number of periodic lines for decomposition (0 for the euclidean disc)
@@ -146,7 +149,10 @@ namespace mln
       bool is_incremental() const;
 
       /// \brief Returns the radius of the disc.
-      float radius() const;
+      float radius() const { return m_radius; }
+
+      /// \brief Returns the extent radius
+      int radial_extent() const { return static_cast<int>(m_radius); }
 
     private:
       struct cache_data_t

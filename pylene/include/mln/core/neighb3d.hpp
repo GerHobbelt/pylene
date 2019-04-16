@@ -16,7 +16,7 @@ namespace mln
     {
       static const int                    static_size = 6;
       static const std::array<point3d, 6> dpoints;
-
+      static constexpr int radial_extent() { return 1; }
       const auto& offsets() const { return dpoints; }
     };
     const std::array<point3d, 6> c6_t::dpoints = {
@@ -26,7 +26,7 @@ namespace mln
     {
       static const int                     static_size = 26;
       static const std::array<point3d, 26> dpoints;
-
+      static constexpr int radial_extent() { return 1; }
       const auto& offsets() const { return dpoints; }
     };
 

@@ -141,7 +141,7 @@ namespace mln
       constexpr Label_t kUnseen       = static_cast<Label_t>(-1);
       const I&          input         = exact(input_);
       const N&          nbh           = exact(nbh_);
-      mln_ch_value(I, Label_t) output = imchvalue<Label_t>(input).adjust(nbh).init(kUnseen);
+      mln_ch_value(I, Label_t) output = imchvalue<Label_t>(input).adjust(nbh).set_init_value(kUnseen);
 
       if (extension::need_adjust(output, nbh))
       {

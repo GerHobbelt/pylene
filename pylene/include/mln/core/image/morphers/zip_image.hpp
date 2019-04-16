@@ -87,15 +87,6 @@ namespace mln
     typedef mln_ch_value(I0, vtype) type;
   };
 
-  namespace internal
-  {
-    template <class I0, class... I>
-    struct image_init_from<zip_image<I0, I...>>
-    {
-      typedef typename image_init_from<typename std::decay<I0>::type>::type type;
-    };
-  } // namespace internal
-
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -391,19 +382,17 @@ namespace mln
     {
     }
 
-    friend internal::initializer<mln_concrete(zip_image), typename internal::image_init_from<zip_image>::type>
-        imconcretize(const zip_image& f)
+    friend auto imconcretize(const zip_image& f)
     {
       using mln::imchvalue;
-      return std::move(imchvalue<value_type>(std::get<0>(f.m_images)));
+      return imchvalue<value_type>(std::get<0>(f.m_images));
     }
 
     template <typename V>
-    friend internal::initializer<mln_ch_value(zip_image, V), typename internal::image_init_from<zip_image>::type>
-        imchvalue(const zip_image& f)
+    friend auto imchvalue(const zip_image& f)
     {
       using mln::imchvalue;
-      return std::move(imchvalue<V>(std::get<0>(f.m_images)));
+      return imchvalue<V>(std::get<0>(f.m_images));
     }
 
     images_type& images() { return m_images; }

@@ -63,12 +63,6 @@ namespace mln
     /// \brief Initialization constructor
     /// \{
     template <typename U>
-    image3d(const image3d<U>& f, mln::init)
-      : base(f, mln::init())
-    {
-    }
-
-    template <typename U>
     image3d(const image3d<U>& f, unsigned border, const T& v = T())
       : base(f, border, v)
     {

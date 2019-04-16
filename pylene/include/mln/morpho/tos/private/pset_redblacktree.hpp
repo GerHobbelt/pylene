@@ -76,7 +76,7 @@ namespace mln
         template <class I>
         template <class J>
         pset_redblacktree<I>::pset_redblacktree(const Image<J>& ima)
-          : m_allocated_nodes(imchvalue<node_t>(ima))
+          : m_allocated_nodes(imchvalue<node_t>(exact(ima)))
         {
         }
 

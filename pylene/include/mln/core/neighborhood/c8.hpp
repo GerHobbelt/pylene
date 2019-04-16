@@ -2,17 +2,16 @@
 
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/point.hpp>
-#include <mln/core/box.hpp>
 
 #include <array>
-#include <range/v3/view/span.hpp>
+#include <range/v3/span.hpp>
 
 namespace mln::experimental
 {
   struct c8_t : neighborhood_facade<c8_t>
   {
   private:
-    using point_t = mln::ndpoint<2, std::ptrdiff_t>;
+    using point_t = point<std::ptrdiff_t, 2>;
 
   public:
     using category     = constant_neighborhood_tag;
@@ -26,27 +25,12 @@ namespace mln::experimental
 
     static constexpr int radial_extent() { return 1; }
 
-    /// \brief Return the input ROI for 2D box.
-    mln::box2d compute_input_region(mln::box2d roi) const
-    {
-      roi.inflate(1);
-      return roi;
-    }
-
-    /// \brief Return the output ROI for 2D box.
-    mln::box2d compute_output_region(mln::box2d roi) const
-    {
-      roi.inflate(-1);
-      return roi;
-    }
-
-
   private:
     // clang-format off
     static inline constexpr std::array<point_t, 8> m_offsets = {{
-        {-1, -1}, {+0, -1}, {+1, -1},
-        {-1, +0},           {+1, +0},
-        {-1, +1}, {+0, +1}, {+1, +1}
+        {-1, -1}, {-1, +0}, {-1, +1},
+        {+0, -1},           {+0, +1},
+        {+1, -1}, {+1, +0}, {+1, +1}
       }};
     // clang-format on
   };

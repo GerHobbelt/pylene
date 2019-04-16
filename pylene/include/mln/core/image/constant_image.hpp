@@ -26,15 +26,6 @@ namespace mln
     typedef mln::extension::value_extension_tag extension;
   };
 
-  namespace internal
-  {
-    template <class Domain, class V>
-    struct image_init_from<constant_image<Domain, V>>
-    {
-      typedef Domain type;
-    };
-  } // namespace internal
-
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -201,15 +192,17 @@ namespace mln
     {
     }
 
-    friend internal::initializer<mln_concrete(constant_image), Domain> imconcretize(const constant_image& f)
+    friend auto imconcretize(const constant_image& f)
     {
-      return {f.m_domain};
+      using I = typename image_from_domain<Domain>::template apply<value_type>::type;
+      return image_builder<I, Domain>{f.m_domain};
     }
 
     template <typename T>
-    friend internal::initializer<mln_ch_value(constant_image, T), Domain> imchvalue(const constant_image& f)
+    friend auto imchvalue(const constant_image& f)
     {
-      return {f.m_domain};
+      using I = typename image_from_domain<Domain>::template apply<T>::type;
+      return image_builder<I, Domain>{f.m_domain};
     }
 
     const domain_type& domain() const { return m_domain; }

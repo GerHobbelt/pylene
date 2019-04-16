@@ -23,6 +23,8 @@ namespace mln::experimental
     static constexpr ::ranges::span<const point_t, 2> before_offsets() { return {m_offsets.data(), 2}; }
     static constexpr ::ranges::span<const point_t, 2> after_offsets() { return {m_offsets.data() + 2, 2}; }
 
+    static constexpr int radial_extent() { return 1; }
+
   private:
     // clang-format off
     static inline constexpr std::array<point_t, 4> m_offsets = {{

@@ -145,6 +145,4 @@ namespace mln
   } // namespace extension
 } // end of namespace mln
 
-#endif //! MLN_CORE_EXTENSION_EXTENSION_HPP
-
 #include <mln/core/extension/private/border_management.hpp>

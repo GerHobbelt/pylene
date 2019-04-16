@@ -23,25 +23,24 @@ TEST(View, extend_with_value)
   mln::box2d        dom{{-1, -2}, {3, 3}};
   mln::image2d<int> ima(dom);
 
-  mln::experimental::iota(ima, 0);
+  mln::iota(ima, 0);
   auto x = mln::view::extend_with_value(ima, 69);
 
   {
     auto zz = mln::view::zip(ima, x);
-    mln_foreach_new(auto px, zz.new_pixels())
+    mln_foreach_new (auto px, zz.new_pixels())
     {
-      auto [v1,v2] = px.val();
+      auto [v1, v2] = px.val();
       ASSERT_EQ(v1, v2);
     }
   }
 
   {
-    mln_foreach_new(auto p, x.new_pixels())
+    mln_foreach_new (auto p, x.new_pixels())
       for (auto q : mln::experimental::c8(p))
         if (!x.domain().has(q.point()))
           ASSERT_EQ(q.val(), 69);
         else
           ASSERT_EQ(&q.val(), &ima(q.point()));
   }
-
 }

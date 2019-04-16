@@ -1,27 +1,26 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/private/image_operators.hpp>
 #include <mln/accu/accumulator.hpp>
-
-#include <mln/core/se/rect2d.hpp>
 #include <mln/core/algorithm/accumulate_local.hpp>
-#include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/all_of.hpp>
-
+#include <mln/core/algorithm/iota.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/view/operators.hpp>
+#include <mln/core/se/rect2d.hpp>
 
 
 #include <gtest/gtest.h>
 
+
 struct accu_sum_impl
 {
   using argument_type = int;
-  using result_type = int;
-  int sum = 0;
+  using result_type   = int;
+  int sum             = 0;
 
   void init() { sum = 0; }
   void take(int x) { sum += x; }
   void untake(int x) { sum -= x; }
   void take(const accu_sum_impl& other) { sum += other.sum; }
-  int to_result() const { return sum; }
+  int  to_result() const { return sum; }
 };
 
 
@@ -36,10 +35,9 @@ struct accu_non_incremental : accu_sum_impl, mln::Accumulator<accu_non_increment
 };
 
 
-
 TEST(Core, Accumulate_Incremental_Border_Is_Large_Enough)
 {
-  mln::image2d<uint8_t> input(5,6);
+  mln::image2d<uint8_t> input(5, 6);
 
   mln::image2d<uint8_t> ref = {
       {19, 27, 33, 39, 45, 35},       //
@@ -50,21 +48,19 @@ TEST(Core, Accumulate_Incremental_Border_Is_Large_Enough)
   };
 
 
-  mln::experimental::iota(input, 0);
+  mln::iota(input, 0);
 
-  auto output = mln::accumulate_local(input,
-                                      mln::experimental::se::rect2d {3,3},
-                                      accu_incremental{},
-                                      mln::extension::bm::fill(uint8_t(1)) );
+  auto output = mln::accumulate_local(input, mln::experimental::se::rect2d{3, 3}, accu_incremental{},
+                                      mln::extension::bm::fill(uint8_t(1)));
 
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
-  ASSERT_TRUE(mln::experimental::all_of(output == ref));
+  ASSERT_TRUE(mln::all_of(output == ref));
 }
 
 TEST(Core, Accumulate_NonIncremental_Border_Is_Large_Enough)
 {
-  mln::image2d<uint8_t> input(5,6);
+  mln::image2d<uint8_t> input(5, 6);
 
   mln::image2d<uint8_t> ref = {
       {19, 27, 33, 39, 45, 35},       //
@@ -75,16 +71,14 @@ TEST(Core, Accumulate_NonIncremental_Border_Is_Large_Enough)
   };
 
 
-  mln::experimental::iota(input, 0);
+  mln::iota(input, 0);
 
-  auto output = mln::accumulate_local(input,
-                                      mln::experimental::se::rect2d {3,3},
-                                      accu_non_incremental{},
-                                      mln::extension::bm::fill(uint8_t(1)) );
+  auto output = mln::accumulate_local(input, mln::experimental::se::rect2d{3, 3}, accu_non_incremental{},
+                                      mln::extension::bm::fill(uint8_t(1)));
 
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
-  ASSERT_TRUE(mln::experimental::all_of(output == ref));
+  ASSERT_TRUE(mln::all_of(output == ref));
 }
 
 TEST(Core, Accumulate_Incremental_Border_Is_Not_Large_Enough)
@@ -101,16 +95,14 @@ TEST(Core, Accumulate_Incremental_Border_Is_Not_Large_Enough)
   };
 
 
-  mln::experimental::iota(input, 0);
+  mln::iota(input, 0);
 
-  auto output = mln::accumulate_local(input,
-                                      mln::experimental::se::rect2d {3,3},
-                                      accu_incremental{},
-                                      mln::extension::bm::fill(uint8_t(1)) );
+  auto output = mln::accumulate_local(input, mln::experimental::se::rect2d{3, 3}, accu_incremental{},
+                                      mln::extension::bm::fill(uint8_t(1)));
 
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
-  ASSERT_TRUE(mln::experimental::all_of(output == ref));
+  ASSERT_TRUE(mln::all_of(output == ref));
 }
 
 
@@ -128,15 +120,12 @@ TEST(Core, Accumulate_NonIncremental_Border_Is_Not_Large_Enough)
   };
 
 
-  mln::experimental::iota(input, 0);
+  mln::iota(input, 0);
 
-  auto output = mln::accumulate_local(input,
-                                      mln::experimental::se::rect2d {3,3},
-                                      accu_non_incremental{},
-                                      mln::extension::bm::fill(uint8_t(1)) );
+  auto output = mln::accumulate_local(input, mln::experimental::se::rect2d{3, 3}, accu_non_incremental{},
+                                      mln::extension::bm::fill(uint8_t(1)));
 
-  using namespace mln::experimental::ops;
+  using namespace mln::view::ops;
 
-  ASSERT_TRUE(mln::experimental::all_of(output == ref));
+  ASSERT_TRUE(mln::all_of(output == ref));
 }
-

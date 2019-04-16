@@ -61,12 +61,6 @@ namespace mln
     /// \brief Initialization constructor
     /// \{
     template <typename U>
-    image2d(const image2d<U>& f, mln::init)
-      : base(f, mln::init())
-    {
-    }
-
-    template <typename U>
     image2d(const image2d<U>& f, unsigned border, const T& v = T())
       : base(f, border, v)
     {

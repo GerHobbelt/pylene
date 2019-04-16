@@ -98,10 +98,23 @@ namespace mln
       /// \{
       /// \brief Initializer constructors
       template <class OtherVMap>
-      image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other, mln::init);
+      image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other, const image_build_params& params);
 
       template <class OtherVMap>
       image_tree_property_map(const image_tree_property_map<P, AMap, OtherVMap>& other, const value_type& v);
+
+      auto concretize() const
+      {
+        using C = typename image_concrete<image_tree_property_map>::type;
+        return image_builder<C, image_tree_property_map>{*this};
+      }
+
+      template <class U>
+      auto ch_value() const
+      {
+        using C = typename image_ch_value<image_tree_property_map, U>::type;
+        return image_builder<C, image_tree_property_map>{*this};
+      }
       /// \}
 
       // Acces
@@ -249,10 +262,13 @@ namespace mln
     template <class P, class AMap, class ValueMap>
     template <class OtherVMap>
     image_tree_property_map<P, AMap, ValueMap>::image_tree_property_map(
-        const image_tree_property_map<P, AMap, OtherVMap>& other, mln::init)
+        const image_tree_property_map<P, AMap, OtherVMap>& other, const image_build_params& params)
       : m_tree(other.m_tree)
-      , m_vmap(m_tree)
     {
+      if (params.init_value.has_value())
+        m_vmap = ValueMap(m_tree, std::any_cast<value_type>(params.init_value));
+      else
+        m_vmap = ValueMap(m_tree);
     }
 
     template <class P, class AMap, class ValueMap>

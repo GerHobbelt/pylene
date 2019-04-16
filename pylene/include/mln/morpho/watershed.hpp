@@ -167,7 +167,7 @@ namespace mln
       const N& nbh = exact(nbh_);
 
       constexpr Label_t kUninitialized = -1;
-      mln_ch_value(I, Label_t) output  = imchvalue<Label_t>(ima).adjust(nbh).init(kUninitialized);
+      mln_ch_value(I, Label_t) output  = imchvalue<Label_t>(ima).adjust(nbh).set_init_value(kUninitialized);
       if (extension::need_adjust(output, nbh))
       {
         auto out = extension::add_value_extension(output, kUninitialized);
@@ -196,7 +196,8 @@ namespace mln
         const N& nbh = exact(nbh_);
 
         constexpr Label_t kUninitialized         = -1;
-        mln_ch_value(InputImage, Label_t) output = imchvalue<Label_t>(ima).adjust(nbh).init(kUninitialized);
+
+        auto output = imchvalue<Label_t>(ima).adjust(nbh).set_init_value(kUninitialized).build();
         if (extension::need_adjust(output, nbh))
         {
           auto out = extension::add_value_extension(output, kUninitialized);

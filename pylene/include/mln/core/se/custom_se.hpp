@@ -17,17 +17,20 @@ namespace mln
     using incremental = std::false_type;
 
     /// \brief Constructs a SE from the set of delta points \p rng
-    custom_se(R rng)
-      : m_rng{std::move(rng)}
+    custom_se(R rng, int radial_extent)
+      : m_rng{std::move(rng)},
+        m_radial_extent{radial_extent}
     {
     }
 
     const R& offsets() const { return m_rng; }
     const R& before_offsets() const { return m_rng; }
     const R& after_offsets() const { return m_rng; }
+    int radial_extent() const { return m_radial_extent; }
 
   private:
-    R m_rng;
+    R   m_rng;
+    int m_radial_extent;
   };
 
 }

@@ -156,7 +156,7 @@ namespace mln
 
     // 2. We set the weights value point-wise
     image2d<unsigned> dmap;
-    resize(dmap, t[0]._get_data()->m_pmap).init(0);
+    resize(dmap, t[0]._get_data()->m_pmap).set_init_value(0);
 
     mln_foreach (auto px, dmap.pixels())
     {

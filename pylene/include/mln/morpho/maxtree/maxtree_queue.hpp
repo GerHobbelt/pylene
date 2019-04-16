@@ -75,7 +75,7 @@ namespace mln
 
         // 2. Create auxiliary structure for the computation
         // {
-        mln_ch_value(I, bool) deja_vu = imchvalue<bool>(ima).adjust(nbh).init(false);
+        mln_ch_value(I, bool) deja_vu = imchvalue<bool>(ima).adjust(nbh).set_init_value(false);
         priority_queue_ima<I, StrictWeakOrdering> pqueue(ima, cmp);
 
         extension::fill(deja_vu, true);

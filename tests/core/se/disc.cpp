@@ -10,7 +10,7 @@
 void naive_dilate(mln::image2d<bool>& f, const mln::experimental::se::periodic_line2d& se)
 {
   mln::image2d<bool> g;
-  mln::resize(g, f).init(false);
+  mln::resize(g, f).set_init_value(false);
 
 
   mln_foreach_new ((auto [pxIn, pxOut]), mln::ranges::view::zip(f.new_pixels(), g.new_pixels()))

@@ -184,10 +184,10 @@ namespace mln
       const I&    ima = exact(ima_);
       const Label bg  = value_traits<Label>::max();
 
-      int status;
-      mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).init(bg).get_status(status);
+      image_build_error_code status;
+      mln_ch_value(I, Label) out = imchvalue<Label>(ima).adjust(nbh).set_init_value(bg).get_status(&status);
 
-      if (status == 0)
+      if (status == IMAGE_BUILD_OK)
         lbl = impl::rag(ima, nbh, graph, lbl, out);
       else
         lbl = impl::rag(ima, nbh, graph, lbl, extension::add_value_extension(out, bg));

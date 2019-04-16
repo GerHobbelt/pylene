@@ -339,18 +339,20 @@ namespace mln
     sub_image() = default;
 
     template <typename OtherImage, typename OtherDomain>
-    sub_image(const sub_image<OtherImage, OtherDomain>& other, mln::init)
-      : m_ima(imchvalue<value_type>(other.m_ima))
+    sub_image(const sub_image<OtherImage, OtherDomain>& other, const image_build_params& params)
+      : m_ima(imchvalue<value_type>(other.m_ima).set_params(params).build())
       , m_domain(other.m_domain)
     {
     }
 
-    template <typename OtherImage, typename OtherDomain>
-    sub_image(const sub_image<OtherImage, OtherDomain>& other, const value_type& v)
-      : m_ima(imchvalue<value_type>(other.m_ima).init(v))
-      , m_domain(other.m_domain)
-    {
-    }
+    friend image_builder<typename image_concrete<sub_image>::type, sub_image>
+    imconcretize(const sub_image& f) {return {f}; }
+
+
+    template <class V>
+    friend image_builder<typename image_ch_value<sub_image, V>::type, sub_image>
+    imchvalue(const sub_image& f) { return {f}; }
+
 
     const Domain& domain() const { return m_domain; }
 

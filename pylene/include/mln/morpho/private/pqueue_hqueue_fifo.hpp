@@ -48,7 +48,7 @@ namespace mln
       template <class I>
       template <class J>
       pqueue_hqueue_fifo<I>::pqueue_hqueue_fifo(const Image<J>& f)
-        : m_next(mln::exact(f), mln::init())
+        : m_next(exact(f), image_build_params{} )
         , m_current_level(nvalues - 1)
       {
       }

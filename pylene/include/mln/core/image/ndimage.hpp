@@ -7,6 +7,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage_iter.hpp>
 #include <mln/core/image/private/ndimage_pixel.hpp>
+#include <mln/core/image/private/image_builder.hpp>
 #include <mln/core/image_category.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
@@ -229,7 +230,7 @@ namespace mln
     explicit ndimage_base(const domain_type& domain, unsigned border = 3, T v = T());
 
     template <typename U, class E2>
-    ndimage_base(const ndimage_base<U, dim, E2>& other, mln::init);
+    ndimage_base(const ndimage_base<U, dim, E2>& other, const image_build_params& params);
 
     template <typename U, class E2>
     ndimage_base(const ndimage_base<U, dim, E2>& other, unsigned border, T v = T());
@@ -343,17 +344,15 @@ namespace mln
     /// \name Concrete-related Image Methods
     /// \{
 
-    auto concretize() const { return imconcretize(*this); }
+    image_builder<concrete_type, E>  concretize() const { return {exact(*this)}; }
+
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    auto ch_value() const
-    {
-      return imchvalue<Val>(*this);
-    }
+    image_builder<ch_value_type<Val>, E>  ch_value() const { return {exact(*this)}; }
 
     /// \brief Resize the image to fit \p domain.
     ///
@@ -365,6 +364,8 @@ namespace mln
     /// \param v The initialization value of the image. If \p is given, values
     /// are copy constructed from \p v, otherwise, they are default-initialized.
     void resize(const domain_type& domain, unsigned border = 3, T v = T());
+
+    void resize(const domain_type& domain, const image_build_params& params);
 
     /// \brief Re-indexation of the image.
     ///
@@ -576,14 +577,21 @@ namespace mln
     resize_(m_domain, m_border, v);
   }
 
+
   template <typename T, unsigned dim, typename E>
-  template <typename U, typename E2>
-  ndimage_base<T, dim, E>::ndimage_base(const ndimage_base<U, dim, E2>& g, mln::init)
-    : m_domain(g.domain())
-    , m_border(g.border())
+  template <typename U, class E2>
+  ndimage_base<T, dim, E>::ndimage_base(const ndimage_base<U, dim, E2>& other, const image_build_params& params)
+    : m_domain(other.domain())
   {
-    resize_(m_domain, m_border, T());
+    m_border = (params.border >= 0) ? params.border : other.border();
+
+    T val{};
+    if (params.init_value.has_value())
+      val = std::any_cast<T>(params.init_value);
+
+    resize_(m_domain, m_border, val);
   }
+
 
   template <typename T, unsigned dim, typename E>
   E ndimage_base<T, dim, E>::from_buffer_extern_(void* buffer, const domain_type& domain, const size_t* strides)
@@ -705,6 +713,28 @@ namespace mln
       std::fill((T*)m_ptr, ((T*)m_last) + 1, v);
     }
   }
+
+  template <typename T, unsigned dim, typename E>
+  void ndimage_base<T, dim, E>::resize(const domain_type& domain, const image_build_params& params)
+  {
+    int border = (params.border >= 0) ? params.border : m_border;
+
+    T val{};
+    if (params.init_value.has_value())
+      val = std::any_cast<T>(params.init_value);
+
+    if (not(domain == m_domain) or border != m_border)
+    {
+      m_domain = domain;
+      m_border = border;
+      resize_(m_domain, border, val);
+    }
+    else if (params.init_value.has_value())
+    {
+      std::fill((T*)m_ptr, ((T*)m_last) + 1, val);
+    }
+  }
+
 
   template <typename T, unsigned dim, typename E>
   inline T* ndimage_base<T, dim, E>::__at(const site_type& p) const

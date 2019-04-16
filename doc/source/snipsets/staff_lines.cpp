@@ -1,7 +1,7 @@
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/neighb2d.hpp>
-#include <mln/core/se/utility.hpp>
+#include <mln/core/se/mask2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/hit_or_miss.hpp>
@@ -27,25 +27,21 @@ int main(int argc, char** argv)
   // x x x
 
   mln::image2d<bool> markers1, markers2;
-  {
-    std::array<mln::point2d, 3> se_hit_data  = {{{0, -1}, {0, 0}, {0, 1}}};
-    std::array<mln::point2d, 6> se_miss_data = {{{-1, -1}, {-1, 0}, {-1, 1}, {+1, -1}, {+1, 0}, {+1, 1}}};
-    auto                        se_hit       = mln::se::make_se(se_hit_data);
-    auto                        se_miss      = mln::se::make_se(se_miss_data);
-    auto                        output       = mln::morpho::hit_or_miss(input, se_hit, se_miss);
-    markers1                                 = output;
+  { // #M1_START
+    mln::se::mask2d se_hit  = {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}};
+    mln::se::mask2d se_miss = {{1, 1, 1}, {0, 0, 0}, {1, 1, 1}};
+    auto            output  = mln::morpho::hit_or_miss(input, se_hit, se_miss);
+    markers1                = output;
     mln::io::experimental::imsave(not markers1, argv[2]);
-  }
+  } // #M1_END
 
-  {
-    std::array<mln::point2d, 6> se_hit_data  = {{{0, -1}, {0, 0}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}};
-    std::array<mln::point2d, 6> se_miss_data = {{{-1, -1}, {-1, 0}, {-1, 1}, {+2, -1}, {+2, 0}, {+2, 1}}};
-    auto                        se_hit       = mln::se::make_se(se_hit_data);
-    auto                        se_miss      = mln::se::make_se(se_miss_data);
-    auto                        output       = mln::morpho::hit_or_miss(input, se_hit, se_miss);
-    markers2                                 = output;
+  { // #M2_START
+    mln::se::mask2d se_hit  = {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {0, 0, 0}};
+    mln::se::mask2d se_miss = {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}};
+    auto            output  = mln::morpho::hit_or_miss(input, se_hit, se_miss);
+    markers2                = output;
     mln::io::experimental::imsave(not markers2, argv[3]);
-  }
+  } // #M2_END
 
   auto markers = markers1 || markers2;
 

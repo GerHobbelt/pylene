@@ -271,7 +271,7 @@ namespace mln::experimental::se
     int r      = static_cast<int>(m_radius);
     int extent = 2 * r + 1;
     ::ranges::span<point2d> points{m_data->m_points.data() + m_data->m_se_size, extent};
-    return {points};
+    return {points, r};
   }
 
   disc::inc_type disc::inc() const
@@ -285,7 +285,7 @@ namespace mln::experimental::se
     int r      = static_cast<int>(m_radius);
     int extent = 2 * r + 1;
     ::ranges::span<point2d> points{m_data->m_points.data() + m_data->m_se_size + extent, extent};
-    return {points};
+    return {points, r};
   }
 
 

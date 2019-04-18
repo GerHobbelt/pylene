@@ -7,12 +7,9 @@
 #include <gtest/gtest.h>
 
 
-namespace concepts = mln::concepts;
-
-
 TEST(Pixel, NdPixel)
 {
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::Pixel<mln::details::ndpixel<int, 3>>);
+  static_assert(mln::concepts::Pixel<mln::details::ndpixel<int, 3>>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 }

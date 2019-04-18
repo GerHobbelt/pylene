@@ -158,7 +158,7 @@ An image can be birectional (see :concept:`Bidirectional Image`) and
 allows to be traversed in the reverse order. In that case, the
 *ranges* are bidirectional as well. Below is an example of image traversal.
 
-.. literalinclude:: /snipsets/first_start_1.cpp
+.. literalinclude:: /snippets/first_start_1.cpp
 
 It produces the following output.
 

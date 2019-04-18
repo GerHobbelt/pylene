@@ -11,15 +11,17 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys
+import os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.append( os.path.abspath("..") )
+sys.path.append(os.path.abspath(".."))
 
 import pylene_lexer
+
 
 # -- General configuration -----------------------------------------------------
 
@@ -29,7 +31,7 @@ import pylene_lexer
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'breathe', "ext.conceptdoc",
-              'matplotlib.sphinxext.plot_directive']
+              'matplotlib.sphinxext.plot_directive', "sphinxcontrib.plantuml"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -176,21 +178,21 @@ htmlhelp_basename = 'Pylenedoc'
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    # 'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    # 'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    # 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Pylene.tex', u'Pylene Documentation',
-   u'EC', 'manual'),
+    ('index', 'Pylene.tex', u'Pylene Documentation',
+     u'EC', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -233,9 +235,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Pylene', u'Pylene Documentation',
-   u'EC', 'Pylene', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'Pylene', u'Pylene Documentation',
+     u'EC', 'Pylene', 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -248,7 +250,7 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 # BREATHE
-breathe_projects = { "Pylene": os.path.realpath("../doxyxml/") }
+breathe_projects = {"Pylene": os.path.realpath("../doxyxml/")}
 breathe_default_project = "Pylene"
 
 
@@ -258,7 +260,7 @@ breathe_path = os.path.realpath("../doxyxml/")
 # Matplotlib
 plot_include_source = False
 plot_html_show_formats = False
-plot_formats = [ ("png", 150) ]
+plot_formats = [("png", 150)]
 
 # Substitution
 rst_prolog = """

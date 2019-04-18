@@ -35,14 +35,14 @@ namespace mln::view
     template <class I, class Scalar, class = std::enable_if_t<!is_a<Scalar, mln::experimental::Image>::value>>         \
     auto op(const mln::experimental::Image<I>& ima1, Scalar s)                                                         \
     {                                                                                                                  \
-      auto g = [f_ = f, s](auto&& arg) { return f_(arg, s); };                                                         \
+      auto g = [f_ = f, s_ = s](auto&& arg) { return f_(arg, s_); };                                                   \
       return view::transform(static_cast<const I&>(ima1), g);                                                          \
     }                                                                                                                  \
                                                                                                                        \
     template <class Scalar, class I, class = std::enable_if_t<!is_a<Scalar, mln::experimental::Image>::value>>         \
     auto op(Scalar s, const mln::experimental::Image<I>& ima2)                                                         \
     {                                                                                                                  \
-      auto g = [f_ = f, s](auto&& arg) { return f_(s, arg); };                                                         \
+      auto g = [f_ = f, s_ = s](auto&& arg) { return f_(s_, arg); };                                                   \
       return view::transform(static_cast<const I&>(ima2), g);                                                          \
     }                                                                                                                  \
   }                                                                                                                    \

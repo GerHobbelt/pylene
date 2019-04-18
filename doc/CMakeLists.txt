@@ -1,4 +1,4 @@
-add_subdirectory(source/snipsets)
+add_subdirectory(source/snippets)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doxyxml/index.xml
   COMMAND doxygen Doxyfile

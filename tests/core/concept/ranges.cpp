@@ -4,20 +4,16 @@
 #include <gtest/gtest.h>
 
 
-namespace concepts   = mln::concepts;
-namespace archetypes = mln::archetypes;
-
-
 TEST(Core, Concept_SegmentedRange)
 {
-  static_assert(concepts::SegmentedRange<archetypes::SegmentedRange>);
-  static_assert(!concepts::SegmentedRange<archetypes::ReversibleRange>);
-  static_assert(concepts::SegmentedRange<archetypes::SegmentedAndReversibleRange>);
+  static_assert(mln::concepts::SegmentedRange<mln::archetypes::SegmentedRange>);
+  static_assert(not mln::concepts::SegmentedRange<mln::archetypes::ReversibleRange>);
+  static_assert(mln::concepts::SegmentedRange<mln::archetypes::SegmentedAndReversibleRange>);
 }
 
 TEST(Core, Concept_ReversibleRange)
 {
-  static_assert(!concepts::ReversibleRange<archetypes::SegmentedRange>);
-  static_assert(concepts::ReversibleRange<archetypes::ReversibleRange>);
-  static_assert(concepts::ReversibleRange<archetypes::SegmentedAndReversibleRange>);
+  static_assert(not mln::concepts::ReversibleRange<mln::archetypes::SegmentedRange>);
+  static_assert(mln::concepts::ReversibleRange<mln::archetypes::ReversibleRange>);
+  static_assert(mln::concepts::ReversibleRange<mln::archetypes::SegmentedAndReversibleRange>);
 }

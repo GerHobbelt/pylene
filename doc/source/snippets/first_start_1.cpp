@@ -1,10 +1,4 @@
-#include <mln/core/image/ndimage.hpp>
-
-#include <mln/core/range/view/reverse.hpp>
-#include <mln/core/range/foreach.hpp>
-
-#include <fmt/core.h>
-#include <iostream>
+#include <mln/core/image/image2d.hpp>
 
 int main()
 {
@@ -12,28 +6,27 @@ int main()
 
   std::cout << "== Traversing forward ==\n";
   std::cout << "Traversing through points.\n";
-  mln_foreach (auto p, f.domain())
-    fmt::print("f({},{}) = {}\n", p.x(), p.y(), f(p));
+  mln_foreach (mln::point2d p, f.domain())
+    std::cout << p << ":" << f(p) << "\n";
 
   std::cout << "Traversing on values.\n";
   mln_foreach (int x, f.values())
     std::cout << x << "\n";
 
   std::cout << "Traversing with pixels.\n";
-  mln_foreach (auto px, f.pixels())
-    fmt::print("f({},{}) = {}\n", px.point().x(), px.point().y(), px.val());
-
+  mln_foreach (auto x, f.pixels())
+    std::cout << x.point() << ":" << x.val() << "\n";
 
   std::cout << "\n== Traversing backward ==\n";
   std::cout << "Traversing through points.\n";
-  mln_foreach (auto p, mln::ranges::view::reverse(f.domain()))
-    fmt::print("f({},{}) = {}\n", p.x(), p.y(), f(p));
+  mln_reverse_foreach (mln::point2d p, f.domain())
+    std::cout << p << ":" << f(p) << "\n";
 
   std::cout << "Traversing on values.\n";
-  mln_foreach (auto x, mln::ranges::view::reverse(f.values()))
+  mln_reverse_foreach (int x, f.values())
     std::cout << x << "\n";
 
   std::cout << "Traversing with pixels.\n";
-  mln_foreach (auto px, mln::ranges::view::reverse(f.pixels()))
-    fmt::print("f({},{}) = {}\n", px.point().x(), px.point().y(), px.val());
+  mln_reverse_foreach (auto x, f.pixels())
+    std::cout << x.point() << ":" << x.val() << "\n";
 }

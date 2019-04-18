@@ -8,8 +8,6 @@
 #include <range/v3/iterator_range.hpp>
 
 
-
-
 namespace mln::archetypes
 {
   // This file defines:
@@ -21,9 +19,9 @@ namespace mln::archetypes
 
     template <class P, class Pix>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    requires mln::concepts::Point<P> && mln::concepts::Pixel<Pix>
+    requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif
-    struct StructuringElement
+        struct StructuringElement
     {
       using category     = adaptative_neighborhood_tag;
       using incremental  = std::false_type;
@@ -44,7 +42,7 @@ namespace mln::archetypes
     struct AsSE : SE, mln::experimental::StructuringElement<AsSE<SE>>
     {
     };
-  }
+  } // namespace details
 
   template <class P = Point, class Pix = PixelT<P>>
   using StructuringElement = details::AsSE<details::StructuringElement<P, Pix>>;
@@ -57,8 +55,8 @@ namespace mln::archetypes
     {
       using decomposable = std::true_type;
 
-      bool is_decomposable() const;
-      ::ranges::iterator_range<archetypes::StructuringElement<P, Pix>*> decompose() const;
+      bool                                                                   is_decomposable() const;
+      ::ranges::iterator_range<mln::archetypes::StructuringElement<P, Pix>*> decompose() const;
     };
 
     template <class P, class Pix>
@@ -66,8 +64,8 @@ namespace mln::archetypes
     {
       using separable = std::true_type;
 
-      bool is_separable() const;
-      ::ranges::iterator_range<archetypes::StructuringElement<P, Pix>*> separate() const;
+      bool                                                                   is_separable() const;
+      ::ranges::iterator_range<mln::archetypes::StructuringElement<P, Pix>*> separate() const;
     };
 
     template <class P, class Pix>
@@ -78,8 +76,7 @@ namespace mln::archetypes
       archetypes::StructuringElement<P, Pix> inc() const;
       archetypes::StructuringElement<P, Pix> dec() const;
     };
-  }
-
+  } // namespace details
 
 
   template <class P = Point, class Pix = PixelT<P>>
@@ -90,4 +87,4 @@ namespace mln::archetypes
 
   template <class P = Point, class Pix = PixelT<P>>
   using IncrementalStructuringElement = details::AsSE<details::IncrementalStructuringElement<P, Pix>>;
-}
+} // namespace mln::archetypes

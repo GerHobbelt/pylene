@@ -23,14 +23,19 @@ RUN DEBIAN_FRONTEND=noninteractive pip3 install -U pip six wheel setuptools && \
   DEBIAN_FRONTEND=noninteractive pip3 install --no-cache-dir scan-build conan pandas pytest \
   breathe sphinx_rtd_theme plantuml sphinxcontrib-plantuml \
   sphinx==1.8.5
-  # issue with sphinx2.0, cf. https://github.com/michaeljones/breathe/issues/430 https://github.com/sphinx-doc/sphinx/issues/6146 https://github.com/michaeljones/breathe/pull/411
+# issue with sphinx2.0, cf. https://github.com/michaeljones/breathe/issues/430 https://github.com/sphinx-doc/sphinx/issues/6146 https://github.com/michaeljones/breathe/pull/411
 
 # Install conan default profile
 WORKDIR /tmp
 COPY conanfile.py .
 COPY utils/docker/conan_config ./conan_config
 RUN conan config install ./conan_config && \
-  conan install . -pr pylene_default --build missing && rm -Rf ./*
+  conan install . -pr pylene_default --build missing && \
+  conan install . -pr gcc7 --build missing && \
+  conan install . -pr gcc8 --build missing && \
+  conan install . -pr clang6 --build missing && \
+  conan install . -pr clang7 --build missing && \
+  rm -Rf ./*
 
 WORKDIR /workspace
 

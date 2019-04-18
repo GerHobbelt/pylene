@@ -32,11 +32,11 @@ TEST(View, mask)
   fill(z, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(z)>);
-  static_assert(concepts::ViewImage<decltype(z)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(z)>);
-  static_assert(not concepts::BidirectionalImage<decltype(z)>);
-  static_assert(not concepts::RawImage<decltype(z)>);
+  static_assert(mln::concepts::OutputImage<decltype(z)>);
+  static_assert(mln::concepts::ViewImage<decltype(z)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(z)>);
+  static_assert(not mln::concepts::BidirectionalImage<decltype(z)>);
+  static_assert(not mln::concepts::RawImage<decltype(z)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : z.domain())
@@ -65,11 +65,11 @@ TEST(View, mask_twice)
   auto A      = mln::view::mask(ima, mask_A);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(A)>);
-  static_assert(concepts::ViewImage<decltype(A)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(A)>);
-  static_assert(not concepts::BidirectionalImage<decltype(A)>);
-  static_assert(not concepts::RawImage<decltype(A)>);
+  static_assert(mln::concepts::OutputImage<decltype(A)>);
+  static_assert(mln::concepts::ViewImage<decltype(A)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(A)>);
+  static_assert(not mln::concepts::BidirectionalImage<decltype(A)>);
+  static_assert(not mln::concepts::RawImage<decltype(A)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   auto mask_B = (A % 4) == 1;
@@ -77,11 +77,11 @@ TEST(View, mask_twice)
   fill(B, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::OutputImage<decltype(B)>);
-  static_assert(concepts::ViewImage<decltype(B)>);
-  static_assert(concepts::IndexableAndAccessibleImage<decltype(B)>);
-  static_assert(not concepts::BidirectionalImage<decltype(B)>);
-  static_assert(not concepts::RawImage<decltype(B)>);
+  static_assert(mln::concepts::OutputImage<decltype(B)>);
+  static_assert(mln::concepts::ViewImage<decltype(B)>);
+  static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(B)>);
+  static_assert(not mln::concepts::BidirectionalImage<decltype(B)>);
+  static_assert(not mln::concepts::RawImage<decltype(B)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : B.domain())

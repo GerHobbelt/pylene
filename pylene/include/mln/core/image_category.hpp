@@ -21,12 +21,12 @@ namespace mln
   //clang-format on
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(concepts::stl::DerivedFrom<bidirectional_image_tag, forward_image_tag>);
-  static_assert(concepts::stl::DerivedFrom<random_access_image_tag, bidirectional_image_tag>);
-  static_assert(concepts::stl::DerivedFrom<random_access_image_tag, forward_image_tag>);
-  static_assert(concepts::stl::DerivedFrom<raw_image_tag, random_access_image_tag>);
-  static_assert(concepts::stl::DerivedFrom<raw_image_tag, bidirectional_image_tag>);
-  static_assert(concepts::stl::DerivedFrom<raw_image_tag, forward_image_tag>);
+  static_assert(mln::concepts::stl::DerivedFrom<bidirectional_image_tag, forward_image_tag>);
+  static_assert(mln::concepts::stl::DerivedFrom<random_access_image_tag, bidirectional_image_tag>);
+  static_assert(mln::concepts::stl::DerivedFrom<random_access_image_tag, forward_image_tag>);
+  static_assert(mln::concepts::stl::DerivedFrom<raw_image_tag, random_access_image_tag>);
+  static_assert(mln::concepts::stl::DerivedFrom<raw_image_tag, bidirectional_image_tag>);
+  static_assert(mln::concepts::stl::DerivedFrom<raw_image_tag, forward_image_tag>);
 #endif
 
 } // namespace mln

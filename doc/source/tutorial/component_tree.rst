@@ -311,7 +311,7 @@ A complete example
 
 Filtering the square roadsigns.
 
-.. image:: /snipsets/images/roadsigns.png
+.. image:: /snippets/images/roadsigns.png
 
 Method description
 ^^^^^^^^^^^^^^^^^^
@@ -370,7 +370,7 @@ The method will proceed as follows:
 
 It gives the following result:
 
-.. image:: /snipsets/images/roadsigns-square.png
+.. image:: /snippets/images/roadsigns-square.png
 
 
 Which is not bad but not perfect. Roadsigns have a high contrast
@@ -392,13 +392,13 @@ levels with average gray level of the shape::
 
 Result:
 
-.. image:: /snipsets/images/roadsigns-square-2.png
+.. image:: /snippets/images/roadsigns-square-2.png
 
 
 Full code
 ^^^^^^^^^
 
-.. literalinclude:: /snipsets/component_tree_1.cpp
+.. literalinclude:: /snippets/component_tree_1.cpp
 
 
 

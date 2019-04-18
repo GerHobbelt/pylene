@@ -215,11 +215,11 @@ Structuring Element Properties
 |  Expression  |  Return Type   |                         Sementics                         |
 +==============+================+===========================================================+
 | ``se.inc()`` | *impl-defined* | A SE equivalent to :math:`\Delta\mathcal{B}^+(p) =        |
-|              |                | \mathcal{B}(p) ∖ (\mathcal{B}(p) ∩             |
+|              |                | \mathcal{B}(p) ∖ (\mathcal{B}(p) ∩                        |
 |              |                | \mathcal{B}(\mathrm{prev}))`                              |
 +--------------+----------------+-----------------------------------------------------------+
 | ``se.dec()`` | *impl-defined* | A SE `s` equivalent to :math:`\Delta\mathcal{B}^-(p) =    |
-|              |                | \mathcal{B}(\mathrm{prev}) ∖ (\mathcal{B}(p) ∩ |
+|              |                | \mathcal{B}(\mathrm{prev}) ∖ (\mathcal{B}(p) ∩            |
 |              |                | \mathcal{B}(\mathrm{prev}))`                              |
 +--------------+----------------+-----------------------------------------------------------+
 

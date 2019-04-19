@@ -52,8 +52,18 @@ namespace mln::py
                                           std::numeric_limits<float>::max(),    //
                                           std::numeric_limits<double>::max(),   //
                                           static_cast<std::size_t>(-1)};
+    constexpr std::size_t type_sizeof()
+    {
+        return dyn_sizeof[val];
+    }
 
     type_id val;
+
+    constexpr Info(type_id t) : val{t}
+    {
+    }
+
+
   };
 
   template <typename type>

@@ -8,21 +8,14 @@
 
 namespace mln::py
 {
-  struct stretch_t
-  {
-    image2d<void> operator()(const image2d<>& src) const;
-
     template <class T>
-    image2d<float> operator()(const image2d<T>& src) const
+    image2d<float> stretch(const image2d<T>& src)
     {
       auto res  = image2d<float>(src.width(), src.height());
       auto span = src.values();
+      const auto &vs = src.get_value_set();
       std::transform(span.begin(), span.end(), res.values().begin(),
-                     [](T val) -> float { return static_cast<float>(val) / std::numeric_limits<T>::max(); });
+              [&vs](auto val) -> float { return vs.normalize(val); });
       return res;
     }
-  };
-
-  inline constexpr const stretch_t stretch{};
-
 } // namespace mln::py

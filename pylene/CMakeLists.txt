@@ -48,8 +48,8 @@ target_sources(Pylene PRIVATE
   src/core/se/mask2d.cpp
   src/core/trace.cpp
 
-  src/py/algorithm/stretch.cpp
   src/py/core/image2d_data.cpp
+  src/py/core/any_span.cpp
   )
 
 target_sources(Pylene-python PRIVATE

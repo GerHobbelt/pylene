@@ -17,11 +17,12 @@ TEST(Py, stretch)
   auto img       = image2d<>::from_buffer(reinterpret_cast<std::byte*>(buffer), 3, 3, Info::INT8_V);
   auto stretched = stretch(img);
 
-  // FIXME:
-  // for (auto i : stretched.values())
-  // {
-  //   std::cout << i << "\n";
-  // }
+  int j = 0;
+  for (auto i : stretched.values())
+  {
+      EXPECT_EQ(i, static_cast<float>(j++) / std::numeric_limits<int8_t>::max());
+  }
+  delete[] buffer;
 }
 
 TEST(Py, stretch_other)

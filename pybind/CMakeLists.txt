@@ -23,7 +23,7 @@ find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 function(add_pytest name python_file_path)
   # Create a target to run the benchmark
   add_custom_target(run-${name}
-    COMMAND ${Python3_EXECUTABLE} ${python_file_path}
+    COMMAND py.test ${python_file_path} --junitxml=${CMAKE_CURRENT_BINARY_DIR}/${name}.xml
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     USES_TERMINAL
     )
@@ -31,4 +31,4 @@ function(add_pytest name python_file_path)
   add_dependencies(run-all-pytests run-${name})
 endfunction(add_pytest)
 
-add_pytest(image2d      ${CMAKE_CURRENT_SOURCE_DIR}/tests/image2d.py)
+add_pytest(UTPy_image2d    ${CMAKE_CURRENT_SOURCE_DIR}/tests/image2d.py)

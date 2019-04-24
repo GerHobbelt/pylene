@@ -49,10 +49,12 @@ build-docker-automatic:
         - cmake --build tests --config $PYLENE_CONFIGURATION
         - cmake --build bench/tests --config $PYLENE_CONFIGURATION
         - ctest -L UnitTests -V --schedule-random --output-on-failure
+        - cmake --build pybind --config $PYLENE_CONFIGURATION
+        - cmake --build . --target run-all-pytests --config $PYLENE_CONFIGURATION
     dependencies: []
     artifacts:
         reports:
-            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml, build/pybind/UTPy_*.xml]
         expire_in: 15 days
 
 distcheck-linux-gcc7-release:

@@ -35,6 +35,7 @@ target_include_directories(Pylene PUBLIC ${FreeImage_INCLUDE_DIRS})
 set_property(TARGET Pylene APPEND
   PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
 target_link_libraries(Pylene PUBLIC range-v3)
+set_target_properties(Pylene PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
 # Set sources

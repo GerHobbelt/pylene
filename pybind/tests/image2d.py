@@ -1,5 +1,7 @@
-import unittest
-import numpy
+import os, sys, numpy, unittest
+
+sys.path.append(os.getcwd())
+
 import PyPylene as pln
 
 

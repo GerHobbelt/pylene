@@ -27,8 +27,8 @@ namespace mln::py
   public:
     image2d_data() = default;
 
-    image2d_data(std::size_t n, Info::type_id type)
-      : image2d_data_base{n * Info::dyn_sizeof[type]}
+    image2d_data(std::size_t n, Info::type_id tid)
+      : image2d_data_base{n * Info::dyn_sizeof(tid)}
     {
       m_buf = m_alloc.allocate(m_size);
       std::uninitialized_default_construct_n(m_buf, m_size);

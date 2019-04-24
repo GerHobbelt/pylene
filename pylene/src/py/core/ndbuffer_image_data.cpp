@@ -1,5 +1,5 @@
-#include <py/core/private/ndbuffer_image_data.hpp>
 #include <py/core/image_format.hpp>
+#include <py/core/private/ndbuffer_image_data.hpp>
 
 
 namespace mln::internal
@@ -11,9 +11,6 @@ namespace mln::internal
     m_buffer = m_allocator.allocate(m_size);
   }
 
-  __ndbuffer_image_data<void>::~__ndbuffer_image_data()
-  {
-    m_allocator.deallocate(m_buffer, m_size);
-  }
+  __ndbuffer_image_data<void>::~__ndbuffer_image_data() { m_allocator.deallocate(m_buffer, m_size); }
 
 } // namespace mln::internal

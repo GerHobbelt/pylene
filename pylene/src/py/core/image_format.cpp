@@ -6,7 +6,7 @@ namespace mln
 
 
   dyn_sample_type_id_traits::dyn_sample_type_id_traits(sample_type_id x)
-    : m_id {x}
+    : m_id{x}
   {
     switch (m_id)
     {
@@ -47,9 +47,6 @@ namespace mln
   }
 
 
-  dyn_sample_type_id_traits get_sample_type_id_traits(sample_type_id st)
-  {
-    return {st};
-  }
+  dyn_sample_type_id_traits get_sample_type_id_traits(sample_type_id st) { return {st}; }
 
 } // namespace mln

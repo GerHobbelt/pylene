@@ -1,6 +1,7 @@
 #pragma once
 
 #include <py/core/image2d.hpp>
+#include <py/core/type_info.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -8,21 +9,26 @@
 
 namespace mln::py
 {
-    template <class T>
-    image2d<float> stretch(const image2d<T>& src)
-    {
-      auto res  = image2d<float>(src.width(), src.height());
-      auto span = src.values();
-      const auto &vs = src.get_value_set();
-      std::transform(span.begin(), span.end(), res.values().begin(),
-              [&vs](auto val) -> float { return vs.normalize(val); });
-      return res;
-    }
+  template <class T>
+  image2d<float> stretch(const image2d<T>& src)
+  {
+    auto        res  = image2d<float>(src.width(), src.height());
+    auto        span = src.values();
+    const auto& vs   = src.get_value_set();
+    std::transform(span.begin(), span.end(), res.values().begin(),
+                   [&vs](auto val) -> float { return vs.normalize(val); });
+    return res;
+  }
 
-    image2d<> stretch2(const image2d<>& src)
+  namespace detail
+  {
+    template <typename T>
+    struct apply_stretch_t
     {
-        if (src.type().val == Info::INT8_V)
-            return stretch(*src.cast_to<int8_t>());
-        return stretch(src);
-    }
+      auto operator()(const image2d<>& src) { return stretch(*src.cast_to<T>()); }
+    };
+  } // namespace detail
+  image2d<float> stretch(const image2d<>& src) { return visit_r<detail::apply_stretch_t>(src.type().tid(), src); };
+
+  image2d<> stretch_py(const image2d<>& src) { return stretch(src); };
 } // namespace mln::py

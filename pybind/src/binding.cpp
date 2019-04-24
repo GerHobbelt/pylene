@@ -27,14 +27,15 @@ PYBIND11_MODULE(PyPylene, m)
                throw std::runtime_error("Incompatible buffer dimension!");
 
              auto tmp = image2d<void>::from_buffer(reinterpret_cast<std::byte*>(info.ptr), info.shape[0], info.shape[1],
-                                                    numpystr_to_sampletypeid(info.format));
+                                                   numpystr_to_sampletypeid(info.format));
              new (&img) image2d<void>(tmp);
            })
 
       .def_buffer([](image2d<void>& img) -> py::buffer_info {
-        return py::buffer_info(img.buffer(), Info::dyn_sizeof[img.type().val], sampletypeid_to_numpystr(img.type().val),
-                               2, {img.height(), img.width()},
-                               {Info::dyn_sizeof[img.type().val] * img.width(), Info::dyn_sizeof[img.type().val]});
+        return py::buffer_info(img.buffer(), Info::dyn_sizeof(img.type().tid()),
+                               sampletypeid_to_numpystr(img.type().tid()), 2, {img.height(), img.width()},
+                               {Info::dyn_sizeof(img.type().tid()) * img.width(), Info::dyn_sizeof(img.type().tid())});
       });
-    m.def("stretch", static_cast <image2d<> (*)(const image2d <>&)>(&mln::py::stretch2));
+
+  m.def("stretch", static_cast<image2d<> (*)(const image2d<>&)>(&mln::py::stretch_py));
 }

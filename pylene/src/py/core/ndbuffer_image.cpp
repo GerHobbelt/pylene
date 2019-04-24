@@ -17,8 +17,8 @@ namespace mln
 
 
   ndbuffer_image::ndbuffer_image()
-    : m_sample_type{sample_type_id::OTHER},
-      m_pdim{0}
+    : m_sample_type{sample_type_id::OTHER}
+    , m_pdim{0}
   {
   }
 
@@ -27,10 +27,7 @@ namespace mln
     resize(sample_type, domain, params);
   }
 
-  ndbuffer_image::ndbuffer_image(sample_type_id sample_type, Box domain)
-  {
-    resize(sample_type, domain);
-  }
+  ndbuffer_image::ndbuffer_image(sample_type_id sample_type, Box domain) { resize(sample_type, domain); }
 
   ndbuffer_image::ndbuffer_image(sample_type_id sample_type, int width, int height, int depth)
   {
@@ -56,18 +53,18 @@ namespace mln
   }
 
 
-
   namespace
   {
-    std::byte* __allocate(sample_type_id sample_type, std::size_t n, const image_build_params&, std::shared_ptr<internal::ndbuffer_image_data>& data)
+    std::byte* __allocate(sample_type_id sample_type, std::size_t n, const image_build_params&,
+                          std::shared_ptr<internal::ndbuffer_image_data>& data)
     {
       data = std::make_shared<internal::__ndbuffer_image_data<void>>(n, sample_type);
       return data->m_buffer;
     }
   } // namespace
 
-  void ndbuffer_image::__init(alloc_fun_t __allocate,
-                              sample_type_id sample_type, int dim, int topleft[], int sizes[], std::ptrdiff_t strides[], const image_build_params& params)
+  void ndbuffer_image::__init(alloc_fun_t __allocate, sample_type_id sample_type, int dim, int topleft[], int sizes[],
+                              std::ptrdiff_t strides[], const image_build_params& params)
   {
     mln_precondition(topleft != nullptr);
     mln_precondition(sizes != nullptr);
@@ -92,7 +89,7 @@ namespace mln
     {
       m_domain.begin[k] = topleft[k];
       m_domain.end[k]   = topleft[k] + sizes[k];
-      m_vbox.begin[k]   = m_domain.begin[k] -border;
+      m_vbox.begin[k]   = m_domain.begin[k] - border;
       m_vbox.end[k]     = m_domain.end[k] + border;
     }
 
@@ -101,7 +98,7 @@ namespace mln
     {
       m_strides[0] = 1;
       for (int k = 1; k < dim; ++k)
-        m_strides[k] = (sizes[k-1] + 2 * border) * m_strides[k-1];
+        m_strides[k] = (sizes[k - 1] + 2 * border) * m_strides[k - 1];
     }
     else // Or copy strides
     {
@@ -120,8 +117,8 @@ namespace mln
     }
 
     // Allocate (or get the buffer)
-    std::size_t size = (sizes[dim-1] + 2 * border) * m_strides[dim - 1];
-    m_buffer = __allocate(sample_type, size, params, m_data); // dynamic behavior
+    std::size_t size = (sizes[dim - 1] + 2 * border) * m_strides[dim - 1];
+    m_buffer         = __allocate(sample_type, size, params, m_data); // dynamic behavior
 
     // Set buffer to (0,0) position
     std::ptrdiff_t x = -m_vbox.begin[0];
@@ -153,9 +150,12 @@ namespace mln
       sizes[i] = 1;
 
     int dim = 1;
-    if (depth != 1) dim = 3;
-    else if (height != 1) dim = 2;
-    else if (width != 1) dim = 1;
+    if (depth != 1)
+      dim = 3;
+    else if (height != 1)
+      dim = 2;
+    else if (width != 1)
+      dim = 1;
     resize(sample_type, dim, topleft, sizes, params);
   }
 
@@ -199,16 +199,16 @@ namespace mln
   }
 
 
-  ndbuffer_image ndbuffer_image::from_buffer(std::byte* buffer, sample_type_id sample_type, int dim,
-                                             int topleft[], int sizes[], std::ptrdiff_t strides[], bool copy)
+  ndbuffer_image ndbuffer_image::from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, int topleft[],
+                                             int sizes[], std::ptrdiff_t strides[], bool copy)
   {
     image_build_params params;
     params.border = 0; // From external data, no border
 
     alloc_fun_t __alloc;
     if (copy)
-      __alloc = [&buffer](sample_type_id st, std::size_t n, const image_build_params&, std::shared_ptr<internal::ndbuffer_image_data>& data)
-      {
+      __alloc = [&buffer](sample_type_id st, std::size_t n, const image_build_params&,
+                          std::shared_ptr<internal::ndbuffer_image_data>& data) {
         data = std::make_shared<internal::__ndbuffer_image_data<void>>(n, st);
         std::memcpy(data->m_buffer, buffer, n * get_sample_type_id_traits(st).size());
         return buffer;

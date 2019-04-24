@@ -2,9 +2,9 @@
 
 #include <mln/core/image/private/image_builder.hpp>
 
-#include <memory>
-#include <functional>
 #include "image_format.hpp"
+#include <functional>
+#include <memory>
 
 
 namespace mln
@@ -19,9 +19,9 @@ namespace mln
     {
     }
 
-    constexpr int operator[] (int k) const { return data[k]; }
-    constexpr int& operator[] (int k) { return data[k]; }
-    int data[PYLENE_NDBUFFER_DEFAULT_DIM];
+    constexpr int  operator[](int k) const { return data[k]; }
+    constexpr int& operator[](int k) { return data[k]; }
+    int            data[PYLENE_NDBUFFER_DEFAULT_DIM];
   };
 
   struct Box
@@ -65,7 +65,7 @@ namespace mln
   {
   public:
     static constexpr int DEFAULT_BORDER_SIZE = 3;
-    static constexpr int DEFAULT_DIM = 4;
+    static constexpr int DEFAULT_DIM         = 4;
 
 
     /// \brief Constructors
@@ -81,7 +81,6 @@ namespace mln
 
     ndbuffer_image(const ndbuffer_image& other, const image_build_params&);
     /// \}
-
 
 
     /// \brief Resizer
@@ -103,8 +102,10 @@ namespace mln
 
   public:
     /// \{
-    static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, int sizes[], std::ptrdiff_t strides[] = nullptr, bool copy = false);
-    static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, int topleft[], int sizes[], std::ptrdiff_t strides[] = nullptr, bool copy = false);
+    static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, int sizes[],
+                                      std::ptrdiff_t strides[] = nullptr, bool copy = false);
+    static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, int topleft[],
+                                      int sizes[], std::ptrdiff_t strides[] = nullptr, bool copy = false);
     /// \}
 
     /// \brief Geometry information
@@ -115,8 +116,8 @@ namespace mln
     int depth() const;
     int size(int dim = 0) const;
 
-    int   border() const;
-    Box   domain() const;
+    int border() const;
+    Box domain() const;
     /// \}
 
 
@@ -147,14 +148,15 @@ namespace mln
     std::byte* __at(const int coords[]) const;
 
   protected:
-    using alloc_fun_t = std::function<std::byte*(sample_type_id, std::size_t, const image_build_params&, std::shared_ptr<internal::ndbuffer_image_data>&)>;
+    using alloc_fun_t = std::function<std::byte*(sample_type_id, std::size_t, const image_build_params&,
+                                                 std::shared_ptr<internal::ndbuffer_image_data>&)>;
 
-    // Note __init is called from a constructor, we need to pass the allocation function from children (it cannot be made virtual !!)
-    // Create from a custom storage (either external or internal)
-    void __init(alloc_fun_t __allocate, sample_type_id sample_type, int dim, int topleft[], int sizes[], std::ptrdiff_t strides[], const image_build_params& params);
+    // Note __init is called from a constructor, we need to pass the allocation function from children (it cannot be
+    // made virtual !!) Create from a custom storage (either external or internal)
+    void __init(alloc_fun_t __allocate, sample_type_id sample_type, int dim, int topleft[], int sizes[],
+                std::ptrdiff_t strides[], const image_build_params& params);
 
   private:
-
     std::shared_ptr<internal::ndbuffer_image_data> m_data;
 
     sample_type_id m_sample_type; // Sample type of the data
@@ -165,7 +167,6 @@ namespace mln
     std::ptrdiff_t m_strides[PYLENE_NDBUFFER_DEFAULT_DIM];
     std::byte*     m_buffer; // Pointer to origin (0,0) (might be out of range)
   };
-
 
 
   /******************************************/
@@ -189,7 +190,6 @@ namespace mln
 
     return nullptr;
   }
-
 
 
 } // namespace mln

@@ -33,6 +33,7 @@ namespace mln::internal
   class __ndbuffer_image_data : public ndbuffer_image_data
   {
     std::allocator<T> m_allocator;
+
   public:
     __ndbuffer_image_data(std::size_t n)
     {
@@ -55,5 +56,4 @@ namespace mln::internal
     }
   };
 
-}
-
+} // namespace mln::internal

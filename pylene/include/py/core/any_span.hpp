@@ -48,14 +48,3 @@ namespace mln::py
         Info        m_type;
     };
 } // namespace mln::py
-
-                            //is any_value even needed ?
-    /*class any_value
-    {
-    public:
-        any_value() = default; //FIXME
-    private:
-        Info        m_type  = {INFO::OTHER};
-        std::byte  *m_data;
-    };
-    */

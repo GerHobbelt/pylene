@@ -12,16 +12,6 @@
 
 namespace py = pybind11;
 
-/*mln::py::Info::type_id get_typeid_from_buffer_mln::py::Info(py::buffer_mln::py::Info mln::py::Info)
-{
-    switch (mln::py::Info)
-    {
-        case
-        default: return mln::py::Info::OTHER_V;
-    }
-}
-*/
-
 
 PYBIND11_MODULE(PyPylene, m)
 {
@@ -33,13 +23,11 @@ PYBIND11_MODULE(PyPylene, m)
              py::buffer_info info = b.request();
 
              /* Sanity checks */
-             if (info.format != py::format_descriptor<int8_t>::format())
-               throw std::runtime_error("Incompatible format: got " + info.format);
              if (info.ndim != 2)
                throw std::runtime_error("Incompatible buffer dimension!");
 
              auto tmp = image2d<void>::from_buffer(reinterpret_cast<std::byte*>(info.ptr), info.shape[0], info.shape[1],
-                                                   Info::INT8_V);
+                                                    numpystr_to_sampletypeid(info.format));
              new (&img) image2d<void>(tmp);
            })
 
@@ -48,6 +36,5 @@ PYBIND11_MODULE(PyPylene, m)
                                2, {img.height(), img.width()},
                                {Info::dyn_sizeof[img.type().val] * img.width(), Info::dyn_sizeof[img.type().val]});
       });
-  // FIXME:
-  // m.def("stretch", static_cast <image2d <> (*)(const image2d <>&)>(&mln::py::stretch));
+    m.def("stretch", static_cast <image2d<> (*)(const image2d <>&)>(&mln::py::stretch2));
 }

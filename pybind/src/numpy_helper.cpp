@@ -33,3 +33,20 @@ std::string sampletypeid_to_numpystr(Info::type_id sample_type)
     return "";
   }
 }
+
+Info::type_id numpystr_to_sampletypeid(const std::string &s)
+{
+    static Info::type_id converter[256];
+    converter['c'] = Info::INT8_V;
+    converter['b'] = Info::INT8_V;
+    converter['B'] = Info::UINT8_V;
+    converter['h'] = Info::INT16_V;
+    converter['H'] = Info::UINT16_V;
+    converter['i'] = Info::INT32_V;
+    converter['I'] = Info::UINT32_V;
+    converter['l'] = Info::INT64_V;
+    converter['L'] = Info::UINT64_V;
+    converter['f'] = Info::FLOAT_V;
+    converter['d'] = Info::DOUBLE_V;
+    return converter[static_cast<int>(s[0])];
+}

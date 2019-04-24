@@ -43,7 +43,7 @@ build-docker-automatic:
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr $BUILD_PROFILE --build missing
+        - conan install .. -pr $BUILD_PROFILE --build missing -o pybind=True
         - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_BUILD_PYBIND=True
         - cmake --build apps --config $PYLENE_CONFIGURATION
         - cmake --build tests --config $PYLENE_CONFIGURATION

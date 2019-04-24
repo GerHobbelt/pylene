@@ -18,4 +18,11 @@ namespace mln::py
               [&vs](auto val) -> float { return vs.normalize(val); });
       return res;
     }
+
+    image2d<> stretch2(const image2d<>& src)
+    {
+        if (src.type().val == Info::INT8_V)
+            return stretch(*src.cast_to<int8_t>());
+        return stretch(src);
+    }
 } // namespace mln::py

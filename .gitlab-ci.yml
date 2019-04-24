@@ -44,7 +44,7 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_BUILD_PYBIND
         - cmake --build apps --config $PYLENE_CONFIGURATION
         - cmake --build tests --config $PYLENE_CONFIGURATION
         - cmake --build bench/tests --config $PYLENE_CONFIGURATION

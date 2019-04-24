@@ -12,7 +12,8 @@ class Pylene(ConanFile):
         True, False], "boost": [True, False], "pybind": [True, False],
         # TO REMOVE once docker image is fixed with the buildfarm profile updated
         "boost_program_options": [True, False]}
-    default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False", "pybind=False",
+    default_options = ("gtest=True", "benchmark=True", "freeimage=False", "boost=False",
+            "pybind=True",
                        # TO REMOVE once docker image is fixed with the buildfarm profile updated
                        "boost_program_options=False")
     generators = "cmake_paths"

@@ -62,10 +62,18 @@ namespace mln::py
     }
 
     template <typename T>
-    image2d<T>* cast_to(void)
+    image2d<T>* cast_to()
     {
         if (Trait<T>::value == m_type.val)
             return static_cast<image2d<T>*>(this);
+        return nullptr;
+    }
+
+    template <typename T>
+    const image2d<T>* cast_to() const
+    {
+        if (Trait<T>::value == m_type.val)
+            return static_cast<const image2d<T>*>(this);
         return nullptr;
     }
 
@@ -95,6 +103,7 @@ namespace mln::py
 
   protected:
     std::byte* m_buffer; // buffer contained by m_data
+    std::aligned_storage_t<sizeof(value_set<>), alignof(value_set<>)> m_vs;
 
   private:
     static void dispatch_value_set(void *vs, Info::type_id tid)
@@ -137,7 +146,6 @@ namespace mln::py
         }
     }
 
-    std::aligned_storage_t<sizeof(value_set<>), alignof(value_set<>)> m_vs;
     size_t m_width  = 0;
     size_t m_height = 0;
     Info   m_type   = {Info::OTHER}; // info for the type the data

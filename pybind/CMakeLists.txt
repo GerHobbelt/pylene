@@ -3,7 +3,7 @@ project(Pybind CXX)
 find_package(pybind11 REQUIRED)
 
 pybind11_add_module(PyPylene MODULE 
-                    src/binding.cpp
+                    src/pypylene.cpp
                     src/numpy_helper.cpp
                     )
 

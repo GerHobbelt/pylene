@@ -13,6 +13,21 @@
 namespace py = pybind11;
 
 
+py::array to_numpy(const mln::py::image2d<>& ima)
+{
+  using namespace mln::py;
+
+  auto info = py::buffer_info{ima.buffer(),
+                              static_cast<ssize_t>(Info::dyn_sizeof(ima.type().tid())),
+                              sampletypeid_to_numpystr(ima.type().tid()),
+                              2,
+                              {ima.height(), ima.width()},
+                              {Info::dyn_sizeof(ima.type().tid()) * ima.width(), Info::dyn_sizeof(ima.type().tid())}
+
+  };
+  return py::array{info};
+}
+
 PYBIND11_MODULE(PyPylene, m)
 {
   using namespace mln::py;
@@ -38,4 +53,5 @@ PYBIND11_MODULE(PyPylene, m)
       });
 
   m.def("stretch", static_cast<image2d<> (*)(const image2d<>&)>(&mln::py::stretch_py));
+  m.def("to_numpy", &to_numpy);
 }

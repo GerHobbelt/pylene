@@ -34,19 +34,20 @@ std::string sampletypeid_to_numpystr(Info::type_id sample_type)
   }
 }
 
-Info::type_id numpystr_to_sampletypeid(const std::string &s)
+Info::type_id numpystr_to_sampletypeid(const std::string& s)
 {
-    static Info::type_id converter[256];
-    converter['c'] = Info::INT8_V;
-    converter['b'] = Info::INT8_V;
-    converter['B'] = Info::UINT8_V;
-    converter['h'] = Info::INT16_V;
-    converter['H'] = Info::UINT16_V;
-    converter['i'] = Info::INT32_V;
-    converter['I'] = Info::UINT32_V;
-    converter['l'] = Info::INT64_V;
-    converter['L'] = Info::UINT64_V;
-    converter['f'] = Info::FLOAT_V;
-    converter['d'] = Info::DOUBLE_V;
-    return converter[static_cast<int>(s[0])];
+  static Info::type_id converter[256];
+  using uch           = unsigned char;
+  converter[(uch)'c'] = Info::INT8_V;
+  converter[(uch)'b'] = Info::INT8_V;
+  converter[(uch)'B'] = Info::UINT8_V;
+  converter[(uch)'h'] = Info::INT16_V;
+  converter[(uch)'H'] = Info::UINT16_V;
+  converter[(uch)'i'] = Info::INT32_V;
+  converter[(uch)'I'] = Info::UINT32_V;
+  converter[(uch)'l'] = Info::INT64_V;
+  converter[(uch)'L'] = Info::UINT64_V;
+  converter[(uch)'f'] = Info::FLOAT_V;
+  converter[(uch)'d'] = Info::DOUBLE_V;
+  return converter[static_cast<Info::type_id>(s[0])];
 }

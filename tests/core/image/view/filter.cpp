@@ -1,17 +1,12 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/view/filter.hpp>
-#include <mln/core/image/view/operators.hpp>
-
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-
+#include <mln/core/concept/new/concepts.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/view/filter.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
-
-#include <mln/core/concept/new/concepts.hpp>
-
-#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
 

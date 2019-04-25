@@ -6,11 +6,24 @@ Images defined by a vector of point -> value are not accessible (ima(p))
 
 Forsee to add pdim (point) and vdim (value) for dimension constant in iamge concept
 
+.. toctree::
+   :hidden:
+   
+   view/cast
+   view/clip
+   view/channel
+   view/filter
+   view/mask
+   view/maths
+   view/operators
+   view/rgb
+   view/transform
+   view/zip
+
 
 .. contents::
    :local:
 
-.. cpp:namespace:: mln
 
 Description & Design Overview
 =============================
@@ -232,14 +245,11 @@ Image Concepts
 Image-related Concepts
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Concepts are defined in the namespace :cpp:expr:`mln::concepts`.
-
 In the introduction, we have seen that an image *f* is function associating **points** to **values**. **Values** are
 simple :cpp:concept:`std::Regular` types. **Points** are also :cpp:concept:`std::Regular` but are also
 :cpp:concept:`StrictTotallyOrdered` because they are the basis of *domains*.
 
-
-.. cpp:namespace:: mln
+.. cpp:namespace:: mln::concepts
 .. cpp:concept:: template <typename D> Domain
 
     A *domain* is a :cpp:concept:`std::Range` of *points* which is totally ordered (this ensures a traversal order of
@@ -334,9 +344,9 @@ The figure below illustrates image properties and some of the image concept.
 Image Concept
 ^^^^^^^^^^^^^
 
-#. .. cpp:concept:: template <typename I> Image
-#. .. cpp:concept:: template <typename I> InputImage
-#. .. cpp:concept:: template <typename I> ForwardImage
+#. .. cpp:concept:: template <class I>  Image
+#. .. cpp:concept:: template <class I>  InputImage
+#. .. cpp:concept:: template <class I>  ForwardImage
 
 
     **Image** (also **ForwardImage** and **InputImage**) is the minimal concept for modeling images. It provides *read*
@@ -615,56 +625,16 @@ Indexable Image Concept
     | ``cima.delta_index(dp)``   | `index_type` |              | Get the index difference for a shift of *dp*       |
     +----------------------------+--------------+--------------+----------------------------------------------------+
 
-Image Traits
-============
-
-.. cpp:namespace:: mln
-
-.. cpp:type:: template <class I> image_concrete_t = I::concrete_type
-              template <class I, class V> image_ch_value_t = I::ch_value_type<V>
-
-              Get the concrete of an image (a type that is writable and can be resized). In the second, it requests an
-              image whose value type is `V`.
-
-.. cpp:type:: template <class I> image_value_t = I::value_type
-              template <class I> image_reference_t = I::reference
-
-              Get the type of the values of an image. *Value type* is the naked type, *reference* is the type returned
-              by the expression `ima(p)` which is generally `T&`.
-
-.. cpp:type:: template <class I> image_domain_t = I::domain_type
-              template <class I> image_point_t = I::point_type
-
-              Get the type of the domain and the type of the points (*points* being the domain values)
-
-
-.. cpp:type:: template <class I> image_index_t = I::index_type
-
-              Get the type of the index of :cpp:concept:`Indexable` images.
-
-
 
 Image Views
 ===========
 
-.. toctree::
-   view/cast
-   view/clip
-   view/channel
-   view/filter
-   view/mask
-   view/maths
-   view/operators
-   view/rgb
-   view/transform
-   view/zip
+
 
 
 Predefined images types
 =======================
 
-.. toctree::
-   images/ndimage
-
+FIXME
 
 

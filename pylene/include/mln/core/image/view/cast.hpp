@@ -24,7 +24,7 @@ namespace mln::view
   template <class V, class InputImage>
   auto cast(InputImage ima)
   {
-    static_assert(is_a<InputImage, experimental::Image>());
+    static_assert(is_a<InputImage, mln::experimental::Image>());
 
     return view::transform(std::move(ima), detail::cast_to<V>{});
   }

@@ -4,11 +4,11 @@
 
 #include <mln/core/colors.hpp>
 #include <mln/core/extension/fill.hpp>
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/math_ops.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/vec/vec_math_ops.hpp>
+#include <mln/core/vec/vec_functional_ops.hpp>
 #include <mln/core/wrt_offset.hpp>
 
 

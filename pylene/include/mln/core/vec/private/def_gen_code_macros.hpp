@@ -9,10 +9,9 @@
 
 #define MLN_VEC_PRIVATE_GEN_UNARY_CODE(FUN)                                                                            \
   template <class T, unsigned dim, class tag>                                                                          \
-  auto FUN(const internal::vec_base<T, dim, tag>& x)                                                                   \
+  inline MLN_VEC_PRIVATE_VEC_PROMOTE_FUN(T, dim, tag, FUN) FUN(const internal::vec_base<T, dim, tag>& x)               \
   {                                                                                                                    \
-    using R = decltype(FUN(std::declval<T>()));                                                                        \
-    internal::vec_base<R, dim, tag> res;                                                                               \
+    MLN_VEC_PRIVATE_VEC_PROMOTE_FUN(T, dim, tag, FUN) res;                                                             \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       res[i] = FUN(x[i]);                                                                                              \
     return res;                                                                                                        \
@@ -20,7 +19,8 @@
 
 #define MLN_VEC_PRIVATE_GEN_BINARY_CODE(FUN, FUNBASE, EXPR)                                                            \
   template <class T, unsigned dim, class tag>                                                                          \
-  auto FUN(const internal::vec_base<T, dim, tag>& x, const internal::vec_base<T, dim, tag>& y)                         \
+  inline auto FUN(const internal::vec_base<T, dim, tag>& x, const internal::vec_base<T, dim, tag>& y)                  \
+      ->decltype(FUNBASE(EXPR))                                                                                        \
   {                                                                                                                    \
     return FUNBASE(EXPR);                                                                                              \
   }

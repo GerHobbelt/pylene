@@ -1,7 +1,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/core/image/ndimage.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/rgb.hpp>
 

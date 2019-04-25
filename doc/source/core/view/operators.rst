@@ -25,7 +25,7 @@ Arithmetical
 
 
     .. code::
-
+    
         mln::image2d<mln::rgb8> ima1 = ...;
         mln::image2d<mln::rgb8> ima2 = ...;
         auto g1 = ima1 + ima2;
@@ -383,12 +383,10 @@ Conditional
 3. .. cpp:function:: auto ifelse(Image ima, Scalar s_if, Image ima2)
 4. .. cpp:function:: auto ifelse(Image ima, Scalar s_if, Scalar s_else)
 
-   .. Sphinx CPP domain with texpr does not support ternary ops
-
-    1. Makes a view where for each pixel value evals to ``out(p) = (ima(p) ? ima1(p) : ima2(p))``.
-    2. Makes a view where for each pixel value evals to ``out(p) = (ima(p) ? ima1(p) : s_else)``.
-    3. Makes a view where for each pixel value evals to ``out(p) = (ima(p) ? s_if : ima2(p))``.
-    4. Makes a view where for each pixel value evals to ``out(p) = (ima(p) ? s_if : s_else)``.
+    1. Makes a view where for each pixel value evals to :cpp:expr:`out(p) = ima(p) ? ima1(p) : ima2(p)`.
+    2. Makes a view where for each pixel value evals to :cpp:expr:`out(p) = ima(p) ? ima1(p) : s_else`.
+    3. Makes a view where for each pixel value evals to :cpp:expr:`out(p) = ima(p) ? s_if : ima2(p)`.
+    4. Makes a view where for each pixel value evals to :cpp:expr:`out(p) = ima(p) ? s_if : s_else`.
 
 
     :param ima: Input range
@@ -398,7 +396,7 @@ Conditional
 
 
     .. code::
-
+    
         mln::image2d<int> ima = ...;
         mln::image2d<int> ima1 = ...;
         mln::image2d<int> ima2 = ...;

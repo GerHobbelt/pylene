@@ -12,8 +12,6 @@
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
-#include <fixtures/ImageCompare/image_compare.hpp>
-
 #include <vector>
 
 #include <gtest/gtest.h>

@@ -1,34 +1,48 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/view/zip.hpp>
 
 #include <type_traits>
 
 
 #define MLN_PRIVATE_DEFINE_UNARY_OPERATOR(op, f)                                                                       \
-  template <class I>                                                                                                   \
-  requires(::mln::is_a<I, ::mln::details::Image>::value) auto op(const I& ima)                                         \
+  template <class I, class = std::enable_if_t<::mln::is_a<I, ::mln::experimental::Image>::value>>                      \
+  auto op(const I& ima)                                                                                                \
   {                                                                                                                    \
-    return ::mln::view::transform(ima, f);                                                                             \
+    return ::mln::view::transform(static_cast<const I&>(ima), f);                                                      \
   }
 
 #define MLN_PRIVATE_DEFINE_BINARY_OPERATOR(op, f)                                                                      \
-  template <class A, class B>                                                                                          \
-  requires(::mln::is_a<A, ::mln::details::Image>::value || ::mln::is_a<B, ::mln::details::Image>::value) auto op(      \
-      const A& a, const B& b)                                                                                          \
+  namespace impl                                                                                                       \
   {                                                                                                                    \
-    constexpr bool is_A_image = ::mln::is_a<A, ::mln::details::Image>::value;                                          \
-    constexpr bool is_B_image = ::mln::is_a<B, ::mln::details::Image>::value;                                          \
+    template <class I1, class I2>                                                                                      \
+    auto op(const ::mln::experimental::Image<I1>& ima1, const ::mln::experimental::Image<I2>& ima2)                    \
+    {                                                                                                                  \
+      return ::mln::view::transform(static_cast<const I1&>(ima1), static_cast<const I2&>(ima2), f);                    \
+    }                                                                                                                  \
                                                                                                                        \
-    if constexpr (is_A_image && is_B_image)                                                                            \
-      return ::mln::view::transform(a, b, f);                                                                          \
-    else if constexpr (is_A_image)                                                                                     \
+    template <class I, class Scalar,                                                                                   \
+              class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::experimental::Image>::value>>                       \
+    auto op(const ::mln::experimental::Image<I>& ima1, Scalar s)                                                       \
     {                                                                                                                  \
-      auto g = [f_ = f, s_ = b](auto&& arg) { return f_(arg, s_); };                                                   \
-      return ::mln::view::transform(a, g);                                                                             \
+      auto g = [f_ = f, s_ = s](auto&& arg) { return f_(arg, s_); };                                                   \
+      return ::mln::view::transform(static_cast<const I&>(ima1), g);                                                   \
     }                                                                                                                  \
-    else if constexpr (is_B_image)                                                                                     \
+                                                                                                                       \
+    template <class Scalar, class I,                                                                                   \
+              class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::experimental::Image>::value>>                       \
+    auto op(Scalar s, const ::mln::experimental::Image<I>& ima2)                                                       \
     {                                                                                                                  \
-      auto g = [f_ = f, s_ = a](auto&& arg) { return f_(s_, arg); };                                                   \
-      return ::mln::view::transform(b, g);                                                                             \
+      auto g = [f_ = f, s_ = s](auto&& arg) { return f_(s_, arg); };                                                   \
+      return ::mln::view::transform(static_cast<const I&>(ima2), g);                                                   \
     }                                                                                                                  \
+  } /* namespace impl */                                                                                               \
+                                                                                                                       \
+  /* This overload is there to be a best match wrt old API impl */                                                     \
+  template <class A, class B,                                                                                          \
+            class = std::enable_if_t<(::mln::is_a<A, ::mln::experimental::Image>::value ||                             \
+                                      ::mln::is_a<B, ::mln::experimental::Image>::value)>>                             \
+  auto op(const A& lhs, const B& rhs)                                                                                  \
+  {                                                                                                                    \
+    return impl::op(lhs, rhs);                                                                                         \
   }

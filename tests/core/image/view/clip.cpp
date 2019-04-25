@@ -7,8 +7,6 @@
 #include <mln/core/image/view/clip.hpp>
 #include <mln/core/image/view/operators.hpp>
 
-#include <fixtures/ImageCompare/image_compare.hpp>
-
 #include <gtest/gtest.h>
 
 
@@ -177,6 +175,27 @@ TEST(Core, Clip_wherex2_joints)
 
   mln::iota(ima, 0);
   mln::fill(view::clip(view::clip(ima, experimental::where(ima > 10)), experimental::where(ima > 20)), 42);
+  ASSERT_TRUE(all_of(ima == ref));
+}
+
+TEST(Core, Clip_wherex2_disjoints)
+{
+  using namespace mln;
+  using namespace mln::view::ops;
+
+  image2d<int> ima(5, 5);
+
+  image2d<int> ref = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 42, 42, 42, 42}, //
+      {42, 42, 42, 42, 42}, //
+      {20, 21, 22, 23, 24}  //
+  };
+
+  mln::iota(ima, 0);
+  auto clipped_ima = view::clip(ima, experimental::where(ima > 10));
+  mln::fill(view::clip(clipped_ima, experimental::where(clipped_ima < 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 

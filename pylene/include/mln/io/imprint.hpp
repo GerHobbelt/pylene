@@ -2,6 +2,7 @@
 
 #include <mln/core/domain/box.hpp>
 #include <mln/core/grays.hpp>
+#include <mln/core/rangev3/rows.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/io/format.hpp>
 
@@ -23,6 +24,16 @@ namespace mln
     template <typename I>
     void imprint_with_border(const Image<I>& ima, std::ostream& os = std::cout);
 
+
+    namespace experimental
+    {
+      template <typename InputImage>
+      void imprint(InputImage ima, std::ostream& os = std::cout);
+
+      template <typename InputImage>
+      void imprint_with_border(InputImage ima, std::ostream& os = std::cout);
+    } // namespace experimental
+
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
@@ -36,7 +47,14 @@ namespace mln
         for (auto p : domain)
         {
           os << '{' << p << ",";
-          format(os, ima(p)) << "}," << std::endl;
+          if constexpr (mln::is_a<Image, mln::experimental::Image>())
+          {
+            format(os, (*const_cast<Image*>(&ima))(p)) << "}," << std::endl;
+          }
+          else
+          {
+            format(os, ima(p)) << "}," << std::endl;
+          }
         }
       }
 
@@ -45,10 +63,24 @@ namespace mln
           imprint(const Image& ima, Domain domain, std::ostream& os)
       {
         (void)domain;
-        mln_foreach (const auto& pix, ima.pixels())
+
+        if constexpr (mln::is_a<Image, mln::experimental::Image>())
         {
-          os << '{' << pix.point() << ",";
-          format(os, pix.val()) << "}," << std::endl;
+          auto pixels = const_cast<Image*>(&ima)->new_pixels();
+          for (auto&& r : mln::ranges::rows(pixels))
+            for (auto&& pix : r)
+            {
+              os << '{' << pix.point() << ",";
+              format(os, pix.val()) << "}," << std::endl;
+            }
+        }
+        else
+        {
+          mln_foreach (const auto& pix, ima.pixels())
+          {
+            os << '{' << pix.point() << ",";
+            format(os, pix.val()) << "}," << std::endl;
+          }
         }
       }
 
@@ -63,8 +95,21 @@ namespace mln
 
         int               wtext = 0;
         frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
+
+        if constexpr (mln::is_a<Image, mln::experimental::Image>())
+        {
+          auto vals = const_cast<Image*>(&ima)->new_values();
+          for (auto&& r : mln::ranges::rows(vals))
+            for (auto&& v : r)
+            {
+              wtext = std::max(wtext, frmter(v));
+            }
+        }
+        else
+        {
+          mln_foreach (V v, ima.values())
+            wtext = std::max(wtext, frmter(v));
+        }
 
         os << domain << "(" << typeid(V).name() << ")" << std::endl;
         os.width(4);
@@ -75,7 +120,14 @@ namespace mln
           for (p[1] = domain.pmin[1]; p[1] < domain.pmax[1]; ++p[1])
           {
             os << std::setw(wtext);
-            format(os, ima(p)) << " ";
+            if constexpr (mln::is_a<Image, mln::experimental::Image>())
+            {
+              format(os, (*const_cast<Image*>(&ima))(p)) << " ";
+            }
+            else
+            {
+              format(os, ima(p)) << " ";
+            }
           }
           os << std::endl;
         }
@@ -93,8 +145,21 @@ namespace mln
 
         int               wtext = 0;
         frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
+
+        if constexpr (mln::is_a<Image, mln::experimental::Image>())
+        {
+          auto vals = const_cast<Image*>(&ima)->new_values();
+          for (auto&& r : mln::ranges::rows(vals))
+            for (auto&& v : r)
+            {
+              wtext = std::max(wtext, frmter(v));
+            }
+        }
+        else
+        {
+          mln_foreach (V v, ima.values())
+            wtext = std::max(wtext, frmter(v));
+        }
 
         os << domain << "(" << typeid(V).name() << ")" << std::endl;
         os.width(4);
@@ -107,7 +172,14 @@ namespace mln
             for (p[2] = domain.pmin[2]; p[2] < domain.pmax[2]; ++p[2])
             {
               os << std::setw(wtext);
-              format(os, ima(p)) << " ";
+              if constexpr (mln::is_a<Image, mln::experimental::Image>())
+              {
+                format(os, (*const_cast<Image*>(&ima))(p)) << " ";
+              }
+              else
+              {
+                format(os, ima(p)) << " ";
+              }
             }
             os << std::endl;
           }
@@ -127,8 +199,21 @@ namespace mln
 
         int               wtext = 0;
         frmt_max_width<V> frmter;
-        mln_foreach (V v, ima.values())
-          wtext = std::max(wtext, frmter(v));
+
+        if constexpr (mln::is_a<Image, mln::experimental::Image>())
+        {
+          auto vals = ima.new_values();
+          for (auto&& r : mln::ranges::rows(vals))
+            for (auto&& v : r)
+            {
+              wtext = std::max(wtext, frmter(v));
+            }
+        }
+        else
+        {
+          mln_foreach (V v, ima.values())
+            wtext = std::max(wtext, frmter(v));
+        }
 
         os << domain << "(" << typeid(V).name() << ")" << std::endl;
         os.width(4);
@@ -140,7 +225,14 @@ namespace mln
           for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1])
           {
             os << std::setw(wtext);
-            format(os, ima.at(p)) << " ";
+            if constexpr (mln::is_a<Image, mln::experimental::Image>())
+            {
+              format(os, const_cast<Image*>(&ima)->at(p)) << " ";
+            }
+            else
+            {
+              format(os, ima.at(p)) << " ";
+            }
           }
           os << std::endl;
         }
@@ -159,5 +251,24 @@ namespace mln
     {
       internal::imprint_with_border(exact(ima), exact(ima).domain(), os);
     }
-  } // namespace io
+
+    namespace experimental
+    {
+      template <typename InputImage>
+      void imprint(InputImage ima, std::ostream& os)
+      {
+        static_assert(mln::is_a<InputImage, mln::experimental::Image>());
+
+        internal::imprint(ima, ima.domain(), os);
+      }
+
+      template <typename InputImage>
+      void imprint_with_border(InputImage ima, std::ostream& os)
+      {
+        static_assert(mln::is_a<InputImage, mln::experimental::Image>());
+
+        internal::imprint_with_border(ima, ima.domain(), os);
+      }
+    } // namespace experimental
+  }   // namespace io
 } // namespace mln

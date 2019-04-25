@@ -3,8 +3,8 @@
 #include <apps/tos/croutines.hpp>
 
 #include <mln/accu/accumulators/mean.hpp>
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/image2d.hpp>
-#include <mln/core/math_ops.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 
 

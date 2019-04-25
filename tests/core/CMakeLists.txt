@@ -18,10 +18,18 @@ add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
 # test Views
 add_core_test(${test_prefix}view_adaptor     image/view/adaptor.cpp)
-add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
-add_core_test(${test_prefix}view_filter      image/view/filter.cpp)
+add_core_test(${test_prefix}view_cast        image/view/cast.cpp)
+add_core_test(${test_prefix}view_channel     image/view/channel.cpp)
 add_core_test(${test_prefix}view_clip        image/view/clip.cpp)
+add_core_test(${test_prefix}view_filter      image/view/filter.cpp)
 add_core_test(${test_prefix}view_mask        image/view/mask.cpp)
+add_core_test(${test_prefix}view_maths_comps image/view/maths_components.cpp)
+add_core_test(${test_prefix}view_maths_reds  image/view/maths_reductions.cpp)
+add_core_test(${test_prefix}view_maths_norms image/view/maths_norms.cpp)
+add_core_test(${test_prefix}view_maths_dists image/view/maths_distances.cpp)
+add_core_test(${test_prefix}view_ops         image/view/operators.cpp)
+add_core_test(${test_prefix}view_rgb         image/view/rgb.cpp)
+add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
 add_core_test(${test_prefix}view_zip         image/view/zip.cpp)
 
 
@@ -33,7 +41,6 @@ add_core_test(${test_prefix}transformed_image       image/morphers/transformed_i
 add_core_test(${test_prefix}filtered_image          image/morphers/filtered_image.cpp)
 add_core_test(${test_prefix}zip_image               image/zip_image.cpp)
 add_core_test(${test_prefix}sub_image               image/sub_image.cpp)
-add_core_test(${test_prefix}image_ops               image/image_ops.cpp)
 add_core_test(${test_prefix}image_routines          image/image_routines.cpp)
 add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
 add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)

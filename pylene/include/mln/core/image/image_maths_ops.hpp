@@ -1,8 +1,8 @@
 #pragma once
 
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/image_expr.hpp>
 #include <mln/core/image/image_ops.hpp>
-#include <mln/core/math_ops.hpp>
 
 namespace mln
 {

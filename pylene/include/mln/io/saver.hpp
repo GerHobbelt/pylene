@@ -69,7 +69,7 @@ namespace mln
     void Saver<I>::save_experimental(I ima, PluginWriter* plugin, bool permissive) const
     {
       static_assert(is_a<I, mln::experimental::Image>());
-      
+
       if (not plugin->can_write(typeid(mln_value(I))))
       {
         std::string msg = "The plugin does not support writing " + internal::demangle(typeid(mln_value(I)).name());
@@ -89,7 +89,7 @@ namespace mln
 
       // FIXME: Oh my! So dirty!
       // To be fixed with new io facility based on type-erased image for python
-      if constexpr (is_a<I, experimental::Image>{})
+      if constexpr (mln::is_a<I, mln::experimental::Image>{})
       {
         for (auto v : const_cast<I*>(&ima)->new_values())
         {

@@ -8,8 +8,17 @@ Forsee to add pdim (point) and vdim (value) for dimension constant in iamge conc
 
 .. toctree::
    :hidden:
-
+   
+   view/cast
+   view/clip
+   view/channel
+   view/filter
+   view/mask
+   view/maths
+   view/operators
+   view/rgb
    view/transform
+   view/zip
 
 
 .. contents::

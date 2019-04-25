@@ -7,7 +7,6 @@
 #include <mln/core/image/image_ops.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/transform.hpp>
-
 #include <mln/io/imprint.hpp>
 
 #include <boost/tuple/tuple_io.hpp>
@@ -117,6 +116,18 @@ TEST(Core, BinaryOperator_SameTypes)
   ASSERT_TRUE(mln::all_of(g1 == ref));
   ASSERT_TRUE(mln::all_of(g2 == ref));
   ASSERT_TRUE(mln::all_of(g3 == ref));
+}
+
+TEST(Core, BinaryOperator_EqualFP)
+{
+  using namespace mln;
+  using namespace mln::view::ops;
+
+  image2d<double> ima = {{1.015, 2.015, 3.015}, {4.015, 5.015, 6.015}};
+  image2d<double> ref = {{1.016, 2.016, 3.016}, {4.016, 5.016, 6.016}};
+
+  ASSERT_TRUE(mln::all_of(equalFP(ima, ref, 10e-3)));
+  ASSERT_TRUE(mln::all_of(not equalFP(ima, ref, 10e-5)));
 }
 
 TEST(Core, BinaryOperators_MixedTypes)

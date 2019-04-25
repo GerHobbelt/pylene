@@ -22,7 +22,7 @@
 #include <mln/core/image/private/image_traits.hpp>
 
 #include <mln/core/image/image_expr.hpp>
-#include <mln/core/image/image_math_ops.hpp>
+#include <mln/core/image/image_maths_ops.hpp>
 #include <mln/core/image/image_ops.hpp>
 
 #include <mln/core/image/image_routines.hpp>

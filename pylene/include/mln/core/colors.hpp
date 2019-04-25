@@ -44,14 +44,18 @@ namespace mln
   template <typename T>
   using rgb = internal::vec_base<T, 3, rgb_tag>;
 
-  typedef rgb<uint8>  rgb8;
-  typedef rgb<uint16> rgb16;
+  using rgb8         = rgb<uint8>;
+  using signed_rgb8  = rgb<int8>;
+  using rgb16        = rgb<uint16>;
+  using signed_rgb16 = rgb<int16>;
 
   template <typename T>
   using bgr = internal::vec_base<T, 3, bgr_tag>;
 
-  typedef bgr<uint8>  bgr8;
-  typedef bgr<uint16> bgr16;
+  using bgr8         = bgr<uint8>;
+  using signed_bgr8  = bgr<int8>;
+  using bgr16        = bgr<uint16>;
+  using signed_bgr16 = bgr<int16>;
 
   template <class I>
   internal::transformed_image<I, dyn_getter, false> channel(Image<I>&& f, int k)

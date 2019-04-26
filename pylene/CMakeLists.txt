@@ -12,27 +12,27 @@ add_library(Pylene)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
   target_link_libraries(Pylene INTERFACE tbb)
-else()
+else ()
   set(PYLENE_USE_TBB OFF)
   #FIXME use a config file
   target_compile_definitions(Pylene INTERFACE MLN_NO_TBB)
-endif()
+endif ()
 
 # FIXME: still useful ?
 if (UNIX AND NOT APPLE)
-   target_link_libraries(Pylene INTERFACE rt)
-endif()
+  target_link_libraries(Pylene INTERFACE rt)
+endif ()
 
 
 # Set dependancies
 target_include_directories(Pylene PUBLIC
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-   $<INSTALL_INTERFACE:include>)
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_include_directories(Pylene PUBLIC ${FreeImage_INCLUDE_DIRS})
 set_property(TARGET Pylene APPEND
-  PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
+             PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
 target_link_libraries(Pylene PUBLIC range-v3)
 
 
@@ -41,12 +41,12 @@ file(GLOB_RECURSE sources "include/mln/*.hpp")
 target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
-  src/core/se/disc.cpp
-  src/core/se/periodic_line2d.cpp
-  src/core/se/rect2d.cpp
-  src/core/se/mask2d.cpp
-  src/core/trace.cpp
-  )
+               src/core/se/disc.cpp
+               src/core/se/periodic_line2d.cpp
+               src/core/se/rect2d.cpp
+               src/core/se/mask2d.cpp
+               src/core/trace.cpp
+               )
 
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_17)
@@ -57,8 +57,7 @@ if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
   find_package(cmcstl2 REQUIRED)
   target_link_libraries(Pylene PUBLIC stl2)
   target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-endif()
-
+endif ()
 
 
 # IDE configuration
@@ -66,35 +65,34 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 
 
-
 add_library(Pylene::Pylene ALIAS Pylene)
 install(TARGETS Pylene
-  EXPORT PyleneTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  INCLUDES DESTINATION include)
+        EXPORT PyleneTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        INCLUDES DESTINATION include)
 
 write_basic_package_version_file(
     PyleneConfigVersion.cmake
     VERSION ${PACKAGE_VERSION}
     COMPATIBILITY AnyNewerVersion
-    )
+)
 
 configure_file(
-  PyleneConfig.cmake.in
-  PyleneConfig.cmake
-  @ONLY
-  )
+    PyleneConfig.cmake.in
+    PyleneConfig.cmake
+    @ONLY
+)
 
 install(EXPORT PyleneTargets
-  FILE PyleneTargets.cmake
-  NAMESPACE Pylene::
-  DESTINATION lib/cmake/pylene
-  )
+        FILE PyleneTargets.cmake
+        NAMESPACE Pylene::
+        DESTINATION lib/cmake/pylene
+        )
 install(DIRECTORY include/mln
-  DESTINATION include)
+        DESTINATION include)
 
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake
-  DESTINATION lib/cmake/pylene )
+        ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake
+        DESTINATION lib/cmake/pylene)

@@ -26,7 +26,6 @@ namespace mln
   /******************************************/
 
 
-
   template <class I>
   class extended_by_value_view : public image_adaptor<I>, public experimental::Image<extended_by_value_view<I>>
   {
@@ -111,6 +110,6 @@ namespace mln
     {
       return {std::move(image), std::move(value)};
     }
-  };
+  }; // namespace view
 
-}
+} // namespace mln

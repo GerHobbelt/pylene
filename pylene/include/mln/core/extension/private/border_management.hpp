@@ -49,7 +49,8 @@ namespace mln::extension
   {
   public:
     template <class I, class SE>
-    [[gnu::noinline]] void manage(I&& f, const experimental::StructuringElement<SE>& se_) const {
+    [[gnu::noinline]] void manage(I&& f, const experimental::StructuringElement<SE>& se_) const
+    {
       static_assert(mln::is_a<std::remove_reference_t<I>, experimental::Image>::value);
 
       const SE& se = static_cast<const SE&>(se_);
@@ -84,36 +85,37 @@ namespace mln::extension
 
     template <class InputImage, class SE>
     [[gnu::noinline]] std::optional<mln::extended_by_value_view<std::decay_t<InputImage>>>
-        manage(InputImage&& f, const experimental::StructuringElement<SE>& se_) const {
-          using I = std::remove_reference_t<InputImage>;
-          static_assert(mln::is_a<I, experimental::Image>::value);
+        manage(InputImage&& f, const experimental::StructuringElement<SE>& se_) const
+    {
+      using I = std::remove_reference_t<InputImage>;
+      static_assert(mln::is_a<I, experimental::Image>::value);
 
-          const SE& se = static_cast<const SE&>(se_);
+      const SE& se = static_cast<const SE&>(se_);
 
-          auto* val = std::any_cast<image_value_t<I>>(&m_value);
-          if (!val)
-            throw std::runtime_error(
-                "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
+      auto* val = std::any_cast<image_value_t<I>>(&m_value);
+      if (!val)
+        throw std::runtime_error(
+            "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
 
-          if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_fill::value)
-          {
-            mln::trace::warn("[Performance] The image has no extension or does not support filling.");
-            return view::extend_with_value(f, *val);
-          }
-          else
-          {
-            if (mln::extension::need_adjust(f, se))
-            {
-              mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-              return view::extend_with_value(f, *val);
-            }
-            else
-            {
-              f.extension().fill(*val);
-              return std::nullopt;
-            }
-          }
+      if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_fill::value)
+      {
+        mln::trace::warn("[Performance] The image has no extension or does not support filling.");
+        return view::extend_with_value(f, *val);
+      }
+      else
+      {
+        if (mln::extension::need_adjust(f, se))
+        {
+          mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
+          return view::extend_with_value(f, *val);
         }
+        else
+        {
+          f.extension().fill(*val);
+          return std::nullopt;
+        }
+      }
+    }
   };
 
   namespace bm

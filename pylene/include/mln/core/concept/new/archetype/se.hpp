@@ -21,7 +21,7 @@ namespace mln::archetypes
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif
-        struct StructuringElement
+    struct StructuringElement
     {
       using category     = adaptative_neighborhood_tag;
       using incremental  = std::false_type;
@@ -87,4 +87,5 @@ namespace mln::archetypes
 
   template <class P = Point, class Pix = PixelT<P>>
   using IncrementalStructuringElement = details::AsSE<details::IncrementalStructuringElement<P, Pix>>;
+
 } // namespace mln::archetypes

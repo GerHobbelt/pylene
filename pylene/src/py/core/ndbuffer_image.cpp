@@ -87,43 +87,43 @@ namespace mln
     // Set domain and extension
     for (int k = 0; k < dim; ++k)
     {
-      m_domain.begin[k] = topleft[k];
-      m_domain.end[k]   = topleft[k] + sizes[k];
-      m_vbox.begin[k]   = m_domain.begin[k] - border;
-      m_vbox.end[k]     = m_domain.end[k] + border;
+      m_axes[k].domain_begin = topleft[k];
+      m_axes[k].domain_end   = topleft[k] + sizes[k];
+      m_axes[k].vbox_begin   = m_axes[k].domain_begin - border;
+      m_axes[k].vbox_end     = m_axes[k].domain_end + border;
     }
 
     // Compute strides
     if (strides == nullptr)
     {
-      m_strides[0] = 1;
+      m_axes[0].stride = 1;
       for (int k = 1; k < dim; ++k)
-        m_strides[k] = (sizes[k - 1] + 2 * border) * m_strides[k - 1];
+        m_axes[k].stride = (sizes[k-1] + 2 * border) * m_axes[k-1].stride;
     }
     else // Or copy strides
     {
       for (int k = 0; k < dim; ++k)
-        m_strides[k] = strides[k];
+        m_axes[k].stride = strides[k];
     }
 
     // Set out-of-dim values
     for (int k = dim; k < DEFAULT_DIM; ++k)
     {
-      m_domain.begin[k] = 0;
-      m_domain.end[k]   = 1;
-      m_vbox.begin[k]   = 0;
-      m_vbox.end[k]     = 1;
-      m_strides[k]      = 0;
+      m_axes[k].domain_begin = 0;
+      m_axes[k].domain_end   = 1;
+      m_axes[k].vbox_begin   = 0;
+      m_axes[k].vbox_end     = 1;
+      m_axes[k].stride       = 0;
     }
 
     // Allocate (or get the buffer)
-    std::size_t size = (sizes[dim - 1] + 2 * border) * m_strides[dim - 1];
-    m_buffer         = __allocate(sample_type, size, params, m_data); // dynamic behavior
+    std::size_t size = (sizes[dim - 1] + 2 * border) * m_axes[dim - 1].stride;
+    m_buffer = __allocate(sample_type, size, params, m_data); // dynamic behavior
 
     // Set buffer to (0,0) position
-    std::ptrdiff_t x = -m_vbox.begin[0];
+    std::ptrdiff_t x = -m_axes[0].vbox_begin;
     for (int k = 1; k < m_pdim; ++k)
-      x += -m_vbox.begin[k] * m_strides[k];
+      x += -m_axes[k].vbox_begin * m_axes[k].stride;
     m_buffer += x * get_sample_type_id_traits(sample_type).size();
   }
 
@@ -146,8 +146,6 @@ namespace mln
   {
     int topleft[PYLENE_NDBUFFER_MAX_DIM] = {0};
     int sizes[PYLENE_NDBUFFER_MAX_DIM]   = {width, height, depth};
-    for (int i = 3; i < PYLENE_NDBUFFER_MAX_DIM; ++i)
-      sizes[i] = 1;
 
     int dim = 1;
     if (depth != 1)
@@ -195,7 +193,16 @@ namespace mln
     if (params.border == -1)
       params.border = other.border();
 
-    resize(other.m_sample_type, other.m_domain, std::move(params));
+    int d = other.m_pdim;
+    int topleft[PYLENE_NDBUFFER_MAX_DIM];
+    int sizes[PYLENE_NDBUFFER_MAX_DIM];
+    for (int i = 0; i < d; ++i)
+    {
+      topleft[i] = other.m_axes[i].domain_begin;
+      sizes[i] = other.m_axes[i].domain_end - other.m_axes[i].domain_begin;
+    }
+
+    resize(other.m_sample_type, d, topleft, sizes, std::move(params));
   }
 
 
@@ -232,20 +239,20 @@ namespace mln
 
   int ndbuffer_image::pdim() const { return m_pdim; }
 
-  int ndbuffer_image::width() const { return m_domain.end[0] - m_domain.begin[0]; }
+  int ndbuffer_image::width() const {return m_axes[0].domain_end - m_axes[0].domain_begin; }
 
-  int ndbuffer_image::height() const { return m_domain.end[1] - m_domain.begin[1]; }
+  int ndbuffer_image::height() const { return m_axes[1].domain_end - m_axes[1].domain_begin; }
 
-  int ndbuffer_image::depth() const { return m_domain.end[2] - m_domain.begin[2]; }
+  int ndbuffer_image::depth() const { return m_axes[2].domain_end - m_axes[2].domain_begin; }
 
-  int ndbuffer_image::size(int k) const { return (k >= m_pdim) ? 1 : (m_domain.end[k] - m_domain.begin[k]); }
+  int ndbuffer_image::size(int k) const { return (k >= m_pdim) ? 1 : (m_axes[k].domain_end - m_axes[k].domain_begin); }
 
   int ndbuffer_image::border() const
   {
-    int border = std::max(m_domain.begin[0] - m_vbox.begin[0], m_vbox.end[0] - m_domain.end[0]);
+    int border = std::max(m_axes[0].domain_begin - m_axes[0].vbox_begin, m_axes[0].vbox_end - m_axes[0].domain_end);
     for (int k = 1; k < m_pdim; ++k)
     {
-      int x = std::max(m_domain.begin[k] - m_vbox.begin[k], m_vbox.end[k] - m_domain.end[k]);
+      int x = std::max(m_axes[k].domain_begin - m_axes[k].vbox_begin, m_axes[k].vbox_end - m_axes[k].domain_end);
       if (x < border)
         border = x;
     }
@@ -260,18 +267,24 @@ namespace mln
   {
     std::ptrdiff_t x = coords[0];
     for (int k = 1; k < m_pdim; ++k)
-      x += coords[k] * m_strides[k];
+      x += coords[k] * m_axes[k].stride;
     return m_buffer + (x * get_sample_type_id_traits(m_sample_type).size());
   }
 
-  std::byte* ndbuffer_image::buffer() const { return this->__at(m_domain.begin.data); }
+  std::byte* ndbuffer_image::buffer() const
+  {
+    int coords[PYLENE_NDBUFFER_MAX_DIM];
+    for (int k = 0; k < m_pdim; ++k)
+      coords[k] = m_axes[k].domain_begin;
+    return this->__at(coords);
+  }
 
   std::ptrdiff_t ndbuffer_image::byte_stride(int dim) const
   {
     mln_precondition(m_sample_type != sample_type_id::OTHER);
-    return m_strides[dim] * get_sample_type_id_traits(m_sample_type).size();
+    return m_axes[dim].stride * get_sample_type_id_traits(m_sample_type).size();
   }
 
-  std::ptrdiff_t ndbuffer_image::stride(int dim) const { return m_strides[dim]; }
+  std::ptrdiff_t ndbuffer_image::stride(int dim) const { return m_axes[dim].stride; }
 
 } // namespace mln

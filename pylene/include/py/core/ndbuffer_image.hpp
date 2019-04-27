@@ -157,14 +157,20 @@ namespace mln
                 std::ptrdiff_t strides[], const image_build_params& params);
 
   private:
-    std::shared_ptr<internal::ndbuffer_image_data> m_data;
+    struct axis_info_t
+    {
+      std::ptrdiff_t stride;
+      int domain_begin;
+      int domain_end;
+      int vbox_begin;
+      int vbox_end;
+    };
 
+
+    std::shared_ptr<internal::ndbuffer_image_data> m_data;
     sample_type_id m_sample_type; // Sample type of the data
     int            m_pdim;        // Dim of the domain
-
-    Box            m_domain; // Domain
-    Box            m_vbox;   // Extension
-    std::ptrdiff_t m_strides[PYLENE_NDBUFFER_DEFAULT_DIM];
+    axis_info_t    m_axes[PYLENE_NDBUFFER_DEFAULT_DIM];
     std::byte*     m_buffer; // Pointer to origin (0,0) (might be out of range)
   };
 

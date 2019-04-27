@@ -9,7 +9,6 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 
 
 add_library(Pylene)
-add_library(Pylene-python)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
   target_link_libraries(Pylene INTERFACE tbb)
@@ -53,19 +52,10 @@ target_sources(Pylene PRIVATE
   src/py/core/any_span.cpp
   )
 
-target_sources(Pylene-python PRIVATE
-  src/py/core/image_format.cpp
-  src/py/core/ndbuffer_image_data.cpp
-  src/py/core/ndbuffer_image.cpp
-  )
 
-target_include_directories(Pylene-python PUBLIC
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-   $<INSTALL_INTERFACE:include>)
 
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_17)
-target_compile_features(Pylene-python PUBLIC cxx_std_17)
 
 # Add concepts support for gcc > 7.2 with -fconcepts
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
@@ -82,7 +72,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 
 
+# Pylene-python lib
+add_library(Pylene-python)
+target_sources(Pylene-python PRIVATE
+  src/py/core/image_format.cpp
+  src/py/core/ndbuffer_image_data.cpp
+  src/py/core/ndbuffer_image.cpp
+  )
+target_include_directories(Pylene-python PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+   $<INSTALL_INTERFACE:include>)
+target_compile_features(Pylene-python PUBLIC cxx_std_17)
+target_link_libraries(Pylene-python PUBLIC Pylene)
 
+
+# EXPORT and INSTALL
 add_library(Pylene::Pylene ALIAS Pylene)
 install(TARGETS Pylene
   EXPORT PyleneTargets

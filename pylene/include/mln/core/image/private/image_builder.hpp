@@ -1,5 +1,6 @@
 #pragma once
 #include <mln/core/concept/new/se.hpp>
+#include <mln/core/concept/neighborhood.hpp>
 #include <mln/core/image/private/image_traits.hpp>
 
 #include <any>

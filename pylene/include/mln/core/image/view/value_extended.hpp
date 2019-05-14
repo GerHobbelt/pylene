@@ -1,23 +1,22 @@
 #pragma once
 
 #include <mln/core/extension/extension_traits.hpp>
-
+#include <mln/core/extension/private/by_value.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
-#include <mln/core/image/morphers/extended_by_value_image.hpp> // mln::by_value_extension<V>
-
 #include <range/v3/utility/common_type.hpp> // common_reference
+
 
 namespace mln
 {
   template <class I>
-  class extended_by_value_view;
+  class value_extended_view;
 
   namespace view
   {
     template <class I>
-    extended_by_value_view<I> extend_with_value(I image, image_value_t<I> value);
+    value_extended_view<I> value_extended(I image, image_value_t<I> value);
   };
 
 
@@ -27,37 +26,43 @@ namespace mln
 
 
   template <class I>
-  class extended_by_value_view : public image_adaptor<I>, public experimental::Image<extended_by_value_view<I>>
+  class value_extended_view : public image_adaptor<I>, public experimental::Image<value_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
   public:
-    using extension_category = extension::value_extension_tag;
-    using extension_type     = by_value_extension<image_value_t<I>>;
-    using reference          = ::ranges::common_reference_t<image_reference_t<I>, image_value_t<I>&>;
+    using extension_category = extension::experimental::value_tag;
+    using extension_type     = extension::by_value<image_value_t<I>>;
+    using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
+    using typename image_adaptor<I>::domain_type;
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
-      using reference = extended_by_value_view::reference;
+      using reference = value_extended_view::reference;
 
-      reference val() const { return m_ima->domain().has(this->base().point()) ? this->base().val() : m_ima->m_value; }
+      reference val() const { return m_dom.has(this->base().point()) ? this->base().val() : m_extptr->value(); }
 
-      new_pixel_type(image_pixel_t<I> px, extended_by_value_view* ima)
+      new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
-        , m_ima{ima}
+        , m_extptr{ext}
+        , m_dom{std::move(dom)}
       {
       }
 
     private:
-      extended_by_value_view* m_ima;
+      extension_type* m_extptr;
+      domain_type     m_dom;
     };
 
+  private:
+    extension_type m_ext;
 
-    extended_by_value_view(I ima, image_value_t<I> value)
+  public:
+    value_extended_view(I ima, image_value_t<I> value)
       : base_t{std::move(ima)}
-      , m_value{std::move(value)}
+      , m_ext{std::move(value)}
     {
     }
 
@@ -73,7 +78,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->domain().has(p) ? this->base().at(p) : m_value;
+      return this->domain().has(p) ? this->base().at(p) : m_ext.value();
     }
 
     template <class J = I>
@@ -85,28 +90,25 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), this};
+      return {this->base().new_pixel(p), &m_ext, this->domain()};
     }
     /// \}
 
     auto new_pixels()
     {
-      return ranges::view::transform(this->base().new_pixels(), [ptr = this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), ptr};
+      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
+        return {std::move(px), &this->m_ext, this->domain()};
       });
     }
 
-    extension_type extension() { return {&m_value}; }
-
-  private:
-    image_value_t<I> m_value;
+    const extension_type& extension() { return m_ext; }
   };
 
 
   namespace view
   {
     template <class I>
-    extended_by_value_view<I> extend_with_value(I image, image_value_t<I> value)
+    value_extended_view<I> value_extended(I image, image_value_t<I> value)
     {
       return {std::move(image), std::move(value)};
     }

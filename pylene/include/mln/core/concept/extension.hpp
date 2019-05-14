@@ -35,7 +35,7 @@ namespace mln
 
       BOOST_CONCEPT_USAGE(MirrorableExtension)
       {
-        void (E::*ptr)() = &E::mirror;
+        void (E::*ptr)(std::size_t) = &E::mirror;
         (void)ptr;
 
         check(support_mirror());

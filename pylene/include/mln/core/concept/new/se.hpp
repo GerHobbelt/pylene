@@ -16,7 +16,7 @@ namespace mln::experimental
   struct StructuringElement
   {
   };
-}
+} // namespace mln::experimental
 
 
 namespace mln::concepts

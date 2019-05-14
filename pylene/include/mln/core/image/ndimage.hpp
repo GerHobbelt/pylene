@@ -3,17 +3,17 @@
 /// \file
 
 #include <mln/core/assert.hpp>
+#include <mln/core/concept/new/neighborhood.hpp>
+#include <mln/core/concept/new/se.hpp>
+#include <mln/core/concept/new/values.hpp>
 #include <mln/core/domain/box.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage_iter.hpp>
-#include <mln/core/image/private/ndimage_pixel.hpp>
 #include <mln/core/image/private/image_builder.hpp>
+#include <mln/core/image/private/ndimage_pixel.hpp>
 #include <mln/core/image_category.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
-
-#include <mln/core/concept/new/values.hpp>
-
 #include <mln/core/rangev3/multi_span.hpp>
 
 #include <type_traits>
@@ -77,14 +77,21 @@ namespace mln
       typedef point<short, dim> P;
 
     public:
-      typedef T               value_type;
-      typedef std::true_type  support_fill;
-      typedef std::true_type  support_mirror;
-      typedef std::false_type support_periodize;
+      using value_type        = T;
+      using support_fill      = std::true_type;
+      using support_mirror    = std::true_type;
+      using support_periodize = std::false_type; // TODO
+      using support_clamp     = std::true_type;
+      using is_finite         = std::true_type;
 
       ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border);
+
+      template <typename SE>
+      bool fit(const SE& se) const;
       void fill(const T& v);
-      void mirror();
+      void mirror(std::size_t padding = 0);
+      // void periodize(); // TODO
+      // void clamp(); // TODO
 
     private:
       template <unsigned d>
@@ -100,10 +107,10 @@ namespace mln
       typename std::enable_if<(d == dim)>::type _fillall(char* ptr, const T& v);
 
       template <unsigned d>
-      typename std::enable_if<(d < dim)>::type _mirror(char* ptr);
+      typename std::enable_if<(d < dim)>::type _mirror(char* ptr, std::size_t /*padding*/);
 
       template <unsigned d>
-      typename std::enable_if<(d == dim)>::type _mirror(char* ptr);
+      typename std::enable_if<(d == dim)>::type _mirror(char* ptr, std::size_t /*padding*/);
 
       template <unsigned d>
       typename std::enable_if<(d < dim)>::type _copy_line(char* src, char* dest);
@@ -344,7 +351,7 @@ namespace mln
     /// \name Concrete-related Image Methods
     /// \{
 
-    image_builder<concrete_type, E>  concretize() const { return {exact(*this)}; }
+    image_builder<concrete_type, E> concretize() const { return {exact(*this)}; }
 
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -352,7 +359,10 @@ namespace mln
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    image_builder<ch_value_type<Val>, E>  ch_value() const { return {exact(*this)}; }
+    image_builder<ch_value_type<Val>, E> ch_value() const
+    {
+      return {exact(*this)};
+    }
 
     /// \brief Resize the image to fit \p domain.
     ///
@@ -417,7 +427,6 @@ namespace mln
     /// \param[in] delta The domain inflation value. It can be negative.
     /// \precondition -amin(shape() / 2) <= delta <= border
     void inflate_domain(int delta);
-
 
 
     /// \brief clip an image to a domain
@@ -1090,25 +1099,42 @@ namespace mln
     }
 
     template <typename T, unsigned dim>
+    template <typename SE>
+    bool ndimage_extension<T, dim>::fit(const SE& se) const
+    {
+      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>() || mln::is_a<SE, mln::Neighborhood>());
+
+      if constexpr (std::is_convertible_v<typename SE::category, dynamic_neighborhood_tag>)
+      {
+        return se.radial_extent() <= m_border;
+      }
+      else
+      {
+        return true; // TODO check wether default value should be true false or error
+      }
+    }
+
+    template <typename T, unsigned dim>
     void ndimage_extension<T, dim>::fill(const T& v)
     {
       _fill<0>(m_ptr, v);
     }
 
     template <typename T, unsigned dim>
-    void ndimage_extension<T, dim>::mirror()
+    void ndimage_extension<T, dim>::mirror(std::size_t padding)
     {
-      _mirror<0>(m_ptr);
+      _mirror<0>(m_ptr, padding);
     }
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_mirror(char* ptr)
+    typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_mirror(char* ptr, std::size_t padding)
     {
+      // FIXME: padding param is ignored for now
       char* pori = ptr + m_border * m_strides[d];
       char* p    = pori;
       for (int i = 0; i < m_shp[d]; ++i, p += m_strides[d])
-        _mirror<d + 1>(p);
+        _mirror<d + 1>(p, padding);
 
       char* src1  = pori;
       char* dest1 = pori - m_strides[d];
@@ -1128,7 +1154,7 @@ namespace mln
 
     template <typename T, unsigned dim>
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_mirror(char* ptr)
+    typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_mirror(char* ptr, std::size_t /*padding*/)
     {
       (void)ptr;
     }

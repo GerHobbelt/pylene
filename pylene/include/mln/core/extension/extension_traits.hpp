@@ -29,7 +29,29 @@ namespace mln
     {
     };
 
-  } // namespace extension
+    namespace experimental
+    {
+
+      struct none_tag
+      {
+      };
+      struct value_tag
+      {
+      };
+      struct pattern_tag
+      {
+      };
+      struct image_tag
+      {
+      };
+      struct buffer_tag
+      {
+      };
+      struct compound_tag
+      {
+      };
+    } // namespace experimental
+  }   // namespace extension
 
   /******************************************/
   /****              Traits              ****/
@@ -42,5 +64,4 @@ namespace mln
     typedef typename E::support_mirror    support_mirror;
     typedef typename E::support_periodize support_periodize;
   };
-
 } // namespace mln

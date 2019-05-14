@@ -25,7 +25,7 @@ TEST(Py, stretch)
   delete[] buffer;
 }
 
-TEST(Py, stretch_other)
+TEST(Py, stretch_invalid)
 {
   // FIXME should properly handle error
   //    auto ntima = image2d<>(3, 3, Info::OTHER);

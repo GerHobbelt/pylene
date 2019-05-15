@@ -2,7 +2,7 @@
 
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/archetype/point.hpp>
-#include <mln/core/concept/new/neighborhood.hpp>
+#include <mln/core/concept/new/neighborhoods.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
 
 #include <range/v3/iterator_range.hpp>

@@ -1,3 +1,3 @@
 #pragma once
 
-#include <mln/core/concept/new/se.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>

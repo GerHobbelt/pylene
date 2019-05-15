@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/se.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -12,8 +12,12 @@ namespace mln::extension
   template <typename V>
   struct by_value
   {
-    using value_type = V;
-    using is_finite  = std::false_type;
+    using value_type        = V;
+    using support_fill      = std::true_type;
+    using support_mirror    = std::false_type;
+    using support_periodize = std::false_type;
+    using support_clamp     = std::false_type;
+    using is_finite         = std::false_type;
 
     by_value(V val)
       : m_val(std::move(val))

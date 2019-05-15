@@ -3,8 +3,8 @@
 /// \file
 
 #include <mln/core/assert.hpp>
-#include <mln/core/concept/new/neighborhood.hpp>
-#include <mln/core/concept/new/se.hpp>
+#include <mln/core/concept/new/neighborhoods.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/concept/new/values.hpp>
 #include <mln/core/domain/box.hpp>
 #include <mln/core/image/image.hpp>
@@ -87,9 +87,10 @@ namespace mln
       ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border);
 
       template <typename SE>
-      bool fit(const SE& se) const;
-      void fill(const T& v);
-      void mirror(std::size_t padding = 0);
+      bool        fit(const SE& se) const;
+      std::size_t size() const;
+      void        fill(const T& v);
+      void        mirror(std::size_t padding = 0);
       // void periodize(); // TODO
       // void clamp(); // TODO
 
@@ -1112,6 +1113,12 @@ namespace mln
       {
         return true; // TODO check wether default value should be true false or error
       }
+    }
+
+    template <typename T, unsigned dim>
+    std::size_t ndimage_extension<T, dim>::size() const
+    {
+      return m_border;
     }
 
     template <typename T, unsigned dim>

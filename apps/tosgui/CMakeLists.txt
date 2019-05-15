@@ -42,4 +42,6 @@ if (Qt4_FOUND AND QWT_FOUND)
                         ${QT_LIBRARIES}
                         )
 
+  add_dependencies(build-apps tosgui toscgui)
+
 endif (Qt4_FOUND AND QWT_FOUND)

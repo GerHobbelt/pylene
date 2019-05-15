@@ -11,3 +11,5 @@ add_custom_target(doc
                   COMMAND sphinx-build -b html ${CMAKE_CURRENT_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/build
                   DEPENDS build-images
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doxyxml/index.xml")
+
+add_dependencies(build-doc doc)

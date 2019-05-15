@@ -44,11 +44,14 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build apps --config $PYLENE_CONFIGURATION
-        - cmake --build tests --config $PYLENE_CONFIGURATION
-        - cmake --build bench/tests --config $PYLENE_CONFIGURATION
-        - ctest -L UnitTests -V --schedule-random --output-on-failure
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
+        - ctest -L UnitTests --schedule-random --output-on-failure
+        - cmake --build . --target dist --config $PYLENE_CONFIGURATION
     dependencies: []
     artifacts:
         reports:
@@ -130,11 +133,10 @@ distcheck-linux-clang7-debug:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build . --target fetch-external-data
-        - cmake --build .
-                --config $PYLENE_CONFIGURATION
-                --target run-all-benchmarks
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION
+        - cmake --build . --target run-all-benchmarks --config $PYLENE_CONFIGURATION
         - ctest -L SpeedTests -V
     tags: [ "pylene-benchmarks" ]
     when: manual
@@ -188,10 +190,8 @@ distbench-linux-clang7-release:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=Release
-        - cmake --build .
-                --config Release
-                --target doc
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - cmake --build . --target build-doc --config Release
         - mkdir ../public && mv doc/build/* ../public/
     artifacts:
         name: "documentation"

@@ -15,3 +15,5 @@ set_target_properties(mumford_shah_on_tree_16 PROPERTIES COMPILE_DEFINITIONS MLN
 
 target_link_libraries(mumford_shah_on_tree_full ${TBB_LIBRARIES})
 target_link_libraries(mumford_shah_on_tree_saliency ${TBB_LIBRARIES})
+
+add_dependencies(build-apps mumford_shah_on_tree mumford_shah_on_tree_16 mumford_shah_on_tree_full mumford_shah_on_tree_saliency)

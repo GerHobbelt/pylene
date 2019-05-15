@@ -22,5 +22,6 @@ if (${QT4_FOUND})
 
   target_link_libraries(hierarchical_seg-gui ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
 
-endif (${QT4_FOUND})
+  add_dependencies(build-apps hierarchical_seg-gui hierarchical_seg-cli)
 
+endif (${QT4_FOUND})

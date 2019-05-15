@@ -22,3 +22,5 @@ target_link_libraries(leveling ${FreeImage_LIBRARIES} Pylene::Pylene)
 target_link_libraries(rgb2lab ${FreeImage_LIBRARIES} Pylene::Pylene)
 target_link_libraries(lab2rgb ${FreeImage_LIBRARIES} Pylene::Pylene)
 
+add_dependencies(build-cli  area_close closing_by_reconstruction dilate-cli leveling 
+                            area_fast_close decompose_channels recompose_channels rgb2lab lab2rgb)

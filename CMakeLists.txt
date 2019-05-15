@@ -50,6 +50,7 @@ endif (USE_DISTCC)
 
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
+option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 
 
 # Compiler configurations
@@ -82,24 +83,30 @@ endif ()
 #### Configuration of the Compiler ###
 
 # Subdirectories
+add_custom_target(build-pylene)
 add_subdirectory(pylene)
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
+  add_custom_target(build-fixtures)
   add_subdirectory(fixtures)
 
-  if (BUILD_TESTING)
+  if (PYLENE_BUILD_TESTING)
     include(CTest)
     add_custom_target(build-tests)
 
     add_subdirectory(tests EXCLUDE_FROM_ALL)
 
     if (PYLENE_BUILD_BENCHMARKS)
+      add_custom_target(build-bench)
       add_subdirectory(bench EXCLUDE_FROM_ALL)
     endif ()
   endif ()
 
+  add_custom_target(build-doc)
   add_subdirectory(doc EXCLUDE_FROM_ALL)
+  add_custom_target(build-apps)
   add_subdirectory(apps EXCLUDE_FROM_ALL)
+  add_custom_target(build-cli)
   add_subdirectory(cli EXCLUDE_FROM_ALL)
 endif ()
 

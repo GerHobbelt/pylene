@@ -14,3 +14,5 @@ set_target_properties(compute_ctos_16-cli
 target_link_libraries(compute_ctos_16-cli ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(satmaxtree-cli satmaxtree-cli.cpp $<TARGET_OBJECTS:g2-tools>)
+
+add_dependencies(build-apps g2-tools compute_ctos-cli compute_ctos-demo compute_ctos_16-cli satmaxtree-cli)

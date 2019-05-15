@@ -66,6 +66,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 
 
 add_library(Pylene::Pylene ALIAS Pylene)
+add_dependencies(build-pylene Pylene::Pylene)
+
 install(TARGETS Pylene
         EXPORT PyleneTargets
         LIBRARY DESTINATION lib

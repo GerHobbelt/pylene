@@ -25,6 +25,7 @@ External dependancies:
 * MSVC 15.8.1
 
 [![pipeline status](https://gitlab.lrde.epita.fr/olena/pylene/badges/dev/pipeline.svg)](https://gitlab.lrde.epita.fr/olena/pylene/commits/dev)
+[![coverage report](https://gitlab.lrde.epita.fr/olena/pylene/badges/dev/coverage.svg)](https://gitlab.lrde.epita.fr/olena/pylene/commits/dev)
 
 
 

@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.8.2)
-project(PYLENE)
+project(Pylene)
 
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+# Add CodeCoverage utility to CMake's module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
 
 if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
   include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
@@ -47,11 +49,9 @@ endif (USE_DISTCC)
 
 
 # CONFIGURATION OPTIONS
-
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
-
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -93,6 +93,33 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   if (PYLENE_BUILD_TESTING)
     include(CTest)
     add_custom_target(build-tests)
+
+    if (CMAKE_COMPILER_IS_GNUCXX)
+      option(PYLENE_CODE_COVERAGE "ON to enable code coverage" ON)
+      if (PYLENE_CODE_COVERAGE)
+        include(CodeCoverage)
+        APPEND_COVERAGE_COMPILER_FLAGS()
+
+        SETUP_TARGET_FOR_COVERAGE_LCOV(
+          NAME run-tests_coverage-lcov
+          EXECUTABLE ctest -L UnitTests --schedule-random --output-on-failure -j ${PROCESSOR_COUNT}
+          DEPENDENCIES build-tests
+        )
+
+        SETUP_TARGET_FOR_COVERAGE_GCOVR_XML(
+          NAME run-tests_coverage-gcovr-xml
+          EXECUTABLE ctest -L UnitTests --schedule-random --output-on-failure -j ${PROCESSOR_COUNT}
+          DEPENDENCIES build-tests
+        )
+
+        SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(
+          NAME run-tests_coverage-gcovr-html
+          EXECUTABLE ctest -L UnitTests --schedule-random --output-on-failure -j ${PROCESSOR_COUNT}
+          DEPENDENCIES build-tests
+        )
+
+      endif ()
+    endif ()
 
     add_subdirectory(tests EXCLUDE_FROM_ALL)
 

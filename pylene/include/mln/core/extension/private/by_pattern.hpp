@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/concept/new/domains.hpp>
 #include <mln/core/concept/new/structuring_elements.hpp>
 
 #include <type_traits>
@@ -8,6 +9,15 @@
 
 namespace mln::extension
 {
+
+  namespace detail
+  {
+    template <class T>
+    struct remove_cvref
+    {
+      using type = std::remove_cv_t<std::remove_reference_t<T>>;
+    };
+  } // namespace detail
 
   template <typename V>
   struct by_pattern
@@ -72,22 +82,34 @@ namespace mln::extension
     template <typename Pnt, typename Ima>
     const V& yield_mirror(Pnt pnt, const Ima& ima) const
     {
+      auto dom = ima.domain();
+
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<detail::remove_cvref<decltype(dom)>>,
+                               "Domain must be shaped to allow pattern-based extension!");
+
       (void)pnt;
-      (void)ima;
     }
 
     template <typename Pnt, typename Ima>
     const V& yield_periodize(Pnt pnt, const Ima& ima) const
     {
+      auto dom = ima.domain();
+
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<detail::remove_cvref<decltype(dom)>>,
+                               "Domain must be shaped to allow pattern-based extension!");
+
       (void)pnt;
-      (void)ima;
     }
 
     template <typename Pnt, typename Ima>
     const V& yield_clamp(Pnt pnt, const Ima& ima) const
     {
+      auto dom = ima.domain();
+
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<detail::remove_cvref<decltype(dom)>>,
+                               "Domain must be shaped to allow pattern-based extension!");
+
       (void)pnt;
-      (void)ima;
     }
 
     Pattern     m_pattern;

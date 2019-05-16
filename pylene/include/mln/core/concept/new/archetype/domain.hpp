@@ -30,4 +30,11 @@ namespace mln::archetypes
   PYLENE_CONCEPT_TS_ASSERT(mln::concepts::SizedDomain<SizedDomain>,
                            "SizedDomain archetype does not model the SizedDomain concept!");
 
+  struct ShapedDomain final : Domain
+  {
+    value_type shape() const;
+  };
+
+  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<ShapedDomain>,
+                           "ShapedDomain archetype does not model the ShapedDomain concept!");
 } // namespace mln::archetypes

@@ -33,6 +33,14 @@ namespace mln::concepts
     requires(const Dom cdom) {
       { cdom.size() } -> stl::UnsignedIntegral&&;
     };
+  
+  // ShapedDomain
+  template <typename Dom>
+  concept ShapedDomain = 
+    Domain<Dom> &&
+    requires(const Dom cdom) {
+      { cdom.shape() }  -> ::ranges::range_value_t<Dom>;
+    };
 
 #endif // PYLENE_CONCEPT_TS_ENABLED
 

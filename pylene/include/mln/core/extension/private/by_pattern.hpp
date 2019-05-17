@@ -28,7 +28,7 @@ namespace mln::extension
     using support_clamp     = std::true_type;
     using is_finite         = std::false_type;
 
-    by_pattern(Pattern p, std::size_t padding = 0)
+    explicit by_pattern(Pattern p, std::size_t padding = 0)
       : m_pattern(p)
       , m_padding(padding)
     {

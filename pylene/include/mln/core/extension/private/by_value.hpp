@@ -19,7 +19,7 @@ namespace mln::extension
     using support_clamp     = std::false_type;
     using is_finite         = std::false_type;
 
-    by_value(V val)
+    explicit by_value(V val)
       : m_val(std::move(val))
     {
     }

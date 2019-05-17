@@ -12,20 +12,48 @@
 
 namespace mln::extension
 {
-
-  template <typename V>
-  struct by_pattern
+  namespace detail
   {
-    using value_type        = V;
-    using support_fill      = std::false_type;
-    using support_mirror    = std::true_type;
-    using support_periodize = std::true_type;
-    using support_clamp     = std::true_type;
+    template <mln::extension::experimental::Pattern P, typename = void>
+    class mirror_pattern_data
+    {
+    };
+
+    template <mln::extension::experimental::Pattern P>
+    class mirror_pattern_data<P, std::enable_if_t<(P == experimental::Pattern::Mirror)>>
+    {
+    public:
+      explicit mirror_pattern_data(std::size_t padding)
+        : m_padding(padding)
+      {
+      }
+
+      std::size_t padding() const { return m_padding; }
+
+    protected:
+      std::size_t m_padding;
+    };
+  } // namespace detail
+
+  template <typename V, mln::extension::experimental::Pattern P>
+  struct by_pattern : public detail::mirror_pattern_data<P>
+  {
+    using value_type                                               = V;
+    static constexpr mln::extension::experimental::Pattern pattern = P;
+    using support_fill                                             = std::false_type;
+    using support_mirror    = std::bool_constant<(P == experimental::Pattern::Mirror)>;
+    using support_periodize = std::bool_constant<(P == experimental::Pattern::Periodize)>;
+    using support_clamp     = std::bool_constant<(P == experimental::Pattern::Clamp)>;
     using is_finite         = std::false_type;
 
-    explicit by_pattern(experimental::Pattern p, std::size_t padding = 0)
-      : m_pattern(p)
-      , m_padding(padding)
+    template <typename U = void, typename = std::enable_if_t<(P == experimental::Pattern::Mirror)>>
+    explicit by_pattern(std::size_t padding = 0)
+      : detail::mirror_pattern_data<P>{padding}
+    {
+    }
+
+    template <typename U = void, typename = std::enable_if_t<(P != experimental::Pattern::Mirror)>>
+    explicit by_pattern()
     {
     }
 
@@ -37,24 +65,28 @@ namespace mln::extension
       return true;
     }
 
-    void mirror(std::size_t padding)
+    template <typename U = void, typename = std::enable_if_t<(P == experimental::Pattern::Mirror)>>
+    void mirror(std::size_t padding = 0)
     {
-      m_pattern = experimental::Pattern::Mirror;
-      m_padding = padding;
+      this->m_padding = padding;
     }
 
-    void periodize() { m_pattern = experimental::Pattern::Periodize; }
+    template <typename U = void, typename = std::enable_if_t<(P == experimental::Pattern::Periodize)>>
+    void periodize()
+    {
+    }
 
-    void clamp() { return m_pattern = experimental::Pattern::Clamp; }
+    template <typename U = void, typename = std::enable_if_t<(P == experimental::Pattern::Clamp)>>
+    void clamp()
+    {
+    }
 
-    experimental::Pattern pattern() const { return m_pattern; }
-
-    std::size_t padding() const { return m_padding; }
+    static constexpr experimental::Pattern pattern() { return pattern; }
 
     template <typename Ima>
     const V& value(image_point_t<Ima> pnt, const Ima& ima) const
     {
-      switch (m_pattern)
+      switch (pattern)
       {
       case experimental::Pattern::Mirror:
         return value_mirror(std::move(pnt), ima);
@@ -139,9 +171,6 @@ namespace mln::extension
       using std::min;
       return {min(pnt[I], shp[I])...};
     }
-
-    experimental::Pattern m_pattern;
-    std::size_t           m_padding;
   };
 
 } // namespace mln::extension

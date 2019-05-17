@@ -10,14 +10,13 @@
 
 namespace mln
 {
-  template <class I>
+  template <class I, mln::extension::experimental::Pattern P>
   class pattern_extended_view;
 
   namespace view
   {
-    template <class I>
-    pattern_extended_view<I> pattern_extended(I image, mln::extension::experimental::Pattern pattern,
-                                              std::size_t padding = 0);
+    template <class I, mln::extension::experimental::Pattern P>
+    pattern_extended_view<I, P> pattern_extended(I image, std::size_t padding = 0);
   };
 
 
@@ -26,14 +25,14 @@ namespace mln
   /******************************************/
 
 
-  template <class I>
-  class pattern_extended_view : public image_adaptor<I>, public experimental::Image<pattern_extended_view<I>>
+  template <class I, mln::extension::experimental::Pattern P>
+  class pattern_extended_view : public image_adaptor<I>, public experimental::Image<pattern_extended_view<I, P>>
   {
     using base_t = image_adaptor<I>;
 
   public:
     using extension_category = extension::experimental::value_tag;
-    using extension_type     = extension::by_pattern<image_value_t<I>>;
+    using extension_type     = extension::by_pattern<image_value_t<I>, P>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
@@ -115,11 +114,10 @@ namespace mln
 
   namespace view
   {
-    template <class I>
-    pattern_extended_view<I> pattern_extended(I image, mln::extension::experimental::Pattern pattern,
-                                              std::size_t padding)
+    template <class I, mln::extension::experimental::Pattern P>
+    pattern_extended_view<I, P> pattern_extended(I image, std::size_t padding)
     {
-      return {std::move(image), pattern, padding};
+      return {std::move(image), padding};
     }
   }; // namespace view
 

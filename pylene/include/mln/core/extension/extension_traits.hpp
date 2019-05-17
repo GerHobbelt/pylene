@@ -31,7 +31,6 @@ namespace mln
 
     namespace experimental
     {
-
       struct none_tag
       {
       };
@@ -44,11 +43,12 @@ namespace mln
       struct image_tag
       {
       };
-      struct buffer_tag
+
+      enum class Pattern
       {
-      };
-      struct compound_tag
-      {
+        Mirror,
+        Periodize,
+        Clamp
       };
     } // namespace experimental
   }   // namespace extension

@@ -90,7 +90,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), &m_ext, this->domain()};
+      return {this->base().new_pixel(p), &this->m_ext, this->domain()};
     }
     /// \}
 

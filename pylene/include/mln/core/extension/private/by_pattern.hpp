@@ -2,6 +2,8 @@
 
 #include <mln/core/concept/new/domains.hpp>
 #include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/image/image.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -14,13 +16,6 @@ namespace mln::extension
   template <typename V>
   struct by_pattern
   {
-    enum class Pattern
-    {
-      Mirror,
-      Periodize,
-      Clamp
-    };
-
     using value_type        = V;
     using support_fill      = std::false_type;
     using support_mirror    = std::true_type;
@@ -28,7 +23,7 @@ namespace mln::extension
     using support_clamp     = std::true_type;
     using is_finite         = std::false_type;
 
-    explicit by_pattern(Pattern p, std::size_t padding = 0)
+    explicit by_pattern(experimental::Pattern p, std::size_t padding = 0)
       : m_pattern(p)
       , m_padding(padding)
     {
@@ -44,35 +39,35 @@ namespace mln::extension
 
     void mirror(std::size_t padding)
     {
-      m_pattern = Pattern::Mirror;
+      m_pattern = experimental::Pattern::Mirror;
       m_padding = padding;
     }
 
-    void periodize() { m_pattern = Pattern::Periodize; }
+    void periodize() { m_pattern = experimental::Pattern::Periodize; }
 
-    void clamp() { return m_pattern = Pattern::Clamp; }
+    void clamp() { return m_pattern = experimental::Pattern::Clamp; }
 
-    Pattern pattern() const { return m_pattern; }
+    experimental::Pattern pattern() const { return m_pattern; }
 
     std::size_t padding() const { return m_padding; }
 
-    template <typename Pnt, typename Ima>
-    const V& value(Pnt pnt, const Ima& ima) const
+    template <typename Ima>
+    const V& value(image_point_t<Ima> pnt, const Ima& ima) const
     {
       switch (m_pattern)
       {
-      case Pattern::Mirror:
+      case experimental::Pattern::Mirror:
         return value_mirror(std::move(pnt), ima);
-      case Pattern::Periodize:
+      case experimental::Pattern::Periodize:
         return value_periodize(std::move(pnt), ima);
-      case Pattern::Clamp:
+      case experimental::Pattern::Clamp:
         return value_clamp(std::move(pnt), ima);
       }
     }
 
   private:
-    template <typename Pnt, typename Ima>
-    const V& value_mirror(Pnt pnt, const Ima& ima) const
+    template <typename Ima>
+    const V& value_mirror(image_point_t<Ima> pnt, const Ima& ima) const
     {
       using domain_t     = typename Ima::domain_type;
       constexpr auto dim = domain_t::dimension;
@@ -96,8 +91,8 @@ namespace mln::extension
       return {(shp[I] - pnt[I] % (shp[I] - padding))...};
     }
 
-    template <typename Pnt, typename Ima>
-    const V& value_periodize(Pnt pnt, const Ima& ima) const
+    template <typename Ima>
+    const V& value_periodize(image_point_t<Ima> pnt, const Ima& ima) const
     {
       using domain_t     = typename Ima::domain_type;
       constexpr auto dim = domain_t::dimension;
@@ -120,8 +115,8 @@ namespace mln::extension
       return {(pnt[I] % shp[I])...};
     }
 
-    template <typename Pnt, typename Ima>
-    const V& value_clamp(Pnt pnt, const Ima& ima) const
+    template <typename Ima>
+    const V& value_clamp(image_point_t<Ima> pnt, const Ima& ima) const
     {
       using domain_t     = typename Ima::domain_type;
       constexpr auto dim = domain_t::dimension;
@@ -145,8 +140,8 @@ namespace mln::extension
       return {min(pnt[I], shp[I])...};
     }
 
-    Pattern     m_pattern;
-    std::size_t m_padding;
+    experimental::Pattern m_pattern;
+    std::size_t           m_padding;
   };
 
 } // namespace mln::extension

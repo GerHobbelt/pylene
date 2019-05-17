@@ -2,21 +2,22 @@
 
 
 #include <mln/accu/accumulator.hpp>
+#include <mln/core/canvas/local_accumulation.hpp>
+#include <mln/core/extension/border_management.hpp>
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/se/se.hpp>
 
-#include <mln/core/canvas/local_accumulation.hpp>
 
 namespace mln
 {
 
 
-  template <class A, class I, class J, class SE, extension::border_management bmm>
+  template <class A, class I, class J, class SE, extension::BorderManagementMethod bmm>
   void accumulate_local(I f, const experimental::StructuringElement<SE>& se, const AccumulatorLike<A>& accu,
                         extension::border_manager<bmm> bm, J g);
 
-  template <class A, class I, class SE, extension::border_management bmm>
+  template <class A, class I, class SE, extension::BorderManagementMethod bmm>
   ch_value_t<I, accu::result_of_t<A, image_value_t<I>>>
       accumulate_local(I f, const experimental::StructuringElement<SE>& se, const AccumulatorLike<A>& accu,
                        extension::border_manager<bmm> bm);
@@ -26,7 +27,7 @@ namespace mln
   /****          Implementation          ****/
   /******************************************/
 
-  template <class A, class I, class J, class SE, extension::border_management bmm>
+  template <class A, class I, class J, class SE, extension::BorderManagementMethod bmm>
   void accumulate_local(I f, const experimental::StructuringElement<SE>& se_, const AccumulatorLike<A>& accu_,
                         extension::border_manager<bmm> bm, J g)
   {
@@ -53,7 +54,7 @@ namespace mln
     }
   }
 
-  template <class A, class I, class SE, extension::border_management bmm>
+  template <class A, class I, class SE, extension::BorderManagementMethod bmm>
   image_ch_value_t<I, accu::result_of_t<A, image_value_t<I>>>
       accumulate_local(I f, const experimental::StructuringElement<SE>& se, const AccumulatorLike<A>& accu,
                        extension::border_manager<bmm> bm)

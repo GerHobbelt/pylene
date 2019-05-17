@@ -50,11 +50,11 @@ namespace mln
         }
         else
         {
-          return m_extptr->yield(this->base().point(), *m_imaptr);
+          return m_extptr->value(this->base().point(), *m_imaptr);
         }
       }
 
-      new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom, const I* ima)
+      new_pixel_type(image_pixel_t<I> px, extension_type* ext, const I* ima, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
         , m_extptr{ext}
         , m_imaptr(ima)
@@ -103,14 +103,14 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), &m_ext, this->domain(), &this->base()};
+      return {this->base().new_pixel(p), &m_ext, &this->base(), this->domain()};
     }
     /// \}
 
     auto new_pixels()
     {
       return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), &this->m_ext, this->domain(), &this->base()};
+        return {std::move(px), &m_ext, &this->base(), this->domain()};
       });
     }
 

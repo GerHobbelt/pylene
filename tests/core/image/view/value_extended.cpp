@@ -5,7 +5,6 @@
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
-
 #include <gtest/gtest.h>
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED

@@ -6,7 +6,9 @@
 
 #include <range/v3/range_traits.hpp>
 
+#include <array>
 #include <type_traits>
+
 
 namespace mln::concepts
 {
@@ -37,9 +39,10 @@ namespace mln::concepts
   // ShapedDomain
   template <typename Dom>
   concept ShapedDomain = 
-    Domain<Dom> &&
+    SizedDomain<Dom> &&
     requires(const Dom cdom) {
-      { cdom.shape() }  -> ::ranges::range_value_t<Dom>;
+      { cdom.shape() }    -> ::ranges::range_value_t<Dom>;
+      { cdom.extents() }  -> std::array<std::size_t, Dom::dimension>;
     };
 
 #endif // PYLENE_CONCEPT_TS_ENABLED

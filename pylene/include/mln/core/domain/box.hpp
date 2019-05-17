@@ -66,8 +66,9 @@ namespace mln
   template <typename T, unsigned dim>
   struct box : ranges::details::multi_indices_facade<dim, box<T, dim>>
   {
-    typedef point<T, dim> point_type;
-    typedef point<T, dim> value_type;
+    typedef point<T, dim>        point_type;
+    typedef point<T, dim>        value_type;
+    static constexpr std::size_t dimension = dim;
 
     typedef internal::nested_loop_iterator<internal::domain_point_visitor_forward<point<T, dim>>,
                                            internal::no_op_visitor, internal::no_op_visitor,

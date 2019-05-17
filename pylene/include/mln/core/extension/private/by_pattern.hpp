@@ -3,21 +3,13 @@
 #include <mln/core/concept/new/domains.hpp>
 #include <mln/core/concept/new/structuring_elements.hpp>
 
+#include <algorithm>
 #include <type_traits>
 #include <utility>
 
 
 namespace mln::extension
 {
-
-  namespace detail
-  {
-    template <class T>
-    struct remove_cvref
-    {
-      using type = std::remove_cv_t<std::remove_reference_t<T>>;
-    };
-  } // namespace detail
 
   template <typename V>
   struct by_pattern
@@ -65,51 +57,97 @@ namespace mln::extension
     std::size_t padding() const { return m_padding; }
 
     template <typename Pnt, typename Ima>
-    const V& yield(Pnt pnt, const Ima& ima) const
+    const V& value(Pnt pnt, const Ima& ima) const
     {
       switch (m_pattern)
       {
       case Pattern::Mirror:
-        return yield_mirror(std::move(pnt), ima);
+        return value_mirror(std::move(pnt), ima);
       case Pattern::Periodize:
-        return yield_periodize(std::move(pnt), ima);
+        return value_periodize(std::move(pnt), ima);
       case Pattern::Clamp:
-        return yield_clamp(std::move(pnt), ima);
+        return value_clamp(std::move(pnt), ima);
       }
     }
 
   private:
     template <typename Pnt, typename Ima>
-    const V& yield_mirror(Pnt pnt, const Ima& ima) const
+    const V& value_mirror(Pnt pnt, const Ima& ima) const
     {
-      auto dom = ima.domain();
+      using domain_t     = typename Ima::domain_type;
+      constexpr auto dim = domain_t::dimension;
 
-      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<detail::remove_cvref<decltype(dom)>>,
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      (void)pnt;
+      return ima(compute_mirror_coords<dim>(std::move(pnt), ima.domain().shape(), m_padding));
+    }
+
+    template <std::size_t dim, typename Pnt>
+    Pnt compute_mirror_coords(Pnt pnt, Pnt shp, std::size_t padding) const
+    {
+      return compute_mirror_coords_impl(std::move(pnt), std::move(shp), std::move(padding),
+                                        std::make_index_sequence<dim>{});
+    }
+
+    template <typename Pnt, std::size_t... I>
+    Pnt compute_mirror_coords_impl(Pnt pnt, Pnt shp, std::size_t padding, std::index_sequence<I...>) const
+    {
+      auto mirror_coord = [&padding](auto pnt, auto shp) { return shp - pnt % (shp - padding); };
+      return {mirror_coord(pnt[I], shp[I])...};
     }
 
     template <typename Pnt, typename Ima>
-    const V& yield_periodize(Pnt pnt, const Ima& ima) const
+    const V& value_periodize(Pnt pnt, const Ima& ima) const
     {
-      auto dom = ima.domain();
+      using domain_t     = typename Ima::domain_type;
+      constexpr auto dim = domain_t::dimension;
 
-      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<detail::remove_cvref<decltype(dom)>>,
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      (void)pnt;
+      return ima(compute_periodize_coords<dim>(std::move(pnt), ima.domain().shape()));
+    }
+
+    template <std::size_t dim, typename Pnt>
+    Pnt compute_periodize_coords(Pnt pnt, Pnt shp) const
+    {
+      return compute_periodize_coords_impl(std::move(pnt), std::move(shp), std::make_index_sequence<dim>{});
+    }
+
+    template <typename Pnt, std::size_t... I>
+    Pnt compute_periodize_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<I...>) const
+    {
+      auto periodize_coord = [](auto pnt, auto shp) { return pnt % shp; };
+      return {periodize_coord(pnt[I], shp[I])...};
     }
 
     template <typename Pnt, typename Ima>
-    const V& yield_clamp(Pnt pnt, const Ima& ima) const
+    const V& value_clamp(Pnt pnt, const Ima& ima) const
     {
-      auto dom = ima.domain();
+      using domain_t     = typename Ima::domain_type;
+      constexpr auto dim = domain_t::dimension;
 
-      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<detail::remove_cvref<decltype(dom)>>,
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      (void)pnt;
+      return ima(compute_clamp_coords<dim>(std::move(pnt), ima.domain().shape()));
+    }
+
+    template <std::size_t dim, typename Pnt>
+    Pnt compute_clamp_coords(Pnt pnt, Pnt shp) const
+    {
+      return compute_clamp_coords_impl(std::move(pnt), std::move(shp), std::make_index_sequence<dim>{});
+    }
+
+    template <typename Pnt, std::size_t... I>
+    Pnt compute_clamp_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<I...>) const
+    {
+      auto clamp_coord = [](auto pnt, auto shp) {
+        using std::min;
+        return min(pnt, shp);
+      };
+      return {clamp_coord(pnt[I], shp[I])...};
     }
 
     Pattern     m_pattern;

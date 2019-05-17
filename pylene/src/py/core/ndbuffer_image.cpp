@@ -98,7 +98,7 @@ namespace mln
     {
       m_axes[0].stride = 1;
       for (int k = 1; k < dim; ++k)
-        m_axes[k].stride = (sizes[k-1] + 2 * border) * m_axes[k-1].stride;
+        m_axes[k].stride = (sizes[k - 1] + 2 * border) * m_axes[k - 1].stride;
     }
     else // Or copy strides
     {
@@ -118,7 +118,7 @@ namespace mln
 
     // Allocate (or get the buffer)
     std::size_t size = (sizes[dim - 1] + 2 * border) * m_axes[dim - 1].stride;
-    m_buffer = __allocate(sample_type, size, params, m_data); // dynamic behavior
+    m_buffer         = __allocate(sample_type, size, params, m_data); // dynamic behavior
 
     // Set buffer to (0,0) position
     std::ptrdiff_t x = -m_axes[0].vbox_begin;
@@ -174,8 +174,8 @@ namespace mln
 
   void ndbuffer_image::resize(sample_type_id sample_type, Box domain, const image_build_params& params)
   {
-    int sizes[PYLENE_NDBUFFER_MAX_DIM];
-    int dim = domain.get_real_dim();
+    int sizes[PYLENE_NDBUFFER_MAX_DIM] = {0};
+    int dim                            = domain.get_real_dim();
     for (int i = 0; i < dim; ++i)
       sizes[i] = domain.end[i] - domain.begin[i];
 
@@ -193,13 +193,13 @@ namespace mln
     if (params.border == -1)
       params.border = other.border();
 
-    int d = other.m_pdim;
-    int topleft[PYLENE_NDBUFFER_MAX_DIM];
-    int sizes[PYLENE_NDBUFFER_MAX_DIM];
+    int d                                = other.m_pdim;
+    int topleft[PYLENE_NDBUFFER_MAX_DIM] = {0};
+    int sizes[PYLENE_NDBUFFER_MAX_DIM]   = {0};
     for (int i = 0; i < d; ++i)
     {
       topleft[i] = other.m_axes[i].domain_begin;
-      sizes[i] = other.m_axes[i].domain_end - other.m_axes[i].domain_begin;
+      sizes[i]   = other.m_axes[i].domain_end - other.m_axes[i].domain_begin;
     }
 
     resize(other.m_sample_type, d, topleft, sizes, std::move(params));
@@ -239,7 +239,7 @@ namespace mln
 
   int ndbuffer_image::pdim() const { return m_pdim; }
 
-  int ndbuffer_image::width() const {return m_axes[0].domain_end - m_axes[0].domain_begin; }
+  int ndbuffer_image::width() const { return m_axes[0].domain_end - m_axes[0].domain_begin; }
 
   int ndbuffer_image::height() const { return m_axes[1].domain_end - m_axes[1].domain_begin; }
 
@@ -273,7 +273,7 @@ namespace mln
 
   std::byte* ndbuffer_image::buffer() const
   {
-    int coords[PYLENE_NDBUFFER_MAX_DIM];
+    int coords[PYLENE_NDBUFFER_MAX_DIM] = {0};
     for (int k = 0; k < m_pdim; ++k)
       coords[k] = m_axes[k].domain_begin;
     return this->__at(coords);

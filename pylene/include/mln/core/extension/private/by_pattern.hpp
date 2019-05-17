@@ -93,8 +93,7 @@ namespace mln::extension
     template <typename Pnt, std::size_t... I>
     Pnt compute_mirror_coords_impl(Pnt pnt, Pnt shp, std::size_t padding, std::index_sequence<I...>) const
     {
-      auto mirror_coord = [&padding](auto pnt, auto shp) { return shp - pnt % (shp - padding); };
-      return {mirror_coord(pnt[I], shp[I])...};
+      return {(shp[I] - pnt[I] % (shp[I] - padding))...};
     }
 
     template <typename Pnt, typename Ima>
@@ -118,8 +117,7 @@ namespace mln::extension
     template <typename Pnt, std::size_t... I>
     Pnt compute_periodize_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<I...>) const
     {
-      auto periodize_coord = [](auto pnt, auto shp) { return pnt % shp; };
-      return {periodize_coord(pnt[I], shp[I])...};
+      return {(pnt[I] % shp[I])...};
     }
 
     template <typename Pnt, typename Ima>
@@ -143,11 +141,8 @@ namespace mln::extension
     template <typename Pnt, std::size_t... I>
     Pnt compute_clamp_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<I...>) const
     {
-      auto clamp_coord = [](auto pnt, auto shp) {
-        using std::min;
-        return min(pnt, shp);
-      };
-      return {clamp_coord(pnt[I], shp[I])...};
+      using std::min;
+      return {min(pnt[I], shp[I])...};
     }
 
     Pattern     m_pattern;

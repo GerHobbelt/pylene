@@ -31,17 +31,18 @@ namespace mln
 
 
   template <class I, class... Args>
-  class extended_view : public image_adaptor<I>, public experimental::Image<extended_view<I>>
+  class extended_view : public image_adaptor<I>, public experimental::Image<extended_view<I, Args...>>
   {
     using base_t          = image_adaptor<I>;
     using adapted_image_t = std::variant<I, // can be the base image (se fit, no adaptation required)
                                          image_extended_view<I, Args...>, none_extended_view<I>,
-                                         pattern_extended_view<I, Args{}...>, extended_view<I>>;
+                                         pattern_extended_view<I, Args{}...>, value_extended_view<I>>;
 
   public:
-    using extension_category = extension::experimental::value_tag;
-    // FIXME
-    // using extension_type     = extension::by_value<image_value_t<I>>;
+    using extension_category = decltype(std::visit(
+        std::declval<adapted_image_t>(), [](auto&& ima) -> image_extension_category_t<decltype(ima)> { return {}; }));
+    using extension_type     = decltype(
+        std::visit(std::declval<adapted_image_t>(), [](auto&& ima) -> image_extension_t<decltype(ima)> { return {}; }));
     using reference     = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type    = image_point_t<I>;
@@ -52,9 +53,9 @@ namespace mln
     adapted_image_t m_adapted_image;
 
   public:
-    extended_view(I ima, adapted_image_t adapted_image)
+    extended_view(I ima, Args&&... args)
       : base_t{std::move(ima)}
-      , m_adapted_image{adapted_image}
+      , m_adapted_image{std::move(ima), args...}
     {
     }
 
@@ -70,7 +71,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->base().at(p);
+      return std::visit(m_adapted_image, [p](auto ima) { return ima.at(p); });
     }
 
     template <class J = I>
@@ -82,18 +83,19 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return this->base().new_pixel(p);
+      return std::visit(m_adapted_image, [p](auto ima) { return ima.new_pixel_at(p); });
     }
     /// \}
 
     auto new_pixels()
     {
-      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), &this->m_ext, this->domain()};
-      });
+      return std::visit(m_adapted_image, [](auto ima) { return ima.new_pixels(); });
     }
 
-    // const extension_type& extension() { return m_ext; }
+    const extension_type& extension()
+    {
+      return std::visit(m_adapted_image, [](auto ima) { return ima.extension(); });
+    }
   };
 
 

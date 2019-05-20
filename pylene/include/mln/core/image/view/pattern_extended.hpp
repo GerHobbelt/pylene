@@ -31,7 +31,7 @@ namespace mln
     using base_t = image_adaptor<I>;
 
   public:
-    using extension_category = extension::experimental::value_tag;
+    using extension_category = extension::experimental::pattern_tag;
     using extension_type     = extension::by_pattern<image_value_t<I>, P>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;

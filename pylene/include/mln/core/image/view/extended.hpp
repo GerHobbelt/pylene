@@ -41,8 +41,9 @@ namespace mln
   public:
     using extension_category = decltype(std::visit(
         std::declval<adapted_image_t>(), [](auto&& ima) -> image_extension_category_t<decltype(ima)> { return {}; }));
-    using extension_type     = decltype(
-        std::visit(std::declval<adapted_image_t>(), [](auto&& ima) -> image_extension_t<decltype(ima)> { return {}; }));
+    using extension_type =
+        decltype(std::visit(std::declval<adapted_image_t>(),
+                            [](auto&& ima) -> image_extension_t<decltype(ima)> { return ima.extension(); }));
     using reference     = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type    = image_point_t<I>;

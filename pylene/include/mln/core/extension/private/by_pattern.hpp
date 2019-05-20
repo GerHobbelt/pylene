@@ -38,9 +38,9 @@ namespace mln::extension
   template <typename V, mln::extension::experimental::Pattern P>
   struct by_pattern : public detail::mirror_pattern_data<P>
   {
-    using value_type                                               = V;
-    static constexpr mln::extension::experimental::Pattern pattern = P;
-    using support_fill                                             = std::false_type;
+    using value_type                                                 = V;
+    static constexpr mln::extension::experimental::Pattern m_pattern = P;
+    using support_fill                                               = std::false_type;
     using support_mirror    = std::bool_constant<(P == experimental::Pattern::Mirror)>;
     using support_periodize = std::bool_constant<(P == experimental::Pattern::Periodize)>;
     using support_clamp     = std::bool_constant<(P == experimental::Pattern::Clamp)>;
@@ -81,7 +81,7 @@ namespace mln::extension
     {
     }
 
-    static constexpr experimental::Pattern pattern() { return pattern; }
+    static constexpr experimental::Pattern pattern() { return m_pattern; }
 
     template <typename Ima>
     const V& value(image_point_t<Ima> pnt, const Ima& ima) const

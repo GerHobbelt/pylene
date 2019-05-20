@@ -58,7 +58,10 @@ namespace mln
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
-    using typename image_adaptor<I>::new_pixel_type;
+    using new_pixel_type = detail::remove_cvref<decltype(std::visit(
+        std::declval<adapted_image_t>(), [](auto&& ima) -> image_pixel_t<detail::remove_cvref<decltype(ima)>> {
+          return ima.new_pixel(std::declval<image_point_t<detail::remove_cvref<decltype(ima)>>>());
+        }))>;
 
   private:
     adapted_image_t m_adapted_image;
@@ -77,7 +80,6 @@ namespace mln
     {
       return this->at(p);
     }
-
 
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)

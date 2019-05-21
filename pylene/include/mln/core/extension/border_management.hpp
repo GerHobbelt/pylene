@@ -21,6 +21,8 @@ namespace mln::extension
     {
       using type = std::remove_cv_t<std::remove_reference_t<T>>;
     };
+    template <class T>
+    using remove_cvref_t = typename remove_cvref<T>::type;
   } // namespace detail
 
   template <typename Ima, typename SE>
@@ -54,9 +56,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    std::optional<mln::none_extended_view<detail::remove_cvref<Ima>>> manage(Ima&& ima, const SE& se) const
+    std::optional<mln::none_extended_view<detail::remove_cvref_t<Ima>>> manage(Ima&& ima, const SE& se) const
     {
-      static_assert(mln::is_a<detail::remove_cvref<Ima>, mln::experimental::Image>::value);
+      static_assert(mln::is_a<detail::remove_cvref_t<Ima>, mln::experimental::Image>::value);
       static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if (!fit(ima, se))
@@ -81,17 +83,18 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    std::optional<mln::value_extended_view<detail::remove_cvref<Ima>>> manage(Ima&& ima, const SE& se) const
+    std::optional<mln::value_extended_view<detail::remove_cvref_t<Ima>>> manage(Ima&& ima, const SE& se) const
     {
-      static_assert(mln::is_a<detail::remove_cvref<Ima>, mln::experimental::Image>::value);
+      using I = detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
       static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
-      auto* val = std::any_cast<image_value_t<Ima>>(&m_value);
+      auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)
         throw std::runtime_error(
             "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
 
-      if constexpr (!image_has_extension<Ima>::value || !image_extension_t<Ima>::support_fill::value)
+      if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_fill::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support filling.");
         return view::value_extended(ima, *val);

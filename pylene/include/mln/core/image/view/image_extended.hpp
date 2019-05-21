@@ -91,22 +91,22 @@ namespace mln
     {
       return this->new_pixel_at(p);
     }
-this->base().point()) ? this->base().val()
+
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
-{
-  return {this->base().new_pixel(p), &this->m_ext, this->domain()};
-}
-/// \}
+    {
+      return {this->base().new_pixel(p), &this->m_ext, this->domain()};
+    }
+    /// \}
 
-auto new_pixels()
-{
-  return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-    return {std::move(px), &this->m_ext, this->domain()};
-  });
-}
+    auto new_pixels()
+    {
+      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
+        return {std::move(px), &this->m_ext, this->domain()};
+      });
+    }
 
-const extension_type& extension() { return m_ext; }
+    const extension_type& extension() { return m_ext; }
   };
 
 

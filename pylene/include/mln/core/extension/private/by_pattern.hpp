@@ -53,7 +53,7 @@ namespace mln::extension
     }
 
     template <typename U = void, typename = std::enable_if_t<(P != experimental::Pattern::Mirror)>>
-    explicit by_pattern()
+    by_pattern()
     {
     }
 
@@ -69,16 +69,19 @@ namespace mln::extension
     void mirror(std::size_t padding = 0)
     {
       this->m_padding = padding;
+      // Nothing to do, lazy evaluation when value is yielded
     }
 
     template <typename U = void, typename = std::enable_if_t<(P == experimental::Pattern::Periodize)>>
     void periodize()
     {
+      // Nothing to do, lazy evaluation when value is yielded
     }
 
     template <typename U = void, typename = std::enable_if_t<(P == experimental::Pattern::Clamp)>>
     void clamp()
     {
+      // Nothing to do, lazy evaluation when value is yielded
     }
 
     static constexpr experimental::Pattern pattern() { return m_pattern; }
@@ -86,13 +89,16 @@ namespace mln::extension
     template <typename Ima>
     const V& value(image_point_t<Ima> pnt, const Ima& ima) const
     {
-      switch (pattern)
+      if constexpr (m_pattern == experimental::Pattern::Mirror)
       {
-      case experimental::Pattern::Mirror:
         return value_mirror(std::move(pnt), ima);
-      case experimental::Pattern::Periodize:
+      }
+      else if constexpr (m_pattern == experimental::Pattern::Periodize)
+      {
         return value_periodize(std::move(pnt), ima);
-      case experimental::Pattern::Clamp:
+      }
+      else if constexpr (m_pattern == experimental::Pattern::Clamp)
+      {
         return value_clamp(std::move(pnt), ima);
       }
     }
@@ -107,7 +113,7 @@ namespace mln::extension
       PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      return ima(compute_mirror_coords<dim>(std::move(pnt), ima.domain().shape(), m_padding));
+      return ima(compute_mirror_coords<dim>(std::move(pnt), ima.domain().shape(), this->m_padding));
     }
 
     template <std::size_t dim, typename Pnt>

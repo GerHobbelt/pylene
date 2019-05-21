@@ -6,6 +6,7 @@
 #include <mln/core/image/view/image_extended.hpp>
 #include <mln/core/image/view/none_extended.hpp>
 #include <mln/core/image/view/pattern_extended.hpp>
+#include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
 #include <range/v3/utility/common_type.hpp> // common_reference
@@ -21,6 +22,36 @@ namespace mln
     struct remove_cvref
     {
       using type = std::remove_cv_t<std::remove_reference_t<T>>;
+    };
+    template <class T>
+    using remove_cvref_t = typename remove_cvref<T>::type;
+
+
+    struct get_image_extension_category_fn
+    {
+      template <typename Ima>
+      image_extension_category_t<Ima> operator()(Ima&&) const
+      {
+        return {};
+      }
+    };
+
+    struct get_image_extension_fn
+    {
+      template <typename Ima>
+      image_extension_t<Ima> operator()(Ima&& ima) const
+      {
+        return std::forward<Ima>(ima).extension();
+      }
+    };
+
+    struct get_image_new_pixel_fn
+    {
+      template <typename Ima>
+      image_pixel_t<Ima> operator()(Ima&& ima) const
+      {
+        return std::forward<Ima>(ima).new_pixel(std::declval<image_point_t<Ima>>());
+      }
     };
   } // namespace detail
 
@@ -48,20 +79,16 @@ namespace mln
                                          pattern_extended_view<I, Args{}...>, value_extended_view<I>>;
 
   public:
-    using extension_category = detail::remove_cvref<decltype(
-        std::visit(std::declval<adapted_image_t>(),
-                   [](auto&& ima) -> image_extension_category_t<detail::remove_cvref<decltype(ima)>> { return {}; }))>;
-    using extension_type     = detail::remove_cvref<decltype(std::visit(
-        std::declval<adapted_image_t>(),
-        [](auto&& ima) -> image_extension_t<detail::remove_cvref<decltype(ima)>> { return ima.extension(); }))>;
+    using extension_category = detail::remove_cvref_t<decltype(
+        std::visit(std::declval<adapted_image_t>(), std::declval<detail::get_image_extension_category_fn>()))>;
+    using extension_type     = detail::remove_cvref_t<decltype(
+        std::visit(std::declval<adapted_image_t>(), std::declval<detail::get_image_extension_fn>()))>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
-    using new_pixel_type = detail::remove_cvref<decltype(std::visit(
-        std::declval<adapted_image_t>(), [](auto&& ima) -> image_pixel_t<detail::remove_cvref<decltype(ima)>> {
-          return ima.new_pixel(std::declval<image_point_t<detail::remove_cvref<decltype(ima)>>>());
-        }))>;
+    using new_pixel_type = detail::remove_cvref_t<decltype(
+        std::visit(std::declval<adapted_image_t>(), std::declval<detail::get_image_new_pixel_fn>()))>;
 
   private:
     adapted_image_t m_adapted_image;

@@ -89,8 +89,13 @@ elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
     message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
 endif()
 
-set(COVERAGE_COMPILER_FLAGS "-g --coverage -fprofile-arcs -ftest-coverage"
-    CACHE INTERNAL "")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(COVERAGE_COMPILER_FLAGS "-g --coverage -fprofile-arcs -ftest-coverage"
+        CACHE INTERNAL "")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage"
+        CACHE INTERNAL "")
+endif ()
 
 set(CMAKE_CXX_FLAGS_COVERAGE
     ${COVERAGE_COMPILER_FLAGS}

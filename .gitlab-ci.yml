@@ -133,7 +133,7 @@ distcheck-linux-clang6-debug:
         BUILD_PROFILE: "clang6"
         CXX: "clang++-6.0"
         CC: "clang-6.0"
-        COV: "llvm-cov-6.0"
+        COV: "$(pwd)/../utils/coverage/llvm-gcov-6.0.sh"
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
@@ -150,7 +150,7 @@ distcheck-linux-clang7-debug:
         BUILD_PROFILE: "clang7"
         CXX: "clang++-7"
         CC: "clang-7"
-        COV: "llvm-cov-7"
+        COV: "$(pwd)/../utils/coverage/llvm-gcov-7.sh"
 
 
 #########

@@ -78,8 +78,8 @@ build-docker-automatic:
     dependencies: []
     artifacts:
         paths:
-            - run-tests_coverage-gcovr-html/
-            - run-tests_coverage-lcov/
+            - build/run-tests_coverage-gcovr-html/
+            - build/run-tests_coverage-lcov/
         reports:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days

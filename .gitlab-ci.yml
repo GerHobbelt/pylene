@@ -45,11 +45,11 @@ build-docker-automatic:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF
-        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - ctest -L UnitTests --schedule-random --output-on-failure
         - cmake --build . --target dist --config $PYLENE_CONFIGURATION
     dependencies: []
@@ -65,11 +65,11 @@ build-docker-automatic:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON
-        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - ctest -L UnitTests --schedule-random --output-on-failure
         - cmake --build . --target run-tests_coverage-gcovr-html --config $PYLENE_CONFIGURATION
         - cmake --build . --target run-tests_coverage-lcov --config $PYLENE_CONFIGURATION
@@ -161,7 +161,7 @@ distcheck-linux-clang7-debug:
         - conan install .. -pr $BUILD_PROFILE --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target run-all-benchmarks --config $PYLENE_CONFIGURATION
         - ctest -L SpeedTests -V
     tags: [ "pylene-benchmarks" ]
@@ -217,7 +217,7 @@ distbench-linux-clang7-release:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
-        - cmake --build . --target build-doc --config Release
+        - cmake --build . --target build-doc --config Release -- -j $(($NBPROC / 2))
         - mkdir ../public && mv doc/build/* ../public/
     artifacts:
         name: "documentation"

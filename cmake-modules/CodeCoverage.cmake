@@ -226,6 +226,7 @@ function(SETUP_TARGET_FOR_COVERAGE_GCOVR_XML)
 
         # Running gcovr
         COMMAND ${GCOVR_PATH} --xml
+            --gcov-executable ${GCOV_PATH}
             -r ${PROJECT_SOURCE_DIR} ${GCOVR_EXCLUDES}
             --object-directory=${PROJECT_BINARY_DIR}
             -o ${Coverage_NAME}.xml
@@ -283,7 +284,8 @@ function(SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/${Coverage_NAME}
 
         # Running gcovr
-        COMMAND ${Python_EXECUTABLE} ${GCOVR_PATH} --html --html-details
+        COMMAND ${Python_EXECUTABLE} ${GCOVR_PATH}
+            --html --html-details --gcov-executable ${GCOV_PATH}
             -r ${PROJECT_SOURCE_DIR} ${GCOVR_EXCLUDES}
             --object-directory=${PROJECT_BINARY_DIR}
             -o ${Coverage_NAME}/index.html

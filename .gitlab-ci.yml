@@ -64,7 +64,7 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV)
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
@@ -99,6 +99,7 @@ distcheck-linux-gcc7-debug:
         BUILD_PROFILE: "gcc7"
         CXX: "g++-7"
         CC: "gcc-7"
+        COV: "gcov-7"
 
 distcheck-linux-gcc8-release:
     <<: *distcheck-linux-base
@@ -115,6 +116,7 @@ distcheck-linux-gcc8-debug:
         BUILD_PROFILE: "gcc8"
         CXX: "g++-8"
         CC: "gcc-8"
+        COV: "gcov-8"
 
 distcheck-linux-clang6-release:
     <<: *distcheck-linux-base
@@ -125,12 +127,13 @@ distcheck-linux-clang6-release:
         CC: "clang-6.0"
 
 distcheck-linux-clang6-debug:
-    <<: *distcheck-linux-base
+    <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
         BUILD_PROFILE: "clang6"
         CXX: "clang++-6.0"
         CC: "clang-6.0"
+        COV: "llvm-cov-6.0"
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
@@ -141,12 +144,13 @@ distcheck-linux-clang7-release:
         CC: "clang-7"
 
 distcheck-linux-clang7-debug:
-    <<: *distcheck-linux-base
+    <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
         BUILD_PROFILE: "clang7"
         CXX: "clang++-7"
         CC: "clang-7"
+        COV: "llvm-cov-7"
 
 
 #########

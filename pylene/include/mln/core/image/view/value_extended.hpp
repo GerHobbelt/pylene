@@ -31,18 +31,23 @@ namespace mln
     using base_t = image_adaptor<I>;
 
   public:
-    using extension_category = extension::experimental::value_tag;
-    using extension_type     = extension::by_value<image_value_t<I>>;
+    using point_type         = image_point_t<I>;
+    using extension_category = extension::value_extension_tag;
+    using extension_type     = extension::by_value<image_value_t<I>, point_type>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
-    using point_type         = image_point_t<I>;
+
     using typename image_adaptor<I>::domain_type;
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
       using reference = value_extended_view::reference;
 
-      reference val() const { return m_dom.has(this->base().point()) ? this->base().val() : m_extptr->value(); }
+      reference val() const
+      {
+        auto pnt = this->base().point();
+        return m_dom.has(pnt) ? this->base().val() : m_extptr->value(pnt);
+      }
 
       new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
@@ -78,7 +83,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->domain().has(p) ? this->base().at(p) : m_ext.value();
+      return this->domain().has(p) ? this->base().at(p) : m_ext.value(p);
     }
 
     template <class J = I>
@@ -90,7 +95,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), &this->m_ext, this->domain()};
+      return {this->base().new_pixel_at(p), &m_ext, this->domain()};
     }
     /// \}
 

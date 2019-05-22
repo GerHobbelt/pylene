@@ -40,18 +40,9 @@ namespace mln
 
     auto extended = bm.manage(f, se);
 
-    if (extended)
-    {
-      auto algo = canvas::make_LocalAccumulation(accu, se, *extended, g);
-      // canvas::LocalAccumulation algo(accu, se, *extended, g);
-      algo.Execute();
-    }
-    else
-    {
-      auto algo = canvas::make_LocalAccumulation(accu, se, f, g);
-      // canvas::LocalAccumulation algo(accu, se, f, g);
-      algo.Execute();
-    }
+    auto algo = canvas::make_LocalAccumulation(accu, se, extended, g);
+    // canvas::LocalAccumulation algo(accu, se, *extended, g);
+    algo.Execute();
   }
 
   template <class A, class I, class SE, extension::BorderManagementMethod bmm>

@@ -10,13 +10,14 @@
 
 namespace mln
 {
-  template <class I, mln::extension::experimental::Pattern P>
+  template <class I>
   class pattern_extended_view;
 
   namespace view
   {
-    template <class I, mln::extension::experimental::Pattern P>
-    pattern_extended_view<I, P> pattern_extended(I image, std::size_t padding = 0);
+    template <class I>
+    pattern_extended_view<I> pattern_extended(I image, mln::extension::experimental::Pattern pattern,
+                                              std::size_t padding = 0);
   };
 
 
@@ -25,14 +26,14 @@ namespace mln
   /******************************************/
 
 
-  template <class I, mln::extension::experimental::Pattern P>
-  class pattern_extended_view : public image_adaptor<I>, public experimental::Image<pattern_extended_view<I, P>>
+  template <class I>
+  class pattern_extended_view : public image_adaptor<I>, public experimental::Image<pattern_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
   public:
-    using extension_category = extension::experimental::pattern_tag;
-    using extension_type     = extension::by_pattern<image_value_t<I>, P>;
+    using extension_category = extension::custom_extension_tag;
+    using extension_type     = extension::by_pattern<image_value_t<I>, I>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
@@ -45,13 +46,12 @@ namespace mln
       reference val() const
       {
         auto pnt = this->base().point();
-        return m_dom.has(pnt) ? this->base().val() : m_extptr->value(pnt, *m_imaptr);
+        return m_dom.has(pnt) ? this->base().val() : m_extptr->value(pnt);
       }
 
-      new_pixel_type(image_pixel_t<I> px, extension_type* ext, const I* ima, domain_type dom)
+      new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
         , m_extptr{ext}
-        , m_imaptr(ima)
         , m_dom{std::move(dom)}
 
       {
@@ -59,7 +59,6 @@ namespace mln
 
     private:
       extension_type* m_extptr;
-      I*              m_imaptr;
       domain_type     m_dom;
     };
 
@@ -69,7 +68,7 @@ namespace mln
   public:
     pattern_extended_view(I ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
       : base_t{std::move(ima)}
-      , m_ext{pattern, padding}
+      , m_ext{&this->base(), pattern, padding}
     {
     }
 
@@ -85,7 +84,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->domain().has(p) ? this->base().at(p) : m_ext.value(p, this->base());
+      return this->domain().has(p) ? this->base().at(p) : m_ext.value(p);
     }
 
     template <class J = I>
@@ -97,14 +96,14 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), &this->m_ext, &this->base(), this->domain()};
+      return {this->base().new_pixel_at(p), &m_ext, this->domain()};
     }
     /// \}
 
     auto new_pixels()
     {
       return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), &m_ext, &this->base(), this->domain()};
+        return {std::move(px), &this->m_ext, this->domain()};
       });
     }
 
@@ -114,10 +113,11 @@ namespace mln
 
   namespace view
   {
-    template <class I, mln::extension::experimental::Pattern P>
-    pattern_extended_view<I, P> pattern_extended(I image, std::size_t padding)
+    template <class I>
+    pattern_extended_view<I> pattern_extended(I image, mln::extension::experimental::Pattern pattern,
+                                              std::size_t padding)
     {
-      return {std::move(image), padding};
+      return {std::move(image), pattern, padding};
     }
   }; // namespace view
 

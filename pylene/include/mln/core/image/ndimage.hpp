@@ -73,26 +73,28 @@ namespace mln
     template <typename T, unsigned dim>
     struct ndimage_extension
     {
-    private:
-      typedef point<short, dim> P;
 
     public:
       using value_type        = T;
+      using point_type        = point<short, dim>;
       using support_fill      = std::true_type;
       using support_mirror    = std::true_type;
       using support_periodize = std::false_type; // TODO
       using support_clamp     = std::true_type;
       using is_finite         = std::true_type;
 
-      ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border);
+      ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp, const box<short, dim>* dom,
+                        int border);
 
       template <typename SE>
-      bool        fit(const SE& se) const;
-      std::size_t size() const;
-      void        fill(const T& v);
-      void        mirror(std::size_t padding = 0);
+      bool              fit(const SE& se) const;
+      const value_type& value(const point_type& pnt) const;
+      std::size_t       size() const;
+      void              fill(const T& v);
+      void              mirror(std::size_t padding = 0);
       // void periodize(); // TODO
       // void clamp(); // TODO
+
 
     private:
       template <unsigned d>
@@ -120,10 +122,11 @@ namespace mln
       typename std::enable_if<(d == dim)>::type _copy_line(char* src, char* dest);
 
     private:
-      size_t m_strides[dim];
-      P      m_shp;
-      char*  m_ptr;
-      int    m_border;
+      size_t                 m_strides[dim];
+      point_type             m_shp;
+      const box<short, dim>* m_dom;
+      char*                  m_ptr;
+      int                    m_border;
     };
 
   } // namespace internal
@@ -1053,7 +1056,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::extension_type ndimage_base<T, dim, E>::extension() const
   {
-    return extension_type(m_ptr, &m_strides[0], m_domain.shape(), m_border);
+    return extension_type(m_ptr, &m_strides[0], m_domain.shape(), &m_domain, m_border);
   }
 
 
@@ -1087,11 +1090,13 @@ namespace mln
   {
 
     template <typename T, unsigned dim>
-    ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border)
+    ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp,
+                                                 const box<short, dim>* dom, int border)
       : m_shp(shp)
+      , m_dom(dom)
+      , m_ptr(ptr)
       , m_border(border)
     {
-      m_ptr = ptr;
       for (unsigned i = 0; i < dim; ++i)
       {
         m_strides[i] = strides[i];
@@ -1114,6 +1119,17 @@ namespace mln
         return true; // TODO check wether default value should be true false or error
       }
     }
+
+    template <typename T, unsigned dim>
+
+    auto ndimage_extension<T, dim>::value(const point_type& pnt) const -> const value_type&
+    {
+      char* ptr = m_ptr;
+      for (unsigned i = 0; i < dim; ++i)
+        ptr += (pnt[i] - m_dom->pmin[i]) * m_strides[i];
+      return *reinterpret_cast<T*>(ptr);
+    }
+
 
     template <typename T, unsigned dim>
     std::size_t ndimage_extension<T, dim>::size() const

@@ -24,11 +24,12 @@ namespace mln::concepts
   // clang-format off
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 
-  template <typename Ext>
+  template <typename Ext, typename Pnt>
   concept Extension =
     std::is_base_of_v<mln::experimental::Extension<Ext>, Ext> &&
     requires {
       typename Ext::value_type;
+      typename Ext::point_type;
       typename Ext::support_fill;
       typename Ext::support_mirror;
       typename Ext::support_periodize;
@@ -38,9 +39,10 @@ namespace mln::concepts
     Value<typename Ext::value_type> &&
     requires (const Ext cext,
         mln::archetypes::StructuringElement<
-          mln::archetypes::Point,
-          mln::archetypes::Pixel> se) {
-      { cext.fit(se) }  -> bool;
+          Pnt,
+          mln::archetypes::Pixel> se, const Pnt pnt) {
+      { cext.fit(se) }    -> bool;
+      { cext.value(pnt) } -> typename Ext::value_type;
     };
   
   template <typename Ext>

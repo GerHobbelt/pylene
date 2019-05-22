@@ -10,13 +10,13 @@
 
 namespace mln
 {
-  template <class I, class U>
+  template <class I>
   class image_extended_view;
 
   namespace view
   {
     template <class I, class U>
-    image_extended_view<I, U> image_extended(I image, U base_ima);
+    image_extended_view<I> image_extended(I image, U base_ima);
   };
 
 
@@ -25,19 +25,19 @@ namespace mln
   /******************************************/
 
 
-  template <class I, class U>
-  class image_extended_view : public image_adaptor<I>, public experimental::Image<image_extended_view<I, U>>
+  template <class I>
+  class image_extended_view : public image_adaptor<I>, public experimental::Image<image_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
   public:
-    using extension_category = extension::experimental::image_tag;
+    using extension_category = extension::image_extension_tag;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
     using typename image_adaptor<I>::value_type;
-    using extension_type = extension::by_image<domain_type, value_type>;
+    using extension_type = extension::by_image<value_type, point_type>;
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
@@ -65,6 +65,7 @@ namespace mln
     extension_type m_ext;
 
   public:
+    template <typename U>
     image_extended_view(I ima, U base_ima)
       : base_t{std::move(ima)}
       , m_ext{base_ima}
@@ -95,7 +96,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), &this->m_ext, this->domain()};
+      return {this->base().new_pixel_at(p), &m_ext, this->domain()};
     }
     /// \}
 
@@ -113,7 +114,7 @@ namespace mln
   namespace view
   {
     template <class I, class U>
-    image_extended_view<I, U> image_extended(I image, U base_ima)
+    image_extended_view<I> image_extended(I image, U base_ima)
     {
       return {std::move(image), std::move(base_ima)};
     }

@@ -9,10 +9,11 @@
 namespace mln::extension
 {
 
-  template <typename V>
+  template <typename V, typename P>
   struct by_value
   {
     using value_type        = V;
+    using point_type        = P;
     using support_fill      = std::true_type;
     using support_mirror    = std::false_type;
     using support_periodize = std::false_type;
@@ -33,7 +34,7 @@ namespace mln::extension
     }
 
     void     fill(V val) { m_val = std::move(val); }
-    const V& value() const { return m_val; }
+    const V& value(const point_type&) const { return m_val; }
 
   private:
     V m_val;

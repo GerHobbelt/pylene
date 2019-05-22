@@ -9,8 +9,11 @@
 namespace mln::extension
 {
 
+  template <typename V, typename P>
   struct none
   {
+    using value_type        = V;
+    using point_type        = P;
     using support_fill      = std::false_type;
     using support_mirror    = std::false_type;
     using support_periodize = std::false_type;
@@ -34,6 +37,8 @@ namespace mln::extension
       }
       return false;
     }
+
+    const value_type& value(const point_type&) const { throw std::runtime_error(" Accessing point out of bound !"); }
   };
 
 } // namespace mln::extension

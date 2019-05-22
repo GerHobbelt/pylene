@@ -31,19 +31,6 @@ namespace mln
 
     namespace experimental
     {
-      struct none_tag
-      {
-      };
-      struct value_tag
-      {
-      };
-      struct pattern_tag
-      {
-      };
-      struct image_tag
-      {
-      };
-
       enum class Pattern
       {
         Mirror,

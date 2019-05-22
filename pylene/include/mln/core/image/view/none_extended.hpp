@@ -31,12 +31,13 @@ namespace mln
     using base_t = image_adaptor<I>;
 
   public:
-    using extension_category = extension::experimental::none_tag;
-    using extension_type     = extension::none;
+    using extension_category = extension::none_extension_tag;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
+    using typename image_adaptor<I>::value_type;
+    using extension_type = extension::none<value_type, point_type>;
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
@@ -96,7 +97,7 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel(p), this->domain()};
+      return {this->base().new_pixel_at(p), this->domain()};
     }
     /// \}
 

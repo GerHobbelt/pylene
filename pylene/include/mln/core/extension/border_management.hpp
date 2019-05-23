@@ -253,6 +253,7 @@ namespace mln::extension
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<Ima>>);
+      static_assert(std::is_convertible_v<image_point_t<Ima>, image_value_t<U>>);
 
       if constexpr (!image_has_extension<I>::value)
       {

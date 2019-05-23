@@ -16,28 +16,6 @@
 
 namespace mln
 {
-  namespace detail
-  {
-    template <typename Pnt>
-    struct get_image_new_pixel_fn
-    {
-      get_image_new_pixel_fn(Pnt&& pnt)
-        : m_pnt{std::move(pnt)}
-      {
-      }
-
-      template <typename Ima>
-      image_pixel_t<Ima> operator()(Ima&& ima) const
-      {
-        return std::forward<Ima>(ima).new_pixel(std::move(m_pnt));
-      }
-
-    private:
-      Pnt m_pnt;
-    };
-
-  } // namespace detail
-
   template <class I>
   class extended_view;
 

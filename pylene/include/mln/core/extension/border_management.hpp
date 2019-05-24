@@ -81,7 +81,7 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    auto manage(Ima&& ima, const SE&) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);

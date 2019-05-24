@@ -88,6 +88,32 @@ build-docker-automatic:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days
 
+.job-build-linux-coverage: &distcheck-linux-coverage
+    image: ${DOCKER_IMAGE}
+    stage: test
+    script:
+        - mkdir build && cd build
+        - conan install .. -pr $BUILD_PROFILE --build missing
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV)
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - ctest -L UnitTests --schedule-random --output-on-failure
+        - cmake --build . --target run-tests_coverage-gcovr-html --config $PYLENE_CONFIGURATION
+        - cmake --build . --target run-tests_coverage-lcov --config $PYLENE_CONFIGURATION
+        - lcov --list run-tests_coverage-lcov.info
+        - cmake --build . --target dist --config $PYLENE_CONFIGURATION
+    dependencies: []
+    artifacts:
+        paths:
+            - build/run-tests_coverage-gcovr-html/
+            - build/run-tests_coverage-lcov/
+        reports:
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
+        expire_in: 15 days
+
 distcheck-linux-gcc7-release:
     <<: *distcheck-linux-base
     variables:

@@ -10,8 +10,8 @@ class Pylene(ConanFile):
     settings = "os", "compiler", "arch", "build_type", "cppstd"
     options = {"gtest": [True, False], "benchmark": [True, False], "freeimage": [
         True, False], "boost": [True, False],
-        # TO REMOVE once docker image is fixed with the buildfarm profile updated
-        "boost_program_options": [True, False]}
+               # TO REMOVE once docker image is fixed with the buildfarm profile updated
+               "boost_program_options": [True, False]}
     default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False",
                        # TO REMOVE once docker image is fixed with the buildfarm profile updated
                        "boost_program_options=False")

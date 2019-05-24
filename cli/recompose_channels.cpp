@@ -2,6 +2,7 @@
 #include <mln/colors/rgba.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/view/channel.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
@@ -27,7 +28,7 @@ int main(int argc, char** argv)
       io::imread(argv[i], f);
       if (i == 2)
         resize(out, f);
-      copy(f, channel(out, i - 2));
+      mln::experimental::copy(f, view::channel(out, i - 2));
     }
     io::imsave(out, argv[1]);
   }
@@ -41,7 +42,7 @@ int main(int argc, char** argv)
       io::imread(argv[i], f);
       if (i == 2)
         resize(out, f);
-      copy(f, channel(out, i - 2));
+      mln::experimental::copy(f, view::channel(out, i - 2));
     }
     io::imsave(out, argv[1]);
   }

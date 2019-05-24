@@ -18,6 +18,7 @@ namespace mln::extension
     using support_mirror    = std::false_type;
     using support_periodize = std::false_type;
     using support_clamp     = std::false_type;
+    using support_buffer    = std::false_type;
     using is_finite         = std::false_type;
 
     explicit by_value(V val)

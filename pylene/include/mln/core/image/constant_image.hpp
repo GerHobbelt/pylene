@@ -184,6 +184,8 @@ namespace mln
       typedef std::false_type support_fill;
       typedef std::false_type support_mirror;
       typedef std::false_type support_periodize;
+      typedef std::false_type support_clamp;
+      typedef std::false_type support_buffer;
     };
 
     constant_image(const Domain& dom, V value)

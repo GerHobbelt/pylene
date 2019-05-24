@@ -4,6 +4,7 @@
 #include <mln/core/concept/new/archetype/point.hpp>
 #include <mln/core/concept/new/archetype/structuring_element.hpp>
 #include <mln/core/concept/new/cmcstl2.hpp>
+#include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/new/values.hpp>
 
 #include <type_traits>
@@ -34,6 +35,7 @@ namespace mln::concepts
       typename Ext::support_mirror;
       typename Ext::support_periodize;
       typename Ext::support_clamp;
+      typename Ext::support_buffer;
       typename Ext::is_finite;
     } &&
     Value<typename Ext::value_type> &&
@@ -83,12 +85,23 @@ namespace mln::concepts
       { ext.periodize() };
     };
 
-    template <typename Ext>
+  template <typename Ext>
   concept ClampableExtension = 
     Extension<Ext> &&
     std::is_same_v<typename Ext::support_clamp, std::true_type> &&
     requires (Ext ext) {
       { ext.clamp() };
+    };
+
+  template <typename Ext, typename U>
+  concept BufferFillableExtension = 
+    Extension<Ext> &&
+    std::is_same_v<typename Ext::support_buffer, std::true_type> &&
+    InputImage<U> &&
+    stl::ConvertibleTo<typename U::value_type, typename Ext::value_type> &&
+    stl::ConvertibleTo<typename Ext::point_type, typename U::point_type> &&
+    requires (Ext ext, U u) {
+      { ext.buffer(u) };
     };
 
 #endif

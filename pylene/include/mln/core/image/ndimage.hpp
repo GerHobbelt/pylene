@@ -80,7 +80,8 @@ namespace mln
       using support_fill      = std::true_type;
       using support_mirror    = std::true_type;
       using support_periodize = std::false_type; // TODO
-      using support_clamp     = std::true_type;
+      using support_clamp     = std::true_type;  // TODO
+      using support_buffer    = std::false_type; // TODO
       using is_finite         = std::true_type;
 
       ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp, const box<short, dim>* dom,
@@ -92,9 +93,12 @@ namespace mln
       std::size_t       size() const;
       void              fill(const T& v);
       void              mirror(std::size_t padding = 0);
-      // void periodize(); // TODO
-      // void clamp(); // TODO
 
+      // TODO
+      // void periodize();
+      // void clamp();
+      // template <typename U>
+      // void buffer(U&& u);
 
     private:
       template <unsigned d>

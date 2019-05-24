@@ -302,6 +302,8 @@ namespace mln
     typedef std::true_type  support_fill;
     typedef std::false_type support_mirror;
     typedef std::false_type support_periodize;
+    typedef std::false_type support_clamp;
+    typedef std::false_type support_buffer;
 
     by_value_extension(V& val)
       : m_val(val)

@@ -57,6 +57,7 @@ namespace mln
       using support_mirror    = std::false_type;
       using support_periodize = std::false_type;
       using support_clamp     = std::false_type;
+      using support_buffer    = std::false_type;
       using is_finite         = std::conjunction<typename image_extension_t<I>::is_finite,
                                          typename image_extension_t<none_extended_view<I>>::is_finite,
                                          typename image_extension_t<value_extended_view<I>>::is_finite,

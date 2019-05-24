@@ -20,6 +20,7 @@ namespace mln::extension
     using support_mirror    = std::false_type;
     using support_periodize = std::false_type;
     using support_clamp     = std::false_type;
+    using support_buffer    = std::true_type;
     using is_finite         = std::true_type;
 
     template <typename U>
@@ -42,6 +43,12 @@ namespace mln::extension
         throw std::runtime_error(" Accessing point out of bound !");
 
       return m_yieldvalue(pnt);
+    }
+
+    template <typename U>
+    void buffer(U&&)
+    {
+      // Nothing to do, everything is lazy-computed
     }
 
   private:

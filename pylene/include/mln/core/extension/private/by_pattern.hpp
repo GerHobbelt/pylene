@@ -21,6 +21,7 @@ namespace mln::extension
     using support_mirror    = std::true_type;
     using support_periodize = std::true_type;
     using support_clamp     = std::true_type;
+    using support_buffer    = std::false_type;
     using is_finite         = std::false_type;
 
     by_pattern(I* ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)

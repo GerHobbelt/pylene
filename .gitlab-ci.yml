@@ -44,13 +44,42 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build apps --config $PYLENE_CONFIGURATION
-        - cmake --build tests --config $PYLENE_CONFIGURATION
-        - cmake --build bench/tests --config $PYLENE_CONFIGURATION
-        - ctest -L UnitTests -V --schedule-random --output-on-failure
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - ctest -L UnitTests --schedule-random --output-on-failure
+        - cmake --build . --target dist --config $PYLENE_CONFIGURATION
     dependencies: []
     artifacts:
+        reports:
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
+        expire_in: 15 days
+
+.job-build-linux-coverage: &distcheck-linux-coverage
+    image: ${DOCKER_IMAGE}
+    stage: test
+    script:
+        - mkdir build && cd build
+        - conan install .. -pr $BUILD_PROFILE --build missing
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV)
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - ctest -L UnitTests --schedule-random --output-on-failure
+        - cmake --build . --target run-tests_coverage-gcovr-html --config $PYLENE_CONFIGURATION
+        - cmake --build . --target run-tests_coverage-lcov --config $PYLENE_CONFIGURATION
+        - lcov --list run-tests_coverage-lcov.info
+        - cmake --build . --target dist --config $PYLENE_CONFIGURATION
+    dependencies: []
+    artifacts:
+        paths:
+            - build/run-tests_coverage-gcovr-html/
+            - build/run-tests_coverage-lcov/
         reports:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days
@@ -64,12 +93,13 @@ distcheck-linux-gcc7-release:
         CC: "gcc-7"
 
 distcheck-linux-gcc7-debug:
-    <<: *distcheck-linux-base
+    <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
         BUILD_PROFILE: "gcc7"
         CXX: "g++-7"
         CC: "gcc-7"
+        COV: "gcov-7"
 
 distcheck-linux-gcc8-release:
     <<: *distcheck-linux-base
@@ -80,12 +110,13 @@ distcheck-linux-gcc8-release:
         CC: "gcc-8"
 
 distcheck-linux-gcc8-debug:
-    <<: *distcheck-linux-base
+    <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
         BUILD_PROFILE: "gcc8"
         CXX: "g++-8"
         CC: "gcc-8"
+        COV: "gcov-8"
 
 distcheck-linux-clang6-release:
     <<: *distcheck-linux-base
@@ -96,12 +127,13 @@ distcheck-linux-clang6-release:
         CC: "clang-6.0"
 
 distcheck-linux-clang6-debug:
-    <<: *distcheck-linux-base
+    <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
         BUILD_PROFILE: "clang6"
         CXX: "clang++-6.0"
         CC: "clang-6.0"
+        COV: "../utils/coverage/llvm-gcov-6.0.sh"
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
@@ -112,12 +144,13 @@ distcheck-linux-clang7-release:
         CC: "clang-7"
 
 distcheck-linux-clang7-debug:
-    <<: *distcheck-linux-base
+    <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
         BUILD_PROFILE: "clang7"
         CXX: "clang++-7"
         CC: "clang-7"
+        COV: "../utils/coverage/llvm-gcov-7.sh"
 
 
 #########
@@ -130,11 +163,10 @@ distcheck-linux-clang7-debug:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build . --target fetch-external-data
-        - cmake --build .
-                --config $PYLENE_CONFIGURATION
-                --target run-all-benchmarks
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target run-all-benchmarks --config $PYLENE_CONFIGURATION
         - ctest -L SpeedTests -V
     tags: [ "pylene-benchmarks" ]
     when: manual
@@ -188,10 +220,8 @@ distbench-linux-clang7-release:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing
-        - cmake .. -DCMAKE_BUILD_TYPE=Release
-        - cmake --build .
-                --config Release
-                --target doc
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - cmake --build . --target build-doc --config Release -- -j $(($NBPROC / 2))
         - mkdir ../public && mv doc/build/* ../public/
     artifacts:
         name: "documentation"

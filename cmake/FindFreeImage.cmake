@@ -20,66 +20,66 @@ SET(FreeImage_INCLUDE_DIRS)
 SET(FreeImage_LIBRARIES)
 
 SET(SEARCH_PATHS
-  $ENV{ProgramFiles}/freeimage/include
-  $ENV{SystemDrive}/freeimage/include
-  $ENV{ProgramFiles}/freeimage
-  $ENV{SystemDrive}/freeimage
-  )
-IF(FreeImage_ROOT)
-  SET(SEARCH_PATHS
-    ${FreeImage_ROOT}
-    ${FreeImage_ROOT}/include
-    ${SEARCH_PATHS}
+    $ENV{ProgramFiles}/freeimage/include
+    $ENV{SystemDrive}/freeimage/include
+    $ENV{ProgramFiles}/freeimage
+    $ENV{SystemDrive}/freeimage
     )
-ENDIF()
+IF (FreeImage_ROOT)
+  SET(SEARCH_PATHS
+      ${FreeImage_ROOT}
+      ${FreeImage_ROOT}/include
+      ${SEARCH_PATHS}
+      )
+ENDIF ()
 
 FIND_PATH(FreeImage_INCLUDE_DIRS
-  NAMES FreeImage.h
-  PATHS ${SEARCH_PATHS}
-  NO_DEFAULT_PATH)
-IF(NOT FreeImage_INCLUDE_DIRS)  # now look in system locations
+          NAMES FreeImage.h
+          PATHS ${SEARCH_PATHS}
+          NO_DEFAULT_PATH)
+IF (NOT FreeImage_INCLUDE_DIRS)  # now look in system locations
   FIND_PATH(FreeImage_INCLUDE_DIRS NAMES FreeImage.h)
-ENDIF(NOT FreeImage_INCLUDE_DIRS)
+ENDIF (NOT FreeImage_INCLUDE_DIRS)
 
 SET(FreeImage_LIBRARY_DIRS)
-IF(FreeImage_ROOT)
+IF (FreeImage_ROOT)
   SET(FreeImage_LIBRARY_DIRS ${FreeImage_ROOT})
-  IF(EXISTS "${FreeImage_ROOT}/lib")
+  IF (EXISTS "${FreeImage_ROOT}/lib")
     SET(FreeImage_LIBRARY_DIRS ${FreeImage_LIBRARY_DIRS} ${FreeImage_ROOT}/lib)
-  ENDIF()
-  IF(EXISTS "${FreeImage_ROOT}/lib/static")
+  ENDIF ()
+  IF (EXISTS "${FreeImage_ROOT}/lib/static")
     SET(FreeImage_LIBRARY_DIRS ${FreeImage_LIBRARY_DIRS} ${FreeImage_ROOT}/lib/static)
-  ENDIF()
-ENDIF()
+  ENDIF ()
+ENDIF ()
 
 # FreeImage
 # Without system dirs
 FIND_LIBRARY(FreeImage_LIBRARY
-  NAMES freeimage
-  PATHS ${FreeImage_LIBRARY_DIRS}
-  NO_DEFAULT_PATH
-  )
-IF(NOT FreeImage_LIBRARY)  # now look in system locations
+             NAMES freeimage
+             PATHS ${FreeImage_LIBRARY_DIRS}
+             NO_DEFAULT_PATH
+             )
+IF (NOT FreeImage_LIBRARY)  # now look in system locations
   FIND_LIBRARY(FreeImage_LIBRARY NAMES freeimage)
-ENDIF(NOT FreeImage_LIBRARY)
+ENDIF (NOT FreeImage_LIBRARY)
 
 SET(FreeImage_LIBRARIES)
-IF(FreeImage_LIBRARY)
+IF (FreeImage_LIBRARY)
   SET(FreeImage_LIBRARIES ${FreeImage_LIBRARY})
-ENDIF()
+ENDIF ()
 
 
-IF(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
+IF (FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
   SET(FreeImage_FOUND TRUE)
-  IF(NOT FreeImage_FIND_QUIETLY)
+  IF (NOT FreeImage_FIND_QUIETLY)
     MESSAGE(STATUS "Found FreeImage: headers at ${FreeImage_INCLUDE_DIRS}, libraries at ${FreeImage_LIBRARY_DIRS} :: ${FreeImage_LIBRARIES}")
-  ENDIF(NOT FreeImage_FIND_QUIETLY)
-ELSE(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
+  ENDIF (NOT FreeImage_FIND_QUIETLY)
+ELSE (FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
   SET(FreeImage_FOUND FALSE)
-  IF(FreeImage_FIND_REQUIRED)
+  IF (FreeImage_FIND_REQUIRED)
     MESSAGE(FATAL_ERROR "FreeImage not found")
-  ELSE(FreeImage_FIND_REQUIRED)
+  ELSE (FreeImage_FIND_REQUIRED)
     MESSAGE(STATUS "FreeImage not found")
-  ENDIF(FreeImage_FIND_REQUIRED)
-ENDIF(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
+  ENDIF (FreeImage_FIND_REQUIRED)
+ENDIF (FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
 MARK_AS_ADVANCED(FreeImage_INCLUDE_DIRS FreeImage_LIBRARIES)

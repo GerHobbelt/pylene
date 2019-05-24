@@ -47,10 +47,8 @@ target_sources(BenchImpl PUBLIC
    ${CMAKE_CURRENT_SOURCE_DIR}/include/bench/neighborhood.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/neighborhood.cpp)
 
-if (BUILD_TESTING)
-  include(CTest)
-  add_subdirectory(tests)
-endif()
+include(CTest)
+add_subdirectory(tests)
 
 set(src_standalone
   BMErosion.cpp
@@ -63,9 +61,6 @@ set(src_standalone
 
 set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
-
-
-enable_testing()
 
 add_benchmark(BMAlgorithms              BMAlgorithms.cpp BMAlgorithms_main.cpp)
 add_benchmark(BMNeighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)

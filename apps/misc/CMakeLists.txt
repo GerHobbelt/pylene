@@ -8,3 +8,4 @@ add_executable(grain_filter_color grain_filter_color.cpp)
 add_executable(psnr psnr.cpp)
 add_executable(compute_depth compute_depth.cpp)
 
+add_dependencies(build-apps print_tos_stat reconstruct_from_tree ppm_grain_filter_marginal grain_filter_color psnr compute_depth)

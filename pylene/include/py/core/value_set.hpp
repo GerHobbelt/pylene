@@ -14,9 +14,11 @@ namespace mln::py
   struct value_set<void>
   {
     virtual float normalize(void* val) const = 0; //abstract normalize function for vs<void>
-    virtual std::any max() const = 0;
+    std::any max() const { return _max(); }
     virtual std::any divide(void* val, std::any any) const = 0;
     virtual std::any divide(void* val, void* any) const = 0;
+    private:
+      virtual std::any _max() const = 0;
   };
 
   template <typename T>
@@ -29,7 +31,9 @@ namespace mln::py
 
     float normalize(T val) const { return static_cast<float>(val) / std::numeric_limits<T>::max(); }
 
-    std::any max() const override final
+    std::any _max() const override final { return max(); }
+
+    std::any max() const
     {
         return std::any(std::numeric_limits<T>::max());
     }

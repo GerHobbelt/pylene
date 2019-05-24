@@ -1,4 +1,6 @@
 #include <py/core/value_set.hpp>
+#include <py/core/image2d.hpp>
+#include <py/core/type_info.hpp>
 
 #include <iostream>
 #include <limits>
@@ -6,7 +8,13 @@
 #include <gtest/gtest.h>
 
 
-TEST(Py, vs_max) //Doesn't even need to be tested, but atomic testing.
+TEST(Py, vs_void_max)
+{
+  image2d<void> img = image2d(3, 3, Info::INT8_V);
+  ASSERT_EQ(std::any_cast<int8_t>(img.), std::numeric_limits<int8_t>::max());
+}
+
+TEST(Py, vs_T_max)
 {
   mln::py::value_set<int8_t> vs;
   ASSERT_EQ(std::any_cast<int8_t>(vs.max()), std::numeric_limits<int8_t>::max());

@@ -75,9 +75,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 # Pylene-python lib
 add_library(Pylene-python)
 target_sources(Pylene-python PRIVATE
-  src/py/core/image_format.cpp
-  src/py/core/ndbuffer_image_data.cpp
-  src/py/core/ndbuffer_image.cpp
+  #src/py/core/image_format.cpp
+  #src/py/core/ndbuffer_image_data.cpp
+  #src/py/core/ndbuffer_image.cpp
   )
 target_include_directories(Pylene-python PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

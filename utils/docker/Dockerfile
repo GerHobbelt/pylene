@@ -21,9 +21,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-rec
 # Install python packages
 RUN DEBIAN_FRONTEND=noninteractive pip3 install -U pip six wheel setuptools && \
   DEBIAN_FRONTEND=noninteractive pip3 install --no-cache-dir scan-build conan pandas pytest \
-  breathe sphinx_rtd_theme plantuml sphinxcontrib-plantuml \
-  sphinx==1.8.5
-# issue with sphinx2.0, cf. https://github.com/michaeljones/breathe/issues/430 https://github.com/sphinx-doc/sphinx/issues/6146 https://github.com/michaeljones/breathe/pull/411
+  breathe sphinx_rtd_theme plantuml sphinxcontrib-plantuml sphinx
 
 # Install conan default profile
 WORKDIR /tmp

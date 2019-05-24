@@ -22,7 +22,6 @@ sys.path.append(os.path.abspath(".."))
 
 import pylene_lexer
 
-
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -31,7 +30,7 @@ import pylene_lexer
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'breathe', "ext.conceptdoc",
-              'matplotlib.sphinxext.plot_directive', "sphinxcontrib.plantuml"]
+              'matplotlib.sphinxext.plot_directive']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

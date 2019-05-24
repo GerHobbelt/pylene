@@ -9,17 +9,17 @@ function(add_image EXECUTABLE INPUT)
   # add_image(EXECUTABLE INPUT OUTPUT1 [ [OUTPUT2 [OUTPUT3 ...] ] ]
 
   set(outputs "")
-  foreach(output IN LISTS ARGN)
+  foreach (output IN LISTS ARGN)
     set(output "${DOCUMENTATION_IMAGE_DIR}/${output}")
     list(APPEND outputs "${output}")
     list(APPEND DOCUMENTATION_IMAGES "${output}")
-  endforeach()
+  endforeach ()
   set(DOCUMENTATION_IMAGES ${DOCUMENTATION_IMAGES} PARENT_SCOPE)
 
   add_custom_command(OUTPUT ${outputs}
-    COMMAND ${EXECUTABLE} ${INPUT} ${outputs}
-    COMMAND_EXPAND_LISTS
-    )
+                     COMMAND ${EXECUTABLE} ${INPUT} ${outputs}
+                     COMMAND_EXPAND_LISTS
+                     )
 endfunction()
 
 add_image("erosion-cli;erosion;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_erosion_1.png)
@@ -27,12 +27,12 @@ add_image("erosion-cli;dilation;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho
 add_image("erosion-cli;opening;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_opening_1.png)
 add_image("erosion-cli;closing;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_closing_1.png)
 add_image("staff_lines" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.pbm"
-  morpho_hitormiss_1.png morpho_hitormiss_2.png staff_lines_markers.png morpho_reconstruction_1.png morpho_reconstruction_2.png)
+          morpho_hitormiss_1.png morpho_hitormiss_2.png staff_lines_markers.png morpho_reconstruction_1.png morpho_reconstruction_2.png)
 add_image("blobs_watershed" "${DOCUMENTATION_IMAGE_DIR}/blobs_binary.png" blobs_distance_transform.png blobs_segmentation.png)
 
 
 add_custom_target(build-images
-  DEPENDS "${DOCUMENTATION_IMAGES}")
+                  DEPENDS "${DOCUMENTATION_IMAGES}")
 
 link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE} ${FreeImage_LIBRARY})
 link_libraries(Pylene::Pylene)

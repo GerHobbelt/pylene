@@ -113,8 +113,9 @@ namespace mln::extension
     auto manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
+      // using S = detail::remove_cvref_t<SE>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<S, mln::experimental::StructuringElement>::value);
 
       auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)
@@ -162,7 +163,7 @@ namespace mln::extension
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)

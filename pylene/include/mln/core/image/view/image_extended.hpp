@@ -107,7 +107,8 @@ namespace mln
       });
     }
 
-    const extension_type& extension() { return m_ext; }
+    const extension_type& extension() const { return m_ext; }
+    extension_type&       extension() { return m_ext; }
   };
 
 

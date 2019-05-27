@@ -28,6 +28,61 @@ namespace mln
     extended_view<I> extended(I image);
   }; // namespace view
 
+  namespace detail
+  {
+    template <class... Ts>
+    struct overloaded : Ts...
+    {
+      using Ts::operator()...;
+    };
+    template <class... Ts>
+    overloaded(Ts...)->overloaded<Ts...>;
+
+    template <typename V, typename I, bool is_finite>
+    struct _is_finite_extension_size
+    {
+    };
+
+    template <typename V, typename I>
+    struct _is_finite_extension_size<V, I, true>
+    {
+      using is_finite = std::true_type;
+
+      explicit _is_finite_extension_size(V* adapted_image)
+        : m_adapted_image{adapted_image}
+      {
+      }
+
+      std::size_t size() const
+      {
+        if (auto* ima = std::get_if<I>(m_adapted_image))
+        {
+          return ima->extension().size();
+        }
+        else
+        {
+          throw std::runtime_error("Calling size on an image that have an infinite extension");
+        }
+      }
+
+    protected:
+      V* m_adapted_image;
+    };
+
+    template <typename V, typename I>
+    struct _is_finite_extension_size<V, I, false>
+    {
+      using is_finite = std::false_type;
+
+      explicit _is_finite_extension_size(V* adapted_image)
+        : m_adapted_image{adapted_image}
+      {
+      }
+
+    protected:
+      V* m_adapted_image;
+    };
+  } // namespace detail
 
   /******************************************/
   /****          Implementation          ****/
@@ -49,8 +104,14 @@ namespace mln
     using typename image_adaptor<I>::domain_type;
     using extension_category = mln::extension::custom_extension_tag;
 
-    struct extension_type
+
+    // There isn't a good constexpr way yet to tell whether an extension is infinite when inside the variant
+    struct extension_type : detail::_is_finite_extension_size<adapted_image_t, I, false>
     {
+    private:
+      using base_t = detail::_is_finite_extension_size<adapted_image_t, I, false>;
+
+    public:
       using value_type        = image_value_t<I>;
       using point_type        = image_point_t<I>;
       using support_fill      = std::false_type;
@@ -58,14 +119,9 @@ namespace mln
       using support_periodize = std::false_type;
       using support_clamp     = std::false_type;
       using support_buffer    = std::false_type;
-      using is_finite         = std::conjunction<typename image_extension_t<I>::is_finite,
-                                         typename image_extension_t<none_extended_view<I>>::is_finite,
-                                         typename image_extension_t<value_extended_view<I>>::is_finite,
-                                         typename image_extension_t<image_extended_view<I>>::is_finite,
-                                         typename image_extension_t<pattern_extended_view<I>>::is_finite>;
 
       explicit extension_type(adapted_image_t* adapted_image)
-        : m_adapted_image{adapted_image}
+        : base_t{adapted_image}
       {
       }
 
@@ -82,9 +138,6 @@ namespace mln
         return std::visit([&pnt](auto&& ima) -> const value_type& { return ima.extension().value(pnt); },
                           *m_adapted_image);
       }
-
-    private:
-      adapted_image_t* m_adapted_image;
     };
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
@@ -131,13 +184,13 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> operator()(point_type p)
     {
-      return std::visit([p](auto ima) { return ima(p); }, m_adapted_image);
+      return std::visit([p](auto ima) -> reference { return ima(p); }, m_adapted_image);
     }
 
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return std::visit([p](auto ima) { return ima.at(p); }, m_adapted_image);
+      return std::visit([p](auto ima) -> reference { return ima.at(p); }, m_adapted_image);
     }
 
     template <class J = I>
@@ -160,7 +213,8 @@ namespace mln
       });
     }
 
-    const extension_type& extension() { return m_ext; }
+    const extension_type& extension() const { return m_ext; }
+    extension_type&       extension() { return m_ext; }
   };
 
 

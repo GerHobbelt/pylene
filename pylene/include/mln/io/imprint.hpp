@@ -22,7 +22,7 @@ namespace mln
     void imprint(const Image<I>& ima, std::ostream& os = std::cout);
 
     template <typename I>
-    void imprint_with_border(const Image<I>& ima, std::ostream& os = std::cout);
+    void imprint_with_border(const Image<I>& ima, std::ostream& os = std::cout, std::size_t default_border_size = 3);
 
 
     namespace experimental
@@ -31,7 +31,7 @@ namespace mln
       void imprint(InputImage ima, std::ostream& os = std::cout);
 
       template <typename InputImage>
-      void imprint_with_border(InputImage ima, std::ostream& os = std::cout);
+      void imprint_with_border(InputImage ima, std::ostream& os = std::cout, std::size_t default_border_size = 3);
     } // namespace experimental
 
     /******************************************/
@@ -189,8 +189,8 @@ namespace mln
       }
 
       template <typename Image, typename P>
-      std::enable_if_t<image_traits<Image>::accessible::value> imprint_with_border(const Image& ima, box<P, 2> domain,
-                                                                                   std::ostream& os)
+      std::enable_if_t<image_traits<Image>::accessible::value>
+          imprint_with_border(const Image& ima, box<P, 2> domain, std::ostream& os, std::size_t default_border_size)
       {
         typedef typename Image::value_type V;
 
@@ -202,7 +202,7 @@ namespace mln
 
         if constexpr (mln::is_a<Image, mln::experimental::Image>())
         {
-          auto vals = ima.new_values();
+          auto vals = const_cast<Image&>(ima).new_values();
           for (auto&& r : mln::ranges::rows(vals))
             for (auto&& v : r)
             {
@@ -219,7 +219,17 @@ namespace mln
         os.width(4);
 
         mln_point(Image) p;
-        int border = ima.border();
+        int border = 0;
+        if constexpr (std::is_convertible_v<typename Image::extension_type::is_finite, std::true_type>)
+        {
+          (void)default_border_size;
+          border = ima.extension().size();
+        }
+        else // infinite border, we use a defaulted value
+        {
+          border = default_border_size;
+        }
+
         for (p[0] = domain.pmin[0] - border; p[0] < domain.pmax[0] + border; ++p[0])
         {
           for (p[1] = domain.pmin[1] - border; p[1] < domain.pmax[1] + border; ++p[1])
@@ -247,9 +257,9 @@ namespace mln
     }
 
     template <typename I>
-    void imprint_with_border(const Image<I>& ima, std::ostream& os)
+    void imprint_with_border(const Image<I>& ima, std::ostream& os, std::size_t default_border_size)
     {
-      internal::imprint_with_border(exact(ima), exact(ima).domain(), os);
+      internal::imprint_with_border(exact(ima), exact(ima).domain(), os, default_border_size);
     }
 
     namespace experimental
@@ -263,11 +273,11 @@ namespace mln
       }
 
       template <typename InputImage>
-      void imprint_with_border(InputImage ima, std::ostream& os)
+      void imprint_with_border(InputImage ima, std::ostream& os, std::size_t default_border_size)
       {
         static_assert(mln::is_a<InputImage, mln::experimental::Image>());
 
-        internal::imprint_with_border(ima, ima.domain(), os);
+        internal::imprint_with_border(ima, ima.domain(), os, default_border_size);
       }
     } // namespace experimental
   }   // namespace io

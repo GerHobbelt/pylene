@@ -8,6 +8,7 @@ namespace mln
   {
     public:
       any_ref() = default;
+      any_ref(std::any& elm);
       any_ref(void*& elm);
       void* data();
     private:

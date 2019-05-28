@@ -11,6 +11,7 @@
 
 #include <any>
 #include <exception>
+#include <type_traits>
 
 
 namespace mln::extension

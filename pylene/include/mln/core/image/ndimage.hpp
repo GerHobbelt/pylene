@@ -16,7 +16,9 @@
 #include <mln/core/memory.hpp>
 #include <mln/core/rangev3/multi_span.hpp>
 
+#include <optional>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -82,17 +84,17 @@ namespace mln
       using support_periodize = std::false_type; // TODO
       using support_clamp     = std::true_type;  // TODO
       using support_buffer    = std::false_type; // TODO
-      using is_finite         = std::true_type;
 
       ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp, const box<short, dim>* dom,
                         int border);
 
       template <typename SE>
-      bool              fit(const SE& se) const;
-      const value_type& value(const point_type& pnt) const;
-      std::size_t       size() const;
-      void              fill(const T& v);
-      void              mirror(std::size_t padding = 0);
+      bool                       fit(const SE& se) const;
+      constexpr bool             is_finite() const;
+      std::optional<std::size_t> size() const;
+      const value_type&          value(const point_type& pnt) const;
+      void                       fill(const T& v);
+      void                       mirror(std::size_t padding = 0);
 
       // TODO
       // void periodize();
@@ -1120,8 +1122,21 @@ namespace mln
       }
       else
       {
-        return true; // TODO check wether default value should be true false or error
+        return false; // TODO check wether default value should be true false or error
       }
+    }
+
+    template <typename T, unsigned dim>
+    constexpr bool ndimage_extension<T, dim>::is_finite() const
+    {
+      return true;
+    }
+
+    template <typename T, unsigned dim>
+
+    std::optional<std::size_t> ndimage_extension<T, dim>::size() const
+    {
+      return m_border;
     }
 
     template <typename T, unsigned dim>
@@ -1132,13 +1147,6 @@ namespace mln
       for (unsigned i = 0; i < dim; ++i)
         ptr += (pnt[i] - m_dom->pmin[i]) * m_strides[i];
       return *reinterpret_cast<T*>(ptr);
-    }
-
-
-    template <typename T, unsigned dim>
-    std::size_t ndimage_extension<T, dim>::size() const
-    {
-      return m_border;
     }
 
     template <typename T, unsigned dim>

@@ -6,6 +6,7 @@
 #include <mln/core/image/image.hpp>
 
 #include <algorithm>
+#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -22,7 +23,6 @@ namespace mln::extension
     using support_periodize = std::true_type;
     using support_clamp     = std::true_type;
     using support_buffer    = std::false_type;
-    using is_finite         = std::false_type;
 
     by_pattern(I* ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
       : m_ima{ima}
@@ -35,20 +35,24 @@ namespace mln::extension
     experimental::Pattern pattern() const { return m_pattern; }
 
     template <typename SE>
-    bool fit(const SE&) const
+    constexpr bool fit(const SE&) const
     {
       PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
       return true;
     }
 
-    void mirror(std::size_t padding = 0)
+    constexpr bool is_finite() const { return false; }
+
+    constexpr std::optional<std::size_t> size() const { return std::nullopt; }
+
+    constexpr void mirror(std::size_t padding = 0)
     {
       m_pattern = experimental::Pattern::Mirror;
       m_padding = padding;
     }
-    void periodize() { m_pattern = experimental::Pattern::Periodize; }
-    void clamp() { m_pattern = experimental::Pattern::Clamp; }
+    constexpr void periodize() { m_pattern = experimental::Pattern::Periodize; }
+    constexpr void clamp() { m_pattern = experimental::Pattern::Clamp; }
 
 
     const V& value(const point_type& pnt) const

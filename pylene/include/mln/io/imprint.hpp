@@ -220,10 +220,9 @@ namespace mln
 
         mln_point(Image) p;
         int border = 0;
-        if constexpr (std::is_convertible_v<typename Image::extension_type::is_finite, std::true_type>)
+        if (ima.extension().is_finite())
         {
-          (void)default_border_size;
-          border = ima.extension().size();
+          border = ima.extension().size().value_or(border);
         }
         else // infinite border, we use a defaulted value
         {

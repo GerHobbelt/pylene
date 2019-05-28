@@ -39,6 +39,8 @@ TEST(Core, Fill_LargeEnough_BM_Auto)
   auto disc         = mln::se::disc{1};
   auto extended_ima = extension::bm::fill(uint8_t(42)).manage(ima, disc);
 
+  ASSERT_TRUE(extended_ima.extension().is_finite());
+
   io::experimental::imprint_with_border(extended_ima, std::cout, 6);
   ASSERT_TRUE(all_of(ima == out));
 }
@@ -55,6 +57,8 @@ TEST(Core, Fill_NotLargeEnough_BM_Auto)
   auto disc         = mln::se::disc{4};
   auto extended_ima = extension::bm::fill(uint8_t(42)).manage(ima, disc);
 
+  ASSERT_FALSE(extended_ima.extension().is_finite());
+
   io::experimental::imprint_with_border(extended_ima, std::cout, 6);
   ASSERT_TRUE(all_of(ima == out));
 }
@@ -70,6 +74,8 @@ TEST(Core, Fill_LargeEnough_BM_User)
 
   auto disc         = mln::se::disc{1};
   auto extended_ima = extension::bm::user_managed::fill(uint8_t(42)).manage(ima, disc);
+
+  ASSERT_TRUE(extended_ima.extension().is_finite());
 
   io::experimental::imprint_with_border(extended_ima, std::cout, 6);
   ASSERT_TRUE(all_of(ima == out));

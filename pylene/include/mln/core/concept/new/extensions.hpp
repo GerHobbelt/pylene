@@ -36,29 +36,17 @@ namespace mln::concepts
       typename Ext::support_periodize;
       typename Ext::support_clamp;
       typename Ext::support_buffer;
-      typename Ext::is_finite;
     } &&
     Value<typename Ext::value_type> &&
     requires (const Ext cext,
         mln::archetypes::StructuringElement<
           Pnt,
           mln::archetypes::Pixel> se, const Pnt pnt) {
-      { cext.fit(se) }    -> bool;
-      { cext.value(pnt) } -> typename Ext::value_type;
+      { cext.fit(se) }      -> bool;
+      { cext.value(pnt) }   -> typename Ext::value_type;
+      { cext.is_finite() }  -> bool
+      { cext.size() }       -> std::optional<std::size_t>;
     };
-  
-  template <typename Ext>
-  concept BoundedExtension =
-    Extension<Ext> &&
-    std::is_same_v<typename Ext::is_finite, std::true_type> &&
-    requires (const Ext cext) {
-      { cext.size() } -> std::size_t;
-    };
-  
-  template <typename Ext>
-  concept UnboundedExtension =
-    Extension<Ext> &&
-    std::is_same_v<typename Ext::is_finite, std::false_type>;
 
   template <typename Ext>
   concept FillableExtension = 

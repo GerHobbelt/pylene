@@ -9,7 +9,10 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/io/imprint.hpp>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
+
 #include <gtest/gtest.h>
+
 
 TEST(Core, Extension_Fill)
 {
@@ -41,8 +44,9 @@ TEST(Core, Fill_LargeEnough_BM_Auto)
 
   ASSERT_TRUE(extended_ima.extension().is_finite());
 
-  io::experimental::imprint_with_border(extended_ima, std::cout, 6);
-  ASSERT_TRUE(all_of(ima == out));
+  // io::experimental::imprint_with_border(extended_ima, std::cout, 6);
+  // ASSERT_TRUE(all_of(extended_ima == out));
+  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, out);
 }
 
 TEST(Core, Fill_NotLargeEnough_BM_Auto)
@@ -60,7 +64,7 @@ TEST(Core, Fill_NotLargeEnough_BM_Auto)
   ASSERT_FALSE(extended_ima.extension().is_finite());
 
   io::experimental::imprint_with_border(extended_ima, std::cout, 6);
-  ASSERT_TRUE(all_of(ima == out));
+  ASSERT_TRUE(all_of(extended_ima == out));
 }
 
 TEST(Core, Fill_LargeEnough_BM_User)
@@ -78,7 +82,7 @@ TEST(Core, Fill_LargeEnough_BM_User)
   ASSERT_TRUE(extended_ima.extension().is_finite());
 
   io::experimental::imprint_with_border(extended_ima, std::cout, 6);
-  ASSERT_TRUE(all_of(ima == out));
+  ASSERT_TRUE(all_of(extended_ima == out));
 }
 
 TEST(Core, Fill_NotLargeEnough_BM_User)

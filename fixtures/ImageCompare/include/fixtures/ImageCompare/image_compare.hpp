@@ -2,6 +2,7 @@
 
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
+#include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 #include <mln/io/imprint.hpp>
 
@@ -27,7 +28,10 @@ namespace fixtures::ImageCompare
   {
     template <class ImageLhs, class ImageRhs>
     bool compare(ImageLhs f, ImageRhs g);
-  }
+
+    template <class ImageLhs, class ImageRhs>
+    bool compare_with_border(ImageLhs f, ImageRhs g, std::size_t default_border = 3);
+  } // namespace experimental
 
   /******************************************/
   /****          Implementation          ****/
@@ -72,28 +76,114 @@ namespace fixtures::ImageCompare
       static_assert(mln::is_a<ImageLhs, mln::experimental::Image>());
       static_assert(mln::is_a<ImageRhs, mln::experimental::Image>());
 
-      auto f_dom = f.domain();
-      auto g_dom = f.domain();
+      using f_domain_t = typename ImageLhs::domain_type;
+      using g_domain_t = typename ImageRhs::domain_type;
 
-      auto f_dom_b = ::ranges::begin(f_dom);
-      auto g_dom_b = ::ranges::begin(g_dom);
-      auto f_dom_e = ::ranges::end(f_dom);
-      auto g_dom_e = ::ranges::end(g_dom);
-      for (; (f_dom_b != f_dom_e) || (g_dom_b != g_dom_e); ++f_dom_b, ++g_dom_b)
-        if (*f_dom_b != *g_dom_b)
-          return false;
+      constexpr auto f_dim = f_domain_t::dimension;
+      constexpr auto g_dim = g_domain_t::dimension;
+      static_assert(f_dim == g_dim);
 
-      if ((f_dom_b != f_dom_e) || (g_dom_b != g_dom_e))
-        return false;
+      {
+        auto f_dom = f.domain();
+        auto g_dom = g.domain();
 
-      auto zipped_vals = mln::ranges::view::zip(f.new_values(), g.new_values());
-      for (auto&& r : mln::ranges::rows(zipped_vals))
-        for (auto&& [f_v, g_v] : r)
-          if (f_v != g_v)
+        auto f_dom_b = ::ranges::begin(f_dom);
+        auto g_dom_b = ::ranges::begin(g_dom);
+        auto f_dom_e = ::ranges::end(f_dom);
+        auto g_dom_e = ::ranges::end(g_dom);
+        for (; (f_dom_b != f_dom_e) || (g_dom_b != g_dom_e); ++f_dom_b, ++g_dom_b)
+          if (*f_dom_b != *g_dom_b)
             return false;
+
+        if ((f_dom_b != f_dom_e) || (g_dom_b != g_dom_e))
+          return false;
+      }
+
+      {
+        auto zipped_vals = mln::ranges::view::zip(f.new_values(), g.new_values());
+        for (auto&& r : mln::ranges::rows(zipped_vals))
+          for (auto&& [f_v, g_v] : r)
+            if (f_v != g_v)
+              return false;
+      }
 
       return true;
     }
+
+    namespace detail
+    {
+      template <typename Pnt, typename S, std::size_t... I>
+      Pnt shift_pnt_impl(const Pnt& p, S shift, std::index_sequence<I...>)
+      {
+        return Pnt((p[I] + shift)...);
+      }
+
+      template <std::size_t D, typename Pnt, typename S>
+      Pnt shift_pnt(const Pnt& p, S shift)
+      {
+        return shift_pnt_impl(p, shift, std::make_index_sequence<D>{});
+      }
+    } // namespace detail
+
+    template <class ImageLhs, class ImageRhs>
+    bool compare_with_border(ImageLhs f, ImageRhs g, std::size_t default_border)
+    {
+      static_assert(mln::is_a<ImageLhs, mln::experimental::Image>());
+      static_assert(mln::is_a<ImageRhs, mln::experimental::Image>());
+
+      using f_domain_t = typename ImageLhs::domain_type;
+      using g_domain_t = typename ImageRhs::domain_type;
+
+      constexpr auto f_dim = f_domain_t::dimension;
+      constexpr auto g_dim = g_domain_t::dimension;
+      static_assert(f_dim == g_dim);
+
+      auto pmin = typename f_domain_t::point_type{};
+      auto pmax = typename f_domain_t::point_type{};
+
+      {
+        auto f_dom = f.domain();
+        auto g_dom = g.domain();
+
+        pmin         = *::ranges::begin(f_dom);
+        auto f_dom_r = mln::ranges::view::reverse(f_dom);
+        pmax         = *::ranges::begin(f_dom_r);
+
+        auto f_dom_b = ::ranges::begin(f_dom);
+        auto g_dom_b = ::ranges::begin(g_dom);
+        auto f_dom_e = ::ranges::end(f_dom);
+        auto g_dom_e = ::ranges::end(g_dom);
+
+        for (; (f_dom_b != f_dom_e) || (g_dom_b != g_dom_e); ++f_dom_b, ++g_dom_b)
+          if (*f_dom_b != *g_dom_b)
+            return false;
+
+        if ((f_dom_b != f_dom_e) || (g_dom_b != g_dom_e))
+          return false;
+      }
+
+      {
+        std::size_t border = 0;
+        auto        f_ext  = f.extension();
+        auto        g_ext  = g.extension();
+        if (f_ext.is_finite() && g_ext.is_finite())
+          border = std::min(*f_ext.size(), *g_ext.size());
+        else if (f_ext.is_finite())
+          border = *f_ext.size();
+        else if (g_ext.is_finite())
+          border = *g_ext.size();
+        else
+          border = default_border;
+
+        auto extended_dom =
+            f_domain_t{detail::shift_pnt<f_dim>(pmin, -border), detail::shift_pnt<f_dim>(pmax, +border)};
+        for (auto&& p : extended_dom)
+          if (f.at(p) != g.at(p))
+            return false;
+      }
+
+      return true;
+    } // namespace experimental
 
     namespace impl
     {
@@ -110,6 +200,20 @@ namespace fixtures::ImageCompare
         mln::io::experimental::imprint(g, msg);
         return msg.str();
       }
+
+      template <class ImageLhs, class ImageRhs>
+      std::string err_compare_with_border_msg(ImageLhs f, ImageRhs g, std::size_t default_border = 3)
+      {
+        static_assert(mln::is_a<ImageLhs, mln::experimental::Image>());
+        static_assert(mln::is_a<ImageRhs, mln::experimental::Image>());
+
+        std::stringstream msg;
+        msg << "The following images differs:\n";
+        mln::io::experimental::imprint_with_border(f, msg, default_border);
+        msg << " and\n:";
+        mln::io::experimental::imprint_with_border(g, msg, default_border);
+        return msg.str();
+      }
     } // namespace impl
   }   // namespace experimental
 
@@ -123,3 +227,7 @@ namespace fixtures::ImageCompare
 #define ASSERT_IMAGES_EQ_EXP(f, g)                                                                                     \
   ASSERT_TRUE(::fixtures::ImageCompare::experimental::compare(f, g))                                                   \
       << ::fixtures::ImageCompare::experimental::impl::err_compare_msg(f, g)
+
+#define ASSERT_IMAGES_WITH_BORDER_EQ_EXP(f, g)                                                                         \
+  ASSERT_TRUE(::fixtures::ImageCompare::experimental::compare_with_border(f, g))                                       \
+      << ::fixtures::ImageCompare::experimental::impl::err_compare_with_border_msg(f, g)

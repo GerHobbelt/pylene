@@ -13,6 +13,20 @@
 
 namespace mln::extension
 {
+  namespace detail
+  {
+    template <typename V, typename U>
+    auto remainder_sup0(V v, U r_)
+    {
+      auto r = static_cast<V>(r_);
+      while (v >= r)
+        v -= r;
+      while (v <= 0)
+        v += r;
+      return v < 0 ? v + r : v;
+    }
+  } // namespace detail
+
   template <typename V, typename I>
   struct by_pattern
   {
@@ -31,7 +45,8 @@ namespace mln::extension
     {
     }
 
-    std::size_t           padding() const { return m_padding; }
+    std::size_t padding() const { return m_padding; }
+
     experimental::Pattern pattern() const { return m_pattern; }
 
     template <typename SE>
@@ -51,7 +66,9 @@ namespace mln::extension
       m_pattern = experimental::Pattern::Mirror;
       m_padding = padding;
     }
+
     constexpr void periodize() { m_pattern = experimental::Pattern::Periodize; }
+
     constexpr void clamp() { m_pattern = experimental::Pattern::Clamp; }
 
 
@@ -92,7 +109,11 @@ namespace mln::extension
     template <typename Pnt, std::size_t... Idx>
     Pnt compute_mirror_coords_impl(Pnt pnt, Pnt shp, std::size_t padding, std::index_sequence<Idx...>) const
     {
-      return Pnt((shp[Idx] - pnt[Idx] % (shp[Idx] - padding))...);
+      if ((((shp[Idx] - padding) <= 0) || ...))
+        throw std::runtime_error(
+            "Cannot have a padding whose size is supperior or equal to one of the dimension's shape.");
+
+      return Pnt((shp[Idx] - detail::remainder_sup0(pnt[Idx], shp[Idx] - padding))...);
     }
 
     const V& value_periodize(image_point_t<I> pnt) const
@@ -115,7 +136,7 @@ namespace mln::extension
     template <typename Pnt, std::size_t... Idx>
     Pnt compute_periodize_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<Idx...>) const
     {
-      return Pnt((pnt[Idx] % shp[Idx])...);
+      return Pnt(detail::remainder_sup0(pnt[Idx], shp[Idx])...);
     }
 
     const V& value_clamp(image_point_t<I> pnt) const

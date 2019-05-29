@@ -56,10 +56,13 @@ namespace fixtures::ImageCompare
   namespace impl
   {
     template <class I, class J>
-    std::string err_compare_msg(const mln::Image<I>& reference, const mln::Image<J>& input)
+    std::string err_compare_msg(const mln::Image<I>& reference, const mln::Image<J>& input, bool eq = true)
     {
       std::stringstream msg;
-      msg << "The following images differs:\n";
+      if (eq)
+        msg << "The following images differ:\n";
+      else
+        msg << "The following images are identical:\n";
       mln::io::imprint(reference, msg);
       msg << " and\n:";
       mln::io::imprint(input, msg);
@@ -188,13 +191,16 @@ namespace fixtures::ImageCompare
     namespace impl
     {
       template <class ImageLhs, class ImageRhs>
-      std::string err_compare_msg(ImageLhs f, ImageRhs g)
+      std::string err_compare_msg(ImageLhs f, ImageRhs g, bool eq = true)
       {
         static_assert(mln::is_a<ImageLhs, mln::experimental::Image>());
         static_assert(mln::is_a<ImageRhs, mln::experimental::Image>());
 
         std::stringstream msg;
-        msg << "The following images differs:\n";
+        if (eq)
+          msg << "The following images differ:\n";
+        else
+          msg << "The following images are identical:\n";
         mln::io::experimental::imprint(f, msg);
         msg << " and\n:";
         mln::io::experimental::imprint(g, msg);
@@ -202,13 +208,16 @@ namespace fixtures::ImageCompare
       }
 
       template <class ImageLhs, class ImageRhs>
-      std::string err_compare_with_border_msg(ImageLhs f, ImageRhs g, std::size_t default_border = 3)
+      std::string err_compare_with_border_msg(ImageLhs f, ImageRhs g, bool eq = true, std::size_t default_border = 3)
       {
         static_assert(mln::is_a<ImageLhs, mln::experimental::Image>());
         static_assert(mln::is_a<ImageRhs, mln::experimental::Image>());
 
         std::stringstream msg;
-        msg << "The following images differs:\n";
+        if (eq)
+          msg << "The following images differ:\n";
+        else
+          msg << "The following images are identical:\n";
         mln::io::experimental::imprint_with_border(f, msg, default_border);
         msg << " and\n:";
         mln::io::experimental::imprint_with_border(g, msg, default_border);
@@ -224,10 +233,21 @@ namespace fixtures::ImageCompare
 #define ASSERT_IMAGES_EQ(f, g)                                                                                         \
   ASSERT_TRUE(::fixtures::ImageCompare::compare(f, g)) << ::fixtures::ImageCompare::impl::err_compare_msg(f, g)
 
+#define ASSERT_IMAGES_NE(f, g)                                                                                         \
+  ASSERT_FALSE(::fixtures::ImageCompare::compare(f, g)) << ::fixtures::ImageCompare::impl::err_compare_msg(f, g, false)
+
 #define ASSERT_IMAGES_EQ_EXP(f, g)                                                                                     \
   ASSERT_TRUE(::fixtures::ImageCompare::experimental::compare(f, g))                                                   \
       << ::fixtures::ImageCompare::experimental::impl::err_compare_msg(f, g)
 
+#define ASSERT_IMAGES_NE_EXP(f, g)                                                                                     \
+  ASSERT_FALSE(::fixtures::ImageCompare::experimental::compare(f, g))                                                  \
+      << ::fixtures::ImageCompare::experimental::impl::err_compare_msg(f, g, false)
+
 #define ASSERT_IMAGES_WITH_BORDER_EQ_EXP(f, g)                                                                         \
   ASSERT_TRUE(::fixtures::ImageCompare::experimental::compare_with_border(f, g))                                       \
       << ::fixtures::ImageCompare::experimental::impl::err_compare_with_border_msg(f, g)
+
+#define ASSERT_IMAGES_WITH_BORDER_NE_EXP(f, g)                                                                         \
+  ASSERT_FALSE(::fixtures::ImageCompare::experimental::compare_with_border(f, g))                                      \
+      << ::fixtures::ImageCompare::experimental::impl::err_compare_with_border_msg(f, g, false)

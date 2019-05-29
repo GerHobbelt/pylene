@@ -25,7 +25,6 @@ TEST(Core, Extension_Fill)
 
   extension::fill(ima, 42);
 
-  io::imprint_with_border(ima);
   ASSERT_TRUE(all_of(ima == out));
 }
 

@@ -68,7 +68,7 @@ namespace mln
   public:
     pattern_extended_view(I ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
       : base_t{std::move(ima)}
-      , m_ext{&this->base(), pattern, padding}
+      , m_ext{this->base(), pattern, padding}
     {
     }
 

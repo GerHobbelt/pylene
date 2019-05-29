@@ -38,13 +38,12 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
   iota(ima, 0);
   image2d<uint8> out          = clone(ima);
   auto           disc         = mln::se::disc{4};
-  auto           extended_ima = extension::bm::mirror().manage(ima, disc);
+  auto           bm           = extension::bm::mirror();
+  auto           extended_ima = bm.manage(ima, disc);
 
   ASSERT_FALSE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
-  // FIXME: crash
-  // ASSERT_IMAGES_NE_EXP(extended_ima, out);
-  // ASSERT_IMAGES_WITH_BORDER_NE_EXP(extended_ima, ima);
+  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
 }
 
 TEST(Core, Mirror_LargeEnough_BM_User)

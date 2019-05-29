@@ -24,8 +24,8 @@ namespace mln::extension
     using support_clamp     = std::true_type;
     using support_buffer    = std::false_type;
 
-    by_pattern(I* ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
-      : m_ima{ima}
+    by_pattern(I ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
+      : m_ima{std::move(ima)}
       , m_padding{padding}
       , m_pattern{pattern}
     {
@@ -79,7 +79,7 @@ namespace mln::extension
       PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      return (*m_ima)(compute_mirror_coords<dim>(std::move(pnt), m_ima->domain().shape(), this->m_padding));
+      return m_ima(compute_mirror_coords<dim>(std::move(pnt), m_ima.domain().shape(), this->m_padding));
     }
 
     template <std::size_t dim, typename Pnt>
@@ -103,7 +103,7 @@ namespace mln::extension
       PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      return (*m_ima)(compute_periodize_coords<dim>(std::move(pnt), m_ima->domain().shape()));
+      return m_ima(compute_periodize_coords<dim>(std::move(pnt), m_ima.domain().shape()));
     }
 
     template <std::size_t dim, typename Pnt>
@@ -126,7 +126,7 @@ namespace mln::extension
       PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
                                "Domain must be shaped to allow pattern-based extension!");
 
-      return (*m_ima)(compute_clamp_coords<dim>(std::move(pnt), m_ima->domain().shape()));
+      return m_ima(compute_clamp_coords<dim>(std::move(pnt), m_ima.domain().shape()));
     }
 
     template <std::size_t dim, typename Pnt>
@@ -143,7 +143,7 @@ namespace mln::extension
     }
 
   private:
-    I*                                    m_ima;
+    I                                     m_ima;
     std::size_t                           m_padding;
     mln::extension::experimental::Pattern m_pattern;
   };

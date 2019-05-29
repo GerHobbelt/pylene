@@ -139,13 +139,13 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> operator()(point_type p)
     {
-      return std::visit([p](auto ima) -> reference { return ima(p); }, m_adapted_image);
+      return std::visit([p](auto&& ima) -> reference { return ima(p); }, m_adapted_image);
     }
 
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return std::visit([p](auto ima) -> reference { return ima.at(p); }, m_adapted_image);
+      return std::visit([p](auto&& ima) -> reference { return ima.at(p); }, m_adapted_image);
     }
 
     template <class J = I>

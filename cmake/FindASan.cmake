@@ -26,6 +26,7 @@ option(SANITIZE_ADDRESS "Enable AddressSanitizer for sanitized targets." Off)
 
 set(FLAG_CANDIDATES
     # Clang 3.2+ use this version. The no-omit-frame-pointer option is optional.
+    "-g -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     "-g -fsanitize=address -fno-omit-frame-pointer"
     "-g -fsanitize=address"
 
@@ -57,5 +58,16 @@ function (add_sanitize_address TARGET)
     endif ()
     
     # message(STATUS "Adding address sanitizers flags for ${TARGET}")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        find_program(LLVM_SYMBOLIZER NAMES llvm-symbolizer llvm-symbolizer-6.0 llvm-symbolizer-7)
+
+        if (NOT LLVM_SYMBOLIZER)
+            message (WARNING "AddressSanitizer failed to locate an llvm-symbolizer program. Stack traces may lack symbols.")
+        endif ()
+
+        set_target_properties(${TARGET} PROPERTIES ENVIRONMENT "ASAN_SYMBOLIZER_PATH=${LLVM_SYMBOLIZER}")
+    endif ()
+
+    set_target_properties(${TARGET} PROPERTIES ENVIRONMENT "ASAN_OPTIONS=check_initialization_order=1:symbolize=1")
     sanitizer_add_flags(${TARGET} "AddressSanitizer" "ASan")
 endfunction ()

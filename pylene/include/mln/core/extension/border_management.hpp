@@ -208,7 +208,7 @@ namespace mln::extension
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_mirror::value)
       {
@@ -250,7 +250,7 @@ namespace mln::extension
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."

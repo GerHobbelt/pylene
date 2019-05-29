@@ -62,6 +62,7 @@ add_core_test(${test_prefix}wneighborhood    neighborhood/wneighborhood.cpp)
 
 # test Extension
 add_core_test(${test_prefix}extension_fill     extension/fill.cpp)
+add_core_test(${test_prefix}extension_mirror   extension/mirror.cpp)
 
 # test Value
 add_core_test(${test_prefix}value_int          value/int.cpp)

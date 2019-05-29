@@ -26,8 +26,8 @@ namespace mln::extension
 
     by_pattern(I* ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
       : m_ima{ima}
-      , m_pattern{pattern}
       , m_padding{padding}
+      , m_pattern{pattern}
     {
     }
 

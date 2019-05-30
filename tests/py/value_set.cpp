@@ -8,13 +8,7 @@
 #include <gtest/gtest.h>
 
 
-/*TEST(Py, vs_void_max)
-{
-  image2d<void> img = image2d(3, 3, Info::INT8_V);
-  ASSERT_EQ(std::any_cast<int8_t>(img.), std::numeric_limits<int8_t>::max());
-}*/
-
-TEST(Py, vs_T_max)
+TEST(Py, vs_max)
 {
   mln::py::value_set<int8_t> vs;
   ASSERT_EQ(std::any_cast<int8_t>(vs.max()), std::numeric_limits<int8_t>::max());

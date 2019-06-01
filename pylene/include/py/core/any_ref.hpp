@@ -1,4 +1,12 @@
-namespace mln
+#pragma once
+
+#include <py/core/any_ref_placeholder.hpp>
+
+#include <any>
+#include <memory>
+#include <typeinfo>
+
+namespace mln::py
 {
   /*
   ** std::any has a dynamic allocation mechanism, hence a lack of performance.
@@ -11,7 +19,24 @@ namespace mln
       any_ref(std::any& elm);
       any_ref(void*& elm);
       void* data();
+
+      template <typename T>
+      T as()
+      {
+        if (dynamic_cast<placeholder<std::any>>(m_held))
+        {
+          return std::any_cast<T>(*dynamic_cast<std::any*>(&m_held));
+        }
+        return static_cast<T>(m_held);
+      }
+
+      template <typename T>
+      any_ref(T& elm)
+      {
+        new (&m_held) placeholder<T>(elm);
+      }
+
     private:
-      void*   m_data;
+      std::aligned_storage_t<sizeof(placeholder_base), alignof(placeholder_base)> m_held;
   };
-} // namespace mln
+} // namespace mln::py

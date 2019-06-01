@@ -48,8 +48,10 @@ target_sources(Pylene PRIVATE
                src/core/se/mask2d.cpp
                src/core/trace.cpp
 
-               src/py/core/image2d_data.cpp
+               src/py/core/any_ref.cpp
+               src/py/core/any_ref_placeholder.cpp
                src/py/core/any_span.cpp
+               src/py/core/image2d_data.cpp
                )
 
 # Compiler configurations

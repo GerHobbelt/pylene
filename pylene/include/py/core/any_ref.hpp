@@ -18,22 +18,31 @@ namespace mln::py
       any_ref() = default;
       any_ref(std::any& elm);
       any_ref(void*& elm);
-      void* data();
-
-      template <typename T>
-      T as()
-      {
-        if (dynamic_cast<placeholder<std::any>>(m_held))
-        {
-          return std::any_cast<T>(*dynamic_cast<std::any*>(&m_held));
-        }
-        return static_cast<T>(m_held);
-      }
 
       template <typename T>
       any_ref(T& elm)
       {
         new (&m_held) placeholder<T>(elm);
+      }
+
+      void* data();
+
+      template <typename T>
+      T as()
+      {
+        placeholder_base* tmp = reinterpret_cast<placeholder_base*>(&m_held);
+        if (placeholder<std::any> *ptr = dynamic_cast<placeholder<std::any>*>(tmp))
+        {
+          return std::any_cast<T>(*static_cast<std::any*>(ptr->m_data));
+        }
+        else if (placeholder<T> *ptr = dynamic_cast<placeholder<T>*>(tmp))
+        {
+          return *static_cast<T*>(ptr->m_data);
+        }
+        else
+        {
+          throw "Invalid any_ref cast";
+        }
       }
 
     private:

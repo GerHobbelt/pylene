@@ -12,25 +12,28 @@
 #include <gtest/gtest.h>
 
 
-TEST(Core, Mirror_LargeEnough_BM_Auto)
+TEST(Core, Periodize_LargeEnough_BM_Auto)
 {
   using namespace mln;
   using namespace mln::view::ops;
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  image2d<uint8> out = clone(ima);
+  [[maybe_unused]] image2d<uint8> out = clone(ima);
 
-  auto disc         = mln::se::disc{1};
-  auto extended_ima = extension::bm::mirror().manage(ima, disc);
+  [[maybe_unused]] auto disc = mln::se::disc{1};
+  // TODO: implement periodize in ndimage
+  /*
+  auto extended_ima = extension::bm::periodize().manage(ima, disc);
 
 
   ASSERT_TRUE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  */
 }
 
-TEST(Core, Mirror_NotLargeEnough_BM_Auto)
+TEST(Core, Periodize_NotLargeEnough_BM_Auto)
 {
   using namespace mln;
   using namespace mln::view::ops;
@@ -39,44 +42,48 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
   iota(ima, 0);
   image2d<uint8> out          = clone(ima);
   auto           disc         = mln::se::disc{4};
-  auto           extended_ima = extension::bm::mirror().manage(ima, disc);
+  auto           extended_ima = extension::bm::periodize().manage(ima, disc);
 
   ASSERT_FALSE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_NE_EXP(extended_ima, ima);
-  ima.extension().mirror();
-  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+
+  // TODO: implement periodize in ndimage
+  // ima.extension().periodize();
+  // ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
 }
 
-TEST(Core, Mirror_LargeEnough_BM_User)
+TEST(Core, Periodize_LargeEnough_BM_User)
 {
   using namespace mln;
   using namespace mln::view::ops;
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  image2d<uint8> out = clone(ima);
+  [[maybe_unused]] image2d<uint8> out = clone(ima);
 
-  auto disc         = mln::se::disc{1};
-  auto extended_ima = extension::bm::user_managed::mirror().manage(ima, disc);
+  [[maybe_unused]] auto disc = mln::se::disc{1};
+  // TODO: implement periodize in ndimage
+  /*
+  auto extended_ima = extension::bm::user_managed::periodize().manage(ima, disc);
 
   ASSERT_TRUE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  */
 }
 
-TEST(Core, Mirror_NotLargeEnough_BM_User)
+TEST(Core, Periodize_NotLargeEnough_BM_User)
 {
   using namespace mln;
   using namespace mln::view::ops;
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  image2d<uint8> out = clone(ima);
+  [[maybe_unused]] image2d<uint8> out = clone(ima);
 
-  auto disc = mln::se::disc{4};
-  auto bm   = extension::bm::user_managed::mirror();
-  EXPECT_THROW(auto extended_ima = bm.manage(ima, disc), std::runtime_error);
+  [[maybe_unused]] auto disc = mln::se::disc{4};
+  [[maybe_unused]] auto bm   = extension::bm::user_managed::periodize();
+  // TODO: implement periodize in ndimage
+  // EXPECT_THROW(auto extended_ima = bm.manage(ima, disc), std::runtime_error);
 }
-
-// TODO: implement mirror with padding in ndimage and test-it

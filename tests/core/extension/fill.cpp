@@ -60,6 +60,8 @@ TEST(Core, Fill_NotLargeEnough_BM_Auto)
   ASSERT_FALSE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_NE_EXP(extended_ima, ima);
+  ima.extension().fill(uint8_t(42));
+  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
 }
 
 TEST(Core, Fill_LargeEnough_BM_User)

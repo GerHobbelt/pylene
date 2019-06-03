@@ -61,8 +61,11 @@ add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)
 add_core_test(${test_prefix}wneighborhood    neighborhood/wneighborhood.cpp)
 
 # test Extension
-add_core_test(${test_prefix}extension_fill     extension/fill.cpp)
-add_core_test(${test_prefix}extension_mirror   extension/mirror.cpp)
+add_core_test(${test_prefix}extension_clamp     extension/clamp.cpp)
+add_core_test(${test_prefix}extension_fill      extension/fill.cpp)
+add_core_test(${test_prefix}extension_mirror    extension/mirror.cpp)
+add_core_test(${test_prefix}extension_periodize extension/periodize.cpp)
+
 
 # test Value
 add_core_test(${test_prefix}value_int          value/int.cpp)

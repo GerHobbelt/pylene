@@ -6,6 +6,7 @@
 #include <mln/core/image/image.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <optional>
 #include <type_traits>
 #include <utility>
@@ -15,15 +16,58 @@ namespace mln::extension
 {
   namespace detail
   {
-    template <typename V, typename U>
-    auto remainder_sup0(V v, U r_)
+    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t padding)
     {
-      auto r = static_cast<V>(r_);
-      while (v >= r)
-        v -= r;
-      while (v <= 0)
-        v += r;
-      return v < 0 ? v + r : v;
+      if (shp_ == 0)
+        throw std::runtime_error("Division by zero!");
+
+      auto shp = static_cast<int>(shp_);
+
+      if (pnt == 0)
+        return 0;
+
+      if (pnt > 0)
+      {
+        if (pnt < shp)
+          return pnt; // point in the original image
+        else
+          return shp - (pnt % shp) - padding - 1;
+      }
+
+      if (pnt < 0)
+        while (pnt < 0)
+          pnt += shp;
+
+      return shp - ((pnt - padding) % shp) - 1;
+    }
+
+    int compute_periodized_coord(int pnt, std::size_t shp_)
+    {
+      if (shp_ == 0)
+        throw std::runtime_error("Division by zero!");
+
+      auto shp = static_cast<int>(shp_);
+
+      if (pnt < 0)
+        while (pnt < 0)
+          pnt += shp;
+
+      return pnt % shp;
+    }
+
+    int compute_clamped_coord(int pnt, std::size_t shp_)
+    {
+      if (shp_ == 0)
+        throw std::runtime_error("Division by zero!");
+      if (pnt < 0)
+        return 0;
+
+      auto shp = static_cast<int>(shp_);
+
+      if (pnt < shp - 1)
+        return pnt;
+      else
+        return shp - 1;
     }
   } // namespace detail
 
@@ -113,7 +157,7 @@ namespace mln::extension
         throw std::runtime_error(
             "Cannot have a padding whose size is supperior or equal to one of the dimension's shape.");
 
-      return Pnt((shp[Idx] - detail::remainder_sup0(pnt[Idx], shp[Idx] - padding))...);
+      return Pnt(detail::compute_mirrored_coord(pnt[Idx], shp[Idx], padding)...);
     }
 
     const V& value_periodize(image_point_t<I> pnt) const
@@ -136,7 +180,7 @@ namespace mln::extension
     template <typename Pnt, std::size_t... Idx>
     Pnt compute_periodize_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<Idx...>) const
     {
-      return Pnt(detail::remainder_sup0(pnt[Idx], shp[Idx])...);
+      return Pnt(detail::compute_periodized_coord(pnt[Idx], shp[Idx])...);
     }
 
     const V& value_clamp(image_point_t<I> pnt) const
@@ -159,8 +203,7 @@ namespace mln::extension
     template <typename Pnt, std::size_t... Idx>
     Pnt compute_clamp_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<Idx...>) const
     {
-      using std::min;
-      return Pnt(min(pnt[Idx], shp[Idx])...);
+      return Pnt(detail::compute_clamped_coord(pnt[Idx], shp[Idx])...);
     }
 
   private:

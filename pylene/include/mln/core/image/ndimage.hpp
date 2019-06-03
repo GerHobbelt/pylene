@@ -97,8 +97,8 @@ namespace mln
       void                       mirror(std::size_t padding = 0);
 
       // TODO
-      // void periodize();
-      // void clamp();
+      void periodize();
+      void clamp();
       // template <typename U>
       // void buffer(U&& u);
 
@@ -1159,6 +1159,18 @@ namespace mln
     void ndimage_extension<T, dim>::mirror(std::size_t padding)
     {
       _mirror<0>(m_ptr, padding);
+    }
+
+    template <typename T, unsigned dim>
+    void ndimage_extension<T, dim>::periodize()
+    {
+      // TODO
+    }
+
+    template <typename T, unsigned dim>
+    void ndimage_extension<T, dim>::clamp()
+    {
+      // TODO
     }
 
     template <typename T, unsigned dim>

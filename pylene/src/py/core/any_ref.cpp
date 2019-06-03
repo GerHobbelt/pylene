@@ -7,11 +7,11 @@ namespace mln::py
 {
   any_ref::any_ref(std::any& elm)
   {
-    new (&m_held) placeholder<std::any&>(elm);
+    new (&m_held) placeholder<std::any>(elm);
   }
 
   void* any_ref::data()
   {
-    return static_cast<void*>(&m_held);
+    return reinterpret_cast<placeholder_base*>(&m_held)->m_data;
   }
 } // namespace mln::py

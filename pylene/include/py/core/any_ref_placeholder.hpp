@@ -10,13 +10,27 @@ namespace mln::py
 
   struct placeholder_base
   {
-    virtual ~placeholder_base();
+    virtual ~placeholder_base() = default;
     virtual const std::type_info& type() const;
     void *m_data;
   };
 
   template <>
   class placeholder<std::any> : public placeholder_base
+  {
+  public:
+    placeholder(std::any& elm)
+    {
+      m_data = &elm;
+    }
+    const std::type_info& type() const override
+    {
+      return static_cast<std::any*>(m_data)->type();
+    }
+  };
+
+  template <>
+  class placeholder<std::any&> : public placeholder_base
   {
   public:
     placeholder(std::any& elm)

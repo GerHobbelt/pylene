@@ -17,7 +17,7 @@ TEST(Core, Mirror_LargeEnough_BM_Auto)
   using namespace mln;
   using namespace mln::view::ops;
 
-  image2d<uint8> ima(10, 10, 20);
+  image2d<uint8> ima(10, 10);
   iota(ima, 0);
   image2d<uint8> out = clone(ima);
 
@@ -28,7 +28,6 @@ TEST(Core, Mirror_LargeEnough_BM_Auto)
   ASSERT_TRUE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
-  mln::io::experimental::imprint_with_border(extended_ima);
 }
 
 TEST(Core, Mirror_NotLargeEnough_BM_Auto)
@@ -38,17 +37,16 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  image2d<uint8> out          = clone(ima);
-  auto           disc         = mln::se::disc{4};
-  auto           extended_ima = extension::bm::mirror().manage(ima, disc);
+  image2d<uint8> out = clone(ima);
+
+  auto disc         = mln::se::disc{4};
+  auto extended_ima = extension::bm::mirror().manage(ima, disc);
 
   ASSERT_FALSE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_NE_EXP(extended_ima, ima);
-  // ima.extension().mirror();
-  // ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
-
-  mln::io::experimental::imprint_with_border(extended_ima, std::cout, 20);
+  ima.extension().mirror();
+  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
 }
 
 TEST(Core, Mirror_LargeEnough_BM_User)

@@ -16,18 +16,22 @@ namespace mln::extension
 {
   namespace detail
   {
-    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t /*padding*/)
+    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t padding)
     {
       if (shp_ == 0)
         throw std::runtime_error("Division by zero!");
 
       auto shp = static_cast<int>(shp_);
 
+      if (pnt < 0)
+        pnt -= padding;
+      else if (pnt >= shp)
+        pnt += padding;
+
       while (pnt < (2 * shp))
         pnt += 2 * shp;
 
       pnt %= 2 * shp;
-      // pnt -= padding;
 
       if (pnt < shp)
         return pnt;

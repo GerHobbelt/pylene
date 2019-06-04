@@ -2,6 +2,7 @@
 
 #include <any>
 #include <iostream>
+#include <typeinfo>
 
 #include <gtest/gtest.h>
 
@@ -43,13 +44,5 @@ TEST(Py, any_ref_invalid_as)
   using namespace mln::py;
   int a = 7;
   any_ref obj = any_ref(a);
-  try
-  {
-    bool __attribute__((unused)) b = obj.as<bool>();
-    ASSERT_TRUE(false);
-  }
-  catch (...)
-  {
-    ASSERT_TRUE(true);
-  }
+  ASSERT_THROW(obj.as<bool>(), std::bad_cast);
 }

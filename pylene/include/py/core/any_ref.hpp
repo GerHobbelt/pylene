@@ -17,7 +17,6 @@ namespace mln::py
     public:
       any_ref() = default;
       any_ref(std::any& elm);
-      any_ref(void*& elm);
 
       template <typename T>
       any_ref(T& elm)
@@ -41,7 +40,7 @@ namespace mln::py
         }
         else
         {
-          throw "Invalid any_ref cast";
+          throw std::bad_cast();
         }
       }
 

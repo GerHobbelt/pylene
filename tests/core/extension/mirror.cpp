@@ -28,6 +28,7 @@ TEST(Core, Mirror_LargeEnough_BM_Auto)
   ASSERT_TRUE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  mln::io::experimental::imprint_with_border(extended_ima);
 }
 
 TEST(Core, Mirror_NotLargeEnough_BM_Auto)
@@ -44,8 +45,10 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
   ASSERT_FALSE(extended_ima.extension().is_finite());
   ASSERT_TRUE(all_of(extended_ima == out));
   ASSERT_IMAGES_WITH_BORDER_NE_EXP(extended_ima, ima);
-  ima.extension().mirror();
-  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  // ima.extension().mirror();
+  // ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+
+  mln::io::experimental::imprint_with_border(extended_ima, std::cout, 20);
 }
 
 TEST(Core, Mirror_LargeEnough_BM_User)

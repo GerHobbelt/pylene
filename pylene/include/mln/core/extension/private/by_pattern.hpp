@@ -16,6 +16,25 @@ namespace mln::extension
 {
   namespace detail
   {
+    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t /*padding*/)
+    {
+      if (shp_ == 0)
+        throw std::runtime_error("Division by zero!");
+
+      auto shp = static_cast<int>(shp_);
+
+      while (pnt < (2 * shp))
+        pnt += 2 * shp;
+
+      pnt %= 2 * shp;
+      // pnt -= padding;
+
+      if (pnt < shp)
+        return pnt;
+      else // pnt >= shp
+        return 2 * shp - 1 - pnt;
+    }
+
     int compute_periodized_coord(int pnt, std::size_t shp_)
     {
       if (shp_ == 0)
@@ -28,43 +47,6 @@ namespace mln::extension
           pnt += shp;
 
       return pnt % shp;
-    }
-
-    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t padding)
-    {
-      if (shp_ == 0)
-        throw std::runtime_error("Division by zero!");
-
-      auto shp = static_cast<int>(shp_);
-
-      // point in the original image
-      if (pnt >= 0 && pnt < shp)
-        return pnt;
-
-      int c = 0; // 0, 2, 4, ... backward reading, 1, 3, 5, ... forward reading
-
-      if (pnt >= shp)
-      {
-        pnt += padding;
-        c = pnt / shp;
-      }
-      else // pnt < 0
-      {
-        c = pnt / shp;
-        pnt -= padding;
-      }
-
-      // add the first shape (original image) to the pattern choice
-      if (pnt >= shp)
-        ++c;
-      // for safe remainder (>0)
-      while (pnt < 0)
-        pnt += shp;
-
-      if (c % 2 == 0) // backward reading
-        return shp - (pnt % shp) - 1;
-      else // forward reading
-        return compute_periodized_coord(pnt, shp_);
     }
 
     int compute_clamped_coord(int pnt, std::size_t shp_)
@@ -168,6 +150,10 @@ namespace mln::extension
       if ((((shp[Idx] - padding) <= 0) || ...))
         throw std::runtime_error(
             "Cannot have a padding whose size is supperior or equal to one of the dimension's shape.");
+
+      // auto p = Pnt(detail::compute_mirrored_coord(pnt[Idx], shp[Idx], padding)...);
+      // std::cout << pnt << " -> " << p << std::endl;
+      // return p;
 
       return Pnt(detail::compute_mirrored_coord(pnt[Idx], shp[Idx], padding)...);
     }

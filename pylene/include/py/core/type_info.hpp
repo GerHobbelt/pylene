@@ -203,47 +203,7 @@ namespace mln::py
   using VTrait_t = typename VTrait<tid>::type;
 
   template <template <typename> class F, typename... Args>
-  void visit(Info::type_id tid, Args&&... args)
-  {
-    switch (tid)
-    {
-    case (Info::INT8_V):
-      F<std::int8_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::INT16_V):
-      F<std::int16_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::INT32_V):
-      F<std::int32_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::INT64_V):
-      F<std::int64_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::UINT8_V):
-      F<std::uint8_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::UINT16_V):
-      F<std::uint16_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::UINT32_V):
-      F<std::uint32_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::UINT64_V):
-      F<std::uint64_t>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::FLOAT_V):
-      F<float>{}(std::forward<Args>(args)...);
-      break;
-    case (Info::DOUBLE_V):
-      F<double>{}(std::forward<Args>(args)...);
-      break;
-    default:
-      throw std::runtime_error("Unhandled data type");
-    }
-  }
-
-  template <template <typename> class F, typename... Args>
-  auto visit_r(Info::type_id tid, Args&&... args)
+  auto visit(Info::type_id tid, Args&&... args)
   {
     switch (tid)
     {
@@ -267,6 +227,36 @@ namespace mln::py
       return F<float>{}(std::forward<Args>(args)...);
     case (Info::DOUBLE_V):
       return F<double>{}(std::forward<Args>(args)...);
+    default:
+      throw std::runtime_error("Unhandled data type");
+    }
+  }
+
+  template <typename F, typename... Args>
+  auto visit_f(Info::type_id tid, F f, Args&&... args)
+  {
+    switch (tid)
+    {
+    case (Info::INT8_V):
+      return f.template call<std::int8_t>(std::forward<Args>(args)...);
+    case (Info::INT16_V):
+      return f.template call<std::int16_t>(std::forward<Args>(args)...);
+    case (Info::INT32_V):
+      return f.template call<std::int32_t>(std::forward<Args>(args)...);
+    case (Info::INT64_V):
+      return f.template call<std::int64_t>(std::forward<Args>(args)...);
+    case (Info::UINT8_V):
+      return f.template call<std::uint8_t>(std::forward<Args>(args)...);
+    case (Info::UINT16_V):
+      return f.template call<std::uint16_t>(std::forward<Args>(args)...);
+    case (Info::UINT32_V):
+      return f.template call<std::uint32_t>(std::forward<Args>(args)...);
+    case (Info::UINT64_V):
+      return f.template call<std::uint64_t>(std::forward<Args>(args)...);
+    case (Info::FLOAT_V):
+      return f.template call<float>(std::forward<Args>(args)...);
+    case (Info::DOUBLE_V):
+      return f.template call<double>(std::forward<Args>(args)...);
     default:
       throw std::runtime_error("Unhandled data type");
     }

@@ -16,9 +16,7 @@ namespace mln::py
     auto        span = src.values();
     const auto& vs   = src.get_value_set();
     std::transform(span.begin(), span.end(), res.values().begin(),
-                   [&vs](auto val) -> float {
-                       return std::any_cast<float>(vs.divide(val, vs.max()));
-                   });
+                   [&vs](auto val) -> float { return std::any_cast<float>(vs.divide(val, vs.max())); });
     return res;
   }
 
@@ -30,7 +28,7 @@ namespace mln::py
       auto operator()(const image2d<>& src) { return stretch(*src.cast_to<T>()); }
     };
   } // namespace detail
-  image2d<float> stretch(const image2d<>& src) { return visit_r<detail::apply_stretch_t>(src.type().tid(), src); };
+  image2d<float> stretch(const image2d<>& src) { return visit<detail::apply_stretch_t>(src.type().tid(), src); };
 
   image2d<> stretch_py(const image2d<>& src) { return stretch(src); };
 } // namespace mln::py

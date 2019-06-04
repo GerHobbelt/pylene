@@ -14,37 +14,38 @@ namespace mln::py
   */
   class any_ref
   {
-    public:
-      any_ref() = default;
-      any_ref(std::any& elm);
+  public:
+    any_ref() = default;
+    any_ref(std::any& elm);
 
-      template <typename T>
-      any_ref(T& elm)
+    template <typename T>
+    any_ref(T& elm)
+    {
+      new (&m_held) placeholder<T>(elm);
+    }
+
+    void*                 data();
+    const std::type_info& type() const;
+
+    template <typename T>
+    T as()
+    {
+      placeholder_base* tmp = reinterpret_cast<placeholder_base*>(&m_held);
+      if (placeholder<std::any>* ptr = dynamic_cast<placeholder<std::any>*>(tmp))
       {
-        new (&m_held) placeholder<T>(elm);
+        return std::any_cast<T>(*static_cast<std::any*>(ptr->m_data));
       }
-
-      void* data();
-
-      template <typename T>
-      T as()
+      else if (placeholder<T>* ptr = dynamic_cast<placeholder<T>*>(tmp))
       {
-        placeholder_base* tmp = reinterpret_cast<placeholder_base*>(&m_held);
-        if (placeholder<std::any> *ptr = dynamic_cast<placeholder<std::any>*>(tmp))
-        {
-          return std::any_cast<T>(*static_cast<std::any*>(ptr->m_data));
-        }
-        else if (placeholder<T> *ptr = dynamic_cast<placeholder<T>*>(tmp))
-        {
-          return *static_cast<T*>(ptr->m_data);
-        }
-        else
-        {
-          throw std::bad_cast();
-        }
+        return *static_cast<T*>(ptr->m_data);
       }
+      else
+      {
+        throw std::bad_cast();
+      }
+    }
 
-    private:
-      std::aligned_storage_t<sizeof(placeholder_base), alignof(placeholder_base)> m_held;
+  private:
+    std::aligned_storage_t<sizeof(placeholder_base), alignof(placeholder_base)> m_held;
   };
 } // namespace mln::py

@@ -4,6 +4,7 @@
 #include <py/core/type_info.hpp>
 
 #include <any>
+#include <iostream>
 #include <limits>
 
 
@@ -107,10 +108,10 @@ namespace mln::py
   private:
     std::any _max() const override final { return max(); }
 
-    template <typename T>
+    template <typename VT>
     struct cast_dispatcher_t
     {
-      explicit cast_dispatcher_t(const value_set<T>* vs)
+      explicit cast_dispatcher_t(const value_set<VT>* vs)
         : m_vs(vs)
       {
       }
@@ -126,7 +127,7 @@ namespace mln::py
 
     std::any _cast(any_ref val, const Info& info) const override final
     {
-      return visit_f(info, cast_dispatcher_t{this}, val);
+      return visit_f(info.tid(), cast_dispatcher_t{this}, val);
     }
   }; // namespace mln::py
 } // namespace mln::py

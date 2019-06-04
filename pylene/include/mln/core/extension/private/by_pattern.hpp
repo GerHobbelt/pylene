@@ -23,16 +23,11 @@ namespace mln::extension
 
       auto shp = static_cast<int>(shp_);
 
-      if (pnt == 0)
-        return 0;
+      if (pnt >= 0 && pnt < shp)
+        return pnt; // point in the original image
 
-      if (pnt > 0)
-      {
-        if (pnt < shp)
-          return pnt; // point in the original image
-        else
-          return shp - (pnt % shp) - padding - 1;
-      }
+      if (pnt >= shp)
+        return shp - (pnt % shp) - padding - 1;
 
       if (pnt < 0)
         while (pnt < 0)

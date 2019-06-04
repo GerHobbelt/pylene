@@ -16,26 +16,6 @@ namespace mln::extension
 {
   namespace detail
   {
-    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t padding)
-    {
-      if (shp_ == 0)
-        throw std::runtime_error("Division by zero!");
-
-      auto shp = static_cast<int>(shp_);
-
-      if (pnt >= 0 && pnt < shp)
-        return pnt; // point in the original image
-
-      if (pnt >= shp)
-        return shp - (pnt % shp) - padding - 1;
-
-      if (pnt < 0)
-        while (pnt < 0)
-          pnt += shp;
-
-      return shp - ((pnt - padding) % shp) - 1;
-    }
-
     int compute_periodized_coord(int pnt, std::size_t shp_)
     {
       if (shp_ == 0)
@@ -48,6 +28,43 @@ namespace mln::extension
           pnt += shp;
 
       return pnt % shp;
+    }
+
+    int compute_mirrored_coord(int pnt, std::size_t shp_, std::size_t padding)
+    {
+      if (shp_ == 0)
+        throw std::runtime_error("Division by zero!");
+
+      auto shp = static_cast<int>(shp_);
+
+      // point in the original image
+      if (pnt >= 0 && pnt < shp)
+        return pnt;
+
+      int c = 0; // 0, 2, 4, ... backward reading, 1, 3, 5, ... forward reading
+
+      if (pnt >= shp)
+      {
+        pnt += padding;
+        c = pnt / shp;
+      }
+      else // pnt < 0
+      {
+        c = pnt / shp;
+        pnt -= padding;
+      }
+
+      // add the first shape (original image) to the pattern choice
+      if (pnt >= shp)
+        ++c;
+      // for safe remainder (>0)
+      while (pnt < 0)
+        pnt += shp;
+
+      if (c % 2 == 0) // backward reading
+        return shp - (pnt % shp) - 1;
+      else // forward reading
+        return compute_periodized_coord(pnt, shp_);
     }
 
     int compute_clamped_coord(int pnt, std::size_t shp_)

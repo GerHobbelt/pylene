@@ -17,7 +17,7 @@ TEST(Core, Mirror_LargeEnough_BM_Auto)
   using namespace mln;
   using namespace mln::view::ops;
 
-  image2d<uint8> ima(10, 10);
+  image2d<uint8> ima(10, 10, 20);
   iota(ima, 0);
   image2d<uint8> out = clone(ima);
 

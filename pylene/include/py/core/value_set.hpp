@@ -19,10 +19,9 @@ namespace mln::py
   {
     virtual float    normalize(void* val) const = 0; // abstract normalize function for vs<void>
     std::any         max() const { return _max(); }
-    virtual std::any divide(void* val, std::any any) const = 0;
-    virtual std::any divide(void* val, void* any) const    = 0;
+    virtual std::any divide(any_ref val1, any_ref val2) const = 0;
 
-    std::any cast(any_ref v, const Info& info) const { return _cast(v, info); }
+    std::any cast(any_ref v, const Info& dest_type) const { return _cast(v, dest_type); }
 
   private:
     virtual std::any _max() const                             = 0;
@@ -48,46 +47,9 @@ namespace mln::py
 
     std::any max() const { return std::any(std::numeric_limits<T>::max()); }
 
-    std::any divide(void* val, std::any denominator) const override final
+    std::any divide(any_ref val1, any_ref denominator) const override final
     {
-      std::any res;
-      try
-      {
-        res = static_cast<float>(*static_cast<T*>(val)) / std::any_cast<T>(denominator);
-      }
-      catch (const std::bad_any_cast& e)
-      {
-        std::cerr << "Error in 'divide(void*, std::any)': unhandled type.\n";
-      }
-      return res;
-    }
-
-    std::any divide(void* val, void* denominator) const override final
-    {
-      std::any res;
-      try
-      {
-        res = static_cast<float>(*static_cast<T*>(val)) / *static_cast<T*>(denominator);
-      }
-      catch (const std::bad_any_cast& e)
-      {
-        std::cerr << "Error in 'divide(void*, void*)': unhandled type.\n";
-      }
-      return res;
-    }
-
-    std::any divide(T val, std::any denominator) const
-    {
-      std::any res;
-      try
-      {
-        res = static_cast<float>(val) / std::any_cast<T>(denominator);
-      }
-      catch (const std::bad_any_cast& e)
-      {
-        std::cerr << "Error in 'divide(T, std::any)': unhandled type.\n";
-      }
-      return res;
+      return static_cast<float>(val1.as<T>()) / denominator.as<T>();
     }
 
 

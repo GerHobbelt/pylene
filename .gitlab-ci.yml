@@ -222,7 +222,7 @@ distbench-linux-clang7-release:
         - conan install .. -pr pylene_default --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc --config Release -- -j $(($NBPROC / 2))
-        - mkdir ../public && mv doc/build/* ../public/
+        - mkdir ../public && mv doc/sphinx/* ../public/
     artifacts:
         name: "documentation"
         expire_in: 2 days

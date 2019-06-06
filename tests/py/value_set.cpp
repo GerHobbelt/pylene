@@ -38,4 +38,10 @@ TEST(Py, vs_divide_void)
   ASSERT_EQ(static_cast<int>(std::any_cast<float>(res)), 12);
 }
 
-//TODO write more tests! Fix stretch :x
+TEST(Py, vs_cast)
+{
+  mln::py::value_set<> vs;
+  float f = 6.4f;
+  int32_t i32 = vs.cast(f, Info::INT32_V);
+  ASSERT_EQ(i32, 6);
+}

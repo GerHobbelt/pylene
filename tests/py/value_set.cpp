@@ -29,19 +29,20 @@ TEST(Py, vs_divide_T)
   ASSERT_EQ(static_cast<int>(std::any_cast<float>(res)), 12);
 }
 
-TEST(Py, vs_divide_void)
+TEST(Py, vs_T_cast)
 {
-  mln::py::value_set<int64_t> vs;
-  int64_t var = 144;
-  void *ptr = &var;
-  std::any res = vs.divide(ptr, int64_t(12));
-  ASSERT_EQ(static_cast<int>(std::any_cast<float>(res)), 12);
+  mln::py::value_set<float> vs;
+  float f = 6.4f;
+  int32_t i32 = vs.cast<int32_t>(f);
+  ASSERT_EQ(i32, 6);
 }
 
-TEST(Py, vs_cast)
+/*
+TEST(Py, vs_void_cast)
 {
   mln::py::value_set<> vs;
   float f = 6.4f;
-  int32_t i32 = vs.cast(f, Info::INT32_V);
+  int32_t i32 = vs.cast<int32_t>(f);
   ASSERT_EQ(i32, 6);
 }
+*/

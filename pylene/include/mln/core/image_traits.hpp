@@ -141,11 +141,11 @@ namespace mln
   template <typename I, typename has_extension = typename image_has_extension<I>::type>
   struct image_extension_traits
   {
-    typedef std::false_type support_fill;
-    typedef std::false_type support_mirror;
-    typedef std::false_type support_periodize;
-    typedef std::false_type support_clamp;
-    typedef std::false_type support_buffer;
+    using support_fill      = std::false_type;
+    using support_mirror    = std::false_type;
+    using support_periodize = std::false_type;
+    using support_clamp     = std::false_type;
+    using support_buffer    = std::false_type;
   };
 
   template <typename I>

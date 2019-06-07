@@ -99,8 +99,14 @@ namespace mln
       // TODO
       void periodize();
       void clamp();
-      // template <typename U>
-      // void buffer(U&& u);
+      template <typename U>
+      void buffer(U&& u);
+
+      constexpr bool is_fill_supported() const;
+      constexpr bool is_mirror_supported() const;
+      constexpr bool is_periodize_supported() const;
+      constexpr bool is_clamp_supported() const;
+      constexpr bool is_buffer_supported() const;
 
     private:
       template <unsigned d>
@@ -1152,25 +1158,77 @@ namespace mln
     template <typename T, unsigned dim>
     void ndimage_extension<T, dim>::fill(const T& v)
     {
+      if (!is_fill_supported())
+        throw std::logic_error("Attempting to use fill on an extension that is not fillable!");
+
       _fill<0>(m_ptr, v);
     }
 
     template <typename T, unsigned dim>
     void ndimage_extension<T, dim>::mirror(std::size_t padding)
     {
+      if (!is_mirror_supported())
+        throw std::logic_error("Attempting to use mirror on an extension that is not mirrorable!");
+
       _mirror<0>(m_ptr, padding);
     }
 
     template <typename T, unsigned dim>
     void ndimage_extension<T, dim>::periodize()
     {
+      if (!is_periodize_supported())
+        throw std::logic_error("Attempting to use periodize on an extension that is not periodizable!");
+
       // TODO
     }
 
     template <typename T, unsigned dim>
     void ndimage_extension<T, dim>::clamp()
     {
+      if (!is_clamp_supported())
+        throw std::logic_error("Attempting to use clamp on an extension that is not clampable!");
+
       // TODO
+    }
+
+    template <typename T, unsigned dim>
+    template <typename U>
+    void ndimage_extension<T, dim>::buffer(U&& /*u*/)
+    {
+      if (!is_buffer_supported())
+        throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+
+      // TODO
+    }
+
+    template <typename T, unsigned dim>
+    constexpr bool ndimage_extension<T, dim>::is_fill_supported() const
+    {
+      return support_fill::value;
+    }
+
+    template <typename T, unsigned dim>
+    constexpr bool ndimage_extension<T, dim>::is_mirror_supported() const
+    {
+      return support_mirror::value;
+    }
+
+    template <typename T, unsigned dim>
+    constexpr bool ndimage_extension<T, dim>::is_periodize_supported() const
+    {
+      return support_periodize::value;
+    }
+
+    template <typename T, unsigned dim>
+    constexpr bool ndimage_extension<T, dim>::is_clamp_supported() const
+    {
+      return support_clamp::value;
+    }
+
+    template <typename T, unsigned dim>
+    constexpr bool ndimage_extension<T, dim>::is_buffer_supported() const
+    {
+      return support_buffer::value;
     }
 
     template <typename T, unsigned dim>

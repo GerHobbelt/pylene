@@ -61,11 +61,6 @@ namespace mln::extension
 
     constexpr std::optional<std::size_t> size() const { return std::nullopt; }
 
-    constexpr void periodize()
-    {
-      // Nothing to do, everything is lazy-computed
-    }
-
     const V& value(const point_type& pnt) const
     {
       using domain_t     = typename I::domain_type;
@@ -76,6 +71,40 @@ namespace mln::extension
 
       return m_ima(compute_coords<dim>(std::move(pnt), m_ima.domain().shape()));
     }
+
+    void fill(const value_type& /*v*/)
+    {
+      if (!is_fill_supported())
+        throw std::logic_error("Attempting to use fill on an extension that is not fillable!");
+    }
+    void mirror(std::size_t /*padding*/ = 0)
+    {
+      if (!is_mirror_supported())
+        throw std::logic_error("Attempting to use mirror on an extension that is not mirrorable!");
+    }
+    void periodize()
+    {
+      if (!is_periodize_supported())
+        throw std::logic_error("Attempting to use periodize on an extension that is not periodizable!");
+
+      // Nothing to do, everything is lazy-computed
+    }
+    void clamp()
+    {
+      if (!is_clamp_supported())
+        throw std::logic_error("Attempting to use clamp on an extension that is not clampable!");
+    }
+    template <typename U>
+    void buffer(U&& /*u*/)
+    {
+      if (!is_buffer_supported())
+        throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+    }
+    constexpr bool is_fill_supported() const { return support_fill::value; }
+    constexpr bool is_mirror_supported() const { return support_mirror::value; }
+    constexpr bool is_periodize_supported() const { return support_periodize::value; }
+    constexpr bool is_clamp_supported() const { return support_clamp::value; }
+    constexpr bool is_buffer_supported() const { return support_buffer::value; }
 
   private:
     template <std::size_t dim, typename Pnt>

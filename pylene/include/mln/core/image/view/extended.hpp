@@ -58,11 +58,11 @@ namespace mln
     {
       using value_type        = image_value_t<I>;
       using point_type        = image_point_t<I>;
-      using support_fill      = std::false_type;
-      using support_mirror    = std::false_type;
-      using support_periodize = std::false_type;
-      using support_clamp     = std::false_type;
-      using support_buffer    = std::false_type;
+      using support_fill      = std::true_type;
+      using support_mirror    = std::true_type;
+      using support_periodize = std::true_type;
+      using support_clamp     = std::true_type;
+      using support_buffer    = std::true_type;
 
       explicit extension_type(adapted_image_t* adapted_image)
         : m_adapted_image{adapted_image}
@@ -91,6 +91,63 @@ namespace mln
       {
         return std::visit([&pnt](auto&& ima) -> const value_type& { return ima.extension().value(pnt); },
                           *m_adapted_image);
+      }
+
+      void fill(const value_type& v)
+      {
+        if (!is_fill_supported())
+          throw std::logic_error("Attempting to use fill on an extension that is not fillable!");
+
+        std::visit([v](auto&& ima) { ima.extension().fill(v); }, *m_adapted_image);
+      }
+      void mirror(std::size_t padding = 0)
+      {
+        if (!is_mirror_supported())
+          throw std::logic_error("Attempting to use mirror on an extension that is not mirrorable!");
+
+        std::visit([padding](auto&& ima) { ima.extension().mirror(padding); }, *m_adapted_image);
+      }
+      void periodize()
+      {
+        if (!is_periodize_supported())
+          throw std::logic_error("Attempting to use periodize on an extension that is not periodizable!");
+
+        std::visit([](auto&& ima) { ima.extension().periodize(); }, *m_adapted_image);
+      }
+      void clamp()
+      {
+        if (!is_clamp_supported())
+          throw std::logic_error("Attempting to use clamp on an extension that is not clampable!");
+
+        std::visit([](auto&& ima) { ima.extension().clamp(); }, *m_adapted_image);
+      }
+      template <typename U>
+      void buffer(U&& u)
+      {
+        if (!is_buffer_supported())
+          throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+
+        std::visit([u_ = std::forward<U>(u)](auto&& ima) { ima.extension().buffer(u_); }, *m_adapted_image);
+      }
+      bool is_fill_supported() const
+      {
+        return std::visit([](auto&& ima) { return ima.extension().is_fill_supported(); }, *m_adapted_image);
+      }
+      bool is_mirror_supported() const
+      {
+        return std::visit([](auto&& ima) { return ima.extension().is_mirror_supported(); }, *m_adapted_image);
+      }
+      bool is_periodize_supported() const
+      {
+        return std::visit([](auto&& ima) { return ima.extension().is_periodize_supported(); }, *m_adapted_image);
+      }
+      bool is_clamp_supported() const
+      {
+        return std::visit([](auto&& ima) { return ima.extension().is_clamp_supported(); }, *m_adapted_image);
+      }
+      bool is_buffer_supported() const
+      {
+        return std::visit([](auto&& ima) { return ima.extension().is_buffer_supported(); }, *m_adapted_image);
       }
 
     private:

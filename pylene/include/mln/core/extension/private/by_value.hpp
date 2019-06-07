@@ -38,8 +38,41 @@ namespace mln::extension
 
     constexpr std::optional<std::size_t> size() const { return std::nullopt; }
 
-    constexpr void     fill(V val) { m_val = std::move(val); }
     constexpr const V& value(const point_type&) const { return m_val; }
+
+    void fill(const value_type& v)
+    {
+      if (!is_fill_supported())
+        throw std::logic_error("Attempting to use fill on an extension that is not fillable!");
+
+      m_val = v;
+    }
+    void mirror(std::size_t /*padding*/ = 0)
+    {
+      if (!is_mirror_supported())
+        throw std::logic_error("Attempting to use mirror on an extension that is not mirrorable!");
+    }
+    void periodize()
+    {
+      if (!is_periodize_supported())
+        throw std::logic_error("Attempting to use periodize on an extension that is not periodizable!");
+    }
+    void clamp()
+    {
+      if (!is_clamp_supported())
+        throw std::logic_error("Attempting to use clamp on an extension that is not clampable!");
+    }
+    template <typename U>
+    void buffer(U&& /*u*/)
+    {
+      if (!is_buffer_supported())
+        throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+    }
+    constexpr bool is_fill_supported() const { return support_fill::value; }
+    constexpr bool is_mirror_supported() const { return support_mirror::value; }
+    constexpr bool is_periodize_supported() const { return support_periodize::value; }
+    constexpr bool is_clamp_supported() const { return support_clamp::value; }
+    constexpr bool is_buffer_supported() const { return support_buffer::value; }
 
   private:
     V m_val;

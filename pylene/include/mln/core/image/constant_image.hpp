@@ -180,12 +180,12 @@ namespace mln
 
     struct extension_type
     {
-      typedef V               value_type;
-      typedef std::false_type support_fill;
-      typedef std::false_type support_mirror;
-      typedef std::false_type support_periodize;
-      typedef std::false_type support_clamp;
-      typedef std::false_type support_buffer;
+      using value_type        = V;
+      using support_fill      = std::false_type;
+      using support_mirror    = std::false_type;
+      using support_periodize = std::false_type;
+      using support_clamp     = std::false_type;
+      using support_buffer    = std::false_type;
     };
 
     constant_image(const Domain& dom, V value)

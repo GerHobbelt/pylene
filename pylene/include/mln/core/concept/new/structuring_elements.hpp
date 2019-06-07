@@ -71,7 +71,7 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept DecomposableStructuringElement =
     StructuringElement<SE, P> &&
-    stl::Same<typename SE::decomposable, std::true_type> &&
+    stl::ConvertibleTo<typename SE::decomposable, std::true_type> &&
     requires(const SE se) {
       { se.is_decomposable() }  -> bool;
       { se.decompose() }        -> stl::ForwardRange&&;
@@ -82,7 +82,7 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept SeparableStructuringElement =
     StructuringElement<SE, P> &&
-    stl::Same<typename SE::separable, std::true_type> &&
+    stl::ConvertibleTo<typename SE::separable, std::true_type> &&
     requires(const SE se) {
       { se.is_separable() } -> bool;
       { se.separate() }     -> stl::ForwardRange&&;
@@ -93,7 +93,7 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept IncrementalStructuringElement =
     StructuringElement<SE, P> &&
-    stl::Same<typename SE::incremental, std::true_type> &&
+    stl::ConvertibleTo<typename SE::incremental, std::true_type> &&
     requires(const SE se) {
       { se.inc() }  -> StructuringElement<P>&&;
       { se.dec() }  -> StructuringElement<P>&&;

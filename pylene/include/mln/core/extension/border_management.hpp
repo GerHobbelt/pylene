@@ -164,10 +164,13 @@ namespace mln::extension
       }
       else
       {
-        if (!fit(ima, se))
+        if (!fit(ima, se) || !ima.extension().is_fill_supported())
         {
-          // The SE doesn't fit, we make a view of the image with an adapted dynamic border
-          mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
+          // The SE doesn't fit or the extension doesn't dynamically support fill, we make a view of the image with an
+          // adapted dynamic border
+          mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension "
+                           "does not really support fill (dynamically)."
+                           " Consider using a large border.");
           return {view::value_extended(ima, *val)};
         }
         else
@@ -213,9 +216,9 @@ namespace mln::extension
                     "The image's extension does not support the fill method."
                     "Use an image that does or switch to the auto border management policy!");
 
-      if (fit(ima, se))
+      if (fit(ima, se) && ima.extension().is_fill_supported())
       {
-        // The SE fits, we set the value of the border
+        // The SE fits and the extension dynamically support fill, we set the value of the border
         ima.extension().fill(*val);
         return {ima};
       }
@@ -253,10 +256,13 @@ namespace mln::extension
       }
       else
       {
-        if (!fit(ima, se))
+        if (!fit(ima, se) || !ima.extension().is_mirror_supported())
         {
-          // The SE doesn't fit, we make a view of the image with an adapted dynamic border
-          mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
+          // The SE doesn't fit or the extension doesn't dynamically support mirror, we make a view of the image with an
+          // adapted dynamic border
+          mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension "
+                           "does not really support mirror (dynamically)."
+                           " Consider using a large border.");
           return {view::mirror_extended(ima, m_padding)};
         }
         else
@@ -296,9 +302,9 @@ namespace mln::extension
                     "The image's extension does not support the mirror method."
                     "Use an image that does or switch to the auto border management policy!");
 
-      if (fit(ima, se))
+      if (fit(ima, se) && ima.extension().is_mirror_supported())
       {
-        // The SE fits, we set the value of the border
+        // The SE fits and the extension dynamically support mirror, we set the value of the border
         ima.extension().mirror(m_padding);
         return {ima};
       }
@@ -329,10 +335,13 @@ namespace mln::extension
       }
       else
       {
-        if (!fit(ima, se))
+        if (!fit(ima, se) || !ima.extension().is_periodize_supported())
         {
-          // The SE doesn't fit, we make a view of the image with an adapted dynamic border
-          mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
+          // The SE doesn't fit or the extension doesn't dynamically support periodize, we make a view of the image with
+          // an adapted dynamic border
+          mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension "
+                           "does not really support periodize (dynamically)."
+                           " Consider using a large border.");
           return {view::periodize_extended(ima)};
         }
         else
@@ -364,9 +373,9 @@ namespace mln::extension
                     "The image's extension does not support the periodize method."
                     "Use an image that does or switch to the auto border management policy!");
 
-      if (fit(ima, se))
+      if (fit(ima, se) && ima.extension().is_periodize_supported())
       {
-        // The SE fits, we set the value of the border
+        // The SE fits and the extension dynamically support periodize, we set the value of the border
         ima.extension().periodize();
         return {ima};
       }
@@ -396,10 +405,13 @@ namespace mln::extension
       }
       else
       {
-        if (!fit(ima, se))
+        if (!fit(ima, se) || !ima.extension().is_clamp_supported())
         {
-          // The SE doesn't fit, we make a view of the image with an adapted dynamic border
-          mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
+          // The SE doesn't fit or the extension doesn't dynamically support clamp, we make a view of the image with an
+          // adapted dynamic border
+          mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension "
+                           "does not really support clamp (dynamically)."
+                           " Consider using a large border.");
           return {view::clamp_extended(ima)};
         }
         else
@@ -431,9 +443,9 @@ namespace mln::extension
                     "The image's extension does not support the clamp method."
                     "Use an image that does or switch to the auto border management policy!");
 
-      if (fit(ima, se))
+      if (fit(ima, se) && ima.extension().is_clamp_supported())
       {
-        // The SE fits, we set the value of the border
+        // The SE fits and the extension dynamically support clamp, we set the value of the border
         ima.extension().clamp();
         return {ima};
       }
@@ -474,10 +486,13 @@ namespace mln::extension
       }
       else
       {
-        if (!fit(ima, se))
+        if (!fit(ima, se) || !ima.extension.is_buffer_supported())
         {
-          // The SE doesn't fit, we make a view of the image with an adapted dynamic border
-          mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
+          // The SE doesn't fit or the extension doesn't dynamically support buffer, we make a view of the image with an
+          // adapted dynamic border
+          mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension "
+                           "does not really support buffer (dynamically)."
+                           " Consider using a large border.");
           return {view::image_extended(ima, m_baseimage)};
         }
         else
@@ -520,10 +535,9 @@ namespace mln::extension
                     "The image's extension does not support the buffer filling method."
                     "Use an image that does or switch to the auto border management policy!");
 
-      if (fit(ima, se))
+      if (fit(ima, se) && ima.extension().is_buffer_supported())
       {
-        // The SE fits, we set the value of the border
-        // The SE fits, we set the value of the border
+        // The SE fits and the extension dynamically support buffer, we set the value of the border
         // FIXME: to implement
         // ima.extension().buffer(m_baseimage);
         return {ima};

@@ -51,45 +51,50 @@ namespace mln::concepts
   template <typename Ext>
   concept FillableExtension = 
     Extension<Ext> &&
-    std::is_same_v<typename Ext::support_fill, std::true_type> &&
-    requires (Ext ext, const typename Ext::value_type& v) {
+    stl::ConvertibleTo<typename Ext::support_fill, std::true_type> &&
+    requires (Ext ext, const Ext cext, const typename Ext::value_type& v) {
       { ext.fill(v) };
+      { cext.is_fill_supported() }  -> bool;
     };
 
   template <typename Ext>
   concept MirrorableExtension = 
     Extension<Ext> &&
-    std::is_same_v<typename Ext::support_mirror, std::true_type> &&
-    requires (Ext ext, std::size_t padding) {
+    stl::ConvertibleTo<typename Ext::support_mirror, std::true_type> &&
+    requires (Ext ext, const Ext cext, std::size_t padding) {
       { ext.mirror() };
       { ext.mirror(padding) };
+      { cext.is_mirror_supported() }  -> bool;
     };
 
   template <typename Ext>
   concept PeriodizableExtension = 
     Extension<Ext> &&
-    std::is_same_v<typename Ext::support_periodize, std::true_type> &&
-    requires (Ext ext) {
+    stl::ConvertibleTo<typename Ext::support_periodize, std::true_type> &&
+    requires (Ext ext, const Ext cext) {
       { ext.periodize() };
+      { cext.is_periodize_supported() }  -> bool;
     };
 
   template <typename Ext>
   concept ClampableExtension = 
     Extension<Ext> &&
-    std::is_same_v<typename Ext::support_clamp, std::true_type> &&
-    requires (Ext ext) {
+    stl::ConvertibleTo<typename Ext::support_clamp, std::true_type> &&
+    requires (Ext ext, const Ext cext) {
       { ext.clamp() };
+      { cext.is_clamp_supported() }  -> bool;
     };
 
   template <typename Ext, typename U>
-  concept BufferFillableExtension = 
+  concept BufferExtension = 
     Extension<Ext> &&
-    std::is_same_v<typename Ext::support_buffer, std::true_type> &&
+    stl::ConvertibleTo<typename Ext::support_buffer, std::true_type> &&
     InputImage<U> &&
     stl::ConvertibleTo<typename U::value_type, typename Ext::value_type> &&
     stl::ConvertibleTo<typename Ext::point_type, typename U::point_type> &&
-    requires (Ext ext, U u) {
+    requires (Ext ext, const Ext cext, U u) {
       { ext.buffer(u) };
+      { cext.is_buffer_supported() }  -> bool;
     };
 
 #endif

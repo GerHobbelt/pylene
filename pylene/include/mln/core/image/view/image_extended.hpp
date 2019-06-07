@@ -16,7 +16,7 @@ namespace mln
   namespace view
   {
     template <class I, class U>
-    image_extended_view<I> image_extended(I image, U base_ima);
+    image_extended_view<I> image_extended(I image, U base_ima, image_point_t<U> offset = image_point_t<U>{});
   };
 
 
@@ -66,9 +66,9 @@ namespace mln
 
   public:
     template <typename U>
-    image_extended_view(I ima, U base_ima)
+    image_extended_view(I ima, U base_ima, point_type offset)
       : base_t{std::move(ima)}
-      , m_ext{base_ima}
+      , m_ext{std::move(base_ima), std::move(offset)}
     {
     }
 
@@ -115,9 +115,9 @@ namespace mln
   namespace view
   {
     template <class I, class U>
-    image_extended_view<I> image_extended(I image, U base_ima)
+    image_extended_view<I> image_extended(I image, U base_ima, image_point_t<U> offset)
     {
-      return {std::move(image), std::move(base_ima)};
+      return {std::move(image), std::move(base_ima), std::move(offset)};
     }
   }; // namespace view
 

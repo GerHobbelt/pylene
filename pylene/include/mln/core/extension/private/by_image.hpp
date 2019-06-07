@@ -24,9 +24,9 @@ namespace mln::extension
     using support_buffer    = std::true_type;
 
     template <typename U>
-    explicit by_image(U base_ima)
-      : m_hasvalue{[base_ima](const P& pnt) { return base_ima.domain().has(pnt); }}
-      , m_yieldvalue{[base_ima](const P& pnt) { return base_ima(pnt); }}
+    explicit by_image(U base_ima, point_type offset = point_type{})
+      : m_hasvalue{[base_ima, offset](const P& pnt) { return base_ima.domain().has(pnt + offset); }}
+      , m_yieldvalue{[base_ima, offset](const P& pnt) { return base_ima(pnt + offset); }}
     {
     }
 

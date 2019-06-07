@@ -119,7 +119,7 @@ namespace mln::extension
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(!image_has_extension<I>::value,
                     "The image has an extension when none is explicitly requested."
@@ -462,11 +462,13 @@ namespace mln::extension
     : public border_manager_base<BorderManagementPolicy::Auto>
   {
   private:
-    U m_baseimage;
+    U                m_baseimage;
+    image_point_t<U> m_offset;
 
   public:
-    explicit border_manager(U baseimage)
+    explicit border_manager(U baseimage, image_point_t<U> offset = image_point_t<U>{})
       : m_baseimage{std::move(baseimage)}
+      , m_offset{std::move(offset)}
     {
     }
 
@@ -475,7 +477,7 @@ namespace mln::extension
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
@@ -493,13 +495,13 @@ namespace mln::extension
           mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension "
                            "does not really support buffer (dynamically)."
                            " Consider using a large border.");
-          return {view::image_extended(ima, m_baseimage)};
+          return {view::image_extended(ima, m_baseimage, m_offset)};
         }
         else
         {
           // The SE fits, we set the value of the border
           // FIXME: to implement
-          // ima.extension().buffer(m_baseimage);
+          // ima.extension().buffer(m_baseimage, m_offset);
           return {ima};
         }
       }
@@ -511,11 +513,13 @@ namespace mln::extension
     : public border_manager_base<BorderManagementPolicy::User>
   {
   private:
-    U m_baseimage;
+    U                m_baseimage;
+    image_point_t<U> m_offset;
 
   public:
-    explicit border_manager(U baseimage)
+    explicit border_manager(U baseimage, image_point_t<U> offset = image_point_t<U>{})
       : m_baseimage{std::move(baseimage)}
+      , m_offset{std::move(offset)}
     {
     }
 
@@ -524,7 +528,7 @@ namespace mln::extension
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
@@ -539,7 +543,7 @@ namespace mln::extension
       {
         // The SE fits and the extension dynamically support buffer, we set the value of the border
         // FIXME: to implement
-        // ima.extension().buffer(m_baseimage);
+        // ima.extension().buffer(m_baseimage, m_offset);
         return {ima};
       }
 

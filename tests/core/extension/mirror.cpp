@@ -57,7 +57,7 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
       },
       extended_ima));
   std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_NE_EXP(i, ima); }, extended_ima);
-  ima.extension().fill(uint8_t(42));
+  ima.extension().mirror();
   std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 

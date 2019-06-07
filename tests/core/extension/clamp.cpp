@@ -61,7 +61,7 @@ TEST(Core, Clamp_NotLargeEnough_BM_Auto)
   std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_NE_EXP(i, ima); }, extended_ima);
 
   // TODO: implement clamp in ndimage
-  // ima.extension().fill(uint8_t(42));
+  // ima.extension().periodize();
   // std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 

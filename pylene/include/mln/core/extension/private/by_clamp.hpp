@@ -16,19 +16,18 @@ namespace mln::extension
 {
   namespace detail
   {
-    int compute_clamped_coord(int pnt, std::size_t shp_)
+    template <typename T>
+    T compute_clamped_coord(T pnt, std::size_t shp_)
     {
       if (shp_ == 0)
         throw std::runtime_error("Division by zero!");
+
       if (pnt < 0)
         return 0;
 
-      auto shp = static_cast<int>(shp_);
+      auto shp = static_cast<T>(shp_);
 
-      if (pnt < shp - 1)
-        return pnt;
-      else
-        return shp - 1;
+      return std::min(pnt, static_cast<T>(shp - 1));
     }
   } // namespace detail
 

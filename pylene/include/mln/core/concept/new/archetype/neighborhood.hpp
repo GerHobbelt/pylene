@@ -11,9 +11,11 @@ namespace mln::archetypes
   {
     template <class P, class Pix>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
+    // clang-format off
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif
-        struct Neighborhood : StructuringElement<P, Pix>
+    struct Neighborhood : StructuringElement<P, Pix>
+    // clang-format on
     {
       ::ranges::iterator_range<P*>   before(P p);
       ::ranges::iterator_range<P*>   after(P p);

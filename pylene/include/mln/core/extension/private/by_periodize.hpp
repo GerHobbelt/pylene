@@ -16,13 +16,13 @@ namespace mln::extension
 {
   namespace detail
   {
-
-    int compute_periodized_coord(int pnt, std::size_t shp_)
+    template <typename T>
+    T compute_periodized_coord(T pnt, std::size_t shp_)
     {
       if (shp_ == 0)
         throw std::runtime_error("Division by zero!");
 
-      auto shp = static_cast<int>(shp_);
+      auto shp = static_cast<T>(shp_);
 
       if (pnt < 0)
         while (pnt < 0)

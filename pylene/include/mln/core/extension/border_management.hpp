@@ -51,40 +51,71 @@ namespace mln::extension
     Auto
   };
 
-  template <BorderManagementMethod, BorderManagementPolicy = BorderManagementPolicy::Auto, typename U = void>
-  class border_manager;
+  template <BorderManagementPolicy Policy>
+  struct managed_image_type_by_policy
+  {
+    template <typename>
+    using managed_image_t = void;
+  };
 
+  template <>
+  struct managed_image_type_by_policy<BorderManagementPolicy::User>
+  {
+    template <typename I>
+    using managed_image_t = std::variant<I>;
+  };
+
+  template <>
+  struct managed_image_type_by_policy<BorderManagementPolicy::Auto>
+  {
+    template <typename I>
+    using managed_image_t = std::variant<I, clamp_extended_view<I>, image_extended_view<I>, mirror_extended_view<I>,
+                                         none_extended_view<I>, periodize_extended_view<I>, value_extended_view<I>>;
+  };
+
+  template <BorderManagementPolicy Policy>
+  struct border_manager_base
+  {
+    template <typename I>
+    using managed_image_t = typename managed_image_type_by_policy<Policy>::template managed_image_t<I>;
+  };
+
+  template <BorderManagementMethod Method, BorderManagementPolicy Policy = BorderManagementPolicy::Auto,
+            typename U = void>
+  class border_manager;
 
   template <typename U>
   class border_manager<BorderManagementMethod::None, BorderManagementPolicy::Auto, U>
+    : public border_manager_base<BorderManagementPolicy::Auto>
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if (!fit(ima, se))
       {
         // The SE doesn't fit, no need to remove the border
-        return mln::view::extended(ima);
+        return {ima};
       }
       else
       {
         // The SE fits, we remove the border
-        return mln::view::extended(ima, view::none_extended(ima));
+        return {view::none_extended(ima)};
       }
     }
   };
 
   template <typename U>
   class border_manager<BorderManagementMethod::None, BorderManagementPolicy::User, U>
+    : public border_manager_base<BorderManagementPolicy::User>
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE&) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE&) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -94,13 +125,14 @@ namespace mln::extension
                     "The image has an extension when none is explicitly requested."
                     "Use an image without a border or switch to the auto border management policy!");
 
-      return ima;
+      return {ima};
     }
   };
 
 
   template <typename U>
   class border_manager<BorderManagementMethod::Fill, BorderManagementPolicy::Auto, U>
+    : public border_manager_base<BorderManagementPolicy::Auto>
   {
   private:
     std::any m_value;
@@ -113,7 +145,7 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       // using S = detail::remove_cvref_t<SE>;
@@ -128,7 +160,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_fill::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support filling.");
-        return view::extended(ima, view::value_extended(ima, *val));
+        return {view::value_extended(ima, *val)};
       }
       else
       {
@@ -136,13 +168,13 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::value_extended(ima, *val));
+          return {view::value_extended(ima, *val)};
         }
         else
         {
           // The SE fits, we set the value of the border
           ima.extension().fill(*val);
-          return view::extended(ima);
+          return {ima};
         }
       }
     }
@@ -150,6 +182,7 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Fill, BorderManagementPolicy::User, U>
+    : public border_manager_base<BorderManagementPolicy::User>
   {
   private:
     std::any m_value;
@@ -162,7 +195,7 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -184,7 +217,7 @@ namespace mln::extension
       {
         // The SE fits, we set the value of the border
         ima.extension().fill(*val);
-        return ima;
+        return {ima};
       }
 
       throw std::runtime_error(
@@ -195,6 +228,7 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, U>
+    : public border_manager_base<BorderManagementPolicy::Auto>
   {
   private:
     std::size_t m_padding;
@@ -206,7 +240,7 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -215,7 +249,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_mirror::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support mirroring.");
-        return view::extended(ima, view::mirror_extended(ima, m_padding));
+        return {view::mirror_extended(ima, m_padding)};
       }
       else
       {
@@ -223,13 +257,13 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::mirror_extended(ima, m_padding));
+          return {view::mirror_extended(ima, m_padding)};
         }
         else
         {
           // The SE fits, we set the value of the border
           ima.extension().mirror(m_padding);
-          return view::extended(ima);
+          return {ima};
         }
       }
     }
@@ -237,6 +271,7 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::User, U>
+    : public border_manager_base<BorderManagementPolicy::User>
   {
   private:
     std::size_t m_padding;
@@ -248,7 +283,7 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -265,7 +300,7 @@ namespace mln::extension
       {
         // The SE fits, we set the value of the border
         ima.extension().mirror(m_padding);
-        return ima;
+        return {ima};
       }
 
       throw std::runtime_error(
@@ -277,10 +312,11 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Periodize, BorderManagementPolicy::Auto, U>
+    : public border_manager_base<BorderManagementPolicy::Auto>
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -289,7 +325,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_periodize::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support periodizing.");
-        return view::extended(ima, view::periodize_extended(ima));
+        return {view::periodize_extended(ima)};
       }
       else
       {
@@ -297,13 +333,13 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::periodize_extended(ima));
+          return {view::periodize_extended(ima)};
         }
         else
         {
           // The SE fits, we set the value of the border
           ima.extension().periodize();
-          return view::extended(ima);
+          return {ima};
         }
       }
     }
@@ -311,10 +347,11 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Periodize, BorderManagementPolicy::User, U>
+    : public border_manager_base<BorderManagementPolicy::User>
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -331,7 +368,7 @@ namespace mln::extension
       {
         // The SE fits, we set the value of the border
         ima.extension().periodize();
-        return ima;
+        return {ima};
       }
 
       throw std::runtime_error(
@@ -342,10 +379,11 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Clamp, BorderManagementPolicy::Auto, U>
+    : public border_manager_base<BorderManagementPolicy::Auto>
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -354,7 +392,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_clamp::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support clamping.");
-        return view::extended(ima, view::clamp_extended(ima));
+        return {view::clamp_extended(ima)};
       }
       else
       {
@@ -362,13 +400,13 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::clamp_extended(ima));
+          return {view::clamp_extended(ima)};
         }
         else
         {
           // The SE fits, we set the value of the border
           ima.extension().clamp();
-          return view::extended(ima);
+          return {ima};
         }
       }
     }
@@ -376,10 +414,11 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Clamp, BorderManagementPolicy::User, U>
+    : public border_manager_base<BorderManagementPolicy::User>
   {
   public:
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -396,7 +435,7 @@ namespace mln::extension
       {
         // The SE fits, we set the value of the border
         ima.extension().clamp();
-        return ima;
+        return {ima};
       }
 
       throw std::runtime_error(
@@ -408,6 +447,7 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Image, BorderManagementPolicy::Auto, U>
+    : public border_manager_base<BorderManagementPolicy::Auto>
   {
   private:
     U m_baseimage;
@@ -419,7 +459,7 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -430,7 +470,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || image_extension_t<I>::support_buffer::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support buffer filling.");
-        return view::extended(ima, view::image_extended(ima, m_baseimage));
+        return {view::image_extended(ima, m_baseimage)};
       }
       else
       {
@@ -438,14 +478,14 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::image_extended(ima, m_baseimage));
+          return {view::image_extended(ima, m_baseimage)};
         }
         else
         {
           // The SE fits, we set the value of the border
           // FIXME: to implement
           // ima.extension().buffer(m_baseimage);
-          return view::extended(ima);
+          return {ima};
         }
       }
     }
@@ -453,6 +493,7 @@ namespace mln::extension
 
   template <typename U>
   class border_manager<BorderManagementMethod::Image, BorderManagementPolicy::User, U>
+    : public border_manager_base<BorderManagementPolicy::User>
   {
   private:
     U m_baseimage;
@@ -464,7 +505,7 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    auto manage(Ima&& ima, const SE& se) const
+    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
       using I = detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -485,7 +526,7 @@ namespace mln::extension
         // The SE fits, we set the value of the border
         // FIXME: to implement
         // ima.extension().buffer(m_baseimage);
-        return ima;
+        return {ima};
       }
 
       throw std::runtime_error(

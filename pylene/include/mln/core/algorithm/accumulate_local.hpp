@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/canvas/local_accumulation.hpp>
 #include <mln/core/extension/border_management.hpp>
@@ -8,11 +7,11 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/se/se.hpp>
 
+#include <variant>
+
 
 namespace mln
 {
-
-
   template <class A, class I, class J, class SE, extension::BorderManagementMethod bmm>
   void accumulate_local(I f, const experimental::StructuringElement<SE>& se, const AccumulatorLike<A>& accu,
                         extension::border_manager<bmm> bm, J g);
@@ -38,11 +37,15 @@ namespace mln
     auto      accu = accu::make_accumulator(mln::exact(accu_), image_value_t<I>());
 
 
-    auto extended = bm.manage(f, se);
+    auto extended_ima = bm.manage(f, se);
 
-    auto algo = canvas::make_LocalAccumulation(accu, se, extended, g);
-    // canvas::LocalAccumulation algo(accu, se, *extended, g);
-    algo.Execute();
+    std::visit(
+        [&accu, &se, &g](auto ima) {
+          auto algo = canvas::make_LocalAccumulation(accu, se, ima, g);
+          // canvas::LocalAccumulation algo(accu, se, *extended, g);
+          algo.Execute();
+        },
+        extended_ima);
   }
 
   template <class A, class I, class SE, extension::BorderManagementMethod bmm>
@@ -57,5 +60,4 @@ namespace mln
 
     return g;
   }
-
 } // namespace mln

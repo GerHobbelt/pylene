@@ -11,6 +11,8 @@
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
+#include <variant>
+
 #include <gtest/gtest.h>
 
 
@@ -41,9 +43,14 @@ TEST(Core, Fill_LargeEnough_BM_Auto)
   auto disc         = mln::se::disc{1};
   auto extended_ima = extension::bm::fill(uint8_t(42)).manage(ima, disc);
 
-  ASSERT_TRUE(extended_ima.extension().is_finite());
-  ASSERT_TRUE(all_of(extended_ima == out));
-  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  ASSERT_TRUE(std::visit([](auto i) { return i.extension().is_finite(); }, extended_ima));
+  ASSERT_TRUE(std::visit(
+      [&out](auto i) {
+        using namespace mln::view::ops;
+        return all_of(i == out);
+      },
+      extended_ima));
+  std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 
 TEST(Core, Fill_NotLargeEnough_BM_Auto)
@@ -57,11 +64,16 @@ TEST(Core, Fill_NotLargeEnough_BM_Auto)
   auto           disc         = mln::se::disc{4};
   auto           extended_ima = extension::bm::fill(uint8_t(42)).manage(ima, disc);
 
-  ASSERT_FALSE(extended_ima.extension().is_finite());
-  ASSERT_TRUE(all_of(extended_ima == out));
-  ASSERT_IMAGES_WITH_BORDER_NE_EXP(extended_ima, ima);
+  ASSERT_FALSE(std::visit([](auto i) { return i.extension().is_finite(); }, extended_ima));
+  ASSERT_TRUE(std::visit(
+      [&out](auto i) {
+        using namespace mln::view::ops;
+        return all_of(i == out);
+      },
+      extended_ima));
+  std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_NE_EXP(i, ima); }, extended_ima);
   ima.extension().fill(uint8_t(42));
-  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 
 TEST(Core, Fill_LargeEnough_BM_User)
@@ -76,9 +88,14 @@ TEST(Core, Fill_LargeEnough_BM_User)
   auto disc         = mln::se::disc{1};
   auto extended_ima = extension::bm::user_managed::fill(uint8_t(42)).manage(ima, disc);
 
-  ASSERT_TRUE(extended_ima.extension().is_finite());
-  ASSERT_TRUE(all_of(extended_ima == out));
-  ASSERT_IMAGES_WITH_BORDER_EQ_EXP(extended_ima, ima);
+  ASSERT_TRUE(std::visit([](auto i) { return i.extension().is_finite(); }, extended_ima));
+  ASSERT_TRUE(std::visit(
+      [&out](auto i) {
+        using namespace mln::view::ops;
+        return all_of(i == out);
+      },
+      extended_ima));
+  std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 
 TEST(Core, Fill_NotLargeEnough_BM_User)

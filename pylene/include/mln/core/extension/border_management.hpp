@@ -3,9 +3,11 @@
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/extension.hpp>
+#include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>
+#include <mln/core/image/view/mirror_extended.hpp>
 #include <mln/core/image/view/none_extended.hpp>
-#include <mln/core/image/view/pattern_extended.hpp>
+#include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/trace.hpp>
 
@@ -213,7 +215,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_mirror::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support mirroring.");
-        return view::extended(ima, view::pattern_extended(ima, experimental::Pattern::Mirror, m_padding));
+        return view::extended(ima, view::mirror_extended(ima, m_padding));
       }
       else
       {
@@ -221,7 +223,7 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::pattern_extended(ima, experimental::Pattern::Mirror, m_padding));
+          return view::extended(ima, view::mirror_extended(ima, m_padding));
         }
         else
         {
@@ -287,7 +289,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_periodize::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support periodizing.");
-        return view::extended(ima, view::pattern_extended(ima, experimental::Pattern::Periodize));
+        return view::extended(ima, view::periodize_extended(ima));
       }
       else
       {
@@ -295,7 +297,7 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::pattern_extended(ima, experimental::Pattern::Periodize));
+          return view::extended(ima, view::periodize_extended(ima));
         }
         else
         {
@@ -352,7 +354,7 @@ namespace mln::extension
       if constexpr (!image_has_extension<I>::value || !image_extension_t<I>::support_clamp::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support clamping.");
-        return view::extended(ima, view::pattern_extended(ima, experimental::Pattern::Clamp));
+        return view::extended(ima, view::clamp_extended(ima));
       }
       else
       {
@@ -360,7 +362,7 @@ namespace mln::extension
         {
           // The SE doesn't fit, we make a view of the image with an adapted dynamic border
           mln::trace::warn("[Performance] The extension of the image is two small. Consider using a large border.");
-          return view::extended(ima, view::pattern_extended(ima, experimental::Pattern::Clamp));
+          return view::extended(ima, view::clamp_extended(ima));
         }
         else
         {

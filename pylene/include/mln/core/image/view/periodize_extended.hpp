@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/extension/extension_traits.hpp>
-#include <mln/core/extension/private/by_pattern.hpp>
+#include <mln/core/extension/private/by_periodize.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
@@ -11,13 +11,12 @@
 namespace mln
 {
   template <class I>
-  class pattern_extended_view;
+  class periodize_extended_view;
 
   namespace view
   {
     template <class I>
-    pattern_extended_view<I> pattern_extended(I image, mln::extension::experimental::Pattern pattern,
-                                              std::size_t padding = 0);
+    periodize_extended_view<I> periodize_extended(I image);
   };
 
 
@@ -27,13 +26,13 @@ namespace mln
 
 
   template <class I>
-  class pattern_extended_view : public image_adaptor<I>, public experimental::Image<pattern_extended_view<I>>
+  class periodize_extended_view : public image_adaptor<I>, public experimental::Image<periodize_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
   public:
     using extension_category = extension::custom_extension_tag;
-    using extension_type     = extension::by_pattern<image_value_t<I>, I>;
+    using extension_type     = extension::by_periodize<image_value_t<I>, I>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type         = image_point_t<I>;
@@ -41,7 +40,7 @@ namespace mln
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
-      using reference = pattern_extended_view::reference;
+      using reference = periodize_extended_view::reference;
 
       reference val() const
       {
@@ -66,9 +65,9 @@ namespace mln
     extension_type m_ext;
 
   public:
-    pattern_extended_view(I ima, mln::extension::experimental::Pattern pattern, std::size_t padding = 0)
+    explicit periodize_extended_view(I ima)
       : base_t{std::move(ima)}
-      , m_ext{this->base(), pattern, padding}
+      , m_ext{this->base()}
     {
     }
 
@@ -115,10 +114,9 @@ namespace mln
   namespace view
   {
     template <class I>
-    pattern_extended_view<I> pattern_extended(I image, mln::extension::experimental::Pattern pattern,
-                                              std::size_t padding)
+    periodize_extended_view<I> periodize_extended(I image)
     {
-      return {std::move(image), pattern, padding};
+      return periodize_extended_view<I>{std::move(image)};
     }
   }; // namespace view
 

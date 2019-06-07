@@ -2,10 +2,12 @@
 
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/view/adaptor.hpp>
+#include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>
 #include <mln/core/image/view/image_extended.hpp>
+#include <mln/core/image/view/mirror_extended.hpp>
 #include <mln/core/image/view/none_extended.hpp>
-#include <mln/core/image/view/pattern_extended.hpp>
+#include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
@@ -40,8 +42,8 @@ namespace mln
   {
     using base_t = image_adaptor<I>;
     // can be the base image (se fit, no adaptation required)
-    using adapted_image_t = std::variant<I, none_extended_view<I>, value_extended_view<I>, image_extended_view<I>,
-                                         pattern_extended_view<I>>;
+    using adapted_image_t = std::variant<I, clamp_extended_view<I>, image_extended_view<I>, mirror_extended_view<I>,
+                                         none_extended_view<I>, periodize_extended_view<I>, value_extended_view<I>>;
 
   public:
     using reference     = const image_value_t<I>&; // Restrict the image to be read-only

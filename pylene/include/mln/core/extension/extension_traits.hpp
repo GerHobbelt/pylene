@@ -28,17 +28,7 @@ namespace mln
     struct image_extension_tag : custom_extension_tag
     {
     };
-
-    namespace experimental
-    {
-      enum class Pattern
-      {
-        Mirror,
-        Periodize,
-        Clamp
-      };
-    } // namespace experimental
-  }   // namespace extension
+  } // namespace extension
 
   /******************************************/
   /****              Traits              ****/

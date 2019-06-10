@@ -8,7 +8,6 @@
 #include <range/v3/span.hpp>
 
 #include <cstddef>
-#include <iostream>
 #include <memory>
 #include <type_traits>
 
@@ -34,7 +33,6 @@ namespace mln::py
       m_data   = std::make_shared<image2d_data<void>>(h * w, m_type.tid());
       m_buffer = m_data->m_buf;
       dispatch_value_set(&m_vs, m_type.tid());
-      std::cout << "initialized a non-templated image\n";
     }
 
     template <typename T>
@@ -46,7 +44,6 @@ namespace mln::py
       m_data   = std::make_shared<image2d_data<T>>(h * w);
       m_buffer = m_data->m_buf;
       new (&m_vs) value_set<T>{};
-      std::cout << "initialized a templated img\n";
     }
 
     template <typename T>
@@ -58,7 +55,6 @@ namespace mln::py
       m_data   = std::make_shared<image2d_data<T>>(h * w, val);
       m_buffer = m_data->m_buf;
       new (&m_vs) value_set<T>{};
-      std::cout << "initialized a templated img with values\n";
     }
 
     template <typename T>

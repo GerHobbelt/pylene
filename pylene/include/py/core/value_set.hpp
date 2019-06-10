@@ -17,7 +17,6 @@ namespace mln::py
   template <>
   struct value_set<void>
   {
-    virtual float    normalize(void* val) const = 0; // abstract normalize function for vs<void>
     std::any         max() const { return _max(); }
     virtual float divide(any_ref val1, any_ref val2) const = 0;
 
@@ -31,12 +30,6 @@ namespace mln::py
   template <typename T>
   struct value_set : value_set<void>
   {
-    float normalize(void* val) const override final
-    {
-      return static_cast<float>(*static_cast<T*>(val)) / std::numeric_limits<T>::max();
-    }
-
-    float normalize(T val) const { return static_cast<float>(val) / std::numeric_limits<T>::max(); }
 
     template <typename U>
     U cast(any_ref v) const

@@ -1,4 +1,5 @@
 #include <py/algorithm/stretch.hpp>
+#include <py/algorithm/invert.hpp>
 #include <py/core/image2d.hpp>
 #include <py/core/type_info.hpp>
 #include <pybind/numpy_helper.hpp>
@@ -53,5 +54,6 @@ PYBIND11_MODULE(PyPylene, m)
       });
 
   m.def("stretch", static_cast<image2d<> (*)(const image2d<>&)>(&mln::py::stretch_py));
+  m.def("invert", static_cast<image2d<> (*)(const image2d<>&)>(&mln::py::invert_py));
   m.def("to_numpy", &to_numpy);
 }

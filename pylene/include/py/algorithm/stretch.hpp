@@ -18,7 +18,7 @@ namespace mln::py
     std::transform(span.begin(), span.end(), res.values().begin(),
                    [&vs](auto val) -> float {
                      auto tmp = vs.max();
-                     return std::any_cast<float>(vs.divide(val, tmp));
+                     return vs.divide(val, tmp);
                    });
     return res;
   }

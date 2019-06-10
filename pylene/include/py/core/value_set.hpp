@@ -19,7 +19,7 @@ namespace mln::py
   {
     virtual float    normalize(void* val) const = 0; // abstract normalize function for vs<void>
     std::any         max() const { return _max(); }
-    virtual std::any divide(any_ref val1, any_ref val2) const = 0;
+    virtual float divide(any_ref val1, any_ref val2) const = 0;
 
     std::any cast(any_ref v, const Info& dest_type) const { return _cast(v, dest_type); }
 
@@ -45,26 +45,17 @@ namespace mln::py
     }
 
 
-    std::any max() const { return std::any(std::numeric_limits<T>::max()); }
+    T max() const { return std::numeric_limits<T>::max(); }
 
-    std::any divide(any_ref val1, any_ref denominator) const override final
+    float divide(any_ref val1, any_ref denominator) const override final
     {
       return static_cast<float>(val1.as<T>()) / denominator.as<T>();
     }
 
 
-    std::any divide(T val, T denominator) const
+    float divide(T val, T denominator) const
     {
-      std::any res;
-      try
-      {
-        res = static_cast<float>(val) / denominator;
-      }
-      catch (const std::bad_any_cast& e)
-      {
-        std::cerr << "Error in 'divide(T, T)': unhandled type.\n";
-      }
-      return res;
+      return static_cast<float>(val) / denominator;
     }
 
   private:

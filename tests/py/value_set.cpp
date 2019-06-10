@@ -14,19 +14,12 @@ TEST(Py, vs_max)
   ASSERT_EQ(std::any_cast<int8_t>(vs.max()), std::numeric_limits<int8_t>::max());
 }
 
-TEST(Py, vs_normalize) //delete after successful implem of divide()?
-{
-  mln::py::value_set<int64_t> vs;
-  int64_t var = 1234;
-  ASSERT_EQ(vs.normalize(var), static_cast<float>(var) / std::numeric_limits<int64_t>::max());
-}
-
 TEST(Py, vs_divide_T)
 {
   mln::py::value_set<int64_t> vs;
   int64_t var = 144;
-  std::any res = vs.divide(var, int64_t(12));
-  ASSERT_EQ(static_cast<int>(std::any_cast<float>(res)), 12);
+  int64_t res = vs.divide(var, int64_t(12));
+  ASSERT_EQ(static_cast<int>(res), 12);
 }
 
 TEST(Py, vs_T_cast)

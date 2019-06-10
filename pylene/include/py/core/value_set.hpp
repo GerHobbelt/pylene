@@ -18,7 +18,7 @@ namespace mln::py
   struct value_set<void>
   {
     std::any         max() const { return _max(); }
-    virtual float divide(any_ref val1, any_ref val2) const = 0;
+    virtual std::any divide(any_ref val1, any_ref val2) const = 0;
 
     std::any cast(any_ref v, const Info& dest_type) const { return _cast(v, dest_type); }
 
@@ -40,15 +40,15 @@ namespace mln::py
 
     T max() const { return std::numeric_limits<T>::max(); }
 
-    float divide(any_ref val1, any_ref denominator) const override final
+    std::any divide(any_ref val1, any_ref denominator) const override final
     {
-      return static_cast<float>(val1.as<T>()) / denominator.as<T>();
+      return val1.as<T>() / denominator.as<T>();
     }
 
 
-    float divide(T val, T denominator) const
+    T divide(T val, T denominator) const
     {
-      return static_cast<float>(val) / denominator;
+      return val / denominator;
     }
 
   private:
@@ -75,5 +75,23 @@ namespace mln::py
     {
       return visit_f(info.tid(), cast_dispatcher_t{this}, val);
     }
-  }; // namespace mln::py
+  }; // value_set
+
+  template <typename T, typename Arg>
+  T generic_cast(Arg&& val)
+  {
+    return static_cast<T>(std::forward<Arg>(val));
+  }
+
+  template <typename T>
+  T generic_cast(any_ref val)
+  {
+    return val.as<T>();
+  }
+
+  template <typename T> //TODO constness of any?
+  T generic_cast(std::any val)
+  {
+    return std::any_cast<T>(val);
+  }
 } // namespace mln::py

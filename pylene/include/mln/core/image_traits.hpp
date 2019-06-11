@@ -145,7 +145,7 @@ namespace mln
     using support_mirror    = std::false_type;
     using support_periodize = std::false_type;
     using support_clamp     = std::false_type;
-    using support_buffer    = std::false_type;
+    using support_extend_with    = std::false_type;
   };
 
   template <typename I>

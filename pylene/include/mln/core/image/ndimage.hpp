@@ -83,16 +83,15 @@ namespace mln
       using support_mirror    = std::true_type;
       using support_periodize = std::false_type; // TODO
       using support_clamp     = std::true_type;  // TODO
-      using support_buffer    = std::false_type; // TODO
+      using support_extend_with    = std::false_type; // TODO
 
-      ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp, const box<short, dim>* dom,
+      ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp,
                         int border);
 
       template <typename SE>
       bool                       fit(const SE& se) const;
       constexpr bool             is_finite() const;
       std::optional<std::size_t> size() const;
-      const value_type&          value(const point_type& pnt) const;
       void                       fill(const T& v);
       void                       mirror(std::size_t padding = 0);
 
@@ -100,13 +99,13 @@ namespace mln
       void periodize();
       void clamp();
       template <typename U>
-      void buffer(U&& u);
+      void extend_with(U&& u, point_type /*offset*/ = {});
 
       constexpr bool is_fill_supported() const;
       constexpr bool is_mirror_supported() const;
       constexpr bool is_periodize_supported() const;
       constexpr bool is_clamp_supported() const;
-      constexpr bool is_buffer_supported() const;
+      constexpr bool is_extend_with_supported() const;
 
     private:
       template <unsigned d>
@@ -136,7 +135,6 @@ namespace mln
     private:
       size_t                 m_strides[dim];
       point_type             m_shp;
-      const box<short, dim>* m_dom;
       char*                  m_ptr;
       int                    m_border;
     };
@@ -1068,7 +1066,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::extension_type ndimage_base<T, dim, E>::extension() const
   {
-    return extension_type(m_ptr, &m_strides[0], m_domain.shape(), &m_domain, m_border);
+    return {m_ptr, &m_strides[0], m_domain.shape(), m_border};
   }
 
 
@@ -1103,9 +1101,8 @@ namespace mln
 
     template <typename T, unsigned dim>
     ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp,
-                                                 const box<short, dim>* dom, int border)
+                                                 int border)
       : m_shp(shp)
-      , m_dom(dom)
       , m_ptr(ptr)
       , m_border(border)
     {
@@ -1146,16 +1143,6 @@ namespace mln
     }
 
     template <typename T, unsigned dim>
-
-    auto ndimage_extension<T, dim>::value(const point_type& pnt) const -> const value_type&
-    {
-      char* ptr = m_ptr;
-      for (unsigned i = 0; i < dim; ++i)
-        ptr += (pnt[i] - m_dom->pmin[i]) * m_strides[i];
-      return *reinterpret_cast<T*>(ptr);
-    }
-
-    template <typename T, unsigned dim>
     void ndimage_extension<T, dim>::fill(const T& v)
     {
       if (!is_fill_supported())
@@ -1193,10 +1180,10 @@ namespace mln
 
     template <typename T, unsigned dim>
     template <typename U>
-    void ndimage_extension<T, dim>::buffer(U&& /*u*/)
+    void ndimage_extension<T, dim>::extend_with(U&& /*u*/, point_type /*offset*/)
     {
-      if (!is_buffer_supported())
-        throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+      if (!is_extend_with_supported())
+        throw std::logic_error("Attempting to use extend_with on an extension that is not extendable!");
 
       // TODO
     }
@@ -1226,9 +1213,9 @@ namespace mln
     }
 
     template <typename T, unsigned dim>
-    constexpr bool ndimage_extension<T, dim>::is_buffer_supported() const
+    constexpr bool ndimage_extension<T, dim>::is_extend_with_supported() const
     {
-      return support_buffer::value;
+      return support_extend_with::value;
     }
 
     template <typename T, unsigned dim>

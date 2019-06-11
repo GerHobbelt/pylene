@@ -46,29 +46,32 @@ namespace mln
       reference val() const
       {
         auto pnt = this->base().point();
-        return m_dom.has(pnt) ? this->base().val() : m_extptr->value(pnt);
+        return m_dom.has(pnt) ? this->base().val() : m_ima->get_value_from_extension(pnt);
       }
 
-      new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom)
+      new_pixel_type(image_pixel_t<I> px, image_extended_view<I>* ima, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
-        , m_extptr{ext}
+        , m_ima{ima}
         , m_dom{std::move(dom)}
       {
       }
 
     private:
-      extension_type* m_extptr;
-      domain_type     m_dom;
+      image_extended_view<I>* m_ima;
+      domain_type             m_dom;
     };
 
   private:
-    extension_type m_ext;
+    using const_extension_type = extension::by_image<image_value_t<I>, point_type, false>;
+    std::function<bool(const point_type&)>      m_has_value_func;
+    std::function<reference(const point_type&)> m_get_value_func;
 
   public:
     template <typename U>
     image_extended_view(I ima, U base_ima, point_type offset)
       : base_t{std::move(ima)}
-      , m_ext{std::move(base_ima), std::move(offset)}
+      , m_has_value_func{[base_ima, offset](const point_type& pnt) { return base_ima.domain().has(pnt + offset); }}
+      , m_get_value_func{[base_ima, offset](const point_type& pnt) { return base_ima(pnt + offset); }}
     {
     }
 
@@ -80,11 +83,10 @@ namespace mln
       return this->at(p);
     }
 
-
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->domain().has(p) ? this->base().at(p) : m_ext.value(p);
+      return this->domain().has(p) ? this->base().at(p) : get_value_from_extension(p);
     }
 
     template <class J = I>
@@ -96,19 +98,28 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel_at(p), &m_ext, this->domain()};
+      return {this->base().new_pixel_at(p), this, this->domain()};
     }
     /// \}
 
     auto new_pixels()
     {
       return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), &this->m_ext, this->domain()};
+        return {std::move(px), this, this->domain()};
       });
     }
 
-    const extension_type& extension() const { return m_ext; }
-    extension_type&       extension() { return m_ext; }
+    const_extension_type extension() const { return {&m_has_value_func, &m_get_value_func}; }
+    extension_type       extension() { return {&m_has_value_func, &m_get_value_func}; }
+
+  private:
+    reference get_value_from_extension(const point_type& pnt) const
+    {
+      if (!m_has_value_func(pnt))
+        throw std::runtime_error("Accessing point out of bound !");
+
+      return m_get_value_func(pnt);
+    }
   };
 
 

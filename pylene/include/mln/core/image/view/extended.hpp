@@ -62,7 +62,7 @@ namespace mln
       using support_mirror    = std::true_type;
       using support_periodize = std::true_type;
       using support_clamp     = std::true_type;
-      using support_buffer    = std::true_type;
+      using support_extend_with    = std::true_type;
 
       explicit extension_type(adapted_image_t* adapted_image)
         : m_adapted_image{adapted_image}
@@ -122,12 +122,12 @@ namespace mln
         std::visit([](auto&& ima) { ima.extension().clamp(); }, *m_adapted_image);
       }
       template <typename U>
-      void buffer(U&& u)
+      void extend_with(U&& u, point_type offset = {})
       {
-        if (!is_buffer_supported())
-          throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+        if (!is_extend_with_supported())
+          throw std::logic_error("Attempting to use extend_with on an extension that is not extendable!");
 
-        std::visit([u_ = std::forward<U>(u)](auto&& ima) { ima.extension().buffer(u_); }, *m_adapted_image);
+        std::visit([u_ = std::forward<U>(u), offset](auto&& ima) { ima.extension().extend_with(u_, offset); }, *m_adapted_image);
       }
       bool is_fill_supported() const
       {
@@ -145,9 +145,9 @@ namespace mln
       {
         return std::visit([](auto&& ima) { return ima.extension().is_clamp_supported(); }, *m_adapted_image);
       }
-      bool is_buffer_supported() const
+      bool is_extend_with_supported() const
       {
-        return std::visit([](auto&& ima) { return ima.extension().is_buffer_supported(); }, *m_adapted_image);
+        return std::visit([](auto&& ima) { return ima.extension().is_extend_with_supported(); }, *m_adapted_image);
       }
 
     private:

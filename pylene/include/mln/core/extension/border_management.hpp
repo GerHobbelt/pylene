@@ -10,6 +10,7 @@
 #include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/utils/remove_cvref.hpp>
 
 #include <any>
 #include <exception>
@@ -18,17 +19,6 @@
 
 namespace mln::extension
 {
-  namespace detail
-  {
-    template <class T>
-    struct remove_cvref
-    {
-      using type = std::remove_cv_t<std::remove_reference_t<T>>;
-    };
-    template <class T>
-    using remove_cvref_t = typename remove_cvref<T>::type;
-  } // namespace detail
-
   template <typename Ima, typename SE>
   constexpr bool fit(const Ima& ima, const SE& se)
   {
@@ -90,9 +80,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -115,9 +105,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE&) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE&) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -145,10 +135,10 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
-      // using S = detail::remove_cvref_t<SE>;
+      using I = mln::detail::remove_cvref_t<Ima>;
+      // using S = mln::detail::remove_cvref_t<SE>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<S, mln::experimental::StructuringElement>::value);
 
@@ -198,9 +188,9 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -243,9 +233,9 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -289,9 +279,9 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -322,9 +312,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -360,9 +350,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -392,9 +382,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -430,9 +420,9 @@ namespace mln::extension
   {
   public:
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
@@ -473,22 +463,22 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
-      if constexpr (!image_has_extension<I>::value || image_extension_t<I>::support_buffer::value)
+      if constexpr (!image_has_extension<I>::value || image_extension_t<I>::support_extend_with::value)
       {
         mln::trace::warn("[Performance] The image has no extension or does not support buffer filling.");
         return {view::image_extended(ima, m_baseimage)};
       }
       else
       {
-        if (!fit(ima, se) || !ima.extension.is_buffer_supported())
+        if (!fit(ima, se) || !ima.extension.is_extend_with_supported())
         {
           // The SE doesn't fit or the extension doesn't dynamically support buffer, we make a view of the image with an
           // adapted dynamic border
@@ -501,7 +491,7 @@ namespace mln::extension
         {
           // The SE fits, we set the value of the border
           // FIXME: to implement
-          // ima.extension().buffer(m_baseimage, m_offset);
+          // ima.extension().extend_with(m_baseimage, m_offset);
           return {ima};
         }
       }
@@ -524,9 +514,9 @@ namespace mln::extension
     }
 
     template <class Ima, class SE>
-    managed_image_t<detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
+    managed_image_t<mln::detail::remove_cvref_t<Ima>> manage(Ima&& ima, const SE& se) const
     {
-      using I = detail::remove_cvref_t<Ima>;
+      using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
@@ -535,15 +525,15 @@ namespace mln::extension
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
                     "Use an image without an extension or switch to the auto border management policy!");
-      static_assert(image_extension_t<I>::support_buffer::value,
+      static_assert(image_extension_t<I>::support_extend_with::value,
                     "The image's extension does not support the buffer filling method."
                     "Use an image that does or switch to the auto border management policy!");
 
-      if (fit(ima, se) && ima.extension().is_buffer_supported())
+      if (fit(ima, se) && ima.extension().is_extend_with_supported())
       {
         // The SE fits and the extension dynamically support buffer, we set the value of the border
         // FIXME: to implement
-        // ima.extension().buffer(m_baseimage, m_offset);
+        // ima.extension().extend_with(m_baseimage, m_offset);
         return {ima};
       }
 

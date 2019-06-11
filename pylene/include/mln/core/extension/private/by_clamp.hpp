@@ -14,38 +14,18 @@
 
 namespace mln::extension
 {
-  namespace detail
-  {
-    template <typename T>
-    T compute_clamped_coord(T pnt, std::size_t shp_)
-    {
-      if (shp_ == 0)
-        throw std::runtime_error("Division by zero!");
-
-      if (pnt < 0)
-        return 0;
-
-      auto shp = static_cast<T>(shp_);
-
-      return std::min(pnt, static_cast<T>(shp - 1));
-    }
-  } // namespace detail
-
   template <typename V, typename I>
   struct by_clamp
   {
-    using value_type        = V;
-    using point_type        = image_point_t<I>;
-    using support_fill      = std::false_type;
-    using support_mirror    = std::false_type;
-    using support_periodize = std::false_type;
-    using support_clamp     = std::true_type;
-    using support_buffer    = std::false_type;
+    using value_type          = V;
+    using point_type          = image_point_t<I>;
+    using support_fill        = std::false_type;
+    using support_mirror      = std::false_type;
+    using support_periodize   = std::false_type;
+    using support_clamp       = std::true_type;
+    using support_extend_with = std::false_type;
 
-    explicit by_clamp(I ima)
-      : m_ima{std::move(ima)}
-    {
-    }
+    by_clamp() {}
 
     template <typename SE>
     constexpr bool fit(const SE&) const
@@ -58,17 +38,6 @@ namespace mln::extension
     constexpr bool is_finite() const { return false; }
 
     constexpr std::optional<std::size_t> size() const { return std::nullopt; }
-
-    const V& value(const point_type& pnt) const
-    {
-      using domain_t     = typename I::domain_type;
-      constexpr auto dim = domain_t::dimension;
-
-      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_t>,
-                               "Domain must be shaped to allow pattern-based extension!");
-
-      return m_ima(compute_coords<dim>(std::move(pnt), m_ima.domain().shape()));
-    }
 
     void fill(const value_type& /*v*/)
     {
@@ -93,33 +62,16 @@ namespace mln::extension
       // Nothing to do, everything is lazy-computed
     }
     template <typename U>
-    void buffer(U&& /*u*/)
+    void extend_with(U&& /*u*/, point_type /*offset*/ = {})
     {
-      if (!is_buffer_supported())
-        throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+      if (!is_extend_with_supported())
+        throw std::logic_error("Attempting to use extend_with on an extension that is not extendable!");
     }
     constexpr bool is_fill_supported() const { return support_fill::value; }
     constexpr bool is_mirror_supported() const { return support_mirror::value; }
     constexpr bool is_periodize_supported() const { return support_periodize::value; }
     constexpr bool is_clamp_supported() const { return support_clamp::value; }
-    constexpr bool is_buffer_supported() const { return support_buffer::value; }
-
-
-  private:
-    template <std::size_t dim, typename Pnt>
-    Pnt compute_coords(Pnt pnt, Pnt shp) const
-    {
-      return compute_coords_impl(std::move(pnt), std::move(shp), std::make_index_sequence<dim>{});
-    }
-
-    template <typename Pnt, std::size_t... Idx>
-    Pnt compute_coords_impl(Pnt pnt, Pnt shp, std::index_sequence<Idx...>) const
-    {
-      return Pnt(detail::compute_clamped_coord(pnt[Idx], shp[Idx])...);
-    }
-
-  private:
-    I m_ima;
+    constexpr bool is_extend_with_supported() const { return support_extend_with::value; }
   };
 
 } // namespace mln::extension

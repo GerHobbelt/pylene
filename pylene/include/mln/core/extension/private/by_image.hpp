@@ -12,7 +12,7 @@
 namespace mln::extension
 {
 
-  template <typename V, typename P>
+  template <typename V, typename P, bool Mutable = true>
   struct by_image
   {
     using value_type        = V;
@@ -21,12 +21,18 @@ namespace mln::extension
     using support_mirror    = std::false_type;
     using support_periodize = std::false_type;
     using support_clamp     = std::false_type;
-    using support_buffer    = std::true_type;
+    using support_extend_with    = std::true_type;
 
-    template <typename U>
-    explicit by_image(U base_ima, point_type offset = point_type{})
-      : m_hasvalue{[base_ima, offset](const P& pnt) { return base_ima.domain().has(pnt + offset); }}
-      , m_yieldvalue{[base_ima, offset](const P& pnt) { return base_ima(pnt + offset); }}
+  private:
+    using has_value_func_ptr_t = std::conditional_t<Mutable, std::function<bool(const point_type&)>*,
+                                                    const std::function<bool(const point_type&)>*>;
+    using get_value_func_ptr_t = std::conditional_t<Mutable, std::function<const value_type&(const point_type&)>*,
+                                                    const std::function<const value_type&(const point_type&)>*>;
+
+  public:
+    by_image(has_value_func_ptr_t f, get_value_func_ptr_t g)
+      : m_has_value_func_ptr{f}
+      , m_get_value_func_ptr{g}
     {
     }
 
@@ -44,14 +50,6 @@ namespace mln::extension
     {
       //  TODO: non trivial
       return 0;
-    }
-
-    const V& value(const P& pnt) const
-    {
-      if (!m_hasvalue(pnt))
-        throw std::runtime_error(" Accessing point out of bound !");
-
-      return m_yieldvalue(pnt);
     }
 
     void fill(const value_type& /*v*/)
@@ -75,22 +73,23 @@ namespace mln::extension
         throw std::logic_error("Attempting to use clamp on an extension that is not clampable!");
     }
     template <typename U>
-    void buffer(U&& /*u*/)
+    void extend_with(U&& base_ima, point_type offset = {})
     {
-      if (!is_buffer_supported())
-        throw std::logic_error("Attempting to use buffer on an extension that is not buffurable!");
+      if (!is_extend_with_supported())
+        throw std::logic_error("Attempting to use extend_with on an extension that is not extendable!");
 
-      // Nothing to do, everything is lazy-computed
+      *m_has_value_func_ptr = [base_ima, offset](const point_type& pnt) { return base_ima.domain().has(pnt + offset); };
+      *m_get_value_func_ptr = [base_ima, offset](const point_type& pnt) { return base_ima(pnt + offset); };
     }
     constexpr bool is_fill_supported() const { return support_fill::value; }
     constexpr bool is_mirror_supported() const { return support_mirror::value; }
     constexpr bool is_periodize_supported() const { return support_periodize::value; }
     constexpr bool is_clamp_supported() const { return support_clamp::value; }
-    constexpr bool is_buffer_supported() const { return support_buffer::value; }
+    constexpr bool is_extend_with_supported() const { return support_extend_with::value; }
 
   private:
-    std::function<bool(const P&)>     m_hasvalue;
-    std::function<const V&(const P&)> m_yieldvalue;
+    has_value_func_ptr_t m_has_value_func_ptr;
+    get_value_func_ptr_t m_get_value_func_ptr;
   };
 
 } // namespace mln::extension

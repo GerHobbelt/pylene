@@ -36,7 +36,6 @@ namespace mln
     using extension_type     = extension::by_value<image_value_t<I>, point_type>;
     using reference          = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
-
     using typename image_adaptor<I>::domain_type;
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
@@ -46,28 +45,29 @@ namespace mln
       reference val() const
       {
         auto pnt = this->base().point();
-        return m_dom.has(pnt) ? this->base().val() : m_extptr->value(pnt);
+        return m_dom.has(pnt) ? this->base().val() : m_ima->m_value;
       }
 
-      new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom)
+      new_pixel_type(image_pixel_t<I> px, value_extended_view<I>* ima, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
-        , m_extptr{ext}
+        , m_ima{ima}
         , m_dom{std::move(dom)}
       {
       }
 
     private:
-      extension_type* m_extptr;
-      domain_type     m_dom;
+      value_extended_view<I>* m_ima;
+      domain_type             m_dom;
     };
 
   private:
-    extension_type m_ext;
+    using const_extension_type = extension::by_value<image_value_t<I>, point_type, false>;
+    image_value_t<I> m_value;
 
   public:
     value_extended_view(I ima, image_value_t<I> value)
       : base_t{std::move(ima)}
-      , m_ext{std::move(value)}
+      , m_value{std::move(value)}
     {
     }
 
@@ -79,11 +79,10 @@ namespace mln
       return this->at(p);
     }
 
-
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->domain().has(p) ? this->base().at(p) : m_ext.value(p);
+      return this->domain().has(p) ? this->base().at(p) : m_value;
     }
 
     template <class J = I>
@@ -95,19 +94,19 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel_at(p), &m_ext, this->domain()};
+      return {this->base().new_pixel_at(p), this, this->domain()};
     }
     /// \}
 
     auto new_pixels()
     {
       return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), &this->m_ext, this->domain()};
+        return {std::move(px), this, this->domain()};
       });
     }
 
-    const extension_type& extension() const { return m_ext; }
-    extension_type&       extension() { return m_ext; }
+    extension_type       extension() { return extension_type{&this->m_value}; }
+    const_extension_type extension() const { return const_extension_type{&this->m_value}; }
   };
 
 

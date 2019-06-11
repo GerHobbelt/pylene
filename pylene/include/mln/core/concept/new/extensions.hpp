@@ -35,7 +35,7 @@ namespace mln::concepts
       typename Ext::support_mirror;
       typename Ext::support_periodize;
       typename Ext::support_clamp;
-      typename Ext::support_buffer;
+      typename Ext::support_extend_with;
     } &&
     Value<typename Ext::value_type> &&
     requires (const Ext cext,
@@ -86,15 +86,15 @@ namespace mln::concepts
     };
 
   template <typename Ext, typename U>
-  concept BufferExtension = 
+  concept ExtendWithExtension = 
     Extension<Ext> &&
-    stl::ConvertibleTo<typename Ext::support_buffer, std::true_type> &&
+    stl::ConvertibleTo<typename Ext::support_extend_with, std::true_type> &&
     InputImage<U> &&
     stl::ConvertibleTo<typename U::value_type, typename Ext::value_type> &&
     stl::ConvertibleTo<typename Ext::point_type, typename U::point_type> &&
-    requires (Ext ext, const Ext cext, U u) {
-      { ext.buffer(u) };
-      { cext.is_buffer_supported() }  -> bool;
+    requires (Ext ext, const Ext cext, U u, typename Ext::point_type offset) {
+      { ext.extend_with(u, offset) };
+      { cext.is_extend_with_supported() }  -> bool;
     };
 
 #endif

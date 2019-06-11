@@ -45,29 +45,28 @@ namespace mln
       reference val() const
       {
         auto pnt = this->base().point();
-        return m_dom.has(pnt) ? this->base().val() : m_extptr->value(pnt);
+        return m_dom.has(pnt) ? this->base().val() : m_ima->compute_periodized_value(pnt);
       }
 
-      new_pixel_type(image_pixel_t<I> px, extension_type* ext, domain_type dom)
+      new_pixel_type(image_pixel_t<I> px, periodize_extended_view<I>* ima, domain_type dom)
         : new_pixel_type::pixel_adaptor{std::move(px)}
-        , m_extptr{ext}
+        , m_ima{ima}
         , m_dom{std::move(dom)}
 
       {
       }
 
     private:
-      extension_type* m_extptr;
-      domain_type     m_dom;
+      periodize_extended_view<I>* m_ima;
+      domain_type                 m_dom;
     };
 
   private:
-    extension_type m_ext;
+    using const_extension_type = extension_type;
 
   public:
     explicit periodize_extended_view(I ima)
       : base_t{std::move(ima)}
-      , m_ext{this->base()}
     {
     }
 
@@ -79,11 +78,10 @@ namespace mln
       return this->at(p);
     }
 
-
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
     {
-      return this->domain().has(p) ? this->base().at(p) : m_ext.value(p);
+      return this->domain().has(p) ? this->base().at(p) : compute_periodized_value(p);
     }
 
     template <class J = I>
@@ -95,20 +93,50 @@ namespace mln
     template <class J = I>
     std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().new_pixel_at(p), &m_ext, this->domain()};
+      return {this->base().new_pixel_at(p), this, this->domain()};
     }
     /// \}
 
     auto new_pixels()
     {
       return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
-        return {std::move(px), &this->m_ext, this->domain()};
+        return {std::move(px), this, this->domain()};
       });
     }
 
-    const extension_type& extension() const { return m_ext; }
-    extension_type&       extension() { return m_ext; }
-  };
+    const_extension_type extension() const { return {}; };
+    extension_type       extension() { return {}; }
+
+  private:
+    reference compute_periodized_value(const point_type& pnt) const
+    {
+      PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<domain_type>,
+                               "Domain must be shaped to allow pattern-based extension!");
+
+      return this->base()(
+          compute_coords(pnt, this->domain().shape(), std::make_index_sequence<domain_type::dimension>{}));
+    }
+
+    template <std::size_t... Idx>
+    point_type compute_coords(const point_type& pnt, const point_type& shp, std::index_sequence<Idx...>) const
+    {
+      return {compute_coords_impl(pnt[Idx], shp[Idx])...};
+    }
+    template <typename Coord>
+    Coord compute_coords_impl(Coord pnt, std::size_t shp_) const
+    {
+      if (shp_ == 0)
+        throw std::runtime_error("Division by zero!");
+
+      auto shp = static_cast<Coord>(shp_);
+
+      if (pnt < 0)
+        while (pnt < 0)
+          pnt += shp;
+
+      return pnt % shp;
+    }
+  }; // namespace mln
 
 
   namespace view

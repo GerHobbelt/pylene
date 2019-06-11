@@ -41,6 +41,6 @@ namespace mln
     typedef typename E::support_mirror    support_mirror;
     typedef typename E::support_periodize support_periodize;
     typedef typename E::support_clamp     support_clamp;
-    typedef typename E::support_buffer    support_buffer;
+    typedef typename E::support_extend_with    support_extend_with;
   };
 } // namespace mln

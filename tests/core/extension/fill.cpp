@@ -76,7 +76,7 @@ TEST(Core, Fill_NotLargeEnough_BM_Auto)
   std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 
-TEST(Core, Fill_LargeEnough_BM_User)
+TEST(Core, Fill_LargeEnough_BM_Native)
 {
   using namespace mln;
   using namespace mln::view::ops;
@@ -86,7 +86,7 @@ TEST(Core, Fill_LargeEnough_BM_User)
   image2d<uint8> out = clone(ima);
 
   auto disc         = mln::se::disc{1};
-  auto extended_ima = extension::bm::user_managed::fill(uint8_t(42)).manage(ima, disc);
+  auto extended_ima = extension::bm::native::fill(uint8_t(42)).manage(ima, disc);
 
   ASSERT_TRUE(std::visit([](auto i) { return i.extension().is_finite(); }, extended_ima));
   ASSERT_TRUE(std::visit(
@@ -98,7 +98,7 @@ TEST(Core, Fill_LargeEnough_BM_User)
   std::visit([&ima](auto i) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, extended_ima);
 }
 
-TEST(Core, Fill_NotLargeEnough_BM_User)
+TEST(Core, Fill_NotLargeEnough_BM_Native)
 {
   using namespace mln;
   using namespace mln::view::ops;
@@ -108,6 +108,6 @@ TEST(Core, Fill_NotLargeEnough_BM_User)
   image2d<uint8> out = clone(ima);
 
   auto disc = mln::se::disc{4};
-  auto bm   = extension::bm::user_managed::fill(uint8_t(42));
+  auto bm   = extension::bm::native::fill(uint8_t(42));
   EXPECT_THROW(auto extended_ima = bm.manage(ima, disc), std::runtime_error);
 }

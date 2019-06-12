@@ -77,7 +77,7 @@ TEST(Core, Clamp_LargeEnough_BM_User)
   [[maybe_unused]] auto disc = mln::se::disc{1};
   // TODO: implement clamp in ndimage
   /*
-  auto extended_ima = extension::bm::user_managed::clamp().manage(ima, disc);
+  auto extended_ima = extension::bm::native::clamp().manage(ima, disc);
 
   ASSERT_TRUE(std::visit([](auto i) { return i.extension().is_finite(); }, extended_ima));
   ASSERT_TRUE(std::visit(
@@ -90,7 +90,7 @@ TEST(Core, Clamp_LargeEnough_BM_User)
   */
 }
 
-TEST(Core, Clamp_NotLargeEnough_BM_User)
+TEST(Core, Clamp_NotLargeEnough_BM_Native)
 {
   using namespace mln;
   using namespace mln::view::ops;
@@ -100,7 +100,7 @@ TEST(Core, Clamp_NotLargeEnough_BM_User)
   [[maybe_unused]] image2d<uint8> out = clone(ima);
 
   [[maybe_unused]] auto disc = mln::se::disc{4};
-  [[maybe_unused]] auto bm   = extension::bm::user_managed::clamp();
+  [[maybe_unused]] auto bm   = extension::bm::native::clamp();
   // TODO: implement clamp in ndimage
   // EXPECT_THROW(auto extended_ima = bm.manage(ima, disc), std::runtime_error);
 }

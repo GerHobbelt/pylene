@@ -37,15 +37,15 @@ namespace mln
     auto      accu = accu::make_accumulator(mln::exact(accu_), image_value_t<I>());
 
 
-    auto extended_ima = bm.manage(f, se);
+    auto managed_result = bm.manage(f, se);
 
-    std::visit(
-        [&accu, &se, &g](auto ima) {
-          auto algo = canvas::make_LocalAccumulation(accu, se, ima, g);
+    mln::extension::visit_result(
+        [&accu, &g](auto ima, auto s) {
+          auto algo = canvas::make_LocalAccumulation(accu, s, ima, g);
           // canvas::LocalAccumulation algo(accu, se, *extended, g);
           algo.Execute();
         },
-        extended_ima);
+        managed_result);
   }
 
   template <class A, class I, class SE, extension::BorderManagementMethod bmm>

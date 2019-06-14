@@ -34,8 +34,9 @@ void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
     for (auto&& [pxIn, pxOut] : rows)
     {
       int tmp = 0;
-      for (auto nx : mln::experimental::c8(pxIn))
-        tmp += nx.val();
+      // FIXME: gcc8 ICE
+      // for (auto nx : mln::experimental::c8(pxIn))
+      //   tmp += nx.val();
       pxOut.val() = tmp;
     }
 }

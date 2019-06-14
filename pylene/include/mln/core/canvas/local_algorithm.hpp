@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
-#include <mln/core/se/se.hpp>
 #include <mln/core/trace.hpp>
 
 namespace mln::canvas

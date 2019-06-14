@@ -13,6 +13,8 @@ namespace mln::archetypes
   // This file defines:
   // StructuringElementT<P = Point, Pix = Pixel<P>>
   // DecomposableStructuringElement<P = Point, Pix = Pixel<P>>
+  // SeparableStructuringElement<P = Point, Pix = Pixel<P>>
+  // IncrementalStructuringElement<P = Point, Pix = Pixel<P>>
 
   namespace details
   {
@@ -31,12 +33,9 @@ namespace mln::archetypes
       using separable    = std::false_type;
 
       ::ranges::iterator_range<P*> operator()(P p);
-      ::ranges::iterator_range<P*> before(P p);
-      ::ranges::iterator_range<P*> after(P p);
 
       ::ranges::iterator_range<Pix*> operator()(Pix px);
-      ::ranges::iterator_range<Pix*> before(Pix px);
-      ::ranges::iterator_range<Pix*> after(Pix px);
+      ::ranges::iterator_range<P*>   offsets() const;
     };
 
 

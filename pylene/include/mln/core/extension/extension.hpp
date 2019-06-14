@@ -1,10 +1,10 @@
 #pragma once
 
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/extended_by_value_image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
-#include <mln/core/se/se.hpp>
 
 
 namespace mln

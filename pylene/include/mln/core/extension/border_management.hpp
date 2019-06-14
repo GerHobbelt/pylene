@@ -9,6 +9,7 @@
 #include <mln/core/image/view/none_extended.hpp>
 #include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
+#include <mln/core/se/view/filter.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/utils/remove_cvref.hpp>
 
@@ -61,32 +62,51 @@ namespace mln::extension
       using managed_image_t = std::variant<mln::detail::remove_cvref_t<I>, mln::detail::remove_cvref_t<V>>;
     };
 
+
+    template <typename Dom>
+    struct adapt_se_none_border
+    {
+      explicit adapt_se_none_border(Dom dom)
+        : m_dom{std::move(dom)}
+      {
+      }
+
+      template <typename Pnt>
+      auto operator()(Pnt&& pnt) const
+      {
+        return m_dom.has(std::forward<Pnt>(pnt));
+      }
+
+    private:
+      Dom m_dom;
+    };
+
     template <BorderManagementMethod Method, typename V = void>
     struct managed_structuring_element_by_method
     {
-      template <typename SE>
+      template <typename SE, typename>
       using managed_se_t = std::variant<mln::detail::remove_cvref_t<SE>>;
     };
 
     template <typename S>
     struct managed_structuring_element_by_method<BorderManagementMethod::None, S>
     {
-      template <typename SE>
-      using managed_se_t = std::variant<mln::detail::remove_cvref_t<SE> /*, TODO adapted SE*/>;
+      template <typename SE, typename Dom>
+      using managed_se_t = std::variant<mln::detail::remove_cvref_t<SE>, se_filter_view<adapt_se_none_border<Dom>, SE>>;
     };
   } // namespace detail
 
-  template <BorderManagementMethod Method, BorderManagementPolicy Policy, typename I, typename SE, typename VI = void,
-            typename VSE = void>
+  template <BorderManagementMethod Method, BorderManagementPolicy Policy, typename I, typename SE, typename Dom,
+            typename VI = void, typename VSE = void>
   struct managed_result
   {
     using type =
         std::pair<typename detail::managed_image_type_by_policy<Policy, VI>::template managed_image_t<I>,
-                  typename detail::managed_structuring_element_by_method<Method, VSE>::template managed_se_t<SE>>;
+                  typename detail::managed_structuring_element_by_method<Method, VSE>::template managed_se_t<SE, Dom>>;
   };
-  template <BorderManagementMethod Method, BorderManagementPolicy Policy, typename I, typename SE, typename VI = void,
-            typename VSE = void>
-  using managed_result_t = typename managed_result<Method, Policy, I, SE, VI, VSE>::type;
+  template <BorderManagementMethod Method, BorderManagementPolicy Policy, typename I, typename SE, typename Dom,
+            typename VI = void, typename VSE = void>
+  using managed_result_t = typename managed_result<Method, Policy, I, SE, Dom, VI, VSE>::type;
 
 
   template <typename Func, typename Result>
@@ -104,7 +124,6 @@ namespace mln::extension
   //////////
   // NONE //
   //////////
-
   template <typename U>
   class border_manager<BorderManagementMethod::None, BorderManagementPolicy::Auto, U>
   {
@@ -112,6 +131,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::None, BorderManagementPolicy::Auto, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             none_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -121,12 +141,12 @@ namespace mln::extension
       if (!fit(ima, se))
       {
         // The SE doesn't fit, no need to remove the border
-        return {ima, se};
+        return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
       }
       else
       {
         // The SE fits, we remove the border
-        return {view::none_extended(ima), se};
+        return {view::none_extended(ima), view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
       }
     }
   };
@@ -138,6 +158,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::None, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             none_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -148,7 +169,7 @@ namespace mln::extension
                     "The image has an extension when none is explicitly requested."
                     "Use an image without a border or switch to the auto border management policy!");
 
-      return {ima, se};
+      return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
     }
   };
 
@@ -173,6 +194,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Fill, BorderManagementPolicy::Auto, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             value_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -227,6 +249,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Fill, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             value_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -278,6 +301,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             mirror_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -325,6 +349,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Mirror, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             mirror_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -363,6 +388,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Periodize, BorderManagementPolicy::Auto, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             periodize_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -402,6 +428,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Periodize, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             periodize_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -440,6 +467,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Clamp, BorderManagementPolicy::Auto, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             clamp_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -479,6 +507,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Clamp, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             clamp_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -527,6 +556,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Image, BorderManagementPolicy::Auto, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             image_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -580,6 +610,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Image, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
                             image_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
@@ -620,7 +651,8 @@ namespace mln::extension
   public:
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
-        -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE>
+        -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -648,7 +680,8 @@ namespace mln::extension
   public:
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
-        -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE>
+        -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE,
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);

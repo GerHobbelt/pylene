@@ -39,7 +39,7 @@ namespace mln::concepts
 
   template <typename SE, typename P>
   concept StructuringElement =
-    std::is_base_of_v<mln::experimental::StructuringElement<SE>, SE> &&
+    stl::ConvertibleTo<SE, mln::experimental::StructuringElement<SE>> &&
     stl::RegularInvocable<SE, P> &&
     stl::RegularInvocable<SE, mln::archetypes::PixelT<P>> &&
     requires {
@@ -51,12 +51,14 @@ namespace mln::concepts
     stl::ConvertibleTo<typename SE::category, mln::adaptative_neighborhood_tag> &&
     details::implies(stl::ConvertibleTo<typename SE::category, mln::dynamic_neighborhood_tag>,
                      details::DynamicStructuringElement<SE>) &&
-    requires (SE se, P p, mln::archetypes::PixelT<P> px) {
-      { se(p) }   -> stl::ForwardRange&&;
-      { se(px) }  -> stl::ForwardRange&&;
+    requires (SE se, const SE cse, P p, mln::archetypes::PixelT<P> px) {
+      { se(p) }         -> stl::ForwardRange&&;
+      { se(px) }        -> stl::ForwardRange&&;
+      { cse.offsets() } -> stl::ForwardRange&&;
 
       requires detail::RangeValueTypeConvertibleTo<decltype(se(p)), P>;
       requires detail::RangeValueTypeConvertibleTo<decltype(se(px)), mln::archetypes::PixelT<P>>;
+      requires detail::RangeValueTypeConvertibleTo<decltype(cse.offsets()), P>;
     };
 
   namespace details

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mln/core/neighborhood/neighborhood_base.hpp>
-#include <mln/core/se/private/se_facade.hpp>
 #include <mln/core/se/custom_se.hpp>
+#include <mln/core/se/private/se_facade.hpp>
 
 #include <mln/core/se/periodic_line2d.hpp>
 #include <range/v3/span.hpp>
@@ -38,7 +38,7 @@ namespace mln
       ///
       /// \param radius The radius r of the disc.
       /// \param approximation Must be 0 or 8 (default: 8)
-      disc(float radius, int approximation = 8);
+      explicit disc(float radius, int approximation = 8);
 
       /// \brief Return a range of SE for decomposition
       std::vector<periodic_line2d> decompose() const;
@@ -103,9 +103,10 @@ namespace mln
 
     public:
       /// Enumeration of disc approximation
-      enum class approx {
-        EXACT = 0, ///< No approximation
-        PERIODIC_LINES_8 = 8 ///< Approximation with 8 periodic lines
+      enum class approx
+      {
+        EXACT            = 0, ///< No approximation
+        PERIODIC_LINES_8 = 8  ///< Approximation with 8 periodic lines
       };
 
 
@@ -157,18 +158,18 @@ namespace mln
     private:
       struct cache_data_t
       {
-        std::vector<point2d> m_points;   // Disc points + inc points + dec points
-        std::ptrdiff_t       m_se_size;  // Number of points in the no-approx disc
+        std::vector<point2d> m_points;  // Disc points + inc points + dec points
+        std::ptrdiff_t       m_se_size; // Number of points in the no-approx disc
       };
 
 
-      void         _compute_data() const;
+      void                          _compute_data() const;
       std::shared_ptr<cache_data_t> __compute_data() const;
 
     private:
-      mutable std::shared_ptr<cache_data_t>  m_data = nullptr; // Cache
-      float m_radius;
-      int   m_nlines; // number of periodic lines for decomposition (0 for the euclidean disc)
+      mutable std::shared_ptr<cache_data_t> m_data = nullptr; // Cache
+      float                                 m_radius;
+      int m_nlines; // number of periodic lines for decomposition (0 for the euclidean disc)
     };
 
   } // namespace experimental::se

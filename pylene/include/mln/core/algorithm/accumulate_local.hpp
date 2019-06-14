@@ -2,10 +2,10 @@
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/canvas/local_accumulation.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/se/se.hpp>
 
 #include <variant>
 

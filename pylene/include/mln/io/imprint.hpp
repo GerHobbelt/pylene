@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/domain/box.hpp>
+#include <mln/core/extension/border_management.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/value/value_traits.hpp>
@@ -220,9 +221,9 @@ namespace mln
 
         mln_point(Image) p;
         int border = 0;
-        if (ima.extension().is_finite())
+        if (mln::extension::is_finite(ima.extension()))
         {
-          border = ima.extension().size().value_or(border);
+          border = ima.extension().extent();
         }
         else // infinite border, we use a defaulted value
         {

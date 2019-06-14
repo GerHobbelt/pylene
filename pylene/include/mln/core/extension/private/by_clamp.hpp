@@ -5,9 +5,7 @@
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 
-#include <algorithm>
-#include <cmath>
-#include <optional>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -35,9 +33,7 @@ namespace mln::extension
       return true;
     }
 
-    constexpr bool is_finite() const { return false; }
-
-    constexpr std::optional<std::size_t> size() const { return std::nullopt; }
+    constexpr int extent() const { return std::numeric_limits<int>::max(); }
 
     void fill(const value_type& /*v*/)
     {

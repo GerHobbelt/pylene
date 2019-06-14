@@ -15,6 +15,7 @@
 
 #include <any>
 #include <exception>
+#include <limits>
 #include <type_traits>
 
 
@@ -26,6 +27,13 @@ namespace mln::extension
     // TODO static_assert
     return ima.extension().fit(se);
   }
+
+  template <typename Ext>
+  constexpr bool is_finite(const Ext& ext)
+  {
+    return not(ext.extent() == std::numeric_limits<int>::max());
+  }
+
   enum class BorderManagementMethod
   {
     None,

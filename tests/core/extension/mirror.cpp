@@ -27,7 +27,8 @@ TEST(Core, Mirror_LargeEnough_BM_Auto)
   auto managed_ima = extension::bm::mirror().manage(ima, disc);
 
 
-  ASSERT_TRUE(mln::extension::visit_result([](auto i, auto) { return i.extension().is_finite(); }, managed_ima));
+  ASSERT_TRUE(
+      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
   ASSERT_TRUE(mln::extension::visit_result(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
@@ -49,7 +50,8 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
   auto disc        = mln::se::disc{4};
   auto managed_ima = extension::bm::mirror().manage(ima, disc);
 
-  ASSERT_FALSE(mln::extension::visit_result([](auto i, auto) { return i.extension().is_finite(); }, managed_ima));
+  ASSERT_FALSE(
+      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
   ASSERT_TRUE(mln::extension::visit_result(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
@@ -73,7 +75,8 @@ TEST(Core, Mirror_LargeEnough_BM_Native)
   auto disc        = mln::se::disc{1};
   auto managed_ima = extension::bm::native::mirror().manage(ima, disc);
 
-  ASSERT_TRUE(mln::extension::visit_result([](auto i, auto) { return i.extension().is_finite(); }, managed_ima));
+  ASSERT_TRUE(
+      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
   ASSERT_TRUE(mln::extension::visit_result(
       [&out](auto i, auto) {
         using namespace mln::view::ops;

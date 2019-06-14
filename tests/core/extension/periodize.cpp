@@ -24,12 +24,13 @@ TEST(Core, Periodize_LargeEnough_BM_Auto)
   [[maybe_unused]] image2d<uint8> out = clone(ima);
 
   [[maybe_unused]] auto disc = mln::se::disc{1};
+
   // TODO: implement periodize in ndimage
   /*
   auto managed_ima = extension::bm::periodize().manage(ima, disc);
 
-
-  ASSERT_TRUE(mln::extension::visit_result([](auto i, auto) { return i.extension().is_finite(); }, managed_ima));
+  ASSERT_TRUE(
+      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
   ASSERT_TRUE(mln::extension::visit_result(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
@@ -51,7 +52,8 @@ TEST(Core, Periodize_NotLargeEnough_BM_Auto)
   auto           disc        = mln::se::disc{4};
   auto           managed_ima = extension::bm::periodize().manage(ima, disc);
 
-  ASSERT_FALSE(mln::extension::visit_result([](auto i, auto) { return i.extension().is_finite(); }, managed_ima));
+  ASSERT_FALSE(
+      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
   ASSERT_TRUE(mln::extension::visit_result(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
@@ -75,11 +77,13 @@ TEST(Core, Periodize_LargeEnough_BM_Native)
   [[maybe_unused]] image2d<uint8> out = clone(ima);
 
   [[maybe_unused]] auto disc = mln::se::disc{1};
+
   // TODO: implement periodize in ndimage
   /*
   auto managed_ima = extension::bm::native::periodize().manage(ima, disc);
 
-  ASSERT_TRUE(mln::extension::visit_result([](auto i, auto) { return i.extension().is_finite(); }, managed_ima));
+  ASSERT_TRUE(mln::extension::visit_result([](auto i, auto) { rreturn mln::extension::is_finite(i.extension()); },
+                                           managed_ima));
   ASSERT_TRUE(mln::extension::visit_result(
       [&out](auto i, auto) {
         using namespace mln::view::ops;

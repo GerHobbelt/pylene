@@ -2,7 +2,6 @@
 
 #include <mln/core/concept/new/structuring_elements.hpp>
 
-#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -13,13 +12,13 @@ namespace mln::extension
   template <typename V, typename P>
   struct none
   {
-    using value_type        = V;
-    using point_type        = P;
-    using support_fill      = std::false_type;
-    using support_mirror    = std::false_type;
-    using support_periodize = std::false_type;
-    using support_clamp     = std::false_type;
-    using support_extend_with    = std::false_type;
+    using value_type          = V;
+    using point_type          = P;
+    using support_fill        = std::false_type;
+    using support_mirror      = std::false_type;
+    using support_periodize   = std::false_type;
+    using support_clamp       = std::false_type;
+    using support_extend_with = std::false_type;
 
     none() {}
 
@@ -39,9 +38,7 @@ namespace mln::extension
       return false;
     }
 
-    constexpr bool is_finite() const { return true; }
-
-    constexpr std::optional<std::size_t> size() const { return 0; }
+    constexpr int extent() const { return 0; }
 
     const value_type& value(const point_type&) const { throw std::runtime_error(" Accessing point out of bound !"); }
 

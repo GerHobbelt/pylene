@@ -77,23 +77,21 @@ namespace mln
     {
 
     public:
-      using value_type        = T;
-      using point_type        = point<short, dim>;
-      using support_fill      = std::true_type;
-      using support_mirror    = std::true_type;
-      using support_periodize = std::false_type; // TODO
-      using support_clamp     = std::true_type;  // TODO
-      using support_extend_with    = std::false_type; // TODO
+      using value_type          = T;
+      using point_type          = point<short, dim>;
+      using support_fill        = std::true_type;
+      using support_mirror      = std::true_type;
+      using support_periodize   = std::false_type; // TODO
+      using support_clamp       = std::true_type;  // TODO
+      using support_extend_with = std::false_type; // TODO
 
-      ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp,
-                        int border);
+      ndimage_extension(char* ptr, const std::size_t* strides, const point_type& shp, int border);
 
       template <typename SE>
-      bool                       fit(const SE& se) const;
-      constexpr bool             is_finite() const;
-      std::optional<std::size_t> size() const;
-      void                       fill(const T& v);
-      void                       mirror(std::size_t padding = 0);
+      bool fit(const SE& se) const;
+      int  extent() const;
+      void fill(const T& v);
+      void mirror(std::size_t padding = 0);
 
       // TODO
       void periodize();
@@ -133,10 +131,10 @@ namespace mln
       typename std::enable_if<(d == dim)>::type _copy_line(char* src, char* dest);
 
     private:
-      size_t                 m_strides[dim];
-      point_type             m_shp;
-      char*                  m_ptr;
-      int                    m_border;
+      size_t     m_strides[dim];
+      point_type m_shp;
+      char*      m_ptr;
+      int        m_border;
     };
 
   } // namespace internal
@@ -1130,14 +1128,8 @@ namespace mln
     }
 
     template <typename T, unsigned dim>
-    constexpr bool ndimage_extension<T, dim>::is_finite() const
-    {
-      return true;
-    }
 
-    template <typename T, unsigned dim>
-
-    std::optional<std::size_t> ndimage_extension<T, dim>::size() const
+    int ndimage_extension<T, dim>::extent() const
     {
       return m_border;
     }

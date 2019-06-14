@@ -4,7 +4,7 @@
 #include <mln/core/image/image.hpp>
 
 #include <functional>
-#include <optional>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -15,13 +15,13 @@ namespace mln::extension
   template <typename V, typename P, bool Mutable = true>
   struct by_image
   {
-    using value_type        = V;
-    using point_type        = P;
-    using support_fill      = std::false_type;
-    using support_mirror    = std::false_type;
-    using support_periodize = std::false_type;
-    using support_clamp     = std::false_type;
-    using support_extend_with    = std::true_type;
+    using value_type          = V;
+    using point_type          = P;
+    using support_fill        = std::false_type;
+    using support_mirror      = std::false_type;
+    using support_periodize   = std::false_type;
+    using support_clamp       = std::false_type;
+    using support_extend_with = std::true_type;
 
   private:
     using has_value_func_ptr_t = std::conditional_t<Mutable, std::function<bool(const point_type&)>*,
@@ -40,13 +40,12 @@ namespace mln::extension
     constexpr bool fit(const SE&) const
     {
       PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
+
       // TODO: non-trivial
       return true;
     }
 
-    constexpr bool is_finite() const { return true; }
-
-    constexpr std::optional<std::size_t> size() const
+    constexpr int extent() const
     {
       //  TODO: non trivial
       return 0;

@@ -166,17 +166,10 @@ namespace fixtures::ImageCompare
       }
 
       {
-        std::size_t border = 0;
-        auto        f_ext  = f.extension();
-        auto        g_ext  = g.extension();
-        if (f_ext.is_finite() && g_ext.is_finite())
-          border = std::min(*f_ext.size(), *g_ext.size());
-        else if (f_ext.is_finite())
-          border = *f_ext.size();
-        else if (g_ext.is_finite())
-          border = *g_ext.size();
-        else
-          border = default_border;
+        int  border = 0;
+        auto f_ext  = f.extension();
+        auto g_ext  = g.extension();
+        border      = std::min(std::min(f_ext.extent(), g_ext.extent()), static_cast<int>(default_border));
 
         auto extended_dom =
             f_domain_t{detail::shift_pnt<f_dim>(pmin, -border), detail::shift_pnt<f_dim>(pmax, +border)};

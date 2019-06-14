@@ -43,8 +43,7 @@ namespace mln::concepts
           Pnt,
           mln::archetypes::Pixel> se, const Pnt pnt) {
       { cext.fit(se) }      -> bool;
-      { cext.is_finite() }  -> bool
-      { cext.size() }       -> std::optional<std::size_t>;
+      { cext.extent() }     -> int;
     };
 
   template <typename Ext>

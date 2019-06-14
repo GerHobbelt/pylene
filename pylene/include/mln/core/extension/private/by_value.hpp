@@ -3,7 +3,7 @@
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/utils/remove_cvref.hpp>
 
-#include <optional>
+#include <limits>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -39,9 +39,7 @@ namespace mln::extension
       return true;
     }
 
-    constexpr bool is_finite() const { return false; }
-
-    constexpr std::optional<std::size_t> size() const { return std::nullopt; }
+    constexpr int extent() const { return std::numeric_limits<int>::max(); }
 
     void fill(const value_type& v)
     {

@@ -132,23 +132,14 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::None, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
-                            none_extended_view<mln::detail::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
-      if (!fit(ima, se))
-      {
-        // The SE doesn't fit, no need to remove the border
-        return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
-      }
-      else
-      {
-        // The SE fits, we remove the border
-        return {view::none_extended(ima), view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
-      }
+      // We remove the border usage by adapting the SE
+      return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
     }
   };
 
@@ -159,8 +150,7 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::None, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
-                            none_extended_view<mln::detail::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
       using I = mln::detail::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
@@ -170,6 +160,7 @@ namespace mln::extension
                     "The image has an extension when none is explicitly requested."
                     "Use an image without a border or switch to the auto border management policy!");
 
+      // We remove the border usage by adapting the SE
       return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
     }
   };

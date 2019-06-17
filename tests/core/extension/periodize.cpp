@@ -21,14 +21,12 @@ TEST(Core, Periodize_LargeEnough_BM_Auto)
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  [[maybe_unused]] image2d<uint8> out = clone(ima);
-
-  [[maybe_unused]] auto disc = mln::se::disc{1};
+  [[maybe_unused]] image2d<uint8> out  = clone(ima);
+  [[maybe_unused]] auto           disc = mln::se::disc{1};
 
   // TODO: implement periodize in ndimage
   /*
   auto [managed_ima, managed_se] = extension::bm::periodize().manage(ima, disc);
-
   ASSERT_TRUE(
       std::visit([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima, managed_se));
   ASSERT_TRUE(std::visit(
@@ -74,14 +72,12 @@ TEST(Core, Periodize_LargeEnough_BM_Native)
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  [[maybe_unused]] image2d<uint8> out = clone(ima);
-
-  [[maybe_unused]] auto disc = mln::se::disc{1};
+  [[maybe_unused]] image2d<uint8> out  = clone(ima);
+  [[maybe_unused]] auto           disc = mln::se::disc{1};
 
   // TODO: implement periodize in ndimage
   /*
   auto [managed_ima, managed_se] = extension::bm::native::periodize().manage(ima, disc);
-
   ASSERT_TRUE(std::visit([](auto i, auto) { rreturn mln::extension::is_finite(i.extension()); },
                                            managed_ima, managed_se));
   ASSERT_TRUE(std::visit(

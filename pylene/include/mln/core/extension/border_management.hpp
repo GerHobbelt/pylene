@@ -117,13 +117,6 @@ namespace mln::extension
   using managed_result_t = typename managed_result<Method, Policy, I, SE, Dom, VI, VSE>::type;
 
 
-  template <typename Func, typename Result>
-  auto visit_result(Func&& func, Result&& managed_res)
-  {
-    return std::visit(std::forward<Func>(func), std::forward<Result>(managed_res).first,
-                      std::forward<Result>(managed_res).second);
-  }
-
   template <BorderManagementMethod Method, BorderManagementPolicy Policy = BorderManagementPolicy::Auto,
             typename U = void>
   class border_manager;

@@ -27,17 +27,17 @@ TEST(Core, Periodize_LargeEnough_BM_Auto)
 
   // TODO: implement periodize in ndimage
   /*
-  auto managed_ima = extension::bm::periodize().manage(ima, disc);
+  auto [managed_ima, managed_se] = extension::bm::periodize().manage(ima, disc);
 
   ASSERT_TRUE(
-      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
-  ASSERT_TRUE(mln::extension::visit_result(
+      std::visit([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima, managed_se));
+  ASSERT_TRUE(std::visit(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
         return all_of(i == out);
       },
-      managed_ima));
-  mln::extension::visit_result([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima);
+      managed_ima, managed_se));
+  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima, managed_se);
   */
 }
 
@@ -48,23 +48,23 @@ TEST(Core, Periodize_NotLargeEnough_BM_Auto)
 
   image2d<uint8> ima(10, 10);
   iota(ima, 0);
-  image2d<uint8> out         = clone(ima);
-  auto           disc        = mln::se::disc{4};
-  auto           managed_ima = extension::bm::periodize().manage(ima, disc);
+  image2d<uint8> out             = clone(ima);
+  auto           disc            = mln::se::disc{4};
+  auto [managed_ima, managed_se] = extension::bm::periodize().manage(ima, disc);
 
   ASSERT_FALSE(
-      mln::extension::visit_result([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima));
-  ASSERT_TRUE(mln::extension::visit_result(
+      std::visit([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima, managed_se));
+  ASSERT_TRUE(std::visit(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
         return all_of(i == out);
       },
-      managed_ima));
-  mln::extension::visit_result([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_NE_EXP(i, ima); }, managed_ima);
+      managed_ima, managed_se));
+  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_NE_EXP(i, ima); }, managed_ima, managed_se);
 
   // TODO: implement periodize in ndimage
   // ima.extension().periodize();
-  // mln::extension::visit_result([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima);
+  // std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima, managed_se);
 }
 
 TEST(Core, Periodize_LargeEnough_BM_Native)
@@ -80,17 +80,17 @@ TEST(Core, Periodize_LargeEnough_BM_Native)
 
   // TODO: implement periodize in ndimage
   /*
-  auto managed_ima = extension::bm::native::periodize().manage(ima, disc);
+  auto [managed_ima, managed_se] = extension::bm::native::periodize().manage(ima, disc);
 
-  ASSERT_TRUE(mln::extension::visit_result([](auto i, auto) { rreturn mln::extension::is_finite(i.extension()); },
-                                           managed_ima));
-  ASSERT_TRUE(mln::extension::visit_result(
+  ASSERT_TRUE(std::visit([](auto i, auto) { rreturn mln::extension::is_finite(i.extension()); },
+                                           managed_ima, managed_se));
+  ASSERT_TRUE(std::visit(
       [&out](auto i, auto) {
         using namespace mln::view::ops;
         return all_of(i == out);
       },
-      managed_ima));
-  mln::extension::visit_result([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima);
+      managed_ima, managed_se));
+  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima, managed_se);
   */
 }
 
@@ -106,5 +106,5 @@ TEST(Core, Periodize_NotLargeEnough_BM_Native)
   [[maybe_unused]] auto disc = mln::se::disc{4};
   [[maybe_unused]] auto bm   = extension::bm::native::periodize();
   // TODO: implement periodize in ndimage
-  // EXPECT_THROW(auto managed_ima = bm.manage(ima, disc), std::runtime_error);
+  // EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);
 }

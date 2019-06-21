@@ -62,5 +62,6 @@
     },
     "python.pythonPath": "/usr/bin/python3",
     "C_Cpp.configurationWarnings": "Disabled",
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "cquery.misc.compilationDatabaseDirectory": "${workspaceRoot}/build-gcc"
 }

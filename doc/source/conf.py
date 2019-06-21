@@ -249,11 +249,8 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 # BREATHE
-breathe_projects = {"Pylene": os.path.realpath("../doxyxml/")}
+breathe_projects = {"Pylene": os.path.realpath(".")}
 breathe_default_project = "Pylene"
-
-
-breathe_path = os.path.realpath("../doxyxml/")
 
 
 # Matplotlib

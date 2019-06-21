@@ -44,7 +44,7 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
@@ -64,7 +64,7 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV)
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV) -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
@@ -84,6 +84,13 @@ build-docker-automatic:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days
 
+
+# Msan not available for gcc. It requires instrumented libstdc++ and instrumented thirdparties so it is disabled for now.
+# No tsan because no multithreaded code for now
+# Asan, memsan and tsan are incompatible with each other within the same binary
+# Asan and ubsan can work together
+
+
 distcheck-linux-gcc7-release:
     <<: *distcheck-linux-base
     variables:
@@ -91,8 +98,11 @@ distcheck-linux-gcc7-release:
         BUILD_PROFILE: "gcc7"
         CXX: "g++-7"
         CC: "gcc-7"
+        ASAN: "OFF"
+        MSAN: "OFF"
+        UBSAN: "OFF"
 
-distcheck-linux-gcc7-debug:
+distcheck-linux-gcc7-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
@@ -100,6 +110,9 @@ distcheck-linux-gcc7-debug:
         CXX: "g++-7"
         CC: "gcc-7"
         COV: "gcov-7"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
 
 distcheck-linux-gcc8-release:
     <<: *distcheck-linux-base
@@ -108,8 +121,11 @@ distcheck-linux-gcc8-release:
         BUILD_PROFILE: "gcc8"
         CXX: "g++-8"
         CC: "gcc-8"
+        ASAN: "OFF"
+        MSAN: "OFF"
+        UBSAN: "OFF"
 
-distcheck-linux-gcc8-debug:
+distcheck-linux-gcc8-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
@@ -117,6 +133,9 @@ distcheck-linux-gcc8-debug:
         CXX: "g++-8"
         CC: "gcc-8"
         COV: "gcov-8"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
 
 distcheck-linux-clang6-release:
     <<: *distcheck-linux-base
@@ -125,8 +144,11 @@ distcheck-linux-clang6-release:
         BUILD_PROFILE: "clang6"
         CXX: "clang++-6.0"
         CC: "clang-6.0"
+        ASAN: "OFF"
+        MSAN: "OFF"
+        UBSAN: "OFF"
 
-distcheck-linux-clang6-debug:
+distcheck-linux-clang6-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
@@ -134,6 +156,9 @@ distcheck-linux-clang6-debug:
         CXX: "clang++-6.0"
         CC: "clang-6.0"
         COV: "../utils/coverage/llvm-gcov-6.0.sh"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
@@ -142,8 +167,11 @@ distcheck-linux-clang7-release:
         BUILD_PROFILE: "clang7"
         CXX: "clang++-7"
         CC: "clang-7"
+        ASAN: "OFF"
+        MSAN: "OFF"
+        UBSAN: "OFF"
 
-distcheck-linux-clang7-debug:
+distcheck-linux-clang7-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
     variables:
         PYLENE_CONFIGURATION: "Debug"
@@ -151,6 +179,9 @@ distcheck-linux-clang7-debug:
         CXX: "clang++-7"
         CC: "clang-7"
         COV: "../utils/coverage/llvm-gcov-7.sh"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
 
 
 #########
@@ -222,7 +253,7 @@ distbench-linux-clang7-release:
         - conan install .. -pr pylene_default --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc --config Release -- -j $(($NBPROC / 2))
-        - mkdir ../public && mv doc/build/* ../public/
+        - mkdir ../public && mv doc/sphinx/* ../public/
     artifacts:
         name: "documentation"
         expire_in: 2 days

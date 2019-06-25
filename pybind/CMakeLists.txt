@@ -2,18 +2,18 @@ project(Pybind CXX)
 
 find_package(pybind11 REQUIRED)
 
-pybind11_add_module(PyPylene MODULE
-                    src/pypylene.cpp
+pybind11_add_module(pylena MODULE
+                    src/pylena.cpp
                     src/numpy_helper.cpp
                     )
 
-target_link_libraries(PyPylene PRIVATE Pylene::Pylene)
-target_include_directories(PyPylene PRIVATE
+target_link_libraries(pylena PRIVATE Pylene::Pylene)
+target_include_directories(pylena PRIVATE
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
-target_compile_features(PyPylene PRIVATE cxx_std_17)
+target_compile_features(pylena PRIVATE cxx_std_17)
 
-add_dependencies(build-pybind PyPylene)
+add_dependencies(build-pybind pylena)
 
 include(CTest)
 

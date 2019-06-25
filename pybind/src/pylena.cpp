@@ -29,7 +29,7 @@ py::array to_numpy(const mln::py::image2d<>& ima)
   return py::array{info};
 }
 
-PYBIND11_MODULE(PyPylene, m)
+PYBIND11_MODULE(pylena, m)
 {
   using namespace mln::py;
   py::class_<image2d<>>(m, "image2d", py::buffer_protocol())

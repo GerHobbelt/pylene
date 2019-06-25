@@ -15,7 +15,7 @@ TEST(Py, stretch_void)
     buffer[i] = i;
   }
   auto img       = image2d<>::from_buffer(reinterpret_cast<std::byte*>(buffer), 3, 3, Info::INT8_V);
-  auto stretched = stretch(img);
+  auto stretched = impl::stretch(img);
 
   int j = 0;
   for (auto i : stretched.values())
@@ -35,7 +35,7 @@ TEST(Py, stretch_T)
     buffer[i] = i;
   }
   auto img       = image2d<int8_t>::from_buffer(buffer, 3, 3);
-  auto stretched = stretch(img);
+  auto stretched = impl::stretch(img);
 
   int j = 0;
   for (auto i : stretched.values())

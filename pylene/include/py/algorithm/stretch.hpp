@@ -9,9 +9,11 @@
 
 namespace mln::py
 {
-  template <class T>
-  image2d<float> stretch(const image2d<T>& src)
+  namespace impl
   {
+    template <class T>
+    image2d<float> stretch(const image2d<T>& src)
+    {
     auto        res  = image2d<float>(src.width(), src.height());
     auto        span = src.values();
     const auto& vs   = src.get_value_set();
@@ -21,6 +23,7 @@ namespace mln::py
                      return generic_cast<float>(val) / generic_cast<float>(tmp);
                    });
     return res;
+    }
   }
 
   namespace detail
@@ -28,7 +31,7 @@ namespace mln::py
     template <typename T>
     struct apply_stretch_t
     {
-      auto operator()(const image2d<>& src) { return stretch(*src.cast_to<T>()); }
+      auto operator()(const image2d<>& src) { return impl::stretch(*src.cast_to<T>()); }
     };
   } // namespace detail
   image2d<float> stretch(const image2d<>& src) { return visit<detail::apply_stretch_t>(src.type().tid(), src); };

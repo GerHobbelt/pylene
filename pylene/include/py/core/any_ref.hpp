@@ -1,6 +1,7 @@
 #pragma once
 
 #include <py/core/any_ref_placeholder.hpp>
+#include <py/core/type_info.hpp>
 
 #include <any>
 #include <memory>
@@ -17,6 +18,7 @@ namespace mln::py
   public:
     any_ref() = default;
     any_ref(std::any& elm);
+    any_ref(std::byte* buf, Info i);
 
     template <typename T>
     any_ref(T& elm)

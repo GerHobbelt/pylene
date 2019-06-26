@@ -18,7 +18,7 @@ TEST(Py, any_span_ctor)
   int i = 0;
   for(auto v : span)
   {
-    ASSERT_EQ(i++, *reinterpret_cast<int8_t*>(v));
+    ASSERT_EQ(i++, v.as<int8_t>());
   }
   delete[] buffer;
 }
@@ -36,7 +36,7 @@ TEST(Py, any_span_ctor_bigger_type)
   int i = 0;
   for(auto v : span)
   {
-    ASSERT_EQ(i++, *reinterpret_cast<int64_t*>(v));
+    ASSERT_EQ(i++, v.as<int64_t>());
   }
   delete[] buffer;
 }

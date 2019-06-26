@@ -47,6 +47,10 @@ namespace mln::py
   class placeholder : public placeholder_base
   {
   public:
+    placeholder(T* elm)
+    {
+      m_data = elm;
+    }
     placeholder(T& elm)
     {
       m_data = &elm;

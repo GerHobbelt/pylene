@@ -17,6 +17,8 @@ namespace mln::py
   class Info
   {
   public:
+    Info() = default;
+
     enum type_id
     {
       INT8_V,
@@ -44,7 +46,7 @@ namespace mln::py
     static constexpr std::size_t max(type_id tid) { return m_max[tid]; }
 
   private:
-    type_id m_tid;
+    type_id m_tid = OTHER;
 
     static constexpr std::size_t m_sizeof[] = {
         sizeof(std::int8_t),  sizeof(std::int16_t),  sizeof(std::int32_t),        sizeof(std::int64_t),

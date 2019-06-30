@@ -17,10 +17,11 @@ namespace mln::py
   {
   public:
     any_ref() = default;
-    any_ref(std::any& elm);
+    any_ref(const any_ref& other) = default;
+    any_ref(any_ref&& other) noexcept = default;
     any_ref(std::byte* buf, Info i);
 
-    template <typename T>
+    template <typename T, class = std::enable_if_t<!std::is_same_v<any_ref, T>>>
     any_ref(T& elm)
     {
       new (&m_held) placeholder<T>(elm);

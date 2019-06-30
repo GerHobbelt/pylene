@@ -22,9 +22,15 @@ namespace mln::py
 
     std::any cast(any_ref v, const Info& dest_type) const { return _cast(v, dest_type); }
 
+    template <typename Dest_type>
+    Dest_type cast(any_ref v) const
+    {
+        return std::any_cast<Dest_type>(_cast(v, Trait<Dest_type>::value));
+    }
+
   private:
     virtual std::any _max() const                             = 0;
-    virtual std::any _cast(any_ref v, const Info& info) const = 0;
+    virtual std::any _cast(any_ref v, const Info& dest_type) const = 0;
   };
 
   template <typename T>
@@ -37,6 +43,11 @@ namespace mln::py
       return static_cast<U>(v.as<T>());
     }
 
+    template <typename U>
+    U cast(T v) const
+    {
+      return static_cast<U>(v);
+    }
 
     T max() const { return std::numeric_limits<T>::max(); }
 
@@ -44,7 +55,6 @@ namespace mln::py
     {
       return val1.as<T>() / denominator.as<T>();
     }
-
 
     T divide(T val, T denominator) const
     {
@@ -54,44 +64,26 @@ namespace mln::py
   private:
     std::any _max() const override final { return max(); }
 
-    template <typename VT>
     struct cast_dispatcher_t
     {
-      explicit cast_dispatcher_t(const value_set<VT>* vs)
+      explicit cast_dispatcher_t(const value_set* vs)
         : m_vs(vs)
       {
       }
-      template <typename U> // U return type
+
+      template <typename Dest_type>
       std::any call(any_ref v)
       {
-        return m_vs->template cast<U>(v);
+        return m_vs->template cast<Dest_type>(v);
       }
 
     private:
       const value_set<T>* m_vs;
     };
 
-    std::any _cast(any_ref val, const Info& info) const override final
+    std::any _cast(any_ref val, const Info& dest_type) const override final
     {
-      return visit_f(info.tid(), cast_dispatcher_t{this}, val);
+      return visit_f(dest_type.tid(), cast_dispatcher_t{this}, val);
     }
   }; // value_set
-
-  template <typename T, typename Arg>
-  T generic_cast(Arg&& val)
-  {
-    return static_cast<T>(std::forward<Arg>(val));
-  }
-
-  template <typename T>
-  T generic_cast(any_ref val)
-  {
-    return val.as<T>();
-  }
-
-  template <typename T> //TODO constness of any?
-  T generic_cast(std::any val)
-  {
-    return std::any_cast<T>(val);
-  }
 } // namespace mln::py

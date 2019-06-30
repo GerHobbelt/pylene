@@ -20,7 +20,7 @@ namespace mln::py
     std::transform(span.begin(), span.end(), res.values().begin(),
                    [&vs](auto val) -> float {
                      auto tmp = vs.max();
-                     return generic_cast<float>(val) / generic_cast<float>(tmp);
+                     return vs.template cast<float>(val) / vs.template cast<float>(tmp);
                    });
     return res;
     }

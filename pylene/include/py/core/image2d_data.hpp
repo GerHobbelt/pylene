@@ -13,6 +13,7 @@ namespace mln::py
 
   struct image2d_data_base
   {
+    image2d_data_base() = default;
     image2d_data_base(std::size_t n);
 
     virtual ~image2d_data_base() = default;

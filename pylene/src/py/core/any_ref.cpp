@@ -14,12 +14,11 @@ namespace mln::py
     }
   };
 
+
   any_ref::any_ref(std::byte* ptr, Info i)
   {
     visit_f(i.tid(), cast_dispatcher_t(), reinterpret_cast<void*>(&m_held), ptr);
   }
-
-  any_ref::any_ref(std::any& elm) { new (&m_held) placeholder<std::any>(elm); }
 
   void* any_ref::data() { return reinterpret_cast<placeholder_base*>(&m_held)->m_data; }
 

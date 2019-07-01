@@ -1,4 +1,4 @@
-FROM debian:testing
+FROM debian:sid
 LABEL maintainer="Michaël Roynard <mroynard@lrde.epita.fr>"
 
 ENV container docker

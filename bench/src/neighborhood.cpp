@@ -31,11 +31,16 @@ void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for (auto&& [pxIn, pxOut] : rows)
+    for ([[maybe_unused]] auto&& [pxIn, pxOut] : rows)
     {
       int tmp = 0;
+#ifdef PYLENE_GCC8_WORKAROUND
+      (void)pxIn;
+      (void)pxOut;
+#else
       for (auto nx : mln::experimental::c8(pxIn))
         tmp += nx.val();
+#endif
       pxOut.val() = tmp;
     }
 }

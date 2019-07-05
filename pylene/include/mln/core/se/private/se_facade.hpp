@@ -1,10 +1,11 @@
 #pragma once
 
-#include <mln/core/concept/new/se.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/neighborhood/private/sliding_pixel_range.hpp>
 #include <range/v3/view/transform.hpp>
 
 #include <type_traits>
+
 
 namespace mln
 {
@@ -25,4 +26,4 @@ namespace mln
                                        [point](P offset) -> P { return point + offset; });
     }
   };
-}
+} // namespace mln

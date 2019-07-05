@@ -98,3 +98,8 @@ install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake
         DESTINATION lib/cmake/pylene)
+
+# GCC8 has enoying random compilation failures
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  target_compile_definitions(Pylene PUBLIC PYLENE_GCC8_WORKAROUND)
+endif()

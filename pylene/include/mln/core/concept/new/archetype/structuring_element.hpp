@@ -2,7 +2,7 @@
 
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/archetype/point.hpp>
-#include <mln/core/concept/new/neighborhood.hpp>
+#include <mln/core/concept/new/neighborhoods.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
 
 #include <range/v3/iterator_range.hpp>
@@ -13,15 +13,19 @@ namespace mln::archetypes
   // This file defines:
   // StructuringElementT<P = Point, Pix = Pixel<P>>
   // DecomposableStructuringElement<P = Point, Pix = Pixel<P>>
+  // SeparableStructuringElement<P = Point, Pix = Pixel<P>>
+  // IncrementalStructuringElement<P = Point, Pix = Pixel<P>>
 
   namespace details
   {
 
     template <class P, class Pix>
+    // clang-format off
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif
-        struct StructuringElement
+    struct StructuringElement
+    // clang-format on
     {
       using category     = adaptative_neighborhood_tag;
       using incremental  = std::false_type;
@@ -29,12 +33,9 @@ namespace mln::archetypes
       using separable    = std::false_type;
 
       ::ranges::iterator_range<P*> operator()(P p);
-      ::ranges::iterator_range<P*> before(P p);
-      ::ranges::iterator_range<P*> after(P p);
 
       ::ranges::iterator_range<Pix*> operator()(Pix px);
-      ::ranges::iterator_range<Pix*> before(Pix px);
-      ::ranges::iterator_range<Pix*> after(Pix px);
+      ::ranges::iterator_range<P*>   offsets() const;
     };
 
 
@@ -87,4 +88,5 @@ namespace mln::archetypes
 
   template <class P = Point, class Pix = PixelT<P>>
   using IncrementalStructuringElement = details::AsSE<details::IncrementalStructuringElement<P, Pix>>;
+
 } // namespace mln::archetypes

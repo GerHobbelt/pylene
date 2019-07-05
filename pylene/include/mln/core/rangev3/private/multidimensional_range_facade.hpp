@@ -17,10 +17,7 @@ namespace mln::ranges::details
     // void __reset_to_begin(int rnk);
 
 
-    void next()
-    {
-      this->__next(::meta::int_<Rank-1>());
-    }
+    void next() { this->__next(::meta::int_<Rank - 1>()); }
 
 
     bool equal(::ranges::default_sentinel) const { return this->derived()->__is_at_end(0); }

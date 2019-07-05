@@ -1,5 +1,6 @@
 #pragma once
-#include <mln/core/concept/new/se.hpp>
+
+#include <mln/core/concept/new/structuring_elements.hpp>
 
 namespace mln::experimental
 {
@@ -34,6 +35,6 @@ namespace mln::concepts
     };
 
 #endif
-    // clang-format on
+  // clang-format on
 
 } // namespace mln::concepts

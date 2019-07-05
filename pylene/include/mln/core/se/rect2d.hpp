@@ -23,13 +23,12 @@ namespace mln
     /// Its width and height are always odd numbers to ensure symmetry.
     class rect2d : public se_facade<rect2d>
     {
-    private:
-      using category = dynamic_neighborhood_tag;
-      using incremental = std::true_type;
-      using decomposable = std::true_type;
-      using separable = std::true_type;
-
     public:
+      using category     = dynamic_neighborhood_tag;
+      using incremental  = std::true_type;
+      using decomposable = std::true_type;
+      using separable    = std::true_type;
+
       /// Construct an empty rectangle
       rect2d() = default;
 
@@ -75,7 +74,7 @@ namespace mln
     };
 
 
-  }
+  } // namespace experimental::se
 
   /**************************/
   /***  Implementation     **/
@@ -162,7 +161,5 @@ namespace mln
       box2d m_dpoints;
     };
 
-  } // namespace mln::se
+  } // namespace se
 } // namespace mln
-
-

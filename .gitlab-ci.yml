@@ -44,7 +44,7 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
@@ -64,7 +64,7 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV) -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV) -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
@@ -101,6 +101,7 @@ distcheck-linux-gcc7-release:
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
 distcheck-linux-gcc7-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
@@ -113,6 +114,7 @@ distcheck-linux-gcc7-debug-cov-asan-ubsan:
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
 distcheck-linux-gcc8-release:
     <<: *distcheck-linux-base
@@ -124,6 +126,7 @@ distcheck-linux-gcc8-release:
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
 distcheck-linux-gcc8-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
@@ -136,6 +139,7 @@ distcheck-linux-gcc8-debug-cov-asan-ubsan:
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
 distcheck-linux-clang6-release:
     <<: *distcheck-linux-base
@@ -147,6 +151,7 @@ distcheck-linux-clang6-release:
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
+        OTHER_CMAKE_ARGS: ""
 
 distcheck-linux-clang6-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
@@ -159,6 +164,7 @@ distcheck-linux-clang6-debug-cov-asan-ubsan:
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
+        OTHER_CMAKE_ARGS: ""
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
@@ -170,6 +176,7 @@ distcheck-linux-clang7-release:
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
+        OTHER_CMAKE_ARGS: ""
 
 distcheck-linux-clang7-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
@@ -182,6 +189,7 @@ distcheck-linux-clang7-debug-cov-asan-ubsan:
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
+        OTHER_CMAKE_ARGS: ""
 
 
 #########

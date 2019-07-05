@@ -53,10 +53,21 @@ option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to 
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 
-# Compiler configurations
+#### GCC + Clang Compiler configuration
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-  add_compile_options("-Wextra" "-Wall" "-Werror" "-Wno-deprecated-declarations")
-endif ()
+  add_compile_options(
+    "-Wextra"
+    "-Wall"
+    "-Werror"
+    "-Wno-deprecated-declarations"
+    )
+endif()
+#### GCC Compiler Configuration
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  add_compile_options(
+    "-Wno-error=maybe-uninitialized" # maybe unitialized may have false alarms
+    )
+endif()
 
 
 #### MSVC Compiler Configuration

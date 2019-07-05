@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/neighborhood.hpp>
-#include <mln/core/concept/new/archetype/se.hpp>
+#include <mln/core/concept/new/archetype/structuring_element.hpp>
+#include <mln/core/concept/new/neighborhoods.hpp>
 
 
 namespace mln::archetypes
@@ -11,9 +11,11 @@ namespace mln::archetypes
   {
     template <class P, class Pix>
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-    requires mln::concepts::Point<P> && mln::concepts::Pixel<Pix>
+    // clang-format off
+    requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif
     struct Neighborhood : StructuringElement<P, Pix>
+    // clang-format on
     {
       ::ranges::iterator_range<P*>   before(P p);
       ::ranges::iterator_range<P*>   after(P p);
@@ -33,4 +35,3 @@ namespace mln::archetypes
   using Neighborhood = details::AsSE<details::Neighborhood<P, Pix>>;
 
 } // namespace mln::archetypes
-

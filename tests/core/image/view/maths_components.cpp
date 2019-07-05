@@ -50,9 +50,9 @@ TEST(View, maths_sqr)
                       {25, 36, 16, 64, 81}, //
                       {100, 121, 144, 169, 196}};
 
-  // FIXME: gcc8 random compilation failure in release
-  // ASSERT_TRUE(all_of(ref == sqr(ima)));
-
+#ifndef PYLENE_GCC8_WORKAROUND
+  ASSERT_TRUE(all_of(ref == sqr(ima)));
+#endif
 
   image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                              {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -77,8 +77,9 @@ TEST(View, maths_pow)
 
   auto ima = view::transform(ref, [](auto x) { return x * x * x; });
 
-  // FIXME: gcc8 random compilation failure in release
-  // ASSERT_TRUE(all_of(pow(ref, 3) == ima));
+#ifndef PYLENE_GCC8_WORKAROUND
+  ASSERT_TRUE(all_of(pow(ref, 3) == ima));
+#endif
 
 
   image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -89,7 +90,9 @@ TEST(View, maths_pow)
                               {{1, 8, 27}, {64, 125, 216}, {343, 512, 729}}, //
                               {{1, 8, 27}, {64, 125, 216}, {343, 512, 729}}};
 
+#ifndef PYLENE_GCC8_WORKAROUND
   ASSERT_TRUE(all_of(ref2 == pow(ima2, 3)));
+#endif
 }
 
 TEST(View, maths_sqrt)
@@ -132,8 +135,9 @@ TEST(View, maths_cbrt)
 
   auto ima = pow(ref, 3);
 
+#ifndef PYLENE_GCC8_WORKAROUND
   ASSERT_TRUE(all_of(equalFP(ref, cbrt(ima), 10e-6)));
-
+#endif
 
   image2d<mln::rgb<double>> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                     {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //

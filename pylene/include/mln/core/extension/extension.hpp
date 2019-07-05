@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/morphers/extended_by_value_image.hpp>
@@ -133,5 +134,13 @@ namespace mln
                                           typename N::category());
     }
 
+    template <class I, class SE>
+    bool need_adjust(const mln::experimental::Image<I>& ima, const mln::experimental::StructuringElement<SE>& se)
+    {
+      return extension::impl::need_adjust(static_cast<const I&>(ima), static_cast<const SE&>(se),
+                                          image_extension_category_t<I>(), typename SE::category());
+    }
+
+
   } // namespace extension
-} // namespace mln
+} // end of namespace mln

@@ -37,8 +37,7 @@ namespace mln
     using view               = std::true_type;
     using extension_category = image_extension_category_t<I>;
     // Transform doesn't preserve contiguity, so it decays from raw_image_tag
-    using category_type = std::conditional_t<std::is_base_of_v<raw_image_tag, image_category_t<I>>,
-                                             bidirectional_image_tag, image_category_t<I>>;
+    using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I, value_type>;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -284,7 +283,7 @@ namespace mln
       using R2 = decltype(m_ima2.new_pixels());
       static_assert(::ranges::ForwardRange<R1>());
       static_assert(::ranges::ForwardRange<R2>());
-      
+
       auto pxwrapper = [fun = this->fun_](::ranges::range_reference_t<R1> px1, ::ranges::range_reference_t<R2> px2) {
         return new_pixel_type{fun, std::move(px1), std::move(px2)};
       };

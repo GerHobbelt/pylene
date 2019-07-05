@@ -16,7 +16,7 @@ namespace mln::experimental
   struct StructuringElement
   {
   };
-}
+} // namespace mln::experimental
 
 
 namespace mln::concepts
@@ -29,8 +29,8 @@ namespace mln::concepts
     template <typename SE>
     concept DynamicStructuringElement =
       requires (SE se) {
-      { se.radial_extent() } -> int
-    };
+        { se.radial_extent() }  -> int
+      };
 
 
     constexpr bool implies(bool a, bool b) { return !a || b; }
@@ -39,7 +39,7 @@ namespace mln::concepts
 
   template <typename SE, typename P>
   concept StructuringElement =
-    std::is_base_of_v<mln::experimental::StructuringElement<SE>, SE> &&
+    stl::ConvertibleTo<SE, mln::experimental::StructuringElement<SE>> &&
     stl::RegularInvocable<SE, P> &&
     stl::RegularInvocable<SE, mln::archetypes::PixelT<P>> &&
     requires {
@@ -51,12 +51,14 @@ namespace mln::concepts
     stl::ConvertibleTo<typename SE::category, mln::adaptative_neighborhood_tag> &&
     details::implies(stl::ConvertibleTo<typename SE::category, mln::dynamic_neighborhood_tag>,
                      details::DynamicStructuringElement<SE>) &&
-    requires (SE se, P p, mln::archetypes::PixelT<P> px) {
-      { se(p) } -> stl::ForwardRange&&;
-      { se(px) } -> stl::ForwardRange&&;
+    requires (SE se, const SE cse, P p, mln::archetypes::PixelT<P> px) {
+      { se(p) }         -> stl::ForwardRange&&;
+      { se(px) }        -> stl::ForwardRange&&;
+      { cse.offsets() } -> stl::ForwardRange&&;
 
       requires detail::RangeValueTypeConvertibleTo<decltype(se(p)), P>;
       requires detail::RangeValueTypeConvertibleTo<decltype(se(px)), mln::archetypes::PixelT<P>>;
+      requires detail::RangeValueTypeConvertibleTo<decltype(cse.offsets()), P>;
     };
 
   namespace details
@@ -71,10 +73,10 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept DecomposableStructuringElement =
     StructuringElement<SE, P> &&
-    stl::Same<typename SE::decomposable, std::true_type> &&
+    stl::ConvertibleTo<typename SE::decomposable, std::true_type> &&
     requires(const SE se) {
-      { se.is_decomposable() } -> bool;
-      { se.decompose() } -> stl::ForwardRange&&;
+      { se.is_decomposable() }  -> bool;
+      { se.decompose() }        -> stl::ForwardRange&&;
       requires details::RangeOfStructuringElement<decltype(se.decompose()), P>;
     };
 
@@ -82,21 +84,21 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept SeparableStructuringElement =
     StructuringElement<SE, P> &&
-    stl::Same<typename SE::separable, std::true_type> &&
+    stl::ConvertibleTo<typename SE::separable, std::true_type> &&
     requires(const SE se) {
       { se.is_separable() } -> bool;
-      { se.separate() } -> stl::ForwardRange&&;
+      { se.separate() }     -> stl::ForwardRange&&;
       requires details::RangeOfStructuringElement<decltype(se.separate()), P>;
-  };
+    };
 
 
   template <typename SE, typename P>
   concept IncrementalStructuringElement =
     StructuringElement<SE, P> &&
-    stl::Same<typename SE::incremental, std::true_type> &&
+    stl::ConvertibleTo<typename SE::incremental, std::true_type> &&
     requires(const SE se) {
-      { se.inc() } -> StructuringElement<P>&&;
-      { se.dec() } -> StructuringElement<P>&&;
+      { se.inc() }  -> StructuringElement<P>&&;
+      { se.dec() }  -> StructuringElement<P>&&;
     };
 #endif
   // clang-format on

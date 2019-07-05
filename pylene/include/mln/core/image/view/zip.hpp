@@ -36,8 +36,7 @@ namespace mln
     using view               = std::true_type;
     using extension_category = mln::extension::none_extension_tag; // Preservative behavior
     // Zip doesn't preserve contiguity, so it decays from raw_image_tag
-    using category_type =
-        std::conditional_t<std::is_base_of_v<raw_image_tag, common_category>, bidirectional_image_tag, common_category>;
+    using category_type = std::common_type_t<common_category, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I0, typename I0::value_type>;
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED

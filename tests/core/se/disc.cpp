@@ -1,6 +1,6 @@
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/se/disc.hpp>
-#include <mln/core/concept/new/se.hpp>
 
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
@@ -21,8 +21,6 @@ void naive_dilate(mln::image2d<bool>& f, const mln::experimental::se::periodic_l
 
   f = std::move(g);
 }
-
-
 
 
 mln::image2d<bool> draw_ball_by_decomposition(float radius, int extent, int& computed_extent)

@@ -269,8 +269,8 @@ namespace mln::concepts
       typename image_extension_t<I>;
     } &&
     not stl::Same<mln::extension::none_extension_tag, image_extension_category_t<I>> &&
-    requires (const I cima, image_point_t<I> p) {
-      { cima.extension() } -> image_extension_t<I>;
+    requires (I ima, image_point_t<I> p) {
+      { ima.extension() } -> image_extension_t<I>;
     };
 
 

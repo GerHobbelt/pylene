@@ -111,6 +111,10 @@ namespace mln
     public:
       typedef typename std::result_of<Extractor(accu_type)>::type type;
     };
+
+    template <class A, class T, class E = default_extractor>
+    using result_of_t = typename result_of<A, T, E>::type;
+
     /// \}
 
     /*********************/

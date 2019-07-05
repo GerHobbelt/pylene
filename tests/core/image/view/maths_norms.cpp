@@ -63,7 +63,9 @@ TEST(View, maths_l1norm)
                        {6, 15, 24}, //
                        {6, 15, 24}};
 
+#ifndef PYLENE_GCC8_WORKAROUND
   ASSERT_TRUE(all_of(ref2 == l1norm(ima2)));
+#endif
 }
 
 TEST(View, maths_l2norm)

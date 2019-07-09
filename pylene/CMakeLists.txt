@@ -51,11 +51,11 @@ target_sources(Pylene PRIVATE
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_17)
 
-# Add concepts support for gcc > 7.2 with -fconcepts
-if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
-  target_compile_options(Pylene PUBLIC -fconcepts)
+# Add concepts support for gcc > 8 with -fconcepts
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
+  set(PYLENE_CONCEPT_TS_ENABLED True PARENT_SCOPE)
   find_package(cmcstl2 REQUIRED)
-  target_link_libraries(Pylene PUBLIC stl2)
+  target_link_libraries(Pylene PUBLIC stl2) # This add appropriate -fconcept flags
   target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
 endif ()
 

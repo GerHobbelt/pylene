@@ -89,7 +89,7 @@ add_core_test(${test_prefix}mask2d             se/mask2d.cpp)
 
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts
-if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.2)
+if (PYLENE_CONCEPT_TS_ENABLED)
   add_core_test(${test_prefix}concept_values            concept/values.cpp)
   add_core_test(${test_prefix}concept_points            concept/points.cpp)
   add_core_test(${test_prefix}concept_pixels            concept/pixels.cpp)

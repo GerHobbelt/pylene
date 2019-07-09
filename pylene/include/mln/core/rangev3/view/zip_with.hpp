@@ -83,7 +83,7 @@ namespace mln::ranges
       void next() requires (mln::concepts::stl::ForwardRange<Rngs> && ...)
       // clang-format on
 #else
-      template <typename U = void, typename = std::enable_if_t<(::ranges::ForwardRange<Rngs>() && ...)>>
+      template <typename U = void, typename = std::enable_if_t<(::ranges::ForwardRange<Rngs>() && ...), U>>
       void next()
 #endif
       {
@@ -94,30 +94,13 @@ namespace mln::ranges
       // clang-format off
       void prev() requires (mln::concepts::stl::BidirectionalRange<Rngs> && ...)
       // clang-format on
-      {
-        std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
-      }
 #else
-      // Clunky SFINAE doesn't work
-      /*
-      template <typename U = void, typename = std::enable_if_t<(::ranges::BidirectionalRange<Rngs>() && ...)>>
+      template <class U = void, class = std::enable_if_t<(::ranges::BidirectionalRange<Rngs>() && ...), U>>
       void prev()
+#endif
       {
         std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
       }
-      */
-      void prev()
-      {
-        if constexpr (are_bidir_rngs_)
-        {
-          std::apply([](auto&... rng_it) { (--rng_it, ...); }, begins_);
-        }
-        else
-        {
-          static_assert(are_bidir_rngs_, "Cannot traverse non-bidirectional range backward");
-        }
-      }
-#endif
     };
 
     cursor begin_cursor()

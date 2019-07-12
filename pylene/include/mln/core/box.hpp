@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mln/core/point.hpp>
-#include <mln/core/range/mdindex.hpp>
-
-#include <algorithm>
-#include <array>
+#include <mln/core/rangev3/multi_indices.hpp>
+#include <mln/core/experimental/point.hpp>
 #include <type_traits>
-#include <vector>
 
-namespace mln
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+#include <stl2/type_traits.hpp>
+#endif
+
+namespace mln::experimental
 {
   // Forward declaration
   template <class Impl>
@@ -21,7 +21,7 @@ namespace mln
 
     template <int D, class T>
     struct _bref;
-  }; // namespace impl
+  };
 
   /******************************************/
   /****   Box Types and Types Aliases    ****/
@@ -36,9 +36,9 @@ namespace mln
   using ndboxref = _box<impl::_bref<dim, const int>>;
 
 
-  using box1d           = ndbox<1>;
-  using box2d           = ndbox<2>;
-  using box3d           = ndbox<3>;
+  using box1d = ndbox<1>;
+  using box2d = ndbox<2>;
+  using box3d = ndbox<3>;
   using const_box1d_ref = ndboxref<1>;
   using const_box2d_ref = ndboxref<2>;
   using const_box3d_ref = ndboxref<3>;
@@ -63,10 +63,10 @@ namespace mln
     friend struct impl::_bref;
 
 
+    using typename Impl::coord_type;
     using Impl::Impl;
     using Impl::ndim;
-    using typename Impl::coord_type;
-    using point_type = ndpoint<ndim, coord_type>;
+
 
     /// Observers
     /// \{
@@ -81,50 +81,49 @@ namespace mln
     constexpr bool empty() const noexcept;
 
     /// \brief Returns the width of the box
-    constexpr int width() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 1) { return size(0); }
+    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 1>>
+    constexpr int width() const noexcept
+    {
+      return size(0);
+    }
 
     /// \brief Returns the height of the box
-    constexpr int height() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2) { return size(1); }
+    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 2>>
+    constexpr int height() const noexcept
+    {
+      return size(1);
+    }
 
     /// \brief Returns the depth of the box
-    constexpr int depth() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 3) { return size(2); }
-
-    using typename Impl::cursor;
-    using typename Impl::backward_cursor;
-    using Impl::begin_cursor;
-    using Impl::end_cursor;
-    using Impl::rbegin_cursor;
-    using Impl::rend_cursor;
-
-
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto rows() const
+    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 3>>
+    constexpr int depth() const noexcept
     {
-      return this->Impl::rows();
+      return size(2);
     }
 
+    /// \brief Returns the begin iterator of the range
     template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto rrows() const
+    auto begin() const
     {
-      return this->Impl::rrows();
+      return Impl::begin();
     }
 
+    /// \brief Returns the end iterator of the range
+    template <int d = ndim, class = std::enable_if_t<d != -1>>
+    auto end() const
+    {
+      return Impl::end();
+    }
+
+    /// \brief Returns the reversed range
+    template <int d = ndim, class = std::enable_if_t<d != -1>>
+    auto reversed() const
+    {
+      return this->Impl::reversed();
+    }
 
     /// \brief Returns the top-left corner point
     using Impl::tl;
-
-    /// \brief Returns the x coordinate of the top-left corner point
-    constexpr int x() const noexcept { return this->__begin(0); }
-
-    /// \brief Returns the y coordinate of the top-left corner point
-    constexpr int y() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2) { return this->__begin(1); }
-
-    /// \brief Returns the z coordinate of the top-left corner point
-    constexpr int z() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 3) { return this->__begin(2); }
-
-    /// \brief Returns the w coordinate of the top-left corner point
-    constexpr int w() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 4) { return this->__begin(3); }
-
 
     /// \brief Returns the k-th coordinate of the top-left corner point
     constexpr int tl(int k) const noexcept { return this->__begin(k); }
@@ -132,45 +131,11 @@ namespace mln
     /// \brief Returns the k-th coordinate of the bottom-right corner point (past-the-end)
     constexpr int br(int k) const noexcept { return this->__end(k); }
 
-    constexpr void shift(point_type diff) noexcept
-    {
-      for (int dim = 0; dim < ndim; ++dim)
-      {
-        this->__begin(dim) += diff[dim];
-        this->__end(dim) += diff[dim];
-      }
-    }
-
-    constexpr auto shifted(point_type diff) const noexcept
-    {
-      auto tmp = *this;
-      tmp.shift(diff);
-      return tmp;
-    }
-
-
-    /// \brief Transpose the box (inplace)
-    constexpr void transpose() noexcept requires(Impl::ndim == 2)
-    {
-      std::swap(this->__begin(0), this->__begin(1));
-      std::swap(this->__end(0), this->__end(1));
-    }
-
-    /// \brief Return the box transposed.
-    constexpr auto transposed() const noexcept requires(Impl::ndim == 2) { return mln::box2d{y(), x(), width(), height()}; }
-
-
     /// \brief Returns the bottom-right (past-the-end) corner point
     using Impl::br;
 
-    /// \brief Returns the shape of the domain
-    using Impl::shape;
-
     /// \brief Returns the number of dimensions
     using Impl::dim;
-
-    /// \brief Returns the size of each dimension
-    using Impl::extents;
 
     /// \brief Returns a pointer to the coordinate array
     using Impl::data;
@@ -230,36 +195,12 @@ namespace mln
     constexpr void clip(const _box<_i>& B) noexcept;
     /// \}
 
-    /// Projection operations
-    /// \{
-
-    /// \brief Clamp a point to box boundaries
-    ///
-    /// yᵢ = clamp(xᵢ, aᵢ, bᵢ)
-    /// \postcondition b.has(p)
-    template <class _p>
-    point_type clamp(_point<_p> x) const noexcept;
-
-
-    /// \brief Project a point into a box by mirroring
-    ///
-    /// yᵢ = clamp(xᵢ, aᵢ, bᵢ)
-    /// \postcondition box.has(p)
-    template <class _p>
-    point_type mirror(_point<_p> x) const noexcept;
-
-    /// \brief Project a point into a box by mirroring
-    /// \postcondition b.has(p)
-    template <class _p>
-    point_type periodize(_point<_p> x) const noexcept;
-    /// \}
-
-
 
   private:
     template <int K>
     constexpr int __size() const noexcept;
   };
+
 
 
   /******************************************/
@@ -277,7 +218,7 @@ namespace mln
 
     /// Storage for a box
     template <int D, typename T>
-    struct _bstorage : mln::ranges::mdindex_facade<D, T, ndpoint<D, T>, _bstorage<D, T>>
+    struct _bstorage : ranges::details::multi_indices_facade<D, _bstorage<D, T>, false /* Col-Major */>
     {
     private:
       using self_t     = _bstorage;
@@ -341,66 +282,37 @@ namespace mln
           _zeros();
       }
 
-
-      constexpr _bstorage(int width) requires(D == 1)
+      template <int d = D, class = std::enable_if_t<d == 1>>
+      constexpr _bstorage(int width)
         : m_begin{0}
         , m_end{width}
       {
         assert(width >= 0);
       }
 
-
-      constexpr _bstorage(int x, int width) requires(D == 1)
-        : m_begin{x}
-        , m_end{x + width}
-      {
-        assert(width >= 0);
-      }
-
-
-      constexpr _bstorage(int width, int height) requires (D == 2)
+      template <int d = D, class = std::enable_if_t<d == 2>>
+      constexpr _bstorage(int width, int height)
         : m_begin{0, 0}
         , m_end{width, height}
       {
         assert(width >= 0 && height >= 0);
       }
 
-      constexpr _bstorage(int x, int y, int width, int height) requires(D == 2)
-        : m_begin{x, y}
-        , m_end{x + width, y + height}
-      {
-        assert(width >= 0 && height >= 0);
-      }
-
-      constexpr _bstorage(int width, int height, int depth) requires(D == 3)
+      template <int d = D, class = std::enable_if_t<d == 3>>
+      constexpr _bstorage(int width, int height, int depth)
         : m_begin{0, 0, 0}
         , m_end{width, height, depth}
       {
         assert(width >= 0 && height >= 0 && depth >= 0);
       }
 
-      constexpr _bstorage(int x, int y, int z, int width, int height, int depth) requires(D == 3)
-        : m_begin{x, y, z}
-        , m_end{x + width, y + height, z + depth}
-      {
-        assert(width >= 0 && height >= 0 && depth >= 0);
-      }
-
-
-      constexpr _bstorage(int width, int height, int depth, int duration) requires (D == 4)
+      template <int d = D, class = std::enable_if_t<d == 4>>
+      constexpr _bstorage(int width, int height, int depth, int duration)
         : m_begin{0, 0, 0, 0}
         , m_end{width, height, depth, duration}
       {
         assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
       }
-
-      constexpr _bstorage(int x, int y, int z, int w, int width, int height, int depth, int duration) requires (D == 4)
-        : m_begin{x, y, z, w}
-        , m_end{x + width, y + height, z + depth, w + duration}
-      {
-        assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
-      }
-
 
 
       static constexpr int dim() noexcept { return D; }
@@ -439,21 +351,8 @@ namespace mln
       constexpr point_type  br() const noexcept { return m_end; }
       constexpr point_type& br() noexcept { return m_end; }
 
-      constexpr auto shape() const noexcept { return br() - tl(); }
-      constexpr auto extents() const noexcept
-      {
-        auto pmin = tl();
-        auto pmax = br();
-        auto ret  = std::array<std::size_t, D>{};
-        for (int i = 0; i < D; i++)
-          ret[i] = pmax[i] - pmin[i];
-        return ret;
-      }
-
-      using base = mln::ranges::mdindex_facade<D, T, point_type, _bstorage<D, T>>;
-      typename base::cursor          begin_cursor() const { return {m_begin.data(), m_end.data(), false}; }
-      typename base::backward_cursor rbegin_cursor() const { return {m_begin.data(), m_end.data(), true}; }
-
+      constexpr point_type __from() const noexcept { return m_begin; }
+      constexpr point_type __to() const noexcept { return m_end; }
 
       point_type m_begin = {};
       point_type m_end   = {};
@@ -573,27 +472,8 @@ namespace mln
       constexpr ConstPointRef br() const noexcept { return {m_dim, m_coords + m_dim}; }
       constexpr PointRef      br() noexcept { return {m_dim, m_coords + m_dim}; }
 
-      constexpr auto shape() const noexcept { return tl() - br(); }
-      auto           extents() const noexcept
-      {
-        auto pmin = tl();
-        auto pmax = br();
-        auto ret  = std::vector<std::size_t>{m_dim, 0};
-        for (int i = 0; i < m_dim; i++)
-          ret[i] = pmax[i] - pmin[i];
-        return ret;
-      }
-
       constexpr int begin() const noexcept { return 0; }
       constexpr int end() const noexcept { return 1; }
-
-      void begin_cursor() const {}
-      void rbegin_cursor() const {};
-      void end_cursor() const {}
-      void rend_cursor() const {};
-      using cursor = void;
-      using backward_cursor = void;
-
 
       int m_dim       = 0;
       T   m_coords[8] = {0}; // (x1,y1,z1,w1) -- (x2,y2,z2,w2)
@@ -601,12 +481,8 @@ namespace mln
 
     /// Reference to box wrapper
     template <int D, class T>
-    struct _bref
-      : mln::ranges::mdindex_facade<D, std::remove_const_t<T>, ndpoint<D, std::remove_const_t<T>>, _bref<D, T>>
+    struct _bref : ranges::details::multi_indices_facade<D, _bref<D, T>, false /* Col-Major */>
     {
-      using base =
-          mln::ranges::mdindex_facade<D, std::remove_const_t<T>, ndpoint<D, std::remove_const_t<T>>, _bref<D, T>>;
-
       static constexpr int ndim = D;
       using coord_type          = T;
 
@@ -623,22 +499,10 @@ namespace mln
       constexpr T& __begin(int k) const noexcept { return assert(k < D), m_coords[k]; }
       constexpr T& __end(int k) const noexcept { return assert(k < D), m_coords[D + k]; }
 
-      constexpr ndpointref<D, T> tl() const noexcept { return {m_coords}; }
-      constexpr ndpointref<D, T> br() const noexcept { return {m_coords + D}; }
-
-      constexpr auto shape() const noexcept { return tl() - br(); }
-      constexpr auto extents() const noexcept
-      {
-        auto pmin = tl();
-        auto pmax = br();
-        auto ret  = std::array<std::size_t, D>{};
-        for (int i = 0; i < D; i++)
-          ret[i] = pmax[i] - pmin[i];
-        return ret;
-      }
-
-      typename base::cursor          begin_cursor() const { return {m_coords, m_coords + D, false}; }
-      typename base::backward_cursor rbegin_cursor() const { return {m_coords, m_coords + D, true}; }
+      constexpr ndpointref<D, T>                   tl() const noexcept { return {m_coords}; }
+      constexpr ndpointref<D, T>                   br() const noexcept { return {m_coords + D}; }
+      constexpr ndpoint<D, std::remove_const_t<T>> __from() const noexcept { return tl(); }
+      constexpr ndpoint<D, std::remove_const_t<T>> __to() const noexcept { return br(); }
 
       T* m_coords;
     };
@@ -673,26 +537,8 @@ namespace mln
       constexpr ConstPointRef tl() const noexcept { return {m_dim, m_coords}; }
       constexpr ConstPointRef br() const noexcept { return {m_dim, m_coords + m_dim}; }
 
-      constexpr auto shape() const noexcept { return tl() - br(); }
-      auto           extents() const noexcept
-      {
-        auto pmin = tl();
-        auto pmax = br();
-        auto ret  = std::vector<std::size_t>{m_dim, 0};
-        for (int i = 0; i < m_dim; i++)
-          ret[i] = pmax[i] - pmin[i];
-        return ret;
-      }
-
       int begin() const { return 0; }
       int end() const { return 1; }
-      void begin_cursor() const {}
-      void rbegin_cursor() const {};
-      void end_cursor() const {}
-      void rend_cursor() const {};
-      using cursor = void;
-      using backward_cursor = void;
-
 
 
       int m_dim;
@@ -719,14 +565,6 @@ namespace mln
       this->_zeros();
   }
 
-  // template <class Impl>
-  // constexpr void _box<Impl>::transpose() noexcept requires (Impl::dim == 2)
-  // {
-  //   std::swap(this->__begin(0), this->__begin(1));
-  //   std::swap(this->__end(0), this->__end(1));
-  // }
-
-
   template <class Impl>
   constexpr int _box<Impl>::size(int k) const noexcept
   {
@@ -737,11 +575,11 @@ namespace mln
   template <class Impl>
   constexpr std::size_t _box<Impl>::size() const noexcept
   {
-    int sz = 1;
+    std::size_t sz = 1;
     for (int k = 0; k < this->dim(); ++k)
       sz *= (this->__end(k) - this->__begin(k));
     if (sz < 0)
-      return 0;
+      sz = 0;
     return sz;
   }
 
@@ -837,85 +675,21 @@ namespace mln
       this->_zeros();
   }
 
-  template <class Impl>
-  template <class _p>
-  auto _box<Impl>::clamp(_point<_p> x) const noexcept -> point_type
-  {
-    assert(this->dim() == x.dim() && "Objects must be of the same dimensions");
-    assert(!this->empty() && "Cannot clamp to an empty box.");
-
-    point_type q;
-    for (int k = 0; k < this->dim(); ++k)
-      q[k] = std::clamp(x[k], this->__begin(k), this->__end(k) - 1);
-    return q;
-  }
-
-  template <class Impl>
-  template <class _p>
-  auto _box<Impl>::mirror(_point<_p> x) const noexcept -> point_type
-  {
-    assert(this->dim() == x.dim() && "Objects must be of the same dimensions");
-    assert(!this->empty() && "Cannot clamp to an empty box.");
-
-    point_type q;
-    for (int k = 0; k < this->dim(); ++k)
-    {
-      auto a = this->__begin(k);
-      auto b = this->__end(k);
-      auto n = b - a;
-      auto s = 2 * n;
-      auto v = x[k] - a;
-      v      = v % s;
-      v      = v < 0 ? v + s : v; // ensure v>0
-      v      = v < n ? v : s - v - 1;
-      q[k]   = a + v;
-    }
-    return q;
-  }
-
-  template <class Impl>
-  template <class _p>
-  auto _box<Impl>::periodize(_point<_p> x) const noexcept -> point_type
-  {
-    assert(this->dim() == x.dim() && "Objects must be of the same dimensions");
-    assert(!this->empty() && "Cannot clamp to an empty box.");
-
-    point_type q;
-    for (int k = 0; k < this->dim(); ++k)
-    {
-      auto a = this->__begin(k);
-      auto b = this->__end(k);
-      auto n = b - a;
-      auto v = x[k] - a;
-      v      = v % n;
-      v      = v < 0 ? v + n : v;
-      q[k]   = a + (v % n);
-    }
-    return q;
-  }
-
-} // namespace mln::
+} // namespace mln::experimental
 
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
 // Specialization of std::common_reference
-namespace concepts
+STL2_OPEN_NAMESPACE
 {
   template <class UImpl, class VImpl, template <class> class TQual, template <class> class UQual>
-  struct basic_common_reference<mln::_box<UImpl>, mln::_box<VImpl>, TQual, UQual>
+  struct basic_common_reference<mln::experimental::_box<UImpl>, mln::experimental::_box<VImpl>, TQual, UQual>
   {
     static_assert((UImpl::ndim == -1) || (VImpl::ndim == -1) || (UImpl::ndim == UImpl::ndim),
                   "Incompatible number of dimensions.");
-    using type = mln::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
+    using type = mln::experimental::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
   };
 }
-
-
-namespace ranges
-{
-  template <typename Impl>
-  struct range_cardinality<mln::_box<Impl>, void> :
-    std::integral_constant<cardinality, finite>
-  {
-  };
-}
+STL2_CLOSE_NAMESPACE
+#endif
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
-#include <mln/core/point.hpp>
+#include <mln/core/experimental/point.hpp>
 
 #include <array>
 #include <range/v3/span.hpp>
@@ -11,7 +11,7 @@ namespace mln::experimental
   struct c8_t : neighborhood_facade<c8_t>
   {
   private:
-    using point_t = point<std::ptrdiff_t, 2>;
+    using point_t = mln::experimental::ndpoint<2, std::ptrdiff_t>;
 
   public:
     using category     = constant_neighborhood_tag;
@@ -28,9 +28,9 @@ namespace mln::experimental
   private:
     // clang-format off
     static inline constexpr std::array<point_t, 8> m_offsets = {{
-        {-1, -1}, {-1, +0}, {-1, +1},
-        {+0, -1},           {+0, +1},
-        {+1, -1}, {+1, +0}, {+1, +1}
+        {-1, -1}, {+0, -1}, {+1, -1},
+        {-1, +0},           {+1, +0},
+        {-1, +1}, {+0, +1}, {+1, +1}
       }};
     // clang-format on
   };

@@ -1,7 +1,8 @@
 set(test_prefix "UTCore_")
 
-# test Domain
-add_core_test(${test_prefix}box domain/box.cpp)
+# test Core components
+add_core_test(${test_prefix}point point.cpp)
+add_core_test(${test_prefix}box box.cpp)
 
 # test loop
 add_core_test(${test_prefix}forloop forloop.cpp)
@@ -43,6 +44,7 @@ add_core_test(${test_prefix}zip_image               image/zip_image.cpp)
 add_core_test(${test_prefix}sub_image               image/sub_image.cpp)
 add_core_test(${test_prefix}image_routines          image/image_routines.cpp)
 add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
+add_core_test(${test_prefix}image_ndbuffer_image    image/ndbuffer_image.cpp)
 add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)
 
 # test Neighborhood

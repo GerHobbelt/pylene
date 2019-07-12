@@ -10,9 +10,6 @@ namespace mln
   {
     switch (m_id)
     {
-    case sample_type_id::BOOL:
-      m_size = sample_type_id_traits<sample_type_id::BOOL>::size();
-      break;
     case sample_type_id::UINT8:
       m_size = sample_type_id_traits<sample_type_id::UINT8>::size();
       break;
@@ -42,9 +39,6 @@ namespace mln
       break;
     case sample_type_id::DOUBLE:
       m_size = sample_type_id_traits<sample_type_id::DOUBLE>::size();
-      break;
-    case sample_type_id::RGB8:
-      m_size = sample_type_id_traits<sample_type_id::RGB8>::size();
       break;
     case sample_type_id::OTHER:
       m_size = 0;

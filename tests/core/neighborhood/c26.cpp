@@ -1,4 +1,4 @@
-#include <mln/core/image/image3d.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/neighborhood/c26.hpp>
 #include <mln/core/algorithm/iota.hpp>
 
@@ -9,33 +9,33 @@
 
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-static_assert(mln::concepts::Neighborhood<mln::experimental::c26_t, mln::point3d>);
-static_assert(not mln::concepts::SeparableStructuringElement<mln::experimental::c26_t, mln::point3d>);
-static_assert(not mln::concepts::DecomposableStructuringElement<mln::experimental::c26_t, mln::point3d>);
-static_assert(not mln::concepts::IncrementalStructuringElement<mln::experimental::c26_t, mln::point3d>);
+static_assert(mln::concepts::Neighborhood<mln::experimental::c26_t, mln::experimental::point3d>);
+static_assert(not mln::concepts::SeparableStructuringElement<mln::experimental::c26_t, mln::experimental::point3d>);
+static_assert(not mln::concepts::DecomposableStructuringElement<mln::experimental::c26_t, mln::experimental::point3d>);
+static_assert(not mln::concepts::IncrementalStructuringElement<mln::experimental::c26_t, mln::experimental::point3d>);
 #endif
 
 
 TEST(Core, c6_point)
 {
-  std::vector<mln::point3d> refs = {
+  std::vector<mln::experimental::point3d> refs = {
     // clang-format off
-    {-2,-2,-2}, {-2,-2,-1}, {-2,-2,+0},
-    {-2,-1,-2}, {-2,-1,-1}, {-2,-1,+0},
-    {-2,+0,-2}, {-2,+0,-1}, {-2,+0,+0},
-    // ---
-    {-1,-2,-2}, {-1,-2,-1}, {-1,-2,+0},
-    {-1,-1,-2},             {-1,-1,+0},
-    {-1,+0,-2}, {-1,+0,-1}, {-1,+0,+0},
-    // ---
-    {+0,-2,-2}, {+0,-2,-1}, {+0,-2,+0},
-    {+0,-1,-2}, {+0,-1,-1}, {+0,-1,+0},
-    {+0,+0,-2}, {+0,+0,-1}, {+0,+0,+0},
+    {-2,-2,-2}, {-1,-2,-2}, {+0,-2,-2},
+    {-2,-1,-2}, {-1,-1,-2}, {+0,-1,-2},
+    {-2,+0,-2}, {-1,+0,-2}, {+0,+0,-2},
+    //
+    {-2,-2,-1}, {-1,-2,-1}, {+0,-2,-1},
+    {-2,-1,-1},             {+0,-1,-1},
+    {-2,+0,-1}, {-1,+0,-1}, {+0,+0,-1},
+    //
+    {-2,-2,+0}, {-1,-2,+0}, {+0,-2,+0},
+    {-2,-1,+0}, {-1,-1,+0}, {+0,-1,+0},
+    {-2,+0,+0}, {-1,+0,+0}, {+0,+0,+0},
     // clang-format on
   };
 
-  mln::point3d p   = {-1, -1, -1};
-  auto         nbh = ::ranges::to_vector(mln::experimental::c26(p));
+  auto p   = mln::experimental::point3d{-1, -1, -1};
+  auto nbh = ::ranges::to_vector(mln::experimental::c26(p));
 
   ASSERT_EQ(refs, nbh);
 }
@@ -43,26 +43,26 @@ TEST(Core, c6_point)
 
 TEST(Core, c26_pixel)
 {
-  mln::image3d<int> f(3,3,3);
+  mln::experimental::image3d<int> f(3,3,3);
   mln::iota(f, 0);
 
 
-  mln::point3d p   = {1, 1, 1};
-  auto         pix = f.new_pixel_at(p);
+  auto p   = mln::experimental::point3d{1, 1, 1};
+  auto pix = f.new_pixel_at(p);
 
-  std::vector<mln::point3d> points = {
+  std::vector<mln::experimental::point3d> points = {
     // clang-format off
-    {+0,+0,+0}, {+0,+0,+1}, {+0,+0,+2},
-    {+0,+1,+0}, {+0,+1,+1}, {+0,+1,+2},
-    {+0,+2,+0}, {+0,+2,+1}, {+0,+2,+2},
-    // ---
-    {+1,+0,+0}, {+1,+0,+1}, {+1,+0,+2},
-    {+1,+1,+0},             {+1,+1,+2},
-    {+1,+2,+0}, {+1,+2,+1}, {+1,+2,+2},
-    // ---
-    {+2,+0,+0}, {+2,+0,+1}, {+2,+0,+2},
-    {+2,+1,+0}, {+2,+1,+1}, {+2,+1,+2},
-    {+2,+2,+0}, {+2,+2,+1}, {+2,+2,+2},
+    {+0,+0,+0}, {+1,+0,+0}, {+2,+0,+0},
+    {+0,+1,+0}, {+1,+1,+0}, {+2,+1,+0},
+    {+0,+2,+0}, {+1,+2,+0}, {+2,+2,+0},
+    //
+    {+0,+0,+1}, {+1,+0,+1}, {+2,+0,+1},
+    {+0,+1,+1},             {+2,+1,+1},
+    {+0,+2,+1}, {+1,+2,+1}, {+2,+2,+1},
+    //
+    {+0,+0,+2}, {+1,+0,+2}, {+2,+0,+2},
+    {+0,+1,+2}, {+1,+1,+2}, {+2,+1,+2},
+    {+0,+2,+2}, {+1,+2,+2}, {+2,+2,+2},
     // clang-format on
   };
 

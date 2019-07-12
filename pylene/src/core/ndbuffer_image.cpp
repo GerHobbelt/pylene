@@ -1,9 +1,9 @@
 #include <mln/core/assert.hpp>
 
 #include <mln/core/image_format.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
-#include <mln/core/image/private/ndbuffer_image_data.hpp>
-#include <mln/core/image/private/ndbuffer_image_impl.hpp>
+#include <mln/core/image/experimental/ndbuffer_image.hpp>
+#include <mln/core/image/experimental/private/ndbuffer_image_data.hpp>
+#include <mln/core/image/experimental/private/ndbuffer_image_impl.hpp>
 
 #include <cstring>
 
@@ -16,44 +16,8 @@ namespace
   using Impl = mln::details::ndbuffer_image_impl<void, -1>;
 }
 
-namespace mln::details
-{
-  void ndbuffer_image_impl_base_0::select(ndbuffer_image_info_t* ima, int dim, const int begin_coords[],
-                                          const int end_coords[])
-  {
-    assert(Impl::is_point_valid(ima, begin_coords) && "Out of bounds coordinates");
-    assert(dim <= ima->m_pdim && "Invalid dimension requested.");
-
-    std::ptrdiff_t offset = 0;
-    for (int k = 0; k < dim; ++k)
-    {
-      ima->m_axes[k].domain_begin = begin_coords[k];
-      ima->m_axes[k].domain_end   = end_coords[k];
-    }
-    for (int k = dim; k < ima->m_pdim; ++k)
-      offset += begin_coords[k] * ima->m_axes[k].byte_stride;
-
-    ima->m_pdim = dim;
-    ima->m_buffer += offset;
-  }
-}
-
 namespace mln
 {
-
-  namespace
-  {
-    /// \param n The number of the elements to allocate
-    /// \param sz The size of the elements to allocate
-    /// \param params Extra params
-    std::byte* __allocate(std::size_t n, std::size_t sz, const image_build_params&,
-                          std::shared_ptr<internal::ndbuffer_image_data>& data)
-    {
-      data = std::make_shared<internal::__ndbuffer_image_data<void>>(n * sz);
-      return data->m_buffer;
-    }
-  } // namespace
-
 
   __ndbuffer_image<void, -1>::__ndbuffer_image()
     : ndbuffer_image_info_t{} // Force 0-initialization
@@ -67,14 +31,14 @@ namespace mln
   }
 
 
-  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, ConstBoxRef domain,
+  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, experimental::ConstBoxRef domain,
                                              const image_build_params& params)
   {
     resize(sample_type, domain, params);
   }
 
 
-  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, ConstBoxRef domain)
+  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, experimental::ConstBoxRef domain)
   {
     resize(sample_type, domain);
   }
@@ -111,22 +75,20 @@ namespace mln
 
   __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, const details::init_list& data)
   {
-    int topleft[3] = {0, 0, 0};
-    int sizes[3]   = {static_cast<int>(data.size(0)), static_cast<int>(data.size(1)), static_cast<int>(data.size(2))};
-    int dim        = data.dim();
+    int sizes[3] = {static_cast<int>(data.size(0)), static_cast<int>(data.size(1)), static_cast<int>(data.size(2))};
+    int dim      = data.dim();
 
-
-    __init(__allocate, sample_type, data.sample_type_size(), dim, topleft, sizes, nullptr, {});
+    resize(sample_type, dim, sizes, image_build_params{});
 
     // Copy data
-    std::ptrdiff_t line_byte_stride  = dim > 1 ? m_axes[1].byte_stride : 0;
-    std::ptrdiff_t slice_byte_stride = dim > 2 ? m_axes[2].byte_stride : 0;
+    std::ptrdiff_t line_byte_stride  = dim > 1 ? this->byte_stride(1) : 0;
+    std::ptrdiff_t slice_byte_stride = dim > 2 ? this->byte_stride(2) : 0;
     data.copy_to_buffer(this->m_buffer, line_byte_stride, slice_byte_stride);
   }
 
 
 
-  Box __ndbuffer_image<void, -1>::domain() const noexcept
+  experimental::Box __ndbuffer_image<void, -1>::domain() const noexcept
   {
     int a_coords[PYLENE_NDBUFFER_MAX_DIM];
     int b_coords[PYLENE_NDBUFFER_MAX_DIM];
@@ -137,27 +99,32 @@ namespace mln
       b_coords[i] = m_axes[i].domain_end;
     }
 
-    ConstPointRef a(m_pdim, a_coords);
-    ConstPointRef b(m_pdim, b_coords);
+    experimental::ConstPointRef a(m_pdim, a_coords);
+    experimental::ConstPointRef b(m_pdim, b_coords);
     return {a, b};
   }
 
 
+  namespace
+  {
+    std::byte* __allocate(sample_type_id sample_type, std::size_t n, const image_build_params&,
+                          std::shared_ptr<internal::ndbuffer_image_data>& data)
+    {
+      data = std::make_shared<internal::__ndbuffer_image_data<void>>(n, sample_type);
+      return data->m_buffer;
+    }
+  } // namespace
 
-  void __ndbuffer_image<void, -1>::__init(alloc_fun_t __allocate, sample_type_id sample_type,
-                                          std::size_t sample_type_size, int dim, const int topleft[], const int sizes[],
-                                          const std::ptrdiff_t byte_strides[], const image_build_params& params)
+
+  void __ndbuffer_image<void, -1>::__init(alloc_fun_t __allocate, sample_type_id sample_type, int dim,
+                                          const int topleft[], const int sizes[], const std::ptrdiff_t strides[],
+                                          const image_build_params& params)
   {
     mln_precondition(topleft != nullptr);
     mln_precondition(sizes != nullptr);
     mln_precondition(dim > 0);
-    mln_precondition(sample_type_size > 0 || sample_type != sample_type_id::OTHER);
 
     int border = (params.border >= 0) ? params.border : DEFAULT_BORDER_SIZE;
-
-    // Retrieve the sample size
-    if (sample_type_size == 0)
-      sample_type_size = get_sample_type_id_traits(sample_type).size();
 
     if (dim > 4)
     {
@@ -169,27 +136,25 @@ namespace mln
     m_pdim        = dim;
 
     // Set domain and extension
-    std::size_t n = 1;
     for (int k = 0; k < dim; ++k)
     {
       m_axes[k].domain_begin = topleft[k];
       m_axes[k].domain_end   = topleft[k] + sizes[k];
       m_axes[k].vbox_begin   = m_axes[k].domain_begin - border;
       m_axes[k].vbox_end     = m_axes[k].domain_end + border;
-      n *= (m_axes[k].vbox_end - m_axes[k].vbox_begin);
     }
 
     // Compute strides
-    if (byte_strides == nullptr)
+    if (strides == nullptr)
     {
-      m_axes[0].byte_stride = sample_type_size;
+      m_axes[0].stride = 1;
       for (int k = 1; k < dim; ++k)
-        m_axes[k].byte_stride = (sizes[k - 1] + 2 * border) * m_axes[k - 1].byte_stride;
+        m_axes[k].stride = (sizes[k - 1] + 2 * border) * m_axes[k - 1].stride;
     }
     else // Or copy strides
     {
       for (int k = 0; k < dim; ++k)
-        m_axes[k].byte_stride = byte_strides[k];
+        m_axes[k].stride = strides[k];
     }
 
     // Set out-of-dim values
@@ -199,17 +164,18 @@ namespace mln
       m_axes[k].domain_end   = 1;
       m_axes[k].vbox_begin   = 0;
       m_axes[k].vbox_end     = 1;
-      m_axes[k].byte_stride  = 0;
+      m_axes[k].stride       = 0;
     }
 
     // Allocate (or get the buffer)
-    m_buffer = __allocate(n, sample_type_size, params, m_data); // dynamic behavior
+    std::size_t size = (sizes[dim - 1] + 2 * border) * m_axes[dim - 1].stride;
+    m_buffer         = __allocate(sample_type, size, params, m_data); // dynamic behavior
 
     // Set buffer to (0,0) position
-    std::ptrdiff_t x = 0;
-    for (int k = 0; k < m_pdim; ++k)
-      x += -m_axes[k].vbox_begin * m_axes[k].byte_stride;
-    m_buffer += x;
+    std::ptrdiff_t x = -m_axes[0].vbox_begin;
+    for (int k = 1; k < m_pdim; ++k)
+      x += -m_axes[k].vbox_begin * m_axes[k].stride;
+    m_buffer += x * get_sample_type_id_traits(sample_type).size();
   }
 
 
@@ -217,7 +183,7 @@ namespace mln
   __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int dim, const int topleft[], const int sizes[],
                                      const image_build_params& params)
   {
-    __init(__allocate, sample_type, 0, dim, topleft, sizes, nullptr, params);
+    __init(__allocate, sample_type, dim, topleft, sizes, nullptr, params);
   }
 
 
@@ -268,7 +234,7 @@ namespace mln
   }
 
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, ConstBoxRef domain,
+  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, experimental::ConstBoxRef domain,
                                           const image_build_params& params)
   {
     int topleft[PYLENE_NDBUFFER_MAX_DIM];
@@ -284,7 +250,7 @@ namespace mln
   }
 
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, ConstBoxRef domain)
+  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, experimental::ConstBoxRef domain)
   {
     resize(sample_type, domain, image_build_params{});
   }
@@ -317,19 +283,19 @@ namespace mln
 
     alloc_fun_t __alloc;
     if (copy)
-      __alloc = [buffer](std::size_t n, std::size_t sz, const image_build_params&,
+      __alloc = [buffer](sample_type_id st, std::size_t n, const image_build_params&,
                          std::shared_ptr<internal::ndbuffer_image_data>& data) {
-        data = std::make_shared<internal::__ndbuffer_image_data<void>>(n * sz);
-        std::memcpy(data->m_buffer, buffer, n * sz);
+        data = std::make_shared<internal::__ndbuffer_image_data<void>>(n, st);
+        std::memcpy(data->m_buffer, buffer, n * get_sample_type_id_traits(st).size());
         return data->m_buffer;
       };
     else
-      __alloc = [buffer](std::size_t, std::size_t, const image_build_params&,
+      __alloc = [buffer](sample_type_id, std::size_t, const image_build_params&,
                          std::shared_ptr<internal::ndbuffer_image_data>&) { return buffer; };
 
 
     __ndbuffer_image out;
-    out.__init(std::move(__alloc), sample_type, 0, dim, topleft, sizes, strides, params);
+    out.__init(std::move(__alloc), sample_type, dim, topleft, sizes, strides, params);
     return out;
   }
 
@@ -399,10 +365,10 @@ namespace mln
     if (m_pdim == 0)
       return 0;
 
-    int border = std::min(m_axes[0].domain_begin - m_axes[0].vbox_begin, m_axes[0].vbox_end - m_axes[0].domain_end);
+    int border = std::max(m_axes[0].domain_begin - m_axes[0].vbox_begin, m_axes[0].vbox_end - m_axes[0].domain_end);
     for (int k = 1; k < m_pdim; ++k)
     {
-      int x = std::min(m_axes[k].domain_begin - m_axes[k].vbox_begin, m_axes[k].vbox_end - m_axes[k].domain_end);
+      int x = std::max(m_axes[k].domain_begin - m_axes[k].vbox_begin, m_axes[k].vbox_end - m_axes[k].domain_end);
       if (x < border)
         border = x;
     }
@@ -425,52 +391,9 @@ namespace mln
     }
   }
 
-  void __ndbuffer_image<void, -1>::inflate_domain_to_extension()
-  {
-    for (int k = 0; k < m_pdim; ++k)
-    {
-      m_axes[k].domain_begin = m_axes[k].vbox_begin;
-      m_axes[k].domain_end = m_axes[k].vbox_end;
-    }
-  }
-
-  void __ndbuffer_image<void, -1>::shift_domain_topleft(ConstPointRef p) noexcept
-  {
-    int dp[PYLENE_NDBUFFER_MAX_DIM];
-
-    assert(p.dim() == m_pdim);
-    for (int i = 0; i < m_pdim; ++i)
-    {
-      m_axes[i].domain_begin += p[i];
-      m_axes[i].domain_end += p[i];
-      m_axes[i].vbox_begin += p[i];
-      m_axes[i].vbox_end += p[i];
-      dp[i] = -p[i];
-    }
-    this->m_buffer = reinterpret_cast<std::byte*>(Impl::get_pointer(this, dp));
-  }
-
-  void __ndbuffer_image<void, -1>::set_domain_topleft(ConstPointRef p) noexcept
-  {
-    int dp[PYLENE_NDBUFFER_MAX_DIM];
-
-    assert(p.dim() == m_pdim);
-    for (int i = 0; i < m_pdim; ++i)
-    {
-      int delta = p[i] - m_axes[i].domain_begin;
-      m_axes[i].domain_begin += delta;
-      m_axes[i].domain_end += delta;
-      m_axes[i].vbox_begin += delta;
-      m_axes[i].vbox_end += delta;
-      dp[i] = -delta;
-    }
-    this->m_buffer = reinterpret_cast<std::byte*>(Impl::get_pointer(this, dp));
-  }
 
 
-
-
-  const void* __ndbuffer_image<void, -1>::operator()(ConstPointRef p) const noexcept
+  const void* __ndbuffer_image<void, -1>::operator()(experimental::ConstPointRef p) const noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_in_domain(this, p.data()));
@@ -478,7 +401,7 @@ namespace mln
   }
 
 
-  void* __ndbuffer_image<void, -1>::operator()(ConstPointRef p) noexcept
+  void* __ndbuffer_image<void, -1>::operator()(experimental::ConstPointRef p) noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_in_domain(this, p.data()));
@@ -486,7 +409,7 @@ namespace mln
   }
 
 
-  const void* __ndbuffer_image<void, -1>::at(ConstPointRef p) const noexcept
+  const void* __ndbuffer_image<void, -1>::at(experimental::ConstPointRef p) const noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -494,7 +417,7 @@ namespace mln
   }
 
 
-  void* __ndbuffer_image<void, -1>::at(ConstPointRef p) noexcept
+  void* __ndbuffer_image<void, -1>::at(experimental::ConstPointRef p) noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -514,7 +437,7 @@ namespace mln
   }
 
 
-  auto __ndbuffer_image<void, -1>::index_of_point(ConstPointRef p) const noexcept->index_type
+  auto __ndbuffer_image<void, -1>::index_of_point(experimental::ConstPointRef p) const noexcept->index_type
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -522,7 +445,7 @@ namespace mln
   }
 
 
-  auto __ndbuffer_image<void, -1>::delta_index(ConstPointRef p) const noexcept -> index_type
+  auto __ndbuffer_image<void, -1>::delta_index(experimental::ConstPointRef p) const noexcept -> index_type
   {
     assert(p.dim() == m_pdim);
     return Impl::get_index(this, p.data());
@@ -549,16 +472,38 @@ namespace mln
 
   std::ptrdiff_t __ndbuffer_image<void, -1>::byte_stride(int dim) const noexcept
   {
-    return m_axes[dim].byte_stride;
+    mln_precondition(m_sample_type != sample_type_id::OTHER);
+    return m_axes[dim].stride * get_sample_type_id_traits(m_sample_type).size();
   }
 
 
   std::ptrdiff_t __ndbuffer_image<void, -1>::stride(int dim) const noexcept
   {
-    return m_axes[dim].byte_stride / m_axes[0].byte_stride;
+    return m_axes[dim].stride;
   }
 
-  auto __ndbuffer_image<void, -1>::clip(ConstBoxRef roi) const ->  __ndbuffer_image
+
+
+  auto __ndbuffer_image<void, -1>::__select(int dim, const int begin_coords[], const int end_coords[]) const -> __ndbuffer_image
+  {
+    assert(Impl::is_point_valid(this->__info(), begin_coords) && "Out of bounds coordinates");
+
+    __ndbuffer_image other  = *this;
+    std::ptrdiff_t offset = 0;
+    for (int k = 0; k < m_pdim; ++k)
+    {
+      other.m_axes[k].domain_begin = begin_coords[k];
+      other.m_axes[k].domain_end   = end_coords[k];
+      offset += begin_coords[k] * m_axes[k].stride;
+    }
+    other.m_pdim = dim;
+    other.m_buffer += offset * get_sample_type_id_traits(m_sample_type).size();
+
+    return other;
+  }
+
+
+  auto __ndbuffer_image<void, -1>::clip(experimental::ConstBoxRef roi) const ->  __ndbuffer_image
   {
     if (roi.dim() != m_pdim)
       throw std::runtime_error("Dimension of the image and the roi differ.");
@@ -574,10 +519,7 @@ namespace mln
       begin[k] = roi.tl(k);
       end[k]   = roi.br(k);
     }
-
-    auto out = *this;
-    Impl::select(&out, m_pdim, begin, end);
-    return out;
+    return __select(m_pdim, begin, end);
   }
 
 
@@ -596,10 +538,7 @@ namespace mln
       begin[k] = 0;
       end[k]   = 1;
     }
-
-    ndbuffer_image_info_t out = *this;
-    Impl::select(&out, 1, begin, end);
-    return out;
+    return __select(1, begin, end);
   }
 
 
@@ -618,20 +557,7 @@ namespace mln
       begin[k] = 0;
       end[k]   = 1;
     }
-
-    auto out = *this;
-    Impl::select(&out, 2, begin, end);
-    return out;
-  }
-
-  std::shared_ptr<internal::ndbuffer_image_data>& __ndbuffer_image<void, -1>::__data()
-  {
-    return m_data;
-  }
-
-  const std::shared_ptr<internal::ndbuffer_image_data>& __ndbuffer_image<void, -1>::__data() const
-  {
-    return m_data;
+    return __select(2, begin, end);
   }
 
 

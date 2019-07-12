@@ -27,7 +27,7 @@ void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output
   }
 }
 
-void Sum_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void Sum_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
@@ -79,7 +79,7 @@ void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer,
   }
 }
 
-void Average_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void Average_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
@@ -160,7 +160,7 @@ void Erosion(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& ou
   }
 }
 
-void Erosion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void Erosion_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
@@ -231,7 +231,7 @@ void Isotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<mln
   }
 }
 
-void Isotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void Isotropic_Diffusion_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
@@ -296,7 +296,7 @@ void Anisotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<m
   }
 }
 
-void Anisotropic_Diffusion_New(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void Anisotropic_Diffusion_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())

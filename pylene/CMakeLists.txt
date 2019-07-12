@@ -46,6 +46,10 @@ target_sources(Pylene PRIVATE
                src/core/se/rect2d.cpp
                src/core/se/mask2d.cpp
                src/core/trace.cpp
+               src/core/init_list.cpp
+               src/core/image_format.cpp
+               src/core/ndbuffer_image_data.cpp
+               src/core/ndbuffer_image.cpp
                )
 
 # Compiler configurations

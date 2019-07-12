@@ -73,7 +73,7 @@ namespace fixtures::ImageCompare
       static_assert(mln::is_a<ImageRhs, mln::experimental::Image>());
 
       auto f_dom = f.domain();
-      auto g_dom = f.domain();
+      auto g_dom = g.domain();
 
       auto f_dom_b = ::ranges::begin(f_dom);
       auto g_dom_b = ::ranges::begin(g_dom);

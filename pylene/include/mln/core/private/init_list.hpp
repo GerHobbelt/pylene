@@ -1,6 +1,6 @@
 #pragma once
-#include <algorithm>
 #include <initializer_list>
+#include <algorithm>
 
 namespace mln::details
 {
@@ -9,6 +9,7 @@ namespace mln::details
   class init_list
   {
   public:
+
     template <class T>
     explicit init_list(const std::initializer_list<T>& l) noexcept;
 
@@ -20,9 +21,8 @@ namespace mln::details
 
     void copy_to_buffer(void* buffer, std::ptrdiff_t line_byte_stride, std::ptrdiff_t slice_byte_stride) const;
 
-    int         dim() const noexcept { return m_dim; }
+    int dim() const noexcept { return m_dim; }
     std::size_t size(int k) const noexcept { return m_sizes[k]; }
-    std::size_t sample_type_size() const noexcept { return m_sample_type_size; }
 
   private:
     template <class T>
@@ -32,7 +32,6 @@ namespace mln::details
 
     int            m_dim;
     std::size_t    m_sizes[3];
-    std::size_t    m_sample_type_size;
     const void*    m_ptr; // Type-erased pointer to const std::initializer_list<...>
     copy_fun_ptr_t m_cpy;
   };
@@ -46,7 +45,6 @@ namespace mln::details
   init_list::init_list(const std::initializer_list<T>& l) noexcept
     : m_dim{1}
     , m_sizes{l.size(), 1, 1}
-    , m_sample_type_size(sizeof(T))
     , m_ptr{reinterpret_cast<const void*>(&l)}
     , m_cpy{&copy_buffer<T>}
   {
@@ -57,7 +55,6 @@ namespace mln::details
   init_list::init_list(const std::initializer_list<std::initializer_list<T>>& l) noexcept
     : m_dim{2}
     , m_sizes{l.begin()->size(), l.size(), 1}
-    , m_sample_type_size(sizeof(T))
     , m_ptr{reinterpret_cast<const void*>(&l)}
     , m_cpy{&copy_buffer<T>}
   {
@@ -67,7 +64,6 @@ namespace mln::details
   init_list::init_list(const std::initializer_list<std::initializer_list<std::initializer_list<T>>>& l) noexcept
     : m_dim{3}
     , m_sizes{l.begin()->begin()->size(), l.begin()->size(), l.size()}
-    , m_sample_type_size(sizeof(T))
     , m_ptr{reinterpret_cast<const void*>(&l)}
     , m_cpy{&copy_buffer<T>}
   {

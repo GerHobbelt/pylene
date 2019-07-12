@@ -44,6 +44,20 @@ See :doc:`core/images` for a description of the image concepts and image basics.
     | :cpp:func:`resize(g,f) <mln::resize>`           | Resize `g` to the *geometry* of `f`                                                      |
     +-------------------------------------------------+------------------------------------------------------------------------------------------+
 
+.. topic:: Fundamental types
+
+  .. table::
+    :class: full
+    :widths: auto
+
+    +----------------------------------------------+--------------------------------------------------------------------------+
+    | :cpp:class:`ndpoint` :cpp:class:`ndpointref` | Generic :doc:`point <core/point>` that hold *n* coordinates              |
+    +----------------------------------------------+--------------------------------------------------------------------------+
+    | :cpp:class:`ndbox` :cpp:class:`ndboxref`     | Generic :doc:`core/box` in *n* dimension                                 |
+    +----------------------------------------------+--------------------------------------------------------------------------+
+
+
+
 .. topic:: Fundamental image types
 
   .. table::
@@ -273,5 +287,3 @@ Fundamental primitives for basic image manipulation. Those are grouped by:
 
 
 :doc:`core/stl` are the fundamentals concepts of the C++ standard library that we are building our concept upon. They are our building blocks.
-
-

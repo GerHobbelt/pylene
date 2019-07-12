@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/domain/box.hpp>
+#include <mln/core/box.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/value/value_traits.hpp>
@@ -128,6 +129,46 @@ namespace mln
             {
               format(os, ima(p)) << " ";
             }
+          }
+          os << std::endl;
+        }
+        os.copyfmt(state);
+      }
+
+
+      template <typename Image>
+      std::enable_if_t<image_traits<Image>::accessible::value> imprint(Image ima, mln::experimental::box2d domain,
+                                                                       std::ostream& os)
+      {
+        typedef typename Image::value_type V;
+
+        std::ios state(NULL);
+        state.copyfmt(os);
+
+        int               wtext = 0;
+        frmt_max_width<V> frmter;
+
+        {
+          auto vals = ima.new_values();
+          for (auto&& r : mln::ranges::rows(vals))
+            for (auto&& v : r)
+              wtext = std::max(wtext, frmter(v));
+        }
+
+        os << "(" << typeid(V).name() << ")" << std::endl;
+        os.width(4);
+
+
+
+        auto pmin = domain.tl();
+        auto pmax = domain.br();
+
+        for (int y = pmin.y(); y < pmax.y(); ++y)
+        {
+          for (int x = pmin.x(); x < pmax.x(); ++x)
+          {
+            os << std::setw(wtext);
+            format(os, ima({x, y})) << " ";
           }
           os << std::endl;
         }

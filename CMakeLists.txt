@@ -53,7 +53,7 @@ option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to 
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 
-#### GCC + Clang Compiler configuration
+# Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
   add_compile_options(
     "-Wextra"

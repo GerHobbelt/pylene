@@ -11,29 +11,58 @@
 
 using vec_t = std::array<int, 4>;
 
+enum layout {
+  kRowMajor = false,
+  kColMajor = true
+};
 
-std::vector<vec_t> generate_forward_reference(vec_t from, vec_t to)
+
+std::vector<vec_t> generate_forward_reference(vec_t from, vec_t to, layout l)
 {
   std::vector<vec_t> data;
   vec_t              v;
-  for (v[0] = from[0]; v[0] < to[0]; ++v[0])
-    for (v[1] = from[1]; v[1] < to[1]; ++v[1])
+
+  if (l == kRowMajor)
+  {
+    for (v[0] = from[0]; v[0] < to[0]; ++v[0])
+      for (v[1] = from[1]; v[1] < to[1]; ++v[1])
+        for (v[2] = from[2]; v[2] < to[2]; ++v[2])
+          for (v[3] = from[3]; v[3] < to[3]; ++v[3])
+            data.push_back(v);
+  }
+  else
+  {
+    for (v[3] = from[3]; v[3] < to[3]; ++v[3])
       for (v[2] = from[2]; v[2] < to[2]; ++v[2])
-        for (v[3] = from[3]; v[3] < to[3]; ++v[3])
-          data.push_back(v);
+        for (v[1] = from[1]; v[1] < to[1]; ++v[1])
+          for (v[0] = from[0]; v[0] < to[0]; ++v[0])
+            data.push_back(v);
+  }
 
   return data;
 }
 
-std::vector<vec_t> generate_backward_reference(vec_t from, vec_t to)
+std::vector<vec_t> generate_backward_reference(vec_t from, vec_t to, layout l)
 {
   std::vector<vec_t> data;
   vec_t              v;
-  for (v[0] = to[0] - 1; v[0] >= from[0]; --v[0])
-    for (v[1] = to[1] - 1; v[1] >= from[1]; --v[1])
+
+  if (l == kRowMajor)
+  {
+    for (v[0] = to[0] - 1; v[0] >= from[0]; --v[0])
+      for (v[1] = to[1] - 1; v[1] >= from[1]; --v[1])
+        for (v[2] = to[2] - 1; v[2] >= from[2]; --v[2])
+          for (v[3] = to[3] - 1; v[3] >= from[3]; --v[3])
+            data.push_back(v);
+  }
+  else
+  {
+    for (v[3] = to[3] - 1; v[3] >= from[3]; --v[3])
       for (v[2] = to[2] - 1; v[2] >= from[2]; --v[2])
-        for (v[3] = to[3] - 1; v[3] >= from[3]; --v[3])
-          data.push_back(v);
+        for (v[1] = to[1] - 1; v[1] >= from[1]; --v[1])
+          for (v[0] = to[0] - 1; v[0] >= from[0]; --v[0])
+            data.push_back(v);
+  }
 
   return data;
 }
@@ -109,7 +138,7 @@ TYPED_TEST_CASE(MultiIndicesTest, MyTypes);
 
 TYPED_TEST(MultiIndicesTest, origin_centered_forward)
 {
-  std::vector<vec_t>               ref_ = generate_forward_reference(this->zero, this->to);
+  std::vector<vec_t>               ref_ = generate_forward_reference(this->zero, this->to, kRowMajor);
   typename TestFixture::range_type rng(this->to_);
 
   auto ref  = this->to_container(ref_);
@@ -119,11 +148,43 @@ TYPED_TEST(MultiIndicesTest, origin_centered_forward)
   ASSERT_EQ(ref, res2);
 }
 
+TYPED_TEST(MultiIndicesTest, origin_centered_forward_column_major)
+{
+  using T = typename TestFixture::T;
+
+  std::vector<vec_t>               ref_ = generate_forward_reference(this->zero, this->to, kColMajor);
+  mln::ranges::multi_indices<TestFixture::Rank, T, false> rng(this->to_);
+
+  auto ref  = this->to_container(ref_);
+  auto res  = this->rng_to_container(rng);
+  auto res2 = this->rng_to_container_row_wise(rng);
+  ASSERT_EQ(ref, res);
+  ASSERT_EQ(ref, res2);
+}
+
+
 
 TYPED_TEST(MultiIndicesTest, origin_centered_backward)
 {
-  std::vector<vec_t>               ref_ = generate_backward_reference(this->zero, this->to);
+  std::vector<vec_t>               ref_ = generate_backward_reference(this->zero, this->to, kRowMajor);
   typename TestFixture::range_type rng(this->to_);
+
+  if constexpr (TestFixture::Rank > 1)
+  {
+    auto ref  = this->to_container(ref_);
+    auto res  = this->rng_to_container(rng.reversed());
+    auto res2 = this->rng_to_container_row_wise(rng.reversed());
+    ASSERT_EQ(ref, res);
+    ASSERT_EQ(ref, res2);
+  }
+}
+
+TYPED_TEST(MultiIndicesTest, origin_centered_backward_column_major)
+{
+  using T = typename TestFixture::T;
+
+  std::vector<vec_t> ref_ = generate_backward_reference(this->zero, this->to, kColMajor);
+  mln::ranges::multi_indices<TestFixture::Rank, T, false> rng(this->to_);
 
   if constexpr (TestFixture::Rank > 1)
   {
@@ -138,8 +199,22 @@ TYPED_TEST(MultiIndicesTest, origin_centered_backward)
 
 TYPED_TEST(MultiIndicesTest, forward)
 {
-  std::vector<vec_t>               ref_ = generate_forward_reference(this->from, this->to);
+  std::vector<vec_t>               ref_ = generate_forward_reference(this->from, this->to, kRowMajor);
   typename TestFixture::range_type rng(this->from_, this->to_);
+
+  auto ref  = this->to_container(ref_);
+  auto res  = this->rng_to_container(rng);
+  auto res2 = this->rng_to_container_row_wise(rng);
+  ASSERT_EQ(ref, res);
+  ASSERT_EQ(ref, res2);
+}
+
+TYPED_TEST(MultiIndicesTest, forward_column_major)
+{
+  using T = typename TestFixture::T;
+
+  std::vector<vec_t>               ref_ = generate_forward_reference(this->from, this->to, kColMajor);
+  mln::ranges::multi_indices<TestFixture::Rank, T, false> rng(this->from_, this->to_);
 
   auto ref  = this->to_container(ref_);
   auto res  = this->rng_to_container(rng);
@@ -151,8 +226,25 @@ TYPED_TEST(MultiIndicesTest, forward)
 
 TYPED_TEST(MultiIndicesTest, backward)
 {
-  std::vector<vec_t>               ref_ = generate_backward_reference(this->from, this->to);
+  std::vector<vec_t>               ref_ = generate_backward_reference(this->from, this->to, kRowMajor);
   typename TestFixture::range_type rng(this->from_, this->to_);
+
+  if constexpr (TestFixture::Rank > 1)
+  {
+    auto ref  = this->to_container(ref_);
+    auto res  = this->rng_to_container(rng.reversed());
+    auto res2 = this->rng_to_container_row_wise(rng.reversed());
+    ASSERT_EQ(ref, res);
+    ASSERT_EQ(ref, res2);
+  }
+}
+
+TYPED_TEST(MultiIndicesTest, backward_column_major)
+{
+  using T = typename TestFixture::T;
+
+  std::vector<vec_t>               ref_ = generate_backward_reference(this->from, this->to, kColMajor);
+  mln::ranges::multi_indices<TestFixture::Rank, T, false> rng(this->from_, this->to_);
 
   if constexpr (TestFixture::Rank > 1)
   {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/private/traits/extension.hpp>
+#include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>
@@ -9,11 +9,10 @@
 #include <mln/core/image/view/none_extended.hpp>
 #include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
-#include <mln/core/range/view/transform.hpp>
-
+#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/utils/private/remove_cvref.hpp>
 
 #include <range/v3/utility/common_type.hpp> // common_reference
-#include <concepts/type_traits.hpp>
 
 #include <optional>
 #include <variant>
@@ -40,7 +39,7 @@ namespace mln
 
 
   template <class I>
-  class extended_view : public image_adaptor<I>, public mln::details::Image<extended_view<I>>
+  class extended_view : public image_adaptor<I>, public experimental::Image<extended_view<I>>
   {
     using base_t = image_adaptor<I>;
     // can be the base image (se fit, no adaptation required)
@@ -48,9 +47,7 @@ namespace mln
                                          none_extended_view<I>, periodize_extended_view<I>, value_extended_view<I>>;
 
   public:
-    using value_type = image_value_t<I>;
-    using reference  = const value_type; // Restrict the image to be read-only by copy, should not be const and be
-                                         // checked on pixel concept (but issue with proxy)
+    using reference     = const image_value_t<I>&; // Restrict the image to be read-only
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type    = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
@@ -76,7 +73,7 @@ namespace mln
       template <typename SE>
       constexpr bool fit(const SE& se) const
       {
-        static_assert(mln::is_a_v<SE, details::StructuringElement>, "SE is not a valid Structuring Element!");
+        PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
         return std::visit([&se](auto&& ima) { return ima.extension().fit(se); }, *m_adapted_image_ptr);
       }
@@ -90,7 +87,7 @@ namespace mln
       {
         std::visit(
             [v](auto&& ima) {
-              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_fill::value)
+              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_fill::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_fill_supported())
@@ -105,7 +102,7 @@ namespace mln
       {
         std::visit(
             [padding](auto&& ima) {
-              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_mirror::value)
+              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_mirror::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_mirror_supported())
@@ -120,7 +117,7 @@ namespace mln
       {
         std::visit(
             [](auto&& ima) {
-              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_periodize::value)
+              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_periodize::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_periodize_supported())
@@ -135,7 +132,7 @@ namespace mln
       {
         std::visit(
             [](auto&& ima) {
-              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_clamp::value)
+              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_clamp::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_clamp_supported())
@@ -151,7 +148,7 @@ namespace mln
       {
         std::visit(
             [u_ = std::forward<U>(u), offset](auto&& ima) {
-              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_extend_with::value)
+              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_extend_with::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_extend_with_supported())
@@ -187,20 +184,20 @@ namespace mln
       const adapted_image_t* m_adapted_image_ptr; // mutable
     };
 
-    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
       using reference = extended_view::reference;
 
-      reference val() const { return (*m_ima_ptr)(this->base().point()); }
+      reference val() const { return (*m_ima)(this->base().point()); }
 
-      pixel_type(image_pixel_t<I> px, extended_view<I>* ima_ptr)
-        : pixel_type::pixel_adaptor{std::move(px)}
-        , m_ima_ptr{ima_ptr}
+      new_pixel_type(image_pixel_t<I> px, extended_view<I>* ima)
+        : new_pixel_type::pixel_adaptor{std::move(px)}
+        , m_ima{ima}
       {
       }
 
     private:
-      extended_view<I>* m_ima_ptr;
+      extended_view<I>* m_ima;
     };
 
 
@@ -230,21 +227,21 @@ namespace mln
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
+    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel(point_type p)
     {
-      return {this->base().pixel(p), this};
+      return {this->base().new_pixel(p), this};
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
+    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().pixel(p), this};
+      return {this->base().new_pixel(p), this};
     }
     /// \}
 
-    auto pixels()
+    auto new_pixels()
     {
-      return ranges::view::transform(this->base().pixels(), [this](image_pixel_t<I> px) -> pixel_type {
+      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
         return {std::move(px), this};
       });
     }

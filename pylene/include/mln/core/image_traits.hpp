@@ -26,6 +26,9 @@ namespace mln
   template <class I, class V>
   using image_ch_value_t = typename I::template ch_value_type<V>;
 
+  template <class I, class V>
+  using ch_value_t = image_ch_value_t<I, V>;
+
   struct [[deprecated]] image_dynamic_tag
   {
   };
@@ -138,9 +141,11 @@ namespace mln
   template <typename I, typename has_extension = typename image_has_extension<I>::type>
   struct image_extension_traits
   {
-    typedef std::false_type support_fill;
-    typedef std::false_type support_mirror;
-    typedef std::false_type support_periodize;
+    using support_fill      = std::false_type;
+    using support_mirror    = std::false_type;
+    using support_periodize = std::false_type;
+    using support_clamp     = std::false_type;
+    using support_extend_with    = std::false_type;
   };
 
   template <typename I>

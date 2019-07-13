@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -22,7 +22,7 @@ namespace mln::extension
     template <typename SE>
     constexpr bool fit(const SE& se) const
     {
-      static_assert(mln::is_a_v<SE, details::StructuringElement>, "SE is not a valid Structuring Element!");
+      PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
       if constexpr (std::is_base_of_v<mln::dynamic_neighborhood_tag, typename SE::category>)
       {

@@ -3,21 +3,24 @@
 /// \file
 
 #include <mln/core/assert.hpp>
+#include <mln/core/concept/new/neighborhoods.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concept/new/values.hpp>
 #include <mln/core/domain/box.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage_iter.hpp>
 #include <mln/core/image/private/ndimage_pixel.hpp>
 #include <mln/core/image/private/ndimage_extension.hpp>
 #include <mln/core/image/private/image_builder.hpp>
+#include <mln/core/image/private/ndimage_pixel.hpp>
 #include <mln/core/image_category.hpp>
 #include <mln/core/image_traits.hpp>
 #include <mln/core/memory.hpp>
-
-#include <mln/core/concept/new/values.hpp>
-
 #include <mln/core/rangev3/multi_span.hpp>
 
+#include <optional>
 #include <type_traits>
+
 
 namespace mln
 {
@@ -297,7 +300,7 @@ namespace mln
     /// \name Concrete-related Image Methods
     /// \{
 
-    image_builder<concrete_type, E>  concretize() const { return {exact(*this)}; }
+    image_builder<concrete_type, E> concretize() const { return {exact(*this)}; }
 
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -305,7 +308,10 @@ namespace mln
 #else
     template <typename Val>
 #endif // PYLENE_CONCEPT_TS_ENABLED
-    image_builder<ch_value_type<Val>, E>  ch_value() const { return {exact(*this)}; }
+    image_builder<ch_value_type<Val>, E> ch_value() const
+    {
+      return {exact(*this)};
+    }
 
     /// \brief Resize the image to fit \p domain.
     ///
@@ -370,7 +376,6 @@ namespace mln
     /// \param[in] delta The domain inflation value. It can be negative.
     /// \precondition -amin(shape() / 2) <= delta <= border
     void inflate_domain(int delta);
-
 
 
     /// \brief clip an image to a domain
@@ -996,7 +1001,7 @@ namespace mln
   template <typename T, unsigned dim, typename E>
   inline typename ndimage_base<T, dim, E>::extension_type ndimage_base<T, dim, E>::extension() const
   {
-    return extension_type(m_ptr, &m_strides[0], m_domain.shape(), m_border);
+    return {m_ptr, &m_strides[0], m_domain.shape(), m_border};
   }
 
 

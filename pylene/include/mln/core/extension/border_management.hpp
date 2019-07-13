@@ -1,8 +1,7 @@
 #pragma once
 
-#include <mln/core/algorithm/paste.hpp>
-#include <mln/core/concepts/image.hpp>
-#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/extension.hpp>
 #include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>
@@ -12,13 +11,12 @@
 #include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/se/view/filter.hpp>
 #include <mln/core/trace.hpp>
-
+#include <mln/core/utils/private/remove_cvref.hpp>
 
 #include <any>
 #include <exception>
 #include <limits>
 #include <type_traits>
-#include <concepts/type_traits.hpp>
 
 
 namespace mln::extension
@@ -62,14 +60,14 @@ namespace mln::extension
     struct managed_image_type_by_policy<BorderManagementPolicy::Native, V>
     {
       template <typename I>
-      using managed_image_t = std::variant<::concepts::remove_cvref_t<I>>;
+      using managed_image_t = std::variant<mln::detail::remove_cvref_t<I>>;
     };
 
     template <typename V>
     struct managed_image_type_by_policy<BorderManagementPolicy::Auto, V>
     {
       template <typename I>
-      using managed_image_t = std::variant<::concepts::remove_cvref_t<I>, ::concepts::remove_cvref_t<V>>;
+      using managed_image_t = std::variant<mln::detail::remove_cvref_t<I>, mln::detail::remove_cvref_t<V>>;
     };
 
 
@@ -95,14 +93,14 @@ namespace mln::extension
     struct managed_structuring_element_by_method
     {
       template <typename SE, typename>
-      using managed_se_t = std::variant<::concepts::remove_cvref_t<SE>>;
+      using managed_se_t = std::variant<mln::detail::remove_cvref_t<SE>>;
     };
 
     template <typename S>
     struct managed_structuring_element_by_method<BorderManagementMethod::None, S>
     {
       template <typename SE, typename Dom>
-      using managed_se_t = std::variant<::concepts::remove_cvref_t<SE>, se_filter_view<adapt_se_none_border<Dom>, SE>>;
+      using managed_se_t = std::variant<mln::detail::remove_cvref_t<SE>, se_filter_view<adapt_se_none_border<Dom>, SE>>;
     };
   } // namespace detail
 
@@ -134,11 +132,11 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::None, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       // We remove the border usage by adapting the SE
       return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
@@ -152,11 +150,11 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::None, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(!image_has_extension<I>::value,
                     "The image has an extension when none is explicitly requested."
@@ -179,27 +177,22 @@ namespace mln::extension
     std::any m_value;
 
   public:
-    constexpr BorderManagementMethod method() const { return BorderManagementMethod::Fill; }
-
     template <class T>
     explicit border_manager(T value)
       : m_value{std::move(value)}
     {
     }
 
-    std::any& get_value() { return m_value; }
-    const std::any& get_value() const { return m_value; }
-
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Fill, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            value_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            value_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      // using S = ::concepts::remove_cvref_t<SE>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<S, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      // using S = mln::detail::remove_cvref_t<SE>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<S, mln::experimental::StructuringElement>::value);
 
       auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)
@@ -220,48 +213,6 @@ namespace mln::extension
 
       return {view::value_extended(ima, *val), se};
     }
-
-
-    template <class InputImage, class SE, class D>
-    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const -> image_concrete_t<::concepts::remove_cvref_t<InputImage>>
-    {
-      using I = ::concepts::remove_cvref_t<InputImage>;
-
-      static_assert(mln::is_a<I, mln::details::Image>());
-      static_assert(mln::is_a<SE, mln::details::StructuringElement>());
-
-      if (m_value.type() != typeid(image_value_t<I>))
-        throw std::runtime_error(
-            "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
-
-      D input_roi = se.compute_input_region(ima.domain());
-
-      image_build_params params;
-      params.init_value = m_value;
-
-      image_concrete_t<I> output(input_roi, params);
-      mln::paste(ima, roi, output);
-      return output;
-    }
-
-    template <class I, class SE, class D>
-    I create_temporary_image(const SE& se, const D& roi) const
-    {
-      static_assert(mln::is_a<I, mln::details::Image>());
-      static_assert(mln::is_a<SE, mln::details::StructuringElement>());
-
-      if (m_value.type() != typeid(image_value_t<I>))
-        throw std::runtime_error(
-          "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
-
-      D input_roi = se.compute_input_region(roi);
-
-      image_build_params params;
-      params.init_value = m_value;
-
-      image_concrete_t<I> output(input_roi, params);
-      return output;
-    }
   };
 
   template <typename U>
@@ -280,12 +231,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Fill, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            value_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            value_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)
@@ -319,46 +270,61 @@ namespace mln::extension
   template <typename U>
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, U>
   {
+  private:
+    std::size_t m_padding;
+
   public:
+    explicit border_manager(std::size_t padding = 0)
+      : m_padding{padding}
+    {
+    }
 
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            mirror_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            mirror_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_mirror::value)
       {
         if (ima.extension().is_mirror_supported() && fit(ima, se))
         {
-          ima.extension().mirror();
+          ima.extension().mirror(m_padding);
           return {ima, se};
         }
       }
 
       mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension does "
                        "not really support mirror. Consider using a large border.");
-      return {view::mirror_extended(ima), se};
+      return {view::mirror_extended(ima, m_padding), se};
     }
   };
 
   template <typename U>
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::Native, U>
   {
+  private:
+    std::size_t m_padding;
+
   public:
+    explicit border_manager(std::size_t padding = 0)
+      : m_padding{padding}
+    {
+    }
+
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Mirror, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            mirror_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            mirror_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -375,7 +341,7 @@ namespace mln::extension
       }
 
       // The SE fits and the extension dynamically support mirror, we set the value of the border
-      ima.extension().mirror();
+      ima.extension().mirror(m_padding);
       return {ima, se};
     }
   };
@@ -392,12 +358,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Periodize, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            periodize_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            periodize_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_periodize::value)
       {
@@ -421,12 +387,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Periodize, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            periodize_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            periodize_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -460,12 +426,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Clamp, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            clamp_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            clamp_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_clamp::value)
       {
@@ -489,12 +455,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Clamp, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            clamp_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            clamp_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -538,12 +504,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Image, BorderManagementPolicy::Auto, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            image_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            image_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
@@ -581,12 +547,12 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Image, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>,
-                            image_extended_view<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>,
+                            image_extended_view<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
@@ -620,18 +586,14 @@ namespace mln::extension
   class border_manager<BorderManagementMethod::User, BorderManagementPolicy::Auto, U>
   {
   public:
-    static constexpr BorderManagementMethod method() { return BorderManagementMethod::User; }
-
-    static std::any get_value() { return {}; }
-
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -647,28 +609,6 @@ namespace mln::extension
       // The SE fit the image
       return {ima, se};
     }
-
-    template <class InputImage, class SE, class D>
-    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const -> image_concrete_t<::concepts::remove_cvref_t<InputImage>>
-    {
-      using I = ::concepts::remove_cvref_t<InputImage>;
-
-      static_assert(mln::is_a<I, mln::details::Image>());
-      static_assert(mln::is_a<SE, mln::details::StructuringElement>());
-
-
-      if (!fit(ima, se))
-      {
-        throw std::runtime_error(
-            "The given image's extension is not large enough to fit the given structuring element.");
-      }
-
-      D input_roi = se.compute_input_region(roi);
-
-      image_concrete_t<I> output(input_roi);
-      mln::impl::paste_unsafe(ima, input_roi, output);
-      return output;
-    }
   };
 
   template <typename U>
@@ -678,11 +618,11 @@ namespace mln::extension
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE,
-                            image_domain_t<::concepts::remove_cvref_t<Ima>>>
+                            image_domain_t<mln::detail::remove_cvref_t<Ima>>>
     {
-      using I = ::concepts::remove_cvref_t<Ima>;
-      static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      using I = mln::detail::remove_cvref_t<Ima>;
+      static_assert(mln::is_a<I, mln::experimental::Image>::value);
+      // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."

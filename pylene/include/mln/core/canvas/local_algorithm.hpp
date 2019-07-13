@@ -1,25 +1,23 @@
 #pragma once
 
-#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/range/rows.hpp>
-#include <mln/core/range/view/zip.hpp>
+#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/rangev3/view/zip.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/box.hpp>
 
 namespace mln::canvas
 {
 
-  template <class SE, class I, class J, class Self = void>
-  // This concept check makes an ICE with MSVC
-  #ifndef _MSC_VER
-   requires concepts::StructuringElement<SE, image_point_t<I>> && concepts::Image<I> && concepts::Image<J>
-  #endif
-  class LocalAlgorithm
+  template <class SE, class I, class J>
+#ifdef PYLENE_CONCEPT_TS_ENABLED
+  requires concepts::StructuringElement<SE, image_point_t<I>>&& concepts::Image<I>&& concepts::Image<J>
+#endif
+      class LocalAlgorithm
   {
-    static_assert(mln::is_a<SE, mln::details::StructuringElement>());
-    static_assert(mln::is_a<I, mln::details::Image>());
-    static_assert(mln::is_a<J, mln::details::Image>());
+    static_assert(mln::is_a<SE, experimental::StructuringElement>());
+    static_assert(mln::is_a<I, experimental::Image>());
+    static_assert(mln::is_a<J, experimental::Image>());
 
     static_assert(std::is_same_v<image_domain_t<I>, image_domain_t<J>>,
                   "Running a local algorithm on two images with differents domain types is not supported.");
@@ -33,19 +31,15 @@ namespace mln::canvas
   public:
     LocalAlgorithm(const SE& se, I& f, J& g)
       : m_se{se}
-      , m_i{f}
-      , m_j{g}
+      , m_i(f)
+      , m_j(g)
     {
     }
 
     virtual void Execute();
 
+
   protected:
-    using self_t = std::conditional_t<std::is_void_v<Self>, LocalAlgorithm*, Self*>;
-
-    self_t self() { return static_cast<self_t>(this); }
-
-
     virtual void ExecuteAtLineStart() = 0;
 
     virtual void EvalBeforeLocalLoop(image_reference_t<I> pval_i, image_reference_t<J> pval_j) = 0;
@@ -54,44 +48,19 @@ namespace mln::canvas
     virtual void EvalAfterLocalLoop(image_reference_t<I> pval_i, image_reference_t<J> pval_j)  = 0;
   };
 
-  // To be incremental:
-  // * the domain contiguous on rows
-  // * the SE must incremental
 
-  // FIXME:
-  // we need to know if a domain is "row-contiguous" that is if the iteration leads to a unit move.
-  namespace details
-  {
-    template <class Domain, class = void>
-    struct is_domain_row_contiguous : std::false_type
-    {
-    };
-
-    template <class Impl>
-    struct is_domain_row_contiguous<mln::_box<Impl>> : std::true_type
-    {
-    };
-  }
-
-
-  template <class SE, class I, class J, class Self = void>
-  class IncrementalLocalAlgorithm : public LocalAlgorithm<SE, I, J, Self>
+  template <class SE, class I, class J>
+  class IncrementalLocalAlgorithm : public LocalAlgorithm<SE, I, J>
   {
     static_assert(SE::incremental::value, "The Structuring Element must be incremental.");
-    static_assert(details::is_domain_row_contiguous<image_domain_t<I>>::value, "The domain must be quite regular.");
 
   public:
     using IncrementalLocalAlgorithm::LocalAlgorithm::LocalAlgorithm;
-
 
     virtual void Execute() override;
 
 
   private:
-    using self_t = std::conditional_t<std::is_void_v<Self>, IncrementalLocalAlgorithm*, Self*>;
-    self_t self() { return static_cast<self_t>(this); }
-
-
     virtual void EvalInDecLoop(image_reference_t<I> nval_i, image_reference_t<I> pval_i,
                                image_reference_t<J> pval_j) = 0;
 
@@ -100,34 +69,30 @@ namespace mln::canvas
   };
 
 
-  template <class SE, class I, class J, class Self>
-#ifndef _MSC_VER
-   requires concepts::StructuringElement<SE, image_point_t<I>> && concepts::Image<I> && concepts::Image<J>
-#endif
-  void LocalAlgorithm<SE, I, J, Self>::Execute()
+  template <class SE, class I, class J>
+  void LocalAlgorithm<SE, I, J>::Execute()
   {
     mln_entering("LocalAlgorithm::Execute (Non-incremental)");
-    auto zz = ranges::view::zip(m_i.pixels(), m_j.pixels());
+    auto zz = ranges::view::zip(m_i.new_pixels(), m_j.new_pixels());
     for (auto rows : ranges::rows(zz))
     {
-      self()->ExecuteAtLineStart();
+      this->ExecuteAtLineStart();
       for (auto [px_i, px_j] : rows)
       {
-        self()->EvalBeforeLocalLoop(px_i.val(), px_j.val());
+        this->EvalBeforeLocalLoop(px_i.val(), px_j.val());
         for (auto nx_i : m_se(px_i))
-          self()->EvalInLocalLoop(nx_i.val(), px_i.val(), px_j.val());
-        self()->EvalAfterLocalLoop(px_i.val(), px_j.val());
+          this->EvalInLocalLoop(nx_i.val(), px_i.val(), px_j.val());
+        this->EvalAfterLocalLoop(px_i.val(), px_j.val());
       }
     }
   }
 
-  template <class SE, class I, class J, class Self>
-  void IncrementalLocalAlgorithm<SE, I, J, Self>::Execute()
+  template <class SE, class I, class J>
+  void IncrementalLocalAlgorithm<SE, I, J>::Execute()
   {
     if (!this->m_se.is_incremental())
     {
-      mln::trace::warn("[Performance] The accumulator is not incremental.");
-      this->LocalAlgorithm<SE, I, J, Self>::Execute();
+      this->LocalAlgorithm<SE, I, J>::Execute();
       return;
     }
 
@@ -136,10 +101,10 @@ namespace mln::canvas
     auto inc = this->m_se.inc();
     auto dec = this->m_se.dec();
 
-    auto zz = ranges::view::zip(this->m_i.pixels(), this->m_j.pixels());
+    auto zz = ranges::view::zip(this->m_i.new_pixels(), this->m_j.new_pixels());
     for (auto rows : ranges::rows(zz))
     {
-      self()->ExecuteAtLineStart();
+      this->ExecuteAtLineStart();
 
       auto b = ::ranges::begin(rows);
       auto e = ::ranges::end(rows);
@@ -148,10 +113,10 @@ namespace mln::canvas
       if (b != e)
       {
         auto [px_i, px_j] = *b;
-        self()->EvalBeforeLocalLoop(px_i.val(), px_j.val());
+        this->EvalBeforeLocalLoop(px_i.val(), px_j.val());
         for (auto nx : this->m_se(px_i))
-          self()->EvalInLocalLoop(nx.val(), px_i.val(), px_j.val());
-        self()->EvalAfterLocalLoop(px_i.val(), px_j.val());
+          this->EvalInLocalLoop(nx.val(), px_i.val(), px_j.val());
+        this->EvalAfterLocalLoop(px_i.val(), px_j.val());
       }
 
       // Next iterations
@@ -161,13 +126,13 @@ namespace mln::canvas
 
         // Untake part
         for (auto nx : dec(px_i))
-          self()->EvalInDecLoop(nx.val(), px_i.val(), px_j.val());
+          this->EvalInDecLoop(nx.val(), px_i.val(), px_j.val());
 
         // Take part
         for (auto nx : inc(px_i))
-          self()->EvalInIncLoop(nx.val(), px_i.val(), px_j.val());
+          this->EvalInIncLoop(nx.val(), px_i.val(), px_j.val());
 
-        self()->EvalAfterLocalLoop(px_i.val(), px_j.val());
+        this->EvalAfterLocalLoop(px_i.val(), px_j.val());
       }
     }
   }

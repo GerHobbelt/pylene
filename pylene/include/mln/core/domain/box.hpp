@@ -14,25 +14,25 @@
 namespace mln
 {
   // Fwd
-  // template <typename T, unsigned dim> struct box_iter;
-  // template <typename T, unsigned dim> struct box_rev_iter;
+  // template <typename T, unsigned d> struct box_iter;
+  // template <typename T, unsigned d> struct box_rev_iter;
 
-  template <typename T, unsigned dim>
+  template <typename T, unsigned d>
   struct strided_box
   {
-    typedef point<T, dim> point_type;
-    typedef point<T, dim> value_type;
+    typedef point<T, d> point_type;
+    typedef point<T, d> value_type;
 
-    typedef internal::nested_loop_iterator<internal::strided_domain_point_visitor_forward<point<T, dim>>,
+    typedef internal::nested_loop_iterator<internal::strided_domain_point_visitor_forward<point<T, d>>,
                                            internal::no_op_visitor, internal::no_op_visitor,
-                                           internal::point_structure<T, dim>, internal::deref_return_point_policy>
+                                           internal::point_structure<T, d>, internal::deref_return_point_policy>
         iterator;
 
     typedef iterator const_iterator;
 
-    typedef internal::nested_loop_iterator<internal::strided_domain_point_visitor_backward<point<T, dim>>,
+    typedef internal::nested_loop_iterator<internal::strided_domain_point_visitor_backward<point<T, d>>,
                                            internal::no_op_visitor, internal::no_op_visitor,
-                                           internal::point_structure<T, dim>, internal::deref_return_point_policy>
+                                           internal::point_structure<T, d>, internal::deref_return_point_policy>
         reverse_iterator;
 
     typedef reverse_iterator const_reverse_iterator;
@@ -58,27 +58,28 @@ namespace mln
     point_type strides;
   };
 
-  template <typename T, unsigned dim>
-  strided_box<T, dim> make_strided_box(point<T, dim> pmin, point<T, dim> pmax, point<T, dim> step);
+  template <typename T, unsigned d>
+  strided_box<T, d> make_strided_box(point<T, d> pmin, point<T, d> pmax, point<T, d> step);
 
   //
   // \pre \tparam T must be an integral type
-  template <typename T, unsigned dim>
-  struct box : ranges::details::multi_indices_facade<dim, box<T, dim>>
+  template <typename T, unsigned d>
+  struct box : ranges::details::multi_indices_facade<d, box<T, d>>
   {
-    typedef point<T, dim> point_type;
-    typedef point<T, dim> value_type;
+    typedef point<T, d>          point_type;
+    typedef point<T, d>          value_type;
+    static constexpr std::size_t ndim = d;
 
-    typedef internal::nested_loop_iterator<internal::domain_point_visitor_forward<point<T, dim>>,
-                                           internal::no_op_visitor, internal::no_op_visitor,
-                                           internal::point_structure<T, dim>, internal::deref_return_point_policy>
+    typedef internal::nested_loop_iterator<internal::domain_point_visitor_forward<point<T, d>>, internal::no_op_visitor,
+                                           internal::no_op_visitor, internal::point_structure<T, d>,
+                                           internal::deref_return_point_policy>
         iterator;
 
     typedef iterator const_iterator;
 
-    typedef internal::nested_loop_iterator<internal::domain_point_visitor_backward<point<T, dim>>,
+    typedef internal::nested_loop_iterator<internal::domain_point_visitor_backward<point<T, d>>,
                                            internal::no_op_visitor, internal::no_op_visitor,
-                                           internal::point_structure<T, dim>, internal::deref_return_point_policy>
+                                           internal::point_structure<T, d>, internal::deref_return_point_policy>
                              reverse_iterator;
     typedef reverse_iterator const_reverse_iterator;
 
@@ -93,7 +94,7 @@ namespace mln
     bool has(const point_type& p) const
     {
       mln_precondition(__is_valid());
-      for (unsigned i = 0; i < dim; ++i)
+      for (unsigned i = 0; i < d; ++i)
         if (p[i] < pmin[i] or p[i] >= pmax[i])
           return false;
       return true;
@@ -105,10 +106,12 @@ namespace mln
       return pmax - pmin;
     }
 
-    std::array<std::size_t, dim> extents() const
+    constexpr int dim() const { return ndim; }
+
+    std::array<std::size_t, d> extents() const
     {
-      std::array<std::size_t, dim> r;
-      for (unsigned i = 0; i < dim; ++i)
+      std::array<std::size_t, d> r;
+      for (unsigned i = 0; i < d; ++i)
         r[i] = pmax[i] - pmin[i];
       return r;
     }
@@ -116,7 +119,7 @@ namespace mln
     bool empty() const
     {
       mln_precondition(__is_valid());
-      for (unsigned i = 0; i < dim; ++i)
+      for (unsigned i = 0; i < d; ++i)
         if (pmax[i] <= pmin[i])
           return true;
       return false;
@@ -126,7 +129,7 @@ namespace mln
     {
       mln_precondition(__is_valid());
       unsigned sz = 1;
-      for (unsigned i = 0; i < dim; ++i)
+      for (unsigned i = 0; i < d; ++i)
         sz *= pmax[i] - pmin[i];
       return sz;
     }
@@ -134,14 +137,14 @@ namespace mln
     iterator iter() const
     {
       mln_precondition(__is_valid());
-      return iterator(internal::point_structure<T, dim>(), internal::make_point_visitor_forward(pmin, pmax),
+      return iterator(internal::point_structure<T, d>(), internal::make_point_visitor_forward(pmin, pmax),
                       internal::no_op_visitor(), internal::no_op_visitor());
     }
 
     reverse_iterator riter() const
     {
       mln_precondition(__is_valid());
-      return reverse_iterator(internal::point_structure<T, dim>(), internal::make_point_visitor_backward(pmin, pmax),
+      return reverse_iterator(internal::point_structure<T, d>(), internal::make_point_visitor_backward(pmin, pmax),
                               internal::no_op_visitor(), internal::no_op_visitor());
     }
 
@@ -173,7 +176,7 @@ namespace mln
 
     bool __is_valid() const
     {
-      for (unsigned i = 0; i < dim; ++i)
+      for (unsigned i = 0; i < d; ++i)
         if (pmin[i] > pmax[i])
           return false;
         else if (pmin[i] == pmax[i]) // empty <=> pmin = pmax
@@ -204,14 +207,14 @@ namespace mln
   typedef strided_box<short, 2> sbox2d;
   typedef strided_box<short, 3> sbox3d;
 
-  template <typename T, unsigned dim>
-  inline std::ostream& operator<<(std::ostream& s, const box<T, dim>& b)
+  template <typename T, unsigned d>
+  inline std::ostream& operator<<(std::ostream& s, const box<T, d>& b)
   {
     return s << "[" << b.pmin << " ... " << b.pmax << "]";
   }
 
-  template <typename T, unsigned dim>
-  inline std::ostream& operator<<(std::ostream& s, const strided_box<T, dim>& b)
+  template <typename T, unsigned d>
+  inline std::ostream& operator<<(std::ostream& s, const strided_box<T, d>& b)
   {
     return s << "[" << b.pmin << " ... " << b.pmax << "..." << b.strides << "]";
   }
@@ -264,17 +267,17 @@ namespace mln
     };
   };
 
-  template <typename T, unsigned dim>
-  struct grain_box : box<T, dim>
+  template <typename T, unsigned d>
+  struct grain_box : box<T, d>
   {
   private:
-    typedef box<T, dim> base;
+    typedef box<T, d> base;
 
   public:
     grain_box()                 = default;
     grain_box(const grain_box&) = default;
 
-    grain_box(const box<T, dim>& b, unsigned grain = 1)
+    grain_box(const box<T, d>& b, unsigned grain = 1)
       : base(b)
       , m_grain(grain)
     {
@@ -312,13 +315,13 @@ namespace mln
   /** Implementation        */
   /**************************/
 
-  template <typename T, unsigned dim>
-  strided_box<T, dim>::strided_box(const point_type& pmin_, const point_type& pmax_, const point_type& strides_)
+  template <typename T, unsigned d>
+  strided_box<T, d>::strided_box(const point_type& pmin_, const point_type& pmax_, const point_type& strides_)
     : pmin(pmin_)
     , strides(strides_)
   {
     mln_precondition(pmin_ <= pmax_);
-    for (unsigned i = 0; i < dim; ++i)
+    for (unsigned i = 0; i < d; ++i)
     {
       T q = (pmax_[i] - pmin_[i]) % strides_[i];
       if (q > 0)
@@ -328,20 +331,20 @@ namespace mln
     }
   }
 
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::has(const point_type& p) const
+  template <typename T, unsigned d>
+  inline bool strided_box<T, d>::has(const point_type& p) const
   {
     mln_precondition(__is_valid());
-    for (unsigned i = 0; i < dim; ++i)
+    for (unsigned i = 0; i < d; ++i)
       if (p[i] < pmin[i] or p[i] >= pmax[i] or (p[i] - pmin[i]) % strides[i] != 0)
         return false;
     return true;
   }
 
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::__is_valid() const
+  template <typename T, unsigned d>
+  inline bool strided_box<T, d>::__is_valid() const
   {
-    for (unsigned i = 0; i < dim; ++i)
+    for (unsigned i = 0; i < d; ++i)
       if (pmin[i] > pmax[i])
         return false;
       else if (pmin[i] == pmax[i]) // empty <=> pmin = pmax
@@ -349,53 +352,53 @@ namespace mln
     return true;
   }
 
-  template <typename T, unsigned dim>
-  inline typename strided_box<T, dim>::point_type strided_box<T, dim>::shape() const
+  template <typename T, unsigned d>
+  inline typename strided_box<T, d>::point_type strided_box<T, d>::shape() const
   {
     point_type shp((pmax - pmin).as_vec() / strides.as_vec());
     return shp;
   }
 
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::empty() const
+  template <typename T, unsigned d>
+  inline bool strided_box<T, d>::empty() const
   {
-    for (unsigned i = 0; i < dim; ++i)
+    for (unsigned i = 0; i < d; ++i)
       if (pmax[i] < pmin[i] + strides[i])
         return true;
     return false;
   }
 
-  template <typename T, unsigned dim>
-  inline typename strided_box<T, dim>::iterator strided_box<T, dim>::iter() const
+  template <typename T, unsigned d>
+  inline typename strided_box<T, d>::iterator strided_box<T, d>::iter() const
   {
-    return iterator(internal::point_structure<T, dim>(),
+    return iterator(internal::point_structure<T, d>(),
                     internal::make_strided_point_visitor_forward(pmin, pmax, strides), internal::no_op_visitor(),
                     internal::no_op_visitor());
   }
 
-  template <typename T, unsigned dim>
-  inline typename strided_box<T, dim>::reverse_iterator strided_box<T, dim>::riter() const
+  template <typename T, unsigned d>
+  inline typename strided_box<T, d>::reverse_iterator strided_box<T, d>::riter() const
   {
-    return reverse_iterator(internal::point_structure<T, dim>(),
+    return reverse_iterator(internal::point_structure<T, d>(),
                             internal::make_strided_point_visitor_backward(pmin, pmax, strides),
                             internal::no_op_visitor(), internal::no_op_visitor());
   }
 
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::operator==(const strided_box& other) const
+  template <typename T, unsigned d>
+  inline bool strided_box<T, d>::operator==(const strided_box& other) const
   {
     return pmin == other.pmin and pmax == other.pmax and strides == other.strides;
   }
 
-  template <typename T, unsigned dim>
-  inline bool strided_box<T, dim>::operator!=(const strided_box& other) const
+  template <typename T, unsigned d>
+  inline bool strided_box<T, d>::operator!=(const strided_box& other) const
   {
     return pmin != other.pmin or pmax != other.pmax or strides != other.strides;
   }
 
 
-  template <typename T, unsigned dim>
-  strided_box<T, dim> make_strided_box(point<T, dim> pmin, point<T, dim> pmax, point<T, dim> step)
+  template <typename T, unsigned d>
+  strided_box<T, d> make_strided_box(point<T, d> pmin, point<T, d> pmax, point<T, d> step)
   {
     return {pmin, pmax, step};
   }

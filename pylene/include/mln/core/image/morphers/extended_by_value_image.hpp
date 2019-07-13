@@ -298,10 +298,12 @@ namespace mln
   template <typename V>
   struct by_value_extension
   {
-    typedef V               value_type;
-    typedef std::true_type  support_fill;
-    typedef std::false_type support_mirror;
-    typedef std::false_type support_periodize;
+    using value_type        = V;
+    using support_fill      = std::true_type;
+    using support_mirror    = std::false_type;
+    using support_periodize = std::false_type;
+    using support_clamp     = std::false_type;
+    using support_extend_with    = std::false_type;
 
     by_value_extension(V& val)
       : m_val(val)

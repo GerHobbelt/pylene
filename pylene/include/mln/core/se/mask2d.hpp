@@ -7,8 +7,8 @@
 
 #include <range/v3/span.hpp>
 
-#include <vector>
 #include <initializer_list>
+#include <vector>
 
 /// \file
 
@@ -46,10 +46,10 @@ namespace mln::se
     class mask2d : public se_facade<mask2d>
     {
     public:
-      using category = dynamic_neighborhood_tag;
-      using separable = std::false_type;
+      using category     = dynamic_neighborhood_tag;
+      using separable    = std::false_type;
       using decomposable = std::false_type;
-      using incremental = std::false_type;
+      using incremental  = std::false_type;
 
       /// \brief Initializer from a 2D array of values.
       /// \param values List of 0-1 to define the mask
@@ -66,4 +66,4 @@ namespace mln::se
       int                       m_radial_extent;
     };
   } // namespace experimental
-} // namespace mln
+} // namespace mln::se

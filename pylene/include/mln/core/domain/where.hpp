@@ -57,8 +57,9 @@ namespace mln
 
       where_t() = default;
 
-      bool has(image_point_t<I> p) const { return m_ima(p); }
-      bool empty() const { return m_ima.domain().empty(); }
+      bool          has(image_point_t<I> p) const { return m_ima(p); }
+      bool          empty() const { return m_ima.domain().empty(); }
+      constexpr int dim() const { return m_ima.domain().dim(); }
     };
 
   } // namespace ranges
@@ -73,5 +74,5 @@ namespace mln
       return {static_cast<const I&>(ima)};
     }
 
-  }
+  } // namespace experimental
 } // namespace mln

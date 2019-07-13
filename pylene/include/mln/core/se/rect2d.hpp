@@ -21,7 +21,7 @@ namespace mln
 
     /// \brief Define a dynamic rectangular window anchored at (0,0).
     /// Its width and height are always odd numbers to ensure symmetry.
-    class rect2d : public se_facade<rect2d>
+    struct rect2d : public se_facade<rect2d>
     {
     public:
       using category     = dynamic_neighborhood_tag;

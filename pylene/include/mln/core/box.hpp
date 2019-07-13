@@ -1,8 +1,11 @@
 #pragma once
 
-#include <mln/core/rangev3/multi_indices.hpp>
 #include <mln/core/experimental/point.hpp>
+#include <mln/core/rangev3/multi_indices.hpp>
+
+#include <array>
 #include <type_traits>
+
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 #include <stl2/type_traits.hpp>
@@ -21,7 +24,7 @@ namespace mln::experimental
 
     template <int D, class T>
     struct _bref;
-  };
+  }; // namespace impl
 
   /******************************************/
   /****   Box Types and Types Aliases    ****/
@@ -36,9 +39,9 @@ namespace mln::experimental
   using ndboxref = _box<impl::_bref<dim, const int>>;
 
 
-  using box1d = ndbox<1>;
-  using box2d = ndbox<2>;
-  using box3d = ndbox<3>;
+  using box1d           = ndbox<1>;
+  using box2d           = ndbox<2>;
+  using box3d           = ndbox<3>;
   using const_box1d_ref = ndboxref<1>;
   using const_box2d_ref = ndboxref<2>;
   using const_box3d_ref = ndboxref<3>;
@@ -63,9 +66,9 @@ namespace mln::experimental
     friend struct impl::_bref;
 
 
-    using typename Impl::coord_type;
     using Impl::Impl;
     using Impl::ndim;
+    using typename Impl::coord_type;
 
 
     /// Observers
@@ -134,8 +137,14 @@ namespace mln::experimental
     /// \brief Returns the bottom-right (past-the-end) corner point
     using Impl::br;
 
+    /// \brief Returns the shape of the domain
+    using Impl::shape;
+
     /// \brief Returns the number of dimensions
     using Impl::dim;
+
+    /// \brief Returns the size of each dimension
+    using Impl::extents;
 
     /// \brief Returns a pointer to the coordinate array
     using Impl::data;
@@ -200,7 +209,6 @@ namespace mln::experimental
     template <int K>
     constexpr int __size() const noexcept;
   };
-
 
 
   /******************************************/
@@ -351,6 +359,17 @@ namespace mln::experimental
       constexpr point_type  br() const noexcept { return m_end; }
       constexpr point_type& br() noexcept { return m_end; }
 
+      constexpr auto shape() const noexcept { return tl() - br(); }
+      constexpr auto extents() const noexcept
+      {
+        auto pmin = tl();
+        auto pmax = br();
+        auto ret  = std::array<std::size_t, D>{};
+        for (int i = 0; i < D; i++)
+          ret[i] = pmax[i] - pmin[i];
+        return ret;
+      }
+
       constexpr point_type __from() const noexcept { return m_begin; }
       constexpr point_type __to() const noexcept { return m_end; }
 
@@ -472,6 +491,17 @@ namespace mln::experimental
       constexpr ConstPointRef br() const noexcept { return {m_dim, m_coords + m_dim}; }
       constexpr PointRef      br() noexcept { return {m_dim, m_coords + m_dim}; }
 
+      constexpr auto shape() const noexcept { return tl() - br(); }
+      auto           extents() const noexcept
+      {
+        auto pmin = tl();
+        auto pmax = br();
+        auto ret  = std::vector<std::size_t>{m_dim, 0};
+        for (int i = 0; i < m_dim; i++)
+          ret[i] = pmax[i] - pmin[i];
+        return ret;
+      }
+
       constexpr int begin() const noexcept { return 0; }
       constexpr int end() const noexcept { return 1; }
 
@@ -499,8 +529,21 @@ namespace mln::experimental
       constexpr T& __begin(int k) const noexcept { return assert(k < D), m_coords[k]; }
       constexpr T& __end(int k) const noexcept { return assert(k < D), m_coords[D + k]; }
 
-      constexpr ndpointref<D, T>                   tl() const noexcept { return {m_coords}; }
-      constexpr ndpointref<D, T>                   br() const noexcept { return {m_coords + D}; }
+      constexpr ndpointref<D, T> tl() const noexcept { return {m_coords}; }
+      constexpr ndpointref<D, T> br() const noexcept { return {m_coords + D}; }
+
+      constexpr auto shape() const noexcept { return tl() - br(); }
+      constexpr auto extents() const noexcept
+      {
+        auto pmin = tl();
+        auto pmax = br();
+        auto ret  = std::array<std::size_t, D>{};
+        for (int i = 0; i < D; i++)
+          ret[i] = pmax[i] - pmin[i];
+        return ret;
+      }
+
+
       constexpr ndpoint<D, std::remove_const_t<T>> __from() const noexcept { return tl(); }
       constexpr ndpoint<D, std::remove_const_t<T>> __to() const noexcept { return br(); }
 
@@ -536,6 +579,17 @@ namespace mln::experimental
       }
       constexpr ConstPointRef tl() const noexcept { return {m_dim, m_coords}; }
       constexpr ConstPointRef br() const noexcept { return {m_dim, m_coords + m_dim}; }
+
+      constexpr auto shape() const noexcept { return tl() - br(); }
+      auto           extents() const noexcept
+      {
+        auto pmin = tl();
+        auto pmax = br();
+        auto ret  = std::vector<std::size_t>{m_dim, 0};
+        for (int i = 0; i < m_dim; i++)
+          ret[i] = pmax[i] - pmin[i];
+        return ret;
+      }
 
       int begin() const { return 0; }
       int end() const { return 1; }
@@ -692,4 +746,3 @@ STL2_OPEN_NAMESPACE
 }
 STL2_CLOSE_NAMESPACE
 #endif
-

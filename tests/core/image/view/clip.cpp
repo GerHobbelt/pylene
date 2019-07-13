@@ -15,7 +15,8 @@ struct vector_domain : public std::vector<mln::point2d>
   using base = std::vector<mln::point2d>;
 
   using base::base;
-  bool has(mln::point2d p) const { return std::binary_search(this->begin(), this->end(), p); }
+  bool          has(mln::point2d p) const { return std::binary_search(this->begin(), this->end(), p); }
+  constexpr int dim() const { return 2; }
 };
 
 

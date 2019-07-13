@@ -18,20 +18,27 @@ add_core_test(${test_prefix}range_reverse       range/reverse.cpp)
 add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
 # test Views
-add_core_test(${test_prefix}view_adaptor     image/view/adaptor.cpp)
-add_core_test(${test_prefix}view_cast        image/view/cast.cpp)
-add_core_test(${test_prefix}view_channel     image/view/channel.cpp)
-add_core_test(${test_prefix}view_clip        image/view/clip.cpp)
-add_core_test(${test_prefix}view_filter      image/view/filter.cpp)
-add_core_test(${test_prefix}view_mask        image/view/mask.cpp)
-add_core_test(${test_prefix}view_maths_comps image/view/maths_components.cpp)
-add_core_test(${test_prefix}view_maths_reds  image/view/maths_reductions.cpp)
-add_core_test(${test_prefix}view_maths_norms image/view/maths_norms.cpp)
-add_core_test(${test_prefix}view_maths_dists image/view/maths_distances.cpp)
-add_core_test(${test_prefix}view_ops         image/view/operators.cpp)
-add_core_test(${test_prefix}view_rgb         image/view/rgb.cpp)
-add_core_test(${test_prefix}view_transform   image/view/transform.cpp)
-add_core_test(${test_prefix}view_zip         image/view/zip.cpp)
+add_core_test(${test_prefix}view_adaptor            image/view/adaptor.cpp)
+add_core_test(${test_prefix}view_cast               image/view/cast.cpp)
+add_core_test(${test_prefix}view_channel            image/view/channel.cpp)
+add_core_test(${test_prefix}view_clip               image/view/clip.cpp)
+add_core_test(${test_prefix}view_value_extended     image/view/value_extended.cpp)
+add_core_test(${test_prefix}view_mirror_extended    image/view/mirror_extended.cpp)
+add_core_test(${test_prefix}view_image_extended     image/view/image_extended.cpp)
+add_core_test(${test_prefix}view_none_extended      image/view/none_extended.cpp)
+add_core_test(${test_prefix}view_periodize_extended image/view/periodize_extended.cpp)
+add_core_test(${test_prefix}view_clamp_extended     image/view/clamp_extended.cpp)
+add_core_test(${test_prefix}view_extended           image/view/extended.cpp)
+add_core_test(${test_prefix}view_filter             image/view/filter.cpp)
+add_core_test(${test_prefix}view_mask               image/view/mask.cpp)
+add_core_test(${test_prefix}view_maths_comps        image/view/maths_components.cpp)
+add_core_test(${test_prefix}view_maths_reds         image/view/maths_reductions.cpp)
+add_core_test(${test_prefix}view_maths_norms        image/view/maths_norms.cpp)
+add_core_test(${test_prefix}view_maths_dists        image/view/maths_distances.cpp)
+add_core_test(${test_prefix}view_ops                image/view/operators.cpp)
+add_core_test(${test_prefix}view_rgb                image/view/rgb.cpp)
+add_core_test(${test_prefix}view_transform          image/view/transform.cpp)
+add_core_test(${test_prefix}view_zip                image/view/zip.cpp)
 
 
 # test Images
@@ -58,7 +65,11 @@ add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)
 add_core_test(${test_prefix}wneighborhood    neighborhood/wneighborhood.cpp)
 
 # test Extension
-add_core_test(${test_prefix}extension_fill     extension/fill.cpp)
+add_core_test(${test_prefix}extension_clamp     extension/clamp.cpp)
+add_core_test(${test_prefix}extension_fill      extension/fill.cpp)
+add_core_test(${test_prefix}extension_mirror    extension/mirror.cpp)
+add_core_test(${test_prefix}extension_periodize extension/periodize.cpp)
+
 
 # test Value
 add_core_test(${test_prefix}value_int          value/int.cpp)
@@ -82,6 +93,7 @@ add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}transform          algorithm/transform.cpp)
 add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
+add_core_test(${test_prefix}accumulate_local   algorithm/accumulate_local.cpp)
 
 # test SE
 add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)

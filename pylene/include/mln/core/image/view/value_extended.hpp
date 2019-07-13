@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/extension/private/by_value.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/range/view/transform.hpp>
-#include <mln/core/private/traits/extension.hpp>
+#include <mln/core/rangev3/view/transform.hpp>
 
 #include <range/v3/utility/common_type.hpp> // common_reference
 
@@ -26,7 +26,7 @@ namespace mln
 
 
   template <class I>
-  class value_extended_view : public image_adaptor<I>, public mln::details::Image<value_extended_view<I>>
+  class value_extended_view : public image_adaptor<I>, public experimental::Image<value_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
@@ -34,16 +34,11 @@ namespace mln
     using point_type         = image_point_t<I>;
     using extension_category = extension::value_extension_tag;
     using extension_type     = extension::by_value<image_value_t<I>>;
-    using value_type         = image_value_t<I>;
-
-    // FIXME: use common_reference here between image_reference_t<I> AND value_type&
-    using reference = image_reference_t<I>; // Not write only (we may want an out of bound value while keeping the
-                                            // the writability of the image)
-
-    using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
+    using reference          = const image_value_t<I>&; // Restrict the image to be read-only
+    using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using typename image_adaptor<I>::domain_type;
 
-    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
       using reference = value_extended_view::reference;
 
@@ -53,8 +48,8 @@ namespace mln
         return m_dom.has(pnt) ? this->base().val() : m_ima->m_value;
       }
 
-      pixel_type(image_pixel_t<I> px, value_extended_view<I>* ima, domain_type dom)
-        : pixel_type::pixel_adaptor{std::move(px)}
+      new_pixel_type(image_pixel_t<I> px, value_extended_view<I>* ima, domain_type dom)
+        : new_pixel_type::pixel_adaptor{std::move(px)}
         , m_ima{ima}
         , m_dom{std::move(dom)}
       {
@@ -90,21 +85,21 @@ namespace mln
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
+    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel(point_type p)
     {
-      return this->pixel_at(p);
+      return this->new_pixel_at(p);
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
+    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().pixel_at(p), this, this->domain()};
+      return {this->base().new_pixel_at(p), this, this->domain()};
     }
     /// \}
 
-    auto pixels()
+    auto new_pixels()
     {
-      return ranges::view::transform(this->base().pixels(), [this](image_pixel_t<I> px) -> pixel_type {
+      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
         return {std::move(px), this, this->domain()};
       });
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/image/image.hpp>
 
 #include <functional>
@@ -37,7 +37,7 @@ namespace mln::extension
     template <typename SE>
     constexpr bool fit(const SE&) const
     {
-      static_assert(mln::is_a_v<SE, details::StructuringElement>, "SE is not a valid Structuring Element!");
+      PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
       // TODO: non-trivial
       return true;

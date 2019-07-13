@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/extension/private/none.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/range/view/transform.hpp>
-#include <mln/core/private/traits/extension.hpp>
+#include <mln/core/rangev3/view/transform.hpp>
 
 #include <range/v3/utility/common_type.hpp> // common_reference
 
@@ -26,7 +26,7 @@ namespace mln
 
 
   template <class I>
-  class none_extended_view : public image_adaptor<I>, public mln::details::Image<none_extended_view<I>>
+  class none_extended_view : public image_adaptor<I>, public experimental::Image<none_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
@@ -39,14 +39,14 @@ namespace mln
     using typename image_adaptor<I>::value_type;
     using extension_type = extension::none;
 
-    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
+    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
     {
       using reference = none_extended_view::reference;
 
       reference val() const { return (*m_ima)(this->base().point()); }
 
-      pixel_type(image_pixel_t<I> px, none_extended_view<I>* ima)
-        : pixel_type::pixel_adaptor{std::move(px)}
+      new_pixel_type(image_pixel_t<I> px, none_extended_view<I>* ima)
+        : new_pixel_type::pixel_adaptor{std::move(px)}
         , m_ima{ima}
       {
       }
@@ -80,21 +80,21 @@ namespace mln
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
+    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel(point_type p)
     {
-      return this->pixel_at(p);
+      return this->new_pixel_at(p);
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
+    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
     {
-      return {this->base().pixel_at(p), this};
+      return {this->base().new_pixel_at(p), this};
     }
     /// \}
 
-    auto pixels()
+    auto new_pixels()
     {
-      return ranges::view::transform(this->base().pixels(), [this](image_pixel_t<I> px) -> pixel_type {
+      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
         return {std::move(px), this};
       });
     }

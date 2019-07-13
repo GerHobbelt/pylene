@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/se/view/adaptor.hpp>
 
 #include <range/v3/view/filter.hpp>
@@ -22,17 +22,17 @@ namespace mln
     {
     }
 
-    template <class P>
-    requires(mln::is_a<P, mln::details::Pixel>::value) auto operator()(const P& pixel) const
+    template <class P, std::enable_if_t<is_a<P, mln::experimental::Pixel>::value, long> = 0>
+    auto operator()(const P& pixel) const
     {
-      return ::ranges::views::filter(details::sliding_pixel_range{pixel, static_cast<const SE*>(this)->offsets()},
+      return ::ranges::view::filter(details::sliding_pixel_range{pixel, static_cast<const SE*>(this)->offsets()},
                                     [this](auto pix) { return m_pred(pix.point()); });
     }
 
-    template <class P>
-    requires(!mln::is_a<P, mln::details::Pixel>::value) auto operator()(const P& point) const
+    template <class P, std::enable_if_t<!is_a<P, mln::experimental::Pixel>::value, int> = 0>
+    auto operator()(const P& point) const
     {
-      return ::ranges::views::filter(::ranges::views::transform(static_cast<const SE*>(this)->offsets(),
+      return ::ranges::view::filter(::ranges::view::transform(static_cast<const SE*>(this)->offsets(),
                                                               [point](P offset) -> P { return point + offset; }),
                                     m_pred);
     }

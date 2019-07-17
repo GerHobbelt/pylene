@@ -4,14 +4,17 @@ stages:
     - bench
     - deploy
 
+before_script:
+    - export CMAKE_BUILD_PARALLEL_LEVEL=$(( (${NBPROC} + 1) / 2 ))
+
 variables:
-    DOCKER_IMAGE: "${CI_REGISTRY}/olena/pylene/build-toolset"
+    FEDORA_30: "${CI_REGISTRY}/olena/pylene/fedora-rawhide" # stdlibc++ 9.1.1-2 not yet in fedora-30
+    FEDORA_29: "${CI_REGISTRY}/olena/pylene/fedora-29"
     BUILD_DOCKER: 'false'
     PACKAGE_NAME: "pylene" # Conan package name
     PACKAGE_TAG: "testing" # Conan tag
     PACKAGE_VERSION: "head" # Version to build
     CONAN_USER: "lrde"
-
 
 #########
 # Build #
@@ -20,8 +23,10 @@ variables:
     stage: build
     script:
         - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-        - docker build -t ${DOCKER_IMAGE} -f utils/docker/Dockerfile --no-cache .
-        - docker push ${DOCKER_IMAGE}
+        - docker build -t ${FEDORA_30} -f utils/docker-fedora/ --build-arg VERSION=30 --no-cache .
+        - docker build -t ${FEDORA_29} -f utils/docker-fedora/ --build-arg VERSION=29 --no-cache .
+        - docker push ${FEDORA_30}
+        - docker push ${FEDORA_29}
 
 build-docker-manual:
     <<: *build-docker-base
@@ -39,17 +44,16 @@ build-docker-automatic:
 ########
 
 .job-build-linux-base: &distcheck-linux-base
-    image: ${DOCKER_IMAGE}
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr $BUILD_PROFILE --build missing
+        - conan install .. -pr pylene_default --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
-        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
         - ctest -L UnitTests --schedule-random --output-on-failure
         - cmake --build . --target dist --config $PYLENE_CONFIGURATION
     dependencies: []
@@ -59,17 +63,16 @@ build-docker-automatic:
         expire_in: 15 days
 
 .job-build-linux-coverage: &distcheck-linux-coverage
-    image: ${DOCKER_IMAGE}
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr $BUILD_PROFILE --build missing
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$(which $COV) -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
-        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
-        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - conan install .. -pr pylene_default --build missing
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$COV -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
+        - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
+        - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
         - ctest -L UnitTests --schedule-random --output-on-failure
         - cmake --build . --target run-tests_coverage-gcovr-html --config $PYLENE_CONFIGURATION
         - cmake --build . --target run-tests_coverage-lcov --config $PYLENE_CONFIGURATION
@@ -91,38 +94,13 @@ build-docker-automatic:
 # Asan and ubsan can work together
 
 
-distcheck-linux-gcc7-release:
-    <<: *distcheck-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "gcc7"
-        CXX: "g++-7"
-        CC: "gcc-7"
-        ASAN: "OFF"
-        MSAN: "OFF"
-        UBSAN: "OFF"
-        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
-
-distcheck-linux-gcc7-debug-cov-asan-ubsan:
-    <<: *distcheck-linux-coverage
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        BUILD_PROFILE: "gcc7"
-        CXX: "g++-7"
-        CC: "gcc-7"
-        COV: "gcov-7"
-        ASAN: "ON"
-        MSAN: "OFF"
-        UBSAN: "ON"
-        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
-
 distcheck-linux-gcc8-release:
     <<: *distcheck-linux-base
+    image: ${FEDORA_29}
     variables:
         PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "gcc8"
-        CXX: "g++-8"
-        CC: "gcc-8"
+        CXX: "g++"
+        CC: "gcc"
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
@@ -130,49 +108,49 @@ distcheck-linux-gcc8-release:
 
 distcheck-linux-gcc8-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
+    image: ${FEDORA_29}
     variables:
         PYLENE_CONFIGURATION: "Debug"
-        BUILD_PROFILE: "gcc8"
-        CXX: "g++-8"
-        CC: "gcc-8"
-        COV: "gcov-8"
+        CXX: "g++"
+        CC: "gcc"
+        COV: "/usr/bin/gcov"
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
         OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
-distcheck-linux-clang6-release:
+distcheck-linux-gcc9-release:
     <<: *distcheck-linux-base
+    image: ${FEDORA_30}
     variables:
         PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "clang6"
-        CXX: "clang++-6.0"
-        CC: "clang-6.0"
+        CXX: "g++"
+        CC: "gcc"
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
-        OTHER_CMAKE_ARGS: ""
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
-distcheck-linux-clang6-debug-cov-asan-ubsan:
+distcheck-linux-gcc9-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
+    image: ${FEDORA_30}
     variables:
         PYLENE_CONFIGURATION: "Debug"
-        BUILD_PROFILE: "clang6"
-        CXX: "clang++-6.0"
-        CC: "clang-6.0"
-        COV: "../utils/coverage/llvm-gcov-6.0.sh"
+        CXX: "g++"
+        CC: "gcc"
+        COV: "/usr/bin/gcov"
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
-        OTHER_CMAKE_ARGS: ""
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
+    image: ${FEDORA_29}
     variables:
         PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "clang7"
-        CXX: "clang++-7"
-        CC: "clang-7"
+        CXX: "clang++"
+        CC: "clang"
         ASAN: "OFF"
         MSAN: "OFF"
         UBSAN: "OFF"
@@ -180,12 +158,37 @@ distcheck-linux-clang7-release:
 
 distcheck-linux-clang7-debug-cov-asan-ubsan:
     <<: *distcheck-linux-coverage
+    image: ${FEDORA_29}
     variables:
         PYLENE_CONFIGURATION: "Debug"
-        BUILD_PROFILE: "clang7"
-        CXX: "clang++-7"
-        CC: "clang-7"
-        COV: "../utils/coverage/llvm-gcov-7.sh"
+        CXX: "clang++"
+        CC: "clang"
+        COV: "/usr/local/bin/llvm/gcov"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
+        OTHER_CMAKE_ARGS: ""
+
+distcheck-linux-clang8-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_30}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+        ASAN: "OFF"
+        MSAN: "OFF"
+        UBSAN: "OFF"
+        OTHER_CMAKE_ARGS: ""
+
+distcheck-linux-clang8-debug-cov-asan-ubsan:
+    <<: *distcheck-linux-coverage
+    image: ${FEDORA_30}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+        COV: "/usr/local/bin/llvm/gcov"
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
@@ -197,14 +200,14 @@ distcheck-linux-clang7-debug-cov-asan-ubsan:
 #########
 
 .job-bench-linux-base: &distbench-linux-base
-    image: ${DOCKER_IMAGE}
+    image: ${FEDORA_30}
     stage: bench
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION
         - cmake --build . --target run-all-benchmarks --config $PYLENE_CONFIGURATION
         - ctest -L SpeedTests -V
     tags: [ "pylene-benchmarks" ]
@@ -216,37 +219,37 @@ distcheck-linux-clang7-debug-cov-asan-ubsan:
             - build/bench/*.json
         expire_in: 15 days
 
-distbench-linux-gcc7-release:
-    <<: *distbench-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "gcc7"
-        CXX: "g++-7"
-        CC: "gcc-7"
-
-distbench-linux-clang6-release:
-    <<: *distbench-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "clang6"
-        CXX: "clang++-6.0"
-        CC: "clang-6.0"
-
 distbench-linux-gcc8-release:
     <<: *distbench-linux-base
+    image: ${FEDORA_29}
     variables:
         PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "gcc8"
-        CXX: "g++-8"
-        CC: "gcc-8"
+        CXX: "g++"
+        CC: "gcc"
 
 distbench-linux-clang7-release:
     <<: *distbench-linux-base
+    image: ${FEDORA_29}
     variables:
         PYLENE_CONFIGURATION: "Release"
-        BUILD_PROFILE: "clang6"
-        CXX: "clang++-7"
-        CC: "clang-7"
+        CXX: "clang++"
+        CC: "clang"
+
+distbench-linux-gcc9-release:
+    <<: *distbench-linux-base
+    image: ${FEDORA_30}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+
+distbench-linux-clang8-release:
+    <<: *distbench-linux-base
+    image: ${FEDORA_30}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
 
 
 #################
@@ -254,13 +257,13 @@ distbench-linux-clang7-release:
 #################
 
 .documentation-base:  &documentation-base
-    image: ${DOCKER_IMAGE}
+    image: ${FEDORA_30}
     stage: test
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
-        - cmake --build . --target build-doc --config Release -- -j $(($NBPROC / 2))
+        - cmake --build . --target build-doc --config Release
         - mkdir ../public && mv doc/sphinx/* ../public/
     artifacts:
         name: "documentation"
@@ -285,7 +288,7 @@ pages:
         - dev
 
 package:
-    image: ${DOCKER_IMAGE}
+    image: ${FEDORA_30}
     stage: deploy
     dependencies: []
     script:

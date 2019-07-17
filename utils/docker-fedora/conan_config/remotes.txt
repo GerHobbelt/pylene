@@ -1,0 +1,4 @@
+conan-center https://conan.bintray.com True
+dutiona-lrde https://api.bintray.com/conan/dutiona/lrde True
+lrde-public  https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public True
+

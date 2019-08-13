@@ -344,7 +344,7 @@ namespace mln::experimental
   constexpr bool _point<Impl>::operator<(const _point<_i>& other) const noexcept
   {
     assert(dim() == other.dim() && "Point dimensions mistmatch.");
-    for (int k = 0; k < dim(); ++k)
+    for (int k = dim() - 1; k >= 0; --k)
       if (this->data(k) < other.data(k))
         return true;
       else if (this->data(k) > other.data(k))
@@ -357,7 +357,7 @@ namespace mln::experimental
   constexpr bool _point<Impl>::operator<=(const _point<_i>& other) const noexcept
   {
     assert(dim() == other.dim() && "Point dimensions mistmatch.");
-    for (int k = 0; k < dim(); ++k)
+    for (int k = dim() - 1; k >= 0; --k)
       if (this->data(k) < other.data(k))
         return true;
       else if (this->data(k) > other.data(k))
@@ -406,6 +406,51 @@ namespace mln::experimental
       this->data(k) -= other.data(k);
     return *this;
   }
+
+  template <class Impl, class = std::enable_if_t<Impl::ndim == -1>>
+  auto operator-(_point<Impl> a) noexcept -> ndpoint<-1, decltype(-a[0])>
+  {
+    using R = decltype(-a[0]);
+    ndpoint<-1, R> c(a.dim());
+
+    for (int k = 0; k < a.dim(); ++k)
+      c[k] = -a[k];
+    return c;
+  }
+
+  template <class Impl, class = std::enable_if_t<Impl::ndim != -1>>
+  auto operator-(_point<Impl> a) noexcept -> ndpoint<Impl::ndim, decltype(-a[0])>
+  {
+    using R = decltype(-a[0]);
+    ndpoint<Impl::ndim, R> c;
+
+    for (int k = 0; k < a.dim(); ++k)
+      c[k] = -a[k];
+    return c;
+  }
+
+  template <class Impl, class U, class = std::enable_if_t<Impl::ndim != -1>>
+  auto operator*(U x, _point<Impl> a) noexcept -> ndpoint<Impl::ndim, decltype(x * a[0])>
+  {
+    using R = decltype(x * a[0]);
+    ndpoint<Impl::ndim, R> c;
+
+    for (int k = 0; k < a.dim(); ++k)
+      c[k] = x * a[k];
+    return c;
+  }
+
+  template <class Impl, class U, class = std::enable_if_t<Impl::ndim != -1>>
+  auto operator*(_point<Impl> a, U x) noexcept -> ndpoint<Impl::ndim, decltype(a[0] * x)>
+  {
+    using R = decltype(x * a[0]);
+    ndpoint<Impl::ndim, R> c;
+
+    for (int k = 0; k < a.dim(); ++k)
+      c[k] = a[k] * x;
+    return c;
+  }
+
 
 
   template <class I1, class I2, class = std::enable_if_t<I1::ndim == -1 && I2::ndim == -1>>

@@ -19,11 +19,11 @@ namespace mln::se
 namespace mln::experimental::se
 {
 
-  periodic_line2d::periodic_line2d(point2d delta, int k)
+  periodic_line2d::periodic_line2d(experimental::point2d delta, int k)
   {
     mln_precondition((k >= 0) && "The extent must be positive");
 
-    m_delta = (delta < mln::point2d{0, 0}) ? point2d(-delta) : delta;
+    m_delta = (delta < mln::experimental::point2d{0, 0}) ? experimental::point2d(-delta) : delta;
     m_k     = k;
   }
 

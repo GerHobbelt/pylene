@@ -4,6 +4,7 @@
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/point.hpp>
+#include <mln/core/experimental/point.hpp>
 
 /// \file
 
@@ -81,8 +82,8 @@ namespace mln
       class rng_t : public ::ranges::view_facade<rng_t>
       {
         friend ::ranges::range_access;
-        point2d m_cur;
-        point2d m_delta;
+        mln::experimental::point2d m_cur;
+        mln::experimental::point2d m_delta;
         std::size_t m_k;
 
         auto read() const { return m_cur; }
@@ -91,7 +92,7 @@ namespace mln
         void next() { m_cur += m_delta; --m_k; }
       public:
         rng_t() = default;
-        rng_t(point2d start, point2d delta, std::size_t k)
+        rng_t(mln::experimental::point2d start, mln::experimental::point2d delta, std::size_t k)
           : m_cur{start}
           , m_delta{delta}
           , m_k{k}
@@ -111,7 +112,7 @@ namespace mln
       /// \param V The period.
       /// \param k Half-number of pixels in the line.
       /// \precondition k >= 0
-      periodic_line2d(point2d V, int k);
+      periodic_line2d(mln::experimental::point2d V, int k);
 
       /// \brief Return a range of SE offsets
       rng_t offsets() const;
@@ -125,13 +126,13 @@ namespace mln
       int repetition() const { return m_k; }
 
       /// \brief Return the period
-      point2d period() const { return m_delta; }
+      mln::experimental::point2d period() const { return m_delta; }
 
       /// \brief Return the extent radius
       int radial_extent() const { return m_k; }
 
     private:
-      point2d m_delta;
+      mln::experimental::point2d m_delta;
       int     m_k;
     };
 

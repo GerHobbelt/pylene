@@ -1,9 +1,10 @@
+#include <mln/core/image/view/filter.hpp>
+
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/concepts.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/view/filter.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
@@ -15,8 +16,8 @@ TEST(View, filter_readonly)
 {
   using namespace mln::view::ops;
 
-  mln::box2d        dom = {{-1, -2}, {3, 3}};
-  mln::image2d<int> ima(dom);
+  mln::experimental::box2d        dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<int> ima(dom);
 
   mln::experimental::iota(ima, 0);
   auto x = mln::view::filter(ima, [](int v) { return v > 10; });
@@ -50,8 +51,8 @@ TEST(View, filter_writable)
 {
   using namespace mln::view::ops;
 
-  mln::box2d        dom{{-1, -2}, {3, 3}};
-  mln::image2d<int> ima(dom);
+  mln::experimental::box2d        dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<int> ima(dom);
 
 
   mln::experimental::iota(ima, 0);
@@ -75,8 +76,8 @@ TEST(View, filter_twice)
 {
   using namespace mln::view::ops;
 
-  mln::box2d        dom = {{-1, -2}, {3, 3}};
-  mln::image2d<int> ima(dom);
+  mln::experimental::box2d        dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<int> ima(dom);
 
   mln::experimental::iota(ima, 0);
 
@@ -112,7 +113,7 @@ TEST(View, filter_twice)
       ASSERT_EQ(pix.val(), ima(pix.point()));
   }
 
-  mln::image2d<int> before = mln::clone(ima);
+  mln::experimental::image2d<int> before = mln::clone(ima);
   mln::fill(u, 1);
   {
     mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.new_values(), ima.new_values()))

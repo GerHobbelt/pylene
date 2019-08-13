@@ -17,7 +17,7 @@ namespace mln
   namespace internal
   {
     template <class T>
-    std::byte* ndbuffer_image_allocate(sample_type_id, std::size_t n, const image_build_params& params,
+    std::byte* ndbuffer_image_allocate(std::size_t n, std::size_t /* sz */, const image_build_params& params,
                                        std::shared_ptr<internal::ndbuffer_image_data>& data)
     {
       if (!params.init_value.has_value())
@@ -172,18 +172,18 @@ namespace mln
 
 
     /// \{
-    static __ndbuffer_image<T, N> from_buffer(T* buffer, int sizes[], std::ptrdiff_t strides[] = nullptr,
+    static __ndbuffer_image<T, N> from_buffer(T* buffer, int sizes[], std::ptrdiff_t byte_strides[] = nullptr,
                                               bool copy = false);
 
-    static __ndbuffer_image<T, N> from_buffer(T* buffer, int topleft[], int sizes[], std::ptrdiff_t strides[] = nullptr,
-                                              bool copy = false);
+    static __ndbuffer_image<T, N> from_buffer(T* buffer, int topleft[], int sizes[],
+                                              std::ptrdiff_t byte_strides[] = nullptr, bool copy = false);
 
     template <class E>
     static __ndbuffer_image<T, N> from(const mln::ndimage_base<T, N, E>& other);
     /// \}
 
   private:
-    void __init(alloc_fun_t __allocate, int topleft[], int sizes[], std::ptrdiff_t strides[],
+    void __init(alloc_fun_t __allocate, int topleft[], int sizes[], std::ptrdiff_t byte_strides[],
                 const image_build_params& params);
 
 
@@ -216,10 +216,10 @@ namespace mln
 
 
   template <class T, int N>
-  void __ndbuffer_image<T, N>::__init(alloc_fun_t __allocate, int topleft[], int sizes[], std::ptrdiff_t strides[],
+  void __ndbuffer_image<T, N>::__init(alloc_fun_t __allocate, int topleft[], int sizes[], std::ptrdiff_t byte_strides[],
                                       const image_build_params& params)
   {
-    base::__init(__allocate, sample_type_traits<T>::id(), N, topleft, sizes, strides, params);
+    base::__init(__allocate, sample_type_traits<T>::id(), sizeof(T), N, topleft, sizes, byte_strides, params);
   }
 
   template <class T, int N>
@@ -238,36 +238,36 @@ namespace mln
 
   template <class T, int N>
   __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int topleft[], int sizes[],
-                                                             std::ptrdiff_t strides[], bool copy)
+                                                             std::ptrdiff_t byte_strides[], bool copy)
   {
     image_build_params params;
     params.border = 0; // From external data, no border
 
     alloc_fun_t __alloc;
     if (copy)
-      __alloc = [buffer](sample_type_id, std::size_t n, const image_build_params&,
+      __alloc = [buffer](std::size_t n, std::size_t /* sz */, const image_build_params&,
                          std::shared_ptr<internal::ndbuffer_image_data>& data) -> std::byte* {
         data = std::make_shared<internal::__ndbuffer_image_data<T>>(n);
         std::copy_n(buffer, n, reinterpret_cast<T*>(data->m_buffer));
         return data->m_buffer;
       };
     else
-      __alloc = [buffer](sample_type_id, std::size_t, const image_build_params&,
+      __alloc = [buffer](std::size_t, std::size_t, const image_build_params&,
                          std::shared_ptr<internal::ndbuffer_image_data>&) -> std::byte* {
         return reinterpret_cast<std::byte*>(buffer);
       };
 
 
     __ndbuffer_image<T, N> out;
-    out.__init(__alloc, topleft, sizes, strides, params);
+    out.__init(__alloc, topleft, sizes, byte_strides, params);
     return out;
   }
 
   template <class T, int N>
-  __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int sizes[], std::ptrdiff_t strides[], bool copy)
+  __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int sizes[], std::ptrdiff_t byte_strides[], bool copy)
   {
     int topleft[N] = {0};
-    return __ndbuffer_image<T, N>::from_buffer(buffer, topleft, sizes, strides, copy);
+    return __ndbuffer_image<T, N>::from_buffer(buffer, topleft, sizes, byte_strides, copy);
   }
 
   template <class T, int N>
@@ -436,22 +436,41 @@ namespace mln
   template <class T, int N>
   __ndbuffer_image<T, 2> __ndbuffer_image<T, N>::slice(int z) const
   {
-    auto tmp = this->base::slice(z);
-    return std::move(tmp.template __cast<T, 2>());
+    int begin[N] = {this->__axes(0).domain_begin, this->__axes(1).domain_begin, z};
+    int end[N]   = {this->__axes(0).domain_end,   this->__axes(1).domain_end, z + 1};
+    for (int k = 3; k < m_pdim; ++k)
+    {
+      begin[k] = 0;
+      end[k]   = 1;
+    }
+
+    ndbuffer_image_info_t tmp = *this->__info();
+    Impl::select(&tmp, 2, begin, end);
+    return *Impl::template cast<T, 2>(&tmp);
   }
 
   template <class T, int N>
   __ndbuffer_image<T, 1> __ndbuffer_image<T, N>::row(int y) const
   {
-    auto tmp = this->base::row(y);
-    return std::move(tmp.template __cast<T, 1>());
+    int begin[N] = {m_axes[0].domain_begin, y};
+    int end[N]   = {m_axes[0].domain_end, y + 1};
+    for (int k = 2; k < m_pdim; ++k)
+    {
+      begin[k] = 0;
+      end[k]   = 1;
+    }
+
+    ndbuffer_image_info_t tmp = *this->__info();
+    Impl::select(&tmp, 1, begin, end);
+    return *Impl::template cast<T, 1>(&tmp);
   }
 
   template <class T, int N>
   __ndbuffer_image<T, N> __ndbuffer_image<T, N>::clip(const experimental::ndbox<N>& roi) const
   {
-    auto tmp = this->base::clip(roi);
-    return std::move(tmp.template __cast<T, N>());
+    __ndbuffer_image tmp = *this;
+    Impl::select(&tmp, N, roi.tl().data(), roi.br().data());
+    return tmp;
   }
 
 
@@ -550,7 +569,7 @@ namespace mln
     for (int i = 0; i < N; ++i)
     {
       counts[N - i - 1]  = static_cast<std::size_t>(this->__axes(i).domain_end - this->__axes(i).domain_begin);
-      strides[N - i - 1] = this->__axes(i).stride;
+      strides[N - i - 1] = this->__axes(i).byte_stride / sizeof(T);
     }
     return {this->buffer(), counts, strides};
   }
@@ -563,7 +582,7 @@ namespace mln
     for (int i = 0; i < N; ++i)
     {
       counts[N - i - 1]  = static_cast<std::size_t>(this->__axes(i).domain_end - this->__axes(i).domain_begin);
-      strides[N - i - 1] = this->__axes(i).stride;
+      strides[N - i - 1] = this->__axes(i).byte_stride / sizeof(T);
     }
     return {this->buffer(), counts, strides};
   }
@@ -596,11 +615,11 @@ namespace mln
     {
       coords[k]  = this->__axes(k).domain_begin;
       shp[k]     = static_cast<short>(this->__axes(k).domain_end - this->__axes(k).domain_begin);
-      strides[k] = this->__axes(k).stride;
+      strides[k] = this->__axes(k).byte_stride / sizeof(T);
     }
 
-    auto ptr = &this->at__(coords);
-    return mln::internal::ndimage_extension<T, N>{ptr, strides, shp, this->border()};
+    auto ptr = Impl::get_pointer(this->__info(), coords);
+    return mln::internal::ndimage_extension<T, N>{(char*)ptr, strides, shp, this->border()};
   }
 
 

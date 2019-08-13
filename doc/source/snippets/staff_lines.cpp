@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     mln::se::mask2d se_miss = {{1, 1, 1}, {0, 0, 0}, {1, 1, 1}};
     auto            output  = mln::morpho::hit_or_miss(input, se_hit, se_miss);
     markers1                = output;
-    mln::io::experimental::imsave(not markers1, argv[2]);
+    mln::io::imsave(mln::lnot(markers1), argv[2]);
   } // #M1_END
 
   { // #M2_START
@@ -40,12 +40,12 @@ int main(int argc, char** argv)
     mln::se::mask2d se_miss = {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}};
     auto            output  = mln::morpho::hit_or_miss(input, se_hit, se_miss);
     markers2                = output;
-    mln::io::experimental::imsave(not markers2, argv[3]);
+    mln::io::imsave(mln::lnot(markers2), argv[3]);
   } // #M2_END
 
-  auto markers = markers1 || markers2;
+  auto markers = mln::lor(markers1, markers2);
 
-  mln::io::experimental::imsave(not markers, argv[4]);
+  mln::io::imsave(mln::lnot(markers), argv[4]);
 
   // FIXME: add experimental version
   auto markers_     = mln::lor(markers1, markers2);

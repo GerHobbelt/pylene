@@ -2,9 +2,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <any>
-
-#include <mln/core/image_format.hpp>
 
 namespace mln::internal
 {
@@ -29,7 +26,9 @@ namespace mln::internal
     std::allocator<std::byte> m_allocator;
 
   public:
-    __ndbuffer_image_data(std::size_t n, sample_type_id sample_type);
+
+    /// \param n Number of **bytes** to allocate
+    __ndbuffer_image_data(std::size_t n);
     ~__ndbuffer_image_data() final;
   };
 
@@ -39,6 +38,8 @@ namespace mln::internal
     std::allocator<T> m_allocator;
 
   public:
+
+    /// \param n Number of **elements** to allocate
     __ndbuffer_image_data(std::size_t n)
     {
       this->m_size   = n;

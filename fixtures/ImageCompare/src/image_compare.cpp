@@ -1,14 +1,11 @@
 #include <fixtures/ImageCompare/image_compare.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/experimental/ndbuffer_image.hpp>
 
 
-namespace fixtures::ImageCompare::impl
+namespace fixtures::ImageCompare::experimental::impl
 {
 
-  // Compare two buffer-encoded images
-  ::testing::AssertionResult compare(const mln::ndbuffer_image& a, const mln::ndbuffer_image& b, int comparaison_flags,
-                                     std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn,
-                                     std::function<void(const mln::ndbuffer_image&)> print_fn)
+  ::testing::AssertionResult compare(const mln::ndbuffer_image& a, const mln::ndbuffer_image& b, int comparaison_flags)
   {
     mln::ndbuffer_image A = a;
     mln::ndbuffer_image B = b;
@@ -37,13 +34,14 @@ namespace fixtures::ImageCompare::impl
 
 
     mln::sample_type_id id = a.sample_type();
-    // If the comparison function is not provided, we use memcmp (type are supposed to be trivially comparable
-    if (!linecmp_fn)
-      linecmp_fn = std::memcmp;
+    if (id == mln::sample_type_id::OTHER)
+      return ::testing::AssertionFailure() << "A and B value type is not trivially comparable."; // Cannot be memcmp
 
-    std::size_t n     = a.width() * mln::get_sample_type_id_traits(id).size();
-    auto        a_buf = A.buffer();
-    auto        b_buf = B.buffer();
+    std::size_t n = a.width() * mln::get_sample_type_id_traits(id).size();
+
+
+    auto a_buf = A.buffer();
+    auto b_buf = B.buffer();
 
     for (int w = 0; w < A.size(3); ++w)
       for (int z = 0; z < A.size(2); ++z)
@@ -51,21 +49,8 @@ namespace fixtures::ImageCompare::impl
         {
           const std::byte* alineptr = a_buf + y * a.byte_stride(1) + z * a.byte_stride(2) + w * a.byte_stride(3);
           const std::byte* blineptr = b_buf + y * b.byte_stride(1) + z * b.byte_stride(2) + w * b.byte_stride(3);
-          if (linecmp_fn(alineptr, blineptr, n) != 0)
-          {
-            if (print_fn)
-            {
-              fmt::print("With A = \n");
-              print_fn(a);
-              fmt::print("  and B = \n");
-              print_fn(b);
-            }
-            else
-            {
-              fmt::print("<Input images not printable.\n>");
-            }
+          if (memcmp(alineptr, blineptr, n) != 0)
             return ::testing::AssertionFailure() << "The lines " << y << " differ.";
-          }
         }
 
     return ::testing::AssertionSuccess();

@@ -15,13 +15,6 @@ Core Module
    core/functional
 
 
-
-
-
-
-
-
-
 .. raw:: html
 
          <h2>Images</h2>
@@ -50,11 +43,12 @@ See :doc:`core/images` for a description of the image concepts and image basics.
     :class: full
     :widths: auto
 
-    +----------------------------------------------+--------------------------------------------------------------------------+
-    | :cpp:class:`ndpoint` :cpp:class:`ndpointref` | Generic :doc:`point <core/point>` that hold *n* coordinates              |
-    +----------------------------------------------+--------------------------------------------------------------------------+
-    | :cpp:class:`ndbox` :cpp:class:`ndboxref`     | Generic :doc:`core/box` in *n* dimension                                 |
-    +----------------------------------------------+--------------------------------------------------------------------------+
+    +----------------------------------------------+-------------------------------------------------------------+
+    | :cpp:class:`ndpoint` :cpp:class:`ndpointref` | Generic :doc:`point <core/point>` that hold *n* coordinates |
+    +----------------------------------------------+-------------------------------------------------------------+
+    | :cpp:class:`ndbox` :cpp:class:`ndboxref`     | Generic :doc:`box <core/box>` in *n* dimension              |
+    +----------------------------------------------+-------------------------------------------------------------+
+
 
 
 

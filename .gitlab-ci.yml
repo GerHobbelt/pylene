@@ -47,7 +47,7 @@ build-docker-automatic:
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr pylene_default --build missing
+        - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
@@ -66,7 +66,7 @@ build-docker-automatic:
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr pylene_default --build missing
+        - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$COV -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
@@ -204,7 +204,7 @@ distcheck-linux-clang8-debug-cov-asan-ubsan:
     stage: bench
     script:
         - mkdir build && cd build
-        - conan install .. -pr $BUILD_PROFILE --build missing
+        - conan install .. -pr $BUILD_PROFILE --build missing -e CXX=g++ -e CC=gcc
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION
@@ -261,7 +261,7 @@ distbench-linux-clang8-release:
     stage: test
     script:
         - mkdir build && cd build
-        - conan install .. -pr pylene_default --build missing
+        - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc --config Release
         - mkdir ../public && mv doc/sphinx/* ../public/
@@ -293,8 +293,8 @@ package:
     dependencies: []
     script:
         - mkdir build && cd build
-        - conan install .. -pr pylene_default --build missing
+        - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. --build missing $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+        - conan create .. --build missing -e CXX=g++ -e CC=gcc $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
         - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
     only: [ "dev", "development/ranges" ]

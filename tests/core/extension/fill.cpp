@@ -1,116 +1,96 @@
-#include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/extension/border_management.hpp>
+
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/extension/border_management.hpp>
-#include <mln/core/extension/fill.hpp>
-#include <mln/core/grays.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/view/operators.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
-#include <mln/io/imprint.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <variant>
-
 #include <gtest/gtest.h>
 
 
-TEST(Core, Extension_Fill)
+TEST(BorderManager, Fill_LargeEnough_BM_Auto)
 {
-  using namespace mln;
-  using namespace mln::view::ops;
-
-  image2d<uint8> ima(10, 10);
-  iota(ima, 0);
-  image2d<uint8> out = clone(ima);
-
-  extension::fill(ima, 42);
-
-  ASSERT_TRUE(all_of(ima == out));
-}
+  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::iota(ima, 0);
 
 
-TEST(Core, Fill_LargeEnough_BM_Auto)
-{
-  using namespace mln;
-  using namespace mln::view::ops;
+  mln::experimental::image2d<uint8_t> ref = clone(ima);
+  ref.extension().fill(42);
 
-  image2d<uint8> ima(10, 10);
-  iota(ima, 0);
-  image2d<uint8> out = clone(ima);
-
+  auto bm                        = mln::extension::bm::fill(uint8_t(42));
   auto disc                      = mln::se::disc{1};
-  auto [managed_ima, managed_se] = extension::bm::fill(uint8_t(42)).manage(ima, disc);
+  auto [managed_ima, managed_se] = bm.manage(ima, disc);
 
-  ASSERT_TRUE(
-      std::visit([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima, managed_se));
-  ASSERT_TRUE(std::visit(
-      [&out](auto i, auto) {
-        using namespace mln::view::ops;
-        return all_of(i == out);
+
+  std::visit([](auto i, auto) { ASSERT_TRUE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
+  std::visit(
+      [&ref](auto input, auto) {
+        ASSERT_IMAGES_EQ_EXP2(input, ref, fixtures::ImageCompare::experimental::COMPARE_EXTENSION);
       },
-      managed_ima, managed_se));
-  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima, managed_se);
+      managed_ima, managed_se);
 }
 
-TEST(Core, Fill_NotLargeEnough_BM_Auto)
+TEST(BorderManager, Fill_NotLargeEnough_BM_Auto)
 {
-  using namespace mln;
-  using namespace mln::view::ops;
+  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::iota(ima, 0);
 
-  image2d<uint8> ima(10, 10);
-  iota(ima, 0);
-  image2d<uint8> out             = clone(ima);
-  auto           disc            = mln::se::disc{4};
-  auto [managed_ima, managed_se] = extension::bm::fill(uint8_t(42)).manage(ima, disc);
+  mln::experimental::image2d<uint8_t> ref  = clone(ima);
 
-  ASSERT_FALSE(
-      std::visit([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima, managed_se));
-  ASSERT_TRUE(std::visit(
-      [&out](auto i, auto) {
-        using namespace mln::view::ops;
-        return all_of(i == out);
+  auto bm                        = mln::extension::bm::fill(uint8_t(42));
+  auto disc                      = mln::se::disc{4};
+  auto [managed_ima, managed_se] = bm.manage(ima, disc);
+
+
+  std::visit([](auto i, auto) { ASSERT_FALSE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
+  std::visit(
+      [&ref](auto input, auto) {
+        ASSERT_IMAGES_EQ_EXP(input, ref);
+        EXPECT_EQ(input.at({-3,-3}), 42);
+        EXPECT_EQ(input.at({13, 13}), 42);
       },
-      managed_ima, managed_se));
-  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_NE_EXP(i, ima); }, managed_ima, managed_se);
-  ima.extension().fill(uint8_t(42));
-  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima, managed_se);
+      managed_ima, managed_se);
 }
 
-TEST(Core, Fill_LargeEnough_BM_Native)
+TEST(BorderManager, Fill_LargeEnough_BM_Native)
 {
-  using namespace mln;
-  using namespace mln::view::ops;
+  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::iota(ima, 0);
 
-  image2d<uint8> ima(10, 10);
-  iota(ima, 0);
-  image2d<uint8> out = clone(ima);
 
+  mln::experimental::image2d<uint8_t> ref = clone(ima);
+  ref.extension().fill(42);
+
+  auto bm                        = mln::extension::bm::native::fill(uint8_t(42));
   auto disc                      = mln::se::disc{1};
-  auto [managed_ima, managed_se] = extension::bm::native::fill(uint8_t(42)).manage(ima, disc);
+  auto [managed_ima, managed_se] = bm.manage(ima, disc);
 
-  ASSERT_TRUE(
-      std::visit([](auto i, auto) { return mln::extension::is_finite(i.extension()); }, managed_ima, managed_se));
-  ASSERT_TRUE(std::visit(
-      [&out](auto i, auto) {
-        using namespace mln::view::ops;
-        return all_of(i == out);
+
+  std::visit([](auto i, auto) { ASSERT_TRUE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
+  std::visit(
+      [&ref](auto input, auto) {
+        ASSERT_IMAGES_EQ_EXP2(input, ref, fixtures::ImageCompare::experimental::COMPARE_EXTENSION);
       },
-      managed_ima, managed_se));
-  std::visit([&ima](auto i, auto) { ASSERT_IMAGES_WITH_BORDER_EQ_EXP(i, ima); }, managed_ima, managed_se);
+      managed_ima, managed_se);
 }
 
-TEST(Core, Fill_NotLargeEnough_BM_Native)
+TEST(BorderManager, Fill_NotLargeEnough_BM_Native)
 {
-  using namespace mln;
-  using namespace mln::view::ops;
-
-  image2d<uint8> ima(10, 10);
-  iota(ima, 0);
-  image2d<uint8> out = clone(ima);
+  mln::experimental::image2d<uint8_t> ima(10, 10);
 
   auto disc = mln::se::disc{4};
-  auto bm   = extension::bm::native::fill(uint8_t(42));
+  auto bm   = mln::extension::bm::native::fill(uint8_t(42));
+  EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);
+}
+
+TEST(BorderManager, Fill_bad_cast)
+{
+  mln::experimental::image2d<uint8_t> ima(10, 10);
+
+  auto disc = mln::se::disc{1};
+  auto bm   = mln::extension::bm::native::fill(42);
   EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);
 }

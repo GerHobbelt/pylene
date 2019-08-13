@@ -1,7 +1,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
-#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/mask.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
@@ -13,11 +13,11 @@ TEST(View, mask)
 {
   using namespace mln::view::ops;
 
-  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 7, 8, 9}, //
                            {10, 11, 12, 13, 14}};
 
-  mln::image2d<int> ref = {{0, 42, 2, 42, 4},  //
+  mln::experimental::image2d<int> ref = {{0, 42, 2, 42, 4},  //
                            {42, 6, 42, 8, 42}, //
                            {10, 42, 12, 42, 14}};
 
@@ -49,11 +49,11 @@ TEST(View, mask_twice)
 {
   using namespace mln::view::ops;
 
-  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 7, 8, 9}, //
                            {10, 11, 12, 13, 14}};
 
-  mln::image2d<int> ref = {{0, 42, 2, 3, 4},  //
+  mln::experimental::image2d<int> ref = {{0, 42, 2, 3, 4},  //
                            {42, 6, 7, 8, 42}, //
                            {10, 11, 12, 42, 14}};
 

@@ -2,11 +2,20 @@
 
 namespace mln::details
 {
+  struct ndbuffer_image_impl_base_0
+  {
+    static void select(ndbuffer_image_info_t* ima, int dim, const int begin_coords[], const int end_coords[]);
+    static std::size_t get_sample_byte_size(const ndbuffer_image_info_t* ima);
+
+    template <class T, int pdim>
+    static __ndbuffer_image<T, pdim>* cast(ndbuffer_image_info_t* ima);
+  };
+
   template <class T>
   struct ndbuffer_image_impl_base_1
   {
     static std::size_t get_sample_byte_size(const ndbuffer_image_info_t* ima);
-    static T* get_pointer(const ndbuffer_image_info_t* ima, std::ptrdiff_t index);
+    static T*          get_pointer(const ndbuffer_image_info_t* ima, std::ptrdiff_t index);
   };
 
   template <int pdim>
@@ -17,25 +26,28 @@ namespace mln::details
     // Get the point of the given index
     static void get_point(const ndbuffer_image_info_t* ima, int index, int coordinates[]);
 
-    // Return the index of the gicen coordinates
-    static std::ptrdiff_t get_index(const ndbuffer_image_info_t* ima, const int coordinates[]);
-
     // Return true if the point belongs to the domain
     static bool is_point_in_domain(const ndbuffer_image_info_t* ima, const int coordinates[]);
 
     // Return true if the point belongs to the domain or extension
     static bool is_point_valid(const ndbuffer_image_info_t* ima, const int coordinates[]);
+
+    // Return a pointer to the loc given by p
+    static void* get_pointer(const ndbuffer_image_info_t* ima, const int coordinates[]);
   };
 
 
   template <class T, int pdim>
-  struct ndbuffer_image_impl : ndbuffer_image_impl_base_1<T>, ndbuffer_image_impl_base_2<pdim>
+  struct ndbuffer_image_impl : ndbuffer_image_impl_base_1<T>,
+                               ndbuffer_image_impl_base_2<pdim>,
+                               ndbuffer_image_impl_base_0
   {
     using ndbuffer_image_impl_base_1<T>::get_pointer;
     using ndbuffer_image_impl_base_1<T>::get_sample_byte_size;
     using ndbuffer_image_impl_base_2<pdim>::get_pdim;
-    using ndbuffer_image_impl_base_2<pdim>::get_index;
 
+    // Return the index of the gicen coordinates
+    static std::ptrdiff_t get_index(const ndbuffer_image_info_t* ima, const int coordinates[]);
 
     // Return a pointer to the loc given by p
     static T* get_pointer(const ndbuffer_image_info_t* ima, const int coordinates[]);
@@ -45,6 +57,12 @@ namespace mln::details
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
+
+  template <class T, int pdim>
+  __ndbuffer_image<T, pdim>* ndbuffer_image_impl_base_0::cast(ndbuffer_image_info_t* ima)
+  {
+    return reinterpret_cast<__ndbuffer_image<T, pdim>*>(ima);
+  }
 
   template <int pdim>
   constexpr int ndbuffer_image_impl_base_2<pdim>::get_pdim(const ndbuffer_image_info_t*)
@@ -58,6 +76,11 @@ namespace mln::details
     return ima->m_pdim;
   }
 
+  inline std::size_t ndbuffer_image_impl_base_0::get_sample_byte_size(const ndbuffer_image_info_t* ima)
+  {
+    return ima->m_axes[0].byte_stride;
+  }
+
   template <class T>
   std::size_t ndbuffer_image_impl_base_1<T>::get_sample_byte_size(const ndbuffer_image_info_t*)
   {
@@ -67,7 +90,7 @@ namespace mln::details
   template <>
   inline std::size_t ndbuffer_image_impl_base_1<void>::get_sample_byte_size(const ndbuffer_image_info_t* ima)
   {
-    return get_sample_type_id_traits(ima->m_sample_type).size();
+    return ndbuffer_image_impl_base_0::get_sample_byte_size(ima);
   }
 
 
@@ -92,13 +115,24 @@ namespace mln::details
 
 
   // Return the index of the loc given by p
-  template <int pdim>
-  std::ptrdiff_t ndbuffer_image_impl_base_2<pdim>::get_index(const ndbuffer_image_info_t* ima, const int coordinates[])
+  template <class T, int pdim>
+  std::ptrdiff_t ndbuffer_image_impl<T, pdim>::get_index(const ndbuffer_image_info_t* ima, const int coordinates[])
   {
-    std::ptrdiff_t i = coordinates[0];
-    for (int k = 1; k < get_pdim(ima); ++k)
-      i += coordinates[k] * ima->m_axes[k].stride;
-    return i;
+    std::ptrdiff_t i = 0;
+    for (int k = 0; k < get_pdim(ima); ++k)
+      i += coordinates[k] * ima->m_axes[k].byte_stride;
+    return i / get_sample_byte_size(ima);
+  }
+
+
+
+  template <int pdim>
+  void* ndbuffer_image_impl_base_2<pdim>::get_pointer(const ndbuffer_image_info_t* ima, const int coordinates[])
+  {
+    std::ptrdiff_t x = 0;
+    for (int k = 0; k < get_pdim(ima); ++k)
+      x += coordinates[k] * ima->m_axes[k].byte_stride;
+    return ima->m_buffer + x;
   }
 
 
@@ -106,7 +140,7 @@ namespace mln::details
   template <class T, int pdim>
   T* ndbuffer_image_impl<T, pdim>::get_pointer(const ndbuffer_image_info_t* ima, const int coordinates[])
   {
-    return get_pointer(ima, get_index(ima, coordinates));
+    return reinterpret_cast<T*>(ndbuffer_image_impl_base_2<pdim>::get_pointer(ima, coordinates));
   }
 
   template <class T>
@@ -115,27 +149,23 @@ namespace mln::details
     return reinterpret_cast<T*>(ima->m_buffer + static_cast<std::ptrdiff_t>(index * get_sample_byte_size(ima)));
   }
 
-
   template <int pdim>
   void ndbuffer_image_impl_base_2<pdim>::get_point(const ndbuffer_image_info_t* ima, int index, int coords[])
   {
-    std::ptrdiff_t diff = index;
+    std::ptrdiff_t diff = index *  ndbuffer_image_impl_base_0::get_sample_byte_size(ima);
     for (int i = 0; i < get_pdim(ima); i++)
     {
       coords[i] = ima->m_axes[i].vbox_begin;
-      diff -= coords[i] * ima->m_axes[i].stride;
+      diff -= coords[i] * ima->m_axes[i].byte_stride;
     }
     assert(diff >= 0);
 
     for (int i = get_pdim(ima) - 1; i >= 0; --i)
     {
-      auto q = std::div(diff, ima->m_axes[i].stride);
+      auto q = std::div(diff, ima->m_axes[i].byte_stride);
       coords[i] += static_cast<short>(q.quot);
       diff = q.rem;
     }
   }
-
-
-
 
 } // namespace mln::details

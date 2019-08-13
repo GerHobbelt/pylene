@@ -1,4 +1,7 @@
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/image2d.hpp>
+
+
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
@@ -14,7 +17,7 @@ void Mult_Inplace(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img)
+void Mult_Inplace_New_Values(mln::experimental::image2d<mln::uint8>& img)
 {
   mln_foreach_new (auto& v, img.new_values())
   {
@@ -22,7 +25,7 @@ void Mult_Inplace_New_Values(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Mult_Inplace_New_Pixels(mln::image2d<mln::uint8>& img)
+void Mult_Inplace_New_Pixels(mln::experimental::image2d<mln::uint8>& img)
 {
   mln_foreach_new (auto&& px, img.new_pixels())
   {
@@ -63,7 +66,7 @@ void Mult_C(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obu
   }
 }
 
-void Mult_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Mult_New_Values(const mln::experimental::image2d<mln::uint8>& in, mln::experimental::image2d<mln::uint8>& out)
 {
   auto zipped_values = mln::ranges::view::zip(in.new_values(), out.new_values());
   for (auto&& r : zipped_values.rows())
@@ -75,7 +78,7 @@ void Mult_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8
   }
 }
 
-void Mult_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Mult_New_Pixels(const mln::experimental::image2d<mln::uint8>& in, mln::experimental::image2d<mln::uint8>& out)
 {
   auto zipped_pixels = mln::ranges::view::zip(in.new_pixels(), out.new_pixels());
   for (auto&& r : zipped_pixels.rows())
@@ -97,7 +100,7 @@ void Threshold_Inplace(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img)
+void Threshold_Inplace_New_Values(mln::experimental::image2d<mln::uint8>& img)
 {
   constexpr mln::uint8 t = 128;
 
@@ -107,7 +110,7 @@ void Threshold_Inplace_New_Values(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Threshold_Inplace_New_Pixels(mln::image2d<mln::uint8>& img)
+void Threshold_Inplace_New_Pixels(mln::experimental::image2d<mln::uint8>& img)
 {
   constexpr mln::uint8 t = 128;
 
@@ -154,7 +157,7 @@ void Threshold(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out
   }
 }
 
-void Threshold_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Threshold_New_Values(const mln::experimental::image2d<mln::uint8>& in, mln::experimental::image2d<mln::uint8>& out)
 {
   constexpr mln::uint8 t = 128;
 
@@ -168,7 +171,7 @@ void Threshold_New_Values(const mln::image2d<mln::uint8>& in, mln::image2d<mln::
   }
 }
 
-void Threshold_New_Pixels(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Threshold_New_Pixels(const mln::experimental::image2d<mln::uint8>& in, mln::experimental::image2d<mln::uint8>& out)
 {
   constexpr mln::uint8 t = 128;
 
@@ -191,7 +194,7 @@ void LUT_Inplace(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
   }
 }
 
-void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
+void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::experimental::image2d<mln::uint8>& img)
 {
   mln_foreach_new (auto& v, img.new_values())
   {
@@ -199,7 +202,7 @@ void LUT_Inplace_New_Values(const mln::uint8 LUT[], mln::image2d<mln::uint8>& im
   }
 }
 
-void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
+void LUT_Inplace_New_Pixels(const mln::uint8 LUT[], mln::experimental::image2d<mln::uint8>& img)
 {
   mln_foreach_new (auto&& px, img.new_pixels())
   {
@@ -239,7 +242,7 @@ void LUT_C(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffer, mln::u
   }
 }
 
-void LUT_New_Values(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void LUT_New_Values(const mln::uint8 LUT[], const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto zipped_values = mln::ranges::view::zip(input.new_values(), output.new_values());
   for (auto&& r : zipped_values.rows())
@@ -251,7 +254,7 @@ void LUT_New_Values(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& inpu
   }
 }
 
-void LUT_New_Pixels(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void LUT_New_Pixels(const mln::uint8 LUT[], const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto zipped_pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto&& r : zipped_pixels.rows())

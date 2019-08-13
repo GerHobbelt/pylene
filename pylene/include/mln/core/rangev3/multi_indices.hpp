@@ -68,7 +68,7 @@ namespace mln::ranges
       template <class T>
       constexpr static decltype(auto) __back(T&& x)
       {
-        return row_major ? std::forward<T>(x).back() : std::forward<T>(x).front();
+        return row_major ? std::forward<T>(x)[Rank - 1] : std::forward<T>(x)[0];
       }
 
       template <class T>

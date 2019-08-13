@@ -37,7 +37,7 @@ namespace mln
     {
       struct axis_info_t
       {
-        std::ptrdiff_t stride;
+        std::ptrdiff_t byte_stride;
         int            domain_begin;
         int            domain_end;
         int            vbox_begin;
@@ -53,7 +53,7 @@ namespace mln
   } // namespace details
 
   template <>
-  class __ndbuffer_image<void, -1> : private details::ndbuffer_image_info_t
+  class __ndbuffer_image<void, -1> : protected details::ndbuffer_image_info_t
   {
   public:
     static constexpr int DEFAULT_BORDER_SIZE = 3;
@@ -121,12 +121,17 @@ namespace mln
   public:
     /// \{
     static __ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, const int sizes[],
-                                        const std::ptrdiff_t strides[] = nullptr, bool copy = false);
+                                        const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false);
     static __ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, const int topleft[],
-                                        const int sizes[], const std::ptrdiff_t strides[] = nullptr, bool copy = false);
+                                        const int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false);
 
+    /// Convert from legacy image
     template <class T, unsigned dim, typename E>
     static __ndbuffer_image from(const mln::ndimage_base<T, dim, E>& other);
+
+    /// Convert to legacy image
+    template <class T, unsigned dim, typename E>
+    void to(mln::ndimage_base<T, dim, E>& other, bool copy);
     /// \}
 
     /// \brief Geometry information
@@ -166,6 +171,12 @@ namespace mln
     /// \param[in] delta The domain inflation value. It can be negative.
     /// \precondition The extension must be wide enough, i.e. delta < border()
     void inflate_domain(int delta);
+
+
+    /// \brief Inflate the domain to match the underlying extension
+    ///
+    /// \note No memory reallocation is performed by the method
+    void inflate_domain_to_extension();
     /// \}
 
 
@@ -196,7 +207,6 @@ namespace mln
     __ndbuffer_image<T, N>* cast_to();
     /// \}
 
-  protected:
     template <class T, int N>
     __ndbuffer_image<T, N>& __cast();
 
@@ -205,20 +215,20 @@ namespace mln
 
   protected:
     /// Private and unsafe API (no bound checking) to be used with type-safe and downstream classes
-    __ndbuffer_image __select(int dim, const int begin_coords[], const int end_coords[]) const;
 
   protected:
-    using alloc_fun_t = std::function<std::byte*(sample_type_id, std::size_t, const image_build_params&,
+    using alloc_fun_t = std::function<std::byte*(std::size_t, std::size_t, const image_build_params&,
                                                  std::shared_ptr<internal::ndbuffer_image_data>&)>;
 
     // Note __init is called from a constructor, we need to pass the allocation function from children (it cannot be
     // made virtual !!) Create from a custom storage (either external or internal)
-    void __init(alloc_fun_t __allocate, sample_type_id sample_type, int dim, const int topleft[], const int sizes[],
-                const std::ptrdiff_t strides[], const image_build_params& params);
+    void __init(alloc_fun_t __allocate, sample_type_id sample_type, std::size_t sample_type_size, int dim,
+                const int topleft[], const int sizes[], const std::ptrdiff_t byte_strides[],
+                const image_build_params& params);
 
 
     static __ndbuffer_image __from_legacy_image(std::byte* buffer, sample_type_id sample_type, int dim, const int topleft[],
-                                                const int sizes[], const std::ptrdiff_t strides[], int border);
+                                                const int sizes[], const std::ptrdiff_t byte_strides[], int border);
 
   private:
     std::shared_ptr<internal::ndbuffer_image_data> m_data;
@@ -305,11 +315,33 @@ namespace mln
     {
       topleft[i] = domain.pmin[dim - i - 1];
       sizes[i]   = domain.pmax[dim - i - 1] - domain.pmin[dim - i - 1];
-      strides[i] = other.strides(dim - i - 1) / sizeof(T);
-      assert(other.strides(dim - i - 1) % sizeof(T) == 0);
+      strides[i] = other.strides(dim - i - 1);
     }
 
     return __from_legacy_image(reinterpret_cast<std::byte*>(const_cast<T*>(other.data())), sample_type_traits<T>::id(), dim, topleft, sizes, strides, other.border());
   }
+
+
+  template <class T, unsigned dim, typename E>
+  void __ndbuffer_image<void, -1>::to(mln::ndimage_base<T, dim, E>& other, bool copy)
+  {
+    assert(dim == m_pdim);
+    assert(sample_type_traits<T>::id() == m_sample_type);
+
+    typename E::domain_type domain;
+    std::size_t strides[dim];
+
+    std::byte* ptr = m_buffer;
+    for (int i = 0; i < static_cast<int>(dim); ++i)
+    {
+      domain.pmin[i] = m_axes[dim - 1 - i].vbox_begin;
+      domain.pmax[i] = m_axes[dim - 1 - i].vbox_end;
+      strides[i]     = m_axes[dim - 1 - i].byte_stride;
+      ptr += domain.pmin[i] * strides[i];
+    }
+    other = E::from_buffer(ptr, domain, strides, copy);
+    other.inflate_domain(-this->border());
+  }
+
 
 } // namespace mln

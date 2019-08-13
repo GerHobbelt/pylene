@@ -6,20 +6,6 @@ Images defined by a vector of point -> value are not accessible (ima(p))
 
 Forsee to add pdim (point) and vdim (value) for dimension constant in iamge concept
 
-.. toctree::
-   :hidden:
-   
-   view/cast
-   view/clip
-   view/channel
-   view/filter
-   view/mask
-   view/maths
-   view/operators
-   view/rgb
-   view/transform
-   view/zip
-
 
 .. contents::
    :local:
@@ -629,12 +615,24 @@ Indexable Image Concept
 Image Views
 ===========
 
-
+.. toctree::
+   view/cast
+   view/clip
+   view/channel
+   view/filter
+   view/mask
+   view/maths
+   view/operators
+   view/rgb
+   view/transform
+   view/zip
 
 
 Predefined images types
 =======================
 
-FIXME
+.. toctree::
+   images/ndimage
+
 
 

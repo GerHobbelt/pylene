@@ -9,7 +9,7 @@
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
-#include <cmath>
+#include <mln/core/image/experimental/ndimage.hpp>
 
 
 void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
@@ -27,23 +27,20 @@ void Sum(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output
   }
 }
 
+
 void Sum_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
   for (auto rows : pixels.rows())
-    for ([[maybe_unused]] auto&& [pxIn, pxOut] : rows)
+    for (auto&& [pxIn, pxOut] : rows)
     {
       int tmp = 0;
-#ifdef PYLENE_GCC8_WORKAROUND
-      (void)pxIn;
-      (void)pxOut;
-#else
       for (auto nx : mln::experimental::c8(pxIn))
         tmp += nx.val();
-#endif
       pxOut.val() = tmp;
     }
 }
+
 
 
 void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
@@ -79,6 +76,7 @@ void Sum_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer,
   }
 }
 
+
 void Average_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
@@ -91,6 +89,7 @@ void Average_New(const mln::experimental::image2d<mln::uint8>& input, mln::exper
       pxOut.val() = tmp / 8;
     }
 }
+
 
 
 void Average(const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
@@ -174,6 +173,7 @@ void Erosion_New(const mln::experimental::image2d<mln::uint8>& input, mln::exper
     }
 }
 
+
 void Erosion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
                std::ptrdiff_t stride)
 {
@@ -231,6 +231,7 @@ void Isotropic_Diffusion(const mln::image2d<mln::uint8>& input, mln::image2d<mln
   }
 }
 
+
 void Isotropic_Diffusion_New(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
 {
   auto pixels = mln::ranges::view::zip(input.new_pixels(), output.new_pixels());
@@ -243,6 +244,7 @@ void Isotropic_Diffusion_New(const mln::experimental::image2d<mln::uint8>& input
       pxOut.val() = pxIn.val() + (tmp - 4 * pxIn.val()) / 8;
     }
 }
+
 
 void Isotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width, int height,
                            std::ptrdiff_t stride)
@@ -313,6 +315,7 @@ void Anisotropic_Diffusion_New(const mln::experimental::image2d<mln::uint8>& inp
     }
 }
 
+
 void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* __restrict obuffer, int width,
                              int height, std::ptrdiff_t stride)
 {
@@ -342,3 +345,4 @@ void Anisotropic_Diffusion_C(const mln::uint8* __restrict ibuffer, mln::uint8* _
     obuffer += stride;
   }
 }
+

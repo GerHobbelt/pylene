@@ -7,6 +7,7 @@
 
 #include <numeric>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 #include <gtest/gtest.h>
 
 
@@ -69,37 +70,6 @@ enum
   MLN_COMPARE_DOMAIN = 0x01,
   MLN_COMPARE_EXTENSION = 0x02
 };
-
-
-
-::testing::AssertionResult compare_images(const mln::ndbuffer_image& a, const mln::ndbuffer_image& b, int comparaison_flags = 0)
-{
-  (void) comparaison_flags;
-
-  if (a.sample_type() != b.sample_type())
-    return ::testing::AssertionFailure() << "A and B sample types differ.";
-
-  if (a.pdim() != b.pdim())
-    return ::testing::AssertionFailure() << "A and B dimension differ.";
-
-  mln::sample_type_id id = a.sample_type();
-  assert(id != mln::sample_type_id::OTHER && "Cannot be memcmp-ed"); // Cannot be memcmp
-
-
-  std::size_t           n  = a.width() * mln::get_sample_type_id_traits(id).size();
-
-  for (int w = 0; w < a.size(3); ++w)
-    for (int z = 0; z < a.size(2); ++z)
-      for (int y = 0; y < a.size(1); ++y)
-      {
-        const std::byte* alineptr = a.buffer() + y * a.byte_stride(1) + z * a.byte_stride(2) + w * a.byte_stride(3);
-        const std::byte* blineptr = b.buffer() + y * b.byte_stride(1) + z * b.byte_stride(2) + w * b.byte_stride(3);
-        if (memcmp(alineptr, blineptr, n) != 0)
-          return ::testing::AssertionFailure() << "The lines " << y << " differ.";
-      }
-
-  return ::testing::AssertionSuccess();
-}
 
 
 /******************************************/
@@ -818,7 +788,9 @@ TEST(ndbuffer_image, clip_valid_roi)
 
 
   auto f = img.clip(roi);
-
+  EXPECT_EQ(f.domain(), roi);
+  EXPECT_EQ(*static_cast<const uint32_t*>(f({2,5})), 52);
+  EXPECT_EQ(*static_cast<const uint32_t*>(f({6,9})), 96);
   EXPECT_EQ(f.width(), 5);
   EXPECT_EQ(f.height(), 5);
   EXPECT_EQ(f.domain(), roi);
@@ -1267,7 +1239,7 @@ void image_test_write(I& img)
   for (auto row : mln::ranges::rows(vals))
     for (auto& v : row)
       v = i++;
-  ASSERT_TRUE(compare_images(img, ref));
+  ASSERT_IMAGES_EQ_EXP(img, ref);
 }
 
 TEST(image2d, value_range_read)
@@ -1357,7 +1329,7 @@ void image_test_pix_write(I& img)
     y++;
   }
 
-  ASSERT_TRUE(compare_images(img, ref));
+  ASSERT_IMAGES_EQ_EXP(img, ref);
 }
 
 TEST(image2d, pixel_range_read)

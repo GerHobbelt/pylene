@@ -12,7 +12,7 @@ Include:
 
 .. cpp:namespace:: mln
 
-N-dimensional buffer images :cpp:class:`__ndbuffer_image`
+N-dimensional buffer images :cpp:class:`__ndbuffer_image` 
 are the most common image types that stores elements within a buffer.
 
 Memory layout and memory management
@@ -32,27 +32,24 @@ the last reference goes out.
 While the type of the element `T` and the number of dimension `pdim` are
 known at compile-time, :cpp:class:`__ndbuffer_image` supports partial type and dimension erasure.
 
-
-
-+------+--------------+-----------------------------------------+----------------------+
-| T    | pdim         | Type alias                              | Description          |
-+======+==============+=========================================+======================+
-| void | dynamic = -1 | :cpp:any:``ndbuffer_image``             | Full type-erased     |
-+------+--------------+-----------------------------------------+----------------------+
-| T    | 1            | :cpp:any:``image1d\<T> <image1d>``      | 1d image type        |
-+------+--------------+-----------------------------------------+----------------------+
-| T    | 2            | :cpp:any:``image2d\<T> <image2d>``      | 2d image type        |
-+------+--------------+-----------------------------------------+----------------------+
-| T    | 3            | :cpp:any:``image3d\<T> <image3d>``      | 3d image type        |
-+------+--------------+-----------------------------------------+----------------------+
-| T    | N            | :cpp:any:``ndimage\<T, N> <ndimage>``   | nd image type        |
-+------+--------------+-----------------------------------------+----------------------+
++------+--------------+---------------------------+------------------------+
+|  T   |     pdim     |        Type alias         |      Description       |
++======+==============+===========================+========================+
+| void | dynamic = -1 | :cpp:any:`ndbuffer_image` | Full type-erased image |
++------+--------------+---------------------------+------------------------+
+| T    | 1            | :cpp:any:`image1d\<T>`    | 1d image type          |
++------+--------------+---------------------------+------------------------+
+| T    | 2            | :cpp:any:`image2d\<T>`    | 2d image type          |
++------+--------------+---------------------------+------------------------+
+| T    | 3            | :cpp:any:`image3d\<T>`    | 3d image type          |
++------+--------------+---------------------------+------------------------+
+| T    | N            | :cpp:any:`ndimage\<T, N>` | nd image type          |
++------+--------------+---------------------------+------------------------+
 
 .. cpp:type:: ndbuffer_image = __ndbuffer_image<void, dynamic>
-.. cpp:type:: template <class T> image1d = __ndbuffer_image<T, 1>
-.. cpp:type:: template <class T> image2d = __ndbuffer_image<T, 2>
-.. cpp:type:: template <class T> image3d = __ndbuffer_image<T, 3>
-.. cpp:type:: template <class T, int N> ndimage = __ndbuffer_image<T, N>
+.. cpp:type:: template <class T> image1d<T> = __ndbuffer_image<T, 1>
+.. cpp:type:: template <class T> image2d<T> = __ndbuffer_image<T, 2>
+.. cpp:type:: template <class T> image3d<T> = __ndbuffer_image<T, 3>
 
 Border management
 *****************
@@ -71,18 +68,18 @@ Overview of the n-dimensional image API
     :stub-columns: 1
     :class: table-synopsis
 
-    *   -
+    *   - 
         - ``__ndbuffer_image<void, dynamic>``
         - ``__ndbuffer_image<T, N>``
     *   - Constructors
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::__ndbuffer_image
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::__ndbuffer_image
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::__ndbuffer_image
     *   - Constructors from external sources
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::from_buffer
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::from_buffer
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::from_buffer
     *   - Resizing
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::resize
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::resize
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::resize
     *   - Geometry information
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::pdim
                          __ndbuffer_image<void, dynamic>::width
@@ -91,13 +88,13 @@ Overview of the n-dimensional image API
                          __ndbuffer_image<void, dynamic>::size
                          __ndbuffer_image<void, dynamic>::border
                          __ndbuffer_image<void, dynamic>::domain
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::pdim
-                         template <class T, int N> __ndbuffer_image::width
-                         template <class T, int N> __ndbuffer_image::height
-                         template <class T, int N> __ndbuffer_image::depth
-                         template <class T, int N> __ndbuffer_image::size
-                         template <class T, int N> __ndbuffer_image::border
-                         template <class T, int N> __ndbuffer_image::domain
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::pdim
+                         template <class T, int N> __ndbuffer_image<T, N>::width
+                         template <class T, int N> __ndbuffer_image<T, N>::height
+                         template <class T, int N> __ndbuffer_image<T, N>::depth
+                         template <class T, int N> __ndbuffer_image<T, N>::size
+                         template <class T, int N> __ndbuffer_image<T, N>::border
+                         template <class T, int N> __ndbuffer_image<T, N>::domain
 
     *   - Data & Layout information
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::sample_type
@@ -106,35 +103,35 @@ Overview of the n-dimensional image API
                          __ndbuffer_image<void, dynamic>::stride
                          __ndbuffer_image<void, dynamic>::index_of_point
                          __ndbuffer_image<void, dynamic>::point_at_index
-                         __ndbuffer_image<void, dynamic>::delta_index
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::sample_type
-                         template <class T, int N> __ndbuffer_image::buffer
-                         template <class T, int N> __ndbuffer_image::byte_stride
-                         template <class T, int N> __ndbuffer_image::stride
-                         template <class T, int N> __ndbuffer_image::index_of_point
-                         template <class T, int N> __ndbuffer_image::point_at_index
-                         template <class T, int N> __ndbuffer_image::delta_index
+                         __ndbuffer_image<void, dynamic>::delta_index      
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::sample_type
+                         template <class T, int N> __ndbuffer_image<T, N>::buffer
+                         template <class T, int N> __ndbuffer_image<T, N>::byte_stride
+                         template <class T, int N> __ndbuffer_image<T, N>::stride
+                         template <class T, int N> __ndbuffer_image<T, N>::index_of_point
+                         template <class T, int N> __ndbuffer_image<T, N>::point_at_index
+                         template <class T, int N> __ndbuffer_image<T, N>::delta_index 
     *   - Data accessors
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::operator()
                          __ndbuffer_image<void, dynamic>::at
                          __ndbuffer_image<void, dynamic>::operator[]
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::operator()
-                         template <class T, int N> __ndbuffer_image::at
-                         template <class T, int N> __ndbuffer_image::operator[]
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::operator()
+                         template <class T, int N> __ndbuffer_image<T, N>::at
+                         template <class T, int N> __ndbuffer_image<T, N>::operator[]
     *   - Slicing & clipping operations
         - .. cpp:alias::  __ndbuffer_image<void, dynamic>::clip
                           __ndbuffer_image<void, dynamic>::row
-                          __ndbuffer_image<void, dynamic>::slice
-        - .. cpp:alias::  template <class T, int N> __ndbuffer_image::clip
-                          template <class T, int N> __ndbuffer_image::row
-                          template <class T, int N> __ndbuffer_image::slice
+                          __ndbuffer_image<void, dynamic>::slice 
+        - .. cpp:alias::  template <class T, int N> __ndbuffer_image<T, N>::clip
+                          template <class T, int N> __ndbuffer_image<T, N>::row
+                          template <class T, int N> __ndbuffer_image<T, N>::slice
     *   - Casting operators
         - .. cpp:alias:: __ndbuffer_image<void, dynamic>::cast_to
         - Implicitely convertible to :cpp:any:`ndbuffer_image`
     *   - Iteration facilities
         -
-        - .. cpp:alias:: template <class T, int N> __ndbuffer_image::values()
-                     template <class T, int N> __ndbuffer_image::pixels()
+        - .. cpp:alias:: template <class T, int N> __ndbuffer_image<T, N>::values()
+                     template <class T, int N> __ndbuffer_image<T, N>::pixels()
 
 
 API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
@@ -146,7 +143,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
 
     .. cpp:type:: point_type = Point
                   value_type = void*
-                  index_type = int
+                  index_type = int 
                   domain_type = Box
 
 
@@ -210,26 +207,26 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
                     __ndbuffer_image(sample_type_id sample_type, int width, const image_build_params& params = {})
                     __ndbuffer_image(sample_type_id sample_type, int width, int height, const image_build_params& params = {})
                     __ndbuffer_image(sample_type_id sample_type, int width, int height, int depth, const image_build_params& params = {})
-
+                    
 
         Creates an image of dimensions given by `domain` with the given `sample_type`. The overloads are provided for convenience:
-
+        
         2. Creates a 1d image of the given `width`
         3. Creates a 2d image of size `width × height`
         4. Creates a 3d image of size `width × height × depth`
 
         By default, the memory is left default-initialized.
         The optional `params` parameter can be used to provide advanced initialization information:
-
+            
         * `params.init_value` can be used to value-initialize the buffer
-        * `params.border` can be used to allocate the image with a given border size.
+        * `params.border` can be used to allocate the image with a given border size. 
 
         .. code-block::
 
             // Create a 3d image of size (width=2, height=3, depth=4) with type uint8_t and default border width (3)
             // and random values
             ndbuffer_image a(sample_type_id::UINT8, 2, 3, 4);
-
+            
 
             // Create a 2d image of size (width=5, height=5) with type uint16_t and border width = 5px
             // with values set to zero.
@@ -243,7 +240,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
 
     .. cpp:function:: __ndbuffer_image(const __ndbuffer_image& other, const image_build_params&)
 
-        Initialization constructor
+        Initialization constructor 
 
 
     .. cpp:function:: template <class T> __ndbuffer_image(std::initializer_list<T>)
@@ -260,9 +257,9 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
 
     .. rubric:: Construction from external buffers
 
-    .. cpp:function:: static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, const \
-            int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false)
-            static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, const \
+    .. cpp:function:: static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, const\
+            int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false)                                       
+            static ndbuffer_image from_buffer(std::byte* buffer, sample_type_id sample_type, int dim, const\
             int topleft[], const int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false)
 
             Constructs an image using an external buffer.
@@ -287,7 +284,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
                       void resize(sample_type_id sample_type, ConstBoxRef domain, const image_build_params& = {})
 
         See the corresponding contructors. These functions allow an image to be default-constructed and resized afterward.
-
+        
         .. note::
             A new buffer is allocated. If a buffer was already attached to the image and this is the last
             reference, the memory is reclaimed.
@@ -304,7 +301,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
 
     .. cpp:function:: int height() const noexcept
 
-        Get the height of the image (0 if empty). Returns 1 if the image is 1D.
+        Get the height of the image (0 if empty). Returns 1 if the image is 1D. 
 
 
     .. cpp:function:: int depth() const noexcept
@@ -328,7 +325,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
     .. cpp:function:: sample_type_id                sample_type() const noexcept
 
         Get the sample type of the data.
-
+    
     .. cpp:function:: std::byte*                    buffer() const noexcept
 
         Get a pointer to first element (in the domain).
@@ -344,7 +341,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
     .. cpp:function:: index_type  index_of_point(ConstPointRef p) const noexcept
 
         Get the linear index (offset in the buffer) of multi-dimensional point.
-
+ 
     .. cpp:function:: point_type  point_at_index(index_type i) const noexcept
 
         Get the point corresponding to the given index.
@@ -363,14 +360,14 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
         :except: std::runtime_error if `y` in invalid or `dim() != 3`.
 
     .. cpp:function:: ndbuffer_image row(int y) const
-
+    
         Return the row at coordinate `y` in the 2nd dimension.
 
         :except: std::runtime_error if `y` in invalid or `dim() != 2`.
-
+    
     .. cpp:function:: ndbuffer_image clip(ConstBoxRef roi) const
 
-        Return the image restricted to the ROI `roi`. `roi` must be included in the domain.
+        Return the image restricted to the ROI `roi`. `roi` must be included in the domain. 
 
         :except: std::runtime_error if ``domain().includes(roi)`` is false or dimensions mismatch.
 
@@ -379,21 +376,21 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
 
     .. cpp:function:: const void* operator() (ConstPointRef p) const noexcept
                       void* operator() (ConstPointRef p) noexcept
-
+ 
         Returns a pointer to the element at `p`.
-
+        
         **Precondition**:  ``this->domain().has(p)``
 
     .. cpp:function:: const void* at (ConstPointRef p) const noexcept
                       void* at (ConstPointRef p) noexcept
-
+ 
         Returns a pointer to the element at `p`. `p` can be in the extension.
-
+        
         **Precondition**:  `p` belongs to the extended domain.
 
     .. cpp:function:: const void* operator[] (index_type i) const noexcept
                       void* operator[] (index_type i) noexcept
-
+ 
         Returns a pointer to the element at index `i`.
 
         **Precondition**: `i` must be a valid index.
@@ -402,9 +399,9 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
     .. rubric:: Casting operators
 
     .. cpp:function:: template <class T, int N>\
-                        const __ndbuffer_image* cast_to() const
+                        const __ndbuffer_image<T, N>* cast_to() const
                       template <class T, int N>\
-                        __ndbuffer_image* cast_to()
+                        __ndbuffer_image<T, N>* cast_to()
 
         Down-cast (or trans-cast) to the requested n-dimensional image type. Returns `nullptr` if the requested types do
         not match the dynamic type information.
@@ -421,7 +418,7 @@ API Reference of the dynamic N-dimensional buffer images (`ndbuffer_image`)
 API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 *************************************************************************
 
-.. cpp:class:: template <class T, int N> __ndbuffer_image
+.. cpp:class:: template <class T, int N> __ndbuffer_image<T, N>
 
     .. rubric:: Type definitions
 
@@ -430,7 +427,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
                   index_type = int
                   domain_type = ndbox<N>
                   pixel_type
-                  const_pixel_type
+                  const_pixel_type  
 
     .. rubric:: Constructors
 
@@ -495,29 +492,29 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 
     .. cpp:function:: __ndbuffer_image(ndbox<N> domain, const image_build_params& = {})
                     [[when N = 1]] __ndbuffer_image(int width, const image_build_params& params = {})
-                    [[when N = 2]] __ndbuffer_image(int width, int height, const image_build_params& params = {})
+                    [[when N = 2]] __ndbuffer_image(int width, int height, const image_build_params& params = {}) 
                     [[when N = 3]] __ndbuffer_image(int width, int height, int depth, const image_build_params& params = {})
-
+                    
 
         Creates an image of dimensions given by `domain` with value type given by ``T``. The overloads are provided for
         convenience and availability depends on ``N``:
-
+        
         2. **When N = 1** Creates a 1d image of the given `width`
         3. **When N = 2** Creates a 2d image of size `width × height`
         4. **When N = 3** Creates a 3d image of size `width × height × depth`
 
         By default, the memory is left default-initialized.
         The optional `params` parameter can be used to provide advanced initialization information:
-
+        
         * `params.init_value` can be used to value-initialize the buffer
-        * `params.border` can be used to allocate the image with a given border size.
+        * `params.border` can be used to allocate the image with a given border size. 
 
         .. code-block::
 
             // Create a 3d image of size (width=2, height=3, depth=4) with type uint8_t and default border width (3)
             // and random values
             image3d<uint8_t> a(2, 3, 4);
-
+            
 
             // Create a 2d image of size (width=5, height=5) with type uint16_t and border width = 5px
             // with values set to zero.
@@ -528,7 +525,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 
     .. cpp:function:: __ndbuffer_image(const __ndbuffer_image& other, const image_build_params&)
 
-        Initialization constructor
+        Initialization constructor 
 
 
     .. cpp:function:: [[when N = 1]] __ndbuffer_image(std::initializer_list<T>)
@@ -547,7 +544,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 
     .. rubric:: Construction from external buffers
 
-    .. cpp:function:: static ndbuffer_image from_buffer(T* buffer, const int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false)
+    .. cpp:function:: static ndbuffer_image from_buffer(T* buffer, const int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false)                                       
             static ndbuffer_image from_buffer(T* buffer, const int topleft[], const int sizes[], const std::ptrdiff_t byte_strides[] = nullptr, bool copy = false)
 
             Constructs an image using an external buffer.
@@ -570,7 +567,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
                       void resize(ConstBoxRef domain, const image_build_params& = {})
 
         See the corresponding contructors. These functions allow an image to be default-constructed and resized afterward.
-
+        
         .. note::
             A new buffer is allocated. If a buffer was already attached to the image and this is the last
             reference, the memory is reclaimed.
@@ -588,7 +585,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 
     .. cpp:function:: int height() const noexcept
 
-        Get the height of the image. Returns 1 if the image is 1D.
+        Get the height of the image. Returns 1 if the image is 1D. 
 
 
     .. cpp:function:: int depth() const noexcept
@@ -612,7 +609,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
     .. cpp:function:: sample_type_id sample_type() const noexcept
 
         Get the sample type of the data.
-
+    
     .. cpp:function:: T* buffer() const noexcept
 
         Get a pointer to first element (in the domain).
@@ -628,7 +625,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
     .. cpp:function:: index_type  index_of_point(ndpoint<N> p) const noexcept
 
         Get the linear index (offset in the buffer) of multi-dimensional point.
-
+ 
     .. cpp:function:: ndpoint<N>  point_at_index(index_type i) const noexcept
 
         Get the point corresponding to the given index.
@@ -648,14 +645,14 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
         **exceptions**: std::runtime_error if `z` is invalid
 
     .. cpp:function:: [[when N = 2]] image1d<T> row(int y) const noexcept
-
+    
         Return the row at coordinate `y` in the 2nd dimension.
 
         **exceptions**: std::runtime_error if `y` is invalid
+    
+    .. cpp:function:: __ndbuffer_image<T, N> clip(ndbox<N> roi) const
 
-    .. cpp:function:: __ndbuffer_image clip(ndbox<N> roi) const
-
-        Return the image restricted to the ROI `roi`. `roi` must be included in the domain.
+        Return the image restricted to the ROI `roi`. `roi` must be included in the domain. 
 
         :except: std::runtime_error if ``domain().includes(roi)`` is false or dimensions mismatch.
 
@@ -664,21 +661,21 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 
     .. cpp:function:: const T& operator() (ndpoint<N> p) const noexcept
                       T& operator() (ndpoint<N> p) noexcept
-
+ 
         Returns a reference to the element at `p`.
-
+        
         **Precondition**:  ``this->domain().has(p)``
 
     .. cpp:function:: const T& at (ndpoint<N> p) const noexcept
                       T& at (ndpoint<N> p) noexcept
-
+ 
         Returns a reference to the element at `p`. `p` can be in the extension.
-
+        
         **Precondition**:  `p` belongs to the extended domain.
 
     .. cpp:function:: const T& operator[] (index_type i) const noexcept
                       T& operator[] (index_type i) noexcept
-
+ 
         Returns a reference to the element at index `i`.
 
         **Precondition**: `i` must be a valid index.
@@ -687,7 +684,7 @@ API Reference of the static N-dimensional buffer images (`ndimage<T, N>`)
 
     .. cpp:function:: auto values() const
                       auto values()
-
+        
         Returns a range to iterate on image values.
 
     .. cpp:function:: auto pixels() const

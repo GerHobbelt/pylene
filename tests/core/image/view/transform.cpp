@@ -1,3 +1,5 @@
+#include <mln/core/image/view/transform.hpp>
+
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/equal.hpp>
 #include <mln/core/algorithm/fill.hpp>
@@ -5,10 +7,9 @@
 #include <mln/core/concept/new/archetype/image.hpp>
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/pixels.hpp>
-#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/core/image/view/transform.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
@@ -19,14 +20,12 @@
 
 TEST(Core, TransformedImage_transform_byval_rvalue)
 {
-  using namespace mln;
+  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<int> ima(dom);
 
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
-
-  iota(ima, 0);
+  mln::iota(ima, 0);
   {
-    auto out = view::transform(ima, [](int x) { return x * 2; });
+    auto out = mln::view::transform(ima, [](int x) { return x * 2; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
@@ -62,14 +61,12 @@ TEST(Core, TransformedImage_transform_byval_rvalue)
 
 TEST(Core, TransformedImage_transform_byval_chain)
 {
-  using namespace mln;
+  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<int> ima(dom);
 
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
-
-  iota(ima, 0);
+  mln::iota(ima, 0);
   {
-    auto out = view::transform(view::transform(ima, [](int x) { return x * 2; }), [](int x) { return x * 2; });
+    auto out = mln::view::transform(mln::view::transform(ima, [](int x) { return x * 2; }), [](int x) { return x * 2; });
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
     static_assert(mln::concepts::ConcreteImage<decltype(ima)>);
@@ -103,15 +100,13 @@ TEST(Core, TransformedImage_transform_byval_chain)
 
 TEST(Core, Transform_Support_Writable)
 {
-  using namespace mln;
-
   typedef std::pair<int, int> V;
 
-  box2d      dom{{-1, -2}, {3, 3}};
-  image2d<V> ima(dom);
+  mln::experimental::box2d      dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<V> ima(dom);
   {
-    auto c1 = view::transform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
-    auto c2 = view::transform(ima, [](const std::pair<int, int>& x) { return x.second; });
+    auto c1 = mln::view::transform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
+    auto c2 = mln::view::transform(ima, [](const std::pair<int, int>& x) { return x.second; });
     fill(ima, std::make_pair(12, 12));
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -173,9 +168,15 @@ int times_two(int x)
 
 TEST(Core, Transform_Supports_Function)
 {
-  mln::box2d        dom{{-1, -2}, {3, 3}};
-  mln::image2d<int> ima(dom, 3, 1);
-  mln::image2d<int> ref(dom, 3, 2);
+  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::image_build_params params;
+  params.border = 3;
+  params.init_value = 1;
+
+  mln::experimental::image2d<int>                    ima(dom, params);
+
+  params.init_value = 2;
+  mln::experimental::image2d<int>                    ref(dom, params);
 
   auto c = mln::view::transform(ima, times_two);
 
@@ -194,13 +195,17 @@ TEST(Core, Transform_Supports_Function)
 
 TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
-  using namespace mln::view::ops;
-
   using V = std::pair<int, int>;
 
-  mln::box2d      dom{{-1, -2}, {3, 3}};
-  mln::image2d<V> ima(dom, 3, std::make_pair(42, 42));
-  mln::image2d<V> ref(dom, 3, std::make_pair(69, 42));
+  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::image_build_params params;
+  params.border = 3;
+
+  params.init_value = std::make_pair(42, 42);
+  mln::experimental::image2d<V> ima(dom, params);
+
+  params.init_value = std::make_pair(69, 42);
+  mln::experimental::image2d<V> ref(dom, params);
 
   auto c = mln::view::transform(ima, &V::first);
 
@@ -220,18 +225,16 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 
 TEST(Core, Transformed2Image_transform_byval_chain)
 {
-  using namespace mln;
+  mln::experimental::box2d        dom({-2, -1}, {3, 3});
+  mln::experimental::image2d<int> ima(dom);
+  mln::experimental::image2d<int> ima2(dom);
 
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
-  image2d<int> ima2(dom);
+  mln::iota(ima, 0);
+  mln::iota(ima2, 1);
 
-  iota(ima, 0);
-  iota(ima2, 1);
-
-  auto x   = view::transform(ima, [](int a) { return a > 3; });
-  auto y   = view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
-  auto out = view::transform(y, ima2, [](int a, int b) { return a + b; });
+  auto x   = mln::view::transform(ima, [](int a) { return a > 3; });
+  auto y   = mln::view::transform(x, ima, [](bool a, int b) { return a ? b : 2; });
+  auto out = mln::view::transform(y, ima2, [](int a, int b) { return a + b; });
 
   std::vector<int> ref = {3, 4, 5, 6, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39};
 

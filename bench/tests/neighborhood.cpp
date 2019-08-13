@@ -1,7 +1,7 @@
 #include <mln/core/extension/fill.hpp>
-#include <mln/core/image/image2d.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/io/imread.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/experimental/imread.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
@@ -15,16 +15,14 @@ class CoreNeighborhood : public ::testing::Test
 {
   virtual void SetUp() override
   {
-    std::string             filename = fixtures::ImagePath::concat_with_filename("lena.ppm");
-    mln::image2d<mln::rgb8> tmp(0, 0);
-    mln::io::imread(filename, tmp);
+    std::string filename = fixtures::ImagePath::concat_with_filename("lena.pgm");
 
-    mln::resize(m_tmp, tmp);
-    mln::copy(mln::red(tmp), m_tmp);
-    mln::extension::fill(m_tmp, 0);
+    mln::io::experimental::imread(filename, m_input);
+    m_input.extension().fill(0);
 
+    m_input.to(m_tmp, true);
+    m_tmp.extension().fill(0);
 
-    m_input = mln::experimental::image2d<uint8_t>::from(m_tmp);
     m_h       = m_input.height();
     m_w       = m_input.width();
     m_stride  = m_input.stride();
@@ -86,9 +84,7 @@ TEST_F(CoreNeighborhood, Algorithm_Sum)
   auto ima1 = this->run_with(Sum_New);
   auto ima2 = this->run_with(Sum);
 
-#ifndef PYLENE_GCC8_WORKAROUND
   ASSERT_IMAGES_EQ_EXP(ima1, ref);
-#endif
   ASSERT_IMAGES_EQ_EXP(mln::experimental::image2d<uint8_t>::from(ima2), ref);
 }
 

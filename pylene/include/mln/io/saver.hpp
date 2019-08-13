@@ -19,7 +19,6 @@ namespace mln
     public:
       virtual ~Saver() = default;
       void save(const Image<I>& ima, PluginWriter* plugin, bool permissive) const;
-      void save_experimental(I ima, PluginWriter* plugin, bool permissive) const;
 
     protected:
       virtual void m_set_domain(const I& ima, PluginWriter* plugin) const = 0;
@@ -66,22 +65,6 @@ namespace mln
     }
 
     template <class I>
-    void Saver<I>::save_experimental(I ima, PluginWriter* plugin, bool permissive) const
-    {
-      static_assert(is_a<I, mln::experimental::Image>());
-
-      if (not plugin->can_write(typeid(mln_value(I))))
-      {
-        std::string msg = "The plugin does not support writing " + internal::demangle(typeid(mln_value(I)).name());
-        throw MLNIOException(msg);
-      }
-
-      plugin->set_value_type(typeid(mln_value(I)));
-      this->m_set_domain(ima, plugin);
-      this->m_save(ima, plugin, permissive);
-    }
-
-    template <class I>
     void Saver<I>::m_save(const I& ima, PluginWriter* plugin, bool permissive) const
     {
       (void)permissive;
@@ -89,19 +72,9 @@ namespace mln
 
       // FIXME: Oh my! So dirty!
       // To be fixed with new io facility based on type-erased image for python
-      if constexpr (mln::is_a<I, mln::experimental::Image>{})
+      mln_foreach (mln_value(I) v, ima.values())
       {
-        for (auto v : const_cast<I*>(&ima)->new_values())
-        {
-          write_next_pixel((void*)&v);
-        }
-      }
-      else
-      {
-        mln_foreach (mln_value(I) v, ima.values())
-        {
-          write_next_pixel((void*)&v);
-        }
+        write_next_pixel((void*)&v);
       }
     }
 

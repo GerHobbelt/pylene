@@ -4,6 +4,7 @@ find_package(Boost 1.58 REQUIRED)
 find_package(range-v3 0.5.0 REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
+find_package(fmt)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
@@ -34,6 +35,7 @@ target_include_directories(Pylene PUBLIC ${FreeImage_INCLUDE_DIRS})
 set_property(TARGET Pylene APPEND
              PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
 target_link_libraries(Pylene PUBLIC range-v3)
+target_link_libraries(Pylene PUBLIC fmt::fmt)
 
 
 # Set sources
@@ -50,6 +52,10 @@ target_sources(Pylene PRIVATE
                src/core/image_format.cpp
                src/core/ndbuffer_image_data.cpp
                src/core/ndbuffer_image.cpp
+               src/io/freeimage_plugin.cpp
+               src/io/io.cpp
+               src/io/imread.cpp
+               src/io/imprint.cpp
                )
 
 # Compiler configurations

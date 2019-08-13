@@ -5,7 +5,7 @@
 namespace mln::io::internal
 {
 
-  class freeimage_reader_plugin final : public plugin_reader
+  class freeimage_reader_plugin : public plugin2d_reader
   {
   public:
     ~freeimage_reader_plugin() final;
@@ -13,11 +13,11 @@ namespace mln::io::internal
     void close() final;
   };
 
-  class freeimage_writer_plugin final : public plugin_writer
+  class freeimage_writer_plugin : public plugin2d_writer
   {
   public:
     ~freeimage_writer_plugin() final;
-    void open(const char* filename, sample_type_id sample_type, int nfim, const int dims[]) final;
+    void open(const char* filename, sample_type_id sample_type, int width, int height) final;
     void close() final;
 
   private:

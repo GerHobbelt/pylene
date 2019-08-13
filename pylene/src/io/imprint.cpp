@@ -1,15 +1,15 @@
-#include <mln/io/imprint.hpp>
+#include <mln/io/experimental/imprint.hpp>
 
-namespace mln::io::internal
+namespace mln::io::experimental::internal
 {
 
-  void imprint2d(const formatter<mln::point2d>& fmter, mln::box2d roi)
+  void imprint2d(const formatter<mln::experimental::point2d>& fmter, mln::experimental::box2d roi)
   {
     // Compute column width
-    int width = 0;
-    mln_foreach (auto p, roi)
+    std::size_t width = 0;
+    mln_foreach_new (auto p, roi)
     {
-      int w = static_cast<int>(fmter.formatted_size(p));
+      std::size_t w = fmter.formatted_size(p);
       if (width < w)
         width = w;
     }
@@ -18,19 +18,19 @@ namespace mln::io::internal
     auto rows = ranges::rows(roi);
     for (auto&& r : rows)
     {
-      for (mln::point2d p : r)
+      for (mln::experimental::point2d p : r)
         fmter.print(p, width + 1);
       fmt::print("\n");
     }
   }
 
-  void imprint3d(const formatter<mln::point3d>& fmter, mln::box3d roi)
+  void imprint3d(const formatter<mln::experimental::point3d>& fmter, mln::experimental::box3d roi)
   {
     // Compute column width
-    int width = 0;
-    mln_foreach (auto p, roi)
+    std::size_t width = 0;
+    mln_foreach_new (auto p, roi)
     {
-      int w = static_cast<int>(fmter.formatted_size(p));
+      std::size_t w = fmter.formatted_size(p);
       if (width < w)
         width = w;
     }
@@ -54,4 +54,4 @@ namespace mln::io::internal
       fmt::print("========\n");
     }
   }
-} // namespace mln::io::internal
+} // namespace mln::io::experimental::internal

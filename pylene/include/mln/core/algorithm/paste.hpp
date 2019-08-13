@@ -1,5 +1,5 @@
 #pragma once
-#include <mln/core/concept/image.hpp>
+#include <mln/core/concept/new/images.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
 namespace mln

@@ -7,7 +7,7 @@ class Pylene(ConanFile):
     license = "https://gitlab.lrde.epita.fr/olena/pylene/blob/dev/LICENSE"
     url = "https://gitlab.lrde.epita.fr/olena/pylene"
     description = "C++ Generic Image Processing Library."
-    settings = "os", "compiler", "arch", "build_type", "cppstd"
+    settings = "os", "compiler", "arch", "build_type"
     options = {"gtest": [True, False], "benchmark": [True, False], "freeimage": [
         True, False], "boost": [True, False],
                # TO REMOVE once docker image is fixed with the buildfarm profile updated
@@ -41,6 +41,7 @@ class Pylene(ConanFile):
     def requirements(self):
         self.requires("range-v3/0.5.0@lrde/patched")
         self.requires("cmcstl2/head@lrde/testing")
+        self.requires("fmt/5.3.0@bincrafters/stable")
 
         if self.options.freeimage:
             self.requires("freeimage/3.18.0@dutiona/stable")

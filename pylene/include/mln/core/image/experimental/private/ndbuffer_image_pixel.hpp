@@ -4,6 +4,7 @@
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
 #include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/point.hpp>
+#include <mln/core/utils/ptroffset.hpp>
 
 namespace mln::experimental::details
 {
@@ -16,7 +17,7 @@ namespace mln::experimental::details
   /// class __ndbuffer_image<T,N>::const_pixel_range
 
   template <class T, int N>
-  struct ndpix : Pixel<ndpix<T, N>>
+  struct ndpix : mln::experimental::Pixel<ndpix<T, N>>
   {
     // Note that using "int" instead of ptrdiff_t prevent clang vectorization
     using point_type = ndpoint<N, std::ptrdiff_t>;
@@ -31,17 +32,17 @@ namespace mln::experimental::details
     {
       if constexpr (N == 2)
       {
-        this->m_lineptr += m_info->m_axes[1].stride * dp[1];
+        this->m_lineptr = ptr_offset(this->m_lineptr, m_info->m_axes[1].byte_stride * dp[1]);
         this->m_point[0] += dp[0];
         this->m_point[1] += dp[1];
       }
       else
       {
+        std::ptrdiff_t offset = 0;
         for (int k = 1; k < N; ++k)
-          this->m_lineptr += m_info->m_axes[k].stride * dp[k];
-
-        for (int k = 0; k < N; ++k)
-          this->m_point[k] += dp[k];
+          offset += m_info->m_axes[k].byte_stride * dp[k];
+        this->m_lineptr = ptr_offset(this->m_lineptr, offset);
+        this->m_point += dp;
       }
     }
 
@@ -161,9 +162,10 @@ namespace mln::experimental::details
     private:
       void __update_lineptr() noexcept
       {
-        this->m_lineptr = reinterpret_cast<T*>(this->m_info->m_buffer);
+        std::ptrdiff_t x = 0;
         for (std::size_t k = 1; k < N; ++k)
-          this->m_lineptr += this->m_point[k] * this->m_info->m_axes[k].stride;
+          x += this->m_point[k] * this->m_info->m_axes[k].byte_stride;
+        this->m_lineptr = reinterpret_cast<T*>(this->m_info->m_buffer + x);
       }
     };
 

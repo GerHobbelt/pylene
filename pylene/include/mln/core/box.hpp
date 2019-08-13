@@ -69,7 +69,7 @@ namespace mln::experimental
     using Impl::Impl;
     using Impl::ndim;
     using typename Impl::coord_type;
-
+    using point_type = ndpoint<ndim, coord_type>;
 
     /// Observers
     /// \{
@@ -124,6 +124,19 @@ namespace mln::experimental
     {
       return this->Impl::reversed();
     }
+
+    template <int d = ndim, class = std::enable_if_t<d != -1>>
+    auto rows()
+    {
+      return this->Impl::rows();
+    }
+
+    template <int d = ndim, class = std::enable_if_t<d != -1>>
+    auto rows() const
+    {
+      return this->Impl::rows();
+    }
+
 
     /// \brief Returns the top-left corner point
     using Impl::tl;
@@ -359,7 +372,7 @@ namespace mln::experimental
       constexpr point_type  br() const noexcept { return m_end; }
       constexpr point_type& br() noexcept { return m_end; }
 
-      constexpr auto shape() const noexcept { return tl() - br(); }
+      constexpr auto shape() const noexcept { return br() - tl(); }
       constexpr auto extents() const noexcept
       {
         auto pmin = tl();
@@ -745,4 +758,18 @@ STL2_OPEN_NAMESPACE
   };
 }
 STL2_CLOSE_NAMESPACE
+
 #endif
+
+namespace ranges
+{
+  inline namespace v3
+  {
+    template <typename Impl>
+    struct range_cardinality<mln::experimental::_box<Impl>, void> :
+      std::integral_constant<cardinality, finite>
+    {
+    };
+  }
+}
+

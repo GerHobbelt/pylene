@@ -1,21 +1,23 @@
+#include <mln/core/image/view/clip.hpp>
+
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concept/new/archetype/image.hpp>
 #include <mln/core/domain/where.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/view/clip.hpp>
+
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
 #include <gtest/gtest.h>
 
 
-struct vector_domain : public std::vector<mln::point2d>
+struct vector_domain : public std::vector<mln::experimental::point2d>
 {
-  using base = std::vector<mln::point2d>;
+  using base = std::vector<mln::experimental::point2d>;
 
   using base::base;
-  bool          has(mln::point2d p) const { return std::binary_search(this->begin(), this->end(), p); }
+  bool          has(mln::experimental::point2d p) const { return std::binary_search(this->begin(), this->end(), p); }
   constexpr int dim() const { return 2; }
 };
 
@@ -24,19 +26,19 @@ TEST(View, clip)
 {
   using namespace mln::view::ops;
 
-  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                           {5, 6, 4, 8, 9}, //
-                           {10, 11, 12, 13, 14}};
+  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+                                         {5, 6, 4, 8, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
-  mln::image2d<int> ref = {{42, 1, 2, 3, 42}, //
-                           {5, 42, 4, 42, 9}, //
-                           {10, 11, 42, 13, 14}};
+  mln::experimental::image2d<int> ref = {{42, 1, 2, 3, 42}, //
+                                         {5, 42, 4, 42, 9}, //
+                                         {10, 11, 42, 13, 14}};
 
-  vector_domain domain = {{0, 0}, {0, 4}, {1, 1}, {1, 3}, {2, 2}};
+  vector_domain domain = {{0, 0}, {4, 0}, {1, 1}, {3, 1}, {2, 2}};
 
 
   auto clipped = mln::view::clip(ima, domain);
-  fill(clipped, 42);
+  mln::fill(clipped, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(clipped)>);
@@ -60,16 +62,16 @@ TEST(View, clip_twice)
 {
   using namespace mln::view::ops;
 
-  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                           {5, 6, 4, 8, 9}, //
-                           {10, 11, 12, 13, 14}};
+  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+                                         {5, 6, 4, 8, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
-  mln::image2d<int> ref = {{0, 1, 2, 3, 4},   //
-                           {5, 42, 4, 42, 9}, //
-                           {10, 11, 12, 13, 14}};
+  mln::experimental::image2d<int> ref = {{0, 1, 2, 3, 4},   //
+                                         {5, 42, 4, 42, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
-  vector_domain domain_a = {{0, 0}, {0, 4}, {1, 1}, {1, 3}, {2, 2}};
-  vector_domain domain_b = {{1, 1}, {1, 3}};
+  vector_domain domain_a = {{0, 0}, {4, 0}, {1, 1}, {3, 1}, {2, 2}};
+  vector_domain domain_b = {{1, 1}, {3, 1}};
 
 
   auto A = mln::view::clip(ima, domain_a);
@@ -107,18 +109,18 @@ TEST(View, clip_other_a_box2d)
 {
   using namespace mln::view::ops;
 
-  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                           {5, 6, 4, 8, 9}, //
-                           {10, 11, 12, 13, 14}};
+  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+                                         {5, 6, 4, 8, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
-  mln::image2d<int> ref = {{0, 42, 42, 3, 4}, //
-                           {5, 42, 42, 8, 9}, //
-                           {10, 11, 12, 13, 14}};
+  mln::experimental::image2d<int> ref = {{0, 42, 42, 3, 4}, //
+                                         {5, 42, 42, 8, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
-  mln::box2d domain = {{0, 1}, {2, 3}};
+  mln::experimental::box2d domain({1, 0}, {3, 2});
 
   // Clip returns an 'image2d'
-  mln::image2d<int> clipped = mln::view::clip(ima, domain);
+  mln::experimental::image2d<int> clipped = mln::view::clip(ima, domain);
   fill(clipped, 42);
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
@@ -141,12 +143,11 @@ TEST(View, clip_other_a_box2d)
 
 TEST(Core, Clip_where)
 {
-  using namespace mln;
   using namespace mln::view::ops;
 
-  image2d<int> ima(5, 5);
+  mln::experimental::image2d<int> ima(5, 5);
 
-  image2d<int> ref = {
+  mln::experimental::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 42, 42, 42, 42}, //
@@ -155,18 +156,17 @@ TEST(Core, Clip_where)
   };
 
   mln::iota(ima, 0);
-  mln::fill(view::clip(ima, experimental::where(ima > 10)), 42);
+  mln::fill(mln::view::clip(ima, mln::experimental::where(ima > 10)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 
 TEST(Core, Clip_wherex2_joints)
 {
-  using namespace mln;
   using namespace mln::view::ops;
 
-  image2d<int> ima(5, 5);
+  mln::experimental::image2d<int> ima(5, 5);
 
-  image2d<int> ref = {
+  mln::experimental::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 11, 12, 13, 14}, //
@@ -175,18 +175,17 @@ TEST(Core, Clip_wherex2_joints)
   };
 
   mln::iota(ima, 0);
-  mln::fill(view::clip(view::clip(ima, experimental::where(ima > 10)), experimental::where(ima > 20)), 42);
+  mln::fill(mln::view::clip(mln::view::clip(ima, mln::experimental::where(ima > 10)), mln::experimental::where(ima > 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 
 TEST(Core, Clip_wherex2_disjoints)
 {
-  using namespace mln;
   using namespace mln::view::ops;
 
-  image2d<int> ima(5, 5);
+  mln::experimental::image2d<int> ima(5, 5);
 
-  image2d<int> ref = {
+  mln::experimental::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 42, 42, 42, 42}, //
@@ -195,19 +194,18 @@ TEST(Core, Clip_wherex2_disjoints)
   };
 
   mln::iota(ima, 0);
-  auto clipped_ima = view::clip(ima, experimental::where(ima > 10));
-  mln::fill(view::clip(clipped_ima, experimental::where(clipped_ima < 20)), 42);
+  auto clipped_ima = mln::view::clip(ima, mln::experimental::where(ima > 10));
+  mln::fill(mln::view::clip(clipped_ima, mln::experimental::where(clipped_ima < 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 
 TEST(Core, Clip_where_and)
 {
-  using namespace mln;
   using namespace mln::view::ops;
 
-  image2d<int> ima(5, 5);
+  mln::experimental::image2d<int> ima(5, 5);
 
-  image2d<int> ref = {
+  mln::experimental::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 42, 42, 42, 42}, //
@@ -216,7 +214,7 @@ TEST(Core, Clip_where_and)
   };
 
   mln::iota(ima, 0);
-  mln::fill(view::clip(ima, experimental::where(ima > 10 && ima < 20)), 42);
+  mln::fill(mln::view::clip(ima, mln::experimental::where(ima > 10 && ima < 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 

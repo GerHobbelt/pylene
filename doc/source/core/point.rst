@@ -3,6 +3,8 @@ ND Points
 
 Include :file:`<mln/core/point.hpp>`
 
+.. cpp:namespace:: mln
+
 .. image:: /figures/core/ndpoint.svg
     :width: 100%
 

@@ -23,8 +23,8 @@ variables:
     stage: build
     script:
         - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-        - docker build -t ${FEDORA_30} -f utils/docker-fedora/ --build-arg VERSION=30 --no-cache .
-        - docker build -t ${FEDORA_29} -f utils/docker-fedora/ --build-arg VERSION=29 --no-cache .
+        - docker build -t ${FEDORA_30} -f utils/docker-fedora/Dockerfile --build-arg VERSION=30 --no-cache .
+        - docker build -t ${FEDORA_29} -f utils/docker-fedora/Dockerfile --build-arg VERSION=29 --no-cache .
         - docker push ${FEDORA_30}
         - docker push ${FEDORA_29}
 

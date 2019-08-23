@@ -1,6 +1,10 @@
 #pragma once
+#include <mln/core/algorithm/copy.hpp>
 #include <mln/core/concept/new/images.hpp>
+#include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/rows.hpp>
+
+#include <mln/core/trace.hpp>
 
 namespace mln
 {
@@ -30,23 +34,85 @@ namespace mln
   template <class InputImage, class OutputImage>
   void paste(InputImage src, OutputImage dest);
 
+  template <class InputImage, class InputRange, class OutputImage>
+  void paste(InputImage src, InputRange roi, OutputImage dest);
+
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
-  template <class InputImage, class OutputImage>
-  void paste(InputImage src, OutputImage dest)
+  namespace details
   {
+    template <class I, class D = image_domain_t<I>, class = void>
+    struct is_image_clippable : std::false_type
+    {
+    };
+
+    template <class I, class D>
+    struct is_image_clippable<I, D, std::void_t<decltype(std::declval<I>().clip(std::declval<D>()))>> : std::true_type
+    {
+    };
+
+    template <class I, class D>
+    inline constexpr bool is_image_clippable_v = is_image_clippable<I, D>::value;
+  }
+
+  namespace impl
+  {
+    // Like paste but allows access to the extension
+    template <class InputImage, class InputRange, class OutputImage>
+    void paste_unsafe(InputImage src, InputRange roi, OutputImage dest)
+    {
+      mln_foreach_new(auto p, roi)
+        dest.at(p) = src.at(p);
+    }
+  }
+
+
+  template <class InputImage, class InputRange, class OutputImage>
+  void paste(InputImage src, InputRange roi, OutputImage dest)
+  {
+    mln_entering("mln::paste");
     // FIXME: Add a precondition about the domain inclusion
     // FIXME: check OutputImage is accessible
     static_assert(mln::is_a<InputImage, experimental::Image>());
     static_assert(mln::is_a<OutputImage, experimental::Image>());
     static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
-    auto&& pixels = src.new_pixels();
-    for (auto row : ranges::rows(pixels))
-      for (auto px : row)
-        dest(px.point()) = px.val();
+    if constexpr (details::is_image_clippable_v<InputImage, InputRange> && details::is_image_clippable_v<OutputImage, InputRange>)
+    {
+      mln::experimental::copy(src.clip(roi), dest.clip(roi));
+    }
+    else
+    {
+      mln_foreach_new(auto p, roi)
+        dest(p) = src(p);
+    }
+  }
+
+  template <class InputImage, class OutputImage>
+  void paste(InputImage src, OutputImage dest)
+  {
+    mln_entering("mln::paste");
+    // FIXME: Add a precondition about the domain inclusion
+    // FIXME: check OutputImage is accessible
+    static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+    using InputRange = image_domain_t<InputImage>;
+
+    if constexpr (details::is_image_clippable_v<OutputImage, InputRange>)
+    {
+      mln::experimental::copy(src, dest.clip(src.domain()));
+    }
+    else
+    {
+      auto&& pixels = src.new_pixels();
+      for (auto row : ranges::rows(pixels))
+        for (auto px : row)
+          dest(px.point()) = px.val();
+    }
   }
 
 } // namespace mln

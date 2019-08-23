@@ -1,19 +1,14 @@
 Erosion
 =======
 
-Include :file:`<mln/morpho/structural/erode.hpp>`
+Include :file:`<mln/morpho/erosion.hpp>`
 
-#. .. cpp:function:: \
-      template <class InputImage, class StructuringElement> \
-      concrete_t<InputImage> erode(const InputImage& ima, const StructuringElement& se)
 
-#. .. cpp:function:: \
-      template <class InputImage, class StructuringElement, class Compare> \
-      concrete_t<InputImage> erode(const InputImage& ima, const StructuringElement& se, Compare cmp)
-
-#. .. cpp:function:: \
-      template <class InputImage, class StructuringElement, class OutputImage, class Compare> \
-      void erode(const InputImage& ima, const StructuringElement& se, OutputImage& output, Compare cmp)
+.. cpp:function:: \
+      Image{I} concrete_t<I> erosion(I image, StructuringElement se)
+      Image{I} concrete_t<I> erosion(I image, StructuringElement se, BorderManager bm)
+      void erosion(Image image, StructuringElement se, OutputImage out)
+      void erosion(Image image, StructuringElement se, BorderManager bm, OutputImage out)
 
       Erosion by a structuring element.
 
@@ -23,21 +18,20 @@ Include :file:`<mln/morpho/structural/erode.hpp>`
       .. math::
          \varepsilon(f)(x) = \bigwedge \{ \, f(y), y \in B_x \, \}
 
-      * (2,3) If a optional \p cmp function is provided, the algorithm will internally do
-        an unqualified call to ``inf(x, y,cmp)``.The default is the product-order so
-        that it works for vectorial type as well.
+      * An optional border management may be used to manage border side-effects.
+        Only *fill* and *user* are currently supported.
 
-      * (3) If the optional ``output`` image is provided, it must be wide enough to store
-        the results (the function does not perform any resizing).
+      * If the optional ``output`` image is provided, it must be wide enough to store
+        the result (the function does not perform any resizing).
 
       :param ima: Input image 𝑓
       :param se:  Structuring element 𝐵
-      :param cmp (optional): Comparison function
+      :param bm (optional): Border manager
       :param output (optional): Output image
 
       :return:
          * (1,2) An image whose type is deduced from the input image
-         * (3\) Nothing (the output image is passed as an argument)
+         * (3,4) Nothing (the output image is passed as an argument)
 
       :exception: N/A
 
@@ -56,13 +50,13 @@ Example 1 : Erosion by a square on a gray-level image
 
 .. code-block:: cpp
 
-   #include <mln/morpho/structural/erode.hpp>
+   #include <mln/morpho/erosion.hpp>
    #include <mln/core/wind2d.hpp>
 
    // Define a square SE of size 21x21
    auto input = ...;
-   auto rect = mln::make_rectangle2d(21,21);
-   auto output = mln::morpho::structural::erode(input, rect);
+   auto rect = mln::se::rect2d(21,21);
+   auto output = mln::morpho::erosion(input, rect);
 
 
 .. image:: /images/lena_gray.jpg

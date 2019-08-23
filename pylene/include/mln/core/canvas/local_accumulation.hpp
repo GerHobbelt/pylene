@@ -1,13 +1,13 @@
 #pragma once
 
 #include <mln/core/canvas/local_algorithm.hpp>
+#include <mln/core/box.hpp>
 
 namespace mln::canvas
 {
 
-
   template <class Accu, class SE, class I, class J,
-            bool __incremental__ = SE::incremental::value&& Accu::has_untake::value>
+            bool __incremental__ = SE::incremental::value&& Accu::has_untake::value && details::is_domain_row_contiguous<image_domain_t<I>>::value>
   class LocalAccumulation;
 
 

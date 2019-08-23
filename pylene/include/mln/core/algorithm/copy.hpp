@@ -3,6 +3,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/trace.hpp>
 
 #include <range/v3/algorithm/copy.hpp>
 
@@ -110,6 +111,8 @@ namespace mln
     template <class InputImage, class OutputImage>
     void copy(InputImage input, OutputImage output)
     {
+      mln_entering("mln::copy");
+
       // FIXME: Add a precondition about the size of the domain ::ranges::size
       static_assert(mln::is_a<InputImage, Image>());
       static_assert(mln::is_a<OutputImage, Image>());

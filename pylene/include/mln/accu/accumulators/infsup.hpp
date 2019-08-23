@@ -209,7 +209,7 @@ namespace mln
         typedef T argument_type;
         typedef T result_type;
 
-        inf(const Compare& cmp = Compare())
+        constexpr inf(const Compare& cmp = Compare())
           : m_cmp(cmp)
           , m_inf(value_traits<T, Compare>::sup())
         {
@@ -250,7 +250,7 @@ namespace mln
         typedef T argument_type;
         typedef T result_type;
 
-        sup(const Compare& cmp = Compare())
+        constexpr sup(const Compare& cmp = Compare())
           : m_cmp(cmp)
           , m_sup(value_traits<T, Compare>::inf())
         {

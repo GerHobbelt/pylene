@@ -65,7 +65,9 @@ namespace mln
         typedef T                                                                                   result_type;
         typedef boost::mpl::set<features::h_sup, features::h_inf, features::inf<>, features::sup<>> provides;
 
-        h_infsup_base()
+        using has_untake = std::true_type;
+
+        constexpr h_infsup_base()
           : m_inf(value_traits<T>::sup())
           , m_sup(value_traits<T>::inf())
           , m_count(0)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/algorithm/paste.hpp>
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/extension.hpp>
@@ -177,6 +178,8 @@ namespace mln::extension
     std::any m_value;
 
   public:
+    constexpr BorderManagementMethod method() const { return BorderManagementMethod::Fill; }
+
     template <class T>
     explicit border_manager(T value)
       : m_value{std::move(value)}
@@ -212,6 +215,29 @@ namespace mln::extension
                        "not really support fill. Consider using a large border.");
 
       return {view::value_extended(ima, *val), se};
+    }
+
+
+    template <class InputImage, class SE, class D>
+    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const -> image_concrete_t<mln::detail::remove_cvref_t<InputImage>>
+    {
+      using I = mln::detail::remove_cvref_t<InputImage>;
+
+      static_assert(mln::is_a<I, mln::experimental::Image>());
+      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>());
+
+      if (m_value.type() != typeid(image_value_t<I>))
+        throw std::runtime_error(
+            "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
+
+      D input_roi = se.compute_input_region(ima.domain());
+
+      image_build_params params;
+      params.init_value = m_value;
+
+      image_concrete_t<I> output(input_roi, params);
+      mln::paste(ima, roi, output);
+      return output;
     }
   };
 
@@ -586,6 +612,8 @@ namespace mln::extension
   class border_manager<BorderManagementMethod::User, BorderManagementPolicy::Auto, U>
   {
   public:
+    static constexpr BorderManagementMethod method() { return BorderManagementMethod::User; }
+
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE,
@@ -608,6 +636,28 @@ namespace mln::extension
 
       // The SE fit the image
       return {ima, se};
+    }
+
+    template <class InputImage, class SE, class D>
+    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const -> image_concrete_t<mln::detail::remove_cvref_t<InputImage>>
+    {
+      using I = mln::detail::remove_cvref_t<InputImage>;
+
+      static_assert(mln::is_a<I, mln::experimental::Image>());
+      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>());
+
+
+      if (!fit(ima, se))
+      {
+        throw std::runtime_error(
+            "The given image's extension is not large enough to fit the given structuring element.");
+      }
+
+      D input_roi = se.compute_input_region(roi);
+
+      image_concrete_t<I> output(input_roi);
+      mln::impl::paste_unsafe(ima, input_roi, output);
+      return output;
     }
   };
 

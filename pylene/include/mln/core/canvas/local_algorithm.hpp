@@ -5,6 +5,7 @@
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/box.hpp>
 
 namespace mln::canvas
 {
@@ -48,11 +49,31 @@ namespace mln::canvas
     virtual void EvalAfterLocalLoop(image_reference_t<I> pval_i, image_reference_t<J> pval_j)  = 0;
   };
 
+  // To be incremental:
+  // * the domain contiguous on rows
+  // * the SE must incremental
+
+  // FIXME:
+  // we need to know if a domain is "row-contiguous" that is if the iteration leads to a unit move.
+  namespace details
+  {
+    template <class Domain, class = void>
+    struct is_domain_row_contiguous : std::false_type
+    {
+    };
+
+    template <class Impl>
+    struct is_domain_row_contiguous<mln::experimental::_box<Impl>> : std::true_type
+    {
+    };
+  }
+
 
   template <class SE, class I, class J>
   class IncrementalLocalAlgorithm : public LocalAlgorithm<SE, I, J>
   {
     static_assert(SE::incremental::value, "The Structuring Element must be incremental.");
+    static_assert(details::is_domain_row_contiguous<image_domain_t<I>>::value, "The domain must be quite regular.");
 
   public:
     using IncrementalLocalAlgorithm::LocalAlgorithm::LocalAlgorithm;
@@ -92,6 +113,7 @@ namespace mln::canvas
   {
     if (!this->m_se.is_incremental())
     {
+      mln::trace::warn("[Performance] The accumulator is not incremental.");
       this->LocalAlgorithm<SE, I, J>::Execute();
       return;
     }

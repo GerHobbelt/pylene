@@ -99,6 +99,10 @@ add_core_test(${test_prefix}disc               se/disc.cpp)
 add_core_test(${test_prefix}rect2d             se/rect2d.cpp)
 add_core_test(${test_prefix}mask2d             se/mask2d.cpp)
 
+
+# Others
+add_core_test(${test_prefix}traverse2d         canvas/traverse2d.cpp)
+
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts
 if (PYLENE_CONCEPT_TS_ENABLED)

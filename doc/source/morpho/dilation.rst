@@ -9,8 +9,8 @@ Include :file:`<mln/morpho/dilation.hpp>`
 
 
 .. cpp:function:: \
-      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se)
-      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se, BorderManager bm)
+      Image{I} concrete_t<I> dilation(I image, StructuringElement se)
+      Image{I} concrete_t<I> dilation(I image, StructuringElement se, BorderManager bm)
       void dilation(Image image, StructuringElement se, OutputImage out)
       void dilation(Image image, StructuringElement se, BorderManager bm, OutputImage out)
 
@@ -42,16 +42,6 @@ Include :file:`<mln/morpho/dilation.hpp>`
       :exception: N/A
 
 
-.. cpp:namespace:: mln::morpho::parallel
-
-
-.. cpp:function:: \
-      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se)
-      void dilation(Image image, StructuringElement se, OutputImage out)
-
-      Parallel version of the dilation algorithm.
-
-
 Notes
 -----
 
@@ -67,7 +57,7 @@ Example 1 : Dilation by a square on a gray-level image
 .. code-block:: cpp
 
    #include <mln/morpho/dilation.hpp>
-   #include <mln/core/se/rect2d.hpp>
+   #include <mln/core/wind2d.hpp>
 
    // Define a square SE of size 21x21
    auto input = ...;

@@ -4,7 +4,7 @@
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/point.hpp>
-#include <mln/core/experimental/point.hpp>
+#include <mln/core/box.hpp>
 
 /// \file
 
@@ -129,14 +129,20 @@ namespace mln
       mln::experimental::point2d period() const { return m_delta; }
 
       /// \brief Return the extent radius
-      int radial_extent() const { return m_k; }
+      int radial_extent() const;
+
+      /// \brief
+      mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+
+      /// \brief
+      mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
 
     private:
       mln::experimental::point2d m_delta;
       int     m_k;
     };
 
-  }
+  } // namespace experimental::se
 
 
   /******************************************/

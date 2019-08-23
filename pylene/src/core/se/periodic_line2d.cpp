@@ -41,4 +41,38 @@ namespace mln::experimental::se
   {
     return { m_delta, m_delta, static_cast<std::size_t>(m_k) };
   }
+
+  int periodic_line2d::radial_extent() const
+  {
+    return m_k * std::max(std::abs(m_delta.x()), std::abs(m_delta.y()));
+  }
+
+  mln::experimental::box2d periodic_line2d::compute_input_region(mln::experimental::box2d roi) const
+  {
+    int dx = std::abs(m_delta.x()) * m_k;
+    int dy = std::abs(m_delta.y()) * m_k;
+    roi.tl().x() -= dx;
+    roi.br().x() += dx;
+    roi.tl().y() -= dy;
+    roi.br().y() += dy;
+    return roi;
+  }
+
+  mln::experimental::box2d periodic_line2d::compute_output_region(mln::experimental::box2d roi) const
+  {
+    int dx = std::abs(m_delta.x()) * m_k;
+    int dy = std::abs(m_delta.y()) * m_k;
+    roi.tl().x() += dx;
+    roi.br().x() -= dx;
+    roi.tl().y() += dy;
+    roi.br().y() -= dy;
+
+    if (roi.width() <= 0 || roi.height() <= 0)
+      roi = mln::experimental::box2d{};
+
+    return roi;
+  }
+
+
+
 } // namespace mln::experimental::se

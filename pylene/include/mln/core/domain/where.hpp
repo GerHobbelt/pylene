@@ -57,7 +57,7 @@ namespace mln
 
       where_t() = default;
 
-      bool          has(image_point_t<I> p) const { return m_ima(p); }
+      bool          has(image_point_t<I> p) const { return m_ima.domain().has(p) && m_ima(p); }
       bool          empty() const { return m_ima.domain().empty(); }
       constexpr int dim() const { return m_ima.domain().dim(); }
     };

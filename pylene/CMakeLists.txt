@@ -52,6 +52,7 @@ target_sources(Pylene PRIVATE
                src/core/image_format.cpp
                src/core/ndbuffer_image_data.cpp
                src/core/ndbuffer_image.cpp
+               src/core/traverse2d.cpp
                src/io/freeimage_plugin.cpp
                src/io/io.cpp
                src/io/imread.cpp

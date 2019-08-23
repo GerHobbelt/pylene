@@ -18,12 +18,12 @@ namespace mln
     struct Pixel
     {
     };
-  }
+  } // namespace experimental
 
   namespace concepts
   {
 
-  // clang-format off
+    // clang-format off
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Pixel
@@ -59,7 +59,9 @@ namespace mln
       Pixel<WPix> &&
       requires(const WPix cpix, pixel_value_t<WPix> v) {
         // Not deep-const, view-semantic.
-        { cpix.val() = v }  -> stl::ConvertibleTo<pixel_reference_t<WPix>>&&;
+        { cpix.val() = v };
+        // Proxy rvalues must not be deep-const on their assignement semantic (unlike tuple...)
+        // { const_cast<typename WPix::reference const &&>(cpix.val()) = v };
       };
   
   } // namespace mln::concepts::detail
@@ -71,8 +73,8 @@ namespace mln
 
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  // clang-format on
+    // clang-format on
 
   } // namespace concepts
 
-} // namespace namespacemln
+} // namespace mln

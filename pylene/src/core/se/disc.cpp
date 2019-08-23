@@ -186,7 +186,7 @@ namespace mln::experimental::se
 
   bool disc::is_incremental() const
   {
-    return m_nlines > 0;
+    return m_nlines == 0;
   }
 
 
@@ -198,7 +198,7 @@ namespace mln::experimental::se
     std::vector<mln::experimental::se::periodic_line2d> lines;
     lines.reserve(m_nlines);
 
-    const point2d se[] = {{0, 1}, {1, 0}, {1, 1}, {1, -1}, {1, 2}, {2, 1}, {2, -1}, {1, -2}};
+    const point2d se[] = {{1, 0}, {0, 1}, {1, 1}, {-1, 1}, {1, 2}, {2, 1}, {-1, 2}, {-2, 1}};
     std::array<int, 3> k;
 
     if (m_nlines == 8)
@@ -229,35 +229,38 @@ namespace mln::experimental::se
     return lines;
   }
 
-  [[gnu::noinline]] void disc::_compute_data() const
+  std::shared_ptr<disc::cache_data_t> disc::_get_data() const
   {
-    mln_precondition(m_data == nullptr);
     // Note that const method can be called from several threads
-    auto                          data     = this->__compute_data();
-    std::shared_ptr<cache_data_t> expected = nullptr;
-    std::atomic_compare_exchange_strong(&m_data, &expected, data);
+    auto data = std::atomic_load(&m_data);
+    if (data == nullptr)
+    {
+      data = this->__compute_data();
+
+      std::shared_ptr<disc::cache_data_t> expected = nullptr;
+      if (!std::atomic_compare_exchange_strong(&m_data, &expected, data))
+        data = std::move(expected);
+    }
+    return data;
   }
 
 
   ::ranges::span<point2d> disc::offsets() const
   {
-    if (m_data == nullptr)
-      _compute_data();
-    return {m_data->m_points.data(), m_data->m_se_size};
+    auto data = _get_data();
+    return {data->m_points.data(), data->m_se_size};
   }
 
   ::ranges::span<point2d> disc::before_offsets() const
   {
-    if (m_data == nullptr)
-      _compute_data();
-    return {m_data->m_points.data(), m_data->m_se_size / 2};
+    auto data = _get_data();
+    return {data->m_points.data(), data->m_se_size / 2};
   }
 
   ::ranges::span<point2d> disc::after_offsets() const
   {
-    if (m_data == nullptr)
-      _compute_data();
-    return {m_data->m_points.data() + m_data->m_se_size / 2 + 1, m_data->m_se_size / 2};
+    auto data = _get_data();
+    return {data->m_points.data() + data->m_se_size / 2 + 1, data->m_se_size / 2};
   }
 
   disc::inc_type disc::dec() const
@@ -265,12 +268,11 @@ namespace mln::experimental::se
     if (!is_incremental())
       throw std::logic_error("Attempting to decompose the disc which is not incremental.");
 
-    if (m_data == nullptr)
-      _compute_data();
+    auto data = _get_data();
 
     int r      = static_cast<int>(m_radius);
     int extent = 2 * r + 1;
-    ::ranges::span<point2d> points{m_data->m_points.data() + m_data->m_se_size, extent};
+    ::ranges::span<point2d> points{data->m_points.data() + data->m_se_size, extent};
     return {points, r};
   }
 
@@ -279,33 +281,30 @@ namespace mln::experimental::se
     if (!is_incremental())
       throw std::logic_error("Attempting to decompose the disc which is not incremental.");
 
-    if (m_data == nullptr)
-      _compute_data();
+    auto data = _get_data();
 
     int r      = static_cast<int>(m_radius);
     int extent = 2 * r + 1;
-    ::ranges::span<point2d> points{m_data->m_points.data() + m_data->m_se_size + extent, extent};
+    ::ranges::span<point2d> points{data->m_points.data() + data->m_se_size + extent, extent};
     return {points, r};
   }
 
 
 
-  std::shared_ptr<disc::cache_data_t> disc::__compute_data() const
+  [[gnu::noinline]] std::shared_ptr<disc::cache_data_t> disc::__compute_data() const
   {
-    typedef point2d::value_type P;
-
     int   r          = static_cast<int>(m_radius);
     int   extent     = 2 * r + 1;
     float radius_sqr = m_radius * m_radius;
 
-    std::vector<point2d> buffer;
+    std::vector<mln::experimental::point2d> buffer;
     buffer.reserve(extent * extent + extent + extent);
 
     // All points
     for (int y = -r; y <= r; ++y)
       for (int x = -r; x <= r; ++x)
         if (y * y + x * x <= radius_sqr)
-          buffer.push_back(point2d{(P)y, (P)x});
+          buffer.push_back({x, y});
     std::size_t se_size = buffer.size();
 
     // Dec Points
@@ -313,7 +312,7 @@ namespace mln::experimental::se
       for (int x = -r; x <= 0; ++x)
         if (y * y + x * x <= radius_sqr)
         {
-          buffer.push_back(point2d{(P)y, (P)(x - 1)}); // before begin of the line
+          buffer.push_back({x - 1, y}); // before begin of the line
           break;
         }
 
@@ -322,7 +321,7 @@ namespace mln::experimental::se
       for (int x = r; x >= 0; --x)
         if (y * y + x * x <= radius_sqr)
         {
-          buffer.push_back(point2d{(P)y, (P)x}); // last point of the line
+          buffer.push_back({x, y}); // last point of the line
           break;
         }
 
@@ -333,6 +332,19 @@ namespace mln::experimental::se
     mln_assertion(se_size % 2 == 1);
 
     return data;
+  }
+
+  mln::experimental::box2d disc::compute_input_region(mln::experimental::box2d roi) const
+  {
+    roi.inflate(radial_extent());
+    return roi;
+  }
+
+
+  mln::experimental::box2d disc::compute_output_region(mln::experimental::box2d roi) const
+  {
+    roi.inflate(-radial_extent());
+    return roi;
   }
 
 

@@ -1,12 +1,11 @@
 #include <mln/core/canvas/private/traverse2d.hpp>
-#include <mln/core/image/ndimage.hpp>
 
 namespace mln::canvas::details
 {
 
-  void traverse_along_direction(mln::box2d roi,
-                                mln::point2d direction,
-                                std::function<void(mln::point2d, mln::point2d, std::size_t n)> callback)
+  void traverse_along_direction(mln::experimental::box2d roi,
+                                mln::experimental::point2d direction,
+                                std::function<void(mln::experimental::point2d, mln::experimental::point2d, std::size_t n)> callback)
   {
     if (roi.empty())
       return;
@@ -26,7 +25,7 @@ namespace mln::canvas::details
 
     assert(dx != 0 || dy != 0);
 
-    auto count = [](int start, int end, int step) { return start >= end ? 0 : ((end - start - 1) / step + 1); };
+    auto count = [](int start, int end, int step) { return (end - start - 1) / step + 1; };
 
     // Top border pixels
     if (dy != 0)
@@ -72,36 +71,4 @@ namespace mln::canvas::details
       }
     }
   }
-
-
-  /// \brief Traverse an image and calls f with a pointer to the data of each line
-  void apply_line(mln::ndbuffer_image& input, std::function<void(std::byte*)> fun)
-  {
-    int pdim = input.pdim();
-
-    if (pdim > 4)
-      throw std::runtime_error("Not implemented for this number of dimensions.");
-
-
-    std::ptrdiff_t strides[4] = {0};
-    int            dims[4]    = {1, 1, 1, 1};
-
-    for (int k = 0; k < pdim; ++k)
-    {
-      dims[k] = input.size(k);
-      strides[k] = input.byte_stride(k);
-    }
-
-
-    for (int w = 0; w < dims[3]; ++w)
-      for (int z = 0; z < dims[2]; ++z)
-      {
-        std::byte* lineptr = input.buffer() + w * strides[3] + z * strides[2];
-        for (int y = 0; y < dims[1]; ++y)
-        {
-          fun(lineptr);
-          lineptr += strides[1];
-        }
-      }
-  }
-} // namespace mln::canvas::details
+}

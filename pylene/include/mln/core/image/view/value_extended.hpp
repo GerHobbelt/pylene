@@ -34,8 +34,11 @@ namespace mln
     using point_type         = image_point_t<I>;
     using extension_category = extension::value_extension_tag;
     using extension_type     = extension::by_value<image_value_t<I>>;
-    using reference          = const image_value_t<I>&; // Restrict the image to be read-only
-    using category_type      = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
+    using value_type         = image_value_t<I>;
+
+    using reference = const value_type; // Restrict the image to be read-only by copy, should not be const and be
+                                        // checked on pixel concept (but issue with proxy)
+    using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using typename image_adaptor<I>::domain_type;
 
     struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>

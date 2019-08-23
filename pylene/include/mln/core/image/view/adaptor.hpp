@@ -266,6 +266,12 @@ namespace mln
     {
       return m_ima.extension();
     }
+
+    template <typename U = I>
+    auto border() const -> decltype(std::declval<const U>().border())
+    {
+      return m_ima.border();
+    }
     /// \}
 
   protected:

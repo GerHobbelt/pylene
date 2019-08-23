@@ -2,6 +2,7 @@
 /cmake-build-*
 /doc/source/images/*.png
 /test_package/build
+/doc/source/_build
 .vs
 .idea
 *.pyc

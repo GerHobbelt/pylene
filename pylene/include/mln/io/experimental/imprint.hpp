@@ -33,7 +33,7 @@ namespace mln::io::experimental
       template <class I>
       formatter(I&& image)
       {
-        new (&m_impl) impl_t<std::remove_reference_t<I>>(std::forward<I>(image));
+        new (&m_impl) impl_t<std::remove_reference_t<I>>(image);
       }
 
       std::size_t formatted_size(P p) const { return reinterpret_cast<const impl_base_t*>(&m_impl)->formatted_size(p); }

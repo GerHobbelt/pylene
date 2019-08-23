@@ -33,6 +33,6 @@ TEST(View, extended)
         if (!x.domain().has(q.point()))
           ASSERT_EQ(q.val(), 69);
         else
-          ASSERT_EQ(&q.val(), &ima(q.point()));
+          ASSERT_EQ(q.val(), ima(q.point()));
   }
 }

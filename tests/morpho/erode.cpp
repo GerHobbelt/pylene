@@ -1,30 +1,32 @@
-#include <mln/core/grays.hpp>
-#include <mln/core/image/image2d.hpp>
+#include <mln/morpho/experimental/erosion.hpp>
+#include <mln/morpho/experimental/dilation.hpp>
+
+
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/view/transform.hpp>
 #include <mln/core/se/disc.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/morpho/structural/dilate.hpp>
-#include <mln/morpho/structural/erode.hpp>
+#include <mln/io/experimental/imread.hpp>
+
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
 
 #include <gtest/gtest.h>
 
-using namespace mln;
 
 // Check that dilation/erosion are adjunctions
 TEST(Morpho, erode_0)
 {
-  image2d<uint8> ima;
-  io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  mln::experimental::image2d<uint8_t> ima;
+  mln::io::experimental::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
-  image2d<uint8> out1, out2;
-  mln::se::disc  win(3);
+  mln::experimental::image2d<uint8_t> out1, out2;
+  mln::experimental::se::disc win(3);
 
-  auto comp = [](uint8 x) -> uint8 { return 255 - x; };
+  auto comp = [](uint8_t x) -> uint8_t { return 255 - x; };
 
-  out1 = morpho::structural::dilate(ima, win);
-  out2 = morpho::structural::erode(imtransform(ima, comp), win);
+  out1 = mln::morpho::experimental::dilation(ima, win);
+  out2 = mln::morpho::experimental::erosion(mln::view::transform(ima, comp), win);
 
-  ASSERT_IMAGES_EQ(out2, imtransform(out1, comp));
+  ASSERT_IMAGES_EQ_EXP(out2, mln::view::transform(out1, comp));
 }

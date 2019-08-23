@@ -47,7 +47,9 @@ namespace mln
                                          none_extended_view<I>, periodize_extended_view<I>, value_extended_view<I>>;
 
   public:
-    using reference     = const image_value_t<I>&; // Restrict the image to be read-only
+    using value_type = image_value_t<I>;
+    using reference  = const value_type; // Restrict the image to be read-only by copy, should not be const and be
+                                         // checked on pixel concept (but issue with proxy)
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using point_type    = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
@@ -188,16 +190,16 @@ namespace mln
     {
       using reference = extended_view::reference;
 
-      reference val() const { return (*m_ima)(this->base().point()); }
+      reference val() const { return (*m_ima_ptr)(this->base().point()); }
 
-      new_pixel_type(image_pixel_t<I> px, extended_view<I>* ima)
+      new_pixel_type(image_pixel_t<I> px, extended_view<I>* ima_ptr)
         : new_pixel_type::pixel_adaptor{std::move(px)}
-        , m_ima{ima}
+        , m_ima_ptr{ima_ptr}
       {
       }
 
     private:
-      extended_view<I>* m_ima;
+      extended_view<I>* m_ima_ptr;
     };
 
 

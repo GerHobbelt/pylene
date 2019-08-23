@@ -97,5 +97,22 @@ namespace mln::experimental::se
     return std::max(x1 - x0, y1 - y0) / 2;
   }
 
+  mln::experimental::box2d rect2d::compute_input_region(mln::experimental::box2d roi) const
+  {
+    roi.tl().x() += m_dpoints.tl().x();
+    roi.tl().y() += m_dpoints.tl().y();
+    roi.br().x() += m_dpoints.br().x() - 1;
+    roi.br().y() += m_dpoints.br().y() - 1;
+    return roi;
+  }
+
+  mln::experimental::box2d rect2d::compute_output_region(mln::experimental::box2d roi) const
+  {
+    roi.tl().x() -= m_dpoints.tl().x();
+    roi.tl().y() -= m_dpoints.tl().y();
+    roi.br().x() -= (m_dpoints.br().x() - 1);
+    roi.br().y() -= (m_dpoints.br().y() - 1);
+    return roi;
+  }
 
 } // namespace mln::experimental::se

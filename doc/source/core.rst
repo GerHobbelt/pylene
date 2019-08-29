@@ -13,6 +13,7 @@ Core Module
    core/neighborhood
    core/stl
    core/functional
+   core/border_management
 
 
 .. raw:: html
@@ -190,6 +191,23 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 
 
+Local algorithms
+****************
+
+.. toctree::
+    :hiddend:
+    
+    core/morpho/dilate
+
+  Local algorithms are algorithms that localy use a window around a pixel. This window is the neighborhood.
+  Local algorithms are fundamental tools for mathematical morphology.
+  To simplify the handling of the border for the user when dealing with those algorithms, the border manager tool (see :doc:`core/border_management`) has been designed.
+
+.. rubric:: Mathematical morphology primitive
+
++---------------------------+--------------------------------------------+
+| :doc:`core/morpho/dilate` | compute the standard dilation of the image |
++---------------------------+--------------------------------------------+
 
 
 Image primitives

@@ -190,6 +190,7 @@ To use the resulting pair, all that is needed is to visit the variant. The stand
           px.val() = use(px, tmp_px);
         } 
         // ...
+        return ima_;
       }, managed_ima, managed_se);
   }
 
@@ -214,7 +215,7 @@ The way to use it is::
     {
       if (se.is_decomposable())
       {
-        auto ima_tmp = bm.prepare_output_image(ima, se, (ima.domain());
+        auto output_ima = bm.prepare_output_image(ima, se, (ima.domain());
         auto dec_ses = se.decompose();
         for(auto&& se : dec_ses)
         {
@@ -223,7 +224,11 @@ The way to use it is::
               tmp_px = use(px, nb);
           output_ima[px.point()] = use(px, tmp_px);
         }
+        return output_ima;
       }
+    } else {
+
+      // normal algorithm ...
     }
   }
 

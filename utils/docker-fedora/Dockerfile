@@ -9,7 +9,7 @@ RUN dnf install --refresh -y -q --nodocs \
         lcov gcovr libasan libubsan \
         gcc llvm clang clang-tools-extra \
         boost-devel tbb-devel freeimage-devel gtest-devel qt5-devel \
-        doxygen python3-numpy python3-matplotlib && \
+        doxygen python3-devel python3-numpy python3-matplotlib && \
     dnf clean all
 
 RUN pip3 install --no-cache-dir -q \

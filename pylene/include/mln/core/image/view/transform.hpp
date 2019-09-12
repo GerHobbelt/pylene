@@ -35,7 +35,11 @@ namespace mln
     using accessible         = image_accessible_t<I>;
     using indexable          = image_indexable_t<I>;
     using view               = std::true_type;
-    using extension_category = image_extension_category_t<I>;
+
+    // The extension could be preserved if F returns a reference. Otherwise extension().fill() would
+    // require to inverse F to fill with the good extension
+    using extension_category = mln::extension::none_extension_tag;
+
     // Transform doesn't preserve contiguity, so it decays from raw_image_tag
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I, value_type>;

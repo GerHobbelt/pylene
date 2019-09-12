@@ -18,6 +18,7 @@ ExternalData_Expand_Arguments(
   fetch-external-data
   images
   DATA{Space1_20MB.jpg}
+  DATA{Aerial_view_of_Olbia.jpg}
   )
 
 # Extra compiler options
@@ -65,7 +66,8 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 add_benchmark(BMAlgorithms              BMAlgorithms.cpp BMAlgorithms_main.cpp)
 add_benchmark(BMNeighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_benchmark(BMRotation                BMRotation.cpp)
-add_benchmark(BMDilation                BMDilation.cpp)
+add_benchmark(BMMorphoBase              BMMorphoBase.cpp)
+add_benchmark(BMMorphoBaseRef           BMMorphoBaseRef.cpp)
 add_benchmark(BMMorphers                BMMorphers.cpp BMMorphers_main.cpp)
 add_benchmark(BMReference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)
 add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)

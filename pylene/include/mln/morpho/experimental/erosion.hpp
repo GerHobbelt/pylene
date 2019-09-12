@@ -48,6 +48,7 @@ namespace mln::morpho::experimental
     template <class V, class = void>
     struct erosion_value_set : erosion_value_set_base<V>
     {
+      using has_incremental_sup = std::false_type;
       static inline constexpr auto accu_sup = mln::accu::accumulators::inf<V>{};
     };
 
@@ -55,7 +56,9 @@ namespace mln::morpho::experimental
     struct erosion_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16)>>
       : erosion_value_set_base<V>
     {
-      static inline constexpr auto accu_sup = mln::accu::accumulators::h_inf<V>{};
+      using has_incremental_sup = std::true_type;
+      static inline constexpr auto accu_sup = mln::accu::accumulators::inf<V>{};
+      static inline constexpr auto accu_incremental_sup = mln::accu::accumulators::h_inf<V>{};
     };
   }
 

@@ -3,6 +3,8 @@
 #include <mln/core/canvas/local_algorithm.hpp>
 #include <mln/core/box.hpp>
 
+//#include <boost/container/small_vector.hpp>
+
 namespace mln::canvas
 {
 
@@ -12,12 +14,15 @@ namespace mln::canvas
 
 
   template <class Accu, class SE, class I, class J>
-  class LocalAccumulation<Accu, SE, I, J, false> : public LocalAlgorithm<SE, I, J>
+  class LocalAccumulation<Accu, SE, I, J, false>
+    : public LocalAlgorithm<SE, I, J, LocalAccumulation<Accu, SE, I, J, false>>
   {
   private:
-    using base_t = LocalAlgorithm<SE, I, J>;
-    Accu m_accu;
+    using self_t = LocalAccumulation;
+    using base_t = LocalAlgorithm<SE, I, J, self_t>;
 
+    Accu m_accu;
+    friend base_t;
 
   public:
     LocalAccumulation(Accu accu, SE se, I& f, J& g)
@@ -42,14 +47,58 @@ namespace mln::canvas
     {
       m_accu.take(nval_i);
     }
+
+  public:
+
+    /*
+    void ExecuteWithIndexes()
+      {
+        mln_entering("LocalAlgorithm::Execute (Non-incremental)");
+
+        std::size_t se_size = ::ranges::size(this->m_se.offsets());
+
+        // Make a local copy to prevent aliasing
+        std::vector<std::ptrdiff_t>   offsets(se_size);
+        std::vector<image_point_t<I>> dps(se_size);
+        {
+          std::size_t i = 0;
+          for (auto dp : this->m_se.offsets())
+          {
+            offsets[i] = this->m_i.delta_index(dp);
+            dps[i]     = dp;
+            i++;
+          }
+        }
+
+        auto zz = ranges::view::zip(this->m_i.new_pixels(), this->m_j.new_pixels());
+        for (auto rows : ranges::rows(zz))
+        {
+          this->ExecuteAtLineStart();
+          for (auto [px_i, px_j] : rows)
+          {
+            this->EvalBeforeLocalLoop(px_i.val(), px_j.val());
+            for (size_t i = 0; i < se_size; ++i)
+            {
+              auto tmp = px_i; tmp.ishift(dps[i], offsets[i]);
+              this->EvalInLocalLoop(tmp.val(), px_i.val(), px_j.val());
+
+            }
+            this->EvalAfterLocalLoop(px_i.val(), px_j.val());
+          }
+        }
+      }
+    */
   };
 
 
   template <class Accu, class SE, class I, class J>
-  class LocalAccumulation<Accu, SE, I, J, true> : public IncrementalLocalAlgorithm<SE, I, J>
+  class LocalAccumulation<Accu, SE, I, J, true> : public IncrementalLocalAlgorithm<SE, I, J,
+                                                                                   LocalAccumulation<Accu, SE, I, J, true>>
   {
   private:
-    using base_t = IncrementalLocalAlgorithm<SE, I, J>;
+    using self_t = LocalAccumulation;
+    using base_t = IncrementalLocalAlgorithm<SE, I, J, LocalAccumulation>;
+    using base_2_t = LocalAlgorithm<SE, I, J, LocalAccumulation>;
     Accu m_accu;
 
   public:
@@ -59,6 +108,8 @@ namespace mln::canvas
     {
     }
 
+    friend base_t;
+    friend base_2_t;
 
   private:
     void ExecuteAtLineStart() final { m_accu.init(); }

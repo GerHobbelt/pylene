@@ -113,7 +113,7 @@ namespace mln::io::internal
     // Read bit-by-bit - 0 is black
     struct impl_bit_t : impl_base_t
     {
-      void read_next_line(std::byte* buffer) final
+      void read_next_line(std::byte* __restrict buffer) final
       {
         std::uint8_t* lineptr = (std::uint8_t*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0, t = 0; x < m_width; x += 8, t++)
@@ -130,7 +130,7 @@ namespace mln::io::internal
         m_y--;
       }
 
-      void write_next_line(const std::byte* buffer_) final
+      void write_next_line(const std::byte* __restrict buffer_) final
       {
         const std::uint8_t* buffer  = (const std::uint8_t*)buffer_;
         std::uint8_t* lineptr = (std::uint8_t*)FreeImage_GetScanLine(m_dib, m_y);
@@ -162,7 +162,7 @@ namespace mln::io::internal
     // Read bit-by-bit - 0 is white
     struct impl_bit_inv_t : impl_base_t
     {
-      void read_next_line(std::byte* buffer) final
+      void read_next_line(std::byte* __restrict buffer) final
       {
         std::uint8_t* lineptr = (std::uint8_t*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0, t = 0; x < m_width; x += 8, t++)
@@ -188,7 +188,7 @@ namespace mln::io::internal
     // Read a index image - 8 bits indexes
     struct impl_palette_8bit_t : impl_base_t
     {
-      void read_next_line(std::byte* buffer) final
+      void read_next_line(std::byte* __restrict buffer) final
       {
         uint8_t* lineptr = (uint8_t*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0; x < m_width; ++x)
@@ -206,7 +206,7 @@ namespace mln::io::internal
     // BITMAP as RGB24
     struct impl_rgb24_t : impl_base_t
     {
-      void read_next_line(std::byte* buffer) final
+      void read_next_line(std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0; x < m_width; ++x)
@@ -218,7 +218,7 @@ namespace mln::io::internal
         m_y--;
       }
 
-      void write_next_line(const std::byte* buffer) final
+      void write_next_line(const std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0; x < m_width; ++x)
@@ -234,7 +234,7 @@ namespace mln::io::internal
     // BITMAP as RGB24
     struct impl_rgba32_t : impl_base_t
     {
-      void read_next_line(std::byte* buffer) final
+      void read_next_line(std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0; x < m_width; ++x)
@@ -247,7 +247,7 @@ namespace mln::io::internal
         m_y--;
       }
 
-      void write_next_line(const std::byte* buffer) final
+      void write_next_line(const std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
         for (int x = 0; x < m_width; ++x)

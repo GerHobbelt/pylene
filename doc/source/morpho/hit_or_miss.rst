@@ -1,13 +1,15 @@
 Hit or Miss
 ===========
 
-#. .. cpp:function:: \
-      template <class InputImage, class StructuringElement1, class StructuringElement2> \
-      concrete_t<InputImage> hit_or_miss(const InputImage& ima, const StructuringElement1& se_hit, const StructuringElement1& se_miss)
 
-#. .. cpp:function:: \
-      template <class InputImage, class StructuringElement1, class StructuringElement2, class OutputImage> \
-      void hit_or_miss(const InputImage& ima, const StructuringElement1& se_hit, const StructuringElement1& se_miss, OutputImage& output)
+Include :file:`<mln/morpho/hit_or_miss.hpp>`
+
+
+.. cpp:namespace:: mln::morpho
+
+.. cpp:function:: \
+    Image{I} concrete_t<I> hit_or_miss(I image, StructuringElement se_hit, StructuringElement se_miss)
+    void hit_or_miss(Image image, StructuringElement se_hit, StructuringElement se_miss, OutputImage out)
 
       The hit-or-miss transform is non-linerar filter used to detect pattern in
       images. It is defined as:

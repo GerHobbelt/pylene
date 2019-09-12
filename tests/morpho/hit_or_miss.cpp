@@ -1,37 +1,19 @@
-#include <mln/core/grays.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/morpho/experimental/hit_or_miss.hpp>
+
+#include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/view/cast.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/se/mask2d.hpp>
-#include <mln/core/win2d.hpp>
-#include <mln/io/imprint.hpp>
-#include <mln/morpho/hit_or_miss.hpp>
 
 #include <gtest/gtest.h>
 
+#include <fixtures/ImageCompare/image_compare.hpp>
 
-// FIXME:
-namespace to_migrate
-{
-  template <typename I>
-  inline bool __all(const mln::Image<I>& ima)
-  {
-    static_assert(std::is_convertible<typename I::value_type, bool>::value,
-                  "Image value type must be convertible to bool");
-
-    mln_viter(v, exact(ima));
-    mln_forall (v)
-      if (!*v)
-        return false;
-
-    return true;
-  }
-} // namespace to_migrate
 
 TEST(Morpho, hit_or_miss)
 {
-  using namespace mln;
-
-  image2d<bool> ima = {
+  mln::experimental::image2d<bool> ima = {
       {0, 0, 0, 1, 1, 1}, //
       {0, 0, 0, 1, 1, 1}, //
       {0, 0, 0, 1, 1, 1}, //
@@ -39,15 +21,15 @@ TEST(Morpho, hit_or_miss)
       {0, 0, 0, 1, 0, 1}  //
   };
 
-  se::mask2d win1 = { {0, 1, 1} };
-  se::mask2d win2 = { {1, 0, 0} };
-  auto out  = morpho::hit_or_miss(ima, win1, win2);
-  auto out2 = morpho::hit_or_miss(lnot(ima), win2, win1);
+  mln::se::experimental::mask2d win1 = { {0, 1, 1} };
+  mln::se::experimental::mask2d win2 = { {1, 0, 0} };
 
-  // FIXME:
-  ASSERT_TRUE(::to_migrate::__all(out == out2));
+  using namespace mln::view::ops;
+  auto out  = mln::morpho::experimental::hit_or_miss(ima, win1, win2);
+  auto out2 = mln::morpho::experimental::hit_or_miss((not ima), win2, win1);
 
-  auto out3 = morpho::hit_or_miss(mln::imcast<uint8>(ima), win1, win2);
-  // FIXME:
-  ASSERT_TRUE(::to_migrate::__all(mln::imcast<uint8>(out) == out3));
+  ASSERT_IMAGES_EQ_EXP(out, out2);
+
+  auto out3 = mln::morpho::experimental::hit_or_miss(mln::view::cast<uint8_t>(ima), win1, win2);
+  ASSERT_IMAGES_EQ_EXP(mln::view::cast<uint8_t>(out), out3);
 }

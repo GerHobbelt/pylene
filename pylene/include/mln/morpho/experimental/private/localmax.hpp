@@ -32,8 +32,16 @@ namespace mln::morpho::experimental::details
     template <class I, class J, class ValueSet, class SE, class D>
     void localmax(I& in, J& out, ValueSet& vs, const mln::experimental::StructuringElement<SE>& se, const D&)
     {
-      mln::canvas::LocalAccumulation alg = { vs.accu_sup, static_cast<const SE&>(se), in, out };
-      alg.Execute();
+      if constexpr (SE::incremental::value && ValueSet::has_incremental_sup::value)
+      {
+        mln::canvas::LocalAccumulation alg = {vs.accu_incremental_sup, static_cast<const SE&>(se), in, out};
+        alg.Execute();
+      }
+      else
+      {
+        mln::canvas::LocalAccumulation alg = {vs.accu_sup, static_cast<const SE&>(se), in, out};
+        alg.Execute();
+      }
     }
   }
 

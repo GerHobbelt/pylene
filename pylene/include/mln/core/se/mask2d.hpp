@@ -3,6 +3,7 @@
 
 #include <mln/core/neighborhood/dyn_neighborhood.hpp> // [legacy]
 #include <mln/core/point.hpp>
+#include <mln/core/experimental/point.hpp>
 #include <mln/core/se/private/se_facade.hpp>
 
 #include <range/v3/span.hpp>
@@ -56,14 +57,14 @@ namespace mln::se
       /// \exception std::runtime_error if the sizes of the list are not odd.
       mask2d(std::initializer_list<std::initializer_list<int>> values);
 
-      ::ranges::span<const mln::point2d> offsets() const;
+      [[gnu::pure]] ::ranges::span<const mln::experimental::point2d> offsets() const;
 
       /// \brief Returns the radial extent of the mask
       int radial_extent() const { return m_radial_extent; }
 
     private:
-      std::vector<mln::point2d> m_points;
-      int                       m_radial_extent;
+      std::vector<mln::experimental::point2d> m_points;
+      int                                     m_radial_extent;
     };
   } // namespace experimental
 } // namespace mln::se

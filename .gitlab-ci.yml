@@ -295,6 +295,6 @@ package:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. --build missing -e CXX=g++ -e CC=gcc $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+        - conan create .. CONAN_USER/$PACKAGE_TAG --build missing -pr pylene_default -e CXX=g++ -e CC=gcc
         - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
     only: [ "dev", "development/ranges" ]

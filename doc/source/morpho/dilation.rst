@@ -57,7 +57,7 @@ Example 1 : Dilation by a square on a gray-level image
 .. code-block:: cpp
 
    #include <mln/morpho/dilation.hpp>
-   #include <mln/core/wind2d.hpp>
+   #include <mln/core/se/rect2d.hpp>
 
    // Define a square SE of size 21x21
    auto input = ...;

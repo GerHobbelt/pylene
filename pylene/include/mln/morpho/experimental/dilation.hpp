@@ -48,6 +48,7 @@ namespace mln::morpho::experimental
     template <class V, class = void>
     struct dilation_value_set : dilation_value_set_base<V>
     {
+      using has_incremental_sup = std::false_type;
       static inline constexpr auto accu_sup = mln::accu::accumulators::sup<V>{};
     };
 
@@ -55,7 +56,9 @@ namespace mln::morpho::experimental
     struct dilation_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16)>>
       : dilation_value_set_base<V>
     {
-      static inline constexpr auto accu_sup = mln::accu::accumulators::h_sup<V>{};
+      using has_incremental_sup = std::true_type;
+      static inline constexpr auto accu_sup = mln::accu::accumulators::sup<V>{};
+      static inline constexpr auto accu_incremental_sup = mln::accu::accumulators::h_sup<V>{};
     };
   }
 
@@ -71,7 +74,7 @@ namespace mln::morpho::experimental
     // assert(image.domain() == out.domain());
 
     if (! (bm.method() == mln::extension::BorderManagementMethod::Fill || bm.method() == mln::extension::BorderManagementMethod::User))
-      throw std::runtime_error("Invalid borde management method (should be FILL or USER)");
+      throw std::runtime_error("Invalid border management method (should be FILL or USER)");
 
     details::localmax(image, out, static_cast<const SE&>(se), bm, details::dilation_value_set<image_value_t<I>>());
   }

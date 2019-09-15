@@ -82,7 +82,7 @@ namespace mln::io::internal
 
 
 
-    struct impl_base_t : plugin2d_base::impl_t
+    struct impl_base_t : plugin_base::impl_t
     {
       const char*       m_filename;
       FIBITMAP*         m_dib;
@@ -97,14 +97,14 @@ namespace mln::io::internal
       void read_next_line(std::byte* buffer) final
       {
         BYTE* lineptr = FreeImage_GetScanLine(m_dib, m_y);
-        std::memcpy(buffer, lineptr, m_width * m_bpp / 8);
+        std::memcpy(buffer, lineptr, m_dims[0] * m_bpp / 8);
         m_y--;
       }
 
       void write_next_line(const std::byte* buffer) final
       {
         BYTE* lineptr = FreeImage_GetScanLine(m_dib, m_y);
-        std::memcpy(lineptr, buffer, m_width * m_bpp / 8);
+        std::memcpy(lineptr, buffer, m_dims[0] * m_bpp / 8);
         m_y--;
       }
     };
@@ -116,7 +116,7 @@ namespace mln::io::internal
       void read_next_line(std::byte* __restrict buffer) final
       {
         std::uint8_t* lineptr = (std::uint8_t*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0, t = 0; x < m_width; x += 8, t++)
+        for (int x = 0, t = 0; x < m_dims[0]; x += 8, t++)
         {
           buffer[x]     = std::byte((lineptr[t] & 0x80) != 0);
           buffer[x + 1] = std::byte((lineptr[t] & 0x40) != 0);
@@ -136,11 +136,11 @@ namespace mln::io::internal
         std::uint8_t* lineptr = (std::uint8_t*)FreeImage_GetScanLine(m_dib, m_y);
 
         int x, t;
-        for (x = 0, t = 0; x + 8 < m_width; x += 8, t++)
+        for (x = 0, t = 0; x + 8 < m_dims[0]; x += 8, t++)
           lineptr[t] = buffer[x + 0] << 7 | buffer[x + 1] << 6 | buffer[x + 2] << 5 | buffer[x + 3] << 4 |
                        buffer[x + 4] << 3 | buffer[x + 5] << 2 | buffer[x + 6] << 1 | buffer[x + 7] << 0;
 
-        int remainder = m_width - x;
+        int remainder = m_dims[0] - x;
         if (remainder > 0)
         {
           lineptr[t] = 0;
@@ -165,7 +165,7 @@ namespace mln::io::internal
       void read_next_line(std::byte* __restrict buffer) final
       {
         std::uint8_t* lineptr = (std::uint8_t*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0, t = 0; x < m_width; x += 8, t++)
+        for (int x = 0, t = 0; x < m_dims[0]; x += 8, t++)
         {
           buffer[x]     = std::byte((lineptr[t] & 0x80) == 0);
           buffer[x + 1] = std::byte((lineptr[t] & 0x40) == 0);
@@ -191,7 +191,7 @@ namespace mln::io::internal
       void read_next_line(std::byte* __restrict buffer) final
       {
         uint8_t* lineptr = (uint8_t*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0; x < m_width; ++x)
+        for (int x = 0; x < m_dims[0]; ++x)
         {
           buffer[3 * x + 0] = std::byte(m_palette[lineptr[x]].rgbRed);
           buffer[3 * x + 1] = std::byte(m_palette[lineptr[x]].rgbGreen);
@@ -209,7 +209,7 @@ namespace mln::io::internal
       void read_next_line(std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0; x < m_width; ++x)
+        for (int x = 0; x < m_dims[0]; ++x)
         {
           buffer[3 * x + 0] = lineptr[3 * x + FI_RGBA_RED];
           buffer[3 * x + 1] = lineptr[3 * x + FI_RGBA_GREEN];
@@ -221,7 +221,7 @@ namespace mln::io::internal
       void write_next_line(const std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0; x < m_width; ++x)
+        for (int x = 0; x < m_dims[0]; ++x)
         {
           lineptr[3 * x + FI_RGBA_RED]   = buffer[3 * x + 0];
           lineptr[3 * x + FI_RGBA_GREEN] = buffer[3 * x + 1];
@@ -237,7 +237,7 @@ namespace mln::io::internal
       void read_next_line(std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0; x < m_width; ++x)
+        for (int x = 0; x < m_dims[0]; ++x)
         {
           buffer[4 * x + 0] = lineptr[4 * x + FI_RGBA_RED];
           buffer[4 * x + 1] = lineptr[4 * x + FI_RGBA_GREEN];
@@ -250,7 +250,7 @@ namespace mln::io::internal
       void write_next_line(const std::byte* __restrict buffer) final
       {
         std::byte* lineptr = (std::byte*) FreeImage_GetScanLine(m_dib, m_y);
-        for (int x = 0; x < m_width; ++x)
+        for (int x = 0; x < m_dims[0]; ++x)
         {
           lineptr[4 * x + FI_RGBA_RED]   = buffer[4 * x + 0];
           lineptr[4 * x + FI_RGBA_GREEN] = buffer[4 * x + 1];
@@ -306,12 +306,13 @@ namespace mln::io::internal
 
     impl->m_dib            = dib;
     impl->m_fif            = fif;
-    impl->m_height         = FreeImage_GetHeight(dib);
-    impl->m_width          = FreeImage_GetWidth(dib);
+    impl->m_ndim           = 2;
+    impl->m_dims[0]        = FreeImage_GetWidth(dib);
+    impl->m_dims[1]        = FreeImage_GetHeight(dib);
     impl->m_sample_type_id = sid;
     impl->m_bpp            = bits_per_pixel;
     impl->m_palette        = FreeImage_GetPalette(dib);
-    impl->m_y              = impl->m_height - 1;
+    impl->m_y              = impl->m_dims[1] - 1;
 
     m_impl = std::move(impl);
     return;
@@ -362,8 +363,14 @@ namespace mln::io::internal
     this->close();
   }
 
-  void freeimage_writer_plugin::open(const char* filename, sample_type_id sample_type, int width, int height)
+  void freeimage_writer_plugin::open(const char* filename, sample_type_id sample_type, int ndim, const int dims[])
   {
+    if (ndim != 2)
+      throw std::runtime_error(fmt::format("Unsupported number of dimension (ndim={}, should be 2).", ndim));
+
+    const int width  = dims[0];
+    const int height = dims[1];
+
     std::unique_ptr<impl_base_t> impl;
 
     FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(filename);
@@ -412,7 +419,7 @@ namespace mln::io::internal
 
     if (!dib)
       throw std::runtime_error(
-          fmt::format("Unable to allocate image (type={}, bpp={}).", FreeImage_GetFormatFromFIF(fif), bits_per_pixel));
+        fmt::format("Unable to allocate image (type={}, bpp={}).", FreeImage_GetFormatFromFIF(fif), bits_per_pixel));
 
     // Set the palette
     RGBQUAD* palette = FreeImage_GetPalette(dib);
@@ -427,8 +434,9 @@ namespace mln::io::internal
         palette[i] = {(BYTE)i, (BYTE)i, (BYTE)i, 0u};
     }
 
-    impl->m_width          = width;
-    impl->m_height         = height;
+    impl->m_ndim           = 2;
+    impl->m_dims[0]        = width;
+    impl->m_dims[1]        = height;
     impl->m_sample_type_id = sample_type;
     impl->m_bpp            = bits_per_pixel;
     impl->m_dib            = dib;

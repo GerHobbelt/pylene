@@ -16,6 +16,6 @@ namespace mln::io::experimental
   void imread(const std::string& filename, mln::ndbuffer_image& out)
   {
     internal::freeimage_reader_plugin p;
-    internal::load2d(&p, filename.c_str(), out);
+    internal::load(&p, filename.c_str(), out);
   }
 }

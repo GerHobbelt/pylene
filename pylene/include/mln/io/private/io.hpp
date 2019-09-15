@@ -11,20 +11,22 @@
 
 namespace mln::io::internal
 {
-  void load2d(plugin2d_reader* p, const char* filename, mln::ndbuffer_image& output);
-
+  template <class I>
+  void save2d(mln::experimental::Image<I>& input, plugin_writer* p, const char* filename);
 
   template <class I>
-  void save2d(mln::experimental::Image<I>& input, plugin2d_writer* p, const char* filename);
+  void save2d(mln::experimental::Image<I>&& input, plugin_writer* p, const char* filename);
 
   template <class I>
-  void save2d(mln::experimental::Image<I>&& input, plugin2d_writer* p, const char* filename);
-
-  template <class I>
-  void save2d(const mln::experimental::Image<I>& input, plugin2d_writer* p, const char* filename);
+  void save2d(const mln::experimental::Image<I>& input, plugin_writer* p, const char* filename);
 
   // Specialization for types convertible to mln::ndbuffer_image
-  void save2d(const mln::ndbuffer_image& input, plugin2d_writer* p, const char* filename);
+  inline void save2d(const mln::ndbuffer_image& input, plugin_writer* p, const char* filename);
+
+
+  // Generic ndimension algorithm for buffer encoded image
+  void load(plugin_reader* p, const char* filename, mln::ndbuffer_image& output);
+  void save(const mln::ndbuffer_image& input, plugin_writer* p, const char* filename);
 }
 
 
@@ -34,7 +36,7 @@ namespace mln::io::internal
   {
 
     template <class Image>
-    void save2d(Image&& input, plugin2d_writer* p, const char* filename)
+    void save2d(Image&& input, plugin_writer* p, const char* filename)
     {
       using I = std::remove_reference_t<Image>;
       using V = image_value_t<I>;
@@ -49,7 +51,8 @@ namespace mln::io::internal
       sample_type_id           tid    = sample_type_traits<V>::id();
 
       // Read header
-      p->open(filename, tid, width, height);
+      int dims[2] = {width, height};
+      p->open(filename, tid, 2, dims);
 
       auto buffer = std::make_unique<V[]>(width);
 
@@ -71,22 +74,27 @@ namespace mln::io::internal
   } // namespace impl
 
   template <class I>
-  void save2d(mln::experimental::Image<I>&& input, plugin2d_writer* p, const char* filename)
+  void save2d(mln::experimental::Image<I>&& input, plugin_writer* p, const char* filename)
   {
     impl::save2d(static_cast<I&&>(input), p, filename);
   }
 
   template <class I>
-  void save2d(mln::experimental::Image<I>& input, plugin2d_writer* p, const char* filename)
+  void save2d(mln::experimental::Image<I>& input, plugin_writer* p, const char* filename)
   {
     impl::save2d(static_cast<I&>(input), p, filename);
   }
 
 
   template <class I>
-  void save2d(const mln::experimental::Image<I>& input, plugin2d_writer* p, const char* filename)
+  void save2d(const mln::experimental::Image<I>& input, plugin_writer* p, const char* filename)
   {
     impl::save2d(static_cast<const I&>(input), p, filename);
+  }
+
+  void save2d(const mln::ndbuffer_image& input, plugin_writer* p, const char* filename)
+  {
+    save(input, p, filename);
   }
 
 } // namespace mln::io::internal

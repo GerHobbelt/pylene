@@ -1,79 +1,60 @@
 #include <mln/io/private/io.hpp>
 
 
+#include <mln/core/canvas/private/traverse2d.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/io/private/plugin.hpp>
 
+#include <functional>
 #include <fmt/core.h>
-
-
 
 
 namespace mln::io::internal
 {
 
-  void load2d(plugin2d_reader* p, const char* filename, mln::ndbuffer_image& output)
+  void load(plugin_reader* p, const char* filename, mln::ndbuffer_image& output)
   {
     // Read header
     p->open(filename);
 
     // Allocate image
-    int            height = p->height();
-    int            width  = p->width();
+    int            pdim   = p->get_ndim();
     sample_type_id tid    = p->get_sample_type_id();
 
     if (output.sample_type() != sample_type_id::OTHER && output.sample_type() != tid)
       throw std::runtime_error(
-        fmt::format("Sample type mismatch. The input is {} (requested: {}).", (int)tid, (int)output.sample_type()));
+          fmt::format("Sample type mismatch. The input is {} (requested: {}).", (int)tid, (int)output.sample_type()));
 
-    if (output.pdim() != 0 && output.pdim() != 2)
-      throw std::runtime_error(fmt::format("Number of dimensions mismath (={}) (should be 2).", output.pdim()));
+    if (output.pdim() != 0 && output.pdim() != pdim)
+      throw std::runtime_error(fmt::format("Number of dimensions mismath (={}) (should be {}).", output.pdim(), pdim));
 
-    output.resize(tid, width, height);
+    output.resize(tid, pdim, p->get_dim_array(), image_build_params{});
 
-    // Fill content
-    {
-      std::byte*     lineptr = output.buffer();
-      std::ptrdiff_t stride  = output.byte_stride();
-      for (int y = 0; y < height; ++y)
-      {
-        p->read_next_line(lineptr);
-        lineptr += stride;
-      }
-    }
+    // Fill content (up to 4 dimensions for now)
+    mln::canvas::details::apply_line(output, std::bind(&plugin_reader::read_next_line, p, std::placeholders::_1));
 
     // Close handle
     p->close();
   }
 
-
-  void save2d(const mln::ndbuffer_image& input, plugin2d_writer* p, const char* filename)
+  void save(const mln::ndbuffer_image& input, plugin_writer* p, const char* filename)
   {
-    if (input.pdim() != 2)
-      throw std::runtime_error(fmt::format("Invalid number of dimensions (={}) (should be 2).", input.pdim()));
+    int ndim = input.pdim();
+    int sizes[16];
 
-    // Allocate image
-    int            height = input.size(1);
-    int            width  = input.size(0);
-    sample_type_id tid    = input.sample_type();
+    for (int k = 0; k < ndim; ++k)
+      sizes[k] = input.size(k);
 
     // Read header
-    p->open(filename, tid, width, height);
+    p->open(filename, input.sample_type(), ndim, sizes);
 
     // Fill content
-    {
-      const std::byte* lineptr = input.buffer();
-      std::ptrdiff_t stride  = input.byte_stride();
-      for (int y = 0; y < height; ++y)
-      {
-        p->write_next_line(lineptr);
-        lineptr += stride;
-      }
-    }
+    mln::canvas::details::apply_line(const_cast<mln::ndbuffer_image&>(input), std::bind(&plugin_writer::write_next_line, p, std::placeholders::_1));
 
     // Close handle
     p->close();
   }
+
 
 
 }

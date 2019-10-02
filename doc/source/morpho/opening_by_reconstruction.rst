@@ -22,7 +22,7 @@ Include :file:`<mln/morpho/opening_by_reconstruction.hpp>`
 
    :param f: Input image 𝑓
    :param markers:  Marker image (must have the same value type of 𝑓)
-   :param nbh:  Fundamental structiring element.
+   :param nbh:  Fundamental structuring element.
 
    :return: An image whose type is deduced from the input image
 

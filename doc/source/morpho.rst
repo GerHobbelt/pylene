@@ -12,6 +12,8 @@ Structural Morphological Operation
    morpho/opening
    morpho/closing
    morpho/hit_or_miss
+   morpho/rank_filter
+   morpho/median_filter
    morpho/opening_by_reconstruction
    morpho/closing_by_reconstruction
 

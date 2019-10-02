@@ -1,12 +1,16 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/se/rect2d.hpp>
-#include <mln/morpho/structural/closing.hpp>
-#include <mln/morpho/structural/dilate.hpp>
-#include <mln/morpho/structural/erode.hpp>
-#include <mln/morpho/structural/opening.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
+#include <mln/core/se/rect2d.hpp>
+
+#include <mln/morpho/experimental/closing.hpp>
+#include <mln/morpho/experimental/dilation.hpp>
+#include <mln/morpho/experimental/erosion.hpp>
+#include <mln/morpho/experimental/opening.hpp>
+#include <mln/morpho/experimental/median_filter.hpp>
+
+#include <mln/io/experimental/imread.hpp>
+#include <mln/io/experimental/imsave.hpp>
+
 
 #include <algorithm>
 #include <boost/program_options.hpp>
@@ -50,7 +54,8 @@ enum morpho_op_type
   kErosion,
   kDilation,
   kOpening,
-  kClosing
+  kClosing,
+  kMedian,
 };
 
 std::istream& operator>>(std::istream& in, morpho_op_type& se)
@@ -66,6 +71,8 @@ std::istream& operator>>(std::istream& in, morpho_op_type& se)
     se = kOpening;
   else if (token == "closing")
     se = kClosing;
+  else if (token == "median")
+    se = kMedian;
   else
     throw po::invalid_option_value("Invalid Operator");
   return in;
@@ -116,27 +123,30 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  mln::image2d<mln::uint8> input, output;
-  mln::io::imread(vm["input"].as<std::string>(), input);
+  mln::experimental::image2d<mln::uint8> input, output;
+  mln::io::experimental::imread(vm["input"].as<std::string>(), input);
 
 
-  mln::se::rect2d nbh(size, size);
+  mln::experimental::se::rect2d nbh(size, size);
 
   switch (vm["operator"].as<morpho_op_type>())
   {
   case kErosion:
-    output = mln::morpho::structural::erode(input, nbh);
+    output = mln::morpho::experimental::erosion(input, nbh);
     break;
   case kDilation:
-    output = mln::morpho::structural::dilate(input, nbh);
+    output = mln::morpho::experimental::dilation(input, nbh);
     break;
   case kOpening:
-    output = mln::morpho::structural::opening(input, nbh);
+    output = mln::morpho::experimental::opening(input, nbh);
     break;
   case kClosing:
-    output = mln::morpho::structural::closing(input, nbh);
+    output = mln::morpho::experimental::closing(input, nbh);
+    break;
+  case kMedian:
+    output = mln::morpho::experimental::median_filter(input, nbh, mln::extension::bm::mirror{});
     break;
   }
 
-  mln::io::imsave(output, vm["output"].as<std::string>());
+  mln::io::experimental::imsave(output, vm["output"].as<std::string>());
 }

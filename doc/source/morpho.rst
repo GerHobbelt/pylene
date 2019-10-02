@@ -14,19 +14,8 @@ Structural Morphological Operation
    morpho/hit_or_miss
    morpho/rank_filter
    morpho/median_filter
-   morpho/gradient
-
-Geodesic transformations
-************************
-
-.. toctree::
-   :maxdepth: 1
-
    morpho/opening_by_reconstruction
-   morpho/area_filter
-   morpho/dynamic_filter
-   morpho/extinction_transform
-   morpho/fill_hole
+   morpho/closing_by_reconstruction
 
 
 Segmentation
@@ -37,20 +26,6 @@ Segmentation
 
    morpho/watershed
 
-
-Component Trees & Hierarchical Representations
-**********************************************
-
-.. toctree::
-    :maxdepth: 1
-
-    morpho/component_tree
-    morpho/maxtree
-    morpho/tos
-    morpho/multivariate_component_tree
-    morpho/alphatree
-    morpho/watershed_hierarchy
-    morpho/waterfall
 
 
 

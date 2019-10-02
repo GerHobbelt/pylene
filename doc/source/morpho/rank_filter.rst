@@ -3,14 +3,12 @@ Rank filter
 
 Include :file:`<mln/morpho/rank_filter.hpp>`
 
-.. cpp:namespace:: mln::morpho
-
 
 .. cpp:function:: \
     template <class Ratio> void rank_filter(Image image, StructuringElement se, BorderManager bm, OutputImage out)
-    template <class Ratio, Image I> image_concrete_t<I> rank_filter(I image, StructuringElement se, BorderManager bm)
+    template <class Ratio> Image{I} concrete_t<I> rank_filter(I image, StructuringElement se, BorderManager bm)
 
-
+    
     The rank filter is non-linear filter that assigns the 𝑟-th value in a given structuring element 𝐵.
 
     .. math::
@@ -31,7 +29,7 @@ Include :file:`<mln/morpho/rank_filter.hpp>`
     :return:
        * (1) Nothing (the output image is passed as an argument)
        * (2) An image whose type is deduced from the input image
-
+    
     :exception: N/A
 
 

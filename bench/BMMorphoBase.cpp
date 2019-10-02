@@ -10,6 +10,7 @@
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/experimental/hit_or_miss.hpp>
 #include <mln/morpho/experimental/opening.hpp>
+#include <mln/morpho/experimental/median_filter.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -131,6 +132,7 @@ BENCHMARK_DEFINE_F(BMMorpho, Dilation_Square)(benchmark::State& st)
   this->run(st, f);
 }
 
+
 constexpr int max_range = 128;
 
 BENCHMARK_REGISTER_F(BMMorpho, Dilation_ApproximatedDisc)->RangeMultiplier(2)->Range(2, max_range);
@@ -147,6 +149,16 @@ BENCHMARK_F(BMMorpho, Opening_Disc)(benchmark::State& st)
   auto f = [se](const image_t& input, image_t& output) { mln::morpho::experimental::opening(input, se, output); };
   this->run(st, f);
 }
+
+BENCHMARK_F(BMMorpho, Median_Filter_Disc)(benchmark::State& st)
+{
+  int  radius = 32;
+  auto se     = mln::experimental::se::disc(radius);
+  auto f = [se](const image_t& input, image_t& output) { mln::morpho::experimental::median_filter(input, se, mln::extension::bm::mirror{}, output); };
+  this->run(st, f);
+}
+
+
 
 BENCHMARK_F(BMMorpho, Hit_or_miss_corner)(benchmark::State& st)
 {

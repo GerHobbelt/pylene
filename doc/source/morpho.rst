@@ -15,7 +15,6 @@ Structural Morphological Operation
    morpho/rank_filter
    morpho/median_filter
    morpho/opening_by_reconstruction
-   morpho/closing_by_reconstruction
 
 
 Segmentation

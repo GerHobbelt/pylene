@@ -4,11 +4,16 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/core/se/mask2d.hpp>
+#include <mln/core/neighb2d.hpp>
+
 #include <mln/io/experimental/imread.hpp>
+
+#include <mln/morpho/hit_or_miss.hpp>
+#include <mln/morpho/median_filter.hpp>
+#include <mln/morpho/opening_by_reconstruction.hpp>
 #include <mln/morpho/structural/closing.hpp>
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
-#include <mln/morpho/hit_or_miss.hpp>
 #include <mln/morpho/structural/opening.hpp>
 
 // [legacy]
@@ -103,11 +108,25 @@ BENCHMARK_REGISTER_F(BMMorpho, Dilation_Square)->RangeMultiplier(2)->Range(2, ma
 
 BENCHMARK_F(BMMorpho, Opening_Disc)(benchmark::State& st)
 {
-  int  radius = 32;
-  auto se     = mln::se::disc(radius);
-  auto f = [se](const image_t& input, image_t& output) { mln::morpho::structural::opening(input, se, mln::productorder_less<uint8_t>(), output); };
+  int  radius  = 32;
+  auto se      = mln::se::rect2d(2 * radius + 1, 2 * radius + 1);
+  auto f       = [se](const image_t& input, image_t& output) {
+    output = mln::morpho::structural::opening(input, se, mln::productorder_less<uint8_t>());
+  };
   this->run(st, f);
 }
+
+BENCHMARK_F(BMMorpho, Opening_By_Reconstruction_Disc)(benchmark::State& st)
+{
+  int  radius  = 32;
+  auto se     = mln::se::disc(radius);
+  auto markers = mln::morpho::structural::erode(m_input_, se);
+  auto f       = [m = std::move(markers)](const image_t& input, image_t& output) {
+    output = mln::morpho::opening_by_reconstruction(input, m, mln::c4);
+  };
+  this->run(st, f);
+}
+
 
 BENCHMARK_F(BMMorpho, Hit_or_miss_corner)(benchmark::State& st)
 {

@@ -1,16 +1,20 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
+
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/core/se/mask2d.hpp>
+#include <mln/core/neighborhood/c4.hpp>
 #include <mln/io/experimental/imread.hpp>
+
 #include <mln/morpho/experimental/closing.hpp>
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/experimental/hit_or_miss.hpp>
-#include <mln/morpho/experimental/opening.hpp>
 #include <mln/morpho/experimental/median_filter.hpp>
+#include <mln/morpho/experimental/opening.hpp>
+#include <mln/morpho/experimental/reconstruction.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -153,10 +157,26 @@ BENCHMARK_F(BMMorpho, Opening_Disc)(benchmark::State& st)
 BENCHMARK_F(BMMorpho, Median_Filter_Disc)(benchmark::State& st)
 {
   int  radius = 32;
-  auto se     = mln::experimental::se::disc(radius);
-  auto f = [se](const image_t& input, image_t& output) { mln::morpho::experimental::median_filter(input, se, mln::extension::bm::mirror{}, output); };
+  auto se      = mln::experimental::se::rect2d(2 * radius + 1, 2 * radius + 1);
+  auto f       = [se](const image_t& input, image_t& output) {
+    mln::morpho::experimental::median_filter(input, se, mln::extension::bm::mirror{}, output);
+  };
   this->run(st, f);
 }
+
+
+BENCHMARK_F(BMMorpho, Opening_By_Reconstruction_Disc)(benchmark::State& st)
+{
+  int  radius = 32;
+  auto se     = mln::experimental::se::disc(radius);
+  auto markers = mln::morpho::experimental::erosion(m_input, se);
+  auto f       = [m = std::move(markers)](const image_t& input, image_t& output) {
+    output = mln::morpho::experimental::opening_by_reconstruction(input, m, mln::experimental::c4);
+  };
+  this->run(st, f);
+}
+
+
 
 
 

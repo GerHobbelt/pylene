@@ -6,7 +6,7 @@ Include :file:`<mln/morpho/rank_filter.hpp>`
 
 .. cpp:function:: \
     template <class Ratio> void rank_filter(Image image, StructuringElement se, BorderManager bm, OutputImage out)
-    template <class Ratio> Image{I} concrete_t<I> rank_filter(I image, StructuringElement se, BorderManager bm)
+    template <class Ratio, Image I> concrete_t<I> rank_filter(I image, StructuringElement se, BorderManager bm)
 
     
     The rank filter is non-linear filter that assigns the 𝑟-th value in a given structuring element 𝐵.

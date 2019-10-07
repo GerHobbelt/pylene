@@ -1,17 +1,17 @@
 #pragma once
 
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
-#include <mln/core/point.hpp>
+#include <mln/core/experimental/point.hpp>
 
 #include <array>
 #include <range/v3/span.hpp>
 
-namespace mln
+namespace mln::experimental
 {
   struct c2_h_t : neighborhood_facade<c2_h_t>
   {
   private:
-    using point_t = mln::ndpoint<2, std::ptrdiff_t>;
+    using point_t = mln::experimental::ndpoint<2, std::ptrdiff_t>;
 
   public:
     using category     = constant_neighborhood_tag;
@@ -26,7 +26,7 @@ namespace mln
     static constexpr int radial_extent() { return 1; }
 
     /// \brief Return the input ROI for 2D box.
-    mln::box2d compute_input_region(mln::box2d roi) const
+    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const
     {
       --roi.tl().x();
       ++roi.br().x();
@@ -34,11 +34,9 @@ namespace mln
     }
 
     /// \brief Return the output ROI for 2D box.
-    mln::box2d compute_output_region(mln::box2d roi) const
+    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const
     {
-      if (roi.width() < 2)
-        return {};
-
+      // Fixme: check emptiness
       ++roi.tl().x();
       --roi.br().x();
       return roi;
@@ -54,4 +52,4 @@ namespace mln
   };
 
   static constexpr inline c2_h_t c2_h = {};
-} // namespace mln::
+} // namespace mln::experimental

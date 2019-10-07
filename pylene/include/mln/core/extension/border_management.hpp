@@ -239,6 +239,25 @@ namespace mln::extension
       mln::paste(ima, roi, output);
       return output;
     }
+
+    template <class I, class SE, class D>
+    I create_temporary_image(const SE& se, const D& roi) const
+    {
+      static_assert(mln::is_a<I, mln::experimental::Image>());
+      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>());
+
+      if (m_value.type() != typeid(image_value_t<I>))
+        throw std::runtime_error(
+          "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
+
+      D input_roi = se.compute_input_region(roi);
+
+      image_build_params params;
+      params.init_value = m_value;
+
+      image_concrete_t<I> output(input_roi, params);
+      return output;
+    }
   };
 
   template <typename U>

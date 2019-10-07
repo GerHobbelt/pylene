@@ -25,6 +25,21 @@ namespace mln::experimental
 
     static constexpr int radial_extent() { return 1; }
 
+    /// \brief Return the input ROI for 2D box.
+    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const
+    {
+      roi.inflate(1);
+      return roi;
+    }
+
+    /// \brief Return the output ROI for 2D box.
+    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const
+    {
+      roi.inflate(-1);
+      return roi;
+    }
+
+
   private:
     // clang-format off
     static inline constexpr std::array<point_t, 4> m_offsets = {{

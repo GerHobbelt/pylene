@@ -43,7 +43,7 @@ Complexity
 
 
 Example 1 : Median-filter by a square on a gray-level image
----------------------------------------------------------
+-----------------------------------------------------------
 
 .. code-block:: cpp
 

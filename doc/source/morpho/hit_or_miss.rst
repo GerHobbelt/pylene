@@ -94,11 +94,10 @@ Hit or miss transform to detect horizontal 2px-thick line, with pattern::
            :width: 49%
 
 
-Logical or between the two previous images:
+Logical or between the two previous images::
 
-.. literalinclude:: /snippets/staff_lines.cpp
-   :lines: 50
-   :language: cpp
+  using mln::view::ops;
+  auto markers = markers1 || markers2;
 
 .. image:: /images/staff_lines.png
            :width: 49%

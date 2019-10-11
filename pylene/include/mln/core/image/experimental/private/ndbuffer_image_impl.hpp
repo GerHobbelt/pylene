@@ -125,7 +125,6 @@ namespace mln::details
   }
 
 
-
   template <int pdim>
   void* ndbuffer_image_impl_base_2<pdim>::get_pointer(const ndbuffer_image_info_t* ima, const int coordinates[])
   {
@@ -135,13 +134,21 @@ namespace mln::details
     return ima->m_buffer + x;
   }
 
-
   // Return a pointer to the loc given by p
   template <class T, int pdim>
   T* ndbuffer_image_impl<T, pdim>::get_pointer(const ndbuffer_image_info_t* ima, const int coordinates[])
   {
-    return reinterpret_cast<T*>(ndbuffer_image_impl_base_2<pdim>::get_pointer(ima, coordinates));
+    if constexpr (std::is_same_v<T, void>)
+      return reinterpret_cast<T*>(ndbuffer_image_impl_base_2<pdim>::get_pointer(ima, coordinates));
+    else
+    {
+      std::ptrdiff_t x = 0;
+      for (int k = 1; k < get_pdim(ima); ++k)
+        x += coordinates[k] * ima->m_axes[k].byte_stride;
+      return reinterpret_cast<T*>(ima->m_buffer + x) + coordinates[0];
+    }
   }
+
 
   template <class T>
   T* ndbuffer_image_impl_base_1<T>::get_pointer(const ndbuffer_image_info_t* ima, std::ptrdiff_t index)

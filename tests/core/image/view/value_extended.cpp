@@ -10,7 +10,7 @@
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::InputImage<mln::value_extended_view<mln::archetypes::InputImage>>);
-static_assert(not mln::concepts::OutputImage<mln::value_extended_view<mln::archetypes::OutputImage>>);
+static_assert(mln::concepts::OutputImage<mln::value_extended_view<mln::archetypes::OutputImage>>);
 static_assert(mln::concepts::IndexableImage<mln::value_extended_view<mln::archetypes::IndexableImage>>);
 static_assert(mln::concepts::AccessibleImage<mln::value_extended_view<mln::archetypes::AccessibleImage>>);
 static_assert(mln::concepts::BidirectionalImage<mln::value_extended_view<mln::archetypes::BidirectionalImage>>);

@@ -36,8 +36,10 @@ namespace mln
     using extension_type     = extension::by_value<image_value_t<I>>;
     using value_type         = image_value_t<I>;
 
-    using reference = const value_type; // Restrict the image to be read-only by copy, should not be const and be
-                                        // checked on pixel concept (but issue with proxy)
+    // FIXME: use common_reference here between image_reference_t<I> AND value_type&
+    using reference = image_reference_t<I>; // Not write only (we may want an out of bound value while keeping the
+                                            // the writability of the image)
+
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using typename image_adaptor<I>::domain_type;
 

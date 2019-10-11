@@ -20,6 +20,9 @@ namespace mln
   {
     D m_subdomain;
 
+    template <class I2, class D2>
+    friend class clip_view;
+
   public:
     /// Type definitions
     /// \{
@@ -60,14 +63,7 @@ namespace mln
 
     template <class I2, class D2>
     clip_view(const clip_view<I2, D2>& other, const image_build_params& params)
-      : clip_view::image_adaptor{imchvalue<value_type>(other, params).build()}
-      , m_subdomain{other.m_subdomain}
-    {
-    }
-
-    template <class I2, class D2>
-    clip_view(const clip_view<I2, D2>& other, const value_type& v)
-      : clip_view::image_adaptor{static_cast<I>((other.base().template ch_value<value_type>()).init(v))}
+      : clip_view::image_adaptor{imchvalue<value_type>(other.base()).set_params(params).build()}
       , m_subdomain{other.m_subdomain}
     {
     }

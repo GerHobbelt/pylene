@@ -5,7 +5,8 @@
 #include <mln/core/algorithm/sort.hpp>
 
 #include <mln/core/dontcare.hpp> // detail::ignore_t
-#include <mln/core/trace.hpp> // detail::ignore_t
+#include <mln/core/trace.hpp>
+
 #include <range/v3/view/reverse.hpp>
 
 namespace mln::morpho::experimental::canvas
@@ -61,15 +62,30 @@ namespace mln::morpho::experimental::canvas
   namespace impl
   {
     template <class I>
-    image_point_t<I> zfindroot(I& par, image_point_t<I> p)
+    [[gnu::noinline]] image_point_t<I> zfindroot(I& par, image_point_t<I> p0) noexcept
     {
       static_assert(mln::is_a<I, mln::experimental::Image>());
 
-      auto q = par(p);
-      if (q != p)
-        return (par(p) = zfindroot(par, q));
-      else
-        return p;
+      image_point_t<I> r;
+      // find root
+      {
+        auto p = p0, q = par(p);
+        while (p != q)
+        {
+          p = q;
+          q = par(p);
+        }
+        r = p;
+      }
+
+      // path compression
+      for (auto p = p0; p != r;)
+      {
+        auto q = par(p);
+        par(p) = r;
+        p = q;
+      }
+      return r;
     }
 
     template <class P>

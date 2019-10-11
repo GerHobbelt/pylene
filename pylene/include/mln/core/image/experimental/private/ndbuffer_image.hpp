@@ -203,7 +203,7 @@ namespace mln
   /******************************************/
 
   template <class T, int N>
-  experimental::ndbox<N> __ndbuffer_image<T, N>::domain() const noexcept
+  inline experimental::ndbox<N> __ndbuffer_image<T, N>::domain() const noexcept
   {
     experimental::ndpoint<N> pmin, pmax;
     for (int k = 0; k < N; ++k)
@@ -216,20 +216,21 @@ namespace mln
 
 
   template <class T, int N>
-  void __ndbuffer_image<T, N>::__init(alloc_fun_t __allocate, int topleft[], int sizes[], std::ptrdiff_t byte_strides[],
+  inline void __ndbuffer_image<T, N>::__init(alloc_fun_t __allocate, int topleft[], int sizes[], std::ptrdiff_t byte_strides[],
                                       const image_build_params& params)
   {
     base::__init(__allocate, sample_type_traits<T>::id(), sizeof(T), N, topleft, sizes, byte_strides, params);
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::concretize() const noexcept -> image_builder<concrete_type, __ndbuffer_image<T,N>>
+  inline auto __ndbuffer_image<T, N>::concretize() const noexcept -> image_builder<concrete_type, __ndbuffer_image<T,N>>
   {
     return {*this};
   }
 
   template <class T, int N>
   template <class V>
+  inline
   auto __ndbuffer_image<T, N>::ch_value() const noexcept -> image_builder<ch_value_type<V>, __ndbuffer_image<T, N>>
   {
     return {*this};
@@ -237,7 +238,7 @@ namespace mln
 
 
   template <class T, int N>
-  __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int topleft[], int sizes[],
+  inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int topleft[], int sizes[],
                                                              std::ptrdiff_t byte_strides[], bool copy)
   {
     image_build_params params;
@@ -264,7 +265,7 @@ namespace mln
   }
 
   template <class T, int N>
-  __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int sizes[], std::ptrdiff_t byte_strides[], bool copy)
+  inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_buffer(T* buffer, int sizes[], std::ptrdiff_t byte_strides[], bool copy)
   {
     int topleft[N] = {0};
     return __ndbuffer_image<T, N>::from_buffer(buffer, topleft, sizes, byte_strides, copy);
@@ -272,7 +273,7 @@ namespace mln
 
   template <class T, int N>
   template <class E>
-  __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from(const mln::ndimage_base<T, N, E>& other)
+  inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from(const mln::ndimage_base<T, N, E>& other)
   {
     auto tmp = base::from(other);
     return static_cast<__ndbuffer_image&>(tmp);
@@ -280,20 +281,20 @@ namespace mln
 
 
   template <class T, int N>
-  __ndbuffer_image<T,N>::__ndbuffer_image(experimental::ndbox<N> domain, const image_build_params& params)
+  inline __ndbuffer_image<T,N>::__ndbuffer_image(experimental::ndbox<N> domain, const image_build_params& params)
   {
     this->resize(domain, params);
   }
 
   template <class T, int N>
-  __ndbuffer_image<T, N>::__ndbuffer_image()
+  inline __ndbuffer_image<T, N>::__ndbuffer_image()
     : base(details::ndbuffer_image_info_t{sample_type_traits<T>::id(), N, {}, nullptr})
   {
   }
 
   template <class T, int N>
   template <int, class>
-  __ndbuffer_image<T, N>::__ndbuffer_image(int width, const image_build_params& params)
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(int width, const image_build_params& params)
   {
     this->resize(width, params);
   }
@@ -301,14 +302,14 @@ namespace mln
 
   template <class T, int N>
   template <int, class>
-  __ndbuffer_image<T, N>::__ndbuffer_image(int width, int height, const image_build_params& params)
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(int width, int height, const image_build_params& params)
   {
     this->resize(width, height, params);
   }
 
   template <class T, int N>
   template <int, class>
-  __ndbuffer_image<T, N>::__ndbuffer_image(int width, int height, int depth, const image_build_params& params)
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(int width, int height, int depth, const image_build_params& params)
   {
     this->resize(width, height, depth, params);
   }
@@ -316,21 +317,21 @@ namespace mln
 
   template <class T, int N>
   template <int M, class>
-  __ndbuffer_image<T, N>::__ndbuffer_image(std::initializer_list<T> values)
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(std::initializer_list<T> values)
     : base(std::move(values))
   {
   }
 
   template <class T, int N>
   template <int M, class>
-  __ndbuffer_image<T, N>::__ndbuffer_image(std::initializer_list<std::initializer_list<T>> values)
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(std::initializer_list<std::initializer_list<T>> values)
     : base(std::move(values))
   {
   }
 
   template <class T, int N>
   template <int M, class>
-  __ndbuffer_image<T, N>::__ndbuffer_image(
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(
       std::initializer_list<std::initializer_list<std::initializer_list<T>>> values)
     : base(std::move(values))
   {
@@ -339,13 +340,13 @@ namespace mln
 
   template <class T, int N>
   template <class U>
-  __ndbuffer_image<T, N>::__ndbuffer_image(const __ndbuffer_image<U, N>& other, const image_build_params& params)
+  inline __ndbuffer_image<T, N>::__ndbuffer_image(const __ndbuffer_image<U, N>& other, const image_build_params& params)
   {
     this->resize(other, params);
   }
 
   template <class T, int N>
-  void __ndbuffer_image<T, N>::resize(experimental::ndbox<N> domain, const image_build_params& params)
+  inline void __ndbuffer_image<T, N>::resize(experimental::ndbox<N> domain, const image_build_params& params)
   {
     int tl[N];
     int sz[N];
@@ -362,7 +363,7 @@ namespace mln
 
   template <class T, int N>
   template <int, class>
-  void __ndbuffer_image<T, N>::resize(int width, const image_build_params& params)
+  inline void __ndbuffer_image<T, N>::resize(int width, const image_build_params& params)
   {
     auto domain = experimental::ndbox<N>(width);
     resize(domain, params);
@@ -371,7 +372,7 @@ namespace mln
 
   template <class T, int N>
   template <int, class>
-  void __ndbuffer_image<T, N>::resize(int width, int height, const image_build_params& params)
+  inline void __ndbuffer_image<T, N>::resize(int width, int height, const image_build_params& params)
   {
     auto domain = experimental::ndbox<N>(width, height);
     resize(domain, params);
@@ -380,7 +381,7 @@ namespace mln
 
   template <class T, int N>
   template <int, class>
-  void __ndbuffer_image<T, N>::resize(int width, int height, int depth, const image_build_params& params)
+  inline void __ndbuffer_image<T, N>::resize(int width, int height, int depth, const image_build_params& params)
   {
     auto domain = experimental::ndbox<N>(width, height, depth);
     resize(domain, params);
@@ -389,7 +390,7 @@ namespace mln
 
   template <class T, int N>
   template <class U>
-  void __ndbuffer_image<T, N>::resize(const __ndbuffer_image<U, N>& other, image_build_params params)
+  inline void __ndbuffer_image<T, N>::resize(const __ndbuffer_image<U, N>& other, image_build_params params)
   {
     if (params.border == -1)
       params.border = other.border();
@@ -400,7 +401,7 @@ namespace mln
 
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::point_at_index(index_type i) const noexcept -> point_type
+  inline auto __ndbuffer_image<T, N>::point_at_index(index_type i) const noexcept -> point_type
   {
     point_type coords;
     Impl::get_point(this->__info(), i, coords.data());
@@ -408,7 +409,7 @@ namespace mln
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::index_of_point(point_type p) const noexcept -> index_type
+  inline auto __ndbuffer_image<T, N>::index_of_point(point_type p) const noexcept -> index_type
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return Impl::get_index(this->__info(), p.data());
@@ -416,25 +417,25 @@ namespace mln
 
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::delta_index(point_type p) const noexcept -> index_type
+  inline auto __ndbuffer_image<T, N>::delta_index(point_type p) const noexcept -> index_type
   {
     return Impl::get_index(this->__info(), p.data());
   }
 
   template <class T, int N>
-  T* __ndbuffer_image<T, N>::buffer() noexcept
+  inline T* __ndbuffer_image<T, N>::buffer() noexcept
   {
     return reinterpret_cast<T*>(this->base::buffer());
   }
 
   template <class T, int N>
-  const T* __ndbuffer_image<T, N>::buffer() const noexcept
+  inline const T* __ndbuffer_image<T, N>::buffer() const noexcept
   {
     return reinterpret_cast<T*>(this->base::buffer());
   }
 
   template <class T, int N>
-  __ndbuffer_image<T, 2> __ndbuffer_image<T, N>::slice(int z) const
+  inline __ndbuffer_image<T, 2> __ndbuffer_image<T, N>::slice(int z) const
   {
     int begin[N] = {this->__axes(0).domain_begin, this->__axes(1).domain_begin, z};
     int end[N]   = {this->__axes(0).domain_end,   this->__axes(1).domain_end, z + 1};
@@ -450,7 +451,7 @@ namespace mln
   }
 
   template <class T, int N>
-  __ndbuffer_image<T, 1> __ndbuffer_image<T, N>::row(int y) const
+  inline __ndbuffer_image<T, 1> __ndbuffer_image<T, N>::row(int y) const
   {
     int begin[N] = {m_axes[0].domain_begin, y};
     int end[N]   = {m_axes[0].domain_end, y + 1};
@@ -466,7 +467,7 @@ namespace mln
   }
 
   template <class T, int N>
-  __ndbuffer_image<T, N> __ndbuffer_image<T, N>::clip(const experimental::ndbox<N>& roi) const
+  inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::clip(const experimental::ndbox<N>& roi) const
   {
     __ndbuffer_image tmp = *this;
     Impl::select(&tmp, N, roi.tl().data(), roi.br().data());
@@ -475,21 +476,21 @@ namespace mln
 
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::operator()(point_type p) const noexcept -> const_reference
+  inline auto __ndbuffer_image<T, N>::operator()(point_type p) const noexcept -> const_reference
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::operator()(point_type p) noexcept -> reference
+  inline auto __ndbuffer_image<T, N>::operator()(point_type p) noexcept -> reference
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::__pixel_at(point_type p) const noexcept -> new_const_pixel_type
+  inline auto __ndbuffer_image<T, N>::__pixel_at(point_type p) const noexcept -> new_const_pixel_type
   {
     point_type lcoords = p;
     lcoords[0]         = 0;
@@ -498,7 +499,7 @@ namespace mln
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::__pixel_at(point_type p) noexcept -> new_pixel_type
+  inline auto __ndbuffer_image<T, N>::__pixel_at(point_type p) noexcept -> new_pixel_type
   {
     point_type lcoords = p;
     lcoords[0]         = 0;
@@ -507,62 +508,62 @@ namespace mln
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::new_pixel(point_type p) const noexcept -> new_const_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel(point_type p) const noexcept -> new_const_pixel_type
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::new_pixel(point_type p) noexcept -> new_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel(point_type p) noexcept -> new_pixel_type
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::new_pixel_at(point_type p) const noexcept -> new_const_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel_at(point_type p) const noexcept -> new_const_pixel_type
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::new_pixel_at(point_type p) noexcept -> new_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel_at(point_type p) noexcept -> new_pixel_type
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::at(point_type p) const noexcept -> const_reference
+  inline auto __ndbuffer_image<T, N>::at(point_type p) const noexcept -> const_reference
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::at(point_type p) noexcept -> reference
+  inline auto __ndbuffer_image<T, N>::at(point_type p) noexcept -> reference
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::operator[](index_type i) const noexcept -> const_reference
+  inline auto __ndbuffer_image<T, N>::operator[](index_type i) const noexcept -> const_reference
   {
     return *Impl::get_pointer(this->__info(), i);
   }
 
   template <class T, int N>
-  auto __ndbuffer_image<T, N>::operator[](index_type i) noexcept -> reference
+  inline auto __ndbuffer_image<T, N>::operator[](index_type i) noexcept -> reference
   {
     return *Impl::get_pointer(this->__info(), i);
   }
 
 
   template <class T, int N>
-  ranges::multi_span<T, N> __ndbuffer_image<T, N>::new_values() noexcept
+  inline ranges::multi_span<T, N> __ndbuffer_image<T, N>::new_values() noexcept
   {
     std::array<std::size_t, N>    counts;
     std::array<std::ptrdiff_t, N> strides;
@@ -575,7 +576,7 @@ namespace mln
   }
 
   template <class T, int N>
-  ranges::multi_span<const T, N> __ndbuffer_image<T, N>::new_values() const noexcept
+  inline ranges::multi_span<const T, N> __ndbuffer_image<T, N>::new_values() const noexcept
   {
     std::array<std::size_t, N>    counts;
     std::array<std::ptrdiff_t, N> strides;
@@ -589,14 +590,14 @@ namespace mln
 
 
   template <class T, int N>
-  experimental::details::ndpix_range<T, N> __ndbuffer_image<T, N>::new_pixels() noexcept
+  inline experimental::details::ndpix_range<T, N> __ndbuffer_image<T, N>::new_pixels() noexcept
   {
     return {this->__info()};
   }
 
 
   template <class T, int N>
-  experimental::details::ndpix_range<const T, N> __ndbuffer_image<T, N>::new_pixels() const noexcept
+  inline experimental::details::ndpix_range<const T, N> __ndbuffer_image<T, N>::new_pixels() const noexcept
   {
     return {this->__info()};
   }

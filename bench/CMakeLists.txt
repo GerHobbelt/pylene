@@ -25,10 +25,10 @@ ExternalData_Expand_Arguments(
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(STANDALONE_COMPILE_FLAGS "-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -gline-tables-only -gcolumn-info ")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -g")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(STANDALONE_COMPILE_FLAGS "-g -fopt-info -fopt-info-vec-missed -ftree-vectorize -ftree-vectorizer-verbose=2")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
+  set(STANDALONE_COMPILE_FLAGS "-g -fopt-info-vec -fopt-info-vec-missed -ftree-vectorize -ftree-vectorizer-verbose=2")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -g")
 else ()
   # W4141: 'inline' : utilisé plusieurs fois in benchmark.h
   set(STANDALONE_COMPILE_FLAGS " ")

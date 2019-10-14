@@ -15,6 +15,7 @@
 #include <mln/morpho/experimental/median_filter.hpp>
 #include <mln/morpho/experimental/opening.hpp>
 #include <mln/morpho/experimental/reconstruction.hpp>
+#include <mln/morpho/experimental/watershed.hpp>
 
 #include <mln/labeling/experimental/local_extrema.hpp>
 
@@ -214,6 +215,18 @@ BENCHMARK_F(BMMorpho, minima)(benchmark::State& st)
   };
   this->run(st, f);
 }
+
+
+BENCHMARK_F(BMMorpho, watershed)(benchmark::State& st)
+{
+  auto f = [](const image_t& input, image_t&) {
+    int nlabel;
+    mln::morpho::experimental::watershed<int8_t>(input, mln::experimental::c4, nlabel);
+    return nlabel;
+  };
+  this->run(st, f);
+}
+
 
 
 BENCHMARK_MAIN();

@@ -15,6 +15,7 @@
 #include <mln/morpho/structural/dilate.hpp>
 #include <mln/morpho/structural/erode.hpp>
 #include <mln/morpho/structural/opening.hpp>
+#include <mln/morpho/watershed.hpp>
 
 #include <mln/labeling/local_extrema.hpp>
 
@@ -157,6 +158,16 @@ BENCHMARK_F(BMMorpho, minima)(benchmark::State& st)
   auto f = [](const image_t& input, image_t&) {
     int nlabel;
     mln::labeling::local_minima<int8_t>(input, mln::c4, nlabel);
+    return nlabel;
+  };
+  this->run(st, f);
+}
+
+BENCHMARK_F(BMMorpho, watershed)(benchmark::State& st)
+{
+  auto f = [](const image_t& input, image_t&) {
+    int nlabel;
+    mln::morpho::watershed<int8_t>(input, mln::c4, nlabel);
     return nlabel;
   };
   this->run(st, f);

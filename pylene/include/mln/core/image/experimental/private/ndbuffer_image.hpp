@@ -614,9 +614,9 @@ namespace mln
 
     for (int k = 0; k < N; ++k)
     {
-      coords[k]  = this->__axes(k).domain_begin;
-      shp[k]     = static_cast<short>(this->__axes(k).domain_end - this->__axes(k).domain_begin);
-      strides[k] = this->__axes(k).byte_stride / sizeof(T);
+      coords[k]          = this->__axes(k).domain_begin;
+      shp[N - k - 1]     = static_cast<short>(this->__axes(k).domain_end - this->__axes(k).domain_begin);
+      strides[N - k - 1] = this->__axes(k).byte_stride;
     }
 
     auto ptr = Impl::get_pointer(this->__info(), coords);

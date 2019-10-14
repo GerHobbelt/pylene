@@ -52,7 +52,7 @@ namespace mln::io::experimental
       template <class I>
       struct impl_t : impl_base_t
       {
-        impl_t(I& x) { this->m_ima = &x; }
+        impl_t(I& x) { this->m_ima = (void*)(&x); }
         ~impl_t() final = default;
         std::size_t formatted_size(P p) const final { return fmt::formatted_size("{}", at(p)); }
         void        print(P p, int width) const final { fmt::print("{:>{}d}", at(p), width); }

@@ -5,3 +5,5 @@ Labeling Module
    :maxdepth: 1
 
    labeling/local_extrema
+   labeling/cdt
+   

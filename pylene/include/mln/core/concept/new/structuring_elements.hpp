@@ -57,7 +57,7 @@ namespace mln::concepts
       { cse.offsets() } -> stl::ForwardRange&&;
 
       requires detail::RangeValueTypeConvertibleTo<decltype(se(p)), P>;
-      requires detail::RangeValueTypeConvertibleTo<decltype(se(px)), mln::archetypes::PixelT<P>>;
+      requires concepts::Pixel<::ranges::range_value_t<decltype(se(px))>>;
       requires detail::RangeValueTypeConvertibleTo<decltype(cse.offsets()), P>;
     };
 

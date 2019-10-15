@@ -47,6 +47,7 @@ namespace mln
   void transform(InputImage in, OutputImage out, UnaryFunction f)
   {
     static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(mln::is_a<OutputImage, experimental::Image>());
     static_assert(::ranges::Invocable<UnaryFunction, image_reference_t<InputImage>>());
     static_assert(std::is_convertible_v<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>,
                                         image_value_t<OutputImage>>,

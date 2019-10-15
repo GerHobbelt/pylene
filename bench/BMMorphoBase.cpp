@@ -6,6 +6,7 @@
 #include <mln/core/se/rect2d.hpp>
 #include <mln/core/se/mask2d.hpp>
 #include <mln/core/neighborhood/c4.hpp>
+#include <mln/core/neighborhood/c8.hpp>
 #include <mln/io/experimental/imread.hpp>
 
 #include <mln/morpho/experimental/closing.hpp>
@@ -18,6 +19,7 @@
 #include <mln/morpho/experimental/watershed.hpp>
 
 #include <mln/labeling/experimental/local_extrema.hpp>
+#include <mln/labeling/experimental/chamfer_distance_transform.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -212,6 +214,20 @@ BENCHMARK_F(BMMorpho, minima)(benchmark::State& st)
     int nlabel;
     mln::labeling::experimental::local_minima<int8_t>(input, mln::experimental::c4, nlabel);
     return nlabel;
+  };
+  this->run(st, f);
+}
+
+BENCHMARK_F(BMMorpho, cdt_2_3)(benchmark::State& st)
+{
+  // mln::se::experimental::wmask2d weights = {{3, 2, 3}, //
+  //                                           {2, 0, 2},
+  //                                           {3, 2, 3}};
+
+  auto f = [](const image_t& input, image_t&) {
+    auto tmp = mln::transform(input, [](uint8_t x) { return x < 128; });
+    auto out = mln::labeling::experimental::chamfer_distance_transform<int16_t>(tmp, mln::experimental::c8);
+    return out;
   };
   this->run(st, f);
 }

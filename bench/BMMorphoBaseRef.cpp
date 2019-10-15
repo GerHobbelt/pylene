@@ -18,6 +18,7 @@
 #include <mln/morpho/watershed.hpp>
 
 #include <mln/labeling/local_extrema.hpp>
+#include <mln/transform/chamfer_distance_transform.hpp>
 
 // [legacy]
 #include <mln/core/image/image2d.hpp>
@@ -162,6 +163,18 @@ BENCHMARK_F(BMMorpho, minima)(benchmark::State& st)
   };
   this->run(st, f);
 }
+
+BENCHMARK_F(BMMorpho, cdt_2_3)(benchmark::State& st)
+{
+
+  auto f = [](const image_t& input, image_t&) {
+    auto tmp = mln::transform(input, [](uint8_t x) { return x < 128; });
+    auto out = mln::transforms::chamfer_distance_transform<int16_t>(tmp, mln::c8);
+    return out;
+  };
+  this->run(st, f);
+}
+
 
 BENCHMARK_F(BMMorpho, watershed)(benchmark::State& st)
 {

@@ -18,7 +18,6 @@ namespace mln::concepts
 
   // clang-format off
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-
   template <typename SE, typename P>
   concept Neighborhood =
     StructuringElement<SE, P> &&
@@ -30,10 +29,9 @@ namespace mln::concepts
 
       requires detail::RangeValueTypeConvertibleTo<decltype(se.before(p)), P>;
       requires detail::RangeValueTypeConvertibleTo<decltype(se.after(p)), P>;
-      requires detail::RangeValueTypeConvertibleTo<decltype(se.before(px)), mln::archetypes::PixelT<P>>;
-      requires detail::RangeValueTypeConvertibleTo<decltype(se.after(px)), mln::archetypes::PixelT<P>>;
+      requires concepts::Pixel<::ranges::range_value_t<decltype(se.before(px))>>;
+      requires concepts::Pixel<::ranges::range_value_t<decltype(se.after(px))>>;
     };
-
 #endif
   // clang-format on
 

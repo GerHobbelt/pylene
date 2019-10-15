@@ -86,24 +86,29 @@ class BMReferenceLinear : public benchmark::Fixture
 
   virtual void SetUp(const benchmark::State&) override
   {
-    mln::experimental::image2d<mln::rgb8> ima;
-    mln::io::experimental::imread(filename, ima);
+    if (!m_initialized)
+    {
+      mln::experimental::image2d<mln::rgb8> ima;
+      mln::io::experimental::imread(filename, ima);
 
-    mln::resize(m_exp_input, ima);
-    mln::resize(m_exp_output, ima);
-    mln::transform(ima, m_exp_input, [](mln::rgb8 x) -> uint8_t { return x[0]; });
+      mln::resize(m_exp_input, ima);
+      mln::resize(m_exp_output, ima);
+      mln::transform(ima, m_exp_input, [](mln::rgb8 x) -> uint8_t { return x[0]; });
 
 
-    m_lut.resize(256);
-    for (int i = 0; i < 256; i++)
-      m_lut[i] = i;
+      m_lut.resize(256);
+      for (int i = 0; i < 256; i++)
+        m_lut[i] = i;
+
+      m_exp_input.to(m_input, true);
+      mln::resize(m_output, m_input);
+
+      m_initialized = true;
+    }
 
     m_height = m_exp_input.height();
     m_width  = m_exp_input.width();
     m_stride = m_exp_input.strides();
-
-    m_exp_input.to(m_input, true);
-    mln::resize(m_output, m_input);
   }
 
 protected:
@@ -144,12 +149,20 @@ protected:
   int            m_height;
   std::ptrdiff_t m_stride;
 
-  mln::image2d<uint8_t> m_input;
-  mln::image2d<uint8_t> m_output;
-  mln::experimental::image2d<uint8_t> m_exp_input;
-  mln::experimental::image2d<uint8_t> m_exp_output;
-  std::vector<uint8_t>  m_lut;
+  static bool                                m_initialized;
+  static mln::image2d<uint8_t>               m_input;
+  static mln::image2d<uint8_t>               m_output;
+  static mln::experimental::image2d<uint8_t> m_exp_input;
+  static mln::experimental::image2d<uint8_t> m_exp_output;
+  static std::vector<uint8_t>                m_lut;
 };
+
+bool                                BMReferenceLinear::m_initialized = false;
+mln::image2d<uint8_t>               BMReferenceLinear::m_input;
+mln::image2d<uint8_t>               BMReferenceLinear::m_output;
+mln::experimental::image2d<uint8_t> BMReferenceLinear::m_exp_input;
+mln::experimental::image2d<uint8_t> BMReferenceLinear::m_exp_output;
+std::vector<uint8_t>                BMReferenceLinear::m_lut;
 
 
 BENCHMARK_F(BMReferenceLinear, Mult_C)(benchmark::State& st)

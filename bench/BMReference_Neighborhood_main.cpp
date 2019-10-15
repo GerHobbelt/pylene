@@ -15,19 +15,21 @@ class BMReferenceNeighborhood : public benchmark::Fixture
 
   virtual void SetUp(const benchmark::State&) override
   {
-    mln::experimental::image2d<mln::rgb8> in;
-    mln::io::experimental::imread(filename, in);
+    if (!m_initialized)
+    {
+      mln::experimental::image2d<mln::rgb8> in;
+      mln::io::experimental::imread(filename, in);
 
-    mln::resize(m_exp_input, in);
-    mln::resize(m_exp_output, in);
-    mln::transform(in, m_exp_input, [](mln::rgb8 x) -> uint8_t { return x[0]; });
-    m_exp_input.extension().fill(0);
+      mln::resize(m_exp_input, in);
+      mln::resize(m_exp_output, in);
+      mln::transform(in, m_exp_input, [](mln::rgb8 x) -> uint8_t { return x[0]; });
+      m_exp_input.extension().fill(0);
 
-    m_exp_input.to(m_input, true);
-    mln::resize(m_output, m_input);
-    m_input.extension().fill(0);
-
-
+      m_exp_input.to(m_input, true);
+      mln::resize(m_output, m_input);
+      m_input.extension().fill(0);
+      m_initialized = true;
+    }
     m_h       = m_exp_input.height();
     m_w       = m_exp_input.width();
     m_stride  = m_exp_input.stride();
@@ -58,11 +60,18 @@ private:
   std::ptrdiff_t           m_stride;
   mln::uint8*              m_ibuffer;
   mln::uint8*              m_obuffer;
-  mln::image2d<mln::uint8> m_input;
-  mln::image2d<mln::uint8> m_output;
-  mln::experimental::image2d<mln::uint8> m_exp_input;
-  mln::experimental::image2d<mln::uint8> m_exp_output;
+  static bool                                   m_initialized;
+  static mln::image2d<mln::uint8>               m_input;
+  static mln::image2d<mln::uint8>               m_output;
+  static mln::experimental::image2d<mln::uint8> m_exp_input;
+  static mln::experimental::image2d<mln::uint8> m_exp_output;
 };
+
+bool                                   BMReferenceNeighborhood::m_initialized = false;
+mln::image2d<mln::uint8>               BMReferenceNeighborhood::m_input;
+mln::image2d<mln::uint8>               BMReferenceNeighborhood::m_output;
+mln::experimental::image2d<mln::uint8> BMReferenceNeighborhood::m_exp_input;
+mln::experimental::image2d<mln::uint8> BMReferenceNeighborhood::m_exp_output;
 
 BENCHMARK_F(BMReferenceNeighborhood, Sum_C)(benchmark::State& st)
 {

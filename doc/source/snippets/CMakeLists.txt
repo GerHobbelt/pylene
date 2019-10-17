@@ -45,6 +45,14 @@ add_image("reconstruction"
   morpho_reconstruction_markers.png
   morpho_reconstruction_rec.png
   morpho_reconstruction_out.png)
+add_image("area_filter"
+  "${DOCUMENTATION_IMAGE_DIR}/blobs2_binary.png"
+  morpho_area_filter_dilated.png
+  morpho_area_filter_opening.png
+  morpho_area_filter_out.png)
+
+
+
 add_image("blobs_watershed" "${DOCUMENTATION_IMAGE_DIR}/blobs_binary.png" blobs_distance_transform.png blobs_segmentation.png)
 
 
@@ -59,4 +67,6 @@ add_executable(staff_lines staff_lines.cpp)
 add_executable(component_tree_1 component_tree_1.cpp)
 add_executable(blobs_watershed blobs_watershed.cpp)
 add_executable(reconstruction reconstruction.cpp)
+add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
+ 

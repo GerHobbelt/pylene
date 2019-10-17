@@ -15,7 +15,15 @@ Structural Morphological Operation
    morpho/rank_filter
    morpho/median_filter
    morpho/gradient
+
+Geodesic transformations
+************************
+
+.. toctree::
+   :maxdepth: 1
+
    morpho/opening_by_reconstruction
+   morpho/area_filter
 
 
 Segmentation

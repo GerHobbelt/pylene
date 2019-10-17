@@ -7,6 +7,7 @@
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/experimental/opening.hpp>
 #include <mln/morpho/experimental/median_filter.hpp>
+#include <mln/morpho/experimental/gradient.hpp>
 
 #include <mln/io/experimental/imread.hpp>
 #include <mln/io/experimental/imsave.hpp>
@@ -56,6 +57,9 @@ enum morpho_op_type
   kOpening,
   kClosing,
   kMedian,
+  kGradient,
+  kInternalGradient,
+  kExternalGradient
 };
 
 std::istream& operator>>(std::istream& in, morpho_op_type& se)
@@ -73,6 +77,12 @@ std::istream& operator>>(std::istream& in, morpho_op_type& se)
     se = kClosing;
   else if (token == "median")
     se = kMedian;
+  else if (token == "gradient")
+    se = kGradient;
+  else if (token == "ext_gradient")
+    se = kExternalGradient;
+  else if (token == "int_gradient")
+    se = kInternalGradient;
   else
     throw po::invalid_option_value("Invalid Operator");
   return in;
@@ -115,7 +125,7 @@ int main(int argc, char** argv)
   {
     std::cout << "Usage: " << argv[0]
               << " [-h,--help] OPERATOR SE size input output\n"
-                 "OPERATOR\t Morphological operation to perform [erosion | dilation]\n"
+                 "OPERATOR\t Morphological operation to perform [erosion | dilation | opening | closing | median | gradient | ext_gradient | int_gradient]\n"
                  "SE\t Structuring element to use [square | disc | diamond]\n"
                  "size\t Size of the SE\n"
                  "input\t Input image (u8)\n"
@@ -145,6 +155,15 @@ int main(int argc, char** argv)
     break;
   case kMedian:
     output = mln::morpho::experimental::median_filter(input, nbh, mln::extension::bm::mirror{});
+    break;
+  case kGradient:
+    output = mln::morpho::experimental::gradient(input, nbh);
+    break;
+  case kExternalGradient:
+    output = mln::morpho::experimental::external_gradient(input, nbh);
+    break;
+  case kInternalGradient:
+    output = mln::morpho::experimental::internal_gradient(input, nbh);
     break;
   }
 

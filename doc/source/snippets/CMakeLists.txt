@@ -27,6 +27,10 @@ add_image("erosion-cli;dilation;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho
 add_image("erosion-cli;opening;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_opening_1.png)
 add_image("erosion-cli;closing;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_closing_1.png)
 add_image("erosion-cli;median;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_median_1.png)
+add_image("erosion-cli;gradient;square;7" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_gradient_1.png)
+add_image("erosion-cli;ext_gradient;square;7" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_ext_gradient_1.png)
+add_image("erosion-cli;int_gradient;square;7" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_int_gradient_1.png)
+
 add_image("cdt;1" "${DOCUMENTATION_IMAGE_DIR}/F.png" F-4.png)
 add_image("cdt;2" "${DOCUMENTATION_IMAGE_DIR}/F.png" F-8.png)
 add_image("cdt;3" "${DOCUMENTATION_IMAGE_DIR}/F.png" F-2-3.png)

@@ -14,6 +14,7 @@ Structural Morphological Operation
    morpho/hit_or_miss
    morpho/rank_filter
    morpho/median_filter
+   morpho/gradient
    morpho/opening_by_reconstruction
 
 

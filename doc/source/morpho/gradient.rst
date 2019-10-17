@@ -6,9 +6,9 @@ Include :file:`<mln/morpho/gradient.hpp>`
 .. cpp:namespace:: mln::morpho
 
 ..  cpp:function:: \
-    Image{I} image_concrete_t<I> gradient(I f, StructuringElement se)
-    Image{I} image_concrete_t<I> external_gradient(I f, StructuringElement se)
-    Image{I} image_concrete_t<I> internal_gradient(I f, StructuringElement se)
+    Image{I} concrete_t<I> gradient(I f, StructuringElement se)
+    Image{I} concrete_t<I> external_gradient(I f, StructuringElement se)
+    Image{I} concrete_t<I> internal_gradient(I f, StructuringElement se)
 
     Compute the morphological gradients. Morphological gradients are
     operators enhancing variations of pixel intensity in a neighborhood

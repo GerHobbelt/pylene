@@ -32,10 +32,14 @@ namespace mln
   template <class InputImage, class OutputImage, class UnaryFunction>
   void transform(InputImage in, const Image<OutputImage>& out, UnaryFunction f);
 
+  template <class InputImage1, class InputImage2, class OutputImage, class BinaryFunction>
+  void transform(InputImage1 in1, InputImage2 in2, OutputImage out, BinaryFunction f);
+
+
 
   template <class InputImage, class UnaryFunction>
   image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
-      transform(InputImage in, UnaryFunction f);
+  transform(InputImage in, UnaryFunction f);
 
 
   /******************************************/
@@ -62,9 +66,36 @@ namespace mln
       ::ranges::transform(r1, ::ranges::begin(r2), f);
   }
 
+  template <class InputImage1, class InputImage2, class OutputImage, class BinaryFunction>
+  void transform(InputImage1 in1, InputImage2 in2, OutputImage out, BinaryFunction f)
+  {
+    static_assert(mln::is_a<InputImage1, experimental::Image>());
+    static_assert(mln::is_a<InputImage2, experimental::Image>());
+    static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(
+        ::ranges::Invocable<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>());
+    static_assert(
+        std::is_convertible_v<
+            std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>,
+            image_value_t<OutputImage>>,
+        "The result of the function is not implicitely convertible to the output image value type");
+
+    mln_entering("mln::transform");
+
+    // FIXME: disabled becaused some domain (e.g. morphed) do not implement comparison for now
+    // mln_precondition(in2.domain() == out.domain());
+    // mln_precondition(in1.domain() == out.domain());
+
+    auto&& ivals1 = in1.new_values();
+    auto&& ivals2 = in2.new_values();
+    auto&& ovals  = out.new_values();
+    for (auto [r1, r2, r3] : ranges::view::zip(ranges::rows(ivals1), ranges::rows(ivals2), ranges::rows(ovals)))
+      ::ranges::transform(r1, ::ranges::begin(r2), ::ranges::begin(r3), f);
+  }
+
   template <class InputImage, class UnaryFunction>
   image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
-      transform(InputImage in, UnaryFunction f)
+  transform(InputImage in, UnaryFunction f)
   {
     static_assert(mln::is_a<InputImage, experimental::Image>());
     static_assert(::ranges::Invocable<UnaryFunction, image_reference_t<InputImage>>());

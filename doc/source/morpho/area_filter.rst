@@ -6,8 +6,8 @@ Include :file:`<mln/morpho/area_filter.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} image_concrete_t<I> area_opening(I f, Neighborhood nbh, int area, Compare cmp)
-    Image{I} image_concrete_t<I> area_closing(I f, Neighborhood nbh, int area)
+    Image{I} concrete_t<I> area_opening(I f, Neighborhood nbh, int area, Compare cmp)
+    Image{I} concrete_t<I> area_closing(I f, Neighborhood nbh, int area)
 
 
     On binary images, the area connected opening that preserves connected
@@ -40,21 +40,21 @@ Example: dense objects detection
 
    *  -  .. figure:: /images/blobs2_binary.png
 
-            \(a) Original image
+            (a) Original image
 
 
       -  .. figure:: /images/morpho_area_filter_dilated.png
 
-            \(b) Dilated of the original image (a)
+            (b) Dilated of the original image (a)
 
    *  -  .. figure:: /images/morpho_area_filter_dilated.png
 
-            \(c) Result of the area opening of (b)
+            (c) Result of the area opening of (b)
 
 
       -  .. figure:: /images/morpho_area_filter_out.png
 
-            \(d) Input image masked by (c)
+            (d) Input image masked by (c)
 
 
 .. literalinclude:: /snippets/area_filter.cpp

@@ -10,22 +10,30 @@
 namespace mln::morpho::experimental
 {
 
-  /// \brief Compute the area algebraic opening of an image.
+  /// \brief Compute the dynamic algebraic opening of an image.
+  ///
+  /// Also called h-maxima transformation. The dynamic represents the difference between the maximum and the minimum of
+  /// the connected component.
+  ///
   /// \param ima The input image
   /// \param nbh The neighborhood
   /// \param area The grain size
   /// \param cmp A strict total ordering on values
   template <class I, class N, class Compare = std::less<image_value_t<std::remove_reference_t<I>>>>
   image_concrete_t<std::remove_reference_t<I>> //
-  area_opening(I&& ima, const N& nbh, int area, Compare cmp = {});
+  dynamic_opening(I&& ima, const N& nbh, int dynamic, Compare cmp = {});
 
-  /// \brief Compute the area algebraic closing of an image.
+  /// \brief Compute the dynamic algebraic closing of an image.
+  ///
+  /// Also called h-minima transformation. The dynamic represents the difference between the maximum and the minimum of
+  /// the connected component.
+  ///
   /// \param ima The input image
   /// \param nbh The neighborhood
   /// \param area The grain size
   template <class I, class N>
   image_concrete_t<std::remove_reference_t<I>> //
-  area_closing(I&& ima, const N& nbh, int area);
+  dynamic_closing(I&& ima, const N& nbh, int dynamic);
 
   /******************************/
   /*** Implementation          **/
@@ -33,42 +41,46 @@ namespace mln::morpho::experimental
 
   namespace impl
   {
-    template <class I>
-    struct area_filter_ufind_visitor
+    template <class I, class Compare>
+    struct dynamic_filter_ufind_visitor
     {
       using P = image_point_t<I>;
 
-      void on_make_set(P p) noexcept { m_count(p) = 1; }
-
-      P on_union(dontcare_t, P rp, dontcare_t, P rq) noexcept
-      {
-        m_count(rp) += m_count(rq);
-        return rp;
-      }
+      void on_make_set(P p) noexcept { m_max(p) = m_ima(p); }
 
       void on_finish(P p, P root) noexcept { m_ima(p) = m_ima(root); }
 
-      bool test(P p) const noexcept { return m_count(p) >= m_area; }
+      bool test(P p) const noexcept { return std::abs(m_max(p) - m_ima(p)) >= m_dynamic; }
 
-      area_filter_ufind_visitor(I& input, int area)
-        : m_ima(input)
-        , m_area(area)
+      P on_union(dontcare_t, P rp, dontcare_t, P rq) noexcept
       {
-        m_count = imchvalue<int>(input);
+        auto a = m_max(rp);
+        auto b = m_max(rq);
+        m_max(rp) = m_cmp(a,b) ? b : a;
+        return rp;
+      }
+
+      dynamic_filter_ufind_visitor(I& input, Compare cmp, int dynamic)
+        : m_ima(input)
+        , m_cmp(cmp)
+        , m_dynamic(dynamic)
+      {
+        m_max = imconcretize(input);
       }
 
 
     private:
       I&                       m_ima;
-      int                      m_area;
-      image_ch_value_t<I, int> m_count;
+      Compare                  m_cmp;
+      int                      m_dynamic;
+      image_concrete_t<I>      m_max;
     };
 
 
     template <class I, class N, class Compare>
-    void area_opening_inplace(I& ima, const N& nbh, int area, Compare cmp)
+    void dynamic_opening_inplace(I& ima, const N& nbh, int dynamic, Compare cmp)
     {
-      area_filter_ufind_visitor<I> viz(ima, area);
+      dynamic_filter_ufind_visitor viz(ima, cmp, dynamic);
       mln::morpho::experimental::canvas::union_find(ima, nbh, viz, cmp);
     }
 
@@ -77,32 +89,32 @@ namespace mln::morpho::experimental
 
   template <class InputImage, class N, class Compare>
   image_concrete_t<std::remove_reference_t<InputImage>> //
-  area_opening(InputImage&& ima, const N& nbh, int area, Compare cmp)
+  dynamic_opening(InputImage&& ima, const N& nbh, int dynamic, Compare cmp)
   {
     using I = std::remove_reference_t<InputImage>;
 
     static_assert(mln::is_a<I, mln::experimental::Image>());
     static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
 
-    mln_entering("mln::morpho::area_opening");
+    mln_entering("mln::morpho::dynamic_opening");
     image_concrete_t<I> out = clone(ima);
-    impl::area_opening_inplace(out, nbh, area, std::move(cmp));
+    impl::dynamic_opening_inplace(out, nbh, dynamic, std::move(cmp));
 
     return out;
   }
 
   template <class InputImage, class N>
   image_concrete_t<std::remove_reference_t<InputImage>> //
-  area_closing(InputImage&& ima, const N& nbh, int area)
+  dynamic_closing(InputImage&& ima, const N& nbh, int dynamic)
   {
     using I = std::remove_reference_t<InputImage>;
 
     static_assert(mln::is_a<I, mln::experimental::Image>());
     static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
 
-    mln_entering("mln::morpho::area_closing");
+    mln_entering("mln::morpho::dynamic_closing");
     image_concrete_t<I> out = clone(ima);
-    impl::area_opening_inplace(out, nbh, area, std::greater<image_value_t<I>>());
+    impl::dynamic_opening_inplace(out, nbh, dynamic, std::greater<image_value_t<I>>());
 
     return out;
   }

@@ -30,11 +30,12 @@ namespace mln::morpho::experimental
 
       void on_make_set(P p) { m_out(p) = m_markers(p); }
 
-      void on_union(P p, P q)
+      P on_union(dontcare_t, P rp, dontcare_t, P rq)
       {
-        auto a = m_out(p);
-        auto b = m_out(q);
-        m_out(q) = m_cmp(a, b) ? b : a;
+        auto a = m_out(rp);
+        auto b = m_out(rq);
+        m_out(rp) = m_cmp(a, b) ? b : a;
+        return rp;
       }
 
       void on_finish(P p, P q) { m_out(p) = m_input(q); }

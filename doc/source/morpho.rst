@@ -24,6 +24,8 @@ Geodesic transformations
 
    morpho/opening_by_reconstruction
    morpho/area_filter
+   morpho/dynamic_filter
+   morpho/extinction_transform
 
 
 Segmentation

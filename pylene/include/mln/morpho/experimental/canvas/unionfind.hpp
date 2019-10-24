@@ -22,10 +22,15 @@ namespace mln::morpho::experimental::canvas
     void on_make_set([[maybe_unused]] ignore_t  p) {}
 
     /// \brief Called during the merge-step.
+    /// It returns the new root of the component (either p or q).
     ///
-    /// Called when a component rooted in \p p merges with a
-    /// component rooted in \p q, \p q becomes the new root.
-    void on_union([[maybe_unused]] ignore_t  p, [[maybe_unused]] ignore_t  q) {}
+    /// Called when a component rooted in \p p merges with a component rooted in \p q through the point \p x.
+    /// The component rooted in p is the last that has been updated (it is initially the current point being process).
+    ///
+    /// IF YOU WANT THE ROOT TO BE A POINT THAT HAS THE MINIMUM VALUE OF THE COMPONENT: RETURN p (it is usually what you
+    /// want).  You want the root to be defined in another way (e.g. to a local maximum or using a rank criterion)
+    ignore_t on_union([[maybe_unused]] ignore_t  p, [[maybe_unused]] ignore_t  rp,
+                      [[maybe_unused]] ignore_t  q, [[maybe_unused]] ignore_t  rq) { return {}; }
 
     /// \brief Called at the end of the algorithm for each point
     ///
@@ -103,34 +108,37 @@ namespace mln::morpho::experimental::canvas
 
       // Forward pass
       {
-        mln_entering("Uniion-find forward pass");
+        mln_entering("Union-find forward pass");
         for (auto p : ::ranges::view::reverse(S))
         {
           par(p) = p;
           viz.on_make_set(p);
-          status(p) = static_cast<ufstatus>(viz.test(p));
 
+          auto rp = p;
+          ufstatus st = static_cast<ufstatus>(viz.test(p));
           for (auto n : nbh(p))
           {
             if (status.at(n) == ufstatus::NONE) // Out-of-range neighbor
               continue;
 
-            auto r = zfindroot(par, n);
-            if (p == r) // Already the root
+            auto rn = zfindroot(par, n);
+            if (rn == rp) // Already the root
               continue;
 
-            if (status(r) == ufstatus::PASS) // Merging with a PASS component => so PASS
+            // Merging with a PASS component => so PASS (no need to merge)
+            if (status(rn) == ufstatus::PASS)
             {
-              status(p) = ufstatus::PASS;
+              st = ufstatus::PASS;
+              continue;
             }
-            else
-            {
-              par(r) = p;
-              viz.on_union(r, p);
-            }
+
+            auto new_root  = viz.on_union(p, rp, n, rn);
+            par(rp)        = new_root;
+            par(rn)        = new_root;
+            rp             = new_root;
           }
-          if (status(p) == ufstatus::FAIL && viz.test(p))
-            status(p) = ufstatus::PASS;
+
+          status(p) = static_cast<ufstatus>((bool)(st) || (bool)(viz.test(p)));
         }
       }
 

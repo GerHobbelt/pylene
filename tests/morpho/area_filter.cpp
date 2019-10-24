@@ -1,6 +1,8 @@
 #include <mln/morpho/experimental/area_filter.hpp>
 
+
 #include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>
 
@@ -10,7 +12,21 @@
 #include <gtest/gtest.h>
 
 
-using namespace mln;
+TEST(Morpho, area_opening_basic)
+{
+
+  const mln::experimental::image2d<uint8_t> input = {{1, 1, 1, 1, 1}, //
+                                                     {1, 2, 2, 2, 1},
+                                                     {1, 2, 2, 2, 1},
+                                                     {1, 2, 2, 2, 1},
+                                                     {1, 2, 2, 2, 1}};
+
+
+  auto res = mln::morpho::experimental::area_opening(input, mln::experimental::c4, 8);
+  ASSERT_IMAGES_EQ_EXP(input, res);
+}
+
+
 
 TEST(Morpho, area_opening_grayscale)
 {

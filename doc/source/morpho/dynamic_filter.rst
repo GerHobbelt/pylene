@@ -6,8 +6,8 @@ Include :file:`<mln/morpho/area_filter.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} image_concrete_t<I> dynamic_opening(I f, Neighborhood nbh, int h)
-    Image{I} image_concrete_t<I> dynamic_closing(I f, Neighborhood nbh, int h)
+    Image{I} concrete_t<I> dynamic_opening(I f, Neighborhood nbh, int h)
+    Image{I} concrete_t<I> dynamic_closing(I f, Neighborhood nbh, int h)
 
 
     On grayscale images, the dynamic connected opening removes maxima whose

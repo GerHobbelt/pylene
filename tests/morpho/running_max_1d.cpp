@@ -1,4 +1,3 @@
-#include <mln/morpho/canvas/private/running_max_1d.hpp>
 #include <mln/morpho/experimental/private/running_max_1d.hpp>
 
 #include <functional>

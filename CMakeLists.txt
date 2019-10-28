@@ -94,7 +94,6 @@ endif ()
 #### Configuration of the Compiler ###
 
 # Subdirectories
-add_custom_target(build-pylene)
 add_subdirectory(pylene)
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)

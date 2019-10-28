@@ -11,7 +11,6 @@
 
 #include <type_traits>
 
-
 namespace mln
 {
 
@@ -33,7 +32,7 @@ namespace mln
     using domain_type = D;
     /// \}
 
-    static_assert(std::is_convertible_v<::ranges::range_value_t<D>, point_type>,
+    static_assert(std::is_convertible_v<mln::ranges::mdrange_value_t<D>, point_type>,
                   "Domain value type must be convertible to image point type.");
     /// \}
 
@@ -58,7 +57,7 @@ namespace mln
       : clip_view::image_adaptor{std::move(ima)}
       , m_subdomain{std::move(subdomain)}
     {
-      mln_precondition(::ranges::includes(std::move(ima).domain(), std::move(subdomain)));
+      // mln_precondition(::ranges::includes(m_ima.domain(), m_subdomain)); //FIXME
     }
 
     template <class I2, class D2>

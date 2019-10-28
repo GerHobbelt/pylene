@@ -11,6 +11,19 @@
 namespace mln
 {
 
+  namespace details
+  {
+    template <class T>
+    struct make_object
+    {
+      template <class... Args>
+      T operator()(Args&&... args) const
+      {
+        return T{std::forward<Args>(args)...};
+      }
+    };
+  } // namespace details
+
   template <class... Images>
   class zip_view : public experimental::Image<zip_view<Images...>>
   {
@@ -103,11 +116,7 @@ namespace mln
 
     decltype(auto) concretize() const { return std::get<0>(m_images).concretize(); }
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    template <concepts::Value V>
-#else
     template <typename V>
-#endif
     decltype(auto) ch_value() const
     {
       return std::get<0>(m_images).template ch_value<V>();
@@ -122,8 +131,7 @@ namespace mln
     auto new_pixels()
     {
       auto g_new_pixels = [](auto&&... images) {
-        return ranges::view::zip_with([](auto&&... pixels) { return new_pixel_type(pixels...); },
-                                      images.new_pixels()...);
+        return ranges::view::zip_with(mln::details::make_object<new_pixel_type>{}, images.new_pixels()...);
       };
       return std::apply(g_new_pixels, m_images);
     }

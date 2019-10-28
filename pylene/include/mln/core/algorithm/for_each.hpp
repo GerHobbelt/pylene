@@ -1,8 +1,9 @@
 #pragma once
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
+
 #include <range/v3/algorithm/for_each.hpp>
-#include <range/v3/utility/functional.hpp>
+#include <range/v3/functional/concepts.hpp>
 /// \file
 
 namespace mln
@@ -18,7 +19,7 @@ namespace mln
   void for_each(InputImage input, UnaryFunction f)
   {
     static_assert(mln::is_a<InputImage, experimental::Image>());
-    static_assert(::ranges::Invocable<UnaryFunction, image_reference_t<InputImage>>());
+    static_assert(::ranges::invocable<UnaryFunction, image_reference_t<InputImage>>);
 
     auto&& vals = input.new_values();
     for (auto r : ranges::rows(vals))

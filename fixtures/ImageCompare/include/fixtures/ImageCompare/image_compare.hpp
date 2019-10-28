@@ -1,14 +1,18 @@
 #pragma once
 
 #include <mln/core/image/experimental/ndimage_fwd.hpp>
+#include <mln/core/image/experimental/ndbuffer_image.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
-#include <mln/io/imprint.hpp>
+#include <mln/io/experimental/imprint.hpp>
 
 #include <range/v3/begin_end.hpp>
 
 #include <string>
+#include <functional>
+#include <algorithm>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -72,9 +76,11 @@ namespace fixtures::ImageCompare
         msg << "The following images differ:\n";
       else
         msg << "The following images are identical:\n";
-      mln::io::imprint(reference, msg);
-      msg << " and\n:";
-      mln::io::imprint(input, msg);
+      (void)input;
+      (void)reference;
+      // mln::io::imprint(reference, msg);
+      // msg << " and\n:";
+      // mln::io::imprint(input, msg);
       return msg.str();
     }
   } // namespace impl
@@ -91,7 +97,9 @@ namespace fixtures::ImageCompare
       /// Type-erased implementation for ndimages
       ::testing::AssertionResult compare(const mln::ndbuffer_image& a,
                                          const mln::ndbuffer_image& b,
-                                         int comparison_flags);
+                                         int comparison_flags,
+                                         std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn,
+                                         std::function<void(const mln::ndbuffer_image&)> print_fn);
 
 
       /// Best-match implementation for ndimages (forwarding to the type-erased one)
@@ -100,8 +108,33 @@ namespace fixtures::ImageCompare
                                          const mln::__ndbuffer_image<TB, bdim>& b,
                                          int comparison_flags)
       {
+        std::function<void(mln::ndbuffer_image)>                        print_fn;
+        std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn;
+
+        if constexpr (fmt::internal::has_formatter<TA, fmt::format_context>() &&
+                      fmt::internal::has_formatter<TB, fmt::format_context>())
+        {
+          print_fn = [](const mln::ndbuffer_image& ima) {
+            if (const auto* a = ima.cast_to<TA, adim>())
+              mln::io::experimental::imprint(*a);
+            else if (const auto* b = ima.cast_to<TB, bdim>())
+              mln::io::experimental::imprint(*b);
+          };
+        }
+
+        // If value types are the same and they are tricially copyable, we will use memcpy
+        // Otherwise, we type-erase the comparison function
+        if constexpr (!(std::is_same_v<TA, TB> && std::is_trivially_copyable_v<TA>))
+        {
+          linecmp_fn = [](const void* a, const void* b, std::size_t n) -> int {
+            return !std::equal(reinterpret_cast<const TA*>(a), reinterpret_cast<const TA*>(a) + n,
+                               reinterpret_cast<const TA*>(b));
+          };
+        }
+
         return compare(static_cast<const mln::ndbuffer_image&>(a),
-                       static_cast<const mln::ndbuffer_image&>(b), comparison_flags);
+                       static_cast<const mln::ndbuffer_image&>(b),
+                       comparison_flags, linecmp_fn, print_fn);
       }
 
       template <class ImageA, class ImageB>
@@ -130,6 +163,7 @@ namespace fixtures::ImageCompare
             return testing::AssertionFailure() << "The domains of A and B differ.";
         }
 
+
         {
           auto zipped_vals = mln::ranges::view::zip(f.new_values(), g.new_values());
           for (auto&& r : mln::ranges::rows(zipped_vals))
@@ -137,6 +171,7 @@ namespace fixtures::ImageCompare
               if (f_v != g_v)
                 return testing::AssertionFailure() << "The values of image A and B differ";
         }
+
         return ::testing::AssertionSuccess();
       }
 

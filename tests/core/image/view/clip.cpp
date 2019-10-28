@@ -10,6 +10,7 @@
 #include <mln/core/image/view/operators.hpp>
 
 #include <gtest/gtest.h>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 
 struct vector_domain : public std::vector<mln::experimental::point2d>
@@ -54,7 +55,7 @@ TEST(View, clip)
     ASSERT_EQ(42, clipped(p));
   }
 
-  ASSERT_TRUE(mln::all_of(ima == ref));
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 
@@ -104,6 +105,9 @@ TEST(View, clip_twice)
   ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
+template <mln::concepts::detail::WritableImage I>
+void foo(I&);
+
 
 TEST(View, clip_other_a_box2d)
 {
@@ -123,22 +127,23 @@ TEST(View, clip_other_a_box2d)
   mln::experimental::image2d<int> clipped = mln::view::clip(ima, domain);
   fill(clipped, 42);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
+
   static_assert(mln::concepts::OutputImage<decltype(clipped)>);
   static_assert(not mln::concepts::ViewImage<decltype(clipped)>);
   static_assert(mln::concepts::ConcreteImage<decltype(clipped)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(clipped)>);
   static_assert(mln::concepts::BidirectionalImage<decltype(clipped)>);
   static_assert(mln::concepts::RawImage<decltype(clipped)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
-  for (auto p : clipped.domain())
-  {
-    ASSERT_EQ(42, ima(p));
-    ASSERT_EQ(42, clipped(p));
-  }
+  auto dom = clipped.domain();
+  for (auto r : mln::ranges::rows(dom))
+    for (auto p : r)
+    {
+      ASSERT_EQ(42, ima(p));
+      ASSERT_EQ(42, clipped(p));
+    }
 
-  ASSERT_TRUE(mln::all_of(ima == ref));
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 TEST(Core, Clip_where)
@@ -157,7 +162,7 @@ TEST(Core, Clip_where)
 
   mln::iota(ima, 0);
   mln::fill(mln::view::clip(ima, mln::experimental::where(ima > 10)), 42);
-  ASSERT_TRUE(all_of(ima == ref));
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 TEST(Core, Clip_wherex2_joints)
@@ -176,7 +181,7 @@ TEST(Core, Clip_wherex2_joints)
 
   mln::iota(ima, 0);
   mln::fill(mln::view::clip(mln::view::clip(ima, mln::experimental::where(ima > 10)), mln::experimental::where(ima > 20)), 42);
-  ASSERT_TRUE(all_of(ima == ref));
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 TEST(Core, Clip_wherex2_disjoints)

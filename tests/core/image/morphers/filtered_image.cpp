@@ -1,6 +1,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/view/filter.hpp>
 #include <mln/core/image/view/operators.hpp>
@@ -10,54 +11,6 @@
 #include <gtest/gtest.h>
 
 
-TEST(Core, FilteredImage_filtered_byval)
-{
-  using namespace mln;
-  using namespace mln::view::ops;
-
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
-
-  iota(ima, 0);
-  auto x = view::filter(ima, [](int v) { return v > 10; });
-
-  ASSERT_TRUE(all_of(x > 10));
-
-  {
-    for (auto&& pix : ima.new_pixels())
-    {
-      if (pix.val() > 10)
-        ASSERT_EQ(pix.val(), x(pix.point()));
-      else
-      {
-        ASSERT_TRUE(!x.domain().has(pix.point()));
-        ASSERT_EQ(pix.val(), x.at(pix.point()));
-      }
-    }
-  }
-
-  {
-    for (auto&& pix : x.new_pixels())
-    {
-      ASSERT_EQ(pix.val(), ima(pix.point()));
-    }
-  }
-}
-
-TEST(Core, FilteredImage_filtered_bypix_writing)
-{
-  using namespace mln;
-  using namespace mln::view::ops;
-
-  box2d        dom{{-1, -2}, {3, 3}};
-  image2d<int> ima(dom);
-
-  iota(ima, 0);
-  auto x = view::filter(ima, [](int v) { return v > 10; });
-
-  mln::fill(x, 10);
-  ASSERT_TRUE(all_of(ima <= 10));
-}
 
 TEST(Core, FilteredImage_filtered_byval_writing)
 {
@@ -106,7 +59,7 @@ TEST(Core, FilteredImage_filtered_chaining)
     }
   }
 
-  const image2d<int> before = clone(ima);
+  const image2d<int> before = mln::clone(ima);
   mln::fill(u, 1);
   {
     auto z = view::zip(ima, before);

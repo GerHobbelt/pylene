@@ -1,15 +1,12 @@
 #pragma once
 
 #include <mln/core/experimental/point.hpp>
-#include <mln/core/rangev3/multi_indices.hpp>
+#include <mln/core/rangev3/mdindex.hpp>
 
 #include <array>
 #include <type_traits>
+#include <algorithm>
 
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-#include <stl2/type_traits.hpp>
-#endif
 
 namespace mln::experimental
 {
@@ -104,37 +101,22 @@ namespace mln::experimental
       return size(2);
     }
 
-    /// \brief Returns the begin iterator of the range
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto begin() const
-    {
-      return Impl::begin();
-    }
+    using Impl::begin_cursor;
+    using Impl::end_cursor;
+    using Impl::rbegin_cursor;
+    using Impl::rend_cursor;
 
-    /// \brief Returns the end iterator of the range
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto end() const
-    {
-      return Impl::end();
-    }
-
-    /// \brief Returns the reversed range
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto reversed() const
-    {
-      return this->Impl::reversed();
-    }
-
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto rows()
-    {
-      return this->Impl::rows();
-    }
 
     template <int d = ndim, class = std::enable_if_t<d != -1>>
     auto rows() const
     {
       return this->Impl::rows();
+    }
+
+    template <int d = ndim, class = std::enable_if_t<d != -1>>
+    auto rrows() const
+    {
+      return this->Impl::rrows();
     }
 
 
@@ -217,6 +199,31 @@ namespace mln::experimental
     constexpr void clip(const _box<_i>& B) noexcept;
     /// \}
 
+    /// Projection operations
+    /// \{
+
+    /// \brief Clamp a point to box boundaries
+    ///
+    /// yᵢ = clamp(xᵢ, aᵢ, bᵢ)
+    /// \postcondition b.has(p)
+    template <class _p>
+    point_type clamp(_point<_p> x) const noexcept;
+
+
+    /// \brief Project a point into a box by mirroring
+    ///
+    /// yᵢ = clamp(xᵢ, aᵢ, bᵢ)
+    /// \postcondition box.has(p)
+    template <class _p>
+    point_type mirror(_point<_p> x) const noexcept;
+
+    /// \brief Project a point into a box by mirroring
+    /// \postcondition b.has(p)
+    template <class _p>
+    point_type periodize(_point<_p> x) const noexcept;
+    /// \}
+
+
 
   private:
     template <int K>
@@ -239,7 +246,7 @@ namespace mln::experimental
 
     /// Storage for a box
     template <int D, typename T>
-    struct _bstorage : ranges::details::multi_indices_facade<D, _bstorage<D, T>, false /* Col-Major */>
+    struct _bstorage : mln::ranges::mdindex_facade<D, T, ndpoint<D, T>, _bstorage<D, T>>
     {
     private:
       using self_t     = _bstorage;
@@ -383,8 +390,10 @@ namespace mln::experimental
         return ret;
       }
 
-      constexpr point_type __from() const noexcept { return m_begin; }
-      constexpr point_type __to() const noexcept { return m_end; }
+      using base = mln::ranges::mdindex_facade<D, T, point_type, _bstorage<D, T>>;
+      typename base::cursor          begin_cursor() const { return {m_begin.data(), m_end.data(), false}; }
+      typename base::backward_cursor rbegin_cursor() const { return {m_begin.data(), m_end.data(), true}; }
+
 
       point_type m_begin = {};
       point_type m_end   = {};
@@ -518,14 +527,24 @@ namespace mln::experimental
       constexpr int begin() const noexcept { return 0; }
       constexpr int end() const noexcept { return 1; }
 
+      void begin_cursor() const {}
+      void rbegin_cursor() const {};
+      void end_cursor() const {}
+      void rend_cursor() const {};
+
+
       int m_dim       = 0;
       T   m_coords[8] = {0}; // (x1,y1,z1,w1) -- (x2,y2,z2,w2)
     };
 
     /// Reference to box wrapper
     template <int D, class T>
-    struct _bref : ranges::details::multi_indices_facade<D, _bref<D, T>, false /* Col-Major */>
+    struct _bref
+      : mln::ranges::mdindex_facade<D, std::remove_const_t<T>, ndpoint<D, std::remove_const_t<T>>, _bref<D, T>>
     {
+      using base =
+          mln::ranges::mdindex_facade<D, std::remove_const_t<T>, ndpoint<D, std::remove_const_t<T>>, _bref<D, T>>;
+
       static constexpr int ndim = D;
       using coord_type          = T;
 
@@ -556,9 +575,8 @@ namespace mln::experimental
         return ret;
       }
 
-
-      constexpr ndpoint<D, std::remove_const_t<T>> __from() const noexcept { return tl(); }
-      constexpr ndpoint<D, std::remove_const_t<T>> __to() const noexcept { return br(); }
+      typename base::cursor          begin_cursor() const { return {m_coords, m_coords + D, false}; }
+      typename base::backward_cursor rbegin_cursor() const { return {m_coords, m_coords + D, true}; }
 
       T* m_coords;
     };
@@ -606,6 +624,11 @@ namespace mln::experimental
 
       int begin() const { return 0; }
       int end() const { return 1; }
+      void begin_cursor() const {}
+      void rbegin_cursor() const {};
+      void end_cursor() const {}
+      void rend_cursor() const {};
+
 
 
       int m_dim;
@@ -742,12 +765,69 @@ namespace mln::experimental
       this->_zeros();
   }
 
+  template <class Impl>
+  template <class _p>
+  auto _box<Impl>::clamp(_point<_p> x) const noexcept -> point_type
+  {
+    assert(this->dim() == x.dim() && "Objects must be of the same dimensions");
+    assert(!this->empty() && "Cannot clamp to an empty box.");
+
+    point_type q;
+    for (int k = 0; k < this->dim(); ++k)
+      q[k] = std::clamp(x[k], this->__begin(k), this->__end(k) - 1);
+    return q;
+  }
+
+  template <class Impl>
+  template <class _p>
+  auto _box<Impl>::mirror(_point<_p> x) const noexcept -> point_type
+  {
+    assert(this->dim() == x.dim() && "Objects must be of the same dimensions");
+    assert(!this->empty() && "Cannot clamp to an empty box.");
+
+    point_type q;
+    for (int k = 0; k < this->dim(); ++k)
+    {
+      auto a = this->__begin(k);
+      auto b = this->__end(k);
+      auto n = b - a;
+      auto s = 2 * n;
+      auto v = x[k] - a;
+      v      = v % s;
+      v      = v < 0 ? v + s : v; // ensure v>0
+      v      = v < n ? v : s - v - 1;
+      q[k]   = a + v;
+    }
+    return q;
+  }
+
+  template <class Impl>
+  template <class _p>
+  auto _box<Impl>::periodize(_point<_p> x) const noexcept -> point_type
+  {
+    assert(this->dim() == x.dim() && "Objects must be of the same dimensions");
+    assert(!this->empty() && "Cannot clamp to an empty box.");
+
+    point_type q;
+    for (int k = 0; k < this->dim(); ++k)
+    {
+      auto a = this->__begin(k);
+      auto b = this->__end(k);
+      auto n = b - a;
+      auto v = x[k] - a;
+      v      = v % n;
+      v      = v < 0 ? v + n : v;
+      q[k]   = a + (v % n);
+    }
+    return q;
+  }
+
 } // namespace mln::experimental
 
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 // Specialization of std::common_reference
-STL2_OPEN_NAMESPACE
+namespace concepts
 {
   template <class UImpl, class VImpl, template <class> class TQual, template <class> class UQual>
   struct basic_common_reference<mln::experimental::_box<UImpl>, mln::experimental::_box<VImpl>, TQual, UQual>
@@ -757,19 +837,14 @@ STL2_OPEN_NAMESPACE
     using type = mln::experimental::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
   };
 }
-STL2_CLOSE_NAMESPACE
-
 #endif
 
 namespace ranges
 {
-  inline namespace v3
+  template <typename Impl>
+  struct range_cardinality<mln::experimental::_box<Impl>, void> :
+    std::integral_constant<cardinality, finite>
   {
-    template <typename Impl>
-    struct range_cardinality<mln::experimental::_box<Impl>, void> :
-      std::integral_constant<cardinality, finite>
-    {
-    };
-  }
+  };
 }
 

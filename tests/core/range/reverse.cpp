@@ -1,10 +1,10 @@
-#include <mln/core/range/view/reverse.hpp>
+#include <mln/core/rangev3/view/reverse.hpp>
 
-#include <mln/core/range/mdindex.hpp>
+#include <mln/core/rangev3/mdindex.hpp>
 
 #include <range/v3/algorithm/copy.hpp>
 #include <range/v3/iterator/insert_iterators.hpp>
-#include <range/v3/range/conversion.hpp>
+#include <range/v3/to_container.hpp>
 
 #include <vector>
 

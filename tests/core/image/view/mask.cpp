@@ -36,56 +36,59 @@ TEST(View, mask)
   static_assert(not mln::concepts::RawImage<decltype(z)>);
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
-  for (auto p : z.domain())
-  {
-    ASSERT_EQ(42, ima(p));
-    ASSERT_EQ(42, z(p));
-  }
+  auto dom = z.domain();
+  for (auto&& r : dom.rows())
+    for (auto p : r)
+    {
+      ASSERT_EQ(42, ima(p));
+      ASSERT_EQ(42, z(p));
+    }
   ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
+template <mln::concepts::Image F>
+void foo(F);
 
 TEST(View, mask_twice)
 {
   using namespace mln::view::ops;
 
   mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                           {5, 6, 7, 8, 9}, //
-                           {10, 11, 12, 13, 14}};
+                                         {5, 6, 7, 8, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
   mln::experimental::image2d<int> ref = {{0, 42, 2, 3, 4},  //
-                           {42, 6, 7, 8, 42}, //
-                           {10, 11, 12, 42, 14}};
+                                         {42, 6, 7, 8, 42}, //
+                                         {10, 11, 12, 42, 14}};
 
 
   auto mask_A = (ima % 2) == 1;
   auto A      = mln::view::mask(ima, mask_A);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(A)>);
   static_assert(mln::concepts::ViewImage<decltype(A)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(A)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(A)>);
   static_assert(not mln::concepts::RawImage<decltype(A)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
+
 
   auto mask_B = (A % 4) == 1;
   auto B      = mln::view::mask(A, mask_B);
-  fill(B, 42);
+  mln::fill(B, 42);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(B)>);
   static_assert(mln::concepts::ViewImage<decltype(B)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(B)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(B)>);
   static_assert(not mln::concepts::RawImage<decltype(B)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
-  for (auto p : B.domain())
-  {
-    ASSERT_EQ(42, ima(p));
-    ASSERT_EQ(42, B(p));
-  }
+  auto dom = B.domain();
+  for (auto&& r : dom.rows())
+    for (auto p : r)
+    {
+      ASSERT_EQ(42, ima(p));
+      ASSERT_EQ(42, B(p));
+    }
 
   ASSERT_TRUE(mln::all_of(ima == ref));
 }
@@ -140,18 +143,11 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
 };
 
 
-PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>), "");
-PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>), "");
-PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
-                             mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>),
-                         "");
-
-PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputAccessibleImage, mask_archetype>>), "");
-PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>), "");
-PYLENE_CONCEPT_TS_ASSERT(
-    (mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>),
-    "");
+static_assert(mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>);
+static_assert(mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>);
+static_assert(mln::concepts::IndexableAndAccessibleImage<
+              mln::mask_view<mln::archetypes::IndexableAndAccessibleImage, mask_archetype>>);
+static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputAccessibleImage, mask_archetype>>);
+static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>);
+static_assert(
+    mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>);

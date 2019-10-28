@@ -1,6 +1,8 @@
 #pragma once
 
 #include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/object.hpp>
+
 #include <mln/core/image/experimental/ndimage_fwd.hpp>
 #include <mln/core/box.hpp>
 #include <mln/core/rangev3/rows.hpp>

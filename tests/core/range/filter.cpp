@@ -1,9 +1,9 @@
-#include <mln/core/range/view/filter.hpp>
+#include <mln/core/rangev3/view/filter.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/concepts/range.hpp>
-#include <mln/core/range/mdspan.hpp>
-
+#include <mln/core/rangev3/concepts.hpp>
+#include <mln/core/rangev3/mdspan.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -13,13 +13,13 @@
 
 TEST(Range, filter_2d_readonly)
 {
-  std::vector<mln::point2d> ref = {{0, 0}, {2, 0}, {1, 1}, {3, 1}, {0, 2}, {2, 2}};
-  mln::box2d                box(4, 3);
+  std::vector<mln::experimental::point2d> ref = {{0, 0}, {2, 0}, {1, 1}, {3, 1}, {0, 2}, {2, 2}};
+  mln::experimental::box2d                box(4, 3);
 
   auto chessboard_pred = [](auto p) { return (p[0] % 2) == (p[1] % 2); };
   auto rng             = mln::ranges::view::filter(box, chessboard_pred);
 
-  std::vector<mln::point2d> res;
+  std::vector<mln::experimental::point2d> res;
   for (auto row : rng.rows())
     for (auto p : row)
       res.push_back(p);
@@ -61,11 +61,13 @@ TEST(Range, reversed_filtered_bidirectional_range)
   auto             even = mln::ranges::view::filter(v, [](auto val) { return val % 2 == 0; });
   auto             res  = mln::ranges::view::reverse(even);
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::stl::ForwardRange<decltype(v)>);
   static_assert(mln::concepts::stl::ForwardRange<decltype(res)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(v)>());
   static_assert(::ranges::ForwardRange<decltype(res)>());
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   ASSERT_EQ(ref, ::ranges::to_vector(res));
 }
@@ -77,6 +79,7 @@ TEST(Range, reversed_filtered_reversible_range)
   auto even_sum = mln::ranges::view::filter(ids, [](auto vals) { return (vals[0] + vals[1]) % 2 == 0; });
   auto res      = mln::ranges::view::reverse(even_sum);
 
+#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::SegmentedRange<decltype(ids)>);
   static_assert(mln::concepts::ReversibleRange<decltype(ids)>);
   static_assert(mln::concepts::SegmentedRange<decltype(res)>);
@@ -84,6 +87,7 @@ TEST(Range, reversed_filtered_reversible_range)
 #else
   static_assert(::ranges::ForwardRange<decltype(ids)>());
   static_assert(::ranges::ForwardRange<decltype(res)>());
+#endif // PYLENE_CONCEPT_TS_ENABLED
 
   ASSERT_EQ(ref, ::ranges::to_vector(res));
 }

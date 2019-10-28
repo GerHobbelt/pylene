@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/cmcstl2.hpp>
+#include <concepts/concepts.hpp>
 
 namespace mln::concepts
 {
@@ -10,21 +10,20 @@ namespace mln::concepts
 #ifdef PYLENE_CONCEPT_TS_ENABLED
   // Value
   template <typename Val>
-  concept Value = stl::Semiregular<Val>;
+  concept Value = ::concepts::semiregular<Val>;
 
 
   // ComparableValue
   template <typename RegVal>
   concept ComparableValue =
-    Value<RegVal> &&
-    stl::Regular<RegVal>;
+    ::concepts::regular<RegVal>;
 
 
   // OrderedValue
   template <typename STORegVal>
   concept OrderedValue =
-    ComparableValue<STORegVal> &&
-    stl::StrictTotallyOrdered<STORegVal>;
+    ::concepts::regular<STORegVal> &&
+    ::concepts::totally_ordered<STORegVal>;
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on

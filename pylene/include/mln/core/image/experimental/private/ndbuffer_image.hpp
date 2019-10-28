@@ -6,7 +6,7 @@
 #include <mln/core/image/experimental/private/ndbuffer_image_impl.hpp>
 #include <mln/core/image/experimental/private/ndbuffer_image_pixel.hpp>
 #include <mln/core/image/private/ndimage_extension.hpp>
-#include <mln/core/rangev3/multi_span.hpp>
+#include <mln/core/rangev3/mdspan.hpp>
 
 namespace mln
 {
@@ -55,8 +55,8 @@ namespace mln
 
     using domain_type           = experimental::ndbox<N>;
     using extension_type        = internal::ndimage_extension<T, N>;
-    using new_value_range       = ranges::multi_span<T, N>;
-    using new_const_value_range = ranges::multi_span<const T, N>;
+    using new_value_range       = ranges::mdspan<T, N>;
+    using new_const_value_range = ranges::mdspan<const T, N>;
     using new_pixel_range       = experimental::details::ndpix_range<T, N>;
     using new_const_pixel_range = experimental::details::ndpix_range<const T, N>;
 
@@ -563,27 +563,27 @@ namespace mln
 
 
   template <class T, int N>
-  inline ranges::multi_span<T, N> __ndbuffer_image<T, N>::new_values() noexcept
+  inline ranges::mdspan<T, N> __ndbuffer_image<T, N>::new_values() noexcept
   {
     std::array<std::size_t, N>    counts;
     std::array<std::ptrdiff_t, N> strides;
     for (int i = 0; i < N; ++i)
     {
-      counts[N - i - 1]  = static_cast<std::size_t>(this->__axes(i).domain_end - this->__axes(i).domain_begin);
-      strides[N - i - 1] = this->__axes(i).byte_stride / sizeof(T);
+      counts[i]  = static_cast<std::size_t>(this->__axes(i).domain_end - this->__axes(i).domain_begin);
+      strides[i] = this->__axes(i).byte_stride / sizeof(T);
     }
     return {this->buffer(), counts, strides};
   }
 
   template <class T, int N>
-  inline ranges::multi_span<const T, N> __ndbuffer_image<T, N>::new_values() const noexcept
+  inline ranges::mdspan<const T, N> __ndbuffer_image<T, N>::new_values() const noexcept
   {
     std::array<std::size_t, N>    counts;
     std::array<std::ptrdiff_t, N> strides;
     for (int i = 0; i < N; ++i)
     {
-      counts[N - i - 1]  = static_cast<std::size_t>(this->__axes(i).domain_end - this->__axes(i).domain_begin);
-      strides[N - i - 1] = this->__axes(i).byte_stride / sizeof(T);
+      counts[i]  = static_cast<std::size_t>(this->__axes(i).domain_end - this->__axes(i).domain_begin);
+      strides[i] = this->__axes(i).byte_stride / sizeof(T);
     }
     return {this->buffer(), counts, strides};
   }

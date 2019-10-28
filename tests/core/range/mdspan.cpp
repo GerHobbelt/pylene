@@ -1,7 +1,8 @@
-#include <mln/core/range/mdspan.hpp>
+#include <mln/core/rangev3/mdspan.hpp>
 
+#include <mln/core/concept/new/concepts.hpp>
 
-#include <range/v3/range/conversion.hpp>
+#include <range/v3/to_container.hpp>
 #include <range/v3/view/indices.hpp>
 #include <range/v3/view/reverse.hpp>
 
@@ -99,7 +100,7 @@ public:
 
 
 using MyTypes = ::testing::Types<std::array<int, 1>, std::array<int, 2>, std::array<int, 3>, std::array<int, 4>>;
-TYPED_TEST_SUITE(MdspanTest, MyTypes);
+TYPED_TEST_CASE(MdspanTest, MyTypes);
 
 TYPED_TEST(MdspanTest, forward)
 {

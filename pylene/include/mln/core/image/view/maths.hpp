@@ -1,8 +1,9 @@
 #pragma once
 
-#include <mln/core/functional_ops.hpp>
-
+#include <mln/core/image/image.hpp>
 #include <mln/core/image/private/def_gen_code_macros.hpp>
+
+#include <mln/core/functional_ops.hpp>
 
 namespace mln::view
 {

@@ -2,8 +2,9 @@
 
 #include <algorithm>
 #include <functional>
+#include <type_traits>
 #include <tuple>
-#include <utility>
+#include <range/v3/detail/adl_get.hpp> // for ADL get(x)
 
 
 /**
@@ -191,40 +192,31 @@ namespace mln
 // definition instead of the instanciation.
 namespace mln
 {
-  // using std::get;
-  namespace internal
+  namespace details
   {
-    template <size_t N, class C>
-    decltype(auto) get_helper(C&& obj, std::true_type _is_scalar_)
+    template <std::size_t N, class C, std::enable_if_t<std::is_scalar_v<std::remove_reference_t<C>>, int> = 0>
+    decltype(auto) get(C&& obj)
     {
-      (void)_is_scalar_;
-      static_assert(N == 0, "N must be null for scalar");
+      static_assert(N == 0, "N must be 0 for scalar type");
       return std::forward<C>(obj);
     }
 
-    template <size_t N, class C>
-    decltype(auto) get_helper(C&& obj, std::false_type _is_scalar_)
+    template <std::size_t N, class C, std::enable_if_t<!std::is_scalar_v<std::remove_reference_t<C>>, long> = 0>
+    decltype(auto) get(C&& obj)
     {
-      (void)_is_scalar_;
-      using std::get;
-      return get<N>(std::forward<C>(obj));
+      // Force ADL look up
+      return ::ranges::detail::adl_get<N>(std::forward<C>(obj));
     }
-  } // namespace internal
-
-  template <size_t N, class C>
-  decltype(auto) get(C&& obj)
-  {
-    return internal::get_helper<N>(std::forward<C>(obj), std::is_scalar<std::remove_reference_t<C>>());
   }
 
   template <size_t N>
   struct getter
   {
     template <class C>
-    auto operator()(C&& obj) const -> decltype(get<N>(std::forward<C>(obj)))
+    auto operator()(C&& obj) const -> decltype(details::get<N>(std::forward<C>(obj)))
     {
       using namespace std;
-      return get<N>(std::forward<C>(obj));
+      return details::get<N>(std::forward<C>(obj));
     }
   };
 } // namespace mln

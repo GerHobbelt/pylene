@@ -1,7 +1,10 @@
+// [legacy]
 #pragma once
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/concept/neighborhood.hpp>
 #include <mln/core/image/private/image_traits.hpp>
+
+
 
 #include <any>
 
@@ -10,6 +13,9 @@
 
 namespace mln
 {
+  // [Legacy] Forward declaration of the concept
+  template <class I> struct Image;
+
 
   /// \brief Structure holding building parameters
   /// It is composed of two fields, a border value and

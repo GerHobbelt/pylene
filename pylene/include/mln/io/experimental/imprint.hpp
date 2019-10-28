@@ -2,6 +2,7 @@
 
 #include <mln/core/box.hpp>
 #include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/object.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
 #include <memory>
@@ -46,7 +47,7 @@ namespace mln::io::experimental
         virtual std::size_t formatted_size(P p) const = 0;
         virtual void print(P p, int width) const = 0;
 
-        void* m_ima;
+        const void* m_ima;
       };
 
       template <class I>
@@ -57,7 +58,7 @@ namespace mln::io::experimental
         std::size_t formatted_size(P p) const final { return fmt::formatted_size("{}", at(p)); }
         void        print(P p, int width) const final { fmt::print("{:>{}d}", at(p), width); }
 
-        decltype(auto) at(P p) const { return reinterpret_cast<I*>(this->m_ima)->at(p); }
+        decltype(auto) at(P p) const { return const_cast<I*>(reinterpret_cast<const I*>(this->m_ima))->at(p); }
       };
 
       std::aligned_storage_t<sizeof(impl_base_t)> m_impl;
@@ -95,6 +96,7 @@ namespace mln::io::experimental
   {
     using U = std::remove_reference_t<I>;
     static_assert(mln::is_a<U, mln::experimental::Image>());
+    static_assert(fmt::internal::has_formatter<image_value_t<U>, fmt::format_context>(), "The value type has no defined formatting.");
 
     auto roi = image.domain();
     if constexpr (std::is_convertible_v<image_extension_category_t<std::remove_reference_t<I>>,

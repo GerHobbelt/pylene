@@ -11,11 +11,8 @@
 #include <gtest/gtest.h>
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
+
 static_assert(mln::concepts::RawImage<mln::experimental::image2d<int>>);
-#endif
-
-
 
 
 TEST(ndbuffer_image, default_constructor)
@@ -1387,3 +1384,4 @@ TEST(image2d, conversion_from_legacy)
   EXPECT_EQ(&new_image({1, 0}), &old_image.at(0, 1));
 
 }
+

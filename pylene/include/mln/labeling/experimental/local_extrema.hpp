@@ -62,10 +62,10 @@ namespace mln::labeling::experimental
           auto fp = input(p);
 
           // Make set
-          auto root = p;
+          point_t root = p;
 
           bool is_possible_minimum = true;
-          for (auto q : nbh.before(p))
+          for (point_t q : nbh.before(p))
           {
             if (output.at(q) == kUnseen)
               continue;

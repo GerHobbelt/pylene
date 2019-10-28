@@ -1,10 +1,10 @@
 #include <mln/core/experimental/point.hpp>
-#include <mln/core/concept/new/cmcstl2.hpp>
+
 #include <mln/core/concept/new/points.hpp>
+#include <concepts/concepts.hpp>
 
 #include <gtest/gtest.h>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
 template <typename U, typename V = U>
 concept AddableWith = requires(U a, V b)
@@ -21,9 +21,7 @@ concept AddableWith = requires(U a, V b)
 
 
 template <typename U, typename V>
-concept Interopable =
-  AddableWith<U, V> &&
-  mln::concepts::stl::StrictTotallyOrderedWith<U, V>; // Implies EqualityComparable<U, V>
+concept Interopable = AddableWith<U, V> && ::concepts::totally_ordered_with<U, V>; // Implies EqualityComparable<U, V>
 
 
 TEST(Point, ConceptChecking)
@@ -40,32 +38,32 @@ TEST(Point, ConceptChecking)
   static_assert(mln::concepts::Point<mln::experimental::ConstPointRef>);
 
   // Static to * conversion
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<-1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<+1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<const mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<-1, const int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<const mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<+1, const int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<+1, int>>);
+  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<-1, const int>>);
+  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<+1, const int>>);
 
   // Dynamic to * conversion
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<-1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<+1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<const mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<-1, const int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<const mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<+1, const int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<+1, int>>);
+  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<-1, const int>>);
+  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<+1, const int>>);
 
   // Static Ref to * conversion
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<-1, const short>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<+1, short>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<-1, const short>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<+1, short>>);
 
   // Dynamic Ref to * conversion
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<-1, short>>);
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<+1, const short>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<-1, short>>);
+  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<+1, const short>>);
 
 
 
@@ -94,10 +92,6 @@ TEST(Point, ConceptChecking)
 
 }
 
-
-
-
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
 TEST(DynamicPoint, Constructors)
 {

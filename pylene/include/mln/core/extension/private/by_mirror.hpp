@@ -20,14 +20,6 @@ namespace mln::extension
     using support_clamp       = std::false_type;
     using support_extend_with = std::false_type;
 
-  public:
-    explicit by_mirror(std::size_t* padding_ptr)
-      : m_padding_ptr{padding_ptr}
-    {
-    }
-
-    std::size_t padding() const { return *m_padding_ptr; }
-
     template <typename SE>
     constexpr bool fit(const SE&) const
     {
@@ -38,21 +30,13 @@ namespace mln::extension
 
     constexpr int extent() const { return std::numeric_limits<int>::max(); }
 
-    void mirror(std::size_t padding = 0) noexcept
-    {
-      *m_padding_ptr = padding;
-
-      // Nothing else to do, everything is lazy-computed
-    }
+    void mirror() noexcept {}
 
     constexpr bool is_fill_supported() const { return support_fill::value; }
     constexpr bool is_mirror_supported() const { return support_mirror::value; }
     constexpr bool is_periodize_supported() const { return support_periodize::value; }
     constexpr bool is_clamp_supported() const { return support_clamp::value; }
     constexpr bool is_extend_with_supported() const { return support_extend_with::value; }
-
-  private:
-    std::size_t* m_padding_ptr; // mutable
   };
 
 } // namespace mln::extension

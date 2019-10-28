@@ -50,7 +50,7 @@ build-docker-automatic:
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
+        - cmake --build . --target Pylene --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
@@ -69,7 +69,7 @@ build-docker-automatic:
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$COV -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
-        - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
+        - cmake --build . --target Pylene --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-apps --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-cli --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
@@ -94,30 +94,30 @@ build-docker-automatic:
 # Asan and ubsan can work together
 
 
-distcheck-linux-gcc8-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_29}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
-        ASAN: "OFF"
-        MSAN: "OFF"
-        UBSAN: "OFF"
-        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
+# distcheck-linux-gcc8-release:
+#     <<: *distcheck-linux-base
+#     image: ${FEDORA_29}
+#     variables:
+#         PYLENE_CONFIGURATION: "Release"
+#         CXX: "g++"
+#         CC: "gcc"
+#         ASAN: "OFF"
+#         MSAN: "OFF"
+#         UBSAN: "OFF"
+#         OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
-distcheck-linux-gcc8-debug-cov-asan-ubsan:
-    <<: *distcheck-linux-coverage
-    image: ${FEDORA_29}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        COV: "/usr/bin/gcov"
-        ASAN: "ON"
-        MSAN: "OFF"
-        UBSAN: "ON"
-        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
+# distcheck-linux-gcc8-debug-cov-asan-ubsan:
+#     <<: *distcheck-linux-coverage
+#     image: ${FEDORA_29}
+#     variables:
+#         PYLENE_CONFIGURATION: "Debug"
+#         CXX: "g++"
+#         CC: "gcc"
+#         COV: "/usr/bin/gcov"
+#         ASAN: "ON"
+#         MSAN: "OFF"
+#         UBSAN: "ON"
+#         OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
 distcheck-linux-gcc9-release:
     <<: *distcheck-linux-base
@@ -144,55 +144,55 @@ distcheck-linux-gcc9-debug-cov-asan-ubsan:
         UBSAN: "ON"
         OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
-distcheck-linux-clang7-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_29}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-        ASAN: "OFF"
-        MSAN: "OFF"
-        UBSAN: "OFF"
-        OTHER_CMAKE_ARGS: ""
+# distcheck-linux-clang7-release:
+#     <<: *distcheck-linux-base
+#     image: ${FEDORA_29}
+#     variables:
+#         PYLENE_CONFIGURATION: "Release"
+#         CXX: "clang++"
+#         CC: "clang"
+#         ASAN: "OFF"
+#         MSAN: "OFF"
+#         UBSAN: "OFF"
+#         OTHER_CMAKE_ARGS: ""
 
-distcheck-linux-clang7-debug-cov-asan-ubsan:
-    <<: *distcheck-linux-coverage
-    image: ${FEDORA_29}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        COV: "/usr/local/bin/llvm/gcov"
-        ASAN: "ON"
-        MSAN: "OFF"
-        UBSAN: "ON"
-        OTHER_CMAKE_ARGS: ""
+# distcheck-linux-clang7-debug-cov-asan-ubsan:
+#     <<: *distcheck-linux-coverage
+#     image: ${FEDORA_29}
+#     variables:
+#         PYLENE_CONFIGURATION: "Debug"
+#         CXX: "clang++"
+#         CC: "clang"
+#         COV: "/usr/local/bin/llvm/gcov"
+#         ASAN: "ON"
+#         MSAN: "OFF"
+#         UBSAN: "ON"
+#         OTHER_CMAKE_ARGS: ""
 
-distcheck-linux-clang8-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_30}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-        ASAN: "OFF"
-        MSAN: "OFF"
-        UBSAN: "OFF"
-        OTHER_CMAKE_ARGS: ""
+# distcheck-linux-clang8-release:
+#     <<: *distcheck-linux-base
+#     image: ${FEDORA_30}
+#     variables:
+#         PYLENE_CONFIGURATION: "Release"
+#         CXX: "clang++"
+#         CC: "clang"
+#         ASAN: "OFF"
+#         MSAN: "OFF"
+#         UBSAN: "OFF"
+#         OTHER_CMAKE_ARGS: ""
 
-distcheck-linux-clang8-debug-cov-asan-ubsan:
-    <<: *distcheck-linux-coverage
-    image: ${FEDORA_30}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        COV: "/usr/local/bin/llvm/gcov"
-        ASAN: "ON"
-        MSAN: "OFF"
-        UBSAN: "ON"
-        OTHER_CMAKE_ARGS: ""
+# distcheck-linux-clang8-debug-cov-asan-ubsan:
+#     <<: *distcheck-linux-coverage
+#     image: ${FEDORA_30}
+#     variables:
+#         PYLENE_CONFIGURATION: "Debug"
+#         CXX: "clang++"
+#         CC: "clang"
+#         COV: "/usr/local/bin/llvm/gcov"
+#         ASAN: "ON"
+#         MSAN: "OFF"
+#         UBSAN: "ON"
+#         OTHER_CMAKE_ARGS: ""
 
 
 #########

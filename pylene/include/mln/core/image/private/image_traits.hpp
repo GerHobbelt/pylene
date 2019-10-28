@@ -1,10 +1,10 @@
 #pragma once
 
-// FIXME: backward compatibility
-#include <mln/core/image_traits.hpp> // image_ch_value_t
-
 namespace mln
 {
+  template <typename I>
+  struct[[deprecated]] image_traits;
+
 
   // Core traits
   template <class I>
@@ -25,6 +25,12 @@ namespace mln
   template <class I>
   using image_concrete_t = typename I::concrete_type;
 
+  template <class I, class V>
+  using image_ch_value_t = typename I::template ch_value_type<V>;
+
+  template <class I, class V>
+  using ch_value_t = image_ch_value_t<I, V>;
+
   template <class I>
   using concrete_t = image_concrete_t<I>;
 
@@ -35,6 +41,8 @@ namespace mln
   template <class I>
   using image_extension_t = typename I::extension_type;
 
+  template <typename Image>
+  using image_has_border = std::is_convertible<typename image_traits<Image>::extension, mln::extension::border_extension_tag>;
 
   // Index trait
   template <class I>
@@ -51,11 +59,6 @@ namespace mln
   template <class I>
   inline constexpr auto image_accessible_v = image_accessible_t<I>::value;
 
-
-  // Change value type trait
-  // FIXME: defined in mln/core/image_traits
-  // template <class I, class V>
-  // using image_ch_value_t = typename I::template ch_value_type<V>;
 
   // Category trait
   template <class I>

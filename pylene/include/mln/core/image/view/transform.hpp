@@ -112,8 +112,7 @@ namespace mln
 
     auto new_pixels()
     {
-      using R        = decltype(this->base().new_pixels());
-      auto pxwrapper = [fun = this->fun_](::ranges::range_value_t<R> px) { return new_pixel_type{fun, std::move(px)}; };
+      auto pxwrapper = [fun = this->fun_](image_pixel_t<I> px) { return new_pixel_type{fun, std::move(px)}; };
       return mln::ranges::view::transform(this->base().new_pixels(), pxwrapper);
     }
 
@@ -275,20 +274,12 @@ namespace mln
 
     auto new_values()
     {
-      static_assert(::ranges::ForwardRange<decltype(m_ima1.new_values())>());
-      static_assert(::ranges::ForwardRange<decltype(m_ima2.new_values())>());
-
       return mln::ranges::view::transform(m_ima1.new_values(), m_ima2.new_values(), fun_);
     }
 
     auto new_pixels()
     {
-      using R1 = decltype(m_ima1.new_pixels());
-      using R2 = decltype(m_ima2.new_pixels());
-      static_assert(::ranges::ForwardRange<R1>());
-      static_assert(::ranges::ForwardRange<R2>());
-
-      auto pxwrapper = [fun = this->fun_](::ranges::range_reference_t<R1> px1, ::ranges::range_reference_t<R2> px2) {
+      auto pxwrapper = [fun = this->fun_](image_pixel_t<I1> px1, image_pixel_t<I2> px2) {
         return new_pixel_type{fun, std::move(px1), std::move(px2)};
       };
       return mln::ranges::view::transform(m_ima1.new_pixels(), m_ima2.new_pixels(), pxwrapper);

@@ -7,6 +7,7 @@
 #include <mln/core/image/view/transform.hpp>
 
 #include <gtest/gtest.h>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 
 TEST(View, maths_l0dist)
@@ -26,9 +27,8 @@ TEST(View, maths_l0dist)
                                          {30, 30, 20, 56, 90}, //
                                          {90, 132, 132, 182, 182}};
 
-#ifndef PYLENE_GCC8_WORKAROUND
-  ASSERT_TRUE(mln::all_of(ref == l0dist(ima1, sqr(ima2))));
-#endif
+  ASSERT_IMAGES_EQ_EXP(ref, l0dist(ima1, sqr(ima2)));
+
 
 
   mln::experimental::image2d<mln::rgb8> ima3 = {{{1, 2, 2}, {2, 4, 4}, {3, 6, 6}}, //
@@ -43,7 +43,7 @@ TEST(View, maths_l0dist)
                                           {2, 0, 2}, //
                                           {2, 0, 2}};
 
-  ASSERT_TRUE(mln::all_of(ref2 == l0dist(ima3, ima4)));
+  ASSERT_IMAGES_EQ_EXP(ref2, l0dist(ima3, ima4));
 }
 
 TEST(View, maths_l1dist)
@@ -63,7 +63,7 @@ TEST(View, maths_l1dist)
                                          {30, 30, 20, 56, 90}, //
                                          {90, 132, 132, 182, 182}};
 
-  ASSERT_TRUE(mln::all_of(ref == l1dist(ima1, sqr(ima2))));
+  ASSERT_IMAGES_EQ_EXP(ref, l1dist(ima1, sqr(ima2)));
 
 
   mln::experimental::image2d<mln::rgb8> ima3 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -78,7 +78,7 @@ TEST(View, maths_l1dist)
                                           {18, 0, 18}, //
                                           {18, 0, 18}};
 
-  ASSERT_TRUE(mln::all_of(ref2 == l1dist(ima3, ima4)));
+  ASSERT_IMAGES_EQ_EXP(ref2, l1dist(ima3, ima4));
 }
 
 TEST(View, maths_l2dist)
@@ -98,7 +98,7 @@ TEST(View, maths_l2dist)
                                             {30, 30, 20, 56, 90}, //
                                             {90, 132, 132, 182, 182}};
 
-  ASSERT_TRUE(mln::all_of(ref == l2dist(ima1, sqr(ima2))));
+  ASSERT_IMAGES_EQ_EXP(ref, l2dist(ima1, sqr(ima2)));
 
 
   mln::experimental::image2d<mln::rgb8> ima3 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -113,7 +113,7 @@ TEST(View, maths_l2dist)
                                              {6, 0, 6}, //
                                              {6, 0, 6}};
 
-  ASSERT_TRUE(mln::all_of(ref2 == l2dist(ima3, ima4)));
+  ASSERT_IMAGES_EQ_EXP(ref2, l2dist(ima3, ima4));
 }
 
 TEST(View, maths_lpdist)
@@ -133,7 +133,7 @@ TEST(View, maths_lpdist)
                                          {30, 30, 20, 56, 90}, //
                                          {90, 132, 132, 182, 182}};
 
-  ASSERT_TRUE(mln::all_of(ref == lpdist<4>(ima1, sqr(ima2))));
+  ASSERT_IMAGES_EQ_EXP(ref , lpdist<4>(ima1, sqr(ima2)));
 
 
   mln::experimental::image2d<mln::rgb8> ima3 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -149,7 +149,7 @@ TEST(View, maths_lpdist)
       {std::pow(6 * 6 * 6 * 6 * 3, 1. / 4.), 0, std::pow(6 * 6 * 6 * 6 * 3, 1. / 4.)}, //
       {std::pow(6 * 6 * 6 * 6 * 3, 1. / 4.), 0, std::pow(6 * 6 * 6 * 6 * 3, 1. / 4.)}};
 
-  ASSERT_TRUE(mln::all_of(ref2 == lpdist<4>(ima3, ima4)));
+  ASSERT_IMAGES_EQ_EXP(ref2,  lpdist<4>(ima3, ima4));
 }
 
 TEST(View, maths_l2dist_sqr)
@@ -169,7 +169,7 @@ TEST(View, maths_l2dist_sqr)
                                          {900, 900, 400, 3136, 8100}, //
                                          {8100, 17424, 17424, 33124, 33124}};
 
-  ASSERT_TRUE(mln::all_of(ref == l2dist_sqr(ima1, sqr(ima2))));
+  ASSERT_IMAGES_EQ_EXP(ref , l2dist_sqr(ima1, sqr(ima2)));
 
 
   mln::experimental::image2d<mln::rgb8> ima3 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -184,7 +184,7 @@ TEST(View, maths_l2dist_sqr)
                                           {108, 0, 108}, //
                                           {108, 0, 108}};
 
-  ASSERT_TRUE(mln::all_of(ref2 == l2dist_sqr(ima3, ima4)));
+ASSERT_IMAGES_EQ_EXP(ref2,  l2dist_sqr(ima3, ima4));
 }
 
 TEST(View, maths_linfdist)
@@ -204,7 +204,7 @@ TEST(View, maths_linfdist)
                                          {900, 900, 400, 3136, 8100}, //
                                          {8100, 17424, 17424, 33124, 33124}};
 
-  ASSERT_TRUE(mln::all_of(ref == linfdist(ima1, sqr(ima2))));
+  ASSERT_IMAGES_EQ_EXP(ref , linfdist(ima1, sqr(ima2)));
 
 
   mln::experimental::image2d<mln::rgb8> ima3 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
@@ -219,5 +219,5 @@ TEST(View, maths_linfdist)
                                           {6, 0, 6}, //
                                           {6, 0, 6}};
 
-  ASSERT_TRUE(mln::all_of(ref2 == linfdist(ima3, ima4)));
+  ASSERT_IMAGES_EQ_EXP(ref2,  linfdist(ima3, ima4));
 }

@@ -3,8 +3,11 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clip.hpp>
+#include <mln/core/domain/where.hpp>
+
 #include <mln/core/rangev3/view/filter.hpp>
 #include <mln/core/rangev3/view/remove_if.hpp>
+
 
 #include <range/v3/empty.hpp>
 #include <range/v3/utility/functional.hpp>
@@ -28,39 +31,7 @@ namespace mln
     using typename filter_view::image_adaptor::point_type;
     using typename filter_view::image_adaptor::reference;
     using typename filter_view::image_adaptor::value_type;
-
-    class domain_type : ::ranges::view_base
-    {
-      using fun_t = ::ranges::composed<F, std::reference_wrapper<I>>; // f o I::operator()
-      using dom_t = decltype(std::declval<I*>()->domain());
-      using rng_t = mln::ranges::remove_if_view<::ranges::view::all_t<dom_t>, ::ranges::logical_negate<fun_t>>;
-
-      fun_t         m_fun;
-      dom_t         m_dom;
-      mutable rng_t m_rng; // domain can be a range, so non-const
-
-      static_assert(::ranges::ForwardRange<rng_t>());
-      static_assert(::ranges::View<::ranges::view::all_t<dom_t>>());
-
-    public:
-      using value_type = ::ranges::range_value_t<rng_t>;
-      using reference  = ::ranges::range_reference_t<rng_t>;
-
-      domain_type(I* ima, F f)
-        : m_fun(std::move(f), std::ref(*ima))
-        , m_dom(ima->domain())
-        , m_rng(mln::ranges::view::filter(::ranges::view::all(m_dom), m_fun))
-      {
-      }
-
-      auto begin() const { return ::ranges::begin(m_rng); }
-      auto end() const { return ::ranges::end(m_rng); }
-
-      bool          has(point_type p) const { return m_dom.has(p) && m_fun(p); }
-      bool          empty() const { return ::ranges::empty(m_rng); }
-      constexpr int dim() const { return m_dom.dim(); }
-    };
-    /// \}
+    using domain_type = mln::ranges::where_t<I, F>;
 
 
     /// Traits & Image Properties
@@ -109,7 +80,7 @@ namespace mln
       return mln::clip_view{this->base(), domain()};
     }
 
-    domain_type domain() const { return {const_cast<I*>(&this->base()), this->f}; }
+    domain_type domain() const { return {this->base(), f}; }
 
     auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
 

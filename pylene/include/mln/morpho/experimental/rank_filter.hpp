@@ -1,13 +1,14 @@
 #pragma once
 
 
-#include <mln/accu/accumulators/h_rank.hpp>
+
 #include <mln/core/canvas/local_accumulation.hpp>
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/trace.hpp>
 
+#include <mln/accu/accumulators/h_rank.hpp>
 
 namespace mln::morpho::experimental
 {

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <mln/core/concept/new/cmcstl2.hpp>
+#include <concepts/concepts.hpp>
 
 #include <mln/core/concept/new/points.hpp>
 #include <mln/core/concept/new/values.hpp>
+#include <mln/core/concept/new/indexes.hpp>
 
 #include <mln/core/image/private/pixel_traits.hpp>
 
@@ -13,7 +14,6 @@ namespace mln
 {
   namespace experimental
   {
-
     template <class Px>
     struct Pixel
     {
@@ -22,19 +22,15 @@ namespace mln
 
   namespace concepts
   {
-
     // clang-format off
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
-  // Pixel
-  template <typename Pix>
-  concept Pixel = 
-    // Minimum constraint on image object
-    // Do not requires DefaultConstructible
-    std::is_base_of_v<mln::experimental::Pixel<Pix>, Pix> &&
-    stl::CopyConstructible<Pix> &&
-    stl::MoveConstructible<Pix> &&
-    requires {
+
+    template <class Pix> concept Pixel =
+      std::is_base_of_v<mln::experimental::Pixel<Pix>, Pix> &&
+      ::concepts::copy_constructible<Pix> &&
+      ::concepts::move_constructible<Pix> &&
+      requires {
       typename pixel_value_t<Pix>;
       typename pixel_reference_t<Pix>;
       typename pixel_point_t<Pix>;
@@ -44,11 +40,10 @@ namespace mln
     !std::is_const_v<pixel_value_t<Pix>> &&
     !std::is_reference_v<pixel_value_t<Pix>> &&
     requires(const Pix cpix, Pix pix, pixel_point_t<Pix> p) {
-      { cpix.point() } -> stl::ConvertibleTo<pixel_point_t<Pix>>&&;
-      { cpix.val() }   -> stl::ConvertibleTo<pixel_reference_t<Pix>>&&;
+      { cpix.point() } -> ::concepts::convertible_to<pixel_point_t<Pix>>&&;
+      { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>&&;
       { pix.shift(p) }
     };
-
 
   namespace detail
   {

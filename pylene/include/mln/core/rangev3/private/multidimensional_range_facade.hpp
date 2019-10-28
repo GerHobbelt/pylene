@@ -1,6 +1,7 @@
 #pragma once
 #include <meta/meta.hpp>
 #include <range/v3/range_fwd.hpp>
+#include <range/v3/iterator/default_sentinel.hpp>
 
 #include <iostream>
 
@@ -20,7 +21,7 @@ namespace mln::ranges::details
     void next() { this->__next(::meta::int_<Rank - 1>()); }
 
 
-    bool equal(::ranges::default_sentinel) const { return this->derived()->__is_at_end(0); }
+    bool equal(::ranges::default_sentinel_t) const { return this->derived()->__is_at_end(0); }
 
   private:
     template <int k>

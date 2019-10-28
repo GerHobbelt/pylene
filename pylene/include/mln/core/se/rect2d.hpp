@@ -1,10 +1,14 @@
 #pragma once
 
 #include <mln/core/box.hpp>
-#include <mln/core/domain/box.hpp>
-#include <mln/core/neighborhood/dyn_neighborhood.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
 #include <mln/core/se/private/se_facade.hpp>
+#include <mln/core/rangev3/view/ravel.hpp>
+
+// [legacy]
+#include <mln/core/domain/box.hpp>
+#include <mln/core/neighborhood/dyn_neighborhood.hpp>
+
 
 #include <vector>
 /// \file
@@ -48,7 +52,7 @@ namespace mln
       rect2d dec() const;
 
       /// \brief Return a range of SE offsets
-      const mln::experimental::box2d& offsets() const { return m_dpoints; }
+      auto offsets() const { return mln::ranges::view::ravel(m_dpoints); }
 
       /// \brief Return true if decomposable (for any non-empty rectangle)
       bool is_decomposable() const;

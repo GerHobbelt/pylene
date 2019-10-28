@@ -1,8 +1,8 @@
-#include <mln/core/range/view/transform_if.hpp>
+#include <mln/core/rangev3/view/transform_if.hpp>
 
-#include <mln/core/range/algorithm/for_each.hpp>
+#include <mln/core/rangev3/algorithm/for_each.hpp>
 #include <mln/core/box.hpp>
-#include <mln/core/range/mdspan.hpp>
+#include <mln/core/rangev3/mdspan.hpp>
 
 
 #include <vector>
@@ -15,11 +15,11 @@ TEST(Core, transform_if_read)
 
 
   // Chessboard only
-  auto box = mln::box2d(3, 3);
+  auto box = mln::experimental::box2d(3, 3);
   auto sp = mln::ranges::mdspan<int, 2>(data.data(), {3, 3});
 
-  auto pred = [](mln::point2d p, int) { return (p.x() % 2) == (p.y() % 2); };
-  auto map  = [](mln::point2d, int v){ return v; };
+  auto pred = [](mln::experimental::point2d p, int) { return (p.x() % 2) == (p.y() % 2); };
+  auto map  = [](mln::experimental::point2d, int v){ return v; };
   auto rng = mln::ranges::view::transform_if(map, pred, box, sp);
 
   static_assert(mln::ranges::MDRange<decltype(rng)>);
@@ -38,11 +38,11 @@ TEST(Core, transform_if_write)
 
 
   // Chessboard only
-  auto box = mln::box2d(3, 3);
+  auto box = mln::experimental::box2d(3, 3);
   auto sp = mln::ranges::mdspan<int, 2>(data.data(), {3, 3});
 
-  auto pred = [](mln::point2d p, int) { return (p.x() % 2) == (p.y() % 2); };
-  auto map  = [](mln::point2d, int& v) -> int& { return v; };
+  auto pred = [](mln::experimental::point2d p, int) { return (p.x() % 2) == (p.y() % 2); };
+  auto map  = [](mln::experimental::point2d, int& v) -> int& { return v; };
   auto rng = mln::ranges::view::transform_if(map, pred, box, sp);
 
   static_assert(mln::ranges::MDRange<decltype(rng)>);

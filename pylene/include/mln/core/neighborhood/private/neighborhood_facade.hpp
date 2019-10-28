@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/concept/object.hpp>
 #include <mln/core/concept/new/neighborhoods.hpp>
 #include <mln/core/neighborhood/private/sliding_pixel_range.hpp>
 #include <range/v3/view/transform.hpp>

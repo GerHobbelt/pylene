@@ -1,11 +1,14 @@
 #pragma once
 
-#include <mln/core/neighborhood/neighborhood_base.hpp>
-#include <mln/core/se/custom_se.hpp>
-#include <mln/core/se/private/se_facade.hpp>
-#include <mln/core/box.hpp>
 
+#include <mln/core/box.hpp>
+#include <mln/core/se/custom_se.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
+#include <mln/core/se/private/se_facade.hpp>
+
+#include <mln/core/neighborhood/neighborhood_base.hpp>
+
+
 #include <range/v3/span.hpp>
 #include <vector>
 

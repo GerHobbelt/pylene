@@ -2,6 +2,9 @@
 
 #include <mln/core/concept/new/structuring_elements.hpp>
 
+#include <concepts/concepts.hpp>
+#include <range/v3/range/concepts.hpp>
+
 namespace mln::experimental
 {
 
@@ -22,13 +25,13 @@ namespace mln::concepts
   concept Neighborhood =
     StructuringElement<SE, P> &&
     requires (SE se, P p, mln::archetypes::PixelT<P> px) {
-      { se.before(p) } -> stl::ForwardRange&&;
-      { se.after(p) } -> stl::ForwardRange&&;
-      { se.before(px) } -> stl::ForwardRange&&;
-      { se.after(px) } -> stl::ForwardRange&&;
+      { se.before(p) }  -> ::ranges::cpp20::forward_range&&;
+      { se.after(p) }   -> ::ranges::cpp20::forward_range&&;
+      { se.before(px) } -> ::ranges::cpp20::forward_range&&;
+      { se.after(px) }  -> ::ranges::cpp20::forward_range&&;
 
-      requires detail::RangeValueTypeConvertibleTo<decltype(se.before(p)), P>;
-      requires detail::RangeValueTypeConvertibleTo<decltype(se.after(p)), P>;
+      requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se.before(p))>, P>;
+      requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se.after(p))>, P>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se.before(px))>>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se.after(px))>>;
     };

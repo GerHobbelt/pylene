@@ -1,5 +1,5 @@
-#include <mln/core/range/foreach.hpp>
-#include <mln/core/range/mdindex.hpp>
+#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/rangev3/mdindex.hpp>
 
 
 #include <gtest/gtest.h>
@@ -23,7 +23,7 @@ TEST(Range, foreach_equal_twofors)
 
   mdindex sp({width, height});
 
-  mln_foreach (auto v, sp)
+  mln_foreach_new (auto v, sp)
     b.push_back(v);
 
   ASSERT_EQ(a, b);
@@ -47,7 +47,7 @@ TEST(Range, foreach_breaks)
 endfor:
   mdindex sp({width, height});
 
-  mln_foreach (auto v, sp)
+  mln_foreach_new (auto v, sp)
   {
     if (v[0] == 1 && v[1] == 3)
       break;
@@ -75,7 +75,7 @@ TEST(Range, foreach_continues)
 
   mdindex sp({width, height});
 
-  mln_foreach (auto v, sp)
+  mln_foreach_new (auto v, sp)
   {
     if (v[0] % 2 == 0 && v[1] % 2 == 0)
       continue;

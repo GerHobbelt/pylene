@@ -1,10 +1,11 @@
 #pragma once
 
-#include <mln/core/concept/new/cmcstl2.hpp>
 #include <mln/core/concept/new/points.hpp>
 #include <mln/core/concept/new/values.hpp>
 
-#include <range/v3/range_traits.hpp>
+
+#include <mln/core/rangev3/concepts.hpp>
+#include <mln/core/rangev3/type_traits.hpp>
 
 #include <array>
 #include <type_traits>
@@ -20,9 +21,9 @@ namespace mln::concepts
   // Domain
   template <typename Dom>
   concept Domain =
-    stl::ForwardRange<Dom> &&
-    Point<::ranges::range_value_t<Dom>> &&
-    requires(const Dom cdom, ::ranges::range_value_t<Dom> p) {
+    mln::ranges::mdrange<Dom> &&
+    Point<mln::ranges::mdrange_value_t<Dom>> &&
+    requires(const Dom cdom, mln::ranges::mdrange_value_t<Dom> p) {
       { cdom.has(p) }   -> bool;
       { cdom.empty() }  -> bool;
       { cdom.dim() }    -> int;
@@ -31,19 +32,19 @@ namespace mln::concepts
 
   // SizedDomain
   template <typename Dom>
-  concept SizedDomain = 
+  concept SizedDomain =
     Domain<Dom> &&
     requires(const Dom cdom) {
-      { cdom.size() } -> stl::UnsignedIntegral&&;
+    { cdom.size() } -> ::concepts::unsigned_integral&&;
     };
-  
+
   // ShapedDomain
   template <typename Dom>
-  concept ShapedDomain = 
+  concept ShapedDomain =
     SizedDomain<Dom> &&
     requires(const Dom cdom) {
       { cdom.shape() }    -> ::ranges::range_value_t<Dom>;
-      { cdom.extents() }  -> stl::ForwardRange&&;
+      { cdom.extents() }  -> ::ranges::cpp20::forward_range&&;
     };
 
 #endif // PYLENE_CONCEPT_TS_ENABLED
@@ -53,4 +54,4 @@ namespace mln::concepts
 } // namespace mln::concepts
 
 // Validate concept
-#include <mln/core/concept/new/archetype/domain.hpp>
+//#include <mln/core/concept/new/archetype/domain.hpp>

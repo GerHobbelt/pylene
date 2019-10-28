@@ -1,4 +1,3 @@
-#include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imprint.hpp>
@@ -33,7 +32,7 @@ TEST(Morpho, saturate)
 
   using namespace mln;
 
-  image2d<uint8> ima;
+  image2d<std::uint8_t> ima;
   io::imread(fixtures::ImagePath::concat_with_filename("squares.pgm"), ima);
 
   image2d<bool> out = morpho::saturate(ima == 154, c4, point2d{0, 0});

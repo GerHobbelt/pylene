@@ -1,4 +1,4 @@
-#include <mln/core/range/mdindex.hpp>
+#include <mln/core/rangev3/mdindex.hpp>
 
 #include <vector>
 #include <gtest/gtest.h>
@@ -51,7 +51,7 @@ public:
 
   MultiIndicesTest()
   {
-    for (int k = 0; k < static_cast<int>(Rank); ++k)
+    for (std::size_t k = 0; k < Rank; ++k)
     {
       from[k]  = k;
       from_[k] = k;
@@ -102,7 +102,7 @@ public:
 
 using MyTypes = ::testing::Types<std::array<int, 1>, std::array<int, 2>, std::array<int, 3>, std::array<int, 4>,
                                  std::array<std::uint8_t, 4>>;
-TYPED_TEST_SUITE(MultiIndicesTest, MyTypes);
+TYPED_TEST_CASE(MultiIndicesTest, MyTypes);
 
 
 

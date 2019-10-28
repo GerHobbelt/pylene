@@ -4,7 +4,7 @@
 #include <mln/core/rangev3/rows.hpp>
 
 #include <range/v3/algorithm/any_of.hpp>
-#include <range/v3/utility/functional.hpp>
+#include <range/v3/functional/concepts.hpp>
 
 
 namespace mln
@@ -23,7 +23,7 @@ namespace mln
   bool any_of(InputImage input, UnaryPredicate p)
   {
     static_assert(mln::is_a<InputImage, experimental::Image>());
-    static_assert(::ranges::Predicate<UnaryPredicate, image_reference_t<InputImage>>());
+    static_assert(::ranges::cpp20::predicate<UnaryPredicate, image_reference_t<InputImage>>);
 
     auto&& vals = input.new_values();
     for (auto r : ranges::rows(vals))

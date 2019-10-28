@@ -315,14 +315,7 @@ namespace mln::extension
   template <typename U>
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, U>
   {
-  private:
-    std::size_t m_padding;
-
   public:
-    explicit border_manager(std::size_t padding = 0)
-      : m_padding{padding}
-    {
-    }
 
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
@@ -338,29 +331,21 @@ namespace mln::extension
       {
         if (ima.extension().is_mirror_supported() && fit(ima, se))
         {
-          ima.extension().mirror(m_padding);
+          ima.extension().mirror();
           return {ima, se};
         }
       }
 
       mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension does "
                        "not really support mirror. Consider using a large border.");
-      return {view::mirror_extended(ima, m_padding), se};
+      return {view::mirror_extended(ima), se};
     }
   };
 
   template <typename U>
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::Native, U>
   {
-  private:
-    std::size_t m_padding;
-
   public:
-    explicit border_manager(std::size_t padding = 0)
-      : m_padding{padding}
-    {
-    }
-
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Mirror, BorderManagementPolicy::Native, Ima, SE,
@@ -386,7 +371,7 @@ namespace mln::extension
       }
 
       // The SE fits and the extension dynamically support mirror, we set the value of the border
-      ima.extension().mirror(m_padding);
+      ima.extension().mirror();
       return {ima, se};
     }
   };

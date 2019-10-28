@@ -1,12 +1,13 @@
 #pragma once
 
 #include <mln/core/concept/new/archetype/pixel.hpp>
-#include <mln/core/concept/new/cmcstl2.hpp>
-#include <mln/core/concept/new/pixels.hpp>
+
 #include <mln/core/concept/new/ranges.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
 
-#include <range/v3/range_traits.hpp>
+#include <concepts/concepts.hpp>
+#include <range/v3/range/concepts.hpp>
+#include <range/v3/functional/concepts.hpp>
 #include <type_traits>
 
 
@@ -39,26 +40,26 @@ namespace mln::concepts
 
   template <typename SE, typename P>
   concept StructuringElement =
-    stl::ConvertibleTo<SE, mln::experimental::StructuringElement<SE>> &&
-    stl::RegularInvocable<SE, P> &&
-    stl::RegularInvocable<SE, mln::archetypes::PixelT<P>> &&
+    ::concepts::convertible_to<SE, mln::experimental::StructuringElement<SE>> &&
+    ::ranges::regular_invocable<SE, P> &&
+    ::ranges::regular_invocable<SE, mln::archetypes::PixelT<P>> &&
     requires {
       typename SE::category;
       typename SE::incremental;
       typename SE::decomposable;
       typename SE::separable;
     } &&
-    stl::ConvertibleTo<typename SE::category, mln::adaptative_neighborhood_tag> &&
-    details::implies(stl::ConvertibleTo<typename SE::category, mln::dynamic_neighborhood_tag>,
+    ::concepts::convertible_to<typename SE::category, mln::adaptative_neighborhood_tag> &&
+    details::implies(::concepts::convertible_to<typename SE::category, mln::dynamic_neighborhood_tag>,
                      details::DynamicStructuringElement<SE>) &&
     requires (SE se, const SE cse, P p, mln::archetypes::PixelT<P> px) {
-      { se(p) }         -> stl::ForwardRange&&;
-      { se(px) }        -> stl::ForwardRange&&;
-      { cse.offsets() } -> stl::ForwardRange&&;
+      { se(p) }         -> ::ranges::cpp20::forward_range&&;
+      { se(px) }        -> ::ranges::cpp20::forward_range&&;
+      { cse.offsets() } -> ::ranges::cpp20::forward_range&&;
 
-      requires detail::RangeValueTypeConvertibleTo<decltype(se(p)), P>;
+      requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se(p))>, P>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se(px))>>;
-      requires detail::RangeValueTypeConvertibleTo<decltype(cse.offsets()), P>;
+      requires ::concepts::convertible_to<::ranges::range_value_t<decltype(cse.offsets())>, P>;
     };
 
   namespace details
@@ -73,10 +74,10 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept DecomposableStructuringElement =
     StructuringElement<SE, P> &&
-    stl::ConvertibleTo<typename SE::decomposable, std::true_type> &&
+    ::concepts::convertible_to<typename SE::decomposable, std::true_type> &&
     requires(const SE se) {
       { se.is_decomposable() }  -> bool;
-      { se.decompose() }        -> stl::ForwardRange&&;
+      { se.decompose() }        -> ::ranges::cpp20::forward_range&&;
       requires details::RangeOfStructuringElement<decltype(se.decompose()), P>;
     };
 
@@ -84,10 +85,10 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept SeparableStructuringElement =
     StructuringElement<SE, P> &&
-    stl::ConvertibleTo<typename SE::separable, std::true_type> &&
+    ::concepts::convertible_to<typename SE::separable, std::true_type> &&
     requires(const SE se) {
       { se.is_separable() } -> bool;
-      { se.separate() }     -> stl::ForwardRange&&;
+      { se.separate() }     -> ::ranges::cpp20::forward_range&&;
       requires details::RangeOfStructuringElement<decltype(se.separate()), P>;
     };
 
@@ -95,7 +96,7 @@ namespace mln::concepts
   template <typename SE, typename P>
   concept IncrementalStructuringElement =
     StructuringElement<SE, P> &&
-    stl::ConvertibleTo<typename SE::incremental, std::true_type> &&
+    ::concepts::convertible_to<typename SE::incremental, std::true_type> &&
     requires(const SE se) {
       { se.inc() }  -> StructuringElement<P>&&;
       { se.dec() }  -> StructuringElement<P>&&;

@@ -1,3 +1,5 @@
+#include <mln/core/concept/new/images.hpp> // Hack for concept::Index concept clash with mln::Index
+
 #include <mln/core/image/private/ndimage_pixel.hpp>
 
 #include <mln/core/concept/new/pixels.hpp>

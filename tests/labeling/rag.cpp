@@ -1,4 +1,3 @@
-#include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imprint.hpp>
@@ -16,13 +15,13 @@ TEST(Labeling, rag_test_1)
   ima.at(4, 0) = true;
   ima.at(4, 4) = true;
 
-  typedef boost::property<labeling::vertex_label_t, uint8>                               Vproperty;
-  typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty> Graph;
+  typedef boost::property<labeling::vertex_label_t, std::uint8_t>                               Vproperty;
+  typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty>        Graph;
 
-  image2d<uint8> lbl;
+  image2d<std::uint8_t> lbl;
   unsigned       nlabel;
   Graph          graph;
-  std::tie(lbl, nlabel) = labeling::rag(ima, c4, graph, uint8());
+  std::tie(lbl, nlabel) = labeling::rag(ima, c4, graph, std::uint8_t());
 
   io::imprint(lbl);
   {
@@ -48,13 +47,13 @@ TEST(Labeling, rag_test_2)
   ima.at(4, 0) = true;
   ima.at(4, 4) = true;
 
-  typedef boost::property<labeling::vertex_label_t, uint8>                               Vproperty;
+  typedef boost::property<labeling::vertex_label_t, std::uint8_t>                        Vproperty;
   typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vproperty> Graph;
 
-  image2d<uint8> lbl;
+  image2d<std::uint8_t> lbl;
   unsigned       nlabel;
   Graph          graph;
-  std::tie(lbl, nlabel) = labeling::rag(ima, c8, graph, uint8());
+  std::tie(lbl, nlabel) = labeling::rag(ima, c8, graph, std::uint8_t());
 
   io::imprint(lbl);
   {

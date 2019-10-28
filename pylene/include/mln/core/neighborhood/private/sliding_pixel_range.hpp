@@ -4,14 +4,14 @@
 
 #include <meta/meta.hpp>
 #include <range/v3/view_adaptor.hpp>
-#include <range/v3/range_concepts.hpp>
+#include <range/v3/range/concepts.hpp>
 
 namespace mln::details
 {
   template <class Pixel, class Rng>
   struct sliding_pixel_range : ::ranges::view_adaptor<sliding_pixel_range<Pixel, Rng>, Rng>
   {
-    static_assert(::ranges::View<Rng>());
+    static_assert(::ranges::cpp20::view<Rng>);
 
   private:
     friend ::ranges::range_access;
@@ -47,14 +47,17 @@ namespace mln::details
 
     sliding_pixel_range() = default;
 
-    CONCEPT_REQUIRES(::ranges::SizedRange<Rng const>())
-    constexpr auto size() const { return ::ranges::size(this->base()); }
+
+    constexpr auto size() const requires(::ranges::cpp20::sized_range<Rng const>)
+    {
+      return ::ranges::size(this->base());
+    }
   };
 
   template <class Pixel, class Rng>
   struct sliding_wpixel_range : ::ranges::view_adaptor<sliding_wpixel_range<Pixel, Rng>, Rng>
   {
-    static_assert(::ranges::View<Rng>());
+    static_assert(::ranges::cpp20::view<Rng>);
 
   private:
     friend ::ranges::range_access;
@@ -90,7 +93,10 @@ namespace mln::details
 
     sliding_wpixel_range() = default;
 
-    CONCEPT_REQUIRES(::ranges::SizedRange<Rng const>())
-    constexpr auto size() const { return ::ranges::size(this->base()); }
+
+    constexpr auto size() const requires(::ranges::cpp20::sized_range<Rng const>)
+    {
+      return ::ranges::size(this->base());
+    }
   };
 }

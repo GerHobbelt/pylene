@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mln/core/concept/new/extensions.hpp>
+
 #include <mln/core/concept/check.hpp>
 #include <mln/core/concept/object.hpp>
 #include <mln/core/extension/extension_traits.hpp>

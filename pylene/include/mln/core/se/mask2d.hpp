@@ -1,11 +1,12 @@
 #pragma once
 
-
-#include <mln/core/neighborhood/dyn_neighborhood.hpp> // [legacy]
-#include <mln/core/point.hpp>
 #include <mln/core/experimental/point.hpp>
 #include <mln/core/se/private/se_facade.hpp>
 #include <mln/core/private/weighted_point.hpp>
+
+// [legacy]
+#include <mln/core/point.hpp>
+#include <mln/core/neighborhood/dyn_neighborhood.hpp>
 
 #include <range/v3/span.hpp>
 

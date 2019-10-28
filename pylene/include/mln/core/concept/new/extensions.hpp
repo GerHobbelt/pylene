@@ -3,9 +3,10 @@
 #include <mln/core/concept/new/archetype/pixel.hpp>
 #include <mln/core/concept/new/archetype/point.hpp>
 #include <mln/core/concept/new/archetype/structuring_element.hpp>
-#include <mln/core/concept/new/cmcstl2.hpp>
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/new/values.hpp>
+
+#include <concepts/concepts.hpp>
 
 #include <type_traits>
 
@@ -45,9 +46,9 @@ namespace mln::concepts
     };
 
   template <typename Ext>
-  concept FillableExtension = 
+  concept FillableExtension =
     Extension<Ext> &&
-    stl::ConvertibleTo<typename Ext::support_fill, std::true_type> &&
+    ::concepts::convertible_to<typename Ext::support_fill, std::true_type> &&
     requires {
       typename Ext::value_type;
     } &&
@@ -57,9 +58,9 @@ namespace mln::concepts
     };
 
   template <typename Ext>
-  concept MirrorableExtension = 
+  concept MirrorableExtension =
     Extension<Ext> &&
-    stl::ConvertibleTo<typename Ext::support_mirror, std::true_type> &&
+    ::concepts::convertible_to<typename Ext::support_mirror, std::true_type> &&
     requires (Ext ext, const Ext cext, std::size_t padding) {
       { ext.mirror() };
       { ext.mirror(padding) };
@@ -67,34 +68,34 @@ namespace mln::concepts
     };
 
   template <typename Ext>
-  concept PeriodizableExtension = 
+  concept PeriodizableExtension =
     Extension<Ext> &&
-    stl::ConvertibleTo<typename Ext::support_periodize, std::true_type> &&
+    ::concepts::convertible_to<typename Ext::support_periodize, std::true_type> &&
     requires (Ext ext, const Ext cext) {
       { ext.periodize() };
       { cext.is_periodize_supported() }  -> bool;
     };
 
   template <typename Ext>
-  concept ClampableExtension = 
+  concept ClampableExtension =
     Extension<Ext> &&
-    stl::ConvertibleTo<typename Ext::support_clamp, std::true_type> &&
+    ::concepts::convertible_to<typename Ext::support_clamp, std::true_type> &&
     requires (Ext ext, const Ext cext) {
       { ext.clamp() };
       { cext.is_clamp_supported() }  -> bool;
     };
 
   template <typename Ext, typename U>
-  concept ExtendWithExtension = 
+  concept ExtendWithExtension =
     Extension<Ext> &&
-    stl::ConvertibleTo<typename Ext::support_extend_with, std::true_type> &&
+    ::concepts::convertible_to<typename Ext::support_extend_with, std::true_type> &&
     InputImage<U> &&
     requires {
       typename Ext::value_type;
       typename Ext::point_type;
     } &&
-    stl::ConvertibleTo<typename U::value_type, typename Ext::value_type> &&
-    stl::ConvertibleTo<typename Ext::point_type, typename U::point_type> &&
+    ::concepts::convertible_to<typename U::value_type, typename Ext::value_type> &&
+    ::concepts::convertible_to<typename Ext::point_type, typename U::point_type> &&
     requires (Ext ext, const Ext cext, U u, typename Ext::point_type offset) {
       { ext.extend_with(u, offset) };
       { cext.is_extend_with_supported() }  -> bool;

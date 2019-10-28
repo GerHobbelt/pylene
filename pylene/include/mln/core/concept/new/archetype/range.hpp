@@ -18,7 +18,7 @@ namespace mln::archetypes
       value_type* end();
     };
 
-    PYLENE_CONCEPT_TS_ASSERT(mln::concepts::stl::RandomAccessRange<RandomAccessRange>,
+    PYLENE_CONCEPT_TS_ASSERT(::ranges::cpp20::random_access_range<RandomAccessRange>,
                              "RandomAccessRange archetype does not model the stl::RandomAccessRange concept!");
 
   } // namespace detail

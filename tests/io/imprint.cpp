@@ -36,7 +36,7 @@ namespace fmt {
     template <typename FormatContext>
     auto format(const mln::rgb8& c, FormatContext& ctx)
     {
-      return format_to(ctx.begin(), "({}, {}, {})", c[0], c[1], c[2]);
+      return format_to(ctx.out(), "({}, {}, {})", c[0], c[1], c[2]);
     }
   };
 
@@ -52,7 +52,7 @@ namespace fmt {
     template <typename FormatContext>
     auto format(const mln::experimental::ndpoint<2, T>& p, FormatContext& ctx)
     {
-      return format_to(ctx.begin(), "({:d}, {:d})", p[0], p[1]);
+      return format_to(ctx.out(), "({:d}, {:d})", p[0], p[1]);
     }
   };
 }

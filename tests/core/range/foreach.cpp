@@ -1,11 +1,13 @@
-#include <gtest/gtest.h>
 #include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/multi_indices.hpp>
+#include <mln/core/rangev3/mdindex.hpp>
+
+
+#include <gtest/gtest.h>
+
 #include <vector>
 
-
-using multi_indices = mln::ranges::multi_indices<2, int>;
-using value_t       = std::array<int, 2>;
+using mdindex = mln::ranges::mdindex<2, int>;
+using value_t = std::array<int, 2>;
 
 TEST(Range, foreach_equal_twofors)
 {
@@ -16,30 +18,12 @@ TEST(Range, foreach_equal_twofors)
 
   for (int y = 0; y < height; ++y)
     for (int x = 0; x < width; ++x)
-      a.push_back({y, x});
+      a.push_back({x, y});
 
 
-  multi_indices sp(value_t{height, width});
+  mdindex sp({width, height});
 
   mln_foreach_new (auto v, sp)
-    b.push_back(v);
-
-  ASSERT_EQ(a, b);
-}
-
-TEST(Range, for_equal_twofors)
-{
-  std::vector<value_t> a, b;
-
-  int width  = 5;
-  int height = 7;
-
-  for (int y = 0; y < height; ++y)
-    for (int x = 0; x < width; ++x)
-      a.push_back({y, x});
-
-  multi_indices sp({height, width});
-  for (auto v : sp)
     b.push_back(v);
 
   ASSERT_EQ(a, b);
@@ -57,15 +41,15 @@ TEST(Range, foreach_breaks)
     {
       if (x == 1 && y == 3)
         goto endfor;
-      a.push_back({y, x});
+      a.push_back({x, y});
     }
 
 endfor:
-  multi_indices sp({height, width});
+  mdindex sp({width, height});
 
   mln_foreach_new (auto v, sp)
   {
-    if (v[1] == 1 && v[0] == 3)
+    if (v[0] == 1 && v[1] == 3)
       break;
     b.push_back(v);
   }
@@ -85,11 +69,11 @@ TEST(Range, foreach_continues)
     {
       if (x % 2 == 0 && y % 2 == 0)
         continue;
-      a.push_back({y, x});
+      a.push_back({x, y});
     }
 
 
-  multi_indices sp({height, width});
+  mdindex sp({width, height});
 
   mln_foreach_new (auto v, sp)
   {

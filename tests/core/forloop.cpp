@@ -1,5 +1,5 @@
-#include <mln/core/domain/box.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/domain/box.hpp>
 
 #include <gtest/gtest.h>
 

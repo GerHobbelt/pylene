@@ -1,6 +1,9 @@
 #pragma once
 
+#include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/object.hpp>
+#include <mln/core/image/private/image_traits.hpp>
+
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image_category.hpp>
 
@@ -23,11 +26,6 @@
 
 namespace mln
 {
-  template <class I, class V>
-  using image_ch_value_t = typename I::template ch_value_type<V>;
-
-  template <class I, class V>
-  using ch_value_t = image_ch_value_t<I, V>;
 
   struct [[deprecated]] image_dynamic_tag
   {
@@ -45,9 +43,6 @@ namespace mln
     template <class I>
     struct Image;
   };
-
-  template <typename I>
-  struct[[deprecated]] image_traits;
 
   namespace details
   {
@@ -129,12 +124,6 @@ namespace mln
   template <typename Image>
   struct image_has_extension
     : std::is_convertible<typename image_traits<Image>::extension, mln::extension::custom_extension_tag>
-  {
-  };
-
-  template <typename Image>
-  struct image_has_border
-    : std::is_convertible<typename image_traits<Image>::extension, mln::extension::border_extension_tag>
   {
   };
 

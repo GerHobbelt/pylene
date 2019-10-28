@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/cmcstl2.hpp>
+#include <concepts/concepts.hpp>
 
 namespace mln::concepts
 {
@@ -11,8 +11,8 @@ namespace mln::concepts
   // Point
   template <typename Pnt>
   concept Point =
-    stl::Regular<Pnt> &&
-    stl::StrictTotallyOrdered<Pnt>;
+    ::concepts::regular<Pnt> &&
+    ::concepts::totally_ordered<Pnt>;
 #endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on

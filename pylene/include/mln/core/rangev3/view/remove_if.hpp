@@ -1,128 +1,81 @@
 #pragma once
 
-#include <mln/core/rangev3/range_traits.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
-
-#include <mln/core/concept/new/concepts.hpp>
-
-#include <mln/core/utils/blank.hpp>
+#include <mln/core/rangev3/private/mdrange_facade.hpp>
+#include <concepts/type_traits.hpp>
 
 #include <range/v3/view/remove_if.hpp>
 
+#include <functional>
+
 namespace mln::ranges
 {
-
   namespace details
   {
-    // Bad way to access the private member
-    template <typename Rng, typename Pred>
-    struct remove_if_view_access
-      : ::ranges::view_adaptor<remove_if_view_access<Rng, Pred>, Rng,
-                               ::ranges::is_finite<Rng>::value ? ::ranges::finite
-                                                               : ::ranges::range_cardinality<Rng>::value>,
-        ::ranges::box<::ranges::semiregular_t<Pred>>
+    template <class Cur, class Fun>
+    requires MDCursor<Cur>
+    struct remove_if_mdcursor : mdcursor_facade<remove_if_mdcursor<Cur, Fun>>
     {
-      ::ranges::detail::non_propagating_cache<::ranges::iterator_t<Rng>> begin_;
-    };
+      struct cursor
+      {
+        decltype(auto) read() const { return ::ranges::range_access::read(m_cur); }
 
+        void           next()
+        {
+          do
+          {
+            m_cur.next();
+          } while (!m_cur.equal(m_end) && m_fun(m_cur.read()));
+        }
+
+        bool equal(::ranges::default_sentinel_t) const { return ::ranges::range_access::equal(m_cur, m_end); }
+        bool equal(const cursor& other) const { return ::ranges::range_access::equal(m_cur, other.m_cur); }
+
+        ::ranges::detail::begin_cursor_t<Cur> m_cur;
+        ::ranges::detail::end_cursor_t<Cur>   m_end;
+        ::ranges::semiregular_box_t<Fun>      m_fun;
+      };
+
+
+      cursor begin_cursor() const
+      {
+        auto c = ::ranges::range_access::begin_cursor(m_cur);
+        auto e = ::ranges::range_access::end_cursor(m_cur);
+        for (; !::ranges::range_access::equal(c, e); c.next())
+          if (!m_fun(c.read()))
+            break;
+        return {c, e, m_fun};
+      }
+
+      ::ranges::default_sentinel_t end_cursor() const { return {}; }
+
+      void next() { return ::ranges::range_access::next(m_cur); }
+      bool equal(const remove_if_mdcursor& other) const { return ::ranges::range_access::equal(m_cur, other.m_cur); }
+      bool equal(::ranges::default_sentinel_t) const { return ::ranges::range_access::equal(m_cur, ::ranges::default_sentinel); }
+
+      Cur                              m_cur;
+      ::ranges::semiregular_box_t<Fun> m_fun;
+    };
   } // namespace details
 
-  template <typename Rng, typename Pred>
-  struct remove_if_view : ::ranges::remove_if_view<Rng, Pred>
+  template <class Rng, class Fun>
+  requires MDRange<Rng>
+  struct remove_if_mdview : details::mdview_facade<remove_if_mdview<Rng, Fun>>
   {
+    using cursor = details::remove_if_mdcursor<::ranges::detail::begin_cursor_t<Rng>, Fun>;
+
+    cursor                       begin_cursor() const { return {{}, ::ranges::range_access::begin_cursor(m_rng), m_fun}; }
+    ::ranges::default_sentinel_t end_cursor() const { return {}; }
+
+    remove_if_mdview() = default;
+    remove_if_mdview(Rng rng, Fun fun)
+      : m_rng{std::move(rng)}
+      , m_fun{std::move(fun)}
+    {
+    }
+
   private:
-    using base_t = ::ranges::remove_if_view<Rng, Pred>;
-
-    auto get_pred() const
-    {
-      return reinterpret_cast<const details::remove_if_view_access<Rng, Pred>*>(this)
-          ->details::template remove_if_view_access<Rng, Pred>::box::get();
-    }
-
-  public:
-    using base_t::base_t;
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    // clang-format off
-    auto rows() const requires mln::concepts::SegmentedRange<Rng>
-    // clang-format on
-#else
-    template <typename U = void, typename = std::enable_if_t<is_segmented_range_v<Rng>, U>>
-    auto rows() const
-#endif
-    {
-      auto f = [pred_ = this->get_pred()](auto row) {
-        return remove_if_view<decltype(row), Pred>(std::forward<decltype(row)>(row), pred_);
-      };
-      return view::transform(this->base().rows(), f);
-    }
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    // clang-format off
-    auto reversed() const requires mln::concepts::ReversibleRange<Rng>
-    // clang-format on
-#else
-    template <typename U = void, typename = std::enable_if_t<is_reversible_range_v<Rng>, U>>
-    auto reversed() const
-#endif
-    {
-      return remove_if_view<decltype(this->base().reversed()), Pred>(this->base().reversed(), this->get_pred());
-    }
+    Rng                              m_rng;
+    ::ranges::semiregular_box_t<Fun> m_fun;
   };
 
-  namespace view
-  {
-    struct remove_if_fn
-    {
-    private:
-      friend ::ranges::view::view_access;
-      template <typename Pred>
-      static auto bind(remove_if_fn remove_if, Pred pred)
-          RANGES_DECLTYPE_AUTO_RETURN_NOEXCEPT(::ranges::make_pipeable(std::bind(remove_if, std::placeholders::_1,
-                                                                                 ::ranges::protect(std::move(pred)))));
-      // //
-
-    public:
-      template <typename Rng, typename Pred>
-      using Constraint = ::meta::and_<::ranges::InputRange<Rng>,
-                                      ::ranges::Predicate<Pred, ::ranges::reference_t<::ranges::iterator_t<Rng>>>
-                                      // FIXME: IndirectPredicate is bugged, see issue #1077
-                                      // https://github.com/ericniebler/range-v3/issues/1077
-                                      // ::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>>
-                                      >;
-
-      template <typename Rng, typename Pred, CONCEPT_REQUIRES_(Constraint<Rng, Pred>())>
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-      // clang-format off
-      requires mln::concepts::stl::InputRange<Rng> &&
-               mln::concepts::stl::IndirectUnaryPredicate<Pred, ::ranges::iterator_t<Rng>>
-#endif
-      RANGES_CXX14_CONSTEXPR auto operator()(Rng&& rng, Pred pred) const
-          // clang-format on
-          RANGES_DECLTYPE_AUTO_RETURN_NOEXCEPT(remove_if_view<::ranges::view::all_t<Rng>, Pred>{
-              ::ranges::view::all(static_cast<Rng&&>(rng)), std::move(pred)});
-
-      template <typename Rng, typename Pred, CONCEPT_REQUIRES_(!Constraint<Rng, Pred>())>
-      void operator()(Rng&&, Pred) const
-      {
-        CONCEPT_ASSERT_MSG(::ranges::InputRange<Rng>(), "The first argument to view::remove_if must be a model of the "
-                                                        "InputRange concept");
-        CONCEPT_ASSERT_MSG(::meta::and_<::ranges::CopyConstructible<Pred>,
-                                        ::ranges::Predicate<Pred, ::ranges::reference_t<::ranges::iterator_t<Rng>>>
-                                        // FIXME: IndirectPredicate is bugged, see issue #1077
-                                        // https://github.com/ericniebler/range-v3/issues/1077
-                                        //::ranges::IndirectPredicate<Pred, ::ranges::iterator_t<Rng>
-                                        >(),
-                           "The second argument to view::remove_if must be callable with "
-                           "a value of the range, and the return type must be convertible "
-                           "to bool");
-      }
-    };
-
-    RANGES_INLINE_VARIABLE(::ranges::view::view<remove_if_fn>, remove_if)
-  } // namespace view
-
 } // namespace mln::ranges
-
-
-RANGES_SATISFY_BOOST_RANGE(mln::ranges::remove_if_view)

@@ -1,10 +1,12 @@
-#include <mln/core/concept/new/concepts.hpp>
-#include <mln/core/rangev3/multi_indices.hpp>
-#include <mln/core/rangev3/multi_span.hpp>
-#include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/transform.hpp>
 
-#include <range/v3/algorithm/equal.hpp>
+#include <mln/core/rangev3/algorithm/equal.hpp>
+#include <mln/core/rangev3/mdindex.hpp>
+#include <mln/core/rangev3/mdspan.hpp>
+#include <mln/core/rangev3/view/reverse.hpp>
+
+#include <range/v3/iterator/insert_iterators.hpp>
+#include <range/v3/algorithm/copy.hpp>
 
 #include <vector>
 
@@ -23,57 +25,21 @@ TEST(Range, transform_on_containers)
   std::vector<int> v   = {2, 3};
   auto             rng = mln::ranges::view::transform(v, [](int x) { return x * 2; });
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::stl::ForwardRange<decltype(v)>);
-  static_assert(mln::concepts::stl::ForwardRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(v)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
+  static_assert(::ranges::cpp20::forward_range<decltype(v)>);
+  static_assert(::ranges::cpp20::forward_range<decltype(rng)>);
   ASSERT_EQ(std::vector({4, 6}), ::ranges::to_vector(rng));
 }
 
 
 TEST(Range, transform_2d_readonly)
 {
-  mln::ranges::multi_indices<2> ind({3, 4});
-  auto                          rng = mln::ranges::view::transform(ind, number_from_vec_t);
-
-  std::size_t n = 0;
-  for (auto v : rng)
-    n += v;
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::SegmentedRange<decltype(ind)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(ind)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(ind)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
-  ASSERT_EQ(1812, n);
-}
-
-
-TEST(Range, transform_2d_readonly_rowwise)
-{
-  mln::ranges::multi_indices<2> ind({3, 4});
+  mln::ranges::mdindex<2> ind({3, 4});
 
   std::size_t n   = 0;
   auto        rng = mln::ranges::view::transform(ind, number_from_vec_t);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::SegmentedRange<decltype(ind)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(ind)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(ind)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
 
   for (auto row : rng.rows())
     for (auto v : row)
@@ -85,57 +51,19 @@ TEST(Range, transform_2d_readonly_rowwise)
 TEST(Range, transform_2d_write)
 {
   std::vector<std::pair<int, int>>                buffer(12, std::make_pair(0, 0));
-  mln::ranges::multi_span<std::pair<int, int>, 2> sp(buffer.data(), {3, 4}, {4, 1});
-  auto                                            rng = mln::ranges::view::transform(sp, &std::pair<int, int>::first);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::stl::ForwardRange<decltype(buffer)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(sp)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(sp)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(buffer)>());
-  static_assert(::ranges::ForwardRange<decltype(sp)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  std::size_t    dims[]    = {4, 3};
+  std::ptrdiff_t strides[] = {1, 4};
+
+  auto sp = mln::ranges::mdspan<std::pair<int, int>, 2>(buffer.data(), dims, strides);
+  auto rng = mln::ranges::view::transform(sp, &std::pair<int, int>::first);
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(sp)>);
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
 
   {
     std::size_t i = 0;
-    for (auto& v : rng)
-      v = i++;
-  }
-
-  for (int i = 0; i < 12; ++i)
-  {
-    ASSERT_EQ(i, buffer[i].first);
-    ASSERT_EQ(0, buffer[i].second);
-  }
-}
-
-
-TEST(Range, transform_2d_write_row_wise)
-{
-  std::vector<std::pair<int, int>>                buffer(12, std::make_pair(0, 0));
-  mln::ranges::multi_span<std::pair<int, int>, 2> sp(buffer.data(), {3, 4}, {4, 1});
-  auto                                            rng = mln::ranges::view::transform(sp, &std::pair<int, int>::first);
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::stl::ForwardRange<decltype(buffer)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(sp)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(sp)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(buffer)>());
-  static_assert(::ranges::ForwardRange<decltype(sp)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
-  {
-    std::size_t i = 0;
-    for (auto row : rng.rows())
-      for (int& v : row)
+    for (auto&& r : rng.rows())
+      for (int& v : r)
         v = i++;
   }
 
@@ -153,62 +81,19 @@ TEST(Range, transform2_on_containers)
   std::vector<int> v2  = {3, 4};
   auto             rng = mln::ranges::view::transform(v, v2, [](int x, int y) { return x + y; });
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::stl::ForwardRange<decltype(v)>);
-  static_assert(mln::concepts::stl::ForwardRange<decltype(v2)>);
-  static_assert(mln::concepts::stl::ForwardRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(v)>());
-  static_assert(::ranges::ForwardRange<decltype(v2)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
   ASSERT_EQ(std::vector({5, 7}), ::ranges::to_vector(rng));
 }
 
 
 TEST(Range, transform2_2d_readonly)
 {
-  mln::ranges::multi_indices<2> ind({3, 4});
+  mln::ranges::mdindex<2> ind({3, 4});
 
   std::size_t n   = 0;
   auto        g   = [](auto a, auto b) { return number_from_vec_t(a) + number_from_vec_t(b); };
   auto        rng = mln::ranges::view::transform(ind, ind, g);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::SegmentedRange<decltype(ind)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(ind)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(ind)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
-  for (auto v : rng)
-    n += v;
-
-  ASSERT_EQ(2 * 1812, n);
-}
-
-
-TEST(Range, transform2_2d_readonly_rowwise)
-{
-  mln::ranges::multi_indices<2> ind({3, 4});
-
-  std::size_t n   = 0;
-  auto        g   = [](auto a, auto b) { return number_from_vec_t(a) + number_from_vec_t(b); };
-  auto        rng = mln::ranges::view::transform(ind, ind, g);
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::SegmentedRange<decltype(ind)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(ind)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(ind)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
 
   for (auto row : rng.rows())
     for (auto v : row)
@@ -217,79 +102,20 @@ TEST(Range, transform2_2d_readonly_rowwise)
 }
 
 
-TEST(Range, transform2_2d_write)
-{
-  std::vector<std::pair<int, int>> buffer1(12, std::make_pair(-1, -1));
-  std::vector<std::pair<int, int>> buffer2(12, std::make_pair(-2, -2));
-
-  mln::ranges::multi_span<std::pair<int, int>, 2> sp1(buffer1.data(), {3, 4}, {4, 1});
-  mln::ranges::multi_span<std::pair<int, int>, 2> sp2(buffer2.data(), {3, 4}, {4, 1});
-
-  auto firsts_of_pairs = [](std::pair<int, int>& a, std::pair<int, int>& b) { return std::tie(a.first, b.first); };
-  auto rng             = mln::ranges::view::transform(sp1, sp2, firsts_of_pairs);
-
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::stl::ForwardRange<decltype(buffer1)>);
-  static_assert(mln::concepts::stl::ForwardRange<decltype(buffer2)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(sp1)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(sp1)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(sp2)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(sp2)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(buffer1)>());
-  static_assert(::ranges::ForwardRange<decltype(buffer2)>());
-  static_assert(::ranges::ForwardRange<decltype(sp1)>());
-  static_assert(::ranges::ForwardRange<decltype(sp2)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
-  {
-    std::size_t i = 0;
-    for (auto&& v : rng)
-    {
-      std::get<0>(v) = i++;
-      std::get<1>(v) = i++;
-    }
-  }
-
-  for (int i = 0; i < 12; ++i)
-  {
-    ASSERT_EQ(2 * i, buffer1[i].first);
-    ASSERT_EQ(2 * i + 1, buffer2[i].first);
-    ASSERT_EQ(-1, buffer1[i].second);
-    ASSERT_EQ(-2, buffer2[i].second);
-  }
-}
-
 TEST(Range, transform2_2d_write_row_wise)
 {
   std::vector<std::pair<int, int>> buffer1(12, std::make_pair(-1, -1));
   std::vector<std::pair<int, int>> buffer2(12, std::make_pair(-2, -2));
 
-  mln::ranges::multi_span<std::pair<int, int>, 2> sp1(buffer1.data(), {3, 4}, {4, 1});
-  mln::ranges::multi_span<std::pair<int, int>, 2> sp2(buffer2.data(), {3, 4}, {4, 1});
+  mln::ranges::mdspan<std::pair<int, int>, 2> sp1(buffer1.data(), {4, 3}, {1, 4});
+  mln::ranges::mdspan<std::pair<int, int>, 2> sp2(buffer2.data(), {4, 3}, {1, 4});
 
   auto firsts_of_pairs = [](std::pair<int, int>& a, std::pair<int, int>& b) { return std::tie(a.first, b.first); };
   auto rng             = mln::ranges::view::transform(sp1, sp2, firsts_of_pairs);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  static_assert(mln::concepts::stl::ForwardRange<decltype(buffer1)>);
-  static_assert(mln::concepts::stl::ForwardRange<decltype(buffer2)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(sp1)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(sp1)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(sp2)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(sp2)>);
-  static_assert(mln::concepts::SegmentedRange<decltype(rng)>);
-  static_assert(mln::concepts::ReversibleRange<decltype(rng)>);
-#else
-  static_assert(::ranges::ForwardRange<decltype(buffer1)>());
-  static_assert(::ranges::ForwardRange<decltype(buffer2)>());
-  static_assert(::ranges::ForwardRange<decltype(sp1)>());
-  static_assert(::ranges::ForwardRange<decltype(sp2)>());
-  static_assert(::ranges::ForwardRange<decltype(rng)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(sp1)>);
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(sp2)>);
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
 
   {
     std::size_t i = 0;
@@ -314,45 +140,53 @@ TEST(Range, transform_read_chain)
 {
   std::vector<int> buffer(12, -1);
 
-  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3, 4}, {4, 1});
+  mln::ranges::mdspan<int, 2> sp(buffer.data(), {4, 3}, {1, 4});
 
   auto x = mln::ranges::view::transform(sp, [](int a) { return a > 3 ? a : 42; });
   auto y = mln::ranges::view::transform(x, [](int a) { return a + 1; });
   auto z = mln::ranges::view::transform(y, [](int a) { return a * 2; });
 
   std::vector<int>                buffer_ref(12, 86);
-  mln::ranges::multi_span<int, 2> ref(buffer_ref.data(), {3, 4}, {4, 1});
+  mln::ranges::mdspan<int, 2>     ref(buffer_ref.data(), {4, 3}, {1, 4});
 
-  ASSERT_TRUE(::ranges::equal(z, ref));
+  ASSERT_TRUE(mln::ranges::equal(z, ref));
 }
 
 TEST(Range, transform2_read_chain)
 {
   std::vector<int> buffer(12, -1);
 
-  mln::ranges::multi_span<int, 2> sp(buffer.data(), {3, 4}, {4, 1});
+  mln::ranges::mdspan<int, 2> sp(buffer.data(), {4, 3}, {1, 4});
 
   auto x = mln::ranges::view::transform(sp, [](int a) { return a > 3 ? a : 42; });
   auto y = mln::ranges::view::transform(x, sp, [](int a, int b) { return a + b; });
   auto z = mln::ranges::view::transform(y, [](int a) { return a + 1; });
 
   std::vector<int>                buffer_ref(12, 42);
-  mln::ranges::multi_span<int, 2> ref(buffer_ref.data(), {3, 4}, {4, 1});
+  mln::ranges::mdspan<int, 2> ref(buffer_ref.data(), {4, 3}, {1, 4});
 
-  ASSERT_TRUE(::ranges::equal(z, ref));
+  ASSERT_TRUE(mln::ranges::equal(z, ref));
 }
 
-TEST(Range, range_transform2_read_chain)
+
+TEST(Range, transform_reversible_range)
 {
-  std::vector<int>    buff(12, -1);
-  ::ranges::span<int> sp(buff.data(), 12);
+  mln::ranges::mdindex<2>         ids({4, 3});
+  std::vector<std::array<int, 2>> ref = {{9, 4}, {4, 4}, {1, 4}, {0, 4}, //
+                                         {9, 1}, {4, 1}, {1, 1}, {0, 1}, //
+                                         {9, 0}, {4, 0}, {1, 0}, {0, 0}};
 
-  auto x = ::ranges::view::transform(sp, [](int a) { return a > 3 ? a : 42; });
-  auto y = ::ranges::view::transform(x, sp, [](int a, int b) { return a + b; });
-  auto z = ::ranges::view::transform(y, [](int a) { return a + 1; });
+  auto pow2 = mln::ranges::view::transform(ids, [](auto vals) {
+    return std::array<int, 2>{vals[0] * vals[0], vals[1] * vals[1]};
+  });
+  auto res  = mln::ranges::view::reverse(pow2);
 
-  std::vector<int>    buffer_ref(12, 42);
-  ::ranges::span<int> ref(buffer_ref.data(), 12);
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(ids)>);
+  static_assert(mln::ranges::MDBidirectionalRange<decltype(res)>);
 
-  ASSERT_TRUE(::ranges::equal(z, ref));
+  std::vector<std::array<int, 2>> out;
+  for (auto&& r : res.rows())
+    ::ranges::copy(r, ::ranges::back_inserter(out));
+
+  ASSERT_EQ(ref, out);
 }

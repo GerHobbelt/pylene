@@ -1,12 +1,15 @@
-#include <mln/core/concept/new/domains.hpp>
 #include <mln/core/box.hpp>
+
+#include <mln/core/concept/new/domains.hpp>
+#include <mln/core/rangev3/concepts.hpp>
+#include <concepts/concepts.hpp>
+
 
 #include <gtest/gtest.h>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
 template <class A, class B>
-concept Interoperable = mln::concepts::stl::EqualityComparableWith<A, B>
+concept Interoperable = ::concepts::equality_comparable_with<A, B>
   && requires(A& a, const A& ca, const B& b)
 {
   { ca.includes(b) } -> bool;
@@ -17,6 +20,11 @@ concept Interoperable = mln::concepts::stl::EqualityComparableWith<A, B>
 
 TEST(Point, ConceptChecking)
 {
+  static_assert(mln::ranges::MDRange<mln::experimental::box1d>);
+  static_assert(mln::ranges::MDRange<mln::experimental::box2d>);
+  static_assert(mln::ranges::MDRange<mln::experimental::box3d>);
+
+
   static_assert(mln::concepts::Domain<mln::experimental::box1d>);
   static_assert(mln::concepts::Domain<mln::experimental::box2d>);
   static_assert(mln::concepts::Domain<mln::experimental::box3d>);
@@ -26,10 +34,10 @@ TEST(Point, ConceptChecking)
   static_assert(mln::concepts::Domain<mln::experimental::const_box2d_ref>);
   static_assert(mln::concepts::Domain<mln::experimental::const_box3d_ref>);
 
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndbox<-1>, mln::experimental::ndbox<-1>>); // Dyn -> dyn
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndbox<+1>, mln::experimental::ndbox<+1>>); // Static -> static
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndbox<+1>, mln::experimental::ndbox<-1>>); // Static -> Dyn
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndbox<-1>, mln::experimental::ndbox<+1>>); // Dyn -> Static
+  static_assert(::concepts::convertible_to<mln::experimental::ndbox<-1>, mln::experimental::ndbox<-1>>); // Dyn -> dyn
+  static_assert(::concepts::convertible_to<mln::experimental::ndbox<+1>, mln::experimental::ndbox<+1>>); // Static -> static
+  static_assert(::concepts::convertible_to<mln::experimental::ndbox<+1>, mln::experimental::ndbox<-1>>); // Static -> Dyn
+  static_assert(::concepts::convertible_to<mln::experimental::ndbox<-1>, mln::experimental::ndbox<+1>>); // Dyn -> Static
 
 
   static_assert(Interoperable<mln::experimental::ndbox<-1>, mln::experimental::ndbox<-1>>); // Dyn <-> dyn
@@ -46,9 +54,6 @@ TEST(Point, ConceptChecking)
   static_assert(Interoperable<mln::experimental::ndbox<-1>, mln::experimental::ndboxref<+1>>);
   static_assert(Interoperable<mln::experimental::ndbox<+1>, mln::experimental::ndboxref<+1>>);
 }
-
-#endif // PYLENE_CONCEPT_TS_ENABLED
-
 
 TEST(Box, dynamic_box_construction)
 {
@@ -487,18 +492,18 @@ TEST(box2d, iteration_forward)
 {
   mln::experimental::box2d b({2, 3}, {6, 8});
   int x = 2, y = 3;
-  for (auto p : b)
-  {
-    ASSERT_EQ(p[0], x);
-    ASSERT_EQ(p[1], y);
-    ASSERT_TRUE(b.has(p));
-    if (++x == 6)
+  for (auto&& r : b.rows())
+    for (auto p : r)
     {
-      x = 2;
-      ++y;
+      ASSERT_EQ(p[0], x);
+      ASSERT_EQ(p[1], y);
+      ASSERT_TRUE(b.has(p));
+      if (++x == 6)
+      {
+        x = 2;
+        ++y;
+      }
     }
-
-  }
 }
 
 TEST(box2d, iteration_backward)
@@ -506,7 +511,8 @@ TEST(box2d, iteration_backward)
   mln::experimental::box2d b({2, 3}, {6, 8});
 
   int x = 5, y = 7;
-  for (auto p : b.reversed())
+  for (auto&& r : b.rrows())
+    for (auto p : r)
   {
     ASSERT_EQ(p[0], x);
     ASSERT_EQ(p[1], y);

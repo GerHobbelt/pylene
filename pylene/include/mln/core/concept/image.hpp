@@ -13,6 +13,13 @@
 
 namespace mln
 {
+  // Forward declaration
+  template <typename V, class I>
+  auto imchvalue(const I& ref);
+
+  template <class I>
+  auto imconcretize(const I& ref);
+
 
   template <typename I>
   struct Image;

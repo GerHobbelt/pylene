@@ -3,7 +3,9 @@
 #include <type_traits>
 #include <algorithm>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
+#include <concepts/type_traits.hpp>
+
+#if 0
 #include <stl2/type_traits.hpp>
 #endif
 
@@ -514,7 +516,7 @@ namespace mln::experimental
 
 #ifdef PYLENE_CONCEPT_TS_ENABLED
 // Specialization of std::common_reference
-STL2_OPEN_NAMESPACE
+namespace concepts
 {
   template <class UImpl, class VImpl, template<class> class TQual, template<class> class UQual>
     struct basic_common_reference<mln::experimental::_point<UImpl>, mln::experimental::_point<VImpl>, TQual, UQual>
@@ -525,5 +527,4 @@ STL2_OPEN_NAMESPACE
                                             common_reference_t<typename UImpl::value_type, typename VImpl::value_type>>;
   };
 }
-STL2_CLOSE_NAMESPACE
 #endif

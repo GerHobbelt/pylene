@@ -5,6 +5,7 @@
 #include <mln/core/rangev3/view/zip.hpp>
 
 #include <range/v3/algorithm/equal.hpp>
+#include <concepts/concepts.hpp>
 
 
 namespace mln
@@ -35,15 +36,14 @@ namespace mln
   {
     static_assert(mln::is_a<LhsImage, experimental::Image>());
     static_assert(mln::is_a<RhsImage, experimental::Image>());
+    static_assert(::concepts::equality_comparable_with<image_value_t<LhsImage>, image_value_t<RhsImage>>);
 
     auto&& lhs_vals = lhs.new_values();
     auto&& rhs_vals = rhs.new_values();
+    auto r1 = ranges::rows(lhs_vals);
+    auto r2 = ranges::rows(rhs_vals);
 
-    using RngLhs = ::ranges::iterator_t<decltype(lhs_vals)>;
-    using RngRhs = ::ranges::iterator_t<decltype(rhs_vals)>;
-    static_assert(::ranges::Comparable<RngLhs, RngRhs, ::ranges::equal_to, ::ranges::ident, ::ranges::ident>());
-
-    for (auto [lhs_r, rhs_r] : ranges::view::zip(ranges::rows(lhs_vals), ranges::rows(rhs_vals)))
+    for (auto [lhs_r, rhs_r] : ranges::view::zip(r1, r2))
       // FIXME: with std::equal you gain performances over ranges::equal here
       if (!::ranges::equal(lhs_r, rhs_r))
         return false;

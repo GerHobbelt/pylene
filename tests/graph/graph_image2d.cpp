@@ -1,3 +1,5 @@
+#include <mln/core/image/image.hpp>
+
 #include <mln/core/foreach.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/graph/graph_image2d.hpp>

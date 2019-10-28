@@ -1,6 +1,5 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/transform.hpp>
-#include <mln/core/image/view/zip.hpp>
 
 #include <type_traits>
 

@@ -5,10 +5,11 @@
 #define BOOST_CONCEPT_ASSERT(Model)
 #include <boost/concept_check.hpp>
 
-#include <mln/core/grays.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/wrt_offset.hpp>
+#include <mln/core/grays.hpp>
 
 #include <benchmark/benchmark.h>
 

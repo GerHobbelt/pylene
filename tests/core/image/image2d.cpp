@@ -13,6 +13,12 @@
 
 #include <gtest/gtest.h>
 
+void iota(mln::image2d<int>& ima, int x)
+{
+  mln_foreach(auto& v, ima.values())
+    v = x++;
+}
+
 
 TEST(UTImage2D, Extension_Fill)
 {
@@ -21,8 +27,8 @@ TEST(UTImage2D, Extension_Fill)
   image2d<int> ima(5, 5);
   image2d<int> ref(5, 5);
 
-  mln::iota(ima, 1);
-  mln::iota(ref, 1);
+  iota(ima, 1);
+  iota(ref, 1);
 
   mln::extension::fill(ima, 69);
   ASSERT_EQ(ima.at(-1, -1), 69);

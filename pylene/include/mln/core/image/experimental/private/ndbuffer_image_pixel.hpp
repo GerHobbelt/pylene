@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mln/core/concept/pixel.hpp>
-#include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <mln/core/rangev3/view/reverse.hpp>
+#include <mln/core/rangev3/private/ndrange_facade.hpp>
+#include <mln/core/rangev3/private/mdrange_facade.hpp>
 #include <mln/core/point.hpp>
 #include <mln/core/utils/ptroffset.hpp>
 
@@ -46,15 +46,17 @@ namespace mln::experimental::details
       }
     }
 
-  private:
-    friend ::ranges::range_access;
-    // Do not return by const& because reverse iterator does not support stashing
-    // (It creates a copy and return *it)
-    constexpr ndpix read() const noexcept { return *this; }
+    void __update_lineptr() noexcept
+    {
+      std::ptrdiff_t offset = 0;
+      for (int k = 1; k < N; ++k)
+        offset += this->m_point[k] * this->m_info->m_axes[k].byte_stride;
+      this->m_lineptr = reinterpret_cast<T*>(ptr_offset(this->m_info->m_buffer, offset));
+    }
 
-    void next() noexcept { this->m_point[0]++; }
-    void prev() noexcept { this->m_point[0]--; }
+
     bool equal(const ndpix& other) const noexcept { return this->m_point[0] == other.m_point[0]; }
+    constexpr ndpix read() const noexcept { return *this; }
 
   public:
     const mln::details::ndbuffer_image_info_t* m_info;
@@ -64,110 +66,110 @@ namespace mln::experimental::details
 
 
   template <class T, int N>
-  class ndpix_range : public ranges::details::multi_view_facade<N, ndpix_range<T, N>>
+  class ndpix_range : public mln::ranges::details::mdview_facade<ndpix_range<T, N>>
   {
   public:
-    struct row_t : public ndpix<T, N>, ::ranges::view_facade<row_t>
+    struct cursor : mln::ranges::details::ndcursor_facade<cursor>
     {
-      friend ::ranges::range_access;
-    private:
-      struct cursor_t : ndpix<T, N>
+      static constexpr int rank = N;
+
+      struct line_cursor : ndpix<T, N>
       {
-        using value_type = ndpix<T, N>;
-        using reference  = ndpix<T,N>;
+        using ndpix<T,N>::read;
+        using ndpix<T,N>::equal;
+        using value_type = ndpix<T,N>;
+        using reference = value_type;
+
+        void next() noexcept { this->m_point[0]++; }
       };
 
-      cursor_t begin_cursor() const noexcept
+      line_cursor begin_cursor() const
       {
-        cursor_t tmp   = {*this};
-        tmp.m_point[0] = this->m_info->m_axes[0].domain_begin;
-        return tmp;
-      }
-      cursor_t end_cursor() const noexcept
-      {
-        cursor_t tmp   = {*this};
-        tmp.m_point[0] = this->m_info->m_axes[0].domain_end;
-        return tmp;
+        auto px = m_pix;
+        px.__update_lineptr();
+        return {px};
       }
 
-    public:
-      row_t() = default;
-      row_t(const ndpix<T, N>& px)
-        : ndpix<T, N>{px}
+      line_cursor end_cursor() const
       {
+        auto tmp = *this;
+        tmp.__goto_end(0);
+        tmp.m_pix.__update_lineptr();
+        return {tmp.m_pix};
       }
+
+
+      void __goto_end(int k) { m_pix.m_point[k] = m_pix.m_info->m_axes[k].domain_end; }
+      bool __is_at_end(int k) const { return m_pix.m_point[k] == m_pix.m_info->m_axes[k].domain_end; }
+      void __reset_to_begin(int k) { m_pix.m_point[k] = m_pix.m_info->m_axes[k].domain_begin; }
+      void __next(int k) { m_pix.m_point[k]++; }
+      bool equal(const cursor& other) const { return m_pix.m_point == other.m_pix.m_point; }
+      using mln::ranges::details::ndcursor_facade<cursor>::equal;
+
+      ndpix<T, N> m_pix;
     };
 
-  public:
-    struct cursor : ndpix<T, N>
+    struct backward_cursor : mln::ranges::details::ndcursor_facade<backward_cursor>
     {
-      using value_type = ndpix<T, N>;
-      using reference  = const ndpix<T, N>&;
+      static constexpr int rank = N;
 
-      const ndpix<T, N>&            __read() const noexcept { return *this; }
-      const ndpix<T, N>&            __rread() const noexcept { return *this; }
-      row_t                         __read_row() const noexcept { return row_t(*this); }
-      ::ranges::reverse_view<row_t> __read_rrow() const noexcept { return ::ranges::view::reverse(row_t(*this)); }
+      struct line_cursor : ndpix<T, N>
+      {
+        using ndpix<T,N>::read;
+        using ndpix<T,N>::equal;
+        using value_type = ndpix<T,N>;
+        using reference = value_type;
 
-      void __next(std::size_t k) noexcept
-      {
-        this->m_point[N - 1 - k]++;
-        if (k + 2 == N)
-          __update_lineptr();
-      }
-      void __rnext(std::size_t k) noexcept
-      {
-        this->m_point[N - 1 - k]--;
-        if (k + 2 == N)
-          __update_lineptr();
-      }
+        void next() noexcept { this->m_point[0]--; }
 
-      void __reset_to_begin(std::size_t k) noexcept
+      };
+
+      line_cursor begin_cursor() const
       {
-        this->m_point[N - 1 - k] = this->m_info->m_axes[N - 1 - k].domain_begin;
-        if (k + 2 == N)
-          __update_lineptr();
+        auto pix = m_pix;
+        pix.__update_lineptr();
+        return {pix};
       }
 
-      void __reset_to_rbegin(std::size_t k) noexcept
+      line_cursor end_cursor() const
       {
-        this->m_point[N - 1 - k] = this->m_info->m_axes[N - 1 - k].domain_end - 1;
-        if (k + 2 == N)
-          __update_lineptr();
+        auto tmp = *this;
+        tmp.__goto_end(0);
+        tmp.m_pix.__update_lineptr();
+        return {tmp.m_pix};
       }
 
-      bool __is_at_end(std::size_t k) const noexcept
-      {
-        return this->m_point[N - 1 - k] == this->m_info->m_axes[N - 1 - k].domain_end;
-      }
-      bool __is_at_rend(std::size_t k) const noexcept
-      {
-        return this->m_point[N - 1 - k] == this->m_info->m_axes[N - 1 - k].domain_begin - 1;
-      }
+      void __reset_to_begin(int k) { m_pix.m_point[k] = m_pix.m_info->m_axes[k].domain_end - 1; }
+      void __goto_end(int k) { m_pix.m_point[k] = m_pix.m_info->m_axes[k].domain_begin - 1; }
+      void __next(int k) { m_pix.m_point[k]--; }
+      bool __is_at_end(int k) const { return m_pix.m_point[k] < m_pix.m_info->m_axes[k].domain_begin; }
+      bool equal(const backward_cursor& other) const { return m_pix.m_point == other.m_pix.m_point; }
 
-      bool __equal(const cursor& other) const noexcept
-      {
-        return this->m_lineptr == other.m_lineptr && this->m_point[0] == other.m_point[0];
-      }
-
-      cursor() = default;
-      cursor(const ndpix_range& r, bool forward = true) noexcept
-      {
-        this->m_info = &r.m_info;
-        for (int i = 0; i < N; ++i)
-          this->m_point[i] = forward ? this->m_info->m_axes[i].domain_begin : (this->m_info->m_axes[i].domain_end - 1);
-        this->__update_lineptr();
-      }
-
-    private:
-      void __update_lineptr() noexcept
-      {
-        std::ptrdiff_t x = 0;
-        for (std::size_t k = 1; k < N; ++k)
-          x += this->m_point[k] * this->m_info->m_axes[k].byte_stride;
-        this->m_lineptr = reinterpret_cast<T*>(this->m_info->m_buffer + x);
-      }
+      using mln::ranges::details::ndcursor_facade<backward_cursor>::equal;
+      ndpix<T, N> m_pix;
     };
+
+
+    cursor begin_cursor() const
+    {
+      ndpix<T, N> pix;
+      pix.m_info = &m_info;
+      for (int i = 0; i < N; ++i)
+        pix.m_point[i] = this->m_info.m_axes[i].domain_begin;
+      return {{}, pix};
+    }
+
+    backward_cursor rbegin_cursor() const
+    {
+      ndpix<T, N> pix;
+      pix.m_info = &m_info;
+      for (int i = 0; i < N; ++i)
+        pix.m_point[i] = this->m_info.m_axes[i].domain_end - 1;
+      return {{}, pix};
+    }
+
+    ::ranges::default_sentinel_t end_cursor() const { return {}; }
+    ::ranges::default_sentinel_t rend_cursor() const { return {}; }
 
     ndpix_range() = default;
 
@@ -176,8 +178,9 @@ namespace mln::experimental::details
     {
     }
 
+  private:
     mln::details::ndbuffer_image_info_t m_info;
-  };
+};
 
 
 } // namespace mln::details

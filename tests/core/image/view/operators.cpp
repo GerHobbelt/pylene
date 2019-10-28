@@ -1,12 +1,14 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
+
 #include <mln/core/domain/where.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/image_ops.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -153,6 +155,7 @@ TEST(Core, IfElse)
   ASSERT_IMAGES_EQ_EXP(y, ref_y);
 }
 
+
 TEST(Core, Where)
 {
   using namespace mln::view::ops;
@@ -162,11 +165,12 @@ TEST(Core, Where)
   auto y = x % 2;
   auto z = mln::experimental::where(y);
 
-  static_assert(::ranges::ForwardRange<decltype(z)>());
+  static_assert(mln::ranges::mdrange<decltype(z)>);
 
 
-  for (auto p : z)
-    ASSERT_EQ(1, x(p) % 2);
+  for (auto r : mln::ranges::rows(z))
+    for (auto p : r)
+      ASSERT_EQ(1, x(p) % 2);
 
   mln_foreach_new (auto p, x.domain())
     if (x(p) % 2 == 1)
@@ -181,7 +185,7 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   using value_type    = bool;
   using reference     = const bool&;
   using domain_type   = mln::archetypes::Domain;
-  using point_type    = ::ranges::range_value_t<domain_type>;
+  using point_type    = mln::ranges::mdrange_value_t<domain_type>;
   using category_type = mln::forward_image_tag;
   using concrete_type = mask_archetype;
 
@@ -224,6 +228,6 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   value_range new_values();
 };
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-static_assert(mln::concepts::Domain<mln::ranges::where_t<mask_archetype>>);
-#endif
+
+static_assert(mln::concepts::Domain<mln::ranges::where_t<mask_archetype, ::ranges::identity>>);
+

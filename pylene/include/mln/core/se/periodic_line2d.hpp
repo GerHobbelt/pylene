@@ -1,11 +1,12 @@
 #pragma once
 
-#include <mln/core/iterator/iterator_base.hpp>
-#include <mln/core/neighborhood/dyn_neighborhood.hpp>
+#include <mln/core/concept/new/images.hpp>
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/point.hpp>
 #include <mln/core/box.hpp>
 
+#include <mln/core/iterator/iterator_base.hpp>
+#include <mln/core/neighborhood/dyn_neighborhood.hpp>
 /// \file
 
 namespace mln
@@ -87,7 +88,7 @@ namespace mln
         std::size_t m_k;
 
         auto read() const { return m_cur; }
-        bool equal(::ranges::default_sentinel) const { return m_k == 0; }
+        bool equal(::ranges::default_sentinel_t) const { return m_k == 0; }
         bool equal(const rng_t& other) const { return m_k == other.m_k; }
         void next() { m_cur += m_delta; --m_k; }
       public:

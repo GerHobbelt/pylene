@@ -50,7 +50,7 @@ TEST(Core, Rect2d)
 
   for (int y = -1; y <= 1; ++y)
     for (int x = -2; x <= 2; ++x, ++p)
-      ASSERT_EQ(*p, mln::experimental::point2d(x, y));
+      ASSERT_EQ(*p, (mln::experimental::point2d{x, y}));
 
   EXPECT_EQ(::ranges::end(rng), p) << "Iterators end do not match.";
 }

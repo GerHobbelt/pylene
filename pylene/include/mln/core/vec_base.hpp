@@ -221,14 +221,17 @@ namespace mln
 
       template <typename dummy = void>
       constexpr vec_base(const T& x, const T& y, typename std::enable_if<dim == 2, dummy>::type* = NULL)
-        : v_{x, y}
       {
+        v_[0] = x;
+        v_[1] = y;
       }
 
       template <typename dummy = void>
       constexpr vec_base(const T& x, const T& y, const T& z, typename std::enable_if<dim == 3, dummy>::type* = NULL)
-        : v_{x, y, z}
       {
+        v_[0] = x;
+        v_[1] = y;
+        v_[2] = z;
       }
 
       template <typename U>
@@ -442,7 +445,7 @@ namespace mln
         return x;
       }
 
-      T v_[dim];
+      T v_[dim] = {};
     };
 
     VEC_BASE_GEN_EW_OP_EXT(is_additive, +)

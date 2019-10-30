@@ -67,6 +67,11 @@ namespace mln::experimental
   /****      Point Types Interface      ****/
   /******************************************/
 
+  namespace detail
+  {
+    constexpr bool have_compatible_dim(int d1, int d2) { return d1 == -1 || d2 == -1 || d1 == d2; }
+  }
+
   template <class Impl>
   class _point : private Impl
   {
@@ -74,15 +79,58 @@ namespace mln::experimental
     template <int, class> friend struct impl::pref;
     template <int, class> friend struct impl::pcontainer;
     template <class U> friend class _point;
-
+    using Impl::has_value_semantic;
     using T = typename Impl::value_type;
 
   public:
-    using Impl::Impl;
     using Impl::dim;
     using Impl::data;
     using Impl::ndim;
     using typename Impl::value_type;
+
+    // Constructors
+    // \{
+    _point() = default;
+    _point(const _point&) = default;
+
+    // Special case for dynamic coord
+    template <int d = Impl::ndim, class = std::enable_if_t<d == -1 && has_value_semantic>>
+    _point(int dim)
+      : Impl(dim)
+    {
+    }
+
+    // From a span of value
+    constexpr _point(int dim, T* values) noexcept
+      : Impl(dim, values)
+    {
+    }
+
+
+    // From initializer list
+    constexpr _point(const std::initializer_list<T>& values) noexcept
+      : Impl(values)
+    {
+    }
+
+    // Converting constructeur
+    template <class I2, class = std::enable_if_t<detail::have_compatible_dim(ndim, I2::ndim)>>
+    constexpr _point(const _point<I2>& other) noexcept
+      : Impl(other)
+    {
+    }
+
+
+    // Cannot use inherited constructors because of
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91718
+    /*
+    template <class... Args>
+    explicit _point(Args&&... args)
+      : Impl(std::forward<Args>(args)...)
+    {
+    }
+    */
+    // \}
 
     constexpr T  at(int k) const noexcept { assert(k < dim()); return this->data(k); }
     constexpr T& at(int k) noexcept { assert(k < dim()); return this->data(k); }
@@ -160,19 +208,27 @@ namespace mln::experimental
       pcontainer() = default;
       pcontainer(const pcontainer& other) = default;
 
-      template <class... Args,
-                class = std::enable_if_t<std::conjunction_v<std::is_convertible<Args, T>...>>>
-      constexpr pcontainer(Args&&... args) noexcept
-        : m_data{args...}
+      // From a span
+      constexpr pcontainer(int dim, const T* data) noexcept
       {
-        static_assert(sizeof...(Args) == Dim, "Invalid number of arguments");
+        assert(dim == Dim && "Point dimensions mistmatch.");
+        for (int i = 0; i < Dim; ++i)
+          m_data[i] = data[i];
       }
 
+      constexpr pcontainer(const std::initializer_list<T>& values) noexcept
+      {
+        assert(values.size() == Dim && "Point dimensions mistmatch.");
+        auto buffer = values.begin();
+        for (int i = 0; i < Dim; ++i)
+          m_data[i] = buffer[i];
+      }
 
       // Converting constructors
-      template <class Impl, class = std::enable_if<std::is_convertible_v<typename Impl::value_type, T>>>
-      pcontainer(const _point<Impl>& other) noexcept
+      template <class Impl>
+      constexpr pcontainer(const _point<Impl>& other) noexcept
       {
+        static_assert(std::is_convertible_v<typename Impl::value_type, T>);
         assert(other.dim() == Dim && "Point dimensions mistmatch.");
         for (int i = 0; i < Dim; ++i)
           m_data[i] = other[i];
@@ -186,10 +242,11 @@ namespace mln::experimental
       constexpr T          data(int k) const noexcept { return m_data[k]; }
 
 
-      using value_type          = T;
-      static constexpr int ndim = Dim;
+      using value_type                         = T;
+      static constexpr bool has_value_semantic = true;
+      static constexpr int  ndim               = Dim;
 
-      T m_data[Dim];
+      T m_data[Dim] = {};
     };
 
     template <class T>
@@ -203,6 +260,15 @@ namespace mln::experimental
         : m_dim{dim}
       {
       }
+
+      // From a span
+      constexpr pcontainer(int dim, const T* data)
+      {
+        assert(dim == m_dim && "Point dimensions mistmatch.");
+        for (int i = 0; i < dim; ++i)
+          m_data[i] = data[i];
+      }
+
 
       constexpr pcontainer(const std::initializer_list<T>& coords) noexcept
         : m_dim{static_cast<int>(coords.size())}
@@ -218,7 +284,7 @@ namespace mln::experimental
 
       // Converting constructors
       template <class Impl, class = std::enable_if<std::is_convertible_v<typename Impl::value_type, T>>>
-      pcontainer(const _point<Impl>& other) noexcept
+      constexpr pcontainer(const _point<Impl>& other) noexcept
         : m_dim(other.dim())
       {
         assert(other.dim() <= 4 && "The number of dimensions is limited to 4.");
@@ -234,8 +300,9 @@ namespace mln::experimental
       constexpr T&       data(int k) noexcept { return m_data[k]; }
       constexpr T        data(int k) const noexcept { return m_data[k]; }
 
-      using value_type = T;
-      static constexpr int ndim = -1;
+      using value_type                         = T;
+      static constexpr bool has_value_semantic = true;
+      static constexpr int  ndim               = -1;
 
       int m_dim;
       T m_data[4];
@@ -273,8 +340,9 @@ namespace mln::experimental
       constexpr T*         data() const noexcept { return m_data; }
       constexpr T&         data(int k) const noexcept { return m_data[k]; }
 
-      using value_type         = T;
-      static constexpr int ndim = Dim_;
+      using value_type                         = T;
+      static constexpr bool has_value_semantic = false;
+      static constexpr int  ndim               = Dim_;
 
       T* m_data;
     };
@@ -320,8 +388,9 @@ namespace mln::experimental
       constexpr T*  data() const noexcept { return m_data; }
       constexpr T&  data(int k) const noexcept { return m_data[k]; }
 
-      using value_type = T;
-      static constexpr int ndim = -1;
+      using value_type                         = T;
+      static constexpr bool has_value_semantic = false;
+      static constexpr int  ndim               = -1;
 
       int m_dim;
       T* m_data;

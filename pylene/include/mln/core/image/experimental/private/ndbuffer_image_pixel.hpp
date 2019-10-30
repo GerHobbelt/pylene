@@ -154,6 +154,7 @@ namespace mln::experimental::details
     {
       ndpix<T, N> pix;
       pix.m_info = &m_info;
+      pix.m_lineptr = nullptr;
       for (int i = 0; i < N; ++i)
         pix.m_point[i] = this->m_info.m_axes[i].domain_begin;
       return {{}, pix};
@@ -163,6 +164,7 @@ namespace mln::experimental::details
     {
       ndpix<T, N> pix;
       pix.m_info = &m_info;
+      pix.m_lineptr = nullptr;
       for (int i = 0; i < N; ++i)
         pix.m_point[i] = this->m_info.m_axes[i].domain_end - 1;
       return {{}, pix};

@@ -141,6 +141,8 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
 
   add_custom_target(build-doc)
   add_subdirectory(doc EXCLUDE_FROM_ALL)
+  add_custom_target(build-apps)
+  add_subdirectory(apps EXCLUDE_FROM_ALL)
 endif ()
 
 

@@ -85,8 +85,8 @@ int main()
   }
 
   {
-    float gamma                      = 0.5f;
-    auto  gamma_fun                  = [gamma](mln::rgb8 x) -> mln::rgb8 { return pow(x, 1 / gamma); };
+    float gamma                      = 2.5f;
+    auto  gamma_fun                  = [gamma](mln::rgb8 x) -> mln::rgb8 { return 256.f * pow(x / 256.f, 1 / gamma); };
     auto  lena_color_gamma_corrected = mln::view::transform(lena_color, gamma_fun);
     mln::io::experimental::imsave(lena_color_gamma_corrected, "images/lena_color_gamma_corrected.png");
   }
@@ -100,8 +100,8 @@ int main()
     auto  lena_grey_binary = mln::view::transform(lena_grey, binary_fun);
     mln::io::experimental::imsave(lena_grey_binary, "images/lena_grey_binary.png");
 
-    float gamma                     = 1.5f;
-    auto  gamma_fun                 = [gamma](auto x) -> mln::uint8 { return pow(x, 1 / gamma); };
+    float gamma                     = 2.5f;
+    auto  gamma_fun                 = [gamma](auto x) -> mln::uint8 { return 256.f * pow(x / 256.f, 1 / gamma); };
     auto  lena_grey_gamma_corrected = mln::view::transform(lena_grey, gamma_fun);
     mln::io::experimental::imsave(lena_grey_gamma_corrected, "images/lena_grey_gamma_corrected.png");
   }

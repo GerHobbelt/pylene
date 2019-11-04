@@ -1,4 +1,5 @@
 #include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
@@ -7,25 +8,27 @@
 #include <mln/io/experimental/imread.hpp>
 #include <mln/io/experimental/imsave.hpp>
 
+#include <cmath>
 #include <iostream>
 
 
 int main()
 {
-  auto lena_dyn = mln::io::experimental::imread("images/lena_color.png");
-  auto lena     = *lena_dyn.cast_to<mln::rgb8, 2>();
+  mln::experimental::image2d<mln::rgb8> lena_color;
+  mln::io::experimental::imread("images/lena_color.png", lena_color);
 
-  mln::io::experimental::imsave(mln::view::red(lena), "images/lena_red_mono.png");
-  mln::io::experimental::imsave(mln::view::green(lena), "images/lena_green_mono.png");
-  mln::io::experimental::imsave(mln::view::blue(lena), "images/lena_blue_mono.png");
+
+  mln::io::experimental::imsave(mln::view::red(lena_color), "images/lena_red_mono.png");
+  mln::io::experimental::imsave(mln::view::green(lena_color), "images/lena_green_mono.png");
+  mln::io::experimental::imsave(mln::view::blue(lena_color), "images/lena_blue_mono.png");
 
   auto filter_red   = [](auto v) -> mln::rgb8 { return {v[0], 0, 0}; };
   auto filter_green = [](auto v) -> mln::rgb8 { return {0, v[1], 0}; };
   auto filter_blue  = [](auto v) -> mln::rgb8 { return {0, 0, v[2]}; };
 
-  auto lena_red   = mln::view::transform(lena, filter_red);
-  auto lena_green = mln::view::transform(lena, filter_green);
-  auto lena_blue  = mln::view::transform(lena, filter_blue);
+  auto lena_red   = mln::view::transform(lena_color, filter_red);
+  auto lena_green = mln::view::transform(lena_color, filter_green);
+  auto lena_blue  = mln::view::transform(lena_color, filter_blue);
 
   mln::io::experimental::imsave(lena_red, "images/lena_red.png");
   mln::io::experimental::imsave(lena_green, "images/lena_green.png");
@@ -39,15 +42,15 @@ int main()
   mln::io::experimental::imsave(lena_rb, "images/lena_rb.png");
   mln::io::experimental::imsave(lena_gb, "images/lena_gb.png");
 
-  if (mln::all_of(lena - lena_red == lena_gb))
+  if (mln::all_of(lena_color - lena_red == lena_gb))
   {
     std::cout << "rgb - red == green + blue" << std::endl;
   }
-  if (mln::all_of(lena - lena_green == lena_rb))
+  if (mln::all_of(lena_color - lena_green == lena_rb))
   {
     std::cout << "rgb - green == red + blue" << std::endl;
   }
-  if (mln::all_of(lena - lena_blue == lena_rg))
+  if (mln::all_of(lena_color - lena_blue == lena_rg))
   {
     std::cout << "rgb - blue == red + green" << std::endl;
   }
@@ -56,12 +59,72 @@ int main()
   mln::io::experimental::imsave(lena_red + lena_blue, "images/lena_rb.png");
   mln::io::experimental::imsave(lena_green + lena_blue, "images/lena_bg.png");
 
-  auto planet_dyn       = mln::io::experimental::imread("images/planet.png");
-  auto planet           = *planet_dyn.cast_to<mln::rgb8, 2>();
-  auto lena_plus_planet = lena + planet;
+  mln::experimental::image2d<mln::rgb8> planet_color;
+  mln::io::experimental::imread("images/planet.png", planet_color);
+
+  auto lena_plus_planet = lena_color + planet_color;
   mln::io::experimental::imsave(lena_plus_planet, "images/lena_+_planet.png");
 
-  [[maybe_unused]] auto zipped_ima = mln::view::zip(lena_red, lena_blue);
-  [[maybe_unused]] auto out        = imconcretize(lena).set_init_value(mln::rgb8{0, 0, 0}).build();
-  // for()
+  auto out        = lena_color.concretize().set_init_value(mln::rgb8{0, 0, 0}).build();
+  auto zipped_ima = mln::view::zip(out, lena_red, lena_blue);
+
+  auto zipped_pixels = zipped_ima.new_pixels();
+  for (auto&& row : mln::ranges::rows(zipped_pixels))
+  {
+    for (auto&& zpix : row)
+    {
+      auto&& [oval, rval, bval] = zpix.val();
+      oval                      = rval + bval;
+    }
+  }
+  mln::io::experimental::imsave(out, "images/lena_rb2.png");
+
+  if (mln::all_of(lena_rb == out))
+  {
+    std::cout << "zipped out == red + blue" << std::endl;
+  }
+
+  {
+    float gamma                      = 0.5f;
+    auto  gamma_fun                  = [gamma](mln::rgb8 x) -> mln::rgb8 { return pow(x, 1 / gamma); };
+    auto  lena_color_gamma_corrected = mln::view::transform(lena_color, gamma_fun);
+    mln::io::experimental::imsave(lena_color_gamma_corrected, "images/lena_color_gamma_corrected.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::io::experimental::imread("images/lena_grey.png", lena_grey);
+
+    float threshold        = 150;
+    auto  binary_fun       = [threshold](auto x) -> mln::uint8 { return (x < threshold) ? 0 : 255; };
+    auto  lena_grey_binary = mln::view::transform(lena_grey, binary_fun);
+    mln::io::experimental::imsave(lena_grey_binary, "images/lena_grey_binary.png");
+
+    float gamma                     = 1.5f;
+    auto  gamma_fun                 = [gamma](auto x) -> mln::uint8 { return pow(x, 1 / gamma); };
+    auto  lena_grey_gamma_corrected = mln::view::transform(lena_grey, gamma_fun);
+    mln::io::experimental::imsave(lena_grey_gamma_corrected, "images/lena_grey_gamma_corrected.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::rgb8> lena_color;
+    mln::io::experimental::imread("images/lena_color.png", lena_color);
+
+    auto lena_color_filtered =
+        mln::view::filter(lena_color, [](auto v) -> bool { return (v[0] + v[1] + v[2]) % 2 == 0; });
+    mln::fill(lena_color_filtered, mln::rgb8{255, 255, 255});
+    mln::io::experimental::imsave(lena_color, "images/lena_color_filtered.png");
+  }
+
+
+  {
+    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::io::experimental::imread("images/lena_grey.png", lena_grey);
+
+    float threshold                 = 150;
+    auto  binary_fun                = [threshold](auto x) -> bool { return x < threshold; };
+    auto  lena_grey_binary_filtered = mln::view::filter(lena_grey, binary_fun);
+    mln::fill(lena_grey_binary_filtered, mln::uint8(0));
+    mln::io::experimental::imsave(lena_grey, "images/lena_grey_binary_filtered.png");
+  }
 }

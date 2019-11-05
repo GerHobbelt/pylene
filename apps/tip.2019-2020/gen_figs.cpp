@@ -1,4 +1,6 @@
 #include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/algorithm/clone.hpp>
+#include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
@@ -112,7 +114,7 @@ int main()
 
     auto lena_color_filtered =
         mln::view::filter(lena_color, [](auto v) -> bool { return (v[0] + v[1] + v[2]) % 2 == 0; });
-    mln::fill(lena_color_filtered, mln::rgb8{255, 255, 255});
+    fill(lena_color_filtered, mln::rgb8{255, 255, 255});
     mln::io::experimental::imsave(lena_color, "images/lena_color_filtered.png");
   }
 
@@ -124,7 +126,53 @@ int main()
     float threshold                 = 150;
     auto  binary_fun                = [threshold](auto x) -> bool { return x < threshold; };
     auto  lena_grey_binary_filtered = mln::view::filter(lena_grey, binary_fun);
-    mln::fill(lena_grey_binary_filtered, mln::uint8(0));
+    fill(lena_grey_binary_filtered, mln::uint8(0));
     mln::io::experimental::imsave(lena_grey, "images/lena_grey_binary_filtered.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::io::experimental::imread("images/lena_grey.png", lena_grey);
+
+    auto dom     = lena_grey.domain();
+    auto tl      = mln::experimental::point2d{dom.width() / 4, dom.height() / 4};
+    auto br      = mln::experimental::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
+    auto sub_dom = mln::experimental::box2d{tl, br};
+    auto sub_lena_grey = mln::view::clip(lena_grey, sub_dom);
+    mln::io::experimental::imsave(sub_lena_grey, "images/lena_grey_clipped.png");
+
+    fill(sub_lena_grey, mln::uint8(255));
+    mln::io::experimental::imsave(lena_grey, "images/lena_grey_minus_clipped.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::rgb8> lena_color;
+    mln::io::experimental::imread("images/lena_color.png", lena_color);
+
+    auto dom     = lena_color.domain();
+    auto tl      = mln::experimental::point2d{dom.width() / 4, dom.height() / 4};
+    auto br      = mln::experimental::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
+    auto sub_dom = mln::experimental::box2d{tl, br};
+    auto sub_lena_color = mln::view::clip(lena_color, sub_dom);
+    mln::io::experimental::imsave(sub_lena_color, "images/lena_grey_clipped.png");
+
+    fill(sub_lena_color, mln::rgb8{255, 255, 255});
+
+    mln::experimental::image2d<mln::rgb8> planet_color;
+    mln::io::experimental::imread("images/planet.png", planet_color);
+
+    auto dom2 = planet_color.domain();
+    auto tl2  = mln::experimental::point2d{dom2.width() / 4, dom2.height() / 4};
+    auto br2  = mln::experimental::point2d{dom2.width() / 4 + dom2.width() / 2, dom2.height() / 4 + dom2.width() / 2};
+    auto sub_dom2         = mln::experimental::box2d{tl2, br2};
+    auto sub_planet_color = mln::view::clip(planet_color, sub_dom2);
+    mln::io::experimental::imsave(sub_planet_color, "images/planet_clipped.png");
+
+    auto sub_planet_color_clone = clone(sub_planet_color);
+    fill(planet_color, mln::rgb8{0, 0, 0});
+    copy(sub_planet_color_clone, sub_planet_color);
+    mln::io::experimental::imsave(planet_color, "images/planet_minus_clipped.png");
+
+    mln::io::experimental::imsave(lena_color + planet_color, "images/lena_+_planet_color.png");
   }
 }

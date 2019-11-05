@@ -32,6 +32,7 @@ namespace mln
   void fill(OutputImage f, const Value& v)
   {
     static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(std::is_convertible_v<Value, mln::image_value_t<OutputImage>>, "Incompatible value types!");
 
     auto&& vals = f.new_values();
     for (auto row : ranges::rows(vals))

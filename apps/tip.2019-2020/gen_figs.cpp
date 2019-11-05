@@ -194,7 +194,7 @@ int main()
     auto dom2 = lena_color.domain();
     auto tl2  = mln::experimental::point2d{dom2.width() / 4, dom2.height() / 4};
     auto br2  = mln::experimental::point2d{dom2.width() / 4 + dom2.width() / 2, dom2.height() / 4 + dom2.width() / 2};
-    auto sub_dom2         = mln::experimental::box2d{tl2, br2};
+    auto sub_dom2       = mln::experimental::box2d{tl2, br2};
     auto sub_lena_color = mln::view::clip(lena_color, sub_dom2);
 
     auto sub_lena_color_clone = clone(sub_lena_color);
@@ -203,5 +203,38 @@ int main()
     mln::io::experimental::imsave(lena_color, "images/lena_color_minus_clipped.png");
 
     mln::io::experimental::imsave(lena_color + planet_color, "images/lena_+_planet_color2.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::io::experimental::imread("images/lena_grey.png", lena_grey);
+
+    auto lena_grey_masked = mln::view::mask(lena_grey, lena_grey > 150);
+    fill(lena_grey_masked, mln::uint8(255));
+
+    mln::io::experimental::imsave(lena_grey, "images/lena_grey_masked1.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::io::experimental::imread("images/lena_grey.png", lena_grey);
+
+    auto lena_grey_masked2 = mln::view::mask(lena_grey, lena_grey <= 150);
+    fill(lena_grey_masked2, mln::uint8(0));
+
+    mln::io::experimental::imsave(lena_grey, "images/lena_grey_masked2.png");
+  }
+
+  {
+    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::io::experimental::imread("images/lena_grey.png", lena_grey);
+
+    auto lena_grey_masked = mln::view::mask(lena_grey, lena_grey > 150);
+    fill(lena_grey_masked, mln::uint8(255));
+
+    auto lena_grey_masked2 = mln::view::mask(lena_grey, lena_grey <= 150);
+    fill(lena_grey_masked2, mln::uint8(0));
+
+    mln::io::experimental::imsave(lena_grey, "images/lena_grey_binary.png");
   }
 }

@@ -1,6 +1,6 @@
 project(tests)
 # add link flag to test framework
-add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
+add_compile_definitions(MLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 

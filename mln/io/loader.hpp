@@ -135,14 +135,9 @@ namespace mln
       {
         // VISUAL STUDIO does not support constexpr pointer to function
         // static constexpr void (*ptr) (void*,void*,std::size_t) = &value_convert<VIN, VOUT>;
-        static void (*const ptr)(void*, void*, std::size_t);
+        static constexpr void (*const ptr)(void*, void*, std::size_t) = &value_convert<VIN, VOUT>;
       };
 
-      template <typename VIN, typename VOUT>
-      void(*const default_converter < VIN, VOUT,
-           typename std::enable_if<std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
-                                   value_traits<VIN>::quant<value_traits<VOUT>::quant>::type>::ptr)(
-          void*, void*, std::size_t) = &value_convert<VIN, VOUT>;
 
 #define MLN_INTERNAL_CONV_EXPAND(r, data, VIN)                                                                         \
   if (sidx == typeid(VIN))                                                                                             \

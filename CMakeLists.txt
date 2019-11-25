@@ -58,11 +58,16 @@ endif()
 
 #### MSVC Compiler Configuration
 if (MSVC)
+  ## This hack is for Ninja generator from VS CODE
+  string(REGEX REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  ##
+
   add_compile_options("/wd4458" # masque le membre de classe
                       "/wd4456" # masque la déclaration locale précédente
                       "/wd5030" # l'attribut 'noinline' n'est pas reconnu
                       "/wd4457" # la déclaration de '?' masque le paramètre de fonction
   )
+
   add_compile_options("/WX" "/W4" "/wd4244" "/wd4127" "/permissive-")
   add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
   add_compile_definitions(_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)

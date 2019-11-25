@@ -1,6 +1,6 @@
 find_package(benchmark)
 
-add_definitions(-DMLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
+add_compile_definitions(MLN_IMG_PATH="${CMAKE_SOURCE_DIR}/img/")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
     CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

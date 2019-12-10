@@ -4,7 +4,7 @@
 #include <mln/core/experimental/point.hpp>
 
 #include <array>
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 
 namespace mln::experimental
 {

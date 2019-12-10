@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <numeric>
 #include <vector>
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 
 
 template <class T, class Compare>

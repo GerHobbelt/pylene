@@ -40,9 +40,13 @@ namespace mln
     !std::is_const_v<pixel_value_t<Pix>> &&
     !std::is_reference_v<pixel_value_t<Pix>> &&
     requires(const Pix cpix, Pix pix, pixel_point_t<Pix> p) {
-      { cpix.point() } -> ::concepts::convertible_to<pixel_point_t<Pix>>&&;
+      { cpix.point() } -> ::concepts::convertible_to<pixel_point_t<Pix>>;
+#if (__GNUG__) // see https://stackoverflow.com/questions/55198202/unable-to-deduce-placeholder-type-in-concept
       { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>&&;
-      { pix.shift(p) }
+#else
+      { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>;
+#endif
+      { pix.shift(p) };
     };
 
   namespace detail

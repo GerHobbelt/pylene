@@ -3,7 +3,7 @@
 #include <mln/core/private/weighted_pixel.hpp>
 
 #include <meta/meta.hpp>
-#include <range/v3/view_adaptor.hpp>
+#include <range/v3/view/adaptor.hpp>
 #include <range/v3/range/concepts.hpp>
 
 namespace mln::details
@@ -34,7 +34,7 @@ namespace mln::details
       }
     };
 
-    adaptor                begin_adaptor() const { return {m_pix}; }
+    adaptor                begin_adaptor() const { return adaptor{m_pix}; }
     ::ranges::adaptor_base end_adaptor() const { return {}; }
 
 
@@ -80,7 +80,7 @@ namespace mln::details
       }
     };
 
-    adaptor                begin_adaptor() const { return {m_pix}; }
+    adaptor                begin_adaptor() const { return adaptor{m_pix}; }
     ::ranges::adaptor_base end_adaptor() const { return {}; }
 
 

@@ -1,7 +1,7 @@
 project(bench)
 
 find_package(benchmark REQUIRED)
-find_package(GTest REQUIRED)
+find_package(GTest MODULE REQUIRED)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
 

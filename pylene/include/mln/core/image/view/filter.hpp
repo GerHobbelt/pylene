@@ -9,7 +9,7 @@
 #include <mln/core/rangev3/view/remove_if.hpp>
 
 
-#include <range/v3/empty.hpp>
+#include <range/v3/range/primitives.hpp>
 #include <range/v3/utility/functional.hpp>
 
 #include <type_traits>

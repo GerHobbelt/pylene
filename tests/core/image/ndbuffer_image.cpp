@@ -807,6 +807,33 @@ TEST(ndbuffer_image, clip_invalid_roi)
 }
 
 /********************************************************************/
+/****             Test Border Size Computation                   ****/
+/********************************************************************/
+
+TEST(ndbuffer_image, compute_border)
+{
+  mln::image_build_params params;
+  params.border = 0;
+
+  mln::ndbuffer_image img(kSampleType, kWidth, kHeight, params);
+
+
+  mln::experimental::Box roi({2,5}, {7,10});
+
+
+  auto f = img.clip(roi);
+  int  left_border   = roi.tl().x();
+  int  right_border  = kWidth - roi.br().x();
+  int  up_border     = roi.tl().y();
+  int  bottom_border = kHeight - roi.br().y();
+
+
+  EXPECT_EQ(f.border(), std::min({left_border, right_border, up_border, bottom_border}));
+}
+
+
+
+/********************************************************************/
 /****             Test from_buffer                               ****/
 /********************************************************************/
 

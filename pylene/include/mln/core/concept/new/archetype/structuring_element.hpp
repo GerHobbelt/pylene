@@ -5,7 +5,7 @@
 #include <mln/core/concept/new/neighborhoods.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
 
-#include <range/v3/iterator_range.hpp>
+#include <range/v3/view/subrange.hpp>
 
 
 namespace mln::archetypes
@@ -32,10 +32,10 @@ namespace mln::archetypes
       using decomposable = std::false_type;
       using separable    = std::false_type;
 
-      ::ranges::iterator_range<P*> operator()(P p);
+      ::ranges::subrange<P*> operator()(P p);
 
-      ::ranges::iterator_range<Pix*> operator()(Pix px);
-      ::ranges::iterator_range<P*>   offsets() const;
+      ::ranges::subrange<Pix*> operator()(Pix px);
+      ::ranges::subrange<P*>   offsets() const;
     };
 
 
@@ -57,7 +57,7 @@ namespace mln::archetypes
       using decomposable = std::true_type;
 
       bool                                                                   is_decomposable() const;
-      ::ranges::iterator_range<mln::archetypes::StructuringElement<P, Pix>*> decompose() const;
+      ::ranges::subrange<mln::archetypes::StructuringElement<P, Pix>*> decompose() const;
     };
 
     template <class P, class Pix>
@@ -66,7 +66,7 @@ namespace mln::archetypes
       using separable = std::true_type;
 
       bool                                                                   is_separable() const;
-      ::ranges::iterator_range<mln::archetypes::StructuringElement<P, Pix>*> separate() const;
+      ::ranges::subrange<mln::archetypes::StructuringElement<P, Pix>*> separate() const;
     };
 
     template <class P, class Pix>

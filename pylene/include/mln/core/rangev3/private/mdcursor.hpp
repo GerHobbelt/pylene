@@ -14,7 +14,7 @@ namespace mln::ranges
     ::ranges::detail::forward_cursor<::ranges::detail::begin_cursor_t<C>> &&
     requires (C c)
     {
-      { c.read() } -> ::ranges::cpp20::forward_range&&;
+      { c.read() } -> ::ranges::cpp20::forward_range;
       c.end_cursor();
     };
 
@@ -40,8 +40,8 @@ namespace mln::ranges
   concept MDRange =
     requires(R r)
   {
-    { r.rows() } -> ::ranges::cpp20::forward_range&&;
-    { r.begin_cursor() } -> MDCursor&&
+    { r.rows() } -> ::ranges::cpp20::forward_range;
+    { r.begin_cursor() } -> MDCursor;
     { r.end_cursor() } -> ::concepts::same_as<::ranges::default_sentinel_t>;
   };
 
@@ -49,8 +49,8 @@ namespace mln::ranges
   template <class R>
   concept MDBidirectionalRange = MDRange<R> && requires (R r)
   {
-    { r.rrows() } -> ::ranges::cpp20::forward_range&&;
-    { r.rbegin_cursor() } -> MDCursor&&;
+    { r.rrows() } -> ::ranges::cpp20::forward_range;
+    { r.rbegin_cursor() } -> MDCursor;
     { r.rend_cursor() } -> ::concepts::same_as<::ranges::default_sentinel_t>;
   };
 

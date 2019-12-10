@@ -570,7 +570,7 @@ namespace mln
     image_.m_ptr_origin             = (T*)buffer;
     image_.m_index_strides[dim - 1] = 1;
     image_.m_index_first            = 0;
-    image_.m_index_last             = sz[dim - 1] - 1;
+    image_.m_index_last             = static_cast<size_type>(sz[dim - 1] - 1);
     image_.m_ptr                    = (char*)buffer;
     image_.m_last                   = (char*)buffer + (sz[dim - 1] - 1) * image_.m_strides[dim - 1];
 
@@ -582,7 +582,7 @@ namespace mln
       }
 
       image_.m_index_strides[i] = image_.m_strides[i] / sizeof(T);
-      image_.m_index_last += (sz[i] - 1) * image_.m_index_strides[i];
+      image_.m_index_last += static_cast<size_type>((sz[i] - 1) * image_.m_index_strides[i]);
       image_.m_last += (sz[i] - 1) * image_.m_strides[i];
     }
 
@@ -644,14 +644,14 @@ namespace mln
     m_ptr_origin             = (T*)m_data->buffer;
     m_index_strides[dim - 1] = 1;
     m_index_first            = m_border;
-    m_index_last             = m_border + sz[dim - 1] - 1;
+    m_index_last             = static_cast<size_type>(m_border + sz[dim - 1] - 1);
     m_ptr                    = m_data->buffer + border * m_strides[dim - 1];
     m_last                   = m_data->buffer + (border + sz[dim - 1] - 1) * m_strides[dim - 1];
     for (int i = dim - 2; i >= 0; --i)
     {
       m_index_strides[i] = m_strides[i] / sizeof(T);
       m_index_first += m_border * m_index_strides[i];
-      m_index_last += (m_border + sz[i] - 1) * m_index_strides[i];
+      m_index_last += static_cast<size_type>((m_border + sz[i] - 1) * m_index_strides[i]);
       m_ptr += border * m_strides[i];
       m_last += (border + sz[i] - 1) * m_strides[i];
     }

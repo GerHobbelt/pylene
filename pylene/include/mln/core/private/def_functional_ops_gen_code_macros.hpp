@@ -35,7 +35,7 @@
     struct FUN##_t<void, void>                                                                                         \
     {                                                                                                                  \
       template <typename T1, typename T2>                                                                              \
-      auto operator()(const T1& x, const T2& y) const -> decltype(FUN(x, y))                                           \
+      auto operator()(const T1& x, const T2& y) const                                       \
       {                                                                                                                \
         return FUN(x, y);                                                                                              \
       }                                                                                                                \

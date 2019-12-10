@@ -33,7 +33,7 @@ namespace mln::concepts
   concept SegmentedRange =
     ::ranges::forward_range<Rng> &&
     requires(Rng rng) {
-    { rng.rows() } -> ::ranges::forward_range&&;
+    { rng.rows() } -> ::ranges::forward_range;
     requires ::concepts::same_as<
       ::ranges::range_value_t<decltype(rng.rows())>,
       ::ranges::range_value_t<Rng>>;
@@ -45,7 +45,7 @@ namespace mln::concepts
   concept ReversibleRange = 
     ::ranges::cpp20::forward_range<Rng> &&
     requires(Rng rng) {
-    { rng.reversed() } -> ::ranges::cpp20::forward_range&&;
+    { rng.reversed() } -> ::ranges::cpp20::forward_range;
       requires ::concepts::same_as<
         ::ranges::range_value_t<decltype(rng.reversed())>,
         ::ranges::range_value_t<Rng>>;

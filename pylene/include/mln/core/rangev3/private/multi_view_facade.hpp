@@ -2,7 +2,7 @@
 
 #include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
 
-#include <range/v3/view_facade.hpp>
+#include <range/v3/view/facade.hpp>
 
 namespace mln::ranges::details
 {

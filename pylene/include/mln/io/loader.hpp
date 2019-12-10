@@ -130,8 +130,8 @@ namespace mln
       template <typename VIN, typename VOUT>
           struct default_converter < VIN,
           VOUT,
-          typename std::enable_if<std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
-                                  value_traits<VIN>::quant<value_traits<VOUT>::quant>::type>
+          std::enable_if_t<std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
+                                  value_traits<VIN>::quant<value_traits<VOUT>::quant>>
       {
         // VISUAL STUDIO does not support constexpr pointer to function
         // static constexpr void (*ptr) (void*,void*,std::size_t) = &value_convert<VIN, VOUT>;
@@ -140,8 +140,8 @@ namespace mln
 
       template <typename VIN, typename VOUT>
       void(*const default_converter < VIN, VOUT,
-           typename std::enable_if<std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
-                                   value_traits<VIN>::quant<value_traits<VOUT>::quant>::type>::ptr)(
+           std::enable_if_t<std::is_scalar<VIN>::value and std::is_scalar<VOUT>::value and
+                                   value_traits<VIN>::quant<value_traits<VOUT>::quant>>::ptr)(
           void*, void*, std::size_t) = &value_convert<VIN, VOUT>;
 
 #define MLN_INTERNAL_CONV_EXPAND(r, data, VIN)                                                                         \

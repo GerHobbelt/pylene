@@ -29,7 +29,7 @@ namespace mln::morpho::details
 
   // fixme: could be optimized for indexable images
   template <class I>
-  [[gnu::noinline]] void copy_to_periodic_line(const I& f,
+  [[gnu::noinline]] void copy_to_periodic_line(I& f,
                                                mln::experimental::point2d origin,
                                                mln::experimental::point2d direction,
                                                std::size_t n,

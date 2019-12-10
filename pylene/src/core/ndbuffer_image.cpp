@@ -398,10 +398,10 @@ namespace mln
     if (m_pdim == 0)
       return 0;
 
-    int border = std::max(m_axes[0].domain_begin - m_axes[0].vbox_begin, m_axes[0].vbox_end - m_axes[0].domain_end);
+    int border = std::min(m_axes[0].domain_begin - m_axes[0].vbox_begin, m_axes[0].vbox_end - m_axes[0].domain_end);
     for (int k = 1; k < m_pdim; ++k)
     {
-      int x = std::max(m_axes[k].domain_begin - m_axes[k].vbox_begin, m_axes[k].vbox_end - m_axes[k].domain_end);
+      int x = std::min(m_axes[k].domain_begin - m_axes[k].vbox_begin, m_axes[k].vbox_end - m_axes[k].domain_end);
       if (x < border)
         border = x;
     }

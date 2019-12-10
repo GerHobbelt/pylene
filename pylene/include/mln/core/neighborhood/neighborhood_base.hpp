@@ -16,6 +16,9 @@ namespace mln
     using is_incremental  = std::false_type;
     using is_decomposable = std::false_type;
 
+    
+    neighborhood_base() = default;
+
   private:
     /// \brief Overload if x is a point lvalue
     template <class X>

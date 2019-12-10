@@ -74,11 +74,11 @@ namespace mln::concepts
     ::concepts::common_reference_with<image_value_t<I>&&, const image_value_t<I>&> &&
     requires(I ima, const I cima, image_domain_t<I> d, image_point_t<I> p) {
       { cima.template ch_value<mln::archetypes::Value>() }
-      -> ::concepts::convertible_to<image_ch_value_t<I, mln::archetypes::Value>>&&;
-      { cima.concretize() } -> ::concepts::convertible_to<image_concrete_t<I>>&&;
+      -> ::concepts::convertible_to<image_ch_value_t<I, mln::archetypes::Value>>;
+      { cima.concretize() } -> ::concepts::convertible_to<image_concrete_t<I>>;
       { cima.domain() }     -> image_domain_t<I>;
-      { ima.new_pixels() }  -> mln::ranges::mdrange&&;
-      { ima.new_values() }  -> mln::ranges::mdrange&&;
+      { ima.new_pixels() }  -> mln::ranges::mdrange;
+      { ima.new_values() }  -> mln::ranges::mdrange;
       requires ::concepts::convertible_to<mln::ranges::mdrange_value_t<decltype(ima.new_pixels())>, image_pixel_t<I>>;
       requires ::concepts::convertible_to<mln::ranges::mdrange_value_t<decltype(ima.new_values())>, image_value_t<I>>;
     };
@@ -93,7 +93,7 @@ namespace mln::concepts
       Image<I> &&
       OutputPixel<image_pixel_t<I>> &&
       requires(I ima) {
-      { ima.new_values() }  -> mln::ranges::output_mdrange<image_value_t<I>>&&;
+      { ima.new_values() }  -> mln::ranges::output_mdrange<image_value_t<I>>;
         // Check Writability of each pixel of the range
         requires OutputPixel<
                    std::common_type_t<
@@ -201,8 +201,8 @@ namespace mln::concepts
     Image<I> &&
     ::concepts::derived_from<image_category_t<I>, bidirectional_image_tag> &&
     requires (I ima) {
-    { ima.new_pixels() }  -> mln::ranges::reversible_mdrange&&;
-    { ima.new_values() }  -> mln::ranges::reversible_mdrange&&;
+    { ima.new_pixels() }  -> mln::ranges::reversible_mdrange;
+    { ima.new_values() }  -> mln::ranges::reversible_mdrange;
   };
 
 
@@ -225,7 +225,7 @@ namespace mln::concepts
     BidirectionalImage<I> &&
     ::concepts::derived_from<image_category_t<I>, raw_image_tag> &&
     requires (I ima, const I cima, int dim) {
-    { ima.data() }        -> ::concepts::convertible_to<const image_value_t<I>*>&&; // data() may be proxied by a view
+    { ima.data() }        -> ::concepts::convertible_to<const image_value_t<I>*>; // data() may be proxied by a view
       { cima.strides(dim) } -> std::ptrdiff_t;
     };
 
@@ -241,7 +241,7 @@ namespace mln::concepts
       WritableBidirectionalImage<I> &&
       RawImage<I> &&
       requires(I ima, image_value_t<I> v) {
-      { ima.data() }        -> ::concepts::convertible_to<image_value_t<I>*>&&;
+      { ima.data() }        -> ::concepts::convertible_to<image_value_t<I>*>;
         { *(ima.data()) = v };
       };
 

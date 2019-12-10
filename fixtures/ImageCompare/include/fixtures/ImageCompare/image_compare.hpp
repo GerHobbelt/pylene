@@ -7,7 +7,7 @@
 #include <mln/core/rangev3/view/zip.hpp>
 #include <mln/io/experimental/imprint.hpp>
 
-#include <range/v3/begin_end.hpp>
+#include <range/v3/range/access.hpp>
 
 #include <string>
 #include <functional>
@@ -128,7 +128,7 @@ namespace fixtures::ImageCompare
         {
           linecmp_fn = [](const void* a, const void* b, std::size_t n) -> int {
             return !std::equal(reinterpret_cast<const TA*>(a), reinterpret_cast<const TA*>(a) + n,
-                               reinterpret_cast<const TA*>(b));
+                               reinterpret_cast<const TB*>(b));
           };
         }
 

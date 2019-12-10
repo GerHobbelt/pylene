@@ -1,7 +1,7 @@
 project(tests)
 
 find_package(Threads REQUIRED)
-find_package(GTest REQUIRED)
+find_package(GTest MODULE REQUIRED)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 

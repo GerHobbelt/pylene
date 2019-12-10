@@ -4,7 +4,7 @@
 #include <mln/core/assert.hpp>
 #include <mln/core/rangev3/private/mdrange_facade.hpp>
 #include <mln/core/rangev3/private/ndrange_facade.hpp>
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 
 namespace mln::ranges
 {

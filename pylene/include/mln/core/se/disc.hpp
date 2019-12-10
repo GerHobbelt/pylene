@@ -9,7 +9,7 @@
 #include <mln/core/neighborhood/neighborhood_base.hpp>
 
 
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 #include <vector>
 
 

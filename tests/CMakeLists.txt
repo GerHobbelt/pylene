@@ -1,7 +1,7 @@
 project(tests)
 
 find_package(Threads REQUIRED)
-find_package(GTest REQUIRED)
+find_package(GTest MODULE REQUIRED)
 find_package(Sanitizers REQUIRED)
 
 sanitizer_add_blacklist_file(${CMAKE_SOURCE_DIR}"/utils/sanitizers/blacklist.txt")

@@ -30,7 +30,7 @@ namespace mln::concepts
     template <typename SE>
     concept DynamicStructuringElement =
       requires (SE se) {
-        { se.radial_extent() }  -> int
+        { se.radial_extent() }  -> int;
       };
 
 
@@ -53,9 +53,9 @@ namespace mln::concepts
     details::implies(::concepts::convertible_to<typename SE::category, mln::dynamic_neighborhood_tag>,
                      details::DynamicStructuringElement<SE>) &&
     requires (SE se, const SE cse, P p, mln::archetypes::PixelT<P> px) {
-      { se(p) }         -> ::ranges::cpp20::forward_range&&;
-      { se(px) }        -> ::ranges::cpp20::forward_range&&;
-      { cse.offsets() } -> ::ranges::cpp20::forward_range&&;
+      { se(p) }         -> ::ranges::cpp20::forward_range;
+      { se(px) }        -> ::ranges::cpp20::forward_range;
+      { cse.offsets() } -> ::ranges::cpp20::forward_range;
 
       requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se(p))>, P>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se(px))>>;
@@ -77,7 +77,7 @@ namespace mln::concepts
     ::concepts::convertible_to<typename SE::decomposable, std::true_type> &&
     requires(const SE se) {
       { se.is_decomposable() }  -> bool;
-      { se.decompose() }        -> ::ranges::cpp20::forward_range&&;
+      { se.decompose() }        -> ::ranges::cpp20::forward_range;
       requires details::RangeOfStructuringElement<decltype(se.decompose()), P>;
     };
 
@@ -88,7 +88,7 @@ namespace mln::concepts
     ::concepts::convertible_to<typename SE::separable, std::true_type> &&
     requires(const SE se) {
       { se.is_separable() } -> bool;
-      { se.separate() }     -> ::ranges::cpp20::forward_range&&;
+      { se.separate() }     -> ::ranges::cpp20::forward_range;
       requires details::RangeOfStructuringElement<decltype(se.separate()), P>;
     };
 
@@ -98,8 +98,8 @@ namespace mln::concepts
     StructuringElement<SE, P> &&
     ::concepts::convertible_to<typename SE::incremental, std::true_type> &&
     requires(const SE se) {
-      { se.inc() }  -> StructuringElement<P>&&;
-      { se.dec() }  -> StructuringElement<P>&&;
+      { se.inc() }  -> StructuringElement<P>;
+      { se.dec() }  -> StructuringElement<P>;
     };
 #endif
   // clang-format on

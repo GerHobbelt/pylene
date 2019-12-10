@@ -11,10 +11,11 @@ namespace mln::canvas
 {
 
   template <class SE, class I, class J, class Self = void>
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-  requires concepts::StructuringElement<SE, image_point_t<I>>&& concepts::Image<I>&& concepts::Image<J>
-#endif
-      class LocalAlgorithm
+  // This concept check makes an ICE with MSVC
+  #ifndef _MSC_VER
+   requires concepts::StructuringElement<SE, image_point_t<I>>&& concepts::Image<I>&& concepts::Image<J>
+  #endif
+  class LocalAlgorithm
   {
     static_assert(mln::is_a<SE, experimental::StructuringElement>());
     static_assert(mln::is_a<I, experimental::Image>());
@@ -32,8 +33,8 @@ namespace mln::canvas
   public:
     LocalAlgorithm(const SE& se, I& f, J& g)
       : m_se{se}
-      , m_i(f)
-      , m_j(g)
+      , m_i{f}
+      , m_j{g}
     {
     }
 

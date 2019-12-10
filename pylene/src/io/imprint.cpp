@@ -6,10 +6,10 @@ namespace mln::io::experimental::internal
   void imprint2d(const formatter<mln::experimental::point2d>& fmter, mln::experimental::box2d roi)
   {
     // Compute column width
-    std::size_t width = 0;
+    int width = 0;
     mln_foreach_new (auto p, roi)
     {
-      std::size_t w = fmter.formatted_size(p);
+      int w = static_cast<int>(fmter.formatted_size(p));
       if (width < w)
         width = w;
     }
@@ -27,10 +27,10 @@ namespace mln::io::experimental::internal
   void imprint3d(const formatter<mln::experimental::point3d>& fmter, mln::experimental::box3d roi)
   {
     // Compute column width
-    std::size_t width = 0;
+    int width = 0;
     mln_foreach_new (auto p, roi)
     {
-      std::size_t w = fmter.formatted_size(p);
+      int w = static_cast<int>(fmter.formatted_size(p));
       if (width < w)
         width = w;
     }

@@ -51,7 +51,7 @@ public:
 
   MultiIndicesTest()
   {
-    for (std::size_t k = 0; k < Rank; ++k)
+    for (int k = 0; k < static_cast<int>(Rank); ++k)
     {
       from[k]  = k;
       from_[k] = k;

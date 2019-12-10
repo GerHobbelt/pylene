@@ -8,7 +8,7 @@
 
 #include <mln/core/image/private/image_traits.hpp>
 #include <mln/core/image/private/pixel_traits.hpp>
-#include <range/v3/range_traits.hpp>
+#include <range/v3/range/traits.hpp>
 #include <type_traits>
 
 

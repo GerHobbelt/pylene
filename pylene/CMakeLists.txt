@@ -17,12 +17,17 @@ if (TBB_FOUND AND PYLENE_USE_TBB)
 else ()
   set(PYLENE_USE_TBB OFF)
   #FIXME use a config file
-  target_compile_definitions(Pylene INTERFACE MLN_NO_TBB)
+  target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
 endif ()
 
 # FIXME: still useful ?
 if (UNIX AND NOT APPLE)
   target_link_libraries(Pylene INTERFACE rt)
+elseif (MSVC)
+  #
+  target_compile_options(Pylene PUBLIC "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
+                                       "/wd5104" # found 'L#x' in macro replacement list, did you mean 
+                      )
 endif ()
 
 
@@ -32,11 +37,9 @@ target_include_directories(Pylene PUBLIC
                            $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-target_include_directories(Pylene PUBLIC ${FreeImage_INCLUDE_DIRS})
-set_property(TARGET Pylene APPEND
-             PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
-target_link_libraries(Pylene PUBLIC range-v3::range-v3)
+target_link_libraries(Pylene PUBLIC range-v3)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
+target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 
 
 # Set sources
@@ -61,9 +64,12 @@ target_sources(Pylene PRIVATE
                )
 
 # Compiler configurations
-target_compile_features(Pylene PUBLIC cxx_std_17)
+target_compile_features(Pylene PUBLIC cxx_std_20)
 
-target_compile_options(Pylene PUBLIC -fconcepts)
+if (CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(Pylene PUBLIC -fconcepts)
+endif()
+
 target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
 
 # Add concepts support for gcc > 8 with -fconcepts

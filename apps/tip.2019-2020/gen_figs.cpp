@@ -156,7 +156,7 @@ int main()
     auto sub_lena_color = mln::view::clip(lena_color, sub_dom);
     mln::io::experimental::imsave(sub_lena_color, "images/lena_color_clipped.png");
 
-    fill(sub_lena_color, mln::rgb8{255, 255, 255});
+    fill(sub_lena_color, mln::rgb8{0, 0, 0});
     mln::io::experimental::imsave(lena_color, "images/lena_color_minus_clipped.png");
 
     mln::experimental::image2d<mln::rgb8> planet_color;
@@ -187,7 +187,7 @@ int main()
     auto sub_dom = mln::experimental::box2d{tl, br};
     auto sub_planet_color = mln::view::clip(planet_color, sub_dom);
 
-    fill(sub_planet_color, mln::rgb8{255, 255, 255});
+    fill(sub_planet_color, mln::rgb8{0, 0, 0});
     mln::io::experimental::imsave(planet_color, "images/planet_color_minus_clipped.png");
 
     mln::experimental::image2d<mln::rgb8> lena_color;

@@ -157,6 +157,7 @@ int main()
     mln::io::experimental::imsave(sub_lena_color, "images/lena_color_clipped.png");
 
     fill(sub_lena_color, mln::rgb8{255, 255, 255});
+    mln::io::experimental::imsave(lena_color, "images/lena_color_minus_clipped.png");
 
     mln::experimental::image2d<mln::rgb8> planet_color;
     mln::io::experimental::imread("images/planet.png", planet_color);
@@ -171,7 +172,7 @@ int main()
     auto sub_planet_color_clone = clone(sub_planet_color);
     fill(planet_color, mln::rgb8{0, 0, 0});
     copy(sub_planet_color_clone, sub_planet_color);
-    mln::io::experimental::imsave(planet_color, "images/planet_minus_clipped.png");
+    mln::io::experimental::imsave(planet_color, "images/planet_minus_clipped2.png");
 
     mln::io::experimental::imsave(lena_color + planet_color, "images/lena_+_planet_color.png");
   }
@@ -187,6 +188,7 @@ int main()
     auto sub_planet_color = mln::view::clip(planet_color, sub_dom);
 
     fill(sub_planet_color, mln::rgb8{255, 255, 255});
+    mln::io::experimental::imsave(planet_color, "images/planet_color_minus_clipped.png");
 
     mln::experimental::image2d<mln::rgb8> lena_color;
     mln::io::experimental::imread("images/lena_color.png", lena_color);
@@ -200,7 +202,7 @@ int main()
     auto sub_lena_color_clone = clone(sub_lena_color);
     fill(lena_color, mln::rgb8{0, 0, 0});
     copy(sub_lena_color_clone, sub_lena_color);
-    mln::io::experimental::imsave(lena_color, "images/lena_color_minus_clipped.png");
+    mln::io::experimental::imsave(lena_color, "images/lena_color_clipped2.png");
 
     mln::io::experimental::imsave(lena_color + planet_color, "images/lena_+_planet_color2.png");
   }

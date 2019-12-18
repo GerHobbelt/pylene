@@ -35,13 +35,12 @@ class Pylene(ConanFile):
 
     def package_info(self):
         if self.settings.compiler in ["gcc", "clang"]:
-            self.cpp_info.cppflags = ["-std=c++17"]
+            self.cpp_info.cppflags = ["-std=c++2a"]
 
     # Requirements part of the INTERFACE
     def requirements(self):
-        self.requires("range-v3/0.5.0@lrde/patched")
-        self.requires("cmcstl2/head@lrde/testing")
-        self.requires("fmt/[>=6.0 <6.1]")
+        self.requires("range-v3/0.9.1@ericniebler/stable")
+        self.requires("fmt/6.0.0")
 
         if self.options.freeimage:
             self.requires("freeimage/3.18.0@dutiona/stable")

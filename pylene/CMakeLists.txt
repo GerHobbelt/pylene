@@ -39,7 +39,7 @@ target_include_directories(Pylene PUBLIC
 target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(Pylene PUBLIC range-v3)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
-target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
+target_link_libraries(Pylene PUBLIC FreeImage::FreeImage)
 
 
 # Set sources

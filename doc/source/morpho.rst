@@ -37,5 +37,16 @@ Segmentation
    morpho/watershed
 
 
+Component Trees
+***************
+
+.. toctree::
+    :maxdepth: 1
+
+    morpho/component_tree
+    morpho/maxtree
+    morpho/tos
+
+
 
 

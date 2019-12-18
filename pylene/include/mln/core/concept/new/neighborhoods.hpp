@@ -25,10 +25,10 @@ namespace mln::concepts
   concept Neighborhood =
     StructuringElement<SE, P> &&
     requires (SE se, P p, mln::archetypes::PixelT<P> px) {
-      { se.before(p) }  -> ::ranges::cpp20::forward_range&&;
-      { se.after(p) }   -> ::ranges::cpp20::forward_range&&;
-      { se.before(px) } -> ::ranges::cpp20::forward_range&&;
-      { se.after(px) }  -> ::ranges::cpp20::forward_range&&;
+      { se.before(p) }  -> ::ranges::cpp20::forward_range;
+      { se.after(p) }   -> ::ranges::cpp20::forward_range;
+      { se.before(px) } -> ::ranges::cpp20::forward_range;
+      { se.after(px) }  -> ::ranges::cpp20::forward_range;
 
       requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se.before(p))>, P>;
       requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se.after(p))>, P>;

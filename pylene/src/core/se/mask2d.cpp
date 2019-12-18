@@ -10,7 +10,7 @@ namespace
   {
     std::vector<mln::point2d> vals;
 
-    height = values.size();
+    height = static_cast<int>(values.size());
     if (height == 0)
       throw std::runtime_error("Invalid height for mask2d");
 
@@ -19,7 +19,7 @@ namespace
 
     auto row = values.begin();
 
-    width = row->size();
+    width = static_cast<int>(row->size());
     if (width == 0)
       throw std::runtime_error("Invalid width for mask2d");
 
@@ -46,7 +46,7 @@ namespace
   {
     std::vector<mln::experimental::point2d> vals;
 
-    height = values.size();
+    height = static_cast<int>(values.size());
     if (height == 0)
       throw std::runtime_error("Invalid height for mask2d");
 
@@ -55,7 +55,7 @@ namespace
 
     auto row = values.begin();
 
-    width = row->size();
+    width = static_cast<int>(row->size());
     if (width == 0)
       throw std::runtime_error("Invalid width for mask2d");
 
@@ -81,38 +81,40 @@ namespace
   // Call a function foreach non-zero value of  an initialization list
   struct mask_info
   {
-    int width;
-    int height;
     int before_size;
     int after_size;
   };
 
   mask_info initlist_to_wvector(std::initializer_list<std::initializer_list<std::byte>> values,
                                 void* zero,
+                                int* sizes,
                                 std::size_t sample_size,
                                 std::function<void(int x, int y, void*)> callback)
   {
-    int height = values.size();
+    int width = sizes[0];
+    int height = sizes[1];
+
     if (height == 0)
       throw std::runtime_error("Invalid height for mask2d");
 
     if (height % 2 == 0)
       throw std::runtime_error("Invalid height for mask2d (must be odd)");
 
-    auto row = values.begin();
 
-    int width = row->size();
     if (width == 0)
       throw std::runtime_error("Invalid width for mask2d");
 
     if (width % 2 == 0)
       throw std::runtime_error("Invalid width for mask2d (must be odd)");
 
-    int before = 0;
-    int after = 0;
+    int         before  = 0;
+    int         after   = 0;
+    auto        row     = values.begin();
+    std::size_t rowsize = row->size();
+
     for (int y = -(height / 2); y <= (height / 2); ++y, ++row)
     {
-      if (static_cast<int>(row->size()) != width)
+      if (row->size() != rowsize)
         throw std::runtime_error("A line has an invalid width");
 
       const std::byte* ptr = row->begin();
@@ -130,7 +132,7 @@ namespace
       }
     }
 
-    mask_info info = {width, height, before, after};
+    mask_info info = {before, after};
     return info;
   }
 }
@@ -155,12 +157,12 @@ namespace mln::se
       m_radial_extent = std::max(width, height) / 2;
     }
 
-    void wmask2d_base::init(void* values, void* zero, std::size_t sample_size, std::function<void(int x, int y, void*)> callback)
+    void wmask2d_base::init(void* values, void* zero, int* sizes, std::size_t sample_size, std::function<void(int x, int y, void*)> callback)
     {
       auto* vals = reinterpret_cast<std::initializer_list<std::initializer_list<std::byte>>*>(values);
-      auto info = initlist_to_wvector(*vals, zero, sample_size, std::move(callback));
+      auto info = initlist_to_wvector(*vals, zero, sizes, sample_size, std::move(callback));
 
-      m_radial_extent = std::max(info.width, info.height) / 2;
+      m_radial_extent = std::max(sizes[0], sizes[1]) / 2;
       m_before_size = info.before_size;
       m_after_size = info.after_size;
     }

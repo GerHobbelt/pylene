@@ -2,7 +2,7 @@
 #include <mln/core/neighborhood/c8.hpp>
 
 #include <gtest/gtest.h>
-#include <range/v3/to_container.hpp>
+#include <range/v3/range/conversion.hpp>
 #include <vector>
 
 

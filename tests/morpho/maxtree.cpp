@@ -1,249 +1,213 @@
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/grays.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/core/range/algorithm/generate.hpp>
-#include <mln/io/imprint.hpp>
+#include <mln/morpho/experimental/maxtree.hpp>
 
-#include <tbb/task_scheduler_init.h>
 
-#include <random>
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/neighborhood/c4.hpp>
+#include <mln/accu/accumulators/count.hpp>
+
+
+#include <mln/io/experimental/imprint.hpp>
+
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
 
-namespace mln
+
+void check_parent_array_sorted(const int* parent, std::size_t n)
 {
+  for (int i = 0; i < static_cast<int>(n); ++i)
+    ASSERT_LE(parent[i], i);
+}
 
-  template <typename V, typename size_type>
-  void unify_parent(const mln::image2d<V>& f, const std::vector<size_type>&, mln::image2d<size_type>& parent)
+mln::experimental::image2d<mln::experimental::point2d> //
+make_parent_image(const int* par, std::size_t n,
+                  const mln::experimental::image2d<int>& node_map)
+{
+  using mln::experimental::point2d;
 
+  std::vector<point2d>                repr(n);
+  std::vector<bool>                   has_repr(n, false);
+  mln::experimental::image2d<point2d> parent;
+
+  mln::resize(parent, node_map);
+
+  mln_foreach_new(auto px, node_map.new_pixels())
   {
-    auto px = parent.pixels().riter();
-    mln_forall (px)
+    auto p = px.point();
+    auto id = px.val();
+    if (!has_repr[id])
     {
-      // std::cout << px->val() << " ! " << px->index() << std::endl;
-      std::size_t p = px->index();
-      std::size_t q = mln::morpho::internal::zfind_repr(f, parent, p);
-      if (p != q)
-      {
-        if (q == parent[q]) // transmit root property
-          parent[p] = p;
-        else
-          parent[p] = parent[q];
-        parent[q] = p;
-      }
+      has_repr[id] = true;
+      repr[id] = p;
     }
-
-    mln_foreach (auto& p, parent.values())
-      p = mln::morpho::internal::zfind_repr(f, parent, p);
+    parent(p) = repr[id];
   }
+
+  mln_foreach_new(auto px, node_map.new_pixels())
+  {
+    auto p  = px.point();
+    auto id = px.val();
+
+    if (parent(p) == p && par[id] != -1)
+      parent(p) = repr[par[id]];
+  }
+  return parent;
 }
 
-template <typename V, typename size_type>
-bool iscanonized(const mln::image2d<V>& ima, const mln::image2d<size_type>& parent)
+
+template <>
+struct fmt::formatter<mln::experimental::point2d>
 {
-  mln_pixter(px, parent);
-  mln_forall (px)
+  auto parse(format_parse_context& ctx)
   {
-    std::size_t q = px->val();
-    if (not(q == parent[q] or ima[q] != ima[parent[q]]))
+    int x = 0;
+    auto c = ctx.begin();
+    auto e = ctx.end();
+    while (c != e && !((x == 0) && (*c == '}')))
     {
-      std::cout << "canaonization error @ " << px->index() << std::endl;
-      return false;
+      if (*c == '{')
+        x++;
+      if (*c == '}')
+        x--;
+      ++c;
     }
+    return c;
   }
-  return true;
-}
 
-template <typename V>
-bool iscanonized(const mln::image2d<V>& ima, const mln::image2d<mln::morpho::maxtree_node>& tree)
+  // parse is inherited from formatter<string_view>.
+  template <typename FormatContext>
+  auto format(mln::experimental::point2d p, FormatContext& ctx)
+  {
+    return format_to(ctx.out(), " ({:d},{:d})", p.x(), p.y());
+  }
+};
+
+
+TEST(Morpho, Maxtree_uint8)
 {
-  mln_pixter(px, tree);
-  mln_forall (px)
-  {
-    std::size_t q = px->val().m_parent;
-    if (not(q == tree[q].m_parent or ima[q] != ima[tree[q].m_parent]))
-    {
-      std::cout << "canaonization error @ " << px->index() << std::endl;
-      return false;
-    }
-  }
-  return true;
+  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+                                                     {+2, 10, 10, 10, 10, 10, 10}, //
+                                                     {18, +2, 18, 19, 18, 14, +6}, //
+                                                     {16, +2, 16, 10, 10, 10, 10}, //
+                                                     {18, 16, 18, +2, +2, +2, +2}};
+
+
+  mln::experimental::image2d<mln::experimental::point2d> ref_parent = {
+    {{6, 2}, {0, 0}, {1, 0}, {1, 0}, {3, 0}, {1, 0}, {6, 0}},
+    {{6, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
+    {{0, 3}, {6, 0}, {0, 3}, {2, 2}, {2, 2}, {0, 0}, {6, 0}},
+    {{5, 2}, {6, 0}, {0, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
+    {{0, 3}, {0, 3}, {0, 3}, {6, 0}, {6, 0}, {6, 0}, {6, 0}}};
+
+  mln::morpho::experimental::component_tree<uint8_t> ctree;
+  mln::experimental::image2d<int>                    node_map;
+
+  std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+
+
+
+  auto& par    = ctree.parent;
+  auto  parent = make_parent_image(par.data(), par.size(), node_map);
+
+
+  check_parent_array_sorted(par.data(), par.size());
+  ASSERT_IMAGES_EQ_EXP(ref_parent, parent);
 }
 
-bool check_S(const mln::image2d<mln::morpho::maxtree_node>& tree, unsigned root)
+
+TEST(Morpho, Maxtree_filtering_min)
 {
-  using namespace mln;
-  image2d<bool> dejavu;
-  resize(dejavu, tree).init(false);
+  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+                                                     {+2, 10, 10, 10, 10, 10, 10}, //
+                                                     {18, +2, 18, 19, 18, 14, +6}, //
+                                                     {16, +2, 16, 10, 10, 10, 10}, //
+                                                     {18, 16, 18, +2, +2, +2, +2}};
 
-  dejavu[root] = true;
-  for (unsigned x = root; x != (unsigned)-1; x = tree[x].m_next)
+  const mln::experimental::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
+                                                    {+2, 10, 10, 10, 10, 10, 10}, //
+                                                    {16, +2, 16, 16, 16, 14, +6}, //
+                                                    {16, +2, 16, 10, 10, 10, 10}, //
+                                                    {16, 16, 16, +2, +2, +2, +2}};
+
+
+  mln::morpho::experimental::component_tree<uint8_t> ctree;
+  mln::experimental::image2d<int>                    node_map;
+
   {
-    assert(dejavu[tree[x].m_parent]);
-    if (!dejavu[tree[x].m_parent])
-      return false;
-    dejavu[x] = true;
+    std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+
+    auto attr = ctree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
+    ctree.filter(mln::morpho::experimental::CT_FILTER_MIN, node_map,
+                 [&attr](int node_id) { return attr[node_id] > 5; });
+
+    auto out = ctree.reconstruct(node_map);
+    ASSERT_IMAGES_EQ_EXP(out, ref1);
   }
-  return true;
+
 }
 
-mln::image2d<std::size_t> pt2idx(const mln::image2d<mln::point2d>& parent)
+
+TEST(Morpho, Maxtree_filtering_max)
 {
-  mln::image2d<std::size_t> out;
-  mln::resize(out, parent);
+  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+                                                     {+2, 10, 10, 10, 10, 10, 10}, //
+                                                     {18, +2, 18, 19, 18, 14, +6}, //
+                                                     {16, +2, 16, 10, 10, 10, 10}, //
+                                                     {18, 16, 18, +2, +2, +2, +2}};
 
-  mln_viter(vin, vout, parent, out);
-  mln_forall (vin, vout)
-    *vout = parent.index_of_point(*vin);
-  return out;
+  const mln::experimental::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
+                                                    {+2, 10, 10, 10, 10, 10, 10}, //
+                                                    {16, +2, 16, 16, 16, 14, +6}, //
+                                                    {16, +2, 16, 10, 10, 10, 10}, //
+                                                    {16, 16, 16, +2, +2, +2, +2}};
+
+
+  mln::morpho::experimental::component_tree<uint8_t> ctree;
+  mln::experimental::image2d<int>                    node_map;
+
+  {
+    std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+
+    auto attr = ctree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
+    ctree.filter(mln::morpho::experimental::CT_FILTER_MAX, node_map,
+                 [&attr](int node_id) { return attr[node_id] > 5; });
+
+
+    auto out = ctree.reconstruct(node_map);
+    ASSERT_IMAGES_EQ_EXP(out, ref1);
+  }
+
 }
 
-template <typename V, typename StrictWeakOrdering>
-void runtest(const mln::image2d<V>& ima, StrictWeakOrdering cmp)
+
+TEST(Morpho, Maxtree_filtering_direct)
 {
-  using namespace mln;
+  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+                                                     {+2, 10, 10, 10, 10, 10, 10}, //
+                                                     {18, +2, 18, 19, 18, 14, +6}, //
+                                                     {16, +2, 16, 10, 10, 10, 10}, //
+                                                     {18, 16, 18, +2, +2, +2, +2}};
 
-  typedef typename image2d<V>::size_type size_type;
-  image2d<size_type>                     parent1, parent;
-  std::vector<size_type>                 S1, S;
-  std::tie(parent1, S1) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
-  unify_parent(ima, S1, parent1);
+  const mln::experimental::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
+                                                    {+2, 10, 10, 10, 10, 10, 10}, //
+                                                    {16, +2, 16, 16, 16, 14, +6}, //
+                                                    {16, +2, 16, 10, 10, 10, 10}, //
+                                                    {16, 16, 16, +2, +2, +2, +2}};
 
-  {
-    std::tie(parent, S) = morpho::impl::serial::maxtree_hqueue(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
 
-  {
-    std::tie(parent, S) = morpho::maxtree_najman(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
+  mln::morpho::experimental::component_tree<uint8_t> ctree;
+  mln::experimental::image2d<int>                    node_map;
 
   {
-    std::tie(parent, S) = morpho::impl::parallel::maxtree_hqueue(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
+    std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+
+    auto attr = ctree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
+    ctree.filter(mln::morpho::experimental::CT_FILTER_DIRECT, node_map,
+                 [&attr](int node_id) { return attr[node_id] > 5; });
+
+    auto out = ctree.reconstruct(node_map);
+    ASSERT_IMAGES_EQ_EXP(out, ref1);
   }
 
-  {
-    std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    std::tie(parent, S) = morpho::impl::parallel::maxtree_ufind(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    std::tie(parent, S) = morpho::impl::parallel::maxtree_ufind_line(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    std::tie(parent, S) = morpho::impl::serial::maxtree_ufindrank(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    std::tie(parent, S) = morpho::impl::parallel::maxtree_ufindrank(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    std::tie(parent, S) = morpho::impl::serial::maxtree_pqueue(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    image2d<morpho::maxtree_node> tree;
-    unsigned                      root;
-    std::tie(tree, root) = morpho::maxtree_pqueue_2(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, tree));
-    ASSERT_TRUE(check_S(tree, root));
-    auto parent = transform(tree, std::mem_fn(&morpho::maxtree_node::m_parent));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
-
-  {
-    std::tie(parent, S) = morpho::impl::parallel::maxtree_pqueue(ima, c4, cmp);
-    ASSERT_TRUE(iscanonized(ima, parent));
-    ASSERT_TRUE(morpho::check_S(parent, S.data(), S.data() + S.size()));
-    unify_parent(ima, S1, parent);
-    ASSERT_TRUE(all(parent == parent1));
-  }
 }
 
-TEST(Morpho, Maxtree)
-{
-  using namespace mln;
-  typedef UInt<8> V;
-  image2d<V>      ima(300, 100);
-
-  std::random_device                 rd;
-  std::mt19937                       gen(rd());
-  std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
-  range::generate(ima.values(), [&sampler, &gen]() { return sampler(gen); });
-
-  tbb::task_scheduler_init ts;
-
-  // {
-  //   image2d<size_type> f;
-  //   resize(f, ima);
-  //   mln_foreach(auto px, f.pixels())
-  //     px.val() = px.index();
-  //   io::imprint(f);
-  // }
-
-  // io::imprint(ima);
-
-  // {
-  //   image2d<point2d> parent_;
-  //   image2d<size_type> parent1;
-  //   std::vector<size_type> S;
-  //   std::less<uint8> cmp;
-  //   resize(parent_, ima);
-
-  //   morpho::maxtree1d(ima, parent_, 0, cmp);
-  //   std::tie(parent1, S) = morpho::maxtree(ima, c4, cmp);
-  //   auto parent = pt2idx(parent_);
-
-  //   ASSERT_TRUE(iscanonized(ima, parent));
-  //   ASSERT_TRUE(iscanonized(ima, parent1));
-
-  //   unify_parent(ima, S, parent1);
-  //   unify_parent(ima, S, parent);
-  //   ASSERT_TRUE(all(parent == parent1));
-  // }
-
-  runtest(ima, std::less<V>());
-  runtest(ima, std::greater<V>());
-}

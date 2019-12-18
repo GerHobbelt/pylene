@@ -7,7 +7,7 @@
 #include <mln/core/rangev3/view/transform.hpp>
 
 #include <range/v3/algorithm/set_algorithm.hpp>
-#include <range/v3/empty.hpp>
+#include <range/v3/range/primitives.hpp>
 
 #include <type_traits>
 

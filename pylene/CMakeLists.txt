@@ -4,7 +4,7 @@ find_package(Boost 1.58 REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 
-find_package(range-v3 0.9.1 REQUIRED)
+find_package(range-v3 0.9.1 REQUIRED CONFIG)
 find_package(fmt 6.0 REQUIRED)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
@@ -17,12 +17,17 @@ if (TBB_FOUND AND PYLENE_USE_TBB)
 else ()
   set(PYLENE_USE_TBB OFF)
   #FIXME use a config file
-  target_compile_definitions(Pylene INTERFACE MLN_NO_TBB)
+  target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
 endif ()
 
 # FIXME: still useful ?
 if (UNIX AND NOT APPLE)
   target_link_libraries(Pylene INTERFACE rt)
+elseif (MSVC)
+  #
+  target_compile_options(Pylene PUBLIC "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
+                                       "/wd5104" # found 'L#x' in macro replacement list, did you mean 
+                      )
 endif ()
 
 
@@ -32,16 +37,14 @@ target_include_directories(Pylene PUBLIC
                            $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-target_include_directories(Pylene PUBLIC ${FreeImage_INCLUDE_DIRS})
-set_property(TARGET Pylene APPEND
-             PROPERTY INTERFACE_LINK_DIRECTORIES ${FreeImage_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
-target_link_libraries(Pylene PUBLIC range-v3::range-v3)
+target_link_libraries(Pylene PUBLIC range-v3)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
+target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 
 
 # Set sources
-file(GLOB_RECURSE sources "include/mln/*.hpp")
-target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
+#file(GLOB_RECURSE sources "include/mln/*.hpp")
+#target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
                src/core/se/disc.cpp
@@ -58,12 +61,20 @@ target_sources(Pylene PRIVATE
                src/io/io.cpp
                src/io/imread.cpp
                src/io/imprint.cpp
+               src/morpho/maxtree.cpp
+               src/morpho/immersion.cpp
+               src/morpho/component_tree.cpp
+               src/morpho/hvector.cpp
+               src/morpho/hvector_unbounded.cpp
                )
 
 # Compiler configurations
-target_compile_features(Pylene PUBLIC cxx_std_17)
+target_compile_features(Pylene PUBLIC cxx_std_20)
 
-target_compile_options(Pylene PUBLIC -fconcepts)
+if (CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(Pylene PUBLIC -fconcepts)
+endif()
+
 target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
 
 # Add concepts support for gcc > 8 with -fconcepts
@@ -84,11 +95,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 
 add_library(Pylene::Pylene ALIAS Pylene)
 
+include(GNUInstallDirs)
 install(TARGETS Pylene
-        EXPORT PyleneTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION include)
+        EXPORT PyleneTargets)
 
 write_basic_package_version_file(
     PyleneConfigVersion.cmake
@@ -105,15 +114,16 @@ configure_file(
 install(EXPORT PyleneTargets
         FILE PyleneTargets.cmake
         NAMESPACE Pylene::
-        DESTINATION lib/cmake/pylene
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
         )
+
 install(DIRECTORY include/mln
-        DESTINATION include)
+        TYPE INCLUDE)
 
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake
-        DESTINATION lib/cmake/pylene)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
 
 # GCC8 has enoying random compilation failures
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)

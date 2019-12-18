@@ -3,7 +3,7 @@
 #include <array>
 #include <mln/core/assert.hpp>
 #include <mln/core/rangev3/private/multi_view_facade.hpp>
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 #include <range/v3/view/reverse.hpp>
 
 

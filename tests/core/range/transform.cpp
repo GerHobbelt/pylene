@@ -61,7 +61,7 @@ TEST(Range, transform_2d_write)
   static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
 
   {
-    std::size_t i = 0;
+    int i = 0;
     for (auto&& r : rng.rows())
       for (int& v : r)
         v = i++;
@@ -118,7 +118,7 @@ TEST(Range, transform2_2d_write_row_wise)
   static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
 
   {
-    std::size_t i = 0;
+    int i = 0;
     for (auto row : rng.rows())
       for (auto&& v : row)
       {

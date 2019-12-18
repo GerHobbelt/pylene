@@ -35,7 +35,7 @@ namespace mln::concepts
   concept SizedDomain =
     Domain<Dom> &&
     requires(const Dom cdom) {
-    { cdom.size() } -> ::concepts::unsigned_integral&&;
+    { cdom.size() } -> ::concepts::unsigned_integral;
     };
 
   // ShapedDomain
@@ -44,7 +44,7 @@ namespace mln::concepts
     SizedDomain<Dom> &&
     requires(const Dom cdom) {
       { cdom.shape() }    -> ::ranges::range_value_t<Dom>;
-      { cdom.extents() }  -> ::ranges::cpp20::forward_range&&;
+      { cdom.extents() }  -> ::ranges::cpp20::forward_range;
     };
 
 #endif // PYLENE_CONCEPT_TS_ENABLED

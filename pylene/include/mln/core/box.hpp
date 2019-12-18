@@ -101,6 +101,8 @@ namespace mln::experimental
       return size(2);
     }
 
+    using Impl::cursor;
+    using Impl::backward_cursor;
     using Impl::begin_cursor;
     using Impl::end_cursor;
     using Impl::rbegin_cursor;
@@ -531,6 +533,8 @@ namespace mln::experimental
       void rbegin_cursor() const {};
       void end_cursor() const {}
       void rend_cursor() const {};
+      using cursor = void;
+      using backward_cursor = void;
 
 
       int m_dim       = 0;
@@ -628,6 +632,8 @@ namespace mln::experimental
       void rbegin_cursor() const {};
       void end_cursor() const {}
       void rend_cursor() const {};
+      using cursor = void;
+      using backward_cursor = void;
 
 
 

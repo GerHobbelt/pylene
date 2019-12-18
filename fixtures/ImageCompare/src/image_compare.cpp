@@ -37,19 +37,13 @@ namespace fixtures::ImageCompare::experimental::impl
 
 
     mln::sample_type_id id = a.sample_type();
-
-    // If the comparison function is not provided, try memcmp
+    // If the comparison function is not provided, we use memcmp (type are supposed to be trivially comparable
     if (!linecmp_fn)
-    {
-      if (id == mln::sample_type_id::OTHER)
-        return ::testing::AssertionFailure() << "A and B value type are not trivially comparable."; // Cannot be memcmp
       linecmp_fn = std::memcmp;
-    }
 
-    std::size_t n = a.width() * mln::get_sample_type_id_traits(id).size();
-
-    auto a_buf = A.buffer();
-    auto b_buf = B.buffer();
+    std::size_t n     = a.width() * mln::get_sample_type_id_traits(id).size();
+    auto        a_buf = A.buffer();
+    auto        b_buf = B.buffer();
 
     for (int w = 0; w < A.size(3); ++w)
       for (int z = 0; z < A.size(2); ++z)

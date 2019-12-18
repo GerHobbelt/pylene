@@ -4,7 +4,7 @@
 
 #include <mln/core/concept/new/concepts.hpp>
 
-#include <range/v3/to_container.hpp>
+#include <range/v3/range/conversion.hpp>
 #include <range/v3/view/indices.hpp>
 
 #include <numeric>

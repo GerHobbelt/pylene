@@ -1,7 +1,7 @@
 project(bench)
 
 find_package(benchmark REQUIRED)
-find_package(GTest REQUIRED)
+find_package(GTest MODULE REQUIRED)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
@@ -66,6 +66,8 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 add_benchmark(BMAlgorithms              BMAlgorithms.cpp BMAlgorithms_main.cpp)
 add_benchmark(BMNeighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_benchmark(BMRotation                BMRotation.cpp)
+add_benchmark(BMMorphoMaxtree           BMMorphoMaxtree.cpp)
+add_benchmark(BMMorphoTos               BMMorphoTos.cpp)
 add_benchmark(BMMorphoBase              BMMorphoBase.cpp)
 add_benchmark(BMMorphers                BMMorphers.cpp BMMorphers_main.cpp)
 add_benchmark(BMReference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)

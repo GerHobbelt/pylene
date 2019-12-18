@@ -4,7 +4,7 @@
 #include <mln/core/assert.hpp>
 #include <mln/core/rangev3/private/mdrange_facade.hpp>
 #include <mln/core/rangev3/private/ndrange_facade.hpp>
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 
 namespace mln::ranges
 {
@@ -79,7 +79,7 @@ namespace mln::ranges
         value_t read() const
         {
           auto tmp = m_i;
-          for (std::size_t k = 0; k < Rank; ++k)
+          for (int k = 0; k < static_cast<int>(Rank); ++k)
             tmp[k]--;
           return tmp;
         }

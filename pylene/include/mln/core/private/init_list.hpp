@@ -1,6 +1,6 @@
 #pragma once
-#include <initializer_list>
 #include <algorithm>
+#include <initializer_list>
 
 namespace mln::details
 {
@@ -9,7 +9,6 @@ namespace mln::details
   class init_list
   {
   public:
-
     template <class T>
     explicit init_list(const std::initializer_list<T>& l) noexcept;
 
@@ -21,7 +20,7 @@ namespace mln::details
 
     void copy_to_buffer(void* buffer, std::ptrdiff_t line_byte_stride, std::ptrdiff_t slice_byte_stride) const;
 
-    int dim() const noexcept { return m_dim; }
+    int         dim() const noexcept { return m_dim; }
     std::size_t size(int k) const noexcept { return m_sizes[k]; }
     std::size_t sample_type_size() const noexcept { return m_sample_type_size; }
 

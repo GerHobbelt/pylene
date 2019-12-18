@@ -8,7 +8,7 @@
 #include <mln/core/point.hpp>
 #include <mln/core/neighborhood/dyn_neighborhood.hpp>
 
-#include <range/v3/span.hpp>
+#include <range/v3/view/span.hpp>
 
 #include <initializer_list>
 #include <vector>
@@ -73,7 +73,7 @@ namespace mln::se
     struct wmask2d_base
     {
       // Initialize from type-erased initializer list
-      void init(void* values, void* zero, std::size_t sample_size, std::function<void(int x, int y, void*)> callback);
+      void init(void* values, void* zero, int* sizes, std::size_t sample_size, std::function<void(int x, int y, void*)> callback);
 
       int m_before_size   = 0;  // Number of points before (0,0)
       int m_after_size    = 0;  // Number of points after (0,0)
@@ -129,10 +129,15 @@ namespace mln::se
     wmask2d<W>::wmask2d(std::initializer_list<std::initializer_list<W>> values)
     {
       W zero = 0;
+      int sizes[2];
       auto callback = [this](int x, int y, void* w) {
         this->m_points.push_back({{x, y}, *reinterpret_cast<W*>(w)});
       };
-      init(reinterpret_cast<void*>(&values), &zero, sizeof(W), callback);
+      sizes[1] = static_cast<int>(values.size());
+      assert(sizes[1] != 0);
+
+      sizes[0] = static_cast<int>(values.begin()->size());
+      init(reinterpret_cast<void*>(&values), &zero, sizes, sizeof(W), callback);
     }
 
     template <class W>

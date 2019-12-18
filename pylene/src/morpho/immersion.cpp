@@ -1,6 +1,6 @@
-#include <mln/morpho/private/immersion.spe.hpp>
+#include <mln/morpho/experimental/private/immersion.spe.hpp>
 
-namespace mln::morpho::details
+namespace mln::morpho::experimental::details
 {
   namespace
   {

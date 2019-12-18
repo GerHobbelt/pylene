@@ -26,11 +26,17 @@ struct accu_sum_impl
 
 struct accu_incremental : accu_sum_impl, mln::Accumulator<accu_incremental>
 {
+  accu_incremental() = default;
+  accu_incremental(const accu_incremental&) = default;
+  accu_incremental(accu_incremental&&) = default;
   using has_untake = std::true_type;
 };
 
 struct accu_non_incremental : accu_sum_impl, mln::Accumulator<accu_non_incremental>
 {
+  accu_non_incremental() = default;
+  accu_non_incremental(const accu_non_incremental&) = default;
+  accu_non_incremental(accu_non_incremental&&) = default;
   using has_untake = std::false_type;
 };
 

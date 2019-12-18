@@ -1,11 +1,10 @@
-#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <cassert>
 #include <climits>
 #include <memory>
 
-namespace mln::morpho::details
+namespace mln::morpho::experimental::details
 {
 
   // Permute the array \p tab considering the permutation array \p permut

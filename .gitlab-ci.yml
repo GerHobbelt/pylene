@@ -4,17 +4,16 @@ stages:
     - bench
     - deploy
 
-before_script:
-    - export CMAKE_BUILD_PARALLEL_LEVEL=$(( (${NBPROC} + 1) / 2 ))
 
 variables:
     FEDORA_30: "${CI_REGISTRY}/olena/pylene/fedora-rawhide" # stdlibc++ 9.1.1-2 not yet in fedora-30
     FEDORA_29: "${CI_REGISTRY}/olena/pylene/fedora-29"
     BUILD_DOCKER: 'false'
     PACKAGE_NAME: "pylene" # Conan package name
-    PACKAGE_TAG: "testing" # Conan tag
+    PACKAGE_TAG: "experimental" # Conan tag
     PACKAGE_VERSION: "head" # Version to build
     CONAN_USER: "lrde"
+    CMAKE_BUILD_PARALLEL_LEVEL: 6
 
 #########
 # Build #
@@ -43,17 +42,40 @@ build-docker-automatic:
 # Test #
 ########
 
+windows-debug:
+    stage: test
+    script:
+        - Invoke-BatchFile -Path $env:VCVAR2019 -Parameters $env:ARCH
+        - mkdir build; cd build
+        - conan install .. -s build_type=Debug --build missing
+        - rm Findrange-v3.cmake
+        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+        - cmake --build . --target build-tests
+        - ctest -L UnitTests --schedule-random --output-on-failure
+    dependencies: []
+    artifacts:
+        reports:
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
+        expire_in: 15 days
+    tags: [ windows ]
+    when: manual
+    variables:
+        VCVAR2019: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat'
+        ARCH: x64
+
+
+
 .job-build-linux-base: &distcheck-linux-base
     stage: test
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
+        - rm Findrange-v3.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
         - ctest -L UnitTests --schedule-random --output-on-failure
-        - cmake --build . --target dist --config $PYLENE_CONFIGURATION
     dependencies: []
     artifacts:
         reports:
@@ -65,15 +87,14 @@ build-docker-automatic:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
+        - rm Findrange-v3.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$COV -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
-        - ctest -L UnitTests --schedule-random --output-on-failure
         - cmake --build . --target run-tests_coverage-gcovr-html --config $PYLENE_CONFIGURATION
         - cmake --build . --target run-tests_coverage-lcov --config $PYLENE_CONFIGURATION
         - lcov --list run-tests_coverage-lcov.info
-        - cmake --build . --target dist --config $PYLENE_CONFIGURATION
     dependencies: []
     artifacts:
         paths:
@@ -127,7 +148,20 @@ distcheck-linux-gcc9-release:
         UBSAN: "OFF"
         OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
 
-distcheck-linux-gcc9-debug-cov-asan-ubsan:
+distcheck-linux-gcc9-debug-asan-ubsan:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_30}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
+        OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
+
+
+distcheck-linux-gcc9-debug-coverage:
     <<: *distcheck-linux-coverage
     image: ${FEDORA_30}
     variables:
@@ -135,10 +169,11 @@ distcheck-linux-gcc9-debug-cov-asan-ubsan:
         CXX: "g++"
         CC: "gcc"
         COV: "/usr/bin/gcov"
-        ASAN: "ON"
+        ASAN: "OFF"
         MSAN: "OFF"
-        UBSAN: "ON"
+        UBSAN: "OFF"
         OTHER_CMAKE_ARGS: "-DCMAKE_CXX_EXTENSIONS=OFF" # This fixes a GCC ICE
+    when: manual
 
 distcheck-linux-clang7-release:
     <<: *distcheck-linux-base
@@ -201,6 +236,7 @@ distcheck-linux-clang8-debug:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing -e CXX=g++ -e CC=gcc
+        - rm Findrange-v3.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION
@@ -258,6 +294,7 @@ distbench-linux-clang8-release:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
+        - rm Findrange-v3.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc --config Release
         - mkdir ../public && mv doc/sphinx/* ../public/
@@ -292,6 +329,6 @@ package:
         - conan profile update settings.compiler.libcxx=libstdc++11 default
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
         - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. CONAN_USER/$PACKAGE_TAG --build missing -e CXX=g++ -e CC=gcc
+        - conan create .. $CONAN_USER/$PACKAGE_TAG --build missing -e CXX=g++ -e CC=gcc
         - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
-    only: [ "dev", "development/ranges" ]
+    only: [ "dev", "development/ranges", "development/cpp20" ]

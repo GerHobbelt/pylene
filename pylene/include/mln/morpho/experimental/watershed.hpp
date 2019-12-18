@@ -44,7 +44,8 @@ namespace mln::morpho::experimental
       // Pixels in the border gets the status 0 (deja vu)
       // Pixels in the queue get -1
       // Pixels not in the queue get -2
-      mln::morpho::experimental::details::pqueue_fifo<I> pqueue(input);
+      constexpr auto impl_type = mln::morpho::experimental::details::pqueue_impl::linked_list;
+      mln::morpho::experimental::details::pqueue_fifo<I, impl_type, /* reversed = */ true> pqueue(input);
       {
         output.extension().fill(kWaterline);
 

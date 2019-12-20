@@ -48,7 +48,7 @@ namespace  mln::morpho::experimental::detail
         m_current_level = std::max(m_current_level, level);
     }
 
-
+    bool              has_key(int level) const noexcept { return !base::empty(level); }
     bool              empty() const noexcept { return base::empty(m_current_level); }
 
     std::pair<int, P> top() const noexcept { return {m_current_level, base::front(m_current_level)}; }

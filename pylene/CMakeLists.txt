@@ -61,6 +61,8 @@ target_sources(Pylene PRIVATE
                src/io/io.cpp
                src/io/imread.cpp
                src/io/imprint.cpp
+               src/morpho/maxtree.cpp
+               src/morpho/component_tree.cpp
                )
 
 # Compiler configurations

@@ -24,6 +24,7 @@ namespace mln::morpho::experimental::details
     void                            pop();
     std::pair<key_type, value_type> top() const;
     bool                            empty() const;
+    bool                            has_key(const key_type& priority) const;
 
   private:
     static_assert(!std::is_signed_v<key_type>, "Must not be signed");
@@ -77,6 +78,13 @@ namespace mln::morpho::experimental::details
   {
     return m_delegate.top();
   }
+
+  template <class I, bool reverse>
+  inline bool pqueue_fifo<I, reverse>::has_key(const key_type& k) const
+  {
+    return m_delegate.has_key(k);
+  }
+
 
 
 } // namespace mln::morpho::experimental::details

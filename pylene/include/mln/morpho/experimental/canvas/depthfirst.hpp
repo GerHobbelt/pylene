@@ -6,7 +6,7 @@
 
 
 #include <range/v3/functional.hpp>
-#include <bitset>
+
 
 namespace  mln::morpho::experimental::canvas
 {
@@ -29,7 +29,7 @@ namespace  mln::morpho::experimental::canvas
   //
   // viz.on_done(Level l, Point p): called when a point has been processed
   //
-  // viz.has_node_at_level(Level l) : true if there is a node at this level in branch
+  // viz.has_level_flooding_started(Level l) : true if this level is already being flooded
 
   template <class I, class N, class DFVisitor, class Proj>
   void depthfirst(I& f, N nbh, DFVisitor& viz, image_point_t<I> start)
@@ -57,22 +57,19 @@ namespace  mln::morpho::experimental::canvas
     queue.push(f(start), start);
     status(start) = INQUEUE;
 
-    constexpr int nvalues = 1 << 8;
-    std::bitset<nvalues> has_level;
 
     // Flooding function turned non-recursive: flood(p, current_level = f(p))
     {
       P    p             = start;
       auto current_level = f(start);
 
-    flood_new_level:
-      has_level.set(current_level);
+    flood:
       viz.on_flood_start(current_level, p);
 
-    flood_flat_zone:
+    keep_flooding:
       for (auto n : nbh(p))
       {
-        if (status(n) != NONE)
+        if (status.at(n) != NONE)
           continue;
 
         // Insert n INQUEUE
@@ -87,7 +84,7 @@ namespace  mln::morpho::experimental::canvas
         // Otherwise, process it, (do not remove p from stack)
         current_level = nval;
         p             = n;
-        goto flood_new_level;
+        goto flood;
       }
 
       // All the neighbors have been seen, p is DONE
@@ -96,23 +93,24 @@ namespace  mln::morpho::experimental::canvas
       queue.pop();
 
       // If the queue gets empty, we have processed the whole image
-      if (!queue.empty())
+      if (queue.empty())
+        goto end_flooding;
+
       {
         auto old_level = current_level;
         std::tie(current_level, p) = queue.top();
         if (current_level == old_level)
-          goto flood_flat_zone;
-
-        viz.on_flood_end(old_level);
-        has_level.reset(old_level);
-
-        if (has_level.test(current_level))
-          goto flood_flat_zone;
-
-        goto flood_new_level;
+          goto keep_flooding;
+        viz.on_flood_end(old_level, current_level);
       }
 
-    // End: there is no more point to process
+      if (viz.has_level_flooding_started(current_level))
+        goto keep_flooding;
+      else
+        goto flood;
+
+      // End: there is no more point to process
+    end_flooding:
       viz.on_flood_end(current_level);
     }
   }

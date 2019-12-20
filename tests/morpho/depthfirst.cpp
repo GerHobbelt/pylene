@@ -9,15 +9,19 @@
 #include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
-#include <mln/io/experimental/imprint.hpp>
+
 #include <functional>
+#include <bitset>
+
 #include <fmt/core.h>
 
 struct ordervisitor
 {
-  void on_flood_start(int, mln::experimental::point2d) noexcept { ++nb_component_entering; }
-  void on_flood_end(int) noexcept { ++nb_component_exiting; }
+  void on_flood_start(int l, mln::experimental::point2d) noexcept { ++nb_component_entering; levelset.set(l); }
+  void on_flood_end(int l, int) noexcept { ++nb_component_exiting; levelset.reset(l); }
+  void on_flood_end(int l) noexcept { ++nb_component_exiting; levelset.reset(l); }
   void on_done(int, mln::experimental::point2d p) { out(p) = count++; cnt(p)++; }
+  bool has_level_flooding_started(int l) const { return levelset.test(l); }
 
   int                                 nb_component_entering = 0;
   int                                 nb_component_exiting = 0;
@@ -25,6 +29,7 @@ struct ordervisitor
   mln::experimental::image2d<uint8_t> out;
   mln::experimental::image2d<int>     cnt;
 
+  std::bitset<256> levelset;
 };
 
 
@@ -45,17 +50,6 @@ TEST(Morpho, depthfirst_max)
 
   mln::morpho::experimental::canvas::depthfirst(input, mln::experimental::c4, viz, {0,0});
 
-  //mln::io::experimental::imprint(input >= 2); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 6); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 10); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 11); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 14); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 15); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 16); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 18); fmt::print("\n");
-  //mln::io::experimental::imprint(input >= 19); fmt::print("\n");
-
-
   // Counting = anti-leveling
   mln_foreach_new(auto p, input.domain())
     for (auto q : mln::experimental::c4(p))
@@ -69,5 +63,4 @@ TEST(Morpho, depthfirst_max)
   EXPECT_EQ(viz.nb_component_entering, viz.nb_component_exiting);
   EXPECT_EQ(viz.nb_component_exiting, 13);
   EXPECT_TRUE(mln::all_of(viz.cnt == 1));
-  //ASSERT_IMAGES_EQ_EXP(ref, res);
 }

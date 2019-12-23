@@ -39,32 +39,38 @@ namespace mln::morpho::experimental
         roots.push_back({static_cast<node_id_t>(nodes.size() - 1), level});
       }
 
-      void on_flood_end(level_t old_level, level_t new_level) noexcept
+      void on_flood_end([[maybe_unused]] level_t old_level, level_t new_level) noexcept
       {
         // Attach to parent
+        assert(!roots.empty());
+
         auto current = roots.back();
         roots.pop_back();
 
         assert(old_level == current.level);
         assert(old_level > new_level);
 
+        // Fixme: optimize this test with a sentinel value
 
-        auto par = roots.back();
-        assert(par.level <= new_level);
+        root_info par;
+        if (!roots.empty())
+          par = roots.back();
 
-        if (par.level != new_level)
+        if (roots.empty() || par.level != new_level)
         {
           nodes.push_back({-1});
           lvlnodes.push_back(new_level);
           par = {static_cast<node_id_t>(nodes.size() - 1), new_level};
           roots.push_back(par);
         }
+        assert(par.level <= new_level);
 
         nodes[current.node_root_id] = par.node_root_id;
       }
 
       void on_flood_end(dontcare_t) noexcept
       {
+        assert(!roots.empty());
         // Attach to parent
         node_id_t root = roots.back().node_root_id;
         roots.pop_back();
@@ -107,6 +113,7 @@ namespace mln::morpho::experimental
     /// Sort the array \c par so that par[i] < i
     /// where `par` encodes a DAG relation
     /// The parent of the root node is supposed to be -1;
+    /// permut[-1] is supposed to be a valid memory location
     void permute_parent(int* par, int* permut, std::size_t n);
 
 
@@ -115,11 +122,12 @@ namespace mln::morpho::experimental
     void
     permute_parent_and_node_map(I&& node_map, int* parent, V* levels, std::size_t n)
     {
-      auto permutation_arr = std::make_unique<int[]>(n);
+      auto permutation_arr = std::make_unique<int[]>(n + 1);
+      int* perm = permutation_arr.get() + 1;
 
-      permute_parent(parent, permutation_arr.get(), n);
-      permute_array(permutation_arr.get(), levels, n, sizeof(V));
-      mln::for_each(node_map, [perm = permutation_arr.get()](int& i) { i = perm[i]; });
+      permute_parent(parent, perm, n);
+      permute_array(perm, levels, n, sizeof(V));
+      mln::for_each(node_map, [perm](int& i) { i = perm[i]; });
     }
   } // namespace details
 

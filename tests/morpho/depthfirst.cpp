@@ -5,6 +5,7 @@
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/algorithm/fill.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -48,6 +49,7 @@ TEST(Morpho, depthfirst_max)
   viz.out.resize(input.domain());
   viz.cnt.resize(input.domain());
 
+  mln::fill(viz.cnt, 0);
   mln::morpho::experimental::canvas::depthfirst(input, mln::experimental::c4, viz, {0,0});
 
   // Counting = anti-leveling

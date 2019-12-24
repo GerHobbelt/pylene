@@ -1,131 +1,135 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
-
 #include <mln/core/assert.hpp>
+#include <mln/core/concept/new/images.hpp>
+#include <mln/data/experimental/histogram.hpp>
 
-namespace  mln::morpho::experimental::detail
+#include <algorithm>
+#include <numeric>
+
+
+namespace  mln::morpho::experimental::details
 {
 
 
-  /// \brief Set of points ordered hierarchically into a list of points
+  /// \brief Set of points ordered hierarchically into a list of points (vector implemented)
   ///
-  /// \tparam N                 Number of levels
   /// \tparam P                 Type of point
-  /// \tparam LinkImage         Type of the link image
-  template <int N, class P, class LinkImage>
-  class hlinked_lists
+  template <class P>
+  class hvectors;
+
+
+  /// \brief Base implementation
+  template <>
+  class hvectors<void>
   {
-    static_assert(N <= (1 << 24), "Too many numbers of level");
-    static_assert(std::is_convertible_v<P, image_point_t<LinkImage>>);
+  public:
+    bool empty(int level) const noexcept;
 
+  protected:
+    /// \param count Number of elements in the histogram
+    /// \param size Size in bytes of an element
+    hvectors() = default;
+    ~hvectors();
+
+    void init(const std::size_t* cumulated_histogram, std::size_t count, std::size_t size);
+
+
+    struct vector_t { void* begin; void* end; };
+    vector_t* m_lists; /* List of unitialized storage */
+  };
+
+
+  template <class P>
+  class hvectors : public hvectors<void>
+  {
     template <class J>
-    hlinked_lists(J&& f);
+    hvectors(J&& f);
+    ~hvectors() = default;
+
+    hvectors(const hvectors&) = delete;
+    hvectors(hvectors&&) = delete;
+    hvectors& operator= (const hvectors&) = delete;
+    hvectors& operator= (hvectors&&) = delete;
 
 
-    void                push_front(int level, P p) noexcept;
     void                push_back(int level, P p) noexcept;
+    P                   pop_back(int level) noexcept;
     P                   pop_front(int level) noexcept;
 
     P                   back(int level) const noexcept;
     P                   front(int level) const noexcept;
-    bool                empty(int level) const noexcept;
-
-
-  private:
-    struct node_t
-    {
-      P    head;
-      P    tail;
-      int  size = 0;
-    };
-
-    std::array<node_t, N> m_lists;
-    LinkImage             m_next;
   };
+
+
+
 
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
-  template <int N, class P, class LinkImage>
+  template <class P>
   template <class J>
-  inline hlinked_lists<N, P, LinkImage>::hlinked_lists(J&& f)
-    : m_next(std::forward<J>(f), image_build_params{})
+  inline hvectors<P>::hvectors(J&& f)
   {
-  }
-
-  template <int N, class P, class LinkImage>
-  inline bool hlinked_lists<N, P, LinkImage>::empty(int level) const noexcept
-  {
-    mln_precondition(level < N);
-    return m_lists[level].size == 0;
+    auto hist = mln::data::experimental::histogram(std::forward<J>(f));
+    std::partial_sum(hist.begin(), hist.end(), hist.begin());
+    this->init(hist.data(), hist.size(), sizeof(P));
   }
 
 
-  template <int N, class P, class LinkImage>
-  inline void hlinked_lists<N, P, LinkImage>::push_front(int level, P p) noexcept
-  {
-    mln_precondition(level < N);
-    if (m_lists[level].size == 0)
-    {
-      m_lists[level].head  = p;
-      m_lists[level].tail  = p;
-    }
-    else
-    {
-      m_next(p)            = m_lists[level].head;
-      m_lists[level].head  = p;
-    }
 
-    m_lists[level].size++;
+  inline bool hvectors<void>::empty(int level) const noexcept
+  {
+    return m_lists[level].begin == m_lists[level].end;
   }
 
 
-  template <int N, class P, class LinkImage>
-  inline void hlinked_lists<N, P, LinkImage>::push_back(int level, P p) noexcept
+  template <class P>
+  inline void hvectors<P>::push_back(int level, P p) noexcept
   {
-    mln_precondition(level < N);
-    if (m_lists[level].size == 0)
-    {
-      m_lists[level].head  = p;
-      m_lists[level].tail  = p;
-    }
-    else
-    {
-      m_next(m_lists[level].tail) = p;
-      m_lists[level].tail         = p;
-    }
-    m_lists[level].size++;
-  }
-
-  template <int N, class P, class LinkImage>
-  inline P hlinked_lists<N, P, LinkImage>::pop_front(int level) noexcept
-  {
-    mln_precondition(level < N);
-    mln_precondition(m_lists[level].size > 0 && "Empty list");
-    P head = m_lists[level].head;
-    m_lists[level].head = m_next(head);
-    m_lists[level].size--;
-
-    return head;
+    P*& end = reinterpret_cast<P*&>(m_lists[level].end);
+    new ((void*) end++) P(p);
   }
 
 
-  template <int N, class P, class LinkImage>
-  inline P hlinked_lists<N, P, LinkImage>::front(int level) const noexcept
+  template <class P>
+  inline P hvectors<P>::pop_front(int level) noexcept
   {
-    mln_precondition(level < N);
-    mln_precondition(m_lists[level].size > 0 && "Empty list");
-    return m_lists[level].head;
+    mln_precondition(!this->empty(level) && "Empty list");
+
+    P*& begin = reinterpret_cast<P*&>(m_lists[level].begin);
+    P tmp = std::move(*begin);
+    std::destroy_at(begin++);
+    return tmp;
   }
 
-  template <int N, class P, class LinkImage>
-  inline P hlinked_lists<N, P, LinkImage>::back(int level) const noexcept
+  template <class P>
+  inline P hvectors<P>::pop_back(int level) noexcept
   {
-    mln_precondition(level < N);
-    mln_precondition(m_lists[level].size > 0 && "Empty list");
-    return m_lists[level].tail;
+    mln_precondition(!this->empty(level) && "Empty list");
+
+    P*& end = reinterpret_cast<P*&>(m_lists[level].end);
+    --end;
+    P tmp = std::move(*end);
+    std::destroy_at(end);
+    return tmp;
+  }
+
+
+
+  template <class P>
+  inline P hvectors<P>::front(int level) const noexcept
+  {
+    mln_precondition(!this->empty(level) && "Empty list");
+    return *reinterpret_cast<P*>(m_lists[level].begin);
+  }
+
+  template <class P>
+  inline P hvectors<P>::back(int level) const noexcept
+  {
+    mln_precondition(!this->empty(level) && "Empty list");
+    return reinterpret_cast<P*>(m_lists[level].end)[-1];
   }
 
 

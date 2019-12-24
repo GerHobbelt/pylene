@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/morpho/experimental/private/hvector.hpp>
+#include <mln/morpho/experimental/private/hlinked_lists.hpp>
 
 namespace  mln::morpho::experimental::detail
 {
@@ -12,15 +12,15 @@ namespace  mln::morpho::experimental::detail
   /// \tparam N                 Number of levels
   /// \tparam P                 Type of point
   /// \tparam LinkImage         Type of the link image
-  template <int N, class P, class LinkImage, bool reverse>
-  class hpqueue : private hlinked_lists<N, P, LinkImage>
+  template <int N, class P, class Impl, bool reverse>
+  class hpqueue : private Impl
   {
-    using base = hlinked_lists<N, P, LinkImage>;
+    using base = Impl;
 
   public:
     template <class J>
     hpqueue(J&& f)
-      : hlinked_lists<N, P, LinkImage>(std::forward<J>(f))
+      : base(std::forward<J>(f))
     {
     }
 
@@ -36,7 +36,10 @@ namespace  mln::morpho::experimental::detail
         m_current_level = std::max(m_current_level, level);
     }
 
+
     // Push in first position at givel level
+    // Not supported by all implementation
+    /*
     void push_first(int level, P p) noexcept
     {
       mln_precondition(0 <= level && level < N);
@@ -47,6 +50,7 @@ namespace  mln::morpho::experimental::detail
       else
         m_current_level = std::max(m_current_level, level);
     }
+    */
 
     bool              has_key(int level) const noexcept { return !base::empty(level); }
     bool              empty() const noexcept { return base::empty(m_current_level); }

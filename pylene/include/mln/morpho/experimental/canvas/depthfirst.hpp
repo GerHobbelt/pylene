@@ -34,7 +34,12 @@ namespace  mln::morpho::experimental::canvas
   template <class I, class N, class DFVisitor, class Proj>
   void depthfirst(I& f, N nbh, DFVisitor& viz, image_point_t<I> start)
   {
-    enum st { NONE = 0, INQUEUE = 1, DONE = 2 };
+    enum st
+    {
+      NONE    = 0,
+      INQUEUE = 1,
+      DONE    = 255,
+    };
     using P = image_point_t<I>;
     //using V = image_value_t<I>;
 
@@ -52,7 +57,8 @@ namespace  mln::morpho::experimental::canvas
 
     status.extension().fill(DONE);
 
-    mln::morpho::experimental::details::pqueue_fifo<I> queue(f);
+    constexpr auto impl_type = mln::morpho::experimental::details::pqueue_impl::vector;
+    mln::morpho::experimental::details::pqueue_fifo<I, impl_type> queue(f);
 
     queue.push(f(start), start);
     status(start) = INQUEUE;
@@ -62,33 +68,39 @@ namespace  mln::morpho::experimental::canvas
     {
       P    p             = start;
       auto current_level = f(start);
+      int  pstatus;
 
     flood:
       viz.on_flood_start(current_level, p);
+      pstatus = 0;
 
     keep_flooding:
-      for (auto n : nbh(p))
+
+      for (int k = 1; auto n : nbh(p))
       {
-        if (status.at(n) != NONE)
+        int mask = 1 << k++;
+        if ((pstatus & mask) || status.at(n) != NONE)
           continue;
 
         // Insert n INQUEUE
         auto nval = f(n);
         status(n) = INQUEUE;
         queue.push(nval, n);
+        pstatus |= mask;
 
         // If the neighbor is lower, postpone the neighbor
         if (nval <= current_level)
           continue;
 
         // Otherwise, process it, (do not remove p from stack)
+        status(p)     = pstatus;
         current_level = nval;
         p             = n;
         goto flood;
       }
 
       // All the neighbors have been seen, p is DONE
-      status(p) = DONE;
+      // status(p) = DONE;
       viz.on_done(current_level, p);
       queue.pop();
 
@@ -99,6 +111,7 @@ namespace  mln::morpho::experimental::canvas
       {
         auto old_level = current_level;
         std::tie(current_level, p) = queue.top();
+        pstatus                    = status(p);
         if (current_level == old_level)
           goto keep_flooding;
         viz.on_flood_end(old_level, current_level);

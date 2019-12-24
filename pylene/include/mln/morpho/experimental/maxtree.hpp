@@ -14,6 +14,7 @@ namespace mln::morpho::experimental
 {
 
   template <class I, class N>
+  [[gnu::noinline]]                                                                                //
   std::pair<component_tree<image_value_t<I>>, image_ch_value_t<I, component_tree<>::node_id_type>> //
   maxtree(I input, N nbh);
 
@@ -132,6 +133,7 @@ namespace mln::morpho::experimental
   } // namespace details
 
   template <class I, class N>
+  [[gnu::noinline]]                                                                                //
   std::pair<component_tree<image_value_t<I>>, image_ch_value_t<I, component_tree<>::node_id_type>> //
   maxtree(I input, N nbh)
   {

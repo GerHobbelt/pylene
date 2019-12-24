@@ -4,16 +4,25 @@
 
 
 #include <mln/morpho/experimental/private/hpqueue.hpp>
+#include <mln/morpho/experimental/private/hlinked_lists.hpp>
+#include <mln/morpho/experimental/private/hvector.hpp>
 
 namespace mln::morpho::experimental::details
 {
+  enum class pqueue_impl
+  {
+    linked_list,
+    vector,
+  };
 
   /// Provides a priority queue of points with a the fifo property
-  template <class I, bool reversed = false>
+  template <class I, pqueue_impl impl_selector = pqueue_impl::linked_list, bool reversed = false>
   class pqueue_fifo
   {
     using key_type   = image_value_t<I>;
     using value_type = image_point_t<I>;
+
+
 
   public:
     template <class J>
@@ -32,7 +41,11 @@ namespace mln::morpho::experimental::details
 
     static constexpr int nvalues = std::numeric_limits<key_type>::max() + 1;
 
-    detail::hpqueue<nvalues, value_type, image_ch_value_t<I, value_type>, reversed> m_delegate;
+    using impl_t = std::conditional_t<impl_selector == pqueue_impl::linked_list,
+                                      hlinked_lists<nvalues, value_type, image_ch_value_t<I, value_type>>, //
+                                      hvectors<value_type>>;
+
+    detail::hpqueue<nvalues, value_type, impl_t, reversed> m_delegate;
   };
 
 
@@ -40,47 +53,47 @@ namespace mln::morpho::experimental::details
   /****          Implementation          ****/
   /******************************************/
 
-  template <class I, bool reverse>
+  template <class I, pqueue_impl impl_selector, bool reverse>
   template <class J>
-  inline pqueue_fifo<I, reverse>::pqueue_fifo(J&& f)
+  inline pqueue_fifo<I, impl_selector, reverse>::pqueue_fifo(J&& f)
     : m_delegate{std::forward<J>(f)}
   {
   }
 
-  template <class I, bool reverse>
-  inline void pqueue_fifo<I, reverse>::push(const key_type& k, const value_type& v)
+  template <class I, pqueue_impl impl_selector, bool reverse>
+  inline void pqueue_fifo<I, impl_selector, reverse>::push(const key_type& k, const value_type& v)
   {
     m_delegate.push_last(k, v);
   }
 
-  template <class I, bool reverse>
-  inline void pqueue_fifo<I, reverse>::push_first(const key_type& k, const value_type& v)
+  template <class I, pqueue_impl impl_selector, bool reverse>
+  inline void pqueue_fifo<I, impl_selector, reverse>::push_first(const key_type& k, const value_type& v)
   {
     m_delegate.push_first(k, v);
   }
 
 
-  template <class I, bool reverse>
-  inline void pqueue_fifo<I, reverse>::pop()
+  template <class I, pqueue_impl impl_selector, bool reverse>
+  inline void pqueue_fifo<I, impl_selector, reverse>::pop()
   {
     m_delegate.pop();
   }
 
-  template <class I, bool reverse>
-  inline bool pqueue_fifo<I, reverse>::empty() const
+  template <class I, pqueue_impl impl_selector, bool reverse>
+  inline bool pqueue_fifo<I, impl_selector, reverse>::empty() const
   {
     return m_delegate.empty();
   }
 
 
-  template <class I, bool reverse>
-  inline auto pqueue_fifo<I, reverse>::top() const -> std::pair<key_type, value_type>
+  template <class I, pqueue_impl impl_selector, bool reverse>
+  inline auto pqueue_fifo<I, impl_selector, reverse>::top() const -> std::pair<key_type, value_type>
   {
     return m_delegate.top();
   }
 
-  template <class I, bool reverse>
-  inline bool pqueue_fifo<I, reverse>::has_key(const key_type& k) const
+  template <class I, pqueue_impl impl_selector, bool reverse>
+  inline bool pqueue_fifo<I, impl_selector, reverse>::has_key(const key_type& k) const
   {
     return m_delegate.has_key(k);
   }

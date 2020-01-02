@@ -43,8 +43,8 @@ target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 
 
 # Set sources
-file(GLOB_RECURSE sources "include/mln/*.hpp")
-target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
+#file(GLOB_RECURSE sources "include/mln/*.hpp")
+#target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
                src/core/se/disc.cpp
@@ -93,11 +93,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 
 add_library(Pylene::Pylene ALIAS Pylene)
 
+include(GNUInstallDirs)
 install(TARGETS Pylene
-        EXPORT PyleneTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION include)
+        EXPORT PyleneTargets)
 
 write_basic_package_version_file(
     PyleneConfigVersion.cmake
@@ -114,15 +112,16 @@ configure_file(
 install(EXPORT PyleneTargets
         FILE PyleneTargets.cmake
         NAMESPACE Pylene::
-        DESTINATION lib/cmake/pylene
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
         )
+
 install(DIRECTORY include/mln
-        DESTINATION include)
+        TYPE INCLUDE)
 
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake
-        DESTINATION lib/cmake/pylene)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
 
 # GCC8 has enoying random compilation failures
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)

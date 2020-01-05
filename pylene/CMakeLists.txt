@@ -62,6 +62,7 @@ target_sources(Pylene PRIVATE
                src/io/imread.cpp
                src/io/imprint.cpp
                src/morpho/maxtree.cpp
+               src/morpho/immersion.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
                )

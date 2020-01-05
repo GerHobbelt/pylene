@@ -56,17 +56,18 @@ namespace mln::morpho::experimental
 
     /// \brief Compute attribute on values
     template <class I, class J, class Accu>
-    void compute_attribute_on_values(I node_map, J input, Accu acc);
-
-    /// \brief Compute attribute on values
-    template <class I, class J, class Accu>
-    void compute_attribute_on_pixels(I node_map, J input, Accu acc);
-
+    std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
+    compute_attribute_on_values(I node_map, J input, Accu acc);
 
     /// \brief Compute attribute on points
     template <class I, class Accu>
     std::vector<typename accu::result_of<Accu, image_point_t<I>>::type> //
     compute_attribute_on_points(I node_map, Accu acc);
+
+    /// \brief Compute attribute on values
+    template <class I, class J, class Accu>
+    void compute_attribute_on_pixels(I node_map, J input, Accu acc);
+
 
 
     /// \brief Reconstruct an image from an attribute map
@@ -235,6 +236,7 @@ namespace mln::morpho::experimental
   component_tree<void>::compute_attribute_on_points(I node_map, Accu acc)
   {
     static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<Accu, mln::Accumulator>());
     using R = typename accu::result_of<Accu, image_point_t<I>>::type;
 
     auto a = accu::make_accumulator(acc, image_point_t<I>());
@@ -259,6 +261,39 @@ namespace mln::morpho::experimental
 
     return out;
   }
+
+  template <class I, class J, class Accu>
+  std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
+  component_tree<void>::compute_attribute_on_values(I node_map, J input, Accu acc)
+  {
+    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<Accu, mln::Accumulator>());
+    using R = typename accu::result_of<Accu, image_value_t<J>>::type;
+
+    auto a = accu::make_accumulator(acc, image_value_t<J>());
+
+    std::vector<decltype(a)> attr(parent.size(), a);
+
+    // Accumulate for each point
+    auto zz = mln::view::zip(node_map, input);
+    mln_foreach_new((auto [node_id, val]), zz.values())
+      attr[node_id].take(val);
+
+
+    // Propgate to parent
+    std::size_t n = parent.size();
+    for (std::size_t i = n - 1; i > 0; --i)
+      attr[parent[i]].take(attr[i]);
+
+
+    // Extract values
+    std::vector<R> out(n);
+    for (std::size_t i = 0; i < n; ++i)
+      out[i] = attr[i].to_result();
+
+    return out;
+  }
+
 
 
 

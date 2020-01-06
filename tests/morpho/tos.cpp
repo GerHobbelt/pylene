@@ -12,22 +12,22 @@
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <gtest/gtest.h>
 
-
+#include "tos_tests_helper.hpp"
 
 
 TEST(ToSImmersion, twodimensional)
 {
   const mln::experimental::image2d<uint8_t> f = {{0, 1, 2}, //
-                                                    {3, 0, 1}};
+                                                 {3, 0, 1}};
 
 
   const mln::experimental::image2d<uint8_t> ref_inf = {{0, 0, 1, 1, 2}, //
-                                                          {0, 0, 0, 0, 1}, //
-                                                          {3, 0, 0, 0, 1}};
+                                                       {0, 0, 0, 0, 1}, //
+                                                       {3, 0, 0, 0, 1}};
 
   const mln::experimental::image2d<uint8_t> ref_sup = {{0, 1, 1, 2, 2}, //
-                                                          {3, 3, 1, 2, 2}, //
-                                                          {3, 3, 0, 1, 1}};
+                                                       {3, 3, 1, 2, 2}, //
+                                                       {3, 3, 0, 1, 1}};
 
 
   auto [inf, sup] = mln::morpho::experimental::details::immersion(f);
@@ -39,17 +39,18 @@ TEST(ToSImmersion, twodimensional_generic)
 {
   using namespace mln::view::ops;
   const mln::experimental::image2d<uint8_t> f = {{0, 1, 2}, //
-                                                    {3, 0, 1}};
+                                                 {3, 0, 1}};
+
   auto fprime = f * uint8_t(1);
 
 
   const mln::experimental::image2d<uint8_t> ref_inf = {{0, 0, 1, 1, 2}, //
-                                                          {0, 0, 0, 0, 1}, //
-                                                          {3, 0, 0, 0, 1}};
+                                                       {0, 0, 0, 0, 1}, //
+                                                       {3, 0, 0, 0, 1}};
 
   const mln::experimental::image2d<uint8_t> ref_sup = {{0, 1, 1, 2, 2}, //
-                                                          {3, 3, 1, 2, 2}, //
-                                                          {3, 3, 0, 1, 1}};
+                                                       {3, 3, 1, 2, 2}, //
+                                                       {3, 3, 0, 1, 1}};
 
 
   auto [inf, sup] = mln::morpho::experimental::details::immersion(fprime);
@@ -247,5 +248,6 @@ TEST(ToSConstruction, saddle_point)
                                                                              {a, a, a, a, a, a, a}, //
                                                                              {a, a, a, a, a, a, a}, //
                                                                              {a, a, a, a, a, a, a}};
-  mln::morpho::experimental::tos(f, {0,0});
+  auto [tree, node_map ] = mln::morpho::experimental::tos(f, {0,0});
+  compare_tree_to_ref(tree, node_map, ref_parent, ref_roots);
 }

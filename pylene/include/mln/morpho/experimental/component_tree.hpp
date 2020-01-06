@@ -236,7 +236,7 @@ namespace mln::morpho::experimental
   component_tree<void>::compute_attribute_on_points(I node_map, Accu acc)
   {
     static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<Accu, mln::Accumulator>());
+    static_assert(mln::is_a<Accu, mln::AccumulatorLike>());
     using R = typename accu::result_of<Accu, image_point_t<I>>::type;
 
     auto a = accu::make_accumulator(acc, image_point_t<I>());
@@ -267,7 +267,7 @@ namespace mln::morpho::experimental
   component_tree<void>::compute_attribute_on_values(I node_map, J input, Accu acc)
   {
     static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<Accu, mln::Accumulator>());
+    static_assert(mln::is_a<Accu, mln::AccumulatorLike>());
     using R = typename accu::result_of<Accu, image_value_t<J>>::type;
 
     auto a = accu::make_accumulator(acc, image_value_t<J>());

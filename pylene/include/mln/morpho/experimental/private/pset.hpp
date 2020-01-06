@@ -89,7 +89,7 @@ namespace mln::morpho::experimental::details
   auto pset<I>::try_pop(int level) noexcept -> std::optional<Point>
   {
     if (m_delegate.empty(level))
-      return {};
+      return std::nullopt;
     m_size--;
     return m_delegate.pop_front(level);
   }

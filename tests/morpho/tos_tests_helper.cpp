@@ -1,8 +1,8 @@
 #include "tos_tests_helper.hpp"
 
 #include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/ndimage.hpp>
-#include <mln/morpho/component_tree.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/morpho/experimental/component_tree.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -10,7 +10,7 @@ namespace
 {
 
   template <class I, class J>
-  void compare_tree_to_ref_T(const mln::morpho::component_tree<>& tree,        //
+  void compare_tree_to_ref_T(const mln::morpho::experimental::component_tree<>& tree,        //
                              const J&                                           node_map,    //
                              const I&                                           parents_ref, //
                              const I&                                           roots_ref)
@@ -21,16 +21,14 @@ namespace
     auto pmax = node_map.domain().br();
 
     std::size_t    n = par.size();
-    std::vector<P> repr_data(n + 1, pmax);
+    std::vector<P> repr(n, pmax);
 
-    P* repr = repr_data.data() + 1;
-    mln_foreach(auto px, node_map.pixels())
+    mln_foreach_new(auto px, node_map.new_pixels())
     {
       int id = px.val();
       P   p    = px.point();
       repr[id] = std::min(repr[id], p);
     }
-    repr[-1] = repr[0];
 
     // Build parent image
     auto roots = mln::transform(node_map, [&repr](int x) { return repr[x]; });
@@ -43,18 +41,18 @@ namespace
 }
 
 
-void compare_tree_to_ref(const mln::morpho::component_tree<>&            tree,
-                         const mln::image2d<int>&                        node_map,
-                         const mln::image2d<mln::point2d>& parents,
-                         const mln::image2d<mln::point2d>& roots)
+void compare_tree_to_ref(const mln::morpho::experimental::component_tree<>&            tree,
+                         const mln::experimental::image2d<int>&                        node_map,
+                         const mln::experimental::image2d<mln::experimental::point2d>& parents,
+                         const mln::experimental::image2d<mln::experimental::point2d>& roots)
 {
   compare_tree_to_ref_T(tree, node_map, parents, roots);
 }
 
-void compare_tree_to_ref(const mln::morpho::component_tree<>&            tree,
-                         const mln::image3d<int>&                        node_map,
-                         const mln::image3d<mln::point3d>& parents,
-                         const mln::image3d<mln::point3d>& roots)
+void compare_tree_to_ref(const mln::morpho::experimental::component_tree<>&            tree,
+                         const mln::experimental::image2d<int>&                        node_map,
+                         const mln::experimental::image3d<mln::experimental::point3d>& parents,
+                         const mln::experimental::image3d<mln::experimental::point3d>& roots)
 {
   compare_tree_to_ref_T(tree, node_map, parents, roots);
 }

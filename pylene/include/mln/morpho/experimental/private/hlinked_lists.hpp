@@ -31,6 +31,13 @@ namespace  mln::morpho::experimental::details
     P                   front(int level) const noexcept;
     bool                empty(int level) const noexcept;
 
+    /// Get the level 𝑙 of the lowest non-empty queue with level ≤ 𝑙
+    /// such that every queue at level x with level ≤ x < 𝑙 are empty.
+    int lower_bound(int level) const noexcept;
+
+    /// Get the level 𝑙 of the highest non-empty queue with 𝑙 < level
+    /// such that every queue at level x with  𝑙 < x ≤ level are empty.
+    int upper_bound(int level) const noexcept;
 
   private:
     struct node_t
@@ -127,6 +134,28 @@ namespace  mln::morpho::experimental::details
     mln_precondition(m_lists[level].size > 0 && "Empty list");
     return m_lists[level].tail;
   }
+
+  template <int N, class P, class LinkImage>
+  inline int hlinked_lists<N, P, LinkImage>::lower_bound(int level) const noexcept
+  {
+    mln_precondition(level < N);
+
+    while (level < N && m_lists[level].size == 0)
+      ++level;
+    return level;
+  }
+
+  template <int N, class P, class LinkImage>
+  inline int hlinked_lists<N, P, LinkImage>::upper_bound(int level) const noexcept
+  {
+    mln_precondition(level < N);
+
+    while (level >= 0 && m_lists[level].size == 0)
+      --level;
+    return level;
+  }
+
+
 
 
 } // namespace mln::morpho::experimental::detail

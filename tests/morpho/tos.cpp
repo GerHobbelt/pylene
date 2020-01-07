@@ -5,6 +5,7 @@
 
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
+#include <mln/core/image/view/cast.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/accu/accumulators/max.hpp>
 
@@ -97,7 +98,7 @@ TEST(ToSImmersion, threedimensional)
 
 
 template <class I, class J>
-void test_propagation(I& f, J& ref)
+void test_propagation(I f, J& ref)
 {
   //std::vector<P> indexes;
 
@@ -223,6 +224,49 @@ TYPED_TEST(ToSPropagation, chessboard)
   test_propagation(f, ref);
 }
 
+
+TYPED_TEST(ToSPropagation, input_has_no_border)
+{
+  TypeParam data[] = {0, 0, 0, 0, //
+                      0, 2, 3, 0, //
+                      0, 0, 2, 0, //
+                      1, 2, 0, 0};
+
+  int  sizes[] = {4, 4};
+  auto f       = mln::experimental::image2d<TypeParam>::from_buffer(data, sizes);
+
+  const mln::experimental::image2d<int> ref = {{0, 0, 0, 0, 0, 0, 0}, //
+                                               {0, 0, 0, 0, 0, 0, 0}, //
+                                               {0, 0, 2, 2, 3, 0, 0}, //
+                                               {0, 0, 0, 0, 2, 0, 0}, //
+                                               {0, 0, 0, 0, 2, 0, 0}, //
+                                               {0, 0, 0, 0, 0, 0, 0}, //
+                                               {1, 1, 2, 0, 0, 0, 0}};
+
+  test_propagation(f, ref);
+}
+
+
+TYPED_TEST(ToSPropagation, input_is_a_view)
+{
+  using namespace mln::view::ops;
+
+  const mln::experimental::image2d<TypeParam> f = {{0, 0, 0, 0}, //
+                                                   {0, 2, 3, 0}, //
+                                                   {0, 0, 2, 0}, //
+                                                   {1, 2, 0, 0}};
+
+  const mln::experimental::image2d<int> ref = {{0, 0, 0, 0, 0, 0, 0}, //
+                                               {0, 0, 0, 0, 0, 0, 0}, //
+                                               {0, 0, 2, 2, 3, 0, 0}, //
+                                               {0, 0, 0, 0, 2, 0, 0}, //
+                                               {0, 0, 0, 0, 2, 0, 0}, //
+                                               {0, 0, 0, 0, 0, 0, 0}, //
+                                               {1, 1, 2, 0, 0, 0, 0}};
+  test_propagation(mln::view::cast<TypeParam>(2 * f), ref);
+}
+
+
 TEST(ToSConstruction, saddle_point)
 {
   const mln::experimental::image2d<uint8_t> f = {{0, 0, 0, 0}, //
@@ -249,5 +293,91 @@ TEST(ToSConstruction, saddle_point)
                                                                              {a, a, a, a, a, a, a}, //
                                                                              {a, a, a, a, a, a, a}};
   auto [tree, node_map ] = mln::morpho::experimental::tos(f, {0,0});
+  compare_tree_to_ref(tree, node_map, ref_parent, ref_roots);
+}
+
+TEST(ToSConstruction, two_branches_with_parallel_flooding)
+{
+  const mln::experimental::image2d<uint8_t> f = {{0, 0, 0, 0}, //
+                                                 {0, 2, 3, 0}, //
+                                                 {0, 0, 2, 0}, //
+                                                 {1, 2, 0, 0}};
+
+
+  const mln::experimental::point2d a = {0, 0};
+  const mln::experimental::point2d b = {2, 2};
+  const mln::experimental::point2d c = {2, 4};
+  const mln::experimental::point2d d = {6, 0};
+  const mln::experimental::point2d e = {6, 2};
+
+  const mln::experimental::image2d<mln::experimental::point2d> ref_parent = {{a, a, a, a, a, a, a}, //
+                                                                             {a, a, a, a, a, a, a}, //
+                                                                             {a, a, a, b, b, a, a}, //
+                                                                             {a, a, a, a, b, a, a}, //
+                                                                             {a, a, a, a, b, a, a}, //
+                                                                             {a, a, a, a, a, a, a}, //
+                                                                             {a, d, d, a, a, a, a}};
+
+  const mln::experimental::image2d<mln::experimental::point2d> ref_roots = {{a, a, a, a, a, a, a}, //
+                                                                            {a, a, a, a, a, a, a}, //
+                                                                            {a, a, b, b, c, a, a}, //
+                                                                            {a, a, a, a, b, a, a}, //
+                                                                            {a, a, a, a, b, a, a}, //
+                                                                            {a, a, a, a, a, a, a}, //
+                                                                            {d, d, e, a, a, a, a}};
+  auto [tree, node_map ] = mln::morpho::experimental::tos(f, {0,0});
+  compare_tree_to_ref(tree, node_map, ref_parent, ref_roots);
+}
+
+TEST(ToSConstruction, branches_with_parallel_flooding_3d)
+{
+  const mln::experimental::image3d<uint8_t> ima = {{{0, 0, 0},  //
+                                                    {0, 2, 3},  //
+                                                    {0, 0, 2}}, //
+                                                   {{1, 0, 1},  //
+                                                    {0, 2, 1},  //
+                                                    {1, 0, 2}}};
+
+  const mln::experimental::point3d a = {0, 0, 0};
+  const mln::experimental::point3d b = {2, 0, 0};
+  const mln::experimental::point3d c = {2, 4, 0};
+  const mln::experimental::point3d d = {1, 2, 3};
+  const mln::experimental::point3d e = {0, 2, 2};
+  const mln::experimental::point3d f = {0, 2, 4};
+
+  const mln::experimental::image3d<mln::experimental::point3d> ref_roots = {{{a, a, a, a, a},  //
+                                                                             {a, a, a, a, a},  //
+                                                                             {a, a, e, e, f},  //
+                                                                             {a, a, a, a, e},  //
+                                                                             {a, a, a, a, e}}, //
+                                                                            {{a, a, a, a, a},  //
+                                                                             {a, a, a, a, a},  //
+                                                                             {a, a, e, d, d},  //
+                                                                             {a, a, a, a, d},  //
+                                                                             {a, a, a, a, e}}, //
+                                                                            {{b, a, a, a, d},  //
+                                                                             {a, a, a, a, d},  //
+                                                                             {a, a, e, d, d},  //
+                                                                             {a, a, a, a, d},  //
+                                                                             {c, a, a, a, e}}};
+
+
+  const mln::experimental::image3d<mln::experimental::point3d> ref_parent = {{{a, a, a, a, a},  //
+                                                                              {a, a, a, a, a},  //
+                                                                              {a, a, d, e, e},  //
+                                                                              {a, a, a, a, e},  //
+                                                                              {a, a, a, a, e}}, //
+                                                                             {{a, a, a, a, a},  //
+                                                                              {a, a, a, a, a},  //
+                                                                              {a, a, e, a, d},  //
+                                                                              {a, a, a, a, d},  //
+                                                                              {a, a, a, a, e}}, //
+                                                                             {{a, a, a, a, d},  //
+                                                                              {a, a, a, a, d},  //
+                                                                              {a, a, e, d, d},  //
+                                                                              {a, a, a, a, d},  //
+                                                                              {a, a, a, a, e}}};
+
+  auto [tree, node_map ] = mln::morpho::experimental::tos(ima, {0,0,0});
   compare_tree_to_ref(tree, node_map, ref_parent, ref_roots);
 }

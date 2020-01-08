@@ -45,7 +45,8 @@ namespace mln
 
     /// Type definitions
     /// \{
-    using point_type           = experimental::ndpoint<N>;
+    using point_type                = experimental::ndpoint<N, short>;
+    using fast_point_type           = experimental::ndpoint<N>;
     using value_type           = T;
     using reference            = T&;
     using const_reference      = const T&;
@@ -137,9 +138,9 @@ namespace mln
     [[deprecated]] T*       data() noexcept { return this->buffer(); }
     [[deprecated]] const T* data() const noexcept { return this->buffer(); }
 
-    index_type  index_of_point(point_type p) const noexcept;
-    point_type  point_at_index(index_type i) const noexcept;
-    index_type  delta_index(point_type p) const noexcept;
+    index_type  index_of_point(fast_point_type p) const noexcept;
+    fast_point_type  point_at_index(index_type i) const noexcept;
+    index_type  delta_index(fast_point_type p) const noexcept;
     /// \}
 
     /// Slicing & clipping operations
@@ -151,17 +152,17 @@ namespace mln
 
     /// Value access
     /// \{
-    const_reference operator()(point_type p) const noexcept;
-    reference       operator()(point_type p) noexcept;
-    const_reference at(point_type p) const noexcept;
-    reference       at(point_type p) noexcept;
+    const_reference operator()(fast_point_type p) const noexcept;
+    reference       operator()(fast_point_type p) noexcept;
+    const_reference at(fast_point_type p) const noexcept;
+    reference       at(fast_point_type p) noexcept;
     const_reference operator[](index_type i) const noexcept;
     reference       operator[](index_type i) noexcept;
 
-    new_pixel_type       new_pixel(point_type p) noexcept;
-    new_const_pixel_type new_pixel(point_type p) const noexcept;
-    new_pixel_type       new_pixel_at(point_type p) noexcept;
-    new_const_pixel_type new_pixel_at(point_type p) const noexcept;
+    new_pixel_type       new_pixel(fast_point_type p) noexcept;
+    new_const_pixel_type new_pixel(fast_point_type p) const noexcept;
+    new_pixel_type       new_pixel_at(fast_point_type p) noexcept;
+    new_const_pixel_type new_pixel_at(fast_point_type p) const noexcept;
 
 
     new_value_range       new_values() noexcept;
@@ -191,8 +192,8 @@ namespace mln
     std::ptrdiff_t __index_of_point(const int coords[]) const noexcept;
 
 
-    new_pixel_type       __pixel_at(point_type p) noexcept;
-    new_const_pixel_type __pixel_at(point_type p) const noexcept;
+    new_pixel_type       __pixel_at(fast_point_type p) noexcept;
+    new_const_pixel_type __pixel_at(fast_point_type p) const noexcept;
 
     // Get a data reference at the given coords
     T& __at(const int coords[]) const noexcept;
@@ -401,15 +402,15 @@ namespace mln
 
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::point_at_index(index_type i) const noexcept -> point_type
+  inline auto __ndbuffer_image<T, N>::point_at_index(index_type i) const noexcept -> fast_point_type
   {
-    point_type coords;
+    fast_point_type coords;
     Impl::get_point(this->__info(), i, coords.data());
     return coords;
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::index_of_point(point_type p) const noexcept -> index_type
+  inline auto __ndbuffer_image<T, N>::index_of_point(fast_point_type p) const noexcept -> index_type
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return Impl::get_index(this->__info(), p.data());
@@ -417,7 +418,7 @@ namespace mln
 
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::delta_index(point_type p) const noexcept -> index_type
+  inline auto __ndbuffer_image<T, N>::delta_index(fast_point_type p) const noexcept -> index_type
   {
     return Impl::get_index(this->__info(), p.data());
   }
@@ -476,74 +477,74 @@ namespace mln
 
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::operator()(point_type p) const noexcept -> const_reference
+  inline auto __ndbuffer_image<T, N>::operator()(fast_point_type p) const noexcept -> const_reference
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::operator()(point_type p) noexcept -> reference
+  inline auto __ndbuffer_image<T, N>::operator()(fast_point_type p) noexcept -> reference
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::__pixel_at(point_type p) const noexcept -> new_const_pixel_type
+  inline auto __ndbuffer_image<T, N>::__pixel_at(fast_point_type p) const noexcept -> new_const_pixel_type
   {
-    point_type lcoords = p;
+    fast_point_type lcoords = p;
     lcoords[0]         = 0;
     const T* lineptr   = Impl::get_pointer(this->__info(), lcoords.data());
     return new_const_pixel_type{{}, this->__info(), lineptr, p};
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::__pixel_at(point_type p) noexcept -> new_pixel_type
+  inline auto __ndbuffer_image<T, N>::__pixel_at(fast_point_type p) noexcept -> new_pixel_type
   {
-    point_type lcoords = p;
+    fast_point_type lcoords = p;
     lcoords[0]         = 0;
     T* lineptr         = Impl::get_pointer(this->__info(), lcoords.data());
     return new_pixel_type{{}, this->__info(), lineptr, p};
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::new_pixel(point_type p) const noexcept -> new_const_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel(fast_point_type p) const noexcept -> new_const_pixel_type
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::new_pixel(point_type p) noexcept -> new_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel(fast_point_type p) noexcept -> new_pixel_type
   {
     assert(Impl::is_point_in_domain(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::new_pixel_at(point_type p) const noexcept -> new_const_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel_at(fast_point_type p) const noexcept -> new_const_pixel_type
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::new_pixel_at(point_type p) noexcept -> new_pixel_type
+  inline auto __ndbuffer_image<T, N>::new_pixel_at(fast_point_type p) noexcept -> new_pixel_type
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return this->__pixel_at(p);
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::at(point_type p) const noexcept -> const_reference
+  inline auto __ndbuffer_image<T, N>::at(fast_point_type p) const noexcept -> const_reference
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());
   }
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::at(point_type p) noexcept -> reference
+  inline auto __ndbuffer_image<T, N>::at(fast_point_type p) noexcept -> reference
   {
     assert(Impl::is_point_valid(this->__info(), p.data()));
     return *Impl::get_pointer(this->__info(), p.data());

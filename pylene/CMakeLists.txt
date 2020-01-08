@@ -73,7 +73,11 @@ target_compile_features(Pylene PUBLIC cxx_std_20)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(Pylene PUBLIC -fconcepts)
-endif()
+endif ()
+
+if (PYLENE_BUILD_PYBIND)
+  set_property(TARGET Pylene PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif ()
 
 target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
 

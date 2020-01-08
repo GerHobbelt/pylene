@@ -137,6 +137,8 @@ namespace mln::morpho::experimental
   std::pair<component_tree<image_value_t<I>>, image_ch_value_t<I, component_tree<>::node_id_type>> //
   maxtree(I input, N nbh)
   {
+    mln_entering("mln::morpho::experimental::maxtree");
+
     using V = image_value_t<I>;
     constexpr std::size_t kStackReserve = 256;
 

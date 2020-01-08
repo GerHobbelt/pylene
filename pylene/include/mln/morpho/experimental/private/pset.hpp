@@ -1,7 +1,8 @@
 #pragma once
 
 
-#include <mln/morpho/experimental/private/hlinked_lists.hpp>
+#include <mln/morpho/experimental/private/hsimple_linked_lists.hpp>
+#include <mln/morpho/experimental/private/hvector_unbounded.hpp>
 #include <limits>
 #include <optional>
 
@@ -44,8 +45,9 @@ namespace mln::morpho::experimental::details
     static_assert(std::numeric_limits<Key>::digits <= 16);
     static constexpr int nLevel = 1 << std::numeric_limits<Key>::digits;
 
-    using link_image_t = image_ch_value_t<I, Point>;
-    using delegate_t = hlinked_lists<nLevel, Point, link_image_t>;
+    //using link_image_t = image_ch_value_t<I, Point>;
+    //using delegate_t = hsimple_linked_lists<nLevel, Point, link_image_t>;
+    using delegate_t = hvectors_unbounded<Point>;
 
     delegate_t  m_delegate;
     std::size_t m_size;
@@ -58,8 +60,8 @@ namespace mln::morpho::experimental::details
 
   template <class I>
   template <class J>
-  pset<I>::pset(J&& ima)
-    : m_delegate{std::forward<J>(ima)},
+  pset<I>::pset(J&&)
+    : m_delegate{nLevel},
       m_size{0}
   {
   }

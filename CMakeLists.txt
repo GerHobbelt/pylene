@@ -50,6 +50,7 @@ endif (USE_DISTCC)
 # CONFIGURATION OPTIONS
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
+option(PYLENE_BUILD_PYBIND "ON to build the python bindings with pybind11" ON)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 
 # Compiler configurations
@@ -146,6 +147,10 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_subdirectory(apps EXCLUDE_FROM_ALL)
 endif ()
 
+if (PYLENE_BUILD_PYBIND)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  add_subdirectory(pybind)
+endif()
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")

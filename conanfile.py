@@ -9,7 +9,7 @@ class Pylene(ConanFile):
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type"
     options = {"gtest": [True, False], "benchmark": [True, False], "freeimage": [
-        True, False], "boost": [True, False],
+        True, False], "boost": [True, False], "pybind": [True, False],
                # TO REMOVE once docker image is fixed with the buildfarm profile updated
                "boost_program_options": [True, False]}
     default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False",
@@ -53,3 +53,6 @@ class Pylene(ConanFile):
 
         if self.options.boost:
             self.requires("boost/1.69.0@conan/stable")
+
+        if self.options.pybind:
+            self.requires("pybind11/2.3.0@conan/stable")

@@ -40,8 +40,31 @@ namespace mln::morpho::experimental
     using node_map_t = int;
 
 
-
-
+    /// \brief Filter the tree given a predicate that removes some nodes according to the selected strategy.
+    ///
+    /// The parent array is updated, as well as the node_map if provided. It does not invalidate the node id, i.e. node
+    /// that remain keeps the same position.
+    ///
+    /// The strategy is one of DIRECT, MIN, MAX, SUBTRACTIVE
+    ///
+    /// * Min
+    /// A node is remove if it does not pass the predicate and
+    /// all its descendant are removed as well.
+    /// Formally, a component Γ is kept if 𝓒(Γ) with
+    /// 𝓒(Γ) = ⋁ { 𝓟(Γ'), Γ ⊆ Γ' }.
+    ///
+    /// * Max
+    /// A node is remove if every node in its childhood does not pass
+    /// the predicate. All its descendant are removed as well.  Formally, a
+    /// component Γ is kept if 𝓒(Γ) with 𝓒(Γ) = ⋀ { 𝓟(Γ'), Γ' ⊆ Γ }.
+    ///
+    /// * Direct
+    /// A node is remove if it does not pass the predicate, the others
+    /// remain.
+    ///
+    ///
+    /// \param strategy The filtering strategy
+    /// \param pred A boolean predicate for each node id
     template <class F>
     void filter(ct_filtering strategy, F pred);
 
@@ -51,36 +74,38 @@ namespace mln::morpho::experimental
 
 
     /// \brief Compute the depth attribute over a tree
-    std::vector<int> compute_depth_map() const;
+    std::vector<int> compute_depth() const;
 
 
     /// \brief Compute attribute on values
+    ///
+    /// Compute attribute with values given from an image
+    ///
+    /// \param node_map Image point -> node_id mapping
+    /// \param values Image point -> value mapping
+    /// \param acc Accumulator to apply on values
     template <class I, class J, class Accu>
     std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
-    compute_attribute_on_values(I node_map, J input, Accu acc);
+    compute_attribute_on_values(I node_map, J values, Accu acc);
 
-    /// \brief Compute attribute on points
+    /// \brief Compute attribute on values
+    ///
+    /// Compute attribute on points
+    ///
+    /// \param node_map Image point -> node_id mapping
+    /// \param values Image point -> value mapping
+    /// \param acc Accumulator to apply on points
     template <class I, class Accu>
     std::vector<typename accu::result_of<Accu, image_point_t<I>>::type> //
     compute_attribute_on_points(I node_map, Accu acc);
 
-    /// \brief Compute attribute on values
-    template <class I, class J, class Accu>
-    void compute_attribute_on_pixels(I node_map, J input, Accu acc);
-
-
 
     /// \brief Reconstruct an image from an attribute map
+    ///
+    /// \param node_map Image point -> node_id mapping
+    /// \param values node_id -> value mapping
     template <class I, class V>
     image_ch_value_t<I, V> reconstruct_from(I node_map, ::ranges::span<V> values) const;
-
-    template <class I, class F>
-    void update_node_map(I node_map, F pred) const;
-
-    /// \brief Filter an image
-
-    // template <class I, class J, class F>
-    // void filter(e_filtering strategy, I node_map, J input, ::ranges::span<V> values, F pred) const;
 
 
 
@@ -88,6 +113,10 @@ namespace mln::morpho::experimental
     std::vector<node_t> parent;
 
   private:
+    template <class I, class F>
+    void update_node_map(I node_map, F pred) const;
+
+
     void filter_direct(const std::vector<bool>& pred);
 
     template <class F>

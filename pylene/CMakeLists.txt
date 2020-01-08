@@ -65,6 +65,7 @@ target_sources(Pylene PRIVATE
                src/morpho/immersion.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
+               src/morpho/hvector_unbounded.cpp
                )
 
 # Compiler configurations

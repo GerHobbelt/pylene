@@ -2,6 +2,7 @@
 
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/trace.hpp>
@@ -21,6 +22,25 @@ namespace mln::morpho::experimental::details
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
+
+  template <class V>
+  struct irange
+  {
+    V inf;
+    V sup;
+  };
+
+
+  template <class I>
+  [[gnu::noinline]]
+  auto to_infsup(I inf, I sup)
+  {
+    mln_entering("mln::morpho::details::to_infsup");
+    using V = image_value_t<I>;
+    image_ch_value_t<I, irange<V>> out = imchvalue<irange<V>>(inf);
+    mln::transform(inf, sup, out, [](V a, V b) -> irange<V> { return {a, b}; });
+    return out;
+  }
 
 
   template <class I>
@@ -58,12 +78,13 @@ namespace mln::morpho::experimental::details
     // if (compute_indexes)
     //   sorted_indexes->reserve(ord.domain().size());
 
+    auto F = to_infsup(inf, sup);
+
     pset<I> queue(inf);
 
     auto p              = pstart;
     V    previous_level = inf(p);
     queue.insert(previous_level, p);
-    ord(p) = 0;
 
     // if (compute_indexes)
     //   sorted_indexes->push_back(p);
@@ -71,40 +92,50 @@ namespace mln::morpho::experimental::details
     int  depth    = 0;
     while (!queue.empty())
     {
-      V cur_level;
-      P p;
-
-      auto tmp = queue.try_pop(previous_level);
-      if (tmp.has_value())
-      {
-        cur_level = previous_level;
-        p         = tmp.value();
-      }
-      else
-      {
-        std::tie(cur_level, p) = queue.pop(previous_level);
+      auto [cur_level, p] = queue.pop(previous_level);
+      if (cur_level != previous_level)
         ++depth;
-      }
-      ord(p) = depth;
+
 
       // if (compute_indexes)
       //   sorted_indexes->push_back(p);
 
-      for (auto q : nbh(p))
+      bool has_nbh_at_level;
+      while (true)
       {
-        if (ord.at(q) == UNPROCESSED)
+
+        P nextp;
+        has_nbh_at_level = false;
+        ord(p)           = depth;
+
+        for (auto q : nbh(p))
         {
-          auto m = inf(q);
-          auto M = sup(q);
+          if (ord.at(q) != UNPROCESSED)
+            continue;
+
+          auto [m, M] = F(q);
           if (M < cur_level)
             queue.insert(M, q);
           else if (cur_level < m)
             queue.insert(m, q);
-          else
+          else  if (has_nbh_at_level)
             queue.insert(cur_level, q);
+          else
+          {
+            has_nbh_at_level = true;
+            nextp            = q;
+            continue;
+          }
           ord(q) = PROCESSED;
         }
+
+        // If propagation stops at this point
+        if (!has_nbh_at_level)
+          break;
+
+        p = nextp;
       }
+
       previous_level = cur_level;
     }
     max_depth = depth;

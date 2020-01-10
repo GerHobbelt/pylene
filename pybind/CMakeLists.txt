@@ -15,6 +15,8 @@ target_include_directories(Pylena PRIVATE
                            $<INSTALL_INTERFACE:include>)
 target_compile_features(Pylena PRIVATE cxx_std_20)
 
+add_sanitizers(Pylena)
+
 include(CTest)
 
 add_custom_target(run-all-pytests)

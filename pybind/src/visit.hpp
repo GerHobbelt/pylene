@@ -11,14 +11,14 @@ namespace mln::py
   {
     switch (tid)
     {
-    // case (mln::sample_type_id::INT8):
-    //   return F<std::int8_t>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT16):
-    //   return F<std::int16_t>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT32):
-    //   return F<std::int32_t>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT64):
-    //   return F<std::int64_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT8):
+      return F<std::int8_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT16):
+      return F<std::int16_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT32):
+      return F<std::int32_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT64):
+      return F<std::int64_t>{}(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT8):
       return F<std::uint8_t>{}(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT16):
@@ -45,14 +45,14 @@ namespace mln::py
   {
     switch (tid)
     {
-    // case (mln::sample_type_id::INT8):
-    //   return F<std::int8_t>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT16):
-    //   return F<std::int16_t>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT32):
-    //   return F<std::int32_t>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT64):
-    //   return F<std::int64_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT8):
+      return F<std::int8_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT16):
+      return F<std::int16_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT32):
+      return F<std::int32_t>{}(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT64):
+      return F<std::int64_t>{}(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT8):
       return F<std::uint8_t>{}(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT16):
@@ -79,14 +79,14 @@ namespace mln::py
   {
     switch (tid)
     {
-    // case (mln::sample_type_id::INT8):
-    //   return f.template call<std::int8_t>(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT16):
-    //   return f.template call<std::int16_t>(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT32):
-    //   return f.template call<std::int32_t>(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT64):
-    //   return f.template call<std::int64_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT8):
+      return f.template call<std::int8_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT16):
+      return f.template call<std::int16_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT32):
+      return f.template call<std::int32_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT64):
+      return f.template call<std::int64_t>(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT8):
       return f.template call<std::uint8_t>(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT16):
@@ -113,14 +113,14 @@ namespace mln::py
   {
     switch (tid)
     {
-    // case (mln::sample_type_id::INT8):
-    //   return f.template call<std::int8_t>(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT16):
-    //   return f.template call<std::int16_t>(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT32):
-    //   return f.template call<std::int32_t>(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::INT64):
-    //   return f.template call<std::int64_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT8):
+      return f.template call<std::int8_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT16):
+      return f.template call<std::int16_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT32):
+      return f.template call<std::int32_t>(std::forward<Args>(args)...);
+    case (mln::sample_type_id::INT64):
+      return f.template call<std::int64_t>(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT8):
       return f.template call<std::uint8_t>(std::forward<Args>(args)...);
     case (mln::sample_type_id::UINT16):

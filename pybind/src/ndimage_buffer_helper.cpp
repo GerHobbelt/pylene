@@ -61,7 +61,7 @@ namespace
 
 namespace mln::py
 {
-  void ndimage_from_buffer(mln::ndbuffer_image& m, ::py::buffer b)
+  mln::ndbuffer_image ndimage_from_buffer(::py::buffer b)
   {
     mln_entering("test");
 
@@ -85,7 +85,7 @@ namespace mln::py
       throw std::runtime_error("Unsupported image stride along the last dimension.");
     }
 
-    m = mln::ndbuffer_image::from_buffer(reinterpret_cast<std::byte*>(info.ptr), st, ndim, dims, strides);
+    return mln::ndbuffer_image::from_buffer(reinterpret_cast<std::byte*>(info.ptr), st, ndim, dims, strides);
   }
 
 

@@ -8,9 +8,9 @@
 namespace py = pybind11;
 
 
-void init_class_ndimage(pybind11::module& m)
+void init_class_ndimage(py::module& m)
 {
   py::class_<mln::ndbuffer_image>(m, "ndimage", py::buffer_protocol()) //
-      .def("__init__", mln::py::ndimage_from_buffer)
+      .def(py::init([](py::buffer b) { return mln::py::ndimage_from_buffer(b); }))
       .def_buffer(mln::py::ndimage_to_buffer);
 }

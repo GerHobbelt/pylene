@@ -8,7 +8,7 @@
 namespace mln::py
 {
 
-  void                  ndimage_from_buffer(mln::ndbuffer_image& m, pybind11::buffer b);
+  mln::ndbuffer_image   ndimage_from_buffer(pybind11::buffer b);
   pybind11::buffer_info ndimage_to_buffer(const mln::ndbuffer_image& img);
 
 } // namespace mln::py

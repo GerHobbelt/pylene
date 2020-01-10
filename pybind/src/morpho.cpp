@@ -35,14 +35,7 @@ namespace
 
   mln::ndbuffer_image dilate(py::buffer buffer, int disc_radius = 1)
   {
-    mln::ndbuffer_image input;
-    mln::py::ndimage_from_buffer(input, buffer);
-
-    if (input.border() < disc_radius)
-    {
-      mln::trace::warn("The border size is not large enough. The processing roi will be shrinked (2px).");
-      input.inflate_domain(disc_radius);
-    }
+    auto input = mln::py::ndimage_from_buffer(buffer);
 
     auto disc = mln::experimental::se::disc(disc_radius);
     if (input.pdim() == 2)

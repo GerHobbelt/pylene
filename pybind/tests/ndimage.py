@@ -11,9 +11,9 @@ import Pylena as pln
 
 class PylenaImage(ut.TestCase):
     def test_from_buffer(self):
-        ref = ref = np.array([[0, 0, 0, 0, 0], [0, 255, 255, 255, 0], [
+        ref = np.array([[0, 0, 0, 0, 0], [0, 255, 255, 255, 0], [
                              0, 255, 255, 255, 0], [0, 255, 255, 255, 0], [0, 0, 0, 0, 0]], dtype="uint8")
-        img = pln.Image(ref)
+        img = pln.ndimage(ref)
         # arr = pln.to_numpy(img)
         # self.assertEqual(ref.all(), arr.all())
 

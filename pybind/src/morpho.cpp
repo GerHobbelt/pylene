@@ -17,68 +17,21 @@ namespace py = pybind11;
 namespace
 {
 
-  template <typename T, int D>
-  struct dilate_operator_impl_t
+  template <typename T>
+  struct dilate2d_operator_t
   {
     template <typename Img, typename SE>
     mln::ndbuffer_image operator()(Img&& img, const SE& se) const
     {
-      if (auto* image_ptr = std::forward<Img>(img).template cast_to<T, D>(); image_ptr)
+      if (auto* image_ptr = std::forward<Img>(img).template cast_to<T, 2>(); image_ptr)
         return mln::morpho::experimental::dilation(*image_ptr, se);
       else
+      {
         std::runtime_error("Unable to convert the image to the required type.");
+        return {};
+      }
     }
   };
-
-  template <int D>
-  struct dilate_operator_impl_t<mln::rgb8, D>
-  {
-    template <typename Img, typename SE>
-    mln::ndbuffer_image operator()(Img&& img, const SE& se) const
-    {
-      std::runtime_error("Unsupported type.");
-      return {};
-    }
-  };
-
-  template <int D>
-  struct dilate_operator_t;
-
-  template <>
-  struct dilate_operator_t<1>
-  {
-    template <typename T>
-    using type = dilate_operator_impl_t<T, 1>;
-  };
-
-  template <>
-  struct dilate_operator_t<2>
-  {
-    template <typename T>
-    using type = dilate_operator_impl_t<T, 2>;
-  };
-
-  template <>
-  struct dilate_operator_t<3>
-  {
-    template <typename T>
-    using type = dilate_operator_impl_t<T, 3>;
-  };
-
-  template <>
-  struct dilate_operator_t<4>
-  {
-    template <typename T>
-    using type = dilate_operator_impl_t<T, 4>;
-  };
-
-  template <>
-  struct dilate_operator_t<5>
-  {
-    template <typename T>
-    using type = dilate_operator_impl_t<T, 5>;
-  };
-
 
   mln::ndbuffer_image dilate(py::buffer buffer, int disc_radius = 1)
   {
@@ -92,20 +45,14 @@ namespace
     }
 
     auto disc = mln::experimental::se::disc(disc_radius);
-    switch (input.pdim())
+    if (input.pdim() == 2)
     {
-    // case 1:
-    //   return mln::py::visit<dilate_operator_t<1>::type>(input.sample_type(), input, disc);
-    case 2:
-      return mln::py::visit<dilate_operator_t<2>::type>(input.sample_type(), input, disc);
-    case 3:
-      return mln::py::visit<dilate_operator_t<3>::type>(input.sample_type(), input, disc);
-    case 4:
-      return mln::py::visit<dilate_operator_t<4>::type>(input.sample_type(), input, disc);
-    // case 5:
-    //   return mln::py::visit<dilate_operator_t<5>::type>(input.sample_type(), input, disc);
-    default:
+      return mln::py::visit<dilate2d_operator_t>(input.sample_type(), input, disc);
+    }
+    else
+    {
       std::runtime_error("Unsupported dimension.");
+      return {};
     }
   }
 

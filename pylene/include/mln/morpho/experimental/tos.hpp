@@ -6,6 +6,8 @@
 #include <mln/morpho/experimental/private/propagation.hpp>
 #include <mln/core/image/view/cast.hpp>
 
+#include <range/v3/algorithm/transform.hpp>
+
 namespace mln::morpho::experimental
 {
 
@@ -35,6 +37,7 @@ namespace mln::morpho::experimental
 
     using Domain = image_domain_t<I>;
     using P = image_point_t<I>;
+    using V = image_value_t<I>;
 
     static_assert(std::is_same_v<Domain, mln::experimental::box2d> || std::is_same_v<Domain, mln::experimental::box3d>,
                   "Only 2D or 3D regular domain supported");
@@ -46,13 +49,21 @@ namespace mln::morpho::experimental
     auto [inf, sup] = details::immersion(input);
 
     image_ch_value_t<I, int> ord = imchvalue<int>(inf).adjust(nbh);
-    details::propagation(inf, sup, ord, pstart, max_depth);
+    auto depth2lvl = details::propagation(inf, sup, ord, pstart, max_depth);
 
     if (max_depth >= (1 << 16))
       throw std::runtime_error("The ToS is too deep (too many number of levels)");
 
     auto casted = mln::view::cast<uint16_t>(ord);
-    return maxtree(casted, nbh);
+    auto [t1, node_map] = maxtree(casted, nbh);
+
+    std::size_t n = t1.parent.size();
+    component_tree<V> t2;
+    t2.parent = std::move(t1.parent);
+    t2.values.resize(n);
+    ::ranges::transform(t1.values, std::begin(t2.values), [&depth2lvl](int l) -> V { return depth2lvl[l]; });
+
+    return std::make_pair(std::move(t2), std::move(node_map));
   }
 
 } // namespace mln::morpho::experimental

@@ -16,7 +16,8 @@ namespace mln::morpho::experimental::details
 {
   /// Propagation
   template <class I>
-  void propagation(I inf, I sup, image_ch_value_t<I, int> out, image_point_t<I> pstart, int& max_depth);
+  std::vector<image_value_t<I>> //
+  propagation(I inf, I sup, image_ch_value_t<I, int> out, image_point_t<I> pstart, int& max_depth);
 
 
   /******************************************/
@@ -44,13 +45,13 @@ namespace mln::morpho::experimental::details
 
 
   template <class I>
-  void propagation(I inf, I sup, image_ch_value_t<I, int> ord, image_point_t<I> pstart, int& max_depth)
+  std::vector<image_value_t<I>> //
+  propagation(I inf, I sup, image_ch_value_t<I, int> ord, image_point_t<I> pstart, int& max_depth)
   {
     mln_entering("mln::morpho::details::propagation");
 
     using P              = image_point_t<I>;
     using V              = image_value_t<I>;
-
 
     static_assert(P::ndim == 2 || P::ndim == 3, "Invalid number of dimension");
     assert(inf.domain() == sup.domain());
@@ -78,9 +79,11 @@ namespace mln::morpho::experimental::details
     // if (compute_indexes)
     //   sorted_indexes->reserve(ord.domain().size());
 
+
     auto F = to_infsup(inf, sup);
 
-    pset<I> queue(inf);
+    pset<I>        queue(inf);
+    std::vector<V> depth2lvl;
 
     auto p              = pstart;
     V    previous_level = inf(p);
@@ -90,12 +93,16 @@ namespace mln::morpho::experimental::details
     //   sorted_indexes->push_back(p);
 
     int  depth    = 0;
+    depth2lvl.push_back(previous_level);
+
     while (!queue.empty())
     {
       auto [cur_level, p] = queue.pop(previous_level);
       if (cur_level != previous_level)
+      {
         ++depth;
-
+        depth2lvl.push_back(cur_level);
+      }
 
       // if (compute_indexes)
       //   sorted_indexes->push_back(p);
@@ -139,6 +146,7 @@ namespace mln::morpho::experimental::details
       previous_level = cur_level;
     }
     max_depth = depth;
+    return depth2lvl;
   }
 
 

@@ -7,6 +7,7 @@ pybind11_add_module(Pylena MODULE
                     src/morpho.cpp
                     src/ndimage.cpp
                     src/ndimage_buffer_helper.cpp
+                    src/se.cpp
                     )
 
 target_link_libraries(Pylena PRIVATE Pylene::Pylene)
@@ -14,6 +15,8 @@ target_include_directories(Pylena PRIVATE
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
 target_compile_features(Pylena PRIVATE cxx_std_20)
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 
 # add_sanitizers(Pylena)
 

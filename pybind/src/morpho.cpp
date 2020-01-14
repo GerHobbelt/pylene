@@ -5,11 +5,15 @@
 
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
+#include <mln/core/se/rect2d.hpp>
+#include <mln/core/trace.hpp>
 #include <mln/morpho/experimental/dilation.hpp>
 
-#include <mln/core/trace.hpp>
-
 #include <fmt/core.h>
+
+#include <pybind11/stl.h>
+
+#include <variant>
 
 
 namespace py = pybind11;
@@ -33,14 +37,17 @@ namespace
     }
   };
 
-  mln::ndbuffer_image dilate(py::buffer buffer, int disc_radius = 1)
+  mln::ndbuffer_image
+  dilate(::py::buffer                                                                                 buffer,
+         const std::variant<mln::experimental::se::disc, mln::experimental::se::disc_non_decomp,
+                            mln::experimental::se::rect2d, mln::experimental::se::rect2d_non_decomp>& se)
   {
     auto input = mln::py::ndimage_from_buffer(buffer);
 
-    auto disc = mln::experimental::se::disc(disc_radius);
     if (input.pdim() == 2)
     {
-      return mln::py::visit<dilate2d_operator_t>(input.sample_type(), input, disc);
+      return std::visit(
+          [&input](auto&& se_) { return mln::py::visit<dilate2d_operator_t>(input.sample_type(), input, se_); }, se);
     }
     else
     {
@@ -54,11 +61,11 @@ namespace
 
 using namespace pybind11::literals;
 
-void init_module_morpho(py::module& m)
+void init_module_morpho(::py::module& m)
 {
   m.def("dilate", dilate,
         "Perform a morphological dilation.\n"
         "\n"
-        "disc_radius must be strictly superior to 0.",
-        "Input"_a, "disc_radius"_a = 1);
+        "structuring element must be valid.",
+        "Input"_a, "se"_a = 1);
 }

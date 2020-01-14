@@ -10,7 +10,8 @@ def test_from_buffer():
     ref = np.zeros((100, 100), dtype="uint8")
     ref[50, 50] = 255
     img = pln.ndimage(ref)
-    ret = pln.morpho.dilate(img, 30)
+    disc = pln.se.disc(30.);
+    ret = pln.morpho.dilate(img, disc)
     npret = np.array(ret)
 
     import matplotlib.pyplot as plt

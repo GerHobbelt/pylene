@@ -120,6 +120,9 @@ namespace mln
       using decomposable = std::true_type;
       using separable    = std::false_type;
 
+      /// Construct an empty disc
+      disc() = default;
+
       /// Constructs a disc of radius \p r with a given approximation.
       ///
       /// \param radius The radius r of the disc.
@@ -184,6 +187,12 @@ namespace mln
       int m_nlines; // number of periodic lines for decomposition (0 for the euclidean disc)
     };
 
+    struct disc_non_decomp : disc
+    {
+      using incremental  = std::false_type;
+      using decomposable = std::false_type;
+      using disc::disc;
+    };
   } // namespace experimental::se
 
 } // namespace mln

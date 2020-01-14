@@ -1,70 +1,91 @@
-#include <mln/accu/accumulators/count.hpp>
-#include <mln/accu/accumulators/infsup.hpp>
-#include <mln/accu/accumulators/variance.hpp>
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-#include <mln/morpho/component_tree/accumulate.hpp>
-#include <mln/morpho/component_tree/filtering.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/morpho/tos/tos.hpp>
+
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/accu/concept/accumulator.hpp>
+#include <mln/io/experimental/imread.hpp>
+#include <mln/io/experimental/imsave.hpp>
+#include <mln/morpho/experimental/tos.hpp>
+#include <mln/morpho/experimental/maxtree.hpp>
+
+
+struct my_accu_t : mln::Accumulator<my_accu_t>
+{
+  using result_type   = my_accu_t;
+  using argument_type = mln::image_pixel_t<mln::experimental::image2d<uint8_t>>;
+
+  my_accu_t() = default;
+
+  template <class Pix>
+  void take(Pix px)
+  {
+    auto p = px.point();
+    auto v = px.val();
+    m_count++;
+    m_sum += v;
+    m_sum_sqr += v * v;
+    m_xmin = std::min((int)p.x(), m_xmin);
+    m_xmax = std::max((int)p.x(), m_xmax);
+    m_ymin = std::min((int)p.y(), m_ymin);
+    m_ymax = std::max((int)p.y(), m_ymax);
+  }
+
+  void take(const my_accu_t& other)
+  {
+    m_count   += other.m_count;
+    m_sum     += other.m_sum;
+    m_sum_sqr += other.m_sum_sqr;
+    m_xmin    = std::min(m_xmin, other.m_xmin);
+    m_ymin    = std::min(m_ymin, other.m_ymin);
+    m_xmax    = std::max(m_xmax, other.m_xmax);
+    m_ymax    = std::max(m_ymax, other.m_ymax);
+  }
+
+  int count() const { return m_count; }
+  int area_bbox() const { return (m_xmax - m_xmin + 1) * (m_ymax - m_ymin + 1); }
+  double variance() const { return (m_sum_sqr - (m_sum * m_sum) / m_count) / m_count; }
+
+  my_accu_t to_result() const { return *this; }
+
+private:
+  int    m_count   = 0;
+  double m_sum     = 0;
+  double m_sum_sqr = 0;
+  int    m_xmin    = INT_MAX;
+  int    m_ymin    = INT_MAX;
+  int    m_xmax    = INT_MIN;
+  int    m_ymax    = INT_MIN;
+};
+
+
+
 
 int main()
 {
-  using mln::uint8;
-
-  mln::image2d<uint8> f;
-  mln::io::imread("images/roadsigns.png", f);
+  mln::experimental::image2d<uint8_t> f;
+  mln::io::experimental::imread("roadsigns.png", f);
 
   // Compute the ToS
-  auto t       = mln::morpho::tos(f);
-  using tree_t = decltype(t);
+  auto [t, node_map] = mln::morpho::experimental::tos(f, {0,0});
+
 
   // Set f to the right size
-  mln::image2d<uint8> f2;
-  {
-    mln::resize(f2, t._get_data()->m_pmap);
-    mln::box2d d = f2.domain();
-    mln::copy(f, f2 | mln::sbox2d{d.pmin, d.pmax, {2, 2}});
+  mln::experimental::image2d<uint8_t> f2 = t.reconstruct(node_map);
 
-    for (unsigned i = 0; i < f2.nrows(); i += 2)
-      for (unsigned j = 0; j < f2.ncols(); j += 2)
-      {
-        f2.at(i, j + 1)     = f2.at(i, j);
-        f2.at(i + 1, j)     = f2.at(i, j);
-        f2.at(i + 1, j + 1) = f2.at(i, j);
-      }
-  }
 
   // Compute the bounding box & the size of the component
-  auto prop_map = mln::morpho::paccumulate(
-      t, f2, mln::accu::features::inf<>() & mln::accu::features::sup<>() & mln::accu::features::count<>());
-
-  auto var_map = mln::morpho::vaccumulate(t, f2, mln::accu::features::variance<>());
+  auto prop_map = t.compute_attribute_on_pixels(node_map, f2, my_accu_t{});
 
   // Predicate: keep the node if it fits 95% of the bbox
   // and its size is less than 100000px
-  auto pred = [&prop_map, &var_map](tree_t::vertex_id_t x) {
-    mln::point2d pmin      = mln::accu::extractor::inf(prop_map[x]);
-    mln::point2d pmax      = mln::accu::extractor::sup(prop_map[x]);
-    unsigned     sz        = mln::accu::extractor::count(prop_map[x]);
-    unsigned     area_bbox = (pmax[0] - pmin[0] + 1) * (pmax[1] - pmin[1] + 1);
-    double       var       = var_map[x];
-    return sz > (0.95 * area_bbox) and sz > 10000 and sz < 1000000 and var > 250;
+  auto pred = [&prop_map](int x) {
+    int sz = prop_map[x].count();
+    return sz > (0.95 * prop_map[x].area_bbox()) && sz > 10000 and sz < 1000000 and prop_map[x].variance() > 250;
   };
 
-  auto pred_ = mln::make_functional_property_map<tree_t::vertex_id_t>(pred);
-
   // Filter
-  mln::morpho::filter_direct_inplace(t, pred_);
+  t.filter(mln::morpho::experimental::CT_FILTER_DIRECT, node_map, pred);
 
   // Reconstruct
-  mln::image2d<uint8> out;
-  mln::resize(out, t._get_data()->m_pmap);
-
-  auto vmap = mln::morpho::make_attribute_map_from_image(t, f2);
-  mln::morpho::reconstruction(t, vmap, out);
-  mln::io::imsave(out, "images/roadsigns-square-2.png");
+  t.values[0] = 0;
+  auto out = t.reconstruct(node_map);
+  mln::io::experimental::imsave(out, "roadsigns-square-2.png");
 }

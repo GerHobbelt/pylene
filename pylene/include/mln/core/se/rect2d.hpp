@@ -1,9 +1,9 @@
 #pragma once
 
 #include <mln/core/box.hpp>
+#include <mln/core/rangev3/view/ravel.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
 #include <mln/core/se/private/se_facade.hpp>
-#include <mln/core/rangev3/view/ravel.hpp>
 
 // [legacy]
 #include <mln/core/domain/box.hpp>
@@ -84,6 +84,12 @@ namespace mln
       mln::experimental::box2d m_dpoints;
     };
 
+    struct rect2d_non_decomp : rect2d
+    {
+      using incremental  = std::false_type;
+      using decomposable = std::false_type;
+      using rect2d::rect2d;
+    };
 
   } // namespace experimental::se
 

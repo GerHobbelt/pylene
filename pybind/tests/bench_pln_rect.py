@@ -62,7 +62,7 @@ def print_results(times):
             t["number"], t["Pylena"], t["PylenaD"]
         ))
 
-def plot_results(times, size):
+def plot_results_by_SE(times, size):
     x = [x["width"] for x in rect_sizes_list]
     y_pln = []
     y_plnD = []
@@ -71,10 +71,7 @@ def plot_results(times, size):
             y_pln.append(t["Pylena"])
             y_plnD.append(t["PylenaD"])
 
-    plt.figure("Original image")
-    plt.imshow(ref)
-
-    plt.figure("Benchmarks")
+    plt.figure("Benchmarks: Time vs. SE size")
 
     plt.plot(x, y_pln, label="Pylena")
     plt.plot(x, y_plnD, label="Pylena Decomp")
@@ -84,11 +81,32 @@ def plot_results(times, size):
     plt.title(
         "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))
     plt.legend()
-    plt.show()
+
+def plot_results_by_pixels(times, rect_width, rect_height):
+    x = [x["width"] * x["height"] for x in sizes_list]
+    y_pln = []
+    y_plnD = []
+    y_skimage = []
+    y_cv = []
+    for t in times:
+        if t["rect"]["width"] == rect_width and t["rect"]["height"] == rect_height:
+            y_pln.append(t["Pylena"])
+            y_plnD.append(t["PylenaD"])
+
+    plt.figure("Benchmarks: Time vs. Image size")
+
+    plt.plot(x, y_pln, label="Pylena")
+    plt.plot(x, y_plnD, label="Pylena Decomp")
+
+    plt.xlabel("Pixel number")
+    plt.ylabel("Time (s)")
+    plt.title(
+        "dilation ({}x{}) SE, {} iterations".format(rect_width, rect_width, number))
+    plt.legend()
 
 
 def main_bench():
-    global rect_width, rect_height, sizes, radius
+    global rect_width, rect_height, sizes, radius, ref
 
     times = []
 
@@ -98,7 +116,7 @@ def main_bench():
         for rect in get_rect_sizes():
             rect_width = rect["width"]
             rect_height = rect["height"]
-            print("Benching {} dilations of {}x{} uint8, rect={}x{}...".format(
+            print("Benchmarking {} dilations of {}x{} uint8, rect={}x{}...".format(
                 number, s["width"], s["height"], rect["width"], rect["height"]
             ))
 
@@ -126,4 +144,11 @@ def main_bench():
 if __name__ == "__main__":
     times = main_bench()
     print_results(times)
-    plot_results(times, {"width": 1000, "height": 1000})
+
+    plt.figure("Original image")
+    plt.imshow(ref)
+
+    plot_results_by_SE(times, {"width": 1000, "height": 1000})
+    plot_results_by_pixels(times, rect_width=15, rect_height=15)
+
+    plt.show()

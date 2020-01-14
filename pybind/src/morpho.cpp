@@ -21,11 +21,14 @@ namespace py = pybind11;
 namespace
 {
 
+  using se_t = std::variant<mln::experimental::se::disc, mln::experimental::se::disc_non_decomp,
+                            mln::experimental::se::rect2d, mln::experimental::se::rect2d_non_decomp>;
+
   template <typename T>
   struct dilate2d_operator_t
   {
     template <typename Img, typename SE>
-    mln::ndbuffer_image operator()(Img&& img, const SE& se) const
+    mln::ndbuffer_image operator()(Img&& img, SE se) const
     {
       if (auto* image_ptr = std::forward<Img>(img).template cast_to<T, 2>(); image_ptr)
         return mln::morpho::experimental::dilation(*image_ptr, se);
@@ -37,17 +40,14 @@ namespace
     }
   };
 
-  mln::ndbuffer_image
-  dilate(::py::buffer                                                                                 buffer,
-         const std::variant<mln::experimental::se::disc, mln::experimental::se::disc_non_decomp,
-                            mln::experimental::se::rect2d, mln::experimental::se::rect2d_non_decomp>& se)
+  mln::ndbuffer_image dilate(::py::buffer buffer, const se_t& se)
   {
     auto input = mln::py::ndimage_from_buffer(buffer);
 
     if (input.pdim() == 2)
     {
       return std::visit(
-          [&input](auto&& se_) { return mln::py::visit<dilate2d_operator_t>(input.sample_type(), input, se_); }, se);
+          [&input](const auto& se_) { return mln::py::visit<dilate2d_operator_t>(input.sample_type(), input, se_); }, se);
     }
     else
     {
@@ -67,5 +67,5 @@ void init_module_morpho(::py::module& m)
         "Perform a morphological dilation.\n"
         "\n"
         "structuring element must be valid.",
-        "Input"_a, "se"_a = 1);
+        "Input"_a, "se"_a);
 }

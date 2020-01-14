@@ -66,6 +66,8 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 add_benchmark(BMAlgorithms              BMAlgorithms.cpp BMAlgorithms_main.cpp)
 add_benchmark(BMNeighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
 add_benchmark(BMRotation                BMRotation.cpp)
+add_benchmark(BMMorphoMaxtree           BMMorphoMaxtree.cpp)
+add_benchmark(BMMorphoTos               BMMorphoTos.cpp)
 add_benchmark(BMMorphoBase              BMMorphoBase.cpp)
 add_benchmark(BMMorphoBaseRef           BMMorphoBaseRef.cpp)
 add_benchmark(BMMorphers                BMMorphers.cpp BMMorphers_main.cpp)

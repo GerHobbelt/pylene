@@ -1,48 +1,63 @@
 #include "tos_tests_helper.hpp"
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/image3d.hpp>
-#include <mln/morpho/component_tree/component_tree.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
 
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/morpho/experimental/component_tree.hpp>
 
-template <class ParentImageType>
-ParentImageType
-    tree_as_parent_image(const mln::morpho::component_tree<unsigned, mln_ch_value(ParentImageType, unsigned)>& tree,
-                         ParentImageType& rootimage)
+#include <fixtures/ImageCompare/image_compare.hpp>
+
+namespace
 {
-  using tree_t = std::decay_t<decltype(tree)>;
 
-  const auto& pmap = tree._get_data()->m_pmap;
-
-  // Store the minimal index for each component
-  using P                            = mln_point(ParentImageType);
-  constexpr P                  UNDEF = mln::value_traits<P>::inf();
-  mln::property_map<tree_t, P> roots(tree, UNDEF);
-  mln_foreach (auto px, pmap.pixels())
+  template <class I, class J>
+  void compare_tree_to_ref_T(const mln::morpho::experimental::component_tree<>& tree,        //
+                             const J&                                           node_map,    //
+                             const I&                                           parents_ref, //
+                             const I&                                           roots_ref)
   {
-    auto  node_id = px.val();
-    auto& r       = roots[node_id];
-    if (r == UNDEF)
-      r = px.point();
+    using P = mln::image_point_t<J>;
+
+    const auto& par = tree.parent;
+    auto pmax = node_map.domain().br();
+
+    std::size_t    n = par.size();
+    std::vector<P> repr_data(n + 1, pmax);
+
+    P* repr = repr_data.data() + 1;
+    mln_foreach_new(auto px, node_map.new_pixels())
+    {
+      int id = px.val();
+      P   p    = px.point();
+      repr[id] = std::min(repr[id], p);
+    }
+    repr[-1] = repr[0];
+
+    // Build parent image
+    auto roots = mln::transform(node_map, [&repr](int x) { return repr[x]; });
+    auto parents = mln::transform(node_map, [&repr, &par](int x) { return repr[par[x]]; });
+
+    ASSERT_IMAGES_EQ_EXP(roots, roots_ref);
+    ASSERT_IMAGES_EQ_EXP(parents, parents_ref);
   }
 
-  mln::resize(rootimage, pmap);
-  mln::morpho::reconstruction(tree, roots, rootimage);
-
-  auto parent = mln::clone(rootimage);
-  mln_foreach (auto node, tree.nodes_without_root())
-    parent(roots[node.id()]) = roots[node.get_parent_id()];
-
-  return parent;
 }
 
-using tree_2d_t = mln::morpho::component_tree<unsigned, mln::image2d<unsigned>>;
-using par_2d_t  = mln::image2d<mln::point2d>;
-using tree_3d_t = mln::morpho::component_tree<unsigned, mln::image3d<unsigned>>;
-using par_3d_t  = mln::image3d<mln::point3d>;
+
+void compare_tree_to_ref(const mln::morpho::experimental::component_tree<>&            tree,
+                         const mln::experimental::image2d<int>&                        node_map,
+                         const mln::experimental::image2d<mln::experimental::point2d>& parents,
+                         const mln::experimental::image2d<mln::experimental::point2d>& roots)
+{
+  compare_tree_to_ref_T(tree, node_map, parents, roots);
+}
+
+void compare_tree_to_ref(const mln::morpho::experimental::component_tree<>&            tree,
+                         const mln::experimental::image3d<int>&                        node_map,
+                         const mln::experimental::image3d<mln::experimental::point3d>& parents,
+                         const mln::experimental::image3d<mln::experimental::point3d>& roots)
+{
+  compare_tree_to_ref_T(tree, node_map, parents, roots);
+}
 
 
-// Explicit instanciation
-template par_2d_t tree_as_parent_image(const tree_2d_t& tree, par_2d_t& roots);
 
-template par_3d_t tree_as_parent_image(const tree_3d_t& tree, par_3d_t& roots);

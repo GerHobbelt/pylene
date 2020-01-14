@@ -54,9 +54,11 @@ int accumulate_baseline(const mln::experimental::image2d<uint8_t>& ima);
 int accumulate_accu(const mln::experimental::image2d<uint8_t>& ima);
 int accumulate(const mln::experimental::image2d<uint8_t>& ima);
 
-std::vector<mln::experimental::point2d> sort_points(const mln::experimental::image2d<uint8_t>& ima);
-std::vector<mln::experimental::point2d> sort_points(const mln::experimental::image2d<int>& ima);
-std::vector<mln::experimental::point2d> sort_points(const mln::experimental::image2d<mln::rgb8>& ima);
+using point_t = mln::image_point_t<mln::experimental::image2d<uint8_t>>;
+
+std::vector<point_t> sort_points(const mln::experimental::image2d<uint8_t>& ima);
+std::vector<point_t> sort_points(const mln::experimental::image2d<int>& ima);
+std::vector<point_t> sort_points(const mln::experimental::image2d<mln::rgb8>& ima);
 
 class BMAlgorithms : public benchmark::Fixture
 {

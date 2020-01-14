@@ -1,11 +1,10 @@
-#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <cassert>
 #include <climits>
 #include <memory>
 
-namespace mln::morpho::details
+namespace mln::morpho::experimental::details
 {
 
   // Permute the array \p tab considering the permutation array \p permut
@@ -48,7 +47,7 @@ namespace mln::morpho::details
         branch_length++;
 
       for (int j = branch_length - 1, k = static_cast<int>(i); j >= 0; --j, k = parent[k])
-        permut[k] = static_cast<int>(pos) + j;
+        permut[k] = pos + j;
 
       pos += branch_length;
     }

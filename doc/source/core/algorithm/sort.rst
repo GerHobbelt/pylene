@@ -7,12 +7,12 @@ Include :file:`<mln/core/algorithm/sort.hpp>`
 
 #. .. cpp:function:: void sort_points(InputImage ima, OutputRange&& rng)
                      void sort_points(InputImage ima, OutputRange&& rng, Compare cmp)
-#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_points(InputImage ima)
-                     std::vector<image_point_t<InputImage>> sort_points(InputImage ima, Compare cmp)
+#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_points(InputImage ima, OutputRange&& rng)
+                     std::vector<image_point_t<InputImage>> sort_points(InputImage ima, OutputRange&& rng, Compare cmp)
 #. .. cpp:function:: void sort_indexes(InputImage ima, OutputRange&& rng)
                      void sort_indexes(InputImage ima, OutputRange&& rng, Compare cmp)
-#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_indexes(InputImage ima)
-                     std::vector<image_point_t<InputImage>> sort_indexes(InputImage ima, Compare cmp)
+#. .. cpp:function:: std::vector<image_point_t<InputImage>> sort_indexes(InputImage ima, OutputRange&& rng)
+                     std::vector<image_point_t<InputImage>> sort_indexes(InputImage ima, OutputRange&& rng, Compare cmp)
 
 
     Sort the points (versions 1-2) or the indexes (versions 3-4) of an image w.r.t their values.

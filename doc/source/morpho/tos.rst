@@ -25,7 +25,7 @@ Include :file:`<mln/morpho/tos.hpp>`
     .. rubric:: Requirements
 
     * ``image_value_t<I>`` is a :cpp:concept:`UnsignedIntegral`
-    * ``image_domain_t<I>`` is :cpp:any:`mln::box2d` or :cpp:any:`mln::box3d`
+    * ``image_domain_t<I>`` is :cpp:class:`mln::box2d` or :cpp:class:`mln::box3d`
 
     .. rubric:: Example
 

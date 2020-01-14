@@ -14,7 +14,6 @@ find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)
-find_package(range-v3 REQUIRED)
 
 
 # CONFIGURE COMPILER LAUNCHERS

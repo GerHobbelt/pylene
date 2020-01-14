@@ -74,4 +74,9 @@ add_benchmark(BMReference_Linear        BMReference_Linear.cpp BMReference_Linea
 add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 
 
+find_package(OpenCV REQUIRED)
+add_benchmark(BMPlnVsOpenCV_Dilation         opencv/BMPlnVsOpenCV_dilation.cpp)
+target_link_libraries(BMPlnVsOpenCV_Dilation PRIVATE ${OpenCV_LIBS})
+
+
 ExternalData_Add_Target(fetch-external-data)

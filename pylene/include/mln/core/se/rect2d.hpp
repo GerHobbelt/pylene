@@ -88,7 +88,18 @@ namespace mln
     {
       using incremental  = std::false_type;
       using decomposable = std::false_type;
+      using separable    = std::false_type;
+
       using rect2d::rect2d;
+
+      /// \brief Return true if decomposable (for any non-empty rectangle)
+      bool is_decomposable() const;
+
+      /// \brief Return true if separable (for any non-empty rectangle)
+      bool is_separable() const;
+
+      /// \brief Return true if incremental (if the width is larger than 1)
+      bool is_incremental() const;
     };
 
   } // namespace experimental::se

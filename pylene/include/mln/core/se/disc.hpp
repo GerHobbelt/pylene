@@ -191,7 +191,14 @@ namespace mln
     {
       using incremental  = std::false_type;
       using decomposable = std::false_type;
+
       using disc::disc;
+
+      /// \brief True if the SE is decomposable (i.e. constructed with approximation)
+      bool is_decomposable() const;
+
+      /// \brief True if the SE is incremental (i.e. constructed with no-approximation)
+      bool is_incremental() const;
     };
   } // namespace experimental::se
 

@@ -11,12 +11,12 @@ import skimage.morphology as skimorph
 import cv2
 
 
-disc_radius = 15
+disc_radius = 30
 
 
 def test_from_buffer():
     img = pln.ndimage(ref)
-    disc = pln.se.disc(30.)
+    disc = pln.se.disc(float(disc_radius))
     ret = pln.morpho.dilate(img, disc)
     npret = np.array(ret)
 
@@ -27,25 +27,25 @@ def test_from_buffer():
 def test_pylena(ref):
     img = pln.ndimage(ref)
     disc = pln.se.disc(float(disc_radius))
-    pln.morpho.dilate(img, disc)
-    # ret = pln.morpho.dilate(img, disc)
-    # npret = np.array(ret)
-    # return npret
+    # pln.morpho.dilate(img, disc)
+    ret = pln.morpho.dilate(img, disc)
+    npret = np.array(ret)
+    return npret
 
 
 def test_sckimage(ref):
     disc = skimorph.disk(disc_radius, dtype="uint8")
     # skimorph.binary_dilation(ref, disc)
     ret = skimorph.binary_dilation(ref, disc)
-    # return ret
+    return ret
 
 
 def test_cv2(ref):
     disc = cv2.getStructuringElement(
         cv2.MORPH_ELLIPSE, (disc_radius*2, disc_radius*2))
-    cv2.dilate(ref, disc, iterations=1)
-    # ret = cv2.dilate(ref, disc, iterations=1)
-    # return ret
+    # cv2.dilate(ref, disc, iterations=1)
+    ret = cv2.dilate(ref, disc, iterations=1)
+    return ret
 
 
 def main_plot():
@@ -97,5 +97,5 @@ def main_bench():
 
 
 if __name__ == "__main__":
-    # main_plot()
-    main_bench()
+    main_plot()
+    # main_bench()

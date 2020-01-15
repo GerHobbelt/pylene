@@ -64,21 +64,17 @@ def plot_results_by_SE(times, size):
     x = radius_list
     y_pln = []
     y_plnD = []
-    y_skimage = []
-    y_cv = []
     for t in times:
         if t["sizes"]["width"] == size["width"] and t["sizes"]["height"] == size["height"]:
             y_pln.append(t["Pylena"])
             y_plnD.append(t["PylenaD"])
-            y_skimage.append(t["Skimage"])
-            y_cv.append(t["OpenCV"])
 
     plt.figure("Benchmarks: Time vs. SE size")
 
     plt.plot(x, y_pln, label="Pylena")
     plt.plot(x, y_plnD, label="Pylena Decomp")
 
-    plt.xlabel("SE square edge size")
+    plt.xlabel("SE radius size")
     plt.ylabel("Time (s)")
     plt.title(
         "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))

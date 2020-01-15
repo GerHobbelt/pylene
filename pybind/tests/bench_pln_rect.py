@@ -86,8 +86,6 @@ def plot_results_by_pixels(times, rect_width, rect_height):
     x = [x["width"] * x["height"] for x in sizes_list]
     y_pln = []
     y_plnD = []
-    y_skimage = []
-    y_cv = []
     for t in times:
         if t["rect"]["width"] == rect_width and t["rect"]["height"] == rect_height:
             y_pln.append(t["Pylena"])

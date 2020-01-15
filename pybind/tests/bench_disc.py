@@ -91,7 +91,7 @@ def plot_results_by_SE(times, size):
     plt.plot(x, y_skimage, label="Skimage")
     plt.plot(x, y_cv, label="OpenCV")
 
-    plt.xlabel("SE square edge size")
+    plt.xlabel("SE radius size")
     plt.ylabel("Time (s)")
     plt.title(
         "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))

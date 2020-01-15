@@ -9,11 +9,10 @@ namespace mln::experimental::se
     mln_precondition(width >= 0 && "A negative width was given.");
     mln_precondition(height >= 0 && "A negative height was given.");
 
-    int xoffset    = width / 2;
-    int yoffset    = height / 2;
-    m_dpoints      = mln::experimental::box2d({-xoffset, -yoffset}, {xoffset + 1, yoffset + 1});
+    int xoffset = width / 2;
+    int yoffset = height / 2;
+    m_dpoints   = mln::experimental::box2d({-xoffset, -yoffset}, {xoffset + 1, yoffset + 1});
   }
-
 
   rect2d rect2d::dec() const
   {
@@ -63,17 +62,9 @@ namespace mln::experimental::se
     return ses;
   }
 
-  std::vector<periodic_line2d> rect2d::separate() const
-  {
-    return decompose();
-  }
+  std::vector<periodic_line2d> rect2d::separate() const { return decompose(); }
 
-
-  bool rect2d::is_decomposable() const
-  {
-    return !m_dpoints.empty();
-  }
-
+  bool rect2d::is_decomposable() const { return !m_dpoints.empty(); }
 
   bool rect2d::is_incremental() const
   {
@@ -82,10 +73,7 @@ namespace mln::experimental::se
     return x1 > x0;
   }
 
-  bool rect2d::is_separable() const
-  {
-    return !m_dpoints.empty();
-  }
+  bool rect2d::is_separable() const { return !m_dpoints.empty(); }
 
   int rect2d::radial_extent() const
   {
@@ -114,5 +102,11 @@ namespace mln::experimental::se
     roi.br().y() -= (m_dpoints.br().y() - 1);
     return roi;
   }
+
+  bool rect2d_non_decomp::is_decomposable() const { return false; }
+
+  bool rect2d_non_decomp::is_incremental() const { return false; }
+
+  bool rect2d_non_decomp::is_separable() const { return false; }
 
 } // namespace mln::experimental::se

@@ -1,5 +1,6 @@
 #include <mln/core/se/rect2d.hpp>
 
+#include <memory>
 
 namespace mln::experimental::se
 {
@@ -103,10 +104,33 @@ namespace mln::experimental::se
     return roi;
   }
 
-  bool rect2d_non_decomp::is_decomposable() const { return false; }
 
-  bool rect2d_non_decomp::is_incremental() const { return false; }
+  rect2d_non_decomp::rect2d_non_decomp(const rect2d& r)
+    : m_rect{r}
+  {
+  }
 
-  bool rect2d_non_decomp::is_separable() const { return false; }
+  rect2d_non_decomp::rect2d_non_decomp(int width, int height)
+    : m_rect{width, height}
+  {
+  }
+
+  rect2d_non_decomp rect2d_non_decomp::dec() const { return m_rect.dec(); }
+
+  rect2d_non_decomp rect2d_non_decomp::inc() const { return m_rect.inc(); }
+
+  bool rect2d_non_decomp::is_incremental() const { return m_rect.is_incremental(); }
+
+  int rect2d_non_decomp::radial_extent() const { return m_rect.radial_extent(); }
+
+  mln::experimental::box2d rect2d_non_decomp::compute_input_region(mln::experimental::box2d roi) const
+  {
+    return m_rect.compute_input_region(roi);
+  }
+
+  mln::experimental::box2d rect2d_non_decomp::compute_output_region(mln::experimental::box2d roi) const
+  {
+    return m_rect.compute_output_region(roi);
+  }
 
 } // namespace mln::experimental::se

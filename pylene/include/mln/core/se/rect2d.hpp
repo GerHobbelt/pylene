@@ -26,7 +26,7 @@ namespace mln
 
     /// \brief Define a dynamic rectangular window anchored at (0,0).
     /// Its width and height are always odd numbers to ensure symmetry.
-    struct rect2d : public se_facade<rect2d>
+    struct rect2d : se_facade<rect2d>
     {
     public:
       using category     = dynamic_neighborhood_tag;
@@ -35,7 +35,9 @@ namespace mln
       using separable    = std::true_type;
 
       /// Construct an empty rectangle
-      rect2d() = default;
+      rect2d()              = default;
+      rect2d(const rect2d&) = default;
+      rect2d& operator=(const rect2d&) = default;
 
       /// Construct a rectangle of size (Width × Height).
       ///
@@ -84,22 +86,52 @@ namespace mln
       mln::experimental::box2d m_dpoints;
     };
 
-    struct rect2d_non_decomp : rect2d
+    struct rect2d_non_decomp : se_facade<rect2d_non_decomp>
     {
-      using incremental  = std::false_type;
+    public:
+      using category     = dynamic_neighborhood_tag;
+      using incremental  = std::true_type;
       using decomposable = std::false_type;
       using separable    = std::false_type;
 
-      using rect2d::rect2d;
+      /// Construct an empty rectangle
+      rect2d_non_decomp()                         = default;
+      rect2d_non_decomp(const rect2d_non_decomp&) = default;
+      rect2d_non_decomp& operator=(const rect2d_non_decomp&) = default;
 
-      /// \brief Return true if decomposable (for any non-empty rectangle)
-      bool is_decomposable() const;
+      rect2d_non_decomp(const rect2d&);
 
-      /// \brief Return true if separable (for any non-empty rectangle)
-      bool is_separable() const;
+      /// Construct a rectangle of size (Width × Height).
+      ///
+      /// \param width The width of the rectangle. If \p width is even, it is
+      /// rounded to the closest lower odd int.
+      /// \param height The height of the rectangle. If \p height is even, it is
+      /// rounded to the closest lower odd int.
+      rect2d_non_decomp(int width, int height);
+
+      /// \brief A WNeighborhood to be added when used incrementally
+      rect2d_non_decomp inc() const;
+
+      /// \brief A WNeighborhood to be substracted when used incrementally
+      rect2d_non_decomp dec() const;
+
+      /// \brief Return a range of SE offsets
+      auto offsets() const { return m_rect.offsets(); }
 
       /// \brief Return true if incremental (if the width is larger than 1)
       bool is_incremental() const;
+
+      /// \brief Return the extent radius
+      int radial_extent() const;
+
+      /// \brief Compute the input region of a ROI
+      mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+
+      /// \brief Compute the output region of a ROI
+      mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+
+    private:
+      rect2d m_rect;
     };
 
   } // namespace experimental::se

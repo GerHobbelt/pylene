@@ -104,6 +104,8 @@ namespace mln
     /// \endrst
     class disc : public se_facade<disc>
     {
+      friend class disc_non_decomp;
+
       using inc_type = custom_se<::ranges::span<point2d>>;
 
     public:
@@ -187,18 +189,61 @@ namespace mln
       int m_nlines; // number of periodic lines for decomposition (0 for the euclidean disc)
     };
 
-    struct disc_non_decomp : disc
+    struct disc_non_decomp : se_facade<disc>
     {
-      using incremental  = std::false_type;
+    public:
+
+      using category     = dynamic_neighborhood_tag;
+      using incremental  = std::true_type;
       using decomposable = std::false_type;
+      using separable    = std::false_type;
 
-      using disc::disc;
+      /// Construct an empty disc
+      disc_non_decomp() = default;
 
-      /// \brief True if the SE is decomposable (i.e. constructed with approximation)
-      bool is_decomposable() const;
+      disc_non_decomp(const disc&);
+
+      /// Constructs a disc of radius \p r with a given approximation.
+      ///
+      /// \param radius The radius r of the disc.
+      /// \param approximation The disc approximation
+      explicit disc_non_decomp(float radius, disc::approx approximation = disc::PERIODIC_LINES_8);
+
+      /// \brief A WNeighborhood to be added when used incrementally
+      /// \exception std::runtime_error if the disc is not incremental
+      disc::inc_type inc() const;
+
+      /// \brief A WNeighborhood to be substracted when used incrementally
+      /// \exception std::runtime_error if this disc is not incremental
+      disc::inc_type dec() const;
+
+      /// \brief Return a range of SE offsets
+      ::ranges::span<point2d> offsets() const;
+
+      /// \brief Return a range of SE offsets before center
+      ::ranges::span<point2d> before_offsets() const;
+
+      /// \brief Return a range of SE offsets after center
+      ::ranges::span<point2d> after_offsets() const;
+
 
       /// \brief True if the SE is incremental (i.e. constructed with no-approximation)
       bool is_incremental() const;
+
+      /// \brief Returns the radius of the disc.
+      float radius() const { return m_disc.radius(); }
+
+      /// \brief Returns the extent radius
+      int radial_extent() const { return m_disc.radial_extent(); }
+
+      /// \brief Return the input ROI for 2D box.
+      mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+
+      /// \brief Return the output ROI for 2D box.
+      mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+
+    private:
+      disc m_disc;
     };
   } // namespace experimental::se
 

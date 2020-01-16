@@ -43,6 +43,7 @@ namespace  mln::morpho::experimental::details
   template <class P>
   class hvectors : public hvectors<void>
   {
+  public:
     template <class J>
     hvectors(J&& f);
     ~hvectors() = default;

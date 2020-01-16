@@ -18,7 +18,7 @@ namespace  mln::morpho::experimental::details
   {
     static_assert(N <= (1 << 24), "Too many numbers of level");
     static_assert(std::is_convertible_v<P, image_point_t<LinkImage>>);
-
+  public:
     template <class J>
     hlinked_lists(J&& f);
 

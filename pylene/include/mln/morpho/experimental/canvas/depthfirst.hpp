@@ -74,9 +74,7 @@ namespace  mln::morpho::experimental::canvas
 
     keep_flooding:
 
-    {
-      int k = 1;
-      for (auto n : nbh(p))
+      for (int k = 1; auto n : nbh(p))
       {
         int mask = 1 << k++;
         if ((pstatus & mask) || status.at(n) != NONE)
@@ -98,7 +96,6 @@ namespace  mln::morpho::experimental::canvas
         p             = n;
         goto flood;
       }
-    }
 
       // All the neighbors have been seen, p is DONE
       // status(p) = DONE;

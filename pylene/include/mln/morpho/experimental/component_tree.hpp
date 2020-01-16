@@ -246,7 +246,7 @@ namespace mln::morpho::experimental
       // Propagate downward
       for (std::size_t i = 1; i < n; ++i)
       {
-        pass[i] = pred(i) && pass[parent[i]];
+        pass[i] = pred(static_cast<int>(i)) && pass[parent[i]];
         if (!pass[parent[i]])
           parent[i] = parent[parent[i]];
       }
@@ -259,7 +259,7 @@ namespace mln::morpho::experimental
       // Propagate upward
       for (std::size_t i = n - 1; i > 0; --i)
       {
-        pass[i] = pass[i] || pred(i);
+        pass[i] = pass[i] || pred(static_cast<int>(i));
         pass[parent[i]] = pass[parent[i]] || pass[i];
       }
       this->filter_direct(pass);

@@ -1,9 +1,7 @@
 set(test_prefix "UTMorpho_")
 
 add_subdirectory(datastruct)
-add_subdirectory(maxtree)
 add_subdirectory(alphatree)
-add_subdirectory(component_tree)
 
 add_core_test(${test_prefix}running_max_1d   running_max_1d.cpp)
 add_core_test(${test_prefix}saturate         saturate.cpp)
@@ -22,4 +20,4 @@ add_core_test(${test_prefix}dynamic_filter   dynamic_filter.cpp)
 add_core_test(${test_prefix}ToS              tos.cpp tos_tests_helper.cpp)
 
 add_core_test(${test_prefix}depth_first      depthfirst.cpp)
-add_core_test(${test_prefix}maxtree         maxtree.cpp)
+add_core_test(${test_prefix}maxtree          maxtree.cpp)

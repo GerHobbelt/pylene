@@ -339,9 +339,39 @@ namespace mln::experimental::se
     return roi;
   }
 
-  bool disc_non_decomp::is_decomposable() const { return false; }
 
-  bool disc_non_decomp::is_incremental() const { return false; }
+  disc_non_decomp::disc_non_decomp(const disc& d)
+    : m_disc{d}
+  {
+  }
+
+  disc_non_decomp::disc_non_decomp(float radius, disc::approx approximation)
+    : m_disc{radius, approximation}
+  {
+  }
+
+  bool disc_non_decomp::is_incremental() const { return m_disc.is_incremental(); }
+
+
+  ::ranges::span<point2d> disc_non_decomp::offsets() const { return m_disc.offsets(); }
+
+  ::ranges::span<point2d> disc_non_decomp::before_offsets() const { return m_disc.before_offsets(); }
+
+  ::ranges::span<point2d> disc_non_decomp::after_offsets() const { return m_disc.after_offsets(); }
+
+  disc::inc_type disc_non_decomp::dec() const { return m_disc.dec(); }
+
+  disc::inc_type disc_non_decomp::inc() const { return m_disc.inc(); }
+
+  mln::experimental::box2d disc_non_decomp::compute_input_region(mln::experimental::box2d roi) const
+  {
+    return m_disc.compute_input_region(roi);
+  }
+
+  mln::experimental::box2d disc_non_decomp::compute_output_region(mln::experimental::box2d roi) const
+  {
+    return m_disc.compute_output_region(roi);
+  }
 
 } // namespace mln::experimental::se
 

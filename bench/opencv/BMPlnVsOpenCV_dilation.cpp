@@ -1,15 +1,16 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/io/experimental/imread.hpp>
 
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 
 #include <mln/morpho/experimental/dilation.hpp>
 
+#include <fixtures/ImagePath/image_path.hpp>
+
 #include <benchmark/benchmark.h>
-
-
 #include <opencv2/opencv.hpp>
 
 #include <random>
@@ -25,30 +26,28 @@ public:
   {
     if (!g_loaded)
     {
-      mln::experimental::image2d<mln::uint8> input(g_width, g_height);
-      cv::Mat                                input_cv = cv::Mat::zeros(g_width, g_height, CV_8UC1);
+      const char*                           filename = "Aerial_view_of_Olbia.jpg";
+      mln::experimental::image2d<mln::rgb8> input;
+      mln::io::experimental::imread(filename, input);
 
-      std::mt19937                    mt(42);
-      std::uniform_int_distribution<> dis(0, 1);
+      g_input          = mln::transform(input, [](mln::rgb8 x) -> uint8_t { return x[0]; });
+      cv::Mat input_cv = cv::Mat::zeros(g_input.width(), g_input.height(), CV_8UC1);
 
-      for (int i = 0; i < g_height; ++i)
+      for (int i = 0; i < g_input.height(); ++i)
       {
-        for (int j = 0; j < g_width; ++j)
+        for (int j = 0; j < g_input.width(); ++j)
         {
-          uint8_t v                  = static_cast<bool>(dis(mt)) ? 0 : 255;
-          input({i, j})              = v;
-          input_cv.at<uint8_t>(i, j) = v;
+          input_cv.at<uint8_t>(j, i) = g_input({j, i});
         }
       }
 
-      g_input    = input;
       g_input_cv = input_cv;
       g_loaded   = true;
     }
     m_input    = g_input;
     m_input_cv = g_input_cv;
     mln::resize(m_output, m_input);
-    m_size = g_width * g_height;
+    m_size = g_input.width() * g_input.height();
   }
 
   void run(benchmark::State& st,
@@ -61,8 +60,6 @@ public:
   }
 
 protected:
-  static int                                 g_width;
-  static int                                 g_height;
   static bool                                g_loaded;
   static mln::experimental::image2d<uint8_t> g_input;
   static cv::Mat                             g_input_cv;
@@ -72,8 +69,6 @@ protected:
   cv::Mat                                    m_output_cv;
   std::size_t                                m_size;
 };
-int                                 BMPlnVsOpenCV_Dilation::g_width  = 1000;
-int                                 BMPlnVsOpenCV_Dilation::g_height = 1000;
 bool                                BMPlnVsOpenCV_Dilation::g_loaded = false;
 mln::experimental::image2d<uint8_t> BMPlnVsOpenCV_Dilation::g_input;
 cv::Mat                             BMPlnVsOpenCV_Dilation::g_input_cv;
@@ -130,7 +125,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_DiscIncremental)(benchmark::State
 
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)(benchmark::State& st)
 {
-  int  edge = st.range(0);
+  int  edge = 2 * st.range(0) + 1;
   auto se   = mln::experimental::se::rect2d(edge, edge);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
@@ -141,7 +136,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)(benchmark::State& st)
 
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_Rect)(benchmark::State& st)
 {
-  int  edge = st.range(0);
+  int  edge = 2 * st.range(0) + 1;
   auto se   = mln::experimental::se::rect2d_non_decomp(edge, edge);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
@@ -156,7 +151,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_Rect)(benchmark::State& st)
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, CV_Disc)(benchmark::State& st)
 {
   int     radius = st.range(0);
-  cv::Mat se     = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * radius, 2 * radius));
+  cv::Mat se     = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * radius + 1, 2 * radius + 1));
 
   auto f = [se](const image_t&, const cv_image_t& input_cv, image_t&, cv_image_t& output_cv) {
     cv::dilate(input_cv, output_cv, se);
@@ -169,8 +164,8 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, CV_Disc)(benchmark::State& st)
 
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, CV_Rect)(benchmark::State& st)
 {
-  int     radius = st.range(0);
-  cv::Mat se     = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * radius, 2 * radius));
+  int     edge = 2 * st.range(0) + 1;
+  cv::Mat se   = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(edge, edge));
 
   auto f = [se](const image_t&, const cv_image_t& input_cv, image_t&, cv_image_t& output_cv) {
     cv::dilate(input_cv, output_cv, se);
@@ -181,12 +176,12 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, CV_Rect)(benchmark::State& st)
 
 constexpr int max_range = 128;
 
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompPeriodic)->RangeMultiplier(2)->Range(2, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)->RangeMultiplier(2)->Range(2, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)->RangeMultiplier(2)->Range(2, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_Rect)->RangeMultiplier(2)->Range(2, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Disc)->RangeMultiplier(2)->Range(2, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Rect)->RangeMultiplier(2)->Range(2, max_range);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompPeriodic)->RangeMultiplier(2)->Range(1, max_range);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)->RangeMultiplier(2)->Range(1, max_range);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)->RangeMultiplier(2)->Range(1, max_range);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_Rect)->RangeMultiplier(2)->Range(1, max_range);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Disc)->RangeMultiplier(2)->Range(1, max_range);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Rect)->RangeMultiplier(2)->Range(1, max_range);
 
 
 BENCHMARK_MAIN();

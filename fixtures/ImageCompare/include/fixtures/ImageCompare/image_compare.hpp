@@ -7,7 +7,8 @@
 #include <mln/core/rangev3/view/zip.hpp>
 #include <mln/io/experimental/imprint.hpp>
 
-#include <range/v3/range/access.hpp>
+#include <range/v3/begin_end.hpp>
+#include <fmt/core.h>
 
 #include <string>
 #include <functional>

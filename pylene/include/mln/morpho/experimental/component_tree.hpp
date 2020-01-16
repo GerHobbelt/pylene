@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include <range/v3/view/span.hpp>
+#include <range/v3/span.hpp>
 
 namespace mln::morpho::experimental
 {

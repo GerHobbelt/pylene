@@ -5,15 +5,13 @@
 #include <mln/morpho/experimental/private/pqueue.hpp>
 
 
-#include <range/v3/functional.hpp>
-
 
 namespace  mln::morpho::experimental::canvas
 {
 
 
 
-  template <class I, class N, class DFVisitor, class Proj = ::ranges::cpp20::identity>
+  template <class I, class N, class DFVisitor>
   void depthfirst(I& f, N nbh, DFVisitor& viz, image_point_t<I> start);
 
   /******************************************/
@@ -31,7 +29,7 @@ namespace  mln::morpho::experimental::canvas
   //
   // viz.has_level_flooding_started(Level l) : true if this level is already being flooded
 
-  template <class I, class N, class DFVisitor, class Proj>
+  template <class I, class N, class DFVisitor>
   void depthfirst(I& f, N nbh, DFVisitor& viz, image_point_t<I> start)
   {
     enum st
@@ -76,7 +74,9 @@ namespace  mln::morpho::experimental::canvas
 
     keep_flooding:
 
-      for (int k = 1; auto n : nbh(p))
+    {
+      int k = 1;
+      for (auto n : nbh(p))
       {
         int mask = 1 << k++;
         if ((pstatus & mask) || status.at(n) != NONE)
@@ -98,6 +98,7 @@ namespace  mln::morpho::experimental::canvas
         p             = n;
         goto flood;
       }
+    }
 
       // All the neighbors have been seen, p is DONE
       // status(p) = DONE;

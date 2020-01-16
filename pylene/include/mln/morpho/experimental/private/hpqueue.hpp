@@ -24,6 +24,8 @@ namespace  mln::morpho::experimental::detail
     {
     }
 
+    ~hpqueue() = default;
+
     // Push in last position at given level
     void push_last(int level, P p) noexcept
     {

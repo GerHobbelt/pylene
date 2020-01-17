@@ -13,7 +13,7 @@ RUN dnf install --refresh -y -q --nodocs \
     dnf clean all
 
 RUN pip3 install --no-cache-dir -q \
-    conan sphinx pandas breathe sphinx_rtd_theme
+    conan sphinx pandas breathe sphinx_rtd_theme pytest
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 

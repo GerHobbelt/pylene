@@ -18,6 +18,8 @@ target_compile_features(Pylena PRIVATE cxx_std_20)
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 
+add_dependencies(build-pybind Pylena)
+
 # add_sanitizers(Pylena)
 
 include(CTest)

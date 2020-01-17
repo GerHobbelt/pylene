@@ -149,6 +149,7 @@ endif ()
 
 if (PYLENE_BUILD_PYBIND)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  add_custom_target(build-pybind)
   add_subdirectory(pybind)
 endif()
 

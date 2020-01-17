@@ -48,7 +48,7 @@ windows-debug:
         - Invoke-BatchFile -Path $env:VCVAR2019 -Parameters $env:ARCH
         - mkdir build; cd build
         - conan install .. -s build_type=Debug --build missing
-        - rm Findrange-v3.cmake
+        - rm Findrange-v3.cmake Findpybind11.cmake
         - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
@@ -70,7 +70,7 @@ windows-debug:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
-        - rm Findrange-v3.cmake
+        - rm Findrange-v3.cmake Findpybind11.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=OFF -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
@@ -87,7 +87,7 @@ windows-debug:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
-        - rm Findrange-v3.cmake
+        - rm Findrange-v3.cmake Findpybind11.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$COV -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN $OTHER_CMAKE_ARGS
         - cmake --build . --target build-fixtures --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
@@ -236,7 +236,7 @@ distcheck-linux-clang8-debug:
     script:
         - mkdir build && cd build
         - conan install .. -pr $BUILD_PROFILE --build missing -e CXX=g++ -e CC=gcc
-        - rm Findrange-v3.cmake
+        - rm Findrange-v3.cmake Findpybind11.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target fetch-external-data --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-bench --config $PYLENE_CONFIGURATION
@@ -294,7 +294,7 @@ distbench-linux-clang8-release:
     script:
         - mkdir build && cd build
         - conan install .. -pr pylene_default --build missing -e CXX=g++ -e CC=gcc
-        - rm Findrange-v3.cmake
+        - rm Findrange-v3.cmake Findpybind11.cmake
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc --config Release
         - mkdir ../public && mv doc/sphinx/* ../public/

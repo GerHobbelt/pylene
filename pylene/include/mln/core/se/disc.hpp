@@ -189,7 +189,7 @@ namespace mln
       int m_nlines; // number of periodic lines for decomposition (0 for the euclidean disc)
     };
 
-    struct disc_non_decomp : se_facade<disc>
+    struct disc_non_decomp : se_facade<disc_non_decomp>
     {
     public:
 

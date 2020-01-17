@@ -74,27 +74,30 @@ namespace  mln::morpho::experimental::canvas
 
     keep_flooding:
 
-      for (int k = 1; auto n : nbh(p))
       {
-        int mask = 1 << k++;
-        if ((pstatus & mask) || status.at(n) != NONE)
-          continue;
+        int k = 1;
+        for (auto n : nbh(p))
+        {
+          int mask = 1 << k++;
+          if ((pstatus & mask) || status.at(n) != NONE)
+            continue;
 
-        // Insert n INQUEUE
-        auto nval = f(n);
-        status(n) = INQUEUE;
-        queue.push(nval, n);
-        pstatus |= mask;
+          // Insert n INQUEUE
+          auto nval = f(n);
+          status(n) = INQUEUE;
+          queue.push(nval, n);
+          pstatus |= mask;
 
-        // If the neighbor is lower, postpone the neighbor
-        if (nval <= current_level)
-          continue;
+          // If the neighbor is lower, postpone the neighbor
+          if (nval <= current_level)
+            continue;
 
-        // Otherwise, process it, (do not remove p from stack)
-        status(p)     = pstatus;
-        current_level = nval;
-        p             = n;
-        goto flood;
+          // Otherwise, process it, (do not remove p from stack)
+          status(p)     = pstatus;
+          current_level = nval;
+          p             = n;
+          goto flood;
+        }
       }
 
       // All the neighbors have been seen, p is DONE

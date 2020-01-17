@@ -52,6 +52,8 @@ windows-debug:
         - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
+        - cmake --build . --target build-pybind
+        - cmake --build . --target run-all-pytests
     dependencies: []
     artifacts:
         reports:
@@ -76,6 +78,8 @@ windows-debug:
         - cmake --build . --target build-pylene --config $PYLENE_CONFIGURATION
         - cmake --build . --target build-tests --config $PYLENE_CONFIGURATION
         - ctest -L UnitTests --schedule-random --output-on-failure
+        - cmake --build . --target build-pybind
+        - cmake --build . --target run-all-pytests
     dependencies: []
     artifacts:
         reports:
@@ -95,6 +99,8 @@ windows-debug:
         - cmake --build . --target run-tests_coverage-gcovr-html --config $PYLENE_CONFIGURATION
         - cmake --build . --target run-tests_coverage-lcov --config $PYLENE_CONFIGURATION
         - lcov --list run-tests_coverage-lcov.info
+        - cmake --build . --target build-pybind
+        - cmake --build . --target run-all-pytests
     dependencies: []
     artifacts:
         paths:

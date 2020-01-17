@@ -47,7 +47,7 @@ namespace mln::morpho::experimental::details
         branch_length++;
 
       for (int j = branch_length - 1, k = static_cast<int>(i); j >= 0; --j, k = parent[k])
-        permut[k] = pos + j;
+        permut[k] = static_cast<int>(pos) + j;
 
       pos += branch_length;
     }

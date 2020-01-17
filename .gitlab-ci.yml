@@ -6,8 +6,8 @@ stages:
 
 
 variables:
-    FEDORA_30: "${CI_REGISTRY}/olena/pylene/fedora-rawhide" # stdlibc++ 9.1.1-2 not yet in fedora-30
-    FEDORA_29: "${CI_REGISTRY}/olena/pylene/fedora-29"
+    FEDORA_30: "${CI_REGISTRY}/olena/pylene/fedora-rawhide-pybind" # stdlibc++ 9.1.1-2 not yet in fedora-30
+    FEDORA_29: "${CI_REGISTRY}/olena/pylene/fedora-29-pybind"
     BUILD_DOCKER: 'false'
     PACKAGE_NAME: "pylene" # Conan package name
     PACKAGE_TAG: "experimental" # Conan tag

@@ -37,10 +37,19 @@ namespace mln::morpho::experimental
 
   namespace details
   {
+    struct sup_t
+    {
+      template <class T>
+      T operator() (T x, T y) const { return mln::sup(x,y); }
+
+      template <class T>
+      std::experimental::simd<T> operator() (std::experimental::simd<T> x, std::experimental::simd<T> y) const { return std::experimental::max(x,y); }
+    };
+
     template <class V>
     struct dilation_value_set_base
     {
-      static inline constexpr auto sup = [](V a, V b) { return mln::sup(a, b); };
+      static inline constexpr sup_t sup = {};
       static inline constexpr auto zero = mln::value_traits<V>::inf();
     };
 
@@ -51,6 +60,7 @@ namespace mln::morpho::experimental
       using has_incremental_sup = std::false_type;
       static inline constexpr auto accu_sup = mln::accu::accumulators::sup<V>{};
     };
+
 
     template <class V>
     struct dilation_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16)>>

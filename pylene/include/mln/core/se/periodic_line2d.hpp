@@ -138,6 +138,13 @@ namespace mln
       /// \brief
       mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
 
+      /// \brief
+      bool is_horizontal() const noexcept;
+
+      /// \brief
+      bool is_vertical() const noexcept;
+
+
     private:
       mln::experimental::point2d m_delta;
       int     m_k;

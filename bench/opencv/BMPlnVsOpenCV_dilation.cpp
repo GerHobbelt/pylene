@@ -174,14 +174,14 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, CV_Rect)(benchmark::State& st)
 }
 
 
-constexpr int max_range = 128;
+constexpr int max_range = 256;
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompPeriodic)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompIncremental)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscIncremental)->RangeMultiplier(2)->Range(1, max_range);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)->RangeMultiplier(2)->Range(1, max_range);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompIncremental)->RangeMultiplier(2)->Range(1, max_range);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscIncremental)->RangeMultiplier(2)->Range(1, max_range);
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_Rect)->RangeMultiplier(2)->Range(1, max_range);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_Rect)->RangeMultiplier(2)->Range(1, max_range);
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Disc)->RangeMultiplier(2)->Range(1, max_range);
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Rect)->RangeMultiplier(2)->Range(1, max_range);
 

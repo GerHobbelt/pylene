@@ -133,16 +133,14 @@ namespace mln::morpho::details
     {
       mln_entering("Running specialization for vertical dilation over 2d buffer with arithmetic types");
 
-      mln::morpho::experimental::details::vertical_running_max_algo_t<T, BinaryFunction> alg(sup);
-      alg.running_max_v2d(in, out, roi, k, true);
+      mln::morpho::experimental::details::running_max_2d<T>(in, out, sup, roi, k, /* use_extension = */ true, /* vertical = */ true);
       return;
     }
     else if (line.is_horizontal())
     {
       mln_entering("Running specialization for horizontal dilation over 2d buffer with arithmetic types");
 
-      mln::morpho::experimental::details::vertical_running_max_algo_t<T, BinaryFunction> alg(sup);
-      alg.running_max_h2d(in, out, roi, k, true);
+      mln::morpho::experimental::details::running_max_2d<T>(in, out, sup, roi, k, /* use_extension = */ true, /* vertical = */ false);
       return;
     }
 

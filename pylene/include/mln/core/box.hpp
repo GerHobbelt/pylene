@@ -81,22 +81,19 @@ namespace mln::experimental
     constexpr bool empty() const noexcept;
 
     /// \brief Returns the width of the box
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 1>>
-    constexpr int width() const noexcept
+    constexpr int width() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 1)
     {
       return size(0);
     }
 
     /// \brief Returns the height of the box
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 2>>
-    constexpr int height() const noexcept
+    constexpr int height() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2)
     {
       return size(1);
     }
 
     /// \brief Returns the depth of the box
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 3>>
-    constexpr int depth() const noexcept
+    constexpr int depth() const noexcept requires (Impl::ndim == -1 || Impl::ndim >= 3)
     {
       return size(2);
     }
@@ -124,6 +121,22 @@ namespace mln::experimental
 
     /// \brief Returns the top-left corner point
     using Impl::tl;
+
+    /// \brief Returns the x coordinate of the top-left corner point
+    constexpr int x() const noexcept { return this->__begin(0); }
+
+    /// \brief Returns the y coordinate of the top-left corner point
+    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 2>>
+    constexpr int y() const noexcept { return this->__begin(1); }
+
+    /// \brief Returns the z coordinate of the top-left corner point
+    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 3>>
+    constexpr int z() const noexcept { return this->__begin(2); }
+
+    /// \brief Returns the w coordinate of the top-left corner point
+    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 4>>
+    constexpr int w() const noexcept { return this->__begin(3); }
+
 
     /// \brief Returns the k-th coordinate of the top-left corner point
     constexpr int tl(int k) const noexcept { return this->__begin(k); }
@@ -312,37 +325,66 @@ namespace mln::experimental
           _zeros();
       }
 
-      template <int d = D, class = std::enable_if_t<d == 1>>
-      constexpr _bstorage(int width)
+
+      constexpr _bstorage(int width) requires(D == 1)
         : m_begin{0}
         , m_end{width}
       {
         assert(width >= 0);
       }
 
-      template <int d = D, class = std::enable_if_t<d == 2>>
-      constexpr _bstorage(int width, int height)
+
+      constexpr _bstorage(int x, int width) requires(D == 1)
+        : m_begin{x}
+        , m_end{x + width}
+      {
+        assert(width >= 0);
+      }
+
+
+      constexpr _bstorage(int width, int height) requires (D == 2)
         : m_begin{0, 0}
         , m_end{width, height}
       {
         assert(width >= 0 && height >= 0);
       }
 
-      template <int d = D, class = std::enable_if_t<d == 3>>
-      constexpr _bstorage(int width, int height, int depth)
+      constexpr _bstorage(int x, int y, int width, int height) requires(D == 2)
+        : m_begin{x, y}
+        , m_end{x + width, y + height}
+      {
+        assert(width >= 0 && height >= 0);
+      }
+
+      constexpr _bstorage(int width, int height, int depth) requires(D == 3)
         : m_begin{0, 0, 0}
         , m_end{width, height, depth}
       {
         assert(width >= 0 && height >= 0 && depth >= 0);
       }
 
-      template <int d = D, class = std::enable_if_t<d == 4>>
-      constexpr _bstorage(int width, int height, int depth, int duration)
+      constexpr _bstorage(int x, int y, int z, int width, int height, int depth) requires(D == 3)
+        : m_begin{x, y, z}
+        , m_end{x + width, y + height, z + depth}
+      {
+        assert(width >= 0 && height >= 0 && depth >= 0);
+      }
+
+
+      constexpr _bstorage(int width, int height, int depth, int duration) requires (D == 4)
         : m_begin{0, 0, 0, 0}
         , m_end{width, height, depth, duration}
       {
         assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
       }
+
+      constexpr _bstorage(int x, int y, int z, int w, int width, int height, int depth, int duration) requires (D == 4)
+        : m_begin{x, y, z, w}
+        , m_end{x + width, y + height, z + depth, w + duration}
+      {
+        assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
+      }
+
 
 
       static constexpr int dim() noexcept { return D; }

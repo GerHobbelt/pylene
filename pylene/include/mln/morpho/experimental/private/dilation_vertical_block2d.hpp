@@ -9,34 +9,55 @@
 namespace mln::morpho::experimental::details
 {
 
+  template <class T, class I, class J, class BinaryFunction>
+  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension, bool vertical);
+
+
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
+
+
+  class TileLoaderBase
+  {
+    // Load tile from memory (roi is in the vertical layout coordinates system)
+    virtual void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
+  };
+
+  class TileWriterBase
+  {
+    // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
+    virtual void write_tile(const std::byte* in,  std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
+  };
+
   class vertical_running_max_algo_base_t
   {
-
+  private:
     // Accumulate the supremum column-wise (eq to the python A.cumsum(axis=0))
     virtual void partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
                                      std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) = 0;
 
-
     // Apply PW OUT[x] = SUP(A[x], B[x])
-    virtual void apply_sup(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict OUT, std::size_t n) = 0;
+    virtual void apply_sup(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict OUT, int width) = 0;
 
     virtual int         get_block_width() const = 0;
     virtual std::size_t get_sample_size() const = 0;
 
+    TileLoaderBase* m_tile_loader = nullptr;
+    TileWriterBase* m_tile_writer = nullptr;
+
   public:
     // Apply the running max algorithm over a block
     // Memory has already been allocated
-    void running_max_block2d(std::byte* f, std::byte* g, std::byte* h, int width, int height, std::ptrdiff_t f_byte_stride,
-                             std::ptrdiff_t g_byte_stride, std::ptrdiff_t h_byte_stride, int k, bool use_extension);
+    void running_max_block2d(std::byte* f, std::byte* g, std::byte* h, std::ptrdiff_t f_byte_stride,
+                             std::ptrdiff_t g_byte_stride, std::ptrdiff_t h_byte_stride, mln::experimental::box2d roi,
+                             int k, bool use_extension);
 
+    // Apply the running max algorithm over a roi using tiling
+    void execute(mln::experimental::box2d roi, int k, bool use_extension, bool vertical = true);
 
-    // Running the 2D dilation vertically using tiling
-    template <class I, class T>
-    void running_max_v2d(I& in, mln::experimental::image2d<T>& out, mln::experimental::box2d roi, int k, bool use_extension);
-
-    // Running the 2D dilation vertically using tiling
-    template <class I, class T>
-    void running_max_h2d(I& in, mln::experimental::image2d<T>& out, mln::experimental::box2d roi, int k, bool use_extension);
+    void set_tile_reader(TileLoaderBase* r) { m_tile_loader = r; }
+    void set_tile_writer(TileWriterBase* w) { m_tile_writer = w; }
   };
 
 
@@ -50,26 +71,57 @@ namespace mln::morpho::experimental::details
     static_assert(::ranges::regular_invocable<BinaryFunction, simd_t, simd_t>);
     static_assert(::ranges::regular_invocable<BinaryFunction, T, T>);
 
-    void apply_sup(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict OUT, std::size_t n) final;
+    void apply_sup(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict OUT, int n) final;
     void partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
                              std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) final;
 
     int         get_block_width() const final { return BLOCK_WIDTH; }
     std::size_t get_sample_size() const final { return sizeof(T); }
 
-    BinaryFunction m_sup;
 
   public:
     vertical_running_max_algo_t(BinaryFunction sup)
       : m_sup{std::move(sup)}
     {
     }
+
+  protected:
+    BinaryFunction m_sup;
   };
 
+
+
+
+
   template <class T, class BinaryFunction>
-  void vertical_running_max_algo_t<T, BinaryFunction>::apply_sup(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict out, std::size_t n)
+  void vertical_running_max_algo_t<T, BinaryFunction>::apply_sup(std::byte* __restrict A_, std::byte* __restrict B_, std::byte* __restrict out_, int width)
   {
-    std::transform((T*)A, (T*)A + n, (T*)B, (T*)out, m_sup);
+    const T* A   = (T*)A_;
+    const T* B   = (T*)B_;
+    T*       out = (T*)out_;
+
+    const int     K               = width / WARP_SIZE;
+    const int     rem             = width % WARP_SIZE;
+
+    assert(width <= BLOCK_WIDTH);
+    for (int k = 0; k < K; k++)
+    {
+      simd_t a;
+      simd_t b;
+      simd_t c;
+      a.copy_from(A + k * WARP_SIZE, std::experimental::element_aligned);
+      b.copy_from(B + k * WARP_SIZE, std::experimental::element_aligned);
+      c = m_sup(a, b);
+      c.copy_to(out + k * WARP_SIZE, std::experimental::element_aligned);
+    }
+
+    if (rem > 0)
+    {
+      A += K * WARP_SIZE;
+      B += K * WARP_SIZE;
+      out += K * WARP_SIZE;
+      std::transform(A, A + rem, B, out, m_sup);
+    }
   }
 
 
@@ -80,7 +132,6 @@ namespace mln::morpho::experimental::details
 
 
     constexpr int MAX_WARP_COUNT  = BLOCK_WIDTH / WARP_SIZE;
-
     const int K   = width / WARP_SIZE;
     const int rem = width % WARP_SIZE;
 
@@ -139,8 +190,8 @@ namespace mln::morpho::experimental::details
   template <class I, class T>
   [[gnu::noinline]] void copy_block(I& in, mln::experimental::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
   {
-    const int x0     = roi.tl().x();
-    const int y0     = roi.tl().y();
+    const int x0     = roi.x();
+    const int y0     = roi.y();
 
     for (int y = 0; y < roi.height(); ++y)
     {
@@ -153,8 +204,8 @@ namespace mln::morpho::experimental::details
   template <class I, class T>
   [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::experimental::box2d roi, I& out)
   {
-    const int x0     = roi.tl().x();
-    const int y0     = roi.tl().y();
+    const int x0     = roi.x();
+    const int y0     = roi.y();
 
     for (int y = 0; y < roi.height(); ++y)
     {
@@ -167,8 +218,8 @@ namespace mln::morpho::experimental::details
   template <class I, class T>
   [[gnu::noinline]] void transpose_block2d(I& in, mln::experimental::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
   {
-    const int x0     = input_roi.tl().x();
-    const int y0     = input_roi.tl().y();
+    const int x0     = input_roi.x();
+    const int y0     = input_roi.y();
 
 
     for (int y = 0; y < input_roi.height(); ++y)
@@ -179,106 +230,75 @@ namespace mln::morpho::experimental::details
   template <class I, class T>
   [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride, mln::experimental::box2d output_roi, I& out)
   {
-    const int x0     = output_roi.tl().x();
-    const int y0     = output_roi.tl().y();
+    const int x0     = output_roi.x();
+    const int y0     = output_roi.y();
 
     for (int y = 0; y < output_roi.height(); ++y)
       for (int x = 0; x < output_roi.width(); ++x)
-        out.at({x0 + x, y0 + y}) =  *(in + x * istride + y); 
+        out.at({x0 + x, y0 + y}) =  *(in + x * istride + y);
   }
-
 
 
 
   template <class I, class T>
-  void vertical_running_max_algo_base_t::running_max_v2d(I& in, mln::experimental::image2d<T>& out, mln::experimental::box2d roi, int k, bool use_extension)
+  class TileLoader : public TileLoaderBase
   {
-    int            kBlockWidth    = this->get_block_width();
-    auto           sz             = this->get_sample_size();
-    std::ptrdiff_t kBlockByteSize = sz * kBlockWidth;
-
-    const int x0     = roi.tl().x();
-    const int y0     = roi.tl().y();
-    const int y1     = roi.br().y();
-    const int width  = roi.width();
-    const int height = roi.height();
-
-    std::byte* f = (std::byte*) std::malloc(sz * kBlockWidth * (height + 2 * k));
-    std::byte* g = (std::byte*) std::malloc(sz * kBlockWidth * (height + 2 * k));
-    std::byte* h = (std::byte*) std::malloc(sz * kBlockWidth * (height + 2 * k));
-
-    for (int x = 0; x < width; x += kBlockWidth)
+  public:
+    // Load tile from memory (roi is in the vertical layout coordinates system)
+    void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) override
     {
-      int w = std::min(kBlockWidth, width - x);
-
-
-      // Copy the block
+      if (m_vertical)
+        copy_block(*m_input, roi, (T*)out, byte_stride / sizeof(T));
+      else
       {
-        mln::experimental::box2d region = {{x + x0, y0 - k}, {x + x0 + w, y1 + k}};
-        copy_block(in, region, (T*)f, kBlockWidth);
-      }
-
-      this->running_max_block2d(f + k * kBlockByteSize, //
-                                g + k * kBlockByteSize, //
-                                h + k * kBlockByteSize, //
-                                w, height, kBlockByteSize, kBlockByteSize, kBlockByteSize, k, use_extension);
-
-      // Copy back
-      {
-        mln::experimental::box2d region = {{x + x0, y0}, {x + x0 + w, y1}};
-        copy_block((T*)f + kBlockWidth * k, kBlockWidth, region, out);
+        mln::experimental::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
+        transpose_block2d(*m_input, region, (T*)out, byte_stride / sizeof(T));
       }
     }
 
-    std::free(f);
-    std::free(g);
-    std::free(h);
-  }
+    TileLoader(I& input, bool vertical) : m_input(&input), m_vertical{vertical} {}
 
+  private:
+    I*   m_input;
+    bool m_vertical;
+  };
 
   template <class I, class T>
-  void vertical_running_max_algo_base_t::running_max_h2d(I& in, mln::experimental::image2d<T>& out, mln::experimental::box2d roi, int k, bool use_extension)
+  class TileWriter : public TileWriterBase
   {
-    int            kBlockWidth    = this->get_block_width();
-    auto           sz             = this->get_sample_size();
-    std::ptrdiff_t kBlockByteSize = sz * kBlockWidth;
-
-    const int x0     = roi.tl().x();
-    const int y0     = roi.tl().y();
-    const int x1     = roi.br().x();
-    const int width  = roi.width();
-    const int height = roi.height();
-
-    std::byte* f = (std::byte*) std::malloc(sz * kBlockWidth * (width + 2 * k));
-    std::byte* g = (std::byte*) std::malloc(sz * kBlockWidth * (width + 2 * k));
-    std::byte* h = (std::byte*) std::malloc(sz * kBlockWidth * (width + 2 * k));
-
-    for (int y = 0; y < height; y += kBlockWidth)
+  public:
+    // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
+    void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) override
     {
-      int H = std::min(kBlockWidth, height - y);
-
-      // Copy the block
+      if (m_vertical)
+        copy_block((const T*)in, byte_stride / sizeof(T), roi, *m_output);
+      else
       {
-        mln::experimental::box2d region = {{x0 - k, y0 + y}, {x1 + k, y0 + y + H}};
-        transpose_block2d(in, region, (T*)f, kBlockWidth);
-      }
-
-      this->running_max_block2d(f + k * kBlockByteSize, //
-                                g + k * kBlockByteSize, //
-                                h + k * kBlockByteSize, //
-                                H, width, kBlockByteSize, kBlockByteSize, kBlockByteSize, k, use_extension);
-
-      // Copy back
-      {
-        mln::experimental::box2d region = {{x0, y0 + y}, {x1, y0 + y + H}};
-        transpose_block2d((T*)f + kBlockWidth * k, kBlockWidth, region, out);
+        mln::experimental::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
+        transpose_block2d((const T*)in, byte_stride / sizeof(T), region, *m_output);
       }
     }
 
-    std::free(f);
-    std::free(g);
-    std::free(h);
+    TileWriter(I& output, bool vertical) : m_output(&output), m_vertical{vertical} {}
+
+  private:
+    I*   m_output;
+    bool m_vertical;
+  };
+
+
+  template <class T, class I, class J, class BinaryFunction>
+  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension, bool vertical)
+  {
+    TileLoader<I, T> r(input, vertical);
+    TileWriter<J, T> w(output, vertical);
+
+    vertical_running_max_algo_t<T, BinaryFunction> alg(sup);
+    alg.set_tile_reader(&r);
+    alg.set_tile_writer(&w);
+    alg.execute(roi, k, use_extension, vertical);
   }
+
 
 
 } // namespace mln::morpho::details

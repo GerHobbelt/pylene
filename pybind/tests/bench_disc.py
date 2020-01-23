@@ -12,7 +12,7 @@ import cv2
 
 
 radius = 3
-sizes = {"width": 50, "height": 50}
+sizes = {"width": 3138, "height": 3138}
 number = 100
 percent = 20
 
@@ -32,14 +32,12 @@ ref = setup_test_img()
 
 
 def test_pylena():
-    img = pln.ndimage(ref)
     disc = pln.se.disc(float(radius))
-    pln.morpho.dilate(img, disc)
+    pln.morpho.dilate(ref, disc)
 
 def test_pylena_decomp():
-    img = pln.ndimage(ref)
     disc = pln.se.disc_decomposable(float(radius))
-    pln.morpho.dilate(img, disc)
+    pln.morpho.dilate(ref, disc)
 
 def test_sckimage():
     disc = skimorph.disk(radius, dtype="uint8")
@@ -47,13 +45,12 @@ def test_sckimage():
 
 def test_cv2():
     disc = cv2.getStructuringElement(
-        cv2.MORPH_ELLIPSE, (radius*2, radius*2))
+        cv2.MORPH_ELLIPSE, (radius*2+1, radius*2+1))
     cv2.dilate(ref, disc, iterations=1)
 
 
-sizes_list = [sizes] + \
-    [{"width": x*100, "height": x*100} for x in range(1, 11)]
-radius_list = [r for r in range(3, 16)]
+sizes_list = [sizes]
+radius_list = [1+2**r for r in range(1, 6)]
 
 
 def get_sizes():

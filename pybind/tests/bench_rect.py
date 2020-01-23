@@ -11,9 +11,9 @@ import skimage.morphology as skimorph
 import cv2
 
 
-rect_width = 15
-rect_height = 15
-sizes = {"width": 50, "height": 50}
+rect_width = 3
+rect_height = 3
+sizes = {"width": 3138, "height": 3138} # 10Mo
 number = 100
 percent = 20
 
@@ -33,14 +33,12 @@ ref = setup_test_img()
 
 
 def test_pylena():
-    img = pln.ndimage(ref)
     rect = pln.se.rect2d(rect_width, rect_height)
-    pln.morpho.dilate(img, rect)
+    pln.morpho.dilate(ref, rect)
 
 def test_pylena_decomp():
-    img = pln.ndimage(ref)
     rect = pln.se.rect2d_decomposable(rect_width, rect_height)
-    pln.morpho.dilate(img, rect)
+    pln.morpho.dilate(ref, rect)
 
 def test_sckimage():
     rect = skimorph.rectangle(rect_width, rect_height, dtype="uint8")
@@ -52,9 +50,8 @@ def test_cv2():
     cv2.dilate(ref, rect, iterations=1)
 
 
-sizes_list = [sizes] + \
-    [{"width": x*100, "height": x*100} for x in range(1, 11)]
-rect_sizes_list = [{"width": x, "height": x} for x in range(3, 16)]
+sizes_list = [sizes]
+rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 9)]
 
 
 def get_sizes():

@@ -9,11 +9,12 @@ import math
 import Pylena as pln
 
 
-rect_width = 15
-rect_height = 15
-sizes = {"width": 50, "height": 50}
+rect_width = 3
+rect_height = 3
+sizes = {"width": 1000, "height": 1000}  # 10Mo
 number = 100
 percent = 20
+
 
 def setup_test_img():
     global sizes
@@ -27,28 +28,25 @@ def setup_test_img():
         ref[x, y] = 255
     return ref
 
-ref = setup_test_img()
-
 
 def test_pylena():
-    img = pln.ndimage(ref)
     rect = pln.se.rect2d(rect_width, rect_height)
-    pln.morpho.dilate(img, rect)
+    pln.morpho.dilate(ref, rect)
+
 
 def test_pylena_decomp():
-    img = pln.ndimage(ref)
     rect = pln.se.rect2d_decomposable(rect_width, rect_height)
-    pln.morpho.dilate(img, rect)
+    pln.morpho.dilate(ref, rect)
 
 
-sizes_list = [sizes] + \
-    [{"width": x*100, "height": x*100} for x in range(1, 11)]
-rect_sizes_list = [{"width": x, "height": x} for x in range(3, 16)]
+sizes_list = [sizes]
+rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 8)]
 
 
 def get_sizes():
     for s in sizes_list:
         yield s
+
 
 def get_rect_sizes():
     for x in rect_sizes_list:
@@ -61,6 +59,7 @@ def print_results(times):
             t["sizes"]["width"], t["sizes"]["height"], t["rect"]["width"], t["rect"]["height"],
             t["number"], t["Pylena"], t["PylenaD"]
         ))
+
 
 def plot_results_by_SE(times, size):
     x = [x["width"] for x in rect_sizes_list]
@@ -78,9 +77,11 @@ def plot_results_by_SE(times, size):
 
     plt.xlabel("SE square edge size")
     plt.ylabel("Time (s)")
+    plt.yscale("log")
     plt.title(
         "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))
     plt.legend()
+
 
 def plot_results_by_pixels(times, rect_width, rect_height):
     x = [x["width"] * x["height"] for x in sizes_list]
@@ -118,21 +119,29 @@ def main_bench():
                 number, s["width"], s["height"], rect["width"], rect["height"]
             ))
 
+            print("Starting Pylena...")
+            time_pln = timeit.timeit(
+                "test_pylena()",
+                setup="from __main__ import test_pylena",
+                number=number
+            )
+            print("End Pylena")
+
+            print("Starting Pylena decomposable...")
+            time_pln_decomp = timeit.timeit(
+                "test_pylena_decomp()",
+                setup="from __main__ import test_pylena_decomp",
+                number=number
+            )
+            print("End Pylena decomposable")
+
             times.append(
                 {
                     "number": number,
                     "sizes": s,
                     "rect": rect,
-                    "Pylena": timeit.timeit(
-                        "test_pylena()",
-                        setup="from __main__ import test_pylena",
-                        number=number
-                    ),
-                    "PylenaD": timeit.timeit(
-                        "test_pylena_decomp()",
-                        setup="from __main__ import test_pylena_decomp",
-                        number=number
-                    )
+                    "Pylena": time_pln,
+                    "PylenaD": time_pln_decomp
                 }
             )
 
@@ -147,6 +156,6 @@ if __name__ == "__main__":
     plt.imshow(ref)
 
     plot_results_by_SE(times, {"width": 1000, "height": 1000})
-    plot_results_by_pixels(times, rect_width=15, rect_height=15)
+    # plot_results_by_pixels(times, rect_width=15, rect_height=15)
 
     plt.show()

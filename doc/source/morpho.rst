@@ -26,6 +26,7 @@ Geodesic transformations
    morpho/area_filter
    morpho/dynamic_filter
    morpho/extinction_transform
+   morpho/fill_hole
 
 
 Segmentation

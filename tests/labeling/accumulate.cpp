@@ -1,21 +1,21 @@
 #include <mln/labeling/accumulate.hpp>
 
 
-#include <mln/core/image/ndimage.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <fmt/core.h>
 #include <gtest/gtest.h>
 
 
 struct mass_center_t : mln::Accumulator<mass_center_t>
 {
-  using P             = mln::point2d;
+  using P             = mln::experimental::point2d;
   using argument_type = P;
   using result_type   = P;
 
   void init() { *this = mass_center_t{}; }
   void take(P p) noexcept { xsum += p.x(); ysum += p.y(); count += 1; }
   void take(const mass_center_t& o) noexcept { xsum += o.xsum; ysum += o.ysum; count += o.count; }
-  mln::point2d to_result() const noexcept { return {(int)(xsum / (float)count + .5f), (int)(ysum / (float)count + .5f)}; }
+  mln::experimental::point2d to_result() const noexcept { return {(int)(xsum / (float)count + .5f), (int)(ysum / (float)count + .5f)}; }
 
 private:
   int xsum = 0;
@@ -26,19 +26,19 @@ private:
 
 TEST(Labeling, accumulate_U)
 {
-  // mln::image2d<bool> ima = {{0, 1, 0, 0, 0, 1, 0}, //
+  // mln::experimental::image2d<bool> ima = {{0, 1, 0, 0, 0, 1, 0}, //
   //                                         {0, 1, 0, 1, 0, 1, 0}, //
   //                                         {0, 1, 0, 0, 0, 1, 0}, //
   //                                         {0, 1, 1, 1, 1, 1, 0}, //
   //                                         {0, 1, 1, 1, 1, 1, 0}};
 
-  mln::image2d<uint8_t> labels = {{0, 1, 0, 0, 0, 1, 0}, //
+  mln::experimental::image2d<uint8_t> labels = {{0, 1, 0, 0, 0, 1, 0}, //
                                                 {0, 1, 0, 2, 0, 1, 0}, //
                                                 {0, 1, 0, 0, 0, 1, 0}, //
                                                 {0, 1, 1, 1, 1, 1, 0}, //
                                                 {0, 1, 1, 1, 1, 1, 0}};
 
-  std::vector<mln::point2d> ref = {{3,2}, {3,3}, {3,1}};
+  std::vector<mln::experimental::point2d> ref = {{3,2}, {3,3}, {3,1}};
   auto res = mln::labeling::accumulate(labels, 2, mass_center_t{});
   ASSERT_EQ(res, ref);
 }
@@ -63,13 +63,13 @@ private:
 
 TEST(Labeling, accumulate_on_U)
 {
-  mln::image2d<uint8_t> ima = {{0, 1, 2, 3, 4, 5, 6}, //
+  mln::experimental::image2d<uint8_t> ima = {{0, 1, 2, 3, 4, 5, 6}, //
                                              {0, 1, 2, 3, 4, 5, 6}, //
                                              {0, 1, 2, 3, 4, 5, 6}, //
                                              {0, 1, 2, 3, 4, 5, 6}, //
                                              {0, 1, 2, 3, 4, 5, 6}};
 
-  mln::image2d<uint8_t> labels = {{0, 1, 0, 0, 0, 1, 0}, //
+  mln::experimental::image2d<uint8_t> labels = {{0, 1, 0, 0, 0, 1, 0}, //
                                                 {0, 1, 0, 2, 0, 1, 0}, //
                                                 {0, 1, 0, 0, 0, 1, 0}, //
                                                 {0, 1, 1, 1, 1, 1, 0}, //

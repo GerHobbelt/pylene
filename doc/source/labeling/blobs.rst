@@ -7,17 +7,14 @@ Include :file:`<mln/labeling/blobs.hpp>`
 
 
 .. cpp:function:: \
-    template <std::integral Label, Image I> \
-    image_ch_value_t<I, Label> blobs(I input, Neighborhood nbh, int& nlabel)
+    template <std::integral Label, Image I> \ 
+    image_ch_value_t<I, Label> blobs(I input, Neighborhood nbh, int& nlabel) 
 
 
-    Labelize the connected components of binary image.
+    Labelize the connected components of binary image. 
 
 
-    :tparam Label: The integral numeric type (``std::is_integral_v<Label>`` is ``true``) for the labels,
-                   filling the following requirements:
-                    * ``Label`` is signed: ``sizeof(Label) <= sizeof(int)``
-                    * ``Label`` is unsigned: ``sizeof(Label) < sizeof(int)``
+    :tparam Label: The integral numeric type for the labels
     :param input: Input image
     :param nbh: Neighborhood
     :param nlabel: The number of labels in the image

@@ -32,16 +32,13 @@ if(SPHINX_FOUND AND DOXYGEN_FOUND)
   file(GLOB_RECURSE SPHINX_SOURCES ${SPHINX_SOURCE} *.rst)
   file(MAKE_DIRECTORY ${SPHINX_BUILD})
 
-  add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
-                    COMMAND ${SPHINX_EXECUTABLE} -b html
+  add_custom_target(build-sphinx COMMAND ${SPHINX_EXECUTABLE} -b html
                     -Dbreathe_projects.Pylene=${DOXYGEN_OUTPUT_DIR}/xml
                     ${SPHINX_SOURCE} ${SPHINX_BUILD}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     DEPENDS build-images build-doxygen ${SPHINX_SOURCES}
-                    MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
                     COMMENT "Generating Sphinx documentation")
 
                     
-  add_custom_target(build-sphinx DEPENDS ${SPHINX_INDEX_FILE})
   add_dependencies(build-doc build-sphinx)
 endif()

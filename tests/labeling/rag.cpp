@@ -19,8 +19,8 @@ void check_edges(const Graph& graph, std::pair<int, int> edges_ref[])
   std::tie(e, f) = boost::edges(graph);
   for (int i = 0; e != f; ++e, ++i)
   {
-    int x = boost::source(*e, graph);
-    int y = boost::target(*e, graph);
+    int x = static_cast<int>(boost::source(*e, graph));
+    int y = static_cast<int>(boost::target(*e, graph));
     ASSERT_EQ(edges_ref[i], std::make_pair(x, y));
   }
 }

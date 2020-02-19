@@ -44,8 +44,8 @@ namespace mln::labeling::experimental
       P* queue = new P[ima.domain().size()];
 
       unsigned qend   = 0;
-      unsigned fstart = ima.domain().size();
-      unsigned fend   = ima.domain().size();
+      std::size_t fstart = ima.domain().size();
+      std::size_t fend   = ima.domain().size();
 
       auto qpush  = [&queue, &qend](const P& p) { queue[qend++] = p; };
       auto qpop   = [&queue, &qend]() -> P { return queue[--qend]; };

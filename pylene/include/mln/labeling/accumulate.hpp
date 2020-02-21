@@ -45,7 +45,11 @@ namespace mln::labeling
 
     {
       mln_foreach_new (auto px, lbl_input.new_pixels())
-        vec_acc[px.val()].take(px.point());
+      {
+        int lbl = px.val();
+        assert(0 <= lbl && lbl <= nlabel);
+        vec_acc[lbl].take(px.point());
+      }
     }
 
     std::transform(std::begin(vec_acc), std::end(vec_acc), std::begin(results),
@@ -73,7 +77,10 @@ namespace mln::labeling
     {
       auto zz = mln::ranges::view::zip(lbl_input.new_values(), values.new_values());
       mln_foreach_new ((auto [lbl, v]), zz)
+      {
+        assert(0 <= lbl && lbl <= nlabel);
         vec_acc[lbl].take(v);
+      }
     }
 
     std::transform(std::begin(vec_acc), std::end(vec_acc), std::begin(results),

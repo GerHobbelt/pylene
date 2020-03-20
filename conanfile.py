@@ -9,12 +9,12 @@ class Pylene(ConanFile):
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type"
     options = {"gtest": [True, False], "benchmark": [True, False], "freeimage": [
-        True, False], "boost": [True, False],
+        True, False], "boost": [True, False], "tbb": [True, False],
                # TO REMOVE once docker image is fixed with the buildfarm profile updated
                "boost_program_options": [True, False]}
     default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False",
                        # TO REMOVE once docker image is fixed with the buildfarm profile updated
-                       "boost_program_options=False")
+                       "boost_program_options=False", "tbb=False")
     generators = [ "cmake_paths", "cmake_find_package" ]
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
@@ -53,3 +53,6 @@ class Pylene(ConanFile):
 
         if self.options.boost:
             self.requires("boost/1.69.0@conan/stable")
+
+        if self.options.tbb:
+            self.requires("tbb/2020.0")

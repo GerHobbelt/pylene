@@ -2,6 +2,7 @@
 
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/vec_base.hpp>
+#include <algorithm>
 
 
 namespace mln

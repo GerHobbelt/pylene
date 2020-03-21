@@ -1,8 +1,5 @@
 set(test_prefix "UTMorpho_")
 
-add_subdirectory(datastruct)
-add_subdirectory(alphatree)
-
 add_core_test(${test_prefix}running_max_1d              running_max_1d.cpp)
 add_core_test(${test_prefix}fill_hole        fill_hole.cpp)
 add_core_test(${test_prefix}dilate           dilate.cpp)
@@ -21,3 +18,4 @@ add_core_test(${test_prefix}ToS              tos.cpp tos_tests_helper.cpp)
 
 add_core_test(${test_prefix}depth_first      depthfirst.cpp)
 add_core_test(${test_prefix}maxtree          maxtree.cpp)
+add_core_test(${test_prefix}alphatree        alphatree.cpp)

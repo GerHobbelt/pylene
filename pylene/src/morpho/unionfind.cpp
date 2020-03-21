@@ -1,5 +1,5 @@
 
-namespace mln::morpho::canvas::impl
+namespace mln::morpho::experimental::canvas::impl
 {
 
 
@@ -26,4 +26,4 @@ namespace mln::morpho::canvas::impl
     return r;
   }
 
-} // namespace mln::morpho::canvas::impl
+} // namespace mln::morpho::experimental::canvas::impl

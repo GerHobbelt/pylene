@@ -43,25 +43,26 @@ target_link_libraries(Pylene PUBLIC fmt::fmt)
 #target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
+               src/core/image_format.cpp
+               src/core/init_list.cpp
+               src/core/ndbuffer_image.cpp
+               src/core/ndbuffer_image_data.cpp
                src/core/se/disc.cpp
+               src/core/se/mask2d.cpp
                src/core/se/periodic_line2d.cpp
                src/core/se/rect2d.cpp
-               src/core/se/mask2d.cpp
                src/core/trace.cpp
-               src/core/init_list.cpp
-               src/core/image_format.cpp
-               src/core/ndbuffer_image_data.cpp
-               src/core/ndbuffer_image.cpp
                src/core/traverse2d.cpp
                src/io/freeimage_plugin.cpp
-               src/io/io.cpp
-               src/io/imread.cpp
                src/io/imprint.cpp
-               src/morpho/maxtree.cpp
-               src/morpho/immersion.cpp
+               src/io/imread.cpp
+               src/io/io.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
+               src/morpho/immersion.cpp
+               src/morpho/maxtree.cpp
+               src/morpho/unionfind.cpp
                )
 
 # Compiler configurations

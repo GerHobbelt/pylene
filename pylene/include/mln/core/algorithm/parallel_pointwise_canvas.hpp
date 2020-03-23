@@ -1,11 +1,13 @@
 #pragma once
 #ifndef MLN_HAS_TBB
-#define MLN_HAS_TBB
+#define MLN_HAS_TBB 1
 #endif
 
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range2d.h"
 #include "mln/core/box.hpp"
+#include "mln/core/concept/object.hpp"
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {

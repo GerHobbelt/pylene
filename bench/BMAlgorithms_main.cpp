@@ -45,6 +45,7 @@ void for_each_baseline(mln::experimental::image2d<uint8_t>& in);
 void for_each_baseline(mln::experimental::image2d<mln::rgb8>& in);
 void for_each(mln::experimental::image2d<uint8_t>& in);
 void for_each(mln::experimental::image2d<mln::rgb8>& in);
+void parallel_for_each(mln::experimental::image2d<uint8_t>& in);
 
 
 void generate_baseline(mln::experimental::image2d<uint8_t>& ima);
@@ -331,6 +332,12 @@ BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, parallel_pointwise_foreach)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
 
 ///////////   GENERATE /////////////////
 

@@ -7,9 +7,11 @@
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/algorithm/generate.hpp>
 #include <mln/core/algorithm/paste.hpp>
+#include <mln/core/algorithm/parallel_pointwise_canvas.hpp>
 #include <mln/core/algorithm/sort.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
+#include <mln/core/concept/object.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 
 #include <algorithm>
@@ -322,6 +324,10 @@ void for_each(mln::experimental::image2d<uint8_t>& in)
 void for_each(mln::experimental::image2d<mln::rgb8>& in)
 {
   mln::for_each(in, plus_one_inplace);
+}
+void parallel_for_each(mln::experimental::image2d<uint8_t>& in)
+{
+  mln::ApplyPointwise(in, plus_one_inplace);
 }
 
 

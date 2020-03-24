@@ -318,6 +318,13 @@ BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
@@ -332,10 +339,10 @@ BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_parallel)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_rgb8_parallel)(benchmark::State& st)
 {
   while (st.KeepRunning())
-    parallel_for_each(m_input_uint8);
+    parallel_for_each(m_input_rbg8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 

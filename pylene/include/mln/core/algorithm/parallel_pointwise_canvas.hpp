@@ -1,50 +1,88 @@
 #pragma once
-#ifndef MLN_HAS_TBB
-#define MLN_HAS_TBB 1
-#endif
 
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range2d.h"
 #include "mln/core/box.hpp"
 #include "mln/core/concept/object.hpp"
 #include <mln/core/image/image.hpp>
+#include <range/v3/functional/concepts.hpp>
+#include <mln/core/algorithm/for_each.hpp>
 
 namespace mln
 {
-    template <class Function, class InputImage>
-    struct ApplyPointwise
-    /*
-    ** Caller for the TBB parallel_for
-    ** Rationale being that every pointwise algorithm applies a function to every pixel,
-    ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
-    */
+
+  class ParallelCanvas2d
+  {
+    constexpr int TILE_WIDTH  = 128;
+    constexpr int TILE_HEIGHT = 128;
+
+
+    void operator()(const tbb::blocked_range2d<int>& tile) const
     {
-        Function _fun;
-        InputImage _in;
+      int x = tile.cols().begin();
+      int w = tile.cols().end() - tile.cols().begin();
+      int y = tile.rows().begin();
+      int h = tile.rows().end() - tile.rows().begin();
 
-        static_assert(mln::is_a<InputImage, experimental::Image>());
-        // FIXME we are trying to see if
-        // std::is_invocable<Function, InputImage({x,y})>::value is true, but how to access field of template ?
-        // static_assert(std::is_invocable<Function, InputImage>::value);
+      mln::experimental::box2d domain(x, y, w, h);
+      this->ExecuteTile(domain);
+    }
 
-        ApplyPointwise(InputImage input, Function fun)
-            : _fun{fun}
-            , _in{input}
-        {
-            tbb::parallel_for(tbb::blocked_range2d<int>(0, _in.width(), _in.width() / 4, 0, _in.height(), _in.height() / 4),
-                                [&](tbb::blocked_range2d<int> tile)
-                                {
-                                    for (auto i = tile.rows().begin(); i != tile.rows().end(); ++i)
-                                        for (auto j = tile.cols().begin(); j != tile.cols().end(); ++j)
-                                        {
-                                            call_function_on_point(i, j);
-                                        }
-                                });
-        }
+    virtual mln::experimental::box2d GetDomain() const = 0;
+    virtual ExecuteTile(mln::experimental::box2d b) const = 0;
+  };
 
-        void call_function_on_point(int x, int y)
-        {
-            _fun(_in({x,y}));
-        }
-    };
+
+  template <class Function, class InputImage>
+  class ForEachPointwise
+  {
+    static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
+
+    ApplyPointwise(InputImage input, Function fun);
+
+    mln::experimental::box2d GetDomain() const final { return input.domain(); }
+
+    void ExecuteTile(mln::experimental::box2d b) const final
+    {
+      auto subimage = input.clip(domain);
+      mln::for_each(subimage, fun);
+    }
+  };
+
+
+
+  template <class Function, class InputImage, class O>
+  class TransformPointwise
+  {
+    static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
+
+    ApplyPointwise(InputImage input, Function fun);
+
+    mln::experimental::box2d GetDomain() const final { return input.domain(); }
+
+    void ExecuteTile(mln::experimental::box2d b) const final
+    {
+      auto subimage_in = input.clip(domain);
+      auto subimage_out = input.clip(domain);
+      mln::transform(subimage, fun);
+    }
+  };
+
+
+  /*
+  ** Caller for the TBB parallel_for
+  ** Rationale being that every pointwise algorithm applies a function to every pixel,
+  ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
+  */
+  void parallel_execute2d(ParallelCanvas2d* canvas)
+  {
+    mln::experimental::box2d domain = canvas->GetDomain();
+    tbb::parallel_for(tbb::blocked_range2d<int>(domain.y(), domain.y() + domain.height(), canvas->TILE_HEIGHT, //
+                                                domain.x(), domain.x() + domain.width(), canvas->TILE_WIDTH),
+                      *canvas);
+  }
+
+
 } // namespace mln

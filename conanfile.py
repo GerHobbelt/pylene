@@ -52,10 +52,10 @@ class Pylene(ConanFile):
             self.requires("freeimage/3.18.0@dutiona/stable")
 
         if self.options.gtest:
-            self.requires("gtest/1.8.1@bincrafters/stable")
+            self.requires("gtest/1.8.1")
 
         if self.options.benchmark:
-            self.requires("benchmark/head@dutiona/stable")
+            self.requires("benchmark/1.5.0")
 
         if self.options.boost:
             self.requires("boost/1.69.0@conan/stable")

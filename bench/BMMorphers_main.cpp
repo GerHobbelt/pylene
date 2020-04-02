@@ -1,5 +1,5 @@
-#include <mln/core/image/ndimage.hpp>
-#include <mln/io/imread.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/io/experimental/imread.hpp>
 
 #include <mln/core/colors.hpp>
 #include <mln/core/algorithm/transform.hpp>
@@ -7,13 +7,13 @@
 
 #include <benchmark/benchmark.h>
 
-unsigned threshold1(mln::image2d<uint8_t> f, uint8_t v);
-unsigned threshold1_bis(mln::image2d<uint8_t> f, uint8_t v);
-unsigned threshold2(mln::image2d<uint8_t> f, uint8_t v);
-unsigned threshold3(mln::image2d<uint8_t> f, uint8_t v);
-unsigned threshold4(mln::image2d<uint8_t> f, uint8_t v);
-void     threshold5(mln::image2d<uint8_t> f, mln::image2d<bool> out, uint8_t v);
-void     threshold6(mln::image2d<uint8_t> f, mln::image2d<bool> out, uint8_t v);
+unsigned threshold1(mln::experimental::image2d<uint8_t> f, uint8_t v);
+unsigned threshold1_bis(mln::experimental::image2d<uint8_t> f, uint8_t v);
+unsigned threshold2(mln::experimental::image2d<uint8_t> f, uint8_t v);
+unsigned threshold3(mln::experimental::image2d<uint8_t> f, uint8_t v);
+unsigned threshold4(mln::experimental::image2d<uint8_t> f, uint8_t v);
+void     threshold5(mln::experimental::image2d<uint8_t> f, mln::experimental::image2d<bool> out, uint8_t v);
+void     threshold6(mln::experimental::image2d<uint8_t> f, mln::experimental::image2d<bool> out, uint8_t v);
 
 using namespace mln;
 
@@ -23,7 +23,7 @@ struct BMMorphers : public benchmark::Fixture
 
   BMMorphers()
   {
-    mln::io::imread(filename, m_input);
+    mln::io::experimental::imread(filename, m_input);
     int nr = m_input.height();
     int nc = m_input.width();
     resize(m_output, m_input);
@@ -31,7 +31,7 @@ struct BMMorphers : public benchmark::Fixture
   }
 
 protected:
-  void Do_0(benchmark::State& st, unsigned (*func)(mln::image2d<uint8_t>, uint8_t))
+  void Do_0(benchmark::State& st, unsigned (*func)(mln::experimental::image2d<uint8_t>, uint8_t))
   {
     auto input = mln::transform(m_input, [](auto x) { return x[0]; });
 
@@ -43,7 +43,7 @@ protected:
     st.SetBytesProcessed(st.iterations() * m_bytes);
   }
 
-  void Do_1(benchmark::State& st, void (*func)(mln::image2d<uint8_t>, mln::image2d<bool>, uint8_t))
+  void Do_1(benchmark::State& st, void (*func)(mln::experimental::image2d<uint8_t>, mln::experimental::image2d<bool>, uint8_t))
   {
     auto input = mln::transform(m_input, [](auto x) { return x[0]; });
 
@@ -54,8 +54,8 @@ protected:
   }
 
 private:
-  mln::image2d<mln::rgb8> m_input;
-  mln::image2d<bool>      m_output;
+  mln::experimental::image2d<mln::rgb8> m_input;
+  mln::experimental::image2d<bool>      m_output;
   std::size_t   m_bytes;
 };
 

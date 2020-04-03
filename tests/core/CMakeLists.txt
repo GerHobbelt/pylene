@@ -44,14 +44,14 @@ add_core_test(${test_prefix}view_zip                image/view/zip.cpp)
 
 
 # test Images
-add_core_test(${test_prefix}image2d                 image/image2d.cpp)
-add_core_test(${test_prefix}image2d_iterators       image/image2d_iterators.cpp)
-add_core_test(${test_prefix}extended_by_value_image image/morphers/extended_by_value.cpp)
-add_core_test(${test_prefix}sub_image               image/sub_image.cpp)
-add_core_test(${test_prefix}transformed_image       image/morphers/transformed_image.cpp)
-add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
 add_core_test(${test_prefix}image_ndbuffer_image    image/ndbuffer_image.cpp)
+add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
+
+
+add_core_test(${test_prefix}image2d_iterators       image/image2d_iterators.cpp)
 add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)
+add_core_test(${test_prefix}sub_image               image/sub_image.cpp)
+
 
 
 
@@ -61,10 +61,6 @@ add_core_test(${test_prefix}c4               neighborhood/c4.cpp)
 add_core_test(${test_prefix}c6               neighborhood/c6.cpp)
 add_core_test(${test_prefix}c8               neighborhood/c8.cpp)
 add_core_test(${test_prefix}c26              neighborhood/c26.cpp)
-add_core_test(${test_prefix}sliding_pixter   neighborhood/sliding_pixter.cpp)
-add_core_test(${test_prefix}sliding_wpiter   neighborhood/sliding_wpiter.cpp)
-add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)
-add_core_test(${test_prefix}wneighborhood    neighborhood/wneighborhood.cpp)
 
 # test Extension
 add_core_test(${test_prefix}extension_clamp     extension/clamp.cpp)

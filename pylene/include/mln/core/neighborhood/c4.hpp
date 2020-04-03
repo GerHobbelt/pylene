@@ -2,6 +2,7 @@
 
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/experimental/point.hpp>
+#include <mln/core/box.hpp>
 
 #include <array>
 #include <range/v3/view/span.hpp>

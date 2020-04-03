@@ -21,7 +21,7 @@ TEST(BorderManager, Fill_LargeEnough_BM_Auto)
   ref.extension().fill(42);
 
   auto bm                        = mln::extension::bm::fill(uint8_t(42));
-  auto disc                      = mln::se::disc{1};
+  auto disc                      = mln::experimental::se::disc{1};
   auto [managed_ima, managed_se] = bm.manage(ima, disc);
 
 
@@ -41,7 +41,7 @@ TEST(BorderManager, Fill_NotLargeEnough_BM_Auto)
   mln::experimental::image2d<uint8_t> ref  = clone(ima);
 
   auto bm                        = mln::extension::bm::fill(uint8_t(42));
-  auto disc                      = mln::se::disc{4};
+  auto disc                      = mln::experimental::se::disc{4};
   auto [managed_ima, managed_se] = bm.manage(ima, disc);
 
 
@@ -65,7 +65,7 @@ TEST(BorderManager, Fill_LargeEnough_BM_Native)
   ref.extension().fill(42);
 
   auto bm                        = mln::extension::bm::native::fill(uint8_t(42));
-  auto disc                      = mln::se::disc{1};
+  auto disc                      = mln::experimental::se::disc{1};
   auto [managed_ima, managed_se] = bm.manage(ima, disc);
 
 
@@ -81,7 +81,7 @@ TEST(BorderManager, Fill_NotLargeEnough_BM_Native)
 {
   mln::experimental::image2d<uint8_t> ima(10, 10);
 
-  auto disc = mln::se::disc{4};
+  auto disc = mln::experimental::se::disc{4};
   auto bm   = mln::extension::bm::native::fill(uint8_t(42));
   EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);
 }
@@ -90,7 +90,7 @@ TEST(BorderManager, Fill_bad_cast)
 {
   mln::experimental::image2d<uint8_t> ima(10, 10);
 
-  auto disc = mln::se::disc{1};
+  auto disc = mln::experimental::se::disc{1};
   auto bm   = mln::extension::bm::native::fill(42);
   EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);
 }

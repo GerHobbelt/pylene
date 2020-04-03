@@ -36,7 +36,9 @@ namespace mln::experimental
     /// \brief Return the output ROI for 2D box.
     mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const
     {
-      // Fixme: check emptiness
+      if (roi.width() < 2)
+        return {};
+
       ++roi.tl().x();
       --roi.br().x();
       return roi;

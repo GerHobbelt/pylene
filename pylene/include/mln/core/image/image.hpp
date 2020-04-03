@@ -30,6 +30,5 @@
 
 
 // The most fundamental views are automatically included
-#include <mln/core/image/morphers/filtered_image.hpp>    // Filter by function
 #include <mln/core/image/morphers/transformed_image.hpp> // Map
 #include <mln/core/image/sub_image.hpp>                  // Filter by domain

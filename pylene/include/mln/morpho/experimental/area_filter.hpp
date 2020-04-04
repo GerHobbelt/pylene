@@ -3,6 +3,7 @@
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/concept/new/neighborhoods.hpp>
 
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/morpho/experimental/canvas/unionfind.hpp>
 
 

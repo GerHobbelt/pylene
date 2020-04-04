@@ -17,9 +17,9 @@ namespace mln
                         extension::border_manager<bmm> bm, J g);
 
   template <class A, class I, class SE, extension::BorderManagementMethod bmm>
-  ch_value_t<I, accu::result_of_t<A, image_value_t<I>>>
-      accumulate_local(I f, const experimental::StructuringElement<SE>& se, const AccumulatorLike<A>& accu,
-                       extension::border_manager<bmm> bm);
+  image_ch_value_t<I, accu::result_of_t<A, image_value_t<I>>> //
+  accumulate_local(I f, const experimental::StructuringElement<SE>& se, const AccumulatorLike<A>& accu,
+                   extension::border_manager<bmm> bm);
 
 
   /******************************************/

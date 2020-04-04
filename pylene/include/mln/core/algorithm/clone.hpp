@@ -8,12 +8,6 @@
 
 namespace mln
 {
-  // FIXME: to remove once circular dependency between image/clone/copy is resolved
-  namespace experimental
-  {
-    template <class InputImage, class OutputImage>
-    void copy(InputImage src, OutputImage dest);
-  } // namespace experimental
 
   /// \ingroup Algorithms
   /// \brief Make and return a deep copy of an image.
@@ -39,4 +33,5 @@ namespace mln
     mln::experimental::copy(std::move(input), out);
     return out;
   }
-} // namespace mln
+
+} // namespace mln::experimental

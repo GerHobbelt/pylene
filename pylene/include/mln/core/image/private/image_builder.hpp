@@ -17,7 +17,7 @@ namespace mln
   template <class I> struct Image;
 
 
-  /// \brief Structure holding building parameters
+  /// \brief Structure holding build parameters
   /// It is composed of two fields, a border value and
   /// an initialization value.
   struct image_build_params

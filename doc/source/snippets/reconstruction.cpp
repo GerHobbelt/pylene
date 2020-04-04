@@ -6,6 +6,7 @@
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/experimental/rank_filter.hpp>

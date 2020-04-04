@@ -109,7 +109,7 @@ namespace mln::labeling::experimental
                    .get_status(&err)
                    .build();
 
-    DistanceType vfill = (background_is_object) ? value_traits<DistanceType>::max() : 0;
+    DistanceType vfill = (background_is_object) ? std::numeric_limits<DistanceType>::max() : 0;
 
 
     if (err == IMAGE_BUILD_OK)

@@ -1,6 +1,6 @@
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/image2d.hpp>
-
+#include <mln/core/forall.hpp>
 
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/rows.hpp>

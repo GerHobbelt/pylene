@@ -40,7 +40,7 @@ namespace mln::morpho::experimental
     template <class V>
     struct dilation_value_set_base
     {
-      static inline constexpr auto sup = [](V a, V b) { return mln::sup(a, b); };
+      static inline constexpr auto sup = [](V a, V b) { return sup(a, b); };
       static inline constexpr auto zero = mln::value_traits<V>::inf();
     };
 

@@ -37,7 +37,7 @@ namespace mln::morpho::experimental::details
 
   private:
     static_assert(!std::is_signed_v<key_type>, "Must not be signed");
-    static_assert(value_traits<key_type>::quant <= 16, "Only low quantized type supported.");
+    static_assert(std::numeric_limits<key_type>::digits <= 16, "Only low quantized type supported.");
 
     static constexpr int nvalues = std::numeric_limits<key_type>::max() + 1;
 

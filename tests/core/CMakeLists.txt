@@ -50,7 +50,7 @@ add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
 
 add_core_test(${test_prefix}image2d_iterators       image/image2d_iterators.cpp)
 add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)
-add_core_test(${test_prefix}sub_image               image/sub_image.cpp)
+
 
 
 

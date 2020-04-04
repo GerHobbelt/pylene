@@ -1,6 +1,4 @@
 #include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/forall.hpp>
 
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/rows.hpp>
@@ -8,13 +6,6 @@
 
 
 
-void Mult_Inplace(mln::image2d<uint8_t>& img)
-{
-  mln_foreach (auto p, img.pixels())
-  {
-    p.val() *= 2;
-  }
-}
 
 void Mult_Inplace_New_Values(mln::experimental::image2d<uint8_t>& img)
 {
@@ -42,15 +33,6 @@ void Mult_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t strid
   }
 }
 
-void Mult(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
-{
-  mln_pixter(pxIn, in);
-  mln_pixter(pxOut, out);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = pxIn->val() * 2;
-  }
-}
 
 void Mult_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
             std::ptrdiff_t stride)
@@ -89,15 +71,6 @@ void Mult_New_Pixels(const mln::experimental::image2d<uint8_t>& in, mln::experim
   }
 }
 
-void Threshold_Inplace(mln::image2d<uint8_t>& img)
-{
-  constexpr uint8_t t = 128;
-
-  mln_foreach (auto p, img.pixels())
-  {
-    p.val() = p.val() < t ? 0 : 255;
-  }
-}
 
 void Threshold_Inplace_New_Values(mln::experimental::image2d<uint8_t>& img)
 {
@@ -145,16 +118,6 @@ void Threshold_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuf
   }
 }
 
-void Threshold(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
-{
-  constexpr uint8_t t = 128;
-  mln_pixter(pxIn, in);
-  mln_pixter(pxOut, out);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = pxIn->val() < t ? 0 : 255;
-  }
-}
 
 void Threshold_New_Values(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
 {
@@ -184,14 +147,6 @@ void Threshold_New_Pixels(const mln::experimental::image2d<uint8_t>& in, mln::ex
   }
 }
 
-void LUT_Inplace(const uint8_t LUT[], mln::image2d<uint8_t>& img)
-{
-  mln_pixter(px, img);
-  mln_forall (px)
-  {
-    px->val() = LUT[px->val()];
-  }
-}
 
 void LUT_Inplace_New_Values(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img)
 {
@@ -219,15 +174,6 @@ void LUT_Inplace_C(const uint8_t* LUT, uint8_t* buffer, int width, int height, s
   }
 }
 
-void LUT(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output)
-{
-  mln_pixter(pxIn, input);
-  mln_pixter(pxOut, output);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = LUT[pxIn->val()];
-  }
-}
 
 void LUT_C(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width,
            int height, std::ptrdiff_t stride)

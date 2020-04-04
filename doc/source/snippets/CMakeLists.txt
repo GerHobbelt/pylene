@@ -69,4 +69,4 @@ add_executable(blobs_watershed blobs_watershed.cpp)
 add_executable(reconstruction reconstruction.cpp)
 add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
- 
+add_executable(first_start_1 first_start_1.cpp)

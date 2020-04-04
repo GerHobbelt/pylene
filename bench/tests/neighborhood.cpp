@@ -26,23 +26,23 @@ class CoreNeighborhood : public ::testing::Test
   }
 
 protected:
-  using fun1_t = std::function<void(const mln::experimental::image2d<mln::uint8>&, mln::experimental::image2d<mln::uint8>&)>;
-  using fun2_t = std::function<void(const mln::uint8*, mln::uint8*, int, int, std::ptrdiff_t)>;
+  using fun1_t = std::function<void(const mln::experimental::image2d<uint8_t>&, mln::experimental::image2d<uint8_t>&)>;
+  using fun2_t = std::function<void(const uint8_t*, uint8_t*, int, int, std::ptrdiff_t)>;
 
-  mln::experimental::image2d<mln::uint8> run_with(fun1_t f) const;
-  mln::experimental::image2d<mln::uint8> run_with(fun2_t f) const;
+  mln::experimental::image2d<uint8_t> run_with(fun1_t f) const;
+  mln::experimental::image2d<uint8_t> run_with(fun2_t f) const;
 
 private:
   int                      m_w, m_h;
   std::ptrdiff_t           m_stride;
-  mln::uint8*              m_ibuffer;
+  uint8_t*              m_ibuffer;
 
-  mln::experimental::image2d<mln::uint8> m_input;
+  mln::experimental::image2d<uint8_t> m_input;
 };
 
-mln::experimental::image2d<mln::uint8> CoreNeighborhood::run_with(fun1_t f) const
+mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun1_t f) const
 {
-  mln::experimental::image2d<mln::uint8> output;
+  mln::experimental::image2d<uint8_t> output;
   mln::resize(output, m_input);
 
   f(m_input, output);
@@ -50,12 +50,12 @@ mln::experimental::image2d<mln::uint8> CoreNeighborhood::run_with(fun1_t f) cons
 }
 
 
-mln::experimental::image2d<mln::uint8> CoreNeighborhood::run_with(fun2_t f) const
+mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun2_t f) const
 {
-  mln::experimental::image2d<mln::uint8> output;
+  mln::experimental::image2d<uint8_t> output;
   mln::resize(output, m_input);
 
-  mln::uint8* obuffer = output.buffer();
+  uint8_t* obuffer = output.buffer();
   f(m_ibuffer, obuffer, m_w, m_h, m_stride);
   return output;
 }

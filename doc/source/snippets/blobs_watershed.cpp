@@ -77,22 +77,22 @@ mln::rgb8 heat_lut(float x)
 
   if (x < x0)
   {
-    auto g = static_cast<mln::uint8>(x / x0 * 255);
+    auto g = static_cast<uint8_t>(x / x0 * 255);
     return mln::rgb8{0, g, 255};
   }
   else if (x < x1)
   {
-    auto b = static_cast<mln::uint8>((x1 - x) / x0 * 255);
+    auto b = static_cast<uint8_t>((x1 - x) / x0 * 255);
     return mln::rgb8{0, 255, b};
   }
   else if (x < x2)
   {
-    auto r = static_cast<mln::uint8>((x - x1) / x0 * 255);
+    auto r = static_cast<uint8_t>((x - x1) / x0 * 255);
     return mln::rgb8{r, 255, 0};
   }
   else
   {
-    auto b = static_cast<mln::uint8>((1.f - x) / x0 * 255);
+    auto b = static_cast<uint8_t>((1.f - x) / x0 * 255);
     return mln::rgb8{255, b, 0};
   }
 }

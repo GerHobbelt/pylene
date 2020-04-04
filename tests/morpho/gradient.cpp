@@ -16,7 +16,6 @@
 
 
 #include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imprint.hpp>
 #include <gtest/gtest.h>
 
 
@@ -124,14 +123,14 @@ TEST(Morpho, gradient_grayscale)
 TEST(Morpho, DISABLED_gradient_on_view)
 {
   using namespace mln::view::ops;
-  mln::experimental::image2d<uint8> ima(10, 5);
+  mln::experimental::image2d<uint8_t> ima(10, 5);
   mln::iota(ima, 0);
 
 
   // Morpher has no extension
   mln::experimental::se::rect2d win(3, 3);
 
-  constexpr uint8 _X = 0;
+  constexpr uint8_t _X = 0;
   mln::experimental::image2d<uint8_t> ref = {{_X, _X, _X, _X, _X, _X, _X, _X, _X, _X},
                                              {_X, _X, _X, _X, _X, _X, _X, _X, _X, _X},
                                              {_X, _X, _X, _X, _X, _X, 11, 12, 12, 11},
@@ -148,10 +147,9 @@ TEST(Morpho, DISABLED_gradient_on_view)
 
   mln::image_build_params init_params;
   init_params.init_value = _X;
-  mln::experimental::image2d<uint8> out2(10, 5, init_params);
+  mln::experimental::image2d<uint8_t> out2(10, 5, init_params);
 
   //mln::paste(out, out2);
-  //mln::io::experimental::imprint(out);
   ASSERT_IMAGES_EQ_EXP(out2, ref);
 }
 

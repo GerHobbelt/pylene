@@ -8,7 +8,6 @@
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
-#include <mln/io/experimental/imprint.hpp>
 #include <gtest/gtest.h>
 
 

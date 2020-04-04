@@ -8,7 +8,7 @@
 #include <vector>
 
 
-void Mult_Inplace_Reversed(mln::image2d<mln::uint8>& img)
+void Mult_Inplace_Reversed(mln::image2d<uint8_t>& img)
 {
   mln_reverse_foreach (auto p, img.pixels())
   {
@@ -16,7 +16,7 @@ void Mult_Inplace_Reversed(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Mult_Inplace_New_Values_Reversed(mln::experimental::image2d<mln::uint8>& img)
+void Mult_Inplace_New_Values_Reversed(mln::experimental::image2d<uint8_t>& img)
 {
   auto reversed_values = mln::ranges::view::reverse(img.new_values());
   mln_foreach_new (auto& v, reversed_values)
@@ -25,7 +25,7 @@ void Mult_Inplace_New_Values_Reversed(mln::experimental::image2d<mln::uint8>& im
   }
 }
 
-void Mult_Inplace_New_Pixels_Reversed(mln::experimental::image2d<mln::uint8>& img)
+void Mult_Inplace_New_Pixels_Reversed(mln::experimental::image2d<uint8_t>& img)
 {
   auto reversed_pixels = mln::ranges::view::reverse(img.new_pixels());
   mln_foreach_new (auto&& px, reversed_pixels)
@@ -34,7 +34,7 @@ void Mult_Inplace_New_Pixels_Reversed(mln::experimental::image2d<mln::uint8>& im
   }
 }
 
-void Mult_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
+void Mult_Inplace_C_Reversed(uint8_t* buffer, int width, int height, std::ptrdiff_t stride)
 {
   buffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
@@ -45,7 +45,7 @@ void Mult_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std::ptr
   }
 }
 
-void Mult_Reversed(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Mult_Reversed(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 {
   mln_rpixter(pxIn, in);
   mln_rpixter(pxOut, out);
@@ -55,7 +55,7 @@ void Mult_Reversed(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>&
   }
 }
 
-void Mult_C_Reversed(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer, int width, int height,
+void Mult_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
                      std::ptrdiff_t stride)
 {
   ibuffer += (height - 1) * stride;
@@ -69,7 +69,7 @@ void Mult_C_Reversed(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restr
   }
 }
 
-void Mult_New_Values_Reversed(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
+void Mult_New_Values_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output)
 {
   auto zipped_values = mln::ranges::view::zip(mln::ranges::view::reverse(input.new_values()),
                                               mln::ranges::view::reverse(output.new_values()));
@@ -82,7 +82,7 @@ void Mult_New_Values_Reversed(const mln::experimental::image2d<mln::uint8>& inpu
   }
 }
 
-void Mult_New_Pixels_Reversed(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
+void Mult_New_Pixels_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output)
 {
   auto zipped_pixels = mln::ranges::view::zip(mln::ranges::view::reverse(input.new_pixels()),
                                               mln::ranges::view::reverse(output.new_pixels()));
@@ -95,9 +95,9 @@ void Mult_New_Pixels_Reversed(const mln::experimental::image2d<mln::uint8>& inpu
   }
 }
 
-void Threshold_Inplace_Reversed(mln::image2d<mln::uint8>& img)
+void Threshold_Inplace_Reversed(mln::image2d<uint8_t>& img)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   mln_reverse_foreach (auto p, img.pixels())
   {
@@ -105,9 +105,9 @@ void Threshold_Inplace_Reversed(mln::image2d<mln::uint8>& img)
   }
 }
 
-void Threshold_Inplace_New_Values_Reversed(mln::experimental::image2d<mln::uint8>& img)
+void Threshold_Inplace_New_Values_Reversed(mln::experimental::image2d<uint8_t>& img)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   auto reversed_values = mln::ranges::view::reverse(img.new_values());
   mln_foreach_new (auto& v, reversed_values)
@@ -116,9 +116,9 @@ void Threshold_Inplace_New_Values_Reversed(mln::experimental::image2d<mln::uint8
   }
 }
 
-void Threshold_Inplace_New_Pixels_Reversed(mln::experimental::image2d<mln::uint8>& img)
+void Threshold_Inplace_New_Pixels_Reversed(mln::experimental::image2d<uint8_t>& img)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   auto reversed_pixels = mln::ranges::view::reverse(img.new_pixels());
   mln_foreach_new (auto&& px, reversed_pixels)
@@ -127,9 +127,9 @@ void Threshold_Inplace_New_Pixels_Reversed(mln::experimental::image2d<mln::uint8
   }
 }
 
-void Threshold_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
+void Threshold_Inplace_C_Reversed(uint8_t* buffer, int width, int height, std::ptrdiff_t stride)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   buffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
@@ -140,10 +140,10 @@ void Threshold_Inplace_C_Reversed(mln::uint8* buffer, int width, int height, std
   }
 }
 
-void Threshold_C_Reversed(const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer, int width,
+void Threshold_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width,
                           int height, std::ptrdiff_t stride)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   ibuffer += (height - 1) * stride;
   obuffer += (height - 1) * stride;
@@ -156,9 +156,9 @@ void Threshold_C_Reversed(const mln::uint8* __restrict__ ibuffer, mln::uint8* __
   }
 }
 
-void Threshold_Reversed(const mln::image2d<mln::uint8>& in, mln::image2d<mln::uint8>& out)
+void Threshold_Reversed(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
   mln_rpixter(pxIn, in);
   mln_rpixter(pxOut, out);
   mln_forall (pxIn, pxOut)
@@ -167,9 +167,9 @@ void Threshold_Reversed(const mln::image2d<mln::uint8>& in, mln::image2d<mln::ui
   }
 }
 
-void Threshold_New_Values_Reversed(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
+void Threshold_New_Values_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   auto zipped_values = mln::ranges::view::zip(mln::ranges::view::reverse(input.new_values()),
                                               mln::ranges::view::reverse(output.new_values()));
@@ -182,9 +182,9 @@ void Threshold_New_Values_Reversed(const mln::experimental::image2d<mln::uint8>&
   }
 }
 
-void Threshold_New_Pixels_Reversed(const mln::experimental::image2d<mln::uint8>& input, mln::experimental::image2d<mln::uint8>& output)
+void Threshold_New_Pixels_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output)
 {
-  constexpr mln::uint8 t = 128;
+  constexpr uint8_t t = 128;
 
   auto zipped_pixels = mln::ranges::view::zip(mln::ranges::view::reverse(input.new_pixels()),
                                               mln::ranges::view::reverse(output.new_pixels()));
@@ -197,7 +197,7 @@ void Threshold_New_Pixels_Reversed(const mln::experimental::image2d<mln::uint8>&
   }
 }
 
-void LUT_Inplace_Reversed(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
+void LUT_Inplace_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
   mln_rpixter(px, img);
   mln_forall (px)
@@ -206,7 +206,7 @@ void LUT_Inplace_Reversed(const mln::uint8 LUT[], mln::image2d<mln::uint8>& img)
   }
 }
 
-void LUT_Inplace_New_Values_Reversed(const mln::uint8 LUT[], mln::experimental::image2d<mln::uint8>& img)
+void LUT_Inplace_New_Values_Reversed(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img)
 {
   mln_foreach_new (auto& v, img.new_values())
   {
@@ -214,7 +214,7 @@ void LUT_Inplace_New_Values_Reversed(const mln::uint8 LUT[], mln::experimental::
   }
 }
 
-void LUT_Inplace_New_Pixels_Reversed(const mln::uint8 LUT[], mln::experimental::image2d<mln::uint8>& img)
+void LUT_Inplace_New_Pixels_Reversed(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img)
 {
   mln_foreach_new (auto&& px, img.new_pixels())
   {
@@ -222,7 +222,7 @@ void LUT_Inplace_New_Pixels_Reversed(const mln::uint8 LUT[], mln::experimental::
   }
 }
 
-void LUT_Inplace_C_Reversed(const mln::uint8* LUT, mln::uint8* buffer, int width, int height, std::ptrdiff_t stride)
+void LUT_Inplace_C_Reversed(const uint8_t* LUT, uint8_t* buffer, int width, int height, std::ptrdiff_t stride)
 {
   buffer += (height - 1) * stride;
   for (int y = height - 1; y >= 0; --y)
@@ -233,7 +233,7 @@ void LUT_Inplace_C_Reversed(const mln::uint8* LUT, mln::uint8* buffer, int width
   }
 }
 
-void LUT_Reversed(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input, mln::image2d<mln::uint8>& output)
+void LUT_Reversed(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output)
 {
   mln_rpixter(pxIn, input);
   mln_rpixter(pxOut, output);
@@ -243,7 +243,7 @@ void LUT_Reversed(const mln::uint8 LUT[], const mln::image2d<mln::uint8>& input,
   }
 }
 
-void LUT_C_Reversed(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffer, mln::uint8* __restrict__ obuffer,
+void LUT_C_Reversed(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer,
                     int width, int height, std::ptrdiff_t stride)
 {
   ibuffer += (height - 1) * stride;
@@ -257,8 +257,8 @@ void LUT_C_Reversed(const mln::uint8* LUT, const mln::uint8* __restrict__ ibuffe
   }
 }
 
-void LUT_New_Values_Reversed(const mln::uint8 LUT[], const mln::experimental::image2d<mln::uint8>& input,
-                             mln::experimental::image2d<mln::uint8>& output)
+void LUT_New_Values_Reversed(const uint8_t LUT[], const mln::experimental::image2d<uint8_t>& input,
+                             mln::experimental::image2d<uint8_t>& output)
 {
   auto zipped_values = mln::ranges::view::zip(mln::ranges::view::reverse(input.new_values()),
                                               mln::ranges::view::reverse(output.new_values()));
@@ -271,8 +271,8 @@ void LUT_New_Values_Reversed(const mln::uint8 LUT[], const mln::experimental::im
   }
 }
 
-void LUT_New_Pixels_Reversed(const mln::uint8 LUT[], const mln::experimental::image2d<mln::uint8>& input,
-                             mln::experimental::image2d<mln::uint8>& output)
+void LUT_New_Pixels_Reversed(const uint8_t LUT[], const mln::experimental::image2d<uint8_t>& input,
+                             mln::experimental::image2d<uint8_t>& output)
 {
   auto zipped_pixels = mln::ranges::view::zip(mln::ranges::view::reverse(input.new_pixels()),
                                               mln::ranges::view::reverse(output.new_pixels()));

@@ -90,7 +90,6 @@ add_core_test(${test_prefix}equal              algorithm/equal.cpp)
 add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}transform          algorithm/transform.cpp)
 add_core_test(${test_prefix}sort               algorithm/sort.cpp)
-add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 add_core_test(${test_prefix}accumulate_local   algorithm/accumulate_local.cpp)
 
 # test SE

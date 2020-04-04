@@ -1,10 +1,10 @@
 
-#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/algorithm/copy.hpp>
+#include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
-
+#include <mln/core/rangev3/foreach.hpp>
 
 
 // Threshold A la C

@@ -20,15 +20,6 @@
 
 
 #include <mln/core/forall.hpp>
-#include <mln/core/image/morphers/morpher_base.hpp>
 #include <mln/core/image_base.hpp>
 
 #include <mln/core/image/image_routines.hpp>
-#include <mln/core/image/image_expr.hpp>
-#include <mln/core/image/image_maths_ops.hpp>
-#include <mln/core/image/image_ops.hpp>
-
-
-// The most fundamental views are automatically included
-#include <mln/core/image/morphers/transformed_image.hpp> // Map
-#include <mln/core/image/sub_image.hpp>                  // Filter by domain

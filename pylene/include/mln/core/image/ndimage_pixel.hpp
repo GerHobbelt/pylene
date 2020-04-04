@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mln/core/image/ndimage.hpp>
-
 #include <type_traits>
 
 namespace mln
@@ -10,6 +8,11 @@ namespace mln
   /// \brief Pixel type definition of nd-images
   template <class T, unsigned dim, class E>
   struct ndimage_pixel;
+
+  /// Fwd declaration
+  template <typename T, unsigned dim, typename E>
+  struct ndimage_base;
+
 
   /******************************************/
   /****          Implementation          ****/

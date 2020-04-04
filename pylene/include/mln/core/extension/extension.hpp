@@ -3,7 +3,6 @@
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/image/morphers/extended_by_value_image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 
 
@@ -48,22 +47,6 @@ namespace mln
     template <class I, class N>
     bool need_adjust(const Image<I>& ima, const Neighborhood<N>& nbh);
 
-    /// \brief Add an infinite value extension to the image. In the resulting
-    /// image, every access outside the image domain yields in the extension value.
-    ///
-    /// \param ima input image
-    /// \param value_extension_tag
-    ///
-    /// \return an image extended by value
-    ///
-    template <typename I>
-    extended_by_value_image<const I&> add_value_extension(const Image<I>& ima, const mln_value(I) & v);
-
-    template <typename I>
-    extended_by_value_image<I&> add_value_extension(Image<I>& ima, const mln_value(I) & v);
-
-    template <typename I>
-    extended_by_value_image<I> add_value_extension(Image<I>&& ima, const mln_value(I) & v);
 
     /******************************************/
     /****          Implementation          ****/
@@ -85,24 +68,6 @@ namespace mln
     I&& remove_extension(Image<I>&& ima)
     {
       return move_exact(ima);
-    }
-
-    template <typename I>
-    extended_by_value_image<const I&> add_value_extension(const Image<I>& ima, const mln_value(I) & v)
-    {
-      return extended_by_value_image<const I&>(exact(ima), v);
-    }
-
-    template <typename I>
-    extended_by_value_image<I&> add_value_extension(Image<I>& ima, const mln_value(I) & v)
-    {
-      return extended_by_value_image<I&>(exact(ima), v);
-    }
-
-    template <typename I>
-    extended_by_value_image<I> add_value_extension(Image<I>&& ima, const mln_value(I) & v)
-    {
-      return extended_by_value_image<I>(move_exact(ima), v);
     }
 
     namespace impl

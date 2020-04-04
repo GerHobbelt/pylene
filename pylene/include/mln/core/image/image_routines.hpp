@@ -5,7 +5,6 @@
 #include <mln/core/iref.hpp>
 #include <mln/core/iterator/filter_iterator.hpp>
 #include <mln/core/iterator/transform_iterator.hpp>
-#include <mln/core/pixel_utility.hpp>
 
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/or.hpp>

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mln/core/image/experimental/ndimage_fwd.hpp>
+
 #include <cstdint>
+#include <cstddef>
 
 void Sum(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
 void Average(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);

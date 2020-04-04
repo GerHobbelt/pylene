@@ -40,14 +40,14 @@ TEST(Accu, Mean_vec)
   accumulators::mean<rgb8> acc;
   accumulators::mean<rgb8> acc2;
 
-  acc.take(rgb8{(uint8)5, (uint8)5, (uint8)255});
-  acc.take(rgb8{(uint8)255, (uint8)5, (uint8)255});
+  acc.take(rgb8{5, 5, 255});
+  acc.take(rgb8{255, 5, 255});
 
   ASSERT_EQ(extractor::sum(acc), (rgb<int>{260, 10, 510}));
   ASSERT_EQ(extractor::count(acc), 2u);
-  ASSERT_EQ(extractor::mean(acc), (rgb8{(uint8)130, (uint8)5, (uint8)255}));
+  ASSERT_EQ(extractor::mean(acc), (rgb8{130, 5, 255}));
 
-  acc.untake(rgb8{(uint8)10, (uint8)10, (uint8)10});
+  acc.untake(rgb8{10, 10, 10});
 
   ASSERT_EQ(extractor::sum(acc), (rgb<int>{250, 0, 500}));
   ASSERT_EQ(extractor::count(acc), 1u);

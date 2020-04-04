@@ -1,13 +1,12 @@
+#include <mln/io/experimental/imread.hpp>
+#include <mln/io/experimental/imsave.hpp>
+
+
 #include <mln/core/algorithm/iota.hpp>
-
-#include <mln/core/grays.hpp>
 #include <mln/core/colors.hpp>
-
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/cast.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imsave.hpp>
 
 #include <fixtures/ImagePath/image_path.hpp>
 #include <fixtures/ImageCompare/image_compare.hpp>

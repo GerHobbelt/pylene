@@ -1,4 +1,3 @@
-#include <mln/core/image/image2d.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/rows.hpp>
@@ -8,13 +7,6 @@
 #include <vector>
 
 
-void Mult_Inplace_Reversed(mln::image2d<uint8_t>& img)
-{
-  mln_reverse_foreach (auto p, img.pixels())
-  {
-    p.val() *= 2;
-  }
-}
 
 void Mult_Inplace_New_Values_Reversed(mln::experimental::image2d<uint8_t>& img)
 {
@@ -45,15 +37,6 @@ void Mult_Inplace_C_Reversed(uint8_t* buffer, int width, int height, std::ptrdif
   }
 }
 
-void Mult_Reversed(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
-{
-  mln_rpixter(pxIn, in);
-  mln_rpixter(pxOut, out);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = pxIn->val() * 2;
-  }
-}
 
 void Mult_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
                      std::ptrdiff_t stride)
@@ -95,15 +78,6 @@ void Mult_New_Pixels_Reversed(const mln::experimental::image2d<uint8_t>& input, 
   }
 }
 
-void Threshold_Inplace_Reversed(mln::image2d<uint8_t>& img)
-{
-  constexpr uint8_t t = 128;
-
-  mln_reverse_foreach (auto p, img.pixels())
-  {
-    p.val() = p.val() < t ? 0 : 255;
-  }
-}
 
 void Threshold_Inplace_New_Values_Reversed(mln::experimental::image2d<uint8_t>& img)
 {
@@ -156,16 +130,6 @@ void Threshold_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restri
   }
 }
 
-void Threshold_Reversed(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
-{
-  constexpr uint8_t t = 128;
-  mln_rpixter(pxIn, in);
-  mln_rpixter(pxOut, out);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = pxIn->val() < t ? 0 : 255;
-  }
-}
 
 void Threshold_New_Values_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output)
 {
@@ -197,14 +161,6 @@ void Threshold_New_Pixels_Reversed(const mln::experimental::image2d<uint8_t>& in
   }
 }
 
-void LUT_Inplace_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>& img)
-{
-  mln_rpixter(px, img);
-  mln_forall (px)
-  {
-    px->val() = LUT[px->val()];
-  }
-}
 
 void LUT_Inplace_New_Values_Reversed(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img)
 {
@@ -233,15 +189,6 @@ void LUT_Inplace_C_Reversed(const uint8_t* LUT, uint8_t* buffer, int width, int 
   }
 }
 
-void LUT_Reversed(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output)
-{
-  mln_rpixter(pxIn, input);
-  mln_rpixter(pxOut, output);
-  mln_forall (pxIn, pxOut)
-  {
-    pxOut->val() = LUT[pxIn->val()];
-  }
-}
 
 void LUT_C_Reversed(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer,
                     int width, int height, std::ptrdiff_t stride)

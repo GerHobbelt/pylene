@@ -21,14 +21,6 @@
 namespace fixtures::ImageCompare
 {
 
-  /// \brief Compare if two images are equals
-  ///
-  /// \param[in] f First image to compare
-  /// \param[in] g Second image to compare
-  /// Two image are equals iff every pixel (point + value) are equals.
-  template <class I, class J>
-  bool compare(const mln::Image<I>& f, const mln::Image<J>& g);
-
   namespace experimental
   {
     enum
@@ -50,41 +42,6 @@ namespace fixtures::ImageCompare
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
-
-  template <class I, class J>
-  bool compare(const mln::Image<I>& reference, const mln::Image<J>& input)
-  {
-    mln_pixter(px1, mln::exact(reference));
-    mln_pixter(px2, mln::exact(input));
-
-    mln_forall (px1, px2)
-    {
-      if (px1->point() != px2->point() or px1->val() != px2->val())
-        return false;
-    }
-    if (px1.finished() && px2.finished())
-      return true;
-    return false;
-  }
-
-  namespace impl
-  {
-    template <class I, class J>
-    std::string err_compare_msg(const mln::Image<I>& reference, const mln::Image<J>& input, bool eq = true)
-    {
-      std::stringstream msg;
-      if (eq)
-        msg << "The following images differ:\n";
-      else
-        msg << "The following images are identical:\n";
-      (void)input;
-      (void)reference;
-      // mln::io::imprint(reference, msg);
-      // msg << " and\n:";
-      // mln::io::imprint(input, msg);
-      return msg.str();
-    }
-  } // namespace impl
 
 
   namespace experimental
@@ -197,12 +154,6 @@ namespace fixtures::ImageCompare
 } // namespace fixtures::ImageCompare
 
 /// \brief GTest macro for image equality test
-#define ASSERT_IMAGES_EQ(f, g)                                                                                         \
-  ASSERT_TRUE(::fixtures::ImageCompare::compare(f, g)) << ::fixtures::ImageCompare::impl::err_compare_msg(f, g)
-
-#define ASSERT_IMAGES_NE(f, g)                                                                                         \
-  ASSERT_FALSE(::fixtures::ImageCompare::compare(f, g)) << ::fixtures::ImageCompare::impl::err_compare_msg(f, g, false)
-
 
 #define ASSERT_IMAGES_EQ_EXP(f, g) ASSERT_TRUE(::fixtures::ImageCompare::experimental::compare(f, g))
 #define ASSERT_IMAGES_NE_EXP(f, g) ASSERT_FALSE(::fixtures::ImageCompare::experimental::compare(f, g))

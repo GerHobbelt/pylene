@@ -14,12 +14,4 @@
 
 #include <mln/core/image_traits.hpp>
 #include <mln/core/image/private/image_builder.hpp>
-#include <mln/core/concept/image.hpp>
 
-
-
-
-#include <mln/core/forall.hpp>
-#include <mln/core/image_base.hpp>
-
-#include <mln/core/image/image_routines.hpp>

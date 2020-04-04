@@ -28,12 +28,6 @@ namespace mln
   template <class I, class V>
   using image_ch_value_t = typename I::template ch_value_type<V>;
 
-  template <class I, class V>
-  using ch_value_t = image_ch_value_t<I, V>;
-
-  template <class I>
-  using concrete_t = image_concrete_t<I>;
-
 
   // Extension trait
   template <class I>

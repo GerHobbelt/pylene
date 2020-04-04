@@ -1,13 +1,15 @@
-#include <mln/core/concept/new/images.hpp>
 #include <mln/core/image/experimental/ndbuffer_image.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/core/image/image2d.hpp>
 
+
+#include <mln/core/concept/new/images.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
 #include <numeric>
+#include <cstdint>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
+
 #include <gtest/gtest.h>
 
 
@@ -1395,20 +1397,4 @@ TEST(image2d, pixel_range_write)
 }
 
 
-TEST(image2d, conversion_from_legacy)
-{
-  mln::image2d<uint8_t> old_image(mln::box2d{{-1, -1}, {1, 2}});
-  old_image.at(-1,-1) = 42;
-  old_image.at(0, 1)  = 69;
-
-
-  auto new_image = mln::experimental::image2d<uint8_t>::from(old_image);
-
-  EXPECT_EQ(new_image.border(), 3);
-  EXPECT_EQ(new_image.width(), 3);
-  EXPECT_EQ(new_image.height(), 2);
-  EXPECT_EQ(&new_image({-1,-1}), &old_image.at(-1,-1));
-  EXPECT_EQ(&new_image({1, 0}), &old_image.at(0, 1));
-
-}
 

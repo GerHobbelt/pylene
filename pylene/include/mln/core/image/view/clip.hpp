@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/rangev3/view/filter.hpp>

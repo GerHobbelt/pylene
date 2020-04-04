@@ -48,12 +48,6 @@ add_core_test(${test_prefix}image_ndbuffer_image    image/ndbuffer_image.cpp)
 add_core_test(${test_prefix}image_ndimage           image/ndimage.cpp)
 
 
-add_core_test(${test_prefix}image2d_iterators       image/image2d_iterators.cpp)
-add_core_test(${test_prefix}image_private_ndpixel   image/private/ndimage_pixel.cpp)
-
-
-
-
 
 
 # test Neighborhood

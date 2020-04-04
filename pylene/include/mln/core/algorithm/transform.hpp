@@ -3,6 +3,8 @@
 #include <mln/core/rangev3/rows.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/assert.hpp>
+
 
 #include <range/v3/algorithm/transform.hpp>
 #include <range/v3/functional/concepts.hpp>

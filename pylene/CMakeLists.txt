@@ -15,7 +15,7 @@ if (TBB_FOUND AND PYLENE_USE_TBB)
   target_link_libraries(Pylene INTERFACE tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
-  #FIXME use a config file
+#FIXME use a config file
   target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
 endif ()
 
@@ -43,6 +43,7 @@ target_link_libraries(Pylene PUBLIC fmt::fmt)
 #target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
+               src/accu/cvxhull.cpp
                src/core/image_format.cpp
                src/core/init_list.cpp
                src/core/ndbuffer_image.cpp

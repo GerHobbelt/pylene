@@ -609,19 +609,19 @@ namespace mln
     // Get the pointer of the first point
     // Old impl
 
-    mln::point<short, N> shp;
+    int                  dims[N];
     int                  coords[N];
     std::size_t          strides[N];
 
     for (int k = 0; k < N; ++k)
     {
       coords[k]          = this->__axes(k).domain_begin;
-      shp[N - k - 1]     = static_cast<short>(this->__axes(k).domain_end - this->__axes(k).domain_begin);
+      dims[N - k - 1]     = static_cast<short>(this->__axes(k).domain_end - this->__axes(k).domain_begin);
       strides[N - k - 1] = this->__axes(k).byte_stride;
     }
 
     auto ptr = Impl::get_pointer(this->__info(), coords);
-    return mln::internal::ndimage_extension<T, N>{(char*)ptr, strides, shp, this->border()};
+    return mln::internal::ndimage_extension<T, N>{(char*)ptr, strides, dims, this->border()};
   }
 
 

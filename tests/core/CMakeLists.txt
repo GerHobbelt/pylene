@@ -4,9 +4,6 @@ set(test_prefix "UTCore_")
 add_core_test(${test_prefix}point point.cpp)
 add_core_test(${test_prefix}box box.cpp)
 
-# test loop
-add_core_test(${test_prefix}forloop forloop.cpp)
-
 # test Range
 add_core_test(${test_prefix}range               range/range.cpp)
 add_core_test(${test_prefix}range_foreach       range/foreach.cpp)

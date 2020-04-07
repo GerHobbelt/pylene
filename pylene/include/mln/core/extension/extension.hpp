@@ -95,7 +95,7 @@ namespace mln
     template <class I, class N>
     bool need_adjust(const Image<I>& ima, const Neighborhood<N>& nbh)
     {
-      return extension::impl::need_adjust(exact(ima), exact(nbh), typename image_traits<I>::extension(),
+      return extension::impl::need_adjust(exact(ima), exact(nbh), image_extension_category_t<I>(),
                                           typename N::category());
     }
 

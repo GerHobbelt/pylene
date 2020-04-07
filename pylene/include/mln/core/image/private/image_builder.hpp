@@ -316,7 +316,7 @@ namespace mln
     // Reindexation (required as ndImage is not cleaned up)
     // It ensures that both image have the same starting index
     if constexpr (mln::is_a<I, mln::Image>::value && mln::is_a<From, mln::Image>::value)
-      if constexpr (image_traits<I>::indexable::value && image_traits<From>::indexable::value)
+      if constexpr (image_indexable_v<I> && image_indexable_v<From>)
       {
         auto&& domain = m_from.domain();
         auto   p      = domain.iter();
@@ -360,7 +360,7 @@ namespace mln
     // Reindexation (required as ndImage is not cleaned up)
     // It ensures that both image have the same starting index
     if constexpr (mln::is_a<To, mln::Image>::value && mln::is_a<From, mln::Image>::value)
-      if constexpr (image_traits<To>::indexable::value && image_traits<From>::indexable::value)
+      if constexpr (image_indexable_v<To> && image_indexable_v<From>)
       {
         auto&& domain = m_from.domain();
         auto   p      = domain.iter();

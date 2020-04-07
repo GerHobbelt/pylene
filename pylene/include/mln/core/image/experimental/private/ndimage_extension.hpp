@@ -91,7 +91,7 @@ namespace mln::internal
   template <typename SE>
   bool ndimage_extension<T, dim>::fit(const SE& se) const
   {
-    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>() || mln::is_a<SE, mln::Neighborhood>());
+    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
     if constexpr (std::is_convertible_v<typename SE::category, dynamic_neighborhood_tag>)
     {

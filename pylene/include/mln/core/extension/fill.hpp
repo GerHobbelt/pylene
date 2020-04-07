@@ -7,8 +7,7 @@
 namespace mln::extension
 {
   template <class InputImage>
-  std::enable_if_t<mln::is_a<InputImage, mln::experimental::Image>::value ||
-                   mln::is_a<InputImage, mln::Image>::value>
+  std::enable_if_t<mln::is_a<InputImage, mln::experimental::Image>::value>
   fill(const InputImage& f, image_value_t<InputImage> v);
 
   template <class InputImage>
@@ -19,8 +18,7 @@ namespace mln::extension
   /******************************************/
 
   template <typename InputImage>
-  std::enable_if_t<mln::is_a<InputImage, mln::experimental::Image>::value ||
-                   mln::is_a<InputImage, mln::Image>::value>
+  std::enable_if_t<mln::is_a<InputImage, mln::experimental::Image>::value>
   fill(const InputImage& ima, image_value_t<InputImage> v)
   {
     static_assert(image_has_extension_v<InputImage>, "Image must have an extension.");

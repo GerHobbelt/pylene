@@ -1,12 +1,14 @@
 #pragma once
 
+
+#include <mln/core/concept/new/neighborhoods.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/reverse.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
-#include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/trace.hpp>
 
 #include <limits>

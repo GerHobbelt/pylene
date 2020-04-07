@@ -16,25 +16,6 @@ namespace mln
     /****          Free functions          ****/
     /******************************************/
 
-    /// \brief Remove the extension of an image.
-    ///
-    /// \p remove_extension recursively removes the extensions of an image until
-    /// getting an image without extension or an image whose extension cannot be
-    /// removed. This function has to be overloaded by the morphers extending an
-    /// image. This default implementation returns the input image as such.
-    ///
-    /// \param ima input image
-    ///
-    /// \return The image without extension
-    ///
-    template <typename I>
-    const I& remove_extension(const Image<I>& ima);
-
-    template <typename I>
-    I& remove_extension(Image<I>& ima);
-
-    template <typename I>
-    I&& remove_extension(Image<I>&& ima);
 
     /// \brief Check if an image extension is wide enough to support
     /// a given neighborhood/se/window.
@@ -44,31 +25,13 @@ namespace mln
     /// * \p ima has an extension
     /// * \p the neighborhood is constant (either static or dynamic)
     /// * \p the extension is wide enough
-    template <class I, class N>
-    bool need_adjust(const Image<I>& ima, const Neighborhood<N>& nbh);
+    template <class I, class SE>
+    bool need_adjust(const experimental::Image<I>& ima, const experimental::StructuringElement<SE>& se);
 
 
     /******************************************/
     /****          Implementation          ****/
     /******************************************/
-
-    template <typename I>
-    const I& remove_extension(const Image<I>& ima)
-    {
-      return exact(ima);
-    }
-
-    template <typename I>
-    I& remove_extension(Image<I>& ima)
-    {
-      return exact(ima);
-    }
-
-    template <typename I>
-    I&& remove_extension(Image<I>&& ima)
-    {
-      return move_exact(ima);
-    }
 
     namespace impl
     {
@@ -92,12 +55,6 @@ namespace mln
       }
     } // namespace impl
 
-    template <class I, class N>
-    bool need_adjust(const Image<I>& ima, const Neighborhood<N>& nbh)
-    {
-      return extension::impl::need_adjust(exact(ima), exact(nbh), image_extension_category_t<I>(),
-                                          typename N::category());
-    }
 
     template <class I, class SE>
     bool need_adjust(const mln::experimental::Image<I>& ima, const mln::experimental::StructuringElement<SE>& se)

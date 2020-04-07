@@ -5,7 +5,6 @@ add_core_test(${test_prefix}point point.cpp)
 add_core_test(${test_prefix}box box.cpp)
 
 # test Range
-add_core_test(${test_prefix}range               range/range.cpp)
 add_core_test(${test_prefix}range_foreach       range/foreach.cpp)
 add_core_test(${test_prefix}range_transform     range/transform.cpp)
 add_core_test(${test_prefix}range_transform_if  range/transform_if.cpp)

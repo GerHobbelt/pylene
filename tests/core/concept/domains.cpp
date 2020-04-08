@@ -1,5 +1,5 @@
-#include <mln/core/concept/new/archetype/domain.hpp>
-#include <mln/core/concept/new/domains.hpp>
+#include <mln/core/concept/archetype/domain.hpp>
+#include <mln/core/concept/domains.hpp>
 
 #include <gtest/gtest.h>
 

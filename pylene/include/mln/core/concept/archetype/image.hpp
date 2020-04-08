@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include <mln/core/concept/new/archetype/domain.hpp>
-#include <mln/core/concept/new/archetype/pixel.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/archetype/domain.hpp>
+#include <mln/core/concept/archetype/pixel.hpp>
+#include <mln/core/concept/images.hpp>
 
 #include <mln/core/image/private/image_traits.hpp>
 #include <mln/core/image/private/pixel_traits.hpp>

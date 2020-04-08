@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/structuring_elements.hpp>
-#include <mln/core/concept/new/pixels.hpp>
+#include <mln/core/concept/structuring_elements.hpp>
+#include <mln/core/concept/pixels.hpp>
 #include <mln/core/concept/object.hpp>
 
 #include <mln/core/neighborhood/private/sliding_pixel_range.hpp>

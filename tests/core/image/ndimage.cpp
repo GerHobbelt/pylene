@@ -1,4 +1,4 @@
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <type_traits>

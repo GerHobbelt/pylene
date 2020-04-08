@@ -1,8 +1,8 @@
 // [legacy]
 #pragma once
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concept/structuring_elements.hpp>
 #include <mln/core/image/private/image_traits.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 
 
 #include <any>

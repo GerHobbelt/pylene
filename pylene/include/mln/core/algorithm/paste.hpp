@@ -1,6 +1,6 @@
 #pragma once
 #include <mln/core/algorithm/copy.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/rows.hpp>
 

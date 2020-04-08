@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/algorithm/sort.hpp>
 

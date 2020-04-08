@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/box.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
 #include <memory>

@@ -3,7 +3,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/concept/new/archetype/image.hpp>
+#include <mln/core/concept/archetype/image.hpp>
 #include <mln/core/domain/where.hpp>
 
 #include <mln/core/image/experimental/ndimage.hpp>

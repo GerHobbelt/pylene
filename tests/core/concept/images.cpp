@@ -1,5 +1,5 @@
-#include <mln/core/concept/new/archetype/image.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/archetype/image.hpp>
+#include <mln/core/concept/images.hpp>
 
 #include <gtest/gtest.h>
 

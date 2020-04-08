@@ -2,9 +2,9 @@
 
 #include <concepts/concepts.hpp>
 
-#include <mln/core/concept/new/points.hpp>
-#include <mln/core/concept/new/values.hpp>
-#include <mln/core/concept/new/indexes.hpp>
+#include <mln/core/concept/points.hpp>
+#include <mln/core/concept/values.hpp>
+#include <mln/core/concept/indexes.hpp>
 
 #include <mln/core/image/private/pixel_traits.hpp>
 

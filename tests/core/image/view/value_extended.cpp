@@ -6,6 +6,8 @@
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 
+#include <mln/core/concept/new/archetype/image.hpp>
+
 #include <gtest/gtest.h>
 
 static_assert(mln::concepts::InputImage<mln::value_extended_view<mln::archetypes::InputImage>>);
@@ -14,7 +16,7 @@ static_assert(mln::concepts::IndexableImage<mln::value_extended_view<mln::archet
 static_assert(mln::concepts::AccessibleImage<mln::value_extended_view<mln::archetypes::AccessibleImage>>);
 static_assert(mln::concepts::BidirectionalImage<mln::value_extended_view<mln::archetypes::BidirectionalImage>>);
 static_assert(!mln::concepts::RawImage<mln::value_extended_view<mln::archetypes::RawImage>>);
-#endif
+
 
 
 TEST(View, value_extended)

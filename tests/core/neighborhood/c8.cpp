@@ -10,7 +10,6 @@ static_assert(mln::concepts::Neighborhood<mln::experimental::c8_t, mln::experime
 static_assert(not mln::concepts::SeparableStructuringElement<mln::experimental::c8_t, mln::experimental::point2d>);
 static_assert(not mln::concepts::DecomposableStructuringElement<mln::experimental::c8_t, mln::experimental::point2d>);
 static_assert(not mln::concepts::IncrementalStructuringElement<mln::experimental::c8_t, mln::experimental::point2d>);
-#endif
 
 
 TEST(Core, c4_point)

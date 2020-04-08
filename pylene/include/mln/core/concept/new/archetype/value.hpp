@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/values.hpp>
 
 
@@ -11,7 +10,7 @@ namespace mln::archetypes
   {
   };
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Value<Value>, "Value archetype does not model the Value concept!");
+  static_assert(mln::concepts::Value<Value>, "Value archetype does not model the Value concept!");
 
 
   struct ComparableValue final
@@ -20,7 +19,7 @@ namespace mln::archetypes
   bool operator==(const ComparableValue&, const ComparableValue&);
   bool operator!=(const ComparableValue&, const ComparableValue&);
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ComparableValue<ComparableValue>,
+  static_assert(mln::concepts::ComparableValue<ComparableValue>,
                            "ComparableValue archetype does not model the ComparableValue concept!");
 
 
@@ -34,7 +33,7 @@ namespace mln::archetypes
   bool operator<=(const OrderedValue&, const OrderedValue&);
   bool operator>=(const OrderedValue&, const OrderedValue&);
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::OrderedValue<OrderedValue>,
+  static_assert(mln::concepts::OrderedValue<OrderedValue>,
                            "OrderedValue archetype does not model the OrderedValue concept!");
 
 } // namespace mln::archetypes

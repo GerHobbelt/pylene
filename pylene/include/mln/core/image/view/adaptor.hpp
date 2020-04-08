@@ -128,10 +128,7 @@ namespace mln
     using category_type      = image_category_t<I>;
     using concrete_type      = image_concrete_t<I>;
 
-    template <concepts::Value Val>
-#else
-    template <typename Val>
-#endif
+    template <class Val>
     using ch_value_type = image_ch_value_t<I, Val>;
     /// \}
 
@@ -156,10 +153,7 @@ namespace mln
     auto new_pixels() { return m_ima.new_pixels(); }
     auto concretize() const { return m_ima.concretize(); }
 
-    template <concepts::Value Val>
-#else
     template <typename Val>
-#endif
     auto ch_value() const
     {
       return m_ima.template ch_value<Val>();

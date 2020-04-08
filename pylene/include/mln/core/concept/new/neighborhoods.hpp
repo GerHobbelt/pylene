@@ -34,7 +34,6 @@ namespace mln::concepts
       requires concepts::Pixel<::ranges::range_value_t<decltype(se.before(px))>>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se.after(px))>>;
     };
-#endif
   // clang-format on
 
 } // namespace mln::concepts

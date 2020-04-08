@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 static_assert(mln::concepts::StructuringElement<mln::experimental::se::periodic_line2d, mln::experimental::point2d>);
-#endif
 
 
 TEST(Core, periodic_line2d)

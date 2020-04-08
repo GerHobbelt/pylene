@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mln/core/concept/new/archetype/point.hpp>
-#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/domains.hpp>
 
 
@@ -21,14 +20,14 @@ namespace mln::archetypes
     int  dim() const;
   };
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::Domain<Domain>, "Domain archetype does not model the Domain concept!");
+  static_assert(mln::concepts::Domain<Domain>, "Domain archetype does not model the Domain concept!");
 
   struct SizedDomain : Domain
   {
     unsigned size() const;
   };
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::SizedDomain<SizedDomain>,
+  static_assert(mln::concepts::SizedDomain<SizedDomain>,
                            "SizedDomain archetype does not model the SizedDomain concept!");
 
   struct ShapedDomain final : SizedDomain
@@ -38,6 +37,6 @@ namespace mln::archetypes
     std::array<std::size_t, ndim> extents() const;
   };
 
-  PYLENE_CONCEPT_TS_ASSERT(mln::concepts::ShapedDomain<ShapedDomain>,
+  static_assert(mln::concepts::ShapedDomain<ShapedDomain>,
                            "ShapedDomain archetype does not model the ShapedDomain concept!");
 } // namespace mln::archetypes

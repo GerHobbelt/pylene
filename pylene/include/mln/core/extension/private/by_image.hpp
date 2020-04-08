@@ -37,7 +37,7 @@ namespace mln::extension
     template <typename SE>
     constexpr bool fit(const SE&) const
     {
-      PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
+      static_assert(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
       // TODO: non-trivial
       return true;

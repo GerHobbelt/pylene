@@ -43,14 +43,12 @@ public:
   using range_type                  = mln::ranges::multi_span<T, Rank>;
 
   static_assert(Rank == 1 || mln::ranges::is_segmented_range<range_type>::value);
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::stl::OutputRange<range_type, const T&>);
   static_assert(mln::concepts::SegmentedRange<range_type>);
   static_assert(mln::concepts::ReversibleRange<range_type>);
 #else
   static_assert(::ranges::ForwardRange<range_type>());
   static_assert(::ranges::OutputRange<range_type, const T&>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
 
   MultiSpanTest()

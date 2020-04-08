@@ -28,13 +28,11 @@ TEST(View, mask)
   auto z = mln::view::mask(ima, mask);
   fill(z, 42);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(z)>);
   static_assert(mln::concepts::ViewImage<decltype(z)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(z)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(z)>);
   static_assert(not mln::concepts::RawImage<decltype(z)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   auto dom = z.domain();
   for (auto&& r : dom.rows())

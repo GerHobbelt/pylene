@@ -53,7 +53,6 @@ namespace mln
     using category_type = std::common_type_t<common_category, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I0, typename I0::value_type>;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value V>
 #else
     template <typename V>

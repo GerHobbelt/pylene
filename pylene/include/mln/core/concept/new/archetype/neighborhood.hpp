@@ -10,7 +10,6 @@ namespace mln::archetypes
   namespace details
   {
     template <class P, class Pix>
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     // clang-format off
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif

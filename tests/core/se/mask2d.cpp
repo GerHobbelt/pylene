@@ -3,7 +3,6 @@
 
 #include <mln/core/image/experimental/ndimage.hpp>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::StructuringElement<mln::se::experimental::mask2d, mln::experimental::point2d>);
 #endif
 

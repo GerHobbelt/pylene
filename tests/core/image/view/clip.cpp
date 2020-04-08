@@ -41,13 +41,11 @@ TEST(View, clip)
   auto clipped = mln::view::clip(ima, domain);
   mln::fill(clipped, 42);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(clipped)>);
   static_assert(mln::concepts::ViewImage<decltype(clipped)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(clipped)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(clipped)>);
   static_assert(not mln::concepts::RawImage<decltype(clipped)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : clipped.domain())
   {
@@ -77,24 +75,20 @@ TEST(View, clip_twice)
 
   auto A = mln::view::clip(ima, domain_a);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(A)>);
   static_assert(mln::concepts::ViewImage<decltype(A)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(A)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(A)>);
   static_assert(not mln::concepts::RawImage<decltype(A)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   auto B = mln::view::clip(A, domain_b);
   fill(B, 42);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(B)>);
   static_assert(mln::concepts::ViewImage<decltype(B)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(B)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(B)>);
   static_assert(not mln::concepts::RawImage<decltype(B)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   for (auto p : B.domain())
   {

@@ -142,6 +142,5 @@ TEST(Disc, approx_disc_is_decomposable)
   EXPECT_NO_THROW(d.decompose());
 }
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::DecomposableStructuringElement<mln::experimental::se::disc, mln::experimental::point2d>);
 #endif

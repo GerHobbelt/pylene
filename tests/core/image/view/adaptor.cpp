@@ -22,16 +22,13 @@ struct identity_pixel : mln::pixel_adaptor<Pix>, mln::experimental::Pixel<identi
 
 TEST(Core, ViewAdaptor_Pixel)
 {
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::Pixel<identity_pixel<mln::archetypes::Pixel>>);
   static_assert(mln::concepts::OutputPixel<identity_pixel<mln::archetypes::OutputPixel>>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 }
 
 
 TEST(Core, ViewAdaptor_Image)
 {
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::Image<identity<mln::archetypes::Image>>);
   static_assert(mln::concepts::IndexableImage<identity<mln::archetypes::IndexableImage>>);
   static_assert(mln::concepts::AccessibleImage<identity<mln::archetypes::AccessibleImage>>);
@@ -60,5 +57,4 @@ TEST(Core, ViewAdaptor_Image)
   static_assert(mln::concepts::ViewImage<identity<mln::archetypes::Image>>);
   static_assert(not mln::concepts::ConcreteImage<identity<mln::archetypes::ConcreteImage>>);
   static_assert(mln::concepts::ViewImage<identity<mln::archetypes::ConcreteImage>>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 }

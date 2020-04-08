@@ -3,7 +3,6 @@
 #include <mln/core/concept/new/structuring_elements.hpp>
 #include <gtest/gtest.h>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::StructuringElement<mln::experimental::se::periodic_line2d, mln::experimental::point2d>);
 #endif
 

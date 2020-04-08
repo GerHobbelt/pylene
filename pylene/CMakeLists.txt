@@ -77,19 +77,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(Pylene PUBLIC -fconcepts)
 endif()
 
-target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-
-# Add concepts support for gcc > 8 with -fconcepts
-# if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
-#  set(PYLENE_CONCEPT_TS_ENABLED True PARENT_SCOPE)
-#  find_package(cmcstl2 REQUIRED)
-#  target_link_libraries(Pylene PUBLIC stl2) # This add appropriate -fconcept flags
-#  target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-# endif ()
-
-
-
-
 # IDE configuration
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})

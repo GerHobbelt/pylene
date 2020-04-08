@@ -8,7 +8,6 @@
 #include <vector>
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::Neighborhood<mln::experimental::c26_t, mln::experimental::point3d>);
 static_assert(not mln::concepts::SeparableStructuringElement<mln::experimental::c26_t, mln::experimental::point3d>);
 static_assert(not mln::concepts::DecomposableStructuringElement<mln::experimental::c26_t, mln::experimental::point3d>);

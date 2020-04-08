@@ -24,7 +24,6 @@ namespace mln
   {
     // clang-format off
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
     template <class Pix> concept Pixel =
       std::is_base_of_v<mln::experimental::Pixel<Pix>, Pix> &&
@@ -70,7 +69,6 @@ namespace mln
   template <typename Pix>
   concept OutputPixel = detail::WritablePixel<Pix>;
 
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
     // clang-format on
 

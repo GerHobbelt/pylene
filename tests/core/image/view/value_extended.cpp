@@ -8,7 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::InputImage<mln::value_extended_view<mln::archetypes::InputImage>>);
 static_assert(mln::concepts::OutputImage<mln::value_extended_view<mln::archetypes::OutputImage>>);
 static_assert(mln::concepts::IndexableImage<mln::value_extended_view<mln::archetypes::IndexableImage>>);

@@ -9,7 +9,6 @@ namespace mln::concepts
 
   // clang-format off
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
   namespace detail
   {
@@ -51,7 +50,6 @@ namespace mln::concepts
         ::ranges::range_value_t<Rng>>;
     };
 
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 

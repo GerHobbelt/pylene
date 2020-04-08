@@ -128,7 +128,6 @@ namespace mln
     using category_type      = image_category_t<I>;
     using concrete_type      = image_concrete_t<I>;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>
@@ -157,7 +156,6 @@ namespace mln
     auto new_pixels() { return m_ima.new_pixels(); }
     auto concretize() const { return m_ima.concretize(); }
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>

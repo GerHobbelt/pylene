@@ -9,7 +9,7 @@
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
 
-#include <mln/core/concept/new/archetype/image.hpp>
+#include <mln/core/concept/archetype/image.hpp>
 
 #include <gtest/gtest.h>
 

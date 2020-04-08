@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concept/structuring_elements.hpp>
 #include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>

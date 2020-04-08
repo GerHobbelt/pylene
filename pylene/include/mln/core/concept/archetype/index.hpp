@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/indexes.hpp>
+#include <mln/core/concept/indexes.hpp>
 
 
 namespace mln::archetypes

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 #include <mln/core/image/experimental/ndbuffer_image.hpp>
 #include <mln/core/image/experimental/private/ndbuffer_image_data.hpp>
 #include <mln/core/image/experimental/private/ndbuffer_image_impl.hpp>

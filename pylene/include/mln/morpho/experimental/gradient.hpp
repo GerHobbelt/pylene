@@ -3,7 +3,7 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concept/structuring_elements.hpp>
 
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>

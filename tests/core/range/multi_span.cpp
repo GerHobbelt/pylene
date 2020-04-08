@@ -1,8 +1,8 @@
-#include <mln/core/range/multi_span.hpp>
-#include <mln/core/range/range_traits.hpp>
-#include <mln/core/range/rows.hpp>
+#include <mln/core/rangev3/multi_span.hpp>
+#include <mln/core/rangev3/range_traits.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
-#include <mln/core/concepts/concept.hpp>
+#include <mln/core/concept/concepts.hpp>
 
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/indices.hpp>
@@ -111,7 +111,7 @@ TYPED_TEST(MultiSpanTest, forward)
 {
   typename TestFixture::range_type rng(this->m_data.data(), this->m_count, this->m_stride);
 
-  auto ref   = ::ranges::to_vector(::ranges::views::indices(int(this->m_size)));
+  auto ref   = ::ranges::to_vector(::ranges::view::indices(int(this->m_size)));
   auto vrng  = this->rng_to_container(rng);
   auto vrng2 = this->rng_to_container_row_wise(rng);
   ASSERT_EQ(ref, vrng);
@@ -123,7 +123,7 @@ TYPED_TEST(MultiSpanTest, backward)
 {
   typename TestFixture::range_type rng(this->m_data.data(), this->m_count, this->m_stride);
 
-  auto ref   = ::ranges::to_vector(::ranges::views::reverse(::ranges::views::indices(int(this->m_size))));
+  auto ref   = ::ranges::to_vector(::ranges::view::reverse(::ranges::view::indices(int(this->m_size))));
   auto vrng  = this->rng_to_container(rng.reversed());
   auto vrng2 = this->rng_to_container_row_wise(rng.reversed());
   ASSERT_EQ(ref, vrng);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/archetype/point.hpp>
-#include <mln/core/concept/new/domains.hpp>
+#include <mln/core/concept/archetype/point.hpp>
+#include <mln/core/concept/domains.hpp>
 
 
 namespace mln::archetypes

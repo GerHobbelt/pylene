@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/box.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 #include <mln/core/image/experimental/ndimage_fwd.hpp>
 #include <mln/core/image_format.hpp>
 #include <mln/core/rangev3/rows.hpp>

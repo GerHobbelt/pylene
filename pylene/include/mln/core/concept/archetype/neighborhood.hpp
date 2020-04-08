@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/archetype/structuring_element.hpp>
-#include <mln/core/concept/new/neighborhoods.hpp>
+#include <mln/core/concept/archetype/structuring_element.hpp>
+#include <mln/core/concept/neighborhoods.hpp>
 
 
 namespace mln::archetypes

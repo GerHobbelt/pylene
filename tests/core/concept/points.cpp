@@ -1,5 +1,5 @@
-#include <mln/core/concepts/archetype/point.hpp>
-#include <mln/core/concepts/point.hpp>
+#include <mln/core/concept/archetype/point.hpp>
+#include <mln/core/concept/points.hpp>
 
 #include <gtest/gtest.h>
 

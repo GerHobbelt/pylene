@@ -1,5 +1,5 @@
-#include <mln/core/concepts/archetype/value.hpp>
-#include <mln/core/concepts/value.hpp>
+#include <mln/core/concept/archetype/value.hpp>
+#include <mln/core/concept/values.hpp>
 
 #include <tuple>
 

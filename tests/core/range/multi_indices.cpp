@@ -1,8 +1,8 @@
-#include <mln/core/range/multi_indices.hpp>
-#include <mln/core/range/range_traits.hpp>
-#include <mln/core/range/rows.hpp>
+#include <mln/core/rangev3/multi_indices.hpp>
+#include <mln/core/rangev3/range_traits.hpp>
+#include <mln/core/rangev3/rows.hpp>
 
-#include <mln/core/concepts/concept.hpp>
+#include <mln/core/concept/concepts.hpp>
 
 #include <vector>
 

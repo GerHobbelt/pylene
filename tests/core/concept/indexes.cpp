@@ -1,5 +1,5 @@
-#include <mln/core/concepts/archetype/index.hpp>
-#include <mln/core/concepts/indexe.hpp>
+#include <mln/core/concept/archetype/index.hpp>
+#include <mln/core/concept/indexes.hpp>
 
 #include <gtest/gtest.h>
 

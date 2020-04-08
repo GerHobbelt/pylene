@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/points.hpp>
-#include <mln/core/concept/new/values.hpp>
+#include <mln/core/concept/points.hpp>
+#include <mln/core/concept/values.hpp>
 
 
 #include <mln/core/rangev3/concepts.hpp>
@@ -52,4 +52,4 @@ namespace mln::concepts
 } // namespace mln::concepts
 
 // Validate concept
-//#include <mln/core/concept/new/archetype/domain.hpp>
+//#include <mln/core/concept/archetype/domain.hpp>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/assert.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concept/images.hpp>
 #include <mln/data/experimental/histogram.hpp>
 
 #include <algorithm>

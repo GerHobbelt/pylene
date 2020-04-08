@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <mln/core/concept/new/neighborhoods.hpp>
+#include <mln/core/concept/neighborhoods.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/value_extended.hpp>

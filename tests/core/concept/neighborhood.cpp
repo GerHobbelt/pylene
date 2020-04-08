@@ -1,5 +1,5 @@
-#include <mln/core/concept/new/archetype/neighborhood.hpp>
-#include <mln/core/concept/new/neighborhoods.hpp>
+#include <mln/core/concept/archetype/neighborhood.hpp>
+#include <mln/core/concept/neighborhoods.hpp>
 
 #include <gtest/gtest.h>
 

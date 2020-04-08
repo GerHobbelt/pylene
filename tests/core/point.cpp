@@ -1,6 +1,6 @@
 #include <mln/core/experimental/point.hpp>
 
-#include <mln/core/concept/new/points.hpp>
+#include <mln/core/concept/points.hpp>
 #include <concepts/concepts.hpp>
 
 #include <gtest/gtest.h>

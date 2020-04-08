@@ -3,7 +3,6 @@
 
 #include <mln/core/concept/new/archetype/domain.hpp>
 #include <mln/core/concept/new/archetype/pixel.hpp>
-#include <mln/core/concept/new/check.hpp>
 #include <mln/core/concept/new/images.hpp>
 
 #include <mln/core/image/private/image_traits.hpp>

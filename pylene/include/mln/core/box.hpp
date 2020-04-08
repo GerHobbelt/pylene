@@ -884,7 +884,7 @@ namespace concepts
     using type = mln::experimental::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
   };
 }
-#endif
+
 
 namespace ranges
 {

@@ -5,10 +5,6 @@
 
 #include <concepts/type_traits.hpp>
 
-#if 0
-#include <stl2/type_traits.hpp>
-#endif
-
 
 namespace mln::experimental
 {
@@ -595,4 +591,3 @@ namespace concepts
                                             common_reference_t<typename UImpl::value_type, typename VImpl::value_type>>;
   };
 }
-#endif

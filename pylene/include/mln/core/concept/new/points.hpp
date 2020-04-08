@@ -17,5 +17,3 @@ namespace mln::concepts
 
 } // namespace mln::concepts
 
-// Validate concept
-#include <mln/core/concept/new/archetype/point.hpp>

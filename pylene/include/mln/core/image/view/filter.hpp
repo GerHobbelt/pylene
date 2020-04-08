@@ -47,7 +47,7 @@ namespace mln
     /// \}
 
     // Checks
-    PYLENE_CONCEPT_TS_ASSERT(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
+    static_assert(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
 
   private:
     struct pix_filter_fn

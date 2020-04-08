@@ -53,10 +53,7 @@ namespace mln
     using category_type = std::common_type_t<common_category, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I0, typename I0::value_type>;
 
-    template <concepts::Value V>
-#else
     template <typename V>
-#endif
     using ch_value_type = image_ch_value_t<I0, V>;
     /// \}
 

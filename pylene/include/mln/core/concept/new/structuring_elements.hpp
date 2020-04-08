@@ -1,8 +1,6 @@
 #pragma once
 
 #include <mln/core/concept/new/archetype/pixel.hpp>
-
-#include <mln/core/concept/new/ranges.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
 
 #include <concepts/concepts.hpp>
@@ -100,7 +98,6 @@ namespace mln::concepts
       { se.inc() }  -> StructuringElement<P>;
       { se.dec() }  -> StructuringElement<P>;
     };
-#endif
   // clang-format on
 
 

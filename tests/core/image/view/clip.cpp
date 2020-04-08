@@ -218,10 +218,10 @@ TEST(Core, Clip_where_and)
 }
 
 
-PYLENE_CONCEPT_TS_ASSERT(
+static_assert(
     (mln::concepts::AccessibleImage<mln::clip_view<mln::archetypes::AccessibleImage, mln::archetypes::Domain>>), "");
-PYLENE_CONCEPT_TS_ASSERT(
+static_assert(
     (mln::concepts::OutputImage<mln::clip_view<mln::archetypes::OutputAccessibleImage, mln::archetypes::Domain>>), "");
-PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
+static_assert((mln::concepts::IndexableAndAccessibleImage<
                              mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>),
                          "");

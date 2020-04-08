@@ -4,8 +4,6 @@
 #include <mln/core/concept/new/archetype/value.hpp>
 #include <mln/core/concept/new/pixels.hpp>
 
-#include <mln/core/concept/new/check.hpp>
-
 
 namespace mln::archetypes
 {

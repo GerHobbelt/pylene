@@ -6,7 +6,7 @@ static_assert(mln::concepts::StructuringElement<mln::experimental::se::rect2d, m
 static_assert(mln::concepts::SeparableStructuringElement<mln::experimental::se::rect2d, mln::experimental::point2d>);
 static_assert(mln::concepts::DecomposableStructuringElement<mln::experimental::se::rect2d, mln::experimental::point2d>);
 static_assert(mln::concepts::IncrementalStructuringElement<mln::experimental::se::rect2d, mln::experimental::point2d>);
-#endif
+
 
 
 template <class SE>

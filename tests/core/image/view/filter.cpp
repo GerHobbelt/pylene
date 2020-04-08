@@ -4,11 +4,12 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/algorithm/clone.hpp>
-#include <mln/core/concept/new/concepts.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/rangev3/foreach.hpp>
 #include <mln/core/rangev3/view/zip.hpp>
+
+#include <mln/core/concept/new/archetype/image.hpp>
 
 #include <gtest/gtest.h>
 
@@ -133,14 +134,14 @@ struct archetype_pred_t
   bool operator()(T&&) const;
 };
 
-PYLENE_CONCEPT_TS_ASSERT(
+static_assert(
     (mln::concepts::AccessibleImage<mln::filter_view<mln::archetypes::AccessibleImage, archetype_pred_t>>), "");
-PYLENE_CONCEPT_TS_ASSERT(
+static_assert(
     (mln::concepts::IndexableImage<mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
     "");
-PYLENE_CONCEPT_TS_ASSERT((mln::concepts::IndexableAndAccessibleImage<
+static_assert((mln::concepts::IndexableAndAccessibleImage<
                              mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
                          "");
-PYLENE_CONCEPT_TS_ASSERT((mln::concepts::OutputImage<
+static_assert((mln::concepts::OutputImage<
                              mln::filter_view<mln::archetypes::OutputIndexableAndAccessibleImage, archetype_pred_t>>),
                          "");

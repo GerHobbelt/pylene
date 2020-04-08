@@ -143,4 +143,4 @@ TEST(Disc, approx_disc_is_decomposable)
 }
 
 static_assert(mln::concepts::DecomposableStructuringElement<mln::experimental::se::disc, mln::experimental::point2d>);
-#endif
+#

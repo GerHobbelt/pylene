@@ -3,10 +3,8 @@
 #include <mln/core/rangev3/concepts.hpp>
 
 #include <mln/core/concept/new/domains.hpp>
-#include <mln/core/concept/new/indexes.hpp>
 #include <mln/core/concept/new/pixels.hpp>
 #include <mln/core/concept/new/points.hpp>
-#include <mln/core/concept/new/values.hpp>
 
 #include <mln/core/concept/new/archetype/value.hpp>
 #include <mln/core/extension/extension_traits.hpp>
@@ -37,7 +35,6 @@ namespace mln::concepts
 {
 
   // clang-format off
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   template <typename I>
   concept Image =
     // Minimum constraint on image object
@@ -280,7 +277,6 @@ namespace mln::concepts
     Image<I> &&
     ::concepts::semiregular<I> &&  // A concrete image is default constructible
     not image_view_v<I>;
-  
 
   // ViewImage
   template <typename I>
@@ -288,11 +284,8 @@ namespace mln::concepts
     Image<I> &&
     image_view_v<I>;
 
-#endif // PYLENE_CONCEPT_TS_ENABLED
+
 
   // clang-format on
 
 } // namespace mln::concepts
-
-// Validate concept
-#include <mln/core/concept/new/archetype/image.hpp>

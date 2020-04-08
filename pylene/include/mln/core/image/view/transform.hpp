@@ -45,7 +45,6 @@ namespace mln
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I, value_type>;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value V>
 #else
     template <typename V>
@@ -119,7 +118,6 @@ namespace mln
 
     decltype(auto) concretize() const { return this->base().template ch_value<value_type>(); }
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value Val>
 #else
     template <typename Val>
@@ -207,7 +205,6 @@ namespace mln
         std::conditional_t<std::is_base_of_v<raw_image_tag, common_category>, bidirectional_image_tag, common_category>;
     using concrete_type = std::common_type_t<image_ch_value_t<I1, value_type>, image_ch_value_t<I2, value_type>>;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     template <concepts::Value V>
 #else
     template <typename V>
@@ -337,7 +334,6 @@ namespace mln
       static_assert(mln::is_a<I1, experimental::Image>());
       static_assert(mln::is_a<I2, experimental::Image>());
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
       static_assert(mln::concepts::InputImage<I1>);
       static_assert(mln::concepts::InputImage<I2>);
 #endif

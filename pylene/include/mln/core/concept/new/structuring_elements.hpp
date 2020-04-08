@@ -23,7 +23,6 @@ namespace mln::experimental
 namespace mln::concepts
 {
   // clang-format off
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
   namespace details
   {

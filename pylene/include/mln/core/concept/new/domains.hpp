@@ -16,7 +16,6 @@ namespace mln::concepts
 
   // clang-format off
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
   // Domain
   template <typename Dom>
@@ -47,7 +46,6 @@ namespace mln::concepts
       { cdom.extents() }  -> ::ranges::cpp20::forward_range;
     };
 
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   // clang-format on
 

@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::StructuringElement<mln::experimental::se::rect2d, mln::experimental::point2d>);
 static_assert(mln::concepts::SeparableStructuringElement<mln::experimental::se::rect2d, mln::experimental::point2d>);
 static_assert(mln::concepts::DecomposableStructuringElement<mln::experimental::se::rect2d, mln::experimental::point2d>);

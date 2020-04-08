@@ -24,7 +24,6 @@ namespace mln::concepts
 {
 
   // clang-format off
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 
   template <typename Ext, typename Pnt>
   concept Extension =

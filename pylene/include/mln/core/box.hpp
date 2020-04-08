@@ -873,7 +873,6 @@ namespace mln::experimental
 } // namespace mln::experimental
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 // Specialization of std::common_reference
 namespace concepts
 {

@@ -20,7 +20,6 @@ namespace mln::concepts
 {
 
   // clang-format off
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   template <typename SE, typename P>
   concept Neighborhood =
     StructuringElement<SE, P> &&

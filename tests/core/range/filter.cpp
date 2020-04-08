@@ -61,13 +61,11 @@ TEST(Range, reversed_filtered_bidirectional_range)
   auto             even = mln::ranges::view::filter(v, [](auto val) { return val % 2 == 0; });
   auto             res  = mln::ranges::view::reverse(even);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::stl::ForwardRange<decltype(v)>);
   static_assert(mln::concepts::stl::ForwardRange<decltype(res)>);
 #else
   static_assert(::ranges::ForwardRange<decltype(v)>());
   static_assert(::ranges::ForwardRange<decltype(res)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   ASSERT_EQ(ref, ::ranges::to_vector(res));
 }
@@ -79,7 +77,6 @@ TEST(Range, reversed_filtered_reversible_range)
   auto even_sum = mln::ranges::view::filter(ids, [](auto vals) { return (vals[0] + vals[1]) % 2 == 0; });
   auto res      = mln::ranges::view::reverse(even_sum);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::SegmentedRange<decltype(ids)>);
   static_assert(mln::concepts::ReversibleRange<decltype(ids)>);
   static_assert(mln::concepts::SegmentedRange<decltype(res)>);
@@ -87,7 +84,6 @@ TEST(Range, reversed_filtered_reversible_range)
 #else
   static_assert(::ranges::ForwardRange<decltype(ids)>());
   static_assert(::ranges::ForwardRange<decltype(res)>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   ASSERT_EQ(ref, ::ranges::to_vector(res));
 }

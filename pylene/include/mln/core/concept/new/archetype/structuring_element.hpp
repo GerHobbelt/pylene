@@ -21,7 +21,6 @@ namespace mln::archetypes
 
     template <class P, class Pix>
     // clang-format off
-#ifdef PYLENE_CONCEPT_TS_ENABLED
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
 #endif
     struct StructuringElement

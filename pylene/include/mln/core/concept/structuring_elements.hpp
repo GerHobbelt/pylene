@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/concept/archetype/pixel.hpp>
-#include <mln/core/neighborhood/neighborhood_traits.hpp>
+#include <mln/core/private/traits/neighborhood.hpp>
 
 #include <concepts/concepts.hpp>
 #include <range/v3/range/concepts.hpp>

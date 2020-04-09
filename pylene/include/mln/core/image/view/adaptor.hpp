@@ -1,12 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/pixels.hpp>
-#include <mln/core/concept/values.hpp>
-
-
-#include <mln/core/image/image.hpp>
-#include <mln/core/image/private/image_traits.hpp>
-#include <mln/core/image/private/pixel_traits.hpp>
+#include <mln/core/private/traits/pixel.hpp>
+#include <mln/core/private/traits/image.hpp>
 
 
 namespace mln

@@ -1,16 +1,16 @@
 #pragma once
 
-#include <mln/core/rangev3/concepts.hpp>
-
+#include <mln/core/concept/ranges.hpp>
 #include <mln/core/concept/domains.hpp>
 #include <mln/core/concept/pixels.hpp>
 #include <mln/core/concept/points.hpp>
 
 #include <mln/core/concept/archetype/value.hpp>
-#include <mln/core/extension/extension_traits.hpp>
-#include <mln/core/image/private/image_traits.hpp>
-#include <mln/core/image/private/pixel_traits.hpp>
-#include <mln/core/image_category.hpp>
+
+#include <mln/core/private/traits/extension.hpp>
+#include <mln/core/private/traits/image.hpp>
+#include <mln/core/private/traits/pixel.hpp>
+
 
 
 #include <concepts/concepts.hpp>

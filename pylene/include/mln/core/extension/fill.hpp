@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/image/image.hpp>
 
 

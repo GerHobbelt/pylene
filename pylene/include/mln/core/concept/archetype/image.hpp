@@ -5,8 +5,8 @@
 #include <mln/core/concept/archetype/pixel.hpp>
 #include <mln/core/concept/images.hpp>
 
-#include <mln/core/image/private/image_traits.hpp>
-#include <mln/core/image/private/pixel_traits.hpp>
+#include <mln/core/private/traits/image.hpp>
+#include <mln/core/private/traits/pixel.hpp>
 #include <range/v3/range/traits.hpp>
 #include <type_traits>
 

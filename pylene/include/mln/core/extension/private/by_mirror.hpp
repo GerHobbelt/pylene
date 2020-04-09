@@ -2,8 +2,8 @@
 
 #include <mln/core/concept/domains.hpp>
 #include <mln/core/concept/structuring_elements.hpp>
-#include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/private/traits/extension.hpp>
 
 #include <limits>
 #include <type_traits>

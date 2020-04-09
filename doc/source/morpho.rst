@@ -26,6 +26,7 @@ Geodesic transformations
    morpho/area_filter
    morpho/dynamic_filter
    morpho/extinction_transform
+   morpho/fill_hole
 
 
 Segmentation
@@ -37,8 +38,8 @@ Segmentation
    morpho/watershed
 
 
-Component Trees
-***************
+Component Trees & Hierarchical Representations
+*********************************************
 
 .. toctree::
     :maxdepth: 1
@@ -46,6 +47,7 @@ Component Trees
     morpho/component_tree
     morpho/maxtree
     morpho/tos
+    morpho/alphatree
 
 
 

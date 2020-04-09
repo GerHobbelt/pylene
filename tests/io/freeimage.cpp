@@ -29,6 +29,26 @@ TEST(IO, FreeImage_pgm)
   ASSERT_IMAGES_EQ_EXP2(ima, ref, fixtures::ImageCompare::experimental::COMPARE_DOMAIN);
 }
 
+// This test fails on Windows due to CLRF in the pgm
+#ifdef _WIN32
+TEST(IO, DISABLED_FreeImage_pgm_fly)
+#else
+TEST(IO, FreeImage_pgm_fly)
+#endif
+{
+  const mln::experimental::image2d<uint8_t>  ref = {
+    {128, 124, 150, 137, 106}, //
+    {116, 128, 156, 165, 117}, //
+    {117,  90, 131, 108, 151}, //
+    {107,  87, 118, 109, 167}, //
+    {107,  73, 125, 157, 117}, //
+  };
+  mln::experimental::image2d<uint8_t> ima;
+  mln::io::experimental::imread(fixtures::ImagePath::concat_with_filename("fly.pgm"), ima);
+
+  ASSERT_IMAGES_EQ_EXP2(ima, ref, fixtures::ImageCompare::experimental::COMPARE_DOMAIN);
+}
+
 
 TEST(IO, FreeImage_ppm)
 {

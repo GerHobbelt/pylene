@@ -8,34 +8,40 @@ class Pylene(ConanFile):
     url = "https://gitlab.lrde.epita.fr/olena/pylene"
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type"
-    options = {"gtest": [True, False], "benchmark": [True, False], "freeimage": [
-        True, False], "boost": [True, False], "tbb": [True, False],
-               # TO REMOVE once docker image is fixed with the buildfarm profile updated
+    options = {
+               "shared": [True, False],
+               "fPIC": [True, False],
+               "gtest": [True, False],
+               "benchmark": [True, False],
+               "freeimage": [True, False],
+               "boost": [True, False],
                "boost_program_options": [True, False]}
-    default_options = ("gtest=False", "benchmark=False", "freeimage=False", "boost=False",
-                       # TO REMOVE once docker image is fixed with the buildfarm profile updated
-                       "boost_program_options=False", "tbb=False")
-    generators = [ "cmake_paths", "cmake_find_package" ]
+    default_options = {
+                       "shared": False,
+                       "fPIC": False,
+                       "gtest": False,
+                       "benchmark": False,
+                       "freeimage": False,
+                       "boost": False,
+                       "boost_program_options": False}
+
+    generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
-    def get_cmake_config(self):
+
+    def build(self):
         cmake = CMake(self)
         cmake.definitions["PYLENE_BUILD_LIBS_ONLY"] = "YES"
         cmake.configure()
-        return cmake
-
-    def build(self):
-        cmake = self.get_cmake_config()
         cmake.build()
+        cmake.install()
 
     def package(self):
-        cmake = self.get_cmake_config()
-        cmake.install()
         self.copy("*", dst="", src="cmake")
 
     def package_info(self):
         if self.settings.compiler in ["gcc", "clang"]:
-            self.cpp_info.cppflags = ["-std=c++17"]
+            self.cpp_info.cppflags = ["-std=c++20"]
 
     # Requirements part of the INTERFACE
     def requirements(self):
@@ -47,10 +53,10 @@ class Pylene(ConanFile):
             self.requires("freeimage/3.18.0@dutiona/stable")
 
         if self.options.gtest:
-            self.requires("gtest/1.8.1@bincrafters/stable")
+            self.requires("gtest/1.8.1")
 
         if self.options.benchmark:
-            self.requires("benchmark/head@dutiona/stable")
+            self.requires("benchmark/1.5.0")
 
         if self.options.boost:
             self.requires("boost/1.69.0@conan/stable")

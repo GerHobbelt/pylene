@@ -291,7 +291,10 @@ namespace
   static auto plus_one_inplace = [](auto& x) { x += 1; };
 
 
-  static auto plus_one_inplace_b = [](auto& x) { x = static_cast<uint8_t>(std::pow(x, 1 / 2.2f)); };
+  static auto plus_one_inplace_b = [](auto& x) {
+    auto tmp = x;
+    x        = static_cast<decltype(tmp)>(mln::pow(tmp, 1 / 2.2f));
+  };
 } // namespace
 
 void transform_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
@@ -330,8 +333,13 @@ void for_each(mln::experimental::image2d<mln::rgb8>& in)
 }
 void parallel_for_each(mln::experimental::image2d<uint8_t>& in)
 {
-  mln::ApplyPointwise(in, plus_one_inplace_b);
+  mln::ForEachPointwise(in, plus_one_inplace_b);
 }
+void parallel_for_each(mln::experimental::image2d<mln::rgb8>& in)
+{
+  mln::ForEachPointwise(in, plus_one_inplace_b);
+}
+
 
 
 namespace

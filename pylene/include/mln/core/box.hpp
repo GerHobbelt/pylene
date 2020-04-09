@@ -81,22 +81,19 @@ namespace mln::experimental
     constexpr bool empty() const noexcept;
 
     /// \brief Returns the width of the box
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 1>>
-    constexpr int width() const noexcept
+    constexpr int width() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 1)
     {
       return size(0);
     }
 
     /// \brief Returns the height of the box
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 2>>
-    constexpr int height() const noexcept
+    constexpr int height() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2)
     {
       return size(1);
     }
 
     /// \brief Returns the depth of the box
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 3>>
-    constexpr int depth() const noexcept
+    constexpr int depth() const noexcept requires (Impl::ndim == -1 || Impl::ndim >= 3)
     {
       return size(2);
     }
@@ -328,8 +325,8 @@ namespace mln::experimental
           _zeros();
       }
 
-      template <int d = D, class = std::enable_if_t<d == 1>>
-      constexpr _bstorage(int width)
+
+      constexpr _bstorage(int width) requires(D == 1)
         : m_begin{0}
         , m_end{width}
       {
@@ -368,8 +365,7 @@ namespace mln::experimental
         assert(width >= 0 && height >= 0 && depth >= 0);
       }
 
-      template <int d = D, class = std::enable_if_t<d == 3>>
-      constexpr _bstorage(int x, int y, int z, int width, int height, int depth)
+      constexpr _bstorage(int x, int y, int z, int width, int height, int depth) requires(D == 3)
         : m_begin{x, y, z}
         , m_end{x + width, y + height, z + depth}
       {
@@ -384,8 +380,7 @@ namespace mln::experimental
         assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
       }
 
-      template <int d = D, class = std::enable_if_t<d == 4>>
-      constexpr _bstorage(int x, int y, int z, int w, int width, int height, int depth, int duration)
+      constexpr _bstorage(int x, int y, int z, int w, int width, int height, int depth, int duration) requires (D == 4)
         : m_begin{x, y, z, w}
         , m_end{x + width, y + height, z + depth, w + duration}
       {

@@ -1,9 +1,0 @@
-include(pylene_default)
-
-[settings]
-compiler=gcc
-compiler.version=7
-
-[env]
-CC=/usr/bin/gcc-7
-CXX=/usr/bin/g++-7

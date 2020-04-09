@@ -1,10 +1,9 @@
 #pragma once
 
+#include <mln/core/concept/images.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/concept/images.hpp>
 #include <mln/core/image/private/image_builder.hpp>
-#include <mln/core/image/private/image_traits.hpp>
 #include <mln/core/image_format.hpp>
 #include <mln/core/private/init_list.hpp>
 

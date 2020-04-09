@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/concepts.hpp>
+#include <mln/core/concept/ranges.hpp>
 #include <range/v3/view/single.hpp>
 
 namespace mln::ranges

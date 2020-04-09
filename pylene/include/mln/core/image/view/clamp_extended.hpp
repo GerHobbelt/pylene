@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/box.hpp>
-#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/extension/private/by_clamp.hpp>
 #include <mln/core/image/view/extend_by_projection.hpp>
 

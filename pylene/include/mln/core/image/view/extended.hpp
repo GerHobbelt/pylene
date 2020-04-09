@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/view/remove_if.hpp>
+#include <mln/core/range/view/remove_if.hpp>
 #include <range/v3/view/filter.hpp>
 
 namespace mln::ranges::view

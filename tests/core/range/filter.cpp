@@ -1,9 +1,9 @@
-#include <mln/core/rangev3/view/filter.hpp>
+#include <mln/core/range/view/filter.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/rangev3/concepts.hpp>
-#include <mln/core/rangev3/mdspan.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/concepts.hpp>
+#include <mln/core/range/mdspan.hpp>
+#include <mln/core/range/rows.hpp>
 
 #include <algorithm>
 #include <numeric>

@@ -5,7 +5,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <utility>
 #include <vector>

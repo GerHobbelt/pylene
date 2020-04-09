@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/preprocessor/punctuation/remove_parens.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/rows.hpp>
 
 
 /// \brief The macro defines mln_foreach(RANGE_DECLARATION, RANGE_EXPRESSION) as equivalent to:

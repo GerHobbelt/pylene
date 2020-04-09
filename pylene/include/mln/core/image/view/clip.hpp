@@ -3,9 +3,9 @@
 #include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/rangev3/view/filter.hpp>
-#include <mln/core/rangev3/view/remove_if.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/filter.hpp>
+#include <mln/core/range/view/remove_if.hpp>
+#include <mln/core/range/view/transform.hpp>
 
 #include <range/v3/algorithm/set_algorithm.hpp>
 #include <range/v3/range/primitives.hpp>

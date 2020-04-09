@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/experimental/point.hpp>
-#include <mln/core/rangev3/mdindex.hpp>
+#include <mln/core/range/mdindex.hpp>
 
 #include <array>
 #include <type_traits>

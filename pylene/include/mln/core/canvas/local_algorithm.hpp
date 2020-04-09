@@ -2,8 +2,8 @@
 
 #include <mln/core/concept/structuring_elements.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/rows.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/rows.hpp>
+#include <mln/core/range/view/zip.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/box.hpp>
 

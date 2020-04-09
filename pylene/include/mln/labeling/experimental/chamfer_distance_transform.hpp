@@ -6,9 +6,9 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/value_extended.hpp>
 #include <mln/core/neighborhood/neighborhood.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/reverse.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/reverse.hpp>
+#include <mln/core/range/view/zip.hpp>
 #include <mln/core/trace.hpp>
 
 #include <limits>

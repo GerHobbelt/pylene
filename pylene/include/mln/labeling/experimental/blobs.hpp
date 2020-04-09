@@ -3,7 +3,7 @@
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
 
 #include <type_traits>

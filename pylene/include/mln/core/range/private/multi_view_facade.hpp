@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multidimensional_range_facade.hpp>
+#include <mln/core/range/private/multidimensional_range_facade.hpp>
 
 #include <range/v3/view/facade.hpp>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <mln/core/rangev3/private/mdrange_facade.hpp>
+#include <mln/core/range/private/mdrange_facade.hpp>
 #include <concepts/type_traits.hpp>
 
 #include <range/v3/view/zip.hpp>

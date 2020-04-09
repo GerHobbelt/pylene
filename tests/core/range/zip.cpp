@@ -1,10 +1,10 @@
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/rangev3/mdindex.hpp>
-#include <mln/core/rangev3/mdspan.hpp>
-#include <mln/core/rangev3/rows.hpp>
-#include <mln/core/rangev3/view/reverse.hpp>
+#include <mln/core/range/mdindex.hpp>
+#include <mln/core/range/mdspan.hpp>
+#include <mln/core/range/rows.hpp>
+#include <mln/core/range/view/reverse.hpp>
 
 #include <array>
 #include <vector>

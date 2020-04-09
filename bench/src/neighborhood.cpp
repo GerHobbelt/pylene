@@ -5,8 +5,8 @@
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 
 

@@ -3,8 +3,8 @@
 #include <mln/core/image/experimental/ndimage_fwd.hpp>
 #include <mln/core/image/experimental/ndbuffer_image.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/rows.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/rows.hpp>
+#include <mln/core/range/view/zip.hpp>
 #include <mln/io/experimental/imprint.hpp>
 
 #include <range/v3/range/access.hpp>

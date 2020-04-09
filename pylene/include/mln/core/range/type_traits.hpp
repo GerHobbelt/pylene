@@ -2,7 +2,7 @@
 
 #include <range/v3/range/concepts.hpp>
 #include <range/v3/range/traits.hpp>
-#include <mln/core/rangev3/private/mdcursor.hpp>
+#include <mln/core/range/private/mdcursor.hpp>
 
 
 

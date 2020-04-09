@@ -1,9 +1,9 @@
 #pragma once
 
 #include <concepts/concepts.hpp>
-#include <mln/core/rangev3/concepts.hpp>
-#include <mln/core/rangev3/type_traits.hpp>
-#include <mln/core/rangev3/private/mdrange_facade.hpp>
+#include <mln/core/range/concepts.hpp>
+#include <mln/core/range/type_traits.hpp>
+#include <mln/core/range/private/mdrange_facade.hpp>
 
 #include <range/v3/view/reverse.hpp>
 

@@ -2,7 +2,7 @@
 
 #include <mln/core/extension/private/by_image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/transform.hpp>
 #include <mln/core/private/traits/extension.hpp>
 
 #include <range/v3/utility/common_type.hpp> // common_reference

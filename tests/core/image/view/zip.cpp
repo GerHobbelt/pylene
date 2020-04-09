@@ -6,8 +6,8 @@
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
-#include <mln/core/rangev3/algorithm/for_each.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/algorithm/for_each.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <gtest/gtest.h>
 

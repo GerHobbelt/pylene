@@ -2,8 +2,8 @@
 
 #include <array>
 #include <mln/core/assert.hpp>
-#include <mln/core/rangev3/private/mdrange_facade.hpp>
-#include <mln/core/rangev3/private/ndrange_facade.hpp>
+#include <mln/core/range/private/mdrange_facade.hpp>
+#include <mln/core/range/private/ndrange_facade.hpp>
 #include <range/v3/view/span.hpp>
 
 namespace mln::ranges

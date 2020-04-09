@@ -2,8 +2,8 @@
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
 
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <gtest/gtest.h>
 

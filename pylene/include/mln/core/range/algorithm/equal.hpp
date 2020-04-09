@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/private/mdcursor.hpp>
+#include <mln/core/range/private/mdcursor.hpp>
 #include <range/v3/algorithm/equal.hpp>
 
 

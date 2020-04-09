@@ -1,4 +1,4 @@
-#include <mln/core/rangev3/mdspan.hpp>
+#include <mln/core/range/mdspan.hpp>
 
 
 #include <range/v3/range/conversion.hpp>

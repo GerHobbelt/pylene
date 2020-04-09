@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/private/multi_view_facade.hpp>
+#include <mln/core/range/private/multi_view_facade.hpp>
 
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/reverse.hpp>

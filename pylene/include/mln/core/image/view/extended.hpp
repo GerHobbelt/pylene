@@ -9,7 +9,7 @@
 #include <mln/core/image/view/none_extended.hpp>
 #include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/transform.hpp>
 
 
 #include <range/v3/utility/common_type.hpp> // common_reference

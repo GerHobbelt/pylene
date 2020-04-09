@@ -6,7 +6,7 @@
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/core/range/foreach.hpp>
 
-#include <mln/core/concept/archetype/image.hpp>
+#include <mln/core/concepts/archetype/image.hpp>
 
 #include <gtest/gtest.h>
 

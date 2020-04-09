@@ -1,9 +1,8 @@
 #pragma once
 
-#include <mln/core/concept/structuring_elements.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/private/traits/extension.hpp>
-#include <mln/core/image/image.hpp>
-#include <mln/core/neighborhood/neighborhood.hpp>
 
 
 namespace mln

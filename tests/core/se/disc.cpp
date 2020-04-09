@@ -1,4 +1,4 @@
-#include <mln/core/concept/structuring_elements.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
 

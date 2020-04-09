@@ -1,6 +1,6 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
-#include <mln/core/concept/archetype/image.hpp>
+#include <mln/core/concepts/archetype/image.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/mask.hpp>
 #include <mln/core/image/view/operators.hpp>

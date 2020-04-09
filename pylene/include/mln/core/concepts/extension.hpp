@@ -11,13 +11,13 @@
 #include <type_traits>
 
 
-namespace mln::
+namespace mln::experimental
 {
   template <class E>
   struct Extension
   {
   };
-} // namespace mln::
+} // namespace mln::experimental
 
 
 namespace mln::concepts
@@ -27,7 +27,7 @@ namespace mln::concepts
 
   template <typename Ext, typename Pnt>
   concept Extension =
-    std::is_base_of_v<mln::Extension<Ext>, Ext> &&
+    std::is_base_of_v<mln::experimental::Extension<Ext>, Ext> &&
     requires {
       typename Ext::support_fill;
       typename Ext::support_mirror;

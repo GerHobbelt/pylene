@@ -2,7 +2,7 @@
 #include <mln/core/image/experimental/ndimage.hpp>
 
 
-#include <mln/core/concept/images.hpp>
+#include <mln/core/concepts/image.hpp>
 #include <mln/core/range/rows.hpp>
 
 #include <numeric>

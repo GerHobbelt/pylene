@@ -3,8 +3,8 @@
 
 
 #include <mln/core/canvas/local_accumulation.hpp>
-#include <mln/core/concept/images.hpp>
-#include <mln/core/concept/structuring_elements.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/trace.hpp>
 

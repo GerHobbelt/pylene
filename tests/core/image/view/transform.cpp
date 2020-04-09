@@ -2,9 +2,9 @@
 
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/concept/archetype/image.hpp>
-#include <mln/core/concept/archetype/pixel.hpp>
-#include <mln/core/concept/pixels.hpp>
+#include <mln/core/concepts/archetype/image.hpp>
+#include <mln/core/concepts/archetype/pixel.hpp>
+#include <mln/core/concepts/pixel.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/operators.hpp>

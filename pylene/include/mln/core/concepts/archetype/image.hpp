@@ -26,7 +26,7 @@ namespace mln::archetypes
   namespace details
   {
     template <class I>
-    struct AsImage : I, mln::details::Image<AsImage<I>>
+    struct AsImage : I, mln::experimental::Image<AsImage<I>>
     {
       using I::I;
 
@@ -44,7 +44,7 @@ namespace mln::archetypes
 
     struct ConcreteImage
     {
-      using pixel_type = archetypes::Pixel;
+      using new_pixel_type = archetypes::Pixel;
       using value_type     = pixel_value_t<mln::archetypes::Pixel>;
       using reference      = pixel_reference_t<mln::archetypes::Pixel>;
       using point_type     = ::ranges::range_value_t<Domain>;
@@ -70,21 +70,21 @@ namespace mln::archetypes
       domain_type domain() const;
 
 
-      struct pixel_range : ::ranges::view_base
+      struct pixel_range
       {
-        const pixel_type* begin();
-        const pixel_type* end();
+        const new_pixel_type* begin();
+        const new_pixel_type* end();
       };
-      pixel_range pixels();
+      pixel_range new_pixels();
 
 
-      struct value_range : ::ranges::view_base
+      struct value_range
       {
         const value_type* begin();
         const value_type* end();
       };
 
-      value_range values();
+      value_range new_values();
     };
 
 
@@ -104,24 +104,24 @@ namespace mln::archetypes
 
     struct OutputImage : Image
     {
-      using pixel_type = archetypes::OutputPixel;
+      using new_pixel_type = archetypes::OutputPixel;
       using reference      = pixel_reference_t<mln::archetypes::OutputPixel>;
 
-      struct pixel_range : ::ranges::view_base
+      struct pixel_range
       {
-        const pixel_type* begin();
-        const pixel_type* end();
+        const new_pixel_type* begin();
+        const new_pixel_type* end();
       };
 
-      pixel_range pixels();
+      pixel_range new_pixels();
 
-      struct value_range : ::ranges::view_base
+      struct value_range
       {
         value_type* begin();
         value_type* end();
       };
 
-      value_range values();
+      value_range new_values();
     };
 
 
@@ -164,8 +164,8 @@ namespace mln::archetypes
 
       reference      operator()(point_type);
       reference      at(point_type);
-      pixel_type pixel(point_type);
-      pixel_type pixel_at(point_type);
+      new_pixel_type new_pixel(point_type);
+      new_pixel_type new_pixel_at(point_type);
     };
 
 
@@ -179,8 +179,8 @@ namespace mln::archetypes
 
       reference      operator()(point_type);
       reference      at(point_type);
-      pixel_type pixel(point_type);
-      pixel_type pixel_at(point_type);
+      new_pixel_type new_pixel(point_type);
+      new_pixel_type new_pixel_at(point_type);
     };
 
 
@@ -223,48 +223,48 @@ namespace mln::archetypes
     {
       using category_type = bidirectional_image_tag;
 
-      struct pixel_range : ::ranges::view_base
+      struct pixel_range
       {
-        const pixel_type* begin();
-        const pixel_type* end();
+        const new_pixel_type* begin();
+        const new_pixel_type* end();
         pixel_range           reversed();
       };
 
-      pixel_range pixels();
+      pixel_range new_pixels();
 
-      struct value_range : ::ranges::view_base
+      struct value_range
       {
         const value_type* begin();
         const value_type* end();
         value_range       reversed();
       };
 
-      value_range values();
+      value_range new_values();
     };
 
 
     struct OutputBidirectionalImage : BidirectionalImage
     {
-      using pixel_type = archetypes::OutputPixel;
+      using new_pixel_type = archetypes::OutputPixel;
       using reference      = pixel_reference_t<mln::archetypes::OutputPixel>;
 
-      struct value_range : ::ranges::view_base
+      struct value_range
       {
         value_type* begin();
         value_type* end();
         value_range reversed();
       };
-      value_range values();
+      value_range new_values();
 
 
-      struct pixel_range : ::ranges::view_base
+      struct pixel_range
       {
-        const pixel_type* begin();
-        const pixel_type* end();
+        const new_pixel_type* begin();
+        const new_pixel_type* end();
         pixel_range           reversed();
       };
 
-      pixel_range pixels();
+      pixel_range new_pixels();
     };
 
 
@@ -274,8 +274,8 @@ namespace mln::archetypes
       using pixel_range   = BidirectionalImage::pixel_range;
       using value_range   = BidirectionalImage::value_range;
 
-      pixel_range pixels();
-      value_range values();
+      pixel_range new_pixels();
+      value_range new_values();
 
 
       const value_type* data() const;
@@ -289,8 +289,8 @@ namespace mln::archetypes
       using pixel_range   = OutputBidirectionalImage::pixel_range;
       using value_range   = OutputBidirectionalImage::value_range;
 
-      pixel_range pixels();
-      value_range values();
+      pixel_range new_pixels();
+      value_range new_values();
 
       value_type*    data() const;
       std::ptrdiff_t strides(int) const;

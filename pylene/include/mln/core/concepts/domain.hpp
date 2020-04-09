@@ -20,9 +20,9 @@ namespace mln::concepts
     mln::ranges::mdrange<Dom> &&
     Point<mln::ranges::mdrange_value_t<Dom>> &&
     requires(const Dom cdom, mln::ranges::mdrange_value_t<Dom> p) {
-    { cdom.has(p) }   -> ::concepts::same_as<bool>;
-    { cdom.empty() }  -> ::concepts::same_as<bool>;
-    { cdom.dim() }    -> ::concepts::same_as<int>;
+      { cdom.has(p) }   -> bool;
+      { cdom.empty() }  -> bool;
+      { cdom.dim() }    -> int;
     };
 
 
@@ -39,6 +39,7 @@ namespace mln::concepts
   concept ShapedDomain =
     SizedDomain<Dom> &&
     requires(const Dom cdom) {
+      { cdom.shape() }    -> ::ranges::range_value_t<Dom>;
       { cdom.extents() }  -> ::ranges::cpp20::forward_range;
     };
 

@@ -2,8 +2,9 @@
 
 /// \file
 
-#include <mln/core/config.hpp>
-#include <mln/core/concept/images.hpp>
-#include <mln/core/neighborhood/neighborhood.hpp>
-#include <mln/core/image/private/image_builder.hpp>
+// Traits and concepts
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/private/traits/image.hpp>
 
+// Utilities
+#include <mln/core/image/private/image_builder.hpp>

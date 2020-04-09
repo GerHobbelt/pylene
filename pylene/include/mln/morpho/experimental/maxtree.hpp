@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/neighborhoods.hpp>
-#include <mln/core/concept/images.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
+#include <mln/core/concepts/image.hpp>
 
 #include <mln/morpho/experimental/canvas/depthfirst.hpp>
 #include <mln/morpho/experimental/component_tree.hpp>

@@ -1,4 +1,5 @@
 #pragma once
 
-#include <mln/core/config.hpp>
+// Traits and concepts
+#include <mln/core/concepts/neighborhood.hpp>
 #include <mln/core/private/traits/neighborhood.hpp>

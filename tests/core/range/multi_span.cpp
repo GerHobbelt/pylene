@@ -2,7 +2,7 @@
 #include <mln/core/range/range_traits.hpp>
 #include <mln/core/range/rows.hpp>
 
-#include <mln/core/concept/concepts.hpp>
+#include <mln/core/concepts/concept.hpp>
 
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/indices.hpp>

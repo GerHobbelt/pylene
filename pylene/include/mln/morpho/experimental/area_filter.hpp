@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/images.hpp>
-#include <mln/core/concept/neighborhoods.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
 
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/morpho/experimental/canvas/unionfind.hpp>

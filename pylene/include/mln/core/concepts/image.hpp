@@ -1,11 +1,11 @@
 #pragma once
 
-#include <mln/core/concept/ranges.hpp>
-#include <mln/core/concept/domains.hpp>
-#include <mln/core/concept/pixels.hpp>
-#include <mln/core/concept/points.hpp>
+#include <mln/core/concepts/range.hpp>
+#include <mln/core/concepts/domain.hpp>
+#include <mln/core/concepts/pixel.hpp>
+#include <mln/core/concepts/point.hpp>
 
-#include <mln/core/concept/archetype/value.hpp>
+#include <mln/core/concepts/archetype/value.hpp>
 
 #include <mln/core/private/traits/extension.hpp>
 #include <mln/core/private/traits/image.hpp>
@@ -17,7 +17,7 @@
 #include <concepts/type_traits.hpp>
 #include <range/v3/range/concepts.hpp>
 
-#include <mln/core/concept/object.hpp> // mln::is_a
+#include <mln/core/concepts/object.hpp> // mln::is_a
 
 #include <cstddef>
 #include <type_traits>

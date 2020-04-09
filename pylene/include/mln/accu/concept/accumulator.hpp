@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/check.hpp>
-#include <mln/core/concept/object.hpp>
+#include <mln/core/concepts/check.hpp>
+#include <mln/core/concepts/object.hpp>
 
 #include <boost/concept_check.hpp>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <mln/core/concept/neighborhoods.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/trace.hpp>

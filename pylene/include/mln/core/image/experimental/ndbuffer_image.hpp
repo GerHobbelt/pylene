@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/images.hpp>
+#include <mln/core/concepts/image.hpp>
 
 #include <mln/core/box.hpp>
 #include <mln/core/image/private/image_builder.hpp>

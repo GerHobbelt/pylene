@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/images.hpp>
+#include <mln/core/concepts/image.hpp>
 #include <mln/morpho/experimental/private/immersion.spe.hpp>
 #include <mln/core/trace.hpp>
 

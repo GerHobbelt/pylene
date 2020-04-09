@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/pixels.hpp>
+#include <mln/core/concepts/pixel.hpp>
 #include <mln/core/experimental/point.hpp>
 #include <mln/core/range/private/mdrange_facade.hpp>
 #include <mln/core/range/private/ndrange_facade.hpp>

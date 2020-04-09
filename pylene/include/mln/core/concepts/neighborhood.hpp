@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/structuring_elements.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 
 #include <concepts/concepts.hpp>
 #include <range/v3/range/concepts.hpp>

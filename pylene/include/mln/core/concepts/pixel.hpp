@@ -2,9 +2,8 @@
 
 #include <concepts/concepts.hpp>
 
-#include <mln/core/concept/points.hpp>
-#include <mln/core/concept/values.hpp>
-#include <mln/core/concept/indexes.hpp>
+#include <mln/core/concepts/point.hpp>
+#include <mln/core/concepts/value.hpp>
 #include <mln/core/private/traits/pixel.hpp>
 
 #include <type_traits>

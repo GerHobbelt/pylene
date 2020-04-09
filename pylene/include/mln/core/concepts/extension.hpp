@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mln/core/concept/archetype/pixel.hpp>
-#include <mln/core/concept/archetype/point.hpp>
-#include <mln/core/concept/archetype/structuring_element.hpp>
-#include <mln/core/concept/images.hpp>
-#include <mln/core/concept/values.hpp>
+#include <mln/core/concepts/archetype/pixel.hpp>
+#include <mln/core/concepts/archetype/point.hpp>
+#include <mln/core/concepts/archetype/structuring_element.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/value.hpp>
 
 #include <concepts/concepts.hpp>
 

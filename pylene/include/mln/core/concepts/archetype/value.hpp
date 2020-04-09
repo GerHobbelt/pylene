@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/values.hpp>
+#include <mln/core/concepts/value.hpp>
 
 
 namespace mln::archetypes

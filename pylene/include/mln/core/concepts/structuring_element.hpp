@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/archetype/pixel.hpp>
+#include <mln/core/concepts/archetype/pixel.hpp>
 #include <mln/core/private/traits/neighborhood.hpp>
 
 #include <concepts/concepts.hpp>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/concept/archetype/pixel.hpp>
-#include <mln/core/concept/archetype/point.hpp>
-#include <mln/core/concept/neighborhoods.hpp>
+#include <mln/core/concepts/archetype/pixel.hpp>
+#include <mln/core/concepts/archetype/point.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
 #include <mln/core/neighborhood/neighborhood_traits.hpp>
 
 #include <range/v3/view/subrange.hpp>

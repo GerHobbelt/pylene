@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/concept/archetype/point.hpp>
-#include <mln/core/concept/archetype/value.hpp>
-#include <mln/core/concept/pixels.hpp>
+#include <mln/core/concepts/archetype/point.hpp>
+#include <mln/core/concepts/archetype/value.hpp>
+#include <mln/core/concepts/pixel.hpp>
 
 
 namespace mln::archetypes

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <mln/core/range/concepts.hpp>
+#include <mln/core/range/range.hpp>
+
 #include <mln/core/range/private/mdrange_facade.hpp>
 
 #include <concepts/type_traits.hpp>

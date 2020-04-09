@@ -10,7 +10,7 @@
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/range/rows.hpp>
 
-#include <mln/core/concept/archetype/domain.hpp>
+#include <mln/core/concepts/archetype/domain.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 

@@ -1,9 +1,11 @@
 #pragma once
 
-#include <range/v3/view/reverse.hpp>
-
+#include <concepts/concepts.hpp>
+#include <mln/core/range/concepts.hpp>
+#include <mln/core/range/type_traits.hpp>
 #include <mln/core/range/private/mdrange_facade.hpp>
 
+#include <range/v3/view/reverse.hpp>
 
 namespace mln::ranges
 {
@@ -45,7 +47,7 @@ namespace mln::ranges
     requires ::ranges::cpp20::bidirectional_range<R>
     auto reverse(R&& rng)
     {
-      return ::ranges::views::reverse(std::forward<R>(rng));
+      return ::ranges::view::reverse(std::forward<R>(rng));
     }
   }
 

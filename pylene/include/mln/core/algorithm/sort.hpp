@@ -2,7 +2,7 @@
 
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>

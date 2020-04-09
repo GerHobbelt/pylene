@@ -6,7 +6,7 @@
 #include <mln/core/image/experimental/private/ndbuffer_image_impl.hpp>
 #include <mln/core/image/experimental/private/ndbuffer_image_pixel.hpp>
 #include <mln/core/image/experimental/private/ndimage_extension.hpp>
-#include <mln/core/rangev3/mdspan.hpp>
+#include <mln/core/range/mdspan.hpp>
 
 namespace mln
 {

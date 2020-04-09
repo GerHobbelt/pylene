@@ -3,7 +3,7 @@
 #include <mln/core/se/private/se_facade.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/rangev3/view/ravel.hpp>
+#include <mln/core/range/view/ravel.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
 
 #include <vector>

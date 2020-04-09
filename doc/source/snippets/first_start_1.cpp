@@ -1,7 +1,7 @@
 #include <mln/core/image/experimental/ndimage.hpp>
 
-#include <mln/core/rangev3/view/reverse.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/view/reverse.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <fmt/core.h>
 #include <iostream>

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <range/v3/range/concepts.hpp>
-#include <mln/core/rangev3/private/mdcursor.hpp>
-#include <mln/core/rangev3/type_traits.hpp>
+#include <mln/core/range/private/mdcursor.hpp>
+#include <mln/core/range/type_traits.hpp>
 
 namespace mln::ranges
 {

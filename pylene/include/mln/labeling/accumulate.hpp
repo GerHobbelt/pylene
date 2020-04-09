@@ -3,8 +3,8 @@
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <algorithm>
 #include <type_traits>

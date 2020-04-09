@@ -138,31 +138,9 @@ namespace mln::ranges
         m_strides[i] = m_strides[i - 1] * m_sizes[i - 1];
     }
 
-    T*             data() const noexcept { return m_data; }
-    std::size_t    size(int dim) const noexcept { return m_sizes[dim]; }
-    std::ptrdiff_t stride(int dim) const noexcept { return m_strides[dim]; }
-    std::ptrdiff_t byte_stride(int dim) const noexcept { return m_strides[dim] * sizeof(T); }
-
-    mdspan<std::byte, Rank> as_writable_bytes() noexcept
-    {
-      std::ptrdiff_t strides[Rank];
-      for (std::size_t i = 0; i < Rank; ++i)
-        strides[i] = this->byte_stride(i);
-      return {reinterpret_cast<std::byte*>(m_data), m_sizes, strides};
-    }
-
-    mdspan<const std::byte, Rank> as_bytes() noexcept
-    {
-      std::ptrdiff_t strides[Rank];
-      for (std::size_t i = 0; i < Rank; ++i)
-        strides[i] = this->byte_stride(i);
-      return {reinterpret_cast<const std::byte*>(m_data), m_sizes, strides};
-    }
-
-
   private:
     T*             m_data;
     std::size_t    m_sizes[Rank];
     std::ptrdiff_t m_strides[Rank];
   };
-} // namespace mln::ranges
+}

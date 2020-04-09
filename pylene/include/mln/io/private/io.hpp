@@ -4,7 +4,7 @@
 #include <mln/core/concept/images.hpp>
 #include <mln/core/image/experimental/ndimage_fwd.hpp>
 #include <mln/core/image_format.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/rows.hpp>
 #include <mln/io/private/plugin.hpp>
 
 #include <range/v3/algorithm/copy.hpp>

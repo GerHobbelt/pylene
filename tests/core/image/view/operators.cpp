@@ -7,8 +7,8 @@
 #include <mln/core/domain/where.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/rows.hpp>
 
 #include <mln/core/concept/archetype/domain.hpp>
 

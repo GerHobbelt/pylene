@@ -1,7 +1,6 @@
 #pragma once
 
-#include <mln/core/range/range.hpp>
-
+#include <mln/core/range/concepts.hpp>
 #include <mln/core/range/private/mdrange_facade.hpp>
 
 #include <concepts/type_traits.hpp>
@@ -132,7 +131,7 @@ namespace mln::ranges
     {
       auto cursors = std::apply(
           [](auto&&... cur) { return std::make_tuple(::ranges::range_access::begin_cursor(cur)...); }, m_ranges);
-      return {{}, cursors, {m_map_fn}, {m_pred_fn}};
+      return {{}, cursors, m_map_fn, m_pred_fn};
     }
 
     ::ranges::default_sentinel_t end_cursor() const { return {}; }
@@ -171,9 +170,9 @@ namespace mln::ranges
       static_assert(::ranges::invocable<F, mln::ranges::mdrange_reference_t<Rng>...>);
       static_assert(::ranges::predicate<Pred, mln::ranges::mdrange_value_t<Rng>...>);
 
-      auto z = ::ranges::views::zip(std::forward<Rng>(ranges)...);
-      auto f = ::ranges::cpp20::views::filter(z, [pred = std::move(pred_fn)](auto&& t) { return std::apply(pred, t); });
-      auto m = ::ranges::cpp20::views::transform(
+      auto z = ::ranges::view::zip(std::forward<Rng>(ranges)...);
+      auto f = ::ranges::view::filter(z, [pred = std::move(pred_fn)](auto&& t) { return std::apply(pred, t); });
+      auto m = ::ranges::view::transform(
           z, [f = std::move(map_fn)](auto&& t) -> decltype(auto) { return std::apply(f, t); });
 
       return m;

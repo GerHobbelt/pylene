@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/rangev3/concepts.hpp>
+#include <mln/core/range/concepts.hpp>
 
 #include <range/v3/algorithm/for_each.hpp>
 

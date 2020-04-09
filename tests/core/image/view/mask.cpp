@@ -4,7 +4,7 @@
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/mask.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <gtest/gtest.h>
 

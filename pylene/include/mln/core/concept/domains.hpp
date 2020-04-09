@@ -4,7 +4,7 @@
 #include <mln/core/concept/values.hpp>
 #include <mln/core/concept/ranges.hpp>
 
-#include <mln/core/rangev3/type_traits.hpp>
+#include <mln/core/range/type_traits.hpp>
 
 #include <array>
 #include <type_traits>

@@ -5,7 +5,7 @@
 #include <mln/core/extension/private/by_clamp.hpp>
 #include <mln/core/image/view/extend_by_projection.hpp>
 
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/transform.hpp>
 #include <concepts/concepts.hpp>
 
 namespace mln

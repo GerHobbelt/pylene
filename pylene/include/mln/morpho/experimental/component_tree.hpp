@@ -3,7 +3,7 @@
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/image/view/zip.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
 
 #include <vector>

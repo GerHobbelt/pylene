@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/concept/images.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/rows.hpp>
 
 #include <range/v3/algorithm/count_if.hpp>
 #include <range/v3/functional/concepts.hpp>

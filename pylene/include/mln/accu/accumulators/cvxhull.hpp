@@ -116,7 +116,7 @@ namespace mln
 
         friend std::vector<P> extract(const cvxhull& accu, features::cvxhull)
         {
-          std::vector<P> pts = convexhull(accu.m_points);
+          std::vector<P> pts = convexhull_sorted(accu.m_points);
           return pts;
         }
 

@@ -1,6 +1,5 @@
 set(test_prefix "UTMorpho_")
 
-
 add_core_test(${test_prefix}running_max_1d              running_max_1d.cpp)
 add_core_test(${test_prefix}running_max_vertical_2d     running_max_vertical_2d.cpp)
 add_core_test(${test_prefix}fill_hole        fill_hole.cpp)

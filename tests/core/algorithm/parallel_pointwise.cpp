@@ -28,3 +28,24 @@ TEST(Core, Parallel_transform)
   mln::parallel_execute2d(transform);
   ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
+
+TEST(Core, Parallel_copy)
+{
+  mln::experimental::image2d<uint8_t> ima = {{12, 2, 93}, {24, 75, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
+
+  mln::CopyParallel copy(ref, ima);
+  mln::parallel_execute2d(copy);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
+}
+
+TEST(Core, Parallel_fill)
+{
+  mln::experimental::image2d<uint8_t> ima = {{12, 2, 93}, {24, 75, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{1, 1, 1}, {1, 1, 1}};
+  int value = 1;
+
+  mln::FillParallel fill(ima, value);
+  mln::parallel_execute2d(fill);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
+}

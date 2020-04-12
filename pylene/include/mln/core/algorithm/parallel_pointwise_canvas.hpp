@@ -28,7 +28,7 @@ namespace mln
 
 
   template <class Function, class InputImage>
-  class ForEachPointwise : public ParallelCanvas2d
+  class ForEachParallel : public ParallelCanvas2d
   {
     InputImage _in;
     Function _fun;
@@ -36,7 +36,7 @@ namespace mln
     static_assert(mln::is_a<InputImage, experimental::Image>());
     static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
 
-    ForEachPointwise(InputImage input, Function fun)
+    ForEachParallel(InputImage input, Function fun)
         : _in{input}
         , _fun{fun}
     {}

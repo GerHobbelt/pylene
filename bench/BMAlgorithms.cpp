@@ -333,12 +333,12 @@ void for_each(mln::experimental::image2d<mln::rgb8>& in)
 }
 void parallel_for_each(mln::experimental::image2d<uint8_t>& in)
 {
-  mln::ForEachPointwise foreach(in, plus_one_inplace_b);
+  mln::ForEachParallel foreach(in, plus_one_inplace_b);
   mln::parallel_execute2d(foreach);
 }
 void parallel_for_each(mln::experimental::image2d<mln::rgb8>& in)
 {
-  mln::ForEachPointwise foreach(in, plus_one_inplace_b);
+  mln::ForEachParallel foreach(in, plus_one_inplace_b);
   mln::parallel_execute2d(foreach);
 }
 

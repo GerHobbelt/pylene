@@ -4,6 +4,7 @@
 #include <mln/core/box.hpp>
 
 #include <mln/core/algorithm/for_each.hpp>
+#include <mln/core/algorithm/transform.hpp>
 
 namespace mln
 {
@@ -50,24 +51,30 @@ namespace mln
     }
   };
 
-/*
   template <class Function, class InputImage, class OutputImage>
-  class TransformPointwise : ParallelCanvas2d
+  class TransformParallel : public ParallelCanvas2d
   {
+    InputImage _in;
+    OutputImage _out;
+    Function _fun;
+
     static_assert(mln::is_a<InputImage, experimental::Image>());
     static_assert(mln::is_a<OutputImage, experimental::Image>());
     static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
 
-    TransformPointwise(InputImage input, Function fun);
+    TransformParallel(InputImage input, OutputImage output, Function fun)
+      : _in{input}
+      , _out{output}
+      , _fun{fun}
+    {}
 
-    mln::experimental::box2d GetDomain() const final { return input.domain(); }
-
+    mln::experimental::box2d GetDomain() const final { return _in.domain(); }
+  public:
     void ExecuteTile(mln::experimental::box2d b) const final
     {
-      auto subimage_in = input.clip(domain);
-      auto subimage_out = input.clip(domain);
-      mln::transform(subimage, fun);
+      auto subimage_in = _in.clip(b);
+      auto subimage_out = _out.clip(b);
+      mln::transform(subimage_in, subimage_out, _fun);
     }
   };
-*/
 } // namespace mln

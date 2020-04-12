@@ -18,3 +18,13 @@ TEST(Core, Parallel_foreach)
   mln::parallel_execute2d(foreach);
   ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
+
+TEST(Core, Parallel_transform)
+{
+  mln::experimental::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
+
+  mln::TransformParallel transform(ima, ima, [](uint8_t x){ return x + 1; });
+  mln::parallel_execute2d(transform);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
+}

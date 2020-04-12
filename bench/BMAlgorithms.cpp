@@ -7,7 +7,7 @@
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/algorithm/generate.hpp>
 #include <mln/core/algorithm/paste.hpp>
-#include <mln/core/algorithm/parallel_pointwise_canvas.hpp>
+#include <mln/core/algorithm/parallel_pointwise.hpp>
 #include <mln/core/algorithm/sort.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>

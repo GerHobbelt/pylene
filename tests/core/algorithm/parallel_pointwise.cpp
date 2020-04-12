@@ -1,4 +1,4 @@
-#include <mln/core/algorithm/parallel_pointwise_canvas.hpp>
+#include <mln/core/algorithm/parallel_pointwise.hpp>
 
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <utility>

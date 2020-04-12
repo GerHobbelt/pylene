@@ -88,6 +88,7 @@ namespace mln
 
     static_assert(mln::is_a<InputImage, experimental::Image>());
     static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
     CopyParallel(InputImage input, OutputImage output)
         : _in{input}

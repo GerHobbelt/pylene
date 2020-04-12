@@ -6,6 +6,7 @@
 //#include <mln/core/algorithm/copy.hpp> not necessary ?
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/for_each.hpp>
+#include <mln/core/algorithm/paste.hpp>
 #include <mln/core/algorithm/transform.hpp>
 
 namespace mln
@@ -102,6 +103,31 @@ namespace mln
       auto subimage_in = _in.clip(b);
       auto subimage_out = _out.clip(b);
       mln::experimental::copy(subimage_in, subimage_out);
+    }
+  };
+
+  template <class InputImage, class OutputImage>
+  class PasteParallel : public ParallelCanvas2d
+  {
+    InputImage _in;
+    OutputImage _out;
+
+    static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+    PasteParallel(InputImage input, OutputImage output)
+        : _in{input}
+        , _out{output}
+    {}
+
+    mln::experimental::box2d GetDomain() const final { return _in.domain(); }
+  public:
+    void ExecuteTile(mln::experimental::box2d b) const final
+    {
+      auto subimage_in = _in.clip(b);
+      auto subimage_out = _out.clip(b);
+      mln::paste(subimage_in, subimage_out);
     }
   };
 

@@ -22,6 +22,8 @@ function(add_image EXECUTABLE INPUT)
                      )
 endfunction()
 
+add_image("intro-1" "${DOCUMENTATION_IMAGE_DIR}/Olena-c6gradi.png" intro-1-1.png)
+
 add_image("erosion-cli;erosion;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_erosion_1.png)
 add_image("erosion-cli;dilation;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_dilation_1.png)
 add_image("erosion-cli;opening;square;21" "${PYLENE_IMAGE_DIR}/lena.pgm" morpho_opening_1.png)
@@ -59,8 +61,12 @@ add_image("blobs_watershed" "${DOCUMENTATION_IMAGE_DIR}/blobs_binary.png" blobs_
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")
 
+add_library(doc-lib lut.cpp)
+target_link_libraries(doc-lib Pylene::Pylene)
+
 link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE} ${FreeImage_LIBRARY})
 link_libraries(Pylene::Pylene)
+link_libraries(doc-lib)
 
 add_executable(erosion-cli erosion-cli.cpp)
 add_executable(staff_lines staff_lines.cpp)
@@ -70,3 +76,4 @@ add_executable(reconstruction reconstruction.cpp)
 add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
+add_executable(intro-1 intro-1.cpp)

@@ -56,6 +56,6 @@ Pixel
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/pixels.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/pixel.hpp
        :language: cpp
        :lines: 17-32

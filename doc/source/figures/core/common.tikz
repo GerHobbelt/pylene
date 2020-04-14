@@ -1,0 +1,21 @@
+\tikzset{
+  focus/.style args={#1 at #2}{
+    insert path={
+      %{ [white] (#2.north east) rectangle (#2.south west)}
+      ($(#2.center)!#1!(#2.north east) $) rectangle ($(#2.center)!#1!(#2.south west) $)
+    }
+  },
+  focusout/.style args={#1 at #2}{
+    even odd rule,
+    insert path={
+      (#2.north east) rectangle (#2.south west)
+      ($(#2.center)!#1!(#2.north east) $) rectangle ($(#2.center)!#1!(#2.south west) $)
+    }
+  },
+  txt/.style={font=\Large\tt},
+  img/.style={
+     inner sep=2pt,
+     draw,
+     label/.append style={font=\small\tt},
+  },
+}

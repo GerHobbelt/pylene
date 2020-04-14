@@ -5,7 +5,24 @@
 
 namespace mln
 {
-  void ParallelCanvas2d::operator()(const tbb::blocked_range2d<int>& tile) const
+  class ParallelCanvas2dImpl
+  {
+  public:
+    ParallelCanvas2dImpl(ParallelCanvas2d* delegate)
+      : m_delegate{delegate}
+    {
+    }
+
+    mln::experimental::box2d GetDomain() const;
+    void operator()(const tbb::blocked_range2d<int>&) const;
+
+    ParallelCanvas2d* delegate() const { return m_delegate; }
+
+  private:
+    ParallelCanvas2d* m_delegate = nullptr;
+  };
+
+  void ParallelCanvas2dImpl::operator()(const tbb::blocked_range2d<int>& tile) const
   {
     int x = tile.cols().begin();
     int w = tile.cols().end() - tile.cols().begin();
@@ -13,7 +30,12 @@ namespace mln
     int h = tile.rows().end() - tile.rows().begin();
 
     mln::experimental::box2d domain(x, y, w, h);
-    this->ExecuteTile(domain);
+    m_delegate->ExecuteTile(domain);
+  }
+
+  mln::experimental::box2d ParallelCanvas2dImpl::GetDomain() const
+  {
+    return m_delegate->GetDomain();
   }
 
 
@@ -25,23 +47,12 @@ namespace mln
   */
   void parallel_execute2d(ParallelCanvas2d& canvas)
   {
-    struct ParallelForWrapper
-    {
-      ParallelCanvas2d* canvas;
-      ParallelForWrapper(ParallelCanvas2d* ptr)
-        : canvas{ptr}
-      {}
 
-      void operator()(const tbb::blocked_range2d<int>& tile) const
-      {
-        std::invoke(*canvas, tile);
-      }
-    };
+    ParallelCanvas2dImpl wrapper(&canvas);
+    mln::experimental::box2d domain = wrapper.GetDomain();
 
-    ParallelForWrapper wrapper(&canvas);
-    mln::experimental::box2d domain = wrapper.canvas->GetDomain();
-    tbb::parallel_for(tbb::blocked_range2d<int>(domain.y(), domain.y() + domain.height(), wrapper.canvas->TILE_HEIGHT, //
-                                                domain.x(), domain.x() + domain.width(), wrapper.canvas->TILE_WIDTH),
-                      wrapper);
+    tbb::blocked_range2d<int> rng(domain.y(), domain.y() + domain.height(), wrapper.delegate()->TILE_HEIGHT, //
+                                  domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);
+    tbb::parallel_for(rng, wrapper);
   }
 } // namespace mln

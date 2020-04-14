@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tbb/blocked_range2d.h>
+//#include <tbb/blocked_range2d.h>
 #include <mln/core/box.hpp>
 
 //#include <mln/core/algorithm/copy.hpp> not necessary ?
@@ -15,8 +15,6 @@ namespace mln
   {
     static constexpr int TILE_WIDTH  = 128;
     static constexpr int TILE_HEIGHT = 128;
-
-    void operator()(const tbb::blocked_range2d<int>&) const;
 
     virtual mln::experimental::box2d GetDomain() const = 0;
     virtual void ExecuteTile(mln::experimental::box2d b) const = 0;

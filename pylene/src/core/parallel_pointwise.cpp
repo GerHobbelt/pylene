@@ -5,7 +5,7 @@
 
 namespace mln
 {
-  void ParallelCanvas2d::operator()(const tbb::blocked_range2d<int>& tile) const
+  void ParallelPointwise2d::operator()(const tbb::blocked_range2d<int>& tile) const
   {
     int x = tile.cols().begin();
     int w = tile.cols().end() - tile.cols().begin();
@@ -23,12 +23,12 @@ namespace mln
   ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
   ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
   */
-  void parallel_execute2d(ParallelCanvas2d& canvas)
+  void parallel_execute2d(ParallelPointwise2d& canvas)
   {
     struct ParallelForWrapper
     {
-      ParallelCanvas2d* canvas;
-      ParallelForWrapper(ParallelCanvas2d* ptr)
+      ParallelPointwise2d* canvas;
+      ParallelForWrapper(ParallelPointwise2d* ptr)
         : canvas{ptr}
       {}
 

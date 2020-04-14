@@ -11,7 +11,7 @@
 
 namespace mln
 {
-  struct ParallelCanvas2d
+  struct ParallelPointwise2d
   {
     static constexpr int TILE_WIDTH  = 128;
     static constexpr int TILE_HEIGHT = 128;
@@ -28,11 +28,11 @@ namespace mln
   ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
   ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
   */
-  void parallel_execute2d(ParallelCanvas2d&);
+  void parallel_execute2d(ParallelPointwise2d&);
 
 
   template <class Function, class InputImage>
-  class ForEachParallel : public ParallelCanvas2d
+  class ForEachParallel : public ParallelPointwise2d
   {
     InputImage _in;
     Function _fun;
@@ -55,7 +55,7 @@ namespace mln
   };
 
   template <class Function, class InputImage, class OutputImage>
-  class TransformParallel : public ParallelCanvas2d
+  class TransformParallel : public ParallelPointwise2d
   {
     InputImage _in;
     OutputImage _out;
@@ -82,7 +82,7 @@ namespace mln
   };
 
   template <class InputImage, class OutputImage>
-  class CopyParallel : public ParallelCanvas2d
+  class CopyParallel : public ParallelPointwise2d
   {
     InputImage _in;
     OutputImage _out;
@@ -107,7 +107,7 @@ namespace mln
   };
 
   template <class InputImage, class OutputImage>
-  class PasteParallel : public ParallelCanvas2d
+  class PasteParallel : public ParallelPointwise2d
   {
     InputImage _in;
     OutputImage _out;
@@ -132,7 +132,7 @@ namespace mln
   };
 
   template <class InputImage, typename Value>
-  class FillParallel : public ParallelCanvas2d
+  class FillParallel : public ParallelPointwise2d
   {
     InputImage _in;
     Value& _val;

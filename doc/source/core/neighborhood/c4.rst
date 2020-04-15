@@ -7,9 +7,13 @@
 .. figure:: /figures/core/c4.svg
     :alt: 4-connected
     :align: center
-    
+
     Center and its 4-connected points
 
+
+.. cpp:class:: c4_t
+
+.. cpp:var:: constexpr c4_t c4
 
 .. rubric:: Properties
 

@@ -1,8 +1,6 @@
 Extension (Concept)
 ===================
 
-.. concept:: Extension
-
 Extension (Overview)
 --------------------
 
@@ -18,7 +16,7 @@ means that even if the image is constant, e.g. the input of an
 algorithm, the algorithm is allowed to write the input's extension.
 
 
-*  `E`: A model of :concept:`Extension`
+*  `E`: A model of :cpp:concept:`Extension`
 *  `ext`: An instance of `E`
 
 .. rubric:: `Type definition`

@@ -1,6 +1,5 @@
-#include <mln/core/rangev3/mdspan.hpp>
+#include <mln/core/range/mdspan.hpp>
 
-#include <mln/core/concept/new/concepts.hpp>
 
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/indices.hpp>

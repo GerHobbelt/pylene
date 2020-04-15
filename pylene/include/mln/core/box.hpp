@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/experimental/point.hpp>
-#include <mln/core/rangev3/mdindex.hpp>
+#include <mln/core/range/mdindex.hpp>
 
 #include <array>
 #include <type_traits>
@@ -873,7 +873,6 @@ namespace mln::experimental
 } // namespace mln::experimental
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 // Specialization of std::common_reference
 namespace concepts
 {
@@ -885,7 +884,7 @@ namespace concepts
     using type = mln::experimental::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
   };
 }
-#endif
+
 
 namespace ranges
 {

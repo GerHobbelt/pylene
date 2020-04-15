@@ -1,6 +1,6 @@
 #include <mln/accu/accumulators/cvxhull_impl.hpp>
 
-#include <mln/core/point.hpp>
+#include <mln/core/experimental/point.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <cmath>
@@ -18,8 +18,8 @@ namespace
   /// \param n Number of points
   /// \param backward True if going backward (y decreasing), false otherwise
   /// \return The position of the minimum
-  std::size_t get_min_angles(mln::point2d        ref,    //
-                             const mln::point2d* points, //
+  std::size_t get_min_angles(mln::experimental::point2d        ref,    //
+                             const mln::experimental::point2d* points, //
                              float*                            angles, //
                              std::size_t                       n,      //
                              bool                              backward)
@@ -55,13 +55,13 @@ namespace mln
 {
   namespace impl
   {
-    std::vector<point2d> cvxhull_sorted(const point2d* points, std::size_t n)
+    std::vector<experimental::point2d> cvxhull_sorted(const experimental::point2d* points, std::size_t n)
     {
       if (n == 0)
         return {};
 
 
-      std::vector<point2d> cvx_hull;
+      std::vector<experimental::point2d> cvx_hull;
       std::vector<float>                 angles(n);
 
 
@@ -95,13 +95,13 @@ namespace mln
   } // namespace impl
 
 
-  std::vector<point2d> convexhull(point2d* points, std::size_t n)
+  std::vector<experimental::point2d> convexhull(experimental::point2d* points, std::size_t n)
   {
     std::sort(points, points + n);
     return impl::cvxhull_sorted(points, n);
   }
 
-  std::vector<point2d> convexhull_sorted(const std::vector<point2d>& points)
+  std::vector<experimental::point2d> convexhull_sorted(const std::vector<experimental::point2d>& points)
   {
     return impl::cvxhull_sorted(points.data(), points.size());
   }

@@ -149,7 +149,7 @@ namespace mln::ranges
               x[k]--;
           }
           __back(x) = __back(m_from);
-          return ::ranges::views::reverse(row_t(x, static_cast<std::size_t>(__back(m_to) - __back(m_from))));
+          return ::ranges::view::reverse(row_t(x, static_cast<std::size_t>(__back(m_to) - __back(m_from))));
         }
 
 

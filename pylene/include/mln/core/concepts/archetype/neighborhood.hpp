@@ -24,7 +24,7 @@ namespace mln::archetypes
 
 
     template <class N>
-    struct AsNeighborhood : N, mln::Neighborhood<AsNeighborhood<N>>
+    struct AsNeighborhood : N, mln::experimental::Neighborhood<AsNeighborhood<N>>
     {
     };
 

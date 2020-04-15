@@ -1,13 +1,18 @@
+
 #include <mln/accu/accumulators/cvxhull.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/range/foreach.hpp>
 
+#include <mln/accu/accumulators/cvxhull_impl.hpp>
+
+
 #include <gtest/gtest.h>
 #include <fmt/ostream.h>
 
-namespace mln
+
+namespace mln::experimental
 {
-  void PrintTo(mln::point2d p, std::ostream* os)
+  void PrintTo(mln::experimental::point2d p, std::ostream* os)
   {
     fmt::print(*os, "({},{})", p.x(), p.y());
   }
@@ -23,8 +28,8 @@ TEST(CvxHull, null)
 
 TEST(CvxHull, SinglePoint)
 {
-  std::vector<mln::point2d> points = {{0, 0}, {0, 0}, {0, 0}};
-  std::vector<mln::point2d> ref    = {{0, 0}};
+  std::vector<mln::experimental::point2d> points = {{0, 0}, {0, 0}, {0, 0}};
+  std::vector<mln::experimental::point2d> ref    = {{0, 0}};
 
   auto res = mln::convexhull(points.data(), points.size());
   ASSERT_EQ(res, ref);
@@ -33,8 +38,8 @@ TEST(CvxHull, SinglePoint)
 
 TEST(CvxHull, Line)
 {
-  std::vector<mln::point2d> points = {{0, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {3, 0}};
-  std::vector<mln::point2d> ref    = {{0, 0}, {3, 0}};
+  std::vector<mln::experimental::point2d> points = {{0, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {3, 0}};
+  std::vector<mln::experimental::point2d> ref    = {{0, 0}, {3, 0}};
 
   auto res = mln::convexhull(points.data(), points.size());
   ASSERT_EQ(res, ref);
@@ -42,8 +47,8 @@ TEST(CvxHull, Line)
 
 TEST(CvxHull, Line_2)
 {
-  std::vector<mln::point2d> points = {{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 3}, {0, 0}};
-  std::vector<mln::point2d> ref    = {{0, 0}, {0, 3}};
+  std::vector<mln::experimental::point2d> points = {{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 3}, {0, 0}};
+  std::vector<mln::experimental::point2d> ref    = {{0, 0}, {0, 3}};
 
   auto res = mln::convexhull(points.data(), points.size());
   ASSERT_EQ(res, ref);
@@ -52,12 +57,12 @@ TEST(CvxHull, Line_2)
 
 TEST(CvxHull, Square_1)
 {
-  std::vector<mln::point2d> points = {{+0, +0}, {+1, +0}, {+2, +0}, {+3, +0}, //
+  std::vector<mln::experimental::point2d> points = {{+0, +0}, {+1, +0}, {+2, +0}, {+3, +0}, //
                                                     {+3, +0}, {+3, +1}, {+3, +2}, {+3, +3}, //
                                                     {+0, +3}, {+1, +3}, {+2, +3}, {+3, +3}, //
                                                     {+0, +3}, {+0, +2}, {+0, +1}, {+0, +0}};
 
-  std::vector<mln::point2d> ref = {{+0, +0}, {+0, +3}, {+3, +3}, {+3, +0}};
+  std::vector<mln::experimental::point2d> ref = {{+0, +0}, {+0, +3}, {+3, +3}, {+3, +0}};
 
   auto res = mln::convexhull(points.data(), points.size());
   ASSERT_EQ(res, ref);
@@ -65,13 +70,12 @@ TEST(CvxHull, Square_1)
 
 TEST(CvxHull, Square_2)
 {
-  std::vector<mln::point2d> points = {{-0, +0}, {-1, +0}, {-2, +0}, {-3, +0}, //
+  std::vector<mln::experimental::point2d> points = {{-0, +0}, {-1, +0}, {-2, +0}, {-3, +0}, //
                                                     {-3, +0}, {-3, +1}, {-3, +2}, {-3, +3}, //
                                                     {-0, +3}, {-1, +3}, {-2, +3}, {-3, +3}, //
                                                     {-0, +3}, {-0, +2}, {-0, +1}, {-0, +0}};
 
-  std::vector<mln::point2d> ref = {{-0, +0}, {-0, +3}, {-3, +3}, {-3, +0}};
-
+  std::vector<mln::experimental::point2d> ref = {{-0, +0}, {-0, +3}, {-3, +3}, {-3, +0}};
 
   auto res = mln::convexhull(points.data(), points.size());
   std::sort(res.begin(), res.end());
@@ -82,12 +86,12 @@ TEST(CvxHull, Square_2)
 
 TEST(CvxHull, Square_3)
 {
-  std::vector<mln::point2d> points = {{+0, -0}, {+1, -0}, {+2, -0}, {+3, -0}, //
+  std::vector<mln::experimental::point2d> points = {{+0, -0}, {+1, -0}, {+2, -0}, {+3, -0}, //
                                                     {+3, -0}, {+3, -1}, {+3, -2}, {+3, -3}, //
                                                     {+0, -3}, {+1, -3}, {+2, -3}, {+3, -3}, //
                                                     {+0, -3}, {+0, -2}, {+0, -1}, {+0, -0}};
 
-  std::vector<mln::point2d> ref = {{+0, -0}, {+0, -3}, {+3, -3}, {+3, -0}};
+  std::vector<mln::experimental::point2d> ref = {{+0, -0}, {+0, -3}, {+3, -3}, {+3, -0}};
 
 
   auto res = mln::convexhull(points.data(), points.size());
@@ -99,12 +103,12 @@ TEST(CvxHull, Square_3)
 
 TEST(CvxHull, Square_4)
 {
-  std::vector<mln::point2d> points = {{-0, -0}, {-1, -0}, {-2, -0}, {-3, -0}, //
+  std::vector<mln::experimental::point2d> points = {{-0, -0}, {-1, -0}, {-2, -0}, {-3, -0}, //
                                                     {-3, -0}, {-3, -1}, {-3, -2}, {-3, -3}, //
                                                     {-0, -3}, {-1, -3}, {-2, -3}, {-3, -3}, //
                                                     {-0, -3}, {-0, -2}, {-0, -1}, {-0, -0}};
 
-  std::vector<mln::point2d> ref = {{-0, -0}, {-0, -3}, {-3, -3}, {-3, -0}};
+  std::vector<mln::experimental::point2d> ref = {{-0, -0}, {-0, -3}, {-3, -3}, {-3, -0}};
 
 
   auto res = mln::convexhull(points.data(), points.size());
@@ -118,7 +122,7 @@ TEST(CvxHull, Square_4)
 // Some dataset generated with https://github.com/qhull/qhull/
 TEST(CvxHull, DS_1)
 {
-  static mln::point2d points[] = {
+  static mln::experimental::point2d points[] = {
       {-473541, -807573}, {-881006, 939647},  {649184, 832006},   {-473563, 826122},  {624358, -411853},
       {-11591, -805774},  {-639320, 949904},  {-959850, -200832}, {622108, -237009},  {596802, 447845},
       {927089, -419198},  {534259, -712781},  {290894, -938273},  {443004, -432747},  {824229, 824427},
@@ -160,12 +164,12 @@ TEST(CvxHull, DS_1)
       {449631, 940996},   {-684727, -212072}, {-299058, -271113}, {-589562, -771063}, {748231, -479687},
       {-91041, -129689},  {309806, 903809},   {318360, 674588},   {-199636, 712366},  {739004, 436455}};
 
-  std::vector<mln::point2d> ref = {
+  std::vector<mln::experimental::point2d> ref = {
       {290894, -938273}, {-341703, 997504},  {-951437, -796575}, {832343, -812421},  {997495, 906781},
       {415600, 988866},  {-661212, -989691}, {-982645, 678639},  {-993784, -527988}, {996330, -679037},
       {-991456, 598724}, {-993492, 376171},  {-637770, 991600},  {927408, 941270},   {-875291, 977572}};
 
-  auto res = mln::convexhull(points, sizeof(points) / sizeof(mln::point2d));
+  auto res = mln::convexhull(points, sizeof(points) / sizeof(mln::experimental::point2d));
   std::sort(res.begin(), res.end());
   std::sort(ref.begin(), ref.end());
 
@@ -175,7 +179,7 @@ TEST(CvxHull, DS_1)
 
 TEST(CvxHull, DS_2)
 {
-  static mln::point2d points[] = {
+  static mln::experimental::point2d points[] = {
       {504947, 646967},   {-418350, 796142},  {757023, -708944},  {776029, 720999},   {-172930, -430268},
       {493870, 471402},   {845156, 535278},   {425496, -682176},  {663533, 5691},     {-343055, 277961},
       {-310451, 244570},  {487641, -211656},  {693818, -994331},  {277030, 39111},    {-659607, -8784},
@@ -220,12 +224,12 @@ TEST(CvxHull, DS_2)
 
   };
 
-  std::vector<mln::point2d> ref = {
+  std::vector<mln::experimental::point2d> ref = {
       {693818, -994331},  {-992987, 875718}, {999046, 962267},   {918845, -968224},  {-935496, -879591},
       {-724756, -966508}, {998817, -877194}, {-991268, -240362}, {-599690, -991244}, {68959, 989876},
   };
 
-  auto res = mln::convexhull(points, sizeof(points) / sizeof(mln::point2d));
+  auto res = mln::convexhull(points, sizeof(points) / sizeof(mln::experimental::point2d));
   std::sort(res.begin(), res.end());
   std::sort(ref.begin(), ref.end());
 
@@ -234,7 +238,7 @@ TEST(CvxHull, DS_2)
 
 TEST(CvxHull, DS_3)
 {
-  static mln::point2d points[] = {
+  static mln::experimental::point2d points[] = {
       {506982, 846792},   {39034, 45176},     {-723495, 220444},  {-992371, -774175}, {444136, 589885},
       {204410, -480342},  {896146, -475973},  {325522, -960126},  {-837627, 7220},    {-654986, -343057},
       {235902, 805475},   {-378431, -298168}, {697210, 7151},     {187901, 58041},    {-499774, 300771},
@@ -277,19 +281,18 @@ TEST(CvxHull, DS_3)
       {541902, -245105},  {515759, 367279},   {853791, -339918},  {997151, -878816},  {-255803, 723991},
   };
 
-  std::vector<mln::point2d> ref = {
+  std::vector<mln::experimental::point2d> ref = {
       {-948948, -975948}, {-999689, 230143}, {-959069, 922033}, {608377, 986982},   {-237937, 996343},
       {441543, -991158},  {789138, -959303}, {998048, 192157},  {-924318, 985923},  {-716785, 997956},
       {874455, 966378},   {985946, 794509},  {413815, 990831},  {-991903, -916610}, {997151, -878816},
   };
 
-  auto res = mln::convexhull(points, sizeof(points) / sizeof(mln::point2d));
+  auto res = mln::convexhull(points, sizeof(points) / sizeof(mln::experimental::point2d));
   std::sort(res.begin(), res.end());
   std::sort(ref.begin(), ref.end());
 
   ASSERT_EQ(res, ref);
 }
-
 
 
 TEST(CvxHull, image)
@@ -314,4 +317,3 @@ TEST(CvxHull, image)
   std::sort(res.begin(), res.end());
   ASSERT_EQ(res, expected);
 }
-

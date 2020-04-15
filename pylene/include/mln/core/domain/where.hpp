@@ -2,7 +2,7 @@
 
 #include <mln/core/image/image.hpp>
 
-#include <mln/core/rangev3/private/mdrange_facade.hpp>
+#include <mln/core/range/private/mdrange_facade.hpp>
 
 #include <range/v3/view/facade.hpp>
 #include <range/v3/view/all.hpp>

@@ -1,6 +1,7 @@
 #pragma once
-#include <mln/core/point.hpp>
+
 #include <type_traits>
+#include <cstddef>
 
 
 namespace mln::internal
@@ -8,9 +9,6 @@ namespace mln::internal
   template <typename T, unsigned dim>
   struct ndimage_extension
   {
-  private:
-    typedef point<short, dim> P;
-
   public:
     using value_type          = T;
     using support_fill        = std::true_type;
@@ -19,7 +17,7 @@ namespace mln::internal
     using support_clamp       = std::false_type; // TODO
     using support_extend_with = std::false_type; // TODO
 
-    ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border);
+    ndimage_extension(char* ptr, const std::size_t strides[], const int dims[], int border);
 
     template <typename SE>
     bool fit(const SE& se) const;
@@ -66,7 +64,7 @@ namespace mln::internal
 
   private:
     size_t m_strides[dim];
-    P      m_shp;
+    int    m_dims[dim];
     char*  m_ptr;
     int    m_border;
   };
@@ -77,13 +75,13 @@ namespace mln::internal
   /******************************************/
 
   template <typename T, unsigned dim>
-  ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const P& shp, int border)
-    : m_shp(shp)
-    , m_border(border)
+  ndimage_extension<T, dim>::ndimage_extension(char* ptr, const std::size_t* strides, const int dims[], int border)
+    : m_border(border)
   {
     m_ptr = ptr;
     for (unsigned i = 0; i < dim; ++i)
     {
+      m_dims[i]     = dims[i];
       m_strides[i] = strides[i];
       m_ptr -= m_strides[i] * border;
     }
@@ -93,7 +91,7 @@ namespace mln::internal
   template <typename SE>
   bool ndimage_extension<T, dim>::fit(const SE& se) const
   {
-    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>() || mln::is_a<SE, mln::Neighborhood>());
+    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
     if constexpr (std::is_convertible_v<typename SE::category, dynamic_neighborhood_tag>)
     {
@@ -161,12 +159,12 @@ namespace mln::internal
   {
     char* pori = ptr + m_border * m_strides[d];
     char* p    = pori;
-    for (int i = 0; i < m_shp[d]; ++i, p += m_strides[d])
+    for (int i = 0; i < m_dims[d]; ++i, p += m_strides[d])
       _mirror<d + 1>(p, padding);
 
     char* src1  = pori;
     char* dest1 = pori - m_strides[d];
-    char* dest2 = pori + m_shp[d] * m_strides[d];
+    char* dest2 = pori + m_dims[d] * m_strides[d];
     char* src2  = dest2 - m_strides[d];
 
     for (int i = 0; i < m_border; ++i)
@@ -192,7 +190,7 @@ namespace mln::internal
   template <unsigned d>
   typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
   {
-    for (int k = 0; k < m_shp[d] + 2 * m_border; ++k)
+    for (int k = 0; k < m_dims[d] + 2 * m_border; ++k)
     {
       _copy_line<d + 1>(src, dest);
       src += m_strides[d];
@@ -214,7 +212,7 @@ namespace mln::internal
     for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
       _fillall<d + 1>(ptr, v);
 
-    for (int i = 0; i < m_shp[d]; ++i, ptr += m_strides[d])
+    for (int i = 0; i < m_dims[d]; ++i, ptr += m_strides[d])
       _fill<d + 1>(ptr, v);
 
     for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
@@ -233,7 +231,7 @@ namespace mln::internal
   template <unsigned d>
   typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
   {
-    for (int i = 0; i < m_shp[d] + (2 * m_border); ++i, ptr += m_strides[d])
+    for (int i = 0; i < m_dims[d] + (2 * m_border); ++i, ptr += m_strides[d])
       _fillall<d + 1>(ptr, v);
   }
 

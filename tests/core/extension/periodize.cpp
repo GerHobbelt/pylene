@@ -21,7 +21,7 @@ TEST(Core, Periodize_LargeEnough_BM_Auto)
   mln::experimental::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
   [[maybe_unused]] mln::experimental::image2d<uint8_t> out  = mln::clone(ima);
-  [[maybe_unused]] auto                                disc = mln::se::disc{1};
+  [[maybe_unused]] auto                                disc = mln::experimental::se::disc{1};
 
   // TODO: implement periodize in ndimage
   /*
@@ -47,7 +47,7 @@ TEST(Core, Periodize_NotLargeEnough_BM_Auto)
 
   mln::experimental::image2d<uint8_t> ref = mln::clone(ima);
 
-  auto disc                      = mln::se::disc{4};
+  auto disc                      = mln::experimental::se::disc{4};
   auto [managed_ima, managed_se] = mln::extension::bm::periodize().manage(ima, disc);
 
   std::visit([](auto i, auto) { ASSERT_FALSE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
@@ -68,7 +68,7 @@ TEST(Core, Periodize_LargeEnough_BM_Native)
   mln::experimental::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
   [[maybe_unused]] mln::experimental::image2d<uint8_t> out  = mln::clone(ima);
-  [[maybe_unused]] auto           disc = mln::se::disc{1};
+  [[maybe_unused]] auto           disc = mln::experimental::se::disc{1};
 
   // TODO: implement periodize in ndimage
   /*
@@ -93,7 +93,7 @@ TEST(Core, Periodize_NotLargeEnough_BM_Native)
   mln::iota(ima, 0);
   [[maybe_unused]] mln::experimental::image2d<uint8_t> out = mln::clone(ima);
 
-  [[maybe_unused]] auto disc = mln::se::disc{4};
+  [[maybe_unused]] auto disc = mln::experimental::se::disc{4};
   [[maybe_unused]] auto bm   = mln::extension::bm::native::periodize();
   // TODO: implement periodize in ndimage
   // EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);

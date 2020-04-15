@@ -1,11 +1,8 @@
 project(bench)
 
 find_package(benchmark REQUIRED)
-find_package(GTest MODULE REQUIRED)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
-
-include(CTest)
 include(ExternalData)
 include(BenchmarkMacros)
 
@@ -35,20 +32,16 @@ else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4141")
 endif ()
 
-add_library(BenchImpl STATIC
-              include/bench/neighborhood.hpp
-              src/neighborhood.cpp)
+add_library(BenchImpl
+  include/bench/neighborhood.hpp
+  src/neighborhood.cpp)
 
-target_compile_features(BenchImpl PUBLIC cxx_std_17)
+
 set_target_properties(BenchImpl PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 target_include_directories(BenchImpl PUBLIC include)
 target_link_libraries(BenchImpl PUBLIC Pylene::Pylene)
 
-target_sources(BenchImpl PUBLIC
-   ${CMAKE_CURRENT_SOURCE_DIR}/include/bench/neighborhood.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/neighborhood.cpp)
 
-include(CTest)
 add_subdirectory(tests)
 
 set(src_standalone
@@ -64,8 +57,6 @@ set_source_files_properties(${src_standalone} PROPERTIES COMPILE_FLAGS ${STANDAL
 
 
 add_benchmark(BMAlgorithms              BMAlgorithms.cpp BMAlgorithms_main.cpp)
-add_benchmark(BMNeighborhood            BMNeighborhood.cpp BMNeighborhood_main.cpp)
-add_benchmark(BMRotation                BMRotation.cpp)
 add_benchmark(BMMorphoMaxtree           BMMorphoMaxtree.cpp)
 add_benchmark(BMMorphoTos               BMMorphoTos.cpp)
 add_benchmark(BMMorphoBase              BMMorphoBase.cpp)

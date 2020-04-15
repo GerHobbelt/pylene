@@ -19,7 +19,7 @@ namespace mln::ranges::view
   template <::ranges::cpp20::range Rng, class Fun>
   [[gnu::always_inline]] inline auto filter(Rng&& rng, Fun&& fun)
   {
-    return ::ranges::cpp20::views::filter(std::forward<Rng>(rng), std::forward<Fun>(fun));
+    return ::ranges::view::filter(std::forward<Rng>(rng), std::forward<Fun>(fun));
   }
 
 } // namespace mln::ranges::view

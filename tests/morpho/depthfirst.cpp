@@ -1,4 +1,3 @@
-#include <mln/io/experimental/imprint.hpp>
 #include <mln/morpho/experimental/canvas/depthfirst.hpp>
 
 #include <mln/core/image/experimental/ndimage.hpp>

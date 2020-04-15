@@ -1,8 +1,8 @@
-#include <mln/core/rangev3/view/transform_if.hpp>
+#include <mln/core/range/view/transform_if.hpp>
 
-#include <mln/core/rangev3/algorithm/for_each.hpp>
+#include <mln/core/range/algorithm/for_each.hpp>
 #include <mln/core/box.hpp>
-#include <mln/core/rangev3/mdspan.hpp>
+#include <mln/core/range/mdspan.hpp>
 
 
 #include <vector>

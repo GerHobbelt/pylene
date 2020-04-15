@@ -40,6 +40,6 @@ Index
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/indexes.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/index.hpp
        :language: cpp
        :lines: 12-13

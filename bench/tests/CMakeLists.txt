@@ -1,9 +1,8 @@
-project(tests)
+include(CTest)
 
 find_package(Threads REQUIRED)
 find_package(GTest MODULE REQUIRED)
 
-include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(UTBenchImpl_Neighborhood neighborhood.cpp)
 target_link_libraries(UTBenchImpl_Neighborhood PRIVATE BenchImpl Fixtures::ImagePath Fixtures::ImageCompare Pylene::Pylene GTest::GTest GTest::Main ${FreeImage_LIBRARIES})

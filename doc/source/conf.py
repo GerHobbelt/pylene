@@ -29,8 +29,8 @@ import pylene_lexer
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'breathe', "ext.conceptdoc",
-              'matplotlib.sphinxext.plot_directive']
+extensions = ['sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'breathe',
+              'matplotlib.sphinxext.plot_directive', 'sphinxcontrib.mermaid']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -98,7 +98,14 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'sphinx_rtd_theme'
-html_style = "code.css"
+
+
+html_context = {
+    'css_files': [
+        '_static/code.css',
+        '_static/theme_overrides.css',  # override wide tables in RTD theme
+        ],
+}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -260,6 +267,6 @@ plot_formats = [("png", 150)]
 
 # Substitution
 rst_prolog = """
-.. |pylene| replace:: pylene
-.. |milena| replace:: milena
+.. |Pylene| replace:: Pylene
+.. _Milena: https://www.lrde.epita.fr/wiki/Olena/Milena
 """

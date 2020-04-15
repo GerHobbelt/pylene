@@ -10,7 +10,6 @@
 #include <mln/labeling/experimental/local_extrema.hpp>
 #include <mln/morpho/experimental/private/pqueue.hpp>
 
-
 namespace mln::morpho::experimental
 {
 
@@ -31,10 +30,10 @@ namespace mln::morpho::experimental
     int watershed(I input, N nbh, O output)
     {
       using Label_t = image_value_t<O>;
+      using V       = image_value_t<I>;
 
       // 1. Labelize minima (note that output is initialized to -1)
-      const int nlabel = mln::labeling::experimental::impl::local_minima(input, nbh, output, std::less<Label_t>());
-
+      const int nlabel = mln::labeling::experimental::impl::local_minima(input, nbh, output, std::less<V>());
 
       constexpr int kUnlabeled = -2;
       constexpr int kInqueue   = -1;

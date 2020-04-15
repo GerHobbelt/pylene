@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <mln/core/concept/new/images.hpp>
-#include <mln/core/concept/new/neighborhoods.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
 
 #include <mln/core/functional_ops.hpp>
 #include <mln/core/algorithm/for_each.hpp>

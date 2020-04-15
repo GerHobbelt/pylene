@@ -1,9 +1,8 @@
 // [legacy]
 #pragma once
-#include <mln/core/concept/new/structuring_elements.hpp>
-#include <mln/core/concept/neighborhood.hpp>
-#include <mln/core/image/private/image_traits.hpp>
-
+#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/private/traits/image.hpp>
+#include <mln/core/concepts/image.hpp>
 
 
 #include <any>
@@ -13,11 +12,8 @@
 
 namespace mln
 {
-  // [Legacy] Forward declaration of the concept
-  template <class I> struct Image;
 
-
-  /// \brief Structure holding building parameters
+  /// \brief Structure holding build parameters
   /// It is composed of two fields, a border value and
   /// an initialization value.
   struct image_build_params
@@ -101,7 +97,7 @@ namespace mln
     /// Override the initialization border parameter with \p border.
     image_builder& set_border(int border)
     {
-      if (!image_has_border<I>())
+      if (!image_has_border_v<I>)
         m_status = IMAGE_BUILD_NO_BORDER;
       base::set_border(border);
       return *this;
@@ -225,7 +221,7 @@ namespace mln
   template <typename V, class I>
   auto imchvalue(const I& ref)
   {
-    static_assert(mln::is_a<I, Image>() || mln::is_a<I, experimental::Image>());
+    static_assert(mln::is_a<I, experimental::Image>());
     return ref.template ch_value<V>();
   }
 
@@ -234,7 +230,7 @@ namespace mln
   template <class I>
   auto imconcretize(const I& ref)
   {
-    static_assert(mln::is_a<I, Image>() || mln::is_a<I, experimental::Image>());
+    static_assert(mln::is_a<I, experimental::Image>());
     return ref.concretize();
   }
 
@@ -242,8 +238,8 @@ namespace mln
   template <class To, class From>
   image_resizer<To, From> resize(To& to, const From& from)
   {
-    static_assert(mln::is_a<To, Image>() || mln::is_a<To, experimental::Image>());
-    static_assert(mln::is_a<From, Image>() || mln::is_a<From, experimental::Image>());
+    static_assert(mln::is_a<To, experimental::Image>());
+    static_assert(mln::is_a<From, experimental::Image>());
     return {to, from};
   }
 
@@ -270,7 +266,7 @@ namespace mln
     template <class SE>
     void image_builder_base::adjust(const SE& nbh)
     {
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>() || mln::is_a<SE, mln::Neighborhood>());
+      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
       if constexpr (std::is_convertible_v<typename SE::category, dynamic_neighborhood_tag>)
       {
@@ -290,9 +286,10 @@ namespace mln
   image_builder<I, From>::image_builder(const From& from)
     : m_from{from}
   {
-    if constexpr (mln::is_a<From, Image>())
+#ifdef MLN_LEGACY_INIT
       if constexpr (image_has_border<From>())
         m_params.border = from.border();
+#endif
   }
 
 
@@ -301,8 +298,10 @@ namespace mln
     : base{params}
     , m_from{from}
   {
+#ifdef MLN_LEGACY_INIT
     if constexpr (image_has_border<From>())
       m_params.border = from.border();
+#endif
   }
 
 
@@ -311,20 +310,8 @@ namespace mln
   {
     if (m_status_ptr)
       *m_status_ptr = m_status;
-    I output{m_from, m_params};
 
-    // Reindexation (required as ndImage is not cleaned up)
-    // It ensures that both image have the same starting index
-    if constexpr (mln::is_a<I, mln::Image>::value && mln::is_a<From, mln::Image>::value)
-      if constexpr (image_traits<I>::indexable::value && image_traits<From>::indexable::value)
-      {
-        auto&& domain = m_from.domain();
-        auto   p      = domain.iter();
-        p.init();
-        output.reindex(m_from.index_of_point(*p));
-      }
-
-    return output;
+    return I{m_from, m_params};
   }
 
 
@@ -333,9 +320,10 @@ namespace mln
     : m_to{to}
     , m_from{from}
   {
-    if constexpr (mln::is_a<From, Image>())
+#ifdef MLN_LEGACY_INIT
       if constexpr (image_has_border<From>())
         m_params.border = from.border();
+#endif
   }
 
 
@@ -345,8 +333,10 @@ namespace mln
     , m_to{to}
     , m_from{from}
   {
+#ifdef MLN_LEGACY_INIT
     if constexpr (image_has_border<From>())
       m_params.border = from.border();
+#endif
   }
 
 
@@ -356,17 +346,6 @@ namespace mln
     if (m_status_ptr)
       *m_status_ptr = m_status;
     m_to.resize(m_from.domain(), m_params);
-
-    // Reindexation (required as ndImage is not cleaned up)
-    // It ensures that both image have the same starting index
-    if constexpr (mln::is_a<To, mln::Image>::value && mln::is_a<From, mln::Image>::value)
-      if constexpr (image_traits<To>::indexable::value && image_traits<From>::indexable::value)
-      {
-        auto&& domain = m_from.domain();
-        auto   p      = domain.iter();
-        p.init();
-        m_to.reindex(m_from.index_of_point(*p));
-      }
   }
 
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <mln/core/config.hpp>
-#include <mln/core/range/has.hpp>
-#include <mln/core/range/iter.hpp>
-#include <mln/core/range/range_traits.hpp>
-#include <mln/core/range/size.hpp>
+// Traits and Concepts
+#include <mln/core/concepts/range.hpp>
+#include <mln/core/private/traits/range.hpp>
+
+// Utilities
+#include <mln/core/range/rows.hpp>

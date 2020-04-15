@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/rows.hpp>
 
 #include <range/v3/algorithm/any_of.hpp>
 #include <range/v3/functional/concepts.hpp>

@@ -1,5 +1,5 @@
-#include <mln/core/concept/new/archetype/pixel.hpp>
-#include <mln/core/concept/new/pixels.hpp>
+#include <mln/core/concepts/archetype/pixel.hpp>
+#include <mln/core/concepts/pixel.hpp>
 
 #include <tuple>
 

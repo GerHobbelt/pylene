@@ -1,9 +1,9 @@
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/transform.hpp>
 
-#include <mln/core/rangev3/algorithm/equal.hpp>
-#include <mln/core/rangev3/mdindex.hpp>
-#include <mln/core/rangev3/mdspan.hpp>
-#include <mln/core/rangev3/view/reverse.hpp>
+#include <mln/core/range/algorithm/equal.hpp>
+#include <mln/core/range/mdindex.hpp>
+#include <mln/core/range/mdspan.hpp>
+#include <mln/core/range/view/reverse.hpp>
 
 #include <range/v3/iterator/insert_iterators.hpp>
 #include <range/v3/algorithm/copy.hpp>

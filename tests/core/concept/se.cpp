@@ -1,5 +1,5 @@
-#include <mln/core/concept/new/archetype/structuring_element.hpp>
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/archetype/structuring_element.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 
 #include <gtest/gtest.h>
 

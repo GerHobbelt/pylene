@@ -1,5 +1,5 @@
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/mdindex.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/mdindex.hpp>
 
 
 #include <gtest/gtest.h>

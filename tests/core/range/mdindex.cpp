@@ -1,4 +1,4 @@
-#include <mln/core/rangev3/mdindex.hpp>
+#include <mln/core/range/mdindex.hpp>
 
 #include <vector>
 #include <gtest/gtest.h>

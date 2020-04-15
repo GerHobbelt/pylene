@@ -4,7 +4,7 @@
 
 /// \file
 
-namespace mln
+namespace mln::se
 {
 
   /// \brief Define a custom neighborhood from a range of delta points.
@@ -33,5 +33,4 @@ namespace mln
     int m_radial_extent;
   };
 
-}
-
+} // namespace mln::se

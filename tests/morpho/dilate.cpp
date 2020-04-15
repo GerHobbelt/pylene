@@ -4,6 +4,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/clip.hpp>
 #include <mln/core/image/view/mask.hpp>

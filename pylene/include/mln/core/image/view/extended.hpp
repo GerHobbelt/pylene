@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>
@@ -9,10 +9,11 @@
 #include <mln/core/image/view/none_extended.hpp>
 #include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
-#include <mln/core/rangev3/view/transform.hpp>
-#include <mln/core/utils/private/remove_cvref.hpp>
+#include <mln/core/range/view/transform.hpp>
+
 
 #include <range/v3/utility/common_type.hpp> // common_reference
+#include <concepts/type_traits.hpp>
 
 #include <optional>
 #include <variant>
@@ -75,7 +76,7 @@ namespace mln
       template <typename SE>
       constexpr bool fit(const SE& se) const
       {
-        PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
+        static_assert(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
         return std::visit([&se](auto&& ima) { return ima.extension().fit(se); }, *m_adapted_image_ptr);
       }
@@ -89,7 +90,7 @@ namespace mln
       {
         std::visit(
             [v](auto&& ima) {
-              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_fill::value)
+              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_fill::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_fill_supported())
@@ -104,7 +105,7 @@ namespace mln
       {
         std::visit(
             [padding](auto&& ima) {
-              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_mirror::value)
+              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_mirror::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_mirror_supported())
@@ -119,7 +120,7 @@ namespace mln
       {
         std::visit(
             [](auto&& ima) {
-              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_periodize::value)
+              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_periodize::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_periodize_supported())
@@ -134,7 +135,7 @@ namespace mln
       {
         std::visit(
             [](auto&& ima) {
-              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_clamp::value)
+              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_clamp::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_clamp_supported())
@@ -150,7 +151,7 @@ namespace mln
       {
         std::visit(
             [u_ = std::forward<U>(u), offset](auto&& ima) {
-              if constexpr (image_extension_t<detail::remove_cvref_t<decltype(ima)>>::support_extend_with::value)
+              if constexpr (image_extension_t<::concepts::remove_cvref_t<decltype(ima)>>::support_extend_with::value)
               {
                 auto ext = ima.extension();
                 if (ext.is_extend_with_supported())

@@ -1,6 +1,5 @@
-#include <mln/core/extension/fill.hpp>
+
 #include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/core/image/image2d.hpp>
 #include <mln/io/experimental/imread.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -20,9 +19,6 @@ class CoreNeighborhood : public ::testing::Test
     mln::io::experimental::imread(filename, m_input);
     m_input.extension().fill(0);
 
-    m_input.to(m_tmp, true);
-    m_tmp.extension().fill(0);
-
     m_h       = m_input.height();
     m_w       = m_input.width();
     m_stride  = m_input.stride();
@@ -30,48 +26,36 @@ class CoreNeighborhood : public ::testing::Test
   }
 
 protected:
-  using fun1_t = std::function<void(const mln::experimental::image2d<mln::uint8>&, mln::experimental::image2d<mln::uint8>&)>;
-  using fun2_t = std::function<void(const mln::uint8*, mln::uint8*, int, int, std::ptrdiff_t)>;
-  using fun3_t = std::function<void(const mln::image2d<mln::uint8>&, mln::image2d<mln::uint8>&)>;
+  using fun1_t = std::function<void(const mln::experimental::image2d<uint8_t>&, mln::experimental::image2d<uint8_t>&)>;
+  using fun2_t = std::function<void(const uint8_t*, uint8_t*, int, int, std::ptrdiff_t)>;
 
-  mln::experimental::image2d<mln::uint8> run_with(fun1_t f) const;
-  mln::image2d<mln::uint8>               run_with(fun3_t f) const;
-  mln::experimental::image2d<mln::uint8> run_with(fun2_t f) const;
+  mln::experimental::image2d<uint8_t> run_with(fun1_t f) const;
+  mln::experimental::image2d<uint8_t> run_with(fun2_t f) const;
 
 private:
   int                      m_w, m_h;
   std::ptrdiff_t           m_stride;
-  mln::uint8*              m_ibuffer;
+  uint8_t*              m_ibuffer;
 
-  mln::image2d<mln::uint8> m_tmp;
-  mln::experimental::image2d<mln::uint8> m_input;
+  mln::experimental::image2d<uint8_t> m_input;
 };
 
-mln::experimental::image2d<mln::uint8> CoreNeighborhood::run_with(fun1_t f) const
+mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun1_t f) const
 {
-  mln::experimental::image2d<mln::uint8> output;
+  mln::experimental::image2d<uint8_t> output;
   mln::resize(output, m_input);
 
   f(m_input, output);
   return output;
 }
 
-mln::image2d<mln::uint8> CoreNeighborhood::run_with(fun3_t f) const
+
+mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun2_t f) const
 {
-  mln::image2d<mln::uint8> output;
-  mln::resize(output, m_tmp);
-
-  f(m_tmp, output);
-  return output;
-}
-
-
-mln::experimental::image2d<mln::uint8> CoreNeighborhood::run_with(fun2_t f) const
-{
-  mln::experimental::image2d<mln::uint8> output;
+  mln::experimental::image2d<uint8_t> output;
   mln::resize(output, m_input);
 
-  mln::uint8* obuffer = output.buffer();
+  uint8_t* obuffer = output.buffer();
   f(m_ibuffer, obuffer, m_w, m_h, m_stride);
   return output;
 }
@@ -81,51 +65,41 @@ mln::experimental::image2d<mln::uint8> CoreNeighborhood::run_with(fun2_t f) cons
 TEST_F(CoreNeighborhood, Algorithm_Sum)
 {
   auto ref  = this->run_with(Sum_C);
-  auto ima1 = this->run_with(Sum_New);
-  auto ima2 = this->run_with(Sum);
+  auto ima = this->run_with(Sum);
 
-  ASSERT_IMAGES_EQ_EXP(ima1, ref);
-  ASSERT_IMAGES_EQ_EXP(mln::experimental::image2d<uint8_t>::from(ima2), ref);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 
 TEST_F(CoreNeighborhood, Algorithm_Average)
 {
   auto ref  = this->run_with(Average_C);
-  auto ima1 = this->run_with(Average_New);
-  auto ima2 = this->run_with(Average);
+  auto ima = this->run_with(Average);
 
-  ASSERT_IMAGES_EQ_EXP(ima1, ref);
-  ASSERT_IMAGES_EQ_EXP(mln::experimental::image2d<uint8_t>::from(ima2), ref);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 
 TEST_F(CoreNeighborhood, Algorithm_Erosion)
 {
   auto ref  = this->run_with(Erosion_C);
-  auto ima1 = this->run_with(Erosion_New);
-  auto ima2 = this->run_with(Erosion);
+  auto ima = this->run_with(Erosion);
 
-  ASSERT_IMAGES_EQ_EXP(ima1, ref);
-  ASSERT_IMAGES_EQ_EXP(mln::experimental::image2d<uint8_t>::from(ima2), ref);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 TEST_F(CoreNeighborhood, Algorithm_Isotropic_Diffusion)
 {
-  auto ref  = this->run_with(Isotropic_Diffusion_C);
-  auto ima1 = this->run_with(Isotropic_Diffusion_New);
-  auto ima2 = this->run_with(Isotropic_Diffusion);
+  auto ref = this->run_with(Isotropic_Diffusion_C);
+  auto ima = this->run_with(Isotropic_Diffusion);
 
-  ASSERT_IMAGES_EQ_EXP(ima1, ref);
-  ASSERT_IMAGES_EQ_EXP(mln::experimental::image2d<uint8_t>::from(ima2), ref);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
 TEST_F(CoreNeighborhood, Algorithm_Anisotropic_Diffusion)
 {
   auto ref  = this->run_with(Anisotropic_Diffusion_C);
-  auto ima1 = this->run_with(Anisotropic_Diffusion_New);
-  auto ima2 = this->run_with(Anisotropic_Diffusion);
+  auto ima = this->run_with(Anisotropic_Diffusion);
 
-  ASSERT_IMAGES_EQ_EXP(ima1, ref);
-  ASSERT_IMAGES_EQ_EXP(mln::experimental::image2d<uint8_t>::from(ima2), ref);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }

@@ -133,7 +133,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  mln::experimental::image2d<mln::uint8> input, output;
+  mln::experimental::image2d<uint8_t> input, output;
   mln::io::experimental::imread(vm["input"].as<std::string>(), input);
 
 

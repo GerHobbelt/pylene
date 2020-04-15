@@ -1,9 +1,9 @@
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
 
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <gtest/gtest.h>
 
@@ -142,6 +142,5 @@ TEST(Disc, approx_disc_is_decomposable)
   EXPECT_NO_THROW(d.decompose());
 }
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 static_assert(mln::concepts::DecomposableStructuringElement<mln::experimental::se::disc, mln::experimental::point2d>);
-#endif
+#

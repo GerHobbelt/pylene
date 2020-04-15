@@ -7,24 +7,26 @@ Objectives:
 * provide image types and basic manipulation routines
 * provide a framework for easy-to-write and efficient image processing algorithms
 
-Foundamental image concepts
----------------------------
+Image representation in Pylene
+------------------------------
 
-An image is basically a function associating a *point* to a
-*value*. The pair *(point,value)* is called a *pixel*. The *domain* of
+An :cpp:concept:`Image` is basically a function associating a *point* to a
+*value*. The pair *(point,value)* is called a :cpp:concept:`Pixel`. The *domain* of
 an image is the *ordered range* of points for which the function is
 defined.
 
 * Example of *point* type:
-  ``point2d``, ``point3d``...
+  ``mln::point2d``, ``mln::point3d``...
 * Example of *domain* types:
-  ``box2d``, ``sbox2d`` (strided boxes)
+  ``mln::box2d``, ``std::set<mln::point2d>``
 * Example of *value* types:
-  ``mln::uint8``, ``double``, ``mln::rgb8``
+  ``uint8_t``, ``double``, ``mln::rgb8``
 * Example of *image* types:
-  ``image2d<int>``, ``image3d<uint8>``
-* Example of *pixel* types:
-  ``image2d<int>::pixel_type``
+  ``mln::image2d<int>``, ``mln::image3d<uint8>``
+
+
+
+
 
 Creating/Loading/Saving an image
 --------------------------------
@@ -37,10 +39,10 @@ defined on a 2D grid. It can be creating from a set of values. For
 instance, in the following code, a 2 × 3 2D image is created with
 values from 1 to 6::
 
-  #include <mln/core/image/image2d.hpp>
+  #include <mln/core/image/ndimage.hpp>
   mln::image2d<int> f = {{1,2,3}, {4,5,6}};
 
-A 2D image can also be created from its number of rows and columns::
+A 2D image can also be created from its width and height::
 
   mln::image2d<int> f(2,3);
 
@@ -48,10 +50,10 @@ Finally a 2D image domain may not start at `(0,0)`. One can initialize
 an image from its domain and also provide an initial value for its
 elements (and also a border, we will see later)::
 
-  mln::box2d d {{1,1}, {5,5}};
-  mln::image2d<mln::uint8> f(d);       // A 4 x 4 image starting at (1,1) with a default border
-  mln::image2d<mln::uint8> g(d, 0);    // A 4 x 4 image starting at (1,1) with no border
-  mln::image2d<mln::uint8> h(d, 0, 3); // A 4 x 4 image starting at (1,1) with no border initialized with value 3
+  mln::box2d d = {{1,1}, {5,5}};
+  mln::image2d<uint8_t> f(d);       // A 4 x 4 image starting at (1,1) with a default border
+  mln::image2d<uint8_t> g(d, 0);    // A 4 x 4 image starting at (1,1) with no border
+  mln::image2d<uint8_t> h(d, 0, 3); // A 4 x 4 image starting at (1,1) with no border initialized with value 3
 
 
 Loading an image
@@ -61,10 +63,10 @@ An image can be loaded from a file. It actually relies on the
 `freeimage <http://freeimage.sourceforge.net/>`_ library to
 handle most file formats::
 
-  #include <mln/core/image/image2d.hpp>
+  #include <mln/core/image/ndimage.hpp>
   #include <mln/io/imread.hpp>
 
-  mln::image2d<mln::uint8> f;
+  mln::image2d<uint8_t> f;
   mln::io::imread("input.pgm", f);
 
 Saving an image
@@ -75,10 +77,10 @@ An image can be saved to a file. Yet it relies on the `freeimage
 automatically deduced from the filename extension when it is
 possible::
 
-  #include <mln/core/image/image2d.hpp>
+  #include <mln/core/image/ndimage.hpp>
   #include <mln/io/imsave.hpp>
 
-  mln::image2d<mln::uint8> f = { {1,2,3}, {4,5,6} };
+  mln::image2d<uint8_t> f = { {1,2,3}, {4,5,6} };
   mln::io::imsave(f, "out.pgm");
 
 
@@ -87,11 +89,10 @@ Displaying an image
 
 To display an image on the console, use :cpp:func:`mln::io::imprint`::
 
-  #include <mln/core/image/image2d.hpp>
-  #include <mln/core/grays.hpp>
+  #include <mln/core/image/ndimage.hpp>
   #include <mln/io/imprint.hpp>
 
-  mln::image2d<mln::uint8> f = { {1,2,3}, {4,5,6} };
+  mln::image2d<uint8_t> f = { {1,2,3}, {4,5,6} };
   mln::io::imprint(f);
 
 
@@ -113,8 +114,8 @@ Accessing image values
 Most standard image types (see :concept:`Accessible Image`) supports
 accessing a value though its point::
 
-  mln::image2d<mln::uint8> f = { {1,2,3}, {4,5,6} };
-  point2d p {1,1};
+  mln::image2d<uint8_t> f = { {1,2,3}, {4,5,6} };
+  mln::point2d p = {1,1};
   std::cout << f(p) << "\n"; // Affiche 5
 
 Note that indexes are in the order `(row, col)`. `(0,0)` refers to the
@@ -122,19 +123,19 @@ topleft corner and `(1,2)` to the bottom-right corner.
 
 For 2D image, an equivalent writing is with :cpp:func:`image2d<T>::at_`::
 
-  mln::image2d<mln::uint8> f = { {1,2,3}, {4,5,6} };
+  mln::image2d<uint8_t> f = { {1,2,3}, {4,5,6} };
   std::cout << f.at_(1,1) << "\n"; // Affiche 5
 
 .. note::
 
-   There are some first differences with |milena|:
+   There are some first differences with Milena_:
 
-   * First the range for the domain in |milena| is closed,
+   * First the range for the domain in Milena_ is closed,
      (i.e. `domain = [pmin,pmax]`), here it is half-open to follow the
      usual convention of the C++ standard library, so it is `domain =
      [pmin,pmax)` and `pmax` is not included in the range.
 
-   * Second, every image ``f`` in |milena| supports ``f(p)`` where
+   * Second, every image ``f`` in Milena_ supports ``f(p)`` where
      ``p`` is point of the domain. This is not always the case with
      this library as we provide more flexible ways to iterate on images.
 
@@ -212,7 +213,7 @@ It produces the following output.
 
 .. note::
 
-   Contrary to |milena|, the ordering of the traversal of images is
+   Contrary to Milena_, the ordering of the traversal of images is
    defined. Domains are *ordered* ranges. This means there is a
    **total order** on *point* type. In the case of
    :cpp:class:`mln::point2d`, this is the lexicographical order
@@ -220,38 +221,20 @@ It produces the following output.
    or *pixel* range follows the same order.
 
 
-Traversing with iterators
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Traversing with ranges and iterators
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The underlying concepts behind *ranges* are **iterators**. A range `R`
-provides iterators (and sometimes reverse iterators) through
-``R.iter()`` (and ``R.riter()``). Then, the macro ``mln_forall(it1,
-it2,...)`` allows to iterate. The element pointed by the iterator is
-accessed with ``*it`` as usually::
+The underlying concepts behind multidimensional ranges. They are like
+normal C++ ranges but have a different interface to enable faster traversal. This is why, you
+cannot use a normal `for` on these ranges but ``mln_foreach``.
 
-  auto&& pxrng = f.pixels();
-  auto px = pxrng.iter();
-  mln_forall(px)
-    std::cout << px->point() << " : ' << px->val() << "\n";
 
-Note the use ``auto&& pxrng`` in order to extend the life of range if
-its a temporary (nothing says that the *pixels range* is a reference!).
-To avoid this burden, we provide some helper macros:
-
-* ``mln_pixter(px, f)`` declares a pixel iterator to ``f.pixels()``
-* ``mln_viter(v, f)`` declares a value iterator to ``f.values()``
-* ``mln_piter(p, f)`` declares a point iterator to ``f.domain()``
-
-The previous code can be simplified by::
-
-  mln_pixter(px, f);
-  mln_forall(px)
-    std::cout << px->point() << " : ' << px->val() << "\n";
-
+  mln_foreach(auto px, f.pixels())
+    std::cout << px.point() << " : ' << px.val() << "\n";
 
 .. note::
 
-   Contrary to |milena| with do not provide *proxy iterators* as it is
+   Contrary to Milena_ with do not provide *proxy iterators* as it is
    more common to directly iterate with ``mln_foreach`` on values.
 
 
@@ -259,28 +242,17 @@ The previous code can be simplified by::
 Traversing several images in the same time
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The direct solution would be::
+Image and range views enable to pack (zip) several objects in a single object::
 
-  mln_pixter(px1, f);
-  mln_pixter(px2, g);
-  mln_forall(px1, px2)
+  auto vals_1 = f.values();
+  auto vals_2 = g.values();
+  mln_foreach((auto [v1, v2]), mln::ranges::view::zip(vals_1, vals_2))
     ...
 
-However, if `f` and `g` have similar structure (e.g. same domain, same
-strides), it leads to redoundant computation (bound checking of rows
-is performed twice,...). The framework allows to declare several
-iterators in the same time that **must** be used **jointly in a forall
-loop**. You should never use then in an other case, as they are actually
-*binded*, incrementing one would increment the other. The syntax is::
+You can also iterate using a domain is the image supports direct access by points::
 
-  mln_pixter(px1, px2, f, g);
-  mln_forall(px1, px2)
-    ...
-
-
-``mln_pixter`` and ``mln_viter`` are actually variadic and allows to iterate on
-how many images you want e.g. ``mln_pixter(px₁, px₂, ..., pxₖ, f₁, f₂, ..., fₖ)``.
-
+  mln_foreach(auto p, domain)
+    // Use f(p) and f(g)
 
 
 

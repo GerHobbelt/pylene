@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/concept/new/structuring_elements.hpp>
-#include <mln/core/concept/new/pixels.hpp>
-#include <mln/core/concept/object.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
+#include <mln/core/concepts/pixel.hpp>
+#include <mln/core/concepts/object.hpp>
 
 #include <mln/core/neighborhood/private/sliding_pixel_range.hpp>
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>

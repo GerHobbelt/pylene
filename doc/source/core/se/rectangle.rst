@@ -1,6 +1,9 @@
 Rectangle
 =========
 
+Include :file:`<mln/core/se/rect2d.hpp>`
+
+
 .. doxygenstruct:: mln::experimental::se::rect2d
    :members:
 
@@ -14,7 +17,7 @@ erosion) by a rectangle does not depend on the size of the rectangle.
 Example 1. Dilation by rectangle
 --------------------------------
 
-.. code-block:: pylenecpp
+.. code::
 
    #include <mln/core/se/rect2d.hpp>
 

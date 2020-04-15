@@ -66,21 +66,20 @@ Example with the 5-7-11 weights::
 
       -   .. figure:: /images/F-4.png
 
-            CDT with :cpp:ref:`c4` (Manhattan distance)
+            CDT with :cpp:ref:`mln::c4` (Manhattan distance)
 
       -   .. figure:: /images/F-8.png
 
-            CDT with :cpp:ref:`c8` (Chessboard distance)
+            CDT with :cpp:ref:`mln::c8` (Chessboard distance)
 
     * -   .. figure:: /images/F-2-3.png
 
-            CDT with 2-3 :cpp:ref:`wmask2d` (2-3 distance)
+            CDT with 2-3 :cpp:ref:`mln::wmask2d` (2-3 distance)
 
       -   .. figure:: /images/F-5-7-11.png
 
-            CDT with 5-7-11 :cpp:ref:`wmask2d` (5-7-11 distance)
+            CDT with 5-7-11 :cpp:ref:`mln::wmask2d` (5-7-11 distance)
 
-      - 
 
 References
 ----------

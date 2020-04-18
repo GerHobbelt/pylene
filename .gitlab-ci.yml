@@ -113,7 +113,7 @@ distcheck-linux-coverage:
         expire_in: 2 weeks
     coverage: '/lines: \d+\.\d+\%/'
     only:
-        - dev/cpp20
+        - development/cpp20
         - merge_requests
 
 #########

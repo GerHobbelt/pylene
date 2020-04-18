@@ -48,6 +48,7 @@ windows-debug:
 
 
 
+
 .job-build-linux-base: &distcheck-linux-base
     stage: build
     script:
@@ -62,27 +63,6 @@ windows-debug:
         reports:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 15 days
-
-.job-build-linux-coverage: &distcheck-linux-coverage
-    stage: build
-    script:
-        - mkdir build && cd build
-        - conan install .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_CODE_COVERAGE=ON -DGCOV_PATH=$COV -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
-        - cmake --build . --target Pylene
-        - cmake --build . --target build-tests
-        - cmake --build . --target run-tests_coverage-gcovr-html
-        - cmake --build . --target run-tests_coverage-lcov
-        - lcov --list run-tests_coverage-lcov.info
-    dependencies: []
-    artifacts:
-        paths:
-            - build/run-tests_coverage-gcovr-html/
-            - build/run-tests_coverage-lcov/
-        reports:
-            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
-        expire_in: 15 days
-
 
 # Msan not available for gcc. It requires instrumented libstdc++ and instrumented thirdparties so it is disabled for now.
 # No tsan because no multithreaded code for now
@@ -113,18 +93,28 @@ distcheck-linux-gcc9-debug-asan-ubsan:
         UBSAN: "ON"
 
 
-distcheck-linux-gcc9-debug-coverage:
-    <<: *distcheck-linux-coverage
+distcheck-linux-coverage:
+    <<: *distcheck-linux-base
     image: ${FEDORA_31}
+    after_script:
+        - mkdir coverage
+        - gcovr --root pylene build -s --xml cobertura --html-details coverage/index.html
     variables:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
-        COV: "/usr/bin/gcov"
-        ASAN: "OFF"
-        MSAN: "OFF"
-        UBSAN: "OFF"
-    when: manual
+        CXXFLAGS: "-fprofile-arcs -ftest-coverage"
+        CFLAGS: "-fprofile-arcs -ftest-coverage"
+    artifacts:
+        paths:
+            - coverage/
+        reports:
+            cobertura: cobertura
+        expire_in: 2 weeks
+    coverage: '/lines: \d+\.\d+\%/'
+    only:
+        - dev/cpp20
+        - merge_requests
 
 #########
 # Bench #

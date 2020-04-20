@@ -1,38 +1,53 @@
-add_executable(bench_iterator ../bench_iterator.cpp)
+add_executable(bench_iterator ../bench_iterator.cpp ../helpers.hpp)
 add_executable(bench_zip_iterator ../bench_zip_iterator.cpp)
 
+set(test_prefix "UTCore_")
 
-add_executable(array std/array.cpp)
+# test Domain
+add_core_test(${test_prefix}box domain/box.cpp)
 
+# test loop
+add_core_test(${test_prefix}forloop forloop.cpp)
+
+# test Range
+add_core_test(${test_prefix}range               range/range.cpp)
+add_core_test(${test_prefix}range_filter        range/filter.cpp)
+add_core_test(${test_prefix}range_zip           range/zip.cpp)
 
 # test Images
-add_executable(zip_image image/zip_image.cpp)
-add_executable(sub_image image/sub_image.cpp)
-add_executable(image_ops image/image_ops.cpp)
+add_core_test(${test_prefix}image2d             image/image2d.cpp)
+add_core_test(${test_prefix}image2d_iterators   image/image2d_iterators.cpp)
+add_core_test(${test_prefix}extended_by_value_image image/morphers/extended_by_value.cpp)
+add_core_test(${test_prefix}transformed_image   image/morphers/transformed_image.cpp)
+add_core_test(${test_prefix}filtered_image      image/morphers/filtered_image.cpp)
+add_core_test(${test_prefix}zip_image           image/zip_image.cpp)
+add_core_test(${test_prefix}sub_image           image/sub_image.cpp)
+add_core_test(${test_prefix}image_ops           image/image_ops.cpp)
+add_core_test(${test_prefix}image_routines      image/image_routines.cpp)
 
-
-add_test(zip_image zip_image)
-add_test(image_ops image_ops)
-add_test(sub_image sub_image)
+# test Neighborhood
+add_core_test(${test_prefix}sliding_pixter   neighborhood/sliding_pixter.cpp)
+add_core_test(${test_prefix}sliding_wpiter   neighborhood/sliding_wpiter.cpp)
+add_core_test(${test_prefix}sliding_wpixter  neighborhood/sliding_wpixter.cpp)
+add_core_test(${test_prefix}wneighborhood    neighborhood/wneighborhood.cpp)
 
 # test Extension
-add_executable(extension_fill extension/fill.cpp)
+add_core_test(${test_prefix}extension_fill     extension/fill.cpp)
 
-add_test(extension_fill extension_fill)
+# test Value
+add_core_test(${test_prefix}value_int          value/int.cpp)
 
+# test Vec
+add_core_test(${test_prefix}vec_math_ops       vec/vec_math_ops.cpp)
 
 # test Algorithms
+add_core_test(${test_prefix}copy               algorithm/copy.cpp)
+add_core_test(${test_prefix}fill               algorithm/fill.cpp)
+add_core_test(${test_prefix}paste              algorithm/paste.cpp)
+add_core_test(${test_prefix}equal              algorithm/equal.cpp)
+add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
+add_core_test(${test_prefix}sort_indexes       algorithm/sort_indexes.cpp)
 
-add_executable(copy algorithm/copy.cpp)
-add_executable(fill algorithm/fill.cpp)
-add_executable(paste algorithm/paste.cpp)
-add_executable(equal algorithm/equal.cpp)
-add_executable(sort_indexes algorithm/sort_indexes.cpp)
-
-
-add_test(copy copy)
-add_test(fill fill)
-add_test(paste paste)
-add_test(equal equal)
-add_test(sort_indexes sort_indexes)
-
+# test SE
+add_core_test(${test_prefix}disc             se/disc.cpp)
+add_core_test(${test_prefix}rect2d             se/rect2d.cpp)

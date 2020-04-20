@@ -6,22 +6,20 @@
 #include <cassert>
 
 #ifndef _MLN_HAS_NDEBUG_FIRST_
-# ifdef NDEBUG
-#  define MLN_NDEBUG
-# endif
-# define _MLN_HAS_NDEBUG_FIRST_
+#if defined(NDEBUG) && !defined(MLN_NDEBUG)
+#define MLN_NDEBUG
+#endif
+#define _MLN_HAS_NDEBUG_FIRST_
 #endif
 
-
-
 #ifndef MLN_NDEBUG
-# define mln_assertion(expr) assert(expr)
-# define MLN_HAS_DEBUG 1
-# define MLN_EVAL_IF_DEBUG(expr) expr
+#define mln_assertion(expr) assert(expr)
+#define MLN_HAS_DEBUG 1
+#define MLN_EVAL_IF_DEBUG(expr) expr
 #else
-# define mln_assertion(expr) (void (0))
-# define MLN_HAS_DEBUG 0
-# define MLN_EVAL_IF_DEBUG(expr)
+#define mln_assertion(expr) (void(0))
+#define MLN_HAS_DEBUG 0
+#define MLN_EVAL_IF_DEBUG(expr)
 #endif
 
 #define mln_precondition(expr) mln_assertion(expr)

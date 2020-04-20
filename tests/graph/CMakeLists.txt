@@ -1,0 +1,1 @@
+add_core_test(UTGraph_image2d graph_image2d.cpp)

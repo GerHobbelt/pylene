@@ -1,0 +1,15 @@
+/**
+* \file
+*
+* \defgroup morpho Mathematical Morphology Module
+* This module defines some common Mathematical Morphology-related operators
+* \{
+* \namespace mln::morpho
+* \brief Namespace for mathematical morphology module
+*
+* \namespace mln::morpho::structural
+* \brief Namespace for mathematical morphology operators based on structuring elements
+*
+* \}
+*/
+

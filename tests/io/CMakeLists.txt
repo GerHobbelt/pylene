@@ -1,7 +1,3 @@
-link_libraries(-lfreeimage)
-add_definitions(-DMLN_IMG_PATH="$(CMAKE_SOURCE_DIR)/img/")
+add_core_test(UTIo_freeimage freeimage.cpp)
 
-
-add_executable(freeimage freeimage.cpp)
-add_test(freeimage freeimage)
-
+target_link_libraries(UTIo_freeimage ${FreeImage_LIBRARIES})

@@ -1,41 +1,83 @@
+#ifndef MLN_CORE_IMAGE_IMAGE_HPP
+#warning "You should not include this file directly but <mln/core/image/image.hpp> instead"
+#include <mln/core/image/image.hpp>
+#endif
+
 #ifndef MLN_CORE_IMAGE_IMAGE_EXPR_HPP
-# define MLN_CORE_IMAGE_IMAGE_EXPR_HPP
+#define MLN_CORE_IMAGE_IMAGE_EXPR_HPP
 
-# include <mln/core/functional.hpp>
+#include <mln/core/image/morphers/transformed_image.hpp>
+#include <mln/core/image/morphers/zip_image.hpp>
 
-# include <mln/core/concept/image.hpp>
-
-# include <mln/core/image/zip_image.hpp>
-
-# include <mln/core/range/iterator_range.hpp>
-# include <mln/core/iterator/transform_iterator.hpp>
-# include <mln/core/iterator/transform_pixel_iterator.hpp>
-
+#include <functional>
+#include <type_traits>
 
 namespace mln
 {
 
-  template <typename Expr>
-  struct image_expr;
+  namespace internal
+  {
+    template <typename Function, class... ArgType>
+    struct func_call_from_tupleargs;
+  }
 
   template <typename UnaryFunction, typename Image>
-  struct unary_image_expr;
+  using unary_image_expr = internal::transformed_image<Image, UnaryFunction, false>;
 
   template <typename BinaryFunction, typename Image1, typename Image2>
-  struct binary_image_expr;
+  using binary_image_expr = internal::transformed_image<
+      zip_image<Image1, Image2>,
+      internal::func_call_from_tupleargs<BinaryFunction, mln_reference(Image1), mln_reference(Image2)>, false>;
 
   template <typename BinaryFunction, typename Image, typename Scalar>
-  struct binary_image_scalar_expr;
+  using binary_image_scalar_expr =
+      internal::transformed_image<Image,
+                                  decltype(std::bind(std::declval<const BinaryFunction&>(), std::placeholders::_1,
+                                                     std::declval<const Scalar&>())),
+                                  false>;
 
   template <typename BinaryFunction, typename Scalar, typename Image>
-  struct binary_scalar_image_expr;
+  using binary_scalar_image_expr =
+      internal::transformed_image<Image,
+                                  decltype(std::bind(std::declval<const BinaryFunction&>(),
+                                                     std::declval<const Scalar&>(), std::placeholders::_1)),
+                                  false>;
+
+  template <typename TernaryFunction, typename Image1, typename Image2, typename Image3>
+  using ternary_image_image_image_expr =
+      internal::transformed_image<zip_image<Image1, Image2, Image3>,
+                                  internal::func_call_from_tupleargs<TernaryFunction, mln_reference(Image1),
+                                                                     mln_reference(Image2), mln_reference(Image3)>,
+                                  false>;
+
+  template <typename TernaryFunction, typename Image1, typename Image2, typename Scalar>
+  using ternary_image_image_scalar_expr =
+      internal::transformed_image<zip_image<Image1, Image2>,
+                                  internal::func_call_from_tupleargs<
+                                      decltype(std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1,
+                                                         std::placeholders::_2, std::declval<const Scalar&>())),
+                                      mln_reference(Image1), mln_reference(Image2)>,
+                                  false>;
+
+  template <typename TernaryFunction, typename Image1, typename Scalar, typename Image2>
+  using ternary_image_scalar_image_expr =
+      internal::transformed_image<zip_image<Image1, Image2>,
+                                  internal::func_call_from_tupleargs<
+                                      decltype(std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1,
+                                                         std::declval<const Scalar&>(), std::placeholders::_2)),
+                                      mln_reference(Image1), mln_reference(Image2)>,
+                                  false>;
+
+  template <typename TernaryFunction, typename Image1, typename Scalar1, typename Scalar2>
+  using ternary_image_scalar_scalar_expr =
+      internal::transformed_image<Image1,
+                                  decltype(std::bind(std::declval<const TernaryFunction&>(), std::placeholders::_1,
+                                                     std::declval<const Scalar1&>(), std::declval<const Scalar2&>())),
+                                  false>;
 
   // template <typename UnaryFunction, typename I>
   // unary_image_expr<UnaryFunction, I>
   // make_unary_image_expr(I&& ima, UnaryFunction f);
-
-
-
 
   /*
   template <typename I>
@@ -49,300 +91,135 @@ namespace mln
   eval(const image_expr<Expr>& ima)
   */
 
-
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
+  namespace internal
+  {
+
+    template <typename Function, class... ArgType>
+    struct func_call_from_tupleargs
+    {
+      func_call_from_tupleargs() = default;
+
+      func_call_from_tupleargs(const Function& f_) : f(f_) {}
+
+      // template <class TTuple, int... N>
+      // inline
+      // typename std::result_of<const Function(ArgType...)>::type
+      // call(const TTuple& x, intseq<N...>) const
+      // {
+      //   return f(static_cast<typename std::tuple_element<N, TTuple>::type>(std::get<N>(x))...);
+      // }
+
+      // inline
+      // typename std::result_of<const Function(ArgType...)>::type
+      // operator() (const std::tuple<ArgType...>& x) const
+      // {
+      //   return call(x, typename int_list_seq<sizeof...(ArgType)>::type ());
+      // }
+
+      template <class TTuple, std::size_t... N>
+      inline typename std::result_of<const Function(ArgType&&...)>::type call(TTuple&& x,
+                                                                              std::index_sequence<N...>) const
+      {
+        return f(std::get<N>(std::move(x))...);
+      }
+
+      inline typename std::result_of<const Function(ArgType&&...)>::type operator()(std::tuple<ArgType...>&& x) const
+      {
+        return call(std::move(x), std::make_index_sequence<sizeof...(ArgType)>());
+      }
+
+    private:
+      Function f;
+    };
+  }
 
   /******************************************/
   /****         Helper functions         ****/
   /******************************************/
 
   template <typename UnaryFunction, typename I>
-  unary_image_expr<UnaryFunction, I>
-  make_unary_image_expr(I&& ima, const UnaryFunction& f)
+  unary_image_expr<UnaryFunction, I> make_unary_image_expr(I&& ima, const UnaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I>::type>));
     return unary_image_expr<UnaryFunction, I>(std::forward<I>(ima), f);
   }
 
   template <typename BinaryFunction, typename I1, typename I2>
-  binary_image_expr<BinaryFunction, I1, I2>
-  make_binary_image_expr(I1&& ima1, I2&& ima2, const BinaryFunction& f)
+  binary_image_expr<BinaryFunction, I1, I2> make_binary_image_expr(I1&& ima1, I2&& ima2, const BinaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
-    return binary_image_expr<BinaryFunction, I1, I2>(std::forward<I1>(ima1), std::forward<I2>(ima2), f);
+    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
+    internal::func_call_from_tupleargs<BinaryFunction, mln_reference(I1), mln_reference(I2)> fun(f);
+    return binary_image_expr<BinaryFunction, I1, I2>(std::move(z), fun);
   }
 
   template <typename BinaryFunction, typename I, typename Scalar>
-  binary_image_scalar_expr<BinaryFunction, I, Scalar>
-  make_binary_image_scalar_expr(I&& ima, const Scalar& x, const BinaryFunction& f)
+  binary_image_scalar_expr<BinaryFunction, I, Scalar> make_binary_image_scalar_expr(I&& ima, const Scalar& x,
+                                                                                    const BinaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I>::type>));
-    return binary_image_scalar_expr<BinaryFunction, I, Scalar>(std::forward<I>(ima), x, f);
+    auto fun = std::bind(f, std::placeholders::_1, x);
+    return binary_image_scalar_expr<BinaryFunction, I, Scalar>(std::forward<I>(ima), fun);
   }
 
   template <typename BinaryFunction, typename Scalar, typename I>
-  binary_scalar_image_expr<BinaryFunction, Scalar, I>
-  make_binary_scalar_image_expr(const Scalar& x, I&& ima, const BinaryFunction& f)
+  binary_scalar_image_expr<BinaryFunction, Scalar, I> make_binary_scalar_image_expr(const Scalar& x, I&& ima,
+                                                                                    const BinaryFunction& f)
   {
     BOOST_CONCEPT_ASSERT((Image<typename std::decay<I>::type>));
-    return binary_scalar_image_expr<BinaryFunction, Scalar, I>(x, std::forward<I>(ima), f);
+    auto fun = std::bind(f, x, std::placeholders::_1);
+    return binary_scalar_image_expr<BinaryFunction, Scalar, I>(std::forward<I>(ima), fun);
   }
 
-
-
-  /******************************************/
-  /****              Traits              ****/
-  /******************************************/
-
-
-  template <typename UnaryFunction, typename Image>
-  struct image_traits< unary_image_expr<UnaryFunction, Image> >
+  template <typename TernaryFunction, typename I1, typename I2, typename I3>
+  ternary_image_image_image_expr<TernaryFunction, I1, I2, I3>
+      make_ternary_image_image_image_expr(I1&& ima1, I2&& ima2, I3&& ima3, const TernaryFunction& f)
   {
-    typedef typename image_traits<Image>::accessible accessible;
-    typedef typename std::common_type< typename image_traits<Image>::category,
-                                       bidirectional_image_tag >::type category;
-  };
-
-  template <typename BinaryFunction, typename Image1, typename Image2>
-  struct image_traits< binary_image_expr<BinaryFunction, Image1, Image2> >
-  {
-    typedef typename std::integral_constant<bool,
-                                            image_traits<Image1>::accessible::value and
-                                            image_traits<Image2>::accessible::value >::type accessible;
-    typedef typename std::common_type< typename image_traits<Image1>::category,
-                                       typename image_traits<Image2>::category,
-                                       bidirectional_image_tag >::type category;
-  };
-
-  template <typename BinaryFunction, typename Image, typename Scalar>
-  struct image_traits< binary_image_scalar_expr<BinaryFunction, Image, Scalar> >
-  {
-    typedef typename image_traits<Image>::accessible accessible;
-    typedef typename std::common_type< typename image_traits<Image>::category,
-                                       bidirectional_image_tag >::type category;
-  };
-
-  template <typename BinaryFunction, typename Scalar, typename Image>
-  struct image_traits< binary_scalar_image_expr<BinaryFunction, Scalar, Image> >
-  {
-    typedef typename image_traits<Image>::accessible accessible;
-    typedef typename std::common_type< typename image_traits<Image>::category,
-                                       bidirectional_image_tag >::type category;
-  };
-
-
-
-
-  template <typename Expr>
-  struct image_expr : Image<Expr>
-  {
-  };
-
-  namespace internal
-  {
-
-
-
-  template <typename UnaryFunction, typename Image, typename E>
-  struct unary_image_expr_base : image_expr<E>
-  {
-
-  private:
-    typedef E                                                           self_t;
-    typedef typename std::remove_reference<Image>::type			image_t;
-
-    typedef typename image_reference<image_t>::type                     arg_t;
-    typedef typename image_const_reference<image_t>::type               const_arg_t;
-
-    typedef typename image_value_iterator<image_t>::type                Vit;
-    typedef typename image_pixel_iterator<image_t>::type                Pixit;
-    typedef typename image_const_value_iterator<image_t>::type          ConstVit;
-    typedef typename image_const_pixel_iterator<image_t>::type          ConstPixit;
-
-
-  public:
-    typedef typename image_t::point_type                                                        point_type;
-    typedef typename image_t::point_type                                                        site_type;
-    typedef typename image_t::domain_type                                                       domain_type;
-    typedef typename std::result_of< const UnaryFunction(arg_t) >::type                         reference;
-    typedef typename std::result_of< const UnaryFunction(const_arg_t) >::type                   const_reference;
-    typedef typename std::remove_reference<reference>::type                                     value_type;
-
-    typedef transform_iterator< Vit, UnaryFunction >                                            value_iterator;
-    typedef transform_pixel_iterator<UnaryFunction, Pixit, E>                                     pixel_iterator;
-
-    typedef transform_iterator< ConstVit, UnaryFunction>                                        const_value_iterator;
-    typedef transform_pixel_iterator< UnaryFunction, ConstPixit, const E>                       const_pixel_iterator;
-
-    //typedef typename const_value_iterator::reference::empty empty;
-    //static_assert(std::is_const<typename std::remove_reference<typename const_value_iterator::reference>::type>::value, "");
-
-    typedef transformed_pixel<UnaryFunction, Pixit, E>                                          pixel_type;
-    typedef transformed_pixel<UnaryFunction, ConstPixit, const E>                               const_pixel_type;
-
-    typedef iterator_range<value_iterator>                                               value_range;
-    typedef iterator_range<pixel_iterator>                                               pixel_range;
-    typedef iterator_range<const_value_iterator>                                         const_value_range;
-    typedef iterator_range<const_pixel_iterator>                                         const_pixel_range;
-
-    unary_image_expr_base(Image&& ima_, const UnaryFunction& f_):
-      ima (std::forward<Image>(ima_)),
-      f (f_)
-    {
-    }
-
-    const domain_type&
-    domain() const
-    {
-      return ima.domain();
-    }
-
-    template <typename dummy = void>
-    typename std::enable_if< image_accessibility<self_t>::type::value, const_reference >::type
-    operator() (point_type p) const
-    {
-      return f(ima(p));
-    }
-
-    template <typename dummy = void>
-    typename std::enable_if< image_accessibility<self_t>::type::value, reference >::type
-    operator() (point_type p)
-    {
-      return f(ima(p));
-    }
-
-
-    value_range
-    values()
-    {
-      value_iterator x(ima.values().iter(), f);
-      return make_iterator_range(x);
-    }
-
-    const_value_range
-    values() const
-    {
-      const_value_iterator x(ima.values().iter(), f);
-      return make_iterator_range(x);
-    }
-
-
-    pixel_range
-    pixels()
-    {
-      pixel_iterator x(f, ima.pixels().iter(), exact(*this));
-      return make_iterator_range(x);
-    }
-
-    const_pixel_range
-    pixels() const
-    {
-      const_pixel_iterator x(f, ima.pixels().iter(), exact(*this));
-      return make_iterator_range(x);
-    }
-
-  private:
-    Image	  ima;
-    UnaryFunction f;
-  };
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I3>::type>));
+    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2), std::forward<I3>(ima3));
+    internal::func_call_from_tupleargs<TernaryFunction, mln_reference(I1), mln_reference(I2), mln_reference(I3)> fun(f);
+    return ternary_image_image_image_expr<TernaryFunction, I1, I2, I3>(std::move(z), fun);
   }
 
-  namespace internal
+  template <typename TernaryFunction, typename I1, typename I2, typename S>
+  ternary_image_image_scalar_expr<TernaryFunction, I1, I2, S>
+      make_ternary_image_image_scalar_expr(I1&& ima1, I2&& ima2, const S& s, const TernaryFunction& f)
   {
-
-    template <typename Function, typename U, typename V>
-    struct wrap_tuple_to_arg
-    {
-      typedef typename std::result_of<Function (U, V)>::type result_type;
-
-      wrap_tuple_to_arg() = default;
-
-
-      wrap_tuple_to_arg(const Function& f_)
-        : f(f_)
-      {
-      }
-
-      result_type
-      operator() (boost::tuple<U,V> x) const
-      {
-        return f(boost::get<0>(x), boost::get<1>(x));
-      }
-
-    private:
-      Function f;
-    };
-
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
+    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
+    auto f2 = std::bind(f, std::placeholders::_1, std::placeholders::_2, s);
+    internal::func_call_from_tupleargs<decltype(f2), mln_reference(I1), mln_reference(I2)> fun(f2);
+    return ternary_image_image_scalar_expr<TernaryFunction, I1, I2, S>(std::move(z), fun);
   }
 
-
-  template <typename BinaryFunction, typename Image1, typename Image2>
-  struct binary_image_expr :
-    internal::unary_image_expr_base< internal::wrap_tuple_to_arg< BinaryFunction,
-                                                                  typename image_reference<typename std::remove_reference<Image1>::type>::type,
-                                                                  typename image_reference<typename std::remove_reference<Image2>::type>::type >,
-                                     zip_image<Image1, Image2>,  binary_image_expr<BinaryFunction, Image1, Image2> >
+  template <typename TernaryFunction, typename I1, typename S, typename I2>
+  ternary_image_scalar_image_expr<TernaryFunction, I1, S, I2>
+      make_ternary_image_scalar_image_expr(I1&& ima1, const S& s, I2&& ima2, const TernaryFunction& f)
   {
-    typedef internal::wrap_tuple_to_arg< BinaryFunction,
-                                          typename image_reference<typename std::remove_reference<Image1>::type>::type,
-                                          typename image_reference<typename std::remove_reference<Image2>::type>::type > F;
-    typedef internal::unary_image_expr_base< F, zip_image<Image1, Image2>,  binary_image_expr<BinaryFunction, Image1, Image2> > base_t;
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I2>::type>));
+    auto z = imzip(std::forward<I1>(ima1), std::forward<I2>(ima2));
+    auto f2 = std::bind(f, std::placeholders::_1, s, std::placeholders::_2);
+    internal::func_call_from_tupleargs<decltype(f2), mln_reference(I1), mln_reference(I2)> fun(f2);
+    return ternary_image_scalar_image_expr<TernaryFunction, I1, S, I2>(std::move(z), fun);
+  }
 
-  public:
-    binary_image_expr(Image1&& ima1, Image2&& ima2, const BinaryFunction& f):
-      base_t( imzip(std::forward<Image1>(ima1), std::forward<Image2>(ima2)), F(f) )
-    {
-    }
-  };
-
-
-  template <typename UnaryFunction, typename Image>
-  struct unary_image_expr : internal::unary_image_expr_base< UnaryFunction, Image, unary_image_expr<UnaryFunction, Image> >
+  template <typename TernaryFunction, typename I1, typename S1, typename S2>
+  ternary_image_scalar_scalar_expr<TernaryFunction, I1, S1, S2>
+      make_ternary_image_scalar_scalar_expr(I1&& ima1, const S1& s1, const S2& s2, const TernaryFunction& f)
   {
-
-    unary_image_expr(Image&& ima, const UnaryFunction& f):
-      internal::unary_image_expr_base< UnaryFunction, Image, unary_image_expr<UnaryFunction, Image> >(std::forward<Image>(ima), f)
-    {
-    }
-  };
-
-
-  template <typename BinaryFunction, typename Image, typename Scalar>
-  struct binary_image_scalar_expr :
-    internal::unary_image_expr_base< mln::binder2nd<BinaryFunction, Scalar>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> >
-  {
-  private:
-    typedef internal::unary_image_expr_base< mln::binder2nd<BinaryFunction, Scalar>, Image, binary_image_scalar_expr<BinaryFunction, Image, Scalar> > base_t;
-
-  public:
-    binary_image_scalar_expr(Image&& ima, const Scalar& x, const BinaryFunction& f):
-      base_t(std::forward<Image>(ima), mln::bind2nd(f, x))
-    {
-    }
-  };
-
-
-  template <typename BinaryFunction, typename Scalar, typename Image>
-  struct binary_scalar_image_expr
-    : internal::unary_image_expr_base< mln::binder1st<BinaryFunction, Scalar>, Image, binary_scalar_image_expr<BinaryFunction,Scalar,Image> >
-  {
-  private:
-    typedef internal::unary_image_expr_base< mln::binder1st<BinaryFunction, Scalar>, Image, binary_scalar_image_expr<BinaryFunction, Scalar, Image> > base_t;
-
-  public:
-    binary_scalar_image_expr(const Scalar& x, Image&& ima, const BinaryFunction& f):
-      base_t(std::forward<Image>(ima), mln::bind1st(f, x))
-    {
-    }
-  };
-
-
-
-
+    BOOST_CONCEPT_ASSERT((Image<typename std::decay<I1>::type>));
+    auto fun = std::bind(f, std::placeholders::_1, s1, s2);
+    return ternary_image_scalar_scalar_expr<TernaryFunction, I1, S1, S2>(std::forward<I1>(ima1), fun);
+  }
 }
 
 #endif // !MLN_CORE_IMAGE_IMAGE_EXPR_HPP

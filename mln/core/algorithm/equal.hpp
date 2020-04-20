@@ -1,8 +1,7 @@
 #ifndef MLN_CORE_ALGORITHM_EQUAL_HPP
-# define MLN_CORE_ALGORITHM_EQUAL_HPP
+#define MLN_CORE_ALGORITHM_EQUAL_HPP
 
-# include <mln/core/concept/image.hpp>
-# include <mln/core/image/zip_image.hpp>
+#include <mln/core/image/image.hpp>
 
 namespace mln
 {
@@ -21,30 +20,25 @@ namespace mln
   /// \return True if image are equals.
   ///
   template <typename I, typename J>
-  bool
-  equal(const Image<I>& ima1, const Image<J>& ima2);
-
+  bool equal(const Image<I>& ima1, const Image<J>& ima2);
 
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
 
   template <typename I, typename J>
-  inline
-  bool
-  equal(const Image<I>& ima1, const Image<J>& ima2)
+  inline bool equal(const Image<I>& ima1, const Image<J>& ima2)
   {
-    // FIXME: add test for domain comparison
+    mln_pixter(px1, exact(ima1));
+    mln_pixter(px2, exact(ima2));
 
-    mln_viter(v1, v2, exact(ima1), exact(ima2));
-    mln_forall(v1, v2)
-      if (*v1 != *v2)
-	return false;
+    mln_forall (px1, px2)
+      if (px1->point() != px2->point() or px1->val() != px2->val())
+        return false;
 
     return true;
   };
 
-
 } // end of namespace mln
 
-#endif //!MLN_CORE_ALGORITHM_EQUAL_HPP
+#endif //! MLN_CORE_ALGORITHM_EQUAL_HPP

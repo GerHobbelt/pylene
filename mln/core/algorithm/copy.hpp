@@ -1,14 +1,12 @@
 #ifndef MLN_CORE_ALGORITHM_COPY_HPP
-# define MLN_CORE_ALGORITHM_COPY_HPP
+#define MLN_CORE_ALGORITHM_COPY_HPP
 
-# include <mln/core/assert.hpp>
-# include <mln/core/concept/image.hpp>
-
-# include <boost/range/algorithm/copy.hpp>
-
+#include <mln/core/assert.hpp>
+#include <mln/core/concept/image.hpp>
 /// \file
 
-namespace mln {
+namespace mln
+{
 
   /*
   // \brief Copy an image to memory pointed by the iterator \p it.
@@ -31,11 +29,10 @@ namespace mln {
   /// This is equivalent to the following code.
   ///
   /// \code
-  /// vin = std::begin(input.values())
-  /// vend = std::end(input.values())
-  /// vout = std::begin(output.values())
-  /// while (vin != vend)
-  ///   vout++ = vin++;
+  /// mln_iter(vin, input.values())
+  /// mln_iter(vout, output.values())
+  /// mln_forall(vin, vout)
+  ///   *vout = *vin;
   /// \endcode
   ///
   /// \param[in] input Input Image
@@ -45,57 +42,50 @@ namespace mln {
   /// \todo add specialization for raw images
   ///
   template <typename InputImage, typename OutputImage>
-  OutputImage&
-  copy(const Image<InputImage>& input, Image<OutputImage>& output);
-
+  OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output);
 
   /// \overload
   /// \ingroup Algorithms
   template <typename InputImage, typename OutputImage>
-  OutputImage&&
-  copy(const Image<InputImage>& input, Image<OutputImage>&& output);
+  OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output);
 
-
-
-/******************************************/
-/****          Implementation          ****/
-/******************************************/
+  /******************************************/
+  /****          Implementation          ****/
+  /******************************************/
 
   namespace impl
   {
 
     template <typename I, typename J>
-    inline
-    void
-    copy(const I& input, J&& output)
+    inline void copy(const I& input, J&& output)
     {
       mln_viter(vin, vout, input, output);
 
-      mln_forall(vin, vout)
-	*vout = *vin;
+      mln_forall (vin, vout)
+        *vout = (mln_value(I)) * vin;
     }
-
   }
 
-
   template <typename InputImage, typename OutputImage>
-  OutputImage&
-  copy(const Image<InputImage>& input, Image<OutputImage>& output)
+  OutputImage& copy(const Image<InputImage>& input, Image<OutputImage>& output)
   {
+    static_assert(std::is_convertible<mln_value(InputImage), mln_value(OutputImage)>::value,
+                  "The input image value type must be convertible to the output image value type");
+
     impl::copy(exact(input), exact(output));
     return exact(output);
   }
 
   template <typename InputImage, typename OutputImage>
-  OutputImage&&
-  copy(const Image<InputImage>& input, Image<OutputImage>&& output)
+  OutputImage&& copy(const Image<InputImage>& input, Image<OutputImage>&& output)
   {
+    static_assert(std::is_convertible<mln_value(InputImage), mln_value(OutputImage)>::value,
+                  "The input image value type must be convertible to the output image value type");
+
     impl::copy(exact(input), exact(output));
     return move_exact(output);
   }
 
-
 } // end of namespace mln
 
-
-#endif //!MLN_CORE_ALGORITHM_COPY_HPP
+#endif //! MLN_CORE_ALGORITHM_COPY_HPP

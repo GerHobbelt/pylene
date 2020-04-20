@@ -1,19 +1,20 @@
-#include <mln/core/image/image2d.hpp>
 #include <mln/core/grays.hpp>
+#include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/wrt_offset.hpp>
-#include <algorithm>
-#include <numeric>
+
 #include <boost/timer.hpp>
 
+#include <algorithm>
+#include <numeric>
 
 using namespace mln;
-
 
 double test_viter(const image2d<int>& ima)
 {
   double v = 0;
-  mln_foreach(auto& x, ima.values()) {
+  mln_foreach (auto& x, ima.values())
+  {
     v += x;
   }
   return v;
@@ -22,7 +23,7 @@ double test_viter(const image2d<int>& ima)
 double test_pixter(const image2d<int>& ima)
 {
   double v = 0;
-  mln_foreach(auto& x, ima.pixels())
+  mln_foreach (auto& x, ima.pixels())
     v += x.val();
 
   return v;
@@ -31,13 +32,12 @@ double test_pixter(const image2d<int>& ima)
 double test_piter(const image2d<int>& ima)
 {
   double v = 0;
-  mln_foreach(auto p, ima.domain()) {
+  mln_foreach (auto p, ima.domain())
+  {
     v += ima(p);
   }
   return v;
 }
-
-
 
 double test_native(const int* ima2, int nrows, int ncols)
 {
@@ -49,18 +49,14 @@ double test_native(const int* ima2, int nrows, int ncols)
   return v;
 }
 
-
 double test_nbh_pixter(const image2d<int>& ima)
 {
-  typedef image2d<int> I;
-
   double u = 0;
   image2d<int>::const_pixel_range::iterator px = ima.pixels().iter();
   auto nx = c8(*px).iter();
 
-
-  mln_forall(px)
-    mln_forall(nx)
+  mln_forall (px)
+    mln_forall (nx)
       u += nx->val();
 
   return u;
@@ -68,21 +64,42 @@ double test_nbh_pixter(const image2d<int>& ima)
 
 double test_nbh_piter(const image2d<int>& ima)
 {
-  typedef image2d<int> I;
-
   double u = 0;
   auto p = ima.domain().iter();
   auto n = c8(*p).iter();
 
-  mln_forall(p)
-    mln_forall(n)
-	u += ima.at(*n);
+  mln_forall (p)
+    mln_forall (n)
+      u += ima.at(*n);
 
   return u;
 }
 
+double test_nbh_index(const image2d<int>& ima)
+{
+  double u = 0;
+  auto idx = ima.index_of_point(ima.domain().pmin);
+  auto w = wrt_delta_index(ima, c8_t::dpoints);
 
+  // std::cout << ima.index_strides()[0] << "," << ima.index_strides()[1] << std::endl;
 
+  auto nrows = ima.nrows();
+  auto ncols = ima.ncols();
+  for (unsigned i = 0; i < nrows; ++i)
+  {
+    for (unsigned j = 0; j < ncols; ++j)
+    {
+      std::size_t p = idx + j; // * ima.index_strides()[1];
+      mln_foreach (auto k, w)
+      {
+        u += ima[static_cast<image2d<int>::size_type>(p + k)];
+      }
+    }
+    idx += static_cast<unsigned>(ima.index_strides()[0]);
+  }
+
+  return u;
+}
 
 double test_native_nbh(const image2d<int>& ima)
 {
@@ -91,32 +108,29 @@ double test_native_nbh(const image2d<int>& ima)
   const int sz = 8;
   auto dpoints = c8_t::dpoints;
 
-
-  const char* ptr2 = (char*) &ima(ima.domain().pmin);
+  const char* ptr2 = (char*)&ima(ima.domain().pmin);
   const size_t* strides = ima.strides();
   const point2d pmax = ima.domain().shape();
   ptrdiff_t offsets[8];
   wrt_offset(ima, dpoints, offsets);
 
   for (int x = 0; x < pmax[0]; ++x, ptr2 += strides[0])
-    {
-      const char* ptr = ptr2;
-      for (int y = 0; y < pmax[1]; ++y, ptr += strides[1])
-        for (int k = 0; k < sz; ++k)
-          r2 += *(const int*)(ptr + offsets[k]);
-    }
+  {
+    const char* ptr = ptr2;
+    for (int y = 0; y < pmax[1]; ++y, ptr += strides[1])
+      for (int k = 0; k < sz; ++k)
+        r2 += *(const int*)(ptr + offsets[k]);
+  }
 
   return r2;
 }
 
-
 template <typename T>
 void iota(image2d<T>& ima, T v)
 {
-  mln_foreach(auto& x, ima.values())
+  mln_foreach (auto& x, ima.values())
     x = v++;
 }
-
 
 void display()
 {
@@ -126,21 +140,21 @@ void display()
 
   {
     std::cout << "Display forward site iterator." << std::endl;
-    mln_foreach(auto p, ima.domain())
+    mln_foreach (auto p, ima.domain())
       std::cout << p << ",";
     std::cout << std::endl;
   }
   {
     std::cout << "Display forward value iterator." << std::endl;
     mln_viter(x, ima);
-    mln_forall(x)
+    mln_forall (x)
       std::cout << *x << ",";
     std::cout << std::endl;
   }
   {
     std::cout << "Display forward pixel iterator." << std::endl;
     mln_pixter(x, ima);
-    mln_forall(x)
+    mln_forall (x)
       std::cout << "(" << x->point() << ":" << x->val() << "," << x->index() << "),";
     std::cout << std::endl;
   }
@@ -156,10 +170,10 @@ void display_nbh()
     std::cout << "Display forward site iterator." << std::endl;
     auto p = ima.domain().iter();
     mln_iter(n, c8(*p));
-    mln_forall(p)
+    mln_forall (p)
     {
       std::cout << *p << ": ";
-      mln_forall(n)
+      mln_forall (n)
         std::cout << *n << ",";
       std::cout << std::endl;
     }
@@ -170,30 +184,27 @@ void display_nbh()
     mln_pixter(px, ima);
     mln_iter(nx, c8(*px));
 
-    mln_forall(px)
+    mln_forall (px)
     {
       std::cout << "{" << px->point() << "," << px->val() << "," << px->index() << "}: ";
-      mln_forall(nx)
+      mln_forall (nx)
         std::cout << "{" << nx->point() << "," << nx->val() << "}: ";
       std::cout << std::endl;
     }
   }
 }
 
-
 int main()
 {
 
   const int nrows = 1000, ncols = 10000;
-
-  typedef image2d<int> I;
   image2d<int> ima(nrows, ncols);
   iota(ima, 0);
 
   display();
   display_nbh();
 
-  //std::iota(std::begin(ima.values()), std::end(ima.values()), 1);
+  // std::iota(std::begin(ima.values()), std::end(ima.values()), 1);
 
   static const int ntest = 10;
 
@@ -203,7 +214,7 @@ int main()
   std::cout << "Point Iterators..." << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
-    r  = test_piter(ima);
+    r = test_piter(ima);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << std::endl;
   std::cout << "Result: " << r << std::endl;
@@ -211,16 +222,15 @@ int main()
   std::cout << "Value Iterators..." << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
-    r1  = test_viter(ima);
+    r1 = test_viter(ima);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << std::endl;
   std::cout << "Result: " << r1 << std::endl;
 
-
   std::cout << "Pixel Iterators..." << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
-    r3  = test_pixter(ima);
+    r3 = test_pixter(ima);
   thistime = t.elapsed();
   std::cout << "Elapsed: " << thistime << std::endl;
   std::cout << "Result: " << r3 << std::endl;
@@ -228,7 +238,6 @@ int main()
   // defaut with pointers
   int* ima2 = new int[nrows * ncols];
   std::iota(ima2, ima2 + nrows * ncols, 1);
-
 
   std::cout << "Native..." << std::endl;
   t.restart();
@@ -239,9 +248,7 @@ int main()
 
   std::cout << r1 << " " << r2 << " " << r3 << std::endl;
 
-
   // bench neighborhood
-
 
   std::cout << "Neighborhood... piter/niter" << std::endl;
   t.restart();
@@ -250,7 +257,6 @@ int main()
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
 
-
   std::cout << "Neighborhood... pixter iterators" << std::endl;
   t.restart();
   for (int i = 0; i < ntest; ++i)
@@ -258,6 +264,12 @@ int main()
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
 
+  std::cout << "Neighborhood... indexes" << std::endl;
+  t.restart();
+  for (int i = 0; i < ntest; ++i)
+    r1 = test_nbh_index(ima);
+  std::cout << "Elapsed: " << t.elapsed() << std::endl;
+  std::cout << r1 << std::endl;
 
   std::cout << "Neighborhood native..." << std::endl;
   t.restart();
@@ -266,7 +278,5 @@ int main()
   std::cout << "Elapsed: " << t.elapsed() << std::endl;
   std::cout << r1 << std::endl;
 
-  delete [] ima2;
+  delete[] ima2;
 }
-
-

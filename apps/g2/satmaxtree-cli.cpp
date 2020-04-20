@@ -1,14 +1,16 @@
+#include "satmaxtree.hpp"
+
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/topology.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include "satmaxtree.hpp"
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/topology.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/compute_depth.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
+
 
 void usage(char** argv)
 {
@@ -28,27 +30,27 @@ int main(int argc, char** argv)
 
   using namespace mln;
 
-  std::string topo = argv[1];
+  std::string     topo = argv[1];
   image2d<uint16> depth;
   io::imread(argv[2], depth);
 
   typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
-  tree_t dtree;
-  property_map<tree_t, uint16> vmap;
-  box2d domain;
+  tree_t                                                      dtree;
+  property_map<tree_t, uint16>                                vmap;
+  box2d                                                       domain;
 
   std::tie(dtree, vmap) = satmaxtree(depth);
   tree_t tree;
   if (topo == "K0")
   {
-    tree = tree_keep_2F(dtree);
+    tree   = tree_keep_2F(dtree);
     domain = depth.domain();
     // depth = depth;
   }
   else if (topo == "K1")
   {
-    tree = dtree;
-    domain = depth.domain();
+    tree        = dtree;
+    domain      = depth.domain();
     domain.pmax = domain.pmax * 2 - 1;
   }
   else

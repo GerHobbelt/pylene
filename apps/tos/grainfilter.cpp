@@ -1,17 +1,20 @@
+#include "addborder.hpp"
+#include "topology.hpp"
+
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include "addborder.hpp"
-#include "topology.hpp"
-#include <boost/format.hpp>
-#include <libgen.h>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/filtering.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
+#include <libgen.h>
+
 
 void usage(int argc, char** argv)
 {
@@ -36,13 +39,13 @@ int main(int argc, char** argv)
   image2d<uint8> ima;
   io::imread(filename, ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I x2 = transform(ima, [](uint8 v) -> V { return v * 2; });
-  I ori = addborder(x2);
+  I                  x2  = transform(ima, [](uint8 v) -> V { return v * 2; });
+  I                  ori = addborder(x2);
 
-  image2d<V> K;
-  image2d<unsigned> parent;
+  image2d<V>            K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
   std::tie(K, parent, S) = morpho::ToS(ori, c4);
 
@@ -50,10 +53,10 @@ int main(int argc, char** argv)
 
   for (int i = 3; i < argc; ++i)
   {
-    int fvalue = std::atoi(argv[i]);
-    image2d<V> out;
+    int            fvalue = std::atoi(argv[i]);
+    image2d<V>     out;
     image2d<uint8> out2;
-    out = morpho::area_filter(K, K, parent, S, fvalue, K1::is_face_2, unsigned());
+    out  = morpho::area_filter(K, K, parent, S, fvalue, K1::is_face_2, unsigned());
     out2 = transform(out, [](V x) -> uint8 { return x / 2; });
 
     image2d<uint8> under;

@@ -1,16 +1,16 @@
-#ifndef MLN_CORE_MORPHO_MAXTREE_PQUEUE_HPP
-#define MLN_CORE_MORPHO_MAXTREE_PQUEUE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/wrt_offset.hpp>
+#include <mln/io/imprint.hpp>
 #include <mln/morpho/pqueue_fast.hpp>
+
 #include <queue>
 #include <stack>
 #include <vector>
 
-#include <mln/io/imprint.hpp>
 
 namespace mln
 {
@@ -23,21 +23,21 @@ namespace mln
 
       template <typename V, typename Neighborhood, typename StrictWeakOrdering, bool parallel>
       void maxtree_flood_pqueue_algorithm(const image2d<V>& ima, image2d<typename image2d<V>::size_type>& parent,
-                                          const Neighborhood&, StrictWeakOrdering cmp,
+                                          const Neighborhood&, StrictWeakOrdering                         cmp,
                                           typename image2d<V>::size_type* Send)
       {
         typedef typename image2d<V>::size_type size_type;
-        static constexpr bool use_dejavu = true;
-        static constexpr size_type UNINITIALIZED = std::numeric_limits<size_type>::max();
-        static constexpr size_type INQUEUE = 0;
-        static constexpr std::size_t nlevels = (std::size_t)1 << value_traits<V>::quant;
+        static constexpr bool                  use_dejavu    = true;
+        static constexpr size_type             UNINITIALIZED = std::numeric_limits<size_type>::max();
+        static constexpr size_type             INQUEUE       = 0;
+        static constexpr std::size_t           nlevels       = (std::size_t)1 << value_traits<V>::quant;
 
-        image2d<bool> deja_vu;
+        image2d<bool>                  deja_vu;
         typedef std::vector<size_type> vec_t;
-        vec_t v_stack;
+        vec_t                          v_stack;
         v_stack.reserve(std::min<std::size_t>(ima.domain().size(), nlevels));
 
-        std::stack<size_type, vec_t> stack(std::move(v_stack));
+        std::stack<size_type, vec_t>                       stack(std::move(v_stack));
         priority_queue_ima<image2d<V>, StrictWeakOrdering> pqueue(ima, cmp);
 
         // std::priority_queue<size_type, vec_t, decltype(fcmp)>
@@ -48,13 +48,13 @@ namespace mln
         (void)Send_;
 
         size_type first_index = ima.index_of_point(ima.domain().pmin);
-        size_type last_index = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
+        size_type last_index  = ima.index_of_point(ima.domain().pmax) - ima.index_strides()[0];
 
         // INIT
         {
           if (use_dejavu)
           {
-            resize(deja_vu, ima).init(false);
+            resize(deja_vu, ima).set_init_value(false);
             extension::fill(deja_vu, true);
           }
 
@@ -73,7 +73,7 @@ namespace mln
         while (!pqueue.empty())
         {
         flood:
-          size_type p = pqueue.top();
+          size_type p    = pqueue.top();
           size_type repr = stack.top();
           assert(ima[p] == ima[repr]);
 
@@ -142,14 +142,14 @@ namespace mln
           assert((Send + ima.domain().size()) == Send_);
       }
 
-    } // end of namespace mln::morpho::internal
+    } // namespace internal
 
     template <typename V, typename Neighborhood, typename StrictWeakOrdering = std::less<V>>
     std::pair<image2d<typename image2d<V>::size_type>, std::vector<typename image2d<V>::size_type>>
         maxtree_pqueue(const image2d<V>& ima, const Neighborhood& nbh, StrictWeakOrdering cmp = StrictWeakOrdering())
     {
       typedef typename image2d<V>::size_type size_type;
-      image2d<size_type> parent;
+      image2d<size_type>                     parent;
       resize(parent, ima);
 
       std::vector<size_type> S(ima.domain().size());
@@ -158,8 +158,6 @@ namespace mln
       return parent;
     }
 
-  } // end of namespace mln::morpho
+  } // namespace morpho
 
-} // end of namespace mln
-
-#endif // ! MLN_CORE_MORPHO_MAXTREE_PQUEUE_HPP
+} // namespace mln

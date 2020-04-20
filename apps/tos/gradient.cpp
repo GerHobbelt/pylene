@@ -1,8 +1,10 @@
 #include "gradient.hpp"
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
 
 void usage(char* argv[])
 {
@@ -25,9 +27,9 @@ int main(int argc, char** argv)
     usage(argv);
 
   typedef uint8 V;
-  auto r = transform(ima, [](rgb8 v) -> V { return v[0]; });
-  auto g = transform(ima, [](rgb8 v) -> V { return v[1]; });
-  auto b = transform(ima, [](rgb8 v) -> V { return v[2]; });
+  auto          r = transform(ima, [](rgb8 v) -> V { return v[0]; });
+  auto          g = transform(ima, [](rgb8 v) -> V { return v[1]; });
+  auto          b = transform(ima, [](rgb8 v) -> V { return v[2]; });
 
   auto gr = gradient(r, size);
   auto gg = gradient(g, size);

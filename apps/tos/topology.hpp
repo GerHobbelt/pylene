@@ -1,7 +1,7 @@
-#ifndef TOPOLOGY_HPP
-#define TOPOLOGY_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
+
 
 namespace mln
 {
@@ -26,7 +26,7 @@ namespace mln
     bool is_face_1h(const point2d& p);
 
     struct is_face_2_t;
-  }
+  } // namespace K1
 
   namespace K2
   {
@@ -43,8 +43,8 @@ namespace mln
     static_assert(std::is_same<mln_value(I), bool>::value, "Bool required for image type");
 
     const I& ima = exact(ima_);
-    auto shp = ima.domain().shape();
-    int nr = shp[0], nc = shp[1];
+    auto     shp = ima.domain().shape();
+    int      nr = shp[0], nc = shp[1];
 
     for (int j = 0; j < nc + 4; j++)
       std::cout << "#";
@@ -88,12 +88,10 @@ namespace mln
     {
       bool operator()(const point2d& p) const { return is_face_2(p); }
     };
-  }
+  } // namespace K1
 
   namespace K2
   {
     inline bool is_face_2(const point2d& p) { return (p[0] % 4 == 0 and p[1] % 4 == 0); }
-  }
-}
-
-#endif // ! TOPOLOGY_HPP
+  } // namespace K2
+} // namespace mln

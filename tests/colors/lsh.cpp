@@ -8,13 +8,13 @@ TEST(Colors, LSH)
 
   typedef vec3i V;
   {
-    rgb8 v = {0, 0, 0};
+    rgb8 v   = {0, 0, 0};
     auto res = lsh2rgb(rgb2lsh(v));
     ASSERT_EQ((V)v, (V)res);
   }
 
   {
-    rgb8 v = {255, 255, 255};
+    rgb8 v   = {255, 255, 255};
     auto res = lsh2rgb(rgb2lsh(v));
     ASSERT_EQ((V)v, (V)res);
   }

@@ -1,7 +1,7 @@
-#ifndef PLOTWINDOW_HPP
-#define PLOTWINDOW_HPP
+#pragma once
 
 #include "attribute.hpp"
+
 #include <QAction>
 #include <QCheckBox>
 #include <QComboBox>
@@ -11,7 +11,9 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QVBoxLayout>
+
 #include <vector>
+
 
 /// \brief define a the window class that holds the attribute plots
 /// and allows to select attributes to plot.
@@ -62,20 +64,18 @@ protected:
 
 private:
   QVBoxLayout* m_layout;
-  QGroupBox* m_attribute_panel;
-  QComboBox* m_attribute_selector;
+  QGroupBox*   m_attribute_panel;
+  QComboBox*   m_attribute_selector;
   QFormLayout* m_options_panel;
   QPushButton* m_options_btncpt;
-  QCheckBox* m_attribute_runnew;
+  QCheckBox*   m_attribute_runnew;
 
-  QMenu* m_display_menu;
+  QMenu*   m_display_menu;
   QAction* m_action_rm_plot;
 
   mln::point2d m_current_selected_point;
-  bool m_has_selected_point;
+  bool         m_has_selected_point;
 
 private:
   std::vector<Attribute*> m_attributes;
 };
-
-#endif // ! PLOTWINDOW_HPP

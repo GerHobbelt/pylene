@@ -1,12 +1,15 @@
 #include "addborder.hpp"
 #include "topology.hpp"
-#include <boost/format.hpp>
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <boost/format.hpp>
+
 
 namespace mln
 {
@@ -18,7 +21,8 @@ namespace mln
     static constexpr unsigned UNDEF = value_traits<unsigned>::max();
 
   public:
-    myheap(const image2d<W>& weights) : m_w(weights)
+    myheap(const image2d<W>& weights)
+      : m_w(weights)
     {
       resize(m_pos, weights).init(UNDEF);
       m_heap.reserve(weights.domain().size());
@@ -36,9 +40,9 @@ namespace mln
     {
       std::swap(m_heap.front(), m_heap.back());
       {
-        point2d p = m_heap.front();
-        m_pos(p) = 0;
-        unsigned i = 0;
+        point2d p   = m_heap.front();
+        m_pos(p)    = 0;
+        unsigned i  = 0;
         unsigned sz = m_heap.size() - 1;
         while (true)
         {
@@ -50,14 +54,14 @@ namespace mln
           if (minpos == i)
             break;
           std::swap(m_heap[i], m_heap[minpos]);
-          m_pos(m_heap[i]) = i;
+          m_pos(m_heap[i])      = i;
           m_pos(m_heap[minpos]) = minpos;
-          i = minpos;
+          i                     = minpos;
         }
       }
 
       point2d p = m_heap.back();
-      m_pos(p) = UNDEF;
+      m_pos(p)  = UNDEF;
       m_heap.pop_back();
       return p;
     }
@@ -65,16 +69,16 @@ namespace mln
     void update(const point2d& p)
     {
       mln_precondition(m_pos(p) != UNDEF);
-      unsigned i = m_pos(p);
+      unsigned i        = m_pos(p);
       unsigned myweight = m_w(p);
       while (i > 0 and myweight < m_w(m_heap[PAR(i)]))
       {
-        m_heap[i] = m_heap[PAR(i)];
+        m_heap[i]        = m_heap[PAR(i)];
         m_pos(m_heap[i]) = i;
-        i = PAR(i);
+        i                = PAR(i);
       }
       m_heap[i] = p;
-      m_pos(p) = i;
+      m_pos(p)  = i;
       // std::cout << "    Position: " << i << std::endl;
       // {
       // 	std::cout << "[";
@@ -91,9 +95,9 @@ namespace mln
     static unsigned LCHILD(unsigned i) { return 2 * i + 1; }
     static unsigned RCHILD(unsigned i) { return 2 * i + 2; }
 
-    const image2d<W>& m_w;
+    const image2d<W>&    m_w;
     std::vector<point2d> m_heap;
-    image2d<unsigned> m_pos;
+    image2d<unsigned>    m_pos;
   };
 
   template <typename W>
@@ -115,7 +119,7 @@ namespace mln
     {
       mln_foreach (point2d p, f.domain())
       {
-        point2d q = 2 * p;
+        point2d q                  = 2 * p;
         grad.at(q + point2d{0, 1}) = l2norm(f(p), f.at(p + point2d{0, 1}));
         grad.at(q + point2d{1, 0}) = l2norm(f(p), f.at(p + point2d{1, 0}));
       }
@@ -130,7 +134,7 @@ namespace mln
 
     {
       myheap<unsigned> heap(mindist);
-      image2d<bool> deja_vu;
+      image2d<bool>    deja_vu;
 
       resize(deja_vu, mindist).init(false);
       extension::fill(deja_vu, true); // Mark nodes outside domain
@@ -161,7 +165,7 @@ namespace mln
               heap.push(q);
             }
             unsigned old = mindist(q);
-            mindist(q) = std::min(mindist(q), mindist(p) + grad(e));
+            mindist(q)   = std::min(mindist(q), mindist(p) + grad(e));
             // std::cout << "  Updating: " << q << " from " << old << " to " << mindist(q) << std::endl;
             heap.update(q);
           }
@@ -171,10 +175,9 @@ namespace mln
 
     return mindist;
   }
-}
+} // namespace mln
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 
@@ -185,7 +188,7 @@ main(int argc, char** argv)
   }
 
   const char* filename = argv[1];
-  const char* outfile = argv[2];
+  const char* outfile  = argv[2];
 
   image2d<rgb8> ima;
   io::imread(filename, ima);

@@ -3,8 +3,6 @@
 #include "thicken.hpp"
 #include "topology.hpp"
 
-#include <boost/format.hpp>
-#include <libgen.h>
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/iota.hpp>
@@ -17,6 +15,11 @@
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/tos/immerse.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
+#include <libgen.h>
+
 
 void usage(int argc, char** argv)
 {
@@ -42,8 +45,8 @@ namespace mln
     mln_precondition(parent.domain() == K.domain());
 
     typedef rgb<unsigned> SumType;
-    image2d<SumType> sum;
-    image2d<unsigned> count;
+    image2d<SumType>      sum;
+    image2d<unsigned>     count;
     resize(count, K).init(0);
     resize(sum, K).init(SumType());
 
@@ -63,7 +66,7 @@ namespace mln
     image2d<V> out;
     resize(out, ima).init(literal::zero);
     unsigned p = S[0];
-    out[p] = sum[p] / count[p];
+    out[p]     = sum[p] / count[p];
     for (unsigned p : S)
     {
       unsigned q = parent[p];
@@ -84,7 +87,12 @@ namespace mln
 
   struct attr_2f
   {
-    attr_2f() : size(0), sum(literal::zero), sum2(literal::zero) {}
+    attr_2f()
+      : size(0)
+      , sum(literal::zero)
+      , sum2(literal::zero)
+    {
+    }
 
     template <typename V>
     void take(const V& x)
@@ -97,14 +105,18 @@ namespace mln
 
     float to_result() { return (sum2 - (sum * sum) / size).sum(); }
 
-    int size;
+    int   size;
     vec3f sum;
     vec3f sum2;
   };
 
   struct attr_1f
   {
-    attr_1f() : size(0), gradient(0) {}
+    attr_1f()
+      : size(0)
+      , gradient(0)
+    {
+    }
 
     void take(float grad_)
     {
@@ -112,7 +124,7 @@ namespace mln
       ++size;
     }
 
-    int size;
+    int   size;
     float gradient;
   };
 
@@ -123,7 +135,7 @@ namespace mln
     struct myattribute
     {
       unsigned count;
-      vec3i sum;
+      vec3i    sum;
     };
 
     mln_precondition(K.domain() == out.domain());
@@ -134,8 +146,8 @@ namespace mln
 
     for (int i = S.size() - 1; i >= 0; --i)
     {
-      unsigned p = S[i];
-      point2d realp = out.point_at_index(p);
+      unsigned p     = S[i];
+      point2d  realp = out.point_at_index(p);
       if (filter(realp))
       {
         unsigned q = K[p] == K[parent[p]] ? parent[p] : p;
@@ -148,8 +160,8 @@ namespace mln
     {
       if (not filter(p))
       {
-        unsigned i = out.index_of_point(p);
-        unsigned q = K[i] == K[parent[i]] ? parent[i] : i;
+        unsigned    i = out.index_of_point(p);
+        unsigned    q = K[i] == K[parent[i]] ? parent[i] : i;
         myattribute a = attr[q];
         while (a.count == 0)
         {
@@ -189,25 +201,25 @@ namespace mln
     image2d<bool> is_removed;
     resize(is_removed, K).init(false);
 
-    bool need_repeat = true;
-    auto sqr = [](vec3f x) { return x * x; };
-    unsigned cpt = 0;
+    bool     need_repeat = true;
+    auto     sqr         = [](vec3f x) { return x * x; };
+    unsigned cpt         = 0;
     while (need_repeat)
     {
       need_repeat = false;
-      unsigned i = 0;
+      unsigned i  = 0;
       for (unsigned p : nodes)
       {
         if (!is_removed[p])
         {
-          unsigned q = findcanonical(is_removed, parent, parent[p]);
-          float delta_e = (-sqr(acc2[p].sum) / acc2[p].size - sqr(acc2[q].sum) / acc2[q].size +
+          unsigned q       = findcanonical(is_removed, parent, parent[p]);
+          float    delta_e = (-sqr(acc2[p].sum) / acc2[p].size - sqr(acc2[q].sum) / acc2[q].size +
                            sqr(acc2[p].sum + acc2[q].sum) / (acc2[p].size + acc2[q].size))
                               .sum();
           if (std::isfinite(delta_e) and delta_e > (-mu * acc1[p].size))
           {
             ++cpt;
-            need_repeat = true;
+            need_repeat   = true;
             is_removed[p] = true;
             acc2[q].sum += acc2[p].sum;
             acc2[q].sum2 += acc2[p].sum2;
@@ -229,8 +241,8 @@ namespace mln
       assert(K[q] != K[parent[q]] or q == parent[q]);
       if (K[p] == K[q]) // p non canonical
       {
-        q = findcanonical(is_removed, parent, q);
-        K[p] = K[q];
+        q         = findcanonical(is_removed, parent, q);
+        K[p]      = K[q];
         parent[p] = q;
       }
       else // p canonical
@@ -238,7 +250,7 @@ namespace mln
         q = findcanonical(is_removed, parent, p);
         if (p != q)
         {
-          K[p] = K[q];
+          K[p]      = K[q];
           parent[p] = q;
         }
         else
@@ -291,7 +303,7 @@ namespace mln
       }
     }
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {
@@ -304,17 +316,17 @@ int main(int argc, char** argv)
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
-  I rr = addborder(r);
-  I gg = addborder(g);
-  I bb = addborder(b);
+  I                  r  = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g  = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b  = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  rr = addborder(r);
+  I                  gg = addborder(g);
+  I                  bb = addborder(b);
 
-  image2d<V> rK, gK, bK;
-  image2d<unsigned> rparent, gparent, bparent;
+  image2d<V>            rK, gK, bK;
+  image2d<unsigned>     rparent, gparent, bparent;
   std::vector<unsigned> rS, gS, bS;
 
   std::tie(rK, rparent, rS) = morpho::ToS(rr, c4);
@@ -338,8 +350,8 @@ int main(int argc, char** argv)
       return std::min(std::get<0>(x), std::min(std::get<1>(x), std::get<2>(x)));
     });
 
-  image2d<unsigned> K;
-  image2d<unsigned> parent;
+  image2d<unsigned>     K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   bool use_tos = argv[1] == std::string("tos");
@@ -354,7 +366,7 @@ int main(int argc, char** argv)
 
   io::imsave(transform(K, [](unsigned v) -> float { return v; }), "area.tiff");
 
-  auto ima2 = addborder(ima, lexicographicalorder_less<rgb8>()); // add border with median w.r.t < lexico
+  auto          ima2 = addborder(ima, lexicographicalorder_less<rgb8>()); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent).init(rgb8{0, 0, 255});
 
@@ -374,11 +386,11 @@ int main(int argc, char** argv)
 
   for (int i = 6; i < argc; ++i)
   {
-    auto K_ = clone(K);
+    auto K_      = clone(K);
     auto parent_ = clone(parent);
-    auto S_ = S;
-    auto x_ = clone(x);
-    auto y_ = clone(y);
+    auto S_      = S;
+    auto x_      = clone(x);
+    auto y_      = clone(y);
 
     float mu = std::atof(argv[i]);
     simplify(K_, parent_, S_, x_, y_, mu);

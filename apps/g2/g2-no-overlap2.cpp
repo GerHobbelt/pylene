@@ -1,30 +1,29 @@
+#include "compute_g2.hpp"
+#include "types.hpp"
+
+#include <apps/attributes/read.hpp>
+#include <apps/llview/cllview.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
+#include <apps/tos/topology.hpp>
+
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/always.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/image/morphers/casted_image.hpp>
 #include <mln/core/neighb2d.hpp>
-
+#include <mln/data/stretch.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <mln/data/stretch.hpp>
-
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/filtering.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/tos/ctos.hpp>
 
-#include <mln/accu/accumulators/count.hpp>
-#include <mln/accu/accumulators/mean.hpp>
-
-#include "compute_g2.hpp"
-#include "types.hpp"
-#include <apps/attributes/read.hpp>
-#include <apps/llview/cllview.hpp>
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/addborder.hpp>
-#include <apps/tos/topology.hpp>
 #include <boost/format.hpp>
+
 
 void usage(char** argv)
 {
@@ -44,7 +43,7 @@ namespace mln
 
     io::imsave(out, name);
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {
@@ -70,10 +69,10 @@ int main(int argc, char** argv)
   int chan[NTREE] = {3, 1};
 
   /// Compute the marginal ToS
-  tree_t t[2];
-  property_map<tree_t, V> val[2];
+  tree_t                      t[2];
+  property_map<tree_t, V>     val[2];
   property_map<tree_t, float> energy[2];
-  property_map<tree_t, int> mval[2];
+  property_map<tree_t, int>   mval[2];
 
   morpho::load(argv[2], t[0]);
   energy[0] = read_attribute_map<float>(argv[3], "extinction", t[0]);
@@ -84,7 +83,7 @@ int main(int argc, char** argv)
   for (int i = 0; i < 2; ++i)
   {
     tree_t::vertex_id_t root_id = t[i].get_root_id();
-    auto pred = make_functional_property_map<tree_t::vertex_id_t>(
+    auto                pred    = make_functional_property_map<tree_t::vertex_id_t>(
         [&energy, root_id, i](tree_t::vertex_id_t x) { return x == root_id or energy[i][x] > 0; });
     morpho::filter_direct_inplace(t[i], pred);
   }
@@ -100,29 +99,29 @@ int main(int argc, char** argv)
       io::imsave(rec, (boost::format("comp%i.tiff") % i).str());
       t[i]._reorder_pset();
       t[i].shrink_to_fit();
-      val[i] = make_attribute_map_from_image(t[i], channel(F, chan[i]));
+      val[i]  = make_attribute_map_from_image(t[i], channel(F, chan[i]));
       mval[i] = vaccumulate_proper(t[i], F2, accu::features::mean<>());
     }
   }
 
   /// Compute the graph
-  typedef Graph<NTREE> MyGraph;
-  typedef graph_content<NTREE> my_graph_content;
-  MyGraph g2;
+  typedef Graph<NTREE>                                                MyGraph;
+  typedef graph_content<NTREE>                                        my_graph_content;
+  MyGraph                                                             g2;
   std::array<property_map<tree_t, MyGraph::vertex_descriptor>, NTREE> tlink;
   std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
   /// Algo to select non-overlapping RGB
 
   auto glink = boost::get(&my_graph_content::tlinks, g2);
-  auto d = boost::get(&my_graph_content::depth, g2);
+  auto d     = boost::get(&my_graph_content::depth, g2);
 
-  typedef mln::vec<unsigned, NTREE> depth_vec_t;
+  typedef mln::vec<unsigned, NTREE>  depth_vec_t;
   image2d<mln::vec<unsigned, NTREE>> imdepth;
   resize(imdepth, F);
 
-  image2d<rgb8> selection;
-  image2d<rgb8> rec;
+  image2d<rgb8>  selection;
+  image2d<rgb8>  rec;
   image2d<uint8> out;
   resize(selection, F);
   resize(rec, F);
@@ -146,7 +145,7 @@ int main(int argc, char** argv)
 
   // 1st step
   {
-    int k = 0;
+    int  k    = 0;
     auto dmap = make_functional_property_map<tree_t::node_type>(
         [&d, &tlink, k](tree_t::node_type x) { return d[tlink[k][x]]; });
     morpho::reconstruction(t[k], dmap, imdepth);
@@ -173,12 +172,12 @@ int main(int argc, char** argv)
     mln_foreach (auto px, imdepth.pixels())
     {
       tree_t::node_type x = t[k].get_node_at(px.index());
-      depth_vec_t v = px.val();
+      depth_vec_t       v = px.val();
       while (x.id() != tree_t::npos())
       {
         depth_vec_t val = d[tlink[k][x]];
-        pred[x] = pred[x] and (vecprod_islessequal(v, val) or vecprod_islessequal(val, v));
-        x = x.parent();
+        pred[x]         = pred[x] and (vecprod_islessequal(v, val) or vecprod_islessequal(val, v));
+        x               = x.parent();
       }
     }
 

@@ -1,5 +1,5 @@
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/vec.hpp>
-#include <mln/core/vec/vec_math_ops.hpp>
 
 #include <gtest/gtest.h>
 

@@ -1,18 +1,18 @@
+#include <apps/supervised-gui/myheap.hpp>
+#include <apps/tos/Kinterpolate.hpp>
+
+#include <mln/accu/accumulators/mean.hpp>
 #include <mln/colors/literal.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <mln/accu/accumulators/mean.hpp>
 #include <mln/morpho/component_tree/accumulate.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/io.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 
-#include <apps/supervised-gui/myheap.hpp>
-#include <apps/tos/Kinterpolate.hpp>
 
 using namespace mln;
 
@@ -22,7 +22,7 @@ property_map<tree_t, float> run_djikstra(const tree_t& tree, property_map<tree_t
                                          const property_map<tree_t, rgb<int>>& vmap, int color)
 {
   property_map<tree_t, float> distancemap(tree, value_traits<float>::max());
-  property_map<tree_t, int> posmap(tree, -1);
+  property_map<tree_t, int>   posmap(tree, -1);
 
   myheap heap(tree, distancemap, posmap);
   mln_foreach (auto node, tree.nodes())
@@ -36,7 +36,7 @@ property_map<tree_t, float> run_djikstra(const tree_t& tree, property_map<tree_t
 
   {
     mln_entering("Running djikstra");
-    tree_t::node_type p;
+    tree_t::node_type     p;
     morpho::tree_neighb_t nbh;
     mln_iter(q, nbh(p));
     while (not heap.empty())
@@ -77,7 +77,7 @@ image2d<rgb8> segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const
       return 0;
   });
 
-  image2d<rgb8> ima = Kadjust_to(ima_, tree._get_data()->m_pmap.domain());
+  image2d<rgb8>  ima    = Kadjust_to(ima_, tree._get_data()->m_pmap.domain());
   image2d<uint8> marker = Kadjust_to(markers_, tree._get_data()->m_pmap.domain(), "zero");
 
   auto vmap = morpho::vaccumulate_proper(tree, ima, accu::features::mean<>());
@@ -85,7 +85,7 @@ image2d<rgb8> segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const
   property_map<tree_t, uint8> colormap(tree, 0);
 
   property_map<tree_t, float> distancemap(tree, value_traits<float>::max());
-  property_map<tree_t, int> posmap(tree, -1);
+  property_map<tree_t, int>   posmap(tree, -1);
 
   mln_foreach (auto px, marker.pixels())
   {
@@ -109,7 +109,7 @@ image2d<rgb8> segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const
   // Run djisktra
   {
     mln_entering("Running djikstra");
-    tree_t::node_type p;
+    tree_t::node_type     p;
     morpho::tree_neighb_t nbh;
     mln_iter(q, nbh(p));
     while (not heap.empty())
@@ -121,7 +121,7 @@ image2d<rgb8> segmentation_(const tree_t& tree, const image2d<rgb8>& ima_, const
         float d = l2norm(vmap[p] - vmap[*q]) + distancemap[p];
         if (d < distancemap[*q])
         {
-          colormap[*q] = colormap[p];
+          colormap[*q]    = colormap[p];
           distancemap[*q] = d;
           if (posmap[*q] == -1)
           { // not in queue, insert
@@ -164,7 +164,7 @@ image2d<bool> segmentation(const tree_t& tree, const image2d<rgb8>& ima_, const 
       return 1; // Bg
   });
 
-  image2d<rgb8> ima = Kadjust_to(ima_, tree._get_data()->m_pmap.domain());
+  image2d<rgb8>  ima    = Kadjust_to(ima_, tree._get_data()->m_pmap.domain());
   image2d<uint8> marker = Kadjust_to(markers_, tree._get_data()->m_pmap.domain(), "zero");
 
   auto vmap = morpho::vaccumulate_proper(tree, ima, accu::features::mean<>());

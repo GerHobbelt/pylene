@@ -25,9 +25,25 @@ BraceWrapping:
 NamespaceIndentation: All
 FixNamespaceComments: true
 
-IndentWrappedFunctionNames: true
+IndentWrappedFunctionNames: false # Do not indent after function def break
 AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakTemplateDeclarations: true
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignEscapedNewlines: Right
+AlignOperands: true
+AlignTrailingComments: true
+BreakConstructorInitializers: BeforeComma
+BreakStringLiterals: true
+CompactNamespaces: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 2
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+MaxEmptyLinesToKeep: 2
 
 # For loop
-ForEachMacros: ['mln_forall', 'mln_foreach']
+ForEachMacros: ['mln_forall', 'mln_foreach', 'mln_foreach_new', 'mln_reverse_foreach']

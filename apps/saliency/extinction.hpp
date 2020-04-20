@@ -1,10 +1,10 @@
-#ifndef APPS_SALIENCY_EXTINCTION_HPP
-#define APPS_SALIENCY_EXTINCTION_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
 
 #include <vector>
+
 
 template <typename V, typename T, class Compare = std::less<V>>
 mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
@@ -28,7 +28,7 @@ namespace internal
   }
 
 #endif
-}
+} // namespace internal
 
 template <typename V, typename T, class Compare>
 mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
@@ -45,12 +45,12 @@ mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, c
   // also retrieve the child
   struct child_t
   {
-    unsigned first_child = UNDEF;
+    unsigned first_child  = UNDEF;
     unsigned next_sibling = UNDEF;
   };
 
   std::vector<unsigned> nodes;
-  image2d<child_t> childs;
+  image2d<child_t>      childs;
   {
     resize(childs, K).init(child_t());
 
@@ -82,7 +82,7 @@ mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, c
   }
 
   // Compute extinction values.
-  image2d<V> extmap;
+  image2d<V>        extmap;
   image2d<unsigned> par; // union-find struct
 
   resize(extmap, K).init(0);
@@ -94,7 +94,7 @@ mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, c
     // std::cout << "Setting node" << x << std::endl;
     // Make set.
     unsigned zx = x;
-    par[x] = zx;
+    par[x]      = zx;
 
     unsigned cchild = childs[x].first_child;
     // U-F
@@ -115,7 +115,7 @@ mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, c
         if (cmp(a[zx], a[zn]))
           std::swap(zn, zx);
 
-        par[zx] = zn;
+        par[zx]    = zn;
         extmap[zx] = std::abs(a[x] - a[zx]);
         // if (extmap[zx] != 0)
         //  std::cout << "Setting minima " << zx << " : " << extmap[zx] << std::endl;
@@ -126,12 +126,10 @@ mln::image2d<V> extinction(const mln::image2d<V>& a, const mln::image2d<T>& K, c
   }
   // root extinction
   unsigned m = ::internal::zfindroot_(par, nodes[0]);
-  extmap[m] = std::abs(a[nodes.back()] - a[m]);
+  extmap[m]  = std::abs(a[nodes.back()] - a[m]);
 
   // std::cout << "Setting glob minimum " << m << " : " << extmap[m] << std::endl;
 
   mln_exiting();
   return extmap;
 }
-
-#endif // ! EXTINCTION_HPP

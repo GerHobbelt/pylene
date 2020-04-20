@@ -1,6 +1,6 @@
-@import url("css/theme.css");
-
-
+.wy-nav-content {
+    max-width: 1200px !important;
+}
 
 /* .breatheparameterlist p { */
 /*     display: inline; */
@@ -16,6 +16,23 @@
 
 .rst-content dl:not(.docutils) dt em:not(.property) {
     color: black;
+}
+
+.full {
+    width: 100%
+}
+
+/* disable top-border in synopsis */
+.table-synopsis {
+    table-layout: fixed;
+}
+
+.table-synopsis dt{
+    border-top: none !important;
+}
+.table-synopsis td{
+    vertical-align: top !important;
+    white-space: revert !important;
 }
 
 /* .rst-content dl:not(.docutils) dt:last-child { */

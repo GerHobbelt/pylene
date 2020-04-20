@@ -1,14 +1,15 @@
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/topology.hpp>
+
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/topology.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
 #include <mln/morpho/component_tree/reconstruction.hpp>
 #include <mln/morpho/maxtree/maxtree.hpp>
+
 
 using namespace mln;
 typedef morpho::component_tree<unsigned, image2d<unsigned>> tree_t;
@@ -23,8 +24,8 @@ image2d<bool> segmentation(const tree_t& tree, const image2d<uint8>& markers__)
   {
     BLANC = 0,
     ROUGE = 1,
-    NOIR = 2,
-    NONE = 3
+    NOIR  = 2,
+    NONE  = 3
   };
 
   auto markers = transform(markers__, [](const uint8& v) -> uint8 {
@@ -40,7 +41,7 @@ image2d<bool> segmentation(const tree_t& tree, const image2d<uint8>& markers__)
   mln_foreach (auto px, markers.pixels())
   {
     tree_t::node_type x = tree.get_node_at(px.index());
-    colortag v = (colortag)px.val();
+    colortag          v = (colortag)px.val();
     if (K1::is_face_2(px.point()) and v != BLANC)
     {
       if (tags[x] == NONE)
@@ -53,7 +54,7 @@ image2d<bool> segmentation(const tree_t& tree, const image2d<uint8>& markers__)
   tags[tree.get_root()] = NOIR; // Root is background
 
   // Propagate up
-  mln_reverse_foreach(auto x, tree.nodes())
+  mln_reverse_foreach (auto x, tree.nodes())
   {
     if (tags[x] != BLANC)
     {
@@ -96,17 +97,17 @@ int main(int argc, char** argv)
 
   image2d<float> sal;
   image2d<uint8> markers;
-  image2d<bool> out;
-  tree_t tree;
+  image2d<bool>  out;
+  tree_t         tree;
 
   io::imread(argv[1], sal);
   io::imread(argv[2], markers);
   box2d dom = markers.domain();
 
   markers = Kadjust_to(markers, sal.domain());
-  tree = morpho::mintree_indexes(sal, c4);
-  out = segmentation(tree, markers);
-  out = Kadjust_to(out, dom);
+  tree    = morpho::mintree_indexes(sal, c4);
+  out     = segmentation(tree, markers);
+  out     = Kadjust_to(out, dom);
 
   io::imsave(out, argv[3]);
 }

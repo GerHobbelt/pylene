@@ -5,6 +5,7 @@ Tutorial
 .. |pylene| replace:: pylene
 
 .. toctree::
+   tutorial/installation.rst
    tutorial/first_start.rst
    tutorial/extension.rst
    tutorial/views.rst

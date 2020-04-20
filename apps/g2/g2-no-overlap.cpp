@@ -1,31 +1,29 @@
-#include <mln/core/always.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/morphers/casted_image.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/data/stretch.hpp>
-
-#include <mln/morpho/tos/ctos.hpp>
-//#include <mln/morpho/component_tree/compute_depth.hpp>
-#include <mln/morpho/component_tree/accumulate.hpp>
-#include <mln/morpho/component_tree/filtering.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
-
-#include <mln/accu/accumulators/count.hpp>
-
 #include "compute_g2.hpp"
 #include "types.hpp"
+
 #include <apps/llview/cllview.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/topology.hpp>
+
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/core/always.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/data/stretch.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/component_tree/accumulate.hpp>
+// #include <mln/morpho/component_tree/compute_depth.hpp>
+#include <mln/morpho/component_tree/filtering.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/tos/ctos.hpp>
+
 #include <boost/format.hpp>
 
-void
-usage(char** argv)
+
+void usage(char** argv)
 {
   std::cerr << "Usage: " << argv[0]
             << " input.ppm λ α output.tree output.tiff\n"
@@ -49,10 +47,9 @@ namespace mln
 
     io::imsave(out, name);
   }
-}
+} // namespace mln
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 6)
     usage(argv);
@@ -67,20 +64,20 @@ main(int argc, char** argv)
 
   typedef value_t::value_type V;
 
-  int ordering[] = {3, 0};
-  unsigned lambda = std::atoi(argv[2]);
-  unsigned alpha = std::atof(argv[3]);
-  unsigned alpha2 = std::atof(argv[4]);
-  unsigned alphas[] = {alpha, alpha, alpha, alpha2};
+  int      ordering[] = {3, 0};
+  unsigned lambda     = std::atoi(argv[2]);
+  unsigned alpha      = std::atof(argv[3]);
+  unsigned alpha2     = std::atof(argv[4]);
+  unsigned alphas[]   = {alpha, alpha, alpha, alpha2};
 
   /// Compute the marginal ToS
-  tree_t t[NTREE];
+  tree_t                  t[NTREE];
   property_map<tree_t, V> val[NTREE];
 
   for (int i = 0; i < NTREE; ++i)
   {
     auto g = imtransform(f, [i](value_t x) { return x[i]; });
-    t[i] = morpho::cToS(g, c4);
+    t[i]   = morpho::cToS(g, c4);
 
     // Grain filter
     {
@@ -94,7 +91,7 @@ main(int argc, char** argv)
     // Level lines simplification
     {
       property_map<tree_t, bool> keep(t[i], false);
-      val[i] = make_attribute_map_from_image(t[i], channel(F, i));
+      val[i]  = make_attribute_map_from_image(t[i], channel(F, i));
       auto& v = val[i];
 
       keep[t[i].get_root()] = true;
@@ -125,17 +122,17 @@ main(int argc, char** argv)
   }
 
   /// Compute the graph
-  typedef Graph<NTREE> MyGraph;
+  typedef Graph<NTREE>         MyGraph;
   typedef graph_content<NTREE> my_graph_content;
 
-  MyGraph g2;
+  MyGraph                                                             g2;
   std::array<property_map<tree_t, MyGraph::vertex_descriptor>, NTREE> tlink;
   std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
   /// Algo to select non-overlapping RGB
 
   auto glink = boost::get(&my_graph_content::tlinks, g2);
-  auto d = boost::get(&my_graph_content::depth, g2);
+  auto d     = boost::get(&my_graph_content::depth, g2);
 
   typedef mln::vec<unsigned, NTREE> depth_vec_t;
 
@@ -160,7 +157,7 @@ main(int argc, char** argv)
 
   // 1st step
   {
-    int k = ordering[0];
+    int  k    = ordering[0];
     auto dmap = make_functional_property_map<tree_t::node_type>(
         [&d, &tlink, k](tree_t::node_type x) { return d[tlink[k][x]]; });
     morpho::reconstruction(t[k], dmap, imdepth);
@@ -188,12 +185,12 @@ main(int argc, char** argv)
     mln_foreach (auto px, imdepth.pixels())
     {
       tree_t::node_type x = t[k].get_node_at(px.index());
-      depth_vec_t v = px.val();
+      depth_vec_t       v = px.val();
       while (x.id() != tree_t::npos())
       {
         depth_vec_t val = d[tlink[k][x]];
-        pred[x] = pred[x] and (vecprod_islessequal(v, val) or vecprod_islessequal(val, v));
-        x = x.parent();
+        pred[x]         = pred[x] and (vecprod_islessequal(v, val) or vecprod_islessequal(val, v));
+        x               = x.parent();
       }
     }
 

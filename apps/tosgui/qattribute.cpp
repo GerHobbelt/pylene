@@ -1,12 +1,16 @@
 #include "qattribute.hpp"
+
 #include <QEvent>
 #include <QMouseEvent>
+
 #include <qwt_picker_machine.h>
+
 
 namespace mln
 {
 
-  QAttributeBase::QAttributeBase(const QwtText& name) : QwtPlot(name)
+  QAttributeBase::QAttributeBase(const QwtText& name)
+    : QwtPlot(name)
   {
     m_curve = new QwtPlotCurve("Energy");
     m_curve->setSamples(m_data);
@@ -28,4 +32,4 @@ namespace mln
     if (event->key() == Qt::Key_F)
       this->showFilteringWindow();
   }
-}
+} // namespace mln

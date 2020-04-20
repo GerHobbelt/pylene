@@ -1,14 +1,14 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/morpho/component_tree/io.hpp>
+#include "mumford_shah_on_tree.hpp"
+
+#include <apps/tos/Kinterpolate.hpp>
 
 #include <mln/accu/accumulators/accu_as_it.hpp>
 #include <mln/accu/accumulators/variance.hpp>
-
+#include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+#include <mln/morpho/component_tree/io.hpp>
 
-#include "mumford_shah_on_tree.hpp"
-#include <apps/tos/Kinterpolate.hpp>
 
 typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 
@@ -16,8 +16,7 @@ typedef mln::morpho::component_tree<unsigned, mln::image2d<unsigned>> tree_t;
 #define MLN_INPUT_VALUE_TYPE mln::rgb8
 #endif
 
-tree_t::vertex_id_t
-find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar, tree_t::vertex_id_t x)
+tree_t::vertex_id_t find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar, tree_t::vertex_id_t x)
 {
   if (newpar[x] == tree_t::npos()) // x is alive
     return x;
@@ -25,8 +24,7 @@ find_canonical(mln::property_map<tree_t, tree_t::vertex_id_t>& newpar, tree_t::v
     return newpar[x] = find_canonical(newpar, newpar[x]);
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   if (argc < 6)
   {
@@ -34,10 +32,10 @@ main(int argc, char** argv)
     std::exit(1);
   }
 
-  const char* input_path = argv[1];
-  const char* tree_path = argv[2];
-  float lambda = std::atof(argv[3]);
-  unsigned grain = std::atoi(argv[4]);
+  const char* input_path  = argv[1];
+  const char* tree_path   = argv[2];
+  float       lambda      = std::atof(argv[3]);
+  unsigned    grain       = std::atoi(argv[4]);
   const char* output_path = argv[5];
 
   using namespace mln;
@@ -45,7 +43,7 @@ main(int argc, char** argv)
   typedef MLN_INPUT_VALUE_TYPE V;
 
   image2d<V> f, F;
-  tree_t tree;
+  tree_t     tree;
 
   io::imread(input_path, f);
   morpho::load(tree_path, tree);
@@ -57,7 +55,7 @@ main(int argc, char** argv)
     accu::accumulators::accu_if<accu::accumulators::count<>, K1::is_face_2_t, point2d> counter;
 
     auto areamap = morpho::paccumulate(tree, F, counter);
-    auto pred = make_functional_property_map<tree_t::vertex_id_t>(
+    auto pred    = make_functional_property_map<tree_t::vertex_id_t>(
         [&areamap, grain](tree_t::vertex_id_t x) { return areamap[x] > grain; });
     morpho::filter_direct_inplace(tree, pred);
     tree.shrink_to_fit();

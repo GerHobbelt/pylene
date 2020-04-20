@@ -1,18 +1,18 @@
-#include <mln/core/image/image2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/core/algorithm/paste.hpp>
-#include <mln/core/algorithm/transform.hpp>
-
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/mumford_shah.hpp>
 #include <apps/tos/objdetection.hpp>
 #include <apps/tos/set_mean_on_nodes.hpp>
-#include <boost/format.hpp>
+
+#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
 
 void usage(char** argv)
 {
@@ -42,7 +42,7 @@ namespace mln
         out[x] = x;
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {
@@ -54,17 +54,17 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima);
 
   typedef UInt<9> V;
-  image2d<uint8> bima = addborder(ima);
-  image2d<V> ima_ = transform(bima, [](uint8 x) -> V { return x * 2; });
-  image2d<uint8> f = interpolate_k1(bima);
+  image2d<uint8>  bima = addborder(ima);
+  image2d<V>      ima_ = transform(bima, [](uint8 x) -> V { return x * 2; });
+  image2d<uint8>  f    = interpolate_k1(bima);
 
-  image2d<V> K;
+  image2d<V>            K;
   std::vector<unsigned> S;
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
 
   std::tie(K, parent, S) = morpho::ToS(ima_, c4);
-  image2d<float> energy = compute_energy(bima, K, parent, S);
-  energy[S[0]] = value_traits<float>::max();
+  image2d<float> energy  = compute_energy(bima, K, parent, S);
+  energy[S[0]]           = value_traits<float>::max();
 
   image2d<unsigned> ids = make_unique_id(K, parent, S);
 
@@ -73,8 +73,8 @@ int main(int argc, char** argv)
   resize(out, K);
   for (int i = 3; i < argc; ++i)
   {
-    int lambda = std::atoi(argv[i]);
-    auto cIds = clone(ids);
+    int  lambda  = std::atoi(argv[i]);
+    auto cIds    = clone(ids);
     auto cParent = clone(parent);
     auto cEnergy = clone(energy);
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
     // Subsample
     {
-      box2d d = out.domain();
+      box2d  d = out.domain();
       sbox2d sub_domain{{2, 2}, {d.pmax[0] - 2, d.pmax[1] - 2}, {2, 2}};
       copy(out | sub_domain, final);
     }

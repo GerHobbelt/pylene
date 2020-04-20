@@ -1,23 +1,20 @@
-#ifndef DISPSALIENCY_HPP
-#define DISPSALIENCY_HPP
+#pragma once
+
+#include <mln/accu/accumulators/mean.hpp>
+#include <mln/accu/accumulators/minmax.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/sub_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imprint.hpp>
+#include <mln/labeling/accumulate.hpp>
+#include <mln/labeling/blobs.hpp>
+#include <mln/qt/imageviewer.hpp>
 
 #include <QObject>
 #include <QSlider>
 #include <QtGui>
 
-#include <mln/accu/accumulators/minmax.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-#include <mln/qt/imageviewer.hpp>
-
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/sub_image.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/accu/accumulators/mean.hpp>
-#include <mln/labeling/accumulate.hpp>
-#include <mln/labeling/blobs.hpp>
-
-#include <mln/io/imprint.hpp>
 
 using namespace mln;
 
@@ -27,7 +24,10 @@ struct Displayer : public QObject
 
 public:
   Displayer(const image2d<float>& f, const image2d<rgb8>* ref = NULL, const QString& title = "")
-      : m_ori(f), m_ref(ref), m_ima((f.nrows() + 1) / 2, (f.ncols() + 1) / 2), m_win(m_ima)
+    : m_ori(f)
+    , m_ref(ref)
+    , m_ima((f.nrows() + 1) / 2, (f.ncols() + 1) / 2)
+    , m_win(m_ima)
   {
     float vmin, vmax;
     std::tie(vmin, vmax) = accumulate(f, accu::features::minmax<>());
@@ -51,9 +51,9 @@ public:
   {
     auto rol = [](int x, int n) { return (x << n) | (x > (16 - n)); };
 
-    unsigned k = x % 6;
+    unsigned                        k = x % 6;
     std::tuple<uint8, uint8, uint8> v{(rol(x, 2) & 255), (rol(x, 5) & 255), (rol(x, 7) & 255)};
-    uint8 r, g, b;
+    uint8                           r, g, b;
     switch (k)
     {
     case 0:
@@ -83,11 +83,11 @@ public slots:
 
   void on_filtering()
   {
-    float v = m_slider.value() / 1000.0;
-    auto bin = m_ori <= v;
+    float v   = m_slider.value() / 1000.0;
+    auto  bin = m_ori <= v;
 
     image2d<unsigned> lbl;
-    unsigned nlabel;
+    unsigned          nlabel;
 
     std::tie(lbl, nlabel) = labeling::blobs(bin, c4, 0u);
     std::cout << "Label: " << nlabel << std::endl;
@@ -114,11 +114,9 @@ public slots:
   }
 
 private:
-  image2d<float> m_ori;
+  image2d<float>       m_ori;
   const image2d<rgb8>* m_ref;
-  image2d<rgb8> m_ima;
-  qt::ImageViewer m_win;
-  QSlider m_slider;
+  image2d<rgb8>        m_ima;
+  qt::ImageViewer      m_win;
+  QSlider              m_slider;
 };
-
-#endif // ! DISPSALIENCY_HPP

@@ -1,24 +1,24 @@
-#include <mln/colors/lab.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/morphers/casted_image.hpp>
-
-#include <mln/morpho/tos/tos.hpp>
+#include "compute_tree_distance.hpp"
 
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/routines.hpp>
 #include <apps/tos/topology.hpp>
 
+#include <mln/colors/lab.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/tos/tos.hpp>
+
 #include <boost/format.hpp>
+
 #include <iostream>
 #include <string>
 
-#include "compute_tree_distance.hpp"
 
 void usage(char** argv)
 {
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   if (argc < 4)
     usage(argv);
 
-  const char* infname = argv[1];
+  const char* infname  = argv[1];
   const char* outfname = argv[2];
 
   using namespace mln;
@@ -40,13 +40,13 @@ int main(int argc, char** argv)
   io::imread(infname, input);
 
   typedef lexicographicalorder_less<rgb8> Compare;
-  Compare cmp;
+  Compare                                 cmp;
 
   image2d<rgb8> Ori = addborder(input, cmp);
-  image2d<rgb8> f = interpolate_k1(Ori);
+  image2d<rgb8> f   = interpolate_k1(Ori);
 
-  image2d<rgb8> K;
-  image2d<unsigned> parent;
+  image2d<rgb8>         K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   auto dist = [](rgb8 x, rgb8 y) { return l1norm(x - y); };

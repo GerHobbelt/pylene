@@ -1,6 +1,8 @@
 #include "plotwindow.hpp"
+
 #include <QGridLayout>
 #include <QMenuBar>
+
 
 PlotWindow::PlotWindow()
 {
@@ -12,8 +14,7 @@ PlotWindow::PlotWindow()
   this->setCentralWidget(main);
 }
 
-void
-PlotWindow::register_attribute(Attribute* attribute)
+void PlotWindow::register_attribute(Attribute* attribute)
 {
   for (QString s : attribute->names())
   {
@@ -26,20 +27,19 @@ PlotWindow::register_attribute(Attribute* attribute)
                    SLOT(onNodeSelected(const mln::image2d<bool>&)));
 }
 
-void
-PlotWindow::init()
+void PlotWindow::init()
 {
   m_layout = new QVBoxLayout(this);
 
   QVBoxLayout* m_panel_left = new QVBoxLayout;
-  m_attribute_selector = new QComboBox(this);
-  m_attribute_runnew = new QCheckBox("Display in new plot", this);
+  m_attribute_selector      = new QComboBox(this);
+  m_attribute_runnew        = new QCheckBox("Display in new plot", this);
   m_panel_left->addWidget(m_attribute_selector);
   m_panel_left->addWidget(m_attribute_runnew);
 
   QGridLayout* m_attribute_panel_layout = new QGridLayout;
-  m_options_panel = new QFormLayout(this);
-  m_options_btncpt = new QPushButton("Run", this);
+  m_options_panel                       = new QFormLayout(this);
+  m_options_btncpt                      = new QPushButton("Run", this);
 
   m_attribute_panel = new QGroupBox("Attribute properties");
   m_attribute_panel_layout->addLayout(m_panel_left, 0, 0);
@@ -57,22 +57,19 @@ PlotWindow::init()
   this->createMenus();
 }
 
-void
-PlotWindow::createMenus()
+void PlotWindow::createMenus()
 {
   m_display_menu = this->menuBar()->addMenu("Display");
   m_display_menu->addAction(m_action_rm_plot);
 }
 
-void
-PlotWindow::createActions()
+void PlotWindow::createActions()
 {
   m_action_rm_plot = new QAction("Remove last plot", this);
   QObject::connect(m_action_rm_plot, SIGNAL(triggered()), this, SLOT(rm_last_plot()));
 }
 
-void
-PlotWindow::displayPlot(int i, bool new_plot, bool force_run)
+void PlotWindow::displayPlot(int i, bool new_plot, bool force_run)
 {
   Attribute* attr = m_attributes[i];
   displayOptions(attr->parameters());
@@ -104,40 +101,35 @@ PlotWindow::displayPlot(int i, bool new_plot, bool force_run)
   plot->setVisible(true);
 }
 
-void
-PlotWindow::onAttributeSelected(int i)
+void PlotWindow::onAttributeSelected(int i)
 {
   this->displayPlot(i, m_attribute_runnew->isChecked(), false);
 }
 
-void
-PlotWindow::plotNode(const mln::point2d& p)
+void PlotWindow::plotNode(const mln::point2d& p)
 {
-  m_has_selected_point = true;
+  m_has_selected_point     = true;
   m_current_selected_point = p;
   for (unsigned i = 0; i < m_attributes.size(); ++i)
   {
-    QString s = m_attribute_selector->itemText(i);
+    QString              s    = m_attribute_selector->itemText(i);
     mln::QAttributeBase* plot = m_attributes[i]->getPlot(s);
     if (plot)
       plot->plotNode(p);
   }
 }
 
-void
-PlotWindow::onNodeSelected(const mln::point2d& p)
+void PlotWindow::onNodeSelected(const mln::point2d& p)
 {
   Q_EMIT(nodeSelected(p));
 }
 
-void
-PlotWindow::onNodeSelected(const mln::image2d<bool>& pts)
+void PlotWindow::onNodeSelected(const mln::image2d<bool>& pts)
 {
   Q_EMIT(nodeSelected(pts));
 }
 
-void
-PlotWindow::displayOptions(const QMap<QString, Attribute::Parameter>& params)
+void PlotWindow::displayOptions(const QMap<QString, Attribute::Parameter>& params)
 {
   while (!m_options_panel->isEmpty())
   {
@@ -168,8 +160,7 @@ PlotWindow::displayOptions(const QMap<QString, Attribute::Parameter>& params)
   m_attribute_panel->update();
 }
 
-void
-PlotWindow::rm_last_plot()
+void PlotWindow::rm_last_plot()
 {
   std::cout << "Fuck" << std::endl;
   if (m_layout->count() > 1)
@@ -179,8 +170,7 @@ PlotWindow::rm_last_plot()
   }
 }
 
-bool
-PlotWindow::eventFilter(QObject* obj, QEvent* event)
+bool PlotWindow::eventFilter(QObject* obj, QEvent* event)
 {
   // When recompute button is clicked
   // Recompute the attribute and update the curve

@@ -1,25 +1,27 @@
-#include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/image/morphers/casted_image.hpp>
-#include <mln/core/neighb2d.hpp>
-#include <mln/core/vec/vec_io.hpp>
-
-#include <mln/morpho/component_tree/accumulate.hpp>
-#include <mln/morpho/component_tree/graphviz.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/morpho/tos/ctos.hpp>
-
-#include <mln/accu/accumulators/accu_if.hpp>
-#include <mln/accu/accumulators/count.hpp>
+#include "compute_g2.hpp"
+#include "reconstruct.hpp"
+#include "remove_parent_relation.hpp"
+#include "routines.hpp"
 
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/topology.hpp>
 
+#include <mln/accu/accumulators/accu_if.hpp>
+#include <mln/accu/accumulators/count.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/morphers/casted_image.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/core/vec/vec_io.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <fstream>
+#include <mln/morpho/component_tree/accumulate.hpp>
+#include <mln/morpho/component_tree/compute_depth.hpp>
+#include <mln/morpho/component_tree/graphviz.hpp>
+#include <mln/morpho/component_tree/pattern_spectra.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/tos/ctos.hpp>
 
 #include <boost/format.hpp>
 #include <boost/graph/dag_shortest_paths.hpp>
@@ -30,13 +32,8 @@
 #include <boost/graph/transpose_graph.hpp>
 #include <boost/property_map/function_property_map.hpp>
 
-#include <mln/morpho/component_tree/compute_depth.hpp>
-#include <mln/morpho/component_tree/pattern_spectra.hpp>
+#include <fstream>
 
-#include "compute_g2.hpp"
-#include "reconstruct.hpp"
-#include "remove_parent_relation.hpp"
-#include "routines.hpp"
 
 namespace mln
 {
@@ -88,7 +85,7 @@ namespace mln
       outs.close();
     }
   }
-}
+} // namespace mln
 
 template <class WeightPropertyMap>
 void make_minimum_spanning_tree(Graph& g, const WeightPropertyMap& weights)
@@ -97,7 +94,7 @@ void make_minimum_spanning_tree(Graph& g, const WeightPropertyMap& weights)
   Graph tg;
   boost::transpose_graph(g, tg);
 
-  auto idxpmap = boost::get(boost::vertex_index, tg);
+  auto                                                                    idxpmap = boost::get(boost::vertex_index, tg);
   boost::vector_property_map<Graph::vertex_descriptor, decltype(idxpmap)> parent(boost::num_vertices(tg), idxpmap);
 
   boost::prim_minimum_spanning_tree(tg, parent, (boost::root_vertex(boost::vertex(0, tg)).weight_map(weights)));
@@ -120,7 +117,7 @@ void make_shortest_path_dag(Graph& g, const WeightPropertyMap& weights, Compare 
   Graph tg;
   boost::transpose_graph(g, tg);
 
-  auto idxpmap = boost::get(boost::vertex_index, tg);
+  auto                                                                    idxpmap = boost::get(boost::vertex_index, tg);
   boost::vector_property_map<Graph::vertex_descriptor, decltype(idxpmap)> parent(boost::num_vertices(tg), idxpmap);
 
   typedef typename boost::property_traits<WeightPropertyMap>::value_type distance_type;
@@ -147,7 +144,7 @@ float compute_graph_energy(const Graph& g, const WeightPropertyMap& w, Function 
 {
   Graph::edge_iterator it, end;
   std::tie(it, end) = boost::edges(g);
-  float res = std::accumulate(it, end, init, [&w, f](float v, Graph::edge_descriptor e) { return f(v, w[e]); });
+  float res         = std::accumulate(it, end, init, [&w, f](float v, Graph::edge_descriptor e) { return f(v, w[e]); });
 
   return res;
 }
@@ -159,10 +156,10 @@ boost::vector_property_map<unsigned> compute_graph_depth(const Graph& g)
   // auto viz = boost::make_bfs_visitor(viz_);
 
   auto one = [](mln::dontcare_t) -> int { return 1; };
-  auto w = boost::make_function_property_map<Graph::edge_descriptor, int, decltype(one)>(one);
+  auto w   = boost::make_function_property_map<Graph::edge_descriptor, int, decltype(one)>(one);
 
   Graph::vertex_descriptor root = boost::vertex(0, g);
-  depth[root] = 0;
+  depth[root]                   = 0;
 
   Graph gT;
   boost::transpose_graph(g, gT);
@@ -187,7 +184,7 @@ mln::image2d<ValueType> write_vmap_to_image(const Graph& g, const mln::image2d<m
   mln_pixter(px, out);
   mln_forall (px)
   {
-    vec3u v = pixmap[px->index()];
+    vec3u     v = pixmap[px->index()];
     ValueType w = init;
     for (int k = 0; k < 3; ++k)
       w = op(w, vmap[v[k]]);
@@ -240,9 +237,9 @@ int main(int argc, char** argv)
   image2d<rgb8> F = immerse_k1(f);
 
   typedef uint8 V;
-  image2d<V> r = transform(f, [](rgb8 x) -> V { return x[0]; });
-  image2d<V> g = transform(f, [](rgb8 x) -> V { return x[1]; });
-  image2d<V> b = transform(f, [](rgb8 x) -> V { return x[2]; });
+  image2d<V>    r = transform(f, [](rgb8 x) -> V { return x[0]; });
+  image2d<V>    g = transform(f, [](rgb8 x) -> V { return x[1]; });
+  image2d<V>    b = transform(f, [](rgb8 x) -> V { return x[2]; });
 
   /// Compute the marginal ToS
   tree_t trees[NTREE];
@@ -281,9 +278,9 @@ int main(int argc, char** argv)
   // }
 
   /// Compute the graph
-  Graph g2;
+  Graph                                                             g2;
   std::array<property_map<tree_t, Graph::vertex_descriptor>, NTREE> tlink;
-  std::tie(g2, tlink) = compute_g2(trees);
+  std::tie(g2, tlink)                                    = compute_g2(trees);
   property_map<tree_t, Graph::vertex_descriptor>& t1link = tlink[0];
   property_map<tree_t, Graph::vertex_descriptor>& t2link = tlink[1];
   property_map<tree_t, Graph::vertex_descriptor>& t3link = tlink[2];
@@ -303,7 +300,7 @@ int main(int argc, char** argv)
 
   // Save depth images
   {
-    auto gdepth = compute_graph_depth(g2);
+    auto              gdepth = compute_graph_depth(g2);
     image2d<unsigned> mindepth =
         write_vmap_to_image(g2, gmap, gdepth, (const unsigned& (*)(const unsigned&, const unsigned&))std::min<unsigned>,
                             value_traits<unsigned>::max());
@@ -346,7 +343,7 @@ int main(int argc, char** argv)
 
   // Save depth images
   {
-    auto gdepth = compute_graph_depth(g2);
+    auto              gdepth = compute_graph_depth(g2);
     image2d<unsigned> mindepth =
         write_vmap_to_image(g2, gmap, gdepth, (const unsigned& (*)(const unsigned&, const unsigned&))std::min<unsigned>,
                             value_traits<unsigned>::max());
@@ -378,7 +375,7 @@ int main(int argc, char** argv)
   for (int i = 2; i < argc; ++i)
   {
     unsigned grain = std::atoi(argv[i]);
-    auto gpred = [&, grain](Graph::vertex_descriptor v) {
+    auto     gpred = [&, grain](Graph::vertex_descriptor v) {
       return (glink[v][0] != t1.nend() and a1[glink[v][0]] > grain) or
              (glink[v][1] != t2.nend() and a2[glink[v][1]] > grain) or
              (glink[v][2] != t3.nend() and a3[glink[v][2]] > grain);

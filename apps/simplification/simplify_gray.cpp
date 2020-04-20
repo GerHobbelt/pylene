@@ -1,17 +1,16 @@
-#include <iostream>
+#include "simplify.hpp"
+#include <apps/tos/addborder.hpp>
 
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include <mln/core/algorithm/transform.hpp>
-
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-#include "simplify.hpp"
-#include <apps/tos/addborder.hpp>
+#include <iostream>
+
 
 void usage(char** argv)
 {
@@ -46,13 +45,13 @@ int main(int argc, char** argv)
   io::imread(argv[1], ima_);
   ima = addborder(ima_);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
 
   I f = transform(ima, [](uint8 v) -> V { return v * 2; });
 
-  image2d<V> K;
-  image2d<unsigned> parent;
+  image2d<V>            K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   std::tie(K, parent, S) = morpho::ToS(f, c4);

@@ -1,8 +1,8 @@
-#ifndef CURVATURE_HPP
-#define CURVATURE_HPP
+#pragma once
 
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
+
 
 namespace mln
 {
@@ -15,7 +15,7 @@ namespace mln
     extension::fill(ima, literal::zero);
 
     auto norm = [](const Vec& x) -> int { return std::abs(x[0] + x[1] + x[2]); };
-    auto sqr = [](int x) { return x * x; };
+    auto sqr  = [](int x) { return x * x; };
 
     image2d<float> curv;
     resize(curv, ima);
@@ -40,6 +40,4 @@ namespace mln
 
     return curv;
   }
-}
-
-#endif // ! CURVATURE_HPP
+} // namespace mln

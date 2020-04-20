@@ -1,11 +1,11 @@
-#ifndef SET_MEAN_ON_NODES_HPP
-#define SET_MEAN_ON_NODES_HPP
+#pragma once
 
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/trace.hpp>
 
 #include <vector>
+
 
 namespace mln
 {
@@ -44,7 +44,7 @@ namespace mln
 
     assert(ima.domain() == K.domain());
 
-    image2d<V> mean;
+    image2d<V>   mean;
     image2d<Acc> accus;
 
     resize(accus, ima);
@@ -92,7 +92,7 @@ namespace mln
 
     assert(ima.domain() == K.domain());
 
-    image2d<V> mean;
+    image2d<V>   mean;
     image2d<Acc> accus;
 
     resize(accus, ima);
@@ -125,6 +125,4 @@ namespace mln
     return mean;
   }
 
-} // end of namespce mln
-
-#endif // ! SET_MEAN_ON_NODES_HPP
+} // namespace mln

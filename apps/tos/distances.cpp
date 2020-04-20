@@ -1,16 +1,16 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/io/imread.hpp>
-
-#include <mln/accu/accumulators/max.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/shape_similarity.hpp>
 #include <apps/tos/utils.hpp>
 
-#include <map>
+#include <mln/accu/accumulators/max.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
+
+#include <map>
+
 
 void usage(char** argv)
 {
@@ -25,13 +25,13 @@ namespace mln
   image2d<V> add_border_and_interp_nn_x2(const image2d<V>& ima, const V& border_val)
   {
     box2d dom = ima.domain();
-    dom.pmax = (dom.pmax + 2) * 2 - 1;
+    dom.pmax  = (dom.pmax + 2) * 2 - 1;
 
     image2d<V> out(dom, 3, border_val);
     mln_foreach (const point2d& p, ima.domain())
     {
-      point2d q = 2 * (p + point2d{1, 1});
-      out(q) = ima(p);
+      point2d q                 = 2 * (p + point2d{1, 1});
+      out(q)                    = ima(p);
       out.at(q + point2d{0, 1}) = ima(p);
       out.at(q + point2d{1, 0}) = ima(p);
       out.at(q + point2d{1, 1}) = ima(p);
@@ -43,7 +43,7 @@ namespace mln
   image2d<uint8> labelize_uniq(const image2d<V>& ima)
   {
     std::map<V, uint8> map;
-    int nlabel = 0;
+    int                nlabel = 0;
 
     image2d<uint8> out;
     resize(out, ima);
@@ -58,7 +58,7 @@ namespace mln
 
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {
@@ -66,17 +66,17 @@ int main(int argc, char** argv)
     usage(argv);
 
   using namespace mln;
-  image2d<rgb8> ima;
+  image2d<rgb8>  ima;
   image2d<uint8> ref;
   io::imread(argv[1], ima);
   io::imread(argv[2], ref);
 
-  image2d<rgb8> ima_ = addborder(ima, lexicographicalorder_less<rgb8>());
-  image2d<uint8> f = add_border_and_interp_nn_x2(ref, value_traits<uint8>::max());
+  image2d<rgb8>  ima_ = addborder(ima, lexicographicalorder_less<rgb8>());
+  image2d<uint8> f    = add_border_and_interp_nn_x2(ref, value_traits<uint8>::max());
 
-  image2d<unsigned> K, K_;
+  image2d<unsigned>     K, K_;
   std::vector<unsigned> S, S_;
-  image2d<unsigned> parent, parent_;
+  image2d<unsigned>     parent, parent_;
   colorToSGrad(ima, K_, parent_, S_);
 
   std::tie(K, parent, S) = remove_01face_from_tos(K_, parent_, S_);

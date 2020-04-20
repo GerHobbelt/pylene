@@ -1,17 +1,18 @@
-#include <iostream>
-
-#include <mln/core/colors.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
 #include "simplify.hpp"
+
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/set_mean_on_nodes.hpp>
+
+#include <mln/core/colors.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+
+#include <iostream>
+
 
 void usage(char** argv)
 {
@@ -37,7 +38,7 @@ int main(int argc, char** argv)
   if (argc < 4)
     usage(argv);
 
-  int eps = std::atoi(argv[2]);
+  int   eps = std::atoi(argv[2]);
   float tol = argc >= 5 ? std::atof(argv[4]) : 1.0;
   //  int grainsize = argc >= 5 ? std::atoi(argv[4]) : 0;
   // float areafactor = argc >= 6 ? std::atof(argv[5]) : 0.0;
@@ -45,12 +46,12 @@ int main(int argc, char** argv)
   image2d<rgb8> ima_, ima;
   io::imread(argv[1], ima_);
 
-  image2d<unsigned> K;
-  image2d<unsigned> parent;
+  image2d<unsigned>     K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
   colorToSGrad(ima_, K, parent, S);
 
-  ima = interpolate_k1(addborder(ima_, lexicographicalorder_less<rgb8>()));
+  ima                = interpolate_k1(addborder(ima_, lexicographicalorder_less<rgb8>()));
   image2d<rgb8> mean = set_mean_on_node2(immerse_k1(ima), K, S, parent, K1::is_face_2);
   // image2d<rgb8> simp = simplify_top_down(unimmerse_k1(mean), K, parent, S, lambda); //, grainsize, areafactor);
   image2d<rgb8> simp = simplify_top_down_tolerance(unimmerse_k1(mean), K, parent, S, eps, tol);

@@ -1,9 +1,10 @@
-#ifndef REMOVE_PARENT_RELATION_HPP
-#define REMOVE_PARENT_RELATION_HPP
+#pragma once
 
 #include "types.hpp"
+
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/property_map/vector_property_map.hpp>
+
 
 namespace mln
 {
@@ -15,9 +16,9 @@ namespace mln
   {
 
     typedef typename Graph::vertex_descriptor vtype;
-    typedef typename Graph::edge_descriptor etype;
+    typedef typename Graph::edge_descriptor   etype;
 
-    typedef vec<vtype, 3> vec3v;
+    typedef vec<vtype, 3>             vec3v;
     boost::vector_property_map<vec3v> parent(boost::num_vertices(g));
 
     auto glink = boost::get(&graph_content::tlinks, g);
@@ -27,7 +28,10 @@ namespace mln
 
     struct viz : public boost::default_dfs_visitor
     {
-      viz(boost::vector_property_map<vec3v>& pmap) : parent(pmap) {}
+      viz(boost::vector_property_map<vec3v>& pmap)
+        : parent(pmap)
+      {
+      }
 
       /// Initialize with the root node
       void initialize_vertex(vtype v, const Graph&) { parent[v] = vec3v{v, v, v}; }
@@ -86,7 +90,7 @@ namespace mln
     // Update the senc of the graph
     {
       auto senc = boost::get(&graph_content::senc, g);
-      BOOST_FOREACH (typename Graph::vertex_descriptor v, boost::vertices(g))
+      BOOST_FOREACH(typename Graph::vertex_descriptor v, boost::vertices(g))
       {
         for (int k = 0; k < 3; ++k)
           senc[v][k] = (glink[v][k].id() != tree_t::npos()) ? glink[v][k].id() : glink[parent[v][k]][k].id();
@@ -94,13 +98,13 @@ namespace mln
     }
 
     // Update now the trees
-    tree_t* trees[3] = {&t1, &t2, &t3};
+    tree_t*  trees[3]  = {&t1, &t2, &t3};
     tlink_t* tlinks[3] = {&t1link, &t2link, &t3link};
 
     for (int k = 0; k < 3; ++k)
     {
       tlink_t& tlink = *(tlinks[k]);
-      tree_t& tree = *(trees[k]);
+      tree_t&  tree  = *(trees[k]);
 
       auto data = tree._get_data();
 
@@ -113,7 +117,7 @@ namespace mln
         tree_t::node_type x = *cur;
         cur.next();
 
-        vtype par = parent[tlink[x]][k];
+        vtype             par    = parent[tlink[x]][k];
         tree_t::node_type newpar = glink[par][k];
 
         // std::cout << tlink[x.id()] << " (" << x.id() << ")"
@@ -127,7 +131,7 @@ namespace mln
 
           // Remove the node (...)
           // 1. From the dble-linked list prev/next
-          data->m_nodes[x.get_prev_node_id()].m_next = x.get_next_sibling_id();
+          data->m_nodes[x.get_prev_node_id()].m_next    = x.get_next_sibling_id();
           data->m_nodes[x.get_next_sibling_id()].m_prev = x.get_prev_node_id();
           // 2. From the next_sibling tree
           // std::cout << "Remove: Updating next sibling" << std::endl;
@@ -139,10 +143,10 @@ namespace mln
           // 1. set parent
           data->m_nodes[x.id()].m_parent = newpar.id();
           // 2. insert in the dble-linked list prev/next
-          data->m_nodes[lastnode.id()].m_next = newpar.get_next_node_id();
+          data->m_nodes[lastnode.id()].m_next             = newpar.get_next_node_id();
           data->m_nodes[newpar.get_next_node_id()].m_prev = lastnode.id();
-          data->m_nodes[x.id()].m_prev = newpar.id();
-          data->m_nodes[newpar.id()].m_next = x.id();
+          data->m_nodes[x.id()].m_prev                    = newpar.id();
+          data->m_nodes[newpar.id()].m_next               = x.id();
           // 3. update the next-sibling relation
           tree_t::vertex_id_t nexts = lastnode.get_next_node_id();
           // std::cout << "Insert: Updating next sibling" << std::endl;
@@ -152,6 +156,4 @@ namespace mln
       }
     }
   }
-}
-
-#endif // ! REMOVE_PARENT_RELATION_HPP
+} // namespace mln

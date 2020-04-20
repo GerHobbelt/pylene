@@ -1,37 +1,37 @@
-#include <mln/core/colors.hpp>
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/accu/accumulators/infsup.hpp>
-#include <mln/core/algorithm/accumulate.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-#include <mln/morpho/tos/immerse.hpp>
-
-#include <apps/tos/addborder.hpp>
-
-#include <boost/dynamic_bitset.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-
 #include "cuts.hpp"
 #include "export.hpp"
 #include "make_graph.hpp"
 #include "relation.hpp"
 #include "shape.hpp"
 
+#include <apps/tos/addborder.hpp>
+
+#include <mln/accu/accumulators/infsup.hpp>
+#include <mln/core/algorithm/accumulate.hpp>
+#include <mln/core/colors.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imprint.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/tos/private/immersion.hpp>
+
+#include <boost/dynamic_bitset.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
+
+
 using namespace boost::numeric;
 
 struct params_t
 {
-  bool addborder = true;
-  bool immerse = false;
-  int subquant = 0;
-  bool display = false;
-  bool stat = false;
-  int export_format = 0; // FMT_IMAGE;
-  bool filter = false;
+  bool             addborder     = true;
+  bool             immerse       = false;
+  int              subquant      = 0;
+  bool             display       = false;
+  bool             stat          = false;
+  int              export_format = 0; // FMT_IMAGE;
+  bool             filter        = false;
   std::vector<int> filtersizes;
 
   std::string export_filename;
@@ -74,9 +74,9 @@ void showstat(const ublas::triangular_matrix<bool, ublas::upper>& mat)
   int n = mat.size1();
 
   std::vector<bool> isleaf(n, true);
-  std::vector<int> profmax(n, 0);
-  std::vector<int> profmin(n, 0);
-  int nleaves = n;
+  std::vector<int>  profmax(n, 0);
+  std::vector<int>  profmin(n, 0);
+  int               nleaves = n;
 
   const auto M = trans(mat); // mat = included   M = includes
 
@@ -115,8 +115,8 @@ void showstat(const ublas::triangular_matrix<bool, ublas::upper>& mat)
   for (int i = 0; i < 6; ++i)
     std::cout << "  Nombre de noeuds avec " << i << " parent(s): " << npar[i] << std::endl;
 
-  float n_ = n;
-  auto sqr = [](float x) { return x * x; };
+  float n_  = n;
+  auto  sqr = [](float x) { return x * x; };
 
   {
     unsigned s = 0, s_2 = 0;
@@ -165,8 +165,8 @@ void filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_m
   // sup2(x) = arg min y { d(x,y) | x R y }
   std::vector<unsigned> supvec2(vshapes.size(), -1);
   {
-    auto dist = [](rgb8 x, rgb8 y) { return l1norm(x - y); };
-    supvec[n - 1] = n - 1;
+    auto dist      = [](rgb8 x, rgb8 y) { return l1norm(x - y); };
+    supvec[n - 1]  = n - 1;
     supvec2[n - 1] = n - 1;
     ublas::vector<int> anc(n);
     for (int i = 0; i < n - 1; ++i)
@@ -232,7 +232,7 @@ void filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_m
       --i;
     while (i >= 0)
     {
-      levels[i] = levels[supvec[i]];
+      levels[i]  = levels[supvec[i]];
       levels2[i] = levels2[supvec2[i]];
       --i;
     }
@@ -240,17 +240,17 @@ void filter_graph(const std::vector<shape_t>& vshapes, const ublas::triangular_m
     mln_foreach (point2d p, f.domain())
     {
       unsigned x = phi(p);
-      out(p) = levels[x];
+      out(p)     = levels[x];
     }
-    copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
+    mln::copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
     io::imsave(tmp, (boost::format("out-anc-%05i.tiff") % grain).str().c_str());
 
     mln_foreach (point2d p, f.domain())
     {
       unsigned x = phi(p);
-      out(p) = levels2[x];
+      out(p)     = levels2[x];
     }
-    copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
+    mln::copy(out | box2d(f.domain().pmin + point2d{1, 1}, f.domain().pmax - point2d{1, 1}), tmp);
     io::imsave(out, (boost::format("out-cp-%05i.tiff") % grain).str().c_str());
   }
 }
@@ -260,14 +260,14 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
              LowerCompare cmp_1 = LowerCompare(), UpperCompare cmp_2 = UpperCompare())
 {
   using namespace mln;
-  typedef rgb8 Vec;
+  typedef rgb8  Vec;
   image2d<rgb8> f;
 
   // 1.Subquantize
   if (params.subquant)
   {
     resize(f, ima);
-    copy(ima / params.subquant, f);
+    mln::copy(ima / params.subquant, f);
   }
   else
   {
@@ -281,18 +281,17 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
   // 3. Interpolate
 
   // 4. Immerse
-  image2d<morpho::tos::irange<Vec>> F;
-  box2d dom = f.domain();
+  image2d<morpho::ToS::impl::irange<Vec>> F;
+  box2d                                   dom = f.domain();
   if (params.immerse)
   {
-    F = morpho::tos::internal::immerse(f, rng_porder_less<Vec>());
+    F   = morpho::ToS::impl::immerse(f, rng_porder_less<Vec>());
     dom = F.domain();
   }
 
   // 5. Compute Inf/sup
-  rgb8 vmin, vmax;
+  rgb8                            vmin, vmax;
   typedef productorder_less<rgb8> Compare;
-  Compare mycmp;
   std::tie(vmin, vmax) = accumulate(f, accu::accumulators::infsup<rgb8, Compare>());
 
   // Compute value set of inf/sup
@@ -306,12 +305,12 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
     mln_foreach (rgb8 x, f.values())
       valset.set(rgb2idx(x));
 
-    bool has_insert = true;
-    unsigned nval = valset.count();
+    bool     has_insert = true;
+    unsigned nval       = valset.count();
 
     boost::dynamic_bitset<> newsupset = valset;
     boost::dynamic_bitset<> newinfset = valset;
-    boost::dynamic_bitset<> initset = valset;
+    boost::dynamic_bitset<> initset   = valset;
     boost::dynamic_bitset<> tmp(1 << 24);
     while (has_insert)
     {
@@ -321,7 +320,7 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
       {
         tmp.reset();
         int sz = newinfset.count();
-        int k = 0;
+        int k  = 0;
 
         for (auto x = newinfset.find_first(); x != newinfset.npos; x = newinfset.find_next(x))
         {
@@ -349,7 +348,7 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
       {
         tmp.reset();
         int sz = newsupset.count();
-        int k = 0;
+        int k  = 0;
 
         for (auto x = newsupset.find_first(); x != newsupset.npos; x = newsupset.find_next(x))
         {
@@ -389,7 +388,7 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
 
   // 6. Compute shapes
   typedef shape<Vec, LowerCompare, UpperCompare> shape_t;
-  shape_set<shape_t> shapes;
+  shape_set<shape_t>                             shapes;
 
   int k = 0;
   // auto diff = (vmax-vmin+1);
@@ -422,9 +421,9 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
   std::vector<shape_t> vshapes;
   vshapes.reserve(shapes.size());
   {
-    auto it1 = shapes.begin();
+    auto it1   = shapes.begin();
     auto itend = shapes.end();
-    auto it2 = std::back_inserter(vshapes);
+    auto it2   = std::back_inserter(vshapes);
     for (; it1 != itend; ++it1, ++it2)
     {
       *it2 = std::move<shape_t>(const_cast<shape_t&&>(*it1));
@@ -451,7 +450,7 @@ void compute(const mln::image2d<mln::rgb8>& ima, const params_t& params = params
   {
     std::cout << "=============== Inclusions ====================" << std::endl;
     std::hash<shape_t> h;
-    int sz = vshapes.size();
+    int                sz = vshapes.size();
     for (int i = 0; i < sz; ++i)
       for (int j = i + 1; j < sz; ++j)
         if (mat(i, j))
@@ -537,7 +536,7 @@ int main(int argc, char** argv)
     params.export_format = FMT_IMAGE;
     if (!vm.count("export-dir"))
     {
-      fs::path p = vm["export-filename"].as<std::string>();
+      fs::path p        = vm["export-filename"].as<std::string>();
       params.export_dir = (p.parent_path() /= p.stem()).native() + std::string("-shapes/");
     }
 
@@ -545,10 +544,10 @@ int main(int argc, char** argv)
       fs::create_directories(params.export_dir);
   }
 
-  typedef rgb8 Vec;
-  typedef morpho::tos::irange<Vec> R;
-  image2d<rgb8> ima;
-  image2d<R> f;
+  typedef rgb8                           Vec;
+  typedef morpho::ToS::impl::irange<Vec> R;
+  image2d<rgb8>                          ima;
+  image2d<R>                             f;
 
   std::string filename = vm["input"].as<std::string>();
   io::imread(filename.c_str(), ima);

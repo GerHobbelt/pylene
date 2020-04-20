@@ -1,19 +1,21 @@
+#include "thicken.hpp"
+#include "addborder.hpp"
+#include "topology.hpp"
+
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include "addborder.hpp"
-#include "thicken.hpp"
-#include "topology.hpp"
-#include <boost/format.hpp>
-#include <libgen.h>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/filtering.hpp>
 #include <mln/morpho/maxtree_ufind_parallel.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+#include <libgen.h>
+
 
 void usage(int argc, char** argv)
 {
@@ -35,8 +37,8 @@ namespace mln
                               const std::vector<unsigned>& S, FilterFun pred)
   {
     typedef rgb<unsigned> SumType;
-    image2d<SumType> sum;
-    image2d<unsigned> count;
+    image2d<SumType>      sum;
+    image2d<unsigned>     count;
     resize(count, K).init(0);
     resize(sum, K).init(SumType());
 
@@ -56,7 +58,7 @@ namespace mln
     image2d<V> out;
     resize(out, ima);
     unsigned p = S[0];
-    out[p] = sum[p] / count[p];
+    out[p]     = sum[p] / count[p];
     for (unsigned p : S)
     {
       unsigned q = parent[p];
@@ -71,7 +73,7 @@ namespace mln
     }
     return out;
   }
-}
+} // namespace mln
 
 int main(int argc, char** argv)
 {
@@ -84,17 +86,17 @@ int main(int argc, char** argv)
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
-  I rr = addborder(r);
-  I gg = addborder(g);
-  I bb = addborder(b);
+  I                  r  = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g  = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b  = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  rr = addborder(r);
+  I                  gg = addborder(g);
+  I                  bb = addborder(b);
 
-  image2d<V> rK, gK, bK;
-  image2d<unsigned> rparent, gparent, bparent;
+  image2d<V>            rK, gK, bK;
+  image2d<unsigned>     rparent, gparent, bparent;
   std::vector<unsigned> rS, gS, bS;
 
   std::tie(rK, rparent, rS) = morpho::ToS(rr, c4);
@@ -116,8 +118,8 @@ int main(int argc, char** argv)
     });
 
   //++io::imprint(area);
-  image2d<unsigned> K;
-  image2d<unsigned> parent;
+  image2d<unsigned>     K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   bool use_tos = argv[1] == std::string("tos");
@@ -127,14 +129,14 @@ int main(int argc, char** argv)
   else
     K = area, std::tie(parent, S) = morpho::impl::serial::maxtree_ufind(area, c8, std::greater<unsigned>());
 
-  auto ima2 = addborder(ima, lexicographicalorder_less<rgb8>()); // add border with median w.r.t < lexico
+  auto          ima2 = addborder(ima, lexicographicalorder_less<rgb8>()); // add border with median w.r.t < lexico
   image2d<rgb8> tmp;
   resize(tmp, parent).init(rgb8{0, 0, 255});
 
   point2d strides = use_tos ? point2d{4, 4} : point2d{2, 2};
   copy(ima2, tmp | sbox2d(tmp.domain().pmin, tmp.domain().pmax, strides));
 
-  auto w = thicken_tdn(K, parent, S, c8);
+  auto          w = thicken_tdn(K, parent, S, c8);
   image2d<rgb8> out;
   if (use_tos)
     out = setmean_on_nodes(tmp, w, parent, S, K2::is_face_2);

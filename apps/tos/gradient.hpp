@@ -1,9 +1,9 @@
-#ifndef GRADIENT_HPP
-#define GRADIENT_HPP
+#pragma once
 
 #include <mln/core/canvas/accfpfn.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/win2d.hpp>
+
 
 namespace mln
 {
@@ -11,7 +11,7 @@ namespace mln
   template <typename T>
   struct Minmax : Accumulator<Minmax<T>>
   {
-    typedef T argument_type;
+    typedef T               argument_type;
     typedef std::pair<T, T> result_type;
 
     void init()
@@ -39,6 +39,4 @@ namespace mln
     rect2d win = make_rectangle2d(size, size);
     return accfpfn(ima, win, true, Minmax<T>(), [](const Minmax<T>& a) -> T { return a.max - a.min; });
   }
-}
-
-#endif // ! GRADIENT_HPP
+} // namespace mln

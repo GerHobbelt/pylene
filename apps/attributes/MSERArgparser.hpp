@@ -1,12 +1,15 @@
-#ifndef APPS_ATTRIBUTES_MSERARGPARSER_HPP
-#define APPS_ATTRIBUTES_MSERARGPARSER_HPP
+#pragma once
 
 #include "MSER.hpp"
 #include "argparser.hpp"
+
 #include <apps/tos/topology.hpp>
+
 #include <boost/program_options/errors.hpp>
 #include <boost/program_options/variables_map.hpp>
+
 #include <string>
+
 
 class MSERArgParser : public AttributeArgParser
 {
@@ -32,7 +35,7 @@ mln::image2d<float> MSERArgParser::run(const boost::program_options::variables_m
                                        const mln::image2d<T>& K, const mln::image2d<unsigned>& parent,
                                        const std::vector<unsigned>& S)
 {
-  std::string smode = vm["mode"].as<std::string>();
+  std::string     smode = vm["mode"].as<std::string>();
   eMSER_attribute mode;
   if (smode == "MSER_DIFF")
     mode = MSER_DIFF;
@@ -43,8 +46,8 @@ mln::image2d<float> MSERArgParser::run(const boost::program_options::variables_m
   else
     throw boost::program_options::invalid_option_value("MSER mode");
 
-  float a0 = vm["a0"].as<float>();
-  float a1 = vm["a1"].as<float>();
+  float a0    = vm["a0"].as<float>();
+  float a1    = vm["a1"].as<float>();
   float delta = vm["delta"].as<float>();
 
   mln::image2d<float> amser = compute_MSER_attribute(f, K, parent, S, delta, mode);
@@ -66,5 +69,3 @@ mln::image2d<float> MSERArgParser::run(const boost::program_options::variables_m
   });
   return eval(attr);
 }
-
-#endif // ! APPS_ATTRIBUTES_MSERARGPARSER_HPP

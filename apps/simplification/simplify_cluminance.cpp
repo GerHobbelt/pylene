@@ -1,20 +1,20 @@
-#include <iostream>
+#include "simplify.hpp"
 
+#include <apps/tos/Kinterpolate.hpp>
+#include <apps/tos/addborder.hpp>
+#include <apps/tos/set_mean_on_nodes.hpp>
+
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include <mln/core/algorithm/transform.hpp>
-
-#include <apps/tos/Kinterpolate.hpp>
-#include <apps/tos/set_mean_on_nodes.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
 
-#include "simplify.hpp"
-#include <apps/tos/addborder.hpp>
+#include <iostream>
+
 
 void usage(char** argv)
 {
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   if (argc < 4)
     usage(argv);
 
-  int eps = std::atoi(argv[2]);
+  int   eps = std::atoi(argv[2]);
   float tol = argc >= 5 ? std::atof(argv[4]) : 1.0;
 
   image2d<rgb8> ori, ori_;
@@ -50,19 +50,19 @@ int main(int argc, char** argv)
   image2d<uint8> ima_, ima;
   ima = transform(ori, [](const rgb8& v) -> uint8 { return (v[0] + v[1] + v[2]) / 3; });
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
 
   I f = transform(ima, [](uint8 v) -> V { return v * 2; });
 
-  image2d<V> K;
-  image2d<unsigned> parent;
+  image2d<V>            K;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   std::tie(K, parent, S) = morpho::ToS(f, c4);
 
   // image2d<uint8> simp = simplify_bottom_up(ima, K, parent, S, lambda, grainsize, areafactor);
-  image2d<rgb8> mean = set_mean_on_node2(immerse_k1(ori), K, S, parent, K1::is_face_2);
+  image2d<rgb8> mean  = set_mean_on_node2(immerse_k1(ori), K, S, parent, K1::is_face_2);
   image2d<rgb8> simp2 = simplify_top_down_tolerance(unimmerse_k1(mean), K, parent, S, eps, tol);
 
   // io::imsave(simp, argv[3]);

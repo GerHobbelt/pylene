@@ -1,104 +1,124 @@
 cmake_minimum_required(VERSION 3.8.2)
-project(MILENA)
+project(Pylene)
 
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-find_package(Boost 1.42 COMPONENTS program_options REQUIRED)
+
+if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
+  include("${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
+  conan_set_rpath()
+  conan_set_std()
+  conan_set_fpic()
+  conan_check_compiler()
+  conan_set_libcxx()
+  conan_set_vs_runtime()
+endif()
+
+
+if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+  include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+endif ()
+
+find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)
 
+
+
+# CONFIGURE COMPILER LAUNCHERS
+
+option(USE_CCACHE "Use ccache as compiler launcher" ON)
+option(USE_DISTCC "Use ccache as compiler launcher" OFF)
+
+if (USE_CCACHE AND USE_DISTCC)
+  message(FATAL_ERROR "You can't use both distcc and ccache at the same time. Please choose either one.")
+endif (USE_CCACHE AND USE_DISTCC)
+
+# ccache
+if (USE_CCACHE)
+  find_program(CCACHE_FOUND ccache)
+  if (CCACHE_FOUND)
+    message(STATUS "ccache found")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+  endif (CCACHE_FOUND)
+endif (USE_CCACHE)
+
+# distcc
+if (USE_DISTCC)
+  find_program(DISTCC_FOUND distcc)
+  if (DISTCC_FOUND)
+    message(STATUS "distcc found")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE distcc)
+    # distcc doesn't offload the linker
+    # set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK distcc)
+  endif (DISTCC_FOUND)
+endif (USE_DISTCC)
+
+
 # CONFIGURATION OPTIONS
-set(MLN_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
-
-# Proper project creation
-set(MLN_INCLUDE_DIR "${PROJECT_SOURCE_DIR}")
-if(MSVC OR APPLE)
-  #dummy static project not linked anywere needed so that a vcxproj is generated with the sources in the solution
-  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-  file(GLOB_RECURSE MLN_SOURCES  "${MLN_INCLUDE_DIR}/*.hpp")
-  add_library(Mln_srcs EXCLUDE_FROM_ALL STATIC ${MLN_SOURCES})
-  set_target_properties(Mln_srcs PROPERTIES LINKER_LANGUAGE CXX)
-  # target_compile_features(Mln_srcs PUBLIC cxx_std_14)
-  target_include_directories(Mln_srcs PUBLIC ${MLN_INCLUDE_DIR})
-  source_group(TREE ${MLN_INCLUDE_DIR} FILES ${MLN_SOURCES})
-endif()
-
-add_library(Mln INTERFACE)
-target_include_directories(Mln INTERFACE ${MLN_INCLUDE_DIR})
-
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(${FreeImage_INCLUDE_DIRS})
-link_directories(${FreeImage_LIBRARY_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
-
-if (TBB_FOUND AND MLN_USE_TBB)
-  include_directories(${TBB_INCLUDE_DIRS})
-  link_directories(${TBB_LIBRARY_DIRS})
-  link_libraries(${TBB_LIBRARIES})
-else()
-  set(MLN_USE_TBB OFF)
-  add_definitions(-DMLN_NO_TBB)
-endif()
-
-if (UNIX AND NOT APPLE)
-   link_libraries(rt)
-endif()
+option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
+option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 
 # Compiler configurations
-target_compile_features(Mln INTERFACE cxx_std_17)
-
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-  add_compile_options("-Wextra" "-Wall" "-Werror")
+  add_compile_options(
+    "-Wextra"
+    "-Wall"
+    "-Werror"
+    )
 endif()
-
 
 #### MSVC Compiler Configuration
 if (MSVC)
-  ## This hack is for Ninja generator from VS CODE
-  string(REGEX REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  ##
-
+  #string(REGEX REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   add_compile_options("/wd4458" # masque le membre de classe
                       "/wd4456" # masque la déclaration locale précédente
                       "/wd5030" # l'attribut 'noinline' n'est pas reconnu
                       "/wd4457" # la déclaration de '?' masque le paramètre de fonction
-  )
-
-  add_compile_options("/WX" "/W4" "/wd4244" "/wd4127" "/permissive-")
+                      "/wd4996" # '...': was declared deprecated
+                      )
+  add_compile_options("/WX" "/W3" "/wd4244" "/wd4127" "/permissive-")
   add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
   add_compile_definitions(_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
   add_compile_definitions(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-endif(MSVC)
+endif (MSVC)
 
 
 # default buidling type
 if (NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type selected, default to Release")
   set(CMAKE_BUILD_TYPE "Release")
-endif()
+endif ()
 
-
-# Testing
-ENABLE_TESTING()
 
 #### Configuration of the Compiler ###
-# set BOOST to use variadic macros
-add_definitions(-D BOOST_PP_VARIADICS=1)
-
-
 
 # Subdirectories
-add_subdirectory(doc EXCLUDE_FROM_ALL)
-add_subdirectory(tests EXCLUDE_FROM_ALL)
-if (PYLENE_BUILD_BENCHMARKS)
-  add_subdirectory(bench EXCLUDE_FROM_ALL)
-endif()
-add_subdirectory(apps EXCLUDE_FROM_ALL)
-add_subdirectory(cli EXCLUDE_FROM_ALL)
+add_subdirectory(pylene)
+
+if (NOT PYLENE_BUILD_LIBS_ONLY)
+  add_custom_target(build-fixtures)
+  add_subdirectory(fixtures)
+
+  if (PYLENE_BUILD_TESTING)
+    include(CTest)
+    add_custom_target(build-tests)
+    add_subdirectory(tests)
+  endif()
+
+  if (PYLENE_BUILD_BENCHMARKS)
+    add_custom_target(build-bench)
+    add_subdirectory(bench)
+  endif ()
+
+  add_custom_target(build-doc)
+  add_subdirectory(doc)
+endif ()
+
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")

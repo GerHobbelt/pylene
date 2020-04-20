@@ -1,57 +1,152 @@
 stages:
     - build
     - test
+    - bench
     - deploy
 
-image: carlinet/buildimage
+cache:
+    paths:
+        - .cache/conan/data
 
+variables:
+    FEDORA_RAWHIDE: "${CI_REGISTRY}/olena/pylene-dockers/fedora-rawhide"
+    FEDORA_31: "${CI_REGISTRY}/olena/pylene-dockers/fedora-31"
+    PACKAGE_NAME: "pylene"                                                      # Conan package name
+    PACKAGE_TAG: "stable"                                                       # Conan tag
+    PACKAGE_VERSION: "head"                                                     # Version to build
+    CMAKE_BUILD_PARALLEL_LEVEL: 6
+    CONAN_USER: "lrde"
+
+before_script:
+        - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
+
+########
+# Test #
+########
+
+windows-debug:
+    before_script:
+        - conan config set storage.path="${env:CI_PROJECT_DIR}\.cache\conan\data"
+        - Invoke-BatchFile -Path "${env:VCVAR2019}" -Parameters "${env:ARCH}"
+    stage: build
+    script:
+        - mkdir build; cd build
+        - conan install .. -s build_type=Debug --build missing
+        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+        - cmake --build . --target build-tests
+        - ctest -L UnitTests --schedule-random --output-on-failure
+    dependencies: []
+    artifacts:
+        reports:
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
+        expire_in: 1 week
+    tags: [ windows ]
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+        - when: manual
+    variables:
+        VCVAR2019: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat'
+        ARCH: x64
 
 .job-build-linux-base: &distcheck-linux-base
-    stage: test
-    script:
-        - mkdir build && cd build
-        - cmake .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DPYLENE_BUILD_BENCHMARKS=OFF
-        - cmake --build . --target check
-
-
-distcheck-linux-gcc-release:
-    <<: *distcheck-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
-
-distcheck-linux-clang-release:
-    <<: *distcheck-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-
-distcheck-linux-gcc-debug:
-    <<: *distcheck-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-
-distcheck-linux-clang-debug:
-    <<: *distcheck-linux-base
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-
-build-doc-images:
     stage: build
     script:
         - mkdir build && cd build
-        - cmake .. -DCMAKE_BUILD_TYPE=Release -DPYLENE_BUILD_BENCHMARKS=OFF
-        - cmake --build . --target build-images
+        - conan install .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
+        - cmake --build . --target Pylene
+        - cmake --build . --target build-tests
+        - ctest -L UnitTests --schedule-random --output-on-failure
+    dependencies: []
+    artifacts:
+        reports:
+            junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
+        expire_in: 1 week
+
+# Msan not available for gcc. It requires instrumented libstdc++ and instrumented thirdparties so it is disabled for now.
+# No tsan because no multithreaded code for now
+# Asan, memsan and tsan are incompatible with each other within the same binary
+# Asan and ubsan can work together
+
+
+distcheck-linux-gcc9-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_31}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+        ASAN: "OFF"
+        MSAN: "OFF"
+        UBSAN: "OFF"
+
+distcheck-linux-gcc9-debug-asan-ubsan:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_31}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
+
+
+distcheck-linux-coverage:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_31}
+    after_script:
+        - mkdir coverage
+        - gcovr --root pylene build -s --xml cobertura --html-details coverage/index.html
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+        CXXFLAGS: "-fprofile-arcs -ftest-coverage"
+        CFLAGS: "-fprofile-arcs -ftest-coverage"
     artifacts:
         paths:
-            - doc/source/images
-        expire_in: 2 days
+            - coverage/
+        reports:
+            cobertura: cobertura
+        expire_in: 1 week
+    coverage: '/lines: \d+\.\d+\%/'
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+        - when: manual
+
+#########
+# Bench #
+#########
+
+.job-bench-linux-base: &distbench-linux-base
+    stage: bench
+    script:
+        - mkdir build && cd build
+        - conan install .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - cmake --build . --target fetch-external-data
+        - cmake --build . --target build-bench
+        - cmake --build . --target run-all-benchmarks
+        - ctest -L SpeedTests -V
+    tags: [ "pylene-benchmarks" ]
+    when: manual
+    dependencies: []
+    artifacts:
+        name: "benchmark-results"
+        paths:
+            - build/bench/*.json
+        expire_in: 1 week
+
+distbench-linux-gcc9-release:
+    <<: *distbench-linux-base
+    image: ${FEDORA_31}
+    variables:
+        CXX: "g++"
+        CC: "gcc"
+
 
 
 #################
@@ -59,14 +154,17 @@ build-doc-images:
 #################
 
 .documentation-base:  &documentation-base
-    stage: test
+    image: ${FEDORA_31}
+    stage: build
     script:
-        - cd doc
-        - doxygen
-        - sphinx-build -b html source ../public
+        - mkdir build && cd build
+        - conan install -u .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - cmake --build . --target build-doc
+        - mkdir ../public && mv doc/sphinx/* ../public/
     artifacts:
         name: "documentation"
-        expire_in: 2 days
+        expire_in: 1 week
         paths:
             - public/
 
@@ -74,10 +172,26 @@ build-doc-images:
 documentation:
     <<: *documentation-base
     except:
-    - dev
+        - dev
 
-# Deploy
+
+##########
+# Deploy #
+##########
+
 pages:
     <<: *documentation-base
     only:
-    - dev
+        - dev
+
+package:
+    image: ${FEDORA_31}
+    stage: deploy
+    dependencies: []
+    script:
+        - mkdir build && cd build
+        - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
+        - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development/cpp20"

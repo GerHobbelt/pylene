@@ -1,8 +1,8 @@
-#ifndef MAXTREE1D_HPP
-#define MAXTREE1D_HPP
+#pragma once
 
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
+
 
 namespace mln
 {
@@ -14,12 +14,12 @@ namespace mln
     void maxtree1d(const image2d<V>& ima, image2d<point2d>& parent, int row, StrictWeakOrdering cmp)
     {
       static const int nvalues = 1 << value_traits<V>::quant;
-      point2d p = ima.domain().pmin;
-      p[0] = row;
+      point2d          p       = ima.domain().pmin;
+      p[0]                     = row;
 
-      int ncols = ima.ncols();
+      int     ncols = ima.ncols();
       point2d stack[nvalues];
-      int sz = 0;
+      int     sz   = 0;
       point2d prec = p;
       ++p[1];
       for (int i = 1; i < ncols; ++i, ++p[1])
@@ -28,9 +28,9 @@ namespace mln
         if (cmp(ima(prec), ima(p))) // ima(prec) < ima(p) => start new component
         {
           // std::cout << "  Push: " << prec << "in stack." << std::endl;
-          stack[sz++] = prec;
+          stack[sz++]  = prec;
           parent(prec) = prec;
-          prec = p;
+          prec         = p;
         }
         else if (not cmp(ima(p), ima(prec))) // ima(p) == ima(prec) => extend component
         {
@@ -44,7 +44,7 @@ namespace mln
             // std::cout << "  Pop: " <<  stack[sz-1] << " from stack." << std::endl;
             // std::cout << "  Attach: " << prec << " @ " << stack[sz-1]  << std::endl;
             parent(prec) = stack[sz - 1];
-            prec = stack[sz - 1];
+            prec         = stack[sz - 1];
             --sz;
           }
           // we have ima(p) <= ima(prec)
@@ -52,7 +52,7 @@ namespace mln
           {
             // std::cout << "  Attach: " << prec << " @ " << p << std::endl;
             parent(prec) = p;
-            prec = p;
+            prec         = p;
           }
           else // ima(p) == ima(prec) => attach p to prec (canonization)
           {
@@ -68,15 +68,9 @@ namespace mln
         // std::cout << "  Pop: " <<  stack[sz-1] << " from stack." << std::endl;
         // std::cout << "  Attach: " << prec << " @ " << stack[sz-1]  << std::endl;
         parent(prec) = stack[sz - 1];
-        prec = stack[sz - 1];
+        prec         = stack[sz - 1];
         --sz;
       }
     }
-  }
-}
-
-#ifndef MLN_INCLUDE_ONLY
-
-#endif // ! MLN_INCLUDE_ONLY
-
-#endif // ! MAXTREE1D_HPP
+  } // namespace morpho
+} // namespace mln

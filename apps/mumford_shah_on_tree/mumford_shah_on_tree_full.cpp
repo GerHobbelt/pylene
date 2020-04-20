@@ -1,28 +1,28 @@
-#include <mln/core/image/image2d.hpp>
-#include <mln/core/neighb2d.hpp>
-
-#include <mln/morpho/component_tree/accumulate.hpp>
-#include <mln/morpho/component_tree/compute_depth.hpp>
-#include <mln/morpho/component_tree/reconstruction.hpp>
-#include <mln/morpho/tos/ctos.hpp>
-
-#include <tbb/parallel_for.h>
-#include <tbb/task_scheduler_init.h>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <boost/graph/dag_shortest_paths.hpp>
-#include <boost/graph/transpose_graph.hpp>
-#include <boost/property_map/function_property_map.hpp>
-#include <mln/core/dontcare.hpp>
-
 #include "mumford_shah_on_tree.hpp"
+
 #include <apps/g2/compute_g2.hpp>
 #include <apps/g2/satmaxtree.hpp>
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/croutines.hpp>
+
+#include <mln/core/utils/dontcare.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/core/neighb2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/component_tree/accumulate.hpp>
+#include <mln/morpho/component_tree/compute_depth.hpp>
+#include <mln/morpho/component_tree/reconstruction.hpp>
+#include <mln/morpho/tos/tos.hpp>
+
+#include <boost/graph/dag_shortest_paths.hpp>
+#include <boost/graph/transpose_graph.hpp>
+#include <boost/property_map/function_property_map.hpp>
+
+#include <tbb/parallel_for.h>
+#include <tbb/task_scheduler_init.h>
+
 
 // Compute the depth attribute of each graph node
 boost::vector_property_map<unsigned> compute_graph_depth(const MyGraph& g)
@@ -32,10 +32,10 @@ boost::vector_property_map<unsigned> compute_graph_depth(const MyGraph& g)
   boost::vector_property_map<unsigned> depth(boost::num_vertices(g));
 
   auto one = [](mln::dontcare_t) -> int { return 1; };
-  auto w = boost::make_function_property_map<MyGraph::edge_descriptor, int, decltype(one)>(one);
+  auto w   = boost::make_function_property_map<MyGraph::edge_descriptor, int, decltype(one)>(one);
 
   MyGraph::vertex_descriptor root = boost::vertex(0, g);
-  depth[root] = 0;
+  depth[root]                     = 0;
 
   MyGraph gT;
   boost::transpose_graph(g, gT);
@@ -55,9 +55,9 @@ void write_vmap_to_image(const tree_t* t, const tlink_t* tlink, const ValueMap& 
     unsigned w = 0;
     for (int i = 0; i < NTREE; ++i)
     {
-      tree_t::node_type tnode = t[i].get_node_at(px.index());
+      tree_t::node_type          tnode = t[i].get_node_at(px.index());
       MyGraph::vertex_descriptor gnode = tlink[i][tnode];
-      w = std::max(w, vmap[gnode]);
+      w                                = std::max(w, vmap[gnode]);
     }
     px.val() = w;
   }
@@ -90,12 +90,12 @@ mln::morpho::component_tree<P, mln::image2d<P>>
   unsigned j = 0;
   for (unsigned i = 0; i < olddata->m_S.size(); ++i)
   {
-    P p = olddata->m_S[i];
+    P       p  = olddata->m_S[i];
     point2d pt = olddata->m_pmap.point_at_index(p);
     if (K1::is_face_2(pt))
     {
       newdata->m_S[j] = newdata->m_pmap.index_of_point(pt / 2);
-      auto node = tree.get_node_at(p);
+      auto node       = tree.get_node_at(p);
       if (node.get_first_point_id() == i)
         newdata->m_nodes[node.id()].m_point_index = j;
       ++j;
@@ -110,22 +110,24 @@ mln::morpho::component_tree<P, mln::image2d<P>>
 void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0]
-            << " input[rgb] α₀ α₁ λ output[rgb]\n"
+            << " input[rgb] α₀ α₁ λ output[rgb] [output[uint16]]\n"
                "α₀\tGrain filter size before merging trees (0 to disable)\n"
                "α₁\tGrain filter size on the color ToS (0 to disable)\n"
-               "λ\tMumford-shah regularisation weight (e.g. 5000)\n";
+               "λ\tMumford-shah regularisation weight (e.g. 5000)\n"
+               "Ex.\n"
+            << argv[0] << " input.jpg 30 30 6000 simp.tiff label.tiff\n";
   std::exit(1);
 }
 
 int main(int argc, char** argv)
 {
-  if (argc < 5)
+  if (argc < 6)
     usage(argv);
 
-  const char* input_path = argv[1];
-  int a0 = std::atoi(argv[2]);
-  int a1 = std::atoi(argv[3]);
-  int lambda = std::atoi(argv[4]);
+  const char* input_path  = argv[1];
+  int         a0          = std::atoi(argv[2]);
+  int         a1          = std::atoi(argv[3]);
+  int         lambda      = std::atoi(argv[4]);
   const char* output_path = argv[5];
 
   tbb::task_scheduler_init init;
@@ -146,7 +148,7 @@ int main(int argc, char** argv)
     // 1. Compute the marginal ToS and filter them if necessary.
     tree_t t[NTREE];
     tbb::parallel_for(0, (int)NTREE, [&t, &f, a0](int i) {
-      t[i] = morpho::cToS(imtransform(f, [i](value_t x) { return x[i]; }), c4);
+      t[i] = morpho::tos(imtransform(f, [i](value_t x) { return x[i]; }));
       if (a0 > 0)
       {
         grain_filter_inplace(t[i], a0);
@@ -155,13 +157,13 @@ int main(int argc, char** argv)
     });
 
     // 2. Compute the Gos.
-    MyGraph g2;
+    MyGraph                                                                      g2;
     std::array<property_map<tree_t, typename MyGraph::vertex_descriptor>, NTREE> tlink;
     std::tie(g2, tlink) = compute_g2<NTREE>(t);
 
     // 3. Compute the depth image
-    boost::vector_property_map<unsigned> gdepth = compute_graph_depth(g2);
-    image2d<uint16> imdepth = imchvalue<uint16>(F);
+    boost::vector_property_map<unsigned> gdepth  = compute_graph_depth(g2);
+    image2d<uint16>                      imdepth = imchvalue<uint16>(F);
 
     write_vmap_to_image(t, &tlink[0], gdepth, imdepth);
 
@@ -170,7 +172,7 @@ int main(int argc, char** argv)
 
     // 4. Compute the saturated maxtree
     std::tie(T, std::ignore) = satmaxtree(imdepth);
-    T = tree_keep_2F(T);
+    T                        = tree_keep_2F(T);
   }
 
   // Mumford-shah + simplification
@@ -184,7 +186,25 @@ int main(int argc, char** argv)
 
     std::cout << "Simplification (number of llines): " << std::endl;
     mumford_shah_on_tree(T, F, lambda);
-    F = Kadjust_to(F, ima.domain());
-    io::imsave(F, output_path);
+    auto output = Kadjust_to(F, ima.domain());
+    io::imsave(output, output_path);
+  }
+
+
+  // Output label image
+  {
+    if (argc > 6)
+    {
+      image2d<uint16>              lbl;
+      property_map<tree_t, uint16> lblmap(T);
+
+      unsigned i = 1;
+      mln_foreach (auto x, T.nodes())
+        lblmap[x] = i++;
+
+      resize(lbl, F);
+      morpho::reconstruction(T, lblmap, lbl);
+      io::imsave(lbl, argv[6]);
+    }
   }
 }

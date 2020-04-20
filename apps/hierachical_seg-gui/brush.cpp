@@ -1,7 +1,11 @@
 #include "brush.hpp"
-#include <QtGui>
-#include <iostream>
+
 #include <mln/io/imsave.hpp>
+
+#include <QtGui>
+
+#include <iostream>
+
 
 inline void brush(QPixmap* pixmap, const QPointF& position, QColor color, int r)
 {
@@ -13,10 +17,15 @@ inline void brush(QPixmap* pixmap, const QPointF& position, QColor color, int r)
   painter.drawEllipse(rectangle);
 }
 
-MyBrush::MyBrush(mln::qt::ImageViewer* viewer,
+MyBrush::MyBrush(mln::qt::ImageViewer*                                                         viewer,
                  std::function<void(const mln::image2d<mln::rgb8>&, mln::image2d<mln::rgb8>&)> callback)
-    : m_viewer(viewer), m_callback(callback), m_scene(viewer->getScene()), m_pixmap(viewer->getPixmap()),
-      m_ima(m_pixmap->pixmap()), m_active(false), m_radius(5)
+  : m_viewer(viewer)
+  , m_callback(callback)
+  , m_scene(viewer->getScene())
+  , m_pixmap(viewer->getPixmap())
+  , m_ima(m_pixmap->pixmap())
+  , m_active(false)
+  , m_radius(5)
 {
   m_ori = mln::clone(viewer->getView());
 }
@@ -39,13 +48,13 @@ bool MyBrush::eventFilter(QObject* obj, QEvent* ev)
 void MyBrush::setColor1()
 {
   m_active = true;
-  m_color = Qt::red;
+  m_color  = Qt::red;
 }
 
 void MyBrush::setColor2()
 {
   m_active = true;
-  m_color = Qt::blue;
+  m_color  = Qt::blue;
 }
 
 void MyBrush::setRadius(int k)

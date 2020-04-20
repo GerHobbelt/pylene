@@ -1,17 +1,17 @@
-#ifndef MLN_APPS_SALIENCY_CLOSURE_HPP
-#define MLN_APPS_SALIENCY_CLOSURE_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 
+
 template <typename V, class Compare = std::less<unsigned>>
-mln::image2d<float>
-area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
-           const std::vector<unsigned>& S, unsigned lambda, Compare cmp = Compare());
+mln::image2d<float> area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K,
+                               const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, unsigned lambda,
+                               Compare cmp = Compare());
 
 template <typename V, class Compare = std::less<float>>
-mln::image2d<float>
-height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
-             const std::vector<unsigned>& S, float lambda, Compare cmp = Compare());
+mln::image2d<float> height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K,
+                                 const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, float lambda,
+                                 Compare cmp = Compare());
 
 /************************/
 /** Implementation     **/
@@ -24,7 +24,7 @@ namespace internal
   {
     static constexpr unsigned UNDEF = -1;
 
-    unsigned first_child = UNDEF;
+    unsigned first_child  = UNDEF;
     unsigned next_sibling = UNDEF;
   };
 
@@ -85,17 +85,17 @@ namespace internal
   }
 
 #endif
-}
+} // namespace internal
 
 template <typename V, class Compare>
-mln::image2d<float>
-area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
-           const std::vector<unsigned>& S, unsigned lambda, Compare cmp)
+mln::image2d<float> area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K,
+                               const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, unsigned lambda,
+                               Compare cmp)
 {
   using namespace mln;
 
   image2d<::internal::child_t> childs = ::internal::getchilds(K, parent, S);
-  std::vector<unsigned> nodes = ::internal::getnodes(K, parent, S);
+  std::vector<unsigned>        nodes  = ::internal::getnodes(K, parent, S);
 
   std::sort(nodes.begin(), nodes.end(), [cmp, &attr](unsigned x, unsigned y) { return cmp(attr[x], attr[y]); });
 
@@ -109,11 +109,11 @@ area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const mln:
   for (unsigned x : nodes)
   {
     // make set
-    par[x] = x;
+    par[x]  = x;
     area[x] = 1;
 
     unsigned cchild = childs[x].first_child;
-    unsigned n = parent[x];
+    unsigned n      = parent[x];
 
     do // foreach neighbor n in tree topo
     {
@@ -156,14 +156,14 @@ area_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const mln:
 }
 
 template <typename V, class Compare>
-mln::image2d<float>
-height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const mln::image2d<unsigned>& parent,
-             const std::vector<unsigned>& S, float lambda, Compare cmp)
+mln::image2d<float> height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K,
+                                 const mln::image2d<unsigned>& parent, const std::vector<unsigned>& S, float lambda,
+                                 Compare cmp)
 {
   using namespace mln;
 
   image2d<::internal::child_t> childs = ::internal::getchilds(K, parent, S);
-  std::vector<unsigned> nodes = ::internal::getnodes(K, parent, S);
+  std::vector<unsigned>        nodes  = ::internal::getnodes(K, parent, S);
 
   std::sort(nodes.begin(), nodes.end(), [cmp, &attr](unsigned x, unsigned y) { return cmp(attr[x], attr[y]); });
 
@@ -171,18 +171,18 @@ height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const ml
   static const unsigned UNDEF = ::internal::child_t::UNDEF;
 
   image2d<unsigned> par;
-  image2d<float> minimum;
+  image2d<float>    minimum;
   resize(par, K).init(UNDEF);
   resize(minimum, K);
 
   for (unsigned x : nodes)
   {
     // make set
-    par[x] = x;
+    par[x]     = x;
     minimum[x] = attr[x];
 
     unsigned cchild = childs[x].first_child;
-    unsigned n = parent[x];
+    unsigned n      = parent[x];
 
     float clevel = attr[x];
 
@@ -195,7 +195,7 @@ height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const ml
         {
           if (std::abs(clevel - minimum[r]) < lambda) // r should be filtered
           {
-            par[r] = x;
+            par[r]     = x;
             minimum[x] = std::min(minimum[x], minimum[r], cmp);
           }
           else
@@ -225,5 +225,3 @@ height_close(const mln::image2d<float>& attr, const mln::image2d<V>& K, const ml
 
   return out;
 }
-
-#endif // ! MLN_APPS_SALIENCY_CLOSURE_HPP

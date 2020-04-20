@@ -20,12 +20,12 @@ External dependancies:
 [FreeImage](www.freeimage.sourceforge.net) (only for IO)
 
 # Status
-* GCC 8.2.0
-* Clang 6.0.1
-* MSVC 15.8.1
+* GCC 9+ with -fconcepts
+* ~~Clang~~
+* MSVC 2019
 
-[![pipeline status](https://gitlab.lrde.epita.fr/olena/pylene/badges/dev/pipeline.svg)](https://gitlab.lrde.epita.fr/olena/pylene/commits/dev)
-
+[![pipeline status](https://gitlab.lrde.epita.fr/olena/pylene/badges/development/cpp20/pipeline.svg)](https://gitlab.lrde.epita.fr/olena/pylene/-/commits/development/cpp20)
+[![coverage report](https://gitlab.lrde.epita.fr/olena/pylene/badges/development/cpp20/coverage.svg)](https://gitlab.lrde.epita.fr/olena/pylene/-/commits/development/cpp20)
 
 
 # Documentation

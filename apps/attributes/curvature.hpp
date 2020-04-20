@@ -1,9 +1,11 @@
-#ifndef APPS_ATTRIBUTE_CURVATURE_HPP
-#define APPS_ATTRIBUTE_CURVATURE_HPP
+#pragma once
 
+#include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
+#include <mln/core/image/view/operators.hpp>
 #include <mln/core/trace.hpp>
+
 
 namespace mln
 {
@@ -52,8 +54,8 @@ namespace mln
                      ima.at(p + point2d{1, 1}) - 2 * ima.at(p) - 2 * ima.at(p + point2d{0, 1})) /
                     2.0;
 
-        float den = (sqr(ux) + sqr(uy));
-        point2d p_ = p * 2 + point2d{0, 1};
+        float   den = (sqr(ux) + sqr(uy));
+        point2d p_  = p * 2 + point2d{0, 1};
         if (den != 0)
           curv.at(p_) = std::abs(uxx * sqr(uy) - 2 * uxy * ux * uy + uyy * sqr(ux)) / (den * std::sqrt(den));
         else
@@ -79,8 +81,8 @@ namespace mln
                      ima.at(p + point2d{1, 1})) /
                     2.0;
 
-        float den = (sqr(ux) + sqr(uy));
-        point2d p_ = p * 2 + point2d{1, 0};
+        float   den = (sqr(ux) + sqr(uy));
+        point2d p_  = p * 2 + point2d{1, 0};
         if (den != 0)
           curv.at(p_) = std::abs(uxx * sqr(uy) - 2 * uxy * ux * uy + uyy * sqr(ux)) / (den * std::sqrt(den));
         else
@@ -88,9 +90,10 @@ namespace mln
       }
     }
 
-    mln_postcondition(all(curv >= 0));
+    using namespace mln::view::ops;
+
+    mln_postcondition(all_of(curv >= 0));
+
     return curv;
   }
-}
-
-#endif // ! APPS_ATTRIBUTE_CURVATURE_HPP
+} // namespace mln

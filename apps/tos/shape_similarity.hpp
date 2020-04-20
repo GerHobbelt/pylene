@@ -1,9 +1,10 @@
-#ifndef SHAPE_SIMILARITY_HPP
-#define SHAPE_SIMILARITY_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/morpho/saturate.hpp>
+
 #include <vector>
+
 
 namespace mln
 {
@@ -85,6 +86,4 @@ namespace mln
 
     return std::accumulate(covery.begin(), covery.end(), 0.0);
   }
-}
-
-#endif // ! SHAPE_SIMILARITY_HPP
+} // namespace mln

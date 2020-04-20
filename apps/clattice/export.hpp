@@ -1,17 +1,19 @@
-#ifndef EXPORT_HPP
-#define EXPORT_HPP
+#pragma once
+
+#include "shape.hpp"
+
+#include <mln/io/png/imsave.hpp>
 
 #include <boost/format.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "shape.hpp"
 #include <fstream>
-#include <mln/io/png/imsave.hpp>
+
 
 enum e_output_mode
 {
   FMT_CLUSTER = 0x01, // Outout shape as a cluster where each point is a node
-  FMT_IMAGE = 0x02,   // Output shape as an image
+  FMT_IMAGE   = 0x02, // Output shape as an image
   FMT_SUMMARY = 0x04  // Only summary (i.e for cluster only representant)
 };
 
@@ -48,7 +50,7 @@ std::string export_shape_as_cluster(int id, const shape_t& shp, std::ostream& do
   dotsream << "  subgraph cluster" << id << "{" << std::endl << "label=\"" << shp << "\";" << std::endl;
 
   // Add shape points to the cluster
-  bool has_repr = false;
+  bool         has_repr = false;
   mln::point2d repr;
   for (const mln::point2d& p : shp.pset())
     if (!deja_vu(p))
@@ -57,7 +59,7 @@ std::string export_shape_as_cluster(int id, const shape_t& shp, std::ostream& do
         dotsream << '"' << p << '"' << " [style=filled, color=\".3 .7 1.\"]" << std::endl;
       if (!has_repr)
       {
-        repr = p;
+        repr     = p;
         has_repr = true;
       }
     }
@@ -118,7 +120,7 @@ template <typename shape_t, typename V>
 void save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vector<shape_t>& shapes,
                 const mln::image2d<V>& ima, const std::string& filename, const std::string& dirname)
 {
-  std::ofstream file(filename);
+  std::ofstream      file(filename);
   mln::image2d<bool> deja_vu;
   mln::resize(deja_vu, ima).init(false);
 
@@ -143,5 +145,3 @@ void save_graph(const boost::numeric::ublas::matrix<bool>& mat, const std::vecto
         file << "  \"" << repr[i] << "\" -> \"" << repr[j] << "\";" << std::endl;
   file << "}";
 }
-
-#endif // ! EXPORT_HPP

@@ -31,8 +31,8 @@ Computing the tree
 
 The are basically three functions:
 
-* :cpp:func:`mln::morpho::maxtree_indexes`
-* :cpp:func:`mln::morpho::mintree_indexes`
+* :cpp:func:`mln::morpho::maxtree`
+* :cpp:func:`mln::morpho::mintree`
 * :cpp:func:`mln::morpho::tos`
 
 
@@ -42,10 +42,10 @@ The are basically three functions:
    #include <mln/io/imread.hpp>
    #include <mln/morpho/maxtree/maxtree.hpp>
 
-   using namespace mln;
-   image2d<uint8> f;
-   io::imread(f, "lena.pgm");
-   auto tree = morpho::maxtree_indexes(f, c4);
+
+   mln::image2d<uint8> f;
+   mln::io::imread("lena.pgm", f);
+   auto tree = mln::morpho::maxtree(f, c4);
 
 
 Morphological tree structures
@@ -311,7 +311,7 @@ A complete example
 
 Filtering the square roadsigns.
 
-.. image:: /snipsets/images/roadsigns.png
+.. image:: /snippets/images/roadsigns.png
 
 Method description
 ^^^^^^^^^^^^^^^^^^
@@ -370,7 +370,7 @@ The method will proceed as follows:
 
 It gives the following result:
 
-.. image:: /snipsets/images/roadsigns-square.png
+.. image:: /snippets/images/roadsigns-square.png
 
 
 Which is not bad but not perfect. Roadsigns have a high contrast
@@ -392,13 +392,13 @@ levels with average gray level of the shape::
 
 Result:
 
-.. image:: /snipsets/images/roadsigns-square-2.png
+.. image:: /snippets/images/roadsigns-square-2.png
 
 
 Full code
 ^^^^^^^^^
 
-.. literalinclude:: /snipsets/component_tree_1.cpp
+.. literalinclude:: /snippets/component_tree_1.cpp
 
 
 

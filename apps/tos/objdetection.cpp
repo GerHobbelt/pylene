@@ -1,17 +1,17 @@
-#include <mln/core/image/image2d.hpp>
-
-#include <mln/io/imread.hpp>
-#include <mln/io/imsave.hpp>
-
-#include <mln/core/algorithm/paste.hpp>
-
 #include <apps/tos/Kinterpolate.hpp>
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/colorToSGrad.hpp>
 #include <apps/tos/mumford_shah.hpp>
 #include <apps/tos/objdetection.hpp>
 #include <apps/tos/set_mean_on_nodes.hpp>
+
+#include <mln/core/algorithm/paste.hpp>
+#include <mln/core/image/image2d.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+
 #include <boost/format.hpp>
+
 
 namespace mln
 {
@@ -130,7 +130,7 @@ namespace mln
   }
   */
 
-} // end of mln
+} // namespace mln
 
 namespace mln
 {
@@ -147,7 +147,7 @@ namespace mln
         out[x] = x;
     return out;
   }
-}
+} // namespace mln
 void usage(char** argv)
 {
   std::cout << "Usage: " << argv[0] << " input(color) output[wo ext] lambda [lambda_2...]" << std::endl
@@ -173,11 +173,11 @@ int main(int argc, char** argv)
   // auto f = interpolate_median(ima, UInt<9> ());
 
   image2d<rgb8> ima_ = addborder(ima, lexicographicalorder_less<rgb8>());
-  image2d<rgb8> f = interpolate_k1(ima_);
+  image2d<rgb8> f    = interpolate_k1(ima_);
 
-  image2d<unsigned> K;
+  image2d<unsigned>     K;
   std::vector<unsigned> S;
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
 
   image2d<rgb8> out, final;
   resize(out, K);
@@ -188,13 +188,13 @@ int main(int argc, char** argv)
   {
     colorToSGrad_with_mintree(ima, K, parent, S);
 
-    image2d<float> energy = compute_energy(f, K, parent, S);
-    image2d<unsigned> ids = make_unique_id(K, parent, S);
+    image2d<float>    energy = compute_energy(f, K, parent, S);
+    image2d<unsigned> ids    = make_unique_id(K, parent, S);
 
     for (int i = 3; i < argc; ++i)
     {
-      int lambda = std::atoi(argv[i]);
-      auto cIds = clone(ids);
+      int  lambda  = std::atoi(argv[i]);
+      auto cIds    = clone(ids);
       auto cParent = clone(parent);
       auto cEnergy = clone(energy);
 
@@ -202,7 +202,7 @@ int main(int argc, char** argv)
       out = set_mean_on_node(f, cIds, S, cParent, K1::is_face_2);
 
       {
-        box2d d = out.domain();
+        box2d  d = out.domain();
         sbox2d sub_domain{{2, 2}, {d.pmax[0] - 2, d.pmax[1] - 2}, {2, 2}};
         copy(out | sub_domain, final);
       }
@@ -224,8 +224,8 @@ int main(int argc, char** argv)
 
     for (int i = 3; i < argc; ++i)
     {
-      int lambda = std::atoi(argv[i]);
-      auto cIds = clone(ids);
+      int  lambda  = std::atoi(argv[i]);
+      auto cIds    = clone(ids);
       auto cParent = clone(parent);
       auto cEnergy = clone(energy);
 

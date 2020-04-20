@@ -24,32 +24,32 @@
 
 set(QWT_FOUND "NO")
 
-if(QT4_FOUND)
+if (QT4_FOUND)
 
   find_path(QWT_INCLUDE_DIR qwt_plot_renderer.h
-    /usr/local/qwt/include
-    /usr/local/include
-    /usr/include/qwt
-    /usr/include/qwt-qt4
-    /usr/include)
+            /usr/local/qwt/include
+            /usr/local/include
+            /usr/include/qwt
+            /usr/include/qwt-qt4
+            /usr/include)
 
   set(QWT_NAMES ${QWT_NAMES} qwt qwt-qt4 libqwt libqwt-qt4)
 
   find_library(QWT_LIBRARY
-    NAMES ${QWT_NAMES}
-    PATHS /usr/local/qwt/lib /usr/local/lib /usr/lib)
+               NAMES ${QWT_NAMES}
+               PATHS /usr/local/qwt/lib /usr/local/lib /usr/lib)
 
-  if(QWT_LIBRARY)
+  if (QWT_LIBRARY)
     set(QWT_LIBRARIES ${QWT_LIBRARY})
     set(QWT_FOUND "YES")
-    
+
     if (CYGWIN)
-      if(NOT BUILD_SHARED_LIBS)
+      if (NOT BUILD_SHARED_LIBS)
         set(QWT_DEFINITIONS -DQWT_STATIC)
-      endif(NOT BUILD_SHARED_LIBS)
-    endif(CYGWIN)
-    
-  endif(QWT_LIBRARY)
-endif(QT4_FOUND)
+      endif (NOT BUILD_SHARED_LIBS)
+    endif (CYGWIN)
+
+  endif (QWT_LIBRARY)
+endif (QT4_FOUND)
 
 mark_as_advanced(QWT_INCLUDE_DIR QWT_LIBRARY QWT_DIR)

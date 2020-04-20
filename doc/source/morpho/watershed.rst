@@ -7,7 +7,7 @@ Include :file:`<mln/morpho/watershed.hpp>`
 
 
 .. cpp:function::  template <class Label_t, class I, class N> \
-                   ch_value_t<I, Label_t> watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel)
+                   image_ch_value_t<I, Label_t> watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel)
 
    Watershed by immersion as defined in [BM92]_. The catchment basins are
    labeled from 1 to n, and the special label 0 is used for watershed lines.
@@ -48,7 +48,7 @@ Example 1: Cell segmentation
 3. Watershed segmentation
 4. Input labelization w.r.t in segmentation labels
 
-.. literalinclude:: /snipsets/blobs_watershed.cpp
+.. literalinclude:: /snippets/blobs_watershed.cpp
    :start-after: BEGIN
    :end-before: END
 

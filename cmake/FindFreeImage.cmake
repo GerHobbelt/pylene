@@ -1,85 +1,63 @@
 # Find the FreeImage library.
 #
-# This module defines
-#  FreeImage_FOUND             - True if FreeImage was found.
-#  FreeImage_INCLUDE_DIRS      - Include directories for FreeImage headers.
-#  FreeImage_LIBRARIES         - Libraries for FreeImage.
+# Once done this will define
+#  FreeImage_FOUND - System has FreeImage
+#  FreeImage_INCLUDE_DIRS - The FreeImage include directories
+#  FreeImage_LIBRARIES - The libraries needed to use FreeImage
+#  FreeImage_DEFINITIONS - Compiler switches required for using FreeImage
 #
-# To specify an additional directory to search, set FreeImage_ROOT.
-#
-# Copyright (c) 2010, Ewen Cheslack-Postava
-# Based on FindSQLite3.cmake by:
-#  Copyright (c) 2006, Jaroslaw Staniek, <js@iidea.pl>
-#  Extended by Siddhartha Chaudhuri, 2008.
-#
-# Redistribution and use is allowed according to the terms of the BSD license.
-#
+# It also creates the IMPORTED target: FreeImage::FreeImage
 
-SET(FreeImage_FOUND FALSE)
-SET(FreeImage_INCLUDE_DIRS)
-SET(FreeImage_LIBRARIES)
-
-SET(SEARCH_PATHS
-  $ENV{ProgramFiles}/freeimage/include
-  $ENV{SystemDrive}/freeimage/include
-  $ENV{ProgramFiles}/freeimage
-  $ENV{SystemDrive}/freeimage
+find_path(FreeImage_INCLUDE_DIR NAMES FreeImage.h)
+find_library(FreeImage_LIBRARY_RELEASE NAMES FreeImage freeimage)
+find_library(FreeImage_LIBRARY_DEBUG
+  NAMES FreeImaged FreeImage_d FreeImage-debug
+  PATH_SUFFIXES debug
   )
-IF(FreeImage_ROOT)
-  SET(SEARCH_PATHS
-    ${FreeImage_ROOT}
-    ${FreeImage_ROOT}/include
-    ${SEARCH_PATHS}
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(FreeImage  DEFAULT_MSG
+                                  FreeImage_LIBRARY_RELEASE
+                                  FreeImage_INCLUDE_DIR)
+
+
+
+mark_as_advanced(FreeImage_INCLUDE_DIR
+                 FreeImage_LIBRARY_DEBUG
+                 FreeImage_LIBRARY_RELEASE)
+
+set(FreeImage_LIBRARY "")
+if (FreeImage_LIBRARY_DEBUG)
+    list(APPEND FreeImage_LIBRARY debug ${FreeImage_LIBRARY_DEBUG})
+endif()
+if (FreeImage_LIBRARY_RELEASE)
+    list(APPEND FreeImage_LIBRARY optimized ${FreeImage_LIBRARY_RELEASE})
+endif()
+
+set(FreeImage_INCLUDE_DIRS ${FreeImage_INCLUDE_DIR})
+set(FreeImage_LIBRARIES ${FreeImage_LIBRARY})
+
+if(FreeImage_FOUND)
+  if (NOT TARGET FreeImage::FreeImage)
+    add_library(FreeImage::FreeImage UNKNOWN IMPORTED)
+  endif()
+  if (FreeImage_LIBRARY_RELEASE)
+    set_property(TARGET FreeImage::FreeImage APPEND PROPERTY
+      IMPORTED_CONFIGURATIONS RELEASE
     )
-ENDIF()
-
-FIND_PATH(FreeImage_INCLUDE_DIRS
-  NAMES FreeImage.h
-  PATHS ${SEARCH_PATHS}
-  NO_DEFAULT_PATH)
-IF(NOT FreeImage_INCLUDE_DIRS)  # now look in system locations
-  FIND_PATH(FreeImage_INCLUDE_DIRS NAMES FreeImage.h)
-ENDIF(NOT FreeImage_INCLUDE_DIRS)
-
-SET(FreeImage_LIBRARY_DIRS)
-IF(FreeImage_ROOT)
-  SET(FreeImage_LIBRARY_DIRS ${FreeImage_ROOT})
-  IF(EXISTS "${FreeImage_ROOT}/lib")
-    SET(FreeImage_LIBRARY_DIRS ${FreeImage_LIBRARY_DIRS} ${FreeImage_ROOT}/lib)
-  ENDIF()
-  IF(EXISTS "${FreeImage_ROOT}/lib/static")
-    SET(FreeImage_LIBRARY_DIRS ${FreeImage_LIBRARY_DIRS} ${FreeImage_ROOT}/lib/static)
-  ENDIF()
-ENDIF()
-
-# FreeImage
-# Without system dirs
-FIND_LIBRARY(FreeImage_LIBRARY
-  NAMES freeimage
-  PATHS ${FreeImage_LIBRARY_DIRS}
-  NO_DEFAULT_PATH
+    set_target_properties(FreeImage::FreeImage PROPERTIES
+      IMPORTED_LOCATION_RELEASE "${FreeImage_LIBRARY_RELEASE}"
+    )
+  endif()
+  if (FreeImage_LIBRARY_DEBUG)
+    set_property(TARGET FreeImage::FreeImage APPEND PROPERTY
+      IMPORTED_CONFIGURATIONS DEBUG
+    )
+    set_target_properties(FreeImage::FreeImage PROPERTIES
+      IMPORTED_LOCATION_DEBUG "${FreeImage_LIBRARY_DEBUG}"
+    )
+  endif()
+  set_target_properties(FreeImage::FreeImage PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${FreeImage_INCLUDE_DIR}"
   )
-IF(NOT FreeImage_LIBRARY)  # now look in system locations
-  FIND_LIBRARY(FreeImage_LIBRARY NAMES freeimage)
-ENDIF(NOT FreeImage_LIBRARY)
-
-SET(FreeImage_LIBRARIES)
-IF(FreeImage_LIBRARY)
-  SET(FreeImage_LIBRARIES ${FreeImage_LIBRARY})
-ENDIF()
-
-
-IF(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
-  SET(FreeImage_FOUND TRUE)
-  IF(NOT FreeImage_FIND_QUIETLY)
-    MESSAGE(STATUS "Found FreeImage: headers at ${FreeImage_INCLUDE_DIRS}, libraries at ${FreeImage_LIBRARY_DIRS} :: ${FreeImage_LIBRARIES}")
-  ENDIF(NOT FreeImage_FIND_QUIETLY)
-ELSE(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
-  SET(FreeImage_FOUND FALSE)
-  IF(FreeImage_FIND_REQUIRED)
-    MESSAGE(FATAL_ERROR "FreeImage not found")
-  ELSE(FreeImage_FIND_REQUIRED)
-    MESSAGE(STATUS "FreeImage not found")
-  ENDIF(FreeImage_FIND_REQUIRED)
-ENDIF(FreeImage_INCLUDE_DIRS AND FreeImage_LIBRARIES)
-MARK_AS_ADVANCED(FreeImage_INCLUDE_DIRS FreeImage_LIBRARIES)
+endif()

@@ -1,1 +1,0 @@
-add_core_test(UTTransform_chamfer_distance_transform chamfer_distance_transform.cpp)

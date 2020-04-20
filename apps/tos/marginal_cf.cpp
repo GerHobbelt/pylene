@@ -1,16 +1,19 @@
+#include "addborder.hpp"
+#include "topology.hpp"
+
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/grays.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
-
-#include "addborder.hpp"
-#include "topology.hpp"
-#include <boost/format.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/tos/tos.hpp>
+
+#include <boost/format.hpp>
+
 #include <stack>
+
 
 namespace mln
 {
@@ -23,7 +26,7 @@ namespace mln
     resize(area, K);
     for (int i = S.size() - 1; i >= 0; --i)
     {
-      unsigned p = S[i];
+      unsigned p  = S[i];
       unsigned rp = K[p] == K[parent[p]] ? parent[p] : p;
 
       if (K1::is_face_2(K.point_at_index(p)))
@@ -40,7 +43,7 @@ namespace mln
 
   image2d<rgb8> setmask_with_mean(const image2d<rgb8>& ima, const image2d<uint8>& mask)
   {
-    static constexpr unsigned PROCESSED = value_traits<unsigned>::max();
+    static constexpr unsigned PROCESSED   = value_traits<unsigned>::max();
     static constexpr unsigned UNPROCESSED = 0;
 
     image2d<unsigned> lbl;
@@ -53,8 +56,8 @@ namespace mln
     queue_.reserve(sz);
 
     std::stack<unsigned, std::vector<unsigned>> q(std::move(queue_));
-    std::vector<rgb<unsigned>> sum_(sz + 1, rgb<unsigned>{0, 0, 0});
-    std::vector<unsigned> count_(sz + 1, 0);
+    std::vector<rgb<unsigned>>                  sum_(sz + 1, rgb<unsigned>{0, 0, 0});
+    std::vector<unsigned>                       count_(sz + 1, 0);
 
     mln_pixter(px, lbl);
     auto didx = wrt_delta_index(mask, c4.dpoints);
@@ -66,7 +69,7 @@ namespace mln
         if (px->val() == UNPROCESSED)
         {
           unsigned i = px->index();
-          uint8 v = mask[i];
+          uint8    v = mask[i];
           if (mask[i] == 0)
           {
             lbl[i] = 0;
@@ -111,10 +114,9 @@ namespace mln
 
     return out;
   }
-}
+} // namespace mln
 
-void
-usage(int argc, char** argv)
+void usage(int argc, char** argv)
 {
   if (argc < 4)
   {
@@ -123,37 +125,36 @@ usage(int argc, char** argv)
   }
 }
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   using namespace mln;
 
   usage(argc, argv);
 
   std::string filename = argv[1];
-  std::string stem = argv[2];
+  std::string stem     = argv[2];
 
   image2d<rgb8> ima;
   io::imread(filename, ima);
 
-  typedef UInt<9> V;
+  typedef UInt<9>    V;
   typedef image2d<V> I;
-  I r = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
-  I g = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
-  I b = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
-  I rr = addborder(r);
-  I gg = addborder(g);
-  I bb = addborder(b);
+  I                  r  = transform(ima, [](rgb8 v) -> V { return v[0] * 2; });
+  I                  g  = transform(ima, [](rgb8 v) -> V { return v[1] * 2; });
+  I                  b  = transform(ima, [](rgb8 v) -> V { return v[2] * 2; });
+  I                  rr = addborder(r);
+  I                  gg = addborder(g);
+  I                  bb = addborder(b);
 
-  image2d<V> rK, gK, bK;
-  image2d<unsigned> rparent, gparent, bparent;
+  image2d<V>            rK, gK, bK;
+  image2d<unsigned>     rparent, gparent, bparent;
   std::vector<unsigned> rS, gS, bS;
 
   std::tie(rK, rparent, rS) = morpho::ToS(rr, c4);
   std::tie(gK, gparent, gS) = morpho::ToS(gg, c4);
   std::tie(bK, bparent, bS) = morpho::ToS(bb, c4);
 
-  auto bima = addborder(ima);
+  auto    bima = addborder(ima);
   point2d strides{2, 2};
   for (int i = 3; i < argc; ++i)
   {

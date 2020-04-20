@@ -1,12 +1,13 @@
+#include "dispsaliency.hpp"
+
 #include <apps/tos/addborder.hpp>
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/io/imread.hpp>
-
-#include "dispsaliency.hpp"
 #include <mln/io/imsave.hpp>
 
-int
-main(int argc, char** argv)
+
+int main(int argc, char** argv)
 {
   if (argc < 2)
   {
@@ -18,8 +19,8 @@ main(int argc, char** argv)
   }
 
   QApplication a(argc, argv);
-  const char* s_input = argv[1];
-  const char* s_input_2 = NULL;
+  const char*  s_input   = argv[1];
+  const char*  s_input_2 = NULL;
 
   if (argc == 3)
     s_input_2 = argv[2];
@@ -42,7 +43,7 @@ main(int argc, char** argv)
     }
     ref = addborder(ref, lexicographicalorder_less<rgb8>());
 
-    point2d sz = smap.domain().shape();
+    point2d sz  = smap.domain().shape();
     point2d sz2 = ref.domain().shape();
     if (sz != (sz2 * 2 - 1))
       throw std::runtime_error("Domains have invalid size");

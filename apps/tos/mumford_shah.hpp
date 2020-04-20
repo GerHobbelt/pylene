@@ -1,13 +1,14 @@
-#ifndef MUMFORD_SHAH_HPP
-#define MUMFORD_SHAH_HPP
+#pragma once
 
 #include "topology.hpp"
+
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/wrt_offset.hpp>
 #include <mln/io/imprint.hpp>
+
 
 namespace mln
 {
@@ -50,7 +51,7 @@ namespace mln
     auto sum(const V& x) -> typename std::enable_if<!std::is_scalar<V>::value, decltype(x[0] + x[0])>::type
     {
       typedef decltype(x[0] + x[0]) R;
-      R s = x[0];
+      R                             s = x[0];
       for (int i = 1; i < V::ndim; ++i)
         s += x[i];
       return s;
@@ -73,28 +74,28 @@ namespace mln
     template <typename V>
     struct energy_t
     {
-      typedef typename energy_helper<V>::sum_type sum_type;
+      typedef typename energy_helper<V>::sum_type     sum_type;
       typedef typename energy_helper<V>::sum_sqr_type sum_sqr_type;
 
       static constexpr const float alpha = 1;
-      static constexpr const float beta = 100;
+      static constexpr const float beta  = 100;
 
-      bool dejavu = false;
-      int depth = -1;
-      int m_e_length = 0;
-      float m_e_sumcurv = 0;
-      int m_v_n_int = 0;
-      sum_type m_v_sum_int = literal::zero;
+      bool         dejavu          = false;
+      int          depth           = -1;
+      int          m_e_length      = 0;
+      float        m_e_sumcurv     = 0;
+      int          m_v_n_int       = 0;
+      sum_type     m_v_sum_int     = literal::zero;
       sum_sqr_type m_v_sum_int_sqr = literal::zero;
-      int m_v_n_ext = 0;
-      sum_type m_v_sum_ext = literal::zero;
+      int          m_v_n_ext       = 0;
+      sum_type     m_v_sum_ext     = literal::zero;
       sum_sqr_type m_v_sum_ext_sqr = literal::zero;
 
       energy_t() {}
 
       float external_energy() const
       {
-        float Vin = sum(m_v_sum_int_sqr) - sum(sqr(m_v_sum_int)) / m_v_n_int;
+        float Vin  = sum(m_v_sum_int_sqr) - sum(sqr(m_v_sum_int)) / m_v_n_int;
         float Vout = m_v_n_ext == 0 ? 0 : sum(m_v_sum_ext_sqr) - sum(sqr(m_v_sum_ext)) / m_v_n_ext;
         float Eext;
         if (Vin + Vout == 0)
@@ -157,20 +158,20 @@ namespace mln
                              const image2d<T>& K)
     {
       std::vector<unsigned> v;
-      int mindepth = value_traits<int>::max();
-      unsigned minp = 0;
+      int                   mindepth = value_traits<int>::max();
+      unsigned              minp     = 0;
       mln_forall (x)
       {
         if (!K.domain().has(x->point()))
           continue;
 
         unsigned i = x->index();
-        i = (parent[i] != (unsigned)-1 and K[i] == K[parent[i]]) ? parent[i] : i;
+        i          = (parent[i] != (unsigned)-1 and K[i] == K[parent[i]]) ? parent[i] : i;
         v.push_back(i);
         if (e[i].depth < mindepth)
         {
           mindepth = e[i].depth;
-          minp = i;
+          minp     = i;
         }
       }
 
@@ -181,14 +182,14 @@ namespace mln
         for (unsigned& i : v)
           if (e[i].depth > mindepth)
           {
-            i = parent[i];
+            i     = parent[i];
             modif = true;
           }
           else if (e[i].depth == mindepth and i != minp)
           {
             i = parent[i];
             mindepth--;
-            minp = i;
+            minp  = i;
             modif = true;
           }
       }
@@ -196,7 +197,7 @@ namespace mln
       return v[0];
     }
 
-  } // end of namespace internal
+  } // namespace internal
 
   template <typename V>
   auto norm(const V& v) -> typename std::enable_if<std::is_scalar<V>::value, decltype(std::abs(v))>::type
@@ -217,7 +218,7 @@ namespace mln
   template <typename V>
   image2d<float> curvature_on_edge(const image2d<V>& ima)
   {
-    typedef decltype(V() + V()) Vec;
+    typedef decltype(V() + V())                  Vec;
     typedef typename std::make_signed<Vec>::type vec_t;
     // static_assert(std::is_same<vec_t, int>::value, "here!");
 
@@ -256,8 +257,8 @@ namespace mln
                          (vec_t)ima.at(p + point2d{1, 1}) - (vec_t)ima.at(p + point2d{-1, 1})) /
                     2.0;
 
-        float den = (sqr(ux) + sqr(uy));
-        point2d p_ = p * 2 + point2d{0, 1};
+        float   den = (sqr(ux) + sqr(uy));
+        point2d p_  = p * 2 + point2d{0, 1};
         if (den != 0)
           curv.at(p_) = std::abs((uxx * sqr(uy) - 2 * uxy * ux * uy + uyy * sqr(ux)) / (den * std::sqrt(den)));
         else
@@ -304,8 +305,8 @@ namespace mln
                          (vec_t)ima.at(p + point2d{1, 1}) - (vec_t)ima.at(p + point2d{1, -1})) /
                     2.0;
 
-        float den = (sqr(ux) + sqr(uy));
-        point2d p_ = p * 2 + point2d{1, 0};
+        float   den = (sqr(ux) + sqr(uy));
+        point2d p_  = p * 2 + point2d{1, 0};
         if (den != 0)
           curv.at(p_) = std::abs((uxx * sqr(uy) - 2 * uxy * ux * uy + uyy * sqr(ux)) / (den * std::sqrt(den)));
         else
@@ -325,12 +326,12 @@ namespace mln
                                  const std::vector<unsigned>& S, int eps = 5,
                                  image2d<internal::energy_t<V>>* feedback = NULL)
   {
-    typedef typename internal::energy_helper<V>::sum_type vec_sum_t;
+    typedef typename internal::energy_helper<V>::sum_type     vec_sum_t;
     typedef typename internal::energy_helper<V>::sum_sqr_type vec_sum_sqr_t;
 
     extension::fill(ima, ima(ima.domain().pmin));
 
-    image2d<float> curv = curvature_on_edge(ima);
+    image2d<float>     curv   = curvature_on_edge(ima);
     image2d<unsigned>& parent = const_cast<image2d<unsigned>&>(parent_);
 
     mln_entering("mln::compute_energy");
@@ -390,7 +391,7 @@ namespace mln
     }
 
     typedef dyn_neighborhood<std::vector<point2d>, dynamic_neighborhood_tag> Nbh;
-    std::vector<point2d> dpoints;
+    std::vector<point2d>                                                     dpoints;
     for (int i = -eps * 2; i <= eps * 2; i += 2)
       for (int j = -eps * 2; j <= eps * 2; j += 2)
         dpoints.emplace_back(i, j);
@@ -409,7 +410,7 @@ namespace mln
         if (K1::is_face_2(px->point()))
         {
           unsigned x = px->index();
-          x = (x != S[0] and K[x] == K[parent[x]]) ? parent[x] : x;
+          x          = (x != S[0] and K[x] == K[parent[x]]) ? parent[x] : x;
 
           unsigned y = 0;
           mln_forall (nx)
@@ -451,7 +452,7 @@ namespace mln
         if (K1::is_face_2(px->point()))
         {
           unsigned r = px->index();
-          r = (K[r] == K[parent[r]]) ? parent[r] : r;
+          r          = (K[r] == K[parent[r]]) ? parent[r] : r;
           branches.clear();
 
           mln_forall (nx)
@@ -460,7 +461,7 @@ namespace mln
               continue;
 
             unsigned x = nx->index();
-            x = (K[x] == K[parent[x]]) ? parent[x] : x;
+            x          = (K[x] == K[parent[x]]) ? parent[x] : x;
 
             unsigned y = internal::common_ancestor(x, r, acc, parent);
             branches.emplace_back(x, y);
@@ -478,7 +479,7 @@ namespace mln
               acc[x].m_v_sum_ext += (vec_sum_t)v;
               acc[x].m_v_sum_ext_sqr += (vec_sum_sqr_t)v * (vec_sum_sqr_t)v;
               acc[x].dejavu = true;
-              x = parent[x];
+              x             = parent[x];
             }
           }
 
@@ -489,7 +490,7 @@ namespace mln
             while (x != y)
             {
               acc[x].dejavu = false;
-              x = parent[x];
+              x             = parent[x];
             }
           }
         }
@@ -578,6 +579,4 @@ namespace mln
 
     return imerode;
   }
-}
-
-#endif // ! MUMFORD_SHAH_HPP
+} // namespace mln

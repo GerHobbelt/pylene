@@ -1,11 +1,12 @@
 #include "maxtree_pqueue_parallel.hpp"
+
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-int
-main(int argc, char** argv)
+
+int main(int argc, char** argv)
 {
   if (argc < 5)
   {
@@ -21,10 +22,10 @@ main(int argc, char** argv)
   using namespace mln;
 
   typedef uint8 V;
-  image2d<V> f;
+  image2d<V>    f;
   io::imread(argv[1], f);
 
-  image2d<unsigned> parent;
+  image2d<unsigned>     parent;
   std::vector<unsigned> S;
 
   int connexity = std::atoi(argv[2]);
@@ -55,7 +56,7 @@ main(int argc, char** argv)
       mln_iter(vout, par.values());
       mln_forall (vin, vout)
       {
-        p = f.point_at_index(*vin);
+        p     = f.point_at_index(*vin);
         *vout = p[0] * nc + p[1];
       };
     }
@@ -64,7 +65,7 @@ main(int argc, char** argv)
       mln_iter(vout, order.values());
       mln_forall (vin, vout)
       {
-        p = f.point_at_index(*vin);
+        p     = f.point_at_index(*vin);
         *vout = p[0] * nc + p[1];
       }
     }

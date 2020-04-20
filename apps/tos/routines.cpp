@@ -1,5 +1,6 @@
 #include "routines.hpp"
 
+
 unsigned lca(const mln::image2d<unsigned>& depth, const mln::image2d<unsigned>& parent, unsigned x, unsigned y)
 {
   if (x == -1)

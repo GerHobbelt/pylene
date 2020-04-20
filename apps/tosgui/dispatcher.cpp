@@ -1,8 +1,10 @@
-#include <algorithm>
-
 #include "dispatcher.hpp"
+
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/sub_image.hpp>
+
+#include <algorithm>
+
 
 namespace mln
 {
@@ -107,9 +109,9 @@ namespace mln
 
   void QDispatcher::doFiltering(std::pair<qt::ImageViewer*, image2d<rgb8>>& obj)
   {
-    qt::ImageViewer* win = obj.first;
-    image2d<rgb8>& view = obj.first->getView();
-    image2d<rgb8>& mean = obj.second;
+    qt::ImageViewer* win  = obj.first;
+    image2d<rgb8>&   view = obj.first->getView();
+    image2d<rgb8>&   mean = obj.second;
     win->reset();
 
     for (unsigned x : m_S)
@@ -124,4 +126,4 @@ namespace mln
 
     win->update();
   }
-}
+} // namespace mln

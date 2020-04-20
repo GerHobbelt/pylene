@@ -1,2 +1,0 @@
-add_executable(bench_blobs blobs.cpp)
-set_target_properties(bench_blobs PROPERTIES OUTPUT_NAME blobs)

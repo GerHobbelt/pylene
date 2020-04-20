@@ -1,8 +1,8 @@
-#ifndef MAXTREE_ROUTINES_HPP
-#define MAXTREE_ROUTINES_HPP
+#pragma once
 
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/point.hpp>
+
 
 namespace mln
 {
@@ -63,12 +63,14 @@ namespace mln
         else
           return p;
       }
-    }
+    } // namespace internal
 
     template <typename V>
     struct MaxtreeCanonizationAlgorithm
     {
-      MaxtreeCanonizationAlgorithm(const image2d<V>& ima, image2d<std::size_t>& parent) : m_ima(ima), m_parent(parent)
+      MaxtreeCanonizationAlgorithm(const image2d<V>& ima, image2d<std::size_t>& parent)
+        : m_ima(ima)
+        , m_parent(parent)
       {
       }
 
@@ -79,10 +81,8 @@ namespace mln
           p = internal::zfind_repr(m_ima, m_parent, p);
       }
 
-      const image2d<V>& m_ima;
+      const image2d<V>&     m_ima;
       image2d<std::size_t>& m_parent;
     };
-  }
-}
-
-#endif // ! MAXTREE_ROUTINES_HPP
+  } // namespace morpho
+} // namespace mln

@@ -1,8 +1,8 @@
-#ifndef APPS_ATTRIBUTE_CMSER_HPP
-#define APPS_ATTRIBUTE_CMSER_HPP
+#pragma once
 
 #include <mln/core/trace.hpp>
 #include <mln/morpho/component_tree/component_tree.hpp>
+
 
 enum eMSER_attribute
 {
@@ -44,28 +44,28 @@ namespace mln
     mln_entering("mln::compute_MSER");
 
     typedef morpho::component_tree<P, Amap> tree_t;
-    typedef typename tree_t::node_type node_t;
+    typedef typename tree_t::node_type      node_t;
 
     property_map<tree_t, unsigned> aplus(tree);
     property_map<tree_t, unsigned> aminus(tree, 0);
 
     if (fsum == MSER_ABSOLUTE)
     {
-      mln_reverse_foreach(auto n, tree.nodes())
+      mln_reverse_foreach (auto n, tree.nodes())
       {
         auto x = n;
         while (x.get_parent_id() != tree.npos() and dist(vmap[n], vmap[x]) < eps)
           x = x.parent();
 
         aminus[x] = std::max<unsigned>(aminus[x], amap[n]);
-        aplus[n] = amap[x];
+        aplus[n]  = amap[x];
       }
     }
     else
     {
-      mln_reverse_foreach(auto n, tree.nodes())
+      mln_reverse_foreach (auto n, tree.nodes())
       {
-        auto x = n;
+        auto  x = n;
         float d = 0;
         while (x.id() != x.get_parent_id() and d < eps)
         {
@@ -73,7 +73,7 @@ namespace mln
           x = x.parent();
         }
         aminus[x] = std::max<unsigned>(aminus[x], amap[n]);
-        aplus[n] = amap[x];
+        aplus[n]  = amap[x];
       }
     }
     aplus[tree.get_root_id()] = amap[tree.get_root()];
@@ -106,10 +106,8 @@ namespace mln
                    const AreaPropertyMap& amap, float eps, eMSER_attribute amser, eMSER_accum_type fsum)
   {
     typedef typename ValuePropertyMap::value_type V;
-    auto dist = [](V x, V y) -> float { return l2norm(x - y); };
+    auto                                          dist = [](V x, V y) -> float { return l2norm(x - y); };
 
     return compute_MSER(tree, vmap, amap, eps, amser, fsum, dist);
   }
-}
-
-#endif // ! APPS_ATTRIBUTE_CMSER_HPP
+} // namespace mln

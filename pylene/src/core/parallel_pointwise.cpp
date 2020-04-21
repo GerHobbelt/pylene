@@ -1,4 +1,4 @@
-#include <mln/core/algorithm/parallel_pointwise.hpp>
+#include <mln/core/canvas/parallel_pointwise.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range2d.h>

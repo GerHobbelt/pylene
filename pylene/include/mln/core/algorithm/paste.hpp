@@ -1,5 +1,5 @@
 #pragma once
-#include <mln/core/algorithm/parallel_pointwise.hpp>
+#include <mln/core/canvas/parallel_pointwise.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/concept/new/images.hpp>
 #include <mln/core/rangev3/foreach.hpp>

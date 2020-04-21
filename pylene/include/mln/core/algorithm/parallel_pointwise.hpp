@@ -5,7 +5,6 @@
 
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/paste.hpp>
-#include <mln/core/algorithm/transform.hpp>
 
 namespace mln
 {
@@ -26,32 +25,6 @@ namespace mln
   */
   void parallel_execute2d(ParallelCanvas2d&);
 
-  template <class Function, class InputImage, class OutputImage>
-  class TransformParallel : public ParallelCanvas2d
-  {
-    InputImage _in;
-    OutputImage _out;
-    Function _fun;
-
-    static_assert(mln::is_a<InputImage, experimental::Image>());
-    static_assert(mln::is_a<OutputImage, experimental::Image>());
-    static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
-
-    TransformParallel(InputImage input, OutputImage output, Function fun)
-      : _in{input}
-      , _out{output}
-      , _fun{fun}
-    {}
-
-    mln::experimental::box2d GetDomain() const final { return _in.domain(); }
-  public:
-    void ExecuteTile(mln::experimental::box2d b) const final
-    {
-      auto subimage_in = _in.clip(b);
-      auto subimage_out = _out.clip(b);
-      mln::transform(subimage_in, subimage_out, _fun);
-    }
-  };
 
   template <class InputImage, class OutputImage>
   class CopyParallel : public ParallelCanvas2d

@@ -2,6 +2,7 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
+#include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <utility>
 
@@ -32,4 +33,13 @@ TEST(Core, Algorithm_Transform_LValue)
 
   mln::experimental::image2d<uint8_t> out = mln::transform(ima, &V::first);
   ASSERT_TRUE(mln::all_of(out == ref));
+}
+
+TEST(Core, Algorithm_Transform_Parallel)
+{
+  mln::experimental::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
+
+  mln::parallel::transform(ima, ima, [](uint8_t x){ return x + 1; });
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
 }

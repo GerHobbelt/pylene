@@ -7,7 +7,6 @@
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/algorithm/generate.hpp>
 #include <mln/core/algorithm/paste.hpp>
-#include <mln/core/algorithm/parallel_pointwise.hpp>
 #include <mln/core/algorithm/sort.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
@@ -333,13 +332,11 @@ void for_each(mln::experimental::image2d<mln::rgb8>& in)
 }
 void parallel_for_each(mln::experimental::image2d<uint8_t>& in)
 {
-  mln::ForEachParallel foreach(in, plus_one_inplace_b);
-  mln::parallel_execute2d(foreach);
+  mln::parallel::for_each(in, plus_one_inplace_b);
 }
 void parallel_for_each(mln::experimental::image2d<mln::rgb8>& in)
 {
-  mln::ForEachParallel foreach(in, plus_one_inplace_b);
-  mln::parallel_execute2d(foreach);
+  mln::parallel::for_each(in, plus_one_inplace_b);
 }
 
 

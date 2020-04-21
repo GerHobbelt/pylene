@@ -16,3 +16,12 @@ TEST(Core, Algorithm_Copy)
 
   ASSERT_TRUE(mln::equal(ima, out));
 }
+
+TEST(Core, Algorithm_Copy_Parallel)
+{
+  mln::experimental::image2d<uint8_t> ima = {{12, 2, 93}, {24, 75, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
+
+  mln::experimental::parallel::copy(ref, ima);
+  ASSERT_TRUE(mln::equal(ima, out));
+}

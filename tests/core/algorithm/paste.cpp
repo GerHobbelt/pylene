@@ -68,3 +68,11 @@ TEST(Core, Experimental_Algorithm_Paste_ROI_no_copy)
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }
 
+TEST(Core, Experimental_Algorithm_Paste_Parallel)
+{
+  mln::experimental::image2d<uint8_t> ima = {{12, 2, 93}, {24, 75, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
+
+  mln::parallel::paste(ref, ima);
+  ASSERT_IMAGES_EQ_EXP(ima, ref);
+}

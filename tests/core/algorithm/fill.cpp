@@ -14,3 +14,13 @@ TEST(Core, Algorithm_Fill)
 
   ASSERT_TRUE(mln::all_of(ima == 69));
 }
+
+TEST(Core, Algorithm_Fill_Parallel)
+{
+  using namespace mln::view::ops;
+
+  mln::experimental::image2d<std::uint8_t> ima(10, 10);
+  mln::parallel::fill(ima, 69);
+
+  ASSERT_TRUE(mln::all_of(ima == 69));
+}

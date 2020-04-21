@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/algorithm/parallel_pointwise.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
@@ -38,4 +39,40 @@ namespace mln
       ::ranges::fill(row, v);
   }
 
+  namespace parallel
+  {
+    namespace details
+    {
+      template <class InputImage, typename Value>
+      class FillParallel : public ParallelCanvas2d
+      {
+        InputImage _in;
+        Value&     _val;
+
+        static_assert(mln::is_a<InputImage, experimental::Image>());
+
+        FillParallel(InputImage input, Value& v)
+          : _in{input}
+          , _val{v}
+        {
+        }
+
+        mln::experimental::box2d GetDomain() const final { return _in.domain(); }
+
+      public:
+        void ExecuteTile(mln::experimental::box2d b) const final
+        {
+          auto subimage_in = _in.clip(b);
+          mln::fill(subimage_in, _val);
+        }
+      };
+    } // namespace details
+
+    template <class InputImage, class Value>
+    void fill(InputImage in, const Value& v);
+    {
+      details::FillParallel caller(in, v);
+      parallel_execute2d(caller);
+    }
+  } // namespace parallel
 } // namespace mln

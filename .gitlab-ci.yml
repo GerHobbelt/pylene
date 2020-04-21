@@ -172,7 +172,7 @@ distbench-linux-gcc9-release:
 documentation:
     <<: *documentation-base
     except:
-        - dev
+        - master
 
 
 ##########
@@ -182,7 +182,7 @@ documentation:
 pages:
     <<: *documentation-base
     only:
-        - dev
+        - master
 
 package:
     image: ${FEDORA_31}

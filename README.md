@@ -1,5 +1,10 @@
 # What is Pylene ?
 
+
+[![pipeline status](https://gitlab.lrde.epita.fr/olena/pylene/badges/master/pipeline.svg)](https://gitlab.lrde.epita.fr/olena/pylene/-/commits/master)
+[![coverage report](https://gitlab.lrde.epita.fr/olena/pylene/badges/master/coverage.svg)](https://gitlab.lrde.epita.fr/olena/pylene/-/commits/master)
+
+
 Pylene is a fork of [Milena](http://www.lrde.epita.fr/olena), an image processing
 library targeting genericity and efficiency. Pylene is a modernized version of
 Milena with the following objectives:
@@ -9,28 +14,30 @@ Milena with the following objectives:
 * Genericity: write algorithms that are able to run on many kind of images with, yet, zero-cost abstraction.
 * Interopability: run pylene algorithms on image coming from external libraries (even on your own image type).
 
-# Requirements
-Pylene is developed in modern C++. You need a modern C++ compatible compiler:
-
-* GCC 7
-* Clang 6
-* Microsoft Visual Studio 2017
-
-External dependancies:
-[FreeImage](www.freeimage.sourceforge.net) (only for IO)
-
-# Status
-* GCC 9+ with -fconcepts
-* ~~Clang~~
-* MSVC 2019
-
-[![pipeline status](https://gitlab.lrde.epita.fr/olena/pylene/badges/development/cpp20/pipeline.svg)](https://gitlab.lrde.epita.fr/olena/pylene/-/commits/development/cpp20)
-[![coverage report](https://gitlab.lrde.epita.fr/olena/pylene/badges/development/cpp20/coverage.svg)](https://gitlab.lrde.epita.fr/olena/pylene/-/commits/development/cpp20)
-
-
 # Documentation
 
 Link to the [C++ Documentation](http://olena.pages.lrde.epita.fr/pylene/)
+
+
+
+
+# Requirements
+Pylene is developed in modern C++. You need a modern C++ compatible compiler:
+
+* GCC 9 ~~GCC 10~~ (in progress)
+* ~~Clang 10~~ (in progress)
+* Microsoft Visual Studio 2019
+
+This project relies on:
+
+* [FreeImage](www.freeimage.sourceforge.net) (only for IO)
+* [range-v3](https://github.com/ericniebler/range-v3)
+* [Boost](https://www.boost.org/)
+* [{fmt}](https://fmt.dev/)
+
+
+
+
 
 ## Presentations
 Other resources (mind the dates, the library probably has changed since then):

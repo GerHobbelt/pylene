@@ -32,3 +32,14 @@ TEST(Core, Algorithm_For_Each_Side_Effects)
   mln::for_each(ima, g);
   ASSERT_EQ(6 * 7 / 2, sum);
 }
+
+TEST(Core, Algorithm_For_Each_Parallel)
+{
+  using namespace mln::view::ops;
+
+  mln::experimental::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
+  mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
+
+  mln::parallel::for_each(ima, [](uint8_t& x) { x += 1; });
+  ASSERT_TRUE(mln::all_of(ima == ref));
+}

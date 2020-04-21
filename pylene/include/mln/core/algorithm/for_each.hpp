@@ -1,4 +1,5 @@
 #pragma once
+#include <mln/core/algorithm/parallel_pointwise.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/rangev3/rows.hpp>
 
@@ -25,5 +26,41 @@ namespace mln
     for (auto r : ranges::rows(vals))
       ::ranges::for_each(r, f);
   }
+
+  namespace parallel
+  {
+    namespace details
+    {
+      template <class Function, class InputImage>
+      class ForEachParallel : public ParallelCanvas2d
+      {
+        InputImage _in;
+        Function _fun;
+
+        static_assert(mln::is_a<InputImage, experimental::Image>());
+        static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
+
+        ForEachParallel(InputImage input, Function fun)
+            : _in{input}
+            , _fun{fun}
+        {}
+
+        mln::experimental::box2d GetDomain() const final { return _in.domain(); }
+      public:
+        void ExecuteTile(mln::experimental::box2d b) const final
+        {
+          auto subimage = _in.clip(b);
+          mln::for_each(subimage, _fun);
+        }
+      };
+    } // namespace details
+
+    template <class InputImage, class UnaryFunction>
+    void for_each(InputImage in, UnaryFunction f)
+    {
+      details::ForEachParallel caller(in, f);
+      parallel_execute2d(caller);
+    }
+  } // namespace parallel
 
 } // namespace mln

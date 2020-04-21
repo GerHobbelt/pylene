@@ -3,9 +3,7 @@
 //#include <tbb/blocked_range2d.h>
 #include <mln/core/box.hpp>
 
-//#include <mln/core/algorithm/copy.hpp> not necessary ?
 #include <mln/core/algorithm/fill.hpp>
-#include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/algorithm/paste.hpp>
 #include <mln/core/algorithm/transform.hpp>
 
@@ -27,30 +25,6 @@ namespace mln
   ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
   */
   void parallel_execute2d(ParallelCanvas2d&);
-
-
-  template <class Function, class InputImage>
-  class ForEachParallel : public ParallelCanvas2d
-  {
-    InputImage _in;
-    Function _fun;
-
-    static_assert(mln::is_a<InputImage, experimental::Image>());
-    static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
-
-    ForEachParallel(InputImage input, Function fun)
-        : _in{input}
-        , _fun{fun}
-    {}
-
-    mln::experimental::box2d GetDomain() const final { return _in.domain(); }
-  public:
-    void ExecuteTile(mln::experimental::box2d b) const final 
-    {
-      auto subimage = _in.clip(b);
-      mln::for_each(subimage, _fun);
-    }
-  };
 
   template <class Function, class InputImage, class OutputImage>
   class TransformParallel : public ParallelCanvas2d

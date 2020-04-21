@@ -2,14 +2,14 @@
 
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/concept/new/archetype/image.hpp>
-#include <mln/core/concept/new/archetype/pixel.hpp>
-#include <mln/core/concept/new/pixels.hpp>
+#include <mln/core/concepts/archetype/image.hpp>
+#include <mln/core/concepts/archetype/pixel.hpp>
+#include <mln/core/concepts/pixel.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <vector>
 #include <range/v3/algorithm/copy.hpp>

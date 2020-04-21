@@ -10,7 +10,6 @@
 #include <mln/core/algorithm/sort.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/core/concept/object.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 
 #include <algorithm>

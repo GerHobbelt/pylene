@@ -82,7 +82,7 @@ namespace mln::morpho::experimental
   fill_hole(I input, N nbh, image_point_t<I> marker)
 
   {
-    static_assert(std::is_convertible<mln_value(I), bool>::value, "Input image value type must be convertible to bool");
+    static_assert(std::is_convertible_v<image_value_t<I>, bool>, "Input image value type must be convertible to bool");
 
     image_build_error_code status;
     image_ch_value_t<I, bool> out = imchvalue<bool>(input)

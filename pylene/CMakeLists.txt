@@ -16,7 +16,7 @@ if (TBB_FOUND AND PYLENE_USE_TBB)
   target_link_libraries(Pylene INTERFACE tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
-  #FIXME use a config file
+#FIXME use a config file
   target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
 endif ()
 
@@ -47,6 +47,7 @@ target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 #target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
+               src/accu/cvxhull.cpp
                src/core/image_format.cpp
                src/core/init_list.cpp
                src/core/ndbuffer_image.cpp
@@ -77,19 +78,6 @@ target_compile_features(Pylene PUBLIC cxx_std_20)
 if (CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(Pylene PUBLIC -fconcepts)
 endif()
-
-target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-
-# Add concepts support for gcc > 8 with -fconcepts
-# if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
-#  set(PYLENE_CONCEPT_TS_ENABLED True PARENT_SCOPE)
-#  find_package(cmcstl2 REQUIRED)
-#  target_link_libraries(Pylene PUBLIC stl2) # This add appropriate -fconcept flags
-#  target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-# endif ()
-
-
-
 
 # IDE configuration
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

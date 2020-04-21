@@ -32,7 +32,7 @@ SegmentedRange
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/range.hpp
        :language: cpp
        :lines: 15-23
 
@@ -58,6 +58,6 @@ ReversibleRange
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/ranges.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/range.hpp
        :language: cpp
        :lines: 27-35

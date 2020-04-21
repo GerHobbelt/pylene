@@ -1,11 +1,11 @@
 #pragma once
 
-#include <mln/core/concept/new/neighborhoods.hpp>
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
+#include <mln/core/concepts/image.hpp>
 
 #include <mln/morpho/experimental/canvas/depthfirst.hpp>
 #include <mln/morpho/experimental/component_tree.hpp>
-#include <mln/core/dontcare.hpp>
+#include <mln/core/utils/dontcare.hpp>
 #include <mln/core/algorithm/for_each.hpp>
 
 #include <vector>

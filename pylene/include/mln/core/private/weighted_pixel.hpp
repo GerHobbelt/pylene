@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/pixels.hpp>
+#include <mln/core/concepts/pixel.hpp>
 
 namespace mln
 {

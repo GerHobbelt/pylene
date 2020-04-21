@@ -97,16 +97,16 @@ Example 2 : Dense region reconstruction
 
    *  -  .. figure:: /images/blobs2_binary.png
 
-            (a) Original image
+            a. Original image
 
 
       -  .. figure:: /images/morpho_reconstruction_markers.png
 
-            (b) Markers from the :doc:`rank_filter`
+            b. Markers from the :doc:`rank_filter`
 
       -  .. figure:: /images/morpho_reconstruction_dilated.png
 
-            (c) Dilated of the original image (a)
+            c. Dilated of the original image *a*
 
 .. literalinclude:: /snippets/reconstruction.cpp
    :start-after: M2_START
@@ -125,8 +125,8 @@ get the objects in dense regions::
 .. list-table::
 
    *  -  .. figure:: /images/morpho_reconstruction_rec.png
-   
-            (d) Reconstruction of (c) from the markers (b)
+
+            d. Reconstruction of *c* from the markers *b*
 
       -  .. figure:: /images/morpho_reconstruction_out.png
 

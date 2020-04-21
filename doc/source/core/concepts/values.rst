@@ -42,7 +42,7 @@ Value
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/values.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/value.hpp
        :language: cpp
        :lines: 12-13
 
@@ -69,7 +69,7 @@ ComparableValue
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/values.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/value.hpp
        :language: cpp
        :lines: 17-20
 
@@ -96,7 +96,7 @@ OrderedValue
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/values.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/value.hpp
        :language: cpp
        :lines: 24-27
 

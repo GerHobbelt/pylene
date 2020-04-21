@@ -3,7 +3,7 @@
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>
@@ -49,9 +49,9 @@ namespace mln::morpho::experimental
     template <class T, class enable = void>
     struct grad_op
     {
-      using result_type = decltype(mln::l2norm(std::declval<T>()));
+      using result_type = decltype(l2norm(std::declval<T>()));
 
-      result_type operator()(T a, T b) const noexcept { return mln::l2norm(T(a - b)); }
+      result_type operator()(T a, T b) const noexcept { return l2norm(T(a - b)); }
     };
 
     template <class T>

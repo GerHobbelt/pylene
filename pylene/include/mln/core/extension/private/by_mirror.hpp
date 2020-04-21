@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mln/core/concept/new/domains.hpp>
-#include <mln/core/concept/new/structuring_elements.hpp>
-#include <mln/core/extension/extension_traits.hpp>
+#include <mln/core/concepts/domain.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/private/traits/extension.hpp>
 
 #include <limits>
 #include <type_traits>
@@ -23,7 +23,7 @@ namespace mln::extension
     template <typename SE>
     constexpr bool fit(const SE&) const
     {
-      PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
+      static_assert(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
       return true;
     }

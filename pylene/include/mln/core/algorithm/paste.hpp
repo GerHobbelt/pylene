@@ -1,9 +1,9 @@
 #pragma once
 #include <mln/core/canvas/parallel_pointwise.hpp>
 #include <mln/core/algorithm/copy.hpp>
-#include <mln/core/concept/new/images.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/rows.hpp>
 
 #include <mln/core/trace.hpp>
 

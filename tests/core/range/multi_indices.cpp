@@ -1,8 +1,8 @@
-#include <mln/core/rangev3/multi_indices.hpp>
-#include <mln/core/rangev3/range_traits.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/multi_indices.hpp>
+#include <mln/core/range/range_traits.hpp>
+#include <mln/core/range/rows.hpp>
 
-#include <mln/core/concept/new/concepts.hpp>
+#include <mln/core/concepts/concept.hpp>
 
 #include <vector>
 
@@ -77,11 +77,9 @@ public:
   using range_type                  = mln::ranges::multi_indices<Rank, T>;
 
   static_assert(Rank == 1 || mln::ranges::is_segmented_range<range_type>::value);
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::stl::ForwardRange<range_type>);
 #else
   static_assert(::ranges::ForwardRange<range_type>());
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   MultiIndicesTest()
   {

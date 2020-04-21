@@ -6,8 +6,6 @@ find_package(Sanitizers REQUIRED)
 
 sanitizer_add_blacklist_file(${CMAKE_SOURCE_DIR}"/utils/sanitizers/blacklist.txt")
 
-include_directories(${GTEST_INCLUDE_DIRS})
-
 # Register an executable test: add_core_test(Exe Source1 [Source2...])
 # Executable: The name of the executable (default: ${Prefix}${TestName})
 # Sources: The source files to compile (default: ${Prefix}${TestName}.cpp)
@@ -30,10 +28,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(accu)
 add_subdirectory(core)
-add_subdirectory(draw)
 add_subdirectory(io)
 add_subdirectory(colors)
 add_subdirectory(morpho)
 add_subdirectory(labeling)
-add_subdirectory(graph)
-add_subdirectory(graphcut)
+add_subdirectory(contrib)

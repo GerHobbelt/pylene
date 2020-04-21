@@ -2,7 +2,7 @@
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/rows.hpp>
 
 namespace mln
 {

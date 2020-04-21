@@ -9,32 +9,6 @@
 
 #include <gtest/gtest.h>
 
-/*
-TEST(Morpho, AlphaTree)
-{
-  using namespace mln;
-  typedef uint8 V;
-  typedef typename image2d<V>::size_type size_type;
-  image2d<V> ima(100, 100);
-
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> sampler(0, value_traits<V>::max());
-  range::generate(ima.values(), [&sampler, &gen] () { return sampler(gen); }) ;
-
-  //iota(ima, 0);
-
-  typedef morpho::component_tree< unsigned, image2d<unsigned> > tree_t;
-  tree_t                                tree;
-  property_map<tree_t, int>             vmap;
-
-  std::tie(tree, vmap) = morpho::alphatree_indexes(ima, c4);
-
-  morpho::internal::checktree(tree);
-}
-*/
-
 
 mln::experimental::image2d<int> //
 cut(const mln::morpho::experimental::component_tree<int>& t, mln::experimental::image2d<int>& node_map, int alpha)

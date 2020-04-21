@@ -1,9 +1,6 @@
 #pragma once
 
 #include <mln/core/colors.hpp>
-#include <mln/core/image/morphers/transformed_image.hpp>
-#include <mln/core/ops.hpp>
-#include <mln/core/value/int.hpp>
 #include <mln/core/vec_base.hpp>
 
 
@@ -36,13 +33,7 @@ namespace mln
     template <typename T>
     using rgba = internal::vec_base<T, 4, rgba_tag>;
 
-    typedef rgba<uint8>  rgba8;
-    typedef rgba<uint16> rgba16;
+    typedef rgba<std::uint8_t>  rgba8;
+    typedef rgba<std::uint16_t> rgba16;
   } // namespace colors
 } // namespace mln
-
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(red, (mln::colors::rgba8), (mln::getter<0>))
-
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(green, (mln::colors::rgba8), (mln::getter<1>))
-
-MLN_DECLARE_IMAGE_LVALUE_OPERATOR_OVERLOAD(blue, (mln::colors::rgba8), (mln::getter<2>))

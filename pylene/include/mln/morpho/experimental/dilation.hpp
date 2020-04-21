@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/ops.hpp>
 #include <mln/core/value/value_traits.hpp>
@@ -40,7 +40,7 @@ namespace mln::morpho::experimental
     struct sup_t
     {
       template <class T>
-      T operator() (T x, T y) const { return mln::sup(x,y); }
+      T operator() (T x, T y) const { return sup(x,y); }
 
       template <class T>
       std::experimental::simd<T> operator() (std::experimental::simd<T> x, std::experimental::simd<T> y) const { return std::experimental::max(x,y); }

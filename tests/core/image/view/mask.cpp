@@ -1,10 +1,10 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
-#include <mln/core/concept/new/archetype/image.hpp>
+#include <mln/core/concepts/archetype/image.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/mask.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <gtest/gtest.h>
 
@@ -28,13 +28,11 @@ TEST(View, mask)
   auto z = mln::view::mask(ima, mask);
   fill(z, 42);
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
   static_assert(mln::concepts::OutputImage<decltype(z)>);
   static_assert(mln::concepts::ViewImage<decltype(z)>);
   static_assert(mln::concepts::IndexableAndAccessibleImage<decltype(z)>);
   static_assert(not mln::concepts::BidirectionalImage<decltype(z)>);
   static_assert(not mln::concepts::RawImage<decltype(z)>);
-#endif // PYLENE_CONCEPT_TS_ENABLED
 
   auto dom = z.domain();
   for (auto&& r : dom.rows())

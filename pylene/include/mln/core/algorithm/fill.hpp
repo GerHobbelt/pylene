@@ -69,7 +69,7 @@ namespace mln
     } // namespace details
 
     template <class InputImage, class Value>
-    void fill(InputImage in, const Value& v);
+    void fill(InputImage in, const Value& v)
     {
       details::FillParallel caller(in, v);
       parallel_execute2d(caller);

@@ -23,5 +23,5 @@ TEST(Core, Algorithm_Copy_Parallel)
   mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
 
   mln::experimental::parallel::copy(ref, ima);
-  ASSERT_TRUE(mln::equal(ima, out));
+  ASSERT_TRUE(mln::equal(ima, ref));
 }

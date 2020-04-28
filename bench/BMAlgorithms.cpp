@@ -321,22 +321,47 @@ void for_each_baseline(mln::experimental::image2d<mln::rgb8>& in)
 {
   baseline::for_each(in, plus_one_inplace);
 }
+void for_each_baseline_hard(mln::experimental::image2d<uint8_t>& in)
+{
+  baseline::for_each(in, plus_one_inplace_b);
+}
+void for_each_baseline_hard(mln::experimental::image2d<mln::rgb8>& in)
+{
+  baseline::for_each(in, plus_one_inplace_b);
+}
 void for_each(mln::experimental::image2d<uint8_t>& in)
 {
-  mln::for_each(in, plus_one_inplace_b);
+  mln::for_each(in, plus_one_inplace);
 }
 void for_each(mln::experimental::image2d<mln::rgb8>& in)
 {
   mln::for_each(in, plus_one_inplace);
 }
+void for_each_hard(mln::experimental::image2d<uint8_t>& in)
+{
+  mln::for_each(in, plus_one_inplace_b);
+}
+void for_each_hard(mln::experimental::image2d<mln::rgb8>& in)
+{
+  mln::for_each(in, plus_one_inplace_b);
+}
 void parallel_for_each(mln::experimental::image2d<uint8_t>& in)
 {
-  mln::parallel::for_each(in, plus_one_inplace_b);
+  mln::parallel::for_each(in, plus_one_inplace);
 }
 void parallel_for_each(mln::experimental::image2d<mln::rgb8>& in)
 {
+  mln::parallel::for_each(in, plus_one_inplace);
+}
+void parallel_for_each_hard(mln::experimental::image2d<uint8_t>& in)
+{
   mln::parallel::for_each(in, plus_one_inplace_b);
 }
+void parallel_for_each_hard(mln::experimental::image2d<mln::rgb8>& in)
+{
+  mln::parallel::for_each(in, plus_one_inplace_b);
+}
+
 
 
 

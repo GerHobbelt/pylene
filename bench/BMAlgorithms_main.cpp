@@ -47,6 +47,12 @@ void for_each(mln::experimental::image2d<uint8_t>& in);
 void for_each(mln::experimental::image2d<mln::rgb8>& in);
 void parallel_for_each(mln::experimental::image2d<uint8_t>& in);
 void parallel_for_each(mln::experimental::image2d<mln::rgb8>& in);
+void for_each_baseline_hard(mln::experimental::image2d<uint8_t>& in);
+void for_each_baseline_hard(mln::experimental::image2d<mln::rgb8>& in);
+void for_each_hard(mln::experimental::image2d<uint8_t>& in);
+void for_each_hard(mln::experimental::image2d<mln::rgb8>& in);
+void parallel_for_each_hard(mln::experimental::image2d<uint8_t>& in);
+void parallel_for_each_hard(mln::experimental::image2d<mln::rgb8>& in);
 
 
 void generate_baseline(mln::experimental::image2d<uint8_t>& ima);
@@ -340,10 +346,52 @@ BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
-BENCHMARK_F(BMAlgorithms, for_each_buffer2d_rgb8_parallel)(benchmark::State& st)
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_parallel)(benchmark::State& st)
 {
   while (st.KeepRunning())
     parallel_for_each(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_baseline_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_baseline_hard(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_hard(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_parallel_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each_hard(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_baseline_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_baseline_hard(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_hard(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_parallel_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each_hard(m_input_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 

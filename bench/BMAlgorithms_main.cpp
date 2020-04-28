@@ -10,6 +10,8 @@ void fill_baseline(mln::experimental::image2d<uint8_t>& ima, uint8_t v);
 void fill_baseline(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v);
 void fill(mln::experimental::image2d<uint8_t>& ima, uint8_t v);
 void fill(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v);
+void fill_parallel(mln::experimental::image2d<uint8_t>& ima, uint8_t v);
+void fill_parallel(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v);
 
 void copy_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out);
 void copy_baseline(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
@@ -114,6 +116,13 @@ BENCHMARK_F(BMAlgorithms, fill_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, fill_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    fill_parallel(m_input_uint8, 69);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
@@ -125,6 +134,13 @@ BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     fill(m_input_rgb8, mln::rgb8{2, 3, 4});
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    fill_parallel(m_input_rgb8, mln::rgb8{2, 3, 4});
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 

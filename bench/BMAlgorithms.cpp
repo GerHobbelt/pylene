@@ -185,6 +185,14 @@ void fill(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v)
 {
   mln::fill(ima, v);
 }
+void fill_parallel(mln::experimental::image2d<uint8_t>& ima, uint8_t v)
+{
+  mln::parallel::fill(ima, v);
+}
+void fill_parallel(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v)
+{
+  mln::parallel::fill(ima, v);
+}
 
 
 void copy_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)

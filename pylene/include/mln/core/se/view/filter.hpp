@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/se/view/adaptor.hpp>
 
 #include <range/v3/view/filter.hpp>

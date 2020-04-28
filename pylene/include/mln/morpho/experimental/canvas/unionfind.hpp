@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concepts/image.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/algorithm/sort.hpp>
 
-#include <mln/core/dontcare.hpp> // detail::ignore_t
+#include <mln/core/utils/dontcare.hpp> // detail::ignore_t
 #include <mln/core/trace.hpp>
 
 #include <range/v3/view/reverse.hpp>
@@ -46,6 +46,27 @@ namespace mln::morpho::experimental::canvas
 
   template <class I, class N, class UFViz, class Compare>
   void union_find(I input, N nbh, UFViz viz, Compare cmp);
+
+
+
+  namespace impl
+  {
+    // Helper functions
+    // Set par(p) = p for each p
+    template <class I>
+    [[gnu::noinline]] void union_find_init_par(I par) noexcept;
+
+
+    // Get the canonical element of the set containing p0 and perform path compression
+    template <class I>
+    [[gnu::noinline]] //
+    image_point_t<I>  //
+    zfindroot(I& par, image_point_t<I> p0) noexcept;
+
+    // Get the canonical element of the set containing p0 and perform path compression
+    // This overload is for set reprensented by a buffer of indexes
+    [[gnu::noinline]] int zfindroot(int* par, int x) noexcept;
+  }
 
 
   /******************************************/
@@ -157,7 +178,17 @@ namespace mln::morpho::experimental::canvas
         }
       }
     }
+
+    template <class I>
+    [[gnu::noinline]] void union_find_init_par(I par) noexcept
+    {
+      mln_foreach_new(auto px, par.new_pixels())
+        px.val() = px.point();
+    }
+
   } // namespace impl
+
+
 
   template <class I, class N, class UFViz, class Compare>
   void union_find(I input, N nbh, UFViz viz, Compare cmp)

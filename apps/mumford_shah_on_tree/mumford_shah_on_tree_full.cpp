@@ -6,7 +6,7 @@
 #include <apps/tos/addborder.hpp>
 #include <apps/tos/croutines.hpp>
 
-#include <mln/core/dontcare.hpp>
+#include <mln/core/utils/dontcare.hpp>
 #include <mln/core/image/image2d.hpp>
 #include <mln/core/neighb2d.hpp>
 #include <mln/io/imread.hpp>

@@ -55,6 +55,6 @@ Domain
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/domains.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/domain.hpp
        :language: cpp
        :lines: 17-25

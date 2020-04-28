@@ -1,9 +1,0 @@
-include(pylene_default)
-
-[settings]
-compiler=clang
-compiler.version=6.0
-
-[env]
-CC=/usr/bin/clang-6.0
-CXX=/usr/bin/clang++-6.0

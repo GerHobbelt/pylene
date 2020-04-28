@@ -3,6 +3,8 @@
 #include <mln/core/colors.hpp>
 #include <mln/core/vec.hpp>
 
+#include <cstdint>
+
 // FIXME: optimize this out (slow because of floats and saturations)
 
 
@@ -16,7 +18,7 @@ namespace mln
   template <typename T>
   using lsh = internal::vec_base<T, 3, lsh_tag>;
 
-  typedef lsh<uint8> lsh8;
+  typedef lsh<uint8_t> lsh8;
 
   namespace internal
   {

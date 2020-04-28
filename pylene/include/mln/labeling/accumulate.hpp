@@ -1,9 +1,10 @@
 #pragma once
 
 #include <mln/accu/accumulator.hpp>
+#include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
-#include <mln/core/rangev3/foreach.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -45,7 +46,11 @@ namespace mln::labeling
 
     {
       mln_foreach_new (auto px, lbl_input.new_pixels())
-        vec_acc[px.val()].take(px.point());
+      {
+        int lbl = px.val();
+        assert(0 <= lbl && lbl <= nlabel);
+        vec_acc[lbl].take(px.point());
+      }
     }
 
     std::transform(std::begin(vec_acc), std::end(vec_acc), std::begin(results),
@@ -73,7 +78,10 @@ namespace mln::labeling
     {
       auto zz = mln::ranges::view::zip(lbl_input.new_values(), values.new_values());
       mln_foreach_new ((auto [lbl, v]), zz)
+      {
+        assert(0 <= lbl && lbl <= nlabel);
         vec_acc[lbl].take(v);
+      }
     }
 
     std::transform(std::begin(vec_acc), std::end(vec_acc), std::begin(results),

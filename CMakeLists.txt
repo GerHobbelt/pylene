@@ -6,6 +6,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 # Add CodeCoverage utility to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
 
+
+if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
+  include("${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
+  conan_set_rpath()
+  conan_set_std()
+  conan_set_fpic()
+  conan_check_compiler()
+  conan_set_libcxx()
+  conan_set_vs_runtime()
+endif()
+
+
 if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
   include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 endif ()
@@ -14,6 +26,7 @@ find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(TBB)
 find_package(Qt4)
+
 
 
 # CONFIGURE COMPILER LAUNCHERS

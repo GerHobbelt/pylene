@@ -1,0 +1,55 @@
+\documentclass[svgnames,tikz]{standalone}
+\usepackage{amsmath}
+\usetikzlibrary{positioning,arrows,calc,shapes.multipart}
+
+\input{common.tikz}
+
+\begin{document}
+\begin{tikzpicture}
+\tikzset{every node/.style={node distance=5pt, font=\Huge}, innertxt/.style={txt, node distance=-3pt} }
+
+
+\node[txt, right] (g) { \verb|auto h =|};
+
+\node[txt, thick, draw=DarkBlue] (h) [base right=of g] { \verb|[](int x) { return 255-x; }|};
+
+
+
+%% Line 2
+
+\node[txt, right] (u) [below=2.5cm of g.west, anchor=west]  { auto u = };
+
+\node[img, yslant=.5, DarkRed] (u1) [right=of u] { \includegraphics[width=1.75cm]{images/Olena-c6gradi.png} };
+
+%% Line 3
+
+
+\node[txt, right] (p0) [below=2cm of u.west, anchor=west]  { auto v = transform( };
+
+\node[innertxt, DarkRed] (p1) [base right=of p0] { u };
+
+\node[innertxt] (p2) [base right=of p1] { , };
+
+\node[innertxt, DarkBlue, thick] (p3) [base right=of p2] {h} ;
+
+\node[innertxt] (p4) [base right=of p3] { ) $\rightarrow$ };
+
+
+\node[yslant=.5, rectangle split, rectangle split parts=3, draw, txt, minimum width=2cm, rectangle split part
+align=left] (p5) [above right=4pt and 2pt of p4.east, anchor=west] {
+  \;h
+  \nodepart{two}
+  \;u \small \emph{(pointer)}
+  \nodepart{three}
+  \vspace{1cm}\strut
+};
+
+\draw[-latex, DarkBlue] (p5.text west) node[fill, circle, inner sep=2pt] {} -| (h);
+\draw[-latex, DarkRed] (p5.two west) node[fill, circle, inner sep=2pt] {} -| (u1);
+
+\node[innertxt] (p6) [right=2.5cm of p4] { $\equiv$ };
+
+\node[img, yslant=.5] (p7) [right=3.1cm of p5.south west, anchor=south west] { \includegraphics[width=2cm]{images/Olena-c6gradi-neg.png} };
+
+\end{tikzpicture}
+\end{document}

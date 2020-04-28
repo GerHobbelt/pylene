@@ -10,13 +10,13 @@ using namespace mln;
 
 TEST(Morpho, extinction_extinction_0)
 {
-  mln::experimental::image2d<uint8> ima = {
+  mln::experimental::image2d<uint8_t> ima = {
       {0, 3, 2}, //
       {2, 2, 3}, //
       {2, 3, 1}  //
   };
 
-  mln::experimental::image2d<uint8> ref = {
+  mln::experimental::image2d<uint8_t> ref = {
       {3, 0, 1}, //
       {0, 0, 0}, //
       {0, 0, 2}  //
@@ -28,7 +28,7 @@ TEST(Morpho, extinction_extinction_0)
 
 TEST(Morpho, extinction_extinction_flatzone)
 {
-  mln::experimental::image2d<uint8> ima = {
+  mln::experimental::image2d<uint8_t> ima = {
       {0, 3, 2}, //
       {2, 2, 3}, //
       {2, 1, 1}  //
@@ -36,7 +36,7 @@ TEST(Morpho, extinction_extinction_flatzone)
 
   // The algorithm does not propagate value in
   // the flat-zone minima
-  mln::experimental::image2d<uint8> ref = {
+  mln::experimental::image2d<uint8_t> ref = {
       {3, 0, 1}, //
       {0, 0, 0}, //
       {0, 1, 0}  //
@@ -49,11 +49,11 @@ TEST(Morpho, extinction_extinction_flatzone)
 /*
 TEST(Morpho, extinction_extinction_FlatZone)
 {
-  image2d<uint8> ima = { {0,3,2},
+  image2d<uint8_t> ima = { {0,3,2},
                          {2,2,3},
                          {2,1,1} };
 
-  image2d<uint8> ref = { {3,0,1},
+  image2d<uint8_t> ref = { {3,0,1},
                          {0,0,0},
                          {0,1,1} };
 

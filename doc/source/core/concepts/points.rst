@@ -52,6 +52,6 @@ Point
 
     **Implementation**
 
-    .. literalinclude:: ../../../../pylene/include/mln/core/concept/new/points.hpp
+    .. literalinclude:: ../../../../pylene/include/mln/core/concepts/point.hpp
        :language: cpp
        :lines: 12-15

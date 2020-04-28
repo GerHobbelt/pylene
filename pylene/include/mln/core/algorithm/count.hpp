@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concepts/image.hpp>
 
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/rows.hpp>
 #include <range/v3/algorithm/count.hpp>
 
 

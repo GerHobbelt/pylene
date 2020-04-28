@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
 #include <mln/core/ops.hpp>
 #include <mln/core/value/value_traits.hpp>

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mln/core/box.hpp>
-#include <mln/core/extension/extension_traits.hpp>
 #include <mln/core/extension/private/by_mirror.hpp>
 #include <mln/core/image/view/extend_by_projection.hpp>
+#include <mln/core/private/traits/extension.hpp>
 
-#include <mln/core/rangev3/view/transform.hpp>
+#include <mln/core/range/view/transform.hpp>
 #include <concepts/concepts.hpp>
 
 namespace mln

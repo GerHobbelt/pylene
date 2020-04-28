@@ -1,7 +1,9 @@
 #include <mln/core/assert.hpp>
 #include <mln/core/se/disc.hpp>
 
+
 #include <array>
+#include <cmath>
 #include <stdexcept>
 
 
@@ -53,119 +55,6 @@ namespace mln::se::details
   }
 
 } // namespace mln::se::details
-
-namespace mln::se
-{
-  disc::disc(float radius, int approximation)
-    : m_radius(radius)
-    , m_nlines(approximation)
-  {
-    assert(m_radius >= 0);
-    assert(m_nlines == 0 || m_nlines == 2 || m_nlines == 4 || m_nlines == 8);
-  }
-
-  bool disc::decomposable() const { return m_nlines > 0; }
-
-
-  std::vector<periodic_line2d> disc::decompose() const
-  {
-    mln_precondition(m_nlines > 0);
-
-    std::vector<periodic_line2d> lines;
-    lines.reserve(m_nlines);
-
-    std::array<int, 3> k = details::disc_compute_decomposition_coeff(static_cast<int>(m_radius));
-
-
-    const point2d se[] = {{0, 1}, {1, 0}, {1, 1}, {1, -1}, {1, 2}, {2, 1}, {2, -1}, {1, -2}};
-    lines.push_back(periodic_line2d(se[0], k[0]));
-    lines.push_back(periodic_line2d(se[1], k[0]));
-
-    if (k[1] > 0)
-    {
-      lines.push_back(periodic_line2d(se[2], k[1]));
-      lines.push_back(periodic_line2d(se[3], k[1]));
-    }
-
-    if (k[2] > 0)
-    {
-      lines.push_back(periodic_line2d(se[4], k[2]));
-      lines.push_back(periodic_line2d(se[5], k[2]));
-      lines.push_back(periodic_line2d(se[6], k[2]));
-      lines.push_back(periodic_line2d(se[7], k[2]));
-    }
-
-    return lines;
-  }
-
-  std::vector<point2d> disc::offsets() const
-  {
-    typedef point2d::value_type P;
-
-    int   r          = static_cast<int>(m_radius);
-    int   extent     = 2 * r + 1;
-    float radius_sqr = m_radius * m_radius;
-
-    std::vector<point2d> dpoints;
-    dpoints.reserve(extent * extent);
-
-    for (int i = -r; i <= r; ++i)
-      for (int j = -r; j <= r; ++j)
-        if (i * i + j * j <= radius_sqr)
-        {
-          point2d p = {(P)i, (P)j};
-          dpoints.push_back(p);
-        }
-    return dpoints;
-  }
-
-  disc::dec_type disc::dec() const
-  {
-    using P = point2d::value_type;
-
-    const int   r          = static_cast<int>(m_radius);
-    const int   extent     = 2 * r + 1;
-    const float radius_sqr = m_radius * m_radius;
-
-    std::vector<point2d> vdec;
-    vdec.reserve(extent);
-    for (int y = -r; y <= r; ++y)
-    {
-      for (int x = -r; x <= 0; ++x)
-        if (y * y + x * x <= radius_sqr)
-        {
-          point2d p = {(P)y, (P)(x - 1)}; // before begin of the line
-          vdec.push_back(p);
-          break;
-        }
-    }
-    return dec_type(std::move(vdec));
-  }
-
-  disc::inc_type disc::inc() const
-  {
-    using P                = point2d::value_type;
-    const int   r          = static_cast<int>(m_radius);
-    const int   extent     = 2 * r + 1;
-    const float radius_sqr = m_radius * m_radius;
-
-    std::vector<point2d> vinc;
-    vinc.reserve(extent);
-    for (int y = -r; y <= r; ++y)
-    {
-      for (int x = r; x >= 0; --x)
-        if (y * y + x * x <= radius_sqr)
-        {
-          point2d p = {(P)y, (P)x}; // last point of the line
-          vinc.push_back(p);
-          break;
-        }
-    }
-
-    return inc_type(std::move(vinc));
-  }
-
-} // namespace mln::se
 
 
 namespace mln::experimental::se
@@ -283,6 +172,7 @@ namespace mln::experimental::se
     return {points, r};
   }
 
+  float disc::radius() const { return m_radius; }
 
   [[gnu::noinline]] std::shared_ptr<disc::cache_data_t> disc::__compute_data() const
   {
@@ -332,6 +222,7 @@ namespace mln::experimental::se
     roi.inflate(radial_extent());
     return roi;
   }
+
 
   mln::experimental::box2d disc::compute_output_region(mln::experimental::box2d roi) const
   {

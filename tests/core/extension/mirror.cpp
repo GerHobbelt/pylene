@@ -21,7 +21,7 @@ TEST(Core, Mirror_LargeEnough_BM_Auto)
   mln::experimental::image2d<uint8_t> ref = clone(ima);
   ref.extension().mirror();
 
-  auto disc                      = mln::se::disc{1};
+  auto disc                      = mln::experimental::se::disc{1};
   auto [managed_ima, managed_se] = mln::extension::bm::mirror().manage(ima, disc);
 
   std::visit([](auto i, auto) { ASSERT_TRUE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
@@ -39,7 +39,7 @@ TEST(Core, Mirror_NotLargeEnough_BM_Auto)
 
   mln::experimental::image2d<uint8_t> ref = clone(ima);
 
-  auto disc                      = mln::se::disc{4};
+  auto disc                      = mln::experimental::se::disc{4};
   auto [managed_ima, managed_se] = mln::extension::bm::mirror().manage(ima, disc);
 
   std::visit([](auto i, auto) { ASSERT_FALSE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
@@ -59,7 +59,7 @@ TEST(Core, Mirror_LargeEnough_BM_Native)
   mln::experimental::image2d<uint8_t> ref = clone(ima);
   ref.extension().mirror();
 
-  auto disc                      = mln::se::disc{1};
+  auto disc                      = mln::experimental::se::disc{1};
   auto [managed_ima, managed_se] = mln::extension::bm::native::mirror().manage(ima, disc);
 
   std::visit([](auto i, auto) { ASSERT_TRUE(mln::extension::is_finite(i.extension())); }, managed_ima, managed_se);
@@ -74,7 +74,7 @@ TEST(Core, Mirror_NotLargeEnough_BM_Native)
 {
   mln::experimental::image2d<uint8_t> ima(10, 10);
 
-  auto disc = mln::se::disc{4};
+  auto disc = mln::experimental::se::disc{4};
   auto bm   = mln::extension::bm::native::mirror();
   EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);
 }

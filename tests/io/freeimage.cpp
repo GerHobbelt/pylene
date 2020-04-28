@@ -1,13 +1,12 @@
+#include <mln/io/experimental/imread.hpp>
+#include <mln/io/experimental/imsave.hpp>
+
+
 #include <mln/core/algorithm/iota.hpp>
-
-#include <mln/core/grays.hpp>
 #include <mln/core/colors.hpp>
-
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/view/cast.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imsave.hpp>
 
 #include <fixtures/ImagePath/image_path.hpp>
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -26,6 +25,26 @@ TEST(IO, FreeImage_pgm)
 
   mln::io::experimental::imsave(ref, "test.tiff");
   mln::io::experimental::imread("test.tiff", ima);
+  ASSERT_IMAGES_EQ_EXP2(ima, ref, fixtures::ImageCompare::experimental::COMPARE_DOMAIN);
+}
+
+// This test fails on Windows due to CLRF in the pgm
+#ifdef _WIN32
+TEST(IO, DISABLED_FreeImage_pgm_fly)
+#else
+TEST(IO, FreeImage_pgm_fly)
+#endif
+{
+  const mln::experimental::image2d<uint8_t>  ref = {
+    {128, 124, 150, 137, 106}, //
+    {116, 128, 156, 165, 117}, //
+    {117,  90, 131, 108, 151}, //
+    {107,  87, 118, 109, 167}, //
+    {107,  73, 125, 157, 117}, //
+  };
+  mln::experimental::image2d<uint8_t> ima;
+  mln::io::experimental::imread(fixtures::ImagePath::concat_with_filename("fly.pgm"), ima);
+
   ASSERT_IMAGES_EQ_EXP2(ima, ref, fixtures::ImageCompare::experimental::COMPARE_DOMAIN);
 }
 

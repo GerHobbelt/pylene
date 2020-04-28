@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/images.hpp>
+#include <mln/core/concepts/image.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/extension/border_management.hpp>

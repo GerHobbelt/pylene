@@ -39,7 +39,7 @@ namespace mln::archetypes
 
 
     template <class SE>
-    struct AsSE : SE, mln::StructuringElement<AsSE<SE>>
+    struct AsSE : SE, mln::experimental::StructuringElement<AsSE<SE>>
     {
     };
   } // namespace details

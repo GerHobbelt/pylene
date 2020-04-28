@@ -26,8 +26,8 @@ namespace mln::io::experimental
     static_assert(std::is_same<image_domain_t<I>, mln::experimental::box2d>() &&
                   "The domain must be a regular box2d");
 
-    internal::freeimage_writer_plugin p;
-    internal::save2d(std::forward<Image>(image), &p, filename);
+    mln::io::internal::freeimage_writer_plugin p;
+    mln::io::internal::save2d(std::forward<Image>(image), &p, filename);
   }
 
   template <class Image>

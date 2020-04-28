@@ -3,7 +3,6 @@
 #include <mln/core/assert.hpp>
 #include <mln/core/config.hpp>
 #include <mln/core/literal/vectorial.hpp>
-#include <mln/core/vec.hpp>
 
 #include <boost/type_traits/promote.hpp>
 #include <boost/utility.hpp>

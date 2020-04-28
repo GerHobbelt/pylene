@@ -1,14 +1,16 @@
+#include <mln/core/image/view/operators.hpp>
+
+
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
-
 #include <mln/core/domain/where.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/core/image/image_ops.hpp>
-#include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/transform.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/rows.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/rows.hpp>
+
+#include <mln/core/concepts/archetype/domain.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 

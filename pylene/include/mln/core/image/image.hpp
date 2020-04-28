@@ -1,35 +1,10 @@
 #pragma once
 
-// DO NOT REMOVE (used for checking include order)
-// #define MLN_CORE_IMAGE_IMAGE_HPP
-
 /// \file
 
-#include <mln/core/config.hpp>
-#include <mln/core/concept/new/images.hpp>
+// Traits and concepts
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/private/traits/image.hpp>
 
-
-#include <mln/core/neighborhood/neighborhood.hpp>
-#include <mln/core/ch_value.hpp> // [Obsolete]
-
-#include <mln/core/image_traits.hpp>
+// Utilities
 #include <mln/core/image/private/image_builder.hpp>
-#include <mln/core/concept/image.hpp>
-
-
-
-
-#include <mln/core/forall.hpp>
-#include <mln/core/image/morphers/morpher_base.hpp>
-#include <mln/core/image_base.hpp>
-
-#include <mln/core/image/image_routines.hpp>
-#include <mln/core/image/image_expr.hpp>
-#include <mln/core/image/image_maths_ops.hpp>
-#include <mln/core/image/image_ops.hpp>
-
-
-// The most fundamental views are automatically included
-#include <mln/core/image/morphers/filtered_image.hpp>    // Filter by function
-#include <mln/core/image/morphers/transformed_image.hpp> // Map
-#include <mln/core/image/sub_image.hpp>                  // Filter by domain

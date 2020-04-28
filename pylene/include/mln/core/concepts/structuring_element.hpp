@@ -9,13 +9,13 @@
 #include <type_traits>
 
 
-namespace mln::details
+namespace mln::experimental
 {
   template <class SE>
   struct StructuringElement
   {
   };
-} // namespace mln
+} // namespace mln::experimental
 
 
 namespace mln::concepts
@@ -27,7 +27,7 @@ namespace mln::concepts
     template <typename SE>
     concept DynamicStructuringElement =
       requires (SE se) {
-      { se.radial_extent() }  -> ::concepts::same_as<int>;
+        { se.radial_extent() }  -> int;
       };
 
 
@@ -37,7 +37,7 @@ namespace mln::concepts
 
   template <typename SE, typename P>
   concept StructuringElement =
-    ::concepts::convertible_to<SE, mln::details::StructuringElement<SE>> &&
+    ::concepts::convertible_to<SE, mln::experimental::StructuringElement<SE>> &&
     ::ranges::regular_invocable<SE, P> &&
     ::ranges::regular_invocable<SE, mln::archetypes::PixelT<P>> &&
     requires {
@@ -73,7 +73,7 @@ namespace mln::concepts
     StructuringElement<SE, P> &&
     ::concepts::convertible_to<typename SE::decomposable, std::true_type> &&
     requires(const SE se) {
-      { se.is_decomposable() }  -> ::concepts::same_as<bool>;
+      { se.is_decomposable() }  -> bool;
       { se.decompose() }        -> ::ranges::cpp20::forward_range;
       requires details::RangeOfStructuringElement<decltype(se.decompose()), P>;
     };
@@ -84,7 +84,7 @@ namespace mln::concepts
     StructuringElement<SE, P> &&
     ::concepts::convertible_to<typename SE::separable, std::true_type> &&
     requires(const SE se) {
-      { se.is_separable() } -> ::concepts::same_as<bool>;
+      { se.is_separable() } -> bool;
       { se.separate() }     -> ::ranges::cpp20::forward_range;
       requires details::RangeOfStructuringElement<decltype(se.separate()), P>;
     };

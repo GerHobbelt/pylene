@@ -29,6 +29,4 @@ TEST(Morpho, fill_hole)
   // pinf \in A => sat(A) == domain(f)
   mln::morpho::experimental::fill_hole(ima == 195, mln::experimental::c4, {45, 69}, out);
   ASSERT_TRUE(mln::all_of(out));
-
-  // io::imprint(out);
 }

@@ -9,7 +9,10 @@ namespace mln
   struct bidirectional_image_tag : forward_image_tag
   {
   };
-  struct raw_image_tag : bidirectional_image_tag
+  struct[[deprecated]] random_access_image_tag : bidirectional_image_tag
+  {
+  };
+  struct raw_image_tag : random_access_image_tag
   {
   };
   //clang-format on

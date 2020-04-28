@@ -38,7 +38,7 @@ namespace mln::archetypes
 
 
     template <class Pix>
-    struct AsPixel : Pix, mln::details::Pixel<AsPixel<Pix>>
+    struct AsPixel : Pix, mln::experimental::Pixel<AsPixel<Pix>>
     {
     };
   } // namespace details

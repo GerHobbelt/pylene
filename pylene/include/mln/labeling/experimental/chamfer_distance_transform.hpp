@@ -1,12 +1,14 @@
 #pragma once
 
+
+#include <mln/core/concepts/neighborhood.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
-#include <mln/core/neighborhood/neighborhood.hpp>
-#include <mln/core/rangev3/foreach.hpp>
-#include <mln/core/rangev3/view/reverse.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
 #include <mln/core/image/view/value_extended.hpp>
+#include <mln/core/neighborhood/neighborhood.hpp>
+#include <mln/core/range/foreach.hpp>
+#include <mln/core/range/view/reverse.hpp>
+#include <mln/core/range/view/zip.hpp>
 #include <mln/core/trace.hpp>
 
 #include <limits>
@@ -109,7 +111,7 @@ namespace mln::labeling::experimental
                    .get_status(&err)
                    .build();
 
-    DistanceType vfill = (background_is_object) ? value_traits<DistanceType>::max() : 0;
+    DistanceType vfill = (background_is_object) ? std::numeric_limits<DistanceType>::max() : 0;
 
 
     if (err == IMAGE_BUILD_OK)

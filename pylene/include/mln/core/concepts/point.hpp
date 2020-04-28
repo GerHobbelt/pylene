@@ -7,15 +7,13 @@ namespace mln::concepts
 
   // clang-format off
 
-  // Fixme: Point is allready a symbol in mln:: (conflicts with GCC-9)
-  template <typename P>
-  concept PointC =
-    ::concepts::regular<P> &&
-    ::concepts::totally_ordered<P>;
-  // clang-format on
+  // Point
+  template <typename Pnt>
+  concept Point =
+    ::concepts::regular<Pnt> &&
+    ::concepts::totally_ordered<Pnt>;
 
-  template <typename P>
-  inline constexpr bool Point = PointC<P>;
+  // clang-format on
 
 } // namespace mln::concepts
 

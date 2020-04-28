@@ -6,8 +6,6 @@
 #include <mln/accu/accumulators/count.hpp>
 
 
-#include <mln/io/experimental/imprint.hpp>
-
 #include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>

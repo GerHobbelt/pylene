@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mln/core/domain/where.hpp>
-#include <mln/core/rangev3/view/transform_if.hpp>
+#include <mln/core/range/view/transform_if.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 

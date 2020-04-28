@@ -1,8 +1,9 @@
 #pragma once
 
+#include <mln/core/assert.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/view/zip.hpp>
 
 #include <tuple>
 #include <type_traits>
@@ -52,11 +53,7 @@ namespace mln
     using category_type = std::common_type_t<common_category, bidirectional_image_tag>;
     using concrete_type = image_ch_value_t<I0, typename I0::value_type>;
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
-    template <concepts::Value V>
-#else
     template <typename V>
-#endif
     using ch_value_type = image_ch_value_t<I0, V>;
     /// \}
 

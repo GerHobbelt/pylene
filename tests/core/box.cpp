@@ -1,7 +1,7 @@
 #include <mln/core/box.hpp>
 
-#include <mln/core/concept/new/domains.hpp>
-#include <mln/core/rangev3/concepts.hpp>
+#include <mln/core/concepts/domain.hpp>
+#include <mln/core/concepts/range.hpp>
 #include <concepts/concepts.hpp>
 
 

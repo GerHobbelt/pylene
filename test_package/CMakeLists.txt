@@ -1,16 +1,10 @@
 project(PyleneTest)
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.8.2)
 
-find_package(pylene REQUIRED COMPONENTS core io-freeimage)
+include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+
+find_package(Pylene REQUIRED)
+find_package(FreeImage REQUIRED)
 
 add_executable(main main.cpp)
-target_link_libraries(main pylene::core pylene::io-freeimage)
-
-if (WITH_PYLENE_NUMPY)
-  find_package(pybind11 REQUIRED)
-  find_package(pylene REQUIRED COMPONENTS pylene-numpy)
-  pybind11_add_module(pylene_extension)
-  target_sources(pylene_extension PRIVATE pylene_extension.cpp)
-  target_link_libraries(pylene_extension PRIVATE pylene::pylene-numpy)
-  file(COPY ${CMAKE_SOURCE_DIR}/main.py DESTINATION ${CMAKE_BINARY_DIR})
-endif(WITH_PYLENE_NUMPY)
+target_link_libraries(main Pylene::Pylene FreeImage::FreeImage)

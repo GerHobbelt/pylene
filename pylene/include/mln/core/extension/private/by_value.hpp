@@ -1,20 +1,20 @@
 #pragma once
 
-#include <mln/core/concept/new/structuring_elements.hpp>
-#include <mln/core/utils/private/remove_cvref.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
+
 
 #include <limits>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-
+#include <concepts/type_traits.hpp>
 
 namespace mln::extension
 {
   template <typename V>
   struct by_value
   {
-    using value_type          = mln::detail::remove_cvref_t<V>;
+    using value_type          = ::concepts::remove_cvref_t<V>;
     using support_fill        = std::true_type;
     using support_mirror      = std::false_type;
     using support_periodize   = std::false_type;
@@ -30,7 +30,7 @@ namespace mln::extension
     template <typename SE>
     constexpr bool fit(const SE&) const
     {
-      PYLENE_CONCEPT_TS_ASSERT(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
+      static_assert(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
 
       return true;
     }

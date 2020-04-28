@@ -1,8 +1,10 @@
 #pragma once
 #include <mln/core/image/image.hpp>
-#include <mln/core/rangev3/rows.hpp>
-#include <mln/core/rangev3/view/zip.hpp>
+#include <mln/core/range/rows.hpp>
+#include <mln/core/range/view/zip.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/core/assert.hpp>
+
 
 #include <range/v3/algorithm/transform.hpp>
 #include <range/v3/functional/concepts.hpp>
@@ -15,14 +17,6 @@ namespace mln
   /// \ingroup Algorithms
   /// \brief Transform the value of an image through a function.
   ///
-  /// This is equivalent to the following code.
-  /// \code
-  /// mln_iter(vout, out.values())
-  /// mln_iter(vin, in.values())
-  /// mln_forall(vin, vout)
-  ///    *vout = f(*vin)
-  ///
-  /// \endcode
   ///
   /// \tparam InputImage A model of :concept:ref:`forward_image`
   /// \tparam OutputImage A model of Writable :concept:ref:`forward_image`
@@ -32,11 +26,10 @@ namespace mln
   /// \param output The output image.
 
   template <class InputImage, class OutputImage, class UnaryFunction>
-  void transform(InputImage in, const Image<OutputImage>& out, UnaryFunction f);
+  void transform(InputImage in, OutputImage out, UnaryFunction f);
 
   template <class InputImage1, class InputImage2, class OutputImage, class BinaryFunction>
   void transform(InputImage1 in1, InputImage2 in2, OutputImage out, BinaryFunction f);
-
 
 
   template <class InputImage, class UnaryFunction>
@@ -106,7 +99,7 @@ namespace mln
     using O = image_ch_value_t<InputImage, R>;
 
     // Check concretizable
-    O out = in.template ch_value<R>();
+    O out = imchvalue<R>(in);
     mln::transform(in, out, f);
     return out;
   }

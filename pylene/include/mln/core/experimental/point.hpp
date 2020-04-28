@@ -5,10 +5,6 @@
 
 #include <concepts/type_traits.hpp>
 
-#if 0
-#include <stl2/type_traits.hpp>
-#endif
-
 
 namespace mln::experimental
 {
@@ -583,7 +579,6 @@ namespace mln::experimental
 
 
 
-#ifdef PYLENE_CONCEPT_TS_ENABLED
 // Specialization of std::common_reference
 namespace concepts
 {
@@ -596,4 +591,3 @@ namespace concepts
                                             common_reference_t<typename UImpl::value_type, typename VImpl::value_type>>;
   };
 }
-#endif

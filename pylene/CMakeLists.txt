@@ -16,7 +16,7 @@ if (TBB_FOUND AND PYLENE_USE_TBB)
   target_link_libraries(Pylene INTERFACE tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
-  #FIXME use a config file
+#FIXME use a config file
   target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
 endif ()
 
@@ -39,7 +39,7 @@ target_include_directories(Pylene PUBLIC
 target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(Pylene PUBLIC range-v3)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
-target_link_libraries(Pylene PUBLIC FreeImage::FreeImage)
+target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 
 
 # Set sources
@@ -47,26 +47,27 @@ target_link_libraries(Pylene PUBLIC FreeImage::FreeImage)
 #target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 target_sources(Pylene PRIVATE
+               src/accu/cvxhull.cpp
+               src/core/image_format.cpp
+               src/core/init_list.cpp
+               src/core/ndbuffer_image.cpp
+               src/core/ndbuffer_image_data.cpp
                src/core/se/disc.cpp
+               src/core/se/mask2d.cpp
                src/core/se/periodic_line2d.cpp
                src/core/se/rect2d.cpp
-               src/core/se/mask2d.cpp
                src/core/trace.cpp
-               src/core/init_list.cpp
-               src/core/image_format.cpp
-               src/core/ndbuffer_image_data.cpp
-               src/core/ndbuffer_image.cpp
                src/core/traverse2d.cpp
                src/io/freeimage_plugin.cpp
-               src/io/io.cpp
-               src/io/imread.cpp
                src/io/imprint.cpp
-               src/morpho/maxtree.cpp
-               src/morpho/immersion.cpp
+               src/io/imread.cpp
+               src/io/io.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
-               src/morpho/running_max_vertical2d.cpp
+               src/morpho/immersion.cpp
+               src/morpho/maxtree.cpp
+               src/morpho/unionfind.cpp
                )
 
 # Compiler configurations
@@ -74,24 +75,7 @@ target_compile_features(Pylene PUBLIC cxx_std_20)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(Pylene PUBLIC -fconcepts)
-endif ()
-
-if (PYLENE_BUILD_PYBIND)
-  set_property(TARGET Pylene PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif ()
-
-target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-
-# Add concepts support for gcc > 8 with -fconcepts
-# if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
-#  set(PYLENE_CONCEPT_TS_ENABLED True PARENT_SCOPE)
-#  find_package(cmcstl2 REQUIRED)
-#  target_link_libraries(Pylene PUBLIC stl2) # This add appropriate -fconcept flags
-#  target_compile_definitions(Pylene PUBLIC PYLENE_CONCEPT_TS_ENABLED)
-# endif ()
-
-
-
+endif()
 
 # IDE configuration
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

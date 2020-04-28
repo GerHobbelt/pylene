@@ -47,7 +47,7 @@ namespace mln::ranges
       ::ranges::reverse_view<::ranges::span<T>> __read_rrow() const
       {
         auto line = ::ranges::make_span(m_ptr[Rank - 2] - m_count.back() + 1, m_ptr[Rank - 2] + 1);
-        return ::ranges::views::reverse(line);
+        return ::ranges::view::reverse(line);
       }
 
       bool __is_at_end(std::size_t k) const { return m_i[k] == m_count[k]; }

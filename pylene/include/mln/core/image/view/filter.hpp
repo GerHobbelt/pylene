@@ -5,8 +5,8 @@
 #include <mln/core/image/view/clip.hpp>
 #include <mln/core/domain/where.hpp>
 
-#include <mln/core/rangev3/view/filter.hpp>
-#include <mln/core/rangev3/view/remove_if.hpp>
+#include <mln/core/range/view/filter.hpp>
+#include <mln/core/range/view/remove_if.hpp>
 
 
 #include <range/v3/range/primitives.hpp>
@@ -47,7 +47,7 @@ namespace mln
     /// \}
 
     // Checks
-    PYLENE_CONCEPT_TS_ASSERT(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
+    static_assert(mln::concepts::AccessibleImage<I>, "The image must be accessible.");
 
   private:
     struct pix_filter_fn

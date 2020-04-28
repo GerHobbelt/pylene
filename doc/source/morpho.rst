@@ -38,8 +38,8 @@ Segmentation
    morpho/watershed
 
 
-Component Trees
-***************
+Component Trees & Hierarchical Representations
+*********************************************
 
 .. toctree::
     :maxdepth: 1
@@ -47,6 +47,7 @@ Component Trees
     morpho/component_tree
     morpho/maxtree
     morpho/tos
+    morpho/alphatree
 
 
 

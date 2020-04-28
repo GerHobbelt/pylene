@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concept/new/structuring_elements.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/se/private/se_facade.hpp>
 

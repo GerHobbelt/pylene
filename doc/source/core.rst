@@ -181,6 +181,8 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
   * :doc:`core/neighborhood/c4`
   * :doc:`core/neighborhood/c8`
+  * :doc:`core/neighborhood/c6`
+  * :doc:`core/neighborhood/c26`
 
 .. topic::  Predefined Structuring Elements
 

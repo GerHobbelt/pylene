@@ -15,6 +15,8 @@ void copy_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimen
 void copy_baseline(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
 void copy(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out);
 void copy(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
+void copy_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out);
+void copy_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
 
 std::ptrdiff_t count_if_baseline(const mln::experimental::image2d<uint8_t>& in);
 std::ptrdiff_t count_if_baseline(const mln::experimental::image2d<mln::rgb8>& in);
@@ -144,6 +146,14 @@ BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  mln::experimental::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    copy_parallel(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::experimental::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
@@ -157,6 +167,14 @@ BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8)(benchmark::State& st)
   mln::experimental::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     copy(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  mln::experimental::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    copy_parallel(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 

@@ -203,6 +203,14 @@ void copy(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::im
 {
   mln::experimental::copy(in, out);
 }
+void copy_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::experimental::parallel::copy(in, out);
+}
+void copy_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::experimental::parallel::copy(in, out);
+}
 
 
 namespace

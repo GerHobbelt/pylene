@@ -35,6 +35,8 @@ void paste_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experime
 void paste_baseline(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
 void paste(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out);
 void paste(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
+void paste_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out);
+void paste_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
 
 void transform_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out);
 void transform_baseline(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out);
@@ -266,6 +268,14 @@ BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  mln::experimental::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    paste_parallel(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::experimental::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
@@ -279,6 +289,14 @@ BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8)(benchmark::State& st)
   mln::experimental::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     paste(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  mln::experimental::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    paste_parallel(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 

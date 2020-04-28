@@ -281,6 +281,14 @@ void paste(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::i
 {
   mln::paste(in, out);
 }
+void paste_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::parallel::paste(in, out);
+}
+void paste_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::parallel::paste(in, out);
+}
 
 
 namespace

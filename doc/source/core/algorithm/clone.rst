@@ -19,13 +19,13 @@ Include :file:`<mln/core/algorithm/clone.hpp>`
         mln::copy(src, dst);
 
     The source and destination images should not alias.
+    This function has a parallel implementation, see following section for an example.
 
     :param src: The source image
     :tparam InputImage: A model of :cpp:concept:`InputImage`
-    :tparam OutputImage: A model of :cpp:concept:`OutputImage`
     :return: The concrete image of `src` with the same values
 
-    
+
 
 Examples
 --------
@@ -37,6 +37,15 @@ Examples
     float stdv = 2.f;
     auto g = (f - mean) / stdv; 
     mln::image2d<float> f2 = mln::clone(g); // Evaluation of the view
+
+#. Using parallel clone to evaluate an image view::
+
+    mln::image2d<mln::uint8> f = ...;
+    float mean = 10.f;
+    float stdv = 2.f;
+    auto g = (f - mean) / stdv; 
+    mln::image2d<float> f2 = mln::parallel::clone(g); // Evaluation of the view
+
 
 Complexity
 ----------

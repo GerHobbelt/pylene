@@ -22,22 +22,6 @@
 
 using namespace mln;
 
-struct sup_t
-{
-  template <class T>
-  T operator()(T x, T y) const
-  {
-    return mln::sup(x, y);
-  }
-
-  template <class T>
-  std::experimental::simd<T> operator()(std::experimental::simd<T> x, std::experimental::simd<T> y) const
-  {
-    return std::experimental::max(x, y);
-  }
-};
-
-
 void test_dilation_by_periodic_line(const mln::experimental::point2d& dp, int k)
 {
   int kWidth = 9;
@@ -62,7 +46,7 @@ void test_dilation_by_periodic_line(const mln::experimental::point2d& dp, int k)
 
   // Run algo
   auto line = mln::experimental::se::periodic_line2d(dp, k);
-  sup_t sup;
+  auto sup  = [](auto x, auto y) { return std::max(x, y); };
   mln::morpho::details::dilation_by_periodic_line(input, input, line, sup, input.domain());
   ASSERT_IMAGES_EQ_EXP(ref, input);
 }

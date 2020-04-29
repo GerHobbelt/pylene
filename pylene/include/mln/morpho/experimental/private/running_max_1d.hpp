@@ -14,9 +14,9 @@ namespace mln::morpho::experimental::details
   /// g[x] = Max f[y] y ∈ [⌊x/α⌋*α:x]
   /// h[x] = Max f[y] y ∈ [x:(⌊x/α⌋+1)*α)
   ///
-  /// \param[in,out] f Input array of size \p n + 2.k. Must be valid on the range [-k, n+k]
-  /// \param[in,out] g Temporary array of size \p n + 2.k. Must be valid on the range [-k, n+k]
-  /// \param[in,out] h Temporary array of size \p n + 2.k. Must be valid on the range [-k, n+k]
+  /// \param[in,out] f Input array of size \p n + 2.k
+  /// \param[in,out] g Temporary array of size \p n + 2.k
+  /// \param[in,out] h Temporary array of size \p n + 2.k
   /// \param[in] n Size of the array
   /// \param[in] k Radius of the sliding windows
   /// \param[in] sup Supremum operator

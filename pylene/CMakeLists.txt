@@ -64,12 +64,12 @@ target_sources(Pylene PRIVATE
                src/io/imread.cpp
                src/io/io.cpp
                src/morpho/component_tree.cpp
-               src/morpho/maxtree.cpp
-               src/morpho/immersion.cpp
-               src/morpho/unionfind.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
+               src/morpho/immersion.cpp
+               src/morpho/maxtree.cpp
                src/morpho/running_max_vertical2d.cpp
+               src/morpho/unionfind.cpp
                )
 
 # Compiler configurations

@@ -356,9 +356,7 @@ namespace mln::experimental
         assert(width >= 0 && height >= 0);
       }
 
-
-      template <int d = D, class = std::enable_if_t<d == 3>>
-      constexpr _bstorage(int width, int height, int depth)
+      constexpr _bstorage(int width, int height, int depth) requires(D == 3)
         : m_begin{0, 0, 0}
         , m_end{width, height, depth}
       {

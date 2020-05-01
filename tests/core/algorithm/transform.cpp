@@ -5,7 +5,7 @@
 #include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <utility>
-
+#include <tbb/task_scheduler_init.h>
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Transform)
@@ -37,6 +37,7 @@ TEST(Core, Algorithm_Transform_LValue)
 
 TEST(Core, Algorithm_Transform_Parallel)
 {
+  tbb::task_scheduler_init init;
   mln::experimental::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
   mln::experimental::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
 

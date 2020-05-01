@@ -2,7 +2,6 @@
 
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
-#include <tbb/task_scheduler_init.h>
 
 namespace mln
 {
@@ -48,7 +47,6 @@ namespace mln
   */
   void parallel_execute2d(ParallelCanvas2d& canvas)
   {
-    tbb::task_scheduler_init init;
     ParallelCanvas2dImpl wrapper(&canvas);
     mln::experimental::box2d domain = wrapper.GetDomain();
 

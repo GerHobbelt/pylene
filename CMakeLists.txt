@@ -24,9 +24,6 @@ endif ()
 
 find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 find_package(FreeImage REQUIRED)
-find_package(TBB)
-find_package(Qt4)
-
 
 
 # CONFIGURE COMPILER LAUNCHERS

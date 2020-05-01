@@ -34,4 +34,17 @@ namespace mln
     return out;
   }
 
+  namespace parallel
+  {
+    template <class InputImage>
+    image_concrete_t<InputImage> clone(InputImage input)
+    {
+      static_assert(mln::is_a<InputImage, experimental::Image>());
+
+      image_concrete_t<InputImage> out = input.concretize();
+      mln::experimental::parallel::copy(std::move(input), out);
+      return out;
+    }
+  } // namespace parallel
+
 } // namespace mln::experimental

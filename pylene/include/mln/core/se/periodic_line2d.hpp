@@ -21,6 +21,7 @@ namespace mln::experimental::se
     : public neighborhood_facade<periodic_line2d>
 #endif
   {
+
     class rng_t : public ::ranges::view_facade<rng_t>
     {
       friend ::ranges::range_access;
@@ -77,16 +78,21 @@ namespace mln::experimental::se
 
     /// \brief Return the extent radius
     int radial_extent() const;
-
     /// \brief
     mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
 
     /// \brief
     mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
 
+    /// \brief
+    bool is_horizontal() const noexcept;
+
+    /// \brief
+    bool is_vertical() const noexcept;
+
+
   private:
     mln::experimental::point2d m_delta;
     int                        m_k;
   };
-
 } // namespace mln::experimental::se

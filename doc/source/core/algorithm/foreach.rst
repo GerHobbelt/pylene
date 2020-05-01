@@ -16,6 +16,8 @@ Include :file:`<mln/core/algorithm/for_each.hpp>`
         for (auto&& v : in.values())
             f(v);
 
+    This function has a parallel implementation, see following section for an example.
+
     :param in: The input image.
     :param f: The function to apply on values.
     :tparam InputImage: A model of :cpp:concept:`InputImage`
@@ -29,6 +31,10 @@ Examples
     mln::image2d<uint8_t> ima = { {1, 2, 3}, {4, 5, 6} };
     auto out = mln::for_each(ima, [](uint8_t& x) { x += 1; });
   
+#. Using parallel for_each to add one to each element::
+
+    mln::image2d<uint8_t> ima = { {1, 2, 3}, {4, 5, 6} };
+    auto out = mln::parallel::for_each(ima, [](uint8_t& x) { x += 1; });
  
 Complexity
 ----------

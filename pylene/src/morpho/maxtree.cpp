@@ -22,7 +22,7 @@ namespace mln::morpho::experimental::details
 
     std::memcpy(tab, tmp, count * size);
     std::free(tmp);
-}
+  }
 
   /// Sort the array \c par so that par[i] < i
   /// where `par` encodes a DAG relation

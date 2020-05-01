@@ -185,6 +185,14 @@ void fill(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v)
 {
   mln::fill(ima, v);
 }
+void fill_parallel(mln::experimental::image2d<uint8_t>& ima, uint8_t v)
+{
+  mln::parallel::fill(ima, v);
+}
+void fill_parallel(mln::experimental::image2d<mln::rgb8>& ima, mln::rgb8 v)
+{
+  mln::parallel::fill(ima, v);
+}
 
 
 void copy_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
@@ -202,6 +210,14 @@ void copy(const mln::experimental::image2d<uint8_t>& in, mln::experimental::imag
 void copy(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
 {
   mln::experimental::copy(in, out);
+}
+void copy_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::experimental::parallel::copy(in, out);
+}
+void copy_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::experimental::parallel::copy(in, out);
 }
 
 
@@ -281,12 +297,30 @@ void paste(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::i
 {
   mln::paste(in, out);
 }
+void paste_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::parallel::paste(in, out);
+}
+void paste_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::parallel::paste(in, out);
+}
 
 
 namespace
 {
   static auto plus_one         = [](auto x) -> decltype(x) { return x + 1; };
   static auto plus_one_inplace = [](auto& x) { x += 1; };
+
+
+  static auto gamma_correction = [](auto& x) {
+    auto tmp = x;
+    return static_cast<decltype(tmp)>(mln::pow(tmp, 1 / 2.2f));
+  };
+  static auto gamma_correction_inplace = [](auto& x) {
+    auto tmp = x;
+    x        = static_cast<decltype(tmp)>(mln::pow(tmp, 1 / 2.2f));
+  };
 } // namespace
 
 void transform_baseline(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
@@ -297,6 +331,14 @@ void transform_baseline(const mln::experimental::image2d<mln::rgb8>& in, mln::ex
 {
   baseline::transform(in, out, plus_one);
 }
+void transform_baseline_hard(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  baseline::transform(in, out, gamma_correction);
+}
+void transform_baseline_hard(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  baseline::transform(in, out, gamma_correction);
+}
 void transform(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
 {
   mln::transform(in, out, plus_one);
@@ -304,6 +346,30 @@ void transform(const mln::experimental::image2d<uint8_t>& in, mln::experimental:
 void transform(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
 {
   mln::transform(in, out, plus_one);
+}
+void transform_hard(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::transform(in, out, gamma_correction);
+}
+void transform_hard(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::transform(in, out, gamma_correction);
+}
+void transform_parallel(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::parallel::transform(in, out, plus_one);
+}
+void transform_parallel(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::parallel::transform(in, out, plus_one);
+}
+void transform_parallel_hard(const mln::experimental::image2d<uint8_t>& in, mln::experimental::image2d<uint8_t>& out)
+{
+  mln::parallel::transform(in, out, gamma_correction);
+}
+void transform_parallel_hard(const mln::experimental::image2d<mln::rgb8>& in, mln::experimental::image2d<mln::rgb8>& out)
+{
+  mln::parallel::transform(in, out, gamma_correction);
 }
 
 
@@ -315,6 +381,14 @@ void for_each_baseline(mln::experimental::image2d<mln::rgb8>& in)
 {
   baseline::for_each(in, plus_one_inplace);
 }
+void for_each_baseline_hard(mln::experimental::image2d<uint8_t>& in)
+{
+  baseline::for_each(in, gamma_correction_inplace);
+}
+void for_each_baseline_hard(mln::experimental::image2d<mln::rgb8>& in)
+{
+  baseline::for_each(in, gamma_correction_inplace);
+}
 void for_each(mln::experimental::image2d<uint8_t>& in)
 {
   mln::for_each(in, plus_one_inplace);
@@ -323,6 +397,32 @@ void for_each(mln::experimental::image2d<mln::rgb8>& in)
 {
   mln::for_each(in, plus_one_inplace);
 }
+void for_each_hard(mln::experimental::image2d<uint8_t>& in)
+{
+  mln::for_each(in, gamma_correction_inplace);
+}
+void for_each_hard(mln::experimental::image2d<mln::rgb8>& in)
+{
+  mln::for_each(in, gamma_correction_inplace);
+}
+void parallel_for_each(mln::experimental::image2d<uint8_t>& in)
+{
+  mln::parallel::for_each(in, plus_one_inplace);
+}
+void parallel_for_each(mln::experimental::image2d<mln::rgb8>& in)
+{
+  mln::parallel::for_each(in, plus_one_inplace);
+}
+void parallel_for_each_hard(mln::experimental::image2d<uint8_t>& in)
+{
+  mln::parallel::for_each(in, gamma_correction_inplace);
+}
+void parallel_for_each_hard(mln::experimental::image2d<mln::rgb8>& in)
+{
+  mln::parallel::for_each(in, gamma_correction_inplace);
+}
+
+
 
 
 namespace

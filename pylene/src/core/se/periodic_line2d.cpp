@@ -32,6 +32,11 @@ namespace mln::experimental::se
     return m_k * std::max(std::abs(m_delta.x()), std::abs(m_delta.y()));
   }
 
+  bool periodic_line2d::is_horizontal() const noexcept { return m_delta.y() == 0; }
+
+  bool periodic_line2d::is_vertical() const noexcept { return m_delta.x() == 0; }
+
+
   mln::experimental::box2d periodic_line2d::compute_input_region(mln::experimental::box2d roi) const
   {
     int dx = std::abs(m_delta.x()) * m_k;

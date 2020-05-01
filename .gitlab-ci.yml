@@ -190,6 +190,6 @@ package:
     script:
         - mkdir build && cd build
         - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. $CONAN_USER/$PACKAGE_TAG --build missing -e CXX=g++ -e CC=gcc
+        - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
         - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
     only: [ "dev", "development/ranges", "development/cpp20" ]

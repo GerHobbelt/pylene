@@ -73,20 +73,21 @@ namespace mln::experimental
         static_assert(mln::is_a<OutputImage, experimental::Image>());
         static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
-        CopyParallel(InputImage input, OutputImage output)
-          : _in{input}
-          , _out{output}
-        {
-        }
 
         mln::experimental::box2d GetDomain() const final { return _in.domain(); }
 
-      public:
         void ExecuteTile(mln::experimental::box2d b) const final
         {
           auto subimage_in  = _in.clip(b);
           auto subimage_out = _out.clip(b);
           mln::experimental::copy(subimage_in, subimage_out);
+        }
+
+      public:
+        CopyParallel(InputImage input, OutputImage output)
+          : _in{input}
+          , _out{output}
+        {
         }
       };
     } // namespace details

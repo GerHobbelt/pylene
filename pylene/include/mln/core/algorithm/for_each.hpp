@@ -40,18 +40,18 @@ namespace mln
         static_assert(mln::is_a<InputImage, experimental::Image>());
         static_assert(::ranges::invocable<Function, image_reference_t<InputImage>>);
 
-        ForEachParallel(InputImage input, Function fun)
-            : _in{input}
-            , _fun{fun}
-        {}
-
         mln::experimental::box2d GetDomain() const final { return _in.domain(); }
-      public:
+
         void ExecuteTile(mln::experimental::box2d b) const final
         {
           auto subimage = _in.clip(b);
           mln::for_each(subimage, _fun);
         }
+      public:
+        ForEachParallel(InputImage input, Function fun)
+            : _in{input}
+            , _fun{fun}
+        {}
       };
     } // namespace details
 

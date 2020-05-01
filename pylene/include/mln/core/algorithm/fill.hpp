@@ -51,19 +51,19 @@ namespace mln
 
         static_assert(mln::is_a<InputImage, experimental::Image>());
 
-        FillParallel(InputImage input, Value& v)
-          : _in{input}
-          , _val{v}
-        {
-        }
-
         mln::experimental::box2d GetDomain() const final { return _in.domain(); }
 
-      public:
         void ExecuteTile(mln::experimental::box2d b) const final
         {
           auto subimage_in = _in.clip(b);
           mln::fill(subimage_in, _val);
+        }
+
+      public:
+        FillParallel(InputImage input, Value& v)
+          : _in{input}
+          , _val{v}
+        {
         }
       };
     } // namespace details

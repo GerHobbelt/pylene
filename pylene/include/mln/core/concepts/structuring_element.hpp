@@ -27,7 +27,7 @@ namespace mln::concepts
     template <typename SE>
     concept DynamicStructuringElement =
       requires (SE se) {
-        { se.radial_extent() }  -> int;
+      { se.radial_extent() }  -> ::concepts::same_as<int>;
       };
 
 
@@ -73,7 +73,7 @@ namespace mln::concepts
     StructuringElement<SE, P> &&
     ::concepts::convertible_to<typename SE::decomposable, std::true_type> &&
     requires(const SE se) {
-      { se.is_decomposable() }  -> bool;
+      { se.is_decomposable() }  -> ::concepts::same_as<bool>;
       { se.decompose() }        -> ::ranges::cpp20::forward_range;
       requires details::RangeOfStructuringElement<decltype(se.decompose()), P>;
     };
@@ -84,7 +84,7 @@ namespace mln::concepts
     StructuringElement<SE, P> &&
     ::concepts::convertible_to<typename SE::separable, std::true_type> &&
     requires(const SE se) {
-      { se.is_separable() } -> bool;
+      { se.is_separable() } -> ::concepts::same_as<bool>;
       { se.separate() }     -> ::ranges::cpp20::forward_range;
       requires details::RangeOfStructuringElement<decltype(se.separate()), P>;
     };

@@ -13,7 +13,7 @@ namespace mln::canvas
   template <class SE, class I, class J, class Self = void>
   // This concept check makes an ICE with MSVC
   #ifndef _MSC_VER
-   requires concepts::StructuringElement<SE, image_point_t<I>>&& concepts::Image<I>&& concepts::Image<J>
+   requires concepts::StructuringElement<SE, image_point_t<I>> && concepts::Image<I> && concepts::Image<J>
   #endif
   class LocalAlgorithm
   {
@@ -101,6 +101,9 @@ namespace mln::canvas
 
 
   template <class SE, class I, class J, class Self>
+#ifndef _MSC_VER
+   requires concepts::StructuringElement<SE, image_point_t<I>> && concepts::Image<I> && concepts::Image<J>
+#endif
   void LocalAlgorithm<SE, I, J, Self>::Execute()
   {
     mln_entering("LocalAlgorithm::Execute (Non-incremental)");

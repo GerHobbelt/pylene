@@ -221,13 +221,13 @@ namespace mln::ranges
     template <::ranges::cpp20::range Rng, class Fun>
     [[gnu::always_inline]] inline auto transform(Rng&& rng, Fun&& fun)
     {
-      return ::ranges::view::transform(std::forward<Rng>(rng), std::forward<Fun>(fun));
+      return ::ranges::views::transform(std::forward<Rng>(rng), std::forward<Fun>(fun));
     }
 
     template <::ranges::cpp20::range Rng1, ::ranges::cpp20::range Rng2, class Fun>
     [[gnu::always_inline]] inline auto transform(Rng1&& rng1, Rng2&& rng2, Fun&& fun)
     {
-      return ::ranges::view::transform(std::forward<Rng1>(rng1), std::forward<Rng2>(rng2), std::forward<Fun>(fun));
+      return ::ranges::views::transform(std::forward<Rng1>(rng1), std::forward<Rng2>(rng2), std::forward<Fun>(fun));
     }
 
   } // namespace view

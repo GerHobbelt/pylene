@@ -25,7 +25,7 @@ namespace mln
     template <class P>
     requires(!mln::is_a<P, mln::details::Pixel>::value) auto operator()(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const SE*>(this)->offsets(), details::add_point<P>{point});
+      return ::ranges::views::transform(static_cast<const SE*>(this)->offsets(), details::add_point<P>{point});
     }
   };
 

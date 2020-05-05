@@ -33,7 +33,7 @@ namespace mln::concepts
     !std::is_reference_v<pixel_value_t<Pix>> &&
     requires(const Pix cpix, Pix pix, pixel_point_t<Pix> p) {
       { cpix.point() } -> ::concepts::convertible_to<pixel_point_t<Pix>>;
-#if (__GNUG__) // see https://stackoverflow.com/questions/55198202/unable-to-deduce-placeholder-type-in-concept
+#if (__GNUG__ == 9) // see https://stackoverflow.com/questions/55198202/unable-to-deduce-placeholder-type-in-concept
       { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>&&;
 #else
       { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>;

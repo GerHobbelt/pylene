@@ -9,10 +9,10 @@
 template <typename U, typename V = U>
 concept AddableWith = requires(U a, V b)
 {
-  { a += b } -> U&;
-  { a -= b } -> U&;
-  { b += a } -> V&;
-  { b -= a } -> V&;
+  { a += b } -> ::concepts::same_as<U&>;
+  { a -= b } -> ::concepts::same_as<U&>;
+  { b += a } -> ::concepts::same_as<V&>;
+  { b -= a } -> ::concepts::same_as<V&>;
   { a + b };
   { a - b };
   { b + a};

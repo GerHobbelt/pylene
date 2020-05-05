@@ -76,7 +76,7 @@ namespace mln
       template <typename SE>
       constexpr bool fit(const SE& se) const
       {
-        static_assert(concepts::StructuringElement<SE>, "SE is not a valid Structuring Element!");
+        static_assert(mln::is_a_v<SE, details::StructuringElement>, "SE is not a valid Structuring Element!");
 
         return std::visit([&se](auto&& ima) { return ima.extension().fit(se); }, *m_adapted_image_ptr);
       }

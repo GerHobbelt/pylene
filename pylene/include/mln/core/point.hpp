@@ -205,7 +205,7 @@ namespace mln
       pcontainer(const pcontainer& other) = default;
 
       // From a span
-      constexpr pcontainer(int dim, const T* data) noexcept
+      constexpr pcontainer([[maybe_unused]]  int dim, const T* data) noexcept
       {
         assert(dim == Dim && "Point dimensions mistmatch.");
         for (int i = 0; i < Dim; ++i)

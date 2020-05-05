@@ -59,19 +59,19 @@ namespace mln
     template <class P>
     requires(!mln::is_a<P, mln::details::Pixel>::value) auto operator()(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const N*>(this)->offsets(), details::add_point<P>{point});
+      return ::ranges::views::transform(static_cast<const N*>(this)->offsets(), details::add_point<P>{point});
     }
 
     template <class P>
     requires(!mln::is_a<P, mln::details::Pixel>::value) auto before(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const N*>(this)->before_offsets(), details::add_point<P>{point});
+      return ::ranges::views::transform(static_cast<const N*>(this)->before_offsets(), details::add_point<P>{point});
     }
 
     template <class P>
     requires(!mln::is_a<P, mln::details::Pixel>::value) auto after(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const N*>(this)->after_offsets(), details::add_point<P>{point});
+      return ::ranges::views::transform(static_cast<const N*>(this)->after_offsets(), details::add_point<P>{point});
     }
   };
 
@@ -99,19 +99,19 @@ namespace mln
     template <class P> requires(!mln::is_a<P, mln::details::Pixel>::value)
     auto operator()(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const N*>(this)->offsets(), details::add_wpoint<P>{point});
+      return ::ranges::views::transform(static_cast<const N*>(this)->offsets(), details::add_wpoint<P>{point});
     }
 
     template <class P> requires(!mln::is_a<P, mln::details::Pixel>::value)
     auto before(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const N*>(this)->before_offsets(), details::add_wpoint<P>{point});
+      return ::ranges::views::transform(static_cast<const N*>(this)->before_offsets(), details::add_wpoint<P>{point});
     }
 
     template <class P> requires(!mln::is_a<P, mln::details::Pixel>::value)
     auto after(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const N*>(this)->after_offsets(), details::add_wpoint<P>{point});
+      return ::ranges::views::transform(static_cast<const N*>(this)->after_offsets(), details::add_wpoint<P>{point});
     }
   };
 } // namespace mln

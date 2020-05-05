@@ -98,8 +98,8 @@ namespace mln
       return size(2);
     }
 
-    using Impl::cursor;
-    using Impl::backward_cursor;
+    using typename Impl::cursor;
+    using typename Impl::backward_cursor;
     using Impl::begin_cursor;
     using Impl::end_cursor;
     using Impl::rbegin_cursor;

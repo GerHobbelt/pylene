@@ -11,19 +11,17 @@ class Pylene(ConanFile):
     options = {
                "shared": [True, False],
                "fPIC": [True, False],
-               "gtest": [True, False],
                "benchmark": [True, False],
                "freeimage": [True, False],
-               "boost": [True, False],
-               "boost_program_options": [True, False]}
+               "boost": [True, False]}
     default_options = {
                        "shared": False,
                        "fPIC": False,
-                       "gtest": False,
                        "benchmark": False,
                        "freeimage": False,
                        "boost": False,
-                       "boost_program_options": False}
+                       "gtest:shared": False
+    }
 
     generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
@@ -43,16 +41,19 @@ class Pylene(ConanFile):
         if self.settings.compiler in ["gcc", "clang"]:
             self.cpp_info.cppflags = ["-std=c++20"]
 
+    # developer dependancies (to be removed)
+    def build_requirements(self):
+        self.build_requires("gtest/[>=1.10]", force_host_context=True)
+
+
     # Requirements part of the INTERFACE
     def requirements(self):
         self.requires("range-v3/0.10.0@ericniebler/stable")
         self.requires("fmt/6.0.0")
 
+
         if self.options.freeimage:
             self.requires("freeimage/3.18.0@dutiona/stable")
-
-        if self.options.gtest:
-            self.requires("gtest/1.8.1")
 
         if self.options.benchmark:
             self.requires("benchmark/1.5.0")

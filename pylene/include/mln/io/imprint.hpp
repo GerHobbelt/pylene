@@ -50,7 +50,7 @@ namespace mln::io
       };
 
       template <class I>
-      struct impl_t : impl_base_t
+      struct impl_t final : impl_base_t
       {
         impl_t(I& x) { this->m_ima = (void*)(&x); }
         ~impl_t() final = default;

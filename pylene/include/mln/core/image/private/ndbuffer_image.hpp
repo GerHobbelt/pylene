@@ -139,7 +139,7 @@ namespace mln
     [[deprecated]] const T* data() const noexcept { return this->buffer(); }
 
     index_type  index_of_point(fast_point_type p) const noexcept;
-    fast_point_type  point_at_index(index_type i) const noexcept;
+    point_type  point_at_index(index_type i) const noexcept;
     index_type  delta_index(fast_point_type p) const noexcept;
     /// \}
 
@@ -402,7 +402,7 @@ namespace mln
 
 
   template <class T, int N>
-  inline auto __ndbuffer_image<T, N>::point_at_index(index_type i) const noexcept -> fast_point_type
+  inline auto __ndbuffer_image<T, N>::point_at_index(index_type i) const noexcept -> point_type
   {
     fast_point_type coords;
     Impl::get_point(this->__info(), i, coords.data());

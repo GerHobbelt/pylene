@@ -120,7 +120,11 @@ namespace mln::concepts
     } &&
     image_indexable_v<I> &&
     requires (I ima, image_index_t<I> k) {
-      { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
+#if __GNUC__ == 9
+    { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
+#else
+    { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
+#endif
     };
 
 
@@ -133,7 +137,11 @@ namespace mln::concepts
       WritableImage<I> &&
       IndexableImage<I> &&
       requires(I ima, image_index_t<I> k, image_value_t<I> v) {
+#if __GNUC__ == 9
+        { ima[k] = v } -> ::concepts::same_as<image_reference_t<I>>&&;
+#else
         { ima[k] = v } -> ::concepts::same_as<image_reference_t<I>>;
+#endif
       };
 
   } // namespace detail
@@ -145,10 +153,17 @@ namespace mln::concepts
     Image<I> &&
     image_accessible_v<I> &&
     requires (I ima, image_point_t<I> p) {
+#if __GNUC__ == 9
+      { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
+      { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>&&; // idem
+      { ima.new_pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>&&; // For concrete image pixel may propagate constness
+      { ima.new_pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>&&; // idem
+#else
       { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
       { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>; // idem
       { ima.new_pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>; // For concrete image pixel may propagate constness
       { ima.new_pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>; // idem
+#endif
     };
 
 

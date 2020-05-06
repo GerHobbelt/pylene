@@ -713,11 +713,11 @@ namespace mln
   template <class Impl>
   constexpr std::size_t _box<Impl>::size() const noexcept
   {
-    std::size_t sz = 1;
+    int sz = 1;
     for (int k = 0; k < this->dim(); ++k)
       sz *= (this->__end(k) - this->__begin(k));
     if (sz < 0)
-      sz = 0;
+      return 0;
     return sz;
   }
 

@@ -132,7 +132,7 @@ namespace mln::ranges
     {
       auto cursors = std::apply(
           [](auto&&... cur) { return std::make_tuple(::ranges::range_access::begin_cursor(cur)...); }, m_ranges);
-      return {{}, cursors, m_map_fn, m_pred_fn};
+      return {{}, cursors, {m_map_fn}, {m_pred_fn}};
     }
 
     ::ranges::default_sentinel_t end_cursor() const { return {}; }

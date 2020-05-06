@@ -67,7 +67,7 @@ namespace  mln::morpho::details
 
 
   template <class P>
-  class hvectors_unbounded : public hvectors_unbounded<void>
+  class hvectors_unbounded final : public hvectors_unbounded<void>
   {
   public:
     hvectors_unbounded(int nlevel);

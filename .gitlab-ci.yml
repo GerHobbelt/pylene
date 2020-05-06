@@ -11,11 +11,16 @@ cache:
 variables:
     FEDORA_RAWHIDE: "${CI_REGISTRY}/olena/pylene-dockers/fedora-rawhide"
     FEDORA_31: "${CI_REGISTRY}/olena/pylene-dockers/fedora-31"
+    FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
     PACKAGE_NAME: "pylene"                                                      # Conan package name
     PACKAGE_TAG: "stable"                                                       # Conan tag
     PACKAGE_VERSION: "head"                                                     # Version to build
     CMAKE_BUILD_PARALLEL_LEVEL: 6
     CONAN_USER: "lrde"
+    CONAN_PROFILE: "gcc-9"
+    ASAN: "OFF"
+    MSAN: "OFF"
+    UBSAN: "OFF"
 
 before_script:
         - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
@@ -45,6 +50,7 @@ windows-debug:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
         - when: manual
+          allow_failure: true
     variables:
         VCVAR2019: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat'
         ARCH: x64
@@ -53,7 +59,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - conan install .. --build missing -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
         - cmake --build . --target Pylene
         - cmake --build . --target build-tests
@@ -77,9 +83,8 @@ distcheck-linux-gcc9-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        ASAN: "OFF"
-        MSAN: "OFF"
-        UBSAN: "OFF"
+        CONAN_PROFILE: "gcc-9"
+
 
 distcheck-linux-gcc9-debug-asan-ubsan:
     <<: *distcheck-linux-base
@@ -91,6 +96,54 @@ distcheck-linux-gcc9-debug-asan-ubsan:
         ASAN: "ON"
         MSAN: "OFF"
         UBSAN: "ON"
+        CONAN_PROFILE: "gcc-9"
+
+distcheck-linux-clang10-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_32}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+        CONAN_PROFILE: "clang-10"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+distcheck-linux-clang10-debug:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_32}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CONAN_PROFILE: "clang-10"
+
+distcheck-linux-gcc10-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_32}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+        CONAN_PROFILE: "gcc-10"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+
+distcheck-linux-gcc10-debug:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_32}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CONAN_PROFILE: "gcc-10"
 
 
 distcheck-linux-coverage:
@@ -115,7 +168,6 @@ distcheck-linux-coverage:
     rules:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
-        - when: manual
 
 #########
 # Bench #
@@ -125,7 +177,7 @@ distcheck-linux-coverage:
     stage: bench
     script:
         - mkdir build && cd build
-        - conan install .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - conan install .. -pr gcc-9 --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target fetch-external-data
         - cmake --build . --target build-bench
@@ -158,7 +210,7 @@ distbench-linux-gcc9-release:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - conan install -u .. -pr gcc-9 --build missing
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc
         - mkdir ../public && mv doc/sphinx/* ../public/

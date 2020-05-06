@@ -20,12 +20,11 @@ Link to the [C++ Documentation](http://olena.pages.lrde.epita.fr/pylene/)
 
 
 
-
 # Requirements
 Pylene is developed in modern C++. You need a modern C++ compatible compiler:
 
-* GCC 9 ~~GCC 10~~ (in progress)
-* ~~Clang 10~~ (in progress)
+* GCC 9 GCC 10
+* Clang 10
 * Microsoft Visual Studio 2019
 
 This project relies on:

@@ -98,8 +98,8 @@ namespace mln
       return size(2);
     }
 
-    using Impl::cursor;
-    using Impl::backward_cursor;
+    using typename Impl::cursor;
+    using typename Impl::backward_cursor;
     using Impl::begin_cursor;
     using Impl::end_cursor;
     using Impl::rbegin_cursor;
@@ -713,11 +713,11 @@ namespace mln
   template <class Impl>
   constexpr std::size_t _box<Impl>::size() const noexcept
   {
-    std::size_t sz = 1;
+    int sz = 1;
     for (int k = 0; k < this->dim(); ++k)
       sz *= (this->__end(k) - this->__begin(k));
     if (sz < 0)
-      sz = 0;
+      return 0;
     return sz;
   }
 

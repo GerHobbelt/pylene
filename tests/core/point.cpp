@@ -9,10 +9,17 @@
 template <typename U, typename V = U>
 concept AddableWith = requires(U a, V b)
 {
+#if __GNUC__ == 9
   { a += b } -> U&;
   { a -= b } -> U&;
   { b += a } -> V&;
   { b -= a } -> V&;
+#else
+  { a += b } -> ::concepts::same_as<U&>;
+  { a -= b } -> ::concepts::same_as<U&>;
+  { b += a } -> ::concepts::same_as<V&>;
+  { b -= a } -> ::concepts::same_as<V&>;
+#endif
   { a + b };
   { a - b };
   { b + a};

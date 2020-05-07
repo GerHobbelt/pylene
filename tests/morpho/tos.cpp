@@ -121,7 +121,7 @@ class ToSPropagation : public ::testing::Test
 };
 
 typedef ::testing::Types<uint8_t> TestValueTypes;
-TYPED_TEST_CASE(ToSPropagation, TestValueTypes);
+TYPED_TEST_SUITE(ToSPropagation, TestValueTypes);
 
 TYPED_TEST(ToSPropagation, saddle_point)
 {

@@ -21,7 +21,7 @@ namespace mln::internal
   class __ndbuffer_image_data;
 
   template <>
-  class __ndbuffer_image_data<void> : public ndbuffer_image_data
+  class __ndbuffer_image_data<void> final : public ndbuffer_image_data
   {
     std::allocator<std::byte> m_allocator;
 
@@ -33,7 +33,7 @@ namespace mln::internal
   };
 
   template <class T>
-  class __ndbuffer_image_data : public ndbuffer_image_data
+  class __ndbuffer_image_data final : public ndbuffer_image_data
   {
     std::allocator<T> m_allocator;
 

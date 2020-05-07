@@ -5,7 +5,7 @@
 namespace mln::io::internal
 {
 
-  class freeimage_reader_plugin : public plugin_reader
+  class freeimage_reader_plugin final : public plugin_reader
   {
   public:
     ~freeimage_reader_plugin() final;
@@ -13,7 +13,7 @@ namespace mln::io::internal
     void close() final;
   };
 
-  class freeimage_writer_plugin : public plugin_writer
+  class freeimage_writer_plugin final : public plugin_writer
   {
   public:
     ~freeimage_writer_plugin() final;

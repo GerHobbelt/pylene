@@ -130,7 +130,7 @@ namespace mln::morpho::canvas
       // Forward pass
       {
         mln_entering("Union-find forward pass");
-        for (auto p : ::ranges::view::reverse(S))
+        for (auto p : ::ranges::views::reverse(S))
         {
           par(p) = p;
           viz.on_make_set(p);

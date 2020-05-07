@@ -49,6 +49,10 @@ namespace mln
   template <typename T, template <typename> class Concept>
   using is_a = typename internal::is_a_helper<T, Concept>::type;
 
+
+  template <typename T, template <typename> class Concept>
+  constexpr inline bool is_a_v = is_a<T, Concept>::value;
+
   /*********************/
   /* Implementation    */
   /*********************/

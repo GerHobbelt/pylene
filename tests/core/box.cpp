@@ -12,8 +12,8 @@ template <class A, class B>
 concept Interoperable = ::concepts::equality_comparable_with<A, B>
   && requires(A& a, const A& ca, const B& b)
 {
-  { ca.includes(b) } -> bool;
-  { ca.intersects(b) } -> bool;
+  { ca.includes(b) } -> ::concepts::same_as<bool>;
+  { ca.intersects(b) } -> ::concepts::same_as<bool>;
   { a.clip(b) };
 };
 

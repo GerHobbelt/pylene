@@ -73,7 +73,7 @@ namespace mln::concepts
       { cima.template ch_value<mln::archetypes::Value>() }
       -> ::concepts::convertible_to<image_ch_value_t<I, mln::archetypes::Value>>;
       { cima.concretize() } -> ::concepts::convertible_to<image_concrete_t<I>>;
-      { cima.domain() }     -> image_domain_t<I>;
+      { cima.domain() }     -> ::concepts::convertible_to<image_domain_t<I>>;
       { ima.pixels() }  -> mln::ranges::mdrange;
       { ima.values() }  -> mln::ranges::mdrange;
       requires ::concepts::convertible_to<mln::ranges::mdrange_value_t<decltype(ima.pixels())>, image_pixel_t<I>>;
@@ -120,7 +120,11 @@ namespace mln::concepts
     } &&
     image_indexable_v<I> &&
     requires (I ima, image_index_t<I> k) {
-      { ima[k] }  -> image_reference_t<I>; // For concrete image it returns a const_reference
+#if __GNUC__ == 9
+    { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
+#else
+    { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
+#endif
     };
 
 
@@ -133,9 +137,13 @@ namespace mln::concepts
       WritableImage<I> &&
       IndexableImage<I> &&
       requires(I ima, image_index_t<I> k, image_value_t<I> v) {
-        { ima[k] = v } -> image_reference_t<I>;
+#if __GNUC__ == 9
+        { ima[k] = v } -> ::concepts::same_as<image_reference_t<I>>&&;
+#else
+        { ima[k] = v } -> ::concepts::same_as<image_reference_t<I>>;
+#endif
       };
-    
+
   } // namespace detail
 
 
@@ -145,10 +153,17 @@ namespace mln::concepts
     Image<I> &&
     image_accessible_v<I> &&
     requires (I ima, image_point_t<I> p) {
-      { ima(p) }              -> image_reference_t<I>; // For concrete image it returns a const_reference
-      { ima.at(p) }           -> image_reference_t<I>; // idem
-      { ima.new_pixel(p) }    -> image_pixel_t<I>; // For concrete image pixel may propagate constness
-      { ima.new_pixel_at(p) } -> image_pixel_t<I>; // idem
+#if __GNUC__ == 9
+      { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
+      { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>&&; // idem
+      { ima.new_pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>&&; // For concrete image pixel may propagate constness
+      { ima.new_pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>&&; // idem
+#else
+      { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
+      { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>; // idem
+      { ima.new_pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>; // For concrete image pixel may propagate constness
+      { ima.new_pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>; // idem
+#endif
     };
 
 
@@ -161,10 +176,10 @@ namespace mln::concepts
       detail::WritableImage<I> &&
       AccessibleImage<I> &&
       requires(I ima, image_point_t<I> p, image_value_t<I> v) {
-        { ima(p) = v }    -> image_reference_t<I>;
-        { ima.at(p) = v } -> image_reference_t<I>;
+        { ima(p) = v };
+        { ima.at(p) = v };
       };
-  
+
   } // namespace detail
 
 
@@ -174,9 +189,9 @@ namespace mln::concepts
     IndexableImage<I> &&
     AccessibleImage<I> &&
     requires (const I cima, image_index_t<I> k, image_point_t<I> p) {
-      { cima.point_at_index(k) }  -> image_point_t<I>;
-      { cima.index_of_point(p) }  -> image_index_t<I>;
-      { cima.delta_index(p) }     -> image_index_t<I>;
+      { cima.point_at_index(k) }  -> ::concepts::same_as<image_point_t<I>>;
+      { cima.index_of_point(p) }  -> ::concepts::same_as<image_index_t<I>>;
+      { cima.delta_index(p) }     -> ::concepts::same_as<image_index_t<I>>;
     };
 
 
@@ -222,8 +237,8 @@ namespace mln::concepts
     BidirectionalImage<I> &&
     ::concepts::derived_from<image_category_t<I>, raw_image_tag> &&
     requires (I ima, const I cima, int dim) {
-    { ima.data() }        -> ::concepts::convertible_to<const image_value_t<I>*>; // data() may be proxied by a view
-      { cima.stride(dim) } -> std::ptrdiff_t;
+      { ima.data() }        -> ::concepts::convertible_to<const image_value_t<I>*>; // data() may be proxied by a view
+      { cima.stride(dim) } -> ::concepts::same_as<std::ptrdiff_t>;
     };
 
 
@@ -238,7 +253,7 @@ namespace mln::concepts
       WritableBidirectionalImage<I> &&
       RawImage<I> &&
       requires(I ima, image_value_t<I> v) {
-      { ima.data() }        -> ::concepts::convertible_to<image_value_t<I>*>;
+        { ima.data() }        -> ::concepts::convertible_to<image_value_t<I>*>;
         { *(ima.data()) = v };
       };
 
@@ -267,7 +282,7 @@ namespace mln::concepts
     } &&
     not ::concepts::same_as<mln::extension::none_extension_tag, image_extension_category_t<I>> &&
     requires (I ima, image_point_t<I> p) {
-      { ima.extension() } -> image_extension_t<I>;
+      { ima.extension() } -> ::concepts::same_as<image_extension_t<I>>;
     };
 
 

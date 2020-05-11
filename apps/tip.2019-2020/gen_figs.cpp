@@ -34,6 +34,7 @@ int main()
 
   mln::io::experimental::imsave(lena_red, "images/lena_red.png");
   mln::io::experimental::imsave(lena_green, "images/lena_green.png");
+
   mln::io::experimental::imsave(lena_blue, "images/lena_blue.png");
 
   using namespace mln::view::ops;
@@ -244,7 +245,7 @@ int main()
     mln::experimental::image2d<mln::uint8> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
-    auto invert = [](auto v) -> mln::uint8 { return 255 - v; };
+    auto invert             = [](auto v) -> mln::uint8 { return 255 - v; };
     auto lena_grey_inverted = mln::view::transform(lena_grey, invert);
 
     mln::io::experimental::imsave(lena_grey_inverted, "images/lena_grey_inverted.png");
@@ -254,7 +255,7 @@ int main()
     mln::experimental::image2d<mln::rgb8> lena_color;
     mln::io::experimental::imread("images/lena_color.png", lena_color);
 
-    auto invert = [](auto v) -> mln::rgb8 { return 255 - v; };
+    auto invert              = [](auto v) -> mln::rgb8 { return 255 - v; };
     auto lena_color_inverted = mln::view::transform(lena_color, invert);
 
     mln::io::experimental::imsave(lena_color_inverted, "images/lena_color_inverted.png");

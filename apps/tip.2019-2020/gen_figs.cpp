@@ -12,7 +12,94 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
+
+constexpr double pi()
+{
+  return std::atan(1) * 4;
+}
+
+
+template <typename T>
+class matrix2d
+{
+public:
+  matrix2d()                = default;
+  matrix2d(const matrix2d&) = default;
+  matrix2d(matrix2d&&)      = default;
+  matrix2d& operator=(const matrix2d&) = default;
+  matrix2d& operator=(matrix2d&&) = default;
+
+  matrix2d(std::size_t width, std::size_t height)
+    : data_(width * height, T{})
+  {
+  }
+
+  const T& operator(std::size_t x, std::size_t y) const
+  {
+    assert(x >= 0 && x < w && y >= 0 && y < h && "Index out of bound");
+    return data_[y * w + x];
+  }
+
+  T& operator(std::size_t x, std::size_t y)
+  {
+    assert(x >= 0 && x < w && y >= 0 && y < h && "Index out of bound");
+    return data_[y * w + x];
+  }
+
+private:
+  std::size_t    w, h;
+  std::vector<T> data_;
+}
+
+matrix2d<double>
+create_gaussian_mask(std::size_t sigma)
+{
+  auto size          = static_cast<std::size_t>(std::ceil(3. * sigma));
+  auto gaussian_mask = matrix2d<double>((size * 2 + 1), (size * 2 + 1));
+  auto sum           = 0.;
+
+  for (int x = -size; x < size + 1; ++x)
+    for (int y = -size; y < size + 1; ++y)
+    {
+      auto tmp = 1. / (2. * pi() * sigma * sigma) * std::exp(-(x * x + y * y) / (2. * sigma * sigma));
+      gaussian_mask(x + size, y + size) = tmp;
+      sum += tmp;
+    }
+
+  // for (int i = 0; i < gaussian_mask.size(); ++i)
+  //  gaussian_mask[i] = gaussian_mask[i] / sum;
+
+  return gaussian_mask;
+}
+
+template <typename Ima>
+mln::experimental::image2d<mln::uint8> gaussian_blur(Ima input, std::size_t sigma)
+{
+  auto gaussian_mask = create_gaussian_mask(sigma);
+  auto mask_size     = std::sqrt(gaussian_mask.size());
+
+  mln::image_build_params bp;
+  bp.border = 0;
+
+  auto output = mln::experimental::image2d<mln::uint8>(input.domain(), bp);
+
+  for (int x = 0; x < input.domain().width(); ++x)
+    for (int y = 0; y < input.domain().height(); ++y)
+    {
+      double sum = 0.;
+      for (int i = x - mask_size / 2; i < x + mask_size / 2 + 1; ++i)
+        for (int j = x - mask_size / 2; j < x + mask_size / 2 + 1; ++j)
+        {
+          sum += input(i, j) * gaussian_mask(i - x + mask_size / 2, j - y + mask_size / 2);
+        }
+
+      output(x, y) = sum;
+    }
+
+  return output;
+}
 
 int main()
 {
@@ -34,8 +121,10 @@ int main()
 
   mln::io::experimental::imsave(lena_red, "images/lena_red.png");
   mln::io::experimental::imsave(lena_green, "images/lena_green.png");
-
   mln::io::experimental::imsave(lena_blue, "images/lena_blue.png");
+
+  auto lena_green_blurred = gaussian_blur(mln::view::green(lena_green), 3);
+  mln::io::experimental::imsave(lena_green, "images/lena_green_blurred.png");
 
   using namespace mln::view::ops;
   auto lena_rg = lena_red + lena_green;

@@ -3,9 +3,8 @@
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/core/grays.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/core/image/image2d.hpp>
+#include <mln/core/image/image.hpp>
 #include <mln/core/image/views.hpp>
 #include <mln/io/experimental/imread.hpp>
 #include <mln/io/experimental/imsave.hpp>
@@ -36,32 +35,34 @@ public:
   {
   }
 
-  const T& operator(std::size_t x, std::size_t y) const
+  const T& operator()(std::size_t x, std::size_t y) const
   {
     assert(x >= 0 && x < w && y >= 0 && y < h && "Index out of bound");
     return data_[y * w + x];
   }
 
-  T& operator(std::size_t x, std::size_t y)
+  T& operator()(std::size_t x, std::size_t y)
   {
     assert(x >= 0 && x < w && y >= 0 && y < h && "Index out of bound");
     return data_[y * w + x];
   }
+
+  std::size_t width() const { return w; }
+  std::size_t height() const { return h; }
 
 private:
   std::size_t    w, h;
   std::vector<T> data_;
-}
+};
 
-matrix2d<double>
-create_gaussian_mask(std::size_t sigma)
+matrix2d<double> create_gaussian_mask(std::size_t sigma)
 {
   auto size          = static_cast<std::size_t>(std::ceil(3. * sigma));
   auto gaussian_mask = matrix2d<double>((size * 2 + 1), (size * 2 + 1));
   auto sum           = 0.;
 
-  for (int x = -size; x < size + 1; ++x)
-    for (int y = -size; y < size + 1; ++y)
+  for (int x = -size, l = size + 1; x < l; ++x)
+    for (int y = -size; y < l; ++y)
     {
       auto tmp = 1. / (2. * pi() * sigma * sigma) * std::exp(-(x * x + y * y) / (2. * sigma * sigma));
       gaussian_mask(x + size, y + size) = tmp;
@@ -75,15 +76,15 @@ create_gaussian_mask(std::size_t sigma)
 }
 
 template <typename Ima>
-mln::experimental::image2d<mln::uint8> gaussian_blur(Ima input, std::size_t sigma)
+mln::experimental::image2d<uint8_t> gaussian_blur(Ima input, std::size_t sigma)
 {
   auto gaussian_mask = create_gaussian_mask(sigma);
-  auto mask_size     = std::sqrt(gaussian_mask.size());
+  auto mask_size     = std::sqrt(gaussian_mask.width());
 
   mln::image_build_params bp;
   bp.border = 0;
 
-  auto output = mln::experimental::image2d<mln::uint8>(input.domain(), bp);
+  auto output = mln::experimental::image2d<uint8_t>(input.domain(), bp);
 
   for (int x = 0; x < input.domain().width(); ++x)
     for (int y = 0; y < input.domain().height(); ++y)
@@ -92,10 +93,11 @@ mln::experimental::image2d<mln::uint8> gaussian_blur(Ima input, std::size_t sigm
       for (int i = x - mask_size / 2; i < x + mask_size / 2 + 1; ++i)
         for (int j = x - mask_size / 2; j < x + mask_size / 2 + 1; ++j)
         {
-          sum += input(i, j) * gaussian_mask(i - x + mask_size / 2, j - y + mask_size / 2);
+          sum += input({static_cast<short int>(i), static_cast<short int>(j)}) *
+                 gaussian_mask(i - x + mask_size / 2, j - y + mask_size / 2);
         }
 
-      output(x, y) = sum;
+      output({x, y}) = sum;
     }
 
   return output;
@@ -123,7 +125,8 @@ int main()
   mln::io::experimental::imsave(lena_green, "images/lena_green.png");
   mln::io::experimental::imsave(lena_blue, "images/lena_blue.png");
 
-  auto lena_green_blurred = gaussian_blur(mln::view::green(lena_green), 3);
+  auto lena_green_monoch  = mln::view::green(lena_color);
+  auto lena_green_blurred = gaussian_blur(lena_green_monoch, 3);
   mln::io::experimental::imsave(lena_green, "images/lena_green_blurred.png");
 
   using namespace mln::view::ops;
@@ -184,16 +187,16 @@ int main()
   }
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
     float threshold        = 150;
-    auto  binary_fun       = [threshold](auto x) -> mln::uint8 { return (x < threshold) ? 0 : 255; };
+    auto  binary_fun       = [threshold](auto x) -> uint8_t { return (x < threshold) ? 0 : 255; };
     auto  lena_grey_binary = mln::view::transform(lena_grey, binary_fun);
     mln::io::experimental::imsave(lena_grey_binary, "images/lena_grey_binary.png");
 
     float gamma                     = 2.5f;
-    auto  gamma_fun                 = [gamma](auto x) -> mln::uint8 { return 256.f * pow(x / 256.f, 1 / gamma); };
+    auto  gamma_fun                 = [gamma](auto x) -> uint8_t { return 256.f * pow(x / 256.f, 1 / gamma); };
     auto  lena_grey_gamma_corrected = mln::view::transform(lena_grey, gamma_fun);
     mln::io::experimental::imsave(lena_grey_gamma_corrected, "images/lena_grey_gamma_corrected.png");
   }
@@ -210,18 +213,18 @@ int main()
 
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
     float threshold                 = 150;
     auto  binary_fun                = [threshold](auto x) -> bool { return x < threshold; };
     auto  lena_grey_binary_filtered = mln::view::filter(lena_grey, binary_fun);
-    fill(lena_grey_binary_filtered, mln::uint8(0));
+    fill(lena_grey_binary_filtered, uint8_t(0));
     mln::io::experimental::imsave(lena_grey, "images/lena_grey_binary_filtered.png");
   }
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
     auto dom     = lena_grey.domain();
@@ -231,7 +234,7 @@ int main()
     auto sub_lena_grey = mln::view::clip(lena_grey, sub_dom);
     mln::io::experimental::imsave(sub_lena_grey, "images/lena_grey_clipped.png");
 
-    fill(sub_lena_grey, mln::uint8(255));
+    fill(sub_lena_grey, uint8_t(255));
     mln::io::experimental::imsave(lena_grey, "images/lena_grey_minus_clipped.png");
   }
 
@@ -298,43 +301,43 @@ int main()
   }
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
     auto lena_grey_masked = mln::view::mask(lena_grey, lena_grey > 150);
-    fill(lena_grey_masked, mln::uint8(255));
+    fill(lena_grey_masked, uint8_t(255));
 
     mln::io::experimental::imsave(lena_grey, "images/lena_grey_masked1.png");
   }
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
     auto lena_grey_masked2 = mln::view::mask(lena_grey, lena_grey <= 150);
-    fill(lena_grey_masked2, mln::uint8(0));
+    fill(lena_grey_masked2, uint8_t(0));
 
     mln::io::experimental::imsave(lena_grey, "images/lena_grey_masked2.png");
   }
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
     auto lena_grey_masked = mln::view::mask(lena_grey, lena_grey > 150);
-    fill(lena_grey_masked, mln::uint8(255));
+    fill(lena_grey_masked, uint8_t(255));
 
     auto lena_grey_masked2 = mln::view::mask(lena_grey, lena_grey <= 150);
-    fill(lena_grey_masked2, mln::uint8(0));
+    fill(lena_grey_masked2, uint8_t(0));
 
     mln::io::experimental::imsave(lena_grey, "images/lena_grey_binary.png");
   }
 
   {
-    mln::experimental::image2d<mln::uint8> lena_grey;
+    mln::experimental::image2d<uint8_t> lena_grey;
     mln::io::experimental::imread("images/lena_grey.png", lena_grey);
 
-    auto invert             = [](auto v) -> mln::uint8 { return 255 - v; };
+    auto invert             = [](auto v) -> uint8_t { return 255 - v; };
     auto lena_grey_inverted = mln::view::transform(lena_grey, invert);
 
     mln::io::experimental::imsave(lena_grey_inverted, "images/lena_grey_inverted.png");

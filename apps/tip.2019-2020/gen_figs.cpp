@@ -31,29 +31,47 @@ public:
   matrix2d& operator=(matrix2d&&) = default;
 
   matrix2d(std::size_t width, std::size_t height)
-    : data_(width * height, T{})
+    : w_(width)
+    , h_(height)
+    , data_(width * height, T{})
   {
   }
 
   const T& operator()(std::size_t x, std::size_t y) const
   {
-    assert(x >= 0 && x < w && y >= 0 && y < h && "Index out of bound");
-    return data_[y * w + x];
+    assert(x >= 0 && x < w_ && y >= 0 && y < h_ && "Index out of bound");
+    return data_[y * w_ + x];
   }
 
   T& operator()(std::size_t x, std::size_t y)
   {
-    assert(x >= 0 && x < w && y >= 0 && y < h && "Index out of bound");
-    return data_[y * w + x];
+    assert(x >= 0 && x < w_ && y >= 0 && y < h_ && "Index out of bound");
+    return data_[y * w_ + x];
   }
 
-  std::size_t width() const { return w; }
-  std::size_t height() const { return h; }
+  std::size_t width() const { return w_; }
+  std::size_t height() const { return h_; }
 
 private:
-  std::size_t    w, h;
+  std::size_t    w_, h_;
   std::vector<T> data_;
 };
+
+template <typename T>
+std::ostream& operator<<(std::ostream& oss, const matrix2d<T>& rhs)
+{
+  for (std::size_t i = 0; i < rhs.height(); ++i)
+  {
+    oss << "|";
+    for (std::size_t j = 0; j < rhs.width() - 1; ++j)
+    {
+      oss << rhs(i, j) << ", ";
+    }
+    oss << rhs(i, rhs.width() - 1) << "|\n";
+  }
+
+  return oss;
+}
 
 matrix2d<double> create_gaussian_mask(std::size_t sigma)
 {
@@ -79,19 +97,24 @@ template <typename Ima>
 mln::experimental::image2d<uint8_t> gaussian_blur(Ima input, std::size_t sigma)
 {
   auto gaussian_mask = create_gaussian_mask(sigma);
-  auto mask_size     = std::sqrt(gaussian_mask.width());
+
+  std::cout << gaussian_mask << std::endl;
+
+  auto mask_size = static_cast<int>(gaussian_mask.width());
 
   mln::image_build_params bp;
   bp.border = 0;
 
   auto output = mln::experimental::image2d<uint8_t>(input.domain(), bp);
 
-  for (int x = 0; x < input.domain().width(); ++x)
-    for (int y = 0; y < input.domain().height(); ++y)
+  mln::experimental::copy(input, output);
+
+  for (int x = mask_size / 2; x < input.domain().width() - mask_size / 2; ++x)
+    for (int y = mask_size / 2; y < input.domain().height() - mask_size / 2; ++y)
     {
       double sum = 0.;
       for (int i = x - mask_size / 2; i < x + mask_size / 2 + 1; ++i)
-        for (int j = x - mask_size / 2; j < x + mask_size / 2 + 1; ++j)
+        for (int j = y - mask_size / 2; j < y + mask_size / 2 + 1; ++j)
         {
           sum += input({static_cast<short int>(i), static_cast<short int>(j)}) *
                  gaussian_mask(i - x + mask_size / 2, j - y + mask_size / 2);
@@ -127,7 +150,7 @@ int main()
 
   auto lena_green_monoch  = mln::view::green(lena_color);
   auto lena_green_blurred = gaussian_blur(lena_green_monoch, 3);
-  mln::io::experimental::imsave(lena_green, "images/lena_green_blurred.png");
+  mln::io::experimental::imsave(lena_green_blurred, "images/lena_green_blurred.png");
 
   using namespace mln::view::ops;
   auto lena_rg = lena_red + lena_green;

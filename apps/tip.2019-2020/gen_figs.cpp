@@ -98,8 +98,6 @@ mln::experimental::image2d<uint8_t> gaussian_blur(Ima input, std::size_t sigma)
 {
   auto gaussian_mask = create_gaussian_mask(sigma);
 
-  std::cout << gaussian_mask << std::endl;
-
   auto mask_size = static_cast<int>(gaussian_mask.width());
 
   mln::image_build_params bp;
@@ -148,9 +146,18 @@ int main()
   mln::io::experimental::imsave(lena_green, "images/lena_green.png");
   mln::io::experimental::imsave(lena_blue, "images/lena_blue.png");
 
-  auto lena_green_monoch  = mln::view::green(lena_color);
-  auto lena_green_blurred = gaussian_blur(lena_green_monoch, 3);
+  auto lena_green_monoch         = mln::view::green(lena_color);
+  auto lena_green_monoch_blurred = gaussian_blur(lena_green_monoch, 3);
+  auto lena_green_blurred        = mln::view::transform(lena_green_monoch_blurred, [](auto g) -> mln::rgb8 {
+    return {0, g, 0};
+  });
   mln::io::experimental::imsave(lena_green_blurred, "images/lena_green_blurred.png");
+
+  auto lena_color_gblurred =
+      mln::view::transform(lena_green_monoch_blurred, lena_color, [](auto g, auto col) -> mln::rgb8 {
+        return {col[0], g, col[2]};
+      });
+  mln::io::experimental::imsave(lena_color_gblurred, "images/lena_color_gblurred.png");
 
   using namespace mln::view::ops;
   auto lena_rg = lena_red + lena_green;

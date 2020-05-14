@@ -9,7 +9,7 @@ sns.set_style("whitegrid")
 sns.set_context("paper")
 
 
-bench_result = json.load(open("../../build/bench/BMPlnVsOpenCV_Dilation_result.json"))
+bench_result = json.load(open("BMPlnVsOpenCV_Dilation_result.json"))
 
 benchmarks = {'Pln_DiscDecompPeriodic': [], 'Pln_RectDecomp': [], 'CV_Disc': [], 'CV_Rect': []}
 size_se_p = re.compile(".*/([0-9]+)")
@@ -35,9 +35,8 @@ for k in benchmarks.keys():
         data[k].append(ret['time'])
 
 _k = list(benchmarks.keys())[0]
-for ret in benchmarks[_k]:
-    indexes.append(ret['size_se'])
-    
+for ret in benchmarks[_k]:fig.savefig("PlnVsOpenCV.png")
+
 df = pd.DataFrame(data=data, index=indexes, columns=['Pln_DiscDecompPeriodic', 'Pln_RectDecomp', 'CV_Disc', 'CV_Rect'])
 
 fig = sns.lineplot(data=df, legend="full")

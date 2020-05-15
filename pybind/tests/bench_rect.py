@@ -82,7 +82,6 @@ def save_result_to_csv(times, size):
         'OpenCV': []
     }
 
-    x = [x["width"] * x["height"] for x in sizes_list]
     for t in times:
         if t["sizes"]["width"] == size["width"] and t["sizes"]["height"] == size["height"]:
             # benchmarks['Pylena'].append(t["Pylena"])
@@ -90,7 +89,7 @@ def save_result_to_csv(times, size):
             benchmarks['Skimage'].append(t["Skimage"])
             benchmarks['OpenCV'].append(t["OpenCV"])
 
-    df = pd.DataFrame(data=benchmarks, index=x, columns=[
+    df = pd.DataFrame(data=benchmarks, index=rect_sizes_list, columns=[
                       'PylenaD', 'Skimage', 'OpenCV'])
     print(df)
     df.to_csv("bench_rect_by_SE.csv")

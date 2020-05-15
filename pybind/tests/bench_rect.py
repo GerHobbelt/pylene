@@ -1,16 +1,17 @@
+import pandas as pd
 import os
 import sys
 import numpy as np
-# import matplotlib.pyplot as plt
 import random as rnd
 import timeit
 import math
+
+os.path.append(os.getcwd())
 
 import Pylena as pln
 import skimage.morphology as skimorph
 import cv2
 
-import pandas as pd
 
 rect_width = 3
 rect_height = 3

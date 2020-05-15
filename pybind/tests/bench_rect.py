@@ -74,7 +74,7 @@ def print_results(times):
         ))
 
 
-def save_result_to_csv(times, rect_width, rect_height):
+def save_result_to_csv(times, size):
     benchmarks = {
         # 'Pylena': [],
         'PylenaD': [],
@@ -84,7 +84,7 @@ def save_result_to_csv(times, rect_width, rect_height):
 
     x = [x["width"] * x["height"] for x in sizes_list]
     for t in times:
-        if t["rect"]["width"] == rect_width and t["rect"]["height"] == rect_height:
+        if t["sizes"]["width"] == size["width"] and t["sizes"]["height"] == size["height"]:
             # benchmarks['Pylena'].append(t["Pylena"])
             benchmarks['PylenaD'].append(t["PylenaD"])
             benchmarks['Skimage'].append(t["Skimage"])
@@ -162,4 +162,4 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    save_result_to_csv(times, 1024, 1024)
+    save_result_to_csv(times, {"width": 1024, "height": 1024})

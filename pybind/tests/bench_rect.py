@@ -14,7 +14,7 @@ import pandas as pd
 
 rect_width = 3
 rect_height = 3
-sizes = {"width": 3138, "height": 3138}  # 10Mo
+sizes = {"width": 1024, "height": 1024}  # 10Mo
 number = 100
 percent = 20
 
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     # plt.figure("Original image")
     # plt.imshow(ref)
 
-    save_result_to_csv(times, {"width": 3138, "height": 3138})
+    save_result_to_csv(times, {"width": 1024, "height": 1024})
 
     # plot_results_by_SE(times, {"width": 3138, "height": 3138})
     # plot_results_by_pixels(times, rect_width=15, rect_height=15)

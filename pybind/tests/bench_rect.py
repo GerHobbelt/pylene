@@ -10,6 +10,7 @@ import Pylena as pln
 import skimage.morphology as skimorph
 import cv2
 
+import pandas as pd
 
 rect_width = 3
 rect_height = 3
@@ -130,6 +131,27 @@ def plot_results_by_pixels(times, rect_width, rect_height):
     plt.legend()
 
 
+def save_result_to_csv(times, rect_width, rect_height):
+    benchmarks = {
+        # 'Pylena': [],
+        'PylenaD': [],
+        'Skimage': [],
+        'OpenCV': []
+    }
+
+    x = [x["width"] * x["height"] for x in sizes_list]
+    for t in times:
+        if t["rect"]["width"] == rect_width and t["rect"]["height"] == rect_height:
+            # benchmarks['Pylena'].append(t["Pylena"])
+            benchmarks['PylenaD'].append(t["PylenaD"])
+            benchmarks['Skimage'].append(t["Skimage"])
+            benchmarks['OpenCV'].append(t["OpenCV"])
+
+    df = pd.DataFrame(data=benchmarks, index=x, columns=[
+                      'PylenaD', 'Skimage', 'OpenCV'])
+    df.to_csv("bench_rect_by_SE.csv")
+
+
 def main_bench():
     global rect_width, rect_height, sizes, radius, ref
 
@@ -196,10 +218,12 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    plt.figure("Original image")
-    plt.imshow(ref)
+    # plt.figure("Original image")
+    # plt.imshow(ref)
 
-    plot_results_by_SE(times, {"width": 3138, "height": 3138})
+    save_result_to_csv(times, {"width": 3138, "height": 3138})
+
+    # plot_results_by_SE(times, {"width": 3138, "height": 3138})
     # plot_results_by_pixels(times, rect_width=15, rect_height=15)
 
-    plt.show()
+    # plt.show()

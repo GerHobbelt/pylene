@@ -12,7 +12,7 @@ import math
 
 rect_width = 3
 rect_height = 3
-sizes = {"width": 1024, "height": 1024}  # 10Mo
+sizes = {"width": 3128, "height": 3128}  # 10Mo
 number = 100
 percent = 20
 
@@ -51,7 +51,7 @@ def test_cv2():
 
 
 sizes_list = [sizes]
-rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 6)]
+rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 8)]
 
 
 def get_sizes():
@@ -162,4 +162,4 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    save_result_to_csv(times, {"width": 1024, "height": 1024})
+    save_result_to_csv(times, {"width": 3128, "height": 3128})

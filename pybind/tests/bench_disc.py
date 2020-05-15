@@ -1,14 +1,13 @@
+import cv2
+import skimage.morphology as skimorph
+import Pylena as pln
+import pandas as pd
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 import random as rnd
 import timeit
 import math
-
-import Pylena as pln
-import skimage.morphology as skimorph
-import cv2
 
 
 radius = 3
@@ -73,59 +72,26 @@ def print_results(times):
         ))
 
 
-def plot_results_by_SE(times, size):
-    x = radius_list
-    # y_pln = []
-    y_plnD = []
-    y_skimage = []
-    y_cv = []
+def save_result_to_csv(times, size):
+    benchmarks = {
+        # 'Pylena': [],
+        'PylenaD': [],
+        'Skimage': [],
+        'OpenCV': []
+    }
+
     for t in times:
         if t["sizes"]["width"] == size["width"] and t["sizes"]["height"] == size["height"]:
-            # y_pln.append(t["Pylena"])
-            y_plnD.append(t["PylenaD"])
-            y_skimage.append(t["Skimage"])
-            y_cv.append(t["OpenCV"])
+            # benchmarks['Pylena'].append(t["Pylena"])
+            benchmarks['PylenaD'].append(t["PylenaD"])
+            benchmarks['Skimage'].append(t["Skimage"])
+            benchmarks['OpenCV'].append(t["OpenCV"])
 
-    plt.figure("Benchmarks: Time vs. SE size")
-
-    # plt.plot(x, y_pln, label="Pylena")
-    plt.plot(x, y_plnD, label="Pylena Decomp")
-    plt.plot(x, y_skimage, label="Skimage")
-    plt.plot(x, y_cv, label="OpenCV")
-
-    plt.xlabel("SE radius size")
-    plt.ylabel("Time (s)")
-    plt.yscale("log")
-    plt.title(
-        "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))
-    plt.legend()
-
-
-def plot_results_by_pixels(times, radius):
-    x = [x["width"] * x["height"] for x in sizes_list]
-    # y_pln = []
-    y_plnD = []
-    y_skimage = []
-    y_cv = []
-    for t in times:
-        if t["radius"] == radius:
-            # y_pln.append(t["Pylena"])
-            y_plnD.append(t["PylenaD"])
-            y_skimage.append(t["Skimage"])
-            y_cv.append(t["OpenCV"])
-
-    plt.figure("Benchmarks: Time vs. Image size")
-
-    # plt.plot(x, y_pln, label="Pylena")
-    plt.plot(x, y_plnD, label="Pylena Decomp")
-    plt.plot(x, y_skimage, label="Skimage")
-    plt.plot(x, y_cv, label="OpenCV")
-
-    plt.xlabel("Pixel number")
-    plt.ylabel("Time (s)")
-    plt.title(
-        "dilation (rad={}) SE, {} iterations".format(radius, number))
-    plt.legend()
+    indexes = [int(math.pi*r*r) for r in radius_list]
+    df = pd.DataFrame(data=benchmarks, index=indexes, columns=[
+                      'PylenaD', 'Skimage', 'OpenCV'])
+    print(df)
+    df.to_csv("bench_disc_by_SE.csv")
 
 
 def main_bench():
@@ -193,10 +159,4 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    plt.figure("Original image")
-    plt.imshow(ref)
-
-    plot_results_by_SE(times, {"width": 3138, "height": 3138})
-    # plot_results_by_pixels(times, radius=15)
-
-    plt.show()
+    save_result_to_csv(times, {"width": 3138, "height": 3138})

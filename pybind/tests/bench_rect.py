@@ -1,3 +1,6 @@
+import cv2
+import skimage.morphology as skimorph
+import Pylena as pln
 import pandas as pd
 import os
 import sys
@@ -5,12 +8,6 @@ import numpy as np
 import random as rnd
 import timeit
 import math
-
-sys.path.append(os.getcwd())
-
-import Pylena as pln
-import skimage.morphology as skimorph
-import cv2
 
 
 rect_width = 3
@@ -54,7 +51,7 @@ def test_cv2():
 
 
 sizes_list = [sizes]
-rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 8)]
+rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 6)]
 
 
 def get_sizes():
@@ -95,6 +92,7 @@ def save_result_to_csv(times, rect_width, rect_height):
 
     df = pd.DataFrame(data=benchmarks, index=x, columns=[
                       'PylenaD', 'Skimage', 'OpenCV'])
+    print(df)
     df.to_csv("bench_rect_by_SE.csv")
 
 
@@ -164,4 +162,4 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    save_result_to_csv(times, {"width": 1024, "height": 1024})
+    save_result_to_csv(times, 1024, 1024)

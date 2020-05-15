@@ -1,7 +1,7 @@
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import random as rnd
 import timeit
 import math
@@ -74,61 +74,6 @@ def print_results(times):
             # t["Pylena"],
             t["PylenaD"], t["Skimage"], t["OpenCV"]
         ))
-
-
-def plot_results_by_SE(times, size):
-    x = [x["width"] for x in rect_sizes_list]
-    # y_pln = []
-    y_plnD = []
-    y_skimage = []
-    y_cv = []
-    for t in times:
-        if t["sizes"]["width"] == size["width"] and t["sizes"]["height"] == size["height"]:
-            # y_pln.append(t["Pylena"])
-            y_plnD.append(t["PylenaD"])
-            y_skimage.append(t["Skimage"])
-            y_cv.append(t["OpenCV"])
-
-    plt.figure("Benchmarks: Time vs. SE size")
-
-    # plt.plot(x, y_pln, label="Pylena")
-    plt.plot(x, y_plnD, label="Pylena Decomp")
-    plt.plot(x, y_skimage, label="Skimage")
-    plt.plot(x, y_cv, label="OpenCV")
-
-    plt.xlabel("SE square edge size")
-    plt.ylabel("Time (s)")
-    plt.yscale("log")
-    plt.title(
-        "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))
-    plt.legend()
-
-
-def plot_results_by_pixels(times, rect_width, rect_height):
-    x = [x["width"] * x["height"] for x in sizes_list]
-    # y_pln = []
-    y_plnD = []
-    y_skimage = []
-    y_cv = []
-    for t in times:
-        if t["rect"]["width"] == rect_width and t["rect"]["height"] == rect_height:
-            # y_pln.append(t["Pylena"])
-            y_plnD.append(t["PylenaD"])
-            y_skimage.append(t["Skimage"])
-            y_cv.append(t["OpenCV"])
-
-    plt.figure("Benchmarks: Time vs. Image size")
-
-    # plt.plot(x, y_pln, label="Pylena")
-    plt.plot(x, y_plnD, label="Pylena Decomp")
-    plt.plot(x, y_skimage, label="Skimage")
-    plt.plot(x, y_cv, label="OpenCV")
-
-    plt.xlabel("Pixel number")
-    plt.ylabel("Time (s)")
-    plt.title(
-        "dilation ({}x{}) SE, {} iterations".format(rect_width, rect_width, number))
-    plt.legend()
 
 
 def save_result_to_csv(times, rect_width, rect_height):
@@ -218,12 +163,4 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    # plt.figure("Original image")
-    # plt.imshow(ref)
-
     save_result_to_csv(times, {"width": 1024, "height": 1024})
-
-    # plot_results_by_SE(times, {"width": 3138, "height": 3138})
-    # plot_results_by_pixels(times, rect_width=15, rect_height=15)
-
-    # plt.show()

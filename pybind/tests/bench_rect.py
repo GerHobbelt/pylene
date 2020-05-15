@@ -89,7 +89,8 @@ def save_result_to_csv(times, size):
             benchmarks['Skimage'].append(t["Skimage"])
             benchmarks['OpenCV'].append(t["OpenCV"])
 
-    df = pd.DataFrame(data=benchmarks, index=rect_sizes_list, columns=[
+    indexes = [x['height'] * x['width'] for x in rect_sizes_list]
+    df = pd.DataFrame(data=benchmarks, index=indexes, columns=[
                       'PylenaD', 'Skimage', 'OpenCV'])
     print(df)
     df.to_csv("bench_rect_by_SE.csv")

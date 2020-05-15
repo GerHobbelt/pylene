@@ -6,7 +6,7 @@ import random as rnd
 import timeit
 import math
 
-os.path.append(os.getcwd())
+sys.path.append(os.getcwd())
 
 import Pylena as pln
 import skimage.morphology as skimorph

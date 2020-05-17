@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
@@ -110,5 +111,21 @@ namespace mln::morpho
     dilation(image, se, mln::extension::bm::fill(mln::value_traits<image_value_t<I>>::inf()),  out);
   }
 
+  namespace parallel
+  {
+    template <class ImageDataType, class SE>
+    class TileExecutor_Dilation : TileExecutorBase
+    {
+      void execute(std::byte* t, SE se) final
+      {
+        ImageDataType* tile = static_cast<ImageDataType*>(t);
+        auto domain = se.compute_input_region();
+        using I = std::remove_reference_t<InputImage>;
+        image_concrete_t<I> img = imconcretize(domain)
+        // Fill `img` with `tile` + padding
+        // Perform operation on tile according to algorithm.
+      }
+    };
+  } // namespace parallel
 
 } // namespace mln::morpho::

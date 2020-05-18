@@ -1,12 +1,13 @@
+import cv2
+import skimage.morphology as skimorph
+import Pylena as pln
+import pandas as pd
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 import random as rnd
 import timeit
 import math
-
-import Pylena as pln
 
 
 radius = 3
@@ -60,47 +61,22 @@ def print_results(times):
         ))
 
 
-def plot_results_by_SE(times, size):
-    x = radius_list
-    y_pln = []
-    y_plnD = []
+def save_result_to_csv(times, size):
+    benchmarks = {
+        'Pylena': [],
+        'PylenaD': []
+    }
+
     for t in times:
         if t["sizes"]["width"] == size["width"] and t["sizes"]["height"] == size["height"]:
-            y_pln.append(t["Pylena"])
-            y_plnD.append(t["PylenaD"])
+            benchmarks['Pylena'].append(t["Pylena"])
+            benchmarks['PylenaD'].append(t["PylenaD"])
 
-    plt.figure("Benchmarks: Time vs. SE size")
-
-    plt.plot(x, y_pln, label="Pylena")
-    plt.plot(x, y_plnD, label="Pylena Decomp")
-
-    plt.xlabel("SE radius size")
-    plt.ylabel("Time (s)")
-    plt.yscale("log")
-    plt.title(
-        "dilation ({}x{}) image, {} iterations".format(size["width"], size["height"], number))
-    plt.legend()
-
-
-def plot_results_by_pixels(times, radius):
-    x = [x["width"] * x["height"] for x in sizes_list]
-    y_pln = []
-    y_plnD = []
-    for t in times:
-        if t["radius"] == radius:
-            y_pln.append(t["Pylena"])
-            y_plnD.append(t["PylenaD"])
-
-    plt.figure("Benchmarks: Time vs. Image size")
-
-    plt.plot(x, y_pln, label="Pylena")
-    plt.plot(x, y_plnD, label="Pylena Decomp")
-
-    plt.xlabel("Pixel number")
-    plt.ylabel("Time (s)")
-    plt.title(
-        "dilation (rad={}) SE, {} iterations".format(radius, number))
-    plt.legend()
+    indexes = [int(math.pi*r*r) for r in radius_list]
+    df = pd.DataFrame(data=benchmarks, index=indexes, columns=[
+                      'Pylena', 'PylenaD'])
+    print(df)
+    df.to_csv("bench_pln_disc_by_SE.csv")
 
 
 def main_bench():
@@ -150,10 +126,4 @@ if __name__ == "__main__":
     times = main_bench()
     print_results(times)
 
-    plt.figure("Original image")
-    plt.imshow(ref)
-
-    plot_results_by_SE(times, {"width": 1000, "height": 1000})
-    # plot_results_by_pixels(times, radius=15)
-
-    plt.show()
+    save_result_to_csv(times, {"width": 1000, "height": 1000})

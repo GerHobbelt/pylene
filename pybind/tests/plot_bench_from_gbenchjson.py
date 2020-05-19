@@ -47,4 +47,4 @@ df = pd.DataFrame(data=data, index=indexes, columns=[
 fig = sns.lineplot(data=df, legend="full")
 fig.set(yscale="log", xlabel="SE size", ylabel="Time (ns)")
 
-grid.get_figure().savefig("PlnVsOpenCV.png")
+fig.get_figure().savefig("PlnVsOpenCV.png")

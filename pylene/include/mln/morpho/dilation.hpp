@@ -123,24 +123,36 @@ namespace mln::morpho
         : _in{input}
         , _se{se}
       {
-        _tile = mln::ndbuffer_image(typeid(type) /*Should use traits ?*/, tile_width, tile_height); 
+        mln::box2d roi(tile_width, tile_height);
+
+        mln::box2d input_roi = _se.compute_input_region(roi);
+        _tile                = mln::image2d<image_value_t<InputImage>>(input_roi);
       }
 
       void load_tile(mln::box2d roi) final
       {
-        auto tile_roi = _se.compute_input_region(roi);
-        auto clipped = _in.clip(tile_roi);
-        mln::copy(clipped, _tile);
+        mln::box2d input_roi = _se.compute_input_region(roi);
+        mln::box2d image_roi = _in.domain();
+
+        mln::box2d copy_roi =  image_roi;
+        copy_roi.clip(input_roi);
+
+        mln::box2d dest_roi = copy_roi;
+        dest_roi.tl() -= roi.tl();
+
+        mln::copy(_in.clip(copy_roi), _tile.clip(dest_roi));
 
         // clipped will always have same dimensions. If domain is too big clipped will contain unallocated data
-        if (clipped.height != tile_roi.height() || clipped.width != tile_roi.width())
+        if (copy_roi != input_roi)
         {
           // Know where missing data is? if width is different, are we missing left side or right side ?
-          int missing_x = tile_roi.width() - _tile.width;
-          int missing_y = tile_roi.height() - _tile.height;
-          int[] borders_x = {0, missing_x}; // or {missing_x, 0} ?
-          int[] borders_y = {0, missing_y}; // or {missing_y, 0} ?
-          const int borders[][2] = {borders_x, borders_y};
+          int borders[2][2];
+
+          borders[0][0] = copy_roi.tl().x() - input_roi.tl().x();
+          borders[0][1] = input_roi.br().x() - copy_roi.br().x();
+          borders[1][0] = copy_roi.tl().y() - input_roi.tl().y();
+          borders[1][1] = input_roi.br().y() - copy_roi.br().y();
+
           DataType padding_value = 0;
           auto padding_method = mln::PAD_ZERO;
           pad(_tile, padding_method, borders, padding_value);

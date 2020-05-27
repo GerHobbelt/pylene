@@ -37,7 +37,7 @@ namespace mln
     }
 
     template <class I, class T>
-    [[gnu::noinline]] void transpose_block2d(I& in, mln::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
+    [[gnu::noinline]] void transpose_block2D(I& in, mln::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
     {
       const int x0 = input_roi.x();
       const int y0 = input_roi.y();
@@ -49,7 +49,7 @@ namespace mln
     }
 
     template <class I, class T>
-    [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride, mln::box2d output_roi, I& out)
+    [[gnu::noinline]] void transpose_block2D(T* __restrict in, std::ptrdiff_t istride, mln::box2d output_roi, I& out)
     {
       const int x0 = output_roi.x();
       const int y0 = output_roi.y();
@@ -93,7 +93,7 @@ namespace mln
   class TileWriterBase
   {
     virtual void                write_tile(mln::box2d roi) = 0;
-    virtual mln::ndbuffer_image get_tile()  = 0;
+    virtual mln::ndbuffer_image get_tile(mln::box2d roi)  = 0;
   };
 
 
@@ -103,28 +103,18 @@ namespace mln
   ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
   ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
   */
-  void parallel_execute_local2d(ParallelLocalCanvas2d&);
+  void parallel_execute_local2D(ParallelLocalCanvas2D& canvas);
 
-  template <class SE, class Image>
   struct ParallelLocalCanvas2D
   {
     static constexpr int TILE_WIDTH  = 128;
     static constexpr int TILE_HEIGHT = 128;
-    TileLoaderBase       m_tile_l;
-    TileWriterBase       m_tile_w;
-    TileExecutorBase     m_exec;
-    SE                   m_se; // Needed ?
+    TileLoaderBase*      m_tile_l;
+    TileWriterBase*      m_tile_w;
+    TileExecutorBase*    m_exec;
 
     virtual mln::box2d GetDomain() const               = 0;
     virtual void       ExecuteTile(mln::box2d b) const = 0;
-    /*{
-      std::byte* tile;
-      std::ptrdiff_t stride = XXX;
-      mln::box2d roi = se.compute_input_region();
-      m_tile_l.load_tile(tile, stride, roi);
-      m_exec.execute(static_cast<ImageType>(tile));
-      m_tile_w.write_tile();
-    }*/
   };
 } // namespace mln
   /*
@@ -135,7 +125,7 @@ namespace mln
     {
     private:
       // Accumulate the supremum column-wise (eq to the python A.cumsum(axis=0))
-      virtual void partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
+      virtual void partial_sum_block2D(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
                                        std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) = 0;
   
       // Apply PW OUT[x] = SUP(A[x], B[x])
@@ -150,7 +140,7 @@ namespace mln
     public:
       // Apply the running max algorithm over a block
       // Memory has already been allocated
-      void running_max_block2d(std::byte* f, std::byte* g, std::byte* h, std::ptrdiff_t f_byte_stride,
+      void running_max_block2D(std::byte* f, std::byte* g, std::byte* h, std::ptrdiff_t f_byte_stride,
                                std::ptrdiff_t g_byte_stride, std::ptrdiff_t h_byte_stride, mln::experimental::box2d roi,
                                int k, bool use_extension);
   
@@ -172,7 +162,7 @@ namespace mln
       static_assert(::ranges::regular_invocable<BinaryFunction, T, T>);
   
       void apply_sup(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict OUT, int n) final;
-      void partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
+      void partial_sum_block2D(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
                                std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) final;
   
       int         get_block_width() const final { return BLOCK_WIDTH; }
@@ -224,7 +214,7 @@ namespace mln
   
   
     template <class T, class BinaryFunction>
-    void vertical_running_max_algo_t<T, BinaryFunction>::partial_sum_block2d(const std::byte* __restrict in,
+    void vertical_running_max_algo_t<T, BinaryFunction>::partial_sum_block2D(const std::byte* __restrict in,
                                                                              std::byte* __restrict out, int width,
                                                                              int height, std::ptrdiff_t in_byte_stride,
                                                                              std::ptrdiff_t out_byte_stride)
@@ -291,7 +281,7 @@ namespace mln
   
   
     template <class T, class I, class J, class BinaryFunction>
-    void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension,
+    void running_max_2D(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension,
                         bool vertical)
     {
       TileLoader<I, T> r(input, vertical);

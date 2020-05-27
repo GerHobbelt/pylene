@@ -114,11 +114,34 @@ namespace mln::morpho
 
   namespace parallel
   {
-    template <class InputImage, class SE, typename DataType>
+    template <class InputImage, class SE>
+    class TileLoader_DilationTranspose : TileLoaderBase
+    {
+    public:
+      TileLoader_DilationTranspose(InputImage input, SE se, size_t tile_width, size_t tile_height)
+        : _in{input}
+        , _se{se}
+      {
+      }
+
+      void load_tile(mln::box2d roi) final
+      {
+      }
+
+      mln::ndbuffer_image get_tile() final
+      {
+      }
+
+    private:
+      InputImage _in;
+      SE _se;
+    };
+
+    template <class InputImage, class SE>
     class TileLoader_Dilation : TileLoaderBase
     {
     public:
-      TileLoader_Dilation(InputImage input, SE se, DataType type, size_t tile_width, size_t tile_height)
+      TileLoader_Dilation(InputImage input, SE se, size_t tile_width, size_t tile_height)
         : _in{input}
         , _se{se}
       {

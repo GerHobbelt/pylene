@@ -2,134 +2,14 @@
 
 #include <mln/core/box.hpp>
 #include <mln/core/concepts/image.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
 
 namespace mln
 {
-  /*TODO
-  Erosion
-  Dilation
-  Opening (Erosion -> Dilation)
-  Closing (Dilation -> Erosion)
-  Hit Or Miss
-  Rank Filter
-  Median filter
-  Mean (Box) filter
-  Morphological gradients
-  Top hat
-  */
-  template <class SE>
-  struct ParallelLocalCanvas2D
-  {
-    static constexpr int TILE_WIDTH  = 128;
-    static constexpr int TILE_HEIGHT = 128;
-    TileLoaderBase       m_tile_l;
-    TileWriterBase       m_tile_w;
-    TileExecutorBase     m_exec;
-    SE                   m_se; // Needed ?
-
-    virtual mln::experimental::box2d GetDomain() const                             = 0;
-    virtual void                     ExecuteTile(mln::experimental::box2d b) const = 0;
-    /*{
-      std::byte* tile;
-      std::ptrdiff_t stride = XXX;
-      mln::experimental::box2d roi = se.compute_input_region();
-      m_tile_l.load_tile(tile, stride, roi);
-      m_exec.execute(static_cast<ImageType>(tile));
-      m_tile_w.write_tile();
-    }*/
-  };
-
-  class TileExecutorBase
-  {
-    virtual void execute(std::byte* tile, std::ptrdiff_t stride) = 0;
-  };
-
-  class TileLoaderBase
-  {
-    // Load tile from memory (roi is in the vertical layout coordinates system)
-    virtual void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
-  };
-
-  class TileWriterBase
-  {
-    // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
-    virtual void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
-  };
-
-
-  template <class InputImage, typename BufferType>
-  class TileLoader : public TileLoaderBase
-  {
-  public:
-    // Load tile from memory (roi is in the vertical layout coordinates system)
-    void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) override
-    {
-      if (m_vertical)
-        details::copy_block(*m_input, roi, (BufferType*)out, byte_stride / sizeof(BufferType));
-      else
-      {
-        mln::experimental::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
-        details::transpose_block2d(*m_input, region, (BufferType*)out, byte_stride / sizeof(BufferType));
-      }
-    }
-
-    TileLoader(InputImage& input, bool vertical)
-      : m_input(&input)
-      , m_vertical{vertical}
-    {
-    }
-
-  private:
-    InputImage* m_input;
-    bool        m_vertical;
-  };
-
-  template <class OutputImage, typename BufferType>
-  class TileWriter : public TileWriterBase
-  {
-  public:
-    // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
-    void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) override
-    {
-      if (m_vertical)
-        details::copy_block((const BufferType*)in, byte_stride / sizeof(BufferType), roi, *m_output);
-      else
-      {
-        mln::experimental::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
-        details::transpose_block2d((const BufferType*)in, byte_stride / sizeof(BufferType), region, *m_output);
-      }
-    }
-
-    TileWriter(OutputImage& output, bool vertical)
-      : m_output(&output)
-      , m_vertical{vertical}
-    {
-    }
-
-  private:
-    OutputImage* m_output;
-    bool         m_vertical;
-  };
-
-  /*
-  ** Caller for the TBB parallel_for
-  ** Rationale being that every pointwise algorithm applies a function to every pixel,
-  ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
-  ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
-  */
-  void parallel_execute_local2d(ParallelLocalCanvas2d&);
-
-  template <class InputImage>
-  void copy_tile_with_padding(InputImage to_copy, image_concrete_t dst)
-  {
-    using I                      = std::remove_reference_t<InputImage>;
-    image_concrete_t<I> concrete = imconcretize(to_copy);
-  }
-
   namespace details
   {
     template <class I, class T>
-    [[gnu::noinline]] void copy_block(I& in, mln::experimental::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
+    [[gnu::noinline]] void copy_block(I& in, mln::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
     {
       const int x0 = roi.x();
       const int y0 = roi.y();
@@ -143,7 +23,7 @@ namespace mln
     }
 
     template <class I, class T>
-    [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::experimental::box2d roi, I& out)
+    [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::box2d roi, I& out)
     {
       const int x0 = roi.x();
       const int y0 = roi.y();
@@ -157,8 +37,7 @@ namespace mln
     }
 
     template <class I, class T>
-    [[gnu::noinline]] void transpose_block2d(I& in, mln::experimental::box2d input_roi, T* __restrict out,
-                                             std::ptrdiff_t out_stride)
+    [[gnu::noinline]] void transpose_block2d(I& in, mln::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
     {
       const int x0 = input_roi.x();
       const int y0 = input_roi.y();
@@ -170,8 +49,7 @@ namespace mln
     }
 
     template <class I, class T>
-    [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride,
-                                             mln::experimental::box2d output_roi, I& out)
+    [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride, mln::box2d output_roi, I& out)
     {
       const int x0 = output_roi.x();
       const int y0 = output_roi.y();
@@ -183,6 +61,71 @@ namespace mln
 
   } // namespace details
 
+  /*TODO
+  Erosion
+  Dilation
+  Opening (Erosion -> Dilation)
+  Closing (Dilation -> Erosion)
+  Hit Or Miss
+  Rank Filter
+  Median filter
+  Mean (Box) filter
+  Morphological gradients
+  Top hat
+  */
+
+  struct TileExecutorBase
+  {
+    virtual void execute(mln::ndbuffer_image input, mln::ndbuffer_image output) = 0;
+  };
+
+  class TileLoaderBase
+  {
+  public:
+    virtual void                load_tile(mln::box2d roi) = 0;
+    virtual mln::ndbuffer_image get_tile()  = 0;
+
+  private:
+    mln::ndbuffer_image _tile;
+    mln::box2d          _tile_roi;
+  };
+
+  class TileWriterBase
+  {
+    virtual void                write_tile(mln::box2d roi) = 0;
+    virtual mln::ndbuffer_image get_tile()  = 0;
+  };
+
+
+  /*
+  ** Caller for the TBB parallel_for
+  ** Rationale being that every pointwise algorithm applies a function to every pixel,
+  ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
+  ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
+  */
+  void parallel_execute_local2d(ParallelLocalCanvas2d&);
+
+  template <class SE, class Image>
+  struct ParallelLocalCanvas2D
+  {
+    static constexpr int TILE_WIDTH  = 128;
+    static constexpr int TILE_HEIGHT = 128;
+    TileLoaderBase       m_tile_l;
+    TileWriterBase       m_tile_w;
+    TileExecutorBase     m_exec;
+    SE                   m_se; // Needed ?
+
+    virtual mln::box2d GetDomain() const               = 0;
+    virtual void       ExecuteTile(mln::box2d b) const = 0;
+    /*{
+      std::byte* tile;
+      std::ptrdiff_t stride = XXX;
+      mln::box2d roi = se.compute_input_region();
+      m_tile_l.load_tile(tile, stride, roi);
+      m_exec.execute(static_cast<ImageType>(tile));
+      m_tile_w.write_tile();
+    }*/
+  };
 } // namespace mln
   /*
   namespace mln::morpho::experimental::details

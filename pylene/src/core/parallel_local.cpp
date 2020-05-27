@@ -5,7 +5,7 @@
 #include <tbb/task_scheduler_init.h>
 
 namespace mln
-{
+{/*
   class ParallelCanvas2dImpl
   {
   public:
@@ -38,7 +38,7 @@ namespace mln
   {
     return m_delegate->GetDomain();
   }
-
+  */
 
   /*
   ** Caller for the TBB parallel_for
@@ -46,14 +46,15 @@ namespace mln
   ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
   ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
   */
-  void parallel_execute_local2d(ParallelCanvas2d& canvas)
+  void parallel_execute_local2d(ParallelLocalCanvas2D& canvas)
   {
-    tbb::task_scheduler_init init;
-    ParallelCanvas2dImpl wrapper(&canvas);
-    mln::experimental::box2d domain = wrapper.GetDomain();
+    //tbb::task_scheduler_init init;
+    //ParallelCanvas2dImpl wrapper(&canvas);
+    //mln::experimental::box2d domain = wrapper.GetDomain();
 
-    tbb::blocked_range2d<int> rng(domain.y(), domain.y() + domain.height(), wrapper.delegate()->TILE_HEIGHT, //
-                                  domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);
-    tbb::parallel_for(rng, wrapper);
+    //tbb::blocked_range2d<int> rng(domain.y(), domain.y() + domain.height(), wrapper.delegate()->TILE_HEIGHT, //
+    //                              domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);
+    //tbb::parallel_for(rng, wrapper);
   }
+  
 } // namespace mln

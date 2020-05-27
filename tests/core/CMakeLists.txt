@@ -101,7 +101,8 @@ add_core_test(${test_prefix}mask2d             se/mask2d.cpp)
 
 
 # Others
-add_core_test(${test_prefix}traverse2d         canvas/traverse2d.cpp)
+add_core_test(${test_prefix}traverse2d                   canvas/traverse2d.cpp)
+add_core_test(${test_prefix}parallel_local_utils         canvas/parallel_local.cpp)
 
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts

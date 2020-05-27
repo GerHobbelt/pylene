@@ -9,8 +9,8 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
-#include <gtest/gtest.h>
 #include <fixtures/ImageCompare/image_compare.hpp>
+#include <gtest/gtest.h>
 
 
 struct vector_domain : public std::vector<mln::point2d>
@@ -28,12 +28,12 @@ TEST(View, clip)
   using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                                         {5, 6, 4, 8, 9}, //
-                                         {10, 11, 12, 13, 14}};
+                           {5, 6, 4, 8, 9}, //
+                           {10, 11, 12, 13, 14}};
 
   mln::image2d<int> ref = {{42, 1, 2, 3, 42}, //
-                                         {5, 42, 4, 42, 9}, //
-                                         {10, 11, 42, 13, 14}};
+                           {5, 42, 4, 42, 9}, //
+                           {10, 11, 42, 13, 14}};
 
   vector_domain domain = {{0, 0}, {4, 0}, {1, 1}, {3, 1}, {2, 2}};
 
@@ -62,12 +62,12 @@ TEST(View, clip_twice)
   using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                                         {5, 6, 4, 8, 9}, //
-                                         {10, 11, 12, 13, 14}};
+                           {5, 6, 4, 8, 9}, //
+                           {10, 11, 12, 13, 14}};
 
   mln::image2d<int> ref = {{0, 1, 2, 3, 4},   //
-                                         {5, 42, 4, 42, 9}, //
-                                         {10, 11, 12, 13, 14}};
+                           {5, 42, 4, 42, 9}, //
+                           {10, 11, 12, 13, 14}};
 
   vector_domain domain_a = {{0, 0}, {4, 0}, {1, 1}, {3, 1}, {2, 2}};
   vector_domain domain_b = {{1, 1}, {3, 1}};
@@ -111,12 +111,28 @@ TEST(View, clip_other_a_box2d)
                            {5, 42, 42, 8, 9}, //
                            {10, 11, 12, 13, 14}};
 
-  mln::box2d domain({1, 0}, {3, 2});
+  mln::box2d domain({1, 0}, {10, 10});
 
   // Clip returns an 'image2d'
   mln::image2d<int> clipped = mln::view::clip(ima, domain);
+
+  std::cout << "Clipped h, w:" << clipped.height() << ", " << clipped.width() << "\n";
+  std::cout << "ima h, w:" << ima.height() << ", " << ima.width()<< "\n";
+  for (int i = 0; i < clipped.height(); ++i){
+    for (int j = 0; j < clipped.width(); ++j){
+      std::cout << clipped({clipped.domain().x() + j, clipped.domain().y() + i}) << " ";
+    }
+    std::cout << "\n";
+  }
+
+  std::cout << "Fill 42\n";
   fill(clipped, 42);
- 
+  for (int i = 0; i < clipped.height(); ++i){
+    for (int j = 0; j < clipped.width(); ++j){
+      std::cout << clipped({clipped.domain().x() + j,clipped.domain().y() + i}) << " ";
+    }
+    std::cout << "\n";
+  }
 
 
   static_assert(mln::concepts::OutputImage<decltype(clipped)>);
@@ -220,5 +236,5 @@ static_assert(
 static_assert(
     (mln::concepts::OutputImage<mln::clip_view<mln::archetypes::OutputAccessibleImage, mln::archetypes::Domain>>), "");
 static_assert((mln::concepts::IndexableAndAccessibleImage<
-                             mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>),
-                         "");
+                  mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>),
+              "");

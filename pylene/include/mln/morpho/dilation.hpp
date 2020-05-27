@@ -1,9 +1,11 @@
 #pragma once
 
+#include <mln/core/algorithm/copy.hpp>
 #include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
+#include <mln/core/extension/padding.hpp>
 #include <mln/core/ops.hpp>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/trace.hpp>
@@ -113,19 +115,113 @@ namespace mln::morpho
 
   namespace parallel
   {
-    template <class ImageDataType, class SE>
+    template <class InputImage, class SE, typename DataType>
+    class TileLoader_Dilation : TileLoaderBase
+    {
+    public:
+      TileLoader_Dilation(InputImage input, SE se, DataType type, size_t tile_width, size_t tile_height)
+        : _in{input}
+        , _se{se}
+      {
+        _tile = mln::ndbuffer_image(typeid(type) /*Should use traits ?*/, tile_width, tile_height); 
+      }
+
+      void load_tile(mln::box2d roi) final
+      {
+        auto tile_roi = _se.compute_input_region(roi);
+        auto clipped = _in.clip(tile_roi);
+        mln::copy(clipped, _tile);
+
+        // clipped will always have same dimensions. If domain is too big clipped will contain unallocated data
+        if (clipped.height != tile_roi.height() || clipped.width != tile_roi.width())
+        {
+          // Know where missing data is? if width is different, are we missing left side or right side ?
+          int missing_x = tile_roi.width() - _tile.width;
+          int missing_y = tile_roi.height() - _tile.height;
+          int[] borders_x = {0, missing_x}; // or {missing_x, 0} ?
+          int[] borders_y = {0, missing_y}; // or {missing_y, 0} ?
+          const int borders[][2] = {borders_x, borders_y};
+          DataType padding_value = 0;
+          auto padding_method = mln::PAD_ZERO;
+          pad(_tile, padding_method, borders, padding_value);
+        }
+      }
+
+      mln::ndbuffer_image get_tile() final
+      {
+        image_concrete_t<InputImage> out = imconcretize(_tile);
+        return out;
+      }
+
+    private:
+      InputImage _in;
+      SE _se;
+    };
+
+    template <class SE, class BorderManager>
     class TileExecutor_Dilation : TileExecutorBase
     {
-      void execute(std::byte* t, SE se) final
+    public:
+
+      template <class SE, class BorderManager>
+      TileExecutor_Dilation(const mln::experimental::StructuringElement<SE>& se, BorderManager bm)
+        : _se{se}
+        , _bm{bm}
+      {}
+
+      void execute(mln::ndbuffer_image in, mln::ndbufferimage out) final
       {
-        ImageDataType* tile = static_cast<ImageDataType*>(t);
-        auto domain = se.compute_input_region();
-        using I = std::remove_reference_t<InputImage>;
-        image_concrete_t<I> img = imconcretize(domain)
-        // Fill `img` with `tile` + padding
         // Perform operation on tile according to algorithm.
+        dilation(in, _se, _bm, out);
       }
+
+    private:
+      SE            _se;
+      BorderManager _bm;
     };
+
+    template <class SE, typename DataType>
+    class TileWriter_Dilation : TileWriterBase
+    {
+    public:
+      template <class InputImage>
+      TileWriter_Dilation(InputImage input, SE se)
+        : _se{se}
+      {
+        _tile = imconcretize(input);
+      }
+
+      void write_tile(mln::box2d roi) final
+      {
+        auto tile_roi = _se.compute_input_region(_tile_roi);
+        _tile = _in.clip(tile_roi);
+
+        if (_tile.height != tile_roi.height() || _tile.width != tile_roi.width())
+        {
+          // know where missing data is? if width is different, are we missing left side or right side ?
+          // missing_x = tile_roi.width() - _tile.width;
+          // missing_y = tile_roi.height() - _tile.height;
+          // borders_x = {0, missing_x}; // or {missing_x, 0} ?
+          // borders_y = {0, missing_y}; // or {missing_y, 0} ?
+          const int borders[][2] = {borders_x, borders_y};
+          DataType padding_value = 0;
+          auto padding_method = mln::PAD_ZERO;
+          pad(_tile, padding_method, borders, padding_value);
+        }
+      }
+
+      mln::ndbuffer_image get_tile() final
+      {
+        image_concrete_t<InputImage> out = imconcretize(_tile);
+        return out;
+      }
+
+    private:
+      InputImage _in;
+      SE _se;
+    };
+
+
   } // namespace parallel
 
 } // namespace mln::morpho::

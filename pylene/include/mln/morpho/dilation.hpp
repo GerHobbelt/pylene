@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mln/core/algorithm/copy.hpp>
 #include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
@@ -140,12 +139,10 @@ namespace mln::morpho
         mln::box2d dest_roi = copy_roi;
         dest_roi.tl() -= roi.tl();
 
-        mln::copy(_in.clip(copy_roi), _tile.clip(dest_roi));
+        mln::copy(_in.clip(copy_roi), _tile.clip(dest_roi)); // TODO mln::details::copy_block
 
-        // clipped will always have same dimensions. If domain is too big clipped will contain unallocated data
         if (copy_roi != input_roi)
         {
-          // Know where missing data is? if width is different, are we missing left side or right side ?
           int borders[2][2];
 
           borders[0][0] = copy_roi.tl().x() - input_roi.tl().x();
@@ -170,69 +167,80 @@ namespace mln::morpho
       SE _se;
     };
 
-    template <class SE, class BorderManager>
+    template <class SE, class BorderManager, class Image>
     class TileExecutor_Dilation : TileExecutorBase
     {
     public:
-
-      template <class SE, class BorderManager>
-      TileExecutor_Dilation(const mln::experimental::StructuringElement<SE>& se, BorderManager bm)
+      template <class SE, class BorderManager, class Image>
+      TileExecutor_Dilation(const mln::experimental::StructuringElement<SE>& se, BorderManager bm, Image& in)
         : _se{se}
         , _bm{bm}
+        , _in{in}
       {}
 
       void execute(mln::ndbuffer_image in, mln::ndbufferimage out) final
       {
         // Perform operation on tile according to algorithm.
-        dilation(in, _se, _bm, out);
+        auto in_image2d = in.cast_to<image_value_t<Image>, 2>();
+        auto out_image2d = out.cast_to<image_value_t<Image>, 2>();
+        auto vs = mln::morpho::details::dilation_value_set<image_value_t<Image>>();
+        mln::box2d roi = in_image2d.domain();
+        auto [imas, ses] = bm.manage(in_image2d, _se);
+        std::visit([&](auto&& ima, auto&& se) { mln::morpho::details::impl::localmax(ima, output, vs, se, roi); }, imas, ses);
       }
 
     private:
       SE            _se;
       BorderManager _bm;
+      Image         _in;
     };
 
-    template <class SE, typename DataType>
+    template <class OutputImage>
     class TileWriter_Dilation : TileWriterBase
     {
     public:
-      template <class InputImage>
-      TileWriter_Dilation(InputImage input, SE se)
-        : _se{se}
+      template <class OutputImage>
+      TileWriter_Dilation(OutputImage out)
+        : _out{out}
+      {}
+
+      void write_tile(mln::box2d roi) final
       {
-        _tile = imconcretize(input);
+      }
+
+      mln::ndbuffer_image get_tile(mln::box2d roi) final
+      {
+        return out.clip(roi);
+      }
+
+    private:
+      OutputImage _out;
+    };
+
+    template <class OutputImage>
+    class TileWriter_DilationTranspose : TileWriterBase
+    {
+    public:
+      template <class OutputImage>
+      TileWriter_DilationTranspose(OutputImage out)
+        : _out{out}
+      {
+        _tile = imconcretize(_out)
       }
 
       void write_tile(mln::box2d roi) final
       {
-        auto tile_roi = _se.compute_input_region(_tile_roi);
-        _tile = _in.clip(tile_roi);
-
-        if (_tile.height != tile_roi.height() || _tile.width != tile_roi.width())
-        {
-          // know where missing data is? if width is different, are we missing left side or right side ?
-          // missing_x = tile_roi.width() - _tile.width;
-          // missing_y = tile_roi.height() - _tile.height;
-          // borders_x = {0, missing_x}; // or {missing_x, 0} ?
-          // borders_y = {0, missing_y}; // or {missing_y, 0} ?
-          const int borders[][2] = {borders_x, borders_y};
-          DataType padding_value = 0;
-          auto padding_method = mln::PAD_ZERO;
-          pad(_tile, padding_method, borders, padding_value);
-        }
+        mln::details::transpose_block2d(/* TODO */);
       }
 
-      mln::ndbuffer_image get_tile() final
+      mln::ndbuffer_image get_tile(mln::box2d roi) final
       {
-        image_concrete_t<InputImage> out = imconcretize(_tile);
-        return out;
+        return out.clip(roi);
       }
 
     private:
-      InputImage _in;
-      SE _se;
+      OutputImage _out;
     };
-
 
   } // namespace parallel
 

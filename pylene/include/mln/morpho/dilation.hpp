@@ -140,7 +140,7 @@ namespace mln::morpho
 */
 
     template <class InputImage, class SE>
-    class TileLoader_Dilation : TileLoaderBase
+    class TileLoader_Dilation : public TileLoaderBase
     {
     public:
       TileLoader_Dilation(InputImage input, SE se, size_t tile_width, size_t tile_height)
@@ -164,7 +164,8 @@ namespace mln::morpho
         mln::box2d dest_roi = copy_roi;
         dest_roi.tl() -= roi.tl();
 
-        mln::copy(_in.clip(copy_roi), _tile.clip(dest_roi)); // TODO mln::details::copy_block
+        auto ima = *(_tile.cast_to<image_value_t<InputImage>, 2>());
+        mln::copy(_in.clip(copy_roi), ima.clip(dest_roi)); // TODO mln::details::copy_block
 
         if (copy_roi != input_roi)
         {
@@ -177,13 +178,13 @@ namespace mln::morpho
 
           image_value_t<InputImage> padding_value  = 0;
           auto     padding_method = mln::PAD_ZERO;
-          pad(_tile, padding_method, borders, padding_value);
+          pad(ima, padding_method, borders, padding_value);
         }
       }
 
       mln::ndbuffer_image get_tile() final
       {
-        image_concrete_t<InputImage> out = imconcretize(_tile.cast_to<image_value_t<InputImage>, 2>());
+        image_concrete_t<InputImage> out = imconcretize(*(_tile.cast_to<image_value_t<InputImage>, 2>()));
         return out;
       }
 
@@ -193,10 +194,10 @@ namespace mln::morpho
     };
 
     template <class SE, class BorderManager, class Image>
-    class TileExecutor_Dilation : TileExecutorBase
+    class TileExecutor_Dilation : public TileExecutorBase
     {
     public:
-      TileExecutor_Dilation(const mln::details::StructuringElement<SE>& se, BorderManager bm, Image& in)
+      TileExecutor_Dilation(const SE& se, BorderManager bm, Image& in)
         : _se{se}
         , _bm{bm}
         , _in{in}
@@ -206,8 +207,8 @@ namespace mln::morpho
       void execute(mln::ndbuffer_image in, mln::ndbuffer_image out) final
       {
         // Perform operation on tile according to algorithm.
-        auto       in_image2d  = in.cast_to<image_value_t<Image>, 2>();
-        auto       out_image2d = out.cast_to<image_value_t<Image>, 2>();
+        auto       in_image2d  = *(in.cast_to<image_value_t<Image>, 2>());
+        auto       out_image2d = *(out.cast_to<image_value_t<Image>, 2>());
         auto       vs          = mln::morpho::details::dilation_value_set<image_value_t<Image>>();
         mln::box2d roi         = in_image2d.domain();
         auto [imas, ses]       = _bm.manage(in_image2d, _se);
@@ -216,13 +217,13 @@ namespace mln::morpho
       }
 
     private:
-      SE            _se;
-      BorderManager _bm;
-      Image         _in;
+      const SE&      _se;
+      BorderManager& _bm;
+      Image&         _in;
     };
 
     template <class OutputImage>
-    class TileWriter_Dilation : TileWriterBase
+    class TileWriter_Dilation : public TileWriterBase
     {
     public:
       TileWriter_Dilation(OutputImage out)
@@ -230,7 +231,7 @@ namespace mln::morpho
       {
       }
 
-      void write_tile(mln::box2d roi) final {}
+      void write_tile(mln::box2d roi) final { (void)roi; }
 
       mln::ndbuffer_image get_tile(mln::box2d roi) final { return _out.clip(roi); }
 
@@ -267,9 +268,12 @@ namespace mln::morpho
         : _in{in}
         , _se{se}
       {
-        m_tile_l = &TileLoader_Dilation(in, se, TILE_WIDTH, TILE_HEIGHT);
-        m_tile_w = &TileLoader_Dilation(out);
-        m_exec   = &TileExecutor_Dilation(se, bm, in);
+        auto l = TileLoader_Dilation(in, se, TILE_WIDTH, TILE_HEIGHT);
+        auto w = TileWriter_Dilation(out);
+        auto e = TileExecutor_Dilation(se, bm, in);
+        m_tile_l = &l;
+        m_tile_w = &w;
+        m_exec = &e;
       }
 
       mln::box2d GetDomain() const final { return _in.domain(); }
@@ -287,11 +291,22 @@ namespace mln::morpho
     };
 
     template <class InputImage, class SE, class BorderManager, class OutputImage>
-    void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
+    void dilation(InputImage&& image, const SE& se, BorderManager bm,
                   OutputImage&& out)
     {
       DilationParallel caller(image, out, se, bm);
       parallel_execute_local2D(caller);
+    }
+
+    template <class InputImage, class SE>
+    image_concrete_t<std::remove_reference_t<InputImage>> dilation(InputImage&&                                image,
+                                                                   const SE& se)
+    {
+      using I = std::remove_reference_t<InputImage>;
+
+      image_concrete_t<I> out = imconcretize(image);
+      dilation(image, se, mln::extension::bm::fill(mln::value_traits<image_value_t<I>>::inf()), out);
+      return out;
     }
   } // namespace parallel
 

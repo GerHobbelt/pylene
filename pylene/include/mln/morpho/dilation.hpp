@@ -14,8 +14,6 @@
 
 #include <mln/morpho/private/localmax.hpp>
 
-#include <fmt/core.h>
-
 namespace mln::morpho
 {
 
@@ -216,12 +214,10 @@ namespace mln::morpho
         auto       in_image2d  = *(in.cast_to<V, 2>());
         auto       out_image2d = *(out.cast_to<V, 2>());
         auto       vs          = mln::morpho::details::dilation_value_set<V>();
-        mln::box2d inroi       = in_image2d.domain();
-        mln::box2d roi         = out_image2d.domain();
+        mln::box2d roi         = out.domain();
 
-        fmt::print("In: x={} y={} w={} h={}\n", inroi.x(), inroi.y(), inroi.width(), inroi.height());
-        fmt::print("Out: x={} y={} w={} h={}\n", roi.x(), roi.y(), roi.width(), roi.height());
-        mln::morpho::details::impl::localmax(in_image2d, out_image2d, vs, _se, roi);
+        auto tmp = in_image2d.clip(roi);
+        mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
       }
 
     private:

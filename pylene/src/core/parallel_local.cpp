@@ -55,5 +55,18 @@ namespace mln
                                   domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);
     tbb::parallel_for(rng, wrapper);
   }
-  
+
+  void ParallelLocalCanvas2D::ExecuteTile(mln::box2d roi) const
+  {
+    mln::box2d input_roi = this->ComputeInputRegion(roi);
+
+    auto m_tile_l = this->GetTileLoader();
+    auto m_tile_w = this->GetTileWriter();
+    auto m_tile_e = this->GetTileExecutor();
+
+    m_tile_l->load_tile(roi, input_roi);
+    m_tile_e->execute(m_tile_l->get_tile(), m_tile_w->get_tile(roi));
+    m_tile_w->write_tile(roi);
+  }
+
 } // namespace mln

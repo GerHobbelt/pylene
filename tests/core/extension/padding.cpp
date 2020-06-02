@@ -47,6 +47,7 @@ void check_padding(mln::__ndbuffer_image<T, dim> f, mln::ndbox<dim> inner,  mln:
 template <class T>
 class Padding2DTest : public testing::TestWithParam<mln::e_padding_mode>
 {
+public:
   mln::image2d<T> input = {
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //

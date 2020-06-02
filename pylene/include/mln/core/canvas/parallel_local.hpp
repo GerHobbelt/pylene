@@ -74,39 +74,40 @@ namespace mln
   Top hat
   */
 
-  struct TileExecutorBase
+  class TileExecutorBase
   {
-    virtual void execute(mln::ndbuffer_image input, mln::ndbuffer_image output) = 0;
+  public:
+    virtual void execute(mln::ndbuffer_image input, mln::ndbuffer_image output) const = 0;
   };
 
   class TileLoaderBase
   {
   public:
-    virtual void                load_tile(mln::box2d roi) = 0;
-    virtual mln::ndbuffer_image get_tile()  = 0;
-
-  private:
-    mln::ndbuffer_image _tile;
-    mln::box2d          _tile_roi;
+    virtual void                load_tile(mln::box2d roi, mln::box2d input_roi) const = 0;
+    virtual mln::ndbuffer_image get_tile() const                                      = 0;
   };
 
   class TileWriterBase
   {
-    virtual void                write_tile(mln::box2d roi) = 0;
-    virtual mln::ndbuffer_image get_tile(mln::box2d roi)  = 0;
+  public:
+    virtual void                write_tile(mln::box2d roi) const = 0;
+    virtual mln::ndbuffer_image get_tile(mln::box2d roi) const   = 0;
   };
 
 
-  struct ParallelLocalCanvas2D
+  class ParallelLocalCanvas2D
   {
+  public:
     static constexpr int TILE_WIDTH  = 128;
     static constexpr int TILE_HEIGHT = 128;
-    TileLoaderBase*      m_tile_l;
-    TileWriterBase*      m_tile_w;
-    TileExecutorBase*    m_exec;
 
-    virtual mln::box2d GetDomain() const               = 0;
-    virtual void       ExecuteTile(mln::box2d b) const = 0;
+    virtual mln::box2d              ComputeInputRegion(mln::box2d) const noexcept = 0;
+    virtual const TileLoaderBase*   GetTileLoader() const noexcept                = 0;
+    virtual const TileWriterBase*   GetTileWriter() const noexcept                = 0;
+    virtual const TileExecutorBase* GetTileExecutor() const noexcept              = 0;
+
+    virtual mln::box2d GetDomain() const = 0;
+    virtual void       ExecuteTile(mln::box2d b) const final;
   };
 
   void parallel_execute_local2D(ParallelLocalCanvas2D& canvas);

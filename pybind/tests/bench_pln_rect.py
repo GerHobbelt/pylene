@@ -21,12 +21,9 @@ def setup_test_img():
     global sizes
     ref = np.zeros((sizes["width"], sizes["height"]), dtype="uint8")
     rnd.seed(42)
-    nb_pixels = sizes["width"]*sizes["height"]
-    nb_pixels_white = int(nb_pixels * percent / 100)
-    for i in range(0, nb_pixels_white):
-        x = rnd.randint(0, sizes["width"]-1)
-        y = rnd.randint(0, sizes["height"]-1)
-        ref[x, y] = 255
+    for x in range(0, sizes["width"]):
+        for y in range(0, sizes["height"]):
+            ref[x, y] = rnd.randint(0, 255)
     return ref
 
 

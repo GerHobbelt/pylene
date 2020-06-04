@@ -45,6 +45,6 @@ df = pd.DataFrame(data=data, index=indexes, columns=[
                   'Pln_DiscDecompPeriodic', 'Pln_RectDecomp', 'CV_Disc', 'CV_Rect'])
 
 fig = sns.lineplot(data=df, legend="full")
-fig.set(yscale="log", xlabel="SE size", ylabel="Time (ns)")
+fig.set(yscale="log", xlabel="SE size", ylabel="Time (ms)")
 
 fig.get_figure().savefig("PlnVsOpenCV.png")

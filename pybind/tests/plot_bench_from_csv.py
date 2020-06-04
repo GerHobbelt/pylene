@@ -20,7 +20,7 @@ def draw_fig_from_csv(csv_file_name_without_ext):
   df = pd.read_csv(filepath_or_buffer=csv_file_name_without_ext + ".csv", index_col=0)
 
   fig = sns.lineplot(data=df, legend="full")
-  fig.set(yscale="log", xlabel="SE size", ylabel="Time (ns)")
+  fig.set(yscale="log", xlabel="SE size", ylabel="Time (ms)")
 
   fig.get_figure().savefig(csv_file_name_without_ext + ".png")
   fig.get_figure().clf()

@@ -48,7 +48,7 @@ def test_cv2():
 
 
 sizes_list = [sizes]
-rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 8)]
+rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 9)]
 
 
 def get_sizes():
@@ -86,7 +86,7 @@ def save_result_to_csv(times, size):
             benchmarks['Skimage'].append(t["Skimage"])
             benchmarks['OpenCV'].append(t["OpenCV"])
 
-    indexes = [x['height'] * x['width'] for x in rect_sizes_list]
+    indexes = [int(math.sqrt(x['height'] * x['width'])) for x in rect_sizes_list]
     df = pd.DataFrame(data=benchmarks, index=indexes, columns=[
                       'PylenaD', 'Skimage', 'OpenCV'])
     print(df)

@@ -38,7 +38,7 @@ def test_pylena_decomp():
 
 
 sizes_list = [sizes]
-rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 8)]
+rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 9)]
 
 
 def get_sizes():
@@ -70,7 +70,7 @@ def save_result_to_csv(times, size):
             benchmarks['Pylena'].append(t["Pylena"])
             benchmarks['PylenaD'].append(t["PylenaD"])
 
-    indexes = [x['height'] * x['width'] for x in rect_sizes_list]
+    indexes = [int(math.sqrt(x['height'] * x['width'])) for x in rect_sizes_list]
     df = pd.DataFrame(data=benchmarks, index=indexes, columns=[
                       'Pylena', 'PylenaD'])
     print(df)

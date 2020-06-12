@@ -246,4 +246,4 @@ package:
         - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
         - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
     rules:
-        - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development/cpp20"
+        - if: $CI_COMMIT_BRANCH == "master"

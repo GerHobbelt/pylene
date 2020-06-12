@@ -3,6 +3,7 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
+#include <tbb/task_scheduler_init.h>
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Clone)
@@ -15,6 +16,22 @@ TEST(Core, Algorithm_Clone)
   // Writing does not affect ima
   out({0, 0}) = 69;
 
+
+  const mln::image2d<uint8_t> ref = {{69, 2, 3}, {4, 5, 6}};
+  ASSERT_TRUE(mln::all_of(out == ref));
+}
+
+TEST(Core, Algorithm_Clone_Parallel)
+{
+  using namespace mln::view::ops;
+
+  tbb::task_scheduler_init init;
+
+  const mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
+  auto                        out = mln::parallel::clone(ima);
+
+  // Writing does not affect ima
+  out({0, 0}) = 69;
 
   const mln::image2d<uint8_t> ref = {{69, 2, 3}, {4, 5, 6}};
   ASSERT_TRUE(mln::all_of(out == ref));

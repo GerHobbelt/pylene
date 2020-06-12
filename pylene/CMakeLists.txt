@@ -2,8 +2,8 @@ include(CMakePackageConfigHelpers)
 
 find_package(Boost 1.58 REQUIRED)
 find_package(FreeImage REQUIRED)
-find_package(TBB)
 
+find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED CONFIG)
 find_package(fmt 6.0 REQUIRED)
 
@@ -13,11 +13,10 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 add_library(Pylene)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene INTERFACE tbb)
+  target_link_libraries(Pylene PRIVATE TBB::TBB)
 else ()
   set(PYLENE_USE_TBB OFF)
-#FIXME use a config file
-  target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
+  target_compile_definitions(Pylene PRIVATE MLN_NO_TBB)
 endif ()
 
 # FIXME: still useful ?
@@ -52,6 +51,7 @@ target_sources(Pylene PRIVATE
                src/core/init_list.cpp
                src/core/ndbuffer_image.cpp
                src/core/ndbuffer_image_data.cpp
+               src/core/parallel_pointwise.cpp
                src/core/se/disc.cpp
                src/core/se/mask2d.cpp
                src/core/se/periodic_line2d.cpp

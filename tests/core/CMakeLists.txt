@@ -82,6 +82,13 @@ add_core_test(${test_prefix}transform          algorithm/transform.cpp)
 add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}accumulate_local   algorithm/accumulate_local.cpp)
 
+target_link_libraries(${test_prefix}copy               PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}clone              PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}fill               PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}for_each           PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}paste              PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}transform          PRIVATE TBB::TBB)
+
 # test SE
 add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)
 add_core_test(${test_prefix}disc               se/disc.cpp)

@@ -1,4 +1,5 @@
 #pragma once
+#include <mln/core/canvas/parallel_pointwise.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/range/foreach.hpp>
@@ -114,5 +115,45 @@ namespace mln
           dest(px.point()) = px.val();
     }
   }
+
+  namespace parallel
+  {
+    namespace details
+    {
+      template <class InputImage, class OutputImage>
+      class PasteParallel : public ParallelCanvas2d
+      {
+        InputImage  _in;
+        OutputImage _out;
+
+        static_assert(mln::is_a<InputImage, mln::details::Image>());
+        static_assert(mln::is_a<OutputImage, mln::details::Image>());
+        static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+        void ExecuteTile(mln::box2d b) const final
+        {
+          auto subimage_in  = _in.clip(b);
+          auto subimage_out = _out.clip(b);
+          mln::paste(subimage_in, subimage_out);
+        }
+
+        mln::box2d GetDomain() const final { return _in.domain(); }
+
+      public:
+        PasteParallel(InputImage input, OutputImage output)
+          : _in{input}
+          , _out{output}
+        {
+        }
+      };
+    } // namespace details
+
+    template <class InputImage, class OutputImage>
+    void paste(InputImage src, OutputImage dest)
+    {
+      details::PasteParallel caller(src, dest);
+      parallel_execute2d(caller);
+    }
+  } // namespace parallel
 
 } // namespace mln

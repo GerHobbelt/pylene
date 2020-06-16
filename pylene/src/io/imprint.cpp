@@ -7,7 +7,7 @@ namespace mln::io::internal
   {
     // Compute column width
     int width = 0;
-    mln_foreach_new (auto p, roi)
+    mln_foreach (auto p, roi)
     {
       int w = static_cast<int>(fmter.formatted_size(p));
       if (width < w)
@@ -28,7 +28,7 @@ namespace mln::io::internal
   {
     // Compute column width
     int width = 0;
-    mln_foreach_new (auto p, roi)
+    mln_foreach (auto p, roi)
     {
       int w = static_cast<int>(fmter.formatted_size(p));
       if (width < w)

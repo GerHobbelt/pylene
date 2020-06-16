@@ -174,7 +174,7 @@ TEST(Core, Where)
     for (auto p : r)
       ASSERT_EQ(1, x(p) % 2);
 
-  mln_foreach_new (auto p, x.domain())
+  mln_foreach (auto p, x.domain())
     if (x(p) % 2 == 1)
     {
       ASSERT_TRUE(z.has(p));

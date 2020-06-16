@@ -52,7 +52,7 @@ namespace mln::morpho
     std::size_t alphatree_create_nodemap(I node_map, J zpar)
     {
       std::size_t node_count = 0;
-      mln_foreach_new(auto px, node_map.pixels())
+      mln_foreach(auto px, node_map.pixels())
       {
         auto p  = px.point();
         auto rp = canvas::impl::zfindroot(zpar, p);
@@ -108,7 +108,7 @@ namespace mln::morpho
     void alphatree_compute_edges(I input, N nbh, F distance, std::vector<E>& edges)
     {
       auto dom = input.domain();
-      mln_foreach_new (auto p, dom)
+      mln_foreach (auto p, dom)
       {
         for (auto n : nbh.after(p))
           if (dom.has(n))

@@ -62,7 +62,7 @@ namespace mln::labeling
       // Forward scan
       {
         auto zz = mln::ranges::view::zip(input.pixels(), output.pixels());
-        mln_foreach_new((auto [pxin, pxout]), zz)
+        mln_foreach((auto [pxin, pxout]), zz)
         {
           if (!pxin.val())
           {
@@ -80,7 +80,7 @@ namespace mln::labeling
       // Backward
       {
         auto zz = mln::ranges::view::zip(input.pixels(), output.pixels());
-        mln_foreach_new((auto [pxin, pxout]), mln::ranges::view::reverse(zz))
+        mln_foreach((auto [pxin, pxout]), mln::ranges::view::reverse(zz))
         {
           if (!pxin.val())
             continue;

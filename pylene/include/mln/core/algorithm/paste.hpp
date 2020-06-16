@@ -63,7 +63,7 @@ namespace mln
     template <class InputImage, class InputRange, class OutputImage>
     void paste_unsafe(InputImage src, InputRange roi, OutputImage dest)
     {
-      mln_foreach_new(auto p, roi)
+      mln_foreach(auto p, roi)
         dest.at(p) = src.at(p);
     }
   }
@@ -85,7 +85,7 @@ namespace mln
     }
     else
     {
-      mln_foreach_new(auto p, roi)
+      mln_foreach(auto p, roi)
         dest(p) = src(p);
     }
   }

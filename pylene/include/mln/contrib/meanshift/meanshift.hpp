@@ -31,7 +31,7 @@ namespace mln
       mln::se::rect2d win(2 * SR + 1, 2 * SR + 1);
 
       auto g = [](double x) -> double { return std::exp(-x); };
-      mln_foreach_new (auto p, f.domain())
+      mln_foreach (auto p, f.domain())
       {
         site_t   py = {static_cast<double>(p.x()), static_cast<double>(p.y())};
         value_t  vy = f(p).as_vec();

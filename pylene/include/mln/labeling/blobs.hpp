@@ -41,7 +41,7 @@ namespace mln::labeling
 
       mln::extension::fill(out, LBL_MAX);
 
-      mln_foreach_new(auto p, ima.domain())
+      mln_foreach(auto p, ima.domain())
       {
         if (!ima(p) || out(p) > 0)
           continue;
@@ -84,7 +84,7 @@ namespace mln::labeling
       mln::extension::fill(out, LBL_MAX);
 
       auto dom = ima.domain();
-      mln_foreach_new(auto p, dom)
+      mln_foreach(auto p, dom)
       {
         if (!ima(p) || out(p) > 0)
           continue;

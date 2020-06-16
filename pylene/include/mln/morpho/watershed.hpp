@@ -48,7 +48,7 @@ namespace mln::morpho
       {
         output.extension().fill(kWaterline);
 
-        mln_foreach_new(auto px, output.pixels())
+        mln_foreach(auto px, output.pixels())
         {
           // Not a local minimum => early exit
           if (px.val() != 0)

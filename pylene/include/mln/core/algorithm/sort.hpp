@@ -79,7 +79,7 @@ namespace mln
       sort_compute_cumulated_histogram(input, histogram, nvalues, proj);
 
       auto out = ::ranges::begin(rng);
-      mln_foreach_new (auto px, input.pixels())
+      mln_foreach (auto px, input.pixels())
       {
         std::ptrdiff_t pos = histogram[proj(px.val())]++;
         if constexpr (use_p)
@@ -98,7 +98,7 @@ namespace mln
       // Copy to container
       {
         auto it = ::ranges::begin(rng);
-        mln_foreach_new (auto px, input.pixels())
+        mln_foreach (auto px, input.pixels())
         {
           if constexpr (use_p)
             *it = px.point();

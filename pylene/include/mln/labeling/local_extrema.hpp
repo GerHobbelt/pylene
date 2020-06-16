@@ -57,7 +57,7 @@ namespace mln::labeling
 
       {
         // Forward scan
-        mln_foreach_new(auto p, input.domain())
+        mln_foreach(auto p, input.domain())
         {
           auto fp = input(p);
 
@@ -102,7 +102,7 @@ namespace mln::labeling
       int n_label = 0;
       // Labelisation
       {
-        mln_foreach_new (auto pxOut, output.pixels())
+        mln_foreach (auto pxOut, output.pixels())
         {
           if (pxOut.val())
           {

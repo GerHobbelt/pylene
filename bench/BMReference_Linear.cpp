@@ -9,7 +9,7 @@
 
 void Mult_Inplace_New_Values(mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto& v, img.values())
+  mln_foreach (auto& v, img.values())
   {
     v *= 2;
   }
@@ -17,7 +17,7 @@ void Mult_Inplace_New_Values(mln::image2d<uint8_t>& img)
 
 void Mult_Inplace_New_Pixels(mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto&& px, img.pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() *= 2;
   }
@@ -76,7 +76,7 @@ void Threshold_Inplace_New_Values(mln::image2d<uint8_t>& img)
 {
   constexpr uint8_t t = 128;
 
-  mln_foreach_new (auto& v, img.values())
+  mln_foreach (auto& v, img.values())
   {
     v = v < t ? 0 : 255;
   }
@@ -86,7 +86,7 @@ void Threshold_Inplace_New_Pixels(mln::image2d<uint8_t>& img)
 {
   constexpr uint8_t t = 128;
 
-  mln_foreach_new (auto&& px, img.pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() = px.val() < t ? 0 : 255;
   }
@@ -150,7 +150,7 @@ void Threshold_New_Pixels(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>
 
 void LUT_Inplace_New_Values(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto& v, img.values())
+  mln_foreach (auto& v, img.values())
   {
     v = LUT[v];
   }
@@ -158,7 +158,7 @@ void LUT_Inplace_New_Values(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 
 void LUT_Inplace_New_Pixels(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto&& px, img.pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() = LUT[px.val()];
   }

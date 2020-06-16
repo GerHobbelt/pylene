@@ -117,7 +117,7 @@ TEST(Core, ZipImage_Value_Iteration_2)
 
   int sum1 = 0;
   {
-    mln_foreach_new ((auto [x, y]), x.values())
+    mln_foreach ((auto [x, y]), x.values())
       sum1 += x + y;
   }
   ASSERT_EQ(sum1, 25 * 24); // sum of 25 first integers * 2
@@ -139,7 +139,7 @@ TEST(Core, ZipImage_Temporary_usage)
   // static_assert(mln::concepts::BidirectionalImage<decltype(x)>); //FIXME
   static_assert(not mln::concepts::RawImage<decltype(x)>);
 
-  mln_foreach_new (auto w, x.values())
+  mln_foreach (auto w, x.values())
     std::get<0>(w) = std::get<1>(w);
 
   ASSERT_TRUE(mln::all_of(ima == make_image()));

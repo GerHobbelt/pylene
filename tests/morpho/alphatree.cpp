@@ -19,7 +19,7 @@ cut(const mln::morpho::component_tree<int>& t, mln::image2d<int>& node_map, int 
 
   int nlabel = 0;
   {
-    mln_foreach_new(auto px, node_map.pixels())
+    mln_foreach(auto px, node_map.pixels())
       if (labels[px.val()] == -1)
         labels[px.val()] = nlabel++;
   }
@@ -37,7 +37,7 @@ cut(const mln::morpho::component_tree<int>& t, mln::image2d<int>& node_map, int 
   mln::image2d<int> imlabel;
   imlabel.resize(node_map.domain());
 
-  mln_foreach_new(auto px, imlabel.pixels())
+  mln_foreach(auto px, imlabel.pixels())
     px.val() = labels[node_map(px.point())];
 
   return imlabel;

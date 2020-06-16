@@ -53,7 +53,7 @@ unsigned threshold1_bis(mln::image2d<uint8_t> f, uint8_t v)
 unsigned threshold2(mln::image2d<uint8_t> f, uint8_t v)
 {
   unsigned count = 0;
-  mln_foreach_new (auto val, f.values())
+  mln_foreach (auto val, f.values())
     count += (val < v);
 
   return count;
@@ -62,7 +62,7 @@ unsigned threshold2(mln::image2d<uint8_t> f, uint8_t v)
 unsigned threshold3(mln::image2d<uint8_t> f, uint8_t v)
 {
   unsigned count = 0;
-  mln_foreach_new (auto px, f.pixels())
+  mln_foreach (auto px, f.pixels())
     count += (px.val() < v);
   return count;
 }

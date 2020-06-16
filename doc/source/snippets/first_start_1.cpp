@@ -12,28 +12,28 @@ int main()
 
   std::cout << "== Traversing forward ==\n";
   std::cout << "Traversing through points.\n";
-  mln_foreach_new (auto p, f.domain())
+  mln_foreach (auto p, f.domain())
     fmt::print("f({},{}) = {}\n", p.x(), p.y(), f(p));
 
   std::cout << "Traversing on values.\n";
-  mln_foreach_new (int x, f.values())
+  mln_foreach (int x, f.values())
     std::cout << x << "\n";
 
   std::cout << "Traversing with pixels.\n";
-  mln_foreach_new (auto px, f.pixels())
+  mln_foreach (auto px, f.pixels())
     fmt::print("f({},{}) = {}\n", px.point().x(), px.point().y(), px.val());
 
 
   std::cout << "\n== Traversing backward ==\n";
   std::cout << "Traversing through points.\n";
-  mln_foreach_new (auto p, mln::ranges::view::reverse(f.domain()))
+  mln_foreach (auto p, mln::ranges::view::reverse(f.domain()))
     fmt::print("f({},{}) = {}\n", p.x(), p.y(), f(p));
 
   std::cout << "Traversing on values.\n";
-  mln_foreach_new (auto x, mln::ranges::view::reverse(f.values()))
+  mln_foreach (auto x, mln::ranges::view::reverse(f.values()))
     std::cout << x << "\n";
 
   std::cout << "Traversing with pixels.\n";
-  mln_foreach_new (auto px, mln::ranges::view::reverse(f.pixels()))
+  mln_foreach (auto px, mln::ranges::view::reverse(f.pixels()))
     fmt::print("f({},{}) = {}\n", px.point().x(), px.point().y(), px.val());
 }

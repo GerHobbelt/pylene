@@ -54,7 +54,7 @@ TEST(IO, FreeImage_ppm)
   mln::image2d<mln::rgb8> ima;
   mln::image2d<mln::rgb8> ref(5, 5);
 
-  mln_foreach_new (auto&& pix, ref.pixels())
+  mln_foreach (auto&& pix, ref.pixels())
   {
     pix.val()[0] = uint8_t(pix.point().y());
     pix.val()[1] = uint8_t(pix.point().x());
@@ -74,7 +74,7 @@ TEST(IO, FreeImage_pbm)
   mln::image2d<bool> ima;
   mln::image2d<bool> ref(5, 5);
 
-  mln_foreach_new (auto p, ref.domain())
+  mln_foreach (auto p, ref.domain())
     ref(p) = ((p.x() % 2) == (p.y() % 2));
 
   mln::io::imsave(ref, "test.tiff");
@@ -108,7 +108,7 @@ TEST(IO, FreeImage_slow_ppm)
   mln::image2d<mln::rgb8> ima;
   mln::image2d<mln::rgb8> ref(5, 5);
 
-  mln_foreach_new (auto&& pix, ref.pixels())
+  mln_foreach (auto&& pix, ref.pixels())
   {
     pix.val()[0] = uint8_t(pix.point().y());
     pix.val()[1] = uint8_t(pix.point().x());
@@ -131,7 +131,7 @@ TEST(IO, FreeImage_slow_pbm)
   mln::image2d<bool> ima;
   mln::image2d<bool> ref(5, 5);
 
-  mln_foreach_new (auto p, ref.domain())
+  mln_foreach (auto p, ref.domain())
     ref(p) = ((p.x() % 2) == (p.y() % 2));
 
   mln::io::imsave(not ref, "test.tiff");

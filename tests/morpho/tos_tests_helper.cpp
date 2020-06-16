@@ -24,7 +24,7 @@ namespace
     std::vector<P> repr_data(n + 1, pmax);
 
     P* repr = repr_data.data() + 1;
-    mln_foreach_new(auto px, node_map.pixels())
+    mln_foreach(auto px, node_map.pixels())
     {
       int id = px.val();
       P   p    = px.point();

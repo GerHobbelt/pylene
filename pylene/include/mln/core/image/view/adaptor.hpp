@@ -107,9 +107,9 @@ namespace mln
     using domain_type = image_domain_t<I>;
     /// \}
 
-    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<new_pixel_type>
+    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
     {
-      using new_pixel_type::pixel_adaptor::pixel_adaptor;
+      using pixel_type::pixel_adaptor::pixel_adaptor;
     };
 
     /// Traits & Image Properties
@@ -177,16 +177,16 @@ namespace mln
       return m_ima.at(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
-      return m_ima.new_pixel(p);
+      return m_ima.pixel(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return m_ima.new_pixel_at(p);
+      return m_ima.pixel_at(p);
     }
     /// \}
 

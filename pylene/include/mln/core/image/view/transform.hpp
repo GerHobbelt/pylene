@@ -52,26 +52,26 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<new_pixel_type>
+    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
     {
       using point_type              = transform_view::point_type;
       using site_type[[deprecated]] = transform_view::point_type;
       using reference               = transform_view::reference;
       using value_type              = transform_view::value_type;
 
-      new_pixel_type(fun_t fun, image_pixel_t<I> px)
-        : new_pixel_type::pixel_adaptor{px}
+      pixel_type(fun_t fun, image_pixel_t<I> px)
+        : pixel_type::pixel_adaptor{px}
         , fun_{fun}
       {
       }
 
-      new_pixel_type(const new_pixel_type& other)
-        : new_pixel_type::pixel_adaptor{other}
+      pixel_type(const pixel_type& other)
+        : pixel_type::pixel_adaptor{other}
         , fun_(other.fun_)
       {
       }
-      new_pixel_type(new_pixel_type&& other)
-        : new_pixel_type::pixel_adaptor{std::move(other)}
+      pixel_type(pixel_type&& other)
+        : pixel_type::pixel_adaptor{std::move(other)}
         , fun_(std::move(other.fun_))
       {
       }
@@ -109,7 +109,7 @@ namespace mln
 
     auto pixels()
     {
-      auto pxwrapper = [fun = this->fun_](image_pixel_t<I> px) { return new_pixel_type{fun, std::move(px)}; };
+      auto pxwrapper = [fun = this->fun_](image_pixel_t<I> px) { return pixel_type{fun, std::move(px)}; };
       return mln::ranges::view::transform(this->base().pixels(), pxwrapper);
     }
 
@@ -147,17 +147,17 @@ namespace mln
       return std::invoke(fun_, this->base().at(p));
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(this->domain().has(p));
-      return {fun_, this->base().new_pixel(p)};
+      return {fun_, this->base().pixel(p)};
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return {fun_, this->base().new_pixel_at(p)};
+      return {fun_, this->base().pixel_at(p)};
     }
     /// \}
 
@@ -206,7 +206,7 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : mln::details::Pixel<new_pixel_type>
+    struct pixel_type : mln::details::Pixel<pixel_type>
     {
     public:
       using point_type              = transform2_view::point_type;
@@ -215,15 +215,15 @@ namespace mln
       using value_type              = transform2_view::value_type;
 
 
-      new_pixel_type(fun_t fun, image_pixel_t<I1> px1, image_pixel_t<I2> px2)
+      pixel_type(fun_t fun, image_pixel_t<I1> px1, image_pixel_t<I2> px2)
         : m_pix1{std::move(px1)}
         , m_pix2{std::move(px2)}
         , fun_{std::move(fun)}
       {
       }
 
-      new_pixel_type(const new_pixel_type& other) = default;
-      new_pixel_type(new_pixel_type&& other)      = default;
+      pixel_type(const pixel_type& other) = default;
+      pixel_type(pixel_type&& other)      = default;
 
       reference val() const { return std::invoke(fun_, m_pix1.val(), m_pix2.val()); }
       auto      point() const { return m_pix1.point(); }
@@ -269,7 +269,7 @@ namespace mln
     auto pixels()
     {
       auto pxwrapper = [fun = this->fun_](image_pixel_t<I1> px1, image_pixel_t<I2> px2) {
-        return new_pixel_type{fun, std::move(px1), std::move(px2)};
+        return pixel_type{fun, std::move(px1), std::move(px2)};
       };
       return mln::ranges::view::transform(m_ima1.pixels(), m_ima2.pixels(), pxwrapper);
     }
@@ -291,18 +291,18 @@ namespace mln
       return std::invoke(fun_, m_ima1.at(p), m_ima2.at(p));
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(m_ima1.domain().has(p));
       mln_precondition(m_ima2.domain().has(p));
-      return {fun_, m_ima1.new_pixel(p), m_ima2.new_pixel(p)};
+      return {fun_, m_ima1.pixel(p), m_ima2.pixel(p)};
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return {fun_, m_ima1.new_pixel_at(p), m_ima2.new_pixel_at(p)};
+      return {fun_, m_ima1.pixel_at(p), m_ima2.pixel_at(p)};
     }
     /// \}
   };

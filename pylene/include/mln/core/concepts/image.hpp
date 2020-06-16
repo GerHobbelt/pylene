@@ -156,13 +156,13 @@ namespace mln::concepts
 #if __GNUC__ == 9
       { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
       { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>&&; // idem
-      { ima.new_pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>&&; // For concrete image pixel may propagate constness
-      { ima.new_pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>&&; // idem
+      { ima.pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>&&; // For concrete image pixel may propagate constness
+      { ima.pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>&&; // idem
 #else
       { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
       { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>; // idem
-      { ima.new_pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>; // For concrete image pixel may propagate constness
-      { ima.new_pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>; // idem
+      { ima.pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>; // For concrete image pixel may propagate constness
+      { ima.pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>; // idem
 #endif
     };
 

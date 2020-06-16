@@ -79,7 +79,7 @@ namespace mln::morpho
         {
           auto [level, p] = pqueue.top();
 
-          auto pxOut = output.new_pixel(p);
+          auto pxOut = output.pixel(p);
           mln_assertion(pxOut.val() == kInqueue);
           pqueue.pop();
 

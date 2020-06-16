@@ -12,9 +12,9 @@ Contents:
    :maxdepth: 2
 
    Introduction <intro>
-   tutorial
-   Reference <reference>
-   Rumination <ruminations>
+   Quick Start <tutorial>
+   Reference Manual <reference>
+   Developer Manual <ruminations>
 
 
 Indices and tables

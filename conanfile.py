@@ -11,13 +11,11 @@ class Pylene(ConanFile):
     options = {
                "shared": [True, False],
                "fPIC": [True, False],
-               "benchmark": [True, False],
                "freeimage": [True, False],
                "boost": [True, False]}
     default_options = {
                        "shared": False,
                        "fPIC": False,
-                       "benchmark": False,
                        "freeimage": False,
                        "boost": False,
                        "gtest:shared": False
@@ -44,6 +42,7 @@ class Pylene(ConanFile):
     # developer dependancies (to be removed)
     def build_requirements(self):
         self.build_requires("gtest/[>=1.10]", force_host_context=True)
+        self.build_requires("benchmark/[>=1.5.0]", force_host_context=True)
 
 
     # Requirements part of the INTERFACE
@@ -54,9 +53,6 @@ class Pylene(ConanFile):
 
         if self.options.freeimage:
             self.requires("freeimage/3.18.0@dutiona/stable")
-
-        if self.options.benchmark:
-            self.requires("benchmark/1.5.0")
 
         if self.options.boost:
             self.requires("boost/1.69.0@conan/stable")

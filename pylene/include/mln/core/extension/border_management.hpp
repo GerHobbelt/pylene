@@ -15,10 +15,10 @@
 
 
 #include <any>
+#include <concepts/type_traits.hpp>
 #include <exception>
 #include <limits>
 #include <type_traits>
-#include <concepts/type_traits.hpp>
 
 
 namespace mln::extension
@@ -203,13 +203,16 @@ namespace mln::extension
         throw std::runtime_error(
             "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
 
-      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_fill::value)
+      if constexpr (image_has_extension<I>::value)
       {
-        if (ima.extension().is_fill_supported() && fit(ima, se))
+        if constexpr (image_extension_t<I>::support_fill::value)
         {
-          // The SE fits, we set the value of the border
-          ima.extension().fill(*val);
-          return {ima, se};
+          if (ima.extension().is_fill_supported() && fit(ima, se))
+          {
+            // The SE fits, we set the value of the border
+            ima.extension().fill(*val);
+            return {ima, se};
+          }
         }
       }
       mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension does "
@@ -220,7 +223,8 @@ namespace mln::extension
 
 
     template <class InputImage, class SE, class D>
-    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const -> image_concrete_t<::concepts::remove_cvref_t<InputImage>>
+    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const
+        -> image_concrete_t<::concepts::remove_cvref_t<InputImage>>
     {
       using I = ::concepts::remove_cvref_t<InputImage>;
 
@@ -249,7 +253,7 @@ namespace mln::extension
 
       if (m_value.type() != typeid(image_value_t<I>))
         throw std::runtime_error(
-          "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
+            "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
 
       D input_roi = se.compute_input_region(roi);
 
@@ -317,7 +321,6 @@ namespace mln::extension
   class border_manager<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, U>
   {
   public:
-
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Mirror, BorderManagementPolicy::Auto, Ima, SE,
@@ -328,12 +331,15 @@ namespace mln::extension
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
-      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_mirror::value)
+      if constexpr (image_has_extension<I>::value)
       {
-        if (ima.extension().is_mirror_supported() && fit(ima, se))
+        if constexpr (image_extension_t<I>::support_mirror::value)
         {
-          ima.extension().mirror();
-          return {ima, se};
+          if (ima.extension().is_mirror_supported() && fit(ima, se))
+          {
+            ima.extension().mirror();
+            return {ima, se};
+          }
         }
       }
 
@@ -396,12 +402,15 @@ namespace mln::extension
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
-      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_periodize::value)
+      if constexpr (image_has_extension<I>::value)
       {
-        if (ima.extension().is_periodize_supported() && fit(ima, se))
+        if constexpr (image_extension_t<I>::support_periodize::value)
         {
-          ima.extension().periodize();
-          return {ima, se};
+          if (ima.extension().is_periodize_supported() && fit(ima, se))
+          {
+            ima.extension().periodize();
+            return {ima, se};
+          }
         }
       }
 
@@ -464,12 +473,15 @@ namespace mln::extension
       static_assert(mln::is_a<I, mln::experimental::Image>::value);
       // static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
 
-      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_clamp::value)
+      if constexpr (image_has_extension<I>::value)
       {
-        if (ima.extension().is_clamp_supported() && fit(ima, se))
+        if constexpr (image_extension_t<I>::support_clamp::value)
         {
-          ima.extension().clamp();
-          return {ima, se};
+          if (ima.extension().is_clamp_supported() && fit(ima, se))
+          {
+            ima.extension().clamp();
+            return {ima, se};
+          }
         }
       }
 
@@ -544,13 +556,16 @@ namespace mln::extension
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
-      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_extend_with::value)
+      if constexpr (image_has_extension<I>::value)
       {
-        if (ima.extension.is_extend_with_supported() && fit(ima, se))
+        if constexpr (image_extension_t<I>::support_extend_with::value)
         {
-          // FIXME: to implement
-          // ima.extension().extend_with(m_baseimage, m_offset);
-          return {ima, se};
+          if (ima.extension.is_extend_with_supported() && fit(ima, se))
+          {
+            // FIXME: to implement
+            // ima.extension().extend_with(m_baseimage, m_offset);
+            return {ima, se};
+          }
         }
       }
 
@@ -644,7 +659,8 @@ namespace mln::extension
     }
 
     template <class InputImage, class SE, class D>
-    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const -> image_concrete_t<::concepts::remove_cvref_t<InputImage>>
+    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi) const
+        -> image_concrete_t<::concepts::remove_cvref_t<InputImage>>
     {
       using I = ::concepts::remove_cvref_t<InputImage>;
 

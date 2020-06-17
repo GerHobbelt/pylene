@@ -22,7 +22,7 @@ namespace mln::morpho::experimental
                                                                    T border_value);
 
   template <class InputImage, class T, class OutputImage>
-  void dilation(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out);
+  void gaussian2d(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out);
 
 
   /******************************************/
@@ -156,8 +156,8 @@ namespace mln::morpho::experimental
       }
     };
 
-
-    void gaussian1d(recursivefilter_coef_ c, float* input, std::ptrdiff_t size, float* tmp1, float* tmp2)
+    template <class T>
+    void gaussian1d(recursivefilter_coef_ c, T* input, std::ptrdiff_t size, T* tmp1, T* tmp2)
     {
       tmp1[0] = c.n[0] * input[0];
 
@@ -222,7 +222,7 @@ namespace mln::morpho::experimental
 
 
     template <class InputImage, class T>
-    void copy_from_column(InputImage&& f, int c, float* buffer)
+    void copy_from_column(InputImage&& f, int c, T* buffer)
     {
       int h  = f.height();
       int y0 = f.domain().y();
@@ -231,7 +231,7 @@ namespace mln::morpho::experimental
     }
 
     template <class InputImage, class T>
-    void copy_to_column(const float* buffer, int c, InputImage&& f)
+    void copy_to_column(const T* buffer, int c, InputImage&& f)
     {
       int h  = f.height();
       int y0 = f.domain().y();
@@ -243,8 +243,6 @@ namespace mln::morpho::experimental
     template <class InputImage, class T>
     void gaussian2d_T(InputImage&& input, float h_sigma, float v_sigma, T border_value)
     {
-
-
       int b      = 5 * static_cast<int>(std::max(h_sigma, v_sigma) + 0.5f);
       int width  = input.width();
       int height = input.height();
@@ -287,8 +285,8 @@ namespace mln::morpho::experimental
         recursivefilter_coef_ coef(1.68f, 3.735f, 1.783f, 1.723f, -0.6803f, -0.2598f, 0.6318f, 1.997f, h_sigma,
                                    recursivefilter_coef_::DericheGaussian);
 
-        int size    = width + 2 * b;
-        T*  lineptr = input.buffer();
+        int   size    = width + 2 * b;
+        auto* lineptr = input.buffer();
         for (int y = 0; y < height; ++y)
         {
           std::copy_n(lineptr, width, i_buffer + b);
@@ -308,12 +306,12 @@ namespace mln::morpho::experimental
     using I = std::remove_reference_t<InputImage>;
 
     image_concrete_t<I> out = imconcretize(image);
-    dilation(image, h_sigma, v_sigma, border_value, out);
+    gaussian2d(image, h_sigma, v_sigma, border_value, out);
     return out;
   }
 
   template <class InputImage, class T, class OutputImage>
-  void dilation(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out)
+  void gaussian2d(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out)
   {
     mln::experimental::copy(image, out);
 

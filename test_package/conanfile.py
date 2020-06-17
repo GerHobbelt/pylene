@@ -3,7 +3,7 @@ import os
 
 class PyleneTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = [ "cmake_paths", "cmake_find_package" ]
+    generators = [ "cmake_find_package" ]
 
 
     def build(self):

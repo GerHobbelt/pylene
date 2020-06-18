@@ -73,6 +73,7 @@ if (OpenCV_FOUND)
 
   add_benchmark(BMPlnVsOpenCV_BgSubPipeline         opencv/BMPlnVsOpenCV_bgSubPipeline.cpp)
   target_link_libraries(BMPlnVsOpenCV_BgSubPipeline PRIVATE ${OpenCV_LIBS})
+  add_sanitizers(BMPlnVsOpenCV_BgSubPipeline)
 else()
   message("OpenCV not found: not building BMPlnVsOpenCV_Dilation nor BMPlnVsOpenCV_bgSubPipeline")
 endif()

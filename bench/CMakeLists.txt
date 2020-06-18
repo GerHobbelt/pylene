@@ -68,10 +68,13 @@ add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 find_package(OpenCV)
 
 if (OpenCV_FOUND)
-  add_benchmark(BMPlnVsOpenCV_Dilation         opencv/BMPlnVsOpenCV_dilation.cpp)
-  target_link_libraries(BMPlnVsOpenCV_Dilation PRIVATE ${OpenCV_LIBS})
+  add_benchmark(BMPlnVsOpenCV_Dilation          opencv/BMPlnVsOpenCV_dilation.cpp)
+  target_link_libraries(BMPlnVsOpenCV_Dilation  PRIVATE ${OpenCV_LIBS})
+
+  add_benchmark(BMPlnVsOpenCV_BgSubPipeline         opencv/BMPlnVsOpenCV_bgSubPipeline.cpp)
+  target_link_libraries(BMPlnVsOpenCV_BgSubPipeline PRIVATE ${OpenCV_LIBS})
 else()
-  message("OpenCV not found: not building BMPlnVsOpenCV_Dilation")
+  message("OpenCV not found: not building BMPlnVsOpenCV_Dilation nor BMPlnVsOpenCV_bgSubPipeline")
 endif()
 
 

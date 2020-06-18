@@ -25,9 +25,12 @@ if (UNIX AND NOT APPLE)
   target_link_libraries(Pylene INTERFACE rt)
 elseif (MSVC)
   #
-  target_compile_options(Pylene PUBLIC "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
-                                       "/wd5104" # found 'L#x' in macro replacement list, did you mean 
-                      )
+  target_compile_options(Pylene PUBLIC
+    "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
+    "/wd5104" # found 'L#x' in macro replacement list, did you mean
+    "/experimental:preprocess"  # required by range-v3
+    "/permissive-" # required by range-v3
+    )
 endif ()
 
 

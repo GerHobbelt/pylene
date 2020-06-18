@@ -4,7 +4,9 @@
 #include <mln/core/range/rows.hpp>
 #include <mln/core/range/view/zip.hpp>
 
-
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
 
 
 void Mult_Inplace_New_Values(mln::image2d<uint8_t>& img)

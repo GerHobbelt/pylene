@@ -65,12 +65,7 @@ add_library(doc-lib lut.cpp)
 target_link_libraries(doc-lib Pylene::Pylene)
 
 
-# for program_options, need to separate CONAN and regular FindBoost
-if (TARGET Boost::program_options)
-  link_libraries(Boost::program_options)
-elseif (TARGET CONAN_LIB::Boost_boost_program_options)
-  link_libraries(CONAN_LIB::Boost_boost_program_options)
-endif()
+
 
 link_libraries(Pylene::Pylene)
 link_libraries(doc-lib)
@@ -84,3 +79,12 @@ add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
+
+target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)
+
+# for program_options, need to separate CONAN and regular FindBoost
+if (TARGET Boost::program_options)
+  target_link_libraries(erosion-cli PRIVATE Boost::program_options)
+elseif (TARGET Boost::Boost)
+  target_link_libraries(erosion-cli PRIVATE Boost::Boost)
+endif()

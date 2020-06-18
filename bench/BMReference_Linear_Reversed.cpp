@@ -4,9 +4,10 @@
 #include <mln/core/range/view/reverse.hpp>
 #include <mln/core/range/view/zip.hpp>
 
-#include <vector>
 
-
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
 
 void Mult_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img)
 {

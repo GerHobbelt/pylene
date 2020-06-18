@@ -32,7 +32,7 @@ def draw_fig_from_csv(csv_rect_file_name_without_ext, csv_disc_file_name_without
     df = df_disc.append(df_rect)
 
     fig = sns.lineplot(data=df, legend="full")
-    fig.set(yscale="log", xlabel="SE size (side size for rectangle, diameter for disc)",
+    fig.set(yscale="log", xlabel="SE size (half edge size for square, radius for disc)",
             ylabel="Time (ms)")
 
     fig.get_figure().savefig("bench_disc_rect_by_SE.png")

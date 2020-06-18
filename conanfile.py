@@ -16,7 +16,7 @@ class Pylene(ConanFile):
         "shared": False,
         "fPIC": False,
         "gtest:shared": False,
-        "boost:header_only": True
+        "boost:shared": True
     }
 
     generators = [ "cmake", "cmake_paths", "cmake_find_package" ]

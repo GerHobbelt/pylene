@@ -20,7 +20,7 @@ if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
   include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 endif ()
 
-find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
+
 find_package(FreeImage REQUIRED)
 
 

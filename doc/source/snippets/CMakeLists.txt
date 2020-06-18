@@ -64,7 +64,14 @@ add_custom_target(build-images
 add_library(doc-lib lut.cpp)
 target_link_libraries(doc-lib Pylene::Pylene)
 
-link_libraries(${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE} ${FreeImage_LIBRARY})
+
+# for program_options, need to separate CONAN and regular FindBoost
+if (TARGET Boost::program_options)
+  link_libraries(Boost::program_options)
+elseif (TARGET CONAN_LIB::Boost_boost_program_options)
+  link_libraries(CONAN_LIB::Boost_boost_program_options)
+endif()
+
 link_libraries(Pylene::Pylene)
 link_libraries(doc-lib)
 

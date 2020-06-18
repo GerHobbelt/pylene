@@ -1,29 +1,42 @@
 from conans import CMake, ConanFile, tools
-
+import os
 
 class Pylene(ConanFile):
     name = "pylene"
     version = "head"
-    license = "https://gitlab.lrde.epita.fr/olena/pylene/blob/dev/LICENSE"
+    license = "MPL v2"
     url = "https://gitlab.lrde.epita.fr/olena/pylene"
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type"
     options = {
-               "shared": [True, False],
-               "fPIC": [True, False],
-               "freeimage": [True, False],
-               "boost": [True, False]}
+        "shared": [True, False],
+        "fPIC": [True, False]
+    }
     default_options = {
-                       "shared": False,
-                       "fPIC": False,
-                       "freeimage": False,
-                       "boost": False,
-                       "gtest:shared": False
+        "shared": False,
+        "fPIC": False,
+        "gtest:shared": False,
+        "boost:shared": True
     }
 
     generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
+    build_requires = [
+        "gtest/[>=1.10]",
+        "benchmark/[>=1.5.0]",
+    ]
+
+    requires = [
+        "range-v3/0.10.0",
+        "fmt/6.0.0",
+        "boost/1.73.0"
+    ]
+
+
+    def configure(self):
+        self.settings.compiler.cppstd = "20"
+        tools.check_min_cppstd(self, "20")
 
     def build(self):
         cmake = CMake(self)
@@ -33,26 +46,20 @@ class Pylene(ConanFile):
         cmake.install()
 
     def package(self):
-        self.copy("*", dst="", src="cmake")
+        self.copy("FindFreeImage.cmake", dst="", src="cmake")
+        tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        if self.settings.compiler in ["gcc", "clang"]:
-            self.cpp_info.cppflags = ["-std=c++20"]
-
-    # developer dependancies (to be removed)
-    def build_requirements(self):
-        self.build_requires("gtest/[>=1.10]", force_host_context=True)
-        self.build_requires("benchmark/[>=1.5.0]", force_host_context=True)
+        self.cpp_info.system_libs.append("freeimage")
+        self.cpp_info.names["cmake_find_package"] = "Pylene"
+        self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
+        self.cpp_info.libs = [ "Pylene" ]
+        self.cpp_info.cxxflags.append(tools.cppstd_flag(self.settings))
 
 
-    # Requirements part of the INTERFACE
-    def requirements(self):
-        self.requires("range-v3/0.10.0@ericniebler/stable")
-        self.requires("fmt/6.0.0")
+        v = tools.Version(self.settings.compiler.version)
+        if self.settings.compiler == "gcc" and v.major == "9":
+            self.cpp_info.cxxflags.append("-fconcepts")
 
-
-        if self.options.freeimage:
-            self.requires("freeimage/3.18.0@dutiona/stable")
-
-        if self.options.boost:
-            self.requires("boost/1.69.0@conan/stable")
+    def package_id(self):
+        del self.info.settings.compiler.cppstd

@@ -48,14 +48,13 @@ conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/c
 1. Install the library with Conan:
 
 ```
-conan install pylene/head@lrde/stable -g cmake_paths -g cmake_find_package
+conan install pylene/head@lrde/stable -g cmake_find_package
 ```
 
 2. Edit your ``CMakeLists.txt`` to include the paths to the library:
 
 ```
-include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-find_package(Pylene CONFIG)
+find_package(Pylene)
 ```
 
 3. Links with target ``Pylene::Pylene``:

@@ -17,7 +17,7 @@ namespace mln
     {
       int    SR    = 5;   // Spatial window radius
       int    NITER = 30;  // Maximal number of iteration
-      float  eps   = 0.1; //
+      float  eps   = 0.1f; //
       double hs2   = hs * hs;
       double hr2   = hr * hr;
       double eps2  = eps * eps;

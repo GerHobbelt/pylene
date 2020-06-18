@@ -68,13 +68,11 @@ The Pylene library is available on our repository https://artifactory.lrde.epita
 
 Then, see conan's documentation for how to use the package with your favorite build system. The following steps apply to CMake.
 
-3. Use conan with the **cmake_paths** generator to allows CMake to find the Config file provided by the library.
+3. Use conan with the **cmake_find_package** generator.
 
-4. In your :file:`CMakeLists.txt`, include the file ``conan_paths.cmake`` and 
-use **find_package** as usual::
+4. In your :file:`CMakeLists.txt`, use **find_package** as usual::
 
-        include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-        find_package(Pylene CONFIG)
+        find_package(Pylene)
 
 
 The following targets are then available:
@@ -125,12 +123,13 @@ Install (for developers)
 #. Clone the repository::
 
     git clone git@gitlab.lrde.epita.fr:olena/pylene.git
-#. Install developer dependencies
+
+#. Install developer dependencies using conan.
 
    * Google Test
-   * Google Benchmark (by Conan)
-   * range v3 (by Conan)
-   * FreeImage
+   * Google Benchmark
+   * range v3
+   * FreeImage (non-managed by conan)
    * Boost
    * Python with Sphinx, Matplotlib, Numpy (for the documentation)
    * Conan
@@ -138,10 +137,7 @@ Install (for developers)
 #. Use *conan* to install the dependencies not provided by your system.
    This is advised to use the followings options::
 
-        benchmark                       = True
-        freeimage                       = False
-        gtest                           = False
-        boost_program_options           = False
+
         benchmark:shared                = True
         gtest:shared                    = True
 

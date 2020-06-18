@@ -30,7 +30,7 @@ class Pylene(ConanFile):
     requires = [
         "range-v3/0.10.0",
         "fmt/6.0.0",
-        "boost/[>=1.69]"
+        "boost/1.73.0"
     ]
 
 

@@ -103,9 +103,9 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
   auto tmp_grey = img_grey - bg_blurred;
 
   // thresholding (view)
-  float threshold       = 150;
-  auto  thesholding_fun = [threshold](auto x) -> uint8_t { return (x < threshold) ? 0 : 255; };
-  auto  tmp_thresholded = mln::view::transform(tmp_grey, thesholding_fun);
+  const float threshold       = 150;
+  auto        thesholding_fun = [threshold](auto x) -> uint8_t { return (x < threshold) ? 0 : 255; };
+  auto        tmp_thresholded = mln::view::transform(tmp_grey, thesholding_fun);
 
   // erosion (algo)
   auto win        = mln::experimental::se::disc(3);
@@ -118,52 +118,71 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
 
 void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_color,
                            const mln::experimental::image2d<mln::rgb8>& bg_color,
-                           mln::experimental::image2d<uint8_t>& /*output*/)
+                           mln::experimental::image2d<uint8_t>&         output)
 {
   // GrayScale (algo)
   mln::experimental::image2d<uint8_t> img_grey, bg_grey;
   mln::resize(img_grey, img_color);
   mln::resize(bg_grey, bg_color);
-
   {
-    auto zipped_images = mln::view::zip(img_grey, img_color);
+    auto zipped_images = mln::view::zip(img_grey, bg_grey, img_color, bg_color);
     auto zipped_pixels = zipped_images.new_pixels();
 
     for (auto&& row : mln::ranges::rows(zipped_pixels))
     {
       for (auto&& zpix : row)
       {
-        auto&& [grey_pix, color_pix] = zpix.val();
-        grey_pix                     = 0.2126 * color_pix[0] + 0.7152 * color_pix[1] + 0.0722 * color_pix[2];
+        auto&& [img_grey_v, bg_grey_v, img_color_v, bg_color_v] = zpix.val();
+
+        img_grey_v = 0.2126 * img_color_v[0] + 0.7152 * img_color_v[1] + 0.0722 * img_color_v[2];
+        bg_grey_v  = 0.2126 * bg_color_v[0] + 0.7152 * bg_color_v[1] + 0.0722 * bg_color_v[2];
       }
     }
   }
-  /*
-  for (auto&& [grey_pix, color_pix] :
-       mln::view::zip(bg_grey.new_pixels(), bg_grey.new_pixels())
-           grey_pix.val() = 0.2126 * color_pix.val()[0] + 0.7152 * color_pix.val()[1] + 0.0722 * color_pix.val()[2];
 
   // Gaussian on BG (algo)
-  const float kLineHeight = 5;
-  const float kWordWidth = 5; const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
-  const float                             kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
+  const float kLineHeight          = 5;
+  const float kWordWidth           = 5;
+  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
+  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
   // Substract (algo)
-  using namespace mln::view::ops; mln::experimental::image2d<uint8_t> tmp_grey; mln::resize(tmp_grey, img_grey);
+  mln::experimental::image2d<uint8_t> tmp_grey;
+  mln::resize(tmp_grey, img_grey);
+  {
+    auto zipped_images = mln::view::zip(tmp_grey, img_grey, bg_grey);
+    auto zipped_pixels = zipped_images.new_pixels();
 
-  for (auto&& [ret, img, bg]
-      : mln::view::zip(tmp_grey.new_pixels), img_grey.new_pixels(), bg_grey.new_pixels)))
-    ret.val() = img.val() - bg.val();
+    for (auto&& row : mln::ranges::rows(zipped_pixels))
+    {
+      for (auto&& zpix : row)
+      {
+        auto&& [tmp_grey_v, img_grey_v, bg_grey_v] = zpix.val();
+
+        tmp_grey_v = img_grey_v - bg_grey_v;
+      }
+    }
+  }
 
   // thresholding (algo)
-  using namespace mln::view::ops;
+  const float                         threshold = 150;
   mln::experimental::image2d<uint8_t> tmp_thresholded;
   mln::resize(tmp_thresholded, tmp_grey);
+  {
+    auto zipped_images = mln::view::zip(tmp_thresholded, tmp_grey);
+    auto zipped_pixels = zipped_images.new_pixels();
 
-  float threshold = 150;
-  for (auto&& [ret, input] : mln::view::zip(tmp_thresholded.new_pixels(), tmp_grey.new_pixels()))
-    ret.val() = (input.val() < threshold) ? 0 : 255;
+    for (auto&& row : mln::ranges::rows(zipped_pixels))
+    {
+      for (auto&& zpix : row)
+      {
+        auto&& [tmp_thresh_v, tmp_grey_v] = zpix.val();
+
+        tmp_thresh_v = (tmp_grey_v < threshold) ? 0 : 255;
+      }
+    }
+  }
 
   // erosion (algo)
   auto win        = mln::experimental::se::disc(3);
@@ -171,7 +190,6 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
 
   // dilation (algo)
   mln::morpho::experimental::dilation(tmp_eroded, win, output);
-  */
 }
 
 class BMPlnVsOpenCV_BgSubPipeline : public benchmark::Fixture
@@ -212,8 +230,10 @@ public:
     }
   }
 
-  void run(benchmark::State&                                                                           st,
-           std::function<void(const image_t& input_img, const image_t& input_bg, out_image_t& output)> callback)
+  void run(benchmark::State& st,
+           std::function<void(const std::vector<image_t>& input_img, const std::vector<image_t>& input_bg,
+                              std::vector<out_image_t>& output)>
+               callback)
   {
     for (auto _ : st)
       callback(m_input_imgs, m_input_bgs, m_outputs);
@@ -221,24 +241,25 @@ public:
   }
 
 protected:
-  static bool                                               g_loaded;
-  static std::vector<mln::experimental::image2d<mln::rgb8>> g_input_imgs;
-  static std::vector<mln::experimental::image2d<mln::rgb8>> g_input_bgs;
-  std::vector<mln::experimental::image2d<mln::rgb8>>        m_input_imgs;
-  std::vector<mln::experimental::image2d<mln::rgb8>>        m_input_bgs;
-  std::vector<mln::experimental::image2d<mln::rgb8>>        m_outputs;
-  std::size_t                                               m_size;
+  static bool                 g_loaded;
+  static std::vector<image_t> g_input_imgs;
+  static std::vector<image_t> g_input_bgs;
+  std::vector<image_t>        m_input_imgs;
+  std::vector<image_t>        m_input_bgs;
+  std::vector<out_image_t>    m_outputs;
+  std::size_t                 m_size;
 };
-bool                                               BMPlnVsOpenCV_BgSubPipeline::g_loaded = false;
-std::vector<mln::experimental::image2d<mln::rgb8>> BMPlnVsOpenCV_BgSubPipeline::g_input_imgs;
-std::vector<mln::experimental::image2d<mln::rgb8>> BMPlnVsOpenCV_BgSubPipeline::g_input_bgs;
+bool                                              BMPlnVsOpenCV_BgSubPipeline::g_loaded     = false;
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t> BMPlnVsOpenCV_BgSubPipeline::g_input_imgs = {};
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t> BMPlnVsOpenCV_BgSubPipeline::g_input_bgs  = {};
 
 
 // PLN
 
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViews)(benchmark::State& st)
 {
-  auto f = [](const image_t& input_imgs, const image_t& input_bgs, out_image_t& outputs) {
+  auto f = [](const std::vector<image_t>& input_imgs, const std::vector<image_t>& input_bgs,
+              std::vector<out_image_t>& outputs) {
     auto it_imgs = input_imgs.begin();
     auto it_bgs  = input_bgs.begin();
     auto it_outs = outputs.begin();
@@ -253,7 +274,8 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViews)(benchmark::State&
 
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeAlgos)(benchmark::State& st)
 {
-  auto f = [](const image_t& input_imgs, const image_t& input_bgs, out_image_t& outputs) {
+  auto f = [](const std::vector<image_t>& input_imgs, const std::vector<image_t>& input_bgs,
+              std::vector<out_image_t>& outputs) {
     auto it_imgs = input_imgs.begin();
     auto it_bgs  = input_bgs.begin();
     auto it_outs = outputs.begin();

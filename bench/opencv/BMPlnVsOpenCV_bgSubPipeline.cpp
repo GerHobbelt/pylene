@@ -102,16 +102,16 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
   using namespace mln::view::ops;
   auto tmp_grey = img_grey - bg_blurred;
 
-  // thresholding (view)
+  // Thresholding (view)
   const float threshold       = 150;
   auto        thesholding_fun = [threshold](auto x) -> uint8_t { return (x < threshold) ? 0 : 255; };
   auto        tmp_thresholded = mln::view::transform(tmp_grey, thesholding_fun);
 
-  // erosion (algo)
+  // Erosion (algo)
   auto win        = mln::experimental::se::disc(3);
   auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
-  // dilation (algo)
+  // Dilation (algo)
   mln::morpho::experimental::dilation(tmp_eroded, win, output);
 }
 
@@ -207,11 +207,17 @@ public:
     {
       {
         auto it_imgs = g_input_imgs.begin();
-        auto it_bgs  = g_input_imgs.begin();
+        auto it_bgs  = g_input_bgs.begin();
+        auto it_outs = g_outputs.begin();
         for (auto&& filename : filenames)
         {
-          mln::io::experimental::imread(filepath + '/' + std::string{filename.first}, *it_imgs++);
-          mln::io::experimental::imread(filepath + '/' + std::string{filename.second}, *it_bgs++);
+          mln::io::experimental::imread(filepath + '/' + std::string{filename.first}, *it_imgs);
+          mln::io::experimental::imread(filepath + '/' + std::string{filename.second}, *it_bgs);
+          mln::resize(*it_outs, *it_imgs);
+          g_size += it_imgs->width() * it_imgs->height();
+          ++it_imgs;
+          ++it_bgs;
+          ++it_outs;
         }
       }
 
@@ -220,14 +226,8 @@ public:
 
     m_input_imgs = g_input_imgs;
     m_input_bgs  = g_input_bgs;
-    {
-      m_size       = 0;
-      auto it_imgs = g_input_imgs.begin();
-      for (auto&& output : m_outputs)
-        mln::resize(output, *it_imgs);
-      m_size += it_imgs->width() * it_imgs->height();
-      ++it_imgs;
-    }
+    m_outputs    = g_outputs;
+    m_size       = g_size;
   }
 
   void run(benchmark::State& st,
@@ -241,17 +241,22 @@ public:
   }
 
 protected:
-  static bool                 g_loaded;
-  static std::vector<image_t> g_input_imgs;
-  static std::vector<image_t> g_input_bgs;
-  std::vector<image_t>        m_input_imgs;
-  std::vector<image_t>        m_input_bgs;
-  std::vector<out_image_t>    m_outputs;
-  std::size_t                 m_size;
+  static bool                     g_loaded;
+  static std::vector<image_t>     g_input_imgs;
+  static std::vector<image_t>     g_input_bgs;
+  static std::vector<out_image_t> g_outputs;
+  static std::size_t              g_size;
+  std::vector<image_t>            m_input_imgs;
+  std::vector<image_t>            m_input_bgs;
+  std::vector<out_image_t>        m_outputs;
+  std::size_t                     m_size;
 };
-bool                                              BMPlnVsOpenCV_BgSubPipeline::g_loaded     = false;
-std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t> BMPlnVsOpenCV_BgSubPipeline::g_input_imgs = {};
-std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t> BMPlnVsOpenCV_BgSubPipeline::g_input_bgs  = {};
+
+bool                                                  BMPlnVsOpenCV_BgSubPipeline::g_loaded = false;
+std::size_t                                           BMPlnVsOpenCV_BgSubPipeline::g_size   = 0;
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t>     BMPlnVsOpenCV_BgSubPipeline::g_input_imgs{filenames.size()};
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t>     BMPlnVsOpenCV_BgSubPipeline::g_input_bgs{filenames.size()};
+std::vector<BMPlnVsOpenCV_BgSubPipeline::out_image_t> BMPlnVsOpenCV_BgSubPipeline::g_outputs{filenames.size()};
 
 
 // PLN

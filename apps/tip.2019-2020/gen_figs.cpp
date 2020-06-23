@@ -2,6 +2,7 @@
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/algorithm/paste.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/experimental/ndimage.hpp>
 #include <mln/core/image/image.hpp>
@@ -169,14 +170,15 @@ namespace bg_sub
   } // namespace detail
 
   constexpr auto filenames_base = detail::sva("a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
-                                              "i.jpg", "g.jpg", "k.jpg", "l.jpg", "m.jpg");
+                                              "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg");
 
   constexpr auto filenames_bg =
       detail::sva("a_bg.jpg", "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
-                  "i_bg.jpg", "g_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
+                  "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
 
-  constexpr std::string_view file_path     = "images/bg_sub_samples";
-  constexpr std::string_view file_path_tmp = "images/bg_sub_tmp";
+  constexpr std::string_view file_path        = "images/bg_sub_samples";
+  constexpr std::string_view file_path_tmp    = "images/bg_sub_tmp";
+  constexpr std::string_view file_path_mosaic = "images/bg_sub_mosaic";
 
   constexpr auto filenames = detail::svap(filenames_base, filenames_bg);
 
@@ -253,12 +255,54 @@ void test_bg_sub_pipeline(std::string_view filename, std::string_view filename_b
                                 std::string{bg_sub::file_path_tmp} + "/result_"s + std::string{filename_bg});
 }
 
+
+void mosaic_fig(std::string_view filename, int mosaic_size)
+{
+  mln::experimental::image2d<mln::rgb8> img_color;
+  mln::io::experimental::imread(std::string{bg_sub::file_path} + '/' + std::string{filename}, img_color);
+
+  mln::image_build_params bp;
+  bp.border     = 15;
+  bp.init_value = mln::rgb8{0, 0, 0};
+
+  auto mosaic_domain =
+      mln::experimental::box2d{img_color.domain().width() * mosaic_size, img_color.domain().height() * mosaic_size};
+
+  auto mosaic_image = mln::experimental::image2d<mln::rgb8>{mosaic_domain, bp};
+
+  for (int w = 0; w < mosaic_size; ++w)
+  {
+    for (int h = 0; h < mosaic_size; ++h)
+    {
+      auto tmp_dom = img_color.domain();
+      auto tl      = tmp_dom.tl();
+      auto br      = tmp_dom.br();
+      tl[0] += w * tmp_dom.width();
+      tl[1] += h * tmp_dom.height();
+      br[0] += w * tmp_dom.width();
+      br[1] += h * tmp_dom.height();
+      auto sub_dom = mln::experimental::box2d{tl, br};
+      mln::experimental::copy(img_color, mosaic_image.clip(sub_dom));
+    }
+  }
+
+  mln::io::experimental::imsave(mosaic_image, std::string{bg_sub::file_path_mosaic} + "/mosaic_"s +
+                                                  std::to_string(mosaic_size) + "x" + std::to_string(mosaic_size) +
+                                                  '_' + std::string{filename});
+}
+
+
 int main()
 {
   for (auto&& img : bg_sub::filenames)
   {
     test_deriche_gaussian2d(img.first, img.second);
     test_bg_sub_pipeline(img.first, img.second);
+    for (int i = 2; i <= 15; ++i)
+    {
+      mosaic_fig(img.first, i);
+      mosaic_fig(img.second, i);
+    }
   }
 
   mln::experimental::image2d<mln::rgb8> lena_color;

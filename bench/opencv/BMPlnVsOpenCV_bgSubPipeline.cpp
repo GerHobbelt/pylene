@@ -69,14 +69,11 @@ namespace detail
 } // namespace detail
 
 constexpr auto filenames_base = detail::sva("a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
-                                            "i.jpg", "g.jpg", "k.jpg", "l.jpg", "m.jpg");
+                                            "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg");
 
 constexpr auto filenames_bg =
     detail::sva("a_bg.jpg", "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
-                "i_bg.jpg", "g_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
-
-constexpr std::string_view file_path     = "images/bg_sub_samples";
-constexpr std::string_view file_path_tmp = "images/bg_sub_tmp";
+                "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
 
 constexpr auto filenames = detail::svap(filenames_base, filenames_bg);
 
@@ -199,7 +196,7 @@ public:
   using out_image_t = mln::experimental::image2d<uint8_t>;
 
   const std::string filepath =
-      std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/bg_sub_samples";
+      std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/bg_sub_mosaic";
 
   BMPlnVsOpenCV_BgSubPipeline()
   {
@@ -211,8 +208,8 @@ public:
         auto it_outs = g_outputs.begin();
         for (auto&& filename : filenames)
         {
-          mln::io::experimental::imread(filepath + '/' + std::string{filename.first}, *it_imgs);
-          mln::io::experimental::imread(filepath + '/' + std::string{filename.second}, *it_bgs);
+          mln::io::experimental::imread(filepath + "/mosaic_10x10_" + std::string{filename.first}, *it_imgs);
+          mln::io::experimental::imread(filepath + "/mosaic_10x10_" + std::string{filename.second}, *it_bgs);
           mln::resize(*it_outs, *it_imgs);
           g_size += it_imgs->width() * it_imgs->height();
           ++it_imgs;

@@ -32,12 +32,53 @@
 #include <utility>
 #include <vector>
 
+#include <malloc.h>
+#include <stdio.h>
+#include <unistd.h>
+
 
 using namespace std::literals;
 
 
 namespace detail
 {
+
+  void GetMemorySize(unsigned long& size, unsigned long& rss)
+  {
+    size       = 0;
+    rss        = 0;
+    FILE* file = fopen("/proc/self/statm", "r");
+    if (file == NULL)
+    {
+      return;
+    }
+
+    int count = fscanf(file, "%lu%lu", &size, &rss);
+    if (count != 2)
+    {
+      fclose(file);
+      return;
+    }
+    size *= (unsigned long)getpagesize();
+    rss *= (unsigned long)getpagesize();
+    fclose(file);
+  }
+
+  void log_memory_usage(const std::string& label = std::string())
+  {
+    struct mallinfo m = mallinfo();
+    std::cout << "mallinfo:" << label << std::endl;
+    std::cout << "  non-mmapped space allocated from system =" << m.arena << std::endl;
+    std::cout << "  number of free chunks =" << m.ordblks << std::endl;
+    std::cout << "  number of fastbin blocks =" << m.smblks << std::endl;
+    std::cout << "  number of mmapped regions =" << m.hblks << std::endl;
+    std::cout << "  space in mmapped regions =" << m.hblkhd << std::endl;
+    std::cout << "  maximum total allocated space =" << m.usmblks << std::endl;
+    std::cout << "  space available in freed fastbin blocks =" << m.fsmblks << std::endl;
+    std::cout << "  total allocated space =" << m.uordblks << std::endl;
+    std::cout << "  total free space =" << m.fordblks << std::endl;
+  }
+
   template <size_t N>
   constexpr std::string_view sv(const char (&literal)[N])
   {
@@ -110,6 +151,11 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
 
   // Dilation (algo)
   mln::morpho::experimental::dilation(tmp_eroded, win, output);
+
+  std::size_t ms, rss;
+  detail::GetMemorySize(ms, rss);
+  std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+  detail::log_memory_usage();
 }
 
 
@@ -187,6 +233,11 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
 
   // dilation (algo)
   mln::morpho::experimental::dilation(tmp_eroded, win, output);
+
+  std::size_t ms, rss;
+  detail::GetMemorySize(ms, rss);
+  std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+  detail::log_memory_usage();
 }
 
 class BMPlnVsOpenCV_BgSubPipeline : public benchmark::Fixture
@@ -208,8 +259,8 @@ public:
         auto it_outs = g_outputs.begin();
         for (auto&& filename : filenames)
         {
-          mln::io::experimental::imread(filepath + "/mosaic_10x10_" + std::string{filename.first}, *it_imgs);
-          mln::io::experimental::imread(filepath + "/mosaic_10x10_" + std::string{filename.second}, *it_bgs);
+          mln::io::experimental::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, *it_imgs);
+          mln::io::experimental::imread(filepath + "/mosaic_15x15_" + std::string{filename.second}, *it_bgs);
           mln::resize(*it_outs, *it_imgs);
           g_size += it_imgs->width() * it_imgs->height();
           ++it_imgs;
@@ -232,9 +283,18 @@ public:
                               std::vector<out_image_t>& output)>
                callback)
   {
+    std::size_t ms, rss;
+    detail::GetMemorySize(ms, rss);
+    std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+    detail::log_memory_usage();
+
     for (auto _ : st)
       callback(m_input_imgs, m_input_bgs, m_outputs);
     st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+
+    detail::GetMemorySize(ms, rss);
+    std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+    detail::log_memory_usage();
   }
 
 protected:

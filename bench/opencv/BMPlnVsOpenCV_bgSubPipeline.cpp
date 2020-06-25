@@ -22,6 +22,7 @@
 
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
+// #include <opencv2/imgcodecs.hpp>
 
 #include <array>
 #include <cmath>
@@ -30,7 +31,9 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 #include <vector>
+
 
 #include <malloc.h>
 #include <stdio.h>
@@ -42,6 +45,10 @@ using namespace std::literals;
 
 namespace detail
 {
+  // clang-format off
+  template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+  template<class... Ts> overload(Ts...) -> overload<Ts...>;
+  // clang-format on
 
   void GetMemorySize(unsigned long& size, unsigned long& rss)
   {
@@ -240,11 +247,41 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
   detail::log_memory_usage();
 }
 
+void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& output)
+{
+  (void)img_color;
+  (void)bg_color;
+  (void)output;
+  // GrayScale (algo)
+
+
+  // Gaussian on BG (algo)
+
+
+  // Substract (algo)
+
+
+  // thresholding (algo)
+
+
+  // erosion (algo)
+
+
+  // dilation (algo)
+
+
+  std::size_t ms, rss;
+  detail::GetMemorySize(ms, rss);
+  std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+  detail::log_memory_usage();
+}
+
 class BMPlnVsOpenCV_BgSubPipeline : public benchmark::Fixture
 {
 public:
   using image_t     = mln::experimental::image2d<mln::rgb8>;
   using out_image_t = mln::experimental::image2d<uint8_t>;
+  using image_cv_t  = cv::Mat;
 
   const std::string filepath =
       std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/bg_sub_mosaic";
@@ -254,43 +291,70 @@ public:
     if (!g_loaded)
     {
       {
-        auto it_imgs = g_input_imgs.begin();
-        auto it_bgs  = g_input_bgs.begin();
-        auto it_outs = g_outputs.begin();
+        auto it_imgs    = g_input_imgs.begin();
+        auto it_bgs     = g_input_bgs.begin();
+        auto it_outs    = g_outputs.begin();
+        auto it_imgs_cv = g_input_imgs_cv.begin();
+        auto it_bgs_cv  = g_input_bgs_cv.begin();
+        auto it_outs_cv = g_outputs_cv.begin();
         for (auto&& filename : filenames)
         {
           mln::io::experimental::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, *it_imgs);
           mln::io::experimental::imread(filepath + "/mosaic_15x15_" + std::string{filename.second}, *it_bgs);
           mln::resize(*it_outs, *it_imgs);
+
+          *it_imgs_cv = cv::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, cv::IMREAD_COLOR);
+          *it_bgs_cv  = cv::imread(filepath + "/mosaic_15x15_" + std::string{filename.second}, cv::IMREAD_COLOR);
+          *it_outs_cv = cv::Mat::zeros(it_imgs_cv->size().width, it_imgs_cv->size().height, CV_8UC1);
+
           g_size += it_imgs->width() * it_imgs->height();
           ++it_imgs;
           ++it_bgs;
           ++it_outs;
+          ++it_imgs_cv;
+          ++it_bgs_cv;
+          ++it_outs_cv;
         }
       }
 
       g_loaded = true;
     }
 
-    m_input_imgs = g_input_imgs;
-    m_input_bgs  = g_input_bgs;
-    m_outputs    = g_outputs;
-    m_size       = g_size;
-  }
+    m_input_imgs    = g_input_imgs;
+    m_input_bgs     = g_input_bgs;
+    m_outputs       = g_outputs;
+    m_input_imgs_cv = g_input_imgs_cv;
+    m_input_bgs_cv  = g_input_bgs_cv;
+    m_outputs_cv    = g_outputs_cv;
+    m_size          = g_size;
+  };
 
-  void run(benchmark::State& st,
-           std::function<void(const std::vector<image_t>& input_img, const std::vector<image_t>& input_bg,
-                              std::vector<out_image_t>& output)>
-               callback)
+
+  using callback_pln = std::function<void(const std::vector<image_t>& input_img, const std::vector<image_t>& input_bg,
+                                          std::vector<out_image_t>& output)>;
+  using callback_cv =
+      std::function<void(const std::vector<image_cv_t>& input_img_cv, const std::vector<image_cv_t>& input_bg_cv,
+                         std::vector<image_cv_t>& output_cv)>;
+  using callback_t = std::variant<callback_pln, callback_cv>;
+
+  void run(benchmark::State& st, callback_t callback)
   {
     std::size_t ms, rss;
     detail::GetMemorySize(ms, rss);
     std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
     detail::log_memory_usage();
 
-    for (auto _ : st)
-      callback(m_input_imgs, m_input_bgs, m_outputs);
-    st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+    std::visit(detail::overload{[&](callback_pln cb) {
+                                  for (auto _ : st)
+                                    cb(m_input_imgs, m_input_bgs, m_outputs);
+                                  st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+                                },
+                                [&](callback_cv cb) {
+                                  for (auto _ : st)
+                                    cb(m_input_imgs_cv, m_input_bgs_cv, m_outputs_cv);
+                                  st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+                                }},
+               callback);
 
     detail::GetMemorySize(ms, rss);
     std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
@@ -302,10 +366,16 @@ protected:
   static std::vector<image_t>     g_input_imgs;
   static std::vector<image_t>     g_input_bgs;
   static std::vector<out_image_t> g_outputs;
+  static std::vector<image_cv_t>  g_input_imgs_cv;
+  static std::vector<image_cv_t>  g_input_bgs_cv;
+  static std::vector<image_cv_t>  g_outputs_cv;
   static std::size_t              g_size;
   std::vector<image_t>            m_input_imgs;
   std::vector<image_t>            m_input_bgs;
   std::vector<out_image_t>        m_outputs;
+  std::vector<image_cv_t>         m_input_imgs_cv;
+  std::vector<image_cv_t>         m_input_bgs_cv;
+  std::vector<image_cv_t>         m_outputs_cv;
   std::size_t                     m_size;
 };
 
@@ -314,7 +384,9 @@ std::size_t                                           BMPlnVsOpenCV_BgSubPipelin
 std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t>     BMPlnVsOpenCV_BgSubPipeline::g_input_imgs{filenames.size()};
 std::vector<BMPlnVsOpenCV_BgSubPipeline::image_t>     BMPlnVsOpenCV_BgSubPipeline::g_input_bgs{filenames.size()};
 std::vector<BMPlnVsOpenCV_BgSubPipeline::out_image_t> BMPlnVsOpenCV_BgSubPipeline::g_outputs{filenames.size()};
-
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_cv_t>  BMPlnVsOpenCV_BgSubPipeline::g_input_imgs_cv{filenames.size()};
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_cv_t>  BMPlnVsOpenCV_BgSubPipeline::g_input_bgs_cv{filenames.size()};
+std::vector<BMPlnVsOpenCV_BgSubPipeline::image_cv_t>  BMPlnVsOpenCV_BgSubPipeline::g_outputs_cv{filenames.size()};
 
 // PLN
 
@@ -350,8 +422,25 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeAlgos)(benchmark::State&
   this->run(st, f);
 }
 
+BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgo)(benchmark::State& st)
+{
+  auto f = [](const std::vector<image_cv_t>& input_imgs_cv, const std::vector<image_cv_t>& input_bgs_cv,
+              std::vector<image_cv_t>& outputs_cv) {
+    auto it_imgs_cv = input_imgs_cv.begin();
+    auto it_bgs_cv  = input_bgs_cv.begin();
+    auto it_outs_cv = outputs_cv.begin();
+    for (; it_imgs_cv != input_imgs_cv.end(); ++it_imgs_cv, ++it_bgs_cv, ++it_outs_cv)
+    {
+      cv_bg_sub_pipe(*it_imgs_cv, *it_bgs_cv, *it_outs_cv);
+    }
+  };
+
+  this->run(st, f);
+}
+
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViews);
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeAlgos);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgo);
 
 BENCHMARK_MAIN();

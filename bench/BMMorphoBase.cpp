@@ -132,6 +132,15 @@ BENCHMARK_DEFINE_F(BMMorpho, Dilation_ApproximatedDisc)(benchmark::State& st)
   this->run(st, f);
 }
 
+BENCHMARK_DEFINE_F(BMMorpho, Dilation_ApproximatedDisc_parallel)(benchmark::State& st)
+{
+  int  radius = st.range(0);
+  auto se     = mln::se::disc(radius, mln::se::disc::PERIODIC_LINES_8);
+
+  auto f = [se](const image_t& input, image_t& output) { mln::morpho::parallel::dilation(input, se, output); };
+  this->run(st, f);
+}
+
 
 BENCHMARK_DEFINE_F(BMMorpho, Dilation_Square)(benchmark::State& st)
 {
@@ -141,14 +150,23 @@ BENCHMARK_DEFINE_F(BMMorpho, Dilation_Square)(benchmark::State& st)
   this->run(st, f);
 }
 
+BENCHMARK_DEFINE_F(BMMorpho, Dilation_Square_parallel)(benchmark::State& st)
+{
+  int  radius = st.range(0);
+  auto se     = mln::se::rect2d(2 * radius + 1, 2 * radius + 1);
+  auto f = [se](const image_t& input, image_t& output) { mln::morpho::parallel::dilation(input, se, output); };
+  this->run(st, f);
+}
+
 
 constexpr int max_range = 128;
 
 BENCHMARK_REGISTER_F(BMMorpho, Dilation_ApproximatedDisc)->RangeMultiplier(2)->Range(2, max_range);
+BENCHMARK_REGISTER_F(BMMorpho, Dilation_ApproximatedDisc_parallel)->RangeMultiplier(2)->Range(2, max_range);
 BENCHMARK_REGISTER_F(BMMorpho, Dilation_EuclideanDisc_naive)->RangeMultiplier(2)->Range(2, 16);
 BENCHMARK_REGISTER_F(BMMorpho, Dilation_EuclideanDisc_incremental)->RangeMultiplier(2)->Range(2, max_range);
 BENCHMARK_REGISTER_F(BMMorpho, Dilation_Square)->RangeMultiplier(2)->Range(2, max_range);
-
+BENCHMARK_REGISTER_F(BMMorpho, Dilation_Square_parallel)->RangeMultiplier(2)->Range(2, max_range);
 
 
 BENCHMARK_F(BMMorpho, Opening_Disc)(benchmark::State& st)

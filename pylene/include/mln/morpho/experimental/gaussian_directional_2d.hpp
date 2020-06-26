@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <mln/core/trace.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/image/image.hpp>
 
@@ -313,6 +313,8 @@ namespace mln::morpho::experimental
   template <class InputImage, class T, class OutputImage>
   void gaussian2d(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out)
   {
+    mln_entering("mln::morpho::experimental::gaussian2d");
+
     mln::experimental::copy(image, out);
 
     detail::gaussian2d_T(out, h_sigma, v_sigma, border_value);

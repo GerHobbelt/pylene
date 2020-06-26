@@ -115,14 +115,16 @@ namespace detail
   }
 } // namespace detail
 
-constexpr auto filenames_base = detail::sva("a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
-                                            "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg");
+constexpr auto filenames_base = detail::sva("a.jpg"/*, "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
+                                            "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg"*/);
 
 constexpr auto filenames_bg =
-    detail::sva("a_bg.jpg", "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
-                "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
+    detail::sva("a_bg.jpg"/*, "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
+                "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg"*/);
 
 constexpr auto filenames = detail::svap(filenames_base, filenames_bg);
+
+constexpr std::size_t radius = 28;
 
 
 void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_color,
@@ -136,10 +138,8 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
   auto bg_grey  = mln::view::transform(bg_color, grayscale);
 
   // Gaussian on BG (algo)
-  const float kLineHeight          = 5;
-  const float kWordWidth           = 5;
-  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
-  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
+  const float kLineVerticalSigma   = 5;
+  const float kLineHorizontalSigma = 5;
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
   // Substract (view)
@@ -152,7 +152,7 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
   auto        tmp_thresholded = mln::view::transform(tmp_grey, thesholding_fun);
 
   // Erosion (algo)
-  auto win        = mln::experimental::se::disc(3);
+  auto win        = mln::experimental::se::disc(radius);
   auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
   // Dilation (algo)
@@ -190,10 +190,8 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
   }
 
   // Gaussian on BG (algo)
-  const float kLineHeight          = 5;
-  const float kWordWidth           = 5;
-  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
-  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
+  const float kLineVerticalSigma   = 5;
+  const float kLineHorizontalSigma = 5;
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
   // Substract (algo)
@@ -234,7 +232,7 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
   }
 
   // erosion (algo)
-  auto win        = mln::experimental::se::disc(3);
+  auto win        = mln::experimental::se::disc(radius);
   auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
   // dilation (algo)
@@ -251,40 +249,59 @@ void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& 
   (void)img_color;
   (void)bg_color;
   (void)output;
+
   // GrayScale (algo)
   cv::Mat img_grey, bg_grey;
-  cv::cvtColor(img_color, img_grey, cv::COLOR_RGB2GRAY);
-  cv::cvtColor(bg_color, bg_grey, cv::COLOR_RGB2GRAY);
+  {
+    mln_entering("opencv::grayscale");
+
+    cv::cvtColor(img_color, img_grey, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(bg_color, bg_grey, cv::COLOR_RGB2GRAY);
+  }
 
   // Gaussian on BG (algo)
-  const float kLineHeight          = 5;
-  const float kWordWidth           = 5;
-  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
-  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
+
+  const float kLineVerticalSigma   = 5;
+  const float kLineHorizontalSigma = 5;
   cv::Mat     bg_blurred;
-  cv::GaussianBlur(bg_grey, bg_blurred, cv::Size(0, 0), kLineVerticalSigma, kLineHorizontalSigma);
+  {
+    mln_entering("opencv::gaussianblur");
+    cv::GaussianBlur(bg_grey, bg_blurred, cv::Size(0, 0), kLineVerticalSigma, kLineHorizontalSigma);
+  }
 
   // Substract (algo)
   auto                           tmp_grey = cv::Mat(img_color.rows, img_color.cols, CV_8UC1);
   cv::MatConstIterator_<uint8_t> it_img = img_grey.begin<uint8_t>(), it_img_end = img_grey.end<uint8_t>();
   cv::MatConstIterator_<uint8_t> it_bg  = bg_blurred.begin<uint8_t>();
   cv::MatIterator_<uint8_t>      it_out = tmp_grey.begin<uint8_t>();
-  for (; it_img != it_img_end; ++it_img, ++it_bg, ++it_out)
   {
-    *it_out = *it_img - *it_bg;
+    mln_entering("opencv::substract");
+    for (; it_img != it_img_end; ++it_img, ++it_bg, ++it_out)
+    {
+      *it_out = *it_img - *it_bg;
+    }
   }
 
   // thresholding (algo)
   cv::Mat tmp_thresholded;
-  cv::threshold(tmp_grey, tmp_thresholded, 150, 255, cv::THRESH_BINARY);
+  {
+    mln_entering("opencv::threshold");
+    cv::threshold(tmp_grey, tmp_thresholded, 150, 255, cv::THRESH_BINARY);
+  }
 
   // erosion (algo)
-  auto se         = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * 3 + 1, 2 * 3 + 1));
+  auto se         = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * radius + 1, 2 * radius + 1));
   auto tmp_eroded = cv::Mat(img_color.rows, img_color.cols, CV_8UC1);
-  cv::erode(tmp_thresholded, tmp_eroded, se);
+  {
+    mln_entering("opencv::erode");
+    cv::erode(tmp_thresholded, tmp_eroded, se);
+  }
 
   // dilation (algo)
-  cv::dilate(tmp_eroded, output, se);
+  {
+    mln_entering("opencv::dilate");
+    cv::dilate(tmp_eroded, output, se);
+  }
 
   std::size_t ms, rss;
   detail::GetMemorySize(ms, rss);

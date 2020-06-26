@@ -1,16 +1,17 @@
 #pragma once
-#include <experimental/simd>
 #include <cassert>
+#include <experimental/simd>
 #include <range/v3/functional/concepts.hpp>
 
-#include <mln/core/image/experimental/ndimage_fwd.hpp>
 #include <mln/core/box.hpp>
+#include <mln/core/image/experimental/ndimage_fwd.hpp>
 
 namespace mln::morpho::experimental::details
 {
 
   template <class T, class I, class J, class BinaryFunction>
-  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension, bool vertical);
+  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension,
+                      bool vertical);
 
 
   /******************************************/
@@ -27,7 +28,7 @@ namespace mln::morpho::experimental::details
   class TileWriterBase
   {
     // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
-    virtual void write_tile(const std::byte* in,  std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
+    virtual void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
   };
 
   class vertical_running_max_algo_base_t
@@ -90,18 +91,16 @@ namespace mln::morpho::experimental::details
   };
 
 
-
-
-
   template <class T, class BinaryFunction>
-  void vertical_running_max_algo_t<T, BinaryFunction>::apply_sup(std::byte* __restrict A_, std::byte* __restrict B_, std::byte* __restrict out_, int width)
+  void vertical_running_max_algo_t<T, BinaryFunction>::apply_sup(std::byte* __restrict A_, std::byte* __restrict B_,
+                                                                 std::byte* __restrict out_, int width)
   {
     const T* A   = (T*)A_;
     const T* B   = (T*)B_;
     T*       out = (T*)out_;
 
-    const int     K               = width / WARP_SIZE;
-    const int     rem             = width % WARP_SIZE;
+    const int K   = width / WARP_SIZE;
+    const int rem = width % WARP_SIZE;
 
     assert(width <= BLOCK_WIDTH);
     for (int k = 0; k < K; k++)
@@ -126,17 +125,20 @@ namespace mln::morpho::experimental::details
 
 
   template <class T, class BinaryFunction>
-  void vertical_running_max_algo_t<T, BinaryFunction>::partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride)
+  void vertical_running_max_algo_t<T, BinaryFunction>::partial_sum_block2d(const std::byte* __restrict in,
+                                                                           std::byte* __restrict out, int width,
+                                                                           int height, std::ptrdiff_t in_byte_stride,
+                                                                           std::ptrdiff_t out_byte_stride)
   {
     using simd_t = std::experimental::simd<T>;
 
 
-    constexpr int MAX_WARP_COUNT  = BLOCK_WIDTH / WARP_SIZE;
-    const int K   = width / WARP_SIZE;
-    const int rem = width % WARP_SIZE;
+    constexpr int MAX_WARP_COUNT = BLOCK_WIDTH / WARP_SIZE;
+    const int     K              = width / WARP_SIZE;
+    const int     rem            = width % WARP_SIZE;
 
-    //fmt::print("BLOCK_WIDTH={} width={}\n", BLOCK_WIDTH, width);
-    //fmt::print("WARP_SIZE={}\n", WARP_SIZE);
+    // fmt::print("BLOCK_WIDTH={} width={}\n", BLOCK_WIDTH, width);
+    // fmt::print("WARP_SIZE={}\n", WARP_SIZE);
 
     assert(width <= BLOCK_WIDTH);
     std::memcpy(out, in, sizeof(T) * width);
@@ -171,7 +173,7 @@ namespace mln::morpho::experimental::details
       in += K * WARP_SIZE * sizeof(T);
       out += K * WARP_SIZE * sizeof(T);
 
-      T  xsum[WARP_SIZE];
+      T xsum[WARP_SIZE];
       std::memcpy(xsum, in, sizeof(T) * rem);
       for (int y = 1; y < height; ++y)
       {
@@ -180,7 +182,7 @@ namespace mln::morpho::experimental::details
 
         for (int c = 0; c < rem; ++c)
         {
-          xsum[c] = m_sup(xsum[c], in_lineptr[c]);
+          xsum[c]        = m_sup(xsum[c], in_lineptr[c]);
           out_lineptr[c] = xsum[c];
         }
       }
@@ -190,8 +192,8 @@ namespace mln::morpho::experimental::details
   template <class I, class T>
   [[gnu::noinline]] void copy_block(I& in, mln::experimental::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
   {
-    const int x0     = roi.x();
-    const int y0     = roi.y();
+    const int x0 = roi.x();
+    const int y0 = roi.y();
 
     for (int y = 0; y < roi.height(); ++y)
     {
@@ -204,8 +206,8 @@ namespace mln::morpho::experimental::details
   template <class I, class T>
   [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::experimental::box2d roi, I& out)
   {
-    const int x0     = roi.x();
-    const int y0     = roi.y();
+    const int x0 = roi.x();
+    const int y0 = roi.y();
 
     for (int y = 0; y < roi.height(); ++y)
     {
@@ -216,10 +218,11 @@ namespace mln::morpho::experimental::details
   }
 
   template <class I, class T>
-  [[gnu::noinline]] void transpose_block2d(I& in, mln::experimental::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
+  [[gnu::noinline]] void transpose_block2d(I& in, mln::experimental::box2d input_roi, T* __restrict out,
+                                           std::ptrdiff_t out_stride)
   {
-    const int x0     = input_roi.x();
-    const int y0     = input_roi.y();
+    const int x0 = input_roi.x();
+    const int y0 = input_roi.y();
 
 
     for (int y = 0; y < input_roi.height(); ++y)
@@ -228,16 +231,16 @@ namespace mln::morpho::experimental::details
   }
 
   template <class I, class T>
-  [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride, mln::experimental::box2d output_roi, I& out)
+  [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride,
+                                           mln::experimental::box2d output_roi, I& out)
   {
-    const int x0     = output_roi.x();
-    const int y0     = output_roi.y();
+    const int x0 = output_roi.x();
+    const int y0 = output_roi.y();
 
     for (int y = 0; y < output_roi.height(); ++y)
       for (int x = 0; x < output_roi.width(); ++x)
-        out.at({x0 + x, y0 + y}) =  *(in + x * istride + y);
+        out.at({x0 + x, y0 + y}) = *(in + x * istride + y);
   }
-
 
 
   template <class I, class T>
@@ -256,7 +259,11 @@ namespace mln::morpho::experimental::details
       }
     }
 
-    TileLoader(I& input, bool vertical) : m_input(&input), m_vertical{vertical} {}
+    TileLoader(I& input, bool vertical)
+      : m_input(&input)
+      , m_vertical{vertical}
+    {
+    }
 
   private:
     I*   m_input;
@@ -279,7 +286,11 @@ namespace mln::morpho::experimental::details
       }
     }
 
-    TileWriter(I& output, bool vertical) : m_output(&output), m_vertical{vertical} {}
+    TileWriter(I& output, bool vertical)
+      : m_output(&output)
+      , m_vertical{vertical}
+    {
+    }
 
   private:
     I*   m_output;
@@ -288,7 +299,8 @@ namespace mln::morpho::experimental::details
 
 
   template <class T, class I, class J, class BinaryFunction>
-  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension, bool vertical)
+  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension,
+                      bool vertical)
   {
     TileLoader<I, T> r(input, vertical);
     TileWriter<J, T> w(output, vertical);
@@ -300,5 +312,4 @@ namespace mln::morpho::experimental::details
   }
 
 
-
-} // namespace mln::morpho::details
+} // namespace mln::morpho::experimental::details

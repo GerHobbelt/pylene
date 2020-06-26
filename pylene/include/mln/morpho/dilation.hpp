@@ -118,26 +118,67 @@ namespace mln::morpho
 
   namespace parallel
   {
-/*
-    template <class InputImage, class SE>
-    class TileLoader_DilationTranspose : TileLoaderBase
+    template <class InputImage>
+    class TileLoader_DilationTranspose : public TileLoaderBase
     {
     public:
-      TileLoader_DilationTranspose(InputImage input, SE se, size_t tile_width, size_t tile_height)
+
+      /// \param input_roi The extended roi required to compute the tile region
+      TileLoader_DilationTranspose(InputImage input, mln::box2d input_roi)
         : _in{input}
-        , _se{se}
+        , m_tile{input_roi}
       {
       }
 
-      void load_tile(mln::box2d roi) final {}
+      TileLoader_DilationTranspose(const TileLoader_DilationTranspose& other)
+        : _in{other._in}
+        , m_tile{other.m_tile.domain()}
+      {
+      }
 
-      mln::ndbuffer_image get_tile() final {}
+      TileLoader_DilationTranspose& operator=(const TileLoader_DilationTranspose&) = delete;
+
+      /// \param roi The tile region
+      /// \param input_roi The extended roi required to compute the tile region
+      void load_tile(mln::box2d roi, mln::box2d input_roi) const final
+      {
+        mln::box2d image_roi = _in.domain();
+
+        mln::box2d copy_roi = image_roi;
+        copy_roi.clip(input_roi);
+
+        mln::box2d dest_roi = copy_roi;
+        dest_roi.tl() -= roi.tl();
+
+        auto src = _in.clip(copy_roi);
+        auto dst = m_tile.clip(dest_roi);
+        mln::details::transpose_block2D(_in, copy_roi, dst.buffer(), dst.byte_stride());
+
+        if (copy_roi != input_roi)
+        {
+          int borders[2][2];
+
+          borders[0][0] = copy_roi.tl().x() - input_roi.tl().x();
+          borders[0][1] = input_roi.br().x() - copy_roi.br().x();
+          borders[1][0] = copy_roi.tl().y() - input_roi.tl().y();
+          borders[1][1] = input_roi.br().y() - copy_roi.br().y();
+
+          image_value_t<InputImage> padding_value  = 0;
+          // FIXME mln::value_traits<image_value_t<I>>::inf()
+          auto padding_method = mln::PAD_ZERO;
+          pad(m_tile, padding_method, borders, padding_value);
+        }
+      }
+
+      mln::ndbuffer_image get_tile() const final
+      {
+        return m_tile;
+      }
 
     private:
       InputImage _in;
-      SE         _se;
+      mutable mln::image2d<image_value_t<InputImage>> m_tile;
     };
-*/
 
     template <class InputImage>
     class TileLoader_Dilation : public TileLoaderBase
@@ -171,7 +212,9 @@ namespace mln::morpho
         mln::box2d dest_roi = copy_roi;
         dest_roi.tl() -= roi.tl();
 
-        mln::copy(_in.clip(copy_roi), m_tile.clip(dest_roi)); // TODO mln::details::copy_block
+        auto src = _in.clip(copy_roi);
+        auto dst = m_tile.clip(dest_roi);
+        mln::details::copy_block(_in, copy_roi, dst.buffer(), dst.byte_stride());
 
         if (copy_roi != input_roi)
         {

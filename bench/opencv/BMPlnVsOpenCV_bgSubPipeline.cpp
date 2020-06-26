@@ -22,7 +22,6 @@
 
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
-// #include <opencv2/imgcodecs.hpp>
 
 #include <array>
 #include <cmath>
@@ -161,8 +160,8 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
 
   std::size_t ms, rss;
   detail::GetMemorySize(ms, rss);
-  std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-  detail::log_memory_usage();
+  // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+  // detail::log_memory_usage();
 }
 
 
@@ -243,8 +242,8 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
 
   std::size_t ms, rss;
   detail::GetMemorySize(ms, rss);
-  std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-  detail::log_memory_usage();
+  // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+  // detail::log_memory_usage();
 }
 
 void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& output)
@@ -253,28 +252,46 @@ void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& 
   (void)bg_color;
   (void)output;
   // GrayScale (algo)
-
+  cv::Mat img_grey, bg_grey;
+  cv::cvtColor(img_color, img_grey, cv::COLOR_RGB2GRAY);
+  cv::cvtColor(bg_color, bg_grey, cv::COLOR_RGB2GRAY);
 
   // Gaussian on BG (algo)
-
+  const float kLineHeight          = 5;
+  const float kWordWidth           = 5;
+  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
+  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
+  cv::Mat     bg_blurred;
+  cv::GaussianBlur(bg_grey, bg_blurred, cv::Size(0, 0), kLineVerticalSigma, kLineHorizontalSigma);
 
   // Substract (algo)
-
+  auto                           tmp_grey = cv::Mat(img_color.rows, img_color.cols, CV_8UC1);
+  cv::MatConstIterator_<uint8_t> it_img = img_grey.begin<uint8_t>(), it_img_end = img_grey.end<uint8_t>();
+  cv::MatConstIterator_<uint8_t> it_bg  = bg_blurred.begin<uint8_t>();
+  cv::MatIterator_<uint8_t>      it_out = tmp_grey.begin<uint8_t>();
+  for (; it_img != it_img_end; ++it_img, ++it_bg, ++it_out)
+  {
+    *it_out = *it_img - *it_bg;
+  }
 
   // thresholding (algo)
-
+  cv::Mat tmp_thresholded;
+  cv::threshold(tmp_grey, tmp_thresholded, 150, 255, cv::THRESH_BINARY);
 
   // erosion (algo)
-
+  auto se         = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * 3 + 1, 2 * 3 + 1));
+  auto tmp_eroded = cv::Mat(img_color.rows, img_color.cols, CV_8UC1);
+  cv::erode(tmp_thresholded, tmp_eroded, se);
 
   // dilation (algo)
-
+  cv::dilate(tmp_eroded, output, se);
 
   std::size_t ms, rss;
   detail::GetMemorySize(ms, rss);
-  std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-  detail::log_memory_usage();
+  // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+  // detail::log_memory_usage();
 }
+
 
 class BMPlnVsOpenCV_BgSubPipeline : public benchmark::Fixture
 {
@@ -305,7 +322,7 @@ public:
 
           *it_imgs_cv = cv::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, cv::IMREAD_COLOR);
           *it_bgs_cv  = cv::imread(filepath + "/mosaic_15x15_" + std::string{filename.second}, cv::IMREAD_COLOR);
-          *it_outs_cv = cv::Mat::zeros(it_imgs_cv->size().width, it_imgs_cv->size().height, CV_8UC1);
+          it_outs_cv->create(it_imgs_cv->size().width, it_imgs_cv->size().height, CV_8UC1);
 
           g_size += it_imgs->width() * it_imgs->height();
           ++it_imgs;
@@ -341,8 +358,8 @@ public:
   {
     std::size_t ms, rss;
     detail::GetMemorySize(ms, rss);
-    std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-    detail::log_memory_usage();
+    // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+    // detail::log_memory_usage();
 
     std::visit(detail::overload{[&](callback_pln cb) {
                                   for (auto _ : st)
@@ -357,8 +374,8 @@ public:
                callback);
 
     detail::GetMemorySize(ms, rss);
-    std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-    detail::log_memory_usage();
+    // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+    // detail::log_memory_usage();
   }
 
 protected:

@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-/*
+
 using namespace mln;
 
 void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
@@ -281,7 +281,6 @@ TEST(Dilation, Unregular_domain)
   ASSERT_TRUE(mln::all_of(mln::view::mask(out, ima <= 128) == mln::view::mask(ima, ima <= 128)));
   ASSERT_TRUE(mln::all_of(out >= ima)); // extensive
 }
-*/
 
 
 /* Not available (need projector / value_set)
@@ -299,9 +298,7 @@ TEST(Dilation, Custom_cmp_function)
   ASSERT_TRUE(all_of(out <= ima)); // anti-extensive
 }
 
-*/
 
- /*
 // Dilation of a binary image
 TEST(Dilation, Binary)
 {
@@ -360,8 +357,6 @@ TEST(Dilation, RGB)
 }
 */
 
-#include <fmt/core.h>
-
 TEST(Dilation, parallel)
 {
   mln::image_build_params params;
@@ -394,6 +389,6 @@ TEST(Dilation, parallel)
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}  //
   };
 
-  auto output = mln::morpho::parallel::dilation(input, mln::se::rect2d(3, 1));
+  auto output = mln::morpho::parallel::dilation(input, mln::se::rect2d(19, 15));
   ASSERT_IMAGES_EQ_EXP(ref, output);
 }

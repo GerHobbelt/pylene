@@ -91,8 +91,8 @@ TEST_P(Padding2DTestRGB, Span) { this->test_span(); }
 
 mln::e_padding_mode paddings[] = {mln::PAD_ZERO, mln::PAD_CONSTANT, mln::PAD_WRAP, mln::PAD_MIRROR, mln::PAD_REPLICATE};
 
-INSTANTIATE_TEST_CASE_P(bla, Padding2DTestInt, testing::ValuesIn(paddings));
-INSTANTIATE_TEST_CASE_P(bla, Padding2DTestRGB, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding2DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding2DTestRGB, testing::ValuesIn(paddings));
 
 
 template <class T>

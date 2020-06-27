@@ -149,6 +149,7 @@ namespace mln::morpho
 
         mln::box2d dest_roi = copy_roi;
         dest_roi.tl() -= roi.tl();
+        dest_roi.br() -= roi.tl();
 
         auto src = _in.clip(copy_roi);
         auto dst = m_tile.clip(dest_roi);
@@ -211,6 +212,7 @@ namespace mln::morpho
 
         mln::box2d dest_roi = copy_roi;
         dest_roi.tl() -= roi.tl();
+        dest_roi.br() -= roi.tl();
 
         auto src = _in.clip(copy_roi);
         auto dst = m_tile.clip(dest_roi);
@@ -258,6 +260,8 @@ namespace mln::morpho
         auto       out_image2d = *(out.cast_to<V, 2>());
         auto       vs          = mln::morpho::details::dilation_value_set<V>();
         mln::box2d roi         = out.domain();
+
+        in_image2d.domain_shift(roi.tl());
 
         auto tmp = in_image2d.clip(roi);
         mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
@@ -342,6 +346,30 @@ namespace mln::morpho
     {
       DilationParallel caller(image, out, se);
       parallel_execute_local2D(caller);
+
+      IROI = se.compute_input_region(out.domain());
+      // se1 + se2
+      {
+        OROI1 = se1.compute_output_region(IROI);
+        DilationParallel caller(image, out, se1); // OROI1;
+        parallel_execute_local2D(caller);
+      }
+
+      {
+        OROI2 = se2.compute_output_region(OROI1);
+        swap(tmp, out);
+        DilationParallel caller(tmp, out, se2); // OROI2
+        parallel_execute_local2D(caller);
+      }
+
+      {
+        OROI3 = se3.compute_output_region(OROI2);
+        swap(tmp, out);
+        DilationParallel caller(tmp, out, se3); // OROI3
+        parallel_execute_local2D(caller);
+      }
+
+
     }
 
     template <class InputImage, class SE>

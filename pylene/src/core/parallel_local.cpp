@@ -53,7 +53,7 @@ namespace mln
 
     tbb::blocked_range2d<int> rng(domain.y(), domain.y() + domain.height(), wrapper.delegate()->TILE_HEIGHT, //
                                   domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);
-    tbb::parallel_for(rng, wrapper);
+    tbb::parallel_for(rng, wrapper, tbb::simple_partitioner());
   }
 
   void ParallelLocalCanvas2D::ExecuteTile(mln::box2d roi) const

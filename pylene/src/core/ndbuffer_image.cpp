@@ -142,6 +142,15 @@ namespace mln
     return {a, b};
   }
 
+  void __ndbuffer_image<void, -1>::domain_shift(point_type pt) noexcept
+  {
+    for (int i = 0; i < m_pdim; ++i)
+    {
+      m_axes[i].domain_begin += pt[i];
+      m_axes[i].domain_end += pt[i];
+    }
+  }
+
 
   void __ndbuffer_image<void, -1>::__init(alloc_fun_t __allocate, sample_type_id sample_type,
                                           std::size_t sample_type_size, int dim, const int topleft[], const int sizes[],

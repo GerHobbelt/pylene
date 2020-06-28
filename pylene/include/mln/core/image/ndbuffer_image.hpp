@@ -143,6 +143,7 @@ namespace mln
 
     int border() const noexcept;
     Box domain() const noexcept;
+    void domain_shift(point_type shift) noexcept;
     /// \}
 
 

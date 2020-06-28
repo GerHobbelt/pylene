@@ -1,4 +1,5 @@
 #pragma once
+        #include <fmt/core.h>
 
 #include <mln/accu/accumulators/h_infsup.hpp>
 #include <mln/accu/accumulators/infsup.hpp>
@@ -260,7 +261,6 @@ namespace mln::morpho
         auto       out_image2d = *(out.cast_to<V, 2>());
         auto       vs          = mln::morpho::details::dilation_value_set<V>();
         mln::box2d roi         = out.domain();
-
         in_image2d.domain_shift(roi.tl());
 
         auto tmp = in_image2d.clip(roi);
@@ -344,32 +344,33 @@ namespace mln::morpho
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out)
     {
-      DilationParallel caller(image, out, se);
-      parallel_execute_local2D(caller);
-
-      IROI = se.compute_input_region(out.domain());
-      // se1 + se2
+      if (se.is_decomposable())
       {
-        OROI1 = se1.compute_output_region(IROI);
-        DilationParallel caller(image, out, se1); // OROI1;
+        auto ses = se.decompose();
+        using I = std::remove_reference_t<InputImage>;
+        image_concrete_t<I> tmp = imconcretize(image);
+        bool first = true;
+        for (auto&& se : ses)
+        {
+          if (first)
+          {
+            first = false;
+            DilationParallel caller(image, out, se); 
+            parallel_execute_local2D(caller);
+          }
+          else
+          {
+            std::swap(tmp, out);
+            DilationParallel caller(tmp, out, se);
+            parallel_execute_local2D(caller);
+          }
+        }
+      }
+      else
+      {
+        DilationParallel caller(image, out, se);
         parallel_execute_local2D(caller);
       }
-
-      {
-        OROI2 = se2.compute_output_region(OROI1);
-        swap(tmp, out);
-        DilationParallel caller(tmp, out, se2); // OROI2
-        parallel_execute_local2D(caller);
-      }
-
-      {
-        OROI3 = se3.compute_output_region(OROI2);
-        swap(tmp, out);
-        DilationParallel caller(tmp, out, se3); // OROI3
-        parallel_execute_local2D(caller);
-      }
-
-
     }
 
     template <class InputImage, class SE>

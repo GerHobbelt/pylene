@@ -144,6 +144,15 @@ namespace mln
     /// \brief Returns the k-th coordinate of the bottom-right corner point (past-the-end)
     constexpr int br(int k) const noexcept { return this->__end(k); }
 
+    constexpr void shift(point_type diff) noexcept
+    {
+      for (int dim = 0; dim < ndim; ++dim)
+      {
+        this->__begin(dim) += diff[dim];
+        this->__end(dim) += diff[dim];
+      }
+    }
+
     /// \brief Returns the bottom-right (past-the-end) corner point
     using Impl::br;
 

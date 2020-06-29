@@ -13,13 +13,13 @@ namespace mln::canvas
   template <class SE, class I, class J, class Self = void>
   // This concept check makes an ICE with MSVC
   #ifndef _MSC_VER
-   requires concepts::StructuringElement<SE, image_point_t<I>>&& concepts::Image<I>&& concepts::Image<J>
+   requires concepts::StructuringElement<SE, image_point_t<I>> && concepts::Image<I> && concepts::Image<J>
   #endif
   class LocalAlgorithm
   {
-    static_assert(mln::is_a<SE, experimental::StructuringElement>());
-    static_assert(mln::is_a<I, experimental::Image>());
-    static_assert(mln::is_a<J, experimental::Image>());
+    static_assert(mln::is_a<SE, mln::details::StructuringElement>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<J, mln::details::Image>());
 
     static_assert(std::is_same_v<image_domain_t<I>, image_domain_t<J>>,
                   "Running a local algorithm on two images with differents domain types is not supported.");
@@ -68,7 +68,7 @@ namespace mln::canvas
     };
 
     template <class Impl>
-    struct is_domain_row_contiguous<mln::experimental::_box<Impl>> : std::true_type
+    struct is_domain_row_contiguous<mln::_box<Impl>> : std::true_type
     {
     };
   }
@@ -101,10 +101,13 @@ namespace mln::canvas
 
 
   template <class SE, class I, class J, class Self>
+#ifndef _MSC_VER
+   requires concepts::StructuringElement<SE, image_point_t<I>> && concepts::Image<I> && concepts::Image<J>
+#endif
   void LocalAlgorithm<SE, I, J, Self>::Execute()
   {
     mln_entering("LocalAlgorithm::Execute (Non-incremental)");
-    auto zz = ranges::view::zip(m_i.new_pixels(), m_j.new_pixels());
+    auto zz = ranges::view::zip(m_i.pixels(), m_j.pixels());
     for (auto rows : ranges::rows(zz))
     {
       self()->ExecuteAtLineStart();
@@ -133,7 +136,7 @@ namespace mln::canvas
     auto inc = this->m_se.inc();
     auto dec = this->m_se.dec();
 
-    auto zz = ranges::view::zip(this->m_i.new_pixels(), this->m_j.new_pixels());
+    auto zz = ranges::view::zip(this->m_i.pixels(), this->m_j.pixels());
     for (auto rows : ranges::rows(zz))
     {
       self()->ExecuteAtLineStart();

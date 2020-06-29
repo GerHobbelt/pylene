@@ -34,12 +34,12 @@ namespace mln
   template <class LhsImage, class RhsImage>
   bool equal(LhsImage lhs, RhsImage rhs)
   {
-    static_assert(mln::is_a<LhsImage, experimental::Image>());
-    static_assert(mln::is_a<RhsImage, experimental::Image>());
+    static_assert(mln::is_a<LhsImage, mln::details::Image>());
+    static_assert(mln::is_a<RhsImage, mln::details::Image>());
     static_assert(::concepts::equality_comparable_with<image_value_t<LhsImage>, image_value_t<RhsImage>>);
 
-    auto&& lhs_vals = lhs.new_values();
-    auto&& rhs_vals = rhs.new_values();
+    auto&& lhs_vals = lhs.values();
+    auto&& rhs_vals = rhs.values();
     auto r1 = ranges::rows(lhs_vals);
     auto r2 = ranges::rows(rhs_vals);
 

@@ -1,4 +1,4 @@
-#include <mln/core/experimental/point.hpp>
+#include <mln/core/point.hpp>
 
 #include <mln/core/concepts/point.hpp>
 #include <concepts/concepts.hpp>
@@ -9,10 +9,17 @@
 template <typename U, typename V = U>
 concept AddableWith = requires(U a, V b)
 {
+#if __GNUC__ == 9
   { a += b } -> U&;
   { a -= b } -> U&;
   { b += a } -> V&;
   { b -= a } -> V&;
+#else
+  { a += b } -> ::concepts::same_as<U&>;
+  { a -= b } -> ::concepts::same_as<U&>;
+  { b += a } -> ::concepts::same_as<V&>;
+  { b -= a } -> ::concepts::same_as<V&>;
+#endif
   { a + b };
   { a - b };
   { b + a};
@@ -26,69 +33,69 @@ concept Interopable = AddableWith<U, V> && ::concepts::totally_ordered_with<U, V
 
 TEST(Point, ConceptChecking)
 {
-  static_assert(mln::concepts::Point<mln::experimental::point1d>);
-  static_assert(mln::concepts::Point<mln::experimental::point2d>);
-  static_assert(mln::concepts::Point<mln::experimental::point3d>);
-  static_assert(mln::concepts::Point<mln::experimental::Point>);
+  static_assert(mln::concepts::Point<mln::point1d>);
+  static_assert(mln::concepts::Point<mln::point2d>);
+  static_assert(mln::concepts::Point<mln::point3d>);
+  static_assert(mln::concepts::Point<mln::Point>);
 
-  static_assert(mln::concepts::Point<mln::experimental::point1d_ref>);
-  static_assert(mln::concepts::Point<mln::experimental::point2d_ref>);
-  static_assert(mln::concepts::Point<mln::experimental::point3d_ref>);
-  static_assert(mln::concepts::Point<mln::experimental::PointRef>);
-  static_assert(mln::concepts::Point<mln::experimental::ConstPointRef>);
+  static_assert(mln::concepts::Point<mln::point1d_ref>);
+  static_assert(mln::concepts::Point<mln::point2d_ref>);
+  static_assert(mln::concepts::Point<mln::point3d_ref>);
+  static_assert(mln::concepts::Point<mln::PointRef>);
+  static_assert(mln::concepts::Point<mln::ConstPointRef>);
 
   // Static to * conversion
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<+1, int>>);
-  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<-1, const int>>);
-  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<+1, int>&, mln::experimental::ndpointref<+1, const int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<+1, short>, mln::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<+1, short>, mln::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<+1, int>&, mln::ndpointref<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<+1, int>&, mln::ndpointref<+1, int>>);
+  static_assert(::concepts::convertible_to<const mln::ndpoint<+1, int>&, mln::ndpointref<-1, const int>>);
+  static_assert(::concepts::convertible_to<const mln::ndpoint<+1, int>&, mln::ndpointref<+1, const int>>);
 
   // Dynamic to * conversion
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<+1, int>>);
-  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<-1, const int>>);
-  static_assert(::concepts::convertible_to<const mln::experimental::ndpoint<-1, int>&, mln::experimental::ndpointref<+1, const int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<-1, short>, mln::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<-1, short>, mln::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<-1, int>&, mln::ndpointref<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpoint<-1, int>&, mln::ndpointref<+1, int>>);
+  static_assert(::concepts::convertible_to<const mln::ndpoint<-1, int>&, mln::ndpointref<-1, const int>>);
+  static_assert(::concepts::convertible_to<const mln::ndpoint<-1, int>&, mln::ndpointref<+1, const int>>);
 
   // Static Ref to * conversion
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<-1, const short>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<+1, short>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpointref<-1, const short>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpointref<+1, short>>);
 
   // Dynamic Ref to * conversion
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<-1, short>>);
-  static_assert(::concepts::convertible_to<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<+1, const short>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpoint<+1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpoint<-1, int>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpointref<-1, short>>);
+  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpointref<+1, const short>>);
 
 
 
   /*
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<-1, int>>); // Dyn -> dyn
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<+1, int>>); // Static -> static
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<-1, int>>); // Static -> Dyn
-  static_assert(mln::concepts::stl::ConvertibleTo<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<+1, int>>); // Dyn -> Static
+  static_assert(mln::concepts::stl::ConvertibleTo<mln::ndpoint<-1, short>, mln::ndpoint<-1, int>>); // Dyn -> dyn
+  static_assert(mln::concepts::stl::ConvertibleTo<mln::ndpoint<+1, short>, mln::ndpoint<+1, int>>); // Static -> static
+  static_assert(mln::concepts::stl::ConvertibleTo<mln::ndpoint<+1, short>, mln::ndpoint<-1, int>>); // Static -> Dyn
+  static_assert(mln::concepts::stl::ConvertibleTo<mln::ndpoint<-1, short>, mln::ndpoint<+1, int>>); // Dyn -> Static
   */
 
 
 
-  static_assert(Interopable<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpoint<-1, int>>); // Dyn <-> dyn
-  static_assert(Interopable<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<+1, int>>); // Static <-> static
-  static_assert(Interopable<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpoint<-1, int>>); // Dyn <-> Static
+  static_assert(Interopable<mln::ndpoint<-1, short>, mln::ndpoint<-1, int>>); // Dyn <-> dyn
+  static_assert(Interopable<mln::ndpoint<+1, short>, mln::ndpoint<+1, int>>); // Static <-> static
+  static_assert(Interopable<mln::ndpoint<+1, short>, mln::ndpoint<-1, int>>); // Dyn <-> Static
 
-  static_assert(Interopable<mln::experimental::ndpointref<-1, short>, mln::experimental::ndpointref<-1, int>>); // dyn ref <-> dyn ref
-  static_assert(Interopable<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<+1, int>>); // static ref <-> static ref
-  static_assert(Interopable<mln::experimental::ndpointref<+1, short>, mln::experimental::ndpointref<-1, int>>); // dyn ref <-> static ref
+  static_assert(Interopable<mln::ndpointref<-1, short>, mln::ndpointref<-1, int>>); // dyn ref <-> dyn ref
+  static_assert(Interopable<mln::ndpointref<+1, short>, mln::ndpointref<+1, int>>); // static ref <-> static ref
+  static_assert(Interopable<mln::ndpointref<+1, short>, mln::ndpointref<-1, int>>); // dyn ref <-> static ref
 
 
-  static_assert(Interopable<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpointref<-1, int>>);
-  static_assert(Interopable<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpointref<-1, int>>);
-  static_assert(Interopable<mln::experimental::ndpoint<-1, short>, mln::experimental::ndpointref<+1, int>>);
-  static_assert(Interopable<mln::experimental::ndpoint<+1, short>, mln::experimental::ndpointref<+1, int>>);
+  static_assert(Interopable<mln::ndpoint<-1, short>, mln::ndpointref<-1, int>>);
+  static_assert(Interopable<mln::ndpoint<+1, short>, mln::ndpointref<-1, int>>);
+  static_assert(Interopable<mln::ndpoint<-1, short>, mln::ndpointref<+1, int>>);
+  static_assert(Interopable<mln::ndpoint<+1, short>, mln::ndpointref<+1, int>>);
 
 }
 
@@ -96,17 +103,17 @@ TEST(Point, ConceptChecking)
 TEST(DynamicPoint, Constructors)
 {
   {
-    mln::experimental::Point p = {}; // 0-init
+    mln::Point p = {}; // 0-init
     ASSERT_EQ(p.dim(), 0);
   }
 
   {
-    mln::experimental::Point p(2); // Create a 2d-point with undefined values
+    mln::Point p(2); // Create a 2d-point with undefined values
     ASSERT_EQ(p.dim(), 2);
   }
 
   {
-    mln::experimental::Point p = {2}; // Create a 1d-point with value 2
+    mln::Point p = {2}; // Create a 1d-point with value 2
     ASSERT_EQ(p.dim(), 1);
     ASSERT_EQ(p[0], 2);
   }
@@ -115,9 +122,9 @@ TEST(DynamicPoint, Constructors)
 TEST(Point, constexpr_points)
 {
   {
-    constexpr mln::experimental::Point p1d = {1};
-    constexpr mln::experimental::Point p2d = {1, 2};
-    constexpr mln::experimental::Point p3d = {1, 2, 3};
+    constexpr mln::Point p1d = {1};
+    constexpr mln::Point p2d = {1, 2};
+    constexpr mln::Point p3d = {1, 2, 3};
 
     static_assert(p1d[0] == 1 && p1d.x() == 1);
     static_assert(p2d[0] == 1 && p2d.x() == 1);
@@ -130,9 +137,9 @@ TEST(Point, constexpr_points)
     static_assert(p3d.dim() == 3);
   }
   {
-    constexpr mln::experimental::point1d p1d = {1};
-    constexpr mln::experimental::point2d p2d = {1, 2};
-    constexpr mln::experimental::point3d p3d = {1, 2, 3};
+    constexpr mln::point1d p1d = {1};
+    constexpr mln::point2d p2d = {1, 2};
+    constexpr mln::point3d p3d = {1, 2, 3};
 
     static_assert(p1d[0] == 1 && p1d.x() == 1);
     static_assert(p2d[0] == 1 && p2d.x() == 1);
@@ -189,18 +196,18 @@ void test_interop()
       auto r1 = p1d + r1d;
       auto r2 = p2d + r2d;
       auto r3 = p3d + r3d;
-      ASSERT_EQ(r1, mln::experimental::Point({2}));
-      ASSERT_EQ(r2, mln::experimental::Point({2,4}));
-      ASSERT_EQ(r3, mln::experimental::Point({2,4,6}));
+      ASSERT_EQ(r1, mln::Point({2}));
+      ASSERT_EQ(r2, mln::Point({2,4}));
+      ASSERT_EQ(r3, mln::Point({2,4,6}));
     }
     // Soustraction
     {
       auto r1 = p1d - r1d;
       auto r2 = p2d - r2d;
       auto r3 = p3d - r3d;
-      ASSERT_EQ(r1, mln::experimental::Point({0}));
-      ASSERT_EQ(r2, mln::experimental::Point({0,0}));
-      ASSERT_EQ(r3, mln::experimental::Point({0,0,0}));
+      ASSERT_EQ(r1, mln::Point({0}));
+      ASSERT_EQ(r2, mln::Point({0,0}));
+      ASSERT_EQ(r3, mln::Point({0,0,0}));
     }
   }
 }
@@ -208,48 +215,48 @@ void test_interop()
 
 TEST(Point, interopability)
 {
-  test_interop<mln::experimental::ndpoint<+1, int>,
-               mln::experimental::ndpoint<+2, int>,
-               mln::experimental::ndpoint<+3, int>,
-               mln::experimental::ndpoint<+1, long>,
-               mln::experimental::ndpoint<+2, long>,
-               mln::experimental::ndpoint<+3, long>>();
+  test_interop<mln::ndpoint<+1, int>,
+               mln::ndpoint<+2, int>,
+               mln::ndpoint<+3, int>,
+               mln::ndpoint<+1, long>,
+               mln::ndpoint<+2, long>,
+               mln::ndpoint<+3, long>>();
 
-  test_interop<mln::experimental::ndpoint<+1, int>,
-               mln::experimental::ndpoint<+2, int>,
-               mln::experimental::ndpoint<+3, int>,
-               mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpoint<-1, int>>();
+  test_interop<mln::ndpoint<+1, int>,
+               mln::ndpoint<+2, int>,
+               mln::ndpoint<+3, int>,
+               mln::ndpoint<-1, int>,
+               mln::ndpoint<-1, int>,
+               mln::ndpoint<-1, int>>();
 
-  test_interop<mln::experimental::ndpoint<+1, int>,
-               mln::experimental::ndpoint<+2, int>,
-               mln::experimental::ndpoint<+3, int>,
-               mln::experimental::ndpointref<+1, const int>,
-               mln::experimental::ndpointref<+2, const int>,
-               mln::experimental::ndpointref<+3, const int>>();
+  test_interop<mln::ndpoint<+1, int>,
+               mln::ndpoint<+2, int>,
+               mln::ndpoint<+3, int>,
+               mln::ndpointref<+1, const int>,
+               mln::ndpointref<+2, const int>,
+               mln::ndpointref<+3, const int>>();
 
-  test_interop<mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpointref<+1, const int>,
-               mln::experimental::ndpointref<+2, const int>,
-               mln::experimental::ndpointref<+3, const int>>();
+  test_interop<mln::ndpoint<-1, int>,
+               mln::ndpoint<-1, int>,
+               mln::ndpoint<-1, int>,
+               mln::ndpointref<+1, const int>,
+               mln::ndpointref<+2, const int>,
+               mln::ndpointref<+3, const int>>();
 
 
-  test_interop<mln::experimental::ndpoint<+1, int>,
-               mln::experimental::ndpoint<+2, int>,
-               mln::experimental::ndpoint<+3, int>,
-               mln::experimental::ndpointref<-1, const int>,
-               mln::experimental::ndpointref<-1, const int>,
-               mln::experimental::ndpointref<-1, const int>>();
+  test_interop<mln::ndpoint<+1, int>,
+               mln::ndpoint<+2, int>,
+               mln::ndpoint<+3, int>,
+               mln::ndpointref<-1, const int>,
+               mln::ndpointref<-1, const int>,
+               mln::ndpointref<-1, const int>>();
 
-  test_interop<mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpoint<-1, int>,
-               mln::experimental::ndpointref<-1, const int>,
-               mln::experimental::ndpointref<-1, const int>,
-               mln::experimental::ndpointref<-1, const int>>();
+  test_interop<mln::ndpoint<-1, int>,
+               mln::ndpoint<-1, int>,
+               mln::ndpoint<-1, int>,
+               mln::ndpointref<-1, const int>,
+               mln::ndpointref<-1, const int>,
+               mln::ndpointref<-1, const int>>();
 
 }
 

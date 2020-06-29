@@ -84,8 +84,8 @@ namespace mln::morpho::experimental
   details::gradient_result_t<std::remove_reference_t<InputImage>> gradient(InputImage&& ima, const SE& se)
   {
     using I = std::remove_reference_t<InputImage>;
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<SE, mln::details::StructuringElement>());
 
     mln_entering("mln::morpho::gradient");
 
@@ -103,8 +103,8 @@ namespace mln::morpho::experimental
   details::gradient_result_t<std::remove_reference_t<InputImage>> external_gradient(InputImage&& ima, const SE& se)
   {
     using I = std::remove_reference_t<InputImage>;
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<SE, mln::details::StructuringElement>());
 
     mln_entering("mln::morpho::external_gradient");
     auto d = morpho::experimental::dilation(ima, se);
@@ -120,8 +120,8 @@ namespace mln::morpho::experimental
   details::gradient_result_t<std::remove_reference_t<InputImage>> internal_gradient(InputImage&& ima, const SE& se)
   {
     using I = std::remove_reference_t<InputImage>;
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<SE, mln::experimental::StructuringElement>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<SE, mln::details::StructuringElement>());
 
     mln_entering("mln::morpho::internal_gradient");
     auto e = morpho::experimental::erosion(ima, se);

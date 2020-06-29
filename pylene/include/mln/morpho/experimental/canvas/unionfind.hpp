@@ -90,7 +90,7 @@ namespace mln::morpho::experimental::canvas
     template <class I>
     [[gnu::noinline]] image_point_t<I> zfindroot(I& par, image_point_t<I> p0) noexcept
     {
-      static_assert(mln::is_a<I, mln::experimental::Image>());
+      static_assert(mln::is_a<I, mln::details::Image>());
 
       image_point_t<I> r;
       // find root

@@ -26,7 +26,7 @@ namespace mln
 
 
   template <class I>
-  class value_extended_view : public image_adaptor<I>, public experimental::Image<value_extended_view<I>>
+  class value_extended_view : public image_adaptor<I>, public mln::details::Image<value_extended_view<I>>
   {
     using base_t = image_adaptor<I>;
 
@@ -43,7 +43,7 @@ namespace mln
     using category_type = std::common_type_t<image_category_t<I>, bidirectional_image_tag>;
     using typename image_adaptor<I>::domain_type;
 
-    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, experimental::Pixel<new_pixel_type>
+    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
     {
       using reference = value_extended_view::reference;
 
@@ -53,8 +53,8 @@ namespace mln
         return m_dom.has(pnt) ? this->base().val() : m_ima->m_value;
       }
 
-      new_pixel_type(image_pixel_t<I> px, value_extended_view<I>* ima, domain_type dom)
-        : new_pixel_type::pixel_adaptor{std::move(px)}
+      pixel_type(image_pixel_t<I> px, value_extended_view<I>* ima, domain_type dom)
+        : pixel_type::pixel_adaptor{std::move(px)}
         , m_ima{ima}
         , m_dom{std::move(dom)}
       {
@@ -90,21 +90,21 @@ namespace mln
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel(point_type p)
+    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
     {
-      return this->new_pixel_at(p);
+      return this->pixel_at(p);
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
+    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
     {
-      return {this->base().new_pixel_at(p), this, this->domain()};
+      return {this->base().pixel_at(p), this, this->domain()};
     }
     /// \}
 
-    auto new_pixels()
+    auto pixels()
     {
-      return ranges::view::transform(this->base().new_pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
+      return ranges::view::transform(this->base().pixels(), [this](image_pixel_t<I> px) -> pixel_type {
         return {std::move(px), this, this->domain()};
       });
     }

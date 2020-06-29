@@ -19,10 +19,10 @@ namespace mln
   template <class InputImage, class UnaryPredicate>
   std::ptrdiff_t count_if(InputImage input, UnaryPredicate p)
   {
-    static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
     static_assert(::ranges::predicate<UnaryPredicate, image_reference_t<InputImage>>);
 
-    auto&&         vals = input.new_values();
+    auto&&         vals = input.values();
     std::ptrdiff_t k    = 0;
 
     for (auto r : ranges::rows(vals))

@@ -6,7 +6,7 @@ namespace mln
 {
   /// \brief Pixel adaptor for weighted pixel range
   template <class Px, class W = void>
-  struct weighted_pixel : mln::experimental::Pixel<weighted_pixel<Px, W>>
+  struct weighted_pixel : mln::details::Pixel<weighted_pixel<Px, W>>
   {
     using point_type = typename Px::point_type;
     using reference  = typename Px::reference;
@@ -30,7 +30,7 @@ namespace mln
 
 
   template <class Px>
-  struct weighted_pixel<Px, void> : mln::experimental::Pixel<weighted_pixel<Px, void>>
+  struct weighted_pixel<Px, void> : mln::details::Pixel<weighted_pixel<Px, void>>
   {
     using point_type = typename Px::point_type;
     using reference  = typename Px::reference;

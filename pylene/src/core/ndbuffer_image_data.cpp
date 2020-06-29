@@ -1,4 +1,4 @@
-#include <mln/core/image/experimental/private/ndbuffer_image_data.hpp>
+#include <mln/core/image/private/ndbuffer_image_data.hpp>
 
 
 namespace mln::internal

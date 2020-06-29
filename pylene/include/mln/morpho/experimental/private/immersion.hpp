@@ -84,7 +84,7 @@ namespace mln::morpho::experimental::details
 
     // 2D generic version of immersion
     template <class I>
-    void immersion_T(I& f, const mln::experimental::box2d& roi, image_concrete_t<I>& inf, image_concrete_t<I>& sup)
+    void immersion_T(I& f, const mln::box2d& roi, image_concrete_t<I>& inf, image_concrete_t<I>& sup)
     {
       if (roi.empty())
         return;
@@ -96,11 +96,11 @@ namespace mln::morpho::experimental::details
       int ymax = roi.br().y();
 
       // First line
-      line_immersion_T(f, mln::experimental::point2d{0, ymin}, xmin, xmax, inf, sup);
+      line_immersion_T(f, mln::point2d{0, ymin}, xmin, xmax, inf, sup);
 
       for (int y = ymin + 1; y < ymax; ++y)
       {
-        line_immersion_T(f, mln::experimental::point2d{0, y}, xmin, xmax, inf, sup);
+        line_immersion_T(f, mln::point2d{0, y}, xmin, xmax, inf, sup);
         line_interpolation2d_T(2 * y - 1, xmin * 2, xmax * 2 - 1, inf, sup);
       }
     }
@@ -110,7 +110,7 @@ namespace mln::morpho::experimental::details
 
     // For 2d-buffer images
     template <class T>
-    void immersion(mln::experimental::image2d<T>& f, mln::experimental::box2d, mln::experimental::image2d<T>& inf, mln::experimental::image2d<T>& sup)
+    void immersion(mln::image2d<T>& f, mln::box2d, mln::image2d<T>& inf, mln::image2d<T>& sup)
     {
       mln_entering("mln::morpho::experimental::details::immersion (2d-buffer)")
       immersion_impl_table_t<T> impl;
@@ -119,7 +119,7 @@ namespace mln::morpho::experimental::details
 
     // For 3d-buffer images (To be implemented)
     template <class T>
-    void immersion(mln::experimental::image3d<T>& f, mln::experimental::box3d, mln::experimental::image3d<T>& inf, mln::experimental::image3d<T>& sup)
+    void immersion(mln::image3d<T>& f, mln::box3d, mln::image3d<T>& inf, mln::image3d<T>& sup)
     {
       mln_entering("mln::morpho::experimental::details::immersion (3d-buffer)")
       immersion_impl_table_t<T> impl;
@@ -128,7 +128,7 @@ namespace mln::morpho::experimental::details
 
     // Fallback for 2d-images
     template <class I>
-    void immersion(mln::experimental::Image<I>& f, mln::experimental::box2d roi, image_concrete_t<I>& inf, image_concrete_t<I>& sup)
+    void immersion(mln::details::Image<I>& f, mln::box2d roi, image_concrete_t<I>& inf, image_concrete_t<I>& sup)
     {
       mln_entering("mln::morpho::experimental::details::immersion (generic)")
       immersion_T(static_cast<I&>(f), roi, inf, sup);
@@ -136,7 +136,7 @@ namespace mln::morpho::experimental::details
 
     // Fallback for 3d-images (To be implemented)
     template <class I>
-    void immersion(mln::experimental::Image<I>& f, mln::experimental::box3d roi, image_concrete_t<I>& inf, image_concrete_t<I>& sup);
+    void immersion(mln::details::Image<I>& f, mln::box3d roi, image_concrete_t<I>& inf, image_concrete_t<I>& sup);
     // \}
 
 
@@ -147,9 +147,9 @@ namespace mln::morpho::experimental::details
   std::pair<image_concrete_t<I>, image_concrete_t<I>> //
   immersion(I ima)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(std::is_same_v<image_domain_t<I>, mln::experimental::box2d> ||
-                  std::is_same_v<image_domain_t<I>, mln::experimental::box3d>,
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(std::is_same_v<image_domain_t<I>, mln::box2d> ||
+                  std::is_same_v<image_domain_t<I>, mln::box3d>,
                   "Input domain must be a box2d or a box3d");
 
     int dim = image_point_t<I>::ndim;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/experimental/point.hpp>
+#include <mln/core/point.hpp>
 #include <vector>
 
 
@@ -9,7 +9,7 @@ namespace mln
 
   /// Compute the convexhull of a set of points. Note that the input array in modified inplace (sorted)
   /// \param points
-  std::vector<experimental::point2d> convexhull(mln::experimental::point2d* points, std::size_t n);
+  std::vector<point2d> convexhull(mln::point2d* points, std::size_t n);
 
 
 
@@ -17,7 +17,7 @@ namespace mln
   /// \param points
   /// \pre \p points must be sorted along first dimension, then second dim.
   ///         (scan order)
-  std::vector<experimental::point2d> convexhull_sorted(const std::vector<experimental::point2d>& points);
+  std::vector<point2d> convexhull_sorted(const std::vector<point2d>& points);
 
 
 
@@ -27,7 +27,7 @@ namespace mln
 
   namespace impl
   {
-    std::vector<experimental::point2d> cvxhull_sorted(const experimental::point2d* points, std::size_t n);
+    std::vector<point2d> cvxhull_sorted(const point2d* points, std::size_t n);
   }
 
 } // namespace mln

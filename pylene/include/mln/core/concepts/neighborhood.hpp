@@ -5,15 +5,13 @@
 #include <concepts/concepts.hpp>
 #include <range/v3/range/concepts.hpp>
 
-namespace mln::experimental
+namespace mln::details
 {
-
   template <class SE>
   struct Neighborhood : StructuringElement<SE>
   {
   };
-
-} // namespace mln::experimental
+} // namespace mln::details
 
 
 namespace mln::concepts

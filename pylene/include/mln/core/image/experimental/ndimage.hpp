@@ -1,11 +1,11 @@
 #pragma once
 
 
-#include <mln/core/image/experimental/ndbuffer_image.hpp>
-#include <mln/core/image/experimental/private/ndbuffer_image.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/private/ndbuffer_image.hpp>
 
 
-namespace mln::experimental
+namespace mln
 {
   template <class T>
   using image1d = mln::__ndbuffer_image<T, 1>;

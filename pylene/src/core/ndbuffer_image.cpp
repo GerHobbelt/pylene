@@ -1,9 +1,9 @@
 #include <mln/core/assert.hpp>
 
 #include <mln/core/image_format.hpp>
-#include <mln/core/image/experimental/ndbuffer_image.hpp>
-#include <mln/core/image/experimental/private/ndbuffer_image_data.hpp>
-#include <mln/core/image/experimental/private/ndbuffer_image_impl.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/private/ndbuffer_image_data.hpp>
+#include <mln/core/image/private/ndbuffer_image_impl.hpp>
 
 #include <cstring>
 
@@ -67,14 +67,14 @@ namespace mln
   }
 
 
-  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, experimental::ConstBoxRef domain,
+  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, ConstBoxRef domain,
                                              const image_build_params& params)
   {
     resize(sample_type, domain, params);
   }
 
 
-  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, experimental::ConstBoxRef domain)
+  __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, ConstBoxRef domain)
   {
     resize(sample_type, domain);
   }
@@ -126,7 +126,7 @@ namespace mln
 
 
 
-  experimental::Box __ndbuffer_image<void, -1>::domain() const noexcept
+  Box __ndbuffer_image<void, -1>::domain() const noexcept
   {
     int a_coords[PYLENE_NDBUFFER_MAX_DIM];
     int b_coords[PYLENE_NDBUFFER_MAX_DIM];
@@ -137,8 +137,8 @@ namespace mln
       b_coords[i] = m_axes[i].domain_end;
     }
 
-    experimental::ConstPointRef a(m_pdim, a_coords);
-    experimental::ConstPointRef b(m_pdim, b_coords);
+    ConstPointRef a(m_pdim, a_coords);
+    ConstPointRef b(m_pdim, b_coords);
     return {a, b};
   }
 
@@ -267,7 +267,7 @@ namespace mln
   }
 
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, experimental::ConstBoxRef domain,
+  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, ConstBoxRef domain,
                                           const image_build_params& params)
   {
     int topleft[PYLENE_NDBUFFER_MAX_DIM];
@@ -283,7 +283,7 @@ namespace mln
   }
 
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, experimental::ConstBoxRef domain)
+  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, ConstBoxRef domain)
   {
     resize(sample_type, domain, image_build_params{});
   }
@@ -436,7 +436,7 @@ namespace mln
 
 
 
-  const void* __ndbuffer_image<void, -1>::operator()(experimental::ConstPointRef p) const noexcept
+  const void* __ndbuffer_image<void, -1>::operator()(ConstPointRef p) const noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_in_domain(this, p.data()));
@@ -444,7 +444,7 @@ namespace mln
   }
 
 
-  void* __ndbuffer_image<void, -1>::operator()(experimental::ConstPointRef p) noexcept
+  void* __ndbuffer_image<void, -1>::operator()(ConstPointRef p) noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_in_domain(this, p.data()));
@@ -452,7 +452,7 @@ namespace mln
   }
 
 
-  const void* __ndbuffer_image<void, -1>::at(experimental::ConstPointRef p) const noexcept
+  const void* __ndbuffer_image<void, -1>::at(ConstPointRef p) const noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -460,7 +460,7 @@ namespace mln
   }
 
 
-  void* __ndbuffer_image<void, -1>::at(experimental::ConstPointRef p) noexcept
+  void* __ndbuffer_image<void, -1>::at(ConstPointRef p) noexcept
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -480,7 +480,7 @@ namespace mln
   }
 
 
-  auto __ndbuffer_image<void, -1>::index_of_point(experimental::ConstPointRef p) const noexcept->index_type
+  auto __ndbuffer_image<void, -1>::index_of_point(ConstPointRef p) const noexcept->index_type
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -488,7 +488,7 @@ namespace mln
   }
 
 
-  auto __ndbuffer_image<void, -1>::delta_index(experimental::ConstPointRef p) const noexcept -> index_type
+  auto __ndbuffer_image<void, -1>::delta_index(ConstPointRef p) const noexcept -> index_type
   {
     assert(p.dim() == m_pdim);
     return Impl::get_index(this, p.data());
@@ -524,7 +524,7 @@ namespace mln
     return m_axes[dim].byte_stride / m_axes[0].byte_stride;
   }
 
-  auto __ndbuffer_image<void, -1>::clip(experimental::ConstBoxRef roi) const ->  __ndbuffer_image
+  auto __ndbuffer_image<void, -1>::clip(ConstBoxRef roi) const ->  __ndbuffer_image
   {
     if (roi.dim() != m_pdim)
       throw std::runtime_error("Dimension of the image and the roi differ.");

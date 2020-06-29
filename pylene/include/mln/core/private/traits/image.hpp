@@ -7,7 +7,7 @@ namespace mln
 {
   // Core traits
   template <class I>
-  using image_pixel_t = typename I::new_pixel_type;
+  using image_pixel_t = typename I::pixel_type;
 
   template <class I>
   using image_reference_t = typename I::reference;

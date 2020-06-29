@@ -48,9 +48,9 @@ namespace mln::labeling::experimental
     template <class I, class N, class O, class SumOp>
     void chamfer_distance_transform(I input, N nbh, O output, SumOp add)
     {
-      static_assert(mln::is_a<I, mln::experimental::Image>());
-      static_assert(mln::is_a<O, mln::experimental::Image>());
-      static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+      static_assert(mln::is_a<I, mln::details::Image>());
+      static_assert(mln::is_a<O, mln::details::Image>());
+      static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
       static_assert(std::is_convertible<image_value_t<I>, bool>::value, "Input value type must be convertible to bool");
 
@@ -101,8 +101,8 @@ namespace mln::labeling::experimental
     using I = std::remove_reference_t<InputImage>;
     using N = std::remove_reference_t<Neighborhood>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     image_build_error_code err = IMAGE_BUILD_OK;
 

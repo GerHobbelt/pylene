@@ -5,7 +5,7 @@
 #include <mln/core/concepts/archetype/image.hpp>
 #include <mln/core/concepts/archetype/pixel.hpp>
 #include <mln/core/concepts/pixel.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/range/foreach.hpp>
@@ -20,8 +20,8 @@
 
 TEST(Core, Transform_Supports_RValue_Lambda)
 {
-  mln::experimental::box2d dom({-2, -1}, {3, 3});
-  mln::experimental::image2d<int> ima(dom);
+  mln::box2d dom({-2, -1}, {3, 3});
+  mln::image2d<int> ima(dom);
 
   mln::iota(ima, 0);
   {
@@ -39,8 +39,8 @@ TEST(Core, Transform_Supports_RValue_Lambda)
     // Test pixel iteration
     // check that properties of pixels are preserved (point + index)
     {
-      auto rng = mln::ranges::view::zip(ima.new_pixels(), out.new_pixels());
-      mln_foreach_new ((auto [px1, px2]), rng)
+      auto rng = mln::ranges::view::zip(ima.pixels(), out.pixels());
+      mln_foreach ((auto [px1, px2]), rng)
       {
         ASSERT_EQ(px1.point(), px2.point());
         // ASSERT_EQ(px1.index(), px2.index());
@@ -51,8 +51,8 @@ TEST(Core, Transform_Supports_RValue_Lambda)
 
     // Test value iteration
     {
-      auto rng = mln::ranges::view::zip(ima.new_values(), out.new_values());
-      mln_foreach_new ((auto [v1, v2]), rng)
+      auto rng = mln::ranges::view::zip(ima.values(), out.values());
+      mln_foreach ((auto [v1, v2]), rng)
         ASSERT_EQ(2 * v1, v2);
     }
   }
@@ -67,10 +67,10 @@ int plus_one(int x)
 
 TEST(Core, Transform_Supports_Function)
 {
-  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::box2d dom({-2, -1}, {3, 3});
 
-  mln::experimental::image2d<int> ima(dom);
-  mln::experimental::image2d<int> ref(dom);
+  mln::image2d<int> ima(dom);
+  mln::image2d<int> ref(dom);
   mln::iota(ima, 0);
   mln::iota(ref, 1);
 
@@ -90,15 +90,15 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
   using V = std::pair<int, int>;
 
-  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::box2d dom({-2, -1}, {3, 3});
   mln::image_build_params params;
   params.border = 3;
 
   params.init_value = std::make_pair(42, 42);
-  mln::experimental::image2d<V> ima(dom, params);
+  mln::image2d<V> ima(dom, params);
 
   params.init_value = std::make_pair(69, 42);
-  mln::experimental::image2d<V> ref(dom, params);
+  mln::image2d<V> ref(dom, params);
 
   auto c = mln::view::transform(ima, &V::first);
 
@@ -116,10 +116,10 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 
 TEST(Core, Transform_Twice)
 {
-  mln::experimental::box2d dom({-2, -1}, {3, 3});
+  mln::box2d dom({-2, -1}, {3, 3});
 
-  mln::experimental::image2d<int> ima(dom);
-  mln::experimental::image2d<int> ref(dom);
+  mln::image2d<int> ima(dom);
+  mln::image2d<int> ref(dom);
 
   mln::iota(ima, 0);
   mln::iota(ref, 2);
@@ -142,8 +142,8 @@ TEST(Core, Transform_Support_Writable)
 {
   typedef std::pair<int, int> V;
 
-  mln::experimental::box2d      dom({-2, -1}, {3, 3});
-  mln::experimental::image2d<V> ima(dom);
+  mln::box2d      dom({-2, -1}, {3, 3});
+  mln::image2d<V> ima(dom);
 
   auto c1 = mln::view::transform(ima, [](std::pair<int, int>& x) -> int& { return x.first; });
   auto c2 = mln::view::transform(ima, [](const std::pair<int, int>& x) { return x.second; });
@@ -171,8 +171,8 @@ TEST(Core, Transform_Support_Writable)
   // Test pixel iteration
   // check that properties of pixels are preserved (point + index)
   {
-    auto rng = mln::ranges::view::zip(ima.new_pixels(), c1.new_pixels(), c2.new_pixels());
-    mln_foreach_new ((auto [px1, px2, px3]), rng)
+    auto rng = mln::ranges::view::zip(ima.pixels(), c1.pixels(), c2.pixels());
+    mln_foreach ((auto [px1, px2, px3]), rng)
     {
       ASSERT_EQ(px1.point(), px2.point());
       ASSERT_EQ(px1.point(), px3.point());
@@ -186,8 +186,8 @@ TEST(Core, Transform_Support_Writable)
 
   // Test value iteration
   {
-    auto rng = mln::ranges::view::zip(ima.new_values(), c1.new_values(), c2.new_values());
-    mln_foreach_new ((auto [v1, v2, v3]), rng)
+    auto rng = mln::ranges::view::zip(ima.values(), c1.values(), c2.values());
+    mln_foreach ((auto [v1, v2, v3]), rng)
     {
       ASSERT_EQ(std::make_pair(69, 12), v1);
       ASSERT_EQ(69, v2);
@@ -199,9 +199,9 @@ TEST(Core, Transform_Support_Writable)
 
 TEST(Core, Transformed2Image_transform_byval_chain)
 {
-  mln::experimental::box2d        dom({-2, -1}, {3, 3});
-  mln::experimental::image2d<int> ima(dom);
-  mln::experimental::image2d<int> ima2(dom);
+  mln::box2d        dom({-2, -1}, {3, 3});
+  mln::image2d<int> ima(dom);
+  mln::image2d<int> ima2(dom);
 
   mln::iota(ima, 0);
   mln::iota(ima2, 1);
@@ -213,7 +213,7 @@ TEST(Core, Transformed2Image_transform_byval_chain)
   std::vector<int> ref = {3, 4, 5, 6, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39};
 
   std::vector<int> tmp;
-  auto&& vals = out.new_values();
+  auto&& vals = out.values();
   for (auto&& r : mln::ranges::rows(vals))
     ::ranges::copy(r, ::ranges::back_inserter(tmp));
 

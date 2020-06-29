@@ -93,8 +93,8 @@ namespace mln::morpho::experimental
   {
     using I = std::remove_reference_t<InputImage>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     mln_entering("mln::morpho::dynamic_opening");
     image_concrete_t<I> out = clone(ima);
@@ -109,8 +109,8 @@ namespace mln::morpho::experimental
   {
     using I = std::remove_reference_t<InputImage>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     mln_entering("mln::morpho::dynamic_closing");
     image_concrete_t<I> out = clone(ima);

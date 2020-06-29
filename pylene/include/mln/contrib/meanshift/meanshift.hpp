@@ -1,8 +1,11 @@
 #pragma once
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/core/range/foreach.hpp>
+
+#include <mln/core/value/value_traits.hpp>
+#include <mln/core/vec.hpp>
 
 namespace mln
 {
@@ -10,11 +13,11 @@ namespace mln
   {
 
     template <class V>
-    mln::experimental::image2d<V> meanshift(const mln::experimental::image2d<V>& f, float hs, float hr)
+    mln::image2d<V> meanshift(const mln::image2d<V>& f, float hs, float hr)
     {
       int    SR    = 5;   // Spatial window radius
       int    NITER = 30;  // Maximal number of iteration
-      float  eps   = 0.1; //
+      float  eps   = 0.1f; //
       double hs2   = hs * hs;
       double hr2   = hr * hr;
       double eps2  = eps * eps;
@@ -22,13 +25,13 @@ namespace mln
       typedef vec<double, value_traits<V>::ndim> value_t;
       typedef vec<double, 2>                     site_t;
 
-      mln::experimental::image2d<V> out;
+      mln::image2d<V> out;
       resize(out, f);
 
-      mln::experimental::se::rect2d win(2 * SR + 1, 2 * SR + 1);
+      mln::se::rect2d win(2 * SR + 1, 2 * SR + 1);
 
       auto g = [](double x) -> double { return std::exp(-x); };
-      mln_foreach_new (auto p, f.domain())
+      mln_foreach (auto p, f.domain())
       {
         site_t   py = {static_cast<double>(p.x()), static_cast<double>(p.y())};
         value_t  vy = f(p).as_vec();

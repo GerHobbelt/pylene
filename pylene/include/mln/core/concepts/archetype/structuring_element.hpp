@@ -39,7 +39,9 @@ namespace mln::archetypes
 
 
     template <class SE>
-    struct AsSE : SE, mln::experimental::StructuringElement<AsSE<SE>>
+    struct AsSE : SE, mln::details::Neighborhood
+    
+    helper  <AsSE<SE>>
     {
     };
   } // namespace details

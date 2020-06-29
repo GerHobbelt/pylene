@@ -25,7 +25,7 @@ namespace mln
     /// * \p the neighborhood is constant (either static or dynamic)
     /// * \p the extension is wide enough
     template <class I, class SE>
-    bool need_adjust(const experimental::Image<I>& ima, const experimental::StructuringElement<SE>& se);
+    bool need_adjust(const mln::details::Image<I>& ima, const mln::details::StructuringElement<SE>& se);
 
 
     /******************************************/
@@ -56,7 +56,7 @@ namespace mln
 
 
     template <class I, class SE>
-    bool need_adjust(const mln::experimental::Image<I>& ima, const mln::experimental::StructuringElement<SE>& se)
+    bool need_adjust(const mln::details::Image<I>& ima, const mln::details::StructuringElement<SE>& se)
     {
       return extension::impl::need_adjust(static_cast<const I&>(ima), static_cast<const SE&>(se),
                                           image_extension_category_t<I>(), typename SE::category());

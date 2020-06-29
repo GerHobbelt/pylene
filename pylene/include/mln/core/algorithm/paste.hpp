@@ -63,7 +63,7 @@ namespace mln
     template <class InputImage, class InputRange, class OutputImage>
     void paste_unsafe(InputImage src, InputRange roi, OutputImage dest)
     {
-      mln_foreach_new(auto p, roi)
+      mln_foreach(auto p, roi)
         dest.at(p) = src.at(p);
     }
   }
@@ -75,17 +75,17 @@ namespace mln
     mln_entering("mln::paste");
     // FIXME: Add a precondition about the domain inclusion
     // FIXME: check OutputImage is accessible
-    static_assert(mln::is_a<InputImage, experimental::Image>());
-    static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<OutputImage, mln::details::Image>());
     static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
     if constexpr (details::is_image_clippable_v<InputImage, InputRange> && details::is_image_clippable_v<OutputImage, InputRange>)
     {
-      mln::experimental::copy(src.clip(roi), dest.clip(roi));
+      mln::copy(src.clip(roi), dest.clip(roi));
     }
     else
     {
-      mln_foreach_new(auto p, roi)
+      mln_foreach(auto p, roi)
         dest(p) = src(p);
     }
   }
@@ -96,19 +96,19 @@ namespace mln
     mln_entering("mln::paste");
     // FIXME: Add a precondition about the domain inclusion
     // FIXME: check OutputImage is accessible
-    static_assert(mln::is_a<InputImage, experimental::Image>());
-    static_assert(mln::is_a<OutputImage, experimental::Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<OutputImage, mln::details::Image>());
     static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
     using InputRange = image_domain_t<InputImage>;
 
     if constexpr (details::is_image_clippable_v<OutputImage, InputRange>)
     {
-      mln::experimental::copy(src, dest.clip(src.domain()));
+      mln::copy(src, dest.clip(src.domain()));
     }
     else
     {
-      auto&& pixels = src.new_pixels();
+      auto&& pixels = src.pixels();
       for (auto row : ranges::rows(pixels))
         for (auto px : row)
           dest(px.point()) = px.val();

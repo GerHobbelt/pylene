@@ -175,7 +175,7 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 .. topic:: Concepts
 
-   * :cpp:concept:`mln::StructuringElement`
+   * :cpp:concept:`mln::details::StructuringElement`
 
 .. topic::  Predefined Neighborhood
 

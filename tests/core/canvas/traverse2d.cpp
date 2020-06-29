@@ -1,6 +1,6 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/canvas/private/traverse2d.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -8,34 +8,34 @@
 
 
 #include <gtest/gtest.h>
-#include <mln/io/experimental/imprint.hpp>
+#include <mln/io/imprint.hpp>
 #include <fmt/format.h>
 
 namespace
 {
-  void fill_line(mln::experimental::image2d<int>& input,
-                 mln::experimental::point2d direction,
-                 mln::experimental::point2d p, std::size_t n)
+  void fill_line(mln::image2d<int>& input,
+                 mln::point2d direction,
+                 mln::point2d p, std::size_t n)
   {
     for (std::size_t i = 0; i < n; ++i, p += direction)
       input(p) += 1;
   }
 } // namespace
 
-void test_direction(mln::experimental::point2d dir)
+void test_direction(mln::point2d dir)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::box2d roi(20, 10);
+  mln::box2d roi(20, 10);
 
   mln::image_build_params params;
   params.init_value = 0;
 
-  mln::experimental::image2d<int> input(roi, params);
+  mln::image2d<int> input(roi, params);
 
 
   mln::canvas::details::traverse_along_direction(
-    roi, dir, [=, &input](mln::experimental::point2d p, mln::experimental::point2d dir, std::size_t n) { fill_line(input, dir, p, n); });
+    roi, dir, [=, &input](mln::point2d p, mln::point2d dir, std::size_t n) { fill_line(input, dir, p, n); });
 
   EXPECT_TRUE(mln::all_of(input == 1)) << fmt::format("with direction ({},{})", dir.x(), dir.y());
 }

@@ -2,7 +2,7 @@
 
 #include <mln/core/box.hpp>
 #include <mln/core/concepts/image.hpp>
-#include <mln/core/image/experimental/ndimage_fwd.hpp>
+#include <mln/core/image/ndimage_fwd.hpp>
 #include <mln/core/image_format.hpp>
 #include <mln/core/range/rows.hpp>
 #include <mln/io/private/plugin.hpp>
@@ -12,13 +12,13 @@
 namespace mln::io::internal
 {
   template <class I>
-  void save2d(mln::experimental::Image<I>& input, plugin_writer* p, const char* filename);
+  void save2d(mln::details::Image<I>& input, plugin_writer* p, const char* filename);
 
   template <class I>
-  void save2d(mln::experimental::Image<I>&& input, plugin_writer* p, const char* filename);
+  void save2d(mln::details::Image<I>&& input, plugin_writer* p, const char* filename);
 
   template <class I>
-  void save2d(const mln::experimental::Image<I>& input, plugin_writer* p, const char* filename);
+  void save2d(const mln::details::Image<I>& input, plugin_writer* p, const char* filename);
 
   // Specialization for types convertible to mln::ndbuffer_image
   inline void save2d(const mln::ndbuffer_image& input, plugin_writer* p, const char* filename);
@@ -41,11 +41,11 @@ namespace mln::io::internal
       using I = std::remove_reference_t<Image>;
       using V = image_value_t<I>;
 
-      static_assert(mln::is_a<I, mln::experimental::Image>());
-      static_assert(std::is_same<image_domain_t<I>, mln::experimental::box2d>() &&
+      static_assert(mln::is_a<I, mln::details::Image>());
+      static_assert(std::is_same<image_domain_t<I>, mln::box2d>() &&
                     "The domain must be a regular box2d");
 
-      mln::experimental::box2d domain = input.domain();
+      mln::box2d domain = input.domain();
       int                      height = domain.height();
       int                      width  = domain.width();
       sample_type_id           tid    = sample_type_traits<V>::id();
@@ -58,7 +58,7 @@ namespace mln::io::internal
 
       // Fill content
       {
-        auto vals = input.new_values();
+        auto vals = input.values();
         auto rows = mln::ranges::rows(vals);
         for (auto&& r : rows)
         {
@@ -74,20 +74,20 @@ namespace mln::io::internal
   } // namespace impl
 
   template <class I>
-  void save2d(mln::experimental::Image<I>&& input, plugin_writer* p, const char* filename)
+  void save2d(mln::details::Image<I>&& input, plugin_writer* p, const char* filename)
   {
     impl::save2d(static_cast<I&&>(input), p, filename);
   }
 
   template <class I>
-  void save2d(mln::experimental::Image<I>& input, plugin_writer* p, const char* filename)
+  void save2d(mln::details::Image<I>& input, plugin_writer* p, const char* filename)
   {
     impl::save2d(static_cast<I&>(input), p, filename);
   }
 
 
   template <class I>
-  void save2d(const mln::experimental::Image<I>& input, plugin_writer* p, const char* filename)
+  void save2d(const mln::details::Image<I>& input, plugin_writer* p, const char* filename)
   {
     impl::save2d(static_cast<const I&>(input), p, filename);
   }

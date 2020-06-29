@@ -33,7 +33,7 @@ namespace mln::labeling
   std::vector<typename accu::result_of<AccuLike, image_point_t<I>>::type>
   accumulate(I lbl_input, int nlabel, const AccumulatorLike<AccuLike>& accu)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
 
     using R = typename accu::result_of<AccuLike, image_point_t<I>>::type;
 
@@ -45,7 +45,7 @@ namespace mln::labeling
 
 
     {
-      mln_foreach_new (auto px, lbl_input.new_pixels())
+      mln_foreach (auto px, lbl_input.pixels())
       {
         int lbl = px.val();
         assert(0 <= lbl && lbl <= nlabel);
@@ -64,8 +64,8 @@ namespace mln::labeling
   std::vector<typename accu::result_of<AccuLike, image_value_t<J>>::type>
   accumulate_on(I lbl_input, J values, int nlabel, const AccumulatorLike<AccuLike>& accu)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<J, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<J, mln::details::Image>());
 
     using R = typename accu::result_of<AccuLike, image_value_t<J>>::type;
 
@@ -76,8 +76,8 @@ namespace mln::labeling
     std::vector<R>             results(nlabel + 1);
 
     {
-      auto zz = mln::ranges::view::zip(lbl_input.new_values(), values.new_values());
-      mln_foreach_new ((auto [lbl, v]), zz)
+      auto zz = mln::ranges::view::zip(lbl_input.values(), values.values());
+      mln_foreach ((auto [lbl, v]), zz)
       {
         assert(0 <= lbl && lbl <= nlabel);
         vec_acc[lbl].take(v);

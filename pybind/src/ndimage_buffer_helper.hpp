@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/image/experimental/ndimage_fwd.hpp>
+#include <mln/core/image/ndimage_fwd.hpp>
 
 #include <pybind11/pybind11.h>
 

@@ -6,19 +6,19 @@
 #include <mln/core/concepts/archetype/image.hpp>
 #include <mln/core/domain/where.hpp>
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
 #include <gtest/gtest.h>
 #include <fixtures/ImageCompare/image_compare.hpp>
 
 
-struct vector_domain : public std::vector<mln::experimental::point2d>
+struct vector_domain : public std::vector<mln::point2d>
 {
-  using base = std::vector<mln::experimental::point2d>;
+  using base = std::vector<mln::point2d>;
 
   using base::base;
-  bool          has(mln::experimental::point2d p) const { return std::binary_search(this->begin(), this->end(), p); }
+  bool          has(mln::point2d p) const { return std::binary_search(this->begin(), this->end(), p); }
   constexpr int dim() const { return 2; }
 };
 
@@ -27,11 +27,11 @@ TEST(View, clip)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 4, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
-  mln::experimental::image2d<int> ref = {{42, 1, 2, 3, 42}, //
+  mln::image2d<int> ref = {{42, 1, 2, 3, 42}, //
                                          {5, 42, 4, 42, 9}, //
                                          {10, 11, 42, 13, 14}};
 
@@ -61,11 +61,11 @@ TEST(View, clip_twice)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 4, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
-  mln::experimental::image2d<int> ref = {{0, 1, 2, 3, 4},   //
+  mln::image2d<int> ref = {{0, 1, 2, 3, 4},   //
                                          {5, 42, 4, 42, 9}, //
                                          {10, 11, 12, 13, 14}};
 
@@ -99,26 +99,22 @@ TEST(View, clip_twice)
   ASSERT_TRUE(mln::all_of(ima == ref));
 }
 
-template <mln::concepts::detail::WritableImage I>
-void foo(I&);
-
-
 TEST(View, clip_other_a_box2d)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                                         {5, 6, 4, 8, 9}, //
-                                         {10, 11, 12, 13, 14}};
+  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+                           {5, 6, 4, 8, 9}, //
+                           {10, 11, 12, 13, 14}};
 
-  mln::experimental::image2d<int> ref = {{0, 42, 42, 3, 4}, //
-                                         {5, 42, 42, 8, 9}, //
-                                         {10, 11, 12, 13, 14}};
+  mln::image2d<int> ref = {{0, 42, 42, 3, 4}, //
+                           {5, 42, 42, 8, 9}, //
+                           {10, 11, 12, 13, 14}};
 
-  mln::experimental::box2d domain({1, 0}, {3, 2});
+  mln::box2d domain({1, 0}, {3, 2});
 
   // Clip returns an 'image2d'
-  mln::experimental::image2d<int> clipped = mln::view::clip(ima, domain);
+  mln::image2d<int> clipped = mln::view::clip(ima, domain);
   fill(clipped, 42);
 
 
@@ -144,9 +140,9 @@ TEST(Core, Clip_where)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima(5, 5);
+  mln::image2d<int> ima(5, 5);
 
-  mln::experimental::image2d<int> ref = {
+  mln::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 42, 42, 42, 42}, //
@@ -155,7 +151,7 @@ TEST(Core, Clip_where)
   };
 
   mln::iota(ima, 0);
-  mln::fill(mln::view::clip(ima, mln::experimental::where(ima > 10)), 42);
+  mln::fill(mln::view::clip(ima, mln::where(ima > 10)), 42);
   ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
@@ -163,9 +159,9 @@ TEST(Core, Clip_wherex2_joints)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima(5, 5);
+  mln::image2d<int> ima(5, 5);
 
-  mln::experimental::image2d<int> ref = {
+  mln::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 11, 12, 13, 14}, //
@@ -174,7 +170,7 @@ TEST(Core, Clip_wherex2_joints)
   };
 
   mln::iota(ima, 0);
-  mln::fill(mln::view::clip(mln::view::clip(ima, mln::experimental::where(ima > 10)), mln::experimental::where(ima > 20)), 42);
+  mln::fill(mln::view::clip(mln::view::clip(ima, mln::where(ima > 10)), mln::where(ima > 20)), 42);
   ASSERT_IMAGES_EQ_EXP(ima, ref);
 }
 
@@ -182,9 +178,9 @@ TEST(Core, Clip_wherex2_disjoints)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima(5, 5);
+  mln::image2d<int> ima(5, 5);
 
-  mln::experimental::image2d<int> ref = {
+  mln::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 42, 42, 42, 42}, //
@@ -193,8 +189,8 @@ TEST(Core, Clip_wherex2_disjoints)
   };
 
   mln::iota(ima, 0);
-  auto clipped_ima = mln::view::clip(ima, mln::experimental::where(ima > 10));
-  mln::fill(mln::view::clip(clipped_ima, mln::experimental::where(clipped_ima < 20)), 42);
+  auto clipped_ima = mln::view::clip(ima, mln::where(ima > 10));
+  mln::fill(mln::view::clip(clipped_ima, mln::where(clipped_ima < 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 
@@ -202,9 +198,9 @@ TEST(Core, Clip_where_and)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima(5, 5);
+  mln::image2d<int> ima(5, 5);
 
-  mln::experimental::image2d<int> ref = {
+  mln::image2d<int> ref = {
       {0, 1, 2, 3, 4},      //
       {5, 6, 7, 8, 9},      //
       {10, 42, 42, 42, 42}, //
@@ -213,7 +209,7 @@ TEST(Core, Clip_where_and)
   };
 
   mln::iota(ima, 0);
-  mln::fill(mln::view::clip(ima, mln::experimental::where(ima > 10 && ima < 20)), 42);
+  mln::fill(mln::view::clip(ima, mln::where(ima > 10 && ima < 20)), 42);
   ASSERT_TRUE(all_of(ima == ref));
 }
 

@@ -29,8 +29,8 @@ namespace mln::data::experimental
   template <class I, class O>
   void stretch_to(I input, O out)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<O, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<O, mln::details::Image>());
 
     using V = image_value_t<O>;
     static_assert(std::is_convertible<image_value_t<I>, V>::value, "The image value type must be convertible to V");
@@ -54,7 +54,7 @@ namespace mln::data::experimental
   {
     using I = std::remove_reference_t<InputImage>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::Image>());
     static_assert(std::is_convertible<image_value_t<I>, V>::value, "The image value type must be convertible to V");
     static_assert(std::is_arithmetic<V>::value, "V must be arithmetic");
 

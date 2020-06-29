@@ -1,7 +1,7 @@
-#include <mln/labeling/experimental/rag.hpp>
+#include <mln/labeling/rag.hpp>
 
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>
 
@@ -30,13 +30,13 @@ TEST(Labeling, rag_test_1)
 {
 
 
-  mln::experimental::image2d<bool> ima = {{1, 0, 0, 0, 1}, //
+  mln::image2d<bool> ima = {{1, 0, 0, 0, 1}, //
                                           {0, 0, 0, 0, 0}, //
                                           {0, 0, 0, 0, 0}, //
                                           {0, 0, 0, 0, 0}, //
                                           {1, 0, 0, 0, 1}};
 
-  mln::experimental::image2d<int16_t> IZ = {{1, 1, 0, 2, 2}, //
+  mln::image2d<int16_t> IZ = {{1, 1, 0, 2, 2}, //
                                             {1, 1, 0, 2, 2}, //
                                             {0, 0, 0, 0, 0}, //
                                             {3, 3, 0, 4, 4}, //
@@ -46,7 +46,7 @@ TEST(Labeling, rag_test_1)
 
   int       nlabel;
   Graph     graph;
-  auto      lbl = mln::labeling::experimental::rag(ima, mln::experimental::c4, graph, nlabel);
+  auto      lbl = mln::labeling::rag(ima, mln::c4, graph, nlabel);
 
   ASSERT_IMAGES_EQ_EXP(lbl, IZ);
   check_edges(graph, edges_ref);
@@ -57,13 +57,13 @@ TEST(Labeling, rag_test_2)
 {
 
 
-  mln::experimental::image2d<bool> ima = {{1, 0, 0, 0, 1}, //
+  mln::image2d<bool> ima = {{1, 0, 0, 0, 1}, //
                                           {0, 0, 0, 0, 0}, //
                                           {0, 0, 0, 0, 0}, //
                                           {0, 0, 0, 0, 0}, //
                                           {1, 0, 0, 0, 1}};
 
-  mln::experimental::image2d<int16_t> IZ = {{1, 1, 0, 2, 2}, //
+  mln::image2d<int16_t> IZ = {{1, 1, 0, 2, 2}, //
                                             {1, 1, 0, 2, 2}, //
                                             {0, 0, 0, 0, 0}, //
                                             {3, 3, 0, 4, 4}, //
@@ -74,7 +74,7 @@ TEST(Labeling, rag_test_2)
 
   int       nlabel;
   Graph     graph;
-  auto      lbl = mln::labeling::experimental::rag(ima, mln::experimental::c8, graph, nlabel);
+  auto      lbl = mln::labeling::rag(ima, mln::c8, graph, nlabel);
 
   ASSERT_IMAGES_EQ_EXP(lbl, IZ);
   check_edges(graph, edges_ref);
@@ -85,7 +85,7 @@ TEST(Labeling, rag_test_2)
 
 TEST(Labeling, rag_U)
 {
-  mln::experimental::image2d<bool> ima = {{0, 1, 0, 0, 0, 1, 0}, //
+  mln::image2d<bool> ima = {{0, 1, 0, 0, 0, 1, 0}, //
                                           {0, 1, 0, 1, 0, 1, 0}, //
                                           {0, 1, 0, 0, 0, 1, 0}, //
                                           {0, 1, 1, 1, 1, 1, 0}, //
@@ -95,7 +95,7 @@ TEST(Labeling, rag_U)
                                           {0, 1, 0, 0, 0, 1, 0}};
 
 
-  mln::experimental::image2d<int16_t> ref = {{1, 1, 1, 0, 1, 1, 1}, //
+  mln::image2d<int16_t> ref = {{1, 1, 1, 0, 1, 1, 1}, //
                                              {1, 1, 0, 2, 0, 1, 1}, //
                                              {1, 1, 1, 0, 1, 1, 1}, //
                                              {1, 1, 1, 1, 1, 1, 1}, //
@@ -109,7 +109,7 @@ TEST(Labeling, rag_U)
 
   int       nlabel;
   Graph     graph;
-  auto IZ = mln::labeling::experimental::rag(ima, mln::experimental::c4, graph, nlabel);
+  auto IZ = mln::labeling::rag(ima, mln::c4, graph, nlabel);
   ASSERT_EQ(nlabel, 4);
   ASSERT_IMAGES_EQ_EXP(ref, IZ);
   check_edges(graph, edges_ref);

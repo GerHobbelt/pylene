@@ -26,7 +26,7 @@ namespace mln
   } // namespace details
 
   template <class... Images>
-  class zip_view : public experimental::Image<zip_view<Images...>>
+  class zip_view : public mln::details::Image<zip_view<Images...>>
   {
     using tuple_t         = std::tuple<Images...>;
     using I0              = typename std::tuple_element<0, tuple_t>::type;
@@ -64,22 +64,22 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : mln::experimental::Pixel<new_pixel_type>
+    struct pixel_type : mln::details::Pixel<pixel_type>
     {
       using reference               = zip_view::reference;
       using value_type              = zip_view::value_type;
       using site_type[[deprecated]] = zip_view::point_type;
       using point_type              = zip_view::point_type;
 
-      new_pixel_type(image_pixel_t<Images>... pixels)
+      pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}
       {
       }
 
-      new_pixel_type(const new_pixel_type&) = default;
-      new_pixel_type(new_pixel_type&&)      = default;
-      new_pixel_type& operator=(const new_pixel_type&) = delete;
-      new_pixel_type& operator=(new_pixel_type&&) = delete;
+      pixel_type(const pixel_type&) = default;
+      pixel_type(pixel_type&&)      = default;
+      pixel_type& operator=(const pixel_type&) = delete;
+      pixel_type& operator=(pixel_type&&) = delete;
 
       point_type point() const { return std::get<0>(m_pixels).point(); }
       reference  val() const
@@ -119,18 +119,18 @@ namespace mln
       return std::get<0>(m_images).template ch_value<V>();
     }
 
-    auto new_values()
+    auto values()
     {
-      auto g_new_values = [](auto&&... images) { return ranges::view::zip(images.new_values()...); };
+      auto g_new_values = [](auto&&... images) { return ranges::view::zip(images.values()...); };
       return std::apply(g_new_values, m_images);
     }
 
-    auto new_pixels()
+    auto pixels()
     {
-      auto g_new_pixels = [](auto&&... images) {
-        return ranges::view::zip_with(mln::details::make_object<new_pixel_type>{}, images.new_pixels()...);
+      auto g_pixels = [](auto&&... images) {
+        return ranges::view::zip_with(mln::details::make_object<pixel_type>{}, images.pixels()...);
       };
-      return std::apply(g_new_pixels, m_images);
+      return std::apply(g_pixels, m_images);
     }
 
 
@@ -150,17 +150,17 @@ namespace mln
       return std::apply(g, m_images);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(all_domain_has(p));
-      return this->new_pixel_at(p);
+      return this->pixel_at(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      auto g = [p](auto&&... images) { return new_pixel_type(images.new_pixel_at(p)...); };
+      auto g = [p](auto&&... images) { return pixel_type(images.pixel_at(p)...); };
       return std::apply(g, m_images);
     }
     /// \}
@@ -180,7 +180,7 @@ namespace mln
     template <class... Images>
     zip_view<Images...> zip(Images... images)
     {
-      static_assert(std::conjunction_v<is_a<Images, experimental::Image>...>, "All zip arguments must be images.");
+      static_assert(std::conjunction_v<is_a<Images, mln::details::Image>...>, "All zip arguments must be images.");
 
       return zip_view<Images...>(std::move(images)...);
     }

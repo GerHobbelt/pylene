@@ -1,7 +1,7 @@
-#include <mln/morpho/experimental/component_tree.hpp>
+#include <mln/morpho/component_tree.hpp>
 
 
-namespace mln::morpho::experimental
+namespace mln::morpho
 {
   void component_tree<void>::filter_direct(const std::vector<bool>& pred)
   {

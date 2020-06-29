@@ -14,18 +14,18 @@
 namespace mln
 {
   template <class SE>
-  struct se_facade : experimental::StructuringElement<SE>
+  struct se_facade : mln::details::StructuringElement<SE>
   {
-    template <class P, std::enable_if_t<is_a<P, mln::experimental::Pixel>::value, long> = 0>
-    auto operator()(const P& pixel) const
+    template <class P>
+    requires(mln::is_a<P, mln::details::Pixel>::value) auto operator()(const P& pixel) const
     {
       return details::sliding_pixel_range{pixel, static_cast<const SE*>(this)->offsets()};
     }
 
-    template <class P, std::enable_if_t<!is_a<P, mln::experimental::Pixel>::value, int> = 0>
-    auto operator()(const P& point) const
+    template <class P>
+    requires(!mln::is_a<P, mln::details::Pixel>::value) auto operator()(const P& point) const
     {
-      return ::ranges::view::transform(static_cast<const SE*>(this)->offsets(), details::add_point<P>{point});
+      return ::ranges::views::transform(static_cast<const SE*>(this)->offsets(), details::add_point<P>{point});
     }
   };
 

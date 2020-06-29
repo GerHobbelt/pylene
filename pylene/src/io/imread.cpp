@@ -1,10 +1,10 @@
-#include <mln/io/experimental/imread.hpp>
+#include <mln/io/imread.hpp>
 
 #include <mln/io/private/io.hpp>
 #include <mln/io/private/freeimage_plugin.hpp>
-#include <mln/core/image/experimental/ndbuffer_image.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
 
-namespace mln::io::experimental
+namespace mln::io
 {
   mln::ndbuffer_image imread(const std::string& filename)
   {

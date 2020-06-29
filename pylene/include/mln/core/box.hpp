@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/experimental/point.hpp>
+#include <mln/core/point.hpp>
 #include <mln/core/range/mdindex.hpp>
 
 #include <array>
@@ -8,7 +8,7 @@
 #include <algorithm>
 
 
-namespace mln::experimental
+namespace mln
 {
   // Forward declaration
   template <class Impl>
@@ -98,8 +98,8 @@ namespace mln::experimental
       return size(2);
     }
 
-    using Impl::cursor;
-    using Impl::backward_cursor;
+    using typename Impl::cursor;
+    using typename Impl::backward_cursor;
     using Impl::begin_cursor;
     using Impl::end_cursor;
     using Impl::rbegin_cursor;
@@ -713,11 +713,11 @@ namespace mln::experimental
   template <class Impl>
   constexpr std::size_t _box<Impl>::size() const noexcept
   {
-    std::size_t sz = 1;
+    int sz = 1;
     for (int k = 0; k < this->dim(); ++k)
       sz *= (this->__end(k) - this->__begin(k));
     if (sz < 0)
-      sz = 0;
+      return 0;
     return sz;
   }
 
@@ -870,18 +870,18 @@ namespace mln::experimental
     return q;
   }
 
-} // namespace mln::experimental
+} // namespace mln
 
 
 // Specialization of std::common_reference
 namespace concepts
 {
   template <class UImpl, class VImpl, template <class> class TQual, template <class> class UQual>
-  struct basic_common_reference<mln::experimental::_box<UImpl>, mln::experimental::_box<VImpl>, TQual, UQual>
+  struct basic_common_reference<mln::_box<UImpl>, mln::_box<VImpl>, TQual, UQual>
   {
     static_assert((UImpl::ndim == -1) || (VImpl::ndim == -1) || (UImpl::ndim == UImpl::ndim),
                   "Incompatible number of dimensions.");
-    using type = mln::experimental::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
+    using type = mln::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
   };
 }
 
@@ -889,7 +889,7 @@ namespace concepts
 namespace ranges
 {
   template <typename Impl>
-  struct range_cardinality<mln::experimental::_box<Impl>, void> :
+  struct range_cardinality<mln::_box<Impl>, void> :
     std::integral_constant<cardinality, finite>
   {
   };

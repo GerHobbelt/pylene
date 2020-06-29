@@ -1,16 +1,16 @@
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
 #include <mln/core/se/rect2d.hpp>
 
-#include <mln/morpho/experimental/closing.hpp>
-#include <mln/morpho/experimental/dilation.hpp>
-#include <mln/morpho/experimental/erosion.hpp>
-#include <mln/morpho/experimental/opening.hpp>
-#include <mln/morpho/experimental/median_filter.hpp>
-#include <mln/morpho/experimental/gradient.hpp>
+#include <mln/morpho/closing.hpp>
+#include <mln/morpho/dilation.hpp>
+#include <mln/morpho/erosion.hpp>
+#include <mln/morpho/opening.hpp>
+#include <mln/morpho/median_filter.hpp>
+#include <mln/morpho/gradient.hpp>
 
-#include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imsave.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 
 
 #include <algorithm>
@@ -133,39 +133,39 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  mln::experimental::image2d<uint8_t> input, output;
-  mln::io::experimental::imread(vm["input"].as<std::string>(), input);
+  mln::image2d<uint8_t> input, output;
+  mln::io::imread(vm["input"].as<std::string>(), input);
 
 
-  mln::experimental::se::rect2d nbh(size, size);
+  mln::se::rect2d nbh(size, size);
 
   switch (vm["operator"].as<morpho_op_type>())
   {
   case kErosion:
-    output = mln::morpho::experimental::erosion(input, nbh);
+    output = mln::morpho::erosion(input, nbh);
     break;
   case kDilation:
-    output = mln::morpho::experimental::dilation(input, nbh);
+    output = mln::morpho::dilation(input, nbh);
     break;
   case kOpening:
-    output = mln::morpho::experimental::opening(input, nbh);
+    output = mln::morpho::opening(input, nbh);
     break;
   case kClosing:
-    output = mln::morpho::experimental::closing(input, nbh);
+    output = mln::morpho::closing(input, nbh);
     break;
   case kMedian:
-    output = mln::morpho::experimental::median_filter(input, nbh, mln::extension::bm::mirror{});
+    output = mln::morpho::median_filter(input, nbh, mln::extension::bm::mirror{});
     break;
   case kGradient:
-    output = mln::morpho::experimental::gradient(input, nbh);
+    output = mln::morpho::gradient(input, nbh);
     break;
   case kExternalGradient:
-    output = mln::morpho::experimental::external_gradient(input, nbh);
+    output = mln::morpho::external_gradient(input, nbh);
     break;
   case kInternalGradient:
-    output = mln::morpho::experimental::internal_gradient(input, nbh);
+    output = mln::morpho::internal_gradient(input, nbh);
     break;
   }
 
-  mln::io::experimental::imsave(output, vm["output"].as<std::string>());
+  mln::io::imsave(output, vm["output"].as<std::string>());
 }

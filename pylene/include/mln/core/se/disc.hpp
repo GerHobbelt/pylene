@@ -3,26 +3,25 @@
 #include <mln/core/se/private/se_facade.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/se/custom_se.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
+#include <mln/core/se/custom_se.hpp>
 
 #include <range/v3/view/span.hpp>
-
-#include <array>
 #include <vector>
+#include <array>
 
 
 /// \file
 
-namespace mln::experimental::se
+namespace mln::se
 {
 
   /// Create a disc of a given radius r with or without approximation.
   ///
   ///
   /// The extent of the structuring will be 2*⌊r⌋+1. If an n-approximation is
-  /// given, the radial decomposition of the disc is used when possible. The
-  /// approximation is a 2-n side polygon. If 0, the exact euclidean disc is
+  /// given, the radial decomposition of the disc is used when possible.  The
+  /// approximiation is a 2-n side polygon. If 0, the exact euclidean disc is
   /// used, that are all points \f$ \{p \mid |p| \le r\} \f$
   ///
   /// \rst
@@ -72,7 +71,7 @@ namespace mln::experimental::se
 
     /// \brief Return a range of SE for decomposition
     /// \exception std::runtime_error if not decomposable
-    std::vector<mln::experimental::se::periodic_line2d> decompose() const;
+    std::vector<mln::se::periodic_line2d> decompose() const;
 
     /// \brief Return a range of SE offsets
     ::ranges::span<point2d> offsets() const;
@@ -91,22 +90,22 @@ namespace mln::experimental::se
     bool is_incremental() const;
 
     /// \brief Returns the radius of the disc.
-    float radius() const;
+    float radius() const { return m_radius; }
 
     /// \brief Returns the extent radius
     int radial_extent() const { return static_cast<int>(m_radius); }
 
     /// \brief Return the input ROI for 2D box.
-    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_input_region(mln::box2d roi) const;
 
     /// \brief Return the output ROI for 2D box.
-    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_output_region(mln::box2d roi) const;
 
 
   private:
     struct cache_data_t
     {
-      std::vector<mln::experimental::point2d> m_points;  // Disc points + inc points + dec points
+      std::vector<mln::point2d> m_points;  // Disc points + inc points + dec points
       std::ptrdiff_t                          m_se_size; // Number of points in the no-approx disc
     };
 
@@ -171,15 +170,15 @@ namespace mln::experimental::se
     int radial_extent() const { return static_cast<int>(radius()); }
 
     /// \brief Return the input ROI for 2D box.
-    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_input_region(mln::box2d roi) const;
 
     /// \brief Return the output ROI for 2D box.
-    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_output_region(mln::box2d roi) const;
 
   private:
     disc m_disc;
   };
-} // namespace mln::experimental::se
+} // namespace mln::se
 
 
 namespace mln::se::details

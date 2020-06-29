@@ -29,10 +29,10 @@ namespace mln::morpho::experimental
   /// \param out (optional) Output image 𝑔 so store the result.
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  median_filter(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm);
+  median_filter(InputImage&& image, const mln::StructuringElement<SE>& se, BorderManager bm);
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void median_filter(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
+  void median_filter(InputImage&& image, const mln::StructuringElement<SE>& se, BorderManager bm,
                      OutputImage&& out);
 
 
@@ -42,7 +42,7 @@ namespace mln::morpho::experimental
 
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void median_filter(InputImage&& input, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
+  void median_filter(InputImage&& input, const mln::StructuringElement<SE>& se, BorderManager bm,
                      OutputImage&& out)
   {
     using R = std::ratio<1, 2>;
@@ -52,7 +52,7 @@ namespace mln::morpho::experimental
 
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  median_filter(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm)
+  median_filter(InputImage&& image, const mln::StructuringElement<SE>& se, BorderManager bm)
   {
     using R = std::ratio<1, 2>;
     return rank_filter<R>(std::forward<InputImage>(image), se, bm);

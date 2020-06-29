@@ -155,8 +155,8 @@ namespace mln::labeling::experimental
   template <typename Label, typename I, typename N, typename Graph>
   image_ch_value_t<I, Label> rag(I input, N nbh, Graph& graph, int& nlabel)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     static_assert(std::is_convertible<image_value_t<I>, bool>::value, "Image value type must be convertible to bool.");
     static_assert(std::is_same<typename boost::graph_traits<Graph>::directed_category, boost::undirected_tag>::value,

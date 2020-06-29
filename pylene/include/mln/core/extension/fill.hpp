@@ -7,8 +7,7 @@
 namespace mln::extension
 {
   template <class InputImage>
-  std::enable_if_t<mln::is_a<InputImage, mln::experimental::Image>::value>
-  fill(const InputImage& f, image_value_t<InputImage> v);
+  void fill(const InputImage& f, image_value_t<InputImage> v);
 
   template <class InputImage>
   bool try_fill(const InputImage& f, image_value_t<InputImage> v);
@@ -18,9 +17,9 @@ namespace mln::extension
   /******************************************/
 
   template <typename InputImage>
-  std::enable_if_t<mln::is_a<InputImage, mln::experimental::Image>::value>
-  fill(const InputImage& ima, image_value_t<InputImage> v)
+  void fill(const InputImage& ima, image_value_t<InputImage> v)
   {
+    static_assert(mln::is_a<InputImage, mln::details::Image>::value);
     static_assert(image_has_extension_v<InputImage>, "Image must have an extension.");
     static_assert(image_extension_t<InputImage>::support_fill::value, "Image extension must support filling.");
 
@@ -30,7 +29,7 @@ namespace mln::extension
   template <class InputImage>
   bool try_fill(const InputImage& f, image_value_t<InputImage> v)
   {
-    static_assert(mln::is_a<InputImage, mln::experimental::Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
 
     using I = std::remove_reference_t<InputImage>;
     if constexpr (image_has_extension_v<I>)

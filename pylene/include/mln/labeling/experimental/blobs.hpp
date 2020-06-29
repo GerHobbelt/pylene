@@ -124,7 +124,7 @@ namespace mln::labeling::experimental
   [[gnu::noinline]]
   image_ch_value_t<I, Label> blobs(I ima, N nbh, int& nlabel)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     static_assert(std::is_convertible<image_value_t<I>, bool>::value, "Only supports binary image (type: bool)");
 
     image_build_error_code     status;

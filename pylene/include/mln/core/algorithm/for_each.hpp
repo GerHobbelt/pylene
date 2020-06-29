@@ -18,10 +18,10 @@ namespace mln
   template <class InputImage, class UnaryFunction>
   void for_each(InputImage input, UnaryFunction f)
   {
-    static_assert(mln::is_a<InputImage, experimental::Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
     static_assert(::ranges::invocable<UnaryFunction, image_reference_t<InputImage>>);
 
-    auto&& vals = input.new_values();
+    auto&& vals = input.values();
     for (auto r : ranges::rows(vals))
       ::ranges::for_each(r, f);
   }

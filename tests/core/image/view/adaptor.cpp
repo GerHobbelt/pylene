@@ -7,14 +7,14 @@
 
 
 template <class I>
-struct identity : mln::image_adaptor<I>, mln::experimental::Image<identity<I>>
+struct identity : mln::image_adaptor<I>, mln::details::Image<identity<I>>
 {
   using identity::image_adaptor::image_adaptor;
 };
 
 
 template <class Pix>
-struct identity_pixel : mln::pixel_adaptor<Pix>, mln::experimental::Pixel<identity_pixel<Pix>>
+struct identity_pixel : mln::pixel_adaptor<Pix>, mln::details::Pixel<identity_pixel<Pix>>
 {
   using identity_pixel::pixel_adaptor::pixel_adaptor;
 };

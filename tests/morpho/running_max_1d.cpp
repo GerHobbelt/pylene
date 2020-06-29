@@ -1,4 +1,4 @@
-#include <mln/morpho/experimental/private/running_max_1d.hpp>
+#include <mln/morpho/private/running_max_1d.hpp>
 
 #include <functional>
 #include <gtest/gtest.h>
@@ -78,7 +78,7 @@ public:
     // Run algorithm
     std::vector<int> g(size);
     std::vector<int> h(size);
-    mln::morpho::experimental::details::running_max_1d(f.data() + radius, g.data() + radius, h.data() + radius, n,
+    mln::morpho::details::running_max_1d(f.data() + radius, g.data() + radius, h.data() + radius, n,
                                                        radius, m_sup);
 
     EXPECT_EQ(gref, g);
@@ -129,7 +129,7 @@ TEST_P(RunningMin1D, check)
 
 
 
-INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMax1D,
+INSTANTIATE_TEST_SUITE_P(se_leq_size, RunningMax1D,
                         ::testing::Values(std::make_tuple(0, 0),    // Identity
                                           std::make_tuple(12, 0),   // Identity
                                           std::make_tuple(12, 1),   // radius = 1
@@ -140,9 +140,9 @@ INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMax1D,
                                           std::make_tuple(14, 3),   // radius = 3
                                           std::make_tuple(13, 6))); // n == k
 
-INSTANTIATE_TEST_CASE_P(se_ge_size_, RunningMax1D, ::testing::Values(std::make_tuple(12, 6)));
+INSTANTIATE_TEST_SUITE_P(se_ge_size_, RunningMax1D, ::testing::Values(std::make_tuple(12, 6)));
 
-INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMin1D,
+INSTANTIATE_TEST_SUITE_P(se_leq_size, RunningMin1D,
                         ::testing::Values(std::make_tuple(0, 0),    // Identity
                                           std::make_tuple(12, 0),   // Identity
                                           std::make_tuple(12, 1),   // radius = 1
@@ -153,5 +153,5 @@ INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMin1D,
                                           std::make_tuple(14, 3),   // radius = 3
                                           std::make_tuple(13, 6))); // n == k
 
-INSTANTIATE_TEST_CASE_P(se_ge_size_, RunningMin1D, ::testing::Values(std::make_tuple(12, 6)));
+INSTANTIATE_TEST_SUITE_P(se_ge_size_, RunningMin1D, ::testing::Values(std::make_tuple(12, 6)));
 

@@ -70,7 +70,7 @@ namespace mln::canvas
           }
         }
 
-        auto zz = ranges::view::zip(this->m_i.new_pixels(), this->m_j.new_pixels());
+        auto zz = ranges::view::zip(this->m_i.pixels(), this->m_j.pixels());
         for (auto rows : ranges::rows(zz))
         {
           this->ExecuteAtLineStart();

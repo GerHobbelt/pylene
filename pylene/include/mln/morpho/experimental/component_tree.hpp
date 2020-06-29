@@ -279,7 +279,7 @@ namespace mln::morpho::experimental
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_points");
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     static_assert(mln::is_a<Accu, mln::AccumulatorLike>());
     using R = typename accu::result_of<Accu, image_point_t<I>>::type;
 
@@ -312,7 +312,7 @@ namespace mln::morpho::experimental
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_values");
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     static_assert(mln::is_a<Accu, mln::AccumulatorLike>());
     using R = typename accu::result_of<Accu, image_value_t<J>>::type;
 
@@ -346,7 +346,7 @@ namespace mln::morpho::experimental
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_pixels");
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     static_assert(mln::is_a<Accu, mln::AccumulatorLike>());
     using R = typename accu::result_of<Accu, image_pixel_t<J>>::type;
 

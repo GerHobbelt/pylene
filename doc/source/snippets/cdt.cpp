@@ -1,10 +1,10 @@
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/se/mask2d.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/data/experimental/stretch.hpp>
-#include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imsave.hpp>
-#include <mln/labeling/experimental/chamfer_distance_transform.hpp>
+#include <mln/data/stretch.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/labeling/chamfer_distance_transform.hpp>
 
 
 #include <cstdint>
@@ -54,36 +54,36 @@ int main(int argc, char** argv)
     std::abort();
   }
 
-  mln::experimental::image2d<bool> input;
-  mln::io::experimental::imread(argv[2], input);
+  mln::image2d<bool> input;
+  mln::io::imread(argv[2], input);
 
   // BEGIN
   // (1) Compute the distance transform
-  mln::se::experimental::wmask2d<int> weights;
+  mln::se::wmask2d<int> weights;
 
   switch (std::atoi(argv[1]))
   {
   case 1:
-    weights = mln::se::experimental::wmask2d({{0, 1, 0}, //
-                                              {1, 0, 1},
-                                              {0, 1, 0}});
+    weights = mln::se::wmask2d({{0, 1, 0}, //
+                                {1, 0, 1},
+                                {0, 1, 0}});
     break;
   case 2:
-    weights = mln::se::experimental::wmask2d({{1, 1, 1}, //
-                                              {1, 0, 1},
-                                              {1, 1, 1}});
+    weights = mln::se::wmask2d({{1, 1, 1}, //
+                                {1, 0, 1},
+                                {1, 1, 1}});
     break;
   case 3:
-    weights = mln::se::experimental::wmask2d({{3, 2, 3}, //
-                                              {2, 0, 2},
-                                              {3, 2, 3}});
+    weights = mln::se::wmask2d({{3, 2, 3}, //
+                                {2, 0, 2},
+                                {3, 2, 3}});
     break;
   case 4:
-    weights = mln::se::experimental::wmask2d({{+0, 11, +0, 11, +0}, //
-                                              {11, +7, +5, +7, 11},
-                                              {+0, +5, +0, +5, +0},
-                                              {11, +7, +5, +7, 11},
-                                              {+0, 11, +0, 11, +0}});
+    weights = mln::se::wmask2d({{+0, 11, +0, 11, +0}, //
+                                {11, +7, +5, +7, 11},
+                                {+0, +5, +0, +5, +0},
+                                {11, +7, +5, +7, 11},
+                                {+0, 11, +0, 11, +0}});
     break;
   default:
     std::cerr << "Bad type.\n";
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
   }
 
 
-  auto d = mln::labeling::experimental::chamfer_distance_transform<int16_t>(input, weights, true);
-  auto d_stretched = mln::data::experimental::stretch<float>(d);
-  mln::io::experimental::imsave(mln::transform(d_stretched, heat_lut), argv[3]);
+  auto d = mln::labeling::chamfer_distance_transform<int16_t>(input, weights, true);
+  auto d_stretched = mln::data::stretch<float>(d);
+  mln::io::imsave(mln::transform(d_stretched, heat_lut), argv[3]);
 }

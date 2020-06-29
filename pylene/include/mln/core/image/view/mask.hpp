@@ -30,14 +30,14 @@ namespace mln
 
 
   template <class I, class M>
-  class mask_view : public image_adaptor<I>, public experimental::Image<mask_view<I, M>>
+  class mask_view : public image_adaptor<I>, public mln::details::Image<mask_view<I, M>>
   {
     M m_mask;
 
   public:
     /// Type definitions
     /// \{
-    using new_pixel_type = image_pixel_t<I>;
+    using pixel_type = image_pixel_t<I>;
     using typename mask_view::image_adaptor::point_type;
     using typename mask_view::image_adaptor::reference;
     using typename mask_view::image_adaptor::value_type;
@@ -84,16 +84,16 @@ namespace mln
     template <class U>
     image_builder<ch_value_type<U>, mask_view> ch_value() const { return {*this}; }
 
-    domain_type domain() const { return mln::experimental::where(m_mask); }
+    domain_type domain() const { return mln::where(m_mask); }
 
-    auto new_values()
+    auto values()
     {
-      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().new_values(), m_mask.new_values());
+      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().values(), m_mask.values());
     }
 
-    auto new_pixels()
+    auto pixels()
     {
-      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().new_pixels(), m_mask.new_values());
+      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().pixels(), m_mask.values());
     }
 
     /// Accessible-image related methods (overwritten from adaptor)
@@ -106,18 +106,18 @@ namespace mln
       return this->base()(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(m_mask.domain().has(p));
       mln_precondition(this->base().domain().has(p));
-      return this->base().new_pixel(p);
+      return this->base().pixel(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return this->base().new_pixel_at(p);
+      return this->base().pixel_at(p);
     }
     /// \}
 
@@ -136,8 +136,8 @@ namespace mln
     template <class I, class M>
     mask_view<I, M> mask(I ima, M mask)
     {
-      static_assert(mln::is_a<I, experimental::Image>());
-      static_assert(mln::is_a<M, experimental::Image>());
+      static_assert(mln::is_a<I, mln::details::Image>());
+      static_assert(mln::is_a<M, mln::details::Image>());
 
       // FIXME: make ima a view first ?
       return {std::move(ima), std::move(mask)};

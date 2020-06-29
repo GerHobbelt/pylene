@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
 #include <stdexcept>
 

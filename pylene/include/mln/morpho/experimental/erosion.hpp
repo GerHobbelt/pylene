@@ -15,19 +15,19 @@ namespace mln::morpho::experimental
 {
 
   template <class InputImage, class SE>
-  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se);
+  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se);
 
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
-           std::enable_if_t<!mln::is_a<BorderManager, mln::experimental::Image>::value>* = nullptr);
+  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
+           std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>* = nullptr);
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::experimental::Image>::value>
-  erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, OutputImage&& out);
+  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
+  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out);
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
+  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
                 OutputImage&& out);
 
 
@@ -73,7 +73,7 @@ namespace mln::morpho::experimental
   }
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
+  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
                 OutputImage&& out)
   {
     using I = std::remove_reference_t<InputImage>;
@@ -91,7 +91,7 @@ namespace mln::morpho::experimental
 
 
   template <class InputImage, class SE>
-  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se)
+  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se)
   {
     using I = std::remove_reference_t<InputImage>;
 
@@ -101,8 +101,8 @@ namespace mln::morpho::experimental
   }
 
   template <class InputImage, class SE, class BorderManager>
-  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
-                                                                 std::enable_if_t<!mln::is_a<BorderManager, mln::experimental::Image>::value>*)
+  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
+                                                                 std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>*)
   {
     using I = std::remove_reference_t<InputImage>;
 
@@ -112,8 +112,8 @@ namespace mln::morpho::experimental
   }
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::experimental::Image>::value>
-  erosion(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, OutputImage&& out)
+  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
+  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out)
   {
     using I = std::remove_reference_t<InputImage>;
     erosion(image, se, mln::extension::bm::fill(mln::value_traits<image_value_t<I>>::sup()),  out);

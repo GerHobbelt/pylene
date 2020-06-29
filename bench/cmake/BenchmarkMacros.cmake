@@ -23,8 +23,7 @@ function(add_benchmark Executable)
   target_link_libraries(${Benchmark_NAME} PRIVATE Fixtures::ImagePath BenchImpl Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
   target_include_directories(${Benchmark_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
   add_dependencies(build-bench ${Benchmark_NAME})
-  # add_sanitizers(${Benchmark_NAME})
-  
+
   # Retrieve reference
   set(Benchmark_OUTPUT_FILE ${Benchmark_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}.json)
 

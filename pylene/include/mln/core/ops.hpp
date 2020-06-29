@@ -192,16 +192,18 @@ namespace mln
 // definition instead of the instanciation.
 namespace mln
 {
-  namespace details
+  namespace details::_getter
   {
-    template <std::size_t N, class C, std::enable_if_t<std::is_scalar_v<std::remove_reference_t<C>>, int> = 0>
+    template <std::size_t N, class C>
+    requires(std::is_scalar_v<std::remove_reference_t<C>>)
     decltype(auto) get(C&& obj)
     {
       static_assert(N == 0, "N must be 0 for scalar type");
       return std::forward<C>(obj);
     }
 
-    template <std::size_t N, class C, std::enable_if_t<!std::is_scalar_v<std::remove_reference_t<C>>, long> = 0>
+    template <std::size_t N, class C>
+    requires (!std::is_scalar_v<std::remove_reference_t<C>>)
     decltype(auto) get(C&& obj)
     {
       // Force ADL look up
@@ -213,10 +215,9 @@ namespace mln
   struct getter
   {
     template <class C>
-    auto operator()(C&& obj) const -> decltype(details::get<N>(std::forward<C>(obj)))
+    decltype(auto) operator()(C&& obj) const
     {
-      using namespace std;
-      return details::get<N>(std::forward<C>(obj));
+      return details::_getter::get<N>(std::forward<C>(obj));
     }
   };
 } // namespace mln

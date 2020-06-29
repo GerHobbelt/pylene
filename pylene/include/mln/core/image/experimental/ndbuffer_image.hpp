@@ -61,7 +61,7 @@ namespace mln
 
     /// Type definitions
     /// \{
-    using point_type      = mln::experimental::Point;
+    using point_type      = mln::Point;
     using value_type      = void*; // FIXME: std::any
     using reference       = void*; // FIXME: any_ref
     using const_reference = const void*; // FIXME: any_ref

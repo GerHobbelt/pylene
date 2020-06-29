@@ -30,10 +30,10 @@ namespace mln::morpho::experimental
   /// \tparam Ratio A std::ratio type that defines the rank of the filtered value.
   template <class Ratio, class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  rank_filter(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm);
+  rank_filter(InputImage&& image, const mln::StructuringElement<SE>& se, BorderManager bm);
 
   template <class Ratio, class InputImage, class SE, class BorderManager, class OutputImage>
-  void rank_filter(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
+  void rank_filter(InputImage&& image, const mln::StructuringElement<SE>& se, BorderManager bm,
                    OutputImage&& out);
 
 
@@ -43,11 +43,11 @@ namespace mln::morpho::experimental
 
 
   template <class Ratio, class InputImage, class SE, class BorderManager, class OutputImage>
-  void rank_filter(InputImage&& input, const mln::experimental::StructuringElement<SE>& se, BorderManager bm,
+  void rank_filter(InputImage&& input, const mln::StructuringElement<SE>& se, BorderManager bm,
                    OutputImage&& out)
   {
     using I = std::remove_reference_t<InputImage>;
-    static_assert(mln::is_a<I, mln::experimental::Image>::value);
+    static_assert(mln::is_a<I, mln::details::Image>::value);
 
     using V = image_value_t<I>;
     mln_entering("mln::morpho::experimental::rank_filter");
@@ -69,10 +69,10 @@ namespace mln::morpho::experimental
 
   template <class Ratio, class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  rank_filter(InputImage&& image, const mln::experimental::StructuringElement<SE>& se, BorderManager bm)
+  rank_filter(InputImage&& image, const mln::StructuringElement<SE>& se, BorderManager bm)
   {
     using I = std::remove_reference_t<InputImage>;
-    static_assert(mln::is_a<I, mln::experimental::Image>::value);
+    static_assert(mln::is_a<I, mln::details::Image>::value);
 
     image_concrete_t<I> out = imconcretize(image);
     rank_filter<Ratio>(image, se, bm, out);

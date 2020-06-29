@@ -99,7 +99,7 @@ public:
 
 
 using MyTypes = ::testing::Types<std::array<int, 1>, std::array<int, 2>, std::array<int, 3>, std::array<int, 4>>;
-TYPED_TEST_CASE(MdspanTest, MyTypes);
+TYPED_TEST_SUITE(MdspanTest, MyTypes);
 
 TYPED_TEST(MdspanTest, forward)
 {

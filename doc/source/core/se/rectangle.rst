@@ -4,7 +4,7 @@ Rectangle
 Include :file:`<mln/core/se/rect2d.hpp>`
 
 
-.. doxygenstruct:: mln::experimental::se::rect2d
+.. doxygenstruct:: mln::se::rect2d
    :members:
 
 

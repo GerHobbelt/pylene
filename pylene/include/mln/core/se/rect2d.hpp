@@ -9,7 +9,7 @@
 #include <vector>
 /// \file
 
-namespace mln::experimental::se
+namespace mln::se
 {
 
   /// \brief Define a dynamic rectangular window anchored at (0,0).
@@ -63,13 +63,13 @@ namespace mln::experimental::se
     int radial_extent() const;
 
     /// \brief Compute the input region of a ROI
-    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_input_region(mln::box2d roi) const;
 
     /// \brief Compute the output region of a ROI
-    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_output_region(mln::box2d roi) const;
 
   private:
-    mln::experimental::box2d m_dpoints;
+    mln::box2d m_dpoints;
   };
 
 
@@ -110,13 +110,13 @@ namespace mln::experimental::se
     int radial_extent() const;
 
     /// \brief Compute the input region of a ROI
-    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_input_region(mln::box2d roi) const;
 
     /// \brief Compute the output region of a ROI
-    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_output_region(mln::box2d roi) const;
 
   private:
     rect2d m_rect;
   };
 
-} // namespace mln::experimental::se
+} // namespace mln::se

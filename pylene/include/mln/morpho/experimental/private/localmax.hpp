@@ -14,7 +14,7 @@ namespace mln::morpho::experimental::details
 
     // Specialized - Periodic line with box2d domain
     template <class I, class J, class ValueSet>
-    void localmax(I& in, J& out, ValueSet& vs, const mln::experimental::se::periodic_line2d& se, const mln::experimental::box2d& roi)
+    void localmax(I& in, J& out, ValueSet& vs, const mln::se::periodic_line2d& se, const mln::box2d& roi)
     {
       mln::trace::warn("[Performance] Running the specialization with perodic lines.");
       mln::morpho::details::dilation_by_periodic_line(in, out, se, vs.sup, roi);
@@ -22,7 +22,7 @@ namespace mln::morpho::experimental::details
 
     // Specialized - Periodic line with box2d domain
     template <class I, class ValueSet>
-    void localmax_inplace(I& inout, ValueSet& vs, const mln::experimental::se::periodic_line2d& se, const mln::experimental::box2d& roi)
+    void localmax_inplace(I& inout, ValueSet& vs, const mln::se::periodic_line2d& se, const mln::box2d& roi)
     {
       mln::trace::warn("[Performance] Running the specialization with perodic lines.");
       mln::morpho::details::dilation_by_periodic_line(inout, inout, se, vs.sup, roi);
@@ -30,7 +30,7 @@ namespace mln::morpho::experimental::details
 
     // Generic - Regular SE over a domain
     template <class I, class J, class ValueSet, class SE, class D>
-    void localmax(I& in, J& out, ValueSet& vs, const mln::experimental::StructuringElement<SE>& se, const D&)
+    void localmax(I& in, J& out, ValueSet& vs, const mln::details::StructuringElement<SE>& se, const D&)
     {
       if constexpr (SE::incremental::value && ValueSet::has_incremental_sup::value)
       {

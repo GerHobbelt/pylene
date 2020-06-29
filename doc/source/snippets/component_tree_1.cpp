@@ -1,16 +1,16 @@
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/accu/concept/accumulator.hpp>
-#include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imsave.hpp>
-#include <mln/morpho/experimental/tos.hpp>
-#include <mln/morpho/experimental/maxtree.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+#include <mln/morpho/tos.hpp>
+#include <mln/morpho/maxtree.hpp>
 
 
 struct my_accu_t : mln::Accumulator<my_accu_t>
 {
   using result_type   = my_accu_t;
-  using argument_type = mln::image_pixel_t<mln::experimental::image2d<uint8_t>>;
+  using argument_type = mln::image_pixel_t<mln::image2d<uint8_t>>;
 
   my_accu_t() = default;
 
@@ -60,15 +60,15 @@ private:
 
 int main()
 {
-  mln::experimental::image2d<uint8_t> f;
-  mln::io::experimental::imread("roadsigns.png", f);
+  mln::image2d<uint8_t> f;
+  mln::io::imread("roadsigns.png", f);
 
   // Compute the ToS
-  auto [t, node_map] = mln::morpho::experimental::tos(f, {0,0});
+  auto [t, node_map] = mln::morpho::tos(f, {0,0});
 
 
   // Set f to the right size
-  mln::experimental::image2d<uint8_t> f2 = t.reconstruct(node_map);
+  mln::image2d<uint8_t> f2 = t.reconstruct(node_map);
 
 
   // Compute the bounding box & the size of the component
@@ -82,10 +82,10 @@ int main()
   };
 
   // Filter
-  t.filter(mln::morpho::experimental::CT_FILTER_DIRECT, node_map, pred);
+  t.filter(mln::morpho::CT_FILTER_DIRECT, node_map, pred);
 
   // Reconstruct
   t.values[0] = 0;
   auto out = t.reconstruct(node_map);
-  mln::io::experimental::imsave(out, "roadsigns-square-2.png");
+  mln::io::imsave(out, "roadsigns-square-2.png");
 }

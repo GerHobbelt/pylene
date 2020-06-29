@@ -3,6 +3,7 @@
 
 #include <mln/accu/accumulators/h_infsup.hpp>
 #include <mln/accu/accumulators/infsup.hpp>
+#include <mln/core/algorithm/paste.hpp>
 #include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
@@ -249,26 +250,46 @@ namespace mln::morpho
     class TileExecutor_Dilation : public TileExecutorBase
     {
     public:
+      TileExecutor_Dilation(const SE& se, mln::box2d& wroi)
+        : _se{se}
+        , _decomposed{true}
+        , _wroi(wroi)
+      {
+      }
+
       TileExecutor_Dilation(const SE& se)
         : _se{se}
+        , _decomposed{false}
       {
       }
 
       void execute(mln::ndbuffer_image in, mln::ndbuffer_image out) const final
       {
-        // Perform operation on tile according to algorithm.
         auto       in_image2d  = *(in.cast_to<V, 2>());
         auto       out_image2d = *(out.cast_to<V, 2>());
         auto       vs          = mln::morpho::details::dilation_value_set<V>();
-        mln::box2d roi         = out.domain();
-        in_image2d.domain_shift(roi.tl());
+        if (!_decomposed)
+        {
+          mln::box2d roi         = out.domain();
+          in_image2d.domain_shift(roi.tl());
 
-        auto tmp = in_image2d.clip(roi);
-        mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
+          auto tmp = in_image2d.clip(roi);
+          mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
+        }
+        else
+        {
+          mln::box2d roi         = out.domain();
+          in_image2d.domain_shift(roi.tl());
+
+          auto tmp = in_image2d.clip(roi);
+          mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
+        }
       }
 
     private:
-      const SE&      _se;
+      const SE&         _se;
+      const bool        _decomposed;
+      const mln::box2d _wroi;
     };
 
     template <class OutputImage>
@@ -322,6 +343,15 @@ namespace mln::morpho
       {
       }
 
+      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d wroi)
+        : m_in{in}
+        , m_se{se},
+          m_tile_l{in, m_se.compute_input_region({TILE_WIDTH, TILE_HEIGHT})},
+          m_tile_w{out},
+          m_tile_e{se, wroi}
+      {
+      }
+
       mln::box2d GetDomain() const noexcept final { return m_in.domain(); }
       mln::box2d ComputeInputRegion(mln::box2d roi) const noexcept final { return m_se.compute_input_region(roi); }
 
@@ -340,31 +370,24 @@ namespace mln::morpho
       tile_writer_t    m_tile_w;
       tile_executor_t  m_tile_e;
     };
-
+    
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out)
     {
       if (se.is_decomposable())
       {
         auto ses = se.decompose();
-        using I = std::remove_reference_t<InputImage>;
-        image_concrete_t<I> tmp = imconcretize(image);
-        bool first = true;
-        for (auto&& se : ses)
+        fmt::print("Decomposable SE\n");
+        auto image_domain = image.domain();
+        auto tmp = mln::details::create_temporary_image(image, se, image_domain);
+        auto input_roi = se.compute_input_region(image_domain);
+        for (auto&& decomposed_se : ses)
         {
-          if (first)
-          {
-            first = false;
-            DilationParallel caller(image, out, se); 
-            parallel_execute_local2D(caller);
-          }
-          else
-          {
-            std::swap(tmp, out);
-            DilationParallel caller(tmp, out, se);
-            parallel_execute_local2D(caller);
-          }
+          auto wroi = decomposed_se.compute_output_region(input_roi);
+          DilationParallel caller(tmp, tmp, decomposed_se, wroi); 
+          parallel_execute_local2D(caller);
         }
+        mln::paste(tmp, image_domain, out);
       }
       else
       {

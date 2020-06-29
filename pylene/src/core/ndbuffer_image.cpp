@@ -148,6 +148,8 @@ namespace mln
     {
       m_axes[i].domain_begin += pt[i];
       m_axes[i].domain_end += pt[i];
+      m_axes[i].vbox_begin += pt[i];
+      m_axes[i].vbox_end += pt[i];
     }
   }
 

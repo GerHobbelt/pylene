@@ -33,16 +33,16 @@ namespace mln::morpho::experimental
   template <class I>
   auto tos(I input, image_point_t<I> pstart, int /* processing_flags */)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
 
     using Domain = image_domain_t<I>;
     using P = image_point_t<I>;
     using V = image_value_t<I>;
 
-    static_assert(std::is_same_v<Domain, mln::experimental::box2d> || std::is_same_v<Domain, mln::experimental::box3d>,
+    static_assert(std::is_same_v<Domain, mln::box2d> || std::is_same_v<Domain, mln::box3d>,
                   "Only 2D or 3D regular domain supported");
 
-    using connectivity_t = std::conditional_t<P::ndim == 2, mln::experimental::c4_t, mln::experimental::c6_t>;
+    using connectivity_t = std::conditional_t<P::ndim == 2, mln::c4_t, mln::c6_t>;
     connectivity_t nbh;
 
     int max_depth;

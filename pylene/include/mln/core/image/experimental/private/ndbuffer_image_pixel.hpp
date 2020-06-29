@@ -1,12 +1,12 @@
 #pragma once
 
 #include <mln/core/concepts/pixel.hpp>
-#include <mln/core/experimental/point.hpp>
+#include <mln/core/point.hpp>
 #include <mln/core/range/private/mdrange_facade.hpp>
 #include <mln/core/range/private/ndrange_facade.hpp>
 #include <mln/core/utils/ptroffset.hpp>
 
-namespace mln::experimental::details
+namespace mln::details
 {
 
   /// This file defines:
@@ -17,7 +17,7 @@ namespace mln::experimental::details
   /// class __ndbuffer_image<T,N>::const_pixel_range
 
   template <class T, int N>
-  struct ndpix : mln::experimental::Pixel<ndpix<T, N>>
+  struct ndpix : mln::Pixel<ndpix<T, N>>
   {
     // Note that using "int" instead of ptrdiff_t prevent clang vectorization
     using point_type = ndpoint<N, std::ptrdiff_t>;

@@ -19,7 +19,7 @@
 /// \code
 ///   mln_foreach((auto [a,b]), multispan)
 /// \endcode
-#define mln_foreach_new(PROTECTED_DECL, RNG)                                                                           \
+#define mln_foreach(PROTECTED_DECL, RNG)                                                                               \
   if (bool __mln_has_been_broken = false; false)                                                                       \
   {                                                                                                                    \
   }                                                                                                                    \

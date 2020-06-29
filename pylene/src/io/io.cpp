@@ -2,7 +2,7 @@
 
 
 #include <mln/core/canvas/private/traverse2d.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/io/private/plugin.hpp>
 
 #include <functional>

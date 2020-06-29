@@ -315,7 +315,7 @@ namespace mln::morpho::experimental
   {
     mln_entering("mln::morpho::experimental::gaussian2d");
 
-    mln::experimental::copy(image, out);
+    mln::copy(image, out);
 
     detail::gaussian2d_T(out, h_sigma, v_sigma, border_value);
   }

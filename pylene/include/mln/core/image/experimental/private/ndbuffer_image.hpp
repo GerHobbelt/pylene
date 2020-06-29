@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mln/core/concepts/image.hpp>
-#include <mln/core/image/experimental/ndbuffer_image.hpp>
-#include <mln/core/image/experimental/private/ndbuffer_image_data.hpp>
-#include <mln/core/image/experimental/private/ndbuffer_image_impl.hpp>
-#include <mln/core/image/experimental/private/ndbuffer_image_pixel.hpp>
-#include <mln/core/image/experimental/private/ndimage_extension.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/private/ndbuffer_image_data.hpp>
+#include <mln/core/image/private/ndbuffer_image_impl.hpp>
+#include <mln/core/image/private/ndbuffer_image_pixel.hpp>
+#include <mln/core/image/private/ndimage_extension.hpp>
 #include <mln/core/range/mdspan.hpp>
 
 namespace mln
@@ -29,7 +29,7 @@ namespace mln
   }
 
   template <class T, int N>
-  class __ndbuffer_image : public __ndbuffer_image<void, -1>, public mln::experimental::Image<__ndbuffer_image<T, N>>
+  class __ndbuffer_image : public __ndbuffer_image<void, -1>, public mln::Image<__ndbuffer_image<T, N>>
   {
     using base = __ndbuffer_image<void, -1>;
     using Impl = mln::details::ndbuffer_image_impl<T, N>;

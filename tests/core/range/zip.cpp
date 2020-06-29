@@ -32,11 +32,11 @@ TEST(Core, zip_container)
 TEST(Core, zip_mdrange_readonly)
 {
 
-  mln::experimental::box2d multi_ind0 = {{0, 0}, {3, 2}};
-  mln::experimental::box2d multi_ind1 = {{2, 1}, {5, 3}};
-  mln::experimental::box2d multi_ind2 = {{3, 2}, {6, 4}};
+  mln::box2d multi_ind0 = {{0, 0}, {3, 2}};
+  mln::box2d multi_ind1 = {{2, 1}, {5, 3}};
+  mln::box2d multi_ind2 = {{3, 2}, {6, 4}};
 
-  std::vector<mln::experimental::point2d> ref = {
+  std::vector<mln::point2d> ref = {
     {0, 0}, {1, 0}, {2, 0}, //
     {0, 1}, {1, 1}, {2, 1}, //
     {0, 2}, {1, 2}, {2, 2}  //
@@ -52,8 +52,8 @@ TEST(Core, zip_mdrange_readonly)
     for (auto [v1, v2, v3] : r)
     {
       ASSERT_EQ(*refv, v1);
-      ASSERT_EQ((*refv + mln::experimental::point2d{2, 1}), v2);
-      ASSERT_EQ((*refv + mln::experimental::point2d{3, 2}), v3);
+      ASSERT_EQ((*refv + mln::point2d{2, 1}), v2);
+      ASSERT_EQ((*refv + mln::point2d{3, 2}), v3);
       refv++;
     }
 }
@@ -66,7 +66,7 @@ TEST(Core, zip_mdrange_write)
   mln::ranges::mdspan<int, 2> X(x_data.data(), {3, 2}, {1, 3});
   mln::ranges::mdspan<int, 2> Y(y_data.data(), {3, 2}, {1, 3});
 
-  auto ind0 = mln::experimental::box2d(4, 3);
+  auto ind0 = mln::box2d(4, 3);
   auto z    = mln::ranges::view::zip(X, Y, ind0);
 
   static_assert(mln::ranges::MDRange<decltype(z)>);
@@ -90,10 +90,10 @@ TEST(Core, zip_mdrange_write)
 
 TEST(Range, zipped_reversed_range)
 {
-  mln::experimental::box2d multi_ind0 = {{0, 0}, {3, 2}};
-  mln::experimental::box2d multi_ind1 = {{2, 1}, {5, 3}};
+  mln::box2d multi_ind0 = {{0, 0}, {3, 2}};
+  mln::box2d multi_ind1 = {{2, 1}, {5, 3}};
 
-  std::vector<mln::experimental::point2d> ref = {
+  std::vector<mln::point2d> ref = {
     {0, 0}, {1, 0}, {2, 0}, //
     {0, 1}, {1, 1}, {2, 1}, //
   };
@@ -118,9 +118,9 @@ TEST(Range, zipped_reversed_range)
 /* FIXME
 TEST(Core, zip_segmented_and_nonsegmented_should_fail)
 {
-  mln::experimental::box2d multi_ind0 = {{0, 0}, {3, 2}};
+  mln::box2d multi_ind0 = {{0, 0}, {3, 2}};
 
-  std::vector<mln::experimental::point2d> ref = {
+  std::vector<mln::point2d> ref = {
       {0, 0}, {0, 1}, {0, 2}, //
       {1, 0}, {1, 1}, {1, 2}, //
   };

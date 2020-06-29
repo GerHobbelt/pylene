@@ -1,8 +1,8 @@
 
 #include <mln/core/algorithm/transform.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/io/experimental/imread.hpp>
+#include <mln/io/imread.hpp>
 
 #include <internal/Neighborhood/neighborhood.hpp>
 
@@ -17,8 +17,8 @@ class BMReferenceNeighborhood : public benchmark::Fixture
   {
     if (!m_initialized)
     {
-      mln::experimental::image2d<mln::rgb8> in;
-      mln::io::experimental::imread(filename, in);
+      mln::image2d<mln::rgb8> in;
+      mln::io::imread(filename, in);
 
       mln::resize(m_input, in);
       mln::resize(m_output, in);
@@ -34,7 +34,7 @@ class BMReferenceNeighborhood : public benchmark::Fixture
   }
 
 protected:
-  using fun1_t = std::function<void(const mln::experimental::image2d<uint8_t>&, mln::experimental::image2d<uint8_t>&)>;
+  using fun1_t = std::function<void(const mln::image2d<uint8_t>&, mln::image2d<uint8_t>&)>;
   using fun2_t = std::function<void(const uint8_t*, uint8_t*, int, int, std::ptrdiff_t)>;
 
   void run_impl(benchmark::State& st, std::function<void()> f)
@@ -53,13 +53,13 @@ private:
   uint8_t*                                   m_ibuffer;
   uint8_t*                                   m_obuffer;
   static bool                                m_initialized;
-  static mln::experimental::image2d<uint8_t> m_input;
-  static mln::experimental::image2d<uint8_t> m_output;
+  static mln::image2d<uint8_t> m_input;
+  static mln::image2d<uint8_t> m_output;
 };
 
 bool                                BMReferenceNeighborhood::m_initialized = false;
-mln::experimental::image2d<uint8_t> BMReferenceNeighborhood::m_input;
-mln::experimental::image2d<uint8_t> BMReferenceNeighborhood::m_output;
+mln::image2d<uint8_t> BMReferenceNeighborhood::m_input;
+mln::image2d<uint8_t> BMReferenceNeighborhood::m_output;
 
 BENCHMARK_F(BMReferenceNeighborhood, Sum_C)(benchmark::State& st)
 {

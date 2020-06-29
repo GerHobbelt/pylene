@@ -145,8 +145,8 @@ namespace mln::morpho::experimental
     using I = std::remove_reference_t<InputImage>;
     using N = std::remove_reference_t<Neighborhood>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     static_assert(std::is_integral<Label_t>::value, "The label type must integral.");
     static_assert(std::is_signed<Label_t>::value, "The label type must be signed.");

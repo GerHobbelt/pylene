@@ -1,14 +1,14 @@
 #include <mln/core/se/periodic_line2d.hpp>
 
 
-namespace mln::experimental::se
+namespace mln::se
 {
 
-  periodic_line2d::periodic_line2d(experimental::point2d delta, int k)
+  periodic_line2d::periodic_line2d(point2d delta, int k)
   {
     mln_precondition((k >= 0) && "The extent must be positive");
 
-    m_delta = (delta < mln::experimental::point2d{0, 0}) ? experimental::point2d(-delta) : delta;
+    m_delta = (delta < mln::point2d{0, 0}) ? point2d(-delta) : delta;
     m_k     = k;
   }
 
@@ -37,7 +37,7 @@ namespace mln::experimental::se
   bool periodic_line2d::is_vertical() const noexcept { return m_delta.x() == 0; }
 
 
-  mln::experimental::box2d periodic_line2d::compute_input_region(mln::experimental::box2d roi) const
+  mln::box2d periodic_line2d::compute_input_region(mln::box2d roi) const
   {
     int dx = std::abs(m_delta.x()) * m_k;
     int dy = std::abs(m_delta.y()) * m_k;
@@ -48,7 +48,7 @@ namespace mln::experimental::se
     return roi;
   }
 
-  mln::experimental::box2d periodic_line2d::compute_output_region(mln::experimental::box2d roi) const
+  mln::box2d periodic_line2d::compute_output_region(mln::box2d roi) const
   {
     int dx = std::abs(m_delta.x()) * m_k;
     int dy = std::abs(m_delta.y()) * m_k;
@@ -58,9 +58,9 @@ namespace mln::experimental::se
     roi.br().y() -= dy;
 
     if (roi.width() <= 0 || roi.height() <= 0)
-      roi = mln::experimental::box2d{};
+      roi = mln::box2d{};
 
     return roi;
   }
 
-} // namespace mln::experimental::se
+} // namespace mln::se

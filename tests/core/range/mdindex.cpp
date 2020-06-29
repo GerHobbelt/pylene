@@ -102,7 +102,7 @@ public:
 
 using MyTypes = ::testing::Types<std::array<int, 1>, std::array<int, 2>, std::array<int, 3>, std::array<int, 4>,
                                  std::array<std::uint8_t, 4>>;
-TYPED_TEST_CASE(MultiIndicesTest, MyTypes);
+TYPED_TEST_SUITE(MultiIndicesTest, MyTypes);
 
 
 

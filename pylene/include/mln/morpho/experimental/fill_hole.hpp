@@ -62,9 +62,9 @@ namespace mln::morpho::experimental
   template <typename I, typename N, typename J>
   void fill_hole(I input, N nbh, image_point_t<I> marker, J out)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<J, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<J, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     static_assert(std::is_convertible<image_value_t<I>, bool>::value, "Input image value type must be convertible to bool");
     static_assert(std::is_same<image_value_t<J>, bool>::value, "Output image value type must be bool");

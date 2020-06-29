@@ -9,7 +9,7 @@
 #include <vector>
 /// \file
 
-namespace mln::experimental::se
+namespace mln::se
 {
 
   /// \brief Define a dynamic rectangular window anchored at (0,0).
@@ -63,14 +63,60 @@ namespace mln::experimental::se
     int radial_extent() const;
 
     /// \brief Compute the input region of a ROI
-    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_input_region(mln::box2d roi) const;
 
     /// \brief Compute the output region of a ROI
-    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_output_region(mln::box2d roi) const;
 
   private:
-    mln::experimental::box2d m_dpoints;
+    mln::box2d m_dpoints;
   };
 
 
-} // namespace mln::experimental::se
+  struct rect2d_non_decomp : se_facade<rect2d_non_decomp>
+  {
+  public:
+    using category     = dynamic_neighborhood_tag;
+    using incremental  = std::true_type;
+    using decomposable = std::false_type;
+    using separable    = std::false_type;
+
+    /// Construct an empty rectangle
+    rect2d_non_decomp() = default;
+
+    rect2d_non_decomp(const rect2d&);
+
+    /// Construct a rectangle of size (Width × Height).
+    ///
+    /// \param width The width of the rectangle. If \p width is even, it is
+    /// rounded to the closest lower odd int.
+    /// \param height The height of the rectangle. If \p height is even, it is
+    /// rounded to the closest lower odd int.
+    rect2d_non_decomp(int width, int height);
+
+    /// \brief A WNeighborhood to be added when used incrementally
+    rect2d_non_decomp inc() const;
+
+    /// \brief A WNeighborhood to be substracted when used incrementally
+    rect2d_non_decomp dec() const;
+
+    /// \brief Return a range of SE offsets
+    auto offsets() const { return m_rect.offsets(); }
+
+    /// \brief Return true if incremental (if the width is larger than 1)
+    bool is_incremental() const;
+
+    /// \brief Return the extent radius
+    int radial_extent() const;
+
+    /// \brief Compute the input region of a ROI
+    mln::box2d compute_input_region(mln::box2d roi) const;
+
+    /// \brief Compute the output region of a ROI
+    mln::box2d compute_output_region(mln::box2d roi) const;
+
+  private:
+    rect2d m_rect;
+  };
+
+} // namespace mln::se

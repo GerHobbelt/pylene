@@ -2,7 +2,7 @@
 
 #include "ndimage_buffer_helper.hpp"
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
 
 namespace py = pybind11;

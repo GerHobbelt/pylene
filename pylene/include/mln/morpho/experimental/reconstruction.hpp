@@ -53,9 +53,9 @@ namespace mln::morpho::experimental
   image_concrete_t<I>
   opening_by_reconstruction(I f, J markers, N nbh, Compare cmp)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>::value);
-    static_assert(mln::is_a<J, mln::experimental::Image>::value);
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>::value);
+    static_assert(mln::is_a<I, mln::details::Image>::value);
+    static_assert(mln::is_a<J, mln::details::Image>::value);
+    static_assert(mln::is_a<N, mln::details::Neighborhood>::value);
 
     static_assert(std::is_convertible_v<image_value_t<J>, image_value_t<I>>,
                   "Marker image value type must be convertible to f's value type.");

@@ -11,7 +11,7 @@
 
 /// \file
 
-namespace mln::experimental
+namespace mln
 {
 
   /// \brief Copy the values of a source image to a destination image regardless their domain.
@@ -46,15 +46,15 @@ namespace mln::experimental
     mln_entering("mln::copy");
 
     // FIXME: Add a precondition about the size of the domain ::ranges::size
-    static_assert(mln::is_a<InputImage, Image>());
-    static_assert(mln::is_a<OutputImage, Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
+    static_assert(mln::is_a<OutputImage, mln::details::Image>());
     static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
 
-    auto&& ivals = input.new_values();
-    auto&& ovals = output.new_values();
+    auto&& ivals = input.values();
+    auto&& ovals = output.values();
 
     for (auto [r1, r2] : ranges::view::zip(ranges::rows(ivals), ranges::rows(ovals)))
       ::ranges::copy(r1, ::ranges::begin(r2));
   }
 
-} // namespace mln::experimental
+} // namespace mln

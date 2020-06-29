@@ -79,22 +79,22 @@ namespace mln::view
       };
 
       template <class I1, class I2>
-      auto equalFP(const ::mln::experimental::Image<I1>& ima1, const ::mln::experimental::Image<I2>& ima2, double eps)
+      auto equalFP(const ::mln::details::Image<I1>& ima1, const ::mln::details::Image<I2>& ima2, double eps)
       {
         return ::mln::view::transform(static_cast<const I1&>(ima1), static_cast<const I2&>(ima2), equalFP_t{eps});
       }
 
       template <class I, class Scalar,
-                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::experimental::Image>::value>>
-      auto equalFP(const ::mln::experimental::Image<I>& ima1, Scalar s, double eps)
+                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::details::Image>::value>>
+      auto equalFP(const ::mln::details::Image<I>& ima1, Scalar s, double eps)
       {
         auto g = [f_ = equalFP_t{eps}, s_ = s](auto&& arg) { return f_(arg, s_); };
         return ::mln::view::transform(static_cast<const I&>(ima1), g);
       }
 
       template <class Scalar, class I,
-                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::experimental::Image>::value>>
-      auto equalFP(Scalar s, const ::mln::experimental::Image<I>& ima2, double eps)
+                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::details::Image>::value>>
+      auto equalFP(Scalar s, const ::mln::details::Image<I>& ima2, double eps)
       {
         auto g = [f_ = equalFP_t{eps}, s_ = s](auto&& arg) { return f_(s_, arg); };
         return ::mln::view::transform(static_cast<const I&>(ima2), g);
@@ -103,8 +103,8 @@ namespace mln::view
 
     /* This overload is there to be a best match wrt old API impl */
     template <class A, class B,
-              class = std::enable_if_t<(::mln::is_a<A, ::mln::experimental::Image>::value ||
-                                        ::mln::is_a<B, ::mln::experimental::Image>::value)>>
+              class = std::enable_if_t<(::mln::is_a<A, ::mln::details::Image>::value ||
+                                        ::mln::is_a<B, ::mln::details::Image>::value)>>
     auto equalFP(const A& lhs, const B& rhs, double eps)
     {
       return impl::equalFP(lhs, rhs, eps);
@@ -120,8 +120,8 @@ namespace mln::view
 
     template <class ICond, class ITrue, class IFalse>
     struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(is_a<ITrue, mln::experimental::Image>::value &&
-                                       is_a<IFalse, mln::experimental::Image>::value)>>
+                     std::enable_if_t<(is_a<ITrue, mln::details::Image>::value &&
+                                       is_a<IFalse, mln::details::Image>::value)>>
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse iffalse) const
       {
@@ -136,8 +136,8 @@ namespace mln::view
 
     template <class ICond, class ITrue, class IFalse>
     struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(!is_a<ITrue, mln::experimental::Image>::value &&
-                                       is_a<IFalse, mln::experimental::Image>::value)>>
+                     std::enable_if_t<(!is_a<ITrue, mln::details::Image>::value &&
+                                       is_a<IFalse, mln::details::Image>::value)>>
     {
       auto operator()(const ICond& cond, ITrue vtrue, IFalse iffalse) const
       {
@@ -151,8 +151,8 @@ namespace mln::view
 
     template <class ICond, class ITrue, class IFalse>
     struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(is_a<ITrue, mln::experimental::Image>::value &&
-                                       !is_a<IFalse, mln::experimental::Image>::value)>>
+                     std::enable_if_t<(is_a<ITrue, mln::details::Image>::value &&
+                                       !is_a<IFalse, mln::details::Image>::value)>>
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse vfalse) const
       {
@@ -167,8 +167,8 @@ namespace mln::view
 
     template <class ICond, class ITrue, class IFalse>
     struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(!is_a<ITrue, mln::experimental::Image>::value &&
-                                       !is_a<IFalse, mln::experimental::Image>::value)>>
+                     std::enable_if_t<(!is_a<ITrue, mln::details::Image>::value &&
+                                       !is_a<IFalse, mln::details::Image>::value)>>
     {
       auto operator()(const ICond& cond, ITrue vtrue, IFalse vfalse) const
       {
@@ -179,7 +179,7 @@ namespace mln::view
   } // namespace details
 
   template <class ICond, class ITrue, class IFalse>
-  auto ifelse(const mln::experimental::Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
+  auto ifelse(const mln::details::Image<ICond>& cond, ITrue iftrue, IFalse iffalse)
   {
     return details::ifelse_fn<ICond, ITrue, IFalse>()(static_cast<const ICond&>(cond), std::move(iftrue),
                                                       std::move(iffalse));

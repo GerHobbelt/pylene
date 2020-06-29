@@ -4,13 +4,13 @@
 #include <range/v3/functional/concepts.hpp>
 
 #include <mln/core/box.hpp>
-#include <mln/core/image/experimental/ndimage_fwd.hpp>
+#include <mln/core/image/ndimage_fwd.hpp>
 
 namespace mln::morpho::experimental::details
 {
 
   template <class T, class I, class J, class BinaryFunction>
-  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension,
+  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::box2d roi, int k, bool use_extension,
                       bool vertical);
 
 
@@ -22,13 +22,13 @@ namespace mln::morpho::experimental::details
   class TileLoaderBase
   {
     // Load tile from memory (roi is in the vertical layout coordinates system)
-    virtual void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
+    virtual void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
   };
 
   class TileWriterBase
   {
     // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
-    virtual void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) = 0;
+    virtual void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
   };
 
   class vertical_running_max_algo_base_t
@@ -51,11 +51,11 @@ namespace mln::morpho::experimental::details
     // Apply the running max algorithm over a block
     // Memory has already been allocated
     void running_max_block2d(std::byte* f, std::byte* g, std::byte* h, std::ptrdiff_t f_byte_stride,
-                             std::ptrdiff_t g_byte_stride, std::ptrdiff_t h_byte_stride, mln::experimental::box2d roi,
+                             std::ptrdiff_t g_byte_stride, std::ptrdiff_t h_byte_stride, mln::box2d roi,
                              int k, bool use_extension);
 
     // Apply the running max algorithm over a roi using tiling
-    void execute(mln::experimental::box2d roi, int k, bool use_extension, bool vertical = true);
+    void execute(mln::box2d roi, int k, bool use_extension, bool vertical = true);
 
     void set_tile_reader(TileLoaderBase* r) { m_tile_loader = r; }
     void set_tile_writer(TileWriterBase* w) { m_tile_writer = w; }
@@ -190,7 +190,7 @@ namespace mln::morpho::experimental::details
   }
 
   template <class I, class T>
-  [[gnu::noinline]] void copy_block(I& in, mln::experimental::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
+  [[gnu::noinline]] void copy_block(I& in, mln::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
   {
     const int x0 = roi.x();
     const int y0 = roi.y();
@@ -204,7 +204,7 @@ namespace mln::morpho::experimental::details
   }
 
   template <class I, class T>
-  [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::experimental::box2d roi, I& out)
+  [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::box2d roi, I& out)
   {
     const int x0 = roi.x();
     const int y0 = roi.y();
@@ -218,7 +218,7 @@ namespace mln::morpho::experimental::details
   }
 
   template <class I, class T>
-  [[gnu::noinline]] void transpose_block2d(I& in, mln::experimental::box2d input_roi, T* __restrict out,
+  [[gnu::noinline]] void transpose_block2d(I& in, mln::box2d input_roi, T* __restrict out,
                                            std::ptrdiff_t out_stride)
   {
     const int x0 = input_roi.x();
@@ -232,7 +232,7 @@ namespace mln::morpho::experimental::details
 
   template <class I, class T>
   [[gnu::noinline]] void transpose_block2d(T* __restrict in, std::ptrdiff_t istride,
-                                           mln::experimental::box2d output_roi, I& out)
+                                           mln::box2d output_roi, I& out)
   {
     const int x0 = output_roi.x();
     const int y0 = output_roi.y();
@@ -248,13 +248,13 @@ namespace mln::morpho::experimental::details
   {
   public:
     // Load tile from memory (roi is in the vertical layout coordinates system)
-    void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) override
+    void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) override
     {
       if (m_vertical)
         copy_block(*m_input, roi, (T*)out, byte_stride / sizeof(T));
       else
       {
-        mln::experimental::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
+        mln::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
         transpose_block2d(*m_input, region, (T*)out, byte_stride / sizeof(T));
       }
     }
@@ -275,13 +275,13 @@ namespace mln::morpho::experimental::details
   {
   public:
     // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
-    void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::experimental::box2d roi) override
+    void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::box2d roi) override
     {
       if (m_vertical)
         copy_block((const T*)in, byte_stride / sizeof(T), roi, *m_output);
       else
       {
-        mln::experimental::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
+        mln::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
         transpose_block2d((const T*)in, byte_stride / sizeof(T), region, *m_output);
       }
     }
@@ -299,7 +299,7 @@ namespace mln::morpho::experimental::details
 
 
   template <class T, class I, class J, class BinaryFunction>
-  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::experimental::box2d roi, int k, bool use_extension,
+  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::box2d roi, int k, bool use_extension,
                       bool vertical)
   {
     TileLoader<I, T> r(input, vertical);

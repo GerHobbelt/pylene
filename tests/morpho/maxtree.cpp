@@ -1,7 +1,7 @@
-#include <mln/morpho/experimental/maxtree.hpp>
+#include <mln/morpho/maxtree.hpp>
 
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/accu/accumulators/count.hpp>
 
@@ -17,19 +17,19 @@ void check_parent_array_sorted(const int* parent, std::size_t n)
     ASSERT_LE(parent[i], i);
 }
 
-mln::experimental::image2d<mln::experimental::point2d> //
+mln::image2d<mln::point2d> //
 make_parent_image(const int* par, std::size_t n,
-                  const mln::experimental::image2d<int>& node_map)
+                  const mln::image2d<int>& node_map)
 {
-  using mln::experimental::point2d;
+  using mln::point2d;
 
   std::vector<point2d>                repr(n);
   std::vector<bool>                   has_repr(n, false);
-  mln::experimental::image2d<point2d> parent;
+  mln::image2d<point2d> parent;
 
   mln::resize(parent, node_map);
 
-  mln_foreach_new(auto px, node_map.new_pixels())
+  mln_foreach(auto px, node_map.pixels())
   {
     auto p = px.point();
     auto id = px.val();
@@ -41,7 +41,7 @@ make_parent_image(const int* par, std::size_t n,
     parent(p) = repr[id];
   }
 
-  mln_foreach_new(auto px, node_map.new_pixels())
+  mln_foreach(auto px, node_map.pixels())
   {
     auto p  = px.point();
     auto id = px.val();
@@ -54,7 +54,7 @@ make_parent_image(const int* par, std::size_t n,
 
 
 template <>
-struct fmt::formatter<mln::experimental::point2d>
+struct fmt::formatter<mln::point2d>
 {
   auto parse(format_parse_context& ctx)
   {
@@ -74,7 +74,7 @@ struct fmt::formatter<mln::experimental::point2d>
 
   // parse is inherited from formatter<string_view>.
   template <typename FormatContext>
-  auto format(mln::experimental::point2d p, FormatContext& ctx)
+  auto format(mln::point2d p, FormatContext& ctx)
   {
     return format_to(ctx.out(), " ({:d},{:d})", p.x(), p.y());
   }
@@ -83,24 +83,24 @@ struct fmt::formatter<mln::experimental::point2d>
 
 TEST(Morpho, Maxtree_uint8)
 {
-  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+  const mln::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
                                                      {+2, 10, 10, 10, 10, 10, 10}, //
                                                      {18, +2, 18, 19, 18, 14, +6}, //
                                                      {16, +2, 16, 10, 10, 10, 10}, //
                                                      {18, 16, 18, +2, +2, +2, +2}};
 
 
-  mln::experimental::image2d<mln::experimental::point2d> ref_parent = {
+  mln::image2d<mln::point2d> ref_parent = {
     {{6, 2}, {0, 0}, {1, 0}, {1, 0}, {3, 0}, {1, 0}, {6, 0}},
     {{6, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
     {{0, 3}, {6, 0}, {0, 3}, {2, 2}, {2, 2}, {0, 0}, {6, 0}},
     {{5, 2}, {6, 0}, {0, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
     {{0, 3}, {0, 3}, {0, 3}, {6, 0}, {6, 0}, {6, 0}, {6, 0}}};
 
-  mln::morpho::experimental::component_tree<uint8_t> ctree;
-  mln::experimental::image2d<int>                    node_map;
+  mln::morpho::component_tree<uint8_t> ctree;
+  mln::image2d<int>                    node_map;
 
-  std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+  std::tie(ctree, node_map) = mln::morpho::maxtree(input, mln::c4);
 
 
 
@@ -115,27 +115,27 @@ TEST(Morpho, Maxtree_uint8)
 
 TEST(Morpho, Maxtree_filtering_min)
 {
-  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+  const mln::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
                                                      {+2, 10, 10, 10, 10, 10, 10}, //
                                                      {18, +2, 18, 19, 18, 14, +6}, //
                                                      {16, +2, 16, 10, 10, 10, 10}, //
                                                      {18, 16, 18, +2, +2, +2, +2}};
 
-  const mln::experimental::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
+  const mln::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
                                                     {+2, 10, 10, 10, 10, 10, 10}, //
                                                     {16, +2, 16, 16, 16, 14, +6}, //
                                                     {16, +2, 16, 10, 10, 10, 10}, //
                                                     {16, 16, 16, +2, +2, +2, +2}};
 
 
-  mln::morpho::experimental::component_tree<uint8_t> ctree;
-  mln::experimental::image2d<int>                    node_map;
+  mln::morpho::component_tree<uint8_t> ctree;
+  mln::image2d<int>                    node_map;
 
   {
-    std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+    std::tie(ctree, node_map) = mln::morpho::maxtree(input, mln::c4);
 
     auto attr = ctree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
-    ctree.filter(mln::morpho::experimental::CT_FILTER_MIN, node_map,
+    ctree.filter(mln::morpho::CT_FILTER_MIN, node_map,
                  [&attr](int node_id) { return attr[node_id] > 5; });
 
     auto out = ctree.reconstruct(node_map);
@@ -147,27 +147,27 @@ TEST(Morpho, Maxtree_filtering_min)
 
 TEST(Morpho, Maxtree_filtering_max)
 {
-  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+  const mln::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
                                                      {+2, 10, 10, 10, 10, 10, 10}, //
                                                      {18, +2, 18, 19, 18, 14, +6}, //
                                                      {16, +2, 16, 10, 10, 10, 10}, //
                                                      {18, 16, 18, +2, +2, +2, +2}};
 
-  const mln::experimental::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
+  const mln::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
                                                     {+2, 10, 10, 10, 10, 10, 10}, //
                                                     {16, +2, 16, 16, 16, 14, +6}, //
                                                     {16, +2, 16, 10, 10, 10, 10}, //
                                                     {16, 16, 16, +2, +2, +2, +2}};
 
 
-  mln::morpho::experimental::component_tree<uint8_t> ctree;
-  mln::experimental::image2d<int>                    node_map;
+  mln::morpho::component_tree<uint8_t> ctree;
+  mln::image2d<int>                    node_map;
 
   {
-    std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+    std::tie(ctree, node_map) = mln::morpho::maxtree(input, mln::c4);
 
     auto attr = ctree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
-    ctree.filter(mln::morpho::experimental::CT_FILTER_MAX, node_map,
+    ctree.filter(mln::morpho::CT_FILTER_MAX, node_map,
                  [&attr](int node_id) { return attr[node_id] > 5; });
 
 
@@ -180,27 +180,27 @@ TEST(Morpho, Maxtree_filtering_max)
 
 TEST(Morpho, Maxtree_filtering_direct)
 {
-  const mln::experimental::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
+  const mln::image2d<uint8_t> input = {{10, 11, 11, 15, 16, 11, +2}, //
                                                      {+2, 10, 10, 10, 10, 10, 10}, //
                                                      {18, +2, 18, 19, 18, 14, +6}, //
                                                      {16, +2, 16, 10, 10, 10, 10}, //
                                                      {18, 16, 18, +2, +2, +2, +2}};
 
-  const mln::experimental::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
+  const mln::image2d<uint8_t> ref1 = {{10, 10, 10, 10, 10, 10, +2}, //
                                                     {+2, 10, 10, 10, 10, 10, 10}, //
                                                     {16, +2, 16, 16, 16, 14, +6}, //
                                                     {16, +2, 16, 10, 10, 10, 10}, //
                                                     {16, 16, 16, +2, +2, +2, +2}};
 
 
-  mln::morpho::experimental::component_tree<uint8_t> ctree;
-  mln::experimental::image2d<int>                    node_map;
+  mln::morpho::component_tree<uint8_t> ctree;
+  mln::image2d<int>                    node_map;
 
   {
-    std::tie(ctree, node_map) = mln::morpho::experimental::maxtree(input, mln::experimental::c4);
+    std::tie(ctree, node_map) = mln::morpho::maxtree(input, mln::c4);
 
     auto attr = ctree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
-    ctree.filter(mln::morpho::experimental::CT_FILTER_DIRECT, node_map,
+    ctree.filter(mln::morpho::CT_FILTER_DIRECT, node_map,
                  [&attr](int node_id) { return attr[node_id] > 5; });
 
     auto out = ctree.reconstruct(node_map);

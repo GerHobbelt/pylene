@@ -1,38 +1,41 @@
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/io/experimental/imread.hpp>
+#include <mln/io/imread.hpp>
 
 #include <vector>
 
 #include <benchmark/benchmark.h>
 
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
 
 void Mult_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 void Threshold_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 void LUT_Inplace_C(const uint8_t* LUT, uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 
-void Mult_C(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void Threshold_C(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void LUT_C(const uint8_t* LUT, const uint8_t* ibuffer, uint8_t* obuffer, int width, int height,
+void Mult_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void Threshold_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void LUT_C(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
            std::ptrdiff_t stride);
 
-void Mult_New_Values(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
-void Mult_New_Pixels(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
+void Mult_New_Values(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void Mult_New_Pixels(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void Threshold_New_Values(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
-void Threshold_New_Pixels(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
+void Threshold_New_Values(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void Threshold_New_Pixels(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void LUT_New_Values(const uint8_t* LUT, const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
-void LUT_New_Pixels(const uint8_t* LUT, const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
+void LUT_New_Values(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void LUT_New_Pixels(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void Mult_Inplace_New_Values(mln::experimental::image2d<uint8_t>& img);
-void Threshold_Inplace_New_Values(mln::experimental::image2d<uint8_t>& img);
-void LUT_Inplace_New_Values(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img);
+void Mult_Inplace_New_Values(mln::image2d<uint8_t>& img);
+void Threshold_Inplace_New_Values(mln::image2d<uint8_t>& img);
+void LUT_Inplace_New_Values(const uint8_t LUT[], mln::image2d<uint8_t>& img);
 
-void Mult_Inplace_New_Pixels(mln::experimental::image2d<uint8_t>& img);
-void Threshold_Inplace_New_Pixels(mln::experimental::image2d<uint8_t>& img);
-void LUT_Inplace_New_Pixels(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img);
+void Mult_Inplace_New_Pixels(mln::image2d<uint8_t>& img);
+void Threshold_Inplace_New_Pixels(mln::image2d<uint8_t>& img);
+void LUT_Inplace_New_Pixels(const uint8_t LUT[], mln::image2d<uint8_t>& img);
 
 
 
@@ -43,29 +46,29 @@ void Threshold_Inplace_C_Reversed(uint8_t* buffer, int width, int height, std::p
 void LUT_Inplace_C_Reversed(const uint8_t* LUT, uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 
 
-void Mult_C_Reversed(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void Threshold_C_Reversed(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void LUT_C_Reversed(const uint8_t* LUT, const uint8_t* ibuffer, uint8_t* obuffer, int width, int height,
+void Mult_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void Threshold_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void LUT_C_Reversed(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
                     std::ptrdiff_t stride);
 
-void Mult_New_Values_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
-void Mult_New_Pixels_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
+void Mult_New_Values_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void Mult_New_Pixels_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void Threshold_New_Values_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
-void Threshold_New_Pixels_Reversed(const mln::experimental::image2d<uint8_t>& input, mln::experimental::image2d<uint8_t>& output);
+void Threshold_New_Values_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void Threshold_New_Pixels_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void LUT_New_Values_Reversed(const uint8_t* LUT, const mln::experimental::image2d<uint8_t>& input,
-                             mln::experimental::image2d<uint8_t>& output);
-void LUT_New_Pixels_Reversed(const uint8_t* LUT, const mln::experimental::image2d<uint8_t>& input,
-                             mln::experimental::image2d<uint8_t>& output);
+void LUT_New_Values_Reversed(const uint8_t LUT[], const mln::image2d<uint8_t>& input,
+                             mln::image2d<uint8_t>& output);
+void LUT_New_Pixels_Reversed(const uint8_t LUT[], const mln::image2d<uint8_t>& input,
+                             mln::image2d<uint8_t>& output);
 
-void Mult_Inplace_New_Values_Reversed(mln::experimental::image2d<uint8_t>& img);
-void Threshold_Inplace_New_Values_Reversed(mln::experimental::image2d<uint8_t>& img);
-void LUT_Inplace_New_Values_Reversed(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img);
+void Mult_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img);
+void Threshold_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img);
+void LUT_Inplace_New_Values_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>& img);
 
-void Mult_Inplace_New_Pixels_Reversed(mln::experimental::image2d<uint8_t>& img);
-void Threshold_Inplace_New_Pixels_Reversed(mln::experimental::image2d<uint8_t>& img);
-void LUT_Inplace_New_Pixels_Reversed(const uint8_t LUT[], mln::experimental::image2d<uint8_t>& img);
+void Mult_Inplace_New_Pixels_Reversed(mln::image2d<uint8_t>& img);
+void Threshold_Inplace_New_Pixels_Reversed(mln::image2d<uint8_t>& img);
+void LUT_Inplace_New_Pixels_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>& img);
 
 
 class BMReferenceLinear : public benchmark::Fixture
@@ -76,8 +79,8 @@ class BMReferenceLinear : public benchmark::Fixture
   {
     if (!m_initialized)
     {
-      mln::experimental::image2d<mln::rgb8> ima;
-      mln::io::experimental::imread(filename, ima);
+      mln::image2d<mln::rgb8> ima;
+      mln::io::imread(filename, ima);
 
       mln::resize(m_input, ima);
       mln::resize(m_output, ima);
@@ -93,12 +96,12 @@ class BMReferenceLinear : public benchmark::Fixture
 
     m_height = m_input.height();
     m_width  = m_input.width();
-    m_stride = m_input.strides();
+    m_stride = m_input.stride();
   }
 
 protected:
-  using fun5_t = std::function<void(mln::experimental::image2d<uint8_t>&)>;
-  using fun6_t = std::function<void(const mln::experimental::image2d<uint8_t>&, mln::experimental::image2d<uint8_t>&)>;
+  using fun5_t = std::function<void(mln::image2d<uint8_t>&)>;
+  using fun6_t = std::function<void(const mln::image2d<uint8_t>&, mln::image2d<uint8_t>&)>;
 
   using fun3_t = std::function<void(uint8_t*, int, int, std::ptrdiff_t)>;
   using fun4_t = std::function<void(const uint8_t*, uint8_t*, int, int, std::ptrdiff_t)>;
@@ -129,14 +132,14 @@ protected:
   std::ptrdiff_t m_stride;
 
   static bool                                m_initialized;
-  static mln::experimental::image2d<uint8_t> m_input;
-  static mln::experimental::image2d<uint8_t> m_output;
+  static mln::image2d<uint8_t> m_input;
+  static mln::image2d<uint8_t> m_output;
   static std::vector<uint8_t>                m_lut;
 };
 
 bool                                BMReferenceLinear::m_initialized = false;
-mln::experimental::image2d<uint8_t> BMReferenceLinear::m_input;
-mln::experimental::image2d<uint8_t> BMReferenceLinear::m_output;
+mln::image2d<uint8_t> BMReferenceLinear::m_input;
+mln::image2d<uint8_t> BMReferenceLinear::m_output;
 std::vector<uint8_t>                BMReferenceLinear::m_lut;
 
 

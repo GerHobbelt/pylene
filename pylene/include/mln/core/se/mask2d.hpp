@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/experimental/point.hpp>
+#include <mln/core/point.hpp>
 #include <mln/core/se/private/se_facade.hpp>
 #include <mln/core/private/weighted_point.hpp>
 
@@ -11,13 +11,13 @@
 
 /// \file
 
-namespace mln::se::experimental
+namespace mln::se
 {
   /// \brief Creates a 2D structuring element based on a mask. Every non-zero value will add the 2D-point in the
   /// set. The SE is assumed to be anchored at the center of the mask, thus the mask must have odd dimensions.
   ///
   /// \code
-  /// mln::se::experimental::mask2d mask = {{0, 0, 1, 0, 0},
+  /// mln::se::mask2d mask = {{0, 0, 1, 0, 0},
   ///                                       {1, 1, 1, 1, 1}
   ///                                       {0, 0, 1, 0, 0}};
   /// \endcode
@@ -34,13 +34,13 @@ namespace mln::se::experimental
     /// \exception std::runtime_error if the sizes of the list are not odd.
     mask2d(std::initializer_list<std::initializer_list<int>> values);
 
-    [[gnu::pure]] ::ranges::span<const mln::experimental::point2d> offsets() const;
+    [[gnu::pure]] ::ranges::span<const mln::point2d> offsets() const;
 
     /// \brief Returns the radial extent of the mask
     int radial_extent() const { return m_radial_extent; }
 
   private:
-    std::vector<mln::experimental::point2d> m_points;
+    std::vector<mln::point2d> m_points;
     int                                     m_radial_extent;
   };
 
@@ -63,7 +63,7 @@ namespace mln::se::experimental
   /// the set. The SE is assumed to be anchored at the center of the mask, thus the mask must have odd dimensions.
   ///
   /// \code
-  /// mln::se::experimental::mask2d mask = {{0,  0, 1,  0, 0},
+  /// mln::se::mask2d mask = {{0,  0, 1,  0, 0},
   ///                                       {1, .5, 0, .5, 1}
   ///                                       {0,  0, 1,  0, 0}};
   /// \endcode
@@ -71,7 +71,7 @@ namespace mln::se::experimental
   template <class W>
   class wmask2d : private details::wmask2d_base, public wneighborhood_facade<wmask2d<W>>
   {
-    using wpoint = mln::weighted_point<mln::experimental::point2d, W>;
+    using wpoint = mln::weighted_point<mln::point2d, W>;
 
   public:
     static_assert(std::is_arithmetic_v<W>, "The weight type should be arithmetic.");
@@ -135,4 +135,4 @@ namespace mln::se::experimental
     return ::ranges::make_span(m_points.data() + m_points.size() - m_after_size, m_after_size);
   }
 
-} // namespace mln::se::experimental
+} // namespace mln::se

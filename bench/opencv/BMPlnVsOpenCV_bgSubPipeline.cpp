@@ -4,15 +4,15 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/views.hpp>
 #include <mln/core/range/view/zip.hpp>
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
-#include <mln/io/experimental/imread.hpp>
-#include <mln/io/experimental/imsave.hpp>
+#include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/experimental/gaussian_directional_2d.hpp>
@@ -127,9 +127,9 @@ constexpr auto filenames = detail::svap(filenames_base, filenames_bg);
 constexpr std::size_t radius = 28;
 
 
-void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_color,
-                           const mln::experimental::image2d<mln::rgb8>& bg_color,
-                           mln::experimental::image2d<uint8_t>&         output)
+void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color,
+                           const mln::image2d<mln::rgb8>& bg_color,
+                           mln::image2d<uint8_t>&         output)
 {
   // GrayScale (view)
   auto grayscale = [](auto v) -> uint8_t { return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
@@ -152,7 +152,7 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
   auto        tmp_thresholded = mln::view::transform(tmp_grey, thesholding_fun);
 
   // Erosion (algo)
-  auto win        = mln::experimental::se::disc(radius);
+  auto win        = mln::se::disc(radius);
   auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
   // Dilation (algo)
@@ -165,17 +165,17 @@ void pln_bg_sub_pipe_views(const mln::experimental::image2d<mln::rgb8>& img_colo
 }
 
 
-void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_color,
-                           const mln::experimental::image2d<mln::rgb8>& bg_color,
-                           mln::experimental::image2d<uint8_t>&         output)
+void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color,
+                           const mln::image2d<mln::rgb8>& bg_color,
+                           mln::image2d<uint8_t>&         output)
 {
   // GrayScale (algo)
-  mln::experimental::image2d<uint8_t> img_grey, bg_grey;
+  mln::image2d<uint8_t> img_grey, bg_grey;
   mln::resize(img_grey, img_color);
   mln::resize(bg_grey, bg_color);
   {
     auto zipped_images = mln::view::zip(img_grey, bg_grey, img_color, bg_color);
-    auto zipped_pixels = zipped_images.new_pixels();
+    auto zipped_pixels = zipped_images.pixels();
 
     for (auto&& row : mln::ranges::rows(zipped_pixels))
     {
@@ -195,11 +195,11 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
   // Substract (algo)
-  mln::experimental::image2d<uint8_t> tmp_grey;
+  mln::image2d<uint8_t> tmp_grey;
   mln::resize(tmp_grey, img_grey);
   {
     auto zipped_images = mln::view::zip(tmp_grey, img_grey, bg_grey);
-    auto zipped_pixels = zipped_images.new_pixels();
+    auto zipped_pixels = zipped_images.pixels();
 
     for (auto&& row : mln::ranges::rows(zipped_pixels))
     {
@@ -214,11 +214,11 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
 
   // thresholding (algo)
   const float                         threshold = 150;
-  mln::experimental::image2d<uint8_t> tmp_thresholded;
+  mln::image2d<uint8_t> tmp_thresholded;
   mln::resize(tmp_thresholded, tmp_grey);
   {
     auto zipped_images = mln::view::zip(tmp_thresholded, tmp_grey);
-    auto zipped_pixels = zipped_images.new_pixels();
+    auto zipped_pixels = zipped_images.pixels();
 
     for (auto&& row : mln::ranges::rows(zipped_pixels))
     {
@@ -232,7 +232,7 @@ void pln_bg_sub_pipe_algos(const mln::experimental::image2d<mln::rgb8>& img_colo
   }
 
   // erosion (algo)
-  auto win        = mln::experimental::se::disc(radius);
+  auto win        = mln::se::disc(radius);
   auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
   // dilation (algo)
@@ -313,8 +313,8 @@ void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& 
 class BMPlnVsOpenCV_BgSubPipeline : public benchmark::Fixture
 {
 public:
-  using image_t     = mln::experimental::image2d<mln::rgb8>;
-  using out_image_t = mln::experimental::image2d<uint8_t>;
+  using image_t     = mln::image2d<mln::rgb8>;
+  using out_image_t = mln::image2d<uint8_t>;
   using image_cv_t  = cv::Mat;
 
   const std::string filepath =
@@ -333,8 +333,8 @@ public:
         auto it_outs_cv = g_outputs_cv.begin();
         for (auto&& filename : filenames)
         {
-          mln::io::experimental::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, *it_imgs);
-          mln::io::experimental::imread(filepath + "/mosaic_15x15_" + std::string{filename.second}, *it_bgs);
+          mln::io::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, *it_imgs);
+          mln::io::imread(filepath + "/mosaic_15x15_" + std::string{filename.second}, *it_bgs);
           mln::resize(*it_outs, *it_imgs);
 
           *it_imgs_cv = cv::imread(filepath + "/mosaic_15x15_" + std::string{filename.first}, cv::IMREAD_COLOR);

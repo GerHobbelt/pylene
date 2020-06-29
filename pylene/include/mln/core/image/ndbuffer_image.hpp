@@ -158,7 +158,7 @@ namespace mln
     index_type  delta_index(ConstPointRef p) const noexcept;
     /// \}
 
-    /// Extension-related and domain-releated operation
+    /// Extension-related operation
     /// \{
 
     /// \brief Inflate (or reduce, if the value is negative) the domain size by
@@ -175,13 +175,6 @@ namespace mln
     ///
     /// \note No memory reallocation is performed by the method
     void inflate_domain_to_extension();
-
-
-    /// \brief Shift the topleft corner of the domain. The size of the domain is not affected
-    void shift_domain_topleft(ConstPointRef dp) noexcept;
-
-    /// \brief Set the topleft corner of the domain. The size of the domain is not affected.
-    void set_domain_topleft(ConstPointRef p) noexcept;
     /// \}
 
 
@@ -243,12 +236,6 @@ namespace mln
     const details::ndbuffer_image_info_t* __info() const { return this; }
     const axis_info_t& __axes(int i) const { return m_axes[i]; }
     std::byte*         __buf() const { return m_buffer; }
-
-  public:
-    /// Access to the shared_ptr holding the data
-    // SHOULD NOT BE USED EXCEPT FOR PYTHON BINDINGS
-    std::shared_ptr<internal::ndbuffer_image_data>& __data();
-    const std::shared_ptr<internal::ndbuffer_image_data>& __data() const;
   };
 
 

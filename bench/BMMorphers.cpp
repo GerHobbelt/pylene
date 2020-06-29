@@ -2,13 +2,13 @@
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/algorithm/copy.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/range/foreach.hpp>
 
 
 // Threshold A la C
-unsigned threshold1(mln::experimental::image2d<uint8_t> f, uint8_t v)
+unsigned threshold1(mln::image2d<uint8_t> f, uint8_t v)
 {
   int         h       = f.height();
   int         w       = f.width();
@@ -25,7 +25,7 @@ unsigned threshold1(mln::experimental::image2d<uint8_t> f, uint8_t v)
   return count;
 }
 
-unsigned threshold1_bis(mln::experimental::image2d<uint8_t> f, uint8_t v)
+unsigned threshold1_bis(mln::image2d<uint8_t> f, uint8_t v)
 {
   int         h       = f.height();
   int         w       = f.width();
@@ -50,31 +50,31 @@ unsigned threshold1_bis(mln::experimental::image2d<uint8_t> f, uint8_t v)
   return count;
 }
 
-unsigned threshold2(mln::experimental::image2d<uint8_t> f, uint8_t v)
+unsigned threshold2(mln::image2d<uint8_t> f, uint8_t v)
 {
   unsigned count = 0;
-  mln_foreach_new (auto val, f.new_values())
+  mln_foreach (auto val, f.values())
     count += (val < v);
 
   return count;
 }
 
-unsigned threshold3(mln::experimental::image2d<uint8_t> f, uint8_t v)
+unsigned threshold3(mln::image2d<uint8_t> f, uint8_t v)
 {
   unsigned count = 0;
-  mln_foreach_new (auto px, f.new_pixels())
+  mln_foreach (auto px, f.pixels())
     count += (px.val() < v);
   return count;
 }
 
-unsigned threshold4(mln::experimental::image2d<uint8_t> f, uint8_t v)
+unsigned threshold4(mln::image2d<uint8_t> f, uint8_t v)
 {
   using namespace mln::view::ops;
 
   return mln::accumulate(f < v, mln::accu::accumulators::sum<unsigned>());
 }
 
-void threshold5(mln::experimental::image2d<uint8_t> f, mln::experimental::image2d<bool> out, uint8_t v)
+void threshold5(mln::image2d<uint8_t> f, mln::image2d<bool> out, uint8_t v)
 {
   const int h = f.height();
   const int w = f.width();
@@ -93,8 +93,8 @@ void threshold5(mln::experimental::image2d<uint8_t> f, mln::experimental::image2
   }
 }
 
-void threshold6(mln::experimental::image2d<uint8_t> f, mln::experimental::image2d<bool> out, uint8_t v)
+void threshold6(mln::image2d<uint8_t> f, mln::image2d<bool> out, uint8_t v)
 {
   using namespace mln::view::ops;
-  mln::experimental::copy(f < v, out);
+  mln::copy(f < v, out);
 }

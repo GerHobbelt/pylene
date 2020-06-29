@@ -1,8 +1,8 @@
-add_subdirectory(source/snippets)
-
 find_package(Doxygen)
 find_package(Sphinx)
+find_package(Boost COMPONENTS program_options REQUIRED)
 
+add_subdirectory(source/snippets)
 
 if(DOXYGEN_FOUND)
   set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR}/pylene/include)
@@ -39,6 +39,5 @@ if(SPHINX_FOUND AND DOXYGEN_FOUND)
                     DEPENDS build-images build-doxygen ${SPHINX_SOURCES}
                     COMMENT "Generating Sphinx documentation")
 
-                    
   add_dependencies(build-doc build-sphinx)
 endif()

@@ -20,9 +20,9 @@ namespace mln::morpho::details
   /// \param[in] roi Processing roi
   template <class I, class J, class BinaryFunction>
   [[gnu::noinline]] void dilation_by_periodic_line(I& in, J& out,
-                                                   const mln::experimental::se::periodic_line2d& line,
+                                                   const mln::se::periodic_line2d& line,
                                                    BinaryFunction sup,
-                                                   mln::experimental::box2d roi);
+                                                   mln::box2d roi);
 
   /******************************************/
   /****          Implementation          ****/
@@ -31,8 +31,8 @@ namespace mln::morpho::details
   // fixme: could be optimized for indexable images
   template <class I>
   [[gnu::noinline]] void copy_to_periodic_line(I& f,
-                                               mln::experimental::point2d origin,
-                                               mln::experimental::point2d direction,
+                                               mln::point2d origin,
+                                               mln::point2d direction,
                                                std::size_t n,
                                                image_value_t<I>* __restrict buffer)
   {
@@ -44,8 +44,8 @@ namespace mln::morpho::details
   // fixme: could be optimized for indexable images
   template <class J>
   [[gnu::noinline]] void copy_from_periodic_line(const image_value_t<J>* __restrict buffer,
-                                                 mln::experimental::point2d origin,
-                                                 mln::experimental::point2d direction,
+                                                 mln::point2d origin,
+                                                 mln::point2d direction,
                                                  std::size_t n,
                                                  J output)
   {
@@ -61,9 +61,9 @@ namespace mln::morpho::details
   // Generic implementation
   template <class I, class J, class BinaryFunction>
   void dilation_by_periodic_line_generic(I& in, J& out,
-                                         const mln::experimental::se::periodic_line2d& line,
+                                         const mln::se::periodic_line2d& line,
                                          BinaryFunction sup,
-                                         mln::experimental::box2d roi)
+                                         mln::box2d roi)
   {
     using V = image_value_t<I>;
 
@@ -90,7 +90,7 @@ namespace mln::morpho::details
     // std::fill_n(g.get(), buffer_size, V(0));
     // std::fill_n(h.get(), buffer_size, V(0));
 
-    auto fun = [&, k](mln::experimental::point2d origin, mln::experimental::point2d dir, std::size_t n) {
+    auto fun = [&, k](mln::point2d origin, mln::point2d dir, std::size_t n) {
       copy_to_periodic_line(in, origin - k * period, dir, n + 2 * k, p.get());
       //copy_to_periodic_line(in, origin, dir, n, p.get() + k);
       mln::morpho::experimental::details::running_max_1d(p.get() + k, g.get() + k, h.get() + k, (int)n, k, sup);
@@ -103,9 +103,9 @@ namespace mln::morpho::details
   // Dispatch to generic version
   template <class I, class J, class BinaryFunction>
   void dilation_by_periodic_line(I& in, J& out,
-                                 const mln::experimental::se::periodic_line2d& line,
+                                 const mln::se::periodic_line2d& line,
                                  BinaryFunction sup,
-                                 mln::experimental::box2d roi)
+                                 mln::box2d roi)
   {
     dilation_by_periodic_line_generic(in, out, line, sup, roi);
   }
@@ -113,9 +113,9 @@ namespace mln::morpho::details
 
   template <class I, class T, class BinaryFunction>
   std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>
-  dilation_by_periodic_line(I& in, mln::experimental::image2d<T>& out,
-                            const mln::experimental::se::periodic_line2d& line, BinaryFunction sup,
-                            mln::experimental::box2d roi)
+  dilation_by_periodic_line(I& in, mln::image2d<T>& out,
+                            const mln::se::periodic_line2d& line, BinaryFunction sup,
+                            mln::box2d roi)
   {
     int                   k      = line.repetition();
     [[maybe_unused]] auto period = line.period();

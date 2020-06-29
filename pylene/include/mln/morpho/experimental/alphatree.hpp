@@ -124,7 +124,7 @@ namespace mln::morpho::experimental
                                             std::vector<int>& par,                     //
                                             std::vector<W>&   levels)
     {
-      static_assert(mln::is_a<I, mln::experimental::Image>());
+      static_assert(mln::is_a<I, mln::details::Image>());
 
 
 
@@ -179,8 +179,8 @@ namespace mln::morpho::experimental
   std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
   alphatree(I input, N nbh, F distance)
   {
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
     static_assert(::ranges::cpp20::invocable<F, image_value_t<I>, image_value_t<I>>);
 
     using V = image_value_t<I>;

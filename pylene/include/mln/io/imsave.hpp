@@ -5,7 +5,7 @@
 #include <string>
 
 
-namespace mln::io::experimental
+namespace mln::io
 {
   template <class I>
   void imsave(I&& image, const std::string& filename);
@@ -22,8 +22,8 @@ namespace mln::io::experimental
   void imsave(Image&& image, const char* filename)
   {
     using I = std::remove_reference_t<Image>;
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(std::is_same<image_domain_t<I>, mln::experimental::box2d>() &&
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(std::is_same<image_domain_t<I>, mln::box2d>() &&
                   "The domain must be a regular box2d");
 
     mln::io::internal::freeimage_writer_plugin p;

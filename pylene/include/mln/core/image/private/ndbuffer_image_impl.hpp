@@ -6,6 +6,9 @@ namespace mln::details
   {
     static void select(ndbuffer_image_info_t* ima, int dim, const int begin_coords[], const int end_coords[]);
     static std::size_t get_sample_byte_size(const ndbuffer_image_info_t* ima);
+
+    template <class T, int pdim>
+    static __ndbuffer_image<T, pdim>* cast(ndbuffer_image_info_t* ima);
   };
 
   template <class T>
@@ -54,6 +57,12 @@ namespace mln::details
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
+
+  template <class T, int pdim>
+  __ndbuffer_image<T, pdim>* ndbuffer_image_impl_base_0::cast(ndbuffer_image_info_t* ima)
+  {
+    return reinterpret_cast<__ndbuffer_image<T, pdim>*>(ima);
+  }
 
   template <int pdim>
   constexpr int ndbuffer_image_impl_base_2<pdim>::get_pdim(const ndbuffer_image_info_t*)

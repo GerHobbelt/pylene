@@ -115,7 +115,7 @@ public:
     sup_t sup = {m_sup, m_sup_vec};
     mln::morpho::experimental::details::vertical_running_max_algo_t<int, sup_t> algo(sup);
     
-    mln::experimental::box2d roi(width, height);
+    mln::box2d roi(width, height);
     algo.running_max_block2d((std::byte*)(f.data() + radius * stride), //
                              (std::byte*)(g.data() + radius * stride), //
                              (std::byte*)(h.data() + radius * stride), //

@@ -3,7 +3,7 @@
 #include "ndimage_buffer_helper.hpp"
 #include "visit.hpp"
 
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/core/trace.hpp>
@@ -21,8 +21,8 @@ namespace py = pybind11;
 namespace
 {
 
-  using se_t = std::variant<mln::experimental::se::disc, mln::experimental::se::disc_non_decomp,
-                            mln::experimental::se::rect2d, mln::experimental::se::rect2d_non_decomp>;
+  using se_t = std::variant<mln::se::disc, mln::se::disc_non_decomp,
+                            mln::se::rect2d, mln::se::rect2d_non_decomp>;
 
   template <typename T>
   struct dilate2d_operator_t

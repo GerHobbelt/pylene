@@ -1,12 +1,12 @@
 #include <mln/core/canvas/private/traverse2d.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
 namespace mln::canvas::details
 {
 
-  void traverse_along_direction(mln::experimental::box2d roi,
-                                mln::experimental::point2d direction,
-                                std::function<void(mln::experimental::point2d, mln::experimental::point2d, std::size_t n)> callback)
+  void traverse_along_direction(mln::box2d roi,
+                                mln::point2d direction,
+                                std::function<void(mln::point2d, mln::point2d, std::size_t n)> callback)
   {
     if (roi.empty())
       return;

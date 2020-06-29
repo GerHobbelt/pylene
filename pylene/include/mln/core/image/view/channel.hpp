@@ -11,7 +11,7 @@ namespace mln::view
   template <typename InputImage>
   auto channel(InputImage ima, int k)
   {
-    static_assert(is_a<InputImage, mln::experimental::Image>());
+    static_assert(is_a<InputImage, mln::details::Image>());
 
     return mln::view::transform(std::move(ima), dyn_getter{k});
   }
@@ -19,7 +19,7 @@ namespace mln::view
   template <unsigned k, typename InputImage>
   auto channel(InputImage ima)
   {
-    static_assert(is_a<InputImage, mln::experimental::Image>());
+    static_assert(is_a<InputImage, mln::details::Image>());
 
     return mln::view::transform(std::move(ima), getter<k>{});
   }

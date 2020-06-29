@@ -1,10 +1,11 @@
 project(PyleneTest)
-cmake_minimum_required(VERSION 3.8.2)
+cmake_minimum_required(VERSION 3.11)
 
-include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+  include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
+endif()
 
 find_package(Pylene REQUIRED)
-find_package(FreeImage REQUIRED)
 
 add_executable(main main.cpp)
-target_link_libraries(main Pylene::Pylene FreeImage::FreeImage)
+target_link_libraries(main Pylene::Pylene)

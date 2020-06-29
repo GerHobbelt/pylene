@@ -1,6 +1,6 @@
-#include <mln/morpho/experimental/private/hvector_unbounded.hpp>
+#include <mln/morpho/private/hvector_unbounded.hpp>
 
-namespace  mln::morpho::experimental::details
+namespace  mln::morpho::details
 {
   namespace
   {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/image/image.hpp>
+#include <mln/core/concepts/image.hpp>
 
 #include <mln/core/assert.hpp>
 

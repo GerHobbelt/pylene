@@ -37,7 +37,7 @@ namespace mln
 
   template <class I>
   class clamp_extended_view : public extend_by_projection_view_base<I, details::clamp_projector<image_domain_t<I>>>,
-                              public experimental::Image<clamp_extended_view<I>>
+                              public mln::details::Image<clamp_extended_view<I>>
   {
     using base = extend_by_projection_view_base<I, details::clamp_projector<image_domain_t<I>>>;
   public:
@@ -57,7 +57,7 @@ namespace mln
     template <class I>
     clamp_extended_view<I> clamp_extended(I image)
     {
-      static_assert(::concepts::convertible_to<image_domain_t<I>, mln::experimental::Box>,
+      static_assert(::concepts::convertible_to<image_domain_t<I>, mln::Box>,
                     "Clamp requires image to be defined over a regular box domain");
       return clamp_extended_view<I>{std::move(image)};
     }

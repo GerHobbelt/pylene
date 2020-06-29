@@ -45,7 +45,7 @@ namespace mln::ranges
     requires ::ranges::cpp20::bidirectional_range<R>
     auto reverse(R&& rng)
     {
-      return ::ranges::view::reverse(std::forward<R>(rng));
+      return ::ranges::views::reverse(std::forward<R>(rng));
     }
   }
 

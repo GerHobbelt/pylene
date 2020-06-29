@@ -1,7 +1,7 @@
 project(apps)
 
-# link_libraries(Pylene)
-# include_directories(${CMAKE_SOURCE_DIR})
+link_libraries(Pylene)
+include_directories(${CMAKE_SOURCE_DIR})
 
 
 # add_subdirectory(maxtree_comparison)

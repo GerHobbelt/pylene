@@ -16,8 +16,4 @@ namespace mln
 
   template <class T>
   using image3d = mln::__ndbuffer_image<T, 3>;
-
-
-  template <class T, int dim>
-  using ndimage = mln::__ndbuffer_image<T, dim>;
 }

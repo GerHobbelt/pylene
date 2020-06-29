@@ -103,9 +103,10 @@ namespace mln::ranges
   } // namespace details
 
 
-  template <class F, MDRange... Rng>
+  template <class F, class... Rng>
   struct zip_with_mdview : details::mdview_facade<zip_with_mdview<F, Rng...>>
   {
+    static_assert((... && MDRange<Rng>));
     using cursor = details::zip_with_mdcursor<F, ::ranges::detail::begin_cursor_t<Rng>...>;
 
     cursor begin_cursor() const
@@ -176,7 +177,7 @@ namespace mln::ranges
     template <class F, ::ranges::cpp20::range... Rng>
     [[gnu::always_inline]] inline auto zip_with(F&& zip_fn, Rng&&... ranges)
     {
-      return ::ranges::view::zip_with(std::forward<F>(zip_fn), std::forward<Rng>(ranges)...);
+      return ::ranges::views::zip_with(std::forward<F>(zip_fn), std::forward<Rng>(ranges)...);
     }
   }
 
@@ -192,7 +193,7 @@ namespace mln::ranges
     template <::ranges::cpp20::range... Rng>
     [[gnu::always_inline]] inline auto zip(Rng&&... ranges)
     {
-      return ::ranges::view::zip(std::forward<Rng>(ranges)...);
+      return ::ranges::views::zip(std::forward<Rng>(ranges)...);
     }
   }
 

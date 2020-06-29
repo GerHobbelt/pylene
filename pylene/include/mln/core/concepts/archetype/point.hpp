@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mln/core/concepts/point.hpp>
+// #include <mln/core/concepts/point.hpp>
 
 
 namespace mln::archetypes
@@ -16,7 +16,5 @@ namespace mln::archetypes
   bool operator>(const Point&, const Point&);
   bool operator<=(const Point&, const Point&);
   bool operator>=(const Point&, const Point&);
-
-  static_assert(mln::concepts::Point<Point>, "Point archetype does not model the Point concept!");
 
 } // namespace mln::archetypes

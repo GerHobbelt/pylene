@@ -6,7 +6,7 @@
 #include <concepts/type_traits.hpp>
 
 
-namespace mln::experimental
+namespace mln
 {
   // Forward declaration
   template <class Impl>
@@ -205,7 +205,7 @@ namespace mln::experimental
       pcontainer(const pcontainer& other) = default;
 
       // From a span
-      constexpr pcontainer(int dim, const T* data) noexcept
+      constexpr pcontainer([[maybe_unused]]  int dim, const T* data) noexcept
       {
         assert(dim == Dim && "Point dimensions mistmatch.");
         for (int i = 0; i < Dim; ++i)
@@ -575,7 +575,7 @@ namespace mln::experimental
 
 
 
-} // namespace mln::experimental
+} // namespace mln
 
 
 
@@ -583,11 +583,11 @@ namespace mln::experimental
 namespace concepts
 {
   template <class UImpl, class VImpl, template<class> class TQual, template<class> class UQual>
-    struct basic_common_reference<mln::experimental::_point<UImpl>, mln::experimental::_point<VImpl>, TQual, UQual>
+    struct basic_common_reference<mln::_point<UImpl>, mln::_point<VImpl>, TQual, UQual>
   {
     static_assert((UImpl::ndim == -1) || (VImpl::ndim == -1) || (UImpl::ndim == UImpl::ndim),
                   "Incompatible number of dimensions.");
-    using type = mln::experimental::ndpoint<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1,
+    using type = mln::ndpoint<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1,
                                             common_reference_t<typename UImpl::value_type, typename VImpl::value_type>>;
   };
 }

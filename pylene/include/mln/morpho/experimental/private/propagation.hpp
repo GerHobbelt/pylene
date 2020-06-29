@@ -58,7 +58,7 @@ namespace mln::morpho::experimental::details
     assert(inf.domain() == ord.domain());
     assert(inf.domain().has(pstart));
 
-    using connectivity_t = std::conditional_t<P::ndim == 2, mln::experimental::c4_t, mln::experimental::c6_t>;
+    using connectivity_t = std::conditional_t<P::ndim == 2, mln::c4_t, mln::c6_t>;
 
     enum
     {

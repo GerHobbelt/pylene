@@ -2,7 +2,7 @@
 
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/transform.hpp>
 
@@ -14,22 +14,22 @@ TEST(View, maths_abs)
   using namespace mln::view::ops;
   using namespace mln::view::maths;
 
-  mln::experimental::image2d<int> ima = {{0, -1, 2, -3, 4},  //
+  mln::image2d<int> ima = {{0, -1, 2, -3, 4},  //
                                          {-5, 6, -4, 8, -9}, //
                                          {10, -11, 12, -13, 14}};
 
-  mln::experimental::image2d<int> ref = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ref = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 4, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
   ASSERT_TRUE(mln::all_of(ref == abs(ima)));
 
 
-  mln::experimental::image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
+  mln::image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}};
 
-  mln::experimental::image2d<mln::rgb8> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
+  mln::image2d<mln::rgb8> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}};
 
@@ -41,11 +41,11 @@ TEST(View, maths_sqr)
   using namespace mln::view::ops;
   using namespace mln::view::maths;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 4, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
-  mln::experimental::image2d<int> ref = {{0, 1, 4, 9, 16},     //
+  mln::image2d<int> ref = {{0, 1, 4, 9, 16},     //
                                          {25, 36, 16, 64, 81}, //
                                          {100, 121, 144, 169, 196}};
 
@@ -53,11 +53,11 @@ TEST(View, maths_sqr)
   ASSERT_TRUE(mln::all_of(ref == sqr(ima)));
 #endif
 
-  mln::experimental::image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
+  mln::image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}};
 
-  mln::experimental::image2d<mln::rgb8> ref2 = {{{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, //
+  mln::image2d<mln::rgb8> ref2 = {{{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, //
                                                 {{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, //
                                                 {{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}};
 
@@ -69,7 +69,7 @@ TEST(View, maths_pow)
   using namespace mln::view::ops;
   using namespace mln::view::maths;
 
-  mln::experimental::image2d<int> ref = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ref = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 4, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
@@ -80,11 +80,11 @@ TEST(View, maths_pow)
 #endif
 
 
-  mln::experimental::image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
+  mln::image2d<mln::rgb8> ima2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}};
 
-  mln::experimental::image2d<mln::rgb16> ref2 = {{{1, 8, 27}, {64, 125, 216}, {343, 512, 729}}, //
+  mln::image2d<mln::rgb16> ref2 = {{{1, 8, 27}, {64, 125, 216}, {343, 512, 729}}, //
                                                  {{1, 8, 27}, {64, 125, 216}, {343, 512, 729}}, //
                                                  {{1, 8, 27}, {64, 125, 216}, {343, 512, 729}}};
 
@@ -98,22 +98,22 @@ TEST(View, maths_sqrt)
   using namespace mln::view::ops;
   using namespace mln::view::maths;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 4, 9, 16},     //
+  mln::image2d<int> ima = {{0, 1, 4, 9, 16},     //
                                          {25, 36, 16, 64, 81}, //
                                          {100, 121, 144, 169, 196}};
 
-  mln::experimental::image2d<int> ref = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ref = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 4, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
   ASSERT_TRUE(mln::all_of(ref == sqrt(ima)));
 
 
-  mln::experimental::image2d<mln::rgb8> ima2 = {{{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, //
+  mln::image2d<mln::rgb8> ima2 = {{{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, //
                                                 {{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, //
                                                 {{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}};
 
-  mln::experimental::image2d<mln::rgb8> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
+  mln::image2d<mln::rgb8> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                 {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}};
 
@@ -125,7 +125,7 @@ TEST(View, maths_cbrt)
   using namespace mln::view::ops;
   using namespace mln::view::maths;
 
-  mln::experimental::image2d<double> ref = {{0, 1, 2, 3, 4}, //
+  mln::image2d<double> ref = {{0, 1, 2, 3, 4}, //
                                             {5, 6, 4, 8, 9}, //
                                             {10, 11, 12, 13, 14}};
 
@@ -135,7 +135,7 @@ TEST(View, maths_cbrt)
   ASSERT_TRUE(mln::all_of(equalFP(ref, cbrt(ima), 10e-6)));
 #endif
 
-  mln::experimental::image2d<mln::rgb<double>> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
+  mln::image2d<mln::rgb<double>> ref2 = {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                        {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, //
                                                        {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}};
 

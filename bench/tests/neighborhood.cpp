@@ -1,6 +1,6 @@
 
-#include <mln/core/image/experimental/ndimage.hpp>
-#include <mln/io/experimental/imread.hpp>
+#include <mln/core/image/ndimage.hpp>
+#include <mln/io/imread.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
@@ -16,7 +16,7 @@ class CoreNeighborhood : public ::testing::Test
   {
     std::string filename = fixtures::ImagePath::concat_with_filename("lena.pgm");
 
-    mln::io::experimental::imread(filename, m_input);
+    mln::io::imread(filename, m_input);
     m_input.extension().fill(0);
 
     m_h       = m_input.height();
@@ -26,23 +26,23 @@ class CoreNeighborhood : public ::testing::Test
   }
 
 protected:
-  using fun1_t = std::function<void(const mln::experimental::image2d<uint8_t>&, mln::experimental::image2d<uint8_t>&)>;
+  using fun1_t = std::function<void(const mln::image2d<uint8_t>&, mln::image2d<uint8_t>&)>;
   using fun2_t = std::function<void(const uint8_t*, uint8_t*, int, int, std::ptrdiff_t)>;
 
-  mln::experimental::image2d<uint8_t> run_with(fun1_t f) const;
-  mln::experimental::image2d<uint8_t> run_with(fun2_t f) const;
+  mln::image2d<uint8_t> run_with(fun1_t f) const;
+  mln::image2d<uint8_t> run_with(fun2_t f) const;
 
 private:
   int                      m_w, m_h;
   std::ptrdiff_t           m_stride;
   uint8_t*              m_ibuffer;
 
-  mln::experimental::image2d<uint8_t> m_input;
+  mln::image2d<uint8_t> m_input;
 };
 
-mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun1_t f) const
+mln::image2d<uint8_t> CoreNeighborhood::run_with(fun1_t f) const
 {
-  mln::experimental::image2d<uint8_t> output;
+  mln::image2d<uint8_t> output;
   mln::resize(output, m_input);
 
   f(m_input, output);
@@ -50,9 +50,9 @@ mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun1_t f) const
 }
 
 
-mln::experimental::image2d<uint8_t> CoreNeighborhood::run_with(fun2_t f) const
+mln::image2d<uint8_t> CoreNeighborhood::run_with(fun2_t f) const
 {
-  mln::experimental::image2d<uint8_t> output;
+  mln::image2d<uint8_t> output;
   mln::resize(output, m_input);
 
   uint8_t* obuffer = output.buffer();

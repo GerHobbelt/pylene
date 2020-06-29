@@ -95,8 +95,8 @@ namespace mln::morpho::experimental
   {
     using I = std::remove_reference_t<InputImage>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     return impl::maxima_extinction_transform(ima, nbh, std::less<image_value_t<I>>());
   }
@@ -107,8 +107,8 @@ namespace mln::morpho::experimental
   {
     using I = std::remove_reference_t<InputImage>;
 
-    static_assert(mln::is_a<I, mln::experimental::Image>());
-    static_assert(mln::is_a<N, mln::experimental::Neighborhood>());
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
 
     return impl::maxima_extinction_transform(ima, nbh, std::greater<image_value_t<I>>());
   }

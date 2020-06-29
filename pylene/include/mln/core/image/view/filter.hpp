@@ -19,7 +19,7 @@ namespace mln
 {
 
   template <class I, class F>
-  class filter_view : public image_adaptor<I>, public experimental::Image<filter_view<I, F>>
+  class filter_view : public image_adaptor<I>, public details::Image<filter_view<I, F>>
   {
     using fun_t = F;
     fun_t f;
@@ -27,7 +27,7 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using new_pixel_type = image_pixel_t<I>;
+    using pixel_type = image_pixel_t<I>;
     using typename filter_view::image_adaptor::point_type;
     using typename filter_view::image_adaptor::reference;
     using typename filter_view::image_adaptor::value_type;
@@ -82,12 +82,12 @@ namespace mln
 
     domain_type domain() const { return {this->base(), f}; }
 
-    auto new_values() { return mln::ranges::view::filter(this->base().new_values(), f); }
+    auto values() { return mln::ranges::view::filter(this->base().values(), f); }
 
-    auto new_pixels()
+    auto pixels()
     {
       auto g = [f_ = this->f](const auto& px) -> bool { return f_(px.val()); };
-      return mln::ranges::view::filter(this->base().new_pixels(), g);
+      return mln::ranges::view::filter(this->base().pixels(), g);
     }
 
 
@@ -115,17 +115,17 @@ namespace mln
     {
       return this->base().at(p);
     }
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(domain().has(p));
       mln_precondition(std::invoke(f, this->base().at(p)));
-      return this->base().new_pixel(p);
+      return this->base().pixel(p);
     }
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return this->base().new_pixel_at(p);
+      return this->base().pixel_at(p);
     }
     /// \}
 
@@ -166,7 +166,7 @@ namespace mln
     template <class I, class P>
     filter_view<I, P> filter(I ima, P predicate)
     {
-      static_assert(mln::is_a<I, experimental::Image>());
+      static_assert(mln::is_a<I, mln::details::Image>());
       static_assert(std::is_invocable_r<bool, P, image_reference_t<I>>());
 
       return {std::move(ima), std::move(predicate)};

@@ -3,7 +3,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/se/disc.hpp>
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -17,10 +17,10 @@ TEST(Core, Clamp_LargeEnough_BM_Auto)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
-  [[maybe_unused]] mln::experimental::image2d<uint8_t> out  = clone(ima);
-  [[maybe_unused]] auto           disc = mln::experimental::se::disc{1};
+  [[maybe_unused]] mln::image2d<uint8_t> out  = clone(ima);
+  [[maybe_unused]] auto           disc = mln::se::disc{1};
 
   // TODO: implement clamp in ndimage
   /*
@@ -41,11 +41,11 @@ TEST(Core, Clamp_NotLargeEnough_BM_Auto)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
-  mln::experimental::image2d<uint8_t> ref = clone(ima);
+  mln::image2d<uint8_t> ref = clone(ima);
 
-  auto disc                      = mln::experimental::se::disc{4};
+  auto disc                      = mln::se::disc{4};
   auto [managed_ima, managed_se] = mln::extension::bm::clamp().manage(ima, disc);
 
 
@@ -64,10 +64,10 @@ TEST(Core, Clamp_LargeEnough_BM_User)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
-  [[maybe_unused]] mln::experimental::image2d<uint8_t> out  = clone(ima);
-  [[maybe_unused]] auto           disc = mln::experimental::se::disc{1};
+  [[maybe_unused]] mln::image2d<uint8_t> out  = clone(ima);
+  [[maybe_unused]] auto           disc = mln::se::disc{1};
 
   // TODO: implement clamp in ndimage
   /*
@@ -88,11 +88,11 @@ TEST(Core, Clamp_NotLargeEnough_BM_Native)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
-  [[maybe_unused]] mln::experimental::image2d<uint8_t> out = clone(ima);
+  [[maybe_unused]] mln::image2d<uint8_t> out = clone(ima);
 
-  [[maybe_unused]] auto disc = mln::experimental::se::disc{4};
+  [[maybe_unused]] auto disc = mln::se::disc{4};
   [[maybe_unused]] auto bm   = mln::extension::bm::native::clamp();
   // TODO: implement clamp in ndimage
   // EXPECT_THROW(bm.manage(ima, disc), std::runtime_error);

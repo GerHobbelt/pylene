@@ -1,8 +1,8 @@
-#include <mln/morpho/experimental/private/hvector.hpp>
+#include <mln/morpho/private/hvector.hpp>
 
 
 
-namespace mln::morpho::experimental::details
+namespace mln::morpho::details
 {
 
 

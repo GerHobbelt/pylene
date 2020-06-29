@@ -6,10 +6,10 @@
 
 namespace
 {
-  std::vector<mln::experimental::point2d>
+  std::vector<mln::point2d>
   initlist_to_vector(const std::initializer_list<std::initializer_list<int>>& values, int& width, int& height)
   {
-    std::vector<mln::experimental::point2d> vals;
+    std::vector<mln::point2d> vals;
 
     height = static_cast<int>(values.size());
     if (height == 0 || height % 2 == 0)
@@ -94,7 +94,7 @@ namespace
 }
 
 
-namespace mln::se::experimental
+namespace mln::se
 {
 
   namespace details
@@ -119,9 +119,9 @@ namespace mln::se::experimental
   }
 
 
-  ::ranges::span<const mln::experimental::point2d> mask2d::offsets() const
+  ::ranges::span<const mln::point2d> mask2d::offsets() const
   {
     return ::ranges::make_span(m_points.data(), m_points.size());
   }
 
-} // namespace mln::se::experimental
+} // namespace mln::se::

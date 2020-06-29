@@ -1,4 +1,4 @@
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
 #include <mln/core/algorithm/count.hpp>
 #include <mln/core/algorithm/fill.hpp>
@@ -8,7 +8,7 @@
 
 TEST(Core, Algorithm_Count)
 {
-  mln::experimental::image2d<int> ima(10, 10);
+  mln::image2d<int> ima(10, 10);
 
   mln::iota(ima, 0);
 
@@ -17,7 +17,7 @@ TEST(Core, Algorithm_Count)
 
 TEST(Core, Algorithm_Count42)
 {
-  mln::experimental::image2d<int> ima(3, 3);
+  mln::image2d<int> ima(3, 3);
 
   mln::fill(ima, 42);
 

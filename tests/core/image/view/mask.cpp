@@ -1,7 +1,7 @@
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/concepts/archetype/image.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/mask.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/range/foreach.hpp>
@@ -13,11 +13,11 @@ TEST(View, mask)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                            {5, 6, 7, 8, 9}, //
                            {10, 11, 12, 13, 14}};
 
-  mln::experimental::image2d<int> ref = {{0, 42, 2, 42, 4},  //
+  mln::image2d<int> ref = {{0, 42, 2, 42, 4},  //
                            {42, 6, 42, 8, 42}, //
                            {10, 42, 12, 42, 14}};
 
@@ -51,11 +51,11 @@ TEST(View, mask_twice)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima = {{0, 1, 2, 3, 4}, //
+  mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
                                          {5, 6, 7, 8, 9}, //
                                          {10, 11, 12, 13, 14}};
 
-  mln::experimental::image2d<int> ref = {{0, 42, 2, 3, 4},  //
+  mln::image2d<int> ref = {{0, 42, 2, 3, 4},  //
                                          {42, 6, 7, 8, 42}, //
                                          {10, 11, 12, 42, 14}};
 
@@ -92,7 +92,7 @@ TEST(View, mask_twice)
 }
 
 
-struct mask_archetype : mln::experimental::Image<mask_archetype>
+struct mask_archetype : mln::details::Image<mask_archetype>
 {
   using value_type    = bool;
   using reference     = const bool&;
@@ -101,7 +101,7 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   using category_type = mln::forward_image_tag;
   using concrete_type = mask_archetype;
 
-  struct new_pixel_type
+  struct pixel_type
   {
     bool       val() const;
     point_type point() const;
@@ -120,15 +120,15 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   domain_type    domain() const;
   reference      operator()(point_type);
   reference      at(point_type);
-  new_pixel_type new_pixel(point_type);
-  new_pixel_type new_pixel_at(point_type);
+  pixel_type pixel(point_type);
+  pixel_type pixel_at(point_type);
 
   struct pixel_range
   {
-    const new_pixel_type* begin();
-    const new_pixel_type* end();
+    const pixel_type* begin();
+    const pixel_type* end();
   };
-  pixel_range new_pixels();
+  pixel_range pixels();
 
 
   struct value_range
@@ -137,7 +137,7 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
     const value_type* end();
   };
 
-  value_range new_values();
+  value_range values();
 };
 
 

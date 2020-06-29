@@ -5,7 +5,7 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/domain/where.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/range/rows.hpp>
@@ -17,9 +17,9 @@
 #include <gtest/gtest.h>
 
 
-mln::experimental::image2d<int> make_image()
+mln::image2d<int> make_image()
 {
-  mln::experimental::image2d<int> x(5, 5);
+  mln::image2d<int> x(5, 5);
   mln::iota(x, 0);
   return x;
 }
@@ -38,7 +38,7 @@ TEST(Core, Image2d_LValueOperator)
   mln::image_build_params params;
   params.init_value = rgb{0, 0, 0};
 
-  auto ima = mln::experimental::image2d<rgb>(5, 5, params);
+  auto ima = mln::image2d<rgb>(5, 5, params);
   auto x   = mln::view::transform(ima, &rgb::r);
   mln::fill(x, 12);
 
@@ -50,8 +50,8 @@ TEST(Core, UnaryOperator)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
-  mln::experimental::image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
+  mln::image2d<int> ima = {{1, 2, 3}, {4, 5, 6}};
+  mln::image2d<int> ref = {{-1, -2, -3}, {-4, -5, -6}};
 
   auto g = -ima;
   ASSERT_IMAGES_EQ_EXP(g, ref);
@@ -61,8 +61,8 @@ TEST(Core, BinaryOperator_SameTypes)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
-  mln::experimental::image2d<uint8_t> ref = {{2, 4, 6}, {8, 10, 12}};
+  mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
+  mln::image2d<uint8_t> ref = {{2, 4, 6}, {8, 10, 12}};
 
   auto g1 = ima + ima;
   auto g2 = uint8_t(2) * ima;
@@ -81,8 +81,8 @@ TEST(Core, BinaryOperator_EqualFP)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<double> ima = {{1.015, 2.015, 3.015}, {4.015, 5.015, 6.015}};
-  mln::experimental::image2d<double> ref = {{1.016, 2.016, 3.016}, {4.016, 5.016, 6.016}};
+  mln::image2d<double> ima = {{1.015, 2.015, 3.015}, {4.015, 5.015, 6.015}};
+  mln::image2d<double> ref = {{1.016, 2.016, 3.016}, {4.016, 5.016, 6.016}};
 
   ASSERT_TRUE(mln::all_of(equalFP(ima, ref, 10e-3)));
   ASSERT_TRUE(mln::all_of(not equalFP(ima, ref, 10e-5)));
@@ -92,9 +92,9 @@ TEST(Core, BinaryOperators_MixedTypes)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t>  ima1 = {{1, 2, 3}, {4, 5, 6}};
-  mln::experimental::image2d<uint16_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
-  mln::experimental::image2d<uint16_t> ref  = {{2, 4, 6}, {8, 10, 12}};
+  mln::image2d<uint8_t>  ima1 = {{1, 2, 3}, {4, 5, 6}};
+  mln::image2d<uint16_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
+  mln::image2d<uint16_t> ref  = {{2, 4, 6}, {8, 10, 12}};
 
   auto g1 = ima1 + ima2;
   auto g2 = uint16_t(2) * ima1;
@@ -117,18 +117,18 @@ TEST(Core, IfElse)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> x = {{1, 2, 3}, //
+  mln::image2d<uint8_t> x = {{1, 2, 3}, //
                                            {4, 5, 6}};
-  mln::experimental::image2d<uint8_t> y = {{4, 5, 6}, //
+  mln::image2d<uint8_t> y = {{4, 5, 6}, //
                                            {1, 2, 3}};
 
-  mln::experimental::image2d<uint8_t> ref_f1 = {{12, 12, 12}, //
+  mln::image2d<uint8_t> ref_f1 = {{12, 12, 12}, //
                                                 {4, 5, 6}};
-  mln::experimental::image2d<uint8_t> ref_f2 = {{4, 5, 6}, //
+  mln::image2d<uint8_t> ref_f2 = {{4, 5, 6}, //
                                                 {4, 5, 6}};
-  mln::experimental::image2d<uint8_t> ref_f3 = {{1, 2, 3}, //
+  mln::image2d<uint8_t> ref_f3 = {{1, 2, 3}, //
                                                 {12, 12, 12}};
-  mln::experimental::image2d<uint8_t> ref_f4 = {{1, 1, 1}, //
+  mln::image2d<uint8_t> ref_f4 = {{1, 1, 1}, //
                                                 {0, 0, 0}};
 
   auto f1 = mln::view::ifelse(x > 3, x, uint8_t(12));         // RValue image + LValue image + scalar
@@ -147,9 +147,9 @@ TEST(Core, IfElse)
   ASSERT_IMAGES_EQ_EXP(f4, ref_f4);
 
 
-  mln::experimental::image2d<uint8_t> ref_x = {{1, 2, 3}, //
+  mln::image2d<uint8_t> ref_x = {{1, 2, 3}, //
                                                {42, 42, 42}};
-  mln::experimental::image2d<uint8_t> ref_y = {{42, 42, 42}, //
+  mln::image2d<uint8_t> ref_y = {{42, 42, 42}, //
                                                {1, 2, 3}};
 
   mln::fill(f2, 42);
@@ -162,10 +162,10 @@ TEST(Core, Where)
 {
   using namespace mln::view::ops;
 
-  mln::experimental::image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
+  mln::image2d<uint8_t> x = {{1, 2, 3}, {4, 5, 6}};
 
   auto y = x % 2;
-  auto z = mln::experimental::where(y);
+  auto z = mln::where(y);
 
   static_assert(mln::ranges::mdrange<decltype(z)>);
 
@@ -174,7 +174,7 @@ TEST(Core, Where)
     for (auto p : r)
       ASSERT_EQ(1, x(p) % 2);
 
-  mln_foreach_new (auto p, x.domain())
+  mln_foreach (auto p, x.domain())
     if (x(p) % 2 == 1)
     {
       ASSERT_TRUE(z.has(p));
@@ -182,7 +182,7 @@ TEST(Core, Where)
 }
 
 
-struct mask_archetype : mln::experimental::Image<mask_archetype>
+struct mask_archetype : mln::details::Image<mask_archetype>
 {
   using value_type    = bool;
   using reference     = const bool&;
@@ -191,7 +191,7 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   using category_type = mln::forward_image_tag;
   using concrete_type = mask_archetype;
 
-  struct new_pixel_type
+  struct pixel_type
   {
     bool       val() const;
     point_type point() const;
@@ -210,15 +210,15 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
   domain_type    domain() const;
   reference      operator()(point_type);
   reference      at(point_type);
-  new_pixel_type new_pixel(point_type);
-  new_pixel_type new_pixel_at(point_type);
+  pixel_type pixel(point_type);
+  pixel_type pixel_at(point_type);
 
   struct pixel_range
   {
-    const new_pixel_type* begin();
-    const new_pixel_type* end();
+    const pixel_type* begin();
+    const pixel_type* end();
   };
-  pixel_range new_pixels();
+  pixel_range pixels();
 
 
   struct value_range
@@ -227,7 +227,7 @@ struct mask_archetype : mln::experimental::Image<mask_archetype>
     const value_type* end();
   };
 
-  value_range new_values();
+  value_range values();
 };
 
 

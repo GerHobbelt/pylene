@@ -1,8 +1,8 @@
 #include <fixtures/ImageCompare/image_compare.hpp>
-#include <mln/core/image/experimental/ndbuffer_image.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
 
 
-namespace fixtures::ImageCompare::experimental::impl
+namespace fixtures::ImageCompare::impl
 {
 
   // Compare two buffer-encoded images

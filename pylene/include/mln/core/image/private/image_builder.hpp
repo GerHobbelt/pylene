@@ -221,7 +221,7 @@ namespace mln
   template <typename V, class I>
   auto imchvalue(const I& ref)
   {
-    static_assert(mln::is_a<I, experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     return ref.template ch_value<V>();
   }
 
@@ -230,7 +230,7 @@ namespace mln
   template <class I>
   auto imconcretize(const I& ref)
   {
-    static_assert(mln::is_a<I, experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     return ref.concretize();
   }
 
@@ -238,8 +238,8 @@ namespace mln
   template <class To, class From>
   image_resizer<To, From> resize(To& to, const From& from)
   {
-    static_assert(mln::is_a<To, experimental::Image>());
-    static_assert(mln::is_a<From, experimental::Image>());
+    static_assert(mln::is_a<To, mln::details::Image>());
+    static_assert(mln::is_a<From, mln::details::Image>());
     return {to, from};
   }
 
@@ -266,7 +266,7 @@ namespace mln
     template <class SE>
     void image_builder_base::adjust(const SE& nbh)
     {
-      static_assert(mln::is_a<SE, mln::experimental::StructuringElement>::value);
+      static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
 
       if constexpr (std::is_convertible_v<typename SE::category, dynamic_neighborhood_tag>)
       {

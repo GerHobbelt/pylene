@@ -143,14 +143,14 @@ namespace mln::ranges
     };
 
     template <class I>
-    using __image_pixel_range_t = decltype(std::declval<I>().new_pixels());
+    using __image_pixel_range_t = decltype(std::declval<I>().pixels());
 
   } // namespace details
 
   template <class I, class Pred>
   class where_t : public details::where_mdview<details::__image_pixel_range_t<I>, Pred>
   {
-    static_assert(mln::is_a<I, experimental::Image>());
+    static_assert(mln::is_a<I, mln::details::Image>());
     static_assert(::ranges::cpp20::predicate<Pred, image_value_t<I>>);
 
     using pixel_range_type = details::__image_pixel_range_t<I>;
@@ -162,7 +162,7 @@ namespace mln::ranges
     where_t(I ima, Pred pred)
       : m_ima{std::move(ima)}
     {
-      this->m_rng = base().new_pixels();
+      this->m_rng = base().pixels();
       this->m_pred = std::move(pred);
     }
 
@@ -179,13 +179,13 @@ namespace mln::ranges
 } // namespace mln::ranges
 
 
-namespace mln::experimental
+namespace mln
 {
 
   template <class I>
-  mln::ranges::where_t<I, ::ranges::identity> where(const experimental::Image<I>& ima)
+  mln::ranges::where_t<I, ::ranges::identity> where(const mln::details::Image<I>& ima)
   {
     return {static_cast<const I&>(ima), ::ranges::identity{}};
   }
 
-} // namespace mln::experimental
+} // namespace mln

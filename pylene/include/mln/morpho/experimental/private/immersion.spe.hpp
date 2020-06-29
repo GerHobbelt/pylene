@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mln/core/image/experimental/ndbuffer_image.hpp>
-#include <mln/core/image/experimental/ndimage_fwd.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/ndimage_fwd.hpp>
 #include <cstddef>
 #include <cstdint>
 

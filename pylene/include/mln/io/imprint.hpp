@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <fmt/format.h>
 
-namespace mln::io::experimental
+namespace mln::io
 {
   /// Display (as characters) an image in the output stream
   ///
@@ -50,7 +50,7 @@ namespace mln::io::experimental
       };
 
       template <class I>
-      struct impl_t : impl_base_t
+      struct impl_t final : impl_base_t
       {
         impl_t(I& x) { this->m_ima = (void*)(&x); }
         ~impl_t() final = default;
@@ -64,19 +64,19 @@ namespace mln::io::experimental
     };
 
 
-    void imprint2d(const formatter<mln::experimental::point2d>& fmter, mln::experimental::box2d roi);
-    void imprint3d(const formatter<mln::experimental::point3d>& fmter, mln::experimental::box3d roi);
+    void imprint2d(const formatter<mln::point2d>& fmter, mln::box2d roi);
+    void imprint3d(const formatter<mln::point3d>& fmter, mln::box3d roi);
 
     /// \group imprint overload set based on the type of the domain
     /// \{
     template <class I>
-    void imprint(I&& image, const mln::experimental::box2d* roi)
+    void imprint(I&& image, const mln::box2d* roi)
     {
       imprint2d(std::forward<I>(image), *roi);
     }
 
     template <class I>
-    void imprint(I&& image, const mln::experimental::box3d* roi)
+    void imprint(I&& image, const mln::box3d* roi)
     {
       imprint3d(std::forward<I>(image), *roi);
     }
@@ -84,7 +84,7 @@ namespace mln::io::experimental
     template <class I>
     void imprint(I&& image, ...)
     {
-      mln_foreach_new(auto px, image.new_pixels())
+      mln_foreach(auto px, image.pixels())
         fmt::print("{{{},{}}}\n", px.point(), px.val());
     }
     /// \}
@@ -94,7 +94,7 @@ namespace mln::io::experimental
   void imprint(I&& image, [[maybe_unused]] bool print_border)
   {
     using U = std::remove_reference_t<I>;
-    static_assert(mln::is_a<U, mln::experimental::Image>());
+    static_assert(mln::is_a<U, mln::details::Image>());
     static_assert(fmt::internal::has_formatter<image_value_t<U>, fmt::format_context>(), "The value type has no defined formatting.");
 
     auto roi = image.domain();

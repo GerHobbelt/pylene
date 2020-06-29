@@ -9,7 +9,7 @@ namespace mln::morpho::experimental::details
   void vertical_running_max_algo_base_t::running_max_block2d(std::byte* __restrict f, std::byte* __restrict g,
                                                              std::byte* __restrict h, std::ptrdiff_t f_byte_stride,
                                                              std::ptrdiff_t g_byte_stride, std::ptrdiff_t h_byte_stride,
-                                                             mln::experimental::box2d roi, int k, bool use_extension)
+                                                             mln::box2d roi, int k, bool use_extension)
   {
     int x0     = roi.x();
     int y0     = roi.y();
@@ -31,7 +31,7 @@ namespace mln::morpho::experimental::details
         // Copy the into the tile$
         if (m_tile_loader)
         {
-          mln::experimental::box2d region(x0, y0 + chunk_start, width, chunk_size);
+          mln::box2d region(x0, y0 + chunk_start, width, chunk_size);
           m_tile_loader->load_tile(f + chunk_start * f_byte_stride, f_byte_stride, region);
         }
 
@@ -68,7 +68,7 @@ namespace mln::morpho::experimental::details
         // Write the tile
         if (m_tile_writer)
         {
-          mln::experimental::box2d region(x0, y0 + y, width, hroi);
+          mln::box2d region(x0, y0 + y, width, hroi);
           m_tile_writer->write_tile(f + y * f_byte_stride, f_byte_stride, region);
         }
       }
@@ -76,7 +76,7 @@ namespace mln::morpho::experimental::details
   }
 
 
-  void vertical_running_max_algo_base_t::execute(mln::experimental::box2d roi, int k, bool use_extension, bool vertical)
+  void vertical_running_max_algo_base_t::execute(mln::box2d roi, int k, bool use_extension, bool vertical)
   {
     int            kBlockWidth    = this->get_block_width();
     auto           sz             = this->get_sample_size();
@@ -101,7 +101,7 @@ namespace mln::morpho::experimental::details
       int w = std::min(kBlockWidth, width - x);
 
 
-      mln::experimental::box2d region(x0 + x, y0, w, height);
+      mln::box2d region(x0 + x, y0, w, height);
       this->running_max_block2d(f_shifted, g_shifted, h_shifted, //
                                 kBlockByteSize, kBlockByteSize, kBlockByteSize, region, k, use_extension);
     }

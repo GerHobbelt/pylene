@@ -3,12 +3,10 @@ project(Pylene)
 
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-# Add CodeCoverage utility to CMake's module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
 
 
 if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  include("${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
+  include("${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
   conan_set_rpath()
   conan_set_std()
   conan_set_fpic()
@@ -22,11 +20,8 @@ if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
   include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
 endif ()
 
-find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
-find_package(FreeImage REQUIRED)
-find_package(TBB)
-find_package(Qt4)
 
+find_package(FreeImage REQUIRED)
 
 
 # CONFIGURE COMPILER LAUNCHERS
@@ -63,8 +58,8 @@ endif (USE_DISTCC)
 # CONFIGURATION OPTIONS
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
-option(PYLENE_BUILD_PYBIND "ON to build the python bindings with pybind11" ON)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
+option(PYLENE_BUILD_PYBIND "ON to build the python bindings with pybind11" ON)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -72,16 +67,8 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
     "-Wextra"
     "-Wall"
     "-Werror"
-    "-Wno-deprecated-declarations"
     )
 endif()
-#### GCC Compiler Configuration
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  add_compile_options(
-    "-Wno-error=maybe-uninitialized" # maybe unitialized may have false alarms
-    )
-endif()
-
 
 #### MSVC Compiler Configuration
 if (MSVC)
@@ -92,7 +79,7 @@ if (MSVC)
                       "/wd4457" # la déclaration de '?' masque le paramètre de fonction
                       "/wd4996" # '...': was declared deprecated
                       )
-  add_compile_options("/WX" "/W3" "/wd4244" "/wd4127" "/permissive-")
+  add_compile_options("/WX" "/W3" "/wd4244" "/wd4127")
   add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
   add_compile_definitions(_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
   add_compile_definitions(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
@@ -118,44 +105,16 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   if (PYLENE_BUILD_TESTING)
     include(CTest)
     add_custom_target(build-tests)
+    add_subdirectory(tests)
+  endif()
 
-    if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-      option(PYLENE_CODE_COVERAGE "ON to enable code coverage" OFF)
-      if (PYLENE_CODE_COVERAGE)
-        include(CodeCoverage)
-        APPEND_COVERAGE_COMPILER_FLAGS()
-
-        SETUP_TARGET_FOR_COVERAGE_LCOV(
-          NAME run-tests_coverage-lcov
-          EXECUTABLE ctest -L UnitTests --schedule-random --output-on-failure -j ${PROCESSOR_COUNT}
-          DEPENDENCIES build-tests
-        )
-
-        SETUP_TARGET_FOR_COVERAGE_GCOVR_XML(
-          NAME run-tests_coverage-gcovr-xml
-          EXECUTABLE ctest -L UnitTests --schedule-random --output-on-failure -j ${PROCESSOR_COUNT}
-          DEPENDENCIES build-tests
-        )
-
-        SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(
-          NAME run-tests_coverage-gcovr-html
-          EXECUTABLE ctest -L UnitTests --schedule-random --output-on-failure -j ${PROCESSOR_COUNT}
-          DEPENDENCIES build-tests
-        )
-
-      endif ()
-    endif ()
-
-    add_subdirectory(tests EXCLUDE_FROM_ALL)
-
-    if (PYLENE_BUILD_BENCHMARKS)
-      add_custom_target(build-bench)
-      add_subdirectory(bench EXCLUDE_FROM_ALL)
-    endif ()
+  if (PYLENE_BUILD_BENCHMARKS)
+    add_custom_target(build-bench)
+    add_subdirectory(bench)
   endif ()
 
   add_custom_target(build-doc)
-  add_subdirectory(doc EXCLUDE_FROM_ALL)
+  add_subdirectory(doc)
   add_custom_target(build-apps)
   add_subdirectory(apps EXCLUDE_FROM_ALL)
 endif ()

@@ -13,13 +13,13 @@
 
 TEST(Range, filter_2d_readonly)
 {
-  std::vector<mln::experimental::point2d> ref = {{0, 0}, {2, 0}, {1, 1}, {3, 1}, {0, 2}, {2, 2}};
-  mln::experimental::box2d                box(4, 3);
+  std::vector<mln::point2d> ref = {{0, 0}, {2, 0}, {1, 1}, {3, 1}, {0, 2}, {2, 2}};
+  mln::box2d                box(4, 3);
 
   auto chessboard_pred = [](auto p) { return (p[0] % 2) == (p[1] % 2); };
   auto rng             = mln::ranges::view::filter(box, chessboard_pred);
 
-  std::vector<mln::experimental::point2d> res;
+  std::vector<mln::point2d> res;
   for (auto row : rng.rows())
     for (auto p : row)
       res.push_back(p);

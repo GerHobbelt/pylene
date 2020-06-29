@@ -5,7 +5,7 @@
 
 /// \file
 
-namespace mln::experimental::se
+namespace mln::se
 {
 
   /// Create a line with points points equally spaced from the origin
@@ -24,8 +24,8 @@ namespace mln::experimental::se
     class rng_t : public ::ranges::view_facade<rng_t>
     {
       friend ::ranges::range_access;
-      mln::experimental::point2d m_cur;
-      mln::experimental::point2d m_delta;
+      mln::point2d m_cur;
+      mln::point2d m_delta;
       std::size_t                m_k;
 
       auto read() const { return m_cur; }
@@ -39,7 +39,7 @@ namespace mln::experimental::se
 
     public:
       rng_t() = default;
-      rng_t(mln::experimental::point2d start, mln::experimental::point2d delta, std::size_t k)
+      rng_t(mln::point2d start, mln::point2d delta, std::size_t k)
         : m_cur{start}
         , m_delta{delta}
         , m_k{k}
@@ -59,7 +59,7 @@ namespace mln::experimental::se
     /// \param V The period.
     /// \param k Half-number of pixels in the line.
     /// \precondition k >= 0
-    periodic_line2d(mln::experimental::point2d V, int k);
+    periodic_line2d(mln::point2d V, int k);
 
     /// \brief Return a range of SE offsets
     rng_t offsets() const;
@@ -73,20 +73,20 @@ namespace mln::experimental::se
     int repetition() const { return m_k; }
 
     /// \brief Return the period
-    mln::experimental::point2d period() const { return m_delta; }
+    mln::point2d period() const { return m_delta; }
 
     /// \brief Return the extent radius
     int radial_extent() const;
 
     /// \brief
-    mln::experimental::box2d compute_input_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_input_region(mln::box2d roi) const;
 
     /// \brief
-    mln::experimental::box2d compute_output_region(mln::experimental::box2d roi) const;
+    mln::box2d compute_output_region(mln::box2d roi) const;
 
   private:
-    mln::experimental::point2d m_delta;
+    mln::point2d m_delta;
     int                        m_k;
   };
 
-} // namespace mln::experimental::se
+} // namespace mln::se

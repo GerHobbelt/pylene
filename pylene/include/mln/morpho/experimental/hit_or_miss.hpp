@@ -61,13 +61,13 @@ namespace mln::morpho::experimental
       if constexpr (std::is_same_v<V, bool>)
       {
         auto res = ero and (not dil);
-        mln::experimental::copy(res, out);
+        mln::copy(res, out);
       }
       else
       {
         V    zero = {};
         auto res  = mln::view::ifelse(dil < ero, ero - dil, zero);
-        mln::experimental::copy(res, out);
+        mln::copy(res, out);
       }
     }
   }
@@ -76,10 +76,10 @@ namespace mln::morpho::experimental
   template <class I, class SEh, class SEm, class OutputImage>
   void hit_or_miss(I& f, const SEh& se_hit, const SEm& se_miss, OutputImage& out)
   {
-    static_assert(mln::is_a<std::remove_reference_t<I>, mln::experimental::Image>());
-    static_assert(mln::is_a<std::remove_reference_t<OutputImage>, mln::experimental::Image>());
-    static_assert(mln::is_a<SEh, mln::experimental::StructuringElement>());
-    static_assert(mln::is_a<SEm, mln::experimental::StructuringElement>());
+    static_assert(mln::is_a<std::remove_reference_t<I>, mln::details::Image>());
+    static_assert(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>());
+    static_assert(mln::is_a<SEh, mln::details::StructuringElement>());
+    static_assert(mln::is_a<SEm, mln::details::StructuringElement>());
 
     impl::hit_or_miss(f, se_hit, se_miss, out);
   }
@@ -89,9 +89,9 @@ namespace mln::morpho::experimental
   template <class I, class SEh, class SEm>
   image_concrete_t<std::remove_reference_t<I>> hit_or_miss(I&& f, const SEh& se_hit, const SEm& se_miss)
   {
-    static_assert(mln::is_a<std::remove_reference_t<I>, mln::experimental::Image>());
-    static_assert(mln::is_a<SEh, mln::experimental::StructuringElement>());
-    static_assert(mln::is_a<SEm, mln::experimental::StructuringElement>());
+    static_assert(mln::is_a<std::remove_reference_t<I>, mln::details::Image>());
+    static_assert(mln::is_a<SEh, mln::details::StructuringElement>());
+    static_assert(mln::is_a<SEm, mln::details::StructuringElement>());
 
     auto out = imconcretize(f).build();
     impl::hit_or_miss(f, se_hit, se_miss, out);

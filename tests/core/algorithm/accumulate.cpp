@@ -4,14 +4,14 @@
 #include <mln/accu/accumulators/min.hpp>
 #include <mln/accu/accumulators/sum.hpp>
 #include <mln/core/algorithm/iota.hpp>
-#include <mln/core/image/experimental/ndimage.hpp>
+#include <mln/core/image/ndimage.hpp>
 
 #include <gtest/gtest.h>
 
 
 TEST(Core, Algorithm_Accumulate_1)
 {
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
 
   // Expected overflow
@@ -29,7 +29,7 @@ TEST(Core, Algorithm_Accumulate_1)
 
 TEST(Core, Algorithm_Accumulate_2)
 {
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
 
   // No overflow (uint8 + uint8 -> int)
@@ -41,7 +41,7 @@ TEST(Core, Algorithm_Accumulate_2)
 
 TEST(Core, Algorithm_Accumulate_3)
 {
-  mln::experimental::image2d<uint8_t> ima(10, 10);
+  mln::image2d<uint8_t> ima(10, 10);
   mln::iota(ima, 0);
 
   // No overflow (uint8 + uint8 -> int)

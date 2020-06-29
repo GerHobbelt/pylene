@@ -4,7 +4,7 @@
 #include <climits>
 #include <memory>
 
-namespace mln::morpho::experimental::details
+namespace mln::morpho::details
 {
 
   // Permute the array \p tab considering the permutation array \p permut

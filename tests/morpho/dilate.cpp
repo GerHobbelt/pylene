@@ -18,6 +18,7 @@
 #include <fixtures/ImagePath/image_path.hpp>
 
 #include <gtest/gtest.h>
+#include <tbb/task_scheduler_init.h>
 
 
 using namespace mln;
@@ -359,6 +360,8 @@ TEST(Dilation, RGB)
 
 TEST(Dilation, Rectangle2D_parallel)
 {
+  auto _ = tbb::task_scheduler_init();
+
   mln::image_build_params params;
   params.init_value = uint8_t(0);
 
@@ -395,6 +398,8 @@ TEST(Dilation, Rectangle2D_parallel)
 
 TEST(Dilation, Disc_approximated_parallel)
 {
+  auto _ = tbb::task_scheduler_init();
+
   mln::box2d            domain(21, 21);
 
   mln::image_build_params params;
@@ -434,6 +439,8 @@ TEST(Dilation, Disc_approximated_parallel)
 
 TEST(Dilation, Disc_euclidean_parallel)
 {
+  auto _ = tbb::task_scheduler_init();
+
   mln::image_build_params params;
   params.init_value = uint8_t(0);
 

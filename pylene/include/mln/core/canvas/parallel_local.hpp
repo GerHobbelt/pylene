@@ -119,16 +119,23 @@ namespace mln
   class ParallelLocalCanvas2D
   {
   public:
-    static constexpr int TILE_WIDTH  = 128;
-    static constexpr int TILE_HEIGHT = 128;
+    static constexpr int TILE_WIDTH  = 8;
+    static constexpr int TILE_HEIGHT = 8;
 
-    virtual mln::box2d              ComputeInputRegion(mln::box2d) const noexcept = 0;
+    virtual ~ParallelLocalCanvas2D() = default;
+    virtual std::unique_ptr<ParallelLocalCanvas2D> clone() const = 0;
+
+    // Compute the input region required to compute the given output region
+    virtual mln::box2d              ComputeInputRegion(mln::box2d out_roi) const noexcept = 0;
     virtual const TileLoaderBase*   GetTileLoader() const noexcept                = 0;
     virtual const TileWriterBase*   GetTileWriter() const noexcept                = 0;
     virtual const TileExecutorBase* GetTileExecutor() const noexcept              = 0;
 
-    virtual mln::box2d GetDomain() const = 0;
-    virtual void       ExecuteTile(mln::box2d b) const final;
+    // The whole output roi we want to compute
+    virtual mln::box2d GetOutputRegion() const = 0;
+
+    // Execute to compute this output roi
+    virtual void       ExecuteTile(mln::box2d out_roi) const final;
   };
 
   void parallel_execute_local2D(ParallelLocalCanvas2D& canvas);

@@ -2,7 +2,6 @@
 
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
-#include <tbb/task_scheduler_init.h>
 
 namespace mln
 {
@@ -10,17 +9,23 @@ namespace mln
   {
   public:
     ParallelLocalCanvas2DImpl(ParallelLocalCanvas2D* delegate)
-      : m_delegate{delegate}
     {
+      m_delegate = delegate->clone();
     }
 
-    mln::box2d GetDomain() const;
+    ParallelLocalCanvas2DImpl(const ParallelLocalCanvas2DImpl& other)
+    {
+      m_delegate = other.m_delegate->clone();
+    }
+
+
+    mln::box2d GetOutputRegion() const;
     void operator()(const tbb::blocked_range2d<int>&) const;
 
-    ParallelLocalCanvas2D* delegate() const { return m_delegate; }
+    ParallelLocalCanvas2D* delegate() const { return m_delegate.get(); }
 
   private:
-    ParallelLocalCanvas2D* m_delegate = nullptr;
+    std::unique_ptr<ParallelLocalCanvas2D> m_delegate = nullptr;
   };
 
   void ParallelLocalCanvas2DImpl::operator()(const tbb::blocked_range2d<int>& tile) const
@@ -34,9 +39,9 @@ namespace mln
     m_delegate->ExecuteTile(domain);
   }
 
-  mln::box2d ParallelLocalCanvas2DImpl::GetDomain() const
+  mln::box2d ParallelLocalCanvas2DImpl::GetOutputRegion() const
   {
-    return m_delegate->GetDomain();
+    return m_delegate->GetOutputRegion();
   }
 
   /*
@@ -47,9 +52,8 @@ namespace mln
   */
   void parallel_execute_local2D(ParallelLocalCanvas2D& canvas)
   {
-    tbb::task_scheduler_init init;
     ParallelLocalCanvas2DImpl wrapper(&canvas);
-    mln::box2d domain = wrapper.GetDomain();
+    mln::box2d domain = wrapper.GetOutputRegion();
 
     tbb::blocked_range2d<int> rng(domain.y(), domain.y() + domain.height(), wrapper.delegate()->TILE_HEIGHT, //
                                   domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);

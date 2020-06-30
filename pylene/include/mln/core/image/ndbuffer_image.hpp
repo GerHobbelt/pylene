@@ -143,7 +143,6 @@ namespace mln
 
     int border() const noexcept;
     Box domain() const noexcept;
-    void domain_shift(point_type shift) noexcept;
     /// \}
 
 
@@ -159,7 +158,7 @@ namespace mln
     index_type  delta_index(ConstPointRef p) const noexcept;
     /// \}
 
-    /// Extension-related operation
+    /// Extension-related and domain-releated operation
     /// \{
 
     /// \brief Inflate (or reduce, if the value is negative) the domain size by
@@ -176,6 +175,13 @@ namespace mln
     ///
     /// \note No memory reallocation is performed by the method
     void inflate_domain_to_extension();
+
+
+    /// \brief Shift the topleft corner of the domain. The size of the domain is not affected
+    void shift_domain_topleft(ConstPointRef dp) noexcept;
+
+    /// \brief Set the topleft corner of the domain. The size of the domain is not affected.
+    void set_domain_topleft(ConstPointRef p) noexcept;
     /// \}
 
 

@@ -1,9 +1,10 @@
 #pragma once
-        #include <fmt/core.h>
+
 
 #include <mln/accu/accumulators/h_infsup.hpp>
 #include <mln/accu/accumulators/infsup.hpp>
 #include <mln/core/algorithm/paste.hpp>
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
@@ -15,6 +16,7 @@
 #include <mln/core/value/value_traits.hpp>
 
 #include <mln/morpho/private/localmax.hpp>
+
 
 namespace mln::morpho
 {
@@ -120,84 +122,24 @@ namespace mln::morpho
 
   namespace parallel
   {
-    template <class InputImage>
-    class TileLoader_DilationTranspose : public TileLoaderBase
-    {
-    public:
 
-      /// \param input_roi The extended roi required to compute the tile region
-      TileLoader_DilationTranspose(InputImage input, mln::box2d input_roi)
-        : _in{input}
-        , m_tile{input_roi}
-      {
-      }
-
-      TileLoader_DilationTranspose(const TileLoader_DilationTranspose& other)
-        : _in{other._in}
-        , m_tile{other.m_tile.domain()}
-      {
-      }
-
-      TileLoader_DilationTranspose& operator=(const TileLoader_DilationTranspose&) = delete;
-
-      /// \param roi The tile region
-      /// \param input_roi The extended roi required to compute the tile region
-      void load_tile(mln::box2d roi, mln::box2d input_roi) const final
-      {
-        mln::box2d image_roi = _in.domain();
-
-        mln::box2d copy_roi = image_roi;
-        copy_roi.clip(input_roi);
-
-        mln::box2d dest_roi = copy_roi;
-        dest_roi.tl() -= roi.tl();
-        dest_roi.br() -= roi.tl();
-
-        auto src = _in.clip(copy_roi);
-        auto dst = m_tile.clip(dest_roi);
-        mln::details::transpose_block2D(_in, copy_roi, dst.buffer(), dst.byte_stride());
-
-        if (copy_roi != input_roi)
-        {
-          int borders[2][2];
-
-          borders[0][0] = copy_roi.tl().x() - input_roi.tl().x();
-          borders[0][1] = input_roi.br().x() - copy_roi.br().x();
-          borders[1][0] = copy_roi.tl().y() - input_roi.tl().y();
-          borders[1][1] = input_roi.br().y() - copy_roi.br().y();
-
-          image_value_t<InputImage> padding_value  = 0;
-          // FIXME mln::value_traits<image_value_t<I>>::inf()
-          auto padding_method = mln::PAD_ZERO;
-          pad(m_tile, padding_method, borders, padding_value);
-        }
-      }
-
-      mln::ndbuffer_image get_tile() const final
-      {
-        return m_tile;
-      }
-
-    private:
-      InputImage _in;
-      mutable mln::image2d<image_value_t<InputImage>> m_tile;
-    };
 
     template <class InputImage>
     class TileLoader_Dilation : public TileLoaderBase
     {
     public:
 
-      /// \param input_roi The extended roi required to compute the tile region
-      TileLoader_Dilation(InputImage input, mln::box2d input_roi)
+      /// \param width the extended width of the tile
+      /// \param width the extended height of the tile
+      TileLoader_Dilation(InputImage input, int width, int height)
         : _in{input}
-        , m_tile{input_roi}
+        , m_tile{width, height}
       {
       }
 
       TileLoader_Dilation(const TileLoader_Dilation& other)
         : _in{other._in}
-        , m_tile{other.m_tile.domain()}
+        , m_tile{other.m_tile.width(), other.m_tile.height()}
       {
       }
 
@@ -205,34 +147,48 @@ namespace mln::morpho
 
       /// \param roi The tile region
       /// \param input_roi The extended roi required to compute the tile region
-      void load_tile(mln::box2d roi, mln::box2d input_roi) const final
+      void load_tile(mln::box2d, mln::box2d input_roi) const final
       {
-        mln::box2d image_roi = _in.domain();
+        assert(m_tile.width() >= input_roi.width() && "Tile width mismatches");
+        assert(m_tile.height() >= input_roi.height() && "Tile height mismatches");
 
-        mln::box2d copy_roi = image_roi;
-        copy_roi.clip(input_roi);
+        m_tile.set_domain_topleft(input_roi.tl());
+        assert(m_tile.domain().includes(input_roi));
+        assert(m_tile.domain().tl() == input_roi.tl());
 
-        mln::box2d dest_roi = copy_roi;
-        dest_roi.tl() -= roi.tl();
-        dest_roi.br() -= roi.tl();
+        // Clip roi so that it does not go outside image boundaries
+        mln::box2d clipped_roi = _in.domain();
+        clipped_roi.clip(input_roi);
 
-        auto src = _in.clip(copy_roi);
-        auto dst = m_tile.clip(dest_roi);
-        mln::details::copy_block(_in, copy_roi, dst.buffer(), dst.byte_stride());
 
-        if (copy_roi != input_roi)
+        // The output tile is in the padding region (this work here but buggy if periodic is used).
+        image_value_t<InputImage> padding_value  = 0;
+        if (clipped_roi.empty())
+        {
+          mln::fill(m_tile, padding_value);
+          return;
+        }
+
+        {
+          auto dst = m_tile.clip(clipped_roi);
+          mln::details::copy_block(_in, clipped_roi, dst.buffer(), dst.stride());
+        }
+        if (clipped_roi == input_roi)
+          return;
+
+        // Padding is required
         {
           int borders[2][2];
 
-          borders[0][0] = copy_roi.tl().x() - input_roi.tl().x();
-          borders[0][1] = input_roi.br().x() - copy_roi.br().x();
-          borders[1][0] = copy_roi.tl().y() - input_roi.tl().y();
-          borders[1][1] = input_roi.br().y() - copy_roi.br().y();
+          borders[0][0] = clipped_roi.tl().x() - input_roi.tl().x();
+          borders[0][1] = input_roi.br().x() - clipped_roi.br().x();
+          borders[1][0] = clipped_roi.tl().y() - input_roi.tl().y();
+          borders[1][1] = input_roi.br().y() - clipped_roi.br().y();
 
-          image_value_t<InputImage> padding_value  = 0;
           // FIXME mln::value_traits<image_value_t<I>>::inf()
           auto padding_method = mln::PAD_ZERO;
-          pad(m_tile, padding_method, borders, padding_value);
+          auto dst = m_tile.clip(input_roi);
+          pad(dst, padding_method, borders, padding_value);
         }
       }
 
@@ -250,37 +206,28 @@ namespace mln::morpho
     class TileExecutor_Dilation : public TileExecutorBase
     {
     public:
-      TileExecutor_Dilation(const SE& se, mln::box2d& wroi)
-        : _se{se}
-        , _decomposed{true}
-        , _wroi(wroi)
-      {
-      }
-
       TileExecutor_Dilation(const SE& se)
         : _se{se}
-        , _decomposed{false}
       {
       }
 
       void execute(mln::ndbuffer_image in, mln::ndbuffer_image out) const final
       {
-        auto       in_image2d  = *(in.cast_to<V, 2>());
-        auto       out_image2d = *(out.cast_to<V, 2>());
-        auto       vs          = mln::morpho::details::dilation_value_set<V>();
-        if (!_decomposed)
-        {
-          mln::box2d roi         = out.domain();
-          in_image2d.domain_shift(roi.tl());
+        assert(in.domain().includes(out.domain()));
 
-          auto tmp = in_image2d.clip(roi);
-          mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
+        auto in_image2d  = *(in.cast_to<V, 2>());
+        auto out_image2d = *(out.cast_to<V, 2>());
+        auto vs          = mln::morpho::details::dilation_value_set<V>();
+        auto roi         = out_image2d.domain();
+
+
+        if (std::is_same_v<SE, mln::se::periodic_line2d>)
+        {
+          mln::morpho::details::impl::localmax(in_image2d, out_image2d, vs, _se, roi);
         }
         else
         {
-          mln::box2d roi         = out.domain();
-          in_image2d.domain_shift(roi.tl());
-
+          // Note: the roi is not considered by the generic version of accumulate, we need to fix that later
           auto tmp = in_image2d.clip(roi);
           mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
         }
@@ -288,8 +235,6 @@ namespace mln::morpho
 
     private:
       const SE&         _se;
-      const bool        _decomposed;
-      const mln::box2d _wroi;
     };
 
     template <class OutputImage>
@@ -333,26 +278,26 @@ namespace mln::morpho
     template <class InputImage, class SE, class OutputImage>
     struct DilationParallel : ParallelLocalCanvas2D
     {
+      static_assert(std::is_same_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+    private:
+      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d roi, mln::box2d tile_dims)
+        : m_in{in}
+        , m_se{se}
+        , m_output_roi{roi}
+        , m_tile_l{in, tile_dims.width(), tile_dims.height()}
+        , m_tile_w{out}
+        , m_tile_e{se}
+      {}
+
     public:
-      DilationParallel(InputImage& in, OutputImage& out, SE& se)
-        : m_in{in}
-        , m_se{se},
-          m_tile_l{in, m_se.compute_input_region({TILE_WIDTH, TILE_HEIGHT})},
-          m_tile_w{out},
-          m_tile_e{se}
+      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d roi)
+        : DilationParallel(in, out, se, roi, se.compute_input_region({TILE_WIDTH, TILE_HEIGHT}))
       {
       }
 
-      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d wroi)
-        : m_in{in}
-        , m_se{se},
-          m_tile_l{in, m_se.compute_input_region({TILE_WIDTH, TILE_HEIGHT})},
-          m_tile_w{out},
-          m_tile_e{se, wroi}
-      {
-      }
-
-      mln::box2d GetDomain() const noexcept final { return m_in.domain(); }
+      std::unique_ptr<ParallelLocalCanvas2D> clone()  const final { return std::make_unique<DilationParallel>(*this); }
+      mln::box2d GetOutputRegion() const noexcept final { return m_output_roi; }
       mln::box2d ComputeInputRegion(mln::box2d roi) const noexcept final { return m_se.compute_input_region(roi); }
 
       const TileLoaderBase*   GetTileLoader() const noexcept   final { return &m_tile_l; };
@@ -366,32 +311,59 @@ namespace mln::morpho
 
       InputImage       m_in;
       SE               m_se;
+      mln::box2d       m_output_roi;
       tile_loader_t    m_tile_l;
       tile_writer_t    m_tile_w;
       tile_executor_t  m_tile_e;
     };
-    
+
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out)
     {
+      auto output_roi = out.domain();
       if (se.is_decomposable())
       {
+        auto input_roi    = se.compute_input_region(output_roi);
+        image_concrete_t<std::remove_reference_t<InputImage>> tmp_1;
+        image_concrete_t<std::remove_reference_t<InputImage>> tmp_2;
+
         auto ses = se.decompose();
-        fmt::print("Decomposable SE\n");
-        auto image_domain = image.domain();
-        auto tmp = mln::details::create_temporary_image(image, se, image_domain);
-        auto input_roi = se.compute_input_region(image_domain);
-        for (auto&& decomposed_se : ses)
+        assert(ses.size() > 1);
+
+        tmp_1.resize(input_roi);
+
+        if (ses.size() > 2)
+          tmp_2.resize(input_roi);
+
+        // First dilation
         {
-          auto wroi = decomposed_se.compute_output_region(input_roi);
-          DilationParallel caller(tmp, tmp, decomposed_se, wroi); 
+          auto&&           se         = ses[0];
+          auto             output_roi = se.compute_output_region(input_roi);
+          DilationParallel caller(image, tmp_1, se, output_roi);
+          parallel_execute_local2D(caller);
+          input_roi = output_roi;
+        }
+        // Intermediate dilation
+        for (std::size_t i = 1; i < ses.size() - 1; ++i)
+        {
+          auto&&           se         = ses[i];
+          auto             output_roi = se.compute_output_region(input_roi);
+          DilationParallel caller(tmp_1, tmp_2, se, output_roi);
+          parallel_execute_local2D(caller);
+          input_roi = output_roi;
+          std::swap(tmp_1, tmp_2);
+        }
+        // Last dilation
+        {
+          auto&&           se         = ses.back();
+          auto             output_roi = se.compute_output_region(input_roi);
+          DilationParallel caller(tmp_1, out, se, output_roi);
           parallel_execute_local2D(caller);
         }
-        mln::paste(tmp, image_domain, out);
       }
       else
       {
-        DilationParallel caller(image, out, se);
+        DilationParallel caller(image, out, se, output_roi);
         parallel_execute_local2D(caller);
       }
     }

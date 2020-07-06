@@ -26,7 +26,7 @@ public:
   {
     if (!g_loaded)
     {
-      const char*                           filename = "Aerial_view_of_Olbia.jpg";
+      const char*             filename = "Aerial_view_of_Olbia.jpg";
       mln::image2d<mln::rgb8> input;
       mln::io::imread(filename, input);
 
@@ -60,18 +60,18 @@ public:
   }
 
 protected:
-  static bool                                g_loaded;
+  static bool                  g_loaded;
   static mln::image2d<uint8_t> g_input;
-  static cv::Mat                             g_input_cv;
+  static cv::Mat               g_input_cv;
   mln::image2d<uint8_t>        m_input;
   mln::image2d<uint8_t>        m_output;
-  cv::Mat                                    m_input_cv;
-  cv::Mat                                    m_output_cv;
-  std::size_t                                m_size;
+  cv::Mat                      m_input_cv;
+  cv::Mat                      m_output_cv;
+  std::size_t                  m_size;
 };
-bool                                BMPlnVsOpenCV_Dilation::g_loaded = false;
+bool                  BMPlnVsOpenCV_Dilation::g_loaded = false;
 mln::image2d<uint8_t> BMPlnVsOpenCV_Dilation::g_input;
-cv::Mat                             BMPlnVsOpenCV_Dilation::g_input_cv;
+cv::Mat               BMPlnVsOpenCV_Dilation::g_input_cv;
 
 
 // PLN Disc

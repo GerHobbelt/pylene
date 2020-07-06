@@ -201,12 +201,8 @@ void test_deriche_gaussian2d(std::string_view filename, std::string_view filenam
   mln::io::imsave(img_grey, std::string{bg_sub::file_path_tmp} + '/' + std::string{filename});
   mln::io::imsave(bg_grey, std::string{bg_sub::file_path_tmp} + '/' + std::string{filename_bg});
 
-  const float kLineHeight = 10;
-  const float kWordWidth  = 10;
-
-  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
-  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
-
+  constexpr float kLineVerticalSigma   = 10.;
+  constexpr float kLineHorizontalSigma = 10.;
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
   mln::io::imsave(bg_blurred,
@@ -228,10 +224,8 @@ void test_bg_sub_pipeline(std::string_view filename, std::string_view filename_b
   auto bg_grey  = mln::view::transform(bg_color, grayscale);
 
   // Gaussian on BG (algo)
-  const float kLineHeight          = 5;
-  const float kWordWidth           = 5;
-  const float kLineVerticalSigma   = (kLineHeight * 0.5f) * 0.1f;
-  const float kLineHorizontalSigma = (kWordWidth * 0.5f) * 1.f;
+  constexpr float kLineVerticalSigma   = 10.;
+  constexpr float kLineHorizontalSigma = 10.;
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
   // Substract (view)

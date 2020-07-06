@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/trace.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/trace.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -42,14 +42,20 @@ namespace mln::morpho::experimental
         DericheGaussianSecondDerivative
       };
 
-      float n[5];
-      float d[5];
-      float nm[5];
-      float dm[5];
-      float sumA, sumC;
+      std::array<float, 4> n;
+      std::array<float, 4> d;
+      std::array<float, 4> nm;
+      std::array<float, 4> dm;
+      float                sumA, sumC;
 
-      recursivefilter_coef_(float a0, float a1, float b0, float b1, float c0, float c1, float w0, float w1, float s,
-                            FilterType filter_type)
+      constexpr recursivefilter_coef_(float a0, float a1, float b0, float b1, float c0, float c1, float w0, float w1,
+                                      float s, FilterType filter_type)
+        : n{0.}
+        , d{0.}
+        , nm{0.}
+        , dm{0.}
+        , sumA{0.}
+        , sumC{0.}
       {
         b0 /= s;
         b1 /= s;
@@ -86,10 +92,9 @@ namespace mln::morpho::experimental
           break;
 
         case DericheGaussianSecondDerivative:
-          float aux;
-          aux = 12.0 * cos0 * exp(3.0 * b0) - 3.0 * exp(2.0 * b0) + 8.0 * cos0 * cos0 * cos0 * exp(3.0 * b0) -
-                12.0 * cos0 * cos0 * exp(4.0 * b0) - (3.0 * exp(4.0 * b0)) + 6.0 * cos0 * exp(5.0 * b0) -
-                exp(6.0 * b0) + 6.0 * cos0 * exp(b0) - (1.0 + 12.0 * cos0 * cos0 * exp(2.0 * b0));
+          float aux = 12.0 * cos0 * exp(3.0 * b0) - 3.0 * exp(2.0 * b0) + 8.0 * cos0 * cos0 * cos0 * exp(3.0 * b0) -
+                      12.0 * cos0 * cos0 * exp(4.0 * b0) - (3.0 * exp(4.0 * b0)) + 6.0 * cos0 * exp(5.0 * b0) -
+                      exp(6.0 * b0) + 6.0 * cos0 * exp(b0) - (1.0 + 12.0 * cos0 * cos0 * exp(2.0 * b0));
           sumA = 4.0 * a0 * sin0 * exp(3.0 * b0) + a1 * cos0 * cos0 * exp(4.0 * b0) -
                  (4.0 * a0 * sin0 * exp(b0) + 6.0 * a1 * cos0 * cos0 * exp(2.0 * b0)) +
                  2.0 * a1 * cos0 * cos0 * cos0 * exp(b0) - 2.0 * a1 * cos0 * exp(b0) +
@@ -123,34 +128,34 @@ namespace mln::morpho::experimental
         n[1] = exp(-b1) * (c1 * sin1 - (c0 + 2 * a0) * cos1) + exp(-b0) * (a1 * sin0 - (2 * c0 + a0) * cos0);
         n[0] = a0 + c0;
 
-        d[4] = exp(-2 * b0 - 2 * b1);
-        d[3] = -2 * cos0 * exp(-b0 - 2 * b1) - 2 * cos1 * exp(-b1 - 2 * b0);
-        d[2] = 4 * cos1 * cos0 * exp(-b0 - b1) + exp(-2 * b1) + exp(-2 * b0);
-        d[1] = -2 * exp(-b1) * cos1 - 2 * exp(-b0) * cos0;
+        d[3] = exp(-2 * b0 - 2 * b1);
+        d[2] = -2 * cos0 * exp(-b0 - 2 * b1) - 2 * cos1 * exp(-b1 - 2 * b0);
+        d[1] = 4 * cos1 * cos0 * exp(-b0 - b1) + exp(-2 * b1) + exp(-2 * b0);
+        d[0] = -2 * exp(-b1) * cos1 - 2 * exp(-b0) * cos0;
 
         switch (filter_type)
         {
         case DericheGaussian:
         case DericheGaussianSecondDerivative:
 
-          for (unsigned i = 1; i <= 3; ++i)
+          for (unsigned i = 0; i < 3; ++i)
           {
             dm[i] = d[i];
-            nm[i] = n[i] - d[i] * n[0];
+            nm[i] = n[i + 1] - d[i] * n[0];
           }
-          dm[4] = d[4];
-          nm[4] = -d[4] * n[0];
+          dm[3] = d[3];
+          nm[3] = -d[3] * n[0];
           break;
 
         case DericheGaussianFirstDerivative:
 
-          for (unsigned i = 1; i <= 3; ++i)
+          for (unsigned i = 0; i < 3; ++i)
           {
             dm[i] = d[i];
-            nm[i] = -(n[i] - d[i] * n[0]);
+            nm[i] = -(n[i + 1] - d[i] * n[0]);
           }
-          dm[4] = d[4];
-          nm[4] = d[4] * n[0];
+          dm[3] = d[3];
+          nm[3] = d[3] * n[0];
           break;
         }
       }
@@ -164,56 +169,56 @@ namespace mln::morpho::experimental
       tmp1[1] = 0                   //
                 + c.n[0] * input[1] //
                 + c.n[1] * input[0] //
-                - c.d[1] * tmp1[0];
+                - c.d[0] * tmp1[0];
 
       tmp1[2] = 0                   //
                 + c.n[0] * input[2] //
                 + c.n[1] * input[1] //
                 + c.n[2] * input[0] //
-                - c.d[1] * tmp1[1]  //
-                - c.d[2] * tmp1[0];
+                - c.d[0] * tmp1[1]  //
+                - c.d[1] * tmp1[0];
 
       tmp1[3] = 0                   //
                 + c.n[0] * input[3] //
                 + c.n[1] * input[2] //
                 + c.n[2] * input[1] //
                 + c.n[3] * input[0] //
-                - c.d[1] * tmp1[2]  //
-                - c.d[2] * tmp1[1]  //
-                - c.d[3] * tmp1[0];
+                - c.d[0] * tmp1[2]  //
+                - c.d[1] * tmp1[1]  //
+                - c.d[2] * tmp1[0];
 
       for (int i = 4; i < size; i++)
       {
         tmp1[i] = c.n[0] * input[i + 0] + c.n[1] * input[i - 1] + //
                   c.n[2] * input[i - 2] + c.n[3] * input[i - 3] - //
-                  c.d[1] * tmp1[i - 1] - c.d[2] * tmp1[i - 2] -   //
-                  c.d[3] * tmp1[i - 3] - c.d[4] * tmp1[i - 4];    //
+                  c.d[0] * tmp1[i - 1] - c.d[1] * tmp1[i - 2] -   //
+                  c.d[2] * tmp1[i - 3] - c.d[3] * tmp1[i - 4];    //
       }
 
       // Non causal part
 
       tmp2[size - 1] = 0;
 
-      tmp2[size - 2] = c.nm[1] * input[size - 1]; //
+      tmp2[size - 2] = c.nm[0] * input[size - 1]; //
 
-      tmp2[size - 3] = c.nm[1] * input[size - 2] + //
+      tmp2[size - 3] = c.nm[0] * input[size - 2] + //
+                       c.nm[1] * input[size - 1] - //
+                       c.dm[0] * tmp2[size - 2];   //
+
+      tmp2[size - 4] = c.nm[0] * input[size - 3] + //
+                       c.nm[1] * input[size - 2] + //
                        c.nm[2] * input[size - 1] - //
+                       c.dm[0] * tmp2[size - 3] -  //
                        c.dm[1] * tmp2[size - 2];   //
-
-      tmp2[size - 4] = c.nm[1] * input[size - 3] + //
-                       c.nm[2] * input[size - 2] + //
-                       c.nm[3] * input[size - 1] - //
-                       c.dm[1] * tmp2[size - 3] -  //
-                       c.dm[2] * tmp2[size - 2];   //
 
       for (int i = size - 5; i >= 0; --i)
       {
-        tmp2[i] = c.nm[1] * input[i + 1] +                        //
-                  c.nm[2] * input[i + 2] +                        //
-                  c.nm[3] * input[i + 3] +                        //
-                  c.nm[4] * input[i + 4] -                        //
-                  c.dm[1] * tmp2[i + 1] - c.dm[2] * tmp2[i + 2] - //
-                  c.dm[3] * tmp2[i + 3] - c.dm[4] * tmp2[i + 4];  //
+        tmp2[i] = c.nm[0] * input[i + 1] +                        //
+                  c.nm[1] * input[i + 2] +                        //
+                  c.nm[2] * input[i + 3] +                        //
+                  c.nm[3] * input[i + 4] -                        //
+                  c.dm[0] * tmp2[i + 1] - c.dm[1] * tmp2[i + 2] - //
+                  c.dm[2] * tmp2[i + 3] - c.dm[3] * tmp2[i + 4];  //
       }
 
       for (int i = 0; i < size; ++i)

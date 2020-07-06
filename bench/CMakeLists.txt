@@ -68,12 +68,28 @@ add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 find_package(OpenCV)
 
 if (OpenCV_FOUND)
+
+  add_library(BenchImplOpenCV
+  include/bench/bg_sub.hpp
+  src/bg_sub.cpp)
+
+  set_target_properties(BenchImplOpenCV PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+  target_include_directories(BenchImplOpenCV PUBLIC include)
+  target_link_libraries(BenchImplOpenCV PUBLIC Pylene::Pylene ${OpenCV_LIBS})
+
+  set(src_standalone_opencv
+    opencv/BMPlnVsOpenCV_dilation.cpp
+    opencv/BMPlnVsOpenCV_bgSubPipeline.cpp
+  )
+
+  set_source_files_properties(${src_standalone_opencv} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+
   add_benchmark(BMPlnVsOpenCV_Dilation          opencv/BMPlnVsOpenCV_dilation.cpp)
-  target_link_libraries(BMPlnVsOpenCV_Dilation  PRIVATE ${OpenCV_LIBS})
+  target_link_libraries(BMPlnVsOpenCV_Dilation  PRIVATE ${OpenCV_LIBS} BenchImplOpenCV)
 
   add_benchmark(BMPlnVsOpenCV_BgSubPipeline         opencv/BMPlnVsOpenCV_bgSubPipeline.cpp)
-  target_link_libraries(BMPlnVsOpenCV_BgSubPipeline PRIVATE ${OpenCV_LIBS})
-  # add_sanitizers(BMPlnVsOpenCV_BgSubPipeline)
+  target_link_libraries(BMPlnVsOpenCV_BgSubPipeline PRIVATE ${OpenCV_LIBS} BenchImplOpenCV)
+
 else()
   message("OpenCV not found: not building BMPlnVsOpenCV_Dilation nor BMPlnVsOpenCV_bgSubPipeline")
 endif()

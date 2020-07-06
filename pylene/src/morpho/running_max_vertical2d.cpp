@@ -82,9 +82,9 @@ namespace mln::morpho::experimental::details
     auto           sz             = this->get_sample_size();
     std::ptrdiff_t kBlockByteSize = sz * kBlockWidth;
 
-    const int x0    = (vertical) ? roi.x() : roi.y();
-    const int y0    = (vertical) ? roi.y() : roi.x();
-    const int width = (vertical) ? roi.width() : roi.height();
+    const int x0     = (vertical) ? roi.x() : roi.y();
+    const int y0     = (vertical) ? roi.y() : roi.x();
+    const int width  = (vertical) ? roi.width() : roi.height();
     const int height = (vertical) ? roi.height() : roi.width();
 
 

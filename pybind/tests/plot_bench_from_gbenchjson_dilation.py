@@ -10,7 +10,7 @@ sns.set_style("whitegrid")
 sns.set_context("paper")
 
 
-bench_result = json.load(open("BMPlnVsOpenCV_Dilation_result.json"))
+bench_result = json.load(open("BMPlnVsOpenCV_Dilation-GNU-9.3.0.json"))
 
 benchmarks = {'Pln_DiscDecompPeriodic': [],
               'Pln_RectDecomp': [], 'CV_Disc': [], 'CV_Rect': []}
@@ -47,4 +47,4 @@ df = pd.DataFrame(data=data, index=indexes, columns=[
 fig = sns.lineplot(data=df, legend="full")
 fig.set(yscale="log", xlabel="SE size", ylabel="Time (ms)")
 
-fig.get_figure().savefig("PlnVsOpenCV.png")
+fig.get_figure().savefig("PlnVsOpenCV_dilation.png")

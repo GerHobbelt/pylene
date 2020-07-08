@@ -9,8 +9,6 @@
 #include <mln/core/image/views.hpp>
 #include <mln/core/range/view/transform.hpp>
 #include <mln/core/range/view/zip.hpp>
-#include <mln/core/se/disc.hpp>
-#include <mln/core/se/rect2d.hpp>
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/experimental/gaussian_directional_2d.hpp>
@@ -18,7 +16,7 @@
 #include <opencv2/opencv.hpp>
 
 void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color, const mln::image2d<mln::rgb8>& bg_color,
-                           mln::image2d<uint8_t>& output, std::size_t radius)
+                           mln::image2d<uint8_t>& output, const pln_se_t& se)
 {
   // GrayScale (view)
   auto grayscale = [](auto v) -> uint8_t { return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
@@ -40,12 +38,16 @@ void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color, const mln::
   auto        thesholding_fun = [threshold](auto x) -> uint8_t { return (x < threshold) ? 0 : 255; };
   auto        tmp_thresholded = mln::view::transform(tmp_grey, thesholding_fun);
 
-  // Erosion (algo)
-  auto win        = mln::se::disc(radius);
-  auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
-  // Dilation (algo)
-  mln::morpho::experimental::dilation(tmp_eroded, win, output);
+  std::visit(
+      [&](auto&& se_) {
+        // Erosion (algo)
+        auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, se_);
+
+        // Dilation (algo)
+        mln::morpho::experimental::dilation(tmp_eroded, se_, output);
+      },
+      se);
 
   // std::size_t ms, rss;
   // detail::GetMemorySize(ms, rss);
@@ -55,7 +57,7 @@ void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color, const mln::
 
 
 void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color, const mln::image2d<mln::rgb8>& bg_color,
-                           mln::image2d<uint8_t>& output, std::size_t radius)
+                           mln::image2d<uint8_t>& output, const pln_se_t& se)
 {
   // GrayScale (algo)
   mln::image2d<uint8_t> img_grey, bg_grey;
@@ -92,14 +94,18 @@ void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color, const mln::
   constexpr float       threshold = 150;
   mln::image2d<uint8_t> tmp_thresholded;
   mln::resize(tmp_thresholded, tmp_grey);
-  mln::transform(tmp_grey, tmp_thresholded, [threshold](auto&& input_val) { return (input_val < threshold) ? 0 : 255; });
+  mln::transform(tmp_grey, tmp_thresholded,
+                 [threshold](auto&& input_val) { return (input_val < threshold) ? 0 : 255; });
 
-  // erosion (algo)
-  auto win        = mln::se::disc(radius);
-  auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
+  std::visit(
+      [&](auto&& se_) {
+        // Erosion (algo)
+        auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, se_);
 
-  // dilation (algo)
-  mln::morpho::experimental::dilation(tmp_eroded, win, output);
+        // Dilation (algo)
+        mln::morpho::experimental::dilation(tmp_eroded, se_, output);
+      },
+      se);
 
   // std::size_t ms, rss;
   // detail::GetMemorySize(ms, rss);
@@ -107,7 +113,7 @@ void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color, const mln::
   // detail::log_memory_usage();
 }
 
-void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& output, std::size_t radius)
+void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& output, const cv::Mat& se)
 {
   (void)img_color;
   (void)bg_color;
@@ -153,7 +159,7 @@ void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& 
   }
 
   // erosion (algo)
-  auto se         = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * radius + 1, 2 * radius + 1));
+
   auto tmp_eroded = cv::Mat(img_color.rows, img_color.cols, CV_8UC1);
   {
     mln_entering("opencv::erode");

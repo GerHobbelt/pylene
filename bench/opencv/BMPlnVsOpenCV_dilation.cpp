@@ -174,16 +174,43 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, CV_Rect)(benchmark::State& st)
 }
 
 
-constexpr int max_range = 256;
+constexpr int kBMRangeMultiplier = 2;
+constexpr int kBMRangeMStep      = 2;
+constexpr int kBMRangeLower      = 2;
+constexpr int kBMRangeUpper      = 128;
 
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompPeriodic)->RangeMultiplier(2)->Range(1, max_range);
-// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)->RangeMultiplier(2)->Range(1, max_range);
-// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompIncremental)->RangeMultiplier(2)->Range(1, max_range);
-// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscIncremental)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)->RangeMultiplier(2)->Range(1, max_range);
-// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_Rect)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Disc)->RangeMultiplier(2)->Range(1, max_range);
-BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Rect)->RangeMultiplier(2)->Range(1, max_range);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompPeriodic)
+    // ->RangeMultiplier(kBMRangeMultiplier)
+    // ->Range(kBMRangeLower, kBMRangeUpper)
+    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)
+// ->RangeMultiplier(kBMRangeMultiplier)
+// ->Range(kBMRangeLower, kBMRangeUpper)
+// ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompIncremental)
+// ->RangeMultiplier(kBMRangeMultiplier)
+// ->Range(kBMRangeLower, kBMRangeUpper)
+// ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_DiscIncremental)
+// ->RangeMultiplier(kBMRangeMultiplier)
+// ->Range(kBMRangeLower, kBMRangeUpper)
+// ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)
+    // ->RangeMultiplier(kBMRangeMultiplier)
+    // ->Range(kBMRangeLower, kBMRangeUpper)
+    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+// BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, Pln_Rect)
+// ->RangeMultiplier(kBMRangeMultiplier)
+// ->Range(kBMRangeLower, kBMRangeUpper)
+// ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Disc)
+    // ->RangeMultiplier(kBMRangeMultiplier)
+    // ->Range(kBMRangeLower, kBMRangeUpper)
+    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
+BENCHMARK_REGISTER_F(BMPlnVsOpenCV_Dilation, CV_Rect)
+    // ->RangeMultiplier(kBMRangeMultiplier)
+    // ->Range(kBMRangeLower, kBMRangeUpper)
+    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep);
 
 
 BENCHMARK_MAIN();

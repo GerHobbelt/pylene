@@ -81,6 +81,7 @@ add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}transform          algorithm/transform.cpp)
 add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}accumulate_local   algorithm/accumulate_local.cpp)
+add_core_test(${test_prefix}transpose          algorithm/transpose.cpp)
 
 # test SE
 add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)

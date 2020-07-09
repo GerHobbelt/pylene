@@ -14,7 +14,7 @@ namespace mln::morpho::experimental::details
 {
 
   template <class T, class I, class J, class BinaryFunction>
-  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::box2d roi, int k, bool use_extension,
+  void running_max_2d(I input, J& output, BinaryFunction sup, mln::box2d roi, int k, bool use_extension,
                       bool vertical);
 
 
@@ -182,7 +182,8 @@ namespace mln::morpho::experimental::details
   }
 
   template <class T, class I, class J, class BinaryFunction>
-  void running_max_2d(I& input, J& output, BinaryFunction sup, mln::box2d roi, int k, bool use_extension, bool vertical)
+  void running_max_2d(I input, J& output, BinaryFunction sup, mln::box2d roi, int k, bool use_extension,
+                      bool vertical)
   {
     TileLoader<I, T> r(input, vertical);
     TileWriter<J, T> w(output, vertical);

@@ -18,7 +18,7 @@ namespace mln::morpho::details
   /// \param[in] sup Supremum operator
   /// \param[in] roi Processing roi
   template <class I, class J, class BinaryFunction>
-  [[gnu::noinline]] void dilation_by_periodic_line(I& in, J& out, const mln::se::periodic_line2d& line,
+  [[gnu::noinline]] void dilation_by_periodic_line(I in, J& out, const mln::se::periodic_line2d& line,
                                                    BinaryFunction sup, mln::box2d roi);
 
   /******************************************/
@@ -27,7 +27,7 @@ namespace mln::morpho::details
 
   // fixme: could be optimized for indexable images
   template <class I>
-  [[gnu::noinline]] void copy_to_periodic_line(I& f, mln::point2d origin, mln::point2d direction, std::size_t n,
+  [[gnu::noinline]] void copy_to_periodic_line(I f, mln::point2d origin, mln::point2d direction, std::size_t n,
                                                image_value_t<I>* __restrict buffer)
   {
     auto p = origin;
@@ -48,7 +48,7 @@ namespace mln::morpho::details
 
   // Generic implementation
   template <class I, class J, class BinaryFunction>
-  void dilation_by_periodic_line_generic(I& in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
+  void dilation_by_periodic_line_generic(I in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
                                          mln::box2d roi)
   {
     using V = image_value_t<I>;
@@ -88,7 +88,7 @@ namespace mln::morpho::details
 
   // Dispatch to generic version
   template <class I, class J, class BinaryFunction>
-  void dilation_by_periodic_line(I& in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
+  void dilation_by_periodic_line(I in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
                                  mln::box2d roi)
   {
     dilation_by_periodic_line_generic(in, out, line, sup, roi);
@@ -97,7 +97,7 @@ namespace mln::morpho::details
 
   template <class I, class T, class BinaryFunction>
   std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>
-  dilation_by_periodic_line(I& in, mln::image2d<T>& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
+  dilation_by_periodic_line(I in, mln::image2d<T>& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
                             mln::box2d roi)
   {
     int                   k      = line.repetition();
@@ -118,7 +118,6 @@ namespace mln::morpho::details
 
       mln::morpho::experimental::details::running_max_2d<T>(in, out, sup, roi, k, /* use_extension = */ true,
                                                             /* vertical = */ true);
-      return;
     }
     else if (line.is_horizontal())
     {
@@ -126,10 +125,11 @@ namespace mln::morpho::details
 
       mln::morpho::experimental::details::running_max_2d<T>(in, out, sup, roi, k, /* use_extension = */ true,
                                                             /* vertical = */ false);
-      return;
     }
-
-    dilation_by_periodic_line_generic(in, out, line, sup, roi);
+    else
+    {
+      dilation_by_periodic_line_generic(in, out, line, sup, roi);
+    }
   }
 
 

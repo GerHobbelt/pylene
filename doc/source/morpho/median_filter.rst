@@ -3,12 +3,14 @@ Median filter
 
 Include :file:`<mln/morpho/median_filter.hpp>`
 
+.. cpp:namespace:: mln::morpho
+
 
 .. cpp:function:: \
     void median_filter(Image image, StructuringElement se, BorderManager bm, OutputImage out)
-    Image{I} concrete_t<I> median_filter(I image, StructuringElement se, BorderManager bm)
+    Image{I} image_concrete_t<I> median_filter(I image, StructuringElement se, BorderManager bm)
 
-    
+
     The median filter is non-linear filter that assigns the median value in a given structuring element 𝐵.
 
     .. math::

@@ -6,8 +6,8 @@ Include :file:`<mln/morpho/structural/closing.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} concrete_t<I> closing(I image, StructuringElement se)
-    Image{I} concrete_t<I> closing(I image, StructuringElement se, BorderManager bm)
+    Image{I} image_concrete_t<I> closing(I image, StructuringElement se)
+    Image{I} image_concrete_t<I> closing(I image, StructuringElement se, BorderManager bm)
     void closing(Image image, StructuringElement se, OutputImage out)
     void closing(Image image, StructuringElement se, BorderManager bm, OutputImage out)
 

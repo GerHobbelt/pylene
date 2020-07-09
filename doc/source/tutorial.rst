@@ -1,5 +1,5 @@
-Tutorial
-========
+Quick Start
+===========
 
 .. |milena| replace:: milena
 .. |pylene| replace:: pylene
@@ -7,7 +7,7 @@ Tutorial
 .. toctree::
    tutorial/installation.rst
    tutorial/first_start.rst
-   tutorial/extension.rst
+   tutorial/using_algorithms.rst
+   tutorial/writing_algorithms.rst
    tutorial/views.rst
-   tutorial/component_tree.rst
 

@@ -45,10 +45,10 @@ library by other means, refer to the [documentation](http://olena.pages.lrde.epi
 conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
 ```
 
-1. Install the library with Conan:
+1. Install the library with Conan (with C++20 standard)
 
 ```
-conan install pylene/head@lrde/stable -g cmake_find_package
+conan install pylene/head@lrde/stable -g cmake_find_package -s compiler.cppstd=20
 ```
 
 2. Edit your ``CMakeLists.txt`` to include the paths to the library:

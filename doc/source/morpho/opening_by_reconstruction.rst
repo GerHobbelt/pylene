@@ -8,12 +8,12 @@ Include :file:`<mln/morpho/reconstruction.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-   Image{I1}\
-   concrete_t<I1> opening_by_reconstruction(I1 f, I2 markers, Neighborhood nbh, Compare cmp)
-   Image{I1}\
-   concrete_t<I1> opening_by_reconstruction(I1 f, I2 markers, Neighborhood nbh)
-   Image{I1}\
-   concrete_t<I1> closing_by_reconstruction(I1 f, I2 markers, Neighborhood nbh)
+   template <Image I1, Image I2> \
+   image_concrete_t<I1> opening_by_reconstruction(I1 f, I2 markers, Neighborhood nbh, Compare cmp)
+   template <Image I1, Image I2> \
+   image_concrete_t<I1> opening_by_reconstruction(I1 f, I2 markers, Neighborhood nbh)
+   template <Image I1, Image I2> \
+   image_concrete_t<I1> closing_by_reconstruction(I1 f, I2 markers, Neighborhood nbh)
 
    The opening by reconstruction performs the reconstruction of the image
    ``markers`` under the constrain image ``f``. The markers designate the parts
@@ -97,16 +97,16 @@ Example 2 : Dense region reconstruction
 
    *  -  .. figure:: /images/blobs2_binary.png
 
-            a. Original image
+            a\. Original image
 
 
       -  .. figure:: /images/morpho_reconstruction_markers.png
 
-            b. Markers from the :doc:`rank_filter`
+            b\. Markers from the :doc:`rank_filter`
 
       -  .. figure:: /images/morpho_reconstruction_dilated.png
 
-            c. Dilated of the original image *a*
+            c\. Dilated of the original image *a*
 
 .. literalinclude:: /snippets/reconstruction.cpp
    :start-after: M2_START
@@ -126,7 +126,7 @@ get the objects in dense regions::
 
    *  -  .. figure:: /images/morpho_reconstruction_rec.png
 
-            d. Reconstruction of *c* from the markers *b*
+            d\. Reconstruction of *c* from the markers *b*
 
       -  .. figure:: /images/morpho_reconstruction_out.png
 

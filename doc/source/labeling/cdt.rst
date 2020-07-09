@@ -80,6 +80,8 @@ Example with the 5-7-11 weights::
 
             CDT with 5-7-11 :cpp:ref:`mln::wmask2d` (5-7-11 distance)
 
+      -
+
 
 References
 ----------

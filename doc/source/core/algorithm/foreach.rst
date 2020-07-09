@@ -5,7 +5,7 @@ Include :file:`<mln/core/algorithm/for_each.hpp>`
 
 .. cpp:namespace:: mln
 
-.. cpp:function:: void for_each(InputImage in, UnaryFunction f)
+.. cpp:function:: void for_each(InputImage in, std::UnaryFunction f)
 
 
     Applies the function `f` to every value of `in`. It can be used for in-place transformation.

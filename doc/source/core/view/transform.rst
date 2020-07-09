@@ -5,7 +5,7 @@ Include :file:`<mln/core/image/view/transform.hpp>`
 
 .. cpp:namespace:: mln::view
 
-#. .. cpp:function:: auto transform(Image ima, UnaryFunction f)
+#. .. cpp:function:: auto transform(Image ima, std::UnaryFunction f)
 #. .. cpp:function:: auto transform(Image ima, Image ima2, BinaryFunction f)
 
     1. Makes a view from `ima` where for each pixel value evals to :cpp:expr:`out(p) = f(ima(p))`

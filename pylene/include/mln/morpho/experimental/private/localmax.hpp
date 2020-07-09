@@ -14,7 +14,7 @@ namespace mln::morpho::experimental::details
 
     // Specialized - Periodic line with box2d domain
     template <class I, class J, class ValueSet>
-    void localmax(I& in, J& out, ValueSet& vs, const mln::se::periodic_line2d& se, const mln::box2d& roi)
+    void localmax(I in, J& out, ValueSet& vs, const mln::se::periodic_line2d& se, const mln::box2d& roi)
     {
       mln::trace::warn("[Performance] Running the specialization with perodic lines.");
       mln::morpho::details::dilation_by_periodic_line(in, out, se, vs.sup, roi);
@@ -30,7 +30,7 @@ namespace mln::morpho::experimental::details
 
     // Generic - Regular SE over a domain
     template <class I, class J, class ValueSet, class SE, class D>
-    void localmax(I& in, J& out, ValueSet& vs, const mln::details::StructuringElement<SE>& se, const D&)
+    void localmax(I in, J& out, ValueSet& vs, const mln::details::StructuringElement<SE>& se, const D&)
     {
       if constexpr (SE::incremental::value && ValueSet::has_incremental_sup::value)
       {
@@ -43,7 +43,7 @@ namespace mln::morpho::experimental::details
         alg.Execute();
       }
     }
-  }
+  } // namespace impl
 
   namespace details
   {
@@ -61,12 +61,12 @@ namespace mln::morpho::experimental::details
     };
 
     template <class SE, class Domain>
-    static constexpr bool is_se_compatible_with_v =  is_se_compatible_with<SE, Domain>::value;
-  }
+    static constexpr bool is_se_compatible_with_v = is_se_compatible_with<SE, Domain>::value;
+  } // namespace details
 
 
   template <class I, class J, class SE, class BorderManager, class ValueSet>
-  void localmax(I& input, J& output, const SE& se, const BorderManager& bm, const ValueSet& vs)
+  void localmax(I input, J& output, const SE& se, const BorderManager& bm, const ValueSet& vs)
   {
     using D = image_domain_t<I>;
 
@@ -74,13 +74,13 @@ namespace mln::morpho::experimental::details
     // assert(input.domain() == output.domain());
     auto roi = input.domain();
 
-    if constexpr(SE::decomposable::value && details::is_se_compatible_with_v<SE, D>)
+    if constexpr (SE::decomposable::value && details::is_se_compatible_with_v<SE, D>)
     {
       if (se.is_decomposable())
       {
         mln::trace::warn("[Performance] Running the specialization with SE decomposition");
-        auto ses = se.decompose();
-        auto tmp = bm.create_temporary_image(input, se, roi);
+        auto ses       = se.decompose();
+        auto tmp       = bm.create_temporary_image(input, se, roi);
         auto input_roi = se.compute_input_region(roi);
         for (auto&& se : ses)
         {
@@ -96,4 +96,4 @@ namespace mln::morpho::experimental::details
     std::visit([&](auto&& ima, auto&& se) { impl::localmax(ima, output, vs, se, roi); }, imas, ses);
   }
 
-}
+} // namespace mln::morpho::experimental::details

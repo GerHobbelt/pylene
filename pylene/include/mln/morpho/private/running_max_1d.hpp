@@ -22,7 +22,8 @@ namespace mln::morpho::details
   /// \param[in] sup Supremum operator
   /// \param[in] use_extension If true, use values from extension. if false assume that they have no influence
   template <class T, class BinaryFunction>
-  [[gnu::noinline]] void running_max_1d(T* __restrict f, T* __restrict g, T* __restrict h, int n, int k, BinaryFunction sup, bool use_extension = true)
+  [[gnu::noinline]] void running_max_1d(T* __restrict f, T* __restrict g, T* __restrict h, int n, int k,
+                                        BinaryFunction sup, bool use_extension = true)
   {
     if (n == 0)
       return;
@@ -63,7 +64,7 @@ namespace mln::morpho::details
     //        = Max( h[x-k], g[x+k] )
     {
       for (int i = 0; i < n; ++i)
-        f[i] = sup(h[i-k], g[i+k]);
+        f[i] = sup(h[i - k], g[i + k]);
     }
   }
 } // namespace mln::morpho::details

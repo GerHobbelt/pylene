@@ -5,8 +5,7 @@ Include :file:`<mln/core/algorithm/accumulate.hpp>`
 
 .. cpp:namespace:: mln
 
-#. .. cpp:function:: template <class V, class BinaryFunction> V accumulate(InputImage in, V init, BinaryFunction op)
-
+#. .. cpp:function:: template <class V, class BinaryFunction>  V accumulate(InputImage in, V init, BinaryFunction op)
 
 #. .. cpp:function:: template <class Accumulator> auto accumulate(InputImage in, Accumulator accu)
 
@@ -57,8 +56,7 @@ Examples
 
     mln::image2d<uint8_t> ima = { {1, 2, 3}, {4, 5, 6} };
     int s = mln::accumulate(ima, mln::accu::features::sum<>());
-  
- 
+
 Complexity
 ----------
 

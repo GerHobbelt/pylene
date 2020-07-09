@@ -5,7 +5,7 @@ Include :file:`<mln/core/algorithm/clone.hpp>`
 
 .. cpp:namespace:: mln
 
-.. cpp:function:: image_concrete_t<InputImage> clone(InputImage src)
+.. cpp:function:: InputImage{I} image_concrete_t<I> clone(I src)
 
     Clone the values from the source image `src` to a destination image which is automatically deduced as the concrete type of the input.
     This primitive is directed at:
@@ -25,7 +25,6 @@ Include :file:`<mln/core/algorithm/clone.hpp>`
     :tparam OutputImage: A model of :cpp:concept:`OutputImage`
     :return: The concrete image of `src` with the same values
 
-    
 
 Examples
 --------

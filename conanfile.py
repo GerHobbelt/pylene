@@ -25,17 +25,19 @@ class Pylene(ConanFile):
     build_requires = [
         "gtest/[>=1.10]",
         "benchmark/[>=1.5.0]",
+
+        # For now boost is too heavy and is not based on components
+        # Such a dependancy brings linktime overhead because too many libraries are linked
+        # "boost/1.73.0"
     ]
 
     requires = [
         "range-v3/0.10.0",
         "fmt/6.0.0",
-        "boost/1.73.0"
     ]
 
 
     def configure(self):
-        self.settings.compiler.cppstd = "20"
         tools.check_min_cppstd(self, "20")
 
     def build(self):
@@ -54,6 +56,8 @@ class Pylene(ConanFile):
         self.cpp_info.names["cmake_find_package"] = "Pylene"
         self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
         self.cpp_info.libs = [ "Pylene" ]
+
+
         self.cpp_info.cxxflags.append(tools.cppstd_flag(self.settings))
 
 

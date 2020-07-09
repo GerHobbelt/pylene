@@ -7,15 +7,15 @@ All_of, any_of, none_of
 
 .. cpp:namespace:: mln
 
-#. .. cpp:function:: bool all_of(InputImage ima, UnaryPredicate p)
+#. .. cpp:function:: bool all_of(InputImage ima, std::UnaryPredicate p)
 
 #. .. cpp:function:: bool all_of(InputImage ima)
 
-#. .. cpp:function:: bool any_of(InputImage ima, UnaryPredicate p)
+#. .. cpp:function:: bool any_of(InputImage ima, std::UnaryPredicate p)
 
 #. .. cpp:function:: bool any_of(InputImage ima)
 
-#. .. cpp:function:: bool none_of(InputImage ima, UnaryPredicate p)
+#. .. cpp:function:: bool none_of(InputImage ima, std::UnaryPredicate p)
 
 #. .. cpp:function:: bool none_of(InputImage ima)
 
@@ -26,7 +26,7 @@ All_of, any_of, none_of
     :param ima: The image to test
     :param p: The unary predicate that will be applied on values
     :tparam InputImage: A model of :cpp:concept:`InputImage`
-    :tparam UnaryPredicate: A model of :cpp:concept:`stl::UnaryPredicate`
+    :tparam std::UnaryPredicate: A model of :cpp:concept:`std::UnaryPredicate`
     :return: True or false
 
     

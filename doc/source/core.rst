@@ -1,13 +1,13 @@
 Core Module
 ===========
 
-
+.. cpp:namespace:: mln
 
 
 .. toctree::
    :hidden:
 
-
+   core/core_types
    core/images
    core/ranges
    core/neighborhood
@@ -52,19 +52,22 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 
 
+
+
 .. topic:: Fundamental image types
 
   .. table::
     :class: full
     :widths: auto
 
-    +--------------+-------------------------+
-    | `image2d<T>` | Buffer-encoded 2D image |
-    +--------------+-------------------------+
-    | `image3d<T>` | Buffer-encoded 3D image |
-    +--------------+-------------------------+
-    | `ndimage<T>` | Buffer-encoded nD image |
-    +--------------+-------------------------+
+    +-----------------------------------------+-------------------------+
+    |         :cpp:any:`image2d`              | Buffer-encoded 2D image |
+    +-----------------------------------------+-------------------------+
+    |         :cpp:any:`image3d`              | Buffer-encoded 3D image |
+    +-----------------------------------------+-------------------------+
+    |         :cpp:any:`ndimage`              | Buffer-encoded nD image |
+    +-----------------------------------------+-------------------------+
+
 
 .. topic:: Functional image views
 

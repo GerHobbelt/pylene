@@ -15,6 +15,8 @@ sizes = {"width": 1000, "height": 1000}
 number = 100
 percent = 20
 
+sizes_list = [sizes]
+radius_list = [r for r in range(0, 127, 2)]
 
 def setup_test_img():
     global sizes
@@ -34,10 +36,6 @@ def test_pylena():
 def test_pylena_decomp():
     disc = pln.se.disc_decomposable(float(radius))
     pln.morpho.dilate(ref, disc)
-
-
-sizes_list = [sizes]
-radius_list = [2**r for r in range(0, 8)]
 
 
 def get_sizes():

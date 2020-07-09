@@ -16,6 +16,8 @@ sizes = {"width": 1000, "height": 1000}  # 10Mo
 number = 100
 percent = 20
 
+sizes_list = [sizes]
+rect_sizes_list = [{"width": 1+x, "height": 1+x} for x in range(0, 254, 4)]
 
 def setup_test_img():
     global sizes
@@ -35,10 +37,6 @@ def test_pylena():
 def test_pylena_decomp():
     rect = pln.se.rect2d_decomposable(rect_width, rect_height)
     pln.morpho.dilate(ref, rect)
-
-
-sizes_list = [sizes]
-rect_sizes_list = [{"width": 1+2**x, "height": 1+2**x} for x in range(1, 9)]
 
 
 def get_sizes():

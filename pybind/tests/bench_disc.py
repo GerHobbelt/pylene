@@ -11,9 +11,12 @@ import math
 
 
 radius = 3
-sizes = {"width": 3138, "height": 3138}
+sizes = {"width": 3138, "height": 3138}  # 10Mo
 number = 100
 percent = 20
+
+sizes_list = [sizes]
+radius_list = [r for r in range(0, 127, 2)]
 
 
 def setup_test_img():
@@ -44,10 +47,6 @@ def test_cv2():
     disc = cv2.getStructuringElement(
         cv2.MORPH_ELLIPSE, (radius*2+1, radius*2+1))
     cv2.dilate(ref, disc, iterations=1)
-
-
-sizes_list = [sizes]
-radius_list = [2**r for r in range(0, 8)]
 
 
 def get_sizes():

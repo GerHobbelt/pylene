@@ -6,7 +6,7 @@ import json
 import re
 
 sns.set()
-sns.set_style("whitegrid")
+# sns.set_style("whitegrid")
 sns.set_context("paper")
 
 
@@ -19,6 +19,8 @@ indexes = []
 for bench in bench_result['benchmarks']:
     for k in benchmarks.keys():
         if k in bench['name']:
+            if 'aggregate_name' in bench:
+                continue
             size_se = size_se_p.search(bench['name'])
             assert(size_se is not None)
             benchmarks[k].append({
@@ -47,4 +49,4 @@ df = pd.DataFrame(data=data, index=indexes, columns=[
 fig = sns.lineplot(data=df, legend="full")
 fig.set(yscale="log", xlabel="SE size", ylabel="Time (ms)")
 
-fig.get_figure().savefig("PlnVsOpenCV_dilation.png")
+fig.get_figure().savefig("PlnVsOpenCV_dilation.pdf")

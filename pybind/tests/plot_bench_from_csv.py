@@ -35,7 +35,7 @@ def draw_fig_from_csv(csv_rect_file_name_without_ext, csv_disc_file_name_without
     fig.set(yscale="log", xlabel="SE size (half edge size for square, radius for disc)",
             ylabel="Time (ms)")
 
-    fig.get_figure().savefig("bench_disc_rect_by_SE.png")
+    fig.get_figure().savefig("bench_disc_rect_by_SE.pdf")
     fig.get_figure().clf()
 
 

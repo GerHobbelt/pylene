@@ -30,7 +30,7 @@ function(add_benchmark Executable)
 
   # Create a target to run the benchmark
   add_custom_target(run-${Benchmark_NAME}
-                    COMMAND ${Benchmark_NAME} --benchmark_out_format=json --benchmark_out=${Benchmark_OUTPUT_FILE} --benchmark_repetitions=1 #--benchmark_display_aggregates_only=true
+                    COMMAND ${Benchmark_NAME} --benchmark_out_format=json --benchmark_out=${Benchmark_OUTPUT_FILE} --benchmark_repetitions=8 #--benchmark_display_aggregates_only=true
                     DEPENDS ${Benchmark_NAME}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     USES_TERMINAL)

@@ -26,7 +26,7 @@ for bench in bench_result['benchmarks']:
             benchmarks[k].append({
                 'size_se': int(size_se.group(1)),
                 'iterations': bench['iterations'],
-                'time': bench['real_time'],
+                'time': bench['real_time']/1000,
                 'unit': bench['time_unit'],
                 'throughput_bps': bench['bytes_per_second']
             })
@@ -47,6 +47,7 @@ df = pd.DataFrame(data=data, index=indexes, columns=[
                   'Pln_DiscDecompPeriodic', 'Pln_RectDecomp', 'CV_Disc', 'CV_Rect'])
 
 fig = sns.lineplot(data=df, legend="full")
-fig.set(yscale="log", xlabel="SE size", ylabel="Time (ms)")
+fig.set(yscale="log", xlabel="SE size (half edge size for square, radius for disc)",
+        ylabel="Time (s)")
 
 fig.get_figure().savefig("PlnVsOpenCV_dilation.pdf")

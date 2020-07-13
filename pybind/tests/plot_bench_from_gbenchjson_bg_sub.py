@@ -48,7 +48,7 @@ for ret in benchmarks[_k]:
 df = pd.DataFrame(data=data, index=indexes, columns=[
                   'Pln_PipeViews', 'Pln_PipeAlgos', 'CV_PipeAlgo'])
 
-df.index.name = "SE size"
+df.index.name = "SE size (half edge size for square, radius for disc)"
 
 print(df.describe())
 

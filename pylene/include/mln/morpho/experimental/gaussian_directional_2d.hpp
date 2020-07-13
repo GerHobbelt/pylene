@@ -305,6 +305,18 @@ namespace mln::morpho::experimental
 
 
   template <class InputImage, class T>
+  image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d_generic(InputImage&& image, float h_sigma,
+                                                                           float v_sigma, T border_value)
+  {
+    using I = std::remove_reference_t<InputImage>;
+
+    image_concrete_t<I> out = imconcretize(image);
+    gaussian2d(image, h_sigma, v_sigma, border_value, out);
+    return out;
+  }
+
+
+  template <class InputImage, class T>
   image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d(InputImage&& image, float h_sigma, float v_sigma,
                                                                    T border_value)
   {

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mln/core/algorithm/copy.hpp>
+#include <mln/core/box.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/morpho/experimental/private/gaussian2d_by_block2d.hpp>
 #include <mln/core/trace.hpp>
 
 #include <algorithm>
@@ -18,12 +20,18 @@ namespace mln::morpho::experimental
 {
 
   template <class InputImage, class T>
-  image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d(InputImage&& image, float h_sigma, float v_sigma,
+  image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d(InputImage&& input, float h_sigma, float v_sigma,
                                                                    T border_value);
 
   template <class InputImage, class T, class OutputImage>
-  void gaussian2d(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out);
+  void gaussian2d(InputImage&& input, float h_sigma, float v_sigma, T border_value, OutputImage&& out);
 
+  namespace detail
+  {
+    template <class T, class InputImage, class OutputImage, class BinaryFunction>
+    void running_gaussian2d(InputImage&& input, OutputImage& output, mln::box2d roi, float h_sigma, float v_sigma,
+                            T border_value, bool use_extension);
+  }
 
   /******************************************/
   /****          Implementation          ****/
@@ -235,8 +243,8 @@ namespace mln::morpho::experimental
         buffer[y] = f({c, y + y0});
     }
 
-    template <class InputImage, class T>
-    void copy_to_column(const T* buffer, int c, InputImage&& f)
+    template <class OutputImage, class T>
+    void copy_to_column(const T* buffer, int c, OutputImage&& f)
     {
       int h  = f.height();
       int y0 = f.domain().y();
@@ -245,8 +253,8 @@ namespace mln::morpho::experimental
     }
 
 
-    template <class InputImage, class T>
-    void gaussian2d_T(InputImage&& input, float h_sigma, float v_sigma, T border_value)
+    template <class InOutImage, class T>
+    void gaussian2d_generic(InOutImage& input, float h_sigma, float v_sigma, T border_value)
     {
       int b      = 5 * static_cast<int>(std::max(h_sigma, v_sigma) + 0.5f);
       int width  = input.width();
@@ -263,7 +271,7 @@ namespace mln::morpho::experimental
       // Fill border
       std::fill_n(i_buffer, tmp_size, border_value);
 
-
+      // horizontal pass
       const int x0 = input.domain().x();
       if (v_sigma != 0.f)
       {
@@ -280,11 +288,7 @@ namespace mln::morpho::experimental
         }
       }
 
-
-      // Fill border
-      std::fill_n(i_buffer, tmp_size, border_value);
-
-
+      // vertical pass
       if (h_sigma != 0.f)
       {
         recursivefilter_coef_ coef(1.68f, 3.735f, 1.783f, 1.723f, -0.6803f, -0.2598f, 0.6318f, 1.997f, h_sigma,
@@ -305,36 +309,90 @@ namespace mln::morpho::experimental
 
 
   template <class InputImage, class T>
-  image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d_generic(InputImage&& image, float h_sigma,
-                                                                           float v_sigma, T border_value)
-  {
-    using I = std::remove_reference_t<InputImage>;
-
-    image_concrete_t<I> out = imconcretize(image);
-    gaussian2d(image, h_sigma, v_sigma, border_value, out);
-    return out;
-  }
-
-
-  template <class InputImage, class T>
-  image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d(InputImage&& image, float h_sigma, float v_sigma,
+  image_concrete_t<std::remove_reference_t<InputImage>> gaussian2d(InputImage&& input, float h_sigma, float v_sigma,
                                                                    T border_value)
   {
     using I = std::remove_reference_t<InputImage>;
 
-    image_concrete_t<I> out = imconcretize(image);
-    gaussian2d(image, h_sigma, v_sigma, border_value, out);
+    image_concrete_t<I> out = imconcretize(input);
+    gaussian2d(input, h_sigma, v_sigma, border_value, out);
     return out;
   }
 
   template <class InputImage, class T, class OutputImage>
-  void gaussian2d(InputImage&& image, float h_sigma, float v_sigma, T border_value, OutputImage&& out)
+  void gaussian2d(InputImage&& input, float h_sigma, float v_sigma, T border_value, OutputImage&& out)
   {
     mln_entering("mln::morpho::experimental::gaussian2d");
 
-    mln::copy(image, out);
-
-    detail::gaussian2d_T(out, h_sigma, v_sigma, border_value);
+    mln::copy(input, out);
+    detail::gaussian2d_generic(out, h_sigma, v_sigma, border_value);
   }
+
+  template <class InputImage, class T, class OutputImage>
+  std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>
+  gaussian2d(InputImage&& input, float h_sigma, float v_sigma, T border_value, mln::image2d<T>& out)
+  {
+    auto roi = input.domain();
+    mln_entering("Running specialization for gaussian2d over 2d buffer with arithmetic types");
+    detail::running_gaussian2d<T>(input, out, roi, h_sigma, v_sigma, border_value, /* use_extension = */ true);
+  }
+
+  namespace detail
+  {
+    template <class T, class InputImage, class OutputImage, class BinaryFunction>
+    void running_gaussian2d(InputImage&& input, OutputImage& output, mln::box2d roi, float h_sigma, float v_sigma,
+                            T border_value, bool use_extension)
+    {
+      int b      = 5 * static_cast<int>(std::max(h_sigma, v_sigma) + 0.5f);
+      int width  = input.width();
+      int height = input.height();
+
+      int tmp_size = std::max(width, height) + 2 * b;
+
+      // Allocate temporary buffer
+      std::vector<float> tmp(3 * tmp_size);
+      float*             i_buffer = tmp.data();
+      float*             tmp1     = tmp.data() + tmp_size;
+      float*             tmp2     = tmp.data() + 2 * tmp_size;
+
+      // Fill border
+      std::fill_n(i_buffer, tmp_size, border_value);
+
+      // vertical pass
+      const int x0 = input.domain().x();
+      if (v_sigma != 0.f)
+      {
+        bool vertical = true;
+
+        recursivefilter_coef_ coef(1.68f, 3.735f, 1.783f, 1.723f, -0.6803f, -0.2598f, 0.6318f, 1.997f, v_sigma,
+                                   recursivefilter_coef_::DericheGaussian);
+
+        TileLoader<InputImage, T>  r(input, vertical);
+        TileWriter<OutputImage, T> w(output, vertical);
+
+        running_gaussian2d_algo_t<T> alg{};
+        alg.set_tile_reader(&r);
+        alg.set_tile_writer(&w);
+        alg.execute(roi, coef, vertical, use_extension);
+      }
+
+      // horizontal pass
+      if (h_sigma != 0.f)
+      {
+        bool vertical = false;
+
+        recursivefilter_coef_ coef(1.68f, 3.735f, 1.783f, 1.723f, -0.6803f, -0.2598f, 0.6318f, 1.997f, h_sigma,
+                                   recursivefilter_coef_::DericheGaussian);
+
+        TileLoader<InputImage, T>  r(input, vertical);
+        TileWriter<OutputImage, T> w(output, vertical);
+
+        running_gaussian2d_algo_t<T> alg{};
+        alg.set_tile_reader(&r);
+        alg.set_tile_writer(&w);
+        alg.execute(roi, coef, vertical, use_extension);
+      }
+    }
+  } // namespace detail
 
 } // namespace mln::morpho::experimental

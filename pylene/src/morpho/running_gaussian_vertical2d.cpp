@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace mln::morpho::experimental::detail
+namespace mln::morpho::experimental::details
 {
 
 
@@ -113,4 +113,4 @@ namespace mln::morpho::experimental::detail
     std::free(h);
   }
 
-} // namespace mln::morpho::experimental::detail
+} // namespace mln::morpho::experimental::details

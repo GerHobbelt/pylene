@@ -50,9 +50,9 @@ void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color, const mln::
       se);
 
   // std::size_t ms, rss;
-  // detail::GetMemorySize(ms, rss);
+  // details::GetMemorySize(ms, rss);
   // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-  // detail::log_memory_usage();
+  // details::log_memory_usage();
 }
 
 
@@ -108,9 +108,9 @@ void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color, const mln::
       se);
 
   // std::size_t ms, rss;
-  // detail::GetMemorySize(ms, rss);
+  // details::GetMemorySize(ms, rss);
   // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-  // detail::log_memory_usage();
+  // details::log_memory_usage();
 }
 
 void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& output, const cv::Mat& se)
@@ -173,7 +173,7 @@ void cv_bg_sub_pipe(const cv::Mat& img_color, const cv::Mat& bg_color, cv::Mat& 
   }
 
   // std::size_t ms, rss;
-  // detail::GetMemorySize(ms, rss);
+  // details::GetMemorySize(ms, rss);
   // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-  // detail::log_memory_usage();
+  // details::log_memory_usage();
 }

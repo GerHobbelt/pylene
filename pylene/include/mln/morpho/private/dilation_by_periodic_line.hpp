@@ -46,8 +46,7 @@ namespace mln::morpho::details
 
 
   template <class I, class J, class BinaryFunction>
-  void dilation_by_periodic_line(I in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup,
-                                 mln::box2d roi)
+  void dilation_by_periodic_line(I in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup, mln::box2d roi)
   {
     using V = image_value_t<I>;
 

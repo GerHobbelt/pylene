@@ -4,8 +4,8 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/paste.hpp>
 #include <mln/core/colors.hpp>
-#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/views.hpp>
 #include <mln/core/se/disc.hpp>
@@ -137,7 +137,7 @@ mln::image2d<uint8_t> gaussian_blur(Ima input, std::size_t sigma)
 
 namespace bg_sub
 {
-  namespace detail
+  namespace details
   {
     template <size_t N>
     constexpr std::string_view sv(const char (&literal)[N])
@@ -167,20 +167,20 @@ namespace bg_sub
       using Indexes = std::make_index_sequence<N>;
       return swap_impl(la, ra, Indexes{});
     }
-  } // namespace detail
+  } // namespace details
 
-  constexpr auto filenames_base = detail::sva("a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
-                                              "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg");
+  constexpr auto filenames_base = details::sva("a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
+                                               "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg");
 
   constexpr auto filenames_bg =
-      detail::sva("a_bg.jpg", "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
-                  "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
+      details::sva("a_bg.jpg", "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
+                   "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
 
   constexpr std::string_view file_path        = "images/bg_sub_samples";
   constexpr std::string_view file_path_tmp    = "images/bg_sub_tmp";
   constexpr std::string_view file_path_mosaic = "images/bg_sub_mosaic";
 
-  constexpr auto filenames = detail::svap(filenames_base, filenames_bg);
+  constexpr auto filenames = details::svap(filenames_base, filenames_bg);
 
 } // namespace bg_sub
 
@@ -205,8 +205,7 @@ void test_deriche_gaussian2d(std::string_view filename, std::string_view filenam
   constexpr float kLineHorizontalSigma = 10.;
   auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
 
-  mln::io::imsave(bg_blurred,
-                                std::string{bg_sub::file_path_tmp} + "/blurred_"s + std::string{filename_bg});
+  mln::io::imsave(bg_blurred, std::string{bg_sub::file_path_tmp} + "/blurred_"s + std::string{filename_bg});
 }
 
 
@@ -239,14 +238,13 @@ void test_bg_sub_pipeline(std::string_view filename, std::string_view filename_b
 
   // erosion (algo)
   mln::se::disc win(3);
-  auto                        tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
+  auto          tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
 
   // dilation (algo)
   auto tmp_dilated = mln::morpho::experimental::dilation(tmp_eroded, win);
 
   // output
-  mln::io::imsave(tmp_dilated,
-                                std::string{bg_sub::file_path_tmp} + "/result_"s + std::string{filename_bg});
+  mln::io::imsave(tmp_dilated, std::string{bg_sub::file_path_tmp} + "/result_"s + std::string{filename_bg});
 }
 
 
@@ -259,8 +257,7 @@ void mosaic_fig(std::string_view filename, int mosaic_size)
   bp.border     = 15;
   bp.init_value = mln::rgb8{0, 0, 0};
 
-  auto mosaic_domain =
-      mln::box2d{img_color.domain().width() * mosaic_size, img_color.domain().height() * mosaic_size};
+  auto mosaic_domain = mln::box2d{img_color.domain().width() * mosaic_size, img_color.domain().height() * mosaic_size};
 
   auto mosaic_image = mln::image2d<mln::rgb8>{mosaic_domain, bp};
 
@@ -280,9 +277,8 @@ void mosaic_fig(std::string_view filename, int mosaic_size)
     }
   }
 
-  mln::io::imsave(mosaic_image, std::string{bg_sub::file_path_mosaic} + "/mosaic_"s +
-                                                  std::to_string(mosaic_size) + "x" + std::to_string(mosaic_size) +
-                                                  '_' + std::string{filename});
+  mln::io::imsave(mosaic_image, std::string{bg_sub::file_path_mosaic} + "/mosaic_"s + std::to_string(mosaic_size) +
+                                    "x" + std::to_string(mosaic_size) + '_' + std::string{filename});
 }
 
 
@@ -430,10 +426,10 @@ int main()
     mln::image2d<uint8_t> lena_grey;
     mln::io::imread("images/lena_grey.png", lena_grey);
 
-    auto dom     = lena_grey.domain();
-    auto tl      = mln::point2d{dom.width() / 4, dom.height() / 4};
-    auto br      = mln::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
-    auto sub_dom = mln::box2d{tl, br};
+    auto dom           = lena_grey.domain();
+    auto tl            = mln::point2d{dom.width() / 4, dom.height() / 4};
+    auto br            = mln::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
+    auto sub_dom       = mln::box2d{tl, br};
     auto sub_lena_grey = mln::view::clip(lena_grey, sub_dom);
     mln::io::imsave(sub_lena_grey, "images/lena_grey_clipped.png");
 
@@ -445,10 +441,10 @@ int main()
     mln::image2d<mln::rgb8> lena_color;
     mln::io::imread("images/lena_color.png", lena_color);
 
-    auto dom     = lena_color.domain();
-    auto tl      = mln::point2d{dom.width() / 4, dom.height() / 4};
-    auto br      = mln::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
-    auto sub_dom = mln::box2d{tl, br};
+    auto dom            = lena_color.domain();
+    auto tl             = mln::point2d{dom.width() / 4, dom.height() / 4};
+    auto br             = mln::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
+    auto sub_dom        = mln::box2d{tl, br};
     auto sub_lena_color = mln::view::clip(lena_color, sub_dom);
     mln::io::imsave(sub_lena_color, "images/lena_color_clipped.png");
 
@@ -458,9 +454,9 @@ int main()
     mln::image2d<mln::rgb8> planet_color;
     mln::io::imread("images/planet.png", planet_color);
 
-    auto dom2 = planet_color.domain();
-    auto tl2  = mln::point2d{dom2.width() / 4, dom2.height() / 4};
-    auto br2  = mln::point2d{dom2.width() / 4 + dom2.width() / 2, dom2.height() / 4 + dom2.width() / 2};
+    auto dom2             = planet_color.domain();
+    auto tl2              = mln::point2d{dom2.width() / 4, dom2.height() / 4};
+    auto br2              = mln::point2d{dom2.width() / 4 + dom2.width() / 2, dom2.height() / 4 + dom2.width() / 2};
     auto sub_dom2         = mln::box2d{tl2, br2};
     auto sub_planet_color = mln::view::clip(planet_color, sub_dom2);
     mln::io::imsave(sub_planet_color, "images/planet_clipped.png");
@@ -477,10 +473,10 @@ int main()
     mln::image2d<mln::rgb8> planet_color;
     mln::io::imread("images/planet.png", planet_color);
 
-    auto dom     = planet_color.domain();
-    auto tl      = mln::point2d{dom.width() / 4, dom.height() / 4};
-    auto br      = mln::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
-    auto sub_dom = mln::box2d{tl, br};
+    auto dom              = planet_color.domain();
+    auto tl               = mln::point2d{dom.width() / 4, dom.height() / 4};
+    auto br               = mln::point2d{dom.width() / 4 + dom.width() / 2, dom.height() / 4 + dom.width() / 2};
+    auto sub_dom          = mln::box2d{tl, br};
     auto sub_planet_color = mln::view::clip(planet_color, sub_dom);
 
     fill(sub_planet_color, mln::rgb8{0, 0, 0});
@@ -489,9 +485,9 @@ int main()
     mln::image2d<mln::rgb8> lena_color;
     mln::io::imread("images/lena_color.png", lena_color);
 
-    auto dom2 = lena_color.domain();
-    auto tl2  = mln::point2d{dom2.width() / 4, dom2.height() / 4};
-    auto br2  = mln::point2d{dom2.width() / 4 + dom2.width() / 2, dom2.height() / 4 + dom2.width() / 2};
+    auto dom2           = lena_color.domain();
+    auto tl2            = mln::point2d{dom2.width() / 4, dom2.height() / 4};
+    auto br2            = mln::point2d{dom2.width() / 4 + dom2.width() / 2, dom2.height() / 4 + dom2.width() / 2};
     auto sub_dom2       = mln::box2d{tl2, br2};
     auto sub_lena_color = mln::view::clip(lena_color, sub_dom2);
 

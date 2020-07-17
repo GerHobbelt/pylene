@@ -28,7 +28,7 @@
 using namespace std::literals;
 
 
-namespace detail
+namespace details
 {
   // clang-format off
   template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
@@ -99,16 +99,16 @@ namespace detail
     using Indexes = std::make_index_sequence<N>;
     return swap_impl(la, ra, Indexes{});
   }
-} // namespace detail
+} // namespace details
 
-constexpr auto filenames_base = detail::sva("a.jpg"/*, "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
+constexpr auto filenames_base = details::sva("a.jpg"/*, "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
                                             "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg"*/);
 
 constexpr auto filenames_bg =
-    detail::sva("a_bg.jpg"/*, "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
+    details::sva("a_bg.jpg"/*, "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
                 "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg"*/);
 
-constexpr auto filenames = detail::svap(filenames_base, filenames_bg);
+constexpr auto filenames = details::svap(filenames_base, filenames_bg);
 
 constexpr std::size_t radius = 30;
 
@@ -171,7 +171,7 @@ public:
     m_size          = g_size;
 
     // std::cerr << "After loading" << std::endl;
-    // detail::log_memory_usage();
+    // details::log_memory_usage();
     // std::cerr << "------" << std::endl;
     // std::cout << "Loading end" << std::endl;
   };
@@ -180,26 +180,26 @@ public:
   void run(benchmark::State& st, callback_t callback)
   {
     // std::size_t ms, rss;
-    // detail::GetMemorySize(ms, rss);
+    // details::GetMemorySize(ms, rss);
     // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-    // detail::log_memory_usage();
+    // details::log_memory_usage();
     // std::cout << "run start" << std::endl;
-    std::visit(detail::overload{[&](callback_pln cb) {
-                                  for (auto _ : st)
-                                    cb(m_input_imgs, m_input_bgs, m_outputs);
-                                  st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
-                                },
-                                [&](callback_cv cb) {
-                                  for (auto _ : st)
-                                    cb(m_input_imgs_cv, m_input_bgs_cv, m_outputs_cv);
-                                  st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
-                                }},
+    std::visit(details::overload{[&](callback_pln cb) {
+                                   for (auto _ : st)
+                                     cb(m_input_imgs, m_input_bgs, m_outputs);
+                                   st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+                                 },
+                                 [&](callback_cv cb) {
+                                   for (auto _ : st)
+                                     cb(m_input_imgs_cv, m_input_bgs_cv, m_outputs_cv);
+                                   st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+                                 }},
                callback);
 
     // std::cout << "run end" << std::endl;
-    // detail::GetMemorySize(ms, rss);
+    // details::GetMemorySize(ms, rss);
     // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-    // detail::log_memory_usage();
+    // details::log_memory_usage();
   }
 
 protected:
@@ -399,7 +399,7 @@ class TestMemoryManager : public benchmark::MemoryManager
   {
     // std::cerr << "Start" << std::endl;
     // malloc_stats();
-    // detail::log_memory_usage();
+    // details::log_memory_usage();
     // std::cerr << "------" << std::endl;
   }
   void Stop(Result* result)
@@ -408,7 +408,7 @@ class TestMemoryManager : public benchmark::MemoryManager
     result->max_bytes_used = 0;
     // std::cerr << "Stop" << std::endl;
     // malloc_stats();
-    // detail::log_memory_usage();
+    // details::log_memory_usage();
     // std::cerr << "------" << std::endl;
   }
 };
@@ -416,7 +416,7 @@ class TestMemoryManager : public benchmark::MemoryManager
 int main(int argc, char** argv)
 {
   // std::cerr << "Before loading" << std::endl;
-  // detail::log_memory_usage();
+  // details::log_memory_usage();
 
   ::benchmark::Initialize(&argc, argv);
   if (::benchmark::ReportUnrecognizedArguments(argc, argv))

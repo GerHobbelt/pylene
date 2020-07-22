@@ -2,7 +2,7 @@
 
 #include <mln/core/box.hpp>
 #include <mln/core/image/ndimage_fwd.hpp>
-#include <mln/morpho/experimental/private/tile_tools.hpp>
+#include <mln/morpho/private/tile_tools.hpp>
 
 #include <range/v3/functional/concepts.hpp>
 
@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-namespace mln::morpho::experimental::details
+namespace mln::morpho::details
 {
 
   template <class T, class I, class J, class BinaryFunction>

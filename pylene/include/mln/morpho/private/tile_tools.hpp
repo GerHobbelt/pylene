@@ -2,24 +2,30 @@
 
 #include <mln/core/box.hpp>
 
-namespace mln::morpho::experimental::details
+namespace mln::morpho::details
 {
 
   class TileLoaderBase
   {
     // Load tile from memory (roi is in the vertical layout coordinates system)
     virtual void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
+
+    virtual void copy_block(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
+    virtual void transpose_block(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d output_roi) = 0;
   };
 
   class TileWriterBase
   {
     // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
     virtual void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
+
+    virtual void copy_block(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
+    virtual void transpose_block(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d input_roi) = 0;
   };
 
 
   template <class I, class T>
-  [[gnu::noinline]] void copy_block(const I& in, mln::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
+  [[gnu::noinline]] void copy_block(I&& in, mln::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
   {
     const int x0 = roi.x();
     const int y0 = roi.y();
@@ -28,7 +34,7 @@ namespace mln::morpho::experimental::details
     {
       T* lineptr = out + y * out_stride;
       for (int x = 0; x < roi.width(); ++x)
-        lineptr[x] = in.at({x0 + x, y0 + y});
+        lineptr[x] = in.at(mln::point2d{x0 + x, y0 + y});
     }
   }
 
@@ -42,12 +48,12 @@ namespace mln::morpho::experimental::details
     {
       const T* lineptr = in + y * istride;
       for (int x = 0; x < roi.width(); ++x)
-        out.at({x0 + x, y0 + y}) = lineptr[x];
+        out.at(mln::point2d{x0 + x, y0 + y}) = lineptr[x];
     }
   }
 
   template <class I, class T>
-  [[gnu::noinline]] void transpose_block2d(const I& in, mln::box2d input_roi, T* __restrict out,
+  [[gnu::noinline]] void transpose_block2d(I&& in, mln::box2d input_roi, T* __restrict out,
                                            std::ptrdiff_t out_stride)
   {
     const int x0 = input_roi.x();
@@ -56,7 +62,7 @@ namespace mln::morpho::experimental::details
 
     for (int y = 0; y < input_roi.height(); ++y)
       for (int x = 0; x < input_roi.width(); ++x)
-        *(out + x * out_stride + y) = in.at({x0 + x, y0 + y});
+        *(out + x * out_stride + y) = in.at(mln::point2d{x0 + x, y0 + y});
   }
 
   template <class I, class T>
@@ -68,7 +74,7 @@ namespace mln::morpho::experimental::details
 
     for (int y = 0; y < output_roi.height(); ++y)
       for (int x = 0; x < output_roi.width(); ++x)
-        out.at({x0 + x, y0 + y}) = *(in + x * istride + y);
+        out.at(mln::point2d{x0 + x, y0 + y}) = *(in + x * istride + y);
   }
 
   template <class I, class T>
@@ -79,7 +85,7 @@ namespace mln::morpho::experimental::details
     void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) override final
     {
       if (m_vertical)
-        copy_block(*m_input, roi, (T*)out, byte_stride / sizeof(T));
+        mln::morpho::details::copy_block(*m_input, roi, (T*)out, byte_stride / sizeof(T));
       else
       {
         mln::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
@@ -87,14 +93,27 @@ namespace mln::morpho::experimental::details
       }
     }
 
-    TileLoader(const I& input, bool vertical)
+
+    void copy_block(std::byte* out, std::ptrdiff_t stride, mln::box2d roi) final
+    {
+      mln::morpho::details::copy_block(*m_input, roi, (T*)out, stride);
+    }
+
+    void transpose_block(std::byte* out, std::ptrdiff_t stride, mln::box2d roi) final
+    {
+      mln::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
+      mln::morpho::details::transpose_block2d(*m_input, region, (T*)out, stride);
+    }
+
+
+    TileLoader(I& input, bool vertical)
       : m_input(&input)
       , m_vertical{vertical}
     {
     }
 
   private:
-    const I* m_input;
+    I*       m_input;
     bool     m_vertical;
   };
 
@@ -106,13 +125,25 @@ namespace mln::morpho::experimental::details
     void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::box2d roi) override final
     {
       if (m_vertical)
-        copy_block((const T*)in, byte_stride / sizeof(T), roi, *m_output);
+        mln::morpho::details::copy_block((const T*)in, byte_stride / sizeof(T), roi, *m_output);
       else
       {
         mln::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
         transpose_block2d((const T*)in, byte_stride / sizeof(T), region, *m_output);
       }
     }
+
+    void copy_block(std::byte* in, std::ptrdiff_t stride, mln::box2d roi) final
+    {
+      mln::morpho::details::copy_block((const T*)in, stride, roi, *m_output);
+    }
+
+    void transpose_block(std::byte* in, std::ptrdiff_t stride, mln::box2d roi) final
+    {
+      mln::box2d region(roi.y(), roi.x(), roi.height(), roi.width());
+      mln::morpho::details::transpose_block2d((const T*)in, stride, region, *m_output);
+    }
+
 
     TileWriter(I& output, bool vertical)
       : m_output(&output)

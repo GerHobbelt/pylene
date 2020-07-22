@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace mln::morpho::experimental::details
+namespace mln::morpho::details
 {
 
 

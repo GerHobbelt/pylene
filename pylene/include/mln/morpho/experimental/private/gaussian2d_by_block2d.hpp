@@ -7,9 +7,6 @@
 
 
 #include <range/v3/functional/concepts.hpp>
-
-#include <experimental/simd>
-
 #include <cassert>
 
 namespace mln::morpho::experimental::details
@@ -48,7 +45,7 @@ namespace mln::morpho::experimental::details
   };
 
 
-  template <class T>
+
   class running_gaussian2d_algo_t : public running_gaussian2d_algo_base_t
   {
     using simd_t                     = std::experimental::simd<T>;
@@ -56,8 +53,9 @@ namespace mln::morpho::experimental::details
     static constexpr int BLOCK_WIDTH = WARP_SIZE * 4;
 
 
-    void apply_coef(std::byte* __restrict A, std::byte* __restrict B, std::byte* __restrict OUT, int with,
+    void apply_coef(float* __restrict A, float* __restrict B, std::byte* __restrict OUT, int with,
                     const recursivefilter_coef_& coef) override final;
+    
     void partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out, int width, int height,
                              std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride,
                              const recursivefilter_coef_& coef) override final;
@@ -116,7 +114,8 @@ namespace mln::morpho::experimental::details
 
 
   template <class T>
-  void running_gaussian2d_algo_t<T>::partial_sum_block2d(const std::byte* __restrict in, std::byte* __restrict out,
+  void running_gaussian2d_algo_t<T>::partial_sum_block2d(const std::byte* __restrict in, //
+                                                         std::byte* __restrict out,      //
                                                          int width, int height, std::ptrdiff_t in_byte_stride,
                                                          std::ptrdiff_t               out_byte_stride,
                                                          const recursivefilter_coef_& coef)

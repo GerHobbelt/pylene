@@ -13,7 +13,7 @@
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/experimental/dilation.hpp>
 #include <mln/morpho/experimental/erosion.hpp>
-#include <mln/morpho/experimental/gaussian_directional_2d.hpp>
+#include <mln/morpho/gaussian2d.hpp>
 
 
 #include <cmath>
@@ -203,7 +203,7 @@ void test_deriche_gaussian2d(std::string_view filename, std::string_view filenam
 
   constexpr float kLineVerticalSigma   = 10.;
   constexpr float kLineHorizontalSigma = 10.;
-  auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
+  auto bg_blurred = mln::morpho::gaussian2d(bg_grey, kLineHorizontalSigma, kLineVerticalSigma);
 
   mln::io::imsave(bg_blurred, std::string{bg_sub::file_path_tmp} + "/blurred_"s + std::string{filename_bg});
 }
@@ -225,7 +225,7 @@ void test_bg_sub_pipeline(std::string_view filename, std::string_view filename_b
   // Gaussian on BG (algo)
   constexpr float kLineVerticalSigma   = 10.;
   constexpr float kLineHorizontalSigma = 10.;
-  auto bg_blurred = mln::morpho::experimental::gaussian2d(bg_grey, kLineVerticalSigma, kLineHorizontalSigma, 255);
+  auto bg_blurred = mln::morpho::gaussian2d(bg_grey, kLineHorizontalSigma, kLineVerticalSigma);
 
   // Substract (view)
   using namespace mln::view::ops;

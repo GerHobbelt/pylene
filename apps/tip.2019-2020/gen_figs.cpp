@@ -7,7 +7,12 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/core/image/views.hpp>
+#include <mln/core/image/view/cast.hpp>
+#include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/view/channel.hpp>
+#include <mln/core/image/view/rgb.hpp>
+#include <mln/core/image/view/filter.hpp>
+#include <mln/core/image/view/mask.hpp>
 #include <mln/core/se/disc.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
@@ -15,9 +20,8 @@
 #include <mln/morpho/experimental/erosion.hpp>
 #include <mln/morpho/gaussian2d.hpp>
 
-
+#include <fmt/core.h>
 #include <cmath>
-#include <iostream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -137,90 +141,77 @@ mln::image2d<uint8_t> gaussian_blur(Ima input, std::size_t sigma)
 
 namespace bg_sub
 {
-  namespace details
-  {
-    template <size_t N>
-    constexpr std::string_view sv(const char (&literal)[N])
-    {
-      return std::string_view(literal, N - 1);
-    }
+  std::vector<std::pair<std::string, std::string>> filenames = {
+      {"a.jpg", "a_bg.jpg"}, {"b.jpg", "b_bg.jpg"}, {"c.jpg", "c_bg.jpg"}, {"d.jpg", "d_bg.jpg"}, {"e.jpg", "e_bg.jpg"},
+      {"f.jpg", "f_bg.jpg"}, {"g.jpg", "g_bg.jpg"}, {"h.jpg", "h_bg.jpg"}, {"i.jpg", "i_bg.jpg"}, {"j.jpg", "j_bg.jpg"},
+      {"k.jpg", "k_bg.jpg"}, {"l.jpg", "l_bg.jpg"}, {"m.jpg", "m_bg.jpg"}};
 
-    template <size_t... N>
-    constexpr std::array<std::string_view, sizeof...(N)> sva(const char (&... literals)[N])
-    {
-      return {{sv(literals)...}};
-    }
-
-    template <size_t... Idx>
-    constexpr std::array<std::pair<std::string_view, std::string_view>, sizeof...(Idx)>
-    swap_impl(std::array<std::string_view, sizeof...(Idx)> la, std::array<std::string_view, sizeof...(Idx)> ra,
-              std::index_sequence<Idx...>)
-    {
-      return {std::make_pair(la[Idx], ra[Idx])...};
-    }
-
-    template <size_t N, size_t M>
-    constexpr std::array<std::pair<std::string_view, std::string_view>, N> svap(std::array<std::string_view, N> la,
-                                                                                std::array<std::string_view, M> ra)
-    {
-      static_assert(N == M, "Wrong size");
-      using Indexes = std::make_index_sequence<N>;
-      return swap_impl(la, ra, Indexes{});
-    }
-  } // namespace details
-
-  constexpr auto filenames_base = details::sva("a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
-                                               "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg");
-
-  constexpr auto filenames_bg =
-      details::sva("a_bg.jpg", "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
-                   "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg");
 
   constexpr std::string_view file_path        = "images/bg_sub_samples";
   constexpr std::string_view file_path_tmp    = "images/bg_sub_tmp";
   constexpr std::string_view file_path_mosaic = "images/bg_sub_mosaic";
 
-  constexpr auto filenames = details::svap(filenames_base, filenames_bg);
-
 } // namespace bg_sub
+
+template <class I>
+void save_to(I&& input, std::string_view dirname, std::string_view filename)
+{
+  std::string path = fmt::format("{}/{}", dirname, filename);
+  fmt::print("Saving image to '{}'.\n", path);
+  mln::io::imsave(input, path);
+}
+
+template <class I>
+void load_from(std::string_view dirname, std::string_view filename, I&& input)
+{
+  std::string path = fmt::format("{}/{}", dirname, filename);
+  fmt::print("Loading image from '{}'.\n", path);
+  mln::io::imread(path, input);
+}
+
+template <class I>
+auto to_gray(I&& input)
+{
+  auto grayscale = [](auto v) -> uint8_t { return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+  return mln::view::transform(input, grayscale);
+}
+
+
 
 void test_deriche_gaussian2d(std::string_view filename, std::string_view filename_bg)
 {
+  mln_entering("deriche gaussian2d");
+
   mln::image2d<mln::rgb8> img_color, bg_color;
-  std::cout << "deriche gaussian2d" << std::endl;
-  std::cout << (std::string{bg_sub::file_path} + '/' + std::string{filename}) << std::endl;
-  std::cout << (std::string{bg_sub::file_path} + '/' + std::string{filename_bg}) << std::endl;
-  mln::io::imread(std::string{bg_sub::file_path} + '/' + std::string{filename}, img_color);
-  mln::io::imread(std::string{bg_sub::file_path} + '/' + std::string{filename_bg}, bg_color);
+  load_from(bg_sub::file_path, filename, img_color);
+  load_from(bg_sub::file_path, filename_bg, bg_color);
 
-  auto grayscale = [](auto v) -> uint8_t { return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
 
-  auto img_grey = mln::view::transform(img_color, grayscale);
-  auto bg_grey  = mln::view::transform(bg_color, grayscale);
+  auto img_grey = to_gray(img_color);
+  auto bg_grey  = to_gray(bg_color);
 
-  mln::io::imsave(img_grey, std::string{bg_sub::file_path_tmp} + '/' + std::string{filename});
-  mln::io::imsave(bg_grey, std::string{bg_sub::file_path_tmp} + '/' + std::string{filename_bg});
+  save_to(img_grey, bg_sub::file_path_tmp, filename);
+  save_to(bg_grey, bg_sub::file_path_tmp, filename_bg);
 
   constexpr float kLineVerticalSigma   = 10.;
   constexpr float kLineHorizontalSigma = 10.;
   auto bg_blurred = mln::morpho::gaussian2d(bg_grey, kLineHorizontalSigma, kLineVerticalSigma);
 
-  mln::io::imsave(bg_blurred, std::string{bg_sub::file_path_tmp} + "/blurred_"s + std::string{filename_bg});
+  save_to(mln::view::cast<uint8_t>(bg_blurred), bg_sub::file_path_tmp, fmt::format("blurred_{}", filename_bg));
 }
 
 
 void test_bg_sub_pipeline(std::string_view filename, std::string_view filename_bg)
 {
   // Input Color
+  mln_entering("test_bg_sub_pipeline");
   mln::image2d<mln::rgb8> img_color, bg_color;
-  mln::io::imread(std::string{bg_sub::file_path} + '/' + std::string{filename}, img_color);
-  mln::io::imread(std::string{bg_sub::file_path} + '/' + std::string{filename_bg}, bg_color);
+  load_from(bg_sub::file_path, filename, img_color);
+  load_from(bg_sub::file_path, filename_bg, bg_color);
 
-  // GrayScale (view)
-  auto grayscale = [](auto v) -> uint8_t { return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
 
-  auto img_grey = mln::view::transform(img_color, grayscale);
-  auto bg_grey  = mln::view::transform(bg_color, grayscale);
+  auto img_grey = to_gray(img_color);
+  auto bg_grey  = to_gray(bg_color);
 
   // Gaussian on BG (algo)
   constexpr float kLineVerticalSigma   = 10.;
@@ -244,14 +235,14 @@ void test_bg_sub_pipeline(std::string_view filename, std::string_view filename_b
   auto tmp_dilated = mln::morpho::experimental::dilation(tmp_eroded, win);
 
   // output
-  mln::io::imsave(tmp_dilated, std::string{bg_sub::file_path_tmp} + "/result_"s + std::string{filename_bg});
+  save_to(tmp_dilated, bg_sub::file_path_tmp, fmt::format("result_{}", filename_bg));
 }
 
 
 void mosaic_fig(std::string_view filename, int mosaic_size)
 {
   mln::image2d<mln::rgb8> img_color;
-  mln::io::imread(std::string{bg_sub::file_path} + '/' + std::string{filename}, img_color);
+  load_from(bg_sub::file_path, filename, img_color);
 
   mln::image_build_params bp;
   bp.border     = 15;
@@ -277,8 +268,7 @@ void mosaic_fig(std::string_view filename, int mosaic_size)
     }
   }
 
-  mln::io::imsave(mosaic_image, std::string{bg_sub::file_path_mosaic} + "/mosaic_"s + std::to_string(mosaic_size) +
-                                    "x" + std::to_string(mosaic_size) + '_' + std::string{filename});
+  save_to(mosaic_image, bg_sub::file_path_mosaic, fmt::format("mosaic_{}x{}_{}", mosaic_size, mosaic_size, filename));
 }
 
 

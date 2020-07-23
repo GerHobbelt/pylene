@@ -82,7 +82,7 @@ if (OpenCV_FOUND)
     opencv/BMPlnVsOpenCV_bgSubPipeline.cpp
   )
 
-  set_source_files_properties(${src_standalone_opencv} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+  #set_source_files_properties(${src_standalone_opencv} PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 
   add_benchmark(BMPlnVsOpenCV_Dilation          opencv/BMPlnVsOpenCV_dilation.cpp)
   target_link_libraries(BMPlnVsOpenCV_Dilation  PRIVATE ${OpenCV_LIBS} BenchImplOpenCV)

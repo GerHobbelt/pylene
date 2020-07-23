@@ -30,11 +30,6 @@ using namespace std::literals;
 
 namespace details
 {
-  // clang-format off
-  template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-  template<class... Ts> overload(Ts...) -> overload<Ts...>;
-  // clang-format on
-
   void GetMemorySize(unsigned long& size, unsigned long& rss)
   {
     size       = 0;
@@ -70,45 +65,26 @@ namespace details
     std::cout << "  total allocated space =" << m.uordblks << std::endl;
     std::cout << "  total free space =" << m.fordblks << std::endl;
   }
-
-  template <size_t N>
-  constexpr std::string_view sv(const char (&literal)[N])
-  {
-    return std::string_view(literal, N - 1);
-  }
-
-  template <size_t... N>
-  constexpr std::array<std::string_view, sizeof...(N)> sva(const char (&... literals)[N])
-  {
-    return {{sv(literals)...}};
-  }
-
-  template <size_t... Idx>
-  constexpr std::array<std::pair<std::string_view, std::string_view>, sizeof...(Idx)>
-  swap_impl(std::array<std::string_view, sizeof...(Idx)> la, std::array<std::string_view, sizeof...(Idx)> ra,
-            std::index_sequence<Idx...>)
-  {
-    return {std::make_pair(la[Idx], ra[Idx])...};
-  }
-
-  template <size_t N, size_t M>
-  constexpr std::array<std::pair<std::string_view, std::string_view>, N> svap(std::array<std::string_view, N> la,
-                                                                              std::array<std::string_view, M> ra)
-  {
-    static_assert(N == M, "Wrong size");
-    using Indexes = std::make_index_sequence<N>;
-    return swap_impl(la, ra, Indexes{});
-  }
 } // namespace details
 
-constexpr auto filenames_base = details::sva("a.jpg"/*, "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "g.jpg", "h.jpg",
-                                            "i.jpg", "j.jpg", "k.jpg", "l.jpg", "m.jpg"*/);
+std::vector<std::pair<std::string, std::string>> filenames = {
+    {"a.jpg", "a_bg.jpg"}, //
+    /*
+    {"b.jpg", "b_bg.jpg"}, //
+    {"c.jpg", "c_bg.jpg"}, //
+    {"d.jpg", "d_bg.jpg"}, //
+    {"e.jpg", "e_bg.jpg"}, //
+    {"f.jpg", "f_bg.jpg"}, //
+    {"g.jpg", "g_bg.jpg"}, //
+    {"h.jpg", "h_bg.jpg"}, //
+    {"i.jpg", "i_bg.jpg"}, //
+    {"j.jpg", "j_bg.jpg"}, //
+    {"k.jpg", "k_bg.jpg"}, //
+    {"l.jpg", "l_bg.jpg"}, //
+    {"m.jpg", "m_bg.jpg"}  //
+    */
+};
 
-constexpr auto filenames_bg =
-    details::sva("a_bg.jpg"/*, "b_bg.jpg", "c_bg.jpg", "d_bg.jpg", "e_bg.jpg", "f_bg.jpg", "g_bg.jpg", "h_bg.jpg",
-                "i_bg.jpg", "j_bg.jpg", "k_bg.jpg", "l_bg.jpg", "m_bg.jpg"*/);
-
-constexpr auto filenames = details::svap(filenames_base, filenames_bg);
 
 constexpr std::size_t radius = 30;
 
@@ -176,31 +152,44 @@ public:
     // std::cout << "Loading end" << std::endl;
   };
 
-
-  void run(benchmark::State& st, callback_t callback)
+  static void run_hook_before()
   {
-    // std::size_t ms, rss;
-    // details::GetMemorySize(ms, rss);
-    // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-    // details::log_memory_usage();
-    // std::cout << "run start" << std::endl;
-    std::visit(details::overload{[&](callback_pln cb) {
-                                   for (auto _ : st)
-                                     cb(m_input_imgs, m_input_bgs, m_outputs);
-                                   st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
-                                 },
-                                 [&](callback_cv cb) {
-                                   for (auto _ : st)
-                                     cb(m_input_imgs_cv, m_input_bgs_cv, m_outputs_cv);
-                                   st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
-                                 }},
-               callback);
-
-    // std::cout << "run end" << std::endl;
-    // details::GetMemorySize(ms, rss);
-    // std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
-    // details::log_memory_usage();
+    std::size_t ms, rss;
+    details::GetMemorySize(ms, rss);
+    std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+    details::log_memory_usage();
+    std::cout << "run start" << std::endl;
   }
+
+  static void run_hook_after()
+  {
+    std::size_t ms, rss;
+    std::cout << "run end" << std::endl;
+    details::GetMemorySize(ms, rss);
+    std::cout << "Amount of memory in use:" << ms << ", RSS=" << rss << std::endl;
+    details::log_memory_usage();
+  }
+
+  void run(benchmark::State& st, callback_pln callback)
+  {
+    //run_hook_before();
+    for (auto _ : st)
+      callback(m_input_imgs, m_input_bgs, m_outputs);
+    st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+    //run_hook_after();
+  }
+
+  void run(benchmark::State& st, callback_cv callback)
+  {
+    //run_hook_before();
+    for (auto _ : st)
+      callback(m_input_imgs_cv, m_input_bgs_cv, m_outputs_cv);
+    st.SetBytesProcessed(int64_t(st.iterations()) * int64_t(m_size));
+    //run_hook_after();
+  }
+
+
+
 
 protected:
   static bool                     g_loaded;
@@ -349,45 +338,61 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgoRect)(benchmark::Stat
   this->run(st, f);
 }
 
-constexpr int kBMRangeMultiplier = 2;
-constexpr int kBMRangeMStep      = 2;
-constexpr int kBMRangeLower      = 2;
-constexpr int kBMRangeUpper      = 128;
+namespace
+{
+  void CustomArguments(benchmark::internal::Benchmark* b) {
+    for (int i = 1; i < 7; ++i)
+    {
+      int r = 1 << i;
+
+      b->Arg(r);
+
+      if (i >= 3)
+        b->Arg(r + (1 << (i - 2)));
+
+      b->Arg(r + (1 << (i - 1)));
+
+      if (i >= 3)
+        b->Arg(r + (1 << (i - 1)) + (1 << (i - 2)));
+    }
+  }
+}
+
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViewsDisc)
     // ->RangeMultiplier(kBMRangeMultiplier)
     // ->Range(kBMRangeLower, kBMRangeUpper)
-    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep)
+    ->Apply(CustomArguments)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeAlgosDisc)
     // ->RangeMultiplier(kBMRangeMultiplier)
     // ->Range(kBMRangeLower, kBMRangeUpper)
-    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep)
+    ->Apply(CustomArguments)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgoDisc)
     // ->RangeMultiplier(kBMRangeMultiplier)
     // ->Range(kBMRangeLower, kBMRangeUpper)
-    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep)
+    ->Apply(CustomArguments)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViewsRect)
     // ->RangeMultiplier(kBMRangeMultiplier)
     // ->Range(kBMRangeLower, kBMRangeUpper)
-    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep)
+    ->Apply(CustomArguments)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeAlgosRect)
     // ->RangeMultiplier(kBMRangeMultiplier)
     // ->Range(kBMRangeLower, kBMRangeUpper)
-    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep)
+    ->Apply(CustomArguments)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgoRect)
     // ->RangeMultiplier(kBMRangeMultiplier)
     // ->Range(kBMRangeLower, kBMRangeUpper)
-    ->DenseRange(kBMRangeLower, kBMRangeUpper, kBMRangeMStep)
+    ->Apply(CustomArguments)
     ->Unit(benchmark::kMillisecond);
 
 /*BENCHMARK_MAIN();*/

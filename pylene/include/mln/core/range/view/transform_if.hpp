@@ -172,8 +172,8 @@ namespace mln::ranges
       static_assert(::ranges::predicate<Pred, mln::ranges::mdrange_value_t<Rng>...>);
 
       auto z = ::ranges::views::zip(std::forward<Rng>(ranges)...);
-      auto f = ::ranges::views::filter(z, [pred = std::move(pred_fn)](auto&& t) { return std::apply(pred, t); });
-      auto m = ::ranges::views::transform(
+      auto f = ::ranges::cpp20::views::filter(z, [pred = std::move(pred_fn)](auto&& t) { return std::apply(pred, t); });
+      auto m = ::ranges::cpp20::views::transform(
           z, [f = std::move(map_fn)](auto&& t) -> decltype(auto) { return std::apply(f, t); });
 
       return m;

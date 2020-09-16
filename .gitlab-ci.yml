@@ -7,23 +7,31 @@ stages:
 cache:
     paths:
         - .cache/conan/data
+        - .cache/ccache/data
 
 variables:
     FEDORA_RAWHIDE: "${CI_REGISTRY}/olena/pylene-dockers/fedora-rawhide"
     FEDORA_31: "${CI_REGISTRY}/olena/pylene-dockers/fedora-31"
     FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
-    PACKAGE_NAME: "pylene"                                                      # Conan package name
-    PACKAGE_TAG: "stable"                                                       # Conan tag
-    PACKAGE_VERSION: "head"                                                     # Version to build
     CMAKE_BUILD_PARALLEL_LEVEL: 6
-    CONAN_USER: "lrde"
-    CONAN_PROFILE: "gcc-9"
+    CONAN_UPLOAD: "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public@True"
+    CONAN_USERNAME: "lrde"
+    CONAN_LOGIN_USERNAME: "carlinet"
+    CONAN_CHANNEL: "stable"                                                     # Conan tag
+    CONAN_STABLE_BRANCH_PATTERN: "master$"
+    CONAN_PASSWORD: $CONAN_LRDE_API_KEY
+    CONAN_CMAKE_GENERATOR: Ninja
     ASAN: "OFF"
     MSAN: "OFF"
     UBSAN: "OFF"
+    CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
+    CCACHE_MAXSIZE: 2G
 
 before_script:
         - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
+        - conan profile new --detect default
+        - ccache -p
+        - ccache -s
 
 ########
 # Test #
@@ -148,7 +156,7 @@ distcheck-linux-gcc10-debug:
 
 distcheck-linux-coverage:
     <<: *distcheck-linux-base
-    image: ${FEDORA_31}
+    image: ${FEDORA_32}
     after_script:
         - mkdir coverage
         - gcovr --root pylene build -s --xml cobertura --html-details coverage/index.html
@@ -158,6 +166,7 @@ distcheck-linux-coverage:
         CC: "gcc"
         CXXFLAGS: "-fprofile-arcs -ftest-coverage"
         CFLAGS: "-fprofile-arcs -ftest-coverage"
+        CONAN_PROFILE: "gcc-10"
     artifacts:
         paths:
             - coverage/
@@ -236,14 +245,29 @@ pages:
     only:
         - master
 
-package:
-    image: ${FEDORA_31}
+.package:
     stage: deploy
     dependencies: []
     script:
-        - mkdir build && cd build
-        - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -s compiler.cppstd=20 -e CXX=g++ -e CC=gcc
-        - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+        - python3 package-conan.py
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
+
+package gcc-9:
+   extends: .package
+   image: ${FEDORA_31}
+   variables:
+        CONAN_BASE_PROFILE: gcc-9
+
+package gcc-10:
+   extends: .package
+   image: ${FEDORA_32}
+   variables:
+        CONAN_BASE_PROFILE: gcc-10
+
+package clang-10:
+   extends: .package
+   image: ${FEDORA_32}
+   variables:
+        CONAN_BASE_PROFILE: clang-10
+

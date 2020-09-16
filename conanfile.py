@@ -40,6 +40,8 @@ class Pylene(ConanFile):
 
     def configure(self):
         tools.check_min_cppstd(self, "20")
+        if self.options.shared:
+            del self.options.fPIC
 
     def build(self):
         cmake = CMake(self)

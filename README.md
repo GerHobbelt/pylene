@@ -109,7 +109,7 @@ If you want to see more of what is in the library, have a look on the [C++ Docum
 * It is generic: it allows to write a single algorithm that could be apply on all compatibles image types
 * It enables lazy-computing with a view system similar to the Boost Generic Image Library
 
-Have a look on the [introduction]((http://olena.pages.lrde.epita.fr/pylene/intro)
+Have a look on the [introduction](http://olena.pages.lrde.epita.fr/pylene/intro)
 
 
 # Other ressources

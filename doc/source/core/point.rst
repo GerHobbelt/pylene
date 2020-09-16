@@ -23,25 +23,24 @@ Class hierarchy diagrams for ndpoints. They all implement the :cpp:class:`__Poin
 
         Default constructor. 
 
-    .. cpp:function:: ndpoint(const P& other)
+    .. cpp:function:: template <class P> ndpoint(const P& other)
 
-        Converting constructor from any point implementing the :cpp:class:`__PointInterface`. This overload is enabled only if `P` is compatible with ``ndpoint``  i.e. if  ``P::value_type`` is convertible to ``T`` and
-        ``ndim == (-1 || other.ndim)``.
-    
+        Converting constructor from any point implementing the :cpp:class:`__PointInterface`. This overload is enabled
+        only if `P` is compatible with ``ndpoint`` i.e. if ``P::value_type`` is convertible to ``T`` and ``ndim == (-1
+        || other.ndim)``.
+
     .. cpp:function:: ndpoint(int dim)
 
         Construction with the number of dimensions given dynamically. Only available when ``ndim == -1``.
-    
 
-    
 .. cpp:class:: template <int ndim, class T> ndpointref
 
     `ndpointref` represents a n-dimensional points (coordinates) over a grid. The number of dimensions can be known at
     compile time or dynamic ``ndim = -1``. It has a reference semantic and should be used as a function parameter only.
 
 
-    1. .. cpp:function:: ndpointref(P& other)
-    2. .. cpp:function:: ndpointref(const P& other)
+    1. .. cpp:function:: template <class P> ndpointref(P& other)
+    2. .. cpp:function:: template <class P> ndpointref(const P& other)
 
         Converting constructor from any point implementing the :cpp:class:`__PointInterface`. This overload is enabled only if `P` is compatible with ``ndpointref``, i.e. if  ``P::value_type*`` is convertible to ``T*`` and ``ndim == (-1 || other.ndim)``.
     
@@ -119,7 +118,7 @@ Any two points p₁ and p₂ of types P₁ and P₂ are said *compatible* if the
 
 
 * Comparison
-    Two *compatible* points are comparable and totally ordered (:cpp:concept:`std::StrictTotallyOrdered`) using the lexicographical ordering. 
+    Two *compatible* points are comparable and totally ordered (:cpp:concept:`std::totally_ordered`) using the lexicographical ordering. 
 
 
 * Arithmetics

@@ -29,7 +29,7 @@ make_parent_image(const int* par, std::size_t n,
 
   mln::resize(parent, node_map);
 
-  mln_foreach_new(auto px, node_map.pixels())
+  mln_foreach(auto px, node_map.pixels())
   {
     auto p = px.point();
     auto id = px.val();
@@ -41,7 +41,7 @@ make_parent_image(const int* par, std::size_t n,
     parent(p) = repr[id];
   }
 
-  mln_foreach_new(auto px, node_map.pixels())
+  mln_foreach(auto px, node_map.pixels())
   {
     auto p  = px.point();
     auto id = px.val();

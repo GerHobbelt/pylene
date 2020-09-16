@@ -40,7 +40,7 @@ TEST(Core, Transform_Supports_RValue_Lambda)
     // check that properties of pixels are preserved (point + index)
     {
       auto rng = mln::ranges::view::zip(ima.pixels(), out.pixels());
-      mln_foreach_new ((auto [px1, px2]), rng)
+      mln_foreach ((auto [px1, px2]), rng)
       {
         ASSERT_EQ(px1.point(), px2.point());
         // ASSERT_EQ(px1.index(), px2.index());
@@ -52,7 +52,7 @@ TEST(Core, Transform_Supports_RValue_Lambda)
     // Test value iteration
     {
       auto rng = mln::ranges::view::zip(ima.values(), out.values());
-      mln_foreach_new ((auto [v1, v2]), rng)
+      mln_foreach ((auto [v1, v2]), rng)
         ASSERT_EQ(2 * v1, v2);
     }
   }
@@ -172,7 +172,7 @@ TEST(Core, Transform_Support_Writable)
   // check that properties of pixels are preserved (point + index)
   {
     auto rng = mln::ranges::view::zip(ima.pixels(), c1.pixels(), c2.pixels());
-    mln_foreach_new ((auto [px1, px2, px3]), rng)
+    mln_foreach ((auto [px1, px2, px3]), rng)
     {
       ASSERT_EQ(px1.point(), px2.point());
       ASSERT_EQ(px1.point(), px3.point());
@@ -187,7 +187,7 @@ TEST(Core, Transform_Support_Writable)
   // Test value iteration
   {
     auto rng = mln::ranges::view::zip(ima.values(), c1.values(), c2.values());
-    mln_foreach_new ((auto [v1, v2, v3]), rng)
+    mln_foreach ((auto [v1, v2, v3]), rng)
     {
       ASSERT_EQ(std::make_pair(69, 12), v1);
       ASSERT_EQ(69, v2);

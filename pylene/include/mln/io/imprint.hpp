@@ -84,7 +84,7 @@ namespace mln::io
     template <class I>
     void imprint(I&& image, ...)
     {
-      mln_foreach_new(auto px, image.pixels())
+      mln_foreach(auto px, image.pixels())
         fmt::print("{{{},{}}}\n", px.point(), px.val());
     }
     /// \}

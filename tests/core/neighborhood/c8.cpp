@@ -34,7 +34,7 @@ TEST(Core, c4_pixel)
   mln::image2d<int> f = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
   auto p   = mln::point2d{1, 1};
-  auto pix = f.new_pixel_at(p);
+  auto pix = f.pixel_at(p);
 
   // clang-format off
   std::vector<mln::point2d> points = {

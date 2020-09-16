@@ -42,7 +42,7 @@ TEST(Core, c6_pixel)
 
 
   mln::point3d p   = {1, 1, 1};
-  auto         pix = f.new_pixel_at(p);
+  auto         pix = f.pixel_at(p);
 
   std::vector<mln::point3d> points = {
     // clang-format off

@@ -49,7 +49,7 @@ Example with the 5-7-11 weights::
     #include <mln/labeling/chamfer_distance_transform.hpp>
     #include <mln/core/se/mask2d.hpp>
 
-    auto weights = mln::se::experimental::wmask2d({{+0, 11, +0, 11, +0}, //
+    auto weights = mln::se::wmask2d({{+0, 11, +0, 11, +0}, //
                                                   {11, +7, +5, +7, 11},
                                                   {+0, +5, +0, +5, +0},
                                                   {11, +7, +5, +7, 11},
@@ -79,6 +79,8 @@ Example with the 5-7-11 weights::
       -   .. figure:: /images/F-5-7-11.png
 
             CDT with 5-7-11 :cpp:ref:`mln::wmask2d` (5-7-11 distance)
+
+      -
 
 
 References

@@ -29,7 +29,7 @@ TEST(Core, c4_pixel)
 
 
   mln::point2d p   = {1, 1};
-  auto                       pix = f.new_pixel_at(p);
+  auto                       pix = f.pixel_at(p);
 
   std::vector<mln::point2d> points = {{1, 0}, {0, 1}, {2, 1}, {1, 2}};
   std::vector<int>                        vals   = {2, 4, 6, 8};

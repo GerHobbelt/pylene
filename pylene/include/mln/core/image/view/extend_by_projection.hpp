@@ -30,7 +30,7 @@ namespace mln
     using point_type         = image_point_t<I>;
     using typename image_adaptor<I>::domain_type;
 
-    struct new_pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<new_pixel_type>
+    struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
     {
       using reference = extend_by_projection_view_base<I, Proj>::reference;
 
@@ -40,8 +40,8 @@ namespace mln
         return (*m_view)(q);
       }
 
-      new_pixel_type(image_pixel_t<I> px, extend_by_projection_view_base<I, Proj>* ima)
-        : new_pixel_type::pixel_adaptor{std::move(px)}
+      pixel_type(image_pixel_t<I> px, extend_by_projection_view_base<I, Proj>* ima)
+        : pixel_type::pixel_adaptor{std::move(px)}
         , m_view{ima}
       {
       }
@@ -75,22 +75,22 @@ namespace mln
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel(point_type p)
+    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
     {
       assert(this->base().domain().has(p));
-      return this->new_pixel_at(p);
+      return this->pixel_at(p);
     }
 
     template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, new_pixel_type> new_pixel_at(point_type p)
+    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
     {
-      return {this->base().new_pixel_at(p), this};
+      return {this->base().pixel_at(p), this};
     }
     /// \}
 
     auto pixels()
     {
-      return ranges::view::transform(this->base().pixels(), [this](image_pixel_t<I> px) -> new_pixel_type {
+      return ranges::view::transform(this->base().pixels(), [this](image_pixel_t<I> px) -> pixel_type {
         return {std::move(px), this};
       });
     }

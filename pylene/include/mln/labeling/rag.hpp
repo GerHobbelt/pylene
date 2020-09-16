@@ -59,7 +59,7 @@ namespace mln::labeling
       int nlabel = 0;
 
       // 1. Push labelize CC and add border pixel in queue
-      mln_foreach_new (auto p, dom)
+      mln_foreach (auto p, dom)
       {
         if (!ima(p) || out(p) > 0)
           continue;

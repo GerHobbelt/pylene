@@ -37,7 +37,7 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using new_pixel_type = image_pixel_t<I>;
+    using pixel_type = image_pixel_t<I>;
     using typename mask_view::image_adaptor::point_type;
     using typename mask_view::image_adaptor::reference;
     using typename mask_view::image_adaptor::value_type;
@@ -106,18 +106,18 @@ namespace mln
       return this->base()(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(m_mask.domain().has(p));
       mln_precondition(this->base().domain().has(p));
-      return this->base().new_pixel(p);
+      return this->base().pixel(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return this->base().new_pixel_at(p);
+      return this->base().pixel_at(p);
     }
     /// \}
 

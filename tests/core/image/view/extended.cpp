@@ -20,7 +20,7 @@ TEST(View, extended)
 
   {
     auto zz = mln::view::zip(ima, x);
-    mln_foreach_new (auto px, zz.pixels())
+    mln_foreach (auto px, zz.pixels())
     {
       auto [v1, v2] = px.val();
       ASSERT_EQ(v1, v2);
@@ -28,7 +28,7 @@ TEST(View, extended)
   }
 
   {
-    mln_foreach_new (auto p, x.pixels())
+    mln_foreach (auto p, x.pixels())
       for (auto q : mln::c8(p))
         if (!x.domain().has(q.point()))
           ASSERT_EQ(q.val(), 69);

@@ -182,7 +182,7 @@ namespace mln::morpho::canvas
     template <class I>
     [[gnu::noinline]] void union_find_init_par(I par) noexcept
     {
-      mln_foreach_new(auto px, par.pixels())
+      mln_foreach(auto px, par.pixels())
         px.val() = px.point();
     }
 

@@ -311,7 +311,7 @@ The method will proceed as follows:
         struct my_accu_t : mln::Accumulator<my_accu_t>
          {
            using result_type   = my_accu_t;
-           using argument_type = mln::image_pixel_t<mln::experimental::image2d<uint8_t>>;
+           using argument_type = mln::image_pixel_t<mln::image2d<uint8_t>>;
 
            my_accu_t() = default;
 
@@ -341,7 +341,7 @@ The method will proceed as follows:
         };
 
         // Filter
-        t.filter(mln::morpho::experimental::CT_FILTER_DIRECT, node_map, pred);
+        t.filter(mln::morpho::CT_FILTER_DIRECT, node_map, pred);
 
 5. Reconstruct the image::
 

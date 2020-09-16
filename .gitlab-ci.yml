@@ -36,7 +36,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build; cd build
-        - conan install .. -s build_type=Debug --build missing
+        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20
         - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
@@ -59,7 +59,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. --build missing -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
+        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
         - cmake --build . --target Pylene
         - cmake --build . --target build-tests
@@ -177,7 +177,7 @@ distcheck-linux-coverage:
     stage: bench
     script:
         - mkdir build && cd build
-        - conan install .. -pr gcc-9 --build missing
+        - conan install .. -pr gcc-9 --build missing -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target fetch-external-data
         - cmake --build . --target build-bench
@@ -210,7 +210,7 @@ distbench-linux-gcc9-release:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-9 --build missing
+        - conan install -u .. -pr gcc-9 --build missing -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc
         - mkdir ../public && mv doc/sphinx/* ../public/
@@ -243,7 +243,7 @@ package:
     script:
         - mkdir build && cd build
         - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
+        - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -s compiler.cppstd=20 -e CXX=g++ -e CC=gcc
         - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
     rules:
         - if: $CI_COMMIT_BRANCH == "master"

@@ -26,7 +26,7 @@ namespace mln
   public:
     /// Type definitions
     /// \{
-    using typename clip_view::image_adaptor::new_pixel_type;
+    using typename clip_view::image_adaptor::pixel_type;
     using typename clip_view::image_adaptor::point_type;
     using typename clip_view::image_adaptor::reference;
     using typename clip_view::image_adaptor::value_type;
@@ -83,7 +83,7 @@ namespace mln
 
     auto pixels()
     {
-      auto g = [this](point_type p) -> new_pixel_type { return this->base().new_pixel_at(p); };
+      auto g = [this](point_type p) -> pixel_type { return this->base().pixel_at(p); };
       return mln::ranges::view::transform(m_subdomain, g);
     }
 
@@ -112,17 +112,17 @@ namespace mln
     {
       return this->base().at(p);
     }
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(domain().has(p));
       mln_precondition(this->base().domain().has(p));
-      return this->base().new_pixel(p);
+      return this->base().pixel(p);
     }
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      return this->base().new_pixel_at(p);
+      return this->base().pixel_at(p);
     }
     /// \}
 

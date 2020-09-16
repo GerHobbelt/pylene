@@ -64,22 +64,22 @@ namespace mln
   public:
     /// Pixel type definitions
     /// \{
-    struct new_pixel_type : mln::details::Pixel<new_pixel_type>
+    struct pixel_type : mln::details::Pixel<pixel_type>
     {
       using reference               = zip_view::reference;
       using value_type              = zip_view::value_type;
       using site_type[[deprecated]] = zip_view::point_type;
       using point_type              = zip_view::point_type;
 
-      new_pixel_type(image_pixel_t<Images>... pixels)
+      pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}
       {
       }
 
-      new_pixel_type(const new_pixel_type&) = default;
-      new_pixel_type(new_pixel_type&&)      = default;
-      new_pixel_type& operator=(const new_pixel_type&) = delete;
-      new_pixel_type& operator=(new_pixel_type&&) = delete;
+      pixel_type(const pixel_type&) = default;
+      pixel_type(pixel_type&&)      = default;
+      pixel_type& operator=(const pixel_type&) = delete;
+      pixel_type& operator=(pixel_type&&) = delete;
 
       point_type point() const { return std::get<0>(m_pixels).point(); }
       reference  val() const
@@ -127,10 +127,10 @@ namespace mln
 
     auto pixels()
     {
-      auto g_new_pixels = [](auto&&... images) {
-        return ranges::view::zip_with(mln::details::make_object<new_pixel_type>{}, images.pixels()...);
+      auto g_pixels = [](auto&&... images) {
+        return ranges::view::zip_with(mln::details::make_object<pixel_type>{}, images.pixels()...);
       };
-      return std::apply(g_new_pixels, m_images);
+      return std::apply(g_pixels, m_images);
     }
 
 
@@ -150,17 +150,17 @@ namespace mln
       return std::apply(g, m_images);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
     {
       mln_precondition(all_domain_has(p));
-      return this->new_pixel_at(p);
+      return this->pixel_at(p);
     }
 
-    template <typename Ret = new_pixel_type>
-    std::enable_if_t<accessible::value, Ret> new_pixel_at(point_type p)
+    template <typename Ret = pixel_type>
+    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
     {
-      auto g = [p](auto&&... images) { return new_pixel_type(images.new_pixel_at(p)...); };
+      auto g = [p](auto&&... images) { return pixel_type(images.pixel_at(p)...); };
       return std::apply(g, m_images);
     }
     /// \}

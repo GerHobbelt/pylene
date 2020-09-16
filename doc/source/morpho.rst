@@ -39,7 +39,7 @@ Segmentation
 
 
 Component Trees & Hierarchical Representations
-*********************************************
+**********************************************
 
 .. toctree::
     :maxdepth: 1

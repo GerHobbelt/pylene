@@ -7,14 +7,17 @@
 
 #include <benchmark/benchmark.h>
 
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
 
 void Mult_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 void Threshold_Inplace_C(uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 void LUT_Inplace_C(const uint8_t* LUT, uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 
-void Mult_C(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void Threshold_C(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void LUT_C(const uint8_t* LUT, const uint8_t* ibuffer, uint8_t* obuffer, int width, int height,
+void Mult_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void Threshold_C(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void LUT_C(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
            std::ptrdiff_t stride);
 
 void Mult_New_Values(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
@@ -23,8 +26,8 @@ void Mult_New_Pixels(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& 
 void Threshold_New_Values(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 void Threshold_New_Pixels(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void LUT_New_Values(const uint8_t* LUT, const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
-void LUT_New_Pixels(const uint8_t* LUT, const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void LUT_New_Values(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
+void LUT_New_Pixels(const uint8_t LUT[], const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
 void Mult_Inplace_New_Values(mln::image2d<uint8_t>& img);
 void Threshold_Inplace_New_Values(mln::image2d<uint8_t>& img);
@@ -43,9 +46,9 @@ void Threshold_Inplace_C_Reversed(uint8_t* buffer, int width, int height, std::p
 void LUT_Inplace_C_Reversed(const uint8_t* LUT, uint8_t* buffer, int width, int height, std::ptrdiff_t stride);
 
 
-void Mult_C_Reversed(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void Threshold_C_Reversed(const uint8_t* ibuffer, uint8_t* obuffer, int width, int height, std::ptrdiff_t stride);
-void LUT_C_Reversed(const uint8_t* LUT, const uint8_t* ibuffer, uint8_t* obuffer, int width, int height,
+void Mult_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void Threshold_C_Reversed(const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height, std::ptrdiff_t stride);
+void LUT_C_Reversed(const uint8_t* LUT, const uint8_t* __restrict__ ibuffer, uint8_t* __restrict__ obuffer, int width, int height,
                     std::ptrdiff_t stride);
 
 void Mult_New_Values_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
@@ -54,9 +57,9 @@ void Mult_New_Pixels_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<u
 void Threshold_New_Values_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 void Threshold_New_Pixels_Reversed(const mln::image2d<uint8_t>& input, mln::image2d<uint8_t>& output);
 
-void LUT_New_Values_Reversed(const uint8_t* LUT, const mln::image2d<uint8_t>& input,
+void LUT_New_Values_Reversed(const uint8_t LUT[], const mln::image2d<uint8_t>& input,
                              mln::image2d<uint8_t>& output);
-void LUT_New_Pixels_Reversed(const uint8_t* LUT, const mln::image2d<uint8_t>& input,
+void LUT_New_Pixels_Reversed(const uint8_t LUT[], const mln::image2d<uint8_t>& input,
                              mln::image2d<uint8_t>& output);
 
 void Mult_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img);

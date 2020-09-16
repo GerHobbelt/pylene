@@ -101,7 +101,7 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   using category_type = mln::forward_image_tag;
   using concrete_type = mask_archetype;
 
-  struct new_pixel_type
+  struct pixel_type
   {
     bool       val() const;
     point_type point() const;
@@ -120,13 +120,13 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   domain_type    domain() const;
   reference      operator()(point_type);
   reference      at(point_type);
-  new_pixel_type new_pixel(point_type);
-  new_pixel_type new_pixel_at(point_type);
+  pixel_type pixel(point_type);
+  pixel_type pixel_at(point_type);
 
   struct pixel_range
   {
-    const new_pixel_type* begin();
-    const new_pixel_type* end();
+    const pixel_type* begin();
+    const pixel_type* end();
   };
   pixel_range pixels();
 

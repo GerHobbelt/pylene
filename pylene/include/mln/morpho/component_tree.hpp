@@ -167,7 +167,7 @@ namespace mln::morpho
   template <class I, class F>
   void component_tree<void>::update_node_map(I node_map, F pred) const
   {
-    mln_foreach_new(auto& id, node_map.values())
+    mln_foreach(auto& id, node_map.values())
     {
       if (id > 0 && !pred(id))
         id = this->parent[id];
@@ -288,7 +288,7 @@ namespace mln::morpho
     std::vector<decltype(a)> attr(parent.size(), a);
 
     // Accumulate for each point
-    mln_foreach_new(auto px, node_map.pixels())
+    mln_foreach(auto px, node_map.pixels())
       attr[px.val()].take(px.point());
 
 
@@ -322,7 +322,7 @@ namespace mln::morpho
 
     // Accumulate for each point
     auto zz = mln::view::zip(node_map, input);
-    mln_foreach_new((auto [node_id, val]), zz.values())
+    mln_foreach((auto [node_id, val]), zz.values())
       attr[node_id].take(val);
 
 
@@ -355,7 +355,7 @@ namespace mln::morpho
     std::vector<decltype(a)> attr(parent.size(), a);
 
     // Accumulate for each point
-    mln_foreach_new (auto px, values.pixels())
+    mln_foreach (auto px, values.pixels())
       attr[node_map(px.point())].take(px);
 
 
@@ -383,7 +383,7 @@ namespace mln::morpho
     image_ch_value_t<I, V> out = imchvalue<V>(node_map);
 
     auto zz = mln::view::zip(node_map, out);
-    mln_foreach_new ((auto&& [node_id, val]), zz.values())
+    mln_foreach ((auto&& [node_id, val]), zz.values())
       val = values[node_id];
 
     return out;

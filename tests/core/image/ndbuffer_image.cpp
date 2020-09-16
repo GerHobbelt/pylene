@@ -1188,7 +1188,7 @@ TEST(image2d, indexes_negative_start)
       EXPECT_EQ(img.index_of_point({x,y}), idx);
       EXPECT_EQ(img.point_at_index(idx), (mln::point2d{x, y}));
       EXPECT_EQ(img[idx], img.at({x,y}));
-      auto px = img.new_pixel_at({x,y});
+      auto px = img.pixel_at({x,y});
       EXPECT_EQ(px.val(), img.at({x,y}));
       EXPECT_EQ(px.point(), (mln::point2d{x, y}));
     }
@@ -1234,7 +1234,7 @@ TEST(image2d, indexes_positive_start)
       EXPECT_EQ(img.index_of_point({x,y}), idx);
       EXPECT_EQ(img.point_at_index(idx), (mln::point2d{x, y}));
       EXPECT_EQ(img[idx], img.at({x,y}));
-      auto px = img.new_pixel_at({x,y});
+      auto px = img.pixel_at({x,y});
       EXPECT_EQ(px.val(), img.at({x,y}));
       EXPECT_EQ(px.point(), (mln::point2d{x, y}));
     }

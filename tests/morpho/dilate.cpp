@@ -41,7 +41,7 @@ void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
   ref.extension().fill(0);
 
   for (int i = 0; i < k; ++i)
-    mln_foreach_new (auto p, ref.domain())
+    mln_foreach (auto p, ref.domain())
       ref(p) = std::max(ref(p), ref.at(p + dp));
 
   // Run algo

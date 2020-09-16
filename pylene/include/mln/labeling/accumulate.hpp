@@ -45,7 +45,7 @@ namespace mln::labeling
 
 
     {
-      mln_foreach_new (auto px, lbl_input.pixels())
+      mln_foreach (auto px, lbl_input.pixels())
       {
         int lbl = px.val();
         assert(0 <= lbl && lbl <= nlabel);
@@ -77,7 +77,7 @@ namespace mln::labeling
 
     {
       auto zz = mln::ranges::view::zip(lbl_input.values(), values.values());
-      mln_foreach_new ((auto [lbl, v]), zz)
+      mln_foreach ((auto [lbl, v]), zz)
       {
         assert(0 <= lbl && lbl <= nlabel);
         vec_acc[lbl].take(v);

@@ -6,8 +6,8 @@ Include :file:`<mln/morpho/extinction_transform.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} concrete_t<I> minima_extinction_transform(I ima, Neighborhood nbh)
-    Image{I} concrete_t<I> maxima_extinction_transform(I ima, Neighborhood nbh)
+    Image{I} image_concrete_t<I> minima_extinction_transform(I ima, Neighborhood nbh)
+    Image{I} image_concrete_t<I> maxima_extinction_transform(I ima, Neighborhood nbh)
  
     The notion of *extinction* of a local extremum is based on the h-extrema (see. :doc:`dynamic_filter`).
     The extinction value of a bassin corresponds its *dynamic* when it merges with another basin.

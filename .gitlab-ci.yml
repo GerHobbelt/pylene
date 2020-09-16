@@ -7,6 +7,7 @@ stages:
 cache:
     paths:
         - .cache/conan/data
+        - .cache/ccache/data
 
 variables:
     FEDORA_RAWHIDE: "${CI_REGISTRY}/olena/pylene-dockers/fedora-rawhide"
@@ -23,10 +24,14 @@ variables:
     ASAN: "OFF"
     MSAN: "OFF"
     UBSAN: "OFF"
+    CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
+    CCACHE_MAXSIZE: 2G
 
 before_script:
         - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
         - conan profile new --detect default
+        - ccache -p
+        - ccache -s
 
 ########
 # Test #

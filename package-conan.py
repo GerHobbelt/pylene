@@ -2,7 +2,7 @@ from cpt.packager import ConanMultiPackager
 import platform
 
 if __name__ == "__main__":
-    builder = ConanMultiPackager(username="lrde")
+    builder = ConanMultiPackager(username="lrde", build_policy="missing")
     builder.add(settings={"arch": "x86_64", "build_type": "Release"}, options={"pylene:shared" : True}, env_vars={}, build_requires={})
     builder.add(settings={"arch": "x86_64", "build_type": "Release"}, options={"pylene:shared" : False, "pylene:fPIC" : True}, env_vars={}, build_requires={})
     builder.add(settings={"arch": "x86_64", "build_type": "Release"}, options={"pylene:shared" : False, "pylene:fPIC" : False}, env_vars={}, build_requires={})

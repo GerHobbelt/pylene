@@ -17,7 +17,8 @@ variables:
     CONAN_UPLOAD: "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public@True"
     CONAN_USERNAME: "lrde"
     CONAN_LOGIN_USERNAME: "carlinet"
-    CONAN_CHANNEL: "stable"                                                     # Conan tag
+    CONAN_CHANNEL: "unstable"                                                     # Conan tag
+    CONAN_STABLE_CHANNEL: "stable"                                                # Conan tag
     CONAN_STABLE_BRANCH_PATTERN: "master$"
     CONAN_PASSWORD: $CONAN_LRDE_API_KEY
     CONAN_CMAKE_GENERATOR: Ninja
@@ -251,7 +252,8 @@ pages:
     script:
         - python3 package-conan.py
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "schedule"
+        - if: $CI_COMMIT_BRANCH == "next"
 
 package gcc-9:
    extends: .package

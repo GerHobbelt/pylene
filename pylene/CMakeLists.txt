@@ -4,7 +4,7 @@ find_package(Boost 1.58 REQUIRED)
 find_package(FreeImage REQUIRED)
 
 find_package(TBB REQUIRED tbb)
-find_package(range-v3 0.10.0 REQUIRED CONFIG)
+find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")

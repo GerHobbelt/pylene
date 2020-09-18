@@ -22,6 +22,7 @@ namespace
   }
 
 
+
   void md_memcpy(mln::padder<void>* vs, int dim, std::byte* dst, const std::byte* src, const int sizes[], const std::ptrdiff_t dst_byte_strides[],
                  const std::ptrdiff_t src_byte_strides[]) noexcept
   {
@@ -40,6 +41,7 @@ namespace
   }
 
 
+
   /// Copy and pad
   /// \param vs: value set
   /// \param dest destination buffer of size: (b-a) x keight
@@ -52,7 +54,7 @@ namespace
   /// \param size Size of an element
   /// \param padding Padding mode
   /// \param value Pointer to the padding value if value mode = CONSTANT
-  void copy_and_pad_horizontally_2d(mln::padder<void>* vs, void* dest, void* src, int width, int height, int a, int b,
+  void copy_and_pad_horizontally_2d(mln::padder<void>* vs, std::byte* dest, const std::byte* src, int width, int height, int a, int b,
                                     std::ptrdiff_t src_pitch, std::ptrdiff_t dest_pitch, std::size_t size,
                                     mln::e_padding_mode padding, void* value)
   {
@@ -72,8 +74,8 @@ namespace
 
     for (int y = 0; y < height; ++y)
     {
-      const std::byte* i_lineptr = (const std::byte*)src + y * src_pitch;
-      std::byte*       o_lineptr = (std::byte*)dest + y * dest_pitch;
+      const std::byte* i_lineptr = src + y * src_pitch;
+      std::byte*       o_lineptr = dest + y * dest_pitch;
 
       // 1. Pad left
       if (bl > 0)
@@ -85,7 +87,7 @@ namespace
           vs->memset(o_lineptr, bl, value);
           break;
         case mln::PAD_REPLICATE:
-          vs->memcpy(o_lineptr, i_lineptr, bl);
+          vs->memset(o_lineptr, bl, i_lineptr + a0 * size);
           break;
         case mln::PAD_MIRROR:
           vs->mirror(o_lineptr, i_lineptr, a, a0, width);
@@ -110,7 +112,7 @@ namespace
           vs->memset(o_lineptr, br, value);
           break;
         case mln::PAD_REPLICATE:
-          vs->memcpy(o_lineptr, i_lineptr + (width - 1) * size, br);
+          vs->memset(o_lineptr, br, i_lineptr + (width - 1) * size);
           break;
         case mln::PAD_MIRROR:
           vs->mirror(o_lineptr, i_lineptr, b0, b, width);
@@ -124,18 +126,164 @@ namespace
   }
 
 
-  void copy_and_pad(mln::padder<void>* vs, int dim, std::byte* dst, std::byte* src, mln::Box roi, const int sizes[],
-                    const std::ptrdiff_t dst_strides[], const std::ptrdiff_t src_strides[], std::size_t esize,
-                    mln::e_padding_mode padding, void* value)
+  void pad_horizontally_2d(mln::padder<void>* vs, std::byte* buffer, int width, int height, std::size_t size, std::ptrdiff_t pitch, int bl, int br, mln::e_padding_mode padding, void* value)
   {
-    const int      a         = roi.tl()[dim - 1];
-    const int      b         = roi.br()[dim - 1];
-    const int      w         = sizes[dim - 1];
-    const int      a0        = std::max(0, a);
-    const int      b0        = std::min(sizes[dim - 1], b);
-    const int      bl        = a0 - a;
+
+    // [a0,b0) is the range on src that will be copied (a subrange of [0,width) )
+    // bl: is the width of the left border
+    // br: is the width of the right border
+    const int b = width;
+    const int a0 = bl;
+    const int b0 = width - br;
+    const int w0 = b0 - a0;
+
+
+    for (int y = 0; y < height; ++y)
+    {
+      std::byte* lineptr = buffer + y * pitch;
+
+      // 1. Pad left
+      if (bl > 0)
+      {
+        switch (padding)
+        {
+        case mln::PAD_ZERO:
+        case mln::PAD_CONSTANT:
+          vs->memset(lineptr, bl, value);
+          break;
+        case mln::PAD_REPLICATE:
+          vs->memset(lineptr, bl, lineptr + a0 * size);
+          break;
+        case mln::PAD_MIRROR:
+          vs->mirror(lineptr, lineptr + a0 * size, -a0, 0, w0);
+          break;
+        case mln::PAD_WRAP:
+          vs->periodize(lineptr, lineptr + a0 * size, -a0, 0, w0);
+          break;
+        }
+      }
+
+      // 2. Pad right
+      if (br > 0)
+      {
+        switch (padding)
+        {
+        case mln::PAD_ZERO:
+        case mln::PAD_CONSTANT:
+          vs->memset(lineptr + b0 * size, br, value);
+          break;
+        case mln::PAD_REPLICATE:
+          vs->memset(lineptr + b0 * size, br, lineptr + (b0 - 1) * size);
+          break;
+        case mln::PAD_MIRROR:
+          vs->mirror(lineptr + b0 * size, lineptr + a0 * size, b0 - a0, b - a0, w0);
+          break;
+        case mln::PAD_WRAP:
+          vs->periodize(lineptr + b0 * size, lineptr + a0 * size, b0 - a0, b - a0, w0);
+          break;
+        }
+      }
+    }
+  }
+} // namespace
+
+
+namespace mln::impl
+{
+
+  void pad(mln::padder<void>* vs, int dim, std::byte* buffer, const int sizes[], const std::ptrdiff_t strides[],
+           const int borders[][2], e_padding_mode padding, void* value) noexcept
+  {
+    const int            bl    = borders[dim - 1][0];
+    const int            br    = borders[dim - 1][1];
+    const int            n     = sizes[dim - 1];
+    const int            a0    = bl;
+    const int            b0    = n - br;
+    const int            w0    = b0 - a0;
+    const std::ptrdiff_t pitch = strides[dim - 1];
+
+
+    if (dim == 1)
+    {
+      pad_horizontally_2d(vs, buffer, sizes[0], 1, strides[0], 0, bl, br, padding, value);
+      return;
+    }
+
+    // Pad each element of the lower dim
+    if (dim == 2)
+    {
+      pad_horizontally_2d(vs, buffer + a0 * pitch, sizes[0], w0, strides[0], strides[1], borders[0][0], borders[0][1],
+                          padding, value);
+    }
+    else
+    {
+      for (int z = a0; z < b0; ++z)
+        impl::pad(vs, dim - 1, buffer + pitch * z, sizes, strides, borders, padding, value);
+    }
+
+    // Pad upper border
+    // Pad lower border
+    auto mirror = [w0, a0](int x) {
+      int n = w0 * 2;
+      x     = (x - a0) % n;               // x in (-n:n)
+      x     = (x >= 0) ? x : x + n;       // x in [0:n)
+      x     = (x < w0) ? x : (n - x - 1); // x in [0,w0)
+      return a0 + x;
+    };
+    auto periodize = [w0, a0](int x) {
+      x = (x - a0) % w0;
+      x = (x >= 0) ? x : x + w0;
+      return a0 + x;
+    };
+
+
+    switch (padding)
+    {
+    case PAD_ZERO:
+    case PAD_CONSTANT:
+      for (int z = 0; z < a0; ++z)
+        md_memset(vs, dim - 1, buffer + pitch * z, sizes, strides, value);
+      for (int z = b0; z < n; ++z)
+        md_memset(vs, dim - 1, buffer + pitch * z, sizes, strides, value);
+      break;
+    case PAD_REPLICATE:
+      for (int z = 0; z < a0; ++z)
+        md_memcpy(vs, dim - 1, buffer + pitch * z, buffer + pitch * a0, sizes, strides, strides);
+      for (int z = b0; z < n; ++z)
+        md_memcpy(vs, dim - 1, buffer + pitch * z, buffer + pitch * (b0 - 1), sizes, strides, strides);
+      break;
+    case PAD_MIRROR:
+      for (int z = 0; z < a0; ++z)
+        md_memcpy(vs, dim - 1, buffer + pitch * z, buffer + pitch * mirror(z), sizes, strides, strides);
+      for (int z = b0; z < n; ++z)
+        md_memcpy(vs, dim - 1, buffer + pitch * z, buffer + pitch * mirror(z), sizes, strides, strides);
+      break;
+    case PAD_WRAP:
+      for (int z = 0; z < a0; ++z)
+        md_memcpy(vs, dim - 1, buffer + pitch * z, buffer + pitch * periodize(z), sizes, strides, strides);
+      for (int z = b0; z < n; ++z)
+        md_memcpy(vs, dim - 1, buffer + pitch * z, buffer + pitch * periodize(z), sizes, strides, strides);
+      break;
+    }
+  } // namespace
+    // mln::implvoidpad(mln::padder<void>*vs,intdim,std::byte*buffer,constintsizes[],conststd::ptrdiff_tstrides[],constintborders[][2],e_padding_modepadding,void*value)noexcept
+
+
+  void copy_pad(mln::padder<void>* vs, int dim, std::byte* dst, std::byte* src, mln::Box roi, const int sizes[],
+                const std::ptrdiff_t dst_strides[], const std::ptrdiff_t src_strides[], mln::e_padding_mode padding,
+                void* value) noexcept
+  {
+    const int a  = roi.tl()[dim - 1];
+    const int b  = roi.br()[dim - 1];
+    const int w  = sizes[dim - 1];
+    const int a0 = std::max(0, a);
+    const int b0 = std::min(sizes[dim - 1], b);
+    const int w0 = b0 - a0;
+    const int bl = a0 - a;
+    // const int      br        = b - b0;
     std::ptrdiff_t src_pitch = src_strides[dim - 1];
     std::ptrdiff_t dst_pitch = dst_strides[dim - 1];
+    std::size_t    esize     = src_strides[0];
 
 
     if (dim == 1)
@@ -145,21 +293,23 @@ namespace
     }
 
     // Copy-And-Pad each element of the lower dim
-    if (dim == 2)
-    {
-      copy_and_pad_horizontally_2d(vs, dst, src, sizes[0], sizes[1], roi.tl().x(), roi.br().x(), src_pitch, dst_pitch,
-                                   esize, padding, value);
-    }
-    else
     {
       auto _src = src + a0 * src_pitch;
       auto _dst = dst + bl * dst_pitch;
 
-      for (int z = a0; z < b0; ++z)
+      if (dim == 2)
       {
-        copy_and_pad(vs, dim - 1, _dst, _src, roi, sizes, dst_strides, src_strides, esize, padding, value);
-        _src += src_pitch;
-        _dst += dst_pitch;
+        copy_and_pad_horizontally_2d(vs, _dst, _src, sizes[0], w0, roi.tl().x(), roi.br().x(), src_pitch, dst_pitch,
+                                     esize, padding, value);
+      }
+      else
+      {
+        for (int z = a0; z < b0; ++z)
+        {
+          copy_pad(vs, dim - 1, _dst, _src, roi, sizes, dst_strides, src_strides, padding, value);
+          _src += src_pitch;
+          _dst += dst_pitch;
+        }
       }
     }
 
@@ -179,154 +329,57 @@ namespace
     };
 
 
-    // 1. Pad left
-    switch (padding)
+    // 2. Padding Left
+    for (int z = a; z < a0; ++z)
     {
-    case mln::PAD_ZERO:
-    case mln::PAD_CONSTANT:
-      for (int z = a; z < a0; ++z)
+      int q;
+
+      switch (padding)
+      {
+      case mln::PAD_REPLICATE:
+        q = a0;
+        break;
+      case mln::PAD_MIRROR:
+        q = mirror(z);
+        break;
+      case mln::PAD_WRAP:
+        q = periodize(z);
+        break;
+      case mln::PAD_ZERO:
+      case mln::PAD_CONSTANT:
+      default:
         md_memset(vs, dim - 1, dst + (z - a) * dst_pitch, sizes, dst_strides, value);
-      for (int z = b0; z < b; ++z)
+        continue;
+      }
+      copy_pad(vs, dim - 1, dst + (z - a) * dst_pitch, src + q * src_pitch, roi, sizes, dst_strides, src_strides,
+               padding, value);
+    }
+
+    // 2. Padding right
+    for (int z = b0; z < b; ++z)
+    {
+      int q;
+
+      switch (padding)
+      {
+      case mln::PAD_REPLICATE:
+        q = b0 - 1;
+        break;
+      case mln::PAD_MIRROR:
+        q = mirror(z);
+        break;
+      case mln::PAD_WRAP:
+        q = periodize(z);
+        break;
+      case mln::PAD_ZERO:
+      case mln::PAD_CONSTANT:
+      default:
         md_memset(vs, dim - 1, dst + (z - a) * dst_pitch, sizes, dst_strides, value);
-      break;
-    case mln::PAD_REPLICATE:
-      for (int z = a; z < a0; ++z)
-        md_memcpy(vs, dim - 1, dst + (z - a) * dst_pitch, src + a0 * src_pitch, sizes, dst_strides, src_strides);
-      for (int z = b0; z < b; ++z)
-        md_memcpy(vs, dim - 1, dst + (z - a) * dst_pitch, src + (b0 - 1) * src_pitch, sizes, dst_strides, src_strides);
-      break;
-    case mln::PAD_MIRROR:
-      for (int z = a; z < a0; ++z)
-        md_memcpy(vs, dim - 1, dst + (z - a) * dst_pitch, src + mirror(z) * src_pitch, sizes, dst_strides, src_strides);
-      for (int z = b0; z < b; ++z)
-        md_memcpy(vs, dim - 1, dst + (z - a) * dst_pitch, src + mirror(z) * src_pitch, sizes, dst_strides, src_strides);
-      break;
-    case mln::PAD_WRAP:
-      for (int z = a; z < a0; ++z)
-        md_memcpy(vs, dim - 1, dst + (z - a) * dst_pitch, src + periodize(z) * src_pitch, sizes, dst_strides,
-                  src_strides);
-      for (int z = b0; z < b; ++z)
-        md_memcpy(vs, dim - 1, dst + (z - a) * dst_pitch, src + periodize(z) * src_pitch, sizes, dst_strides,
-                  src_strides);
-      break;
-    }
-  }
-} // namespace
-
-
-
-namespace mln
-{
-
-
-  mdspan_padder<void>::mdspan_padder(void* buffer, int dim, const int sizes[], const std::ptrdiff_t strides[],
-                                     const int borders[][2]) noexcept
-    : m_buffer{(char*)buffer}
-    , m_dim{dim}
-  {
-    assert(dim < _max_dim && "dim is currently limited to _max_dim");
-
-    for (int k = 0; k < dim; ++k)
-    {
-      m_sizes[k]        = sizes[k];
-      m_byte_strides[k] = strides[k];
-      m_borders[k][0]   = borders[k][0];
-      m_borders[k][1]   = borders[k][1];
-      assert(m_borders[k][0] >= 0);
-      assert(m_borders[k][1] >= 0);
-      assert((m_borders[k][0] + m_borders[k][1]) < (int)sizes[k]);
-    }
-    for (int k = dim; k < _max_dim; ++k)
-    {
-      m_sizes[k]        = 1;
-      m_byte_strides[k] = m_byte_strides[k - 1];
-      m_borders[k][0]   = 0;
-      m_borders[k][1]   = 0;
+        continue;
+      }
+      copy_pad(vs, dim - 1, dst + (z - a) * dst_pitch, src + q * src_pitch, roi, sizes, dst_strides, src_strides,
+               padding, value);
     }
   }
 
-  void mdspan_padder<void>::_pad(e_padding_mode padding, void* value) const noexcept
-  {
-    if (padding == mln::PAD_ZERO)
-      value = nullptr;
-    this->_pad(m_dim, m_buffer, padding, value);
-  }
-
-  void mdspan_padder<void>::_pad(int dim, char* buffer, e_padding_mode padding, void* value) const noexcept
-  {
-    assert(dim <= m_dim);
-
-    const auto n  = m_sizes[dim - 1];
-    const int  a  = m_borders[dim - 1][0];
-    const int  b  = n - m_borders[dim - 1][1];
-    const int  w0 = b - a;
-
-
-    if (dim == 1)
-    {
-      this->pad_horizontally_2d(buffer, padding, value);
-      return;
-    }
-
-    // Pad each element of the lower dim
-    if (dim == 2)
-    {
-      this->pad_horizontally_2d(buffer, padding, value);
-    }
-    else
-    {
-      for (int z = a; z < b; ++z)
-        this->_pad(dim - 1, buffer + m_byte_strides[dim - 1] * z, padding, value);
-    }
-
-    // Pad upper border
-    // Pad lower border
-    auto mirror = [w0, a](int x) {
-      int n = w0 * 2;
-      x     = (x - a) % n;                // x in (-n:n)
-      x     = (x >= 0) ? x : x + n;       // x in [0:n)
-      x     = (x < w0) ? x : (n - x - 1); // x in [0,w0)
-      return a + x;
-    };
-    auto periodize = [w0, a](int x) {
-      x = (x - a) % w0;
-      x = (x >= 0) ? x : x + w0;
-      return a + x;
-    };
-
-
-    switch (padding)
-    {
-    case PAD_ZERO:
-    case PAD_CONSTANT:
-      for (int z = 0; z < a; ++z)
-        this->memset(dim - 1, buffer + m_byte_strides[dim - 1] * z, value);
-      for (int z = b; z < n; ++z)
-        this->memset(dim - 1, buffer + m_byte_strides[dim - 1] * z, value);
-      break;
-    case PAD_REPLICATE:
-      for (int z = 0; z < a; ++z)
-        this->memcpy(dim - 1, buffer + m_byte_strides[dim - 1] * z, buffer + m_byte_strides[dim - 1] * a);
-      for (int z = b; z < n; ++z)
-        this->memcpy(dim - 1, buffer + m_byte_strides[dim - 1] * z, buffer + m_byte_strides[dim - 1] * (b - 1));
-      break;
-    case PAD_MIRROR:
-      for (int z = 0; z < a; ++z)
-        this->memcpy(dim - 1, buffer + m_byte_strides[dim - 1] * z, buffer + m_byte_strides[dim - 1] * mirror(z));
-      for (int z = b; z < n; ++z)
-        this->memcpy(dim - 1, buffer + m_byte_strides[dim - 1] * z, buffer + m_byte_strides[dim - 1] * mirror(z));
-      break;
-    case PAD_WRAP:
-      for (int z = 0; z < a; ++z)
-        this->memcpy(dim - 1, buffer + m_byte_strides[dim - 1] * z, buffer + m_byte_strides[dim - 1] * periodize(z));
-      for (int z = b; z < n; ++z)
-        this->memcpy(dim - 1, buffer + m_byte_strides[dim - 1] * z, buffer + m_byte_strides[dim - 1] * periodize(z));
-      break;
-    }
-  }
-
-
-
-
-
-} // namespace mln
+} // namespace mln::impl

@@ -88,7 +88,7 @@ class Padding2DTest : public testing::TestWithParam<mln::e_padding_mode>
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
   };
-
+public:
   void test_image()
   {
     auto      bm           = GetParam();
@@ -228,6 +228,7 @@ class CopyPadding2DTest : public testing::TestWithParam<mln::e_padding_mode>
       {148, 149, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150}, //
     }};
 
+public:
   void test_copy_upper_left()
     {
       mln::image2d<T> refs[5];
@@ -292,6 +293,7 @@ class Padding1DTest : public testing::TestWithParam<mln::e_padding_mode>
 {
   mln::image1d<T> input = {0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0};
 
+public:
   void test_image()
   {
     auto      bm           = GetParam();
@@ -328,6 +330,7 @@ class Padding3DTest : public testing::TestWithParam<mln::e_padding_mode>
 {
   mln::image3d<T> input;
 
+public:
   Padding3DTest() : input(15, 9, 4)
     {
       input({4, 3, 1}) = 1;
@@ -377,6 +380,7 @@ class CopyPadding3DTest : public testing::TestWithParam<mln::e_padding_mode>
 {
   mln::image3d<T> input;
 
+public:
   CopyPadding3DTest()
     : input(15, 9, 4)
   {

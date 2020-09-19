@@ -162,7 +162,7 @@ namespace mln
     std::ptrdiff_t strides[dim];
     int            sizes[dim];
 
-    for (std::size_t i = 0; i < dim; ++i)
+    for (int i = 0; i < static_cast<int>(dim); ++i)
     {
       sizes[i] = static_cast<int>(sp.size(i));
       strides[i] = sp.byte_stride(i);
@@ -180,7 +180,7 @@ namespace mln
     std::ptrdiff_t strides[dim];
     int            sizes[dim];
 
-    for (std::size_t i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
     {
       sizes[i] = static_cast<int>(f.size(i));
       strides[i] = f.byte_stride(i);
@@ -203,7 +203,7 @@ namespace mln
     std::ptrdiff_t ostrides[dim];
     int            sizes[dim];
 
-    for (std::size_t i = 0; i < dim; ++i)
+    for (int i = 0; i < static_cast<int>(dim); ++i)
     {
       assert((std::size_t)roi.size(i) == (std::size_t)out.size(i));
 
@@ -229,7 +229,7 @@ namespace mln
     auto            x0  = input.domain().tl();
 
 
-    for (std::size_t i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
     {
       assert((std::size_t)roi.size(i) == (std::size_t)output.size(i));
 

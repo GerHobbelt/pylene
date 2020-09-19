@@ -32,7 +32,7 @@ if (WIN32 AND EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TBB_DLL}" "${CMAKE_BINARY_DIR}/tests"
     )
   add_dependencies(build-tests copy-dlls-in-test-dir)
-endif(WIN32)
+endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(accu)

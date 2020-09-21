@@ -30,7 +30,7 @@ namespace mln
   ///   pad each dimension using periodization `[2 3 1 2 3 1 2 3 1]`
   /// PAD_MIRROR
   ///   pad each dimension using edge mirroring `[2 1 1 2 3 3 2 1 1]`
-  /// PAD_MIRROR
+  /// PAD_REPLICATE
   ///   pad each dimension using edge replication `[1 1 1 2 3 3 3 3 3]`
   ///
   /// \param input The image or mdspan to pad

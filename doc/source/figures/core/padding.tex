@@ -50,7 +50,7 @@
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
     \edef\mycmd{\padding{\wrap}{\xx}{\yy}}%
-    \show\mycmd%
+    %\show\mycmd%
     %
     \draw let \n1 = {\mycmd } in node at (\xx+.5,\yy+.5) {\n1};
 }}
@@ -64,7 +64,7 @@
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
     \edef\mycmd{\padding{\mirror}{\xx}{\yy}}%
-    \show\mycmd%
+    %\show\mycmd%
     %
     \draw let \n1 = {\mycmd } in node at (\xx+.5,\yy+.5) {\n1};
 }}
@@ -77,7 +77,7 @@
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
     \edef\mycmd{\padding{\trunc}{\xx}{\yy}}%
-    \show\mycmd%
+    %\show\mycmd%
     %
     \draw let \n1 = {\mycmd } in node at (\xx+.5,\yy+.5) {\n1};
 }}
@@ -90,7 +90,7 @@
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
     \edef\mycmd{\fillA{\xx}{\yy}}%
-    \show\mycmd%
+    %\show\mycmd%
     %
     \draw let \n1 = {\mycmd } in node at (\xx+.5,\yy+.5) {\n1};
 }}

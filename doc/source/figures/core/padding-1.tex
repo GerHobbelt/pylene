@@ -1,0 +1,24 @@
+\documentclass[svgnames,tikz]{standalone}
+
+
+
+
+\begin{document}
+\begin{tikzpicture}[scale=.7,yscale=-1]
+\tikzset{
+  pad/.style={fill=LightGray},
+  border/.style={very thick,<->}
+}
+
+
+\draw[pad, ultra thick] (0,0) rectangle (12,12);
+\draw[fill=white,ultra thick] (2,3) rectangle (11,10);
+
+\draw (0,0) grid[] (12,12);
+\draw[DarkRed,border] (0,6) -- ++(2,0);
+\draw[DarkRed,border] (12,6) -- ++(-1,0);
+\draw[DarkBlue,border] (6,0) -- ++(0,3);
+\draw[DarkBlue,border] (6,12) -- ++(0,-2);
+
+\end{tikzpicture}
+\end{document}

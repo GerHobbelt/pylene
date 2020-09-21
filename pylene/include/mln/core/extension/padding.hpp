@@ -66,10 +66,11 @@ namespace mln
   /// \param roi Region of the output buffer (coordinates expressed in the reference space)
   /// \param mode The padding mode
   /// \param value The value used when mode=PAD_CONSTANT
-  template <class T, std::size_t dim>
-  void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<(int)dim> roi, e_padding_mode mode,  T value = {});
+  template <class T, int dim>
+  void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<dim> roi, e_padding_mode mode,  T value = {});
 
 
+  /// \overload
   template <class T, int dim>
   void copy_pad(const ndimage<T, dim>& input, ndimage<T, dim>& output, e_padding_mode mode,  T value = {});
 
@@ -194,8 +195,8 @@ namespace mln
 
 
 
-  template <class T, std::size_t dim>
-  void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<(int)dim> roi, e_padding_mode mode,  T value)
+  template <class T, int dim>
+  void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<dim> roi, e_padding_mode mode,  T value)
   {
     padder<T>      _padder;
 

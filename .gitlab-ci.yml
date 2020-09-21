@@ -62,6 +62,7 @@ windows-debug:
     variables:
         VCVAR2019: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat'
         ARCH: x64
+        CONAN_USE_ALWAYS_SHORT_PATHS: 1
 
 .job-build-linux-base: &distcheck-linux-base
     stage: build

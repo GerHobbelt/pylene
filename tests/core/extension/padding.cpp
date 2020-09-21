@@ -117,8 +117,8 @@ TEST_P(Padding2DTestRGB, Image) { this->test_image(); }
 TEST_P(Padding2DTestRGB, Span) { this->test_span(); }
 
 mln::e_padding_mode paddings[] = {mln::PAD_ZERO, mln::PAD_CONSTANT, mln::PAD_WRAP, mln::PAD_MIRROR, mln::PAD_REPLICATE};
-INSTANTIATE_TEST_CASE_P(bla, Padding2DTestInt, testing::ValuesIn(paddings));
-INSTANTIATE_TEST_CASE_P(bla, Padding2DTestRGB, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding2DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding2DTestRGB, testing::ValuesIn(paddings));
 
 
 template <class T>
@@ -283,8 +283,8 @@ TEST_P(CopyPadding2DTestRGB, UpperLeft) {this->test_copy_upper_left();}
 TEST_P(CopyPadding2DTestRGB, LowerRight) {this->test_copy_lower_right();}
 
 
-INSTANTIATE_TEST_CASE_P(bla, CopyPadding2DTestInt, testing::ValuesIn(paddings));
-INSTANTIATE_TEST_CASE_P(bla, CopyPadding2DTestRGB, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, CopyPadding2DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, CopyPadding2DTestRGB, testing::ValuesIn(paddings));
 
 
 
@@ -321,8 +321,8 @@ TEST_P(Padding1DTestInt, Span) { this->test_span(); }
 TEST_P(Padding1DTestRGB, Image) { this->test_image(); }
 TEST_P(Padding1DTestRGB, Span) { this->test_span(); }
 
-INSTANTIATE_TEST_CASE_P(bla, Padding1DTestInt, testing::ValuesIn(paddings));
-INSTANTIATE_TEST_CASE_P(bla, Padding1DTestRGB, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding1DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding1DTestRGB, testing::ValuesIn(paddings));
 
 
 template <class T>
@@ -370,8 +370,8 @@ TEST_P(Padding3DTestRGB, Span) { this->test_span(); }
 
 
 
-INSTANTIATE_TEST_CASE_P(bla, Padding3DTestInt, testing::ValuesIn(paddings));
-INSTANTIATE_TEST_CASE_P(bla, Padding3DTestRGB, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding3DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, Padding3DTestRGB, testing::ValuesIn(paddings));
 
 
 
@@ -424,6 +424,6 @@ TEST_P(CopyPadding3DTestRGB, LowerRight) { this->test_lower_right(); }
 
 
 
-INSTANTIATE_TEST_CASE_P(bla, CopyPadding3DTestInt, testing::ValuesIn(paddings));
-INSTANTIATE_TEST_CASE_P(bla, CopyPadding3DTestRGB, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, CopyPadding3DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, CopyPadding3DTestRGB, testing::ValuesIn(paddings));
 

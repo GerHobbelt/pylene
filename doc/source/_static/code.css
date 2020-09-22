@@ -8,10 +8,10 @@
 
 
 .rst-content dl:not(.docutils) dt {
-    display: block;
-    background: none;
-    margin-top: 0;
-    margin-bottom: 0;
+    display: block !important;
+    background: none !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .rst-content dl:not(.docutils) dt em:not(.property) {

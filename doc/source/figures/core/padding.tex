@@ -4,6 +4,7 @@
 
 
 \begin{document}
+
 \begin{tikzpicture}[scale=.7,yscale=-1]
 \tikzset{
   pad/.style={fill=LightGray},
@@ -11,24 +12,30 @@
 }
 
 
-\draw[pattern=dots,ultra thick] (-2,6) rectangle ++(11,10);
-\draw[fill=white, ultra thick] (0,0) rectangle (12,12);
+\draw[fill=white] (0,0) grid[] (12,12);
+\draw[ultra thick, Orange] (0,0) node[left] {Input} rectangle (12,12);
+\draw[ultra thick, Magenta, pattern=dots] (-2,6) rectangle ++(11,10) node[right] {Output};
+
+\node[above] at (0,0) {(0,0)};
+\node[below] at (12,12) {(12,12)};
+\node[above] at (-2,6) {(-2,6)};
+\node[below] at (-2+11,6+10) {(9,16)};
 
 
 \begin{scope}
-  \clip (0,0) rectangle (12,12);
-  \draw[fill=Gray,ultra thick] (-2,6) rectangle ++(11,10);
+  \clip (1pt,1pt) rectangle ($ (12,12) - (1pt,1pt) $);
+  \fill[Gray] (-2,6) rectangle ++(11,10);
 \end{scope}
 
-\draw (0,0) grid[] (12,12);
-\draw[DarkRed,border] (0,8) -- ++(-2,0);
-\draw[DarkBlue,border] (6,12) -- ++(0,+4);
+
 
 
 \foreach \i in {0,...,11}{
 \foreach \j in {1,...,12}{
   \draw let \n1 = {int(\i*12+\j)} in node at (\j-.5,\i+.5) {\n1};
 }}
+
+
 
 \end{tikzpicture}
 
@@ -43,9 +50,17 @@
 \def\fillA#1#2{(\inR{#1} && \inR{#2}) ? \f{#1}{#2} : 69}
 
 
+
 \begin{tikzpicture}[scale=.7,yscale=-1]
+  \coordinate (A)  at (0,6);
+  \coordinate (C)  at (9,12);
+
+  
   \fill[Gray] (0,6) rectangle ++(9,6);
   \draw (-2,6) grid[] ++(11,10);
+  \draw[Orange, ultra thick] (A) |- (C);
+  \draw[ultra thick, Magenta] (-2,6) rectangle ++(11,10) node[right] {Output};
+
 
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
@@ -57,9 +72,13 @@
 \end{tikzpicture}
 
 
+
 \begin{tikzpicture}[scale=.7,yscale=-1]
   \fill[Gray] (0,6) rectangle ++(9,6);
   \draw (-2,6) grid[] ++(11,10);
+  \draw[Orange, ultra thick] (A) |- (C);
+  \draw[ultra thick, Magenta] (-2,6) rectangle ++(11,10) node[right] {Output};
+
 
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
@@ -73,6 +92,8 @@
 \begin{tikzpicture}[scale=.7,yscale=-1]
   \fill[Gray] (0,6) rectangle ++(9,6);
   \draw (-2,6) grid[] ++(11,10);
+  \draw[Orange, ultra thick] (A) |- (C);
+  \draw[ultra thick, Magenta] (-2,6) rectangle ++(11,10) node[right] {Output};
 
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{
@@ -86,6 +107,9 @@
 \begin{tikzpicture}[scale=.7,yscale=-1]
   \fill[Gray] (0,6) rectangle ++(9,6);
   \draw (-2,6) grid[] ++(11,10);
+  \draw[Orange, ultra thick] (A) |- (C);
+  \draw[ultra thick, Magenta] (-2,6) rectangle ++(11,10) node[right] {Output};
+
 
 \foreach \yy in {6,...,15}{
   \foreach \xx in {-2,...,8}{

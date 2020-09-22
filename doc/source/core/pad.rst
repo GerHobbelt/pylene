@@ -67,8 +67,13 @@ This file provides functions to pad a rectangular buffer or an image either:
                   Pad an image or a buffer inplace with the given borders. The `borders` parameter is a `dim × 2` that
                   contains the left/right border width in each dimension that will be filled accorded to the padding policy.
 
-                  .. figure:: /figures/core/padding-inplace.svg
-                              :align: center
+
+                  .. list-table::
+
+                     * - .. image:: /figures/core/padding-inplace-1.svg
+                       - .. image:: /figures/core/padding-inplace-2.svg
+                     * - Before padding
+                       - After padding
 
 
 
@@ -79,7 +84,7 @@ This file provides functions to pad a rectangular buffer or an image either:
 
 
 
-                  .. topic:: Example
+                  .. rubric:: Example
 
                   .. code-block:: cpp
 
@@ -89,7 +94,7 @@ This file provides functions to pad a rectangular buffer or an image either:
                      int borders[2][2] = {{2,1}, // 1st (x-) dimension
                                           {3,2}} // 2nd (y-) dimension
                      auto input = ...;
-                     mln::pad(input, mln::PAD_CONSTANT, borders, 42);
+                     mln::pad(input, mln::PAD_CONSTANT, borders, 69);
 
 
 
@@ -101,8 +106,15 @@ This file provides functions to pad a rectangular buffer or an image either:
                   Copy an image or a buffer to an external image and fill the missing regions according to the padding
                   policy.
 
-                  .. figure:: /figures/core/padding-1.svg
-                             :align: center
+
+                  .. list-table::
+
+                     * - .. image:: /figures/core/padding-1.svg
+                       - .. image:: /figures/core/padding-5.svg
+                     * - Before padding
+                       - After padding
+
+
 
                   **First version**
 
@@ -121,7 +133,7 @@ This file provides functions to pad a rectangular buffer or an image either:
 
 
 
-                  .. topic:: Example
+                  .. rubric:: Example
 
                   .. code-block:: cpp
 

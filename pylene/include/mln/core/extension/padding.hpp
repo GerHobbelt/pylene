@@ -6,6 +6,8 @@
 #include <mln/core/image/ndimage_fwd.hpp>
 #include <mln/core/range/mdspan_fwd.hpp>
 #include <mln/core/box.hpp>
+#include <mln/core/concepts/image.hpp>
+#include <mln/core/range/foreach.hpp>
 
 namespace mln
 {
@@ -41,6 +43,10 @@ namespace mln
   void pad(ndimage<T, dim>& image, e_padding_mode mode, const int borders[][2], T value = {});
 
   /// \overload
+  template <concepts::Image I>
+  void pad(I image, e_padding_mode mode, const int borders[][2], image_value_t<I> value = {});
+
+  /// \overload
   template <class T, std::size_t dim>
   void pad(const ranges::mdspan<T, dim>& image, e_padding_mode mode, const int borders[][2], T value = {});
 
@@ -70,10 +76,14 @@ namespace mln
   void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<dim> roi, e_padding_mode mode,  T value = {});
 
 
-  /// \overload
+    /// \overload
   template <class T, int dim>
   void copy_pad(const ndimage<T, dim>& input, ndimage<T, dim>& output, e_padding_mode mode,  T value = {});
 
+  /// \overload
+  template <concepts::Image I, concepts::Image J>
+  requires(I::pdim == J::pdim)
+  void copy_pad(I in, J out, e_padding_mode mode, image_value_t<J> value = {});
 
 
   /******************************************/
@@ -246,6 +256,92 @@ namespace mln
 
 
   }
+
+
+
+
+  namespace impl
+  {
+    template <class I, typename T, int dim>
+    void pad_generic(I image, e_padding_mode mode, const int borders[][2], T value, mln::ndbox<dim> domain)
+    {
+      ndbox<dim> inner;
+
+      for (int d = 0; d < dim; ++d)
+      {
+        inner.tl()[d] = domain.tl()[d] + borders[d][0];
+        inner.br()[d] = domain.br()[d] - borders[d][1];
+        if (inner.tl()[d] >= inner.br()[d])
+          return;
+      }
+
+      mln_foreach(auto p, domain)
+        if (!inner.has(p))
+          switch (mode)
+          {
+          case PAD_ZERO: image(p) = 0;
+            break;
+          case PAD_CONSTANT: image(p) = value;
+            break;
+          case PAD_WRAP: image(p) = image(inner.periodize(p));
+            break;
+          case PAD_MIRROR: image(p) = image(inner.mirror(p));
+            break;
+          case PAD_REPLICATE: image(p) = image(inner.clamp(p));
+            break;
+          }
+    }
+
+
+    template <concepts::Image I, concepts::Image J, typename T, int dim>
+    void copy_pad_generic(I in, J out, e_padding_mode mode, T value, mln::ndbox<dim> domain)
+    {
+      ndbox<dim> inner  = in.domain();
+
+      mln_foreach (auto p, domain)
+        if (inner.has(p))
+          out(p) = in(p);
+        else
+          switch (mode)
+          {
+          case PAD_ZERO:
+            out(p) = 0;
+            break;
+          case PAD_CONSTANT:
+            out(p) = value;
+            break;
+          case PAD_WRAP:
+            out(p) = in(inner.periodize(p));
+            break;
+          case PAD_MIRROR:
+            out(p) = in(inner.mirror(p));
+            break;
+          case PAD_REPLICATE:
+            out(p) = in(inner.clamp(p));
+            break;
+          }
+    }
+  } // namespace impl
+
+
+  template <concepts::Image I>
+  void pad(I image, e_padding_mode mode, const int borders[][2], image_value_t<I> value)
+  {
+    static_assert(std::is_convertible_v<image_domain_t<I>, mln::Box>);
+    impl::pad_generic(std::move(image), mode, borders, value, image.domain());
+  }
+
+
+  template <concepts::Image I, concepts::Image J>
+  requires(I::pdim == J::pdim)
+  void copy_pad(I in, J out, e_padding_mode mode, image_value_t<J> value)
+  {
+    static_assert(std::is_convertible_v<image_domain_t<I>, mln::Box>);
+    static_assert(std::is_convertible_v<image_domain_t<J>, mln::Box>);
+
+    impl::copy_pad_generic(std::move(in), std::move(out), mode, value, out.domain());
+  }
+
 
 
 } // namespace mln

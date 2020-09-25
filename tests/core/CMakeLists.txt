@@ -14,6 +14,10 @@ add_core_test(${test_prefix}range_zip           range/zip.cpp)
 add_core_test(${test_prefix}range_mdspan        range/mdspan.cpp)
 add_core_test(${test_prefix}range_mdindex       range/mdindex.cpp)
 
+# test padding functionalities
+add_core_test(${test_prefix}padding             extension/padding.cpp)
+
+
 
 # test Views
 add_core_test(${test_prefix}view_adaptor            image/view/adaptor.cpp)

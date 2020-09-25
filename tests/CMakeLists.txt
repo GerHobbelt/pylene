@@ -23,6 +23,15 @@ function(add_core_test Executable)
 
 endfunction(add_core_test)
 
+# Windows required DLLs to be located near tests (suppose TBB is installed with conan)
+# (Some libraries cannot be static (e.g. TBB)
+if (WIN32 AND EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
+  set(TBB_DLL "${CONAN_BIN_DIRS_TBB}/tbb$<$<CONFIG:DEBUG>:_debug>.dll")
+  add_custom_target(copy-dlls-in-test-dir
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TBB_DLL}" "${CMAKE_BINARY_DIR}/tests"
+    )
+  add_dependencies(build-tests copy-dlls-in-test-dir)
+endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

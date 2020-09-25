@@ -55,6 +55,8 @@ target_sources(Pylene PRIVATE
                src/core/init_list.cpp
                src/core/ndbuffer_image.cpp
                src/core/ndbuffer_image_data.cpp
+               src/core/padding.cpp
+               src/core/parallel_pointwise.cpp
                src/core/se/disc.cpp
                src/core/se/mask2d.cpp
                src/core/se/periodic_line2d.cpp

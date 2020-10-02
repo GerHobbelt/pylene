@@ -13,7 +13,7 @@ void naive_dilate(mln::image2d<bool>& f, const mln::se::periodic_line2d& se)
   mln::resize(g, f).set_init_value(false);
 
 
-  mln_foreach_new ((auto [pxIn, pxOut]), mln::ranges::view::zip(f.pixels(), g.pixels()))
+  mln_foreach ((auto [pxIn, pxOut]), mln::ranges::view::zip(f.pixels(), g.pixels()))
     if (pxIn.val())
       for (auto nxOut : se(pxOut))
         if (f.domain().has(nxOut.point()))
@@ -56,7 +56,7 @@ float compute_disc_error(const mln::image2d<bool>& f, float radius)
   int  nerror = 0;
   auto sqr    = [](auto x) { return x * x; };
 
-  mln_foreach_new (auto px, f.pixels())
+  mln_foreach (auto px, f.pixels())
   {
     bool ref = sqr(px.point().x()) + sqr(px.point().y()) <= sqr(radius);
     nerror += (ref != px.val());

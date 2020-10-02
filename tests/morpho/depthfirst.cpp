@@ -52,7 +52,7 @@ TEST(Morpho, depthfirst_max)
   mln::morpho::canvas::depthfirst(input, mln::c4, viz, {0,0});
 
   // Counting = anti-leveling
-  mln_foreach_new(auto p, input.domain())
+  mln_foreach(auto p, input.domain())
     for (auto q : mln::c4(p))
       if (input.domain().has(q))
       {

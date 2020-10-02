@@ -4,14 +4,15 @@
 #include <mln/core/range/view/reverse.hpp>
 #include <mln/core/range/view/zip.hpp>
 
-#include <vector>
 
-
+#ifdef _MSC_VER
+# define __restrict__ __restrict
+#endif
 
 void Mult_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img)
 {
   auto reversed_values = mln::ranges::view::reverse(img.values());
-  mln_foreach_new (auto& v, reversed_values)
+  mln_foreach (auto& v, reversed_values)
   {
     v *= 2;
   }
@@ -20,7 +21,7 @@ void Mult_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img)
 void Mult_Inplace_New_Pixels_Reversed(mln::image2d<uint8_t>& img)
 {
   auto reversed_pixels = mln::ranges::view::reverse(img.pixels());
-  mln_foreach_new (auto&& px, reversed_pixels)
+  mln_foreach (auto&& px, reversed_pixels)
   {
     px.val() *= 2;
   }
@@ -84,7 +85,7 @@ void Threshold_Inplace_New_Values_Reversed(mln::image2d<uint8_t>& img)
   constexpr uint8_t t = 128;
 
   auto reversed_values = mln::ranges::view::reverse(img.values());
-  mln_foreach_new (auto& v, reversed_values)
+  mln_foreach (auto& v, reversed_values)
   {
     v = v < t ? 0 : 255;
   }
@@ -95,7 +96,7 @@ void Threshold_Inplace_New_Pixels_Reversed(mln::image2d<uint8_t>& img)
   constexpr uint8_t t = 128;
 
   auto reversed_pixels = mln::ranges::view::reverse(img.pixels());
-  mln_foreach_new (auto&& px, reversed_pixels)
+  mln_foreach (auto&& px, reversed_pixels)
   {
     px.val() = px.val() < t ? 0 : 255;
   }
@@ -164,7 +165,7 @@ void Threshold_New_Pixels_Reversed(const mln::image2d<uint8_t>& input, mln::imag
 
 void LUT_Inplace_New_Values_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto& v, img.values())
+  mln_foreach (auto& v, img.values())
   {
     v = LUT[v];
   }
@@ -172,7 +173,7 @@ void LUT_Inplace_New_Values_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>&
 
 void LUT_Inplace_New_Pixels_Reversed(const uint8_t LUT[], mln::image2d<uint8_t>& img)
 {
-  mln_foreach_new (auto&& px, img.pixels())
+  mln_foreach (auto&& px, img.pixels())
   {
     px.val() = LUT[px.val()];
   }

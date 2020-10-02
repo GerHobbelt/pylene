@@ -34,7 +34,7 @@ TEST(View, filter_readonly)
 
   ASSERT_TRUE(mln::all_of(x > 10));
 
-  mln_foreach_new (auto&& pix, ima.pixels())
+  mln_foreach (auto&& pix, ima.pixels())
   {
     if (pix.val() > 10)
       ASSERT_EQ(pix.val(), x(pix.point()));
@@ -42,7 +42,7 @@ TEST(View, filter_readonly)
       ASSERT_EQ(pix.val(), x.at(pix.point()));
   }
 
-  mln_foreach_new (auto&& pix, x.pixels())
+  mln_foreach (auto&& pix, x.pixels())
     ASSERT_EQ(pix.val(), ima(pix.point()));
 }
 
@@ -92,7 +92,7 @@ TEST(View, filter_twice)
 
   ASSERT_TRUE(mln::all_of(u > 10 && u < 15));
 
-  mln_foreach_new (auto&& pix, ima.pixels())
+  mln_foreach (auto&& pix, ima.pixels())
   {
     if (pix.val() > 10 and pix.val() < 15)
     {
@@ -107,14 +107,14 @@ TEST(View, filter_twice)
   }
 
   {
-    mln_foreach_new (auto&& pix, u.pixels())
+    mln_foreach (auto&& pix, u.pixels())
       ASSERT_EQ(pix.val(), ima(pix.point()));
   }
 
   mln::image2d<int> before = mln::clone(ima);
   mln::fill(u, 1);
   {
-    mln_foreach_new ((auto [old_v, new_v]), mln::ranges::view::zip(before.values(), ima.values()))
+    mln_foreach ((auto [old_v, new_v]), mln::ranges::view::zip(before.values(), ima.values()))
     {
       if (old_v > 10 && old_v < 15)
         ASSERT_EQ(1, new_v);
@@ -123,7 +123,7 @@ TEST(View, filter_twice)
     }
   }
 
-  mln_foreach_new (auto&& px, u.pixels())
+  mln_foreach (auto&& px, u.pixels())
     ASSERT_EQ(px.val(), ima(px.point()));
 }
 

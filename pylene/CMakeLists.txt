@@ -4,7 +4,7 @@ find_package(Boost 1.58 REQUIRED)
 find_package(FreeImage REQUIRED)
 
 find_package(TBB REQUIRED tbb)
-find_package(range-v3 0.10.0 REQUIRED CONFIG)
+find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
@@ -24,9 +24,12 @@ if (UNIX AND NOT APPLE)
   target_link_libraries(Pylene INTERFACE rt)
 elseif (MSVC)
   #
-  target_compile_options(Pylene PUBLIC "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
-                                       "/wd5104" # found 'L#x' in macro replacement list, did you mean 
-                      )
+  target_compile_options(Pylene PUBLIC
+    "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
+    "/wd5104" # found 'L#x' in macro replacement list, did you mean
+    "/experimental:preprocessor"  # required by range-v3
+    "/permissive-" # required by range-v3
+    )
 endif ()
 
 
@@ -35,8 +38,8 @@ target_include_directories(Pylene PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
 
-target_include_directories(Pylene SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-target_link_libraries(Pylene PUBLIC range-v3)
+target_include_directories(Pylene SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+target_link_libraries(Pylene PUBLIC range-v3::range-v3)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
 target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 
@@ -52,6 +55,7 @@ target_sources(Pylene PRIVATE
                src/core/ndbuffer_image.cpp
                src/core/ndbuffer_image_data.cpp
 							 src/core/parallel_local.cpp
+               src/core/padding.cpp
                src/core/parallel_pointwise.cpp
                src/core/padding.cpp
                src/core/se/disc.cpp
@@ -75,7 +79,7 @@ target_sources(Pylene PRIVATE
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_20)
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
   target_compile_options(Pylene PUBLIC -fconcepts)
 endif()
 

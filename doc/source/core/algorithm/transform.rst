@@ -5,9 +5,9 @@ Include :file:`<mln/core/algorithm/transform.hpp>`
 
 .. cpp:namespace:: mln
 
-#. .. cpp:function:: void transform(InputImage in, OutputImage out, UnaryFunction f)
+#. .. cpp:function:: void transform(InputImage in, OutputImage out, std::UnaryFunction f)
 
-#. .. cpp:function:: image_ch_value_t<InputImage, R> transform(InputImage in, UnaryFunction f)
+#. .. cpp:function:: image_ch_value_t<InputImage, R> transform(InputImage in, std::UnaryFunction f)
 
 
     1) Applies the function `f` to every value of `in` and stores the result in `out`.

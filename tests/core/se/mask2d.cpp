@@ -63,7 +63,7 @@ TEST(Core, Weighted_Mask2d_2)
 
   int i = 0;
   mln::point2d center = {1,1};
-  auto px = f.new_pixel(center);
+  auto px = f.pixel(center);
 
   for (auto wpx : mask(px))
   {

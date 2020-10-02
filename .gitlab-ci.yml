@@ -7,23 +7,32 @@ stages:
 cache:
     paths:
         - .cache/conan/data
+        - .cache/ccache/data
 
 variables:
     FEDORA_RAWHIDE: "${CI_REGISTRY}/olena/pylene-dockers/fedora-rawhide"
     FEDORA_31: "${CI_REGISTRY}/olena/pylene-dockers/fedora-31"
     FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
-    PACKAGE_NAME: "pylene"                                                      # Conan package name
-    PACKAGE_TAG: "stable"                                                       # Conan tag
-    PACKAGE_VERSION: "head"                                                     # Version to build
     CMAKE_BUILD_PARALLEL_LEVEL: 6
-    CONAN_USER: "lrde"
-    CONAN_PROFILE: "gcc-9"
+    CONAN_UPLOAD: "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public@True"
+    CONAN_USERNAME: "lrde"
+    CONAN_LOGIN_USERNAME: "carlinet"
+    CONAN_CHANNEL: "unstable"                                                     # Conan tag
+    CONAN_STABLE_CHANNEL: "stable"                                                # Conan tag
+    CONAN_STABLE_BRANCH_PATTERN: "master$"
+    CONAN_PASSWORD: $CONAN_LRDE_API_KEY
+    CONAN_CMAKE_GENERATOR: Ninja
     ASAN: "OFF"
     MSAN: "OFF"
     UBSAN: "OFF"
+    CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
+    CCACHE_MAXSIZE: 2G
 
 before_script:
         - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
+        - conan profile new --detect default
+        - ccache -p
+        - ccache -s
 
 ########
 # Test #
@@ -36,7 +45,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build; cd build
-        - conan install .. -s build_type=Debug --build missing
+        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20
         - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
@@ -54,12 +63,13 @@ windows-debug:
     variables:
         VCVAR2019: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat'
         ARCH: x64
+        CONAN_USE_ALWAYS_SHORT_PATHS: 1
 
 .job-build-linux-base: &distcheck-linux-base
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. --build missing -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
+        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
         - cmake --build . --target Pylene
         - cmake --build . --target build-tests
@@ -148,7 +158,7 @@ distcheck-linux-gcc10-debug:
 
 distcheck-linux-coverage:
     <<: *distcheck-linux-base
-    image: ${FEDORA_31}
+    image: ${FEDORA_32}
     after_script:
         - mkdir coverage
         - gcovr --root pylene build -s --xml cobertura --html-details coverage/index.html
@@ -158,6 +168,7 @@ distcheck-linux-coverage:
         CC: "gcc"
         CXXFLAGS: "-fprofile-arcs -ftest-coverage"
         CFLAGS: "-fprofile-arcs -ftest-coverage"
+        CONAN_PROFILE: "gcc-10"
     artifacts:
         paths:
             - coverage/
@@ -177,7 +188,7 @@ distcheck-linux-coverage:
     stage: bench
     script:
         - mkdir build && cd build
-        - conan install .. -pr gcc-9 --build missing
+        - conan install .. -pr gcc-9 --build missing -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target fetch-external-data
         - cmake --build . --target build-bench
@@ -210,7 +221,7 @@ distbench-linux-gcc9-release:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-9 --build missing
+        - conan install -u .. -pr gcc-9 --build missing -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc
         - mkdir ../public && mv doc/sphinx/* ../public/
@@ -236,14 +247,30 @@ pages:
     only:
         - master
 
-package:
-    image: ${FEDORA_31}
+.package:
     stage: deploy
     dependencies: []
     script:
-        - mkdir build && cd build
-        - conan user carlinet -r lrde-public -p $CONAN_LRDE_API_KEY
-        - conan create .. $CONAN_USER/$PACKAGE_TAG -pr gcc-9 --build missing -e CXX=g++ -e CC=gcc
-        - conan upload -r lrde-public --all $PACKAGE_NAME/$PACKAGE_VERSION@$CONAN_USER/$PACKAGE_TAG
+        - python3 package-conan.py
     rules:
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "schedule"
+        - if: $CI_COMMIT_BRANCH == "next"
+
+package gcc-9:
+   extends: .package
+   image: ${FEDORA_31}
+   variables:
+        CONAN_BASE_PROFILE: gcc-9
+
+package gcc-10:
+   extends: .package
+   image: ${FEDORA_32}
+   variables:
+        CONAN_BASE_PROFILE: gcc-10
+
+package clang-10:
+   extends: .package
+   image: ${FEDORA_32}
+   variables:
+        CONAN_BASE_PROFILE: clang-10
+

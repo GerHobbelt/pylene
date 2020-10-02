@@ -160,7 +160,6 @@ namespace mln::morpho
         mln::box2d clipped_roi = _in.domain();
         clipped_roi.clip(input_roi);
 
-
         // The output tile is in the padding region (this work here but buggy if periodic is used).
         image_value_t<InputImage> padding_value  = 0;
         if (clipped_roi.empty())
@@ -169,27 +168,9 @@ namespace mln::morpho
           return;
         }
 
-        {
-          auto dst = m_tile.clip(clipped_roi);
-          mln::details::copy_block(_in, clipped_roi, dst.buffer(), dst.stride());
-        }
-        if (clipped_roi == input_roi)
-          return;
-
-        // Padding is required
-        {
-          int borders[2][2];
-
-          borders[0][0] = clipped_roi.tl().x() - input_roi.tl().x();
-          borders[0][1] = input_roi.br().x() - clipped_roi.br().x();
-          borders[1][0] = clipped_roi.tl().y() - input_roi.tl().y();
-          borders[1][1] = input_roi.br().y() - clipped_roi.br().y();
-
-          // FIXME mln::value_traits<image_value_t<I>>::inf()
-          auto padding_method = mln::PAD_ZERO;
-          auto dst = m_tile.clip(input_roi);
-          pad(dst, padding_method, borders, padding_value);
-        }
+        auto padding_method = mln::PAD_ZERO;
+        auto dst = m_tile.clip(input_roi);
+        copy_pad_generic(_in, dst, padding_method, padding_value, dst.domain());
       }
 
       mln::ndbuffer_image get_tile() const final

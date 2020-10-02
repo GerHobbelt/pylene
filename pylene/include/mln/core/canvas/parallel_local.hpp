@@ -83,16 +83,16 @@ namespace mln
   } // namespace details
 
   /*TODO
-  Erosion
-  Dilation
-  Opening (Erosion -> Dilation)
-  Closing (Dilation -> Erosion)
-  Hit Or Miss
-  Rank Filter
-  Median filter
-  Mean (Box) filter
-  Morphological gradients
-  Top hat
+  Dilation : DONE
+  Erosion : everything
+  Opening (Erosion -> Dilation) : everything
+  Closing (Dilation -> Erosion) : everything
+  Hit Or Miss : everything
+  Rank Filter : everything
+  Median filter : everything
+  Mean (Box) filter : everything
+  Morphological gradients : everything
+  Top hat : everything
   */
 
   class TileExecutorBase
@@ -119,8 +119,8 @@ namespace mln
   class ParallelLocalCanvas2D
   {
   public:
-    static constexpr int TILE_WIDTH  = 8;
-    static constexpr int TILE_HEIGHT = 8;
+    static constexpr int TILE_WIDTH  = 128;
+    static constexpr int TILE_HEIGHT = 128;
 
     virtual ~ParallelLocalCanvas2D() = default;
     virtual std::unique_ptr<ParallelLocalCanvas2D> clone() const = 0;

@@ -82,7 +82,6 @@ namespace mln
 
   /// \overload
   template <concepts::Image I, concepts::Image J>
-  requires(I::pdim == J::pdim)
   void copy_pad(I in, J out, e_padding_mode mode, image_value_t<J> value = {});
 
 
@@ -333,7 +332,6 @@ namespace mln
 
 
   template <concepts::Image I, concepts::Image J>
-  requires(I::pdim == J::pdim)
   void copy_pad(I in, J out, e_padding_mode mode, image_value_t<J> value)
   {
     static_assert(std::is_convertible_v<image_domain_t<I>, mln::Box>);

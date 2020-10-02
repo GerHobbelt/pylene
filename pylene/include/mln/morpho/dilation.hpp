@@ -170,7 +170,7 @@ namespace mln::morpho
 
         auto padding_method = mln::PAD_ZERO;
         auto dst = m_tile.clip(input_roi);
-        copy_pad_generic(_in, dst, padding_method, padding_value, dst.domain());
+        copy_pad(_in, dst, padding_method, padding_value);
       }
 
       mln::ndbuffer_image get_tile() const final

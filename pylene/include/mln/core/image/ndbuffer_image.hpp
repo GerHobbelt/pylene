@@ -140,6 +140,7 @@ namespace mln
     int height() const noexcept;
     int depth() const noexcept;
     int size(int dim = 0) const noexcept;
+    void domain_shift(point_type shift) noexcept;
 
     int border() const noexcept;
     Box domain() const noexcept;

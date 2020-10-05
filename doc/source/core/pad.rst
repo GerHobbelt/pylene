@@ -59,8 +59,7 @@ This file provides functions to pad a rectangular buffer or an image either:
 
 
 
-.. cpp:function:: template <class T, int dim> \
-                  void pad(ndimage<T, dim>& image, e_padding_mode mode, const int borders[][2], T value = {})
+.. cpp:function:: void pad(Image image, e_padding_mode mode, const int borders[][2], T value = {})
                   template <class T, std::size_t dim> \
                   void pad(const ranges::mdspan<T, dim>& buffer, e_padding_mode mode, const int borders[][2], T value = {})
 
@@ -98,10 +97,9 @@ This file provides functions to pad a rectangular buffer or an image either:
 
 
 
-.. cpp:function:: template <class T, int dim> \
-                  void copy_pad(const ndimage<T, dim>& input, ndimage<T, dim>& output, e_padding_mode mode,  T value = {});
+.. cpp:function:: void copy_pad(Image input, Image output, e_padding_mode mode,  T value = {})
                   template <class T, int dim> \
-                  void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<dim> roi, e_padding_mode mode,  T value = {});
+                  void copy_pad(ranges::mdspan<T, dim> input, ranges::mdspan<T, dim> out, mln::ndbox<dim> roi, e_padding_mode mode,  T value = {})
 
                   Copy an image or a buffer to an external image and fill the missing regions according to the padding
                   policy.

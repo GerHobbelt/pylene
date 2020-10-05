@@ -193,6 +193,24 @@ See :doc:`core/images` for a description of the image concepts and image basics.
   * :doc:`core/se/rectangle`
   * :doc:`core/se/periodic_lines`
 
+Border handling
+***************
+
+.. toctree::
+   :hidden:
+
+   core/pad.rst
+
+.. table::
+  :class: full
+  :widths: auto
+
+  +---------------------------------+----------------------------------------+
+  | :cpp:func:`mln::pad`            | Pad an image inplace                   |
+  +---------------------------------+----------------------------------------+
+  | :cpp:func:`mln::copy_pad`       | Copy a region of an image and fill     |
+  |                                 | missing values wrt a padding policy.   |
+  +---------------------------------+----------------------------------------+
 
 
 

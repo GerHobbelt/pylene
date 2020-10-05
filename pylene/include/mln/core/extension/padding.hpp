@@ -64,7 +64,7 @@ namespace mln
   ///   pad each dimension using periodization `[2 3 1 2 3 1 2 3 1]`
   /// PAD_MIRROR
   ///   pad each dimension using edge mirroring `[2 1 1 2 3 3 2 1 1]`
-  /// PAD_REPLICATE
+  /// PAD_MIRROR
   ///   pad each dimension using edge replication `[1 1 1 2 3 3 3 3 3]`
   ///
   /// \param input The input mdspan defined on [0...sizes] (used as referencial)

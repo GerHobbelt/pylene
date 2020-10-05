@@ -111,7 +111,7 @@ TEST(View, clip_other_a_box2d)
                            {5, 42, 42, 8, 9}, //
                            {10, 11, 12, 13, 14}};
 
-  mln::box2d domain({1, 0}, {10, 10});
+  mln::box2d domain({1, 0}, {3, 2});
 
   // Clip returns an 'image2d'
   mln::image2d<int> clipped = mln::view::clip(ima, domain);

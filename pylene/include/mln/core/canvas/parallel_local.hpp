@@ -119,8 +119,8 @@ namespace mln
   class ParallelLocalCanvas2D
   {
   public:
-    static constexpr int TILE_WIDTH  = 128;
-    static constexpr int TILE_HEIGHT = 128;
+    inline static int TILE_WIDTH  = 8;
+    inline static int TILE_HEIGHT = 8;
 
     virtual ~ParallelLocalCanvas2D() = default;
     virtual std::unique_ptr<ParallelLocalCanvas2D> clone() const = 0;

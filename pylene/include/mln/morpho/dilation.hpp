@@ -17,8 +17,6 @@
 
 #include <mln/morpho/private/localmax.hpp>
 
-#include <fmt/core.h>
-
 namespace mln::morpho
 {
 

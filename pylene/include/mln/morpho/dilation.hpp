@@ -234,26 +234,6 @@ namespace mln::morpho
       OutputImage _out;
     };
 
-/*
-    template <class OutputImage>
-    class TileWriter_DilationTranspose : TileWriterBase
-    {
-    public:
-      template <class OutputImage>
-      TileWriter_DilationTranspose(OutputImage out)
-        : _out{out}
-      {
-        _tile = imconcretize(_out);
-      }
-
-      void write_tile(mln::box2d roi) final { mln::details::transpose_block2d(/ TODO /); }
-
-      mln::ndbuffer_image get_tile(mln::box2d roi) final { return out.clip(roi); }
-
-    private:
-      OutputImage _out;
-    };
-*/
 
     template <class InputImage, class SE, class OutputImage>
     struct DilationParallel : ParallelLocalCanvas2D

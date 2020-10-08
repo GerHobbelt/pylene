@@ -37,7 +37,7 @@ namespace mln
           out.at({x0 + x, y0 + y}) = lineptr[x];
       }
     }
-
+/*
     template <class I, class T>
     [[gnu::noinline]] void transpose_block2D(I& in, mln::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
     {
@@ -60,26 +60,7 @@ namespace mln
         for (int x = 0; x < output_roi.width(); ++x)
           out.at({x0 + x, y0 + y}) = *(in + x * istride + y);
     }
-
-    /// Used in mln::morpho::parallel::dilation
-    template <class InputImage, class SE, class D>
-    auto create_temporary_image(InputImage&& ima, const SE& se, const D& roi)
-    {
-      using I = ::concepts::remove_cvref_t<InputImage>;
-
-      static_assert(mln::is_a<I, mln::details::Image>());
-      static_assert(mln::is_a<SE, mln::details::StructuringElement>());
-
-      D input_roi = se.compute_input_region(ima.domain());
-
-      image_build_params params;
-      params.init_value = mln::value_traits<image_value_t<I>>::inf();
-
-      image_concrete_t<I> output(input_roi, params);
-      mln::paste(ima, roi, output);
-      return output;
-    }
-
+*/
   } // namespace details
 
   /*TODO

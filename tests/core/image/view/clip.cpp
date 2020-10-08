@@ -115,25 +115,7 @@ TEST(View, clip_other_a_box2d)
 
   // Clip returns an 'image2d'
   mln::image2d<int> clipped = mln::view::clip(ima, domain);
-
-  std::cout << "Clipped h, w:" << clipped.height() << ", " << clipped.width() << "\n";
-  std::cout << "ima h, w:" << ima.height() << ", " << ima.width()<< "\n";
-  for (int i = 0; i < clipped.height(); ++i){
-    for (int j = 0; j < clipped.width(); ++j){
-      std::cout << clipped({clipped.domain().x() + j, clipped.domain().y() + i}) << " ";
-    }
-    std::cout << "\n";
-  }
-
-  std::cout << "Fill 42\n";
   fill(clipped, 42);
-  for (int i = 0; i < clipped.height(); ++i){
-    for (int j = 0; j < clipped.width(); ++j){
-      std::cout << clipped({clipped.domain().x() + j,clipped.domain().y() + i}) << " ";
-    }
-    std::cout << "\n";
-  }
-
 
   static_assert(mln::concepts::OutputImage<decltype(clipped)>);
   static_assert(not mln::concepts::ViewImage<decltype(clipped)>);

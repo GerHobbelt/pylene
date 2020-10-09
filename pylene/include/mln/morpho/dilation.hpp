@@ -155,21 +155,12 @@ namespace mln::morpho
         assert(m_tile.domain().includes(input_roi));
         assert(m_tile.domain().tl() == input_roi.tl());
 
-        // Clip roi so that it does not go outside image boundaries
-        mln::box2d clipped_roi = _in.domain();
-        clipped_roi.clip(input_roi);
-
-        // The output tile is in the padding region (this work here but buggy if periodic is used).
-        image_value_t<InputImage> padding_value  = 0;
-        if (clipped_roi.empty())
-        {
-          mln::fill(m_tile, padding_value);
-          return;
-        }
-
+        image_value_t<InputImage> padding_value = 0;
         auto padding_method = mln::PAD_ZERO;
         auto dst = m_tile.clip(input_roi);
         copy_pad(_in, dst, padding_method, padding_value);
+
+        //mln::io::imprint(m_tile);
       }
 
       mln::ndbuffer_image get_tile() const final
@@ -242,8 +233,7 @@ namespace mln::morpho
 
     private:
       DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d roi, mln::box2d tile_dims)
-        : m_in{in}
-        , m_se{se}
+        : m_se{se}
         , m_output_roi{roi}
         , m_tile_l{in, tile_dims.width(), tile_dims.height()}
         , m_tile_w{out}
@@ -276,7 +266,6 @@ namespace mln::morpho
       using tile_executor_t = TileExecutor_Dilation<image_value_t<InputImage>, SE>;
       using tile_writer_t   = TileWriter_Dilation<OutputImage>;
 
-      InputImage       m_in;
       SE               m_se;
       mln::box2d       m_output_roi;
       tile_loader_t    m_tile_l;
@@ -284,56 +273,6 @@ namespace mln::morpho
       tile_executor_t  m_tile_e;
     };
 
-    template <class InputImage, class SE, class OutputImage>
-    void dilation(InputImage&& image, const SE& se, OutputImage&& out)
-    {
-      auto output_roi = out.domain();
-      if (se.is_decomposable())
-      {
-        auto input_roi    = se.compute_input_region(output_roi);
-        image_concrete_t<std::remove_reference_t<InputImage>> tmp_1;
-        image_concrete_t<std::remove_reference_t<InputImage>> tmp_2;
-
-        auto ses = se.decompose();
-        assert(ses.size() > 1);
-
-        tmp_1.resize(input_roi);
-
-        if (ses.size() > 2)
-          tmp_2.resize(input_roi);
-
-        // First dilation
-        {
-          auto&&           se         = ses[0];
-          auto             output_roi = se.compute_output_region(input_roi);
-          DilationParallel caller(image, tmp_1, se, output_roi);
-          parallel_execute_local2D(caller);
-          input_roi = output_roi;
-        }
-        // Intermediate dilation
-        for (std::size_t i = 1; i < ses.size() - 1; ++i)
-        {
-          auto&&           se         = ses[i];
-          auto             output_roi = se.compute_output_region(input_roi);
-          DilationParallel caller(tmp_1, tmp_2, se, output_roi);
-          parallel_execute_local2D(caller);
-          input_roi = output_roi;
-          std::swap(tmp_1, tmp_2);
-        }
-        // Last dilation
-        {
-          auto&&           se         = ses.back();
-          auto             output_roi = se.compute_output_region(input_roi);
-          DilationParallel caller(tmp_1, out, se, output_roi);
-          parallel_execute_local2D(caller);
-        }
-      }
-      else
-      {
-        DilationParallel caller(image, out, se, output_roi);
-        parallel_execute_local2D(caller);
-      }
-    }
 
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out, int tile_width, int tile_height)
@@ -358,16 +297,17 @@ namespace mln::morpho
           auto&&           se         = ses[0];
           auto             output_roi = se.compute_output_region(input_roi);
           DilationParallel caller(image, tmp_1, se, output_roi, tile_width, tile_height);
-          parallel_execute_local2D(caller);
+          sequential_execute_local2D(caller);
           input_roi = output_roi;
         }
+
         // Intermediate dilation
         for (std::size_t i = 1; i < ses.size() - 1; ++i)
         {
           auto&&           se         = ses[i];
           auto             output_roi = se.compute_output_region(input_roi);
           DilationParallel caller(tmp_1, tmp_2, se, output_roi, tile_width, tile_height);
-          parallel_execute_local2D(caller);
+          sequential_execute_local2D(caller);
           input_roi = output_roi;
           std::swap(tmp_1, tmp_2);
         }
@@ -376,18 +316,19 @@ namespace mln::morpho
           auto&&           se         = ses.back();
           auto             output_roi = se.compute_output_region(input_roi);
           DilationParallel caller(tmp_1, out, se, output_roi, tile_width, tile_height);
-          parallel_execute_local2D(caller);
+          sequential_execute_local2D(caller);
         }
+
       }
       else
       {
         DilationParallel caller(image, out, se, output_roi, tile_width, tile_height);
-        parallel_execute_local2D(caller);
+        sequential_execute_local2D(caller);
       }
     }
 
     template <class InputImage, class SE>
-    image_concrete_t<std::remove_reference_t<InputImage>> dilation(InputImage&& image, const SE& se, int tile_width, int tile_height)
+    image_concrete_t<std::remove_reference_t<InputImage>> dilation(InputImage&& image, const SE& se, int tile_width , int tile_height)
     {
       using I = std::remove_reference_t<InputImage>;
 
@@ -399,11 +340,7 @@ namespace mln::morpho
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> dilation(InputImage&& image, const SE& se)
     {
-      using I = std::remove_reference_t<InputImage>;
-
-      image_concrete_t<I> out = imconcretize(image);
-      dilation(image, se, out);
-      return out;
+      return dilation(image, se, 8, 8);
     }
   } // namespace parallel
 

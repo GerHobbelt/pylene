@@ -238,73 +238,67 @@ class CopyPadding2DTest : public testing::TestWithParam<mln::e_padding_mode>
       {148, 149, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150}, //
     }};
 
+
+  static constexpr int  w = 13;
+  static constexpr int  h = 7;
+
 public:
+  void run_test(bool generic, mln::box2d roi, const mln::image2d<T> refs[])
+  {
+    auto bm = GetParam();
+    T    v  = 69;
+
+    mln::image2d<T> out(roi);
+
+    if (generic)
+      mln::impl::copy_pad_generic(input, out, bm, v, out.domain());
+    else
+      copy_pad(input, out, bm, v);
+
+
+    check_padding(input, out, bm, v);
+    if (refs != nullptr)
+    {
+      ASSERT_IMAGES_EQ_EXP(out, refs[bm]);
+    }
+  }
+
+
   void test_copy_upper_left(bool generic)
-    {
-      mln::image2d<T> refs[5];
-      refs[mln::PAD_ZERO] = r0_refs[0];
-      refs[mln::PAD_CONSTANT] = r0_refs[1];
-      refs[mln::PAD_WRAP] = r0_refs[2];
-      refs[mln::PAD_MIRROR] = r0_refs[3];
-      refs[mln::PAD_REPLICATE] = r0_refs[4];
+  {
+    mln::box2d roi(-3, -2, w, h);
+    run_test(generic, roi, r0_refs);
+  }
 
-      auto bm = GetParam();
-      T    v  = 69;
-      int  w  = 13;
-      int  h  = 7;
+  void test_copy_lower_right(bool generic)
+  {
+    mln::box2d roi(12, 7, w, h);
+    run_test(generic, roi, r1_refs);
+  }
 
-      mln::box2d      roi(-3, -2, w, h);
-      mln::image2d<T> out(roi);
-
-      if (generic)
-        mln::impl::copy_pad_generic(input, out, bm, v, out.domain());
-      else
-        copy_pad(input, out, bm, v);
-
-
-      check_padding(input, out, bm, v);
-      ASSERT_IMAGES_EQ_EXP(out, refs[bm]);
-    }
-
-    void test_copy_lower_right(bool generic)
-    {
-      mln::image2d<T> refs[5];
-      refs[mln::PAD_ZERO] = r1_refs[0];
-      refs[mln::PAD_CONSTANT] = r1_refs[1];
-      refs[mln::PAD_WRAP] = r1_refs[2];
-      refs[mln::PAD_MIRROR] = r1_refs[3];
-      refs[mln::PAD_REPLICATE] = r1_refs[4];
-
-      auto bm = GetParam();
-      T    v  = 69;
-      int  w  = 13;
-      int  h  = 7;
-
-      mln::box2d      roi(12, 7, w, h);
-      mln::image2d<T> out(roi);
-      if (generic)
-        mln::impl::copy_pad_generic(input, out, bm, v, out.domain());
-      else
-        copy_pad(input, out, bm, v);
-      check_padding(input, out, bm, v);
-      ASSERT_IMAGES_EQ_EXP(out, refs[bm]);
-    }
+  void test_outside_region(bool generic)
+  {
+    mln::box2d roi(-30, -30, w, h);
+    run_test(generic, roi, nullptr);
+  }
 };
-
-
 
 
 using CopyPadding2DTestInt = CopyPadding2DTest<int>;
 using CopyPadding2DTestRGB = CopyPadding2DTest<rgb_t>;
+
 TEST_P(CopyPadding2DTestInt, UpperLeft) {this->test_copy_upper_left(false);}
 TEST_P(CopyPadding2DTestInt, LowerRight) {this->test_copy_lower_right(false);}
+TEST_P(CopyPadding2DTestInt, Outside) {this->test_outside_region(false);}
 TEST_P(CopyPadding2DTestRGB, UpperLeft) {this->test_copy_upper_left(false);}
 TEST_P(CopyPadding2DTestRGB, LowerRight) {this->test_copy_lower_right(false);}
+TEST_P(CopyPadding2DTestRGB, Outside) {this->test_outside_region(false);}
 TEST_P(CopyPadding2DTestInt, UpperLeftGeneric) {this->test_copy_upper_left(true);}
 TEST_P(CopyPadding2DTestInt, LowerRightGeneric) {this->test_copy_lower_right(true);}
+TEST_P(CopyPadding2DTestInt, OutsideGeneric) {this->test_outside_region(true);}
 TEST_P(CopyPadding2DTestRGB, UpperLeftGeneric) {this->test_copy_upper_left(true);}
 TEST_P(CopyPadding2DTestRGB, LowerRightGeneric) {this->test_copy_lower_right(true);}
-
+TEST_P(CopyPadding2DTestRGB, OutsideGeneric) {this->test_outside_region(true);}
 
 
 INSTANTIATE_TEST_SUITE_P(bla, CopyPadding2DTestInt, testing::ValuesIn(paddings));
@@ -410,38 +404,39 @@ public:
     mln::iota(input, 1);
   }
 
-  void test_upper_left(bool generic)
+  void run_test(bool generic, mln::box3d roi)
   {
-    mln::box3d      roi(-3, -2, -1, 10, 6, 6);
     mln::image3d<T> out(roi);
 
-    auto      bm           = GetParam();
-    T         v            = 69;
+    auto bm = GetParam();
+    T    v  = 69;
 
     if (generic)
       mln::impl::copy_pad_generic(input, out, bm, v, out.domain());
     else
       copy_pad(input, out, bm, v);
     check_padding(input, out, bm, v);
+  }
+
+  void test_upper_left(bool generic)
+  {
+    mln::box3d roi(-3, -2, -1, 10, 6, 6);
+    run_test(generic, roi);
   }
 
 
   void test_lower_right(bool generic)
   {
-    mln::box3d      roi(7, 3, 3, 10, 6, 6);
-    mln::image3d<T> out(roi);
-
-    auto      bm           = GetParam();
-    T         v            = 69;
-    if (generic)
-      mln::impl::copy_pad_generic(input, out, bm, v, out.domain());
-    else
-      copy_pad(input, out, bm, v);
-    check_padding(input, out, bm, v);
+    mln::box3d roi(7, 3, 3, 10, 6, 6);
+    run_test(generic, roi);
   }
 
+  void test_outside_region(bool generic)
+  {
 
-
+    mln::box3d roi(-17, -8, -101, 10, 6, 6);
+    run_test(generic, roi);
+  }
 };
 
 using CopyPadding3DTestInt = CopyPadding3DTest<int>;
@@ -449,13 +444,19 @@ using CopyPadding3DTestRGB = CopyPadding3DTest<rgb_t>;
 
 TEST_P(CopyPadding3DTestInt, UpperLeft) { this->test_upper_left(false); }
 TEST_P(CopyPadding3DTestInt, LowerRight) { this->test_lower_right(false); }
+TEST_P(CopyPadding3DTestInt, Outside) { this->test_outside_region(false); }
+
 TEST_P(CopyPadding3DTestRGB, UpperLeft) { this->test_upper_left(false); }
 TEST_P(CopyPadding3DTestRGB, LowerRight) { this->test_lower_right(false); }
+TEST_P(CopyPadding3DTestRGB, Outside) { this->test_outside_region(false); }
+
 TEST_P(CopyPadding3DTestInt, UpperLeftGeneric) { this->test_upper_left(true); }
 TEST_P(CopyPadding3DTestInt, LowerRightGeneric) { this->test_lower_right(true); }
+TEST_P(CopyPadding3DTestInt, OutsideGeneric) { this->test_outside_region(true); }
+
 TEST_P(CopyPadding3DTestRGB, UpperLeftGeneric) { this->test_upper_left(true); }
 TEST_P(CopyPadding3DTestRGB, LowerRightGeneric) { this->test_lower_right(true); }
-
+TEST_P(CopyPadding3DTestRGB, OutsideGeneric) { this->test_outside_region(true); }
 
 
 INSTANTIATE_TEST_SUITE_P(bla, CopyPadding3DTestInt, testing::ValuesIn(paddings));

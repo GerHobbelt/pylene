@@ -3,6 +3,9 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
+//#include <fmt/core.h>
+//#include <mln/io/imprint.hpp>
+
 namespace mln
 {
   class ParallelLocalCanvas2DImpl
@@ -60,9 +63,34 @@ namespace mln
     tbb::parallel_for(rng, wrapper, tbb::simple_partitioner());
   }
 
+
+  void sequential_execute_local2D(ParallelLocalCanvas2D& canvas)
+  {
+    ParallelLocalCanvas2DImpl wrapper(&canvas);
+    mln::box2d roi = wrapper.GetOutputRegion();
+    const int x1 = roi.br().x();
+    const int y1 = roi.br().y();
+    const int tile_width = canvas.TILE_WIDTH;
+    const int tile_height = canvas.TILE_HEIGHT;
+
+    //fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
+
+    for (int y = roi.y(); y < y1; y += tile_height)
+      for (int x = roi.x(); x < x1; x += tile_width)
+      {
+        int w = std::min(tile_width, x1 - x);
+        int h = std::min(tile_height, y1 - y);
+        canvas.ExecuteTile({x, y, w, h});
+      }
+  }
+
+
   void ParallelLocalCanvas2D::ExecuteTile(mln::box2d roi) const
   {
     mln::box2d input_roi = this->ComputeInputRegion(roi);
+    //fmt::print("Loading tile=(x={},y={},w={},h={})\n", input_roi.x(), input_roi.y(), input_roi.width(), input_roi.height());
+    //fmt::print("Writing tile=(x={},y={},w={},h={})\n", roi.x(), roi.y(), roi.width(), roi.height());
+
 
     auto m_tile_l = this->GetTileLoader();
     auto m_tile_w = this->GetTileWriter();

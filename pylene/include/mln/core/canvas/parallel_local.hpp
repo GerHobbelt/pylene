@@ -100,8 +100,8 @@ namespace mln
   class ParallelLocalCanvas2D
   {
   public:
-    inline static int TILE_WIDTH  = 8;
-    inline static int TILE_HEIGHT = 8;
+    int TILE_WIDTH  = 8;
+    int TILE_HEIGHT = 8;
 
     virtual ~ParallelLocalCanvas2D() = default;
     virtual std::unique_ptr<ParallelLocalCanvas2D> clone() const = 0;
@@ -120,4 +120,5 @@ namespace mln
   };
 
   void parallel_execute_local2D(ParallelLocalCanvas2D& canvas);
+  void sequential_execute_local2D(ParallelLocalCanvas2D& canvas);
 } // namespace mln

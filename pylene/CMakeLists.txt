@@ -67,6 +67,7 @@ target_sources(Pylene PRIVATE
                src/io/imprint.cpp
                src/io/imread.cpp
                src/io/io.cpp
+               src/morpho/block_running_max.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp

@@ -153,6 +153,14 @@ namespace mln
       }
     }
 
+    /// \brief Transpose the box (inplace)
+    constexpr void transpose() noexcept requires (Impl::ndim == 2)
+      {
+        std::swap(this->__begin(0), this->__begin(1));
+        std::swap(this->__end(0), this->__end(1));
+      }
+
+
     /// \brief Returns the bottom-right (past-the-end) corner point
     using Impl::br;
 
@@ -711,6 +719,14 @@ namespace mln
     if (empty)
       this->_zeros();
   }
+
+  // template <class Impl>
+  // constexpr void _box<Impl>::transpose() noexcept requires (Impl::dim == 2)
+  // {
+  //   std::swap(this->__begin(0), this->__begin(1));
+  //   std::swap(this->__end(0), this->__end(1));
+  // }
+
 
   template <class Impl>
   constexpr int _box<Impl>::size(int k) const noexcept

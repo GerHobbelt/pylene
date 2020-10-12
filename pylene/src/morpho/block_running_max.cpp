@@ -10,7 +10,7 @@ namespace mln::morpho::details
     bool use_extension = true;
 
     //
-    std::size_t kBlockLineByteSize = e_size * block_width;
+    std::ptrdiff_t kBlockLineByteSize = e_size * block_width;
     std::byte* g0 = (std::byte*)std::malloc(kBlockLineByteSize * (height + 2 * k));
     std::byte* h0 = (std::byte*)std::malloc(kBlockLineByteSize * (height + 2 * k));
     std::byte* g = g0 + k * kBlockLineByteSize;

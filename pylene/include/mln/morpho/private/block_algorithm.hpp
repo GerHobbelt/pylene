@@ -19,7 +19,7 @@ namespace mln::morpho::details
 
   // Apply the partial sum algorithm column-wise on a block
   template <int BLOCK_WIDTH, class T, class BinaryFunction>
-  void block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction sup);
+  void block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero);
 
 
   // Apply the partial sum algorithm column-wise on a block
@@ -58,33 +58,29 @@ namespace mln::morpho::details
   template <int BLOCK_WIDTH, class T, class BinaryFunction>
   [[gnu::noinline]] void block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height,
                                            std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride,
-                                           BinaryFunction sup)
+                                           BinaryFunction sup, T zero)
   {
     using simd_t = xsimd::simd_type<T>;
 
 
-    constexpr std::size_t WARP_SIZE     = simd_t::size;
-    constexpr int         WARP_PER_LINE = BLOCK_WIDTH / WARP_SIZE;
-    const int             K             = width / WARP_SIZE;
-    const int             rem           = width % WARP_SIZE;
+    constexpr std::size_t WARP_SIZE         = simd_t::size;
+    constexpr int         WARP_PER_LINE     = (BLOCK_WIDTH + (WARP_SIZE - 1)) / WARP_SIZE;
+    const int             K                 = width / WARP_SIZE;
+    const int             rem               = width % WARP_SIZE;
 
     assert(width <= BLOCK_WIDTH);
-    std::memcpy(out, in, sizeof(T) * width);
-
     {
       simd_t xsum[WARP_PER_LINE];
-      T      xsum_s[WARP_SIZE];
 
-      for (int k = 0; k < K; k++)
-        xsimd::load_unaligned((T*)in + k * WARP_SIZE, xsum[k]);
-      for (int k = 0; k < rem; ++k)
-        xsum_s[k] = in[K * WARP_SIZE + k];
+      for (int k = 0; k < WARP_PER_LINE; k++)
+        xsum[k] = simd_t{zero};
 
-      // Next lines
-      for (int y = 1; y < height; ++y)
+
+      for (int y = 0; y < height; ++y)
       {
         const T* in_lineptr  = ptr_offset(in, y * in_byte_stride);
         T*       out_lineptr = ptr_offset(out, y * out_byte_stride);
+
 
         for (int k = 0; k < K; k++)
         {
@@ -100,8 +96,8 @@ namespace mln::morpho::details
         // The last columns
         for (int k = 0; k < rem; ++k)
         {
-          xsum_s[k]       = sup(in_lineptr[k], xsum_s[k]);
-          out_lineptr[+k] = xsum_s[k];
+          xsum[WARP_PER_LINE - 1][k] = sup(in_lineptr[k], xsum[WARP_PER_LINE-1][k]);
+          out_lineptr[k] = xsum[WARP_PER_LINE-1][k];
         }
       }
     }

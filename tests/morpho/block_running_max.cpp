@@ -114,7 +114,7 @@ public:
 
     std::vector<int> out(total_size);
     sup_t sup = {m_sup, m_sup_vec};
-    mln::morpho::details::block_running_max<128>(f.data() + radius * stride, width, height, stride * sizeof(int), radius, sup);
+    mln::morpho::details::block_running_max<128>(f.data() + radius * stride, width, height, stride * sizeof(int), radius, sup, m_zero);
 
 
     // compare_span2d(gref.data(), g.data(), width, height + 2 * radius);

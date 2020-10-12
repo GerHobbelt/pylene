@@ -5,7 +5,7 @@
 namespace mln::morpho::details
 {
 
-  void block_running_max_algo_base::run(int block_width, int e_size, std::byte* in, int width, int height, std::ptrdiff_t byte_stride, int k, void* sup)
+  void block_running_max_algo_base::run(int block_width, int e_size, std::byte* in, int width, int height, std::ptrdiff_t byte_stride, int k, void* sup, void* zero)
   {
     bool use_extension = true;
 
@@ -29,13 +29,13 @@ namespace mln::morpho::details
         // Compute g[x] = Max f(y), y ∈ [α * ⌊x / α⌋ : x]
         this->partial_sum(in + chunk_start * byte_stride,    //
                            g + chunk_start * kBlockLineByteSize, //
-                           width, chunk_size, byte_stride, kBlockLineByteSize, sup);
+                          width, chunk_size, byte_stride, kBlockLineByteSize, sup, zero);
 
         // Backward pass
         // Compute h[x] = Max f(y) y ∈ [x : α * (⌊x/α⌋+1))
         this->partial_sum(in + (chunk_start + chunk_size - 1) * byte_stride,    //
                            h + (chunk_start + chunk_size - 1) * kBlockLineByteSize, //
-                           width, chunk_size, -byte_stride, -kBlockLineByteSize, sup);
+                          width, chunk_size, -byte_stride, -kBlockLineByteSize, sup, zero);
       }
     }
 

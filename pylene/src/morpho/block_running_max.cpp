@@ -1,18 +1,20 @@
 #include <mln/morpho/private/block_running_max.hpp>
 
+#include <memory>
+
 namespace mln::morpho::details
 {
 
-  void block_running_max_algo_base::run(int block_width, int e_size, const std::byte* in, std::byte* out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride, int k, void* sup)
+  void block_running_max_algo_base::run(int block_width, int e_size, std::byte* in, int width, int height, std::ptrdiff_t byte_stride, int k, void* sup)
   {
     bool use_extension = true;
 
     //
-    std::size_t kBlockLineByteSize = e_size * kBlockWidth;
-    std::byte* g = (std::byte*)std::malloc(kBlockByteSize * (height + 2 * k));
-    std::byte* h = (std::byte*)std::malloc(kBlockByteSize * (height + 2 * k));
-    std::byte* g_shifted = g + k * kBlockLineByteSize;
-    std::byte* h_shifted = h + k * kBlockLineByteSize;
+    std::size_t kBlockLineByteSize = e_size * block_width;
+    std::byte* g0 = (std::byte*)std::malloc(kBlockLineByteSize * (height + 2 * k));
+    std::byte* h0 = (std::byte*)std::malloc(kBlockLineByteSize * (height + 2 * k));
+    std::byte* g = g0 + k * kBlockLineByteSize;
+    std::byte* h = h0 + k * kBlockLineByteSize;
 
     const int alpha = 2 * k + 1;
     {
@@ -25,22 +27,24 @@ namespace mln::morpho::details
 
         // Forward pass
         // Compute g[x] = Max f(y), y ∈ [α * ⌊x / α⌋ : x]
-        this->partial_sum_block2d(in + chunk_start * in_byte_stride, //
-                                  g + chunk_start * kBlockLineByteSize,   //
-                                  width, chunk_size, in_byte_stride, kBlockLineByteSize, sup);
+        this->partial_sum(in + chunk_start * byte_stride,    //
+                           g + chunk_start * kBlockLineByteSize, //
+                           width, chunk_size, byte_stride, kBlockLineByteSize, sup);
 
         // Backward pass
         // Compute h[x] = Max f(y) y ∈ [x : α * (⌊x/α⌋+1))
-        this->partial_sum_block2d(in + (chunk_start + chunk_size - 1) * in_byte_stride, //
-                                  h + (chunk_start + chunk_size - 1) * kBlockLineByteSize,   //
-                                  width, chunk_size, -in_byte_stride, -kBlockLineByteSize, sup);
+        this->partial_sum(in + (chunk_start + chunk_size - 1) * byte_stride,    //
+                           h + (chunk_start + chunk_size - 1) * kBlockLineByteSize, //
+                           width, chunk_size, -byte_stride, -kBlockLineByteSize, sup);
       }
     }
 
     // Compute local maximum out[x] = Max f(y) y ∈ [x-k:x+k]
     // out[x] = Max   (Max f[x-k:b),  Max f[b:x+k]) with b = α.⌈(x-k)/α⌉ = α.⌊(x+k)/α⌋
     //        = Max( h[x-k], g[x+k] )
-    this->transform(g, h, out, width, height, kBlockLineByteSize, kBlockLineByteSize, out_byte_stride, sup);
+    this->transform(g + k * kBlockLineByteSize, h - k * kBlockLineByteSize, in, width, height, kBlockLineByteSize, kBlockLineByteSize, byte_stride, sup);
+    std::free(g0);
+    std::free(h0);
   }
 
 }

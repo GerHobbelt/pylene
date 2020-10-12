@@ -4,6 +4,7 @@
 #include <mln/core/utils/ptroffset.hpp>
 
 #include <cstddef>
+#include <cassert>
 #include <algorithm>
 
 

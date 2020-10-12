@@ -185,7 +185,7 @@ TEST_P(RunningMin2D, check)
 
 
 
-INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMax2D,
+INSTANTIATE_TEST_SUITE_P(se_leq_size, RunningMax2D,
                         ::testing::Values(std::make_tuple(0, 0),    // Identity
                                           std::make_tuple(12, 0),   // Identity
                                           std::make_tuple(12, 1),   // radius = 1
@@ -196,9 +196,9 @@ INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMax2D,
                                           std::make_tuple(14, 3),   // radius = 3
                                           std::make_tuple(13, 6))); // n == k
 
-INSTANTIATE_TEST_CASE_P(se_ge_size_, RunningMax2D, ::testing::Values(std::make_tuple(12, 6)));
+INSTANTIATE_TEST_SUITE_P(se_ge_size_, RunningMax2D, ::testing::Values(std::make_tuple(12, 6)));
 
-INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMin2D,
+INSTANTIATE_TEST_SUITE_P(se_leq_size, RunningMin2D,
                         ::testing::Values(std::make_tuple(0, 0),    // Identity
                                           std::make_tuple(12, 0),   // Identity
                                           std::make_tuple(12, 1),   // radius = 1
@@ -209,5 +209,5 @@ INSTANTIATE_TEST_CASE_P(se_leq_size, RunningMin2D,
                                           std::make_tuple(14, 3),   // radius = 3
                                           std::make_tuple(13, 6))); // n == k
 
-INSTANTIATE_TEST_CASE_P(se_ge_size_, RunningMin2D, ::testing::Values(std::make_tuple(12, 6)));
+INSTANTIATE_TEST_SUITE_P(se_ge_size_, RunningMin2D, ::testing::Values(std::make_tuple(12, 6)));
 

@@ -4,10 +4,14 @@
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/algorithm/iota.hpp>
 
+#include <mln/core/image/view/adaptor.hpp>
+#include <mln/core/range/view/transform.hpp>
+
 #include <fmt/core.h>
 #include <gtest/gtest.h>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
+
 
 struct rgb_t
 {
@@ -134,6 +138,7 @@ INSTANTIATE_TEST_SUITE_P(bla, Padding2DTestRGB, testing::ValuesIn(paddings));
 template <class T>
 class CopyPadding2DTest : public testing::TestWithParam<mln::e_padding_mode>
 {
+protected:
   mln::image2d<T> input = {
     {  1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15}, //
     { 16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30}, //
@@ -462,3 +467,96 @@ TEST_P(CopyPadding3DTestRGB, OutsideGeneric) { this->test_outside_region(true); 
 INSTANTIATE_TEST_SUITE_P(bla, CopyPadding3DTestInt, testing::ValuesIn(paddings));
 INSTANTIATE_TEST_SUITE_P(bla, CopyPadding3DTestRGB, testing::ValuesIn(paddings));
 
+
+
+template <class I>
+class ImageT : public mln::image_adaptor<I>, public mln::details::Image<ImageT<I>>
+{
+public:
+  ImageT(I ima)
+    : mln::image_adaptor<I>{ima}
+  {
+  }
+
+  mln::box2d domain() const
+  {
+    auto d = this->base().domain();
+    return {d.y(), d.x(), d.height(), d.width()};
+  }
+
+
+  auto values()
+  {
+    return mln::ranges::view::transform(domain(), [this](mln::point2d p) { return this->at(p); });
+  }
+  auto pixels()
+  {
+    return mln::ranges::view::transform(domain(), [this](mln::point2d p) { return this->pixel_at(p); });
+  }
+
+  auto operator()(mln::point2d p) { return this->base()({p.y(), p.x()}); }
+  auto at(mln::point2d p) { return this->base().at({p.y(), p.x()}); }
+  auto pixel(mln::point2d p) { return this->base().pixel({p.y(), p.x()}); }
+  auto pixel_at(mln::point2d p) { return this->base().pixel_at({p.y(), p.x()}); }
+};
+
+
+template <class T>
+class TransposePadding2DTest : public CopyPadding2DTest<T>
+{
+
+  static constexpr int  w = 13;
+  static constexpr int  h = 7;
+
+public:
+  void run_test(mln::box2d roi, const mln::image2d<T> refs[])
+  {
+    auto bm = this->GetParam();
+    T    v  = 69;
+
+    mln::box2d roi_t = roi;
+    roi_t.transpose();
+
+    mln::image2d<T> out(roi_t);
+    transpose_pad(this->input, out, bm, v);
+    //check_padding(this->input, out, bm, v);
+    if (refs != nullptr)
+    {
+      ASSERT_IMAGES_EQ_EXP(out, ImageT{refs[bm]});
+    }
+  }
+
+
+  void test_copy_upper_left()
+  {
+    mln::box2d roi(-3, -2, w, h);
+    run_test(roi, this->r0_refs);
+  }
+
+  void test_copy_lower_right()
+  {
+    mln::box2d roi(12, 7, w, h);
+    run_test(roi, this->r1_refs);
+  }
+
+  void test_outside_region()
+  {
+    mln::box2d roi(-30, -30, w, h);
+    run_test(roi, nullptr);
+  }
+};
+
+
+using TransposePadding2DTestInt = TransposePadding2DTest<int>;
+using TransposePadding2DTestRGB = TransposePadding2DTest<rgb_t>;
+
+TEST_P(TransposePadding2DTestInt, UpperLeft) {this->test_copy_upper_left();}
+TEST_P(TransposePadding2DTestInt, LowerRight) {this->test_copy_lower_right();}
+TEST_P(TransposePadding2DTestInt, Outside) {this->test_outside_region();}
+TEST_P(TransposePadding2DTestRGB, UpperLeft) {this->test_copy_upper_left();}
+TEST_P(TransposePadding2DTestRGB, LowerRight) {this->test_copy_lower_right();}
+TEST_P(TransposePadding2DTestRGB, Outside) {this->test_outside_region();}
+
+
+INSTANTIATE_TEST_SUITE_P(bla, TransposePadding2DTestInt, testing::ValuesIn(paddings));
+INSTANTIATE_TEST_SUITE_P(bla, TransposePadding2DTestRGB, testing::ValuesIn(paddings));

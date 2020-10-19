@@ -75,6 +75,7 @@ target_sources(Pylene PRIVATE
                src/morpho/immersion.cpp
                src/morpho/maxtree.cpp
                src/morpho/unionfind.cpp
+               src/morpho/filters2d.cpp
                )
 
 # Compiler configurations

@@ -2,6 +2,7 @@
 
 
 #include <mln/core/utils/ptroffset.hpp>
+#include <mln/core/box.hpp>
 
 #include <cstddef>
 #include <cassert>
@@ -11,22 +12,37 @@
 #include <range/v3/functional/concepts.hpp>
 #include <xsimd/xsimd.hpp>
 
+
+
+
 ///
 /// Algorithms that process a block column-wise with simd acceleration when possible
 
 namespace mln::morpho::details
 {
+  constexpr int MAX_BLOCK_WIDTH = 128;
 
   // Apply the partial sum algorithm column-wise on a block
-  template <int BLOCK_WIDTH, class T, class BinaryFunction>
-  void block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero);
+  template <class T, class BinaryFunction>
+  void block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero) noexcept;
 
 
   // Apply the partial sum algorithm column-wise on a block
-  template <int BLOCK_WIDTH, class T, class BinaryFunction>
-  void block_transform(const T* __restrict a, const T* __restrict b,  T* __restrict out, int width, int height, std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction op);
+  template <class T, class BinaryFunction>
+  void block_transform(const T* __restrict a, const T* __restrict b,  T* __restrict out, int width, int height, std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction op) noexcept;
 
 
+  // Transpose a square block inplace
+  template <class T>
+  void block_transpose(T* in, int width, std::ptrdiff_t byte_stride) noexcept;
+
+  // Transpose a block
+  // Input is supposed to be located at (0,0)
+  // Coordinate of the output roi are relative to (0,0)
+  // Equivalent to:
+  // out(p - roi.tl()) = in({p.y, p.x})
+  template <class T>
+  void block_transpose(const T* in, T* out, mln::box2d roi, std::ptrdiff_t byte_stride) noexcept;
 
 
   /******************************************/
@@ -35,8 +51,10 @@ namespace mln::morpho::details
 
 
   template <class T, class BinaryFunction>
-  [[gnu::noinline]]
-  void block_partial_sum_generic(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride, BinaryFunction sup)
+  [[gnu::noinline]] //
+  void
+  block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride,
+                    std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero) noexcept
   {
     static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
 
@@ -55,22 +73,23 @@ namespace mln::morpho::details
   }
 
 
-  template <int BLOCK_WIDTH, class T, class BinaryFunction>
-  [[gnu::noinline]] void block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height,
-                                           std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride,
-                                           BinaryFunction sup, T zero)
+  template <::concepts::integral T, class BinaryFunction>
+  [[gnu::noinline]] //
+  void
+  block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride,
+                    std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero) noexcept
   {
     using simd_t = xsimd::simd_type<T>;
+    static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
+    static_assert(::ranges::cpp20::invocable<BinaryFunction, simd_t, simd_t>);
 
+    constexpr std::size_t WARP_SIZE     = simd_t::size;
+    const int             WARP_PER_LINE = (width + (WARP_SIZE - 1)) / WARP_SIZE;
+    const int             K             = width / WARP_SIZE;
+    const int             rem           = width % WARP_SIZE;
 
-    constexpr std::size_t WARP_SIZE         = simd_t::size;
-    constexpr int         WARP_PER_LINE     = (BLOCK_WIDTH + (WARP_SIZE - 1)) / WARP_SIZE;
-    const int             K                 = width / WARP_SIZE;
-    const int             rem               = width % WARP_SIZE;
-
-    assert(width <= BLOCK_WIDTH);
     {
-      simd_t xsum[WARP_PER_LINE];
+      simd_t* xsum = (simd_t*) std::malloc(WARP_PER_LINE * WARP_SIZE * sizeof(T));
 
       for (int k = 0; k < WARP_PER_LINE; k++)
         xsum[k] = simd_t{zero};
@@ -100,16 +119,22 @@ namespace mln::morpho::details
           out_lineptr[k] = xsum[WARP_PER_LINE-1][k];
         }
       }
+      std::free(xsum);
     }
   }
+
+  
+  /******************************************/
+  /****         Block transform          ****/
+  /******************************************/
 
 
   template <class T, class BinaryFunction>
   [[gnu::noinline]] //
   void
-  block_transform_generic(const T* __restrict a, const T* __restrict b, T* __restrict out, int width, int height,
-                          std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride, std::ptrdiff_t out_byte_stride,
-                          BinaryFunction op)
+  block_transform(const T* __restrict a, const T* __restrict b, T* __restrict out, int width, int height,
+                  std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride, std::ptrdiff_t out_byte_stride,
+                  BinaryFunction op) noexcept
   {
     static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
     for (int y = 0; y < height; ++y)
@@ -122,17 +147,18 @@ namespace mln::morpho::details
   }
 
 
-  template <int BLOCK_WIDTH, class T, class BinaryFunction>
-  [[gnu::noinline]] void block_transform(const T* __restrict a, const T* __restrict b, T* __restrict out, int width,
-                                         int height, std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride,
-                                         std::ptrdiff_t out_byte_stride, BinaryFunction op)
+      // Simd version
+  template <::concepts::integral T, class BinaryFunction>
+  [[gnu::noinline]] //
+  void
+  block_transform(const T* __restrict a, const T* __restrict b, T* __restrict out, int width, int height,
+                  std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride, std::ptrdiff_t out_byte_stride,
+                  BinaryFunction op) noexcept
   {
     using simd_t = xsimd::simd_type<T>;
     static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
     static_assert(::ranges::cpp20::invocable<BinaryFunction, simd_t, simd_t>);
 
-
-    assert(width < BLOCK_WIDTH);
 
     constexpr std::size_t WARP_SIZE = simd_t::size;
     const int             K         = width / WARP_SIZE;
@@ -157,5 +183,35 @@ namespace mln::morpho::details
         out_lineptr[k] = op(a_lineptr[k], b_lineptr[k]);
     }
   }
+
+
+  // Transpose a square block inplace
+  template <class T>
+  [[gnu::noinline]]
+  void block_transpose(T* in, int width, std::ptrdiff_t byte_stride) noexcept
+  {
+    for (int y = 0; y < width; ++y)
+    {
+      T* lineptr = ptr_offset(in, y * byte_stride);
+      T* colptr  = in + y;
+      for (int x = y + 1; x < width; ++x)
+        *ptr_offset(colptr, x * byte_stride) = lineptr[x];
+    }
+  }
+
+  template <class T>
+  [[gnu::noinline]]
+  void block_transpose(const T* in, T* out, mln::box2d roi, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
+  {
+    for (int y = 0; y < roi.height(); ++y)
+    {
+      T* lineptr = ptr_offset(out, y * out_byte_stride);
+      const T* colptr  = in + roi.y() + y;
+      for (int x = 0; x < roi.width(); ++x)
+        lineptr[x] = *ptr_offset(colptr, (roi.x() + x) * in_byte_stride);
+    }
+  }
+
+
 
 } // namespace mln::morpho::details

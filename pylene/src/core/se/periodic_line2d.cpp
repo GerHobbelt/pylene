@@ -58,4 +58,16 @@ namespace mln::se
     return roi;
   }
 
+  bool periodic_line2d::is_horizontal() const noexcept
+  {
+    return (m_delta.y() == 0 && std::abs(m_delta.x()) == 1);
+  }
+
+
+  bool periodic_line2d::is_vertical() const noexcept
+  {
+    return (m_delta.x() == 0 && std::abs(m_delta.y()) == 1);
+  }
+
+
 } // namespace mln::se

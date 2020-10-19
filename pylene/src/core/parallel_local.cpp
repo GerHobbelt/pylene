@@ -3,7 +3,7 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
-//#include <fmt/core.h>
+#include <fmt/core.h>
 //#include <mln/io/imprint.hpp>
 
 namespace mln
@@ -11,7 +11,7 @@ namespace mln
   class ParallelLocalCanvas2DImpl
   {
   public:
-    ParallelLocalCanvas2DImpl(ParallelLocalCanvas2D* delegate)
+    ParallelLocalCanvas2DImpl(ParallelLocalCanvas2DBase* delegate)
     {
       m_delegate = delegate->clone();
     }
@@ -21,14 +21,10 @@ namespace mln
       m_delegate = other.m_delegate->clone();
     }
 
-
-    mln::box2d GetOutputRegion() const;
     void operator()(const tbb::blocked_range2d<int>&) const;
 
-    ParallelLocalCanvas2D* delegate() const { return m_delegate.get(); }
-
   private:
-    std::unique_ptr<ParallelLocalCanvas2D> m_delegate = nullptr;
+    std::unique_ptr<ParallelLocalCanvas2DBase> m_delegate = nullptr;
   };
 
   void ParallelLocalCanvas2DImpl::operator()(const tbb::blocked_range2d<int>& tile) const
@@ -38,14 +34,12 @@ namespace mln
     int y = tile.rows().begin();
     int h = tile.rows().end() - tile.rows().begin();
 
-    mln::box2d domain(x, y, w, h);
-    m_delegate->ExecuteTile(domain);
+    mln::box2d roi(x, y, w, h);
+
+    fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
+    m_delegate->ExecuteTile(roi);
   }
 
-  mln::box2d ParallelLocalCanvas2DImpl::GetOutputRegion() const
-  {
-    return m_delegate->GetOutputRegion();
-  }
 
   /*
   ** Caller for the TBB parallel_for
@@ -53,25 +47,20 @@ namespace mln
   ** and each algorithm can take input image(s) as well as an output image, hence the variadInputImage
   ** We create a wrapper class to circumvent TBB not allowing abstract classes as parallel_for body
   */
-  void parallel_execute_local2D(ParallelLocalCanvas2D& canvas)
+  void ParallelLocalCanvas2DBase::execute_parallel(mln::box2d roi, int tile_width, int tile_height)
   {
-    ParallelLocalCanvas2DImpl wrapper(&canvas);
-    mln::box2d domain = wrapper.GetOutputRegion();
+    ParallelLocalCanvas2DImpl wrapper(this);
 
-    tbb::blocked_range2d<int> rng(domain.y(), domain.y() + domain.height(), wrapper.delegate()->TILE_HEIGHT, //
-                                  domain.x(), domain.x() + domain.width(), wrapper.delegate()->TILE_WIDTH);
+    tbb::blocked_range2d<int> rng(roi.y(), roi.y() + roi.height(), tile_height, //
+                                  roi.x(), roi.x() + roi.width(), tile_width);
     tbb::parallel_for(rng, wrapper, tbb::simple_partitioner());
   }
 
 
-  void sequential_execute_local2D(ParallelLocalCanvas2D& canvas)
+  void ParallelLocalCanvas2DBase::execute_sequential(mln::box2d roi, int tile_width, int tile_height)
   {
-    ParallelLocalCanvas2DImpl wrapper(&canvas);
-    mln::box2d roi = wrapper.GetOutputRegion();
     const int x1 = roi.br().x();
     const int y1 = roi.br().y();
-    const int tile_width = canvas.TILE_WIDTH;
-    const int tile_height = canvas.TILE_HEIGHT;
 
     //fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
 
@@ -80,8 +69,17 @@ namespace mln
       {
         int w = std::min(tile_width, x1 - x);
         int h = std::min(tile_height, y1 - y);
-        canvas.ExecuteTile({x, y, w, h});
+        this->ExecuteTile({x, y, w, h});
       }
+  }
+
+  void ParallelLocalCanvas2DBase::execute(mln::box2d roi, int tile_width, int tile_height)
+  {
+    bool parallel = true;
+    if (parallel)
+      this->execute_parallel(roi, tile_width, tile_height);
+    else
+      this->execute_sequential(roi, tile_width, tile_height);
   }
 
 

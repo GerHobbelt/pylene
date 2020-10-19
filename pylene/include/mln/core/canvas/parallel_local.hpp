@@ -10,6 +10,7 @@ namespace mln
 {
   namespace details
   {
+    /*
     template <class I, class T>
     [[gnu::noinline]] void copy_block(I& in, mln::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
     {
@@ -37,6 +38,7 @@ namespace mln
           out.at({x0 + x, y0 + y}) = lineptr[x];
       }
     }
+    */
 /*
     template <class I, class T>
     [[gnu::noinline]] void transpose_block2D(I& in, mln::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
@@ -85,40 +87,60 @@ namespace mln
   class TileLoaderBase
   {
   public:
-    virtual void                load_tile(mln::box2d roi, mln::box2d input_roi) const = 0;
-    virtual mln::ndbuffer_image get_tile() const                                      = 0;
+    virtual void                            load_tile(mln::box2d roi, mln::box2d input_roi) const = 0;
+    virtual mln::ndbuffer_image             get_tile() const                                      = 0;
+    virtual std::unique_ptr<TileLoaderBase> clone() const                                         = 0;
   };
 
   class TileWriterBase
   {
   public:
+    // Commit to memory (maybe write a temp buffer to memory)
     virtual void                write_tile(mln::box2d roi) const = 0;
+
+    // Return the output buffer (maybe a temporary buffer)
     virtual mln::ndbuffer_image get_tile(mln::box2d roi) const   = 0;
   };
 
 
-  class ParallelLocalCanvas2D
+  class ParallelLocalCanvas2DBase
   {
   public:
-    int TILE_WIDTH  = 8;
-    int TILE_HEIGHT = 8;
+    virtual ~ParallelLocalCanvas2DBase() = default;
+
+    virtual std::unique_ptr<ParallelLocalCanvas2DBase> clone() const = 0;
+
+  private:
+    // Execute the tile
+    virtual void ExecuteTile(mln::box2d out_roi) const = 0;
+
+
+  public:
+    // Execute
+    void execute_parallel(mln::box2d roi, int tile_width, int tile_height);
+    void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
+    void execute(mln::box2d roi, int tile_width, int tile_height);
+  };
+
+
+  class ParallelLocalCanvas2D : public ParallelLocalCanvas2DBase
+  {
+  public:
+    int TILE_WIDTH  = 128;
+    int TILE_HEIGHT = 128;
 
     virtual ~ParallelLocalCanvas2D() = default;
-    virtual std::unique_ptr<ParallelLocalCanvas2D> clone() const = 0;
 
-    // Compute the input region required to compute the given output region
-    virtual mln::box2d              ComputeInputRegion(mln::box2d out_roi) const noexcept = 0;
+
     virtual const TileLoaderBase*   GetTileLoader() const noexcept                = 0;
     virtual const TileWriterBase*   GetTileWriter() const noexcept                = 0;
     virtual const TileExecutorBase* GetTileExecutor() const noexcept              = 0;
 
-    // The whole output roi we want to compute
-    virtual mln::box2d GetOutputRegion() const = 0;
+    // Compute the input region required to compute the given output region
+    virtual mln::box2d ComputeInputRegion(mln::box2d out_roi) const noexcept = 0;
+
 
     // Execute to compute this output roi
     virtual void       ExecuteTile(mln::box2d out_roi) const final;
   };
-
-  void parallel_execute_local2D(ParallelLocalCanvas2D& canvas);
-  void sequential_execute_local2D(ParallelLocalCanvas2D& canvas);
 } // namespace mln

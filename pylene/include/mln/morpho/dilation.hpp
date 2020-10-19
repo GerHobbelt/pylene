@@ -5,7 +5,6 @@
 #include <mln/accu/accumulators/infsup.hpp>
 #include <mln/core/algorithm/paste.hpp>
 #include <mln/core/algorithm/fill.hpp>
-#include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
@@ -16,6 +15,7 @@
 #include <mln/core/value/value_traits.hpp>
 
 #include <mln/morpho/private/localmax.hpp>
+#include <mln/morpho/private/dilation.2d.hpp>
 
 namespace mln::morpho
 {
@@ -44,12 +44,25 @@ namespace mln::morpho
 
   namespace details
   {
+
+    template <class V>
+    struct dilation_sup_t
+    {
+      constexpr auto operator()(V a, V b) const { return sup(a, b); }
+
+      template <std::size_t N>
+      constexpr auto operator()(xsimd::batch<V, N> a, xsimd::batch<V, N> b) const
+      {
+        return xsimd::max(a, b);
+      }
+    };
+
+
     template <class V>
     struct dilation_value_set_base
     {
-      static inline constexpr auto _sup = [](V a, V b) { return sup(a, b); };
-      static inline constexpr auto sup  = _sup;
-      static inline constexpr auto zero = mln::value_traits<V>::inf();
+      static inline constexpr dilation_sup_t<V> sup  = {};
+      static inline constexpr auto  zero = mln::value_traits<V>::inf();
     };
 
 
@@ -123,212 +136,20 @@ namespace mln::morpho
   {
 
 
-    template <class InputImage>
-    class TileLoader_Dilation : public TileLoaderBase
-    {
-    public:
-
-      /// \param width the extended width of the tile
-      /// \param width the extended height of the tile
-      TileLoader_Dilation(InputImage input, int width, int height)
-        : _in{input}
-        , m_tile{width, height}
-      {
-      }
-
-      TileLoader_Dilation(const TileLoader_Dilation& other)
-        : _in{other._in}
-        , m_tile{other.m_tile.width(), other.m_tile.height()}
-      {
-      }
-
-      TileLoader_Dilation& operator=(const TileLoader_Dilation&) = delete;
-
-      /// \param roi The tile region
-      /// \param input_roi The extended roi required to compute the tile region
-      void load_tile(mln::box2d, mln::box2d input_roi) const final
-      {
-        assert(m_tile.width() >= input_roi.width() && "Tile width mismatches");
-        assert(m_tile.height() >= input_roi.height() && "Tile height mismatches");
-
-        m_tile.set_domain_topleft(input_roi.tl());
-        assert(m_tile.domain().includes(input_roi));
-        assert(m_tile.domain().tl() == input_roi.tl());
-
-        image_value_t<InputImage> padding_value = 0;
-        auto padding_method = mln::PAD_ZERO;
-        auto dst = m_tile.clip(input_roi);
-        copy_pad(_in, dst, padding_method, padding_value);
-
-        //mln::io::imprint(m_tile);
-      }
-
-      mln::ndbuffer_image get_tile() const final
-      {
-        return m_tile;
-      }
-
-    private:
-      InputImage _in;
-      mutable mln::image2d<image_value_t<InputImage>> m_tile;
-    };
-
-    template <class V, class SE>
-    class TileExecutor_Dilation : public TileExecutorBase
-    {
-    public:
-      TileExecutor_Dilation(const SE& se)
-        : _se{se}
-      {
-      }
-
-      void execute(mln::ndbuffer_image in, mln::ndbuffer_image out) const final
-      {
-        assert(in.domain().includes(out.domain()));
-
-        auto in_image2d  = *(in.cast_to<V, 2>());
-        auto out_image2d = *(out.cast_to<V, 2>());
-        auto vs          = mln::morpho::details::dilation_value_set<V>();
-        auto roi         = out_image2d.domain();
-
-
-        if (std::is_same_v<SE, mln::se::periodic_line2d>)
-        {
-          mln::morpho::details::impl::localmax(in_image2d, out_image2d, vs, _se, roi);
-        }
-        else
-        {
-          // Note: the roi is not considered by the generic version of accumulate, we need to fix that later
-          auto tmp = in_image2d.clip(roi);
-          mln::morpho::details::impl::localmax(tmp, out_image2d, vs, _se, roi);
-        }
-      }
-
-    private:
-      const SE&         _se;
-    };
-
-    template <class OutputImage>
-    class TileWriter_Dilation : public TileWriterBase
-    {
-    public:
-      TileWriter_Dilation(OutputImage out)
-        : _out{out}
-      {
-      }
-
-      void write_tile(mln::box2d roi) const final { (void)roi; }
-
-      mln::ndbuffer_image get_tile(mln::box2d roi) const final { return _out.clip(roi); }
-
-    private:
-      OutputImage _out;
-    };
-
-
-    template <class InputImage, class SE, class OutputImage>
-    struct DilationParallel : ParallelLocalCanvas2D
-    {
-      static_assert(std::is_same_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
-
-    private:
-      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d roi, mln::box2d tile_dims)
-        : m_se{se}
-        , m_output_roi{roi}
-        , m_tile_l{in, tile_dims.width(), tile_dims.height()}
-        , m_tile_w{out}
-        , m_tile_e{se}
-      {}
-
-    public:
-      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d roi)
-        : DilationParallel(in, out, se, roi, se.compute_input_region({TILE_WIDTH, TILE_HEIGHT}))
-      {
-      }
-
-      DilationParallel(InputImage& in, OutputImage& out, SE& se, mln::box2d roi, int tile_width, int tile_height)
-        : DilationParallel(in, out, se, roi, se.compute_input_region({tile_width, tile_height}))
-      {
-        ParallelLocalCanvas2D::TILE_WIDTH  = tile_width;
-        ParallelLocalCanvas2D::TILE_HEIGHT = tile_height;
-      }
-
-      std::unique_ptr<ParallelLocalCanvas2D> clone()  const final { return std::make_unique<DilationParallel>(*this); }
-      mln::box2d GetOutputRegion() const noexcept final { return m_output_roi; }
-      mln::box2d ComputeInputRegion(mln::box2d roi) const noexcept final { return m_se.compute_input_region(roi); }
-
-      const TileLoaderBase*   GetTileLoader() const noexcept   final { return &m_tile_l; };
-      const TileWriterBase*   GetTileWriter() const noexcept   final { return &m_tile_w; };
-      const TileExecutorBase* GetTileExecutor() const noexcept final { return &m_tile_e; };
-
-    private:
-      using tile_loader_t   = TileLoader_Dilation<InputImage>;
-      using tile_executor_t = TileExecutor_Dilation<image_value_t<InputImage>, SE>;
-      using tile_writer_t   = TileWriter_Dilation<OutputImage>;
-
-      SE               m_se;
-      mln::box2d       m_output_roi;
-      tile_loader_t    m_tile_l;
-      tile_writer_t    m_tile_w;
-      tile_executor_t  m_tile_e;
-    };
-
-
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out, int tile_width, int tile_height)
     {
-      auto output_roi = out.domain();
-      if (se.is_decomposable())
-      {
-        auto input_roi    = se.compute_input_region(output_roi);
-        image_concrete_t<std::remove_reference_t<InputImage>> tmp_1;
-        image_concrete_t<std::remove_reference_t<InputImage>> tmp_2;
+      using I = std::remove_reference_t<InputImage>;
+      using VS = morpho::details::dilation_value_set<image_value_t<I>>;
 
-        auto ses = se.decompose();
-        assert(ses.size() > 1);
-
-        tmp_1.resize(input_roi);
-
-        if (ses.size() > 2)
-          tmp_2.resize(input_roi);
-
-        // First dilation
-        {
-          auto&&           se         = ses[0];
-          auto             output_roi = se.compute_output_region(input_roi);
-          DilationParallel caller(image, tmp_1, se, output_roi, tile_width, tile_height);
-          sequential_execute_local2D(caller);
-          input_roi = output_roi;
-        }
-
-        // Intermediate dilation
-        for (std::size_t i = 1; i < ses.size() - 1; ++i)
-        {
-          auto&&           se         = ses[i];
-          auto             output_roi = se.compute_output_region(input_roi);
-          DilationParallel caller(tmp_1, tmp_2, se, output_roi, tile_width, tile_height);
-          sequential_execute_local2D(caller);
-          input_roi = output_roi;
-          std::swap(tmp_1, tmp_2);
-        }
-        // Last dilation
-        {
-          auto&&           se         = ses.back();
-          auto             output_roi = se.compute_output_region(input_roi);
-          DilationParallel caller(tmp_1, out, se, output_roi, tile_width, tile_height);
-          sequential_execute_local2D(caller);
-        }
-
-      }
-      else
-      {
-        DilationParallel caller(image, out, se, output_roi, tile_width, tile_height);
-        sequential_execute_local2D(caller);
-      }
+      VS vs;
+      morpho::details::dilation2d(std::forward<InputImage>(image), std::forward<OutputImage>(out), se, vs, tile_width,
+                                  tile_height);
     }
 
     template <class InputImage, class SE>
-    image_concrete_t<std::remove_reference_t<InputImage>> dilation(InputImage&& image, const SE& se, int tile_width , int tile_height)
+    image_concrete_t<std::remove_reference_t<InputImage>> //
+    dilation(InputImage&& image, const SE& se, int tile_width, int tile_height)
     {
       using I = std::remove_reference_t<InputImage>;
 

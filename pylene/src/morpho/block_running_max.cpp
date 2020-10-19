@@ -5,12 +5,12 @@
 namespace mln::morpho::details
 {
 
-  void block_running_max_algo_base::run(int block_width, int e_size, std::byte* in, int width, int height, std::ptrdiff_t byte_stride, int k, void* sup, void* zero)
+  void block_running_max_algo_base::run(int e_size, std::byte* in, int width, int height, std::ptrdiff_t byte_stride, int k, void* sup, void* zero)
   {
     bool use_extension = true;
 
     //
-    std::ptrdiff_t kBlockLineByteSize = e_size * block_width;
+    std::ptrdiff_t kBlockLineByteSize = e_size * width;
     std::byte* g0 = (std::byte*)std::malloc(kBlockLineByteSize * (height + 2 * k));
     std::byte* h0 = (std::byte*)std::malloc(kBlockLineByteSize * (height + 2 * k));
     std::byte* g = g0 + k * kBlockLineByteSize;

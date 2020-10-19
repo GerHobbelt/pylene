@@ -210,8 +210,8 @@ TEST(Dilation, Unregular_domain)
   ASSERT_TRUE(mln::all_of(out >= ima)); // extensive
 }
 
-
-/* Not available (need projector / value_set)
+/*
+// Not available (need projector / value_set)
 
 // Custom comparison function, erosion
 TEST(Dilation, Custom_cmp_function)
@@ -225,7 +225,6 @@ TEST(Dilation, Custom_cmp_function)
   auto            out = morpho::structural::dilate(ima, win, std::greater<uint8>());
   ASSERT_TRUE(all_of(out <= ima)); // anti-extensive
 }
-
 */
 
 // Dilation of a binary image
@@ -464,7 +463,7 @@ INSTANTIATE_TEST_SUITE_P(Morpho, DilationTestSuite, testing::ValuesIn(test_suite
 
 
 
-
+/*
 TEST(Dilation, view_as_parallel_argument)
 {
   auto _ = tbb::task_scheduler_init();
@@ -481,3 +480,4 @@ TEST(Dilation, view_as_parallel_argument)
 }
 
 
+*/

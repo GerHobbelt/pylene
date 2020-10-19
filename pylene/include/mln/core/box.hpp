@@ -81,22 +81,13 @@ namespace mln
     constexpr bool empty() const noexcept;
 
     /// \brief Returns the width of the box
-    constexpr int width() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 1)
-    {
-      return size(0);
-    }
+    constexpr int width() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 1) { return size(0); }
 
     /// \brief Returns the height of the box
-    constexpr int height() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2)
-    {
-      return size(1);
-    }
+    constexpr int height() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2) { return size(1); }
 
     /// \brief Returns the depth of the box
-    constexpr int depth() const noexcept requires (Impl::ndim == -1 || Impl::ndim >= 3)
-    {
-      return size(2);
-    }
+    constexpr int depth() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 3) { return size(2); }
 
     using typename Impl::cursor;
     using typename Impl::backward_cursor;
@@ -126,16 +117,13 @@ namespace mln
     constexpr int x() const noexcept { return this->__begin(0); }
 
     /// \brief Returns the y coordinate of the top-left corner point
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 2>>
-    constexpr int y() const noexcept { return this->__begin(1); }
+    constexpr int y() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 2) { return this->__begin(1); }
 
     /// \brief Returns the z coordinate of the top-left corner point
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 3>>
-    constexpr int z() const noexcept { return this->__begin(2); }
+    constexpr int z() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 3) { return this->__begin(2); }
 
     /// \brief Returns the w coordinate of the top-left corner point
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 4>>
-    constexpr int w() const noexcept { return this->__begin(3); }
+    constexpr int w() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 4) { return this->__begin(3); }
 
 
     /// \brief Returns the k-th coordinate of the top-left corner point
@@ -153,12 +141,23 @@ namespace mln
       }
     }
 
+    constexpr auto shifted(point_type diff) const noexcept
+    {
+      auto tmp = *this;
+      tmp.shift(diff);
+      return tmp;
+    }
+
+
     /// \brief Transpose the box (inplace)
-    constexpr void transpose() noexcept requires (Impl::ndim == 2)
-      {
-        std::swap(this->__begin(0), this->__begin(1));
-        std::swap(this->__end(0), this->__end(1));
-      }
+    constexpr void transpose() noexcept requires(Impl::ndim == 2)
+    {
+      std::swap(this->__begin(0), this->__begin(1));
+      std::swap(this->__end(0), this->__end(1));
+    }
+
+    /// \brief Return the box transposed.
+    constexpr auto transposed() const noexcept requires(Impl::ndim == 2) { return mln::box2d{y(), x(), width(), height()}; }
 
 
     /// \brief Returns the bottom-right (past-the-end) corner point

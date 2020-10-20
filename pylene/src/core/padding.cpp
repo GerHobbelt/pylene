@@ -396,7 +396,7 @@ namespace mln::impl
       case mln::PAD_ZERO:
       case mln::PAD_CONSTANT:
       default:
-        md_memset(vs, dim - 1, dst + (z - a) * dst_pitch, sizes, dst_strides, value);
+        md_memset(vs, dim - 1, dst + (z - a) * dst_pitch, roi, dst_strides, value);
         continue;
       }
       copy_pad(vs, dim - 1, dst + (z - a) * dst_pitch, src + q * src_pitch, roi, sizes, dst_strides, src_strides,

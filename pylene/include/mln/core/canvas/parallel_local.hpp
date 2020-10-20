@@ -120,7 +120,7 @@ namespace mln
     // Execute
     void execute_parallel(mln::box2d roi, int tile_width, int tile_height);
     void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
-    void execute(mln::box2d roi, int tile_width, int tile_height);
+    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
   };
 
 

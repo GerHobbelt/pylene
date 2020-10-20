@@ -1,10 +1,12 @@
 #pragma once
 
 #include <mln/core/point.hpp>
+#include <mln/core/box.hpp>
 #include <mln/core/se/private/se_facade.hpp>
 #include <mln/core/private/weighted_point.hpp>
 
 #include <range/v3/view/span.hpp>
+
 
 #include <initializer_list>
 #include <vector>
@@ -38,6 +40,14 @@ namespace mln::se
 
     /// \brief Returns the radial extent of the mask
     int radial_extent() const { return m_radial_extent; }
+
+
+    /// \brief Return the input region of th roi
+    mln::box2d compute_input_region(mln::box2d roi) const noexcept;
+
+        /// \brief Return the input region of th roi
+    mln::box2d compute_output_region(mln::box2d roi) const noexcept;
+
 
   private:
     std::vector<mln::point2d> m_points;

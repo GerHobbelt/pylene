@@ -17,7 +17,12 @@ namespace mln::morpho::details
   // Generic 2D dilation for any se (will not perform a decomposition test)
   // Will fallback to the local accumulation canvas
   template <class I, class J, class SE, class ValueSet>
-  void dilation2d(I& input, J& output, const SE& se, ValueSet& vs);
+  void dilation2d(I& input, J& out, const SE& se, ValueSet& vs, int tile_width, int tile_height, bool parallel);
+
+  template <class I, class J, class SE, class ValueSet>
+  void dilation2d(I& input, J& out, const SE& se, ValueSet& vs, int tile_width, int tile_height, bool parallel, e_padding_mode padding_mode, image_value_t<I> padding_value);
+
+
 
 
   /******************************************/
@@ -200,44 +205,57 @@ namespace mln::morpho::details
   };
 
 
-    template <class I, class J, class SE, class ValueSet>
-    void dilation2d(I& input, J& out, const SE& se, ValueSet& vs, int tile_width, int tile_height)
+  template <class I, class J, class SE, class ValueSet>
+  void dilation2d(I& input, J& out, const SE& se, ValueSet& vs, int tile_width, int tile_height, bool parallel, e_padding_mode padding_mode, image_value_t<I> padding_value)
+  {
+    using V = image_value_t<I>;
+
+    // DilationParallel alg{input, out, se, vs, out.domain(), tile_width, tile_height};
+
+
+    mln::details::DirectTileLoader2D<I, V> loader = {input, padding_mode, padding_value};
+    mln::details::DirectTileWriter2D<J, V> writer = {out};
+
+    mln::box2d tile_roi(tile_width, tile_height);
+    tile_roi = se.compute_input_region(tile_roi);
+
+    FilterChain chain = FilterChain::MakeChain<V>(tile_roi.width(), tile_roi.height());
+
+
+    chain.SetLoadFunction(std::cref(loader));
+    chain.SetWriteFunction(std::cref(writer));
+
+    bool decompose = false;
+    if constexpr (SE::decomposable::value)
     {
-      using V = image_value_t<I>;
-
-      //DilationParallel alg{input, out, se, vs, out.domain(), tile_width, tile_height};
-
-
-      mln::details::DirectTileLoader2D<I, V> loader = {input, mln::PAD_CONSTANT, vs.zero};
-      mln::details::DirectTileWriter2D<J, V> writer = {out};
-
-      mln::box2d tile_roi(tile_width, tile_height);
-      tile_roi = se.compute_input_region(tile_roi);
-
-      FilterChain chain = FilterChain::MakeChain<V>(tile_roi.width(), tile_roi.height());
-
-
-      chain.SetLoadFunction(std::cref(loader));
-      chain.SetWriteFunction(std::cref(writer));
-
-      if (se.is_decomposable())
+      decompose = se.is_decomposable();
+      if (decompose)
       {
         auto roi = se.compute_input_region(tile_roi);
-        auto ses       = se.decompose();
+        auto ses = se.decompose();
 
         for (auto se : ses)
         {
           chain.addFilter(
-            std::make_unique<SimpleDilation2D<V, decltype(se), ValueSet>>(se, &vs, roi.width(), roi.height()));
+              std::make_unique<SimpleDilation2D<V, decltype(se), ValueSet>>(se, &vs, roi.width(), roi.height()));
           roi = se.compute_output_region(roi);
         }
       }
-      else
-      {
-        chain.addFilter(
-          std::make_unique<SimpleDilation2D<V, SE, ValueSet>>(se, &vs, tile_roi.width(), tile_roi.height()));
-      }
-
-      chain.execute(out.domain(), tile_width, tile_height);
     }
+    if (!decompose)
+    {
+      chain.addFilter(
+          std::make_unique<SimpleDilation2D<V, SE, ValueSet>>(se, &vs, tile_roi.width(), tile_roi.height()));
+    }
+
+    chain.execute(out.domain(), tile_width, tile_height, parallel);
   }
+
+
+  template <class I, class J, class SE, class ValueSet>
+  void dilation2d(I& input, J& out, const SE& se, ValueSet& vs, int tile_width, int tile_height, bool parallel)
+  {
+    dilation2d(input, out, se, vs, tile_width, tile_height, parallel, mln::PAD_CONSTANT, vs.zero);
+  }
+
+} // namespace mln::morpho::details

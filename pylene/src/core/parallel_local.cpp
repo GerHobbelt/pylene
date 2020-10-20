@@ -3,8 +3,6 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
-#include <fmt/core.h>
-//#include <mln/io/imprint.hpp>
 
 namespace mln
 {
@@ -36,7 +34,6 @@ namespace mln
 
     mln::box2d roi(x, y, w, h);
 
-    //fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
     m_delegate->ExecuteTile(roi);
   }
 
@@ -72,9 +69,8 @@ namespace mln
       }
   }
 
-  void ParallelLocalCanvas2DBase::execute(mln::box2d roi, int tile_width, int tile_height)
+  void ParallelLocalCanvas2DBase::execute(mln::box2d roi, int tile_width, int tile_height, bool parallel)
   {
-    bool parallel = true;
     if (parallel)
       this->execute_parallel(roi, tile_width, tile_height);
     else
@@ -85,8 +81,6 @@ namespace mln
   void ParallelLocalCanvas2D::ExecuteTile(mln::box2d roi) const
   {
     mln::box2d input_roi = this->ComputeInputRegion(roi);
-    //fmt::print("Loading tile=(x={},y={},w={},h={})\n", input_roi.x(), input_roi.y(), input_roi.width(), input_roi.height());
-    //fmt::print("Writing tile=(x={},y={},w={},h={})\n", roi.x(), roi.y(), roi.width(), roi.height());
 
 
     auto m_tile_l = this->GetTileLoader();

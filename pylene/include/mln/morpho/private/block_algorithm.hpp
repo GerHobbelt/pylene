@@ -80,8 +80,10 @@ namespace mln::morpho::details
   block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride,
                     std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero) noexcept
   {
-    using simd_t = xsimd::simd_type<T>;
-    static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
+    // For bool, consider the corresponding uint8_t type
+    using U = std::conditional_t<std::is_same_v<T, bool>, std::uint8_t, T>;
+    using simd_t = xsimd::simd_type<U>;
+    static_assert(::ranges::cpp20::invocable<BinaryFunction, U, U>);
     static_assert(::ranges::cpp20::invocable<BinaryFunction, simd_t, simd_t>);
 
     constexpr std::size_t WARP_SIZE     = simd_t::size;
@@ -90,7 +92,7 @@ namespace mln::morpho::details
     const int             rem           = width % WARP_SIZE;
 
     {
-      simd_t* xsum = (simd_t*) std::malloc(WARP_PER_LINE * WARP_SIZE * sizeof(T));
+      simd_t* xsum = (simd_t*) std::aligned_alloc(alignof(simd_t), WARP_PER_LINE * WARP_SIZE * sizeof(T));
 
       for (int k = 0; k < WARP_PER_LINE; k++)
         xsum[k] = simd_t{zero};
@@ -98,8 +100,8 @@ namespace mln::morpho::details
 
       for (int y = 0; y < height; ++y)
       {
-        const T* in_lineptr  = ptr_offset(in, y * in_byte_stride);
-        T*       out_lineptr = ptr_offset(out, y * out_byte_stride);
+        const U* in_lineptr  = (const U*)ptr_offset(in, y * in_byte_stride);
+        U*       out_lineptr = (U*)ptr_offset(out, y * out_byte_stride);
 
 
         for (int k = 0; k < K; k++)
@@ -156,7 +158,9 @@ namespace mln::morpho::details
                   std::ptrdiff_t a_byte_stride, std::ptrdiff_t b_byte_stride, std::ptrdiff_t out_byte_stride,
                   BinaryFunction op) noexcept
   {
-    using simd_t = xsimd::simd_type<T>;
+    // For bool, consider the corresponding uint8_t type
+    using U = std::conditional_t<std::is_same_v<T, bool>, std::uint8_t, T>;
+    using simd_t = xsimd::simd_type<U>;
     static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
     static_assert(::ranges::cpp20::invocable<BinaryFunction, simd_t, simd_t>);
 
@@ -167,9 +171,9 @@ namespace mln::morpho::details
 
     for (int y = 0; y < height; ++y)
     {
-      const T* a_lineptr   = ptr_offset(a, y * a_byte_stride);
-      const T* b_lineptr   = ptr_offset(b, y * b_byte_stride);
-      T*       out_lineptr = ptr_offset(out, y * out_byte_stride);
+      const U* a_lineptr   = (const U*)ptr_offset(a, y * a_byte_stride);
+      const U* b_lineptr   = (const U*)ptr_offset(b, y * b_byte_stride);
+      U*       out_lineptr = (U*)ptr_offset(out, y * out_byte_stride);
 
       for (int k = 0; k < K; k++)
       {

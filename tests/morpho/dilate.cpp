@@ -49,8 +49,7 @@ void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
 
   // Run algo
   auto line = mln::se::periodic_line2d(dp, k);
-  auto sup  = [](auto x, auto y) { return std::max(x, y); };
-  mln::morpho::details::dilation_by_periodic_line(input, input, line, sup, input.domain());
+  mln::morpho::dilation(input, line, input);
   ASSERT_IMAGES_EQ_EXP(ref, input);
 }
 
@@ -83,43 +82,6 @@ TEST(Dilation, PeriodicLine2d_vertical_knightmove)
 
 
 
-
-TEST(Dilation, Rectangle2d)
-{
-  mln::image_build_params params;
-  params.init_value = uint8_t(0);
-
-  mln::image2d<uint8_t> input(21, 21, params);
-  input({10, 10}) = 1;
-
-  const mln::image2d<uint8_t> ref = {
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}  //
-  };
-
-  auto output = mln::morpho::dilation(input, mln::se::rect2d(19, 15));
-  ASSERT_IMAGES_EQ_EXP(ref, output);
-}
-
 TEST(Dilation, Rectangle2d_with_side_effects)
 {
   mln::image_build_params params;
@@ -142,7 +104,10 @@ TEST(Dilation, Rectangle2d_with_side_effects)
     {2, 2, 0, 0, 0, 2, 2}, //
   };
 
-  auto output = mln::morpho::dilation(input, mln::se::rect2d(5, 5), mln::extension::bm::user{});
+  mln::image2d<uint8_t> output(7, 7);
+  input.inflate_domain_to_extension();
+
+  mln::morpho::dilation(input, mln::se::rect2d(5, 5), mln::extension::bm::user{}, output);
   ASSERT_IMAGES_EQ_EXP(ref, output);
 }
 

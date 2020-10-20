@@ -6,7 +6,7 @@ namespace mln::morpho::details
 
   void FilterChain::ExecuteTile(mln::box2d roi) const
   {
-    mln::box2d roi_ = roi;
+    [[maybe_unused]] mln::box2d roi_ = roi;
 
     roi = this->ComputeInputRegion(roi);
 
@@ -27,7 +27,6 @@ namespace mln::morpho::details
     }
 
     assert(roi == roi_);
-    //fmt::print("Write: x={} y={} w={} h={}\n", roi.x(), roi.y(), roi.width(), roi.height());
     write_tile(aux.clip(roi));
   }
 
@@ -45,28 +44,6 @@ namespace mln::morpho::details
   }
 
 
-
-  /*
-  void FilterChainCanvas::Execute() const final
-  {
-    AuxTileLoader2D load;
-
-
-    mln::ndbuffer_image aux = m_aux;
-    mln::ndbuffer_image out = m_out;
-
-    if ((m_filters.size() % 2) == 1)
-      std::swap(m_aux, m_out);
-
-    mln::box2d roi = this->GetInputRegion();
-    for (auto f : m_filters)
-    {
-      roi = f.ComputeOutputRegion(roi);
-      f(aux, out.clip(roi));
-      std::swap(aux, out);
-    }
-  }
-  */
 
   std::unique_ptr<ParallelLocalCanvas2DBase> FilterChain::clone() const
   {

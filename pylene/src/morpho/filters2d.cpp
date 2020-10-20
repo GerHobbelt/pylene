@@ -1,20 +1,23 @@
 #include <mln/morpho/private/dilation.2d.hpp>
-
-
+//#include <fmt/core.h>
 
 namespace mln::morpho::details
 {
 
   void FilterChain::ExecuteTile(mln::box2d roi) const
   {
-    roi = this->ComputeInputRegion(roi);
-    m_tile_in.set_domain_topleft(roi.tl());
-    m_tile_out.set_domain_topleft(roi.tl());
-    load_tile(m_tile_in.clip(roi));
+    mln::box2d roi_ = roi;
 
+    roi = this->ComputeInputRegion(roi);
 
     mln::ndbuffer_image aux = m_tile_in;
     mln::ndbuffer_image out = m_tile_out;
+
+    aux.set_domain_topleft(roi.tl());
+    out.set_domain_topleft(roi.tl());
+    load_tile(aux.clip(roi));
+
+
 
     for (auto& f : this->m_filters)
     {
@@ -23,6 +26,8 @@ namespace mln::morpho::details
       std::swap(aux, out);
     }
 
+    assert(roi == roi_);
+    //fmt::print("Write: x={} y={} w={} h={}\n", roi.x(), roi.y(), roi.width(), roi.height());
     write_tile(aux.clip(roi));
   }
 
@@ -32,7 +37,6 @@ namespace mln::morpho::details
   void FilterChain::SetWriteFunction(std::function<void(mln::ndbuffer_image&&)> fn) { write_tile = std::move(fn); }
 
 
-  
   mln::box2d FilterChain::ComputeInputRegion(mln::box2d roi) const
   {
     for (auto f = m_filters.rbegin(); f != m_filters.rend(); ++f)
@@ -66,10 +70,10 @@ namespace mln::morpho::details
 
   std::unique_ptr<ParallelLocalCanvas2DBase> FilterChain::clone() const
   {
-    auto c           = std::make_unique<FilterChain>();
-    c->load_tile     = this->load_tile;
-    c->write_tile    = this->write_tile;
-    c->create_tile   = this->create_tile;
+    std::unique_ptr<FilterChain> c(new FilterChain());
+    c->load_tile                   = this->load_tile;
+    c->write_tile                  = this->write_tile;
+    c->create_tile                 = this->create_tile;
 
     int w = this->m_tile_in.width();
     int h = this->m_tile_in.height();

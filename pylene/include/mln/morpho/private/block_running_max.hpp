@@ -8,7 +8,9 @@
 namespace mln::morpho::details
 {
 
-  // Apply the dilation column wise
+  /// Apply the dilation column wise
+  ///
+  /// \param in Input image. Must be valid for lines [-k:h+k] of width \p width
   template <class T, class BinaryFunction>
   void block_running_max(T* in, int width, int height, std::ptrdiff_t byte_stride, int k, BinaryFunction sup, T zero);
 

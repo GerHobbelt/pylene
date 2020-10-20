@@ -36,7 +36,7 @@ namespace mln
 
     mln::box2d roi(x, y, w, h);
 
-    fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
+    //fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
     m_delegate->ExecuteTile(roi);
   }
 
@@ -62,7 +62,6 @@ namespace mln
     const int x1 = roi.br().x();
     const int y1 = roi.br().y();
 
-    //fmt::print("== Processing region=(x={},y={},w={},h={})==\n", roi.x(), roi.y(), roi.width(), roi.height());
 
     for (int y = roi.y(); y < y1; y += tile_height)
       for (int x = roi.x(); x < x1; x += tile_width)

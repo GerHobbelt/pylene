@@ -66,20 +66,15 @@ namespace mln::details
   template <class InputImage, typename V>
   struct DirectTileLoader2D
   {
-    void operator()(mln::ndbuffer_image& out_) const
-    {
-      auto& out = out_.__cast<V, 2>();
-      copy_pad(*m_in, out, m_padding_mode, m_padding_value);
-    }
 
     void operator()(mln::ndbuffer_image&& out_) const
     {
       auto& out = out_.__cast<V, 2>();
-      copy_pad(*m_in, out, m_padding_mode, m_padding_value);
+      copy_pad(m_in, out, m_padding_mode, m_padding_value);
     }
 
 
-    InputImage*             m_in;
+    InputImage              m_in;
     e_padding_mode          m_padding_mode;
     V                       m_padding_value;
 
@@ -88,20 +83,14 @@ namespace mln::details
   template <class OutputImage, typename V>
   struct DirectTileWriter2D
   {
-    void operator()(mln::ndbuffer_image& in_) const
-    {
-      auto& in  = in_.__cast<V, 2>();
-      mln::paste(in, in.domain(), *m_out);
-    }
 
     void operator()(mln::ndbuffer_image&& in_) const
     {
       auto& in  = in_.__cast<V, 2>();
-      mln::paste(in, in.domain(), *m_out);
+      mln::paste(in, in.domain(), m_out);
     }
 
-
-    OutputImage* m_out;
+    OutputImage m_out;
   };
 
 

@@ -42,7 +42,8 @@ namespace mln::morpho::details
   // Equivalent to:
   // out(p - roi.tl()) = in({p.y, p.x})
   template <class T>
-  void block_transpose(const T* in, T* out, mln::box2d roi, std::ptrdiff_t byte_stride) noexcept;
+  void block_transpose(const T* in, T* out, int width, int height, std::ptrdiff_t in_byte_stride,
+                       std::ptrdiff_t out_byte_stride) noexcept;
 
 
   /******************************************/
@@ -54,7 +55,7 @@ namespace mln::morpho::details
   [[gnu::noinline]] //
   void
   block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride,
-                    std::ptrdiff_t out_byte_stride, BinaryFunction sup, T zero) noexcept
+                    std::ptrdiff_t out_byte_stride, BinaryFunction sup, T /*zero*/) noexcept
   {
     static_assert(::ranges::cpp20::invocable<BinaryFunction, T, T>);
 
@@ -201,14 +202,14 @@ namespace mln::morpho::details
 
   template <class T>
   [[gnu::noinline]]
-  void block_transpose(const T* in, T* out, mln::box2d roi, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
+  void block_transpose(const T* in, T* out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
   {
-    for (int y = 0; y < roi.height(); ++y)
+    for (int y = 0; y < height; ++y)
     {
-      T* lineptr = ptr_offset(out, y * out_byte_stride);
-      const T* colptr  = in + roi.y() + y;
-      for (int x = 0; x < roi.width(); ++x)
-        lineptr[x] = *ptr_offset(colptr, (roi.x() + x) * in_byte_stride);
+      T*       lineptr = ptr_offset(out, y * out_byte_stride);
+      const T* colptr  = in + y;
+      for (int x = 0; x < width; ++x)
+        lineptr[x] = *ptr_offset(colptr, x * in_byte_stride);
     }
   }
 

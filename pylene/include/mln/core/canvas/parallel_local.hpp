@@ -108,9 +108,10 @@ namespace mln
   public:
     virtual ~ParallelLocalCanvas2DBase() = default;
 
+    // Dynamic copy
     virtual std::unique_ptr<ParallelLocalCanvas2DBase> clone() const = 0;
 
-  private:
+  public:
     // Execute the tile
     virtual void ExecuteTile(mln::box2d out_roi) const = 0;
 

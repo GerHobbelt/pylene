@@ -4,14 +4,14 @@ Writing algorithms
 Non-generic implementation
 **************************
 
-Even if Pylene have algorithms written in a generic way as much as possible, you do **not** have to write generic
-algorithms yourself if do not need so (nevertheless, we will see that it is not that difficult to do so).
+Even if Pylene has algorithms written in a generic way as much as possible, you do **not** have to write generic
+algorithms yourself if it is unnecessary (nevertheless, we will see that it is not that difficult to do so).
 
 Working on 2D/3D images
 -----------------------
 
-You can always use the two/three nested loop to iterate over all positions in the domain. You can access the value
-of an :cpp:any:`mln::ndimage` at a given position `p=(x,y)` ou `p=(x,y,z)` with ``ima({x,y})`` or ``ima({x,y,z})``.
+You can always use two/three nested loops to iterate over all positions in the domain. You can access the value
+of an :cpp:any:`mln::ndimage` at a given position `p=(x,y)` or `p=(x,y,z)` with ``ima({x,y})`` or ``ima({x,y,z})``.
 
 
 ::
@@ -63,7 +63,7 @@ pixels. For example, in 2D, you may want to use 4-connectivity or 8-connectivity
 
 
 :ref:doc:`Neighborhoods and structuring elements </core/neighborhood>` are range generators. The expression `nbh(x)`
-generates a set of points from an anchor (a point) `x`. The following snippet visit all :ref:doc:`4-connected
+generates a set of points from an anchor (a point) `x`. The following snippet visits all :ref:doc:`4-connected
 </core/neighborhood/c4>` neighbors of all points of an image::
 
   for (int y = 0; y < roi.height(); ++y)
@@ -173,10 +173,7 @@ A simple but not optimal generic implementation of a dilation would look like::
   }
 
 
+Writing parallel algorithms
+---------------------------
 
-
-
-
-
-
-
+See :ref:doc:`Writing parallel algorithms </tutorial/parallel_algorithms>`

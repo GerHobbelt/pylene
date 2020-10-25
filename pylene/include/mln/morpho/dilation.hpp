@@ -146,7 +146,7 @@ namespace mln::morpho
 
       /// \param roi The tile region
       /// \param input_roi The extended roi required to compute the tile region
-      void load_tile(mln::box2d, mln::box2d input_roi) const final
+      void load_tile(mln::box2d input_roi) const final
       {
         assert(m_tile.width() >= input_roi.width() && "Tile width mismatches");
         assert(m_tile.height() >= input_roi.height() && "Tile height mismatches");

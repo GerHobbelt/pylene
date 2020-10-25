@@ -96,7 +96,7 @@ namespace mln
     auto m_tile_w = this->GetTileWriter();
     auto m_tile_e = this->GetTileExecutor();
 
-    m_tile_l->load_tile(roi, input_roi);
+    m_tile_l->load_tile(input_roi);
     m_tile_e->execute(m_tile_l->get_tile(), m_tile_w->get_tile(roi));
     m_tile_w->write_tile(roi);
   }

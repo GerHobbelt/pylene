@@ -85,7 +85,7 @@ namespace mln
   class TileLoaderBase
   {
   public:
-    virtual void                load_tile(mln::box2d roi, mln::box2d input_roi) const = 0;
+    virtual void                load_tile(mln::box2d input_roi) const = 0;
     virtual mln::ndbuffer_image get_tile() const                                      = 0;
   };
 

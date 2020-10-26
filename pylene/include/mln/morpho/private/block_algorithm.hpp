@@ -92,7 +92,7 @@ namespace mln::morpho::details
     const int             rem           = width % WARP_SIZE;
 
     {
-      simd_t* xsum = (simd_t*) std::aligned_alloc(alignof(simd_t), WARP_PER_LINE * WARP_SIZE * sizeof(T));
+      simd_t* xsum = new simd_t[WARP_PER_LINE];
 
       for (int k = 0; k < WARP_PER_LINE; k++)
         xsum[k] = simd_t{zero};
@@ -122,11 +122,11 @@ namespace mln::morpho::details
           out_lineptr[k] = xsum[WARP_PER_LINE-1][k];
         }
       }
-      std::free(xsum);
+      delete [] (xsum);
     }
   }
 
-  
+
   /******************************************/
   /****         Block transform          ****/
   /******************************************/

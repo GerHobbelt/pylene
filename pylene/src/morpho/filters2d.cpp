@@ -1,5 +1,4 @@
 #include <mln/morpho/private/dilation.2d.hpp>
-//#include <fmt/core.h>
 
 namespace mln::morpho::details
 {
@@ -48,15 +47,15 @@ namespace mln::morpho::details
   std::unique_ptr<ParallelLocalCanvas2DBase> FilterChain::clone() const
   {
     std::unique_ptr<FilterChain> c(new FilterChain());
-    c->load_tile                   = this->load_tile;
-    c->write_tile                  = this->write_tile;
-    c->create_tile                 = this->create_tile;
+    c->load_tile   = this->load_tile;
+    c->write_tile  = this->write_tile;
+    c->create_tile = this->create_tile;
 
     int w = this->m_tile_in.width();
     int h = this->m_tile_in.height();
 
-    this->create_tile(c->m_tile_in, w, h);
-    this->create_tile(c->m_tile_out, w, h);
+    c->m_tile_in  = this->create_tile(w, h);
+    c->m_tile_out = this->create_tile(w, h);
 
     c->m_filters.resize(this->m_filters.size());
     std::transform(this->m_filters.begin(), this->m_filters.end(), c->m_filters.begin(),

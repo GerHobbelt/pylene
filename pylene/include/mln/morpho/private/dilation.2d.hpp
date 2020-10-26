@@ -169,7 +169,7 @@ namespace mln::morpho::details
 
     std::function<void(mln::ndbuffer_image&&)>             load_tile;
     std::function<void(mln::ndbuffer_image&&)>             write_tile;
-    std::function<void(mln::ndbuffer_image&, int, int)>  create_tile;
+    std::function<mln::ndbuffer_image(int, int)>           create_tile;
 
   private:
     FilterChain() = default;
@@ -182,7 +182,7 @@ namespace mln::morpho::details
       FilterChain c;
       c.m_tile_in   = mln::image2d<T>(tile_width, tile_height);
       c.m_tile_out  = mln::image2d<T>(tile_width, tile_height);
-      c.create_tile = [](mln::ndbuffer_image& in, int width, int height) { in = mln::image2d<T>(width, height); };
+      c.create_tile = [](int width, int height) -> mln::ndbuffer_image { return mln::image2d<T>(width, height); };
       return c;
     }
 
@@ -204,6 +204,35 @@ namespace mln::morpho::details
     std::unique_ptr<ParallelLocalCanvas2DBase>       clone() const final;
   };
 
+  template <class InputImage, typename V>
+  struct DirectTileLoader2D
+  {
+
+    void operator()(mln::ndbuffer_image&& out_) const
+    {
+      auto& out = out_.__cast<V, 2>();
+      copy_pad(m_in, out, m_padding_mode, m_padding_value);
+    }
+
+
+    InputImage     m_in;
+    e_padding_mode m_padding_mode;
+    V              m_padding_value;
+  };
+
+  template <class OutputImage, typename V>
+  struct DirectTileWriter2D
+  {
+
+    void operator()(mln::ndbuffer_image&& in_) const
+    {
+      auto& in  = in_.__cast<V, 2>();
+      mln::paste(in, in.domain(), m_out);
+    }
+
+    OutputImage m_out;
+  };
+
 
   template <class I, class J, class SE, class ValueSet>
   void dilation2d(I& input, J& out, const SE& se, ValueSet& vs, int tile_width, int tile_height, bool parallel, e_padding_mode padding_mode, image_value_t<I> padding_value)
@@ -213,8 +242,8 @@ namespace mln::morpho::details
     // DilationParallel alg{input, out, se, vs, out.domain(), tile_width, tile_height};
 
 
-    mln::details::DirectTileLoader2D<I, V> loader = {input, padding_mode, padding_value};
-    mln::details::DirectTileWriter2D<J, V> writer = {out};
+    DirectTileLoader2D<I, V> loader = {input, padding_mode, padding_value};
+    DirectTileWriter2D<J, V> writer = {out};
 
     mln::box2d tile_roi(tile_width, tile_height);
     tile_roi = se.compute_input_region(tile_roi);

@@ -190,7 +190,7 @@ namespace mln::morpho::details
   }
 
 
-  // Transpose a square block inplace
+  // Transpose a square block inplace (generic version)
   template <class T>
   [[gnu::noinline]]
   void block_transpose(T* in, int width, std::ptrdiff_t byte_stride) noexcept
@@ -204,9 +204,31 @@ namespace mln::morpho::details
     }
   }
 
+
+  // SIMD version of transposition
+  #if XSIMD_INSTR_SET
+
+  // Transpose inplace of a 4x4 matrix of DWORD data
+  [[gnu::noinline]]
+  void block_transpose_4x4(const std::byte* __restrict in, std::byte* __restrict out, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
+  {
+    xsimd::simd<int32_t, 4> rows[4];
+    rows[0].load_unaligned((int32_t*)(in + 0 * in_byte_stride));
+    rows[1].load_unaligned((int32_t*)(in + 1 * in_byte_stride));
+    rows[2].load_unaligned((int32_t*)(in + 2 * in_byte_stride));
+    rows[3].load_unaligned((int32_t*)(in + 3 * in_byte_stride));
+
+    _MM_TRANSPOSE4_PS(rows[0], rows[1], rows[2], rows[3]);
+
+    rows[0].store_unaligned((int32_t*)(out + 0 * out_byte_stride));
+    rows[1].store_unaligned((int32_t*)(out + 1 * out_byte_stride));
+    rows[2].store_unaligned((int32_t*)(out + 2 * out_byte_stride));
+    rows[3].store_unaligned((int32_t*)(out + 3 * out_byte_stride));
+  }
+
   template <class T>
   [[gnu::noinline]]
-  void block_transpose(const T* in, T* out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
+  void block_transpose_generic(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
   {
     for (int y = 0; y < height; ++y)
     {
@@ -215,6 +237,51 @@ namespace mln::morpho::details
       for (int x = 0; x < width; ++x)
         lineptr[x] = *ptr_offset(colptr, x * in_byte_stride);
     }
+
+  }
+
+
+  template <::concepts::integral T>
+  [[gnu::noinline]]
+  void block_transpose(const T* in, T* out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
+  {
+    constexpr int block_size = 128 / sizeof(T);
+
+    int yrem = height;
+
+
+    for (int y = 0; yrem >= block_size; y += block_size, yrem -= block_size)
+    {
+      int xrem = width;
+      for (int x = 0; xrem >= block_size; x += block_size, xrem -= block_size)
+      {
+        const T* iBlock = ptroffset(in, x * in_byte_stride) + y;
+        T* oBlock = ptroffset(out, y * out_byte_stride) + x;
+        block_transpose_4x4((const std::byte*) iBlock, (const std::byte*) oBlock, in_byte_stride, out_byte_stride);
+      }
+
+      if (xrem >= 0)
+      {
+        const T* iBlock = ptroffset(in, x * in_byte_stride) + y;
+        T*       oBlock = ptroffset(out, y * out_byte_stride) + x;
+        block_transpose_generic(iBlock, oBlock, xrem, block_size, in_byte_stride, out_byte_stride);
+      }
+    }
+    if (yrem >= 0)
+    {
+      const T* iBlock = ptroffset(in, x * in_byte_stride) + y;
+      T*       oBlock = ptroffset(out, y * out_byte_stride) + x;
+      block_transpose_generic(iBlock, oBlock, width, yrem, in_byte_stride, out_byte_stride);
+    }
+  }
+
+  #endif
+
+
+  template <class T>
+  void block_transpose(const T* in, T* out, int width, int height, std::ptrdiff_t in_byte_stride, std::ptrdiff_t out_byte_stride) noexcept
+  {
+    block_transpose_generic(in, out, width, height, in_byte_stride, out_byte_stride);
   }
 
 

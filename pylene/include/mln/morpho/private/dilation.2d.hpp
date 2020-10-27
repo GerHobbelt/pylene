@@ -3,8 +3,7 @@
 #include <mln/core/canvas/parallel_local.hpp>
 #include <mln/core/algorithm/paste.hpp>
 
-#include <mln/core/canvas/private/loader2d.hpp>
-
+#include <mln/core/extension/padding.hpp>
 #include <mln/morpho/private/block_algorithm.hpp>
 #include <mln/morpho/private/block_running_max.hpp>
 #include <mln/morpho/private/localmax.hpp>

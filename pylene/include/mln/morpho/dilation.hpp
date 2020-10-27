@@ -342,6 +342,15 @@ namespace mln::morpho
     {
       return dilation(image, se, 8, 8);
     }
+
+    template <class InputImage, class SE, class OutputImage>
+    std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
+    dilation(InputImage&& image, const SE& se, OutputImage&& out)
+  //template <class InputImage, class SE, class OutputImage>
+  //dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out)
+    {
+      dilation(image, se, out, 8, 8);
+    }
   } // namespace parallel
 
 } // namespace mln::morpho

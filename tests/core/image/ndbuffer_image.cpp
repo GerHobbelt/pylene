@@ -1396,5 +1396,3 @@ TEST(image2d, pixel_range_write)
 
 }
 
-
-

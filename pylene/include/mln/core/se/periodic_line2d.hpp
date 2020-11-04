@@ -60,40 +60,45 @@ namespace mln::se
     /// \param V The period.
     /// \param k Half-number of pixels in the line.
     /// \precondition k >= 0
-    periodic_line2d(mln::point2d V, int k);
+    periodic_line2d(mln::point2d V, int k) noexcept;
 
     /// \brief Return a range of SE offsets
-    rng_t offsets() const;
-    rng_t before_offsets() const;
-    rng_t after_offsets() const;
+    rng_t offsets() const noexcept;
+    rng_t before_offsets() const noexcept;
+    rng_t after_offsets() const noexcept;
 
     /// \brief Return the number of pixels in the line
-    int size() const { return 2 * m_k + 1; }
+    int size() const noexcept { return 2 * m_k + 1; }
 
     /// \brief Return the number of repetitions \p k
-    int repetition() const { return m_k; }
+    int repetition() const noexcept { return m_k; }
 
     /// \brief Return the period
-    mln::point2d period() const { return m_delta; }
+    mln::point2d period() const noexcept { return m_delta; }
 
     /// \brief Return the extent radius
-    int radial_extent() const;
-    /// \brief
-    mln::box2d compute_input_region(mln::box2d roi) const;
+    int radial_extent() const noexcept;
 
-    /// \brief
-    mln::box2d compute_output_region(mln::box2d roi) const;
+    /// \brief Return the input region (the outer region needed for the \p roi computation)
+    ///
+    /// \post ``this->compute_input_region(roi).includes(roi)``
+    mln::box2d compute_input_region(mln::box2d roi) const noexcept;
 
-    /// \brief
+    /// \brief Return the output region (the valid inner region)
+    ///
+    /// \pre ``roi.includes(this->se.compute_output_region(roi)``
+    mln::box2d compute_output_region(mln::box2d roi) const noexcept;
+
+    /// \brief Return true if the line is a pure horizontal (dy=0 and dx=1)
     bool is_horizontal() const noexcept;
 
-    /// \brief
+    /// \brief Return true if the line is a pure vertical (dx=0 and dy=1)
     bool is_vertical() const noexcept;
 
 
   private:
     mln::point2d m_delta;
-    int                        m_k;
+    int          m_k;
   };
 
 } // namespace mln::se

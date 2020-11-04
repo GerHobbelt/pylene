@@ -85,9 +85,11 @@ namespace fixtures::ImageCompare
                      comparison_flags, linecmp_fn, print_fn);
     }
 
+
+
     template <class ImageA, class ImageB>
-    ::testing::AssertionResult compare(const mln::details::Image<ImageA>& f_, const mln::details::Image<ImageB>& g_,
-                                       int comparison_flags)
+    ::testing::AssertionResult compare(const mln::details::Image<ImageA>& f_,
+                                       const mln::details::Image<ImageB>& g_, int comparison_flags)
     {
       ImageA f = static_cast<const ImageA&>(f_);
       ImageB g = static_cast<const ImageB&>(g_);
@@ -110,16 +112,32 @@ namespace fixtures::ImageCompare
           return testing::AssertionFailure() << "The domains of A and B differ.";
       }
 
-
+      bool pass = true;
       {
         auto zipped_vals = mln::ranges::view::zip(f.values(), g.values());
         for (auto&& r : mln::ranges::rows(zipped_vals))
           for (auto&& [f_v, g_v] : r)
             if (f_v != g_v)
-              return testing::AssertionFailure() << "The values of image A and B differ";
+              pass = false;
+      }
+      if constexpr (std::is_same_v<f_domain_t, mln::box2d> && //
+                    std::is_same_v<g_domain_t, mln::box2d> && //
+                    fmt::internal::has_formatter<mln::image_value_t<ImageA>, fmt::format_context>() &&
+                    fmt::internal::has_formatter<mln::image_value_t<ImageB>, fmt::format_context>())
+      {
+        if (!pass)
+        {
+          fmt::print("A = \n");
+          mln::io::imprint(f);
+          fmt::print("vs B = \n");
+          mln::io::imprint(g);
+        }
       }
 
-      return ::testing::AssertionSuccess();
+      if (!pass)
+        return ::testing::AssertionFailure() << "The values of image A and B differ";
+      else
+        return ::testing::AssertionSuccess();
     }
 
     /// \}

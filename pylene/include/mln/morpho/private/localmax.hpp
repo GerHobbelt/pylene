@@ -2,6 +2,7 @@
 
 #include <mln/core/canvas/local_accumulation.hpp>
 #include <mln/morpho/private/dilation_by_periodic_line.hpp>
+#include <variant>
 
 namespace mln::morpho::details
 {

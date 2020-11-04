@@ -6,6 +6,7 @@ find_package(FreeImage REQUIRED)
 find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
+find_package(xsimd REQUIRED)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
@@ -39,7 +40,7 @@ target_include_directories(Pylene PUBLIC
                            $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
-target_link_libraries(Pylene PUBLIC range-v3::range-v3)
+target_link_libraries(Pylene PUBLIC range-v3::range-v3 xsimd::xsimd)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
 target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 
@@ -55,6 +56,7 @@ target_sources(Pylene PRIVATE
                src/core/ndbuffer_image.cpp
                src/core/ndbuffer_image_data.cpp
                src/core/padding.cpp
+               src/core/parallel_local.cpp
                src/core/parallel_pointwise.cpp
                src/core/se/disc.cpp
                src/core/se/mask2d.cpp
@@ -66,12 +68,14 @@ target_sources(Pylene PRIVATE
                src/io/imprint.cpp
                src/io/imread.cpp
                src/io/io.cpp
+               src/morpho/block_running_max.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
                src/morpho/immersion.cpp
                src/morpho/maxtree.cpp
                src/morpho/unionfind.cpp
+               src/morpho/filters2d.cpp
                )
 
 # Compiler configurations

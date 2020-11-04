@@ -187,6 +187,9 @@ namespace mln::extension
     {
     }
 
+    std::any& get_value() { return m_value; }
+    const std::any& get_value() const { return m_value; }
+
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Fill, BorderManagementPolicy::Auto, Ima, SE,
@@ -618,6 +621,8 @@ namespace mln::extension
   {
   public:
     static constexpr BorderManagementMethod method() { return BorderManagementMethod::User; }
+
+    static std::any get_value() { return {}; }
 
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const

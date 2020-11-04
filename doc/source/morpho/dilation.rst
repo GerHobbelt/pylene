@@ -42,6 +42,16 @@ Include :file:`<mln/morpho/dilation.hpp>`
       :exception: N/A
 
 
+.. cpp:namespace:: mln::morpho::parallel
+
+
+.. cpp:function:: \
+      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se)
+      void dilation(Image image, StructuringElement se, OutputImage out)
+
+      Parallel version of the dilation algorithm.
+
+
 Notes
 -----
 

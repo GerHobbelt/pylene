@@ -470,6 +470,10 @@ namespace mln
   template <class T, int N>
   inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::clip(const ndbox<N>& roi) const
   {
+    auto d = this->domain();
+    if (!d.includes(roi))
+      throw std::runtime_error("The roi must be included in the domain.");
+
     __ndbuffer_image tmp = *this;
     Impl::select(&tmp, N, roi.tl().data(), roi.br().data());
     return tmp;

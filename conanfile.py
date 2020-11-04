@@ -34,6 +34,8 @@ class Pylene(ConanFile):
     requires = [
         "range-v3/0.10.0",
         "fmt/6.0.0",
+        "tbb/2020.0",
+        "xsimd/7.4.6"
     ]
 
 

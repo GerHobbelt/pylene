@@ -65,7 +65,6 @@ namespace mln::morpho::details
     int       k      = line.repetition();
     auto      period = line.period();
 
-
     // Some sanity check
     {
       assert(period.y() >= 0);

@@ -1,3 +1,4 @@
+#include <fmt/core.h>
 #include <mln/core/box.hpp>
 
 #include <mln/core/concepts/domain.hpp>
@@ -523,4 +524,13 @@ TEST(box2d, iteration_backward)
       --y;
     }
   }
+}
+
+TEST(box2d, shift)
+{
+  mln::box2d b({2, 3}, {6, 8});
+  mln::box2d ref({3,7}, {7, 12});
+  b.shift({1,4});
+  ASSERT_EQ(b.tl(), ref.tl());
+  ASSERT_EQ(b.br(), ref.br());
 }

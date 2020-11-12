@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/view/operators.hpp>
@@ -107,12 +108,13 @@ namespace mln::morpho
         using namespace mln::view::ops;
         auto output1 = Operation1(funcs[0], m_input);
         auto output2 = Operation2(funcs[1], m_input);
-        res          = output1 - output2;
+        res = mln::clone(output1 - output2);
         break;
       }
       default:
         throw std::runtime_error("Unrecognized ending for morphological operation pipeline.");
       }
+      return res;
     }
 
   private:

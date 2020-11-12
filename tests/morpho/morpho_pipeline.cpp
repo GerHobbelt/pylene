@@ -15,7 +15,7 @@
 #include <mln/io/imread.hpp>
 #include <gtest/gtest.h>
 
-TEST(Morpho, gradient_color)
+TEST(Morpho, gradient_int_endtoend)
 {
   using namespace mln::view::ops;
 

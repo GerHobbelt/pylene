@@ -50,6 +50,21 @@ target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 #file(GLOB_RECURSE sources "include/mln/*.hpp")
 #target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
+add_library(Pylene-bp OBJECT
+  src/bp/transpose.cpp
+  src/bp/swap.cpp
+  src/bp/alloc.cpp
+  )
+
+target_include_directories(Pylene-bp PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(Pylene-bp PRIVATE xsimd::xsimd fmt::fmt)
+target_compile_features(Pylene-bp PUBLIC cxx_std_20)
+
+target_link_libraries(Pylene PRIVATE Pylene-bp)
+
+
 target_sources(Pylene PRIVATE
                src/accu/cvxhull.cpp
                src/core/image_format.cpp
@@ -83,6 +98,7 @@ target_sources(Pylene PRIVATE
 target_compile_features(Pylene PUBLIC cxx_std_20)
 
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
+  target_compile_options(Pylene-bp PUBLIC -fconcepts)
   target_compile_options(Pylene PUBLIC -fconcepts)
 endif()
 
@@ -94,7 +110,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 add_library(Pylene::Pylene ALIAS Pylene)
 
 include(GNUInstallDirs)
-install(TARGETS Pylene
+install(TARGETS Pylene Pylene-bp
         EXPORT PyleneTargets)
 
 write_basic_package_version_file(

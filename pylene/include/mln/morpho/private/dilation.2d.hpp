@@ -8,6 +8,9 @@
 #include <mln/morpho/private/block_running_max.hpp>
 #include <mln/morpho/private/localmax.hpp>
 
+#include <mln/bp/transpose.hpp>
+#include <mln/bp/alloc.hpp>
+
 /// \file Provides specialization for 2d dilation
 
 namespace mln::morpho::details
@@ -31,6 +34,8 @@ namespace mln::morpho::details
   class SimpleFilter2D
   {
   public:
+    SimpleFilter2D() = default;
+
     virtual ~SimpleFilter2D()                                                                         = default;
     virtual void                            Execute(mln::ndbuffer_image& in, mln::ndbuffer_image out) = 0;
     virtual mln::box2d                      ComputeInputRegion(mln::box2d roi) const noexcept         = 0;
@@ -71,7 +76,7 @@ namespace mln::morpho::details
 
 
   template <class V, class ValueSet>
-  class SimpleDilation2D<V, mln::se::periodic_line2d, ValueSet> : public SimpleFilter2D
+  class SimpleDilation2D<V, mln::se::periodic_line2d, ValueSet> final : public SimpleFilter2D
   {
   public:
     SimpleDilation2D(mln::se::periodic_line2d se, ValueSet* vs, int input_tile_width, int input_tile_height)
@@ -89,9 +94,25 @@ namespace mln::morpho::details
       if (m_orient == HORIZONTAL)
       {
         // Allocate space for the transposition
-        m_tmp_in = mln::image2d<V>(input_tile_height, input_tile_width);
+        // m_tmp_in = mln::image2d<V>(input_tile_height, input_tile_width);
+        std::ptrdiff_t pitch;
+        m_tmp_in = mln::bp::aligned_alloc_2d<V>(input_tile_height, input_tile_width, pitch);
+        m_tmp_in_width = input_tile_height;
+        m_tmp_in_height = input_tile_width;
+        m_tmp_in_stride = pitch;
       }
     }
+
+    ~SimpleDilation2D() final
+      {
+        if (m_tmp_in)
+          mln::bp::aligned_free_2d(m_tmp_in, m_tmp_in_width, m_tmp_in_height, m_tmp_in_stride);
+      }
+
+    SimpleDilation2D(const SimpleDilation2D&) = delete;
+    SimpleDilation2D(SimpleDilation2D&&)      = default;
+    SimpleDilation2D& operator=(const SimpleDilation2D&) = delete;
+    SimpleDilation2D& operator=(SimpleDilation2D&&) = default;
 
 
     void Execute(mln::ndbuffer_image& in_, mln::ndbuffer_image out_) final
@@ -119,17 +140,17 @@ namespace mln::morpho::details
         auto input_roi  = this->ComputeInputRegion(roi);
 
         { // 1. Transpose
-          block_transpose(&in.at(input_roi.tl()), m_tmp_in.buffer(), input_roi.height(), input_roi.width(),
-                          in.byte_stride(), m_tmp_in.byte_stride());
+          mln::bp::transpose(&in.at(input_roi.tl()), m_tmp_in, input_roi.height(), input_roi.width(),
+                             in.byte_stride(), m_tmp_in_stride);
         }
 
-        V* block_ptr = mln::ptr_offset(m_tmp_in.buffer(), m_se.repetition() * m_tmp_in.byte_stride());
+        V* block_ptr = mln::ptr_offset(m_tmp_in, m_se.repetition() * m_tmp_in_stride);
         { // 2. Run vertically inplace
-          block_running_max(block_ptr, roi.height(), roi.width(), m_tmp_in.byte_stride(), m_se.repetition(), m_vs->sup,
+          block_running_max(block_ptr, roi.height(), roi.width(), m_tmp_in_stride, m_se.repetition(), m_vs->sup,
                             m_vs->zero);
         }
         { // 3. Transpose and write
-          block_transpose(block_ptr, out.buffer(), roi.width(), roi.height(), m_tmp_in.byte_stride(), out.byte_stride());
+          mln::bp::transpose(block_ptr, out.buffer(), roi.width(), roi.height(), m_tmp_in_stride, out.byte_stride());
         }
       }
     }
@@ -140,7 +161,7 @@ namespace mln::morpho::details
 
     std::unique_ptr<SimpleFilter2D> Clone() const final
     {
-      return std::make_unique<SimpleDilation2D>(m_se, m_vs, m_tmp_in.height(), m_tmp_in.width());
+      return std::make_unique<SimpleDilation2D>(m_se, m_vs, m_tmp_in_height, m_tmp_in_width);
     }
 
 
@@ -155,7 +176,10 @@ namespace mln::morpho::details
     mln::se::periodic_line2d  m_se;
     ValueSet*                 m_vs;
     orientation_t             m_orient;
-    mln::image2d<V>           m_tmp_in;  // Temporary image used for transposition
+    V*                        m_tmp_in = nullptr; // Temporary image used for transposition
+    int                       m_tmp_in_width;
+    int                       m_tmp_in_height;
+    std::ptrdiff_t            m_tmp_in_stride;
   };
 
 

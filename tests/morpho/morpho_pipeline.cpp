@@ -8,6 +8,7 @@
 #include <mln/core/se/rect2d.hpp>
 
 #include <functional>
+#include <tbb/task_scheduler_init.h>
 
 #include <fixtures/ImagePath/image_path.hpp>
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -23,6 +24,9 @@ TEST(Morpho, gradient_int_endtoend)
   mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   mln::se::rect2d win(3, 3);
+
+  tbb::task_scheduler_init init;
+  
   auto grad1 = mln::morpho::internal_gradient(ima, win);
   auto grad2 = mln::morpho::MorphoPipeline(mln::morpho::details::e_MorphoPipelineOperation::Grad_int, ima, win).execute();
 

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <mln/core/algorithm/clone.hpp>
+#include <mln/core/algorithm/transform.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/view/operators.hpp>
@@ -26,7 +26,7 @@ namespace mln::morpho
     }
   } // namespace details
 
-  enum e_MorphoPipelineOperation
+  enum class e_MorphoPipelineOperation
   {
     Closing,
     Opening,
@@ -42,88 +42,62 @@ namespace mln::morpho
     top hat,
     bot hat,
   */
-  template <typename SE>
+
   class MorphoPipeline
   {
+      using functype = std::function<mln::ndbuffer_image(mln::ndbuffer_image)>;
+      using last_op_functype = std::function<mln::ndbuffer_image(mln::ndbuffer_image, mln::ndbuffer_image)>;
   public:
-    template <class Image>
+    template <class Image, class SE>
     MorphoPipeline(const e_MorphoPipelineOperation op, Image& input, const SE& se)
-      : m_input{input}
-      , m_se{se}
+      : m_input{input}, m_op(op)
     {
-      typedef Image (*functype)(Image&, const SE&);
-      functype erode  = mln::morpho::parallel::erosion;
-      functype dilate = mln::morpho::parallel::dilation;
-      functype id     = mln::morpho::details::identity;
+      using V = image_value_t<Image>;
+      m_erode  = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image { return mln::morpho::parallel::erosion((Image&)f, se); };
+      m_dilate = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image { return mln::morpho::parallel::dilation((Image&)f, se); };
+      m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image { return mln::transform((Image&)a, (Image&)b, std::minus<V>()); }; // TODO parallel
+    }
 
-      m_end = details::e_morphoFinish::None;
-      switch (op)
+    ndbuffer_image execute() const
+    {
+      mln::ndbuffer_image dil;
+      mln::ndbuffer_image ero;
+      switch (m_op)
       {
       case e_MorphoPipelineOperation::Closing:
-        m_funcs[0] = dilate;
-        m_funcs[1] = erode;
-        break;
+        dil = m_dilate(m_input);
+        return m_erode(dil);
       case e_MorphoPipelineOperation::Opening:
-        m_funcs[0] = erode;
-        m_funcs[1] = dilate;
-        break;
+        ero = m_erode(m_input);
+        return m_dilate(ero);
       case e_MorphoPipelineOperation::Grad_thick:
-        m_funcs[0] = dilate;
-        m_funcs[1] = erode;
-        m_end      = details::e_morphoFinish::Subtraction;
-        break;
+        dil = m_dilate(m_input);
+        ero = m_erode(m_input);
+        return m_diff(dil, ero);
       case e_MorphoPipelineOperation::Grad_ext:
-        m_funcs[0] = dilate;
-        m_funcs[1] = id;
-        m_end      = details::e_morphoFinish::Subtraction;
-        break;
+        dil = m_dilate(m_input);
+        return m_diff(dil, m_input);
       case e_MorphoPipelineOperation::Grad_int:
-        m_funcs[0] = id;
-        m_funcs[1] = erode;
-        m_end      = details::e_morphoFinish::Subtraction;
-        break;
+        ero = m_erode(m_input);
+        return m_diff(m_input, ero);
       case e_MorphoPipelineOperation::Top_hat:
         // FIXME opening(input) - id(input)
+        throw std::runtime_error("No implementation found.");
         break;
       case e_MorphoPipelineOperation::Bot_hat:
+        throw std::runtime_error("No implementation found.");
         // FIXME id(input) - closing(input)
         break;
       default:
-        m_funcs[0] = id;
-        m_funcs[1] = id;
-        break;
+        throw std::runtime_error("No implementation found.");
       }
-    }
-
-    ndbuffer_image execute()
-    {
-      ndbuffer_image res;
-      switch (m_end)
-      {
-      case details::e_morphoFinish::None: {
-        /* Then inputs for op1 and op2 are the same image: res = op2(op1(m_input))*/
-        auto output1 = m_funcs[0](m_input, m_se);
-        res          = m_funcs[1](output1, m_se);
-        break;
-      }
-      case details::e_morphoFinish::Subtraction: {
-        /* Then inputs for op1 and op2 are both the starting image: res = op1(m_input) - op2(m_input)*/
-        using namespace mln::view::ops;
-        auto output1 = m_funcs[0](m_input, m_se);
-        auto output2 = m_funcs[1](m_input, m_se);
-        res = mln::clone(output1 - output2);
-        break;
-      }
-      default:
-        throw std::runtime_error("Unrecognized ending for morphological operation pipeline.");
-      }
-      return res;
     }
 
   private:
-    ndbuffer_image                                            m_input;
-    SE                                                        m_se;
-    std::function<ndbuffer_image(ndbuffer_image&, const SE&)> m_funcs[2];
-    details::e_morphoFinish                                   m_end;
+    ndbuffer_image                                m_input;
+    functype                                      m_erode;
+    functype                                      m_dilate;    
+    last_op_functype                              m_diff;
+    e_MorphoPipelineOperation                     m_op;
   };
 } // namespace mln::morpho

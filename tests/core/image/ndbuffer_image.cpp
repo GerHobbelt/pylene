@@ -1395,13 +1395,3 @@ TEST(image2d, pixel_range_write)
   }
 
 }
-
-TEST(image2d, domain_shift)
-{
-  mln::box2d domain({1,1}, {3,4});
-  mln::box2d ref({3,3}, {5,6});
-  mln::image2d<uint32_t> img(domain);
-  img.domain_shift({2,2});
-  ASSERT_EQ(img.domain(), ref);
-}
-

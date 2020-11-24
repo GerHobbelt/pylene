@@ -434,17 +434,6 @@ namespace mln
     }
   }
 
-  void __ndbuffer_image<void, -1>::domain_shift(point_type pt) noexcept
-  {
-    for (int i = 0; i < m_pdim; ++i)
-    {
-      m_axes[i].domain_begin += pt[i];
-      m_axes[i].domain_end += pt[i];
-      m_axes[i].vbox_begin += pt[i];
-      m_axes[i].vbox_end += pt[i];
-    }
-  }
-
   void __ndbuffer_image<void, -1>::shift_domain_topleft(ConstPointRef p) noexcept
   {
     int dp[PYLENE_NDBUFFER_MAX_DIM];

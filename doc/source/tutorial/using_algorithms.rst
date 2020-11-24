@@ -74,4 +74,3 @@ by adding a ``height`` and ``width`` parameter to the function call (N.B. those 
 ::
 
   auto output = mln::morpho::parallel::dilation(input, mln::se::disc(5), 128, 128);
-

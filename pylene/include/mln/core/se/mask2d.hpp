@@ -42,10 +42,15 @@ namespace mln::se
     int radial_extent() const { return m_radial_extent; }
 
 
-    /// \brief Return the input region of th roi
+    /// \brief Return the input region (the outer region needed for the \p roi computation)
+    ///
+    ///
+    /// \post ``this->compute_input_region(roi).includes(roi)``
     mln::box2d compute_input_region(mln::box2d roi) const noexcept;
 
-        /// \brief Return the input region of th roi
+    /// \brief Return the output region (the valid inner region)
+    ///
+    /// \pre ``roi.includes(this->se.compute_output_region(roi)``
     mln::box2d compute_output_region(mln::box2d roi) const noexcept;
 
 

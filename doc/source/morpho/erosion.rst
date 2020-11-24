@@ -36,6 +36,15 @@ Include :file:`<mln/morpho/erosion.hpp>`
 
       :exception: N/A
 
+.. cpp:namespace:: mln::morpho::parallel
+
+
+.. cpp:function:: \
+      Image{I} image_concrete_t<I> erosion(I image, StructuringElement se)
+      void erosion(Image image, StructuringElement se, OutputImage out)
+
+      Parallel version of the erosion algorithm.
+
 
 Notes
 -----

@@ -421,28 +421,3 @@ std::string print_test_name(const testing::TestParamInfo<test_param_t>& info)
 }
 
 INSTANTIATE_TEST_SUITE_P(Morpho, DilationTestSuite, testing::ValuesIn(test_suite_params), print_test_name);
-
-
-
-
-
-
-
-/*
-TEST(Dilation, view_as_parallel_argument)
-{
-  auto _ = tbb::task_scheduler_init();
-  mln::image2d<uint8_t> ima;
-  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
-  auto input = mln::view::red(ima);
-
-  { // Fast: border wide enough
-    using namespace mln::view::ops;
-    auto se  = mln::se::disc(9, mln::se::disc::EXACT);
-    auto out = mln::morpho::parallel::dilation(input, se);
-    ASSERT_TRUE(mln::all_of(out >= input)); // extensive
-  }
-}
-
-
-*/

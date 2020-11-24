@@ -4,7 +4,7 @@
 namespace mln::se
 {
 
-  periodic_line2d::periodic_line2d(point2d delta, int k)
+  periodic_line2d::periodic_line2d(point2d delta, int k) noexcept
   {
     mln_precondition((k >= 0) && "The extent must be positive");
 
@@ -12,27 +12,27 @@ namespace mln::se
     m_k     = k;
   }
 
-  periodic_line2d::rng_t periodic_line2d::offsets() const
+  periodic_line2d::rng_t periodic_line2d::offsets() const noexcept
   {
     return { -m_k * m_delta, m_delta, static_cast<std::size_t>(2 * m_k + 1) };
   }
 
-  periodic_line2d::rng_t periodic_line2d::before_offsets() const
+  periodic_line2d::rng_t periodic_line2d::before_offsets() const noexcept
   {
     return { -m_k * m_delta, m_delta, static_cast<std::size_t>(m_k) };
   }
 
-  periodic_line2d::rng_t periodic_line2d::after_offsets() const
+  periodic_line2d::rng_t periodic_line2d::after_offsets() const noexcept
   {
     return { m_delta, m_delta, static_cast<std::size_t>(m_k) };
   }
 
-  int periodic_line2d::radial_extent() const
+  int periodic_line2d::radial_extent() const noexcept
   {
     return m_k * std::max(std::abs(m_delta.x()), std::abs(m_delta.y()));
   }
 
-  mln::box2d periodic_line2d::compute_input_region(mln::box2d roi) const
+  mln::box2d periodic_line2d::compute_input_region(mln::box2d roi) const noexcept
   {
     int dx = std::abs(m_delta.x()) * m_k;
     int dy = std::abs(m_delta.y()) * m_k;
@@ -43,7 +43,7 @@ namespace mln::se
     return roi;
   }
 
-  mln::box2d periodic_line2d::compute_output_region(mln::box2d roi) const
+  mln::box2d periodic_line2d::compute_output_region(mln::box2d roi) const noexcept
   {
     int dx = std::abs(m_delta.x()) * m_k;
     int dy = std::abs(m_delta.y()) * m_k;

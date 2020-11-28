@@ -1,5 +1,6 @@
 #include <mln/morpho/closing.hpp>
 #include <mln/morpho/opening.hpp>
+#include <mln/core/canvas/morpho_pipeline.hpp>
 
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/image/ndimage.hpp>
@@ -105,3 +106,14 @@ TEST(Morpho, DISABLED_opening_non_symetric)
   ASSERT_IMAGES_EQ_EXP(g_1, ref_1);
 }
 
+TEST(Morpho, opening_parallel)
+{
+  mln::image2d<uint8_t> ima;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  auto ref = mln::morpho::opening(ima, win);
+  auto out = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, ima, win).execute().__cast<uint8_t, 2>();
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}

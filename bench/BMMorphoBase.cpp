@@ -18,6 +18,8 @@
 #include <mln/morpho/reconstruction.hpp>
 #include <mln/morpho/watershed.hpp>
 
+#include <mln/core/canvas/morpho_pipeline.hpp>
+
 #include <mln/labeling/local_extrema.hpp>
 #include <mln/labeling/chamfer_distance_transform.hpp>
 
@@ -184,6 +186,14 @@ BENCHMARK_F(BMMorpho, Opening_Disc)(benchmark::State& st)
   int  radius = 32;
   auto se     = mln::se::disc(radius);
   auto f = [se](const image_t& input, image_t& output) { mln::morpho::opening(input, se, output); };
+  this->run(st, f);
+}
+
+BENCHMARK_F(BMMorpho, Opening_Disc_pipeline)(benchmark::State& st)
+{
+  int  radius = 32;
+  auto se     = mln::se::disc(radius);
+  auto f = [se](const image_t& input, image_t& output){ output = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, input, se).execute().__cast<uint8_t, 2>(); };
   this->run(st, f);
 }
 

@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/ndbuffer_image.hpp>
@@ -45,17 +46,25 @@ namespace mln::morpho
 
   class MorphoPipeline
   {
-      using functype = std::function<mln::ndbuffer_image(mln::ndbuffer_image)>;
-      using last_op_functype = std::function<mln::ndbuffer_image(mln::ndbuffer_image, mln::ndbuffer_image)>;
+    using functype         = std::function<mln::ndbuffer_image(mln::ndbuffer_image)>;
+    using last_op_functype = std::function<mln::ndbuffer_image(mln::ndbuffer_image, mln::ndbuffer_image)>;
+
   public:
     template <class Image, class SE>
     MorphoPipeline(const e_MorphoPipelineOperation op, Image& input, const SE& se)
-      : m_input{input}, m_op(op)
+      : m_input{input}
+      , m_op(op)
     {
       using V = image_value_t<Image>;
-      m_erode  = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image { return mln::morpho::parallel::erosion((Image&)f, se); };
-      m_dilate = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image { return mln::morpho::parallel::dilation((Image&)f, se); };
-      m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image { return mln::transform((Image&)a, (Image&)b, std::minus<V>()); }; // TODO parallel
+      m_erode = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
+        return mln::morpho::parallel::erosion((Image&)f, se);
+      };
+      m_dilate = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
+        return mln::morpho::parallel::dilation((Image&)f, se);
+      };
+      m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image {
+        return mln::transform((Image&)a, (Image&)b, std::minus<V>());
+      }; // TODO parallel
     }
 
     ndbuffer_image execute() const
@@ -94,10 +103,10 @@ namespace mln::morpho
     }
 
   private:
-    ndbuffer_image                                m_input;
-    functype                                      m_erode;
-    functype                                      m_dilate;    
-    last_op_functype                              m_diff;
-    e_MorphoPipelineOperation                     m_op;
+    ndbuffer_image            m_input;
+    functype                  m_erode;
+    functype                  m_dilate;
+    last_op_functype          m_diff;
+    e_MorphoPipelineOperation m_op;
   };
 } // namespace mln::morpho

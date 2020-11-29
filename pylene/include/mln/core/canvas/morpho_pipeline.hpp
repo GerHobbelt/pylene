@@ -51,19 +51,19 @@ namespace mln::morpho
 
   public:
     template <class Image, class SE>
-    MorphoPipeline(const e_MorphoPipelineOperation op, Image& input, const SE& se)
+    MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se)
       : m_input{input}
       , m_op(op)
     {
       using V = image_value_t<Image>;
       m_erode = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
-        return mln::morpho::parallel::erosion((Image&)f, se);
+        return mln::morpho::parallel::erosion(static_cast<Image&>(f), se);
       };
       m_dilate = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
-        return mln::morpho::parallel::dilation((Image&)f, se);
+        return mln::morpho::parallel::dilation(static_cast<Image&>(f), se);
       };
       m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image {
-        return mln::transform((Image&)a, (Image&)b, std::minus<V>());
+        return mln::transform(static_cast<Image&>(a), static_cast<Image&>(b), std::minus<V>());
       }; // TODO parallel
     }
 

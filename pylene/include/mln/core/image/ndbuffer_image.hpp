@@ -83,6 +83,7 @@ namespace mln
     __ndbuffer_image(const __ndbuffer_image& other, const image_build_params&);
 
     template <class T>
+    requires (!std::is_convertible_v<T, __ndbuffer_image>)
     __ndbuffer_image(std::initializer_list<T>);
 
     template <class T>
@@ -254,6 +255,7 @@ namespace mln
 
 
   template <class T>
+  requires (!std::is_convertible_v<T, mln::__ndbuffer_image<void, -1>>)
   __ndbuffer_image<void, -1>::__ndbuffer_image(std::initializer_list<T> l)
     : __ndbuffer_image(sample_type_traits<T>::id(), details::init_list(l))
   {

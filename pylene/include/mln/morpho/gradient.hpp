@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/algorithm/transform.hpp>
+#include <mln/core/canvas/morpho_pipeline.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
@@ -133,4 +134,40 @@ namespace mln::morpho
     return out;
   }
 
-} // namespace mln::morpho::
+  namespace parallel
+  {
+    template <class InputImage, class SE>
+    details::gradient_result_t<std::remove_reference_t<InputImage>> gradient(InputImage&& input, const SE& se);
+
+    template <class InputImage, class SE>
+    details::gradient_result_t<std::remove_reference_t<InputImage>> external_gradient(InputImage&& input, const SE& se);
+
+    template <class InputImage, class SE>
+    details::gradient_result_t<std::remove_reference_t<InputImage>> internal_gradient(InputImage&& input, const SE& se);
+
+    /*************************/
+    /***  Implementation   ***/
+    /*************************/
+
+    template <class InputImage, class SE>
+    details::gradient_result_t<std::remove_reference_t<InputImage>> gradient(InputImage&& input, const SE& se)
+    {
+			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_thick, input, se).execute();
+      return static_cast<InputImage&>(tmp);
+    }
+
+    template <class InputImage, class SE>
+    details::gradient_result_t<std::remove_reference_t<InputImage>> external_gradient(InputImage&& input, const SE& se)
+    {
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_ext, input, se).execute();
+      return static_cast<InputImage&>(tmp);
+    }
+
+    template <class InputImage, class SE>
+    details::gradient_result_t<std::remove_reference_t<InputImage>> internal_gradient(InputImage&& input, const SE& se)
+    {
+			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_int, input, se).execute();
+      return static_cast<InputImage&>(tmp);
+    }
+  } // namespace parallel
+} // namespace mln::morpho

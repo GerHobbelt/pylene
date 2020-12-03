@@ -38,12 +38,6 @@ namespace mln::morpho
     Bot_hat
   };
 
-  /*
-    TODO
-    top hat,
-    bot hat,
-  */
-
   class MorphoPipeline
   {
     using functype         = std::function<mln::ndbuffer_image(mln::ndbuffer_image)>;
@@ -90,13 +84,13 @@ namespace mln::morpho
         ero = m_erode(m_input);
         return m_diff(m_input, ero);
       case e_MorphoPipelineOperation::Top_hat:
-        // FIXME opening(input) - id(input)
-        throw std::runtime_error("No implementation found.");
-        break;
+        ero = m_erode(m_input);
+        dil = m_dilate(ero); // opening
+        return m_diff(dil, m_input);
       case e_MorphoPipelineOperation::Bot_hat:
-        throw std::runtime_error("No implementation found.");
-        // FIXME id(input) - closing(input)
-        break;
+        dil = m_dilate(m_input);
+        ero = m_erode(dil); // closing
+        return m_diff(m_input, ero);
       default:
         throw std::runtime_error("No implementation found.");
       }

@@ -113,7 +113,21 @@ TEST(Morpho, opening_parallel)
   auto win = mln::se::rect2d(3, 3);
 
   auto ref = mln::morpho::opening(ima, win);
-  auto out = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, ima, win).execute().__cast<uint8_t, 2>();
+  auto out = mln::morpho::parallel::opening(ima, win);
 
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }
+
+/*
+TEST(Morpho, opening_parallel_rgb)
+{
+  mln::image2d<mln::rgb8> ima;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  auto ref = mln::morpho::opening(ima, win);
+  auto out = mln::morpho::parallel::opening(ima, win);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}
+*/

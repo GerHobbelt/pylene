@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <mln/core/canvas/morpho_pipeline.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>
@@ -93,5 +94,54 @@ namespace mln::morpho
     return out;
   }
 
+  namespace parallel
+  {
+    /// \brief Compute the structural morphological opening.
+    ///
+    /// The structurual morphological closing γ of \p f by a structuring
+    /// element 𝓑
+    /// \f[
+    /// \gamma(f) = \delta_\mathcal{B}(\varepsilon_\mathcal{B}(f))
+    /// \f]
+    /// where ε denotes the erosion and δ the dilation.
+    ///
+    ///
+    /// + If the optional \p out image is provided, it must be wide enough to store
+    ///   the results (the function does not perform any resizing).
+    ///
+    /// + A border manager can be supplied for side-effects
+    ///
+    /// \param[in] input Input image \p f
+    /// \param[in] se Structuring element/Neighborhood/Window \p B to look around.
+    /// \param[out] out (optional) Output image \p g to write in.
+    /// \param[in] bm (optional) Border management function
+    template <class InputImage, class SE, class BorderManager, class OutputImage>
+    void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
+                 OutputImage&& out);
 
-} // namespace mln::morpho::
+    template <class InputImage, class SE>
+    image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&& image, const SE& se);
+
+    template <class InputImage, class SE, class BorderManager>
+    image_concrete_t<std::remove_reference_t<InputImage>>
+    opening(InputImage&& image, const SE& se, BorderManager bm,
+            std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>* = nullptr);
+
+    template <class InputImage, class SE, class OutputImage>
+    std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
+    opening(InputImage&& image, const SE& se, OutputImage&& out);
+
+
+    /******************************************/
+    /****          Implementation          ****/
+    /******************************************/
+
+    template <class InputImage, class SE>
+    image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&& image, const SE& se)
+    {
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se).execute();
+      return static_cast<InputImage&>(tmp);
+    }
+  } // namespace parallel
+
+} // namespace mln::morpho

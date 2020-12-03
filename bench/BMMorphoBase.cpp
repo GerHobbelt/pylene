@@ -193,7 +193,7 @@ BENCHMARK_F(BMMorpho, Opening_Disc_pipeline)(benchmark::State& st)
 {
   int  radius = 32;
   auto se     = mln::se::disc(radius);
-  auto f = [se](const image_t& input, image_t& output){ output = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, input, se).execute().__cast<uint8_t, 2>(); };
+  auto f = [se](const image_t& input, image_t& output){ output = mln::morpho::parallel::opening(input, se); };
   this->run(st, f);
 }
 

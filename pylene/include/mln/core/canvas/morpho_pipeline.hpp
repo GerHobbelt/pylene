@@ -2,31 +2,14 @@
 
 #include <functional>
 
-#include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/ndbuffer_image.hpp>
-#include <mln/core/image/view/operators.hpp>
 #include <mln/morpho/dilation.hpp>
 #include <mln/morpho/erosion.hpp>
 
 namespace mln::morpho
 {
-  namespace details
-  {
-    enum e_morphoFinish
-    {
-      Subtraction,
-      None
-    };
-
-    template <typename SE>
-    ndbuffer_image identity(ndbuffer_image in, SE se)
-    {
-      return in;
-    }
-  } // namespace details
-
   enum class e_MorphoPipelineOperation
   {
     Closing,

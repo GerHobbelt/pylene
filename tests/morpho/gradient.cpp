@@ -130,19 +130,19 @@ TEST(Morpho, gradient_grayscale_parallel)
 
   {
     mln::image2d<uint8_t> ref = mln::morpho::gradient(ima, win);
-    auto                  out = mln::morpho::parallel::gradient(ima, win).__cast<uint8_t, 2>();
+    auto                  out = mln::morpho::parallel::gradient(ima, win);
     ASSERT_IMAGES_EQ_EXP(out, ref);
   }
 
   {
     mln::image2d<uint8_t> ref = mln::morpho::external_gradient(ima, win);
-    auto                  out = mln::morpho::parallel::external_gradient(ima, win).__cast<uint8_t, 2>();
+    auto                  out = mln::morpho::parallel::external_gradient(ima, win);
     ASSERT_IMAGES_EQ_EXP(out, ref);
   }
 
   {
     mln::image2d<uint8_t> ref = mln::morpho::internal_gradient(ima, win);
-    auto                  out = mln::morpho::parallel::internal_gradient(ima, win).__cast<uint8_t, 2>();
+    auto                  out = mln::morpho::parallel::internal_gradient(ima, win);
     ASSERT_IMAGES_EQ_EXP(out, ref);
   }
 }
@@ -211,19 +211,19 @@ TEST(Morpho, gradient_color_parallel)
 
   {
     auto ref = mln::morpho::gradient(ima, win);
-    auto out = mln::morpho::parallel::gradient(ima, win).__cast<mln::rgb8, 2>();
+    auto out = mln::morpho::parallel::gradient(ima, win);
     ASSERT_IMAGES_EQ_EXP(out, ref);
   }
 
   {
     auto ref = mln::morpho::external_gradient(ima, win);
-    auto out = mln::morpho::parallel::external_gradient(ima, win).__cast<mln::rgb8, 2>();
+    auto out = mln::morpho::parallel::external_gradient(ima, win);
     ASSERT_IMAGES_EQ_EXP(out, ref);
   }
 
   {
     auto ref = mln::morpho::internal_gradient(ima, win);
-    auto out = mln::morpho::parallel::internal_gradient(ima, win).__cast<mln::rgb8, 2>();
+    auto out = mln::morpho::parallel::internal_gradient(ima, win);
     ASSERT_IMAGES_EQ_EXP(out, ref);
   }
 }

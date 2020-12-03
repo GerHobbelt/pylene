@@ -118,7 +118,7 @@ TEST(Morpho, opening_parallel)
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }
 
-/*
+
 TEST(Morpho, opening_parallel_rgb)
 {
   mln::image2d<mln::rgb8> ima;
@@ -130,4 +130,3 @@ TEST(Morpho, opening_parallel_rgb)
 
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }
-*/

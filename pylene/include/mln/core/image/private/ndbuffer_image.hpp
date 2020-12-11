@@ -438,33 +438,13 @@ namespace mln
   template <class T, int N>
   inline __ndbuffer_image<T, 2> __ndbuffer_image<T, N>::slice(int z) const
   {
-    int begin[N] = {this->__axes(0).domain_begin, this->__axes(1).domain_begin, z};
-    int end[N]   = {this->__axes(0).domain_end,   this->__axes(1).domain_end, z + 1};
-    for (int k = 3; k < m_pdim; ++k)
-    {
-      begin[k] = 0;
-      end[k]   = 1;
-    }
-
-    ndbuffer_image_info_t tmp = *this->__info();
-    Impl::select(&tmp, 2, begin, end);
-    return *Impl::template cast<T, 2>(&tmp);
+    return static_cast<__ndbuffer_image<T,2>&&>(this->base::slice(z));
   }
 
   template <class T, int N>
   inline __ndbuffer_image<T, 1> __ndbuffer_image<T, N>::row(int y) const
   {
-    int begin[N] = {m_axes[0].domain_begin, y};
-    int end[N]   = {m_axes[0].domain_end, y + 1};
-    for (int k = 2; k < m_pdim; ++k)
-    {
-      begin[k] = 0;
-      end[k]   = 1;
-    }
-
-    ndbuffer_image_info_t tmp = *this->__info();
-    Impl::select(&tmp, 1, begin, end);
-    return *Impl::template cast<T, 1>(&tmp);
+    return static_cast<__ndbuffer_image<T,1>&&>(this->base::row(y));
   }
 
   template <class T, int N>

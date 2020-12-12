@@ -63,8 +63,8 @@ namespace mln::morpho
       };
       m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image {
         using I = std::remove_reference_t<Image>;
-        return mln::transform(static_cast<Image&>(a), static_cast<Image&>(b), details::grad_op<image_value_t<I>>());
-      }; // TODO parallel
+        return mln::parallel::transform(static_cast<Image&>(a), static_cast<Image&>(b), details::grad_op<image_value_t<I>>());
+      };
     }
 
     template <class Image, class SE, class OutputImage>
@@ -81,8 +81,8 @@ namespace mln::morpho
       };
       m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image {
         using I = std::remove_reference_t<Image>;
-        return mln::transform(static_cast<Image&>(a), static_cast<Image&>(b), details::grad_op<image_value_t<I>>());
-      }; // TODO parallel
+        return mln::parallel::transform(static_cast<Image&>(a), static_cast<Image&>(b), details::grad_op<image_value_t<I>>());
+      };
     }
 
     ndbuffer_image execute() const;

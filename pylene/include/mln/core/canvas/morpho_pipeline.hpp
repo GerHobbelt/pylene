@@ -10,6 +10,29 @@
 
 namespace mln::morpho
 {
+  namespace details
+  {
+    template <class T, class enable = void>
+    struct grad_op
+    {
+      using result_type = decltype(l2norm(std::declval<T>()));
+
+      result_type operator()(T a, T b) const noexcept { return l2norm(T(a - b)); }
+    };
+
+    template <class T>
+    // require std...
+    struct grad_op<T, std::enable_if_t<std::is_arithmetic_v<T>>>
+    {
+      using result_type = T;
+
+      T operator()(T a, T b) const noexcept { return a - b; }
+    };
+
+    template <class I>
+    using gradient_result_t = image_ch_value_t<I, typename grad_op<image_value_t<I>>::result_type>;
+  }
+
   enum class e_MorphoPipelineOperation
   {
     Closing,
@@ -32,7 +55,6 @@ namespace mln::morpho
       : m_input{input}
       , m_op(op)
     {
-      using V = image_value_t<Image>;
       m_erode = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
         return mln::morpho::parallel::erosion(static_cast<Image&>(f), se);
       };
@@ -40,7 +62,8 @@ namespace mln::morpho
         return mln::morpho::parallel::dilation(static_cast<Image&>(f), se);
       };
       m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image {
-        return mln::transform(static_cast<Image&>(a), static_cast<Image&>(b), std::minus<V>());
+        using I = std::remove_reference_t<Image>;
+        return mln::transform(static_cast<Image&>(a), static_cast<Image&>(b), details::grad_op<image_value_t<I>>());
       }; // TODO parallel
     }
 
@@ -74,10 +97,10 @@ namespace mln::morpho
         dil = m_dilate(m_input);
         ero = m_erode(dil); // closing
         return m_diff(m_input, ero);
-      default:
-        throw std::runtime_error("No implementation found.");
       }
+      __builtin_unreachable();
     }
+
 
   private:
     ndbuffer_image            m_input;
@@ -86,4 +109,6 @@ namespace mln::morpho
     last_op_functype          m_diff;
     e_MorphoPipelineOperation m_op;
   };
+
+
 } // namespace mln::morpho

@@ -68,6 +68,7 @@ target_sources(Pylene PRIVATE
                src/accu/cvxhull.cpp
                src/core/image_format.cpp
                src/core/init_list.cpp
+               src/core/morpho_pipeline.cpp
                src/core/ndbuffer_image.cpp
                src/core/ndbuffer_image_data.cpp
                src/core/padding.cpp

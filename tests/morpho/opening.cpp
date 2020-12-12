@@ -1,12 +1,13 @@
+#include <mln/core/canvas/morpho_pipeline.hpp>
 #include <mln/morpho/closing.hpp>
 #include <mln/morpho/opening.hpp>
-#include <mln/core/canvas/morpho_pipeline.hpp>
 
 #include <mln/core/algorithm/all_of.hpp>
+#include <mln/core/colors.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
-#include <mln/core/se/rect2d.hpp>
 #include <mln/core/se/mask2d.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
@@ -122,7 +123,7 @@ TEST(Morpho, opening_parallel)
 TEST(Morpho, opening_parallel_rgb)
 {
   mln::image2d<mln::rgb8> ima;
-  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
   auto win = mln::se::rect2d(3, 3);
 
   auto ref = mln::morpho::opening(ima, win);

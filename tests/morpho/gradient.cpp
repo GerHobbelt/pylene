@@ -11,6 +11,8 @@
 
 #include <functional>
 
+#include <tbb/task_scheduler_init.h>
+
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
 
@@ -119,6 +121,7 @@ TEST(Morpho, gradient_grayscale)
 
 TEST(Morpho, gradient_grayscale_parallel)
 {
+  tbb::task_scheduler_init init;
   mln::image2d<uint8_t> ima = {{0, 0, 0, 0, 9, 0, 0},  //
                                {0, 0, 0, 0, 9, 0, 0},  //
                                {0, 9, 9, 9, 9, 9, 0},  //
@@ -204,6 +207,7 @@ TEST(Morpho, gradient_color)
 
 TEST(Morpho, gradient_color_parallel)
 {
+  tbb::task_scheduler_init init;
   mln::image2d<mln::rgb8> ima;
   mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
 

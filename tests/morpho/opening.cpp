@@ -10,6 +10,8 @@
 #include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
 
+#include <tbb/task_scheduler_init.h>
+
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>
 
@@ -109,6 +111,7 @@ TEST(Morpho, DISABLED_opening_non_symetric)
 
 TEST(Morpho, opening_parallel)
 {
+  tbb::task_scheduler_init init;
   mln::image2d<uint8_t> ima;
   mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
   auto win = mln::se::rect2d(3, 3);
@@ -121,6 +124,7 @@ TEST(Morpho, opening_parallel)
 
 TEST(Morpho, opening_parallel_inplace)
 {
+  tbb::task_scheduler_init init;
   mln::image2d<uint8_t> ima;
   mln::image2d<uint8_t> out;
   mln::image2d<uint8_t> ref;
@@ -135,6 +139,7 @@ TEST(Morpho, opening_parallel_inplace)
 
 TEST(Morpho, opening_parallel_rgb)
 {
+  tbb::task_scheduler_init init;
   mln::image2d<mln::rgb8> ima;
   mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
   auto win = mln::se::rect2d(3, 3);
@@ -147,6 +152,7 @@ TEST(Morpho, opening_parallel_rgb)
 
 TEST(Morpho, opening_parallel_rgb_inplace)
 {
+  tbb::task_scheduler_init init;
   mln::image2d<mln::rgb8> ima;
   mln::image2d<mln::rgb8> out;
   mln::image2d<mln::rgb8> ref;

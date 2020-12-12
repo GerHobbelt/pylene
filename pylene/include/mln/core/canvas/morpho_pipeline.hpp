@@ -53,7 +53,25 @@ namespace mln::morpho
     template <class Image, class SE>
     MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se)
       : m_input{input}
-      , m_op(op)
+      , m_op{op}
+    {
+      m_erode = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
+        return mln::morpho::parallel::erosion(static_cast<Image&>(f), se);
+      };
+      m_dilate = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
+        return mln::morpho::parallel::dilation(static_cast<Image&>(f), se);
+      };
+      m_diff = [](mln::ndbuffer_image a, mln::ndbuffer_image b) -> mln::ndbuffer_image {
+        using I = std::remove_reference_t<Image>;
+        return mln::transform(static_cast<Image&>(a), static_cast<Image&>(b), details::grad_op<image_value_t<I>>());
+      }; // TODO parallel
+    }
+
+    template <class Image, class SE, class OutputImage>
+    MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se, OutputImage& out)
+      : m_input{input}
+      , m_output{out}
+      , m_op{op}
     {
       m_erode = [se](mln::ndbuffer_image f) -> mln::ndbuffer_image {
         return mln::morpho::parallel::erosion(static_cast<Image&>(f), se);
@@ -68,10 +86,12 @@ namespace mln::morpho
     }
 
     ndbuffer_image execute() const;
+    void execute_inplace();
 
 
   private:
     ndbuffer_image            m_input;
+    ndbuffer_image            m_output;
     functype                  m_erode;
     functype                  m_dilate;
     last_op_functype          m_diff;

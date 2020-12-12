@@ -3,7 +3,7 @@
 /doc/source/images/*.png
 /test_package/build
 /doc/source/_build
-.vs
+.vs*
 .idea
 *.pyc
 compile_commands.json

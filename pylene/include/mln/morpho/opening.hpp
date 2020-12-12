@@ -117,7 +117,7 @@ namespace mln::morpho
     /// \param[in] bm (optional) Border management function
     template <class InputImage, class SE, class BorderManager, class OutputImage>
     void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                 OutputImage&& out);
+                 OutputImage&& out); // FIXME keep or delete?
 
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&& image, const SE& se);
@@ -126,10 +126,11 @@ namespace mln::morpho
     image_concrete_t<std::remove_reference_t<InputImage>>
     opening(InputImage&& image, const SE& se, BorderManager bm,
             std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>* = nullptr);
+            //FIXME keep or delete?
 
     template <class InputImage, class SE, class OutputImage>
-    std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-    opening(InputImage&& image, const SE& se, OutputImage&& out);
+    requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
+    void opening(InputImage&& image, const SE& se, OutputImage&& out);
 
 
     /******************************************/
@@ -141,6 +142,13 @@ namespace mln::morpho
     {
       auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se).execute();
       return static_cast<InputImage&>(tmp);
+    }
+
+    template <class InputImage, class SE, class OutputImage>
+    requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
+    void opening(InputImage&& image, const SE& se, OutputImage&& out)
+    {
+      mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se, out).execute_inplace();
     }
   } // namespace parallel
 

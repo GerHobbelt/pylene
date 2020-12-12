@@ -119,6 +119,19 @@ TEST(Morpho, opening_parallel)
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }
 
+TEST(Morpho, opening_parallel_inplace)
+{
+  mln::image2d<uint8_t> ima;
+  mln::image2d<uint8_t> out;
+  mln::image2d<uint8_t> ref;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  mln::morpho::opening(ima, win, ref);
+  mln::morpho::parallel::opening(ima, win, out);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}
 
 TEST(Morpho, opening_parallel_rgb)
 {
@@ -128,6 +141,20 @@ TEST(Morpho, opening_parallel_rgb)
 
   auto ref = mln::morpho::opening(ima, win);
   auto out = mln::morpho::parallel::opening(ima, win);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}
+
+TEST(Morpho, opening_parallel_rgb_inplace)
+{
+  mln::image2d<mln::rgb8> ima;
+  mln::image2d<mln::rgb8> out;
+  mln::image2d<mln::rgb8> ref;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  mln::morpho::opening(ima, win, ref);
+  mln::morpho::parallel::opening(ima, win, out);
 
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }

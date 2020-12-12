@@ -164,3 +164,59 @@ TEST(Morpho, opening_parallel_rgb_inplace)
 
   ASSERT_IMAGES_EQ_EXP(out, ref);
 }
+
+TEST(Morpho, closing_parallel)
+{
+  tbb::task_scheduler_init init;
+  mln::image2d<uint8_t> ima;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  auto ref = mln::morpho::closing(ima, win);
+  auto out = mln::morpho::parallel::closing(ima, win);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}
+
+TEST(Morpho, closing_parallel_inplace)
+{
+  tbb::task_scheduler_init init;
+  mln::image2d<uint8_t> ima;
+  mln::image2d<uint8_t> out;
+  mln::image2d<uint8_t> ref;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  mln::morpho::closing(ima, win, ref);
+  mln::morpho::parallel::closing(ima, win, out);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}
+
+TEST(Morpho, closing_parallel_rgb)
+{
+  tbb::task_scheduler_init init;
+  mln::image2d<mln::rgb8> ima;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  auto ref = mln::morpho::closing(ima, win);
+  auto out = mln::morpho::parallel::closing(ima, win);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}
+
+TEST(Morpho, closing_parallel_rgb_inplace)
+{
+  tbb::task_scheduler_init init;
+  mln::image2d<mln::rgb8> ima;
+  mln::image2d<mln::rgb8> out;
+  mln::image2d<mln::rgb8> ref;
+  mln::io::imread(fixtures::ImagePath::concat_with_filename("small.ppm"), ima);
+  auto win = mln::se::rect2d(3, 3);
+
+  mln::morpho::closing(ima, win, ref);
+  mln::morpho::parallel::closing(ima, win, out);
+
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+}

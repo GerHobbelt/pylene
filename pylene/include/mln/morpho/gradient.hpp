@@ -137,7 +137,7 @@ namespace mln::morpho
       using O = image_ch_value_t<I, R>;
 
 			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_thick, input, se).execute();
-      return static_cast<O&>(tmp);
+      return std::any_cast<O&>(tmp);
     }
 
     template <class InputImage, class SE>
@@ -149,7 +149,7 @@ namespace mln::morpho
       using O = image_ch_value_t<I, R>;
 
 			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_ext, input, se).execute();
-      return static_cast<O&>(tmp);
+      return std::any_cast<O&>(tmp);
     }
 
     template <class InputImage, class SE>
@@ -161,7 +161,7 @@ namespace mln::morpho
       using O = image_ch_value_t<I, R>;
 
 			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_int, input, se).execute();
-      return static_cast<O&>(tmp);
+      return std::any_cast<O&>(tmp);
     }
   } // namespace parallel
 } // namespace mln::morpho

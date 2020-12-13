@@ -141,14 +141,15 @@ namespace mln::morpho
     image_concrete_t<std::remove_reference_t<InputImage>> closing(InputImage&& image, const SE& se)
     {
       auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Closing, image, se).execute();
-      return static_cast<InputImage&>(tmp);
+      return std::any_cast<InputImage&>(tmp);
     }
 
     template <class InputImage, class SE, class OutputImage>
     requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
     void closing(InputImage&& image, const SE& se, OutputImage&& out)
     {
-      mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Closing, image, se, out).execute_inplace();
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Closing, image, se).execute();
+      out = std::any_cast<OutputImage&>(tmp);
     }
   } // namespace parallel
 

@@ -2,10 +2,10 @@
 
 namespace mln::morpho
 {
-  ndbuffer_image MorphoPipeline::execute() const
+  std::any MorphoPipeline::execute() const
   {
-    mln::ndbuffer_image dil;
-    mln::ndbuffer_image ero;
+    std::any dil;
+    std::any ero;
     switch (m_op)
     {
     case e_MorphoPipelineOperation::Closing:
@@ -36,10 +36,10 @@ namespace mln::morpho
     __builtin_unreachable();
   }
 
-  void MorphoPipeline::execute_inplace()
+  /*void MorphoPipeline::execute_inplace()
   {
-    mln::ndbuffer_image dil;
-    mln::ndbuffer_image ero;
+    std::any dil;
+    std::any ero;
     switch (m_op)
     {
     case e_MorphoPipelineOperation::Closing:
@@ -74,5 +74,5 @@ namespace mln::morpho
       m_output = m_diff(m_input, ero);
       break;
     }
-  }
+  } RECHECK might be unnecessary*/
 } // namespace mln::morpho

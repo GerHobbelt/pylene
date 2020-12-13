@@ -137,49 +137,41 @@ namespace mln::morpho
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> bottom_hat(InputImage&& image, const SE& se)
     {
-      using I    = std::remove_reference_t<InputImage>;
+      using I = std::remove_reference_t<InputImage>;
       using Func = details::grad_op<image_value_t<I>>;
-      using R    = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O    = image_ch_value_t<I, R>;
+      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
+      using O = image_ch_value_t<I, R>;
 
-      auto closing = mln::morpho::parallel::closing(image, se);
-      auto out     = mln::parallel::transform(image, closing, mln::morpho::details::grad_op<image_value_t<I>>());
-
-      return static_cast<O&>(out);
+			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Bot_hat, image, se).execute();
+      return std::any_cast<O&>(tmp);
     }
 
     template <class InputImage, class SE, class OutputImage>
     requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
     void bottom_hat(InputImage&& image, const SE& se, OutputImage&& out)
     {
-      using I    = std::remove_reference_t<InputImage>;
-
-      auto closing = mln::morpho::parallel::closing(image, se);
-      mln::parallel::transform(image, closing, out, mln::morpho::details::grad_op<image_value_t<I>>());
+			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Bot_hat, image, se).execute();
+      out = std::any_cast<OutputImage&>(tmp);
     }
 
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> top_hat(InputImage&& image, const SE& se)
     {
-      using I    = std::remove_reference_t<InputImage>;
+      using I = std::remove_reference_t<InputImage>;
       using Func = details::grad_op<image_value_t<I>>;
-      using R    = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O    = image_ch_value_t<I, R>;
+      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
+      using O = image_ch_value_t<I, R>;
 
-      auto opening = mln::morpho::parallel::opening(image, se);
-      auto out     = mln::parallel::transform(opening, image, mln::morpho::details::grad_op<image_value_t<I>>());
-
-      return static_cast<O&>(out);
+			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Top_hat, image, se).execute();
+      return std::any_cast<O&>(tmp);
     }
 
     template <class InputImage, class SE, class OutputImage>
     requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
     void top_hat(InputImage&& image, const SE& se, OutputImage&& out)
     {
-      using I    = std::remove_reference_t<InputImage>;
-
-      auto opening = mln::morpho::parallel::opening(image, se);
-      mln::parallel::transform(opening, image, out, mln::morpho::details::grad_op<image_value_t<I>>());
+			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Top_hat, image, se).execute();
+      out = std::any_cast<OutputImage&>(tmp);
     }
   } // namespace parallel
 

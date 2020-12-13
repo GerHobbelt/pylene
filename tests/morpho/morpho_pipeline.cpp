@@ -50,7 +50,7 @@ TEST(Morpho, gradient_int_endtoend)
   tbb::task_scheduler_init init;
 
   auto grad1 = mln::morpho::internal_gradient(ima, win);
-  auto grad2 = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_int, ima, win).execute(); //TODO mln::morpho::parallel::internal_gradient
+  auto grad2 = std::any_cast<mln::image2d<mln::uint8>>(mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_int, ima, win).execute());
 
-  ASSERT_IMAGES_EQ_EXP((grad2.__cast<uint8_t, 2>()), grad1);
+  ASSERT_IMAGES_EQ_EXP(grad2, grad1);
 }

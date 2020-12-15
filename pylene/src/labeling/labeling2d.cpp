@@ -33,12 +33,33 @@ namespace
     }
   }
 
-  template <int W>
-  void find(uint8_t* equiv_table, xsimd::batch<uint8_t, W> x)
+  template <class T, int W, class U, std::size_t... Ints>
+  void set_from_array(xsimd::batch<T, W>& x, U v[W], std::index_sequence<Ints...>)
   {
-    while (
-    for (int i = 0; i < W
+    x = xsimd::batch<T, W>(v[Ints]...);
   }
+
+  template <int W>
+  void find(uint8_t* equiv_table, xsimd::batch<uint8_t, W>& x)
+  {
+    int X[W];
+    for (int i = 0; i < W; ++i)
+    {
+      int y = x[i];
+      while (y != equiv_table[y])
+        y = equiv_table[y];
+      X[i] = y;
+    }
+    set_from_array(x, X, std::make_index_sequence<W>());
+  }
+
+  template <int W>
+  void merge(uint8_t* equiv_table, int a[W], int b[W])
+  {
+
+
+  }
+
 
   void vlabelize2d_16x16_pass_2(mln::bp::Tile2DView<uint8_t> labels, uint8_t* __restrict__ equiv_table)
   {
@@ -52,12 +73,10 @@ namespace
     for (int y = 0; y < H; ++y)
     {
       X.load_aligned(reinterpret_cast<uint8_t*>(labels.row(y)));
+      find(equiv_table, X);
+      
 
 
-      L += xsimd::bitwise_andnot(Xold, X); // X[i] = X[i-1] if (X[i-1] == 1 and X[i] == 1) else L[i]
-
-      Xold = X;
-      X = X * L;
       X.store_aligned(static_cast<uint8_t*>(labels.row(y)));
     }
   }

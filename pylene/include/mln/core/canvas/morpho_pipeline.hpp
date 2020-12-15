@@ -47,26 +47,11 @@ namespace mln::morpho
 
   class MorphoPipeline
   {
-    using functype         = std::function<std::any(std::any)>;
-    using last_op_functype = std::function<std::any(std::any, std::any)>;
+    using functype         = std::function<std::any(std::any&)>;
+    using functype_out     = std::function<void(std::any&, std::any&)>;
+    using last_op_functype = std::function<void(std::any&, std::any&, std::any&)>;
 
   public:
-    template <class Image, class SE>
-    MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se)
-      : m_input{input}
-      , m_op{op}
-    {
-      m_erode = [se](std::any f) -> std::any {
-        return mln::morpho::parallel::erosion(std::any_cast<Image&>(f), se);
-      };
-      m_dilate = [se](std::any f) -> std::any {
-        return mln::morpho::parallel::dilation(std::any_cast<Image&>(f), se);
-      };
-      m_diff = [](std::any a, std::any b) -> std::any {
-        using I = std::remove_reference_t<Image>;
-        return mln::parallel::transform(std::any_cast<Image&>(a), std::any_cast<Image&>(b), details::grad_op<image_value_t<I>>());
-      };
-    }
 
     template <class Image, class SE, class OutputImage>
     MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se, OutputImage& out)
@@ -74,20 +59,26 @@ namespace mln::morpho
       , m_output{out}
       , m_op{op}
     {
-      m_erode = [se](std::any f) -> std::any {
+      m_erode = [se](std::any& f) -> std::any {
         return mln::morpho::parallel::erosion(std::any_cast<Image&>(f), se);
       };
-      m_dilate = [se](std::any f) -> std::any {
+      m_dilate = [se](std::any& f) -> std::any {
         return mln::morpho::parallel::dilation(std::any_cast<Image&>(f), se);
       };
-      m_diff = [](std::any a, std::any b) -> std::any {
+      m_erode_out = [se](std::any& f, std::any& out) {
+        return mln::morpho::parallel::erosion(std::any_cast<Image&>(f), se, std::any_cast<OutputImage&>(out));
+      };
+      m_dilate_out = [se](std::any& f, std::any& out) {
+        return mln::morpho::parallel::dilation(std::any_cast<Image&>(f), se, std::any_cast<OutputImage&>(out));
+      };
+      m_diff = [](std::any& a, std::any& b, std::any& out) {
         using I = std::remove_reference_t<Image>;
-        return mln::parallel::transform(std::any_cast<Image&>(a), std::any_cast<Image&>(b), details::grad_op<image_value_t<I>>());
+        mln::parallel::transform(std::any_cast<Image&>(a), std::any_cast<Image&>(b), std::any_cast<OutputImage&>(out), details::grad_op<image_value_t<I>>());
       };
     }
 
-    std::any execute() const;
-    void execute_inplace();
+
+    void execute();
 
 
   private:
@@ -95,6 +86,8 @@ namespace mln::morpho
     std::any                  m_output;
     functype                  m_erode;
     functype                  m_dilate;
+    functype_out              m_erode_out;
+    functype_out              m_dilate_out;
     last_op_functype          m_diff;
     e_MorphoPipelineOperation m_op;
   };

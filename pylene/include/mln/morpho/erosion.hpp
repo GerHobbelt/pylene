@@ -150,6 +150,15 @@ namespace mln::morpho
                                   tile_height, parallel);
     }
 
+    template <class InputImage, class SE, class OutputImage>
+    void erosion(InputImage&& image, const SE& se, OutputImage&& out)
+    {
+      constexpr int kDefaultTileWidth = 128;
+      constexpr int kDefaultTileHeight = 128;
+      return erosion(image, se, out, kDefaultTileWidth, kDefaultTileHeight);
+    }
+
+
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> //
     erosion(InputImage&& image, const SE& se, int tile_width, int tile_height)

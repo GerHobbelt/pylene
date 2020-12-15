@@ -2,7 +2,7 @@
 
 namespace mln::morpho
 {
-  std::any MorphoPipeline::execute() const
+  void MorphoPipeline::execute()
   {
     std::any dil;
     std::any ero;
@@ -10,30 +10,36 @@ namespace mln::morpho
     {
     case e_MorphoPipelineOperation::Closing:
       dil = m_dilate(m_input);
-      return m_erode(dil);
+      m_erode_out(dil, m_output);
+      break;
     case e_MorphoPipelineOperation::Opening:
       ero = m_erode(m_input);
-      return m_dilate(ero);
+      m_dilate_out(ero, m_output);
+      break;
     case e_MorphoPipelineOperation::Grad_thick:
       dil = m_dilate(m_input);
       ero = m_erode(m_input);
-      return m_diff(dil, ero);
+      m_diff(dil, ero, m_output);
+      break;
     case e_MorphoPipelineOperation::Grad_ext:
       dil = m_dilate(m_input);
-      return m_diff(dil, m_input);
+      m_diff(dil, m_input, m_output);
+      break;
     case e_MorphoPipelineOperation::Grad_int:
       ero = m_erode(m_input);
-      return m_diff(m_input, ero);
+      m_diff(m_input, ero, m_output);
+      break;
     case e_MorphoPipelineOperation::Top_hat:
       ero = m_erode(m_input);
       dil = m_dilate(ero); // opening
-      return m_diff(dil, m_input);
+      m_diff(dil, m_input, m_output);
+      break;
     case e_MorphoPipelineOperation::Bot_hat:
       dil = m_dilate(m_input);
       ero = m_erode(dil); // closing
-      return m_diff(m_input, ero);
+      m_diff(m_input, ero, m_output);
+      break;
     }
-    __builtin_unreachable();
   }
 
   /*void MorphoPipeline::execute_inplace()

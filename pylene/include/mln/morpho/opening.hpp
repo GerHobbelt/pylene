@@ -140,16 +140,18 @@ namespace mln::morpho
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&& image, const SE& se)
     {
-      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se).execute();
-      return std::any_cast<InputImage&>(tmp);
+      auto out = imconcretize(image).build();
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se, out);
+      tmp.execute();
+      return out;
     }
 
     template <class InputImage, class SE, class OutputImage>
     requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
     void opening(InputImage&& image, const SE& se, OutputImage&& out)
     {
-      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se).execute();
-      out = std::any_cast<OutputImage&>(tmp);
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Opening, image, se, out);
+      tmp.execute();
     }
   } // namespace parallel
 

@@ -218,6 +218,7 @@ namespace mln::morpho
                                   tile_height, parallel);
     }
 
+
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out)
     {

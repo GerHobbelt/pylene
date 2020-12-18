@@ -137,41 +137,35 @@ namespace mln::morpho
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> bottom_hat(InputImage&& image, const SE& se)
     {
-      using I = std::remove_reference_t<InputImage>;
-      using Func = details::grad_op<image_value_t<I>>;
-      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O = image_ch_value_t<I, R>;
-
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Bot_hat, image, se).execute();
-      return std::any_cast<O&>(tmp);
+      auto out = imconcretize(image).build();
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Bot_hat, image, se, out);
+      tmp.execute();
+      return out;
     }
 
     template <class InputImage, class SE, class OutputImage>
     requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
     void bottom_hat(InputImage&& image, const SE& se, OutputImage&& out)
     {
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Bot_hat, image, se).execute();
-      out = std::any_cast<OutputImage&>(tmp);
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Bot_hat, image, se, out);
+      tmp.execute();
     }
 
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> top_hat(InputImage&& image, const SE& se)
     {
-      using I = std::remove_reference_t<InputImage>;
-      using Func = details::grad_op<image_value_t<I>>;
-      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O = image_ch_value_t<I, R>;
-
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Top_hat, image, se).execute();
-      return std::any_cast<O&>(tmp);
+      auto out = imconcretize(image).build();
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Top_hat, image, se, out);
+      tmp.execute();
+      return out;
     }
 
     template <class InputImage, class SE, class OutputImage>
     requires mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value
     void top_hat(InputImage&& image, const SE& se, OutputImage&& out)
     {
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Top_hat, image, se).execute();
-      out = std::any_cast<OutputImage&>(tmp);
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Top_hat, image, se, out);
+      tmp.execute();
     }
   } // namespace parallel
 

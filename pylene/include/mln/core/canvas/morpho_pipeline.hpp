@@ -22,7 +22,7 @@ namespace mln::morpho
     };
 
     template <class T>
-    // require std...
+    // TODO require std...
     struct grad_op<T, std::enable_if_t<std::is_arithmetic_v<T>>>
     {
       using result_type = T;
@@ -54,6 +54,7 @@ namespace mln::morpho
   public:
 
     template <class Image, class SE, class OutputImage>
+    requires std::is_convertible_v<image_value_t<Image>, image_value_t<OutputImage>>
     MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se, OutputImage& out)
       : m_input{input}
       , m_output{out}
@@ -77,6 +78,23 @@ namespace mln::morpho
       };
     }
 
+    template <class Image, class SE, class OutputImage>
+    MorphoPipeline(e_MorphoPipelineOperation op, Image& input, const SE& se, OutputImage& out)
+      : m_input{input}
+      , m_output{out}
+      , m_op{op}
+    {
+      m_erode = [se](std::any& f) -> std::any {
+        return mln::morpho::parallel::erosion(std::any_cast<Image&>(f), se);
+      };
+      m_dilate = [se](std::any& f) -> std::any {
+        return mln::morpho::parallel::dilation(std::any_cast<Image&>(f), se);
+      };
+      m_diff = [](std::any& a, std::any& b, std::any& out) {
+        using I = std::remove_reference_t<Image>;
+        mln::parallel::transform(std::any_cast<Image&>(a), std::any_cast<Image&>(b), std::any_cast<OutputImage&>(out), details::grad_op<image_value_t<I>>());
+      };
+    }
 
     void execute();
 

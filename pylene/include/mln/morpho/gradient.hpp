@@ -129,39 +129,42 @@ namespace mln::morpho
     /*************************/
 
     template <class InputImage, class SE>
-    details::gradient_result_t<std::remove_reference_t<InputImage>> gradient(InputImage&& input, const SE& se)
+    details::gradient_result_t<std::remove_reference_t<InputImage>> gradient(InputImage&& image, const SE& se)
     {
       using I = std::remove_reference_t<InputImage>;
-      using Func = details::grad_op<image_value_t<I>>;
-      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O = image_ch_value_t<I, R>;
+      using R = typename details::grad_op<image_value_t<I>>::result_type;
+      using O = details::gradient_result_t<I>;
 
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_thick, input, se).execute();
-      return std::any_cast<O&>(tmp);
+      O out = imchvalue<R>(image);
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_thick, image, se, out);
+      tmp.execute();
+      return out;
     }
 
     template <class InputImage, class SE>
-    details::gradient_result_t<std::remove_reference_t<InputImage>> external_gradient(InputImage&& input, const SE& se)
+    details::gradient_result_t<std::remove_reference_t<InputImage>> external_gradient(InputImage&& image, const SE& se)
     {
       using I = std::remove_reference_t<InputImage>;
-      using Func = details::grad_op<image_value_t<I>>;
-      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O = image_ch_value_t<I, R>;
+      using R = typename details::grad_op<image_value_t<I>>::result_type;
+      using O = details::gradient_result_t<I>;
 
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_ext, input, se).execute();
-      return std::any_cast<O&>(tmp);
+      O out = imchvalue<R>(image);
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_ext, image, se, out);
+      tmp.execute();
+      return out;
     }
 
     template <class InputImage, class SE>
-    details::gradient_result_t<std::remove_reference_t<InputImage>> internal_gradient(InputImage&& input, const SE& se)
+    details::gradient_result_t<std::remove_reference_t<InputImage>> internal_gradient(InputImage&& image, const SE& se)
     {
       using I = std::remove_reference_t<InputImage>;
-      using Func = details::grad_op<image_value_t<I>>;
-      using R = std::invoke_result_t<Func, image_reference_t<I>, image_reference_t<I>>;
-      using O = image_ch_value_t<I, R>;
+      using R = typename details::grad_op<image_value_t<I>>::result_type;
+      using O = details::gradient_result_t<I>;
 
-			auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_int, input, se).execute();
-      return std::any_cast<O&>(tmp);
+      O out = imchvalue<R>(image);
+      auto tmp = mln::morpho::MorphoPipeline(mln::morpho::e_MorphoPipelineOperation::Grad_int, image, se, out);
+      tmp.execute();
+      return out;
     }
   } // namespace parallel
 } // namespace mln::morpho

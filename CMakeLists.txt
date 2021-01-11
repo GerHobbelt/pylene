@@ -23,6 +23,10 @@ endif ()
 
 find_package(FreeImage REQUIRED)
 
+set(PYLENE_PYTHON YES CACHE BOOL "Set to NO to disable building python bindings")
+if (PYLENE_PYTHON)
+  find_package(pybind11)
+endif(PYLENE_PYTHON)
 
 # CONFIGURE COMPILER LAUNCHERS
 

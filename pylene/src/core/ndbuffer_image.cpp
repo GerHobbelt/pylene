@@ -624,5 +624,10 @@ namespace mln
     return out;
   }
 
+  std::shared_ptr<internal::ndbuffer_image_data>& __ndbuffer_image<void, -1>::__data()
+  {
+    return m_data;
+  }
+
 
 } // namespace mln

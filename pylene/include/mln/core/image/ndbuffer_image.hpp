@@ -243,6 +243,11 @@ namespace mln
     const details::ndbuffer_image_info_t* __info() const { return this; }
     const axis_info_t& __axes(int i) const { return m_axes[i]; }
     std::byte*         __buf() const { return m_buffer; }
+
+  public:
+    /// Access to the shared_ptr holding the data
+    // SHOULD NOT BE USED EXCEPT FOR PYTHON BINDINGS
+    std::shared_ptr<internal::ndbuffer_image_data>& __data();
   };
 
 

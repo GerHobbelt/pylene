@@ -98,8 +98,8 @@ endif ()
 add_subdirectory(pylene)
 
 if (PYLENE_BUILD_PYTHON)
-add_custom_target(build_python)
-add_subdirectory(pylene-python)
+  add_custom_target(build_python)
+  add_subdirectory(pylene-python)
 endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)

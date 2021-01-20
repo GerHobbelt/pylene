@@ -93,23 +93,8 @@ target_sources(Pylene PRIVATE
                src/morpho/filters2d.cpp
                )
 
-if (pybind11_FOUND AND PYLENE_PYTHON)
-  message(STATUS "Building python bindings")
-  # To make Pylene linkable to the pylena python module
+if (PYLENE_BUILD_PYTHON)
   set_target_properties(Pylene PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-
-  # Pylena python module
-  pybind11_add_module(pylena)
-  target_link_libraries(pylena PRIVATE Pylene::Pylene ImagePath)
-  target_sources(pylena PRIVATE src/python/image_cast.cpp
-                                src/python/io.cpp
-                                src/python/module.cpp
-                                src/python/morpho.cpp
-                                src/python/numpy_format.cpp
-                                src/python/utils.cpp)
-  target_compile_features(pylena PUBLIC cxx_std_20)
-elseif(NOT pybind11_FOUND AND PYLENE_PYTHON)
-  message(STATUS "Pybind11 missing. Skipping python bindings build...")
 endif()
 
 # Compiler configurations

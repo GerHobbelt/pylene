@@ -1,4 +1,4 @@
-#include <mln/python/numpy_format.hpp>
+#include <pln/core/numpy_format.hpp>
 
 namespace pln
 {

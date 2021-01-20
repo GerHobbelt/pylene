@@ -1,6 +1,6 @@
 #include <mln/core/image/private/ndbuffer_image_data.hpp>
-#include <mln/python/image_cast.hpp>
-#include <mln/python/numpy_format.hpp>
+#include <pln/core/image_cast.hpp>
+#include <pln/core/numpy_format.hpp>
 
 #include <vector>
 

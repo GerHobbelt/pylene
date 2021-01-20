@@ -23,11 +23,6 @@ endif ()
 
 find_package(FreeImage REQUIRED)
 
-set(PYLENE_PYTHON YES CACHE BOOL "Set to NO to disable building python bindings")
-if (PYLENE_PYTHON)
-  find_package(pybind11)
-endif(PYLENE_PYTHON)
-
 # CONFIGURE COMPILER LAUNCHERS
 
 option(USE_CCACHE "Use ccache as compiler launcher" ON)
@@ -63,6 +58,7 @@ endif (USE_DISTCC)
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
+option(PYLENE_BUILD_PYTHON "ON to build Python bindings" ON)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -100,6 +96,11 @@ endif ()
 
 # Subdirectories
 add_subdirectory(pylene)
+
+if (PYLENE_BUILD_PYTHON)
+add_custom_target(build_python)
+add_subdirectory(pylene-python)
+endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_custom_target(build-fixtures)

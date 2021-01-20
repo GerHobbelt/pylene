@@ -104,6 +104,7 @@ if (pybind11_FOUND AND PYLENE_PYTHON)
   target_sources(pylena PRIVATE src/python/image_cast.cpp
                                 src/python/io.cpp
                                 src/python/module.cpp
+                                src/python/morpho.cpp
                                 src/python/numpy_format.cpp
                                 src/python/utils.cpp)
   target_compile_features(pylena PUBLIC cxx_std_20)

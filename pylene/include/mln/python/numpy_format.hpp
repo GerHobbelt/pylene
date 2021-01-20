@@ -6,9 +6,9 @@
 
 namespace pln
 {
-    /* mln -> numpy sample type */
-    std::string get_sample_type(mln::sample_type_id);
+  /* mln -> numpy sample type */
+  std::string get_sample_type(mln::sample_type_id);
 
-    /* numpy -> mln sample type */
-    mln::sample_type_id get_sample_type(const std::string&);
-}
+  /* numpy -> mln sample type */
+  mln::sample_type_id get_sample_type(const std::string&);
+} // namespace pln

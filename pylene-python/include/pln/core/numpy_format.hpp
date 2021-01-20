@@ -6,9 +6,13 @@
 
 namespace pln
 {
-  /* mln -> numpy sample type */
-  std::string get_sample_type(mln::sample_type_id);
+  /// \brief Conversion from enumerated type to NumPy string type
+  /// \param[in] type An enumerated type
+  /// \return A string corresponding to the NumPy type
+  std::string get_sample_type(mln::sample_type_id type);
 
-  /* numpy -> mln sample type */
-  mln::sample_type_id get_sample_type(const std::string&);
+  /// \brief Conversion from NumPy string type to enumerated type
+  /// \param[in] type A string corresponding to the NumPy type
+  /// \return An enumerated type
+  mln::sample_type_id get_sample_type(const std::string& type);
 } // namespace pln

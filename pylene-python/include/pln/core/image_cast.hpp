@@ -7,9 +7,15 @@
 
 namespace pln
 {
+  /// \brief Convert a NumPy array to a ndbuffer_image
+  /// \param[in] arr A NumPy array
+  /// \return A ndbuffer_image
   mln::ndbuffer_image from_numpy(pybind11::array arr);
 
-  pybind11::array to_numpy(mln::ndbuffer_image);
+  /// \brief Convert a ndbuffer_image array to a NumPy
+  /// \param[in] arr A ndbuffer_image
+  /// \return A NumPy array
+  pybind11::array to_numpy(mln::ndbuffer_image img);
 } // namespace pln
 
 namespace pybind11::detail

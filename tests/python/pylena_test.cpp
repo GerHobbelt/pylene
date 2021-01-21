@@ -3,8 +3,6 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/range/foreach.hpp>
 
-#include <fixtures/ImagePath/image_path.hpp>
-
 #include <pybind11/pybind11.h>
 
 #include <tuple>
@@ -58,7 +56,6 @@ namespace pln::test
 
     // Utility functions
     m.def("id", [](mln::ndbuffer_image img) { return img; });
-    m.def("get_image_path", [](const std::string& name) { return fixtures::ImagePath::concat_with_filename(name); });
 
     // Checking functions
     m.def("check_from_numpy", &check_from_numpy);

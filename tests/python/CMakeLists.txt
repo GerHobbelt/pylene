@@ -6,7 +6,7 @@ set(PYTHON_PYLENE_SRC ${CMAKE_SOURCE_DIR}/pylene-python/src)
 pybind11_add_module(pylena_test pylena_test.cpp
                                 ${PYTHON_PYLENE_SRC}/core/image_cast.cpp
                                 ${PYTHON_PYLENE_SRC}/core/numpy_format.cpp)
-target_link_libraries(pylena_test PRIVATE Pylene ImagePath)
+target_link_libraries(pylena_test PRIVATE Pylene)
 target_include_directories(pylena_test PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
 add_dependencies(build-tests pylena_test)
 

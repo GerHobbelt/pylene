@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <mln/core/canvas/morpho_pipeline.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/extension/border_management.hpp>

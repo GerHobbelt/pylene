@@ -28,17 +28,23 @@ namespace pln
     return res;
   }
 
-  pybind11::array to_numpy(mln::ndbuffer_image img)
+  pybind11::object to_numpy(mln::ndbuffer_image img)
   {
-    auto data = pybind11::handle();
+    auto& api   = pybind11::detail::npy_api::get();
+    auto  data  = pybind11::handle();
+    int   flags = ~pybind11::detail::npy_api::NPY_ARRAY_OWNDATA_ & pybind11::detail::npy_api::NPY_ARRAY_WRITEABLE_;
     if (img.__data())
+    {
       data = pybind11::cast(img.__data()).inc_ref();
+      flags &= pybind11::detail::npy_api::NPY_ARRAY_C_CONTIGUOUS_;
+    }
 
     /* For the moment, restrict RGB8 image to 2D image */
     const bool               is_rgb8 = img.pdim() == 2 && img.sample_type() == mln::sample_type_id::RGB8;
     const auto               ndim    = img.pdim() + (is_rgb8 ? 1 : 0);
     std::vector<std::size_t> strides(ndim, 1);
     std::vector<std::size_t> shapes(ndim, 3);
+    auto                     descr = pybind11::dtype(get_sample_type(img.sample_type()));
 
     for (auto d = 0; d < img.pdim(); d++)
     {
@@ -46,8 +52,15 @@ namespace pln
       shapes[d]  = img.size(img.pdim() - d - 1);
     }
 
-    return pybind11::array(pybind11::buffer_info(img.buffer(), mln::get_sample_type_id_traits(img.sample_type()).size(),
-                                                 get_sample_type(img.sample_type()), ndim, shapes, strides),
-                           data /* To keep data alive until the end of the life of the numpy array*/);
+    auto res = pybind11::reinterpret_steal<pybind11::object>(api.PyArray_NewFromDescr_(
+        api.PyArray_Type_, descr.release().ptr(), reinterpret_cast<int>(ndim),
+        reinterpret_cast<Py_intptr_t*>(shapes.data()), reinterpret_cast<Py_intptr_t*>(strides.data()),
+        reinterpret_cast<void*>(img.buffer()), flags, nullptr));
+
+    if (!res)
+      throw std::runtime_error("Unable to create the numpy array in ndimage -> array");
+    if (data)
+      api.PyArray_SetBaseObject_(res.ptr(), data.inc_ref().ptr());
+    return res;
   }
 } // namespace pln

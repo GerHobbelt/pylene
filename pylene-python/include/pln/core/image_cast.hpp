@@ -15,7 +15,7 @@ namespace pln
   /// \brief Convert a ndbuffer_image array to a NumPy
   /// \param[in] arr A ndbuffer_image
   /// \return A NumPy array
-  pybind11::array to_numpy(mln::ndbuffer_image img);
+  pybind11::object to_numpy(mln::ndbuffer_image img);
 } // namespace pln
 
 namespace pybind11::detail

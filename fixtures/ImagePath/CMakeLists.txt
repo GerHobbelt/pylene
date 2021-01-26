@@ -6,7 +6,7 @@ add_library(ImagePath STATIC
             include/fixtures/ImagePath/image_path.hpp
             ${CMAKE_CURRENT_BINARY_DIR}/src/image_path.cpp)
 
-target_compile_features(ImagePath PUBLIC cxx_std_17)
+target_compile_features(ImagePath PUBLIC cxx_std_20)
 target_include_directories(ImagePath PUBLIC include)
 
 target_sources(ImagePath PUBLIC

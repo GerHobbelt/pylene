@@ -1,3 +1,4 @@
+/venv
 /build*
 /cmake-build-*
 /doc/source/images/*.png

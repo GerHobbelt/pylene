@@ -1,6 +1,6 @@
 project(Pybind CXX)
 
-find_package(pybind11 CONFIG REQUIRED)
+find_package(pybind11 REQUIRED)
 
 pybind11_add_module(Pylena MODULE
                     src/pylena.cpp

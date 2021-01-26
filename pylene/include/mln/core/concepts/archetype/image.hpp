@@ -4,6 +4,7 @@
 #include <mln/core/concepts/archetype/domain.hpp>
 #include <mln/core/concepts/archetype/pixel.hpp>
 #include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/extension.hpp>
 
 #include <mln/core/private/traits/image.hpp>
 #include <mln/core/private/traits/pixel.hpp>
@@ -299,8 +300,16 @@ namespace mln::archetypes
 
     struct WithExtensionImage : Image
     {
-      struct Extension
+      struct Extension : ::mln::Extension<Extension>
       {
+        using support_fill = std::false_type;
+        using support_mirror = std::false_type;
+        using support_periodize = std::false_type;
+        using support_clamp = std::false_type;
+        using support_extend_with = std::false_type;
+        using value_type = image_value_t<Image>;
+        bool fit(mln::archetypes::StructuringElement<image_point_t<Image>, mln::archetypes::Pixel> se) const;
+        int extent() const;
       };
 
       using extension_type = Extension;

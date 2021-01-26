@@ -4,6 +4,7 @@
 #include <mln/core/concepts/domain.hpp>
 #include <mln/core/concepts/pixel.hpp>
 #include <mln/core/concepts/point.hpp>
+#include <mln/core/concepts/extension.hpp>
 
 #include <mln/core/concepts/archetype/value.hpp>
 
@@ -280,9 +281,10 @@ namespace mln::concepts
     requires {
       typename image_extension_t<I>;
     } &&
+    Extension<image_extension_t<I>, image_point_t<I>> &&
     not ::concepts::same_as<mln::extension::none_extension_tag, image_extension_category_t<I>> &&
     requires (I ima, image_point_t<I> p) {
-      { ima.extension() } -> ::concepts::same_as<image_extension_t<I>>;
+      { ima.extension() } -> ::concepts::convertible_to<image_extension_t<I>>;
     };
 
 

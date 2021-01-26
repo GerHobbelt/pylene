@@ -1,6 +1,9 @@
 #include <mln/core/se/periodic_line2d.hpp>
 
 #include <mln/core/concepts/structuring_element.hpp>
+
+#include <range/v3/range/conversion.hpp>
+
 #include <gtest/gtest.h>
 
 static_assert(mln::concepts::StructuringElement<mln::se::periodic_line2d, mln::point2d>);

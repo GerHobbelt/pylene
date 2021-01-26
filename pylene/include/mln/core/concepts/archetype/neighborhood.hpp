@@ -12,7 +12,6 @@ namespace mln::archetypes
     template <class P, class Pix>
     // clang-format off
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
-#endif
     struct Neighborhood : StructuringElement<P, Pix>
     // clang-format on
     {

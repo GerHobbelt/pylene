@@ -7,6 +7,7 @@ namespace mln::morpho::details
 
   class TileLoaderBase
   {
+    public:
     // Load tile from memory (roi is in the vertical layout coordinates system)
     virtual void load_tile(std::byte* out, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
 
@@ -16,6 +17,7 @@ namespace mln::morpho::details
 
   class TileWriterBase
   {
+    public:
     // Copy a line to output (coordinates and size are in the vertical layout coordinates system)
     virtual void write_tile(const std::byte* in, std::ptrdiff_t byte_stride, mln::box2d roi) = 0;
 

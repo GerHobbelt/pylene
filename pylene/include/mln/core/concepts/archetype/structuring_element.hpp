@@ -3,7 +3,7 @@
 #include <mln/core/concepts/archetype/pixel.hpp>
 #include <mln/core/concepts/archetype/point.hpp>
 #include <mln/core/concepts/neighborhood.hpp>
-#include <mln/core/neighborhood/neighborhood_traits.hpp>
+#include <mln/core/neighborhood/neighborhood.hpp>
 
 #include <range/v3/view/subrange.hpp>
 
@@ -22,7 +22,6 @@ namespace mln::archetypes
     template <class P, class Pix>
     // clang-format off
     requires mln::concepts::Point<P>&& mln::concepts::Pixel<Pix>
-#endif
     struct StructuringElement
     // clang-format on
     {
@@ -39,9 +38,7 @@ namespace mln::archetypes
 
 
     template <class SE>
-    struct AsSE : SE, mln::details::Neighborhood
-    
-    helper  <AsSE<SE>>
+    struct AsSE : SE, mln::details::Neighborhood<AsSE<SE>>
     {
     };
   } // namespace details

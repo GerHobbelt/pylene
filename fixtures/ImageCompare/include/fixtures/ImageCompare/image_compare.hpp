@@ -1,19 +1,20 @@
 #pragma once
 
-#include <mln/core/image/ndimage_fwd.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/image.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/ndimage_fwd.hpp>
 #include <mln/core/range/rows.hpp>
 #include <mln/core/range/view/zip.hpp>
 #include <mln/io/imprint.hpp>
 
-#include <range/v3/begin_end.hpp>
-#include <fmt/core.h>
 
-#include <string>
-#include <functional>
+#include <range/v3/range/access.hpp>
+
 #include <algorithm>
+#include <functional>
+#include <string>
 #include <type_traits>
+
 
 #include <gtest/gtest.h>
 
@@ -61,8 +62,7 @@ namespace fixtures::ImageCompare
       std::function<void(mln::ndbuffer_image)>                        print_fn;
       std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn;
 
-      if constexpr (fmt::internal::has_formatter<TA, fmt::format_context>() &&
-                    fmt::internal::has_formatter<TB, fmt::format_context>())
+      if constexpr (fmt::has_formatter<TA, fmt::format_context>() && fmt::has_formatter<TB, fmt::format_context>())
       {
         print_fn = [](const mln::ndbuffer_image& ima) {
           if (const auto* a = ima.cast_to<TA, adim>())
@@ -148,4 +148,3 @@ namespace fixtures::ImageCompare
 
 #define ASSERT_IMAGES_EQ_EXP2(f, g, flags) ASSERT_TRUE(::fixtures::ImageCompare::compare(f, g, flags))
 #define ASSERT_IMAGES_NE_EXP2(f, g, flags) ASSERT_FALSE(::fixtures::ImageCompare::compare(f, g, flags))
-

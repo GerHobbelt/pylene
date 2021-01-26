@@ -17,6 +17,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include <malloc.h>
 #include <stdio.h>
@@ -69,19 +70,16 @@ namespace details
 } // namespace details
 
 std::vector<std::pair<std::string, std::string>> filenames = {
-    {"a.jpg", "a_bg.jpg"}, //
-    {"b.jpg", "b_bg.jpg"}, //
-    {"c.jpg", "c_bg.jpg"}, //
-    {"d.jpg", "d_bg.jpg"}, //
-    {"e.jpg", "e_bg.jpg"}, //
-    {"f.jpg", "f_bg.jpg"}, //
-    {"g.jpg", "g_bg.jpg"}, //
-    {"h.jpg", "h_bg.jpg"}, //
-    {"i.jpg", "i_bg.jpg"}, //
-    {"j.jpg", "j_bg.jpg"}, //
-    {"k.jpg", "k_bg.jpg"}, //
-    {"l.jpg", "l_bg.jpg"}, //
-    {"m.jpg", "m_bg.jpg"}  //
+    {"castle_fg_1.tif", "castle_bg.tif"}, //
+    {"garden_fg_1.tif", "garden_bg.tif"}, //
+    {"garden_fg_2.tif", "garden_bg.tif"}, //
+    {"garden_fg_3.tif", "garden_bg.tif"}, //
+    {"garden_fg_4.tif", "garden_bg.tif"}, //
+    {"garden_fg_5.tif", "garden_bg.tif"}, //
+    {"pathway_fg_1.tif", "pathway_bg.tif"}, //
+    {"pathway_fg_2.tif", "pathway_bg.tif"}, //
+    {"pathway_fg_3.tif", "pathway_bg.tif"}, //
+    {"pathway_fg_4.tif", "pathway_bg.tif"}
 };
 
 
@@ -98,7 +96,7 @@ public:
   using callback_cv  = std::function<void(const image_cv_t& input_img_cv, const image_cv_t& input_bg_cv, image_cv_t& output_cv)>;
 
   const std::string filepath =
-      std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/bg_sub_mosaic";
+      std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/clean_samples/6048x4024";
 
   BMPlnVsOpenCV_BgSubPipeline()
   {
@@ -115,15 +113,17 @@ public:
 
       for (std::size_t i = 0; i < n; ++i)
       {
-        mln::io::imread(fmt::format("{}/mosaic_{}_{}", filepath, "6x6", filenames[i].first), g_input_imgs[i]);
-        mln::io::imread(fmt::format("{}/mosaic_{}_{}", filepath, "6x6", filenames[i].second), g_input_bgs[i]);
+        std::cout << "reading " << fmt::format("{}/{}", filepath, filenames[i].first) << std::endl;
+
+        mln::io::imread(fmt::format("{}/{}", filepath, filenames[i].first), g_input_imgs[i]);
+        mln::io::imread(fmt::format("{}/{}", filepath, filenames[i].second), g_input_bgs[i]);
         mln::resize(g_outputs[i], g_input_imgs[i]);
 
         int w = g_input_imgs[i].width();
         int h = g_input_imgs[i].height();
 
-        g_input_imgs_cv[i] = cv::imread(fmt::format("{}/mosaic_{}_{}", filepath, "6x6", filenames[i].first), cv::IMREAD_COLOR);
-        g_input_bgs_cv[i]  = cv::imread(fmt::format("{}/mosaic_{}_{}", filepath, "6x6", filenames[i].second), cv::IMREAD_COLOR);
+        g_input_imgs_cv[i] = cv::imread(fmt::format("{}/{}", filepath, filenames[i].first), cv::IMREAD_COLOR);
+        g_input_bgs_cv[i]  = cv::imread(fmt::format("{}/{}", filepath, filenames[i].second), cv::IMREAD_COLOR);
         g_outputs_cv[i].create(w, h, CV_8UC1);
 
         g_size += w * h;

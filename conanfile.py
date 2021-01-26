@@ -1,6 +1,7 @@
 from conans import CMake, ConanFile, tools
 import os
 
+
 class Pylene(ConanFile):
     name = "pylene"
     version = "head"
@@ -19,21 +20,20 @@ class Pylene(ConanFile):
         "boost:shared": True
     }
 
-    generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
+    generators = ["cmake", "cmake_paths", "cmake_find_package"]
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     build_requires = [
         "gtest/[>=1.10]",
-        "benchmark/[>=1.5.0]",
+        "benchmark/[>=1.5.1]",
     ]
 
     requires = [
         "range-v3/0.10.0",
-        "fmt/6.0.0",
-        "boost/1.73.0",
-        "pybind11/2.3.0@conan/stable"
+        "fmt/7.0.3",
+        "boost/1.74.0",
+        "pybind11/2.5.0"
     ]
-
 
     def configure(self):
         self.settings.compiler.cppstd = "20"
@@ -54,9 +54,8 @@ class Pylene(ConanFile):
         self.cpp_info.system_libs.append("freeimage")
         self.cpp_info.names["cmake_find_package"] = "Pylene"
         self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
-        self.cpp_info.libs = [ "Pylene" ]
+        self.cpp_info.libs = ["Pylene"]
         self.cpp_info.cxxflags.append(tools.cppstd_flag(self.settings))
-
 
         v = tools.Version(self.settings.compiler.version)
         if self.settings.compiler == "gcc" and v.major == "9":

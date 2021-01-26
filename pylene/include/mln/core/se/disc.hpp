@@ -37,9 +37,10 @@ namespace mln::se
   /// \endrst
   class disc : public se_facade<disc>
   {
-    using inc_type = mln::se::custom_se<::ranges::span<point2d>>;
-
   public:
+
+    using inc_type = mln::se::custom_se<::ranges::span<point2d>>;
+    
     /// Enumeration of disc approximation
     enum approx
     {

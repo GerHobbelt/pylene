@@ -3,7 +3,7 @@
 # Based on asan-wrapper script from RWTH Aachen University and Matthew Arsenault, for our specific usage
 
 lib=$(echo pylena_test*.so)
-libasan=$(ldd $lib | grep libasan | sed "s/^[[:space:]]//" | cut -d' ' -f1)
+libasan=$(ldd $lib | grep asan | sed "s/^[[:space:]]//" | cut -d' ' -f1)
 libasan_filename=$($CC --print-file-name=$libasan)
 
 if [ -n "$libasan" ]

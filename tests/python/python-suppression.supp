@@ -1,0 +1,2 @@
+leak:_PyObject_GC_NewVar
+leak:PyCode_NewWithPosOnlyArgs

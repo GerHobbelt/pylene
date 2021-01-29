@@ -128,8 +128,11 @@ distcheck-linux-clang10-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"
+        #CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        #CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CONAN_PROFILE: "clang-10"
 
 distcheck-linux-gcc10-release:
@@ -152,8 +155,11 @@ distcheck-linux-gcc10-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        #CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        #CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        ASAN: "ON"
+        MSAN: "OFF"
+        UBSAN: "ON"        
         CONAN_PROFILE: "gcc-10"
 
 

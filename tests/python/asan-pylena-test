@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Based on asan-wrapper script from RWTH Aachen University and Matthew Arsenault, for our specific usage
+
+lib=$(echo pylena_test*.so)
+libasan=$(ldd $lib | grep libasan | sed "s/^[[:space:]]//" | cut -d' ' -f1)
+libasan_filename=$($CC --print-file-name=$libasan)
+
+if [ -n "$libasan" ]
+then
+    if [ -n "$LD_PRELOAD" ]
+    then
+        export LD_PRELOAD="$libasan_filename:$LD_PRELOAD"
+    else
+        export LD_PRELOAD="$libasan_filename"
+    fi
+    export PYTHONMALLOC=malloc
+    export LSAN_OPTIONS="suppressions=python-suppression.supp:print_suppressions=0"
+fi
+
+exec $@

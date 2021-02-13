@@ -60,6 +60,10 @@ option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 option(PYLENE_BUILD_PYTHON "ON to build Python bindings" ON)
 
+if (PYLENE_BUILD_PYTHON)
+  find_package(pybind11 REQUIRED)
+endif(PYLENE_BUILD_PYTHON)
+
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
   add_compile_options(

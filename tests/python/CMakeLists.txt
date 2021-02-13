@@ -1,4 +1,3 @@
-find_package(pybind11 REQUIRED)
 pybind11_find_import(numpy REQUIRED)
 
 # Python module for testing

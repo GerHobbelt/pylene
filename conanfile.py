@@ -10,11 +10,13 @@ class Pylene(ConanFile):
     settings = "os", "compiler", "arch", "build_type"
     options = {
         "shared": [True, False],
-        "fPIC": [True, False]
+        "fPIC": [True, False],
+        "python": [True, False]
     }
     default_options = {
         "shared": False,
         "fPIC": False,
+        "python": False,
         "gtest:shared": False,
         "boost:shared": True
     }
@@ -52,6 +54,8 @@ class Pylene(ConanFile):
     def build(self):
         cmake = CMake(self)
         cmake.definitions["PYLENE_BUILD_LIBS_ONLY"] = "YES"
+        if self.options.python:
+            cmake.definitions["PYLENE_BUILD_PYTHON"] = "YES"
         cmake.configure()
         cmake.build()
         cmake.install()

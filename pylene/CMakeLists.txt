@@ -93,10 +93,6 @@ target_sources(Pylene PRIVATE
                src/morpho/filters2d.cpp
                )
 
-if (PYLENE_BUILD_PYTHON)
-  set_target_properties(Pylene PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-endif()
-
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_20)
 

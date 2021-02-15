@@ -58,7 +58,7 @@ endif (USE_DISTCC)
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
-option(PYLENE_BUILD_PYTHON "ON to build Python bindings" ON)
+option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
 if (PYLENE_BUILD_PYTHON)
   find_package(pybind11 REQUIRED)
@@ -101,9 +101,11 @@ endif ()
 # Subdirectories
 add_subdirectory(pylene)
 
-if (PYLENE_BUILD_PYTHON)
+if (PYLENE_BUILD_PYTHON AND CMAKE_POSITION_INDEPENDENT_CODE)
   add_custom_target(build_python)
   add_subdirectory(pylene-python)
+elseif (PYLENE_BUILD_PYTHON)
+  message(WARNING "Position Independent Code disabled. Skip Python bindings...")
 endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)

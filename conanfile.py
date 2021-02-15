@@ -25,7 +25,11 @@ class Pylene(ConanFile):
     build_requires = [
         "gtest/[>=1.10]",
         "benchmark/[>=1.5.0]",
-        "pybind11/[>=2.6.0]",
+        # Temporary remove pybind11 from conan because of the issue
+        # https://github.com/conan-io/conan-center-index/issues/4407
+        # on conan 1.33 and waiting for the merging of the PR
+        # https://github.com/conan-io/conan-center-index/pull/4445
+        #"pybind11/2.6.2", 
 
         # For now boost is too heavy and is not based on components
         # Such a dependancy brings linktime overhead because too many libraries are linked

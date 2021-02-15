@@ -15,7 +15,6 @@ then
         export LD_PRELOAD="$libasan_filename"
     fi
     export PYTHONMALLOC=malloc
-    #export LSAN_OPTIONS="suppressions=python-suppression.supp:print_suppressions=0"
 fi
 
 out=$($@ 2>&1)

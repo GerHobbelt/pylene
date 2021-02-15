@@ -50,5 +50,15 @@ class TestNumpyImage(unittest.TestCase):
         arr = np.arange(12).reshape((4, 3)).astype(np.int32)
         self.assertTrue(pln.check_from_numpy(arr))
 
+    def test_ndbuffer_to_numpy(self):
+        res = pln.iota()
+        res2 = pln.id(res)
+        self.assertTrue(res.dtype == res2.dtype == np.uint16)
+        self.assertTrue(res.shape[0] == res2.shape[0] == 10)
+        self.assertTrue(res.shape[1] == res2.shape[1] == 15)
+        self.assertTrue(res.strides[0] == res2.strides[0] == 30)
+        self.assertTrue(res.strides[1] == res2.strides[1] == 2)
+        self.assertTrue(res.data == res2.data)
+
 if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,6 @@ target_include_directories(pylena_test PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python
 
 # Sanitizer (clang linked statically asan by default unlike gcc)
 if ((SANITIZE_ADDRESS OR SANITIZE_UNDEFINED OR SANITIZE_MEMORY OR SANITIZE_THREAD))
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/python-suppression.supp DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         target_compile_options(pylena_test PRIVATE -shared-libasan)
         target_link_options(pylena_test PRIVATE -shared-libasan)

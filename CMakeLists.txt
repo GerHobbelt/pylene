@@ -60,10 +60,6 @@ option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
-if (PYLENE_BUILD_PYTHON)
-  find_package(pybind11 REQUIRED)
-endif(PYLENE_BUILD_PYTHON)
-
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
   add_compile_options(
@@ -102,6 +98,10 @@ endif ()
 add_subdirectory(pylene)
 
 if (PYLENE_BUILD_PYTHON AND CMAKE_POSITION_INDEPENDENT_CODE)
+  # Until the cmake_find_package conan generator will be broken for pybind11 with conan 1.33,
+  # we will use these two lines
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONAN_BUILD_MODULE_PATH_PYBIND11}")
+  include(pybind11Install)
   add_custom_target(build_python)
   add_subdirectory(pylene-python)
 elseif (PYLENE_BUILD_PYTHON)

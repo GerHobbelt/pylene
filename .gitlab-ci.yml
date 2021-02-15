@@ -46,7 +46,7 @@ windows-debug:
     script:
         - mkdir build; cd build
         - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20
-        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=On
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
@@ -70,7 +70,7 @@ windows-debug:
     script:
         - mkdir build && cd build
         - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=On
         - cmake --build . --target Pylene
         - cmake --build . --target pylena
         - cmake --build . --target build-tests

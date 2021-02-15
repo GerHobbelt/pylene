@@ -8,21 +8,25 @@ namespace pln
 {
   mln::ndbuffer_image from_numpy(pybind11::array arr)
   {
-    auto                        base    = arr.base();
-    const auto                  info    = arr.request();
-    const auto                  type    = get_sample_type(info.format);
-    const bool                  is_rgb8 = info.ndim == 3 && info.shape[2] == 3 && type == mln::sample_type_id::UINT8;
-    const auto                  pdim    = info.ndim - (is_rgb8 ? 1 : 0);
-    std::vector<int>            size(pdim);
-    std::vector<std::ptrdiff_t> strides(pdim);
+    auto       base    = arr.base();
+    const auto info    = arr.request();
+    const auto type    = get_sample_type(info.format);
+    const bool is_rgb8 = info.ndim == 3 && info.shape[2] == 3 && type == mln::sample_type_id::UINT8;
+    const auto pdim    = info.ndim - (is_rgb8 ? 1 : 0);
+    if (pdim > mln::PYLENE_NDBUFFER_DEFAULT_DIM)
+      throw std::invalid_argument("Invalid number of dimension (should be < 5)");
+    int            size[mln::PYLENE_NDBUFFER_DEFAULT_DIM]    = {0};
+    std::ptrdiff_t strides[mln::PYLENE_NDBUFFER_DEFAULT_DIM] = {0};
     for (auto d = 0; d < pdim; d++)
     {
       size[d]    = info.shape[pdim - d - 1];
       strides[d] = info.strides[pdim - d - 1];
+      if (d > 0 && strides[d] < strides[d - 1])
+        throw std::invalid_argument("Array should be C contiguous");
     }
     const auto sample_type = is_rgb8 ? mln::sample_type_id::RGB8 : type;
-    auto res = mln::ndbuffer_image::from_buffer(reinterpret_cast<std::byte*>(info.ptr), sample_type, pdim, size.data(),
-                                                strides.data());
+    auto       res =
+        mln::ndbuffer_image::from_buffer(reinterpret_cast<std::byte*>(info.ptr), sample_type, pdim, size, strides);
     if (base && pybind11::isinstance<mln::internal::ndbuffer_image_data>(base))
       res.__data() = pybind11::cast<std::shared_ptr<mln::internal::ndbuffer_image_data>>(base);
     return res;

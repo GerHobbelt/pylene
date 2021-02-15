@@ -29,27 +29,6 @@ namespace pln::test
     return res;
   }
 
-  /// \brief Check a specific array for the conversion NumPy (fortran order) -> ndbuffer_image
-  /// \param[in] img An image created by numpy with specific values and parameters
-  /// \return A boolean indicating if the convertion worked
-  auto check_from_numpy_f(const mln::ndbuffer_image& img)
-  {
-    bool res     = true;
-    res          = res && img.sample_type() == mln::sample_type_id::INT32;
-    res          = res && img.pdim() == 2;
-    res          = res && img.size(0) == 3;
-    res          = res && img.size(1) == 4;
-    res          = res && img.byte_stride(0) == 16;
-    res          = res && img.byte_stride(1) == 4;
-    //std::int32_t i = 0;
-    auto casted = img.__cast<std::int32_t, 2>();
-    mln_foreach (auto p, casted.domain())
-      //res = res && casted(p) == (i++);
-      pybind11::print(casted(p));
-
-    return res;
-  }
-
   PYBIND11_MODULE(pylena_test, m)
   {
     pybind11::module_::import("pylena");
@@ -59,6 +38,5 @@ namespace pln::test
 
     // Checking functions
     m.def("check_from_numpy", &check_from_numpy);
-    m.def("check_from_numpy_f", &check_from_numpy_f);
   }
 } // namespace pln::test

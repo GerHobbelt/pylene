@@ -57,5 +57,19 @@ class TestNumpyImage(unittest.TestCase):
         self.assertTrue(res.strides[1] == res2.strides[1] == 2)
         self.assertTrue(res.data == res2.data)
 
+    def test_several_pylena_numpy_extension(self):
+        """
+        Just check there are no memory leaks or runtime error, not a precise result
+        """
+        import pylena_extension as ext
+        img1 = pln.iota()
+        img2 = ext.generate_iota()
+        res1 = pln.id(img2)
+        res2 = ext.id(img1)
+        expected1 = np.arange(10, 10 + 10 * 15).reshape((15, 10))
+        expected2 = np.arange(10 * 15).reshape((10, 15))
+        self.assertTrue(np.all(res1 == expected1))
+        self.assertTrue(np.all(res2 == expected2))
+
 if __name__ == "__main__":
     unittest.main()

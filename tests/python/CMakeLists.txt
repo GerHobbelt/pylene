@@ -5,6 +5,11 @@ pybind11_add_module(pylena_test pylena_test.cpp)
 target_link_libraries(pylena_test PRIVATE Pylene pylena_numpy)
 target_include_directories(pylena_test PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
 
+# Dummy extension for testing
+pybind11_add_module(pylena_extension extension_pylena_numpy.cpp)
+target_link_libraries(pylena_extension PRIVATE Pylene pylena_numpy)
+target_include_directories(pylena_extension PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
+
 # Sanitizer (clang linked statically asan by default unlike gcc)
 if ((SANITIZE_ADDRESS OR SANITIZE_UNDEFINED OR SANITIZE_MEMORY OR SANITIZE_THREAD))
     if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)

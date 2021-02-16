@@ -8,3 +8,10 @@ pybind11_add_module(pylena)
 target_link_libraries(pylena PRIVATE Pylene pylena_numpy)
 target_include_directories(pylena PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_sources(pylena PRIVATE src/module.cpp)
+
+include(GNUInstallDirs)
+install(TARGETS pylena_numpy
+        EXPORT PyleneTargets)
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/pln/core/image_cast.hpp
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/pln/core)

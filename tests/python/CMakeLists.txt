@@ -4,11 +4,13 @@ pybind11_find_import(numpy REQUIRED)
 pybind11_add_module(pylena_test pylena_test.cpp)
 target_link_libraries(pylena_test PRIVATE Pylene pylena_numpy)
 target_include_directories(pylena_test PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
+add_dependencies(build-tests pylena_test)
 
 # Dummy extension for testing
 pybind11_add_module(pylena_extension extension_pylena_numpy.cpp)
 target_link_libraries(pylena_extension PRIVATE Pylene pylena_numpy)
 target_include_directories(pylena_extension PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
+add_dependencies(build-tests pylena_extension)
 
 # Sanitizer (clang linked statically asan by default unlike gcc)
 if ((SANITIZE_ADDRESS OR SANITIZE_UNDEFINED OR SANITIZE_MEMORY OR SANITIZE_THREAD))
@@ -20,7 +22,6 @@ if ((SANITIZE_ADDRESS OR SANITIZE_UNDEFINED OR SANITIZE_MEMORY OR SANITIZE_THREA
     file(COPY asan-pylena-test DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     set(SANITIZE_SCRIPT asan-pylena-test)
 endif()
-add_dependencies(build-tests pylena_test)
 
 function(add_python_test filename)
     file(COPY ${filename} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

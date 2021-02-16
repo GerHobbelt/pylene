@@ -64,10 +64,10 @@ class TestNumpyImage(unittest.TestCase):
         import pylena_extension as ext
         img1 = pln.iota()
         img2 = ext.generate_iota()
-        res1 = pln.id(img2)
-        res2 = ext.id(img1)
-        expected1 = np.arange(10, 10 + 10 * 15).reshape((15, 10))
-        expected2 = np.arange(10 * 15).reshape((10, 15))
+        res1 = ext.id(img1)
+        res2 = pln.id(img2)
+        expected1 = np.arange(10 * 15).reshape((10, 15))
+        expected2 = np.arange(20, 20 + 10 * 15).reshape((15, 10))
         self.assertTrue(np.all(res1 == expected1))
         self.assertTrue(np.all(res2 == expected2))
 

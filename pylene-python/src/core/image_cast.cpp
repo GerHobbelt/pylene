@@ -2,6 +2,8 @@
 #include <pln/core/image_cast.hpp>
 #include <pln/core/numpy_format.hpp>
 
+#include <pybind11/cast.h>
+
 #include <vector>
 
 namespace pln
@@ -70,7 +72,11 @@ namespace pln
 
   void init_pylena_numpy(pybind11::module& m)
   {
-    pybind11::class_<mln::internal::ndbuffer_image_data, std::shared_ptr<mln::internal::ndbuffer_image_data>>(
-        m, "ndbuffer_image_data");
+    if (!pybind11::detail::get_global_type_info(typeid(mln::internal::ndbuffer_image_data)) &&
+        !pybind11::detail::get_global_type_info(typeid(std::shared_ptr<mln::internal::ndbuffer_image_data>)))
+    {
+      pybind11::class_<mln::internal::ndbuffer_image_data, std::shared_ptr<mln::internal::ndbuffer_image_data>>(
+          m, "ndbuffer_image_data");
+    }
   }
 } // namespace pln

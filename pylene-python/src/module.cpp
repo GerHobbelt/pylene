@@ -12,8 +12,6 @@ namespace pln
 
   PYBIND11_MODULE(pylena, m)
   {
-    py::class_<mln::internal::ndbuffer_image_data, std::shared_ptr<mln::internal::ndbuffer_image_data>>(
-        m, "ndbuffer_image_data");
-    m.def("id", [](const mln::ndbuffer_image& img) { return img; });
+    init_pylena_numpy(m);
   }
 } // namespace pln

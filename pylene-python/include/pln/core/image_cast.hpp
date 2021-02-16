@@ -16,6 +16,12 @@ namespace pln
   /// \param[in] arr A ndbuffer_image
   /// \return A NumPy array
   pybind11::object to_numpy(mln::ndbuffer_image img);
+
+
+  /// \brief Export the binding of the class
+  /// ndbuffer_image_data
+  /// \param[in] m The module in which the class will be exported
+  void init_pylena_numpy(pybind11::module& m);
 } // namespace pln
 
 namespace pybind11::detail

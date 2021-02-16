@@ -67,4 +67,10 @@ namespace pln
       api.PyArray_SetBaseObject_(res.ptr(), data.inc_ref().ptr());
     return res;
   }
+
+  void init_pylena_numpy(pybind11::module& m)
+  {
+    pybind11::class_<mln::internal::ndbuffer_image_data, std::shared_ptr<mln::internal::ndbuffer_image_data>>(
+        m, "ndbuffer_image_data");
+  }
 } // namespace pln

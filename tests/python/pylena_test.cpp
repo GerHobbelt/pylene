@@ -48,7 +48,7 @@ namespace pln::test
 
   PYBIND11_MODULE(pylena_test, m)
   {
-    pybind11::module_::import("pylena");
+    init_pylena_numpy(m);
 
     // Utility functions
     m.def("id", [](mln::ndbuffer_image img) { return img; });

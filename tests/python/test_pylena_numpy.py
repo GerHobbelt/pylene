@@ -1,6 +1,3 @@
-import sys
-sys.path.append("../../pylene-python")
-
 import unittest
 import numpy as np
 

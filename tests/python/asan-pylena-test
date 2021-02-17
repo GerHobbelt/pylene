@@ -17,13 +17,20 @@ then
     export PYTHONMALLOC=malloc
 fi
 
-out=$($@ 2>&1)
-
-nlines=$(grep -c "pln" <<< $out)
-if [ $nlines -eq 0 ]
+export ASAN_OPTIONS="log_path=log.tmp:halt_on_error=false"
+$@
+if [ $? -ne 0 ]
 then
-	exit 0
+    exit 1
+fi
+unset ASAN_OPTIONS
+log_path=$(echo log.tmp*)
+grep "pln" $log_path
+if [ $? -eq 1 ]
+then
+    rm $log_path
+    exit 0
 else
-	echo "Leaks detected"
-	exit 1
+    rm $log_path
+    exit 1
 fi

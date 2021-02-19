@@ -45,7 +45,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build; cd build
-        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20
+        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20 -o pylene:fPIC=True -o pylene:pylena_numpy=True
         - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=On
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure

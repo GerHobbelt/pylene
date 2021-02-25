@@ -8,10 +8,10 @@ namespace pln::test
     m.def("id", [](const mln::ndbuffer_image& img) { return img; });
     m.def("generate_iota", []() {
       mln::ndbuffer_image img(mln::sample_type_id::UINT8, 10, 15, {0, 0});
-      for (std::size_t y = 0; y < 15; y++)
+      for (std::uint8_t y = 0; y < 15; y++)
       {
         std::uint8_t* lineptr = reinterpret_cast<std::uint8_t*>(img.buffer()) + y * 10;
-        for (std::size_t x = 0; x < 10; x++)
+        for (std::uint8_t x = 0; x < 10; x++)
         {
           lineptr[x] = 20 + y * 10 + x;
         }

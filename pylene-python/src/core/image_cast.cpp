@@ -59,7 +59,7 @@ namespace pln
     }
 
     auto res = pybind11::reinterpret_steal<pybind11::object>(api.PyArray_NewFromDescr_(
-        api.PyArray_Type_, descr.release().ptr(), reinterpret_cast<int>(ndim),
+        api.PyArray_Type_, descr.release().ptr(), ndim,
         reinterpret_cast<Py_intptr_t*>(shapes.data()), reinterpret_cast<Py_intptr_t*>(strides.data()),
         reinterpret_cast<void*>(img.buffer()), flags, nullptr));
 

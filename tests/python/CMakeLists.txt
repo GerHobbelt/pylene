@@ -1,11 +1,13 @@
 # Python module for testing
 pybind11_add_module(pylena_test pylena_test.cpp)
 target_link_libraries(pylena_test PRIVATE Pylene Pylena_numpy)
+target_include_directories(pylena_test PRIVATE ${CONAN_INCLUDE_DIRS_PYBIND11} ${PYTHON_INCLUDE_DIRS}) # TO REMOVE WHEN cmake_find_package FOR PYBIND11 WILL BE FIXED
 add_dependencies(build-tests pylena_test)
 
 # Dummy extension for testing
 pybind11_add_module(pylena_extension extension_pylena_numpy.cpp)
 target_link_libraries(pylena_extension PRIVATE Pylene Pylena_numpy)
+target_include_directories(pylena_extension PRIVATE ${CONAN_INCLUDE_DIRS_PYBIND11} ${PYTHON_INCLUDE_DIRS}) # TO REMOVE WHEN cmake_find_package FOR PYBIND11 WILL BE FIXED
 add_dependencies(build-tests pylena_extension)
 
 # Sanitizer (clang linked statically asan by default unlike gcc)

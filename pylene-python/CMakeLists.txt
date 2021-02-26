@@ -4,6 +4,8 @@ add_library(Pylena_numpy)
 add_library(Pylene::Pylena_numpy ALIAS Pylena_numpy)
 target_include_directories(Pylena_numpy PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                                $<INSTALL_INTERFACE:include>
+                                        # PRIVATE TO REMOVE WHEN cmake_find_package FOR PYBIND11 WILL BE FIXED
+                                        PRIVATE
                                                ${CONAN_INCLUDE_DIRS_PYBIND11}
                                                ${PYTHON_INCLUDE_DIRS})
 target_sources(Pylena_numpy PRIVATE src/core/image_cast.cpp

@@ -14,13 +14,15 @@ namespace pln::test
   /// \return A boolean indicating if the convertion worked
   auto check_from_numpy(const mln::ndbuffer_image& img)
   {
-    bool res            = true;
-    res                 = res && img.sample_type() == mln::sample_type_id::INT32;
-    res                 = res && img.pdim() == 2;
-    res                 = res && img.size(0) == 3;
-    res                 = res && img.size(1) == 4;
-    res                 = res && img.byte_stride(0) == 4;
-    res                 = res && img.byte_stride(1) == 12;
+    bool res = true;
+    res      = res && img.sample_type() == mln::sample_type_id::INT32;
+    res      = res && img.pdim() == 2;
+    res      = res && img.size(0) == 3;
+    res      = res && img.size(1) == 4;
+    res      = res && img.byte_stride(0) == 4;
+    res      = res && img.byte_stride(1) == 12;
+    if (!res)
+      return false;
     std::int32_t i      = 0;
     auto         casted = img.__cast<std::int32_t, 2>();
     mln_foreach (auto p, casted.domain())

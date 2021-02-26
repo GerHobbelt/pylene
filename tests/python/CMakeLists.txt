@@ -1,15 +1,11 @@
-pybind11_find_import(numpy REQUIRED)
-
 # Python module for testing
 pybind11_add_module(pylena_test pylena_test.cpp)
-target_link_libraries(pylena_test PRIVATE Pylene pylena_numpy)
-target_include_directories(pylena_test PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
+target_link_libraries(pylena_test PRIVATE Pylene Pylena_numpy)
 add_dependencies(build-tests pylena_test)
 
 # Dummy extension for testing
 pybind11_add_module(pylena_extension extension_pylena_numpy.cpp)
-target_link_libraries(pylena_extension PRIVATE Pylene pylena_numpy)
-target_include_directories(pylena_extension PRIVATE ${CMAKE_SOURCE_DIR}/pylene-python/include)
+target_link_libraries(pylena_extension PRIVATE Pylene Pylena_numpy)
 add_dependencies(build-tests pylena_extension)
 
 # Sanitizer (clang linked statically asan by default unlike gcc)

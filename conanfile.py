@@ -75,11 +75,11 @@ class Pylene(ConanFile):
         self.cpp_info.components["Pylene"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd"]
 
         if self.options.fPIC and self.options.pylena_numpy:
-            self.cpp_info.components["pylena_numpy"].names["cmake_find_pakage"] = "pylena_numpy"
-            self.cpp_info.components["pylena_numpy"].names["cmake_find_pakage_multi"] = "pylena_numpy"
-            self.cpp_info.components["pylena_numpy"].libs = ["pylena_numpy"]
-            self.cpp_info.components["pylena_numpy"].requires = ["Pylene", "pybind11::pybind11"]
-            self.cpp_info.components["pylena_numpy"].includedirs = [os.path.join(self.package_folder, "include")]
+            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
+            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylena-numpy"
+            self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
+            self.cpp_info.components["Pylene-numpy"].requires = ["Pylene", "pybind11::pybind11"]
+            self.cpp_info.components["Pylene-numpy"].includedirs = [os.path.join(self.package_folder, "include")]
 
         v = tools.Version(self.settings.compiler.version)
         for comp in self.cpp_info.components:

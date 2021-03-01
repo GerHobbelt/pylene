@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 import os
 import sys
 
@@ -8,10 +8,10 @@ class PyleneTestConan(ConanFile):
 
 
     def build(self):
-        os.remove(os.path.join(self.build_folder, "Findpybind11.cmake"))
         cmake = CMake(self)
-        if self.options["pylene"].pylena_numpy and self.options["pylene"].fPIC:
-            cmake.definitions["WITH_PYLENA_NUMPY"] = "YES"
+        if self.options["pylene"].shared or self.options["pylene"].fPIC or tools.os_info.is_windows:
+            os.remove(os.path.join(self.build_folder, "Findpybind11.cmake")) # TO REMOVE WHEN cmake_find_package FOR PYBIND11 WORK
+            cmake.definitions["WITH_PYLENE_NUMPY"] = "YES"
         cmake.configure()
         cmake.build()
 
@@ -21,4 +21,5 @@ class PyleneTestConan(ConanFile):
 
     def test(self):
         self.run(".{}main".format(os.sep))
-        self.run("{} main.py".format(sys.executable))
+        if self.options["pylene"].shared or self.options["pylene"].fPIC or tools.os_info.is_windows:
+            self.run("{} main.py".format(sys.executable))

@@ -97,15 +97,13 @@ endif ()
 # Subdirectories
 add_subdirectory(pylene)
 
-if (PYLENE_BUILD_PYTHON AND CMAKE_POSITION_INDEPENDENT_CODE)
+if (PYLENE_BUILD_PYTHON)
   # Until the cmake_find_package conan generator will be broken for pybind11 with conan 1.33,
   # we will use these two lines
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONAN_BUILD_MODULE_PATH_PYBIND11}")
   include(pybind11Install)
   add_custom_target(build_python)
   add_subdirectory(pylene-python)
-elseif (PYLENE_BUILD_PYTHON)
-  message(WARNING "Position Independent Code disabled. Skip Python bindings...")
 endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)

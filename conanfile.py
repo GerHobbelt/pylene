@@ -11,14 +11,11 @@ class Pylene(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
-        "pylena_numpy": [True, False]
     }
     default_options = {
         "shared": False,
         "fPIC": False,
-        "pylena_numpy": False,
         "gtest:shared": False,
-        "boost:shared": True
     }
 
     generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
@@ -45,16 +42,16 @@ class Pylene(ConanFile):
         tools.check_min_cppstd(self, "20")
         if self.options.shared:
             del self.options.fPIC
-        if self.options.pylena_numpy and self.options.fPIC:
+        if self.options.shared or self.options.fPIC or tools.os_info.is_windows:
             self.requires.add("pybind11/2.6.2")
-        elif self.options.pylena_numpy:
-            self.output.warn("fPIC option set to False. Skipping pylena_numpy component. To build pylena_numpy component, please set fPIC option to True.")
 
     def build(self):
         cmake = CMake(self)
         cmake.definitions["PYLENE_BUILD_LIBS_ONLY"] = "YES"
-        if self.options.fPIC and self.options.pylena_numpy:
+        if self.options.shared or self.options.fPIC or tools.os_info.is_windows:
             cmake.definitions["PYLENE_BUILD_PYTHON"] = "YES"
+        else:
+            self.output.warn("fPIC disabled. Skipping python bindings build...")
         cmake.configure()
         cmake.build()
         cmake.install()
@@ -74,9 +71,9 @@ class Pylene(ConanFile):
         self.cpp_info.components["Pylene"].includedirs = [os.path.join(self.package_folder, "include")]
         self.cpp_info.components["Pylene"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd"]
 
-        if self.options.fPIC and self.options.pylena_numpy:
+        if self.options.shared or self.options.fPIC or tools.os_info.is_windows:
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
-            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylena-numpy"
+            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
             self.cpp_info.components["Pylene-numpy"].requires = ["Pylene", "pybind11::pybind11"]
             self.cpp_info.components["Pylene-numpy"].includedirs = [os.path.join(self.package_folder, "include")]

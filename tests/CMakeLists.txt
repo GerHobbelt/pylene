@@ -2,10 +2,7 @@ project(tests)
 
 find_package(Threads REQUIRED)
 find_package(GTest 1.10 REQUIRED)
-find_package(Sanitizers REQUIRED)
 find_package(TBB REQUIRED tbb)
-
-sanitizer_add_blacklist_file(${CMAKE_SOURCE_DIR}"/utils/sanitizers/blacklist.txt")
 
 # Register an executable test: add_core_test(Exe Source1 [Source2...])
 # Executable: The name of the executable (default: ${Prefix}${TestName})
@@ -20,7 +17,6 @@ function(add_core_test Executable)
 
   add_test(NAME ${core_test_NAME} COMMAND ${core_test_NAME} --gtest_output=xml:${core_test_NAME}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
   set_tests_properties(${core_test_NAME} PROPERTIES LABELS UnitTests)
-  add_sanitizers(${core_test_NAME})
   add_dependencies(build-tests ${core_test_NAME})
 endfunction(add_core_test)
 

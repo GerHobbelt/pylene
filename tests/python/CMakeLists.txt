@@ -10,19 +10,9 @@ target_link_libraries(pylena_extension PRIVATE Pylene Pylene-numpy)
 target_include_directories(pylena_extension PRIVATE ${CONAN_INCLUDE_DIRS_PYBIND11} ${PYTHON_INCLUDE_DIRS}) # TO REMOVE WHEN cmake_find_package FOR PYBIND11 WILL BE FIXED
 add_dependencies(build-tests pylena_extension)
 
-# Sanitizer (clang linked statically asan by default unlike gcc)
-if ((SANITIZE_ADDRESS OR SANITIZE_UNDEFINED OR SANITIZE_MEMORY OR SANITIZE_THREAD))
-    if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        target_compile_options(pylena_test PRIVATE -shared-libasan)
-        target_link_options(pylena_test PRIVATE -shared-libasan)
-    endif()
-    add_sanitizers(pylena_test)
-    if (SANITIZE_ADDRESS)
-        target_compile_options(pylena_test PRIVATE "-fsanitize-recover=address")
-    endif(SANITIZE_ADDRESS)
-    file(COPY asan-pylena-test DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    set(SANITIZE_SCRIPT asan-pylena-test)
-endif()
+# Copy a script to launch ASAN for python extensions
+set(SANITIZE_SCRIPT "asan-pylena-test")
+file(COPY ${SANITIZE_SCRIPT} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 function(add_python_test filename)
     file(COPY ${filename} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

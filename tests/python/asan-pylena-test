@@ -19,18 +19,27 @@ fi
 
 export ASAN_OPTIONS="log_path=log.tmp:halt_on_error=false"
 $@
-if [ $? -ne 0 ]
+return_code=$?
+if [ $return_code -ne 0 ]
 then
     exit 1
 fi
+
 unset ASAN_OPTIONS
 log_path=$(echo log.tmp*)
-grep "pln" $log_path
-if [ $? -eq 1 ]
+if [ "$log_path" = "log.tmp*" ]
+then
+    exit 0
+fi
+
+output_lines="$(grep "pln" $log_path)"
+n_lines=$(echo -n $output_lines | wc -c)
+if [ $n_lines = 0 ]
 then
     rm $log_path
     exit 0
 else
+    echo $output_lines
     rm $log_path
     exit 1
 fi

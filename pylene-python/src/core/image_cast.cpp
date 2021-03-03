@@ -12,7 +12,7 @@ namespace pln
   {
     auto       base    = arr.base();
     const auto info    = arr.request();
-    const auto type    = get_sample_type(info.format);
+    const auto type    = get_sample_type(pybind11::dtype(info.format));
     const bool is_rgb8 = info.ndim == 3 && info.shape[2] == 3 && type == mln::sample_type_id::UINT8;
     const auto pdim    = info.ndim - (is_rgb8 ? 1 : 0);
     if (pdim > mln::PYLENE_NDBUFFER_DEFAULT_DIM)
@@ -50,7 +50,7 @@ namespace pln
     const auto               ndim    = img.pdim() + (is_rgb8 ? 1 : 0);
     std::vector<std::size_t> strides(ndim, 1);
     std::vector<std::size_t> shapes(ndim, 3);
-    auto                     descr = pybind11::dtype(get_sample_type(img.sample_type()));
+    auto                     descr = get_sample_type(img.sample_type());
 
     for (auto d = 0; d < img.pdim(); d++)
     {

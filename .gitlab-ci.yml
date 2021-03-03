@@ -124,8 +124,8 @@ distcheck-linux-clang10-debug:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"
         CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -shared-libasan
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -shared-libasan
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CONAN_PROFILE: "clang-10"
 
 distcheck-linux-gcc10-release:

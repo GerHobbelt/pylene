@@ -11,8 +11,11 @@ target_include_directories(pylena_extension PRIVATE ${CONAN_INCLUDE_DIRS_PYBIND1
 add_dependencies(build-tests pylena_extension)
 
 # Copy a script to launch ASAN for python extensions
-set(SANITIZE_SCRIPT "asan-pylena-test")
-file(COPY ${SANITIZE_SCRIPT} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+set(SANITIZE_SCRIPT "")
+if (UNIX AND NOT CYGWIN)
+    set(SANITIZE_SCRIPT "asan-pylena-test")
+    file(COPY ${SANITIZE_SCRIPT} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 function(add_python_test filename)
     file(COPY ${filename} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

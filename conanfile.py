@@ -37,18 +37,20 @@ class Pylene(ConanFile):
         "xsimd/7.4.6",
     ]
 
+    def _build_python(self):
+        return self.options.shared or self.options.fPIC or tools.os_info.is_windows
 
     def configure(self):
         tools.check_min_cppstd(self, "20")
         if self.options.shared:
             del self.options.fPIC
-        if self.options.shared or self.options.fPIC or tools.os_info.is_windows:
+        if self._build_python():
             self.requires.add("pybind11/2.6.2")
 
     def build(self):
         cmake = CMake(self)
         cmake.definitions["PYLENE_BUILD_LIBS_ONLY"] = "YES"
-        if self.options.shared or self.options.fPIC or tools.os_info.is_windows:
+        if self._build_python():
             cmake.definitions["PYLENE_BUILD_PYTHON"] = "YES"
         else:
             self.output.warn("fPIC disabled. Skipping python bindings build...")
@@ -71,9 +73,9 @@ class Pylene(ConanFile):
         self.cpp_info.components["Pylene"].includedirs = [os.path.join(self.package_folder, "include")]
         self.cpp_info.components["Pylene"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd"]
 
-        if self.options.shared or self.options.fPIC or tools.os_info.is_windows:
-            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
+        if self._build_python():
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
+            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
             self.cpp_info.components["Pylene-numpy"].requires = ["Pylene", "pybind11::pybind11"]
             self.cpp_info.components["Pylene-numpy"].includedirs = [os.path.join(self.package_folder, "include")]

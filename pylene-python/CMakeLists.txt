@@ -1,5 +1,3 @@
-pybind11_find_import(numpy REQUIRED)
-
 add_library(Pylene-numpy)
 add_library(Pylene::Pylene-numpy ALIAS Pylene-numpy)
 target_include_directories(Pylene-numpy PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

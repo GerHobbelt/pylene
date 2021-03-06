@@ -4,8 +4,11 @@ namespace pln
 {
   namespace details
   {
-    //template <mln::sample_type_id t>
-    //using numpy_desc = pybind11::format_descriptor<typename mln::sample_type_id_traits<t>::type>;
+    template <mln::sample_type_id T>
+    static pybind11::dtype dtype_of()
+    {
+        return pybind11::dtype::of<typename mln::sample_type_id_traits<T>::type>();
+    }
   }
 
   pybind11::dtype get_sample_type(mln::sample_type_id type)
@@ -13,57 +16,58 @@ namespace pln
     switch (type)
     {
     case mln::sample_type_id::INT8:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT8>::type>();
+      return details::dtype_of<mln::sample_type_id::INT8>();
     case mln::sample_type_id::INT16:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT16>::type>();
+      return details::dtype_of<mln::sample_type_id::INT16>();
     case mln::sample_type_id::INT32:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT32>::type>();
+      return details::dtype_of<mln::sample_type_id::INT32>();
     case mln::sample_type_id::INT64:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT64>::type>();
+      return details::dtype_of<mln::sample_type_id::INT64>();
     case mln::sample_type_id::UINT8:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT8>::type>();
+      return details::dtype_of<mln::sample_type_id::UINT8>();
     case mln::sample_type_id::UINT16:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT16>::type>();
+      return details::dtype_of<mln::sample_type_id::UINT16>();
     case mln::sample_type_id::UINT32:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT32>::type>();
+      return details::dtype_of<mln::sample_type_id::UINT32>();
     case mln::sample_type_id::UINT64:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT64>::type>();
+      return details::dtype_of<mln::sample_type_id::UINT64>();
     case mln::sample_type_id::FLOAT:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::FLOAT>::type>();
+      return details::dtype_of<mln::sample_type_id::FLOAT>();
     case mln::sample_type_id::DOUBLE:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::DOUBLE>::type>();
+      return details::dtype_of<mln::sample_type_id::DOUBLE>();
     case mln::sample_type_id::BOOL:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::BOOL>::type>();
+      return details::dtype_of<mln::sample_type_id::BOOL>();
     case mln::sample_type_id::RGB8:
-      return pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT8>::type>();
+      return details::dtype_of<mln::sample_type_id::UINT8>();
     default:
-      return pybind11::none();
+      throw std::runtime_error("Invalid sample_type_id");
     }
+    return pybind11::none();
   }
 
   mln::sample_type_id get_sample_type(pybind11::dtype type)
   {
-    if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT8>::type>().ptr() == type.ptr())
+    if (type.is(details::dtype_of<mln::sample_type_id::INT8>()))
       return mln::sample_type_id::INT8;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT16>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::INT16>()))
       return mln::sample_type_id::INT16;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT32>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::INT32>()))
       return mln::sample_type_id::INT32;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::INT64>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::INT64>()))
       return mln::sample_type_id::INT64;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT8>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::UINT8>()))
       return mln::sample_type_id::UINT8;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT16>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::UINT16>()))
       return mln::sample_type_id::UINT16;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT32>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::UINT32>()))
       return mln::sample_type_id::UINT32;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::UINT64>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::UINT64>()))
       return mln::sample_type_id::UINT64;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::FLOAT>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::FLOAT>()))
       return mln::sample_type_id::FLOAT;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::DOUBLE>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::DOUBLE>()))
       return mln::sample_type_id::DOUBLE;
-    else if (pybind11::dtype::of<mln::sample_type_id_traits<mln::sample_type_id::BOOL>::type>().ptr() == type.ptr())
+    else if (type.is(details::dtype_of<mln::sample_type_id::BOOL>()))
       return mln::sample_type_id::BOOL;
     return mln::sample_type_id::OTHER;
   }

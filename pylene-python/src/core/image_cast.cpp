@@ -10,9 +10,11 @@ namespace pln
 {
   mln::ndbuffer_image from_numpy(pybind11::array arr)
   {
-    auto       base    = arr.base();
-    const auto info    = arr.request();
-    const auto type    = get_sample_type(pybind11::dtype(info.format));
+    auto                base = arr.base();
+    const auto          info = arr.request();
+    mln::sample_type_id type = get_sample_type(info.format);
+    if (type == mln::sample_type_id::OTHER)
+      throw std::invalid_argument("Invalid dtype argument");
     const bool is_rgb8 = info.ndim == 3 && info.shape[2] == 3 && type == mln::sample_type_id::UINT8;
     const auto pdim    = info.ndim - (is_rgb8 ? 1 : 0);
     if (pdim > mln::PYLENE_NDBUFFER_DEFAULT_DIM)
@@ -59,9 +61,8 @@ namespace pln
     }
 
     auto res = pybind11::reinterpret_steal<pybind11::object>(api.PyArray_NewFromDescr_(
-        api.PyArray_Type_, descr.release().ptr(), ndim,
-        reinterpret_cast<Py_intptr_t*>(shapes.data()), reinterpret_cast<Py_intptr_t*>(strides.data()),
-        reinterpret_cast<void*>(img.buffer()), flags, nullptr));
+        api.PyArray_Type_, descr.release().ptr(), ndim, reinterpret_cast<Py_intptr_t*>(shapes.data()),
+        reinterpret_cast<Py_intptr_t*>(strides.data()), reinterpret_cast<void*>(img.buffer()), flags, nullptr));
 
     if (!res)
       throw std::runtime_error("Unable to create the numpy array in ndimage -> array");

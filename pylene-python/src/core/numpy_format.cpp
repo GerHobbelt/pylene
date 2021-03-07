@@ -7,9 +7,9 @@ namespace pln
     template <mln::sample_type_id T>
     static pybind11::dtype dtype_of()
     {
-        return pybind11::dtype::of<typename mln::sample_type_id_traits<T>::type>();
+      return pybind11::dtype::of<typename mln::sample_type_id_traits<T>::type>();
     }
-  }
+  } // namespace details
 
   pybind11::dtype get_sample_type(mln::sample_type_id type)
   {
@@ -45,8 +45,17 @@ namespace pln
     return pybind11::none();
   }
 
-  mln::sample_type_id get_sample_type(pybind11::dtype type)
+  mln::sample_type_id get_sample_type(const std::string& type_format)
   {
+    pybind11::dtype type;
+    try
+    {
+      type = pybind11::dtype(type_format);
+    }
+    catch (const std::exception&)
+    {
+      return mln::sample_type_id::OTHER;
+    }
     if (type.is(details::dtype_of<mln::sample_type_id::INT8>()))
       return mln::sample_type_id::INT8;
     else if (type.is(details::dtype_of<mln::sample_type_id::INT16>()))

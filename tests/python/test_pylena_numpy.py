@@ -71,5 +71,21 @@ class TestNumpyImage(unittest.TestCase):
         self.assertTrue(np.all(res1 == expected1))
         self.assertTrue(np.all(res2 == expected2))
 
+    def test_incorrect_type(self):
+        ERROR_MSG = "Invalid dtype argument"
+
+        img = np.zeros((10, 10), dtype=str)
+        with self.assertRaises(ValueError) as context:
+            pln.id(img)
+            self.assertTrue(ERROR_MSG in str(context.exception))
+
+        class WrongType:
+            pass
+        img = np.zeros((10, 10), dtype=WrongType)
+        with self.assertRaises(ValueError) as context:
+            pln.id(img)
+            self.assertTrue(ERROR_MSG in str(context.exception))
+        
+
 if __name__ == "__main__":
     unittest.main()

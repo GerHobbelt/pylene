@@ -86,7 +86,7 @@ class TestNumpyImage(unittest.TestCase):
             pln.id(img)
             self.assertTrue(ERROR_MSG in str(context.exception))
 
-    def test_ref_count(self):
+    def test_memory(self):
         import gc
         def change_scope():
             img = pln.iota()
@@ -102,6 +102,34 @@ class TestNumpyImage(unittest.TestCase):
         del img
         gc.collect()
         self.assertTrue(img2[0, 0] == 1136)
+
+    def test_returned_change_value(self):
+        def by_reference(img):
+            img[0, 0] = 1111
+
+        def by_reference_returned(img):
+            img[0, 0] = 2222
+            return img
+
+        img1 = pln.iota()
+        img2 = pln.iota()
+        img1[0, 0] = 3333
+        img2[0, 0] = 4444
+        by_reference(img1)
+        img3 = by_reference_returned(img2)
+        self.assertTrue(img1[0, 0] == 1111)
+        self.assertTrue(img2[0, 0] == img3[0, 0] == 2222)
+
+    def test_ref_count(self):
+        import sys
+        img = pln.iota()
+        img2 = pln.id(img)
+        self.assertTrue(sys.getrefcount(img.base) == sys.getrefcount(img2.base) == 3)
+        base = img.base
+        del img
+        del img2
+        self.assertTrue(sys.getrefcount(base) == 2)
+
 
 if __name__ == "__main__":
     unittest.main()

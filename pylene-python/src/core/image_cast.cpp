@@ -39,12 +39,12 @@ namespace pln
   pybind11::object to_numpy(mln::ndbuffer_image img)
   {
     auto& api   = pybind11::detail::npy_api::get();
-    auto  data  = pybind11::handle();
-    int   flags = ~pybind11::detail::npy_api::NPY_ARRAY_OWNDATA_ & pybind11::detail::npy_api::NPY_ARRAY_WRITEABLE_;
+    pybind11::object data = pybind11::none();
+    int   flags = pybind11::detail::npy_api::NPY_ARRAY_OWNDATA_ | pybind11::detail::npy_api::NPY_ARRAY_WRITEABLE_;
     if (img.__data())
     {
-      data = pybind11::cast(img.__data()).inc_ref();
-      flags &= pybind11::detail::npy_api::NPY_ARRAY_C_CONTIGUOUS_;
+      data = pybind11::reinterpret_borrow<pybind11::object>(pybind11::cast(img.__data()));
+      flags |= pybind11::detail::npy_api::NPY_ARRAY_C_CONTIGUOUS_;
     }
 
     /* For the moment, restrict RGB8 image to 2D image */
@@ -67,7 +67,7 @@ namespace pln
     if (!res)
       throw std::runtime_error("Unable to create the numpy array in ndimage -> array");
     if (data)
-      api.PyArray_SetBaseObject_(res.ptr(), data.inc_ref().ptr());
+      api.PyArray_SetBaseObject_(res.ptr(), data.release().ptr());
     return res;
   }
 

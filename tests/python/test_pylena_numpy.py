@@ -85,7 +85,23 @@ class TestNumpyImage(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             pln.id(img)
             self.assertTrue(ERROR_MSG in str(context.exception))
-        
+
+    def test_ref_count(self):
+        import gc
+        def change_scope():
+            img = pln.iota()
+            img[0, 0] = 1303
+            return pln.id(img)
+        img = pln.iota()
+        img2 = pln.id(img)
+        img3 = change_scope()
+        img[0, 0] = 1136
+        self.assertTrue(img[0, 0] == img2[0, 0] == 1136)
+        gc.collect()
+        self.assertTrue(img3[0, 0] == 1303)
+        del img
+        gc.collect()
+        self.assertTrue(img2[0, 0] == 1136)
 
 if __name__ == "__main__":
     unittest.main()

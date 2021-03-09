@@ -1,0 +1,21 @@
+[includedirs]
+pylene/include
+
+# using placeholders from conan settings and options
+[libdirs]
+../build/pylene/
+
+[bindirs]
+{% if options.shared %}
+../build/pylene
+{% else %}
+../build/pylene
+{% endif %}
+
+
+# The source_folder, build_folder are useful for workspaces
+[source_folder]
+pylene/src
+
+[build_folder]
+../build

@@ -8,6 +8,7 @@
 #include <mln/core/box.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/range/foreach.hpp>
+#include <mln/bp/tile.hpp>
 
 namespace mln
 {
@@ -49,6 +50,11 @@ namespace mln
   /// \overload
   template <class T, std::size_t dim>
   void pad(const ranges::mdspan<T, dim>& image, e_padding_mode mode, const int borders[][2], T value = {});
+
+  /// \overload
+  template <class T>
+  void pad(const Tile2DView<T>& image, e_padding_mode mode, const int borders[][2], T value = {});
+
 
 
 
@@ -207,6 +213,18 @@ namespace mln
     impl::pad(&_padder, static_cast<int>(dim), (std::byte*)sp.data(), sizes, strides, borders, mode, vptr);
 
   }
+
+  template <class T>
+  void pad(Tile2DView<T> f, e_padding_mode mode, const int borders[][2], T value)
+  {
+    padder<T>      _padder;
+    std::ptrdiff_t strides[2] = {sizeof(T), f.stride()};
+    int            sizes[2] = {f.width(), f.height()};
+
+    T* vptr = (mode == mln::PAD_ZERO) ? nullptr : &value;
+    impl::pad(&_padder, 2, (std::byte*)f.buffer(), sizes, strides, borders, mode, vptr);
+  }
+
 
   template <class T, int dim>
   void pad(ndimage<T, dim>& f, e_padding_mode mode, const int borders[][2], T value)

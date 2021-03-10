@@ -22,9 +22,6 @@ variables:
     CONAN_STABLE_BRANCH_PATTERN: "master$"
     CONAN_PASSWORD: $CONAN_LRDE_API_KEY
     CONAN_CMAKE_GENERATOR: Ninja
-    ASAN: "OFF"
-    MSAN: "OFF"
-    UBSAN: "OFF"
     CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
     CCACHE_MAXSIZE: 2G
 
@@ -45,8 +42,8 @@ windows-debug:
     stage: build
     script:
         - mkdir build; cd build
-        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20
-        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20 -o pylene:fPIC=True
+        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
@@ -69,9 +66,10 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DSANITIZE_ADDRESS=$ASAN -DSANITIZE_MEMORY=$MSAN -DSANITIZE_UNDEFINED=$UBSAN
+        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
         - cmake --build . --target Pylene
+        - cmake --build . --target pylena
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
@@ -103,10 +101,9 @@ distcheck-linux-gcc9-debug-asan-ubsan:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
         CC: "gcc"
-        ASAN: "ON"
-        MSAN: "OFF"
-        UBSAN: "ON"
         CONAN_PROFILE: "gcc-9"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 
 distcheck-linux-clang10-release:
     <<: *distcheck-linux-base

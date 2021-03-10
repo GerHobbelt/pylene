@@ -23,7 +23,6 @@ endif ()
 
 find_package(FreeImage REQUIRED)
 
-
 # CONFIGURE COMPILER LAUNCHERS
 
 option(USE_CCACHE "Use ccache as compiler launcher" ON)
@@ -59,6 +58,7 @@ endif (USE_DISTCC)
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
+option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -96,6 +96,15 @@ endif ()
 
 # Subdirectories
 add_subdirectory(pylene)
+
+if (PYLENE_BUILD_PYTHON)
+  # Until the cmake_find_package conan generator will be broken for pybind11 with conan 1.33,
+  # we will use these two lines
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONAN_BUILD_MODULE_PATH_PYBIND11}")
+  include(pybind11Install)
+  add_custom_target(build_python)
+  add_subdirectory(pylene-python)
+endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_custom_target(build-fixtures)

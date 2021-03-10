@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 
+#include <cassert>
 #include <vector>
 
 namespace pln
@@ -25,7 +26,8 @@ namespace pln
     const auto pdim    = info.ndim - (is_rgb8 ? 1 : 0);
     if (pdim > mln::PYLENE_NDBUFFER_DEFAULT_DIM)
       throw std::invalid_argument(
-          fmt::format("Invalid number of dimension from numpy array (Got {} but should be < 5)", pdim));
+          fmt::format("Invalid number of dimension from numpy array (Got {} but should be less than {})", pdim,
+                      mln::PYLENE_NDBUFFER_DEFAULT_DIM));
     int            size[mln::PYLENE_NDBUFFER_DEFAULT_DIM]    = {0};
     std::ptrdiff_t strides[mln::PYLENE_NDBUFFER_DEFAULT_DIM] = {0};
     for (auto d = 0; d < pdim; d++)
@@ -41,13 +43,16 @@ namespace pln
     return res;
   }
 
-  pybind11::object to_numpy(mln::ndbuffer_image img)
+  pybind11::object to_numpy(const mln::ndbuffer_image& img)
   {
     const auto&      api   = pybind11::detail::npy_api::get();
     pybind11::object data  = pybind11::none();
     int              flags = pybind11::detail::npy_api::NPY_ARRAY_WRITEABLE_;
     if (img.__data())
-      data = pybind11::reinterpret_borrow<pybind11::object>(pybind11::cast(img.__data()));
+    {
+      data = pybind11::cast(img.__data());
+      assert(data.ref_count() > 0);
+    }
 
     /* For the moment, restrict RGB8 image to 2D image */
     const bool               is_rgb8 = img.pdim() == 2 && img.sample_type() == mln::sample_type_id::RGB8;
@@ -69,6 +74,7 @@ namespace pln
     if (!res)
       throw std::runtime_error("Unable to create the numpy array in ndimage -> array");
     if (data)
+      // **Steal** a reference to data (https://numpy.org/devdocs/reference/c-api/array.html#c.PyArray_SetBaseObject)
       api.PyArray_SetBaseObject_(res.ptr(), data.release().ptr());
     return res;
   }

@@ -248,6 +248,7 @@ namespace mln
     /// Access to the shared_ptr holding the data
     // SHOULD NOT BE USED EXCEPT FOR PYTHON BINDINGS
     std::shared_ptr<internal::ndbuffer_image_data>& __data();
+    const std::shared_ptr<internal::ndbuffer_image_data>& __data() const;
   };
 
 

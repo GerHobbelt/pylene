@@ -15,7 +15,7 @@ namespace pln
   /// \brief Convert a ndbuffer_image array to a NumPy
   /// \param[in] arr A ndbuffer_image
   /// \return A NumPy array
-  PYBIND11_EXPORT pybind11::object to_numpy(mln::ndbuffer_image img);
+  PYBIND11_EXPORT pybind11::object to_numpy(const mln::ndbuffer_image& img);
 
 
   /// \brief Export the binding of the class
@@ -38,6 +38,6 @@ namespace pybind11::detail
       return true;
     }
 
-    static handle cast(mln::ndbuffer_image img, return_value_policy, handle) { return pln::to_numpy(img).inc_ref(); }
+    static handle cast(const mln::ndbuffer_image& img, return_value_policy, handle) { return pln::to_numpy(img).inc_ref(); }
   };
 } // namespace pybind11::detail

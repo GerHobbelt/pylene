@@ -5,18 +5,19 @@ find_package(Boost COMPONENTS program_options REQUIRED)
 add_subdirectory(source/snippets)
 
 if(DOXYGEN_FOUND)
-  set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR}/pylene/include)
+  set(DOXYGEN_INPUT_DIR "${PROJECT_SOURCE_DIR}/pylene/include ${PROJECT_SOURCE_DIR}/pylene-python/include")
   set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
   set(DOXYGEN_INDEX_FILE ${DOXYGEN_OUTPUT_DIR}/html/index.html)
   set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
   set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
   configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
   file(GLOB_RECURSE PYLENE_PUBLIC_HEADERS ${PROJECT_SOURCE_DIR}/pylene/include/*.hpp)
+  file(GLOB_RECURSE PYLENE_PYTHON_PUBLIC_HEADERS ${PROJECT_SOURCE_DIR}/pylene-python/*.hpp)
   file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
 
   add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
                     COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
-                    DEPENDS ${PYLENE_PUBLIC_HEADERS}
+                    DEPENDS ${PYLENE_PUBLIC_HEADERS} ${PYLENE_PYTHON_PUBLIC_HEADERS}
                     MAIN_DEPENDENCY ${DOXYFILE_OUT} ${DOXYFILE_IN}
                     COMMENT "Generating Doxygen documentation")
 

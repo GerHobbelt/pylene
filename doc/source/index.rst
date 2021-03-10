@@ -26,6 +26,7 @@ Mathematical Morphology Operators).
    Introduction <intro>
    tutorial
    community
+   Python module <python>
    Reference Manual <reference>
    Developer Manual <ruminations>
 

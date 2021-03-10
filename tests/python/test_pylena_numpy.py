@@ -72,19 +72,15 @@ class TestNumpyImage(unittest.TestCase):
         self.assertTrue(np.all(res2 == expected2))
 
     def test_incorrect_type(self):
-        ERROR_MSG = "Invalid dtype argument"
-
         img = np.zeros((10, 10), dtype=str)
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError, msg="Invalid dtype argument (Got dtype format 1w, expected types: [u]int[8, 16, 32, 64], float, double or bool)"):
             pln.id(img)
-            self.assertTrue(ERROR_MSG in str(context.exception))
 
         class WrongType:
             pass
         img = np.zeros((10, 10), dtype=WrongType)
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError, msg="Invalid dtype argument (Got dtype format 0, expected types: [u]int[8, 16, 32, 64], float, double or bool)"):
             pln.id(img)
-            self.assertTrue(ERROR_MSG in str(context.exception))
 
     def test_memory(self):
         import gc
@@ -129,6 +125,11 @@ class TestNumpyImage(unittest.TestCase):
         del img
         del img2
         self.assertTrue(sys.getrefcount(base) == 2)
+
+    def test_invalid_dim(self):
+        img = np.zeros(np.arange(5))
+        with self.assertRaises(ValueError, msg="Invalid number of dimension from numpy array (Got 5 but should be < 5)"):
+            pln.id(img)
 
 
 if __name__ == "__main__":

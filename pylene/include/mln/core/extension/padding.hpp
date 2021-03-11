@@ -53,7 +53,7 @@ namespace mln
 
   /// \overload
   template <class T>
-  void pad(const Tile2DView<T>& image, e_padding_mode mode, const int borders[][2], T value = {});
+  void pad(const bp::Tile2DView<T>& image, e_padding_mode mode, const int borders[][2], T value = {});
 
 
 
@@ -215,7 +215,7 @@ namespace mln
   }
 
   template <class T>
-  void pad(Tile2DView<T> f, e_padding_mode mode, const int borders[][2], T value)
+  void pad(bp::Tile2DView<T> f, e_padding_mode mode, const int borders[][2], T value)
   {
     padder<T>      _padder;
     std::ptrdiff_t strides[2] = {sizeof(T), f.stride()};

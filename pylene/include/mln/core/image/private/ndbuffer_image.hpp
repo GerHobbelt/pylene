@@ -620,14 +620,14 @@ namespace mln
   template <class T, int N>
   bp::Tile2DView<T> __ndbuffer_image<T, N>::as_tile() noexcept requires (N == 2)
   {
-    return Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride());
+    return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
 
   }
 
   template <class T, int N>
-  bp::Tile2DView<T> __ndbuffer_image<T, N>::as_tile() noexcept requires (N == 2)
+  bp::Tile2DView<const T> __ndbuffer_image<T, N>::as_tile() const noexcept requires (N == 2)
   {
-    return Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride());
+    return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
   }
 
 

@@ -34,14 +34,15 @@ namespace mln::bp
     assert(in.width() == out.width());
     assert(in.height() == out.height());
 
+    int w = in.width();
     for (int y = 0; y < in.height(); ++y)
     {
       auto a = in.row(y);
       auto b = out.row(y);
       int i;
-      for (i = 0; i < width - simd_t::size; i += simd_t::size)
+      for (i = 0; i < w - simd_t::size; i += simd_t::size)
         xsimd::store_unaligned(b + i, f(xsimd::load_unaligned(a + i)));
-      for (; i < width; i++)
+      for (; i < w; i++)
         b[i] = f(a[i]);
     }
   }
@@ -53,16 +54,16 @@ namespace mln::bp
     static_assert(std::is_invocable_r_v<simd_t, Func, simd_t>);
     static_assert(std::is_invocable_r_v<T, Func, T>);
 
-    int i = 0;
-    for (i = 0; i < width - simd_t::size; i += simd_t::size)
-      xsimd::store_unaligned(a + i, f(xsimd::load_unaligned(a + i)));
-    for (; i < width; i++)
-      a[i] = f(a[i]);
+    std::size_t i = 0;
+    for (i = 0; i < n - simd_t::size; i += simd_t::size)
+      xsimd::store_unaligned(in + i, f(xsimd::load_unaligned(in + i)));
+    for (; i < n; i++)
+      in[i] = f(in[i]);
   }
 
 
   template <class T, class Func>
-  void apply(Tile2DView<T> in, Func f);
+  void apply(Tile2DView<T> in, Func f)
   {
     using simd_t = xsimd::simd_type<T>;
     static_assert(std::is_invocable_r_v<simd_t, Func, simd_t>);

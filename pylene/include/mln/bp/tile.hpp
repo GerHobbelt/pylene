@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/bp/alloc.hpp>
+#include <cassert>
 
 namespace mln::bp
 {
@@ -39,7 +40,7 @@ namespace mln::bp
 
     /// \brief Return true if the buffer aligned with the required size
     /// e.g., ``is_aligned(16)`` to check that the buffer is 16-bytes aligned
-    bool is_aligned(int width = 16) { return m_ptr & (intptr_t)(width - 1) == 0; }
+    bool is_aligned(int width = 16) { return ((intptr_t)m_ptr & (intptr_t)(width - 1)) == 0; }
 
 
   protected:

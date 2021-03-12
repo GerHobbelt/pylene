@@ -61,6 +61,10 @@ namespace mln::bp
     {
     }
 
+    /// \brief Return a raw to pointer to the buffer
+    T* data() const noexcept { return (T*)m_ptr; }
+
+
     T* row(int y) const noexcept { return (T*)(base::row(y)); }
     T& at(int x, int y) const noexcept { return *((T*)(base::row(y)) + x); }
     T& operator()(int x, int y) const noexcept { return *((T*)(base::row(y)) + x); }
@@ -101,7 +105,7 @@ namespace mln::bp
     assert(0 < width && (x + width) <= m_width);
     assert(0 < height && (y + height) <= m_height);
 
-    return Tile2DView<T>{this->at(x,y), width, height, this->m_stride};
+    return Tile2DView<T>{this->row(y) + x, width, height, this->m_stride};
   }
 
   template <class T>
@@ -118,7 +122,7 @@ namespace mln::bp
   Tile2D<T>::~Tile2D()
   {
     if (this->m_ptr)
-      aligned_free_2d<T>(this->m_ptr, this->m_width, this->m_height, this->m_stride);
+      aligned_free_2d<T>((T*)this->m_ptr, this->m_width, this->m_height, this->m_stride);
   }
 
   template <class T>

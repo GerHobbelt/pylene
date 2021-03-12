@@ -40,7 +40,7 @@ namespace mln::bp
       auto a = in.row(y);
       auto b = out.row(y);
       int i;
-      for (i = 0; i < w - simd_t::size; i += simd_t::size)
+      for (i = 0; (i + simd_t::size) < w; i += simd_t::size)
         xsimd::store_unaligned(b + i, f(xsimd::load_unaligned(a + i)));
       for (; i < w; i++)
         b[i] = f(a[i]);
@@ -55,7 +55,7 @@ namespace mln::bp
     static_assert(std::is_invocable_r_v<T, Func, T>);
 
     std::size_t i = 0;
-    for (i = 0; i < n - simd_t::size; i += simd_t::size)
+    for (i = 0; (i + simd_t::size) < n; i += simd_t::size)
       xsimd::store_unaligned(in + i, f(xsimd::load_unaligned(in + i)));
     for (; i < n; i++)
       in[i] = f(in[i]);

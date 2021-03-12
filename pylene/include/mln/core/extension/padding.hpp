@@ -215,14 +215,14 @@ namespace mln
   }
 
   template <class T>
-  void pad(bp::Tile2DView<T> f, e_padding_mode mode, const int borders[][2], T value)
+  void pad(const bp::Tile2DView<T>& f, e_padding_mode mode, const int borders[][2], T value)
   {
     padder<T>      _padder;
     std::ptrdiff_t strides[2] = {sizeof(T), f.stride()};
     int            sizes[2] = {f.width(), f.height()};
 
     T* vptr = (mode == mln::PAD_ZERO) ? nullptr : &value;
-    impl::pad(&_padder, 2, (std::byte*)f.buffer(), sizes, strides, borders, mode, vptr);
+    impl::pad(&_padder, 2, (std::byte*)f.data(), sizes, strides, borders, mode, vptr);
   }
 
 

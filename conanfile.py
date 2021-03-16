@@ -37,8 +37,9 @@ class Pylene(ConanFile):
         "xsimd/7.4.6",
     ]
 
+    # Disable python packaging until cmake_find_package generator for pybind11 does not work
     def _build_python(self):
-        return self.options.shared or self.options.fPIC or tools.os_info.is_windows
+        return (self.options.shared or self.options.fPIC or tools.os_info.is_windows) and False
 
     def configure(self):
         tools.check_min_cppstd(self, "20")

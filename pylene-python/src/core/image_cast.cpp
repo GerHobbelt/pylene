@@ -1,6 +1,6 @@
 #include <mln/core/image/private/ndbuffer_image_data.hpp>
 #include <pln/core/image_cast.hpp>
-#include <pln/core/numpy_format.hpp>
+#include "numpy_format.hpp"
 
 #include <pybind11/cast.h>
 

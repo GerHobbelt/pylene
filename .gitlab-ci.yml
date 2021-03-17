@@ -252,6 +252,8 @@ pages:
     rules:
         - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "schedule"
         - if: $CI_COMMIT_BRANCH == "next"
+    variables:
+        CONAN_REVISIONS_ENABLED: 1
 
 package gcc-9:
    extends: .package

@@ -45,7 +45,7 @@ class Pylene(ConanFile):
         if self.options.shared:
             del self.options.fPIC
         if self._build_python():
-            self.requires.add("pybind11/2.6.2")
+            self.build_requires.append("pybind11/2.6.2")
 
     def build(self):
         cmake = CMake(self)
@@ -77,7 +77,7 @@ class Pylene(ConanFile):
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
-            self.cpp_info.components["Pylene-numpy"].requires = ["Pylene", "pybind11::pybind11"]
+            self.cpp_info.components["Pylene-numpy"].requires = ["Pylene"]
             self.cpp_info.components["Pylene-numpy"].includedirs = [os.path.join(self.package_folder, "include")]
 
         v = tools.Version(self.settings.compiler.version)

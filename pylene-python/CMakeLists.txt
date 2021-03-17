@@ -23,5 +23,5 @@ include(GNUInstallDirs)
 install(TARGETS Pylene-numpy
         EXPORT PyleneTargets)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/pln/core/image_cast.hpp
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/pln/core)
+install(DIRECTORY include/pln
+        TYPE INCLUDE)

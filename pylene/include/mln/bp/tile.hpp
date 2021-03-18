@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/bp/alloc.hpp>
+#include <utility>
 #include <cassert>
 
 namespace mln::bp
@@ -81,6 +82,7 @@ namespace mln::bp
   class Tile2D : public Tile2DView<T>
   {
   public:
+    Tile2D() = default;
     Tile2D(int width, int height);
     ~Tile2D();
 
@@ -88,6 +90,11 @@ namespace mln::bp
     Tile2D& operator=(const Tile2D&) = delete;
     Tile2D(Tile2D&&) noexcept;
     Tile2D& operator=(Tile2D&&) noexcept;
+
+
+    static Tile2D<T> acquire(T* ptr, int width, int height, std::ptrdiff_t stride) noexcept;
+    T*               release() noexcept;
+
   private:
     using base = Tile2DView<T>;
   };
@@ -125,18 +132,34 @@ namespace mln::bp
       aligned_free_2d<T>((T*)this->m_ptr, this->m_width, this->m_height, this->m_stride);
   }
 
+
   template <class T>
   Tile2D<T>::Tile2D(Tile2D&& other) noexcept
-    : base(other)
   {
-    other.m_ptr = nullptr;
+    std::swap(*(base*)(this), (base&)other);
   }
 
   template <class T>
   Tile2D<T>& Tile2D<T>::operator=(Tile2D&& other) noexcept
   {
-    *(base*)(this) = *(base*)other;
-    other.m_ptr = nullptr;
+    std::swap(*(base*)(this), (base&)other);
+  }
+
+  template <class T>
+  T* Tile2D<T>::release() noexcept
+  {
+    return (T*)std::exchange(this->m_ptr, nullptr);
+  }
+
+  template <class T>
+  Tile2D<T> Tile2D<T>::acquire(T* ptr, int width, int height, std::ptrdiff_t pitch) noexcept
+  {
+    Tile2D t;
+    t.m_ptr    = aligned_alloc_2d<T>(width, height, pitch);
+    t.m_stride = pitch;
+    t.m_width  = width;
+    t.m_height = height;
+    return t;
   }
 
 

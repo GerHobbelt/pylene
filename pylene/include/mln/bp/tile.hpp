@@ -88,6 +88,7 @@ namespace mln::bp
 
     Tile2D(const Tile2D&) = delete;
     Tile2D& operator=(const Tile2D&) = delete;
+
     Tile2D(Tile2D&&) noexcept;
     Tile2D& operator=(Tile2D&&) noexcept;
 
@@ -135,14 +136,16 @@ namespace mln::bp
 
   template <class T>
   Tile2D<T>::Tile2D(Tile2D&& other) noexcept
+    : base(std::move(other))
   {
-    std::swap(*(base*)(this), (base&)other);
+    this->m_ptr = std::exchange(other.m_ptr, nullptr);
   }
 
   template <class T>
   Tile2D<T>& Tile2D<T>::operator=(Tile2D&& other) noexcept
   {
-    std::swap(*(base*)(this), (base&)other);
+    std::swap((base&)(*this), (base&)other);
+    return *this;
   }
 
   template <class T>
@@ -155,7 +158,7 @@ namespace mln::bp
   Tile2D<T> Tile2D<T>::acquire(T* ptr, int width, int height, std::ptrdiff_t pitch) noexcept
   {
     Tile2D t;
-    t.m_ptr    = aligned_alloc_2d<T>(width, height, pitch);
+    t.m_ptr    = ptr;
     t.m_stride = pitch;
     t.m_width  = width;
     t.m_height = height;

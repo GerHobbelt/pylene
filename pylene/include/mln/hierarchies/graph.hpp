@@ -1,0 +1,34 @@
+#pragma once
+
+#include <vector>
+#include <string>
+#include <tuple>
+
+namespace mln
+{
+    class Graph
+    {
+        public:
+
+        Graph(unsigned nb_vertices)
+        : nb_vertices_(nb_vertices)
+        {}
+
+        Graph(unsigned nb_vertices, const std::string filename);
+
+        void add_edge(unsigned source, unsigned destination, unsigned weight);
+        unsigned get_edge(unsigned n);
+        unsigned weight_node(unsigned n);
+
+        void kruskal();
+
+
+        private:
+
+        unsigned nb_vertices_;
+        std::vector<std::tuple<unsigned, unsigned ,unsigned>> edges_;
+        std::vector<std::tuple<unsigned, unsigned ,unsigned>> mst;
+    };
+
+
+} // namespace mln

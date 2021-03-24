@@ -79,6 +79,8 @@ target_sources(Pylene PRIVATE
                src/core/se/rect2d.cpp
                src/core/trace.cpp
                src/core/traverse2d.cpp
+               src/hierarchies/collections.cpp
+               src/hierarchies/graph.cpp
                src/io/freeimage_plugin.cpp
                src/io/imprint.cpp
                src/io/imread.cpp

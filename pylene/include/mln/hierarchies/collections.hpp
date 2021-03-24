@@ -4,57 +4,47 @@
 
 namespace mln
 {
-    class QEBT
-    {
-        public:
+  class QBT
+  {
+  public:
+    QBT(unsigned nb_vertices);
 
-        QEBT(unsigned nb_vertices);
+    void     make_set(unsigned q);
+    unsigned make_union(unsigned cx, unsigned cy);
+    unsigned find_canonical(unsigned q);
 
-        void make_set(unsigned q);
-        unsigned make_union(unsigned q);
-        unsigned find_canonical(unsigned q);
+    unsigned size;
+    int*     parent;
+  };
 
+  class QT
+  {
+  public:
+    QT(unsigned nb_vertices);
 
-        private:
+    void     make_set();
+    unsigned make_union(unsigned cx, unsigned cy);
+    unsigned find_canonical(unsigned q);
 
-        unsigned nb_vertices;
-        std::vector<unsigned> root;
-        QBT qbt;
-        QT qt;
-    };
+    unsigned size;
+    int*     parent;
+    int*     rank;
+  };
 
-    class QT
-    {
-        public:
+  class QEBT
+  {
+  public:
+    QEBT(unsigned nb_vertices);
 
-        QT(unsigned nb_vertices);
-
-        void make_set(unsigned q);
-        unsigned make_union(unsigned q);
-        unsigned find_canonical(unsigned q);
-
-
-        private:
-
-        unsigned size;
-        std::vector<unsigned> parent;
-        std::vector<unsigned> rank;
-    };
-
-    class QBT
-    {
-        public:
-
-        QBT(unsigned nb_vertices);
-
-        void make_set(unsigned q);
-        unsigned make_union(unsigned q);
-        unsigned find_canonical(unsigned q);
+    void     make_set(unsigned q);
+    unsigned make_union(unsigned cx, unsigned cy);
+    unsigned find_canonical(unsigned q);
 
 
-        private:
-
-        unsigned size;
-        std::vector<unsigned> parent;
-    };
+  private:
+    unsigned nb_vertices;
+    int*     root;
+    QBT      qbt;
+    QT       qt;
+  };
 } // namespace mln

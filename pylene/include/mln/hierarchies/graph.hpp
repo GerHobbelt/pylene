@@ -1,5 +1,8 @@
 #pragma once
 
+#include "mln/hierarchies/collections.hpp"
+
+#include <algorithm>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -11,6 +14,7 @@ namespace mln
   public:
     Graph(unsigned nb_vertices)
       : nb_vertices_(nb_vertices)
+      , qebt(QEBT(nb_vertices))
     {
     }
 
@@ -27,6 +31,7 @@ namespace mln
     unsigned                                              nb_vertices_;
     std::vector<std::tuple<unsigned, unsigned, unsigned>> edges_;
     std::vector<std::tuple<unsigned, unsigned, unsigned>> mst;
+    QEBT                                                  qebt;
   };
 
 

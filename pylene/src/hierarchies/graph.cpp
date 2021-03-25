@@ -17,7 +17,6 @@ namespace mln
     return std::get<2>(triplet);
   }
 
-
   static bool sortbyth(const std::tuple<std::size_t, std::size_t, std::size_t>& a,
                        const std::tuple<std::size_t, std::size_t, std::size_t>& b)
   {

@@ -20,7 +20,7 @@ namespace mln
 
     Graph(std::size_t nb_vertices, const std::string filename);
 
-    void     add_edge(std::size_t source, std::size_t destination, std::size_t weight);
+    void        add_edge(std::size_t source, std::size_t destination, std::size_t weight);
     std::size_t get_edge(std::size_t n);
     std::size_t weight_node(std::size_t n);
 
@@ -28,10 +28,10 @@ namespace mln
 
 
   private:
-    std::size_t                                              nb_vertices_;
+    std::size_t                                                    nb_vertices_;
     std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> edges_;
     std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> mst;
-    QEBT                                                  qebt;
+    QEBT                                                           qebt;
   };
 
 

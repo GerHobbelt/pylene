@@ -60,8 +60,8 @@ namespace mln
     if (this->rank[cx] > this->rank[cy])
     {
       std::size_t tmp = cx;
-      cx           = cy;
-      cy           = tmp;
+      cx              = cy;
+      cy              = tmp;
     }
 
     if (this->rank[cx] == this->rank[cy])
@@ -82,7 +82,7 @@ namespace mln
 
     while (this->parent[q] >= 0)
     {
-      std::size_t tmp      = q;
+      std::size_t tmp   = q;
       q                 = this->parent[q];
       this->parent[tmp] = r;
     }
@@ -117,7 +117,7 @@ namespace mln
     this->qbt.parent[tu] = this->qbt.size;
     this->qbt.parent[tv] = this->qbt.size;
 
-    std::size_t c    = this->qt.make_union(cx, cy);
+    std::size_t c = this->qt.make_union(cx, cy);
     this->root[c] = this->qbt.size;
     this->qbt.make_set(this->qbt.size);
     return this->qbt.size - 1;

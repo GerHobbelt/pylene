@@ -7,26 +7,26 @@ namespace mln
   class QBT
   {
   public:
-    QBT(unsigned nb_vertices);
+    QBT(std::size_t nb_vertices);
 
-    void     make_set(unsigned q);
-    unsigned make_union(unsigned cx, unsigned cy);
-    unsigned find_canonical(unsigned q);
+    void     make_set(std::size_t q);
+    std::size_t make_union(std::size_t cx, std::size_t cy);
+    std::size_t find_canonical(std::size_t q);
 
-    unsigned size;
+    std::size_t size;
     int*     parent;
   };
 
   class QT
   {
   public:
-    QT(unsigned nb_vertices);
+    QT(std::size_t nb_vertices);
 
     void     make_set();
-    unsigned make_union(unsigned cx, unsigned cy);
-    unsigned find_canonical(unsigned q);
+    std::size_t make_union(std::size_t cx, std::size_t cy);
+    std::size_t find_canonical(std::size_t q);
 
-    unsigned size;
+    std::size_t size;
     int*     parent;
     int*     rank;
   };
@@ -34,15 +34,14 @@ namespace mln
   class QEBT
   {
   public:
-    QEBT(unsigned nb_vertices);
+    QEBT(std::size_t nb_vertices);
 
-    void     make_set(unsigned q);
-    unsigned make_union(unsigned cx, unsigned cy);
-    unsigned find_canonical(unsigned q);
+    void     make_set(std::size_t q);
+    std::size_t make_union(std::size_t cx, std::size_t cy);
+    std::size_t find_canonical(std::size_t q);
 
 
   private:
-    unsigned nb_vertices;
     int*     root;
     QBT      qbt;
     QT       qt;

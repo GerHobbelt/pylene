@@ -12,25 +12,25 @@ namespace mln
   class Graph
   {
   public:
-    Graph(unsigned nb_vertices)
+    Graph(std::size_t nb_vertices)
       : nb_vertices_(nb_vertices)
       , qebt(QEBT(nb_vertices))
     {
     }
 
-    Graph(unsigned nb_vertices, const std::string filename);
+    Graph(std::size_t nb_vertices, const std::string filename);
 
-    void     add_edge(unsigned source, unsigned destination, unsigned weight);
-    unsigned get_edge(unsigned n);
-    unsigned weight_node(unsigned n);
+    void     add_edge(std::size_t source, std::size_t destination, std::size_t weight);
+    std::size_t get_edge(std::size_t n);
+    std::size_t weight_node(std::size_t n);
 
     void kruskal();
 
 
   private:
-    unsigned                                              nb_vertices_;
-    std::vector<std::tuple<unsigned, unsigned, unsigned>> edges_;
-    std::vector<std::tuple<unsigned, unsigned, unsigned>> mst;
+    std::size_t                                              nb_vertices_;
+    std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> edges_;
+    std::vector<std::tuple<std::size_t, std::size_t, std::size_t>> mst;
     QEBT                                                  qebt;
   };
 

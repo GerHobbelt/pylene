@@ -80,7 +80,7 @@ namespace mln
 
     const std::vector<Edge>& s_map = saliency_map(tree);
 
-    for (const auto& edge : leaf_graph->get_edges())
+    for (const auto& edge : s_map)
     {
       int u = std::get<0>(edge);
       int v = std::get<1>(edge);

@@ -1,127 +1,137 @@
 #include "mln/hierarchies/collections.hpp"
+#include "mln/hierarchies/graph.hpp"
 
 namespace mln
 {
-  QBT::QBT(std::size_t nb_vertices)
+  QBT::QBT(const Graph* leaf_graph)
+    : HierarchyTree(leaf_graph)
   {
-    this->size   = 0;
-    this->parent = new int[2 * nb_vertices - 1];
+    int nb_vertices = leaf_graph->get_nb_vertices();
 
-    for (std::size_t i = 0; i < 2 * nb_vertices - 1; i++)
+    this->size_   = 0;
+    this->parent_ = new int[2 * nb_vertices - 1];
+
+    for (int i = 0; i < 2 * nb_vertices - 1; i++)
     {
-      this->parent[i] = -1;
+      this->parent_[i] = -1;
     }
   }
 
-  void QBT::make_set(std::size_t q)
+  void QBT::make_set(int q)
   {
-    this->parent[q] = -1;
-    this->size += 1;
+    this->parent_[q] = -1;
+    this->size_ += 1;
   }
 
-  std::size_t QBT::make_union(std::size_t cx, std::size_t cy)
+  int QBT::make_union(int cx, int cy)
   {
-    this->parent[cx] = this->size;
-    this->parent[cy] = this->size;
-    this->make_set(this->size);
-    return this->size - 1;
+    this->parent_[cx] = this->size_;
+    this->parent_[cy] = this->size_;
+    this->make_set(this->size_);
+    return this->size_ - 1;
   }
 
-  std::size_t QBT::find_canonical(std::size_t q)
+  int QBT::find_canonical(int q)
   {
-    while (this->parent[q] >= 0)
-      q = this->parent[q];
+    while (this->parent_[q] >= 0)
+      q = this->parent_[q];
 
     return q;
   }
 
-  QT::QT(std::size_t nb_vertices)
+  QT::QT(const Graph* leaf_graph)
+    : HierarchyTree(leaf_graph)
   {
-    this->size   = 0;
-    this->parent = new int[nb_vertices];
-    this->rank   = new int[nb_vertices];
+    int nb_vertices = leaf_graph->get_nb_vertices();
 
-    for (std::size_t i = 0; i < nb_vertices; i++)
+    this->size_   = 0;
+    this->parent_ = new int[nb_vertices];
+    this->rank_   = new int[nb_vertices];
+
+    for (int i = 0; i < nb_vertices; i++)
     {
-      this->parent[i] = -1;
-      this->rank[i]   = -1;
+      this->parent_[i] = -1;
+      this->rank_[i]   = -1;
     }
   }
 
   void QT::make_set()
   {
-    this->parent[this->size] = -1;
-    this->rank[this->size]   = 0;
-    this->size += 1;
+    this->parent_[this->size_] = -1;
+    this->rank_[this->size_]   = 0;
+    this->size_ += 1;
   }
 
-  std::size_t QT::make_union(std::size_t cx, std::size_t cy)
+  int QT::make_union(int cx, int cy)
   {
-    if (this->rank[cx] > this->rank[cy])
+    if (this->rank_[cx] > this->rank_[cy])
     {
-      std::size_t tmp = cx;
-      cx              = cy;
-      cy              = tmp;
+      int tmp = cx;
+      cx      = cy;
+      cy      = tmp;
     }
 
-    if (this->rank[cx] == this->rank[cy])
+    if (this->rank_[cx] == this->rank_[cy])
     {
-      this->rank[cy] += 1;
+      this->rank_[cy] += 1;
     }
 
-    this->parent[cx] = cy;
+    this->parent_[cx] = cy;
     return cy;
   }
 
-  std::size_t QT::find_canonical(std::size_t q)
+  int QT::find_canonical(int q)
   {
-    std::size_t r = q;
+    int r = q;
 
-    while (this->parent[r] >= 0)
-      r = this->parent[r];
+    while (this->parent_[r] >= 0)
+      r = this->parent_[r];
 
-    while (this->parent[q] >= 0)
+    while (this->parent_[q] >= 0)
     {
-      std::size_t tmp   = q;
-      q                 = this->parent[q];
-      this->parent[tmp] = r;
+      int tmp            = q;
+      q                  = this->parent_[q];
+      this->parent_[tmp] = r;
     }
 
     return r;
   }
 
-  QEBT::QEBT(std::size_t nb_vertices)
-    : qbt(QBT(nb_vertices))
-    , qt(QT(nb_vertices))
+  QEBT::QEBT(const Graph* leaf_graph)
+    : HierarchyTree(leaf_graph)
+    , qbt_(QBT(leaf_graph))
+    , qt_(QT(leaf_graph))
   {
-    this->root = new int[nb_vertices];
+    int nb_vertices = leaf_graph->get_nb_vertices();
 
-    for (std::size_t i = 0; i < nb_vertices; i++)
+    this->root_ = new int[nb_vertices];
+
+    for (int i = 0; i < nb_vertices; i++)
     {
-      this->root[i] = -1;
+      this->root_[i] = -1;
     }
   }
 
-  void QEBT::make_set(std::size_t q)
+  void QEBT::make_set(int q)
   {
-    this->root[q] = q;
-    this->qbt.make_set(q);
-    this->qt.make_set();
+    this->root_[q] = q;
+    this->qbt_.make_set(q);
+    this->qt_.make_set();
   }
 
-  std::size_t QEBT::make_union(std::size_t cx, std::size_t cy)
+  int QEBT::make_union(int cx, int cy)
   {
-    std::size_t tu = this->root[cx];
-    std::size_t tv = this->root[cy];
+    int tu = this->root_[cx];
+    int tv = this->root_[cy];
 
-    this->qbt.parent[tu] = this->qbt.size;
-    this->qbt.parent[tv] = this->qbt.size;
+    this->qbt_.parent_[tu] = this->qbt_.size_;
+    this->qbt_.parent_[tv] = this->qbt_.size_;
 
-    std::size_t c = this->qt.make_union(cx, cy);
-    this->root[c] = this->qbt.size;
-    this->qbt.make_set(this->qbt.size);
-    return this->qbt.size - 1;
+    int c          = this->qt_.make_union(cx, cy);
+    this->root_[c] = this->qbt_.size_;
+    this->qbt_.make_set(this->qbt_.size_);
+    return this->qbt_.size_ - 1;
   }
 
-  std::size_t QEBT::find_canonical(std::size_t q) { return this->qt.find_canonical(q); }
+  int QEBT::find_canonical(int q) { return this->qt_.find_canonical(q); }
 } // namespace mln

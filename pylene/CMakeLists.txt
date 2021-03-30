@@ -81,6 +81,7 @@ target_sources(Pylene PRIVATE
                src/core/traverse2d.cpp
                src/hierarchies/collections.cpp
                src/hierarchies/graph.cpp
+               src/hierarchies/saliency.cpp
                src/io/freeimage_plugin.cpp
                src/io/imprint.cpp
                src/io/imread.cpp

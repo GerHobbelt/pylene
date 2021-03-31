@@ -79,4 +79,32 @@ namespace mln
     return volume;
   }
 
+  int* extrema_attribute(const HierarchyTree& tree)
+  {
+    const Graph* leaf_graph = tree.leaf_graph;
+
+    int tree_nb_vertices = tree.get_nb_vertices();
+
+    int* extrema = new int[tree_nb_vertices];
+    std::fill_n(extrema, tree_nb_vertices, 1);
+
+    std::fill_n(extrema, leaf_graph->get_nb_vertices(), 0);
+
+    for (int i_node = leaf_graph->get_nb_vertices(); i_node < tree_nb_vertices - 1; ++i_node)
+    {
+      int parent_node = tree.get_parent(i_node);
+      if (parent_node == -1)
+      {
+        extrema[i_node] = -1;
+        continue;
+      }
+
+      bool same_weight = leaf_graph->weight_node(i_node) == leaf_graph->weight_node(parent_node);
+      extrema[parent_node] &= same_weight && extrema[i_node];
+      extrema[i_node] &= !same_weight;
+    }
+
+    return extrema;
+  }
+
 } // namespace mln

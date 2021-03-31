@@ -16,6 +16,8 @@ namespace mln
     }
   }
 
+  QBT::~QBT() { delete[] parent_; }
+
   void QBT::make_set(int q)
   {
     this->parent_[q] = -1;
@@ -55,6 +57,12 @@ namespace mln
       this->parent_[i] = -1;
       this->rank_[i]   = -1;
     }
+  }
+
+  QT::~QT()
+  {
+    delete[] parent_;
+    delete[] rank_;
   }
 
   void QT::make_set()
@@ -122,6 +130,8 @@ namespace mln
     this->qbt_.make_set(q);
     this->qt_.make_set();
   }
+
+  QEBT::~QEBT() { delete[] root_; }
 
   int QEBT::make_union(int cx, int cy)
   {

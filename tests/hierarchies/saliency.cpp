@@ -44,9 +44,9 @@ TEST(Hierarchies, Saliency_Map)
 
   Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  const HierarchyTree& bpt = graph->kruskal();
+  HierarchyTree* bpt = graph->kruskal();
 
-  auto s_map = saliency_map(bpt);
+  auto s_map = saliency_map(*bpt);
 
   for (int i = 0; i < 24; ++i)
   {
@@ -63,6 +63,9 @@ TEST(Hierarchies, Saliency_Map)
       }
     }
   }
+
+  delete bpt;
+  delete graph;
 }
 
 TEST(Hierarchies, Khalimsky_Grid)
@@ -84,12 +87,16 @@ TEST(Hierarchies, Khalimsky_Grid)
 
   Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  const HierarchyTree& bpt = graph->kruskal();
+  HierarchyTree* bpt = graph->kruskal();
 
-  auto khalimsky_grid = saliency_khalimsky_grid(bpt);
+  auto* khalimsky_grid = saliency_khalimsky_grid(*bpt);
 
   for (int i = 0; i < 9 * 9; ++i)
   {
     ASSERT_EQ(expected_khalimsky_grid[i], khalimsky_grid[i]);
   }
+
+  delete[] khalimsky_grid;
+  delete bpt;
+  delete graph;
 }

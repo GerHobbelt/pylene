@@ -13,6 +13,8 @@ namespace mln
   public:
     QBT(const Graph* leaf_graph);
 
+    ~QBT();
+
     void make_set(int q);
     int  make_union(int cx, int cy);
     int  find_canonical(int q);
@@ -21,7 +23,7 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
-    int nb_vertices_;
+    int  nb_vertices_;
     int  size_;
     int* parent_;
   };
@@ -33,6 +35,8 @@ namespace mln
   public:
     QT(const Graph* leaf_graph);
 
+    ~QT();
+
     void make_set();
     int  make_union(int cx, int cy);
     int  find_canonical(int q);
@@ -41,7 +45,7 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
-    int nb_vertices_;
+    int  nb_vertices_;
     int  size_;
     int* parent_;
     int* rank_;
@@ -51,6 +55,8 @@ namespace mln
   {
   public:
     QEBT(const Graph* leaf_graph);
+
+    ~QEBT();
 
     void make_set(int q);
     int  make_union(int cx, int cy);

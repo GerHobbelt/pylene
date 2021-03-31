@@ -63,6 +63,8 @@ namespace mln
       res.emplace_back(edge);
     }
 
+    delete[] depth;
+
     return res;
   }
 

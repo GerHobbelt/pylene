@@ -11,6 +11,8 @@ namespace mln
     {
     }
 
+    virtual ~HierarchyTree() = default;
+
     virtual int get_nb_vertices() const = 0;
 
     virtual int get_parent(int node) const = 0;

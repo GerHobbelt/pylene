@@ -19,7 +19,6 @@ namespace mln
       : nb_vertices_(height * width)
       , height_(height)
       , width_(width)
-      , qebt(QEBT(this))
     {
     }
 
@@ -37,7 +36,7 @@ namespace mln
     int  get_edge(int n) const;
     int  weight_node(int n) const;
 
-    const QEBT& kruskal();
+    QEBT* kruskal();
 
   private:
     int nb_vertices_;
@@ -47,6 +46,5 @@ namespace mln
 
     std::vector<Edge> edges_;
     std::vector<Edge> mst;
-    QEBT              qebt;
   };
 } // namespace mln

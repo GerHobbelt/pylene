@@ -82,3 +82,29 @@ TEST(Hierarchies, Area_Attribute)
   delete bpt;
   delete graph;
 }
+
+TEST(Hierarchies, Volume_Attribute)
+{
+  int gray_image[16] = {0,  0,  100, 0, //
+                        0,  0,  75,  0, //
+                        95, 80, 60,  0, //
+                        0,  0,  0,   0};
+
+  int expected_volume[31] = {0, 0, 0, 0, 0, 0, 0, 0,   0,   0,  0,  0,  0,   0,   0,   0,
+                             0, 0, 0, 0, 0, 0, 0, 420, 300, 10, 10, 40, 215, 815, 1115};
+
+  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+
+  HierarchyTree* bpt = graph->kruskal();
+
+  int* volume = volume_attribute(*bpt);
+
+  for (int i = 0; i < 31; ++i)
+  {
+    ASSERT_EQ(expected_volume[i], volume[i]);
+  }
+
+  delete[] volume;
+  delete bpt;
+  delete graph;
+}

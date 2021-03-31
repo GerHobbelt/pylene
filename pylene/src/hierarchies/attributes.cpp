@@ -51,4 +51,32 @@ namespace mln
     return area;
   }
 
+  int* volume_attribute(const HierarchyTree& tree)
+  {
+    const Graph* leaf_graph = tree.leaf_graph;
+
+    int tree_nb_vertices = tree.get_nb_vertices();
+
+    int* area = area_attribute(tree);
+
+    int* volume = new int[tree_nb_vertices];
+    std::fill_n(volume, tree_nb_vertices, 0);
+
+    for (int i_node = leaf_graph->get_nb_vertices(); i_node < tree_nb_vertices - 1; ++i_node)
+    {
+      int parent_node = tree.get_parent(i_node);
+      if (parent_node == -1)
+      {
+        volume[i_node] = -1;
+        continue;
+      }
+
+      volume[i_node] += area[i_node] * abs(leaf_graph->weight_node(i_node) - leaf_graph->weight_node(parent_node));
+      volume[parent_node] += volume[i_node];
+    }
+
+    delete[] area;
+    return volume;
+  }
+
 } // namespace mln

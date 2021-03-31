@@ -8,4 +8,6 @@ namespace mln
 
   int* area_attribute(const HierarchyTree& tree);
 
+  int* volume_attribute(const HierarchyTree& tree);
+
 } // namespace mln

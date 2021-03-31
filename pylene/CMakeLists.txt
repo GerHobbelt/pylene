@@ -14,30 +14,30 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 add_library(Pylene)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene PRIVATE TBB::TBB)
+    target_link_libraries(Pylene PRIVATE TBB::TBB)
 else ()
-  set(PYLENE_USE_TBB OFF)
-  target_compile_definitions(Pylene PRIVATE MLN_NO_TBB)
+    set(PYLENE_USE_TBB OFF)
+    target_compile_definitions(Pylene PRIVATE MLN_NO_TBB)
 endif ()
 
 # FIXME: still useful ?
 if (UNIX AND NOT APPLE)
-  target_link_libraries(Pylene INTERFACE rt)
+    target_link_libraries(Pylene INTERFACE rt)
 elseif (MSVC)
-  #
-  target_compile_options(Pylene PUBLIC
-    "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
-    "/wd5104" # found 'L#x' in macro replacement list, did you mean
-    "/experimental:preprocessor"  # required by range-v3
-    "/permissive-" # required by range-v3
-    )
+    #
+    target_compile_options(Pylene PUBLIC
+            "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
+            "/wd5104" # found 'L#x' in macro replacement list, did you mean
+            "/experimental:preprocessor"  # required by range-v3
+            "/permissive-" # required by range-v3
+            )
 endif ()
 
 
 # Set dependancies
 target_include_directories(Pylene PUBLIC
-                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                           $<INSTALL_INTERFACE:include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
 target_link_libraries(Pylene PUBLIC range-v3::range-v3 xsimd::xsimd)
@@ -50,14 +50,14 @@ target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
 #target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
 
 add_library(Pylene-bp OBJECT
-  src/bp/transpose.cpp
-  src/bp/swap.cpp
-  src/bp/alloc.cpp
-  )
+        src/bp/transpose.cpp
+        src/bp/swap.cpp
+        src/bp/alloc.cpp
+        )
 
 target_include_directories(Pylene-bp PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
 target_link_libraries(Pylene-bp PRIVATE xsimd::xsimd fmt::fmt)
 target_compile_features(Pylene-bp PUBLIC cxx_std_20)
 
@@ -65,44 +65,45 @@ target_link_libraries(Pylene PRIVATE Pylene-bp)
 
 
 target_sources(Pylene PRIVATE
-               src/accu/cvxhull.cpp
-               src/core/image_format.cpp
-               src/core/init_list.cpp
-               src/core/ndbuffer_image.cpp
-               src/core/ndbuffer_image_data.cpp
-               src/core/padding.cpp
-               src/core/parallel_local.cpp
-               src/core/parallel_pointwise.cpp
-               src/core/se/disc.cpp
-               src/core/se/mask2d.cpp
-               src/core/se/periodic_line2d.cpp
-               src/core/se/rect2d.cpp
-               src/core/trace.cpp
-               src/core/traverse2d.cpp
-               src/hierarchies/collections.cpp
-               src/hierarchies/graph.cpp
-               src/hierarchies/saliency.cpp
-               src/io/freeimage_plugin.cpp
-               src/io/imprint.cpp
-               src/io/imread.cpp
-               src/io/io.cpp
-               src/morpho/block_running_max.cpp
-               src/morpho/component_tree.cpp
-               src/morpho/hvector.cpp
-               src/morpho/hvector_unbounded.cpp
-               src/morpho/immersion.cpp
-               src/morpho/maxtree.cpp
-               src/morpho/unionfind.cpp
-               src/morpho/filters2d.cpp
-               )
+        src/accu/cvxhull.cpp
+        src/core/image_format.cpp
+        src/core/init_list.cpp
+        src/core/ndbuffer_image.cpp
+        src/core/ndbuffer_image_data.cpp
+        src/core/padding.cpp
+        src/core/parallel_local.cpp
+        src/core/parallel_pointwise.cpp
+        src/core/se/disc.cpp
+        src/core/se/mask2d.cpp
+        src/core/se/periodic_line2d.cpp
+        src/core/se/rect2d.cpp
+        src/core/trace.cpp
+        src/core/traverse2d.cpp
+        src/hierarchies/collections.cpp
+        src/hierarchies/graph.cpp
+        src/hierarchies/saliency.cpp
+        src/hierarchies/attributes.cpp
+        src/io/freeimage_plugin.cpp
+        src/io/imprint.cpp
+        src/io/imread.cpp
+        src/io/io.cpp
+        src/morpho/block_running_max.cpp
+        src/morpho/component_tree.cpp
+        src/morpho/hvector.cpp
+        src/morpho/hvector_unbounded.cpp
+        src/morpho/immersion.cpp
+        src/morpho/maxtree.cpp
+        src/morpho/unionfind.cpp
+        src/morpho/filters2d.cpp
+        )
 
 # Compiler configurations
 target_compile_features(Pylene PUBLIC cxx_std_20)
 
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
-  target_compile_options(Pylene-bp PUBLIC -fconcepts)
-  target_compile_options(Pylene PUBLIC -fconcepts)
-endif()
+    target_compile_options(Pylene-bp PUBLIC -fconcepts)
+    target_compile_options(Pylene PUBLIC -fconcepts)
+endif ()
 
 # IDE configuration
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -116,15 +117,15 @@ install(TARGETS Pylene Pylene-bp
         EXPORT PyleneTargets)
 
 write_basic_package_version_file(
-    PyleneConfigVersion.cmake
-    VERSION 0.1
-    COMPATIBILITY AnyNewerVersion
+        PyleneConfigVersion.cmake
+        VERSION 0.1
+        COMPATIBILITY AnyNewerVersion
 )
 
 configure_file(
-    PyleneConfig.cmake.in
-    PyleneConfig.cmake
-    @ONLY
+        PyleneConfig.cmake.in
+        PyleneConfig.cmake
+        @ONLY
 )
 
 install(EXPORT PyleneTargets
@@ -143,5 +144,5 @@ install(FILES
 
 # GCC8 has enoying random compilation failures
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-  target_compile_definitions(Pylene PUBLIC PYLENE_GCC8_WORKAROUND)
-endif()
+    target_compile_definitions(Pylene PUBLIC PYLENE_GCC8_WORKAROUND)
+endif ()

@@ -16,10 +16,7 @@ namespace mln
     return std::get<2>(triplet);
   }
 
-  static bool sortbyth(const std::tuple<int, int, int>& a, const std::tuple<int, int, int>& b)
-  {
-    return (std::get<2>(a) < std::get<2>(b));
-  }
+  static bool sortbyth(const Edge& a, const Edge& b) { return (std::get<2>(a) < std::get<2>(b)); }
 
   QEBT* Graph::kruskal()
   {

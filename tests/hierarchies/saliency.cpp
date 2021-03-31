@@ -37,10 +37,10 @@ TEST(Hierarchies, Saliency_Map)
                         95, 80, 60,  0, //
                         0,  0,  0,   0};
 
-  int expected_s_map_val[24][3] = {{0, 4, 0},   {0, 1, 0},   {1, 5, 0},    {3, 7, 0},    {4, 5, 0},   {7, 11, 0},
-                                   {11, 15, 0}, {12, 13, 0}, {13, 14, 0},  {14, 15, 0},  {6, 10, 15}, {8, 9, 15},
+  int expected_s_map_val[24][3] = {{0, 1, 0},   {14, 15, 0}, {13, 14, 0},  {12, 13, 0},  {11, 15, 0}, {7, 11, 0},
+                                   {4, 5, 0},   {3, 7, 0},   {0, 4, 0},    {1, 5, 0},    {6, 10, 15}, {8, 9, 15},
                                    {9, 10, 20}, {2, 6, 25},  {10, 14, 60}, {10, 11, 60}, {5, 6, 75},  {6, 7, 60},
-                                   {5, 9, 75},  {9, 13, 60}, {4, 8, 75},   {8, 12, 60},  {1, 2, 75},  {2, 3, 60}};
+                                   {9, 13, 60}, {5, 9, 75},  {8, 12, 60},  {4, 8, 75},   {2, 3, 60},  {1, 2, 75}};
 
   Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
 
@@ -52,16 +52,7 @@ TEST(Hierarchies, Saliency_Map)
   {
     auto expected_edge = expected_s_map_val[i];
 
-    for (const auto& edge : s_map)
-    {
-      int u = std::get<0>(edge);
-      int v = std::get<1>(edge);
-
-      if ((u == expected_edge[0] && v == expected_edge[1]) || (u == expected_edge[1] && v == expected_edge[0]))
-      {
-        ASSERT_EQ(expected_edge[2], std::get<2>(edge));
-      }
-    }
+    ASSERT_EQ(expected_edge[2], std::get<2>(s_map[i]));
   }
 
   delete bpt;

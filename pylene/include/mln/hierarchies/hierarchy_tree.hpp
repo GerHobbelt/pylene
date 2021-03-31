@@ -6,7 +6,7 @@ namespace mln
 
   struct HierarchyTree
   {
-    HierarchyTree(const Graph* leaf_graph)
+    explicit HierarchyTree(const Graph* leaf_graph)
       : leaf_graph(leaf_graph)
     {
     }

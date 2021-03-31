@@ -22,7 +22,7 @@ namespace mln
     return (std::get<2>(a) < std::get<2>(b));
   }
 
-  void Graph::kruskal()
+  const QEBT& Graph::kruskal()
   {
     for (int xi = 0; xi < this->nb_vertices_; xi++)
       this->qebt.make_set(xi);
@@ -37,8 +37,12 @@ namespace mln
       int cy = this->qebt.find_canonical(std::get<1>(edge));
 
       if (cx != cy)
+      {
         this->qebt.make_union(cx, cy);
-      this->mst.push_back(edge);
+        this->mst.push_back(edge);
+      }
     }
+
+    return this->qebt;
   }
 } // namespace mln

@@ -37,7 +37,7 @@ namespace mln
     int  get_edge(int n) const;
     int  weight_node(int n) const;
 
-    void kruskal();
+    const QEBT& kruskal();
 
   private:
     int nb_vertices_;

@@ -5,13 +5,12 @@ namespace mln
 {
   QBT::QBT(const Graph* leaf_graph)
     : HierarchyTree(leaf_graph)
+    , nb_vertices_(2 * leaf_graph->get_nb_vertices() - 1)
   {
-    int nb_vertices = leaf_graph->get_nb_vertices();
-
     this->size_   = 0;
-    this->parent_ = new int[2 * nb_vertices - 1];
+    this->parent_ = new int[nb_vertices_];
 
-    for (int i = 0; i < 2 * nb_vertices - 1; i++)
+    for (int i = 0; i < nb_vertices_; i++)
     {
       this->parent_[i] = -1;
     }
@@ -39,16 +38,19 @@ namespace mln
     return q;
   }
 
+  int QBT::get_nb_vertices() const { return nb_vertices_; }
+
+  int QBT::get_parent(int node) const { return parent_[node]; }
+
   QT::QT(const Graph* leaf_graph)
     : HierarchyTree(leaf_graph)
+    , nb_vertices_(leaf_graph->get_nb_vertices())
   {
-    int nb_vertices = leaf_graph->get_nb_vertices();
-
     this->size_   = 0;
-    this->parent_ = new int[nb_vertices];
-    this->rank_   = new int[nb_vertices];
+    this->parent_ = new int[nb_vertices_];
+    this->rank_   = new int[nb_vertices_];
 
-    for (int i = 0; i < nb_vertices; i++)
+    for (int i = 0; i < nb_vertices_; i++)
     {
       this->parent_[i] = -1;
       this->rank_[i]   = -1;
@@ -97,16 +99,18 @@ namespace mln
     return r;
   }
 
+  int QT::get_nb_vertices() const { return nb_vertices_; }
+
+  int QT::get_parent(int node) const { return parent_[node]; }
+
   QEBT::QEBT(const Graph* leaf_graph)
     : HierarchyTree(leaf_graph)
     , qbt_(QBT(leaf_graph))
     , qt_(QT(leaf_graph))
   {
-    int nb_vertices = leaf_graph->get_nb_vertices();
+    this->root_ = new int[qbt_.nb_vertices_];
 
-    this->root_ = new int[nb_vertices];
-
-    for (int i = 0; i < nb_vertices; i++)
+    for (int i = 0; i < qbt_.nb_vertices_; i++)
     {
       this->root_[i] = -1;
     }
@@ -134,4 +138,8 @@ namespace mln
   }
 
   int QEBT::find_canonical(int q) { return this->qt_.find_canonical(q); }
+
+  int QEBT::get_nb_vertices() const { return qbt_.nb_vertices_; }
+
+  int QEBT::get_parent(int node) const { return qbt_.parent_[node]; }
 } // namespace mln

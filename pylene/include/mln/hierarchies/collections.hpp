@@ -21,6 +21,7 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
+    int nb_vertices_;
     int  size_;
     int* parent_;
   };
@@ -40,6 +41,7 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
+    int nb_vertices_;
     int  size_;
     int* parent_;
     int* rank_;
@@ -58,7 +60,6 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
-    int  nb_vertices_;
     int* root_;
     QBT  qbt_;
     QT   qt_;

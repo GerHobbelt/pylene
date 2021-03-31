@@ -26,7 +26,8 @@ namespace mln
     return depth;
   }
 
-  static int lca(int* depth, const HierarchyTree& tree, int u, int v)
+  // TODO Use sparse table to optimize LCA
+  static int lca(const int* depth, const HierarchyTree& tree, int u, int v)
   {
     // Put u and v at the same level
     while (depth[u] != depth[v])
@@ -89,29 +90,28 @@ namespace mln
       int u_pos[2] = {u / width, u % width};
       int v_pos[2] = {v / width, v % width};
 
-      int res_offset[2] = {u_pos[0] - v_pos[0], u_pos[1] - v_pos[1]};
-
+      int res_offset[2]   = {u_pos[0] - v_pos[0], u_pos[1] - v_pos[1]};
       int res_edge_pos[2] = {2 * v_pos[0] + 1 + res_offset[0], 2 * v_pos[1] + 1 + res_offset[1]};
 
-      res[res_edge_pos[0] * width + res_edge_pos[1]] = w;
+      res[res_edge_pos[0] * res_width + res_edge_pos[1]] = w;
     }
 
-    for (int y = 0; y < height; y += 2)
+    for (int y = 0; y < res_height; y += 2)
     {
-      for (int x = 0; x < width; x += 2)
+      for (int x = 0; x < res_width; x += 2)
       {
         int max = std::numeric_limits<int>::min();
 
         if (y + 1 < height)
-          max = std::max(max, res[(y + 1) * width + x]);
+          max = std::max(max, res[(y + 1) * res_width + x]);
         if (x + 1 < width)
-          max = std::max(max, res[y * width + x + 1]);
+          max = std::max(max, res[y * res_width + x + 1]);
         if (y - 1 >= 0)
-          max = std::max(max, res[(y - 1) * width + x]);
+          max = std::max(max, res[(y - 1) * res_width + x]);
         if (x - 1 >= 0)
-          max = std::max(max, res[y * width + x - 1]);
+          max = std::max(max, res[y * res_width + x - 1]);
 
-        res[y * width + x] = max;
+        res[y * res_width + x] = max;
       }
     }
 

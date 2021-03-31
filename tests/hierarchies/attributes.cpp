@@ -56,3 +56,29 @@ TEST(Hierarchies, Depth_Attribute)
   delete bpt;
   delete graph;
 }
+
+TEST(Hierarchies, Area_Attribute)
+{
+  int gray_image[16] = {0,  0,  100, 0, //
+                        0,  0,  75,  0, //
+                        95, 80, 60,  0, //
+                        0,  0,  0,   0};
+
+  int expected_area[31] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 1,
+                           2, 2, 3, 4, 5, 6, 2, 7, 4, 2, 2, 4, 5, 12, 16};
+
+  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+
+  HierarchyTree* bpt = graph->kruskal();
+
+  int* area = area_attribute(*bpt);
+
+  for (int i = 0; i < 31; ++i)
+  {
+    ASSERT_EQ(expected_area[i], area[i]);
+  }
+
+  delete[] area;
+  delete bpt;
+  delete graph;
+}

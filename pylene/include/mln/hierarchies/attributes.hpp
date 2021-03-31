@@ -6,4 +6,6 @@ namespace mln
 {
   int* depth_attribute(const HierarchyTree& tree);
 
+  int* area_attribute(const HierarchyTree& tree);
+
 } // namespace mln

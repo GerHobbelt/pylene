@@ -1,8 +1,11 @@
 #pragma once
 
 #include "mln/hierarchies/collections.hpp"
+#include <mln/core/image/ndimage.hpp>
+#include <mln/io/imread.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -22,7 +25,7 @@ namespace mln
     {
     }
 
-    Graph(int nb_vertices, const std::string filename);
+    Graph(int height, int width, const std::string filename);
 
     inline int get_nb_vertices() const { return nb_vertices_; }
 

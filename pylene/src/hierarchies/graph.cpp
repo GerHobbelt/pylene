@@ -46,4 +46,41 @@ namespace mln
 
     return qebt;
   }
+
+  Graph::Graph(int height, int width, const std::string filename)
+    : nb_vertices_(height * width)
+    , height_(height)
+    , width_(width)
+  {
+    mln::image2d<uint16_t> img;
+    mln::io::imread(filename, img);
+
+    auto shape = img.domain();
+
+    int x0 = shape.x();
+    int y0 = shape.y();
+
+    for (int x = 0; x < shape.height(); x++)
+    {
+      for (int y = 0; y < shape.width(); y++)
+      {
+        auto pix = img({x0 + x, y0 + x});
+
+        if (x0 + x < shape.height() - 1)
+        {
+          auto pix3    = img({x0 + x + 1, y0 + y});
+          auto weighty = sqrt(pow(pix3 - pix, 2));
+          this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x + 1) * shape.width() + (y0 + y), weighty);
+        }
+
+        if (y0 + y < shape.width() - 1)
+        {
+          auto pix2    = img({x0 + x, y0 + y + 1});
+          auto weightx = sqrt(pow(pix2 - pix, 2));
+
+          this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x) * shape.width() + (y0 + y + 1), weightx);
+        }
+      }
+    }
+  }
 } // namespace mln

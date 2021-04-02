@@ -7,7 +7,7 @@ find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3.9 REQUIRED)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
@@ -44,6 +44,7 @@ target_include_directories(Pylene SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUD
 target_link_libraries(Pylene PUBLIC range-v3::range-v3 xsimd::xsimd)
 target_link_libraries(Pylene PUBLIC fmt::fmt)
 target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
+target_link_libraries(Pylene PRIVATE Eigen3::Eigen3)
 
 
 # Set sources

@@ -35,6 +35,7 @@ class Pylene(ConanFile):
         "fmt/6.0.0",
         "tbb/2020.0",
         "xsimd/7.4.6",
+        "eigen/3.3.9",
     ]
 
     def _build_python(self):

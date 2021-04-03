@@ -107,4 +107,43 @@ namespace mln
     return extrema;
   }
 
+  int* height_attribute(const HierarchyTree& tree)
+  {
+    const Graph* leaf_graph = tree.leaf_graph;
+
+    int tree_nb_vertices = tree.get_nb_vertices();
+
+    int* deepest_altitude = new int[tree_nb_vertices];
+    std::fill_n(deepest_altitude, tree_nb_vertices, std::numeric_limits<int>::max());
+
+    int root = tree_nb_vertices - 1;
+
+    for (int node = 0; node < root; ++node)
+    {
+      int parent_node = tree.get_parent(node);
+      if (parent_node == -1)
+      {
+        deepest_altitude[node] = -1;
+        continue;
+      }
+
+      if (node < leaf_graph->get_nb_vertices())
+        deepest_altitude[node] = leaf_graph->weight_node(parent_node);
+
+      deepest_altitude[parent_node] = std::min(deepest_altitude[parent_node], deepest_altitude[node]);
+    }
+
+    int* height = new int[tree_nb_vertices];
+    for (int node = 0; node < root; ++node)
+    {
+      height[node] =
+          deepest_altitude[node] == -1 ? -1 : leaf_graph->weight_node(tree.get_parent(node)) - deepest_altitude[node];
+    }
+
+    height[root] = leaf_graph->weight_node(root) - deepest_altitude[root];
+
+    delete[] deepest_altitude;
+    return height;
+  }
+
 } // namespace mln

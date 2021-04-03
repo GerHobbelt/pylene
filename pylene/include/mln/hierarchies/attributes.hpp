@@ -15,4 +15,6 @@ namespace mln
    */
   int* extrema_attribute(const HierarchyTree& tree);
 
+  int* height_attribute(const HierarchyTree& tree);
+
 } // namespace mln

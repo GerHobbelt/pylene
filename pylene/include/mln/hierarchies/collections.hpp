@@ -65,6 +65,8 @@ namespace mln
     int get_nb_vertices() const override;
     int get_parent(int node) const override;
 
+    inline const QBT& get_qbt() const { return qbt_; };
+
   private:
     QBT              qbt_;
     QT               qt_;

@@ -6,17 +6,10 @@ namespace mln
   QBT::QBT(const Graph* leaf_graph)
     : HierarchyTree(leaf_graph)
     , nb_vertices_(2 * leaf_graph->get_nb_vertices() - 1)
+    , size_(0)
+    , parent_(nb_vertices_, -1)
   {
-    this->size_   = 0;
-    this->parent_ = new int[nb_vertices_];
-
-    for (int i = 0; i < nb_vertices_; i++)
-    {
-      this->parent_[i] = -1;
-    }
   }
-
-  QBT::~QBT() { delete[] parent_; }
 
   void QBT::make_set(int q)
   {
@@ -47,22 +40,10 @@ namespace mln
   QT::QT(const Graph* leaf_graph)
     : HierarchyTree(leaf_graph)
     , nb_vertices_(leaf_graph->get_nb_vertices())
+    , size_(0)
+    , parent_(nb_vertices_, -1)
+    , rank_(nb_vertices_, -1)
   {
-    this->size_   = 0;
-    this->parent_ = new int[nb_vertices_];
-    this->rank_   = new int[nb_vertices_];
-
-    for (int i = 0; i < nb_vertices_; i++)
-    {
-      this->parent_[i] = -1;
-      this->rank_[i]   = -1;
-    }
-  }
-
-  QT::~QT()
-  {
-    delete[] parent_;
-    delete[] rank_;
   }
 
   void QT::make_set()
@@ -115,13 +96,8 @@ namespace mln
     : HierarchyTree(leaf_graph)
     , qbt_(QBT(leaf_graph))
     , qt_(QT(leaf_graph))
+    , root_(qbt_.nb_vertices_, -1)
   {
-    this->root_ = new int[qbt_.nb_vertices_];
-
-    for (int i = 0; i < qbt_.nb_vertices_; i++)
-    {
-      this->root_[i] = -1;
-    }
   }
 
   void QEBT::make_set(int q)
@@ -130,8 +106,6 @@ namespace mln
     this->qbt_.make_set(q);
     this->qt_.make_set();
   }
-
-  QEBT::~QEBT() { delete[] root_; }
 
   int QEBT::make_union(int cx, int cy)
   {

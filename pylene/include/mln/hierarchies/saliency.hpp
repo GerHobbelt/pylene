@@ -9,6 +9,6 @@ namespace mln
   std::vector<Edge> saliency_map(const HierarchyTree& tree);
 
   // FIXME Return an image
-  int* saliency_khalimsky_grid(const HierarchyTree& tree);
+  std::vector<int> saliency_khalimsky_grid(const HierarchyTree& tree);
 
 } // namespace mln

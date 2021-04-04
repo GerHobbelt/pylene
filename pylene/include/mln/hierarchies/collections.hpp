@@ -13,7 +13,7 @@ namespace mln
   public:
     QBT(const Graph* leaf_graph);
 
-    ~QBT();
+    ~QBT() = default;
 
     void make_set(int q);
     int  make_union(int cx, int cy);
@@ -23,9 +23,9 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
-    int  nb_vertices_;
-    int  size_;
-    int* parent_;
+    int              nb_vertices_;
+    int              size_;
+    std::vector<int> parent_;
   };
 
   class QT : public HierarchyTree
@@ -35,7 +35,7 @@ namespace mln
   public:
     QT(const Graph* leaf_graph);
 
-    ~QT();
+    ~QT() = default;
 
     void make_set();
     int  make_union(int cx, int cy);
@@ -45,10 +45,10 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
-    int  nb_vertices_;
-    int  size_;
-    int* parent_;
-    int* rank_;
+    int              nb_vertices_;
+    int              size_;
+    std::vector<int> parent_;
+    std::vector<int> rank_;
   };
 
   class QEBT : public HierarchyTree
@@ -56,7 +56,7 @@ namespace mln
   public:
     QEBT(const Graph* leaf_graph);
 
-    ~QEBT();
+    ~QEBT() = default;
 
     void make_set(int q);
     int  make_union(int cx, int cy);
@@ -66,8 +66,8 @@ namespace mln
     int get_parent(int node) const override;
 
   private:
-    int* root_;
-    QBT  qbt_;
-    QT   qt_;
+    QBT              qbt_;
+    QT               qt_;
+    std::vector<int> root_;
   };
 } // namespace mln

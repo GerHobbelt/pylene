@@ -45,14 +45,13 @@ TEST(Hierarchies, Depth_Attribute)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  int* depth = depth_attribute(*bpt);
+  std::vector<int> depth = depth_attribute(*bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_depth[i], depth[i]);
   }
 
-  delete[] depth;
   delete bpt;
   delete graph;
 }
@@ -71,14 +70,13 @@ TEST(Hierarchies, Area_Attribute)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  int* area = area_attribute(*bpt);
+  std::vector<int> area = area_attribute(*bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_area[i], area[i]);
   }
 
-  delete[] area;
   delete bpt;
   delete graph;
 }
@@ -97,14 +95,13 @@ TEST(Hierarchies, Volume_Attribute)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  int* volume = volume_attribute(*bpt);
+  std::vector<int> volume = volume_attribute(*bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_volume[i], volume[i]);
   }
 
-  delete[] volume;
   delete bpt;
   delete graph;
 }
@@ -123,14 +120,13 @@ TEST(Hierarchies, Extrema_Attribute)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  int* extrema = extrema_attribute(*bpt);
+  std::vector<int> extrema = extrema_attribute(*bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_extrema[i], extrema[i]);
   }
 
-  delete[] extrema;
   delete bpt;
   delete graph;
 }
@@ -149,14 +145,13 @@ TEST(Hierarchies, Height_Attribute)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  int* height = height_attribute(*bpt);
+  std::vector<int> height = height_attribute(*bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_height[i], height[i]);
   }
 
-  delete[] height;
   delete bpt;
   delete graph;
 }
@@ -175,14 +170,13 @@ TEST(Hierarchies, Dynamic_Attribute)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  int* dynamic = dynamic_attribute(*bpt);
+  std::vector<int> dynamic = dynamic_attribute(*bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_dynamic[i], dynamic[i]);
   }
 
-  delete[] dynamic;
   delete bpt;
   delete graph;
 }

@@ -5,12 +5,11 @@
 
 namespace mln
 {
-  int* depth_attribute(const HierarchyTree& tree)
+  std::vector<int> depth_attribute(const HierarchyTree& tree)
   {
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    int* depth = new int[tree_nb_vertices];
-    std::fill_n(depth, tree_nb_vertices, -1);
+    std::vector<int> depth(tree_nb_vertices, -1);
 
     // Set root depth to 0
     depth[tree_nb_vertices - 1] = 0;
@@ -27,14 +26,12 @@ namespace mln
     return depth;
   }
 
-  int* area_attribute(const HierarchyTree& tree)
+  std::vector<int> area_attribute(const HierarchyTree& tree)
   {
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    int* area = new int[tree_nb_vertices];
-    std::fill_n(area, tree_nb_vertices, 0);
-
-    std::fill_n(area, tree.leaf_graph->get_nb_vertices(), 1);
+    std::vector<int> area(tree_nb_vertices, 0);
+    std::fill_n(area.begin(), tree.leaf_graph->get_nb_vertices(), 1);
 
     for (int node = 0; node < tree_nb_vertices - 1; ++node)
     {
@@ -51,16 +48,15 @@ namespace mln
     return area;
   }
 
-  int* volume_attribute(const HierarchyTree& tree)
+  std::vector<int> volume_attribute(const HierarchyTree& tree)
   {
     const Graph* leaf_graph = tree.leaf_graph;
 
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    int* area = area_attribute(tree);
+    std::vector<int> area = area_attribute(tree);
 
-    int* volume = new int[tree_nb_vertices];
-    std::fill_n(volume, tree_nb_vertices, 0);
+    std::vector<int> volume(tree_nb_vertices, 0);
 
     for (int i_node = leaf_graph->get_nb_vertices(); i_node < tree_nb_vertices - 1; ++i_node)
     {
@@ -75,20 +71,17 @@ namespace mln
       volume[parent_node] += volume[i_node];
     }
 
-    delete[] area;
     return volume;
   }
 
-  int* extrema_attribute(const HierarchyTree& tree)
+  std::vector<int> extrema_attribute(const HierarchyTree& tree)
   {
     const Graph* leaf_graph = tree.leaf_graph;
 
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    int* extrema = new int[tree_nb_vertices];
-    std::fill_n(extrema, tree_nb_vertices, 1);
-
-    std::fill_n(extrema, leaf_graph->get_nb_vertices(), 0);
+    std::vector<int> extrema(tree_nb_vertices, 1);
+    std::fill_n(extrema.begin(), leaf_graph->get_nb_vertices(), 0);
 
     for (int i_node = leaf_graph->get_nb_vertices(); i_node < tree_nb_vertices - 1; ++i_node)
     {
@@ -107,14 +100,13 @@ namespace mln
     return extrema;
   }
 
-  int* height_attribute(const HierarchyTree& tree)
+  std::vector<int> height_attribute(const HierarchyTree& tree)
   {
     const Graph* leaf_graph = tree.leaf_graph;
 
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    int* deepest_altitude = new int[tree_nb_vertices];
-    std::fill_n(deepest_altitude, tree_nb_vertices, std::numeric_limits<int>::max());
+    std::vector<int> deepest_altitude(tree_nb_vertices, std::numeric_limits<int>::max());
 
     int root = tree_nb_vertices - 1;
 
@@ -133,7 +125,7 @@ namespace mln
       deepest_altitude[parent_node] = std::min(deepest_altitude[parent_node], deepest_altitude[node]);
     }
 
-    int* height = new int[tree_nb_vertices];
+    std::vector<int> height(tree_nb_vertices);
     for (int node = 0; node < root; ++node)
     {
       height[node] =
@@ -142,21 +134,17 @@ namespace mln
 
     height[root] = leaf_graph->weight_node(root) - deepest_altitude[root];
 
-    delete[] deepest_altitude;
     return height;
   }
 
-  int* dynamic_attribute(const HierarchyTree& tree)
+  std::vector<int> dynamic_attribute(const HierarchyTree& tree)
   {
     const Graph* leaf_graph = tree.leaf_graph;
 
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    int* deepest_altitude = new int[tree_nb_vertices];
-    std::fill_n(deepest_altitude, tree_nb_vertices, std::numeric_limits<int>::max());
-
-    int* path_to_minima = new int[tree_nb_vertices];
-    std::fill_n(path_to_minima, tree_nb_vertices, -1);
+    std::vector<int> deepest_altitude(tree_nb_vertices, std::numeric_limits<int>::max());
+    std::vector<int> path_to_minima(tree_nb_vertices, -1);
 
     int root = tree_nb_vertices - 1;
 
@@ -181,13 +169,11 @@ namespace mln
       }
     }
 
-    int* dynamic = new int[tree_nb_vertices];
-    std::fill_n(dynamic, tree_nb_vertices, -1);
+    std::vector<int> dynamic(tree_nb_vertices, -1);
     dynamic[root] = leaf_graph->weight_node(root) - deepest_altitude[root];
 
-    int* minima         = extrema_attribute(tree);
-    int* nearest_minima = new int[tree_nb_vertices];
-    std::fill_n(nearest_minima, tree_nb_vertices, -1);
+    std::vector<int> minima = extrema_attribute(tree);
+    std::vector<int> nearest_minima(tree_nb_vertices, -1);
 
     for (int node = root - 1; node >= 0; --node)
     {
@@ -218,11 +204,6 @@ namespace mln
       else
         dynamic[node] = leaf_graph->weight_node(parent_node) - deepest_altitude[node];
     }
-
-    delete[] deepest_altitude;
-    delete[] path_to_minima;
-    delete[] minima;
-    delete[] nearest_minima;
 
     return dynamic;
   }

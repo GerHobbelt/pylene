@@ -80,14 +80,13 @@ TEST(Hierarchies, Khalimsky_Grid)
 
   HierarchyTree* bpt = graph->kruskal();
 
-  auto* khalimsky_grid = saliency_khalimsky_grid(*bpt);
+  std::vector<int> khalimsky_grid = saliency_khalimsky_grid(*bpt);
 
   for (int i = 0; i < 9 * 9; ++i)
   {
     ASSERT_EQ(expected_khalimsky_grid[i], khalimsky_grid[i]);
   }
 
-  delete[] khalimsky_grid;
   delete bpt;
   delete graph;
 }

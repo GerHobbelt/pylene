@@ -5,10 +5,10 @@
 
 namespace mln
 {
-  static int* lca_preprocess(const HierarchyTree& tree) { return depth_attribute(tree); }
+  static std::vector<int> lca_preprocess(const HierarchyTree& tree) { return depth_attribute(tree); }
 
   // TODO Use sparse table to optimize LCA
-  static int lca(const int* depth, const HierarchyTree& tree, int u, int v)
+  static int lca(const std::vector<int>& depth, const HierarchyTree& tree, int u, int v)
   {
     // Put u and v at the same level
     while (depth[u] != depth[v])
@@ -35,7 +35,7 @@ namespace mln
 
     const Graph* leaf_graph = tree.leaf_graph;
 
-    int* depth = lca_preprocess(tree);
+    std::vector<int> depth = lca_preprocess(tree);
 
     for (Edge edge : leaf_graph->get_edges())
     {
@@ -44,12 +44,10 @@ namespace mln
       res.emplace_back(edge);
     }
 
-    delete[] depth;
-
     return res;
   }
 
-  int* saliency_khalimsky_grid(const HierarchyTree& tree)
+  std::vector<int> saliency_khalimsky_grid(const HierarchyTree& tree)
   {
     const Graph* leaf_graph = tree.leaf_graph;
 
@@ -59,8 +57,7 @@ namespace mln
     int res_height = 2 * height + 1;
     int res_width  = 2 * width + 1;
 
-    int* res = new int[res_height * res_width];
-    std::fill_n(res, res_height * res_width, 0);
+    std::vector<int> res(res_height * res_width, 0);
 
     const std::vector<Edge>& s_map = saliency_map(tree);
 

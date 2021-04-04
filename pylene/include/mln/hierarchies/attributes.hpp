@@ -17,4 +17,6 @@ namespace mln
 
   int* height_attribute(const HierarchyTree& tree);
 
+  int* dynamic_attribute(const HierarchyTree& tree);
+
 } // namespace mln

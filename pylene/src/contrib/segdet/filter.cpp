@@ -97,21 +97,81 @@ namespace mln::contrib::segdet
            accepts_sigma(f.X_predicted(2, 0), obs(2, 0), f.sigma_luminosity);
   }
 
-  Observation choose_nearest(Filter& f, Observation& obs, const uint32_t& t)
+  std::optional<Observation> choose_nearest(Filter& f, Observation& obs)
   {
-    auto X = obs.obs;
-    auto obs_to_return = obs;
+    auto X             = obs.obs;
+    auto obs_to_return = std::make_optional(obs);
 
     uint32_t distance = std::abs(X(0, 0) - f.X_predicted(0, 0));
 
     if (f.observation == std::nullopt || distance < f.observation_distance)
     {
-      obs_to_return = f.observation.value();
-      f.observation = obs;
-      f.observation_position = t;
+      if (f.observation != std::nullopt)
+        obs_to_return = f.observation.value();
+      else
+        obs_to_return = std::nullopt;
+      f.observation          = obs;
       f.observation_distance = distance;
     }
     return obs_to_return;
+  }
+
+  double compute_slope(Filter& f)
+  {
+    // regression lineaire TODO
+    (void) f;
+    return 1;
+  }
+
+  void insert_into_filters_list(Filter& f, Eigen::Matrix<double, 3, 1> observation, uint32_t t)
+  {
+    f.n_values.push_back(observation(0, 0));
+    f.thicknesses.push_back(observation(1, 0));
+    f.luminosities.push_back(observation(2, 0));
+    f.t_values.push_back(t);
+    f.slopes.push_back(compute_slope(f));
+
+    if (f.n_values.size() > SEGDET_NB_VALUES_TO_KEEP)
+    {
+      auto thick = f.thicknesses[0];
+      auto nn    = f.n_values[0];
+      auto tt    = f.t_values[0];
+
+      f.thicknesses.erase(f.thicknesses.begin());
+      f.t_values.erase(f.t_values.begin());
+      f.n_values.erase(f.n_values.begin());
+      f.luminosities.erase(f.luminosities.begin());
+      f.slopes.erase(f.slopes.begin());
+
+      if (f.first_slope == std::nullopt)
+        f.first_slope = std::make_optional(f.slopes[f.slopes.size() - 1]);
+
+      f.segment_points.emplace_back(nn, tt, thick, f.is_horizontal);
+    }
+  }
+
+  void integrate(Filter& f, uint32_t t)
+  {
+    auto& observation = f.observation.value().obs;
+    if (!f.currently_under_other.empty())
+    {
+      for (auto& elm : f.currently_under_other)
+        f.under_other.push_back(elm);
+      f.currently_under_other.clear();
+    }
+
+    auto G = f.H * C_transpose * (C * f.H * C_transpose + Vn).inverse();
+    f.S    = f.S_predicted + G * (observation - f.X_predicted);
+    f.H    = (Eigen::Matrix<double, 4, 4>::Identity() - G * C) * f.H;
+
+    insert_into_filters_list(f, observation, t);
+
+    auto   length = f.slopes.size();
+    double second_derivative =
+        (f.slopes[length - 1] - f.slopes[length - 2]) / (f.t_values[length - 1] - f.t_values[length - 1]);
+    f.W(0,0) = 0.5 * second_derivative;
+    f.W(1, 0) = second_derivative;
+    f.last_integration = t;
   }
 
 } // namespace mln::contrib::segdet

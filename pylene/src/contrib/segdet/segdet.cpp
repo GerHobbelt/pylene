@@ -1,6 +1,7 @@
 
 
 #include "mln/contrib/segdet/segdet.hpp"
+#include "mln/contrib/segdet/segment.hpp"
 #include <mln/contrib/segdet/filter.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/io/imread.hpp>
@@ -11,6 +12,9 @@
 #define SEGDET_MAX_LLUM 225
 #define SEGDET_MAX_THK 100
 #define SEGDET_RATIO_LUM 1
+#define SEGDET_MAX_SLOPES_TOO_LARGE 5
+
+#define SEGDET_MINIMUM_FOR_FUSION 15
 
 namespace mln::contrib::segdet
 {
@@ -129,7 +133,162 @@ namespace mln::contrib::segdet
 
     return did_match;
   }
-  std::vector<Segment> dothething(const image2d<uint8_t>& image, bool is_horizontal, uint min_len, uint discontinuity)
+
+  bool same_observation(const Filter& f, const Filter& fj)
+  {
+    if (f.n_values.size() < SEGDET_MINIMUM_FOR_FUSION || fj.n_values.size() < SEGDET_MINIMUM_FOR_FUSION)
+      return false;
+    for (uint32_t i = 0; i < SEGDET_MINIMUM_FOR_FUSION; i++)
+    {
+      auto k = f.thicknesses.size() - 1 - i;
+      if (f.thicknesses[k] != fj.thicknesses[k] || f.t_values[k] != fj.t_values[k] || f.n_values[k] != fj.n_values[k])
+        return false;
+    }
+    return true;
+  }
+
+
+  Segment make_segment_from_filter(Filter& filter, uint32_t min_len, uint32_t nb_to_remove)
+  {
+    uint32_t last_index = filter.n_values.size() - nb_to_remove;
+
+    for (uint32_t i = 0; i < last_index; i++)
+    {
+      filter.segment_points.emplace_back(filter.n_values[i], filter.t_values[i], filter.thicknesses[i],
+                                         filter.is_horizontal);
+    }
+    auto& point       = filter.segment_points;
+    auto& under_other = filter.under_other;
+
+    for (auto& p : filter.currently_under_other)
+      under_other.push_back(p);
+
+    auto first_part_slope =
+        std::nullopt == filter.first_slope ? filter.slopes[min_len - 1] : filter.first_slope.value();
+    auto last_part_slope = filter.slopes[last_index - 1];
+
+    return Segment(point, under_other, first_part_slope, last_part_slope, filter.is_horizontal);
+  }
+
+  void erase_segments(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t min_len, uint32_t j,
+                      Filter& fj)
+  {
+    if (fj.last_integration - fj.first - SEGDET_MINIMUM_FOR_FUSION > min_len)
+      segments.push_back(make_segment_from_filter(fj, min_len, SEGDET_MINIMUM_FOR_FUSION));
+    filters.erase(filters.begin() + j);
+  }
+
+
+  bool make_potential_fusion(std::vector<Filter>& filters, uint32_t index, std::vector<Segment>& segments,
+                             uint32_t min_len)
+  {
+    uint32_t j                          = index + 1;
+    bool     current_filter_was_deleted = false;
+
+    auto f = filters[index];
+    while (j < filters.size())
+    {
+      auto fj = filters[j];
+      if (fj.observation != std::nullopt && same_observation(f, fj))
+      {
+        if (f.first < fj.first)
+        {
+          erase_segments(filters, segments, min_len, j, fj);
+        }
+        else
+        {
+          current_filter_was_deleted = true;
+          erase_segments(filters, segments, min_len, index, f);
+          break;
+        }
+      }
+      j++;
+    }
+    return current_filter_was_deleted;
+  }
+
+
+  void insert_in_sorted_filter_vector(Filter& f, std::vector<Filter>& filters)
+  {
+    auto elm = filters.begin();
+    while (elm != filters.end() && (elm)->n_values[(elm)->n_values.size() - 1] < f.n_values[f.n_values.size() - 1])
+    {
+      elm++;
+    }
+    filters.insert(elm, std::move(f));
+  }
+
+  bool filter_has_to_continue(Filter& f, uint32_t t, uint32_t discontinuity)
+  {
+    if (t - f.last_integration < discontinuity)
+    {
+      return true;
+    }
+    if (!f.currently_under_other.empty())
+    {
+      auto last_t = f.is_horizontal ? f.currently_under_other[f.currently_under_other.size() - 1].x
+                                    : f.currently_under_other[f.currently_under_other.size() - 1].y;
+      return t - last_t < discontinuity;
+    }
+    return false;
+  }
+
+  std::vector<Filter> filter_selection(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t t,
+                                       uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
+  {
+    std::vector<Filter> filters_to_keep;
+
+    size_t i = 0;
+    while (i < filters.size())
+    {
+      auto f = filters[i];
+      if (f.observation != std::nullopt)
+      {
+        if (two_matches > SEGDET_MINIMUM_FOR_FUSION && make_potential_fusion(filters, i, segments, min_len))
+          continue;
+
+        integrate(f, t);
+
+        if (f.nb_current_slopes_over_slope_max > SEGDET_MAX_SLOPES_TOO_LARGE)
+        {
+          if (f.last_integration - f.first - SEGDET_MAX_SLOPES_TOO_LARGE > min_len)
+            segments.push_back(make_segment_from_filter(f, min_len, 0));
+          i++;
+          continue;
+        }
+
+        insert_in_sorted_filter_vector(f, filters_to_keep);
+      }
+      else if (filter_has_to_continue(f, t, discontinuity))
+      {
+        f.S = f.S_predicted;
+        insert_in_sorted_filter_vector(f, filters_to_keep);
+      }
+      else if (f.last_integration - f.first > min_len)
+        segments.push_back(make_segment_from_filter(f, min_len, 0));
+      i++;
+    }
+    return filters_to_keep;
+  }
+
+
+  void to_thrash(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t min_len)
+  {
+    uint32_t i = 0;
+    while (i < filters.size())
+    {
+      auto &f = filters[i];
+      if (make_potential_fusion(filters, i, segments, min_len))
+        continue;
+
+      if (f.last_integration - f.first > min_len)
+        segments.push_back(make_segment_from_filter(f, min_len, 0));
+
+      i++;
+    }
+  }
+
+  std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len, uint discontinuity)
   {
     uint32_t xmult     = 1;
     uint32_t ymult     = 0;
@@ -177,20 +336,51 @@ namespace mln::contrib::segdet
             auto observation_s = Observation(obs, accepted.size(), t);
             for (auto& f : accepted)
             {
-              auto obs_result = choose_nearest(*f, observation_s, t);
-              // TODO
-              (void) obs_result;
-              (void) two_matches_through_n;
-              (void) two_matches;
-              (void) min_len;
-              (void) discontinuity;
-            }
-          }
+              auto obs_result = choose_nearest(*f, observation_s);
+              if (obs_result != std::nullopt)
+              {
+                auto obs_result_value = obs_result.value();
+                obs_result_value.match_count--;
+                if (obs_result_value.match_count == 0)
+                {
+                  auto new_filter = Filter(is_horizontal, t, slope_max, obs_result_value.obs);
+                  insert_in_sorted_filter_vector(new_filter, new_filters);
+
+                  auto elm = new_filters.begin();
+                  while (elm != new_filters.end() &&
+                         elm->n_values[elm->n_values.size() - 1] < obs_result_value.obs(0, 0))
+                  {
+                    elm++;
+                  }
+                  new_filters.insert(elm, Filter(is_horizontal, t, slope_max, obs_result_value.obs));
+                }
+              }
+            } // for
+            if (observation_s.match_count > 1)
+              two_matches_through_n = true;
+          } // else
         }
       }
+
+      if (two_matches_through_n)
+        two_matches++;
+      else
+        two_matches = 0;
+
+
+      auto selection = filter_selection(filters, segments, t, two_matches, min_len, discontinuity);
+
+      filters.clear();
+      filters.reserve(selection.size() + new_filters.size());
+      std::merge(selection.begin(), selection.end(), new_filters.begin(), new_filters.end(), filters.begin(),
+                 [](const Filter& lhs, const Filter& rhs) {
+                   return lhs.n_values[lhs.n_values.size() - 1] < rhs.n_values[rhs.n_values.size() - 1];
+                 });
     }
 
-    return std::vector<Segment>();
+    to_thrash(filters, segments, min_len);
+
+    return segments;
   }
 
 
@@ -198,8 +388,8 @@ namespace mln::contrib::segdet
                                                                 uint discontinuity)
   {
     // TODO Multi threading, splitter l'image
-    std::vector<Segment> horizontal_segments = dothething(image, true, min_len, discontinuity);
-    std::vector<Segment> vertical_segments   = dothething(image, false, min_len, discontinuity);
+    std::vector<Segment> horizontal_segments = traversal(image, true, min_len, discontinuity);
+    std::vector<Segment> vertical_segments   = traversal(image, false, min_len, discontinuity);
 
     return std::make_pair(horizontal_segments, vertical_segments);
   }

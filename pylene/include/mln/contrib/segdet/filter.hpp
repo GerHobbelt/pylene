@@ -34,7 +34,14 @@ namespace mln
       static const Eigen::Matrix<double, 4, 4>
           A_transpose((Eigen::Matrix<double, 4, 4>() << 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1).finished());
       static const Eigen::Matrix<double, 3, 4>
-          C((Eigen::Matrix<double, 3, 4>() << 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1).finished());
+          C((Eigen::Matrix<double, 3, 4>() << 1, 0, 0, 0,
+                                              0, 0, 1, 0,
+                                              0, 0, 0, 1).finished());
+      static const Eigen::Matrix<double, 4, 3>
+          C_transpose((Eigen::Matrix<double, 4, 3>() << 1, 0, 0,
+                                                           0, 0, 0,
+                                                           0, 1, 0,
+                                                           0, 0, 1).finished());
       static const Eigen::Matrix<double, 3, 3> Vn((Eigen::Matrix<double, 3, 3>() << SEGDET_VARIANCE_POSITION, 0, 0, 0,
                                                    SEGDET_VARIANCE_THICKNESS, 0, 0, 0, SEGDET_VARIANCE_LUMINOSITY)
                                                       .finished());
@@ -48,7 +55,6 @@ namespace mln
           , W(Eigen::Matrix<double, 4, 1>::Zero())
           , H(Eigen::Matrix<double, 4, 4>::Identity())
           , observation(std::nullopt)
-          , observation_position(0)
           , observation_distance(0)
           , last_integration(t_integration)
         {
@@ -92,16 +98,16 @@ namespace mln
         Eigen::Matrix<double, 3, 1> X_predicted;
         std::optional<Observation>
                   observation;          // matrix {{position (n)},{thickness},{luminosity}}, nullopt if none was matched
-        u_int32_t observation_position; // t value referring to the position of the last observation
         u_int32_t observation_distance; // n distance from last observation to current prediction
 
         u_int32_t last_integration; // t value referring to the position of the last integration
       };
 
-
       void        predict(Filter& f);
       bool accepts(const Filter& filter, const Eigen::Matrix<double, 3, 1>& obs, uint32_t min, uint32_t max);
-      Observation choose_nearest(Filter &f, Observation &obs, const uint32_t &t);
+      std::optional<Observation> choose_nearest(Filter& f, Observation& obs);
+      void integrate(Filter& f, uint32_t t);
+
 
     } // namespace segdet
   }   // namespace contrib

@@ -4,6 +4,7 @@
 
 #include "mln/contrib/segdet/filter.hpp"
 #include "mln/accu/accumulators/variance.hpp"
+#include "mln/contrib/segdet/linearregression.hpp"
 #include <algorithm>
 #include <numeric>
 
@@ -118,9 +119,24 @@ namespace mln::contrib::segdet
 
   double compute_slope(Filter& f)
   {
-    // regression lineaire TODO
-    (void) f;
-    return 1;
+    auto X = f.t_values;
+    auto Y = f.n_values;
+
+    std::vector<std::vector<uint32_t>> Z(X.size());
+    Z[0] = X;
+    Z[1] = Y;
+
+    Linear_Regression <double, uint32_t> reg{};
+    reg.fit(Z);
+
+    auto slope = reg.b_1;
+
+    if (std::abs(slope) > f.slope_max)
+      f.nb_current_slopes_over_slope_max++;
+    else
+      f.nb_current_slopes_over_slope_max = 0;
+
+    return slope;
   }
 
   void insert_into_filters_list(Filter& f, Eigen::Matrix<double, 3, 1> observation, uint32_t t)
@@ -168,7 +184,7 @@ namespace mln::contrib::segdet
 
     auto   length = f.slopes.size();
     double second_derivative =
-        (f.slopes[length - 1] - f.slopes[length - 2]) / (f.t_values[length - 1] - f.t_values[length - 1]);
+        (f.slopes[length - 1] - f.slopes[length - 2]) / (f.t_values[length - 1] - f.t_values[length - 2]);
     f.W(0,0) = 0.5 * second_derivative;
     f.W(1, 0) = second_derivative;
     f.last_integration = t;

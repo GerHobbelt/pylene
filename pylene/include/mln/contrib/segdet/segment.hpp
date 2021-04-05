@@ -39,9 +39,9 @@ namespace mln
       struct Segment
       {
 
-        Segment(std::vector<Point> points, std::vector<Point> underOther, float firstPartSlope, float lastPartSlope,
+        Segment(std::vector<Point> points_vector, std::vector<Point> underOther, float firstPartSlope, float lastPartSlope,
                 bool isHorizontal)
-          : points(std::move(points))
+          : points(std::move(points_vector))
           , under_other(std::move(underOther))
           , first_part_slope(firstPartSlope)
           , last_part_slope(lastPartSlope)

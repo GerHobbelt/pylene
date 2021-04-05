@@ -69,6 +69,7 @@ target_link_libraries(Pylene PRIVATE Pylene-bp)
 target_sources(Pylene PRIVATE
                src/accu/cvxhull.cpp
                src/contrib/segdet/filter.cpp
+               src/contrib/segdet/linearregression.cpp
                src/contrib/segdet/segdet.cpp
                src/contrib/segdet/segment.cpp
                src/core/image_format.cpp

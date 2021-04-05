@@ -85,4 +85,32 @@ namespace mln
     delete qebt;
     return res;
   }
+
+  std::vector<int> threshold_cut_labelization(const HierarchyTree& tree, double threshold)
+  {
+    int          tree_nb_vertices = tree.get_nb_vertices();
+    const Graph* leaf_graph       = tree.leaf_graph;
+
+    int max_altitude = std::numeric_limits<int>::min();
+    for (int i_node = leaf_graph->get_nb_vertices(); i_node < tree_nb_vertices; ++i_node)
+      max_altitude = std::max(max_altitude, leaf_graph->weight_node(i_node));
+
+    std::vector<int> labels(tree_nb_vertices, -1);
+
+    for (int i_node = tree_nb_vertices - 2; i_node >= leaf_graph->get_nb_vertices(); --i_node)
+    {
+      int parent_node = tree.get_parent(i_node);
+      if (parent_node == -1)
+        continue;
+
+      labels[i_node] = (leaf_graph->weight_node(parent_node) / static_cast<double>(max_altitude)) > threshold
+                           ? i_node
+                           : labels[parent_node];
+    }
+
+    for (int leaf = 0; leaf < leaf_graph->get_nb_vertices(); ++leaf)
+      labels[leaf] = labels[tree.get_parent(leaf)];
+
+    return labels;
+  }
 } // namespace mln

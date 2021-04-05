@@ -52,3 +52,30 @@ TEST(Hierarchies, Segmentation_Watershed_graph)
   delete graph;
   delete watershed_graph;
 }
+
+TEST(Hierarchies, Segmentation_Threshold_cut_labelization)
+{
+  int gray_image[16] = {0,  0,  100, 0, //
+                        0,  0,  75,  0, //
+                        95, 80, 60,  0, //
+                        0,  0,  0,   0};
+
+  double threshold = 0.5;
+
+  int expected_labels[31] = {24, 24, 28, 23, 24, 24, 28, 23, 28, 28, 28, 23, 23, 23, 23, 23,
+                             24, 23, 23, 23, 23, 23, 24, 23, 24, 28, 28, 28, 28, 29, -1};
+
+  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+
+  HierarchyTree* bpt = graph->kruskal();
+
+  std::vector<int> labels = threshold_cut_labelization(*bpt, threshold);
+
+  for (int i = 0; i < 31; ++i)
+  {
+    ASSERT_EQ(expected_labels[i], labels[i]);
+  }
+
+  delete bpt;
+  delete graph;
+}

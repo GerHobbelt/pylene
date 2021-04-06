@@ -113,4 +113,64 @@ namespace mln
 
     return labels;
   }
+
+  std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image)
+  {
+    int          tree_nb_vertices = tree.get_nb_vertices();
+    const Graph* leaf_graph       = tree.leaf_graph;
+
+    int width = image.width();
+
+    std::vector<rgb<int>> mean_color(tree_nb_vertices, rgb<int>{0, 0, 0});
+
+    for (int leaf = 0; leaf < leaf_graph->get_nb_vertices(); ++leaf)
+      mean_color[leaf] = image({leaf % width, leaf / width});
+
+    for (int node = 0; node < tree_nb_vertices - 1; ++node)
+    {
+      int parent_node = tree.get_parent(node);
+      if (parent_node == -1)
+        continue;
+
+      mean_color[parent_node] += mean_color[node];
+    }
+
+    std::vector<int> area = area_attribute(tree);
+
+    for (int i_node = leaf_graph->get_nb_vertices(); i_node < tree_nb_vertices; ++i_node)
+    {
+      // Deleted node
+      if (area[i_node] == -1)
+        continue;
+
+      mean_color[i_node] /= area[i_node];
+    }
+
+    return std::vector<rgb8>(mean_color.begin(), mean_color.end());
+  }
+
+  image2d<rgb8> hierarchical_segmentation(const std::string& filename, WatershedAttribute attribute_type,
+                                          double threshold)
+  {
+    image2d<rgb8> image;
+    io::imread(filename, image);
+
+    // FIXME Replace the filename parameter with the image directly
+    Graph  graph(image.height(), image.width(), filename);
+    Graph* watershed_graph = mln::watershed_graph(&graph, attribute_type);
+
+    const HierarchyTree* tree = watershed_graph->kruskal();
+
+    std::vector<int>  labels     = threshold_cut_labelization(*tree, threshold);
+    std::vector<rgb8> mean_color = mean_color_per_node(*tree, image);
+
+    int width = image.width();
+
+    for (int leaf = 0; leaf < tree->leaf_graph->get_nb_vertices(); ++leaf)
+      image({leaf % width, leaf / width}) = mean_color[labels[leaf]];
+
+    delete tree;
+    delete watershed_graph;
+    return image;
+  }
 } // namespace mln

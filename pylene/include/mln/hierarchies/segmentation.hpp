@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mln/core/colors.hpp"
+#include "mln/core/image/ndbuffer_image.hpp"
 #include "mln/hierarchies/graph.hpp"
 
 namespace mln
@@ -18,4 +20,10 @@ namespace mln
    * @return The nearest connected component root for each node
    */
   std::vector<int> threshold_cut_labelization(const HierarchyTree& tree, double threshold);
+
+  std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image);
+
+  // FIXME Replace filename parameter with image directly
+  image2d<rgb8> hierarchical_segmentation(const std::string& filename, WatershedAttribute attribute_type,
+                                          double threshold);
 } // namespace mln

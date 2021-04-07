@@ -2,7 +2,6 @@
 
 #include "mln/hierarchies/collections.hpp"
 #include <mln/core/image/ndimage.hpp>
-#include <mln/io/imread.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -41,6 +40,7 @@ namespace mln
 
     QEBT* kruskal();
 
+  std::vector<Edge> mst;
   private:
     int nb_vertices_;
 
@@ -48,6 +48,5 @@ namespace mln
     int width_;
 
     std::vector<Edge> edges_;
-    std::vector<Edge> mst;
   };
 } // namespace mln

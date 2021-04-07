@@ -59,7 +59,7 @@ namespace mln
       for (int y = 0; y < shape.width(); y++)
       {
         auto pix = img({x0 + x, y0 + x});
-        
+
         if (x0 + x < shape.height() - 1)
         {
           auto pix3    = img({x0 + x + 1, y0 + y});

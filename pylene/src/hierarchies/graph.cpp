@@ -44,14 +44,11 @@ namespace mln
     return qebt;
   }
 
-  Graph::Graph(int height, int width, const std::string filename)
+  Graph::Graph(int height, int width, mln::image2d<uint16_t> img)
     : nb_vertices_(height * width)
     , height_(height)
     , width_(width)
   {
-    mln::image2d<uint16_t> img;
-    mln::io::imread(filename, img);
-
     auto shape = img.domain();
 
     int x0 = shape.x();
@@ -62,7 +59,7 @@ namespace mln
       for (int y = 0; y < shape.width(); y++)
       {
         auto pix = img({x0 + x, y0 + x});
-
+        
         if (x0 + x < shape.height() - 1)
         {
           auto pix3    = img({x0 + x + 1, y0 + y});

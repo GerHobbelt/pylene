@@ -25,7 +25,7 @@ namespace mln
     {
     }
 
-    Graph(int height, int width, const std::string filename);
+    Graph(int height, int width, mln::image2d<uint16_t> img);
 
     inline int get_nb_vertices() const { return nb_vertices_; }
 

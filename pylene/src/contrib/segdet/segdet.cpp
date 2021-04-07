@@ -5,28 +5,26 @@
 #include <mln/contrib/segdet/filter.hpp>
 #include <mln/contrib/segdet/linearregression.hpp>
 #include <mln/core/image/ndimage.hpp>
+#include <mln/core/image/view/transform.hpp>
+#include <mln/io/imprint.hpp>
 #include <mln/io/imread.hpp>
 #include <numeric>
+#include <utility>
 
 #define SEGDET_SLOPE_MAX_VERTICAL 1.05
 #define SEGDET_SLOPE_MAX_HORIZONTAL 1.0
 #define SEGDET_MAX_LLUM 225
 #define SEGDET_MAX_THK 100
 #define SEGDET_RATIO_LUM 1
+#define SEGDET_MERGE_SLOPE_VARIATION 0.4
+#define SEGDET_MERGE_DISTANCE_MAX 8
 #define SEGDET_MAX_SLOPES_TOO_LARGE 5
+#define SEGDET_THRESHOLD_INTERSECTION 0.8
 
 #define SEGDET_MINIMUM_FOR_FUSION 15
 
 namespace mln::contrib::segdet
 {
-  int detect_line(const mln::image2d<uint8_t>& image, uint min_len, uint discontinuity)
-  {
-    // TODO faire le top hat
-    auto p = process(image, min_len, discontinuity);
-
-    printf("lol");
-    return 0;
-  }
 
   uint8_t image_at(const image2d<uint8_t>& image, int n, int t, bool is_horizontal)
   {
@@ -58,9 +56,9 @@ namespace mln::contrib::segdet
 
     uint32_t max_lum = luminosities_list[n_max_lum];
 
-    uint32_t m_lum = max_lum + (SEGDET_MAX_LLUM - max_lum) * SEGDET_RATIO_LUM;
-    auto n_start = n;
-    uint32_t n_end = n + thickness;
+    uint32_t m_lum   = max_lum + (SEGDET_MAX_LLUM - max_lum) * SEGDET_RATIO_LUM;
+    auto     n_start = n;
+    uint32_t n_end   = n + thickness;
 
     if (n_end == n_max)
       n_end--;
@@ -86,8 +84,8 @@ namespace mln::contrib::segdet
 
   bool in_between(uint32_t min, uint32_t value, uint32_t max) { return min <= value && value < max; }
 
-  bool find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted, const Eigen::Matrix<double, 3, 1>& obs,
-                  const uint32_t& t, bool horizontal, uint32_t& index)
+  bool find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted,
+                  const Eigen::Matrix<double, 3, 1>& obs, const uint32_t& t, bool horizontal, uint32_t& index)
   {
     bool did_match = false;
 
@@ -166,8 +164,8 @@ namespace mln::contrib::segdet
     return Segment(point, under_other, first_part_slope, last_part_slope, filter.is_horizontal);
   }
 
-  void erase_segments(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len, uint32_t j,
-                      Filter& fj)
+  void erase_segments(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len,
+                      uint32_t j, Filter& fj)
   {
     if (fj.last_integration - fj.first - SEGDET_MINIMUM_FOR_FUSION > min_len)
       segments.push_back(make_segment_from_filter(fj, min_len, SEGDET_MINIMUM_FOR_FUSION));
@@ -175,8 +173,8 @@ namespace mln::contrib::segdet
   }
 
 
-  bool make_potential_fusion(std::vector<std::shared_ptr<Filter>>& filters, uint32_t index, std::vector<Segment>& segments,
-                             uint32_t min_len)
+  bool make_potential_fusion(std::vector<std::shared_ptr<Filter>>& filters, uint32_t index,
+                             std::vector<Segment>& segments, uint32_t min_len)
   {
     uint32_t j                          = index + 1;
     bool     current_filter_was_deleted = false;
@@ -229,8 +227,9 @@ namespace mln::contrib::segdet
     return false;
   }
 
-  std::vector<std::shared_ptr<Filter>> filter_selection(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t t,
-                                       uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
+  std::vector<std::shared_ptr<Filter>> filter_selection(std::vector<std::shared_ptr<Filter>>& filters,
+                                                        std::vector<Segment>& segments, uint32_t t,
+                                                        uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
   {
     std::vector<std::shared_ptr<Filter>> filters_to_keep;
 
@@ -286,7 +285,7 @@ namespace mln::contrib::segdet
 
 
   template <typename T, typename F>
-  void merge(const std::vector<T> &arr1, const std::vector<T> &arr2, std::vector<T> &arr_out, F cmp)
+  void merge(const std::vector<T>& arr1, const std::vector<T>& arr2, std::vector<T>& arr_out, F cmp)
   {
     size_t i = 0;
     size_t j = 0;
@@ -332,8 +331,8 @@ namespace mln::contrib::segdet
       }
 
       std::vector<std::shared_ptr<Filter>> new_filters{};
-      bool                two_matches_through_n = false;
-      uint32_t            filter_index          = 0;
+      bool                                 two_matches_through_n = false;
+      uint32_t                             filter_index          = 0;
 
       for (uint32_t n = 0; n < n_max; n++)
       {
@@ -364,7 +363,7 @@ namespace mln::contrib::segdet
 
                   auto elm = new_filters.begin();
                   while (elm != new_filters.end() &&
-                      (*elm)->n_values[(*elm)->n_values.size() - 1] < obs_result_value.obs(0, 0))
+                         (*elm)->n_values[(*elm)->n_values.size() - 1] < obs_result_value.obs(0, 0))
                   {
                     elm++;
                   }
@@ -388,18 +387,198 @@ namespace mln::contrib::segdet
 
       filters.clear();
       filters.reserve(selection.size() + new_filters.size());
-//      std::merge(selection.begin(), selection.end(), new_filters.begin(), new_filters.end(), filters.begin(),
-//                 [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
-//                   return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
-//                 });
-      merge(selection, new_filters, filters, [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
-                   return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
-                 });
+      merge(selection, new_filters, filters,
+            [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
+              return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
+            });
     }
 
     to_thrash(filters, segments, min_len);
 
     return segments;
+  }
+
+  uint32_t distance_points(const Point& p1, const Point& p2)
+  {
+    auto xvar = p1.x - p2.x;
+    auto yvar = p1.y - p2.y;
+
+    xvar *= xvar;
+    yvar *= yvar;
+
+    return std::sqrt(xvar + yvar);
+  }
+
+  bool has_to_link(Segment a, Segment b)
+  {
+    if (std::abs(a.last_part_slope - b.first_part_slope) > SEGDET_MERGE_SLOPE_VARIATION)
+      return false;
+
+    if (a.points.size() && a.points.size() &&
+        distance_points(a.points[a.points.size() - 1], b.points[0]) < SEGDET_MERGE_DISTANCE_MAX)
+      return true;
+
+    return false;
+  }
+
+  template <typename T>
+  void add_all(std::vector<T>& lhs, const std::vector<T>& rhs)
+  {
+    for (auto elm : rhs)
+      lhs.push_back(elm);
+  }
+
+  void merge_segments(Segment& a, const Segment& b)
+  {
+    if (a.is_horizontal)
+      a.length = b.points[-1].x - a.points[0].x;
+    else
+      a.length = b.points[-1].y - a.points[0].y;
+
+    add_all(a.under_other, b.under_other);
+    add_all(a.points, b.points);
+
+    a.length += b.length;
+
+    a.last_part_slope = b.last_part_slope;
+  }
+
+  void segment_linking(std::vector<Segment>& segments)
+  {
+    size_t i = 0;
+    while (i < segments.size())
+    {
+      size_t j = i + 1;
+      while (j < segments.size())
+      {
+        if (has_to_link(segments[i], segments[j]))
+        {
+          merge_segments(segments[i], segments[j]);
+          segments.erase(segments.begin() + j);
+        }
+        else
+          j++;
+      }
+      i++;
+    }
+  }
+
+
+  void draw_labeled_pixel(image2d<uint16_t>& img, uint16_t label, int x, int y)
+  {
+    if (img({x, y}) != 0)
+      img.at({x, y}) = 1;
+    else
+      img.at({x, y}) = label;
+  }
+
+
+  void draw_labeled_point(image2d<uint16_t>& img, uint16_t label, Point point, bool is_horizontal)
+  {
+    auto thickness = point.thickness / 2;
+    auto is_odd    = point.thickness % 2;
+
+    if (is_horizontal)
+    {
+      for (int i = -thickness; i < static_cast<int>(thickness) + static_cast<int>(is_odd); i++)
+      {
+        if (static_cast<int>(point.y) + i < img.size())
+          draw_labeled_pixel(img, label, static_cast<int>(point.x), static_cast<int>(point.y + i));
+      }
+    }
+    else
+    {
+      for (int i = -thickness; i < static_cast<int>(thickness) + static_cast<int>(is_odd); i++)
+      {
+        if (static_cast<int>(point.y) + i < img.size(1))
+          draw_labeled_pixel(img, label, static_cast<int>(point.x + i), static_cast<int>(point.y));
+      }
+    }
+  }
+
+  enum labeling_type
+  {
+    LABELING_TYPE_VERTICAL,
+    LABELING_TYPE_HORIZONTAL,
+  };
+
+  image2d<uint16_t> labeled_arr(size_t height, size_t width, std::vector<Segment> horizontal_segments,
+                                std::vector<Segment> vertical_segments, labeling_type type, bool include_other)
+  {
+    image2d<uint16_t> arr = image2d<uint16_t>(width, height);
+
+    std::vector<Segment> segments;
+    switch (type)
+    {
+    case LABELING_TYPE_VERTICAL:
+      segments = std::move(vertical_segments);
+      break;
+    case LABELING_TYPE_HORIZONTAL:
+      segments = std::move(horizontal_segments);
+      break;
+    }
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+      auto segment = segments[i];
+      for (auto& point : segment.points)
+        draw_labeled_point(arr, i + 3, point, segment.is_horizontal);
+      if (include_other)
+        for (auto& point : segment.under_other)
+          draw_labeled_point(arr, 1, point, segment.is_horizontal);
+    }
+    return arr;
+  }
+
+  void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, size_t height,
+                  size_t width)
+  {
+    auto first_output =
+        labeled_arr(height, width, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
+    auto second_output =
+        labeled_arr(height, width, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
+
+    auto second_output_bin = mln::view::transform(second_output, [](uint16_t p) { return (p != 0) ? 1 : 0; });
+
+    auto intersection =
+        mln::view::transform(first_output, second_output_bin, [](uint16_t x, uint16_t y) { return x * y; });
+
+    std::vector<uint16_t> segments = std::vector<uint16_t>(segments_removable.size());
+
+    mln_foreach (auto p, intersection.values())
+    {
+      if (p >= 3)
+        segments[p - 3]++;
+    }
+
+    int k = 0;
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+      if (segments_removable[i - k].length != 0)
+      {
+//        double segments_ratio = segments[i] / segments_removable[i - k].length  // TODO nb_pixels
+        segments[i] /= segments_removable[i - k].length;
+      }
+      if (segments_removable[i - k].length == 0 || segments[i] > SEGDET_THRESHOLD_INTERSECTION)
+      {
+        segments_removable.erase(segments_removable.begin() + i - k);
+      }
+      k++;
+    }
+  }
+
+  void remove_duplicates(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width,
+                         size_t img_height)
+  {
+    remove_dup(pair.first, pair.second, img_width, img_height);
+    remove_dup(pair.second, pair.first, img_width, img_height);
+  }
+
+
+  void post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height)
+  {
+    segment_linking(pair.first);
+    segment_linking(pair.second);
+    remove_duplicates(pair, img_width, img_height);
   }
 
 
@@ -411,6 +590,16 @@ namespace mln::contrib::segdet
     std::vector<Segment> vertical_segments   = traversal(image, false, min_len, discontinuity);
 
     return std::make_pair(horizontal_segments, vertical_segments);
+  }
+
+  int detect_line(const mln::image2d<uint8_t>& image, uint min_len, uint discontinuity)
+  {
+    // TODO faire le top hat
+    auto p = process(image, min_len, discontinuity);
+
+    post_process(p, image.size(0), image.size(1));
+
+    return 0;
   }
 
 } // namespace mln::contrib::segdet

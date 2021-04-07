@@ -14,11 +14,11 @@ namespace mln
         Point(u_int32_t x, u_int32_t y, u_int32_t size)
           : x(x)
           , y(y)
-          , size(size)
+          , thickness(size)
         {
         }
         Point(u_int32_t n, u_int32_t t, u_int32_t size, bool is_horizontal)
-          : size(size)
+          : thickness(size)
         {
           if (is_horizontal)
           {
@@ -34,7 +34,7 @@ namespace mln
 
         u_int32_t x;
         u_int32_t y;
-        u_int32_t size;
+        u_int32_t thickness;
       };
       struct Segment
       {

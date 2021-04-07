@@ -5,7 +5,7 @@
 
 using namespace mln;
 
-TEST(Hierarchies, Kruskal)
+TEST(Hierarchies, Kruskal_easy)
 {
   auto* res = new Graph(5, 5);
 
@@ -17,16 +17,40 @@ TEST(Hierarchies, Kruskal)
 
   HierarchyTree* bpt = res->kruskal();
 
-  std::ofstream myfile;
-  myfile.open ("example.txt");
+  ASSERT_EQ(res->mst.size(), 3);
+  ASSERT_EQ(res->mst[0], std::make_tuple(2, 3, 4));
+  ASSERT_EQ(res->mst[1], std::make_tuple(0, 3, 5));
+  ASSERT_EQ(res->mst[2], std::make_tuple(0, 1, 10));
+  
+  delete bpt;
+  delete res;
+}
 
-  for (std::size_t i = 0; i < res->mst.size(); i++)
-  {
-    auto tmp = res->mst[i];
-    myfile << std::get<0>(tmp) << " " << std::get<1>(tmp) << " " << std::get<2>(tmp) << '\n';
-  }
+TEST(Hierarchies, Kruskal_med)
+{
+  auto* res = new Graph(10, 10);
 
-  myfile.close();
+  res->add_edge(0, 1, 2);
+  res->add_edge(0, 4, 0);
+  res->add_edge(1, 2, 2);
+  res->add_edge(1, 5, 2);
+  res->add_edge(2, 3, 0);
+  res->add_edge(2, 6, 3);
+  res->add_edge(3, 7, 1);
+  res->add_edge(4, 5, 1);
+  res->add_edge(5, 6, 2);
+  res->add_edge(6, 7, 0);
+
+  HierarchyTree* bpt = res->kruskal();
+
+  ASSERT_EQ(res->mst.size(), 7);
+  ASSERT_EQ(res->mst[0], std::make_tuple(0, 4, 0));
+  ASSERT_EQ(res->mst[1], std::make_tuple(2, 3, 0));
+  ASSERT_EQ(res->mst[2], std::make_tuple(6, 7, 0));
+  ASSERT_EQ(res->mst[3], std::make_tuple(3, 7, 1));
+  ASSERT_EQ(res->mst[4], std::make_tuple(4, 5, 1));
+  ASSERT_EQ(res->mst[5], std::make_tuple(0, 1, 2));
+  ASSERT_EQ(res->mst[6], std::make_tuple(1, 2, 2));
 
   delete bpt;
   delete res;

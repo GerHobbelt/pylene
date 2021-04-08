@@ -39,7 +39,7 @@ namespace mln::contrib::segdet
   {
     uint32_t thickness = 0;
 
-    uint32_t n_max_lum = n;
+    uint32_t n_max_lum = 0;
 
     std::vector<uint8_t> luminosities_list = std::vector<uint8_t>();
     uint32_t             lumi;
@@ -65,16 +65,18 @@ namespace mln::contrib::segdet
 
     uint32_t n_to_skip = n_end;
 
-    while (luminosities_list[n - n_start] > m_lum)
+    while (luminosities_list[n  - n_start] > m_lum)
       n += 1;
 
+    int k = luminosities_list.size() - 1;
+    while (luminosities_list[k] > m_lum)
+      k--;
 
-    while (luminosities_list[n_end - n_start] > m_lum)
-      n_end--;
+    n_end = n_start + k;
+    n_end++;
 
     thickness         = n_end - n;
     uint32_t position = n + thickness / 2;
-
 
     const double mean = mln::contrib::segdet::mean(luminosities_list, n - n_start, n_end - n_start);
 

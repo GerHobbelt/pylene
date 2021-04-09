@@ -6,13 +6,13 @@ The Pylene library makes possible to expose its features in Python. To this aim,
 * The ``Pylene-numpy`` library, which converts Pylene images into Numpy arrays.
 * The ``pylena`` module, which binds some Pylene algorithms in Python.
 
-For instance, the ``pylena`` module is under development and is currently empty. However, it is possible to create
+Currently, the ``pylena`` module is under development and is empty. However, it is possible to create
 a Python module using `Pybind11 <https://pybind11.readthedocs.io>`_ and the ``Pylene-numpy`` library. This is described in the next section.
 
 Installation
 ^^^^^^^^^^^^
 
-Before continuing, it is advised to read this section about the Pylene installation.
+Before continuing, it is advised to read :ref:doc:`this section</tutorial/installation>` about the Pylene installation.
 
 This subsection describe how to get the ``Pylene-numpy`` library. Two methods are explained :
 

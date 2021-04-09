@@ -1,3 +1,8 @@
+if (NOT CMAKE_POSITION_INDEPENDENT_CODE)
+        message(WARNING "Building the Python components without POSITION_INDEPENDENT_CODE enabled. \
+                         Build should fail during the linking part of the compilation of the pylena module.")
+endif()
+
 find_package(fmt 6.0 REQUIRED)
 
 add_library(Pylene-numpy)

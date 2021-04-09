@@ -1,11 +1,10 @@
 Writing an extension module
 ===========================
 
-When writing an algorithm in C++ is great for performance issue but it is not
-easy to prototype algorithms in this language. To solve this problem, Pylene
-provides a library, ``Pylene-numpy``, which makes the the automatic conversion
-between Pylene images and Numpy arrays, thanks to the Pybind11's
-``type_caster``.
+While writing an algorithm in C++ is great for performance issue, it is not easy
+to prototype algorithms in this language. To solve this problem, Pylene provides
+a library, ``Pylene-numpy``, which makes the automatic conversion between
+Pylene images and Numpy arrays, thanks to the Pybind11's ``type_caster``.
 
 In the following, it is explained how to make use of this library to create an
 extension module.
@@ -28,18 +27,18 @@ At first, a ``conanfile.txt`` is created.
     [options]
     pylene:fPIC=True # or pylene:shared=True
 
-In this conanfile, two Conan's generators are used: the ``cmake`` generator and
-the ``cmake_find_package`` generator. In the previous section, it is specified
-that the ``cmake_find_package`` is prefered but an issue in the Conan Center
+In this conanfile, two Conan's generators are used: the ``cmake`` and
+the ``cmake_find_package`` generators. In the previous section, it is specified
+that the ``cmake_find_package`` one is prefered but an issue in the Conan Center
 Index makes it unusable for Pybind11 (see `here
 <https://github.com/conan-io/conan-center-index/pull/4445>`_ for more details).
 For the same reason, the Pybind11 package is not a runtime dependency of the
 ``Pylene-numpy`` library and should be specified as a dependency of the
 extension project. Finally, the `fPIC` option is specified as an option for
-Pylene, which enable to use have the ``Pylene-numpy`` library during the
+Pylene, which enable to have the ``Pylene-numpy`` library during the
 dependencies installation.
 
-Then, bellow is the ``CMakeLists.txt``:
+Then, below is the ``CMakeLists.txt``:
 
 .. code-block:: cmake
 
@@ -63,7 +62,7 @@ Then, bellow is the ``CMakeLists.txt``:
 Step 2: Writing an extension
 ----------------------------
 
-Bellow is an exemple of an extension module:
+Below is an exemple of an extension module:
 
 .. code-block:: cpp
 
@@ -98,28 +97,29 @@ Bellow is an exemple of an extension module:
 There are a few important things to note about this code. At first,
 **the header** ``<pln/core/image_cast.hpp>`` 
 **must be included in all the compilation unit of the extension module**.
-In this header, the ``type_caster`` converting Pylene images into Numpy
+In this header, there is the ``type_caster`` converting Pylene images into Numpy
 arrays and inversely. If not included, some undefined behavior may happen.
 
-Then, a ``iota`` function is defined. This function fill inplace a 2D image with
-unsigned element on 8 bits. The argument of this function is a
-``mln::ndbuffer_image``, the type-erased version of the Pylene images, where the
-type and the dimension of the image are stored dynamically. However, it is not
-considered as an image by the library and cannot be manipulated directly: it has
-to be casted to a Pylene image, as it is done in the first lines of the
+Then, a ``iota`` function is defined. This function fills inplace a 2D image
+with unsigned element on 8 bits. The argument of this function is a
+``mln::ndbuffer_image``, the type-erased version of the Pylene images, in which
+the type and the dimension of the image are stored dynamically. However, it is
+not considered as an image by the library and cannot be manipulated directly: it
+has to be casted to a Pylene image, as it is done in the first lines of the
 function, thanks to the ``cast_to`` method. This method takes two template
 parameters: the type of the image and its dimension. If it matches the ones
-stored dynamically, the image is converted. Else, ``nullptr`` is returned by the
-method.
+stored dynamically, a pointer to the converted image is returned. Else,
+``nullptr`` is returned by the method.
 
 Finally, the last lines define the Python module, thanks to Pybind11. It is
 important to note that the ``pln::init_pylena_numpy`` is called at the first
-line of the module extension. **It should be called at the first line of the module definition for an extension module.**
+line of the module extension.
+**It must be called at the first line of the module definition for an extension module.**
 
 Step 3: Using the extension
 ---------------------------
 
-Finally, bellow is an example of how to use the simple module developped above.
+Finally, below is an example of how to use the simple module developed above.
 
 >>> from pylene_extension import iota
 >>> import numpy as np

@@ -17,7 +17,7 @@ Installation
 
 Before continuing, it is advised to read :ref:doc:`this section</tutorial/installation>` about the Pylene installation.
 
-This subsection describe how to get the ``Pylene-numpy`` library. Two methods
+This subsection describes how to get the ``Pylene-numpy`` library. Two methods
 are explained :
 
 * Getting ``Pylene-numpy`` using Conan to use it in a project.
@@ -32,7 +32,7 @@ Using Conan (preferred)
 -----------------------
 
 When writing a `conanfile` to get the `Pylene` library, some ``options`` have to
-be added to get the Python components. Bellow is an exemple of a
+be added to get the Python components. Below is an exemple of a
 `conanfile.txt`, where the `fPIC` option has been added for Pylene.
 
 .. code-block:: text
@@ -58,6 +58,9 @@ execute the following command to build the Python components.
 
 .. code-block:: console
 
+    $ git clone https://gitlab.lrde.epita.fr/olena/pylene.git
+    $ cd pylene
+    $ git checkout next
     $ mkdir build && cd build
     $ conan install .. -o pylene:fPIC=True
     $ cmake .. -DPYLENE_BUILD_PYTHON=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON

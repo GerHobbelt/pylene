@@ -1,8 +1,19 @@
 Writing an extension module
 ===========================
 
+When writing an algorithm in C++ is great for performance issue but it is not
+easy to prototype algorithms in this language. To solve this problem, Pylene
+provides a library, ``Pylene-numpy``, which makes the the automatic conversion
+between Pylene images and Numpy arrays, thanks to the Pybind11's
+``type_caster``.
+
+In the following, it is explained how to make use of this library to create an
+extension module.
+
 Step 1: Setup the project
 --------------------------
+
+At first, a ``conanfile.txt`` is created.
 
 .. code-block:: text
 
@@ -15,17 +26,30 @@ Step 1: Setup the project
     pybind11/2.6.2
 
     [options]
-    pylene:fPIC=True
+    pylene:fPIC=True # or pylene:shared=True
+
+In this conanfile, two Conan's generators are used: the ``cmake`` generator and
+the ``cmake_find_package`` generator. In the previous section, it is specified
+that the ``cmake_find_package`` is prefered but an issue in the Conan Center
+Index makes it unusable for Pybind11 (see `here
+<https://github.com/conan-io/conan-center-index/pull/4445>`_ for more details).
+For the same reason, the Pybind11 package is not a runtime dependency of the
+``Pylene-numpy`` library and should be specified as a dependency of the
+extension project. Finally, the `fPIC` option is specified as an option for
+Pylene, which enable to use have the ``Pylene-numpy`` library during the
+dependencies installation.
+
+Then, bellow is the ``CMakeLists.txt``:
 
 .. code-block:: cmake
 
     cmake_minimum_required(VERSION 3.14)
     project(pylene_extension)
 
-    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
-      include("${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
-      conan_set_rpath()
+    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
+        message(FATAL_ERROR "Conan dit not run. Please run conan install.")
     endif()
+    include("${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
 
     set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_BINARY_DIR}" "${CONAN_BUILD_DIRS_PYBIND11}")
     find_package(Pylene REQUIRED)
@@ -35,8 +59,11 @@ Step 1: Setup the project
     target_sources(pylene_extension PRIVATE pylene_extension.cpp)
     target_link_libraries(pylene_extension PUBLIC Pylene::Pylene-numpy)
 
+
 Step 2: Writing an extension
 ----------------------------
+
+Bellow is an exemple of an extension module:
 
 .. code-block:: cpp
 
@@ -68,8 +95,31 @@ Step 2: Writing an extension
         m.def("iota", &iota);
     }
 
+There are a few important things to note about this code. At first,
+**the header** ``<pln/core/image_cast.hpp>`` 
+**must be included in all the compilation unit of the extension module**.
+In this header, the ``type_caster`` converting Pylene images into Numpy
+arrays and inversely. If not included, some undefined behavior may happen.
+
+Then, a ``iota`` function is defined. This function fill inplace a 2D image with
+unsigned element on 8 bits. The argument of this function is a
+``mln::ndbuffer_image``, the type-erased version of the Pylene images, where the
+type and the dimension of the image are stored dynamically. However, it is not
+considered as an image by the library and cannot be manipulated directly: it has
+to be casted to a Pylene image, as it is done in the first lines of the
+function, thanks to the ``cast_to`` method. This method takes two template
+parameters: the type of the image and its dimension. If it matches the ones
+stored dynamically, the image is converted. Else, ``nullptr`` is returned by the
+method.
+
+Finally, the last lines define the Python module, thanks to Pybind11. It is
+important to note that the ``pln::init_pylena_numpy`` is called at the first
+line of the module extension. **It should be called at the first line of the module definition for an extension module.**
+
 Step 3: Using the extension
 ---------------------------
+
+Finally, bellow is an example of how to use the simple module developped above.
 
 >>> from pylene_extension import iota
 >>> import numpy as np

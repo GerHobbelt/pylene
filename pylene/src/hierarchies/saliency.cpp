@@ -1,4 +1,5 @@
 #include "mln/hierarchies/saliency.hpp"
+#include "mln/core/algorithm/fill.hpp"
 #include "mln/hierarchies/attributes.hpp"
 
 #include <algorithm>
@@ -47,7 +48,7 @@ namespace mln
     return res;
   }
 
-  std::vector<int> saliency_khalimsky_grid(const HierarchyTree& tree)
+  image2d<int> saliency_khalimsky_grid(const HierarchyTree& tree)
   {
     const Graph& leaf_graph = tree.leaf_graph;
 
@@ -57,7 +58,8 @@ namespace mln
     int res_height = 2 * height + 1;
     int res_width  = 2 * width + 1;
 
-    std::vector<int> res(res_height * res_width, 0);
+    image2d<int> res(res_width, res_height);
+    fill(res, 0);
 
     const std::vector<Edge>& s_map = saliency_map(tree);
 
@@ -67,13 +69,13 @@ namespace mln
       int v = std::get<1>(edge);
       int w = std::get<2>(edge);
 
-      int u_pos[2] = {u / width, u % width};
-      int v_pos[2] = {v / width, v % width};
+      int u_pos[2] = {u % width, u / width};
+      int v_pos[2] = {v % width, v / width};
 
       int res_offset[2]   = {u_pos[0] - v_pos[0], u_pos[1] - v_pos[1]};
       int res_edge_pos[2] = {2 * v_pos[0] + 1 + res_offset[0], 2 * v_pos[1] + 1 + res_offset[1]};
 
-      res[res_edge_pos[0] * res_width + res_edge_pos[1]] = w;
+      res({res_edge_pos[0], res_edge_pos[1]}) = w;
     }
 
     for (int y = 0; y < res_height; y += 2)
@@ -83,15 +85,15 @@ namespace mln
         int max = std::numeric_limits<int>::min();
 
         if (y + 1 < height)
-          max = std::max(max, res[(y + 1) * res_width + x]);
+          max = std::max(max, res({x, y + 1}));
         if (x + 1 < width)
-          max = std::max(max, res[y * res_width + x + 1]);
+          max = std::max(max, res({x + 1, y}));
         if (y - 1 >= 0)
-          max = std::max(max, res[(y - 1) * res_width + x]);
+          max = std::max(max, res({x, y - 1}));
         if (x - 1 >= 0)
-          max = std::max(max, res[y * res_width + x - 1]);
+          max = std::max(max, res({x - 1, y}));
 
-        res[y * res_width + x] = max;
+        res({x, y}) = max;
       }
     }
 

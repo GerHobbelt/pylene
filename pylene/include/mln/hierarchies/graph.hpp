@@ -39,7 +39,7 @@ namespace mln
     int  get_edge(int n) const;
     int  weight_node(int n) const;
 
-    QEBT* kruskal();
+    QEBT kruskal();
 
     std::vector<Edge> mst;
 

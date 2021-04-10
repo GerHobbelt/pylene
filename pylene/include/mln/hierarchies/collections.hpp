@@ -11,7 +11,7 @@ namespace mln
     friend class QEBT;
 
   public:
-    QBT(const Graph* leaf_graph);
+    QBT(const Graph& leaf_graph);
 
     ~QBT() = default;
 
@@ -33,7 +33,7 @@ namespace mln
     friend class QEBT;
 
   public:
-    QT(const Graph* leaf_graph);
+    QT(const Graph& leaf_graph);
 
     ~QT() = default;
 
@@ -54,7 +54,7 @@ namespace mln
   class QEBT : public HierarchyTree
   {
   public:
-    QEBT(const Graph* leaf_graph);
+    QEBT(const Graph& leaf_graph);
 
     ~QEBT() = default;
 

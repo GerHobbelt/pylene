@@ -18,25 +18,23 @@ namespace mln
 
   static bool sortbyth(const Edge& a, const Edge& b) { return (std::get<2>(a) < std::get<2>(b)); }
 
-  QEBT* Graph::kruskal()
+  QEBT Graph::kruskal()
   {
-    QEBT* qebt = new QEBT(this);
+    QEBT qebt(*this);
 
     for (int xi = 0; xi < this->nb_vertices_; xi++)
-      qebt->make_set(xi);
+      qebt.make_set(xi);
 
     std::sort(this->edges_.begin(), this->edges_.end(), sortbyth);
 
-    for (std::size_t i = 0; i < this->edges_.size(); i++)
+    for (auto edge : this->edges_)
     {
-      auto edge = this->edges_[i];
-
-      int cx = qebt->find_canonical(std::get<0>(edge));
-      int cy = qebt->find_canonical(std::get<1>(edge));
+      int cx = qebt.find_canonical(std::get<0>(edge));
+      int cy = qebt.find_canonical(std::get<1>(edge));
 
       if (cx != cy)
       {
-        qebt->make_union(cx, cy);
+        qebt.make_union(cx, cy);
         this->mst.emplace_back(edge);
       }
     }

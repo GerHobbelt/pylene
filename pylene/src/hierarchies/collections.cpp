@@ -3,9 +3,9 @@
 
 namespace mln
 {
-  QBT::QBT(const Graph* leaf_graph)
+  QBT::QBT(const Graph& leaf_graph)
     : HierarchyTree(leaf_graph)
-    , nb_vertices_(2 * leaf_graph->get_nb_vertices() - 1)
+    , nb_vertices_(2 * leaf_graph.get_nb_vertices() - 1)
     , size_(0)
     , parent_(nb_vertices_, -1)
   {
@@ -37,9 +37,9 @@ namespace mln
 
   int QBT::get_parent(int node) const { return parent_[node]; }
 
-  QT::QT(const Graph* leaf_graph)
+  QT::QT(const Graph& leaf_graph)
     : HierarchyTree(leaf_graph)
-    , nb_vertices_(leaf_graph->get_nb_vertices())
+    , nb_vertices_(leaf_graph.get_nb_vertices())
     , size_(0)
     , parent_(nb_vertices_, -1)
     , rank_(nb_vertices_, -1)
@@ -92,7 +92,7 @@ namespace mln
 
   int QT::get_parent(int node) const { return parent_[node]; }
 
-  QEBT::QEBT(const Graph* leaf_graph)
+  QEBT::QEBT(const Graph& leaf_graph)
     : HierarchyTree(leaf_graph)
     , qbt_(QBT(leaf_graph))
     , qt_(QT(leaf_graph))

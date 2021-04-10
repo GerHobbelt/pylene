@@ -5,9 +5,9 @@
 
 using namespace mln;
 
-static Graph* create_graph_from_gray_image(int* image, int height, int width)
+static Graph create_graph_from_gray_image(int* image, int height, int width)
 {
-  auto* res = new Graph(height, width);
+  Graph res(height, width);
 
   for (int j = 0; j < height; ++j)
   {
@@ -18,12 +18,12 @@ static Graph* create_graph_from_gray_image(int* image, int height, int width)
       if (j != height - 1)
       {
         int weight = std::abs(image[array_pos] - image[array_pos + width]);
-        res->add_edge(array_pos, array_pos + width, weight);
+        res.add_edge(array_pos, array_pos + width, weight);
       }
       if (i != width - 1)
       {
         int weight = std::abs(image[array_pos] - image[array_pos + 1]);
-        res->add_edge(array_pos, array_pos + 1, weight);
+        res.add_edge(array_pos, array_pos + 1, weight);
       }
     }
   }
@@ -41,19 +41,16 @@ TEST(Hierarchies, Depth_Attribute)
   int expected_depth[31] = {3, 3, 3, 3, 3, 3, 5, 4, 5, 5, 5, 5, 6, 7, 8, 8,
                             2, 7, 6, 5, 4, 3, 2, 2, 1, 4, 4, 3, 2, 1, 0};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> depth = depth_attribute(*bpt);
+  std::vector<int> depth = depth_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_depth[i], depth[i]);
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Area_Attribute)
@@ -66,19 +63,16 @@ TEST(Hierarchies, Area_Attribute)
   int expected_area[31] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 1,
                            2, 2, 3, 4, 5, 6, 2, 7, 4, 2, 2, 4, 5, 12, 16};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> area = area_attribute(*bpt);
+  std::vector<int> area = area_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_area[i], area[i]);
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Volume_Attribute)
@@ -91,19 +85,16 @@ TEST(Hierarchies, Volume_Attribute)
   int expected_volume[31] = {0, 0, 0, 0, 0, 0, 0, 0,   0,   0,  0,  0,  0,   0,   0,   0,
                              0, 0, 0, 0, 0, 0, 0, 420, 300, 10, 10, 40, 215, 815, 1115};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> volume = volume_attribute(*bpt);
+  std::vector<int> volume = volume_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_volume[i], volume[i]);
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Extrema_Attribute)
@@ -116,19 +107,16 @@ TEST(Hierarchies, Extrema_Attribute)
   int expected_extrema[31] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                               0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> extrema = extrema_attribute(*bpt);
+  std::vector<int> extrema = extrema_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_extrema[i], extrema[i]);
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Height_Attribute)
@@ -141,19 +129,16 @@ TEST(Hierarchies, Height_Attribute)
   int expected_height[31] = {0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0,  0,  0,  0, 0,
                              0, 0, 0, 0, 0, 0, 0, 60, 75, 5, 5, 10, 45, 75, 75};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> height = height_attribute(*bpt);
+  std::vector<int> height = height_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_height[i], height[i]);
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Dynamic_Attribute)
@@ -166,17 +151,14 @@ TEST(Hierarchies, Dynamic_Attribute)
   int expected_dynamic[31] = {75, 75, 0,  75, 75, 75, 45, 75, 5,  5,  45, 75, 75, 75, 75, 75,
                               75, 75, 75, 75, 75, 75, 0,  75, 75, 45, 5,  45, 45, 75, 75};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> dynamic = dynamic_attribute(*bpt);
+  std::vector<int> dynamic = dynamic_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_dynamic[i], dynamic[i]);
   }
-
-  delete bpt;
-  delete graph;
 }

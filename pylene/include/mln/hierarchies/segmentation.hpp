@@ -14,7 +14,7 @@ namespace mln
     DEPTH
   };
 
-  Graph* watershed_graph(Graph* graph, WatershedAttribute attribute_type);
+  Graph watershed_graph(Graph& graph, WatershedAttribute attribute_type);
 
   /**
    * @return The nearest connected component root for each node

@@ -4,9 +4,9 @@
 
 using namespace mln;
 
-static Graph* create_graph_from_gray_image(int* image, int height, int width)
+static Graph create_graph_from_gray_image(int* image, int height, int width)
 {
-  auto* res = new Graph(height, width);
+  Graph res(height, width);
 
   for (int j = 0; j < height; ++j)
   {
@@ -17,12 +17,12 @@ static Graph* create_graph_from_gray_image(int* image, int height, int width)
       if (j != height - 1)
       {
         int weight = std::abs(image[array_pos] - image[array_pos + width]);
-        res->add_edge(array_pos, array_pos + width, weight);
+        res.add_edge(array_pos, array_pos + width, weight);
       }
       if (i != width - 1)
       {
         int weight = std::abs(image[array_pos] - image[array_pos + 1]);
-        res->add_edge(array_pos, array_pos + 1, weight);
+        res.add_edge(array_pos, array_pos + 1, weight);
       }
     }
   }
@@ -42,11 +42,11 @@ TEST(Hierarchies, Saliency_Map)
                                    {9, 10, 20}, {2, 6, 25},  {10, 14, 60}, {10, 11, 60}, {5, 6, 75},  {6, 7, 60},
                                    {9, 13, 60}, {5, 9, 75},  {8, 12, 60},  {4, 8, 75},   {2, 3, 60},  {1, 2, 75}};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  auto s_map = saliency_map(*bpt);
+  auto s_map = saliency_map(bpt);
 
   for (int i = 0; i < 24; ++i)
   {
@@ -54,9 +54,6 @@ TEST(Hierarchies, Saliency_Map)
 
     ASSERT_EQ(expected_edge[2], std::get<2>(s_map[i]));
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Khalimsky_Grid)
@@ -76,17 +73,14 @@ TEST(Hierarchies, Khalimsky_Grid)
                                         0,  0,  0,  0,  0,  0,  0,  0, 0, //
                                         0,  0,  0,  0,  0,  0,  0,  0, 0};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> khalimsky_grid = saliency_khalimsky_grid(*bpt);
+  std::vector<int> khalimsky_grid = saliency_khalimsky_grid(bpt);
 
   for (int i = 0; i < 9 * 9; ++i)
   {
     ASSERT_EQ(expected_khalimsky_grid[i], khalimsky_grid[i]);
   }
-
-  delete bpt;
-  delete graph;
 }

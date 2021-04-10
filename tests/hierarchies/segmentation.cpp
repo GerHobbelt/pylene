@@ -4,9 +4,9 @@
 
 using namespace mln;
 
-static Graph* create_graph_from_gray_image(int* image, int height, int width)
+static Graph create_graph_from_gray_image(int* image, int height, int width)
 {
-  auto* res = new Graph(height, width);
+  Graph res(height, width);
 
   for (int j = 0; j < height; ++j)
   {
@@ -17,12 +17,12 @@ static Graph* create_graph_from_gray_image(int* image, int height, int width)
       if (j != height - 1)
       {
         int weight = std::abs(image[array_pos] - image[array_pos + width]);
-        res->add_edge(array_pos, array_pos + width, weight);
+        res.add_edge(array_pos, array_pos + width, weight);
       }
       if (i != width - 1)
       {
         int weight = std::abs(image[array_pos] - image[array_pos + 1]);
-        res->add_edge(array_pos, array_pos + 1, weight);
+        res.add_edge(array_pos, array_pos + 1, weight);
       }
     }
   }
@@ -39,18 +39,15 @@ TEST(Hierarchies, Segmentation_Watershed_graph)
 
   int expected_edge[15] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 5, 4};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  Graph*            watershed_graph = mln::watershed_graph(graph, WatershedAttribute::AREA);
-  std::vector<Edge> watershed_edges = watershed_graph->get_edges();
+  Graph             watershed_graph = mln::watershed_graph(graph, WatershedAttribute::AREA);
+  std::vector<Edge> watershed_edges = watershed_graph.get_edges();
 
   for (int i = 0; i < 15; ++i)
   {
     ASSERT_EQ(expected_edge[i], std::get<2>(watershed_edges[i]));
   }
-
-  delete graph;
-  delete watershed_graph;
 }
 
 TEST(Hierarchies, Segmentation_Threshold_cut_labelization)
@@ -65,19 +62,16 @@ TEST(Hierarchies, Segmentation_Threshold_cut_labelization)
   int expected_labels[31] = {24, 24, 28, 23, 24, 24, 28, 23, 28, 28, 28, 23, 23, 23, 23, 23,
                              24, 23, 23, 23, 23, 23, 24, 23, 24, 28, 28, 28, 28, 29, -1};
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> labels = threshold_cut_labelization(*bpt, threshold);
+  std::vector<int> labels = threshold_cut_labelization(bpt, threshold);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_labels[i], labels[i]);
   }
-
-  delete bpt;
-  delete graph;
 }
 
 TEST(Hierarchies, Segmentation_Mean_color_per_node)
@@ -101,17 +95,14 @@ TEST(Hierarchies, Segmentation_Mean_color_per_node)
       {53, 54, 55},
   };
 
-  Graph* graph = create_graph_from_gray_image(gray_image, 4, 4);
+  Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  HierarchyTree* bpt = graph->kruskal();
+  const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<rgb8> mean_color = mean_color_per_node(*bpt, rgb_image);
+  std::vector<rgb8> mean_color = mean_color_per_node(bpt, rgb_image);
 
   for (int i = 0; i < 31; ++i)
   {
     ASSERT_EQ(expected_mean_color[i], mean_color[i]);
   }
-
-  delete bpt;
-  delete graph;
 }

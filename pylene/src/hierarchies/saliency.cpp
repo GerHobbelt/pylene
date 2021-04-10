@@ -33,14 +33,14 @@ namespace mln
   {
     std::vector<Edge> res;
 
-    const Graph* leaf_graph = tree.leaf_graph;
+    const Graph& leaf_graph = tree.leaf_graph;
 
     std::vector<int> depth = lca_preprocess(tree);
 
-    for (Edge edge : leaf_graph->get_edges())
+    for (Edge edge : leaf_graph.get_edges())
     {
       int merge_parent_node = lca(depth, tree, std::get<0>(edge), std::get<1>(edge));
-      std::get<2>(edge)     = leaf_graph->weight_node(merge_parent_node);
+      std::get<2>(edge)     = leaf_graph.weight_node(merge_parent_node);
       res.emplace_back(edge);
     }
 
@@ -49,10 +49,10 @@ namespace mln
 
   std::vector<int> saliency_khalimsky_grid(const HierarchyTree& tree)
   {
-    const Graph* leaf_graph = tree.leaf_graph;
+    const Graph& leaf_graph = tree.leaf_graph;
 
-    int height = leaf_graph->get_height();
-    int width  = leaf_graph->get_width();
+    int height = leaf_graph.get_height();
+    int width  = leaf_graph.get_width();
 
     int res_height = 2 * height + 1;
     int res_width  = 2 * width + 1;

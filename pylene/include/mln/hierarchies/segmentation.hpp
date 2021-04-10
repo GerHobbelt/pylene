@@ -23,7 +23,6 @@ namespace mln
 
   std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image);
 
-  // FIXME Replace filename parameter with image directly
-  image2d<rgb8> hierarchical_segmentation(const std::string& filename, WatershedAttribute attribute_type,
+  image2d<rgb8> hierarchical_segmentation(const mln::image2d<rgb8>& image, WatershedAttribute attribute_type,
                                           double threshold);
 } // namespace mln

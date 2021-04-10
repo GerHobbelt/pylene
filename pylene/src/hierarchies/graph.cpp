@@ -44,12 +44,12 @@ namespace mln
     return qebt;
   }
 
-  Graph::Graph(int height, int width, mln::image2d<uint16_t> img)
+  Graph::Graph(int height, int width, const mln::image2d<rgb8>& image)
     : nb_vertices_(height * width)
     , height_(height)
     , width_(width)
   {
-    auto shape = img.domain();
+    auto shape = image.domain();
 
     int x0 = shape.x();
     int y0 = shape.y();
@@ -58,20 +58,21 @@ namespace mln
     {
       for (int y = 0; y < shape.width(); y++)
       {
-        auto pix = img({x0 + x, y0 + y});
+        rgb8 pix = image({x0 + x, y0 + y});
+
+        // FIXME Edges weight must be of type double
 
         if (x0 + x < shape.height() - 1)
         {
-          auto pix3    = img({x0 + x + 1, y0 + y});
-          auto weighty = sqrt(pow(pix3 - pix, 2));
+          rgb8 pix3    = image({x0 + x + 1, y0 + y});
+          int  weighty = sqrt(pow(pix3[0] - pix[0], 2) + pow(pix3[1] - pix[1], 2) + pow(pix3[2] - pix[2], 2));
           this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x + 1) * shape.width() + (y0 + y), weighty);
         }
 
         if (y0 + y < shape.width() - 1)
         {
-          auto pix2    = img({x0 + x, y0 + y + 1});
-          auto weightx = sqrt(pow(pix2 - pix, 2));
-
+          rgb8 pix2    = image({x0 + x, y0 + y + 1});
+          int  weightx = sqrt(pow(pix2[0] - pix[0], 2) + pow(pix2[1] - pix[1], 2) + pow(pix2[2] - pix[2], 2));
           this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x) * shape.width() + (y0 + y + 1), weightx);
         }
       }

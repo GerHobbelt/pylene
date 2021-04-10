@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mln/core/colors.hpp"
 #include "mln/hierarchies/collections.hpp"
 #include <mln/core/image/ndimage.hpp>
 
@@ -24,7 +25,7 @@ namespace mln
     {
     }
 
-    Graph(int height, int width, mln::image2d<uint16_t> img);
+    Graph(int height, int width, const mln::image2d<rgb8>& image);
 
     inline int get_nb_vertices() const { return nb_vertices_; }
 
@@ -40,7 +41,8 @@ namespace mln
 
     QEBT* kruskal();
 
-  std::vector<Edge> mst;
+    std::vector<Edge> mst;
+
   private:
     int nb_vertices_;
 

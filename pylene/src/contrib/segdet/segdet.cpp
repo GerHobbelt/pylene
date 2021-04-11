@@ -433,14 +433,14 @@ namespace mln::contrib::segdet
   void merge_segments(Segment& a, const Segment& b)
   {
     if (a.is_horizontal)
-      a.length = b.points[-1].x - a.points[0].x;
+      a.length = b.points[b.points.size() - 1].x - a.points[0].x + 1;
     else
-      a.length = b.points[-1].y - a.points[0].y;
+      a.length = b.points[b.points.size() - 1].y - a.points[0].y + 1;
 
     add_all(a.under_other, b.under_other);
     add_all(a.points, b.points);
 
-    a.length += b.length;
+    a.nb_pixels += b.nb_pixels;
 
     a.last_part_slope = b.last_part_slope;
   }
@@ -469,9 +469,9 @@ namespace mln::contrib::segdet
   void draw_labeled_pixel(image2d<uint16_t>& img, uint16_t label, int x, int y)
   {
     if (img({x, y}) != 0)
-      img.at({x, y}) = 1;
+      img({x, y}) = 1;
     else
-      img.at({x, y}) = label;
+      img({x, y}) = label;
   }
 
 
@@ -484,7 +484,7 @@ namespace mln::contrib::segdet
     {
       for (int i = -thickness; i < static_cast<int>(thickness) + static_cast<int>(is_odd); i++)
       {
-        if (static_cast<int>(point.y) + i < img.size())
+        if (static_cast<int>(point.y) + i < img.size(1))
           draw_labeled_pixel(img, label, static_cast<int>(point.x), static_cast<int>(point.y + i));
       }
     }
@@ -492,7 +492,7 @@ namespace mln::contrib::segdet
     {
       for (int i = -thickness; i < static_cast<int>(thickness) + static_cast<int>(is_odd); i++)
       {
-        if (static_cast<int>(point.y) + i < img.size(1))
+        if (static_cast<int>(point.x) + i < img.size(0))
           draw_labeled_pixel(img, label, static_cast<int>(point.x + i), static_cast<int>(point.y));
       }
     }
@@ -504,21 +504,13 @@ namespace mln::contrib::segdet
     LABELING_TYPE_HORIZONTAL,
   };
 
-  image2d<uint16_t> labeled_arr(size_t height, size_t width, std::vector<Segment> horizontal_segments,
-                                std::vector<Segment> vertical_segments, labeling_type type, bool include_other)
+  image2d<uint16_t> labeled_arr(size_t width, size_t height, std::vector<Segment> &horizontal_segments,
+                                 std::vector<Segment> &vertical_segments, labeling_type type, bool include_other)
   {
     image2d<uint16_t> arr = image2d<uint16_t>(width, height);
 
-    std::vector<Segment> segments;
-    switch (type)
-    {
-    case LABELING_TYPE_VERTICAL:
-      segments = std::move(vertical_segments);
-      break;
-    case LABELING_TYPE_HORIZONTAL:
-      segments = std::move(horizontal_segments);
-      break;
-    }
+     std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
+
     for (size_t i = 0; i < segments.size(); i++)
     {
       auto segment = segments[i];
@@ -531,13 +523,13 @@ namespace mln::contrib::segdet
     return arr;
   }
 
-  void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, size_t height,
-                  size_t width)
+  void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, size_t width,
+                  size_t height)
   {
     auto first_output =
-        labeled_arr(height, width, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
+        labeled_arr(width, height, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
     auto second_output =
-        labeled_arr(height, width, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
+        labeled_arr(width, height, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
 
     auto second_output_bin = mln::view::transform(second_output, [](uint16_t p) { return (p != 0) ? 1 : 0; });
 
@@ -555,15 +547,11 @@ namespace mln::contrib::segdet
     int k = 0;
     for (size_t i = 0; i < segments.size(); i++)
     {
-      if (segments_removable[i - k].length != 0)
-      {
-//        double segments_ratio = segments[i] / segments_removable[i - k].length  // TODO nb_pixels
-        segments[i] /= segments_removable[i - k].length;
-      }
-      if (segments_removable[i - k].length == 0 || segments[i] > SEGDET_THRESHOLD_INTERSECTION)
-      {
+      double segments_ratio = 0;
+      if (segments_removable[i - k].nb_pixels != 0)
+        segments_ratio = segments[i] / (double)segments_removable[i - k].nb_pixels;
+      if (segments_removable[i - k].nb_pixels == 0 || segments_ratio > SEGDET_THRESHOLD_INTERSECTION)
         segments_removable.erase(segments_removable.begin() + i - k);
-      }
       k++;
     }
   }

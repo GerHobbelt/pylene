@@ -45,9 +45,14 @@ namespace mln
           , under_other(std::move(underOther))
           , first_part_slope(firstPartSlope)
           , last_part_slope(lastPartSlope)
-          , length(points.size() + underOther.size())
+          , length(points.size() + under_other.size())
           , is_horizontal(isHorizontal)
         {
+          nb_pixels = 0;
+          for(auto machin : points)
+            nb_pixels += machin.thickness;
+          for (auto machin :under_other)
+            nb_pixels += machin.thickness;
         }
 
         std::vector<Point> points;
@@ -56,6 +61,7 @@ namespace mln
         float     first_part_slope;
         float     last_part_slope;
         u_int32_t length;
+        u_int32_t nb_pixels;
         bool      is_horizontal;
       };
     } // namespace segdet

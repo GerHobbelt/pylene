@@ -6,8 +6,11 @@
 #include <mln/contrib/segdet/linearregression.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/views.hpp>
 #include <mln/io/imprint.hpp>
 #include <mln/io/imread.hpp>
+#include <mln/io/imsave.hpp>
+
 #include <numeric>
 #include <utility>
 
@@ -65,7 +68,7 @@ namespace mln::contrib::segdet
 
     uint32_t n_to_skip = n_end;
 
-    while (luminosities_list[n  - n_start] > m_lum)
+    while (luminosities_list[n - n_start] > m_lum)
       n += 1;
 
     int k = luminosities_list.size() - 1;
@@ -504,12 +507,14 @@ namespace mln::contrib::segdet
     LABELING_TYPE_HORIZONTAL,
   };
 
-  image2d<uint16_t> labeled_arr(size_t width, size_t height, std::vector<Segment> &horizontal_segments,
-                                 std::vector<Segment> &vertical_segments, labeling_type type, bool include_other)
+  image2d<uint16_t> labeled_arr(image2d<uint16_t> out, size_t width, size_t height,
+                                std::vector<Segment>& horizontal_segments, std::vector<Segment>& vertical_segments,
+                                labeling_type type, bool include_other)
   {
-    image2d<uint16_t> arr = image2d<uint16_t>(width, height);
-
-     std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
+    (void)(width);
+    (void)(height);
+    auto                 arr      = out;
+    std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
 
     for (size_t i = 0; i < segments.size(); i++)
     {
@@ -523,18 +528,59 @@ namespace mln::contrib::segdet
     return arr;
   }
 
+  void binarize_img(image2d<uint16_t> img)
+  {
+    mln_foreach (auto p, img.domain())
+    {
+      if (img(p) != 0)
+        img(p) = 1;
+      else
+        img(p) = 0;
+    }
+  }
+
+  void intersect(image2d<uint16_t> img, image2d<uint16_t> img2, image2d<uint16_t> out)
+  {
+    mln_foreach (auto pt, img.domain())
+      out(pt) = img(pt) * img2(pt);
+  }
+
   void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, size_t width,
                   size_t height)
   {
-    auto first_output =
-        labeled_arr(width, height, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
-    auto second_output =
-        labeled_arr(width, height, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
+    image2d<uint16_t> first_output = image2d<uint16_t>(width, height);
 
-    auto second_output_bin = mln::view::transform(second_output, [](uint16_t p) { return (p != 0) ? 1 : 0; });
+    mln_foreach (auto pt, first_output.domain())
+      first_output(pt) = 0;
 
-    auto intersection =
-        mln::view::transform(first_output, second_output_bin, [](uint16_t x, uint16_t y) { return x * y; });
+    mln::io::imsave(first_output, "first_output.pgm");
+    labeled_arr(first_output, width, height, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
+
+    image2d<uint16_t> second_output = image2d<uint16_t>(width, height);
+
+    mln_foreach (auto pt, second_output.domain())
+      second_output(pt) = 0;
+
+    mln::io::imsave(second_output, "second_output.pgm");
+    labeled_arr(second_output, width, height, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
+
+    mln::io::imsave(first_output, "first_output.pgm");
+    mln::io::imsave(second_output, "second_output.pgm");
+
+    //    auto second_output_bin = mln::view::transform(second_output, [](uint16_t p) { return (p != 0) ? 1 : 0; });
+
+    binarize_img(second_output);
+
+    //    auto second_output_bin_c = image2d<uint16_t>(second_output_bin);
+    mln::io::imsave(second_output, "second_output_bin.pgm");
+
+    image2d<uint16_t> intersection = image2d<uint16_t>(width, height);
+
+    //    auto intersection =
+    //        mln::view::transform(first_output, second_output_bin, [](uint16_t x, uint16_t y) { return x * y; });
+    intersect(first_output, second_output, intersection);
+
+    mln::io::imsave(intersection, "intersection.pgm");
 
     std::vector<uint16_t> segments = std::vector<uint16_t>(segments_removable.size());
 

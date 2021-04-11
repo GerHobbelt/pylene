@@ -22,6 +22,12 @@
 namespace mln::contrib::segdet
 {
 
+  /**
+   * Compute the standard deviation of the diven vector
+   * @tparam T The type of a vector
+   * @param vec The given vector
+   * @return A double that is the standard deviation of the series
+   */
   template <typename T>
   double std(const std::vector<T>& vec)
   {
@@ -39,9 +45,13 @@ namespace mln::contrib::segdet
       return accumulator + ((val - mean) * (val - mean) / ((double)sz - 1));
     };
 
-    return std::accumulate(vec.begin(), vec.end(), 0.0, variance_func);
+    return sqrt(std::accumulate(vec.begin(), vec.end(), 0.0, variance_func));
   }
 
+  /**
+   * Update the given filter by computing the standard deviations of the position, thickness and luminosity vectors
+   * @param f
+   */
   void compute_sigmas(Filter& f)
   {
     if (f.n_values.size() > SEGDET_MIN_NB_VALUES_SIGMA)
@@ -75,6 +85,13 @@ namespace mln::contrib::segdet
     compute_sigmas(f);
   }
 
+  /**
+   * Checks if the given observation is in the interval prediction +/- 3 sigma
+   * @param prediction The prediction value
+   * @param observation The observation value
+   * @param sigma The standard deviation value
+   * @return true if it is in the interval, else false
+   */
   bool accepts_sigma(uint32_t prediction, uint32_t observation, double sigma)
   {
     if (prediction > observation)
@@ -117,6 +134,11 @@ namespace mln::contrib::segdet
     return obs_to_return;
   }
 
+  /**
+   * Compute the slope of the segment formed by the filter using Linear regression
+   * @param f The filter for which to compute the slope
+   * @return The computed slope
+   */
   double compute_slope(Filter& f)
   {
     auto X = f.t_values;
@@ -126,7 +148,7 @@ namespace mln::contrib::segdet
     Z[0] = X;
     Z[1] = Y;
 
-    Linear_Regression <double, uint32_t> reg{};
+    Linear_Regression<double, uint32_t> reg{};
     reg.fit(Z);
 
     auto slope = reg.b_1;
@@ -139,6 +161,13 @@ namespace mln::contrib::segdet
     return slope;
   }
 
+  /**
+   * Integrate the observation values into the vectors, and make sure the length of those vector do not exceed the
+   * maximum number of values to keep
+   * @param f The filter for which to integrate
+   * @param observation The observation matrix to integrate
+   * @param t The position at which the integration was made
+   */
   void insert_into_filters_list(Filter& f, Eigen::Matrix<double, 3, 1> observation, uint32_t t)
   {
     f.n_values.push_back(observation(0, 0));
@@ -185,8 +214,8 @@ namespace mln::contrib::segdet
     auto   length = f.slopes.size();
     double second_derivative =
         (f.slopes[length - 1] - f.slopes[length - 2]) / (f.t_values[length - 1] - f.t_values[length - 2]);
-    f.W(0,0) = 0.5 * second_derivative;
-    f.W(1, 0) = second_derivative;
+    f.W(0, 0)          = 0.5 * second_derivative;
+    f.W(1, 0)          = second_derivative;
     f.last_integration = t;
   }
 

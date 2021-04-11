@@ -602,6 +602,7 @@ namespace mln::contrib::segdet
     }
   }
 
+
   void remove_duplicates(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width,
                          size_t img_height)
   {

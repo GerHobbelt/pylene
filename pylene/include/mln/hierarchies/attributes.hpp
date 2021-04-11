@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mln/hierarchies/accumulator_base.hpp"
+#include "mln/hierarchies/accumulators/accumulator_base.hpp"
 #include "mln/hierarchies/hierarchy_tree.hpp"
 
 #include <vector>

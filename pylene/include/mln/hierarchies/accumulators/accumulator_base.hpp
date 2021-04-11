@@ -9,8 +9,6 @@ namespace mln
   {
     virtual void init() = 0;
 
-    virtual void take(T element) = 0;
-
     virtual void take(const AccumulatorBase<T>& acc) = 0;
 
     virtual T extract_value() const = 0;

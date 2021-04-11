@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mln/hierarchies/accumulator_base.hpp"
+#include "mln/hierarchies/accumulators/accumulator_base.hpp"
 
 namespace mln
 {
@@ -14,8 +14,6 @@ namespace mln
     }
 
     inline void init() override { acc_ = 1; }
-
-    inline void take(int element) override { acc_ += element; }
 
     // FIXME Replace AccumulatorBase<int> by AreaAccumulator
     inline void take(const AccumulatorBase<int>& acc) override { acc_ += acc.extract_value(); }

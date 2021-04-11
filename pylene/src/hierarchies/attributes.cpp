@@ -1,7 +1,8 @@
 #include "mln/hierarchies/attributes.hpp"
 #include "mln/hierarchies/graph.hpp"
 
-#include "mln/hierarchies/area_accumulator.hpp"
+#include "mln/hierarchies/accumulators/area_accumulator.hpp"
+#include "mln/hierarchies/accumulators/depth_accumulator.hpp"
 
 namespace mln
 {
@@ -50,23 +51,7 @@ namespace mln
 
   std::vector<int> depth_attribute(const HierarchyTree& tree)
   {
-    int tree_nb_vertices = tree.get_nb_vertices();
-
-    std::vector<int> depth(tree_nb_vertices, -1);
-
-    // Set root depth to 0
-    depth[tree_nb_vertices - 1] = 0;
-
-    for (int node = tree_nb_vertices - 2; node >= 0; --node)
-    {
-      int parent_node = tree.get_parent(node);
-      if (parent_node == -1)
-        continue;
-
-      depth[node] = depth[parent_node] + 1;
-    }
-
-    return depth;
+    return compute_attribute_from_accumulator<int, DepthAccumulator>(tree, TraversalOrder::ROOT_TO_LEAVES);
   }
 
   std::vector<int> area_attribute(const HierarchyTree& tree)

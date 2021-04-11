@@ -3,15 +3,20 @@
 
 #include "mln/hierarchies/accumulators/area_accumulator.hpp"
 #include "mln/hierarchies/accumulators/depth_accumulator.hpp"
+#include "mln/hierarchies/accumulators/volume_accumulator.hpp"
+
 
 namespace mln
 {
   template <typename T, Accumulator<T> AccumulatorType>
-  std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, TraversalOrder traversal_order)
+  std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
+                                                    TraversalOrder traversal_order)
   {
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    std::vector<AccumulatorType> accumulators(tree_nb_vertices);
+    std::vector<AccumulatorType> accumulators(tree_nb_vertices, acc);
+    for (int i = 0; i < tree_nb_vertices; ++i)
+      accumulators[i].set_associated_node(i);
 
     if (traversal_order == TraversalOrder::LEAVES_TO_ROOT)
     {
@@ -22,9 +27,12 @@ namespace mln
       {
         int parent_node = tree.get_parent(node);
         if (parent_node == -1)
+        {
+          accumulators[node].invalidate();
           continue;
+        }
 
-        accumulators[parent_node].take(accumulators[node]);
+        accumulators[parent_node].merge(accumulators[node]);
       }
     }
     else if (traversal_order == TraversalOrder::ROOT_TO_LEAVES)
@@ -35,54 +43,50 @@ namespace mln
       {
         int parent_node = tree.get_parent(node);
         if (parent_node == -1)
+        {
+          accumulators[node].invalidate();
           continue;
+        }
 
-        accumulators[node].take(accumulators[parent_node]);
+        accumulators[node].merge(accumulators[parent_node]);
       }
     }
 
     std::vector<T> attribute(tree_nb_vertices);
 
     for (int i = 0; i < tree_nb_vertices; ++i)
-      attribute[i] = accumulators[i].extract_value();
+      attribute[i] = accumulators[i].get_value();
 
     return attribute;
   }
 
   std::vector<int> depth_attribute(const HierarchyTree& tree)
   {
-    return compute_attribute_from_accumulator<int, DepthAccumulator>(tree, TraversalOrder::ROOT_TO_LEAVES);
+    return compute_attribute_from_accumulator<int, DepthAccumulator>(tree, DepthAccumulator(),
+                                                                     TraversalOrder::ROOT_TO_LEAVES);
   }
 
   std::vector<int> area_attribute(const HierarchyTree& tree)
   {
-    return compute_attribute_from_accumulator<int, AreaAccumulator>(tree, TraversalOrder::LEAVES_TO_ROOT);
+    return compute_attribute_from_accumulator<int, AreaAccumulator>(tree, AreaAccumulator(),
+                                                                    TraversalOrder::LEAVES_TO_ROOT);
   }
 
   std::vector<int> volume_attribute(const HierarchyTree& tree)
   {
-    const Graph& leaf_graph = tree.leaf_graph;
+    auto diff_altitude = [&](int node) {
+      if (node < tree.leaf_graph.get_nb_vertices())
+        return 0;
 
-    int tree_nb_vertices = tree.get_nb_vertices();
-
-    std::vector<int> area = area_attribute(tree);
-
-    std::vector<int> volume(tree_nb_vertices, 0);
-
-    for (int i_node = leaf_graph.get_nb_vertices(); i_node < tree_nb_vertices - 1; ++i_node)
-    {
-      int parent_node = tree.get_parent(i_node);
+      int parent_node = tree.get_parent(node);
       if (parent_node == -1)
-      {
-        volume[i_node] = -1;
-        continue;
-      }
+        return -1;
 
-      volume[i_node] += area[i_node] * abs(leaf_graph.weight_node(i_node) - leaf_graph.weight_node(parent_node));
-      volume[parent_node] += volume[i_node];
-    }
+      return tree.leaf_graph.weight_node(parent_node) - tree.leaf_graph.weight_node(node);
+    };
 
-    return volume;
+    return compute_attribute_from_accumulator<int, VolumeAccumulator>(tree, VolumeAccumulator(diff_altitude),
+                                                                      TraversalOrder::LEAVES_TO_ROOT);
   }
 
   std::vector<int> extrema_attribute(const HierarchyTree& tree)

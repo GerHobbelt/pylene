@@ -1,24 +1,27 @@
 #pragma once
 
-#include "mln/hierarchies/accumulators/accumulator_base.hpp"
+#include "mln/hierarchies/accumulators/hierarchy_accumulator_base.hpp"
 
 namespace mln
 {
-  class DepthAccumulator : public AccumulatorBase<int>
+  class DepthAccumulator : public HierarchyAccumulatorBase<int>
   {
   public:
-    DepthAccumulator()
+    explicit DepthAccumulator()
       // Neutral element
       : acc_(-1)
     {
     }
 
+    ~DepthAccumulator() override = default;
+
     inline void init() override { acc_ = 0; }
 
-    // FIXME Replace AccumulatorBase<int> by DepthAccumulator
-    inline void take(const AccumulatorBase<int>& acc) override { acc_ = acc.extract_value() + 1; }
+    inline void invalidate() override { acc_ = -1; }
 
-    inline int extract_value() const override { return acc_; }
+    inline void merge(HierarchyAccumulatorBase<int>& other) override { acc_ = other.get_value() + 1; }
+
+    inline int get_value() const override { return acc_; }
 
   private:
     int acc_;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mln/hierarchies/accumulators/accumulator_base.hpp"
+#include "mln/hierarchies/accumulators/hierarchy_accumulator_base.hpp"
 #include "mln/hierarchies/hierarchy_tree.hpp"
 
 #include <vector>
@@ -14,7 +14,8 @@ namespace mln
   };
 
   template <typename T, Accumulator<T> AccumulatorType>
-  std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, TraversalOrder traversal_order);
+  std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
+                                                    TraversalOrder traversal_order);
 
   std::vector<int> depth_attribute(const HierarchyTree& tree);
 

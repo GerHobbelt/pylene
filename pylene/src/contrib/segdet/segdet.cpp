@@ -28,25 +28,22 @@
 
 namespace mln::contrib::segdet
 {
-
-  uint8_t image_at(const image2d<uint8_t>& image, int n, int t, bool is_horizontal)
+  uint8_t image_at(image2d<uint8_t> image, int n, int t, bool is_horizontal)
   {
-    if (is_horizontal)
-      return image.at({t, n});
-    else
-      return image.at({n, t});
+    // TODO remove the check done by image.at(,) using image(,)
+    return is_horizontal ? image.at({t, n}) : image.at({n, t});
   }
 
   Eigen::Matrix<double, 3, 1> determine_observation(const image2d<uint8_t>& image, uint32_t& n, uint32_t t,
                                                     uint32_t n_max, bool is_horizontal)
   {
     uint32_t thickness = 0;
-
     uint32_t n_max_lum = 0;
 
     std::vector<uint8_t> luminosities_list = std::vector<uint8_t>();
     uint32_t             lumi;
 
+    // n + thickess: current position in the n-th line
     while (n + thickness < n_max && (lumi = image_at(image, n + thickness, t, is_horizontal)) < SEGDET_MAX_LLUM)
     {
       luminosities_list.push_back(lumi);
@@ -57,96 +54,113 @@ namespace mln::contrib::segdet
       thickness += 1;
     }
 
-    uint32_t max_lum = luminosities_list[n_max_lum];
+    uint32_t n_to_skip = n + thickness;                // Position of the next n to work on
+    uint32_t max_lum   = luminosities_list[n_max_lum]; // Max luminosity of the current span
 
+    // m_lum : max_luminosity of what is accepted in the span
     uint32_t m_lum   = max_lum + (SEGDET_MAX_LLUM - max_lum) * SEGDET_RATIO_LUM;
-    auto     n_start = n;
-    uint32_t n_end   = n + thickness;
+    auto     n_start = n;             // n_start is AT LEAST n
+    uint32_t n_end   = n + thickness; // n_end is AT MOST n + thickness
 
-    if (n_end == n_max)
+    if (n_end == n_max) // In case we stopped because of outOfBound value
       n_end--;
-
-    uint32_t n_to_skip = n_end;
 
     while (luminosities_list[n - n_start] > m_lum)
       n += 1;
 
-    int k = luminosities_list.size() - 1;
+    uint32_t k = luminosities_list.size() - 1;
     while (luminosities_list[k] > m_lum)
       k--;
-
-    n_end = n_start + k;
-    n_end++;
+    n_end = n_start + k + 1; // Plus one because the last pixel has to be included
 
     thickness         = n_end - n;
     uint32_t position = n + thickness / 2;
 
     const double mean = mln::contrib::segdet::mean(luminosities_list, n - n_start, n_end - n_start);
 
-    n = n_to_skip;
+    n = n_to_skip; // Setting reference value of n
+
     return Eigen::Matrix<double, 3, 1>(position, thickness, mean);
   }
 
-  bool in_between(uint32_t min, uint32_t value, uint32_t max) { return min <= value && value < max; }
+  inline bool in_between(uint32_t min, uint32_t value, uint32_t max) { return min <= value && value < max; }
 
-  bool find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted,
-                  const Eigen::Matrix<double, 3, 1>& obs, const uint32_t& t, bool horizontal, uint32_t& index)
+  void add_point_under_other(Filter& f, uint32_t t, uint32_t n, uint32_t thickness)
   {
-    bool did_match = false;
+    if (f.is_horizontal)
+      f.currently_under_other.emplace_back(t, n, thickness);
+    else
+      f.currently_under_other.emplace_back(n, t, thickness);
+  }
 
+  /**
+   * Compute list of filters that accept the current Observation
+   * @param filters Current
+   * @param obs Observation to match
+   * @param t Current t
+   * @param index Current index in n column
+   * @return The List of filters that accept the observation
+   */
+  bool find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted,
+                  const Eigen::Matrix<double, 3, 1>& obs, const uint32_t& t, uint32_t& index)
+  {
     uint32_t obs_n_min = obs(0, 0) - obs(1, 0) / 2 - 1;
     uint32_t obs_n_max = obs(0, 0) + obs(1, 0) / 2 + 1;
-
-    uint32_t n         = obs_n_min;
-    uint32_t alpha     = n + obs(1, 0);
     uint32_t obs_thick = obs(1, 0);
 
-    uint32_t i = index;
-
-    while (i < filters.size() && filters[i]->X_predicted(0, 0) - alpha < 10)
+    // Only checking the acceptation for near predictions
+    while (index < filters.size() && filters[index]->X_predicted(0, 0) - obs_n_max < 10)
     {
-      Filter& f = *filters[i];
+      Filter& f = *filters[index];
       if (accepts(f, obs, obs_n_min, obs_n_max))
-      {
         accepted.push_back(&f);
-        did_match = true;
-      }
       else if (f.observation == std::nullopt && in_between(obs_n_min, f.n_min, obs_n_max) &&
                in_between(obs_n_min, f.n_max, obs_n_max) && f.X_predicted(1, 0) < obs_thick)
       {
-        if (horizontal)
-          f.currently_under_other.emplace_back(t, round(f.X_predicted(0, 0)), round(f.X_predicted(1, 0)));
-        else
-          f.currently_under_other.emplace_back(round(f.X_predicted(0, 0)), t, round(f.X_predicted(1, 0)));
+        add_point_under_other(f, t, round(f.X_predicted(0, 0)), round(f.X_predicted(1, 0)));
       }
-      i++;
+      index++;
     }
 
-    if (i == filters.size() && filters.size())
-      i--;
+    // Check the overflow
+    if (index == filters.size() && !filters.empty())
+      index--;
 
-    while (i > 0 && filters[i]->X_predicted(0, 0) - n > 0)
-      i--;
+    // Go back with index
+    while (index > 0 && filters[index]->X_predicted(0, 0) - obs_n_max > 0)
+      index--;
 
-    index = i;
-
-    return did_match;
+    return !accepted.empty();
   }
 
+  /**
+   * Check if the filters are following the same observation
+   * @param f first filter
+   * @param fj second filter
+   * @return true if the filters are following the same observation for SEGDET_MINIMUM_FOR_FUSION length
+   */
   bool same_observation(const Filter& f, const Filter& fj)
   {
     if (f.n_values.size() < SEGDET_MINIMUM_FOR_FUSION || fj.n_values.size() < SEGDET_MINIMUM_FOR_FUSION)
       return false;
+
     for (uint32_t i = 0; i < SEGDET_MINIMUM_FOR_FUSION; i++)
     {
       auto k = f.thicknesses.size() - 1 - i;
       if (f.thicknesses[k] != fj.thicknesses[k] || f.t_values[k] != fj.t_values[k] || f.n_values[k] != fj.n_values[k])
         return false;
     }
+
     return true;
   }
 
-
+  /**
+   * Extract the segment from a filter
+   * @param filter filter from which we create the segment
+   * @param min_len
+   * @param nb_to_remove number of last pixels to remove
+   * @return the segment created calling the constructor
+   */
   Segment make_segment_from_filter(Filter& filter, uint32_t min_len, uint32_t nb_to_remove)
   {
     uint32_t last_index = filter.n_values.size() - nb_to_remove;
@@ -169,82 +183,124 @@ namespace mln::contrib::segdet
     return Segment(point, under_other, first_part_slope, last_part_slope, filter.is_horizontal);
   }
 
-  void erase_segments(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len,
-                      uint32_t j, Filter& fj)
+  /**
+   * Erase a filter adding if needed the extract segment
+   * @param filters Current list of filters
+   * @param segments Current list of segments
+   * @param min_len
+   * @param j Index of the filter to erase
+   * @param fj Filter to erase
+   */
+  void erase_filter(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len,
+                    uint32_t j, Filter& fj)
   {
     if (fj.last_integration - fj.first - SEGDET_MINIMUM_FOR_FUSION > min_len)
       segments.push_back(make_segment_from_filter(fj, min_len, SEGDET_MINIMUM_FOR_FUSION));
+
     filters.erase(filters.begin() + j);
   }
 
-
+  /**
+   * Check if a fusion with the current filter
+   * @param filters Current list of filter
+   * @param index Index of the current filter
+   * @param segments Current list of segment
+   * @param min_len
+   * @return true if happened
+   */
   bool make_potential_fusion(std::vector<std::shared_ptr<Filter>>& filters, uint32_t index,
                              std::vector<Segment>& segments, uint32_t min_len)
   {
+    auto f = filters[index];
+
     uint32_t j                          = index + 1;
     bool     current_filter_was_deleted = false;
 
-    auto f = filters[index];
     while (j < filters.size())
     {
       auto fj = filters[j];
       if (fj->observation != std::nullopt && same_observation(*f, *fj))
       {
         if (f->first < fj->first)
-        {
-          erase_segments(filters, segments, min_len, j, *fj);
-        }
+          erase_filter(filters, segments, min_len, j, *fj);
         else
         {
           current_filter_was_deleted = true;
-          erase_segments(filters, segments, min_len, index, *f);
+          erase_filter(filters, segments, min_len, index, *f);
           break;
         }
       }
+
       j++;
     }
+
     return current_filter_was_deleted;
   }
 
 
+  /**
+   * Insert f in filters sorted in increasing order following the position of the prediction
+   * @param f
+   * @param filters
+   */
   void insert_in_sorted_filter_vector(std::shared_ptr<Filter>& f, std::vector<std::shared_ptr<Filter>>& filters)
   {
     auto elm = filters.begin();
+
     while (elm != filters.end() && (*elm)->n_values[(*elm)->n_values.size() - 1] < f->n_values[f->n_values.size() - 1])
-    {
       elm++;
-    }
+
     filters.insert(elm, std::move(f));
   }
 
+  /**
+   * Say if the filter has to continue
+   * @param f filter to check
+   * @param t current t
+   * @param discontinuity discontinuity allowed
+   * @return true if the filter has to continue
+   */
   bool filter_has_to_continue(Filter& f, uint32_t t, uint32_t discontinuity)
   {
     if (t - f.last_integration < discontinuity)
-    {
       return true;
-    }
+
     if (!f.currently_under_other.empty())
     {
       auto last_t = f.is_horizontal ? f.currently_under_other[f.currently_under_other.size() - 1].x
                                     : f.currently_under_other[f.currently_under_other.size() - 1].y;
       return t - last_t <= discontinuity;
     }
+
     return false;
   }
 
+  /**
+   * Integrate observation for filters that matched an observation
+   * Select filters that have to continue
+   * Add segment in segments if needed
+   * @param filters Current filters
+   * @param segments Current segments
+   * @param t Current t
+   * @param two_matches Current time of two filters matching
+   * @param min_len
+   * @param discontinuity
+   * @return List of filters that have to continue
+   */
   std::vector<std::shared_ptr<Filter>> filter_selection(std::vector<std::shared_ptr<Filter>>& filters,
                                                         std::vector<Segment>& segments, uint32_t t,
                                                         uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
   {
     std::vector<std::shared_ptr<Filter>> filters_to_keep;
 
-    size_t i = 0;
-    while (i < filters.size())
+    size_t index = 0;
+    while (index < filters.size())
     {
-      auto f = filters[i];
+      auto f = filters[index];
+
       if (f->observation != std::nullopt)
       {
-        if (two_matches > SEGDET_MINIMUM_FOR_FUSION && make_potential_fusion(filters, i, segments, min_len))
+        if (two_matches > SEGDET_MINIMUM_FOR_FUSION && make_potential_fusion(filters, index, segments, min_len))
           continue;
 
         integrate(*f, t);
@@ -253,7 +309,7 @@ namespace mln::contrib::segdet
         {
           if (f->last_integration - f->first - SEGDET_MAX_SLOPES_TOO_LARGE > min_len)
             segments.push_back(make_segment_from_filter(*f, min_len, 0));
-          i++;
+          index++;
           continue;
         }
 
@@ -266,12 +322,19 @@ namespace mln::contrib::segdet
       }
       else if (f->last_integration - f->first > min_len)
         segments.push_back(make_segment_from_filter(*f, min_len, 0));
-      i++;
+
+      index++;
     }
+
     return filters_to_keep;
   }
 
-
+  /**
+   * Add last segment from current filters if needed
+   * @param filters Current filters
+   * @param segments Current segments
+   * @param min_len
+   */
   void to_thrash(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len)
   {
     uint32_t i = 0;
@@ -289,11 +352,21 @@ namespace mln::contrib::segdet
   }
 
 
+  /**
+   *
+   * @tparam T
+   * @tparam F
+   * @param arr1
+   * @param arr2
+   * @param arr_out
+   * @param cmp
+   */
   template <typename T, typename F>
   void merge(const std::vector<T>& arr1, const std::vector<T>& arr2, std::vector<T>& arr_out, F cmp)
   {
     size_t i = 0;
     size_t j = 0;
+
     while (i < arr1.size() && j < arr2.size())
     {
       if (cmp(arr1[i], arr2[j]))
@@ -301,39 +374,97 @@ namespace mln::contrib::segdet
       else
         arr_out.push_back(arr2[j++]);
     }
+
     while (i < arr1.size())
       arr_out.push_back(arr1[i++]);
+
     while (j < arr2.size())
       arr_out.push_back(arr2[j++]);
   }
 
-
-  std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len, uint discontinuity)
+  void set_parameters(bool is_horizontal, uint32_t& xmult, uint32_t& ymult, double& slope_max, uint32_t& n_max,
+                      uint32_t& t_max, uint32_t width, uint32_t height)
   {
-    uint32_t xmult     = 1;
-    uint32_t ymult     = 0;
-    double   slope_max = SEGDET_SLOPE_MAX_VERTICAL;
     if (is_horizontal)
     {
       xmult     = 0;
       ymult     = 1;
       slope_max = SEGDET_SLOPE_MAX_HORIZONTAL;
+      n_max     = height;
+      t_max     = width;
+    }
+    else
+    {
+      xmult     = 1;
+      ymult     = 0;
+      slope_max = SEGDET_SLOPE_MAX_VERTICAL;
+      n_max     = width;
+      t_max     = height;
+    }
+  }
+
+  bool handle_find_filter(std::vector<std::shared_ptr<Filter>>& new_filters, std::vector<Filter*>& accepted,
+                          const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max) {
+
+    auto observation_s = Observation(obs, accepted.size(), t);
+    for (auto& f : accepted)
+    {
+      auto obs_result = choose_nearest(*f, observation_s);
+      if (obs_result != std::nullopt)
+      {
+        auto obs_result_value = obs_result.value();
+        obs_result_value.match_count--;
+        if (obs_result_value.match_count == 0)
+        {
+          auto new_filter = std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs);
+
+          auto elm = new_filters.begin();
+          while (elm != new_filters.end() && (*elm)->n_values[(*elm)->n_values.size() - 1] < obs_result_value.obs(0, 0))
+          {
+            elm++;
+          }
+          new_filters.insert(elm, std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs));
+        }
+      }
     }
 
-    uint32_t n_max = image.size() * xmult + image.size(1) * ymult;
-    uint32_t t_max = image.size() * ymult + image.size(1) * xmult;
+    return observation_s.match_count > 1;
+  }
 
-    auto filters  = std::vector<std::shared_ptr<Filter>>();
-    auto segments = std::vector<Segment>();
+  /**
+   * Merge selection and new_filters in filters
+   * @param filters
+   * @param selection
+   * @param new_filters
+   */
+  void update_current_filters( std::vector<std::shared_ptr<Filter>>& filters, std::vector<std::shared_ptr<Filter>>& selection, std::vector<std::shared_ptr<Filter>>& new_filters) {
+    filters.clear();
+    filters.reserve(selection.size() + new_filters.size());
+    merge(selection, new_filters, filters,
+          [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
+            return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
+          });
+  }
 
-    uint32_t two_matches = 0;
+  std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len, uint discontinuity)
+  {
+    // Usefull parameter used in the function
+    uint32_t xmult, ymult;
+    double   slope_max;
+    uint32_t n_max, t_max;
+
+    set_parameters(is_horizontal, xmult, ymult, slope_max, n_max, t_max, image.size(), image.size(1));
+
+    auto filters  = std::vector<std::shared_ptr<Filter>>(); // List of current filters
+    auto segments = std::vector<Segment>();                 // List of current segments
+
+    uint32_t two_matches = 0; // Number of t where two segments matched the same observation
+    // Useful to NOT check if filters has to be merged
 
     for (uint32_t t = 0; t < t_max; t++)
     {
       for (auto& filter : filters)
-      {
         predict(*filter);
-      }
 
       std::vector<std::shared_ptr<Filter>> new_filters{};
       bool                                 two_matches_through_n = false;
@@ -345,40 +476,11 @@ namespace mln::contrib::segdet
         {
           Eigen::Matrix<double, 3, 1> obs = determine_observation(image, n, t, n_max, is_horizontal);
 
-          std::vector<Filter*> accepted{};
-
-          bool found = find_match(filters, accepted, obs, t, is_horizontal, filter_index);
-
-          if (!found && obs(1, 0) < SEGDET_MAX_THK)
+          std::vector<Filter*> accepted{}; // List of accepted filters by the current observation obs
+          if (!find_match(filters, accepted, obs, t, filter_index) && obs(1, 0) < SEGDET_MAX_THK)
             new_filters.push_back(std::make_shared<Filter>(is_horizontal, t, slope_max, obs));
           else
-          {
-            auto observation_s = Observation(obs, accepted.size(), t);
-            for (auto& f : accepted)
-            {
-              auto obs_result = choose_nearest(*f, observation_s);
-              if (obs_result != std::nullopt)
-              {
-                auto obs_result_value = obs_result.value();
-                obs_result_value.match_count--;
-                if (obs_result_value.match_count == 0)
-                {
-                  auto new_filter = std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs);
-                  insert_in_sorted_filter_vector(new_filter, new_filters);
-
-                  auto elm = new_filters.begin();
-                  while (elm != new_filters.end() &&
-                         (*elm)->n_values[(*elm)->n_values.size() - 1] < obs_result_value.obs(0, 0))
-                  {
-                    elm++;
-                  }
-                  new_filters.insert(elm, std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs));
-                }
-              }
-            } // for
-            if (observation_s.match_count > 1)
-              two_matches_through_n = true;
-          } // else
+            two_matches_through_n = handle_find_filter(new_filters, accepted, obs, t, is_horizontal, slope_max);
         }
       }
 
@@ -387,15 +489,8 @@ namespace mln::contrib::segdet
       else
         two_matches = 0;
 
-
       auto selection = filter_selection(filters, segments, t, two_matches, min_len, discontinuity);
-
-      filters.clear();
-      filters.reserve(selection.size() + new_filters.size());
-      merge(selection, new_filters, filters,
-            [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
-              return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
-            });
+      update_current_filters(filters, selection, new_filters);
     }
 
     to_thrash(filters, segments, min_len);
@@ -403,6 +498,12 @@ namespace mln::contrib::segdet
     return segments;
   }
 
+  /**
+   * Compute the distance between 2 points
+   * @param p1
+   * @param p2
+   * @return
+   */
   uint32_t distance_points(const Point& p1, const Point& p2)
   {
     auto xvar = p1.x - p2.x;
@@ -414,6 +515,12 @@ namespace mln::contrib::segdet
     return std::sqrt(xvar + yvar);
   }
 
+  /**
+   * Say if 2 segments have to be linked
+   * @param a
+   * @param b
+   * @return
+   */
   bool has_to_link(Segment a, Segment b)
   {
     if (std::abs(a.last_part_slope - b.first_part_slope) > SEGDET_MERGE_SLOPE_VARIATION)
@@ -426,6 +533,12 @@ namespace mln::contrib::segdet
     return false;
   }
 
+  /**
+   * Push all elements in right in left vector
+   * @tparam T
+   * @param lhs
+   * @param rhs
+   */
   template <typename T>
   void add_all(std::vector<T>& lhs, const std::vector<T>& rhs)
   {
@@ -433,6 +546,11 @@ namespace mln::contrib::segdet
       lhs.push_back(elm);
   }
 
+  /**
+   * Merge the second segment to the first
+   * @param a First segment
+   * @param b Second segment
+   */
   void merge_segments(Segment& a, const Segment& b)
   {
     if (a.is_horizontal)
@@ -448,6 +566,10 @@ namespace mln::contrib::segdet
     a.last_part_slope = b.last_part_slope;
   }
 
+  /**
+   * Call the function linking segments if needed
+   * @param segments All segments
+   */
   void segment_linking(std::vector<Segment>& segments)
   {
     size_t i = 0;
@@ -468,7 +590,13 @@ namespace mln::contrib::segdet
     }
   }
 
-
+  /**
+   * Label a pixel in img
+   * @param img Image to labelize
+   * @param label Color
+   * @param x X position
+   * @param y Y position
+   */
   void draw_labeled_pixel(image2d<uint16_t>& img, uint16_t label, int x, int y)
   {
     if (img({x, y}) != 0)
@@ -601,7 +729,6 @@ namespace mln::contrib::segdet
       k++;
     }
   }
-
 
   void remove_duplicates(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width,
                          size_t img_height)

@@ -7,15 +7,22 @@
 
 namespace mln
 {
-  enum TraversalOrder
+  struct HierarchyTraversal
   {
-    ROOT_TO_LEAVES,
-    LEAVES_TO_ROOT
+    enum Order
+    {
+      LEAVES_TO_ROOT = 0,
+      ROOT_TO_LEAVES,
+    } order = LEAVES_TO_ROOT;
+
+    bool exclude_leaves = false;
   };
+
+  std::vector<int> hierarchy_traversal(const HierarchyTree& tree, const HierarchyTraversal& traversal);
 
   template <typename T, Accumulator<T> AccumulatorType>
   std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
-                                                    TraversalOrder traversal_order);
+                                                    const HierarchyTraversal& traversal);
 
   std::vector<int> depth_attribute(const HierarchyTree& tree);
 

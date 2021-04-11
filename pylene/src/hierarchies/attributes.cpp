@@ -3,14 +3,29 @@
 
 #include "mln/hierarchies/accumulators/area_accumulator.hpp"
 #include "mln/hierarchies/accumulators/depth_accumulator.hpp"
+#include "mln/hierarchies/accumulators/extrema_accumulator.hpp"
 #include "mln/hierarchies/accumulators/volume_accumulator.hpp"
+
+#include <numeric>
 
 
 namespace mln
 {
+  std::vector<int> hierarchy_traversal(const HierarchyTree& tree, const HierarchyTraversal& traversal)
+  {
+    // Exclude root
+    std::vector<int> res((traversal.exclude_leaves ? tree.get_nb_vertices() / 2 : tree.get_nb_vertices()) - 1);
+    std::iota(res.begin(), res.end(), traversal.exclude_leaves ? tree.leaf_graph.get_nb_vertices() : 0);
+
+    if (traversal.order == HierarchyTraversal::ROOT_TO_LEAVES)
+      std::reverse(res.begin(), res.end());
+
+    return res;
+  }
+
   template <typename T, Accumulator<T> AccumulatorType>
   std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
-                                                    TraversalOrder traversal_order)
+                                                    const HierarchyTraversal& traversal)
   {
     int tree_nb_vertices = tree.get_nb_vertices();
 
@@ -18,12 +33,14 @@ namespace mln
     for (int i = 0; i < tree_nb_vertices; ++i)
       accumulators[i].set_associated_node(i);
 
-    if (traversal_order == TraversalOrder::LEAVES_TO_ROOT)
+    std::vector<int> traversal_vector = hierarchy_traversal(tree, traversal);
+
+    if (traversal.order == HierarchyTraversal::LEAVES_TO_ROOT)
     {
       for (int leaf = 0; leaf < tree.leaf_graph.get_nb_vertices(); ++leaf)
         accumulators[leaf].init();
 
-      for (int node = 0; node < tree.get_nb_vertices() - 1; ++node)
+      for (const auto& node : traversal_vector)
       {
         int parent_node = tree.get_parent(node);
         if (parent_node == -1)
@@ -35,11 +52,11 @@ namespace mln
         accumulators[parent_node].merge(accumulators[node]);
       }
     }
-    else if (traversal_order == TraversalOrder::ROOT_TO_LEAVES)
+    else if (traversal.order == HierarchyTraversal::ROOT_TO_LEAVES)
     {
       accumulators[tree_nb_vertices - 1].init();
 
-      for (int node = tree.get_nb_vertices() - 2; node >= 0; --node)
+      for (const auto& node : traversal_vector)
       {
         int parent_node = tree.get_parent(node);
         if (parent_node == -1)
@@ -62,20 +79,21 @@ namespace mln
 
   std::vector<int> depth_attribute(const HierarchyTree& tree)
   {
-    return compute_attribute_from_accumulator<int, DepthAccumulator>(tree, DepthAccumulator(),
-                                                                     TraversalOrder::ROOT_TO_LEAVES);
+    return compute_attribute_from_accumulator<int>(tree, DepthAccumulator(),
+                                                   HierarchyTraversal{HierarchyTraversal::ROOT_TO_LEAVES});
   }
 
   std::vector<int> area_attribute(const HierarchyTree& tree)
   {
-    return compute_attribute_from_accumulator<int, AreaAccumulator>(tree, AreaAccumulator(),
-                                                                    TraversalOrder::LEAVES_TO_ROOT);
+    return compute_attribute_from_accumulator<int>(tree, AreaAccumulator(), HierarchyTraversal{});
   }
 
   std::vector<int> volume_attribute(const HierarchyTree& tree)
   {
+    int nb_leaves = tree.leaf_graph.get_nb_vertices();
+
     auto diff_altitude = [&](int node) {
-      if (node < tree.leaf_graph.get_nb_vertices())
+      if (node < nb_leaves)
         return 0;
 
       int parent_node = tree.get_parent(node);
@@ -85,34 +103,22 @@ namespace mln
       return tree.leaf_graph.weight_node(parent_node) - tree.leaf_graph.weight_node(node);
     };
 
-    return compute_attribute_from_accumulator<int, VolumeAccumulator>(tree, VolumeAccumulator(diff_altitude),
-                                                                      TraversalOrder::LEAVES_TO_ROOT);
+    return compute_attribute_from_accumulator<int>(tree, VolumeAccumulator(diff_altitude),
+                                                   HierarchyTraversal{HierarchyTraversal::LEAVES_TO_ROOT});
   }
 
   std::vector<int> extrema_attribute(const HierarchyTree& tree)
   {
-    const Graph& leaf_graph = tree.leaf_graph;
-
-    int tree_nb_vertices = tree.get_nb_vertices();
-
-    std::vector<int> extrema(tree_nb_vertices, 1);
-    std::fill_n(extrema.begin(), leaf_graph.get_nb_vertices(), 0);
-
-    for (int i_node = leaf_graph.get_nb_vertices(); i_node < tree_nb_vertices - 1; ++i_node)
-    {
-      int parent_node = tree.get_parent(i_node);
+    auto same_altitude = [&](int node) {
+      int parent_node = tree.get_parent(node);
       if (parent_node == -1)
-      {
-        extrema[i_node] = -1;
-        continue;
-      }
+        return false;
 
-      bool same_weight = leaf_graph.weight_node(i_node) == leaf_graph.weight_node(parent_node);
-      extrema[parent_node] &= same_weight && extrema[i_node];
-      extrema[i_node] &= !same_weight;
-    }
+      return tree.leaf_graph.weight_node(parent_node) == tree.leaf_graph.weight_node(node);
+    };
 
-    return extrema;
+    return compute_attribute_from_accumulator<int>(tree, ExtremaAccumulator(same_altitude),
+                                                   HierarchyTraversal{HierarchyTraversal::LEAVES_TO_ROOT, true});
   }
 
   std::vector<int> height_attribute(const HierarchyTree& tree)

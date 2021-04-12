@@ -49,7 +49,7 @@ namespace mln
 
     std::function<int(int)> diff_altitude_;
 
-    SumAccumulator sum_;
+    SumAccumulator<int> sum_;
   };
 
 } // namespace mln

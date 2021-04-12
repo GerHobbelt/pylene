@@ -4,29 +4,30 @@
 
 namespace mln
 {
-  class SumAccumulator : public HierarchyAccumulatorBase<int>
+  template <typename T>
+  class SumAccumulator : public HierarchyAccumulatorBase<T>
   {
   public:
     explicit SumAccumulator()
       // Neutral element
-      : acc_(0)
+      : acc_()
     {
     }
 
     ~SumAccumulator() override = default;
 
-    inline void init(int n) override { acc_ = n; }
+    inline void init(T n) override { acc_ = n; }
 
     inline void invalidate() override { acc_ = -1; }
 
     inline void merge(SumAccumulator& other) { acc_ += other.get_value(); }
 
-    inline int get_value() const override { return acc_; }
+    inline T get_value() const override { return acc_; }
 
   private:
-    using HierarchyAccumulatorBase<int>::merge;
+    using HierarchyAccumulatorBase<T>::merge;
 
-    int acc_;
+    T acc_;
   };
 
 } // namespace mln

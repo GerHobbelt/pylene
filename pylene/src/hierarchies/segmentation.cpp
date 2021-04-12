@@ -1,7 +1,8 @@
 #include "mln/hierarchies/segmentation.hpp"
 
+#include "mln/hierarchies/accumulators/max_accumulator.hpp"
+#include "mln/hierarchies/accumulators/sum_accumulator.hpp"
 #include "mln/hierarchies/attributes.hpp"
-
 
 namespace mln
 {
@@ -11,22 +12,18 @@ namespace mln
     int qbt_nb_vertices = qbt.get_nb_vertices();
     int qbt_root        = qbt_nb_vertices - 1;
 
-    std::vector<int> qbt_computed_attribute(qbt_nb_vertices, std::numeric_limits<int>::min());
-    std::fill_n(qbt_computed_attribute.begin(), leaf_graph.get_nb_vertices(), 0);
-
-    for (int node = 0; node < qbt_root; ++node)
+    std::vector<int> different_i_node_altitude(qbt_nb_vertices, std::numeric_limits<int>::min());
+    std::fill_n(different_i_node_altitude.begin(), leaf_graph.get_nb_vertices(), 0);
+    for (int i_node = leaf_graph.get_nb_vertices(); i_node < qbt_nb_vertices - 1; ++i_node)
     {
-      int parent_node = qbt.get_parent(node);
-
-      if (node >= leaf_graph.get_nb_vertices() && leaf_graph.weight_node(parent_node) != leaf_graph.weight_node(node))
-        qbt_computed_attribute[node] = attribute[node];
-
-      qbt_computed_attribute[parent_node] = std::max(qbt_computed_attribute[parent_node], qbt_computed_attribute[node]);
+      if (leaf_graph.weight_node(qbt.get_parent(i_node)) != leaf_graph.weight_node(i_node))
+        different_i_node_altitude[i_node] = attribute[i_node];
     }
 
-    qbt_computed_attribute[qbt_root] = attribute[qbt_root];
+    different_i_node_altitude[qbt_root] = attribute[qbt_root];
 
-    return qbt_computed_attribute;
+    return compute_attribute_from_accumulator<int>(qbt, MaxAccumulator(), HierarchyTraversal{},
+                                                   different_i_node_altitude);
   }
 
   Graph watershed_graph(Graph& graph, const std::function<std::vector<int>(const HierarchyTree&)>& attribute_func)
@@ -94,19 +91,12 @@ namespace mln
 
     int width = image.width();
 
-    std::vector<rgb<int>> mean_color(tree_nb_vertices, rgb<int>{0, 0, 0});
+    std::vector<rgb<int>> colors(tree_nb_vertices, rgb<int>{0, 0, 0});
 
     for (int leaf = 0; leaf < leaf_graph.get_nb_vertices(); ++leaf)
-      mean_color[leaf] = image({leaf % width, leaf / width});
+      colors[leaf] = image({leaf % width, leaf / width});
 
-    for (int node = 0; node < tree_nb_vertices - 1; ++node)
-    {
-      int parent_node = tree.get_parent(node);
-      if (parent_node == -1)
-        continue;
-
-      mean_color[parent_node] += mean_color[node];
-    }
+    std::vector<rgb<int>> mean_color = compute_attribute_from_accumulator<rgb<int>>(tree, SumAccumulator<rgb<int>>(), HierarchyTraversal{}, colors);
 
     std::vector<int> area = area_attribute(tree);
 

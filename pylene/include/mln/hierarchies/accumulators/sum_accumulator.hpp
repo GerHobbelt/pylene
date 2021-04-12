@@ -4,22 +4,22 @@
 
 namespace mln
 {
-  class AreaAccumulator : public HierarchyAccumulatorBase<int>
+  class SumAccumulator : public HierarchyAccumulatorBase<int>
   {
   public:
-    explicit AreaAccumulator()
+    explicit SumAccumulator()
       // Neutral element
       : acc_(0)
     {
     }
 
-    ~AreaAccumulator() override = default;
+    ~SumAccumulator() override = default;
 
-    inline void init() override { acc_ = 1; }
+    inline void init(int n) override { acc_ = n; }
 
     inline void invalidate() override { acc_ = -1; }
 
-    inline void merge(AreaAccumulator& other) { acc_ += other.get_value(); }
+    inline void merge(SumAccumulator& other) { acc_ += other.get_value(); }
 
     inline int get_value() const override { return acc_; }
 

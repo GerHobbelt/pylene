@@ -10,6 +10,7 @@ namespace mln
   {
   public:
     explicit ExtremaAccumulator(std::function<bool(int)> same_altitude)
+      // Neutral element
       : acc_(1)
       , same_altitude_(std::move(same_altitude))
     {
@@ -17,7 +18,7 @@ namespace mln
 
     ~ExtremaAccumulator() override = default;
 
-    inline void init() override { acc_ = 0; }
+    inline void init(int n) override { acc_ = n; }
 
     inline void invalidate() override { acc_ = -1; }
 

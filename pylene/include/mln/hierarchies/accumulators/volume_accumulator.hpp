@@ -10,6 +10,7 @@ namespace mln
   {
   public:
     explicit VolumeAccumulator(std::function<int(int)> diff_altitude)
+      // Neutral element
       : acc_(0)
       , diff_altitude_(std::move(diff_altitude))
     {
@@ -17,24 +18,24 @@ namespace mln
 
     ~VolumeAccumulator() override = default;
 
-    inline void init() override
+    inline void init(int n) override
     {
       acc_ = 0;
-      area_.init();
+      sum_.init(n);
     }
 
     inline void invalidate() override
     {
       acc_ = -1;
-      area_.invalidate();
+      sum_.invalidate();
     }
 
     inline void merge(VolumeAccumulator& other)
     {
-      area_.merge(other.area_);
+      sum_.merge(other.sum_);
 
       int node = other.get_associated_node();
-      other.acc_ += other.area_.get_value() * diff_altitude_(node);
+      other.acc_ += other.sum_.get_value() * diff_altitude_(node);
 
       acc_ += other.get_value();
     }
@@ -48,7 +49,7 @@ namespace mln
 
     std::function<int(int)> diff_altitude_;
 
-    AreaAccumulator area_;
+    SumAccumulator sum_;
   };
 
 } // namespace mln

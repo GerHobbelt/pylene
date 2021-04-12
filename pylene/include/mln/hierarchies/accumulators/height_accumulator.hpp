@@ -18,7 +18,7 @@ namespace mln
 
     ~HeightAccumulator() override = default;
 
-    inline void init() override { acc_ = parent_altitude_(get_associated_node()); }
+    inline void init(int n) override { acc_ = n; }
 
     inline void invalidate() override { acc_ = -1; }
 

@@ -9,13 +9,13 @@ namespace mln
   public:
     explicit DepthAccumulator()
       // Neutral element
-      : acc_(-1)
+      : acc_(0)
     {
     }
 
     ~DepthAccumulator() override = default;
 
-    inline void init() override { acc_ = 0; }
+    inline void init(int n) override { acc_ = n; }
 
     inline void invalidate() override { acc_ = -1; }
 

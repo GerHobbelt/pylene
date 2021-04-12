@@ -22,7 +22,8 @@ namespace mln
 
   template <typename T, Accumulator<T> AccumulatorType>
   std::vector<T> compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
-                                                    const HierarchyTraversal& traversal);
+                                                    const HierarchyTraversal& traversal,
+                                                    std::vector<T>            init_list = std::vector<T>());
 
   std::vector<int> depth_attribute(const HierarchyTree& tree);
 

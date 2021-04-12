@@ -15,7 +15,7 @@ namespace mln
 
     virtual ~HierarchyAccumulatorBase() = default;
 
-    virtual void init() = 0;
+    virtual void init(T) = 0;
 
     virtual void invalidate() = 0;
 

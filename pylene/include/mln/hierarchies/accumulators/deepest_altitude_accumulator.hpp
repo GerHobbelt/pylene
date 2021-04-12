@@ -23,10 +23,10 @@ namespace mln
 
     ~DeepestAltitudeAccumulator() override = default;
 
-    inline void init() override
+    inline void init(std::tuple<int, int> tuple) override
     {
-      acc_            = 0;
-      node_to_minima_ = -1;
+      acc_            = std::get<0>(tuple);
+      node_to_minima_ = std::get<1>(tuple);
     }
 
     inline void invalidate() override

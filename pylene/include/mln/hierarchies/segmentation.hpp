@@ -6,15 +6,7 @@
 
 namespace mln
 {
-  enum WatershedAttribute
-  {
-    AREA = 0,
-    DYNAMIC,
-    HEIGHT,
-    DEPTH
-  };
-
-  Graph watershed_graph(Graph& graph, WatershedAttribute attribute_type);
+  Graph watershed_graph(Graph& graph, const std::function<std::vector<int>(const HierarchyTree&)>& attribute_func);
 
   /**
    * @return The nearest connected component root for each node
@@ -23,6 +15,7 @@ namespace mln
 
   std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image);
 
-  image2d<rgb8> hierarchical_segmentation(const mln::image2d<rgb8>& image, WatershedAttribute attribute_type,
-                                          double threshold);
+  image2d<rgb8> hierarchical_segmentation(const mln::image2d<rgb8>&                                    image,
+                                          const std::function<std::vector<int>(const HierarchyTree&)>& attribute_func,
+                                          double                                                       threshold);
 } // namespace mln

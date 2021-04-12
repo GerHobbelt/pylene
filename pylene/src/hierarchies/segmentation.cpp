@@ -5,29 +5,6 @@
 
 namespace mln
 {
-  static std::vector<int> get_hierarchy_attribute(const QBT& qbt, WatershedAttribute attribute_type)
-  {
-    std::vector<int> attribute;
-
-    switch (attribute_type)
-    {
-    case AREA:
-      attribute = area_attribute(qbt);
-      break;
-    case DYNAMIC:
-      attribute = dynamic_attribute(qbt);
-      break;
-    case HEIGHT:
-      attribute = height_attribute(qbt);
-      break;
-    case DEPTH:
-      attribute = depth_attribute(qbt);
-      break;
-    }
-
-    return attribute;
-  }
-
   static std::vector<int> get_qbt_computed_attribute(const Graph& leaf_graph, const QBT& qbt,
                                                      std::vector<int> attribute)
   {
@@ -52,14 +29,14 @@ namespace mln
     return qbt_computed_attribute;
   }
 
-  Graph watershed_graph(Graph& graph, WatershedAttribute attribute_type)
+  Graph watershed_graph(Graph& graph, const std::function<std::vector<int>(const HierarchyTree&)>& attribute_func)
   {
     const QEBT& qebt = graph.kruskal();
     const QBT&  qbt  = qebt.get_qbt();
 
     int qbt_nb_vertices = qbt.get_nb_vertices();
 
-    std::vector<int> attribute               = get_hierarchy_attribute(qbt, attribute_type);
+    std::vector<int> attribute               = attribute_func(qbt);
     std::vector<int> qbt_computed_attributes = get_qbt_computed_attribute(graph, qbt, attribute);
 
     std::vector<int> min_qbt_computed_attributes(qbt_nb_vertices, std::numeric_limits<int>::max());
@@ -145,11 +122,12 @@ namespace mln
     return std::vector<rgb8>(mean_color.begin(), mean_color.end());
   }
 
-  image2d<rgb8> hierarchical_segmentation(const mln::image2d<rgb8>& image, WatershedAttribute attribute_type,
-                                          double threshold)
+  image2d<rgb8> hierarchical_segmentation(const mln::image2d<rgb8>&                                    image,
+                                          const std::function<std::vector<int>(const HierarchyTree&)>& attribute_func,
+                                          double                                                       threshold)
   {
     Graph graph(image.height(), image.width(), image);
-    Graph watershed_graph = mln::watershed_graph(graph, attribute_type);
+    Graph watershed_graph = mln::watershed_graph(graph, attribute_func);
 
     const HierarchyTree& tree = watershed_graph.kruskal();
 

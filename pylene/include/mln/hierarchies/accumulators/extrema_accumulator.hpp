@@ -21,19 +21,19 @@ namespace mln
 
     inline void invalidate() override { acc_ = -1; }
 
-    inline void merge(HierarchyAccumulatorBase<int>& other) override
+    inline void merge(ExtremaAccumulator& other)
     {
-      auto& other_extrema = dynamic_cast<ExtremaAccumulator&>(other);
+      int node = other.get_associated_node();
+      acc_ &= same_altitude_(node) && other.get_value();
 
-      int node = other_extrema.get_associated_node();
-      acc_ &= same_altitude_(node) && other_extrema.get_value();
-
-      other_extrema.acc_ &= !same_altitude_(node);
+      other.acc_ &= !same_altitude_(node);
     }
 
     inline int get_value() const override { return acc_; }
 
   private:
+    using HierarchyAccumulatorBase<int>::merge;
+
     int acc_;
 
     std::function<bool(int)> same_altitude_;

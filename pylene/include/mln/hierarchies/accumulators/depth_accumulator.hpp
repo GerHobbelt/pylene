@@ -19,11 +19,13 @@ namespace mln
 
     inline void invalidate() override { acc_ = -1; }
 
-    inline void merge(HierarchyAccumulatorBase<int>& other) override { acc_ = other.get_value() + 1; }
+    inline void merge(DepthAccumulator& other) { acc_ = other.get_value() + 1; }
 
     inline int get_value() const override { return acc_; }
 
   private:
+    using HierarchyAccumulatorBase<int>::merge;
+
     int acc_;
   };
 

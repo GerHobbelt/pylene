@@ -29,21 +29,21 @@ namespace mln
       area_.invalidate();
     }
 
-    inline void merge(HierarchyAccumulatorBase<int>& other) override
+    inline void merge(VolumeAccumulator& other)
     {
-      auto& other_volume = dynamic_cast<VolumeAccumulator&>(other);
+      area_.merge(other.area_);
 
-      area_.merge(other_volume.area_);
+      int node = other.get_associated_node();
+      other.acc_ += other.area_.get_value() * diff_altitude_(node);
 
-      int node = other_volume.get_associated_node();
-      other_volume.acc_ += other_volume.area_.get_value() * diff_altitude_(node);
-
-      acc_ += other_volume.get_value();
+      acc_ += other.get_value();
     }
 
     inline int get_value() const override { return acc_; }
 
   private:
+    using HierarchyAccumulatorBase<int>::merge;
+
     int acc_;
 
     std::function<int(int)> diff_altitude_;

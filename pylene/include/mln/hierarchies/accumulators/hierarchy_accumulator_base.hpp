@@ -23,7 +23,7 @@ namespace mln
 
     inline void set_associated_node(int associated_node) { associated_node_ = associated_node; }
 
-    virtual void merge(HierarchyAccumulatorBase<T>& other) = 0;
+    virtual void merge(HierarchyAccumulatorBase<T>&){};
 
     virtual T get_value() const = 0;
 

@@ -22,15 +22,13 @@ namespace mln
 
     inline void invalidate() override { acc_ = -1; }
 
-    inline void merge(HierarchyAccumulatorBase<int>& other) override
-    {
-      auto& other_height = dynamic_cast<HeightAccumulator&>(other);
-      acc_               = std::min(acc_, other_height.acc_);
-    }
+    inline void merge(HeightAccumulator& other) { acc_ = std::min(acc_, other.acc_); }
 
     inline int get_value() const override { return parent_altitude_(get_associated_node()) - acc_; }
 
   private:
+    using HierarchyAccumulatorBase<int>::merge;
+
     int acc_;
 
     std::function<int(int)> parent_altitude_;

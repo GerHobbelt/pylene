@@ -2,6 +2,7 @@
 #include "mln/hierarchies/graph.hpp"
 
 #include "mln/hierarchies/accumulators/area_accumulator.hpp"
+#include "mln/hierarchies/accumulators/deepest_altitude_accumulator.hpp"
 #include "mln/hierarchies/accumulators/depth_accumulator.hpp"
 #include "mln/hierarchies/accumulators/extrema_accumulator.hpp"
 #include "mln/hierarchies/accumulators/height_accumulator.hpp"
@@ -146,34 +147,16 @@ namespace mln
 
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    std::vector<int> deepest_altitude(tree_nb_vertices, std::numeric_limits<int>::max());
-    std::vector<int> path_to_minima(tree_nb_vertices, -1);
+    auto internal_altitude = [&](int node) { return tree.leaf_graph.weight_node(node); };
+
+    std::vector<std::tuple<int, int>> deepest_altitude = compute_attribute_from_accumulator<std::tuple<int, int>>(
+        tree, DeepestAltitudeAccumulator(internal_altitude),
+        HierarchyTraversal{HierarchyTraversal::LEAVES_TO_ROOT, true});
 
     int root = tree_nb_vertices - 1;
 
-    // Compute deepest altitude and path to deepest minima
-    for (int node = leaf_graph.get_nb_vertices(); node < root; ++node)
-    {
-      int parent_node = tree.get_parent(node);
-      if (parent_node == -1)
-      {
-        deepest_altitude[node] = -1;
-        continue;
-      }
-
-      // Deepest non leaf node
-      if (deepest_altitude[node] == std::numeric_limits<int>::max())
-        deepest_altitude[node] = leaf_graph.weight_node(node);
-
-      if (deepest_altitude[node] < deepest_altitude[parent_node])
-      {
-        deepest_altitude[parent_node] = deepest_altitude[node];
-        path_to_minima[parent_node]   = node;
-      }
-    }
-
     std::vector<int> dynamic(tree_nb_vertices, -1);
-    dynamic[root] = leaf_graph.weight_node(root) - deepest_altitude[root];
+    dynamic[root] = leaf_graph.weight_node(root) - std::get<0>(deepest_altitude[root]);
 
     std::vector<int> minima = extrema_attribute(tree);
     std::vector<int> nearest_minima(tree_nb_vertices, -1);
@@ -202,10 +185,10 @@ namespace mln
       else
         nearest_minima[node] = nearest_minima[parent_node];
 
-      if (node == path_to_minima[parent_node])
+      if (node == std::get<1>(deepest_altitude[parent_node]))
         dynamic[node] = dynamic[parent_node];
       else
-        dynamic[node] = leaf_graph.weight_node(parent_node) - deepest_altitude[node];
+        dynamic[node] = leaf_graph.weight_node(parent_node) - std::get<0>(deepest_altitude[node]);
     }
 
     return dynamic;

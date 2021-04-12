@@ -28,12 +28,29 @@
 
 namespace mln::contrib::segdet
 {
+  /**
+   * Give the value of the pixel in (n, t) according to traversal direction
+   * @param image Image to take pixel from
+   * @param n
+   * @param t
+   * @param is_horizontal
+   * @return the value of the pixel
+   */
   uint8_t image_at(image2d<uint8_t> image, int n, int t, bool is_horizontal)
   {
     // TODO remove the check done by image.at(,) using image(,)
     return is_horizontal ? image.at({t, n}) : image.at({n, t});
   }
 
+  /**
+   * Determine the observation Matrix
+   * @param image
+   * @param n
+   * @param t
+   * @param n_max
+   * @param is_horizontal
+   * @return Observation Eigen matrix
+   */
   Eigen::Matrix<double, 3, 1> determine_observation(const image2d<uint8_t>& image, uint32_t& n, uint32_t t,
                                                     uint32_t n_max, bool is_horizontal)
   {
@@ -83,8 +100,22 @@ namespace mln::contrib::segdet
     return Eigen::Matrix<double, 3, 1>(position, thickness, mean);
   }
 
+  /**
+   * Say if a value is betwen two other
+   * @param min
+   * @param value
+   * @param max
+   * @return true if the value is between
+   */
   inline bool in_between(uint32_t min, uint32_t value, uint32_t max) { return min <= value && value < max; }
 
+  /**
+   * Add a point in the under other attribute of filter
+   * @param f Filter in which add the point
+   * @param t
+   * @param n
+   * @param thickness
+   */
   void add_point_under_other(Filter& f, uint32_t t, uint32_t n, uint32_t thickness)
   {
     if (f.is_horizontal)
@@ -94,14 +125,13 @@ namespace mln::contrib::segdet
   }
 
   /**
-   * Compute list of filters that accept the current Observation
+   * Compute list of filters that accept the current Observation, add the filter inside accepted list
    * @param filters Current
    * @param obs Observation to match
    * @param t Current t
    * @param index Current index in n column
-   * @return The List of filters that accept the observation
    */
-  bool find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted,
+  void find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted,
                   const Eigen::Matrix<double, 3, 1>& obs, const uint32_t& t, uint32_t& index)
   {
     uint32_t obs_n_min = obs(0, 0) - obs(1, 0) / 2 - 1;
@@ -129,8 +159,6 @@ namespace mln::contrib::segdet
     // Go back with index
     while (index > 0 && filters[index]->X_predicted(0, 0) - obs_n_max > 0)
       index--;
-
-    return !accepted.empty();
   }
 
   /**
@@ -351,7 +379,6 @@ namespace mln::contrib::segdet
     }
   }
 
-
   /**
    *
    * @tparam T
@@ -382,6 +409,17 @@ namespace mln::contrib::segdet
       arr_out.push_back(arr2[j++]);
   }
 
+  /**
+   * Set the parameters of the traversal according to the direction
+   * @param is_horizontal direction
+   * @param xmult
+   * @param ymult
+   * @param slope_max
+   * @param n_max
+   * @param t_max
+   * @param width Width of the image
+   * @param height Height of the image
+   */
   void set_parameters(bool is_horizontal, uint32_t& xmult, uint32_t& ymult, double& slope_max, uint32_t& n_max,
                       uint32_t& t_max, uint32_t width, uint32_t height)
   {
@@ -403,6 +441,16 @@ namespace mln::contrib::segdet
     }
   }
 
+  /**
+   * Handle case where one or more filter matched the observation
+   * @param new_filters List of new filters
+   * @param accepted List of filters that accepts the observation
+   * @param obs
+   * @param t
+   * @param is_horizontal
+   * @param slope_max
+   * @return
+   */
   bool handle_find_filter(std::vector<std::shared_ptr<Filter>>& new_filters, std::vector<Filter*>& accepted,
                           const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max) {
 
@@ -476,8 +524,9 @@ namespace mln::contrib::segdet
         {
           Eigen::Matrix<double, 3, 1> obs = determine_observation(image, n, t, n_max, is_horizontal);
 
-          std::vector<Filter*> accepted{}; // List of accepted filters by the current observation obs
-          if (!find_match(filters, accepted, obs, t, filter_index) && obs(1, 0) < SEGDET_MAX_THK)
+          std::vector<Filter*> accepted{};// List of accepted filters by the current observation obs
+          find_match(filters, accepted, obs, t, filter_index);
+          if (accepted.empty() && obs(1, 0) < SEGDET_MAX_THK)
             new_filters.push_back(std::make_shared<Filter>(is_horizontal, t, slope_max, obs));
           else
             two_matches_through_n = handle_find_filter(new_filters, accepted, obs, t, is_horizontal, slope_max);
@@ -570,7 +619,7 @@ namespace mln::contrib::segdet
    * Call the function linking segments if needed
    * @param segments All segments
    */
-  void segment_linking(std::vector<Segment>& segments)
+  void segment_link(std::vector<Segment>& segments)
   {
     size_t i = 0;
     while (i < segments.size())
@@ -591,13 +640,23 @@ namespace mln::contrib::segdet
   }
 
   /**
+    * Call segment link for horizontal and vertical segments
+    * @param pair First is horizontal segment and second vertical segments
+    */
+  void segment_linking(std::pair<std::vector<Segment>, std::vector<Segment>>& pair)
+  {
+    segment_link(pair.first);
+    segment_link(pair.second);
+  }
+
+  /**
    * Label a pixel in img
    * @param img Image to labelize
    * @param label Color
    * @param x X position
    * @param y Y position
    */
-  void draw_labeled_pixel(image2d<uint16_t>& img, uint16_t label, int x, int y)
+  void draw_labeled_pixel(image2d<uint16_t> img, uint16_t label, int x, int y)
   {
     if (img({x, y}) != 0)
       img({x, y}) = 1;
@@ -605,8 +664,14 @@ namespace mln::contrib::segdet
       img({x, y}) = label;
   }
 
-
-  void draw_labeled_point(image2d<uint16_t>& img, uint16_t label, Point point, bool is_horizontal)
+  /**
+   * Draw a pint in img
+   * @param img Image to labelize
+   * @param label Color
+   * @param point Point to draw
+   * @param is_horizontal
+   */
+  void draw_labeled_point(image2d<uint16_t> img, uint16_t label, Point point, bool is_horizontal)
   {
     auto thickness = point.thickness / 2;
     auto is_odd    = point.thickness % 2;
@@ -635,27 +700,35 @@ namespace mln::contrib::segdet
     LABELING_TYPE_HORIZONTAL,
   };
 
-  image2d<uint16_t> labeled_arr(image2d<uint16_t> out, size_t width, size_t height,
+  /**
+   * Draw segments in img out according to type
+   * @param out Image to draw in
+   * @param horizontal_segments
+   * @param vertical_segments
+   * @param type Labeling type
+   * @param include_other true if need to include under other points
+   */
+  void labeled_arr(image2d<uint16_t> out,
                                 std::vector<Segment>& horizontal_segments, std::vector<Segment>& vertical_segments,
                                 labeling_type type, bool include_other)
   {
-    (void)(width);
-    (void)(height);
-    auto                 arr      = out;
     std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
 
     for (size_t i = 0; i < segments.size(); i++)
     {
       auto segment = segments[i];
       for (auto& point : segment.points)
-        draw_labeled_point(arr, i + 3, point, segment.is_horizontal);
+        draw_labeled_point(out, i + 3, point, segment.is_horizontal);
       if (include_other)
         for (auto& point : segment.under_other)
-          draw_labeled_point(arr, 1, point, segment.is_horizontal);
+          draw_labeled_point(out, 1, point, segment.is_horizontal);
     }
-    return arr;
   }
 
+  /**
+   * Binarize the image
+   * @param img Image to binarize
+   */
   void binarize_img(image2d<uint16_t> img)
   {
     mln_foreach (auto p, img.domain())
@@ -667,12 +740,25 @@ namespace mln::contrib::segdet
     }
   }
 
+  /**
+   * Compute the intersection between two images and store it in out
+   * @param img first image
+   * @param img2 second image
+   * @param out image storing result
+   */
   void intersect(image2d<uint16_t> img, image2d<uint16_t> img2, image2d<uint16_t> out)
   {
     mln_foreach (auto pt, img.domain())
       out(pt) = img(pt) * img2(pt);
   }
 
+  /**
+   * Remove duplication of segment
+   * @param segments_to_compare
+   * @param segments_removable
+   * @param width
+   * @param height
+   */
   void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, size_t width,
                   size_t height)
   {
@@ -682,7 +768,7 @@ namespace mln::contrib::segdet
       first_output(pt) = 0;
 
     mln::io::imsave(first_output, "first_output.pgm");
-    labeled_arr(first_output, width, height, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
+    labeled_arr(first_output, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
 
     image2d<uint16_t> second_output = image2d<uint16_t>(width, height);
 
@@ -690,7 +776,7 @@ namespace mln::contrib::segdet
       second_output(pt) = 0;
 
     mln::io::imsave(second_output, "second_output.pgm");
-    labeled_arr(second_output, width, height, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
+    labeled_arr(second_output, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
 
     mln::io::imsave(first_output, "first_output.pgm");
     mln::io::imsave(second_output, "second_output.pgm");
@@ -730,6 +816,13 @@ namespace mln::contrib::segdet
     }
   }
 
+
+  /**
+   * Call remove duplicates for horizontal and vertical segments
+   * @param pair Pair (horizontal segments,vertical segments)
+   * @param img_width Width of the image where segments were extract
+   * @param img_height Height of the image where segments were extract
+   */
   void remove_duplicates(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width,
                          size_t img_height)
   {
@@ -737,15 +830,25 @@ namespace mln::contrib::segdet
     remove_dup(pair.second, pair.first, img_width, img_height);
   }
 
-
+  /**
+   * Post process segments linking them and removing duplications
+   * @param pair Pair (horizontal segments,vertical segments)
+   * @param img_width Width of the image where segments were extract
+   * @param img_height Height of the image where segments were extract
+   */
   void post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height)
   {
-    segment_linking(pair.first);
-    segment_linking(pair.second);
+    segment_linking(pair);
     remove_duplicates(pair, img_width, img_height);
   }
 
-
+  /**
+   * Compute the two traversals to detect horizontal and vertical segments
+   * @param image image to extract segment from
+   * @param min_len
+   * @param discontinuity
+   * @return Pair (horizontal segments,vertical segments)
+   */
   std::pair<std::vector<Segment>, std::vector<Segment>> process(const image2d<uint8_t>& image, uint min_len,
                                                                 uint discontinuity)
   {
@@ -756,6 +859,17 @@ namespace mln::contrib::segdet
     return std::make_pair(horizontal_segments, vertical_segments);
   }
 
+
+
+  /*** PUBLIC FUNCTION **/
+
+  /**
+   *
+   * @param image
+   * @param min_len
+   * @param discontinuity
+   * @return
+   */
   int detect_line(const mln::image2d<uint8_t>& image, uint min_len, uint discontinuity)
   {
     // TODO faire le top hat

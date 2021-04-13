@@ -453,7 +453,8 @@ namespace mln::contrib::segdet
    * @return
    */
   bool handle_find_filter(std::vector<std::shared_ptr<Filter>>& new_filters, std::vector<Filter*>& accepted,
-                          const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max) {
+                          const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max)
+  {
 
     auto observation_s = Observation(obs, accepted.size(), t);
     for (auto& f : accepted)
@@ -486,13 +487,15 @@ namespace mln::contrib::segdet
    * @param selection
    * @param new_filters
    */
-  void update_current_filters( std::vector<std::shared_ptr<Filter>>& filters, std::vector<std::shared_ptr<Filter>>& selection, std::vector<std::shared_ptr<Filter>>& new_filters) {
+  void update_current_filters(std::vector<std::shared_ptr<Filter>>& filters,
+                              std::vector<std::shared_ptr<Filter>>& selection,
+                              std::vector<std::shared_ptr<Filter>>& new_filters)
+  {
     filters.clear();
     filters.reserve(selection.size() + new_filters.size());
-    merge(selection, new_filters, filters,
-          [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
-            return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
-          });
+    merge(selection, new_filters, filters, [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
+      return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
+    });
   }
 
   std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len, uint discontinuity)
@@ -525,7 +528,7 @@ namespace mln::contrib::segdet
         {
           Eigen::Matrix<double, 3, 1> obs = determine_observation(image, n, t, n_max, is_horizontal);
 
-          std::vector<Filter*> accepted{};// List of accepted filters by the current observation obs
+          std::vector<Filter*> accepted{}; // List of accepted filters by the current observation obs
           find_match(filters, accepted, obs, t, filter_index);
           if (accepted.empty() && obs(1, 0) < SEGDET_MAX_THK)
             new_filters.push_back(std::make_shared<Filter>(is_horizontal, t, slope_max, obs));
@@ -641,9 +644,9 @@ namespace mln::contrib::segdet
   }
 
   /**
-    * Call segment link for horizontal and vertical segments
-    * @param pair First is horizontal segment and second vertical segments
-    */
+   * Call segment link for horizontal and vertical segments
+   * @param pair First is horizontal segment and second vertical segments
+   */
   void segment_linking(std::pair<std::vector<Segment>, std::vector<Segment>>& pair)
   {
     segment_link(pair.first);
@@ -709,9 +712,8 @@ namespace mln::contrib::segdet
    * @param type Labeling type
    * @param include_other true if need to include under other points
    */
-  void labeled_arr(image2d<uint16_t> out,
-                                std::vector<Segment>& horizontal_segments, std::vector<Segment>& vertical_segments,
-                                labeling_type type, bool include_other)
+  void labeled_arr(image2d<uint16_t> out, std::vector<Segment>& horizontal_segments,
+                   std::vector<Segment>& vertical_segments, labeling_type type, bool include_other)
   {
     std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
 
@@ -765,24 +767,18 @@ namespace mln::contrib::segdet
   {
     image2d<uint16_t> first_output = image2d<uint16_t>(width, height);
 
-    mln_foreach (auto pt, first_output.domain())
-      first_output(pt) = 0;
+    mln::fill(first_output, 0);
 
-    mln::io::imsave(first_output, "first_output.pgm");
     labeled_arr(first_output, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
 
     image2d<uint16_t> second_output = image2d<uint16_t>(width, height);
 
-    mln_foreach (auto pt, second_output.domain())
-      second_output(pt) = 0;
+    mln::fill(second_output, 0);
 
-    mln::io::imsave(second_output, "second_output.pgm");
     labeled_arr(second_output, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
 
-    mln::io::imsave(first_output, "first_output.pgm");
-    mln::io::imsave(second_output, "second_output.pgm");
-
-    //    auto second_output_bin = mln::view::transform(second_output, [](uint16_t p) { return (p != 0) ? 1 : 0; });
+    auto second_output_bin =
+        mln::view::transform(second_output, [](uint16_t p) -> uint8_t { return (p != 0) ? 1 : 0; });
 
     binarize_img(second_output);
 
@@ -859,7 +855,6 @@ namespace mln::contrib::segdet
 
     return std::make_pair(horizontal_segments, vertical_segments);
   }
-
 
 
   /*** PUBLIC FUNCTION **/

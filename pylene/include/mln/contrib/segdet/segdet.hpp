@@ -1,7 +1,6 @@
 #pragma once
 
 #include "segment.hpp"
-#include <Eigen/Dense>
 #include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/io/imread.hpp>
@@ -22,7 +21,7 @@ namespace mln
        * @param discontinuity The maximum accepted discontinuity for segments
        * @return A vector of detected segments
        */
-      int detect_line(const image2d<uint8_t>& image, uint min_len, uint discontinuity);
+      std::vector<Segment> detect_line(image2d<uint8_t> image, uint min_len, uint discontinuity);
 
       /**
        * Process the image

@@ -1,10 +1,11 @@
 
-
-#include "mln/contrib/segdet/segdet.hpp"
-#include "mln/contrib/segdet/segment.hpp"
+#include <Eigen/Dense>
 #include <mln/contrib/segdet/filter.hpp>
 #include <mln/contrib/segdet/linearregression.hpp>
+#include <mln/contrib/segdet/segdet.hpp>
+#include <mln/contrib/segdet/segment.hpp>
 #include <mln/core/image/ndimage.hpp>
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/image/views.hpp>
 #include <mln/io/imprint.hpp>
@@ -870,14 +871,21 @@ namespace mln::contrib::segdet
    * @param discontinuity
    * @return
    */
-  int detect_line(const mln::image2d<uint8_t>& image, uint min_len, uint discontinuity)
+  std::vector<Segment> detect_line(image2d<uint8_t> image, uint min_len, uint discontinuity)
   {
     // TODO faire le top hat
     auto p = process(image, min_len, discontinuity);
 
     post_process(p, image.size(0), image.size(1));
 
-    return 0;
+    std::vector<Segment> out;
+
+    for (auto& seg : p.first)
+      out.push_back(seg);
+    for (auto& seg : p.second)
+      out.push_back(seg);
+
+    return out;
   }
 
 } // namespace mln::contrib::segdet

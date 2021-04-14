@@ -4,8 +4,8 @@
 #include <mln/contrib/segdet/linearregression.hpp>
 #include <mln/contrib/segdet/segdet.hpp>
 #include <mln/contrib/segdet/segment.hpp>
-#include <mln/core/image/ndimage.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/image/views.hpp>
 #include <mln/io/imprint.hpp>
@@ -132,17 +132,19 @@ namespace mln::contrib::segdet
    * @param t Current t
    * @param index Current index in n column
    */
-  void find_match(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Filter*>& accepted,
-                  const Eigen::Matrix<double, 3, 1>& obs, const uint32_t& t, uint32_t& index)
+  void find_match(std::vector<Filter>& filters, std::vector<Filter*>& accepted, const Eigen::Matrix<double, 3, 1>& obs,
+                  const uint32_t& t, uint32_t& index)
   {
-    uint32_t obs_n_min = obs(0, 0) - obs(1, 0) / 2 - 1;
+    uint32_t obs_n_min = obs(0, 0) - obs(1, 0) / 2;
+    if (obs_n_min != 0)
+      obs_n_min--;
     uint32_t obs_n_max = obs(0, 0) + obs(1, 0) / 2 + 1;
     uint32_t obs_thick = obs(1, 0);
 
     // Only checking the acceptation for near predictions
-    while (index < filters.size() && filters[index]->X_predicted(0, 0) - obs_n_max < 10)
+    while (index < filters.size() && filters[index].X_predicted(0, 0) - obs_n_max < 10)
     {
-      Filter& f = *filters[index];
+      Filter& f = filters[index];
       if (accepts(f, obs, obs_n_min, obs_n_max))
         accepted.push_back(&f);
       else if (f.observation == std::nullopt && in_between(obs_n_min, f.n_min, obs_n_max) &&
@@ -158,7 +160,7 @@ namespace mln::contrib::segdet
       index--;
 
     // Go back with index
-    while (index > 0 && filters[index]->X_predicted(0, 0) - obs_n_max > 0)
+    while (index > 0 && filters[index].X_predicted(0, 0) - obs_n_max > 0)
       index--;
   }
 
@@ -175,8 +177,12 @@ namespace mln::contrib::segdet
 
     for (uint32_t i = 0; i < SEGDET_MINIMUM_FOR_FUSION; i++)
     {
-      auto k = f.thicknesses.size() - 1 - i;
-      if (f.thicknesses[k] != fj.thicknesses[k] || f.t_values[k] != fj.t_values[k] || f.n_values[k] != fj.n_values[k])
+      size_t k = f.thicknesses.size() - 1 - i;
+      size_t kj = fj.thicknesses.size() - 1 - i;
+
+      if (f.thicknesses[k] != fj.thicknesses[kj]
+          || f.t_values[k] != fj.t_values[kj]
+          || f.n_values[k] != fj.n_values[kj])
         return false;
     }
 
@@ -220,8 +226,8 @@ namespace mln::contrib::segdet
    * @param j Index of the filter to erase
    * @param fj Filter to erase
    */
-  void erase_filter(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len,
-                    uint32_t j, Filter& fj)
+  void erase_filter(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t min_len, uint32_t j,
+                    Filter& fj)
   {
     if (fj.last_integration - fj.first - SEGDET_MINIMUM_FOR_FUSION > min_len)
       segments.push_back(make_segment_from_filter(fj, min_len, SEGDET_MINIMUM_FOR_FUSION));
@@ -237,8 +243,8 @@ namespace mln::contrib::segdet
    * @param min_len
    * @return true if happened
    */
-  bool make_potential_fusion(std::vector<std::shared_ptr<Filter>>& filters, uint32_t index,
-                             std::vector<Segment>& segments, uint32_t min_len)
+  bool make_potential_fusion(std::vector<Filter>& filters, uint32_t index, std::vector<Segment>& segments,
+                             uint32_t min_len)
   {
     auto f = filters[index];
 
@@ -248,14 +254,14 @@ namespace mln::contrib::segdet
     while (j < filters.size())
     {
       auto fj = filters[j];
-      if (fj->observation != std::nullopt && same_observation(*f, *fj))
+      if (fj.observation != std::nullopt && same_observation(f, fj))
       {
-        if (f->first < fj->first)
-          erase_filter(filters, segments, min_len, j, *fj);
+        if (f.first < fj.first)
+          erase_filter(filters, segments, min_len, j, fj);
         else
         {
           current_filter_was_deleted = true;
-          erase_filter(filters, segments, min_len, index, *f);
+          erase_filter(filters, segments, min_len, index, f);
           break;
         }
       }
@@ -272,11 +278,11 @@ namespace mln::contrib::segdet
    * @param f
    * @param filters
    */
-  void insert_in_sorted_filter_vector(std::shared_ptr<Filter>& f, std::vector<std::shared_ptr<Filter>>& filters)
+  void insert_in_sorted_filter_vector(Filter& f, std::vector<Filter>& filters)
   {
     auto elm = filters.begin();
 
-    while (elm != filters.end() && (*elm)->n_values[(*elm)->n_values.size() - 1] < f->n_values[f->n_values.size() - 1])
+    while (elm != filters.end() && (*elm).n_values[(*elm).n_values.size() - 1] < f.n_values[f.n_values.size() - 1])
       elm++;
 
     filters.insert(elm, std::move(f));
@@ -286,12 +292,12 @@ namespace mln::contrib::segdet
    * Say if the filter has to continue
    * @param f filter to check
    * @param t current t
-   * @param discontinuity discontinuity allowed
+   * @param discontinuity discontinuity allowedt
    * @return true if the filter has to continue
    */
   bool filter_has_to_continue(Filter& f, uint32_t t, uint32_t discontinuity)
   {
-    if (t - f.last_integration < discontinuity)
+    if (t - f.last_integration <= discontinuity)
       return true;
 
     if (!f.currently_under_other.empty())
@@ -316,41 +322,40 @@ namespace mln::contrib::segdet
    * @param discontinuity
    * @return List of filters that have to continue
    */
-  std::vector<std::shared_ptr<Filter>> filter_selection(std::vector<std::shared_ptr<Filter>>& filters,
-                                                        std::vector<Segment>& segments, uint32_t t,
-                                                        uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
+  std::vector<Filter> filter_selection(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t t,
+                                       uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
   {
-    std::vector<std::shared_ptr<Filter>> filters_to_keep;
+    std::vector<Filter> filters_to_keep;
 
     size_t index = 0;
     while (index < filters.size())
     {
       auto f = filters[index];
 
-      if (f->observation != std::nullopt)
+      if (f.observation != std::nullopt)
       {
         if (two_matches > SEGDET_MINIMUM_FOR_FUSION && make_potential_fusion(filters, index, segments, min_len))
           continue;
 
-        integrate(*f, t);
+        integrate(f, t);
 
-        if (f->nb_current_slopes_over_slope_max > SEGDET_MAX_SLOPES_TOO_LARGE)
+        if (f.nb_current_slopes_over_slope_max > SEGDET_MAX_SLOPES_TOO_LARGE)
         {
-          if (f->last_integration - f->first - SEGDET_MAX_SLOPES_TOO_LARGE > min_len)
-            segments.push_back(make_segment_from_filter(*f, min_len, 0));
+          if (f.last_integration - f.first - SEGDET_MAX_SLOPES_TOO_LARGE > min_len)
+            segments.push_back(make_segment_from_filter(f, min_len, 0));
           index++;
           continue;
         }
 
         insert_in_sorted_filter_vector(f, filters_to_keep);
       }
-      else if (filter_has_to_continue(*f, t, discontinuity))
+      else if (filter_has_to_continue(f, t, discontinuity))
       {
-        f->S = f->S_predicted;
+        f.S = f.S_predicted;
         insert_in_sorted_filter_vector(f, filters_to_keep);
       }
-      else if (f->last_integration - f->first > min_len)
-        segments.push_back(make_segment_from_filter(*f, min_len, 0));
+      else if (f.last_integration - f.first > min_len)
+        segments.push_back(make_segment_from_filter(f, min_len, 0));
 
       index++;
     }
@@ -364,7 +369,7 @@ namespace mln::contrib::segdet
    * @param segments Current segments
    * @param min_len
    */
-  void to_thrash(std::vector<std::shared_ptr<Filter>>& filters, std::vector<Segment>& segments, uint32_t min_len)
+  void to_thrash(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t min_len)
   {
     uint32_t i = 0;
     while (i < filters.size())
@@ -373,8 +378,8 @@ namespace mln::contrib::segdet
       if (make_potential_fusion(filters, i, segments, min_len))
         continue;
 
-      if (f->last_integration - f->first > min_len)
-        segments.push_back(make_segment_from_filter(*f, min_len, 0));
+      if (f.last_integration - f.first > min_len)
+        segments.push_back(make_segment_from_filter(f, min_len, 0));
 
       i++;
     }
@@ -452,7 +457,7 @@ namespace mln::contrib::segdet
    * @param slope_max
    * @return
    */
-  bool handle_find_filter(std::vector<std::shared_ptr<Filter>>& new_filters, std::vector<Filter*>& accepted,
+  bool handle_find_filter(std::vector<Filter>& new_filters, std::vector<Filter*>& accepted,
                           const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max)
   {
 
@@ -469,11 +474,11 @@ namespace mln::contrib::segdet
           auto new_filter = std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs);
 
           auto elm = new_filters.begin();
-          while (elm != new_filters.end() && (*elm)->n_values[(*elm)->n_values.size() - 1] < obs_result_value.obs(0, 0))
+          while (elm != new_filters.end() && (*elm).n_values[(*elm).n_values.size() - 1] < obs_result_value.obs(0, 0))
           {
             elm++;
           }
-          new_filters.insert(elm, std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs));
+          new_filters.insert(elm, Filter(is_horizontal, t, slope_max, obs_result_value.obs));
         }
       }
     }
@@ -487,14 +492,13 @@ namespace mln::contrib::segdet
    * @param selection
    * @param new_filters
    */
-  void update_current_filters(std::vector<std::shared_ptr<Filter>>& filters,
-                              std::vector<std::shared_ptr<Filter>>& selection,
-                              std::vector<std::shared_ptr<Filter>>& new_filters)
+  void update_current_filters(std::vector<Filter>& filters, std::vector<Filter>& selection,
+                              std::vector<Filter>& new_filters)
   {
     filters.clear();
     filters.reserve(selection.size() + new_filters.size());
-    merge(selection, new_filters, filters, [](const std::shared_ptr<Filter>& lhs, const std::shared_ptr<Filter>& rhs) {
-      return lhs->n_values[lhs->n_values.size() - 1] < rhs->n_values[rhs->n_values.size() - 1];
+    merge(selection, new_filters, filters, [](const Filter& lhs, const Filter& rhs) {
+      return lhs.n_values[lhs.n_values.size() - 1] < rhs.n_values[rhs.n_values.size() - 1];
     });
   }
 
@@ -507,8 +511,8 @@ namespace mln::contrib::segdet
 
     set_parameters(is_horizontal, xmult, ymult, slope_max, n_max, t_max, image.size(), image.size(1));
 
-    auto filters  = std::vector<std::shared_ptr<Filter>>(); // List of current filters
-    auto segments = std::vector<Segment>();                 // List of current segments
+    auto filters  = std::vector<Filter>();  // List of current filters
+    auto segments = std::vector<Segment>(); // List of current segments
 
     uint32_t two_matches = 0; // Number of t where two segments matched the same observation
     // Useful to NOT check if filters has to be merged
@@ -516,11 +520,11 @@ namespace mln::contrib::segdet
     for (uint32_t t = 0; t < t_max; t++)
     {
       for (auto& filter : filters)
-        predict(*filter);
+        predict(filter);
 
-      std::vector<std::shared_ptr<Filter>> new_filters{};
-      bool                                 two_matches_through_n = false;
-      uint32_t                             filter_index          = 0;
+      std::vector<Filter> new_filters{};
+      bool                two_matches_through_n = false;
+      uint32_t            filter_index          = 0;
 
       for (uint32_t n = 0; n < n_max; n++)
       {
@@ -531,9 +535,10 @@ namespace mln::contrib::segdet
           std::vector<Filter*> accepted{}; // List of accepted filters by the current observation obs
           find_match(filters, accepted, obs, t, filter_index);
           if (accepted.empty() && obs(1, 0) < SEGDET_MAX_THK)
-            new_filters.push_back(std::make_shared<Filter>(is_horizontal, t, slope_max, obs));
+            new_filters.emplace_back(is_horizontal, t, slope_max, obs);
           else
-            two_matches_through_n = handle_find_filter(new_filters, accepted, obs, t, is_horizontal, slope_max);
+            two_matches_through_n =
+                handle_find_filter(new_filters, accepted, obs, t, is_horizontal, slope_max) || two_matches_through_n;
         }
       }
 
@@ -783,7 +788,7 @@ namespace mln::contrib::segdet
     binarize_img(second_output);
 
     //    auto second_output_bin_c = image2d<uint16_t>(second_output_bin);
-    mln::io::imsave(second_output, "second_output_bin.pgm");
+    //    mln::io::imsave(second_output, "second_output_bin.pgm");
 
     image2d<uint16_t> intersection = image2d<uint16_t>(width, height);
 
@@ -791,7 +796,7 @@ namespace mln::contrib::segdet
     //        mln::view::transform(first_output, second_output_bin, [](uint16_t x, uint16_t y) { return x * y; });
     intersect(first_output, second_output, intersection);
 
-    mln::io::imsave(intersection, "intersection.pgm");
+    //    mln::io::imsave(intersection, "intersection.pgm");
 
     std::vector<uint16_t> segments = std::vector<uint16_t>(segments_removable.size());
 
@@ -856,22 +861,14 @@ namespace mln::contrib::segdet
     return std::make_pair(horizontal_segments, vertical_segments);
   }
 
+  // Public functions
 
-  /*** PUBLIC FUNCTION **/
-
-  /**
-   *
-   * @param image
-   * @param min_len
-   * @param discontinuity
-   * @return
-   */
   std::vector<Segment> detect_line(image2d<uint8_t> image, uint min_len, uint discontinuity)
   {
     // TODO faire le top hat
     auto p = process(image, min_len, discontinuity);
 
-    post_process(p, image.size(0), image.size(1));
+//    post_process(p, image.size(0), image.size(1));
 
     std::vector<Segment> out;
 

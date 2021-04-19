@@ -6,38 +6,42 @@
 
 namespace mln
 {
-  class ExtremaAccumulator : public HierarchyAccumulatorBase<int>
+  class ExtremaAccumulator : public HierarchyAccumulatorBase<std::tuple<bool, bool>, int>
   {
   public:
-    explicit ExtremaAccumulator(std::function<bool(int)> same_altitude)
+    explicit ExtremaAccumulator()
       // Neutral element
-      : acc_(1)
-      , same_altitude_(std::move(same_altitude))
+      : acc_(true)
+      , parent_same_altitude_(true)
     {
     }
 
     ~ExtremaAccumulator() override = default;
 
-    inline void init(int n) override { acc_ = n; }
-
     inline void invalidate() override { acc_ = -1; }
 
-    inline void merge(ExtremaAccumulator& other)
+    inline void take(std::tuple<bool, bool> t) override
     {
-      int node = other.get_associated_node();
-      acc_ &= same_altitude_(node) && other.get_value();
-
-      other.acc_ &= !same_altitude_(node);
+      acc_                  = std::get<0>(t);
+      parent_same_altitude_ = std::get<1>(t);
     }
 
-    inline int get_value() const override { return acc_; }
+    inline void take(const ExtremaAccumulator& other) { acc_ &= other.parent_same_altitude_ && other.acc_; }
+
+    inline int get_value() const override
+    {
+      if (acc_ == -1)
+        return -1;
+
+      return acc_ && !parent_same_altitude_;
+    }
 
   private:
-    using HierarchyAccumulatorBase<int>::merge;
+    using HierarchyAccumulatorBase<std::tuple<bool, bool>, int>::take;
 
     int acc_;
 
-    std::function<bool(int)> same_altitude_;
+    bool parent_same_altitude_;
   };
 
 } // namespace mln

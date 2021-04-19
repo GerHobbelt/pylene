@@ -3,35 +3,39 @@
 #include <utility>
 
 #include "mln/hierarchies/accumulators/hierarchy_accumulator_base.hpp"
+#include "mln/hierarchies/accumulators/min_accumulator.hpp"
 
 namespace mln
 {
-  class HeightAccumulator : public HierarchyAccumulatorBase<int>
+  class HeightAccumulator : public HierarchyAccumulatorBase<std::tuple<int, int>, int>
   {
   public:
-    explicit HeightAccumulator(std::function<int(int)> parent_altitude)
+    explicit HeightAccumulator()
       // Neutral element
-      : acc_(std::numeric_limits<int>::max())
-      , parent_altitude_(std::move(parent_altitude))
+      : parent_altitude_(0)
     {
     }
 
     ~HeightAccumulator() override = default;
 
-    inline void init(int n) override { acc_ = n; }
+    inline void invalidate() override { acc_.invalidate(); }
 
-    inline void invalidate() override { acc_ = -1; }
+    inline void take(std::tuple<int, int> t) override
+    {
+      acc_.take(std::get<0>(t));
+      parent_altitude_ = std::get<1>(t);
+    }
 
-    inline void merge(HeightAccumulator& other) { acc_ = std::min(acc_, other.acc_); }
+    inline void take(const HeightAccumulator& other) { acc_.take(other.acc_); }
 
-    inline int get_value() const override { return parent_altitude_(get_associated_node()) - acc_; }
+    inline int get_value() const override { return parent_altitude_ - acc_.get_value(); }
 
   private:
-    using HierarchyAccumulatorBase<int>::merge;
+    using HierarchyAccumulatorBase<std::tuple<int, int>, int>::take;
 
-    int acc_;
+    MinAccumulator acc_;
 
-    std::function<int(int)> parent_altitude_;
+    int parent_altitude_;
   };
 
 } // namespace mln

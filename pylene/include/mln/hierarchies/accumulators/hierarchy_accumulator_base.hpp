@@ -4,33 +4,23 @@
 
 namespace mln
 {
-  template <typename T>
+  template <typename I, typename O>
   class HierarchyAccumulatorBase
   {
   public:
-    explicit HierarchyAccumulatorBase<T>()
-      : associated_node_(-1)
-    {
-    }
+    HierarchyAccumulatorBase<I, O>() = default;
 
     virtual ~HierarchyAccumulatorBase() = default;
 
-    virtual void init(T) = 0;
-
     virtual void invalidate() = 0;
 
-    inline int get_associated_node() const { return associated_node_; }
+    virtual void take(I) = 0;
 
-    inline void set_associated_node(int associated_node) { associated_node_ = associated_node; }
+    virtual void take(const HierarchyAccumulatorBase<I, O>&){};
 
-    virtual void merge(HierarchyAccumulatorBase<T>&){};
-
-    virtual T get_value() const = 0;
-
-  private:
-    int associated_node_;
+    virtual O get_value() const = 0;
   };
 
-  template <class T, class U>
-  concept Accumulator = std::is_base_of<HierarchyAccumulatorBase<U>, T>::value;
+  template <class T, typename I, typename O>
+  concept Accumulator = std::is_base_of<HierarchyAccumulatorBase<I, O>, T>::value;
 } // namespace mln

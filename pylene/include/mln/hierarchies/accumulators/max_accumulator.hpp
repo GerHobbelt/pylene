@@ -4,7 +4,7 @@
 
 namespace mln
 {
-  class MaxAccumulator : public HierarchyAccumulatorBase<int>
+  class MaxAccumulator : public HierarchyAccumulatorBase<int, int>
   {
   public:
     explicit MaxAccumulator()
@@ -15,16 +15,16 @@ namespace mln
 
     ~MaxAccumulator() override = default;
 
-    inline void init(int n) override { acc_ = n; }
-
     inline void invalidate() override { acc_ = -1; }
 
-    inline void merge(MaxAccumulator& other) { acc_ = std::max(acc_, other.get_value()); }
+    inline void take(int n) override { acc_ = n; }
+
+    inline void take(const MaxAccumulator& other) { acc_ = std::max(acc_, other.get_value()); }
 
     inline int get_value() const override { return acc_; }
 
   private:
-    using HierarchyAccumulatorBase<int>::merge;
+    using HierarchyAccumulatorBase<int, int>::take;
 
     int acc_;
   };

@@ -6,50 +6,47 @@
 
 namespace mln
 {
-  class VolumeAccumulator : public HierarchyAccumulatorBase<int>
+  // V(n) = area(n) ∗ |altitude(n) − altitude(parent(n))| + ∑c∈children(n)V(c)
+  class VolumeAccumulator : public HierarchyAccumulatorBase<std::tuple<int, int>, int>
   {
   public:
-    explicit VolumeAccumulator(std::function<int(int)> diff_altitude)
+    explicit VolumeAccumulator()
       // Neutral element
-      : acc_(0)
-      , diff_altitude_(std::move(diff_altitude))
+      : volume_sum_(0)
+      , diff_altitude_(0)
     {
     }
 
     ~VolumeAccumulator() override = default;
 
-    inline void init(int n) override
-    {
-      acc_ = 0;
-      sum_.init(n);
-    }
-
     inline void invalidate() override
     {
-      acc_ = -1;
-      sum_.invalidate();
+      area_.invalidate();
+      volume_sum_    = -1;
+      diff_altitude_ = -1;
     }
 
-    inline void merge(VolumeAccumulator& other)
+    inline void take(std::tuple<int, int> t) override
     {
-      sum_.merge(other.sum_);
-
-      int node = other.get_associated_node();
-      other.acc_ += other.sum_.get_value() * diff_altitude_(node);
-
-      acc_ += other.get_value();
+      area_.take(std::get<0>(t));
+      diff_altitude_ = std::get<1>(t);
     }
 
-    inline int get_value() const override { return acc_; }
+    inline void take(const VolumeAccumulator& other)
+    {
+      area_.take(other.area_);
+      volume_sum_ += other.get_value();
+    }
+
+    inline int get_value() const override { return area_.get_value() * diff_altitude_ + volume_sum_; }
 
   private:
-    using HierarchyAccumulatorBase<int>::merge;
+    using HierarchyAccumulatorBase<std::tuple<int, int>, int>::take;
 
-    int acc_;
+    int volume_sum_;
+    int diff_altitude_;
 
-    std::function<int(int)> diff_altitude_;
-
-    SumAccumulator<int> sum_;
+    SumAccumulator<int> area_;
   };
 
 } // namespace mln

@@ -28,7 +28,14 @@ namespace mln
 
     inline void take(const HeightAccumulator& other) { acc_.take(other.acc_); }
 
-    inline int get_value() const override { return parent_altitude_ - acc_.get_value(); }
+    inline int get_value() const override
+    {
+      // Invalid accumulator
+      if (acc_.get_value() == -1)
+        return -1;
+
+      return parent_altitude_ - acc_.get_value();
+    }
 
   private:
     using HierarchyAccumulatorBase<std::tuple<int, int>, int>::take;

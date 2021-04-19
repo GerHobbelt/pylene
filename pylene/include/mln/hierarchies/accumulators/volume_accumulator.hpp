@@ -22,8 +22,7 @@ namespace mln
     inline void invalidate() override
     {
       area_.invalidate();
-      volume_sum_    = -1;
-      diff_altitude_ = -1;
+      volume_sum_ = -1;
     }
 
     inline void take(std::tuple<int, int> t) override
@@ -38,7 +37,14 @@ namespace mln
       volume_sum_ += other.get_value();
     }
 
-    inline int get_value() const override { return area_.get_value() * diff_altitude_ + volume_sum_; }
+    inline int get_value() const override
+    {
+      // Invalid accumulator
+      if (volume_sum_ == -1)
+        return -1;
+
+      return area_.get_value() * diff_altitude_ + volume_sum_;
+    }
 
   private:
     using HierarchyAccumulatorBase<std::tuple<int, int>, int>::take;

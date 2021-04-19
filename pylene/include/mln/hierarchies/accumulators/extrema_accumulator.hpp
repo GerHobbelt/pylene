@@ -30,6 +30,7 @@ namespace mln
 
     inline int get_value() const override
     {
+      // Invalid accumulator
       if (acc_ == -1)
         return -1;
 

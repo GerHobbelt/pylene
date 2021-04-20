@@ -18,7 +18,6 @@ At first, a ``conanfile.txt`` is created.
 
     [generators]
     cmake_find_package
-    cmake
 
     [requires]
     pylene/head@lrde/unstable
@@ -27,16 +26,8 @@ At first, a ``conanfile.txt`` is created.
     [options]
     pylene:fPIC=True # or pylene:shared=True
 
-In this conanfile, two Conan's generators are used: the ``cmake`` and
-the ``cmake_find_package`` generators. In the previous section, it is specified
-that the ``cmake_find_package`` one is prefered but an issue in the Conan Center
-Index makes it unusable for Pybind11 (see `here
-<https://github.com/conan-io/conan-center-index/pull/4445>`_ for more details).
-For the same reason, the Pybind11 package is not a runtime dependency of the
-``Pylene-numpy`` library and should be specified as a dependency of the
-extension project. Finally, the `fPIC` option is specified as an option for
-Pylene, which enable to have the ``Pylene-numpy`` library during the
-dependencies installation.
+The `fPIC` option is specified as an option for Pylene, which enable to have the
+``Pylene-numpy`` library during the dependencies installation.
 
 Then, below is the ``CMakeLists.txt``:
 
@@ -45,15 +36,10 @@ Then, below is the ``CMakeLists.txt``:
     cmake_minimum_required(VERSION 3.14)
     project(pylene_extension)
 
-    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
-        message(FATAL_ERROR "Conan dit not run. Please run conan install.")
-    endif()
-    include("${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake")
-
-    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_BINARY_DIR}" "${CONAN_BUILD_DIRS_PYBIND11}")
+    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_BINARY_DIR}")
     find_package(Pylene REQUIRED)
-
-    include(pybind11Install)
+    find_package(pybind11 REQUIRED)
+    
     pybind11_add_module(pylene_extension)
     target_sources(pylene_extension PRIVATE pylene_extension.cpp)
     target_link_libraries(pylene_extension PUBLIC Pylene::Pylene-numpy)

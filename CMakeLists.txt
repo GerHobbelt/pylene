@@ -98,10 +98,6 @@ endif ()
 add_subdirectory(pylene)
 
 if (PYLENE_BUILD_PYTHON)
-  # Until the cmake_find_package conan generator will be broken for pybind11 with conan 1.33,
-  # we will use these two lines
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONAN_BUILD_MODULE_PATH_PYBIND11}")
-  include(pybind11Install)
   add_custom_target(build_python)
   add_subdirectory(pylene-python)
 endif()

@@ -12,6 +12,8 @@ if (UNIX AND NOT CYGWIN)
     endif()
 endif()
 
+find_package(pybind11 REQUIRED)
+
 # Python module for testing
 pybind11_add_module(pylena_test pylena_test.cpp)
 target_link_libraries(pylena_test PRIVATE Pylene Pylene-numpy)

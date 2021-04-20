@@ -96,7 +96,7 @@ namespace mln
     : HierarchyTree(leaf_graph)
     , qbt_(QBT(leaf_graph))
     , qt_(QT(leaf_graph))
-    , root_(qbt_.nb_vertices_, -1)
+    , root_(leaf_graph.get_nb_vertices(), -1)
   {
   }
 

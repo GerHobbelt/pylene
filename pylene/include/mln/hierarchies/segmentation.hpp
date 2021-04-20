@@ -54,11 +54,11 @@ namespace mln
 
     Graph res(graph.get_height(), graph.get_width());
 
-    const std::vector<Edge>& graph_edges = graph.get_edges();
+    const std::vector<Edge>& graph_mst = graph.mst;
 
     for (int i_node = graph.get_nb_vertices(); i_node < qbt_nb_vertices; ++i_node)
     {
-      const Edge& edge = graph_edges[graph.get_edge(i_node)];
+      const Edge& edge = graph_mst[graph.get_edge(i_node)];
       res.add_edge(std::get<0>(edge), std::get<1>(edge), min_qbt_computed_attributes[i_node]);
     }
 

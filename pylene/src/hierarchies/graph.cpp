@@ -49,29 +49,24 @@ namespace mln
   {
     auto shape = image.domain();
 
-    int x0 = shape.x();
-    int y0 = shape.y();
-
-    for (int x = 0; x < shape.height(); x++)
+    for (int y = 0; y < shape.height(); y++)
     {
-      for (int y = 0; y < shape.width(); y++)
+      for (int x = 0; x < shape.width(); x++)
       {
-        rgb8 pix = image({x0 + x, y0 + y});
+        rgb8 pix = image({x, y});
 
-        // FIXME Edges weight must be of type double
-
-        if (x0 + x < shape.height() - 1)
+        if (x < shape.width() - 1)
         {
-          rgb8   pix3    = image({x0 + x + 1, y0 + y});
+          rgb8   pix3    = image({x + 1, y});
           double weighty = sqrt(pow(pix3[0] - pix[0], 2) + pow(pix3[1] - pix[1], 2) + pow(pix3[2] - pix[2], 2));
-          this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x + 1) * shape.width() + (y0 + y), weighty);
+          this->add_edge(x + shape.width() * y, (x + 1) + shape.width() * y, weighty);
         }
 
-        if (y0 + y < shape.width() - 1)
+        if (y < shape.height() - 1)
         {
-          rgb8   pix2    = image({x0 + x, y0 + y + 1});
+          rgb8   pix2    = image({x, y + 1});
           double weightx = sqrt(pow(pix2[0] - pix[0], 2) + pow(pix2[1] - pix[1], 2) + pow(pix2[2] - pix[2], 2));
-          this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x) * shape.width() + (y0 + y + 1), weightx);
+          this->add_edge(x + shape.width() * y, x + shape.width() * (y + 1), weightx);
         }
       }
     }

@@ -177,12 +177,11 @@ namespace mln::contrib::segdet
 
     for (uint32_t i = 0; i < SEGDET_MINIMUM_FOR_FUSION; i++)
     {
-      size_t k = f.thicknesses.size() - 1 - i;
+      size_t k  = f.thicknesses.size() - 1 - i;
       size_t kj = fj.thicknesses.size() - 1 - i;
 
-      if (f.thicknesses[k] != fj.thicknesses[kj]
-          || f.t_values[k] != fj.t_values[kj]
-          || f.n_values[k] != fj.n_values[kj])
+      if (f.thicknesses[k] != fj.thicknesses[kj] || f.t_values[k] != fj.t_values[kj] ||
+          f.n_values[k] != fj.n_values[kj])
         return false;
     }
 
@@ -785,18 +784,14 @@ namespace mln::contrib::segdet
     auto second_output_bin =
         mln::view::transform(second_output, [](uint16_t p) -> uint8_t { return (p != 0) ? 1 : 0; });
 
-    binarize_img(second_output);
-
-    //    auto second_output_bin_c = image2d<uint16_t>(second_output_bin);
-    //    mln::io::imsave(second_output, "second_output_bin.pgm");
+    binarize_img(first_output);
 
     image2d<uint16_t> intersection = image2d<uint16_t>(width, height);
+    mln::fill(intersection, 0);
 
     //    auto intersection =
     //        mln::view::transform(first_output, second_output_bin, [](uint16_t x, uint16_t y) { return x * y; });
     intersect(first_output, second_output, intersection);
-
-    //    mln::io::imsave(intersection, "intersection.pgm");
 
     std::vector<uint16_t> segments = std::vector<uint16_t>(segments_removable.size());
 
@@ -868,7 +863,7 @@ namespace mln::contrib::segdet
     // TODO faire le top hat
     auto p = process(image, min_len, discontinuity);
 
-//    post_process(p, image.size(0), image.size(1));
+    post_process(p, image.size(0), image.size(1));
 
     std::vector<Segment> out;
 

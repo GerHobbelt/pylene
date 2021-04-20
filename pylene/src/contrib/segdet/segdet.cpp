@@ -161,7 +161,7 @@ namespace mln::contrib::segdet
       index--;
 
     // Go back with index
-    while (index > 0 && filters[index].X_predicted(0, 0) - obs_n_max > 0)
+    while (index > 0 && filters[index].X_predicted(0, 0) - obs_n_min > 0)
       index--;
   }
 

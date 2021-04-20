@@ -864,23 +864,38 @@ namespace mln::contrib::segdet
     return std::make_pair(horizontal_segments, vertical_segments);
   }
 
+
+  std::vector<Segment> filter_length(std::pair<std::vector<Segment>, std::vector<Segment>>& p, uint min_len)
+  {
+    std::vector<Segment> res{};
+
+    for (auto& seg : p.first)
+    {
+      if (seg.length > min_len)
+        res.push_back(seg);
+    }
+    for (auto& seg : p.second)
+    {
+      if (seg.length > min_len)
+        res.push_back(seg);
+    }
+
+    return res;
+  }
+
   // Public functions
 
   std::vector<Segment> detect_line(image2d<uint8_t> image, uint min_len, uint discontinuity)
   {
     // TODO faire le top hat
-    auto p = process(image, min_len, discontinuity);
+
+    auto p = process(image, 5, discontinuity);
 
     post_process(p, image.size(0), image.size(1));
 
-    std::vector<Segment> out;
+    auto res = filter_length(p, min_len);
 
-    for (auto& seg : p.first)
-      out.push_back(seg);
-    for (auto& seg : p.second)
-      out.push_back(seg);
-
-    return out;
+    return res;
   }
 
 } // namespace mln::contrib::segdet

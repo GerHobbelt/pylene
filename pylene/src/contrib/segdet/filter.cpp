@@ -37,10 +37,14 @@ namespace mln::contrib::segdet
 
     // Now calculate the variance
     auto variance_func = [&mean, &sz](double accumulator, const double& val) {
-      return accumulator + ((val - mean) * (val - mean) / ((double)sz - 1));
+      return accumulator + ((val - mean) * (val - mean));
     };
 
-    return sqrt(std::accumulate(vec.begin(), vec.end(), 0.0, variance_func));
+    auto variance = std::accumulate(vec.begin(), vec.end(), 0.0, variance_func) / ((double)sz);
+
+    auto result = sqrt(variance);
+
+    return result;
   }
 
   void compute_sigmas(Filter& f)

@@ -38,14 +38,13 @@ namespace mln
       };
       struct Segment
       {
-
         Segment(std::vector<Point> points_vector, std::vector<Point> underOther, float firstPartSlope, float lastPartSlope,
                 bool isHorizontal)
           : points(std::move(points_vector))
           , under_other(std::move(underOther))
           , first_part_slope(firstPartSlope)
           , last_part_slope(lastPartSlope)
-          , length(points.size() + under_other.size())
+          , length( 1 + (isHorizontal ? points[points.size() - 1].x - points[0].x : points[points.size() - 1].y - points[0].y))
           , is_horizontal(isHorizontal)
         {
           nb_pixels = 0;

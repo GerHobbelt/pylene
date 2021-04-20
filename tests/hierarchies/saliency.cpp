@@ -77,10 +77,10 @@ TEST(Hierarchies, Khalimsky_Grid)
 
   const HierarchyTree& bpt = graph.kruskal();
 
-  image2d<int> khalimsky_grid = saliency_khalimsky_grid(bpt);
+  image2d<double> khalimsky_grid = saliency_khalimsky_grid(bpt);
 
   for (int i = 0; i < 9 * 9; ++i)
   {
-    ASSERT_EQ(expected_khalimsky_grid[i], khalimsky_grid({i % 9, i / 9}));
+    ASSERT_EQ(expected_khalimsky_grid[i], static_cast<int>(khalimsky_grid({i % 9, i / 9})));
   }
 }

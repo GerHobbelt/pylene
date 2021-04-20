@@ -23,4 +23,7 @@ namespace mln
 
   template <class T, typename I, typename O>
   concept Accumulator = std::is_base_of<HierarchyAccumulatorBase<I, O>, T>::value;
+
+  template <typename T>
+  concept Attribute = std::is_same<T, int>::value or std::is_same<T, double>::value;
 } // namespace mln

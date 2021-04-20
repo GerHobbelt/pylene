@@ -43,7 +43,7 @@ TEST(Hierarchies, Segmentation_Watershed_graph)
 
   Graph graph = create_graph_from_gray_image(gray_image, 4, 4);
 
-  Graph             watershed_graph = mln::watershed_graph(graph, mln::area_attribute);
+  Graph             watershed_graph = mln::watershed_graph<int>(graph, mln::area_attribute);
   std::vector<Edge> watershed_edges = watershed_graph.get_edges();
 
   for (int i = 0; i < 15; ++i)

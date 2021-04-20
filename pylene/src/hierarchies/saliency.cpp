@@ -48,7 +48,7 @@ namespace mln
     return res;
   }
 
-  image2d<int> saliency_khalimsky_grid(const HierarchyTree& tree)
+  image2d<double> saliency_khalimsky_grid(const HierarchyTree& tree)
   {
     const Graph& leaf_graph = tree.leaf_graph;
 
@@ -58,16 +58,16 @@ namespace mln
     int res_height = 2 * height + 1;
     int res_width  = 2 * width + 1;
 
-    image2d<int> res(res_width, res_height);
+    image2d<double> res(res_width, res_height);
     fill(res, 0);
 
     const std::vector<Edge>& s_map = saliency_map(tree);
 
     for (const auto& edge : s_map)
     {
-      int u = std::get<0>(edge);
-      int v = std::get<1>(edge);
-      int w = std::get<2>(edge);
+      int    u = std::get<0>(edge);
+      int    v = std::get<1>(edge);
+      double w = std::get<2>(edge);
 
       int u_pos[2] = {u % width, u / width};
       int v_pos[2] = {v % width, v / width};
@@ -82,7 +82,7 @@ namespace mln
     {
       for (int x = 0; x < res_width; x += 2)
       {
-        int max = std::numeric_limits<int>::min();
+        double max = std::numeric_limits<double>::min();
 
         if (y + 1 < height)
           max = std::max(max, res({x, y + 1}));

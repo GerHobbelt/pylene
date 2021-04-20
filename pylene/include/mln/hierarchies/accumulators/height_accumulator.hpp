@@ -7,7 +7,7 @@
 
 namespace mln
 {
-  class HeightAccumulator : public HierarchyAccumulatorBase<std::tuple<int, int>, int>
+  class HeightAccumulator : public HierarchyAccumulatorBase<std::tuple<double, double>, double>
   {
   public:
     explicit HeightAccumulator()
@@ -20,7 +20,7 @@ namespace mln
 
     inline void invalidate() override { acc_.invalidate(); }
 
-    inline void take(std::tuple<int, int> t) override
+    inline void take(std::tuple<double, double> t) override
     {
       acc_.take(std::get<0>(t));
       parent_altitude_ = std::get<1>(t);
@@ -28,7 +28,7 @@ namespace mln
 
     inline void take(const HeightAccumulator& other) { acc_.take(other.acc_); }
 
-    inline int get_value() const override
+    inline double get_value() const override
     {
       // Invalid accumulator
       if (acc_.get_value() == -1)
@@ -38,11 +38,11 @@ namespace mln
     }
 
   private:
-    using HierarchyAccumulatorBase<std::tuple<int, int>, int>::take;
+    using HierarchyAccumulatorBase<std::tuple<double, double>, double>::take;
 
-    MinAccumulator acc_;
+    MinAccumulator<double> acc_;
 
-    int parent_altitude_;
+    double parent_altitude_;
   };
 
 } // namespace mln

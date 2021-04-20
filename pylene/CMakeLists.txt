@@ -83,7 +83,6 @@ target_sources(Pylene PRIVATE
         src/hierarchies/graph.cpp
         src/hierarchies/saliency.cpp
         src/hierarchies/attributes.cpp
-        src/hierarchies/segmentation.cpp
         src/io/freeimage_plugin.cpp
         src/io/imprint.cpp
         src/io/imread.cpp

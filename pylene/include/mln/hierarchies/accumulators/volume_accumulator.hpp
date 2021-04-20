@@ -7,7 +7,7 @@
 namespace mln
 {
   // V(n) = area(n) ∗ |altitude(n) − altitude(parent(n))| + ∑c∈children(n)V(c)
-  class VolumeAccumulator : public HierarchyAccumulatorBase<std::tuple<int, int>, int>
+  class VolumeAccumulator : public HierarchyAccumulatorBase<std::tuple<double, double>, double>
   {
   public:
     explicit VolumeAccumulator()
@@ -25,7 +25,7 @@ namespace mln
       volume_sum_ = -1;
     }
 
-    inline void take(std::tuple<int, int> t) override
+    inline void take(std::tuple<double, double> t) override
     {
       area_.take(std::get<0>(t));
       diff_altitude_ = std::get<1>(t);
@@ -37,7 +37,7 @@ namespace mln
       volume_sum_ += other.get_value();
     }
 
-    inline int get_value() const override
+    inline double get_value() const override
     {
       // Invalid accumulator
       if (volume_sum_ == -1)
@@ -47,12 +47,12 @@ namespace mln
     }
 
   private:
-    using HierarchyAccumulatorBase<std::tuple<int, int>, int>::take;
+    using HierarchyAccumulatorBase<std::tuple<double, double>, double>::take;
 
-    int volume_sum_;
-    int diff_altitude_;
+    double volume_sum_;
+    double diff_altitude_;
 
-    SumAccumulator<int> area_;
+    SumAccumulator<double> area_;
   };
 
 } // namespace mln

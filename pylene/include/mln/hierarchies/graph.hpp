@@ -12,7 +12,7 @@
 
 namespace mln
 {
-  using Edge = std::tuple<int, int, int>;
+  using Edge = std::tuple<int, int, double>;
 
   // Image graph (4/8 adjacency)
   class Graph
@@ -35,9 +35,9 @@ namespace mln
 
     inline const std::vector<Edge>& get_edges() const { return edges_; }
 
-    void add_edge(int source, int destination, int weight);
-    int  get_edge(int n) const;
-    int  weight_node(int n) const;
+    void   add_edge(int source, int destination, double weight);
+    int    get_edge(int n) const;
+    double weight_node(int n) const;
 
     QEBT kruskal();
 

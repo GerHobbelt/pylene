@@ -2,14 +2,14 @@
 
 namespace mln
 {
-  void Graph::add_edge(int source, int destination, int weight)
+  void Graph::add_edge(int source, int destination, double weight)
   {
     this->edges_.emplace_back(std::make_tuple(source, destination, weight));
   }
 
   int Graph::get_edge(int n) const { return n - this->nb_vertices_; }
 
-  int Graph::weight_node(int n) const
+  double Graph::weight_node(int n) const
   {
     auto triplet = this->mst[this->get_edge(n)];
 
@@ -62,15 +62,15 @@ namespace mln
 
         if (x0 + x < shape.height() - 1)
         {
-          rgb8 pix3    = image({x0 + x + 1, y0 + y});
-          int  weighty = sqrt(pow(pix3[0] - pix[0], 2) + pow(pix3[1] - pix[1], 2) + pow(pix3[2] - pix[2], 2));
+          rgb8   pix3    = image({x0 + x + 1, y0 + y});
+          double weighty = sqrt(pow(pix3[0] - pix[0], 2) + pow(pix3[1] - pix[1], 2) + pow(pix3[2] - pix[2], 2));
           this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x + 1) * shape.width() + (y0 + y), weighty);
         }
 
         if (y0 + y < shape.width() - 1)
         {
-          rgb8 pix2    = image({x0 + x, y0 + y + 1});
-          int  weightx = sqrt(pow(pix2[0] - pix[0], 2) + pow(pix2[1] - pix[1], 2) + pow(pix2[2] - pix[2], 2));
+          rgb8   pix2    = image({x0 + x, y0 + y + 1});
+          double weightx = sqrt(pow(pix2[0] - pix[0], 2) + pow(pix2[1] - pix[1], 2) + pow(pix2[2] - pix[2], 2));
           this->add_edge((x0 + x) * shape.width() + (y0 + y), (x0 + x) * shape.width() + (y0 + y + 1), weightx);
         }
       }

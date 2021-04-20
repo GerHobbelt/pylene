@@ -89,7 +89,7 @@ TEST(Hierarchies, Volume_Attribute)
 
   const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> volume = volume_attribute(bpt);
+  std::vector<double> volume = volume_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
@@ -133,7 +133,7 @@ TEST(Hierarchies, Height_Attribute)
 
   const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> height = height_attribute(bpt);
+  std::vector<double> height = height_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {
@@ -155,7 +155,7 @@ TEST(Hierarchies, Dynamic_Attribute)
 
   const HierarchyTree& bpt = graph.kruskal();
 
-  std::vector<int> dynamic = dynamic_attribute(bpt);
+  std::vector<double> dynamic = dynamic_attribute(bpt);
 
   for (int i = 0; i < 31; ++i)
   {

@@ -34,26 +34,27 @@ namespace mln
     return compute_attribute_from_accumulator<int, int>(tree, SumAccumulator<int>(), one_leaves);
   }
 
-  std::vector<int> volume_attribute(const HierarchyTree& tree)
+  std::vector<double> volume_attribute(const HierarchyTree& tree)
   {
-    std::vector<std::tuple<int, int>> leaves(tree.leaf_graph.get_nb_vertices(), std::make_tuple<>(1, 0));
+    std::vector<std::tuple<double, double>> leaves(tree.leaf_graph.get_nb_vertices(), std::make_tuple<>(1, 0));
 
     auto diff_altitude = [&](int node) {
       int parent_node = tree.get_parent(node);
       if (parent_node == -1)
-        return -1;
+        return -1.;
 
       return tree.leaf_graph.weight_node(parent_node) - tree.leaf_graph.weight_node(node);
     };
 
-    std::vector<std::tuple<int, int>> edges(tree.get_nb_vertices() - tree.leaf_graph.get_nb_vertices());
+    std::vector<std::tuple<double, double>> edges(tree.get_nb_vertices() - tree.leaf_graph.get_nb_vertices());
     for (int i_node = tree.leaf_graph.get_nb_vertices(); i_node < tree.get_nb_vertices() - 1; ++i_node)
       edges[i_node - tree.leaf_graph.get_nb_vertices()] = std::make_tuple<>(0, diff_altitude(i_node));
 
     // Root node
     edges[tree.get_nb_vertices() - tree.leaf_graph.get_nb_vertices() - 1] = std::make_tuple<>(0, 0);
 
-    return compute_attribute_from_accumulator<std::tuple<int, int>, int>(tree, VolumeAccumulator(), leaves, edges);
+    return compute_attribute_from_accumulator<std::tuple<double, double>, double>(tree, VolumeAccumulator(), leaves,
+                                                                                  edges);
   }
 
   std::vector<int> extrema_attribute(const HierarchyTree& tree)
@@ -76,21 +77,21 @@ namespace mln
                                                                            true);
   }
 
-  std::vector<int> height_attribute(const HierarchyTree& tree)
+  std::vector<double> height_attribute(const HierarchyTree& tree)
   {
     auto parent_altitude = [&](int node) {
       int parent_node = tree.get_parent(node);
       if (parent_node == -1)
-        return -1;
+        return -1.;
 
       return tree.leaf_graph.weight_node(parent_node);
     };
 
-    std::vector<std::tuple<int, int>> leaves(tree.leaf_graph.get_nb_vertices());
+    std::vector<std::tuple<double, double>> leaves(tree.leaf_graph.get_nb_vertices());
     for (int leaf = 0; leaf < tree.leaf_graph.get_nb_vertices(); ++leaf)
       leaves[leaf] = std::make_tuple<>(parent_altitude(leaf), parent_altitude(leaf));
 
-    std::vector<std::tuple<int, int>> edges(tree.get_nb_vertices() - tree.leaf_graph.get_nb_vertices());
+    std::vector<std::tuple<double, double>> edges(tree.get_nb_vertices() - tree.leaf_graph.get_nb_vertices());
     for (int i_node = tree.leaf_graph.get_nb_vertices(); i_node < tree.get_nb_vertices() - 1; ++i_node)
     {
       edges[i_node - tree.leaf_graph.get_nb_vertices()] =
@@ -101,17 +102,18 @@ namespace mln
     edges[root - tree.leaf_graph.get_nb_vertices()] =
         std::make_tuple<>(std::numeric_limits<int>::max(), tree.leaf_graph.weight_node(root));
 
-    return compute_attribute_from_accumulator<std::tuple<int, int>, int>(tree, HeightAccumulator(), leaves, edges);
+    return compute_attribute_from_accumulator<std::tuple<double, double>, double>(tree, HeightAccumulator(), leaves,
+                                                                                  edges);
   }
 
-  std::vector<int> dynamic_attribute(const HierarchyTree& tree)
+  std::vector<double> dynamic_attribute(const HierarchyTree& tree)
   {
     const Graph& leaf_graph = tree.leaf_graph;
 
     int tree_nb_vertices = tree.get_nb_vertices();
 
-    std::vector<int> deepest_altitude(tree_nb_vertices, std::numeric_limits<int>::max());
-    std::vector<int> path_to_minima(tree_nb_vertices, -1);
+    std::vector<double> deepest_altitude(tree_nb_vertices, std::numeric_limits<double>::max());
+    std::vector<double> path_to_minima(tree_nb_vertices, -1);
 
     int root = tree_nb_vertices - 1;
 
@@ -126,7 +128,7 @@ namespace mln
       }
 
       // Deepest non leaf node
-      if (deepest_altitude[node] == std::numeric_limits<int>::max())
+      if (deepest_altitude[node] == std::numeric_limits<double>::max())
         deepest_altitude[node] = leaf_graph.weight_node(node);
 
       if (deepest_altitude[node] < deepest_altitude[parent_node])
@@ -136,7 +138,7 @@ namespace mln
       }
     }
 
-    std::vector<int> dynamic(tree_nb_vertices, -1);
+    std::vector<double> dynamic(tree_nb_vertices, -1);
     dynamic[root] = leaf_graph.weight_node(root) - deepest_altitude[root];
 
     std::vector<int> minima = extrema_attribute(tree);

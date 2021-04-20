@@ -318,12 +318,12 @@ namespace mln::contrib::segdet
    * @param segments Current segments
    * @param t Current t
    * @param two_matches Current time of two filters matching
-   * @param min_len
+   * @param min_len_embryo
    * @param discontinuity
    * @return List of filters that have to continue
    */
   std::vector<Filter> filter_selection(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t t,
-                                       uint32_t two_matches, uint32_t min_len, uint32_t discontinuity)
+                                       uint32_t two_matches, uint32_t min_len_embryo, uint32_t discontinuity)
   {
     std::vector<Filter> filters_to_keep;
 
@@ -334,7 +334,7 @@ namespace mln::contrib::segdet
 
       if (f.observation != std::nullopt)
       {
-        if (two_matches > SEGDET_MINIMUM_FOR_FUSION && make_potential_fusion(filters, index, segments, min_len))
+        if (two_matches > SEGDET_MINIMUM_FOR_FUSION && make_potential_fusion(filters, index, segments, min_len_embryo))
           continue;
 
         integrate(f, t);
@@ -342,8 +342,8 @@ namespace mln::contrib::segdet
 
         if (f.nb_current_slopes_over_slope_max > SEGDET_MAX_SLOPES_TOO_LARGE)
         {
-          if (f.last_integration - f.first - SEGDET_MAX_SLOPES_TOO_LARGE > min_len)
-            segments.push_back(make_segment_from_filter(f, min_len, 0));
+          if (f.last_integration - f.first - SEGDET_MAX_SLOPES_TOO_LARGE > min_len_embryo)
+            segments.push_back(make_segment_from_filter(f, min_len_embryo, 0));
           index++;
           continue;
         }
@@ -355,8 +355,8 @@ namespace mln::contrib::segdet
         f.S = f.S_predicted;
         insert_in_sorted_filter_vector(f, filters_to_keep);
       }
-      else if (f.last_integration - f.first > min_len)
-        segments.push_back(make_segment_from_filter(f, min_len, 0));
+      else if (f.last_integration - f.first > min_len_embryo)
+        segments.push_back(make_segment_from_filter(f, min_len_embryo, 0));
 
       index++;
     }
@@ -504,7 +504,7 @@ namespace mln::contrib::segdet
     });
   }
 
-  std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len, uint discontinuity)
+  std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len_embryo, uint discontinuity)
   {
     // Usefull parameter used in the function
     uint32_t xmult, ymult;
@@ -553,12 +553,12 @@ namespace mln::contrib::segdet
         two_matches = 0;
 
       // Selection for next turn
-      selection = filter_selection(filters, segments, t, two_matches, min_len, discontinuity);
+      selection = filter_selection(filters, segments, t, two_matches, min_len_embryo, discontinuity);
       // Sort filters according to their position prediction
       update_current_filters(filters, selection, new_filters);
     }
 
-    to_thrash(filters, segments, min_len);
+    to_thrash(filters, segments, min_len_embryo);
 
     return segments;
   }
@@ -854,12 +854,12 @@ namespace mln::contrib::segdet
    * @param discontinuity
    * @return Pair (horizontal segments,vertical segments)
    */
-  std::pair<std::vector<Segment>, std::vector<Segment>> process(const image2d<uint8_t>& image, uint min_len,
+  std::pair<std::vector<Segment>, std::vector<Segment>> process(const image2d<uint8_t>& image, uint min_len_embryo,
                                                                 uint discontinuity)
   {
     // TODO Multi threading, splitter l'image
-    std::vector<Segment> horizontal_segments = traversal(image, true, min_len, discontinuity);
-    std::vector<Segment> vertical_segments   = traversal(image, false, min_len, discontinuity);
+    std::vector<Segment> horizontal_segments = traversal(image, true, min_len_embryo, discontinuity);
+    std::vector<Segment> vertical_segments   = traversal(image, false, min_len_embryo, discontinuity);
 
     return std::make_pair(horizontal_segments, vertical_segments);
   }
@@ -889,7 +889,7 @@ namespace mln::contrib::segdet
   {
     // TODO faire le top hat
 
-    auto p = process(image, 5, discontinuity);
+    auto p = process(image, min(5U, min_len), discontinuity);
 
     post_process(p, image.size(0), image.size(1));
 

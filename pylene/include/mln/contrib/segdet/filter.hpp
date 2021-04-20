@@ -11,6 +11,10 @@
 #define SEGDET_VARIANCE_THICKNESS 1
 #define SEGDET_VARIANCE_LUMINOSITY 12
 
+#define SEGDET_DEFAULT_SIGMA_POS 2
+#define SEGDET_DEFAULT_SIGMA_THK 2
+#define SEGDET_DEFAULT_SIGMA_LUM 57
+
 namespace mln::contrib::segdet
 {
   /**
@@ -71,9 +75,9 @@ namespace mln::contrib::segdet
       , observation_distance(0)
       , last_integration(t_integration)
     {
-      first                            = t_integration;
-      t_values                         = std::vector<uint32_t>({t_integration});
-      n_values                         = std::vector<uint32_t>({static_cast<uint32_t>(observation(0, 0))});
+      first    = t_integration;
+      t_values = std::vector<uint32_t>({t_integration});
+      n_values = std::vector<uint32_t>({static_cast<uint32_t>(observation(0, 0))});
 
       slopes                           = std::vector<double>({0});
       thicknesses                      = std::vector<double>({observation(1, 0)});
@@ -81,16 +85,16 @@ namespace mln::contrib::segdet
       nb_current_slopes_over_slope_max = 0;
       first_slope                      = std::nullopt;
 
-      under_other                      = std::vector<Point>();
-      currently_under_other            = std::vector<Point>();
-      segment_points                   = std::vector<Point>();
+      under_other           = std::vector<Point>();
+      currently_under_other = std::vector<Point>();
+      segment_points        = std::vector<Point>();
 
       n_min = 0;
       n_max = 0;
 
-      sigma_position = 0;
-      sigma_thickness = 0;
-      sigma_luminosity = 0;
+      sigma_position   = SEGDET_DEFAULT_SIGMA_POS;
+      sigma_thickness  = SEGDET_DEFAULT_SIGMA_THK;
+      sigma_luminosity = SEGDET_DEFAULT_SIGMA_LUM;
 
       S_predicted = Eigen::Matrix<double, 4, 1>::Zero();
       X_predicted = Eigen::Matrix<double, 3, 1>::Zero();
@@ -138,6 +142,13 @@ namespace mln::contrib::segdet
    * @param f The filter for which to update
    */
   void predict(Filter& f);
+
+  /**
+   * Update the given filter if enough values by computing the standard deviations of the position, thickness and
+   * luminosity vectors
+   * @param f
+   */
+  void compute_sigmas(Filter& f);
 
   /**
    * The accepts method will check if the given filter and observation are compatible

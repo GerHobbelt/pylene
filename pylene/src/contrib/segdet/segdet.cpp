@@ -337,6 +337,7 @@ namespace mln::contrib::segdet
           continue;
 
         integrate(f, t);
+        compute_sigmas(f);
 
         if (f.nb_current_slopes_over_slope_max > SEGDET_MAX_SLOPES_TOO_LARGE)
         {

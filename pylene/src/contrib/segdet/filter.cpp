@@ -14,11 +14,6 @@
 #define SEGDET_SIGMA_THK_MIN 1.5
 #define SEGDET_SIGMA_LUM_MIN 13
 
-#define SEGDET_DEFAULT_SIGMA_POS 2
-#define SEGDET_DEFAULT_SIGMA_THK 2
-#define SEGDET_DEFAULT_SIGMA_LUM 57
-
-
 namespace mln::contrib::segdet
 {
 
@@ -48,10 +43,6 @@ namespace mln::contrib::segdet
     return sqrt(std::accumulate(vec.begin(), vec.end(), 0.0, variance_func));
   }
 
-  /**
-   * Update the given filter by computing the standard deviations of the position, thickness and luminosity vectors
-   * @param f
-   */
   void compute_sigmas(Filter& f)
   {
     if (f.n_values.size() > SEGDET_MIN_NB_VALUES_SIGMA)
@@ -59,12 +50,6 @@ namespace mln::contrib::segdet
       f.sigma_position   = std(f.n_values) + SEGDET_SIGMA_POS_MIN + f.currently_under_other.size() * 0.2;
       f.sigma_thickness  = std(f.thicknesses) + SEGDET_SIGMA_THK_MIN;
       f.sigma_luminosity = std(f.luminosities) + SEGDET_SIGMA_LUM_MIN;
-    }
-    else
-    {
-      f.sigma_position   = SEGDET_DEFAULT_SIGMA_POS;
-      f.sigma_thickness  = SEGDET_DEFAULT_SIGMA_THK;
-      f.sigma_luminosity = SEGDET_DEFAULT_SIGMA_LUM;
     }
   }
 
@@ -81,8 +66,6 @@ namespace mln::contrib::segdet
     f.W = Eigen::Matrix<double, 4, 1>(0, 0, 0, 0);
 
     f.observation = std::nullopt;
-
-    compute_sigmas(f);
   }
 
   /**

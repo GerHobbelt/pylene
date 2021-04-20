@@ -67,7 +67,8 @@ namespace mln::contrib::segdet
 
     f.H = A * f.H * A_transpose;
 
-    f.W = Eigen::Matrix<double, 4, 1>(0, 0, 0, 0);
+    f.W(0, 0) = 0;
+    f.W(1, 0) = 0;
 
     f.observation = std::nullopt;
   }
@@ -94,7 +95,7 @@ namespace mln::contrib::segdet
       return false;
     }
 
-    if (min > f.n_max || max < f.n_min)
+    if (f.n_max < min || max < f.n_min)
       return false;
 
     return accepts_sigma(f.X_predicted(0, 0), obs(0, 0), f.sigma_position) &&
@@ -185,6 +186,7 @@ namespace mln::contrib::segdet
   void integrate(Filter& f, uint32_t t)
   {
     auto& observation = f.observation.value().obs;
+
     if (!f.currently_under_other.empty())
     {
       for (auto& elm : f.currently_under_other)

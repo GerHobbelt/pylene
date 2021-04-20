@@ -138,6 +138,7 @@ namespace mln::contrib::segdet
     uint32_t obs_n_min = obs(0, 0) - obs(1, 0) / 2;
     if (obs_n_min != 0)
       obs_n_min--;
+
     uint32_t obs_n_max = obs(0, 0) + obs(1, 0) / 2 + 1;
     uint32_t obs_thick = obs(1, 0);
 
@@ -460,24 +461,25 @@ namespace mln::contrib::segdet
   bool handle_find_filter(std::vector<Filter>& new_filters, std::vector<Filter*>& accepted,
                           const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max)
   {
-
     auto observation_s = Observation(obs, accepted.size(), t);
+
     for (auto& f : accepted)
     {
       auto obs_result = choose_nearest(*f, observation_s);
+
       if (obs_result != std::nullopt)
       {
         auto obs_result_value = obs_result.value();
         obs_result_value.match_count--;
+
         if (obs_result_value.match_count == 0)
         {
           auto new_filter = std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs);
 
           auto elm = new_filters.begin();
-          while (elm != new_filters.end() && (*elm).n_values[(*elm).n_values.size() - 1] < obs_result_value.obs(0, 0))
-          {
+          while (elm != new_filters.end() && elm->n_values[elm->n_values.size() - 1] < obs_result_value.obs(0, 0))
             elm++;
-          }
+
           new_filters.insert(elm, Filter(is_horizontal, t, slope_max, obs_result_value.obs));
         }
       }
@@ -511,8 +513,10 @@ namespace mln::contrib::segdet
 
     set_parameters(is_horizontal, xmult, ymult, slope_max, n_max, t_max, image.size(), image.size(1));
 
-    auto filters  = std::vector<Filter>();  // List of current filters
-    auto segments = std::vector<Segment>(); // List of current segments
+    auto                filters  = std::vector<Filter>();  // List of current filters
+    auto                segments = std::vector<Segment>(); // List of current segments
+    std::vector<Filter> new_filters{};
+    std::vector<Filter> selection{};
 
     uint32_t two_matches = 0; // Number of t where two segments matched the same observation
     // Useful to NOT check if filters has to be merged
@@ -522,9 +526,10 @@ namespace mln::contrib::segdet
       for (auto& filter : filters)
         predict(filter);
 
-      std::vector<Filter> new_filters{};
-      bool                two_matches_through_n = false;
-      uint32_t            filter_index          = 0;
+
+      new_filters.clear();
+      bool     two_matches_through_n = false;
+      uint32_t filter_index          = 0;
 
       for (uint32_t n = 0; n < n_max; n++)
       {
@@ -547,7 +552,9 @@ namespace mln::contrib::segdet
       else
         two_matches = 0;
 
-      auto selection = filter_selection(filters, segments, t, two_matches, min_len, discontinuity);
+      // Selection for next turn
+      selection = filter_selection(filters, segments, t, two_matches, min_len, discontinuity);
+      // Sort filters according to their position prediction
       update_current_filters(filters, selection, new_filters);
     }
 

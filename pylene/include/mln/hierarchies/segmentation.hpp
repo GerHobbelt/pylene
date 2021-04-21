@@ -68,7 +68,7 @@ namespace mln
   /**
    * @return The nearest connected component root for each node
    */
-  std::vector<int> threshold_cut_labelization(const HierarchyTree& tree, double threshold)
+  inline std::vector<int> threshold_cut_labelization(const HierarchyTree& tree, double threshold)
   {
     int          tree_nb_vertices = tree.get_nb_vertices();
     const Graph& leaf_graph       = tree.leaf_graph;
@@ -94,20 +94,21 @@ namespace mln
     return labels;
   }
 
-  std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image)
+  inline std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image)
   {
     int          tree_nb_vertices = tree.get_nb_vertices();
     const Graph& leaf_graph       = tree.leaf_graph;
 
     int width = image.width();
 
-    std::vector<rgb<int>> colors(leaf_graph.get_nb_vertices(), rgb<int>{0, 0, 0});
+    std::vector<rgb<unsigned long long>> colors(leaf_graph.get_nb_vertices(), rgb<unsigned long long>{0, 0, 0});
 
     for (int leaf = 0; leaf < leaf_graph.get_nb_vertices(); ++leaf)
       colors[leaf] = image({leaf % width, leaf / width});
 
-    std::vector<rgb<int>> mean_color =
-        compute_attribute_from_accumulator<rgb<int>, rgb<int>>(tree, SumAccumulator<rgb<int>>(), colors);
+    std::vector<rgb<unsigned long long>> mean_color =
+        compute_attribute_from_accumulator<rgb<unsigned long long>, rgb<unsigned long long>>(
+            tree, SumAccumulator<rgb<unsigned long long>>(), colors);
 
     std::vector<int> area = area_attribute(tree);
 
@@ -124,7 +125,7 @@ namespace mln
   }
 
   template <Attribute AttributeType>
-  image2d<rgb8>
+  inline image2d<rgb8>
   hierarchical_segmentation(const mln::image2d<rgb8>&                                              image,
                             const std::function<std::vector<AttributeType>(const HierarchyTree&)>& attribute_func,
                             double                                                                 threshold)

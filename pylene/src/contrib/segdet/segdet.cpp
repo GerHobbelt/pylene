@@ -114,7 +114,7 @@ namespace mln::contrib::segdet
    * @param max
    * @return true if the value is between
    */
-  inline bool in_between(uint32_t min, uint32_t value, uint32_t max) { return min <= value && value < max; }
+  inline bool in_between(double min, double value, double max) { return min <= value && value < max; }
 
   /**
    * Add a point in the under other attribute of filter
@@ -148,8 +148,7 @@ namespace mln::contrib::segdet
     if (obs_n_min != 0)
       obs_n_min--;
 
-    uint32_t obs_n_max = obs(0, 0) + obs(1, 0) / 2 + 1;
-    uint32_t obs_thick = obs(1, 0);
+    uint32_t obs_n_max = obs(0, 0) + obs_thick_d2 + 1;
 
     // Only checking the acceptation for near predictions
     while (index < filters.size() && filters[index].X_predicted(0, 0) - obs_n_max < 10)

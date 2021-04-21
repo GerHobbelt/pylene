@@ -122,8 +122,8 @@ namespace mln::contrib::segdet
     Eigen::Matrix<double, 3, 1> N; // measured noise matrix
     Eigen::Matrix<double, 4, 4> H; // S prediction error variance matrix
 
-    u_int32_t n_min;
-    u_int32_t n_max;
+    double n_min;
+    double n_max;
     double    sigma_position;
     double    sigma_thickness;
     double    sigma_luminosity;

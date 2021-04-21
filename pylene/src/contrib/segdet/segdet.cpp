@@ -86,10 +86,16 @@ namespace mln::contrib::segdet
     while (luminosities_list[n - n_start] > m_lum)
       n += 1;
 
-    uint32_t k = luminosities_list.size() - 1;
-    while (luminosities_list[k] > m_lum)
-      k--;
-    n_end = n_start + k + 1; // Plus one because the last pixel has to be included
+    while (image_at(image, n_end, t, is_horizontal) > m_lum)
+      n_end--;
+    n_end++;
+
+      /*
+      uint32_t k = luminosities_list.size() - 1;
+      while (luminosities_list[k] > m_lum)
+        k--;
+      n_end = n_start + k + 1; // Plus one because the last pixel has to be included
+    */
 
     thickness         = n_end - n;
     uint32_t position = n + thickness / 2;

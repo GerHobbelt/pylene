@@ -19,13 +19,13 @@ namespace mln
   {
   public:
     Graph(int height, int width)
-      : nb_vertices_(height * width)
-      , height_(height)
+      : height_(height)
       , width_(width)
+      , nb_vertices_(height_ * width_)
     {
     }
 
-    Graph(int height, int width, const mln::image2d<rgb8>& image);
+    explicit Graph(const mln::image2d<rgb8>& image);
 
     inline int get_nb_vertices() const { return nb_vertices_; }
 
@@ -44,10 +44,9 @@ namespace mln
     std::vector<Edge> mst;
 
   private:
-    int nb_vertices_;
-
     int height_;
     int width_;
+    int nb_vertices_;
 
     std::vector<Edge> edges_;
   };

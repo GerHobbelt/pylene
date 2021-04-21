@@ -129,7 +129,7 @@ namespace mln
                             const std::function<std::vector<AttributeType>(const HierarchyTree&)>& attribute_func,
                             double                                                                 threshold)
   {
-    Graph graph(image.height(), image.width(), image);
+    Graph graph(image);
     Graph watershed_graph = mln::watershed_graph<AttributeType>(graph, attribute_func);
 
     const HierarchyTree& tree = watershed_graph.kruskal();

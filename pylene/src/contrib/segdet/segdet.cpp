@@ -135,7 +135,10 @@ namespace mln::contrib::segdet
   void find_match(std::vector<Filter>& filters, std::vector<Filter*>& accepted, const Eigen::Matrix<double, 3, 1>& obs,
                   const uint32_t& t, uint32_t& index)
   {
-    uint32_t obs_n_min = obs(0, 0) - obs(1, 0) / 2;
+    uint32_t obs_thick = obs(1, 0);
+    uint32_t obs_thick_d2 = obs_thick / 2;
+
+    uint32_t obs_n_min = obs(0, 0) - obs_thick_d2;
     if (obs_n_min != 0)
       obs_n_min--;
 

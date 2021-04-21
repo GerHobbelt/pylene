@@ -62,8 +62,9 @@ namespace mln::contrib::segdet
     f.S_predicted = A * f.S + f.W;
     f.X_predicted = C * f.S_predicted + f.N;
 
-    f.n_min = f.X_predicted(0, 0) - f.X_predicted(1, 0) / 2;
-    f.n_max = f.X_predicted(0, 0) + f.X_predicted(1, 0) / 2;
+    uint32_t thik_d2 = f.X_predicted(1, 0) / 2;
+    f.n_min = f.X_predicted(0, 0) - thik_d2;
+    f.n_max = f.X_predicted(0, 0) + thik_d2;
 
     f.H = A * f.H * A_transpose;
 

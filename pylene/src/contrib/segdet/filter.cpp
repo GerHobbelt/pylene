@@ -11,7 +11,7 @@
 #define SEGDET_MIN_NB_VALUES_SIGMA 10
 
 #define SEGDET_SIGMA_POS_MIN 1
-#define SEGDET_SIGMA_THK_MIN 1.5
+#define SEGDET_SIGMA_THK_MIN 0.64F
 #define SEGDET_SIGMA_LUM_MIN 13
 
 namespace mln::contrib::segdet
@@ -52,7 +52,7 @@ namespace mln::contrib::segdet
     if (f.n_values.size() > SEGDET_MIN_NB_VALUES_SIGMA)
     {
       f.sigma_position   = std(f.n_values) + SEGDET_SIGMA_POS_MIN + f.currently_under_other.size() * 0.2;
-      f.sigma_thickness  = std(f.thicknesses) + SEGDET_SIGMA_THK_MIN;
+      f.sigma_thickness  = std(f.thicknesses) * 2 + SEGDET_SIGMA_THK_MIN;
       f.sigma_luminosity = std(f.luminosities) + SEGDET_SIGMA_LUM_MIN;
     }
   }

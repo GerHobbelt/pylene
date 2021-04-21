@@ -14,7 +14,6 @@ namespace mln
 {
   using Edge = std::tuple<int, int, double>;
 
-  // Image graph (4/8 adjacency)
   class Graph
   {
   public:
@@ -25,6 +24,9 @@ namespace mln
     {
     }
 
+    /**
+     * Generate a 4 adjacency graph from an image
+     */
     explicit Graph(const mln::image2d<rgb8>& image);
 
     inline int get_nb_vertices() const { return nb_vertices_; }

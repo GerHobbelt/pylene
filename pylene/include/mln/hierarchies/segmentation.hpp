@@ -10,10 +10,19 @@
 
 namespace mln
 {
+  /**
+   * Get the attribute at the time of the merging on the Binary Partition Tree
+   *
+   * @tparam AttributeType Attribute Type
+   *
+   * @param qbt The Binary Partition Tree where we flood the attribute
+   * @param attribute Attribute computed on the Binary Partition Tree
+   */
   template <Attribute AttributeType>
-  inline std::vector<AttributeType> get_qbt_computed_attribute(const Graph& leaf_graph, const QBT& qbt,
-                                                               std::vector<AttributeType> attribute)
+  inline std::vector<AttributeType> get_qbt_computed_attribute(const QBT& qbt, std::vector<AttributeType> attribute)
   {
+    const Graph& leaf_graph = qbt.leaf_graph;
+
     int qbt_nb_vertices   = qbt.get_nb_vertices();
     int graph_nb_vertices = leaf_graph.get_nb_vertices();
     int qbt_root          = qbt_nb_vertices - 1;
@@ -33,6 +42,15 @@ namespace mln
                                                                             leaves, edges);
   }
 
+  /**
+   * Compute the watershed graph from an initial adjacency graph and an attribute function
+   * To obtain the second hierarchy, the kruskal method have to be called on the watershed graph
+   *
+   * @tparam AttributeType Attribute Type
+   *
+   * @param graph Initial adjacency graph computed on an image
+   * @param attribute_func Attribute function
+   */
   template <Attribute AttributeType>
   inline Graph watershed_graph(Graph&                                                                 graph,
                                const std::function<std::vector<AttributeType>(const HierarchyTree&)>& attribute_func)
@@ -43,7 +61,7 @@ namespace mln
     int qbt_nb_vertices = qbt.get_nb_vertices();
 
     std::vector<AttributeType> attribute               = attribute_func(qbt);
-    std::vector<AttributeType> qbt_computed_attributes = get_qbt_computed_attribute<>(graph, qbt, attribute);
+    std::vector<AttributeType> qbt_computed_attributes = get_qbt_computed_attribute<>(qbt, attribute);
 
     std::vector<AttributeType> min_qbt_computed_attributes(qbt_nb_vertices, std::numeric_limits<AttributeType>::max());
     for (int node = 0; node < qbt_nb_vertices - 1; ++node)
@@ -66,6 +84,12 @@ namespace mln
   }
 
   /**
+   * Label all nodes with the nearest connected component root of the tree they belong
+   * determined by the cut of the Hierarchy Tree with a threshold
+   *
+   * @param tree Hierarchy Tree were the cut will be performed
+   * @param threshold Value in [0, 1] that represent the altitude percentage of the cut
+   *
    * @return The nearest connected component root for each node
    */
   inline std::vector<int> threshold_cut_labelization(const HierarchyTree& tree, double threshold)
@@ -94,6 +118,12 @@ namespace mln
     return labels;
   }
 
+  /**
+   * Compute the mean color per node
+   *
+   * @param tree Hierarchy Tree
+   * @param image Initial image from which the Hierarchy Tree has been computed
+   */
   inline std::vector<rgb8> mean_color_per_node(const HierarchyTree& tree, const image2d<rgb8>& image)
   {
     int          tree_nb_vertices = tree.get_nb_vertices();
@@ -124,6 +154,18 @@ namespace mln
     return std::vector<rgb8>(mean_color.begin(), mean_color.end());
   }
 
+  /**
+   * General function that encapsulate the flow of hierarchical segmentations
+   *
+   * @tparam AttributeType Attribute Type
+   *
+   * @param image Image where the hierarchical segmentation will be applied
+   * @param attribute_func Attribute function that will define the second hierarchy (used to reduce over-segmentation)
+   * @param threshold Value in [0, 1] that represent the wanted number of details in the resulting image
+   *                  The lower the threshold, the greater the details on the resulting image
+   *
+   * @return Segmented image
+   */
   template <Attribute AttributeType>
   inline image2d<rgb8>
   hierarchical_segmentation(const mln::image2d<rgb8>&                                              image,
@@ -135,6 +177,8 @@ namespace mln
 
     const HierarchyTree& tree = watershed_graph.kruskal();
 
+    // FIXME threshold has to be unexpectedly low to obtain good images
+    //       It should should be a value in [0, 1] that represent a percentage
     std::vector<int>  labels     = threshold_cut_labelization(tree, threshold);
     std::vector<rgb8> mean_color = mean_color_per_node(tree, image);
 

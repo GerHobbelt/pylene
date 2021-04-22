@@ -15,7 +15,8 @@ target_sources(Pylene-numpy PRIVATE src/core/image_cast.cpp
                                     src/core/numpy_format.cpp)
 
 target_link_libraries(Pylene-numpy PUBLIC Pylene)
-target_link_libraries(Pylene-numpy PRIVATE fmt::fmt pybind11::headers)
+target_link_libraries(Pylene-numpy PRIVATE fmt::fmt)
+target_include_directories(Pylene-numpy PRIVATE ${pybind11_INCLUDE_DIRS})
 
 pybind11_add_module(pylena)
 target_link_libraries(pylena PRIVATE Pylene Pylene-numpy)

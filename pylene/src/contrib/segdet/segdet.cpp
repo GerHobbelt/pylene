@@ -5,9 +5,24 @@
 #include <mln/contrib/segdet/linearregression.hpp>
 #include <mln/contrib/segdet/segdet.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/algorithm/transform.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
+#include <mln/core/image/views.hpp>
+#include <mln/core/neighborhood/c4.hpp>
+#include <mln/core/neighborhood/c8.hpp>
+#include <mln/core/se/rect2d.hpp>
 #include <mln/io/imprint.hpp>
 #include <mln/io/imsave.hpp>
+#include <mln/morpho/dynamic_filter.hpp>
+#include <mln/morpho/reconstruction.hpp>
+#include <mln/morpho/closing.hpp>
+#include <mln/morpho/opening.hpp>
+#include <utility>
+
+
+#include <numeric>
+#include <utility>
 
 #define SEGDET_SLOPE_MAX_VERTICAL 1.05
 #define SEGDET_SLOPE_MAX_HORIZONTAL 1.0
@@ -848,6 +863,31 @@ namespace mln::contrib::segdet
     auto res = filter_length(p, min_len);
 
     return res;
+  }
+  mln::image2d<uint8_t> preprocess_img(mln::image2d<mln::rgb8> img)
+  {
+    // TODO check that underlying image is a real rgb image
+
+    mln::image2d<uint8_t> out = mln::transform(std::move(img), [](mln::rgb8 p) -> uint8_t {
+      double r = p[0];
+      double g = p[1];
+      double b = p[2];
+      return 0.2125 * r + 0.7154 * g + 0.0721 * b;
+    });
+
+//    auto er = mln::morpho::erosion(out, mln::se::rect2d(11, 11));
+//    auto markers = mln::transform(out, [](uint8_t p) -> uint8_t {return p + 0.6 * 255;});
+    auto dyn = mln::morpho::dynamic_closing(out, mln::c4, 0.6*255);
+
+//    auto dyn = mln::morpho::closing_by_reconstruction(er, markers, mln::c4);
+
+    out = mln::transform(out, dyn, [](uint8_t lhs, uint8_t rhs) -> uint8_t {
+      return 255 - rhs + lhs;
+    });
+
+//    out = mln::morpho::dilation(out, mln::se::rect2d(11, 11));
+
+    return out;
   }
 
 } // namespace mln::contrib::segdet

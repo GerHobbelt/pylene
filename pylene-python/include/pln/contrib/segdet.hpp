@@ -1,5 +1,6 @@
 #pragma once
 #include <mln/contrib/segdet/segdet.hpp>
+#include <utility>
 
 
 using sorry_edwin =
@@ -28,4 +29,12 @@ namespace pln::contrib::segdet
 
     return out;
   }
+
+  mln::ndbuffer_image preprocess(mln::ndbuffer_image img)
+  {
+    auto img2d = img.__cast<mln::rgb8, 2>();
+    mln::image2d<uint8_t> out =  mln::contrib::segdet::preprocess_img(std::move(img2d));
+    return std::move(out);
+  }
+
 } // namespace pln::contrib::segdet

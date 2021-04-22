@@ -3,15 +3,15 @@
 #include "segment.hpp"
 #include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/ndimage.hpp>
+#include <mln/core/image/view/rgb.hpp>
 #include <mln/io/imread.hpp>
+#include <mln/core/colors.hpp>
+
+#include <mln/morpho/erosion.hpp>
 #include <utility>
 
 
-namespace mln
-{
-  namespace contrib
-  {
-    namespace segdet
+namespace mln::contrib::segdet
     {
 
       /**
@@ -32,6 +32,9 @@ namespace mln
        */
       std::pair<std::vector<Segment>, std::vector<Segment>> process(const image2d<uint8_t>& image, uint min_len,
                                                                     uint discontinuity);
-    } // namespace segdet
-  }   // namespace contrib
-} // namespace mln
+
+
+      mln::image2d<uint8_t> preprocess_img(mln::image2d<mln::rgb8> img);
+
+
+    } // namespace mln

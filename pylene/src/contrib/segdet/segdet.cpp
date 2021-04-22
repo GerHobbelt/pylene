@@ -1,19 +1,13 @@
 
 #include <Eigen/Dense>
+#include <algorithm>
 #include <mln/contrib/segdet/filter.hpp>
 #include <mln/contrib/segdet/linearregression.hpp>
 #include <mln/contrib/segdet/segdet.hpp>
-#include <mln/contrib/segdet/segment.hpp>
 #include <mln/core/algorithm/fill.hpp>
-#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
-#include <mln/core/image/views.hpp>
 #include <mln/io/imprint.hpp>
-#include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-
-#include <numeric>
-#include <utility>
 
 #define SEGDET_SLOPE_MAX_VERTICAL 1.05
 #define SEGDET_SLOPE_MAX_HORIZONTAL 1.0
@@ -280,22 +274,6 @@ namespace mln::contrib::segdet
     return current_filter_was_deleted;
   }
 
-
-  /**
-   * Insert f in filters sorted in increasing order following the position of the prediction
-   * @param f
-   * @param filters
-   */
-  void insert_in_sorted_filter_vector(Filter& f, std::vector<Filter>& filters)
-  {
-    auto elm = filters.begin();
-
-    while (elm != filters.end() && (*elm).n_values[(*elm).n_values.size() - 1] < f.n_values[f.n_values.size() - 1])
-      elm++;
-
-    filters.insert(elm, std::move(f));
-  }
-
   /**
    * Say if the filter has to continue
    * @param f filter to check
@@ -356,12 +334,12 @@ namespace mln::contrib::segdet
           continue;
         }
 
-        insert_in_sorted_filter_vector(f, filters_to_keep);
+        filters_to_keep.push_back(f);
       }
       else if (filter_has_to_continue(f, t, discontinuity))
       {
         f.S = f.S_predicted;
-        insert_in_sorted_filter_vector(f, filters_to_keep);
+        filters_to_keep.push_back(f);
       }
       else if (f.last_integration - f.first > min_len_embryo)
         segments.push_back(make_segment_from_filter(f, min_len_embryo, 0));
@@ -392,36 +370,6 @@ namespace mln::contrib::segdet
 
       i++;
     }
-  }
-
-  /**
-   *
-   * @tparam T
-   * @tparam F
-   * @param arr1
-   * @param arr2
-   * @param arr_out
-   * @param cmp
-   */
-  template <typename T, typename F>
-  void merge(const std::vector<T>& arr1, const std::vector<T>& arr2, std::vector<T>& arr_out, F cmp)
-  {
-    size_t i = 0;
-    size_t j = 0;
-
-    while (i < arr1.size() && j < arr2.size())
-    {
-      if (cmp(arr1[i], arr2[j]))
-        arr_out.push_back(arr1[i++]);
-      else
-        arr_out.push_back(arr2[j++]);
-    }
-
-    while (i < arr1.size())
-      arr_out.push_back(arr1[i++]);
-
-    while (j < arr2.size())
-      arr_out.push_back(arr2[j++]);
   }
 
   /**
@@ -481,15 +429,7 @@ namespace mln::contrib::segdet
         obs_result_value.match_count--;
 
         if (obs_result_value.match_count == 0)
-        {
-          auto new_filter = std::make_shared<Filter>(is_horizontal, t, slope_max, obs_result_value.obs);
-
-          auto elm = new_filters.begin();
-          while (elm != new_filters.end() && elm->n_values[elm->n_values.size() - 1] < obs_result_value.obs(0, 0))
-            elm++;
-
-          new_filters.insert(elm, Filter(is_horizontal, t, slope_max, obs_result_value.obs));
-        }
+          new_filters.emplace_back(is_horizontal, t, slope_max, obs_result_value.obs);
       }
     }
 
@@ -506,10 +446,12 @@ namespace mln::contrib::segdet
                               std::vector<Filter>& new_filters)
   {
     filters.clear();
-    filters.reserve(selection.size() + new_filters.size());
-    merge(selection, new_filters, filters, [](const Filter& lhs, const Filter& rhs) {
-      return lhs.n_values[lhs.n_values.size() - 1] < rhs.n_values[rhs.n_values.size() - 1];
-    });
+
+    for (auto& f : selection)
+      filters.push_back(f);
+
+    for (auto& f : new_filters)
+      filters.push_back(f);
   }
 
   std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len_embryo, uint discontinuity)
@@ -534,6 +476,7 @@ namespace mln::contrib::segdet
       for (auto& filter : filters)
         predict(filter);
 
+      std::sort(filters.begin(), filters.end(), [](Filter f1, Filter f2) { return f1.S_predicted(0, 0) < f2.S_predicted(0, 0) ;});
 
       new_filters.clear();
       bool     two_matches_through_n = false;
@@ -562,7 +505,7 @@ namespace mln::contrib::segdet
 
       // Selection for next turn
       selection = filter_selection(filters, segments, t, two_matches, min_len_embryo, discontinuity);
-      // Sort filters according to their position prediction
+      // Merge selection and new_filters in filters
       update_current_filters(filters, selection, new_filters);
     }
 
@@ -897,7 +840,8 @@ namespace mln::contrib::segdet
   {
     // TODO faire le top hat
 
-    auto p = process(image, min(5U, min_len), discontinuity);
+    uint min_len_embryo = 5U < min_len ? 5U : min_len;
+    auto p = process(image, min_len_embryo, discontinuity);
 
     post_process(p, image.size(0), image.size(1));
 

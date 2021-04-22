@@ -36,7 +36,7 @@ namespace mln::contrib::segdet
     const double mean = std::accumulate(vec.begin(), vec.end(), 0.0) / sz;
 
     // Now calculate the variance
-    auto variance_func = [&mean, &sz](double accumulator, const double& val) {
+    auto variance_func = [&mean](double accumulator, const double& val) {
       return accumulator + ((val - mean) * (val - mean));
     };
 
@@ -51,9 +51,9 @@ namespace mln::contrib::segdet
   {
     if (f.n_values.size() > SEGDET_MIN_NB_VALUES_SIGMA)
     {
-      f.sigma_position   = std(f.n_values) + SEGDET_SIGMA_POS_MIN + f.currently_under_other.size() * 0.2;
-      f.sigma_thickness  = std(f.thicknesses) * 2 + SEGDET_SIGMA_THK_MIN;
-      f.sigma_luminosity = std(f.luminosities) + SEGDET_SIGMA_LUM_MIN;
+      f.sigma_position   = std<uint32_t>(f.n_values) + SEGDET_SIGMA_POS_MIN + f.currently_under_other.size() * 0.2;
+      f.sigma_thickness  = std<double>(f.thicknesses) * 2 + SEGDET_SIGMA_THK_MIN;
+      f.sigma_luminosity = std<double>(f.luminosities) + SEGDET_SIGMA_LUM_MIN;
     }
   }
 

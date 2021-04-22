@@ -14,7 +14,7 @@ target_include_directories(Pylene-numpy PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT
 target_sources(Pylene-numpy PRIVATE src/core/image_cast.cpp
                                     src/core/numpy_format.cpp)
 
-target_link_libraries(Pylene-numpy PUBLIC Pylene)
+target_link_libraries(Pylene-numpy PUBLIC Pylene ${pybind11_python_link_helper_LINK_LIBS})
 target_link_libraries(Pylene-numpy PRIVATE fmt::fmt)
 target_include_directories(Pylene-numpy PRIVATE ${pybind11_INCLUDE_DIRS})
 

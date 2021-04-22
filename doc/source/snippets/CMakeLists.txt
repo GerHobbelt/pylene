@@ -70,7 +70,6 @@ target_link_libraries(doc-lib Pylene::Pylene)
 link_libraries(Pylene::Pylene)
 link_libraries(doc-lib)
 
-find_package(Eigen3)
 add_executable(erosion-cli erosion-cli.cpp)
 add_executable(staff_lines staff_lines.cpp)
 add_executable(component_tree_1 component_tree_1.cpp)
@@ -80,10 +79,7 @@ add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
-add_executable(seg_det seg_det.cpp)
 
-
-target_link_libraries(seg_det PRIVATE Eigen3::Eigen3)
 target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)
 
 # for program_options, need to separate CONAN and regular FindBoost

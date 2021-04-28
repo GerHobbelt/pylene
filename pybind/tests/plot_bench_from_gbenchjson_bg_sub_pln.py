@@ -10,7 +10,7 @@ sns.set()
 sns.set_context("paper")
 
 
-bench_result = json.load(open("BMPlnVsOpenCV_BgSubPipeline-GNU-9.3.0.json"))
+bench_result = json.load(open("BMPlnVsOpenCV_BgSubPipeline-GNU-10.2.1.json"))
 
 
 def draw_fig(img_id):

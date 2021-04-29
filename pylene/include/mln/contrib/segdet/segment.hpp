@@ -9,6 +9,59 @@ namespace mln
   {
     namespace segdet
     {
+      struct Parameters
+      {
+        u_int32_t nb_values_to_keep;
+        u_int32_t variance_position;
+        u_int32_t variance_thickness;
+        u_int32_t variance_luminosity;
+
+        u_int32_t default_sigma_position;
+        u_int32_t default_sigma_thickness;
+        u_int32_t default_sigma_luminosity;
+
+        u_int32_t min_nb_values_sigma;
+        double    sigma_pos_min;
+        double    sigma_thickness_min;
+        double    sigma_luminosity_min;
+
+        double    slope_max_vertical;
+        double    slope_max_horizontal;
+        u_int32_t max_llum;
+        u_int32_t max_thickness;
+        double    ratio_lum;
+        double    merge_slope_variation;
+        double    merge_distance_max;
+        u_int32_t max_slopes_too_large;
+        double    threshold_intersection;
+        u_int32_t minimum_for_fusion;
+
+        Parameters()
+            : nb_values_to_keep(30)
+            , variance_position(2)
+            , variance_thickness(1)
+            , variance_luminosity(12)
+            , default_sigma_position(2)
+            , default_sigma_thickness(2)
+            , default_sigma_luminosity(57)
+            , min_nb_values_sigma(10)
+            , sigma_pos_min(1)
+            , sigma_thickness_min(0.64)
+            , sigma_luminosity_min(13)
+            , slope_max_vertical(1.05)
+            , slope_max_horizontal(1.0)
+            , max_llum(225)
+            , max_thickness(100)
+            , ratio_lum(1)
+            , merge_slope_variation(0.4)
+            , merge_distance_max(8)
+            , max_slopes_too_large(5)
+            , threshold_intersection(0.8)
+            , minimum_for_fusion(15)
+        {
+        }
+      };
+
       struct Point
       {
         Point(u_int32_t x, u_int32_t y, u_int32_t size)

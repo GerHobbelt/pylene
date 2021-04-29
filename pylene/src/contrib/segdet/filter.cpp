@@ -47,13 +47,13 @@ namespace mln::contrib::segdet
     return result;
   }
 
-  void compute_sigmas(Filter& f)
+  void compute_sigmas(Filter& f, Parameters params)
   {
-    if (f.n_values.size() > SEGDET_MIN_NB_VALUES_SIGMA)
+    if (f.n_values.size() > params.min_nb_values_sigma)
     {
-      f.sigma_position   = std<uint32_t>(f.n_values) + SEGDET_SIGMA_POS_MIN + f.currently_under_other.size() * 0.2;
-      f.sigma_thickness  = std<double>(f.thicknesses) * 2 + SEGDET_SIGMA_THK_MIN;
-      f.sigma_luminosity = std<double>(f.luminosities) + SEGDET_SIGMA_LUM_MIN;
+      f.sigma_position   = std<uint32_t>(f.n_values) + params.sigma_pos_min + f.currently_under_other.size() * 0.2;
+      f.sigma_thickness  = std<double>(f.thicknesses) * 2 + params.sigma_thickness_min;
+      f.sigma_luminosity = std<double>(f.luminosities) + params.sigma_luminosity_min;
     }
   }
 
@@ -88,9 +88,9 @@ namespace mln::contrib::segdet
     return (observation - prediction) <= 3 * sigma;
   }
 
-  bool accepts(const Filter& f, const Eigen::Matrix<double, 3, 1>& obs, uint32_t min, uint32_t max)
+  bool accepts(const Filter& f, const Eigen::Matrix<double, 3, 1>& obs, uint32_t min, uint32_t max, Parameters params)
   {
-    if (f.n_values.size() > SEGDET_MIN_NB_VALUES_SIGMA && obs(1, 0) / f.X_predicted(1, 0) > 1.5 &&
+    if (f.n_values.size() > params.min_nb_values_sigma && obs(1, 0) / f.X_predicted(1, 0) > 1.5 &&
         std::abs(obs(1, 0) - f.X_predicted(1, 0)) > 3)
     {
       return false;
@@ -157,7 +157,7 @@ namespace mln::contrib::segdet
    * @param observation The observation matrix to integrate
    * @param t The position at which the integration was made
    */
-  void insert_into_filters_list(Filter& f, Eigen::Matrix<double, 3, 1> observation, uint32_t t)
+  void insert_into_filters_list(Filter& f, Eigen::Matrix<double, 3, 1> observation, uint32_t t, Parameters params)
   {
     f.n_values.push_back(observation(0, 0));
     f.thicknesses.push_back(observation(1, 0));
@@ -165,7 +165,7 @@ namespace mln::contrib::segdet
     f.t_values.push_back(t);
     f.slopes.push_back(compute_slope(f));
 
-    if (f.n_values.size() > SEGDET_NB_VALUES_TO_KEEP)
+    if (f.n_values.size() > params.nb_values_to_keep)
     {
       auto thick = f.thicknesses[0];
       auto nn    = f.n_values[0];
@@ -184,7 +184,7 @@ namespace mln::contrib::segdet
     }
   }
 
-  void integrate(Filter& f, uint32_t t)
+  void integrate(Filter& f, uint32_t t, Parameters params)
   {
     auto& observation = f.observation.value().obs;
 
@@ -199,7 +199,7 @@ namespace mln::contrib::segdet
     f.S    = f.S_predicted + G * (observation - f.X_predicted);
     f.H    = (Eigen::Matrix<double, 4, 4>::Identity() - G * C) * f.H;
 
-    insert_into_filters_list(f, observation, t);
+    insert_into_filters_list(f, observation, t, params);
 
     auto   length = f.slopes.size();
     double second_derivative =

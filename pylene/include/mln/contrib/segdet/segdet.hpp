@@ -31,7 +31,7 @@ namespace mln::contrib::segdet
        * @return
        */
       std::pair<std::vector<Segment>, std::vector<Segment>> process(const image2d<uint8_t>& image, uint min_len,
-                                                                    uint discontinuity);
+                                                                    uint discontinuity, Parameters params);
 
 
       mln::image2d<uint8_t> preprocess_img_grayscale(mln::image2d<uint8_t> img);

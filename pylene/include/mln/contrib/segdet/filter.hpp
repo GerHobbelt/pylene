@@ -124,9 +124,9 @@ namespace mln::contrib::segdet
 
     double n_min;
     double n_max;
-    double    sigma_position;
-    double    sigma_thickness;
-    double    sigma_luminosity;
+    double sigma_position;
+    double sigma_thickness;
+    double sigma_luminosity;
 
     Eigen::Matrix<double, 4, 1> S_predicted;
     Eigen::Matrix<double, 3, 1> X_predicted;
@@ -148,7 +148,7 @@ namespace mln::contrib::segdet
    * luminosity vectors
    * @param f
    */
-  void compute_sigmas(Filter& f);
+  void compute_sigmas(Filter& f, Parameters params);
 
   /**
    * The accepts method will check if the given filter and observation are compatible
@@ -158,7 +158,8 @@ namespace mln::contrib::segdet
    * @param max The observation max value
    * @return true if observation is compatible with filter else false
    */
-  bool accepts(const Filter& filter, const Eigen::Matrix<double, 3, 1>& obs, uint32_t min, uint32_t max);
+  bool accepts(const Filter& filter, const Eigen::Matrix<double, 3, 1>& obs, uint32_t min, uint32_t max,
+               Parameters params);
 
   /**
    * The choose_nearest method check whether the given observation, or the one already contained in the Filter is the
@@ -174,7 +175,7 @@ namespace mln::contrib::segdet
    * @param f The filter struct
    * @param t The position of the new last integration
    */
-  void integrate(Filter& f, uint32_t t);
+  void integrate(Filter& f, uint32_t t, Parameters params);
 
 
 } // namespace mln::contrib::segdet

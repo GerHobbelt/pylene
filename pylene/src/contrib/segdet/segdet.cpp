@@ -549,29 +549,16 @@ namespace mln::contrib::segdet
    * @param b
    * @return
    */
-  bool has_to_link(Segment a, Segment b, Parameters params)
+  bool has_to_link(Segment &a, const Segment &b, const Parameters &params)
   {
     if (std::abs(a.last_part_slope - b.first_part_slope) > params.merge_slope_variation)
       return false;
 
-    if (a.points.size() && a.points.size() &&
-        distance_points(a.points[a.points.size() - 1], b.points[0]) < params.merge_distance_max)
+    if (!a.points.empty() && !b.points.empty() &&
+        distance_points(a.last_point, b.first_point) < params.merge_distance_max)
       return true;
 
     return false;
-  }
-
-  /**
-   * Push all elements in right in left vector
-   * @tparam T
-   * @param lhs
-   * @param rhs
-   */
-  template <typename T>
-  void add_all(std::vector<T>& lhs, const std::vector<T>& rhs)
-  {
-    for (auto elm : rhs)
-      lhs.push_back(elm);
   }
 
   /**
@@ -586,12 +573,13 @@ namespace mln::contrib::segdet
     else
       a.length = b.points[b.points.size() - 1].y - a.points[0].y + 1;
 
-    add_all(a.under_other, b.under_other);
-    add_all(a.points, b.points);
+    for (auto &p : b.points)
+      a.points.push_back(p);
 
     a.nb_pixels += b.nb_pixels;
 
     a.last_part_slope = b.last_part_slope;
+    a.last_point = b.last_point;
   }
 
   /**
@@ -637,10 +625,7 @@ namespace mln::contrib::segdet
    */
   void draw_labeled_pixel(image2d<uint16_t> img, uint16_t label, int x, int y)
   {
-    if (img({x, y}) != 0)
-      img({x, y}) = 1;
-    else
-      img({x, y}) = label;
+    img({x, y}) = img({x, y}) != 0 ? 1 : label;
   }
 
   /**
@@ -685,21 +670,16 @@ namespace mln::contrib::segdet
    * @param horizontal_segments
    * @param vertical_segments
    * @param type Labeling type
-   * @param include_other true if need to include under other points
    */
   void labeled_arr(image2d<uint16_t> out, std::vector<Segment>& horizontal_segments,
-                   std::vector<Segment>& vertical_segments, labeling_type type, bool include_other)
+                   std::vector<Segment>& vertical_segments, labeling_type type)
   {
     std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
 
     for (size_t i = 0; i < segments.size(); i++)
     {
-      auto segment = segments[i];
-      for (auto& point : segment.points)
-        draw_labeled_point(out, i + 3, point, segment.is_horizontal);
-      if (include_other)
-        for (auto& point : segment.under_other)
-          draw_labeled_point(out, 1, point, segment.is_horizontal);
+      for (auto& point : segments[i].points)
+        draw_labeled_point(out, i + 3, point, segments[i].is_horizontal);
     }
   }
 
@@ -741,16 +721,12 @@ namespace mln::contrib::segdet
                   size_t height, Parameters params)
   {
     image2d<uint16_t> first_output = image2d<uint16_t>(width, height);
-
     mln::fill(first_output, 0);
-
-    labeled_arr(first_output, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL, true);
+    labeled_arr(first_output, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL);
 
     image2d<uint16_t> second_output = image2d<uint16_t>(width, height);
-
     mln::fill(second_output, 0);
-
-    labeled_arr(second_output, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL, true);
+    labeled_arr(second_output, segments_to_compare, segments_removable, LABELING_TYPE_VERTICAL);
 
     auto second_output_bin =
         mln::view::transform(second_output, [](uint16_t p) -> uint8_t { return (p != 0) ? 1 : 0; });

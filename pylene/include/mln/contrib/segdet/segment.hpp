@@ -89,26 +89,36 @@ namespace mln
         u_int32_t y;
         u_int32_t thickness;
       };
+
       struct Segment
       {
-        Segment(std::vector<Point> points_vector, std::vector<Point> underOther, float firstPartSlope, float lastPartSlope,
+        Segment(std::vector<Point> points_vector, const std::vector<Point>& underOther, float firstPartSlope, float lastPartSlope,
                 bool isHorizontal)
-          : points(std::move(points_vector))
-          , under_other(std::move(underOther))
+          : first_point(points_vector[0])
+          , last_point(points_vector[points_vector.size() - 1])
+          , points(std::move(points_vector))
           , first_part_slope(firstPartSlope)
           , last_part_slope(lastPartSlope)
           , length( 1 + (isHorizontal ? points[points.size() - 1].x - points[0].x : points[points.size() - 1].y - points[0].y))
           , is_horizontal(isHorizontal)
         {
           nb_pixels = 0;
-          for(auto machin : points)
+
+          for(auto &machin : points)
             nb_pixels += machin.thickness;
-          for (auto machin :under_other)
+
+          for (auto &machin :underOther)
+          {
             nb_pixels += machin.thickness;
+            points.push_back(machin);
+          }
         }
 
+
+        Point first_point;
+        Point last_point;
+
         std::vector<Point> points;
-        std::vector<Point> under_other;
 
         float     first_part_slope;
         float     last_part_slope;

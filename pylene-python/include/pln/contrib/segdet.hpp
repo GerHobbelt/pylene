@@ -21,8 +21,6 @@ namespace pln::contrib::segdet
       for (auto& point : seg.points)
         points.push_back(std::vector<uint32_t>({point.x, point.y, point.thickness}));
       std::vector<std::vector<uint32_t>> under;
-      for (auto& under_o : seg.under_other)
-        points.push_back(std::vector<uint32_t>({under_o.x, under_o.y, under_o.thickness}));
 
       auto inner_pair = std::make_pair(points, under);
       auto outer_pair = std::make_pair(seg.is_horizontal, inner_pair);

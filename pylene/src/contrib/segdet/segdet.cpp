@@ -864,30 +864,40 @@ namespace mln::contrib::segdet
 
     return res;
   }
-  mln::image2d<uint8_t> preprocess_img(mln::image2d<mln::rgb8> img)
-  {
-    // TODO check that underlying image is a real rgb image
 
-    mln::image2d<uint8_t> out = mln::transform(std::move(img), [](mln::rgb8 p) -> uint8_t {
+  mln::image2d<uint8_t> preprocess_img_grayscale(mln::image2d<uint8_t> input)
+  {
+    // 1. Negate
+    input = mln::transform(input, [](uint8_t p) -> uint8_t {return 255 - p;});
+
+    // 2. Get seeds
+    auto seeds =
+        mln::transform(input, [](uint8_t p) -> uint8_t { return std::max(static_cast<int>(p - static_cast<int>(0.6 * 255)), 0); });
+
+    // 3. Create connectivity mask
+    auto connectivity_mask = mln::morpho::dilation(input, mln::se::rect2d{11,11});
+
+    // 4. Reconstruction to get the background
+    auto out = mln::morpho::opening_by_reconstruction(connectivity_mask, seeds, mln::c4);
+    out = mln::transform(input, out, [](uint8_t a, uint8_t b) -> uint8_t { return std::min(a,b); });
+
+    // 5. Top hat
+    mln::transform(input, out, out, [](uint8_t a, uint8_t b) -> uint8_t { return a - b; });
+
+    return out;
+  }
+
+  mln::image2d<uint8_t> preprocess_img_rgb(mln::image2d<mln::rgb8> img) {
+
+    // Convert image to greyscale
+    mln::image2d<uint8_t> input = mln::transform(std::move(img), [](mln::rgb8 p) -> uint8_t {
       double r = p[0];
       double g = p[1];
       double b = p[2];
       return 0.2125 * r + 0.7154 * g + 0.0721 * b;
     });
 
-//    auto er = mln::morpho::erosion(out, mln::se::rect2d(11, 11));
-//    auto markers = mln::transform(out, [](uint8_t p) -> uint8_t {return p + 0.6 * 255;});
-    auto dyn = mln::morpho::dynamic_closing(out, mln::c4, 0.6*255);
-
-//    auto dyn = mln::morpho::closing_by_reconstruction(er, markers, mln::c4);
-
-    out = mln::transform(out, dyn, [](uint8_t lhs, uint8_t rhs) -> uint8_t {
-      return 255 - rhs + lhs;
-    });
-
-//    out = mln::morpho::dilation(out, mln::se::rect2d(11, 11));
-
-    return out;
+    return preprocess_img_grayscale(input);
   }
 
 } // namespace mln::contrib::segdet

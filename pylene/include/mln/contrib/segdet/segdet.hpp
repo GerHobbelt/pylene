@@ -34,7 +34,8 @@ namespace mln::contrib::segdet
                                                                     uint discontinuity);
 
 
-      mln::image2d<uint8_t> preprocess_img(mln::image2d<mln::rgb8> img);
+      mln::image2d<uint8_t> preprocess_img_grayscale(mln::image2d<uint8_t> img);
+      mln::image2d<uint8_t> preprocess_img_rgb(mln::image2d<mln::rgb8> img);
 
 
     } // namespace mln

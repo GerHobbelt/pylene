@@ -39,11 +39,9 @@ namespace pln::contrib::segdet
     switch (img.sample_type())
     {
     case mln::sample_type_id::UINT8:
-      pybind11::print("uint8");
       out        = mln::contrib::segdet::preprocess_img_grayscale(img.__cast<uint8_t, 2>());
       break;
     case mln::sample_type_id::RGB8:
-      pybind11::print("rgb8");
       out        = mln::contrib::segdet::preprocess_img_rgb(img.__cast<mln::rgb8, 2>());
       break;
     default:

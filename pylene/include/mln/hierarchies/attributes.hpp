@@ -12,8 +12,8 @@ namespace mln
   /**
    * Traverse a Hierarchy Tree using an accumulator to produce an attribute on it
    *
-   * @tparam I Input type used for initialization of accumulators
-   * @tparam O Output type that is the type of the returned attribute
+   * @tparam ArgumentType Input type used for initialization of accumulators
+   * @tparam ResultType Output type that is the type of the returned attribute
    * @tparam AccumulatorType Accumulator type
    *
    * @param tree Hierarchy Tree that will be use to compute the attribute
@@ -22,11 +22,12 @@ namespace mln
    * @param edges_list Initialization list of the tree internal nodes (graph edges) for the accumulation
    * @param exclude_leaves Exclude leaves from accumulation or not
    */
-  template <typename I, typename O, Accumulator<I, O> AccumulatorType>
-  inline std::vector<O> compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
-                                                           std::vector<I> leaves_list    = std::vector<I>(),
-                                                           std::vector<I> edges_list     = std::vector<I>(),
-                                                           bool           exclude_leaves = false)
+  template <typename ArgumentType, typename ResultType, Accumulator<ArgumentType, ResultType> AccumulatorType>
+  inline std::vector<ResultType>
+  compute_attribute_from_accumulator(const HierarchyTree& tree, const AccumulatorType& acc,
+                                     std::vector<ArgumentType> leaves_list    = std::vector<ArgumentType>(),
+                                     std::vector<ArgumentType> edges_list     = std::vector<ArgumentType>(),
+                                     bool                      exclude_leaves = false)
   {
     size_t tree_nb_vertices  = tree.get_nb_vertices();
     size_t graph_nb_vertices = tree.leaf_graph.get_nb_vertices();
@@ -56,7 +57,7 @@ namespace mln
       accumulators[parent_node].take(accumulators[node]);
     }
 
-    std::vector<O> attribute(tree_nb_vertices);
+    std::vector<ResultType> attribute(tree_nb_vertices);
 
     for (size_t i = 0; i < tree_nb_vertices; ++i)
       attribute[i] = accumulators[i].get_value();

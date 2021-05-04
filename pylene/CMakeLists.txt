@@ -80,6 +80,7 @@ target_sources(Pylene PRIVATE
         src/core/trace.cpp
         src/core/traverse2d.cpp
         src/hierarchies/collections.cpp
+        src/hierarchies/component_saliency.cpp
         src/hierarchies/graph.cpp
         src/hierarchies/saliency.cpp
         src/hierarchies/attributes.cpp

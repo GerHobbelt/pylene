@@ -7,9 +7,9 @@
 
 namespace mln
 {
-  static std::vector<int> lca_preprocess(mln::morpho::component_tree<uint8_t> tree, const auto node_map)
+  static std::vector<int> lca_preprocess(mln::morpho::component_tree<uint8_t> tree)
   {
-    return tree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
+    return tree.compute_depth();
   }
 
   // TODO Use sparse table to optimize LCA
@@ -38,7 +38,7 @@ namespace mln
   {
     std::vector<Edge> res;
 
-    std::vector<int> depth = lca_preprocess(tree, node_map);
+    std::vector<int> depth = lca_preprocess(tree);
 
     for (Edge edge : leaf_graph.get_edges())
     {

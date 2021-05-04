@@ -215,7 +215,7 @@ namespace mln::morpho
     std::size_t node_count = flatzones_count;
 
     std::vector<int> par(node_count);
-    std::vector<int> levels(node_count, 0);
+    std::vector<W> levels(node_count, 0);
     // 4. Compute the hierarchy
     {
       std::iota(std::begin(par), std::end(par), 0);

@@ -21,18 +21,18 @@ namespace mln::morpho
 
     assert(vals.size() == t.parent.size());
 
-    image_ch_value_t<Nodemap, L> lbl = imchvalue<L>(nm);
-    image_concrete_t<Nodemap> cut_nm = imconcretize(nm);
+    image_ch_value_t<Nodemap, L> lbl    = imchvalue<L>(nm);
+    image_concrete_t<Nodemap>    cut_nm = imconcretize(nm);
 
-    mln_foreach(auto p, nm.domain())
+    mln_foreach (auto p, nm.domain())
     {
-        cut_nm(p) = nm(p);
-        while (t.parent[cut_nm(p)] != cut_nm(p) && t.values[t.parent[cut_nm(p)]] <= th)
-            cut_nm(p) = t.parent[cut_nm(p)];
+      cut_nm(p) = nm(p);
+      while (t.parent[cut_nm(p)] != cut_nm(p) && t.values[t.parent[cut_nm(p)]] <= th)
+        cut_nm(p) = t.parent[cut_nm(p)];
     }
 
-    mln_foreach(auto px, cut_nm.pixels())
-        lbl(px.point()) = vals[px.val()];
+    mln_foreach (auto px, cut_nm.pixels())
+      lbl(px.point()) = vals[px.val()];
 
     return lbl;
   }

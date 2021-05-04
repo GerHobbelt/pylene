@@ -1,17 +1,12 @@
-#include <mln/morpho/alphatree.hpp>
-
 #include <mln/core/colors.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
-
+#include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/cut.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
 #include <gtest/gtest.h>
-
-#include <cmath>
-#include <iostream>
 
 template <typename V>
 mln::image2d<int> //
@@ -151,9 +146,8 @@ TEST(Morpho, AlphaTreeRGB8)
 
   auto [t, nm] = mln::morpho::alphatree(
       ima, mln::c4, [](const auto& a, const auto& b) -> int { return mln::functional::l2dist_t<>()(a, b); });
-  std::vector<int> rng(t.parent.size());
+  auto rng = std::vector<int>(t.parent.size());
   std::iota(rng.begin(), rng.end(), 0);
-
   ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 0, rng), nm);
   ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 8, rng), ref_8);
   ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 16, rng), ref_16);

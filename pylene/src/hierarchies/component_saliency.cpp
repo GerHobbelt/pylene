@@ -7,10 +7,7 @@
 
 namespace mln
 {
-  static std::vector<int> lca_preprocess(mln::morpho::component_tree<uint8_t> tree)
-  {
-    return tree.compute_depth();
-  }
+  static std::vector<int> lca_preprocess(mln::morpho::component_tree<uint8_t> tree) { return tree.compute_depth(); }
 
   // TODO Use sparse table to optimize LCA
   static int lca(const std::vector<int>& depth, mln::morpho::component_tree<uint8_t> tree, int u, int v)
@@ -34,7 +31,8 @@ namespace mln
     return u;
   }
 
-  std::vector<Edge> saliency_map(mln::morpho::component_tree<uint8_t> tree, const auto node_map, const Graph& leaf_graph)
+  std::vector<Edge> saliency_map(mln::morpho::component_tree<uint8_t> tree, const auto node_map,
+                                 const Graph& leaf_graph)
   {
     std::vector<Edge> res;
 
@@ -50,7 +48,8 @@ namespace mln
     return res;
   }
 
-  image2d<double> saliency_khalimsky_grid(mln::morpho::component_tree<uint8_t> tree, const auto node_map, const Graph& leaf_graph)
+  image2d<double> saliency_khalimsky_grid(mln::morpho::component_tree<uint8_t> tree, const auto node_map,
+                                          const Graph& leaf_graph)
   {
     int height = leaf_graph.get_height();
     int width  = leaf_graph.get_width();

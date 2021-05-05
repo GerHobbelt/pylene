@@ -1,14 +1,14 @@
 Alpha Tree
 ==========
 
-Include :file:`<mln/morpho/alphatree.hpp>`
+* Include :file:`<mln/morpho/alphatree.hpp>`
 
 .. cpp:namespace:: mln::morpho
 
 
 .. cpp:function:: auto alphatree(Image f, Neighborhood nbh, F dist);
 
-    Compute the alphatree (also known as quasi-flat zone hierarchy) and returns a pair
+    Compute the alpha tree (also known as quasi-flat zone hierarchy) and returns a pair
     `(tree, node_map)`. See :doc:`component_tree` for more information about the
     representation of tree.
 
@@ -21,7 +21,38 @@ Include :file:`<mln/morpho/alphatree.hpp>`
 
     * ``std::invoke_result_t<F, image_value_t<Image>, image_value_t<Image>>`` is :cpp:concept:`std::totally_ordered`
 
-    .. rubric:: Example
+Definition
+----------
+
+The Alpha tree is the tree of :math:`\alpha`-connected components. An :math:`\alpha`-connected component in an image :math:`f`, for a pixel :math:`p`, is defined as
+
+.. math::
+    \alpha-CC(p) = \{p\}\ \cup\ \{q\ |\ \text{there exists a path}\ \Pi = \{\pi_0, ..., \pi_n\}\ \text{between}\ p\ \text{and}\ q\ \text{such that}\ d(f(\pi_i), f(\pi_{i+1})) \leq \alpha\}
+where :math:`d` is a dissimilarity function between two pixels of the image :math:`f`.
+
+The :math:`\alpha`-connected components form an ordered sequence when :math:`\alpha` is growing, such that for :math:`\alpha_i < \alpha_j`,
+:math:`\alpha_i-CC(p) \subseteq \alpha_j-CC(p)`. Thus, the alphatree is the hierarchy where the parenthood relationship represents the inclusion of the
+:math:`\alpha`-connected components.
+
+Representation
+--------------
+
+.. image:: /figures/morpho/alphatree_repr.svg
+    :align: center
+    :width: 30%
+
+The ``alphatree`` function returns a tree and a node map. The tree has two attributes:
+
+* ``parent``: The parenthood relationship of the node :math:`i`, representing the inclusion relationship of the :math:`\alpha`-connected components.
+* ``values``: The value of :math:`\alpha` assigned to a node :math:`i`.
+
+Then, the node map is the relation between a pixel of the image and its related node in the tree, a leaf for the case of the alphatree.
+
+The image above illustrates the representation of the alpha tree in Pylene, the parenthood relationship being illustrated in arrows, the values of alpha, assigned to each node, being in red, and the relation 
+between a node of the tree and a pixel of the image being represented by blue dashed lines.
+
+Example
+-------
 
     ::
 
@@ -32,7 +63,7 @@ Include :file:`<mln/morpho/alphatree.hpp>`
         #include <mln/morpho/cut.hpp> // for horizontal_cut_labelization_from
         mln::image2d<uint8_t> input = ...;
 
-        // Compute the alphatree
+        // Compute the alpha tree
         auto [tree, node_map] = mln::morpho::alphatree(input, mln::c4);
 
         // Compute an attribute (for example the average pixels value at each node, as below)
@@ -47,11 +78,11 @@ Include :file:`<mln/morpho/alphatree.hpp>`
 
         * -   .. figure:: /images/alphatree_cut_color.png
 
-                Cut of the alphatree with a threshold of 10
+                Cut of the alpha tree with a threshold of 10
 
           -   .. figure:: /images/alphatree_cut_gray.png
 
-                Cut of the alphatree with a threshold of 3
+                Cut of the alpha tree with a threshold of 3
 
 Notes
 -----

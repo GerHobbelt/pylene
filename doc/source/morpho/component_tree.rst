@@ -148,9 +148,9 @@ A :cpp:class:`component_tree` `t` has the following methods.
 
 .. cpp:namespace-push::  template <class V> component_tree
 
-.. cpp:function:: auto accumulate_on_points(Image node_map, Accumulator accu) const
-                  auto accumulate_on_values(Image node_map, Image values, Accumulator accu) const
-                  auto accumulate_on_pixels(Image node_map, Image values, Accumulator accu) const
+.. cpp:function:: auto compute_attribute_on_points(Image node_map, Accumulator accu) const
+                  auto compute_attribute_on_values(Image node_map, Image values, Accumulator accu) const
+                  auto compute_attribute_on_pixels(Image node_map, Image values, Accumulator accu) const
 
     Accumulate the points of each component.
 
@@ -190,7 +190,7 @@ Example: computing the size (number of points) of the components.
 
     #include <mln/accu/accumulators/count.hpp>
 
-    auto sizes = tree.accumulate_on_points(node_map, mln::accu::features::count<>());
+    auto sizes = tree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
 
 .. cpp:function:: auto compute_depth() const
 
@@ -255,6 +255,7 @@ A :cpp:class:`component_tree` `t` has the following methods.
         auto pred = [&](int id) { nchildren > 1; };      
         t.filter(CT_FILTER_DIRECT, pred);
 
+
 Image reconstruction
 --------------------
 
@@ -279,7 +280,22 @@ the image from the filtered tree.
         t.filter(CT_FILTER_DIRECT, [&area](int id) { return area[id] > 20; });
         auto out = t.reconstruct(node_map);
 
+Horizontal cut
+--------------
+When the tree is a hierarchy of partition, such as the :doc:`alphatree`, it is possible
+to make an horizontal cut of this tree.
 
+* Include :file:`<mln/morpho/cut.hpp>`
+
+.. cpp:function::   auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, const std::vector<L>& vals)
+                    auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, ::ranges::span<L> vals)
+
+    Make an horizontal cut at threshold ``th`` of the tree and labelize the node on a reconstructed image with the value ``vals``.
+
+    :param t: The tree.
+    :param nm: The node map.
+    :param th: The threshold of the cut.
+    :param vals: the value assigned to each node of the tree for the labelization.
 
 A complete example
 ------------------

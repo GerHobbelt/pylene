@@ -4,18 +4,18 @@
 
 namespace mln::morpho
 {
-  template <typename V, typename Nodemap, typename L>
-  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, ::ranges::span<L> vals);
+  template <typename V, typename Nodemap, typename Th, typename L>
+  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, Th th, ::ranges::span<L> vals);
 
-  template <typename V, typename Nodemap, typename L>
-  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, const std::vector<L>& vals);
+  template <typename V, typename Nodemap, typename Th, typename L>
+  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, Th th, const std::vector<L>& vals);
 
   /******************
    * Implementation *
    ******************/
 
-  template <typename V, typename Nodemap, typename L>
-  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, ::ranges::span<L> vals)
+  template <typename V, typename Nodemap, typename Th, typename L> requires(std::is_convertible_v<Th, V>)
+  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, Th th, ::ranges::span<L> vals)
   {
     static_assert(mln::is_a_v<Nodemap, mln::details::Image>);
     static_assert(std::is_same_v<image_value_t<Nodemap>, int>);
@@ -39,8 +39,8 @@ namespace mln::morpho
     return lbl;
   }
 
-  template <typename V, typename Nodemap, typename L>
-  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, const std::vector<L>& vals)
+  template <typename V, typename Nodemap, typename Th, typename L> requires(std::is_convertible_v<Th, V>)
+  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, Th th, const std::vector<L>& vals)
   {
     return horizontal_cut_labelization_from(t, nm, th, ::ranges::make_span(vals.data(), vals.size()));
   }

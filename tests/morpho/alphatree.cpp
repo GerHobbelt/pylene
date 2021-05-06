@@ -52,7 +52,7 @@ TEST(Morpho, AlphaTree)
       {107, 87, 118, 109, 167},  //
       {107, 73, 125, 157, 117},  //
   };
-  auto [t, node_map] = mln::morpho::alphatree(ima, mln::c4);
+  auto [t, node_map] = mln::morpho::alphatree(ima, mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b);});
 
   mln::image2d<int> ref0 = {
       {0, 1, 2, 3, 4},      //
@@ -145,15 +145,15 @@ TEST(Morpho, AlphaTreeRGB8)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> int { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint16_t { return mln::functional::l2dist_t<>()(a, b); });
   auto rng = std::vector<int>(t.parent.size());
   std::iota(rng.begin(), rng.end(), 0);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 0, rng), nm);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 8, rng), ref_8);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 16, rng), ref_16);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 17, rng), ref_17);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 18, rng), ref_18);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 24, rng), ref_24);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 32, rng), ref_32);
-  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 36, rng), ref_36);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 0u, rng), nm);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 8u, rng), ref_8);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 16u, rng), ref_16);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 17u, rng), ref_17);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 18u, rng), ref_18);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 24u, rng), ref_24);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 32u, rng), ref_32);
+  ASSERT_IMAGES_EQ_EXP(mln::morpho::horizontal_cut_labelization_from(t, nm, 36u, rng), ref_36);
 }

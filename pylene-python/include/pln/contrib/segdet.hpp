@@ -55,7 +55,36 @@ namespace pln::contrib::segdet
     mln::image2d<uint16_t> out(img.size(0), img.size(1));
     mln::fill(out, 0);
     mln::contrib::segdet::labeled_arr(out, p);
-    return out;
+    return std::move(out);
+  }
+
+  mln::ndbuffer_image detect_line_numpy(mln::ndbuffer_image img, int min_len, int disc,
+                                        const std::map<std::string, double>& params = std::map<std::string, double>())
+  {
+    auto p = detect_line_base(std::move(img), min_len, disc, params);
+
+    int nb_points = 0;
+    for (auto &seg : p)
+    {
+      nb_points += seg.nb_pixels;
+    }
+
+    mln::image2d<uint32_t> out(3, nb_points);
+
+    int count = 0;
+    int nb_seg = 0;
+    for (auto& seg : p)
+    {
+      for (auto& point : seg.points)
+      {
+        out({0, count}) = nb_seg;
+        out({1, count}) = point.x;
+        out({2, count++}) = point.y;
+      }
+      nb_seg++;
+    }
+
+    return std::move(out);
   }
 
 

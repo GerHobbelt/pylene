@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mln/core/concepts/image.hpp>
-#include <mln/core/range/foreach.hpp>
 #include <mln/morpho/private/hvector_unbounded.hpp>
 
 #include <array>
@@ -16,8 +15,10 @@ namespace mln::morpho::details
   template <typename I, typename N, typename F>
   class directional_hqueue
   {
-    static_assert(is_a_v<I, mln::details::Image>);
-    using V          = image_value_t<I>;
+    static_assert(is_a_v<I, mln::details::Image>, "I should be an image");
+    static_assert(is_a_v<N, mln::details::Neighborhood>, "N should be a neighborhood");
+    using V = image_value_t<I>;
+    static_assert(std::is_invocable_v<F, V, V>, "F must be invocable with the value of I");
     using Key        = std::invoke_result_t<F, V, V>;
     using Point      = image_point_t<I>;
     using queue_type = hvectors_unbounded<Point>;
@@ -42,8 +43,8 @@ namespace mln::morpho::details
     bool empty() const noexcept;
 
   private:
-    static_assert(std::is_integral_v<Key> && std::is_unsigned_v<Key>);
-    static_assert(sizeof(Key) <= 2);
+    static_assert(std::is_integral_v<Key> && std::is_unsigned_v<Key>, "Key should be an unsigned integral type");
+    static_assert(sizeof(Key) <= 2, "Key should have a size of at least 2");
 
   private:
     static constexpr std::size_t               m_ndir    = N::after_offsets().size();

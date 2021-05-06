@@ -319,7 +319,8 @@ namespace mln::contrib::segdet
    * @return List of filters that have to continue
    */
   std::vector<Filter> filter_selection(std::vector<Filter>& filters, std::vector<Segment>& segments, uint32_t t,
-                                       uint32_t two_matches, uint32_t min_len_embryo, uint32_t discontinuity, Parameters params)
+                                       uint32_t two_matches, uint32_t min_len_embryo, uint32_t discontinuity,
+                                       Parameters params)
   {
     std::vector<Filter> filters_to_keep;
 
@@ -330,7 +331,8 @@ namespace mln::contrib::segdet
 
       if (f.observation != std::nullopt)
       {
-        if (two_matches > params.minimum_for_fusion && make_potential_fusion(filters, index, segments, min_len_embryo, params))
+        if (two_matches > params.minimum_for_fusion &&
+            make_potential_fusion(filters, index, segments, min_len_embryo, params))
           continue;
 
         integrate(f, t, params);
@@ -532,10 +534,10 @@ namespace mln::contrib::segdet
    * @param p2
    * @return
    */
-  uint32_t distance_points(const Point& p1, const Point& p2)
+  double distance_points(const Point& p1, const Point& p2)
   {
-    auto xvar = p1.x - p2.x;
-    auto yvar = p1.y - p2.y;
+    int xvar = (int) p1.x - (int) p2.x;
+    int yvar = (int) p1.y - (int) p2.y;
 
     xvar *= xvar;
     yvar *= yvar;
@@ -549,16 +551,12 @@ namespace mln::contrib::segdet
    * @param b
    * @return
    */
-  bool has_to_link(Segment &a, const Segment &b, const Parameters &params)
+  double distance_linking(Segment& a, const Segment& b, const Parameters& params)
   {
     if (std::abs(a.last_part_slope - b.first_part_slope) > params.merge_slope_variation)
-      return false;
+      return params.merge_distance_max;
 
-    if (!a.points.empty() && !b.points.empty() &&
-        distance_points(a.last_point, b.first_point) < params.merge_distance_max)
-      return true;
-
-    return false;
+    return distance_points(a.last_point, b.first_point);
   }
 
   /**
@@ -573,13 +571,13 @@ namespace mln::contrib::segdet
     else
       a.length = b.points[b.points.size() - 1].y - a.points[0].y + 1;
 
-    for (auto &p : b.points)
+    for (auto& p : b.points)
       a.points.push_back(p);
 
     a.nb_pixels += b.nb_pixels;
 
     a.last_part_slope = b.last_part_slope;
-    a.last_point = b.last_point;
+    a.last_point      = b.last_point;
   }
 
   /**
@@ -592,16 +590,27 @@ namespace mln::contrib::segdet
     while (i < segments.size())
     {
       size_t j = i + 1;
+
+      size_t best_index = i;
+      double best_distance = params.merge_distance_max;
       while (j < segments.size())
       {
-        if (has_to_link(segments[i], segments[j], params))
+        auto distance_link = distance_linking(segments[i], segments[j], params);
+        if (distance_link < best_distance)
         {
-          merge_segments(segments[i], segments[j]);
-          segments.erase(segments.begin() + j);
+          best_index = j;
+          best_distance = distance_link;
         }
         else
           j++;
       }
+
+      if (best_distance < params.merge_distance_max)
+      {
+        merge_segments(segments[i], segments[best_index]);
+        segments.erase(segments.begin() + best_index);
+      }
+
       i++;
     }
   }

@@ -31,8 +31,7 @@ namespace mln
     return u;
   }
 
-  std::vector<Edge> saliency_map(mln::morpho::component_tree<uint8_t> tree, const auto node_map,
-                                 const Graph& leaf_graph)
+  std::vector<Edge> saliency_map(mln::morpho::component_tree<uint8_t> tree, const Graph& leaf_graph)
   {
     std::vector<Edge> res;
 
@@ -60,7 +59,7 @@ namespace mln
     image2d<double> res(res_width, res_height);
     fill(res, 0);
 
-    const std::vector<Edge>& s_map = saliency_map(tree, node_map, leaf_graph);
+    const std::vector<Edge>& s_map = saliency_map(tree, leaf_graph);
 
     for (const auto& edge : s_map)
     {

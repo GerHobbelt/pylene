@@ -17,6 +17,5 @@ namespace pln
   {
     init_pylena_numpy(m);
     m.def("detect_line", &pln::contrib::segdet::detect_line_hat);
-    m.def("preprocess", &pln::contrib::segdet::preprocess);
   }
 } // namespace pln

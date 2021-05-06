@@ -780,7 +780,8 @@ namespace mln::contrib::segdet
    * @param img_width Width of the image where segments were extract
    * @param img_height Height of the image where segments were extract
    */
-  void post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height, Parameters params)
+  void post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height,
+                    Parameters params)
   {
     segment_linking(pair, params);
     remove_duplicates(pair, img_width, img_height, params);
@@ -824,36 +825,21 @@ namespace mln::contrib::segdet
 
   // Public functions
 
-  std::vector<Segment> detect_line(image2d<uint8_t> image, uint min_len, uint discontinuity)
-  {
-
-    auto params = Parameters();
-
-    uint min_len_embryo = min_len / 4; // 5U < min_len ? 5U : min_len;
-    auto p              = process(image, min_len_embryo, discontinuity, params);
-
-    post_process(p, image.size(0), image.size(1), params);
-
-    auto res = filter_length(p, min_len);
-
-    return res;
-  }
-
   mln::image2d<uint8_t> preprocess_img_grayscale(mln::image2d<uint8_t> input)
   {
     // 1. Negate
-    input = mln::transform(input, [](uint8_t p) -> uint8_t {return 255 - p;});
+    input = mln::transform(input, [](uint8_t p) -> uint8_t { return 255 - p; });
 
     // 2. Get seeds
-    auto seeds =
-        mln::transform(input, [](uint8_t p) -> uint8_t { return std::max(static_cast<int>(p - static_cast<int>(0.6 * 255)), 0); });
+    auto seeds = mln::transform(
+        input, [](uint8_t p) -> uint8_t { return std::max(static_cast<int>(p - static_cast<int>(0.6 * 255)), 0); });
 
     // 3. Create connectivity mask
-    auto connectivity_mask = mln::morpho::dilation(input, mln::se::rect2d{11,11});
+    auto connectivity_mask = mln::morpho::dilation(input, mln::se::rect2d{11, 11});
 
     // 4. Reconstruction to get the background
     auto out = mln::morpho::opening_by_reconstruction(connectivity_mask, seeds, mln::c4);
-    out = mln::transform(input, out, [](uint8_t a, uint8_t b) -> uint8_t { return std::min(a,b); });
+    out      = mln::transform(input, out, [](uint8_t a, uint8_t b) -> uint8_t { return std::min(a, b); });
 
     // 5. Top hat
     mln::transform(input, out, out, [](uint8_t a, uint8_t b) -> uint8_t { return 255 - (a - b); });
@@ -861,7 +847,8 @@ namespace mln::contrib::segdet
     return out;
   }
 
-  mln::image2d<uint8_t> preprocess_img_rgb(mln::image2d<mln::rgb8> img) {
+  mln::image2d<uint8_t> preprocess_img_rgb(mln::image2d<mln::rgb8> img)
+  {
 
     // Convert image to greyscale
     mln::image2d<uint8_t> input = mln::transform(std::move(img), [](mln::rgb8 p) -> uint8_t {
@@ -872,6 +859,41 @@ namespace mln::contrib::segdet
     });
 
     return preprocess_img_grayscale(input);
+  }
+
+  mln::ndbuffer_image preprocess(mln::ndbuffer_image img)
+  {
+    mln::image2d<uint8_t> out;
+
+    switch (img.sample_type())
+    {
+    case mln::sample_type_id::UINT8:
+      out = mln::contrib::segdet::preprocess_img_grayscale(img.__cast<uint8_t, 2>());
+      break;
+    case mln::sample_type_id::RGB8:
+      out = mln::contrib::segdet::preprocess_img_rgb(img.__cast<mln::rgb8, 2>());
+      break;
+    default:;
+    }
+    return std::move(out);
+  }
+
+  std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity)
+  {
+    // Preprocessing
+    mln::ndbuffer_image preprocessed_img = preprocess(std::move(image));
+    auto                params           = Parameters();
+
+    uint min_len_embryo = min_len / 4; // 5U < min_len ? 5U : min_len;
+    // Processing
+    auto p              = process(preprocessed_img.__cast<uint8_t, 2>(), min_len_embryo, discontinuity, params);
+
+    // Post Processing
+    post_process(p, preprocessed_img.size(0), preprocessed_img.size(1), params);
+
+    auto res = filter_length(p, min_len);
+
+    return res;
   }
 
 } // namespace mln::contrib::segdet

@@ -9,32 +9,11 @@ using sorry_edwin =
     std::vector<std::pair<bool, std::pair<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>>>>;
 namespace pln::contrib::segdet
 {
-
-  mln::ndbuffer_image preprocess(mln::ndbuffer_image img)
-  {
-    mln::image2d<uint8_t> out;
-
-    switch (img.sample_type())
-    {
-    case mln::sample_type_id::UINT8:
-      out        = mln::contrib::segdet::preprocess_img_grayscale(img.__cast<uint8_t, 2>());
-      break;
-    case mln::sample_type_id::RGB8:
-      out        = mln::contrib::segdet::preprocess_img_rgb(img.__cast<mln::rgb8, 2>());
-      break;
-    default:
-      pybind11::print("Image type not rgb8 or uint8");
-    }
-
-    return std::move(out);
-  }
-
     sorry_edwin detect_line_hat(mln::ndbuffer_image img, int min_len, int disc)
     {
-      // Preprocessing
-      mln::ndbuffer_image preprocessed_img = preprocess(std::move(img));
+
       // Line detection
-      auto p = mln::contrib::segdet::detect_line(preprocessed_img.__cast<uint8_t, 2>(), min_len, disc);
+      auto p = mln::contrib::segdet::detect_line(img, min_len, disc);
 
       sorry_edwin out;
 

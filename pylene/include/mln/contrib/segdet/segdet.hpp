@@ -24,4 +24,11 @@ namespace mln::contrib::segdet
   std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity);
   std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity, const Parameters &params);
 
+  /**
+ * Draw segments in img out
+ * @param out Image to draw in
+ * @param segments
+ */
+  void labeled_arr(image2d<uint16_t> out, const std::vector<Segment>& segments);
+
 } // namespace mln::contrib::segdet

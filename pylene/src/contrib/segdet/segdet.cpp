@@ -15,22 +15,6 @@
 #include <mln/morpho/reconstruction.hpp>
 #include <utility>
 
-
-#include <numeric>
-#include <utility>
-
-#define SEGDET_SLOPE_MAX_VERTICAL 1.05
-#define SEGDET_SLOPE_MAX_HORIZONTAL 1.0
-#define SEGDET_MAX_LLUM 225
-#define SEGDET_MAX_THK 100
-#define SEGDET_RATIO_LUM 1
-#define SEGDET_MERGE_SLOPE_VARIATION 0.4
-#define SEGDET_MERGE_DISTANCE_MAX 8
-#define SEGDET_MAX_SLOPES_TOO_LARGE 5
-#define SEGDET_THRESHOLD_INTERSECTION 0.8
-
-#define SEGDET_MINIMUM_FOR_FUSION 15
-
 namespace mln::contrib::segdet
 {
   /**
@@ -673,6 +657,17 @@ namespace mln::contrib::segdet
     LABELING_TYPE_HORIZONTAL,
   };
 
+
+  void labeled_arr(image2d<uint16_t> out, const std::vector<Segment>& segments)
+  {
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+      for (auto& point : segments[i].points)
+        draw_labeled_point(out, i + 3, point, segments[i].is_horizontal);
+    }
+  }
+
+
   /**
    * Draw segments in img out according to type
    * @param out Image to draw in
@@ -685,11 +680,7 @@ namespace mln::contrib::segdet
   {
     std::vector<Segment> segments = type == LABELING_TYPE_HORIZONTAL ? horizontal_segments : vertical_segments;
 
-    for (size_t i = 0; i < segments.size(); i++)
-    {
-      for (auto& point : segments[i].points)
-        draw_labeled_point(out, i + 3, point, segments[i].is_horizontal);
-    }
+    labeled_arr(out, segments);
   }
 
   /**

@@ -22,5 +22,6 @@ namespace mln::contrib::segdet
    * @return A vector of detected segments
    */
   std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity);
+  std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity, const Parameters &params);
 
 } // namespace mln::contrib::segdet

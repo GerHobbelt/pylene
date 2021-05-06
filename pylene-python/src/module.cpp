@@ -16,6 +16,7 @@ namespace pln
   PYBIND11_MODULE(pylena, m)
   {
     init_pylena_numpy(m);
-    m.def("detect_line", &pln::contrib::segdet::detect_line_hat);
+    m.def("detect_line", &pln::contrib::segdet::detect_line_hat, py::arg("img"), py::arg("min_len"), py::arg("disc"),
+          py::arg("params") = std::map<std::string, double>());
   }
 } // namespace pln

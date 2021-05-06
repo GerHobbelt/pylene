@@ -887,11 +887,10 @@ namespace mln::contrib::segdet
     return std::move(out);
   }
 
-  std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity)
+  std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity, const Parameters &params)
   {
     // Preprocessing
     mln::ndbuffer_image preprocessed_img = preprocess(std::move(image));
-    auto                params           = Parameters();
 
     uint min_len_embryo = min_len / 4; // 5U < min_len ? 5U : min_len;
     // Processing
@@ -904,5 +903,12 @@ namespace mln::contrib::segdet
 
     return res;
   }
+
+  std::vector<Segment> detect_line(mln::ndbuffer_image image, uint min_len, uint discontinuity)
+  {
+    return detect_line(std::move(image), min_len, discontinuity, Parameters());
+  }
+
+
 
 } // namespace mln::contrib::segdet

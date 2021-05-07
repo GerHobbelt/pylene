@@ -22,7 +22,7 @@ TEST(Morpho, DirectionalHQueue)
 
   constexpr std::array<W, 12> ref = {1, 2, 4, 5, 5, 8, 8, 12, 12, 17, 21, 24};
 
-  auto hqueue = mln::morpho::details::directional_hqueue<decltype(ima), mln::c4_t, F>();
+  auto hqueue = mln::morpho::details::directional_hqueue<decltype(ima), mln::c4_t, W>();
 
   mln_foreach (auto p, ima.domain())
   {

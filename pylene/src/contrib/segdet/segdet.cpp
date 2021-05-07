@@ -899,7 +899,4 @@ namespace mln::contrib::segdet
   {
     return detect_line(std::move(image), min_len, discontinuity, Parameters());
   }
-
-
-
 } // namespace mln::contrib::segdet

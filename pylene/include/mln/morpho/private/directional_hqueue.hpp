@@ -87,14 +87,14 @@ namespace mln::morpho::details
     assert(m_size > 0);
     const auto p = m_queues[m_current_dir]->pop_front(m_current_level);
     const auto q = p + N::after_offsets()[m_current_dir];
-    const int w = m_current_level;
+    const int  w = m_current_level;
     m_size--;
 
     // Update the current level and the current dir if needed
     if (m_size > 0 && m_queues[m_current_dir]->empty(m_current_level))
     {
       int lvl = m_queues[0]->lower_bound(m_current_level);
-      int dir = 0;
+      std::size_t dir = 0;
       for (std::size_t i = 1; i < m_ndir; i++)
       {
         int tmp = m_queues[i]->lower_bound(m_current_level);

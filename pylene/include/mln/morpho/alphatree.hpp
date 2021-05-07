@@ -69,7 +69,7 @@ namespace mln::morpho
         : m_current(0)
       {
       }
-      void                push(std::size_t dir, W w, P p) { m_cont.push_back({p, p + offsets[dir], w}); }
+      void                push(std::size_t dir, W w, P p) { m_cont.push_back({p, p + N::after_offsets()[dir], w}); }
       std::tuple<P, P, W> pop()
       {
         assert(m_current < m_cont.size());
@@ -89,7 +89,6 @@ namespace mln::morpho
       }
 
     private:
-      static constexpr auto offsets = N::after_offsets();
       struct edge_t
       {
         P p;

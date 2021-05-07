@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mln/core/concepts/image.hpp>
+#include <mln/core/concepts/neighborhood.hpp>
 #include <mln/morpho/private/hvector_unbounded.hpp>
 
 #include <array>

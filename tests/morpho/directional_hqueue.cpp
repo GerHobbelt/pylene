@@ -3,6 +3,7 @@
 #include <mln/core/functional_ops.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <gtest/gtest.h>
 

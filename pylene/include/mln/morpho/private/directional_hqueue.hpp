@@ -48,7 +48,7 @@ namespace mln::morpho::details
     static_assert(sizeof(Key) <= 2, "Key should have a size of at least 2");
 
   private:
-    static constexpr std::size_t               m_ndir    = N::after_offsets().size();
+    static constexpr std::size_t               m_ndir    = decltype(N::after_offsets())::extent;
     static constexpr std::size_t               m_nlevels = 1 << std::numeric_limits<Key>::digits;
     std::array<std::shared_ptr<queue_type>, 2> m_queues;
     std::size_t                                m_current_dir;

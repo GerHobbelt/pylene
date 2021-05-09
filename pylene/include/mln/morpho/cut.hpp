@@ -14,8 +14,9 @@ namespace mln::morpho
    * Implementation *
    ******************/
 
-  template <typename V, typename Nodemap, typename Th, typename L> requires(std::is_convertible_v<Th, V>)
-  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, Th th, ::ranges::span<L> vals)
+  template <typename V, typename Nodemap, typename Th, typename L>
+  requires(std::is_convertible_v<Th, V>) auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm,
+                                                                               Th th, ::ranges::span<L> vals)
   {
     static_assert(mln::is_a_v<Nodemap, mln::details::Image>);
     static_assert(std::is_same_v<image_value_t<Nodemap>, int>);
@@ -23,24 +24,28 @@ namespace mln::morpho
 
     assert(static_cast<std::size_t>(vals.size()) == t.parent.size());
 
-    image_ch_value_t<Nodemap, ValueType> lbl    = imchvalue<ValueType>(nm);
-    image_concrete_t<Nodemap>            cut_nm = imconcretize(nm);
+    image_ch_value_t<Nodemap, ValueType> lbl = imchvalue<ValueType>(nm);
 
-    mln_foreach (auto p, nm.domain())
+    std::size_t n = t.parent.size();
+
+    // Root of cut connected component
+    std::vector<std::size_t> root_cut_cc(n);
+    for (std::size_t node = 0; node < n; ++node)
     {
-      cut_nm(p) = nm(p);
-      while (t.parent[cut_nm(p)] != cut_nm(p) && t.values[t.parent[cut_nm(p)]] <= th)
-        cut_nm(p) = t.parent[cut_nm(p)];
+      std::size_t parent_node = t.parent[node];
+      root_cut_cc[node]       = t.values[parent_node] > th ? node : root_cut_cc[parent_node];
     }
 
-    mln_foreach (auto px, cut_nm.pixels())
-      lbl(px.point()) = vals[px.val()];
+    // Reconstruction of image
+    mln_foreach (auto px, nm.pixels())
+      lbl(px.point()) = vals[root_cut_cc[px.val()]];
 
     return lbl;
   }
 
-  template <typename V, typename Nodemap, typename Th, typename L> requires(std::is_convertible_v<Th, V>)
-  auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, Th th, const std::vector<L>& vals)
+  template <typename V, typename Nodemap, typename Th, typename L>
+  requires(std::is_convertible_v<Th, V>) auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm,
+                                                                               Th th, const std::vector<L>& vals)
   {
     return horizontal_cut_labelization_from(t, nm, th, ::ranges::make_span(vals.data(), vals.size()));
   }

@@ -81,6 +81,7 @@ namespace mln::bp
   template <class T>
   class Tile2D : public Tile2DView<T>
   {
+    using free_fn_t = void (*)(void*);
   public:
     Tile2D() = default;
     Tile2D(int width, int height);
@@ -93,11 +94,12 @@ namespace mln::bp
     Tile2D& operator=(Tile2D&&) noexcept;
 
 
-    static Tile2D<T> acquire(T* ptr, int width, int height, std::ptrdiff_t stride) noexcept;
+    static Tile2D<T> acquire(T* ptr, int width, int height, std::ptrdiff_t stride, free_fn_t free_fn= nullptr) noexcept;
     T*               release() noexcept;
 
   private:
     using base = Tile2DView<T>;
+    free_fn_t m_free = nullptr;
   };
 
 
@@ -130,21 +132,28 @@ namespace mln::bp
   Tile2D<T>::~Tile2D()
   {
     if (this->m_ptr)
-      aligned_free_2d<T>((T*)this->m_ptr, this->m_width, this->m_height, this->m_stride);
+    {
+      if (this->m_free == nullptr)
+        aligned_free_2d<T>((T*)this->m_ptr, this->m_width, this->m_height, this->m_stride);
+      else
+        this->m_free(this->m_ptr);
+    }
   }
 
 
   template <class T>
   Tile2D<T>::Tile2D(Tile2D&& other) noexcept
-    : base(std::move(other))
+    : base(other)
   {
     this->m_ptr = std::exchange(other.m_ptr, nullptr);
+    this->m_free = std::exchange(other.m_free, nullptr);
   }
 
   template <class T>
   Tile2D<T>& Tile2D<T>::operator=(Tile2D&& other) noexcept
   {
     std::swap((base&)(*this), (base&)other);
+    std::swap(this->m_free, other.m_free);
     return *this;
   }
 
@@ -155,13 +164,14 @@ namespace mln::bp
   }
 
   template <class T>
-  Tile2D<T> Tile2D<T>::acquire(T* ptr, int width, int height, std::ptrdiff_t pitch) noexcept
+  Tile2D<T> Tile2D<T>::acquire(T* ptr, int width, int height, std::ptrdiff_t pitch, free_fn_t free_fn) noexcept
   {
     Tile2D t;
-    t.m_ptr    = ptr;
-    t.m_stride = pitch;
-    t.m_width  = width;
-    t.m_height = height;
+    t.m_ptr     = ptr;
+    t.m_stride  = pitch;
+    t.m_width   = width;
+    t.m_height  = height;
+    t.m_free    = free_fn;
     return t;
   }
 

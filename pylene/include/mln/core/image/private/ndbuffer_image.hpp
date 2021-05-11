@@ -7,6 +7,7 @@
 #include <mln/core/image/private/ndbuffer_image_pixel.hpp>
 #include <mln/core/image/private/ndimage_extension.hpp>
 #include <mln/core/range/mdspan.hpp>
+#include <mln/bp/tile.hpp>
 
 namespace mln
 {
@@ -135,6 +136,7 @@ namespace mln
     /// \{
     T*                      buffer() noexcept;
     const T*                buffer() const noexcept;
+
     [[deprecated]] T*       data() noexcept { return this->buffer(); }
     [[deprecated]] const T* data() const noexcept { return this->buffer(); }
 
@@ -148,6 +150,13 @@ namespace mln
     __ndbuffer_image<T, 2> slice(int z) const;
     __ndbuffer_image<T, 1> row(int y) const;
     __ndbuffer_image<T, N> clip(const ndbox<N>& roi) const;
+    /// \}
+
+
+    /// Conversion to primitive objects
+    /// \{
+    bp::Tile2DView<T>           as_tile() noexcept requires (N == 2);
+    bp::Tile2DView<const T>     as_tile() const noexcept requires (N == 2);
     /// \}
 
     /// Value access
@@ -606,6 +615,19 @@ namespace mln
 
     auto ptr = Impl::get_pointer(this->__info(), coords);
     return mln::internal::ndimage_extension<T, N>{(char*)ptr, strides, dims, this->border()};
+  }
+
+  template <class T, int N>
+  bp::Tile2DView<T> __ndbuffer_image<T, N>::as_tile() noexcept requires (N == 2)
+  {
+    return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
+
+  }
+
+  template <class T, int N>
+  bp::Tile2DView<const T> __ndbuffer_image<T, N>::as_tile() const noexcept requires (N == 2)
+  {
+    return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
   }
 
 

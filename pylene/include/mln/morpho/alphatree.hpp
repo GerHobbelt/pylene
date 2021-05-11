@@ -58,6 +58,14 @@ namespace mln::morpho
       details::directional_hqueue<I, N, W> m_cont;
     };
 
+    template <typename P, typename W>
+    struct edge_t
+    {
+      P p;
+      P q;
+      W w;
+    };
+
     template <typename I, typename N, typename W>
     class alphatree_edges
     {
@@ -85,19 +93,13 @@ namespace mln::morpho
       bool empty() const { return m_cont.size() == m_current; }
       void on_finish_insert()
       {
-        std::sort(m_cont.begin(), m_cont.end(), [](const edge_t& a, const edge_t& b) { return a.w < b.w; });
+        std::sort(m_cont.begin(), m_cont.end(), [](const edge_t<P, W>& a, const edge_t<P, W>& b) { return a.w < b.w; });
       }
 
     private:
-      static constexpr auto cn = N();
-      struct edge_t
-      {
-        P p;
-        P q;
-        W w;
-      };
-      std::vector<edge_t> m_cont;
-      std::size_t         m_current;
+      static constexpr auto     cn = N();
+      std::vector<edge_t<P, W>> m_cont;
+      std::size_t               m_current;
     };
 
 

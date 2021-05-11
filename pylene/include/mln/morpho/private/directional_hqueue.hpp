@@ -45,12 +45,12 @@ namespace mln::morpho::details
     static_assert(sizeof(K) <= 2, "Key should have a size of at least 2");
 
   private:
-    static constexpr std::size_t               m_ndir    = decltype(N::after_offsets())::extent;
-    static constexpr int                       m_nlevels = 1 << std::numeric_limits<K>::digits;
-    std::array<std::shared_ptr<queue_type>, 2> m_queues;
-    std::size_t                                m_current_dir;
-    int                                        m_current_level;
-    std::size_t                                m_size;
+    static constexpr std::size_t                    m_ndir    = decltype(N::after_offsets())::extent;
+    static constexpr int                            m_nlevels = 1 << std::numeric_limits<K>::digits;
+    std::array<std::shared_ptr<queue_type>, m_ndir> m_queues;
+    std::size_t                                     m_current_dir;
+    int                                             m_current_level;
+    std::size_t                                     m_size;
   };
 
   /******************
@@ -93,7 +93,7 @@ namespace mln::morpho::details
     // Update the current level and the current dir if needed
     if (m_size > 0 && m_queues[m_current_dir]->empty(m_current_level))
     {
-      int lvl = m_queues[0]->lower_bound(m_current_level);
+      int         lvl = m_queues[0]->lower_bound(m_current_level);
       std::size_t dir = 0;
       for (std::size_t i = 1; i < m_ndir; i++)
       {

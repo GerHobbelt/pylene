@@ -742,10 +742,10 @@ namespace mln::contrib::segdet
 
     std::vector<uint16_t> segments = std::vector<uint16_t>(segments_removable.size());
 
-    mln_foreach (auto p, intersection.values())
+    mln_foreach (auto v, intersection.values())
     {
-      if (p >= 3)
-        segments[p - 3]++;
+      if (v >= 3)
+        segments[v - 3]++;
     }
 
     int k = 0;

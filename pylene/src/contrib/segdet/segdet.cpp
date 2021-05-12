@@ -76,6 +76,7 @@ namespace mln::contrib::segdet
 
     while (image_at(image, n_end, t, is_horizontal) > m_lum)
       n_end--;
+
     n_end++;
 
     /*
@@ -88,6 +89,11 @@ namespace mln::contrib::segdet
     thickness         = n_end - n;
     uint32_t position = n + thickness / 2;
 
+    if (n_end - n > luminosities_list.size()){
+      thickness--;
+      n_end--;
+      position = n + thickness / 2;
+    }
     const double mean = mln::contrib::segdet::mean(luminosities_list, n - n_start, n_end - n_start);
 
     n = n_to_skip; // Setting reference value of n
@@ -736,11 +742,14 @@ namespace mln::contrib::segdet
     image2d<uint16_t> intersection = image2d<uint16_t>(width, height);
     mln::fill(intersection, 0);
 
-    //    auto intersection =
-    //        mln::view::transform(first_output, second_output_bin, [](uint16_t x, uint16_t y) { return x * y; });
     intersect(first_output, second_output, intersection);
 
+
+
     std::vector<uint16_t> segments = std::vector<uint16_t>(segments_removable.size());
+
+    for (unsigned short & segment : segments)
+      segment = 0;
 
     mln_foreach (auto v, intersection.values())
     {
@@ -883,7 +892,7 @@ namespace mln::contrib::segdet
     // Preprocessing
     mln::ndbuffer_image preprocessed_img = preprocess(std::move(image));
 
-    uint min_len_embryo = min_len / 4; // 5U < min_len ? 5U : min_len;
+    uint min_len_embryo = min_len / 4 + 1; // 5U < min_len ? 5U : min_len;
     // Processing
     auto p              = process(preprocessed_img.__cast<uint8_t, 2>(), min_len_embryo, discontinuity, params);
 

@@ -196,6 +196,39 @@ TEST(Morpho, AlphaTree8C)
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16.f), ref_16);
 }
 
+TEST(Morpho, AlphaTree8CHQUEUE)
+{
+    mln::image2d<std::uint8_t> ima = {
+            {128, 124, 150, 137, 106}, //
+            {116, 128, 156, 165, 117}, //
+            {117, 90, 131, 108, 151},  //
+            {107, 87, 118, 109, 167},  //
+            {107, 73, 125, 157, 117},  //
+    };
+
+    auto [t, nm] = mln::morpho::alphatree(
+            ima, mln::c8, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
+
+    mln::image2d<int> ref_0 = {
+            {0, 1, 2, 3, 4},      //
+            {5, 0, 6, 7, 8},      //
+            {9, 10, 11, 12, 13},  //
+            {14, 15, 16, 17, 18}, //
+            {14, 19, 20, 21, 22}, //
+    };
+
+    mln::image2d<int> ref_16 = {
+            {0, 1, 2, 3, 4},      //
+            {5, 0, 2, 7, 8},      //
+            {5, 10, 0, 12, 13},  //
+            {14, 10, 16, 12, 18}, //
+            {14, 19, 16, 18, 22}, //
+    };
+
+    ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0.f), ref_0);
+    ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16.f), ref_16);
+}
+
 TEST(Morpho, AlphaTree3DImage)
 {
   const mln::image3d<uint32_t> ima = {
@@ -221,4 +254,31 @@ TEST(Morpho, AlphaTree3DImage)
 
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0u), ref_0);
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16u), ref_16);
+}
+
+TEST(Morpho, AlphaTree3DImageHQUEUE)
+{
+    const mln::image3d<uint8_t> ima = {
+            {{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},   //
+            {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}}, //
+            {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}    //
+    };
+
+    auto [t, nm] = mln::morpho::alphatree(
+            ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
+
+    const mln::image3d<int> ref_0 = {
+            {{0, 1, 1}, {0, 1, 1}, {2, 3, 4}},   //
+            {{5, 6, 7}, {8, 9, 10}, {11, 12, 13}}, //
+            {{14, 15, 16}, {12, 17, 18}, {19, 20, 21}}    //
+    };
+
+    const mln::image3d<int> ref_16 = {
+            {{0, 1, 1}, {0, 1, 1}, {0, 3, 4}},   //
+            {{5, 6, 7}, {5, 1, 10}, {11, 6, 13}}, //
+            {{5, 7, 1}, {6, 7, 13}, {19, 1, 10}}    //
+    };
+
+    ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0u), ref_0);
+    ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16u), ref_16);
 }

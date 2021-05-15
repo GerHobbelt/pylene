@@ -211,14 +211,18 @@ namespace mln::morpho
           // Do we need to create a new node
           int rp_root = links[rp];
           int rq_root = links[rq];
+
+          int max_root = std::max(rp_root, rq_root);
+          int min_root = std::min(rp_root, rq_root);
+
           int new_root_id;
-          if (levels[rq_root] == w)
+          if (levels[max_root] == w)
           {
-            new_root_id = rq_root;
+            new_root_id = max_root;
           }
-          else if (levels[rp_root] == w)
+          else if (levels[min_root] == w)
           {
-            new_root_id = rp_root;
+            new_root_id = min_root;
           }
           else
           {

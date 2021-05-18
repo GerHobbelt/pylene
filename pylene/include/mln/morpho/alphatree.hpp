@@ -188,7 +188,6 @@ namespace mln::morpho
     {
       static_assert(mln::is_a<I, mln::details::Image>());
 
-
       std::vector<int> zpar(node_count);  // Parent of ufind structure
       std::vector<int> links(node_count); // Node index in the alpha tree
 
@@ -240,6 +239,50 @@ namespace mln::morpho
     }
   } // namespace internal
 
+  template <class W>
+  std::pair<std::vector<int>, std::vector<W>> canonize_tree(const std::vector<int>& par,        //
+                                                            const std::vector<W>&   levels,     //
+                                                            std::size_t             node_count, //
+                                                            std::size_t             flatzones_count)
+  {
+    std::vector<int> translation_map(node_count);
+
+    std::size_t root = node_count - 1;
+
+    // Determine final node number and create the translation map
+    std::size_t count = flatzones_count;
+    for (std::size_t i = flatzones_count; i < node_count - 1; ++i)
+    {
+      if (levels[i] != levels[par[i]]) // Keep the node
+        translation_map[i] = count++;
+    }
+    translation_map[root] = count;
+
+    std::vector<int> canonized_par(count + 1);
+    std::vector<W>   canonized_levels(count + 1, 0);
+
+    canonized_par[count]      = count;
+    canonized_levels[count--] = levels[root];
+
+    // Build canonized tree
+    for (std::size_t i = node_count - 1; i >= flatzones_count; --i)
+    {
+      if (levels[i] != levels[par[i]]) // Keep the node: Update tree
+      {
+        canonized_par[count]      = translation_map[par[i]];
+        canonized_levels[count--] = levels[i];
+      }
+      else // Deleted node: retrieve the parent translation
+        translation_map[i] = translation_map[par[i]];
+    }
+
+    // Change parents of leaves
+    for (std::size_t i = 0; i < flatzones_count; ++i)
+      canonized_par[i] = translation_map[par[i]];
+
+    return {canonized_par, canonized_levels};
+  }
+
   template <class I, class N, class F>
   std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
   alphatree(I input, N nbh, F distance)
@@ -276,6 +319,11 @@ namespace mln::morpho
     {
       std::iota(std::begin(par), std::end(par), 0);
       node_count = internal::alphatree_compute_hierarchy(edges, node_map, node_count, par, levels);
+
+      auto [canonized_par, canonized_levels] = canonize_tree(par, levels, node_count, flatzones_count);
+      par                                    = canonized_par;
+      levels                                 = canonized_levels;
+      node_count                             = par.size();
     }
 
     // 5. Parent / levels are ordered from leaves to root, we need to reverse

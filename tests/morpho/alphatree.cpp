@@ -112,6 +112,22 @@ TEST(Morpho, AlphaTreeParentRelation)
     ASSERT_TRUE(static_cast<int>(i) >= t.parent[i]);
 }
 
+TEST(Morpho, AlphaTreeCanonized)
+{
+  mln::image2d<int> ima = {
+      {4, 0, 0, 1},  //
+      {5, 0, 8, 1},  //
+      {6, 0, 9, 1},  //
+      {7, 0, 10, 1}, //
+      {2, 3, 4, 5},  //
+  };
+
+  auto [t, _] = mln::morpho::alphatree(ima, mln::c4);
+
+  for (std::size_t i = 1; i < t.parent.size(); ++i)
+    ASSERT_TRUE(t.values[i] != t.values[t.parent[i]]);
+}
+
 TEST(Morpho, AlphaTreeRGB8Uint16Distance)
 {
   const mln::image2d<mln::rgb8> ima = {

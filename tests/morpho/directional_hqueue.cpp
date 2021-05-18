@@ -89,12 +89,14 @@ TEST(Morpho, DirectionalHQueueC8)
 
 TEST(Morpho, DirectionalHQueueC6)
 {
-  mln::image3d<std::uint8_t> ima = {{
-                                        {10, 15, 32}, //
-                                        {12, 16, 8},  //
-                                        {7, 28, 20}   //
-                                    },
-                                    {{12, 6, 3}, {27, 1, 9}, {7, 15, 2}}};
+  mln::image3d<std::uint8_t> ima = {
+      {{10, 15, 32}, //
+       {12, 16, 8},  //
+       {7, 28, 20}}, //
+      {{12, 6, 3},   //
+       {27, 1, 9},   //
+       {7, 15, 2}}   //
+  };
 
   auto dist = [](std::uint8_t a, std::uint8_t b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); };
   using F   = decltype(dist);

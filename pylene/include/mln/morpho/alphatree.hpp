@@ -37,6 +37,8 @@ namespace mln::morpho
 
   namespace internal
   {
+    /// \brief Canvas for the edges in the alphatree. Using different data
+    /// structures related to the type of the edges.
     template <typename I, typename N, typename W>
     class alphatree_edges;
 

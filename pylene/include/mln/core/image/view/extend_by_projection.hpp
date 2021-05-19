@@ -51,7 +51,7 @@ namespace mln
     };
 
   public:
-    extend_by_projection_view_base<I, Proj>(I ima, Proj proj)
+    extend_by_projection_view_base(I ima, Proj proj)
       : base_t{std::move(ima)}
       , m_proj{std::move(proj)}
     {

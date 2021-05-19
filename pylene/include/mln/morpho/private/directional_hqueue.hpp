@@ -79,8 +79,7 @@ namespace mln::morpho::details
   }
 
   template <typename P, typename N, typename K>
-  std::tuple<P, P, int>
-  directional_hqueue<P, N, K>::pop() noexcept
+  std::tuple<P, P, int> directional_hqueue<P, N, K>::pop() noexcept
   {
     assert(m_size > 0);
     const auto p = m_queues[m_current_dir]->pop_front(m_current_level);

@@ -13,13 +13,11 @@ namespace mln::morpho::details
   /// \tparam I The image the edges are calculated from
   /// \tparam N The neighborhood used to compute the edges
   /// \tparam K Value type of the level (Should be unsigned integer of at least a size of 2)
-  template <typename I, typename N, typename K>
+  template <typename P, typename N, typename K>
   class directional_hqueue
   {
-    static_assert(is_a_v<I, mln::details::Image>, "I should be an image");
     static_assert(is_a_v<N, mln::details::Neighborhood>, "N should be a neighborhood");
-    using Point      = image_point_t<I>;
-    using queue_type = hvectors_unbounded<Point>;
+    using queue_type = hvectors_unbounded<P>;
 
   public:
     /// \brief Constructor
@@ -29,10 +27,10 @@ namespace mln::morpho::details
     /// \param dir The hierarchical queue index (from after_offset() in N)
     /// \param w The weight of the edge
     /// \param p The point the edge weight is calculated from
-    void insert(std::size_t dir, int w, Point p) noexcept;
+    void insert(std::size_t dir, int w, P p) noexcept;
 
     /// \brief Return the tuple (p, q, w) where p and q are the vertex of the edge and w its weight
-    std::tuple<Point, Point, int> pop() noexcept;
+    std::tuple<P, P, int> pop() noexcept;
 
     /// \brief Return the lower weight of the queue
     int current_level() const noexcept;
@@ -57,8 +55,8 @@ namespace mln::morpho::details
    * Implementation *
    ******************/
 
-  template <typename I, typename N, typename K>
-  directional_hqueue<I, N, K>::directional_hqueue() noexcept
+  template <typename P, typename N, typename K>
+  directional_hqueue<P, N, K>::directional_hqueue() noexcept
     : m_current_dir(0)
     , m_current_level(0)
     , m_size(0)
@@ -67,8 +65,8 @@ namespace mln::morpho::details
       m_queues[i] = std::make_shared<queue_type>(m_nlevels);
   }
 
-  template <typename I, typename N, typename K>
-  void directional_hqueue<I, N, K>::insert(std::size_t dir, int w, Point p) noexcept
+  template <typename P, typename N, typename K>
+  void directional_hqueue<P, N, K>::insert(std::size_t dir, int w, P p) noexcept
   {
     // Update the current level and the current dir to keep the queue sorted
     if (m_size == 0 || w < m_current_level)
@@ -80,9 +78,9 @@ namespace mln::morpho::details
     m_size++;
   }
 
-  template <typename I, typename N, typename K>
-  std::tuple<typename directional_hqueue<I, N, K>::Point, typename directional_hqueue<I, N, K>::Point, int>
-  directional_hqueue<I, N, K>::pop() noexcept
+  template <typename P, typename N, typename K>
+  std::tuple<P, P, int>
+  directional_hqueue<P, N, K>::pop() noexcept
   {
     assert(m_size > 0);
     const auto p = m_queues[m_current_dir]->pop_front(m_current_level);
@@ -111,15 +109,15 @@ namespace mln::morpho::details
     return {p, q, w};
   }
 
-  template <typename I, typename N, typename K>
-  int directional_hqueue<I, N, K>::current_level() const noexcept
+  template <typename P, typename N, typename K>
+  int directional_hqueue<P, N, K>::current_level() const noexcept
   {
     assert(m_size > 0);
     return m_current_level;
   }
 
-  template <typename I, typename N, typename K>
-  bool directional_hqueue<I, N, K>::empty() const noexcept
+  template <typename P, typename N, typename K>
+  bool directional_hqueue<P, N, K>::empty() const noexcept
   {
     return m_size == 0;
   }

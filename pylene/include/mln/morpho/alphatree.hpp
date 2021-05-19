@@ -39,15 +39,12 @@ namespace mln::morpho
   {
     /// \brief Canvas for the edges in the alphatree. Using different data
     /// structures related to the type of the edges.
-    template <typename I, typename N, typename W>
+    template <typename P, typename N, typename W>
     class alphatree_edges;
 
-    template <typename I, typename N, typename W>
-    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2) class alphatree_edges<I, N, W>
+    template <typename P, typename N, typename W>
+    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2) class alphatree_edges<P, N, W>
     {
-      static_assert(is_a_v<I, mln::details::Image>);
-      using P = image_point_t<I>;
-
     public:
       alphatree_edges(){};
       void                push(std::size_t dir, W w, P p) { m_cont.insert(dir, w, p); }
@@ -57,7 +54,7 @@ namespace mln::morpho
       void                on_finish_insert() {}
 
     private:
-      details::directional_hqueue<I, N, W> m_cont;
+      details::directional_hqueue<P, N, W> m_cont;
     };
 
     template <typename P, typename W>
@@ -68,12 +65,9 @@ namespace mln::morpho
       W w;
     };
 
-    template <typename I, typename N, typename W>
+    template <typename P, typename N, typename W>
     class alphatree_edges
     {
-      static_assert(is_a_v<I, mln::details::Image>);
-      using P = image_point_t<I>;
-
     public:
       alphatree_edges()
         : m_current(0)
@@ -163,8 +157,11 @@ namespace mln::morpho
     auto alphatree_compute_edges(I input, N nbh, F distance)
     {
       static_assert(is_a_v<I, mln::details::Image>);
-      using V    = image_value_t<I>;
-      auto edges = alphatree_edges<I, N, std::invoke_result_t<F, V, V>>();
+      using V = image_value_t<I>;
+      using P = image_point_t<I>;
+      using W = std::invoke_result_t<F, V, V>;
+
+      auto edges = alphatree_edges<P, N, W>();
       auto dom   = input.domain();
       mln_foreach (auto p, dom)
       {

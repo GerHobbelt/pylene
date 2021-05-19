@@ -20,11 +20,12 @@ TEST(Morpho, DirectionalHQueueC4)
   auto dist = [](std::uint8_t a, std::uint8_t b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); };
   using F   = decltype(dist);
   using V   = mln::image_value_t<decltype(ima)>;
+  using P   = mln::image_point_t<decltype(ima)>;
   using W   = std::invoke_result_t<F, V, V>;
 
   constexpr std::array<W, 12> ref = {1, 2, 4, 5, 5, 8, 8, 12, 12, 17, 21, 24};
 
-  auto hqueue = mln::morpho::details::directional_hqueue<decltype(ima), mln::c4_t, W>();
+  auto hqueue = mln::morpho::details::directional_hqueue<P, mln::c4_t, W>();
 
   mln_foreach (auto p, ima.domain())
   {
@@ -59,11 +60,12 @@ TEST(Morpho, DirectionalHQueueC8)
   auto dist = [](std::uint8_t a, std::uint8_t b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); };
   using F   = decltype(dist);
   using V   = mln::image_value_t<decltype(ima)>;
+  using P   = mln::image_point_t<decltype(ima)>;
   using W   = std::invoke_result_t<F, V, V>;
 
   constexpr std::array<W, 20> ref = {1, 2, 3, 4, 4, 5, 5, 6, 7, 8, 8, 9, 12, 12, 16, 16, 17, 20, 21, 24};
 
-  auto hqueue = mln::morpho::details::directional_hqueue<decltype(ima), mln::c8_t, W>();
+  auto hqueue = mln::morpho::details::directional_hqueue<P, mln::c8_t, W>();
 
   mln_foreach (auto p, ima.domain())
   {
@@ -101,12 +103,13 @@ TEST(Morpho, DirectionalHQueueC6)
   auto dist = [](std::uint8_t a, std::uint8_t b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); };
   using F   = decltype(dist);
   using V   = mln::image_value_t<decltype(ima)>;
+  using P   = mln::image_point_t<decltype(ima)>;
   using W   = std::invoke_result_t<F, V, V>;
 
   constexpr std::array<W, 33> ref = {0, 1,  1,  2,  2,  3,  4,  5,  5,  5,  6,  6,  7,  8,  8,  8, 8,
                                      9, 12, 12, 13, 13, 14, 15, 15, 15, 17, 18, 20, 21, 24, 26, 29};
 
-  auto hqueue = mln::morpho::details::directional_hqueue<decltype(ima), mln::c6_t, W>();
+  auto hqueue = mln::morpho::details::directional_hqueue<P, mln::c6_t, W>();
 
   mln_foreach (auto p, ima.domain())
   {

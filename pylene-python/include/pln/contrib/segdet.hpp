@@ -5,6 +5,7 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image_format.hpp>
 #include <pybind11/iostream.h>
+#include <exception>
 #include <utility>
 
 namespace pln::contrib::segdet
@@ -17,6 +18,10 @@ namespace pln::contrib::segdet
       params_cpp = mln::contrib::segdet::Parameters();
     else
       params_cpp = mln::contrib::segdet::Parameters(params);
+    if (!params_cpp.is_valid())
+    {
+      throw std::invalid_argument("One of the parameters is invalid.");
+    }
 
     return mln::contrib::segdet::detect_line(std::move(img), min_len, disc, params_cpp);
   }

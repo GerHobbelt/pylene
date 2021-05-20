@@ -2,9 +2,13 @@
 
 
 #include <mln/accu/accumulator.hpp>
+#include <mln/core/algorithm/fill.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/ndimage_fwd.hpp>
 #include <mln/core/image/view/zip.hpp>
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
+#include <mln/hierarchies/graph.hpp>
 
 #include <vector>
 
@@ -26,13 +30,12 @@ namespace mln::morpho
   class component_tree;
 
 
-
   template <>
   class component_tree<void>
   {
   public:
     using node_id_type = int;
-    using node_map_t = int;
+    using node_map_t   = int;
 
 
     /// \brief Filter the tree given a predicate that removes some nodes according to the selected strategy.
@@ -67,10 +70,8 @@ namespace mln::morpho
     void filter(ct_filtering strategy, I node_map, F pred);
 
 
-
     /// \brief Compute the depth attribute over a tree
     std::vector<int> compute_depth() const;
-
 
     /// \brief Compute attribute on values
     ///
@@ -107,8 +108,6 @@ namespace mln::morpho
     compute_attribute_on_pixels(I node_map, J values, Accu acc);
 
 
-
-
     /// \brief Reconstruct an image from an attribute map
     ///
     /// \param node_map Image point -> node_id mapping
@@ -116,7 +115,16 @@ namespace mln::morpho
     template <class I, class V>
     image_ch_value_t<I, V> reconstruct_from(I node_map, ::ranges::span<V> values) const;
 
+    using Edge = std::tuple<int, int, double>;
 
+    /// Generate a saliency map of the given Component Tree
+    ///
+    /// @return A list of edges that associates each edges to a saliency weight
+    std::vector<Edge> saliency_map(const Graph& leaf_graph);
+
+
+    /// Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
+    mln::image2d<double> saliency_khalimsky_grid(const Graph& leaf_graph);
 
     using node_t = int;
     std::vector<node_t> parent;
@@ -137,7 +145,6 @@ namespace mln::morpho
   class component_tree : public component_tree<void>
   {
   public:
-
     template <class I>
     image_ch_value_t<std::remove_reference_t<I>, T> reconstruct(I&& node_map)
     {
@@ -167,13 +174,12 @@ namespace mln::morpho
   template <class I, class F>
   void component_tree<void>::update_node_map(I node_map, F pred) const
   {
-    mln_foreach(auto& id, node_map.values())
+    mln_foreach (auto& id, node_map.values())
     {
       if (id > 0 && !pred(id))
         id = this->parent[id];
     }
   }
-
 
 
   template <class F>
@@ -213,7 +219,7 @@ namespace mln::morpho
       // Propagate upward
       for (std::size_t i = n - 1; i > 0; --i)
       {
-        pass[i] = pass[i] || pred(i);
+        pass[i]         = pass[i] || pred(i);
         pass[parent[i]] = pass[parent[i]] || pass[i];
       }
 
@@ -260,7 +266,7 @@ namespace mln::morpho
       // Propagate upward
       for (std::size_t i = n - 1; i > 0; --i)
       {
-        pass[i] = pass[i] || pred(static_cast<int>(i));
+        pass[i]         = pass[i] || pred(static_cast<int>(i));
         pass[parent[i]] = pass[parent[i]] || pass[i];
       }
       this->filter_direct(pass);
@@ -268,9 +274,6 @@ namespace mln::morpho
 
     this->update_node_map(node_map, [&pass](int x) { return pass[x]; });
   }
-
-
-
 
 
   template <class I, class Accu>
@@ -288,7 +291,7 @@ namespace mln::morpho
     std::vector<decltype(a)> attr(parent.size(), a);
 
     // Accumulate for each point
-    mln_foreach(auto px, node_map.pixels())
+    mln_foreach (auto px, node_map.pixels())
       attr[px.val()].take(px.point());
 
 
@@ -322,7 +325,7 @@ namespace mln::morpho
 
     // Accumulate for each point
     auto zz = mln::view::zip(node_map, input);
-    mln_foreach((auto [node_id, val]), zz.values())
+    mln_foreach ((auto [node_id, val]), zz.values())
       attr[node_id].take(val);
 
 
@@ -374,7 +377,6 @@ namespace mln::morpho
   }
 
 
-
   template <class I, class V>
   image_ch_value_t<I, V> component_tree<void>::reconstruct_from(I node_map, ::ranges::span<V> values) const
   {
@@ -390,4 +392,4 @@ namespace mln::morpho
   }
 
 
-} // namespace mln::morpho::
+} // namespace mln::morpho

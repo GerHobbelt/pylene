@@ -29,6 +29,8 @@ namespace mln
      */
     explicit Graph(const mln::image2d<rgb8>& image);
 
+    explicit Graph(const mln::image2d<uint8_t>& image);
+
     inline int get_nb_vertices() const { return nb_vertices_; }
 
     inline int get_height() const { return height_; }

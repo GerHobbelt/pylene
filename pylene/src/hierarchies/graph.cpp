@@ -69,4 +69,32 @@ namespace mln
       }
     }
   }
+
+  Graph::Graph(const mln::image2d<uint8_t>& image)
+    : height_(image.height())
+    , width_(image.width())
+    , nb_vertices_(height_ * width_)
+  {
+    for (int y = 0; y < height_; y++)
+    {
+      for (int x = 0; x < width_; x++)
+      {
+        auto pix = image({x, y});
+
+        if (x < width_ - 1)
+        {
+          auto   pix3    = image({x + 1, y});
+          double weighty = std::abs(pix - pix3);
+          this->add_edge(x + width_ * y, (x + 1) + width_ * y, weighty);
+        }
+
+        if (y < height_ - 1)
+        {
+          auto   pix2    = image({x, y + 1});
+          double weightx = std::abs(pix - pix2);
+          this->add_edge(x + width_ * y, x + width_ * (y + 1), weightx);
+        }
+      }
+    }
+  }
 } // namespace mln

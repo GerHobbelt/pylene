@@ -145,7 +145,9 @@ namespace mln::contrib::segdet
     uint32_t obs_n_max = obs(0, 0) + obs_thick_d2 + 1;
 
     // Only checking the acceptation for near predictions
-    while (index < filters.size() && filters[index].X_predicted(0, 0) - obs_n_max < 10)
+//    while (index < filters.size() && filters[index].X_predicted(0, 0) - obs_n_max < 10)
+    index = 0;
+    while (index < filters.size())
     {
       Filter& f = filters[index];
       if (accepts(f, obs, obs_n_min, obs_n_max, params))
@@ -479,8 +481,8 @@ namespace mln::contrib::segdet
       for (auto& filter : filters)
         predict(filter);
 
-      std::sort(filters.begin(), filters.end(),
-                [](Filter f1, Filter f2) { return f1.S_predicted(0, 0) < f2.S_predicted(0, 0); });
+//      std::sort(filters.begin(), filters.end(),
+//                [](Filter f1, Filter f2) { return f1.S_predicted(0, 0) < f2.S_predicted(0, 0); });
 
       new_filters.clear();
       bool     two_matches_through_n = false;

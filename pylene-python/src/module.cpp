@@ -1,4 +1,5 @@
 #include <pln/contrib/segdet.hpp>
+#include <mln/contrib/segdet/evaluation.hpp>
 #include <pln/core/image_cast.hpp>
 
 #include <pybind11/pybind11.h>
@@ -22,5 +23,7 @@ namespace pln
     
     m.def("detect_line_np", &pln::contrib::segdet::detect_line_numpy, py::arg("img"), py::arg("min_len"),
           py::arg("disc"), py::arg("params") = std::map<std::string, double>());
+
+    m.def("score_detection", &mln::contrib::segdet::score_detection);
   }
 } // namespace pln

@@ -128,6 +128,47 @@ TEST(Morpho, AlphaTreeCanonized)
     ASSERT_TRUE(t.values[i] != t.values[t.parent[i]]);
 }
 
+TEST(Morpho, AlphaTreeMST)
+{
+  mln::image2d<int> ima = {
+      {4, 0, 0, 1},  //
+      {5, 0, 8, 1},  //
+      {6, 0, 9, 1},  //
+      {7, 0, 10, 1}, //
+      {2, 3, 4, 5},  //
+  };
+
+  std::vector<mln::morpho::internal::edge_t<mln::image_point_t<mln::image2d<int>>, std::float_t>> expected_mst = {
+      {{0, 2}, {0, 3}, 1.}, //
+      {{2, 4}, {3, 4}, 1.}, //
+      {{1, 4}, {2, 4}, 1.}, //
+      {{0, 4}, {1, 4}, 1.}, //
+      {{2, 2}, {2, 3}, 1.}, //
+      {{0, 0}, {0, 1}, 1.}, //
+      {{2, 0}, {3, 0}, 1.}, //
+      {{0, 1}, {0, 2}, 1.}, //
+      {{2, 1}, {2, 2}, 1.}, //
+      {{1, 3}, {1, 4}, 3.}, //
+      {{0, 0}, {1, 0}, 4.}, //
+      {{2, 3}, {2, 4}, 6.}  //
+  };
+
+  std::vector<mln::morpho::internal::edge_t<mln::image_point_t<mln::image2d<int>>, std::float_t>> mst;
+
+  auto [t, _] = mln::morpho::internal::__alphatree(
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::float_t { return mln::functional::l2dist_t<>()(a, b); },
+      &mst);
+
+
+  for (std::size_t i = 0; i < expected_mst.size(); ++i)
+  {
+    ASSERT_EQ(expected_mst[i].p, mst[i].p);
+    ASSERT_EQ(expected_mst[i].q, mst[i].q);
+    ASSERT_EQ(expected_mst[i].w, mst[i].w);
+  }
+  ASSERT_EQ(expected_mst.size(), mst.size());
+}
+
 TEST(Morpho, AlphaTreeRGB8Uint16Distance)
 {
   const mln::image2d<mln::rgb8> ima = {

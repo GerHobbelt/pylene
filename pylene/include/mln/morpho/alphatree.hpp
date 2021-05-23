@@ -237,51 +237,40 @@ namespace mln::morpho
       }
       return node_count;
     }
-  } // namespace internal
 
-  template <class W>
-  std::pair<std::vector<int>, std::vector<W>> canonize_tree(const std::vector<int>& par,        //
-                                                            const std::vector<W>&   levels,     //
-                                                            std::size_t             node_count, //
-                                                            std::size_t             flatzones_count)
-  {
-    std::vector<int> translation_map(node_count);
-
-    std::size_t root = node_count - 1;
-
-    // Determine final node number and create the translation map
-    std::size_t count = flatzones_count;
-    for (std::size_t i = flatzones_count; i < node_count - 1; ++i)
+    template <class W>
+    std::pair<std::vector<int>, std::vector<W>> canonize_component_tree(const std::vector<int>& par,    //
+                                                                        const std::vector<W>&   levels, //
+                                                                        std::size_t             node_count)
     {
-      if (levels[i] != levels[par[i]]) // Keep the node
-        translation_map[i] = count++;
-    }
-    translation_map[root] = count;
+      std::vector<int> canonized_par;
+      std::vector<W>   canonized_levels;
 
-    std::vector<int> canonized_par(count + 1);
-    std::vector<W>   canonized_levels(count + 1, 0);
+      // Init with root
+      canonized_par.push_back(0);
+      canonized_levels.push_back(levels[0]);
 
-    canonized_par[count]      = count;
-    canonized_levels[count--] = levels[root];
+      std::vector<int> translation_map(node_count);
 
-    // Build canonized tree
-    for (std::size_t i = node_count - 1; i >= flatzones_count; --i)
-    {
-      if (levels[i] != levels[par[i]]) // Keep the node: Update tree
+      translation_map[0] = 0;
+      std::size_t count  = 1;
+
+      // Build canonized component tree
+      for (std::size_t i = 1; i < node_count; ++i)
       {
-        canonized_par[count]      = translation_map[par[i]];
-        canonized_levels[count--] = levels[i];
+        if (levels[i] != levels[par[i]]) // Keep the node: Update tree
+        {
+          translation_map[i] = count++;
+          canonized_par.push_back(translation_map[par[i]]);
+          canonized_levels.push_back(levels[i]);
+        }
+        else // Deleted node: retrieve the parent translation
+          translation_map[i] = translation_map[par[i]];
       }
-      else // Deleted node: retrieve the parent translation
-        translation_map[i] = translation_map[par[i]];
+
+      return {canonized_par, canonized_levels};
     }
-
-    // Change parents of leaves
-    for (std::size_t i = 0; i < flatzones_count; ++i)
-      canonized_par[i] = translation_map[par[i]];
-
-    return {canonized_par, canonized_levels};
-  }
+  } // namespace internal
 
   template <class I, class N, class F>
   std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
@@ -319,15 +308,15 @@ namespace mln::morpho
     {
       std::iota(std::begin(par), std::end(par), 0);
       node_count = internal::alphatree_compute_hierarchy(edges, node_map, node_count, par, levels);
-
-      auto [canonized_par, canonized_levels] = canonize_tree(par, levels, node_count, flatzones_count);
-      par                                    = canonized_par;
-      levels                                 = canonized_levels;
-      node_count                             = par.size();
     }
 
     // 5. Parent / levels are ordered from leaves to root, we need to reverse
     internal::alphatree_reorder_nodes(par.data(), levels.data(), node_count);
+
+    auto [canonized_par, canonized_levels] = internal::canonize_component_tree(par, levels, node_count);
+    par                                    = canonized_par;
+    levels                                 = canonized_levels;
+    node_count                             = par.size();
 
     // 6. Update the node_map
     mln::for_each(node_map, [node_count](int& id) { id = static_cast<int>(node_count) - id - 1; });

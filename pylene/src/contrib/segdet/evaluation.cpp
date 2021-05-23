@@ -2,12 +2,13 @@
 #include "mln/core/algorithm/fill.hpp"
 #include "mln/core/range/foreach.hpp"
 #include <map>
+#include <mln/io/imsave.hpp>
 
 namespace mln::contrib::segdet
 {
-  size_t image_max(mln::image2d<u_int32_t> img)
+  size_t image_max(mln::image2d<u_int8_t> img)
   {
-    uint32_t max = 0;
+    uint8_t max = 0;
 
     mln_foreach (auto v, img.values())
     {
@@ -18,9 +19,9 @@ namespace mln::contrib::segdet
     return max;
   }
 
-  mln::image2d<u_int32_t> image_where_equal(mln::image2d<u_int32_t> img, u_int32_t value, int& count)
+  mln::image2d<u_int8_t> image_where_equal(mln::image2d<u_int8_t> img, u_int8_t value, int& count)
   {
-    image2d<uint32_t> output = image2d<uint32_t>(img.width(), img.height());
+    image2d<uint8_t> output = image2d<uint8_t>(img.width(), img.height());
 
     mln_foreach (auto d, img.domain())
     {
@@ -36,13 +37,13 @@ namespace mln::contrib::segdet
     return output;
   }
 
-  mln::image2d<u_int32_t> image_where_equal(mln::image2d<u_int32_t> img, u_int32_t value)
+  mln::image2d<u_int8_t> image_where_equal(mln::image2d<u_int8_t> img, u_int8_t value)
   {
     int k = 0;
     return image_where_equal(img, value, k);
   }
 
-  int image_count_value(mln::image2d<u_int32_t> img, uint32_t value)
+  int image_count_value(mln::image2d<u_int8_t> img, uint8_t value)
   {
     int count = 0;
 
@@ -55,9 +56,9 @@ namespace mln::contrib::segdet
     return count;
   }
 
-  mln::image2d<u_int32_t> image_intersect(mln::image2d<uint32_t> img1, mln::image2d<uint32_t> img2)
+  mln::image2d<u_int8_t> image_intersect(mln::image2d<uint8_t> img1, mln::image2d<uint8_t> img2)
   {
-    image2d<uint32_t> out = image2d<uint32_t>(img1.width(), img1.height());
+    image2d<uint8_t> out = image2d<uint8_t>(img1.width(), img1.height());
 
     mln_foreach (auto d, img1.domain())
       out(d) = img1(d) * img2(d);
@@ -65,9 +66,9 @@ namespace mln::contrib::segdet
     return out;
   }
 
-  std::map<u_int32_t, int> image_unique(mln::image2d<u_int32_t> img)
+  std::map<u_int8_t, int> image_unique(mln::image2d<u_int8_t> img)
   {
-    std::map<u_int32_t, int> ret = {};
+    std::map<u_int8_t, int> ret = {};
 
     mln_foreach (auto v, img.values())
     {
@@ -86,8 +87,8 @@ namespace mln::contrib::segdet
 
   std::vector<double> score_detection(mln::ndbuffer_image ref_buf, mln::ndbuffer_image output_buf)
   {
-    mln::image2d<uint32_t> ref    = ref_buf.__cast<uint32_t, 2>();
-    mln::image2d<uint32_t> output = output_buf.__cast<uint32_t, 2>();
+    mln::image2d<uint8_t> ref    = ref_buf.__cast<uint8_t, 2>();
+    mln::image2d<uint8_t> output = output_buf.__cast<uint8_t, 2>();
 
     std::vector<double> seg_recall    = {};
     std::vector<double> seg_precision = {};
@@ -122,13 +123,13 @@ namespace mln::contrib::segdet
         false_positive_count += width * height - image_count_value(seg_intersection, 0);
       }
 
-      auto srecall = true_positive_count / wanted_count;
+      auto srecall = (double) true_positive_count / (double) wanted_count;
 
-      auto sprecision = 0;
+      double sprecision = 0;
       if (true_positive_count + false_positive_count != 0)
-        sprecision = true_positive_count / (true_positive_count + false_positive_count);
+        sprecision = ((double) true_positive_count) / (double) (true_positive_count + false_positive_count);
 
-      auto sfscore = 0;
+      double sfscore = 0;
       if (srecall + sprecision != 0)
         sfscore = 2 * (srecall * sprecision) / (srecall + sprecision);
 

@@ -15,13 +15,11 @@ void process_example(const mln::image2d<V>& img, const std::string& cut_filename
   // 2. Build the alphatree
   auto [t, nm] = mln::morpho::alphatree(img, mln::c4);
 
-  using th_value_type = decltype(t.values)::value_type;
-
   // 3. Compute the mean attribute
   auto mean = t.compute_attribute_on_values(nm, img, mln::accu::accumulators::mean<V>());
 
   // 4. Compute a cut of the alphatree
-  auto cut_nm = t.horizontal_cut(th_value_type(threshold), nm);
+  auto cut_nm = t.horizontal_cut(threshold, nm);
 
   // 5. Labelize the cut
   auto cut = t.reconstruct_from(cut_nm, ::ranges::make_span(mean));

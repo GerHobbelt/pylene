@@ -386,9 +386,10 @@ TEST(Morpho, AlphaTreeCutMeanLabelization)
   auto [t, nm] = mln::morpho::alphatree(ima, mln::c4);
   auto val     = t.compute_attribute_on_values(nm, ima, mln::accu::accumulators::mean<std::uint8_t, std::uint8_t>());
 
-  auto make_cut = [&t, &nm, &val](const typename decltype(t.values)::value_type threshold) {
-    auto lbl = t.horizontal_cut(threshold, nm);
-    return t.reconstruct_from(lbl, ::ranges::make_span(val));
+    // Renaming t and nm because clang does not allow to capture structured bindings
+  auto make_cut = [&lt=t, &lnm=nm, &val](const typename decltype(t.values)::value_type threshold) {
+    auto lbl = lt.horizontal_cut(threshold, lnm);
+    return lt.reconstruct_from(lbl, ::ranges::make_span(val));
   };
 
   ASSERT_IMAGES_EQ_EXP(make_cut(0), ima);

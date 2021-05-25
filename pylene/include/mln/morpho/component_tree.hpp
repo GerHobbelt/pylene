@@ -388,7 +388,7 @@ namespace mln::morpho
     for (std::size_t node = 0; node < parent.size(); ++node)
     {
       int parent_node   = parent[node];
-      root_cut_cc[node] = levels[parent_node] > threshold ? node : root_cut_cc[parent_node];
+      root_cut_cc[node] = levels[parent_node] > threshold ? static_cast<int>(node) : root_cut_cc[parent_node];
     }
 
     auto out = mln::clone(nodemap);

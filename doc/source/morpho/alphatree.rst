@@ -14,7 +14,7 @@ Alpha Tree
 
     :param input: The input image
     :param nbh: The neighborhood
-    :param dist: The function weighting the edges between two pixels
+    :param dist: The function weighting the edges between two pixels. For grayscale images, this is generally the absolute difference between two values.
     :return: A pair `(tree, node_map)` where *tree* is of type ``component_tree<std::invoke_result_t<F, image_value_t<Image>, image_value_t<Image>>>`` and *node_map* is a mapping between the image pixels and the node of the tree.
 
     .. rubric:: Requirements

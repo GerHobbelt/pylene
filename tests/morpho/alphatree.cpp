@@ -130,7 +130,12 @@ TEST(Morpho, AlphaTreeCanonized)
 
 TEST(Morpho, AlphaTreeMST)
 {
-  mln::image2d<int> ima = {
+  using I = mln::image2d<std::uint8_t>;
+  using P = mln::image_point_t<I>;
+  using W = std::uint8_t;
+  using E = mln::morpho::internal::edge_t<P, W>;
+
+  I ima = {
       {4, 0, 0, 1},  //
       {5, 0, 8, 1},  //
       {6, 0, 9, 1},  //
@@ -138,27 +143,25 @@ TEST(Morpho, AlphaTreeMST)
       {2, 3, 4, 5},  //
   };
 
-  std::vector<mln::morpho::internal::edge_t<mln::image_point_t<mln::image2d<int>>, std::float_t>> expected_mst = {
-      {{0, 2}, {0, 3}, 1.}, //
-      {{2, 4}, {3, 4}, 1.}, //
-      {{1, 4}, {2, 4}, 1.}, //
-      {{0, 4}, {1, 4}, 1.}, //
-      {{2, 2}, {2, 3}, 1.}, //
-      {{0, 0}, {0, 1}, 1.}, //
-      {{2, 0}, {3, 0}, 1.}, //
-      {{0, 1}, {0, 2}, 1.}, //
-      {{2, 1}, {2, 2}, 1.}, //
-      {{1, 3}, {1, 4}, 3.}, //
-      {{0, 0}, {1, 0}, 4.}, //
-      {{2, 3}, {2, 4}, 6.}  //
+  std::vector<E> expected_mst = {
+      {{2, 4}, {3, 4}, 1}, //
+      {{1, 4}, {2, 4}, 1}, //
+      {{0, 4}, {1, 4}, 1}, //
+      {{2, 0}, {3, 0}, 1}, //
+      {{2, 2}, {2, 3}, 1}, //
+      {{0, 2}, {0, 3}, 1}, //
+      {{2, 1}, {2, 2}, 1}, //
+      {{0, 1}, {0, 2}, 1}, //
+      {{0, 0}, {0, 1}, 1}, //
+      {{1, 3}, {1, 4}, 3}, //
+      {{0, 0}, {1, 0}, 4}, //
+      {{2, 3}, {2, 4}, 6}  //
   };
 
-  std::vector<mln::morpho::internal::edge_t<mln::image_point_t<mln::image2d<int>>, std::float_t>> mst;
+  std::vector<E> mst;
 
   auto [t, _] = mln::morpho::internal::__alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> std::float_t { return mln::functional::l2dist_t<>()(a, b); },
-      &mst);
-
+      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist_t<>()(a, b); }, &mst);
 
   for (std::size_t i = 0; i < expected_mst.size(); ++i)
   {

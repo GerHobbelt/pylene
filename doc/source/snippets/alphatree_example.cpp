@@ -6,12 +6,11 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/morpho/alphatree.hpp>
-#include <mln/morpho/cut.hpp>
 
 #include <iostream>
 
 template <typename V>
-void process_example(const mln::image2d<V>& img, const std::string& cut_filename, double threshold)
+void process_example(const mln::image2d<V>& img, const std::string& cut_filename, const double threshold)
 {
   // 2. Build the alphatree
   auto [t, nm] = mln::morpho::alphatree(img, mln::c4);
@@ -22,7 +21,10 @@ void process_example(const mln::image2d<V>& img, const std::string& cut_filename
   auto mean = t.compute_attribute_on_values(nm, img, mln::accu::accumulators::mean<V>());
 
   // 4. Compute a cut of the alphatree
-  auto cut = mln::morpho::horizontal_cut_labelization_from(t, nm, th_value_type(threshold), mean);
+  auto cut_nm = t.horizontal_cut(th_value_type(threshold), nm);
+
+  // 5. Labelize the cut
+  auto cut = t.reconstruct_from(cut_nm, ::ranges::make_span(mean));
 
   // 5. Save the output cut
   mln::io::imsave(mln::view::cast<V>(cut), cut_filename);

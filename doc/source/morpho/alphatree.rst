@@ -10,7 +10,7 @@ Alpha Tree
 
     Compute the alpha tree (also known as quasi-flat zone hierarchy) and returns a pair
     `(tree, node_map)`. See :doc:`component_tree` for more information about the
-    representation of tree.
+    representation of tree. The implementation is based on the Kruskal algorithm [Naj13]_.
 
     :param input: The input image
     :param nbh: The neighborhood
@@ -54,24 +54,29 @@ between a node of the tree and a pixel of the image being represented by blue da
 Example
 -------
 
+This example is used to generate the grayscale lena cut with a threshold of 3 below.
+
     ::
 
         #include <mln/accu/accumulators/mean.hpp>
         #include <mln/morpho/alphatree.hpp>
         #include <mln/core/image/ndimage.hpp>
         #include <mln/core/neighborhood/c4.hpp>
-        #include <mln/morpho/cut.hpp> // for horizontal_cut_labelization_from
+
         mln::image2d<uint8_t> input = ...;
 
         // Compute the alpha tree
         auto [tree, node_map] = mln::morpho::alphatree(input, mln::c4);
 
         // Compute an attribute (for example the average pixels value at each node, as below)
-        auto mean = t.compute_attribute_on_values(node_map, input, mln::accu::accumulators::mean<std::uint8_t>());
+        auto mean = t.compute_attribute_on_values(node_map, input, mln::accu::accumulators::mean<uint8_t>());
 
         // Making an horizontal cut of the tree
-        auto th = ...;
-        auto cut = mln::morpho::horizontal_cut_labelization_from(t, node_map, th, mean);
+        const auto threshold = 3; // Threshold of the horizontal cut, that means the lowest alpha in the cut
+        auto nodemap_cut = t.horizontal_cut(threshold, node_map); // Return a new nodemap associated to the cut
+
+        // Labelizing the cut with the mean values of each node
+        auto out = t.reconstruct_from(nodemap_cut, ranges::make_span(mean)); // Using range-v3 span
 
 
     .. list-table::
@@ -93,3 +98,5 @@ Complexity
 
 References
 ----------
+
+.. [Naj13] Laurent Najman, Jean Cousty, and Benjamin Perret (2013). Playing with kruskal: algorithms for morphological trees in edge-weighted graphs. *International Symposium on Mathematical Morphology and Its Applications to Signal and Image Processing*. Springer, Berlin, Heidelberg. 135-146

@@ -285,17 +285,14 @@ Horizontal cut
 When the tree is a hierarchy of partition, such as the :doc:`alphatree`, it is possible
 to make an horizontal cut of this tree.
 
-* Include :file:`<mln/morpho/cut.hpp>`
+.. cpp:function::   I horizontal_cut(const T threshold, I nodemap) const
+                    I horizontal_cut_from_levels(const T threshold, I nodemap, ::ranges::span<V> levels) const
 
-.. cpp:function::   auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, const std::vector<L>& vals)
-                    auto horizontal_cut_labelization_from(const component_tree<V>& t, Nodemap nm, V th, ::ranges::span<L> vals)
+    Make an horizontal cut at threshold ``threshold`` of the tree and return the nodemap associated to the cut.
 
-    Make an horizontal cut at threshold ``th`` of the tree and labelize the node on a reconstructed image with the value ``vals``.
-
-    :param t: The tree.
-    :param nm: The node map.
-    :param th: The threshold of the cut.
-    :param vals: the value assigned to each node of the tree for the labelization.
+    :param threshold: The threshold of the horizontal cut
+    :param nodemap: An image thats maps ``point -> node id``
+    :param levels: (Optional) The altitude of each node in the tree (for example the :math:`\alpha` associated to each node for the alphatree).
 
 A complete example
 ------------------

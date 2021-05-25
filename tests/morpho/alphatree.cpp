@@ -1,10 +1,10 @@
+#include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c26.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/morpho/alphatree.hpp>
-#include <mln/morpho/cut.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -358,4 +358,41 @@ TEST(Morpho, AlphaTree3DImageHQUEUE)
 
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0u), ref_0);
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16u), ref_16);
+}
+
+TEST(Morpho, AlphaTreeCutMeanLabelization)
+{
+  mln::image2d<std::uint8_t> ima = {
+      {1, 1, 5}, //
+      {2, 5, 6}, //
+      {0, 1, 4}  //
+  };
+  mln::image2d<std::uint8_t> cut_1 = {
+      {1, 1, 5}, //
+      {1, 5, 5}, //
+      {0, 0, 4}  //
+  };
+  mln::image2d<std::uint8_t> cut_2 = {
+      {1, 1, 5}, //
+      {1, 5, 5}, //
+      {1, 1, 5}  //
+  };
+  mln::image2d<std::uint8_t> cut_3 = {
+      {2, 2, 2}, //
+      {2, 2, 2}, //
+      {2, 2, 2}  //
+  };
+
+  auto [t, nm] = mln::morpho::alphatree(ima, mln::c4);
+  auto val     = t.compute_attribute_on_values(nm, ima, mln::accu::accumulators::mean<std::uint8_t, std::uint8_t>());
+
+  auto make_cut = [&t, &nm, &val](const typename decltype(t.values)::value_type threshold) {
+    auto lbl = t.horizontal_cut(threshold, nm);
+    return t.reconstruct_from(lbl, ::ranges::make_span(val));
+  };
+
+  ASSERT_IMAGES_EQ_EXP(make_cut(0), ima);
+  ASSERT_IMAGES_EQ_EXP(make_cut(1), cut_1);
+  ASSERT_IMAGES_EQ_EXP(make_cut(2), cut_2);
+  ASSERT_IMAGES_EQ_EXP(make_cut(3), cut_3);
 }

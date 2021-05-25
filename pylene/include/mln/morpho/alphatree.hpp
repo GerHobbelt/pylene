@@ -257,7 +257,7 @@ namespace mln::morpho
       std::vector<int> translation_map(node_count);
 
       translation_map[0] = 0;
-      std::size_t count  = 1;
+      int count  = 1;
 
       // Build canonized component tree
       for (std::size_t i = 1; i < node_count; ++i)

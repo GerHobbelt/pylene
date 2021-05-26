@@ -148,9 +148,9 @@ A :cpp:class:`component_tree` `t` has the following methods.
 
 .. cpp:namespace-push::  template <class V> component_tree
 
-.. cpp:function:: auto accumulate_on_points(Image node_map, Accumulator accu) const
-                  auto accumulate_on_values(Image node_map, Image values, Accumulator accu) const
-                  auto accumulate_on_pixels(Image node_map, Image values, Accumulator accu) const
+.. cpp:function:: auto compute_attribute_on_points(Image node_map, Accumulator accu) const
+                  auto compute_attribute_on_values(Image node_map, Image values, Accumulator accu) const
+                  auto compute_attribute_on_pixels(Image node_map, Image values, Accumulator accu) const
 
     Accumulate the points of each component.
 
@@ -190,7 +190,7 @@ Example: computing the size (number of points) of the components.
 
     #include <mln/accu/accumulators/count.hpp>
 
-    auto sizes = tree.accumulate_on_points(node_map, mln::accu::features::count<>());
+    auto sizes = tree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
 
 .. cpp:function:: auto compute_depth() const
 
@@ -255,6 +255,7 @@ A :cpp:class:`component_tree` `t` has the following methods.
         auto pred = [&](int id) { nchildren > 1; };      
         t.filter(CT_FILTER_DIRECT, pred);
 
+
 Image reconstruction
 --------------------
 
@@ -279,7 +280,19 @@ the image from the filtered tree.
         t.filter(CT_FILTER_DIRECT, [&area](int id) { return area[id] > 20; });
         auto out = t.reconstruct(node_map);
 
+Horizontal cut
+--------------
+When the tree is a hierarchy of partition, such as the :doc:`alphatree`, it is possible
+to make an horizontal cut of this tree.
 
+.. cpp:function::   I horizontal_cut(const T threshold, I nodemap) const
+                    I horizontal_cut_from_levels(const T threshold, I nodemap, ::ranges::span<V> levels) const
+
+    Make an horizontal cut at threshold ``threshold`` of the tree and return the nodemap associated to the cut.
+
+    :param threshold: The threshold of the horizontal cut
+    :param nodemap: An image thats maps ``point -> node id``
+    :param levels: (Optional) The altitude of each node in the tree (for example the :math:`\alpha` associated to each node for the alphatree).
 
 A complete example
 ------------------

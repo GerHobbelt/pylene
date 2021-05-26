@@ -46,7 +46,6 @@ namespace mln::morpho
     requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2) class alphatree_edges<P, N, W>
     {
     public:
-      alphatree_edges(){};
       void                push(std::size_t dir, W w, P p) { m_cont.insert(dir, w, p); }
       std::tuple<P, P, W> pop() { return m_cont.pop(); }
       W                   top() const { return m_cont.current_level(); }
@@ -69,10 +68,6 @@ namespace mln::morpho
     class alphatree_edges
     {
     public:
-      alphatree_edges()
-        : m_current(0)
-      {
-      }
       void                push(std::size_t dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
       std::tuple<P, P, W> pop()
       {
@@ -95,7 +90,7 @@ namespace mln::morpho
     private:
       static constexpr auto     cn = N();
       std::vector<edge_t<P, W>> m_cont;
-      std::size_t               m_current;
+      std::size_t               m_current = 0;
     };
 
 
@@ -153,16 +148,12 @@ namespace mln::morpho
     }
 
 
-    template <class I, class N, class F>
-    auto alphatree_compute_edges(I input, N nbh, F distance)
+    template <class I, class N, class F, class C>
+    void alphatree_compute_edges(I input, N nbh, F distance, C& edges)
     {
       static_assert(is_a_v<I, mln::details::Image>);
-      using V = image_value_t<I>;
-      using P = image_point_t<I>;
-      using W = std::invoke_result_t<F, V, V>;
 
-      auto edges = alphatree_edges<P, N, W>();
-      auto dom   = input.domain();
+      auto dom = input.domain();
       mln_foreach (auto p, dom)
       {
         std::size_t i = 0;
@@ -174,7 +165,6 @@ namespace mln::morpho
         }
       }
       edges.on_finish_insert();
-      return edges;
     }
 
     //
@@ -257,7 +247,7 @@ namespace mln::morpho
       std::vector<int> translation_map(node_count);
 
       translation_map[0] = 0;
-      int count  = 1;
+      int count          = 1;
 
       // Build canonized component tree
       for (std::size_t i = 1; i < node_count; ++i)
@@ -292,7 +282,8 @@ namespace mln::morpho
       static_assert(std::is_same<M, edge_t<P, W>>());
 
       // 1. Get the list of edges
-      auto edges = internal::alphatree_compute_edges(std::move(input), std::move(nbh), std::move(distance));
+      auto edges = alphatree_edges<P, N, W>();
+      internal::alphatree_compute_edges(std::move(input), std::move(nbh), std::move(distance), edges);
 
       std::size_t              flatzones_count;
       image_ch_value_t<I, int> node_map = imchvalue<int>(input).set_init_value(-1);

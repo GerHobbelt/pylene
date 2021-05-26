@@ -4,15 +4,12 @@
 #include <mln/core/concepts/neighborhood.hpp>
 #include <mln/morpho/private/hvector_unbounded.hpp>
 
-#include <array>
-#include <memory>
-
 namespace mln::morpho::details
 {
   /// \brief Directional hierarchical queue
-  /// \tparam I The image the edges are calculated from
+  /// \tparam P The point type stored in the queue
   /// \tparam N The neighborhood used to compute the edges
-  /// \tparam K Value type of the level (Should be unsigned integer of at least a size of 2)
+  /// \tparam K Value type of the level (Should be unsigned and ``sizeof(K) <= 2 bytes``)
   template <typename P, typename N, typename K>
   class directional_hqueue
   {
@@ -20,14 +17,14 @@ namespace mln::morpho::details
     using queue_type = hvectors_unbounded<P>;
 
   public:
-    /// \brief Constructor
+    /// Constructor
     directional_hqueue() noexcept;
 
     /// \brief Insert an point in the directional hierarchical queue
     /// \param dir The hierarchical queue index (from after_offset() in N)
     /// \param w The weight of the edge
     /// \param p The point the edge weight is calculated from
-    void insert(std::size_t dir, int w, P p) noexcept;
+    void insert(int dir, int w, P p) noexcept;
 
     /// \brief Return the tuple (p, q, w) where p and q are the vertex of the edge and w its weight
     std::tuple<P, P, int> pop() noexcept;
@@ -43,12 +40,13 @@ namespace mln::morpho::details
     static_assert(sizeof(K) <= 2, "Key should have a size of at least 2");
 
   private:
-    static constexpr std::size_t                    m_ndir    = decltype(N::after_offsets())::extent;
-    static constexpr int                            m_nlevels = 1 << std::numeric_limits<K>::digits;
-    std::array<std::shared_ptr<queue_type>, m_ndir> m_queues;
-    std::size_t                                     m_current_dir;
-    int                                             m_current_level;
-    std::size_t                                     m_size;
+    static constexpr std::size_t m_ndir    = decltype(N::after_offsets())::extent;
+    static constexpr int         m_nlevels = 1 << std::numeric_limits<K>::digits;
+
+    queue_type  m_queues[m_ndir];
+    int         m_current_dir;
+    int         m_current_level;
+    std::size_t m_size = 0;
   };
 
   /******************
@@ -57,16 +55,15 @@ namespace mln::morpho::details
 
   template <typename P, typename N, typename K>
   directional_hqueue<P, N, K>::directional_hqueue() noexcept
-    : m_current_dir(0)
-    , m_current_level(0)
-    , m_size(0)
   {
     for (std::size_t i = 0; i < m_ndir; i++)
-      m_queues[i] = std::make_shared<queue_type>(m_nlevels);
+    {
+      m_queues[i].initialize(m_nlevels, sizeof(P));
+    }
   }
 
   template <typename P, typename N, typename K>
-  void directional_hqueue<P, N, K>::insert(std::size_t dir, int w, P p) noexcept
+  void directional_hqueue<P, N, K>::insert(int dir, int w, P p) noexcept
   {
     // Update the current level and the current dir to keep the queue sorted
     if (m_size == 0 || w < m_current_level)
@@ -74,7 +71,7 @@ namespace mln::morpho::details
       m_current_dir   = dir;
       m_current_level = w;
     }
-    m_queues[dir]->push_front(w, p);
+    m_queues[dir].push_front(w, p);
     m_size++;
   }
 
@@ -82,19 +79,19 @@ namespace mln::morpho::details
   std::tuple<P, P, int> directional_hqueue<P, N, K>::pop() noexcept
   {
     assert(m_size > 0);
-    const auto p = m_queues[m_current_dir]->pop_front(m_current_level);
+    const auto p = m_queues[m_current_dir].pop_front(m_current_level);
     const auto q = p + N::after_offsets()[m_current_dir];
     const int  w = m_current_level;
     m_size--;
 
     // Update the current level and the current dir if needed
-    if (m_size > 0 && m_queues[m_current_dir]->empty(m_current_level))
+    if (m_size > 0 && m_queues[m_current_dir].empty(m_current_level))
     {
-      int         lvl = m_queues[0]->lower_bound(m_current_level);
+      int         lvl = m_queues[0].lower_bound(m_current_level);
       std::size_t dir = 0;
       for (std::size_t i = 1; i < m_ndir; i++)
       {
-        int tmp = m_queues[i]->lower_bound(m_current_level);
+        int tmp = m_queues[i].lower_bound(m_current_level);
         if (tmp < lvl && tmp < m_nlevels)
         {
           lvl = tmp;

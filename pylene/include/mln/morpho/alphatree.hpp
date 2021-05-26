@@ -46,7 +46,7 @@ namespace mln::morpho
     requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2) class alphatree_edges<P, N, W>
     {
     public:
-      void                push(std::size_t dir, W w, P p) { m_cont.insert(dir, w, p); }
+      void                push(int dir, W w, P p) { m_cont.insert(dir, w, p); }
       std::tuple<P, P, W> pop() { return m_cont.pop(); }
       W                   top() const { return m_cont.current_level(); }
       bool                empty() const { return m_cont.empty(); }
@@ -68,7 +68,7 @@ namespace mln::morpho
     class alphatree_edges
     {
     public:
-      void                push(std::size_t dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
+      void                push(int dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
       std::tuple<P, P, W> pop()
       {
         assert(m_current < m_cont.size());
@@ -156,7 +156,7 @@ namespace mln::morpho
       auto dom = input.domain();
       mln_foreach (auto p, dom)
       {
-        std::size_t i = 0;
+        int i = 0;
         for (auto n : nbh.after(p))
         {
           if (dom.has(n))

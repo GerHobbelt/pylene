@@ -29,7 +29,7 @@ TEST(Morpho, DirectionalHQueueC4)
 
   mln_foreach (auto p, ima.domain())
   {
-    std::size_t i = 0;
+    int i = 0;
     for (auto q : mln::c4.after(p))
     {
       if (ima.domain().has(q))
@@ -69,7 +69,7 @@ TEST(Morpho, DirectionalHQueueC8)
 
   mln_foreach (auto p, ima.domain())
   {
-    std::size_t i = 0;
+    int i = 0;
     for (auto q : mln::c8.after(p))
     {
       if (ima.domain().has(q))
@@ -113,7 +113,7 @@ TEST(Morpho, DirectionalHQueueC6)
 
   mln_foreach (auto p, ima.domain())
   {
-    std::size_t i = 0;
+    int i = 0;
     for (auto q : mln::c6.after(p))
     {
       if (ima.domain().has(q))

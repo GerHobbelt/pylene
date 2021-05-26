@@ -103,7 +103,7 @@ namespace mln::morpho::details
 
   inline int hvectors_unbounded<void>::lower_bound(int level) const noexcept
   {
-    assert(m_lists != nullptr);
+    mln_precondition(m_lists != nullptr);
     mln_precondition(level < m_nlevels);
 
     while (level < m_nlevels && m_lists[level].size == 0)
@@ -113,7 +113,7 @@ namespace mln::morpho::details
 
   inline int hvectors_unbounded<void>::upper_bound(int level) const noexcept
   {
-    assert(m_lists != nullptr);
+    mln_precondition(m_lists != nullptr);
     mln_precondition(level < m_nlevels);
 
     while (level >= 0 && m_lists[level].size == 0)
@@ -123,7 +123,7 @@ namespace mln::morpho::details
 
   inline bool hvectors_unbounded<void>::empty(int level) const noexcept
   {
-    assert(m_lists != nullptr);
+    mln_precondition(m_lists != nullptr);
     return m_lists[level].size == 0;
   }
 
@@ -156,7 +156,7 @@ namespace mln::morpho::details
   template <class P>
   inline void hvectors_unbounded<P>::push_front(int level, P p) noexcept
   {
-    assert(m_lists != nullptr);
+    mln_precondition(m_lists != nullptr);
     if (m_lists[level].size == m_lists[level].capacity)
       this->resize(level, sizeof(P));
 

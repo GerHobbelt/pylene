@@ -41,10 +41,10 @@ namespace mln::morpho::details
 
   private:
     static constexpr int m_ndir    = decltype(N::after_offsets())::extent;
-    static constexpr int         m_nlevels = 1 << std::numeric_limits<K>::digits;
+    static constexpr int m_nlevels = 1 << std::numeric_limits<K>::digits;
 
     queue_type  m_queues[m_ndir];
-    int         m_current_dir;
+    int         m_current_dir = -1;
     int         m_current_level;
     std::size_t m_size = 0;
   };
@@ -87,7 +87,7 @@ namespace mln::morpho::details
     // Update the current level and the current dir if needed
     if (m_size > 0 && m_queues[m_current_dir].empty(m_current_level))
     {
-      int         lvl = m_queues[0].lower_bound(m_current_level);
+      int lvl = m_queues[0].lower_bound(m_current_level);
       int dir = 0;
       for (int i = 1; i < m_ndir; i++)
       {

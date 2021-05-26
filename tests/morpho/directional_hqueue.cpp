@@ -1,5 +1,6 @@
 #include <mln/morpho/private/directional_hqueue.hpp>
 
+#include <mln/core/algorithm/iota.hpp>
 #include <mln/core/functional_ops.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
@@ -131,4 +132,39 @@ TEST(Morpho, DirectionalHQueueC6)
     n++;
   }
   ASSERT_EQ(n, 33);
+}
+
+TEST(Morpho, DirectionalHQueueResizeHVector)
+{
+  using I = mln::image2d<std::uint16_t>;
+  using P = mln::image_point_t<I>;
+
+  mln::image_build_params params;
+  params.init_value = std::make_any<std::uint16_t>(0);
+  I img(100, 100, params);
+  img({0, 0}) = 20;
+
+  auto hqueue = mln::morpho::details::directional_hqueue<P, mln::c4_t, std::uint16_t>();
+  auto dist   = [](const std::uint16_t a, std::uint16_t b) -> std::uint16_t {
+    return std::abs(static_cast<int>(a) - static_cast<int>(b));
+  };
+
+  mln_foreach (auto p, img.domain())
+  {
+    int i = 0;
+    for (auto q : mln::c4.after(p))
+    {
+      if (img.domain().has(q))
+        hqueue.insert(i, dist(img(p), img(q)), p);
+      i++;
+    }
+  }
+
+  std::uint16_t prev = 0;
+  while (!hqueue.empty())
+  {
+    auto [p, q, w] = hqueue.pop();
+    ASSERT_LE(prev, w);
+    prev = w;
+  }
 }

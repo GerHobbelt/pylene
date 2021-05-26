@@ -35,7 +35,7 @@ namespace mln::morpho::details
 
   void hvectors_unbounded<void>::release()
   {
-    assert(m_lists != nullptr);
+    mln_precondition(m_lists != nullptr);
     for (int i = 0; i < m_nlevels; ++i)
     {
       this->destroy_n(m_lists[i].begin, m_lists[i].size);
@@ -48,7 +48,7 @@ namespace mln::morpho::details
 
   void hvectors_unbounded<void>::resize(int i, std::size_t size)
   {
-    assert(m_lists != nullptr);
+    mln_precondition(m_lists != nullptr);
     constexpr float kResizingFactor = 2;
     int             old_capacity    = m_lists[i].capacity;
     void*           old_ptr         = m_lists[i].begin;

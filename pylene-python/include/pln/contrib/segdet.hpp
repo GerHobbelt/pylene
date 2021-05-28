@@ -117,12 +117,14 @@ namespace pln::contrib::segdet
   std::vector<mln::contrib::segdet::Point> init_douglas_peucker(std::vector<mln::contrib::segdet::Point>& points,
                                                                 bool is_horizontal, double precision)
   {
+    using namespace mln::contrib::segdet;
     if (!is_horizontal)
       swapXY(points);
 
-    (void)is_horizontal;
-
+    std::sort(points.begin(), points.end(), [](Point& lhs, Point& rhs){ return lhs.x > rhs.x;});
+    
     auto last   = points.back();
+    pybind11::print(last.x, last.y);
     auto output = douglas_peucker(points, precision);
     output.push_back(last);
 

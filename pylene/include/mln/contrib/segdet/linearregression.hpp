@@ -61,4 +61,59 @@ namespace mln::contrib::segdet
     X b_1;
     X b_0;
   };
+
+
+  class MemoryLinearRegressor
+  {
+  public:
+
+    float predict()
+    {
+      count = std::min(memory, n);
+      float mean_x = (float) -(count + 1) / (float) 2;
+      float mean_y = Sy / (float) count;
+      float var_x = (float) (count * count - 1) / 12;
+      float cov_xy = Sxy / (float) count - mean_x * mean_y;
+      float a = var_x > 0  ? cov_xy / var_x : 0;
+      return mean_y - a * mean_x;
+    }
+
+    void push(float y)
+    {
+      count = std::min(memory, n);
+      if (n < memory)
+      {
+        Y.push_back(y);
+        Sy  = Sy + (float) y;
+        Sxy = Sxy - Sy;
+      }
+      else
+      {
+        int i   = n % memory;
+        float old = Y[i];
+        Sy  = Sy - (float) old + (float) y;
+        Sxy = Sxy + (float) old * count - Sy;
+        Y[i] = y;
+      }
+      n += 1;
+    }
+
+
+    MemoryLinearRegressor(float y0, int memory = 20)
+        : memory(memory)
+    {
+      Y = std::vector<float>({y0});
+      Sy  = y0;
+      Sxy = -y0;
+      n   = 1;
+    }
+
+  private:
+    std::vector<float> Y;
+    float Sy, Sxy;
+    int count;
+    int n;
+    int memory;
+  };
+
 } // namespace mln::contrib::segdet

@@ -161,7 +161,7 @@ TEST(Morpho, AlphaTreeMST)
   std::vector<E> mst;
 
   auto [t, _] = mln::morpho::internal::__alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist_t<>()(a, b); }, &mst);
+      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist_t<>()(a, b); }, true, &mst);
 
   for (std::size_t i = 0; i < expected_mst.size(); ++i)
   {
@@ -386,8 +386,8 @@ TEST(Morpho, AlphaTreeCutMeanLabelization)
   auto [t, nm] = mln::morpho::alphatree(ima, mln::c4);
   auto val     = t.compute_attribute_on_values(nm, ima, mln::accu::accumulators::mean<std::uint8_t, std::uint8_t>());
 
-    // Renaming t and nm because clang does not allow to capture structured bindings
-  auto make_cut = [&lt=t, &lnm=nm, &val](const typename decltype(t.values)::value_type threshold) {
+  // Renaming t and nm because clang does not allow to capture structured bindings
+  auto make_cut = [&lt = t, &lnm = nm, &val](const typename decltype(t.values)::value_type threshold) {
     auto lbl = lt.horizontal_cut(threshold, lnm);
     return lt.reconstruct_from(lbl, ::ranges::make_span(val));
   };

@@ -130,17 +130,8 @@ namespace mln::contrib::segdet
    */
   double compute_slope(Filter& f)
   {
-    auto X = f.t_values;
-    auto Y = f.n_values;
-
-    std::vector<std::vector<uint32_t>> Z(X.size());
-    Z[0] = X;
-    Z[1] = Y;
-
-    Linear_Regression<double, uint32_t> reg{};
-    reg.fit(Z);
-
-    auto slope = reg.b_1;
+    f.reg.push(f.t_values.back(), f.n_values.back());
+    auto slope = f.reg.predict();
 
     if (std::abs(slope) > f.slope_max)
       f.nb_current_slopes_over_slope_max++;
@@ -164,7 +155,6 @@ namespace mln::contrib::segdet
     f.luminosities.push_back(observation(2, 0));
     f.t_values.push_back(t);
     f.slopes.push_back(compute_slope(f));
-
     if (f.n_values.size() > params.nb_values_to_keep)
     {
       auto thick = f.thicknesses[0];

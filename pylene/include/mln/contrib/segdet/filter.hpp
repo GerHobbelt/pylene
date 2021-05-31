@@ -1,6 +1,7 @@
 #pragma once
 
 #include "segment.hpp"
+#include "linearregression.hpp"
 #include <Eigen/Dense>
 #include <utility>
 #include <vector>
@@ -74,6 +75,7 @@ namespace mln::contrib::segdet
       , observation(std::nullopt)
       , observation_distance(0)
       , last_integration(t_integration)
+      , reg(t_integration, observation(0,0))
     {
       first    = t_integration;
       t_values = std::vector<uint32_t>({t_integration});
@@ -135,6 +137,8 @@ namespace mln::contrib::segdet
     u_int32_t observation_distance; // n distance from last observation to current prediction
 
     u_int32_t last_integration; // t value referring to the position of the last integration
+
+    MemoryLinearRegressor reg;
   };
 
   /**

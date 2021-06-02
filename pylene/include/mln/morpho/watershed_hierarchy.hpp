@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mln/accu/accumulators/max.hpp>
 #include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/component_tree.hpp>
 
@@ -11,11 +10,12 @@ namespace mln::morpho
   /// Compute the watershed hierarchy of an image
   ///
   /// \param input The input image
+  /// \param acc The accumulator that define the attribute computation
   /// \param neighborhood The neighborhood relation
   /// \param distance Distance function
-  template <class I, class N, class F = mln::functional::l2dist_t<>>
-  std::pair<component_tree<unsigned long>, image_ch_value_t<I, int>> //
-  watershed_hierarchy(I input, N nbh, F distance = F{});
+  template <class I, class Accu, class N, class F = mln::functional::l2dist_t<>>
+  std::pair<component_tree<typename accu::result_of<Accu, image_point_t<I>>::type>, image_ch_value_t<I, int>> //
+  watershed_hierarchy(I input, Accu acc, N nbh, F distance = F{});
 
 
   /******************************************/
@@ -87,21 +87,20 @@ namespace mln::morpho
     }
   } // namespace internal
 
-  template <class I, class N, class F>
-  std::pair<component_tree<unsigned long>, image_ch_value_t<I, int>> //
-  watershed_hierarchy(I input, N nbh, F distance)
+  template <class I, class Accu, class N, class F>
+  std::pair<component_tree<typename accu::result_of<Accu, image_point_t<I>>::type>, image_ch_value_t<I, int>> //
+  watershed_hierarchy(I input, Accu acc, N nbh, F distance)
   {
     std::vector<internal::edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> mst;
     std::size_t nb_leaves;
     auto [tree, nm] = internal::__alphatree(input, nbh, distance, false, &mst, &nb_leaves);
 
-    // FIXME Area attribute is temporary
-    auto area_attribute = tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
+    auto attribute = tree.compute_attribute_on_points(nm, acc);
 
     // FIXME Maybe an option in alpha tree function is better
     auto node_count = tree.parent.size();
     mln::for_each(nm, [node_count](int& id) { id = static_cast<int>(node_count) - id - 1; });
 
-    return internal::watershed<I>(tree, nm, mst, area_attribute, nbh, nb_leaves);
+    return internal::watershed<I>(tree, nm, mst, attribute, nbh, nb_leaves);
   }
 } // namespace mln::morpho

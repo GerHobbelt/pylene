@@ -63,8 +63,8 @@ namespace mln::contrib::segdet
     f.X_predicted = C * f.S_predicted + f.N;
 
     uint32_t thik_d2 = f.X_predicted(1, 0) / 2;
-    f.n_min = f.X_predicted(0, 0) - thik_d2;
-    f.n_max = f.X_predicted(0, 0) + thik_d2;
+    f.n_min          = f.X_predicted(0, 0) - thik_d2;
+    f.n_max          = f.X_predicted(0, 0) + thik_d2;
 
     f.H = A * f.H * A_transpose;
 
@@ -170,7 +170,7 @@ namespace mln::contrib::segdet
       if (f.first_slope == std::nullopt)
         f.first_slope = std::make_optional(f.slopes[f.slopes.size() - 1]);
 
-      f.segment_points.emplace_back(nn, tt, thick, f.is_horizontal);
+      f.segment_points.emplace_back(tt, nn, thick);
     }
   }
 

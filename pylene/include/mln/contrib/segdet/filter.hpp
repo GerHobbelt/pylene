@@ -65,8 +65,8 @@ namespace mln::contrib::segdet
      * @param slopeMax The maximum value that the filter's slope can have
      * @param observation The filter's first observation
      */
-    Filter(bool isHorizontal, uint32_t t_integration, double slopeMax, Eigen::Matrix<double, 3, 1> observation)
-      : is_horizontal(isHorizontal)
+    Filter(uint32_t t_integration, double slopeMax, Eigen::Matrix<double, 3, 1> observation)
+      : is_horizontal(true)
       , slope_max(slopeMax)
       , S((Eigen::Matrix<double, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
       , W(Eigen::Matrix<double, 4, 1>::Zero())

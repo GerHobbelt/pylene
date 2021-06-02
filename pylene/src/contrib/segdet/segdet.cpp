@@ -25,10 +25,10 @@ namespace mln::contrib::segdet
    * @param is_horizontal
    * @return the value of the pixel
    */
-  uint8_t image_at(image2d<uint8_t> image, int n, int t, bool is_horizontal)
+  uint8_t image_at(image2d<uint8_t> image, int n, int t)
   {
     // TODO remove the check done by image.at(,) using image(,)
-    return is_horizontal ? image.at({t, n}) : image.at({n, t});
+    return image.at({t, n});
   }
 
   /**
@@ -41,7 +41,7 @@ namespace mln::contrib::segdet
    * @return Observation Eigen matrix
    */
   Eigen::Matrix<double, 3, 1> determine_observation(const image2d<uint8_t>& image, uint32_t& n, uint32_t t,
-                                                    uint32_t n_max, bool is_horizontal, Parameters params)
+                                                    uint32_t n_max, Parameters params)
   {
     uint32_t thickness = 0;
     uint32_t n_max_lum = 0;
@@ -50,7 +50,7 @@ namespace mln::contrib::segdet
     uint32_t             lumi;
 
     // n + thickess: current position in the n-th line
-    while (n + thickness < n_max && (lumi = image_at(image, n + thickness, t, is_horizontal)) < params.max_llum)
+    while (n + thickness < n_max && (lumi = image_at(image, n + thickness, t)) < params.max_llum)
     {
       luminosities_list.push_back(lumi);
 
@@ -74,7 +74,8 @@ namespace mln::contrib::segdet
     while (luminosities_list[n - n_start] > m_lum)
       n += 1;
 
-    while (image_at(image, n_end, t, is_horizontal) > m_lum)
+//    while (image_at(image, n_end, t, is_horizontal) > m_lum)
+    while (image_at(image, n_end, t) > m_lum)
       n_end--;
 
     n_end++;
@@ -119,10 +120,7 @@ namespace mln::contrib::segdet
    */
   void add_point_under_other(Filter& f, uint32_t t, uint32_t n, uint32_t thickness)
   {
-    if (f.is_horizontal)
       f.currently_under_other.emplace_back(t, n, thickness);
-    else
-      f.currently_under_other.emplace_back(n, t, thickness);
   }
 
   /**
@@ -206,8 +204,7 @@ namespace mln::contrib::segdet
 
     for (uint32_t i = 0; i < last_index; i++)
     {
-      filter.segment_points.emplace_back(filter.n_values[i], filter.t_values[i], filter.thicknesses[i],
-                                         filter.is_horizontal);
+      filter.segment_points.emplace_back(filter.n_values[i], filter.t_values[i], filter.thicknesses[i]);
     }
     auto& point       = filter.segment_points;
     auto& under_other = filter.under_other;
@@ -219,7 +216,7 @@ namespace mln::contrib::segdet
         std::nullopt == filter.first_slope ? filter.slopes[min_len - 1] : filter.first_slope.value();
     auto last_part_slope = filter.slopes[last_index - 1];
 
-    return Segment(point, under_other, first_part_slope, last_part_slope, filter.is_horizontal);
+    return Segment(point, under_other, first_part_slope, last_part_slope);
   }
 
   /**
@@ -290,8 +287,7 @@ namespace mln::contrib::segdet
 
     if (!f.currently_under_other.empty())
     {
-      auto last_t = f.is_horizontal ? f.currently_under_other[f.currently_under_other.size() - 1].x
-                                    : f.currently_under_other[f.currently_under_other.size() - 1].y;
+      auto last_t = f.currently_under_other[f.currently_under_other.size() - 1].x;
       return t - last_t <= discontinuity;
     }
 
@@ -419,7 +415,7 @@ namespace mln::contrib::segdet
    * @return
    */
   bool handle_find_filter(std::vector<Filter>& new_filters, std::vector<Filter*>& accepted,
-                          const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, bool is_horizontal, double slope_max)
+                          const Eigen::Matrix<double, 3, 1>& obs, uint32_t& t, double slope_max)
   {
     auto observation_s = Observation(obs, accepted.size(), t);
 
@@ -433,7 +429,7 @@ namespace mln::contrib::segdet
         obs_result_value.match_count--;
 
         if (obs_result_value.match_count == 0)
-          new_filters.emplace_back(is_horizontal, t, slope_max, obs_result_value.obs);
+          new_filters.emplace_back(t, slope_max, obs_result_value.obs);
       }
     }
 
@@ -461,12 +457,8 @@ namespace mln::contrib::segdet
   std::vector<Segment> traversal(const image2d<uint8_t>& image, bool is_horizontal, uint min_len_embryo,
                                  uint discontinuity, Parameters params)
   {
-    // Usefull parameter used in the function
-    uint32_t xmult, ymult;
-    double   slope_max;
-    uint32_t n_max, t_max;
-
-    set_parameters(is_horizontal, xmult, ymult, slope_max, n_max, t_max, image.size(), image.size(1), params);
+    double   slope_max = is_horizontal ? params.slope_max_horizontal : params.slope_max_vertical;
+    uint32_t n_max = image.size(1), t_max = image.size(0);
 
     auto                filters  = std::vector<Filter>();  // List of current filters
     auto                segments = std::vector<Segment>(); // List of current segments
@@ -481,26 +473,23 @@ namespace mln::contrib::segdet
       for (auto& filter : filters)
         predict(filter);
 
-//      std::sort(filters.begin(), filters.end(),
-//                [](Filter f1, Filter f2) { return f1.S_predicted(0, 0) < f2.S_predicted(0, 0); });
-
       new_filters.clear();
       bool     two_matches_through_n = false;
       uint32_t filter_index          = 0;
 
       for (uint32_t n = 0; n < n_max; n++)
       {
-        if (image_at(image, n, t, is_horizontal) < params.max_llum)
+        if (image_at(image, n, t) < params.max_llum)
         {
-          Eigen::Matrix<double, 3, 1> obs = determine_observation(image, n, t, n_max, is_horizontal, params);
+          Eigen::Matrix<double, 3, 1> obs = determine_observation(image, n, t, n_max, params);
 
           std::vector<Filter*> accepted{}; // List of accepted filters by the current observation obs
           find_match(filters, accepted, obs, t, filter_index, params);
           if (accepted.empty() && obs(1, 0) < params.max_thickness)
-            new_filters.emplace_back(is_horizontal, t, slope_max, obs);
+            new_filters.emplace_back(t, slope_max, obs);
           else
             two_matches_through_n =
-                handle_find_filter(new_filters, accepted, obs, t, is_horizontal, slope_max) || two_matches_through_n;
+                handle_find_filter(new_filters, accepted, obs, t, slope_max) || two_matches_through_n;
         }
       }
 
@@ -645,16 +634,18 @@ namespace mln::contrib::segdet
     {
       for (int i = -thickness; i < static_cast<int>(thickness) + static_cast<int>(is_odd); i++)
       {
-        if (static_cast<int>(point.y) + i < img.size(1))
-          draw_labeled_pixel(img, label, static_cast<int>(point.x), static_cast<int>(point.y + i));
+        int y = static_cast<int>(point.y) + i;
+        if (0 <= y && y < img.size(1))
+          draw_labeled_pixel(img, label, static_cast<int>(point.x), y);
       }
     }
     else
     {
       for (int i = -thickness; i < static_cast<int>(thickness) + static_cast<int>(is_odd); i++)
       {
-        if (static_cast<int>(point.x) + i < img.size(0))
-          draw_labeled_pixel(img, label, static_cast<int>(point.x + i), static_cast<int>(point.y));
+        int x = static_cast<int>(point.x) + i;
+        if ( 0 <= x && x < img.size(0))
+          draw_labeled_pixel(img, label, x, static_cast<int>(point.y));
       }
     }
   }
@@ -728,6 +719,7 @@ namespace mln::contrib::segdet
   void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, size_t width,
                   size_t height, Parameters params)
   {
+    return;
     image2d<uint16_t> first_output = image2d<uint16_t>(width, height);
     mln::fill(first_output, 0);
     labeled_arr(first_output, segments_to_compare, segments_removable, LABELING_TYPE_HORIZONTAL);
@@ -798,6 +790,44 @@ namespace mln::contrib::segdet
     remove_duplicates(pair, img_width, img_height, params);
   }
 
+  image2d<uint8_t> transpose(image2d<uint8_t> image)
+  {
+    int width = image.size(0), height = image.size(1);
+    image2d<uint8_t> transpose_image = image2d<uint8_t>(height, width);
+    mln::fill(transpose_image, 0);
+    for (int x = 0; x < width; ++x)
+    {
+      for (int y = 0; y < height; ++y)
+      {
+        transpose_image({y, x}) = image.at({x, y});
+      }
+    }
+
+    return transpose_image;
+  }
+
+  void my_swap(uint32_t &a, uint32_t &b)
+  {
+    auto tmp = a;
+    a = b;
+    b = tmp;
+  }
+
+  void reverse_polarity(std::vector<Segment> &segments)
+  {
+    for (auto &segment : segments)
+    {
+      for (auto &point : segment.points)
+      {
+        my_swap(point.x, point.y);
+      }
+
+      my_swap(segment.last_point.x, segment.last_point.y);
+      my_swap(segment.first_point.x, segment.first_point.y);
+      segment.is_horizontal = false;
+    }
+  }
+
   /**
    * Compute the two traversals to detect horizontal and vertical segments
    * @param image image to extract segment from
@@ -805,12 +835,15 @@ namespace mln::contrib::segdet
    * @param discontinuity
    * @return Pair (horizontal segments,vertical segments)
    */
-  std::pair<std::vector<Segment>, std::vector<Segment>> process(const image2d<uint8_t>& image, uint min_len_embryo,
+  std::pair<std::vector<Segment>, std::vector<Segment>> process(image2d<uint8_t> image, uint min_len_embryo,
                                                                 uint discontinuity, Parameters params)
   {
     // TODO Multi threading, splitter l'image
     std::vector<Segment> horizontal_segments = traversal(image, true, min_len_embryo, discontinuity, params);
-    std::vector<Segment> vertical_segments   = traversal(image, false, min_len_embryo, discontinuity, params);
+
+    image2d<uint8_t> transpose_image = transpose(image);
+    std::vector<Segment> vertical_segments   = traversal(transpose_image, false, min_len_embryo, discontinuity, params);
+    reverse_polarity(vertical_segments);
 
     return std::make_pair(horizontal_segments, vertical_segments);
   }

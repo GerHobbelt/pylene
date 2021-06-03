@@ -70,6 +70,9 @@ target_sources(Pylene PRIVATE
                src/accu/cvxhull.cpp
                src/contrib/segdet/evaluation.cpp
                src/contrib/segdet/filter.cpp
+               src/contrib/segdet/preprocess.cpp
+               src/contrib/segdet/process.cpp
+               src/contrib/segdet/postprocess.cpp
                src/contrib/segdet/segdet.cpp
                src/contrib/segdet/segment.cpp
                src/core/image_format.cpp

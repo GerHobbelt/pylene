@@ -21,32 +21,4 @@ namespace mln::morpho
 
     return depth;
   }
-
-  std::vector<int> lca_preprocess(mln::morpho::component_tree<void>& tree) { return tree.compute_depth(); }
-
-  // TODO Use sparse table to optimize LCA
-  int lca(const std::vector<int>& depth, mln::morpho::component_tree<void>& tree, int u, int v)
-  {
-    // Put u and v at the same level
-    while (depth[u] != depth[v])
-    {
-      if (depth[u] > depth[v])
-        u = tree.parent[u];
-      else
-        v = tree.parent[v];
-    }
-
-    // Go until the ancestor is common
-    while (u != v)
-    {
-      u = tree.parent[u];
-
-      if (u == -1 && v == -1)
-        return -1;
-
-      v = tree.parent[v];
-    }
-
-    return u;
-  }
 } // namespace mln::morpho

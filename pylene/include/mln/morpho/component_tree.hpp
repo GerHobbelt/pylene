@@ -454,8 +454,6 @@ namespace mln::morpho
   {
     std::vector<Edge> res;
 
-    std::vector<int> depth = lca_preprocess(*this);
-
     auto width = node_map.width();
 
     mln_foreach (auto p, node_map.domain())

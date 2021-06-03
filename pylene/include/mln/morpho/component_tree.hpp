@@ -6,6 +6,7 @@
 #include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/ndimage_fwd.hpp>
 #include <mln/core/image/view/zip.hpp>
+#include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/hierarchies/graph.hpp>
@@ -120,11 +121,13 @@ namespace mln::morpho
     /// Generate a saliency map of the given Component Tree
     ///
     /// @return A list of edges that associates each edges to a saliency weight
-    std::vector<Edge> saliency_map(const Graph& leaf_graph);
+    template <class I, class J>
+    std::vector<Edge> saliency_map(I node_map, J values);
 
 
     /// Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
-    mln::image2d<double> saliency_khalimsky_grid(const Graph& leaf_graph);
+    template <class I, class J>
+    mln::image2d<double> saliency_khalimsky_grid(I node_map, J values);
 
     using node_t = int;
     std::vector<node_t> parent;
@@ -391,5 +394,99 @@ namespace mln::morpho
     return out;
   }
 
+  int lca(const std::vector<int>& depth, mln::morpho::component_tree<void>& tree, int u, int v);
 
+  std::vector<int> lca_preprocess(mln::morpho::component_tree<void>& tree);
+
+  template <class I, class J>
+  mln::image2d<double> component_tree<void>::saliency_khalimsky_grid(I node_map, J values)
+  {
+    int height = node_map.height();
+    int width  = node_map.width();
+
+    int res_height = 2 * height + 1;
+    int res_width  = 2 * width + 1;
+
+    image2d<double> res(res_width, res_height);
+    fill(res, 0);
+
+    const std::vector<Edge>& s_map = this->saliency_map(node_map, values);
+
+    for (const auto& edge : s_map)
+    {
+      int    u = std::get<0>(edge);
+      int    v = std::get<1>(edge);
+      double w = std::get<2>(edge);
+
+      int u_pos[2] = {u % width, u / width};
+      int v_pos[2] = {v % width, v / width};
+
+      int res_offset[2]   = {u_pos[0] - v_pos[0], u_pos[1] - v_pos[1]};
+      int res_edge_pos[2] = {2 * v_pos[0] + 1 + res_offset[0], 2 * v_pos[1] + 1 + res_offset[1]};
+
+      res({res_edge_pos[0], res_edge_pos[1]}) = w;
+    }
+
+    for (int y = 0; y < res_height; y += 2)
+    {
+      for (int x = 0; x < res_width; x += 2)
+      {
+        double max = std::numeric_limits<double>::min();
+
+        if (y + 1 < height)
+          max = std::max(max, res({x, y + 1}));
+        if (x + 1 < width)
+          max = std::max(max, res({x + 1, y}));
+        if (y - 1 >= 0)
+          max = std::max(max, res({x, y - 1}));
+        if (x - 1 >= 0)
+          max = std::max(max, res({x - 1, y}));
+
+        res({x, y}) = max;
+      }
+    }
+
+    return res;
+  }
+
+  template <class I, class J>
+  std::vector<Edge> component_tree<void>::saliency_map(I node_map, J values)
+  {
+    std::vector<Edge> res;
+
+    std::vector<int> depth = lca_preprocess(*this);
+
+    auto width = node_map.width();
+
+    mln_foreach (auto p, node_map.domain())
+    {
+      for (auto q : mln::c4(p))
+      {
+        if ((q[0] == p[0] + 1 || q[1] == p[1] + 1) && q[0] < node_map.width() && q[1] < node_map.height())
+        {
+          auto id_p = 0;
+          auto id_q = 0;
+          for (size_t i = 1; i < this->parent.size(); i++)
+          {
+            if (id_p == 0 && values[i] == node_map(p))
+              id_p = i;
+
+            if (id_q == 0 && values[i] == node_map(q))
+              id_q = i;
+
+            if (id_p != 0 && id_q != 0)
+              break;
+          }
+
+          auto edge = std::make_tuple(p[0] + width * p[1], q[0] + width * q[1], 0);
+
+          std::get<2>(edge) = std::abs(node_map(p) - node_map(q));
+
+          res.emplace_back(edge);
+        }
+      }
+    }
+
+    return res;
+  }
 } // namespace mln::morpho

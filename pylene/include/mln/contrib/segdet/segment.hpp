@@ -12,7 +12,7 @@ namespace mln::contrib::segdet
 {
   struct Point
   {
-    Point(u_int32_t n, u_int32_t t, u_int32_t size)
+    Point(u_int32_t t, u_int32_t n, u_int32_t size)
       : thickness(size)
     {
       x = t;

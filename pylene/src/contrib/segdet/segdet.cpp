@@ -25,7 +25,7 @@ namespace mln::contrib::segdet
    * @param is_horizontal
    * @return the value of the pixel
    */
-  uint8_t image_at(image2d<uint8_t> image, int n, int t)
+  uint8_t image_at(image2d<uint8_t> image, int t, int n)
   {
     // TODO remove the check done by image.at(,) using image(,)
     return image.at({t, n});
@@ -50,7 +50,7 @@ namespace mln::contrib::segdet
     uint32_t             lumi;
 
     // n + thickess: current position in the n-th line
-    while (n + thickness < n_max && (lumi = image_at(image, n + thickness, t)) < params.max_llum)
+    while (n + thickness < n_max && (lumi = image_at(image, t, n + thickness)) < params.max_llum)
     {
       luminosities_list.push_back(lumi);
 
@@ -75,7 +75,7 @@ namespace mln::contrib::segdet
       n += 1;
 
 //    while (image_at(image, n_end, t, is_horizontal) > m_lum)
-    while (image_at(image, n_end, t) > m_lum)
+    while (image_at(image, t, n_end) > m_lum)
       n_end--;
 
     n_end++;
@@ -204,7 +204,7 @@ namespace mln::contrib::segdet
 
     for (uint32_t i = 0; i < last_index; i++)
     {
-      filter.segment_points.emplace_back(filter.n_values[i], filter.t_values[i], filter.thicknesses[i]);
+      filter.segment_points.emplace_back(filter.t_values[i], filter.n_values[i], filter.thicknesses[i]);
     }
     auto& point       = filter.segment_points;
     auto& under_other = filter.under_other;
@@ -479,7 +479,7 @@ namespace mln::contrib::segdet
 
       for (uint32_t n = 0; n < n_max; n++)
       {
-        if (image_at(image, n, t) < params.max_llum)
+        if (image_at(image, t, n) < params.max_llum)
         {
           Eigen::Matrix<double, 3, 1> obs = determine_observation(image, n, t, n_max, params);
 
@@ -840,10 +840,14 @@ namespace mln::contrib::segdet
   {
     // TODO Multi threading, splitter l'image
     std::vector<Segment> horizontal_segments = traversal(image, true, min_len_embryo, discontinuity, params);
-
+    (void)discontinuity;
+    (void) min_len_embryo;
+    (void) params;
+//    std::vector<Segment> horizontal_segments{};
     image2d<uint8_t> transpose_image = transpose(image);
     std::vector<Segment> vertical_segments   = traversal(transpose_image, false, min_len_embryo, discontinuity, params);
     reverse_polarity(vertical_segments);
+//    std::vector<Segment> vertical_segments{};
 
     return std::make_pair(horizontal_segments, vertical_segments);
   }

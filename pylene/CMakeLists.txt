@@ -11,22 +11,21 @@ find_package(xsimd REQUIRED)
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
 
-add_library(Pylene)
+add_library(Pylene-core)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene INTERFACE tbb)
+  target_link_libraries(Pylene-core PRIVATE TBB::TBB)
 else ()
   set(PYLENE_USE_TBB OFF)
-#FIXME use a config file
-  target_compile_definitions(Pylene PUBLIC MLN_NO_TBB)
+  target_compile_definitions(Pylene-core PRIVATE MLN_NO_TBB)
 endif ()
 
 # FIXME: still useful ?
 if (UNIX AND NOT APPLE)
-  target_link_libraries(Pylene INTERFACE rt)
+  target_link_libraries(Pylene-core INTERFACE rt)
 elseif (MSVC)
   #
-  target_compile_options(Pylene PUBLIC
+  target_compile_options(Pylene-core PUBLIC
     "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
     "/wd5104" # found 'L#x' in macro replacement list, did you mean
     "/experimental:preprocessor"  # required by range-v3
@@ -36,14 +35,14 @@ endif ()
 
 
 # Set dependancies
-target_include_directories(Pylene PUBLIC
+target_include_directories(Pylene-core PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
 
-target_include_directories(Pylene SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
-target_link_libraries(Pylene PUBLIC range-v3::range-v3 xsimd::xsimd)
-target_link_libraries(Pylene PUBLIC fmt::fmt)
-target_link_libraries(Pylene PRIVATE FreeImage::FreeImage)
+target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd::xsimd)
+target_link_libraries(Pylene-core PUBLIC fmt::fmt)
+target_link_libraries(Pylene-core PRIVATE FreeImage::FreeImage)
 
 
 # Set sources
@@ -62,10 +61,10 @@ target_include_directories(Pylene-bp PUBLIC
 target_link_libraries(Pylene-bp PRIVATE xsimd::xsimd fmt::fmt)
 target_compile_features(Pylene-bp PUBLIC cxx_std_20)
 
-target_link_libraries(Pylene PRIVATE Pylene-bp)
+target_link_libraries(Pylene-core PRIVATE Pylene-bp)
 
 
-target_sources(Pylene PRIVATE
+target_sources(Pylene-core PRIVATE
                src/accu/cvxhull.cpp
                src/core/image_format.cpp
                src/core/init_list.cpp
@@ -95,11 +94,11 @@ target_sources(Pylene PRIVATE
                )
 
 # Compiler configurations
-target_compile_features(Pylene PUBLIC cxx_std_20)
+target_compile_features(Pylene-core PUBLIC cxx_std_20)
 
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
   target_compile_options(Pylene-bp PUBLIC -fconcepts)
-  target_compile_options(Pylene PUBLIC -fconcepts)
+  target_compile_options(Pylene-core PUBLIC -fconcepts)
 endif()
 
 # IDE configuration
@@ -107,39 +106,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/mln FILES ${sources})
 
 
-add_library(Pylene::Pylene ALIAS Pylene)
+add_library(Pylene::Core ALIAS Pylene-core)
 
-include(GNUInstallDirs)
-install(TARGETS Pylene Pylene-bp
-        EXPORT PyleneTargets)
-
-write_basic_package_version_file(
-    PyleneConfigVersion.cmake
-    VERSION 0.1
-    COMPATIBILITY AnyNewerVersion
-)
-
-configure_file(
-    PyleneConfig.cmake.in
-    PyleneConfig.cmake
-    @ONLY
-)
-
-install(EXPORT PyleneTargets
-        FILE PyleneTargets.cmake
-        NAMESPACE Pylene::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
-        )
-
-install(DIRECTORY include/mln
-        TYPE INCLUDE)
-
-install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/PyleneConfigVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
 
 # GCC8 has enoying random compilation failures
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-  target_compile_definitions(Pylene PUBLIC PYLENE_GCC8_WORKAROUND)
+  target_compile_definitions(Pylene-core PUBLIC PYLENE_GCC8_WORKAROUND)
 endif()

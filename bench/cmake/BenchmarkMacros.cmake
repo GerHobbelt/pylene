@@ -9,7 +9,7 @@
 # the list of executables to be run.
 # A test is also added with the same name and belongs to the group "SpeedTests"
 # They can be run with ctest -L SpeedTests.
-# 
+#
 
 add_custom_target(run-all-benchmarks)
 
@@ -20,10 +20,10 @@ function(add_benchmark Executable)
 
   # Create benchmark exe
   add_executable(${Benchmark_NAME} ${Benchmark_SOURCES})
-  target_link_libraries(${Benchmark_NAME} PRIVATE Fixtures::ImagePath BenchImpl Pylene::Pylene benchmark::benchmark ${FreeImage_LIBRARIES})
+  target_link_libraries(${Benchmark_NAME} PRIVATE Fixtures::ImagePath BenchImpl Pylene::Core benchmark::benchmark ${FreeImage_LIBRARIES})
   target_include_directories(${Benchmark_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
   add_dependencies(build-bench ${Benchmark_NAME})
-  
+
   # Retrieve reference
   set(Benchmark_OUTPUT_FILE ${Benchmark_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}.json)
 

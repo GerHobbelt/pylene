@@ -66,19 +66,19 @@ class Pylene(ConanFile):
         self.cpp_info.names["cmake_find_package"] = "Pylene"
         self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
 
-        self.cpp_info.components["Pylene"].system_libs.append("freeimage")
-        self.cpp_info.components["Pylene"].names["cmake_find_package"] = "Pylene"
-        self.cpp_info.components["Pylene"].names["cmake_find_package_multi"] = "Pylene"
-        self.cpp_info.components["Pylene"].libs = ["Pylene"]
-        self.cpp_info.components["Pylene"].includedirs = [os.path.join(self.package_folder, "include")]
-        self.cpp_info.components["Pylene"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd"]
+        self.cpp_info.components["Core"].system_libs.append("freeimage")
+        self.cpp_info.components["Core"].names["cmake_find_package"] = "Core"
+        self.cpp_info.components["Core"].names["cmake_find_package_multi"] = "Core"
+        self.cpp_info.components["Core"].libs = ["Pylene-core"]
+        self.cpp_info.components["Core"].includedirs = ["include"]
+        self.cpp_info.components["Core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd"]
 
         if self._build_python():
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
-            self.cpp_info.components["Pylene-numpy"].requires = ["Pylene"]
-            self.cpp_info.components["Pylene-numpy"].includedirs = [os.path.join(self.package_folder, "include")]
+            self.cpp_info.components["Pylene-numpy"].requires = ["Core"]
+            self.cpp_info.components["Pylene-numpy"].includedirs = ["include"]
 
         v = tools.Version(self.settings.compiler.version)
         for comp in self.cpp_info.components:

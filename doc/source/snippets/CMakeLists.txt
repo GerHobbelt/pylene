@@ -64,12 +64,12 @@ add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")
 
 add_library(doc-lib lut.cpp)
-target_link_libraries(doc-lib Pylene::Pylene)
+target_link_libraries(doc-lib Pylene::Core)
 
 
 
 
-link_libraries(Pylene::Pylene)
+link_libraries(Pylene::Core)
 link_libraries(doc-lib)
 
 add_executable(alphatree_example alphatree_example.cpp)

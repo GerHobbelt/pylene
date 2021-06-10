@@ -124,7 +124,6 @@ namespace pln::contrib::segdet
     std::sort(points.begin(), points.end(), [](Point& lhs, Point& rhs){ return lhs.x > rhs.x;});
 
     auto last   = points.back();
-    pybind11::print(last.x, last.y);
     auto output = douglas_peucker(points, precision);
     output.push_back(last);
 

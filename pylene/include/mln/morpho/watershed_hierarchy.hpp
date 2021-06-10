@@ -5,7 +5,7 @@
 
 namespace mln::morpho
 {
-  // TODO Add the attribute parameter
+  // FIXME Pass a std::function instead of an accumulator ?
 
   /// Compute the watershed hierarchy of an image
   ///
@@ -37,7 +37,7 @@ namespace mln::morpho
       {
         int parent = tree.parent[i];
 
-        if (i <= nb_leaves && tree.values[parent] != tree.values[i])
+        if (i <= (n - nb_leaves - 1) && tree.values[parent] != tree.values[i])
           res[i] = attribute[i];
 
         res[parent] = std::max(res[parent], res[i]);
@@ -47,10 +47,10 @@ namespace mln::morpho
       return res;
     }
 
-    template <typename I, typename W, typename E, typename N, typename A>
+    template <typename I, typename N, typename W, typename E, typename A>
     std::pair<component_tree<A>, image_ch_value_t<I, int>>
     watershed(const component_tree<W>& tree, image_ch_value_t<I, int> node_map, std::vector<E> mst,
-              const std::vector<A>& attribute, N nbh, std::size_t nb_leaves)
+              const std::vector<A>& attribute, std::size_t nb_leaves)
     {
       auto computed_attribute = get_computed_attribute(tree, attribute, nb_leaves);
 
@@ -64,26 +64,16 @@ namespace mln::morpho
         min_computed_attributes[parent] = std::min<A>(min_computed_attributes[parent], computed_attribute[i]);
       }
 
-      auto edges = alphatree_edges<image_point_t<I>, N, A>();
+      auto edges = alphatree_edges<image_point_t<I>, N, A, false>();
       for (std::size_t i = 0; i < mst.size(); ++i)
       {
         auto [p, q, _] = mst[i];
         A new_weight   = min_computed_attributes[nb_leaves - i - 2];
-
-        int dir = 0;
-        for (auto nb : nbh.after(p))
-        {
-          if (q == nb)
-            break;
-
-          ++dir;
-        }
-
-        edges.push(dir, new_weight, p);
+        edges.push(p, q, new_weight);
       }
       edges.on_finish_insert();
 
-      return internal::alphatree_from_graph<A>(edges, node_map, nb_leaves, true);
+      return internal::alphatree_from_graph<A>(edges, node_map, nb_leaves, false);
     }
   } // namespace internal
 
@@ -92,15 +82,13 @@ namespace mln::morpho
   watershed_hierarchy(I input, Accu acc, N nbh, F distance)
   {
     std::vector<internal::edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> mst;
-    std::size_t nb_leaves;
-    auto [tree, nm] = internal::__alphatree(input, nbh, distance, false, &mst, &nb_leaves);
+    auto [tree, nm] = internal::__alphatree<I, N, F, false>(input, nbh, distance, false, false, &mst);
 
     auto attribute = tree.compute_attribute_on_points(nm, acc);
 
-    // FIXME Maybe an option in alpha tree function is better
     auto node_count = tree.parent.size();
     mln::for_each(nm, [node_count](int& id) { id = static_cast<int>(node_count) - id - 1; });
 
-    return internal::watershed<I>(tree, nm, mst, attribute, nbh, nb_leaves);
+    return internal::watershed<I, N>(tree, nm, mst, attribute, input.domain().size());
   }
 } // namespace mln::morpho

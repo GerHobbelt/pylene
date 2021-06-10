@@ -39,11 +39,11 @@ namespace mln::morpho
   {
     /// \brief Canvas for the edges in the alphatree. Using different data
     /// structures related to the type of the edges.
-    template <typename P, typename N, typename W>
+    template <typename P, typename N, typename W, bool HQ>
     class alphatree_edges;
 
-    template <typename P, typename N, typename W>
-    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2) class alphatree_edges<P, N, W>
+    template <typename P, typename N, typename W, bool HQ>
+    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2 && HQ) class alphatree_edges<P, N, W, HQ>
     {
     public:
       void                push(int dir, W w, P p) { m_cont.insert(dir, w, p); }
@@ -64,11 +64,14 @@ namespace mln::morpho
       W w;
     };
 
-    template <typename P, typename N, typename W>
+    template <typename P, typename N, typename W, bool HQ>
     class alphatree_edges
     {
     public:
-      void                push(int dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
+      void push(int dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
+
+      void push(P p, P q, W w) { m_cont.push_back({p, q, w}); }
+
       std::tuple<P, P, W> pop()
       {
         assert(m_current < m_cont.size());
@@ -81,10 +84,13 @@ namespace mln::morpho
         assert(m_current < m_cont.size());
         return m_cont[m_current].w;
       }
+
       bool empty() const { return m_cont.size() == m_current; }
+
       void on_finish_insert()
       {
-        std::sort(m_cont.begin(), m_cont.end(), [](const edge_t<P, W>& a, const edge_t<P, W>& b) { return a.w < b.w; });
+        std::stable_sort(m_cont.begin(), m_cont.end(),
+                         [](const edge_t<P, W>& a, const edge_t<P, W>& b) { return a.w < b.w; });
       }
 
     private:
@@ -115,8 +121,6 @@ namespace mln::morpho
     template <class E, class J>
     void alphatree_compute_flatzones(E& edges, J zpar)
     {
-      canvas::impl::union_find_init_par(zpar);
-
       while (!edges.empty() && edges.top() == 0)
       {
         const auto [p, q, w] = edges.pop();
@@ -312,11 +316,11 @@ namespace mln::morpho
       return {std::move(t), std::move(node_map)};
     }
 
-    template <class I, class N, class F,
+    template <class I, class N, class F, bool HQ = true,
               class M = edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>>
     std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
-    __alphatree(I input, N nbh, F distance, bool canonize_tree = true, std::vector<M>* mst = nullptr,
-                std::size_t* nb_leaves = nullptr)
+    __alphatree(I input, N nbh, F distance, bool canonize_tree = true, bool compute_flatzones = true,
+                std::vector<M>* mst = nullptr)
     {
       static_assert(mln::is_a<I, mln::details::Image>());
       static_assert(mln::is_a<N, mln::details::Neighborhood>());
@@ -330,22 +334,21 @@ namespace mln::morpho
       static_assert(std::is_same<M, edge_t<P, W>>());
 
       // 1. Get the list of edges
-      auto edges = alphatree_edges<P, N, W>();
+      auto edges = alphatree_edges<P, N, W, HQ>();
       internal::alphatree_compute_edges(std::move(input), std::move(nbh), std::move(distance), edges);
 
       std::size_t              flatzones_count;
       image_ch_value_t<I, int> node_map = imchvalue<int>(input).set_init_value(-1);
       {
         image_ch_value_t<I, P> zpar = imchvalue<P>(input);
-        // 2. Compute flat zone of the image
-        internal::alphatree_compute_flatzones(edges, zpar);
+        canvas::impl::union_find_init_par(zpar);
+
+        if (compute_flatzones)
+          internal::alphatree_compute_flatzones(edges, zpar);
 
         // 3. Compute a node_id for each flat zone
         flatzones_count = internal::alphatree_create_nodemap(node_map, zpar);
       }
-
-      if (nb_leaves != nullptr)
-        *nb_leaves = flatzones_count;
 
       return alphatree_from_graph<W>(edges, node_map, flatzones_count, canonize_tree, mst);
     }

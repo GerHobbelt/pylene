@@ -161,7 +161,8 @@ TEST(Morpho, AlphaTreeMST)
   std::vector<E> mst;
 
   auto [t, _] = mln::morpho::internal::__alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist_t<>()(a, b); }, true, &mst);
+      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist_t<>()(a, b); }, true, true,
+      &mst);
 
   for (std::size_t i = 0; i < expected_mst.size(); ++i)
   {

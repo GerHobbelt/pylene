@@ -73,7 +73,7 @@ namespace mln::morpho
       }
       edges.on_finish_insert();
 
-      return internal::alphatree_from_graph<A>(edges, node_map, nb_leaves, false);
+      return internal::alphatree_from_graph<A>(edges, node_map, nb_leaves, true);
     }
   } // namespace internal
 

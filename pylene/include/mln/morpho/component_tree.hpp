@@ -129,9 +129,8 @@ namespace mln::morpho
     /// \brief Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
     ///
     /// \param node_map Image point -> node_id mapping
-    /// \param values node_id -> value mapping
-    template <class I, class J>
-    mln::image2d<double> saliency(I node_map, J values);
+    template <class I>
+    mln::image2d<double> saliency(I node_map);
 
 
     using node_t = int;
@@ -424,8 +423,8 @@ namespace mln::morpho
 
   using Edge = std::tuple<int, int, double>;
 
-  template <class I, class J>
-  std::vector<Edge> saliency_map(I node_map, J values, std::vector<int> parent)
+  template <class I>
+  std::vector<Edge> saliency_map(I node_map)
   {
     std::vector<Edge> res;
 
@@ -437,20 +436,6 @@ namespace mln::morpho
       {
         if ((q[0] == p[0] + 1 || q[1] == p[1] + 1) && q[0] < node_map.width() && q[1] < node_map.height())
         {
-          auto id_p = 0;
-          auto id_q = 0;
-          for (size_t i = 1; i < parent.size(); i++)
-          {
-            if (id_p == 0 && values[i] == node_map(p))
-              id_p = i;
-
-            if (id_q == 0 && values[i] == node_map(q))
-              id_q = i;
-
-            if (id_p != 0 && id_q != 0)
-              break;
-          }
-
           auto edge = std::make_tuple(p[0] + width * p[1], q[0] + width * q[1], 0);
 
           std::get<2>(edge) = std::abs(node_map(p) - node_map(q));
@@ -463,8 +448,8 @@ namespace mln::morpho
     return res;
   }
 
-  template <class I, class J>
-  mln::image2d<double> component_tree<void>::saliency(I node_map, J values)
+  template <class I>
+  mln::image2d<double> component_tree<void>::saliency(I node_map)
   {
     int height = node_map.height();
     int width  = node_map.width();
@@ -475,7 +460,7 @@ namespace mln::morpho
     image2d<double> res(res_width, res_height);
     fill(res, 0);
 
-    const std::vector<Edge>& s_map = saliency_map(node_map, values, this->parent);
+    const std::vector<Edge>& s_map = saliency_map(node_map);
 
     for (const auto& edge : s_map)
     {

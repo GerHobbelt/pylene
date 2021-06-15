@@ -28,7 +28,7 @@ namespace mln::morpho
     template <typename W, typename A>
     std::vector<A> get_computed_attribute(const component_tree<W>& tree, const std::vector<A>& attribute, int nb_leaves)
     {
-      int n = tree.parent.size();
+      int n = static_cast<int>(tree.parent.size());
 
       std::vector<A> res(n, std::numeric_limits<A>::min());
       std::fill_n(res.end() - nb_leaves, nb_leaves, 0);
@@ -52,9 +52,9 @@ namespace mln::morpho
     watershed(const component_tree<W>& tree, image_ch_value_t<I, int> node_map, std::vector<E> mst,
               const std::vector<A>& attribute, std::size_t nb_leaves)
     {
-      auto computed_attribute = get_computed_attribute(tree, attribute, nb_leaves);
+      auto computed_attribute = get_computed_attribute(tree, attribute, static_cast<int>(nb_leaves));
 
-      int n = tree.parent.size();
+      int n = static_cast<int>(tree.parent.size());
 
       std::vector<A> min_computed_attributes(n, std::numeric_limits<A>::max());
       for (int i = n - 1; i > 0; --i)

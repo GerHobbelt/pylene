@@ -125,18 +125,13 @@ namespace mln::morpho
     template <class I, class V>
     image_ch_value_t<I, V> reconstruct_from(I node_map, ::ranges::span<V> values) const;
 
-    using Edge = std::tuple<int, int, double>;
 
-    /// Generate a saliency map of the given Component Tree
+    /// \brief Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
     ///
-    /// @return A list of edges that associates each edges to a saliency weight
+    /// \param node_map Image point -> node_id mapping
+    /// \param values node_id -> value mapping
     template <class I, class J>
-    std::vector<Edge> saliency_map(I node_map, J values);
-
-
-    /// Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
-    template <class I, class J>
-    mln::image2d<double> saliency_khalimsky_grid(I node_map, J values);
+    mln::image2d<double> saliency(I node_map, J values);
 
 
     using node_t = int;
@@ -430,7 +425,7 @@ namespace mln::morpho
   using Edge = std::tuple<int, int, double>;
 
   template <class I, class J>
-  std::vector<Edge> component_tree<void>::saliency_map(I node_map, J values)
+  std::vector<Edge> saliency_map(I node_map, J values, std::vector<int> parent)
   {
     std::vector<Edge> res;
 
@@ -444,7 +439,7 @@ namespace mln::morpho
         {
           auto id_p = 0;
           auto id_q = 0;
-          for (size_t i = 1; i < this->parent.size(); i++)
+          for (size_t i = 1; i < parent.size(); i++)
           {
             if (id_p == 0 && values[i] == node_map(p))
               id_p = i;
@@ -469,7 +464,7 @@ namespace mln::morpho
   }
 
   template <class I, class J>
-  mln::image2d<double> component_tree<void>::saliency_khalimsky_grid(I node_map, J values)
+  mln::image2d<double> component_tree<void>::saliency(I node_map, J values)
   {
     int height = node_map.height();
     int width  = node_map.width();
@@ -480,7 +475,7 @@ namespace mln::morpho
     image2d<double> res(res_width, res_height);
     fill(res, 0);
 
-    const std::vector<Edge>& s_map = this->saliency_map(node_map, values);
+    const std::vector<Edge>& s_map = saliency_map(node_map, values, this->parent);
 
     for (const auto& edge : s_map)
     {

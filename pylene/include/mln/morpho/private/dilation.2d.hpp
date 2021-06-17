@@ -37,7 +37,7 @@ namespace mln::morpho::details
     SimpleFilter2D() = default;
 
     virtual ~SimpleFilter2D()                                                                         = default;
-    virtual void                            Execute(mln::ndbuffer_image& in, mln::ndbuffer_image out) = 0;
+    virtual void                            Execute(mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out) = 0;
     virtual mln::box2d                      ComputeInputRegion(mln::box2d roi) const noexcept         = 0;
     virtual mln::box2d                      ComputeOutputRegion(mln::box2d roi) const noexcept        = 0;
     virtual std::unique_ptr<SimpleFilter2D> Clone() const                                             = 0;
@@ -55,13 +55,18 @@ namespace mln::morpho::details
     }
 
 
-    void Execute(mln::ndbuffer_image& in_, mln::ndbuffer_image out_) final
+    void Execute(mln::bp::Tile2DView<void> in_, mln::bp::Tile2DView<void> out_, mln::box2d roi) final
     {
-      auto& in  = in_.__cast<V, 2>();
-      auto& out = out_.__cast<V, 2>();
-      mln::box2d roi = out.domain();
-      auto tmp = in.clip(roi);
-      mln::morpho::details::impl::localmax(tmp, out, *m_vs, m_se, roi);
+      auto in = mln::bp::downcast<V>(in_);
+      auto out = mln::bp::downcast<V>(out_);
+
+      mln::box2d input_roi = this->ComputeInputRegion(roi);
+
+      auto in_as_image  = mln::image2d<V>::from_tile(in, input_roi.tl());
+      auto out_as_image = mln::image2d<V>::from_tile(out, roi.tl());
+      in_as_image       = in_as_image.clip(roi);
+
+      mln::morpho::details::impl::localmax(in_as_image, out_as_image, *m_vs, m_se, roi);
     }
 
     std::unique_ptr<SimpleFilter2D> Clone() const final { return std::make_unique<SimpleDilation2D>(*this); }

@@ -64,5 +64,4 @@ namespace mln::bp
     aligned_free_2d((void*)ptr);
   }
 
-
 }

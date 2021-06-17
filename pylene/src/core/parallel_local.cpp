@@ -38,6 +38,39 @@ namespace mln
   }
 
 
+  SimpleFilter2D::SimpleFilter2D(int tile_width, int tile_height)
+  {
+    mln::box2d roi = {tile_width, tile_height};
+    mln::box2d iroi = m_executor->ComputeInputRegion(roi);
+
+
+    m_tile_out = m_tile_create(tile_width, tile_height);
+    m_tile_in  = m_tile_create(iroi.width(), iroi.height());
+  }
+
+  SimpleFilter2D::Execute(mln::box2d roi)
+  {
+    auto iroi = m_executor->ComputeInputRegion(roi);
+
+    // Laod the tile from the main image
+    m_load(iroi, m_tile_in);
+
+    // Execute on the tile
+    {
+      int x = roi.x() - iroi.x();
+      int y = roi.y() - iroi.y();
+      int w = roi.width();
+      int h = roi.height();
+      auto in = m_tile_in.clip(x, y, w, h);
+      auto out = m_tile_out.clip(0, 0, w, h);
+      m_executor->Execute(in, out);
+    }
+
+    // Write back the tile in the main image
+    m_store(roi, m_tile_out);
+  }
+
+  
   /*
   ** Caller for the TBB parallel_for
   ** Rationale being that every pointwise algorithm applies a function to every pixel,

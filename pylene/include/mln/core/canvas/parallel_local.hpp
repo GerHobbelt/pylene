@@ -8,101 +8,81 @@
 
 namespace mln
 {
-  namespace details
-  {
-    /*
-    template <class I, class T>
-    [[gnu::noinline]] void copy_block(I& in, mln::box2d roi, T* __restrict out, std::ptrdiff_t out_stride)
-    {
-      const int x0 = roi.x();
-      const int y0 = roi.y();
-
-      for (int y = 0; y < roi.height(); ++y)
-      {
-        T* lineptr = out + y * out_stride;
-        for (int x = 0; x < roi.width(); ++x)
-          lineptr[x] = in.at({x0 + x, y0 + y});
-      }
-    }
-
-    template <class I, class T>
-    [[gnu::noinline]] void copy_block(T* __restrict in, std::ptrdiff_t istride, mln::box2d roi, I& out)
-    {
-      const int x0 = roi.x();
-      const int y0 = roi.y();
-
-      for (int y = 0; y < roi.height(); ++y)
-      {
-        const T* lineptr = in + y * istride;
-        for (int x = 0; x < roi.width(); ++x)
-          out.at({x0 + x, y0 + y}) = lineptr[x];
-      }
-    }
-    */
-/*
-    template <class I, class T>
-    [[gnu::noinline]] void transpose_block2D(I& in, mln::box2d input_roi, T* __restrict out, std::ptrdiff_t out_stride)
-    {
-      const int x0 = input_roi.x();
-      const int y0 = input_roi.y();
 
 
-      for (int y = 0; y < input_roi.height(); ++y)
-        for (int x = 0; x < input_roi.width(); ++x)
-          *(out + x * out_stride + y) = in.at({x0 + x, y0 + y});
-    }
-
-    template <class I, class T>
-    [[gnu::noinline]] void transpose_block2D(T* __restrict in, std::ptrdiff_t istride, mln::box2d output_roi, I& out)
-    {
-      const int x0 = output_roi.x();
-      const int y0 = output_roi.y();
-
-      for (int y = 0; y < output_roi.height(); ++y)
-        for (int x = 0; x < output_roi.width(); ++x)
-          out.at({x0 + x, y0 + y}) = *(in + x * istride + y);
-    }
-*/
-  } // namespace details
-
-  /*TODO
-  Dilation : DONE
-  Erosion : everything
-  Opening (Erosion -> Dilation) : everything
-  Closing (Dilation -> Erosion) : everything
-  Hit Or Miss : everything
-  Rank Filter : everything
-  Median filter : everything
-  Mean (Box) filter : everything
-  Morphological gradients : everything
-  Top hat : everything
-  */
 
   class TileExecutorBase
   {
   public:
-    virtual void execute(mln::ndbuffer_image input, mln::ndbuffer_image output) const = 0;
+
+    virtual ~TileExecutorBase();
+    virtual void                            Execute(mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out) = 0;
+    virtual mln::box2d                      ComputeInputRegion(mln::box2d roi) const noexcept         = 0;
+    virtual mln::box2d                      ComputeOutputRegion(mln::box2d roi) const noexcept        = 0;
   };
 
-  class TileLoaderBase
+  class SimpleFilter2D
   {
   public:
-    virtual void                            load_tile(mln::box2d roi, mln::box2d input_roi) const = 0;
-    virtual mln::ndbuffer_image             get_tile() const                                      = 0;
-    virtual std::unique_ptr<TileLoaderBase> clone() const                                         = 0;
+    using tile_loader_fn = std::function<void(mln::box2d roi, mln::bp::Tile2DView<void> out)>;
+    using tile_writer_fn = std::function<void(mln::box2d roi, mln::bp::Tile2DView<void> out)>;
+    using tile_alloc_fn  = std::function<Tile2D<void>(int width, int height)>;
+
+    /// \param tile_width The width of the output tile
+    /// \param tile_height The height of the output tile
+    SimpleFilter2D(int tile_width, int tile_height);
+
+    /// Run execution for the given output \p roi
+    void Execute(mln::box2d roi);
+
+  private:
+    tile_loader_fn    m_load;
+    tile_writer_fn    m_store;
+    tile_generator_fn m_tile_create;
+    TileExecutorBase* m_executor;
+
+    // Auxiliary data
+    Tile2D<void>      m_tile_in;
+    Tile2D<void>      m_tile_out;
   };
 
-  class TileWriterBase
+
+
+  class LocalFilter2D
   {
   public:
-    // Commit to memory (maybe write a temp buffer to memory)
-    virtual void                write_tile(mln::box2d roi) const = 0;
+    LocalFilter2D(SimpleFilter2D f);
 
-    // Return the output buffer (maybe a temporary buffer)
-    virtual mln::ndbuffer_image get_tile(mln::box2d roi) const   = 0;
+    // Execute
+    void execute_parallel(mln::box2d roi, int tile_width, int tile_height);
+    void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
+    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
+
+
+  private:
+    SimpleFilter2D m_filter;
   };
 
 
+  /*
+  class LocalChainFilter2D
+  {
+  public:
+    // Execute
+    void execute_parallel(mln::box2d roi, int tile_width, int tile_height);
+    void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
+    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
+
+    void add_filter(SimpleFilter2D f);
+
+
+  private:
+    std::vector<SimpleFilter2D> m_filter;
+  };
+
+
+
+  
   class ParallelLocalCanvas2DBase
   {
   public:
@@ -142,6 +122,7 @@ namespace mln
 
 
     // Execute to compute this output roi
-    virtual void       ExecuteTile(mln::box2d out_roi) const final;
+    virtual void ExecuteTile(mln::box2d out_roi) const final;
   };
+  */
 } // namespace mln

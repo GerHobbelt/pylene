@@ -43,13 +43,22 @@ namespace mln::bp
     /// e.g., ``is_aligned(16)`` to check that the buffer is 16-bytes aligned
     bool is_aligned(int width = 16) { return ((intptr_t)m_ptr & (intptr_t)(width - 1)) == 0; }
 
-
   protected:
     void*          m_ptr = nullptr;
     int            m_width;
     int            m_height;
     std::ptrdiff_t m_stride;
   };
+
+  /// \brief Downcast
+  template <class T>
+  Tile2DView<T>& downcast(Tile2DView<void>& in) { return static_cast<Tile2DView<T>&>(in); }
+
+  /// \brief Downcast
+  template <class T>
+  const Tile2DView<T>& downcast(const Tile2DView<void>& in) { return static_cast<const Tile2DView<T>&>(in); }
+
+
 
 
   template <class T>
@@ -103,6 +112,39 @@ namespace mln::bp
   };
 
 
+  template <>
+  class Tile2D<void> : public Tile2DView<void>
+  {
+    using free_fn_t = void (*)(void*);
+  public:
+    Tile2D() = default;
+
+    template <class T>
+    Tile2D(Tile2D<T>&& other) noexcept;
+
+    template <class T>
+    Tile2D& operator=(Tile2D<T>&& other) noexcept;
+
+
+    ~Tile2D();
+
+    Tile2D(const Tile2D&) = delete;
+    Tile2D& operator=(const Tile2D&) = delete;
+
+    Tile2D(Tile2D&&) noexcept;
+    Tile2D& operator=(Tile2D&&) noexcept;
+
+
+    static Tile2D<T> acquire(void* ptr, int width, int height, std::ptrdiff_t stride, free_fn_t free_fn= nullptr) noexcept;
+    void*            release() noexcept;
+
+  private:
+    using base = Tile2DView<void>;
+    free_fn_t m_free = nullptr;
+  };
+
+
+
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
@@ -126,6 +168,7 @@ namespace mln::bp
     this->m_stride = pitch;
     this->m_width  = width;
     this->m_height = height;
+    this->m_free   = (free_fn_t)aligned_free_2d;
   }
 
   template <class T>
@@ -133,10 +176,9 @@ namespace mln::bp
   {
     if (this->m_ptr)
     {
-      if (this->m_free == nullptr)
-        aligned_free_2d<T>((T*)this->m_ptr, this->m_width, this->m_height, this->m_stride);
-      else
-        this->m_free(this->m_ptr);
+      for (int y = 0; y < height; y++)
+        std::destroy_n(mln::bp::ptr_offset(ptr, pitch * y), width);
+      this->m_free(this->m_ptr);
     }
   }
 

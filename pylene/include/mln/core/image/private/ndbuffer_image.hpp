@@ -188,6 +188,9 @@ namespace mln
     static __ndbuffer_image<T, N> from_buffer(T* buffer, int topleft[], int sizes[],
                                               std::ptrdiff_t byte_strides[] = nullptr, bool copy = false);
 
+    static __ndbuffer_image<T, N> from_tile(bp::Tile2DView<T> tile, mln::point2d anchor) requires (N == 2);
+
+
     template <class E>
     static __ndbuffer_image<T, N> from(const mln::ndimage_base<T, N, E>& other);
     /// \}
@@ -628,6 +631,26 @@ namespace mln
   bp::Tile2DView<const T> __ndbuffer_image<T, N>::as_tile() const noexcept requires (N == 2)
   {
     return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
+  }
+
+
+  template <class T, int N>
+  inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::from_tile(bp::Tile2DView<T> tile, mln::point2d anchor) requires (N == 2)
+  {
+    image_build_params params;
+    params.border = 0; // From external data, no border
+
+    alloc_fun_t __alloc = [buffer = tile.data()](std::size_t, std::size_t, const image_build_params&, auto&) -> std::byte* {
+      return reinterpret_cast<std::byte*>(buffer);
+    };
+
+    std::ptrdiff_t byte_strides[2] = {sizeof(T), tile.stride()};
+    int            topleft[2]      = {anchor.x(), anchor.y()};
+    int            sizes[2]        = {tile.width(), tile.height()};
+
+    __ndbuffer_image<T, N> out;
+    out.__init(__alloc, topleft, sizes, byte_strides, params);
+    return out;
   }
 
 

@@ -95,7 +95,7 @@ TEST(Morpho, AreaWatershedHierarchyGray)
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
-      [](auto tree, auto nm) -> std::vector<unsigned long> {
+      [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
       mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
@@ -129,7 +129,7 @@ TEST(Morpho, AreaWatershedHierarchyGrayHQ)
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
-      [](auto tree, auto nm) -> std::vector<unsigned long> {
+      [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
       mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
@@ -163,7 +163,7 @@ TEST(Morpho, AreaWatershedHierarchyRGB)
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
-      [](auto tree, auto nm) -> std::vector<unsigned long> {
+      [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
       mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
@@ -197,7 +197,7 @@ TEST(Morpho, AreaWatershedHierarchyGrayC8)
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
-      [](auto tree, auto nm) -> std::vector<unsigned long> {
+      [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
       mln::c8, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
@@ -229,7 +229,7 @@ TEST(Morpho, AreaWatershedHierarchy3DImage)
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
-      [](auto tree, auto nm) -> std::vector<unsigned long> {
+      [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
       mln::c26, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });

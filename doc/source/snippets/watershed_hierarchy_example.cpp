@@ -13,7 +13,7 @@ template <typename V>
 void process_example(const mln::image2d<V>& img, const std::string& output_filename, const double threshold)
 {
   // 2. Build the watershed hierarchy
-  auto area_attribute_func = [](auto tree, auto nm) -> std::vector<unsigned long> {
+  auto area_attribute_func = [](auto tree, auto nm) -> std::vector<size_t> {
     return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
   };
   auto [t, nm] = mln::morpho::watershed_hierarchy(img, area_attribute_func, mln::c4);

@@ -75,7 +75,7 @@ This example is used to generate the grayscale lena watershed hierarchy by area 
         mln::image2d<uint8_t> input = ...;
 
         // Compute the watershed hierarchy by area
-        auto area_attribute_func = [](auto tree, auto node_map) -> std::vector<unsigned long> {
+        auto area_attribute_func = [](auto tree, auto node_map) -> std::vector<size_t> {
             return tree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
         };
         auto [tree, node_map] = mln::morpho::watershed_hierarchy(input, area_attribute_func, mln::c4);

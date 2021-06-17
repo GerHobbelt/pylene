@@ -77,6 +77,7 @@ target_sources(Pylene-core PRIVATE
                src/core/se/mask2d.cpp
                src/core/se/periodic_line2d.cpp
                src/core/se/rect2d.cpp
+               src/core/se/se_2d.cpp
                src/core/trace.cpp
                src/core/traverse2d.cpp
                src/io/freeimage_plugin.cpp

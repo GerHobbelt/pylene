@@ -316,7 +316,7 @@ namespace mln::morpho
       return {std::move(t), std::move(node_map)};
     }
 
-    template <class I, class N, class F, bool HQ = true,
+    template <bool HQ = true, class I, class N, class F,
               class M = edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>>
     std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
     __alphatree(I input, N nbh, F distance, bool canonize_tree = true, bool compute_flatzones = true,

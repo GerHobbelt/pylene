@@ -301,51 +301,84 @@ namespace mln::contrib::segdet
     return res;
   }
 
-  bool is_intersection(image2d<uint16_t> img, const Point &point, bool is_horizontal)
+  bool is_usefull_under_object(image2d<uint16_t> img, Point &point, bool is_horizontal)
   {
     auto thickness = point.thickness / 2;
     int is_odd    = point.thickness % 2;
 
     if (is_horizontal)
     {
-      for (int i = -thickness; i < static_cast<int>(thickness) + is_odd; i++)
+      int y_init = point.y - thickness;
+      int y_end = point.y + thickness + is_odd;
+      if (thickness != 0)
+        y_end--;
+
+      while (y_init < 0)
+        y_init++;
+      while (y_end >= img.size(1))
+        y_end--;
+
+      while (y_init <= y_end && img({static_cast<int>(point.x), y_init}) == 2)
+        y_init++;
+      while (y_init <= y_end && img({static_cast<int>(point.x), y_end}) == 2)
+        y_end--;
+
+      point.thickness = y_end - y_init + 1;
+      point.y = (y_init + y_end) / 2;
+
+      if (point.thickness < 1)
       {
-        int y = static_cast<int>(point.y) + i;
-        if (0 <= y && y < img.size(1) && img({static_cast<int>(point.x), y}) == 2)
-          return false;
+        std::cout << "toto" << point.x << " " << point.y << " " << point.thickness << "\n";
+        return false;
       }
     }
     else
     {
-      for (int i = -thickness; i < static_cast<int>(thickness) + is_odd; i++)
-      {
-        int x = static_cast<int>(point.x) + i;
-        if (0 <= x && x < img.size(0) && img({x, static_cast<int>(point.y)}) == 2)
-          return false;
-      }
+      int x_init = point.x - thickness;
+      int x_end = point.x + thickness + is_odd;
+      if (thickness != 0)
+        x_end--;
+
+      while (x_init < 0)
+        x_init++;
+      while (x_end >= img.size(0))
+        x_end--;
+
+      int y = static_cast<int>(point.y);
+      while (x_init <= x_end && img({ x_init, y}) == 2)
+        x_init++;
+      while (x_init <= x_end && img({x_end, y}) == 2)
+        x_end--;
+
+      point.thickness = x_end - x_init + 1;
+      point.x = (x_init + x_end) / 2;
+
+      if (point.thickness < 1)
+        return false;
     }
 
     return true;
   }
 
-  std::vector<Segment> retreive_good_under_other(std::vector<Segment> &segments, size_t width, size_t height)
+  std::vector<Segment> retrieve_good_under_other(std::vector<Segment> &segments, size_t width, size_t height)
   {
     image2d<uint16_t> image = image2d<uint16_t>(width, height);
     mln::fill(image, 0);
 
     for (const auto &segment : segments)
     {
-      for (const auto &point : segment.under_other_object)
-      {
+      for (const auto& point : segment.under_other_object)
         draw_labeled_point(image, 2, point, segment.is_horizontal);
-      }
+
+      for (const auto& point : segment.points)
+        draw_labeled_point(image, 2, point, segment.is_horizontal);
     }
 
     for (auto &segment : segments)
     {
-      for (const auto &point : segment.under_other_object)
+      for (auto &point : segment.under_other_object)
       {
-        if (is_intersection(image, point, segment.is_horizontal))
+        if (is_usefull_under_object(image, point, segment.is_horizontal))
           segment.points.push_back(point);
       }
 
@@ -368,7 +401,9 @@ namespace mln::contrib::segdet
     remove_duplicates(pair, img_width, img_height, params);
 
     auto pre_res = filter_length(pair, min_len);
-    auto res = retreive_good_under_other(pre_res, img_width, img_height);
+    auto res = retrieve_good_under_other(pre_res, img_width, img_height);
+
+
 
     return res;
   }

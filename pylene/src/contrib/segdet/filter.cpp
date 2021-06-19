@@ -81,11 +81,9 @@ namespace mln::contrib::segdet
    * @param sigma The standard deviation value
    * @return true if it is in the interval, else false
    */
-  bool accepts_sigma(uint32_t prediction, uint32_t observation, double sigma)
+  bool accepts_sigma(double prediction, double observation, double sigma)
   {
-    if (prediction > observation)
-      return (prediction - observation) <= 3 * sigma;
-    return (observation - prediction) <= 3 * sigma;
+    return abs(prediction - observation) <= 3 * sigma;
   }
 
   bool accepts(const Filter& f, const Eigen::Matrix<double, 3, 1>& obs, uint32_t min, uint32_t max, Parameters params)

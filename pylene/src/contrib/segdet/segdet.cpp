@@ -7,29 +7,7 @@
 
 namespace mln::contrib::segdet
 {
-  /**
-   * Only keep segments that are above a given length and combine pair
-   * @param p Pair of vectors of segments
-   * @param min_len The length
-   * @return
-   */
-  std::vector<Segment> filter_length(std::pair<std::vector<Segment>, std::vector<Segment>>& p, uint min_len)
-  {
-    std::vector<Segment> res{};
 
-    for (auto& seg : p.first)
-    {
-      if (seg.length > min_len)
-        res.push_back(seg);
-    }
-    for (auto& seg : p.second)
-    {
-      if (seg.length > min_len)
-        res.push_back(seg);
-    }
-
-    return res;
-  }
 
   // Public functions
 
@@ -44,9 +22,7 @@ namespace mln::contrib::segdet
     auto p = process(preprocessed_img.__cast<uint8_t, 2>(), min_len_embryo, discontinuity, params);
 
     // Post Processing
-    post_process(p, preprocessed_img.size(0), preprocessed_img.size(1), params);
-
-    auto res = filter_length(p, min_len);
+    auto res = post_process(p, min_len, preprocessed_img.size(0), preprocessed_img.size(1), params);
 
     return res;
   }

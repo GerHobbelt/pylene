@@ -274,15 +274,42 @@ namespace mln::contrib::segdet
   }
 
   /**
+   * Only keep segments that are above a given length and combine pair
+   * @param p Pair of vectors of segments
+   * @param min_len The length
+   * @return
+   */
+  std::vector<Segment> filter_length(std::pair<std::vector<Segment>, std::vector<Segment>>& p, uint min_len)
+  {
+    std::vector<Segment> res{};
+
+    for (auto& seg : p.first)
+    {
+      if (seg.length > min_len)
+        res.push_back(seg);
+    }
+    for (auto& seg : p.second)
+    {
+      if (seg.length > min_len)
+        res.push_back(seg);
+    }
+
+    return res;
+  }
+
+  /**
    * Post process segments linking them and removing duplications
    * @param pair Pair (horizontal segments,vertical segments)
    * @param img_width Width of the image where segments were extract
    * @param img_height Height of the image where segments were extract
    */
-  void post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height,
+  std::vector<Segment> post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height, uint32_t min_len,
                     Parameters params)
   {
     segment_linking(pair, params);
     remove_duplicates(pair, img_width, img_height, params);
+    auto res = filter_length(pair, min_len);
+
+    return res;
   }
 } // namespace mln::contrib::segdet

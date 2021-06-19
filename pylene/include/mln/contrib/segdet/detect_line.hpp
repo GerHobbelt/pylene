@@ -25,7 +25,7 @@ namespace mln::contrib::segdet
    * @param img_width Width of the image where segments were extract
    * @param img_height Height of the image where segments were extract
    */
-  void post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height,
+  std::vector<Segment> post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& pair, size_t img_width, size_t img_height, uint32_t min_len,
                     Parameters params);
 
 } // namespace mln::contrib::segdet

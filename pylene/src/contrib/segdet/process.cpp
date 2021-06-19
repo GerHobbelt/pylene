@@ -465,9 +465,9 @@ namespace mln::contrib::segdet
     for (auto& segment : segments)
     {
       for (auto& point : segment.points)
-      {
         my_swap(point.x, point.y);
-      }
+      for (auto& point : segment.under_other_object)
+        my_swap(point.x, point.y);
 
       my_swap(segment.last_point.x, segment.last_point.y);
       my_swap(segment.first_point.x, segment.first_point.y);

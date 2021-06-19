@@ -58,50 +58,6 @@ namespace mln::contrib::segdet
    */
   struct Filter
   {
-    /**
-     * Constructor
-     * @param isHorizontal Boolean set to true if the filter is horizontal
-     * @param t_integration The position of the first integration
-     * @param slopeMax The maximum value that the filter's slope can have
-     * @param observation The filter's first observation
-     */
-    Filter(uint32_t t_integration, double slopeMax, Eigen::Matrix<double, 3, 1> observation)
-      : is_horizontal(true)
-      , slope_max(slopeMax)
-      , S((Eigen::Matrix<double, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
-      , W(Eigen::Matrix<double, 4, 1>::Zero())
-      , N(Eigen::Matrix<double, 3, 1>::Zero())
-      , H(Eigen::Matrix<double, 4, 4>::Identity())
-      , observation(std::nullopt)
-      , observation_distance(0)
-      , last_integration(t_integration)
-      , reg(t_integration, observation(0,0))
-    {
-      first    = t_integration;
-      t_values = std::vector<uint32_t>({t_integration});
-      n_values = std::vector<uint32_t>({static_cast<uint32_t>(observation(0, 0))});
-
-      slopes                           = std::vector<double>({0});
-      thicknesses                      = std::vector<double>({observation(1, 0)});
-      luminosities                     = std::vector<double>({observation(2, 0)});
-      nb_current_slopes_over_slope_max = 0;
-      first_slope                      = std::nullopt;
-
-      under_other           = std::vector<Point>();
-      currently_under_other = std::vector<Point>();
-      segment_points        = std::vector<Point>();
-
-      n_min = 0;
-      n_max = 0;
-
-      sigma_position   = SEGDET_DEFAULT_SIGMA_POS;
-      sigma_thickness  = SEGDET_DEFAULT_SIGMA_THK;
-      sigma_luminosity = SEGDET_DEFAULT_SIGMA_LUM;
-
-      S_predicted = Eigen::Matrix<double, 4, 1>::Zero();
-      X_predicted = Eigen::Matrix<double, 3, 1>::Zero();
-    }
-
     bool      is_horizontal; // set if filter is horizontal (t = x, n = y)
     u_int32_t first;         // t value of first integration
 
@@ -139,6 +95,50 @@ namespace mln::contrib::segdet
     u_int32_t last_integration; // t value referring to the position of the last integration
 
     MemoryLinearRegressor reg;
+
+    /**
+     * Constructor
+     * @param isHorizontal Boolean set to true if the filter is horizontal
+     * @param t_integration The position of the first integration
+     * @param slopeMax The maximum value that the filter's slope can have
+     * @param observation The filter's first observation
+     */
+    Filter(uint32_t t_integration, double slopeMax, Eigen::Matrix<double, 3, 1> observation)
+        : is_horizontal(true)
+        , slope_max(slopeMax)
+        , S((Eigen::Matrix<double, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
+        , W(Eigen::Matrix<double, 4, 1>::Zero())
+        , N(Eigen::Matrix<double, 3, 1>::Zero())
+        , H(Eigen::Matrix<double, 4, 4>::Identity())
+        , observation(std::nullopt)
+        , observation_distance(0)
+        , last_integration(t_integration)
+        , reg(t_integration, observation(0,0))
+    {
+      first    = t_integration;
+      t_values = std::vector<uint32_t>({t_integration});
+      n_values = std::vector<uint32_t>({static_cast<uint32_t>(observation(0, 0))});
+
+      slopes                           = std::vector<double>({0});
+      thicknesses                      = std::vector<double>({observation(1, 0)});
+      luminosities                     = std::vector<double>({observation(2, 0)});
+      nb_current_slopes_over_slope_max = 0;
+      first_slope                      = std::nullopt;
+
+      under_other           = std::vector<Point>();
+      currently_under_other = std::vector<Point>();
+      segment_points        = std::vector<Point>();
+
+      n_min = 0;
+      n_max = 0;
+
+      sigma_position   = SEGDET_DEFAULT_SIGMA_POS;
+      sigma_thickness  = SEGDET_DEFAULT_SIGMA_THK;
+      sigma_luminosity = SEGDET_DEFAULT_SIGMA_LUM;
+
+      S_predicted = Eigen::Matrix<double, 4, 1>::Zero();
+      X_predicted = Eigen::Matrix<double, 3, 1>::Zero();
+    }
   };
 
   /**

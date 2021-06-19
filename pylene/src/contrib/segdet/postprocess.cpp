@@ -53,6 +53,8 @@ namespace mln::contrib::segdet
 
     for (auto& p : b.points)
       a.points.push_back(p);
+    for (auto& p : b.under_other_object)
+      a.under_other_object.push_back(p);
 
     a.nb_pixels += b.nb_pixels;
 
@@ -162,6 +164,9 @@ namespace mln::contrib::segdet
     {
       for (auto& point : segments[i].points)
         draw_labeled_point(out, i + 3, point, segments[i].is_horizontal);
+      for (auto& point : segments[i].under_other_object)
+        draw_labeled_point(out, i + 3, point, segments[i].is_horizontal);
+
     }
   }
 
@@ -297,6 +302,40 @@ namespace mln::contrib::segdet
     return res;
   }
 
+  bool is_intersection(image2d<uint16_t> img, const Point &point, bool is_horizontal)
+  {
+    (void) img;
+    (void) point;
+    (void) is_horizontal;
+
+    return true;
+  }
+
+  std::vector<Segment> retreive_good_under_other(std::vector<Segment> &segments, size_t width, size_t height)
+  {
+    image2d<uint16_t> image = image2d<uint16_t>(width, height);
+    mln::fill(image, 1);
+
+    for (const auto &segment : segments)
+    {
+      for (const auto &point : segment.under_other_object)
+      {
+        draw_labeled_point(image, 2, point, segment.is_horizontal);
+      }
+    }
+
+    for (auto &segment : segments)
+    {
+      for (const auto &point : segment.under_other_object)
+      {
+        if (is_intersection(image, point, segment.is_horizontal))
+          segment.points.push_back(point);
+      }
+    }
+
+    return segments;
+  }
+
   /**
    * Post process segments linking them and removing duplications
    * @param pair Pair (horizontal segments,vertical segments)
@@ -308,7 +347,9 @@ namespace mln::contrib::segdet
   {
     segment_linking(pair, params);
     remove_duplicates(pair, img_width, img_height, params);
-    auto res = filter_length(pair, min_len);
+
+    auto pre_res = filter_length(pair, min_len);
+    auto res = retreive_good_under_other(pre_res, img_width, img_height);
 
     return res;
   }

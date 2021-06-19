@@ -22,7 +22,7 @@ namespace mln::contrib::segdet
     auto p = process(preprocessed_img.__cast<uint8_t, 2>(), min_len_embryo, discontinuity, params);
 
     // Post Processing
-    auto res = post_process(p, min_len, preprocessed_img.size(0), preprocessed_img.size(1), params);
+    auto res = post_process(p, preprocessed_img.size(0), preprocessed_img.size(1), min_len, params);
 
     return res;
   }

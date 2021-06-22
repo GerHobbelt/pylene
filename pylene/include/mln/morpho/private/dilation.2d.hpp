@@ -9,6 +9,7 @@
 #include <mln/morpho/private/localmax.hpp>
 
 #include <mln/bp/transpose.hpp>
+#include <mln/bp/copy.hpp>
 #include <mln/bp/alloc.hpp>
 
 /// \file Provides specialization for 2d dilation
@@ -31,60 +32,61 @@ namespace mln::morpho::details
   /****          Implementation          ****/
   /******************************************/
 
-  class SimpleFilter2D
-  {
-  public:
-    SimpleFilter2D() = default;
 
-    virtual ~SimpleFilter2D()                                                                         = default;
-    virtual void                            Execute(mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out) = 0;
-    virtual mln::box2d                      ComputeInputRegion(mln::box2d roi) const noexcept         = 0;
-    virtual mln::box2d                      ComputeOutputRegion(mln::box2d roi) const noexcept        = 0;
-    virtual std::unique_ptr<SimpleFilter2D> Clone() const                                             = 0;
-  };
-
-
+  // Generic implementation
   template <class V, class SE, class ValueSet>
-  class SimpleDilation2D final : public SimpleFilter2D
+  class TileExecutor_Dilation2D final : public TileExecutorBase
   {
   public:
-    SimpleDilation2D(SE se, ValueSet* vs, int /*tile_width*/, int /*tile_height*/)
-      : m_se{std::move(se)}
+    TileExecutor_Dilation2D(SE se, ValueSet* vs)
+      : m_se{se}
       , m_vs{vs}
     {
     }
 
 
-    void Execute(mln::bp::Tile2DView<void> in_, mln::bp::Tile2DView<void> out_, mln::box2d roi) final
+    void Execute(mln::bp::Tile2DView<void> in_, mln::point2d i_anchor, mln::bp::Tile2DView<void> out_, mln::point2d o_anchor) final
     {
       auto in = mln::bp::downcast<V>(in_);
       auto out = mln::bp::downcast<V>(out_);
+      auto in_as_image  = mln::image2d<V>::from_tile(in, i_anchor);
+      auto out_as_image = mln::image2d<V>::from_tile(out, o_anchor);
 
-      mln::box2d input_roi = this->ComputeInputRegion(roi);
+      mln::box2d roi = out_as_image.domain();
 
-      auto in_as_image  = mln::image2d<V>::from_tile(in, input_roi.tl());
-      auto out_as_image = mln::image2d<V>::from_tile(out, roi.tl());
-      in_as_image       = in_as_image.clip(roi);
-
-      mln::morpho::details::impl::localmax(in_as_image, out_as_image, *m_vs, m_se, roi);
+      auto tmp = in_as_image.clip(roi);
+      mln::morpho::details::impl::localmax(tmp, out_as_image, *m_vs, m_se, roi);
     }
-
-    std::unique_ptr<SimpleFilter2D> Clone() const final { return std::make_unique<SimpleDilation2D>(*this); }
 
     mln::box2d ComputeInputRegion(mln::box2d roi) const noexcept final { return m_se.compute_input_region(roi); }
     mln::box2d ComputeOutputRegion(mln::box2d roi) const noexcept final { return m_se.compute_output_region(roi); }
+    int        GetElementSize() const noexcept final { return sizeof(V); }
+    bool       NeedTranspose() const noexcept final { return false; }
 
-  private:
+  public:
     SE                       m_se;
     ValueSet*                m_vs;
   };
 
 
+  // Specialization for periodic lines
   template <class V, class ValueSet>
-  class SimpleDilation2D<V, mln::se::periodic_line2d, ValueSet> final : public SimpleFilter2D
+  class TileExecutor_Dilation2D<V, mln::se::periodic_line2d, ValueSet> final : public TileExecutorBase
   {
+  private:
+    enum orientation_t
+    {
+      VERTICAL,
+      HORIZONTAL,
+      OTHER
+    };
+
+    mln::se::periodic_line2d m_se;
+    ValueSet*                m_vs;
+    orientation_t            m_orient;
+
   public:
-    SimpleDilation2D(mln::se::periodic_line2d se, ValueSet* vs, int input_tile_width, int input_tile_height)
+    TileExecutor_Dilation2D(mln::se::periodic_line2d se, ValueSet* vs)
       : m_se{se}
       , m_vs{vs}
     {
@@ -94,171 +96,38 @@ namespace mln::morpho::details
         m_orient = HORIZONTAL;
       else
         m_orient = OTHER;
-
-
-      if (m_orient == HORIZONTAL)
-      {
-        // Allocate space for the transposition
-        // m_tmp_in = mln::image2d<V>(input_tile_height, input_tile_width);
-        std::ptrdiff_t pitch;
-        m_tmp_in = mln::bp::aligned_alloc_2d<V>(input_tile_height, input_tile_width, pitch);
-        m_tmp_in_width = input_tile_height;
-        m_tmp_in_height = input_tile_width;
-        m_tmp_in_stride = pitch;
-      }
     }
 
-    ~SimpleDilation2D() final
-      {
-        if (m_tmp_in)
-          mln::bp::aligned_free_2d(m_tmp_in, m_tmp_in_width, m_tmp_in_height, m_tmp_in_stride);
-      }
-
-    SimpleDilation2D(const SimpleDilation2D&) = delete;
-    SimpleDilation2D(SimpleDilation2D&&)      = default;
-    SimpleDilation2D& operator=(const SimpleDilation2D&) = delete;
-    SimpleDilation2D& operator=(SimpleDilation2D&&) = default;
+    int  GetElementSize() const noexcept final { return sizeof(V); }
+    bool NeedTranspose() const noexcept final { return m_orient == HORIZONTAL; }
 
 
-    void Execute(mln::ndbuffer_image& in_, mln::ndbuffer_image out_) final
+    void Execute(mln::bp::Tile2DView<void> in_, mln::point2d i_anchor, mln::bp::Tile2DView<void> out_, mln::point2d o_anchor) final
     {
-      auto& in  = in_.__cast<V, 2>();
-      auto& out = out_.__cast<V, 2>();
-      auto roi = out.domain();
+      auto in           = mln::bp::downcast<V>(in_);
+      auto out          = mln::bp::downcast<V>(out_);
 
       if (m_orient == OTHER)
       {
-        mln::trace::warn("[Performance] Running the specialization with perodic lines (1).");
-        dilation_by_periodic_line(in, out, m_se, m_vs->sup, roi);
+        auto in_as_image  = mln::image2d<V>::from_tile(in, i_anchor);
+        auto out_as_image = mln::image2d<V>::from_tile(out, o_anchor);
+        auto roi          = out_as_image.domain();
+
+        auto tmp = in_as_image.clip(roi);
+        dilation_by_periodic_line(tmp, out_as_image, m_se, m_vs->sup, roi);
       }
-      else if (m_orient == VERTICAL)
+      else if (m_orient == VERTICAL || m_orient == HORIZONTAL)
       {
-        mln::trace::warn("[Performance] Running the specialization with vertical lines.");
-        block_running_max(&in.at(roi.tl()), roi.width(), roi.height(), in.byte_stride(), m_se.repetition(), m_vs->sup,
-                          m_vs->zero);
-        mln::paste(in, roi, out);
+        auto diff       = o_anchor - i_anchor;
+        auto in_clipped = in.clip(diff.x(), diff.y(), out.width(), out.height());
 
-      }
-      else if (m_orient == HORIZONTAL)
-      {
-        mln::trace::warn("[Performance] Running the specialization with horizontal lines.");
-        auto input_roi  = this->ComputeInputRegion(roi);
-
-        { // 1. Transpose
-          mln::bp::transpose(&in.at(input_roi.tl()), m_tmp_in, input_roi.height(), input_roi.width(),
-                             in.byte_stride(), m_tmp_in_stride);
-        }
-
-        V* block_ptr = mln::ptr_offset(m_tmp_in, m_se.repetition() * m_tmp_in_stride);
-        { // 2. Run vertically inplace
-          block_running_max(block_ptr, roi.height(), roi.width(), m_tmp_in_stride, m_se.repetition(), m_vs->sup,
-                            m_vs->zero);
-        }
-        { // 3. Transpose and write
-          mln::bp::transpose(block_ptr, out.buffer(), roi.width(), roi.height(), m_tmp_in_stride, out.byte_stride());
-        }
+        block_running_max(in_clipped.data(), in_clipped.width(), in_clipped.height(), in.stride(), m_se.repetition(), m_vs->sup, m_vs->zero);
+        mln::bp::copy(in_clipped, out);
       }
     }
 
     mln::box2d ComputeInputRegion(mln::box2d roi) const noexcept final { return m_se.compute_input_region(roi); }
     mln::box2d ComputeOutputRegion(mln::box2d roi) const noexcept final { return m_se.compute_output_region(roi); }
-
-
-    std::unique_ptr<SimpleFilter2D> Clone() const final
-    {
-      return std::make_unique<SimpleDilation2D>(m_se, m_vs, m_tmp_in_height, m_tmp_in_width);
-    }
-
-
-  private:
-    enum orientation_t
-    {
-      HORIZONTAL,
-      VERTICAL,
-      OTHER
-    };
-
-    mln::se::periodic_line2d  m_se;
-    ValueSet*                 m_vs;
-    orientation_t             m_orient;
-    V*                        m_tmp_in = nullptr; // Temporary image used for transposition
-    int                       m_tmp_in_width;
-    int                       m_tmp_in_height;
-    std::ptrdiff_t            m_tmp_in_stride;
-  };
-
-
-
-  class FilterChain : public ParallelLocalCanvas2DBase
-  {
-    std::vector<std::unique_ptr<SimpleFilter2D>> m_filters; // List of filters to apply
-    mln::ndbuffer_image                  m_tile_in;
-    mln::ndbuffer_image                  m_tile_out;
-
-    std::function<void(mln::ndbuffer_image&&)>             load_tile;
-    std::function<void(mln::ndbuffer_image&&)>             write_tile;
-    std::function<mln::ndbuffer_image(int, int)>           create_tile;
-
-  private:
-    FilterChain() = default;
-
-
-  public:
-    template <class T>
-    static FilterChain MakeChain(int tile_width, int tile_height)
-    {
-      FilterChain c;
-      c.m_tile_in   = mln::image2d<T>(tile_width, tile_height);
-      c.m_tile_out  = mln::image2d<T>(tile_width, tile_height);
-      c.create_tile = [](int width, int height) -> mln::ndbuffer_image { return mln::image2d<T>(width, height); };
-      return c;
-    }
-
-
-    FilterChain(const FilterChain&) = delete;
-    FilterChain(FilterChain&&) = default;
-    FilterChain& operator=(const FilterChain&) = delete;
-
-
-    void SetLoadFunction(std::function<void(mln::ndbuffer_image&&)> fn);
-    void SetWriteFunction(std::function<void(mln::ndbuffer_image&&)> fn);
-    void addFilter(std::unique_ptr<SimpleFilter2D> f);
-
-
-
-    mln::box2d ComputeInputRegion(mln::box2d roi) const;
-
-    void                                             ExecuteTile(mln::box2d roi) const final;
-    std::unique_ptr<ParallelLocalCanvas2DBase>       clone() const final;
-  };
-
-  template <class InputImage, typename V>
-  struct DirectTileLoader2D
-  {
-
-    void operator()(mln::ndbuffer_image&& out_) const
-    {
-      auto& out = out_.__cast<V, 2>();
-      copy_pad(m_in, out, m_padding_mode, m_padding_value);
-    }
-
-
-    InputImage     m_in;
-    e_padding_mode m_padding_mode;
-    V              m_padding_value;
-  };
-
-  template <class OutputImage, typename V>
-  struct DirectTileWriter2D
-  {
-
-    void operator()(mln::ndbuffer_image&& in_) const
-    {
-      auto& in  = in_.__cast<V, 2>();
-      mln::paste(in, in.domain(), m_out);
-    }
-
-    OutputImage m_out;
   };
 
 
@@ -269,10 +138,15 @@ namespace mln::morpho::details
 
     // DilationParallel alg{input, out, se, vs, out.domain(), tile_width, tile_height};
 
+    TileExecutor_Dilation2D<V, SE, ValueSet> exec(se, &vs);
+    LocalFilter2D<V> filter;
+    filter.set_input(input, padding_mode, padding_value);
+    filter.set_output(out);
+    filter.set_executor(&exec);
 
-    DirectTileLoader2D<I, V> loader = {input, padding_mode, padding_value};
-    DirectTileWriter2D<J, V> writer = {out};
+    filter.execute(out.domain(), tile_width, tile_height, parallel);
 
+    /*
     mln::box2d tile_roi(tile_width, tile_height);
     tile_roi = se.compute_input_region(tile_roi);
 
@@ -306,6 +180,7 @@ namespace mln::morpho::details
     }
 
     chain.execute(out.domain(), tile_width, tile_height, parallel);
+    */
   }
 
 

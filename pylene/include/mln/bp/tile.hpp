@@ -43,6 +43,14 @@ namespace mln::bp
     /// e.g., ``is_aligned(16)`` to check that the buffer is 16-bytes aligned
     bool is_aligned(int width = 16) { return ((intptr_t)m_ptr & (intptr_t)(width - 1)) == 0; }
 
+
+    /// \brief Clip a buffer view to the given region
+    /// \paral size The size (in bytes) of the elements
+    Tile2DView<void> clip(int x, int y, int width, int height, int size) const noexcept;
+
+    /// \brief Clip a buffer view to the given size
+    Tile2DView<void> clip(int width, int height) const noexcept;
+
   protected:
     void*          m_ptr = nullptr;
     int            m_width;
@@ -106,8 +114,10 @@ namespace mln::bp
     static Tile2D<T> acquire(T* ptr, int width, int height, std::ptrdiff_t stride, free_fn_t free_fn= nullptr) noexcept;
     T*               release() noexcept;
 
+
   private:
     using base = Tile2DView<T>;
+    template <class> friend class Tile2D;
     free_fn_t m_free = nullptr;
   };
 
@@ -116,17 +126,16 @@ namespace mln::bp
   class Tile2D<void> : public Tile2DView<void>
   {
     using free_fn_t = void (*)(void*);
+    using destroy_fn_t = void(*)(void*, std::size_t);
   public:
     Tile2D() = default;
+    ~Tile2D();
 
     template <class T>
     Tile2D(Tile2D<T>&& other) noexcept;
-
     template <class T>
     Tile2D& operator=(Tile2D<T>&& other) noexcept;
 
-
-    ~Tile2D();
 
     Tile2D(const Tile2D&) = delete;
     Tile2D& operator=(const Tile2D&) = delete;
@@ -135,12 +144,14 @@ namespace mln::bp
     Tile2D& operator=(Tile2D&&) noexcept;
 
 
-    static Tile2D<T> acquire(void* ptr, int width, int height, std::ptrdiff_t stride, free_fn_t free_fn= nullptr) noexcept;
+    static Tile2D<void> acquire(void* ptr, int width, int height, std::ptrdiff_t stride,
+                                free_fn_t free_fn = nullptr) noexcept;
     void*            release() noexcept;
 
   private:
     using base = Tile2DView<void>;
-    free_fn_t m_free = nullptr;
+    destroy_fn_t m_destroy = nullptr; // Type related
+    free_fn_t    m_free    = nullptr; // Allocator related (malloc vs cudaMalloc)
   };
 
 
@@ -148,6 +159,80 @@ namespace mln::bp
   /******************************************/
   /****          Implementation          ****/
   /******************************************/
+
+
+  template <class T>
+  inline Tile2D<void>::Tile2D(Tile2D<T>&& other) noexcept
+    : base(other)
+  {
+    this->m_ptr = std::exchange(other.m_ptr, nullptr);
+    this->m_free = std::exchange(other.m_free, nullptr);
+
+    if constexpr (!std::is_trivially_destructible_v<T>)
+      this->m_destroy = [](void* ptr, std::size_t n) { std::destroy_n((T*)ptr, n); };
+  }
+
+  template <class T>
+  inline Tile2D<void>& Tile2D<void>::operator=(Tile2D<T>&& other) noexcept
+  {
+    std::destroy_at(this);
+
+    (base&)(*this) = (base&)other;
+    this->m_ptr = std::exchange(other.m_ptr, nullptr);
+    this->m_free = std::exchange(other.m_free, nullptr);
+    if constexpr (!std::is_trivially_destructible_v<T>)
+      this->m_destroy = [](void* ptr, std::size_t n) { std::destroy_n((T*)ptr, n); };
+
+    return *this;
+  }
+
+  inline Tile2D<void>::Tile2D(Tile2D<void>&& other) noexcept
+    : base(other)
+  {
+    this->m_ptr     = std::exchange(other.m_ptr, nullptr);
+    this->m_free    = std::exchange(other.m_free, nullptr);
+    this->m_destroy = std::exchange(other.m_destroy, nullptr);
+  }
+
+  inline Tile2D<void>& Tile2D<void>::operator=(Tile2D<void>&& other) noexcept
+  {
+    std::swap(*(base*)this, (base&)other);
+    std::swap(m_free, other.m_free);
+    std::swap(m_destroy, other.m_destroy);
+    return *this;
+  }
+
+  inline Tile2D<void>::~Tile2D()
+  {
+    if (this->m_ptr)
+    {
+      if (m_destroy)
+        for (int y = 0; y < this->m_height; y++)
+          m_destroy(mln::bp::ptr_offset(this->m_ptr, this->m_stride * y), this->m_width);
+      this->m_free(this->m_ptr);
+    }
+  }
+
+
+
+  inline Tile2DView<void> Tile2DView<void>::clip(int x, int y, int width, int height, int size) const noexcept
+  {
+    assert(0 <= x && x < m_width);
+    assert(0 <= y && y < m_height);
+    assert(0 < width && (x + width) <= m_width);
+    assert(0 < height && (y + height) <= m_height);
+
+    return Tile2DView<void>{mln::bp::ptr_offset(this->row(y), x * size), width, height, this->m_stride};
+  }
+
+  inline Tile2DView<void> Tile2DView<void>::clip(int width, int height) const noexcept
+  {
+    assert(0 < width && width <= m_width);
+    assert(0 < height && height <= m_height);
+    return Tile2DView<void>{this->m_ptr, width, height, this->m_stride};
+  }
+
+
 
   template <class T>
   Tile2DView<T> Tile2DView<T>::clip(int x, int y, int width, int height)
@@ -159,6 +244,7 @@ namespace mln::bp
 
     return Tile2DView<T>{this->row(y) + x, width, height, this->m_stride};
   }
+
 
   template <class T>
   Tile2D<T>::Tile2D(int width, int height)
@@ -176,8 +262,8 @@ namespace mln::bp
   {
     if (this->m_ptr)
     {
-      for (int y = 0; y < height; y++)
-        std::destroy_n(mln::bp::ptr_offset(ptr, pitch * y), width);
+      for (int y = 0; y < this->m_height; y++)
+        std::destroy_n(mln::bp::ptr_offset((T*)this->m_ptr, this->m_stride * y), this->m_width);
       this->m_free(this->m_ptr);
     }
   }

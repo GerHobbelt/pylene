@@ -86,6 +86,10 @@ namespace mln
   void copy_pad(const ndimage<T, dim>& input, ndimage<T, dim>& output, e_padding_mode mode,  T value = {});
 
   /// \overload
+  template <class I, class T>
+  void copy_pad(I input, mln::bp::Tile2DView<T> output, mln::point2d anchor, e_padding_mode mode,  T value = {});
+
+  /// \overload
   template <concepts::Image I, concepts::Image J>
   void copy_pad(I in, J out, e_padding_mode mode, image_value_t<J> value = {});
 
@@ -295,11 +299,15 @@ namespace mln
 
     T* vptr = (mode == mln::PAD_ZERO) ? nullptr : &value;
     impl::copy_pad(&_padder, dim, (std::byte*)output.buffer(), (std::byte*)input.buffer(), roi, sizes, ostrides, istrides, mode, vptr);
-
-
   }
 
-
+  template <class I, class T>
+  void copy_pad(I input, mln::bp::Tile2DView<T> output, mln::point2d anchor, e_padding_mode mode, T value)
+  {
+    static_assert(image_point_t<I>::ndim == 2);
+    auto tmp = image2d<T>::from_tile(output, anchor);
+    copy_pad(input, tmp, mode, value);
+  }
 
 
   namespace impl

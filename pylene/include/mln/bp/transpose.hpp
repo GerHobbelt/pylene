@@ -21,9 +21,9 @@ namespace mln::bp
 
 
   /// \brief Transpose the data from \p src into \p dst
+  // \param (width, height) Dimensions of the **output** buffer (input buffer is supposed to heigth x width)
   template <class T>
   void transpose(const T* src, T* dst, int width, int height, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept(std::is_nothrow_swappable_v<T>);
-
 
 
   void transpose_inplace(uint8_t* buffer, int n, std::ptrdiff_t byte_stride, int block_size);

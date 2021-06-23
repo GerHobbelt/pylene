@@ -6,7 +6,7 @@ Hierarchical Watershed
 .. cpp:namespace:: mln::morpho
 
 
-.. cpp:function:: auto watershed_hierarchy(Image f, AttributeFunction attribute_func, Neighborhood nbh, F dist);
+.. cpp:function:: auto watershed_hierarchy(Image input, AttributeFunction attribute_func, Neighborhood nbh, F dist);
 
     Compute the watershed hierarchy and returns a pair `(tree, node_map)`.
     See :doc:`component_tree` for more information about the representation of tree.
@@ -31,33 +31,7 @@ process can be imagined as the filling of branches of the Binary Partition Tree 
 drives the speed of the filling.
 
 The tree that represent a watershed hierarchy is an Alpha tree, also known as quasi-flat zone hierarchy.
-
-The Alpha tree is the tree of :math:`\alpha`-connected components. An :math:`\alpha`-connected component in an image :math:`f`, for a pixel :math:`p`, is defined as
-
-.. math::
-    \alpha-CC(p) = \{p\}\ \cup\ \{q\ |\ \text{there exists a path}\ \Pi = \{\pi_0, ..., \pi_n\}\ \text{between}\ p\ \text{and}\ q\ \text{such that}\ d(f(\pi_i), f(\pi_{i+1})) \leq \alpha\}
-where :math:`d` is a dissimilarity function between two pixels of the image :math:`f`.
-
-The :math:`\alpha`-connected components form an ordered sequence when :math:`\alpha` is growing, such that for :math:`\alpha_i < \alpha_j`,
-:math:`\alpha_i-CC(p) \subseteq \alpha_j-CC(p)`. Thus, the alphatree is the hierarchy where the parenthood relationship represents the inclusion of the
-:math:`\alpha`-connected components.
-
-Representation
---------------
-
-.. image:: /figures/morpho/alphatree_repr.svg
-    :align: center
-    :width: 30%
-
-The ``watershed_hierarchy`` function returns a tree and a node map. The tree has two attributes:
-
-* ``parent``: The parenthood relationship of the node :math:`i`, representing the inclusion relationship of the :math:`\alpha`-connected components.
-* ``values``: The value of :math:`\alpha` assigned to a node :math:`i`.
-
-Then, the node map is the relation between a pixel of the image and its related node in the tree, a leaf for the case of the watershed hierarchy.
-
-The image above illustrates the representation of the watershed hierarchy in Pylene, the parenthood relationship being illustrated in arrows, the values of alpha, assigned to each node, being in red, and the relation
-between a node of the tree and a pixel of the image being represented by blue dashed lines.
+See :doc:`alphatree` for more information.
 
 Example
 -------

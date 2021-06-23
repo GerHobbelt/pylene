@@ -36,7 +36,6 @@ Segmentation
    :maxdepth: 1
 
    morpho/watershed
-   morpho/watershed_hierarchy
 
 
 Component Trees & Hierarchical Representations
@@ -49,7 +48,7 @@ Component Trees & Hierarchical Representations
     morpho/maxtree
     morpho/tos
     morpho/alphatree
-
+    morpho/watershed_hierarchy
 
 
 

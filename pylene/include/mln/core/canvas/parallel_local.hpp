@@ -31,8 +31,8 @@ namespace mln
   public:
     using tile_loader_fn    = std::function<void(mln::point2d anchor, mln::bp::Tile2DView<void> out)>;
     using tile_writer_fn    = std::function<void(mln::point2d anchor, mln::bp::Tile2DView<void> out)>;
-    using tile_generator_fn = std::function<mln::bp::Tile2D<void>(int width, int height)>;
-    using tile_transpose_fn = std::function<void(mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out)>;
+    using tile_generator_fn = mln::bp::Tile2D<void> (*)(int width, int height);
+    using tile_transpose_fn = void (*)(mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out);
 
     SimpleFilter2D() = default;
 
@@ -44,7 +44,7 @@ namespace mln
 
     void SetLoader(tile_loader_fn load_fn) noexcept { m_load = std::move(load_fn); }
     void SetWriter(tile_writer_fn write_fn) noexcept { m_store = std::move(write_fn); }
-    void SetTileGenerator(tile_generator_fn fn) noexcept { m_tile_create = std::move(fn); }
+    void SetTileGenerator(tile_generator_fn fn) noexcept { m_tile_create = fn; }
     void SetTranposeFunction(tile_transpose_fn fn) noexcept { m_transpose = fn; }
     void SetExecutor(TileExecutorBase* exec) noexcept { m_executor = exec; }
 
@@ -85,6 +85,8 @@ namespace mln
     void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
     void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
 
+    virtual void set_output(mln::ndbuffer_image* out) = 0;
+    virtual void set_input(mln::ndbuffer_image* out)  = 0;
 
   protected:
     SimpleFilter2D m_filter;
@@ -99,27 +101,72 @@ namespace mln
     template <class I>
     void set_input(I& input, e_padding_mode padding_mode, V padding_value);
 
+    template <class I>
+    void set_input(I& input);
+
+    void set_input(mln::ndbuffer_image* in) final;
+
+
     template <class J>
     void set_output(J& output);
+
+    void set_output(mln::ndbuffer_image* out) final;
   };
 
-  class LocalChainFilter2D
+  template <class V>
+  class LocalChainFilter2D;
+
+
+  template <>
+  class LocalChainFilter2D<void>
+  {
+  public:
+    LocalChainFilter2D() = default;
+    virtual ~LocalChainFilter2D() = default;
+
+    void add_executor(std::unique_ptr<TileExecutorBase> f) { m_filters.push_back(std::move(f)); }
+    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
+
+  protected:
+    virtual LocalFilter2D<void>* get_first_filter() noexcept = 0;
+    virtual LocalFilter2D<void>* get_middle_filter() noexcept = 0;
+    virtual LocalFilter2D<void>* get_last_filter() noexcept = 0;
+    virtual mln::ndbuffer_image  create_tmp_image(mln::box2d domain) = 0;
+
+
+    std::vector<std::unique_ptr<TileExecutorBase>>    m_filters;
+  };
+
+
+  template <class V>
+  class LocalChainFilter2D : public LocalChainFilter2D<void>
   {
   public:
     LocalChainFilter2D() = default;
 
-    // Execute
-    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
+    template <class I>
+    void set_input(I& input, e_padding_mode padding_mode, V padding_value)
+    {
+      m_first_filter.set_input(input, padding_mode, padding_value);
+    }
 
-    void set_writer(SimpleFilter2D::tile_writer_fn fn);
-    void set_tile_generator(SimpleFilter2D::tile_generator_fn fn);
-    void add_filter(TileExecutorBase* f);
+    template <class J>
+    void set_output(J& output)
+    {
+      m_last_filter.set_output(output);
+    }
+
+  protected:
+    LocalFilter2D<void>* get_first_filter() noexcept final { return &m_first_filter; }
+    LocalFilter2D<void>* get_middle_filter() noexcept final { return &m_middle_filter; }
+    LocalFilter2D<void>* get_last_filter() noexcept final { return &m_last_filter; }
+    mln::ndbuffer_image  create_tmp_image(mln::box2d domain) final { return mln::image2d<V>(domain); }
+
 
   private:
-    std::vector<TileExecutorBase*>    m_filters;
-    SimpleFilter2D::tile_loader_fn    m_load;
-    SimpleFilter2D::tile_writer_fn    m_store;
-    SimpleFilter2D::tile_generator_fn m_tile_generator;
+    LocalFilter2D<V> m_first_filter;
+    LocalFilter2D<V> m_middle_filter;
+    LocalFilter2D<V> m_last_filter;
   };
 
   /******************************************/
@@ -129,12 +176,11 @@ namespace mln
   template <class V>
   LocalFilter2D<V>::LocalFilter2D()
   {
-    auto fn_1 = [](int width, int height) { return mln::bp::Tile2D<V>(width, height); };
+    static auto fn_1 = [](int width, int height) -> mln::bp::Tile2D<void> { return mln::bp::Tile2D<V>(width, height); };
     m_filter.SetTileGenerator(fn_1);
 
-    auto fn_2 = [](mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out) {
+    static auto fn_2 = [](mln::bp::Tile2DView<void> in, mln::bp::Tile2DView<void> out) {
       mln::bp::transpose((V*)in.data(), (V*)out.data(), out.width(), out.height(), in.stride(), out.stride());
-      return out;
     };
     m_filter.SetTranposeFunction(fn_2);
   }
@@ -151,6 +197,32 @@ namespace mln
   }
 
   template <class V>
+  template <class I>
+  void LocalFilter2D<V>::set_input(I& input)
+  {
+    auto fn = [&input](mln::point2d anchor, mln::bp::Tile2DView<void> out_) {
+      auto out = mln::bp::downcast<V>(out_);
+      auto roi = mln::box2d{anchor.x(), anchor.y(), out.width(), out.height()};
+      mln::paste(input, roi, mln::image2d<V>::from_tile(out, anchor));
+    };
+    m_filter.SetLoader(fn);
+  }
+
+  template <class V>
+  void LocalFilter2D<V>::set_input(mln::ndbuffer_image* in)
+  {
+    auto* input = static_cast<mln::image2d<V>*>(in);
+    auto fn = [input](mln::point2d anchor, mln::bp::Tile2DView<void> out_) {
+      auto out = mln::bp::downcast<V>(out_);
+      auto roi = mln::box2d{anchor.x(), anchor.y(), out.width(), out.height()};
+      mln::paste(*input, roi, mln::image2d<V>::from_tile(out, anchor));
+    };
+    m_filter.SetLoader(fn);
+  }
+
+
+
+  template <class V>
   template <class J>
   void LocalFilter2D<V>::set_output(J& output)
   {
@@ -162,66 +234,17 @@ namespace mln
     m_filter.SetWriter(fn);
   }
 
-
-  /*
-  class LocalChainFilter2D
+  template <class V>
+  void LocalFilter2D<V>::set_output(mln::ndbuffer_image* out)
   {
-  public:
-    // Execute
-    void execute_parallel(mln::box2d roi, int tile_width, int tile_height);
-    void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
-    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
-
-    void add_filter(SimpleFilter2D f);
-
-
-  private:
-    std::vector<SimpleFilter2D> m_filter;
-  };
+    auto* output = static_cast<mln::image2d<V>*>(out);
+    auto  fn     = [output](mln::point2d anchor, mln::bp::Tile2DView<void> in_) {
+      auto in  = mln::bp::downcast<V>(in_);
+      auto img = mln::image2d<V>::from_tile(in, anchor);
+      paste(img, img.domain(), *output);
+    };
+    m_filter.SetWriter(fn);
+  }
 
 
-
-  
-  class ParallelLocalCanvas2DBase
-  {
-  public:
-    virtual ~ParallelLocalCanvas2DBase() = default;
-
-    // Dynamic copy
-    virtual std::unique_ptr<ParallelLocalCanvas2DBase> clone() const = 0;
-
-  public:
-    // Execute the tile
-    virtual void ExecuteTile(mln::box2d out_roi) const = 0;
-
-
-  public:
-    // Execute
-    void execute_parallel(mln::box2d roi, int tile_width, int tile_height);
-    void execute_sequential(mln::box2d roi, int tile_width, int tile_height);
-    void execute(mln::box2d roi, int tile_width, int tile_height, bool parallel);
-  };
-
-
-  class ParallelLocalCanvas2D : public ParallelLocalCanvas2DBase
-  {
-  public:
-    int TILE_WIDTH  = 128;
-    int TILE_HEIGHT = 128;
-
-    virtual ~ParallelLocalCanvas2D() = default;
-
-
-    virtual const TileLoaderBase*   GetTileLoader() const noexcept                = 0;
-    virtual const TileWriterBase*   GetTileWriter() const noexcept                = 0;
-    virtual const TileExecutorBase* GetTileExecutor() const noexcept              = 0;
-
-    // Compute the input region required to compute the given output region
-    virtual mln::box2d ComputeInputRegion(mln::box2d out_roi) const noexcept = 0;
-
-
-    // Execute to compute this output roi
-    virtual void ExecuteTile(mln::box2d out_roi) const final;
-  };
-  */
 } // namespace mln

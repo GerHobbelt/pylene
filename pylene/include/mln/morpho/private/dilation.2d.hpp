@@ -64,8 +64,8 @@ namespace mln::morpho::details
     bool       NeedTranspose() const noexcept final { return false; }
 
   public:
-    SE                       m_se;
-    ValueSet*                m_vs;
+    SE        m_se;
+    ValueSet* m_vs;
   };
 
 
@@ -136,51 +136,37 @@ namespace mln::morpho::details
   {
     using V = image_value_t<I>;
 
-    // DilationParallel alg{input, out, se, vs, out.domain(), tile_width, tile_height};
-
-    TileExecutor_Dilation2D<V, SE, ValueSet> exec(se, &vs);
-    LocalFilter2D<V> filter;
-    filter.set_input(input, padding_mode, padding_value);
-    filter.set_output(out);
-    filter.set_executor(&exec);
-
-    filter.execute(out.domain(), tile_width, tile_height, parallel);
-
-    /*
-    mln::box2d tile_roi(tile_width, tile_height);
-    tile_roi = se.compute_input_region(tile_roi);
-
-    FilterChain chain = FilterChain::MakeChain<V>(tile_roi.width(), tile_roi.height());
-
-
-    chain.SetLoadFunction(std::cref(loader));
-    chain.SetWriteFunction(std::cref(writer));
-
+    // Check for decomposability and decompose into a list of filters
     bool decompose = false;
     if constexpr (SE::decomposable::value)
-    {
       decompose = se.is_decomposable();
-      if (decompose)
-      {
-        auto roi = se.compute_input_region(tile_roi);
-        auto ses = se.decompose();
 
-        for (auto se : ses)
-        {
-          chain.addFilter(
-              std::make_unique<SimpleDilation2D<V, decltype(se), ValueSet>>(se, &vs, roi.width(), roi.height()));
-          roi = se.compute_output_region(roi);
-        }
-      }
-    }
+    // Case where the filter is not decompasble
     if (!decompose)
     {
-      chain.addFilter(
-          std::make_unique<SimpleDilation2D<V, SE, ValueSet>>(se, &vs, tile_roi.width(), tile_roi.height()));
-    }
+      LocalFilter2D<V>                         filter;
+      TileExecutor_Dilation2D<V, SE, ValueSet> exec(se, &vs);
 
-    chain.execute(out.domain(), tile_width, tile_height, parallel);
-    */
+      filter.set_input(input, padding_mode, padding_value);
+      filter.set_output(out);
+      filter.set_executor(&exec);
+      filter.execute(out.domain(), tile_width, tile_height, parallel);
+    }
+    else
+    {
+      if constexpr (SE::decomposable::value) // Dbl-check for compilation
+      {
+        LocalChainFilter2D<V> filter;
+        filter.set_input(input, padding_mode, padding_value);
+        filter.set_output(out);
+
+
+        for (auto se : se.decompose())
+          filter.add_executor(std::make_unique<TileExecutor_Dilation2D<V, decltype(se), ValueSet>>(se, &vs));
+
+        filter.execute(out.domain(), tile_width, tile_height, parallel);
+      }
+    }
   }
 
 

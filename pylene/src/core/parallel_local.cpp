@@ -9,10 +9,9 @@ namespace mln
   class ParallelLocalCanvas2DImpl
   {
   public:
-    ParallelLocalCanvas2DImpl(const SimpleFilter2D& delegate, int tile_width, int tile_height)
+    ParallelLocalCanvas2DImpl(const SimpleFilter2D& delegate)
       : m_delegate{delegate}
     {
-      m_delegate.SetTileSize(tile_width, tile_height);
     }
 
     void operator()(const tbb::blocked_range2d<int>&) const;
@@ -53,6 +52,7 @@ namespace mln
     : m_load{other.m_load}
     , m_store{other.m_store}
     , m_tile_create{other.m_tile_create}
+    , m_transpose{other.m_transpose}
     , m_executor{other.m_executor}
   {
     m_tile_out = m_tile_create(other.m_tile_out.width(), other.m_tile_out.height());
@@ -70,6 +70,7 @@ namespace mln
     m_load        = other.m_load;
     m_store       = other.m_store;
     m_tile_create = other.m_tile_create;
+    m_transpose   = other.m_transpose;
     m_executor    = other.m_executor;
     if (m_executor->NeedTranspose())
     {
@@ -92,8 +93,8 @@ namespace mln
 
     bool need_transpose = m_executor->NeedTranspose();
 
-    mln::bp::Tile2DView<void> in_1      = (!need_transpose) ? in : m_aux_in.clip(in.height(), in.width());
-    mln::bp::Tile2DView<void> out_1     = (!need_transpose) ? out : m_aux_out.clip(out.height(), out.width());
+    mln::bp::Tile2DView<void> in_1  = (!need_transpose) ? in : m_aux_in.clip(in.height(), in.width());
+    mln::bp::Tile2DView<void> out_1 = (!need_transpose) ? out : m_aux_out.clip(out.height(), out.width());
 
     mln::point2d anchor_in  = (!need_transpose) ? iroi.tl() : mln::point2d{iroi.y(), iroi.x()};
     mln::point2d anchor_out = (!need_transpose) ? roi.tl() : mln::point2d{roi.y(), roi.x()};
@@ -121,7 +122,7 @@ namespace mln
   {
     this->m_filter.SetTileSize(tile_width, tile_height);
 
-    ParallelLocalCanvas2DImpl wrapper(m_filter, tile_width, tile_height);
+    ParallelLocalCanvas2DImpl wrapper(m_filter);
     tbb::blocked_range2d<int> rng(roi.y(), roi.y() + roi.height(), tile_height, //
                                   roi.x(), roi.x() + roi.width(), tile_width);
     tbb::parallel_for(rng, wrapper, tbb::simple_partitioner());
@@ -152,40 +153,57 @@ namespace mln
       this->execute_sequential(roi, tile_width, tile_height);
   }
 
-
-  /*
-  void LocalChainFilter2D::execute(mln::box2d roi, int tile_width, int tile_height, bool parallel,
-                                   mln::ndbuffer_image aux_1, mln::ndbuffer_image aux_2)
+  void LocalChainFilter2D<void>::execute(mln::box2d roi, int tile_width, int tile_height, bool parallel)
   {
-    int n = m_filers.size();
+    int n = m_filters.size();
+    if (n < 2)
+      throw std::runtime_error("The number of filters in the chain must be >= 2.");
 
-    std::vector<mln::box2d> output_roi(n);
-    output_roi[n-1] = roi;
+    std::vector<mln::box2d> regions(n);
+    for (int i = n - 1; i >= 0; i--)
+      regions[i] = std::exchange(roi, m_filters[i]->ComputeInputRegion(roi));
 
-    for (int i = n - 2; i >= 0; i--)
-      output_roi[i] = m_filter[i]->ComputeInputRegion(output_roi[i+1]);
 
-    auto m_aux1_writer = 
+    // Allocate temporary images
+    mln::ndbuffer_image tmp_1, tmp_2;
+    if (n >= 2)
+      tmp_1 = this->create_tmp_image(regions[0]);
 
+    if (n > 2)
+      tmp_2 = this->create_tmp_image(regions[1]);
+
+    // Declare swap buffers
+    mln::ndbuffer_image* tmp_in  = &tmp_2;
+    mln::ndbuffer_image* tmp_out = &tmp_1;
 
     // First filter
     {
-      SimpleFilter2D f(m_load, m_tmp_store, m_tile_generator, m_filters.front());
-      f.execute(output_roi.front(), tile_width, tile_height, parallel);
+      auto* f = this->get_first_filter();
+      f->set_output(tmp_out);
+      f->set_executor(m_filters[0].get());
+      f->execute(regions[0], tile_width, tile_height, parallel);
     }
 
-    for (int i = 1; i < n - 1; ++i)
+    // Intermediate filters
     {
-      SimpleFilter2D f(m_tmp_load, m_tmp_store, m_tile_generator, m_filters[i]());
-      f.execute(output_roi[i], tile_width, tile_height, parallel);
+      for (int i = 1; i < n - 1; ++i)
+      {
+        auto* f =  this->get_middle_filter();
+        std::swap(tmp_in, tmp_out);
+        tmp_out->clip(regions[i]);
+        f->set_input(tmp_in);
+        f->set_output(tmp_out);
+        f->set_executor(m_filters[i].get());
+        f->execute(regions[i], tile_width, tile_height, parallel);
+      }
     }
-
     // Last filter
     {
-      SimpleFilter2D f(m_tmp_load, m_store, m_tile_generator, m_filters.back());
-      f.execute(output_roi.back(), tile_width, tile_height, parallel);
+      auto* f = this->get_last_filter();
+      f->set_input(tmp_out);
+      f->set_executor(m_filters[n-1].get());
+      f->execute(regions[n-1], tile_width, tile_height, parallel);
     }
   }
 
-  */
 } // namespace mln

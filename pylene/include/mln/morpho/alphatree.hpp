@@ -28,7 +28,7 @@ namespace mln::morpho
   template <class I, class N, class F = mln::functional::l2dist_t<>>
   std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
   alphatree(I input, N nbh, F distance = F{});
-
+  
 
   /******************************************/
   /****          Implementation          ****/
@@ -54,14 +54,6 @@ namespace mln::morpho
 
     private:
       details::directional_hqueue<P, N, W> m_cont;
-    };
-
-    template <typename P, typename W>
-    struct edge_t
-    {
-      P p;
-      P q;
-      W w;
     };
 
     template <typename P, typename N, typename W, bool HQ>

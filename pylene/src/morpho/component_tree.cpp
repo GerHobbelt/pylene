@@ -64,12 +64,8 @@ namespace mln::morpho
 
     const std::vector<mln::morpho::edge_t<int, double>>& s_map = saliency_map(node_map);
 
-    for (const auto& edge : s_map)
+    for (const auto [u, v, w] : s_map)
     {
-      int    u = edge.p;
-      int    v = edge.q;
-      double w = edge.w;
-
       int u_pos[2] = {u % width, u / width};
       int v_pos[2] = {v % width, v / width};
 

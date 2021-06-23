@@ -64,5 +64,7 @@ add_benchmark(BMMorphers                BMMorphers.cpp BMMorphers_main.cpp)
 add_benchmark(BMReference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)
 add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 add_benchmark(BMBufferPrimitives        BMBufferPrimitives.cpp)
+add_benchmark(BMAlphaTree               BMAlphaTree.cpp)
+add_benchmark(BMWatershedHierarchy      BMWatershedHierarchy.cpp)
 
 ExternalData_Add_Target(fetch-external-data)

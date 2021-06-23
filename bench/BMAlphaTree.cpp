@@ -8,11 +8,10 @@
 
 using image_t = mln::image2d<mln::rgb8>;
 
-static const std::vector<std::string> bench_images = {"plane.png", "nature.png", "mountains.png", "hong_kong.png"};
+static const std::vector<std::string> bench_images = {"Aerial_view_of_Olbia.jpg", "Space1_20MB.jpg"};
 
 static const auto alphatree_vect_function = [](const image_t& input) {
-  mln::morpho::alphatree(input, mln::c4,
-                         [](const auto& a, const auto& b) -> std::double_t { return mln::l2dist(a, b); });
+  mln::morpho::alphatree(input, mln::c4, [](const auto& a, const auto& b) -> double { return mln::l2dist(a, b); });
 };
 
 static const auto alphatree_hq_function = [](const image_t& input) {
@@ -43,44 +42,24 @@ public:
 };
 
 
-BENCHMARK_F(BMAlphaTree, AlphatreePlaneVect)(benchmark::State& st)
+BENCHMARK_F(BMAlphaTree, AlphatreeOlbiaVect)(benchmark::State& st)
 {
   this->run(st, alphatree_vect_function, 0);
 }
 
-BENCHMARK_F(BMAlphaTree, AlphatreePlaneHQ)(benchmark::State& st)
+BENCHMARK_F(BMAlphaTree, AlphatreeOlbiaHQ)(benchmark::State& st)
 {
   this->run(st, alphatree_hq_function, 0);
 }
 
-BENCHMARK_F(BMAlphaTree, AlphatreeNatureVect)(benchmark::State& st)
+BENCHMARK_F(BMAlphaTree, AlphatreeSpaceVect)(benchmark::State& st)
 {
   this->run(st, alphatree_vect_function, 1);
 }
 
-BENCHMARK_F(BMAlphaTree, AlphatreeNatureHQ)(benchmark::State& st)
+BENCHMARK_F(BMAlphaTree, AlphatreeSpaceHQ)(benchmark::State& st)
 {
   this->run(st, alphatree_hq_function, 1);
-}
-
-BENCHMARK_F(BMAlphaTree, AlphatreeMountainsVect)(benchmark::State& st)
-{
-  this->run(st, alphatree_vect_function, 2);
-}
-
-BENCHMARK_F(BMAlphaTree, AlphatreeMountainsHQ)(benchmark::State& st)
-{
-  this->run(st, alphatree_hq_function, 2);
-}
-
-BENCHMARK_F(BMAlphaTree, AlphatreeHongKongVect)(benchmark::State& st)
-{
-  this->run(st, alphatree_vect_function, 3);
-}
-
-BENCHMARK_F(BMAlphaTree, AlphatreeHongKongHQ)(benchmark::State& st)
-{
-  this->run(st, alphatree_hq_function, 3);
 }
 
 BENCHMARK_MAIN();

@@ -6,14 +6,14 @@ Hierarchical Watershed
 .. cpp:namespace:: mln::morpho
 
 
-.. cpp:function:: auto watershed_hierarchy(Image f, Accumulator acc, Neighborhood nbh, F dist);
+.. cpp:function:: auto watershed_hierarchy(Image f, AttributeFunction attribute_func, Neighborhood nbh, F dist);
 
     Compute the watershed hierarchy and returns a pair `(tree, node_map)`.
     See :doc:`component_tree` for more information about the representation of tree.
     The implementation is based on [Naj13]_.
 
     :param input: The input image
-    :param acc: The accumulator that define the attribute computation
+    :param attribute_func: The function that define the attribute computation
     :param nbh: The neighborhood relation
     :param dist: The function weighting the edges between two pixels.
     :return: A pair `(tree, node_map)` where *tree* is of type ``component_tree<std::invoke_result_t<F, image_value_t<Image>, image_value_t<Image>>>`` and *node_map* is a mapping between the image pixels and the node of the tree.
@@ -75,8 +75,10 @@ This example is used to generate the grayscale lena watershed hierarchy by area 
         mln::image2d<uint8_t> input = ...;
 
         // Compute the watershed hierarchy by area
-        auto area_acc = mln::accu::features::count<>();
-        auto [tree, node_map] = mln::morpho::watershed_hierarchy(input, area_acc, mln::c4);
+        auto area_attribute_func = [](auto tree, auto node_map) -> std::vector<size_t> {
+            return tree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
+        };
+        auto [tree, node_map] = mln::morpho::watershed_hierarchy(input, area_attribute_func, mln::c4);
 
         // Compute an attribute (for example the average pixels value at each node, as below)
         auto mean = tree.compute_attribute_on_values(node_map, input, mln::accu::accumulators::mean<uint8_t>());

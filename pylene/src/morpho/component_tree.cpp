@@ -3,6 +3,17 @@
 
 namespace mln::morpho
 {
+  namespace internal
+  {
+    template <typename P, typename W>
+    struct edge_t
+    {
+      P p;
+      P q;
+      W w;
+    };
+  } // namespace internal
+
   void component_tree<void>::filter_direct(const std::vector<bool>& pred)
   {
     this->filter_direct_T([&pred](int x) { return pred[x]; });
@@ -22,9 +33,9 @@ namespace mln::morpho
     return depth;
   }
 
-  static std::vector<mln::morpho::edge_t<int, double>> saliency_map(mln::image2d<uint8_t> node_map)
+  static std::vector<internal::edge_t<int, double>> saliency_map(mln::image2d<uint8_t> node_map)
   {
-    std::vector<mln::morpho::edge_t<int, double>> res;
+    std::vector<internal::edge_t<int, double>> res;
 
     auto width = node_map.width();
 
@@ -35,11 +46,10 @@ namespace mln::morpho
       {
         if (dom.has(q))
         {
-          mln::morpho::edge_t<int, double> edge = {p[0] + width * p[1], q[0] + width * q[1], 0};
+          auto offset_p = p[0] + width * p[1];
+          auto offset_q = q[0] + width * q[1];
 
-          // std::cout << p[0] + width * p[1] << ' ' << node_map.index_of_point(p) << '\n';
-          // std::cout << q[0] + width * q[1] << ' ' << node_map.index_of_point(q) << '\n';
-          // std::cout << "\n\n";
+          internal::edge_t<int, double> edge = {offset_p, offset_q, 0};
 
           edge.w = std::abs(node_map(p) - node_map(q));
 
@@ -62,7 +72,7 @@ namespace mln::morpho
     image2d<double> res(res_width, res_height);
     fill(res, 0);
 
-    const std::vector<mln::morpho::edge_t<int, double>>& s_map = saliency_map(node_map);
+    const std::vector<internal::edge_t<int, double>>& s_map = saliency_map(node_map);
 
     for (const auto [u, v, w] : s_map)
     {
@@ -104,4 +114,4 @@ namespace mln::morpho
 
     return res;
   }
-}
+} // namespace mln::morpho

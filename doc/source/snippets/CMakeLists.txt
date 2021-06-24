@@ -62,6 +62,8 @@ add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.pgm" alphatree_cut_gray.
 add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.ppm" watershed_hierarchy_area_color.png)
 add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.pgm" watershed_hierarchy_area_gray.png)
 
+add_image("saliency_example" "${PYLENE_IMAGE_DIR}/lena.pgm" saliency_watershed.png)
+
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")
 
@@ -74,6 +76,7 @@ link_libraries(doc-lib)
 
 add_executable(alphatree_example alphatree_example.cpp)
 add_executable(watershed_hierarchy_example watershed_hierarchy_example.cpp)
+add_executable(saliency_example saliency_example.cpp)
 add_executable(erosion-cli erosion-cli.cpp)
 add_executable(staff_lines staff_lines.cpp)
 add_executable(component_tree_1 component_tree_1.cpp)

@@ -133,7 +133,7 @@ TEST(Morpho, AlphaTreeMST)
   using I = mln::image2d<std::uint8_t>;
   using P = mln::image_point_t<I>;
   using W = std::uint8_t;
-  using E = mln::morpho::edge_t<P, W>;
+  using E = mln::morpho::internal::edge_t<P, W>;
 
   I ima = {
       {4, 0, 0, 1},  //

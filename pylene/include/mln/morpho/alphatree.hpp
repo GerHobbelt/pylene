@@ -56,6 +56,14 @@ namespace mln::morpho
       details::directional_hqueue<P, N, W> m_cont;
     };
 
+    template <typename P, typename W>
+    struct edge_t
+    {
+      P p;
+      P q;
+      W w;
+    };
+
     template <typename P, typename N, typename W, bool HQ>
     class alphatree_edges
     {

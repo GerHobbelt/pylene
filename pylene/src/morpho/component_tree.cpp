@@ -35,11 +35,10 @@ namespace mln::morpho
       {
         if (dom.has(q))
         {
-          mln::morpho::edge_t<int, double> edge = {p[0] + width * p[1], q[0] + width * q[1], 0};
+          auto offset_p = p[0] + width * p[1];
+          auto offset_q = q[0] + width * q[1];
 
-          // std::cout << p[0] + width * p[1] << ' ' << node_map.index_of_point(p) << '\n';
-          // std::cout << q[0] + width * q[1] << ' ' << node_map.index_of_point(q) << '\n';
-          // std::cout << "\n\n";
+          mln::morpho::edge_t<int, double> edge = {offset_p, offset_q, 0};
 
           edge.w = std::abs(node_map(p) - node_map(q));
 
@@ -104,4 +103,4 @@ namespace mln::morpho
 
     return res;
   }
-}
+} // namespace mln::morpho

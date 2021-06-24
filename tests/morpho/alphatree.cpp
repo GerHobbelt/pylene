@@ -54,7 +54,7 @@ TEST(Morpho, AlphaTree)
       {107, 73, 125, 157, 117},  //
   };
   auto [t, node_map] = mln::morpho::alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
 
   mln::image2d<int> ref_0 = {
       {0, 1, 2, 3, 4},      //
@@ -161,7 +161,7 @@ TEST(Morpho, AlphaTreeMST)
   std::vector<E> mst;
 
   auto [t, _] = mln::morpho::internal::__alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist_t<>()(a, b); }, true, true,
+      ima, mln::c4, [](const auto& a, const auto& b) -> W { return mln::functional::l2dist(a, b); }, true, true,
       &mst);
 
   for (std::size_t i = 0; i < expected_mst.size(); ++i)
@@ -182,7 +182,7 @@ TEST(Morpho, AlphaTreeRGB8Uint16Distance)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint16_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint16_t { return mln::functional::l2dist(a, b); });
 
   const mln::image2d<int> ref_0 = {
       {0, 0, 1}, //
@@ -216,7 +216,7 @@ TEST(Morpho, AlphaTreeRGB8FloatDistance)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c4, [](const auto& a, const auto& b) -> std::float_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::float_t { return mln::functional::l2dist(a, b); });
 
   const mln::image2d<int> ref_0 = {
       {0, 0, 1}, //
@@ -252,7 +252,7 @@ TEST(Morpho, AlphaTree8C)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c8, [](const auto& a, const auto& b) -> std::uint32_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c8, [](const auto& a, const auto& b) -> std::uint32_t { return mln::functional::l2dist(a, b); });
 
   mln::image2d<int> ref_0 = {
       {0, 1, 2, 3, 4},      //
@@ -285,7 +285,7 @@ TEST(Morpho, AlphaTree8CHQUEUE)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c8, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c8, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
 
   mln::image2d<int> ref_0 = {
       {0, 1, 2, 3, 4},      //
@@ -316,7 +316,7 @@ TEST(Morpho, AlphaTree3DImage)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint32_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint32_t { return mln::functional::l2dist(a, b); });
 
   const mln::image3d<int> ref_0 = {
       {{0, 1, 1}, {0, 1, 1}, {2, 3, 4}},         //
@@ -343,7 +343,7 @@ TEST(Morpho, AlphaTree3DImageHQUEUE)
   };
 
   auto [t, nm] = mln::morpho::alphatree(
-      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
+      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
 
   const mln::image3d<int> ref_0 = {
       {{0, 1, 1}, {0, 1, 1}, {2, 3, 4}},         //
@@ -388,7 +388,7 @@ TEST(Morpho, AlphaTreeCutMeanLabelization)
   auto val     = t.compute_attribute_on_values(nm, ima, mln::accu::accumulators::mean<std::uint8_t, std::uint8_t>());
 
   // Renaming t and nm because clang does not allow to capture structured bindings
-  auto make_cut = [&lt = t, &lnm = nm, &val](const typename decltype(t.values)::value_type threshold) {
+  auto make_cut = [&lt = t, &lnm = nm, &val](auto threshold) {
     auto lbl = lt.horizontal_cut(threshold, lnm);
     return lt.reconstruct_from(lbl, ::ranges::make_span(val));
   };

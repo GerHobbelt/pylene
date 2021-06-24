@@ -25,10 +25,10 @@ TEST(Morpho, HeightAttribute)
 
   // Build BPT
   auto [tree, nm] = mln::morpho::internal::__alphatree<false>(
-      input, mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); }, false,
+      input, mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); }, false,
       false);
 
-  auto attribute = mln::morpho::height_attribute(tree, nm);
+  auto attribute = mln::morpho::internal::height_attribute(tree, nm);
 
   ASSERT_EQ(expected_attribute.size(), attribute.size());
 
@@ -48,7 +48,7 @@ TEST(Morpho, DynamicAttribute)
 
   // Build BPT
   auto [tree, nm] = mln::morpho::internal::__alphatree<false>(
-      input, mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); }, false,
+      input, mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); }, false,
       false);
 
   std::vector<bool> expected_extrema_attribute = {false, false, false, false, false, false, false, false, false, true,
@@ -57,7 +57,7 @@ TEST(Morpho, DynamicAttribute)
                                                   false, false, false, false, false, false, false, false, false, false,
                                                   false, false, false, false, false, false, false, false, false};
 
-  auto extrema_attribute = mln::morpho::extrema_attribute(tree, nm);
+  auto extrema_attribute = mln::morpho::internal::extrema_attribute(tree, nm);
 
   ASSERT_EQ(expected_extrema_attribute.size(), extrema_attribute.size());
 
@@ -69,7 +69,7 @@ TEST(Morpho, DynamicAttribute)
       134.f, 70.f,  70.f,  70.f, 70.f, 70.f, 70.f, 0,     134.f, 134.f, 134.f, 134.f, 38.f, 38.f, 38.f,  0,     134.f,
       70.f,  70.f,  70.f,  70.f, 38.f, 0,    29.f, 29.f,  70.f,  38.f,  70.f,  70.f,  29.f, 70.f, 0};
 
-  auto dynamic_attribute = mln::morpho::dynamic_attribute(tree, nm);
+  auto dynamic_attribute = mln::morpho::internal::dynamic_attribute(tree, nm);
 
   ASSERT_EQ(expected_dynamic_attribute.size(), dynamic_attribute.size());
 
@@ -98,7 +98,70 @@ TEST(Morpho, AreaWatershedHierarchyGray)
       [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
-      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
+      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
+
+  ASSERT_EQ(expected_parent.size(), tree.parent.size());
+  ASSERT_EQ(expected_values.size(), tree.values.size());
+  ASSERT_EQ(tree.parent.size(), tree.values.size());
+
+  for (std::size_t i = 0; i < expected_parent.size(); ++i)
+  {
+    EXPECT_EQ(expected_parent[i], tree.parent[i]);
+    EXPECT_EQ(expected_values[i], tree.values[i]);
+  }
+}
+
+TEST(Morpho, DynamicWatershedHierarchyGray)
+{
+  mln::image2d<uint8_t> input = {
+      {163, 112, 42, 121, 112},  //
+      {42, 121, 1, 42, 255},     //
+      {1, 112, 121, 112, 121},   //
+      {112, 255, 42, 1, 42},     //
+      {121, 112, 121, 112, 163}, //
+  };
+
+  std::vector<int> expected_parent = {0,  0,  1,  0, 3,  4, 5,  6,  1,  8, 9,  2, 7,  11, 13,
+                                      14, 15, 1, 13, 2, 19, 16, 17, 0, 23, 20, 21, 13};
+
+  std::vector<unsigned long> expected_values = {70, 38, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  auto [tree, _] = mln::morpho::watershed_hierarchy(
+      input,
+      mln::morpho::WatershedAttribute::DYNAMIC,
+      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
+
+  ASSERT_EQ(expected_parent.size(), tree.parent.size());
+  ASSERT_EQ(expected_values.size(), tree.values.size());
+  ASSERT_EQ(tree.parent.size(), tree.values.size());
+
+  for (std::size_t i = 0; i < expected_parent.size(); ++i)
+  {
+    EXPECT_EQ(expected_parent[i], tree.parent[i]);
+    EXPECT_EQ(expected_values[i], tree.values[i]);
+  }
+}
+
+TEST(Morpho, HeightWatershedHierarchyGray)
+{
+  mln::image2d<uint8_t> input = {
+      {163, 112, 42, 121, 112},  //
+      {42, 121, 1, 42, 255},     //
+      {1, 112, 121, 112, 121},   //
+      {112, 255, 42, 1, 42},     //
+      {121, 112, 121, 112, 163}, //
+  };
+
+  std::vector<int> expected_parent = {0, 0, 1, 0, 3, 4, 5, 6, 1, 8, 9, 2, 7, 11, 13, 14, 15, 1, 13, 2, 19, 16, 17, 0, 23, 20, 21, 13};
+
+  std::vector<unsigned long> expected_values = {70, 38, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  auto [tree, _] = mln::morpho::watershed_hierarchy(
+      input,
+      mln::morpho::WatershedAttribute::HEIGHT,
+      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());
@@ -132,7 +195,7 @@ TEST(Morpho, AreaWatershedHierarchyGrayHQ)
       [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
-      mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist_t<>()(a, b); });
+      mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());
@@ -166,7 +229,7 @@ TEST(Morpho, AreaWatershedHierarchyRGB)
       [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
-      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
+      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());
@@ -200,7 +263,7 @@ TEST(Morpho, AreaWatershedHierarchyGrayC8)
       [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
-      mln::c8, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
+      mln::c8, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());
@@ -232,7 +295,7 @@ TEST(Morpho, AreaWatershedHierarchy3DImage)
       [](auto tree, auto nm) -> std::vector<size_t> {
         return tree.compute_attribute_on_points(nm, mln::accu::features::count<>());
       },
-      mln::c26, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist_t<>()(a, b); });
+      mln::c26, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());

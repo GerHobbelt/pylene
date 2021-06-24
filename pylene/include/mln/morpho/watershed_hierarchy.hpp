@@ -12,11 +12,22 @@ namespace mln::morpho
   /// \param neighborhood The neighborhood relation
   /// \param distance Distance function
   template <class I, class A, class N, class F = mln::functional::l2dist_t<>>
-  std::pair<component_tree<typename std::invoke_result_t<
-                A, component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>,
-                image_ch_value_t<I, int>>::value_type>,
-            image_ch_value_t<I, int>> //
-  watershed_hierarchy(I input, A attribute_func, N nbh, F distance = F{});
+  auto watershed_hierarchy(I input, A attribute_func, N nbh, F distance = F{});
+
+  enum WatershedAttribute
+  {
+    HEIGHT = 0,
+    DYNAMIC
+  };
+
+  /// Compute the watershed hierarchy of an image
+  ///
+  /// \param input The input image
+  /// \param watershed_attribute Enumeration for default attribute computation
+  /// \param neighborhood The neighborhood relation
+  /// \param distance Distance function
+  template <class I, class N, class F = mln::functional::l2dist_t<>>
+  auto watershed_hierarchy(I input, WatershedAttribute watershed_attribute, N nbh, F distance = F{});
 
 
   /******************************************/
@@ -26,6 +37,110 @@ namespace mln::morpho
 
   namespace internal
   {
+    template <typename W, class I>
+    std::vector<W> height_attribute(component_tree<W> tree, I node_map)
+    {
+      int n         = static_cast<int>(tree.parent.size());
+      int nb_leaves = static_cast<int>(node_map.domain().size());
+
+      std::vector<W> deepest_altitude(n, std::numeric_limits<W>::max());
+      for (int i = n - 1; i >= 0; --i)
+      {
+        int parent = tree.parent[i];
+
+        if (i > (n - nb_leaves - 1))
+          deepest_altitude[i] = tree.values[parent];
+
+        deepest_altitude[parent] = std::min(deepest_altitude[parent], deepest_altitude[i]);
+      }
+
+      std::vector<W> height(n);
+      for (int i = n - 1; i >= 0; --i)
+        height[i] = tree.values[tree.parent[i]] - deepest_altitude[i];
+
+      return height;
+    }
+
+    template <typename W, class I>
+    std::vector<bool> extrema_attribute(component_tree<W> tree, I node_map)
+    {
+      int n         = static_cast<int>(tree.parent.size());
+      int nb_leaves = static_cast<int>(node_map.domain().size());
+
+      std::vector<bool> extrema(n, true);
+      std::fill_n(extrema.end() - nb_leaves, nb_leaves, false);
+
+      for (int i = (n - nb_leaves - 1); i > 0; --i)
+      {
+        int parent = tree.parent[i];
+
+        bool same_weight = tree.values[i] == tree.values[parent];
+        extrema[parent]  = extrema[parent] && same_weight && extrema[i];
+        extrema[i]       = extrema[i] && !same_weight;
+      }
+
+      return extrema;
+    }
+
+    template <typename W, class I>
+    std::vector<W> dynamic_attribute(component_tree<W> tree, I node_map)
+    {
+      int n         = static_cast<int>(tree.parent.size());
+      int nb_leaves = static_cast<int>(node_map.domain().size());
+
+      std::vector<W>   deepest_altitude(n, std::numeric_limits<W>::max());
+      std::vector<int> path_to_minima(n, -1);
+
+      // Compute deepest altitude and path to deepest minima
+      for (int i = (n - nb_leaves - 1); i >= 0; --i)
+      {
+        int parent = tree.parent[i];
+
+        // Deepest non leaf node
+        if (deepest_altitude[i] == std::numeric_limits<W>::max())
+          deepest_altitude[i] = tree.values[i];
+
+        if (deepest_altitude[i] < deepest_altitude[parent])
+        {
+          deepest_altitude[parent] = deepest_altitude[i];
+          path_to_minima[parent]   = i;
+        }
+      }
+
+      auto             extrema = internal::extrema_attribute(tree, node_map);
+      std::vector<int> nearest_minima(n, -1);
+
+      std::vector<W> dynamic(n);
+      dynamic[0] = tree.values[0] - deepest_altitude[0];
+
+      for (int i = 1; i < n; ++i)
+      {
+        int parent = tree.parent[i];
+
+        if (i > (n - nb_leaves - 1))
+        {
+          if (nearest_minima[parent] != -1)
+            dynamic[i] = dynamic[nearest_minima[parent]];
+          else
+            dynamic[i] = 0;
+
+          continue;
+        }
+
+        if (extrema[i])
+          nearest_minima[i] = i;
+        else
+          nearest_minima[i] = nearest_minima[parent];
+
+        if (i == path_to_minima[parent])
+          dynamic[i] = dynamic[parent];
+        else
+          dynamic[i] = tree.values[parent] - deepest_altitude[i];
+      }
+
+      return dynamic;
+    }
+
     template <typename W, typename A>
     std::vector<A> get_computed_attribute(const component_tree<W>& tree, const std::vector<A>& attribute, int nb_leaves)
     {
@@ -78,116 +193,8 @@ namespace mln::morpho
     }
   } // namespace internal
 
-  template <typename W, class I>
-  std::vector<W> height_attribute(component_tree<W> tree, I node_map)
-  {
-    int n         = static_cast<int>(tree.parent.size());
-    int nb_leaves = static_cast<int>(node_map.domain().size());
-
-    std::vector<W> deepest_altitude(n, std::numeric_limits<W>::max());
-    for (int i = n - 1; i >= 0; --i)
-    {
-      int parent = tree.parent[i];
-
-      if (i > (n - nb_leaves - 1))
-        deepest_altitude[i] = tree.values[parent];
-
-      deepest_altitude[parent] = std::min(deepest_altitude[parent], deepest_altitude[i]);
-    }
-
-    std::vector<W> height(n);
-    for (int i = n - 1; i >= 0; --i)
-      height[i] = tree.values[tree.parent[i]] - deepest_altitude[i];
-
-    return height;
-  }
-
-  template <typename W, class I>
-  std::vector<bool> extrema_attribute(component_tree<W> tree, I node_map)
-  {
-    int n         = static_cast<int>(tree.parent.size());
-    int nb_leaves = static_cast<int>(node_map.domain().size());
-
-    std::vector<bool> extrema(n, true);
-    std::fill_n(extrema.end() - nb_leaves, nb_leaves, false);
-
-    for (int i = (n - nb_leaves - 1); i > 0; --i)
-    {
-      int parent = tree.parent[i];
-
-      bool same_weight = tree.values[i] == tree.values[parent];
-      extrema[parent]  = extrema[parent] && same_weight && extrema[i];
-      extrema[i]       = extrema[i] && !same_weight;
-    }
-
-    return extrema;
-  }
-
-  template <typename W, class I>
-  std::vector<W> dynamic_attribute(component_tree<W> tree, I node_map)
-  {
-    int n         = static_cast<int>(tree.parent.size());
-    int nb_leaves = static_cast<int>(node_map.domain().size());
-
-    std::vector<W>   deepest_altitude(n, std::numeric_limits<W>::max());
-    std::vector<int> path_to_minima(n, -1);
-
-    // Compute deepest altitude and path to deepest minima
-    for (int i = (n - nb_leaves - 1); i >= 0; --i)
-    {
-      int parent = tree.parent[i];
-
-      // Deepest non leaf node
-      if (deepest_altitude[i] == std::numeric_limits<W>::max())
-        deepest_altitude[i] = tree.values[i];
-
-      if (deepest_altitude[i] < deepest_altitude[parent])
-      {
-        deepest_altitude[parent] = deepest_altitude[i];
-        path_to_minima[parent]   = i;
-      }
-    }
-
-    auto             extrema = extrema_attribute(tree, node_map);
-    std::vector<int> nearest_minima(n, -1);
-
-    std::vector<W> dynamic(n);
-    dynamic[0] = tree.values[0] - deepest_altitude[0];
-
-    for (int i = 1; i < n; ++i)
-    {
-      int parent = tree.parent[i];
-
-      if (i > (n - nb_leaves - 1))
-      {
-        if (nearest_minima[parent] != -1)
-          dynamic[i] = dynamic[nearest_minima[parent]];
-        else
-          dynamic[i] = 0;
-
-        continue;
-      }
-
-      if (extrema[i])
-        nearest_minima[i] = i;
-      else
-        nearest_minima[i] = nearest_minima[parent];
-
-      if (i == path_to_minima[parent])
-        dynamic[i] = dynamic[parent];
-      else
-        dynamic[i] = tree.values[parent] - deepest_altitude[i];
-    }
-
-    return dynamic;
-  }
-
   template <class I, class A, class N, class F>
-  std::pair<component_tree<typename std::invoke_result_t<
-                A, component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>,
-                image_ch_value_t<I, int>>::value_type>,
-            image_ch_value_t<I, int>> //
-  watershed_hierarchy(I input, A attribute_func, N nbh, F distance)
+  auto watershed_hierarchy(I input, A attribute_func, N nbh, F distance)
   {
     std::vector<edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> mst;
     auto [tree, nm] = internal::__alphatree<false>(input, nbh, distance, false, false, &mst);
@@ -199,4 +206,24 @@ namespace mln::morpho
 
     return internal::watershed<I, N>(tree, nm, mst, attribute, input.domain().size());
   }
+
+  template <class I, class N, class F>
+  auto watershed_hierarchy(I input, WatershedAttribute watershed_attribute, N nbh, F distance)
+  {
+    using W = std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>;
+    std::function<std::vector<W>(component_tree<W>, image_ch_value_t<I, int>)> attribute_func;
+
+    switch (watershed_attribute)
+    {
+    case HEIGHT:
+      attribute_func = [](auto tree, auto nm) -> std::vector<W> { return internal::height_attribute(tree, nm); };
+      break;
+    case DYNAMIC:
+      attribute_func = [](auto tree, auto nm) -> std::vector<W> { return internal::dynamic_attribute(tree, nm); };
+      break;
+    }
+
+    return watershed_hierarchy(input, attribute_func, nbh, distance);
+  }
+
 } // namespace mln::morpho

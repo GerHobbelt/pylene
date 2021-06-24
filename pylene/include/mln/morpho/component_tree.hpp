@@ -10,8 +10,6 @@
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
 
-#include <iostream>
-
 #include <vector>
 
 #include <range/v3/view/span.hpp>

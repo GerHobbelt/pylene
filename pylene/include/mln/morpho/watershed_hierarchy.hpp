@@ -196,7 +196,7 @@ namespace mln::morpho
   template <class I, class A, class N, class F>
   auto watershed_hierarchy(I input, A attribute_func, N nbh, F distance)
   {
-    std::vector<edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> mst;
+    std::vector<internal::edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> mst;
     auto [tree, nm] = internal::__alphatree<false>(input, nbh, distance, false, false, &mst);
 
     auto attribute = attribute_func(tree, nm);

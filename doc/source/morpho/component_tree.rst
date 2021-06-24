@@ -306,6 +306,17 @@ It is also possible to compute the saliency map to obtain another visualization.
 
     :return: The saliency map as an image
 
+.. list-table::
+
+   * - .. image:: /images/watershed_hierarchy_area_gray.png
+          :width: 100%
+
+     - .. image:: /images/saliency_watershed.png
+          :width: 100%
+
+   * - Watershed hierarchy by area with a cut at a threshold of 25
+     - The corresponding saliency map
+
 A complete example
 ------------------
 

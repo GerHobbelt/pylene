@@ -4,7 +4,7 @@
 
 #include <pybind11/pybind11.h>
 
-#include <memory>
+#include "morpho/morpho.hpp"
 
 namespace pln
 {
@@ -13,5 +13,6 @@ namespace pln
   PYBIND11_MODULE(pylena, m)
   {
     init_pylena_numpy(m);
+    morpho::define_morpho_module(m);
   }
 } // namespace pln

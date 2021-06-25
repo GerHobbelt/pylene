@@ -28,7 +28,7 @@ namespace mln::morpho
   template <class I, class N, class F = mln::functional::l2dist_t<>>
   std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
   alphatree(I input, N nbh, F distance = F{});
-
+  
 
   /******************************************/
   /****          Implementation          ****/
@@ -39,11 +39,11 @@ namespace mln::morpho
   {
     /// \brief Canvas for the edges in the alphatree. Using different data
     /// structures related to the type of the edges.
-    template <typename P, typename N, typename W>
+    template <typename P, typename N, typename W, bool HQ>
     class alphatree_edges;
 
-    template <typename P, typename N, typename W>
-    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2) class alphatree_edges<P, N, W>
+    template <typename P, typename N, typename W, bool HQ>
+    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2 && HQ) class alphatree_edges<P, N, W, HQ>
     {
     public:
       void                push(int dir, W w, P p) { m_cont.insert(dir, w, p); }
@@ -64,11 +64,14 @@ namespace mln::morpho
       W w;
     };
 
-    template <typename P, typename N, typename W>
+    template <typename P, typename N, typename W, bool HQ>
     class alphatree_edges
     {
     public:
-      void                push(int dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
+      void push(int dir, W w, P p) { m_cont.push_back({p, p + cn.after_offsets()[dir], w}); }
+
+      void push(P p, P q, W w) { m_cont.push_back({p, q, w}); }
+
       std::tuple<P, P, W> pop()
       {
         assert(m_current < m_cont.size());
@@ -81,10 +84,13 @@ namespace mln::morpho
         assert(m_current < m_cont.size());
         return m_cont[m_current].w;
       }
+
       bool empty() const { return m_cont.size() == m_current; }
+
       void on_finish_insert()
       {
-        std::sort(m_cont.begin(), m_cont.end(), [](const edge_t<P, W>& a, const edge_t<P, W>& b) { return a.w < b.w; });
+        std::stable_sort(m_cont.begin(), m_cont.end(),
+                         [](const edge_t<P, W>& a, const edge_t<P, W>& b) { return a.w < b.w; });
       }
 
     private:
@@ -115,8 +121,6 @@ namespace mln::morpho
     template <class E, class J>
     void alphatree_compute_flatzones(E& edges, J zpar)
     {
-      canvas::impl::union_find_init_par(zpar);
-
       while (!edges.empty() && edges.top() == 0)
       {
         const auto [p, q, w] = edges.pop();
@@ -174,7 +178,8 @@ namespace mln::morpho
                                             std::size_t       node_count, //
                                             std::vector<int>& par,        //
                                             std::vector<W>&   levels,     //
-                                            std::vector<M>*   mst)
+                                            std::vector<M>*   mst,        //
+                                            bool              canonize_tree)
     {
       static_assert(mln::is_a<I, mln::details::Image>());
 
@@ -205,11 +210,11 @@ namespace mln::morpho
           int min_root = std::min(rp_root, rq_root);
 
           int new_root_id;
-          if (levels[max_root] == w)
+          if (canonize_tree && levels[max_root] == w)
           {
             new_root_id = max_root;
           }
-          else if (levels[min_root] == w)
+          else if (canonize_tree && levels[min_root] == w)
           {
             new_root_id = min_root;
           }
@@ -233,14 +238,18 @@ namespace mln::morpho
     }
 
     template <class W>
-    std::pair<std::vector<int>, std::vector<W>> canonize_component_tree(const std::vector<int>& par,    //
-                                                                        const std::vector<W>&   levels, //
-                                                                        std::size_t             node_count)
+    std::pair<std::vector<int>, std::vector<W>> canonize_component_tree(const std::vector<int>& par,        //
+                                                                        const std::vector<W>&   levels,     //
+                                                                        std::size_t             node_count, //
+                                                                        std::size_t             nb_leaves)
     {
+      assert(node_count >= nb_leaves);
+
       std::vector<int> canonized_par;
       std::vector<W>   canonized_levels;
 
       // Root initialization
+
       canonized_par.push_back(0);
       canonized_levels.push_back(levels[0]);
 
@@ -249,8 +258,11 @@ namespace mln::morpho
       translation_map[0] = 0;
       int count          = 1;
 
+      std::size_t begin_leaves = node_count - nb_leaves;
+
       // Build canonized component tree
-      for (std::size_t i = 1; i < node_count; ++i)
+
+      for (std::size_t i = 1; i < begin_leaves; ++i)
       {
         if (levels[i] != levels[par[i]]) // Keep the node: Update tree
         {
@@ -262,13 +274,53 @@ namespace mln::morpho
           translation_map[i] = translation_map[par[i]];
       }
 
+      for (std::size_t i = begin_leaves; i < node_count; ++i)
+      {
+        translation_map[i] = count++;
+        canonized_par.push_back(translation_map[par[i]]);
+        canonized_levels.push_back(levels[i]);
+      }
+
       return {canonized_par, canonized_levels};
     }
 
-    template <class I, class N, class F,
+    template <typename W, class E, class I, class M = edge_t<image_point_t<I>, W>>
+    std::pair<component_tree<W>, image_ch_value_t<I, int>>
+    alphatree_from_graph(E& edges, I node_map, std::size_t nb_leaves, bool canonize_tree, std::vector<M>* mst = nullptr)
+    {
+      std::size_t      node_count = nb_leaves;
+      std::vector<int> par(node_count);
+      std::vector<W>   levels(node_count, 0);
+
+      std::iota(std::begin(par), std::end(par), 0);
+      node_count = internal::alphatree_compute_hierarchy(edges, node_map, node_count, par, levels, mst, canonize_tree);
+
+      // Parent / levels are ordered from leaves to root, we need to reverse
+      internal::alphatree_reorder_nodes(par.data(), levels.data(), node_count);
+
+      if (canonize_tree)
+      {
+        auto [canonized_par, canonized_levels] = internal::canonize_component_tree(par, levels, node_count, nb_leaves);
+        par                                    = canonized_par;
+        levels                                 = canonized_levels;
+      }
+
+      component_tree<W> t;
+      t.parent   = par;
+      t.values   = levels;
+      node_count = t.parent.size();
+
+      // Update the node map according to the component tree representation
+      mln::for_each(node_map, [node_count](int& id) { id = static_cast<int>(node_count) - id - 1; });
+
+      return {std::move(t), std::move(node_map)};
+    }
+
+    template <bool HQ = true, class I, class N, class F,
               class M = edge_t<image_point_t<I>, std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>>
     std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
-    __alphatree(I input, N nbh, F distance, std::vector<M>* mst = nullptr, bool canonize_tree = true)
+    __alphatree(I input, N nbh, F distance, bool canonize_tree = true, bool compute_flatzones = true,
+                std::vector<M>* mst = nullptr)
     {
       static_assert(mln::is_a<I, mln::details::Image>());
       static_assert(mln::is_a<N, mln::details::Neighborhood>());
@@ -282,50 +334,23 @@ namespace mln::morpho
       static_assert(std::is_same<M, edge_t<P, W>>());
 
       // 1. Get the list of edges
-      auto edges = alphatree_edges<P, N, W>();
+      auto edges = alphatree_edges<P, N, W, HQ>();
       internal::alphatree_compute_edges(std::move(input), std::move(nbh), std::move(distance), edges);
 
       std::size_t              flatzones_count;
       image_ch_value_t<I, int> node_map = imchvalue<int>(input).set_init_value(-1);
       {
         image_ch_value_t<I, P> zpar = imchvalue<P>(input);
-        // 2. Compute flat zone of the image
-        internal::alphatree_compute_flatzones(edges, zpar);
+        canvas::impl::union_find_init_par(zpar);
+
+        if (compute_flatzones)
+          internal::alphatree_compute_flatzones(edges, zpar);
 
         // 3. Compute a node_id for each flat zone
         flatzones_count = internal::alphatree_create_nodemap(node_map, zpar);
       }
 
-      std::size_t node_count = flatzones_count;
-
-      std::vector<int> par(node_count);
-      std::vector<W>   levels(node_count, 0);
-      // 4. Compute the hierarchy
-      {
-        std::iota(std::begin(par), std::end(par), 0);
-        node_count = internal::alphatree_compute_hierarchy(edges, node_map, node_count, par, levels, mst);
-      }
-
-      // 5. Parent / levels are ordered from leaves to root, we need to reverse
-      internal::alphatree_reorder_nodes(par.data(), levels.data(), node_count);
-
-      // Optional tree canonization: remove useless nodes
-      if (canonize_tree)
-      {
-        auto [canonized_par, canonized_levels] = internal::canonize_component_tree(par, levels, node_count);
-        par                                    = canonized_par;
-        levels                                 = canonized_levels;
-        node_count                             = par.size();
-      }
-
-      // 6. Update the node_map
-      mln::for_each(node_map, [node_count](int& id) { id = static_cast<int>(node_count) - id - 1; });
-
-      component_tree<W> t;
-      t.parent = std::move(par);
-      t.values = std::move(levels);
-
-      return {std::move(t), std::move(node_map)};
+      return alphatree_from_graph<W>(edges, node_map, flatzones_count, canonize_tree, mst);
     }
   } // namespace internal
 

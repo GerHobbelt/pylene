@@ -3,7 +3,10 @@
 
 #include <mln/accu/accumulator.hpp>
 #include <mln/core/algorithm/clone.hpp>
+#include <mln/core/algorithm/fill.hpp>
+#include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/zip.hpp>
+#include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/trace.hpp>
 
@@ -22,6 +25,13 @@ namespace mln::morpho
     // CT_FILTER_SUBTRACTIVE (not yet implemented)
   };
 
+  template <typename P, typename W>
+  struct edge_t
+  {
+    P p;
+    P q;
+    W w;
+  };
 
   template <class T = void>
   class component_tree;
@@ -122,8 +132,13 @@ namespace mln::morpho
     template <class I, class V>
     image_ch_value_t<I, V> reconstruct_from(I node_map, ::ranges::span<V> values) const;
 
-
     using node_t = int;
+
+    /// \brief Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
+    ///
+    /// \param node_map Image point -> node_id mapping
+    mln::image2d<double> saliency(mln::image2d<uint8_t> node_map);
+
     std::vector<node_t> parent;
 
   private:
@@ -410,6 +425,4 @@ namespace mln::morpho
 
     return out;
   }
-
-
 } // namespace mln::morpho

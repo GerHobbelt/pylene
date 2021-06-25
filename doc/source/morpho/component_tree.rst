@@ -294,6 +294,29 @@ to make an horizontal cut of this tree.
     :param nodemap: An image thats maps ``point -> node id``
     :param levels: (Optional) The altitude of each node in the tree (for example the :math:`\alpha` associated to each node for the alphatree).
 
+Saliency Computation
+--------------
+It is also possible to compute the saliency map to obtain another visualization.
+
+.. cpp:function:: auto saliency(Image node_map)
+
+    Compute and return the saliency map of the tree.
+
+    :param node_map: An image thats maps ``point -> node id``
+
+    :return: The saliency map as an image
+
+.. list-table::
+
+   * - .. image:: /images/watershed_hierarchy_area_gray.png
+          :width: 100%
+
+     - .. image:: /images/saliency_watershed.png
+          :width: 100%
+
+   * - Watershed hierarchy by area with a cut at a threshold of 25
+     - The corresponding saliency map
+
 A complete example
 ------------------
 

@@ -95,6 +95,8 @@ endif ()
 #### Configuration of the Compiler ###
 
 # Subdirectories
+add_library(Pylene INTERFACE)
+add_library(Pylene::Pylene ALIAS Pylene)
 add_subdirectory(pylene)
 
 if (PYLENE_BUILD_PYTHON)
@@ -120,6 +122,59 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_custom_target(build-doc)
   add_subdirectory(doc)
 endif ()
+
+
+####################################################
+####### Installation & CMAKE module files ##########
+####################################################
+
+target_link_libraries(Pylene INTERFACE Pylene::Core)
+
+include(GNUInstallDirs)
+
+set(PyleneTargets Pylene Pylene-core Pylene-bp)
+if (TARGET Pylene-numpy)
+  list(APPEND PyleneTargets Pylene-numpy)
+endif()
+
+install(TARGETS ${PyleneTargets}
+        EXPORT PyleneTargets)
+
+write_basic_package_version_file(
+    pylene/PyleneConfigVersion.cmake
+    VERSION 0.1
+    COMPATIBILITY AnyNewerVersion
+    )
+
+configure_file(
+    pylene/PyleneConfig.cmake.in
+    pylene/PyleneConfig.cmake
+    @ONLY
+    )
+
+install(EXPORT PyleneTargets
+        FILE PyleneTargets.cmake
+        NAMESPACE Pylene::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
+        )
+
+install(DIRECTORY pylene-python/include/pln
+        TYPE INCLUDE)
+
+
+install(DIRECTORY pylene/include/mln
+        TYPE INCLUDE)
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
+
+
+
+####################################################
+#######          Packaging                ##########
+####################################################
 
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")

@@ -96,9 +96,14 @@ Then, see conan's documentation for how to use the package with your favorite bu
 
 The following targets are then available:
 
-* ``Pylene::Pylene``: target to link with when using Pylene::
+* ``Pylene::Pylene``: target to link with all Pylene components::
 
     target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
+
+* ``Pylene::Core``: target to link with when using only the core component of Pylene::
+
+    target_link_libraries(MyTarget PRIVATE Pylene::Core)
+
 
 
 Integration with CMake as a subdirectory
@@ -113,11 +118,17 @@ or to exclude it from ``make``, ``make all``, or ``cmake --build ..``::
 
     add_subdirectory(pylene EXCLUDE_FROM_ALL)
 
+
 The following targets are then available:
 
-* ``Pylene::Pylene``: target to link with when using Pylene::
+* ``Pylene::Pylene``: target to link with all Pylene components::
 
     target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
+
+* ``Pylene::Core``: target to link with when using only the core component of Pylene::
+
+    target_link_libraries(MyTarget PRIVATE Pylene::Core)
+
 
 
 Integration with CMake from an existing installation
@@ -128,12 +139,16 @@ Use ``find_package`` in your CMakeLists::
 
     find_package(Pylene)
 
-It makes the following targets available:
 
-* ``Pylene::Pylene``: target to link with when using Pylene::
+The following targets are then available:
+
+* ``Pylene::Pylene``: target to link with all Pylene components::
 
     target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
 
+* ``Pylene::Core``: target to link with when using only the core component of Pylene::
+
+    target_link_libraries(MyTarget PRIVATE Pylene::Core)
 
 
 Installation (for developers)
@@ -189,7 +204,7 @@ See `<https://gitlab.lrde.epita.fr/olena/pylene/-/blob/master/test_package/>`_.
 
     find_package(Pylene REQUIRED)
     add_executable(main main.cpp)
-    target_link_libraries(main Pylene::Pylene)
+    target_link_libraries(main Pylene::Core)
 
 
 * Build intructions::

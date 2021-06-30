@@ -22,7 +22,7 @@ add_core_test(${test_prefix}depth_first depthfirst.cpp)
 add_core_test(${test_prefix}maxtree maxtree.cpp)
 add_core_test(${test_prefix}alphatree alphatree.cpp)
 add_core_test(${test_prefix}private_directional_hqueue directional_hqueue.cpp)
-add_core_test(${test_prefix}component_tree component_tree.cpp)
+#add_core_test(${test_prefix}component_tree component_tree.cpp)
 
 
 target_link_libraries(${test_prefix}dilate PRIVATE TBB::TBB)

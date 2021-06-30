@@ -90,7 +90,7 @@ namespace mln::morpho
     /// \param acc Accumulator to apply on values
     template <class I, class J, class Accu>
     std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
-    compute_attribute_on_values(I node_map, J values, Accu acc);
+    compute_attribute_on_values(I node_map, J values, Accu acc) const;
 
     /// \brief Compute attribute on values
     ///
@@ -101,7 +101,7 @@ namespace mln::morpho
     /// \param acc Accumulator to apply on points
     template <class I, class Accu>
     std::vector<typename accu::result_of<Accu, image_point_t<I>>::type> //
-    compute_attribute_on_points(I node_map, Accu acc);
+    compute_attribute_on_points(I node_map, Accu acc) const;
 
 
     /// \brief Compute attribute on pixels
@@ -113,7 +113,7 @@ namespace mln::morpho
     /// \param acc Accumulator to apply on values
     template <class I, class J, class Accu>
     std::vector<typename accu::result_of<Accu, image_pixel_t<J>>::type> //
-    compute_attribute_on_pixels(I node_map, J values, Accu acc);
+    compute_attribute_on_pixels(I node_map, J values, Accu acc) const;
 
     /// \brief Compute the horizontal cut of a hierarchie at level `threshold` and return a nodemap
     /// valued with the node indices of the lowest nodes satisfying levels[n] > threshold
@@ -135,9 +135,10 @@ namespace mln::morpho
     using node_t = int;
 
     /// \brief Produce a visualization of the given Component Tree using the Khalimsky grid of the saliency map
+    ///        The component_tree must be built on a 2D image with a 4-connectivity.
     ///
     /// \param node_map Image point -> node_id mapping
-    mln::image2d<double> saliency(mln::image2d<uint8_t> node_map);
+    mln::image2d<double> saliency(mln::image2d<int> node_map, ::ranges::span<double> values) const;
 
     std::vector<node_t> parent;
 
@@ -296,7 +297,7 @@ namespace mln::morpho
 
   template <class I, class Accu>
   std::vector<typename accu::result_of<Accu, image_point_t<I>>::type>
-  component_tree<void>::compute_attribute_on_points(I node_map, Accu acc)
+  component_tree<void>::compute_attribute_on_points(I node_map, Accu acc) const
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_points");
 
@@ -329,7 +330,7 @@ namespace mln::morpho
 
   template <class I, class J, class Accu>
   std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
-  component_tree<void>::compute_attribute_on_values(I node_map, J input, Accu acc)
+  component_tree<void>::compute_attribute_on_values(I node_map, J input, Accu acc) const
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_values");
 
@@ -363,7 +364,7 @@ namespace mln::morpho
 
   template <class I, class J, class Accu>
   std::vector<typename accu::result_of<Accu, image_pixel_t<J>>::type> //
-  component_tree<void>::compute_attribute_on_pixels(I node_map, J values, Accu acc)
+  component_tree<void>::compute_attribute_on_pixels(I node_map, J values, Accu acc) const
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_pixels");
 

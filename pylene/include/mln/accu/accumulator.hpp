@@ -109,7 +109,7 @@ namespace mln
       typedef typename accu_of<AccuLike, T>::type accu_type;
 
     public:
-      typedef typename std::result_of<Extractor(accu_type)>::type type;
+      typedef typename std::invoke_result<Extractor, accu_type>::type type;
     };
 
     template <class A, class T, class E = default_extractor>

@@ -298,24 +298,25 @@ Saliency Computation
 --------------
 It is also possible to compute the saliency map to obtain another visualization.
 
-.. cpp:function:: auto saliency(Image node_map)
+.. cpp:function:: auto saliency(image2d<int> node_map, ranges::span<double> values) const
 
-    Compute and return the saliency map of the tree.
+    Compute and return the saliency map of the tree. **Works only for 2D images and with tree node values of type** ``double``.
 
     :param node_map: An image thats maps ``point -> node id``
+    :param values: the levels of the tree for each node
 
     :return: The saliency map as an image
 
 .. list-table::
 
-   * - .. image:: /images/watershed_hierarchy_area_gray.png
+   * - .. image:: /images/lena_gray.jpg
           :width: 100%
 
      - .. image:: /images/saliency_watershed.png
           :width: 100%
 
-   * - Watershed hierarchy by area with a cut at a threshold of 25
-     - The corresponding saliency map
+   * - Original image
+     - Saliency map of the watershed hierarchy by area
 
 A complete example
 ------------------

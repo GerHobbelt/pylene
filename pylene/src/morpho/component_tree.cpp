@@ -1,7 +1,5 @@
 #include <mln/morpho/component_tree.hpp>
 
-#include <iostream>
-
 namespace mln::morpho
 {
   namespace internal
@@ -51,27 +49,22 @@ namespace mln::morpho
       }
       return b;
     };
-    std::vector<internal::edge_t<point2d, int>> s_map;
-    mln_foreach (auto p, node_map.domain())
-    {
-      if (p[0] == 440 && p[1] == 224)
-        std::cout << "";
-      for (auto q : c4.after(p))
-      {
-        if (node_map.domain().has(q))
-          s_map.emplace_back(p, q, values[lca(node_map(p), node_map(q))]);
-      }
-    }
 
     const auto   kwidth  = node_map.width() * 2 - 1;
     const auto   kheight = node_map.height() * 2 - 1;
     image2d<double> res(kwidth, kheight);
     fill(res, 0);
 
-    for (const auto [u, v, w] : s_map)
+    mln_foreach (auto p, node_map.domain())
     {
-      const auto dir = v - u;
-      res(point2d{2 * u[0], 2 * u[1]} + dir) = w;
+      for (auto q : c4.after(p))
+      {
+        if (node_map.domain().has(q))
+        {
+          const auto dir = q - p;
+          res(point2d{2 * p[0], 2 * p[1]} + dir) = values[lca(node_map(p), node_map(q))];
+        }
+      }
     }
 
     return res;

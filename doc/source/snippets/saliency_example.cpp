@@ -1,11 +1,9 @@
-#include <mln/accu/accumulators/mean.hpp>
-#include <mln/core/colors.hpp>
+#include <mln/accu/accumulators/count.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/cast.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/morpho/tos.hpp>
 #include <mln/morpho/watershed_hierarchy.hpp>
 
 

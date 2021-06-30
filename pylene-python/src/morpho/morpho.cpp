@@ -137,7 +137,7 @@ namespace pln::morpho
         .def("compute_depth", &tree_t::compute_depth)
         .def(
             "horizontal_cut",
-            [](tree_t& self, const double th, image_t nodemap, const std::vector<double>& values) -> image_t {
+            [](const tree_t& self, const double th, image_t nodemap, const std::vector<double>& values) -> image_t {
               auto* nodemap_casted = nodemap.cast_to<int, 2>();
               if (!nodemap_casted)
                 throw std::invalid_argument("Nodemap should be a 2D int image.");
@@ -151,7 +151,7 @@ namespace pln::morpho
             pybind11::arg("th"), pybind11::arg("nodemap"), pybind11::arg("values"))
         .def(
             "reconstruct_from_mean",
-            [](tree_t& self, image_t nodemap, image_t image) -> image_t {
+            [](const tree_t& self, image_t nodemap, image_t image) -> image_t {
               if (nodemap.domain() != image.domain())
                 throw std::invalid_argument("nodemap and domain must have the same dimensions.");
               if (nodemap.pdim() != 2)
@@ -191,13 +191,22 @@ namespace pln::morpho
             pybind11::arg("nodemap"), pybind11::arg("image"))
         .def(
             "area",
-            [](tree_t self, image_t nodemap) {
+            [](const tree_t& self, image_t nodemap) {
               auto* nodemap_casted = nodemap.cast_to<int, 2>();
               if (!nodemap_casted)
                 throw std::invalid_argument("Nodemap should be 2D int image.");
               return self.compute_attribute_on_points(*nodemap_casted, mln::accu::accumulators::count<>());
             },
-            "Return a mapping tree node -> area attribute", pybind11::arg("nodemap"));
+            "Return a mapping tree node -> area attribute", pybind11::arg("nodemap"))
+        .def("saliency",
+          [](const tree_t& self, image_t nodemap, const std::vector<double>& values) 
+            -> image_t
+          {
+            auto* nodemap_casted = nodemap.cast_to<int, 2>();
+            if (!nodemap_casted)
+              throw std::invalid_argument("Nodemap should be 2D int image.");
+            return self.saliency(*nodemap_casted, ::ranges::make_span<double>(const_cast<double*>(values.data()), values.size()));
+          });
 
     morpho.def("alphatree", &details::alphatree,
                "Compute the alpahtree of a graph computed from an image using the 4-connectivity and a distance L2",

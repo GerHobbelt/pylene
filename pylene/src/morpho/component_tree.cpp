@@ -66,6 +66,17 @@ namespace mln::morpho
         }
       }
     }
+    mln_foreach(auto p, res.domain())
+    {
+      if (p[0] % 2 == 1 && p[1] % 2 == 1)
+      {
+        for (auto q : c4(p))
+        {
+          if (res.domain().has(q) && res(p) < res(q))
+            res(p) = res(q);
+        }
+      }
+    }
 
     return res;
   }

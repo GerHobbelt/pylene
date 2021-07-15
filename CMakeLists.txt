@@ -132,7 +132,7 @@ target_link_libraries(Pylene INTERFACE Pylene::Core)
 
 include(GNUInstallDirs)
 
-set(PyleneTargets Pylene Pylene-core Pylene-bp)
+set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
 if (TARGET Pylene-numpy)
   list(APPEND PyleneTargets Pylene-numpy)
 endif()

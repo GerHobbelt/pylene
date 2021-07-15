@@ -39,7 +39,7 @@ add_library(BenchImpl
 
 set_target_properties(BenchImpl PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 target_include_directories(BenchImpl PUBLIC include)
-target_link_libraries(BenchImpl PUBLIC Pylene::Pylene)
+target_link_libraries(BenchImpl PUBLIC Pylene::Core Pylene::IO-freeimage)
 
 
 add_subdirectory(tests)

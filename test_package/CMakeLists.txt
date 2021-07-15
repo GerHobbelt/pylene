@@ -1,10 +1,10 @@
 project(PyleneTest)
 cmake_minimum_required(VERSION 3.11)
 
-find_package(Pylene REQUIRED COMPONENTS Core)
+find_package(Pylene REQUIRED COMPONENTS Core IO-freeimage)
 
 add_executable(main main.cpp)
-target_link_libraries(main Pylene::Core)
+target_link_libraries(main Pylene::Core Pylene::IO-freeimage)
 
 if (WITH_PYLENE_NUMPY)
   find_package(pybind11 REQUIRED)

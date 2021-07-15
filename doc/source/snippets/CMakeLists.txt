@@ -73,7 +73,7 @@ target_link_libraries(doc-lib Pylene::Core)
 
 
 
-link_libraries(Pylene::Core)
+link_libraries(Pylene::Core Pylene::IO-freeimage)
 link_libraries(doc-lib)
 
 add_executable(alphatree_example alphatree_example.cpp)
@@ -90,10 +90,3 @@ add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
 
 target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)
-
-# for program_options, need to separate CONAN and regular FindBoost
-if (TARGET Boost::program_options)
-  target_link_libraries(erosion-cli PRIVATE Boost::program_options)
-elseif (TARGET Boost::Boost)
-  target_link_libraries(erosion-cli PRIVATE Boost::Boost)
-endif()

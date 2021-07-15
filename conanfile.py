@@ -16,6 +16,7 @@ class Pylene(ConanFile):
         "shared": False,
         "fPIC": False,
         "gtest:shared": False,
+        "boost:header_only": True,
     }
 
     generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
@@ -24,10 +25,6 @@ class Pylene(ConanFile):
     build_requires = [
         "gtest/1.10.0",
         "benchmark/[>=1.5.0]",
-
-        # For now boost is too heavy and is not based on components
-        # Such a dependancy brings linktime overhead because too many libraries are linked
-        # "boost/1.73.0"
     ]
 
     requires = [
@@ -35,6 +32,7 @@ class Pylene(ConanFile):
         "fmt/6.0.0",
         "tbb/2020.0",
         "xsimd/7.4.6",
+        "boost/1.75.0"
     ]
 
     def _build_python(self):
@@ -66,13 +64,22 @@ class Pylene(ConanFile):
         self.cpp_info.names["cmake_find_package"] = "Pylene"
         self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
 
-        self.cpp_info.components["Core"].system_libs.append("freeimage")
+        # Core component
         self.cpp_info.components["Core"].names["cmake_find_package"] = "Core"
         self.cpp_info.components["Core"].names["cmake_find_package_multi"] = "Core"
         self.cpp_info.components["Core"].libs = ["Pylene-core"]
         self.cpp_info.components["Core"].includedirs = ["include"]
-        self.cpp_info.components["Core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd"]
+        self.cpp_info.components["Core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
 
+        # IO component
+        self.cpp_info.components["IO-freeimage"].system_libs.append("freeimage")
+        self.cpp_info.components["IO-freeimage"].names["cmake_find_package"] = "IO-freeimage"
+        self.cpp_info.components["IO-freeimage"].names["cmake_find_package_multi"] = "IO-freeimage"
+        self.cpp_info.components["IO-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp_info.components["IO-freeimage"].includedirs = ["include"]
+        self.cpp_info.components["IO-freeimage"].requires = ["Core"]
+
+        # Pylene-numpy component
         if self._build_python():
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
             self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"

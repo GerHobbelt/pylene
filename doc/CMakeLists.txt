@@ -1,6 +1,5 @@
 find_package(Doxygen)
 find_package(Sphinx)
-find_package(Boost COMPONENTS program_options REQUIRED)
 
 add_subdirectory(source/snippets)
 

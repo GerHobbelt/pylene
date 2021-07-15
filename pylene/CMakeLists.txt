@@ -42,8 +42,6 @@ target_include_directories(Pylene-core PUBLIC
 target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
 target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd::xsimd)
 target_link_libraries(Pylene-core PUBLIC fmt::fmt)
-target_link_libraries(Pylene-core PRIVATE FreeImage::FreeImage)
-
 
 # Set sources
 #file(GLOB_RECURSE sources "include/mln/*.hpp")
@@ -79,10 +77,7 @@ target_sources(Pylene-core PRIVATE
                src/core/se/rect2d.cpp
                src/core/trace.cpp
                src/core/traverse2d.cpp
-               src/io/freeimage_plugin.cpp
                src/io/imprint.cpp
-               src/io/imread.cpp
-               src/io/io.cpp
                src/morpho/block_running_max.cpp
                src/morpho/component_tree.cpp
                src/morpho/hvector.cpp
@@ -93,12 +88,27 @@ target_sources(Pylene-core PRIVATE
                src/morpho/filters2d.cpp
                )
 
+add_library(Pylene-io-freeimage)
+add_library(Pylene::IO-freeimage ALIAS Pylene-io-freeimage)
+target_sources(Pylene-io-freeimage PRIVATE
+               src/io/freeimage_plugin.cpp
+               src/io/imread.cpp
+               src/io/io.cpp            
+)
+target_compile_features(Pylene-io-freeimage PUBLIC cxx_std_20)
+target_include_directories(Pylene-io-freeimage PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(Pylene-io-freeimage PUBLIC FreeImage::FreeImage Pylene-core)
+
 # Compiler configurations
 target_compile_features(Pylene-core PUBLIC cxx_std_20)
 
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
   target_compile_options(Pylene-bp PUBLIC -fconcepts)
   target_compile_options(Pylene-core PUBLIC -fconcepts)
+  target_compile_options(Pylene-io-freeimage PUBLIC -fconcepts)
 endif()
 
 # IDE configuration

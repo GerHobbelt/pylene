@@ -1,58 +1,25 @@
 #include <mln/core/image/ndimage.hpp>
 
+#include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 
 #include <mln/morpho/closing.hpp>
 #include <mln/morpho/dilation.hpp>
 #include <mln/morpho/erosion.hpp>
-#include <mln/morpho/opening.hpp>
-#include <mln/morpho/median_filter.hpp>
 #include <mln/morpho/gradient.hpp>
+#include <mln/morpho/median_filter.hpp>
+#include <mln/morpho/opening.hpp>
 
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 
-
-#include <algorithm>
-#include <boost/program_options.hpp>
-#include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
-namespace po = boost::program_options;
-
-enum se_type
+enum class morpho_op_type
 {
-  kSquare,
-  kDisc,
-  kDiamond
-};
-
-
-int tolower_safe(int c)
-{
-  return std::tolower(static_cast<unsigned char>(c));
-}
-
-std::istream& operator>>(std::istream& in, se_type& se)
-{
-  std::string token;
-  in >> token;
-  std::transform(token.begin(), token.end(), token.begin(), tolower_safe);
-  if (token == "square")
-    se = kSquare;
-  else if (token == "disc")
-    se = kDisc;
-  else if (token == "diamond")
-    se = kDiamond;
-  else
-    throw po::invalid_option_value("Invalid SE");
-  return in;
-}
-
-enum morpho_op_type
-{
-  kErosion,
+  kErosion = 0,
   kDilation,
   kOpening,
   kClosing,
@@ -62,110 +29,113 @@ enum morpho_op_type
   kExternalGradient
 };
 
-std::istream& operator>>(std::istream& in, morpho_op_type& se)
+enum class se_type
 {
-  std::string token;
-  in >> token;
-  std::transform(token.begin(), token.end(), token.begin(), tolower_safe);
-  if (token == "erosion")
-    se = kErosion;
-  else if (token == "dilation")
-    se = kDilation;
-  else if (token == "opening")
-    se = kOpening;
-  else if (token == "closing")
-    se = kClosing;
-  else if (token == "median")
-    se = kMedian;
-  else if (token == "gradient")
-    se = kGradient;
-  else if (token == "ext_gradient")
-    se = kExternalGradient;
-  else if (token == "int_gradient")
-    se = kInternalGradient;
-  else
-    throw po::invalid_option_value("Invalid Operator");
-  return in;
-}
-
-
-struct exec_params_type
-{
-  se_type        se;
-  morpho_op_type op;
-  int            size;
+  kSquare = 0,
+  kDisc
 };
 
-
-int main(int argc, char** argv)
+morpho_op_type get_morpho_op(char* arg)
 {
-  po::options_description            desc("Allowed options");
-  po::positional_options_description p;
-  p.add("operator", 1).add("se", 1).add("size", 1).add("input", 1).add("output", 1);
+  const std::string str(arg);
+  if (str == "erosion")
+    return morpho_op_type::kErosion;
+  else if (str == "dilation")
+    return morpho_op_type::kDilation;
+  else if (str == "opening")
+    return morpho_op_type::kOpening;
+  else if (str == "closing")
+    return morpho_op_type::kClosing;
+  else if (str == "median")
+    return morpho_op_type::kMedian;
+  else if (str == "gradient")
+    return morpho_op_type::kGradient;
+  else if (str == "int_gradient")
+    return morpho_op_type::kInternalGradient;
+  else if (str == "ext_gradient")
+    return morpho_op_type::kExternalGradient;
+  else
+    throw std::invalid_argument("Invalid input morphological operation");
+}
 
-  desc.add_options()("help", "produce help message")("operator", po::value<morpho_op_type>()->required(), "")(
-      "se", po::value<se_type>()->required(), "")("size", po::value<int>()->required(), "Size of the SE.")(
-      "input", po::value<std::string>()->required(),
-      "Input image (8u or rgb8)")("output", po::value<std::string>()->required(), "Output image (8u or rgb8)");
+se_type get_se(char* arg)
+{
+  const std::string str(arg);
+  if (str == "square")
+    return se_type::kSquare;
+  else if (str == "disk")
+    return se_type::kDisc;
+  else
+    throw std::invalid_argument("Invalid input structuring element");
+}
 
-  po::variables_map vm;
-  int               size;
-  try
+template <typename SE>
+mln::image2d<std::uint8_t> process(mln::image2d<std::uint8_t> img, morpho_op_type op, SE se)
+{
+  using namespace mln::morpho;
+  switch (op)
   {
-    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
-    po::notify(vm);
-    size = vm["size"].as<int>();
-    if (size < 1 || size % 2 == 0)
-    {
-      std::cerr << "Size must be positive and odd.\n";
-      return 1;
-    }
+  case morpho_op_type::kErosion:
+    return erosion(img, se);
+    break;
+  case morpho_op_type::kDilation:
+    return dilation(img, se);
+    break;
+  case morpho_op_type::kOpening:
+    return opening(img, se);
+    break;
+  case morpho_op_type::kClosing:
+    return closing(img, se);
+    break;
+  case morpho_op_type::kMedian:
+    return median_filter(img, se, mln::extension::bm::mirror{});
+    break;
+  case morpho_op_type::kGradient:
+    return gradient(img, se);
+    break;
+  case morpho_op_type::kInternalGradient:
+    return internal_gradient(img, se);
+    break;
+  case morpho_op_type::kExternalGradient:
+    return external_gradient(img, se);
+    break;
   }
-  catch (...)
+  return mln::image2d<std::uint8_t>();
+}
+
+int main(int argc, char* argv[])
+{
+  using namespace mln;
+
+  if (argc != 6)
   {
     std::cout << "Usage: " << argv[0]
-              << " [-h,--help] OPERATOR SE size input output\n"
-                 "OPERATOR\t Morphological operation to perform [erosion | dilation | opening | closing | median | gradient | ext_gradient | int_gradient]\n"
-                 "SE\t Structuring element to use [square | disc | diamond]\n"
+              << " OPERATOR SE size input output\n"
+                 "OPERATOR\t Morphological operation to perform [erosion | dilation | opening | closing | median | "
+                 "gradient | ext_gradient | int_gradient]\n"
+                 "SE\t Structuring element to use [square | disc]\n"
                  "size\t Size of the SE\n"
                  "input\t Input image (u8)\n"
                  "output\t Output image (u8)\n";
     return 1;
   }
 
-  mln::image2d<uint8_t> input, output;
-  mln::io::imread(vm["input"].as<std::string>(), input);
+  const auto input_op = get_morpho_op(argv[1]);
+  const auto input_se = get_se(argv[2]);
+  const auto size     = std::atoi(argv[3]);
 
+  mln::image2d<std::uint8_t> img;
+  mln::io::imread(argv[4], img);
 
-  mln::se::rect2d nbh(size, size);
+  if (size < 1 || size % 2 == 0)
+    throw std::invalid_argument("Structuring element size must be positive and odd");
 
-  switch (vm["operator"].as<morpho_op_type>())
-  {
-  case kErosion:
-    output = mln::morpho::erosion(input, nbh);
-    break;
-  case kDilation:
-    output = mln::morpho::dilation(input, nbh);
-    break;
-  case kOpening:
-    output = mln::morpho::opening(input, nbh);
-    break;
-  case kClosing:
-    output = mln::morpho::closing(input, nbh);
-    break;
-  case kMedian:
-    output = mln::morpho::median_filter(input, nbh, mln::extension::bm::mirror{});
-    break;
-  case kGradient:
-    output = mln::morpho::gradient(input, nbh);
-    break;
-  case kExternalGradient:
-    output = mln::morpho::external_gradient(input, nbh);
-    break;
-  case kInternalGradient:
-    output = mln::morpho::internal_gradient(input, nbh);
-    break;
-  }
+  mln::image2d<std::uint8_t> out;
+  if (input_se == se_type::kDisc)
+    out = process(img, input_op, se::disc(size));
+  else
+    out = process(img, input_op, se::rect2d(size, size));
 
-  mln::io::imsave(output, vm["output"].as<std::string>());
+  mln::io::imsave(out, argv[5]);
+  return 0;
 }

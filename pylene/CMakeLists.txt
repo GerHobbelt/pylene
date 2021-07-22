@@ -83,6 +83,7 @@ target_sources(Pylene-core PRIVATE
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
                src/morpho/immersion.cpp
+               src/morpho/lca.cpp
                src/morpho/maxtree.cpp
                src/morpho/unionfind.cpp
                src/morpho/filters2d.cpp

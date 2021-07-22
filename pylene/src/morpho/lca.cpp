@@ -44,7 +44,7 @@ namespace mln::morpho
     , m_R(t.parent.size(), -1)
   {
     compute_euler_tour(t);
-    m_rmq = std::move(details::rmq_t(m_L));
+    m_rmq = details::rmq_t(m_L);
   }
 
   void lca_t::compute_euler_tour(const component_tree<void>& t)

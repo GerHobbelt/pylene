@@ -6,35 +6,74 @@ namespace mln::morpho
 {
   namespace details
   {
-    rmq_t::rmq_t(const std::vector<int>& tab)
-      : m_tab(tab.size() * tab.size(), 0)
-      , m_stride(tab.size())
+    rmq_sparse_table::rmq_sparse_table(std::function<int(int)> data_fun, int n_data)
+      : m_data(n_data * std::ceil(std::log2(n_data)), -1)
+      , m_data_function(data_fun)
+      , m_line_stride(n_data)
     {
-      const int s = static_cast<int>(tab.size());
+      // Compute the RMQ for 1-length RMQ
+      for (int i = 0; i < m_line_stride; i++)
+        m_data[i] = i;
 
-      // Fill diagonale
-      for (int i = 0; i < s; i++)
-        m_tab[i * m_stride + i] = i;
-
-      // Fill the table
-      for (int i = 1; i < s; i++)
+      // Compute dynamically the 2^n-length RMQ
+      const int log2_size = std::ceil(std::log2(n_data));
+      for (int i = 1; i < log2_size; i++)
       {
-        int j = i + 1;
-        while (j < s)
+        for (int j = 0; j + std::pow(2, i) <= m_line_stride; j++)
         {
-          if (tab[m_tab[i * m_stride + (j - 1)]] < tab[j])
-            m_tab[i * m_stride + j] = m_tab[i * m_stride + (j - 1)];
+          const int oth_ind = (i - 1) * m_line_stride + (j + std::pow(2, i - 1));
+          if (m_data_function(m_data[(i - 1) * m_line_stride + j]) <= m_data_function(m_data[oth_ind]))
+            m_data[i * m_line_stride + j] = m_data[(i - 1) * m_line_stride + j];
           else
-            m_tab[i * m_stride + j] = j;
-          j++;
+            m_data[i * m_line_stride + j] = m_data[oth_ind];
         }
       }
     }
 
-    int rmq_t::operator()(int i, int j) const
+    int rmq_sparse_table::operator()(int i, int j) const
     {
       assert(i <= j);
-      return m_tab[i * m_stride + j];
+      const int k = i == j ? 0 : std::floor(std::log2(j - i));
+      return m_data_function(m_data[k * m_line_stride + i]) < m_data_function(m_data[k * m_line_stride + (j - std::pow(2, k) + 1)])
+                 ? m_data[k * m_line_stride + i]
+                 : m_data[k * m_line_stride + (j - std::pow(2, k) + 1)];
+    }
+
+    bool rmq_sparse_table::has_been_processed() const { return m_data[0] >= 0; }
+
+    restricted_rmq::restricted_rmq(const std::vector<int>& tab)
+      : m_block_size(std::ceil(std::log2(tab.size()) / 2))
+      , m_in_block_rmq(m_num_pos * m_table_line_stride, -1)
+    {
+      // View to the normalized table
+      const auto normalized_tab = [&](int i) { return tab[i] - tab[(i / m_block_size) * m_block_size]; };
+
+      // Computation of in-block RMQ
+      int ind = 0;
+      for (int i = 0; i < static_cast<int>(tab.size()); i++)
+      {
+        if (i != 0 && i % m_block_size == 0)
+        {
+          // If no ST has been built on this pattern, build it.
+          if (m_in_block_rmq[ind * m_table_line_stride] < 0)
+          {
+          }
+          ind = 0;
+        }
+        else
+        {
+          ind = ind << 1 | (normalized_tab(i) > 0 ? 1 : 0);
+        }
+      }
+
+      // Computation of block RMQ
+    }
+
+    int restricted_rmq::operator()(const std::vector<int>& tab, int i, int j) const
+    {
+      assert(i <= j);
+      (void)tab;
+      return 0;
     }
   } // namespace details
 
@@ -44,7 +83,8 @@ namespace mln::morpho
     , m_R(t.parent.size(), -1)
   {
     compute_euler_tour(t);
-    m_rmq = details::rmq_t(m_L);
+    auto fun = [&](int i) { return m_L[i]; };
+    m_rmq    = details::rmq_sparse_table(fun, m_L.size());
   }
 
   void lca_t::compute_euler_tour(const component_tree<void>& t)

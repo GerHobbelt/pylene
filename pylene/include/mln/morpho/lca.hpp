@@ -3,57 +3,72 @@
 #include <mln/morpho/component_tree.hpp>
 
 #include <cmath>
-#include <functional>
 
 namespace mln::morpho
 {
   namespace details
   {
+    /**
+     * Implementation of the RMQ algorithm, preprocess the data in O(n log(n)) and execute a query in O(1)
+     * The internal sparse table represents the table below :
+     *
+     *                  n
+     *           +-------------+
+     *  Log n {  |     ...     |
+     *           +-------------+
+     *
+     */
     class rmq_sparse_table
     {
     public:
+      rmq_sparse_table(const rmq_sparse_table&) = delete;
+      rmq_sparse_table& operator=(const rmq_sparse_table&) = delete;
+
       rmq_sparse_table() = default;
-      rmq_sparse_table(std::function<int(int)> data_fun, int n_data);
+      rmq_sparse_table(int* tab, int n);
+      ~rmq_sparse_table();
 
-      int  operator()(int i, int j) const;
-      bool has_been_processed() const;
+      void preprocess(int* tab, int n);
 
-    private:
-      std::vector<int>        m_data;
-      std::function<int(int)> m_data_function;
-      int                     m_line_stride;
-    };
-
-    class restricted_rmq
-    {
-    public:
-      restricted_rmq() = default;
-      explicit restricted_rmq(const std::vector<int>& tab);
-
-      int operator()(const std::vector<int>& tab, int i, int j) const;
+      int operator()(int a, int b) const;
 
     private:
-      int              m_block_size;
-      int              m_table_line_stride = m_block_size * m_block_size;
-      int              m_num_pos           = std::pow(2, m_block_size - 1);
-      std::vector<int> m_in_block_rmq;
+      int* m_sparse_table = nullptr; ///< Sparse Table (ST)
+      int* m_table;                  ///< Input table
+      int  m_ncols;                  ///< Number of element of the input table
+      int  m_nrows;                  ///< Number of rows in the ST (log(m_ncols))
     };
+
+
   } // namespace details
 
-  class lca_t
+  class lca
   {
   public:
-    explicit lca_t(const component_tree<void>& t);
+    lca()           = delete;
+    lca(const lca&) = delete;
+    lca& operator=(const lca&) = delete;
+
+    // Constructor (preprocess the LCA from a tree)
+    explicit lca(const component_tree<void>& t);
+
+    // Destructor (Deallocate the Euler tour tables)
+    ~lca();
 
     int operator()(int a, int b) const;
 
   private:
-    void compute_euler_tour(const component_tree<void>& t);
+    // Memory management
+    void allocate(std::size_t n);
+    void deallocate();
+
+    // Euler tour
+    void compute_euler_tour(const component_tree<void>& t, int* E, int* D, int* R);
 
   private:
-    std::vector<int>          m_E;
-    std::vector<int>          m_L;
-    std::vector<int>          m_R;
-    details::rmq_sparse_table m_rmq;
+    int*                      m_E = nullptr; ///< Euler tour
+    int*                      m_D = nullptr; ///< Depth of each node in the Euler tour
+    int*                      m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
+    details::rmq_sparse_table m_rmq;         ///< RMQ implementation in the LCA
   };
 } // namespace mln::morpho

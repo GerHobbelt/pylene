@@ -66,5 +66,6 @@ add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 add_benchmark(BMBufferPrimitives        BMBufferPrimitives.cpp)
 add_benchmark(BMAlphaTree               BMAlphaTree.cpp)
 add_benchmark(BMWatershedHierarchy      BMWatershedHierarchy.cpp)
+add_benchmark(BMSaliency                BMSaliency.cpp)
 
 ExternalData_Add_Target(fetch-external-data)

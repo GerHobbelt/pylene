@@ -7,11 +7,15 @@ namespace mln::morpho
 {
   namespace details
   {
-    rmq_sparse_table::rmq_sparse_table(int* tab, int n) { preprocess(tab, n); }
+    rmq_sparse_table::rmq_sparse_table(int* __restrict tab, int n) noexcept { preprocess(tab, n); }
 
-    rmq_sparse_table::~rmq_sparse_table() { std::free(m_sparse_table); }
+    rmq_sparse_table::~rmq_sparse_table() noexcept
+    {
+      std::free(m_sparse_table);
+      std::free(m_pow2);
+    }
 
-    void rmq_sparse_table::preprocess(int* tab, int n)
+    void rmq_sparse_table::preprocess(int* __restrict tab, int n) noexcept
     {
       mln_precondition(tab != nullptr);
       mln_precondition(n > 0);
@@ -21,6 +25,12 @@ namespace mln::morpho
       m_sparse_table = (int*)std::malloc(m_nrows * m_ncols * sizeof(int));
       m_table        = tab;
 
+      // Computation of the pow2 (faster than using std::pow)
+      m_pow2    = (int*)std::malloc(m_nrows * sizeof(int));
+      m_pow2[0] = 1;
+      for (int i = 1; i < m_nrows; i++)
+        m_pow2[i] = m_pow2[i - 1] * 2;
+
       // First row : block of size 1
       for (int i = 0; i < m_ncols; i++)
         m_sparse_table[i] = i;
@@ -28,18 +38,17 @@ namespace mln::morpho
       // Filling the other rows
       for (int i = 1; i < m_nrows; i++)
       {
-        for (int j = 0; j < (m_ncols - (int)std::pow(2, i)) + 1; j++)
+        for (int j = 0; j < (m_ncols - m_pow2[i] + 1); j++)
         {
-          m_sparse_table[i * m_ncols + j] =
-              m_table[m_sparse_table[(i - 1) * m_ncols + j]] <=
-                      m_table[m_sparse_table[(i - 1) * m_ncols + (j + (int)std::pow(2, i - 1))]]
-                  ? m_sparse_table[(i - 1) * m_ncols + j]
-                  : m_sparse_table[(i - 1) * m_ncols + (j + (int)std::pow(2, i - 1))];
+          m_sparse_table[i * m_ncols + j] = m_table[m_sparse_table[(i - 1) * m_ncols + j]] <=
+                                                    m_table[m_sparse_table[(i - 1) * m_ncols + (j + m_pow2[i - 1])]]
+                                                ? m_sparse_table[(i - 1) * m_ncols + j]
+                                                : m_sparse_table[(i - 1) * m_ncols + (j + m_pow2[i - 1])];
         }
       }
     }
 
-    int rmq_sparse_table::operator()(int a, int b) const
+    int rmq_sparse_table::operator()(int a, int b) const noexcept
     {
       mln_precondition(a <= b);
 
@@ -47,59 +56,41 @@ namespace mln::morpho
         return a;
 
       const int k = std::floor(std::log2(b - a));
-      return m_table[m_sparse_table[k * m_ncols + a]] <
-                     m_table[m_sparse_table[k * m_ncols + (b - (int)std::pow(2, k) + 1)]]
+      return m_table[m_sparse_table[k * m_ncols + a]] < m_table[m_sparse_table[k * m_ncols + (b - m_pow2[k] + 1)]]
                  ? m_sparse_table[k * m_ncols + a]
-                 : m_sparse_table[k * m_ncols + (b - (int)std::pow(2, k) + 1)];
+                 : m_sparse_table[k * m_ncols + (b - m_pow2[k] + 1)];
     }
   } // namespace details
 
-  lca::lca(const component_tree<void>& t)
+  lca::lca(const component_tree<void>& t) noexcept
   {
-    allocate(t.parent.size());
-    compute_euler_tour(t, m_E, m_D, m_R);
-    m_rmq.preprocess(m_D, 2 * t.parent.size() - 1);
-  }
-
-  void lca::allocate(std::size_t n)
-  {
-    m_E = (int*)std::malloc((2 * n - 1) * sizeof(int));
-    m_D = (int*)std::malloc((2 * n - 1) * sizeof(int));
-    m_R = (int*)std::malloc(n * sizeof(int));
-  }
-
-  void lca::deallocate()
-  {
-    std::free(m_E);
-    std::free(m_D);
-    std::free(m_R);
-  }
-
-  void lca::compute_euler_tour(const component_tree<void>& t, int* E, int* D, int* R)
-  {
-    int num_node = t.parent.size();
+    const int num_node = t.parent.size();
+    m_E                = (int*)std::malloc((2 * num_node - 1) * sizeof(int));
+    m_D                = (int*)std::malloc((2 * num_node - 1) * sizeof(int));
+    m_R                = (int*)std::malloc(num_node * sizeof(int));
 
     // First pass : computation of the children
-    int* first_child  = (int*)std::malloc(num_node * sizeof(int));
-    int* last_child   = (int*)std::malloc(num_node * sizeof(int));
-    int* next_sibling = (int*)std::malloc(num_node * sizeof(int));
-    std::memset(first_child, -1, num_node * sizeof(int));
+    int*      children_info       = (int*)std::malloc(3 * num_node * sizeof(int));
+    const int last_child_offset   = num_node;
+    const int next_sibling_offset = 2 * num_node;
+
+    std::memset(children_info, -1, num_node * sizeof(int));
 
     for (int n = 1; n < num_node; n++)
     {
       const int p = t.parent[n];
-      if (first_child[p] < 0)
+      if (children_info[p] < 0)
       {
-        first_child[p] = n;
-        last_child[p]  = n;
+        children_info[p]                     = n;
+        children_info[last_child_offset + p] = n;
       }
-      next_sibling[last_child[p]] = n;
-      last_child[p]               = n;
-      next_sibling[n]             = -1;
+      children_info[next_sibling_offset + children_info[last_child_offset + p]] = n;
+      children_info[last_child_offset + p]                                      = n;
+      children_info[next_sibling_offset + n]                                    = -1;
     }
 
     // Second pass : computation of the Euler tour
-    std::memset(R, -1, num_node * sizeof(int));
+    std::memset(m_R, -1, num_node * sizeof(int));
     int             i = 0;
     std::stack<int> st;
     st.push(0);
@@ -107,12 +98,12 @@ namespace mln::morpho
     {
       const int cur = st.top();
       st.pop();
-      D[i] = t.parent[cur] == cur ? 0 : D[R[t.parent[cur]]] + 1;
-      E[i] = cur;
-      if (R[cur] < 0)
+      m_D[i] = t.parent[cur] == cur ? 0 : m_D[m_R[t.parent[cur]]] + 1;
+      m_E[i] = cur;
+      if (m_R[cur] < 0)
       {
-        R[cur] = i;
-        for (int c = first_child[cur]; c >= 0; c = next_sibling[c])
+        m_R[cur] = i;
+        for (int c = children_info[cur]; c >= 0; c = children_info[next_sibling_offset + c])
         {
           st.push(cur);
           st.push(c);
@@ -121,14 +112,19 @@ namespace mln::morpho
       i++;
     }
 
-    std::free(first_child);
-    std::free(last_child);
-    std::free(next_sibling);
+    std::free(children_info);
+
+    m_rmq.preprocess(m_D, 2 * num_node - 1);
   }
 
-  lca::~lca() { deallocate(); }
+  lca::~lca() noexcept
+  {
+    std::free(m_E);
+    std::free(m_D);
+    std::free(m_R);
+  }
 
-  int lca::operator()(int a, int b) const
+  int lca::operator()(int a, int b) const noexcept
   {
     int ar = m_R[a];
     int br = m_R[b];

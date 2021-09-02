@@ -25,18 +25,19 @@ namespace mln::morpho
       rmq_sparse_table& operator=(const rmq_sparse_table&) = delete;
 
       rmq_sparse_table() = default;
-      rmq_sparse_table(int* tab, int n);
-      ~rmq_sparse_table();
+      rmq_sparse_table(int* tab, int n) noexcept;
+      ~rmq_sparse_table() noexcept;
 
-      void preprocess(int* tab, int n);
+      void preprocess(int* tab, int n) noexcept;
 
-      int operator()(int a, int b) const;
+      int operator()(int a, int b) const noexcept;
 
     private:
       int* m_sparse_table = nullptr; ///< Sparse Table (ST)
       int* m_table;                  ///< Input table
       int  m_ncols;                  ///< Number of element of the input table
       int  m_nrows;                  ///< Number of rows in the ST (log(m_ncols))
+      int* m_pow2;
     };
 
 
@@ -50,20 +51,12 @@ namespace mln::morpho
     lca& operator=(const lca&) = delete;
 
     // Constructor (preprocess the LCA from a tree)
-    explicit lca(const component_tree<void>& t);
+    explicit lca(const component_tree<void>& t) noexcept;
 
     // Destructor (Deallocate the Euler tour tables)
-    ~lca();
+    ~lca() noexcept;
 
-    int operator()(int a, int b) const;
-
-  private:
-    // Memory management
-    void allocate(std::size_t n);
-    void deallocate();
-
-    // Euler tour
-    void compute_euler_tour(const component_tree<void>& t, int* E, int* D, int* R);
+    int operator()(int a, int b) const noexcept;
 
   private:
     int*                      m_E = nullptr; ///< Euler tour

@@ -40,7 +40,53 @@ namespace mln::morpho
       int* m_pow2;
     };
 
+    inline int rmq_sparse_table::operator()(int a, int b) const noexcept
+    {
+      mln_precondition(a <= b);
 
+      if (a == b)
+        return a;
+
+      const int k = std::floor(std::log2(b - a));
+      return m_table[m_sparse_table[k * m_ncols + a]] < m_table[m_sparse_table[k * m_ncols + (b - m_pow2[k] + 1)]]
+                 ? m_sparse_table[k * m_ncols + a]
+                 : m_sparse_table[k * m_ncols + (b - m_pow2[k] + 1)];
+    }
+
+
+    /**
+     * Implementation of the restricted RMQ, which has a preprocessing complexity in O(n) and a query complexity in O(1)
+     * 
+     * This RMQ is only applicable on tables which have adjacent elements differing by +/- 1
+     */
+    class restricted_rmq
+    {
+    public:
+      restricted_rmq(const restricted_rmq&) = delete;
+      restricted_rmq& operator=(const restricted_rmq&) = delete;
+
+      restricted_rmq() = default;
+      restricted_rmq(int* tab, int n) noexcept;
+
+      ~restricted_rmq() noexcept;
+
+      void preprocess(int* tab, int n) noexcept;
+
+      int operator()(int a, int b) const noexcept;
+
+    private:
+      void compute_in_block_tables(int* tab, int n) noexcept;
+
+    private:
+      int*                      m_table = nullptr;              ///< Input table
+      int                       m_block_size;                   ///< Size of a block (log(n) / 2)
+      int                       m_num_block;                    ///< Number of block
+      int*                      m_in_block_tables    = nullptr; ///< In-block RMQ
+      int*                      m_map_in_block_table = nullptr; ///< Map from block index to in-block table index
+      int*                      m_rmq_block_value    = nullptr; ///< Minimum value of each block in the table
+      int*                      m_rmq_block_index    = nullptr; ///< Index for each block in which m_rmq_block_value occurs
+      details::rmq_sparse_table m_rmq_blocks;                   ///< Sparse Table on m_rmq_block_value
+    };
   } // namespace details
 
   class lca
@@ -59,9 +105,9 @@ namespace mln::morpho
     int operator()(int a, int b) const noexcept;
 
   private:
-    int*                      m_E = nullptr; ///< Euler tour
-    int*                      m_D = nullptr; ///< Depth of each node in the Euler tour
-    int*                      m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
-    details::rmq_sparse_table m_rmq;         ///< RMQ implementation in the LCA
+    int*                    m_E = nullptr; ///< Euler tour
+    int*                    m_D = nullptr; ///< Depth of each node in the Euler tour
+    int*                    m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
+    details::restricted_rmq m_rmq;         ///< RMQ implementation in the LCA
   };
 } // namespace mln::morpho

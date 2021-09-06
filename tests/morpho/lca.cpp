@@ -4,7 +4,6 @@
 
 TEST(Morpho, RMQ_Sparse_Table)
 {
-
   // Setup data
   int       test[]     = {1, 2, 5, 4, 7, 0};
   const int expected[] = {0, 0, 0, 0, 0, 5, 1, 1, 1, 1, 5, 2, 3, 3, 5, 3, 3, 5, 4, 5, 5};
@@ -12,6 +11,26 @@ TEST(Morpho, RMQ_Sparse_Table)
 
   // Setup RMQ
   auto rmq = mln::morpho::details::rmq_sparse_table(test, size);
+
+  // Test
+  int exp_ind = 0;
+  for (int i = 0; i < size; i++)
+  {
+    for (int j = i; j < size; j++)
+      ASSERT_EQ(rmq(i, j), expected[exp_ind++]);
+  }
+}
+
+TEST(Morpho, RMQ_Restricted)
+{
+  // Setup data
+  int       test[]     = {3, 4, 5, 4, 3, 2, 3, 4, 5};
+  const int expected[] = {0, 0, 0, 0, 0, 5, 5, 5, 5, 1, 1, 1, 4, 5, 5, 5, 5, 2, 3, 4, 5, 5, 5,
+                          5, 3, 4, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8};
+  const int size       = 9;
+
+  // Setup RMQ
+  auto rmq = mln::morpho::details::restricted_rmq(test, size);
 
   // Test
   int exp_ind = 0;

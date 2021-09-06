@@ -4,6 +4,8 @@
 #include <numeric>
 #include <stack>
 
+#include <iostream>
+
 namespace mln::morpho
 {
   namespace details
@@ -170,10 +172,11 @@ namespace mln::morpho
             for (int c = l + 1; c < m_block_size; c++)
             {
               cur_tab[l * m_block_size + c] =
-                  norm_tab(cur_tab[l * m_num_block + c - 1]) <= norm_tab(i + c) ? cur_tab[l * m_num_block + c - 1] : c;
+                  norm_tab(cur_tab[l * m_block_size + c - 1]) <= norm_tab(c) ? cur_tab[l * m_block_size + c - 1] : c;
             }
           }
         }
+
         m_rmq_block_value[i / m_block_size] = m_table[i + cur_tab[m_block_size - 1]];
         m_rmq_block_index[i / m_block_size] = i + cur_tab[m_block_size - 1];
       }

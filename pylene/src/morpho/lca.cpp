@@ -28,6 +28,7 @@ namespace mln::morpho
     {
       mln_precondition(tab != nullptr);
       mln_precondition(n > 0);
+      mln_precondition(!m_sparse_table);
 
       m_ncols        = n;
       m_nrows        = std::ceil(std::log2(m_ncols));
@@ -189,9 +190,10 @@ namespace mln::morpho
   lca::lca(const component_tree<void>& t) noexcept
   {
     const int num_node = static_cast<int>(t.parent.size());
-    m_E                = (int*)std::malloc((2 * num_node - 1) * sizeof(int));
-    m_D                = (int*)std::malloc((2 * num_node - 1) * sizeof(int));
-    m_R                = (int*)std::malloc(num_node * sizeof(int));
+    m_memory = (int*)std::malloc((5 * num_node - 2) * sizeof(int));
+    m_E                = m_memory;
+    m_D                = m_memory + (2 * num_node - 1);
+    m_R                = m_memory + (4 * num_node - 2);
 
     // First pass : computation of the children
     int*      children_info       = (int*)std::malloc(3 * num_node * sizeof(int));
@@ -216,7 +218,7 @@ namespace mln::morpho
     // Second pass : computation of the Euler tour
     std::memset(m_R, -1, num_node * sizeof(int));
     int             i = 0;
-    std::stack<int> st;
+    std::stack<int, std::vector<int>> st;
     st.push(0);
     while (!st.empty())
     {
@@ -243,9 +245,7 @@ namespace mln::morpho
 
   lca::~lca() noexcept
   {
-    std::free(m_E);
-    std::free(m_D);
-    std::free(m_R);
+    std::free(m_memory);
   }
 
   int lca::operator()(int a, int b) const noexcept

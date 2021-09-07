@@ -56,7 +56,7 @@ namespace mln::morpho
 
     /**
      * Implementation of the restricted RMQ, which has a preprocessing complexity in O(n) and a query complexity in O(1)
-     * 
+     *
      * This RMQ is only applicable on tables which have adjacent elements differing by +/- 1
      */
     class restricted_rmq
@@ -84,8 +84,8 @@ namespace mln::morpho
       int*                      m_in_block_tables    = nullptr; ///< In-block RMQ
       int*                      m_map_in_block_table = nullptr; ///< Map from block index to in-block table index
       int*                      m_rmq_block_value    = nullptr; ///< Minimum value of each block in the table
-      int*                      m_rmq_block_index    = nullptr; ///< Index for each block in which m_rmq_block_value occurs
-      details::rmq_sparse_table m_rmq_blocks;                   ///< Sparse Table on m_rmq_block_value
+      int*                      m_rmq_block_index = nullptr; ///< Index for each block in which m_rmq_block_value occurs
+      details::rmq_sparse_table m_rmq_blocks;                ///< Sparse Table on m_rmq_block_value
     };
   } // namespace details
 
@@ -105,8 +105,9 @@ namespace mln::morpho
     int operator()(int a, int b) const noexcept;
 
   private:
-    int*                    m_E = nullptr; ///< Euler tour
-    int*                    m_D = nullptr; ///< Depth of each node in the Euler tour
+    int*                    m_memory = nullptr;
+    int*                    m_E      = nullptr; ///< Euler tour
+    int*                    m_D      = nullptr; ///< Depth of each node in the Euler tour
     int*                    m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
     details::restricted_rmq m_rmq;         ///< RMQ implementation in the LCA
   };

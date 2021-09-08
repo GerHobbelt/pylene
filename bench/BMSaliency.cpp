@@ -111,6 +111,18 @@ BENCHMARK_F(BMSaliency, LinearLCA_Olbia)(benchmark::State& st)
   run<mln::morpho::lca<>>(st, 0);
 }
 
+BENCHMARK_F(BMSaliency, SimpleDynLCA_Olbia)(benchmark::State& st)
+{
+  for (auto _ : st)
+    m_trees[0].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[0], ::ranges::make_span(m_trees[0].values.data(), m_trees[0].values.size()));
+}
+
+BENCHMARK_F(BMSaliency, LinearDynLCA_Olbia)(benchmark::State& st)
+{
+  for (auto _ : st)
+    m_trees[0].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[0], ::ranges::make_span(m_trees[0].values.data(), m_trees[0].values.size()));
+}
+
 BENCHMARK_F(BMSaliency, SimpleLCA_Space)(benchmark::State& st)
 {
   run<mln::morpho::simple_lca>(st, 1);
@@ -125,6 +137,18 @@ BENCHMARK_F(BMSaliency, SimpleLCA_Space)(benchmark::State& st)
 BENCHMARK_F(BMSaliency, LinearLCA_Space)(benchmark::State& st)
 {
   run<mln::morpho::lca<>>(st, 1);
+}
+
+BENCHMARK_F(BMSaliency, SimpleDynLCA_Space)(benchmark::State& st)
+{
+  for (auto _ : st)
+    m_trees[1].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+}
+
+BENCHMARK_F(BMSaliency, LinearDynLCA_Space)(benchmark::State& st)
+{
+  for (auto _ : st)
+    m_trees[1].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
 }
 
 // We do not have this file for the bench
@@ -142,5 +166,7 @@ BENCHMARK_F(BMSaliency, LinearLCA_Map)(benchmark::State& st)
 {
   run<mln::morpho::lca<>>(st, 2);
 }*/
+
+
 
 BENCHMARK_MAIN();

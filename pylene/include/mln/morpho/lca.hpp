@@ -89,6 +89,9 @@ namespace mln::morpho
     };
   } // namespace details
 
+  /**
+   * Naive implementation of the LCA
+   */
   class simple_lca
   {
   public:
@@ -110,6 +113,9 @@ namespace mln::morpho
   template <typename RMQ>
   class lca;
 
+  /**
+   * Base class of the LCA, doing the Euler tour, which is independent of the RMQ implementation used
+   */
   template <>
   class lca<void>
   {
@@ -135,6 +141,9 @@ namespace mln::morpho
     int* m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
   };
 
+  /**
+   * Implementation of the LCA using a RMQ implementation (default: restricted RMQ)
+   */
   template <typename RMQ = mln::morpho::details::restricted_rmq>
   class lca : public lca<void>
   {
@@ -156,6 +165,43 @@ namespace mln::morpho
     RMQ m_rmq;
   };
 
+  /**
+   * Type erased version of the LCA, used in the saliency map.
+   * It provides two implementation of the LCA : the naive one and the one with a linear processing time and a constant
+   * query time.
+   */
+  class dyn_lca
+  {
+  public:
+    enum class kind
+    {
+      SIMPLE,
+      LINEAR,
+      OTHER
+    };
+
+  public:
+    dyn_lca() noexcept;
+    dyn_lca(kind k, const component_tree<void>& t) noexcept;
+
+    dyn_lca(const dyn_lca&) = delete;
+    dyn_lca(dyn_lca&&)      = delete;
+    dyn_lca& operator=(const dyn_lca&) = delete;
+    dyn_lca& operator=(dyn_lca&&) = delete;
+
+    ~dyn_lca();
+
+    void init(kind k, const component_tree<void>& t) noexcept;
+    int  operator()(int a, int b) const noexcept;
+
+  private:
+    static constexpr std::size_t lca_size = std::max({sizeof(simple_lca), sizeof(lca<>)});
+
+  private:
+    char m_lca[lca_size];
+    kind m_kind;
+  };
+
   /*
    * Implementation
    */
@@ -164,7 +210,7 @@ namespace mln::morpho
   lca<RMQ>::lca(const component_tree<void>& t) noexcept
     : base_t(t)
   {
-    m_rmq.preprocess(m_D, 2 * t.parent.size() - 1);
+    m_rmq.preprocess(m_D, 2 * static_cast<int>(t.parent.size()) - 1);
   }
 
   template <typename RMQ>
@@ -178,38 +224,4 @@ namespace mln::morpho
 
     return m_E[m_rmq(ar, br)];
   }
-
-  class dyn_lca
-  {
-    public:
-    enum class kind
-    {
-      SIMPLE,
-      LINEAR,
-      OTHER
-    };
-
-  public:
-    dyn_lca() noexcept;
-    dyn_lca(kind k, const component_tree<void>& t) noexcept;
-    ~dyn_lca();
-
-    void init(kind k, const component_tree<void>& t) noexcept;
-    int operator()(int a, int b) const noexcept;
-
-  private:
-    static constexpr std::size_t lca_size = std::max({sizeof(simple_lca), sizeof(lca<>)});
-    template <typename T>
-    static constexpr kind type_to_kind()
-    {
-      if constexpr (std::is_same_v<T, simple_lca>)
-        return kind::SIMPLE;
-      else
-        return kind::LINEAR;
-    }
-
-  private:
-    char m_lca[lca_size];
-    kind m_kind;
-  };
 } // namespace mln::morpho

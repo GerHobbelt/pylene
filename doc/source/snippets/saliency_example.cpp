@@ -18,7 +18,7 @@ void process_example(const mln::image2d<uint8_t>& img, const std::string& output
   auto [t, nm] = mln::morpho::watershed_hierarchy(img, area_attribute_func, mln::c4);
 
   // 3. Compute the saliency map
-  auto saliency = t.saliency(nm, ::ranges::make_span(t.values.data(), t.values.size()));
+  auto saliency = t.saliency(mln::morpho::SAL_SIMPLE_LCA, nm, ::ranges::make_span(t.values.data(), t.values.size()));
 
   // 4. Save the output
   mln::io::imsave(mln::view::cast<std::uint16_t>(saliency), output_filename);

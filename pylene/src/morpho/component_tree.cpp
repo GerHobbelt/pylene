@@ -1,6 +1,8 @@
 #include <mln/morpho/component_tree.hpp>
 #include <mln/morpho/lca.hpp>
 
+#include <any>
+
 namespace mln::morpho
 {
   namespace internal
@@ -33,9 +35,13 @@ namespace mln::morpho
     return depth;
   }
 
-  mln::image2d<double> component_tree<void>::saliency(mln::image2d<int> node_map, ::ranges::span<double> values) const
+  mln::image2d<double> component_tree<void>::saliency(ct_saliency meth, mln::image2d<int> node_map, ::ranges::span<double> values) const
   {
-    const auto lca = mln::morpho::lca(*this);
+    dyn_lca lca;
+    if (meth == SAL_SIMPLE_LCA)
+      lca.init(dyn_lca::kind::SIMPLE, *this);
+    else
+      lca.init(dyn_lca::kind::LINEAR, *this);
 
     const auto   kwidth  = node_map.width() * 2 - 1;
     const auto   kheight = node_map.height() * 2 - 1;

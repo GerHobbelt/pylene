@@ -23,7 +23,7 @@ TEST(Morpho, SaliencyAlphaTree)
 
   auto [t, nm] =
       mln::morpho::alphatree(input, mln::c4, [](auto a, auto b) -> double { return mln::functional::l2dist(a, b); });
-  const auto res = t.saliency(nm, ::ranges::make_span(t.values.data(), t.values.size()));
+  const auto res = t.saliency(mln::morpho::SAL_SIMPLE_LCA, nm, ::ranges::make_span(t.values.data(), t.values.size()));
 
   ASSERT_IMAGES_EQ_EXP(res, expected);
 }

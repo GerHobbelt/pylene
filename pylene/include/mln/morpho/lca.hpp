@@ -94,9 +94,9 @@ namespace mln::morpho
   public:
     explicit simple_lca(const component_tree<void>& ct) noexcept;
 
-    simple_lca() = delete;
+    simple_lca()                  = delete;
     simple_lca(const simple_lca&) = delete;
-    simple_lca(simple_lca&&) = delete;
+    simple_lca(simple_lca&&)      = delete;
     simple_lca& operator=(const simple_lca&) = delete;
     simple_lca& operator=(simple_lca&&) = delete;
 
@@ -178,4 +178,38 @@ namespace mln::morpho
 
     return m_E[m_rmq(ar, br)];
   }
+
+  class dyn_lca
+  {
+    public:
+    enum class kind
+    {
+      SIMPLE,
+      LINEAR,
+      OTHER
+    };
+
+  public:
+    dyn_lca() noexcept;
+    dyn_lca(kind k, const component_tree<void>& t) noexcept;
+    ~dyn_lca();
+
+    void init(kind k, const component_tree<void>& t) noexcept;
+    int operator()(int a, int b) const noexcept;
+
+  private:
+    static constexpr std::size_t lca_size = std::max({sizeof(simple_lca), sizeof(lca<>)});
+    template <typename T>
+    static constexpr kind type_to_kind()
+    {
+      if constexpr (std::is_same_v<T, simple_lca>)
+        return kind::SIMPLE;
+      else
+        return kind::LINEAR;
+    }
+
+  private:
+    char m_lca[lca_size];
+    kind m_kind;
+  };
 } // namespace mln::morpho

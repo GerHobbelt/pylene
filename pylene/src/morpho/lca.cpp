@@ -190,7 +190,7 @@ namespace mln::morpho
    * Simple LCA implementation
    */
   simple_lca::simple_lca(const component_tree<void>& ct) noexcept
-    : m_D(std::move(ct.compute_depth()))
+    : m_D(ct.compute_depth())
     , m_t(ct)
   {
   }
@@ -272,4 +272,38 @@ namespace mln::morpho
   }
 
   lca<void>::~lca() noexcept { std::free(m_memory); }
+
+  dyn_lca::dyn_lca() noexcept
+    : m_kind(dyn_lca::kind::OTHER)
+  {
+  }
+
+  dyn_lca::dyn_lca(dyn_lca::kind k, const component_tree<void>& t) noexcept { init(k, t); }
+
+  dyn_lca::~dyn_lca()
+  {
+    if (m_kind == kind::SIMPLE)
+      static_cast<simple_lca*>((void*)&m_lca)->~simple_lca();
+    else if (m_kind == kind::LINEAR)
+      static_cast<lca<>*>((void*)&m_lca)->~lca();
+  }
+
+  void dyn_lca::init(kind k, const component_tree<void>& t) noexcept
+  {
+    m_kind = k;
+    if (k == kind::SIMPLE)
+      new (&m_lca) simple_lca(t);
+    else if (k == kind::LINEAR)
+      new (&m_lca) lca<>(t);
+  }
+
+  int dyn_lca::operator()(int a, int b) const noexcept
+  {
+    mln_precondition(m_kind != kind::OTHER);
+
+    if (m_kind == kind::SIMPLE)
+      return static_cast<simple_lca*>((void*)&m_lca)->operator()(a, b);
+    else
+      return static_cast<lca<>*>((void*)&m_lca)->operator()(a, b);
+  }
 } // namespace mln::morpho

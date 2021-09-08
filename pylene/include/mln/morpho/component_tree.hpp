@@ -25,6 +25,12 @@ namespace mln::morpho
     // CT_FILTER_SUBTRACTIVE (not yet implemented)
   };
 
+  enum ct_saliency
+  {
+    SAL_SIMPLE_LCA,
+    SAL_LINEAR_LCA
+  };
+
   template <typename P, typename W>
   struct edge_t
   {
@@ -138,7 +144,7 @@ namespace mln::morpho
     ///        The component_tree must be built on a 2D image with a 4-connectivity.
     ///
     /// \param node_map Image point -> node_id mapping
-    mln::image2d<double> saliency(mln::image2d<int> node_map, ::ranges::span<double> values) const;
+    mln::image2d<double> saliency(ct_saliency meth, mln::image2d<int> node_map, ::ranges::span<double> values) const;
 
     std::vector<node_t> parent;
 

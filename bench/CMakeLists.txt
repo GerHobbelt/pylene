@@ -17,7 +17,8 @@ ExternalData_Expand_Arguments(
   DATA{Space1_20MB.jpg}
   DATA{Aerial_view_of_Olbia.jpg}
   )
-file(DOWNLOAD "https://github.com/soduco/ICDAR-2021-Vectorization/raw/main/images/best_models_prediction/BDCN_pretrain_best_val.png" "${CMAKE_CURRENT_BINARY_DIR}/BDCN_pretrain_best_val.png")
+# Doing the line below force us to download at config time. (TODO: Add the image in the directory)
+# file(DOWNLOAD "https://github.com/soduco/ICDAR-2021-Vectorization/raw/main/images/best_models_prediction/BDCN_pretrain_best_val.png" "${CMAKE_CURRENT_BINARY_DIR}/BDCN_pretrain_best_val.png")
 
 # Extra compiler options
 

@@ -41,7 +41,7 @@ TEST(Morpho, RMQ_Restricted)
   }
 }
 
-TEST(Morpho, LCA)
+TEST(Morpho, SimpleLCA)
 {
   // Setup data
   mln::morpho::component_tree<void> t;
@@ -50,7 +50,47 @@ TEST(Morpho, LCA)
                           0, 2, 2, 3, 1, 1, 0, 0, 4, 1, 0, 0, 5, 0, 0, 6, 2, 7};
 
   // Setup LCA
-  mln::morpho::lca lca(t);
+  mln::morpho::simple_lca lca(t);
+
+  // Test
+  int exp_ind = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    for (int j = i; j < 8; j++)
+      ASSERT_EQ(lca(i, j), expected[exp_ind++]);
+  }
+}
+
+TEST(Morpho, SparseTableLCA)
+{
+  // Setup data
+  mln::morpho::component_tree<void> t;
+  t.parent             = std::vector<int>{0, 0, 0, 1, 1, 1, 2, 2};
+  const int expected[] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 2, 0, 0,
+                          0, 2, 2, 3, 1, 1, 0, 0, 4, 1, 0, 0, 5, 0, 0, 6, 2, 7};
+
+  // Setup LCA
+  mln::morpho::lca<mln::morpho::details::rmq_sparse_table> lca(t);
+
+  // Test
+  int exp_ind = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    for (int j = i; j < 8; j++)
+      ASSERT_EQ(lca(i, j), expected[exp_ind++]);
+  }
+}
+
+TEST(Morpho, LinearLCA)
+{
+  // Setup data
+  mln::morpho::component_tree<void> t;
+  t.parent             = std::vector<int>{0, 0, 0, 1, 1, 1, 2, 2};
+  const int expected[] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 2, 0, 0,
+                          0, 2, 2, 3, 1, 1, 0, 0, 4, 1, 0, 0, 5, 0, 0, 6, 2, 7};
+
+  // Setup LCA
+  mln::morpho::lca<> lca(t);
 
   // Test
   int exp_ind = 0;

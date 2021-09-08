@@ -1,4 +1,5 @@
 #include <mln/morpho/component_tree.hpp>
+#include <mln/morpho/lca.hpp>
 
 namespace mln::morpho
 {
@@ -34,21 +35,7 @@ namespace mln::morpho
 
   mln::image2d<double> component_tree<void>::saliency(mln::image2d<int> node_map, ::ranges::span<double> values) const
   {
-    auto lca = [parent=parent, d=compute_depth()](int a, int b) {
-      while (a != b)
-      {
-        if (d[a] < d[b])
-          b = parent[b];
-        else if (d[a] > d[b])
-          a = parent[a];
-        else
-        {
-          a = parent[a];
-          b = parent[b];
-        }
-      }
-      return b;
-    };
+    const auto lca = mln::morpho::lca(*this);
 
     const auto   kwidth  = node_map.width() * 2 - 1;
     const auto   kheight = node_map.height() * 2 - 1;

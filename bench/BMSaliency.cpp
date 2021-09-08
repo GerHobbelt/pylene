@@ -11,44 +11,10 @@
 #include <benchmark/benchmark.h>
 
 /**
- * Simple LCA implementation, without any optimizations
- */
-class SimpleLCA
-{
-public:
-  SimpleLCA(const mln::morpho::component_tree<void>& ct)
-    : t(ct)
-    , d(t.compute_depth())
-  {
-  }
-
-  int operator()(int a, int b) const
-  {
-    while (a != b)
-    {
-      if (d[a] < d[b])
-        b = t.parent[b];
-      else if (d[a] > d[b])
-        a = t.parent[a];
-      else
-      {
-        a = t.parent[a];
-        b = t.parent[b];
-      }
-    }
-    return b;
-  }
-
-private:
-  const mln::morpho::component_tree<void>& t;
-  const std::vector<int>                   d;
-};
-
-/**
  * Saliency function to be used with several LCA
  */
-template <typename LCA, typename V>
-auto saliency(const mln::morpho::component_tree<V>& t, mln::image2d<int> node_map)
+template <typename LCA>
+auto saliency(const mln::morpho::component_tree<double>& t, mln::image2d<int> node_map)
 {
   LCA lca(t);
 
@@ -86,7 +52,7 @@ auto saliency(const mln::morpho::component_tree<V>& t, mln::image2d<int> node_ma
 }
 
 static const std::vector<std::string> filenames{"Aerial_view_of_Olbia.jpg", "Space1_20MB.jpg",
-                                                "BDCN_pretrain_best_val.png"};
+                                                /*"BDCN_pretrain_best_val.png"*/};
 
 class BMSaliency : public benchmark::Fixture
 {
@@ -132,32 +98,49 @@ std::vector<mln::image2d<int>>                   BMSaliency::m_nodemaps;
 
 BENCHMARK_F(BMSaliency, SimpleLCA_Olbia)(benchmark::State& st)
 {
-  run<SimpleLCA>(st, 0);
+  run<mln::morpho::simple_lca>(st, 0);
+}
+
+BENCHMARK_F(BMSaliency, SparseTableLCA_Olbia)(benchmark::State& st)
+{
+  run<mln::morpho::lca<mln::morpho::details::rmq_sparse_table>>(st, 0);
 }
 
 BENCHMARK_F(BMSaliency, LinearLCA_Olbia)(benchmark::State& st)
 {
-  run<mln::morpho::lca>(st, 0);
+  run<mln::morpho::lca<>>(st, 0);
 }
 
 BENCHMARK_F(BMSaliency, SimpleLCA_Space)(benchmark::State& st)
 {
-  run<SimpleLCA>(st, 1);
+  run<mln::morpho::simple_lca>(st, 1);
 }
+
+// Segfault on my machine (use too much memory)
+/*BENCHMARK_F(BMSaliency, SparseTableLCA_Space)(benchmark::State& st)
+{
+  run<mln::morpho::lca<mln::morpho::details::rmq_sparse_table>>(st, 1);
+}*/
 
 BENCHMARK_F(BMSaliency, LinearLCA_Space)(benchmark::State& st)
 {
-  run<mln::morpho::lca>(st, 1);
+  run<mln::morpho::lca<>>(st, 1);
 }
 
-BENCHMARK_F(BMSaliency, SimpleLCA_Map)(benchmark::State& st)
+// We do not have this file for the bench
+/*BENCHMARK_F(BMSaliency, SimpleLCA_Map)(benchmark::State& st)
 {
-  run<SimpleLCA>(st, 2);
+  run<mln::morpho::simple_lca>(st, 2);
+}
+
+BENCHMARK_F(BMSaliency, SparseTableLCA_Map)(benchmark::State& st)
+{
+  run<mln::morpho::lca<mln::morpho::details::rmq_sparse_table>>(st, 2);
 }
 
 BENCHMARK_F(BMSaliency, LinearLCA_Map)(benchmark::State& st)
 {
-  run<mln::morpho::lca>(st, 2);
-}
+  run<mln::morpho::lca<>>(st, 2);
+}*/
 
 BENCHMARK_MAIN();

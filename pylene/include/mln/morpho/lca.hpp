@@ -89,12 +89,36 @@ namespace mln::morpho
     };
   } // namespace details
 
-  class lca
+  class simple_lca
   {
   public:
+    explicit simple_lca(const component_tree<void>& ct) noexcept;
+
+    simple_lca() = delete;
+    simple_lca(const simple_lca&) = delete;
+    simple_lca(simple_lca&&) = delete;
+    simple_lca& operator=(const simple_lca&) = delete;
+    simple_lca& operator=(simple_lca&&) = delete;
+
+    int operator()(int a, int b) const noexcept;
+
+  private:
+    const std::vector<int>      m_D;
+    const component_tree<void>& m_t;
+  };
+
+  template <typename RMQ>
+  class lca;
+
+  template <>
+  class lca<void>
+  {
+  protected:
     lca()           = delete;
     lca(const lca&) = delete;
+    lca(lca&&)      = delete;
     lca& operator=(const lca&) = delete;
+    lca& operator=(lca&&) = delete;
 
     // Constructor (preprocess the LCA from a tree)
     explicit lca(const component_tree<void>& t) noexcept;
@@ -102,13 +126,56 @@ namespace mln::morpho
     // Destructor (Deallocate the Euler tour tables)
     ~lca() noexcept;
 
+  private:
+    int* m_memory = nullptr;
+
+  protected:
+    int* m_E = nullptr; ///< Euler tour
+    int* m_D = nullptr; ///< Depth of each node in the Euler tour
+    int* m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
+  };
+
+  template <typename RMQ = mln::morpho::details::restricted_rmq>
+  class lca : public lca<void>
+  {
+    using base_t = lca<void>;
+
+  public:
+    lca()           = delete;
+    lca(const lca&) = delete;
+    lca(lca&&)      = delete;
+    lca& operator=(const lca&) = delete;
+    lca& operator=(lca&&) = delete;
+
+    // Constructor (preprocess the LCA from a tree)
+    explicit lca(const component_tree<void>& t) noexcept;
+
     int operator()(int a, int b) const noexcept;
 
   private:
-    int*                    m_memory = nullptr;
-    int*                    m_E      = nullptr; ///< Euler tour
-    int*                    m_D      = nullptr; ///< Depth of each node in the Euler tour
-    int*                    m_R = nullptr; ///< Representative of each node in the Euler tour (first pass on a node)
-    details::restricted_rmq m_rmq;         ///< RMQ implementation in the LCA
+    RMQ m_rmq;
   };
+
+  /*
+   * Implementation
+   */
+
+  template <typename RMQ>
+  lca<RMQ>::lca(const component_tree<void>& t) noexcept
+    : base_t(t)
+  {
+    m_rmq.preprocess(m_D, 2 * t.parent.size() - 1);
+  }
+
+  template <typename RMQ>
+  int lca<RMQ>::operator()(int a, int b) const noexcept
+  {
+    int ar = m_R[a];
+    int br = m_R[b];
+
+    if (ar > br)
+      std::swap(ar, br);
+
+    return m_E[m_rmq(ar, br)];
+  }
 } // namespace mln::morpho

@@ -106,21 +106,23 @@ namespace mln::morpho
 
       // Computation of the left RMQ
       if (a_mod > 0)
-        min = a_block * m_block_size + m_in_block_tables[m_map_in_block_table[a_block] * squared_block_size + (a_mod + 1) * m_block_size - 1];
+        min = a_block * m_block_size +
+              m_in_block_tables[m_map_in_block_table[a_block] * squared_block_size + (a_mod + 1) * m_block_size - 1];
 
       // Computation of the middle RMQ
-      const int left = a_block + (a_mod == 0 ? 0 : 1);
+      const int left  = a_block + (a_mod == 0 ? 0 : 1);
       const int right = b_block - (b_mod == m_block_size - 1 ? 0 : 1);
       if (left <= right)
       {
         const int mid_ind = m_rmq_block_index[m_rmq_blocks(left, right)];
-        min = min > -1 ? (m_table[mid_ind] < m_table[min] ? mid_ind : min) : mid_ind;
+        min               = min > -1 ? (m_table[mid_ind] < m_table[min] ? mid_ind : min) : mid_ind;
       }
 
       // Computation of the right RMQ
       if (b_mod < m_block_size - 1)
       {
-        const int right_ind = b_block * m_block_size + m_in_block_tables[m_map_in_block_table[b_block] * squared_block_size + b_mod];
+        const int right_ind =
+            b_block * m_block_size + m_in_block_tables[m_map_in_block_table[b_block] * squared_block_size + b_mod];
         min = min > -1 ? (m_table[right_ind] < m_table[min] ? right_ind : min) : right_ind;
       }
       return min;
@@ -185,12 +187,40 @@ namespace mln::morpho
   } // namespace details
 
   /*
+   * Simple LCA implementation
+   */
+  simple_lca::simple_lca(const component_tree<void>& ct) noexcept
+    : m_D(std::move(ct.compute_depth()))
+    , m_t(ct)
+  {
+  }
+
+  int simple_lca::operator()(int a, int b) const noexcept
+  {
+    while (a != b)
+    {
+      if (m_D[a] < m_D[b])
+        b = m_t.parent[b];
+      else if (m_D[a] > m_D[b])
+        a = m_t.parent[a];
+      else
+      {
+        a = m_t.parent[a];
+        b = m_t.parent[b];
+      }
+    }
+    return b;
+  }
+
+  /*
    * LCA implementation
    */
-  lca::lca(const component_tree<void>& t) noexcept
+  lca<void>::lca(const component_tree<void>& t) noexcept
   {
+    mln_precondition(t.parent.size() > 0);
+
     const int num_node = static_cast<int>(t.parent.size());
-    m_memory = (int*)std::malloc((5 * num_node - 2) * sizeof(int));
+    m_memory           = (int*)std::malloc((5 * num_node - 2) * sizeof(int));
     m_E                = m_memory;
     m_D                = m_memory + (2 * num_node - 1);
     m_R                = m_memory + (4 * num_node - 2);
@@ -217,7 +247,7 @@ namespace mln::morpho
 
     // Second pass : computation of the Euler tour
     std::memset(m_R, -1, num_node * sizeof(int));
-    int             i = 0;
+    int                               i = 0;
     std::stack<int, std::vector<int>> st;
     st.push(0);
     while (!st.empty())
@@ -239,23 +269,7 @@ namespace mln::morpho
     }
 
     std::free(children_info);
-
-    m_rmq.preprocess(m_D, 2 * num_node - 1);
   }
 
-  lca::~lca() noexcept
-  {
-    std::free(m_memory);
-  }
-
-  int lca::operator()(int a, int b) const noexcept
-  {
-    int ar = m_R[a];
-    int br = m_R[b];
-
-    if (ar > br)
-      std::swap(ar, br);
-
-    return m_E[m_rmq(ar, br)];
-  }
+  lca<void>::~lca() noexcept { std::free(m_memory); }
 } // namespace mln::morpho

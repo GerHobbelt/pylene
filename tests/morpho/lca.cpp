@@ -100,3 +100,43 @@ TEST(Morpho, LinearLCA)
       ASSERT_EQ(lca(i, j), expected[exp_ind++]);
   }
 }
+
+TEST(Morpho, DynSimpleLCA)
+{
+  // Setup data
+  mln::morpho::component_tree<void> t;
+  t.parent             = std::vector<int>{0, 0, 0, 1, 1, 1, 2, 2};
+  const int expected[] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 2, 0, 0,
+                          0, 2, 2, 3, 1, 1, 0, 0, 4, 1, 0, 0, 5, 0, 0, 6, 2, 7};
+
+  // Setup LCA
+  mln::morpho::dyn_lca lca(mln::morpho::dyn_lca::kind::SIMPLE, t);
+
+  // Test
+  int exp_ind = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    for (int j = i; j < 8; j++)
+      ASSERT_EQ(lca(i, j), expected[exp_ind++]);
+  }
+}
+
+TEST(Morpho, DynLinearLCA)
+{
+  // Setup data
+  mln::morpho::component_tree<void> t;
+  t.parent             = std::vector<int>{0, 0, 0, 1, 1, 1, 2, 2};
+  const int expected[] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 2, 0, 0,
+                          0, 2, 2, 3, 1, 1, 0, 0, 4, 1, 0, 0, 5, 0, 0, 6, 2, 7};
+
+  // Setup LCA
+  mln::morpho::dyn_lca lca(mln::morpho::dyn_lca::kind::LINEAR, t);
+
+  // Test
+  int exp_ind = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    for (int j = i; j < 8; j++)
+      ASSERT_EQ(lca(i, j), expected[exp_ind++]);
+  }
+}

@@ -295,17 +295,36 @@ to make an horizontal cut of this tree.
     :param levels: (Optional) The altitude of each node in the tree (for example the :math:`\alpha` associated to each node for the alphatree).
 
 Saliency Computation
---------------
+--------------------
+
 It is also possible to compute the saliency map to obtain another visualization.
 
-.. cpp:function:: auto saliency(image2d<int> node_map, ranges::span<double> values) const
+The saliency map can be computed using different Lowest Common Ancestor (or LCA) algorithm (see here), depending of the application.
+
+SAL_SIMPLE_LCA
+
+    Use the naive LCA.
+
+SAL_LINEAR_LCA
+
+    Use an algorithm preprocessing the tree in :math:`O(n)` and querying the LCA in :math:`O(1)`.
+
+.. cpp:function:: auto saliency(ct_saliency meth, image2d<int> node_map, ranges::span<double> values) const
 
     Compute and return the saliency map of the tree. **Works only for 2D images and with tree node values of type** ``double``.
 
+    :param meth: The method to use to compute the saliency map (see above).
     :param node_map: An image thats maps ``point -> node id``
     :param values: the levels of the tree for each node
 
     :return: The saliency map as an image
+
+    .. rubric:: Example
+
+    Saliency map of an image::
+
+        auto [t, nodemap] = ...; // Tree computation
+        auto saliency = t.saliency(SAL_SIMPLE_LCA, nodemap, ranges::make_span(t.values.data(), t.values.size()));
 
 .. list-table::
 

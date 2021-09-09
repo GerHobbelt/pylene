@@ -45,6 +45,7 @@ Component Trees & Hierarchical Representations
     :maxdepth: 1
 
     morpho/component_tree
+    morpho/lca
     morpho/maxtree
     morpho/tos
     morpho/alphatree

@@ -135,7 +135,7 @@ namespace mln::morpho
       m_map_in_block_table = (int*)std::malloc(m_num_block * sizeof(int));
       m_rmq_block_value    = (int*)std::malloc(m_num_block * sizeof(int));
       m_rmq_block_index    = (int*)std::malloc(m_num_block * sizeof(int));
-      std::memset(m_in_block_tables, -1, std::pow(2, m_block_size - 1) * squared_block_size * sizeof(int));
+      std::fill(m_in_block_tables, m_in_block_tables + static_cast<int>(std::pow(2, m_block_size - 1)) * squared_block_size, -1);
 
       for (int i = 0; i < n; i += m_block_size)
       {
@@ -230,7 +230,7 @@ namespace mln::morpho
     const int last_child_offset   = num_node;
     const int next_sibling_offset = 2 * num_node;
 
-    std::memset(children_info, -1, num_node * sizeof(int));
+    std::fill(children_info, children_info + num_node, -1);
 
     for (int n = 1; n < num_node; n++)
     {
@@ -246,7 +246,7 @@ namespace mln::morpho
     }
 
     // Second pass : computation of the Euler tour
-    std::memset(m_R, -1, num_node * sizeof(int));
+    std::fill(m_R, m_R + num_node, -1);
     int                               i = 0;
     std::stack<int, std::vector<int>> st;
     st.push(0);

@@ -51,23 +51,22 @@ auto saliency(const mln::morpho::component_tree<double>& t, mln::image2d<int> no
   return res;
 }
 
-static const std::vector<std::string> filenames{"Aerial_view_of_Olbia.jpg", "Space1_20MB.jpg",
-                                                "BDCN_pretrain_best_val.png"};
+static const std::string filenames[]    = {"Aerial_view_of_Olbia.jpg", "Space1_20MB.jpg", "BDCN_pretrain_best_val.png"};
+static constexpr std::size_t num_images = 3;
 
 class BMSaliency : public benchmark::Fixture
 {
 public:
   BMSaliency()
   {
-    if (m_trees.empty())
+    if (m_trees[0].parent.empty())
     {
-      m_trees         = std::vector<mln::morpho::component_tree<double>>(filenames.size());
-      m_nodemaps      = std::vector<mln::image2d<int>>(filenames.size());
       const auto d    = [](auto a, auto b) -> double { return mln::functional::l2dist(a, b); };
       const auto attr = [](auto tree, auto nm) {
-        return tree.compute_attribute_on_points(nm, mln::accu::features::count<double>());
+        auto tmp = tree.compute_attribute_on_points(nm, mln::accu::features::count<std::size_t>());
+        return std::vector<double>(tmp.begin(), tmp.end());
       };
-      for (std::size_t i = 0; i < filenames.size(); i++)
+      for (std::size_t i = 0; i < num_images; i++)
       {
         mln::ndbuffer_image ima_dyn = mln::io::imread(filenames[i]);
         if (ima_dyn.sample_type() == mln::sample_type_id::UINT8)
@@ -90,12 +89,12 @@ public:
   }
 
 protected:
-  static std::vector<mln::morpho::component_tree<double>> m_trees;
-  static std::vector<mln::image2d<int>>                   m_nodemaps;
+  static mln::morpho::component_tree<double> m_trees[num_images];
+  static mln::image2d<int>                   m_nodemaps[num_images];
 };
 
-std::vector<mln::morpho::component_tree<double>> BMSaliency::m_trees;
-std::vector<mln::image2d<int>>                   BMSaliency::m_nodemaps;
+mln::morpho::component_tree<double> BMSaliency::m_trees[num_images];
+mln::image2d<int>                   BMSaliency::m_nodemaps[num_images];
 
 BENCHMARK_F(BMSaliency, SimpleLCA_Olbia)(benchmark::State& st)
 {
@@ -115,13 +114,15 @@ BENCHMARK_F(BMSaliency, LinearLCA_Olbia)(benchmark::State& st)
 BENCHMARK_F(BMSaliency, SimpleDynLCA_Olbia)(benchmark::State& st)
 {
   for (auto _ : st)
-    m_trees[0].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[0], ::ranges::make_span(m_trees[0].values.data(), m_trees[0].values.size()));
+    m_trees[0].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[0],
+                        ::ranges::make_span(m_trees[0].values.data(), m_trees[0].values.size()));
 }
 
 BENCHMARK_F(BMSaliency, LinearDynLCA_Olbia)(benchmark::State& st)
 {
   for (auto _ : st)
-    m_trees[0].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[0], ::ranges::make_span(m_trees[0].values.data(), m_trees[0].values.size()));
+    m_trees[0].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[0],
+                        ::ranges::make_span(m_trees[0].values.data(), m_trees[0].values.size()));
 }
 
 BENCHMARK_F(BMSaliency, SimpleLCA_Space)(benchmark::State& st)
@@ -143,13 +144,15 @@ BENCHMARK_F(BMSaliency, LinearLCA_Space)(benchmark::State& st)
 BENCHMARK_F(BMSaliency, SimpleDynLCA_Space)(benchmark::State& st)
 {
   for (auto _ : st)
-    m_trees[1].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+    m_trees[1].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[1],
+                        ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
 }
 
 BENCHMARK_F(BMSaliency, LinearDynLCA_Space)(benchmark::State& st)
 {
   for (auto _ : st)
-    m_trees[1].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+    m_trees[1].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1],
+                        ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
 }
 
 BENCHMARK_F(BMSaliency, SimpleLCA_Map)(benchmark::State& st)
@@ -170,13 +173,15 @@ BENCHMARK_F(BMSaliency, LinearLCA_Map)(benchmark::State& st)
 BENCHMARK_F(BMSaliency, SimpleDynLCA_Map)(benchmark::State& st)
 {
   for (auto _ : st)
-    m_trees[2].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+    m_trees[2].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[1],
+                        ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
 }
 
 BENCHMARK_F(BMSaliency, LinearDynLCA_Map)(benchmark::State& st)
 {
   for (auto _ : st)
-    m_trees[2].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+    m_trees[2].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1],
+                        ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
 }
 
 BENCHMARK_MAIN();

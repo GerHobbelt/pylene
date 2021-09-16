@@ -52,7 +52,7 @@ auto saliency(const mln::morpho::component_tree<double>& t, mln::image2d<int> no
 }
 
 static const std::vector<std::string> filenames{"Aerial_view_of_Olbia.jpg", "Space1_20MB.jpg",
-                                                /*"BDCN_pretrain_best_val.png"*/};
+                                                "BDCN_pretrain_best_val.png"};
 
 class BMSaliency : public benchmark::Fixture
 {
@@ -78,6 +78,7 @@ public:
               mln::morpho::watershed_hierarchy(*(ima_dyn.cast_to<mln::rgb8, 2>()), attr, mln::c4, d);
       }
     }
+    this->Iterations(20);
     this->Unit(benchmark::kSecond);
   }
 
@@ -151,8 +152,7 @@ BENCHMARK_F(BMSaliency, LinearDynLCA_Space)(benchmark::State& st)
     m_trees[1].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
 }
 
-// We do not have this file for the bench
-/*BENCHMARK_F(BMSaliency, SimpleLCA_Map)(benchmark::State& st)
+BENCHMARK_F(BMSaliency, SimpleLCA_Map)(benchmark::State& st)
 {
   run<mln::morpho::simple_lca>(st, 2);
 }
@@ -165,8 +165,18 @@ BENCHMARK_F(BMSaliency, SparseTableLCA_Map)(benchmark::State& st)
 BENCHMARK_F(BMSaliency, LinearLCA_Map)(benchmark::State& st)
 {
   run<mln::morpho::lca<>>(st, 2);
-}*/
+}
 
+BENCHMARK_F(BMSaliency, SimpleDynLCA_Map)(benchmark::State& st)
+{
+  for (auto _ : st)
+    m_trees[2].saliency(mln::morpho::SAL_SIMPLE_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+}
 
+BENCHMARK_F(BMSaliency, LinearDynLCA_Map)(benchmark::State& st)
+{
+  for (auto _ : st)
+    m_trees[2].saliency(mln::morpho::SAL_LINEAR_LCA, m_nodemaps[1], ::ranges::make_span(m_trees[1].values.data(), m_trees[1].values.size()));
+}
 
 BENCHMARK_MAIN();

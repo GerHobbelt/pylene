@@ -32,7 +32,8 @@ class Pylene(ConanFile):
         "fmt/6.0.0",
         "tbb/2020.0",
         "xsimd/7.4.6",
-        "boost/1.75.0"
+        "boost/1.75.0",
+        "cfitsio/4.0.0"
     ]
 
     def _build_python(self):
@@ -71,13 +72,21 @@ class Pylene(ConanFile):
         self.cpp_info.components["Core"].includedirs = ["include"]
         self.cpp_info.components["Core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
 
-        # IO component
+        # IO component (FreeImage)
         self.cpp_info.components["IO-freeimage"].system_libs.append("freeimage")
         self.cpp_info.components["IO-freeimage"].names["cmake_find_package"] = "IO-freeimage"
         self.cpp_info.components["IO-freeimage"].names["cmake_find_package_multi"] = "IO-freeimage"
         self.cpp_info.components["IO-freeimage"].libs = ["Pylene-io-freeimage"]
         self.cpp_info.components["IO-freeimage"].includedirs = ["include"]
         self.cpp_info.components["IO-freeimage"].requires = ["Core"]
+
+        # IO component (cfitsio)
+        self.cpp_info.components["IO-fits"].names["cmake_find_package"] = "IO-fits"
+        self.cpp_info.components["IO-fits"].names["cmake_find_package_multi"] = "IO-fits"
+        self.cpp_info.components["IO-fits"].libs = ["Pylene-io-fits"]
+        self.cpp_info.components["IO-fits"].includedirs = ["include"]
+        self.cpp_info.components["IO-fits"].requires = ["Core", "cfitsio::cfitsio"]
+
 
         # Pylene-numpy component
         if self._build_python():

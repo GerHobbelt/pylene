@@ -107,13 +107,14 @@ add_library(Pylene-io-fits)
 add_library(Pylene::IO-fits ALIAS Pylene-io-fits)
 target_sources(Pylene-io-fits PRIVATE
                src/io/cfitsio_plugin.cpp
+               src/io/io.cpp
 )
 target_compile_features(Pylene-io-fits PUBLIC cxx_std_20)
 target_include_directories(Pylene-io-fits PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(Pylene-io-freeimage PUBLIC cfitsio::cfitsio Pylene-core)
+target_link_libraries(Pylene-io-fits PUBLIC cfitsio::cfitsio Pylene-core)
 
 # Compiler configurations
 target_compile_features(Pylene-core PUBLIC cxx_std_20)

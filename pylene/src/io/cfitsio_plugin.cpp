@@ -98,7 +98,7 @@ namespace mln::io::fits
       int ndim;
       fits_get_img_dim(file, &ndim, &status);
       if (ndim == 0 || ndim > 4)
-        throw std::runtime_error(fmt::format("Unhandled image number of dimension (Got {}, expected in [1 - 4]", ndim));
+        throw std::runtime_error(fmt::format("Unhandled image number of dimension (Got {}, expected in [1 - 4])", ndim));
 
       // Get the dimensions
       long dims[4];

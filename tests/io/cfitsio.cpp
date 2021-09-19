@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cstring>
+
 static const auto filename = fixtures::ImagePath::concat_with_filename("test.fit");
 
 TEST(IO, cfitsio_not_an_image)
@@ -16,9 +18,10 @@ TEST(IO, cfitsio_not_an_image)
     auto img = mln::io::fits::imread(filename, 0);
     (void)img;
   }
-  catch (std::runtime_error&)
+  catch (std::runtime_error& e)
   {
     has_raised = true;
+    ASSERT_TRUE(std::strcmp("Unhandled image number of dimension (Got 0, expected in [1 - 4])",e.what()) == 0);
   }
   ASSERT_TRUE(has_raised);
 }

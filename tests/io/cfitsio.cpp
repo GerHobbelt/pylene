@@ -21,7 +21,7 @@ TEST(IO, cfitsio_not_an_image)
   catch (std::runtime_error& e)
   {
     has_raised = true;
-    ASSERT_TRUE(std::strcmp("Unhandled image number of dimension (Got 0, expected in [1 - 4])",e.what()) == 0);
+    ASSERT_EQ(std::strcmp("Unhandled image number of dimension (Got 0, expected in [1 - 4])", e.what()), 0);
   }
   ASSERT_TRUE(has_raised);
 }
@@ -37,10 +37,10 @@ TEST(IO, cfitsio_2D_uint8)
   };
 
   auto img = mln::io::fits::imread(filename, 1);
-  ASSERT_TRUE(img.sample_type() == mln::sample_type_id::UINT8);
-  ASSERT_TRUE(img.pdim() == 2);
-  ASSERT_TRUE(img.width() == 5);
-  ASSERT_TRUE(img.height() == 5);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::UINT8);
+  ASSERT_EQ(img.pdim(), 2);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
 
   auto* casted = img.cast_to<std::uint8_t, 2>();
   ASSERT_IMAGES_EQ_EXP(*casted, ref);
@@ -57,10 +57,10 @@ TEST(IO, cfitsio_2D_int16)
   };
 
   auto img = mln::io::fits::imread(filename, 2);
-  ASSERT_TRUE(img.sample_type() == mln::sample_type_id::INT16);
-  ASSERT_TRUE(img.pdim() == 2);
-  ASSERT_TRUE(img.width() == 5);
-  ASSERT_TRUE(img.height() == 5);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::INT16);
+  ASSERT_EQ(img.pdim(), 2);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
 
   auto* casted = img.cast_to<std::int16_t, 2>();
   ASSERT_IMAGES_EQ_EXP(*casted, ref);
@@ -77,10 +77,10 @@ TEST(IO, cfitsio_2D_int32)
   };
 
   auto img = mln::io::fits::imread(filename, 3);
-  ASSERT_TRUE(img.sample_type() == mln::sample_type_id::INT32);
-  ASSERT_TRUE(img.pdim() == 2);
-  ASSERT_TRUE(img.width() == 5);
-  ASSERT_TRUE(img.height() == 5);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::INT32);
+  ASSERT_EQ(img.pdim(), 2);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
 
   auto* casted = img.cast_to<std::int32_t, 2>();
   ASSERT_IMAGES_EQ_EXP(*casted, ref);
@@ -97,10 +97,10 @@ TEST(IO, cfitsio_2D_int64)
   };
 
   auto img = mln::io::fits::imread(filename, 4);
-  ASSERT_TRUE(img.sample_type() == mln::sample_type_id::INT64);
-  ASSERT_TRUE(img.pdim() == 2);
-  ASSERT_TRUE(img.width() == 5);
-  ASSERT_TRUE(img.height() == 5);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::INT64);
+  ASSERT_EQ(img.pdim(), 2);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
 
   auto* casted = img.cast_to<std::int64_t, 2>();
   ASSERT_IMAGES_EQ_EXP(*casted, ref);
@@ -117,10 +117,10 @@ TEST(IO, cfitsio_2D_float)
   };
 
   auto img = mln::io::fits::imread(filename, 5);
-  ASSERT_TRUE(img.sample_type() == mln::sample_type_id::FLOAT);
-  ASSERT_TRUE(img.pdim() == 2);
-  ASSERT_TRUE(img.width() == 5);
-  ASSERT_TRUE(img.height() == 5);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::FLOAT);
+  ASSERT_EQ(img.pdim(), 2);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
 
   auto* casted = img.cast_to<float, 2>();
   ASSERT_IMAGES_EQ_EXP(*casted, ref);
@@ -137,11 +137,44 @@ TEST(IO, cfitsio_2D_double)
   };
 
   auto img = mln::io::fits::imread(filename, 6);
-  ASSERT_TRUE(img.sample_type() == mln::sample_type_id::DOUBLE);
-  ASSERT_TRUE(img.pdim() == 2);
-  ASSERT_TRUE(img.width() == 5);
-  ASSERT_TRUE(img.height() == 5);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::DOUBLE);
+  ASSERT_EQ(img.pdim(), 2);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
 
   auto* casted = img.cast_to<double, 2>();
   ASSERT_IMAGES_EQ_EXP(*casted, ref);
+}
+
+TEST(IO, cfitsio_3D)
+{
+  auto img = mln::io::fits::imread(filename, 7);
+  ASSERT_EQ(img.sample_type(), mln::sample_type_id::UINT8);
+  ASSERT_EQ(img.pdim(), 3);
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 4);
+
+  auto* casted = img.cast_to<std::uint8_t, 3>();
+  int   cur    = 0;
+  mln_foreach (auto p, casted->domain())
+    ASSERT_EQ(casted->operator()(p), cur++);
+}
+
+TEST(IO, cfitsio_read_to_argument)
+{
+  mln::image2d<std::uint8_t> ref = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 11, 12, 13, 14}, //
+      {15, 16, 17, 18, 19}, //
+      {20, 21, 22, 23, 24}  //
+  };
+
+  mln::image2d<std::uint8_t> img;
+  mln::io::fits::imread(filename, img, 1);
+
+  ASSERT_EQ(img.width(), 5);
+  ASSERT_EQ(img.height(), 5);
+
+  ASSERT_IMAGES_EQ_EXP(img, ref);
 }

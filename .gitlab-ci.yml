@@ -67,6 +67,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
+        - conan remote list
         - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
         - cmake --build . --target Pylene-core

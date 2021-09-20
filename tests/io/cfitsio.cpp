@@ -10,22 +10,6 @@
 
 static const auto filename = fixtures::ImagePath::concat_with_filename("test.fit");
 
-TEST(IO, cfitsio_not_an_image)
-{
-  bool has_raised = false;
-  try
-  {
-    auto img = mln::io::fits::imread(filename, 0);
-    (void)img;
-  }
-  catch (std::runtime_error& e)
-  {
-    has_raised = true;
-    ASSERT_EQ(std::strcmp("Unhandled image number of dimension (Got 0, expected in [1 - 4])", e.what()), 0);
-  }
-  ASSERT_TRUE(has_raised);
-}
-
 TEST(IO, cfitsio_2D_uint8)
 {
   mln::image2d<std::uint8_t> ref = {

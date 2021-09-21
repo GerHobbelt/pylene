@@ -24,7 +24,7 @@ class Pylene(ConanFile):
 
     build_requires = [
         #"gtest/[>=1.10]",
-        "gtest/1.10.0"
+        "gtest/1.10.0",
         "benchmark/[>=1.5.0]",
     ]
 

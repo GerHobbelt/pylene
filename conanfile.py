@@ -23,7 +23,7 @@ class Pylene(ConanFile):
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     build_requires = [
-        "gtest/[>=1.10]",
+        "gtest/1.10.0",
         "benchmark/[>=1.5.0]",
 
         # For now boost is too heavy and is not based on components

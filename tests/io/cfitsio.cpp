@@ -1,5 +1,5 @@
 #include <mln/core/image/ndimage.hpp>
-#include <mln/io/imread.hpp>
+#include <mln/io/fits/imread.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <fixtures/ImagePath/image_path.hpp>

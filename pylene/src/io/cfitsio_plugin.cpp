@@ -1,6 +1,6 @@
 #include <mln/core/image/ndimage.hpp>
 
-#include <mln/io/imread.hpp>
+#include <mln/io/fits/imread.hpp>
 #include <mln/io/private/cfitsio_plugin.hpp>
 #include <mln/io/private/io.hpp>
 

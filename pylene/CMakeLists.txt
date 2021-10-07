@@ -7,6 +7,7 @@ find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
+find_package(cfitsio)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
@@ -95,12 +96,27 @@ target_sources(Pylene-io-freeimage PRIVATE
                src/io/imread.cpp
                src/io/io.cpp            
 )
-target_compile_features(Pylene-io-freeimage PUBLIC cxx_std_20)
 target_include_directories(Pylene-io-freeimage PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(Pylene-io-freeimage PUBLIC FreeImage::FreeImage Pylene-core)
+target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
+target_link_libraries(Pylene-io-freeimage PRIVATE FreeImage::FreeImage)
+
+if (cfitsio_FOUND)
+  add_library(Pylene-io-fits)
+  add_library(Pylene::IO-fits ALIAS Pylene-io-fits)
+  target_sources(Pylene-io-fits PRIVATE
+                 src/io/cfitsio_plugin.cpp
+                 src/io/io.cpp
+  )
+  target_include_directories(Pylene-io-fits PUBLIC
+                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                             $<INSTALL_INTERFACE:include>
+  )
+  target_link_libraries(Pylene-io-fits PUBLIC Pylene-core)
+  target_link_libraries(Pylene-io-fits PRIVATE cfitsio::cfitsio)
+endif(cfitsio_FOUND)
 
 # Compiler configurations
 target_compile_features(Pylene-core PUBLIC cxx_std_20)

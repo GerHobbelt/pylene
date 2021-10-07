@@ -1,8 +1,8 @@
 #include <mln/io/imread.hpp>
 
-#include <mln/io/private/io.hpp>
-#include <mln/io/private/freeimage_plugin.hpp>
 #include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/io/private/freeimage_plugin.hpp>
+#include <mln/io/private/io.hpp>
 
 namespace mln::io
 {
@@ -18,4 +18,4 @@ namespace mln::io
     internal::freeimage_reader_plugin p;
     internal::load(&p, filename.c_str(), out);
   }
-}
+} // namespace mln::io

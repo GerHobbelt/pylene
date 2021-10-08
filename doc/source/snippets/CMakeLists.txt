@@ -64,7 +64,7 @@ add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.pgm" watershed
 
 add_image("saliency_example" "${PYLENE_IMAGE_DIR}/lena.pgm" saliency_watershed.png)
 
-add_image("mtos_example" "${PYLENE_IMAGE_DIR}/lena.ppm" depth_map.png)
+add_image("mtos_example" "${PYLENE_IMAGE_DIR}/lena.ppm" depth_map.png mtos_rec.png)
 
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")

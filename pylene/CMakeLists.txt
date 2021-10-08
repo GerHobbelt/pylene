@@ -86,6 +86,7 @@ target_sources(Pylene-core PRIVATE
                src/morpho/hvector_unbounded.cpp
                src/morpho/immersion.cpp
                src/morpho/maxtree.cpp
+               src/morpho/satmaxtree.cpp
                src/morpho/trees_fusion.cpp
                src/morpho/unionfind.cpp
                )

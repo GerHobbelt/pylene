@@ -1,4 +1,4 @@
-#include <mln/accu/accumulators/mean.hpp>
+#include <mln/accu/accumulators/count.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/channel.hpp>
@@ -21,9 +21,10 @@ namespace
   {
     using result_type = decltype(std::declval<mln::rgb8>() + std::declval<mln::rgb8>());
   public:
-    void take(const mln::rgb8& v)
+    template <typename Pix>
+    void take(const Pix& pix)
     {
-      m_sum += v;
+      m_sum += pix.val();
       m_count++;
     }
 
@@ -60,14 +61,10 @@ namespace
     }
 
     std::sort(border.begin(), border.end(), [](const mln::rgb8& a, const mln::rgb8& b) {
-      for (int i = 0; i < 3; i++)
-      {
-        if (a[i] < b[i])
-          return true;
-        else if (b[i] < a[i])
-          return false;
-      }
-      return false;
+      int i = 0;
+      while (i < 3 && a[i] == b[i])
+        i++;
+      return i < 3 && a[i] < b[i];
     });
     mln::rgb8 med = border[border.size() / 2];
 
@@ -97,13 +94,13 @@ namespace
   /// \brief Reduce the size of a nodemap by a factor 2
   mln::image2d<int> reduce_nodemap(mln::image2d<int> n)
   {
-    mln::image2d<int> res((n.width() + 1) / 2, (n.height() + 1) / 2);
+    mln::image2d<int> res((n.width() + 3) / 4, (n.height() + 3) / 4);
 
     mln_foreach(auto p, n.domain())
     {
-      if (p[0] % 2 == 0 && p[1] % 2 == 0)
+      if (p[0] % 4 == 0 && p[1] % 4 == 0)
       {
-        res(mln::point2d{p[0] / 2, p[1] / 2}) = n(p);
+        res(mln::point2d{p[0] / 4, p[1] / 4}) = n(p);
       }
     }
 
@@ -145,11 +142,11 @@ int main(int argc, char* argv[])
   }
 
   auto [t, nm] = mln::morpho::details::satmaxtree(depth_map);
-  nm = reduce_nodemap(reduce_nodemap(nm));
+  nm = reduce_nodemap(nm);
+  auto mean = t.compute_attribute_on_pixels(nm, ima, mean_node_accu());
   auto area = t.compute_attribute_on_points(nm, mln::accu::accumulators::count<int>());
   t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 100; });
-  auto mean = t.compute_attribute_on_values(nm, ima, mean_node_accu());
-  auto rec = t.reconstruct_from(nm, ::ranges::make_span(mean.data(), mean.size()));
+  auto rec = t.reconstruct_from(nm, ranges::make_span(mean.data(), mean.size()));
   mln::io::imsave(mln::view::cast<mln::rgb8>(rec), argv[3]);
 
   return 0;

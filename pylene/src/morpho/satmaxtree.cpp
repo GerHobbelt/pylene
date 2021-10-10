@@ -19,7 +19,10 @@ namespace mln::morpho::details
     for (int i = 1; i < num_node; i++)
       t.values[i] += delta[i];
 
-    t.filter(CT_FILTER_DIRECT, nm, [&t](int a) { return t.values[a] > t.values[t.parent[a]] || t.parent[a] == 0; });
+    std::vector<bool> pred(t.parent.size());
+    for (int n = 1; n < (int)t.parent.size(); n++)
+      pred[n] = t.values[n] > t.values[t.parent[n]] || t.parent[n] == 0;
+    t.filter(CT_FILTER_DIRECT, nm, [&pred](int n) { return pred[n]; });
 
     return {std::move(t), std::move(nm)};
   }

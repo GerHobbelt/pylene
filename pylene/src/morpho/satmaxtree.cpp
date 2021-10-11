@@ -8,7 +8,7 @@ namespace mln::morpho::details
   {
     auto [t, nm] = mln::morpho::tos(depth_map, {0, 0});
 
-    const int                  num_node = t.parent.size();
+    const int                  num_node = static_cast<int>(t.parent.size());
     std::vector<std::uint16_t> delta(num_node, 0);
     for (int i = 1; i < num_node; i++)
     {

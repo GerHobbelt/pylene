@@ -83,17 +83,13 @@ namespace mln::morpho::details
   {
     std::vector<std::vector<int>> tree_to_graph(ntrees); // Link tree node -> graph node
     std::vector<std::set<int>>    graph(1); // The graph (the container of out vertices is a set since there can only be
-                                         // one edge between two nodes, with ensure faster result for removing)
-    // FIXME: to replace
-    // Graph routine, to make the code readable
-    const auto num_vertices = [&graph]() -> int { return graph.size(); };
-    const auto add_vertex   = [&graph]() -> int {
-      int n = graph.size();
+                                            // one edge between two nodes, with ensure faster result for removing)
+    
+    const auto add_vertex = [&graph]() -> int {
+      int n = static_cast<int>(graph.size());
       graph.push_back(std::set<int>());
       return n;
     };
-    const auto add_edge    = [&graph](int s, int t) { graph[s].insert(t); };
-    const auto remove_edge = [&graph](int s, int t) { graph[s].erase(t); };
 
     // Computing SES (the SES of one node in the same tree is itself)
     std::vector<std::vector<int>> ses(ntrees * ntrees);
@@ -171,11 +167,11 @@ namespace mln::morpho::details
       const auto& ti = trees[i];
       for (int n = 1; n < (int)ti.parent.size(); n++)
       {
-        add_edge(tree_to_graph[i][n], tree_to_graph[i][ti.parent[n]]);
+        graph[tree_to_graph[i][n]].insert(tree_to_graph[i][ti.parent[n]]);
         for (int j = 0; j < ntrees; j++)
         {
           if (i != j && ses[j * ntrees + i][ses[i * ntrees + j][n]] != n)
-            add_edge(tree_to_graph[i][n], tree_to_graph[j][ses[i * ntrees + j][n]]);
+            graph[tree_to_graph[i][n]].insert(tree_to_graph[j][ses[i * ntrees + j][n]]);
         }
       }
     }
@@ -187,7 +183,7 @@ namespace mln::morpho::details
         i++;
       return i == ntrees;
     };
-    for (int v = 0; v < num_vertices(); v++)
+    for (int v = 0; v < (int)graph.size(); v++)
     {
       std::set<int> to_remove;
       for (int d1 : graph[v])
@@ -199,7 +195,7 @@ namespace mln::morpho::details
         }
       }
       for (int e : to_remove)
-        remove_edge(v, e);
+        graph[v].erase(e);
     }
 
     return {std::move(graph), std::move(tree_to_graph)};

@@ -7,7 +7,8 @@ namespace mln::morpho::details
 {
   namespace
   {
-    std::vector<int> smallest_enclosing_shape(const auto& ti, auto ni, const auto& tj, auto nj, const auto& depth)
+    std::vector<int> smallest_enclosing_shape(const component_tree<>& ti, image2d<int> ni, const component_tree<>& tj,
+                                              image2d<int> nj, const std::vector<int>& depth)
     {
       const auto lca = [&depth, &tj](int a, int b) {
         if (a < 0)
@@ -43,7 +44,7 @@ namespace mln::morpho::details
       static constexpr int PERMANENT = 2;
 
       std::vector<int> res(g.size());
-      int              cur = g.size() - 1;
+      int              cur = static_cast<int>(g.size()) - 1;
 
       std::vector<int> visited(g.size(), UNMARKED);
       std::stack<int>  st;
@@ -81,8 +82,8 @@ namespace mln::morpho::details
   compute_inclusion_graph(component_tree<>* trees, image2d<int>* nodemaps, std::vector<int>* depths, int ntrees)
   {
     std::vector<std::vector<int>> tree_to_graph(ntrees); // Link tree node -> graph node
-    std::vector<std::set<int>> graph(1); // The graph (the container of out vertices is a set since there can only be one
-                                      // edge between two nodes, with ensure faster result for removing)
+    std::vector<std::set<int>>    graph(1); // The graph (the container of out vertices is a set since there can only be
+                                         // one edge between two nodes, with ensure faster result for removing)
     // FIXME: to replace
     // Graph routine, to make the code readable
     const auto num_vertices = [&graph]() -> int { return graph.size(); };

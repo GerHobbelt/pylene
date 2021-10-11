@@ -82,6 +82,14 @@ namespace
     return res;
   }
 
+  mln::image2d<int> remove_border(mln::image2d<int> n)
+  {
+    mln::image2d<int> res(n.width() - 2, n.height() - 2);
+    mln_foreach(auto p, res.domain())
+      res(p) = n(p + mln::point2d{1, 1});
+    return res;
+  }
+
   /// \brief Compute the maximum value of an image
   std::uint16_t max(mln::image2d<std::uint16_t> ima)
   {
@@ -118,7 +126,7 @@ int main(int argc, char* argv[])
 
   mln::image2d<mln::rgb8> ima;
   mln::io::imread(argv[1], ima);
-  ima = add_border(ima);
+  auto to_process = add_border(ima);
 
   mln::morpho::component_tree<> trees[3];
   mln::image2d<int>             nodemaps[3];
@@ -126,7 +134,7 @@ int main(int argc, char* argv[])
 
   for (int c = 0; c < 3; c++)
   {
-    std::tie(trees[c], nodemaps[c]) = mln::morpho::tos(mln::view::channel(ima, c), {0, 0});
+    std::tie(trees[c], nodemaps[c]) = mln::morpho::tos(mln::view::channel(to_process, c), {0, 0});
     depths[c]                       = trees[c].compute_depth();
   }
 
@@ -143,9 +151,10 @@ int main(int argc, char* argv[])
 
   auto [t, nm] = mln::morpho::details::satmaxtree(depth_map);
   nm = reduce_nodemap(nm);
-  auto mean = t.compute_attribute_on_pixels(nm, ima, mean_node_accu());
+  nm = remove_border(nm);
   auto area = t.compute_attribute_on_points(nm, mln::accu::accumulators::count<int>());
   t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 100; });
+  auto mean = t.compute_attribute_on_pixels(nm, ima, mean_node_accu());
   auto rec = t.reconstruct_from(nm, ranges::make_span(mean.data(), mean.size()));
   mln::io::imsave(mln::view::cast<mln::rgb8>(rec), argv[3]);
 

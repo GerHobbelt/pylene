@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
   nm = reduce_nodemap(nm);
   nm = remove_border(nm);
   auto area = t.compute_attribute_on_points(nm, mln::accu::accumulators::count<int>());
-  t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 200; });
+  t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 100; });
   auto mean = t.compute_attribute_on_values(nm, ima, mean_node_accu());
   auto rec = t.reconstruct_from(nm, ranges::make_span(mean.data(), mean.size()));
   mln::io::imsave(mln::view::cast<mln::rgb8>(rec), argv[3]);

@@ -84,7 +84,7 @@ namespace mln::morpho::details
     std::vector<std::vector<int>> tree_to_graph(ntrees); // Link tree node -> graph node
     std::vector<std::set<int>>    graph(1); // The graph (the container of out vertices is a set since there can only be
                                             // one edge between two nodes, with ensure faster result for removing)
-    
+
     const auto add_vertex = [&graph]() -> int {
       int n = static_cast<int>(graph.size());
       graph.push_back(std::set<int>());

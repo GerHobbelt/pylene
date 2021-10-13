@@ -16,18 +16,19 @@ Pylene.
 
     :param ima: The input image in RGB format.
     :param pstart: The rooting point
-    :return: A tree of type ``component_tree<void>`` (no values are related to the nodes of the tree since they do not have a unique value) and a map from image point to node tree.
+    :return: A tree of type ``component_tree<void>`` (no values are related to the nodes of the tree since they do not have a natural value) and a map from image point to node tree.
 
 Notes
 -----
 
 * Before computing the MToS, the user should add a border to the image, with the values of this border set to the median value of the border of the original image.
-* The MToS not having values related to the nodes, the user has to compute a value.
+* The resulting nodemap has a domain size of ``4d - 3`` with ``d`` the input image domain.
+* The MToS not having values related to the nodes, the user has to compute a value for each node, such as the mean of each node (as shown below in example with the ``mean_node_accu`` accumulator).
 
 Example
 -------
 
-This example computes a grain filter, which removes all the node which have an area inferior to 100.
+This example computes a grain filter, which removes all the node having an area inferior to 100.
 
     ::
 
@@ -105,7 +106,7 @@ This example computes a grain filter, which removes all the node which have an a
       - .. image:: /images/mtos_rec.png
            :width: 100%
 
-    * - The depth map resulting of the fusion of the trees
+    * - The depth map resulting of the fusion of the trees (see [Car15]_ for more details)
       - The reconstructed image from the filtered tree
 
 References

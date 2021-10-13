@@ -208,7 +208,7 @@ namespace mln::morpho::details
     std::vector<int>       graph_depth(graph.size(), -1);
     graph_depth[0] = 0;
 
-    // FIXME : Optimization removing the transpose (modify topo_sort)
+    /// FIXME: Optimization removing the transpose (modify topo_sort)
     std::vector<std::set<int>> gT(graph.size());
     for (int v = 0; v < (int)graph.size(); v++)
     {

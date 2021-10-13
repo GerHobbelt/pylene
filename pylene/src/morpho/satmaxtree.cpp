@@ -4,9 +4,9 @@
 
 namespace mln::morpho::details
 {
-  std::pair<component_tree<>, image2d<int>> satmaxtree(image2d<std::uint16_t> depth_map)
+  std::pair<component_tree<>, image2d<int>> satmaxtree(image2d<std::uint16_t> depth_map, point2d pstart)
   {
-    auto [t, nm] = mln::morpho::tos(depth_map, {0, 0});
+    auto [t, nm] = mln::morpho::tos(depth_map, pstart);
 
     const int                  num_node = static_cast<int>(t.parent.size());
     std::vector<std::uint16_t> delta(num_node, 0);

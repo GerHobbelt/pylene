@@ -21,8 +21,8 @@ Pylene.
 Notes
 -----
 
-* Before computing the MToS, the user should add a border to the image, with the values of this border set to the median value of the border of the original image
-* The resulting nodemap is sixteen times bigger than the original image. The user is advised to reduce the nodemap before doing any processing. (**FIXME** to keep ?)
+* Before computing the MToS, the user should add a border to the image, with the values of this border set to the median value of the border of the original image.
+* The MToS not having values related to the nodes, the user has to compute a value.
 
 Example
 -------
@@ -45,16 +45,14 @@ This example computes a grain filter, which removes all the node which have an a
         // Function to remove the border
         mln::image2d<int> remove_border(mln::image2d<int> n);
 
-        // Accumulator to compute the mean of each node, without taking into account the values of the holes
-        // (it only takes into account the value of the connected component related to a node)
+        // Accumulator to compute the mean of the pixel values of each node, without taking into account the values of the holes
         struct mean_node_accu : mln::Accumulator<mean_node_accu>
         {
           using result_type = decltype(std::declval<mln::rgb8>() + std::declval<mln::rgb8>());
         public:
-          template <typename Pix>
-          void take(const Pix& pix)
+          void take(const mln::rgb8& v)
           {
-            m_sum += pix.val();
+            m_sum += v;
             m_count++;
           }
 
@@ -91,7 +89,7 @@ This example computes a grain filter, which removes all the node which have an a
             t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 100; });
 
             // Compute the mean of the connected component of each nodes
-            auto mean = t.compute_attribute_on_pixels(nm, ima, mean_node_accu());
+            auto mean = t.compute_attribute_on_values(nm, ima, mean_node_accu());
 
             // Reconstruct the tree
             auto rec = t.reconstruct_from(nm, ranges::make_span(mean.data(), mean.size()));

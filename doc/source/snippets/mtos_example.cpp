@@ -21,10 +21,9 @@ namespace
   {
     using result_type = decltype(std::declval<mln::rgb8>() + std::declval<mln::rgb8>());
   public:
-    template <typename Pix>
-    void take(const Pix& pix)
+    void take(const mln::rgb8& v)
     {
-      m_sum += pix.val();
+      m_sum += v;
       m_count++;
     }
 
@@ -149,12 +148,12 @@ int main(int argc, char* argv[])
     mln::io::imsave(heat_depth, argv[2]);
   }
 
-  auto [t, nm] = mln::morpho::details::satmaxtree(depth_map);
+  auto [t, nm] = mln::morpho::details::satmaxtree(depth_map, {0, 0});
   nm = reduce_nodemap(nm);
   nm = remove_border(nm);
   auto area = t.compute_attribute_on_points(nm, mln::accu::accumulators::count<int>());
-  t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 100; });
-  auto mean = t.compute_attribute_on_pixels(nm, ima, mean_node_accu());
+  t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 200; });
+  auto mean = t.compute_attribute_on_values(nm, ima, mean_node_accu());
   auto rec = t.reconstruct_from(nm, ranges::make_span(mean.data(), mean.size()));
   mln::io::imsave(mln::view::cast<mln::rgb8>(rec), argv[3]);
 

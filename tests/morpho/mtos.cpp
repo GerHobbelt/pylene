@@ -112,9 +112,6 @@ TEST(Morpho, DepthMap)
 
 TEST(Morpho, Satmaxtree)
 {
-  // Test satmaxtree computation from depth map
-  auto [t, nm] = mln::morpho::details::satmaxtree(depth_map_ref);
-
   std::vector<int> parent_ref = {-1, 0,  1,  1,  3,  3,  3,  3,  3,  3,  1,  10, 10,
                                  10, 10, 10, 10, 10, 10, 10, 10, 10, 21, 21, 10};
 
@@ -137,6 +134,9 @@ TEST(Morpho, Satmaxtree)
       {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}, //
       {20, 10, 10, 10, 17, 10, 10, 10, 10, 10, 10, 10, 16, 10, 10, 10, 18}, //
   };
+
+  // Test satmaxtree computation from depth map
+  auto [t, nm] = mln::morpho::details::satmaxtree(depth_map_ref, {0, 0});
 
   ASSERT_EQ(t.parent.size(), parent_ref.size());
 

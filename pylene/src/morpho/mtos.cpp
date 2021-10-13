@@ -21,7 +21,7 @@ namespace mln::morpho
 
     const auto [gos, tree_to_graph] = mln::morpho::details::compute_inclusion_graph(trees, nodemaps, depths, 3);
     auto depth_map                  = mln::morpho::details::compute_depth_map(gos, tree_to_graph, nodemaps);
-    auto [t, nm]                    = mln::morpho::details::satmaxtree(depth_map);
+    auto [t, nm]                    = mln::morpho::details::satmaxtree(depth_map, pstart);
 
     return {std::move(t), std::move(nm)};
   }

@@ -1,9 +1,9 @@
 #include <mln/morpho/mtos.hpp>
+#include <mln/morpho/private/satmaxtree.hpp>
+#include <mln/morpho/private/trees_fusion.hpp>
 
 #include <mln/core/image/view/channel.hpp>
 #include <mln/morpho/tos.hpp>
-
-#include <mln/morpho/private/trees_fusion.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 #include <gtest/gtest.h>
@@ -113,4 +113,35 @@ TEST(Morpho, DepthMap)
 TEST(Morpho, Satmaxtree)
 {
   // Test satmaxtree computation from depth map
+  auto [t, nm] = mln::morpho::details::satmaxtree(depth_map_ref);
+
+  std::vector<int> parent_ref = {-1, 0,  1,  1,  3,  3,  3,  3,  3,  3,  1,  10, 10,
+                                 10, 10, 10, 10, 10, 10, 10, 10, 10, 21, 21, 10};
+
+  mln::image2d<int> nodemap_ref = {
+      {0, 0, 0, 0, 2, 1, 1, 1, 4, 3, 3, 3, 6, 3, 3, 3, 7},                  //
+      {0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3},                  //
+      {0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3},                  //
+      {0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3},                  //
+      {23, 1, 1, 1, 1, 1, 1, 1, 8, 3, 3, 3, 3, 3, 3, 3, 9},                 //
+      {21, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3},                 //
+      {21, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3},                 //
+      {21, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3},                 //
+      {22, 21, 21, 21, 21, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 3},            //
+      {21, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1},            //
+      {21, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1},            //
+      {21, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1},            //
+      {21, 10, 10, 10, 19, 10, 10, 10, 10, 10, 10, 10, 12, 10, 10, 10, 14}, //
+      {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}, //
+      {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}, //
+      {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}, //
+      {20, 10, 10, 10, 17, 10, 10, 10, 10, 10, 10, 10, 16, 10, 10, 10, 18}, //
+  };
+
+  ASSERT_EQ(t.parent.size(), parent_ref.size());
+
+  for (int i = 0; i < (int)parent_ref.size(); i++)
+    ASSERT_EQ(t.parent[i], parent_ref[i]);
+
+  ASSERT_IMAGES_EQ_EXP(nm, nodemap_ref);
 }

@@ -24,3 +24,6 @@ target_include_directories(pylena PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_sources(pylena PRIVATE
   src/module.cpp
   src/morpho/morpho.cpp)
+
+
+install(TARGETS pylena LIBRARY DESTINATION lib)

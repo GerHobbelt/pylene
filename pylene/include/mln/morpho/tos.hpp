@@ -21,7 +21,8 @@ namespace mln::morpho
   /// \param[in] start_point Root point
   /// \return A pair (tree, node_map) encoding the tree of shapes and the mapping (pixel -> node_index)
   template <class I>
-  [[gnu::noinline]] auto tos(I input, image_point_t<I> pstart, int processing_flags = ToS_NodeMapTwiceSize);
+  [[gnu::noinline]] auto tos(I input, image_point_t<I> pstart, int processing_flags = ToS_NodeMapTwiceSize)
+    -> std::pair<component_tree<image_value_t<I>>, image_ch_value_t<I, int>>;
 
 
 
@@ -31,13 +32,18 @@ namespace mln::morpho
 
 
   template <class I>
-  auto tos(I input, image_point_t<I> pstart, int /* processing_flags */)
+  auto tos(I input, image_point_t<I> pstart, int processing_flags)
+    -> std::pair<component_tree<image_value_t<I>>, image_ch_value_t<I, int>>
   {
     static_assert(mln::is_a<I, mln::details::Image>());
 
     using Domain = image_domain_t<I>;
     using P = image_point_t<I>;
     using V = image_value_t<I>;
+
+    if (processing_flags != ToS_NodeMapTwiceSize)
+      throw std::runtime_error("Only 'ToS_NodeMapTwiceSize' supported for now.");
+
 
     static_assert(std::is_same_v<Domain, mln::box2d> || std::is_same_v<Domain, mln::box3d>,
                   "Only 2D or 3D regular domain supported");

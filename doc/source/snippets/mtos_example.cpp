@@ -66,19 +66,23 @@ namespace
     return border[border.size() / 2];
   }
 
-  /// \brief Reduce the size of a nodemap by a factor 2
+  /// \brief Reduce the size of the nodemap resulting from the MToS computation
+  ///        to fit the original image one
   mln::image2d<int> reduce_nodemap(mln::image2d<int> n)
   {
-    // mln::image2d<int> res((n.width() + 3) / 4, (n.height() + 3) / 4);
     const mln::point2d pmin(n.domain().tl());
     const mln::point2d pmax(n.domain().br());
     mln::image2d<int>  res(mln::box2d{{(pmin[0] - 3) / 4, (pmin[1] - 3) / 4}, {(pmax[0] + 3) / 4, (pmax[1] + 3) / 4}});
 
-    mln_foreach (auto p, n.domain())
+    for (int y = 0; y < res.height(); y++)
     {
-      if (p[0] % 4 == 0 && p[1] % 4 == 0)
+      int* in  = n.buffer() + y * 4 * n.stride(1);
+      int* out = res.buffer() + y * res.stride();
+      for (int x = 0; x < res.width(); x++)
       {
-        res(mln::point2d{p[0] / 4, p[1] / 4}) = n(p);
+        *out = *in;
+        in += 4;
+        out++;
       }
     }
 

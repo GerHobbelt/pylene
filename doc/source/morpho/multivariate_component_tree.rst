@@ -33,6 +33,7 @@ This example computes a grain filter, which removes all the node having an area 
     ::
 
         #include <mln/accu/accumulators/count.hpp>
+        #include <mln/core/extension/padding.hpp>
         #include <mln/core/image/ndimage.hpp>
         #include <mln/morpho/mtos.hpp>
         #include <mln/io/imread.hpp>
@@ -40,11 +41,8 @@ This example computes a grain filter, which removes all the node having an area 
         // Function to reduce the nodemap to the original image domain
         mln::image2d<int> reduce_nodemap(mln::image2d<int> n);
 
-        // Function to add a border
-        mln::image2d<mln::rgb8> add_border(mln::image2d<mln::rgb8> ima);
-
-        // Function to remove the border
-        mln::image2d<int> remove_border(mln::image2d<int> n);
+        // Function to get the median of the border values
+        mln::rgb8 get_median_on_border(mln::image2d<mln::rgb8> ima);
 
         // Accumulator to compute the mean of the pixel values of each node, without taking into account the values of the holes
         struct mean_node_accu : mln::Accumulator<mean_node_accu>
@@ -71,17 +69,21 @@ This example computes a grain filter, which removes all the node having an area 
             mln::image2d<mln::rgb8> ima;
             mln::io::imread("lena.ppm", ima);
 
-            // Add a border
-            auto to_process = add_border(ima);
+            // Adding a border
+            const auto median = get_median_on_border(ima);
+            ima.inflate_domain(1);
+            constexpr int borders[2][2] = {{1, 1}, {1, 1}};
+            mln::pad(ima, mln::PAD_CONSTANT, borders, median);
 
             // Compute the MToS
-            auto [t, nm] = mln::morpho::mtos(to_process, {0, 0});
+            auto [t, nm] = mln::morpho::mtos(to_process, {-1, -1}); // The rooting point is in the added border
 
             // Reduce the nodemap
             nm = reduce_nodemap(nm);
 
-            // Remove the border in the nodemap
-            nm = remove_border(nm);
+            // Remove the border
+            ima.inflate_domain(-1);
+            nm.inflate_domain(-1);
 
             // Compute the area of each node of the tree
             auto area = t.compute_attribute_on_points(nm, mln::accu::accumulators::count<int>());

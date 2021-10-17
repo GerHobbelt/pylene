@@ -55,7 +55,7 @@ namespace mln::morpho
     auto [inf, sup] = details::immersion(input);
 
     image_ch_value_t<I, int> ord = imchvalue<int>(inf).adjust(nbh);
-    auto depth2lvl = details::propagation(inf, sup, ord, pstart, max_depth);
+    auto depth2lvl = details::propagation(inf, sup, ord, 2 * pstart, max_depth);
 
     if (max_depth >= (1 << 16))
       throw std::runtime_error("The ToS is too deep (too many number of levels)");

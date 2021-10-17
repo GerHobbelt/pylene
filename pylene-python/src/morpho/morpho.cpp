@@ -7,6 +7,7 @@
 #include <pln/core/image_cast.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -48,17 +49,29 @@ namespace pln::morpho
   }
 
   std::pair<ComponentTree, mln::ndbuffer_image>
-  tos2d(mln::ndbuffer_image input)
+  tos2d(mln::ndbuffer_image input, py::object coordinate)
   {
     auto in = input.cast_to<std::uint8_t, 2>();
     if (in == nullptr)
       throw std::invalid_argument("input image should be a 2D uint8 image");
 
-    auto [maxtree, nodemap] = mln::morpho::tos(*in, in->domain().tl());
+    mln::point2d coord = in->domain().tl();
+    if (!coordinate.is_none())
+    {
+
+      auto c = py::cast<py::tuple>(coordinate);
+      if (py::len(c) != 2)
+        throw std::invalid_argument("The coordinate must be a pair of numbers");
+
+      coord[0] = py::cast<int>(c[0]);
+      coord[1] = py::cast<int>(c[1]);
+    }
+    std::cout << "root none ?:" << coordinate.is_none() << "\n";
+    std::cout << "root:" << coord[0] << " : " << coord[1] << "\n";
+
+    auto [maxtree, nodemap] = mln::morpho::tos(*in, coord);
     return {ComponentTree{std::move(maxtree)}, std::move(nodemap)};
   }
-
-
 }
 
 
@@ -71,5 +84,8 @@ void init_morpho_module(py::module_& m)
       .def_property_readonly("values", &pln::morpho::ComponentTree::get_values);
 
   m.def("maxtree", &pln::morpho::maxtree2d, "Compute the maxtree of a 2D image");
-  m.def("tos", &pln::morpho::tos2d, "Compute the Tree of Shapes of a 2D image");
+  m.def("tos", &pln::morpho::tos2d,
+        py::arg("input"),
+        py::arg("coordinate"),
+        "Compute the Tree of Shapes of a 2D image");
 }

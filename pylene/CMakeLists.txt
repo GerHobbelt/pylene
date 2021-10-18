@@ -81,12 +81,15 @@ target_sources(Pylene-core PRIVATE
                src/io/imprint.cpp
                src/morpho/block_running_max.cpp
                src/morpho/component_tree.cpp
+               src/morpho/filters2d.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
                src/morpho/immersion.cpp
                src/morpho/maxtree.cpp
+               src/morpho/mtos.cpp
+               src/morpho/satmaxtree.cpp
+               src/morpho/trees_fusion.cpp
                src/morpho/unionfind.cpp
-               src/morpho/filters2d.cpp
                )
 
 add_library(Pylene-io-freeimage)

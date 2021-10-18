@@ -119,7 +119,7 @@ This file provides functions to pad a rectangular buffer or an image either:
                   :param input: The input ndimage (or ndimensional buffer).
                   :param output: The input ndimage (or ndimensional buffer).
                   :param mode: The padding policy
-                  :param value: The value used to fill the array (used if mode is `PAD_CONSTANT`
+                  :param value: The value used to fill the array (used if mode is `PAD_CONSTANT`)
 
                   **Second version**
 
@@ -127,7 +127,7 @@ This file provides functions to pad a rectangular buffer or an image either:
                   :param out: The output ndimensional buffer.
                   :param roi: The roi of the output buffer
                   :param mode: The padding policy
-                  :param value: The value used to fill the array (used if mode is `PAD_CONSTANT`
+                  :param value: The value used to fill the array (used if mode is `PAD_CONSTANT`)
 
 
 
@@ -143,7 +143,7 @@ This file provides functions to pad a rectangular buffer or an image either:
                      mln::image2d<uint8_t> input(iroi);
                      mln::image2d<uint8_t> out(oroi);
 
-                     mln::copy_and_pad(input, out, mln::PAD_CONSTANT, 69);
+                     mln::copy_pad(input, out, mln::PAD_CONSTANT, 69);
 
 
 

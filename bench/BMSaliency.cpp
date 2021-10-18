@@ -5,7 +5,7 @@
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/morpho/component_tree.hpp>
-#include <mln/morpho/lca.hpp>
+#include <mln/morpho/private/lca.hpp>
 #include <mln/morpho/watershed_hierarchy.hpp>
 
 #include <benchmark/benchmark.h>

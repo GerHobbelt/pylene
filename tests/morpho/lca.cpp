@@ -1,4 +1,4 @@
-#include <mln/morpho/lca.hpp>
+#include <mln/morpho/private/lca.hpp>
 
 #include <gtest/gtest.h>
 

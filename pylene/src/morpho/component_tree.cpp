@@ -1,5 +1,5 @@
 #include <mln/morpho/component_tree.hpp>
-#include <mln/morpho/lca.hpp>
+#include <mln/morpho/private/lca.hpp>
 
 #include <any>
 

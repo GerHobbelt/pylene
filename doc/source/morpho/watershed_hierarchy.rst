@@ -1,5 +1,5 @@
 Hierarchical Watershed
-==========
+======================
 
 * Include :file:`<mln/morpho/watershed_hierarchy.hpp>`
 

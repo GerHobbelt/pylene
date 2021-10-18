@@ -295,7 +295,7 @@ to make an horizontal cut of this tree.
     :param levels: (Optional) The altitude of each node in the tree (for example the :math:`\alpha` associated to each node for the alphatree).
 
 Saliency Computation
---------------
+--------------------
 It is also possible to compute the saliency map to obtain another visualization.
 
 .. cpp:function:: auto saliency(image2d<int> node_map, ranges::span<double> values) const

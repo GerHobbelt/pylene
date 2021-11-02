@@ -148,15 +148,16 @@ A :cpp:class:`component_tree` `t` has the following methods.
 
 .. cpp:namespace-push::  template <class V> component_tree
 
-.. cpp:function:: auto compute_attribute_on_points(Image node_map, Accumulator accu) const
-                  auto compute_attribute_on_values(Image node_map, Image values, Accumulator accu) const
-                  auto compute_attribute_on_pixels(Image node_map, Image values, Accumulator accu) const
+.. cpp:function:: auto compute_attribute_on_points(Image node_map, Accumulator accu, bool propagate) const
+                  auto compute_attribute_on_values(Image node_map, Image values, Accumulator accu, bool propagate) const
+                  auto compute_attribute_on_pixels(Image node_map, Image values, Accumulator accu, bool propagate) const
 
     Accumulate the points of each component.
 
     :param node_map: An image thats maps: point -> node id
     :param values: An image where values to accumlate are taken from
     :param accu: The feature to compute
+    :param propagate: Option to propagate the values to the parent (default: true)
 
     :return: A vector mapping for each node the result of accumulation.
 

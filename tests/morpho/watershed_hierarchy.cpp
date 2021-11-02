@@ -87,11 +87,8 @@ TEST(Morpho, AreaWatershedHierarchyGray)
       {121, 112, 121, 112, 163}, //
   };
 
-  std::vector<int> expected_parent = {0,  0,  1,  1, 0,  4, 5,  6,  7,  1, 9,  10, 2,  8, 12,
-                                      14, 15, 16, 2, 14, 3, 20, 17, 18, 3, 24, 21, 22, 14};
-
-  std::vector<unsigned long> expected_values = {6, 3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 1, 1, 0, 1, 2, 2, 3, 3};
+  std::vector<unsigned long> expected_values = {6, 3, 2, 2, 0, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
@@ -121,16 +118,12 @@ TEST(Morpho, DynamicWatershedHierarchyGray)
       {121, 112, 121, 112, 163}, //
   };
 
-  std::vector<int> expected_parent = {0,  0,  1,  0, 3,  4, 5,  6,  1,  8, 9,  2, 7,  11, 13,
-                                      14, 15, 1, 13, 2, 19, 16, 17, 0, 23, 20, 21, 13};
-
-  std::vector<unsigned long> expected_values = {70, 38, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 1, 0, 1, 2, 1, 2, 0};
+  std::vector<unsigned long> expected_values = {70, 38, 29, 0, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
-      input,
-      mln::morpho::WatershedAttribute::DYNAMIC,
-      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
+      input, mln::morpho::WatershedAttribute::DYNAMIC, mln::c4,
+      [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());
@@ -153,15 +146,12 @@ TEST(Morpho, HeightWatershedHierarchyGray)
       {121, 112, 121, 112, 163}, //
   };
 
-  std::vector<int> expected_parent = {0, 0, 1, 0, 3, 4, 5, 6, 1, 8, 9, 2, 7, 11, 13, 14, 15, 1, 13, 2, 19, 16, 17, 0, 23, 20, 21, 13};
-
-  std::vector<unsigned long> expected_values = {70, 38, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 1, 0, 1, 2, 1, 2, 0};
+  std::vector<unsigned long> expected_values = {70, 38, 29, 0, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
-      input,
-      mln::morpho::WatershedAttribute::HEIGHT,
-      mln::c4, [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
+      input, mln::morpho::WatershedAttribute::HEIGHT, mln::c4,
+      [](const auto& a, const auto& b) -> float { return mln::functional::l2dist(a, b); });
 
   ASSERT_EQ(expected_parent.size(), tree.parent.size());
   ASSERT_EQ(expected_values.size(), tree.values.size());
@@ -184,11 +174,8 @@ TEST(Morpho, AreaWatershedHierarchyGrayHQ)
       {121, 112, 121, 112, 163}, //
   };
 
-  std::vector<int> expected_parent = {0,  0,  1,  1, 0,  4, 5,  6,  7,  1, 9,  10, 2,  8, 12,
-                                      14, 15, 16, 2, 14, 3, 20, 17, 18, 3, 24, 21, 22, 14};
-
-  std::vector<unsigned long> expected_values = {6, 3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 1, 1, 0, 1, 2, 2, 3, 3};
+  std::vector<unsigned long> expected_values = {6, 3, 2, 2, 0, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
@@ -218,11 +205,8 @@ TEST(Morpho, AreaWatershedHierarchyRGB)
       {{255, 75, 0}, {31, 174, 0}, {255, 75, 0}, {31, 174, 0}, {255, 146, 0}}, //
   };
 
-  std::vector<int> expected_parent = {0, 0,  0,  0,  3, 2, 5,  6, 3, 4, 3,  3,  7,  3,
-                                      9, 12, 12, 16, 3, 1, 19, 2, 5, 1, 23, 20, 21, 26};
-
-  std::vector<unsigned long> expected_values = {3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 0, 0, 2, 1, 2, 1};
+  std::vector<unsigned long> expected_values = {3, 2, 2, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
@@ -252,11 +236,8 @@ TEST(Morpho, AreaWatershedHierarchyGrayC8)
       {107, 73, 125, 157, 117},  //
   };
 
-  std::vector<int> expected_parent = {0, 0,  0, 0,  1, 3, 2,  3,  1,  4,  6, 5,  7,  8,  9,
-                                      2, 11, 4, 13, 4, 5, 15, 21, 17, 19, 5, 21, 22, 17, 23};
-
-  std::vector<unsigned long> expected_values = {7, 3, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 0, 0, 1, 3, 2, 3, 1, 4, 2, 4, 4};
+  std::vector<unsigned long> expected_values = {7, 3, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,
@@ -284,11 +265,8 @@ TEST(Morpho, AreaWatershedHierarchy3DImage)
       {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}    //
   };
 
-  std::vector<int> expected_parent = {0, 0,  1,  0, 3, 3,  2, 2, 6, 1,  5,  8,  8,  7,  9, 9,
-                                      4, 10, 12, 8, 9, 18, 9, 8, 1, 17, 25, 24, 26, 28, 27};
-
-  std::vector<unsigned long> expected_values = {9, 3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int>           expected_parent = {0, 0, 1, 0, 3, 3, 2, 2, 1, 1};
+  std::vector<unsigned long> expected_values = {9, 3, 2, 2, 0, 0, 0, 0, 0, 0};
 
   auto [tree, _] = mln::morpho::watershed_hierarchy(
       input,

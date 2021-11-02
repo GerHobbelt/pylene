@@ -88,9 +88,10 @@ namespace mln::morpho
     /// \param node_map Image point -> node_id mapping
     /// \param values Image point -> value mapping
     /// \param acc Accumulator to apply on values
+    /// \param propagate Boolean to propagate the values to the parent
     template <class I, class J, class Accu>
     std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
-    compute_attribute_on_values(I node_map, J values, Accu acc) const;
+    compute_attribute_on_values(I node_map, J values, Accu acc, bool propagate = true) const;
 
     /// \brief Compute attribute on values
     ///
@@ -99,9 +100,10 @@ namespace mln::morpho
     /// \param node_map Image point -> node_id mapping
     /// \param values Image point -> value mapping
     /// \param acc Accumulator to apply on points
+    /// \param propagate Boolean to propagate the values to the parent
     template <class I, class Accu>
     std::vector<typename accu::result_of<Accu, image_point_t<I>>::type> //
-    compute_attribute_on_points(I node_map, Accu acc) const;
+    compute_attribute_on_points(I node_map, Accu acc, bool propagate = true) const;
 
 
     /// \brief Compute attribute on pixels
@@ -111,9 +113,10 @@ namespace mln::morpho
     /// \param node_map Image point -> node_id mapping
     /// \param values Image point -> value mapping
     /// \param acc Accumulator to apply on values
+    /// \param propagate Boolean to propagate the values to the parent
     template <class I, class J, class Accu>
     std::vector<typename accu::result_of<Accu, image_pixel_t<J>>::type> //
-    compute_attribute_on_pixels(I node_map, J values, Accu acc) const;
+    compute_attribute_on_pixels(I node_map, J values, Accu acc, bool propagate = true) const;
 
     /// \brief Compute the horizontal cut of a hierarchie at level `threshold` and return a nodemap
     /// valued with the node indices of the lowest nodes satisfying levels[n] > threshold
@@ -297,7 +300,7 @@ namespace mln::morpho
 
   template <class I, class Accu>
   std::vector<typename accu::result_of<Accu, image_point_t<I>>::type>
-  component_tree<void>::compute_attribute_on_points(I node_map, Accu acc) const
+  component_tree<void>::compute_attribute_on_points(I node_map, Accu acc, bool propagate) const
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_points");
 
@@ -313,12 +316,13 @@ namespace mln::morpho
     mln_foreach (auto px, node_map.pixels())
       attr[px.val()].take(px.point());
 
-
-    // Propgate to parent
-    std::size_t n = parent.size();
-    for (std::size_t i = n - 1; i > 0; --i)
-      attr[parent[i]].take(attr[i]);
-
+    const std::size_t n = parent.size();
+    if (propagate)
+    {
+      // Propgate to parent
+      for (std::size_t i = n - 1; i > 0; --i)
+        attr[parent[i]].take(attr[i]);
+    }
 
     // Extract values
     std::vector<R> out(n);
@@ -330,7 +334,7 @@ namespace mln::morpho
 
   template <class I, class J, class Accu>
   std::vector<typename accu::result_of<Accu, image_value_t<J>>::type> //
-  component_tree<void>::compute_attribute_on_values(I node_map, J input, Accu acc) const
+  component_tree<void>::compute_attribute_on_values(I node_map, J input, Accu acc, bool propagate) const
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_values");
 
@@ -347,12 +351,13 @@ namespace mln::morpho
     mln_foreach ((auto [node_id, val]), zz.values())
       attr[node_id].take(val);
 
-
-    // Propgate to parent
-    std::size_t n = parent.size();
-    for (std::size_t i = n - 1; i > 0; --i)
-      attr[parent[i]].take(attr[i]);
-
+    const std::size_t n = parent.size();
+    if (propagate)
+    {
+      // Propgate to parent
+      for (std::size_t i = n - 1; i > 0; --i)
+        attr[parent[i]].take(attr[i]);
+    }
 
     // Extract values
     std::vector<R> out(n);
@@ -364,7 +369,7 @@ namespace mln::morpho
 
   template <class I, class J, class Accu>
   std::vector<typename accu::result_of<Accu, image_pixel_t<J>>::type> //
-  component_tree<void>::compute_attribute_on_pixels(I node_map, J values, Accu acc) const
+  component_tree<void>::compute_attribute_on_pixels(I node_map, J values, Accu acc, bool propagate) const
   {
     mln_entering("mln::morpho::component_tree::compute_attribute_on_pixels");
 
@@ -380,12 +385,13 @@ namespace mln::morpho
     mln_foreach (auto px, values.pixels())
       attr[node_map(px.point())].take(px);
 
-
-    // Propgate to parent
-    std::size_t n = parent.size();
-    for (std::size_t i = n - 1; i > 0; --i)
-      attr[parent[i]].take(attr[i]);
-
+    const std::size_t n = parent.size();
+    if (propagate)
+    {
+      // Propgate to parent
+      for (std::size_t i = n - 1; i > 0; --i)
+        attr[parent[i]].take(attr[i]);
+    }
 
     // Extract values
     std::vector<R> out(n);

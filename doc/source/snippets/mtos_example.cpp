@@ -1,5 +1,6 @@
 #include <mln/accu/accumulators/count.hpp>
 #include <mln/accu/accumulators/max.hpp>
+#include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/algorithm/accumulate.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/extension/padding.hpp>
@@ -20,26 +21,6 @@
 
 namespace
 {
-  struct mean_node_accu : mln::Accumulator<mean_node_accu>
-  {
-    using result_type = decltype(std::declval<mln::rgb8>() + std::declval<mln::rgb8>());
-
-  public:
-    void take(const mln::rgb8& v)
-    {
-      m_sum += v;
-      m_count++;
-    }
-
-    void take(const mean_node_accu&) {}
-
-    result_type to_result() const { return m_count > 1 ? static_cast<result_type>(m_sum / m_count) : m_sum; }
-
-  private:
-    result_type m_sum   = {0, 0, 0};
-    int         m_count = 0;
-  };
-
   mln::rgb8 get_median_on_border(mln::image2d<mln::rgb8> ima)
   {
     std::vector<mln::rgb8> border;
@@ -134,7 +115,7 @@ int main(int argc, char* argv[])
 
   auto area = t.compute_attribute_on_points(nm, mln::accu::accumulators::count<int>());
   t.filter(mln::morpho::CT_FILTER_DIRECT, nm, [&area](int n) { return area[n] >= 100; });
-  auto mean = t.compute_attribute_on_values(nm, ima, mean_node_accu());
+  auto mean = t.compute_attribute_on_values(nm, ima, mln::accu::features::mean<>(), false);
   auto rec  = t.reconstruct_from(nm, ranges::make_span(mean.data(), mean.size()));
   mln::io::imsave(mln::view::cast<mln::rgb8>(rec), argv[3]);
 

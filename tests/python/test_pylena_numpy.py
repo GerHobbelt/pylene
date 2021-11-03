@@ -131,6 +131,11 @@ class TestNumpyImage(unittest.TestCase):
         with self.assertRaises(ValueError, msg="Invalid number of dimension from numpy array (Got 5 but should be < 5)"):
             pln.id(img)
 
+    def test_invalid_input(self):
+        a = 10
+        with self.assertRaises(ValueError, msg="Input value is not a valid array (Got `<class 'int'>`)"):
+            pln.id(a)
+
 
 if __name__ == "__main__":
     unittest.main()

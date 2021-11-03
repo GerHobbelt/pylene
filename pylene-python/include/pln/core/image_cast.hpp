@@ -5,6 +5,8 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <fmt/format.h>
+
 namespace pln
 {
   /// \brief Convert a NumPy array to a ndbuffer_image
@@ -33,6 +35,8 @@ namespace pybind11::detail
 
     bool load(handle h, bool)
     {
+      if (!pybind11::array::check_(h))
+        throw std::invalid_argument(fmt::format("Input value is not a valid array (Got `{}`)", static_cast<std::string>(pybind11::str(pybind11::type::handle_of(h)))));
       pybind11::array arr = reinterpret_borrow<pybind11::array>(h);
       value               = pln::from_numpy(arr);
       return true;

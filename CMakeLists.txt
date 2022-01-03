@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.2)
+cmake_minimum_required(VERSION 3.14)
 project(Pylene)
 
 # Add FindTBB directory to CMake's module path

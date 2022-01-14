@@ -14,6 +14,7 @@ Include :file:`<mln/core/algorithm/copy.hpp>`
             vout = vin;
 
     The source and destination images should not alias.
+    This function has a parallel implementation, see following section for an example.
 
     :param src: The source image
     :param dst: The destination image
@@ -36,6 +37,11 @@ Examples
     mln::box2d tl = {{0,0}, {10,10}};
     mln::box2d br = {{10,10}, {20,20}};
     mln::copy(mln::view::clip(f, tl), mln::view::clip(f, br)); // or mln::copy(f | tl, f | br);
+
+#. Using parallel copy to copy the red component into the green component::
+
+    mln::image2d<mln::rgb8> f = ...;
+    mln::parallel::copy(mln::view::red(f), mln::view::green(f));
  
 Complexity
 ----------

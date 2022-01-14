@@ -7,6 +7,8 @@
 #include <mln/core/image/private/ndbuffer_image_pixel.hpp>
 #include <mln/core/image/private/ndimage_extension.hpp>
 #include <mln/core/range/mdspan.hpp>
+#include <mln/core/value/value_set.hpp>
+#include <mln/bp/tile.hpp>
 
 namespace mln
 {
@@ -135,6 +137,7 @@ namespace mln
     /// \{
     T*                      buffer() noexcept;
     const T*                buffer() const noexcept;
+
     [[deprecated]] T*       data() noexcept { return this->buffer(); }
     [[deprecated]] const T* data() const noexcept { return this->buffer(); }
 
@@ -150,8 +153,16 @@ namespace mln
     __ndbuffer_image<T, N> clip(const ndbox<N>& roi) const;
     /// \}
 
+
+    /// Conversion to primitive objects
+    /// \{
+    bp::Tile2DView<T>           as_tile() noexcept requires (N == 2);
+    bp::Tile2DView<const T>     as_tile() const noexcept requires (N == 2);
+    /// \}
+
     /// Value access
     /// \{
+    value_set<T>    get_value_set() const noexcept;
     const_reference operator()(fast_point_type p) const noexcept;
     reference       operator()(fast_point_type p) noexcept;
     const_reference at(fast_point_type p) const noexcept;
@@ -438,43 +449,32 @@ namespace mln
   template <class T, int N>
   inline __ndbuffer_image<T, 2> __ndbuffer_image<T, N>::slice(int z) const
   {
-    int begin[N] = {this->__axes(0).domain_begin, this->__axes(1).domain_begin, z};
-    int end[N]   = {this->__axes(0).domain_end,   this->__axes(1).domain_end, z + 1};
-    for (int k = 3; k < m_pdim; ++k)
-    {
-      begin[k] = 0;
-      end[k]   = 1;
-    }
-
-    ndbuffer_image_info_t tmp = *this->__info();
-    Impl::select(&tmp, 2, begin, end);
-    return *Impl::template cast<T, 2>(&tmp);
+    return static_cast<__ndbuffer_image<T,2>&&>(this->base::slice(z));
   }
 
   template <class T, int N>
   inline __ndbuffer_image<T, 1> __ndbuffer_image<T, N>::row(int y) const
   {
-    int begin[N] = {m_axes[0].domain_begin, y};
-    int end[N]   = {m_axes[0].domain_end, y + 1};
-    for (int k = 2; k < m_pdim; ++k)
-    {
-      begin[k] = 0;
-      end[k]   = 1;
-    }
-
-    ndbuffer_image_info_t tmp = *this->__info();
-    Impl::select(&tmp, 1, begin, end);
-    return *Impl::template cast<T, 1>(&tmp);
+    return static_cast<__ndbuffer_image<T,1>&&>(this->base::row(y));
   }
 
   template <class T, int N>
   inline __ndbuffer_image<T, N> __ndbuffer_image<T, N>::clip(const ndbox<N>& roi) const
   {
+    auto d = this->domain();
+    if (!d.includes(roi))
+      throw std::runtime_error("The roi must be included in the domain.");
+
     __ndbuffer_image tmp = *this;
     Impl::select(&tmp, N, roi.tl().data(), roi.br().data());
     return tmp;
   }
 
+  template <class T, int N>
+  value_set<T> __ndbuffer_image<T, N>::get_value_set() const noexcept
+  {
+    return {};
+  }
 
   template <class T, int N>
   inline auto __ndbuffer_image<T, N>::operator()(fast_point_type p) const noexcept -> const_reference
@@ -622,6 +622,19 @@ namespace mln
 
     auto ptr = Impl::get_pointer(this->__info(), coords);
     return mln::internal::ndimage_extension<T, N>{(char*)ptr, strides, dims, this->border()};
+  }
+
+  template <class T, int N>
+  bp::Tile2DView<T> __ndbuffer_image<T, N>::as_tile() noexcept requires (N == 2)
+  {
+    return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
+
+  }
+
+  template <class T, int N>
+  bp::Tile2DView<const T> __ndbuffer_image<T, N>::as_tile() const noexcept requires (N == 2)
+  {
+    return bp::Tile2DView{this->buffer(), this->width(), this->height(), this->byte_stride()};
   }
 
 

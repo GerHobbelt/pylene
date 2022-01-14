@@ -12,6 +12,8 @@ Include :file:`<mln/core/algorithm/fill.hpp>`
         for (auto& vout : ima.values())
             vout = value;
 
+    This function has a parallel implementation, see following section for an example.
+
     :param ima: The image to be filled.
     :param value: The value to fill with.
     :tparam V: Must be convertible to :cpp:expr:`image_value_t<OutputImage>`
@@ -32,6 +34,11 @@ Examples
 
     mln::image2d<mln::rgb8> f = ...;
     mln::fill(mln::view::red(f), 69);
+
+#. Using parallel fill to set the pixels to a color::
+
+    mln::image2d<mln::rgb8> f = ...;
+    mln::parallel::fill(f, mln::rgb8{255,0,0});
  
 Complexity
 ----------

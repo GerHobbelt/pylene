@@ -31,8 +31,8 @@ namespace mln::py
       return F<float>{}(std::forward<Args>(args)...);
     case (mln::sample_type_id::DOUBLE):
       return F<double>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::RGB8):
-    //   return F<mln::rgb8>{}(std::forward<Args>(args)...);
+    /*case (mln::sample_type_id::RGB8):
+      return F<mln::rgb8>{}(std::forward<Args>(args)...);*/
     case (mln::sample_type_id::OTHER):
       [[fallthrough]];
     default:
@@ -65,8 +65,8 @@ namespace mln::py
       return F<float>{}(std::forward<Args>(args)...);
     case (mln::sample_type_id::DOUBLE):
       return F<double>{}(std::forward<Args>(args)...);
-    // case (mln::sample_type_id::RGB8):
-    //   return F<mln::rgb8>{}(std::forward<Args>(args)...);
+    /*case (mln::sample_type_id::RGB8):
+      return F<mln::rgb8>{}(std::forward<Args>(args)...);*/
     case (mln::sample_type_id::OTHER):
       [[fallthrough]];
     default:

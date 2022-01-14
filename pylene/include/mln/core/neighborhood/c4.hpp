@@ -52,4 +52,4 @@ namespace mln
   };
 
   static constexpr inline c4_t c4 = {};
-} // namespace mln
+} // namespace mln::

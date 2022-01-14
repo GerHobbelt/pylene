@@ -167,8 +167,8 @@ TEST(Transform, chamfer_distance_transform_bg_is_zero_weighted_distance_transfor
 
 
   mln::se::wmask2d weights = {{1.5f, 1.0f, 1.5f}, //
-                              {1.0f, 0.0f, 1.0f}, //
-                              {1.5f, 1.0f, 1.5f}};
+                                            {1.0f, 0.0f, 1.0f}, //
+                                            {1.5f, 1.0f, 1.5f}};
 
   mln::image2d<float> res = mln::labeling::chamfer_distance_transform<float>(f, weights);
 
@@ -200,8 +200,8 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
 
 
   mln::se::wmask2d weights = {{1.5f, 1.0f, 1.5f}, //
-                              {1.0f, 0.0f, 1.0f},
-                              {1.5f, 1.0f, 1.5f}};
+                                            {1.0f, 0.0f, 1.0f},
+                                            {1.5f, 1.0f, 1.5f}};
 
   mln::image2d<float> res =
       mln::labeling::chamfer_distance_transform<float>(f, weights, true);
@@ -235,10 +235,10 @@ TEST(Transform, chamfer_distance_transform_bg_is_one_weighted_distance_transform
 
 
   mln::se::wmask2d weights = {{0, c, 0, c, 0}, //
-                              {c, b, a, b, c},
-                              {0, a, 0, a, 0},
-                              {c, b, a, b, c},
-                              {0, c, 0, c, 0}};
+                                            {c, b, a, b, c},
+                                            {0, a, 0, a, 0},
+                                            {c, b, a, b, c},
+                                            {0, c, 0, c, 0}};
 
 
   mln::image2d<int> res = mln::labeling::chamfer_distance_transform(f, weights, true);

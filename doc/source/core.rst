@@ -1,13 +1,13 @@
 Core Module
 ===========
 
-
+.. cpp:namespace:: mln
 
 
 .. toctree::
    :hidden:
 
-
+   core/core_types
    core/images
    core/ranges
    core/neighborhood
@@ -52,19 +52,22 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 
 
+
+
 .. topic:: Fundamental image types
 
   .. table::
     :class: full
     :widths: auto
 
-    +--------------+-------------------------+
-    | `image2d<T>` | Buffer-encoded 2D image |
-    +--------------+-------------------------+
-    | `image3d<T>` | Buffer-encoded 3D image |
-    +--------------+-------------------------+
-    | `ndimage<T>` | Buffer-encoded nD image |
-    +--------------+-------------------------+
+    +-----------------------------------------+-------------------------+
+    |         :cpp:any:`image2d`              | Buffer-encoded 2D image |
+    +-----------------------------------------+-------------------------+
+    |         :cpp:any:`image3d`              | Buffer-encoded 3D image |
+    +-----------------------------------------+-------------------------+
+    |         :cpp:any:`ndimage`              | Buffer-encoded nD image |
+    +-----------------------------------------+-------------------------+
+
 
 .. topic:: Functional image views
 
@@ -175,7 +178,7 @@ See :doc:`core/images` for a description of the image concepts and image basics.
 
 .. topic:: Concepts
 
-   * :cpp:concept:`mln::details::StructuringElement`
+   * :cpp:concept:`mln::StructuringElement`
 
 .. topic::  Predefined Neighborhood
 
@@ -190,6 +193,24 @@ See :doc:`core/images` for a description of the image concepts and image basics.
   * :doc:`core/se/rectangle`
   * :doc:`core/se/periodic_lines`
 
+Border handling
+***************
+
+.. toctree::
+   :hidden:
+
+   core/pad.rst
+
+.. table::
+  :class: full
+  :widths: auto
+
+  +---------------------------------+----------------------------------------+
+  | :cpp:func:`mln::pad`            | Pad an image inplace                   |
+  +---------------------------------+----------------------------------------+
+  | :cpp:func:`mln::copy_pad`       | Copy a region of an image and fill     |
+  |                                 | missing values wrt a padding policy.   |
+  +---------------------------------+----------------------------------------+
 
 
 

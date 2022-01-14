@@ -10,11 +10,15 @@ void fill_baseline(mln::image2d<uint8_t>& ima, uint8_t v);
 void fill_baseline(mln::image2d<mln::rgb8>& ima, mln::rgb8 v);
 void fill(mln::image2d<uint8_t>& ima, uint8_t v);
 void fill(mln::image2d<mln::rgb8>& ima, mln::rgb8 v);
+void fill_parallel(mln::image2d<uint8_t>& ima, uint8_t v);
+void fill_parallel(mln::image2d<mln::rgb8>& ima, mln::rgb8 v);
 
 void copy_baseline(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
 void copy_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 void copy(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
 void copy(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+void copy_parallel(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
+void copy_parallel(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 
 std::ptrdiff_t count_if_baseline(const mln::image2d<uint8_t>& in);
 std::ptrdiff_t count_if_baseline(const mln::image2d<mln::rgb8>& in);
@@ -35,16 +39,34 @@ void paste_baseline(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out)
 void paste_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 void paste(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
 void paste(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+void paste_parallel(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
+void paste_parallel(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 
 void transform_baseline(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
 void transform_baseline(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 void transform(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
 void transform(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+void transform_parallel(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
+void transform_parallel(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+void transform_baseline_hard(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
+void transform_baseline_hard(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+void transform_hard(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
+void transform_hard(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
+void transform_parallel_hard(const mln::image2d<uint8_t>& in, mln::image2d<uint8_t>& out);
+void transform_parallel_hard(const mln::image2d<mln::rgb8>& in, mln::image2d<mln::rgb8>& out);
 
 void for_each_baseline(mln::image2d<uint8_t>& in);
 void for_each_baseline(mln::image2d<mln::rgb8>& in);
 void for_each(mln::image2d<uint8_t>& in);
 void for_each(mln::image2d<mln::rgb8>& in);
+void parallel_for_each(mln::image2d<uint8_t>& in);
+void parallel_for_each(mln::image2d<mln::rgb8>& in);
+void for_each_baseline_hard(mln::image2d<uint8_t>& in);
+void for_each_baseline_hard(mln::image2d<mln::rgb8>& in);
+void for_each_hard(mln::image2d<uint8_t>& in);
+void for_each_hard(mln::image2d<mln::rgb8>& in);
+void parallel_for_each_hard(mln::image2d<uint8_t>& in);
+void parallel_for_each_hard(mln::image2d<mln::rgb8>& in);
 
 
 void generate_baseline(mln::image2d<uint8_t>& ima);
@@ -94,6 +116,13 @@ BENCHMARK_F(BMAlgorithms, fill_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, fill_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    fill_parallel(m_input_uint8, 69);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
@@ -105,6 +134,13 @@ BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8)(benchmark::State& st)
 {
   while (st.KeepRunning())
     fill(m_input_rgb8, mln::rgb8{2, 3, 4});
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, fill_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    fill_parallel(m_input_rgb8, mln::rgb8{2, 3, 4});
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
@@ -126,6 +162,14 @@ BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, copy_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  mln::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    copy_parallel(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
@@ -139,6 +183,14 @@ BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8)(benchmark::State& st)
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     copy(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, copy_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    copy_parallel(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
@@ -250,6 +302,14 @@ BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, paste_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  mln::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    paste_parallel(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
@@ -263,6 +323,14 @@ BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8)(benchmark::State& st)
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
   while (st.KeepRunning())
     paste(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, paste_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    paste_parallel(m_input_rgb8, output_rgb8);
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
@@ -284,6 +352,14 @@ BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  mln::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_parallel(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
@@ -300,6 +376,61 @@ BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_parallel(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_baseline_hard)(benchmark::State& st)
+{
+  mln::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_baseline_hard(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_hard)(benchmark::State& st)
+{
+  mln::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_hard(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, transform_buffer2d_uint8_parallel_hard)(benchmark::State& st)
+{
+  mln::image2d<uint8_t> output_uint8(m_input_uint8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_parallel_hard(m_input_uint8, output_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_baseline_hard)(benchmark::State& st)
+{
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_baseline_hard(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_hard)(benchmark::State& st)
+{
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_hard(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, transform_ibuffer2d_rgb8_parallel_hard)(benchmark::State& st)
+{
+  mln::image2d<mln::rgb8> output_rgb8(m_input_rgb8, mln::image_build_params{});
+  while (st.KeepRunning())
+    transform_parallel_hard(m_input_rgb8, output_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
 
 //////// FOR_EACH //////////////////
 
@@ -317,6 +448,13 @@ BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
 BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_baseline)(benchmark::State& st)
 {
   while (st.KeepRunning())
@@ -331,6 +469,54 @@ BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8)(benchmark::State& st)
   st.SetBytesProcessed(st.iterations() * m_pixel_count);
 }
 
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_parallel)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_baseline_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_baseline_hard(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_hard(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_buffer2d_uint8_parallel_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each_hard(m_input_uint8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_baseline_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_baseline_hard(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    for_each_hard(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
+
+BENCHMARK_F(BMAlgorithms, for_each_ibuffer2d_rgb8_parallel_hard)(benchmark::State& st)
+{
+  while (st.KeepRunning())
+    parallel_for_each_hard(m_input_rgb8);
+  st.SetBytesProcessed(st.iterations() * m_pixel_count);
+}
 
 ///////////   GENERATE /////////////////
 

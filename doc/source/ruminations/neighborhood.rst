@@ -70,15 +70,9 @@ Algorithms that run with neighborhood
 * Convolution: can be separable
 
 
-.. uml::
+.. mermaid::
 
-   @startuml
-   abstract class WeightedNeighborhood {
-   }
-
-   abstract class Neighborhood {
-   }
-
+   classDiagram
    WeightedNeighborhood <|-- Neighborhood
    Neighborhood <|-- c4
    Neighborhood <|-- c8
@@ -90,7 +84,6 @@ Algorithms that run with neighborhood
    Neighborhood <|-- diamond2d_1
    Neighborhood <|-- diamond2d
    Neighborhood <|-- neighb2d
-   @enduml
 
 
 

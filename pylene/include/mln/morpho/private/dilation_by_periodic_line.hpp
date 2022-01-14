@@ -1,11 +1,12 @@
 #pragma once
 
 
+
 #include <mln/core/box.hpp>
-#include <mln/core/canvas/private/traverse2d.hpp>
 #include <mln/core/se/periodic_line2d.hpp>
 #include <mln/core/trace.hpp>
 #include <mln/morpho/private/running_max_1d.hpp>
+#include <mln/core/canvas/private/traverse2d.hpp>
 
 
 namespace mln::morpho::details
@@ -17,8 +18,10 @@ namespace mln::morpho::details
   /// \param[in] sup Supremum operator
   /// \param[in] roi Processing roi
   template <class I, class J, class BinaryFunction>
-  [[gnu::noinline]] void dilation_by_periodic_line(I in, J& out, const mln::se::periodic_line2d& line,
-                                                   BinaryFunction sup, mln::box2d roi);
+  [[gnu::noinline]] void dilation_by_periodic_line(I& in, J& out,
+                                                   const mln::se::periodic_line2d& line,
+                                                   BinaryFunction sup,
+                                                   mln::box2d roi);
 
   /******************************************/
   /****          Implementation          ****/
@@ -26,7 +29,10 @@ namespace mln::morpho::details
 
   // fixme: could be optimized for indexable images
   template <class I>
-  [[gnu::noinline]] void copy_to_periodic_line(I f, mln::point2d origin, mln::point2d direction, std::size_t n,
+  [[gnu::noinline]] void copy_to_periodic_line(I& f,
+                                               mln::point2d origin,
+                                               mln::point2d direction,
+                                               std::size_t n,
                                                image_value_t<I>* __restrict buffer)
   {
     auto p = origin;
@@ -36,8 +42,11 @@ namespace mln::morpho::details
 
   // fixme: could be optimized for indexable images
   template <class J>
-  [[gnu::noinline]] void copy_from_periodic_line(const image_value_t<J>* __restrict buffer, mln::point2d origin,
-                                                 mln::point2d direction, std::size_t n, J output)
+  [[gnu::noinline]] void copy_from_periodic_line(const image_value_t<J>* __restrict buffer,
+                                                 mln::point2d origin,
+                                                 mln::point2d direction,
+                                                 std::size_t n,
+                                                 J output)
   {
     auto p = origin;
     for (std::size_t i = 0; i < n; ++i, p += direction)
@@ -46,13 +55,15 @@ namespace mln::morpho::details
 
 
   template <class I, class J, class BinaryFunction>
-  void dilation_by_periodic_line(I in, J& out, const mln::se::periodic_line2d& line, BinaryFunction sup, mln::box2d roi)
+  void dilation_by_periodic_line(I& in, J& out,
+                                 const mln::se::periodic_line2d& line,
+                                 BinaryFunction sup,
+                                 mln::box2d roi)
   {
     using V = image_value_t<I>;
 
-    int  k      = line.repetition();
-    auto period = line.period();
-
+    int       k      = line.repetition();
+    auto      period = line.period();
 
     // Some sanity check
     {
@@ -76,11 +87,11 @@ namespace mln::morpho::details
 
     auto fun = [&, k](mln::point2d origin, mln::point2d dir, std::size_t n) {
       copy_to_periodic_line(in, origin - k * period, dir, n + 2 * k, p.get());
-      // copy_to_periodic_line(in, origin, dir, n, p.get() + k);
+      //copy_to_periodic_line(in, origin, dir, n, p.get() + k);
       mln::morpho::details::running_max_1d(p.get() + k, g.get() + k, h.get() + k, (int)n, k, sup);
       copy_from_periodic_line(p.get() + k, origin, dir, n, out);
     };
 
     mln::canvas::details::traverse_along_direction(roi, period, fun);
   }
-} // namespace mln::morpho::details
+} // namespace mln::morpho::internal

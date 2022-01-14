@@ -4,16 +4,14 @@
 
 #include <pybind11/pybind11.h>
 
-namespace py = pybind11;
 
-
-PYBIND11_MODULE(Pylena, m)
+PYBIND11_MODULE(pylena, m)
 {
-  init_class_ndimage(m);
+  mln::py::init_pylena_numpy(m);
 
   auto mmorpho = m.def_submodule("morpho", "Mathematical morphology module.");
-  init_module_morpho(mmorpho);
+  mln::py::init_module_morpho(mmorpho);
 
   auto mse = m.def_submodule("se", "Structuring elements module.");
-  init_module_se(mse);
+  mln::py::init_module_se(mse);
 }

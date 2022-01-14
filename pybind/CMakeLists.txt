@@ -1,26 +1,28 @@
 project(Pybind CXX)
 
 find_package(pybind11 REQUIRED)
+find_package(fmt 6.0 REQUIRED)
 
-pybind11_add_module(Pylena MODULE
+pybind11_add_module(pylena MODULE
                     src/pylena.cpp
                     src/morpho.cpp
                     src/ndimage.cpp
-                    src/ndimage_buffer_helper.cpp
                     src/se.cpp
+                    src/py_value_set.cpp
                     )
 
-target_link_libraries(Pylena PRIVATE Pylene::Pylene)
-target_include_directories(Pylena PRIVATE
+target_link_libraries(pylena PRIVATE Pylene::Pylene fmt::fmt)
+target_include_directories(pylena PRIVATE
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
-target_compile_features(Pylena PRIVATE cxx_std_20)
+target_compile_features(pylena PRIVATE cxx_std_20)
+target_compile_options(pylena PRIVATE -Wno-deprecated-declarations) # https://github.com/pybind/pybind11/issues/1444
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 
-add_dependencies(build-pybind Pylena)
+#add_dependencies(build-pybind pylena)
 
-# add_sanitizers(Pylena)
+# add_sanitizers(pylena)
 
 include(CTest)
 

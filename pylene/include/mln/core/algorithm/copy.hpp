@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mln/core/canvas/parallel_pointwise.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/range/rows.hpp>
 #include <mln/core/range/view/zip.hpp>
@@ -56,5 +57,46 @@ namespace mln
     for (auto [r1, r2] : ranges::view::zip(ranges::rows(ivals), ranges::rows(ovals)))
       ::ranges::copy(r1, ::ranges::begin(r2));
   }
+
+  namespace parallel
+  {
+    namespace details
+    {
+      template <class InputImage, class OutputImage>
+      class CopyParallel : public ParallelCanvas2d
+      {
+        InputImage  _in;
+        OutputImage _out;
+
+        static_assert(mln::is_a<InputImage, mln::details::Image>());
+        static_assert(mln::is_a<OutputImage, mln::details::Image>());
+        static_assert(std::is_convertible_v<image_value_t<InputImage>, image_value_t<OutputImage>>);
+
+
+        mln::box2d GetDomain() const final { return _in.domain(); }
+
+        void ExecuteTile(mln::box2d b) const final
+          {
+            auto subimage_in  = _in.clip(b);
+            auto subimage_out = _out.clip(b);
+            mln::copy(subimage_in, subimage_out);
+          }
+
+      public:
+        CopyParallel(InputImage input, OutputImage output)
+          : _in{input}
+          , _out{output}
+          {
+          }
+      };
+    } // namespace details
+
+    template <class InputImage, class OutputImage>
+    void copy(InputImage in, OutputImage out)
+    {
+      details::CopyParallel caller(in, out);
+      parallel_execute2d(caller);
+    }
+  } // namespace parallel
 
 } // namespace mln

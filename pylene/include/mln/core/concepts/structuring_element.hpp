@@ -95,8 +95,9 @@ namespace mln::concepts
     StructuringElement<SE, P> &&
     ::concepts::convertible_to<typename SE::incremental, std::true_type> &&
     requires(const SE se) {
-      { se.inc() }  -> StructuringElement<P>;
-      { se.dec() }  -> StructuringElement<P>;
+      { se.is_incremental() } -> ::concepts::same_as<bool>;
+      { se.inc() };  // -> StructuringElement<SE, P>;
+      { se.dec() };  // -> StructuringElement<SE, P>;
     };
   // clang-format on
 

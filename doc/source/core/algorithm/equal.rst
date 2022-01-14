@@ -5,7 +5,7 @@ Include :file:`<mln/core/algorithm/equal.hpp>`
 
 .. cpp:namespace:: mln
 
-.. cpp:function:: bool equal(LhsImage lhs, RhsImage rhs)
+.. cpp:function:: Image{A} Image{B} bool equal(A lhs, B rhs)
 
     Compare the pixels of `lhs` and `rhs`.
     The result is true if and only if rhs's values equal lhs's values.

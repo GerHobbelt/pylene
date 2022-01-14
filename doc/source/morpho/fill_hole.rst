@@ -6,7 +6,7 @@ Include :file:`<mln/morpho/fill_hole.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} concrete_t<I> fill_hole(I f, Neighborhood nbh, image_point_t<I> marker)
+    Image{I} image_concrete_t<I> fill_hole(I f, Neighborhood nbh, image_point_t<I> marker)
     Image{I} void fill_hole(I f, Neighborhood nbh, image_point_t<I> marker, Image out)
  
     The holes of a binary image correspond to the set of its regional minima which

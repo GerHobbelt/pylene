@@ -3,7 +3,6 @@
 #include <mln/core/concepts/archetype/pixel.hpp>
 #include <mln/core/concepts/archetype/point.hpp>
 #include <mln/core/concepts/neighborhood.hpp>
-#include <mln/core/neighborhood/neighborhood.hpp>
 
 #include <range/v3/view/subrange.hpp>
 
@@ -38,7 +37,7 @@ namespace mln::archetypes
 
 
     template <class SE>
-    struct AsSE : SE, mln::details::Neighborhood<AsSE<SE>>
+    struct AsSE : SE, mln::details::StructuringElement<AsSE<SE>>
     {
     };
   } // namespace details

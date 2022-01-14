@@ -15,10 +15,10 @@
 
 
 #include <any>
-#include <concepts/type_traits.hpp>
 #include <exception>
 #include <limits>
 #include <type_traits>
+#include <concepts/type_traits.hpp>
 
 
 namespace mln::extension
@@ -138,7 +138,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       // We remove the border usage by adapting the SE
       return {ima, view::se_filter(se, detail::adapt_se_none_border{ima.domain()})};
@@ -156,7 +156,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       static_assert(!image_has_extension<I>::value,
                     "The image has an extension when none is explicitly requested."
@@ -187,6 +187,9 @@ namespace mln::extension
     {
     }
 
+    std::any& get_value() { return m_value; }
+    const std::any& get_value() const { return m_value; }
+
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::Fill, BorderManagementPolicy::Auto, Ima, SE,
@@ -196,23 +199,20 @@ namespace mln::extension
       using I = ::concepts::remove_cvref_t<Ima>;
       // using S = ::concepts::remove_cvref_t<SE>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<S, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<S, mln::StructuringElement>::value);
 
       auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)
         throw std::runtime_error(
             "Trying to fill the border with a bad value type. Ensure that value type fits the image type.");
 
-      if constexpr (image_has_extension<I>::value)
+      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_fill::value)
       {
-        if constexpr (image_extension_t<I>::support_fill::value)
+        if (ima.extension().is_fill_supported() && fit(ima, se))
         {
-          if (ima.extension().is_fill_supported() && fit(ima, se))
-          {
-            // The SE fits, we set the value of the border
-            ima.extension().fill(*val);
-            return {ima, se};
-          }
+          // The SE fits, we set the value of the border
+          ima.extension().fill(*val);
+          return {ima, se};
         }
       }
       mln::trace::warn("[Performance] Either the extension of the image is two small or the underlying extension does "
@@ -285,7 +285,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       auto* val = std::any_cast<image_value_t<I>>(&m_value);
       if (!val)
@@ -329,17 +329,14 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
-      if constexpr (image_has_extension<I>::value)
+      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_mirror::value)
       {
-        if constexpr (image_extension_t<I>::support_mirror::value)
+        if (ima.extension().is_mirror_supported() && fit(ima, se))
         {
-          if (ima.extension().is_mirror_supported() && fit(ima, se))
-          {
-            ima.extension().mirror();
-            return {ima, se};
-          }
+          ima.extension().mirror();
+          return {ima, se};
         }
       }
 
@@ -361,7 +358,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -400,17 +397,14 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
-      if constexpr (image_has_extension<I>::value)
+      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_periodize::value)
       {
-        if constexpr (image_extension_t<I>::support_periodize::value)
+        if (ima.extension().is_periodize_supported() && fit(ima, se))
         {
-          if (ima.extension().is_periodize_supported() && fit(ima, se))
-          {
-            ima.extension().periodize();
-            return {ima, se};
-          }
+          ima.extension().periodize();
+          return {ima, se};
         }
       }
 
@@ -432,7 +426,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -471,17 +465,14 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
-      if constexpr (image_has_extension<I>::value)
+      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_clamp::value)
       {
-        if constexpr (image_extension_t<I>::support_clamp::value)
+        if (ima.extension().is_clamp_supported() && fit(ima, se))
         {
-          if (ima.extension().is_clamp_supported() && fit(ima, se))
-          {
-            ima.extension().clamp();
-            return {ima, se};
-          }
+          ima.extension().clamp();
+          return {ima, se};
         }
       }
 
@@ -503,7 +494,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."
@@ -552,20 +543,17 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
-      if constexpr (image_has_extension<I>::value)
+      if constexpr (image_has_extension<I>::value && image_extension_t<I>::support_extend_with::value)
       {
-        if constexpr (image_extension_t<I>::support_extend_with::value)
+        if (ima.extension.is_extend_with_supported() && fit(ima, se))
         {
-          if (ima.extension.is_extend_with_supported() && fit(ima, se))
-          {
-            // FIXME: to implement
-            // ima.extension().extend_with(m_baseimage, m_offset);
-            return {ima, se};
-          }
+          // FIXME: to implement
+          // ima.extension().extend_with(m_baseimage, m_offset);
+          return {ima, se};
         }
       }
 
@@ -598,7 +586,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
       static_assert(std::is_convertible_v<image_value_t<U>, image_value_t<I>>);
       static_assert(std::is_convertible_v<image_point_t<I>, image_value_t<U>>);
 
@@ -634,6 +622,8 @@ namespace mln::extension
   public:
     static constexpr BorderManagementMethod method() { return BorderManagementMethod::User; }
 
+    static std::any get_value() { return {}; }
+
     template <class Ima, class SE>
     auto manage(Ima&& ima, const SE& se) const
         -> managed_result_t<BorderManagementMethod::User, BorderManagementPolicy::Native, Ima, SE,
@@ -641,7 +631,7 @@ namespace mln::extension
     {
       using I = ::concepts::remove_cvref_t<Ima>;
       static_assert(mln::is_a<I, mln::details::Image>::value);
-      // static_assert(mln::is_a<SE, mln::details::StructuringElement>::value);
+      // static_assert(mln::is_a<SE, mln::StructuringElement>::value);
 
       static_assert(image_has_extension<I>::value,
                     "The given image has no extension."

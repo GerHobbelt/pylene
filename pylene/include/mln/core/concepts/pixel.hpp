@@ -18,7 +18,8 @@ namespace mln::concepts
 {
   // clang-format off
 
-    template <class Pix> concept Pixel =
+    template <class Pix>
+    concept Pixel =
       std::is_base_of_v<mln::details::Pixel<Pix>, Pix> &&
       ::concepts::copy_constructible<Pix> &&
       ::concepts::move_constructible<Pix> &&

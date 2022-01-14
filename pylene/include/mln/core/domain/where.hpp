@@ -188,4 +188,4 @@ namespace mln
     return {static_cast<const I&>(ima), ::ranges::identity{}};
   }
 
-} // namespace mln
+} // namespace mln::

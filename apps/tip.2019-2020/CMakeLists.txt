@@ -1,4 +1,4 @@
-find_package(fmt 7.0 REQUIRED)
+find_package(fmt 6.0 REQUIRED)
 
 add_executable(gen_figs gen_figs.cpp)
 target_link_libraries(gen_figs PRIVATE fmt::fmt Fixtures::ImagePath Fixtures::ImageCompare Pylene::Pylene ${FreeImage_LIBRARIES})

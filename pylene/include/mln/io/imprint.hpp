@@ -56,15 +56,7 @@ namespace mln::io
         impl_t(I& x) { this->m_ima = (void*)(&x); }
         ~impl_t() final = default;
         std::size_t formatted_size(P p) const final { return fmt::formatted_size("{}", at(p)); }
-        void        print(P p, int width) const final
-        {
-          if constexpr (std::is_integral_v<image_value_t<I>>)
-            fmt::print("{:>{}d}", at(p), width);
-          else if (std::is_floating_point_v<image_value_t<I>>)
-            fmt::print("{:>{}f}", at(p), width);
-          else
-            fmt::print("{:>{}}", at(p), width);
-        }
+        void        print(P p, int width) const final { fmt::print("{:>{}d}", at(p), width); }
 
         decltype(auto) at(P p) const { return const_cast<I*>(reinterpret_cast<const I*>(this->m_ima))->at(p); }
       };
@@ -104,7 +96,7 @@ namespace mln::io
   {
     using U = std::remove_reference_t<I>;
     static_assert(mln::is_a<U, mln::details::Image>());
-    static_assert(fmt::has_formatter<image_value_t<U>, fmt::format_context>(),
+    static_assert(fmt::internal::has_formatter<image_value_t<U>, fmt::format_context>(),
                   "The value type has no defined formatting.");
 
     auto roi = image.domain();

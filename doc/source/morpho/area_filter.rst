@@ -6,8 +6,8 @@ Include :file:`<mln/morpho/area_filter.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} concrete_t<I> area_opening(I f, Neighborhood nbh, int area, Compare cmp)
-    Image{I} concrete_t<I> area_closing(I f, Neighborhood nbh, int area)
+    Image{I} image_concrete_t<I> area_opening(I f, Neighborhood nbh, int area, Compare cmp)
+    Image{I} image_concrete_t<I> area_closing(I f, Neighborhood nbh, int area)
 
 
     On binary images, the area connected opening that preserves connected

@@ -45,10 +45,10 @@ library by other means, refer to the [documentation](http://olena.pages.lrde.epi
 conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
 ```
 
-1. Install the library with Conan:
+1. Install the library with Conan (with C++20 standard)
 
 ```
-conan install pylene/head@lrde/stable -g cmake_find_package
+conan install pylene/head@lrde/stable -g cmake_find_package -s compiler.cppstd=20
 ```
 
 2. Edit your ``CMakeLists.txt`` to include the paths to the library:
@@ -109,7 +109,7 @@ If you want to see more of what is in the library, have a look on the [C++ Docum
 * It is generic: it allows to write a single algorithm that could be apply on all compatibles image types
 * It enables lazy-computing with a view system similar to the Boost Generic Image Library
 
-Have a look on the [introduction]((http://olena.pages.lrde.epita.fr/pylene/intro)
+Have a look on the [introduction](http://olena.pages.lrde.epita.fr/pylene/intro)
 
 
 # Other ressources

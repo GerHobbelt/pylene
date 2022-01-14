@@ -45,14 +45,14 @@ public:
   }
 
 protected:
-  static bool                  g_loaded;
+  static bool                                g_loaded;
   static mln::image2d<uint8_t> g_input;
   mln::image2d<uint8_t>        m_input;
   mln::image2d<uint8_t>        m_output;
-  std::size_t                  m_size;
+  std::size_t                                m_size;
 };
 
-bool                  BMMorpho::g_loaded = false;
+bool                                BMMorpho::g_loaded = false;
 mln::image2d<uint8_t> BMMorpho::g_input;
 
 

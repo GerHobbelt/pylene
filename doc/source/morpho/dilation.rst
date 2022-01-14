@@ -9,8 +9,8 @@ Include :file:`<mln/morpho/dilation.hpp>`
 
 
 .. cpp:function:: \
-      Image{I} concrete_t<I> dilation(I image, StructuringElement se)
-      Image{I} concrete_t<I> dilation(I image, StructuringElement se, BorderManager bm)
+      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se)
+      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se, BorderManager bm)
       void dilation(Image image, StructuringElement se, OutputImage out)
       void dilation(Image image, StructuringElement se, BorderManager bm, OutputImage out)
 
@@ -40,6 +40,16 @@ Include :file:`<mln/morpho/dilation.hpp>`
          * (3,4) Nothing (the output image is passed as an argument)
 
       :exception: N/A
+
+
+.. cpp:namespace:: mln::morpho::parallel
+
+
+.. cpp:function:: \
+      Image{I} image_concrete_t<I> dilation(I image, StructuringElement se)
+      void dilation(Image image, StructuringElement se, OutputImage out)
+
+      Parallel version of the dilation algorithm.
 
 
 Notes

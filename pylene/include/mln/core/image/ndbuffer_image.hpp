@@ -6,6 +6,7 @@
 #include <mln/core/image/private/image_builder.hpp>
 #include <mln/core/image_format.hpp>
 #include <mln/core/private/init_list.hpp>
+#include <mln/core/value/value_set.hpp>
 
 #include <memory>
 #include <functional>
@@ -152,13 +153,14 @@ namespace mln
     std::byte*                    buffer() const noexcept;
     std::ptrdiff_t                byte_stride(int dim = 1) const noexcept;
     std::ptrdiff_t                stride(int dim = 1) const noexcept;
+    value_set<>    get_value_set() const noexcept;
 
     index_type  index_of_point(ConstPointRef p) const noexcept;
     point_type  point_at_index(index_type i) const noexcept;
     index_type  delta_index(ConstPointRef p) const noexcept;
     /// \}
 
-    /// Extension-related operation
+    /// Extension-related and domain-releated operation
     /// \{
 
     /// \brief Inflate (or reduce, if the value is negative) the domain size by
@@ -175,6 +177,13 @@ namespace mln
     ///
     /// \note No memory reallocation is performed by the method
     void inflate_domain_to_extension();
+
+
+    /// \brief Shift the topleft corner of the domain. The size of the domain is not affected
+    void shift_domain_topleft(ConstPointRef dp) noexcept;
+
+    /// \brief Set the topleft corner of the domain. The size of the domain is not affected.
+    void set_domain_topleft(ConstPointRef p) noexcept;
     /// \}
 
 
@@ -236,6 +245,12 @@ namespace mln
     const details::ndbuffer_image_info_t* __info() const { return this; }
     const axis_info_t& __axes(int i) const { return m_axes[i]; }
     std::byte*         __buf() const { return m_buffer; }
+
+  public:
+    /// Access to the shared_ptr holding the data
+    // SHOULD NOT BE USED EXCEPT FOR PYTHON BINDINGS
+    std::shared_ptr<internal::ndbuffer_image_data>& __data();
+    const std::shared_ptr<internal::ndbuffer_image_data>& __data() const;
   };
 
 

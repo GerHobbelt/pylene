@@ -1,5 +1,5 @@
 find_package(GTest MODULE REQUIRED)
-find_package(fmt 7.0 REQUIRED)
+find_package(fmt 6.0 REQUIRED)
 
 add_library(ImageCompare)
 

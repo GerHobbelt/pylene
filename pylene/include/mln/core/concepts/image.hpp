@@ -1,17 +1,16 @@
 #pragma once
 
-#include <mln/core/concepts/range.hpp>
 #include <mln/core/concepts/domain.hpp>
+#include <mln/core/concepts/extension.hpp>
 #include <mln/core/concepts/pixel.hpp>
 #include <mln/core/concepts/point.hpp>
-#include <mln/core/concepts/extension.hpp>
+#include <mln/core/concepts/range.hpp>
 
 #include <mln/core/concepts/archetype/value.hpp>
 
 #include <mln/core/private/traits/extension.hpp>
 #include <mln/core/private/traits/image.hpp>
 #include <mln/core/private/traits/pixel.hpp>
-
 
 
 #include <concepts/concepts.hpp>
@@ -30,7 +29,7 @@ namespace mln::details
   struct Image
   {
   };
-} // namespace mln
+} // namespace mln::details
 
 namespace mln::concepts
 {
@@ -121,11 +120,7 @@ namespace mln::concepts
     } &&
     image_indexable_v<I> &&
     requires (I ima, image_index_t<I> k) {
-#if __GNUC__ == 9
-    { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
-#else
     { ima[k] }  -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
-#endif
     };
 
 
@@ -138,11 +133,7 @@ namespace mln::concepts
       WritableImage<I> &&
       IndexableImage<I> &&
       requires(I ima, image_index_t<I> k, image_value_t<I> v) {
-#if __GNUC__ == 9
-        { ima[k] = v } -> ::concepts::same_as<image_reference_t<I>>&&;
-#else
-        { ima[k] = v } -> ::concepts::same_as<image_reference_t<I>>;
-#endif
+        { ima[k] = v };
       };
 
   } // namespace detail
@@ -154,17 +145,10 @@ namespace mln::concepts
     Image<I> &&
     image_accessible_v<I> &&
     requires (I ima, image_point_t<I> p) {
-#if __GNUC__ == 9
-      { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>&&; // For concrete image it returns a const_reference
-      { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>&&; // idem
-      { ima.pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>&&; // For concrete image pixel may propagate constness
-      { ima.pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>&&; // idem
-#else
       { ima(p) }              -> ::concepts::same_as<image_reference_t<I>>; // For concrete image it returns a const_reference
       { ima.at(p) }           -> ::concepts::same_as<image_reference_t<I>>; // idem
       { ima.pixel(p) }    -> ::concepts::same_as<image_pixel_t<I>>; // For concrete image pixel may propagate constness
       { ima.pixel_at(p) } -> ::concepts::same_as<image_pixel_t<I>>; // idem
-#endif
     };
 
 
@@ -179,6 +163,9 @@ namespace mln::concepts
       requires(I ima, image_point_t<I> p, image_value_t<I> v) {
         { ima(p) = v };
         { ima.at(p) = v };
+
+        requires OutputPixel<decltype(ima.pixel(p))>;
+        requires OutputPixel<decltype(ima.pixel_at(p))>;
       };
 
   } // namespace detail
@@ -249,13 +236,12 @@ namespace mln::concepts
     // WritableRawImage
     template <typename I>
     concept WritableRawImage =
-      WritableImage<I> &&
       WritableIndexableAndAccessibleImage<I> &&
       WritableBidirectionalImage<I> &&
       RawImage<I> &&
-      requires(I ima, image_value_t<I> v) {
+      requires(I ima, image_value_t<I> v, image_index_t<I> k) {
         { ima.data() }        -> ::concepts::convertible_to<image_value_t<I>*>;
-        { *(ima.data()) = v };
+        { *(ima.data() + k) = v };
       };
 
   } // namespace detail
@@ -265,7 +251,7 @@ namespace mln::concepts
   // Usage: RawImage<I> && OutputImage<I>
   template <typename I>
   concept OutputImage =
-    (not ForwardImage<I> || (detail::WritableImage<I>)) &&
+    (not Image<I> || (detail::WritableImage<I>)) &&
     (not IndexableImage<I> || (detail::WritableIndexableImage<I>)) &&
     (not AccessibleImage<I> || (detail::WritableAccessibleImage<I>)) &&
     (not IndexableAndAccessibleImage<I> ||
@@ -300,7 +286,6 @@ namespace mln::concepts
   concept ViewImage =
     Image<I> &&
     image_view_v<I>;
-
 
 
   // clang-format on

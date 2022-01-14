@@ -124,4 +124,18 @@ namespace mln::se
     return ::ranges::make_span(m_points.data(), m_points.size());
   }
 
+
+  mln::box2d mask2d::compute_input_region(mln::box2d roi) const noexcept
+  {
+    roi.inflate(m_radial_extent);
+    return roi;
+  }
+
+
+  mln::box2d mask2d::compute_output_region(mln::box2d roi) const noexcept
+  {
+    roi.inflate(-m_radial_extent);
+    return roi;
+  }
+
 } // namespace mln::se::

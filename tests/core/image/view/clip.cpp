@@ -9,8 +9,8 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
-#include <gtest/gtest.h>
 #include <fixtures/ImageCompare/image_compare.hpp>
+#include <gtest/gtest.h>
 
 
 struct vector_domain : public std::vector<mln::point2d>
@@ -28,12 +28,12 @@ TEST(View, clip)
   using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                                         {5, 6, 4, 8, 9}, //
-                                         {10, 11, 12, 13, 14}};
+                           {5, 6, 4, 8, 9}, //
+                           {10, 11, 12, 13, 14}};
 
   mln::image2d<int> ref = {{42, 1, 2, 3, 42}, //
-                                         {5, 42, 4, 42, 9}, //
-                                         {10, 11, 42, 13, 14}};
+                           {5, 42, 4, 42, 9}, //
+                           {10, 11, 42, 13, 14}};
 
   vector_domain domain = {{0, 0}, {4, 0}, {1, 1}, {3, 1}, {2, 2}};
 
@@ -62,12 +62,12 @@ TEST(View, clip_twice)
   using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                                         {5, 6, 4, 8, 9}, //
-                                         {10, 11, 12, 13, 14}};
+                           {5, 6, 4, 8, 9}, //
+                           {10, 11, 12, 13, 14}};
 
   mln::image2d<int> ref = {{0, 1, 2, 3, 4},   //
-                                         {5, 42, 4, 42, 9}, //
-                                         {10, 11, 12, 13, 14}};
+                           {5, 42, 4, 42, 9}, //
+                           {10, 11, 12, 13, 14}};
 
   vector_domain domain_a = {{0, 0}, {4, 0}, {1, 1}, {3, 1}, {2, 2}};
   vector_domain domain_b = {{1, 1}, {3, 1}};
@@ -116,7 +116,6 @@ TEST(View, clip_other_a_box2d)
   // Clip returns an 'image2d'
   mln::image2d<int> clipped = mln::view::clip(ima, domain);
   fill(clipped, 42);
-
 
   static_assert(mln::concepts::OutputImage<decltype(clipped)>);
   static_assert(not mln::concepts::ViewImage<decltype(clipped)>);
@@ -219,5 +218,5 @@ static_assert(
 static_assert(
     (mln::concepts::OutputImage<mln::clip_view<mln::archetypes::OutputAccessibleImage, mln::archetypes::Domain>>), "");
 static_assert((mln::concepts::IndexableAndAccessibleImage<
-                             mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>),
-                         "");
+                  mln::clip_view<mln::archetypes::IndexableAndAccessibleImage, mln::archetypes::Domain>>),
+              "");

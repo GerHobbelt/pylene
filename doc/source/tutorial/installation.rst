@@ -1,5 +1,5 @@
 Installation
-############
+============
 
 .. contents::
    :local:
@@ -12,23 +12,35 @@ particular:
 * `Intel TBB <https://software.intel.com/en-us/tbb>`_
 * `Boost <https://www.boost.org/>`_
 * `Range-v3 <https://github.com/ericniebler/range-v3>`_
+* `FreeImage <https://freeimage.sourceforge.io/>`_
+* `Fmt <https://fmt.dev>`_
+
+
 
 There are three ways to install the C++ Pylene:
 
 * The preferred and strongly recommended way to use Pylene is using Conan, a C++ package manager that would handle the dependencies.
 * The other way is using installing the libraries from sources.
 
+In all cases, you have to install *boost* and *FreeImage* using your system package manager.
 
-Install (for users)
-===================
+.. highlight:: shell
+
+Pre-installation
+----------------
+
+Install  *FreeImage* and *Boost* with the system package manager of your distribution.
+The packages are generally named `freeimage`, `freeimage-devel`, and `boost-devel`
+
+
 
 Install from sources
-********************
+--------------------
 
 To build from sources, you will need cmake and install all the dependencies.
 Conan can be used to install the dependencies.
 
-Download the latest release from FIXME.
+Download the latest release from `Pylene Gitlab <https://gitlab.lrde.epita.fr/olena/pylene/-/releases>`_
 
 1. Untar the archive::
 
@@ -37,34 +49,40 @@ Download the latest release from FIXME.
 #. Install the dependencies::
 
     mkdir build && cd build
-    conan install ..
+    conan install .. -s compiler.cppstd=20
 
-#. Build the library::
+#. Build the library (with no test)::
 
-    cmake .. -DCMAKE_BUILD_TYPE=release
-    cmake --build . --target Pylene
+    cmake .. -DCMAKE_BUILD_TYPE=release -DPYLENE_BUILD_LIBS_ONLY=On
+    cmake --build . --target Pylene (or make)
 
 #. Install the library (as root)::
 
-    cmake --build . --target install
+    cmake --build . --target install (or make install)
+
+.. tip::
+
+   You can install in a specific local as *normal* user in your home directory. To install in $HOME/.local
+   use::
+
+     cmake . -DCMAKE_INSTALL_PREFIX=$HOME/.local
+     cmake --build . --target install
 
 
 Integration with CMake and Conan (preferred)
-********************************************
+--------------------------------------------
 
 `Conan <https://docs.conan.io/>`_ is a C++ package manager that can be installed with pip.
 The Pylene library is available on our repository https://artifactory.lrde.epita.fr/
 
-1. Add the repository in your conan remotes:
+1. Add the repository in your conan remotes::
 
-    .. code-block:: shell
-    
-        conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
+     conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
 
 
 2. In a :file:`conanfile.txt`, add the reference to Pylene::
 
-    pylene/head@lrde/stable
+     pylene/head@lrde/stable
 
 Then, see conan's documentation for how to use the package with your favorite build system. The following steps apply to CMake.
 
@@ -72,18 +90,24 @@ Then, see conan's documentation for how to use the package with your favorite bu
 
 4. In your :file:`CMakeLists.txt`, use **find_package** as usual::
 
-        find_package(Pylene)
+     set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+     find_package(Pylene)
 
 
 The following targets are then available:
 
-* ``Pylene::Pylene``: target to link with when using Pylene. Ex::
+* ``Pylene::Pylene``: target to link with all Pylene components::
 
     target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
 
+* ``Pylene::Core``: target to link with when using only the core component of Pylene::
+
+    target_link_libraries(MyTarget PRIVATE Pylene::Core)
+
+
 
 Integration with CMake as a subdirectory
-****************************************
+----------------------------------------
 
 You can add the :file:`pylene` library directory into your project and include it in your
 :file:`CMakeLists.txt` file::
@@ -94,31 +118,41 @@ or to exclude it from ``make``, ``make all``, or ``cmake --build ..``::
 
     add_subdirectory(pylene EXCLUDE_FROM_ALL)
 
+
 The following targets are then available:
 
-* ``Pylene::Pylene``: target to link with when using Pylene. Ex::
+* ``Pylene::Pylene``: target to link with all Pylene components::
 
     target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
 
+* ``Pylene::Core``: target to link with when using only the core component of Pylene::
+
+    target_link_libraries(MyTarget PRIVATE Pylene::Core)
+
+
 
 Integration with CMake from an existing installation
-****************************************************
+----------------------------------------------------
 
 The library installs CMake config files and provide CMake targets.
 Use ``find_package`` in your CMakeLists::
 
-    find_package(Pylene CONFIG)
+    find_package(Pylene)
 
-It makes the following targets available:
 
-* ``Pylene::Pylene``: target to link with when using Pylene. Ex::
+The following targets are then available:
+
+* ``Pylene::Pylene``: target to link with all Pylene components::
 
     target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
 
+* ``Pylene::Core``: target to link with when using only the core component of Pylene::
+
+    target_link_libraries(MyTarget PRIVATE Pylene::Core)
 
 
-Install (for developers)
-========================
+Installation (for developers)
+-----------------------------
 
 #. Clone the repository::
 
@@ -141,19 +175,43 @@ Install (for developers)
         benchmark:shared                = True
         gtest:shared                    = True
 
-    In the source directory, use:
+   In the source directory, use::
 
-    .. code-block:: shell
-
-        mkdir build && cd build
-        conan install ..
-        cmake ..
-        cmake --build .
+     mkdir build && cd build
+     conan install ..
+     cmake ..
+     cmake --build .
 
 
+Sample project structure using Pylene
+-------------------------------------
+
+See `<https://gitlab.lrde.epita.fr/olena/pylene/-/blob/master/test_package/>`_.
 
 
+* :file:`conanfile.txt`::
 
+    [requires]
+    pylene/head@lrde/stable
+
+
+* :file:`CMakeLists.txt`::
+
+
+    project(PyleneTest)
+
+    set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+
+    find_package(Pylene REQUIRED)
+    add_executable(main main.cpp)
+    target_link_libraries(main Pylene::Core)
+
+
+* Build intructions::
+
+    mkdir build && cd build
+    conan install .. -g cmake_find_package -s compiler.cppstd=c++20
+    cmake ..
 
 
 

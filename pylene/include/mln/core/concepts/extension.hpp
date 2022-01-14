@@ -60,9 +60,8 @@ namespace mln::concepts
   concept MirrorableExtension =
     Extension<Ext, Pnt> &&
     ::concepts::convertible_to<typename Ext::support_mirror, std::true_type> &&
-    requires (Ext ext, const Ext cext, std::size_t padding) {
+    requires (Ext ext, const Ext cext) {
       { ext.mirror() };
-      { ext.mirror(padding) };
       { cext.is_mirror_supported() }  -> ::concepts::same_as<bool>;
     };
 
@@ -90,7 +89,6 @@ namespace mln::concepts
     ::concepts::convertible_to<typename Ext::support_extend_with, std::true_type> &&
     // InputImage<U> &&
     requires {
-      typename Ext::value_type;
       typename Ext::point_type;
     } &&
     ::concepts::convertible_to<typename U::value_type, typename Ext::value_type> &&

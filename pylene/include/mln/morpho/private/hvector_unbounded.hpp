@@ -8,7 +8,7 @@
 #include <numeric>
 
 
-namespace  mln::morpho::details
+namespace mln::morpho::details
 {
 
 
@@ -34,9 +34,11 @@ namespace  mln::morpho::details
     /// such that every queue at level x with  𝑙 < x ≤ level are empty.
     int upper_bound(int level) const noexcept;
 
-
+    void initialize(int nlevel, std::size_t size);
 
   protected:
+    hvectors_unbounded() = default;
+
     /// \param nlevel Number of levels
     /// \param size Size in bytes of an element
     hvectors_unbounded(int nlevel, std::size_t size);
@@ -49,9 +51,9 @@ namespace  mln::morpho::details
     /// Free the memory
     void release();
 
-    virtual ~hvectors_unbounded() = default;
+    virtual ~hvectors_unbounded()                                             = default;
     virtual void uninitialized_copy_n(void* in, std::size_t count, void* out) = 0;
-    virtual void destroy_n(void* buffer, std::size_t count) = 0;
+    virtual void destroy_n(void* buffer, std::size_t count)                   = 0;
 
 
     struct node_t
@@ -61,8 +63,8 @@ namespace  mln::morpho::details
       int   capacity;
     };
 
-    node_t*     m_lists; /* List of unitialized storage */
-    int         m_nlevels;
+    node_t* m_lists = nullptr; /* List of unitialized storage */
+    int     m_nlevels;
   };
 
 
@@ -70,31 +72,29 @@ namespace  mln::morpho::details
   class hvectors_unbounded final : public hvectors_unbounded<void>
   {
   public:
+    hvectors_unbounded() = default;
     hvectors_unbounded(int nlevel);
     ~hvectors_unbounded() final;
 
     hvectors_unbounded(const hvectors_unbounded&) = delete;
-    hvectors_unbounded(hvectors_unbounded&&) = delete;
-    hvectors_unbounded& operator= (const hvectors_unbounded&) = delete;
-    hvectors_unbounded& operator= (hvectors_unbounded&&) = delete;
+    hvectors_unbounded(hvectors_unbounded&&)      = delete;
+    hvectors_unbounded& operator=(const hvectors_unbounded&) = delete;
+    hvectors_unbounded& operator=(hvectors_unbounded&&) = delete;
 
 
-    void                push_front(int level, P p) noexcept;
-    P                   pop_front(int level) noexcept;
+    void push_front(int level, P p) noexcept;
+    P    pop_front(int level) noexcept;
 
-    P                   back(int level) const noexcept;
-    P                   front(int level) const noexcept;
+    P back(int level) const noexcept;
+    P front(int level) const noexcept;
 
   private:
     void uninitialized_copy_n(void* in, std::size_t count, void* out) final;
     void destroy_n(void* buffer, std::size_t count) final;
 
 
-
     using base = hvectors_unbounded<void>;
   };
-
-
 
 
   /******************************************/
@@ -103,6 +103,7 @@ namespace  mln::morpho::details
 
   inline int hvectors_unbounded<void>::lower_bound(int level) const noexcept
   {
+    mln_precondition(m_lists != nullptr);
     mln_precondition(level < m_nlevels);
 
     while (level < m_nlevels && m_lists[level].size == 0)
@@ -112,6 +113,7 @@ namespace  mln::morpho::details
 
   inline int hvectors_unbounded<void>::upper_bound(int level) const noexcept
   {
+    mln_precondition(m_lists != nullptr);
     mln_precondition(level < m_nlevels);
 
     while (level >= 0 && m_lists[level].size == 0)
@@ -121,6 +123,7 @@ namespace  mln::morpho::details
 
   inline bool hvectors_unbounded<void>::empty(int level) const noexcept
   {
+    mln_precondition(m_lists != nullptr);
     return m_lists[level].size == 0;
   }
 
@@ -150,16 +153,15 @@ namespace  mln::morpho::details
   }
 
 
-
-
   template <class P>
   inline void hvectors_unbounded<P>::push_front(int level, P p) noexcept
   {
+    mln_precondition(m_lists != nullptr);
     if (m_lists[level].size == m_lists[level].capacity)
       this->resize(level, sizeof(P));
 
-    P*  buffer = reinterpret_cast<P*>(m_lists[level].begin);
-    P*  e      = buffer + m_lists[level].size++;
+    P* buffer = reinterpret_cast<P*>(m_lists[level].begin);
+    P* e      = buffer + m_lists[level].size++;
     new ((void*)e) P(p);
   }
 
@@ -178,7 +180,6 @@ namespace  mln::morpho::details
   }
 
 
-
   template <class P>
   inline P hvectors_unbounded<P>::front(int level) const noexcept
   {
@@ -189,4 +190,4 @@ namespace  mln::morpho::details
   }
 
 
-} // namespace mln::morpho::detail
+} // namespace mln::morpho::details

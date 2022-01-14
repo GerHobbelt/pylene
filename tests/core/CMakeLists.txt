@@ -14,6 +14,10 @@ add_core_test(${test_prefix}range_zip           range/zip.cpp)
 add_core_test(${test_prefix}range_mdspan        range/mdspan.cpp)
 add_core_test(${test_prefix}range_mdindex       range/mdindex.cpp)
 
+# test padding functionalities
+add_core_test(${test_prefix}padding             extension/padding.cpp)
+
+
 
 # test Views
 add_core_test(${test_prefix}view_adaptor            image/view/adaptor.cpp)
@@ -81,7 +85,13 @@ add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}transform          algorithm/transform.cpp)
 add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}accumulate_local   algorithm/accumulate_local.cpp)
-add_core_test(${test_prefix}transpose          algorithm/transpose.cpp)
+
+target_link_libraries(${test_prefix}copy               PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}clone              PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}fill               PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}for_each           PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}paste              PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}transform          PRIVATE TBB::TBB)
 
 # test SE
 add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)
@@ -91,7 +101,7 @@ add_core_test(${test_prefix}mask2d             se/mask2d.cpp)
 
 
 # Others
-add_core_test(${test_prefix}traverse2d         canvas/traverse2d.cpp)
+add_core_test(${test_prefix}traverse2d                   canvas/traverse2d.cpp)
 
 # test Concepts
 # Add concepts support for gcc > 7.2 with -fconcepts

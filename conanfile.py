@@ -11,37 +11,52 @@ class Pylene(ConanFile):
     settings = "os", "compiler", "arch", "build_type"
     options = {
         "shared": [True, False],
-        "fPIC": [True, False]
+        "fPIC": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": False,
         "gtest:shared": False,
-        "boost:shared": True
+        "boost:header_only": True,
     }
 
     generators = ["cmake", "cmake_paths", "cmake_find_package"]
-    exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
+    exports_sources = ["pylene/*", "pylene-python/*",
+                       "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     build_requires = [
-        "gtest/[>=1.10]",
-        "benchmark/[>=1.5.1]",
+        "gtest/[>=1.10.0]",
+        "benchmark/[>=1.5.0]",
     ]
 
     requires = [
         "range-v3/0.10.0",
-        "fmt/7.0.3",
-        "boost/1.74.0",
-        "pybind11/2.5.0"
+        "fmt/6.0.0",
+        "tbb/2020.0",
+        "xsimd/7.4.6",
+        "boost/1.75.0",
+        "cfitsio/4.0.0"
     ]
+
+    def _build_python(self):
+        return self.options.shared or self.options.fPIC or tools.os_info.is_windows
 
     def configure(self):
         self.settings.compiler.cppstd = "20"
         tools.check_min_cppstd(self, "20")
+        if self.options.shared:
+            del self.options.fPIC
+        if self._build_python():
+            self.build_requires.append("pybind11/2.8.1")
 
     def build(self):
         cmake = CMake(self)
         cmake.definitions["PYLENE_BUILD_LIBS_ONLY"] = "YES"
+        if self._build_python():
+            cmake.definitions["PYLENE_BUILD_PYTHON"] = "YES"
+        else:
+            self.output.warn(
+                "fPIC disabled. Skipping python bindings build...")
         cmake.configure()
         cmake.build()
         cmake.install()
@@ -51,15 +66,48 @@ class Pylene(ConanFile):
         tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        self.cpp_info.system_libs.append("freeimage")
         self.cpp_info.names["cmake_find_package"] = "Pylene"
         self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
-        self.cpp_info.libs = ["Pylene"]
-        self.cpp_info.cxxflags.append(tools.cppstd_flag(self.settings))
+
+        # Core component
+        self.cpp_info.components["Core"].names["cmake_find_package"] = "Core"
+        self.cpp_info.components["Core"].names["cmake_find_package_multi"] = "Core"
+        self.cpp_info.components["Core"].libs = ["Pylene-core"]
+        self.cpp_info.components["Core"].includedirs = ["include"]
+        self.cpp_info.components["Core"].requires = [
+            "range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
+
+        # IO component (FreeImage)
+        self.cpp_info.components["IO-freeimage"].system_libs.append(
+            "freeimage")
+        self.cpp_info.components["IO-freeimage"].names["cmake_find_package"] = "IO-freeimage"
+        self.cpp_info.components["IO-freeimage"].names["cmake_find_package_multi"] = "IO-freeimage"
+        self.cpp_info.components["IO-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp_info.components["IO-freeimage"].includedirs = ["include"]
+        self.cpp_info.components["IO-freeimage"].requires = ["Core"]
+
+        # IO component (cfitsio)
+        self.cpp_info.components["IO-fits"].names["cmake_find_package"] = "IO-fits"
+        self.cpp_info.components["IO-fits"].names["cmake_find_package_multi"] = "IO-fits"
+        self.cpp_info.components["IO-fits"].libs = ["Pylene-io-fits"]
+        self.cpp_info.components["IO-fits"].includedirs = ["include"]
+        self.cpp_info.components["IO-fits"].requires = ["Core",
+                                                        "cfitsio::cfitsio"]
+
+        # Pylene-numpy component
+        if self._build_python():
+            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
+            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
+            self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
+            self.cpp_info.components["Pylene-numpy"].requires = ["Core"]
+            self.cpp_info.components["Pylene-numpy"].includedirs = ["include"]
 
         v = tools.Version(self.settings.compiler.version)
-        if self.settings.compiler == "gcc" and v.major == "9":
-            self.cpp_info.cxxflags.append("-fconcepts")
+        for comp in self.cpp_info.components:
+            self.cpp_info.components[comp].cxxflags.append(
+                tools.cppstd_flag(self.settings))
+            if self.settings.compiler == "gcc" and v.major == "9":
+                self.cpp_info.components[comp].cxxflags.append("-fconcepts")
 
     def package_id(self):
         del self.info.settings.compiler.cppstd

@@ -4,7 +4,8 @@
 namespace mln::canvas::details
 {
 
-  void traverse_along_direction(mln::box2d roi, mln::point2d direction,
+  void traverse_along_direction(mln::box2d roi,
+                                mln::point2d direction,
                                 std::function<void(mln::point2d, mln::point2d, std::size_t n)> callback)
   {
     if (roi.empty())
@@ -13,6 +14,7 @@ namespace mln::canvas::details
     // Make the direction downward the y-axis
     if (direction.y() < 0)
       direction = -direction;
+
 
 
     int dx   = direction.x();
@@ -24,7 +26,7 @@ namespace mln::canvas::details
 
     assert(dx != 0 || dy != 0);
 
-    auto count = [](int start, int end, int step) { return (end - start - 1) / step + 1; };
+    auto count = [](int start, int end, int step) { return start >= end ? 0 : ((end - start - 1) / step + 1); };
 
     // Top border pixels
     if (dy != 0)
@@ -86,7 +88,7 @@ namespace mln::canvas::details
 
     for (int k = 0; k < pdim; ++k)
     {
-      dims[k]    = input.size(k);
+      dims[k] = input.size(k);
       strides[k] = input.byte_stride(k);
     }
 

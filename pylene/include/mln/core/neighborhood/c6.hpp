@@ -25,11 +25,28 @@ namespace mln
 
     static constexpr int radial_extent() { return 1; }
 
+
+
+    /// \brief Return the input ROI for 3D box.
+    mln::box3d compute_input_region(mln::box3d roi) const
+    {
+      roi.inflate(1);
+      return roi;
+    }
+
+    /// \brief Return the output ROI for 3D box.
+    mln::box3d compute_output_region(mln::box3d roi) const
+    {
+      roi.inflate(-1);
+      return roi;
+    }
+
   private:
     static inline constexpr std::array<point_t, 6> m_offsets = {
         {{+0, +0, -1}, {+0, -1, +0}, {-1, +0, +0}, {+1, +0, +0}, {+0, +1, +0}, {+0, +0, +1}}};
+
   };
 
 
   static constexpr inline c6_t c6 = {};
-} // namespace mln
+} // namespace mln::

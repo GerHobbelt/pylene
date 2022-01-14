@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.2)
+cmake_minimum_required(VERSION 3.14)
 project(Pylene)
 
 # Add FindTBB directory to CMake's module path
@@ -22,7 +22,6 @@ endif ()
 
 
 find_package(FreeImage REQUIRED)
-
 
 # CONFIGURE COMPILER LAUNCHERS
 
@@ -59,7 +58,7 @@ endif (USE_DISTCC)
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
-option(PYLENE_BUILD_PYBIND "ON to build the python bindings with pybind11" ON)
+option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -96,7 +95,16 @@ endif ()
 #### Configuration of the Compiler ###
 
 # Subdirectories
+add_library(Pylene INTERFACE)
+add_library(Pylene::Pylene ALIAS Pylene)
 add_subdirectory(pylene)
+
+if (PYLENE_BUILD_PYTHON)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  add_custom_target(build_python)
+  #add_subdirectory(pylene-python)
+  add_subdirectory(pybind)
+endif()
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_custom_target(build-fixtures)
@@ -119,11 +127,63 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_subdirectory(apps EXCLUDE_FROM_ALL)
 endif ()
 
-if (PYLENE_BUILD_PYBIND)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  add_custom_target(build-pybind)
-  add_subdirectory(pybind)
-endif()
+
+####################################################
+####### Installation & CMAKE module files ##########
+####################################################
+
+target_link_libraries(Pylene INTERFACE Pylene::Core)
+
+include(GNUInstallDirs)
+
+set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
+set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy)
+
+foreach(tgt ${OptionalPyleneTargets})
+  if (TARGET ${tgt})
+    list(APPEND PyleneTargets ${tgt})
+  endif()
+endforeach()
+
+install(TARGETS ${PyleneTargets}
+        EXPORT PyleneTargets)
+
+write_basic_package_version_file(
+    pylene/PyleneConfigVersion.cmake
+    VERSION 0.1
+    COMPATIBILITY AnyNewerVersion
+    )
+
+configure_file(
+    pylene/PyleneConfig.cmake.in
+    pylene/PyleneConfig.cmake
+    @ONLY
+    )
+
+install(EXPORT PyleneTargets
+        FILE PyleneTargets.cmake
+        NAMESPACE Pylene::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
+        )
+
+install(DIRECTORY pylene-python/include/pln
+        TYPE INCLUDE)
+
+
+install(DIRECTORY pylene/include/mln
+        TYPE INCLUDE)
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
+
+
+
+####################################################
+#######          Packaging                ##########
+####################################################
+
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")

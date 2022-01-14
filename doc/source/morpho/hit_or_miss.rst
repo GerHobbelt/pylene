@@ -8,7 +8,7 @@ Include :file:`<mln/morpho/hit_or_miss.hpp>`
 .. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-    Image{I} concrete_t<I> hit_or_miss(I image, StructuringElement se_hit, StructuringElement se_miss)
+    Image{I} image_concrete_t<I> hit_or_miss(I image, StructuringElement se_hit, StructuringElement se_miss)
     void hit_or_miss(Image image, StructuringElement se_hit, StructuringElement se_miss, OutputImage out)
 
       The hit-or-miss transform is non-linerar filter used to detect pattern in

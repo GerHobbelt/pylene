@@ -1,10 +1,10 @@
+#include <mln/core/image/private/ndbuffer_image_data.hpp>
+
 #include <pln/core/image_cast.hpp>
 
-#include <pybind11/stl.h>
+#include <pybind11/pybind11.h>
 
 #include <memory>
-
-#include "scribo/scribo.hpp"
 
 namespace pln
 {
@@ -13,9 +13,5 @@ namespace pln
   PYBIND11_MODULE(pylena, m)
   {
     init_pylena_numpy(m);
-
-#ifdef ENABLE_SCRIBO
-    pln::scribo::define_scribo(m);
-#endif
   }
 } // namespace pln

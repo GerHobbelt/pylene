@@ -85,6 +85,7 @@ namespace mln
 
     sample_type_id id() const { return m_id; }
     std::size_t size() const { return m_size; }
+    bool           is_multichannel() const { return m_id == sample_type_id::RGB8; }
 
   private:
     sample_type_id      m_id;

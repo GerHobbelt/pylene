@@ -3,10 +3,11 @@ Erosion
 
 Include :file:`<mln/morpho/erosion.hpp>`
 
+.. cpp:namespace:: mln::morpho
 
 .. cpp:function:: \
-      Image{I} concrete_t<I> erosion(I image, StructuringElement se)
-      Image{I} concrete_t<I> erosion(I image, StructuringElement se, BorderManager bm)
+      Image{I} image_concrete_t<I> erosion(I image, StructuringElement se)
+      Image{I} image_concrete_t<I> erosion(I image, StructuringElement se, BorderManager bm)
       void erosion(Image image, StructuringElement se, OutputImage out)
       void erosion(Image image, StructuringElement se, BorderManager bm, OutputImage out)
 
@@ -34,6 +35,15 @@ Include :file:`<mln/morpho/erosion.hpp>`
          * (3,4) Nothing (the output image is passed as an argument)
 
       :exception: N/A
+
+.. cpp:namespace:: mln::morpho::parallel
+
+
+.. cpp:function:: \
+      Image{I} image_concrete_t<I> erosion(I image, StructuringElement se)
+      void erosion(Image image, StructuringElement se, OutputImage out)
+
+      Parallel version of the erosion algorithm.
 
 
 Notes

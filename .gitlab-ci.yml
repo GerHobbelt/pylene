@@ -269,14 +269,16 @@ distbench-linux-gcc9-release:
 #################
 
 .documentation-base:  &documentation-base
-    image: ${FEDORA_31}
+    image: ${FEDORA_34}
     stage: build
     script:
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-9 --build missing -s compiler.cppstd=20
+        - conan install -u .. -pr gcc-11 --build missing -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
         - cmake --build . --target build-doc
-        - mkdir ../public && mv doc/sphinx/* ../public/
+        - DOCDIR="public/"
+        - if [ "${CI_COMMIT_REF_SLUG}" != "master" ]; then DOCDIR="public/${CI_COMMIT_REF_SLUG}/"; fi
+        - mkdir -p ../${DOCDIR} && mv doc/sphinx/* ../${DOCDIR}
     artifacts:
         name: "documentation"
         expire_in: 1 week
@@ -288,6 +290,7 @@ documentation:
     <<: *documentation-base
     except:
         - master
+        - next
 
 
 ##########
@@ -298,6 +301,7 @@ pages:
     <<: *documentation-base
     only:
         - master
+        - next
 
 .package:
     stage: deploy

@@ -10,6 +10,7 @@
 #include <mln/core/image/view/mask.hpp>
 #include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/rgb.hpp>
+#include <mln/core/image/view/cast.hpp>
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 #include <mln/io/imread.hpp>
@@ -338,36 +339,40 @@ mln::image2d<uint8_t> ref[3] = {
 
 class DilationTestSuite : public testing::TestWithParam<test_param_t>
 {
+public:
+  template <class V>
+  void test_with(test_param_t tparams);
+
 private:
   tbb::task_scheduler_init __tinit = {};
 };
 
-TEST_P(DilationTestSuite, Exec)
+template <class V>
+void DilationTestSuite::test_with(test_param_t tparam)
 {
-  test_param_t tparam = GetParam();
+    mln::image_build_params params;
+    params.init_value = V(0);
 
-  mln::image_build_params params;
-  params.init_value = uint8_t(0);
+    mln::image2d<V> input(21, 21, params);
+    input({10, 10}) = 1;
 
-  mln::image2d<uint8_t> input(21, 21, params);
-  input({10, 10}) = 1;
+    mln::image2d<V> output;
 
-  mln::image2d<uint8_t> output;
-
-  if (tparam.parallel == PARALLEL)
-  {
-    switch (tparam.se)
+    if (tparam.parallel == PARALLEL)
     {
-    case RECTANGLE:
-      output = mln::morpho::parallel::dilation(input, mln::se::rect2d(19, 15), tparam.tile_width, tparam.tile_height);
-      break;
-    case DISC:
-      output = mln::morpho::parallel::dilation(input, mln::se::disc(9, mln::se::disc::EXACT), tparam.tile_width, tparam.tile_height);
-      break;
-    case DISC_APPROX:
-      output = mln::morpho::parallel::dilation(input, mln::se::disc(9), tparam.tile_width, tparam.tile_height);
-      break;
-    }
+      switch (tparam.se)
+      {
+      case RECTANGLE:
+        output = mln::morpho::parallel::dilation(input, mln::se::rect2d(19, 15), tparam.tile_width, tparam.tile_height);
+        break;
+      case DISC:
+        output = mln::morpho::parallel::dilation(input, mln::se::disc(9, mln::se::disc::EXACT), tparam.tile_width,
+                                                 tparam.tile_height);
+        break;
+      case DISC_APPROX:
+        output = mln::morpho::parallel::dilation(input, mln::se::disc(9), tparam.tile_width, tparam.tile_height);
+        break;
+      }
   }
   else
   {
@@ -384,7 +389,19 @@ TEST_P(DilationTestSuite, Exec)
       break;
     }
   }
-  ASSERT_IMAGES_EQ_EXP(ref[tparam.se], output);
+
+    if constexpr (std::is_same_v<V, uint8_t>)
+      ASSERT_IMAGES_EQ_EXP(ref[tparam.se], output);
+    else
+      ASSERT_IMAGES_EQ_EXP(mln::view::cast<V>(ref[tparam.se]), output);
+}
+
+
+TEST_P(DilationTestSuite, Exec)
+{
+  test_param_t tparam = GetParam();
+  test_with<uint8_t>(tparam);
+  test_with<int8_t>(tparam);
 }
 
 

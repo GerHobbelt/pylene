@@ -100,7 +100,7 @@ namespace mln::morpho
     };
 
     template <class V>
-    struct dilation_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16)>>
+    struct dilation_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16) && std::is_unsigned_v<V>>>
       : dilation_value_set_base<V>
     {
       using has_incremental_sup                         = std::true_type;

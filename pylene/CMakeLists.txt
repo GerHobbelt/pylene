@@ -7,6 +7,7 @@ find_package(TBB)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
+find_package(Eigen3 3.3.9)
 find_package(cfitsio)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
@@ -120,6 +121,30 @@ if (cfitsio_FOUND)
   target_link_libraries(Pylene-io-fits PUBLIC Pylene-core)
   target_link_libraries(Pylene-io-fits PRIVATE cfitsio::cfitsio)
 endif(cfitsio_FOUND)
+
+if (Eigen3_FOUND)
+  add_library(Pylene-scribo)
+  add_library(Pylene::Scribo ALIAS Pylene-scribo)
+
+  target_include_directories(Pylene-scribo PUBLIC
+                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                             $<INSTALL_INTERFACE:include>)
+
+  target_sources(Pylene-scribo PRIVATE
+          src/scribo/segdet/filter.cpp
+          src/scribo/segdet/label_array.cpp
+          src/scribo/segdet/linearregression.cpp
+          src/scribo/segdet/parameters.cpp
+          src/scribo/segdet/preprocess.cpp
+          src/scribo/segdet/process.cpp
+          src/scribo/segdet/postprocess.cpp
+          src/scribo/segdet/segdet.cpp
+          src/scribo/segdet/segment.cpp
+  )
+
+  target_link_libraries(Pylene-scribo PUBLIC Pylene-core)
+  target_link_libraries(Pylene-scribo PRIVATE Eigen3::Eigen3)
+endif(Eigen3_FOUND)
 
 # Compiler configurations
 target_compile_features(Pylene-core PUBLIC cxx_std_20)

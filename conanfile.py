@@ -32,6 +32,7 @@ class Pylene(ConanFile):
         "fmt/6.0.0",
         "tbb/2020.0",
         "xsimd/7.4.6",
+        "eigen/3.3.9",
         "boost/1.75.0",
         "cfitsio/4.0.0"
     ]
@@ -71,6 +72,13 @@ class Pylene(ConanFile):
         self.cpp_info.components["Core"].libs = ["Pylene-core"]
         self.cpp_info.components["Core"].includedirs = ["include"]
         self.cpp_info.components["Core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
+
+        # Scribo component
+        self.cpp_info.components["Scribo"].names["cmake_find_package"] = "Scribo"
+        self.cpp_info.components["Scribo"].names["cmake_find_package_multi"] = "Scribo"
+        self.cpp_info.components["Scribo"].libs = ["Pylene-scribo"]
+        self.cpp_info.components["Scribo"].includedirs = ["include"]
+        self.cpp_info.components["Scribo"].requires = ["Core", "eigen::eigen3"]
 
         # IO component (FreeImage)
         self.cpp_info.components["IO-freeimage"].system_libs.append("freeimage")

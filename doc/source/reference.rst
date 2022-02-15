@@ -10,4 +10,5 @@ Reference
    core
    labeling
    morpho
+   scribo
    concept

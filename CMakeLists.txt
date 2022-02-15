@@ -133,7 +133,7 @@ target_link_libraries(Pylene INTERFACE Pylene::Core)
 include(GNUInstallDirs)
 
 set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
-set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy)
+set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy Pylene-scribo)
 
 foreach(tgt ${OptionalPyleneTargets})
   if (TARGET ${tgt})

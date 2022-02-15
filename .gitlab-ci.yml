@@ -70,7 +70,7 @@ windows-debug:
         - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
         - cmake --build . --target Pylene-core
-        - cmake --build . --target pylena
+        - cmake --build . --target Pylene-numpy
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []

@@ -42,8 +42,6 @@ class Pylene(ConanFile):
 
     def configure(self):
         tools.check_min_cppstd(self, "20")
-        if self.options.shared:
-            del self.options.fPIC
         if self._build_python():
             self.build_requires.append("pybind11/2.6.2")
 

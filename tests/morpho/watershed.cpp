@@ -2,6 +2,7 @@
 
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
+#include <mln/core/algorithm/fill.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -46,4 +47,36 @@ TEST(Morpho, watershed_thick)
   int  nlabel;
   auto res = mln::morpho::watershed<int16_t>(input, mln::c4, nlabel);
   ASSERT_IMAGES_EQ_EXP(ref, res);
+}
+
+TEST(Morpho, watershed_propagate_seeds_c4)
+{
+  const mln::image2d<std::uint8_t> input{
+    {255, 255, 255, 255, 255, 255, 255, 255},
+    {255, 0, 0, 0, 255, 0, 0, 255},
+    {255, 0, 0, 0, 255, 0, 0, 255},
+    {255, 0, 0, 0, 255, 255, 255, 255},
+    {255, 255, 255, 255, 255, 3, 2, 255}
+  };
+
+  const mln::image2d<std::uint8_t> seeds{
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 3, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 5, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0}
+  };
+
+  const mln::image2d<std::int16_t> ref{
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 1, 1, 1, 0, 2, 2, 0},
+    {0, 1, 1, 1, 0, 2, 2, 0},
+    {0, 1, 1, 1, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0},
+  };
+
+  mln::image2d<std::int16_t> out(input.domain());
+  mln::fill(out, -1);
+  mln::morpho::impl::details::propagate_seeds(input, mln::c4, out, seeds);
+  ASSERT_IMAGES_EQ_EXP(out, ref);
 }

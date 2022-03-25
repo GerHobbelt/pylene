@@ -47,7 +47,7 @@ namespace mln::morpho
             {
               auto p = st.top();
               st.pop();
-              output(p) = px.val();
+              output(p) = nlbl;
               for (auto q : nbh(p))
               {
                 if (domain.has(q) && output(q) <= 0 && output(q) != -2 && input(p) == input(q))

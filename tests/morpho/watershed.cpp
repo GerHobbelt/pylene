@@ -142,7 +142,7 @@ TEST(Morpho, watershed_from_markers_c4)
       {1, 1, 1, 1, 0, 2, 2, 2}, //
   };
 
-  int nlabel;
+  int  nlabel;
   auto out = mln::morpho::watershed_from_markers<std::int16_t>(input, mln::c4, seeds, nlabel);
   ASSERT_EQ(nlabel, 2);
   ASSERT_IMAGES_EQ_EXP(out, ref);
@@ -174,7 +174,7 @@ TEST(Morpho, watershed_from_markers_c8)
       {1, 1, 1, 1, 1, 1, 1, 1}, //
   };
 
-  int nlabel;
+  int  nlabel;
   auto out = mln::morpho::watershed_from_markers<std::int16_t>(input, mln::c8, seeds, nlabel);
   ASSERT_EQ(nlabel, 2);
   ASSERT_IMAGES_EQ_EXP(out, ref);

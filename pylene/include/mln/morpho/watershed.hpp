@@ -32,10 +32,10 @@ namespace mln::morpho
       template <typename I, typename N, typename O, typename S>
       int propagate_seeds(I input, N nbh, O output, S seeds)
       {
-        using P = image_point_t<I>;
-        int nlbl = 0;
+        using P           = image_point_t<I>;
+        int        nlbl   = 0;
         const auto domain = input.domain();
-        mln_foreach(auto px, seeds.pixels())
+        mln_foreach (auto px, seeds.pixels())
         {
           if (px.val() > 0)
           {
@@ -63,7 +63,7 @@ namespace mln::morpho
         }
         return nlbl;
       }
-    }
+    } // namespace details
 
     template <class I, class N, class O, class S = std::nullptr_t>
     int watershed(I input, N nbh, O output, S* seeds = nullptr)

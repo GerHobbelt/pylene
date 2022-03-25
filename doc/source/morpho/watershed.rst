@@ -22,6 +22,20 @@ Include :file:`<mln/morpho/watershed.hpp>`
 
    :exception: N/A
 
+.. cpp:function:: template <class Label_t, class I, class N, class S> \
+                 image_ch_value_t<I, Label_t> watershed_from_markers(I&& input, N&& nbh, S&& seeds, int& nlabel)
+
+   Watershed by immersion as defined in [BM92]_ with given markers.
+
+   :tparam Label_t: The type of label (must be *signed* :cpp:concept:`Integral`)
+
+   :param input: Input image
+   :param nbh: The considered neighborhood
+   :param seeds: An image with markers, labeled from 1 to n
+   :param nlabel (out): The nuber of catchment basins (the maximum label of marker)
+
+   :return: A labelized image
+
 Notes
 -----
 

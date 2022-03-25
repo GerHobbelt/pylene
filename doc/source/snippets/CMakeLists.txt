@@ -55,6 +55,7 @@ add_image("area_filter"
 
 
 add_image("blobs_watershed" "${DOCUMENTATION_IMAGE_DIR}/blobs_binary.png" blobs_distance_transform.png blobs_segmentation.png)
+add_image("watershed_from_markers" "${PYLENE_IMAGE_DIR}/lena.png" marker_on_gradient.png lena_ws_marker.png)
 
 add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.ppm" alphatree_cut_color.png)
 add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.pgm" alphatree_cut_gray.png)
@@ -91,5 +92,6 @@ add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
 add_executable(mtos_example mtos_example.cpp)
+add_executable(watershed_from_markers watershed_from_markers.cpp)
 
 target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)

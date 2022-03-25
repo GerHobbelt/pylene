@@ -83,5 +83,30 @@ Example 1: Cell segmentation
 
    Segmented blobs and watershed lines (labels displayed in false colors).
 
+Example 2: Watershed from markers
+---------------------------------
 
+This example demonstrates how to use the watershed based on input markers.
 
+.. code-block::
+
+   // (1) Get input image and markers image
+   mln::image2d<std::uint8_t> input = ...;
+   mln::image2d<std::uint16_t> seeds = ...;
+
+   // (2) Compute the Beucher gradient
+   auto grad = mln::morpho::gradient(input, mln::se::disc(3));
+
+   // (3) Compute the watershed
+    auto out = mln::morpho::watershed_from_markers<std::int32_t>(grad, mln::c8, seeds, nlbl); 
+
+.. list-table::
+
+   * - .. image:: /images/marker_on_gradient.png
+          :width: 100%
+
+     - .. image:: /images/lena_ws_marker.png
+          :width: 100%
+
+   * - Input image (with markers in red)
+     - Segmented image with watershed lines (labels are displayed in false colors).

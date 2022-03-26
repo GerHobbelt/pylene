@@ -66,7 +66,7 @@ namespace mln::morpho
     } // namespace details
 
     template <class I, class N, class O, class S = std::nullptr_t>
-    int watershed(I input, N nbh, O output, S* seeds = nullptr)
+    int watershed(I input, N nbh, O output, [[maybe_unused]] const S* seeds = nullptr)
     {
       using Label_t = image_value_t<O>;
       using V       = image_value_t<I>;

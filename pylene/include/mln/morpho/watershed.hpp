@@ -9,9 +9,8 @@
 #include <mln/core/trace.hpp>
 
 #include <mln/labeling/local_extrema.hpp>
+#include <mln/labeling/blobs.hpp>
 #include <mln/morpho/private/pqueue.hpp>
-
-#include <stack>
 
 namespace mln::morpho
 {
@@ -27,56 +26,16 @@ namespace mln::morpho
 
   namespace impl
   {
-    namespace details
-    {
-      template <typename I, typename N, typename O, typename S>
-      int propagate_seeds(I input, N nbh, O output, S seeds)
-      {
-        using P           = image_point_t<I>;
-        int        nlbl   = 0;
-        const auto domain = input.domain();
-        mln_foreach (auto px, seeds.pixels())
-        {
-          if (px.val() > 0)
-          {
-            // Will use union find to labelize instead of flood filling
-            nlbl++;
-            auto st = std::stack<P>();
-            st.push(px.point());
-            while (!st.empty())
-            {
-              auto p = st.top();
-              st.pop();
-              output(p) = nlbl;
-              for (auto q : nbh(p))
-              {
-                if (domain.has(q) && output(q) <= 0 && output(q) != -2 && input(p) == input(q))
-                {
-                  output(q) = -2;
-                  st.push(q);
-                }
-              }
-            }
-          }
-          else if (output(px.point()) < 0)
-            output(px.point()) = 0;
-        }
-        return nlbl;
-      }
-    } // namespace details
-
-    template <class I, class N, class O, class S = std::nullptr_t>
-    int watershed(I input, N nbh, O output, [[maybe_unused]] const S* seeds = nullptr)
+    template <class I, class N, class O>
+    int watershed(I input, N nbh, O output, bool markers=false)
     {
       using Label_t = image_value_t<O>;
       using V       = image_value_t<I>;
 
       // 1. Labelize minima (note that output is initialized to -1)
       int nlabel = 0;
-      if constexpr (std::is_same_v<S, std::nullptr_t>)
+      if (!markers)
         nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>());
-      else
-        nlabel = details::propagate_seeds(input, nbh, output, *seeds);
 
       constexpr int kUnlabeled = -2;
       constexpr int kInqueue   = -1;
@@ -237,26 +196,11 @@ namespace mln::morpho
     mln_entering("mln::morpho::watershed_from_markers");
     assert(ima.domain() == seeds.domain());
 
-    constexpr Label_t kUninitialized = -1;
-
-    image_build_error_code err = IMAGE_BUILD_OK;
-
-    auto output = imchvalue<Label_t>(ima) //
-                      .adjust(nbh)
-                      .set_init_value(kUninitialized)
-                      .get_status(&err)
-                      .build();
-
-    if (err == IMAGE_BUILD_OK)
-    {
-      nlabel = impl::watershed(ima, nbh, output, &seeds);
-    }
+    auto output = mln::labeling::blobs<Label_t>(seeds, nbh, nlabel);
+    if (output.border() < nbh.radial_extent())
+      impl::watershed(ima, nbh, view::value_extended(output, 0), true);
     else
-    {
-      mln::trace::warn("[Performance] The extension is not wide enough");
-      auto out = view::value_extended(output, kUninitialized);
-      nlabel   = impl::watershed(ima, nbh, out, &seeds);
-    }
+      impl::watershed(ima, nbh, output, true);
     return output;
   }
 } // namespace mln::morpho

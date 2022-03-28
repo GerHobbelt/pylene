@@ -33,7 +33,7 @@ Include :file:`<mln/morpho/watershed.hpp>`
 
    :param input: Input image
    :param nbh: The considered neighborhood
-   :param seeds: An image with markers
+   :param seeds: An image with markers. The image should be binary, with the markers label greater than 0.
    :param nlabel (out): The number of catchment basins
 
    :return: A labelized image

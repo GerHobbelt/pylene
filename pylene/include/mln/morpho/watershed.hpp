@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mln/core/algorithm/count_if.hpp>
 #include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/extension/fill.hpp>
 #include <mln/core/image/image.hpp>
@@ -8,8 +7,8 @@
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
 
-#include <mln/labeling/local_extrema.hpp>
 #include <mln/labeling/blobs.hpp>
+#include <mln/labeling/local_extrema.hpp>
 #include <mln/morpho/private/pqueue.hpp>
 
 namespace mln::morpho
@@ -27,7 +26,7 @@ namespace mln::morpho
   namespace impl
   {
     template <class I, class N, class O>
-    int watershed(I input, N nbh, O output, bool markers=false)
+    int watershed(I input, N nbh, O output, bool markers = false)
     {
       using Label_t = image_value_t<O>;
       using V       = image_value_t<I>;

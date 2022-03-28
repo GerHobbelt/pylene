@@ -1,6 +1,5 @@
 #include <mln/morpho/watershed.hpp>
 
-#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>

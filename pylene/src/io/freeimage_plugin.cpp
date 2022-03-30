@@ -1,6 +1,8 @@
 #include <mln/io/private/freeimage_plugin.hpp>
 #include <fmt/core.h>
 
+#include <stdexcept>
+
 #include <FreeImage.h>
 
 namespace mln::io::internal

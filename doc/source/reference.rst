@@ -8,6 +8,7 @@ Reference
 
 
    core
+   io
    labeling
    morpho
    scribo

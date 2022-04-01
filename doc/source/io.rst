@@ -162,6 +162,14 @@ has a plugin **only to read these images** around CFITSIO. **It only handles
 standard FITS file** (this can be check using `FITSVERIFY
 <https://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/>`_.
 
+This plugin is contained in the component ``Pylene::IO-fits``, which
+depends on ``Pylene::Core``. When using it, do not forget to add it in the
+CMakeLists.txt as below:
+
+.. code-block:: cmake
+
+    target_link_libraries(my_executable PRIVATE Pylene::IO-fits)
+
 Reading images
 --------------
 

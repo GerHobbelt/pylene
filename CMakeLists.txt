@@ -2,23 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 project(Pylene)
 
 # Add FindTBB directory to CMake's module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-
-
-if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  include("${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  conan_set_rpath()
-  conan_set_std()
-  conan_set_fpic()
-  conan_check_compiler()
-  conan_set_libcxx()
-  conan_set_vs_runtime()
-endif()
-
-
-if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
-  include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
-endif ()
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${CMAKE_BINARY_DIR}")
 
 
 find_package(FreeImage REQUIRED)

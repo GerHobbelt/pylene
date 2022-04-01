@@ -27,6 +27,7 @@ variables:
     CCACHE_MAXSIZE: 2G
 
 before_script:
+        - pip install --upgrade conan
         - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
         - conan profile new --detect default
         - ccache -p
@@ -43,9 +44,9 @@ windows-debug:
     stage: build
     script:
         - mkdir build; cd build
-        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20 -o pylene:fPIC=True
-        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
-        - cmake --build . --target build-tests
+        - conan install .. -s build_type=Debug -s compiler.cppstd=20 --build missing
+        - cmake .. -D CMAKE_TOOLCHAIN_FILE=.\conan_toolchain.cmake -D FreeImage_ROOT=C:\vcpkg\packages\freeimage_x64-windows\ -D CMAKE_BUILD_TYPE=Debug
+        - cmake --build . --target build-tests --config Debug
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
     artifacts:
@@ -67,8 +68,8 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
+        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True -s build_type=$PYLENE_CONFIGURATION
+        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -D PYLENE_BUILD_PYTHON=ON
         - cmake --build . --target Pylene-core
         - cmake --build . --target pylena
         - cmake --build . --target build-tests

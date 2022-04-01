@@ -36,6 +36,8 @@ as below:
 
     target_link_libraries(my_executable PRIVATE Pylene::IO-freeimage)
 
+Supported formats (from `here <https://freeimage.sourceforge.io/features.html>`_).
+
 Reading image
 -------------
 
@@ -159,8 +161,8 @@ System <https://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html>`_ (FITS). The
 `CFITSIO <https://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html>`_
 library handles the reading and the writing of these image. The Pylene library
 has a plugin **only to read these images** around CFITSIO. **It only handles
-standard FITS file** (this can be check using `FITSVERIFY
-<https://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/>`_.
+standard FITS file** (this can be checked using `FITSVERIFY
+<https://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/>`_).
 
 This plugin is contained in the component ``Pylene::IO-fits``, which
 depends on ``Pylene::Core``. When using it, do not forget to add it in the

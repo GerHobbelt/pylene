@@ -1,5 +1,7 @@
-from conans import CMake, ConanFile, tools
+from conans import ConanFile, tools
 import os
+from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
+from conan.tools.layout import cmake_layout
 
 class Pylene(ConanFile):
     name = "pylene"
@@ -19,11 +21,11 @@ class Pylene(ConanFile):
         "boost:header_only": True,
     }
 
-    generators = [ "cmake", "cmake_paths", "cmake_find_package" ]
+    generators = "CMakeDeps"
     exports_sources = ["pylene/*", "pylene-python/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     build_requires = [
-        "gtest/[>=1.10.0]",
+        "gtest/[>=1.11.0]",
         "benchmark/[>=1.5.0]",
     ]
 
@@ -45,62 +47,88 @@ class Pylene(ConanFile):
         if self._build_python():
             self.build_requires.append("pybind11/2.6.2")
 
-    def build(self):
-        cmake = CMake(self)
-        cmake.definitions["PYLENE_BUILD_LIBS_ONLY"] = "YES"
+    def generate(self):
+        cmake = CMakeDeps(self)
+        cmake.generate()
+        tc = CMakeToolchain(self)
+        tc.generate()
+
+    def layout(self):
+        self.folders.source = "."
+        self.folders.build = "build"
+        self.folders.generators = "build"
+        # Core component
+        self.cpp.package.components["core"].libs = ["Pylene-core"]
+        self.cpp.package.components["core"].libdirs = ["lib"]
+        self.cpp.package.components["core"].includedirs = ["include"]
+        self.cpp.source.components["core"].includedirs = ["pylene/include"]
+        self.cpp.build.components["core"].libdirs = ["pylene"]
+
+        # Scribo component
+        self.cpp.package.components["scribo"].libs = ["Pylene-scribo"]
+        self.cpp.source.components["scribo"].includedirs = ["pylene/include"]
+        self.cpp.build.components["scribo"].libdirs = ["pylene"]
+
+
+        # IO component (FreeImage)
+        self.cpp.package.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp.source.components["io-freeimage"].includedirs = ["pylene/include"]
+        self.cpp.build.components["io-freeimage"].libdirs = ["pylene"]
+
+
+        # IO component (cfitsio)
+        self.cpp.package.components["io-fits"].libs = ["Pylene-io-fits"]
+        self.cpp.source.components["io-fits"].includedirs = ["pylene/include"]
+        self.cpp.build.components["io-fits"].libdirs = ["pylene"]
+
         if self._build_python():
-            cmake.definitions["PYLENE_BUILD_PYTHON"] = "YES"
+            self.cpp.package.components["pylene-numpy"].libs = ["Pylene-numpy"]
+            self.cpp.source.components["pylene-numpy"].includedirs = ["pylene-python/include"]
+            self.cpp.build.components["pylene-numpy"].libdirs = ["pylene-python"]
+
+
+    def build(self):
+        variables = { "PYLENE_BUILD_LIBS_ONLY" : "YES" } # Controls what is built, not the toolchain
+        if self._build_python():
+            variables["PYLENE_BUILD_PYTHON"] = "YES"
         else:
             self.output.warn("fPIC disabled. Skipping python bindings build...")
-        cmake.configure()
+        cmake = CMake(self)
+        cmake.configure(variables)
         cmake.build()
         cmake.install()
 
     def package(self):
-        self.copy("FindFreeImage.cmake", dst="", src="cmake")
+        self.copy("FindFreeImage.cmake", dst="cmake", src="cmake")
         tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
-        self.cpp_info.names["cmake_find_package"] = "Pylene"
-        self.cpp_info.names["cmake_find_package_multi"] = "Pylene"
+        self.cpp_info.builddirs = ["cmake"]
+        self.cpp_info.set_property("cmake_target_name", "pylene::pylene")
+
 
         # Core component
-        self.cpp_info.components["Core"].names["cmake_find_package"] = "Core"
-        self.cpp_info.components["Core"].names["cmake_find_package_multi"] = "Core"
-        self.cpp_info.components["Core"].libs = ["Pylene-core"]
-        self.cpp_info.components["Core"].includedirs = ["include"]
-        self.cpp_info.components["Core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
+        self.cpp_info.components["core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
+        self.cpp_info.components["core"].libs = ["Pylene-core"]
 
         # Scribo component
-        self.cpp_info.components["Scribo"].names["cmake_find_package"] = "Scribo"
-        self.cpp_info.components["Scribo"].names["cmake_find_package_multi"] = "Scribo"
-        self.cpp_info.components["Scribo"].libs = ["Pylene-scribo"]
-        self.cpp_info.components["Scribo"].includedirs = ["include"]
-        self.cpp_info.components["Scribo"].requires = ["Core", "eigen::eigen3"]
+        self.cpp_info.components["scribo"].requires = ["core", "eigen::eigen3"]
+        self.cpp_info.components["scribo"].libs = ["Pylene-scribo"]
 
         # IO component (FreeImage)
-        self.cpp_info.components["IO-freeimage"].system_libs.append("freeimage")
-        self.cpp_info.components["IO-freeimage"].names["cmake_find_package"] = "IO-freeimage"
-        self.cpp_info.components["IO-freeimage"].names["cmake_find_package_multi"] = "IO-freeimage"
-        self.cpp_info.components["IO-freeimage"].libs = ["Pylene-io-freeimage"]
-        self.cpp_info.components["IO-freeimage"].includedirs = ["include"]
-        self.cpp_info.components["IO-freeimage"].requires = ["Core"]
+        self.cpp_info.components["io-freeimage"].system_libs.append("freeimage")
+        self.cpp_info.components["io-freeimage"].requires = ["core"]
+        self.cpp_info.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
 
         # IO component (cfitsio)
-        self.cpp_info.components["IO-fits"].names["cmake_find_package"] = "IO-fits"
-        self.cpp_info.components["IO-fits"].names["cmake_find_package_multi"] = "IO-fits"
-        self.cpp_info.components["IO-fits"].libs = ["Pylene-io-fits"]
-        self.cpp_info.components["IO-fits"].includedirs = ["include"]
-        self.cpp_info.components["IO-fits"].requires = ["Core", "cfitsio::cfitsio"]
+        self.cpp_info.components["io-fits"].requires = ["core", "cfitsio::cfitsio"]
+        self.cpp_info.components["io-fits"].libs = ["Pylene-io-fits"]
 
 
         # Pylene-numpy component
         if self._build_python():
-            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage_multi"] = "Pylene-numpy"
-            self.cpp_info.components["Pylene-numpy"].names["cmake_find_pakage"] = "Pylene-numpy"
-            self.cpp_info.components["Pylene-numpy"].libs = ["Pylene-numpy"]
-            self.cpp_info.components["Pylene-numpy"].requires = ["Core"]
-            self.cpp_info.components["Pylene-numpy"].includedirs = ["include"]
+            self.cpp_info.components["pylene-numpy"].requires = ["core"]
+            self.cpp_info.components["pylene-numpy"].libs = ["Pylene-numpy"]
 
         v = tools.Version(self.settings.compiler.version)
         for comp in self.cpp_info.components:

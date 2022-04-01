@@ -85,37 +85,6 @@ windows-debug:
 # Asan, memsan and tsan are incompatible with each other within the same binary
 # Asan and ubsan can work together
 
-
-distcheck-linux-gcc9-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_31}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
-        CONAN_PROFILE: "gcc-9"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-
-distcheck-linux-gcc9-debug-asan-ubsan:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_31}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        CONAN_PROFILE: "gcc-9"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master"
-        - if: $CI_MERGE_REQUEST_ID
-          when: never
-        - when: manual
-          allow_failure: true
-
 distcheck-linux-clang10-release:
     <<: *distcheck-linux-base
     image: ${FEDORA_32}
@@ -315,11 +284,6 @@ pages:
     variables:
         CONAN_REVISIONS_ENABLED: 1
 
-package gcc-9:
-   extends: .package
-   image: ${FEDORA_31}
-   variables:
-        CONAN_BASE_PROFILE: gcc-9
 
 package gcc-10:
    extends: .package

@@ -85,6 +85,17 @@ namespace mln
           m_hist.fill(0);
         }
 
+        void take(const h_infsup_base& other)
+        {
+          for (std::size_t i = 0; i < m_hist.size(); ++i)
+            m_hist[i] += other.m_hist[i];
+
+          m_count += other.m_count;
+          m_inf = std::min(other.m_inf, m_inf);
+          m_sup = std::max(other.m_sup, m_sup);
+        }
+
+
         void take(const T& x)
         {
           ++m_hist[x];

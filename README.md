@@ -23,8 +23,8 @@ Under [Mozilla Public License, v. 2.0](http://mozilla.org/MPL/2.0/).
 Pylene is developed in modern C++ so you need a recent C++ compiler. The followings compilers are currently supported
 and tested:
 
-* GCC 9 and 10
-* Clang 10
+* ~~GCC 9~~ GCC 10, GCC 11
+* Clang 10, Clang 11, Clang 12
 * Microsoft Visual Studio 2019
 
 This project relies on:

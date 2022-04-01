@@ -26,4 +26,4 @@ add_core_test(${test_prefix}component_tree component_tree.cpp)
 add_core_test(${test_prefix}MToS mtos.cpp)
 
 
-target_link_libraries(${test_prefix}dilate PRIVATE TBB::TBB)
+target_link_libraries(${test_prefix}dilate PRIVATE tbb::tbb)

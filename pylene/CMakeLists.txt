@@ -16,7 +16,7 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 add_library(Pylene-core)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene-core PRIVATE TBB::TBB)
+  target_link_libraries(Pylene-core PRIVATE tbb::tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
   target_compile_definitions(Pylene-core PRIVATE MLN_NO_TBB)
@@ -42,7 +42,7 @@ target_include_directories(Pylene-core PUBLIC
                            $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
-target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd::xsimd)
+target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd)
 target_link_libraries(Pylene-core PUBLIC fmt::fmt)
 
 # Set sources
@@ -58,7 +58,7 @@ add_library(Pylene-bp OBJECT
 target_include_directories(Pylene-bp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_link_libraries(Pylene-bp PRIVATE xsimd::xsimd fmt::fmt)
+target_link_libraries(Pylene-bp PRIVATE xsimd fmt::fmt)
 target_compile_features(Pylene-bp PUBLIC cxx_std_20)
 
 target_link_libraries(Pylene-core PRIVATE Pylene-bp)
@@ -143,7 +143,7 @@ if (Eigen3_FOUND)
   )
 
   target_link_libraries(Pylene-scribo PUBLIC Pylene-core)
-  target_link_libraries(Pylene-scribo PRIVATE Eigen3::Eigen3)
+  target_link_libraries(Pylene-scribo PRIVATE Eigen3::Eigen)
 endif(Eigen3_FOUND)
 
 # Compiler configurations

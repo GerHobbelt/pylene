@@ -5,6 +5,8 @@ endif()
 
 find_package(fmt 6.0 REQUIRED)
 find_package(pybind11 REQUIRED)
+include(pybind11Common)
+
 find_package(Eigen3)
 
 add_library(Pylene-numpy)

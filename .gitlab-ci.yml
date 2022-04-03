@@ -242,6 +242,7 @@ distbench-linux-gcc9-release:
     image: ${FEDORA_31}
     stage: build
     script:
+        - dnf install -y cairo-devel
         - mkdir build && cd build
         - conan install -u .. -pr gcc-9 --build missing -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release

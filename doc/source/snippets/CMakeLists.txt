@@ -66,6 +66,7 @@ add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.pgm" watershed
 add_image("saliency_example" "${PYLENE_IMAGE_DIR}/lena.pgm" saliency_watershed.png)
 
 add_image("mtos_example" "${PYLENE_IMAGE_DIR}/lena.ppm" depth_map.png mtos_rec.png)
+add_image("hough_lines" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.pbm" "staff_hough_lines.png")
 
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")
@@ -92,6 +93,8 @@ add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
 add_executable(mtos_example mtos_example.cpp)
+add_executable(hough_lines hough_lines.cpp)
+target_link_libraries(hough_lines -lcairo)
 add_executable(watershed_from_markers watershed_from_markers.cpp)
 
 target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)

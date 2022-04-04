@@ -68,23 +68,31 @@ class Pylene(ConanFile):
 
         # Scribo component
         self.cpp.package.components["scribo"].libs = ["Pylene-scribo"]
+        self.cpp.package.components["scribo"].libdirs = ["lib"]
+        self.cpp.package.components["scribo"].includedirs = ["include"]
         self.cpp.source.components["scribo"].includedirs = ["pylene/include"]
         self.cpp.build.components["scribo"].libdirs = ["pylene"]
 
 
         # IO component (FreeImage)
         self.cpp.package.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp.package.components["io-freeimage"].libdirs = ["lib"]
+        self.cpp.package.components["io-freeimage"].includedirs = ["include"]
         self.cpp.source.components["io-freeimage"].includedirs = ["pylene/include"]
         self.cpp.build.components["io-freeimage"].libdirs = ["pylene"]
 
 
         # IO component (cfitsio)
         self.cpp.package.components["io-fits"].libs = ["Pylene-io-fits"]
+        self.cpp.package.components["io-fits"].libdirs = ["lib"]
+        self.cpp.package.components["io-fits"].includedirs = ["include"]
         self.cpp.source.components["io-fits"].includedirs = ["pylene/include"]
         self.cpp.build.components["io-fits"].libdirs = ["pylene"]
 
         if self._build_python():
             self.cpp.package.components["pylene-numpy"].libs = ["Pylene-numpy"]
+            self.cpp.package.components["pylene-numpy"].libdirs = ["lib"]
+            self.cpp.package.components["pylene-numpy"].includedirs = ["include"]
             self.cpp.source.components["pylene-numpy"].includedirs = ["pylene-python/include"]
             self.cpp.build.components["pylene-numpy"].libdirs = ["pylene-python"]
 

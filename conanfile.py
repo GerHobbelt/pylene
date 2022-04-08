@@ -2,6 +2,7 @@ from conans import ConanFile, tools
 import os
 from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
 from conan.tools.layout import cmake_layout
+from conans.errors import ConanInvalidConfiguration
 
 class Pylene(ConanFile):
     name = "pylene"
@@ -42,8 +43,13 @@ class Pylene(ConanFile):
     def _build_python(self):
         return self.options.shared or self.options.fPIC or tools.os_info.is_windows
 
-    def configure(self):
+    def _check_configuration(self):
         tools.check_min_cppstd(self, "20")
+        if self.settings.compiler in ["gcc", "clang"] and tools.Version(self.settings.compiler.version) < 10:
+            raise ConanInvalidConfiguration("Invalid compiler version for {} (Got {}, should be greater or equal to 10)".format(self.settings.compiler, self.settings.compiler.version))
+
+    def configure(self):
+        self._check_configuration()
         if self.options.shared:
             self.options.fPIC = True
         if self._build_python():

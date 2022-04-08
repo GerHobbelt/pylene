@@ -5,7 +5,6 @@ project(Pylene)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${CMAKE_BINARY_DIR}")
 
-
 find_package(FreeImage REQUIRED)
 
 # CONFIGURE COMPILER LAUNCHERS
@@ -47,6 +46,9 @@ option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10")
+    message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler minimum version required is 10 (Got ${CMAKE_CXX_COMPILER_VERSION})")
+  endif()
   add_compile_options(
     "-Wextra"
     "-Wall"

@@ -72,7 +72,7 @@ namespace mln::morpho
   {
     const auto        domain = nodemap.domain();
     mln::image2d<int> out    = mln::imconcretize(nodemap).set_init_value(0);
-    auto       depth  = t.compute_depth();
+    auto              depth  = t.compute_depth();
     /*auto depth = [&t]() {
       auto res = std::vector(t.parent.size(), 0);
       for (int i = t.parent.size() - 2; i > 0; i--)

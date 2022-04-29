@@ -40,7 +40,9 @@ int main(int argc, char* argv[])
   // Save the watershed
   {
     const int waterline = t.parent.size() - 1;
-    mln::io::imsave(mln::view::transform(mln::view::ifelse(nodemap == waterline, 0, nodemap), [](auto x) { return regions_lut(x); }), output_watershed);
+    mln::io::imsave(mln::view::transform(mln::view::ifelse(nodemap == waterline, 0, nodemap),
+                                         [](auto x) { return regions_lut(x); }),
+                    output_watershed);
   }
 
   // Compute the saliency map
@@ -49,8 +51,7 @@ int main(int argc, char* argv[])
   // Save the saliency
   mln::io::imsave(mln::view::transform(saliency,
                                        [&t](int x) -> std::uint8_t {
-                                         return static_cast<float>(x) /
-                                                static_cast<float>(t.values[0]) * 255;
+                                         return static_cast<float>(x) / static_cast<float>(t.values[0]) * 255;
                                        }),
                   output_saliency_filename.c_str());
 

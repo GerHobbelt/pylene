@@ -26,7 +26,6 @@ namespace mln::morpho
       std::vector<std::tuple<int, int, int>> m_mst;
       int                                    m_nlbl;
       int                                    m_save;
-      int debug_counter = 0;
     };
   } // namespace details
 

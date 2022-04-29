@@ -44,7 +44,12 @@ int main(int argc, char* argv[])
   auto saliency = mln::morpho::waterfall_saliency(t, nodemap);
 
   // Save the saliency
-  mln::io::imsave(saliency, output_saliency_filename.c_str());
+  mln::io::imsave(mln::view::transform(saliency,
+                                       [&t](int x) -> std::uint8_t {
+                                         return static_cast<float>(x) /
+                                                static_cast<float>(t.values[t.parent.size() - 1]) * 255;
+                                       }),
+                  output_saliency_filename.c_str());
 
   // Threshold the saliency
   auto thresholded_saliency = saliency >= threshold;

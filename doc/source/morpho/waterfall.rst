@@ -15,7 +15,8 @@ Example
     * - Original image
       - Watershedd segmentation on the gradient of the original image
 
-    * - Missing
+    * - .. image:: /images/waterfall_saliency.png
+           :width: 100%
     
       - .. image:: /images/waterfall_cut.png
            :width: 100%

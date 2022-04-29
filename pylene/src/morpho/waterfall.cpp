@@ -72,13 +72,13 @@ namespace mln::morpho
   {
     const auto        domain = nodemap.domain();
     mln::image2d<int> out    = mln::imconcretize(nodemap).set_init_value(0);
-    // auto       depth  = t.compute_depth();
-    auto depth = [&t]() {
+    auto       depth  = t.compute_depth();
+    /*auto depth = [&t]() {
       auto res = std::vector(t.parent.size(), 0);
       for (int i = t.parent.size() - 2; i > 0; i--)
         res[i] = res[t.parent[i]] + 1;
       return res;
-    }();
+    }();*/
     auto lca = [&depth, &t](int a, int b) {
       while (depth[a] > depth[b])
         a = t.parent[a];
@@ -92,15 +92,16 @@ namespace mln::morpho
       return a;
     };
 
+    const int waterline = t.parent.size() - 1;
     mln_foreach (auto p, domain)
     {
-      if (nodemap(p) == 0)
+      if (nodemap(p) == waterline)
       {
         int           tab[8];
         std::set<int> track;
         for (auto q : mln::c8(p))
         {
-          if (domain.has(q) && nodemap(q) > 0 && !track.contains(nodemap(q)))
+          if (domain.has(q) && nodemap(q) < waterline && !track.contains(nodemap(q)))
           {
             tab[track.size()] = nodemap(q);
             track.insert(nodemap(q));
@@ -111,15 +112,14 @@ namespace mln::morpho
       }
     }
 
-    
     mln_foreach (auto p, domain)
     {
-      if (nodemap(p) == 0)
+      if (nodemap(p) == waterline)
       {
         int value[4];
         int nval = 0;
         for (auto q : mln::c4(p))
-          if (domain.has(q) && nodemap(q) == 0)
+          if (domain.has(q) && nodemap(q) == waterline)
             value[nval++] = out(q);
         if (nval > 2)
           out(p) = *std::max_element(value, value + nval);

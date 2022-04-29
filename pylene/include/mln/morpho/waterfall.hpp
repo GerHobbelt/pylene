@@ -59,7 +59,8 @@ namespace mln::morpho
     //std::tie(t.parent, t.values) = internal::canonize_component_tree(viz.parent, viz.values, output);
     t.parent = std::move(viz.parent);
     t.values = std::move(viz.values);
-    //internal::alphatree_reorder_nodes(t.parent.data(), t.values.data(), t.parent.size());
+    internal::alphatree_reorder_nodes(t.parent.data(), t.values.data(), t.parent.size());
+    mln::for_each(output, [node_count=t.parent.size()](int& id) { id = static_cast<int>(node_count) - id - 1; });
 
     return std::make_pair(std::move(t), std::move(output));
   }

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <mln/core/neighborhood/c4c8.hpp>
 #include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/watershed.hpp>
 
 #include <tuple>
+#include <variant>
 #include <vector>
 
 namespace mln::morpho
@@ -65,5 +67,5 @@ namespace mln::morpho
     return std::make_pair(std::move(t), std::move(output));
   }
 
-  image2d<int> waterfall_saliency(const component_tree<int>&, const image2d<int>&);
+  image2d<int> waterfall_saliency(const component_tree<int>&, const image2d<int>&, const mln::c4c8_t&);
 } // namespace mln::morpho

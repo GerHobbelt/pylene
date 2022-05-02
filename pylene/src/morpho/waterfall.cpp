@@ -2,6 +2,7 @@
 #include <mln/morpho/waterfall.hpp>
 
 #include <mln/core/neighborhood/c4.hpp>
+#include <mln/core/neighborhood/c4c8.hpp>
 #include <mln/core/neighborhood/c8.hpp>
 
 #include <iostream>
@@ -68,18 +69,12 @@ namespace mln::morpho
     }
   } // namespace details
 
-  image2d<int> waterfall_saliency(const component_tree<int>& t, const image2d<int>& nodemap)
+  image2d<int> waterfall_saliency(const component_tree<int>& t, const image2d<int>& nodemap, const mln::c4c8_t& nbh)
   {
     const auto        domain = nodemap.domain();
     mln::image2d<int> out    = mln::imconcretize(nodemap).set_init_value(0);
     auto              depth  = t.compute_depth();
-    /*auto depth = [&t]() {
-      auto res = std::vector(t.parent.size(), 0);
-      for (int i = t.parent.size() - 2; i > 0; i--)
-        res[i] = res[t.parent[i]] + 1;
-      return res;
-    }();*/
-    auto lca = [&depth, &t](int a, int b) {
+    auto              lca    = [&depth, &t](int a, int b) {
       while (depth[a] > depth[b])
         a = t.parent[a];
       while (depth[b] > depth[a])
@@ -92,14 +87,14 @@ namespace mln::morpho
       return a;
     };
 
-    const int waterline = t.parent.size() - 1;
+    const int waterline = static_cast<int>(t.parent.size()) - 1;
     mln_foreach (auto p, domain)
     {
       if (nodemap(p) == waterline)
       {
         int           tab[8];
         std::set<int> track;
-        for (auto q : mln::c8(p))
+        for (auto&& q : nbh(p))
         {
           if (domain.has(q) && nodemap(q) < waterline && !track.contains(nodemap(q)))
           {
@@ -116,9 +111,10 @@ namespace mln::morpho
     {
       if (nodemap(p) == waterline)
       {
-        int value[4];
-        int nval = 0;
-        for (auto q : mln::c4(p))
+        int  value[4];
+        int  nval = 0;
+        auto bnbh = nbh.alternative();
+        for (auto&& q : bnbh(p))
           if (domain.has(q) && nodemap(q) == waterline)
             value[nval++] = out(q);
         if (nval > 2)

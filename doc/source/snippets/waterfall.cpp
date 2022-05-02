@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   }
 
   // Compute the saliency map
-  auto saliency = mln::morpho::waterfall_saliency(t, nodemap);
+  auto saliency = mln::morpho::waterfall_saliency(t, nodemap, mln::c4c8_t(mln::c2d_type::C8));
 
   // Save the saliency
   mln::io::imsave(mln::view::transform(saliency,

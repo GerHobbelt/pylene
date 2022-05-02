@@ -5,7 +5,6 @@
 #include <mln/morpho/watershed.hpp>
 
 #include <tuple>
-#include <variant>
 #include <vector>
 
 namespace mln::morpho

@@ -28,7 +28,8 @@ Include :file:`<mln/morpho/waterfall.hpp>`
 
    :param t: A tree
    :param node_map: A mapping from an image point to a node of `t`
-   :param nbh: The neighborhood relationship to build the saliency map
+   :param nbh: The neighborhood relationship to build the saliency map **(should
+    be the same as the one used to build the Waterfall hierarchy)**
    :return: An image representing the saliency map
 
 References
@@ -57,7 +58,7 @@ Example
     auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
 
     // (4) Compute the saliency of the waterfall
-    auto saliency = mln::morpho::waterfall_saliency(t, nodemap, mln::c4c8_t(mln::c2d_type::C8));
+    auto saliency = mln::morpho::waterfall_saliency(t, nodemap, mln::c8);
 
     // (5) Compute the horizontal cut at level 4 from the saliency
     auto thresholded_saliency = saliency >= 4;

@@ -36,9 +36,10 @@ namespace mln::morpho
       if (rp != rq)
       {
         m_zpar.push_back(m_nlbl);
-        m_zpar[rp]      = m_nlbl;
-        m_zpar[rq]      = m_nlbl;
-        auto [min, max] = std::minmax(m_diameter[rp], m_diameter[rq]);
+        m_zpar[rp] = m_nlbl;
+        m_zpar[rq] = m_nlbl;
+        int min, max; // Using tie instead of SB due to lifetime error
+        std::tie(min, max) = std::minmax(m_diameter[rp], m_diameter[rq]);
         m_diameter.push_back(std::max(min + 1, max));
         m_mst.emplace_back(p, q, min + 1);
         m_nlbl++;

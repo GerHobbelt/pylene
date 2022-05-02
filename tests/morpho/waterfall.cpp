@@ -117,8 +117,75 @@ TEST(Morpho, waterfall_c4)
   ASSERT_EQ(t.values, values_ref);
 }
 
-TEST(Morpho, waterfall_c8) {}
+TEST(Morpho, waterfall_c8)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 2, 0}, //
+      {0, 0, 0, 2, 0}, //
+      {3, 3, 3, 1, 3}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 2, 0, 0}  //
+  };
 
-TEST(Morpho, waterfall_saliency_c4) {}
+  const mln::image2d<int> nodemap_ref{
+      {6, 6, 6, 7, 5}, //
+      {6, 6, 6, 7, 5}, //
+      {7, 7, 7, 7, 7}, //
+      {4, 4, 7, 3, 3}, //
+      {4, 4, 7, 3, 3}  //
+  };
+  std::vector<int> parent_ref{0, 0, 0, 1, 1, 2, 2, 7};
+  std::vector<int> values_ref{2, 1, 1, 0, 0, 0, 0, 0};
 
-TEST(Morpho, waterfall_saliency_c8) {}
+  auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
+
+  ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
+  ASSERT_EQ(t.parent, parent_ref);
+  ASSERT_EQ(t.values, values_ref);
+}
+
+TEST(Morpho, waterfall_saliency_c4)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 2, 0}, //
+      {0, 0, 0, 1, 0}, //
+      {3, 3, 3, 2, 3}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 2, 0, 0}  //
+  };
+
+  const mln::image2d<int> sal_ref{
+      {0, 0, 0, 1, 0}, //
+      {0, 0, 0, 2, 0}, //
+      {2, 2, 2, 0, 2}, //
+      {0, 0, 1, 0, 0}, //
+      {0, 0, 1, 0, 0}  //
+  };
+
+  auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c4);
+  auto sal          = mln::morpho::waterfall_saliency(t, nodemap, mln::c4);
+  ASSERT_IMAGES_EQ_EXP(sal, sal_ref);
+}
+
+TEST(Morpho, waterfall_saliency_c8)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 2, 0}, //
+      {0, 0, 0, 2, 0}, //
+      {3, 3, 3, 1, 3}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 2, 0, 0}  //
+  };
+
+  const mln::image2d<int> sal_ref{
+      {0, 0, 0, 1, 0}, //
+      {0, 0, 0, 1, 0}, //
+      {2, 2, 2, 2, 2}, //
+      {0, 0, 1, 0, 0}, //
+      {0, 0, 1, 0, 0}  //
+  };
+
+  auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
+  auto sal          = mln::morpho::waterfall_saliency(t, nodemap, mln::c8);
+  ASSERT_IMAGES_EQ_EXP(sal, sal_ref);
+}

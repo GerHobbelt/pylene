@@ -103,23 +103,18 @@ namespace mln::morpho
             track.insert(nodemap(q));
           }
         }
-        if (track.size() == 2)
-          out(p) = t.values[lca(tab[0], tab[1])];
-      }
-    }
-
-    mln_foreach (auto p, domain)
-    {
-      if (nodemap(p) == waterline)
-      {
-        int  value[4];
-        int  nval = 0;
-        auto bnbh = nbh.alternative();
-        for (auto&& q : bnbh(p))
-          if (domain.has(q) && nodemap(q) == waterline)
-            value[nval++] = out(q);
-        if (nval > 2)
-          out(p) = *std::max_element(value, value + nval);
+        int       max  = -1;
+        const int size = static_cast<int>(track.size());
+        assert(size > 1);
+        for (int i = 0; i < size - 1; i++)
+        {
+          for (int j = i + 1; j < size; j++)
+          {
+            int cur = t.values[lca(tab[i], tab[j])];
+            max     = cur > max ? cur : max;
+          }
+        }
+        out(p) = max;
       }
     }
 

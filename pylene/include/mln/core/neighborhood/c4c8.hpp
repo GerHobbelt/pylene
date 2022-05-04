@@ -5,7 +5,6 @@
 #include <mln/core/point.hpp>
 
 #include <range/v3/view/concat.hpp>
-#include <range/v3/view/empty.hpp>
 #include <range/v3/view/span.hpp>
 #include <range/v3/view/take.hpp>
 #include <range/v3/view/take_last.hpp>

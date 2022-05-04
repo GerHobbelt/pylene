@@ -4,8 +4,11 @@
 #include <mln/core/neighborhood/private/neighborhood_facade.hpp>
 #include <mln/core/point.hpp>
 
+#include <range/v3/view/concat.hpp>
+#include <range/v3/view/empty.hpp>
 #include <range/v3/view/span.hpp>
-#include <range/v3/view/stride.hpp>
+#include <range/v3/view/take.hpp>
+#include <range/v3/view/take_last.hpp>
 
 namespace mln
 {
@@ -15,8 +18,8 @@ namespace mln
 
   enum class c2d_type : std::ptrdiff_t
   {
-    C8 = 1,
-    C4 = 2
+    C4 = 4,
+    C8 = 8
   };
 
   struct c4c8_t : neighborhood_facade<c4c8_t>
@@ -30,38 +33,38 @@ namespace mln
     using decomposable = std::false_type;
     using separable    = std::false_type;
 
-    c4c8_t(c2d_type t)
+    constexpr c4c8_t(c2d_type t)
       : m_type(t)
-      , m_first((static_cast<std::ptrdiff_t>(t) + 1) % 2)
     {
     }
 
-    c4c8_t(const mln::c4_t&)
+    constexpr c4c8_t(const mln::c4_t&)
       : m_type(c2d_type::C4)
-      , m_first(1)
     {
     }
 
-    c4c8_t(const mln::c8_t&)
+    constexpr c4c8_t(const mln::c8_t&)
       : m_type(c2d_type::C8)
-      , m_first(0)
     {
     }
 
-    auto offsets() const
+    constexpr auto offsets() const
     {
-      return (::ranges::span<const point_t>{m_offsets.data() + m_first, 8 - m_first} |
-              ::ranges::views::stride(static_cast<std::ptrdiff_t>(m_type)));
+      return ::ranges::span<const point_t>{m_offsets.data(), static_cast<std::ptrdiff_t>(m_type)};
     }
+
     auto before_offsets() const
     {
-      return (::ranges::span<const point_t>{m_offsets.data() + m_first, 4 - m_first} |
-              ::ranges::views::stride(static_cast<std::ptrdiff_t>(m_type)));
+      return ::ranges::views::concat(m_offsets | ::ranges::views::take(2),
+                                     m_offsets | ::ranges::views::take_last((static_cast<std::ptrdiff_t>(m_type) - 4)) |
+                                         ::ranges::views::take(2));
     }
+
     auto after_offsets() const
     {
-      return (::ranges::span<const point_t>{m_offsets.data() + 4 + m_first, 4 - m_first} |
-              ::ranges::views::stride(static_cast<std::ptrdiff_t>(m_type)));
+      return ::ranges::views::concat(m_offsets | ::ranges::views::take(4) | ::ranges::views::take_last(2),
+                                     m_offsets |
+                                         ::ranges::views::take_last((static_cast<std::ptrdiff_t>(m_type) - 4) / 2));
     }
 
     static constexpr int radial_extent() { return 1; }
@@ -80,15 +83,14 @@ namespace mln
       return roi;
     }
 
-    auto alternative() const { return c4c8_t(m_type == c2d_type::C4 ? c2d_type::C8 : c2d_type::C4); }
+    constexpr auto alternative() const { return c4c8_t(m_type == c2d_type::C4 ? c2d_type::C8 : c2d_type::C4); }
 
   private:
-    const c2d_type       m_type;
-    const std::ptrdiff_t m_first;
+    const c2d_type m_type;
     // clang-format off
     static inline constexpr std::array<point_t, 8> m_offsets = {{
-        {-1, -1}, {+0, -1}, {+1, -1}, {-1, +0}, {-1, +1}, {+1, +0}, {+1, +1}, {+0, +1}
-      }};
+        {-1, 0}, {0, -1}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {1, 1}, {-1, 1}
+    }};
     // clang-format on
   };
 } // namespace mln

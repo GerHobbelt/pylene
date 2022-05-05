@@ -15,7 +15,7 @@ namespace mln::morpho
     {
     public:
       void init(int) noexcept;
-      void visit(int, int) noexcept;
+      void visit(int, int, mln::dontcare_t, mln::dontcare_t) noexcept;
       void finalize() noexcept;
 
       std::vector<int> values;
@@ -57,11 +57,11 @@ namespace mln::morpho
     }
 
     component_tree<int> t;
-    // std::tie(t.parent, t.values) = internal::canonize_component_tree(viz.parent, viz.values, output);
-    t.parent = std::move(viz.parent);
-    t.values = std::move(viz.values);
-    internal::alphatree_reorder_nodes(t.parent.data(), t.values.data(), t.parent.size());
-    mln::for_each(output, [node_count = t.parent.size()](int& id) { id = static_cast<int>(node_count) - id - 1; });
+    internal::alphatree_reorder_nodes(viz.parent.data(), viz.values.data(), viz.parent.size());
+    std::tie(t.parent, t.values) = internal::canonize_component_tree(viz.parent, viz.values, output);
+    t.parent.push_back(t.parent.size());
+    t.values.push_back(0);
+    mln::for_each(output, [waterline = t.parent.size() - 1](int& v) { v = v == 0 ? waterline : v; });
 
     return std::make_pair(std::move(t), std::move(output));
   }

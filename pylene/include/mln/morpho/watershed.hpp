@@ -28,7 +28,10 @@ namespace mln::morpho
     struct watershed_default_visitor
     {
       void init(mln::dontcare_t) {}
-      void visit(mln::dontcare_t, mln::dontcare_t) {}
+      void visit(mln::dontcare_t /*lbl1*/, mln::dontcare_t /*lbl2*/, mln::dontcare_t /*cur_p*/,
+                 mln::dontcare_t /*cur_v*/)
+      {
+      }
       void finalize() {}
     };
 
@@ -109,7 +112,7 @@ namespace mln::morpho
             else if (nlbl != common_label)
             {
               has_single_adjacent_marker = false;
-              watershed_visitor.visit(nlbl, common_label);
+              watershed_visitor.visit(nlbl, common_label, p, level);
               break;
             }
           }
@@ -175,7 +178,7 @@ namespace mln::morpho
                       .set_init_value(kUninitialized)
                       .get_status(&err)
                       .build();
-    
+
     impl::watershed_default_visitor viz{};
 
     if (err == IMAGE_BUILD_OK)

@@ -5,7 +5,6 @@
 #include <mln/core/neighborhood/c4c8.hpp>
 #include <mln/core/neighborhood/c8.hpp>
 
-#include <iostream>
 #include <set>
 
 namespace mln::morpho
@@ -27,7 +26,7 @@ namespace mln::morpho
       m_diameter.resize(m_nlbl, 0);
     }
 
-    void waterfall_visitor::visit(int p, int q) noexcept
+    void waterfall_visitor::visit(int p, int q, mln::dontcare_t, mln::dontcare_t) noexcept
     {
       using mln::morpho::canvas::impl::zfindroot;
 
@@ -87,31 +86,27 @@ namespace mln::morpho
       }
       return a;
     };
-
     const int waterline = static_cast<int>(t.parent.size()) - 1;
+
     mln_foreach (auto p, domain)
     {
       if (nodemap(p) == waterline)
       {
-        int           tab[8];
-        std::set<int> track;
-        for (auto&& q : nbh(p))
+        int vals[8];
+        int count = 0;
+        for (auto q : nbh(p))
         {
-          if (domain.has(q) && nodemap(q) < waterline && !track.contains(nodemap(q)))
-          {
-            tab[track.size()] = nodemap(q);
-            track.insert(nodemap(q));
-          }
+          if (domain.has(q) && nodemap(q) < waterline)
+            vals[count++] = nodemap(q);
         }
-        int       max  = -1;
-        const int size = static_cast<int>(track.size());
-        assert(size > 1);
-        for (int i = 0; i < size - 1; i++)
+        int max = 0;
+        for (int i = 0; i < count - 1; i++)
         {
-          for (int j = i + 1; j < size; j++)
+          for (int j = i + 1; j < count; j++)
           {
-            int cur = t.values[lca(tab[i], tab[j])];
-            max     = cur > max ? cur : max;
+            if (vals[i] == vals[j])
+              continue;
+            max = std::max(max, t.values[lca(vals[i], vals[j])]);
           }
         }
         out(p) = max;
@@ -120,4 +115,5 @@ namespace mln::morpho
 
     return out;
   }
+
 } // namespace mln::morpho

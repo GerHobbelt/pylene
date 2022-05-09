@@ -27,11 +27,12 @@ namespace mln::morpho
   {
     struct watershed_default_visitor
     {
-      void init(mln::dontcare_t) {}
-      void visit(mln::dontcare_t /*lbl1*/, mln::dontcare_t /*lbl2*/, mln::dontcare_t /*cur_p*/,
-                 mln::dontcare_t /*cur_v*/)
+      void init(mln::dontcare_t /*nlabel*/, mln::dontcare_t /*markers*/) {}
+      void on_waterline(mln::dontcare_t /*lbl1*/, mln::dontcare_t /*lbl2*/, mln::dontcare_t /*cur_p*/,
+                        mln::dontcare_t /*cur_v*/)
       {
       }
+      void on_label(mln::dontcare_t /*p*/, mln::dontcare_t /*val*/) {}
       void finalize() {}
     };
 
@@ -46,7 +47,7 @@ namespace mln::morpho
       if (!markers)
         nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>());
 
-      watershed_visitor.init(nlabel);
+      watershed_visitor.init(nlabel, output);
 
       constexpr int kUnlabeled = -2;
       constexpr int kInqueue   = -1;
@@ -101,7 +102,7 @@ namespace mln::morpho
           bool    has_single_adjacent_marker = false;
           for (auto nxOut : nbh(pxOut))
           {
-            int nlbl = nxOut.val();
+            const int nlbl = nxOut.val();
             if (nlbl <= 0)
               continue;
             else if (common_label == kWaterline)
@@ -112,7 +113,7 @@ namespace mln::morpho
             else if (nlbl != common_label)
             {
               has_single_adjacent_marker = false;
-              watershed_visitor.visit(nlbl, common_label, p, level);
+              watershed_visitor.on_waterline(nlbl, common_label, p, level);
               break;
             }
           }
@@ -127,6 +128,7 @@ namespace mln::morpho
             // If a single label, it gets labeled
             // Add neighbors in the queue
             pxOut.val() = common_label;
+            watershed_visitor.on_label(pxOut.point(), common_label);
             for (auto q : nbh(p))
             {
               auto nlbl = output.at(q);

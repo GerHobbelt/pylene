@@ -23,6 +23,24 @@ namespace mln::morpho
   /****          Implementation          ****/
   /******************************************/
 
+  namespace details
+  {
+    struct default_watershed_visitor
+    {
+      // After markers are obtained, the visitor may be initialized with the information of number of label
+      void on_init(int /*nlabel*/) {}
+
+      // Every time two labels are meet, an action may be performed between these labels
+      void on_visit(mln::dontcare_t /*lbl1*/, mln::dontcare_t /*lbl2*/, mln::dontcare_t /*cur_p*/,
+                    mln::dontcare_t /*cur_v*/)
+      {
+      }
+
+      // At the end of the watershed, an action may be performed
+      void on_finalize() {}
+    };
+  } // namespace details
+
   namespace impl
   {
     template <class I, class N, class O>
@@ -138,14 +156,16 @@ namespace mln::morpho
       return nlabel;
     }
 
-    template <class I, class N, class O>
-    int watershed_partition(I input, N nbh, O output, bool markers = false)
+    template <class I, class N, class O, class WS>
+    int watershed_partition(I input, N nbh, O output, WS& viz, bool markers = false)
     {
       using V = image_value_t<I>;
 
       int nlabel = 0;
       if (!markers)
         nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>());
+
+      viz.on_init(nlabel);
 
       constexpr auto impl_type = mln::morpho::details::pqueue_impl::linked_list;
       mln::morpho::details::pqueue_fifo<I, impl_type, /* reversed = */ true> pqueue(input);
@@ -176,9 +196,12 @@ namespace mln::morpho
               output(q) = output(p);
               pqueue.push(input(q), q);
             }
+            else if (output.at(q) > 0)
+              viz.on_visit(output(p), output(q), p, lvl);
           }
         }
       }
+      viz.on_finalize();
       return nlabel;
     }
   } // namespace impl
@@ -213,7 +236,10 @@ namespace mln::morpho
       if (waterline)
         nlabel = impl::watershed(ima, nbh, output);
       else
-        nlabel = impl::watershed_partition(ima, nbh, output);
+      {
+        details::default_watershed_visitor viz{};
+        nlabel = impl::watershed_partition(ima, nbh, output, viz);
+      }
     }
     else
     {
@@ -222,7 +248,10 @@ namespace mln::morpho
       if (waterline)
         nlabel = impl::watershed(ima, nbh, out);
       else
-        nlabel = impl::watershed_partition(ima, nbh, out);
+      {
+        details::default_watershed_visitor viz{};
+        nlabel = impl::watershed_partition(ima, nbh, out, viz);
+      }
     }
     return output;
   }

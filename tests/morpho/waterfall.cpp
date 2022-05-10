@@ -19,7 +19,7 @@ namespace
       m_zpar.resize(m_nlbl);
       std::iota(m_zpar.begin(), m_zpar.end(), 0);
     }
-    void on_waterline(int p, int q, mln::dontcare_t, mln::dontcare_t)
+    bool on_waterline(int p, int q, mln::dontcare_t, mln::dontcare_t)
     {
       using mln::morpho::canvas::impl::zfindroot;
       auto rp = zfindroot(m_zpar.data(), p);
@@ -32,6 +32,7 @@ namespace
         m_zpar[rq] = m_nlbl;
         m_nlbl++;
       }
+      return true;
     }
     void on_label(mln::dontcare_t, mln::dontcare_t) {}
     void finalize() {}
@@ -113,7 +114,7 @@ TEST(Morpho, waterfall_c4)
 
   const auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c4);
 
-  // ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
+  ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
   ASSERT_EQ(t.parent, parent_ref);
   ASSERT_EQ(t.values, values_ref);
 }
@@ -140,7 +141,7 @@ TEST(Morpho, waterfall_c8)
 
   auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
 
-  // ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
+  ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
   ASSERT_EQ(t.parent, parent_ref);
   ASSERT_EQ(t.values, values_ref);
 }

@@ -9,48 +9,15 @@
 
 namespace mln::morpho
 {
-  image2d<int> waterfall_saliency(const component_tree<int>& t, const image2d<int>& nodemap, const mln::c4c8_t& nbh)
+  image2d<int> waterfall_saliency(const component_tree<int>& t, const image2d<int>& nodemap, const mln::c4c8_t& /*nbh*/)
   {
-    const auto        domain = nodemap.domain();
-    mln::image2d<int> out    = mln::imconcretize(nodemap).set_init_value(0);
-    auto              depth  = t.compute_depth();
-    auto              lca    = [&depth, &t](int a, int b) {
-      while (depth[a] > depth[b])
-        a = t.parent[a];
-      while (depth[b] > depth[a])
-        b = t.parent[b];
-      while (a != b)
-      {
-        a = t.parent[a];
-        b = t.parent[b];
-      }
-      return a;
-    };
-    const int waterline = static_cast<int>(t.parent.size()) - 1;
-
+    const auto        domain   = nodemap.domain();
+    mln::image2d<int> out      = mln::imconcretize(nodemap).set_init_value(0);
+    const auto        is_wline = [&t, &nodemap](const auto& p) { return t.values[nodemap(p)] > 0; };
     mln_foreach (auto p, domain)
     {
-      if (nodemap(p) == waterline)
-      {
-        int vals[8];
-        int count = 0;
-        for (auto q : nbh(p))
-        {
-          if (domain.has(q) && nodemap(q) < waterline)
-            vals[count++] = nodemap(q);
-        }
-        int max = 0;
-        for (int i = 0; i < count - 1; i++)
-        {
-          for (int j = i + 1; j < count; j++)
-          {
-            if (vals[i] == vals[j])
-              continue;
-            max = std::max(max, t.values[lca(vals[i], vals[j])]);
-          }
-        }
-        out(p) = max;
-      }
+      if (is_wline(p))
+        out(p) = t.values[nodemap(p)];
     }
 
     return out;

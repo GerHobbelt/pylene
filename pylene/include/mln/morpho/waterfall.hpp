@@ -4,6 +4,7 @@
 #include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/watershed.hpp>
 
+#include <map>
 #include <tuple>
 #include <vector>
 
@@ -15,7 +16,9 @@ namespace mln::morpho
     struct waterfall_visitor
     {
       waterfall_visitor(I ima)
-        : nodemap(mln::imchvalue<int>(ima).set_init_value(0))
+        : nodemap(mln::imchvalue<int>(ima).set_init_value(-1))
+        , m_prev_p({-1, -1})
+        , m_prev_diameter(-1)
       {
       }
 
@@ -43,7 +46,7 @@ namespace mln::morpho
         m_roots.resize(m_nlbl);
       }
 
-      void on_waterline(int p, int q, const image_point_t<I>& /*pwl*/, mln::dontcare_t) noexcept
+      bool on_waterline(int p, int q, const image_point_t<I>& pwl, mln::dontcare_t) noexcept
       {
         using mln::morpho::canvas::impl::zfindroot;
 
@@ -60,6 +63,8 @@ namespace mln::morpho
           m_roots[rq] = m_nlbl;
           m_nlbl++;
         }
+        m_rel.emplace_back(pwl, std::min(p, q), std::max(p, q));
+        return false;
       }
 
       void on_label(const mln::image_point_t<I>& p, int lbl) noexcept { nodemap(p) = lbl; }
@@ -92,6 +97,28 @@ namespace mln::morpho
           values.push_back(w);
           m_nlbl++;
         }
+
+        const auto depth = [this]() {
+          auto res = std::vector<int>(this->parent.size(), 0);
+          for (int i = this->parent.size() - 2; i > 0; i--)
+            res[i] = res[this->parent[i]] + 1;
+          return res;
+        }();
+        const auto lca = [&depth, this](int a, int b) {
+          while (depth[a] > depth[b])
+            a = this->parent[a];
+          while (depth[b] > depth[a])
+            b = this->parent[b];
+          while (a != b)
+          {
+            a = this->parent[a];
+            b = this->parent[b];
+          }
+          return a;
+        };
+
+        for (auto [p, a, b] : m_rel)
+          nodemap(p) = lca(a, b);
       }
 
     public:
@@ -100,12 +127,15 @@ namespace mln::morpho
       mln::image_ch_value_t<I, int> nodemap;
 
     private:
-      std::vector<int>                       m_zpar;
-      std::vector<int>                       m_diameter;
-      std::vector<std::tuple<int, int, int>> m_mst;
-      int                                    m_nlbl;
-      int                                    m_save;
-      std::vector<int>                       m_roots;
+      std::vector<int>                                    m_zpar;
+      std::vector<int>                                    m_diameter;
+      std::vector<std::tuple<int, int, int>>              m_mst;
+      int                                                 m_nlbl;
+      int                                                 m_save;
+      std::vector<int>                                    m_roots;
+      std::vector<std::tuple<image_point_t<I>, int, int>> m_rel;
+      point2d                                             m_prev_p;
+      int                                                 m_prev_diameter;
     };
   } // namespace details
 

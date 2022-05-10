@@ -32,7 +32,7 @@ namespace mln::morpho
                         mln::dontcare_t /*cur_v*/)
       {
       }
-      void on_label(mln::dontcare_t /*p*/, mln::dontcare_t /*val*/) {}
+      bool on_label(mln::dontcare_t /*p*/, mln::dontcare_t /*val*/) { return true; /* Stop on second label */ }
       void finalize() {}
     };
 
@@ -113,8 +113,8 @@ namespace mln::morpho
             else if (nlbl != common_label)
             {
               has_single_adjacent_marker = false;
-              watershed_visitor.on_waterline(nlbl, common_label, p, level);
-              break;
+              if (watershed_visitor.on_waterline(nlbl, common_label, p, level))
+                break;
             }
           }
 

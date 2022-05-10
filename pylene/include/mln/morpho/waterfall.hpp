@@ -12,31 +12,15 @@ namespace mln::morpho
 {
   namespace details
   {
-    template <typename I>
     struct waterfall_visitor
     {
-      waterfall_visitor(I ima)
-        : nodemap(mln::imchvalue<int>(ima).set_init_value(-1))
-        , m_prev_p({-1, -1})
-        , m_prev_diameter(-1)
+      void on_init(int nlbl) noexcept
       {
-      }
-
-      template <typename M>
-      void init(int nlbl, M minima) noexcept
-      {
-        static_assert(mln::is_a_v<M, mln::details::Image>);
-        static_assert(std::is_same_v<mln::image_value_t<M>, int>);
-        assert(minima.domain() == nodemap.domain());
-
         // Result initialization
         m_nlbl = nlbl + 1;
         values.resize(m_nlbl, 0);
         std::iota(parent.begin(), parent.end(), 0);
         parent.resize(m_nlbl);
-        mln_foreach (auto p, minima.domain())
-          if (minima(p) > 0)
-            nodemap(p) = minima(p);
 
         // Helpers
         m_save = m_nlbl;
@@ -46,7 +30,7 @@ namespace mln::morpho
         m_roots.resize(m_nlbl);
       }
 
-      bool on_waterline(int p, int q, const image_point_t<I>& pwl, mln::dontcare_t) noexcept
+      bool on_visit(int p, int q, mln::dontcare_t, mln::dontcare_t) noexcept
       {
         using mln::morpho::canvas::impl::zfindroot;
 
@@ -63,13 +47,10 @@ namespace mln::morpho
           m_roots[rq] = m_nlbl;
           m_nlbl++;
         }
-        m_rel.emplace_back(pwl, std::min(p, q), std::max(p, q));
         return false;
       }
 
-      void on_label(const mln::image_point_t<I>& p, int lbl) noexcept { nodemap(p) = lbl; }
-
-      void finalize() noexcept
+      void on_finalize() noexcept
       {
         using mln::morpho::canvas::impl::zfindroot;
 
@@ -97,45 +78,19 @@ namespace mln::morpho
           values.push_back(w);
           m_nlbl++;
         }
-
-        const auto depth = [this]() {
-          auto res = std::vector<int>(this->parent.size(), 0);
-          for (int i = this->parent.size() - 2; i > 0; i--)
-            res[i] = res[this->parent[i]] + 1;
-          return res;
-        }();
-        const auto lca = [&depth, this](int a, int b) {
-          while (depth[a] > depth[b])
-            a = this->parent[a];
-          while (depth[b] > depth[a])
-            b = this->parent[b];
-          while (a != b)
-          {
-            a = this->parent[a];
-            b = this->parent[b];
-          }
-          return a;
-        };
-
-        for (auto [p, a, b] : m_rel)
-          nodemap(p) = lca(a, b);
       }
 
     public:
-      std::vector<int>              values;
-      std::vector<int>              parent;
-      mln::image_ch_value_t<I, int> nodemap;
+      std::vector<int> values;
+      std::vector<int> parent;
 
     private:
-      std::vector<int>                                    m_zpar;
-      std::vector<int>                                    m_diameter;
-      std::vector<std::tuple<int, int, int>>              m_mst;
-      int                                                 m_nlbl;
-      int                                                 m_save;
-      std::vector<int>                                    m_roots;
-      std::vector<std::tuple<image_point_t<I>, int, int>> m_rel;
-      point2d                                             m_prev_p;
-      int                                                 m_prev_diameter;
+      std::vector<int>                       m_zpar;
+      std::vector<int>                       m_diameter;
+      std::vector<std::tuple<int, int, int>> m_mst;
+      int                                    m_nlbl;
+      int                                    m_save;
+      std::vector<int>                       m_roots;
     };
   } // namespace details
 
@@ -147,7 +102,7 @@ namespace mln::morpho
 
     mln_entering("mln::morpho::waterfall");
     image_build_error_code     err = IMAGE_BUILD_OK;
-    details::waterfall_visitor viz{ima};
+    details::waterfall_visitor viz;
     auto                       output = imchvalue<int>(ima) //
                       .adjust(nbh)
                       .set_init_value(-1)
@@ -156,21 +111,19 @@ namespace mln::morpho
 
     if (err == IMAGE_BUILD_OK)
     {
-      impl::watershed(ima, nbh, output, viz);
+      impl::watershed_partition(ima, nbh, output, viz);
     }
     else
     {
       mln::trace::warn("[Performance] The extension is not wide enough");
       auto out = view::value_extended(output, -1);
-      impl::watershed(ima, nbh, out, viz);
+      impl::watershed_partition(ima, nbh, out, viz);
     }
 
     component_tree<int> t;
     internal::alphatree_reorder_nodes(viz.parent.data(), viz.values.data(), viz.parent.size());
-    std::tie(t.parent, t.values) = internal::canonize_component_tree(viz.parent, viz.values, viz.nodemap);
+    std::tie(t.parent, t.values) = internal::canonize_component_tree(viz.parent, viz.values, output);
 
-    return std::make_pair(std::move(t), std::move(viz.nodemap));
+    return std::make_pair(std::move(t), std::move(output));
   }
-
-  image2d<int> waterfall_saliency(const component_tree<int>&, const image2d<int>&, const mln::c4c8_t&);
 } // namespace mln::morpho

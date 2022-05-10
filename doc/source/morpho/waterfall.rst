@@ -20,18 +20,6 @@ Include :file:`<mln/morpho/waterfall.hpp>`
     the image to a node of the tree. This node map is usually the initial
     watershed segmentation.
 
-.. cpp:function:: image2d<int> waterfall_saliency(const component_tree<int>& t, const image2d<int>& node_map, const mln::c4c8_t& nbh)
-
-   Return the saliency map of a waterfall built on a 2D image. The watershed
-   lines are weighted by their level of disappearing, corresponding to an
-   interation level in the Waterfall.
-
-   :param t: A tree
-   :param node_map: A mapping from an image point to a node of `t`
-   :param nbh: The neighborhood relationship to build the saliency map **(should
-    be the same as the one used to build the Waterfall hierarchy)**
-   :return: An image representing the saliency map
-
 References
 ----------
 
@@ -57,13 +45,8 @@ Example
     // (3) Compute the waterfall hierarchy
     auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
 
-    // (4) Compute the saliency of the waterfall
-    auto saliency = mln::morpho::waterfall_saliency(t, nodemap, mln::c8);
-
-    // (5) Compute the horizontal cut at level 4 from the saliency
-    auto thresholded_saliency = saliency >= 4;
-    int  nlbl;
-    auto cut = mln::labeling::blobs<std::uint16_t>(1 - thresholded_saliency, mln::c8, nlbl);
+    // (4) Compute the cut at level 4
+    t.horizontal_cut(4, nodemap);
 
 .. list-table::
 
@@ -72,15 +55,10 @@ Example
 
       - .. image:: /images/waterfall_nodemap.png
            :width: 100%
-
-    * - Original image
-      - Watershed segmentation on the gradient of the original image
-
-    * - .. image:: /images/waterfall_saliency.png
-           :width: 100%
     
       - .. image:: /images/waterfall_cut.png
            :width: 100%
 
-    * - Saliency of the waterfall
+    * - Original image
+      - Watershed segmentation on the gradient of the original image  
       - Waterfall horizontal cut at level 4

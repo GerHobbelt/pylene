@@ -171,7 +171,7 @@ namespace mln::morpho
       std::ranges::sort(flatten_graph, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
 
       // Kruskal
-      int                                    nlbl = rag.size();
+      int                                    nlbl = static_cast<int>(rag.size());
       std::vector<int>                       zpar(nlbl);
       std::vector<int>                       diameter(nlbl);
       std::vector<std::tuple<int, int, int>> mst;
@@ -249,7 +249,7 @@ namespace mln::morpho
     template <typename I, typename N>
     std::pair<component_tree<int>, image_ch_value_t<I, int>> waterfall(I input, N nbh)
     {
-      const auto process = [&input, &nbh]<typename O>(O output) {
+      const auto process = [&input, &nbh](auto output) {
         int        nlbl = 0;
         const auto rag  = details::watershed_rag(input, output, nbh, nlbl);
         auto       mst  = details::mst_waterfall(rag);

@@ -59,3 +59,57 @@ TEST(Morpho, waterfall_c8)
   ASSERT_EQ(t.parent, parent_ref);
   ASSERT_EQ(t.values, values_ref);
 }
+
+TEST(Morpho, waterfall_c4_2)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 1, 0}, //
+      {0, 0, 0, 3, 0}, //
+      {3, 3, 3, 3, 2}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 1, 0, 0}  //
+  };
+
+  const mln::image2d<int> nodemap_ref{
+      {6, 6, 6, 6, 5}, //
+      {6, 6, 6, 6, 5}, //
+      {6, 6, 6, 3, 5}, //
+      {4, 4, 4, 3, 3}, //
+      {4, 4, 4, 3, 3}  //
+  };
+  std::vector<int> parent_ref{0, 0, 0, 1, 1, 2, 2};
+  std::vector<int> values_ref{2, 1, 1, 0, 0, 0, 0};
+
+  auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c4);
+
+  ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
+  ASSERT_EQ(t.parent, parent_ref);
+  ASSERT_EQ(t.values, values_ref);
+}
+
+TEST(Morpho, waterfall_c8_2)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 1, 0}, //
+      {0, 0, 0, 3, 0}, //
+      {3, 3, 3, 3, 2}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 1, 0, 0}  //
+  };
+
+  const mln::image2d<int> nodemap_ref{
+      {6, 6, 6, 6, 5}, //
+      {6, 6, 6, 6, 5}, //
+      {6, 6, 6, 6, 5}, //
+      {4, 4, 4, 3, 3}, //
+      {4, 4, 4, 3, 3}  //
+  };
+  std::vector<int> parent_ref{0, 0, 0, 1, 1, 2, 2};
+  std::vector<int> values_ref{2, 1, 1, 0, 0, 0, 0};
+
+  auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
+
+  ASSERT_IMAGES_EQ_EXP(nodemap, nodemap_ref);
+  ASSERT_EQ(t.parent, parent_ref);
+  ASSERT_EQ(t.values, values_ref);
+}

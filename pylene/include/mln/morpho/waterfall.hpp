@@ -2,6 +2,7 @@
 
 #include <mln/core/neighborhood/c4c8.hpp>
 #include <mln/morpho/alphatree.hpp>
+#include <mln/morpho/canvas/kruskal.hpp>
 #include <mln/morpho/watershed.hpp>
 
 #include <map>
@@ -12,86 +13,39 @@ namespace mln::morpho
 {
   namespace details
   {
-    /*struct waterfall_visitor
+    class mst_waterfall_visitor
     {
-      void on_init(int nlbl) noexcept
-      {
-        // Result initialization
-        m_nlbl = nlbl + 1;
-        values.resize(m_nlbl, 0);
-        std::iota(parent.begin(), parent.end(), 0);
-        parent.resize(m_nlbl);
-
-        // Helpers
-        m_save = m_nlbl;
-        m_zpar.resize(m_nlbl);
-        std::iota(m_zpar.begin(), m_zpar.end(), 0);
-        m_diameter.resize(m_nlbl, 0);
-        m_roots.resize(m_nlbl);
-      }
-
-      bool on_visit(int p, int q, mln::dontcare_t, mln::dontcare_t) noexcept
-      {
-        using mln::morpho::canvas::impl::zfindroot;
-
-        int rp = zfindroot(m_zpar.data(), p);
-        int rq = zfindroot(m_zpar.data(), q);
-        if (rp != rq)
-        {
-          m_zpar[rp] = rq;
-          int min, max; // Using tie instead of SB due to lifetime error
-          std::tie(min, max) = std::minmax(m_diameter[m_roots[rp]], m_diameter[m_roots[rq]]);
-          m_diameter.push_back(std::max(min + 1, max));
-          m_mst.emplace_back(p, q, min + 1);
-          m_roots[rp] = m_nlbl;
-          m_roots[rq] = m_nlbl;
-          m_nlbl++;
-        }
-        return false;
-      }
-
-      void on_finalize() noexcept
-      {
-        using mln::morpho::canvas::impl::zfindroot;
-
-        std::ranges::sort(m_mst, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
-
-        m_nlbl = m_save;
-        std::iota(m_zpar.begin(), m_zpar.end(), 0);
-        std::iota(m_roots.begin(), m_roots.end(), 0);
-        for (auto [p, q, w] : m_mst)
-        {
-          // No test : we are traversing the MST
-          int rp     = zfindroot(m_zpar.data(), p);
-          int rq     = zfindroot(m_zpar.data(), q);
-          m_zpar[rp] = rq;
-
-          // BPTAO of the reweighted MST
-          parent.push_back(m_nlbl);
-          parent[m_roots[rp]] = m_nlbl;
-          parent[m_roots[rq]] = m_nlbl;
-
-          // Update roots in the parenthood
-          m_roots[rp] = m_nlbl;
-          m_roots[rq] = m_nlbl;
-
-          values.push_back(w);
-          m_nlbl++;
-        }
-      }
+    public:
+      void        on_init(int n);
+      void        on_union(int p, int rp, int q, int rq, mln::dontcare_t);
+      inline void on_processing(mln::dontcare_t, mln::dontcare_t, mln::dontcare_t, mln::dontcare_t, mln::dontcare_t) {}
+      inline void on_finish() {}
 
     public:
-      std::vector<int> values;
+      std::vector<std::tuple<int, int, int>> mst;
+
+    private:
+      std::vector<int> m_diameter;
+      std::vector<int> m_roots;
+      int              m_nlbl;
+    };
+
+    class waterfall_bpt_visitor
+    {
+    public:
+      void        on_init(int n);
+      void        on_union(mln::dontcare_t, int rp, mln::dontcare_t, int rq, int w);
+      inline void on_processing(mln::dontcare_t, mln::dontcare_t, mln::dontcare_t, mln::dontcare_t, mln::dontcare_t) {}
+      inline void on_finish() {}
+
+    public:
+      std::vector<int> value;
       std::vector<int> parent;
 
     private:
-      std::vector<int>                       m_zpar;
-      std::vector<int>                       m_diameter;
-      std::vector<std::tuple<int, int, int>> m_mst;
-      int                                    m_nlbl;
-      int                                    m_save;
-      std::vector<int>                       m_roots;
-    };*/
+      std::vector<int> m_roots;
+      int              m_nlbl;
+    };
 
     template <typename I, typename O, typename N>
     std::vector<std::vector<std::pair<int, image_value_t<I>>>> watershed_rag(I input, O output, N nbh, int& nlabel)
@@ -171,74 +125,23 @@ namespace mln::morpho
       std::ranges::sort(flatten_graph, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
 
       // Kruskal
-      int                                    nlbl = static_cast<int>(rag.size());
-      std::vector<int>                       zpar(nlbl);
-      std::vector<int>                       diameter(nlbl);
-      std::vector<std::tuple<int, int, int>> mst;
-      std::vector<int>                       roots(nlbl);
-      std::iota(zpar.begin(), zpar.end(), 0);
-      std::iota(roots.begin(), roots.end(), 0);
-      using mln::morpho::canvas::impl::zfindroot;
-      for (auto [p, q, _] : flatten_graph)
-      {
-        int rp = zfindroot(zpar.data(), p);
-        int rq = zfindroot(zpar.data(), q);
-        if (rp != rq)
-        {
-          zpar[rp] = rq;
-          int min, max; // Using tie instead of SB due to lifetime error
-          std::tie(min, max) = std::minmax(diameter[roots[rp]], diameter[roots[rq]]);
-          diameter.push_back(std::max(min + 1, max));
-          mst.emplace_back(p, q, min + 1);
-          roots[rp] = nlbl;
-          roots[rq] = nlbl;
-          nlbl++;
-        }
-      }
-      return mst;
+      mst_waterfall_visitor viz;
+      mln::morpho::canvas::kruskal(flatten_graph.data(), flatten_graph.size(), static_cast<int>(rag.size()), viz);
+
+      return std::move(viz.mst);
     }
 
     template <typename N>
     component_tree<int> waterfall_from_mst(std::vector<std::tuple<int, int, int>>& mst, int n_vertices, N& nm)
     {
-      using mln::morpho::canvas::impl::zfindroot;
-
-      std::vector<int> value(n_vertices, 0);
-      std::vector<int> parent(n_vertices);
-      std::vector<int> roots(n_vertices);
-      std::vector<int> zpar(n_vertices);
-
-      std::iota(parent.begin(), parent.end(), 0);
-      std::iota(zpar.begin(), zpar.end(), 0);
-      std::iota(roots.begin(), roots.end(), 0);
-
       std::ranges::sort(mst, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
 
-      int nlbl = n_vertices;
-      for (auto [p, q, w] : mst)
-      {
-        // No test : we are traversing the MST
-        int rp   = zfindroot(zpar.data(), p);
-        int rq   = zfindroot(zpar.data(), q);
-        zpar[rp] = rq;
+      waterfall_bpt_visitor viz;
+      mln::morpho::canvas::kruskal(mst.data(), mst.size(), n_vertices, viz);
 
-        // BPTAO of the reweighted MST
-        parent.push_back(nlbl);
-        parent[roots[rp]] = nlbl;
-        parent[roots[rq]] = nlbl;
-
-        // Update roots in the parenthood
-        roots[rp] = nlbl;
-        roots[rq] = nlbl;
-
-        value.push_back(w);
-        nlbl++;
-      }
-
-
-      internal::alphatree_reorder_nodes(parent.data(), value.data(), parent.size());
+      internal::alphatree_reorder_nodes(viz.parent.data(), viz.value.data(), viz.parent.size());
       component_tree<int> res;
-      std::tie(res.parent, res.values) = internal::canonize_component_tree(parent, value, nm);
+      std::tie(res.parent, res.values) = internal::canonize_component_tree(viz.parent, viz.value, nm);
 
       return res;
     }

@@ -126,7 +126,8 @@ namespace mln::morpho
 
       // Kruskal
       mst_waterfall_visitor viz;
-      mln::morpho::canvas::kruskal(flatten_graph.data(), flatten_graph.size(), static_cast<int>(rag.size()), viz);
+      mln::morpho::canvas::kruskal(flatten_graph.data(), static_cast<int>(flatten_graph.size()),
+                                   static_cast<int>(rag.size()), viz);
 
       return std::move(viz.mst);
     }
@@ -137,7 +138,7 @@ namespace mln::morpho
       std::ranges::sort(mst, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
 
       waterfall_bpt_visitor viz;
-      mln::morpho::canvas::kruskal(mst.data(), mst.size(), n_vertices, viz);
+      mln::morpho::canvas::kruskal(mst.data(), static_cast<int>(mst.size()), n_vertices, viz);
 
       internal::alphatree_reorder_nodes(viz.parent.data(), viz.value.data(), viz.parent.size());
       component_tree<int> res;

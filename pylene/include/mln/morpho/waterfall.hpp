@@ -1,11 +1,9 @@
 #pragma once
 
-#include <mln/core/neighborhood/c4c8.hpp>
 #include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/canvas/kruskal.hpp>
 #include <mln/morpho/watershed.hpp>
 
-#include <map>
 #include <tuple>
 #include <vector>
 

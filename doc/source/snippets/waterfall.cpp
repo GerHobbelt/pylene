@@ -8,10 +8,51 @@
 #include <mln/morpho/gradient.hpp>
 #include <mln/morpho/waterfall.hpp>
 
+#include <mln/core/se/mask2d.hpp>
+#include <mln/morpho/dilation.hpp>
+#include <mln/morpho/erosion.hpp>
+
 #include <iostream>
 #include <string>
 
 #include "lut.hpp"
+
+mln::image2d<int> ucm(const mln::morpho::component_tree<int>& t, mln::image2d<int> nm)
+{
+  using namespace mln::view::ops;
+  mln::image2d<int> res        = mln::imconcretize(nm).set_init_value(0);
+  auto              mask       = mln::se::mask2d{{0, 1, 0}, {1, 1, 1}, {0, 1, 0}};
+  auto              err        = mln::morpho::erosion(nm, mask);
+  auto              dil        = mln::morpho::erosion(nm, mask);
+  auto              boundaries = (err != dil);
+  const auto        depth      = t.compute_depth();
+  const auto        lca        = [&depth, &t](int a, int b) {
+    while (depth[a] > depth[b])
+      b = t.parent[b];
+    while (depth[b] > depth[a])
+      a = t.parent[a];
+
+    while (a != b)
+    {
+      a = t.parent[a];
+      b = t.parent[b];
+    }
+    return a;
+  };
+  mln_foreach (auto p, nm.domain())
+  {
+    for (auto q : mln::c8(p))
+    {
+      if (nm.domain().has(q) && boundaries(p) && !boundaries(q) && nm(p) != nm(q))
+      {
+        std::cout << "nm(p) = " << nm(p) << " nm(q) = " << nm(q) << " ";
+        res(p) = std::max(res(p), t.values[lca(nm(p), nm(q))]);
+        std::cout << "res(p) = " << res(p);
+      }
+    }
+  }
+  return res;
+}
 
 int main(int argc, char* argv[])
 {
@@ -41,6 +82,9 @@ int main(int argc, char* argv[])
 
   auto cut = t.horizontal_cut(threshold, nodemap);
   mln::io::imsave(mln::view::transform(cut, [](auto x) { return regions_lut(x); }), output_segmentation_filename);
+
+  auto saliency = ucm(t, nodemap);
+  mln::io::imsave(mln::view::cast<std::uint8_t>(saliency), "sal.pgm");
 
   return 0;
 }

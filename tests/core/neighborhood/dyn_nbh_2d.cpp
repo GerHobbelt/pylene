@@ -1,7 +1,7 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c4.hpp>
-#include <mln/core/neighborhood/c4c8.hpp>
 #include <mln/core/neighborhood/c8.hpp>
+#include <mln/core/neighborhood/dyn_nbh_2d.hpp>
 
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/take.hpp>
@@ -14,15 +14,15 @@
 #include <vector>
 
 
-static_assert(mln::concepts::Neighborhood<mln::c4c8_t, mln::point2d>);
-static_assert(not mln::concepts::SeparableStructuringElement<mln::c4c8_t, mln::point2d>);
-static_assert(not mln::concepts::DecomposableStructuringElement<mln::c4c8_t, mln::point2d>);
-static_assert(not mln::concepts::IncrementalStructuringElement<mln::c4c8_t, mln::point2d>);
+static_assert(mln::concepts::Neighborhood<mln::dyn_nbh_2d_t, mln::point2d>);
+static_assert(not mln::concepts::SeparableStructuringElement<mln::dyn_nbh_2d_t, mln::point2d>);
+static_assert(not mln::concepts::DecomposableStructuringElement<mln::dyn_nbh_2d_t, mln::point2d>);
+static_assert(not mln::concepts::IncrementalStructuringElement<mln::dyn_nbh_2d_t, mln::point2d>);
 
 TEST(Core, c4c8_c4_point)
 {
   mln::point2d              p{3, 7};
-  auto                      nbh = mln::c4c8_t(mln::c4);
+  auto                      nbh = mln::dyn_nbh_2d_t(mln::c4);
   std::vector<mln::point2d> ref{{2, 7}, {3, 6}, {4, 7}, {3, 8}};
 
   // Complete neighborhood
@@ -45,7 +45,7 @@ TEST(Core, c4c8_c8_point)
   std::vector<mln::point2d> after_ref{{4, 7}, {3, 8}, {4, 8}, {2, 8}};
   std::vector<mln::point2d> before_ref{{2, 7}, {3, 6}, {2, 6}, {4, 6}};
   mln::point2d              p{3, 7};
-  auto                      nbh = mln::c4c8_t(mln::c8);
+  auto                      nbh = mln::dyn_nbh_2d_t(mln::c8);
 
   // Complete neighborhood
   auto comp = ::ranges::to_vector(nbh(p));
@@ -70,7 +70,7 @@ TEST(Core, c4c8_c4_pixel)
   };
   auto pix = ima.pixel_at(mln::point2d{1, 1});
 
-  mln::c4c8_t nbh(mln::c4);
+  mln::dyn_nbh_2d_t nbh(mln::c4);
 
   std::vector<std::uint8_t> v_ref{4, 2, 6, 8};
   std::vector<mln::point2d> p_ref{{0, 1}, {1, 0}, {2, 1}, {1, 2}};
@@ -92,7 +92,7 @@ TEST(Core, c4c8_c8_pixel)
   };
   auto pix = ima.pixel_at(mln::point2d{1, 1});
 
-  mln::c4c8_t nbh(mln::c8);
+  mln::dyn_nbh_2d_t nbh(mln::c8);
 
   std::vector<std::uint8_t> v_ref{4, 2, 6, 8, 1, 3, 9, 7};
   std::vector<mln::point2d> p_ref{{0, 1}, {1, 0}, {2, 1}, {1, 2}, {0, 0}, {2, 0}, {2, 2}, {0, 2}};

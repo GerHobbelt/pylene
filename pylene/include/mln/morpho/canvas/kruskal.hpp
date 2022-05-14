@@ -2,6 +2,7 @@
 
 #include <mln/morpho/canvas/unionfind.hpp>
 
+#include <memory>
 #include <vector>
 
 namespace mln::morpho::canvas
@@ -48,15 +49,15 @@ namespace mln::morpho::canvas
   template <typename E, typename V>
   void kruskal(E edges, int size, int nvertices, V& visitor)
   {
-    auto zpar = std::vector<int>(nvertices);
-    std::iota(zpar.begin(), zpar.end(), 0);
+    auto zpar = std::make_unique<int[]>(nvertices);
+    std::iota(zpar.get(), zpar.get() + nvertices, 0);
     visitor.on_init(nvertices);
 
     for (int i = 0; i < size; i++)
     {
       auto [p, q, w] = edges[i];
-      int rp         = impl::zfindroot(zpar.data(), p);
-      int rq         = impl::zfindroot(zpar.data(), q);
+      int rp         = impl::zfindroot(zpar.get(), p);
+      int rq         = impl::zfindroot(zpar.get(), q);
       if (rp != rq)
       {
         zpar[rp] = rq;

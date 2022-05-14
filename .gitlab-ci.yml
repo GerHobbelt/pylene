@@ -69,7 +69,7 @@ windows-debug:
     script:
         - mkdir build && cd build
         - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True -s build_type=$PYLENE_CONFIGURATION
-        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -D PYLENE_BUILD_PYTHON=ON
+        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -D PYLENE_BUILD_PYTHON=ON -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target Pylene-core
         - cmake --build . --target pylena
         - cmake --build . --target build-tests

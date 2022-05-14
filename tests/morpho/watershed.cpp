@@ -112,3 +112,51 @@ TEST(Morpho, watershed_from_markers_c8)
   ASSERT_IMAGES_EQ_EXP(out, ref);
   ASSERT_EQ(nlabel, 2);
 }
+
+TEST(Morpho, watershed_partition_c4)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 2, 0}, //
+      {0, 0, 0, 1, 0}, //
+      {3, 3, 3, 2, 3}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 2, 0, 0}  //
+  };
+
+  const mln::image2d<std::int16_t> ref{
+      {1, 1, 1, 1, 2}, //
+      {1, 1, 1, 1, 2}, //
+      {1, 1, 1, 4, 2}, //
+      {3, 3, 3, 4, 4}, //
+      {3, 3, 3, 4, 4}  //
+  };
+
+  int  nlabel;
+  auto out = mln::morpho::watershed<std::int16_t>(grad, mln::c4, nlabel, false);
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+  ASSERT_EQ(nlabel, 4);
+}
+
+TEST(Morpho, watershed_partition_c8)
+{
+  const mln::image2d<std::uint8_t> grad{
+      {0, 0, 0, 2, 0}, //
+      {0, 0, 0, 2, 0}, //
+      {3, 3, 3, 1, 3}, //
+      {0, 0, 3, 0, 0}, //
+      {0, 0, 2, 0, 0}  //
+  };
+
+  const mln::image2d<std::int16_t> ref{
+      {1, 1, 1, 1, 2}, //
+      {1, 1, 1, 1, 2}, //
+      {1, 1, 1, 1, 2}, //
+      {3, 3, 3, 4, 4}, //
+      {3, 3, 3, 4, 4}  //
+  };
+
+  int  nlabel;
+  auto out = mln::morpho::watershed<std::int16_t>(grad, mln::c8, nlabel, false);
+  ASSERT_IMAGES_EQ_EXP(out, ref);
+  ASSERT_EQ(nlabel, 4);
+}

@@ -7,7 +7,7 @@ Include :file:`<mln/morpho/watershed.hpp>`
 
 
 .. cpp:function::  template <class Label_t, class I, class N> \
-                   image_ch_value_t<I, Label_t> watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel)
+                   image_ch_value_t<I, Label_t> watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel, bool waterline=true)
 
    Watershed by immersion as defined in [BM92]_. The catchment basins are
    labeled from 1 to n, and the special label 0 is used for watershed lines.
@@ -17,6 +17,7 @@ Include :file:`<mln/morpho/watershed.hpp>`
    :param input: Input image
    :param nbh: Neighborhood considered
    :param nlabel (out): Number of catchment basins
+   :param waterline: Add the watershed lines in the resulting segmentation
 
    :return: A labelized image
 

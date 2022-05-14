@@ -55,6 +55,7 @@ add_core_test(${test_prefix}c4               neighborhood/c4.cpp)
 add_core_test(${test_prefix}c6               neighborhood/c6.cpp)
 add_core_test(${test_prefix}c8               neighborhood/c8.cpp)
 add_core_test(${test_prefix}c26              neighborhood/c26.cpp)
+add_core_test(${test_prefix}dyn_nbh_2d       neighborhood/dyn_nbh_2d.cpp)
 
 # test Extension
 add_core_test(${test_prefix}extension_clamp     extension/clamp.cpp)

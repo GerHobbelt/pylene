@@ -91,6 +91,7 @@ target_sources(Pylene-core PRIVATE
                src/morpho/satmaxtree.cpp
                src/morpho/trees_fusion.cpp
                src/morpho/unionfind.cpp
+               src/morpho/waterfall.cpp
                src/transforms/hough_lines.cpp
                )
 

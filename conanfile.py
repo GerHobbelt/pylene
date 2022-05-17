@@ -20,6 +20,7 @@ class Pylene(ConanFile):
         "fPIC": False,
         "gtest:shared": False,
         "boost:header_only": True,
+        "freeimage:shared": True
     }
 
     generators = "CMakeDeps"
@@ -37,7 +38,8 @@ class Pylene(ConanFile):
         "xsimd/7.4.6",
         "eigen/3.3.9",
         "boost/1.75.0",
-        "cfitsio/4.0.0"
+        "cfitsio/4.0.0",
+        "freeimage/3.18.0"
     ]
 
     def _build_python(self):

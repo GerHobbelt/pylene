@@ -244,8 +244,8 @@ distbench-linux-gcc9-release:
     script:
         - dnf install -y cairo-devel
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-11 --build missing -s compiler.cppstd=20
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - conan install -u .. -pr gcc-11 --build missing -s compiler.cppstd=20 -s build_type=Release
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
         - cmake --build . --target build-doc
         - DOCDIR="public/"
         - if [ "${CI_COMMIT_REF_SLUG}" != "master" ]; then DOCDIR="public/${CI_COMMIT_REF_SLUG}/"; fi

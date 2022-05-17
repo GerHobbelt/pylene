@@ -117,7 +117,6 @@ class Pylene(ConanFile):
         cmake.install()
 
     def package(self):
-        self.copy("FindFreeImage.cmake", dst="cmake", src="cmake")
         tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
@@ -134,8 +133,7 @@ class Pylene(ConanFile):
         self.cpp_info.components["scribo"].libs = ["Pylene-scribo"]
 
         # IO component (FreeImage)
-        self.cpp_info.components["io-freeimage"].system_libs.append("freeimage")
-        self.cpp_info.components["io-freeimage"].requires = ["core"]
+        self.cpp_info.components["io-freeimage"].requires = ["core", "freeimage::FreeImage"]
         self.cpp_info.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
 
         # IO component (cfitsio)

@@ -191,7 +191,8 @@ namespace mln
 
       vec_base() = default;
 
-      vec_base(const vec_base&) = default;
+      // Defaulted
+      // vec_base(const vec_base&) = default;
 
       template <class OtherTag>
       explicit vec_base(const vec_base<T, dim, OtherTag>& other)

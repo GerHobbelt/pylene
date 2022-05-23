@@ -195,7 +195,9 @@ distcheck-linux-coverage:
         paths:
             - coverage/
         reports:
-            cobertura: cobertura
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage/cobertura-coverage.xml
         expire_in: 1 week
     coverage: '/lines: \d+\.\d+\%/'
     rules:

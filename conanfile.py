@@ -4,6 +4,33 @@ from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
 from conan.tools.layout import cmake_layout
 from conans.errors import ConanInvalidConfiguration
 
+# Boost options (not header only because of openimageio) (from CCI Boost conanfile.py without required options)
+BOOST_CONFIGURE_OPTIONS = (
+    "context",
+    "contract",
+    "coroutine",
+    "fiber",
+    "graph",
+    "graph_parallel",
+    "iostreams",
+    "json",
+    "locale",
+    "log",
+    "math",
+    "mpi",
+    "nowide",
+    "program_options",
+    "python",
+    "random",
+#    "regex",
+    "serialization",
+    "stacktrace",
+    "test",
+    "timer",
+    "type_erasure",
+    "wave",
+)
+
 class Pylene(ConanFile):
     name = "pylene"
     version = "head"
@@ -19,9 +46,14 @@ class Pylene(ConanFile):
         "shared": False,
         "fPIC": False,
         "gtest:shared": False,
-        "boost:header_only": True,
-        "freeimage:shared": True
+        "freeimage:shared": True,
+        # OIIO options
+        "openimageio:shared": True,
+        "openimageio:with_opencolorio": False,
+        "openimageio:with_opencv": False,
+        "openimageio:with_ffmpeg": False,
     }
+    default_options.update({"boost:without_{}".format(bl): True for bl in BOOST_CONFIGURE_OPTIONS})
 
     generators = "CMakeDeps"
     exports_sources = ["pylene/*", "pylene-python/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
@@ -34,12 +66,13 @@ class Pylene(ConanFile):
     requires = [
         "range-v3/0.10.0",
         "fmt/6.0.0",
-        "tbb/2020.0",
+        "onetbb/2020.0",
         "xsimd/7.4.6",
         "eigen/3.3.9",
         "boost/1.75.0",
         "cfitsio/4.0.0",
-        "freeimage/3.18.0"
+        "freeimage/3.18.0",
+        "openimageio/2.3.7.2"
     ]
 
     def _build_python(self):

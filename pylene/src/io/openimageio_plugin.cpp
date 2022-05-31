@@ -79,7 +79,7 @@ namespace mln::io::oiio
         case sample_type_id::BOOL: // This should be ignore in case of PBM
           return {TypeDesc::UINT8, 1};
         case sample_type_id::RGB8:
-          return {TypeDesc::UINT8, 24, 3};
+          return {TypeDesc::UINT8, 8, 3};
         case sample_type_id::OTHER:
           throw std::invalid_argument("Unhandled input type");
         }
@@ -87,38 +87,79 @@ namespace mln::io::oiio
 
       bool is_rgb8(int nchannels, auto desc) { return nchannels == 3 && desc == OIIO::TypeDesc::UINT8; }
     } // namespace
+
+    // Base Implementation
     struct impl_base_t : public mln::io::internal::plugin_base::impl_t
     {
       const char*                        m_filename;
       std::unique_ptr<OIIO::ImageInput>  m_inp;
       std::unique_ptr<OIIO::ImageOutput> m_out;
-      OIIO::TypeDesc::BASETYPE           m_desc;
-      int                                m_bpp;
+      OIIO::TypeDesc                     m_desc;
       int                                m_y = 0;
     };
 
+    // Memcpy based implementation
     struct impl_memcpy_t : public impl_base_t
     {
-      impl_memcpy_t(int size)
-        : m_scanline(std::make_unique<std::byte[]>(size))
-      {
-      }
-
       void read_next_line(std::byte* buffer) final
       {
-        m_inp->read_scanline(m_y, 0, m_desc, m_scanline.get());
-        std::memcpy(buffer, m_scanline.get(), m_dims[0] * m_bpp / 8);
+        assert(m_inp);
+        m_inp->read_scanline(m_y, 0, m_desc, buffer);
         m_y++;
       }
 
       void write_next_line(const std::byte* buffer) final
       {
-        std::memcpy(m_scanline.get(), buffer, m_dims[0] * m_bpp / 8);
-        m_out->write_scanline(m_y, 0, m_desc, m_scanline.get());
+        assert(m_out);
+        m_out->write_scanline(m_y, 0, m_desc, buffer);
+        m_y++;
+      }
+    };
+
+    struct impl_bit_t : public impl_base_t
+    {
+      impl_bit_t(int scan_size)
+        : m_scanline(std::make_unique<std::uint8_t[]>(scan_size))
+      {
+      }
+
+      void read_next_line(std::byte* buffer)
+      {
+        assert(m_inp);
+        m_inp->read_scanline(m_y, 0, m_desc, buffer);
+        std::uint8_t* buf = (std::uint8_t*)buffer;
+        for (int x = 0; x < m_dims[0]; x++)
+          buf[x] = buf[x] ? 1 : 0;
         m_y++;
       }
 
-      std::unique_ptr<std::byte[]> m_scanline;
+      void write_next_line(const std::byte* buffer)
+      {
+        assert(m_out);
+        for (int x = 0; x < m_dims[0]; x++)
+          m_scanline.get()[x] = ((bool*)buffer[x]) ? -1 : 0;
+        m_out->write_scanline(m_y, 0, OIIO::TypeDesc::UINT8, m_scanline.get());
+        m_y++;
+      }
+
+    private:
+      std::unique_ptr<std::uint8_t[]> m_scanline;
+    };
+
+    // Used for reading only
+    struct inv_bit_t : public impl_base_t
+    {
+      void read_next_line(std::byte* buffer_)
+      {
+        assert(m_inp);
+        m_inp->read_scanline(m_y, 0, m_desc, buffer_);
+        bool* buffer = reinterpret_cast<bool*>(buffer_);
+        for (int x = 0; x < m_dims[0]; x++)
+          buffer[x] = !buffer[x];
+        m_y++;
+      }
+
+      void write_next_line(const std::byte*) { std::abort(); }
     };
 
     openimageio_reader_plugin::~openimageio_reader_plugin() { this->close(); }
@@ -135,27 +176,45 @@ namespace mln::io::oiio
       // Number of dimension
       int ndim = 2;
       if (spec.depth > 1)
-        ndim++;
+        // ndim++;
+        throw std::runtime_error("Only 2D images are handled by the OIIO plugin reader");
 
       // Channels handling
       auto desc      = static_cast<TypeDesc::BASETYPE>(format.basetype);
       auto st        = get_sample_type(desc);
       int  nchannels = spec.nchannels;
-      int  bpp       = spec.get_int_attribute("oiio:BitsPerSample", 12) * nchannels;
+      int  bpp       = -1;
+      {
+        // Handle the conversion between float and int for bpp, which is not handled by oiio
+        auto bps = spec["oiio:BitsPerSample"];
+        if (bps.type().basetype == TypeFloat.basetype)
+          bpp = static_cast<int>(bps.get<float>(-1));
+        else
+          bpp = bps.get<int>(-1);
+        // If no bpp info, maybe a BMP
+        if (bpp < 0)
+          bpp = spec.get_int_attribute("bmp:bitsperpixel", -1);
+        // Else, we rely only on the OIIO TypeDesc
+      }
+
       if (is_rgb8(nchannels, desc))
         st = sample_type_id::RGB8;
       else if (nchannels != 1)
         throw std::invalid_argument(fmt::format("Invalid value format. Only handle univariate or RGB (24 bits) images "
                                                 "(Number of channels: {}, Value type: {})",
                                                 nchannels, format.c_str()));
-      // Special case: Binary PBM
-      if (st == sample_type_id::OTHER && spec.get_int_attribute("oiio:BitsPerSample") == 1)
-        st = sample_type_id::BOOL;
-      if (st == sample_type_id::BOOL)
-        throw std::invalid_argument("BOOL format not implemented");
 
-      // Implementation (Only memcpy for now)
-      auto impl              = std::make_unique<impl_memcpy_t>(spec.width * spec.nchannels * format.size());
+      if (bpp == 1)
+        st = sample_type_id::BOOL;
+
+      std::unique_ptr<impl_base_t> impl;
+      if (bpp == 1 && std::string_view(inp->format_name()) == "pnm")
+        impl = std::make_unique<inv_bit_t>();
+      else if (bpp == 1)
+        impl = std::make_unique<impl_bit_t>(0);
+      else
+        impl = std::make_unique<impl_memcpy_t>();
+
       impl->m_filename       = filename;
       impl->m_desc           = desc;
       impl->m_sample_type_id = st;
@@ -163,7 +222,6 @@ namespace mln::io::oiio
       impl->m_dims[0]        = spec.width;
       impl->m_dims[1]        = spec.height;
       impl->m_dims[2]        = spec.depth;
-      impl->m_bpp            = bpp;
       impl->m_inp            = std::move(inp);
 
       m_impl = std::move(impl);
@@ -184,38 +242,40 @@ namespace mln::io::oiio
     void openimageio_writer_plugin::open(const char* filename, sample_type_id sample_type, int ndim, const int dims[])
     {
       using namespace OIIO;
-      if (ndim > 3 || ndim < 0)
+      if (ndim != 2)
         throw std::invalid_argument(
-            fmt::format("Invalid number of dimensions for writing (Got {}, expected: {1, 2, 3})", ndim));
+            fmt::format("Invalid number of dimensions for writing (Got {}, expected: 2)", ndim));
       auto out = ImageOutput::create(filename);
       if (!out)
         throw std::runtime_error(fmt::format("Unable to open output {} ({})", filename, geterror()));
 
       // Implementation (Only for memcpy for now)
-      if (sample_type == sample_type_id::BOOL)
-        throw std::invalid_argument("BOOL not implemented");
-
       auto [descr, bpp, nchan] = get_descriptor(sample_type);
-      auto tmp                 = std::ceil(static_cast<float>(bpp) / 8);
-      auto impl                = std::make_unique<impl_memcpy_t>(dims[0] * tmp);
-      impl->m_ndim             = ndim;
-      impl->m_dims[0]          = dims[0];
-      impl->m_dims[1]          = dims[1];
+      std::unique_ptr<impl_base_t> impl;
+      if (bpp == 1)
+        impl = std::make_unique<impl_bit_t>(dims[0]);
+      else
+        impl = std::make_unique<impl_memcpy_t>();
+
+      impl->m_ndim           = ndim;
+      impl->m_dims[0]        = dims[0];
+      impl->m_dims[1]        = dims[1];
+      impl->m_sample_type_id = sample_type;
       if (ndim > 2)
         impl->m_dims[2] = dims[2];
-      impl->m_desc = static_cast<TypeDesc::BASETYPE>(descr.basetype);
-      impl->m_bpp  = bpp;
+      impl->m_desc = descr;
       ImageSpec spec{};
-      if (sample_type == sample_type_id::BOOL)
-        spec.attribute("oiio:BitsPerSample", 1);
+      if (bpp > 0)
+        spec.attribute("oiio:BitsPerSample", bpp);
       spec.width     = dims[0];
       spec.height    = dims[1];
-      spec.depth     = ndim > 2 ? dims[2] : 1;
+      spec.depth     = 1; // ndim > 2 ? dims[2] : 1;
       spec.nchannels = nchan;
       spec.format    = descr;
       out->open(filename, spec);
       impl->m_out = std::move(out);
-      m_impl      = std::move(impl);
+
+      m_impl = std::move(impl);
     }
 
     void openimageio_writer_plugin::close()

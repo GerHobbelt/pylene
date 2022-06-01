@@ -80,7 +80,7 @@ namespace mln::io::oiio
           return {TypeDesc::UINT8, 1};
         case sample_type_id::RGB8:
           return {TypeDesc::UINT8, 8, 3};
-        case sample_type_id::OTHER:
+        default:
           throw std::invalid_argument("Unhandled input type");
         }
       }

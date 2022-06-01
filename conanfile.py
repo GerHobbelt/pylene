@@ -66,13 +66,14 @@ class Pylene(ConanFile):
     requires = [
         "range-v3/0.10.0",
         "fmt/6.0.0",
-        "onetbb/2020.0",
+        "onetbb/2020.3",
         "xsimd/7.4.6",
         "eigen/3.3.9",
-        "boost/1.75.0",
+        "boost/1.78.0",
         "cfitsio/4.0.0",
         "freeimage/3.18.0",
-        "openimageio/2.3.7.2"
+        "openimageio/2.3.7.2",
+        "openjpeg/2.5.0" # To solve dependency conflict between freeimage and openimageio
     ]
 
     def _build_python(self):

@@ -210,8 +210,6 @@ TEST(Dilation, Custom_cmp_function)
 }
 */
 
-*/
-
 
 // Dilation of a binary image
 TEST(Dilation, Binary)

@@ -112,28 +112,28 @@ target_include_directories(Pylene-io-freeimage PUBLIC
                            $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
-target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::FreeImage)
+target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::freeimage)
 
-add_library(Pylene-io-openimageio)
-add_library(Pylene::IO-openimageio ALIAS Pylene-io-openimageio)
-target_sources(Pylene-io-openimageio PRIVATE src/io/openimageio_plugin.cpp src/io/io.cpp)
-target_link_libraries(Pylene-io-openimageio PRIVATE OpenImageIO::OpenImageIO)
-target_link_libraries(Pylene-io-openimageio PUBLIC Pylene-core)
+#add_library(Pylene-io-openimageio)
+#add_library(Pylene::IO-openimageio ALIAS Pylene-io-openimageio)
+#target_sources(Pylene-io-openimageio PRIVATE src/io/openimageio_plugin.cpp src/io/io.cpp)
+#target_link_libraries(Pylene-io-openimageio PRIVATE OpenImageIO::OpenImageIO)
+#target_link_libraries(Pylene-io-openimageio PUBLIC Pylene-core)
 
-if (cfitsio_FOUND)
-  add_library(Pylene-io-fits)
-  add_library(Pylene::IO-fits ALIAS Pylene-io-fits)
-  target_sources(Pylene-io-fits PRIVATE
-                 src/io/cfitsio_plugin.cpp
-                 src/io/io.cpp
-  )
-  target_include_directories(Pylene-io-fits PUBLIC
-                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                             $<INSTALL_INTERFACE:include>
-  )
-  target_link_libraries(Pylene-io-fits PUBLIC Pylene-core)
-  target_link_libraries(Pylene-io-fits PRIVATE cfitsio::cfitsio)
-endif(cfitsio_FOUND)
+#if (cfitsio_FOUND)
+#  add_library(Pylene-io-fits)
+#  add_library(Pylene::IO-fits ALIAS Pylene-io-fits)
+#  target_sources(Pylene-io-fits PRIVATE
+#                 src/io/cfitsio_plugin.cpp
+#                 src/io/io.cpp
+#  )
+#  target_include_directories(Pylene-io-fits PUBLIC
+#                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#                             $<INSTALL_INTERFACE:include>
+#  )
+#  target_link_libraries(Pylene-io-fits PUBLIC Pylene-core)
+#  target_link_libraries(Pylene-io-fits PRIVATE cfitsio::cfitsio)
+#endif(cfitsio_FOUND)
 
 if (Eigen3_FOUND)
   add_library(Pylene-scribo)

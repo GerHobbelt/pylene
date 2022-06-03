@@ -14,6 +14,7 @@ add_subdirectory(theo)
 add_subdirectory(tosgui)
 add_subdirectory(hierachical_seg-gui)
 add_subdirectory(hyperspec)
+add_subdirectory(icip.2022)
 
 
 ## Old apps no longer supported or using an old API

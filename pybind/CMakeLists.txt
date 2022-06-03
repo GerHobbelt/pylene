@@ -3,6 +3,8 @@ project(Pybind CXX)
 find_package(pybind11 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 
+include(pybind11Common)
+
 pybind11_add_module(pylena MODULE
                     src/pylena.cpp
                     src/morpho.cpp

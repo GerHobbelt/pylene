@@ -52,7 +52,7 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
   add_compile_options(
     "-Wextra"
     "-Wall"
-    "-Werror"
+    # "-Werror"
     )
 endif()
 

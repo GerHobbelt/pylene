@@ -8,6 +8,9 @@ Reference
 
 
    core
+   io
    labeling
    morpho
+   transforms
+   scribo
    concept

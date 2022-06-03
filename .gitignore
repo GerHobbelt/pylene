@@ -15,3 +15,5 @@ compile_commands.json
 apps/tip.2019-2020/images/bg_sub_results
 apps/tip.2019-2020/images/clean_samples
 *.so
+CMakeUserPresets.json
+.vscode

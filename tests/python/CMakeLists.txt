@@ -13,6 +13,7 @@ if (UNIX AND NOT CYGWIN)
 endif()
 
 find_package(pybind11 REQUIRED)
+include(pybind11Common)
 
 # Python module for testing
 pybind11_add_module(pylena_test pylena_test.cpp)

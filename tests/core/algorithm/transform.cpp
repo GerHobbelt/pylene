@@ -10,8 +10,6 @@
 
 TEST(Core, Algorithm_Transform)
 {
-  using namespace mln::view::ops;
-
   mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
 
   mln::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
@@ -45,7 +43,6 @@ TEST(Core, Algorithm_Transform_3args_BinaryFunction)
 
 TEST(Core, Algorithm_Transform_LValue)
 {
-  using namespace mln::view::ops;
   using V = std::pair<uint8_t, uint8_t>;
 
 

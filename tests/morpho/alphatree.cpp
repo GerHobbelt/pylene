@@ -397,3 +397,4 @@ TEST(Morpho, AlphaTreeCutMeanLabelization)
   ASSERT_IMAGES_EQ_EXP(make_cut(1), cut_1);
   ASSERT_IMAGES_EQ_EXP(make_cut(2), cut_2);
   ASSERT_IMAGES_EQ_EXP(make_cut(3), cut_3);
+}

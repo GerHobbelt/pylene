@@ -52,12 +52,12 @@ TEST(View, mask_twice)
   using namespace mln::view::ops;
 
   mln::image2d<int> ima = {{0, 1, 2, 3, 4}, //
-                           {5, 6, 7, 8, 9}, //
-                           {10, 11, 12, 13, 14}};
+                                         {5, 6, 7, 8, 9}, //
+                                         {10, 11, 12, 13, 14}};
 
   mln::image2d<int> ref = {{0, 42, 2, 3, 4},  //
-                           {42, 6, 7, 8, 42}, //
-                           {10, 11, 12, 42, 14}};
+                                         {42, 6, 7, 8, 42}, //
+                                         {10, 11, 12, 42, 14}};
 
 
   auto mask_A = (ima % 2) == 1;
@@ -117,11 +117,11 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   using view               = std::false_type;
 
 
-  domain_type domain() const;
-  reference   operator()(point_type);
-  reference   at(point_type);
-  pixel_type  pixel(point_type);
-  pixel_type  pixel_at(point_type);
+  domain_type    domain() const;
+  reference      operator()(point_type);
+  reference      at(point_type);
+  pixel_type pixel(point_type);
+  pixel_type pixel_at(point_type);
 
   struct pixel_range
   {

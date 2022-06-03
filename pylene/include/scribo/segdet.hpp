@@ -3,142 +3,63 @@
 #include <mln/core/image/ndimage_fwd.hpp>
 
 #include <cstdint>
-#include <map>
-#include <tuple>
 #include <vector>
 
 namespace scribo
 {
-  /**
-   * @brief SEGDET_PREPROCESS_ENUM Precise the preprocess to apply
-   */
-  enum class SEGDET_PREPROCESS_ENUM
-  {
-    NONE,          ///< None
-    BLACK_TOP_HAT, ///< Black-Top-Hat with specific filter size and dynamic
-  };
-
-  /**
-   * @brief SEGDET_PROCESS_TRACKING_ENUM Precise which tracker is used
-   */
-  enum class SEGDET_PROCESS_TRACKING_ENUM
-  {
-    KALMAN,          ///< Kalman Filters following classics prediction and correction
-    KALMAN_LEPLUMEY, ///< Kalman Filters by Leplumey as understood
-  };
-
-  /**
-   * @brief SEGDET_PROCESS_TRAVERSAL_MODE_ENUM Precise the traversal performed for line detection
-   */
-  enum class SEGDET_PROCESS_TRAVERSAL_MODE_ENUM
-  {
-    HORIZONTAL,          ///< Only horizontal traversal is performed
-    VERTICAL,            ///< Only vertical traversal is performed
-    HORIZONTAL_VERTICAL, ///< Both horizontal and vertical traversal are performed
-  };
-
-  /**
-   * @brief SegDetParams holds parameters of the line detection
-   */
   struct SegDetParams
   {
-    SEGDET_PREPROCESS_ENUM             preprocess = SEGDET_PREPROCESS_ENUM::NONE;         ///< Preprocess applied
-    SEGDET_PROCESS_TRACKING_ENUM       tracker    = SEGDET_PROCESS_TRACKING_ENUM::KALMAN; ///< Tracker used
-    SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode =
-        SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL; ///< Traversal performed
+    float     dyn               = 0.6f;
+    int nb_values_to_keep = 30;
+    int discontinuity     = 0;
 
-    float dyn       = 0.6f; ///< Dynamic when Black-Top-Hat preprocess is applied
-    int   size_mask = 11;   ///< Filter size when Black-Top-Hat preprocess is applied
+    int default_sigma_position   = 2;
+    int default_sigma_thickness  = 2;
+    int default_sigma_luminosity = 57;
 
-    int nb_values_to_keep = 30; ///< Memory of filter to compute variances for the matching
-    int discontinuity_relative =
-        0; ///< Percentage. Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
-    int discontinuity_absolute =
-        0; ///< Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
-    int   minimum_for_fusion = 15;   ///< Threshold to merge filters following same observation
-    float max_slope          = 50.f; ///< Max allowed slope of segment to detect
+    int min_nb_values_sigma  = 10;
+    float     sigma_pos_min        = 1.f;
+    float     sigma_thickness_min  = 0.64f;
+    float     sigma_luminosity_min = 13.f;
 
-    int default_sigma_position   = 2;  ///< Position default variance value
-    int default_sigma_thickness  = 2;  ///< Thickness default variance value
-    int default_sigma_luminosity = 57; ///< Luminosity default variance value
+    int max_llum      = 225;
+    int max_thickness = 100;
 
-    int   min_nb_values_sigma  = 10;    ///< Threshold to compute variance and not use defauld values
-    float sigma_pos_min        = 1.f;   ///< Minimum position variance value
-    float sigma_thickness_min  = 0.64f; ///< Minimum thickness variance value
-    float sigma_luminosity_min = 13.f;  ///< Minimum luminosity variance value
+    float ratio_lum = 1.f;
 
-    int   max_llum     = 225; ///< First threshold for observation extraction
-    int   max_max_llum = 225; ///< Second threshold for observation extraction
-    float ratio_lum    = 1.f; ///< Ratio of kept luminosity in observation extraction
+    float merge_slope_variation = 0.4f;
+    float merge_distance_max    = 8.f;
 
-    int max_thickness = 100; ///< Max allowed (vertical|horizontal) thickness of segment to detect
+    float threshold_intersection = 0.8f;
 
-    float threshold_intersection = 0.8f; ///< Threshold for duplication removal
-    bool  remove_duplicates      = true; ///< Say if duplication removal has to be computed
+    int minimum_for_fusion = 15;
 
-    /**
-     * @brief Say if parameters values are compatible
-     * @return true if parameters are valid
-     */
     bool is_valid() const;
   };
 
-  /**
-   * @brief VSegment structure holding vectorial information about detected lines
-   *
-   */
-  struct VSegment
+  struct segdet_output
   {
-    int label; ///< Label of segment
-    int x0;    ///< First coordinate of first point
-    int y0;    ///< Second coordinate of first point
-    int x1;    ///< First coordinate of second point
-    int y1;    ///< Second coordinate of second point
+    std::vector<int>   seg_ids;
+    std::vector<float> mid_pos_x;
+    std::vector<float> mid_pos_y;
+    std::vector<int>   thickness;
+    std::vector<float> angle;
   };
 
   /**
+   * Detects lines in the given image trying to find good parameters
+   * @param image A grayscale image to process
+   * @param min_len The minimum length of segments to detect
+   * @return A vector of detected segments
+   */
+  segdet_output detect_line(const mln::image2d<std::uint8_t>& image, int min_len);
+
+  /**
    * Detects lines in the given image using given parameters
-   * @param image A ndbuffer representing the image to process
+   * @param image A grayscale image to process
    * @param min_len The minimum length of segments to detect
    * @param params A struct containing the parameters of the method
    * @return A vector of detected segments
    */
-  std::vector<VSegment> detect_line_vector(const mln::image2d<std::uint8_t>& image, int min_len,
-                                           const SegDetParams& params = SegDetParams());
-
-  static constexpr int first_label = 2;
-  /**
-   * @brief LSuperposition structure holding superposition information
-   *
-   */
-  struct LSuperposition
-  {
-    int label; ///< Label of the segment superposing
-    int x;     ///< First coordinate of the position of the superposition
-    int y;     ///< Second coordinate of the position of the superposition
-  };
-
-  /**
-   * Detects lines in the given image using given parameters
-   * @param image A ndbuffer representing the image to process
-   * @param min_len The minimum length of segments to detect
-   * @param params A struct containing the parameters of the method
-   * @return An image with pixel labelized (intersection with single label)
-   */
-  std::tuple<mln::image2d<uint16_t>, std::vector<LSuperposition>>
-  detect_line_label(mln::image2d<std::uint8_t> image, int min_len, const SegDetParams& params = SegDetParams());
-
-  /**
-   * Detects lines in the given image using given parameters
-   * @param image A ndbuffer representing the image to process
-   * @param min_len The minimum length of segments to detect
-   * @param params A struct containing the parameters of the method
-   * @return Tuple with 1. Image with pixel labelized (intersection with single label)
-   *                    2. Vector of detected segment
-   *                    3. Vector of LSuperposition Type Intersection information
-   */
-  std::tuple<mln::image2d<std::uint16_t>, std::vector<LSuperposition>, std::vector<VSegment>>
-  detect_line_full(mln::image2d<std::uint8_t> image, int min_len, const SegDetParams& params = SegDetParams());
-
-  mln::image2d<std::uint8_t> detect_line_pp(const mln::image2d<std::uint8_t>& image, const SegDetParams& params);
-} // namespace scribo
+  segdet_output detect_line(const mln::image2d<std::uint8_t>& image, int min_len, const SegDetParams& params);
+} // namespace mln::contrib::segdet

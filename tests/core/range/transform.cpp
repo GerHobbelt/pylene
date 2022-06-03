@@ -5,10 +5,8 @@
 #include <mln/core/range/mdspan.hpp>
 #include <mln/core/range/view/reverse.hpp>
 
-#include <range/v3/algorithm/copy.hpp>
 #include <range/v3/iterator/insert_iterators.hpp>
-#include <range/v3/range/conversion.hpp>
-
+#include <range/v3/algorithm/copy.hpp>
 
 #include <vector>
 
@@ -52,12 +50,12 @@ TEST(Range, transform_2d_readonly)
 
 TEST(Range, transform_2d_write)
 {
-  std::vector<std::pair<int, int>> buffer(12, std::make_pair(0, 0));
+  std::vector<std::pair<int, int>>                buffer(12, std::make_pair(0, 0));
 
   std::size_t    dims[]    = {4, 3};
   std::ptrdiff_t strides[] = {1, 4};
 
-  auto sp  = mln::ranges::mdspan<std::pair<int, int>, 2>(buffer.data(), dims, strides);
+  auto sp = mln::ranges::mdspan<std::pair<int, int>, 2>(buffer.data(), dims, strides);
   auto rng = mln::ranges::view::transform(sp, &std::pair<int, int>::first);
   static_assert(mln::ranges::MDBidirectionalRange<decltype(sp)>);
   static_assert(mln::ranges::MDBidirectionalRange<decltype(rng)>);
@@ -148,8 +146,8 @@ TEST(Range, transform_read_chain)
   auto y = mln::ranges::view::transform(x, [](int a) { return a + 1; });
   auto z = mln::ranges::view::transform(y, [](int a) { return a * 2; });
 
-  std::vector<int>            buffer_ref(12, 86);
-  mln::ranges::mdspan<int, 2> ref(buffer_ref.data(), {4, 3}, {1, 4});
+  std::vector<int>                buffer_ref(12, 86);
+  mln::ranges::mdspan<int, 2>     ref(buffer_ref.data(), {4, 3}, {1, 4});
 
   ASSERT_TRUE(mln::ranges::equal(z, ref));
 }
@@ -164,7 +162,7 @@ TEST(Range, transform2_read_chain)
   auto y = mln::ranges::view::transform(x, sp, [](int a, int b) { return a + b; });
   auto z = mln::ranges::view::transform(y, [](int a) { return a + 1; });
 
-  std::vector<int>            buffer_ref(12, 42);
+  std::vector<int>                buffer_ref(12, 42);
   mln::ranges::mdspan<int, 2> ref(buffer_ref.data(), {4, 3}, {1, 4});
 
   ASSERT_TRUE(mln::ranges::equal(z, ref));

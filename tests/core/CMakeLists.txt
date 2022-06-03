@@ -55,6 +55,7 @@ add_core_test(${test_prefix}c4               neighborhood/c4.cpp)
 add_core_test(${test_prefix}c6               neighborhood/c6.cpp)
 add_core_test(${test_prefix}c8               neighborhood/c8.cpp)
 add_core_test(${test_prefix}c26              neighborhood/c26.cpp)
+add_core_test(${test_prefix}dyn_nbh_2d       neighborhood/dyn_nbh_2d.cpp)
 
 # test Extension
 add_core_test(${test_prefix}extension_clamp     extension/clamp.cpp)
@@ -85,13 +86,13 @@ add_core_test(${test_prefix}accumulate         algorithm/accumulate.cpp)
 add_core_test(${test_prefix}transform          algorithm/transform.cpp)
 add_core_test(${test_prefix}sort               algorithm/sort.cpp)
 add_core_test(${test_prefix}accumulate_local   algorithm/accumulate_local.cpp)
+target_link_libraries(${test_prefix}clone PRIVATE TBB::tbb)
+target_link_libraries(${test_prefix}copy PRIVATE TBB::tbb)
+target_link_libraries(${test_prefix}fill PRIVATE TBB::tbb)
+target_link_libraries(${test_prefix}for_each PRIVATE TBB::tbb)
+target_link_libraries(${test_prefix}paste PRIVATE TBB::tbb)
+target_link_libraries(${test_prefix}transform PRIVATE TBB::tbb)
 
-target_link_libraries(${test_prefix}copy               PRIVATE TBB::TBB)
-target_link_libraries(${test_prefix}clone              PRIVATE TBB::TBB)
-target_link_libraries(${test_prefix}fill               PRIVATE TBB::TBB)
-target_link_libraries(${test_prefix}for_each           PRIVATE TBB::TBB)
-target_link_libraries(${test_prefix}paste              PRIVATE TBB::TBB)
-target_link_libraries(${test_prefix}transform          PRIVATE TBB::TBB)
 
 # test SE
 add_core_test(${test_prefix}periodic_line2d    se/periodic_line2d.cpp)

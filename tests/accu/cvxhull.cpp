@@ -1,4 +1,6 @@
-#include <mln/accu/accumulators/cvxhull_impl.hpp>
+#include <mln/accu/accumulators/cvxhull.hpp>
+#include <mln/core/image/ndimage.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <gtest/gtest.h>
 #include <fmt/ostream.h>
@@ -286,5 +288,30 @@ TEST(CvxHull, DS_3)
   std::sort(ref.begin(), ref.end());
 
   ASSERT_EQ(res, ref);
+}
+
+
+
+TEST(CvxHull, image)
+{
+  mln::image2d<bool> input = {
+    {0, 0, 0, 0, 0, 0},
+    {0, 1, 1, 0, 0, 0},
+    {0, 0, 1, 0, 1, 0},
+    {0, 1, 1, 1, 1, 0},
+    {0, 0, 1, 0, 1, 0}
+  };
+
+  mln::accu::accumulators::cvxhull<mln::point2d> cvxhull;
+
+  mln_foreach(auto px, input.pixels())
+    if (px.val())
+      cvxhull.take(px.point());
+
+
+  auto res      = cvxhull.to_result();
+  auto expected = std::vector<mln::point2d>{{1, 1}, {2, 1}, {4, 2}, {1, 3}, {2, 4}, {4, 4}};
+  std::ranges::sort(res);
+  ASSERT_EQ(res, expected);
 }
 

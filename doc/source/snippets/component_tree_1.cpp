@@ -14,6 +14,8 @@ struct my_accu_t : mln::Accumulator<my_accu_t>
 
   my_accu_t() = default;
 
+  void init() { *this = my_accu_t{}; }
+
   template <class Pix>
   void take(Pix px)
   {

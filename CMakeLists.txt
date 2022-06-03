@@ -2,24 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 project(Pylene)
 
 # Add FindTBB directory to CMake's module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-
-
-if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  include("${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  conan_set_rpath()
-  conan_set_std()
-  conan_set_fpic()
-  conan_check_compiler()
-  conan_set_libcxx()
-  conan_set_vs_runtime()
-endif()
-
-
-if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
-  include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
-endif ()
-
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${CMAKE_BINARY_DIR}")
 
 find_package(FreeImage REQUIRED)
 
@@ -62,10 +46,13 @@ option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10")
+    message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler minimum version required is 10 (Got ${CMAKE_CXX_COMPILER_VERSION})")
+  endif()
   add_compile_options(
     "-Wextra"
     "-Wall"
-    # "-Werror"
+    "-Werror"
     )
 endif()
 
@@ -137,7 +124,7 @@ target_link_libraries(Pylene INTERFACE Pylene::Core)
 include(GNUInstallDirs)
 
 set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
-set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy)
+set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy Pylene-scribo)
 
 foreach(tgt ${OptionalPyleneTargets})
   if (TARGET ${tgt})

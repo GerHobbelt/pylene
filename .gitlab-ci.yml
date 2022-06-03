@@ -27,6 +27,7 @@ variables:
     CCACHE_MAXSIZE: 2G
 
 before_script:
+        - pip install --upgrade conan
         - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
         - conan profile new --detect default
         - ccache -p
@@ -43,9 +44,9 @@ windows-debug:
     stage: build
     script:
         - mkdir build; cd build
-        - conan install .. -s build_type=Debug --build missing -s compiler.cppstd=20 -o pylene:fPIC=True
-        - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=debug -D CMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
-        - cmake --build . --target build-tests
+        - conan install .. -s build_type=Debug -s compiler.cppstd=20 --build missing
+        - cmake .. -D CMAKE_TOOLCHAIN_FILE=.\conan_toolchain.cmake -D FreeImage_ROOT=C:\vcpkg\packages\freeimage_x64-windows\ -D CMAKE_BUILD_TYPE=Debug
+        - cmake --build . --target build-tests --config Debug
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
     artifacts:
@@ -67,8 +68,8 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DPYLENE_BUILD_PYTHON=ON
+        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True -s build_type=$PYLENE_CONFIGURATION
+        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -D PYLENE_BUILD_PYTHON=ON -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target Pylene-core
         - cmake --build . --target pylena
         - cmake --build . --target build-tests
@@ -83,37 +84,6 @@ windows-debug:
 # No tsan because no multithreaded code for now
 # Asan, memsan and tsan are incompatible with each other within the same binary
 # Asan and ubsan can work together
-
-
-distcheck-linux-gcc9-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_31}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
-        CONAN_PROFILE: "gcc-9"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-
-distcheck-linux-gcc9-debug-asan-ubsan:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_31}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        CONAN_PROFILE: "gcc-9"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master"
-        - if: $CI_MERGE_REQUEST_ID
-          when: never
-        - when: manual
-          allow_failure: true
 
 distcheck-linux-clang10-release:
     <<: *distcheck-linux-base
@@ -156,17 +126,6 @@ distcheck-linux-gcc10-debug:
     image: ${FEDORA_32}
     variables:
         PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CONAN_PROFILE: "clang-10"
-
-distcheck-linux-gcc10-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_32}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
@@ -236,7 +195,9 @@ distcheck-linux-coverage:
         paths:
             - coverage/
         reports:
-            cobertura: cobertura
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage/cobertura-coverage.xml
         expire_in: 1 week
     coverage: '/lines: \d+\.\d+\%/'
     rules:
@@ -280,14 +241,17 @@ distbench-linux-gcc9-release:
 #################
 
 .documentation-base:  &documentation-base
-    image: ${FEDORA_31}
+    image: ${FEDORA_34}
     stage: build
     script:
+        - dnf install -y cairo-devel
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-9 --build missing -s compiler.cppstd=20
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - conan install -u .. -pr gcc-11 --build missing --build openjpeg -s compiler.cppstd=20 -s build_type=Release
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
         - cmake --build . --target build-doc
-        - mkdir ../public && mv doc/sphinx/* ../public/
+        - DOCDIR="public/"
+        - if [ "${CI_COMMIT_REF_SLUG}" != "master" ]; then DOCDIR="public/${CI_COMMIT_REF_SLUG}/"; fi
+        - mkdir -p ../${DOCDIR} && mv doc/sphinx/* ../${DOCDIR}
     artifacts:
         name: "documentation"
         expire_in: 1 week
@@ -299,6 +263,7 @@ documentation:
     <<: *documentation-base
     except:
         - master
+        - next
 
 
 ##########
@@ -309,6 +274,7 @@ pages:
     <<: *documentation-base
     only:
         - master
+        - next
 
 .package:
     stage: deploy
@@ -321,11 +287,6 @@ pages:
     variables:
         CONAN_REVISIONS_ENABLED: 1
 
-package gcc-9:
-   extends: .package
-   image: ${FEDORA_31}
-   variables:
-        CONAN_BASE_PROFILE: gcc-9
 
 package gcc-10:
    extends: .package

@@ -3,7 +3,7 @@
 //
 #include <gtest/gtest.h>
 
-#include "../../pylene/src/scribo/segdet/process/linearregression.hpp"
+#include "../../pylene/src/scribo/segdet/linearregression.hpp"
 
 TEST(Segdet, lin_regress_basic_0)
 {

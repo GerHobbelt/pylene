@@ -5,7 +5,6 @@ import sys
 class PyleneTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = [ "cmake_find_package" ]
-    
     requires = ["pybind11/2.6.2"]
 
     def _build_python(self):

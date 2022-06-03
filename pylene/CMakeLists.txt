@@ -7,6 +7,8 @@ find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
+find_package(OpenImageIO REQUIRED)
+find_package(Eigen3 3.3.9)
 find_package(cfitsio)
 
 set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
@@ -15,7 +17,7 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 add_library(Pylene-core)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene-core PRIVATE TBB::TBB)
+  target_link_libraries(Pylene-core PRIVATE TBB::tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
   target_compile_definitions(Pylene-core PRIVATE MLN_NO_TBB)
@@ -41,7 +43,7 @@ target_include_directories(Pylene-core PUBLIC
                            $<INSTALL_INTERFACE:include>)
 
 target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
-target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd::xsimd)
+target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd)
 target_link_libraries(Pylene-core PUBLIC fmt::fmt)
 
 # Set sources
@@ -57,7 +59,7 @@ add_library(Pylene-bp OBJECT
 target_include_directories(Pylene-bp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_link_libraries(Pylene-bp PRIVATE xsimd::xsimd fmt::fmt)
+target_link_libraries(Pylene-bp PRIVATE xsimd fmt::fmt)
 target_compile_features(Pylene-bp PUBLIC cxx_std_20)
 
 target_link_libraries(Pylene-core PRIVATE Pylene-bp)
@@ -94,6 +96,8 @@ target_sources(Pylene-core PRIVATE
                src/morpho/satmaxtree.cpp
                src/morpho/trees_fusion.cpp
                src/morpho/unionfind.cpp
+               src/morpho/waterfall.cpp
+               src/transforms/hough_lines.cpp
                )
 
 add_library(Pylene-io-freeimage)
@@ -108,7 +112,13 @@ target_include_directories(Pylene-io-freeimage PUBLIC
                            $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
-target_link_libraries(Pylene-io-freeimage PRIVATE FreeImage::FreeImage)
+target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::FreeImage)
+
+add_library(Pylene-io-openimageio)
+add_library(Pylene::IO-openimageio ALIAS Pylene-io-openimageio)
+target_sources(Pylene-io-openimageio PRIVATE src/io/openimageio_plugin.cpp src/io/io.cpp)
+target_link_libraries(Pylene-io-openimageio PRIVATE OpenImageIO::OpenImageIO)
+target_link_libraries(Pylene-io-openimageio PUBLIC Pylene-core)
 
 if (cfitsio_FOUND)
   add_library(Pylene-io-fits)
@@ -124,6 +134,30 @@ if (cfitsio_FOUND)
   target_link_libraries(Pylene-io-fits PUBLIC Pylene-core)
   target_link_libraries(Pylene-io-fits PRIVATE cfitsio::cfitsio)
 endif(cfitsio_FOUND)
+
+if (Eigen3_FOUND)
+  add_library(Pylene-scribo)
+  add_library(Pylene::Scribo ALIAS Pylene-scribo)
+
+  target_include_directories(Pylene-scribo PUBLIC
+                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                             $<INSTALL_INTERFACE:include>)
+
+  target_sources(Pylene-scribo PRIVATE
+          src/scribo/segdet/filter.cpp
+          src/scribo/segdet/label_array.cpp
+          src/scribo/segdet/linearregression.cpp
+          src/scribo/segdet/parameters.cpp
+          src/scribo/segdet/preprocess.cpp
+          src/scribo/segdet/process.cpp
+          src/scribo/segdet/postprocess.cpp
+          src/scribo/segdet/segdet.cpp
+          src/scribo/segdet/segment.cpp
+  )
+
+  target_link_libraries(Pylene-scribo PUBLIC Pylene-core)
+  target_link_libraries(Pylene-scribo PRIVATE Eigen3::Eigen)
+endif(Eigen3_FOUND)
 
 # Compiler configurations
 target_compile_features(Pylene-core PUBLIC cxx_std_20)

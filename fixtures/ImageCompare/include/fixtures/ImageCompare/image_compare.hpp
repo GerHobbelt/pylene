@@ -1,20 +1,18 @@
 #pragma once
 
-#include <mln/core/image/image.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/ndimage_fwd.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/image.hpp>
 #include <mln/core/range/rows.hpp>
 #include <mln/core/range/view/zip.hpp>
 #include <mln/io/imprint.hpp>
 
-
 #include <range/v3/range/access.hpp>
 
-#include <algorithm>
-#include <functional>
 #include <string>
+#include <functional>
+#include <algorithm>
 #include <type_traits>
-
 
 #include <gtest/gtest.h>
 
@@ -88,9 +86,10 @@ namespace fixtures::ImageCompare
     }
 
 
+
     template <class ImageA, class ImageB>
-    ::testing::AssertionResult compare(const mln::details::Image<ImageA>& f_, const mln::details::Image<ImageB>& g_,
-                                       int comparison_flags)
+    ::testing::AssertionResult compare(const mln::details::Image<ImageA>& f_,
+                                       const mln::details::Image<ImageB>& g_, int comparison_flags)
     {
       ImageA f = static_cast<const ImageA&>(f_);
       ImageB g = static_cast<const ImageB&>(g_);
@@ -166,3 +165,4 @@ namespace fixtures::ImageCompare
 
 #define ASSERT_IMAGES_EQ_EXP2(f, g, flags) ASSERT_TRUE(::fixtures::ImageCompare::compare(f, g, flags))
 #define ASSERT_IMAGES_NE_EXP2(f, g, flags) ASSERT_FALSE(::fixtures::ImageCompare::compare(f, g, flags))
+

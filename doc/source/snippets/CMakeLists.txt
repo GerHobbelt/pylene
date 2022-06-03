@@ -55,6 +55,7 @@ add_image("area_filter"
 
 
 add_image("blobs_watershed" "${DOCUMENTATION_IMAGE_DIR}/blobs_binary.png" blobs_distance_transform.png blobs_segmentation.png)
+add_image("watershed_from_markers" "${PYLENE_IMAGE_DIR}/lena.png" marker_on_gradient.png lena_ws_marker.png)
 
 add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.ppm" alphatree_cut_color.png)
 add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.pgm" alphatree_cut_gray.png)
@@ -65,6 +66,8 @@ add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.pgm" watershed
 add_image("saliency_example" "${PYLENE_IMAGE_DIR}/lena.pgm" saliency_watershed.png)
 
 add_image("mtos_example" "${PYLENE_IMAGE_DIR}/lena.ppm" depth_map.png mtos_rec.png)
+add_image("hough_lines" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.pbm" "staff_hough_lines.png")
+add_image("waterfall;4" "${PYLENE_IMAGE_DIR}/lena.pgm" "waterfall_nodemap.png" "waterfall_cut.png")
 
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")
@@ -90,12 +93,10 @@ add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
+add_executable(mtos_example mtos_example.cpp)
+add_executable(hough_lines hough_lines.cpp)
+target_link_libraries(hough_lines -lcairo)
+add_executable(watershed_from_markers watershed_from_markers.cpp)
+add_executable(waterfall waterfall.cpp)
 
 target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)
-
-# for program_options, need to separate CONAN and regular FindBoost
-if (TARGET Boost::program_options)
-  target_link_libraries(erosion-cli PRIVATE Boost::program_options)
-elseif (TARGET Boost::Boost)
-  target_link_libraries(erosion-cli PRIVATE Boost::Boost)
-endif ()

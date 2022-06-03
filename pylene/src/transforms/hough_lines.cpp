@@ -23,8 +23,8 @@ namespace mln::transforms
     m_sin_angles = std::unique_ptr<float[]>(new float[m_count]);
     m_cos_angles = std::unique_ptr<float[]>(new float[m_count]);
 
-    std::transform(angles.begin(), angles.end(), m_sin_angles.get(), [](float x) { return std::sin(x); });
-    std::transform(angles.begin(), angles.end(), m_cos_angles.get(), [](float x) { return std::cos(x); });
+    std::ranges::transform(angles, m_sin_angles.get(), [](float x) { return std::sin(x); });
+    std::ranges::transform(angles, m_cos_angles.get(), [](float x) { return std::cos(x); });
 
     m_max_distance = static_cast<int>(std::ceil(max_distance));
   }
@@ -125,13 +125,13 @@ namespace mln::transforms
 
       float                  offset = acc.height() / 2;
       std::vector<HoughLine> out(res.size());
-      std::transform(res.begin(), res.end(), out.begin(), [&, offset](point2d p) {
+      std::ranges::transform(res, out.begin(), [&, offset](point2d p) {
         return HoughLine{.angle  = angles[p.x()],  //
                          .radius = p.y() - offset, //
                          .count  = float(nms_image(p))};
       });
 
-      std::sort(out.begin(), out.end(), [](auto a, auto b) { return a.count > b.count; });
+      std::ranges::sort(out, [](auto a, auto b) { return a.count > b.count; });
       return out;
     }
 
@@ -157,10 +157,10 @@ namespace mln::transforms
         counts[a] += c;
 
       std::vector<HoughLineAngle> result(counts.size());
-      std::transform(counts.begin(), counts.end(), result.begin(), [](std::pair<float, float> e) {
+      std::ranges::transform(counts, result.begin(), [](std::pair<float, float> e) {
         return HoughLineAngle{e.first, e.second};
       });
-      std::sort(result.begin(), result.end(), [](auto a, auto b) { return a.count > b.count; });
+      std::ranges::sort(result, [](auto a, auto b) { return a.count > b.count; });
 
       return result;
     }

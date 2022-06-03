@@ -1,20 +1,10 @@
 #pragma once
 
+#include <scribo/private/segment.hpp>
 #include <scribo/segdet.hpp>
 
 namespace scribo::internal
 {
-  // Used for tests
-  struct segdet_output
-  {
-    std::vector<int>   seg_ids;
-    std::vector<float> mid_pos_x;
-    std::vector<float> mid_pos_y;
-    std::vector<int>   thickness;
-    std::vector<bool>  angle;
-  };
-
-  segdet_output detect_line_span(const mln::image2d<std::uint8_t>& image, int min_len, const SegDetParams& params);
-  segdet_output detect_line_span(const mln::image2d<std::uint8_t>& image, int min_len);
-
-} // namespace scribo::internal
+  std::vector<Segment> detect_line_seg(const mln::image2d<uint8_t>& image, int min_len, const SegDetParams& params);
+  void detect_line_label(mln::image2d<std::uint8_t> image, int min_len, mln::image2d<std::uint16_t> out, const SegDetParams& params);
+}

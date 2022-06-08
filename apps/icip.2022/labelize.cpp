@@ -2,6 +2,7 @@
 #include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/fill.hpp>
+#include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/algorithm/paste.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image.hpp>
@@ -62,7 +63,6 @@ int main(int, char** argv)
 
   mln::image2d<uint8_t> input;
   mln::io::imread(path + "images/input.pgm", input);
-  // mln::io::imsave(input, path + "images/output.pgm");
 
   // threshold input
   uint8_t threshold    = 125;
@@ -114,7 +114,13 @@ int main(int, char** argv)
     return label_count[lab] > min_comps && label_count[lab] < max_comps;
   });
 
-  mln::fill(ima_filtered, std::make_tuple(mln::rgb8{255, 0, 0}, 0u));
+  auto red = mln::rgb8{255, 0, 0};
+  mln::for_each(ima_filtered, [&](auto&& val) {
+    auto&& [v_rgb, v_lbl] = val; // ignore label here
+    v_rgb                 = red; // assign color to red
+  });
+
+  // mln::fill(ima_filtered, std::make_tuple(mln::rgb8{255, 0, 0}, 0u));
 
   mln::io::imsave(colored_output, path + "images/output.pgm");
 }

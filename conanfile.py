@@ -1,7 +1,6 @@
 from conans import ConanFile, tools
 import os
 from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
-from conan.tools.layout import cmake_layout
 from conans.errors import ConanInvalidConfiguration
 
 class Pylene(ConanFile):
@@ -20,6 +19,7 @@ class Pylene(ConanFile):
         "fPIC": False,
         "gtest:shared": False,
         "boost:header_only": True,
+        "freeimage:shared": True
     }
 
     generators = "CMakeDeps"
@@ -37,7 +37,8 @@ class Pylene(ConanFile):
         "xsimd/7.4.6",
         "eigen/3.3.9",
         "boost/1.75.0",
-        "cfitsio/4.0.0"
+        "cfitsio/4.0.0",
+        "freeimage/3.18.0@lrde/stable"
     ]
 
     def _build_python(self):
@@ -146,3 +147,6 @@ class Pylene(ConanFile):
 
     def package_id(self):
         del self.info.settings.compiler.cppstd
+
+    def imports(self):
+        self.copy("*.dll", src="bin", dst="build")

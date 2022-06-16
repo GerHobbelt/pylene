@@ -45,9 +45,10 @@ windows-debug:
     script:
         - mkdir build; cd build
         - conan install .. -s build_type=Debug -s compiler.cppstd=20 --build missing
-        - cmake .. -D CMAKE_TOOLCHAIN_FILE=.\conan_toolchain.cmake -D FreeImage_ROOT=C:\vcpkg\packages\freeimage_x64-windows\ -D CMAKE_BUILD_TYPE=Debug
+        - cmake .. -D CMAKE_TOOLCHAIN_FILE=.\conan_toolchain.cmake -D CMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         - cmake --build . --target build-tests --config Debug
-        - ctest -L UnitTests --schedule-random --output-on-failure
+        - $env:PATH = -join($env:PATH, ";", $(Get-Location));
+        - ctest -C Debug -L UnitTests --schedule-random --output-on-failure
     dependencies: []
     artifacts:
         reports:
@@ -68,7 +69,7 @@ windows-debug:
     stage: build
     script:
         - mkdir build && cd build
-        - conan install .. --build missing -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True -s build_type=$PYLENE_CONFIGURATION
+        - conan install .. --build missing --build openjpeg -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True -s build_type=$PYLENE_CONFIGURATION
         - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -D PYLENE_BUILD_PYTHON=ON -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target Pylene-core
         - cmake --build . --target pylena
@@ -246,8 +247,8 @@ distbench-linux-gcc9-release:
     script:
         - dnf install -y cairo-devel
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-9 --build missing -s compiler.cppstd=20
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+        - conan install -u .. -pr gcc-11 --build missing --build openjpeg -s compiler.cppstd=20
+        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
         - cmake --build . --target build-doc
         - mkdir ../public && mv doc/sphinx/* ../public/
     artifacts:

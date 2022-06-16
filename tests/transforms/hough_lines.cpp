@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/transforms/hough_lines.hpp>
 #include <cmath>
 #include <numbers>
 
-
 TEST(HoughLines, detect_peaks)
 {
   int n=500;
   mln::image2d<bool> in(n,n);
+  mln::fill(in, false);
   for (int i = 0; i < n; ++i)
     in({i, i}) = true;
 

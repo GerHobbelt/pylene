@@ -107,7 +107,7 @@ target_include_directories(Pylene-io-freeimage PUBLIC
                            $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
-target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::freeimage)
+target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::FreeImage)
 
 if (cfitsio_FOUND)
   add_library(Pylene-io-fits)

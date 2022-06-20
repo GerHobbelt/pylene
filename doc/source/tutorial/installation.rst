@@ -15,24 +15,21 @@ particular:
 * `FreeImage <https://freeimage.sourceforge.io/>`_
 * `Fmt <https://fmt.dev>`_
 
-
-
 There are three ways to install the C++ Pylene:
 
 * The preferred and strongly recommended way to use Pylene is using Conan, a C++ package manager that would handle the dependencies.
 * The other way is using installing the libraries from sources.
 
-In all cases, you have to install *boost* and *FreeImage* using your system package manager.
+The Pylene dependencies are all handled by Conan and may be installed using the
+command ``conan install`` as described below.
+
+.. note::
+    When installing the Pylene dependencies, make sure the ``openjpeg`` library,
+    a dependency of FreeImage, is compatible with the standard C library. One way
+    to ensure this is to force the build from source, appending the ``--build openjpeg``
+    to the install command.
 
 .. highlight:: shell
-
-Pre-installation
-----------------
-
-Install  *FreeImage* and *Boost* with the system package manager of your distribution.
-The packages are generally named `freeimage`, `freeimage-devel`, and `boost-devel`
-
-
 
 Install from sources
 --------------------
@@ -46,17 +43,21 @@ Download the latest release from `Pylene Gitlab <https://gitlab.lrde.epita.fr/ol
 
     tar xf pylene-*-.tar.bz2
 
-#. Install the dependencies::
+2. Install the dependencies::
 
     mkdir build && cd build
-    conan install .. -s compiler.cppstd=20
+    conan install .. -s build_type=Release -s compiler.cppstd=20 --build missing --build openjpeg
 
-#. Build the library (with no test)::
+.. warning::
+    If running on Linux and using the libstdc++, please add the setting ``-s
+    compiler.libcxx=libstdc++11``.
+
+3. Build the library (with no test)::
 
     cmake .. -DCMAKE_BUILD_TYPE=release -DPYLENE_BUILD_LIBS_ONLY=On
     cmake --build . --target Pylene (or make)
 
-#. Install the library (as root)::
+4. Install the library (as root)::
 
     cmake --build . --target install (or make install)
 

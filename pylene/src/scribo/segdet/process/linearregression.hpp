@@ -7,7 +7,6 @@
 
 namespace scribo::internal
 {
-
   template <typename T>
   float mean(std::vector<T> array, int start, int end)
   {
@@ -28,7 +27,7 @@ namespace scribo::internal
   public:
     MemoryLinearRegressor(float x0, float y0, int memory = 20);
     float predict();
-    void push(size_t x, size_t y);
+    void  push(size_t x, size_t y);
   };
 
-} // namespace mln::contrib::segdet
+} // namespace scribo::internal

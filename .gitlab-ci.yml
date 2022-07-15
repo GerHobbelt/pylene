@@ -184,7 +184,7 @@ distcheck-linux-coverage:
     image: ${FEDORA_32}
     after_script:
         - mkdir coverage 
-        - cd build && gcovr --root .. --filter '\.\./pylene' . -s --xml ../cobertura --html-details ../coverage/index.html
+        - cd build && gcovr --root .. --filter '\.\./pylene' . -s --xml ../coverage/cobertura-coverage.xml --html-details ../coverage/index.html
     variables:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"

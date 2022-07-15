@@ -1,21 +1,12 @@
 #pragma once
 
-#include <vector>
+#include <scribo/private/span.hpp>
+#include "process/filter.hpp"
 
+#include <vector>
 
 namespace scribo::internal
 {
-
-  struct Span
-  {
-    int x;
-    int y;
-    int thickness;
-    float angle;
-  };
-
-  struct Filter;
-
   struct Segment
   {
     bool is_horizontal;
@@ -31,6 +22,6 @@ namespace scribo::internal
     int length;
     int nb_pixels;
 
-    Segment(const Filter& filter, int nb_to_remove);
+    Segment(Filter&& filter, int nb_to_remove);
   };
-} // namespace mln::contrib::segdet
+} // namespace scribo::internal

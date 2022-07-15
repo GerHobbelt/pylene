@@ -123,6 +123,7 @@ class Pylene(ConanFile):
         # Scribo component
         self.cpp_info.components["scribo"].requires = ["core", "eigen::eigen3"]
         self.cpp_info.components["scribo"].libs = ["Pylene-scribo"]
+        self.cpp_info.components["scribo"].includedirs = ["include"]
 
         # IO component (FreeImage)
         self.cpp_info.components["io-freeimage"].requires = ["core", "freeimage::FreeImage"]

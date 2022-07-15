@@ -133,16 +133,22 @@ if (Eigen3_FOUND)
                              $<INSTALL_INTERFACE:include>)
 
   target_sources(Pylene-scribo PRIVATE
-          src/scribo/segdet/filter.cpp
-          src/scribo/segdet/label_array.cpp
-          src/scribo/segdet/linearregression.cpp
+          src/scribo/segdet/descriptor.cpp
+          src/scribo/segdet/detect_line.cpp
+          src/scribo/segdet/segment_to_X.cpp
           src/scribo/segdet/parameters.cpp
-          src/scribo/segdet/preprocess.cpp
-          src/scribo/segdet/process.cpp
-          src/scribo/segdet/postprocess.cpp
+          src/scribo/segdet/process/filter.cpp
+          src/scribo/segdet/process/filter_impl.cpp
+          src/scribo/segdet/process/linearregression.cpp
+          src/scribo/segdet/process/process.cpp
+          src/scribo/segdet/process/trackers/kalman.cpp
+          src/scribo/segdet/process/trackers/kalman_leplumey.cpp
+          src/scribo/segdet/postprocess/postprocess.cpp
+          src/scribo/segdet/preprocess/preprocess.cpp
           src/scribo/segdet/segdet.cpp
+          src/scribo/segdet/segdet_private.cpp
           src/scribo/segdet/segment.cpp
-  )
+          )
 
   target_link_libraries(Pylene-scribo PUBLIC Pylene-core)
   target_link_libraries(Pylene-scribo PRIVATE Eigen3::Eigen)

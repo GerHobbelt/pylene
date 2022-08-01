@@ -44,14 +44,11 @@ namespace scribo::internal
    * @param width
    * @param height
    */
-  void remove_dup(std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, int width,
+  void remove_dup(const std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, int width,
                   int height, const Descriptor& descriptor)
   {
     auto first_output  = std::get<0>(segment_to_label(segments_to_compare, width, height, false));
     auto second_output = std::get<0>(segment_to_label(segments_removable, width, height, false));
-
-    auto second_output_bin =
-        mln::view::transform(second_output, [](std::uint16_t p) -> std::uint8_t { return (p != 0) ? 1 : 0; });
 
     binarize_img(first_output);
 
@@ -64,8 +61,8 @@ namespace scribo::internal
 
     mln_foreach (auto v, intersection.values())
     {
-      if (v >= 3)
-        segments[v - 3]++;
+      if (v >= first_label)
+        segments[v - first_label]++;
     }
 
     int k = 0;
@@ -136,7 +133,6 @@ namespace scribo::internal
       remove_duplicates(pair, img_width, img_height, descriptor);
 
     auto segments = filter_length(pair, descriptor);
-    // auto res      = retrieve_good_under_other(segments, img_width, img_height);
 
     return segments;
   }

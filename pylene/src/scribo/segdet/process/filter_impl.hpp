@@ -37,7 +37,7 @@ namespace scribo::internal
     std::vector<float> thicknesses;
     std::vector<float> luminosities;
 
-    float current_slope;
+    float current_slope; // Allowed the handling of early stop of filter
 
     std::vector<Span> under_other;
     std::vector<Span> segment_spans;
@@ -48,8 +48,6 @@ namespace scribo::internal
     float sigma_thickness;
     float sigma_luminosity;
 
-    Eigen::Matrix<float, 4, 1> S; // state matrix {{position (n)}, {slope}, {thickness}, {luminosity}}
-    Eigen::Matrix<float, 4, 1> S_predicted;
     Eigen::Matrix<float, 3, 1> X_predicted;
 
     std::optional<Observation>

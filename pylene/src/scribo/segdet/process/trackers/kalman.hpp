@@ -6,6 +6,7 @@ namespace scribo::internal
 {
   struct Kalman final : public Filter_impl
   {
+    Eigen::Matrix<float, 4, 1> S; // state matrix {{position (n)}, {slope}, {thickness}, {luminosity}}
     Eigen::Matrix<float, 4, 4> H; // S prediction error variance matrix
 
     Kalman(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor);

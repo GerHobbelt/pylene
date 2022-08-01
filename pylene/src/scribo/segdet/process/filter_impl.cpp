@@ -40,8 +40,7 @@ namespace scribo::internal
   }
 
   Filter_impl::Filter_impl(int t_integration, Eigen::Matrix<float, 3, 1> obs, const Descriptor& descriptor)
-    : S((Eigen::Matrix<float, 4, 1>() << obs(0, 0), 0, obs(1, 0), obs(2, 0)).finished())
-    , observation(std::nullopt)
+    : observation(std::nullopt)
     , observation_distance(0)
     , last_integration(t_integration)
     , reg(t_integration, obs(0, 0))
@@ -69,7 +68,6 @@ namespace scribo::internal
     sigma_thickness  = descriptor.default_sigma_thickness;
     sigma_luminosity = descriptor.default_sigma_luminosity;
 
-    S_predicted = Eigen::Matrix<float, 4, 1>::Zero();
     X_predicted = Eigen::Matrix<float, 3, 1>::Zero();
 
     segment_spans = std::vector<Span>();

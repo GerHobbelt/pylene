@@ -257,6 +257,7 @@ namespace scribo::internal
     {
       Filter&& f = std::move(filters[fi]);
 
+      // Early stoping on high slopes
       if (f.impl->n_values.size() > slope_threshold && std::abs(f.impl->current_slope) > slope_max)
       {
         fi++;
@@ -274,7 +275,6 @@ namespace scribo::internal
       }
       else if (filter_has_to_continue(f, t, descriptor))
       {
-        f.impl->S = f.impl->S_predicted;
         filters_to_keep.push_back(std::move(f));
       }
       else if (f.impl->last_integration - f.impl->first > descriptor.min_length_embryo)

@@ -20,20 +20,24 @@ namespace scribo::internal
     static const Eigen::Matrix<float, 3, 3> Vn((Eigen::Matrix<float, 3, 3>() << SEGDET_VARIANCE_POSITION, 0, 0, 0,
                                                 SEGDET_VARIANCE_THICKNESS, 0, 0, 0, SEGDET_VARIANCE_LUMINOSITY)
                                                    .finished());
-  } // namespace kalman_leplumey
+  } // namespace
 
   KalmanLeplumey::KalmanLeplumey(int t_integration, Eigen::Matrix<float, 3, 1> observation,
                                  const Descriptor& descriptor)
     : Filter_impl(t_integration, observation, descriptor)
+    , S((Eigen::Matrix<float, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
     , H(Eigen::Matrix<float, 4, 4>::Identity())
     , W(Eigen::Matrix<float, 4, 1>::Zero())
+    , save_last_slope(0)
   {
   }
 
   void KalmanLeplumey::predict()
   {
-    S_predicted = A * S + W;
-    X_predicted = C * S_predicted;
+    save_last_slope = S(1, 0);
+
+    S           = A * S + W;
+    X_predicted = C * S;
 
     H = A * H * A_transpose;
 
@@ -48,11 +52,10 @@ namespace scribo::internal
     const auto& obs = observation.value().obs;
 
     float save_last_intergration = last_integration;
-    float save_last_slope = S(1, 0);
 
     const auto H_Ct = H * C_transpose;
     const auto G    = H_Ct * (C * H_Ct + Vn).inverse();
-    S               = S_predicted + G * (obs - X_predicted);
+    S               = S + G * (obs - X_predicted);
     H               = (Eigen::Matrix<float, 4, 4>::Identity() - G * C) * H;
 
     float current_slope = S(1, 0);

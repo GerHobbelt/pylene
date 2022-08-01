@@ -58,11 +58,9 @@ namespace scribo::internal
     thicknesses.reserve(descriptor.nb_values_to_keep);
     luminosities.reserve(descriptor.nb_values_to_keep);
 
-    first_slope   = undefined_slop;
-    last_slope    = 0;
     current_slope = 0;
 
-    under_other           = std::vector<Span>();
+    under_other = std::vector<Span>();
 
     n_min = 0;
     n_max = 0;
@@ -163,7 +161,7 @@ namespace scribo::internal
   {
     const auto& obs = observation.value().obs;
 
-    last_integration      = t;
+    last_integration = t;
 
     n_values.push_back(obs(0, 0));
     thicknesses.push_back(obs(1, 0));
@@ -171,14 +169,10 @@ namespace scribo::internal
 
     t_values.push_back(t);
 
-    last_slope    = current_slope;
     current_slope = compute_slope();
 
     if (static_cast<int>(n_values.size()) > descriptor.nb_values_to_keep)
     {
-      if (first_slope == undefined_slop)
-        first_slope = S(1, 0);
-
       auto thick = thicknesses[0];
       auto nn    = n_values[0];
       auto tt    = t_values[0];

@@ -21,9 +21,6 @@ namespace scribo::internal
 
     under_other_object = filter.impl->under_other;
 
-    first_part_slope = filter.impl->first_slope;
-    last_part_slope  = filter.impl->current_slope;
-
     first_span = spans[0];
     last_span  = spans[spans.size() - 1];
 

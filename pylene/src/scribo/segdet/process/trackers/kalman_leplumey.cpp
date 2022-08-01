@@ -47,16 +47,20 @@ namespace scribo::internal
   {
     const auto& obs = observation.value().obs;
 
+    float save_last_intergration = last_integration;
+    float save_last_slope = S(1, 0);
+
     const auto H_Ct = H * C_transpose;
     const auto G    = H_Ct * (C * H_Ct + Vn).inverse();
     S               = S_predicted + G * (obs - X_predicted);
     H               = (Eigen::Matrix<float, 4, 4>::Identity() - G * C) * H;
 
-    int save_last_intergration = last_integration;
-    Filter_impl::integrate(t, descriptor);
+    float current_slope = S(1, 0);
 
-    float second_derivative = (last_slope - current_slope) / (save_last_intergration - t);
+    float second_derivative = (save_last_slope - current_slope) / (save_last_intergration - t);
     W(0, 0)                 = 0.5 * second_derivative;
     W(1, 0)                 = second_derivative;
+
+    Filter_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

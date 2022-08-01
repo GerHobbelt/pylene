@@ -10,7 +10,9 @@
 
 namespace scribo::internal
 {
-  static constexpr int isolated_point = 2;
+  static constexpr int   isolated_point  = 2;
+  static constexpr int   slope_threshold = 10;
+  static constexpr float slope_max       = 1.2f; // tan(50)
 
   /**
    * Determine the observation Matrix
@@ -136,20 +138,19 @@ namespace scribo::internal
    * @param fj second filter
    * @return true if the filters are following the same observation for SEGDET_MINIMUM_FOR_FUSION length
    */
-  bool same_observation(const std::vector<Filter>& filters, size_t fi, size_t fj, const Descriptor& descriptor)
+  bool same_observation(const Filter& fi, const Filter& fj, const Descriptor& descriptor)
   {
-    if (static_cast<int>(filters[fi].impl->n_values.size()) < descriptor.minimum_for_fusion ||
-        static_cast<int>(filters[fj].impl->n_values.size()) < descriptor.minimum_for_fusion)
+    if (static_cast<int>(fi.impl->n_values.size()) < descriptor.minimum_for_fusion ||
+        static_cast<int>(fj.impl->n_values.size()) < descriptor.minimum_for_fusion)
       return false;
 
     for (int i = 0; i < descriptor.minimum_for_fusion; i++)
     {
-      int k  = static_cast<int>(filters[fi].impl->thicknesses.size()) - 1 - i;
-      int kj = static_cast<int>(filters[fj].impl->thicknesses.size()) - 1 - i;
+      int k  = static_cast<int>(fi.impl->thicknesses.size()) - 1 - i;
+      int kj = static_cast<int>(fj.impl->thicknesses.size()) - 1 - i;
 
-      if (filters[fi].impl->thicknesses[k] != filters[fj].impl->thicknesses[kj] ||
-          filters[fi].impl->t_values[k] != filters[fj].impl->t_values[kj] ||
-          filters[fi].impl->n_values[k] != filters[fj].impl->n_values[kj])
+      if (fi.impl->thicknesses[k] != fj.impl->thicknesses[kj] || fi.impl->t_values[k] != fj.impl->t_values[kj] ||
+          fi.impl->n_values[k] != fj.impl->n_values[kj])
         return false;
     }
 
@@ -189,7 +190,7 @@ namespace scribo::internal
 
     while (fj < filters.size())
     {
-      if (filters[fj].impl->observation != std::nullopt && same_observation(filters, fi, fj, descriptor))
+      if (filters[fj].impl->observation != std::nullopt && same_observation(filters[fi], filters[fj], descriptor))
       {
         if (filters[fi].impl->first < filters[fj].impl->first)
         {
@@ -256,8 +257,7 @@ namespace scribo::internal
     {
       Filter&& f = std::move(filters[fi]);
 
-      if (f.impl->n_values.size() > 10 &&
-          (f.impl->current_slope < -descriptor.max_slope || descriptor.max_slope < f.impl->current_slope))
+      if (f.impl->n_values.size() > slope_threshold && std::abs(f.impl->current_slope) > slope_max)
       {
         fi++;
         continue;

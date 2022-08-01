@@ -16,8 +16,6 @@ namespace scribo::internal
 
     Span  first_span;
     Span  last_span;
-    float first_part_slope;
-    float last_part_slope;
 
     int length;
     int nb_pixels;

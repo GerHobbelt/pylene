@@ -97,7 +97,7 @@ namespace scribo::internal
    * @param obs Observation to match
    * @param t Current t
    */
-  std::vector<size_t> find_match(std::vector<Filter>& filters, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
+  std::vector<Filter> find_match(std::vector<Filter>& filters, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
                                  const Descriptor& descriptor)
   {
     int obs_thick    = obs(1, 0);
@@ -109,13 +109,18 @@ namespace scribo::internal
 
     int obs_n_max = obs(0, 0) + obs_thick_d2 + 1;
 
-    std::vector<size_t> accepted{};
+    std::vector<Filter> accepted;
     for (size_t f_index = 0; f_index < filters.size(); f_index++)
     {
       Filter&& f = std::move(filters[f_index]);
 
       if (obs_thick < descriptor.max_thickness && f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor))
-        accepted.push_back(f_index);
+      {
+        accepted.push_back(std::move(f));
+
+        std::iter_swap(filters.begin() + f_index, filters.begin() + filters.size() - 1);
+        filters.pop_back();
+      }
       else if (f.impl->observation == std::nullopt && in_between(obs_n_min - 1, f.impl->n_min, obs_n_max + 1) &&
                in_between(obs_n_min - 1, f.impl->n_max, obs_n_max + 1) && f.impl->X_predicted(1, 0) < obs_thick)
       {
@@ -125,8 +130,8 @@ namespace scribo::internal
         span.thickness = round(f.impl->X_predicted(1, 0));
         f.impl->under_other.push_back(span);
       }
-
-      filters[f_index] = std::move(f);
+      else
+        filters[f_index] = std::move(f);
     }
 
     return accepted;
@@ -316,7 +321,7 @@ namespace scribo::internal
    * @param descriptor
    * @return
    */
-  bool handle_find_filter(std::vector<Filter>& current_filters, std::vector<size_t>& accepted,
+  bool handle_find_filter(std::vector<Filter>& current_filters, std::vector<Filter>& accepted,
                           std::vector<Filter>& new_filters, const Eigen::Matrix<float, 3, 1>& obs, int t,
                           const Descriptor& descriptor)
   {
@@ -325,9 +330,9 @@ namespace scribo::internal
     observation_s.match_count = static_cast<int>(accepted.size());
     observation_s.t           = t;
 
-    for (auto& index : accepted)
+    for (auto& f : accepted)
     {
-      auto obs_result = current_filters[index].impl->choose_nearest(observation_s);
+      auto obs_result = f.impl->choose_nearest(observation_s);
 
       if (obs_result != std::nullopt)
       {
@@ -337,6 +342,8 @@ namespace scribo::internal
         if (obs_result_value.match_count == 0)
           new_filters.emplace_back(t, obs_result_value.obs, descriptor);
       }
+
+      current_filters.push_back(std::move(f));
     }
 
     return observation_s.match_count > 1;
@@ -382,7 +389,7 @@ namespace scribo::internal
     bool                two_matches_through_t = false;
     for (const auto& obs : observations)
     {
-      std::vector<size_t> accepted = find_match(filters, obs, t, descriptor);
+      std::vector<Filter> accepted = find_match(filters, obs, t, descriptor);
       if (accepted.empty() && obs(1, 0) < descriptor.max_thickness)
         new_filters.emplace_back(t, obs, descriptor);
       else

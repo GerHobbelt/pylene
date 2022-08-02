@@ -18,8 +18,26 @@
 using namespace scribo;
 using namespace scribo::internal;
 
+void sort_segdet_span_output(segdet_output& out)
+{
+  std::sort(out.seg_ids.begin(), out.seg_ids.end());
+  std::sort(out.seg_ids.begin(), out.seg_ids.end());
+  std::sort(out.mid_pos_x.begin(), out.mid_pos_x.end());
+  std::sort(out.mid_pos_y.begin(), out.mid_pos_y.end());
+  std::sort(out.thickness.begin(), out.thickness.end());
+  std::sort(out.angle.begin(), out.angle.end());
+}
+
+void sort_ref_output(segdet_output& ref, segdet_output& output)
+{
+  sort_segdet_span_output(ref);
+  sort_segdet_span_output(output);
+}
+
 void expect_empty(segdet_output ref, segdet_output output)
 {
+  sort_ref_output(ref, output);
+
   EXPECT_EQ(output.seg_ids.size(), ref.seg_ids.size());
   EXPECT_EQ(output.seg_ids, ref.seg_ids);
   EXPECT_EQ(output.mid_pos_x, ref.mid_pos_x);
@@ -30,6 +48,8 @@ void expect_empty(segdet_output ref, segdet_output output)
 
 void expect_multiple(segdet_output ref, segdet_output output, int abs_error)
 {
+  sort_ref_output(ref, output);
+  
   ASSERT_EQ(output.seg_ids.size(), ref.seg_ids.size());
   for (size_t p = 0; p < output.seg_ids.size(); p++)
   {

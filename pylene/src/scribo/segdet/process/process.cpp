@@ -208,23 +208,13 @@ namespace scribo::internal
    * @param fj second filter
    * @return true if the filters are following the same observation for SEGDET_MINIMUM_FOR_FUSION length
    */
-  bool same_observation(const Filter& fi, const Filter& fj, const Descriptor& descriptor)
+  bool need_fusion(const Filter& fi, const Filter& fj, const Descriptor& descriptor)
   {
-    if (static_cast<int>(fi.impl->n_values.size()) < descriptor.minimum_for_fusion ||
-        static_cast<int>(fj.impl->n_values.size()) < descriptor.minimum_for_fusion)
-      return false;
-
-    for (int i = 0; i < descriptor.minimum_for_fusion; i++)
-    {
-      int k  = static_cast<int>(fi.impl->thicknesses.size()) - 1 - i;
-      int kj = static_cast<int>(fj.impl->thicknesses.size()) - 1 - i;
-
-      if (fi.impl->thicknesses[k] != fj.impl->thicknesses[kj] || fi.impl->t_values[k] != fj.impl->t_values[kj] ||
-          fi.impl->n_values[k] != fj.impl->n_values[kj])
-        return false;
-    }
-
-    return true;
+    int i = 0;
+    for (auto ite_i = fi.impl->same_observation.crbegin(), ite_j = fj.impl->same_observation.crbegin();
+         i < descriptor.minimum_for_fusion && *ite_i == *ite_j; ite_i++, ite_j++)
+      i++;
+    return i == descriptor.minimum_for_fusion;
   }
 
   /**
@@ -260,7 +250,8 @@ namespace scribo::internal
 
     while (fj < filters.size())
     {
-      if (filters[fj].impl->observation != std::nullopt && same_observation(filters[fi], filters[fj], descriptor))
+      if (filters[fj].impl->same_observation.size() > static_cast<size_t>(descriptor.minimum_for_fusion) &&
+          filters[fj].impl->observation != std::nullopt && need_fusion(filters[fi], filters[fj], descriptor))
       {
         if (filters[fi].impl->first < filters[fj].impl->first)
         {
@@ -313,12 +304,11 @@ namespace scribo::internal
    * @param filters Current filters
    * @param segments Current segments
    * @param t Current t
-   * @param two_matches Current time of two filters matching
    * @param discontinuity
    * @return List of filters that have to continue
    */
   std::vector<Filter> filter_selection(std::vector<Filter>& filters, std::vector<Segment>& segments, int t,
-                                       int two_matches, const Descriptor& descriptor)
+                                        const Descriptor& descriptor)
   {
     std::vector<Filter> filters_to_keep;
 
@@ -336,7 +326,9 @@ namespace scribo::internal
 
       if (f.impl->observation != std::nullopt)
       {
-        if (descriptor.remove_duplicates && two_matches > descriptor.minimum_for_fusion && make_potential_fusion(filters, fi, segments, descriptor))
+        if (descriptor.remove_duplicates &&
+            f.impl->same_observation.size() >= static_cast<size_t>(descriptor.minimum_for_fusion) &&
+            make_potential_fusion(filters, fi, segments, descriptor))
           continue;
 
         f.integrate(t, descriptor);
@@ -366,9 +358,6 @@ namespace scribo::internal
     size_t fi = 0;
     while (fi < filters.size())
     {
-      if (descriptor.remove_duplicates && make_potential_fusion(filters, fi, segments, descriptor))
-        continue;
-
       if (filters[fi].impl->last_integration - filters[fi].impl->first > descriptor.min_length_embryo)
         segments.emplace_back(std::move(filters[fi]), 0);
 
@@ -386,13 +375,14 @@ namespace scribo::internal
    * @param descriptor
    * @return
    */
-  bool handle_find_filter(Buckets& buckets, std::vector<Filter>& accepted, std::vector<Filter>& new_filters,
-                          const Eigen::Matrix<float, 3, 1>& obs, int t, const Descriptor& descriptor)
+  void handle_find_filter(Buckets& buckets, std::vector<Filter>& accepted, std::vector<Filter>& new_filters,
+                          const Eigen::Matrix<float, 3, 1>& obs, int t, size_t id, const Descriptor& descriptor)
   {
     auto observation_s        = Observation();
     observation_s.obs         = obs;
     observation_s.match_count = static_cast<int>(accepted.size());
     observation_s.t           = t;
+    observation_s.id          = id;
 
     for (auto& f : accepted)
     {
@@ -409,8 +399,6 @@ namespace scribo::internal
 
       buckets.insert(std::move(f));
     }
-
-    return observation_s.match_count > 1;
   }
 
   /**
@@ -446,26 +434,20 @@ namespace scribo::internal
   }
 
   std::vector<Filter> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
-                                                        Buckets& buckets, int& two_matches, int t,
+                                                        Buckets& buckets, int t,
                                                         const Descriptor& descriptor)
   {
     std::vector<Filter> new_filters{};
-    bool                two_matches_through_t = false;
 
+    size_t id = 0;
     for (const auto& obs : observations)
     {
       std::vector<Filter> accepted = find_match(buckets, obs, t, descriptor);
       if (accepted.empty() && obs(1, 0) < descriptor.max_thickness)
         new_filters.emplace_back(t, obs, descriptor);
       else
-        two_matches_through_t =
-            handle_find_filter(buckets, accepted, new_filters, obs, t, descriptor) || two_matches_through_t;
+        handle_find_filter(buckets, accepted, new_filters, obs, t, id++, descriptor);
     }
-
-    if (two_matches_through_t)
-      two_matches++;
-    else
-      two_matches = 0;
 
     return new_filters;
   }
@@ -489,9 +471,6 @@ namespace scribo::internal
     std::vector<Filter>                     filter_kept;
     std::vector<Eigen::Matrix<float, 3, 1>> observations;
 
-    // Useful to NOT check if filters has to be merged
-    int two_matches = 0; // Number of t where two segments matched the same observation
-
     for (int t = 0; t < t_max; t++)
     {
       make_predictions(filters);
@@ -499,10 +478,10 @@ namespace scribo::internal
       observations = extract_observations(image, t, n_max, descriptor);
 
       buckets.fill(filters);
-      new_filters = match_observations_to_predictions(observations, buckets, two_matches, t, descriptor);
+      new_filters = match_observations_to_predictions(observations, buckets, t, descriptor);
       buckets.empty(filters);
 
-      filter_kept = filter_selection(filters, segments, t, two_matches, descriptor);
+      filter_kept = filter_selection(filters, segments, t, descriptor);
 
       filters = get_active_filters(filter_kept, new_filters);
     }

@@ -157,7 +157,13 @@ namespace scribo::internal
    */
   void Filter_impl::integrate(int t, const Descriptor& descriptor)
   {
-    const auto& obs = observation.value().obs;
+    const auto& observation_non_opt = observation.value();
+    const auto& obs = observation_non_opt.obs;
+
+    if (observation_non_opt.match_count != 1)
+      same_observation.push_back(observation_non_opt.id * observation_non_opt.t);
+    else
+      same_observation.clear();
 
     last_integration = t;
 

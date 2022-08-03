@@ -22,6 +22,7 @@ namespace scribo::internal
     Eigen::Matrix<float, 3, 1> obs;         // The observation Matrix
     int                        match_count; // The numbers of time the observation was matched to a filter_impl
     int                        t;           // The t-position at which the observation was made
+    size_t                     id;          // The id of the observation (used for fusion)
   };
 
   /**
@@ -31,9 +32,8 @@ namespace scribo::internal
   {
     int first; // t value of first integration
 
-    std::vector<int> t_values; // t values of SEGDET_NB_VALUES_TO_KEEP last integrations
-    std::vector<int> n_values;
-
+    std::vector<int>   t_values; // t values of SEGDET_NB_VALUES_TO_KEEP last integrations
+    std::vector<int>   n_values;
     std::vector<float> thicknesses;
     std::vector<float> luminosities;
 
@@ -51,8 +51,9 @@ namespace scribo::internal
     Eigen::Matrix<float, 3, 1> X_predicted;
 
     std::optional<Observation>
-        observation;          // matrix {{position (n)},{thickness},{luminosity}}, nullopt if none was matched
-    int observation_distance; // n distance from last observation to current prediction
+                     observation; // matrix {{position (n)},{thickness},{luminosity}}, nullopt if none was matched
+    int              observation_distance; // n distance from last observation to current prediction
+    std::vector<size_t> same_observation;
 
     int last_integration; // t value referring to the position of the last integration
 

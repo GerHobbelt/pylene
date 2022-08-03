@@ -14,6 +14,52 @@ namespace scribo::internal
   static constexpr int   slope_threshold = 10;
   static constexpr float slope_max       = 1.2f; // tan(50)
 
+  struct Buckets
+  {
+    const size_t bucket_size;
+    const size_t bucket_count;
+
+    std::vector<std::vector<Filter>> container;
+
+    Buckets(size_t n_max, const Descriptor& descriptor)
+      : bucket_size(std::min(static_cast<size_t>(descriptor.bucket_size), n_max))
+      , bucket_count(n_max / bucket_size + (n_max % bucket_size == 0 ? 0 : 1))
+    {
+      container = std::vector<std::vector<Filter>>();
+      for (size_t i = 0; i < bucket_count; i++)
+        container.push_back(std::vector<Filter>());
+    }
+
+    size_t get_bucket_number(size_t n)
+    {
+      return std::max(static_cast<size_t>(0), std::min(bucket_count - 1, n / bucket_size));
+    }
+
+    size_t get_bucket_number(Filter& f) { return get_bucket_number(f.get_position()); }
+
+    void insert(Filter&& filter) { container[get_bucket_number(filter)].push_back(std::move(filter)); }
+
+    void fill(std::vector<Filter>& filters)
+    {
+      for (auto& filter : filters)
+        insert(std::move(filter));
+      filters.clear();
+    }
+
+    void empty(std::vector<Filter>& filters)
+    {
+      for (size_t i = 0; i < bucket_count; i++)
+      {
+        for (size_t j = 0; j < container[i].size(); j++)
+          filters.push_back(std::move(container[i][j]));
+        container[i].clear();
+      }
+    }
+
+    std::vector<Filter>& get_bucket(size_t i) { return container[i]; }
+  };
+
+
   /**
    * Determine the observation Matrix
    * @param image
@@ -90,6 +136,39 @@ namespace scribo::internal
     return min <= value && value < max;
   }
 
+  void find_match_bucket(Buckets& buckets, size_t bucket, std::vector<Filter>& accepted,
+                         const Eigen::Matrix<float, 3, 1>& obs, const int& t, int obs_thick, int obs_n_min,
+                         int obs_n_max, const Descriptor& descriptor)
+  {
+
+    for (size_t i = 0; i < buckets.container[bucket].size(); i++)
+    {
+      Filter&& f = std::move(buckets.container[bucket][i]);
+
+      if (obs_thick < descriptor.max_thickness && f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor))
+      {
+        accepted.push_back(std::move(f));
+
+        std::iter_swap(buckets.container[bucket].begin() + i,
+                       buckets.container[bucket].begin() + buckets.container[bucket].size() - 1);
+        buckets.container[bucket].pop_back();
+      }
+      else
+      {
+        if (f.impl->observation == std::nullopt && in_between(obs_n_min - 1, f.impl->n_min, obs_n_max + 1) &&
+            in_between(obs_n_min - 1, f.impl->n_max, obs_n_max + 1) && f.impl->X_predicted(1, 0) < obs_thick)
+        {
+          Span span{};
+          span.x         = t;
+          span.y         = round(f.impl->X_predicted(0, 0));
+          span.thickness = round(f.impl->X_predicted(1, 0));
+          f.impl->under_other.push_back(span);
+        }
+
+        buckets.container[bucket][i] = std::move(f);
+      }
+    }
+  }
 
   /**
    * Compute list of filters that accept the current Observation, add the filter inside accepted list
@@ -97,7 +176,7 @@ namespace scribo::internal
    * @param obs Observation to match
    * @param t Current t
    */
-  std::vector<Filter> find_match(std::vector<Filter>& filters, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
+  std::vector<Filter> find_match(Buckets& buckets, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
                                  const Descriptor& descriptor)
   {
     int obs_thick    = obs(1, 0);
@@ -106,33 +185,19 @@ namespace scribo::internal
     int obs_n_min = obs(0, 0) - obs_thick_d2;
     if (obs_n_min != 0)
       obs_n_min--;
-
     int obs_n_max = obs(0, 0) + obs_thick_d2 + 1;
 
-    std::vector<Filter> accepted;
-    for (size_t f_index = 0; f_index < filters.size(); f_index++)
-    {
-      Filter&& f = std::move(filters[f_index]);
+    size_t obs_bucket_min = buckets.get_bucket_number(static_cast<size_t>(obs_n_min));
+    size_t obs_bucket_max = buckets.get_bucket_number(static_cast<size_t>(obs_n_max));
 
-      if (obs_thick < descriptor.max_thickness && f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor))
-      {
-        accepted.push_back(std::move(f));
+    if (obs_bucket_min > 0)
+      obs_bucket_min--;
+    if (obs_bucket_max + 1 < buckets.bucket_count)
+      obs_bucket_max++;
 
-        std::iter_swap(filters.begin() + f_index, filters.begin() + filters.size() - 1);
-        filters.pop_back();
-      }
-      else if (f.impl->observation == std::nullopt && in_between(obs_n_min - 1, f.impl->n_min, obs_n_max + 1) &&
-               in_between(obs_n_min - 1, f.impl->n_max, obs_n_max + 1) && f.impl->X_predicted(1, 0) < obs_thick)
-      {
-        Span span{};
-        span.x         = t;
-        span.y         = round(f.impl->X_predicted(0, 0));
-        span.thickness = round(f.impl->X_predicted(1, 0));
-        f.impl->under_other.push_back(span);
-      }
-      else
-        filters[f_index] = std::move(f);
-    }
+    std::vector<Filter> accepted{};
+    for (size_t b = obs_bucket_min; b <= obs_bucket_max; b++)
+      find_match_bucket(buckets, b, accepted, obs, t, obs_thick, obs_n_min, obs_n_max, descriptor);
 
     return accepted;
   }
@@ -321,9 +386,8 @@ namespace scribo::internal
    * @param descriptor
    * @return
    */
-  bool handle_find_filter(std::vector<Filter>& current_filters, std::vector<Filter>& accepted,
-                          std::vector<Filter>& new_filters, const Eigen::Matrix<float, 3, 1>& obs, int t,
-                          const Descriptor& descriptor)
+  bool handle_find_filter(Buckets& buckets, std::vector<Filter>& accepted, std::vector<Filter>& new_filters,
+                          const Eigen::Matrix<float, 3, 1>& obs, int t, const Descriptor& descriptor)
   {
     auto observation_s        = Observation();
     observation_s.obs         = obs;
@@ -343,7 +407,7 @@ namespace scribo::internal
           new_filters.emplace_back(t, obs_result_value.obs, descriptor);
       }
 
-      current_filters.push_back(std::move(f));
+      buckets.insert(std::move(f));
     }
 
     return observation_s.match_count > 1;
@@ -367,7 +431,7 @@ namespace scribo::internal
 
   void make_predictions(std::vector<Filter>& filters)
   {
-    for (Filter& filter : filters)
+    for (auto& filter : filters)
       filter.predict();
   }
 
@@ -382,19 +446,20 @@ namespace scribo::internal
   }
 
   std::vector<Filter> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
-                                                        std::vector<Filter>& filters, int& two_matches, int t,
+                                                        Buckets& buckets, int& two_matches, int t,
                                                         const Descriptor& descriptor)
   {
     std::vector<Filter> new_filters{};
     bool                two_matches_through_t = false;
+
     for (const auto& obs : observations)
     {
-      std::vector<Filter> accepted = find_match(filters, obs, t, descriptor);
+      std::vector<Filter> accepted = find_match(buckets, obs, t, descriptor);
       if (accepted.empty() && obs(1, 0) < descriptor.max_thickness)
         new_filters.emplace_back(t, obs, descriptor);
       else
         two_matches_through_t =
-            handle_find_filter(filters, accepted, new_filters, obs, t, descriptor) || two_matches_through_t;
+            handle_find_filter(buckets, accepted, new_filters, obs, t, descriptor) || two_matches_through_t;
     }
 
     if (two_matches_through_t)
@@ -416,11 +481,13 @@ namespace scribo::internal
   {
     int n_max = image.size(1), t_max = image.size(0);
 
-    auto                                    filters  = std::vector<Filter>();  // List of current filters
-    auto                                    segments = std::vector<Segment>(); // List of current segments
-    std::vector<Filter>                     new_filters{};
-    std::vector<Filter>                     filter_kept{};
-    std::vector<Eigen::Matrix<float, 3, 1>> observations{};
+    Buckets buckets(n_max, descriptor);
+
+    std::vector<Segment>                    segments; // List of current segments
+    std::vector<Filter>                     filters;
+    std::vector<Filter>                     new_filters;
+    std::vector<Filter>                     filter_kept;
+    std::vector<Eigen::Matrix<float, 3, 1>> observations;
 
     // Useful to NOT check if filters has to be merged
     int two_matches = 0; // Number of t where two segments matched the same observation
@@ -431,7 +498,10 @@ namespace scribo::internal
 
       observations = extract_observations(image, t, n_max, descriptor);
 
-      new_filters = match_observations_to_predictions(observations, filters, two_matches, t, descriptor);
+      buckets.fill(filters);
+      new_filters = match_observations_to_predictions(observations, buckets, two_matches, t, descriptor);
+      buckets.empty(filters);
+
       filter_kept = filter_selection(filters, segments, t, two_matches, descriptor);
 
       filters = get_active_filters(filter_kept, new_filters);

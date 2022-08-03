@@ -20,6 +20,8 @@ namespace scribo
 
     if (tracker != SEGDET_PROCESS_TRACKING_ENUM::KALMAN && tracker != SEGDET_PROCESS_TRACKING_ENUM::KALMAN_LEPLUMEY)
       return false;
+    if (bucket_size == 0)
+      return false;
 
     return true;
   }

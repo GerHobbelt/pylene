@@ -49,6 +49,7 @@ namespace scribo
 
     float dyn       = 0.6f; ///< Dynamic when Black-Top-Hat preprocess is applied
     int   size_mask = 11;   ///< Filter size when Black-Top-Hat preprocess is applied
+    int bucket_size = 30; ///< Bucket size during traversal
 
     int nb_values_to_keep = 30; ///< Memory of filter to compute variances for the matching
     int discontinuity_relative =

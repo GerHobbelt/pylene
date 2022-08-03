@@ -413,3 +413,31 @@ TEST(Segdet, line_detect_small_cross_noise_vector)
   auto abs_error = 5;
   check_vector_output(ref, output, abs_error);
 }
+
+TEST(Segdet, bucket_size_dividor)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 0, 5);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+
+  auto params          = SegDetParams();
+  params.bucket_size = 100 / 2;
+
+  auto output = detect_line_span(img, 10, params);
+
+  expect_eq(ref, output);
+}
+
+TEST(Segdet, bucket_size_higher_one_bucket)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 0, 5);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+
+  auto params          = SegDetParams();
+  params.bucket_size = 100 * 2;
+
+  auto output = detect_line_span(img, 10, params);
+
+  expect_eq(ref, output);
+}

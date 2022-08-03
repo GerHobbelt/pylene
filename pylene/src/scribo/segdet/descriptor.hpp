@@ -18,6 +18,7 @@ namespace scribo::internal
 
     /// PROCESS
     SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode;
+    int                                bucket_size;
     int                                min_length_embryo;
     int                                discontinuity_absolute;
     double                             discontinuity_relative;

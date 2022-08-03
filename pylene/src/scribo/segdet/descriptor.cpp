@@ -12,6 +12,7 @@ namespace scribo::internal
     }
 
     traversal_mode         = params.traversal_mode;
+    bucket_size            = params.bucket_size;
     min_length_embryo      = min_length / 4 + 1;
     discontinuity_relative = static_cast<double>(params.discontinuity_relative) / 100;
     discontinuity_absolute = params.discontinuity_absolute;

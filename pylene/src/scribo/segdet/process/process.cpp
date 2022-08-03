@@ -336,7 +336,7 @@ namespace scribo::internal
 
       if (f.impl->observation != std::nullopt)
       {
-        if (two_matches > descriptor.minimum_for_fusion && make_potential_fusion(filters, fi, segments, descriptor))
+        if (descriptor.remove_duplicates && two_matches > descriptor.minimum_for_fusion && make_potential_fusion(filters, fi, segments, descriptor))
           continue;
 
         f.integrate(t, descriptor);
@@ -366,7 +366,7 @@ namespace scribo::internal
     size_t fi = 0;
     while (fi < filters.size())
     {
-      if (make_potential_fusion(filters, fi, segments, descriptor))
+      if (descriptor.remove_duplicates && make_potential_fusion(filters, fi, segments, descriptor))
         continue;
 
       if (filters[fi].impl->last_integration - filters[fi].impl->first > descriptor.min_length_embryo)

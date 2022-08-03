@@ -34,7 +34,12 @@ void sort_ref_output(segdet_output& ref, segdet_output& output)
   sort_segdet_span_output(output);
 }
 
-void expect_empty(segdet_output ref, segdet_output output)
+void expect_empty(segdet_output output)
+{
+  EXPECT_EQ(output.seg_ids.size(), 0);
+}
+
+void expect_eq(segdet_output ref, segdet_output output)
 {
   sort_ref_output(ref, output);
 
@@ -46,10 +51,10 @@ void expect_empty(segdet_output ref, segdet_output output)
   EXPECT_EQ(output.angle, ref.angle);
 }
 
-void expect_multiple(segdet_output ref, segdet_output output, int abs_error)
+void expect_near(segdet_output ref, segdet_output output, int abs_error)
 {
   sort_ref_output(ref, output);
-  
+
   ASSERT_EQ(output.seg_ids.size(), ref.seg_ids.size());
   for (size_t p = 0; p < output.seg_ids.size(); p++)
   {
@@ -100,7 +105,7 @@ TEST(Segdet, line_detect_one_horizontal)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_one_vertical)
@@ -111,7 +116,7 @@ TEST(Segdet, line_detect_one_vertical)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_one_cross)
@@ -122,7 +127,7 @@ TEST(Segdet, line_detect_one_cross)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_4_cross)
@@ -133,7 +138,7 @@ TEST(Segdet, line_detect_4_cross)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_8_cross)
@@ -144,7 +149,7 @@ TEST(Segdet, line_detect_8_cross)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_15x15)
@@ -155,7 +160,7 @@ TEST(Segdet, line_detect_15x15)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_1_vert_too_long)
@@ -166,7 +171,7 @@ TEST(Segdet, line_detect_1_vert_too_long)
 
   auto output = detect_line_span(img, 101);
 
-  expect_empty(ref, output);
+  expect_empty(output);
 }
 
 TEST(Segdet, line_detect_1_vert_too_thick)
@@ -180,7 +185,7 @@ TEST(Segdet, line_detect_1_vert_too_thick)
   params.max_thickness = 10;
   auto output          = detect_line_span(img, 100, params);
 
-  expect_empty(ref, output);
+  expect_empty(output);
 }
 
 TEST(Segdet, line_detect_2_cross_noise)
@@ -198,7 +203,7 @@ TEST(Segdet, line_detect_2_cross_noise)
   auto output = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_4_cross_noise)
@@ -215,7 +220,7 @@ TEST(Segdet, line_detect_4_cross_noise)
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_10_vertical_20_offset)
@@ -227,7 +232,7 @@ TEST(Segdet, line_detect_10_vertical_20_offset)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 0;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 
@@ -245,7 +250,7 @@ TEST(Segdet, line_detect_10_vertical_20_offset_noise)
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_small_cross)
@@ -257,7 +262,7 @@ TEST(Segdet, line_detect_small_cross)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 0;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_small_cross_noise)
@@ -274,7 +279,7 @@ TEST(Segdet, line_detect_small_cross_noise)
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_small_cross_noise_leplumey)
@@ -292,7 +297,7 @@ TEST(Segdet, line_detect_small_cross_noise_leplumey)
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_vertical_10_degrees)
@@ -304,7 +309,7 @@ TEST(Segdet, line_detect_one_vertical_10_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_vertical_m10_degrees)
@@ -316,7 +321,7 @@ TEST(Segdet, line_detect_one_vertical_m10_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_horizontal_30_degrees)
@@ -328,7 +333,7 @@ TEST(Segdet, line_detect_one_horizontal_30_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 0;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_horizontal_m30_degrees)
@@ -340,7 +345,7 @@ TEST(Segdet, line_detect_one_horizontal_m30_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_10_horizontal_10_degrees)
@@ -352,7 +357,7 @@ TEST(Segdet, line_detect_10_horizontal_10_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 1;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_cross_5_degrees)
@@ -364,7 +369,7 @@ TEST(Segdet, line_detect_cross_5_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 1;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_cross_5_degrees_vector)

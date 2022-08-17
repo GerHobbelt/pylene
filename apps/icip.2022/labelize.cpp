@@ -1,29 +1,17 @@
-#include <mln/core/algorithm/all_of.hpp>
-#include <mln/core/algorithm/clone.hpp>
 #include <mln/core/algorithm/copy.hpp>
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/algorithm/for_each.hpp>
-#include <mln/core/algorithm/paste.hpp>
 #include <mln/core/colors.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/ndimage.hpp>
-#include <mln/core/image/view/cast.hpp>
-#include <mln/core/image/view/channel.hpp>
 #include <mln/core/image/view/filter.hpp>
-#include <mln/core/image/view/mask.hpp>
-#include <mln/core/image/view/operators.hpp>
 #include <mln/core/image/view/rgb.hpp>
 #include <mln/core/image/view/transform.hpp>
 #include <mln/core/image/view/zip.hpp>
-#include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>
-#include <mln/core/se/disc.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/labeling/blobs.hpp>
-#include <mln/morpho/experimental/dilation.hpp>
-#include <mln/morpho/experimental/erosion.hpp>
-#include <mln/morpho/gaussian2d.hpp>
 
 
 #include <fmt/core.h>

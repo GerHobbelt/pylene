@@ -8,7 +8,11 @@ add_executable(blur blur.cpp)
 target_link_libraries(blur PRIVATE Pylene::Pylene)
 target_compile_features(blur PRIVATE cxx_std_20)
 
+add_executable(print_se print_se.cpp)
+target_link_libraries(print_se PRIVATE Pylene::Pylene fmt::fmt)
+target_compile_features(print_se PRIVATE cxx_std_20)
 
-add_sanitizers(gen_figs)
+
+# add_sanitizers(gen_figs)
 
 add_dependencies(build-apps gen_figs)

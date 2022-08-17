@@ -15,7 +15,7 @@ add_subdirectory(tosgui)
 add_subdirectory(hierachical_seg-gui)
 add_subdirectory(hyperspec)
 add_subdirectory(icip.2022)
-
+add_subdirectory(tip.2019-2020)
 
 ## Old apps no longer supported or using an old API
 # add_subdirectory(simplification)

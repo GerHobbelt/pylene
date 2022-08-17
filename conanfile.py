@@ -67,7 +67,6 @@ class Anonymous(ConanFile):
         "xsimd/7.4.6",
         "eigen/3.3.9",
         "boost/1.78.0",
-        "cfitsio/4.1.0",
         "freeimage/3.18.0",
         "openjpeg/2.5.0"  # To solve dependency conflict between freeimage and openimageio
     ]
@@ -105,14 +104,6 @@ class Anonymous(ConanFile):
         self.cpp.source.components["core"].includedirs = ["anonymous/include"]
         self.cpp.build.components["core"].libdirs = ["anonymous"]
 
-        # Scribo component
-        self.cpp.package.components["scribo"].libs = ["Anonymous-scribo"]
-        self.cpp.package.components["scribo"].libdirs = ["lib"]
-        self.cpp.package.components["scribo"].includedirs = ["include"]
-        self.cpp.source.components["scribo"].includedirs = [
-            "anonymous/include"]
-        self.cpp.build.components["scribo"].libdirs = ["anonymous"]
-
         # IO component (FreeImage)
         self.cpp.package.components["io-freeimage"].libs = [
             "Anonymous-io-freeimage"]
@@ -121,13 +112,6 @@ class Anonymous(ConanFile):
         self.cpp.source.components["io-freeimage"].includedirs = [
             "anonymous/include"]
         self.cpp.build.components["io-freeimage"].libdirs = ["anonymous"]
-
-        # IO component (cfitsio)
-        self.cpp.package.components["io-fits"].libs = ["Anonymous-io-fits"]
-        self.cpp.package.components["io-fits"].libdirs = ["lib"]
-        self.cpp.package.components["io-fits"].includedirs = ["include"]
-        self.cpp.source.components["io-fits"].includedirs = ["anonymous/include"]
-        self.cpp.build.components["io-fits"].libdirs = ["anonymous"]
 
         if self._build_python():
             self.cpp.package.components["anonymous-numpy"].libs = [
@@ -170,13 +154,8 @@ class Anonymous(ConanFile):
 
         # IO component (FreeImage)
         self.cpp_info.components["io-freeimage"].requires = ["core",
-                                                             "freeimage::FreeImage"]
+                                                             "freeimage::freeimage"]
         self.cpp_info.components["io-freeimage"].libs = ["Anonymous-io-freeimage"]
-
-        # IO component (cfitsio)
-        self.cpp_info.components["io-fits"].requires = ["core",
-                                                        "cfitsio::cfitsio"]
-        self.cpp_info.components["io-fits"].libs = ["Anonymous-io-fits"]
 
         # Anonymous-numpy component
         if self._build_python():

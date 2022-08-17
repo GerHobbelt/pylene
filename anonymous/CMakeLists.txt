@@ -8,7 +8,6 @@ find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
 find_package(Eigen3 3.3.9)
-find_package(cfitsio)
 
 set(ANONYMOUS_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
 
@@ -76,17 +75,13 @@ target_sources(Anonymous-core PRIVATE
                src/core/parallel_pointwise.cpp
                src/core/se/disc.cpp
                src/core/se/mask2d.cpp
-               src/core/se/periodic_line2d.cpp
                src/core/se/rect2d.cpp
                src/core/trace.cpp
                src/core/traverse2d.cpp
                src/io/imprint.cpp
-               src/morpho/block_running_max.cpp
                src/morpho/component_tree.cpp
-               src/morpho/filters2d.cpp
                src/morpho/hvector.cpp
                src/morpho/hvector_unbounded.cpp
-               src/morpho/running_max_vertical2d.cpp
                src/morpho/gaussian2d.cpp
                src/morpho/gaussian2d_coefs.cpp
                src/morpho/immersion.cpp
@@ -111,7 +106,7 @@ target_include_directories(Anonymous-io-freeimage PUBLIC
                            $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(Anonymous-io-freeimage PUBLIC Anonymous-core)
-target_link_libraries(Anonymous-io-freeimage PRIVATE freeimage::freeimage)
+target_link_libraries(Anonymous-io-freeimage PRIVATE freeimage)
 
 
 # Compiler configurations

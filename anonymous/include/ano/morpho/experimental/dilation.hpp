@@ -11,8 +11,6 @@
 
 #include <ano/morpho/experimental/private/localmax.hpp>
 
-#include <experimental/simd>
-
 namespace ano::morpho::experimental
 {
 
@@ -46,12 +44,6 @@ namespace ano::morpho::experimental
       T operator()(T x, T y) const
       {
         return ano::sup(x, y);
-      }
-
-      template <class T>
-      std::experimental::simd<T> operator()(std::experimental::simd<T> x, std::experimental::simd<T> y) const
-      {
-        return std::experimental::max(x, y);
       }
     };
 

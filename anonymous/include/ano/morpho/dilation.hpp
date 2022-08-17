@@ -10,7 +10,6 @@
 #include <ano/core/trace.hpp>
 #include <ano/core/value/value_traits.hpp>
 
-#include <ano/morpho/private/dilation.2d.hpp>
 #include <ano/morpho/private/localmax.hpp>
 
 namespace ano::morpho
@@ -62,24 +61,12 @@ namespace ano::morpho
     struct dilation_sup_t
     {
       constexpr auto operator()(V a, V b) const { return sup(a, b); }
-
-      template <std::size_t N>
-      constexpr auto operator()(xsimd::batch<V, N> a, xsimd::batch<V, N> b) const
-      {
-        return xsimd::max(a, b);
-      }
     };
 
     template <>
     struct dilation_sup_t<bool>
     {
       constexpr auto operator()(bool a, bool b) const { return a || b; }
-
-      template <std::size_t N>
-      constexpr auto operator()(xsimd::batch<uint8_t, N> a, xsimd::batch<uint8_t, N> b) const
-      {
-        return xsimd::max(a, b);
-      }
     };
 
 
@@ -126,36 +113,6 @@ namespace ano::morpho
       ano::morpho::details::localmax(image, out, static_cast<const SE&>(se), bm, vs);
     }
 
-    // Specialisation for 2D images
-    template <class InputImage, class SE, class ValueSet, class BorderManager, class OutputImage>
-    requires(::concepts::same_as<image_domain_t<std::remove_reference_t<InputImage>>, ano::box2d>&& //
-             ::concepts::same_as<image_domain_t<std::remove_reference_t<OutputImage>>, ano::box2d>) //
-
-        void dilation(InputImage&& image, const ano::details::StructuringElement<SE>& se, BorderManager bm,
-                      ValueSet& vs, OutputImage&& out)
-    {
-      using V = image_value_t<std::remove_reference_t<InputImage>>;
-      ano_entering("ano::morpho::dilation (2d spe)");
-
-      if (!(bm.method() == ano::extension::BorderManagementMethod::Fill ||
-            bm.method() == ano::extension::BorderManagementMethod::User))
-        throw std::runtime_error("Invalid border management method (should be FILL or USER)");
-
-
-      int  tile_width  = 128;
-      int  tile_height = 128;
-      bool parallel    = false;
-
-      if (bm.method() == ano::extension::BorderManagementMethod::User)
-        ano::morpho::details::dilation2d(image, out, static_cast<const SE&>(se), vs, tile_width, tile_height, parallel);
-      else if (bm.method() == ano::extension::BorderManagementMethod::Fill)
-      {
-        V padding_value = std::any_cast<V>(bm.get_value());
-        ano::morpho::details::dilation2d(image, out, static_cast<const SE&>(se), vs, tile_width, tile_height, parallel,
-                                         ano::PAD_CONSTANT, padding_value);
-      }
-    }
-
   } // namespace details
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
@@ -200,21 +157,6 @@ namespace ano::morpho
 
   namespace parallel
   {
-
-    template <class InputImage, class SE, class OutputImage>
-    void dilation(InputImage&& image, const SE& se, OutputImage&& out, int tile_width, int tile_height)
-    {
-      using I  = std::remove_reference_t<InputImage>;
-      using VS = morpho::details::dilation_value_set<image_value_t<I>>;
-
-      static_assert(std::is_same_v<image_domain_t<std::remove_reference_t<InputImage>>, ano::box2d>);
-      static_assert(std::is_same_v<image_domain_t<std::remove_reference_t<OutputImage>>, ano::box2d>);
-
-      VS   vs;
-      bool parallel = true;
-      morpho::details::dilation2d(std::forward<InputImage>(image), std::forward<OutputImage>(out), se, vs, tile_width,
-                                  tile_height, parallel);
-    }
 
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out)

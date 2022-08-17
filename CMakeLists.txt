@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(Pylene)
+project(Anonymous)
 
 # Add FindTBB directory to CMake's module path
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
@@ -39,10 +39,8 @@ endif (USE_DISTCC)
 
 
 # CONFIGURATION OPTIONS
-option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
-option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
-option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
-option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
+option(ANONYMOUS_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
+option(ANONYMOUS_BUILD_TESTING "ON to build the test suite" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -100,34 +98,14 @@ if(NOT "${USE_ALTERNATE_LINKER}" STREQUAL "")
 endif()
 
 # Subdirectories
-add_library(Pylene INTERFACE)
-add_library(Pylene::Pylene ALIAS Pylene)
-add_subdirectory(pylene)
+add_library(Anonymous INTERFACE)
+add_library(Anonymous::Anonymous ALIAS Anonymous)
+add_subdirectory(anonymous)
 
-if (PYLENE_BUILD_PYTHON)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  add_custom_target(build_python)
-  #add_subdirectory(pylene-python)
-  add_subdirectory(pybind)
-endif()
-
-if (NOT PYLENE_BUILD_LIBS_ONLY)
+if (NOT ANONYMOUS_BUILD_LIBS_ONLY)
   add_custom_target(build-fixtures)
   add_subdirectory(fixtures)
 
-  if (PYLENE_BUILD_TESTING)
-    include(CTest)
-    add_custom_target(build-tests)
-    add_subdirectory(tests)
-  endif()
-
-  if (PYLENE_BUILD_BENCHMARKS)
-    add_custom_target(build-bench)
-    add_subdirectory(bench)
-  endif ()
-
-  add_custom_target(build-doc)
-  add_subdirectory(doc)
   add_custom_target(build-apps)
   add_subdirectory(apps EXCLUDE_FROM_ALL)
 endif ()
@@ -137,60 +115,44 @@ endif ()
 ####### Installation & CMAKE module files ##########
 ####################################################
 
-target_link_libraries(Pylene INTERFACE Pylene::Core)
+target_link_libraries(Anonymous INTERFACE Anonymous::Core)
 
 include(GNUInstallDirs)
 
-set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
-set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy Pylene-scribo)
+set(AnonymousTargets Anonymous Anonymous-core Anonymous-bp Anonymous-io-freeimage)
+set(OptionalAnonymousTargets Anonymous-io-fits Anonymous-numpy Anonymous-scribo)
 
-foreach(tgt ${OptionalPyleneTargets})
+foreach(tgt ${OptionalAnonymousTargets})
   if (TARGET ${tgt})
-    list(APPEND PyleneTargets ${tgt})
+    list(APPEND AnonymousTargets ${tgt})
   endif()
 endforeach()
 
-install(TARGETS ${PyleneTargets}
-        EXPORT PyleneTargets)
+install(TARGETS ${AnonymousTargets}
+        EXPORT AnonymousTargets)
 
 write_basic_package_version_file(
-    pylene/PyleneConfigVersion.cmake
+    anonymous/AnonymousConfigVersion.cmake
     VERSION 0.1
     COMPATIBILITY AnyNewerVersion
     )
 
 configure_file(
-    pylene/PyleneConfig.cmake.in
-    pylene/PyleneConfig.cmake
+    anonymous/AnonymousConfig.cmake.in
+    anonymous/AnonymousConfig.cmake
     @ONLY
     )
 
-install(EXPORT PyleneTargets
-        FILE PyleneTargets.cmake
-        NAMESPACE Pylene::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
+install(EXPORT AnonymousTargets
+        FILE AnonymousTargets.cmake
+        NAMESPACE Anonymous::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/anonymous
         )
 
-install(DIRECTORY pylene-python/include/pln
-        TYPE INCLUDE)
-
-
-install(DIRECTORY pylene/include/mln
+install(DIRECTORY anonymous/include/ano
         TYPE INCLUDE)
 
 install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfigVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
-
-
-
-####################################################
-#######          Packaging                ##########
-####################################################
-
-
-set(CPACK_SOURCE_GENERATOR "TBZ2")
-set(CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}/;/\\\\.git/;.*~;#.*#")
-INCLUDE(CPack)
-add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
+        ${CMAKE_CURRENT_BINARY_DIR}/anonymous/AnonymousConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/anonymous/AnonymousConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/anonymous)

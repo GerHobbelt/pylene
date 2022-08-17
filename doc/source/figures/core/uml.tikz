@@ -1,9 +1,0 @@
-
-
-\tikzset{
-   class/.style={draw, fill=LightYellow},
-   template/.style={label={[mTemplateNodeStyle]north east:#1}},
-   realization/.style={-Latex[open]},
-%%
-   mTemplateNodeStyle/.style={fill=white,draw,dashed,font={\tt\small}, inner sep=2pt, anchor=center}
-}

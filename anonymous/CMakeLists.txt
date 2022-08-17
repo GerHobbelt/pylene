@@ -1,0 +1,142 @@
+include(CMakePackageConfigHelpers)
+
+find_package(Boost 1.58 REQUIRED)
+find_package(FreeImage REQUIRED)
+
+find_package(TBB REQUIRED tbb)
+find_package(range-v3 0.10.0 REQUIRED)
+find_package(fmt 6.0 REQUIRED)
+find_package(xsimd REQUIRED)
+find_package(OpenImageIO REQUIRED)
+find_package(Eigen3 3.3.9)
+find_package(cfitsio)
+
+set(ANONYMOUS_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and parallelization")
+
+
+add_library(Anonymous-core)
+
+if (TBB_FOUND AND ANONYMOUS_USE_TBB)
+  target_link_libraries(Anonymous-core PRIVATE TBB::tbb)
+else ()
+  set(ANONYMOUS_USE_TBB OFF)
+  target_compile_definitions(Anonymous-core PRIVATE ANO_NO_TBB)
+endif ()
+
+# FIXME: still useful ?
+if (UNIX AND NOT APPLE)
+  target_link_libraries(Anonymous-core INTERFACE rt)
+elseif (MSVC)
+  #
+  target_compile_options(Anonymous-core PUBLIC
+    "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
+    "/wd5104" # found 'L#x' in macro replacement list, did you mean
+    "/experimental:preprocessor"  # required by range-v3
+    "/permissive-" # required by range-v3
+    )
+endif ()
+
+
+# Set dependancies
+target_include_directories(Anonymous-core PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>)
+
+target_include_directories(Anonymous-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+target_link_libraries(Anonymous-core PUBLIC range-v3::range-v3 xsimd)
+target_link_libraries(Anonymous-core PUBLIC fmt::fmt)
+
+# Set sources
+#file(GLOB_RECURSE sources "include/ano/*.hpp")
+#target_sources(Anonymous INTERFACE $<BUILD_INTERFACE:${sources}>)
+
+add_library(Anonymous-bp OBJECT
+  src/bp/transpose.cpp
+  src/bp/swap.cpp
+  src/bp/alloc.cpp
+  )
+
+target_include_directories(Anonymous-bp PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(Anonymous-bp PRIVATE xsimd fmt::fmt)
+target_compile_features(Anonymous-bp PUBLIC cxx_std_20)
+
+target_link_libraries(Anonymous-core PRIVATE Anonymous-bp)
+
+
+target_sources(Anonymous-core PRIVATE
+               src/accu/cvxhull.cpp
+               src/core/image_format.cpp
+               src/core/init_list.cpp
+               src/core/ndbuffer_image.cpp
+               src/core/ndbuffer_image_data.cpp
+               src/core/value_set.cpp
+               src/core/padding.cpp
+               src/core/parallel_local.cpp
+               src/core/parallel_pointwise.cpp
+               src/core/se/disc.cpp
+               src/core/se/mask2d.cpp
+               src/core/se/periodic_line2d.cpp
+               src/core/se/rect2d.cpp
+               src/core/trace.cpp
+               src/core/traverse2d.cpp
+               src/io/imprint.cpp
+               src/morpho/block_running_max.cpp
+               src/morpho/component_tree.cpp
+               src/morpho/filters2d.cpp
+               src/morpho/hvector.cpp
+               src/morpho/hvector_unbounded.cpp
+               src/morpho/running_max_vertical2d.cpp
+               src/morpho/gaussian2d.cpp
+               src/morpho/gaussian2d_coefs.cpp
+               src/morpho/immersion.cpp
+               src/morpho/maxtree.cpp
+               src/morpho/mtos.cpp
+               src/morpho/satmaxtree.cpp
+               src/morpho/trees_fusion.cpp
+               src/morpho/unionfind.cpp
+               src/morpho/waterfall.cpp
+               src/transforms/hough_lines.cpp
+               )
+
+add_library(Anonymous-io-freeimage)
+add_library(Anonymous::IO-freeimage ALIAS Anonymous-io-freeimage)
+target_sources(Anonymous-io-freeimage PRIVATE
+               src/io/freeimage_plugin.cpp
+               src/io/imread.cpp
+               src/io/io.cpp            
+)
+target_include_directories(Anonymous-io-freeimage PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(Anonymous-io-freeimage PUBLIC Anonymous-core)
+target_link_libraries(Anonymous-io-freeimage PRIVATE freeimage::freeimage)
+
+
+# Compiler configurations
+target_compile_features(Anonymous-core PUBLIC cxx_std_20)
+
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
+  target_compile_options(Anonymous-bp PUBLIC -fconcepts)
+  target_compile_options(Anonymous-core PUBLIC -fconcepts)
+  target_compile_options(Anonymous-io-freeimage PUBLIC -fconcepts)
+endif()
+
+if (ANONYMOUS_BUILD_PYTHON)
+  set_property(TARGET Anonymous-core PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif ()
+
+# IDE configuration
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/ano FILES ${sources})
+
+
+add_library(Anonymous::Core ALIAS Anonymous-core)
+
+
+# GCC8 has enoying random compilation failures
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  target_compile_definitions(Anonymous-core PUBLIC ANONYMOUS_GCC8_WORKAROUND)
+endif()

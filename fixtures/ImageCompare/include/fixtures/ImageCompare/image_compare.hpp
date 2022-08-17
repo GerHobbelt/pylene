@@ -1,11 +1,11 @@
 #pragma once
 
-#include <mln/core/image/image.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
-#include <mln/core/image/ndimage_fwd.hpp>
-#include <mln/core/range/rows.hpp>
-#include <mln/core/range/view/zip.hpp>
-#include <mln/io/imprint.hpp>
+#include <ano/core/image/image.hpp>
+#include <ano/core/image/ndbuffer_image.hpp>
+#include <ano/core/image/ndimage_fwd.hpp>
+#include <ano/core/range/rows.hpp>
+#include <ano/core/range/view/zip.hpp>
+#include <ano/io/imprint.hpp>
 
 
 #include <range/v3/range/access.hpp>
@@ -49,27 +49,27 @@ namespace fixtures::ImageCompare
     /// \{
 
     /// Type-erased implementation for ndimages
-    ::testing::AssertionResult compare(const mln::ndbuffer_image& a, const mln::ndbuffer_image& b, int comparison_flags,
+    ::testing::AssertionResult compare(const ano::ndbuffer_image& a, const ano::ndbuffer_image& b, int comparison_flags,
                                        std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn,
-                                       std::function<void(const mln::ndbuffer_image&)>                 print_fn);
+                                       std::function<void(const ano::ndbuffer_image&)>                 print_fn);
 
 
     /// Best-match implementation for ndimages (forwarding to the type-erased one)
     template <class TA, class TB, int adim, int bdim>
-    ::testing::AssertionResult compare(const mln::__ndbuffer_image<TA, adim>& a,
-                                       const mln::__ndbuffer_image<TB, bdim>& b, int comparison_flags)
+    ::testing::AssertionResult compare(const ano::__ndbuffer_image<TA, adim>& a,
+                                       const ano::__ndbuffer_image<TB, bdim>& b, int comparison_flags)
     {
-      std::function<void(mln::ndbuffer_image)>                        print_fn;
+      std::function<void(ano::ndbuffer_image)>                        print_fn;
       std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn;
 
       if constexpr (fmt::internal::has_formatter<TA, fmt::format_context>() &&
                     fmt::internal::has_formatter<TB, fmt::format_context>())
       {
-        print_fn = [](const mln::ndbuffer_image& ima) {
+        print_fn = [](const ano::ndbuffer_image& ima) {
           if (const auto* a = ima.cast_to<TA, adim>())
-            mln::io::imprint(*a);
+            ano::io::imprint(*a);
           else if (const auto* b = ima.cast_to<TB, bdim>())
-            mln::io::imprint(*b);
+            ano::io::imprint(*b);
         };
       }
 
@@ -83,15 +83,14 @@ namespace fixtures::ImageCompare
         };
       }
 
-      return compare(static_cast<const mln::ndbuffer_image&>(a), static_cast<const mln::ndbuffer_image&>(b),
+      return compare(static_cast<const ano::ndbuffer_image&>(a), static_cast<const ano::ndbuffer_image&>(b),
                      comparison_flags, linecmp_fn, print_fn);
     }
 
 
-
     template <class ImageA, class ImageB>
-    ::testing::AssertionResult compare(const mln::details::Image<ImageA>& f_,
-                                       const mln::details::Image<ImageB>& g_, int comparison_flags)
+    ::testing::AssertionResult compare(const ano::details::Image<ImageA>& f_, const ano::details::Image<ImageB>& g_,
+                                       int comparison_flags)
     {
       ImageA f = static_cast<const ImageA&>(f_);
       ImageB g = static_cast<const ImageB&>(g_);
@@ -116,23 +115,23 @@ namespace fixtures::ImageCompare
 
       bool pass = true;
       {
-        auto zipped_vals = mln::ranges::view::zip(f.values(), g.values());
-        for (auto&& r : mln::ranges::rows(zipped_vals))
+        auto zipped_vals = ano::ranges::view::zip(f.values(), g.values());
+        for (auto&& r : ano::ranges::rows(zipped_vals))
           for (auto&& [f_v, g_v] : r)
             if (f_v != g_v)
               pass = false;
       }
-      if constexpr (std::is_same_v<f_domain_t, mln::box2d> && //
-                    std::is_same_v<g_domain_t, mln::box2d> && //
-                    fmt::internal::has_formatter<mln::image_value_t<ImageA>, fmt::format_context>() &&
-                    fmt::internal::has_formatter<mln::image_value_t<ImageB>, fmt::format_context>())
+      if constexpr (std::is_same_v<f_domain_t, ano::box2d> && //
+                    std::is_same_v<g_domain_t, ano::box2d> && //
+                    fmt::internal::has_formatter<ano::image_value_t<ImageA>, fmt::format_context>() &&
+                    fmt::internal::has_formatter<ano::image_value_t<ImageB>, fmt::format_context>())
       {
         if (!pass)
         {
           fmt::print("A = \n");
-          mln::io::imprint(f);
+          ano::io::imprint(f);
           fmt::print("vs B = \n");
-          mln::io::imprint(g);
+          ano::io::imprint(g);
         }
       }
 
@@ -151,8 +150,8 @@ namespace fixtures::ImageCompare
   {
     using A = std::remove_reference_t<ImageLhs>;
     using B = std::remove_reference_t<ImageRhs>;
-    static_assert(mln::is_a<A, mln::details::Image>());
-    static_assert(mln::is_a<B, mln::details::Image>());
+    static_assert(ano::is_a<A, ano::details::Image>());
+    static_assert(ano::is_a<B, ano::details::Image>());
 
     return impl::compare(std::forward<ImageLhs>(f), std::forward<ImageRhs>(g), comparison_flags);
   }

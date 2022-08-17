@@ -4,7 +4,7 @@ find_package(fmt 6.0 REQUIRED)
 add_library(ImageCompare)
 
 target_include_directories(ImageCompare PUBLIC include)
-target_link_libraries(ImageCompare PUBLIC Pylene::Pylene GTest::GTest fmt::fmt)
+target_link_libraries(ImageCompare PUBLIC Anonymous::Anonymous GTest::GTest fmt::fmt)
 target_compile_features(ImageCompare PUBLIC cxx_std_20)
 
 target_sources(ImageCompare PRIVATE

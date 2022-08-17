@@ -1,17 +1,17 @@
+#include <ano/core/image/ndbuffer_image.hpp>
 #include <fixtures/ImageCompare/image_compare.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
 
 
 namespace fixtures::ImageCompare::impl
 {
 
   // Compare two buffer-encoded images
-  ::testing::AssertionResult compare(const mln::ndbuffer_image& a, const mln::ndbuffer_image& b, int comparaison_flags,
+  ::testing::AssertionResult compare(const ano::ndbuffer_image& a, const ano::ndbuffer_image& b, int comparaison_flags,
                                      std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn,
-                                     std::function<void(const mln::ndbuffer_image&)> print_fn)
+                                     std::function<void(const ano::ndbuffer_image&)>                 print_fn)
   {
-    mln::ndbuffer_image A = a;
-    mln::ndbuffer_image B = b;
+    ano::ndbuffer_image A = a;
+    ano::ndbuffer_image B = b;
 
 
     if (A.sample_type() != B.sample_type())
@@ -36,12 +36,12 @@ namespace fixtures::ImageCompare::impl
         return ::testing::AssertionFailure() << "A and B domains extents mismatch.";
 
 
-    mln::sample_type_id id = a.sample_type();
+    ano::sample_type_id id = a.sample_type();
     // If the comparison function is not provided, we use memcmp (type are supposed to be trivially comparable
     if (!linecmp_fn)
       linecmp_fn = std::memcmp;
 
-    std::size_t n     = a.width() * mln::get_sample_type_id_traits(id).size();
+    std::size_t n     = a.width() * ano::get_sample_type_id_traits(id).size();
     auto        a_buf = A.buffer();
     auto        b_buf = B.buffer();
 
@@ -71,4 +71,4 @@ namespace fixtures::ImageCompare::impl
     return ::testing::AssertionSuccess();
   }
 
-}
+} // namespace fixtures::ImageCompare::impl

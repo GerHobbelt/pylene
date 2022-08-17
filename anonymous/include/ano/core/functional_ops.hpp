@@ -1,0 +1,127 @@
+#pragma once
+
+#include <ano/core/private/maths_ops.hpp>
+#include <ano/core/vec/vec_maths_ops.hpp>
+
+#include <cmath>
+
+
+#include <ano/core/private/def_functional_ops_gen_code_macros.hpp>
+
+namespace ano
+{
+  namespace functional
+  {
+    template <typename T = void>
+    struct sqrt_t;
+    template <typename T = void>
+    struct cbrt_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct pow_t;
+    template <typename T = void>
+    struct sqr_t;
+    template <typename T = void>
+    struct abs_t;
+    template <typename T = void>
+    struct sum_t;
+    template <typename T = void>
+    struct prod_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct dot_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct cross_t;
+    template <typename T = void>
+    struct minimum_t;
+    template <typename T = void>
+    struct maximum_t;
+
+    template <typename T = void>
+    struct l0norm_t;
+    template <typename T = void>
+    struct l1norm_t;
+    template <typename T = void>
+    struct l2norm_t;
+    template <typename T = void>
+    struct l2norm_sqr_t;
+    template <typename T = void>
+    struct linfnorm_t;
+    template <unsigned p, typename T = void>
+    struct lpnorm_t;
+
+    template <typename T1 = void, typename T2 = T1>
+    struct l0dist_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct l1dist_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct l2dist_t;
+    template <unsigned p, typename T1 = void, typename T2 = T1>
+    struct lpdist_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct l2dist_sqr_t;
+    template <typename T1 = void, typename T2 = T1>
+    struct linfdist_t;
+  }; // namespace functional
+
+
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(sqrt);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(cbrt);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(pow);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(sqr);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(abs);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(sum);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(prod);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(dot);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(cross);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(maximum);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(minimum);
+
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(l0norm);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(l1norm);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(l2norm);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(l2norm_sqr);
+  ANO_PRIVATE_FUNCTIONAL_GEN_UNARY_CODE(linfnorm);
+  namespace functional
+  {
+    template <unsigned p, typename T>
+    struct lpnorm_t
+    {
+      typedef decltype(lpnorm<p>(std::declval<T>())) result_type;
+      auto operator()(const T& x) const -> decltype(lpnorm<p>(x)) { return lpnorm<p>(x); }
+    };
+    template <unsigned p>
+    struct lpnorm_t<p, void>
+    {
+      template <typename T>
+      auto operator()(const T& x) const -> decltype(lpnorm<p>(x))
+      {
+        return lpnorm<p>(x);
+      }
+    };
+  } // namespace functional
+
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(l0dist);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(l1dist);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(l2dist);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(l2dist_sqr);
+  ANO_PRIVATE_FUNCTIONAL_GEN_BINARY_CODE(linfdist);
+  namespace functional
+  {
+    template <unsigned p, typename T1, typename T2>
+    struct lpdist_t
+    {
+      typedef decltype(lpdist<p>(std::declval<T1>(), std::declval<T2>())) result_type;
+      auto operator()(const T1& x, const T2& y) const -> decltype(lpdist<p>(x, y)) { return lpdist<p>(x, y); }
+    };
+    template <unsigned p>
+    struct lpdist_t<p, void, void>
+    {
+      template <typename T1, typename T2>
+      auto operator()(const T1& x, const T2& y) const -> decltype(lpdist<p>(x, y))
+      {
+        return lpdist<p>(x, y);
+      }
+    };
+  } // namespace functional
+} // namespace ano
+
+#include <ano/core/private/undef_functional_ops_gen_code_macros.hpp>

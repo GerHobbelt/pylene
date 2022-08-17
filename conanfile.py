@@ -32,11 +32,11 @@ BOOST_CONFIGURE_OPTIONS = (
 )
 
 
-class Pylene(ConanFile):
-    name = "pylene"
+class Anonymous(ConanFile):
+    name = "anonymous"
     version = "head"
     license = "MPL v2"
-    url = "https://gitlab.lrde.epita.fr/olena/pylene"
+    url = ""
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type"
     options = {
@@ -58,8 +58,7 @@ class Pylene(ConanFile):
         bl): True for bl in BOOST_CONFIGURE_OPTIONS})
 
     generators = "CMakeDeps"
-    exports_sources = ["pylene/*", "pylene-python/*",
-                       "cmake/*", "CMakeLists.txt", "LICENSE"]
+    exports_sources = ["anonymous/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     build_requires = [
         "gtest/[>=1.11.0]",
@@ -106,46 +105,51 @@ class Pylene(ConanFile):
         self.folders.build = "build"
         self.folders.generators = "build"
         # Core component
-        self.cpp.package.components["core"].libs = ["Pylene-core"]
+        self.cpp.package.components["core"].libs = ["Anonymous-core"]
         self.cpp.package.components["core"].libdirs = ["lib"]
         self.cpp.package.components["core"].includedirs = ["include"]
-        self.cpp.source.components["core"].includedirs = ["pylene/include"]
-        self.cpp.build.components["core"].libdirs = ["pylene"]
+        self.cpp.source.components["core"].includedirs = ["anonymous/include"]
+        self.cpp.build.components["core"].libdirs = ["anonymous"]
 
         # Scribo component
-        self.cpp.package.components["scribo"].libs = ["Pylene-scribo"]
+        self.cpp.package.components["scribo"].libs = ["Anonymous-scribo"]
         self.cpp.package.components["scribo"].libdirs = ["lib"]
         self.cpp.package.components["scribo"].includedirs = ["include"]
-        self.cpp.source.components["scribo"].includedirs = ["pylene/include"]
-        self.cpp.build.components["scribo"].libdirs = ["pylene"]
+        self.cpp.source.components["scribo"].includedirs = [
+            "anonymous/include"]
+        self.cpp.build.components["scribo"].libdirs = ["anonymous"]
 
         # IO component (FreeImage)
-        self.cpp.package.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp.package.components["io-freeimage"].libs = [
+            "Anonymous-io-freeimage"]
         self.cpp.package.components["io-freeimage"].libdirs = ["lib"]
         self.cpp.package.components["io-freeimage"].includedirs = ["include"]
-        self.cpp.source.components["io-freeimage"].includedirs = ["pylene/include"]
-        self.cpp.build.components["io-freeimage"].libdirs = ["pylene"]
+        self.cpp.source.components["io-freeimage"].includedirs = [
+            "anonymous/include"]
+        self.cpp.build.components["io-freeimage"].libdirs = ["anonymous"]
 
         # IO component (cfitsio)
-        self.cpp.package.components["io-fits"].libs = ["Pylene-io-fits"]
+        self.cpp.package.components["io-fits"].libs = ["Anonymous-io-fits"]
         self.cpp.package.components["io-fits"].libdirs = ["lib"]
         self.cpp.package.components["io-fits"].includedirs = ["include"]
-        self.cpp.source.components["io-fits"].includedirs = ["pylene/include"]
-        self.cpp.build.components["io-fits"].libdirs = ["pylene"]
+        self.cpp.source.components["io-fits"].includedirs = ["anonymous/include"]
+        self.cpp.build.components["io-fits"].libdirs = ["anonymous"]
 
         if self._build_python():
-            self.cpp.package.components["pylene-numpy"].libs = ["Pylene-numpy"]
-            self.cpp.package.components["pylene-numpy"].libdirs = ["lib"]
-            self.cpp.package.components["pylene-numpy"].includedirs = ["include"]
-            self.cpp.source.components["pylene-numpy"].includedirs = [
-                "pylene-python/include"]
-            self.cpp.build.components["pylene-numpy"].libdirs = ["pylene-python"]
+            self.cpp.package.components["anonymous-numpy"].libs = [
+                "Anonymous-numpy"]
+            self.cpp.package.components["anonymous-numpy"].libdirs = ["lib"]
+            self.cpp.package.components["anonymous-numpy"].includedirs = ["include"]
+            self.cpp.source.components["anonymous-numpy"].includedirs = [
+                "anonymous-python/include"]
+            self.cpp.build.components["anonymous-numpy"].libdirs = [
+                "anonymous-python"]
 
     def build(self):
         # Controls what is built, not the toolchain
-        variables = {"PYLENE_BUILD_LIBS_ONLY": "YES"}
+        variables = {"ANONYMOUS_BUILD_LIBS_ONLY": "YES"}
         if self._build_python():
-            variables["PYLENE_BUILD_PYTHON"] = "YES"
+            variables["ANONYMOUS_BUILD_PYTHON"] = "YES"
         else:
             self.output.warn(
                 "fPIC disabled. Skipping python bindings build...")
@@ -159,31 +163,31 @@ class Pylene(ConanFile):
 
     def package_info(self):
         self.cpp_info.builddirs = ["cmake"]
-        self.cpp_info.set_property("cmake_target_name", "pylene::pylene")
+        self.cpp_info.set_property("cmake_target_name", "anonymous::anonymous")
 
         # Core component
         self.cpp_info.components["core"].requires = [
             "range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
-        self.cpp_info.components["core"].libs = ["Pylene-core"]
+        self.cpp_info.components["core"].libs = ["Anonymous-core"]
 
         # Scribo component
         self.cpp_info.components["scribo"].requires = ["core", "eigen::eigen3"]
-        self.cpp_info.components["scribo"].libs = ["Pylene-scribo"]
+        self.cpp_info.components["scribo"].libs = ["Anonymous-scribo"]
 
         # IO component (FreeImage)
         self.cpp_info.components["io-freeimage"].requires = ["core",
                                                              "freeimage::FreeImage"]
-        self.cpp_info.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp_info.components["io-freeimage"].libs = ["Anonymous-io-freeimage"]
 
         # IO component (cfitsio)
         self.cpp_info.components["io-fits"].requires = ["core",
                                                         "cfitsio::cfitsio"]
-        self.cpp_info.components["io-fits"].libs = ["Pylene-io-fits"]
+        self.cpp_info.components["io-fits"].libs = ["Anonymous-io-fits"]
 
-        # Pylene-numpy component
+        # Anonymous-numpy component
         if self._build_python():
-            self.cpp_info.components["pylene-numpy"].requires = ["core"]
-            self.cpp_info.components["pylene-numpy"].libs = ["Pylene-numpy"]
+            self.cpp_info.components["anonymous-numpy"].requires = ["core"]
+            self.cpp_info.components["anonymous-numpy"].libs = ["Anonymous-numpy"]
 
         v = tools.Version(self.settings.compiler.version)
         for comp in self.cpp_info.components:

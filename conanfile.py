@@ -47,12 +47,7 @@ class Anonymous(ConanFile):
         "shared": False,
         "fPIC": False,
         "gtest:shared": False,
-        "freeimage:shared": True,
-        # OIIO options
-        "openimageio:shared": True,
-        "openimageio:with_opencolorio": False,
-        "openimageio:with_opencv": False,
-        "openimageio:with_ffmpeg": False,
+        "freeimage:shared": True
     }
     default_options.update({"boost:without_{}".format(
         bl): True for bl in BOOST_CONFIGURE_OPTIONS})
@@ -74,7 +69,6 @@ class Anonymous(ConanFile):
         "boost/1.78.0",
         "cfitsio/4.1.0",
         "freeimage/3.18.0",
-        "openimageio/2.3.7.2",
         "openjpeg/2.5.0"  # To solve dependency conflict between freeimage and openimageio
     ]
 

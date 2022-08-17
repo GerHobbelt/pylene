@@ -7,7 +7,6 @@ find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
-find_package(OpenImageIO REQUIRED)
 find_package(Eigen3 3.3.9)
 find_package(cfitsio)
 

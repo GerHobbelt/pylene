@@ -123,7 +123,7 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   pixel_type pixel(point_type);
   pixel_type pixel_at(point_type);
 
-  struct pixel_range
+  struct pixel_range : ::ranges::view_base
   {
     const pixel_type* begin();
     const pixel_type* end();
@@ -131,7 +131,7 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   pixel_range pixels();
 
 
-  struct value_range
+  struct value_range : ::ranges::view_base
   {
     const value_type* begin();
     const value_type* end();

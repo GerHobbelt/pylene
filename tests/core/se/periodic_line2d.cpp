@@ -1,5 +1,7 @@
 #include <mln/core/se/periodic_line2d.hpp>
 
+#include <range/v3/range/conversion.hpp>
+
 #include <mln/core/concepts/structuring_element.hpp>
 #include <gtest/gtest.h>
 
@@ -19,7 +21,7 @@ TEST(Core, periodic_line2d)
   std::vector<mln::point2d> expected_before_offsets = {{+2, -2}, {+1, -1}};
   std::vector<mln::point2d> expected_after_offsets  = {{-1, +1}, {-2, +2}};
 
-  EXPECT_EQ(expected_offsets, ::ranges::to_vector(line2d(mln::point2d{0, 0})));
-  EXPECT_EQ(expected_before_offsets, ::ranges::to_vector(line2d.before(mln::point2d{0, 0})));
-  EXPECT_EQ(expected_after_offsets, ::ranges::to_vector(line2d.after(mln::point2d{0, 0})));
+  EXPECT_EQ(expected_offsets, ::ranges::to<std::vector>(line2d(mln::point2d{0, 0})));
+  EXPECT_EQ(expected_before_offsets, ::ranges::to<std::vector>(line2d.before(mln::point2d{0, 0})));
+  EXPECT_EQ(expected_after_offsets, ::ranges::to<std::vector>(line2d.after(mln::point2d{0, 0})));
 }

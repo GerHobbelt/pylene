@@ -311,7 +311,7 @@ TEST(CvxHull, image)
 
   auto res      = cvxhull.to_result();
   auto expected = std::vector<mln::point2d>{{1, 1}, {2, 1}, {4, 2}, {1, 3}, {2, 4}, {4, 4}};
-  std::ranges::sort(res);
+  std::sort(res.begin(), res.end());
   ASSERT_EQ(res, expected);
 }
 

@@ -46,12 +46,13 @@ namespace mln::morpho
     };
 
     template <typename I, typename O, typename N>
-    std::vector<std::vector<std::pair<int, image_value_t<I>>>> watershed_rag(I input, O output, N nbh, int& nlabel)
+    std::vector<std::vector<std::pair<int, image_value_t<I>>>> watershed_rag(I input, O output, N nbh, int& nlabel, bool markers=false)
     {
       using V = image_value_t<I>;
       using P = image_point_t<I>;
 
-      nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>()) + 1;
+      if (!markers)
+        nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>()) + 1;
 
       std::vector<std::vector<std::pair<int, image_value_t<I>>>> rag(nlabel);
 
@@ -120,7 +121,7 @@ namespace mln::morpho
         for (auto [out, w] : rag[in])
           flatten_graph.emplace_back(in, out, w);
       }
-      std::ranges::sort(flatten_graph, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
+      std::sort(flatten_graph.begin(), flatten_graph.end(), [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
 
       // Kruskal
       mst_waterfall_visitor viz;
@@ -133,7 +134,7 @@ namespace mln::morpho
     template <typename N>
     component_tree<int> waterfall_from_mst(std::vector<std::tuple<int, int, int>>& mst, int n_vertices, N& nm)
     {
-      std::ranges::sort(mst, [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
+      std::sort(mst.begin(), mst.end(), [](const auto& a, const auto& b) { return std::get<2>(a) < std::get<2>(b); });
 
       waterfall_bpt_visitor viz;
       mln::morpho::canvas::kruskal(mst.data(), static_cast<int>(mst.size()), n_vertices, viz);
@@ -178,6 +179,32 @@ namespace mln::morpho
       }
       return {std::move(t), output};
     }
+
+    template <typename I, typename S, typename N>
+    std::pair<component_tree<int>, image_ch_value_t<I, int>> waterfall_from_markers(I input, S seeds, N nbh)
+    {
+      int nlabels;
+      auto                   output = mln::labeling::blobs<int>(seeds, nbh, nlabels);
+
+      const auto process = [&input, &nbh, &nlabels](auto output) {
+        const auto rag  = details::watershed_rag(input, output, nbh, nlabels, true);
+        auto       mst  = details::mst_waterfall(rag);
+        return details::waterfall_from_mst(mst, nlabels, output);
+      };
+
+      component_tree<int> t;
+      if (output.border() < nbh.radial_extent())
+      {
+        t = process(output);
+      }
+      else
+      {
+        mln::trace::warn("[Performance] The extension is not wide enough");
+        auto out = view::value_extended(output, -1);
+        t        = process(out);
+      }
+      return {std::move(t), output};
+    }
   } // namespace impl
 
   template <typename I, typename N>
@@ -189,5 +216,19 @@ namespace mln::morpho
     mln_entering("mln::morpho::waterfall");
 
     return impl::waterfall(ima, nbh);
+  }
+
+  template <typename I, typename S, typename N>
+  auto waterfall_from_markers(I ima, S seeds, N nbh)
+  {
+    static_assert(mln::is_a_v<I, mln::details::Image>);
+    static_assert(mln::is_a_v<S, mln::details::Image>);
+    static_assert(mln::is_a_v<N, mln::details::Neighborhood>);
+
+    assert(ima.domain() == seeds.domain());
+
+    mln_entering("mln::morpho::waterfall_from_markers");
+
+    return impl::waterfall_from_markers(ima, seeds, nbh);
   }
 } // namespace mln::morpho

@@ -35,7 +35,7 @@ class Pylene(ConanFile):
         "fmt/6.0.0",
         "tbb/2020.0",
         "xsimd/7.4.6",
-        "eigen/3.3.9",
+        "eigen/3.4.0",
         "boost/1.75.0",
         "cfitsio/4.0.0",
         "freeimage/3.18.0@lrde/stable"

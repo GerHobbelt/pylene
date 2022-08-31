@@ -62,3 +62,44 @@ Example
     * - Original image
       - Watershed segmentation on the gradient of the original image  
       - Waterfall horizontal cut at level 4
+
+.. cpp:function::  template <typename I, typename S, typename N> \
+                   auto waterfall_from_markers(I ima, S seeds, N nbh)
+
+    Implementation of the waterfall from user defined markers (instead of local minima
+    in the previous implementation).
+
+   :param ima: The input image
+   :param seeds: Image of markers
+   :param nbh: The neighborhood relationship considered to build the watershed segmentation
+   :return: A pair `(tree, node_map)` where `tree` is the hierarchical
+    representation of the Waterfall and `node_map` is a mapping from a point of
+    the image to a node of the tree. This node map is usually the initial
+    watershed segmentation.
+
+.. code-block::
+
+    // (1) Get an image
+    mln::image2d<std::uint8_t> input = ...;
+
+    // (2) Get the image of markers
+    mln::image2d<std::uint8_t> markers = ...;
+
+    // (3) Compute the gradient (here using the morphological gradient)
+    auto grad = mln::morpho::gradient(input, mln::se::disc(3));
+
+    // (4) Compute the waterfall hierarchy
+    auto [t, nodemap] = mln::morpho::waterfall_from_markers(grad, markers, mln::c8);
+
+    // (5) Compute the cut at level 4
+    t.horizontal_cut(4, nodemap);
+
+.. list-table::
+
+    * -
+      -
+      -
+
+    * - Original image
+      - Markers image
+      - Waterfall horizontal cut at level 4

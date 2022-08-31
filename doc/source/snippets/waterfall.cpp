@@ -59,23 +59,39 @@ int main(int argc, char* argv[])
   using namespace mln::view::ops;
   if (argc < 5)
   {
-    std::cerr << "Usage: " << argv[0] << " threshold input output_watershed output_segmentation\n";
+    std::cerr << "Usage: " << argv[0] << " threshold input output_watershed output_segmentation [seeds]\n";
     return 1;
   }
   int         threshold = std::atoi(argv[1]);
   std::string input_filename(argv[2]);
   std::string output_watershed(argv[3]);
   std::string output_segmentation_filename(argv[4]);
+  bool        from_markers = argc >= 6;
 
   // Reading the input image
   mln::image2d<std::uint8_t> input;
   mln::io::imread(input_filename, input);
 
-  // Computing the gradient
-  auto grad = mln::morpho::gradient(input, mln::se::disc(3));
+  mln::image2d<int> nodemap;
+  mln::morpho::component_tree<int> t;
 
-  // Computing the waterfall
-  auto [t, nodemap] = mln::morpho::waterfall(grad, mln::c8);
+  // Computing the gradient
+  //auto grad = mln::morpho::gradient(input, mln::se::disc(3));
+
+
+  if (from_markers)
+  {
+    mln::image2d<std::uint8_t> markers;
+    std::string seeds_filename(argv[5]);
+    mln::io::imread(seeds_filename, markers);
+
+    std::tie(t, nodemap) = mln::morpho::waterfall_from_markers(input, markers, mln::c8);
+  }
+  else
+  {
+    // Computing the waterfall
+    std::tie(t, nodemap) = mln::morpho::waterfall(input, mln::c8);
+  }
 
   // Save the watershed
   mln::io::imsave(mln::view::transform(nodemap, [](auto x) { return regions_lut(x); }), output_watershed);

@@ -96,10 +96,20 @@ Example
 
 .. list-table::
 
-    * -
-      -
-      -
+    * - .. image:: /images/lena_gray.jpg
+           :width: 100%
+
+      - .. image:: /images/lena_seeds.png
+           :width: 100%
 
     * - Original image
       - Markers image
-      - Waterfall horizontal cut at level 4
+
+    * - .. image:: /images/waterfall_seed_nodemap.png
+           :width: 100%
+
+      - .. image:: /images/waterfall_seed_cut.png
+           :width: 100%
+
+    * - Watershed from markers
+      - Waterfall horizontal cut at level 1

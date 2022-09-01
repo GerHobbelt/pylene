@@ -185,6 +185,7 @@ namespace mln::morpho
     {
       int nlabels;
       auto                   output = mln::labeling::blobs<int>(seeds, nbh, nlabels);
+      nlabels += 1;
 
       const auto process = [&input, &nbh, &nlabels](auto output) {
         const auto rag  = details::watershed_rag(input, output, nbh, nlabels, true);

@@ -113,3 +113,27 @@ TEST(Morpho, waterfall_c8_2)
   ASSERT_EQ(t.parent, parent_ref);
   ASSERT_EQ(t.values, values_ref);
 }
+
+TEST(Morpho, waterfall_from_markers_c4)
+{
+  const mln::image2d<std::uint8_t> ima{
+    {8, 0, 5, 4, 7, 1},
+    {8, 0, 5, 4, 6, 2},
+    {4, 1, 8, 4, 7, 2},
+    {3, 2, 6, 3, 8, 1}
+  };
+
+  const mln::image2d<std::uint8_t> seeds{
+    {0, 1, 0, 0, 0, 1},
+    {0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 0, 0},
+    {0, 1, 0, 1, 0, 1},
+  };
+
+  const auto [t, n] = mln::morpho::waterfall_from_markers(ima, seeds, mln::c4);
+}
+
+TEST(Morpho, waterfall_from_markers_c8)
+{
+  
+}

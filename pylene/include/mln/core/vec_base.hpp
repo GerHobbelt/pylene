@@ -4,33 +4,18 @@
 #include <mln/core/config.hpp>
 #include <mln/core/literal/vectorial.hpp>
 
-#include <boost/type_traits/promote.hpp>
-#include <boost/utility.hpp>
-
 #include <iostream>
 #include <type_traits>
 
-
-// FIXME:
-// replace boost::common_type by c++11 decltype for type broadcasting
-// replace boost::enable_if by c++11 std::enable_if
-// add specialization for std::is_arithmetic de <type_traits>
-
-// Visual studio specific warning
-#ifdef _MSC_VER
-#pragma warning(disable : 4701)
-#endif
-
-#define VEC_BASE_ENABLE_IF(Trait, R) typename std::enable_if<vec_base_traits<tag>::Trait, R>::type
-
-#define VEC_BASE_ENABLE_IFC(Trait, R)                                                                                  \
-  typename std::enable_if<vec_base_traits<tag>::Trait and std::is_convertible<T, U>::value, R>::type
+#define VEC_BASE_REQUIRES_CONVERTIBLE(Trait)                                                                           \
+  requires(vec_base_traits<tag>::Trait && std::is_convertible_v<T, U>)
 
 // Element-wise operator
 // Ex: vector u,v,w;
 // w = u + v; <=> w[i] = u[i] + v[i] forall i
 #define VEC_BASE_GEN_EW_OP(Trait, Op)                                                                                  \
-  template <typename U, typename = typename std::enable_if<vec_base_traits<tag>::Trait, U>::type>                      \
+  template <typename U>                                                                                                \
+  requires (vec_base_traits<tag>::Trait)                                                                               \
   vec_base& operator Op(const vec_base<U, dim, tag>& o)                                                                \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
@@ -42,7 +27,8 @@
 // Ex: vector u, v; scalar a;
 // u = v + a; <=> u[i] = v[i] + a forall i
 #define VEC_BASE_GEN_EXT_OP(Trait, Op)                                                                                 \
-  template <typename U, typename = typename std::enable_if<vec_base_traits<tag>::Trait, U>::type>                      \
+  template <typename U>                                                                                                \
+  requires(vec_base_traits<tag>::Trait)                                                                                \
   vec_base& operator Op(const U& o)                                                                                    \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
@@ -54,7 +40,8 @@
 // Ex: vector u, v;
 // u < v iif u[i] = v[i] forall i
 #define VEC_BASE_GEN_REL(Trait, Op)                                                                                    \
-  template <typename U, typename = typename std::enable_if<vec_base_traits<tag>::Trait, U>::type>                      \
+  template <typename U>                                                                                                \
+  requires(vec_base_traits<tag>::Trait)                                                                                \
   bool operator Op(const vec_base<U, dim, tag>& o) const                                                               \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
@@ -68,7 +55,8 @@
 // u op v iif u[i] op v[i] forall i
 #define VEC_BASE_GEN_REL_ALL(Trait, Op)                                                                                \
   template <typename U>                                                                                                \
-  typename std::enable_if<vec_base_traits<tag>::Trait, bool>::type operator Op(const vec_base<U, dim, tag>& o) const   \
+  requires(vec_base_traits<tag>::Trait)                                                                                \
+  bool operator Op(const vec_base<U, dim, tag>& o) const                                                               \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       if (!(v_[i] Op o[i]))                                                                                            \
@@ -81,7 +69,8 @@
 // u op v iif exists i u[i] op v[i]
 #define VEC_BASE_GEN_REL_ANY(Trait, Op)                                                                                \
   template <typename U>                                                                                                \
-  typename std::enable_if<vec_base_traits<tag>::Trait, bool>::type operator Op(const vec_base<U, dim, tag>& o) const   \
+  requires(vec_base_traits<tag>::Trait)                                                                                \
+  bool operator Op(const vec_base<U, dim, tag>& o) const                                                               \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       if (v_[i] Op o[i])                                                                                               \
@@ -92,8 +81,8 @@
 // Outside class, Element-wise operator
 #define VEC_BASE_GEN_EW_OP_EXT(TraitName, Op)                                                                          \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
-  typename std::enable_if<vec_base_traits<tag>::TraitName,                                                             \
-                          vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>>::type inline            \
+  requires(vec_base_traits<tag>::TraitName)                                                                            \
+  vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>inline                                            \
       operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                      \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
@@ -106,8 +95,8 @@
 // Outside class, Relational operator
 #define VEC_BASE_GEN_EXT_OP_EXT(TraitName, Op)                                                                         \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
-  typename boost::lazy_enable_if_c<vec_base_traits<tag>::TraitName && std::is_convertible<U, T>::value,                \
-                                   vec_base_helper<std::common_type<T, U>, dim, tag>>::type inline                     \
+  requires(vec_base_traits<tag>::TraitName && std::is_convertible_v<U, T>)                                             \
+  vec_base_helper_t<std::common_type<T, U>, dim, tag> inline                                                             \
       operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                          \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
@@ -118,8 +107,8 @@
   }                                                                                                                    \
                                                                                                                        \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
-  typename boost::lazy_enable_if_c<vec_base_traits<tag>::TraitName && std::is_convertible<U, T>::value,                \
-                                   vec_base_helper<std::common_type<T, U>, dim, tag>>::type inline                     \
+  requires(vec_base_traits<tag>::TraitName && std::is_convertible<U, T>::value)                                        \
+  vec_base_helper_t<std::common_type<T, U>, dim, tag> inline                                                           \
       operator Op(const U& y, const vec_base<T, dim, tag>& x)                                                          \
   {                                                                                                                    \
     typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
@@ -148,8 +137,11 @@ namespace mln
     template <typename T, unsigned dim, typename tag>
     struct vec_base_helper
     {
-      typedef vec_base<typename T::type, dim, tag> type;
+      using type = vec_base<typename T::type, dim, tag>;
     };
+
+    template <typename T, unsigned dim, typename tag>
+    using vec_base_helper_t = vec_base_helper<T, dim, tag>::type;
 
     template <int... N>
     struct Seq
@@ -164,7 +156,7 @@ namespace mln
     template <int... S>
     struct genseq<1, S...>
     {
-      typedef Seq<0, S...> type;
+      using type = Seq<0, S...>;
     };
 
     template <typename T, unsigned dim, typename tag>
@@ -321,8 +313,8 @@ namespace mln
 
       /* RELATIONAL */
       template <typename U>
-      VEC_BASE_ENABLE_IFC(is_equality_comparable, bool)
-      operator==(const vec_base<U, dim, tag>& o) const
+      VEC_BASE_REQUIRES_CONVERTIBLE(is_equality_comparable)
+      bool operator==(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (!(v_[i] == o[i]))
@@ -331,8 +323,8 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_ENABLE_IFC(is_equality_comparable, bool)
-      operator!=(const vec_base<U, dim, tag>& o) const
+      VEC_BASE_REQUIRES_CONVERTIBLE(is_equality_comparable)
+      bool operator!=(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (v_[i] != o[i])
@@ -341,8 +333,8 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
-      operator<(const vec_base<U, dim, tag>& o) const
+      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      bool operator<(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (v_[i] < o[i])
@@ -353,8 +345,8 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
-      operator<=(const vec_base<U, dim, tag>& o) const
+      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      bool operator<=(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (v_[i] < o.v_[i])
@@ -365,15 +357,15 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
-      operator>(const vec_base<U, dim, tag>& o) const
+      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      bool operator>(const vec_base<U, dim, tag>& o) const
       {
         return not(*this <= o);
       }
 
       template <typename U>
-      VEC_BASE_ENABLE_IFC(is_less_than_comparable, bool)
-      operator>=(const vec_base<U, dim, tag>& o) const
+      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      bool operator>=(const vec_base<U, dim, tag>& o) const
       {
         return not(*this < o);
       }
@@ -410,20 +402,11 @@ namespace mln
         return v_[N];
       }
 
-#if defined(WIN32) && !defined(__MINGW32__)
-#pragma warning(push)
-#pragma warning(disable : 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
-#endif
-
       template <unsigned N>
       constexpr T& get()
       {
         return v_[N];
       }
-
-#if defined(WIN32) && !defined(__MINGW32__)
-#pragma warning(pop)
-#endif
 
     private:
       template <size_t N, class T2, unsigned dim2, typename tag2>
@@ -525,16 +508,3 @@ namespace std
     typedef mln::internal::vec_base<typename std::common_type<T1, T2>::type, dim, Tag> type;
   };
 } // namespace std
-
-namespace boost
-{
-  template <typename T, unsigned dim, typename tag>
-  struct promote<mln::internal::vec_base<T, dim, tag>>
-  {
-    typedef mln::internal::vec_base<typename boost::promote<T>::type, dim, tag> type;
-  };
-} // namespace boost
-
-#ifdef _MSC_VER
-#pragma warning(default : 4701)
-#endif

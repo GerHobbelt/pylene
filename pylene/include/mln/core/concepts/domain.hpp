@@ -5,6 +5,8 @@
 #include <mln/core/concepts/range.hpp>
 
 #include <mln/core/range/type_traits.hpp>
+
+#include <concepts>
 #include <type_traits>
 
 
@@ -20,9 +22,9 @@ namespace mln::concepts
     mln::ranges::mdrange<Dom> &&
     Point<mln::ranges::mdrange_value_t<Dom>> &&
     requires(const Dom cdom, mln::ranges::mdrange_value_t<Dom> p) {
-    { cdom.has(p) }   -> ::concepts::same_as<bool>;
-    { cdom.empty() }  -> ::concepts::same_as<bool>;
-    { cdom.dim() }    -> ::concepts::same_as<int>;
+    { cdom.has(p) }   -> std::same_as<bool>;
+    { cdom.empty() }  -> std::same_as<bool>;
+    { cdom.dim() }    -> std::same_as<int>;
     };
 
 
@@ -31,7 +33,7 @@ namespace mln::concepts
   concept SizedDomain =
     Domain<Dom> &&
     requires(const Dom cdom) {
-    { cdom.size() } -> ::concepts::unsigned_integral;
+    { cdom.size() } -> std::unsigned_integral;
     };
 
   // ShapedDomain

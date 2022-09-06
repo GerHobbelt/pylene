@@ -6,7 +6,8 @@
 #include <mln/core/private/traits/extension.hpp>
 
 #include <mln/core/range/view/transform.hpp>
-#include <concepts/concepts.hpp>
+
+#include <concepts>
 
 namespace mln
 {
@@ -57,7 +58,7 @@ namespace mln
     template <class I>
     mirror_extended_view<I> mirror_extended(I image)
     {
-      static_assert(::concepts::convertible_to<image_domain_t<I>, mln::Box>,
+      static_assert(std::convertible_to<image_domain_t<I>, mln::Box>,
                     "Clamp requires image to be defined over a regular box domain");
       return mirror_extended_view<I>{std::move(image)};
     }

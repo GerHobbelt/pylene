@@ -85,7 +85,7 @@
   vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>inline                                            \
       operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                      \
   {                                                                                                                    \
-    typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
+    using R = vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>;                                     \
     R                                                                           r;                                     \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = x[i] Op y[i];                                                                                             \
@@ -96,10 +96,10 @@
 #define VEC_BASE_GEN_EXT_OP_EXT(TraitName, Op)                                                                         \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
   requires(vec_base_traits<tag>::TraitName && std::is_convertible_v<U, T>)                                             \
-  vec_base_helper_t<std::common_type<T, U>, dim, tag> inline                                                             \
+  vec_base_helper_t<std::common_type<T, U>, dim, tag> inline                                                           \
       operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                          \
   {                                                                                                                    \
-    typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
+    using R = vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>;                                     \
     R                                                                           r;                                     \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = x[i] Op y;                                                                                                \
@@ -141,23 +141,7 @@ namespace mln
     };
 
     template <typename T, unsigned dim, typename tag>
-    using vec_base_helper_t = vec_base_helper<T, dim, tag>::type;
-
-    template <int... N>
-    struct Seq
-    {
-    };
-
-    template <int n, int... S>
-    struct genseq : genseq<n - 1, n - 1, S...>
-    {
-    };
-
-    template <int... S>
-    struct genseq<1, S...>
-    {
-      using type = Seq<0, S...>;
-    };
+    using vec_base_helper_t = typename vec_base_helper<T, dim, tag>::type;
 
     template <typename T, unsigned dim, typename tag>
     struct vec_base
@@ -166,20 +150,17 @@ namespace mln
       friend struct vec_base;
 
     public:
-      typedef T                               value_type;
-      typedef T*                              pointer;
-      typedef T&                              reference;
-      typedef T*                              iterator;
-      typedef const T*                        const_iterator;
-      typedef std::reverse_iterator<T*>       reverse_iterator;
-      typedef std::reverse_iterator<const T*> const_reverse_iterator;
-      typedef size_t                          size_type;
-      typedef ptrdiff_t                       difference_type;
+      using value_type = T;
+      using pointer = T*;
+      using reference = T&;
+      using iterator = T*;
+      using const_iterator = const T*;
+      using reverse_iterator = std::reverse_iterator<T*>;
+      using const_reverse_iterator = std::reverse_iterator<const T*>;
+      using size_type = size_t;
+      using difference_type = std::ptrdiff_t;
 
-      enum
-      {
-        ndim = dim
-      };
+      static constexpr unsigned ndim = dim;
 
       vec_base() = default;
 
@@ -207,7 +188,7 @@ namespace mln
 
       // explicit
       constexpr vec_base(const T& x)
-        : vec_base(x, typename genseq<dim>::type())
+        : vec_base(x, std::make_integer_sequence<int, dim>{})
       {
       }
 
@@ -417,7 +398,7 @@ namespace mln
       friend constexpr T2&& get(vec_base<T2, dim2, tag2>&&);
 
       template <int... N>
-      constexpr vec_base(const T& x, Seq<N...>)
+      constexpr vec_base(const T& x, std::integer_sequence<int, N...>)
         : v_{__copy<N>(x)...}
       {
       }

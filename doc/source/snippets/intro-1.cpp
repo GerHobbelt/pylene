@@ -16,7 +16,7 @@
 template <class I, class N>
 requires (mln::concepts::Image<I> &&
           mln::concepts::Neighborhood<N, mln::image_point_t<I>> &&
-          ::concepts::unsigned_integral<mln::image_value_t<I>>)
+          std::unsigned_integral<mln::image_value_t<I>>)
 auto chain_1(I input, N nbh, int lambda)
 {
   using V = mln::image_value_t<I>;
@@ -35,7 +35,7 @@ auto chain_1(I input, N nbh, int lambda)
 template <class I, class N>
 requires (mln::concepts::Image<I> &&
           mln::concepts::Neighborhood<N, mln::image_point_t<I>> &&
-          ::concepts::unsigned_integral<mln::image_value_t<I>>)
+          std::unsigned_integral<mln::image_value_t<I>>)
 auto chain_2(I input, N nbh, int lambda)
 {
   using V = mln::image_value_t<I>;

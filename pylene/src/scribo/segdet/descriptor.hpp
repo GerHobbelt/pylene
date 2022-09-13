@@ -36,6 +36,8 @@ namespace scribo::internal
     float sigma_luminosity_min;
 
     // EXTRACTION
+    SEGDET_PROCESS_EXTRACTION_ENUM extraction_type;
+    int   gradient_threshold;
     int   max_llum;
     int   max_max_llum;
     int   max_thickness;

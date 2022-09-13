@@ -18,6 +18,12 @@ namespace scribo
     BLACK_TOP_HAT, ///< Black-Top-Hat with specific filter size and dynamic
   };
 
+  enum class SEGDET_PROCESS_EXTRACTION_ENUM
+  {
+    BINARY,   ///< Binary extraction with threshold
+    GRADIENT, ///< Gradient extraction with threshold
+  };
+
   /**
    * @brief SEGDET_PROCESS_TRACKING_ENUM Precise which tracker is used
    */
@@ -49,7 +55,8 @@ namespace scribo
     SEGDET_PREPROCESS_ENUM             preprocess = SEGDET_PREPROCESS_ENUM::NONE;         ///< Preprocess applied
     SEGDET_PROCESS_TRACKING_ENUM       tracker    = SEGDET_PROCESS_TRACKING_ENUM::KALMAN; ///< Tracker used
     SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode =
-        SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL; ///< Traversal performed
+        SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL;                             ///< Traversal performed
+    SEGDET_PROCESS_EXTRACTION_ENUM extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY; ///< Extraction type for observations
 
     float dyn                          = 0.6f;  ///< Dynamic when Black-Top-Hat preprocess is applied
     int   size_mask                    = 11;    ///< Filter size when Black-Top-Hat preprocess is applied
@@ -75,9 +82,10 @@ namespace scribo
     float sigma_thickness_min  = 0.64f; ///< Minimum thickness variance value
     float sigma_luminosity_min = 13.f;  ///< Minimum luminosity variance value
 
-    int   max_llum     = 225; ///< First threshold for observation extraction
-    int   max_max_llum = 225; ///< Second threshold for observation extraction
-    float ratio_lum    = 1.f; ///< Ratio of kept luminosity in observation extraction
+    int   gradient_threshold = 30;  ///< Gradient threshold when gradient preprocess is applied
+    int   max_llum           = 225; ///< First threshold for observation ternary extraction
+    int   max_max_llum       = 225; ///< Second threshold for observation ternary extraction
+    float ratio_lum          = 1.f; ///< Ratio of kept luminosity in observation extraction
 
     int max_thickness = 100; ///< Max allowed (vertical|horizontal) thickness of segment to detect
 

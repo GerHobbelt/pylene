@@ -104,8 +104,9 @@ namespace scribo::internal
       return false;
     }
 
-    if (n_max < min || max < n_min) // TODO: Check cette condition | Garder pour les zones connexes, mais peut
-                                    // être trop contraignante
+    if (descriptor.extraction_type == SEGDET_PROCESS_EXTRACTION_ENUM::BINARY &&
+        (n_max < min || max < n_min)) // TODO: Check cette condition | Garder pour les zones connexes, mais peut
+                                      // être trop contraignante
       return false;
 
     return accepts_sigma(X_predicted(0, 0), obs(0, 0), sigma_position) &&
@@ -158,7 +159,7 @@ namespace scribo::internal
   void Filter_impl::integrate(int t, const Descriptor& descriptor)
   {
     const auto& observation_non_opt = observation.value();
-    const auto& obs = observation_non_opt.obs;
+    const auto& obs                 = observation_non_opt.obs;
 
     if (observation_non_opt.match_count != 1)
       same_observation.push_back(observation_non_opt.id * observation_non_opt.t);

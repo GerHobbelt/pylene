@@ -28,10 +28,12 @@ namespace scribo::internal
     sigma_thickness_min      = params.sigma_thickness_min;
     sigma_luminosity_min     = params.sigma_luminosity_min;
 
-    max_llum      = params.max_llum;
-    max_max_llum  = params.max_max_llum;
-    max_thickness = params.max_thickness;
-    ratio_lum     = params.ratio_lum;
+    extraction_type    = params.extraction_type;
+    gradient_threshold = params.gradient_threshold;
+    max_llum           = params.max_llum;
+    max_max_llum       = params.max_max_llum;
+    max_thickness      = params.max_thickness;
+    ratio_lum          = params.ratio_lum;
 
     filter_type                  = params.tracker;
     double_exponential_alpha     = params.double_exponential_alpha;

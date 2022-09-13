@@ -19,5 +19,7 @@ namespace scribo::internal
 
     void predict();
     void integrate(int t, const Descriptor& descriptor);
+
+    size_t get_position();
   };
 } // namespace scribo::internal

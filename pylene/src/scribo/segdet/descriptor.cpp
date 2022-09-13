@@ -33,11 +33,13 @@ namespace scribo::internal
     max_thickness = params.max_thickness;
     ratio_lum     = params.ratio_lum;
 
-    filter_type = params.tracker;
+    filter_type                  = params.tracker;
+    double_exponential_alpha     = params.double_exponential_alpha;
+    simple_moving_average_memory = params.simple_moving_average_memory;
+
 
     threshold_intersection = params.threshold_intersection;
-    remove_duplicates =
-        params.remove_duplicates && (traversal_mode == scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL);
-    this->min_length = min_length;
+    remove_duplicates      = params.remove_duplicates;
+    this->min_length       = min_length;
   }
 } // namespace scribo::internal

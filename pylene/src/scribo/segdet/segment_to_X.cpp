@@ -117,6 +117,4 @@ namespace scribo::internal
 
     return ret;
   }
-
-
 } // namespace scribo::internal

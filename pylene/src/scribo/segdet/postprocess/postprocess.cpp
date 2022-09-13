@@ -129,7 +129,7 @@ namespace scribo::internal
   {
     auto pair = std::make_pair(hsegments, vsegments);
 
-    if (descriptor.remove_duplicates)
+    if (descriptor.remove_duplicates && descriptor.traversal_mode == scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL)
       remove_duplicates(pair, img_width, img_height, descriptor);
 
     auto segments = filter_length(pair, descriptor);

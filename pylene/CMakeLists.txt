@@ -143,6 +143,10 @@ if (Eigen3_FOUND)
           src/scribo/segdet/process/process.cpp
           src/scribo/segdet/process/trackers/kalman.cpp
           src/scribo/segdet/process/trackers/kalman_leplumey.cpp
+          src/scribo/segdet/process/trackers/one_euro.cpp
+          src/scribo/segdet/process/trackers/double_exponential.cpp
+          src/scribo/segdet/process/trackers/simple_moving_average.cpp
+          src/scribo/segdet/process/trackers/last_integration.cpp
           src/scribo/segdet/postprocess/postprocess.cpp
           src/scribo/segdet/preprocess/preprocess.cpp
           src/scribo/segdet/segdet.cpp

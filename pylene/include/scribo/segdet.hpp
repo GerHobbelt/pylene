@@ -23,8 +23,12 @@ namespace scribo
    */
   enum class SEGDET_PROCESS_TRACKING_ENUM
   {
-    KALMAN,          ///< Kalman Filters following classics prediction and correction
-    KALMAN_LEPLUMEY, ///< Kalman Filters by Leplumey as understood
+    KALMAN,               ///< Kalman Filters following classics prediction and correction
+    KALMAN_LEPLUMEY,      ///< Kalman Filters by Leplumey as understood
+    ONE_EURO,             ///< One Euro Filter (modification from Nicolas Roussel code)
+    DOUBLE_EXPONENTIAL,   ///< Double exponential Filter
+    LAST_INTEGRATION,     ///< Last observation predictor
+    SIMPLE_MOVING_AVERAGE ///< Simple moving average predictor
   };
 
   /**
@@ -47,8 +51,11 @@ namespace scribo
     SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode =
         SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL; ///< Traversal performed
 
-    float dyn       = 0.6f; ///< Dynamic when Black-Top-Hat preprocess is applied
-    int   size_mask = 11;   ///< Filter size when Black-Top-Hat preprocess is applied
+    float dyn                          = 0.6f;  ///< Dynamic when Black-Top-Hat preprocess is applied
+    int   size_mask                    = 11;    ///< Filter size when Black-Top-Hat preprocess is applied
+    float double_exponential_alpha     = 0.6f;  ///< Alpha used in double exponential filter if chosen
+    float simple_moving_average_memory = 30.0f; ///< Memory used in simple moving average filter if chosen
+
     int bucket_size = 30; ///< Bucket size during traversal
 
     int nb_values_to_keep = 30; ///< Memory of filter to compute variances for the matching

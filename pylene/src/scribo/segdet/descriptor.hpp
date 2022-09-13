@@ -43,7 +43,8 @@ namespace scribo::internal
 
     // MODULE
     SEGDET_PROCESS_TRACKING_ENUM filter_type;
-
+    float                        double_exponential_alpha;
+    float                        simple_moving_average_memory;
 
     /// POSTPROCESS
     bool  remove_duplicates;

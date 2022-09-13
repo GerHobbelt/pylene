@@ -3,7 +3,6 @@
 
 namespace scribo::internal
 {
-
   MemoryLinearRegressor::MemoryLinearRegressor(float x0, float y0, int memory)
     : count(0)
     , memory(memory)
@@ -55,5 +54,4 @@ namespace scribo::internal
     }
     n += 1;
   }
-
 } // namespace mln::contrib::segdet

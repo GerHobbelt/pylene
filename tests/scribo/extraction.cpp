@@ -28,7 +28,7 @@ void test_extract_observations(std::vector<Eigen::Matrix<float, 3, 1>>& ref, con
   }
 }
 
-TEST(Segdet, no_observation_binary)
+TEST(Segdet, binary_none)
 {
   using namespace scribo;
   using namespace scribo::internal;
@@ -48,4 +48,164 @@ TEST(Segdet, no_observation_binary)
   params.max_llum        = GREY_WHITE;
 
   test_extract_observations(ref, image, params);
+}
+
+TEST(Segdet, binary_odd)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = WHITE;
+    image({1, 0})                    = BLACK;
+    image({2, 0})                    = BLACK;
+    image({3, 0})                    = BLACK;
+    image({4, 0})                    = WHITE;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+    ref.push_back(Eigen::Matrix<float, 3, 1>(2, 3, BLACK));
+
+    auto params            = SegDetParams();
+    params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+    params.max_max_llum    = GREY_WHITE;
+    params.max_llum        = GREY_WHITE;
+
+    test_extract_observations(ref, image, params);
+}
+
+TEST(Segdet, binary_even_end)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = WHITE;
+    image({1, 0})                    = BLACK;
+    image({2, 0})                    = BLACK;
+    image({3, 0})                    = BLACK;
+    image({4, 0})                    = BLACK;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+    ref.push_back(Eigen::Matrix<float, 3, 1>(2, 4, BLACK));
+
+    auto params            = SegDetParams();
+    params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+    params.max_max_llum    = GREY_WHITE;
+    params.max_llum        = GREY_WHITE;
+
+    test_extract_observations(ref, image, params);
+}
+
+TEST(Segdet, binary_multiple)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = BLACK;
+    image({1, 0})                    = BLACK;
+    image({2, 0})                    = WHITE;
+    image({3, 0})                    = BLACK;
+    image({4, 0})                    = BLACK;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+    ref.push_back(Eigen::Matrix<float, 3, 1>(0, 2, BLACK));
+    ref.push_back(Eigen::Matrix<float, 3, 1>(3, 2, GREY));
+
+    auto params            = SegDetParams();
+    params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+    params.max_max_llum    = GREY_WHITE;
+    params.max_llum        = GREY_WHITE;
+
+    test_extract_observations(ref, image, params);
+}
+
+TEST(Segdet, binary_even_begin)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = BLACK;
+    image({1, 0})                    = BLACK;
+    image({2, 0})                    = BLACK;
+    image({3, 0})                    = BLACK;
+    image({4, 0})                    = WHITE;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+    ref.push_back(Eigen::Matrix<float, 3, 1>(1, 4, BLACK));
+
+    auto params            = SegDetParams();
+    params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+    params.max_max_llum    = GREY_WHITE;
+    params.max_llum        = GREY_WHITE;
+
+    test_extract_observations(ref, image, params);
+}
+
+TEST(Segdet, gradient_none)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = WHITE;
+    image({1, 0})                    = WHITE;
+    image({2, 0})                    = WHITE;
+    image({3, 0})                    = WHITE;
+    image({4, 0})                    = WHITE;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+
+    auto params               = SegDetParams();
+    params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+    params.gradient_threshold = GREY_WHITE;
+
+    test_extract_observations(ref, image, params);
+}
+
+TEST(Segdet, gradient_two)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = WHITE;
+    image({1, 0})                    = BLACK;
+    image({2, 0})                    = BLACK;
+    image({3, 0})                    = BLACK;
+    image({4, 0})                    = WHITE;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+    ref.push_back(Eigen::Matrix<float, 3, 1>(1, 1, BLACK));
+    ref.push_back(Eigen::Matrix<float, 3, 1>(3, 1, BLACK));
+
+    auto params               = SegDetParams();
+    params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+    params.gradient_threshold = GREY_WHITE;
+
+    test_extract_observations(ref, image, params);
+}
+
+
+TEST(Segdet, gradient_two_size)
+{
+    using namespace scribo;
+    using namespace scribo::internal;
+
+    mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
+    image({0, 0})                    = WHITE;
+    image({1, 0})                    = GREY;
+    image({2, 0})                    = BLACK;
+    image({3, 0})                    = WHITE;
+    image({4, 0})                    = WHITE;
+
+    std::vector<Eigen::Matrix<float, 3, 1>> ref;
+    ref.push_back(Eigen::Matrix<float, 3, 1>(3, 1, GREY - WHITE));
+
+    auto params               = SegDetParams();
+    params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+    params.gradient_threshold = 32;
+
+    test_extract_observations(ref, image, params);
 }

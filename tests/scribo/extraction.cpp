@@ -18,7 +18,7 @@ void test_extract_observations(std::vector<Eigen::Matrix<float, 3, 1>>& ref, con
                                const scribo::SegDetParams& params)
 {
   auto descriptor = scribo::internal::Descriptor(params, 0);
-  auto output     = scribo::internal::extract_observations(image, 0, image.height(), descriptor);
+  auto output     = scribo::internal::extract_observations(image, 0, image.width(), descriptor);
 
   EXPECT_EQ(output.size(), ref.size());
   for (size_t i = 0; i < output.size(); i++)
@@ -35,10 +35,10 @@ TEST(Segdet, binary_none)
 
   mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
   image({0, 0})                    = WHITE;
-  image({1, 0})                    = WHITE;
-  image({2, 0})                    = WHITE;
-  image({3, 0})                    = WHITE;
-  image({4, 0})                    = WHITE;
+  image({0, 1})                    = WHITE;
+  image({0, 2})                    = WHITE;
+  image({0, 3})                    = WHITE;
+  image({0, 4})                    = WHITE;
 
   std::vector<Eigen::Matrix<float, 3, 1>> ref;
 
@@ -57,10 +57,10 @@ TEST(Segdet, binary_odd)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = WHITE;
-    image({1, 0})                    = BLACK;
-    image({2, 0})                    = BLACK;
-    image({3, 0})                    = BLACK;
-    image({4, 0})                    = WHITE;
+    image({0, 1})                    = BLACK;
+    image({0, 2})                    = BLACK;
+    image({0, 3})                    = BLACK;
+    image({0, 4})                    = WHITE;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
     ref.push_back(Eigen::Matrix<float, 3, 1>(2, 3, BLACK));
@@ -80,13 +80,13 @@ TEST(Segdet, binary_even_end)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = WHITE;
-    image({1, 0})                    = BLACK;
-    image({2, 0})                    = BLACK;
-    image({3, 0})                    = BLACK;
-    image({4, 0})                    = BLACK;
+    image({0, 1})                    = BLACK;
+    image({0, 2})                    = BLACK;
+    image({0, 3})                    = BLACK;
+    image({0, 4})                    = BLACK;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
-    ref.push_back(Eigen::Matrix<float, 3, 1>(2, 4, BLACK));
+    ref.push_back(Eigen::Matrix<float, 3, 1>(2.5f, 4, BLACK));
 
     auto params            = SegDetParams();
     params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
@@ -103,14 +103,14 @@ TEST(Segdet, binary_multiple)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = BLACK;
-    image({1, 0})                    = BLACK;
-    image({2, 0})                    = WHITE;
-    image({3, 0})                    = BLACK;
-    image({4, 0})                    = BLACK;
+    image({0, 1})                    = BLACK;
+    image({0, 2})                    = WHITE;
+    image({0, 3})                    = BLACK;
+    image({0, 4})                    = BLACK;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
-    ref.push_back(Eigen::Matrix<float, 3, 1>(0, 2, BLACK));
-    ref.push_back(Eigen::Matrix<float, 3, 1>(3, 2, GREY));
+    ref.push_back(Eigen::Matrix<float, 3, 1>(0.5f, 2, BLACK));
+    ref.push_back(Eigen::Matrix<float, 3, 1>(3.5f, 2, GREY));
 
     auto params            = SegDetParams();
     params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
@@ -127,13 +127,13 @@ TEST(Segdet, binary_even_begin)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = BLACK;
-    image({1, 0})                    = BLACK;
-    image({2, 0})                    = BLACK;
-    image({3, 0})                    = BLACK;
-    image({4, 0})                    = WHITE;
+    image({0, 1})                    = BLACK;
+    image({0, 2})                    = BLACK;
+    image({0, 3})                    = BLACK;
+    image({0, 4})                    = WHITE;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
-    ref.push_back(Eigen::Matrix<float, 3, 1>(1, 4, BLACK));
+    ref.push_back(Eigen::Matrix<float, 3, 1>(1.5f, 4, BLACK));
 
     auto params            = SegDetParams();
     params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
@@ -150,10 +150,10 @@ TEST(Segdet, gradient_none)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = WHITE;
-    image({1, 0})                    = WHITE;
-    image({2, 0})                    = WHITE;
-    image({3, 0})                    = WHITE;
-    image({4, 0})                    = WHITE;
+    image({0, 1})                    = WHITE;
+    image({0, 2})                    = WHITE;
+    image({0, 3})                    = WHITE;
+    image({0, 4})                    = WHITE;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
 
@@ -171,10 +171,10 @@ TEST(Segdet, gradient_two)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = WHITE;
-    image({1, 0})                    = BLACK;
-    image({2, 0})                    = BLACK;
-    image({3, 0})                    = BLACK;
-    image({4, 0})                    = WHITE;
+    image({0, 1})                    = BLACK;
+    image({0, 2})                    = BLACK;
+    image({0, 3})                    = BLACK;
+    image({0, 4})                    = WHITE;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
     ref.push_back(Eigen::Matrix<float, 3, 1>(1, 1, BLACK));
@@ -195,10 +195,10 @@ TEST(Segdet, gradient_two_size)
 
     mln::image2d<std::uint8_t> image = mln::image2d<std::uint8_t>(5, 1);
     image({0, 0})                    = WHITE;
-    image({1, 0})                    = GREY;
-    image({2, 0})                    = BLACK;
-    image({3, 0})                    = WHITE;
-    image({4, 0})                    = WHITE;
+    image({0, 1})                    = GREY;
+    image({0, 2})                    = BLACK;
+    image({0, 3})                    = WHITE;
+    image({0, 4})                    = WHITE;
 
     std::vector<Eigen::Matrix<float, 3, 1>> ref;
     ref.push_back(Eigen::Matrix<float, 3, 1>(3, 1, GREY - WHITE));

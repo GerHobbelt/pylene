@@ -1,17 +1,10 @@
 #include "extract_observation.hpp"
 
 #include <numeric>
+#include <iostream>
 
 namespace scribo::internal
 {
-
-  template <typename T>
-  float mean(std::vector<T> array, int start, int end)
-  {
-    auto it_end = end == 0 ? array.end() : array.begin() + end;
-    return std::accumulate(array.begin() + start, it_end, 0.0) / static_cast<double>(array.size());
-  }
-
   /**
    * Determine the observation Matrix
    * @param image
@@ -24,56 +17,43 @@ namespace scribo::internal
   Eigen::Matrix<float, 3, 1> determine_observation(const mln::image2d<uint8_t>& image, int& n, int t, int n_max,
                                                    const Descriptor& descriptor)
   {
-    int thickness = 0;
-    int n_max_lum = 0;
+    int ithickness = 0;
 
-    std::vector<std::uint16_t> luminosities_list;
-    int                        lumi;
-
-    // n + thickess: current position in the n-th line
-    while (n + thickness < n_max && (lumi = (int)image({t, n + thickness})) < descriptor.max_max_llum)
+    std::vector<float> luminosities_list;
+    int                min_iluminosity = 255;
+    int                sum_iluminosity = 0;
+    while (n + ithickness < n_max)
     {
-      luminosities_list.push_back(lumi);
+      int iluminosity = static_cast<int>(image({t, n + ithickness}));
+      if (iluminosity > descriptor.max_max_llum)
+        break;
 
-      if (lumi < luminosities_list[n_max_lum])
-        n_max_lum = thickness;
+      if (iluminosity < min_iluminosity)
+        min_iluminosity = iluminosity;
 
-      thickness += 1;
+      luminosities_list.push_back(iluminosity);
+      sum_iluminosity += iluminosity;
+      ithickness++;
     }
 
-    int n_to_skip = n + thickness;                // Position of the next n to work on
-    int max_lum   = luminosities_list[n_max_lum]; // Max luminosity of the current span
+    float medium_luminosity = min_iluminosity + (descriptor.max_max_llum - min_iluminosity) * descriptor.ratio_lum;
+    int   n_min_observation = n;
+    while (luminosities_list[n_min_observation - n] > medium_luminosity)
+      sum_iluminosity -= luminosities_list[n_min_observation++ - n];
 
-    // m_lum : max_luminosity of what is accepted in the span
-    int  m_lum   = max_lum + (descriptor.max_max_llum - max_lum) * descriptor.ratio_lum;
-    auto n_start = n;             // n_start is AT LEAST n
-    int  n_end   = n + thickness; // n_end is AT MOST n + thickness
+    int n_max_observation = n + ithickness;
+    while (luminosities_list[--n_max_observation - n] > medium_luminosity)
+      sum_iluminosity -= luminosities_list[n_max_observation - n];
 
-    if (n_end == n_max) // In case we stopped because of outOfBound value
-      n_end--;
+    float position   = (n_max_observation + n_min_observation) / 2.0f;
+    float thickness  = n_max_observation - n_min_observation + 1.0f;
+    float luminosity = sum_iluminosity / thickness;
 
-    while (luminosities_list[n - n_start] > m_lum)
-      n += 1;
+    auto ret = Eigen::Matrix<float, 3, 1>(position, thickness, luminosity);
 
-    while (image({t, n_end}) > m_lum)
-      n_end--;
+    n += ithickness;
 
-    n_end++;
-
-    thickness    = n_end - n;
-    int position = n + thickness / 2;
-
-    if (n_end - n > (int)luminosities_list.size())
-    {
-      thickness--;
-      n_end--;
-      position = n + thickness / 2;
-    }
-    const float mean_value = mean(luminosities_list, n - n_start, n_end - n_start);
-
-    n = n_to_skip; // Setting reference value of n
-
-    return Eigen::Matrix<float, 3, 1>(position, thickness, mean_value);
+    return ret;
   }
 
   std::vector<Eigen::Matrix<float, 3, 1>> extract_observations(const mln::image2d<uint8_t>& image, int t, int n_max,
@@ -85,8 +65,12 @@ namespace scribo::internal
     {
     case SEGDET_PROCESS_EXTRACTION_ENUM::BINARY:
       for (int n = 0; n < n_max; n++)
+      {
         if (image({t, n}) < descriptor.max_llum)
+        {
           observations.push_back(determine_observation(image, n, t, n_max, descriptor));
+        }
+      }
       break;
     case SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT:
       for (int n = 1; n < n_max - 1; n++)
@@ -97,7 +81,8 @@ namespace scribo::internal
           while (n + size + 1 < n_max &&
                  std::abs(image({t, n + size - 1}) - image({t, n + size + 1})) > descriptor.gradient_threshold)
             size++;
-          observations.push_back(Eigen::Matrix<float, 3, 1>(n + size / 2, 1, 1));
+          observations.push_back(
+              Eigen::Matrix<float, 3, 1>(n + size / 2, size, image({t, n + size - 1}) - image({t, n + size + 1})));
         }
       }
     }

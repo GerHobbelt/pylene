@@ -199,6 +199,8 @@ TEST(Segdet, line_detect_2_cross_noise)
   params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  params.max_llum      = 180;
+  params.max_max_llum  = 180;
 
   auto output = detect_line_span(img, 10, params);
 
@@ -420,7 +422,7 @@ TEST(Segdet, bucket_size_dividor)
   mln::image2d<std::uint8_t> img  = pair.first;
   segdet_output              ref  = pair.second;
 
-  auto params          = SegDetParams();
+  auto params        = SegDetParams();
   params.bucket_size = 100 / 2;
 
   auto output = detect_line_span(img, 10, params);
@@ -434,7 +436,7 @@ TEST(Segdet, bucket_size_higher_one_bucket)
   mln::image2d<std::uint8_t> img  = pair.first;
   segdet_output              ref  = pair.second;
 
-  auto params          = SegDetParams();
+  auto params        = SegDetParams();
   params.bucket_size = 100 * 2;
 
   auto output = detect_line_span(img, 10, params);

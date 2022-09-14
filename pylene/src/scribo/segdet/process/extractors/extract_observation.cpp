@@ -1,7 +1,7 @@
 #include "extract_observation.hpp"
 
-#include <numeric>
 #include <iostream>
+#include <numeric>
 
 namespace scribo::internal
 {
@@ -14,8 +14,8 @@ namespace scribo::internal
    * @param is_horizontal
    * @return Observation Eigen matrix
    */
-  Eigen::Matrix<float, 3, 1> determine_observation(const mln::image2d<uint8_t>& image, int& n, int t, int n_max,
-                                                   const Descriptor& descriptor)
+  Eigen::Matrix<float, 3, 1> determine_observation_binary(const mln::image2d<uint8_t>& image, int& n, int t, int n_max,
+                                                          const Descriptor& descriptor)
   {
     int ithickness = 0;
 
@@ -56,6 +56,35 @@ namespace scribo::internal
     return ret;
   }
 
+  Eigen::Matrix<float, 3, 1> determine_observation_gradient(const mln::image2d<uint8_t>& image, int& n, int t,
+                                                            int n_max, const Descriptor& descriptor)
+  {
+    int gradient_sign = static_cast<int>(image({t, n + 1})) - static_cast<int>(image({t, n - 1})) < 0 ? -1 : 1;
+
+    int ithickness = 1;
+    while (n + ithickness + 1 < n_max)
+    {
+      int gradient =
+          static_cast<int>(image({t, (n + ithickness) + 1})) - static_cast<int>(image({t, (n + ithickness) - 1}));
+      if (gradient * gradient_sign < descriptor.gradient_threshold)
+        break;
+
+      ithickness++;
+    }
+
+    int grad = static_cast<int>(image({t, n + ithickness})) - static_cast<int>(image({t, n - 1}));
+
+    float position   = (n - 1 + n + ithickness) / 2.0f;
+    float thickness  = ithickness;
+    float luminosity = grad;
+
+    auto ret = Eigen::Matrix<float, 3, 1>(position, thickness, luminosity);
+
+    n += ithickness;
+
+    return ret;
+  }
+
   std::vector<Eigen::Matrix<float, 3, 1>> extract_observations(const mln::image2d<uint8_t>& image, int t, int n_max,
                                                                const Descriptor& descriptor)
   {
@@ -68,23 +97,20 @@ namespace scribo::internal
       {
         if (image({t, n}) < descriptor.max_llum)
         {
-          observations.push_back(determine_observation(image, n, t, n_max, descriptor));
+          observations.push_back(determine_observation_binary(image, n, t, n_max, descriptor));
         }
       }
       break;
     case SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT:
-      for (int n = 1; n < n_max - 1; n++)
+      for (int n = 1; n < (n_max - 1); n++)
       {
-        if (std::abs(image({t, n - 1}) - image({t, n + 1})) > descriptor.gradient_threshold)
+        if (std::abs(static_cast<int>(image({t, n - 1})) - static_cast<int>(image({t, n + 1}))) >
+            descriptor.gradient_threshold)
         {
-          int size = 1;
-          while (n + size + 1 < n_max &&
-                 std::abs(image({t, n + size - 1}) - image({t, n + size + 1})) > descriptor.gradient_threshold)
-            size++;
-          observations.push_back(
-              Eigen::Matrix<float, 3, 1>(n + size / 2, size, image({t, n + size - 1}) - image({t, n + size + 1})));
+          observations.push_back(determine_observation_gradient(image, n, t, n_max, descriptor));
         }
       }
+      break;
     }
 
     return observations;

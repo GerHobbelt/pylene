@@ -7,8 +7,6 @@ namespace scribo::internal
 {
   struct Descriptor;
 
-  static constexpr int undefined_slop = 360;
-
   /**
    * Compute the standard deviation of the diven vector
    * @tparam T The type of a vector

@@ -46,8 +46,8 @@ namespace scribo::internal
     , reg(t_integration, obs(0, 0))
   {
     first    = t_integration;
-    t_values = std::vector<int>({t_integration});
-    n_values = std::vector<int>({static_cast<int>(obs(0, 0))});
+    t_values = std::vector<float>({static_cast<float>(t_integration)});
+    n_values = std::vector<float>({obs(0, 0)});
 
     thicknesses  = std::vector<float>({obs(1, 0)});
     luminosities = std::vector<float>({obs(2, 0)});

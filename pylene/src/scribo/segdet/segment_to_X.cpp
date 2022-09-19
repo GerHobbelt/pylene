@@ -46,25 +46,31 @@ namespace scribo::internal
   void draw_labeled_span(image2d<uint16_t>& img, std::uint16_t label, Span span, bool is_horizontal,
                          std::vector<LSuperposition>& superpositions, uint16_t max_label)
   {
-    int thickness = span.thickness / 2;
-    int is_odd    = span.thickness % 2;
+    float thickness_d2 = static_cast<float>(span.thickness) / 2.0f;
 
     if (is_horizontal)
     {
-      for (int i = -thickness; i < thickness + is_odd; i++)
+      int i_min  = std::ceil(span.y - thickness_d2);
+      int i_max  = std::floor(span.y + thickness_d2);
+
+      int height = img.size(1);
+
+      for (int i = i_min; i <= i_max; i++)
       {
-        int y = span.y + i;
-        if (0 <= y && y < img.size(1))
-          draw_labeled_pixel(img, label, span.x, y, superpositions, max_label);
+        if (0 <= i && i < height)
+          draw_labeled_pixel(img, label, span.x, i, superpositions, max_label);
       }
     }
     else
     {
-      for (int i = -thickness; i < thickness + is_odd; i++)
+      int i_min = std::ceil(span.x - thickness_d2);
+      int i_max = std::floor(span.x + thickness_d2);
+      int width = img.size(0);
+
+      for (int i = i_min; i <= i_max; i++)
       {
-        int x = span.x + i;
-        if (0 <= x && x < img.size(0))
-          draw_labeled_pixel(img, label, x, span.y, superpositions, max_label);
+        if (0 <= i && i < width)
+          draw_labeled_pixel(img, label, i, span.y, superpositions, max_label);
       }
     }
   }
@@ -108,10 +114,10 @@ namespace scribo::internal
     for (const auto& seg : segs)
     {
       VSegment vseg = {.label = label_counter++,
-                       .x0    = seg.first_span.x,
-                       .y0    = seg.first_span.y,
-                       .x1    = seg.last_span.x,
-                       .y1    = seg.last_span.y};
+                       .x0    = static_cast<int>(seg.first_span.x),
+                       .y0    = static_cast<int>(seg.first_span.y),
+                       .x1    = static_cast<int>(seg.last_span.x),
+                       .y1    = static_cast<int>(seg.last_span.y)};
       ret.push_back(vseg);
     }
 

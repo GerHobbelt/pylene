@@ -32,8 +32,8 @@ namespace scribo::internal
   {
     int first; // t value of first integration
 
-    std::vector<int>   t_values; // t values of SEGDET_NB_VALUES_TO_KEEP last integrations
-    std::vector<int>   n_values;
+    std::vector<float>   t_values; // t values of SEGDET_NB_VALUES_TO_KEEP last integrations
+    std::vector<float>   n_values;
     std::vector<float> thicknesses;
     std::vector<float> luminosities;
 
@@ -51,8 +51,8 @@ namespace scribo::internal
     Eigen::Matrix<float, 3, 1> X_predicted;
 
     std::optional<Observation>
-                     observation; // matrix {{position (n)},{thickness},{luminosity}}, nullopt if none was matched
-    int              observation_distance; // n distance from last observation to current prediction
+                        observation; // matrix {{position (n)},{thickness},{luminosity}}, nullopt if none was matched
+    int                 observation_distance; // n distance from last observation to current prediction
     std::vector<size_t> same_observation;
 
     int last_integration; // t value referring to the position of the last integration

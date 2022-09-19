@@ -26,32 +26,31 @@ namespace scribo::internal
     return a;
   }
 
-  void MemoryLinearRegressor::push(size_t x, size_t y)
+  void MemoryLinearRegressor::push(float x, float y)
   {
     count    = std::min(memory, n);
-    auto f_x = (float)x;
-    auto f_y = (float)y;
     if (n < memory)
     {
-      Y.push_back(f_y);
-      X.push_back(f_x);
-      Sy  = Sy + f_y;
-      Sx  = Sx + f_x;
-      Sxx = Sxx + f_x * f_x;
-      Sxy = Sxy + f_x * f_y;
+      Y.push_back(y);
+      X.push_back(x);
+      Sy  = Sy + y;
+      Sx  = Sx + x;
+      Sxx = Sxx + x * x;
+      Sxy = Sxy + x * y;
     }
     else
     {
       int   i     = n % memory;
       float old_y = Y[i];
       float old_x = X[i];
-      Sy          = Sy - old_y + f_y;
-      Sx          = Sx - old_x + f_x;
-      Sxy         = Sxy - old_x * old_y + f_y * f_x;
-      Sxx         = Sxx - old_x * old_x + f_x * f_x;
-      Y[i]        = f_y;
-      X[i]        = f_x;
+      Sy          = Sy - old_y + y;
+      Sx          = Sx - old_x + x;
+      Sxy         = Sxy - old_x * old_y + y * x;
+      Sxx         = Sxx - old_x * old_x + x * x;
+      Y[i]        = y;
+      X[i]        = x;
     }
+    
     n += 1;
   }
 } // namespace mln::contrib::segdet

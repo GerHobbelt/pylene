@@ -22,6 +22,7 @@ Input
 
 .. doxygenenum:: scribo::SEGDET_PREPROCESS_ENUM
 .. doxygenenum:: scribo::SEGDET_PROCESS_TRACKING_ENUM
+.. doxygenenum:: scribo::SEGDET_PROCESS_EXTRACTION_ENUM
 .. doxygenenum:: scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM
 
 .. doxygenstruct:: scribo::SegDetParams

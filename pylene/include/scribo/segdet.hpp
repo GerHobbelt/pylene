@@ -55,8 +55,9 @@ namespace scribo
     SEGDET_PREPROCESS_ENUM             preprocess = SEGDET_PREPROCESS_ENUM::NONE;         ///< Preprocess applied
     SEGDET_PROCESS_TRACKING_ENUM       tracker    = SEGDET_PROCESS_TRACKING_ENUM::KALMAN; ///< Tracker used
     SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode =
-        SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL;                             ///< Traversal performed
-    SEGDET_PROCESS_EXTRACTION_ENUM extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY; ///< Extraction type for observations
+        SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL; ///< Traversal performed
+    SEGDET_PROCESS_EXTRACTION_ENUM extraction_type =
+        SEGDET_PROCESS_EXTRACTION_ENUM::BINARY; ///< Extraction type for observations
 
     float dyn                          = 0.6f;  ///< Dynamic when Black-Top-Hat preprocess is applied
     int   size_mask                    = 11;    ///< Filter size when Black-Top-Hat preprocess is applied

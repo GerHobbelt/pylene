@@ -34,8 +34,6 @@ namespace scribo::internal
 
   void KalmanLeplumey::predict()
   {
-    save_last_slope = S(1, 0);
-
     S           = A * S + W;
     X_predicted = C * S;
 
@@ -52,6 +50,7 @@ namespace scribo::internal
     const auto& obs = observation.value().obs;
 
     float save_last_intergration = last_integration;
+    save_last_slope = S(1, 0);
 
     const auto H_Ct = H * C_transpose;
     const auto G    = H_Ct * (C * H_Ct + Vn).inverse();
@@ -60,10 +59,10 @@ namespace scribo::internal
 
     float current_slope = S(1, 0);
 
+    Filter_impl::integrate(t, descriptor);
+
     float second_derivative = (save_last_slope - current_slope) / (save_last_intergration - t);
     W(0, 0)                 = 0.5 * second_derivative;
     W(1, 0)                 = second_derivative;
-
-    Filter_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

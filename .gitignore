@@ -12,3 +12,4 @@ compile_commands.json
 .nfs*
 .history
 CMakeUserPresets.json
+.vscode

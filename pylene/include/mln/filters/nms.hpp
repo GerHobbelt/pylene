@@ -65,13 +65,13 @@ namespace mln::filters
           if (vec.size() < static_cast<std::size_t>(num_peaks))
           {
             vec.push_back(px_v.point());
-            std::ranges::push_heap(vec, cmp);
+            std::push_heap(vec.begin(), vec.end(), cmp);
           }
           else if (px_v.val() > input(vec[0]))
           {
-            std::ranges::pop_heap(vec, cmp);
+            std::pop_heap(vec.begin(), vec.end(), cmp);
             vec.back() = px_v.point();
-            std::ranges::push_heap(vec, cmp);
+            std::push_heap(vec.begin(), vec.end(), cmp);
           }
 
         }
@@ -81,7 +81,7 @@ namespace mln::filters
     if (nms_image)
       *nms_image = std::move(dil);
 
-    std::ranges::sort_heap(vec, cmp);
+    std::sort_heap(vec.begin(), vec.end(), cmp);
     return vec;
   }
 

@@ -263,8 +263,7 @@ namespace scribo::internal
 
       if (f.impl->observation != std::nullopt)
       {
-        if (descriptor.remove_duplicates &&
-            f.impl->same_observation.size() >= static_cast<size_t>(descriptor.minimum_for_fusion) &&
+        if (f.impl->same_observation.size() >= static_cast<size_t>(descriptor.minimum_for_fusion) &&
             make_potential_fusion(filters, fi, segments, descriptor))
           continue;
 

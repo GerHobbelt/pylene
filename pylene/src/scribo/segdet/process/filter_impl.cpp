@@ -62,9 +62,9 @@ namespace scribo::internal
     n_min = 0;
     n_max = 0;
 
-    sigma_position   = descriptor.default_sigma_position;
-    sigma_thickness  = descriptor.default_sigma_thickness;
-    sigma_luminosity = descriptor.default_sigma_luminosity;
+    sigma_position   = descriptor.default_sigma_position * 3;
+    sigma_thickness  = descriptor.default_sigma_thickness * 3;
+    sigma_luminosity = descriptor.default_sigma_luminosity * 3;
 
     X_predicted = Eigen::Matrix<float, 3, 1>::Zero();
 
@@ -75,9 +75,9 @@ namespace scribo::internal
   {
     if (static_cast<int>(n_values.size()) > descriptor.min_nb_values_sigma)
     {
-      sigma_position   = std(n_values) + descriptor.sigma_pos_min;
-      sigma_thickness  = std(thicknesses) * 2 + descriptor.sigma_thickness_min;
-      sigma_luminosity = std(luminosities) + descriptor.sigma_luminosity_min;
+      sigma_position   = (std(n_values) + descriptor.sigma_pos_min) * 3;
+      sigma_thickness  = (std(thicknesses) * 2 + descriptor.sigma_thickness_min) * 3;
+      sigma_luminosity = (std(luminosities) + descriptor.sigma_luminosity_min) * 3;
     }
   }
 
@@ -91,7 +91,7 @@ namespace scribo::internal
    */
   bool accepts_sigma(float prediction, float observation, float sigma)
   {
-    return abs(prediction - observation) <= 3 * sigma;
+    return abs(prediction - observation) <= sigma;
   }
 
   bool Filter_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max, const Descriptor& descriptor) const

@@ -47,7 +47,6 @@ namespace scribo::internal
 
   size_t Filter::get_position()
   {
-    return impl->n_values.back();
+    return static_cast<size_t>(impl->n_values.back());
   }
-
 } // namespace scribo::internal

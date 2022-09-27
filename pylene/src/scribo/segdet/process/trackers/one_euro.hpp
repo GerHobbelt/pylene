@@ -102,5 +102,4 @@ namespace scribo::internal
     void predict();
     void integrate(int t, const Descriptor& descriptor);
   };
-
 } // namespace scribo::internal

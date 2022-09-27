@@ -9,57 +9,13 @@
 #include <utility>
 
 #include "extractors/extract_observation.hpp"
+#include "bucket.hpp"
 
 namespace scribo::internal
 {
   static constexpr int   isolated_point  = 2;
   static constexpr int   slope_threshold = 10;
   static constexpr float slope_max       = 1.2f; // tan(50)
-
-  struct Buckets
-  {
-    const size_t bucket_size;
-    const size_t bucket_count;
-
-    std::vector<std::vector<Filter>> container;
-
-    Buckets(size_t n_max, const Descriptor& descriptor)
-      : bucket_size(std::min(static_cast<size_t>(descriptor.bucket_size), n_max))
-      , bucket_count(n_max / bucket_size + (n_max % bucket_size == 0 ? 0 : 1))
-    {
-      container = std::vector<std::vector<Filter>>();
-      for (size_t i = 0; i < bucket_count; i++)
-        container.push_back(std::vector<Filter>());
-    }
-
-    size_t get_bucket_number(size_t n)
-    {
-      return std::max(static_cast<size_t>(0), std::min(bucket_count - 1, n / bucket_size));
-    }
-
-    size_t get_bucket_number(Filter& f) { return get_bucket_number(f.get_position()); }
-
-    void insert(Filter&& filter) { container[get_bucket_number(filter)].push_back(std::move(filter)); }
-
-    void fill(std::vector<Filter>& filters)
-    {
-      for (auto& filter : filters)
-        insert(std::move(filter));
-      filters.clear();
-    }
-
-    void empty(std::vector<Filter>& filters)
-    {
-      for (size_t i = 0; i < bucket_count; i++)
-      {
-        for (size_t j = 0; j < container[i].size(); j++)
-          filters.push_back(std::move(container[i][j]));
-        container[i].clear();
-      }
-    }
-
-    std::vector<Filter>& get_bucket(size_t i) { return container[i]; }
-  };
 
   /**
    * Say if a value is between two other
@@ -77,7 +33,6 @@ namespace scribo::internal
                          const Eigen::Matrix<float, 3, 1>& obs, const int& t, int obs_thick, int obs_n_min,
                          int obs_n_max, const Descriptor& descriptor)
   {
-
     for (size_t i = 0; i < buckets.container[bucket].size(); i++)
     {
       Filter&& f = std::move(buckets.container[bucket][i]);

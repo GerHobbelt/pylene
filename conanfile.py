@@ -76,6 +76,7 @@ class Pylene(ConanFile):
         "cfitsio/4.1.0",
         "freeimage/3.18.0",
         "openimageio/2.3.7.2",
+        # "opencv/4.5.5",
         "openjpeg/2.5.0"  # To solve dependency conflict between freeimage and openimageio
     ]
 

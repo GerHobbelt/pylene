@@ -21,7 +21,9 @@ namespace scribo::internal
         , current_sum(value)
         , dividor(1)
       {
-        buffer = std::vector<float>({value});
+        buffer = std::vector<float>(memory);
+        std::fill(buffer.begin(), buffer.end(), 0);
+        buffer[0] = value;
       }
 
       float predict() { return current_sum / static_cast<float>(dividor); }

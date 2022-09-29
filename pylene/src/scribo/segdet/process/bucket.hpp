@@ -37,8 +37,7 @@ namespace scribo::internal
     {
       for (size_t i = 0; i < bucket_count; i++)
       {
-        for (size_t j = 0; j < container[i].size(); j++)
-          filters.push_back(std::move(container[i][j]));
+        filters.insert(filters.begin(), std::move_iterator(container[i].begin()), std::move_iterator(container[i].end()));
         container[i].clear();
       }
     }

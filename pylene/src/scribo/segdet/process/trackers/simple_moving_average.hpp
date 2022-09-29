@@ -41,9 +41,9 @@ namespace scribo::internal
     SimpleMovingAverageInside lumi;
 
     SimpleMovingAverage(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor);
-    ~SimpleMovingAverage() = default;
+    ~SimpleMovingAverage() override = default; 
 
-    void predict();
-    void integrate(int t, const Descriptor& descriptor);
+    void predict() override;
+    void integrate(int t, const Descriptor& descriptor) override;
   };
 } // namespace scribo::internal

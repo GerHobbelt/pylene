@@ -267,7 +267,7 @@ TEST(Segdet, line_detect_small_cross)
   expect_near(ref, output, abs_error);
 }
 
-TEST(Segdet, line_detect_small_cross_noise)
+TEST(Segdet, line_detect_small_cross_noise_kalman)
 {
   auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
   mln::image2d<std::uint8_t> img  = pair.first;
@@ -276,6 +276,7 @@ TEST(Segdet, line_detect_small_cross_noise)
 
   auto params          = SegDetParams();
   params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::KALMAN;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -302,7 +303,25 @@ TEST(Segdet, line_detect_small_cross_noise_leplumey)
   expect_near(ref, output, abs_error);
 }
 
-TEST(Segdet, line_detect_small_cross_noise_sma)
+// TEST(Segdet, line_detect_small_cross_noise_sma)
+// {
+//   auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+//   mln::image2d<std::uint8_t> img  = pair.first;
+//   segdet_output              ref  = pair.second;
+//   add_gaussian_noise_on_image(img, 100, 30, 4);
+
+//   auto params          = SegDetParams();
+//   params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+//   params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE;
+//   int max_dim          = std::max(img.height(), img.width());
+//   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+//   auto output          = detect_line_span(img, 10, params);
+
+//   auto abs_error = 2;
+//   expect_near(ref, output, abs_error);
+// }
+
+TEST(Segdet, line_detect_small_cross_noise_double_exp)
 {
   auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
   mln::image2d<std::uint8_t> img  = pair.first;
@@ -311,7 +330,44 @@ TEST(Segdet, line_detect_small_cross_noise_sma)
 
   auto params          = SegDetParams();
   params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE;
+  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::DOUBLE_EXPONENTIAL;
+  int max_dim          = std::max(img.height(), img.width());
+  params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  auto output          = detect_line_span(img, 10, params);
+
+  auto abs_error = 2;
+  expect_near(ref, output, abs_error);
+}
+
+TEST(Segdet, line_detect_small_cross_noise_last_observation)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+  add_gaussian_noise_on_image(img, 100, 30, 4);
+
+  auto params          = SegDetParams();
+  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::LAST_INTEGRATION;
+  int max_dim          = std::max(img.height(), img.width());
+  params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  auto output          = detect_line_span(img, 10, params);
+
+  auto abs_error = 2;
+  expect_near(ref, output, abs_error);
+}
+
+
+TEST(Segdet, line_detect_small_cross_noise_one_euro)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+  add_gaussian_noise_on_image(img, 100, 30, 4);
+
+  auto params          = SegDetParams();
+  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::ONE_EURO;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);

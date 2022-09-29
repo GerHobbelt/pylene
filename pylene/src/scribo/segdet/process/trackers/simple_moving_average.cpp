@@ -28,11 +28,8 @@ namespace scribo::internal
     thick.integrate(obs(1, 0));
     lumi.integrate(obs(2, 0));
 
-    std::cout << "a:" << current_slope << std::endl;
     Filter_impl::integrate(t, descriptor);
-    std::cout << "b:" << current_slope << std::endl;
-    // x_move.integrate(current_slope);
-    std::cout << "c:" << current_slope << std::endl;
-
+  
+    x_move.integrate(current_slope);
   }
 } // namespace scribo::internal

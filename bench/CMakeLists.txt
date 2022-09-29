@@ -66,6 +66,7 @@ add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
 add_benchmark(BMBufferPrimitives        BMBufferPrimitives.cpp)
 add_benchmark(BMAlphaTree               BMAlphaTree.cpp)
 add_benchmark(BMWatershedHierarchy      BMWatershedHierarchy.cpp)
+add_benchmark(BM_gpce2022_rebutal       BM_gpce2022_rebutal.cpp)
 
 find_package(OpenCV)
 

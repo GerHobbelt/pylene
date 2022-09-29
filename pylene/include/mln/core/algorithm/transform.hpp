@@ -1,10 +1,10 @@
 #pragma once
+#include <mln/core/assert.hpp>
 #include <mln/core/canvas/parallel_pointwise.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/range/rows.hpp>
 #include <mln/core/range/view/zip.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/assert.hpp>
 
 #include <range/v3/algorithm/transform.hpp>
 #include <range/v3/functional/concepts.hpp>
@@ -31,8 +31,9 @@ namespace mln
 
   template <class InputImage1, class InputImage2, class BinaryFunction>
   requires ::ranges::invocable<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>
-  image_ch_value_t<InputImage1, std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>>
-  transform(InputImage1 in1, InputImage2 in2, BinaryFunction f);
+      image_ch_value_t<InputImage1, std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>,
+                                                                      image_reference_t<InputImage2>>>>
+      transform(InputImage1 in1, InputImage2 in2, BinaryFunction f);
 
   template <class InputImage1, class InputImage2, class OutputImage, class BinaryFunction>
   requires ::ranges::invocable<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>
@@ -53,10 +54,10 @@ namespace mln
   requires ::ranges::invocable<UnaryFunction, image_reference_t<InputImage>>
   void transform(InputImage in, OutputImage out, UnaryFunction f)
   {
-    static_assert(mln::is_a<InputImage,  mln::details::Image>());
+    static_assert(mln::is_a<InputImage, mln::details::Image>());
     static_assert(mln::is_a<OutputImage, mln::details::Image>());
     static_assert(std::is_convertible_v<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>,
-                  image_value_t<OutputImage>>,
+                                        image_value_t<OutputImage>>,
                   "The result of the function is not implicitely convertible to the output image value type");
 
     mln_entering("mln::transform");
@@ -70,15 +71,17 @@ namespace mln
 
   template <class InputImage1, class InputImage2, class BinaryFunction>
   requires ::ranges::invocable<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>
-  image_ch_value_t<InputImage1, std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>>
-  transform(InputImage1 in1, InputImage2 in2, BinaryFunction f)
+      image_ch_value_t<InputImage1, std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>,
+                                                                      image_reference_t<InputImage2>>>>
+      transform(InputImage1 in1, InputImage2 in2, BinaryFunction f)
   {
     static_assert(mln::is_a<InputImage1, mln::details::Image>());
     static_assert(mln::is_a<InputImage2, mln::details::Image>());
 
     mln_entering("mln::transform");
 
-    using R = std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>;
+    using R = std::decay_t<
+        std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>;
     using O = image_ch_value_t<InputImage1, R>;
 
     // Check concretizable
@@ -115,8 +118,8 @@ namespace mln
 
   template <class InputImage, class UnaryFunction>
   requires ::ranges::invocable<UnaryFunction, image_reference_t<InputImage>>
-  image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
-  transform(InputImage in, UnaryFunction f)
+      image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
+      transform(InputImage in, UnaryFunction f)
   {
     static_assert(mln::is_a<InputImage, mln::details::Image>());
 
@@ -160,7 +163,6 @@ namespace mln
           , _fun{fun}
         {
         }
-
       };
 
       template <class Function, class InputImage1, class InputImage2, class OutputImage>
@@ -181,8 +183,8 @@ namespace mln
 
         void ExecuteTile(mln::box2d b) const final
         {
-          auto subimage_in1  = _in1.clip(b);
-          auto subimage_in2  = _in2.clip(b);
+          auto subimage_in1 = _in1.clip(b);
+          auto subimage_in2 = _in2.clip(b);
           auto subimage_out = _out.clip(b);
           mln::transform(subimage_in1, subimage_in2, subimage_out, _fun);
         }
@@ -195,14 +197,13 @@ namespace mln
           , _fun{fun}
         {
         }
-
       };
     } // namespace details
 
     template <class InputImage, class UnaryFunction>
     requires ::ranges::invocable<UnaryFunction, image_reference_t<InputImage>>
-    image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
-    transform(InputImage in, UnaryFunction f)
+        image_ch_value_t<InputImage, std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>>
+        transform(InputImage in, UnaryFunction f)
     {
       using R = std::decay_t<std::invoke_result_t<UnaryFunction, image_reference_t<InputImage>>>;
       using O = image_ch_value_t<InputImage, R>;
@@ -210,8 +211,9 @@ namespace mln
       // Check concretizable
       O out = imchvalue<R>(in);
 
-      details::TransformParallel caller(in, out, f);
-      parallel_execute2d(caller);
+      // details::TransformParallel caller(in, out, f);
+      // parallel_execute2d(caller);
+      mln::transform(in, out, f);
 
       return out;
     }
@@ -226,15 +228,17 @@ namespace mln
 
     template <class InputImage1, class InputImage2, class BinaryFunction>
     requires ::ranges::invocable<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>
-    image_ch_value_t<InputImage1, std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>>
-    transform(InputImage1 in1, InputImage2 in2, BinaryFunction f)
+        image_ch_value_t<InputImage1, std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>,
+                                                                        image_reference_t<InputImage2>>>>
+        transform(InputImage1 in1, InputImage2 in2, BinaryFunction f)
     {
       assert(in1.domain() == in2.domain());
-      using R = std::decay_t<std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>;
+      using R = std::decay_t<
+          std::invoke_result_t<BinaryFunction, image_reference_t<InputImage1>, image_reference_t<InputImage2>>>;
       using O = image_ch_value_t<InputImage1, R>;
 
       // Check concretizable
-      O out = imchvalue<R>(in1);
+      O                                      out = imchvalue<R>(in1);
       details::Transform_BinaryFunc_Parallel caller(in1, in2, out, f);
       parallel_execute2d(caller);
 

@@ -58,9 +58,9 @@ BENCHMARK_F(BMgpce2022_rebutal, labelize_view)(benchmark::State& st)
     auto input_thresholded = mln::view::transform(ima_grayscale, thresholding);
 
     // perform connected components labeling
-    // int  nlabel;
-    auto ima_ret = mln::morpho::erosion(input_thresholded, m_disc);
-    // auto ima_ret = mln::labeling::blobs<uint8_t>(input_thresholded, mln::c8, nlabel);
+    int nlabel;
+    // auto ima_ret = mln::morpho::erosion(input_thresholded, m_disc);
+    auto ima_ret = mln::labeling::blobs<uint8_t>(input_thresholded, mln::c8, nlabel);
     // auto ima_ret = mln::morpho::watershed<int16_t>(input_thresholded, mln::c8, nlabel);
 
     benchmark::DoNotOptimize(ima_ret);
@@ -83,9 +83,9 @@ BENCHMARK_F(BMgpce2022_rebutal, labelize_serial)(benchmark::State& st)
     auto input_thresholded = mln::transform(ima_grayscale, thresholding);
 
     // perform connected components labeling
-    // int  nlabel;
-    auto ima_ret = mln::morpho::erosion(input_thresholded, m_disc);
-    // auto ima_ret = mln::labeling::blobs<uint8_t>(input_thresholded, mln::c8, nlabel);
+    int nlabel;
+    // auto ima_ret = mln::morpho::erosion(input_thresholded, m_disc);
+    auto ima_ret = mln::labeling::blobs<uint8_t>(input_thresholded, mln::c8, nlabel);
     //  auto ima_ret = mln::morpho::watershed<int16_t>(input_thresholded, mln::c8, nlabel);
     benchmark::DoNotOptimize(ima_ret);
   }

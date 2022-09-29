@@ -7,7 +7,6 @@ find_package(TBB REQUIRED tbb)
 find_package(range-v3 0.10.0 REQUIRED)
 find_package(fmt 6.0 REQUIRED)
 find_package(xsimd REQUIRED)
-find_package(OpenImageIO REQUIRED)
 find_package(Eigen3 3.3.9)
 find_package(cfitsio)
 
@@ -113,12 +112,6 @@ target_include_directories(Pylene-io-freeimage PUBLIC
 )
 target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
 target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::freeimage)
-
-#add_library(Pylene-io-openimageio)
-#add_library(Pylene::IO-openimageio ALIAS Pylene-io-openimageio)
-#target_sources(Pylene-io-openimageio PRIVATE src/io/openimageio_plugin.cpp src/io/io.cpp)
-#target_link_libraries(Pylene-io-openimageio PRIVATE OpenImageIO::OpenImageIO)
-#target_link_libraries(Pylene-io-openimageio PUBLIC Pylene-core)
 
 #if (cfitsio_FOUND)
 #  add_library(Pylene-io-fits)

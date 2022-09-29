@@ -4,7 +4,7 @@ from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
 from conan.tools.layout import cmake_layout
 from conans.errors import ConanInvalidConfiguration
 
-# Boost options (not header only because of openimageio) (from CCI Boost conanfile.py without required options)
+# Boost options (from CCI Boost conanfile.py without required options)
 BOOST_CONFIGURE_OPTIONS = (
     "context",
     "contract",
@@ -48,11 +48,6 @@ class Pylene(ConanFile):
         "fPIC": False,
         "gtest:shared": False,
         "freeimage:shared": True,
-        # OIIO options
-        "openimageio:shared": True,
-        "openimageio:with_opencolorio": False,
-        "openimageio:with_opencv": False,
-        "openimageio:with_ffmpeg": False,
     }
     default_options.update({"boost:without_{}".format(
         bl): True for bl in BOOST_CONFIGURE_OPTIONS})
@@ -75,8 +70,6 @@ class Pylene(ConanFile):
         "boost/1.78.0",
         "cfitsio/4.1.0",
         "freeimage/3.18.0",
-        "openimageio/2.3.7.2",
-        "openjpeg/2.5.0"  # To solve dependency conflict between freeimage and openimageio
     ]
 
     def _build_python(self):

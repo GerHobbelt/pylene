@@ -3,10 +3,10 @@
 #include <mln/core/point.hpp>
 #include <mln/core/range/mdindex.hpp>
 
+#include <algorithm>
 #include <array>
 #include <type_traits>
-#include <algorithm>
-
+#include <vector>
 
 namespace mln
 {
@@ -894,7 +894,7 @@ namespace mln
     return q;
   }
 
-} // namespace mln
+} // namespace mln::
 
 
 // Specialization of std::common_reference

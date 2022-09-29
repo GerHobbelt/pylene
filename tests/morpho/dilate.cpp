@@ -22,26 +22,7 @@
 #include <tbb/task_scheduler_init.h>
 
 
-#include <experimental/simd>
-
-
 using namespace mln;
-
-struct sup_t
-{
-  template <class T>
-  T operator()(T x, T y) const
-  {
-    return mln::sup(x, y);
-  }
-
-  template <class T>
-  std::experimental::simd<T> operator()(std::experimental::simd<T> x, std::experimental::simd<T> y) const
-  {
-    return std::experimental::max(x, y);
-  }
-};
-
 
 void test_dilation_by_periodic_line(const mln::point2d& dp, int k)
 {
@@ -209,7 +190,6 @@ TEST(Dilation, Custom_cmp_function)
   ASSERT_TRUE(all_of(out <= ima)); // anti-extensive
 }
 */
-
 
 // Dilation of a binary image
 TEST(Dilation, Binary)

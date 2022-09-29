@@ -16,7 +16,7 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 add_library(Pylene-core)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene-core PRIVATE TBB::tbb)
+  target_link_libraries(Pylene-core PRIVATE tbb::tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
   target_compile_definitions(Pylene-core PRIVATE MLN_NO_TBB)
@@ -30,7 +30,7 @@ elseif (MSVC)
   target_compile_options(Pylene-core PUBLIC
     "/wd4275" # non dll-interface class '...' used as base for dll-interface (fmt lib)
     "/wd5104" # found 'L#x' in macro replacement list, did you mean
-    "/experimental:preprocessor"  # required by range-v3
+    "/Zc:preprocessor"  # required by range-v3
     "/permissive-" # required by range-v3
     )
 endif ()
@@ -111,7 +111,8 @@ target_include_directories(Pylene-io-freeimage PUBLIC
                            $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
-target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::freeimage)
+#target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::freeimage)
+target_link_libraries(Pylene-io-freeimage PRIVATE ${FreeImage_LIBRARIES})
 
 #if (cfitsio_FOUND)
 #  add_library(Pylene-io-fits)

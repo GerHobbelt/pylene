@@ -1,20 +1,18 @@
 #pragma once
 
-#include <mln/core/image/image.hpp>
-#include <mln/core/image/ndbuffer_image.hpp>
 #include <mln/core/image/ndimage_fwd.hpp>
+#include <mln/core/image/ndbuffer_image.hpp>
+#include <mln/core/image/image.hpp>
 #include <mln/core/range/rows.hpp>
 #include <mln/core/range/view/zip.hpp>
 #include <mln/io/imprint.hpp>
 
-
 #include <range/v3/range/access.hpp>
 
-#include <algorithm>
-#include <functional>
 #include <string>
+#include <functional>
+#include <algorithm>
 #include <type_traits>
-
 
 #include <gtest/gtest.h>
 
@@ -167,3 +165,4 @@ namespace fixtures::ImageCompare
 
 #define ASSERT_IMAGES_EQ_EXP2(f, g, flags) ASSERT_TRUE(::fixtures::ImageCompare::compare(f, g, flags))
 #define ASSERT_IMAGES_NE_EXP2(f, g, flags) ASSERT_FALSE(::fixtures::ImageCompare::compare(f, g, flags))
+

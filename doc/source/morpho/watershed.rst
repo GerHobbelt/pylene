@@ -112,3 +112,4 @@ This example demonstrates how to use the watershed based on input markers.
           :width: 100%
 
    * - Input image (with markers in red)
+     - Segmented image with watershed lines (labels are displayed in false colors).

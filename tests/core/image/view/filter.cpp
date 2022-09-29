@@ -134,7 +134,6 @@ struct archetype_pred_t
   bool operator()(T&&) const;
 };
 
-/*
 static_assert(
     (mln::concepts::AccessibleImage<mln::filter_view<mln::archetypes::AccessibleImage, archetype_pred_t>>), "");
 static_assert(
@@ -143,8 +142,6 @@ static_assert(
 static_assert((mln::concepts::IndexableAndAccessibleImage<
                              mln::filter_view<mln::archetypes::IndexableAndAccessibleImage, archetype_pred_t>>),
                          "");
-
 static_assert((mln::concepts::OutputImage<
                              mln::filter_view<mln::archetypes::OutputIndexableAndAccessibleImage, archetype_pred_t>>),
                          "");
-*/

@@ -123,7 +123,7 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   pixel_type pixel(point_type);
   pixel_type pixel_at(point_type);
 
-  struct pixel_range
+  struct pixel_range : ::ranges::view_base
   {
     const pixel_type* begin();
     const pixel_type* end();
@@ -131,7 +131,7 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   pixel_range pixels();
 
 
-  struct value_range
+  struct value_range : ::ranges::view_base
   {
     const value_type* begin();
     const value_type* end();
@@ -140,7 +140,7 @@ struct mask_archetype : mln::details::Image<mask_archetype>
   value_range values();
 };
 
-/*
+
 static_assert(mln::concepts::AccessibleImage<mln::mask_view<mln::archetypes::AccessibleImage, mask_archetype>>);
 static_assert(mln::concepts::IndexableImage<mln::mask_view<mln::archetypes::IndexableImage, mask_archetype>>);
 static_assert(mln::concepts::IndexableAndAccessibleImage<
@@ -149,4 +149,3 @@ static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputA
 static_assert(mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableImage, mask_archetype>>);
 static_assert(
     mln::concepts::OutputImage<mln::mask_view<mln::archetypes::OutputIndexableAndAccessibleImage, mask_archetype>>);
-*/

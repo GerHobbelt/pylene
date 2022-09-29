@@ -26,10 +26,9 @@ namespace mln::labeling
   {
 
     template <typename I, typename N, typename O>
-    [[gnu::noinline]]
-    int blobs_no_boundcheck(I& ima, N nbh, O& out)
+    [[gnu::noinline]] int blobs_no_boundcheck(I& ima, N nbh, O& out)
     {
-      using P = image_point_t<std::remove_reference_t<I>>;
+      using P     = image_point_t<std::remove_reference_t<I>>;
       using Label = image_value_t<O>;
       mln_entering("mln::labeling::blobs (no_boundcheck)");
 
@@ -41,7 +40,7 @@ namespace mln::labeling
 
       mln::extension::fill(out, LBL_MAX);
 
-      mln_foreach(auto p, ima.domain())
+      mln_foreach (auto p, ima.domain())
       {
         if (!ima(p) || out(p) > 0)
           continue;
@@ -68,8 +67,7 @@ namespace mln::labeling
     }
 
     template <typename I, typename N, typename O>
-    [[gnu::noinline]]
-    int blobs_boundcheck(I& ima, N nbh, O& out)
+    [[gnu::noinline]] int blobs_boundcheck(I& ima, N nbh, O& out)
     {
       using P               = image_point_t<std::remove_reference_t<I>>;
       using Label           = image_value_t<O>;
@@ -84,7 +82,7 @@ namespace mln::labeling
       mln::extension::fill(out, LBL_MAX);
 
       auto dom = ima.domain();
-      mln_foreach(auto p, dom)
+      mln_foreach (auto p, dom)
       {
         if (!ima(p) || out(p) > 0)
           continue;
@@ -121,11 +119,13 @@ namespace mln::labeling
 
   /// \brief labelize connected components of a binary image ima.
   template <typename Label, class I, class N>
-  [[gnu::noinline]]
-  image_ch_value_t<I, Label> blobs(I ima, N nbh, int& nlabel)
+  [[gnu::noinline]] image_ch_value_t<I, Label> blobs(I ima, N nbh, int& nlabel)
   {
     static_assert(mln::is_a<I, mln::details::Image>());
     static_assert(std::is_convertible<image_value_t<I>, bool>::value, "Only supports binary image (type: bool)");
+    static_assert(std::is_integral_v<Label>, "Label value should be integral");
+    static_assert((std::is_signed_v<Label> && sizeof(Label) <= sizeof(int)) ||
+                  (std::is_unsigned_v<Label> && sizeof(Label) < sizeof(int)));
 
     image_build_error_code     status;
     image_ch_value_t<I, Label> out = imchvalue<Label>(ima)
@@ -141,4 +141,4 @@ namespace mln::labeling
   }
 
 
-} // namespace mln::labeling::
+} // namespace mln::labeling

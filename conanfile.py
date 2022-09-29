@@ -1,36 +1,7 @@
 from conans import ConanFile, tools
 import os
 from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
-from conan.tools.layout import cmake_layout
 from conans.errors import ConanInvalidConfiguration
-
-# Boost options (from CCI Boost conanfile.py without required options)
-BOOST_CONFIGURE_OPTIONS = (
-    "context",
-    "contract",
-    "coroutine",
-    "fiber",
-    "graph",
-    "graph_parallel",
-    "iostreams",
-    "json",
-    "locale",
-    "log",
-    "math",
-    "mpi",
-    "nowide",
-    "program_options",
-    "python",
-    "random",
-    #    "regex",
-    "serialization",
-    "stacktrace",
-    "test",
-    "timer",
-    "type_erasure",
-    "wave",
-)
-
 
 class Pylene(ConanFile):
     name = "pylene"
@@ -47,14 +18,12 @@ class Pylene(ConanFile):
         "shared": False,
         "fPIC": False,
         "gtest:shared": False,
-        "freeimage:shared": True,
+        "boost:header_only": True,
+        "freeimage:shared": True
     }
-    default_options.update({"boost:without_{}".format(
-        bl): True for bl in BOOST_CONFIGURE_OPTIONS})
 
     generators = "CMakeDeps"
-    exports_sources = ["pylene/*", "pylene-python/*",
-                       "cmake/*", "CMakeLists.txt", "LICENSE"]
+    exports_sources = ["pylene/*", "pylene-python/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
     build_requires = [
         "gtest/[>=1.11.0]",
@@ -62,14 +31,14 @@ class Pylene(ConanFile):
     ]
 
     requires = [
-        "range-v3/0.10.0",
+        "range-v3/0.12.0",
         "fmt/6.0.0",
-        "onetbb/2020.3",
+        "tbb/2020.0",
         "xsimd/7.4.6",
         "eigen/3.3.9",
-        "boost/1.78.0",
-        "cfitsio/4.1.0",
-        "freeimage/3.18.0",
+        "boost/1.75.0",
+        "cfitsio/4.0.0",
+        "freeimage/3.18.0@lrde/stable"
     ]
 
     def _build_python(self):
@@ -78,8 +47,7 @@ class Pylene(ConanFile):
     def _check_configuration(self):
         tools.check_min_cppstd(self, "20")
         if self.settings.compiler in ["gcc", "clang"] and tools.Version(self.settings.compiler.version) < 10:
-            raise ConanInvalidConfiguration("Invalid compiler version for {} (Got {}, should be greater or equal to 10)".format(
-                self.settings.compiler, self.settings.compiler.version))
+            raise ConanInvalidConfiguration("Invalid compiler version for {} (Got {}, should be greater or equal to 10)".format(self.settings.compiler, self.settings.compiler.version))
 
     def configure(self):
         self._check_configuration()
@@ -112,12 +80,14 @@ class Pylene(ConanFile):
         self.cpp.source.components["scribo"].includedirs = ["pylene/include"]
         self.cpp.build.components["scribo"].libdirs = ["pylene"]
 
+
         # IO component (FreeImage)
         self.cpp.package.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
         self.cpp.package.components["io-freeimage"].libdirs = ["lib"]
         self.cpp.package.components["io-freeimage"].includedirs = ["include"]
         self.cpp.source.components["io-freeimage"].includedirs = ["pylene/include"]
         self.cpp.build.components["io-freeimage"].libdirs = ["pylene"]
+
 
         # IO component (cfitsio)
         self.cpp.package.components["io-fits"].libs = ["Pylene-io-fits"]
@@ -130,48 +100,47 @@ class Pylene(ConanFile):
             self.cpp.package.components["pylene-numpy"].libs = ["Pylene-numpy"]
             self.cpp.package.components["pylene-numpy"].libdirs = ["lib"]
             self.cpp.package.components["pylene-numpy"].includedirs = ["include"]
-            self.cpp.source.components["pylene-numpy"].includedirs = [
-                "pylene-python/include"]
+            self.cpp.source.components["pylene-numpy"].includedirs = ["pylene-python/include"]
             self.cpp.build.components["pylene-numpy"].libdirs = ["pylene-python"]
 
+
     def build(self):
-        # Controls what is built, not the toolchain
-        variables = {"PYLENE_BUILD_LIBS_ONLY": "YES"}
+        variables = { "PYLENE_BUILD_LIBS_ONLY" : "YES" } # Controls what is built, not the toolchain
         if self._build_python():
             variables["PYLENE_BUILD_PYTHON"] = "YES"
         else:
-            self.output.warn(
-                "fPIC disabled. Skipping python bindings build...")
+            self.output.warn("fPIC disabled. Skipping python bindings build...")
         cmake = CMake(self)
         cmake.configure(variables)
         cmake.build()
         cmake.install()
 
     def package(self):
+        self.copy("FindFreeImage.cmake", dst="cmake", src="cmake")
         tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
         self.cpp_info.builddirs = ["cmake"]
         self.cpp_info.set_property("cmake_target_name", "pylene::pylene")
 
+
         # Core component
-        self.cpp_info.components["core"].requires = [
-            "range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
+        self.cpp_info.components["core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
         self.cpp_info.components["core"].libs = ["Pylene-core"]
 
         # Scribo component
         self.cpp_info.components["scribo"].requires = ["core", "eigen::eigen3"]
         self.cpp_info.components["scribo"].libs = ["Pylene-scribo"]
+        self.cpp_info.components["scribo"].includedirs = ["include"]
 
         # IO component (FreeImage)
-        self.cpp_info.components["io-freeimage"].requires = ["core",
-                                                             "freeimage::FreeImage"]
+        self.cpp_info.components["io-freeimage"].requires = ["core", "freeimage::FreeImage"]
         self.cpp_info.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
 
         # IO component (cfitsio)
-        self.cpp_info.components["io-fits"].requires = ["core",
-                                                        "cfitsio::cfitsio"]
+        self.cpp_info.components["io-fits"].requires = ["core", "cfitsio::cfitsio"]
         self.cpp_info.components["io-fits"].libs = ["Pylene-io-fits"]
+
 
         # Pylene-numpy component
         if self._build_python():
@@ -180,10 +149,12 @@ class Pylene(ConanFile):
 
         v = tools.Version(self.settings.compiler.version)
         for comp in self.cpp_info.components:
-            self.cpp_info.components[comp].cxxflags.append(
-                tools.cppstd_flag(self.settings))
+            self.cpp_info.components[comp].cxxflags.append(tools.cppstd_flag(self.settings))
             if self.settings.compiler == "gcc" and v.major == "9":
                 self.cpp_info.components[comp].cxxflags.append("-fconcepts")
 
     def package_id(self):
         del self.info.settings.compiler.cppstd
+
+    def imports(self):
+        self.copy("*.dll", src="bin", dst="build")

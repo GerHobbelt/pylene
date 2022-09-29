@@ -4,10 +4,9 @@
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/range/foreach.hpp>
 
-#include <fmt/format.h>
 #include <memory>
 #include <type_traits>
-
+#include <fmt/format.h>
 
 namespace mln::io
 {
@@ -38,14 +37,14 @@ namespace mln::io
       }
 
       std::size_t formatted_size(P p) const { return reinterpret_cast<const impl_base_t*>(&m_impl)->formatted_size(p); }
-      void        print(P p, int width) const { reinterpret_cast<const impl_base_t*>(&m_impl)->print(p, width); }
+      void print(P p, int width) const { reinterpret_cast<const impl_base_t*>(&m_impl)->print(p, width); }
 
     private:
       struct impl_base_t
       {
-        virtual ~impl_base_t()                          = default;
-        virtual std::size_t formatted_size(P p) const   = 0;
-        virtual void        print(P p, int width) const = 0;
+        virtual ~impl_base_t() = default;
+        virtual std::size_t formatted_size(P p) const = 0;
+        virtual void print(P p, int width) const = 0;
 
         const void* m_ima;
       };
@@ -85,7 +84,7 @@ namespace mln::io
     template <class I>
     void imprint(I&& image, ...)
     {
-      mln_foreach (auto px, image.pixels())
+      mln_foreach(auto px, image.pixels())
         fmt::print("{{{},{}}}\n", px.point(), px.val());
     }
     /// \}
@@ -96,16 +95,15 @@ namespace mln::io
   {
     using U = std::remove_reference_t<I>;
     static_assert(mln::is_a<U, mln::details::Image>());
-    static_assert(fmt::internal::has_formatter<image_value_t<U>, fmt::format_context>(),
-                  "The value type has no defined formatting.");
+    static_assert(fmt::internal::has_formatter<image_value_t<U>, fmt::format_context>(), "The value type has no defined formatting.");
 
     auto roi = image.domain();
     if constexpr (std::is_convertible_v<image_extension_category_t<std::remove_reference_t<I>>,
-                                        mln::extension::border_extension_tag>)
+                  mln::extension::border_extension_tag>)
       if (print_border)
         roi.inflate(image.border());
 
     internal::imprint(std::forward<I>(image), &roi);
   }
 
-} // namespace mln::io
+}

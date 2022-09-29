@@ -1,4 +1,3 @@
-#include <fixtures/ImageCompare/image_compare.hpp>
 #include <mln/core/algorithm/all_of.hpp>
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/ndimage.hpp>

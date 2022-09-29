@@ -71,7 +71,7 @@ namespace mln::archetypes
       domain_type domain() const;
 
 
-      struct pixel_range
+      struct pixel_range : ::ranges::view_base
       {
         const pixel_type* begin();
         const pixel_type* end();
@@ -79,7 +79,7 @@ namespace mln::archetypes
       pixel_range pixels();
 
 
-      struct value_range
+      struct value_range : ::ranges::view_base
       {
         const value_type* begin();
         const value_type* end();
@@ -108,7 +108,7 @@ namespace mln::archetypes
       using pixel_type = archetypes::OutputPixel;
       using reference      = pixel_reference_t<mln::archetypes::OutputPixel>;
 
-      struct pixel_range
+      struct pixel_range : ::ranges::view_base
       {
         const pixel_type* begin();
         const pixel_type* end();
@@ -116,7 +116,7 @@ namespace mln::archetypes
 
       pixel_range pixels();
 
-      struct value_range
+      struct value_range : ::ranges::view_base
       {
         value_type* begin();
         value_type* end();
@@ -224,7 +224,7 @@ namespace mln::archetypes
     {
       using category_type = bidirectional_image_tag;
 
-      struct pixel_range
+      struct pixel_range : ::ranges::view_base
       {
         const pixel_type* begin();
         const pixel_type* end();
@@ -233,7 +233,7 @@ namespace mln::archetypes
 
       pixel_range pixels();
 
-      struct value_range
+      struct value_range : ::ranges::view_base
       {
         const value_type* begin();
         const value_type* end();
@@ -249,7 +249,7 @@ namespace mln::archetypes
       using pixel_type = archetypes::OutputPixel;
       using reference      = pixel_reference_t<mln::archetypes::OutputPixel>;
 
-      struct value_range
+      struct value_range : ::ranges::view_base
       {
         value_type* begin();
         value_type* end();
@@ -258,7 +258,7 @@ namespace mln::archetypes
       value_range values();
 
 
-      struct pixel_range
+      struct pixel_range : ::ranges::view_base
       {
         const pixel_type* begin();
         const pixel_type* end();

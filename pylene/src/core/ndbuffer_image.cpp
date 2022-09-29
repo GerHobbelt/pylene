@@ -14,7 +14,7 @@ namespace
 
 
   using Impl = mln::details::ndbuffer_image_impl<void, -1>;
-} // namespace
+}
 
 namespace mln::details
 {
@@ -36,7 +36,7 @@ namespace mln::details
     ima->m_pdim = dim;
     ima->m_buffer += offset;
   }
-} // namespace mln::details
+}
 
 namespace mln
 {
@@ -68,7 +68,7 @@ namespace mln
 
 
   __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, ConstBoxRef domain,
-                                               const image_build_params& params)
+                                             const image_build_params& params)
   {
     resize(sample_type, domain, params);
   }
@@ -91,13 +91,13 @@ namespace mln
   }
 
   __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, int width, int height,
-                                               const image_build_params& params)
+                                             const image_build_params& params)
   {
     resize(sample_type, width, height, params);
   }
 
   __ndbuffer_image<void, -1>::__ndbuffer_image(sample_type_id sample_type, int width, int height, int depth,
-                                               const image_build_params& params)
+                                             const image_build_params& params)
   {
     resize(sample_type, width, height, depth, params);
   }
@@ -123,6 +123,7 @@ namespace mln
     std::ptrdiff_t slice_byte_stride = dim > 2 ? m_axes[2].byte_stride : 0;
     data.copy_to_buffer(this->m_buffer, line_byte_stride, slice_byte_stride);
   }
+
 
 
   Box __ndbuffer_image<void, -1>::domain() const noexcept
@@ -212,22 +213,25 @@ namespace mln
   }
 
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int dim, const int topleft[], const int sizes[],
-                                          const image_build_params& params)
+  void
+  __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int dim, const int topleft[], const int sizes[],
+                                     const image_build_params& params)
   {
     __init(__allocate, sample_type, 0, dim, topleft, sizes, nullptr, params);
   }
 
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int dim, const int sizes[],
-                                          const image_build_params& params)
+  void
+  __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int dim, const int sizes[],
+                                     const image_build_params& params)
   {
     int topleft[PYLENE_NDBUFFER_MAX_DIM] = {0};
     resize(sample_type, dim, topleft, sizes, params);
   }
 
-  void __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int width, int height, int depth,
-                                          const image_build_params& params)
+  void
+  __ndbuffer_image<void, -1>::resize(sample_type_id sample_type, int width, int height, int depth,
+                                     const image_build_params& params)
   {
     int topleft[PYLENE_NDBUFFER_MAX_DIM] = {0};
     int sizes[PYLENE_NDBUFFER_MAX_DIM]   = {width, height, depth};
@@ -284,6 +288,7 @@ namespace mln
   {
     resize(sample_type, domain, image_build_params{});
   }
+
 
 
   void __ndbuffer_image<void, -1>::resize(const __ndbuffer_image& other, image_build_params params)
@@ -344,7 +349,7 @@ namespace mln
                                                        const std::ptrdiff_t strides[], int border) -> __ndbuffer_image
   {
     bool copy = false;
-    auto ima  = __ndbuffer_image<void, -1>::from_buffer(buffer, sample_type, dim, topleft, sizes, strides, copy);
+    auto ima = __ndbuffer_image<void, -1>::from_buffer(buffer, sample_type, dim, topleft, sizes, strides, copy);
     for (int i = 0; i < dim; ++i)
     {
       ima.m_axes[i].vbox_begin = ima.m_axes[i].domain_begin - border;
@@ -430,7 +435,7 @@ namespace mln
     for (int k = 0; k < m_pdim; ++k)
     {
       m_axes[k].domain_begin = m_axes[k].vbox_begin;
-      m_axes[k].domain_end   = m_axes[k].vbox_end;
+      m_axes[k].domain_end = m_axes[k].vbox_end;
     }
   }
 
@@ -468,6 +473,8 @@ namespace mln
   }
 
 
+
+
   const void* __ndbuffer_image<void, -1>::operator()(ConstPointRef p) const noexcept
   {
     assert(p.dim() == m_pdim);
@@ -500,13 +507,19 @@ namespace mln
   }
 
 
-  const void* __ndbuffer_image<void, -1>::operator[](index_type i) const noexcept { return Impl::get_pointer(this, i); }
+  const void* __ndbuffer_image<void, -1>::operator[](index_type i) const noexcept
+  {
+    return Impl::get_pointer(this, i);
+  }
 
 
-  void* __ndbuffer_image<void, -1>::operator[](index_type i) noexcept { return Impl::get_pointer(this, i); }
+  void* __ndbuffer_image<void, -1>::operator[](index_type i) noexcept
+  {
+    return Impl::get_pointer(this, i);
+  }
 
 
-  auto __ndbuffer_image<void, -1>::index_of_point(ConstPointRef p) const noexcept -> index_type
+  auto __ndbuffer_image<void, -1>::index_of_point(ConstPointRef p) const noexcept->index_type
   {
     assert(p.dim() == m_pdim);
     assert(Impl::is_point_valid(this, p.data()));
@@ -529,6 +542,7 @@ namespace mln
   }
 
 
+
   std::byte* __ndbuffer_image<void, -1>::buffer() const noexcept
   {
     int coords[PYLENE_NDBUFFER_MAX_DIM];
@@ -538,7 +552,10 @@ namespace mln
   }
 
 
-  std::ptrdiff_t __ndbuffer_image<void, -1>::byte_stride(int dim) const noexcept { return m_axes[dim].byte_stride; }
+  std::ptrdiff_t __ndbuffer_image<void, -1>::byte_stride(int dim) const noexcept
+  {
+    return m_axes[dim].byte_stride;
+  }
 
 
   std::ptrdiff_t __ndbuffer_image<void, -1>::stride(int dim) const noexcept
@@ -546,7 +563,7 @@ namespace mln
     return m_axes[dim].byte_stride / m_axes[0].byte_stride;
   }
 
-  auto __ndbuffer_image<void, -1>::clip(ConstBoxRef roi) const -> __ndbuffer_image
+  auto __ndbuffer_image<void, -1>::clip(ConstBoxRef roi) const ->  __ndbuffer_image
   {
     if (roi.dim() != m_pdim)
       throw std::runtime_error("Dimension of the image and the roi differ.");
@@ -569,7 +586,7 @@ namespace mln
   }
 
 
-  auto __ndbuffer_image<void, -1>::row(int y) const -> __ndbuffer_image
+  auto __ndbuffer_image<void, -1>::row(int y) const ->  __ndbuffer_image
   {
     if (m_pdim > 2)
       throw std::runtime_error("Dimension of the image must not exceed 2.");
@@ -587,7 +604,7 @@ namespace mln
 
     ndbuffer_image_info_t out = *this;
     Impl::select(&out, 1, begin, end);
-    return out;
+    return out;  
   }
 
 

@@ -171,12 +171,14 @@ install(EXPORT PyleneTargets
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
         )
 
-install(DIRECTORY pylene-python/include/pln
-        TYPE INCLUDE)
+install(DIRECTORY pylene-python/include/pln TYPE INCLUDE)
+install(DIRECTORY pylene/include/mln TYPE INCLUDE)
+if (TARGET Pylene-scribo)
+  install(DIRECTORY pylene/include/scribo
+    TYPE INCLUDE
+    PATTERN private EXCLUDE)
+endif (TARGET Pylene-scribo)
 
-
-install(DIRECTORY pylene/include/mln
-        TYPE INCLUDE)
 
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfig.cmake

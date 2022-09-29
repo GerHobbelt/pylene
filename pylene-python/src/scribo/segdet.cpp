@@ -261,7 +261,7 @@ namespace pln::scribo
     return static_cast<mln::ndbuffer_image>(out);
   }
 
-  pybind11::array detect_line_label(mln::ndbuffer_image img, int min_len,
+  mln::ndbuffer_image detect_line_label(mln::ndbuffer_image img, int min_len,
                                         const std::map<std::string, float>& params)
   {
     mln::image2d<uint16_t> out(img.size(0), img.size(1));
@@ -269,21 +269,21 @@ namespace pln::scribo
     if (!cast_img)
       throw std::invalid_argument("Input image should be 2D uint8");
 
-    ::scribo::internal::detect_line_label(*cast_img, min_len, out, parse_parameters(params));
+    auto p = parse_parameters(params);
+    ::scribo::internal::detect_line_label(*cast_img, min_len, out, p);
 
-
-    return to_numpy(out);
+    return static_cast<mln::ndbuffer_image>(out);
   }
 
-  pybind11::array detect_line(mln::ndbuffer_image img, int min_len, const std::string& mode,
+  mln::ndbuffer_image detect_line(mln::ndbuffer_image img, int min_len, const std::string& mode,
                                   const std::map<std::string, float>& params)
   {
     if (mode == "pixel")
-      return to_numpy(detect_line_pixel(img, min_len, params));
+      return detect_line_pixel(img, min_len, params);
     else if (mode == "vector")
-      return to_numpy(detect_line_vector(img, min_len, params));
+      return detect_line_vector(img, min_len, params);
     else if (mode == "polyline")
-      return to_numpy(detect_line_vectors(img, min_len, params));
+      return detect_line_vectors(img, min_len, params);
     else
       throw std::invalid_argument(R"(Invalid mode. Suitable modes are "pixel", "vector", "polyline".)");
   }

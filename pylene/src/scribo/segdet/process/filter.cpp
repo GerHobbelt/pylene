@@ -7,6 +7,7 @@
 #include "trackers/last_integration.hpp"
 #include "trackers/double_exponential.hpp"
 #include "trackers/simple_moving_average.hpp"
+#include "trackers/exponential_moving_average.hpp"
 
 namespace scribo::internal
 {
@@ -31,6 +32,9 @@ namespace scribo::internal
       break;
     case SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE:
       impl = std::make_unique<SimpleMovingAverage>(t, observation, descriptor);
+      break;
+    case SEGDET_PROCESS_TRACKING_ENUM::EXPONENTIAL_MOVING_AVERAGE:
+      impl = std::make_unique<ExponentialMovingAverage>(t, observation, descriptor);
       break;
     }
   }

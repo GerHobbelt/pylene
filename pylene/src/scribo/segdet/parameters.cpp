@@ -22,7 +22,8 @@ namespace scribo
         tracker != SEGDET_PROCESS_TRACKING_ENUM::ONE_EURO &&
         tracker != SEGDET_PROCESS_TRACKING_ENUM::DOUBLE_EXPONENTIAL &&
         tracker != SEGDET_PROCESS_TRACKING_ENUM::LAST_INTEGRATION && 
-        tracker != SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE)
+        tracker != SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE &&
+        tracker != SEGDET_PROCESS_TRACKING_ENUM::EXPONENTIAL_MOVING_AVERAGE)
       return false;
 
     if (bucket_size == 0)

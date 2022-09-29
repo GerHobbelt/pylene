@@ -12,10 +12,10 @@ namespace scribo::internal
     float save_last_slope;
 
     KalmanLeplumey(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor);
-    ~KalmanLeplumey() = default;
+    ~KalmanLeplumey() override = default;
 
-    void predict();
-    void integrate(int t, const Descriptor& descriptor);
+    void predict() override;
+    void integrate(int t, const Descriptor& descriptor) override;
   };
 
 } // namespace scribo::internal

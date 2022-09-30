@@ -96,6 +96,19 @@ void check_vector_output(std::vector<VSegment> ref, std::vector<VSegment> output
   }
 }
 
+void check_pixel_horizontal_output(mln::image2d<std::uint16_t> ref, mln::image2d<std::uint16_t> output)
+{
+  std::map<int, int> res;
+  for (int y = 0; y < ref.height(); y++)
+    for (int x = 0; x < ref.width(); x++)
+    {
+      int vref = static_cast<int>(ref({x, 0}));
+      int vout = static_cast<int>(output({x, y}));
+      if (res.find(vref) == res.end())
+        res[vref] = vout;
+      EXPECT_EQ(res[vref], vout);
+    }
+}
 
 TEST(Segdet, line_detect_one_horizontal)
 {
@@ -538,8 +551,8 @@ TEST(Segdet, bucket_size_higher_one_bucket)
 
 TEST(Segdet, odd_observation_on_odd)
 {
-  mln::image2d<std::uint8_t> img = {{255, 0, 255}, {255, 0, 255}, {255, 0, 255}, {255, 0, 255}, {255, 0, 255}};
-  mln::image2d<std::uint8_t> ref = {{0, 2, 0}};
+  mln::image2d<std::uint8_t>  img = {{255, 0, 255}, {255, 0, 255}, {255, 0, 255}, {255, 0, 255}, {255, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{0, 2, 0}};
 
   int  min_len          = 0;
   auto params           = SegDetParams();
@@ -547,18 +560,14 @@ TEST(Segdet, odd_observation_on_odd)
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
-  for (int y = 0; y < img.height(); y++)
-    for (int x = 0; x < img.width(); x++)
-    {
-      EXPECT_EQ(static_cast<int>(ref({x, 0})), static_cast<int>(out({x, y})));
-    }
+  check_pixel_horizontal_output(ref, out);
 }
 
 TEST(Segdet, even_observation_on_odd)
 {
   mln::image2d<std::uint8_t> img = {
       {255, 0, 0, 255}, {255, 0, 0, 255}, {255, 0, 0, 255}, {255, 0, 0, 255}, {255, 0, 0, 255}};
-  mln::image2d<std::uint8_t> ref = {{0, 2, 2, 0}};
+  mln::image2d<std::uint16_t> ref = {{0, 2, 2, 0}};
 
   int  min_len          = 0;
   auto params           = SegDetParams();
@@ -566,21 +575,17 @@ TEST(Segdet, even_observation_on_odd)
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
-  for (int y = 0; y < img.height(); y++)
-    for (int x = 0; x < img.width(); x++)
-    {
-      EXPECT_EQ(static_cast<int>(ref({x, 0})), static_cast<int>(out({x, y})));
-    }
+  check_pixel_horizontal_output(ref, out);
 }
 
 TEST(Segdet, even_observation_on_even)
 {
-  mln::image2d<std::uint8_t> img = {{255, 255, 0, 0, 255},
-                                    {255, 255, 0, 0, 255},
-                                    {255, 255, 0, 0, 255},
-                                    {255, 255, 0, 0, 255},
-                                    {255, 255, 0, 0, 255}};
-  mln::image2d<std::uint8_t> ref = {{0, 0, 2, 2, 0}};
+  mln::image2d<std::uint8_t>  img = {{255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{0, 0, 2, 2, 0}};
 
   int  min_len          = 0;
   auto params           = SegDetParams();
@@ -588,18 +593,14 @@ TEST(Segdet, even_observation_on_even)
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
-  for (int y = 0; y < img.height(); y++)
-    for (int x = 0; x < img.width(); x++)
-    {
-      EXPECT_EQ(static_cast<int>(ref({x, 0})), static_cast<int>(out({x, y})));
-    }
+  check_pixel_horizontal_output(ref, out);
 }
 
 TEST(Segdet, odd_observation_on_even)
 {
   mln::image2d<std::uint8_t> img = {
       {255, 255, 0, 255}, {255, 255, 0, 255}, {255, 255, 0, 255}, {255, 255, 0, 255}, {255, 255, 0, 255}};
-  mln::image2d<std::uint8_t> ref = {{0, 0, 2, 0}};
+  mln::image2d<std::uint16_t> ref = {{0, 0, 2, 0}};
 
   int  min_len          = 0;
   auto params           = SegDetParams();
@@ -607,9 +608,82 @@ TEST(Segdet, odd_observation_on_even)
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
-  for (int y = 0; y < img.height(); y++)
-    for (int x = 0; x < img.width(); x++)
-    {
-      EXPECT_EQ(static_cast<int>(ref({x, 0})), static_cast<int>(out({x, y})));
-    }
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_even)
+{
+  mln::image2d<std::uint8_t> img = {
+      {255, 255, 0, 0}, {255, 255, 0, 0}, {255, 255, 0, 0}, {255, 255, 0, 0}, {255, 255, 0, 0}};
+  mln::image2d<std::uint16_t> ref = {{0, 0, 2, 2}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_odd)
+{
+  mln::image2d<std::uint8_t>  img = {{255, 0, 0, 0}, {255, 0, 0, 0}, {255, 0, 0, 0}, {255, 0, 0, 0}, {255, 0, 0, 0}};
+  mln::image2d<std::uint16_t> ref = {{0, 2, 2, 2}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_odd_beg)
+{
+  mln::image2d<std::uint8_t>  img = {{0, 0, 0, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{2, 2, 2, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_even_beg)
+{
+  mln::image2d<std::uint8_t> img = {
+      {0, 0, 255, 255}, {0, 0, 255, 255}, {0, 0, 255, 255}, {0, 0, 255, 255}, {0, 0, 255, 255}};
+  mln::image2d<std::uint16_t> ref = {{2, 2, 0, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, two_observations_limit)
+{
+  mln::image2d<std::uint8_t>  img = {{0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0}};
+  mln::image2d<std::uint16_t> ref = {{2, 2, 0, 0, 0, 3, 3}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.bucket_size    = 4;
+  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
 }

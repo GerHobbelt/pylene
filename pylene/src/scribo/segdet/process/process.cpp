@@ -40,7 +40,6 @@ namespace scribo::internal
       if (obs_thick < descriptor.max_thickness && f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor))
       {
         accepted.push_back(std::move(f));
-
         std::iter_swap(buckets.container[bucket].begin() + i,
                        buckets.container[bucket].begin() + buckets.container[bucket].size() - 1);
         buckets.container[bucket].pop_back();
@@ -69,23 +68,22 @@ namespace scribo::internal
    * @param t Current t
    */
   std::vector<Filter> find_match(Buckets& buckets, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
-                                 const Descriptor& descriptor)
+                                 float max_sigma_pos, const Descriptor& descriptor)
   {
-    int obs_thick    = obs(1, 0);
-    int obs_thick_d2 = obs_thick / 2;
+    float max_sigma_thickD2 = std::max(max_sigma_pos, obs(1, 0) / 2.f);
 
-    int obs_n_min = obs(0, 0) - obs_thick_d2;
-    if (obs_n_min != 0)
-      obs_n_min--;
-    int obs_n_max = obs(0, 0) + obs_thick_d2 + 1;
-
-    size_t obs_bucket_min = buckets.get_bucket_number(static_cast<size_t>(obs_n_min));
-    size_t obs_bucket_max = buckets.get_bucket_number(static_cast<size_t>(obs_n_max));
-
+    size_t obs_bucket_min     = buckets.get_bucket_number(static_cast<size_t>(std::max(obs(0, 0) - max_sigma_thickD2, 0.f)));
     if (obs_bucket_min > 0)
       obs_bucket_min--;
-    if (obs_bucket_max + 1 < buckets.bucket_count)
+
+    size_t obs_bucket_max = buckets.get_bucket_number(obs(0, 0) + max_sigma_thickD2);
+    if (obs_bucket_max < buckets.bucket_count - 1)
       obs_bucket_max++;
+
+    float obs_thick    = obs(1, 0);
+    float obs_thick_d2 = obs_thick / 2.f;
+    int obs_n_min = std::floor(obs(0, 0) - obs_thick_d2);
+    int obs_n_max = std::ceil(obs(0, 0) + obs_thick_d2);
 
     std::vector<Filter> accepted{};
     for (size_t b = obs_bucket_min; b <= obs_bucket_max; b++)
@@ -288,7 +286,7 @@ namespace scribo::internal
           new_filters.emplace_back(t, obs_result_value.obs, descriptor);
       }
 
-      buckets.insert(std::move(f));
+      filters.push_back(std::move(f));
     }
   }
 
@@ -298,14 +296,12 @@ namespace scribo::internal
    * @param selection
    * @param new_filters
    */
-  std::vector<Filter> get_active_filters(std::vector<Filter>& kept, std::vector<Filter>& news)
+  void get_active_filters(std::vector<Filter>& filters, std::vector<Filter>& kept, std::vector<Filter>& news)
   {
-    std::vector<Filter> filters;
+    filters.clear();
 
     filters.insert(filters.begin(), std::move_iterator(kept.begin()), std::move_iterator(kept.end()));
     filters.insert(filters.begin(), std::move_iterator(news.begin()), std::move_iterator(news.end()));
-
-    return filters;
   }
 
   void make_predictions(std::vector<Filter>& filters)
@@ -315,14 +311,15 @@ namespace scribo::internal
   }
 
   std::vector<Filter> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
-                                                        Buckets& buckets, int t, const Descriptor& descriptor)
+                                                        Buckets& buckets, int t, float max_sigma_pos,
+                                                        const Descriptor& descriptor)
   {
     std::vector<Filter> new_filters{};
 
     size_t id = 0;
     for (const auto& obs : observations)
     {
-      std::vector<Filter> accepted = find_match(buckets, obs, t, descriptor);
+      std::vector<Filter> accepted = find_match(buckets, obs, t, max_sigma_pos, descriptor);
       if (accepted.empty() && obs(1, 0) < descriptor.max_thickness)
         new_filters.emplace_back(t, obs, descriptor);
       else
@@ -343,7 +340,7 @@ namespace scribo::internal
   {
     int n_max = image.size(1), t_max = image.size(0);
 
-    Buckets buckets(n_max, descriptor);
+    Buckets buckets(n_max, descriptor.bucket_size);
 
     std::vector<Segment>                    segments; // List of current segments
     std::vector<Filter>                     filters;
@@ -358,12 +355,13 @@ namespace scribo::internal
       observations = extract_observations(image, t, n_max, descriptor);
 
       buckets.fill(filters);
-      new_filters = match_observations_to_predictions(observations, buckets, t, descriptor);
+      new_filters = match_observations_to_predictions(observations, buckets, t, max_dist, descriptor);
       buckets.empty(filters);
 
       filter_kept = filter_selection(filters, segments, t, descriptor);
 
-      filters = get_active_filters(filter_kept, new_filters);
+      // i_f = 0;
+      get_active_filters(filters, filter_kept, new_filters);
     }
 
     finish_traversal(filters, segments, descriptor);

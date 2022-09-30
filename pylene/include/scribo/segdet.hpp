@@ -29,12 +29,13 @@ namespace scribo
    */
   enum class SEGDET_PROCESS_TRACKING_ENUM
   {
-    KALMAN,               ///< Kalman Filters following classics prediction and correction
-    KALMAN_LEPLUMEY,      ///< Kalman Filters by Leplumey as understood
-    ONE_EURO,             ///< One Euro Filter (modification from Nicolas Roussel code)
-    DOUBLE_EXPONENTIAL,   ///< Double exponential Filter
-    LAST_INTEGRATION,     ///< Last observation predictor
-    SIMPLE_MOVING_AVERAGE ///< Simple moving average predictor
+    KALMAN,                    ///< Kalman Filters following classics prediction and correction
+    KALMAN_LEPLUMEY,           ///< Kalman Filters by Leplumey as understood
+    ONE_EURO,                  ///< One Euro Filter (modification from Nicolas Roussel code)
+    DOUBLE_EXPONENTIAL,        ///< Double exponential Filter
+    LAST_INTEGRATION,          ///< Last observation predictor
+    SIMPLE_MOVING_AVERAGE,     ///< Simple moving average predictor
+    EXPONENTIAL_MOVING_AVERAGE ///< Exponential moving average predictor
   };
 
   /**

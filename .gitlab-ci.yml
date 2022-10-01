@@ -15,7 +15,7 @@ variables:
     FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
     FEDORA_34: "${CI_REGISTRY}/olena/pylene-dockers/fedora-34"
     CMAKE_BUILD_PARALLEL_LEVEL: 6
-    CONAN_UPLOAD: "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public@True"
+    CONAN_UPLOAD: "https://artifactory.lre.epita.fr/artifactory/api/conan/lrde-public@True"
     CONAN_USERNAME: "lrde"
     CONAN_LOGIN_USERNAME: "carlinet"
     CONAN_CHANNEL: "unstable"                                                     # Conan tag

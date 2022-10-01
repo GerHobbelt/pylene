@@ -8,8 +8,8 @@
 #include <algorithm>
 #include <utility>
 
-#include "extractors/extract_observation.hpp"
 #include "bucket.hpp"
+#include "extractors/extract_observation.hpp"
 
 namespace scribo::internal
 {
@@ -72,7 +72,8 @@ namespace scribo::internal
   {
     float max_sigma_thickD2 = std::max(max_sigma_pos, obs(1, 0) / 2.f);
 
-    size_t obs_bucket_min     = buckets.get_bucket_number(static_cast<size_t>(std::max(obs(0, 0) - max_sigma_thickD2, 0.f)));
+    size_t obs_bucket_min =
+        buckets.get_bucket_number(static_cast<size_t>(std::max(obs(0, 0) - max_sigma_thickD2, 0.f)));
     if (obs_bucket_min > 0)
       obs_bucket_min--;
 
@@ -82,8 +83,8 @@ namespace scribo::internal
 
     float obs_thick    = obs(1, 0);
     float obs_thick_d2 = obs_thick / 2.f;
-    int obs_n_min = std::floor(obs(0, 0) - obs_thick_d2);
-    int obs_n_max = std::ceil(obs(0, 0) + obs_thick_d2);
+    int   obs_n_min    = std::floor(obs(0, 0) - obs_thick_d2);
+    int   obs_n_max    = std::ceil(obs(0, 0) + obs_thick_d2);
 
     std::vector<Filter> accepted{};
     for (size_t b = obs_bucket_min; b <= obs_bucket_max; b++)
@@ -286,7 +287,7 @@ namespace scribo::internal
           new_filters.emplace_back(t, obs_result_value.obs, descriptor);
       }
 
-      filters.push_back(std::move(f));
+      buckets.insert(std::move(f));
     }
   }
 
@@ -304,10 +305,15 @@ namespace scribo::internal
     filters.insert(filters.begin(), std::move_iterator(news.begin()), std::move_iterator(news.end()));
   }
 
-  void make_predictions(std::vector<Filter>& filters)
+  float make_predictions(std::vector<Filter>& filters)
   {
+    float max_dist = 0;
     for (auto& filter : filters)
+    {
       filter.predict();
+      max_dist = std::max(max_dist, filter.impl->sigma_position);
+    }
+    return max_dist;
   }
 
   std::vector<Filter> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
@@ -350,7 +356,7 @@ namespace scribo::internal
 
     for (int t = 0; t < t_max; t++)
     {
-      make_predictions(filters);
+      float max_dist = make_predictions(filters);
 
       observations = extract_observations(image, t, n_max, descriptor);
 

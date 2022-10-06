@@ -20,6 +20,6 @@ namespace scribo::internal
     void predict();
     void integrate(int t, const Descriptor& descriptor);
 
-    size_t get_position();
+    int get_position() const noexcept;
   };
 } // namespace scribo::internal

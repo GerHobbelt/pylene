@@ -1,47 +1,44 @@
-#include <vector>
+#pragma once
 
+#include <vector>
 #include "filter.hpp"
 
 namespace scribo::internal
 {
   struct Buckets
   {
-    const size_t bucket_size;
-    const size_t bucket_count;
+    private:
+      const size_t m_bucket_size;
+      const size_t m_bucket_count;
+      std::vector<std::vector<Filter>> m_container;
 
-    std::vector<std::vector<Filter>> container;
 
-    Buckets(size_t n_max, size_t bucket_size)
-      : bucket_size(std::min(bucket_size, n_max))
-      , bucket_count(n_max / bucket_size + (n_max % bucket_size == 0 ? 0 : 1))
-    {
-      container = std::vector<std::vector<Filter>>();
-      for (size_t i = 0; i < bucket_count; i++)
-        container.push_back(std::vector<Filter>());
-    }
+    public:
+      Buckets(size_t n_max, size_t bucket_size);
+      size_t get_bucket_count() const { return m_bucket_count; } 
+      size_t get_bucket_number(int n) const noexcept;
+      size_t get_bucket_number(const Filter& f) const noexcept;
+      void insert(Filter&& filter);
+      void acquire(std::vector<Filter>& filters);
+      void release(std::vector<Filter>& filters);
 
-    size_t get_bucket_number(size_t n) { return std::min(bucket_count - 1, n / bucket_size); }
+      ///
+      /// @brief Move the elements that verifies a given predicate from the i-th bucket to the end of the list \p out. 
+      /// 
+      /// @param i 
+      /// @param pred 
+      /// @param out 
+      ///
+      void remove_if(int i, std::function<bool(const Filter&)> pred, std::vector<Filter>& out);
 
-    size_t get_bucket_number(Filter& f) { return get_bucket_number(f.get_position()); }
+      ///
+      /// @brief Applies the callback \p action on each item of the i-th bucket 
+      /// 
+      /// @param i 
+      /// @param action 
+      ///
+      void for_each_filter(int i, std::function<void(Filter&)> action);
 
-    void insert(Filter&& filter) { container[get_bucket_number(filter)].push_back(std::move(filter)); }
-
-    void fill(std::vector<Filter>& filters)
-    {
-      for (auto& filter : filters)
-        insert(std::move(filter));
-      filters.clear();
-    }
-
-    void empty(std::vector<Filter>& filters)
-    {
-      for (size_t i = 0; i < bucket_count; i++)
-      {
-        filters.insert(filters.begin(), std::move_iterator(container[i].begin()), std::move_iterator(container[i].end()));
-        container[i].clear();
-      }
-    }
-
-    std::vector<Filter>& get_bucket(size_t i) { return container[i]; }
+    //std::vector<Filter>& get_bucket(size_t i);
   };
 } // namespace scribo::internal

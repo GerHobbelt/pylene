@@ -137,6 +137,7 @@ if (Eigen3_FOUND)
           src/scribo/segdet/detect_line.cpp
           src/scribo/segdet/segment_to_X.cpp
           src/scribo/segdet/parameters.cpp
+          src/scribo/segdet/process/bucket.cpp
           src/scribo/segdet/process/filter.cpp
           src/scribo/segdet/process/filter_impl.cpp
           src/scribo/segdet/process/linearregression.cpp

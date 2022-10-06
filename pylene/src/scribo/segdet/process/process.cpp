@@ -10,6 +10,7 @@
 
 #include "bucket.hpp"
 #include "extractors/extract_observation.hpp"
+#include <mln/bp/transpose.hpp>
 
 namespace scribo::internal
 {
@@ -33,20 +34,13 @@ namespace scribo::internal
                          const Eigen::Matrix<float, 3, 1>& obs, const int& t, int obs_thick, int obs_n_min,
                          int obs_n_max, const Descriptor& descriptor)
   {
-    for (size_t i = 0; i < buckets.container[bucket].size(); i++)
-    {
-      Filter&& f = std::move(buckets.container[bucket][i]);
+    if (obs_thick < descriptor.max_thickness)
+      buckets.remove_if(bucket, [=, &obs, &descriptor] (const Filter& f) { 
+        return f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor);
+        }, accepted); 
 
-      if (obs_thick < descriptor.max_thickness && f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor))
-      {
-        accepted.push_back(std::move(f));
-        std::iter_swap(buckets.container[bucket].begin() + i,
-                       buckets.container[bucket].begin() + buckets.container[bucket].size() - 1);
-        buckets.container[bucket].pop_back();
-      }
-      else
-      {
-        if (f.impl->observation == std::nullopt && in_between(obs_n_min - 1, f.impl->n_min, obs_n_max + 1) &&
+    buckets.for_each_filter(bucket, [=](const Filter& f) {
+      if (f.impl->observation == std::nullopt && in_between(obs_n_min - 1, f.impl->n_min, obs_n_max + 1) &&
             in_between(obs_n_min - 1, f.impl->n_max, obs_n_max + 1) && f.impl->X_predicted(1, 0) < obs_thick)
         {
           Span span{};
@@ -55,10 +49,7 @@ namespace scribo::internal
           span.thickness = round(f.impl->X_predicted(1, 0));
           f.impl->under_other.push_back(span);
         }
-
-        buckets.container[bucket][i] = std::move(f);
-      }
-    }
+    });
   }
 
   /**
@@ -78,7 +69,7 @@ namespace scribo::internal
       obs_bucket_min--;
 
     size_t obs_bucket_max = buckets.get_bucket_number(obs(0, 0) + max_sigma_thickD2);
-    if (obs_bucket_max < buckets.bucket_count - 1)
+    if (obs_bucket_max < buckets.get_bucket_count() - 1)
       obs_bucket_max++;
 
     float obs_thick    = obs(1, 0);
@@ -86,7 +77,7 @@ namespace scribo::internal
     int   obs_n_min    = std::floor(obs(0, 0) - obs_thick_d2);
     int   obs_n_max    = std::ceil(obs(0, 0) + obs_thick_d2);
 
-    std::vector<Filter> accepted{};
+    std::vector<Filter> accepted;
     for (size_t b = obs_bucket_min; b <= obs_bucket_max; b++)
       find_match_bucket(buckets, b, accepted, obs, t, obs_thick, obs_n_min, obs_n_max, descriptor);
 
@@ -320,7 +311,7 @@ namespace scribo::internal
                                                         Buckets& buckets, int t, float max_sigma_pos,
                                                         const Descriptor& descriptor)
   {
-    std::vector<Filter> new_filters{};
+    std::vector<Filter> new_filters;
 
     size_t id = 0;
     for (const auto& obs : observations)
@@ -360,9 +351,9 @@ namespace scribo::internal
 
       observations = extract_observations(image, t, n_max, descriptor);
 
-      buckets.fill(filters);
+      buckets.acquire(filters);
       new_filters = match_observations_to_predictions(observations, buckets, t, max_dist, descriptor);
-      buckets.empty(filters);
+      buckets.release(filters);
 
       filter_kept = filter_selection(filters, segments, t, descriptor);
 
@@ -377,17 +368,9 @@ namespace scribo::internal
 
   image2d<std::uint8_t> transpose(image2d<std::uint8_t> img)
   {
-    image2d<std::uint8_t> transpose_image = image2d<std::uint8_t>(img.height(), img.width());
-    mln::fill(transpose_image, 0);
-    for (int x = 0; x < img.width(); ++x)
-    {
-      for (int y = 0; y < img.height(); ++y)
-      {
-        transpose_image({y, x}) = img({x, y});
-      }
-    }
-
-    return transpose_image;
+    auto out = image2d<std::uint8_t>(img.height(), img.width());
+    mln::bp::transpose(img.buffer(), out.buffer(), img.width(), img.height(), img.byte_stride(), out.byte_stride());
+    return out;
   }
 
   void transpose_segments(std::vector<Segment>& segments)

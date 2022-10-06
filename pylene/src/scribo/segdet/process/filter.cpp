@@ -49,8 +49,8 @@ namespace scribo::internal
     impl->integrate(t, descriptor);
   }
 
-  size_t Filter::get_position()
+  int Filter::get_position() const noexcept
   {
-    return static_cast<size_t>(impl->n_values.back());
+    return static_cast<int>(impl->n_values.back());
   }
 } // namespace scribo::internal

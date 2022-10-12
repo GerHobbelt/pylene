@@ -116,4 +116,5 @@ Have a look on the [introduction](http://olena.pages.lrde.epita.fr/pylene/intro)
 
 Other resources (mind the dates, the library probably has changed since then):
 
+* [A Modern C++ Point of View of Programming in Image Processing (GPCE'22)](https://www.lrde.epita.fr/dload/papers/roynard.22.gpce.pdf)
 * [A Modern C++ Library for Generic and Efficient Image Processing (GTGDMM'18)](https://www.lrde.epita.fr/dload/presentations/2018-06-19-geraud.2018.gtgdmmm.pdf)

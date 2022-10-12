@@ -369,7 +369,7 @@ namespace scribo::internal
   image2d<std::uint8_t> transpose(image2d<std::uint8_t> img)
   {
     auto out = image2d<std::uint8_t>(img.height(), img.width());
-    mln::bp::transpose(img.buffer(), out.buffer(), img.width(), img.height(), img.byte_stride(), out.byte_stride());
+    mln::bp::transpose(img.buffer(), out.buffer(), out.width(), out.height(), img.byte_stride(), out.byte_stride());
     return out;
   }
 

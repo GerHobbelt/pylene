@@ -5,8 +5,8 @@
 #include <mln/core/range/view/zip.hpp>
 
 #include <range/v3/algorithm/equal.hpp>
-#include <concepts/concepts.hpp>
 
+#include <concepts>
 
 namespace mln
 {
@@ -36,7 +36,7 @@ namespace mln
   {
     static_assert(mln::is_a<LhsImage, mln::details::Image>());
     static_assert(mln::is_a<RhsImage, mln::details::Image>());
-    static_assert(::concepts::equality_comparable_with<image_value_t<LhsImage>, image_value_t<RhsImage>>);
+    static_assert(std::equality_comparable_with<image_value_t<LhsImage>, image_value_t<RhsImage>>);
 
     auto&& lhs_vals = lhs.values();
     auto&& rhs_vals = rhs.values();

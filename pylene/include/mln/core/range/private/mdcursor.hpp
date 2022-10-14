@@ -1,9 +1,10 @@
 #pragma once
 
-#include <concepts/concepts.hpp>
 #include <range/v3/range/concepts.hpp>
 #include <range/v3/detail/range_access.hpp>
 #include <range/v3/view/facade.hpp> // ::ranges::detail::begin_cursor_t
+
+#include <concepts>
 
 namespace mln::ranges
 {
@@ -19,10 +20,10 @@ namespace mln::ranges
     };
 
   template <class C>
-  concept NDCursor = ::concepts::semiregular<C> &&
+  concept NDCursor = std::semiregular<C> &&
     requires (C c)
   {
-    { C::rank } -> ::concepts::same_as<int>;
+    { C::rank } -> std::same_as<int>;
     c.read();
     c.move_to_next(0);
     c.move_to_end(0);
@@ -42,7 +43,7 @@ namespace mln::ranges
   {
     { r.rows() } -> ::ranges::cpp20::forward_range;
     { r.begin_cursor() } -> MDCursor;
-    { r.end_cursor() } -> ::concepts::same_as<::ranges::default_sentinel_t>;
+    { r.end_cursor() } -> std::same_as<::ranges::default_sentinel_t>;
   };
 
 
@@ -51,7 +52,7 @@ namespace mln::ranges
   {
     { r.rrows() } -> ::ranges::cpp20::forward_range;
     { r.rbegin_cursor() } -> MDCursor;
-    { r.rend_cursor() } -> ::concepts::same_as<::ranges::default_sentinel_t>;
+    { r.rend_cursor() } -> std::same_as<::ranges::default_sentinel_t>;
   };
 
 }

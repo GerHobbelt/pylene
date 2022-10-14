@@ -161,7 +161,7 @@ TEST(Dilation, Unregular_domain)
 {
   using namespace mln::view::ops;
 
-  mln::image2d<uint8> ima;
+  mln::image2d<std::uint8_t> ima;
   mln::io::imread(fixtures::ImagePath::concat_with_filename("small.pgm"), ima);
 
   auto win = mln::se::rect2d(3, 3);

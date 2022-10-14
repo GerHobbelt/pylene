@@ -85,14 +85,14 @@ namespace mln
     template <unsigned p, typename T>
     struct lpnorm_t
     {
-      typedef decltype(lpnorm<p>(std::declval<T>())) result_type;
+      using result_type = decltype(lpnorm<p>(std::declval<T>()));
       auto operator()(const T& x) const -> decltype(lpnorm<p>(x)) { return lpnorm<p>(x); }
     };
     template <unsigned p>
     struct lpnorm_t<p, void>
     {
       template <typename T>
-      auto operator()(const T& x) const -> decltype(lpnorm<p>(x))
+      auto operator()(const T& x) const
       {
         return lpnorm<p>(x);
       }
@@ -109,14 +109,14 @@ namespace mln
     template <unsigned p, typename T1, typename T2>
     struct lpdist_t
     {
-      typedef decltype(lpdist<p>(std::declval<T1>(), std::declval<T2>())) result_type;
-      auto operator()(const T1& x, const T2& y) const -> decltype(lpdist<p>(x, y)) { return lpdist<p>(x, y); }
+      using result_type = decltype(lpdist<p>(std::declval<T1>(), std::declval<T2>()));
+      auto operator()(const T1& x, const T2& y) const { return lpdist<p>(x, y); }
     };
     template <unsigned p>
     struct lpdist_t<p, void, void>
     {
       template <typename T1, typename T2>
-      auto operator()(const T1& x, const T2& y) const -> decltype(lpdist<p>(x, y))
+      auto operator()(const T1& x, const T2& y) const
       {
         return lpdist<p>(x, y);
       }

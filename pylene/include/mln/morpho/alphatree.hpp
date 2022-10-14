@@ -318,7 +318,7 @@ namespace mln::morpho
       using P = image_point_t<I>;
       using W = std::invoke_result_t<F, V, V>;
 
-      static_assert(::concepts::totally_ordered<W>);
+      static_assert(std::totally_ordered<W>);
       static_assert(std::is_same<M, edge_t<P, W>>());
 
       // 1. Get the list of edges

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mln/core/range/private/mdrange_facade.hpp>
-#include <concepts/type_traits.hpp>
 
 #include <range/v3/view/remove_if.hpp>
 

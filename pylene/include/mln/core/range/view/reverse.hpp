@@ -37,7 +37,7 @@ namespace mln::ranges
     requires MDBidirectionalRange<Rng>
     auto reverse(Rng&& rng)
     {
-      using R = ::concepts::remove_cvref_t<Rng>;
+      using R = std::remove_cvref_t<Rng>;
       return reversed_mdview<R>{std::forward<Rng>(rng)};
     }
 

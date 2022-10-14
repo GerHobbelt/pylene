@@ -7,9 +7,6 @@
 #include <iostream>
 #include <type_traits>
 
-#define VEC_BASE_REQUIRES_CONVERTIBLE(Trait)                                                                           \
-  requires(vec_base_traits<tag>::Trait && std::is_convertible_v<T, U>)
-
 // Element-wise operator
 // Ex: vector u,v,w;
 // w = u + v; <=> w[i] = u[i] + v[i] forall i
@@ -188,19 +185,18 @@ namespace mln
 
       // explicit
       constexpr vec_base(const T& x)
-        : vec_base(x, std::make_integer_sequence<int, dim>{})
       {
+        for (unsigned i = 0; i < dim; i++)
+          v_[i] = x;
       }
 
-      template <typename dummy = void>
-      constexpr vec_base(const T& x, const T& y, typename std::enable_if<dim == 2, dummy>::type* = NULL)
+      constexpr vec_base(const T& x, const T& y) requires (dim == 2)
       {
         v_[0] = x;
         v_[1] = y;
       }
 
-      template <typename dummy = void>
-      constexpr vec_base(const T& x, const T& y, const T& z, typename std::enable_if<dim == 3, dummy>::type* = NULL)
+      constexpr vec_base(const T& x, const T& y, const T& z) requires (dim == 3)
       {
         v_[0] = x;
         v_[1] = y;
@@ -294,7 +290,7 @@ namespace mln
 
       /* RELATIONAL */
       template <typename U>
-      VEC_BASE_REQUIRES_CONVERTIBLE(is_equality_comparable)
+      requires(vec_base_traits<tag>::is_equality_comparable && std::is_convertible_v<T, U>)
       bool operator==(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
@@ -304,7 +300,7 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_REQUIRES_CONVERTIBLE(is_equality_comparable)
+      requires(vec_base_traits<tag>::is_equality_comparable && std::is_convertible_v<T, U>)
       bool operator!=(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
@@ -314,7 +310,7 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
       bool operator<(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
@@ -326,7 +322,7 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
       bool operator<=(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
@@ -338,14 +334,14 @@ namespace mln
       }
 
       template <typename U>
-      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
       bool operator>(const vec_base<U, dim, tag>& o) const
       {
         return not(*this <= o);
       }
 
       template <typename U>
-      VEC_BASE_REQUIRES_CONVERTIBLE(is_less_than_comparable)
+      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
       bool operator>=(const vec_base<U, dim, tag>& o) const
       {
         return not(*this < o);
@@ -396,18 +392,6 @@ namespace mln
       friend constexpr T2& get(vec_base<T2, dim2, tag2>&);
       template <size_t N, class T2, unsigned dim2, typename tag2>
       friend constexpr T2&& get(vec_base<T2, dim2, tag2>&&);
-
-      template <int... N>
-      constexpr vec_base(const T& x, std::integer_sequence<int, N...>)
-        : v_{__copy<N>(x)...}
-      {
-      }
-
-      template <int i>
-      static constexpr T __copy(T x)
-      {
-        return x;
-      }
 
       T v_[dim] = {};
     };

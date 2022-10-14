@@ -65,7 +65,7 @@ namespace scribo
     float double_exponential_alpha     = 0.6f;  ///< Alpha used in double exponential filter if chosen
     float simple_moving_average_memory = 30.0f; ///< Memory used in simple moving average filter if chosen
 
-    int bucket_size = 30; ///< Bucket size during traversal
+    int bucket_size = 32; ///< Bucket size during traversal
 
     int nb_values_to_keep = 30; ///< Memory of filter to compute variances for the matching
     int discontinuity_relative =

@@ -74,7 +74,7 @@ namespace mln::morpho::details
   }
 
 
-  template <::concepts::integral T, class BinaryFunction>
+  template <std::integral T, class BinaryFunction>
   [[gnu::noinline]] //
   void
   block_partial_sum(const T* __restrict in, T* __restrict out, int width, int height, std::ptrdiff_t in_byte_stride,
@@ -151,7 +151,7 @@ namespace mln::morpho::details
 
 
       // Simd version
-  template <::concepts::integral T, class BinaryFunction>
+  template <std::integral T, class BinaryFunction>
   [[gnu::noinline]] //
   void
   block_transform(const T* __restrict a, const T* __restrict b, T* __restrict out, int width, int height,

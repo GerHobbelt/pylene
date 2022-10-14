@@ -4,10 +4,10 @@
 
 #include <vector>
 
-#include <concepts/concepts.hpp>
 #include <range/v3/algorithm/fill.hpp>
 #include <range/v3/view/span.hpp>
 
+#include <concepts>
 
 namespace mln::data
 {
@@ -34,7 +34,7 @@ namespace mln::data
     {
       using V = image_value_t<std::remove_reference_t<I>>;
 
-      static_assert(::concepts::unsigned_integral<V>);
+      static_assert(std::unsigned_integral<V>);
 
       ::ranges::fill(hist, 0);
       mln::for_each(std::forward<I>(image), [&hist](int x) { hist[x]++; });
@@ -53,7 +53,7 @@ namespace mln::data
   std::vector<std::size_t> histogram(I image)
   {
     using V = image_value_t<I>;
-    static_assert(::concepts::unsigned_integral<V>);
+    static_assert(std::unsigned_integral<V>);
 
     std::vector<std::size_t> histogram;
     histogram.resize(std::numeric_limits<V>::max() + 1);

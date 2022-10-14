@@ -101,31 +101,31 @@ namespace mln
   template <typename U, typename V = U>
   struct add
   {
-    typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x + y; }
+    std::common_type_t<U, V> operator()(const U& x, const V& y) const { return x + y; }
   };
 
   template <typename U, typename V = U>
   struct substract
   {
-    typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x - y; }
+    std::common_type_t<U, V> operator()(const U& x, const V& y) const { return x - y; }
   };
 
   template <typename U, typename V = U>
   struct multiplies
   {
-    typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x * y; }
+    std::common_type_t<U, V> operator()(const U& x, const V& y) const { return x * y; }
   };
 
   template <typename U, typename V = U>
   struct devides
   {
-    typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x / y; }
+    std::common_type_t<U, V> operator()(const U& x, const V& y) const { return x / y; }
   };
 
   template <typename U, typename V = U>
   struct modulo
   {
-    typename std::common_type<U, V>::type operator()(const U& x, const V& y) const { return x % y; }
+    std::common_type_t<U, V> operator()(const U& x, const V& y) const { return x % y; }
   };
 
   template <typename U, typename V = U>
@@ -178,9 +178,8 @@ namespace mln
 
   struct conditional_ternary
   {
-
     template <typename E1, typename E2, typename E3>
-    inline decltype(auto) operator()(E1&& expr1, E2&& expr2, E3&& expr3) const
+    inline auto operator()(E1&& expr1, E2&& expr2, E3&& expr3) const
     {
       return std::forward<E1>(expr1) ? std::forward<E2>(expr2) : std::forward<E3>(expr3);
     }
@@ -260,7 +259,7 @@ namespace mln
     template <class U, class V = U>
     struct max_t
     {
-      typedef typename std::common_type<U, V>::type R;
+      using R = std::common_type_t<U, V>;
 
       R operator()(const U& x, const V& y) const { return std::max<R>(x, y); }
     };
@@ -268,7 +267,7 @@ namespace mln
     template <class U, class V = U>
     struct min_t
     {
-      typedef typename std::common_type<U, V>::type R;
+      using R = std::common_type_t<U, V>;
 
       R operator()(const U& x, const V& y) const { return std::min<R>(x, y); }
     };
@@ -276,7 +275,7 @@ namespace mln
     template <class U, class V = U>
     struct inf_t
     {
-      typedef typename std::common_type<U, V>::type R;
+      using R = std::common_type_t<U, V>;
 
       R operator()(const U& x, const V& y) const { return inf<R>(x, y); }
     };
@@ -284,7 +283,7 @@ namespace mln
     template <class U, class V = U>
     struct sup_t
     {
-      typedef typename std::common_type<U, V>::type R;
+      using R = std::common_type_t<U, V>;
 
       R operator()(const U& x, const V& y) const { return sup<R>(x, y); }
     };

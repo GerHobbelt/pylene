@@ -9,8 +9,8 @@ TEST(Segdet, size_1)
     
     scribo::internal::Buckets buckets(n_max, bucket_size);
 
-    EXPECT_EQ(buckets.bucket_size, 1);
-    EXPECT_EQ(buckets.bucket_count, 1);
+    EXPECT_EQ(buckets.get_bucket_size(), 1);
+    EXPECT_EQ(buckets.get_bucket_count(), 1);
 }
 
 TEST(Segdet, size_100)
@@ -20,8 +20,8 @@ TEST(Segdet, size_100)
     
     scribo::internal::Buckets buckets(n_max, bucket_size);
 
-    EXPECT_EQ(buckets.bucket_size, 30);
-    EXPECT_EQ(buckets.bucket_count, 4);
+    EXPECT_EQ(buckets.get_bucket_size(), 30);
+    EXPECT_EQ(buckets.get_bucket_count(), 4);
     EXPECT_EQ(buckets.get_bucket_number(10), 0);
     EXPECT_EQ(buckets.get_bucket_number(30), 1);
     EXPECT_EQ(buckets.get_bucket_number(95), 3);
@@ -35,8 +35,8 @@ TEST(Segdet, size_120)
     
     scribo::internal::Buckets buckets(n_max, bucket_size);
 
-    EXPECT_EQ(buckets.bucket_size, 30);
-    EXPECT_EQ(buckets.bucket_count, 4);
+    EXPECT_EQ(buckets.get_bucket_size(), 30);
+    EXPECT_EQ(buckets.get_bucket_count(), 4);
     EXPECT_EQ(buckets.get_bucket_number(10), 0);
     EXPECT_EQ(buckets.get_bucket_number(30), 1);
     EXPECT_EQ(buckets.get_bucket_number(95), 3);

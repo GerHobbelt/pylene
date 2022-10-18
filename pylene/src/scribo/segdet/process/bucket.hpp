@@ -16,6 +16,7 @@ namespace scribo::internal
     public:
       Buckets(size_t n_max, size_t bucket_size);
       size_t get_bucket_count() const { return m_bucket_count; } 
+      size_t get_bucket_size() const { return m_bucket_size; }
       size_t get_bucket_number(int n) const noexcept;
       size_t get_bucket_number(const Filter& f) const noexcept;
       void insert(Filter&& filter);

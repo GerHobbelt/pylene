@@ -30,7 +30,7 @@ namespace scribo::internal
       /// @param pred 
       /// @param out 
       ///
-      void remove_if(int i, std::function<bool(const Filter&)> pred, std::vector<Filter>& out);
+      void remove_if(size_t i, std::function<bool(const Filter&)> pred, std::vector<Filter>& out);
 
       ///
       /// @brief Applies the callback \p action on each item of the i-th bucket 
@@ -38,7 +38,7 @@ namespace scribo::internal
       /// @param i 
       /// @param action 
       ///
-      void for_each_filter(int i, std::function<void(Filter&)> action);
+      void for_each_filter(size_t i, std::function<void(Filter&)> action);
 
     //std::vector<Filter>& get_bucket(size_t i);
   };

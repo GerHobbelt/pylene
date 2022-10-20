@@ -31,9 +31,9 @@ namespace scribo::internal
       }
     }
 
-    void Buckets::remove_if(int i, std::function<bool(const Filter&)> pred, std::vector<Filter>& out)
+    void Buckets::remove_if(size_t i, std::function<bool(const Filter&)> pred, std::vector<Filter>& out)
     {
-        assert(0 <= i && i < (int)m_bucket_count);
+        assert(i < m_bucket_count);
         auto& c = m_container[i];
         auto [end1, end2] = std::partition_copy(
           std::move_iterator(c.begin()),
@@ -43,9 +43,9 @@ namespace scribo::internal
         c.erase(end2, c.end());
     }
 
-    void Buckets::for_each_filter(int i, std::function<void(Filter&)> action)
+    void Buckets::for_each_filter(size_t i, std::function<void(Filter&)> action)
     {
-        assert(0 <= i && i < (int)m_bucket_count);
+        assert(i < m_bucket_count);
         auto& c = m_container[i];
         std::for_each(c.begin(), c.end(), action);
     }

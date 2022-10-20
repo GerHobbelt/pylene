@@ -2,6 +2,8 @@
 
 #include "../filter_impl.hpp"
 
+#include <numbers>
+
 namespace scribo::internal
 {
   struct OneEuros : public Filter_impl
@@ -66,7 +68,7 @@ namespace scribo::internal
       double alpha(double cutoff)
       {
         double te  = 1.0 / freq;
-        double tau = 1.0 / (2 * M_PI * cutoff);
+        double tau = 1.0 / (2 * std::numbers::pi * cutoff);
         return 1.0 / (1.0 + tau / te);
       }
 

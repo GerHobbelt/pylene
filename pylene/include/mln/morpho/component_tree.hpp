@@ -477,7 +477,7 @@ namespace mln::morpho
     mln_entering("mln::morpho::component_tree::horizontal_cut_from_levels");
 
     auto root_cut_cc = std::vector<int>(parent.size());
-    for (std::size_t node = 0; node < parent.size(); ++node)
+    for (std::size_t node = 1; node < parent.size(); ++node)
     {
       int parent_node   = parent[node];
       root_cut_cc[node] = levels[parent_node] > threshold ? static_cast<int>(node) : root_cut_cc[parent_node];

@@ -139,10 +139,10 @@ TEST(Morpho, Filtering_subtractive)
 
 TEST(Morpho, HorizontalCut)
 {
-  const mln::morpho::component_tree<int> t{
-    std::vector<int>{0, 0, 0, 1, 1, 2, 2, 2},
-    std::vector<int>{3, 2, 1, 0, 0, 0, 0, 0}
-  };
+  mln::morpho::component_tree<int> t;
+  t.parent = std::vector<int>{0, 0, 0, 1, 1, 2, 2, 2};
+  t.values = std::vector<int>{3, 2, 1, 0, 0, 0, 0, 0};
+  
   const mln::image2d<int> nodemap{
     {5, 5, 6, 3, 3},
     {5, 5, 6, 3, 4},
@@ -182,10 +182,10 @@ TEST(Morpho, HorizontalCut)
 
 TEST(Morpho, HorizontalCut_AfterFiltering)
 {
-  mln::morpho::component_tree<int> t{
-    std::vector<int>{0, 0, 0, 1, 1, 2, 2, 2},
-    std::vector<int>{3, 2, 1, 0, 0, 0, 0, 0}
-  };
+  mln::morpho::component_tree<int> t;
+  t.parent = std::vector<int>{0, 0, 0, 1, 1, 2, 2, 2};
+  t.values = std::vector<int>{3, 2, 1, 0, 0, 0, 0, 0};
+  
   mln::image2d<int> nodemap{
     {5, 5, 6, 3, 3},
     {5, 5, 6, 3, 4},

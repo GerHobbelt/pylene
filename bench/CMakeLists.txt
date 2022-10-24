@@ -68,29 +68,101 @@ add_benchmark(BMAlphaTree               BMAlphaTree.cpp)
 add_benchmark(BMWatershedHierarchy      BMWatershedHierarchy.cpp)
 add_benchmark(BM_gpce2022_rebutal       BM_gpce2022_rebutal.cpp)
 
+set(OpenCV_STATIC ON)
+set(OpenCV_SHARED OFF)
 find_package(OpenCV)
 
 if (OpenCV_FOUND)
+  message(STATUS "${OpenCV_LIBS}")
+  get_target_property(target_type opencv_core TYPE)
+  if (target_type STREQUAL STATIC_LIBRARY)
+    message(STATUS "opencv_core static")
+  endif()
+  if (target_type STREQUAL SHARED_LIBRARY)
+    message(STATUS "opencv_core shared")
+  endif()
+  #opencv_calib3d
+  #opencv_dnn
+  #opencv_features2d
+  #opencv_flann
+  #opencv_highgui
+  #opencv_imgcodecs
+  #opencv_imgproc
+  #opencv_ml
+  #opencv_objdetect
+  #opencv_photo
+  #opencv_stitching
+  #opencv_video
+  #opencv_videoio
+  #opencv_alphamat
+  #opencv_aruco
+  #opencv_barcode
+  #opencv_bgsegm
+  #opencv_bioinspired
+  #opencv_ccalib
+  #opencv_cvv
+  #opencv_datasets
+  #opencv_dnn_objdetect
+  #opencv_dnn_superres
+  #opencv_dpm
+  #opencv_face
+  #opencv_freetype
+  #opencv_fuzzy
+  #opencv_hdf
+  #opencv_hfs
+  #opencv_img_hash
+  #opencv_intensity_transform
+  #opencv_line_descriptor
+  #opencv_mcc
+  #opencv_optflow
+  #opencv_phase_unwrapping
+  #opencv_plot
+  #opencv_quality
+  #opencv_rapid
+  #opencv_reg
+  #opencv_rgbd
+  #opencv_saliency
+  #opencv_shape
+  #opencv_stereo
+  #opencv_structured_light
+  #opencv_superres
+  #opencv_surface_matching
+  #opencv_text
+  #opencv_tracking
+  #opencv_videostab
+  #opencv_viz
+  #opencv_wechat_qrcode
+  #opencv_ximgproc
+  #opencv_xobjdetect
+  #opencv_xphoto
 
-  add_library(BenchImpl_bgSub_views include/bench/bg_sub.hpp src/bg_sub_views.cpp)
+  add_library(BenchImpl_bgSub_views SHARED include/bench/bg_sub.hpp src/bg_sub_views.cpp)
+  set_property(TARGET BenchImpl_bgSub_views PROPERTY POSITION_INDEPENDENT_CODE ON)
   set_target_properties(BenchImpl_bgSub_views PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
   target_include_directories(BenchImpl_bgSub_views PUBLIC include)
   target_link_libraries(BenchImpl_bgSub_views PUBLIC Pylene::Pylene Pylene::IO-freeimage)
 
-  add_library(BenchImpl_bgSub_algos include/bench/bg_sub.hpp src/bg_sub_algos.cpp)
+  add_library(BenchImpl_bgSub_algos SHARED include/bench/bg_sub.hpp src/bg_sub_algos.cpp)
+  set_property(TARGET BenchImpl_bgSub_algos PROPERTY POSITION_INDEPENDENT_CODE ON)
   set_target_properties(BenchImpl_bgSub_algos PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
   target_include_directories(BenchImpl_bgSub_algos PUBLIC include)
   target_link_libraries(BenchImpl_bgSub_algos PUBLIC Pylene::Pylene Pylene::IO-freeimage)
 
-  add_library(BenchImpl_bgSub_opencv include/bench/bg_sub.hpp src/bg_sub_opencv.cpp)
+  add_library(BenchImpl_bgSub_opencv SHARED include/bench/bg_sub.hpp src/bg_sub_opencv.cpp)
+  set_property(TARGET BenchImpl_bgSub_opencv PROPERTY POSITION_INDEPENDENT_CODE ON)
   set_target_properties(BenchImpl_bgSub_opencv PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
   target_include_directories(BenchImpl_bgSub_opencv PUBLIC include)
-  target_link_libraries(BenchImpl_bgSub_opencv PUBLIC Pylene::Pylene ${OpenCV_LIBS})
+  #target_link_libraries(BenchImpl_bgSub_opencv PUBLIC Pylene::Pylene ${OpenCV_LIBS})
+  target_link_libraries(BenchImpl_bgSub_opencv PUBLIC Pylene::Pylene)
+
+  target_include_directories(BenchImpl_bgSub_opencv PUBLIC "/usr/include/opencv4/")
+  target_link_libraries(BenchImpl_bgSub_opencv PUBLIC "libopencv_core.a")
 
   add_library(BenchImplOpenCV include/bench/bg_sub.hpp src/bg_sub.cpp)
   set_target_properties(BenchImplOpenCV PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
   target_include_directories(BenchImplOpenCV PUBLIC include)
   target_link_libraries(BenchImplOpenCV PUBLIC Pylene::Pylene Pylene::IO-freeimage ${OpenCV_LIBS})
+  
 
   set(src_standalone_opencv
     opencv/BMPlnVsOpenCV_dilation.cpp

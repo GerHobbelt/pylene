@@ -23,8 +23,8 @@
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
 #include <mln/labeling/blobs.hpp>
-#include <mln/morpho/experimental/dilation.hpp>
-#include <mln/morpho/experimental/erosion.hpp>
+#include <mln/morpho/dilation.hpp>
+#include <mln/morpho/erosion.hpp>
 #include <mln/morpho/gaussian2d.hpp>
 
 

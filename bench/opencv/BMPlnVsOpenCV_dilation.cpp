@@ -6,7 +6,7 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
 
-#include <mln/morpho/experimental/dilation.hpp>
+#include <mln/morpho/dilation.hpp>
 
 #include <fixtures/ImagePath/image_path.hpp>
 
@@ -82,7 +82,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompPeriodic)(benchmark::St
   auto se     = mln::se::disc(radius, mln::se::disc::PERIODIC_LINES_8);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
-    mln::morpho::experimental::dilation(input, se, output);
+    mln::morpho::dilation(input, se, output);
   };
   this->run(st, f);
 }
@@ -93,7 +93,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_DiscPeriodic)(benchmark::State& s
   auto se     = mln::se::disc_non_decomp(radius, mln::se::disc::PERIODIC_LINES_8);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
-    mln::morpho::experimental::dilation(input, se, output);
+    mln::morpho::dilation(input, se, output);
   };
   this->run(st, f);
 }
@@ -104,7 +104,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_DiscDecompIncremental)(benchmark:
   auto se     = mln::se::disc(radius, mln::se::disc::EXACT);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
-    mln::morpho::experimental::dilation(input, se, output);
+    mln::morpho::dilation(input, se, output);
   };
   this->run(st, f);
 }
@@ -115,7 +115,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_DiscIncremental)(benchmark::State
   auto se     = mln::se::disc_non_decomp(radius, mln::se::disc::EXACT);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
-    mln::morpho::experimental::dilation(input, se, output);
+    mln::morpho::dilation(input, se, output);
   };
   this->run(st, f);
 }
@@ -129,7 +129,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_RectDecomp)(benchmark::State& st)
   auto se   = mln::se::rect2d(edge, edge);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
-    mln::morpho::experimental::dilation(input, se, output);
+    mln::morpho::dilation(input, se, output);
   };
   this->run(st, f);
 }
@@ -140,7 +140,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_Dilation, Pln_Rect)(benchmark::State& st)
   auto se   = mln::se::rect2d_non_decomp(edge, edge);
 
   auto f = [se](const image_t& input, const cv_image_t&, image_t& output, cv_image_t&) {
-    mln::morpho::experimental::dilation(input, se, output);
+    mln::morpho::dilation(input, se, output);
   };
   this->run(st, f);
 }

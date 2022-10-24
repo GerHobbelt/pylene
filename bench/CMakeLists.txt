@@ -72,10 +72,22 @@ find_package(OpenCV)
 
 if (OpenCV_FOUND)
 
-  add_library(BenchImplOpenCV
-  include/bench/bg_sub.hpp
-  src/bg_sub.cpp)
+  add_library(BenchImpl_bgSub_views include/bench/bg_sub.hpp src/bg_sub_views.cpp)
+  set_target_properties(BenchImpl_bgSub_views PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+  target_include_directories(BenchImpl_bgSub_views PUBLIC include)
+  target_link_libraries(BenchImpl_bgSub_views PUBLIC Pylene::Pylene Pylene::IO-freeimage)
 
+  add_library(BenchImpl_bgSub_algos include/bench/bg_sub.hpp src/bg_sub_algos.cpp)
+  set_target_properties(BenchImpl_bgSub_algos PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+  target_include_directories(BenchImpl_bgSub_algos PUBLIC include)
+  target_link_libraries(BenchImpl_bgSub_algos PUBLIC Pylene::Pylene Pylene::IO-freeimage)
+
+  add_library(BenchImpl_bgSub_opencv include/bench/bg_sub.hpp src/bg_sub_opencv.cpp)
+  set_target_properties(BenchImpl_bgSub_opencv PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
+  target_include_directories(BenchImpl_bgSub_opencv PUBLIC include)
+  target_link_libraries(BenchImpl_bgSub_opencv PUBLIC Pylene::Pylene ${OpenCV_LIBS})
+
+  add_library(BenchImplOpenCV include/bench/bg_sub.hpp src/bg_sub.cpp)
   set_target_properties(BenchImplOpenCV PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
   target_include_directories(BenchImplOpenCV PUBLIC include)
   target_link_libraries(BenchImplOpenCV PUBLIC Pylene::Pylene Pylene::IO-freeimage ${OpenCV_LIBS})

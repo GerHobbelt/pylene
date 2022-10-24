@@ -16,8 +16,8 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/io/imread.hpp>
 #include <mln/io/imsave.hpp>
-#include <mln/morpho/experimental/dilation.hpp>
-#include <mln/morpho/experimental/erosion.hpp>
+#include <mln/morpho/dilation.hpp>
+#include <mln/morpho/erosion.hpp>
 #include <mln/morpho/gaussian2d.hpp>
 
 
@@ -44,11 +44,11 @@ template <typename T>
 class matrix2d
 {
 public:
-  matrix2d()                = default;
-  matrix2d(const matrix2d&) = default;
-  matrix2d(matrix2d&&)      = default;
+  matrix2d()                           = default;
+  matrix2d(const matrix2d&)            = default;
+  matrix2d(matrix2d&&)                 = default;
   matrix2d& operator=(const matrix2d&) = default;
-  matrix2d& operator=(matrix2d&&) = default;
+  matrix2d& operator=(matrix2d&&)      = default;
 
   matrix2d(std::size_t width, std::size_t height)
     : w_(width)
@@ -247,7 +247,7 @@ auto test_bg_sub_pipeline(std::string dirname, std::string_view filename, std::s
   save_to(bg_grey, dirname, fmt::format("tmp_bg_gray_{}", filename));
 
   // Gaussian on BG (algo)
-  constexpr float sigma = 1.;
+  constexpr float     sigma            = 1.;
   mln::image2d<float> bg_blurred_float = mln::morpho::gaussian2d(bg_grey, sigma, sigma);
   auto                bg_blurred       = mln::view::cast<uint8_t>(bg_blurred_float);
   // auto bg_blurred = gaussian_blur(bg_grey, sigma);
@@ -271,11 +271,11 @@ auto test_bg_sub_pipeline(std::string dirname, std::string_view filename, std::s
 
   // erosion (algo)
   mln::se::disc win(5);
-  auto          tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, win);
+  auto          tmp_eroded = mln::morpho::erosion(tmp_thresholded, win);
   save_to(tmp_eroded, dirname, fmt::format("tmp_eroded_{}", filename));
 
   // dilation (algo)
-  auto tmp_dilated = mln::morpho::experimental::dilation(tmp_eroded, win);
+  auto tmp_dilated = mln::morpho::dilation(tmp_eroded, win);
   save_to(tmp_dilated, dirname, fmt::format("tmp_dilated_{}", filename));
 
   // output
@@ -329,10 +329,10 @@ void handle_new_images(std::string path_)
   const std::string              path        = path_ + "images/clean_samples";
   const std::vector<std::string> resolutions = {"6048x4024", "4838x3219", "3870x2575"};
   const std::vector<samples_t>   filenames   = {
-      {"castle_bg.tif", {"castle_fg_1.tif"}},
-      {"garden_bg.tif",
-       {"garden_fg_1.tif", "garden_fg_2.tif", "garden_fg_3.tif", "garden_fg_4.tif", "garden_fg_5.tif"}},
-      {"pathway_bg.tif", {"pathway_fg_1.tif", "pathway_fg_2.tif", "pathway_fg_3.tif", "pathway_fg_4.tif"}}};
+          {"castle_bg.tif", {"castle_fg_1.tif"}},
+          {"garden_bg.tif",
+           {"garden_fg_1.tif", "garden_fg_2.tif", "garden_fg_3.tif", "garden_fg_4.tif", "garden_fg_5.tif"}},
+          {"pathway_bg.tif", {"pathway_fg_1.tif", "pathway_fg_2.tif", "pathway_fg_3.tif", "pathway_fg_4.tif"}}};
 
   for (auto r : resolutions)
   {
@@ -629,7 +629,7 @@ int main(int, char** argv)
 {
   std::string path = argv[1];
 
-  //gen_lena_figs(path);
+  // gen_lena_figs(path);
 
   handle_new_images(path);
 }

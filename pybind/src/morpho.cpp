@@ -8,7 +8,7 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/se/disc.hpp>
 #include <mln/core/se/rect2d.hpp>
-#include <mln/morpho/experimental/dilation.hpp>
+#include <mln/morpho/dilation.hpp>
 
 #include <fmt/core.h>
 

@@ -9,8 +9,8 @@
 #include <mln/core/image/views.hpp>
 #include <mln/core/range/view/transform.hpp>
 #include <mln/core/range/view/zip.hpp>
-#include <mln/morpho/experimental/dilation.hpp>
-#include <mln/morpho/experimental/erosion.hpp>
+#include <mln/morpho/dilation.hpp>
+#include <mln/morpho/erosion.hpp>
 #include <mln/morpho/gaussian2d.hpp>
 
 #include <opencv2/opencv.hpp>
@@ -27,7 +27,7 @@ void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color, const mln::
   // Gaussian on BG (algo)
   constexpr float kLineVerticalSigma   = 5;
   constexpr float kLineHorizontalSigma = 5;
-  auto bg_blurred = mln::morpho::gaussian2d(bg_grey,  kLineHorizontalSigma, kLineVerticalSigma);
+  auto            bg_blurred           = mln::morpho::gaussian2d(bg_grey, kLineHorizontalSigma, kLineVerticalSigma);
 
   // Substract (view)
   using namespace mln::view::ops;
@@ -42,10 +42,10 @@ void pln_bg_sub_pipe_views(const mln::image2d<mln::rgb8>& img_color, const mln::
   std::visit(
       [&](auto&& se_) {
         // Erosion (algo)
-        auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, se_);
+        auto tmp_eroded = mln::morpho::erosion(tmp_thresholded, se_);
 
         // Dilation (algo)
-        mln::morpho::experimental::dilation(tmp_eroded, se_, output);
+        mln::morpho::dilation(tmp_eroded, se_, output);
       },
       se);
 
@@ -77,7 +77,7 @@ void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color, const mln::
   // Gaussian on BG (algo)
   constexpr float kLineVerticalSigma   = 5;
   constexpr float kLineHorizontalSigma = 5;
-  auto bg_blurred = mln::morpho::gaussian2d(bg_grey,  kLineHorizontalSigma, kLineVerticalSigma);
+  auto            bg_blurred           = mln::morpho::gaussian2d(bg_grey, kLineHorizontalSigma, kLineVerticalSigma);
 
   // Substract (algo)
   mln::image2d<uint8_t> tmp_grey;
@@ -100,10 +100,10 @@ void pln_bg_sub_pipe_algos(const mln::image2d<mln::rgb8>& img_color, const mln::
   std::visit(
       [&](auto&& se_) {
         // Erosion (algo)
-        auto tmp_eroded = mln::morpho::experimental::erosion(tmp_thresholded, se_);
+        auto tmp_eroded = mln::morpho::erosion(tmp_thresholded, se_);
 
         // Dilation (algo)
-        mln::morpho::experimental::dilation(tmp_eroded, se_, output);
+        mln::morpho::dilation(tmp_eroded, se_, output);
       },
       se);
 

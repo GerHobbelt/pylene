@@ -13,16 +13,16 @@
 #include <opencv2/opencv.hpp>
 
 #include <array>
+#include <iostream>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-#include <iostream>
 
+#include <fmt/core.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <fmt/core.h>
 
 bool ENABLE_MEMORY_LOG = false;
 
@@ -69,18 +69,16 @@ namespace details
   }
 } // namespace details
 
-std::vector<std::pair<std::string, std::string>> filenames = {
-    {"castle_fg_1.tif", "castle_bg.tif"}, //
-    {"garden_fg_1.tif", "garden_bg.tif"}, //
-    {"garden_fg_2.tif", "garden_bg.tif"}, //
-    {"garden_fg_3.tif", "garden_bg.tif"}, //
-    {"garden_fg_4.tif", "garden_bg.tif"}, //
-    {"garden_fg_5.tif", "garden_bg.tif"}, //
-    {"pathway_fg_1.tif", "pathway_bg.tif"}, //
-    {"pathway_fg_2.tif", "pathway_bg.tif"}, //
-    {"pathway_fg_3.tif", "pathway_bg.tif"}, //
-    {"pathway_fg_4.tif", "pathway_bg.tif"}
-};
+std::vector<std::pair<std::string, std::string>> filenames = {{"castle_fg_1.png", "castle_bg.png"},   //
+                                                              {"garden_fg_1.png", "garden_bg.png"},   //
+                                                              {"garden_fg_2.png", "garden_bg.png"},   //
+                                                              {"garden_fg_3.png", "garden_bg.png"},   //
+                                                              {"garden_fg_4.png", "garden_bg.png"},   //
+                                                              {"garden_fg_5.png", "garden_bg.png"},   //
+                                                              {"pathway_fg_1.png", "pathway_bg.png"}, //
+                                                              {"pathway_fg_2.png", "pathway_bg.png"}, //
+                                                              {"pathway_fg_3.png", "pathway_bg.png"}, //
+                                                              {"pathway_fg_4.png", "pathway_bg.png"}};
 
 
 constexpr std::size_t radius = 30;
@@ -93,10 +91,11 @@ public:
   using out_image_t  = mln::image2d<uint8_t>;
   using image_cv_t   = cv::Mat;
   using callback_pln = std::function<void(const image_t&, const image_t&, out_image_t&)>;
-  using callback_cv  = std::function<void(const image_cv_t& input_img_cv, const image_cv_t& input_bg_cv, image_cv_t& output_cv)>;
+  using callback_cv =
+      std::function<void(const image_cv_t& input_img_cv, const image_cv_t& input_bg_cv, image_cv_t& output_cv)>;
 
   const std::string filepath =
-      std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/clean_samples/6048x4024";
+      std::string{fixtures::ImagePath::get_image_path()} + "../apps/tip.2019-2020/images/clean_samples/1512x1006";
 
   BMPlnVsOpenCV_BgSubPipeline()
   {
@@ -179,8 +178,6 @@ public:
   }
 
 
-
-
 protected:
   static bool                     g_loaded;
   static std::vector<image_t>     g_input_imgs;
@@ -208,7 +205,9 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViewsDisc)(benchmark::St
   const int radius = st.range(1);
   auto      se     = mln::se::disc(radius);
 
-  callback_pln f = [se](const image_t& in1, const image_t& in2, out_image_t& out) { pln_bg_sub_pipe_views(in1, in2, out, se); };
+  callback_pln f = [se](const image_t& in1, const image_t& in2, out_image_t& out) {
+    pln_bg_sub_pipe_views(in1, in2, out, se);
+  };
   this->run(st, f);
 }
 
@@ -245,7 +244,7 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeAlgosRect)(benchmark::St
 BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgoDisc)(benchmark::State& st)
 {
   const int radius = st.range(1);
-  auto se = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * radius + 1, 2 * radius + 1));
+  auto      se     = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * radius + 1, 2 * radius + 1));
   auto f = [se](const image_cv_t& in1, const image_cv_t& in2, image_cv_t& out) { cv_bg_sub_pipe(in1, in2, out, se); };
 
   this->run(st, f);
@@ -262,7 +261,8 @@ BENCHMARK_DEFINE_F(BMPlnVsOpenCV_BgSubPipeline, CV_PipeAlgoRect)(benchmark::Stat
 
 namespace
 {
-  void CustomArguments(benchmark::internal::Benchmark* b) {
+  void CustomArguments(benchmark::internal::Benchmark* b)
+  {
     for (int img_id = 0; img_id < (int)(filenames.size()); ++img_id)
     {
       for (int i = 1; i < 7; ++i)
@@ -274,14 +274,14 @@ namespace
         if (i >= 3)
           b->Args({img_id, r + (1 << (i - 2))});
 
-                 b->Args({img_id, r + (1 << (i - 1))});
+        b->Args({img_id, r + (1 << (i - 1))});
 
         if (i >= 3)
           b->Args({img_id, r + (1 << (i - 1)) + (1 << (i - 2))});
       }
     }
   }
-}
+} // namespace
 
 
 BENCHMARK_REGISTER_F(BMPlnVsOpenCV_BgSubPipeline, Pln_PipeViewsDisc)

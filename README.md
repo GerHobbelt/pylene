@@ -39,7 +39,7 @@ This project relies on:
 ## Installation
 
 The preferred and strongly recommended way to use Pylene is using Conan, a C++ package manager, and CMake. For using the
-library by other means, refer to the [documentation](http://olena.pages.lrde.epita.fr/pylene/tutorial/installation)
+library by other means, refer to the [documentation](http://olena.pages.lre.epita.fr/pylene/next/tutorial/installation)
 
 ```
 conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public

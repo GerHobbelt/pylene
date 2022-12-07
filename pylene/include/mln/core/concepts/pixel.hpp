@@ -3,7 +3,7 @@
 #include <mln/core/concepts/point.hpp>
 #include <mln/core/private/traits/pixel.hpp>
 
-#include <concepts/concepts.hpp>
+#include <concepts>
 #include <type_traits>
 
 namespace mln::details
@@ -20,23 +20,23 @@ namespace mln::concepts
 
     template <class Pix> concept Pixel =
       std::is_base_of_v<mln::details::Pixel<Pix>, Pix> &&
-      ::concepts::copy_constructible<Pix> &&
-      ::concepts::move_constructible<Pix> &&
+      std::copy_constructible<Pix> &&
+      std::move_constructible<Pix> &&
       requires {
       typename pixel_value_t<Pix>;
       typename pixel_reference_t<Pix>;
       typename pixel_point_t<Pix>;
     } &&
-    ::concepts::semiregular<pixel_value_t<Pix>> &&
+    std::semiregular<pixel_value_t<Pix>> &&
     Point<pixel_point_t<Pix>> &&
     !std::is_const_v<pixel_value_t<Pix>> &&
     !std::is_reference_v<pixel_value_t<Pix>> &&
     requires(const Pix cpix, Pix pix, pixel_point_t<Pix> p) {
-      { cpix.point() } -> ::concepts::convertible_to<pixel_point_t<Pix>>;
+      { cpix.point() } -> std::convertible_to<pixel_point_t<Pix>>;
 #if (__GNUG__ == 9) // see https://stackoverflow.com/questions/55198202/unable-to-deduce-placeholder-type-in-concept
-      { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>&&;
+      { cpix.val() }   -> std::convertible_to<pixel_reference_t<Pix>>&&;
 #else
-      { cpix.val() }   -> ::concepts::convertible_to<pixel_reference_t<Pix>>;
+      { cpix.val() }   -> std::convertible_to<pixel_reference_t<Pix>>;
 #endif
       { pix.shift(p) };
     };

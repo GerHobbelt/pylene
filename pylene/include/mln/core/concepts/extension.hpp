@@ -6,10 +6,8 @@
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/value.hpp>
 
-#include <concepts/concepts.hpp>
-
+#include <concepts>
 #include <type_traits>
-
 
 namespace mln::
 {
@@ -47,7 +45,7 @@ namespace mln::concepts
   template <typename Ext>
   concept FillableExtension =
     Extension<Ext> &&
-    ::concepts::convertible_to<typename Ext::support_fill, std::true_type> &&
+    std::convertible_to<typename Ext::support_fill, std::true_type> &&
     requires {
       typename Ext::value_type;
     } &&
@@ -59,7 +57,7 @@ namespace mln::concepts
   template <typename Ext>
   concept MirrorableExtension =
     Extension<Ext> &&
-    ::concepts::convertible_to<typename Ext::support_mirror, std::true_type> &&
+    std::convertible_to<typename Ext::support_mirror, std::true_type> &&
     requires (Ext ext, const Ext cext, std::size_t padding) {
       { ext.mirror() };
       { ext.mirror(padding) };
@@ -69,7 +67,7 @@ namespace mln::concepts
   template <typename Ext>
   concept PeriodizableExtension =
     Extension<Ext> &&
-    ::concepts::convertible_to<typename Ext::support_periodize, std::true_type> &&
+    std::convertible_to<typename Ext::support_periodize, std::true_type> &&
     requires (Ext ext, const Ext cext) {
       { ext.periodize() };
       { cext.is_periodize_supported() }  -> bool;
@@ -78,7 +76,7 @@ namespace mln::concepts
   template <typename Ext>
   concept ClampableExtension =
     Extension<Ext> &&
-    ::concepts::convertible_to<typename Ext::support_clamp, std::true_type> &&
+    std::convertible_to<typename Ext::support_clamp, std::true_type> &&
     requires (Ext ext, const Ext cext) {
       { ext.clamp() };
       { cext.is_clamp_supported() }  -> bool;
@@ -87,14 +85,14 @@ namespace mln::concepts
   template <typename Ext, typename U>
   concept ExtendWithExtension =
     Extension<Ext> &&
-    ::concepts::convertible_to<typename Ext::support_extend_with, std::true_type> &&
+    std::convertible_to<typename Ext::support_extend_with, std::true_type> &&
     InputImage<U> &&
     requires {
       typename Ext::value_type;
       typename Ext::point_type;
     } &&
-    ::concepts::convertible_to<typename U::value_type, typename Ext::value_type> &&
-    ::concepts::convertible_to<typename Ext::point_type, typename U::point_type> &&
+    std::convertible_to<typename U::value_type, typename Ext::value_type> &&
+    std::convertible_to<typename Ext::point_type, typename U::point_type> &&
     requires (Ext ext, const Ext cext, U u, typename Ext::point_type offset) {
       { ext.extend_with(u, offset) };
       { cext.is_extend_with_supported() }  -> bool;

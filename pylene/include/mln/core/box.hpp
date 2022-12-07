@@ -3,10 +3,10 @@
 #include <mln/core/point.hpp>
 #include <mln/core/range/mdindex.hpp>
 
+#include <algorithm>
 #include <array>
 #include <type_traits>
-#include <algorithm>
-
+#include <vector>
 
 namespace mln
 {
@@ -898,7 +898,7 @@ namespace mln
 
 
 // Specialization of std::common_reference
-namespace concepts
+namespace std
 {
   template <class UImpl, class VImpl, template <class> class TQual, template <class> class UQual>
   struct basic_common_reference<mln::_box<UImpl>, mln::_box<VImpl>, TQual, UQual>

@@ -1,20 +1,20 @@
-#include <fmt/core.h>
 #include <mln/core/box.hpp>
 
 #include <mln/core/concepts/domain.hpp>
 #include <mln/core/concepts/range.hpp>
-#include <concepts/concepts.hpp>
 
-
+#include <fmt/core.h>
 #include <gtest/gtest.h>
+
+#include <concepts>
 
 
 template <class A, class B>
-concept Interoperable = ::concepts::equality_comparable_with<A, B>
+concept Interoperable = std::equality_comparable_with<A, B>
   && requires(A& a, const A& ca, const B& b)
 {
-  { ca.includes(b) } -> ::concepts::same_as<bool>;
-  { ca.intersects(b) } -> ::concepts::same_as<bool>;
+  { ca.includes(b) } -> std::same_as<bool>;
+  { ca.intersects(b) } -> std::same_as<bool>;
   { a.clip(b) };
 };
 
@@ -35,10 +35,10 @@ TEST(Point, ConceptChecking)
   static_assert(mln::concepts::Domain<mln::const_box2d_ref>);
   static_assert(mln::concepts::Domain<mln::const_box3d_ref>);
 
-  static_assert(::concepts::convertible_to<mln::ndbox<-1>, mln::ndbox<-1>>); // Dyn -> dyn
-  static_assert(::concepts::convertible_to<mln::ndbox<+1>, mln::ndbox<+1>>); // Static -> static
-  static_assert(::concepts::convertible_to<mln::ndbox<+1>, mln::ndbox<-1>>); // Static -> Dyn
-  static_assert(::concepts::convertible_to<mln::ndbox<-1>, mln::ndbox<+1>>); // Dyn -> Static
+  static_assert(std::convertible_to<mln::ndbox<-1>, mln::ndbox<-1>>); // Dyn -> dyn
+  static_assert(std::convertible_to<mln::ndbox<+1>, mln::ndbox<+1>>); // Static -> static
+  static_assert(std::convertible_to<mln::ndbox<+1>, mln::ndbox<-1>>); // Static -> Dyn
+  static_assert(std::convertible_to<mln::ndbox<-1>, mln::ndbox<+1>>); // Dyn -> Static
 
 
   static_assert(Interoperable<mln::ndbox<-1>, mln::ndbox<-1>>); // Dyn <-> dyn

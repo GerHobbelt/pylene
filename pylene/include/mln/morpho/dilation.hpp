@@ -129,8 +129,8 @@ namespace mln::morpho
 
     // Specialisation for 2D images
     template <class InputImage, class SE, class ValueSet, class BorderManager, class OutputImage>
-    requires(::concepts::same_as<image_domain_t<std::remove_reference_t<InputImage>>, mln::box2d>&& //
-             ::concepts::same_as<image_domain_t<std::remove_reference_t<OutputImage>>, mln::box2d>) //
+    requires(std::same_as<image_domain_t<std::remove_reference_t<InputImage>>, mln::box2d>&& //
+             std::same_as<image_domain_t<std::remove_reference_t<OutputImage>>, mln::box2d>) //
 
     void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
                   ValueSet& vs, OutputImage&& out)

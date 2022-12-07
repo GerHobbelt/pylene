@@ -3,9 +3,6 @@
 #include <type_traits>
 #include <algorithm>
 
-#include <concepts/type_traits.hpp>
-
-
 namespace mln
 {
   // Forward declaration
@@ -584,7 +581,7 @@ namespace mln
 
 
 // Specialization of std::common_reference
-namespace concepts
+namespace std
 {
   template <class UImpl, class VImpl, template<class> class TQual, template<class> class UQual>
     struct basic_common_reference<mln::_point<UImpl>, mln::_point<VImpl>, TQual, UQual>

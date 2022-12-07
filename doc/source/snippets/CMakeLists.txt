@@ -69,6 +69,7 @@ add_image("mtos_example" "${PYLENE_IMAGE_DIR}/lena.ppm" depth_map.png mtos_rec.p
 add_image("hough_lines" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.pbm" "staff_hough_lines.png")
 add_image("segdet" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.png" "staff_scribo_lines_vector.png"  "staff_scribo_lines_pixel.png")
 add_image("waterfall;4" "${PYLENE_IMAGE_DIR}/lena.pgm" "waterfall_nodemap.png" "waterfall_cut.png")
+add_image("waterfall;1" "${PYLENE_IMAGE_DIR}/lena.pgm" "waterfall_seed_nodemap.png" "waterfall_seed_cut.png" "lena_seeds.png")
 
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")

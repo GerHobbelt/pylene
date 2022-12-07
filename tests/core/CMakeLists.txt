@@ -63,10 +63,6 @@ add_core_test(${test_prefix}extension_fill      extension/fill.cpp)
 add_core_test(${test_prefix}extension_mirror    extension/mirror.cpp)
 add_core_test(${test_prefix}extension_periodize extension/periodize.cpp)
 
-
-# test Value
-add_core_test(${test_prefix}value_int          value/int.cpp)
-
 # test Vec
 add_core_test(${test_prefix}vec_math_ops       vec/vec_math_ops.cpp)
 

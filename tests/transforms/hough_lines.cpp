@@ -3,6 +3,8 @@
 #include <mln/core/algorithm/fill.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/transforms/hough_lines.hpp>
+
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 
@@ -92,7 +94,7 @@ TEST(HoughLines, detect_peaks_p90)
 
 
   auto ht = mln::transforms::hough_lines(in, angles);
-  std::ranges::transform(angles, angles, [](float v) { return v + 0.5f * std::numbers::pi_v<float>; });
+  std::transform(std::begin(angles), std::end(angles), std::begin(angles), [](float v) { return v + 0.5f * std::numbers::pi_v<float>; });
   ht = mln::transforms::hough_lines(in, angles, &ht);
 
   auto peaks = mln::transforms::hough_lines_detect_peak_angles(ht, angles, 0.5f,  5, 5);

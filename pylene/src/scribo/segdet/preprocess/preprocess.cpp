@@ -39,15 +39,18 @@ namespace scribo::internal
 
   mln::image2d<std::uint8_t> preprocess(const mln::image2d<std::uint8_t>& input, const Descriptor& descriptor)
   {
+    auto input_copy = input;
+    if (descriptor.negate_image)
+      input_copy = mln::transform(input, [](std::uint8_t p) -> std::uint8_t { return 255 - p; });
+
     switch (descriptor.preprocess)
     {
     case SEGDET_PREPROCESS_ENUM::NONE:
-      return input;
+      return input_copy;
     case SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT:
-      return black_top_hat(input, descriptor);
+      return black_top_hat(input_copy, descriptor);
     default:
       throw std::runtime_error("Bad preprocess choice. Possible are NONE(0), BLACK_TOP_HAT(1)");
     }
   }
-
 } // namespace scribo::internal

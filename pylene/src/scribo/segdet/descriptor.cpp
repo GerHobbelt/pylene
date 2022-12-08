@@ -4,7 +4,8 @@ namespace scribo::internal
 {
   Descriptor::Descriptor(const SegDetParams& params, int min_length)
   {
-    preprocess = params.preprocess;
+    negate_image = params.negate_image;
+    preprocess   = params.preprocess;
     if (params.preprocess == scribo::SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT)
     {
       dyn       = params.dyn;

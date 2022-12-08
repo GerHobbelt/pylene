@@ -60,6 +60,8 @@ namespace scribo
     SEGDET_PROCESS_EXTRACTION_ENUM extraction_type =
         SEGDET_PROCESS_EXTRACTION_ENUM::BINARY; ///< Extraction type for observations
 
+    bool negate_image = false; ///< Say if image has to be reversed before processing
+
     float dyn                          = 0.6f;  ///< Dynamic when Black-Top-Hat preprocess is applied
     int   size_mask                    = 11;    ///< Filter size when Black-Top-Hat preprocess is applied
     float double_exponential_alpha     = 0.6f;  ///< Alpha used in double exponential filter if chosen

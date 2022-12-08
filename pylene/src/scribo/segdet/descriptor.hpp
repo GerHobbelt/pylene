@@ -10,6 +10,7 @@ namespace scribo::internal
   struct Descriptor
   {
     /// PREPROCESS
+    bool                   negate_image;
     SEGDET_PREPROCESS_ENUM preprocess;
     // BLACK_TOP_HAT
     float dyn;
@@ -37,11 +38,11 @@ namespace scribo::internal
 
     // EXTRACTION
     SEGDET_PROCESS_EXTRACTION_ENUM extraction_type;
-    int   gradient_threshold;
-    int   max_llum;
-    int   max_max_llum;
-    int   max_thickness;
-    float ratio_lum;
+    int                            gradient_threshold;
+    int                            max_llum;
+    int                            max_max_llum;
+    int                            max_thickness;
+    float                          ratio_lum;
 
     // MODULE
     SEGDET_PROCESS_TRACKING_ENUM filter_type;

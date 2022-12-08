@@ -30,25 +30,56 @@ namespace scribo::internal
     return min <= value && value < max;
   }
 
+  /**
+   * Compute the intersection of two spans
+   * @param a
+   * @param b
+   * @return the intersection
+   */
+  inline Span intersect(const Eigen::Matrix<float, 3, 1>& a, const Eigen::Matrix<float, 3, 1>& b)
+  {
+    Span ret{};
+
+    ret.thickness = 0;
+
+    float amin = a(0) - a(1) / 2;
+    float amax = a(0) + a(1) / 2;
+    float bmin = b(0) - b(1) / 2;
+    float bmax = b(0) + b(1) / 2;
+
+    if (amin > bmax || bmin > amax)
+      return ret;
+
+    float min = std::max(amin, bmin);
+    float max = std::min(amax, bmax);
+
+    ret.y         = std::round((min + max) / 2.f);
+    ret.thickness = std::round(max - min);
+
+    return ret;
+  }
+
   void find_match_bucket(Buckets& buckets, size_t bucket, std::vector<Filter>& accepted,
                          const Eigen::Matrix<float, 3, 1>& obs, const int& t, int obs_thick, int obs_n_min,
                          int obs_n_max, const Descriptor& descriptor)
   {
     if (obs_thick < descriptor.max_thickness)
-      buckets.remove_if(bucket, [=, &obs, &descriptor] (const Filter& f) { 
-        return f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor);
-        }, accepted); 
+      buckets.remove_if(
+          bucket,
+          [=, &obs, &descriptor](const Filter& f) { return f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor); },
+          accepted);
 
     buckets.for_each_filter(bucket, [=](const Filter& f) {
-      if (f.impl->observation == std::nullopt && in_between(obs_n_min - 1, f.impl->n_min, obs_n_max + 1) &&
-            in_between(obs_n_min - 1, f.impl->n_max, obs_n_max + 1) && f.impl->X_predicted(1, 0) < obs_thick)
-        {
-          Span span{};
-          span.x         = t;
-          span.y         = round(f.impl->X_predicted(0, 0));
-          span.thickness = round(f.impl->X_predicted(1, 0));
-          f.impl->under_other.push_back(span);
-        }
+      if (f.impl->observation != std::nullopt)
+        return;
+
+      Span intersection = intersect(obs, f.impl->X_predicted);
+
+      if (intersection.thickness <= 0)
+        return;
+
+      intersection.x = t;
+      f.impl->under_other.push_back(intersection);
     });
   }
 

@@ -63,7 +63,8 @@ namespace scribo::internal
       LowPassFilter x;
       LowPassFilter dx;
 
-      double obs_value = 0;
+      double obs_value;
+      int    last_t;
 
       double alpha(double cutoff)
       {
@@ -80,9 +81,16 @@ namespace scribo::internal
         return x.filterWithAlpha(obs_value, alpha(cutoff));
       }
 
-      void integrate(double value) { obs_value = value; }
+      void integrate(double value, int t)
+      {
+        obs_value = value;
 
-      OneEuro(double initval, double freq = 1.0, double mincutoff = 1.0, double beta_ = 0.0, double dcutoff = 1.0)
+        freq   = 1.f / static_cast<float>(t - last_t);
+        last_t = t;
+      }
+
+      OneEuro(double initval, int t, double freq = 1.0, double mincutoff = 1.0, double beta_ = 0.0,
+              double dcutoff = 1.0)
         : freq(freq)
         , mincutoff(mincutoff)
         , beta_(beta_)
@@ -90,6 +98,7 @@ namespace scribo::internal
         , x(LowPassFilter(alpha(mincutoff), initval))
         , dx(LowPassFilter(alpha(dcutoff), 0.0))
         , obs_value(initval)
+        , last_t(t)
       {
       }
     };

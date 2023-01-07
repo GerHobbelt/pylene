@@ -4,9 +4,9 @@ namespace scribo::internal
 {
   OneEuros::OneEuros(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
     : Filter_impl(t_integration, observation, descriptor)
-    , x(OneEuro(observation(0, 0)))
-    , thick(OneEuro(observation(1, 0)))
-    , lumi(OneEuro(observation(2, 0)))
+    , x(OneEuro(observation(0, 0), t_integration))
+    , thick(OneEuro(observation(1, 0), t_integration))
+    , lumi(OneEuro(observation(2, 0), t_integration))
   {
   }
 
@@ -23,9 +23,9 @@ namespace scribo::internal
   {
     const auto& obs = observation.value().obs;
 
-    x.integrate(obs(0, 0));
-    thick.integrate(obs(1, 0));
-    lumi.integrate(obs(2, 0));
+    x.integrate(obs(0, 0), t);
+    thick.integrate(obs(1, 0), t);
+    lumi.integrate(obs(2, 0), t);
 
     Filter_impl::integrate(t, descriptor);
   }

@@ -298,7 +298,7 @@ TEST(Segdet, line_detect_small_cross_noise_kalman)
   expect_near(ref, output, abs_error);
 }
 
-TEST(Segdet, line_detect_small_cross_noise_leplumey)
+TEST(Segdet, line_detect_small_cross_noise_IRISA)
 {
   auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
   mln::image2d<std::uint8_t> img  = pair.first;
@@ -307,7 +307,7 @@ TEST(Segdet, line_detect_small_cross_noise_leplumey)
 
   auto params          = SegDetParams();
   params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::KALMAN_LEPLUMEY;
+  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::KALMAN_IRISA;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);

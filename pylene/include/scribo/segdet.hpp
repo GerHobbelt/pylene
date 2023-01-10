@@ -30,7 +30,7 @@ namespace scribo
   enum class SEGDET_PROCESS_TRACKING_ENUM
   {
     KALMAN,                    ///< Kalman Filters following classics prediction and correction
-    KALMAN_LEPLUMEY,           ///< Kalman Filters by Leplumey as understood
+    KALMAN_IRISA,              ///< Kalman Filters by IRISA as understood
     ONE_EURO,                  ///< One Euro Filter (modification from Nicolas Roussel code)
     DOUBLE_EXPONENTIAL,        ///< Double exponential Filter
     LAST_INTEGRATION,          ///< Last observation predictor

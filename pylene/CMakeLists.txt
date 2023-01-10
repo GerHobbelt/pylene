@@ -144,7 +144,7 @@ if (Eigen3_FOUND)
           src/scribo/segdet/process/process.cpp
           src/scribo/segdet/process/extractors/extract_observation.cpp
           src/scribo/segdet/process/trackers/kalman.cpp
-          src/scribo/segdet/process/trackers/kalman_leplumey.cpp
+          src/scribo/segdet/process/trackers/kalman_IRISA.cpp
           src/scribo/segdet/process/trackers/one_euro.cpp
           src/scribo/segdet/process/trackers/double_exponential.cpp
           src/scribo/segdet/process/trackers/simple_moving_average.cpp

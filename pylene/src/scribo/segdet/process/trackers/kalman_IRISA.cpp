@@ -1,4 +1,4 @@
-#include "kalman_leplumey.hpp"
+#include "kalman_IRISA.hpp"
 
 namespace scribo::internal
 {
@@ -22,8 +22,7 @@ namespace scribo::internal
                                                    .finished());
   } // namespace
 
-  KalmanLeplumey::KalmanLeplumey(int t_integration, Eigen::Matrix<float, 3, 1> observation,
-                                 const Descriptor& descriptor)
+  KalmanIRISA::KalmanIRISA(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
     : Filter_impl(t_integration, observation, descriptor)
     , S((Eigen::Matrix<float, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
     , H(Eigen::Matrix<float, 4, 4>::Identity())
@@ -32,7 +31,7 @@ namespace scribo::internal
   {
   }
 
-  void KalmanLeplumey::predict()
+  void KalmanIRISA::predict()
   {
     S           = A * S + W;
     X_predicted = C * S;
@@ -45,12 +44,12 @@ namespace scribo::internal
     Filter_impl::predict();
   }
 
-  void KalmanLeplumey::integrate(int t, const Descriptor& descriptor)
+  void KalmanIRISA::integrate(int t, const Descriptor& descriptor)
   {
     const auto& obs = observation.value().obs;
 
     float save_last_intergration = last_integration;
-    save_last_slope = S(1, 0);
+    save_last_slope              = S(1, 0);
 
     const auto H_Ct = H * C_transpose;
     const auto G    = H_Ct * (C * H_Ct + Vn).inverse();

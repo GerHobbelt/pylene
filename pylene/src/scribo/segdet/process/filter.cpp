@@ -1,13 +1,13 @@
 #include "filter.hpp"
 
 // Include of trackers/*.hpp
-#include "trackers/kalman.hpp"
-#include "trackers/kalman_leplumey.hpp"
-#include "trackers/one_euro.hpp"
-#include "trackers/last_integration.hpp"
 #include "trackers/double_exponential.hpp"
-#include "trackers/simple_moving_average.hpp"
 #include "trackers/exponential_moving_average.hpp"
+#include "trackers/kalman.hpp"
+#include "trackers/kalman_IRISA.hpp"
+#include "trackers/last_integration.hpp"
+#include "trackers/one_euro.hpp"
+#include "trackers/simple_moving_average.hpp"
 
 namespace scribo::internal
 {
@@ -18,8 +18,8 @@ namespace scribo::internal
     case SEGDET_PROCESS_TRACKING_ENUM::KALMAN:
       impl = std::make_unique<Kalman>(t, observation, descriptor);
       break;
-    case SEGDET_PROCESS_TRACKING_ENUM::KALMAN_LEPLUMEY:
-      impl = std::make_unique<KalmanLeplumey>(t, observation, descriptor);
+    case SEGDET_PROCESS_TRACKING_ENUM::KALMAN_IRISA:
+      impl = std::make_unique<KalmanIRISA>(t, observation, descriptor);
       break;
     case SEGDET_PROCESS_TRACKING_ENUM::ONE_EURO:
       impl = std::make_unique<OneEuros>(t, observation, descriptor);

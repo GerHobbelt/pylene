@@ -43,8 +43,11 @@ class Pylene(ConanFile):
     def build_requirements(self):
         self.test_requires("gtest/[>=1.11.0]")
         self.test_requires("benchmark/[>=1.5.0]")
+
+    def requirements(self):
         if self._build_python():
-            self.tool_requires("pybind11/2.6.2")
+            self.requires("pybind11/2.6.2")
+        
 
     def _check_configuration(self):
         tools.check_min_cppstd(self, "20")

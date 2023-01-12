@@ -25,10 +25,6 @@ class Pylene(ConanFile):
     generators = "CMakeDeps"
     exports_sources = ["pylene/*", "pylene-python/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
-    build_requires = [
-        "gtest/[>=1.11.0]",
-        "benchmark/[>=1.5.0]",
-    ]
 
     requires = [
         "range-v3/0.12.0",
@@ -44,6 +40,15 @@ class Pylene(ConanFile):
     def _build_python(self):
         return self.options.shared or self.options.fPIC or tools.os_info.is_windows
 
+    def build_requirements(self):
+        self.test_requires("gtest/[>=1.11.0]")
+        self.test_requires("benchmark/[>=1.5.0]")
+
+    def requirements(self):
+        if self._build_python():
+            self.requires("pybind11/2.6.2")
+        
+
     def _check_configuration(self):
         tools.check_min_cppstd(self, "20")
         if self.settings.compiler in ["gcc", "clang"] and tools.Version(self.settings.compiler.version) < 10:
@@ -53,8 +58,6 @@ class Pylene(ConanFile):
         self._check_configuration()
         if self.options.shared:
             self.options.fPIC = True
-        if self._build_python():
-            self.build_requires.append("pybind11/2.6.2")
 
     def generate(self):
         cmake = CMakeDeps(self)

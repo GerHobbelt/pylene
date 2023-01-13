@@ -24,7 +24,6 @@ namespace scribo::internal
     int                                discontinuity_absolute;
     double                             discontinuity_relative;
     int                                minimum_for_fusion;
-    float                              max_slope;
 
     // MATCHING
     int   nb_values_to_keep;
@@ -39,8 +38,8 @@ namespace scribo::internal
     // EXTRACTION
     SEGDET_PROCESS_EXTRACTION_ENUM extraction_type;
     int                            gradient_threshold;
-    int                            max_llum;
-    int                            max_max_llum;
+    int                            llumi;
+    int                            blumi;
     int                            max_thickness;
     float                          ratio_lum;
 

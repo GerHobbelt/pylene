@@ -212,8 +212,8 @@ TEST(Segdet, line_detect_2_cross_noise)
   params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
-  params.max_llum      = 180;
-  params.max_max_llum  = 180;
+  params.llumi         = 180;
+  params.blumi         = 180;
 
   auto output = detect_line_span(img, 10, params);
 

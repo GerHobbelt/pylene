@@ -7,7 +7,7 @@ namespace scribo
     if (nb_values_to_keep < minimum_for_fusion)
       return false;
 
-    if (max_llum > max_max_llum)
+    if (llumi > blumi)
       return false;
 
     if (preprocess != SEGDET_PREPROCESS_ENUM::NONE && preprocess != SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT)

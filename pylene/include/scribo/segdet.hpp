@@ -75,7 +75,6 @@ namespace scribo
     int discontinuity_absolute =
         0; ///< Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
     int   minimum_for_fusion = 15;   ///< Threshold to merge filters following same observation
-    float max_slope          = 50.f; ///< Max allowed slope of segment to detect
 
     int default_sigma_position   = 2;  ///< Position default variance value
     int default_sigma_thickness  = 2;  ///< Thickness default variance value
@@ -87,8 +86,8 @@ namespace scribo
     float sigma_luminosity_min = 13.f;  ///< Minimum luminosity variance value
 
     int   gradient_threshold = 30;  ///< Gradient threshold when gradient preprocess is applied
-    int   max_llum           = 225; ///< First threshold for observation ternary extraction
-    int   max_max_llum       = 225; ///< Second threshold for observation ternary extraction
+    int   llumi              = 225; ///< First threshold for observation ternary extraction
+    int   blumi              = 225; ///< Second threshold for observation ternary extraction
     float ratio_lum          = 1.f; ///< Ratio of kept luminosity in observation extraction
 
     int max_thickness = 100; ///< Max allowed (vertical|horizontal) thickness of segment to detect

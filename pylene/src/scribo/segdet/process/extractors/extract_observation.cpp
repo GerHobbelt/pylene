@@ -20,33 +20,33 @@ namespace scribo::internal
     int ithickness = 0;
 
     std::vector<float> luminosities_list;
-    int                min_iluminosity = 255;
+    int                mlumi           = 255;
     int                sum_iluminosity = 0;
     while (n + ithickness < n_max)
     {
       int iluminosity = static_cast<int>(image({t, n + ithickness}));
-      if (iluminosity > descriptor.max_max_llum)
+      if (iluminosity > descriptor.blumi)
         break;
 
-      if (iluminosity < min_iluminosity)
-        min_iluminosity = iluminosity;
+      if (iluminosity < mlumi)
+        mlumi = iluminosity;
 
       luminosities_list.push_back(iluminosity);
       sum_iluminosity += iluminosity;
       ithickness++;
     }
 
-    float medium_luminosity = min_iluminosity + (descriptor.max_max_llum - min_iluminosity) * descriptor.ratio_lum;
-    int   n_min_observation = n;
-    while (luminosities_list[n_min_observation - n] > medium_luminosity)
-      sum_iluminosity -= luminosities_list[n_min_observation++ - n];
+    float slumi = mlumi + (descriptor.blumi - mlumi) * descriptor.ratio_lum; // lstab
+    int   ni    = n;
+    while (luminosities_list[ni - n] > slumi)
+      sum_iluminosity -= luminosities_list[ni++ - n];
 
-    int n_max_observation = n + ithickness;
-    while (luminosities_list[--n_max_observation - n] > medium_luminosity)
-      sum_iluminosity -= luminosities_list[n_max_observation - n];
+    int nf = n + ithickness;
+    while (luminosities_list[--nf - n] > slumi)
+      sum_iluminosity -= luminosities_list[nf - n];
 
-    float position   = (n_max_observation + n_min_observation) / 2.0f;
-    float thickness  = n_max_observation - n_min_observation + 1.0f;
+    float position   = (nf + ni) / 2.0f;
+    float thickness  = nf - ni + 1.0f;
     float luminosity = sum_iluminosity / thickness;
 
     auto ret = Eigen::Matrix<float, 3, 1>(position, thickness, luminosity);
@@ -95,7 +95,7 @@ namespace scribo::internal
     case SEGDET_PROCESS_EXTRACTION_ENUM::BINARY:
       for (int n = 0; n < n_max; n++)
       {
-        if (image({t, n}) < descriptor.max_llum)
+        if (image({t, n}) < descriptor.llumi)
         {
           observations.push_back(determine_observation_binary(image, n, t, n_max, descriptor));
         }

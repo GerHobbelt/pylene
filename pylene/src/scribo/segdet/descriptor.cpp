@@ -14,11 +14,10 @@ namespace scribo::internal
 
     traversal_mode         = params.traversal_mode;
     bucket_size            = params.bucket_size;
-    min_length_embryo      = min_length / 4 + 1;
+    min_length_embryo      = std::min(min_length / 4 + 1, 10);
     discontinuity_relative = static_cast<double>(params.discontinuity_relative) / 100;
     discontinuity_absolute = params.discontinuity_absolute;
     minimum_for_fusion     = params.minimum_for_fusion;
-    max_slope              = std::tan(params.max_slope * 3.14 / 180);
 
     nb_values_to_keep        = params.nb_values_to_keep;
     default_sigma_position   = params.default_sigma_position;
@@ -31,8 +30,8 @@ namespace scribo::internal
 
     extraction_type    = params.extraction_type;
     gradient_threshold = params.gradient_threshold;
-    max_llum           = params.max_llum;
-    max_max_llum       = params.max_max_llum;
+    llumi           = params.llumi;
+    blumi              = params.blumi;
     max_thickness      = params.max_thickness;
     ratio_lum          = params.ratio_lum;
 

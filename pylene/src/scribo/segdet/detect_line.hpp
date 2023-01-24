@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <tuple>
 
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/ndimage_fwd.hpp>
@@ -31,7 +32,7 @@ namespace scribo::internal
    * @param img_width Width of the image where segments were extract
    * @param img_height Height of the image where segments were extract
    */
-  std::vector<Segment> post_process(std::vector<Segment>& hsegments, std::vector<Segment>& vsegments, int img_width,
+  std::tuple<std::vector<Segment>, std::vector<Segment>> post_process(std::vector<Segment>& hsegments, std::vector<Segment>& vsegments, int img_width,
                                     int img_height, const Descriptor& descriptor);
 
   /**
@@ -42,5 +43,5 @@ namespace scribo::internal
    * @param params Parameters of the line detection
    * @return std::vector<Segment> 
    */
-  std::vector<Segment> detect_line(const image2d<std::uint8_t>& img, int min_len, const SegDetParams& params);
+  std::tuple<std::vector<Segment>, std::vector<Segment>> detect_line(const image2d<std::uint8_t>& img, int min_len, const SegDetParams& params);
 } // namespace scribo::internal

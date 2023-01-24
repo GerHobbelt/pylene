@@ -47,8 +47,8 @@ namespace scribo::internal
   void remove_dup(const std::vector<Segment>& segments_to_compare, std::vector<Segment>& segments_removable, int width,
                   int height, const Descriptor& descriptor)
   {
-    auto first_output  = std::get<0>(segment_to_label(segments_to_compare, width, height, false));
-    auto second_output = std::get<0>(segment_to_label(segments_removable, width, height, false));
+    auto first_output  = std::get<0>(segment_to_label(segments_to_compare, {}, width, height, false));
+    auto second_output = std::get<0>(segment_to_label(segments_removable, {}, width, height, false));
 
     binarize_img(first_output);
 
@@ -99,23 +99,26 @@ namespace scribo::internal
    * @param descriptor Descriptor of parameter (used : min_length)
    * @return
    */
-  std::vector<Segment> filter_length(std::pair<std::vector<Segment>, std::vector<Segment>>& p,
-                                     const Descriptor&                                      descriptor)
+  std::tuple<std::vector<Segment>, std::vector<Segment>>
+  filter_length(std::pair<std::vector<Segment>, std::vector<Segment>>& p, const Descriptor& descriptor)
   {
+    std::vector<Segment> res_all{};
+    res_all.reserve(p.first.size() + p.second.size());
+    res_all.insert(res_all.end(), p.first.begin(), p.first.end());
+    res_all.insert(res_all.end(), p.second.begin(), p.second.end());
+
     std::vector<Segment> res{};
+    std::vector<Segment> nres{};
 
-    for (auto& seg : p.first)
+    for (auto& s : res_all)
     {
-      if (seg.length >= descriptor.min_length)
-        res.push_back(seg);
-    }
-    for (auto& seg : p.second)
-    {
-      if (seg.length >= descriptor.min_length)
-        res.push_back(seg);
+      auto& v = s.length < descriptor.min_length ? nres : res;
+      v.push_back(s);
     }
 
-    return res;
+    auto ret = std::make_tuple(res, nres);
+
+    return ret;
   }
 
   /**
@@ -124,12 +127,14 @@ namespace scribo::internal
    * @param img_width Width of the image where segments were extract
    * @param img_height Height of the image where segments were extract
    */
-  std::vector<Segment> post_process(std::vector<Segment>& hsegments, std::vector<Segment>& vsegments, int img_width,
-                                    int img_height, const Descriptor& descriptor)
+  std::tuple<std::vector<Segment>, std::vector<Segment>> post_process(std::vector<Segment>& hsegments,
+                                                                      std::vector<Segment>& vsegments, int img_width,
+                                                                      int img_height, const Descriptor& descriptor)
   {
     auto pair = std::make_pair(hsegments, vsegments);
 
-    if (descriptor.remove_duplicates && descriptor.traversal_mode == scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL)
+    if (descriptor.remove_duplicates &&
+        descriptor.traversal_mode == scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL)
       remove_duplicates(pair, img_width, img_height, descriptor);
 
     auto segments = filter_length(pair, descriptor);

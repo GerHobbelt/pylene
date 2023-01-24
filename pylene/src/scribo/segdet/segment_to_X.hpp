@@ -23,7 +23,7 @@ namespace scribo::internal
    * label X : Segment X
    */
   std::tuple<image2d<std::uint16_t>, std::vector<LSuperposition>>
-  segment_to_label(const std::vector<Segment>& segments, int width, int height, bool handle_under_other = true);
+  segment_to_label(const std::vector<Segment>& segments,const std::vector<Segment>& nsegments, int width, int height, bool handle_under_other = true);
 
   std::vector<VSegment> segment_to_vsegment(const std::vector<Segment>& segs);
 } // namespace scribo::internal

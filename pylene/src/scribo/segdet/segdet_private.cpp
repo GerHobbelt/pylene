@@ -72,7 +72,8 @@ namespace scribo::internal
 
   segdet_output detect_line_span(const image2d<std::uint8_t>& image, int min_len, const SegDetParams& params)
   {
-    return segments_to_output(detect_line(std::move(image), min_len, params));
+    auto [res, _] = detect_line(std::move(image), min_len, params);
+    return segments_to_output(res);
   }
 
   segdet_output detect_line_span(const image2d<std::uint8_t>& image, int min_len)

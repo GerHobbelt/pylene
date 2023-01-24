@@ -18,7 +18,7 @@ namespace scribo::internal
 
   {
     auto pos = {x, y};
-    if (img(pos) == 0)
+    if (img(pos) == 0 || label == 0)
     {
       img(pos) = label + max_label;
     }
@@ -50,8 +50,8 @@ namespace scribo::internal
 
     if (is_horizontal)
     {
-      int i_min  = std::ceil(span.y - thickness_d2);
-      int i_max  = std::floor(span.y + thickness_d2);
+      int i_min = std::ceil(span.y - thickness_d2);
+      int i_max = std::floor(span.y + thickness_d2);
 
       int height = img.size(1);
 
@@ -75,8 +75,10 @@ namespace scribo::internal
     }
   }
 
-  std::tuple<image2d<std::uint16_t>, std::vector<LSuperposition>>
-  segment_to_label(const std::vector<Segment>& segments, int width, int height, bool handle_under_other)
+  std::tuple<image2d<std::uint16_t>, std::vector<LSuperposition>> segment_to_label(const std::vector<Segment>& segments,
+                                                                                   const std::vector<Segment>& nsegment,
+                                                                                   int width, int height,
+                                                                                   bool handle_under_other)
   {
     auto img_out = mln::image2d<uint16_t>(width, height);
     mln::fill(img_out, 0);
@@ -93,6 +95,16 @@ namespace scribo::internal
       if (handle_under_other)
         for (auto& span : segments[i].under_other_object)
           draw_labeled_span(img_out, i + first_label, span, segments[i].is_horizontal, superpositions, max_label);
+    }
+
+    // Remove object that are not segments
+    for (int i = 0; i < (int)nsegment.size(); i++)
+    {
+      for (auto& span : nsegment[i].spans)
+        draw_labeled_span(img_out, 0, span, nsegment[i].is_horizontal, superpositions, 0);
+
+      for (auto& span : nsegment[i].under_other_object)
+        draw_labeled_span(img_out, 0, span, nsegment[i].is_horizontal, superpositions, 0);
     }
 
     if (handle_under_other)

@@ -4,7 +4,7 @@ namespace scribo::internal
 {
   using namespace mln;
 
-  std::vector<Segment> detect_line(const image2d<std::uint8_t>& image, int min_len, const SegDetParams& params)
+  std::tuple<std::vector<Segment>, std::vector<Segment>> detect_line(const image2d<std::uint8_t>& image, int min_len, const SegDetParams& params)
   {
     // Parameter setting
     const Descriptor& descriptor = Descriptor(params, min_len);

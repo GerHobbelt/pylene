@@ -29,8 +29,7 @@ namespace scribo
    */
   enum class SEGDET_PROCESS_TRACKING_ENUM
   {
-    KALMAN,                    ///< Kalman Filters following classics prediction and correction
-    KALMAN_IRISA,              ///< Kalman Filters by IRISA as understood
+    KALMAN,                    ///< Kalman Filters following classics prediction and correction based on IRISA article
     ONE_EURO,                  ///< One Euro Filter (modification from Nicolas Roussel code)
     DOUBLE_EXPONENTIAL,        ///< Double exponential Filter
     LAST_INTEGRATION,          ///< Last observation predictor
@@ -159,5 +158,6 @@ namespace scribo
   std::tuple<mln::image2d<std::uint16_t>, std::vector<LSuperposition>, std::vector<VSegment>>
   detect_line_full(mln::image2d<std::uint8_t> image, int min_len, const SegDetParams& params = SegDetParams());
 
-  mln::image2d<std::uint8_t> detect_line_pp(const mln::image2d<std::uint8_t>& image, const SegDetParams& params);
+  std::tuple<mln::image2d<std::uint8_t>, mln::image2d<std::uint8_t>, mln::image2d<std::uint8_t>>
+  detect_line_pp(const mln::image2d<std::uint8_t>& image, const SegDetParams& params);
 } // namespace scribo

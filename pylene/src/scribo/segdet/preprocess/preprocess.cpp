@@ -14,6 +14,13 @@
 
 namespace scribo::internal
 {
+  /**
+   * @brief Perform a black top hat on the input image
+   * 
+   * @param input The input image
+   * @param descriptor Descriptor containing the parameters of the preprocessing
+   * @return mln::image2d<std::uint8_t> 
+   */
   mln::image2d<std::uint8_t> black_top_hat(const mln::image2d<std::uint8_t>& input, const Descriptor& descriptor)
   {
     // 1. Negate

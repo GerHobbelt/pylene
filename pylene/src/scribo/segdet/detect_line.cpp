@@ -16,7 +16,7 @@ namespace scribo::internal
     auto p = process(std::move(preprocessed_img), descriptor);
 
     // Post Processing
-    auto result = post_process(p.first, p.second, image.size(0), image.size(1), descriptor);
+    auto result = post_process(p, image.size(0), image.size(1), descriptor);
 
     return result;
   }

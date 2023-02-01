@@ -121,23 +121,14 @@ namespace scribo::internal
     return ret;
   }
 
-  /**
-   * Post process segments linking them and removing duplications
-   * @param pair Pair (horizontal segments,vertical segments)
-   * @param img_width Width of the image where segments were extract
-   * @param img_height Height of the image where segments were extract
-   */
-  std::tuple<std::vector<Segment>, std::vector<Segment>> post_process(std::vector<Segment>& hsegments,
-                                                                      std::vector<Segment>& vsegments, int img_width,
+  std::tuple<std::vector<Segment>, std::vector<Segment>> post_process(std::pair<std::vector<Segment>, std::vector<Segment>> segments_pair, int img_width,
                                                                       int img_height, const Descriptor& descriptor)
   {
-    auto pair = std::make_pair(hsegments, vsegments);
-
     if (descriptor.remove_duplicates &&
         descriptor.traversal_mode == scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL)
-      remove_duplicates(pair, img_width, img_height, descriptor);
+      remove_duplicates(segments_pair, img_width, img_height, descriptor);
 
-    auto segments = filter_length(pair, descriptor);
+    auto segments = filter_length(segments_pair, descriptor);
 
     return segments;
   }

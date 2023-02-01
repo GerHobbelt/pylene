@@ -20,7 +20,7 @@ namespace scribo::internal
     static const Eigen::Matrix<float, 3, 3> Vn((Eigen::Matrix<float, 3, 3>() << SEGDET_VARIANCE_POSITION, 0, 0, 0,
                                                 SEGDET_VARIANCE_THICKNESS, 0, 0, 0, SEGDET_VARIANCE_LUMINOSITY)
                                                    .finished());
-    static const Eigen::Matrix<float, 4, 4> Q(Eigen::Matrix<float, 4, 4>::Identity() * 0.00001);
+    static const Eigen::Matrix<float, 4, 4> Vw(Eigen::Matrix<float, 4, 4>::Identity() * 0.00001);
 
   } // namespace
 
@@ -36,7 +36,7 @@ namespace scribo::internal
     S           = A * S;
     X_predicted = C * S;
 
-    H = A * H * A_transpose + Q;
+    H = A * H * A_transpose + Vw;
 
     Filter_impl::predict();
   }

@@ -7,13 +7,13 @@ namespace scribo::internal
 {
   struct DoubleExponential final : public Filter_impl
   {
-    struct DoubleExponentialInt
+    struct DoubleExponentialInternal
     {
       const float alpha;
       float       hatxiprev;
       float       hatxi2prev;
 
-      DoubleExponentialInt(float value, float alpha)
+      DoubleExponentialInternal(float value, float alpha)
         : alpha(alpha)
         , hatxiprev(value)
         , hatxi2prev(value)
@@ -24,14 +24,14 @@ namespace scribo::internal
 
       void integrate(int x)
       {
-          hatxiprev = alpha * x + (1.0 - alpha) * hatxiprev;
-          hatxi2prev = alpha * hatxiprev + (1.0 - alpha) * hatxi2prev;
+        hatxiprev  = alpha * x + (1.0 - alpha) * hatxiprev;
+        hatxi2prev = alpha * hatxiprev + (1.0 - alpha) * hatxi2prev;
       }
     };
 
-    DoubleExponentialInt x;
-    DoubleExponentialInt thick;
-    DoubleExponentialInt lumi;
+    DoubleExponentialInternal x;
+    DoubleExponentialInternal thick;
+    DoubleExponentialInternal lumi;
 
     DoubleExponential(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor);
     ~DoubleExponential() override = default;

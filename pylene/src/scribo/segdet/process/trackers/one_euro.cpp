@@ -4,9 +4,12 @@ namespace scribo::internal
 {
   OneEuros::OneEuros(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
     : Filter_impl(t_integration, observation, descriptor)
-    , x(OneEuro(observation(0, 0), t_integration))
-    , thick(OneEuro(observation(1, 0), t_integration))
-    , lumi(OneEuro(observation(2, 0), t_integration))
+    , x(OneEuro(observation(0, 0), t_integration, descriptor.one_euro_mincutoff, descriptor.one_euro_beta,
+                descriptor.one_euro_dcutoff))
+    , thick(OneEuro(observation(1, 0), t_integration, descriptor.one_euro_mincutoff, descriptor.one_euro_beta,
+                    descriptor.one_euro_dcutoff))
+    , lumi(OneEuro(observation(2, 0), t_integration, descriptor.one_euro_mincutoff, descriptor.one_euro_beta,
+                   descriptor.one_euro_dcutoff))
   {
   }
 

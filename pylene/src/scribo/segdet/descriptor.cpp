@@ -30,14 +30,18 @@ namespace scribo::internal
 
     extraction_type    = params.extraction_type;
     gradient_threshold = params.gradient_threshold;
-    llumi           = params.llumi;
+    llumi              = params.llumi;
     blumi              = params.blumi;
     max_thickness      = params.max_thickness;
     ratio_lum          = params.ratio_lum;
 
-    filter_type                  = params.tracker;
-    double_exponential_alpha     = params.double_exponential_alpha;
-    simple_moving_average_memory = params.simple_moving_average_memory;
+    filter_type                       = params.tracker;
+    double_exponential_alpha          = params.double_exponential_alpha;
+    simple_moving_average_memory      = params.simple_moving_average_memory;
+    exponential_moving_average_memory = params.exponential_moving_average_memory;
+    one_euro_mincutoff                = params.one_euro_mincutoff;
+    one_euro_beta                     = params.one_euro_beta;
+    one_euro_dcutoff                  = params.one_euro_dcutoff;
 
 
     threshold_intersection = params.threshold_intersection;

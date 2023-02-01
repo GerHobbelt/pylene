@@ -61,10 +61,14 @@ namespace scribo
 
     bool negate_image = false; ///< Say if image has to be reversed before processing
 
-    float dyn                          = 0.6f;  ///< Dynamic when Black-Top-Hat preprocess is applied
-    int   size_mask                    = 11;    ///< Filter size when Black-Top-Hat preprocess is applied
-    float double_exponential_alpha     = 0.6f;  ///< Alpha used in double exponential filter if chosen
-    float simple_moving_average_memory = 30.0f; ///< Memory used in simple moving average filter if chosen
+    float dyn                               = 0.6f;   ///< Dynamic when Black-Top-Hat preprocess is applied
+    int   size_mask                         = 11;     ///< Filter size when Black-Top-Hat preprocess is applied
+    float double_exponential_alpha          = 0.6f;   ///< Alpha used in double exponential filter if chosen
+    float simple_moving_average_memory      = 30.0f;  ///< Memory used in simple moving average filter if chosen
+    float exponential_moving_average_memory = 16.0f;  ///< Memory used in exponential moving average filter if chosen
+    float one_euro_beta                     = 0.007f; ///< Beta used in one euro filter if chosen
+    float one_euro_mincutoff                = 1.0f;   ///< Min cutoff used in one euro filter if chosen
+    float one_euro_dcutoff                  = 1.0f;   ///< Dcutoff used in one euro filter if chosen
 
     int bucket_size = 32; ///< Bucket size during traversal
 

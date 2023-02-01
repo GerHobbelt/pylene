@@ -6,14 +6,16 @@ namespace scribo::internal
 {
   struct ExponentialMovingAverage final : public Filter_impl
   {
-    struct ExponentialMovingAverageInside
+    struct ExponentialMovingAverageInternal
     {
       float current;
       float nb_value;
+      const float nb_value_max;
 
-      ExponentialMovingAverageInside(float value)
+      ExponentialMovingAverageInternal(float value, float nb_value_max)
         : current(value)
         , nb_value(1.f)
+        , nb_value_max(nb_value_max)
       {
       }
 
@@ -21,15 +23,16 @@ namespace scribo::internal
 
       void integrate(float x)
       {
-        float w = 2.f / (nb_value++ + 1);
-        current = current * w + x * (1.f - w);
+        float w  = 2.f / (nb_value + 1);
+        nb_value = std::min(nb_value + 1, nb_value_max);
+        current  = current * w + x * (1.f - w);
       }
     };
 
     float                          x;
-    ExponentialMovingAverageInside x_move;
-    ExponentialMovingAverageInside thick;
-    ExponentialMovingAverageInside lumi;
+    ExponentialMovingAverageInternal x_move;
+    ExponentialMovingAverageInternal thick;
+    ExponentialMovingAverageInternal lumi;
 
     ExponentialMovingAverage(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor);
     ~ExponentialMovingAverage() override = default;

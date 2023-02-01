@@ -5,9 +5,9 @@ namespace scribo::internal
   ExponentialMovingAverage::ExponentialMovingAverage(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
     : Filter_impl(t_integration, observation, descriptor)
     , x(observation(0, 0))
-    , x_move(ExponentialMovingAverageInside(0))
-    , thick(ExponentialMovingAverageInside(observation(1, 0)))
-    , lumi(ExponentialMovingAverageInside(observation(2, 0)))
+    , x_move(ExponentialMovingAverageInternal(0, descriptor.exponential_moving_average_memory))
+    , thick(ExponentialMovingAverageInternal(observation(1, 0), descriptor.exponential_moving_average_memory))
+    , lumi(ExponentialMovingAverageInternal(observation(2, 0), descriptor.exponential_moving_average_memory))
   {
   }
 

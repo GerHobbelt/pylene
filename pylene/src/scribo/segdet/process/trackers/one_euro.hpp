@@ -89,9 +89,8 @@ namespace scribo::internal
         last_t = t;
       }
 
-      OneEuro(double initval, int t, double freq = 1.0, double mincutoff = 1.0, double beta_ = 0.0,
-              double dcutoff = 1.0)
-        : freq(freq)
+      OneEuro(double initval, int t, double mincutoff, double beta_, double dcutoff)
+        : freq(1.0)
         , mincutoff(mincutoff)
         , beta_(beta_)
         , dcutoff(dcutoff)

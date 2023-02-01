@@ -4,9 +4,9 @@ namespace scribo::internal
 {
   DoubleExponential::DoubleExponential(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
     : Filter_impl(t_integration, observation, descriptor)
-    , x(DoubleExponentialInt(observation(0, 0), descriptor.double_exponential_alpha))
-    , thick(DoubleExponentialInt(observation(1, 0), descriptor.double_exponential_alpha))
-    , lumi(DoubleExponentialInt(observation(2, 0), descriptor.double_exponential_alpha))
+    , x(DoubleExponentialInternal(observation(0, 0), descriptor.double_exponential_alpha))
+    , thick(DoubleExponentialInternal(observation(1, 0), descriptor.double_exponential_alpha))
+    , lumi(DoubleExponentialInternal(observation(2, 0), descriptor.double_exponential_alpha))
   {
   }
 

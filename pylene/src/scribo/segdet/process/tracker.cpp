@@ -1,4 +1,4 @@
-#include "filter.hpp"
+#include "tracker.hpp"
 
 // Include of trackers/*.hpp
 #include "trackers/double_exponential.hpp"
@@ -10,9 +10,9 @@
 
 namespace scribo::internal
 {
-  Filter::Filter(int t, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
+  Tracker::Tracker(int t, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
   {
-    switch (descriptor.filter_type)
+    switch (descriptor.tracking_type)
     {
     case SEGDET_PROCESS_TRACKING_ENUM::KALMAN:
       impl = std::make_unique<Kalman>(t, observation, descriptor);
@@ -35,17 +35,17 @@ namespace scribo::internal
     }
   }
 
-  void Filter::predict()
+  void Tracker::predict()
   {
     impl->predict();
   }
 
-  void Filter::integrate(int t, const Descriptor& descriptor)
+  void Tracker::integrate(int t, const Descriptor& descriptor)
   {
     impl->integrate(t, descriptor);
   }
 
-  int Filter::get_position() const noexcept
+  int Tracker::get_position() const noexcept
   {
     return static_cast<int>(impl->n_values.back());
   }

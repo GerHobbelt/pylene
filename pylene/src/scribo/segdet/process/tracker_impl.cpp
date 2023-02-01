@@ -1,4 +1,4 @@
-#include "filter_impl.hpp"
+#include "tracker_impl.hpp"
 
 #include <algorithm>
 #include <numeric>
@@ -37,7 +37,7 @@ namespace scribo::internal
     return result;
   }
 
-  Filter_impl::Filter_impl(int t_integration, Eigen::Matrix<float, 3, 1> obs, const Descriptor& descriptor)
+  Tracker_impl::Tracker_impl(int t_integration, Eigen::Matrix<float, 3, 1> obs, const Descriptor& descriptor)
     : observation(std::nullopt)
     , observation_distance(0)
     , last_integration(t_integration)
@@ -71,7 +71,7 @@ namespace scribo::internal
     segment_spans = std::vector<Span>();
   }
 
-  void Filter_impl::compute_sigmas(const Descriptor& descriptor)
+  void Tracker_impl::compute_sigmas(const Descriptor& descriptor)
   {
     if (static_cast<int>(n_values.size()) > descriptor.min_nb_values_sigma)
     {
@@ -94,7 +94,7 @@ namespace scribo::internal
     return abs(prediction - observation) <= sigma;
   }
 
-  bool Filter_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max, const Descriptor& descriptor) const
+  bool Tracker_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max, const Descriptor& descriptor) const
   {
     if (static_cast<int>(n_values.size()) > descriptor.min_nb_values_sigma && obs(1, 0) / X_predicted(1, 0) > 1.5 &&
         std::abs(obs(1, 0) - X_predicted(1, 0)) > 3)
@@ -112,7 +112,7 @@ namespace scribo::internal
            accepts_sigma(X_predicted(2, 0), obs(2, 0), sigma_luminosity);
   }
 
-  std::optional<Observation> Filter_impl::choose_nearest(Observation& obs)
+  std::optional<Observation> Tracker_impl::choose_nearest(Observation& obs)
   {
     auto X             = obs.obs;
     auto obs_to_return = std::make_optional(obs);
@@ -129,17 +129,17 @@ namespace scribo::internal
   }
 
   /**
-   * Compute the slope of the segment formed by the filter using Linear regression
+   * Compute the slope of the segment formed by the tracker using Linear regression
    * @return The computed slope
    */
-  float Filter_impl::compute_slope()
+  float Tracker_impl::compute_slope()
   {
     reg.push(t_values.back(), n_values.back());
     auto slope = reg.predict();
     return slope;
   }
 
-  void Filter_impl::predict()
+  void Tracker_impl::predict()
   {
     int thik_d2 = X_predicted(1, 0) / 2;
     n_min       = X_predicted(0, 0) - thik_d2;
@@ -154,7 +154,7 @@ namespace scribo::internal
    * @param observation The observation matrix to integrate
    * @param t The position at which the integration was made
    */
-  void Filter_impl::integrate(int t, const Descriptor& descriptor)
+  void Tracker_impl::integrate(int t, const Descriptor& descriptor)
   {
     const auto& observation_non_opt = observation.value();
     const auto& obs                 = observation_non_opt.obs;

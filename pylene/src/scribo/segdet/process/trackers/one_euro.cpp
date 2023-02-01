@@ -3,7 +3,7 @@
 namespace scribo::internal
 {
   OneEuros::OneEuros(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
-    : Filter_impl(t_integration, observation, descriptor)
+    : Tracker_impl(t_integration, observation, descriptor)
     , x(OneEuro(observation(0, 0), t_integration, descriptor.one_euro_mincutoff, descriptor.one_euro_beta,
                 descriptor.one_euro_dcutoff))
     , thick(OneEuro(observation(1, 0), t_integration, descriptor.one_euro_mincutoff, descriptor.one_euro_beta,
@@ -19,7 +19,7 @@ namespace scribo::internal
     X_predicted(1, 0) = thick.predict();
     X_predicted(2, 0) = lumi.predict();
 
-    Filter_impl::predict();
+    Tracker_impl::predict();
   }
 
   void OneEuros::integrate(int t, const Descriptor& descriptor)
@@ -30,6 +30,6 @@ namespace scribo::internal
     thick.integrate(obs(1, 0), t);
     lumi.integrate(obs(2, 0), t);
 
-    Filter_impl::integrate(t, descriptor);
+    Tracker_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

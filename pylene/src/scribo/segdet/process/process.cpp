@@ -59,17 +59,17 @@ namespace scribo::internal
     return ret;
   }
 
-  void find_match_bucket(Buckets& buckets, size_t bucket, std::vector<Filter>& accepted,
+  void find_match_bucket(Buckets& buckets, size_t bucket, std::vector<Tracker>& accepted,
                          const Eigen::Matrix<float, 3, 1>& obs, const int& t, int obs_thick, int obs_n_min,
                          int obs_n_max, const Descriptor& descriptor)
   {
     if (obs_thick < descriptor.max_thickness)
       buckets.remove_if(
           bucket,
-          [=, &obs, &descriptor](const Filter& f) { return f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor); },
+          [=, &obs, &descriptor](const Tracker& f) { return f.impl->accepts(obs, obs_n_min, obs_n_max, descriptor); },
           accepted);
 
-    buckets.for_each_filter(bucket, [=](const Filter& f) {
+    buckets.for_each_tracker(bucket, [=](const Tracker& f) {
       if (f.impl->observation != std::nullopt)
         return;
 
@@ -84,12 +84,12 @@ namespace scribo::internal
   }
 
   /**
-   * Compute list of filters that accept the current Observation, add the filter inside accepted list
-   * @param filters Current
+   * Compute list of trackers that accept the current Observation, add the tracker inside accepted list
+   * @param trackers Current
    * @param obs Observation to match
    * @param t Current t
    */
-  std::vector<Filter> find_match(Buckets& buckets, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
+  std::vector<Tracker> find_match(Buckets& buckets, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
                                  float max_sigma_pos, const Descriptor& descriptor)
   {
     float max_sigma_thickD2 = std::max(max_sigma_pos, obs(1, 0) / 2.f);
@@ -108,7 +108,7 @@ namespace scribo::internal
     int   obs_n_min    = std::floor(obs(0, 0) - obs_thick_d2);
     int   obs_n_max    = std::ceil(obs(0, 0) + obs_thick_d2);
 
-    std::vector<Filter> accepted;
+    std::vector<Tracker> accepted;
     for (size_t b = obs_bucket_min; b <= obs_bucket_max; b++)
       find_match_bucket(buckets, b, accepted, obs, t, obs_thick, obs_n_min, obs_n_max, descriptor);
 
@@ -116,12 +116,12 @@ namespace scribo::internal
   }
 
   /**
-   * Check if the filters are following the same observation
-   * @param f first filter
-   * @param fj second filter
-   * @return true if the filters are following the same observation for SEGDET_MINIMUM_FOR_FUSION length
+   * Check if the trackers are following the same observation
+   * @param f first tracker
+   * @param fj second tracker
+   * @return true if the trackers are following the same observation for SEGDET_MINIMUM_FOR_FUSION length
    */
-  bool need_fusion(const Filter& fi, const Filter& fj, const Descriptor& descriptor)
+  bool need_fusion(const Tracker& fi, const Tracker& fj, const Descriptor& descriptor)
   {
     int i = 0;
     for (auto ite_i = fi.impl->same_observation.crbegin(), ite_j = fj.impl->same_observation.crbegin();
@@ -131,50 +131,50 @@ namespace scribo::internal
   }
 
   /**
-   * Erase a filter adding if needed the extract segment
-   * @param filters Current list of filters
+   * Erase a tracker adding if needed the extract segment
+   * @param trackers Current list of trackers
    * @param segments Current list of segments
-   * @param j Index of the filter to erase
+   * @param j Index of the tracker to erase
    * @param descriptor parameters
    */
-  void erase_filter(std::vector<Filter>& filters, std::vector<Segment>& segments, size_t fi,
+  void erase_tracker(std::vector<Tracker>& trackers, std::vector<Segment>& segments, size_t fi,
                     const Descriptor& descriptor)
   {
-    if (filters[fi].impl->last_integration - filters[fi].impl->first - descriptor.minimum_for_fusion >
+    if (trackers[fi].impl->last_integration - trackers[fi].impl->first - descriptor.minimum_for_fusion >
         descriptor.min_length_embryo)
-      segments.emplace_back(std::move(filters[fi]), descriptor.minimum_for_fusion);
+      segments.emplace_back(std::move(trackers[fi]), descriptor.minimum_for_fusion);
 
-    std::iter_swap(filters.begin() + fi, filters.begin() + filters.size() - 1);
-    filters.pop_back();
+    std::iter_swap(trackers.begin() + fi, trackers.begin() + trackers.size() - 1);
+    trackers.pop_back();
   }
 
   /**
-   * Check if a fusion with the current filter is to be done
-   * @param filters Current list of filter
-   * @param index Index of the current filter
+   * Check if a fusion with the current tracker is to be done
+   * @param trackers Current list of tracker
+   * @param index Index of the current tracker
    * @param segments Current list of segment
    * @return true if happened
    */
-  bool make_potential_fusion(std::vector<Filter>& filters, size_t fi, std::vector<Segment>& segments,
+  bool make_potential_fusion(std::vector<Tracker>& trackers, size_t fi, std::vector<Segment>& segments,
                              const Descriptor& descriptor)
   {
     size_t fj                         = fi + 1;
-    bool   current_filter_was_deleted = false;
+    bool   current_tracker_was_deleted = false;
 
-    while (fj < filters.size())
+    while (fj < trackers.size())
     {
-      if (filters[fj].impl->same_observation.size() > static_cast<size_t>(descriptor.minimum_for_fusion) &&
-          filters[fj].impl->observation != std::nullopt && need_fusion(filters[fi], filters[fj], descriptor))
+      if (trackers[fj].impl->same_observation.size() > static_cast<size_t>(descriptor.minimum_for_fusion) &&
+          trackers[fj].impl->observation != std::nullopt && need_fusion(trackers[fi], trackers[fj], descriptor))
       {
-        if (filters[fi].impl->first < filters[fj].impl->first)
+        if (trackers[fi].impl->first < trackers[fj].impl->first)
         {
-          erase_filter(filters, segments, fj, descriptor);
+          erase_tracker(trackers, segments, fj, descriptor);
           continue;
         }
         else
         {
-          current_filter_was_deleted = true;
-          erase_filter(filters, segments, fi, descriptor);
+          current_tracker_was_deleted = true;
+          erase_tracker(trackers, segments, fi, descriptor);
           break;
         }
       }
@@ -182,17 +182,17 @@ namespace scribo::internal
       fj++;
     }
 
-    return current_filter_was_deleted;
+    return current_tracker_was_deleted;
   }
 
   /**
-   * Say if the filter has to continue
-   * @param f filter to check
+   * Say if the tracker has to continue
+   * @param f tracker to check
    * @param t current t
    * @param discontinuity discontinuity allowed
-   * @return true if the filter has to continue
+   * @return true if the tracker has to continue
    */
-  bool filter_has_to_continue(const Filter& f, int t, const Descriptor& descriptor)
+  bool tracker_has_to_continue(const Tracker& f, int t, const Descriptor& descriptor)
   {
     // Isolated point
     if (f.impl->last_integration - f.impl->first <= isolated_point)
@@ -211,24 +211,24 @@ namespace scribo::internal
   }
 
   /**
-   * Integrate observation for filters that matched an observation
-   * Select filters that have to continue
+   * Integrate observation for trackers that matched an observation
+   * Select trackers that have to continue
    * Add segment in segments if needed
-   * @param filters Current filters
+   * @param trackers Current trackers
    * @param segments Current segments
    * @param t Current t
    * @param discontinuity
-   * @return List of filters that have to continue
+   * @return List of trackers that have to continue
    */
-  std::vector<Filter> filter_selection(std::vector<Filter>& filters, std::vector<Segment>& segments, int t,
+  std::vector<Tracker> tracker_selection(std::vector<Tracker>& trackers, std::vector<Segment>& segments, int t,
                                        const Descriptor& descriptor)
   {
-    std::vector<Filter> filters_to_keep;
+    std::vector<Tracker> trackers_to_keep;
 
     size_t fi = 0;
-    while (fi < filters.size())
+    while (fi < trackers.size())
     {
-      Filter&& f = std::move(filters[fi]);
+      Tracker&& f = std::move(trackers[fi]);
 
       // Early stoping on high slopes
       if (f.impl->n_values.size() > slope_threshold && std::abs(f.impl->current_slope) > slope_max)
@@ -240,16 +240,16 @@ namespace scribo::internal
       if (f.impl->observation != std::nullopt)
       {
         if (f.impl->same_observation.size() >= static_cast<size_t>(descriptor.minimum_for_fusion) &&
-            make_potential_fusion(filters, fi, segments, descriptor))
+            make_potential_fusion(trackers, fi, segments, descriptor))
           continue;
 
         f.integrate(t, descriptor);
 
-        filters_to_keep.push_back(std::move(f));
+        trackers_to_keep.push_back(std::move(f));
       }
-      else if (filter_has_to_continue(f, t, descriptor))
+      else if (tracker_has_to_continue(f, t, descriptor))
       {
-        filters_to_keep.push_back(std::move(f));
+        trackers_to_keep.push_back(std::move(f));
       }
       else if (f.impl->last_integration - f.impl->first > descriptor.min_length_embryo)
         segments.emplace_back(std::move(f), 0);
@@ -257,37 +257,37 @@ namespace scribo::internal
       fi++;
     }
 
-    return filters_to_keep;
+    return trackers_to_keep;
   }
 
   /**
-   * Add last segment from current filters if needed
-   * @param filters Current filters
+   * Add last segment from current trackers if needed
+   * @param trackers Current trackers
    * @param segments Current segments
    */
-  void finish_traversal(std::vector<Filter>& filters, std::vector<Segment>& segments, const Descriptor& descriptor)
+  void finish_traversal(std::vector<Tracker>& trackers, std::vector<Segment>& segments, const Descriptor& descriptor)
   {
     size_t fi = 0;
-    while (fi < filters.size())
+    while (fi < trackers.size())
     {
-      if (filters[fi].impl->last_integration - filters[fi].impl->first > descriptor.min_length_embryo)
-        segments.emplace_back(std::move(filters[fi]), 0);
+      if (trackers[fi].impl->last_integration - trackers[fi].impl->first > descriptor.min_length_embryo)
+        segments.emplace_back(std::move(trackers[fi]), 0);
 
       fi++;
     }
   }
 
   /**
-   * Handle case where one or more filter matched the observation
-   * @param new_filters List of new filters
-   * @param accepted List of filters that accepts the observation
+   * Handle case where one or more tracker matched the observation
+   * @param new_trackers List of new trackers
+   * @param accepted List of trackers that accepts the observation
    * @param obs
    * @param t
    * @param is_horizontal
    * @param descriptor
    * @return
    */
-  void handle_find_filter(Buckets& buckets, std::vector<Filter>& accepted, std::vector<Filter>& new_filters,
+  void handle_find_tracker(Buckets& buckets, std::vector<Tracker>& accepted, std::vector<Tracker>& new_trackers,
                           const Eigen::Matrix<float, 3, 1>& obs, int t, size_t id, const Descriptor& descriptor)
   {
     auto observation_s        = Observation();
@@ -306,7 +306,7 @@ namespace scribo::internal
         obs_result_value.match_count--;
 
         if (obs_result_value.match_count == 0)
-          new_filters.emplace_back(t, obs_result_value.obs, descriptor);
+          new_trackers.emplace_back(t, obs_result_value.obs, descriptor);
       }
 
       buckets.insert(std::move(f));
@@ -314,47 +314,47 @@ namespace scribo::internal
   }
 
   /**
-   * Merge selection and new_filters in filters
-   * @param filters
+   * Merge selection and new_trackers in trackers
+   * @param trackers
    * @param selection
-   * @param new_filters
+   * @param new_trackers
    */
-  void get_active_filters(std::vector<Filter>& filters, std::vector<Filter>& kept, std::vector<Filter>& news)
+  void get_active_trackers(std::vector<Tracker>& trackers, std::vector<Tracker>& kept, std::vector<Tracker>& news)
   {
-    filters.clear();
+    trackers.clear();
 
-    filters.insert(filters.begin(), std::move_iterator(kept.begin()), std::move_iterator(kept.end()));
-    filters.insert(filters.begin(), std::move_iterator(news.begin()), std::move_iterator(news.end()));
+    trackers.insert(trackers.begin(), std::move_iterator(kept.begin()), std::move_iterator(kept.end()));
+    trackers.insert(trackers.begin(), std::move_iterator(news.begin()), std::move_iterator(news.end()));
   }
 
-  float make_predictions(std::vector<Filter>& filters)
+  float make_predictions(std::vector<Tracker>& trackers)
   {
     float max_dist = 0;
-    for (auto& filter : filters)
+    for (auto& tracker : trackers)
     {
-      filter.predict();
-      max_dist = std::max(max_dist, filter.impl->sigma_position);
+      tracker.predict();
+      max_dist = std::max(max_dist, tracker.impl->sigma_position);
     }
     return max_dist;
   }
 
-  std::vector<Filter> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
+  std::vector<Tracker> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
                                                         Buckets& buckets, int t, float max_sigma_pos,
                                                         const Descriptor& descriptor)
   {
-    std::vector<Filter> new_filters;
+    std::vector<Tracker> new_trackers;
 
     size_t id = 0;
     for (const auto& obs : observations)
     {
-      std::vector<Filter> accepted = find_match(buckets, obs, t, max_sigma_pos, descriptor);
+      std::vector<Tracker> accepted = find_match(buckets, obs, t, max_sigma_pos, descriptor);
       if (accepted.empty() && obs(1, 0) < descriptor.max_thickness)
-        new_filters.emplace_back(t, obs, descriptor);
+        new_trackers.emplace_back(t, obs, descriptor);
       else
-        handle_find_filter(buckets, accepted, new_filters, obs, t, id++, descriptor);
+        handle_find_tracker(buckets, accepted, new_trackers, obs, t, id++, descriptor);
     }
 
-    return new_filters;
+    return new_trackers;
   }
 
   /**
@@ -371,28 +371,28 @@ namespace scribo::internal
     Buckets buckets(n_max, descriptor.bucket_size);
 
     std::vector<Segment>                    segments; // List of current segments
-    std::vector<Filter>                     filters;
-    std::vector<Filter>                     new_filters;
-    std::vector<Filter>                     filter_kept;
+    std::vector<Tracker>                     trackers;
+    std::vector<Tracker>                     new_trackers;
+    std::vector<Tracker>                     tracker_kept;
     std::vector<Eigen::Matrix<float, 3, 1>> observations;
 
     for (int t = 0; t < t_max; t++)
     {
-      float max_dist = make_predictions(filters);
+      float max_dist = make_predictions(trackers);
 
       observations = extract_observations(image, t, n_max, descriptor);
 
-      buckets.acquire(filters);
-      new_filters = match_observations_to_predictions(observations, buckets, t, max_dist, descriptor);
-      buckets.release(filters);
+      buckets.acquire(trackers);
+      new_trackers = match_observations_to_predictions(observations, buckets, t, max_dist, descriptor);
+      buckets.release(trackers);
 
-      filter_kept = filter_selection(filters, segments, t, descriptor);
+      tracker_kept = tracker_selection(trackers, segments, t, descriptor);
 
       // i_f = 0;
-      get_active_filters(filters, filter_kept, new_filters);
+      get_active_trackers(trackers, tracker_kept, new_trackers);
     }
 
-    finish_traversal(filters, segments, descriptor);
+    finish_traversal(trackers, segments, descriptor);
 
     return segments;
   }

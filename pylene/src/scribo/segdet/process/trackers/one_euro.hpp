@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../filter_impl.hpp"
+#include "../tracker_impl.hpp"
 
 #include <numbers>
 
 namespace scribo::internal
 {
-  struct OneEuros : public Filter_impl
+  struct OneEuros : public Tracker_impl
   {
     struct OneEuro
     {

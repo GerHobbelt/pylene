@@ -44,7 +44,7 @@ namespace scribo::internal
     float                          ratio_lum;
 
     // MODULE
-    SEGDET_PROCESS_TRACKING_ENUM filter_type;
+    SEGDET_PROCESS_TRACKING_ENUM tracking_type;
     float                        double_exponential_alpha;
     float                        simple_moving_average_memory;
     float                        exponential_moving_average_memory;

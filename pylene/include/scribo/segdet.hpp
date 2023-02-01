@@ -31,10 +31,10 @@ namespace scribo
   {
     KALMAN,                    ///< Kalman Filters following classics prediction and correction based on IRISA article
     ONE_EURO,                  ///< One Euro Filter (modification from Nicolas Roussel code)
-    DOUBLE_EXPONENTIAL,        ///< Double exponential Filter
-    LAST_INTEGRATION,          ///< Last observation predictor
-    SIMPLE_MOVING_AVERAGE,     ///< Simple moving average predictor
-    EXPONENTIAL_MOVING_AVERAGE ///< Exponential moving average predictor
+    DOUBLE_EXPONENTIAL,        ///< Double exponential
+    LAST_INTEGRATION,          ///< Last observation
+    SIMPLE_MOVING_AVERAGE,     ///< Simple moving average
+    EXPONENTIAL_MOVING_AVERAGE ///< Exponential moving average
   };
 
   /**
@@ -63,21 +63,21 @@ namespace scribo
 
     float dyn                               = 0.6f;   ///< Dynamic when Black-Top-Hat preprocess is applied
     int   size_mask                         = 11;     ///< Filter size when Black-Top-Hat preprocess is applied
-    float double_exponential_alpha          = 0.6f;   ///< Alpha used in double exponential filter if chosen
-    float simple_moving_average_memory      = 30.0f;  ///< Memory used in simple moving average filter if chosen
-    float exponential_moving_average_memory = 16.0f;  ///< Memory used in exponential moving average filter if chosen
-    float one_euro_beta                     = 0.007f; ///< Beta used in one euro filter if chosen
-    float one_euro_mincutoff                = 1.0f;   ///< Min cutoff used in one euro filter if chosen
-    float one_euro_dcutoff                  = 1.0f;   ///< Dcutoff used in one euro filter if chosen
+    float double_exponential_alpha          = 0.6f;   ///< Alpha used in double exponential tracker if chosen
+    float simple_moving_average_memory      = 30.0f;  ///< Memory used in simple moving average tracker if chosen
+    float exponential_moving_average_memory = 16.0f;  ///< Memory used in exponential moving average tracker if chosen
+    float one_euro_beta                     = 0.007f; ///< Beta used in one euro tracker if chosen
+    float one_euro_mincutoff                = 1.0f;   ///< Min cutoff used in one euro tracker if chosen
+    float one_euro_dcutoff                  = 1.0f;   ///< Dcutoff used in one euro tracker if chosen
 
     int bucket_size = 32; ///< Bucket size during traversal
 
-    int nb_values_to_keep = 30; ///< Memory of filter to compute variances for the matching
+    int nb_values_to_keep = 30; ///< Memory of tracker to compute variances for the matching
     int discontinuity_relative =
         0; ///< Percentage. Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
     int discontinuity_absolute =
         0; ///< Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
-    int   minimum_for_fusion = 15;   ///< Threshold to merge filters following same observation
+    int minimum_for_fusion = 15; ///< Threshold to merge trackers following same observation
 
     int default_sigma_position   = 2;  ///< Position default variance value
     int default_sigma_thickness  = 2;  ///< Thickness default variance value

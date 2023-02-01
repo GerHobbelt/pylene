@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../filter_impl.hpp"
+#include "../tracker_impl.hpp"
 #include "algorithm"
 
 namespace scribo::internal
 {
-  struct DoubleExponential final : public Filter_impl
+  struct DoubleExponential final : public Tracker_impl
   {
     struct DoubleExponentialInternal
     {

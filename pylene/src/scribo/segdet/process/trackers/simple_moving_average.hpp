@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../filter_impl.hpp"
+#include "../tracker_impl.hpp"
 #include "algorithm"
 
 namespace scribo::internal
 {
-  struct SimpleMovingAverage final : public Filter_impl
+  struct SimpleMovingAverage final : public Tracker_impl
   {
     struct SimpleMovingAverageInside
     {
@@ -43,7 +43,7 @@ namespace scribo::internal
     SimpleMovingAverageInside lumi;
 
     SimpleMovingAverage(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor);
-    ~SimpleMovingAverage() override = default; 
+    ~SimpleMovingAverage() override = default;
 
     void predict() override;
     void integrate(int t, const Descriptor& descriptor) override;

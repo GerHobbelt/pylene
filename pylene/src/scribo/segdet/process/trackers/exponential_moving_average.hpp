@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../filter_impl.hpp"
+#include "../tracker_impl.hpp"
 
 namespace scribo::internal
 {
-  struct ExponentialMovingAverage final : public Filter_impl
+  struct ExponentialMovingAverage final : public Tracker_impl
   {
     struct ExponentialMovingAverageInternal
     {
-      float current;
-      float nb_value;
+      float       current;
+      float       nb_value;
       const float nb_value_max;
 
       ExponentialMovingAverageInternal(float value, float nb_value_max)
@@ -29,7 +29,7 @@ namespace scribo::internal
       }
     };
 
-    float                          x;
+    float                            x;
     ExponentialMovingAverageInternal x_move;
     ExponentialMovingAverageInternal thick;
     ExponentialMovingAverageInternal lumi;

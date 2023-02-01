@@ -25,7 +25,7 @@ namespace scribo::internal
   } // namespace
 
   Kalman::Kalman(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
-    : Filter_impl(t_integration, observation, descriptor)
+    : Tracker_impl(t_integration, observation, descriptor)
     , S((Eigen::Matrix<float, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
     , H(Eigen::Matrix<float, 4, 4>::Identity())
   {
@@ -38,7 +38,7 @@ namespace scribo::internal
 
     H = A * H * A_transpose + Vw;
 
-    Filter_impl::predict();
+    Tracker_impl::predict();
   }
 
   void Kalman::integrate(int t, const Descriptor& descriptor)
@@ -50,6 +50,6 @@ namespace scribo::internal
     S               = S + G * (obs - X_predicted);
     H               = (Eigen::Matrix<float, 4, 4>::Identity() - G * C) * H;
 
-    Filter_impl::integrate(t, descriptor);
+    Tracker_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

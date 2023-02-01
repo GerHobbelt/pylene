@@ -35,7 +35,7 @@ namespace scribo::internal
     max_thickness      = params.max_thickness;
     ratio_lum          = params.ratio_lum;
 
-    filter_type                       = params.tracker;
+    tracking_type                     = params.tracker;
     double_exponential_alpha          = params.double_exponential_alpha;
     simple_moving_average_memory      = params.simple_moving_average_memory;
     exponential_moving_average_memory = params.exponential_moving_average_memory;

@@ -3,7 +3,7 @@
 namespace scribo::internal
 {
   DoubleExponential::DoubleExponential(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
-    : Filter_impl(t_integration, observation, descriptor)
+    : Tracker_impl(t_integration, observation, descriptor)
     , x(DoubleExponentialInternal(observation(0, 0), descriptor.double_exponential_alpha))
     , thick(DoubleExponentialInternal(observation(1, 0), descriptor.double_exponential_alpha))
     , lumi(DoubleExponentialInternal(observation(2, 0), descriptor.double_exponential_alpha))
@@ -16,7 +16,7 @@ namespace scribo::internal
     X_predicted(1, 0) = thick.predict();
     X_predicted(2, 0) = lumi.predict();
 
-    Filter_impl::predict();
+    Tracker_impl::predict();
   }
 
   void DoubleExponential::integrate(int t, const Descriptor& descriptor)
@@ -27,6 +27,6 @@ namespace scribo::internal
     thick.integrate(obs(1, 0));
     lumi.integrate(obs(2, 0));
 
-    Filter_impl::integrate(t, descriptor);
+    Tracker_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

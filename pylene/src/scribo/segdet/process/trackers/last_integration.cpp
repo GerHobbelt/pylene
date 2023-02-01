@@ -3,7 +3,7 @@
 namespace scribo::internal
 {
   LastIntegration::LastIntegration(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
-    : Filter_impl(t_integration, observation, descriptor)
+    : Tracker_impl(t_integration, observation, descriptor)
   {
   }
 
@@ -13,11 +13,11 @@ namespace scribo::internal
     X_predicted(1, 0) = thicknesses.back();
     X_predicted(2, 0) = luminosities.back();
 
-    Filter_impl::predict();
+    Tracker_impl::predict();
   }
 
   void LastIntegration::integrate(int t, const Descriptor& descriptor)
   {
-    Filter_impl::integrate(t, descriptor);
+    Tracker_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

@@ -1,7 +1,10 @@
-from conans import ConanFile, tools
-import os
+from conan import ConanFile
+from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
+from conan.tools.scm import Version
 from conans.errors import ConanInvalidConfiguration
+
+import os
 
 class Pylene(ConanFile):
     name = "pylene"
@@ -17,41 +20,41 @@ class Pylene(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": False,
-        "gtest:shared": False,
-        "boost:header_only": True,
-        "freeimage:shared": True
+        "gtest/*:shared": False,
+        "boost/*:header_only": True,
+        "freeimage/*:shared": True
     }
 
-    generators = "CMakeDeps"
     exports_sources = ["pylene/*", "pylene-python/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
 
     requires = [
         "range-v3/0.12.0",
-        "fmt/6.0.0",
-        "tbb/2020.0",
+        "fmt/9.0.0",
+        "onetbb/2021.7.0",
         "xsimd/7.4.6",
         "eigen/3.3.9",
         "boost/1.75.0",
-        "cfitsio/4.0.0",
+        "cfitsio/4.1.0@lrde/stable",
         "freeimage/3.18.0@lrde/stable"
     ]
 
     def _build_python(self):
-        return self.options.shared or self.options.fPIC or tools.os_info.is_windows
+        return self.options.shared or self.options.fPIC or self.settings.os == "Windows"
 
     def build_requirements(self):
         self.test_requires("gtest/[>=1.11.0]")
         self.test_requires("benchmark/[>=1.5.0]")
 
     def requirements(self):
+        self.requires("zlib/1.2.13", override=True)
         if self._build_python():
             self.requires("pybind11/2.6.2")
         
 
     def _check_configuration(self):
-        tools.check_min_cppstd(self, "20")
-        if self.settings.compiler in ["gcc", "clang"] and tools.Version(self.settings.compiler.version) < 10:
+        check_min_cppstd(self, "20")
+        if self.settings.compiler in ["gcc", "clang"] and Version(self.settings.compiler.version) < 10:
             raise ConanInvalidConfiguration("Invalid compiler version for {} (Got {}, should be greater or equal to 10)".format(self.settings.compiler, self.settings.compiler.version))
 
     def configure(self):
@@ -60,9 +63,9 @@ class Pylene(ConanFile):
             self.options.fPIC = True
 
     def generate(self):
-        cmake = CMakeDeps(self)
-        cmake.generate()
         tc = CMakeToolchain(self)
+        tc.generate()
+        tc = CMakeDeps(self)
         tc.generate()
 
     def layout(self):

@@ -12,7 +12,7 @@ function(add_core_test Executable)
   set(core_test_NAME ${Executable})
 
   add_executable(${core_test_NAME} ${core_test_SOURCES})
-  target_link_libraries(${core_test_NAME} PRIVATE Fixtures::ImagePath Fixtures::ImageCompare Pylene::Core Pylene::IO-freeimage GTest::gtest)
+  target_link_libraries(${core_test_NAME} PRIVATE Fixtures::ImagePath Fixtures::ImageCompare Pylene::Core Pylene::IO-freeimage GTest::gtest_main)
   set_target_properties(${core_test_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
   add_test(NAME ${core_test_NAME} COMMAND ${core_test_NAME} --gtest_output=xml:${core_test_NAME}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)

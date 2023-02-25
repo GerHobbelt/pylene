@@ -60,8 +60,8 @@ namespace fixtures::ImageCompare
       std::function<void(mln::ndbuffer_image)>                        print_fn;
       std::function<int(const void* a, const void* b, std::size_t n)> linecmp_fn;
 
-      if constexpr (fmt::internal::has_formatter<TA, fmt::format_context>() &&
-                    fmt::internal::has_formatter<TB, fmt::format_context>())
+      if constexpr (fmt::has_formatter<TA, fmt::format_context>() &&
+                    fmt::has_formatter<TB, fmt::format_context>())
       {
         print_fn = [](const mln::ndbuffer_image& ima) {
           if (const auto* a = ima.cast_to<TA, adim>())
@@ -122,8 +122,8 @@ namespace fixtures::ImageCompare
       }
       if constexpr (std::is_same_v<f_domain_t, mln::box2d> && //
                     std::is_same_v<g_domain_t, mln::box2d> && //
-                    fmt::internal::has_formatter<mln::image_value_t<ImageA>, fmt::format_context>() &&
-                    fmt::internal::has_formatter<mln::image_value_t<ImageB>, fmt::format_context>())
+                    fmt::has_formatter<mln::image_value_t<ImageA>, fmt::format_context>() &&
+                    fmt::has_formatter<mln::image_value_t<ImageB>, fmt::format_context>())
       {
         if (!pass)
         {

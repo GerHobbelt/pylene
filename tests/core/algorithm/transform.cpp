@@ -5,7 +5,7 @@
 
 #include <functional>
 #include <utility>
-#include <tbb/task_scheduler_init.h>
+#include <tbb/global_control.h>
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Transform)
@@ -56,7 +56,7 @@ TEST(Core, Algorithm_Transform_LValue)
 
 TEST(Core, Algorithm_Transform_Parallel_Unary_with_out)
 {
-  tbb::task_scheduler_init init;
+  tbb::global_control init(tbb::global_control::max_allowed_parallelism, std::thread::hardware_concurrency());
   mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
   mln::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
 
@@ -66,7 +66,7 @@ TEST(Core, Algorithm_Transform_Parallel_Unary_with_out)
 
 TEST(Core, Algorithm_Transform_Parallel_Unary_no_out)
 {
-  tbb::task_scheduler_init init;
+  tbb::global_control init(tbb::global_control::max_allowed_parallelism, std::thread::hardware_concurrency());
   mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
   mln::image2d<uint8_t> ref = {{2, 3, 4}, {5, 6, 7}};
 
@@ -76,7 +76,7 @@ TEST(Core, Algorithm_Transform_Parallel_Unary_no_out)
 
 TEST(Core, Algorithm_Transform_Parallel_Binary_with_out)
 {
-  tbb::task_scheduler_init init;
+  tbb::global_control init(tbb::global_control::max_allowed_parallelism, std::thread::hardware_concurrency());
   mln::image2d<uint8_t> ima1 = {{2, 3, 4}, {5, 6, 8}};
   mln::image2d<uint8_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
   mln::image2d<uint8_t> out = {{0, 0, 0}, {0, 0, 0}};
@@ -88,7 +88,7 @@ TEST(Core, Algorithm_Transform_Parallel_Binary_with_out)
 
 TEST(Core, Algorithm_Transform_Parallel_Binary_no_out)
 {
-  tbb::task_scheduler_init init;
+  tbb::global_control init(tbb::global_control::max_allowed_parallelism, std::thread::hardware_concurrency());
   mln::image2d<uint8_t> ima1 = {{2, 3, 4}, {5, 6, 8}};
   mln::image2d<uint8_t> ima2 = {{1, 2, 3}, {4, 5, 6}};
   mln::image2d<uint8_t> ref = {{1, 1, 1}, {1, 1, 2}};

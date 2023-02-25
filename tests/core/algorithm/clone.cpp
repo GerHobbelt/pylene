@@ -3,7 +3,7 @@
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/operators.hpp>
 
-#include <tbb/task_scheduler_init.h>
+#include <tbb/global_control.h>
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Clone)
@@ -25,7 +25,7 @@ TEST(Core, Algorithm_Clone_Parallel)
 {
   using namespace mln::view::ops;
 
-  tbb::task_scheduler_init init;
+  tbb::global_control init(tbb::global_control::max_allowed_parallelism, std::thread::hardware_concurrency());
 
   const mln::image2d<uint8_t> ima = {{1, 2, 3}, {4, 5, 6}};
   auto                        out = mln::parallel::clone(ima);

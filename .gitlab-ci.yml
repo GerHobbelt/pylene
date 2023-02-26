@@ -28,8 +28,9 @@ variables:
 
 before_script:
         - pip install --upgrade conan
-        - conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
-        - conan profile new --detect default
+        - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
+        #- conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
+        - conan profile detect
         - ccache -p
         - ccache -s
 
@@ -39,7 +40,7 @@ before_script:
 
 windows-debug:
     before_script:
-        - conan config set storage.path="${env:CI_PROJECT_DIR}\.cache\conan\data"
+        #- conan config set storage.path="${env:CI_PROJECT_DIR}\.cache\conan\data"
         - Invoke-BatchFile -Path "${env:VCVAR2019}" -Parameters "${env:ARCH}"
     stage: build
     script:
@@ -68,11 +69,10 @@ windows-debug:
 .job-build-linux-base: &distcheck-linux-base
     stage: build
     script:
-        - mkdir build && cd build
-        - conan install .. --build missing --build openjpeg -s compiler.cppstd=20 -e CXXFLAGS="" -e CCFLAGS="" -pr $CONAN_PROFILE -o pylene:fPIC=True -s build_type=$PYLENE_CONFIGURATION
-        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -D PYLENE_BUILD_PYTHON=ON -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
+        - mkdir build; cd build
+        - conan install .. --build missing --build openjpeg -s compiler.cppstd=20 -s build_type=$PYLENE_CONFIGURATION
+        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
         - cmake --build . --target Pylene-core
-        - cmake --build . --target pylena
         - cmake --build . --target build-tests
         - ctest -L UnitTests --schedule-random --output-on-failure
     dependencies: []
@@ -93,7 +93,6 @@ distcheck-linux-clang10-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        CONAN_PROFILE: "clang-10"
     rules:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
@@ -107,7 +106,6 @@ distcheck-linux-clang10-debug:
         CC: "clang"
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CONAN_PROFILE: "clang-10"
 
 distcheck-linux-gcc10-release:
     <<: *distcheck-linux-base
@@ -116,7 +114,6 @@ distcheck-linux-gcc10-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        CONAN_PROFILE: "gcc-10"
     rules:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
@@ -131,7 +128,6 @@ distcheck-linux-gcc10-debug:
         CC: "gcc"
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CONAN_PROFILE: "gcc-10"
 
 distcheck-linux-gcc11-release:
     <<: *distcheck-linux-base
@@ -140,7 +136,6 @@ distcheck-linux-gcc11-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "g++"
         CC: "gcc"
-        CONAN_PROFILE: "gcc-11"
     rules:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
@@ -154,7 +149,6 @@ distcheck-linux-gcc11-debug:
         CC: "gcc"
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CONAN_PROFILE: "gcc-11"
 
 distcheck-linux-clang12-release:
     <<: *distcheck-linux-base
@@ -163,7 +157,6 @@ distcheck-linux-clang12-release:
         PYLENE_CONFIGURATION: "Release"
         CXX: "clang++"
         CC: "clang"
-        CONAN_PROFILE: "clang-12"
     rules:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
@@ -177,7 +170,6 @@ distcheck-linux-clang12-debug:
         CC: "clang"
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CONAN_PROFILE: "clang-12"
 
 distcheck-linux-coverage:
     <<: *distcheck-linux-base
@@ -247,7 +239,7 @@ distbench-linux-gcc9-release:
     script:
         - dnf install -y cairo-devel
         - mkdir build && cd build
-        - conan install -u .. -pr gcc-11 --build missing --build openjpeg -s compiler.cppstd=20
+        - conan install .. --build missing --build openjpeg -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -s build_type=Release
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
         - cmake --build . --target build-doc
         - DOCDIR="public/"

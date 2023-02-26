@@ -43,7 +43,7 @@ class Pylene(ConanFile):
         return self.options.shared or self.options.fPIC or self.settings.os == "Windows"
 
     def build_requirements(self):
-        self.test_requires("gtest/[>=1.11.0]")
+        self.test_requires("gtest/1.11.0")
         self.test_requires("benchmark/[>=1.5.0]")
 
     def requirements(self):

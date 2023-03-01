@@ -23,16 +23,11 @@ Under [Mozilla Public License, v. 2.0](http://mozilla.org/MPL/2.0/).
 Pylene is developed in modern C++ so you need a recent C++ compiler. The followings compilers are currently supported
 and tested:
 
-* ~~GCC 9~~ GCC 10, GCC 11
-* Clang 10, Clang 11, Clang 12
+* GCC 10 -> 12
+* Clang 11 -> 15
 * Microsoft Visual Studio 2019
 
-This project relies on:
-
-* [FreeImage](www.freeimage.sourceforge.net) (only for IO)
-* [range-v3](https://github.com/ericniebler/range-v3)
-* [Boost](https://www.boost.org/)
-* [{fmt}](https://fmt.dev/)
+This project relies on some third part libraries, which are handled by the [Conan Package Manager](https://conan.io/) (version 2.0.0 minimum)
 
 # Quick Start
 
@@ -48,7 +43,7 @@ conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/c
 1. Install the library with Conan (with C++20 standard)
 
 ```
-conan install pylene/head@lrde/stable -g cmake_find_package -s compiler.cppstd=20
+conan install pylene/head@lrde/stable -s compiler.cppstd=20
 ```
 
 2. Edit your ``CMakeLists.txt`` to include the paths to the library:

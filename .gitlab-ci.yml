@@ -237,6 +237,27 @@ distcheck-linux-clang14-debug:
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 
+distcheck-linux-clang15-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_37}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+distcheck-linux-clang15-debug:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_37}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+
 distcheck-linux-coverage:
     <<: *distcheck-linux-base
     image: ${FEDORA_32}

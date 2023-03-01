@@ -14,6 +14,9 @@ variables:
     FEDORA_31: "${CI_REGISTRY}/olena/pylene-dockers/fedora-31"
     FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
     FEDORA_34: "${CI_REGISTRY}/olena/pylene-dockers/fedora-34"
+    FEDORA_35: "${CI_REGISTRY}/olena/pylene-dockers/fedora-35"
+    FEDORA_36: "${CI_REGISTRY}/olena/pylene-dockers/fedora-36"
+    FEDORA_37: "${CI_REGISTRY}/olena/pylene-dockers/fedora-37"
     CMAKE_BUILD_PARALLEL_LEVEL: 6
     CONAN_UPLOAD: "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public@True"
     CONAN_USERNAME: "lrde"
@@ -150,6 +153,27 @@ distcheck-linux-gcc11-debug:
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 
+distcheck-linux-gcc12-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_36}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "g++"
+        CC: "gcc"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+distcheck-linux-gcc12-debug:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_36}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "g++"
+        CC: "gcc"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+
 distcheck-linux-clang12-release:
     <<: *distcheck-linux-base
     image: ${FEDORA_34}
@@ -164,6 +188,48 @@ distcheck-linux-clang12-release:
 distcheck-linux-clang12-debug:
     <<: *distcheck-linux-base
     image: ${FEDORA_34}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+
+distcheck-linux-clang13-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_35}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+distcheck-linux-clang13-debug:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_35}
+    variables:
+        PYLENE_CONFIGURATION: "Debug"
+        CXX: "clang++"
+        CC: "clang"
+        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+
+distcheck-linux-clang14-release:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_36}
+    variables:
+        PYLENE_CONFIGURATION: "Release"
+        CXX: "clang++"
+        CC: "clang"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+distcheck-linux-clang14-debug:
+    <<: *distcheck-linux-base
+    image: ${FEDORA_36}
     variables:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "clang++"

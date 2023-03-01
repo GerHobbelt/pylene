@@ -2,6 +2,7 @@ from conan import ConanFile
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
 from conan.tools.scm import Version
+from conan.tools.files import rmdir
 from conans.errors import ConanInvalidConfiguration
 
 import os
@@ -39,17 +40,12 @@ class Pylene(ConanFile):
         "freeimage/3.18.0@lrde/stable"
     ]
 
-    def _build_python(self):
-        return self.options.shared or self.options.fPIC or self.settings.os == "Windows"
-
     def build_requirements(self):
         self.test_requires("gtest/1.11.0")
         self.test_requires("benchmark/[>=1.5.0]")
 
     def requirements(self):
         self.requires("zlib/1.2.13", override=True)
-        if self._build_python():
-            self.requires("pybind11/2.6.2")
         
 
     def _check_configuration(self):
@@ -102,33 +98,19 @@ class Pylene(ConanFile):
         self.cpp.source.components["io-fits"].includedirs = ["pylene/include"]
         self.cpp.build.components["io-fits"].libdirs = ["pylene"]
 
-        if self._build_python():
-            self.cpp.package.components["pylene-numpy"].libs = ["Pylene-numpy"]
-            self.cpp.package.components["pylene-numpy"].libdirs = ["lib"]
-            self.cpp.package.components["pylene-numpy"].includedirs = ["include"]
-            self.cpp.source.components["pylene-numpy"].includedirs = ["pylene-python/include"]
-            self.cpp.build.components["pylene-numpy"].libdirs = ["pylene-python"]
-
-
     def build(self):
         variables = { "PYLENE_BUILD_LIBS_ONLY" : "YES" } # Controls what is built, not the toolchain
-        if self._build_python():
-            variables["PYLENE_BUILD_PYTHON"] = "YES"
-        else:
-            self.output.warn("fPIC disabled. Skipping python bindings build...")
         cmake = CMake(self)
         cmake.configure(variables)
         cmake.build()
         cmake.install()
 
     def package(self):
-        self.copy("FindFreeImage.cmake", dst="cmake", src="cmake")
-        tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
         self.cpp_info.builddirs = ["cmake"]
         self.cpp_info.set_property("cmake_target_name", "pylene::pylene")
-
 
         # Core component
         self.cpp_info.components["core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
@@ -146,21 +128,6 @@ class Pylene(ConanFile):
         # IO component (cfitsio)
         self.cpp_info.components["io-fits"].requires = ["core", "cfitsio::cfitsio"]
         self.cpp_info.components["io-fits"].libs = ["Pylene-io-fits"]
-
-
-        # Pylene-numpy component
-        if self._build_python():
-            self.cpp_info.components["pylene-numpy"].requires = ["core"]
-            self.cpp_info.components["pylene-numpy"].libs = ["Pylene-numpy"]
-
-        v = tools.Version(self.settings.compiler.version)
-        for comp in self.cpp_info.components:
-            self.cpp_info.components[comp].cxxflags.append(tools.cppstd_flag(self.settings))
-            if self.settings.compiler == "gcc" and v.major == "9":
-                self.cpp_info.components[comp].cxxflags.append("-fconcepts")
-
-    def package_id(self):
-        del self.info.settings.compiler.cppstd
 
     def imports(self):
         self.copy("*.dll", src="bin", dst="build")

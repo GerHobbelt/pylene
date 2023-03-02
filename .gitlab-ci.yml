@@ -30,7 +30,7 @@ variables:
     CCACHE_MAXSIZE: 2G
 
 before_script:
-        - pip install --upgrade conan
+        - pip install -U git+https://github.com/conan-io/conan@release/2.0 # VERY TEMPORAR UNTIL CONAN 2.0.1
         - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
         #- conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
         - conan profile detect
@@ -257,6 +257,17 @@ distcheck-linux-clang15-debug:
         CC: "clang"
         CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
         CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+
+# This job checks `conan create` is working before discovering mistakes in `next`
+distcheck-linux-conan-create:
+    image: ${FEDORA_32}
+    script:
+        - conan create . -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 --build missing -r lrde-public
+    variables:
+        CXX: "g++"
+        CC: "gcc"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
 
 distcheck-linux-coverage:
     <<: *distcheck-linux-base

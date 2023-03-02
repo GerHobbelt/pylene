@@ -1,7 +1,6 @@
 from conan import ConanFile
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMakeDeps, CMakeToolchain, CMake
-from conan.tools.scm import Version
 from conan.tools.files import rmdir
 from conans.errors import ConanInvalidConfiguration
 
@@ -23,40 +22,49 @@ class Pylene(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": False,
-        "gtest/*:shared": False,
         "boost/*:header_only": True,
         "freeimage/*:shared": True
     }
 
-    exports_sources = ["pylene/*", "pylene-python/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
+    exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
 
     requires = [
-        "range-v3/0.12.0",
-        "fmt/9.0.0",
-        "onetbb/2021.7.0",
-        "xsimd/7.4.6",
-        "eigen/3.3.9",
-        "boost/1.75.0",
         "cfitsio/4.1.0@lrde/stable",
         "freeimage/3.18.0@lrde/stable"
     ]
 
     def build_requirements(self):
-        self.test_requires("gtest/1.11.0")
-        self.test_requires("benchmark/[>=1.5.0]")
+        self.test_requires("gtest/1.11.0", options={"shared": False})
+        self.test_requires("benchmark/1.7.1")
 
     def requirements(self):
-        self.requires("zlib/1.2.13", override=True)
+        self.requires("range-v3/0.12.0", transitive_headers=True)
+        self.requires("fmt/9.0.0", transitive_headers=True)
+        self.requires("onetbb/2021.7.0", transitive_headers=True)
+        self.requires("xsimd/7.4.6", transitive_headers=True)
+        self.requires("eigen/3.3.9", transitive_headers=True)
+        self.requires("boost/1.75.0", transitive_headers=True)
+        self.requires("zlib/1.2.13", override=True) # Fix dependencies version
         
 
     def _check_configuration(self):
         check_min_cppstd(self, "20")
-        if self.settings.compiler in ["gcc", "clang"] and Version(self.settings.compiler.version) < 10:
-            raise ConanInvalidConfiguration("Invalid compiler version for {} (Got {}, should be greater or equal to 10)".format(self.settings.compiler, self.settings.compiler.version))
+        
+        if self.settings.os == "Linux":
+            accepted_compilers = ["gcc", "clang"]
+            accepted_compilers_dict = {
+                "gcc": [str(i) for i in range(10, 13)],
+                "clang": [str(i) for i in range(11, 16)]
+            }
+            if not str(self.settings.compiler) in accepted_compilers or not str(self.settings.compiler.version) in accepted_compilers_dict[str(self.settings.compiler)]:
+                accepted_e = [f"{comp}-{ver}" for comp in accepted_compilers for ver in accepted_compilers_dict[comp]]
+                raise ConanInvalidConfiguration(f"Compiler {self.settings.compiler} version {self.settings.compiler} not handled on Linux (Accepted: {accepted_e})")
+
+    def validate(self):
+        self._check_configuration()
 
     def configure(self):
-        self._check_configuration()
         if self.options.shared:
             self.options.fPIC = True
 
@@ -108,14 +116,14 @@ class Pylene(ConanFile):
         cmake.install()
 
     def package(self):
-        rmdir(os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
         self.cpp_info.builddirs = ["cmake"]
         self.cpp_info.set_property("cmake_target_name", "pylene::pylene")
 
         # Core component
-        self.cpp_info.components["core"].requires = ["range-v3::range-v3", "fmt::fmt", "tbb::tbb", "xsimd::xsimd", "boost::headers"]
+        self.cpp_info.components["core"].requires = ["range-v3::range-v3", "fmt::fmt", "onetbb::onetbb", "xsimd::xsimd", "boost::headers"]
         self.cpp_info.components["core"].libs = ["Pylene-core"]
 
         # Scribo component

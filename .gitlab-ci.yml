@@ -10,9 +10,8 @@ cache:
         - .cache/ccache/data
 
 variables:
-    FEDORA_RAWHIDE: "${CI_REGISTRY}/olena/pylene-dockers/fedora-rawhide"
-    FEDORA_31: "${CI_REGISTRY}/olena/pylene-dockers/fedora-31"
     FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
+    FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-33"
     FEDORA_34: "${CI_REGISTRY}/olena/pylene-dockers/fedora-34"
     FEDORA_35: "${CI_REGISTRY}/olena/pylene-dockers/fedora-35"
     FEDORA_36: "${CI_REGISTRY}/olena/pylene-dockers/fedora-36"
@@ -20,11 +19,9 @@ variables:
     CMAKE_BUILD_PARALLEL_LEVEL: 6
     CONAN_UPLOAD: "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public@True"
     CONAN_USERNAME: "lrde"
-    CONAN_LOGIN_USERNAME: "carlinet"
     CONAN_CHANNEL: "unstable"                                                     # Conan tag
     CONAN_STABLE_CHANNEL: "stable"                                                # Conan tag
     CONAN_STABLE_BRANCH_PATTERN: "master$"
-    CONAN_PASSWORD: $CONAN_LRDE_API_KEY
     CONAN_CMAKE_GENERATOR: Ninja
     CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
     CCACHE_MAXSIZE: 2G
@@ -32,7 +29,6 @@ variables:
 before_script:
         - pip install -U git+https://github.com/conan-io/conan@release/2.0 # VERY TEMPORAR UNTIL CONAN 2.0.1
         - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
-        #- conan config set storage.path="${CI_PROJECT_DIR}/.cache/conan/data"
         - conan profile detect
         - ccache -p
         - ccache -s
@@ -334,7 +330,6 @@ distbench-linux-gcc9-release:
     image: ${FEDORA_34}
     stage: build
     script:
-        - dnf install -y cairo-devel
         - mkdir build && cd build
         - conan install .. --build missing -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -s build_type=Release -r lrde-public
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake

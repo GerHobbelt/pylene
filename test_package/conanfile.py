@@ -21,4 +21,4 @@ class PyleneTestConan(ConanFile):
     def test(self):
         if can_run(self):
             cmd = os.path.join(self.cpp.build.bindir, "main")
-            self.run(cmd)
+            self.run(cmd, env="conanrun")

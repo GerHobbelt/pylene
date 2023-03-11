@@ -12,7 +12,7 @@ class Pylene(ConanFile):
     name = "pylene"
     version = "head"
     license = "MPL v2"
-    url = "https://gitlab.lrde.epita.fr/olena/pylene"
+    url = "https://gitlab.lre.epita.fr/olena/pylene"
     description = "C++ Generic Image Processing Library."
     settings = "os", "compiler", "arch", "build_type"
     options = {
@@ -40,7 +40,7 @@ class Pylene(ConanFile):
 
     def requirements(self):
         self.requires("range-v3/0.12.0", transitive_headers=True)
-        self.requires("fmt/9.0.0", transitive_headers=True)
+        self.requires("fmt/9.0.0", transitive_headers=True, transitive_libs=True)
         self.requires("onetbb/2021.7.0", transitive_headers=True)
         self.requires("xsimd/7.4.6", transitive_headers=True)
         self.requires("eigen/3.3.9", transitive_headers=True)
@@ -63,10 +63,6 @@ class Pylene(ConanFile):
 
     def validate(self):
         self._check_configuration()
-
-    def configure(self):
-        if self.options.shared:
-            self.options.fPIC = True
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -125,6 +121,7 @@ class Pylene(ConanFile):
         # Core component
         self.cpp_info.components["core"].requires = ["range-v3::range-v3", "fmt::fmt", "onetbb::onetbb", "xsimd::xsimd", "boost::headers"]
         self.cpp_info.components["core"].libs = ["Pylene-core"]
+        self.cpp_info.components["core"].includedirs = ["include"]
 
         # Scribo component
         self.cpp_info.components["scribo"].requires = ["core", "eigen::eigen3"]
@@ -134,10 +131,12 @@ class Pylene(ConanFile):
         # IO component (FreeImage)
         self.cpp_info.components["io-freeimage"].requires = ["core", "freeimage::FreeImage"]
         self.cpp_info.components["io-freeimage"].libs = ["Pylene-io-freeimage"]
+        self.cpp_info.components["io-freeimage"].includedirs = ["include"]
 
         # IO component (cfitsio)
         self.cpp_info.components["io-fits"].requires = ["core", "cfitsio::cfitsio"]
         self.cpp_info.components["io-fits"].libs = ["Pylene-io-fits"]
+        self.cpp_info.components["io-fits"].includedirs = ["include"]
 
     def imports(self):
         self.copy("*.dll", src="bin", dst="build")

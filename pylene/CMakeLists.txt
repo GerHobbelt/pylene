@@ -45,10 +45,6 @@ target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_I
 target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd)
 target_link_libraries(Pylene-core PUBLIC fmt::fmt)
 
-# Set sources
-#file(GLOB_RECURSE sources "include/mln/*.hpp")
-#target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
-
 add_library(Pylene-bp OBJECT
   src/bp/transpose.cpp
   src/bp/swap.cpp

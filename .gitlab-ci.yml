@@ -358,8 +358,8 @@ distcheck-package-create:
         CC: "gcc"
         CXX: "g++"
         CONAN_CHANNEL: "unstable"
-    only:
-        - merge-requests
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
 
 .stable-deploy:
     variables:

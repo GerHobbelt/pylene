@@ -6,7 +6,7 @@ from conans.errors import ConanInvalidConfiguration
 
 import os
 
-required_conan_version = ">=2.0"
+required_conan_version = ">=2.0.1"
 
 class Pylene(ConanFile):
     name = "pylene"

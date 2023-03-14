@@ -45,7 +45,8 @@ class Pylene(ConanFile):
         self.requires("xsimd/7.4.6", transitive_headers=True)
         self.requires("eigen/3.3.9", transitive_headers=True)
         self.requires("boost/1.75.0", transitive_headers=True)
-        self.requires("zlib/1.2.13", override=True) # Fix dependencies version
+        self.requires("zlib/1.2.13", override=True)
+        self.requires("libwebp/1.2.4", override=True)
         
 
     def _check_configuration(self):

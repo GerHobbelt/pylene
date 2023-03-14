@@ -326,9 +326,9 @@ pages:
 
 .package-base:
     script:
-        - conan create . --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
-        - conan create . --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:fPIC=True
-        - conan create . --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:shared=True
+        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
+        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:fPIC=True
+        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:shared=True
 
 .deploy-package-base:
     stage: deploy

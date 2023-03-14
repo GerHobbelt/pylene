@@ -80,8 +80,8 @@ namespace mln
     int lambda;
     std::tie(min, med, max, lambda) = internal::get_MinMedMax(v[0], v[1], v[2]);
     float L                         = (min + max + med) / 3.0f;
-    float S                         = 1.5f * (L > med ? (max - L) : (L - min));
-    float H = k * (lambda + 0.5f - ((lambda % 2 == 0) ? 1 : -1) * (max + min - 2 * med) / (2 * S));
+    float S                         = min < max ? 1.5f * (L > med ? (max - L) : (L - min)) : 0;
+    float H = min < max ? k * (lambda + 0.5f - ((lambda % 2 == 0) ? 1 : -1) * (max + min - 2 * med) / (2 * S)) : 0;
 
     lsh<T> out;
     out[0] = static_cast<T>(L);

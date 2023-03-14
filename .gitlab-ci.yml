@@ -233,7 +233,7 @@ distcheck-linux-coverage:
     image: ${FEDORA_32}
     after_script:
         - mkdir coverage 
-        - cd build && gcovr --root .. --filter '\.\./pylene' . -s --xml ../coverage/cobertura-coverage.xml --html-details ../coverage/index.html
+        - cd build && gcovr --root .. --filter '\.\./pylene' . -s --xml ../coverage/cobertura-coverage.xml --html-details ../coverage/index.html --gcov-ignore-parse-errors
     variables:
         PYLENE_CONFIGURATION: "Debug"
         CXX: "g++"
@@ -324,17 +324,6 @@ pages:
 # Deploy #
 ##########
 
-.package:
-    stage: deploy
-    dependencies: []
-    script:
-        - python3 package-conan.py
-    rules:
-        - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "schedule"
-        - if: $CI_COMMIT_BRANCH == "next"
-    variables:
-        CONAN_REVISIONS_ENABLED: 1
-
 .package-base:
     script:
         - conan create . --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
@@ -342,6 +331,7 @@ pages:
         - conan create . --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:shared=True
 
 .deploy-package-base:
+    stage: deploy
     extends: .package-base
     after_script:
         - conan remote login -p $CONAN_PASSWORD lrde-public $CONAN_LOGIN_USERNAME
@@ -352,6 +342,7 @@ pages:
 
 # Ensure package creation on merge request
 distcheck-package-create:
+    stage: build
     image: ${FEDORA_34}
     extends: .package-base
     variables:

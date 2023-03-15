@@ -138,6 +138,3 @@ class Pylene(ConanFile):
         self.cpp_info.components["io-fits"].requires = ["core", "cfitsio::cfitsio"]
         self.cpp_info.components["io-fits"].libs = ["Pylene-io-fits"]
         self.cpp_info.components["io-fits"].includedirs = ["include"]
-
-    def imports(self):
-        self.copy("*.dll", src="bin", dst="build")

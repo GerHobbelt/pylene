@@ -166,7 +166,13 @@ or one can choose as a target a particular Pylene component.
 Architecture
 ------------
 
-**TBD**
+Pylene is divided into several components to be modular. These components are to
+be used in Conan and CMake. Below are the components:
+
+* :code:`pylene::core`: contains the core library, without any input/output routines
+* :code:`pylene::io-freeimage`: contains the IO routines for classic image formats. These ones are based on the `FreeImage <https://freeimage.sourceforge.io/>`_ library. For more information, look at `IO Module <../io.html>`_
+* :code:`pylene::io-fits`: contains the routines to load `FITS <https://fits.gsfc.nasa.gov/fits_primer.html>`_ images. These ones are based on the `cfitsio <https://heasarc.gsfc.nasa.gov/fitsio/>`_ library.
+* :code:`pylene::scribo`: contains features related to document analysis and processing.
 
 Sample project
 --------------

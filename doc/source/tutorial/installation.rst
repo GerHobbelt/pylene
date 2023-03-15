@@ -1,224 +1,234 @@
 Installation
 ============
 
+.. caution::
+
+    While the :code:`next` branch is not merged in the :code:`master` branch,
+    this installation guide works for the :code:`next` branch **ONLY**, inducing
+    it works **ONLY** for the :code:`unstable` conan channel of Pylene.
+
 .. contents::
    :local:
 
+Installation
+------------
 
-Pylene can be installed in many Operating Systems. It is currently tested on Windows with
-MSVC and Linux with GCC and Clang. Pylene has several dependencies on C++ libraries, in
-particular:
+In this part, we present 3 ways to set up the library. The two first ones are
+dedicated to the consumption of the library while the third one aims to develop
+in the library.
 
-* `Intel TBB <https://software.intel.com/en-us/tbb>`_
-* `Boost <https://www.boost.org/>`_
-* `Range-v3 <https://github.com/ericniebler/range-v3>`_
-* `FreeImage <https://freeimage.sourceforge.io/>`_
-* `Fmt <https://fmt.dev>`_
+Preliminaries (in all cases)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are three ways to install the C++ Pylene:
+The library relies on the `Conan <https://conan.io/>`_ package manager and the
+`CMake <https://cmake.org>`_ build system generator. In this way, the first
+prerequisite is to install Conan. To this aim, use the `pip
+<https://pip.pypa.io>`_ package installer this way
 
-* The preferred and strongly recommended way to use Pylene is using Conan, a C++ package manager that would handle the dependencies.
-* The other way is using installing the libraries from sources.
+.. code-block:: bash
 
-The Pylene dependencies are all handled by Conan and may be installed using the
-command ``conan install`` as described below.
+    $ pip install conan>=2.0.1
 
-.. note::
-    When installing the Pylene dependencies, make sure the ``openjpeg`` library,
-    a dependency of FreeImage, is compatible with the standard C library. One way
-    to ensure this is to force the build from source, appending the ``--build openjpeg``
-    to the install command.
+Pylene is set up to use the modern version of Conan and does not accept Conan
+versions below 2.0.1. When Conan is installed, configure it by creating a
+default profile and adding the LRDE artifactory remote:
 
-.. highlight:: shell
+.. code-block:: bash
 
-Install from sources
---------------------
+    $ conan profile detect
+    $ conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
 
-To build from sources, you will need cmake and install all the dependencies.
-Conan can be used to install the dependencies.
+Pylene artifacts are stored in this ``lrde-public`` remote, as well as some
+prebuilt binaries of the dependencies to earn some time when getting the
+library. 
 
-Download the latest release from `Pylene Gitlab <https://gitlab.lrde.epita.fr/olena/pylene/-/releases>`_
+Install from Conan (Preferred)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Untar the archive::
+1. First of all, set up a project by creating a :code:`CMakeLists.txt` and a
+   :code:`conanfile.txt`. Below is an example of a :code:`conanfile.txt`:
 
-    tar xf pylene-*-.tar.bz2
+.. code-block:: text
 
-2. Install the dependencies::
-
-    mkdir build && cd build
-    conan install .. -s build_type=Release -s compiler.cppstd=20 --build missing --build openjpeg
-
-.. warning::
-    If running on Linux and using the libstdc++, please add the setting ``-s
-    compiler.libcxx=libstdc++11``.
-
-3. Build the library (with no test)::
-
-    cmake .. -DCMAKE_BUILD_TYPE=release -DPYLENE_BUILD_LIBS_ONLY=On
-    cmake --build . --target Pylene (or make)
-
-4. Install the library (as root)::
-
-    cmake --build . --target install (or make install)
-
-.. tip::
-
-   You can install in a specific local as *normal* user in your home directory. To install in $HOME/.local
-   use::
-
-     cmake . -DCMAKE_INSTALL_PREFIX=$HOME/.local
-     cmake --build . --target install
-
-
-Integration with CMake and Conan (preferred)
---------------------------------------------
-
-`Conan <https://docs.conan.io/>`_ is a C++ package manager that can be installed with pip.
-The Pylene library is available on our repository https://artifactory.lrde.epita.fr/
-
-1. Add the repository in your conan remotes::
-
-     conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
-
-
-2. In a :file:`conanfile.txt`, add the reference to Pylene::
-
-     pylene/head@lrde/stable
-
-Then, see conan's documentation for how to use the package with your favorite build system. The following steps apply to CMake.
-
-3. Use conan with the **cmake_find_package** generator.
-
-4. In your :file:`CMakeLists.txt`, use **find_package** as usual::
-
-     set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
-     find_package(Pylene)
-
-
-The following targets are then available:
-
-* ``Pylene::Pylene``: target to link with all Pylene components::
-
-    target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
-
-* ``Pylene::Core``: target to link with when using only the core component of Pylene::
-
-    target_link_libraries(MyTarget PRIVATE Pylene::Core)
-
-
-
-Integration with CMake as a subdirectory
-----------------------------------------
-
-You can add the :file:`pylene` library directory into your project and include it in your
-:file:`CMakeLists.txt` file::
-
-    add_subdirectory(pylene)
-
-or to exclude it from ``make``, ``make all``, or ``cmake --build ..``::
-
-    add_subdirectory(pylene EXCLUDE_FROM_ALL)
-
-
-The following targets are then available:
-
-* ``Pylene::Pylene``: target to link with all Pylene components::
-
-    target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
-
-* ``Pylene::Core``: target to link with when using only the core component of Pylene::
-
-    target_link_libraries(MyTarget PRIVATE Pylene::Core)
-
-
-
-Integration with CMake from an existing installation
-----------------------------------------------------
-
-The library installs CMake config files and provide CMake targets.
-Use ``find_package`` in your CMakeLists::
-
-    find_package(Pylene)
-
-
-The following targets are then available:
-
-* ``Pylene::Pylene``: target to link with all Pylene components::
-
-    target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
-
-* ``Pylene::Core``: target to link with when using only the core component of Pylene::
-
-    target_link_libraries(MyTarget PRIVATE Pylene::Core)
-
-
-Installation (for developers)
------------------------------
-
-#. Clone the repository::
-
-    git clone git@gitlab.lrde.epita.fr:olena/pylene.git
-
-#. Install developer dependencies using conan.
-
-   * Google Test
-   * Google Benchmark
-   * range v3
-   * FreeImage (non-managed by conan)
-   * Boost
-   * Python with Sphinx, Matplotlib, Numpy (for the documentation)
-   * Conan
-
-#. Use *conan* to install the dependencies not provided by your system.
-   This is advised to use the followings options::
-
-
-        benchmark:shared                = True
-        gtest:shared                    = True
-
-   In the source directory, use::
-
-     mkdir build && cd build
-     conan install ..
-     cmake ..
-     cmake --build .
-
-
-Sample project structure using Pylene
--------------------------------------
-
-See `<https://gitlab.lrde.epita.fr/olena/pylene/-/blob/master/test_package/>`_.
-
-
-* :file:`conanfile.txt`::
+    [generators]
+    CMakeDeps
+    CMakeToolchain
 
     [requires]
     pylene/head@lrde/stable
 
+Some options may be added to the :code:`conanfile.txt` followings the needs of
+the consumer project.
 
-* :file:`CMakeLists.txt`::
+2. Then, install the dependencies of the consumer project (in this case, only
+   Pylene and its dependencies):
 
+.. code-block::
 
-    project(PyleneTest)
+    $ mkdir build && cd build
+    $ conan create .. -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 [--build missing --build openjpeg* [--build freeimage*]]
 
-    set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+The :code:`--build` argument are optional and may not be used if the package are
+already built. In the previous example, we are in the case the dependencies have
+been download from the `Conan Center <https://conan.io/center/>`_. However, one
+can use the prebuilt libraries from the LRDE artifactory by adding the flag
+:code:`-r lrde-public`.
 
-    find_package(Pylene REQUIRED)
-    add_executable(main main.cpp)
-    target_link_libraries(main Pylene::Core)
+If using the Conan Center, the usage of the :code:`openjpeg` library may result
+in some linking error, while its binaries have been built on an older libc. In
+this case, the :code:`--build openjpeg*` forces the library to be built from
+sources instead of using the prebuilt binary. However, if the FreeImage library
+has already been built, it may have no effect and you should also build the
+FreeImage library from sources.
 
+3. Finally, when the CMake project is ready to configure the consuming project,
+execute the following command:
 
-* Build intructions::
+.. code-block:: bash
 
-    mkdir build && cd build
-    conan install .. -g cmake_find_package -s compiler.cppstd=c++20
-    cmake ..
+    $ cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
 
+A sample project using this way to install Pylene is given in the `Sample
+Project`_ section of this page.
 
+Install from sources
+^^^^^^^^^^^^^^^^^^^^
 
+1. Clone the Pylene repository:
 
+.. code-block:: bash
 
+    $ git clone https://gitlab.lre.epita.fr/olena/pylene
 
+2. In the root of the project, execute the creation of the package:
 
+.. code-block:: bash
 
+    $ conan create . --user lrde --channel stable -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 [--build missing --build openjpeg* [--build freeimage*]]
 
+For more information about the optional :code:`--build` flags, please refer to
+the `Install from Conan (Preferred)`_ part of this page.
+
+Library development
+^^^^^^^^^^^^^^^^^^^
+
+1. Clone the Pylene repository, create a :code:`build` directory at the root of
+   the repository and go into it:
+
+.. code-block:: bash
+
+    $ git clone https://gitlab.lre.epita.fr/olena/pylene
+    $ mkdir pylene/build
+    $ cd pylene/build
+
+2. Install the dependencies Pylene:
+
+.. code-block:: bash
+
+    $ conan install .. -s build_type=Debug -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 [--build missing --build openjpeg* [--build freeimage*]]
+
+For more information about the optional :code:`--build` flags, please refer to
+the `Install from Conan (Preferred)`_ part of this page.
+
+3. Configure the project with CMake:
+
+.. code-block:: bash
+
+    $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
+
+or if at least CMake 3.23 is available:
+
+.. code-block:: bash
+
+    $ cmake .. --preset conan-debug
+
+4. Build the project:
+
+.. code-block:: bash
+
+    $ cmake --build . --target Pylene-core # To build the core library
+
+or one can choose as a target a particular Pylene component.
+
+5. Build the tests:
+
+.. code-block:: bash
+
+    $ cmake --build . --target build-tests # Build the tests
+    $ cmake --build . --target test # Execute the test suite
+
+6. Build this documentation:
+
+.. code-block:: bash
+
+    $ cmake --build . --target build-doc
+
+Architecture
+------------
+
+**TBD**
+
+Sample project
+--------------
+
+This sample project produces an executable taking into argument an image
+filename whose target image will be opened, eroded by a 2D square of size 10 and
+save the output image into a file :code:`out.png`.
+
+Here are the files used in this sample project with their content:
+
+.. code-block:: text
+    :caption: :code:`conanfile.txt`
+
+    [generators]
+    CMakeDeps
+    CMakeToolchain
+
+    [requires]
+    pylene/head@lrde/stable
+
+.. code-block:: cmake
+    :caption: :code:`CMakeLists.txt`
+
+    cmake_minimum_required(VERSION 3.23)
+    project(erosion-cli)
+
+    find_package(pylene REQUIRED)
+
+    add_executable(erosion-cli main.cpp)
+    target_link_libraries(erosion-cli PRIVATE Pylene::io-freeimage)
+
+.. code-block:: cpp
+    :caption: :code:`main.cpp`
+
+    #include <mln/core/image/ndimage.hpp>
+    #include <mln/io/imread.hpp>
+    #include <mln/io/imsave.hpp>
+    #include <mln/morpho/erosion.hpp>
+    #include <mln/core/se/rect2d.hpp>
+
+    #include <iostream>
+
+    int main(int argc, char* argv[])
+    {
+        if (argc < 2)
+        {
+            std::cerr << "Usage: " << argv[0] << " input_image\n";
+            return 1;
+        }
+
+        mln::image2d<std::uint8_t> input;
+        mln::io::imread(argv[1], input);
+        const auto output = mln::morpho::erosion(input, mln::se::rect2d(10, 10));
+        mln::io::imsave(output, "out.png");
+        return 1;
+    }
+
+To use it, execute the following commands:
+
+.. code-block:: bash
+
+    $ mkdir build && cd build
+    $ conan install .. --output-folder=. -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 --build missing --build freeimage* --build openjpeg* # The --build are required when using the conan center openjpeg.
+    $ cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
+    $ cmake --build .

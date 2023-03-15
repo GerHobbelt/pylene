@@ -335,8 +335,8 @@ pages:
     extends: .package-base
     after_script:
         - conan remote login -p $CONAN_PASSWORD lrde-public $CONAN_LOGIN_USERNAME
-        - conan upload pylene/head@lrde/$CONAN_CHANNEL
-        - conan remote logout
+        - conan upload pylene/head@lrde/$CONAN_CHANNEL -r lrde-public
+        - conan remote logout lrde-public
     variables:
         CONAN_REVISIONS_ENABLED: 1
 

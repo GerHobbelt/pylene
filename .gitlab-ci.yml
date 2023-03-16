@@ -11,7 +11,6 @@ cache:
 
 variables:
     FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-32"
-    FEDORA_32: "${CI_REGISTRY}/olena/pylene-dockers/fedora-33"
     FEDORA_34: "${CI_REGISTRY}/olena/pylene-dockers/fedora-34"
     FEDORA_35: "${CI_REGISTRY}/olena/pylene-dockers/fedora-35"
     FEDORA_36: "${CI_REGISTRY}/olena/pylene-dockers/fedora-36"
@@ -34,7 +33,6 @@ before_script:
 
 windows-debug:
     before_script:
-        #- conan config set storage.path="${env:CI_PROJECT_DIR}\.cache\conan\data"
         - Invoke-BatchFile -Path "${env:VCVAR2019}" -Parameters "${env:ARCH}"
     stage: build
     script:

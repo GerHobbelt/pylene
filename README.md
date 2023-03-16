@@ -23,8 +23,8 @@ Under [Mozilla Public License, v. 2.0](http://mozilla.org/MPL/2.0/).
 Pylene is developed in modern C++ so you need a recent C++ compiler. The followings compilers are currently supported
 and tested:
 
-* GCC 10 -> 12
-* Clang 11 -> 15
+* GCC 10, 11, 12
+* Clang 12, 13, 14, 15
 * ~~Microsoft Visual Studio 2019~~ (Dependencies issue from Conan Center Index)
 
 This project relies on some third part libraries, which are handled by the [Conan Package Manager](https://conan.io/) (version 2.0.1 minimum)

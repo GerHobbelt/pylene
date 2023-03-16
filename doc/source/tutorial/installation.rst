@@ -3,8 +3,8 @@ Installation
 
 .. caution::
 
-    While the :code:`next` branch is not merged in the :code:`master` branch,
-    this installation guide works for the :code:`next` branch **ONLY**, inducing
+    While the :code:`next` branch is not merged into the :code:`master` branch,
+    this installation guide works for the :code:`next` branch **ONLY**, meaning
     it works **ONLY** for the :code:`unstable` conan channel of Pylene.
 
 .. contents::
@@ -13,17 +13,17 @@ Installation
 Installation
 ------------
 
-In this part, we present 3 ways to set up the library. The two first ones are
-dedicated to the consumption of the library while the third one aims to develop
-in the library.
+In this part, we present 3 ways to set up the library. The first two ones aimed
+at a user wishing to consume the library in his project whereas the third one is
+aimed at a contributor wishing to work in the library itself.
 
 Preliminaries (in all cases)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The library relies on the `Conan <https://conan.io/>`_ package manager and the
 `CMake <https://cmake.org>`_ build system generator. In this way, the first
-prerequisite is to install Conan. To this aim, use the `pip
-<https://pip.pypa.io>`_ package installer this way
+prerequisite is to install Conan. For this, just use the `pip <https://pip.pypa.io>`_
+package installer this way
 
 .. code-block:: bash
 
@@ -39,8 +39,8 @@ default profile and adding the LRDE artifactory remote:
     $ conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
 
 Pylene artifacts are stored in this ``lrde-public`` remote, as well as some
-prebuilt binaries of the dependencies to earn some time when getting the
-library. 
+prebuilt binaries of the dependencies to save some time when fetching the
+library.
 
 Install from Conan (Preferred)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -69,13 +69,13 @@ the consumer project.
     $ conan create .. -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 [--build missing --build openjpeg* [--build freeimage*]]
 
 The :code:`--build` argument are optional and may not be used if the package are
-already built. In the previous example, we are in the case the dependencies have
-been download from the `Conan Center <https://conan.io/center/>`_. However, one
-can use the prebuilt libraries from the LRDE artifactory by adding the flag
-:code:`-r lrde-public`.
+already built. In the previous example, we are in the case where the
+dependencies have been download from the `Conan Center <https://conan.io/center/>`_.
+However, one can use the prebuilt libraries from the LRDE artifactory by adding
+the flag :code:`-r lrde-public`.
 
 If using the Conan Center, the usage of the :code:`openjpeg` library may result
-in some linking error, while its binaries have been built on an older libc. In
+in some linking error, because its binaries have been built on an older libc. In
 this case, the :code:`--build openjpeg*` forces the library to be built from
 sources instead of using the prebuilt binary. However, if the FreeImage library
 has already been built, it may have no effect and you should also build the
@@ -166,8 +166,8 @@ or one can choose as a target a particular Pylene component.
 Architecture
 ------------
 
-Pylene is divided into several components to be modular. These components are to
-be used in Conan and CMake. Below are the components:
+Pylene is divided into several components to be modular. These components are
+used in Conan and CMake. Below are the components:
 
 * :code:`pylene::core`: contains the core library, without any input/output routines
 * :code:`pylene::io-freeimage`: contains the IO routines for classic image formats. These ones are based on the `FreeImage <https://freeimage.sourceforge.io/>`_ library. For more information, look at `IO Module <../io.html>`_

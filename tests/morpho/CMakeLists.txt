@@ -27,4 +27,4 @@ add_core_test(${test_prefix}MToS mtos.cpp)
 add_core_test(${test_prefix}waterfall waterfall.cpp)
 
 
-target_link_libraries(${test_prefix}dilate PRIVATE tbb::tbb)
+target_link_libraries(${test_prefix}dilate PRIVATE TBB::tbb)

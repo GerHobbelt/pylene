@@ -19,7 +19,7 @@
 #include <fixtures/ImagePath/image_path.hpp>
 
 #include <gtest/gtest.h>
-#include <tbb/task_scheduler_init.h>
+#include <tbb/global_control.h>
 
 
 using namespace mln;
@@ -344,7 +344,7 @@ public:
   void test_with(test_param_t tparams);
 
 private:
-  tbb::task_scheduler_init __tinit = {};
+  tbb::global_control __init = tbb::global_control(tbb::global_control::max_allowed_parallelism, std::thread::hardware_concurrency());
 };
 
 template <class V>

@@ -37,7 +37,7 @@ void check_padding(mln::__ndbuffer_image<T, dim> f, mln::ndbox<dim> inner,  mln:
     if (inner.has(p))
       continue;
 
-    T val;
+    T val{};
     switch (bm)
     {
     case mln::PAD_ZERO: val = 0; break;
@@ -59,7 +59,7 @@ void check_padding(mln::__ndbuffer_image<T, dim> input, mln::__ndbuffer_image<T,
 
   mln_foreach(auto p, tile.domain())
   {
-    T val;
+    T val{};
     if (D.has(p))
       val = input(p);
     else

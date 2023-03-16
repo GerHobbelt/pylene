@@ -41,7 +41,7 @@ void render_image_vector(mln::image2d<argb8> input, std::vector<scribo::VSegment
     fmt::print("(x={},y={}) -> (x={},y={})\n", segment.x0, segment.y0, segment.x1, segment.y1);
 
     auto color = regions_lut(segment.label);
-    cairo_set_source_rgb(ctx, color[0] / 255.d, color[1] / 255.d, color[2] / 255.d);
+    cairo_set_source_rgb(ctx, color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
     cairo_move_to(ctx, segment.x0, segment.y0);
     cairo_line_to(ctx, segment.x1, segment.y1);
     cairo_stroke(ctx);

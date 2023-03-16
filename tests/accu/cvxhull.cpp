@@ -302,7 +302,7 @@ TEST(CvxHull, image)
     {0, 0, 1, 0, 1, 0}
   };
 
-  mln::accu::accumulators::cvxhull<mln::point2d> cvxhull;
+  mln::accu::accumulators::cvxhull<mln::point2d> cvxhull{};
 
   mln_foreach(auto px, input.pixels())
     if (px.val())

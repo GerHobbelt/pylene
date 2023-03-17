@@ -57,6 +57,10 @@ target_include_directories(Pylene-bp PUBLIC
 target_link_libraries(Pylene-bp PRIVATE xsimd fmt::fmt)
 target_compile_features(Pylene-bp PUBLIC cxx_std_20)
 
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET Pylene-bp PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif(BUILD_SHARED_LIBS)
+
 target_link_libraries(Pylene-core PRIVATE Pylene-bp)
 
 

@@ -65,6 +65,14 @@ class Pylene(ConanFile):
     def validate(self):
         self._check_configuration()
 
+    def config_options(self):
+        if self.settings.os == "Windows":
+            del self.options.fPIC
+
+    def configure(self):
+        if self.options.shared:
+            del self.options.fPIC
+
     def generate(self):
         tc = CMakeToolchain(self)
         tc.generate()

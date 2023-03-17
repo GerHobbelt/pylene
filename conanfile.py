@@ -62,16 +62,18 @@ class Pylene(ConanFile):
                 accepted_e = [f"{comp}-{ver}" for comp in accepted_compilers for ver in accepted_compilers_dict[comp]]
                 raise ConanInvalidConfiguration(f"Compiler {self.settings.compiler} version {self.settings.compiler} not handled on Linux (Accepted: {accepted_e})")
 
+    def _conditional_delete_fPIC(self, cond: bool):
+        if cond and self.options.get_safe("fPIC") is not None:
+            del self.options.fPIC
+
     def validate(self):
         self._check_configuration()
 
     def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
+        self._conditional_delete_fPIC(self.settings.os == "Windows")
 
     def configure(self):
-        if self.options.shared:
-            del self.options.fPIC
+        self._conditional_delete_fPIC(self.options.shared)
 
     def generate(self):
         tc = CMakeToolchain(self)

@@ -265,9 +265,9 @@ namespace mln::morpho::experimental
     std::vector<internal::edge<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> edges =
         internal::make_edges(input, nbh, map, distance);
 
-    mln::morpho::experimental::internal::QEBT                                                q = {12};
+    mln::morpho::experimental::internal::QEBT                                                q = {id};
     std::vector<internal::edge<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> MST =
-        mln::morpho::experimental::internal::kruskal(q, edges, 12);
+        mln::morpho::experimental::internal::kruskal(q, edges, id);
 
     auto qt = mln::morpho::experimental::internal::canonize_qbt(q.qbt, MST);
 

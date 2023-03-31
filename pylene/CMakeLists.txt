@@ -3,9 +3,9 @@ include(CMakePackageConfigHelpers)
 find_package(Boost 1.58 REQUIRED)
 find_package(FreeImage REQUIRED)
 
-find_package(TBB REQUIRED tbb)
+find_package(TBB REQUIRED)
 find_package(range-v3 0.10.0 REQUIRED)
-find_package(fmt 6.0 REQUIRED)
+find_package(fmt REQUIRED)
 find_package(xsimd REQUIRED)
 find_package(Eigen3 3.3.9)
 find_package(cfitsio)
@@ -16,7 +16,7 @@ set(PYLENE_USE_TBB YES CACHE BOOL "Set to NO to disable use of TBB and paralleli
 add_library(Pylene-core)
 
 if (TBB_FOUND AND PYLENE_USE_TBB)
-  target_link_libraries(Pylene-core PRIVATE tbb::tbb)
+  target_link_libraries(Pylene-core PRIVATE TBB::tbb)
 else ()
   set(PYLENE_USE_TBB OFF)
   target_compile_definitions(Pylene-core PRIVATE MLN_NO_TBB)
@@ -45,10 +45,6 @@ target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_I
 target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd)
 target_link_libraries(Pylene-core PUBLIC fmt::fmt)
 
-# Set sources
-#file(GLOB_RECURSE sources "include/mln/*.hpp")
-#target_sources(Pylene INTERFACE $<BUILD_INTERFACE:${sources}>)
-
 add_library(Pylene-bp OBJECT
   src/bp/transpose.cpp
   src/bp/swap.cpp
@@ -60,6 +56,10 @@ target_include_directories(Pylene-bp PUBLIC
   $<INSTALL_INTERFACE:include>)
 target_link_libraries(Pylene-bp PRIVATE xsimd fmt::fmt)
 target_compile_features(Pylene-bp PUBLIC cxx_std_20)
+
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET Pylene-bp PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif(BUILD_SHARED_LIBS)
 
 target_link_libraries(Pylene-core PRIVATE Pylene-bp)
 

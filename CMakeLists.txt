@@ -42,7 +42,6 @@ endif (USE_DISTCC)
 option(PYLENE_BUILD_BENCHMARKS "Require Google Benchmark library. Set to YES to enable the compilation of benchmarks." YES)
 option(PYLENE_BUILD_LIBS_ONLY "ON to build only the library (packaging)" OFF)
 option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
-option(PYLENE_BUILD_PYTHON "ON to build Python bindings" OFF)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
@@ -86,11 +85,6 @@ add_library(Pylene INTERFACE)
 add_library(Pylene::Pylene ALIAS Pylene)
 add_subdirectory(pylene)
 
-if (PYLENE_BUILD_PYTHON)
-  add_custom_target(build_python)
-  add_subdirectory(pylene-python)
-endif()
-
 if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_custom_target(build-fixtures)
   add_subdirectory(fixtures)
@@ -120,7 +114,7 @@ target_link_libraries(Pylene INTERFACE Pylene::Core)
 include(GNUInstallDirs)
 
 set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
-set(OptionalPyleneTargets Pylene-io-fits Pylene-numpy Pylene-scribo)
+set(OptionalPyleneTargets Pylene-io-fits Pylene-scribo)
 
 foreach(tgt ${OptionalPyleneTargets})
   if (TARGET ${tgt})
@@ -149,7 +143,6 @@ install(EXPORT PyleneTargets
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
         )
 
-install(DIRECTORY pylene-python/include/pln TYPE INCLUDE)
 install(DIRECTORY pylene/include/mln TYPE INCLUDE)
 if (TARGET Pylene-scribo)
   install(DIRECTORY pylene/include/scribo

@@ -77,7 +77,7 @@ namespace mln
         typedef features::cvxhull        feature;
         typedef boost::mpl::set<feature> provides;
 
-        cvxhull() {}
+        cvxhull() { init(); }
 
         void init()
         {

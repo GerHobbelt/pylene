@@ -35,7 +35,7 @@ protected:
   {
     auto input = mln::transform(m_input, [](auto x) { return x[0]; });
 
-    unsigned count;
+    unsigned count = 0;
     while (st.KeepRunning())
       count = func(input, 128);
 

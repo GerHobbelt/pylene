@@ -3,7 +3,7 @@ if (NOT CMAKE_POSITION_INDEPENDENT_CODE)
                          Build should fail during the linking part of the compilation of the pylena module.")
 endif()
 
-find_package(fmt 6.0 REQUIRED)
+find_package(fmt REQUIRED)
 find_package(pybind11 REQUIRED)
 include(pybind11Common)
 

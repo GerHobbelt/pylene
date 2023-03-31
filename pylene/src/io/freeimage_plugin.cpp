@@ -319,7 +319,7 @@ namespace mln::io::internal
     return;
 
   error:
-    const char* cstr_ctype;
+    const char* cstr_ctype = "";
     switch (colortype)
     {
     case FIC_MINISBLACK:

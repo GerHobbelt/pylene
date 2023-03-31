@@ -1,8 +1,8 @@
 #pragma once
 
+#include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/neighborhood.hpp>
-#include <mln/core/algorithm/for_each.hpp>
 #include <mln/morpho/component_tree.hpp>
 
 namespace mln::morpho::experimental
@@ -146,11 +146,11 @@ namespace mln::morpho::experimental
 
 
     template <class I, class N, class F>
-    std::vector<edge<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>>
-    make_edges(I input, N nbh, image_ch_value_t<I, int> map, F distance)
+    std::vector<edge<std::invoke_result_t<F, I, I>>> make_edges(I input, N nbh, image_ch_value_t<I, int> map,
+                                                                F distance)
     {
-      std::vector<edge<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> edges = {};
-      auto                                                                           dom   = input.domain();
+      std::vector<edge<std::invoke_result_t<F, I, I>>> edges = {};
+      auto                                             dom   = input.domain();
       mln_foreach (auto p, dom)
       {
         for (auto n : nbh.after(p))
@@ -231,7 +231,6 @@ namespace mln::morpho::experimental
     component_tree<W> make_tree(std::vector<int> qt, std::vector<edge<W>> MST)
     {
       component_tree<W> tree;
-      tree.parent = qt;
 
       auto vals = std::vector<W>(qt.size(), 0);
       int  size = qt.size();
@@ -243,6 +242,7 @@ namespace mln::morpho::experimental
           vals[i] = weight_node(i, size / 2, MST);
       }
       tree.values = vals;
+      tree.parent = std::move(qt);
 
       return tree;
     }
@@ -250,8 +250,8 @@ namespace mln::morpho::experimental
   } // namespace internal
 
   template <class I, class N, class F>
-  std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>>
-  alphatree(I input, N nbh, F distance)
+  std::pair<component_tree<std::invoke_result_t<F, I, I>>, image_ch_value_t<I, int>> alphatree(I input, N nbh,
+                                                                                               F distance)
   {
     mln::image_ch_value_t<I, int> map = imchvalue<int>(input).set_init_value(-1);
     auto                          dom = map.domain();
@@ -262,16 +262,15 @@ namespace mln::morpho::experimental
       id++;
     }
 
-    std::vector<internal::edge<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> edges =
-        internal::make_edges(input, nbh, map, distance);
+    std::vector<internal::edge<std::invoke_result_t<F, I, I>>> edges = internal::make_edges(input, nbh, map, distance);
 
-    mln::morpho::experimental::internal::QEBT                                                q = {id};
-    std::vector<internal::edge<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>> MST =
+    mln::morpho::experimental::internal::QEBT                  q = {id};
+    std::vector<internal::edge<std::invoke_result_t<F, I, I>>> MST =
         mln::morpho::experimental::internal::kruskal(q, edges, id);
 
-    auto qt = mln::morpho::experimental::internal::canonize_qbt(q.qbt, MST);
+    auto qt = mln::morpho::experimental::internal::canonize_qbt(std::move(q.qbt), MST);
 
-    auto tree = mln::morpho::experimental::internal::make_tree(qt, MST);
+    auto tree = mln::morpho::experimental::internal::make_tree(std::move(qt), std::move(MST));
 
     return {tree, map};
   }

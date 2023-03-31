@@ -108,8 +108,6 @@ TEST(AlphaTree, kruskalEbt)
 
   ASSERT_VEC_EQ(refP, q.qbt.parent);
   ASSERT_VEC_EQ(refMST, MST);
-
-  return;
 }
 
 TEST(AlphaTree, full_int)
@@ -135,5 +133,31 @@ TEST(AlphaTree, full_int)
 
   ASSERT_VEC_EQ(refP, t.parent);
   ASSERT_VEC_EQ(refV, t.values);
-  return;
+}
+
+TEST(AlphaTree, Image3d)
+{
+  const mln::image3d<uint8_t> ima = {{{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},
+                                     {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}},
+                                     {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}};
+
+  const mln::image3d<std::uint8_t> refNm = {{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}},
+                                            {{9, 10, 11}, {12, 13, 14}, {15, 16, 17}},
+                                            {{18, 19, 20}, {21, 22, 23}, {24, 25, 26}}};
+  std::vector<int>                 refP  = {27, 30, 30, 27, 30, 30, 37, 49, 52, 40, 44, 35, 40, 42, 33, 51, 31, 34,
+                                            40, 35, 42, 31, 35, 34, 50, 42, 33, 37, 28, 29, 42, 44, 32, 45, 49, 40,
+                                            36, 43, 38, 39, 43, 41, 45, 46, 46, 49, 49, 47, 48, 50, 51, 52, -1};
+  std::vector<uint8_t> refV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,
+                               0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 2, 0, 2, 3, 3, 3, 4, 0, 0, 5, 6, 12, 13};
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
+
+  mln_foreach (auto p, nm.domain())
+  {
+    ASSERT_EQ(nm(p), refNm(p));
+  }
+
+  ASSERT_VEC_EQ(refP, t.parent);
+  ASSERT_VEC_EQ(refV, t.values);
 }

@@ -92,7 +92,7 @@ namespace scribo::internal
 
     switch (descriptor.extraction_type)
     {
-    case SEGDET_PROCESS_EXTRACTION_ENUM::BINARY:
+    case e_segdet_process_extraction::BINARY:
       for (int n = 0; n < n_max; n++)
       {
         if (image({t, n}) < descriptor.llumi)
@@ -101,7 +101,7 @@ namespace scribo::internal
         }
       }
       break;
-    case SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT:
+    case e_segdet_process_extraction::GRADIENT:
       for (int n = 1; n < (n_max - 1); n++)
       {
         if (std::abs(static_cast<int>(image({t, n - 1})) - static_cast<int>(image({t, n + 1}))) >

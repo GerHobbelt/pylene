@@ -94,7 +94,8 @@ namespace scribo::internal
     return abs(prediction - observation) <= sigma;
   }
 
-  bool Tracker_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max, const Descriptor& descriptor) const
+  bool Tracker_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max,
+                             const Descriptor& descriptor) const
   {
     if (static_cast<int>(n_values.size()) > descriptor.min_nb_values_sigma && obs(1, 0) / X_predicted(1, 0) > 1.5 &&
         std::abs(obs(1, 0) - X_predicted(1, 0)) > 3)
@@ -102,7 +103,7 @@ namespace scribo::internal
       return false;
     }
 
-    if (descriptor.extraction_type == SEGDET_PROCESS_EXTRACTION_ENUM::BINARY &&
+    if (descriptor.extraction_type == e_segdet_process_extraction::BINARY &&
         (n_max < min || max < n_min)) // TODO: Check cette condition | Garder pour les zones connexes, mais peut
                                       // être trop contraignante
       return false;

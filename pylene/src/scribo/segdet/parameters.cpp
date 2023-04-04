@@ -10,19 +10,19 @@ namespace scribo
     if (llumi > blumi)
       return false;
 
-    if (preprocess != SEGDET_PREPROCESS_ENUM::NONE && preprocess != SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT)
+    if (preprocess != e_segdet_preprocess::NONE && preprocess != e_segdet_preprocess::BLACK_TOP_HAT)
       return false;
 
-    if (traversal_mode != SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL &&
-        traversal_mode != SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL &&
-        traversal_mode != SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL)
+    if (traversal_mode != e_segdet_process_traversal_mode::HORIZONTAL &&
+        traversal_mode != e_segdet_process_traversal_mode::VERTICAL &&
+        traversal_mode != e_segdet_process_traversal_mode::HORIZONTAL_VERTICAL)
       return false;
 
-    if (tracker != SEGDET_PROCESS_TRACKING_ENUM::KALMAN && tracker != SEGDET_PROCESS_TRACKING_ENUM::ONE_EURO &&
-        tracker != SEGDET_PROCESS_TRACKING_ENUM::DOUBLE_EXPONENTIAL &&
-        tracker != SEGDET_PROCESS_TRACKING_ENUM::LAST_INTEGRATION &&
-        tracker != SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE &&
-        tracker != SEGDET_PROCESS_TRACKING_ENUM::EXPONENTIAL_MOVING_AVERAGE)
+    if (tracker != e_segdet_process_tracking::KALMAN && tracker != e_segdet_process_tracking::ONE_EURO &&
+        tracker != e_segdet_process_tracking::DOUBLE_EXPONENTIAL &&
+        tracker != e_segdet_process_tracking::LAST_INTEGRATION &&
+        tracker != e_segdet_process_tracking::SIMPLE_MOVING_AVERAGE &&
+        tracker != e_segdet_process_tracking::EXPONENTIAL_MOVING_AVERAGE)
       return false;
 
     if (bucket_size == 0)

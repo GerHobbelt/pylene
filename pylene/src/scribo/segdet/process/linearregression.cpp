@@ -28,7 +28,7 @@ namespace scribo::internal
 
   void MemoryLinearRegressor::push(float x, float y)
   {
-    count    = std::min(memory, n);
+    count = std::min(memory, n);
     if (n < memory)
     {
       Y.push_back(y);
@@ -50,7 +50,7 @@ namespace scribo::internal
       Y[i]        = y;
       X[i]        = x;
     }
-    
+
     n += 1;
   }
-} // namespace mln::contrib::segdet
+} // namespace scribo::internal

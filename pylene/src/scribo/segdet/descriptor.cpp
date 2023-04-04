@@ -6,7 +6,7 @@ namespace scribo::internal
   {
     negate_image = params.negate_image;
     preprocess   = params.preprocess;
-    if (params.preprocess == scribo::SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT)
+    if (params.preprocess == scribo::e_segdet_preprocess::BLACK_TOP_HAT)
     {
       dyn       = params.dyn;
       size_mask = params.size_mask;

@@ -41,7 +41,7 @@ namespace scribo::internal
    * user but was by the algorithm. Thus their pixel in case of pixel output should not be erased.
    */
   std::tuple<std::vector<Segment>, std::vector<Segment>>
-  post_process(std::pair<std::vector<Segment>, std::vector<Segment>> segments_pair, int img_width, int img_height,
+  post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& segments_pair, int img_width, int img_height,
                const Descriptor& descriptor);
 
   /**

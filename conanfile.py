@@ -43,8 +43,8 @@ class Pylene(ConanFile):
         self.requires("fmt/9.0.0", transitive_headers=True, transitive_libs=True)
         self.requires("onetbb/2021.7.0", transitive_headers=True)
         self.requires("xsimd/7.4.6", transitive_headers=True)
-        self.requires("eigen/3.3.9", transitive_headers=True)
-        self.requires("boost/1.75.0", transitive_headers=True)
+        self.requires("eigen/3.4.0", transitive_headers=True)
+        self.requires("boost/1.81.0", transitive_headers=True)
         self.requires("zlib/1.2.13", override=True)
         self.requires("libwebp/1.2.4", override=True)
         

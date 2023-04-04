@@ -2,7 +2,8 @@
 
 namespace scribo::internal
 {
-  DoubleExponential::DoubleExponential(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
+  DoubleExponential::DoubleExponential(int t_integration, Eigen::Matrix<float, 3, 1> observation,
+                                       const Descriptor& descriptor)
     : Tracker_impl(t_integration, observation, descriptor)
     , x(DoubleExponentialInternal(observation(0, 0), descriptor.double_exponential_alpha))
     , thick(DoubleExponentialInternal(observation(1, 0), descriptor.double_exponential_alpha))

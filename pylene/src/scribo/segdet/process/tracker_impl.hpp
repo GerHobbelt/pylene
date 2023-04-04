@@ -99,8 +99,8 @@ namespace scribo::internal
     bool accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max, const Descriptor& descriptor) const;
 
     /**
-     * The choose_nearest method check whether the given observation, or the one already contained in the Tracker_impl is
-     * the most compatible
+     * The choose_nearest method check whether the given observation, or the one already contained in the Tracker_impl
+     * is the most compatible
      * @param f The tracker_impl struct
      * @param obs The observation to check
      * @return The best observation for the tracker_impl

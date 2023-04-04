@@ -209,7 +209,7 @@ TEST(Segdet, line_detect_2_cross_noise)
   add_gaussian_noise_on_image(img, 100, 40);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   params.llumi         = 180;
@@ -229,7 +229,7 @@ TEST(Segdet, line_detect_4_cross_noise)
   add_gaussian_noise_on_image(img, 100, 40);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -259,7 +259,7 @@ TEST(Segdet, line_detect_10_vertical_20_offset_noise)
   add_gaussian_noise_on_image(img, 100, 10, 42);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -288,8 +288,8 @@ TEST(Segdet, line_detect_small_cross_noise_kalman)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::KALMAN;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::KALMAN;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -306,8 +306,8 @@ TEST(Segdet, line_detect_small_cross_noise_sma)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::SIMPLE_MOVING_AVERAGE;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -324,8 +324,8 @@ TEST(Segdet, line_detect_small_cross_noise_double_exp)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::DOUBLE_EXPONENTIAL;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::DOUBLE_EXPONENTIAL;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -342,8 +342,8 @@ TEST(Segdet, line_detect_small_cross_noise_last_observation)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::LAST_INTEGRATION;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::LAST_INTEGRATION;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -361,8 +361,8 @@ TEST(Segdet, line_detect_small_cross_noise_one_euro)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::ONE_EURO;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::ONE_EURO;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -379,8 +379,8 @@ TEST(Segdet, line_detect_small_cross_noise_ema)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::EXPONENTIAL_MOVING_AVERAGE;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::EXPONENTIAL_MOVING_AVERAGE;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
@@ -494,7 +494,7 @@ TEST(Segdet, line_detect_small_cross_noise_vector)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_vector(img, 10, params);
@@ -538,7 +538,7 @@ TEST(Segdet, odd_observation_on_odd)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -553,7 +553,7 @@ TEST(Segdet, even_observation_on_odd)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -571,7 +571,7 @@ TEST(Segdet, even_observation_on_even)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -586,7 +586,7 @@ TEST(Segdet, odd_observation_on_even)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -601,7 +601,7 @@ TEST(Segdet, odd_observation_on_even_observation_bord_even)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -615,7 +615,7 @@ TEST(Segdet, odd_observation_on_even_observation_bord_odd)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -629,7 +629,7 @@ TEST(Segdet, odd_observation_on_even_observation_bord_odd_beg)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -644,7 +644,7 @@ TEST(Segdet, odd_observation_on_even_observation_bord_even_beg)
 
   int  min_len          = 0;
   auto params           = SegDetParams();
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 
@@ -663,7 +663,7 @@ TEST(Segdet, two_observations_limit)
   int  min_len          = 0;
   auto params           = SegDetParams();
   params.bucket_size    = 4;
-  params.traversal_mode = SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
 
   auto [out, supperpositon] = detect_line_label(img, min_len, params);
 

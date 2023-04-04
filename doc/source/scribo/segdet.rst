@@ -20,10 +20,10 @@ Line Detection using Multiple Object Tracking
 Input
 -----
 
-.. doxygenenum:: scribo::SEGDET_PREPROCESS_ENUM
-.. doxygenenum:: scribo::SEGDET_PROCESS_TRACKING_ENUM
-.. doxygenenum:: scribo::SEGDET_PROCESS_EXTRACTION_ENUM
-.. doxygenenum:: scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM
+.. doxygenenum:: scribo::e_segdet_preprocess
+.. doxygenenum:: scribo::e_segdet_process_tracking
+.. doxygenenum:: scribo::e_segdet_process_extraction
+.. doxygenenum:: scribo::e_segdet_process_traversal_mode
 
 .. doxygenstruct:: scribo::SegDetParams
    :members:

@@ -2,7 +2,8 @@
 
 namespace scribo::internal
 {
-  SimpleMovingAverage::SimpleMovingAverage(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
+  SimpleMovingAverage::SimpleMovingAverage(int t_integration, Eigen::Matrix<float, 3, 1> observation,
+                                           const Descriptor& descriptor)
     : Tracker_impl(t_integration, observation, descriptor)
     , x(observation(0, 0))
     , x_move(SimpleMovingAverageInside(0, descriptor.simple_moving_average_memory))
@@ -29,7 +30,7 @@ namespace scribo::internal
     lumi.integrate(obs(2, 0));
 
     Tracker_impl::integrate(t, descriptor);
-  
+
     x_move.integrate(current_slope);
   }
 } // namespace scribo::internal

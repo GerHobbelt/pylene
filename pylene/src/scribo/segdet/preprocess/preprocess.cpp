@@ -1,9 +1,3 @@
-#include "../detect_line.hpp"
-#include <scribo/segdet.hpp>
-
-
-#include <stdexcept>
-
 #include <mln/core/algorithm/transform.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/image/view/transform.hpp>
@@ -12,14 +6,20 @@
 #include <mln/morpho/closing.hpp>
 #include <mln/morpho/reconstruction.hpp>
 
+#include <scribo/segdet.hpp>
+
+#include <stdexcept>
+
+#include "../detect_line.hpp"
+
 namespace scribo::internal
 {
   /**
    * @brief Perform a black top hat on the input image
-   * 
+   *
    * @param input The input image
    * @param descriptor Descriptor containing the parameters of the preprocessing
-   * @return mln::image2d<std::uint8_t> 
+   * @return mln::image2d<std::uint8_t>
    */
   mln::image2d<std::uint8_t> black_top_hat(const mln::image2d<std::uint8_t>& input, const Descriptor& descriptor)
   {
@@ -52,9 +52,9 @@ namespace scribo::internal
 
     switch (descriptor.preprocess)
     {
-    case SEGDET_PREPROCESS_ENUM::NONE:
+    case e_segdet_preprocess::NONE:
       return input_copy;
-    case SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT:
+    case e_segdet_preprocess::BLACK_TOP_HAT:
       return black_top_hat(input_copy, descriptor);
     default:
       throw std::runtime_error("Bad preprocess choice. Possible are NONE(0), BLACK_TOP_HAT(1)");

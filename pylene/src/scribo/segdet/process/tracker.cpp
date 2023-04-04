@@ -14,22 +14,22 @@ namespace scribo::internal
   {
     switch (descriptor.tracking_type)
     {
-    case SEGDET_PROCESS_TRACKING_ENUM::KALMAN:
+    case e_segdet_process_tracking::KALMAN:
       impl = std::make_unique<Kalman>(t, observation, descriptor);
       break;
-    case SEGDET_PROCESS_TRACKING_ENUM::ONE_EURO:
+    case e_segdet_process_tracking::ONE_EURO:
       impl = std::make_unique<OneEuros>(t, observation, descriptor);
       break;
-    case SEGDET_PROCESS_TRACKING_ENUM::LAST_INTEGRATION:
+    case e_segdet_process_tracking::LAST_INTEGRATION:
       impl = std::make_unique<LastIntegration>(t, observation, descriptor);
       break;
-    case SEGDET_PROCESS_TRACKING_ENUM::DOUBLE_EXPONENTIAL:
+    case e_segdet_process_tracking::DOUBLE_EXPONENTIAL:
       impl = std::make_unique<DoubleExponential>(t, observation, descriptor);
       break;
-    case SEGDET_PROCESS_TRACKING_ENUM::SIMPLE_MOVING_AVERAGE:
+    case e_segdet_process_tracking::SIMPLE_MOVING_AVERAGE:
       impl = std::make_unique<SimpleMovingAverage>(t, observation, descriptor);
       break;
-    case SEGDET_PROCESS_TRACKING_ENUM::EXPONENTIAL_MOVING_AVERAGE:
+    case e_segdet_process_tracking::EXPONENTIAL_MOVING_AVERAGE:
       impl = std::make_unique<ExponentialMovingAverage>(t, observation, descriptor);
       break;
     }

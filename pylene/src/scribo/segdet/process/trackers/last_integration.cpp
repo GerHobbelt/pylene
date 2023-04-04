@@ -2,7 +2,8 @@
 
 namespace scribo::internal
 {
-  LastIntegration::LastIntegration(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
+  LastIntegration::LastIntegration(int t_integration, Eigen::Matrix<float, 3, 1> observation,
+                                   const Descriptor& descriptor)
     : Tracker_impl(t_integration, observation, descriptor)
   {
   }

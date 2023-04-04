@@ -116,16 +116,15 @@ namespace scribo::internal
       v.push_back(s);
     }
 
-    auto ret = std::make_tuple(res, nres);
-
-    return ret;
+    return {std::move(res), std::move(nres)};
   }
 
-  std::tuple<std::vector<Segment>, std::vector<Segment>> post_process(std::pair<std::vector<Segment>, std::vector<Segment>> segments_pair, int img_width,
-                                                                      int img_height, const Descriptor& descriptor)
+  std::tuple<std::vector<Segment>, std::vector<Segment>>
+  post_process(std::pair<std::vector<Segment>, std::vector<Segment>>& segments_pair, int img_width, int img_height,
+               const Descriptor& descriptor)
   {
     if (descriptor.remove_duplicates &&
-        descriptor.traversal_mode == scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL)
+        descriptor.traversal_mode == scribo::e_segdet_process_traversal_mode::HORIZONTAL_VERTICAL)
       remove_duplicates(segments_pair, img_width, img_height, descriptor);
 
     auto segments = filter_length(segments_pair, descriptor);

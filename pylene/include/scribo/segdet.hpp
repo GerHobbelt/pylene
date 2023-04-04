@@ -10,24 +10,24 @@
 namespace scribo
 {
   /**
-   * @brief SEGDET_PREPROCESS_ENUM Precise the preprocess to apply
+   * @brief e_segdet_preprocess Precise the preprocess to apply
    */
-  enum class SEGDET_PREPROCESS_ENUM
+  enum class e_segdet_preprocess
   {
     NONE,          ///< None
     BLACK_TOP_HAT, ///< Black-Top-Hat with specific filter size and dynamic
   };
 
-  enum class SEGDET_PROCESS_EXTRACTION_ENUM
+  enum class e_segdet_process_extraction
   {
     BINARY,   ///< Binary extraction with threshold
     GRADIENT, ///< Gradient extraction with threshold
   };
 
   /**
-   * @brief SEGDET_PROCESS_TRACKING_ENUM Precise which tracker is used
+   * @brief e_segdet_process_tracking Precise which tracker is used
    */
-  enum class SEGDET_PROCESS_TRACKING_ENUM
+  enum class e_segdet_process_tracking
   {
     KALMAN,                    ///< Kalman Filters following classics prediction and correction based on IRISA article
     ONE_EURO,                  ///< One Euro Filter (modification from Nicolas Roussel code)
@@ -38,9 +38,9 @@ namespace scribo
   };
 
   /**
-   * @brief SEGDET_PROCESS_TRAVERSAL_MODE_ENUM Precise the traversal performed for line detection
+   * @brief e_segdet_process_traversal_mode Precise the traversal performed for line detection
    */
-  enum class SEGDET_PROCESS_TRAVERSAL_MODE_ENUM
+  enum class e_segdet_process_traversal_mode
   {
     HORIZONTAL,          ///< Only horizontal traversal is performed
     VERTICAL,            ///< Only vertical traversal is performed
@@ -52,12 +52,12 @@ namespace scribo
    */
   struct SegDetParams
   {
-    SEGDET_PREPROCESS_ENUM             preprocess = SEGDET_PREPROCESS_ENUM::NONE;         ///< Preprocess applied
-    SEGDET_PROCESS_TRACKING_ENUM       tracker    = SEGDET_PROCESS_TRACKING_ENUM::KALMAN; ///< Tracker used
-    SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode =
-        SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL_VERTICAL; ///< Traversal performed
-    SEGDET_PROCESS_EXTRACTION_ENUM extraction_type =
-        SEGDET_PROCESS_EXTRACTION_ENUM::BINARY; ///< Extraction type for observations
+    e_segdet_preprocess             preprocess = e_segdet_preprocess::NONE;         ///< Preprocess applied
+    e_segdet_process_tracking       tracker    = e_segdet_process_tracking::KALMAN; ///< Tracker used
+    e_segdet_process_traversal_mode traversal_mode =
+        e_segdet_process_traversal_mode::HORIZONTAL_VERTICAL; ///< Traversal performed
+    e_segdet_process_extraction extraction_type =
+        e_segdet_process_extraction::BINARY; ///< Extraction type for observations
 
     bool negate_image = false; ///< Say if image has to be reversed before processing
 
@@ -148,7 +148,7 @@ namespace scribo
    * @return An image with pixel labelized (intersection with single label)
    */
   std::tuple<mln::image2d<uint16_t>, std::vector<LSuperposition>>
-  detect_line_label(mln::image2d<std::uint8_t> image, int min_len, const SegDetParams& params = SegDetParams());
+  detect_line_label(const mln::image2d<std::uint8_t>& image, int min_len, const SegDetParams& params = SegDetParams());
 
   /**
    * Detects lines in the given image using given parameters
@@ -160,7 +160,7 @@ namespace scribo
    *                    3. Vector of LSuperposition Type Intersection information
    */
   std::tuple<mln::image2d<std::uint16_t>, std::vector<LSuperposition>, std::vector<VSegment>>
-  detect_line_full(mln::image2d<std::uint8_t> image, int min_len, const SegDetParams& params = SegDetParams());
+  detect_line_full(const mln::image2d<std::uint8_t>& image, int min_len, const SegDetParams& params = SegDetParams());
 
   std::tuple<mln::image2d<std::uint8_t>, mln::image2d<std::uint8_t>, mln::image2d<std::uint8_t>>
   detect_line_pp(const mln::image2d<std::uint8_t>& image, const SegDetParams& params);

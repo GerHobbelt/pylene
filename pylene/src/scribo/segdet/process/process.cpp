@@ -90,7 +90,7 @@ namespace scribo::internal
    * @param t Current t
    */
   std::vector<Tracker> find_match(Buckets& buckets, const Eigen::Matrix<float, 3, 1>& obs, const int& t,
-                                 float max_sigma_pos, const Descriptor& descriptor)
+                                  float max_sigma_pos, const Descriptor& descriptor)
   {
     float max_sigma_thickD2 = std::max(max_sigma_pos, obs(1, 0) / 2.f);
 
@@ -138,7 +138,7 @@ namespace scribo::internal
    * @param descriptor parameters
    */
   void erase_tracker(std::vector<Tracker>& trackers, std::vector<Segment>& segments, size_t fi,
-                    const Descriptor& descriptor)
+                     const Descriptor& descriptor)
   {
     if (trackers[fi].impl->last_integration - trackers[fi].impl->first - descriptor.minimum_for_fusion >
         descriptor.min_length_embryo)
@@ -158,7 +158,7 @@ namespace scribo::internal
   bool make_potential_fusion(std::vector<Tracker>& trackers, size_t fi, std::vector<Segment>& segments,
                              const Descriptor& descriptor)
   {
-    size_t fj                         = fi + 1;
+    size_t fj                          = fi + 1;
     bool   current_tracker_was_deleted = false;
 
     while (fj < trackers.size())
@@ -221,7 +221,7 @@ namespace scribo::internal
    * @return List of trackers that have to continue
    */
   std::vector<Tracker> tracker_selection(std::vector<Tracker>& trackers, std::vector<Segment>& segments, int t,
-                                       const Descriptor& descriptor)
+                                         const Descriptor& descriptor)
   {
     std::vector<Tracker> trackers_to_keep;
 
@@ -288,7 +288,7 @@ namespace scribo::internal
    * @return
    */
   void handle_find_tracker(Buckets& buckets, std::vector<Tracker>& accepted, std::vector<Tracker>& new_trackers,
-                          const Eigen::Matrix<float, 3, 1>& obs, int t, size_t id, const Descriptor& descriptor)
+                           const Eigen::Matrix<float, 3, 1>& obs, int t, size_t id, const Descriptor& descriptor)
   {
     auto observation_s        = Observation();
     observation_s.obs         = obs;
@@ -339,8 +339,8 @@ namespace scribo::internal
   }
 
   std::vector<Tracker> match_observations_to_predictions(std::vector<Eigen::Matrix<float, 3, 1>>& observations,
-                                                        Buckets& buckets, int t, float max_sigma_pos,
-                                                        const Descriptor& descriptor)
+                                                         Buckets& buckets, int t, float max_sigma_pos,
+                                                         const Descriptor& descriptor)
   {
     std::vector<Tracker> new_trackers;
 
@@ -371,9 +371,9 @@ namespace scribo::internal
     Buckets buckets(n_max, descriptor.bucket_size);
 
     std::vector<Segment>                    segments; // List of current segments
-    std::vector<Tracker>                     trackers;
-    std::vector<Tracker>                     new_trackers;
-    std::vector<Tracker>                     tracker_kept;
+    std::vector<Tracker>                    trackers;
+    std::vector<Tracker>                    new_trackers;
+    std::vector<Tracker>                    tracker_kept;
     std::vector<Eigen::Matrix<float, 3, 1>> observations;
 
     for (int t = 0; t < t_max; t++)
@@ -429,12 +429,12 @@ namespace scribo::internal
   {
     // Horizontal traversal
     std::vector<Segment> horizontal_segments;
-    if (descriptor.traversal_mode != SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::VERTICAL)
+    if (descriptor.traversal_mode != e_segdet_process_traversal_mode::VERTICAL)
       horizontal_segments = traversal(image, descriptor);
 
     // Vertical traversal
     std::vector<Segment> vertical_segments;
-    if (descriptor.traversal_mode != SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL)
+    if (descriptor.traversal_mode != e_segdet_process_traversal_mode::HORIZONTAL)
     {
       vertical_segments = traversal(transpose(image), descriptor);
       transpose_segments(vertical_segments);

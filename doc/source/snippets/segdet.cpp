@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   {
     // #BEGIN 1
     int                  min_len = 20;
-    scribo::SegDetParams params  = {.traversal_mode         = scribo::SEGDET_PROCESS_TRAVERSAL_MODE_ENUM::HORIZONTAL,
+    scribo::SegDetParams params  = {.traversal_mode         = scribo::e_segdet_process_traversal_mode::HORIZONTAL,
                                     .discontinuity_relative = 30,
                                     .max_thickness          = 5};
     auto [labelled_image, superposition_vector, vsegment_vector] = scribo::detect_line_full(input, min_len, params);

@@ -6,6 +6,6 @@ namespace scribo::internal
   {
     float x;
     float y;
-    int thickness;
+    int   thickness;
   };
-}
+} // namespace scribo::internal

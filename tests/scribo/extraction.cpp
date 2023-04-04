@@ -6,11 +6,10 @@
 
 namespace
 {
-#define WHITE 255
-#define GREY_WHITE 172
-#define GREY 128
-#define BLACK_GREY 64
-#define BLACK 0
+  static constexpr std::uint8_t WHITE      = 255;
+  static constexpr std::uint8_t GREY_WHITE = 172;
+  static constexpr std::uint8_t GREY       = 128;
+  static constexpr std::uint8_t BLACK      = 0;
 } // namespace
 
 
@@ -44,9 +43,9 @@ TEST(Segdet, binary_none)
   std::vector<Eigen::Matrix<float, 3, 1>> ref;
 
   auto params            = SegDetParams();
-  params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+  params.extraction_type = e_segdet_process_extraction::BINARY;
   params.blumi           = GREY_WHITE;
-  params.llumi        = GREY_WHITE;
+  params.llumi           = GREY_WHITE;
 
   test_extract_observations(ref, image, params);
 }
@@ -67,9 +66,9 @@ TEST(Segdet, binary_odd)
   ref.push_back(Eigen::Matrix<float, 3, 1>(2, 3, BLACK));
 
   auto params            = SegDetParams();
-  params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+  params.extraction_type = e_segdet_process_extraction::BINARY;
   params.blumi           = GREY_WHITE;
-  params.llumi        = GREY_WHITE;
+  params.llumi           = GREY_WHITE;
 
   test_extract_observations(ref, image, params);
 }
@@ -90,9 +89,9 @@ TEST(Segdet, binary_even_end)
   ref.push_back(Eigen::Matrix<float, 3, 1>(2.5f, 4, BLACK));
 
   auto params            = SegDetParams();
-  params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+  params.extraction_type = e_segdet_process_extraction::BINARY;
   params.blumi           = GREY_WHITE;
-  params.llumi        = GREY_WHITE;
+  params.llumi           = GREY_WHITE;
 
   test_extract_observations(ref, image, params);
 }
@@ -114,9 +113,9 @@ TEST(Segdet, binary_multiple)
   ref.push_back(Eigen::Matrix<float, 3, 1>(3.5f, 2, GREY));
 
   auto params            = SegDetParams();
-  params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+  params.extraction_type = e_segdet_process_extraction::BINARY;
   params.blumi           = GREY_WHITE;
-  params.llumi        = GREY_WHITE;
+  params.llumi           = GREY_WHITE;
 
   test_extract_observations(ref, image, params);
 }
@@ -137,9 +136,9 @@ TEST(Segdet, binary_even_begin)
   ref.push_back(Eigen::Matrix<float, 3, 1>(1.5f, 4, BLACK));
 
   auto params            = SegDetParams();
-  params.extraction_type = SEGDET_PROCESS_EXTRACTION_ENUM::BINARY;
+  params.extraction_type = e_segdet_process_extraction::BINARY;
   params.blumi           = GREY_WHITE;
-  params.llumi        = GREY_WHITE;
+  params.llumi           = GREY_WHITE;
 
   test_extract_observations(ref, image, params);
 }
@@ -159,7 +158,7 @@ TEST(Segdet, gradient_none)
   std::vector<Eigen::Matrix<float, 3, 1>> ref;
 
   auto params               = SegDetParams();
-  params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+  params.extraction_type    = e_segdet_process_extraction::GRADIENT;
   params.gradient_threshold = 32;
 
   test_extract_observations(ref, image, params);
@@ -182,7 +181,7 @@ TEST(Segdet, gradient_two)
   ref.push_back(Eigen::Matrix<float, 3, 1>(3, 1, WHITE - BLACK)); // 2
 
   auto params               = SegDetParams();
-  params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+  params.extraction_type    = e_segdet_process_extraction::GRADIENT;
   params.gradient_threshold = 32;
 
   test_extract_observations(ref, image, params);
@@ -208,7 +207,7 @@ TEST(Segdet, gradient_double)
   ref.push_back(Eigen::Matrix<float, 3, 1>(4.5f, 2, WHITE - BLACK)); // 2
 
   auto params               = SegDetParams();
-  params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+  params.extraction_type    = e_segdet_process_extraction::GRADIENT;
   params.gradient_threshold = 32;
 
   test_extract_observations(ref, image, params);
@@ -231,7 +230,7 @@ TEST(Segdet, gradient_smallest)
   ref.push_back(Eigen::Matrix<float, 3, 1>(3, 1, WHITE - BLACK)); // 2
 
   auto params               = SegDetParams();
-  params.extraction_type    = SEGDET_PROCESS_EXTRACTION_ENUM::GRADIENT;
+  params.extraction_type    = e_segdet_process_extraction::GRADIENT;
   params.gradient_threshold = 32;
 
   test_extract_observations(ref, image, params);

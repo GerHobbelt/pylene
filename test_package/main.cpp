@@ -2,6 +2,8 @@
 #include <mln/core/se/disc.hpp>
 #include <mln/morpho/dilation.hpp>
 
+#include <scribo/segdet.hpp>
+
 #include <mln/io/imprint.hpp>
 #include <mln/io/imsave.hpp>
 
@@ -189,11 +191,12 @@ static const uint8_t data[64*64] = {
 // clang-format on
 
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
   int  sizes[2] = {64, 64};
   auto input    = mln::image2d<uint8_t>::from_buffer(const_cast<uint8_t*>(data), sizes);
   auto output   = mln::morpho::dilation(input, mln::se::disc(5));
+  scribo::detect_line_label(input, 10);
 
   mln::io::imsave(output, "test.pgm");
   mln::io::imprint(output);

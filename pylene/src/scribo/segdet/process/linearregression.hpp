@@ -27,7 +27,7 @@ namespace scribo::internal
   public:
     MemoryLinearRegressor(float x0, float y0, int memory = 20);
     float predict();
-    void  push(size_t x, size_t y);
+    void  push(float x, float y);
   };
 
 } // namespace scribo::internal

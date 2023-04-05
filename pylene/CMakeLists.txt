@@ -137,12 +137,18 @@ if (Eigen3_FOUND)
           src/scribo/segdet/detect_line.cpp
           src/scribo/segdet/segment_to_X.cpp
           src/scribo/segdet/parameters.cpp
-          src/scribo/segdet/process/filter.cpp
-          src/scribo/segdet/process/filter_impl.cpp
+          src/scribo/segdet/process/bucket.cpp
+          src/scribo/segdet/process/tracker.cpp
+          src/scribo/segdet/process/tracker_impl.cpp
           src/scribo/segdet/process/linearregression.cpp
           src/scribo/segdet/process/process.cpp
+          src/scribo/segdet/process/extractors/extract_observation.cpp
           src/scribo/segdet/process/trackers/kalman.cpp
-          src/scribo/segdet/process/trackers/kalman_leplumey.cpp
+          src/scribo/segdet/process/trackers/one_euro.cpp
+          src/scribo/segdet/process/trackers/double_exponential.cpp
+          src/scribo/segdet/process/trackers/simple_moving_average.cpp
+          src/scribo/segdet/process/trackers/exponential_moving_average.cpp
+          src/scribo/segdet/process/trackers/last_integration.cpp
           src/scribo/segdet/postprocess/postprocess.cpp
           src/scribo/segdet/preprocess/preprocess.cpp
           src/scribo/segdet/segdet.cpp

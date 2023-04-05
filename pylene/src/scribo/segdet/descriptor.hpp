@@ -10,19 +10,20 @@ namespace scribo::internal
   struct Descriptor
   {
     /// PREPROCESS
-    SEGDET_PREPROCESS_ENUM preprocess;
+    bool                negate_image;
+    e_segdet_preprocess preprocess;
     // BLACK_TOP_HAT
     float dyn;
     int   size_mask;
 
 
     /// PROCESS
-    SEGDET_PROCESS_TRAVERSAL_MODE_ENUM traversal_mode;
-    int                                min_length_embryo;
-    int                                discontinuity_absolute;
-    double                             discontinuity_relative;
-    int                                minimum_for_fusion;
-    float                              max_slope;
+    e_segdet_process_traversal_mode traversal_mode;
+    int                             bucket_size;
+    int                             min_length_embryo;
+    int                             discontinuity_absolute;
+    double                          discontinuity_relative;
+    int                             minimum_for_fusion;
 
     // MATCHING
     int   nb_values_to_keep;
@@ -35,13 +36,21 @@ namespace scribo::internal
     float sigma_luminosity_min;
 
     // EXTRACTION
-    int   max_llum;
-    int   max_max_llum;
-    int   max_thickness;
-    float ratio_lum;
+    e_segdet_process_extraction extraction_type;
+    int                         gradient_threshold;
+    int                         llumi;
+    int                         blumi;
+    int                         max_thickness;
+    float                       ratio_lum;
 
     // MODULE
-    SEGDET_PROCESS_TRACKING_ENUM filter_type;
+    e_segdet_process_tracking tracking_type;
+    float                     double_exponential_alpha;
+    float                     simple_moving_average_memory;
+    float                     exponential_moving_average_memory;
+    float                     one_euro_beta;
+    float                     one_euro_mincutoff;
+    float                     one_euro_dcutoff;
 
 
     /// POSTPROCESS

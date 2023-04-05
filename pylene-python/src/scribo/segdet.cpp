@@ -45,8 +45,8 @@ namespace pln::scribo
         params.sigma_luminosity_min = val;
       else if (str == GET_VARIABLE_NAME(max_thickness))
         params.max_thickness = val;
-      else if (str == GET_VARIABLE_NAME(max_llum))
-        params.max_llum = val;
+      else if (str == GET_VARIABLE_NAME(llumi))
+        params.llumi = val;
       else if (str == GET_VARIABLE_NAME(ratio_lum))
         params.ratio_lum = val;
       else if (str == GET_VARIABLE_NAME(merge_slope_variation))

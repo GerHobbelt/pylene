@@ -1,4 +1,4 @@
-#include "filter_impl.hpp"
+#include "tracker_impl.hpp"
 
 #include <algorithm>
 #include <numeric>
@@ -6,8 +6,6 @@
 namespace scribo::internal
 {
   struct Descriptor;
-
-  static constexpr int undefined_slop = 360;
 
   /**
    * Compute the standard deviation of the diven vector
@@ -39,16 +37,15 @@ namespace scribo::internal
     return result;
   }
 
-  Filter_impl::Filter_impl(int t_integration, Eigen::Matrix<float, 3, 1> obs, const Descriptor& descriptor)
-    : S((Eigen::Matrix<float, 4, 1>() << obs(0, 0), 0, obs(1, 0), obs(2, 0)).finished())
-    , observation(std::nullopt)
+  Tracker_impl::Tracker_impl(int t_integration, Eigen::Matrix<float, 3, 1> obs, const Descriptor& descriptor)
+    : observation(std::nullopt)
     , observation_distance(0)
     , last_integration(t_integration)
     , reg(t_integration, obs(0, 0))
   {
     first    = t_integration;
-    t_values = std::vector<int>({t_integration});
-    n_values = std::vector<int>({static_cast<int>(obs(0, 0))});
+    t_values = std::vector<float>({static_cast<float>(t_integration)});
+    n_values = std::vector<float>({obs(0, 0)});
 
     thicknesses  = std::vector<float>({obs(1, 0)});
     luminosities = std::vector<float>({obs(2, 0)});
@@ -58,32 +55,29 @@ namespace scribo::internal
     thicknesses.reserve(descriptor.nb_values_to_keep);
     luminosities.reserve(descriptor.nb_values_to_keep);
 
-    first_slope   = undefined_slop;
-    last_slope    = 0;
     current_slope = 0;
 
-    under_other           = std::vector<Span>();
+    under_other = std::vector<Span>();
 
     n_min = 0;
     n_max = 0;
 
-    sigma_position   = descriptor.default_sigma_position;
-    sigma_thickness  = descriptor.default_sigma_thickness;
-    sigma_luminosity = descriptor.default_sigma_luminosity;
+    sigma_position   = descriptor.default_sigma_position * 3;
+    sigma_thickness  = descriptor.default_sigma_thickness * 3;
+    sigma_luminosity = descriptor.default_sigma_luminosity * 3;
 
-    S_predicted = Eigen::Matrix<float, 4, 1>::Zero();
     X_predicted = Eigen::Matrix<float, 3, 1>::Zero();
 
     segment_spans = std::vector<Span>();
   }
 
-  void Filter_impl::compute_sigmas(const Descriptor& descriptor)
+  void Tracker_impl::compute_sigmas(const Descriptor& descriptor)
   {
     if (static_cast<int>(n_values.size()) > descriptor.min_nb_values_sigma)
     {
-      sigma_position   = std(n_values) + descriptor.sigma_pos_min;
-      sigma_thickness  = std(thicknesses) * 2 + descriptor.sigma_thickness_min;
-      sigma_luminosity = std(luminosities) + descriptor.sigma_luminosity_min;
+      sigma_position   = (std(n_values) + descriptor.sigma_pos_min) * 3;
+      sigma_thickness  = (std(thicknesses) * 2 + descriptor.sigma_thickness_min) * 3;
+      sigma_luminosity = (std(luminosities) + descriptor.sigma_luminosity_min) * 3;
     }
   }
 
@@ -97,10 +91,11 @@ namespace scribo::internal
    */
   bool accepts_sigma(float prediction, float observation, float sigma)
   {
-    return abs(prediction - observation) <= 3 * sigma;
+    return abs(prediction - observation) <= sigma;
   }
 
-  bool Filter_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max, const Descriptor& descriptor) const
+  bool Tracker_impl::accepts(const Eigen::Matrix<float, 3, 1>& obs, int min, int max,
+                             const Descriptor& descriptor) const
   {
     if (static_cast<int>(n_values.size()) > descriptor.min_nb_values_sigma && obs(1, 0) / X_predicted(1, 0) > 1.5 &&
         std::abs(obs(1, 0) - X_predicted(1, 0)) > 3)
@@ -108,8 +103,9 @@ namespace scribo::internal
       return false;
     }
 
-    if (n_max < min || max < n_min) // TODO: Check cette condition | Garder pour les zones connexes, mais peut
-                                    // être trop contraignante
+    if (descriptor.extraction_type == e_segdet_process_extraction::BINARY &&
+        (n_max < min || max < n_min)) // TODO: Check cette condition | Garder pour les zones connexes, mais peut
+                                      // être trop contraignante
       return false;
 
     return accepts_sigma(X_predicted(0, 0), obs(0, 0), sigma_position) &&
@@ -117,7 +113,7 @@ namespace scribo::internal
            accepts_sigma(X_predicted(2, 0), obs(2, 0), sigma_luminosity);
   }
 
-  std::optional<Observation> Filter_impl::choose_nearest(Observation& obs)
+  std::optional<Observation> Tracker_impl::choose_nearest(Observation& obs)
   {
     auto X             = obs.obs;
     auto obs_to_return = std::make_optional(obs);
@@ -134,17 +130,17 @@ namespace scribo::internal
   }
 
   /**
-   * Compute the slope of the segment formed by the filter using Linear regression
+   * Compute the slope of the segment formed by the tracker using Linear regression
    * @return The computed slope
    */
-  float Filter_impl::compute_slope()
+  float Tracker_impl::compute_slope()
   {
     reg.push(t_values.back(), n_values.back());
     auto slope = reg.predict();
     return slope;
   }
 
-  void Filter_impl::predict()
+  void Tracker_impl::predict()
   {
     int thik_d2 = X_predicted(1, 0) / 2;
     n_min       = X_predicted(0, 0) - thik_d2;
@@ -159,11 +155,17 @@ namespace scribo::internal
    * @param observation The observation matrix to integrate
    * @param t The position at which the integration was made
    */
-  void Filter_impl::integrate(int t, const Descriptor& descriptor)
+  void Tracker_impl::integrate(int t, const Descriptor& descriptor)
   {
-    const auto& obs = observation.value().obs;
+    const auto& observation_non_opt = observation.value();
+    const auto& obs                 = observation_non_opt.obs;
 
-    last_integration      = t;
+    if (observation_non_opt.match_count != 1)
+      same_observation.push_back(observation_non_opt.id * observation_non_opt.t);
+    else
+      same_observation.clear();
+
+    last_integration = t;
 
     n_values.push_back(obs(0, 0));
     thicknesses.push_back(obs(1, 0));
@@ -171,14 +173,10 @@ namespace scribo::internal
 
     t_values.push_back(t);
 
-    last_slope    = current_slope;
     current_slope = compute_slope();
 
     if (static_cast<int>(n_values.size()) > descriptor.nb_values_to_keep)
     {
-      if (first_slope == undefined_slop)
-        first_slope = S(1, 0);
-
       auto thick = thicknesses[0];
       auto nn    = n_values[0];
       auto tt    = t_values[0];

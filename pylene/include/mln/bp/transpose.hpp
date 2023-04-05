@@ -20,7 +20,15 @@ namespace mln::bp
   void transpose_inplace(T* buffer, int n, std::ptrdiff_t byte_stride) noexcept(std::is_nothrow_swappable_v<T>);
 
 
-  /// \brief Transpose the data from \p src into \p dst
+  /// @brief Transpose the data from \p src into \p dst
+  /// 
+  /// @tparam T 
+  /// @param src Source buffer
+  /// @param dst Destination buffer
+  /// @param width Width of the *destination* buffer
+  /// @param height Height of the *destination* buffer
+  /// @param src_stride Pitch (in bytes) of the source buffer
+  /// @param dst_stride Pitch (in bytes) of the destination buffer
   template <class T>
   void transpose(const T* src, T* dst, int width, int height, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept(std::is_nothrow_swappable_v<T>);
 

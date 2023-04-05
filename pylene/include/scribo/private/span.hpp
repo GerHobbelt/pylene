@@ -4,8 +4,8 @@ namespace scribo::internal
 {
   struct Span
   {
-    int x;
-    int y;
-    int thickness;
+    float x;
+    float y;
+    int   thickness;
   };
-}
+} // namespace scribo::internal

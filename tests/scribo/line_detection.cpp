@@ -18,8 +18,31 @@
 using namespace scribo;
 using namespace scribo::internal;
 
-void expect_empty(segdet_output ref, segdet_output output)
+void sort_segdet_span_output(segdet_output& out)
 {
+  std::sort(out.seg_ids.begin(), out.seg_ids.end());
+  std::sort(out.seg_ids.begin(), out.seg_ids.end());
+  std::sort(out.mid_pos_x.begin(), out.mid_pos_x.end());
+  std::sort(out.mid_pos_y.begin(), out.mid_pos_y.end());
+  std::sort(out.thickness.begin(), out.thickness.end());
+  std::sort(out.angle.begin(), out.angle.end());
+}
+
+void sort_ref_output(segdet_output& ref, segdet_output& output)
+{
+  sort_segdet_span_output(ref);
+  sort_segdet_span_output(output);
+}
+
+void expect_empty(segdet_output output)
+{
+  EXPECT_EQ(output.seg_ids.size(), 0);
+}
+
+void expect_eq(segdet_output ref, segdet_output output)
+{
+  sort_ref_output(ref, output);
+
   EXPECT_EQ(output.seg_ids.size(), ref.seg_ids.size());
   EXPECT_EQ(output.seg_ids, ref.seg_ids);
   EXPECT_EQ(output.mid_pos_x, ref.mid_pos_x);
@@ -28,8 +51,10 @@ void expect_empty(segdet_output ref, segdet_output output)
   EXPECT_EQ(output.angle, ref.angle);
 }
 
-void expect_multiple(segdet_output ref, segdet_output output, int abs_error)
+void expect_near(segdet_output ref, segdet_output output, int abs_error)
 {
+  sort_ref_output(ref, output);
+
   ASSERT_EQ(output.seg_ids.size(), ref.seg_ids.size());
   for (size_t p = 0; p < output.seg_ids.size(); p++)
   {
@@ -71,6 +96,19 @@ void check_vector_output(std::vector<VSegment> ref, std::vector<VSegment> output
   }
 }
 
+void check_pixel_horizontal_output(mln::image2d<std::uint16_t> ref, mln::image2d<std::uint16_t> output)
+{
+  std::map<int, int> res;
+  for (int y = 0; y < ref.height(); y++)
+    for (int x = 0; x < ref.width(); x++)
+    {
+      int vref = static_cast<int>(ref({x, 0}));
+      int vout = static_cast<int>(output({x, y}));
+      if (res.find(vref) == res.end())
+        res[vref] = vout;
+      EXPECT_EQ(res[vref], vout);
+    }
+}
 
 TEST(Segdet, line_detect_one_horizontal)
 {
@@ -80,7 +118,7 @@ TEST(Segdet, line_detect_one_horizontal)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_one_vertical)
@@ -91,7 +129,7 @@ TEST(Segdet, line_detect_one_vertical)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_one_cross)
@@ -102,7 +140,7 @@ TEST(Segdet, line_detect_one_cross)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_4_cross)
@@ -113,7 +151,7 @@ TEST(Segdet, line_detect_4_cross)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_8_cross)
@@ -124,7 +162,7 @@ TEST(Segdet, line_detect_8_cross)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_15x15)
@@ -135,7 +173,7 @@ TEST(Segdet, line_detect_15x15)
 
   auto output = detect_line_span(img, 10);
 
-  expect_empty(ref, output);
+  expect_eq(ref, output);
 }
 
 TEST(Segdet, line_detect_1_vert_too_long)
@@ -146,7 +184,7 @@ TEST(Segdet, line_detect_1_vert_too_long)
 
   auto output = detect_line_span(img, 101);
 
-  expect_empty(ref, output);
+  expect_empty(output);
 }
 
 TEST(Segdet, line_detect_1_vert_too_thick)
@@ -160,7 +198,7 @@ TEST(Segdet, line_detect_1_vert_too_thick)
   params.max_thickness = 10;
   auto output          = detect_line_span(img, 100, params);
 
-  expect_empty(ref, output);
+  expect_empty(output);
 }
 
 TEST(Segdet, line_detect_2_cross_noise)
@@ -171,14 +209,16 @@ TEST(Segdet, line_detect_2_cross_noise)
   add_gaussian_noise_on_image(img, 100, 40);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  params.llumi         = 180;
+  params.blumi         = 180;
 
   auto output = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_4_cross_noise)
@@ -189,13 +229,13 @@ TEST(Segdet, line_detect_4_cross_noise)
   add_gaussian_noise_on_image(img, 100, 40);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_10_vertical_20_offset)
@@ -207,7 +247,7 @@ TEST(Segdet, line_detect_10_vertical_20_offset)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 0;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 
@@ -219,13 +259,13 @@ TEST(Segdet, line_detect_10_vertical_20_offset_noise)
   add_gaussian_noise_on_image(img, 100, 10, 42);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_small_cross)
@@ -237,10 +277,10 @@ TEST(Segdet, line_detect_small_cross)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 0;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
-TEST(Segdet, line_detect_small_cross_noise)
+TEST(Segdet, line_detect_small_cross_noise_kalman)
 {
   auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
   mln::image2d<std::uint8_t> img  = pair.first;
@@ -248,16 +288,17 @@ TEST(Segdet, line_detect_small_cross_noise)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::KALMAN;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
-TEST(Segdet, line_detect_small_cross_noise_leplumey)
+TEST(Segdet, line_detect_small_cross_noise_sma)
 {
   auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
   mln::image2d<std::uint8_t> img  = pair.first;
@@ -265,14 +306,87 @@ TEST(Segdet, line_detect_small_cross_noise_leplumey)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
-  params.tracker       = SEGDET_PROCESS_TRACKING_ENUM::KALMAN_LEPLUMEY;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::SIMPLE_MOVING_AVERAGE;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_span(img, 10, params);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
+}
+
+TEST(Segdet, line_detect_small_cross_noise_double_exp)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+  add_gaussian_noise_on_image(img, 100, 30, 4);
+
+  auto params          = SegDetParams();
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::DOUBLE_EXPONENTIAL;
+  int max_dim          = std::max(img.height(), img.width());
+  params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  auto output          = detect_line_span(img, 10, params);
+
+  auto abs_error = 2;
+  expect_near(ref, output, abs_error);
+}
+
+TEST(Segdet, line_detect_small_cross_noise_last_observation)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+  add_gaussian_noise_on_image(img, 100, 30, 4);
+
+  auto params          = SegDetParams();
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::LAST_INTEGRATION;
+  int max_dim          = std::max(img.height(), img.width());
+  params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  auto output          = detect_line_span(img, 10, params);
+
+  auto abs_error = 2;
+  expect_near(ref, output, abs_error);
+}
+
+
+TEST(Segdet, line_detect_small_cross_noise_one_euro)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+  add_gaussian_noise_on_image(img, 100, 30, 4);
+
+  auto params          = SegDetParams();
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::ONE_EURO;
+  int max_dim          = std::max(img.height(), img.width());
+  params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  auto output          = detect_line_span(img, 10, params);
+
+  auto abs_error = 2;
+  expect_near(ref, output, abs_error);
+}
+
+TEST(Segdet, line_detect_small_cross_noise_ema)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 1, 5, 30);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+  add_gaussian_noise_on_image(img, 100, 30, 4);
+
+  auto params          = SegDetParams();
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
+  params.tracker       = e_segdet_process_tracking::EXPONENTIAL_MOVING_AVERAGE;
+  int max_dim          = std::max(img.height(), img.width());
+  params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
+  auto output          = detect_line_span(img, 10, params);
+
+  auto abs_error = 2;
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_vertical_10_degrees)
@@ -284,7 +398,7 @@ TEST(Segdet, line_detect_one_vertical_10_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_vertical_m10_degrees)
@@ -296,7 +410,7 @@ TEST(Segdet, line_detect_one_vertical_m10_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_horizontal_30_degrees)
@@ -308,7 +422,7 @@ TEST(Segdet, line_detect_one_horizontal_30_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 0;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_one_horizontal_m30_degrees)
@@ -320,7 +434,7 @@ TEST(Segdet, line_detect_one_horizontal_m30_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 2;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_10_horizontal_10_degrees)
@@ -332,7 +446,7 @@ TEST(Segdet, line_detect_10_horizontal_10_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 1;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_cross_5_degrees)
@@ -344,7 +458,7 @@ TEST(Segdet, line_detect_cross_5_degrees)
   auto output = detect_line_span(img, 10);
 
   auto abs_error = 1;
-  expect_multiple(ref, output, abs_error);
+  expect_near(ref, output, abs_error);
 }
 
 TEST(Segdet, line_detect_cross_5_degrees_vector)
@@ -380,11 +494,178 @@ TEST(Segdet, line_detect_small_cross_noise_vector)
   add_gaussian_noise_on_image(img, 100, 30, 4);
 
   auto params          = SegDetParams();
-  params.preprocess    = SEGDET_PREPROCESS_ENUM::BLACK_TOP_HAT;
+  params.preprocess    = e_segdet_preprocess::BLACK_TOP_HAT;
   int max_dim          = std::max(img.height(), img.width());
   params.max_thickness = static_cast<int>(std::ceil(max_dim * 0.4));
   auto output          = detect_line_vector(img, 10, params);
 
   auto abs_error = 5;
   check_vector_output(ref, output, abs_error);
+}
+
+TEST(Segdet, bucket_size_dividor)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 0, 5);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+
+  auto params        = SegDetParams();
+  params.bucket_size = 100 / 2;
+
+  auto output = detect_line_span(img, 10, params);
+
+  expect_eq(ref, output);
+}
+
+TEST(Segdet, bucket_size_higher_one_bucket)
+{
+  auto                       pair = generate_test_image_span(100, 100, 1, 0, 5);
+  mln::image2d<std::uint8_t> img  = pair.first;
+  segdet_output              ref  = pair.second;
+
+  auto params        = SegDetParams();
+  params.bucket_size = 100 * 2;
+
+  auto output = detect_line_span(img, 10, params);
+
+  expect_eq(ref, output);
+}
+
+TEST(Segdet, odd_observation_on_odd)
+{
+  mln::image2d<std::uint8_t>  img = {{255, 0, 255}, {255, 0, 255}, {255, 0, 255}, {255, 0, 255}, {255, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{0, 2, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, even_observation_on_odd)
+{
+  mln::image2d<std::uint8_t> img = {
+      {255, 0, 0, 255}, {255, 0, 0, 255}, {255, 0, 0, 255}, {255, 0, 0, 255}, {255, 0, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{0, 2, 2, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, even_observation_on_even)
+{
+  mln::image2d<std::uint8_t>  img = {{255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255},
+                                     {255, 255, 0, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{0, 0, 2, 2, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even)
+{
+  mln::image2d<std::uint8_t> img = {
+      {255, 255, 0, 255}, {255, 255, 0, 255}, {255, 255, 0, 255}, {255, 255, 0, 255}, {255, 255, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{0, 0, 2, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_even)
+{
+  mln::image2d<std::uint8_t> img = {
+      {255, 255, 0, 0}, {255, 255, 0, 0}, {255, 255, 0, 0}, {255, 255, 0, 0}, {255, 255, 0, 0}};
+  mln::image2d<std::uint16_t> ref = {{0, 0, 2, 2}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_odd)
+{
+  mln::image2d<std::uint8_t>  img = {{255, 0, 0, 0}, {255, 0, 0, 0}, {255, 0, 0, 0}, {255, 0, 0, 0}, {255, 0, 0, 0}};
+  mln::image2d<std::uint16_t> ref = {{0, 2, 2, 2}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_odd_beg)
+{
+  mln::image2d<std::uint8_t>  img = {{0, 0, 0, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}};
+  mln::image2d<std::uint16_t> ref = {{2, 2, 2, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, odd_observation_on_even_observation_bord_even_beg)
+{
+  mln::image2d<std::uint8_t> img = {
+      {0, 0, 255, 255}, {0, 0, 255, 255}, {0, 0, 255, 255}, {0, 0, 255, 255}, {0, 0, 255, 255}};
+  mln::image2d<std::uint16_t> ref = {{2, 2, 0, 0}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
+}
+
+TEST(Segdet, two_observations_limit)
+{
+  mln::image2d<std::uint8_t>  img = {{0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0},
+                                     {0, 0, 255, 255, 255, 0, 0}};
+  mln::image2d<std::uint16_t> ref = {{2, 2, 0, 0, 0, 3, 3}};
+
+  int  min_len          = 0;
+  auto params           = SegDetParams();
+  params.bucket_size    = 4;
+  params.traversal_mode = e_segdet_process_traversal_mode::VERTICAL;
+
+  auto [out, supperpositon] = detect_line_label(img, min_len, params);
+
+  check_pixel_horizontal_output(ref, out);
 }

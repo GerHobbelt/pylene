@@ -369,6 +369,17 @@ distcheck-package-create:
         CC: "gcc"
         CXX: "g++"
 
+   variables:
+        CONAN_BASE_PROFILE: gcc-11
+
+
+.package-gcc-10:
+    image: ${FEDORA_32}
+    extends: .deploy-package-base
+    variables:
+        CC: "gcc"
+        CXX: "g++"
+
 .package-gcc-11:
     image: ${FEDORA_34}
     extends: .deploy-package-base

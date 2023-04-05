@@ -9,7 +9,7 @@ include(BenchmarkMacros)
 # Download file dependency
 set(ExternalData_URL_TEMPLATES
   "file:///lrde/dload/olena/pylene/data/%(algo)/%(hash)"
-  "https://www.lrde.epita.fr/dload/olena/pylene/data/%(algo)/%(hash)")
+  "https://www.lre.epita.fr/dload/olena/pylene/data/%(algo)/%(hash)")
 
 ExternalData_Expand_Arguments(
   fetch-external-data

@@ -20,24 +20,25 @@ namespace scribo::internal
     static const Eigen::Matrix<float, 3, 3> Vn((Eigen::Matrix<float, 3, 3>() << SEGDET_VARIANCE_POSITION, 0, 0, 0,
                                                 SEGDET_VARIANCE_THICKNESS, 0, 0, 0, SEGDET_VARIANCE_LUMINOSITY)
                                                    .finished());
-    static const Eigen::Matrix<float, 4, 4> Q(Eigen::Matrix<float, 4, 4>::Identity() * 0.00001);
+    static const Eigen::Matrix<float, 4, 4> Vw(Eigen::Matrix<float, 4, 4>::Identity() * 0.00001);
 
-  } // namespace kalman
+  } // namespace
 
   Kalman::Kalman(int t_integration, Eigen::Matrix<float, 3, 1> observation, const Descriptor& descriptor)
-    : Filter_impl(t_integration, observation, descriptor)
+    : Tracker_impl(t_integration, observation, descriptor)
+    , S((Eigen::Matrix<float, 4, 1>() << observation(0, 0), 0, observation(1, 0), observation(2, 0)).finished())
     , H(Eigen::Matrix<float, 4, 4>::Identity())
   {
   }
 
   void Kalman::predict()
   {
-    S_predicted = A * S;
-    X_predicted = C * S_predicted;
+    S           = A * S;
+    X_predicted = C * S;
 
-    H = A * H * A_transpose + Q;
+    H = A * H * A_transpose + Vw;
 
-    Filter_impl::predict();
+    Tracker_impl::predict();
   }
 
   void Kalman::integrate(int t, const Descriptor& descriptor)
@@ -46,9 +47,9 @@ namespace scribo::internal
 
     const auto H_Ct = H * C_transpose;
     const auto G    = H_Ct * (C * H_Ct + Vn).inverse();
-    S               = S_predicted + G * (obs - X_predicted);
+    S               = S + G * (obs - X_predicted);
     H               = (Eigen::Matrix<float, 4, 4>::Identity() - G * C) * H;
 
-    Filter_impl::integrate(t, descriptor);
+    Tracker_impl::integrate(t, descriptor);
   }
 } // namespace scribo::internal

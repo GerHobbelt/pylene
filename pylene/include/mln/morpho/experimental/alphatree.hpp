@@ -4,6 +4,7 @@
 #include <mln/core/concepts/image.hpp>
 #include <mln/core/concepts/neighborhood.hpp>
 #include <mln/morpho/component_tree.hpp>
+#include <mln/morpho/experimental/canvas/kruskal.hpp>
 
 namespace mln::morpho::experimental
 {
@@ -27,130 +28,12 @@ namespace mln::morpho::experimental
       bool operator==(edge<W> o) const { return a == o.a && b == o.b && w == o.w; }
     };
 
-    class QBT
-    {
-    public:
-      std::vector<int> parent;
-      int              size;
-
-      QBT(int n)
-        : parent(std::vector<int>(2 * n - 1, -1))
-        , size(0)
-      {
-      }
-
-      void make_set(int q)
-      {
-        parent[q] = -1;
-        size += 1;
-      }
-
-      int find_canonical(int q)
-      {
-        while (parent[q] >= 0)
-          q = parent[q];
-        return q;
-      }
-
-      void union_q(int cx, int cy)
-      {
-        parent[cx] = size;
-        parent[cy] = size;
-        make_set(size);
-      }
-    };
-
-    class QT
-    {
-    public:
-      std::vector<int> parent;
-      std::vector<int> rank;
-      int              size;
-
-      QT(int n)
-        : parent(std::vector<int>(n, -1))
-        , rank(std::vector<int>(n, 0))
-        , size(0)
-      {
-      }
-
-      void make_set(int q)
-      {
-        (void)q;
-        parent[size] = -1;
-        rank[size]   = 0;
-        size += 1;
-      }
-
-      int find_canonical(int q)
-      {
-        int r = q;
-        while (parent[r] >= 0)
-          r = parent[r];
-        while (parent[q] >= 0)
-        {
-          auto tmp    = q;
-          q           = parent[q];
-          parent[tmp] = r;
-        }
-        return r;
-      }
-
-      int union_q(int cx, int cy)
-      {
-        if (rank[cx] > rank[cy])
-          std::swap(cx, cy);
-        if (rank[cx] == rank[cy])
-          rank[cy] += 1;
-        parent[cx] = cy;
-        return cy;
-      }
-    };
-
-    class QEBT
-    {
-    public:
-      std::vector<int> root;
-      QBT              qbt;
-      QT               qt;
-      int              size;
-
-      QEBT(int n)
-        : root(std::vector<int>(n, 0))
-        , qbt(QBT(n))
-        , qt(QT(n))
-        , size(0)
-      {
-      }
-
-      void make_set(int q)
-      {
-        root[q] = q;
-        qbt.make_set(q);
-        qt.make_set(q);
-      }
-
-      int find_canonical(int q) { return qt.find_canonical(q); }
-
-      void union_q(int cx, int cy)
-      {
-        int tu         = root[cx];
-        int tv         = root[cy];
-        qbt.parent[tu] = qbt.size;
-        qbt.parent[tv] = qbt.size;
-        int c          = qt.union_q(cx, cy);
-        root[c]        = qbt.size;
-        qbt.make_set(qbt.size);
-      }
-    };
-
-
     template <class I, class N, class F>
     std::vector<edge<std::invoke_result_t<F, I, I>>> make_edges(I input, N nbh, image_ch_value_t<I, int> map,
                                                                 F distance)
     {
-      std::vector<edge<std::invoke_result_t<F, I, I>>> edges = {};
-      auto                                             dom   = input.domain();
+      auto edges = std::vector<edge<std::invoke_result_t<F, I, I>>>();
+      auto dom   = input.domain();
       mln_foreach (auto p, dom)
       {
         for (auto n : nbh.after(p))
@@ -164,26 +47,19 @@ namespace mln::morpho::experimental
       return edges;
     }
 
-    template <class Q, class E>
-    std::vector<E> kruskal(Q& q, std::vector<E>& adjList, int nbNodes)
+    template <class V, class E>
+    void kruskal(V& visitor, std::vector<E>& adjList)
     {
-      int            c   = 0;
-      std::vector<E> MST = {};
       std::stable_sort(adjList.begin(), adjList.end(), [](E a, E b) -> bool { return a.w < b.w; });
-      for (int i = 0; i < nbNodes; i++)
-        q.make_set(i);
       for (auto e : adjList)
       {
-        auto cx = q.find_canonical(e.a);
-        auto cy = q.find_canonical(e.b);
+        int cx = visitor.on_find(e.a);
+        int cy = visitor.on_find(e.b);
         if (cx != cy)
         {
-          q.union_q(cx, cy);
-          MST.push_back(e);
-          c += 1;
+          visitor.on_union(cx, cy, e);
         }
       }
-      return MST;
     }
 
     int get_edge(int n, int nbNodes)
@@ -199,22 +75,22 @@ namespace mln::morpho::experimental
     }
 
     template <typename M>
-    std::vector<int> canonize_qbt(QBT qbt, M MST)
+    std::vector<int> canonize_qbt(std::vector<int> parent, M MST, int size)
     {
-      std::vector<int> res = std::vector<int>(qbt.size, 0);
-      for (int n = 0; n < qbt.size; n++)
+      std::vector<int> res = std::vector<int>(size, 0);
+      for (int n = 0; n < size; n++)
       {
-        res[n] = qbt.parent[n];
+        res[n] = parent[n];
       }
-      for (int n = qbt.size - 2; n > qbt.size / 2; n--)
+      for (int n = size - 2; n > size / 2; n--)
       {
         auto p = res[n];
-        if (weight_node(p, qbt.size / 2, MST) == weight_node(n, qbt.size / 2, MST))
+        if (weight_node(p, size / 2, MST) == weight_node(n, size / 2, MST))
         {
           bool flag = false;
-          for (int c = 0; c < qbt.size; c++)
+          for (int c = 0; c < size; c++)
           {
-            if (qbt.parent[c] == n)
+            if (parent[c] == n)
             {
               flag   = true;
               res[c] = p;
@@ -261,16 +137,16 @@ namespace mln::morpho::experimental
       map(p) = id;
       id++;
     }
+    //mln::iota
 
-    std::vector<internal::edge<std::invoke_result_t<F, I, I>>> edges = internal::make_edges(input, nbh, map, distance);
+    auto edges = internal::make_edges(input, nbh, map, distance);
 
-    mln::morpho::experimental::internal::QEBT                  q = {id};
-    std::vector<internal::edge<std::invoke_result_t<F, I, I>>> MST =
-        mln::morpho::experimental::internal::kruskal(q, edges, id);
+    auto visitor = mln::morpho::experimental::canvas::kruskal_visitor_base(id);
+    auto MST     = internal::kruskal(visitor, edges);
 
-    auto qt = mln::morpho::experimental::internal::canonize_qbt(std::move(q.qbt), MST);
+    auto qt = internal::canonize_qbt(std::move(visitor.parent), MST, id * 2 - 1);
 
-    auto tree = mln::morpho::experimental::internal::make_tree(std::move(qt), std::move(MST));
+    auto tree = internal::make_tree(std::move(qt), std::move(MST));
 
     return {tree, map};
   }

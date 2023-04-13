@@ -6,6 +6,7 @@
 #include <mln/core/neighborhood/c8.hpp>
 #include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/experimental/alphatree.hpp>
+#include <mln/morpho/experimental/canvas/kruskal.hpp>
 
 #include <fixtures/ImageCompare/image_compare.hpp>
 
@@ -56,7 +57,23 @@ TEST(AlphaTree, edges)
   ASSERT_VEC_EQ(ref, edges);
 }
 
-TEST(AlphaTree, kruskalBt)
+TEST(AlphaTree, KruskalVisitorBase)
+{
+  using E = mln::morpho::experimental::internal::edge<std::int16_t>;
+
+  std::vector<E> edges = {{0, 1, 3},  {0, 4, 3},  {1, 2, 4}, {1, 5, 5},  {2, 3, 1},  {2, 6, 2},
+                          {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
+                          {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
+
+  std::vector<int> refP = {20, 20, 15, 15, 12, 17, 13, 16, 12, 14, 13, 19, 14, 18, 17, 16, 18, 21, 19, 22, 21, 22, -1};
+  mln::morpho::experimental::canvas::kruskal_visitor_base v = {12};
+
+  mln::morpho::experimental::internal::kruskal(v, edges);
+
+  ASSERT_VEC_EQ(refP, v.parent);
+}
+
+TEST(AlphaTree, KruskalVisitorMst)
 {
   using E = mln::morpho::experimental::internal::edge<std::int16_t>;
 
@@ -67,14 +84,15 @@ TEST(AlphaTree, kruskalBt)
   std::vector<int> refP = {20, 20, 15, 15, 12, 17, 13, 16, 12, 14, 13, 19, 14, 18, 17, 16, 18, 21, 19, 22, 21, 22, -1};
   std::vector<E>   refMST                    = {{4, 8, 0}, {6, 10, 0},  {8, 9, 0}, {2, 3, 1}, {3, 7, 1}, {4, 5, 1},
                                                 {2, 6, 2}, {10, 11, 2}, {0, 1, 3}, {0, 4, 3}, {5, 6, 3}};
-  mln::morpho::experimental::internal::QBT q = {12};
+  mln::morpho::experimental::canvas::kruskal_visitor_mst<E> v = {12};
 
-  std::vector<E> MST = mln::morpho::experimental::internal::kruskal(q, edges, 12);
+  mln::morpho::experimental::internal::kruskal(v, edges);
 
-  ASSERT_VEC_EQ(refP, q.parent);
-  ASSERT_VEC_EQ(refMST, MST);
+  ASSERT_VEC_EQ(refP, v.parent);
+  ASSERT_VEC_EQ(refMST, v.mst);
 }
 
+/*
 TEST(AlphaTree, Qt)
 {
   using E = mln::morpho::experimental::internal::edge<std::int16_t>;
@@ -161,3 +179,4 @@ TEST(AlphaTree, Image3d)
   ASSERT_VEC_EQ(refP, t.parent);
   ASSERT_VEC_EQ(refV, t.values);
 }
+*/

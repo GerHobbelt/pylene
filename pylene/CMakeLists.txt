@@ -93,6 +93,7 @@ target_sources(Pylene-core PRIVATE
                src/morpho/unionfind.cpp
                src/morpho/waterfall.cpp
                src/transforms/hough_lines.cpp
+               src/morpho/experimental/kruskal.cpp
                )
 
 add_library(Pylene-io-freeimage)

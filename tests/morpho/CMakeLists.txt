@@ -1,6 +1,7 @@
 set(test_prefix "UTMorpho_")
 
-add_core_test(experimental experimental/alphatree.cpp)
+add_core_test(experimental_alphatree experimental/alphatree.cpp)
+add_core_test(experimental_kruskal experimental/kruskal.cpp)
 add_core_test(${test_prefix}running_max_1d running_max_1d.cpp)
 add_core_test(${test_prefix}block_running_max block_running_max.cpp)
 add_core_test(${test_prefix}fill_hole fill_hole.cpp)

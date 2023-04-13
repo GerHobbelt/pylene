@@ -47,21 +47,6 @@ namespace mln::morpho::experimental
       return edges;
     }
 
-    template <class V, class E>
-    void kruskal(V& visitor, std::vector<E>& adjList)
-    {
-      std::stable_sort(adjList.begin(), adjList.end(), [](E a, E b) -> bool { return a.w < b.w; });
-      for (auto e : adjList)
-      {
-        int cx = visitor.on_find(e.a);
-        int cy = visitor.on_find(e.b);
-        if (cx != cy)
-        {
-          visitor.on_union(cx, cy, e);
-        }
-      }
-    }
-
     int get_edge(int n, int nbNodes)
     {
       return n - nbNodes;
@@ -129,24 +114,26 @@ namespace mln::morpho::experimental
   std::pair<component_tree<std::invoke_result_t<F, I, I>>, image_ch_value_t<I, int>> alphatree(I input, N nbh,
                                                                                                F distance)
   {
-    mln::image_ch_value_t<I, int> map = imchvalue<int>(input).set_init_value(-1);
+    mln::image_ch_value_t<I, int> map = imchvalue<int>(input);
     auto                          dom = map.domain();
     int                           id  = 0;
+    
     mln_foreach (auto p, dom)
     {
       map(p) = id;
       id++;
     }
-    //mln::iota
+    // mln::iota
 
     auto edges = internal::make_edges(input, nbh, map, distance);
 
-    auto visitor = mln::morpho::experimental::canvas::kruskal_visitor_base(id);
-    auto MST     = internal::kruskal(visitor, edges);
+    auto visitor =
+        mln::morpho::experimental::canvas::kruskal_visitor_mst<internal::edge<std::invoke_result_t<F, I, I>>>(id);
+    mln::morpho::experimental::canvas::kruskal(visitor, edges);
 
-    auto qt = internal::canonize_qbt(std::move(visitor.parent), MST, id * 2 - 1);
+    auto qt = internal::canonize_qbt(std::move(visitor.parent), visitor.mst, id * 2 - 1);
 
-    auto tree = internal::make_tree(std::move(qt), std::move(MST));
+    auto tree = internal::make_tree(std::move(qt), std::move(visitor.mst));
 
     return {tree, map};
   }

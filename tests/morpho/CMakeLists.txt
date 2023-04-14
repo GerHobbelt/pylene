@@ -28,5 +28,24 @@ add_core_test(${test_prefix}component_tree component_tree.cpp)
 add_core_test(${test_prefix}MToS mtos.cpp)
 add_core_test(${test_prefix}waterfall waterfall.cpp)
 
+target_compile_options(experimental_alphatree PRIVATE
+    "-fsanitize=address"
+    "-fno-omit-frame-pointer"
+    "-fsanitize=undefined")
+
+target_link_options(experimental_alphatree PRIVATE
+    "-fsanitize=address"
+    "-fno-omit-frame-pointer"
+    "-fsanitize=undefined")
+
+    target_compile_options(experimental_kruskal PRIVATE
+    "-fsanitize=address"
+    "-fno-omit-frame-pointer"
+    "-fsanitize=undefined")
+
+target_link_options(experimental_kruskal PRIVATE
+    "-fsanitize=address"
+    "-fno-omit-frame-pointer"
+    "-fsanitize=undefined")
 
 target_link_libraries(${test_prefix}dilate PRIVATE TBB::tbb)

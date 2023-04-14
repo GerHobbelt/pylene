@@ -95,7 +95,7 @@ namespace mln::morpho::experimental
 
       auto vals = std::vector<W>(qt.size(), 0);
       int  size = qt.size();
-      for (int i = size / 2; i < size; i++)
+      for (int i = size / 2 + 1; i < size; i++)
       {
         if (qt[i] == i)
           vals[i] = 0;

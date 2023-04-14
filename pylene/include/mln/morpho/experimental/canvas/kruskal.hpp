@@ -78,7 +78,7 @@ namespace mln::morpho::experimental::canvas
 
     void on_finish()
     {
-      for (int i = this->m_size / 2; i < this->m_size; i++)
+      for (int i = this->m_size / 2 + 1; i < this->m_size; i++)
       {
         if (this->parent[i] == i)
           values[i] = 0;

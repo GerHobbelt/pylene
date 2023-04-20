@@ -14,19 +14,20 @@ namespace scribo::internal
    * @param y Y position
    */
   void draw_labeled_pixel(image2d<uint16_t>& img, std::uint16_t label, int x, int y,
-                          std::vector<LSuperposition>& superpositions, uint16_t max_label)
+                          std::vector<LSuperposition>& superpositions, int max_label)
 
   {
     auto pos = {x, y};
     if (img(pos) == 0 || label == 0)
     {
-      img(pos) = label + max_label;
+      img(pos) = label + (max_label > 0 ? static_cast<uint16_t>(max_label) : 0);
     }
     else
     {
       uint16_t last_label = img(pos);
-      if (last_label > max_label)
-        last_label -= max_label;
+      uint16_t umax_label = static_cast<uint16_t>(std::abs(max_label));
+      if (last_label > umax_label)
+        last_label -= umax_label;
 
       if (last_label != 1)
         superpositions.push_back({.label = last_label, .x = x, .y = y});
@@ -44,7 +45,7 @@ namespace scribo::internal
    * @param is_horizontal
    */
   void draw_labeled_span(image2d<uint16_t>& img, std::uint16_t label, Span span, bool is_horizontal,
-                         std::vector<LSuperposition>& superpositions, uint16_t max_label)
+                         std::vector<LSuperposition>& superpositions, int max_label)
   {
     float thickness_d2 = static_cast<float>(span.thickness) / 2.0f;
 
@@ -89,22 +90,26 @@ namespace scribo::internal
 
     for (int i = 0; i < (int)segments.size(); i++)
     {
+      // Draw segments
       for (auto& span : segments[i].spans)
-        draw_labeled_span(img_out, i + first_label, span, segments[i].is_horizontal, superpositions, 0);
+        draw_labeled_span(img_out, i + first_label, span, segments[i].is_horizontal, superpositions, -max_label);
 
+      // Draw under other object and save information if the object is really under another object
+      // having at its position a label > max_label.
       if (handle_under_other)
         for (auto& span : segments[i].under_other_object)
           draw_labeled_span(img_out, i + first_label, span, segments[i].is_horizontal, superpositions, max_label);
     }
 
     // Remove object that are not segments
+    // Using label = 0 we reset the pixel position to 0, and we remove in the superposition vector
     for (int i = 0; i < (int)nsegment.size(); i++)
     {
       for (auto& span : nsegment[i].spans)
-        draw_labeled_span(img_out, 0, span, nsegment[i].is_horizontal, superpositions, 0);
+        draw_labeled_span(img_out, 0, span, nsegment[i].is_horizontal, superpositions, -max_label);
 
       for (auto& span : nsegment[i].under_other_object)
-        draw_labeled_span(img_out, 0, span, nsegment[i].is_horizontal, superpositions, 0);
+        draw_labeled_span(img_out, 0, span, nsegment[i].is_horizontal, superpositions, -max_label);
     }
 
     if (handle_under_other)

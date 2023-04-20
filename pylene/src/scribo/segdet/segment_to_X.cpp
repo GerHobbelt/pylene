@@ -116,6 +116,13 @@ namespace scribo::internal
       }
     }
 
+    // Remove superposition if the pixel is not labeled anymore
+    superpositions.erase(std::remove_if(superpositions.begin(), superpositions.end(),
+                                        [&](const auto& it) {
+                                          return img_out({it.x, it.y}) != 1;
+                                        }),
+                         superpositions.end());
+
     return std::make_tuple(img_out, superpositions);
   }
 

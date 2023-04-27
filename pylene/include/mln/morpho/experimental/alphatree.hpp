@@ -72,17 +72,14 @@ namespace mln::morpho::experimental
         auto p = res[n];
         if (weight_node(p, size / 2, MST) == weight_node(n, size / 2, MST))
         {
-          bool flag = false;
           for (int c = 0; c < size; c++)
           {
             if (parent[c] == n)
             {
-              flag   = true;
               res[c] = p;
             }
           }
-          if (flag)
-            res[n] = n;
+          res[n] = n;
         }
       }
       return res;
@@ -117,7 +114,7 @@ namespace mln::morpho::experimental
     mln::image_ch_value_t<I, int> map = imchvalue<int>(input);
     auto                          dom = map.domain();
     int                           id  = 0;
-    
+
     mln_foreach (auto p, dom)
     {
       map(p) = id;
@@ -128,13 +125,13 @@ namespace mln::morpho::experimental
     auto edges = internal::make_edges(input, nbh, map, distance);
 
     auto visitor =
-        mln::morpho::experimental::canvas::kruskal_visitor_mst<internal::edge<std::invoke_result_t<F, I, I>>>(id);
+        mln::morpho::experimental::canvas::kruskal_visitor_canonized<I, std::invoke_result_t<F, I, I>>(id, std::move(map));
     mln::morpho::experimental::canvas::kruskal(visitor, edges);
+    
+    component_tree<std::invoke_result_t<F, I, I>> tree;
+    tree.values = visitor.value;
+    tree.parent = visitor.parent;
 
-    auto qt = internal::canonize_qbt(std::move(visitor.parent), visitor.mst, id * 2 - 1);
-
-    auto tree = internal::make_tree(std::move(qt), std::move(visitor.mst));
-
-    return {tree, map};
+    return {tree, visitor.nodemap};
   }
 } // namespace mln::morpho::experimental

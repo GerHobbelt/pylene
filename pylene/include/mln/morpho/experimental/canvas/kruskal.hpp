@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mln/core/algorithm/for_each.hpp>
 #include <mln/core/algorithm/iota.hpp>
 #include <mln/core/concepts/image.hpp>
+#include <mln/core/range/foreach.hpp>
 
 #include <mln/core/utils/dontcare.hpp>
 #include <vector>
@@ -96,7 +96,7 @@ namespace mln::morpho::experimental::canvas
           continue;
         if (nb == 0)
         {
-          res.push_back(-1);
+          res.push_back(0);
         }
         else
         {
@@ -110,16 +110,16 @@ namespace mln::morpho::experimental::canvas
         res.push_back(parent[parent[i]]);
       }
 
-      /*int  i   = 0;
+      int  i   = 0;
       auto dom = nodemap.domain();
 
       mln_foreach (auto p, dom)
       {
         nodemap(p) = parent[parent[i]];
         i++;
-      }*/
+      }
 
-      parent = move(res);
+      parent = std::move(res);
     }
 
     void make_set(int q)
@@ -140,7 +140,7 @@ namespace mln::morpho::experimental::canvas
   };
 
 
-  template <class I, class E>
+  template <class I, class W>
   class kruskal_visitor_mst : public kruskal_visitor_base<I>
   {
   public:
@@ -150,7 +150,7 @@ namespace mln::morpho::experimental::canvas
     {
     }
 
-    void on_union(int cx, int cy, E e)
+    void on_union(int cx, int cy, internal::edge<W> e)
     {
       int tu           = this->m_root[cx];
       int tv           = this->m_root[cy];
@@ -170,7 +170,7 @@ namespace mln::morpho::experimental::canvas
     }
 
   public:
-    std::vector<E> mst;
+    std::vector<internal::edge<W>> mst;
   };
 
   template <class I, class W>
@@ -186,7 +186,7 @@ namespace mln::morpho::experimental::canvas
     void on_finish()
     {
       this->make_tree();
-      for (int i = 0; i < this->m_size / 2; i++)
+      for (int i = 1; i < this->m_size / 2; i++)
       {
         if (this->parent[i] == i)
           value[i] = 0;
@@ -224,10 +224,9 @@ namespace mln::morpho::experimental::canvas
       : kruskal_visitor_values<I, W>(size, nd)
     {
     }
-    // calculer value avant et mettre à jour
     void on_finish()
     {
-      for (int i = 0; i < this->m_size / 2; i++)
+      for (int i = 1; i < this->m_size / 2; i++)
       {
         if (this->parent[i] == i)
           this->value[i] = 0;
@@ -254,6 +253,51 @@ namespace mln::morpho::experimental::canvas
       }
       this->parent = canonized;
       this->make_tree();
+      int i = this->parent.size();
+      mln_foreach(auto p, this->nodemap.domain())
+      {
+        if (this->value[this->nodemap(p)] != 0)
+        {
+          this->parent.push_back(this->nodemap(p));
+          this->nodemap(p) = i;
+          i++;
+          this->value.push_back(0);
+        }
+      }
+    }
+
+  protected:
+    void make_tree()
+    {
+      std::vector<int> npar = {};
+      std::vector<W> nval = {};
+      int              nb  = 0;
+      for (auto i = this->m_size - 1; i > this->m_size / 2; --i)
+      {
+        if (this->parent[i] == i)
+          continue;
+        if (nb == 0)
+        {
+          npar.push_back(0);
+        }
+        else
+        {
+          npar.push_back(this->parent[this->parent[i]]);
+        }
+        nval.push_back(this->value[this->m_size - i - 1]);
+        this->parent[i] = nb;
+        nb++;
+      }
+      int  i   = 0;
+      auto dom = this->nodemap.domain();
+      mln_foreach (auto p, dom)
+      {
+        this->nodemap(p) = this->parent[this->parent[i]];
+        i++;
+      }
+
+      this->parent = std::move(npar);
+      this->value = std::move(nval);
     }
   };
 

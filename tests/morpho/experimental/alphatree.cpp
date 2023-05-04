@@ -102,22 +102,18 @@ TEST(AlphaTree, imageInt)
           return b - a;
       });
 
-  // const mln::image2d<int> refNm = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
-  std::vector<int>           refP = {-1, 0, 0, 1, 2, 1, 0, 0, 3, 3, 4, 2, 5, 3, 4, 4, 5, 1};
-  std::vector<std::uint16_t> refV = {3, 3, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-  /*mln_foreach (auto p, nm.domain())
-  {
-    ASSERT_EQ(nm(p), refNm(p));
-  }*/
+  const mln::image2d<int>    refNm = {{6, 7, 8, 9}, {4, 10, 5, 11}, {4, 4, 5, 12}};
+  std::vector<int>           refP  = {0, 0, 0, 1, 2, 1, 0, 0, 3, 3, 2, 3, 1};
+  std::vector<std::uint16_t> refV  = {3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   ASSERT_VEC_EQ(refP, t.parent);
   ASSERT_VEC_EQ(refV, t.values);
+  ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }
 
 /*TEST(AlphaTree, Image3d)
 {
-  const mln::image3d<uint8_t> ima = {{{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},
+  const mln::image3d<std::uint8_t> ima = {{{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},
                                      {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}},
                                      {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}};
 
@@ -127,40 +123,65 @@ TEST(AlphaTree, imageInt)
   std::vector<int>                 refP  = {27, 30, 30, 27, 30, 30, 37, 49, 52, 40, 44, 35, 40, 42, 33, 51, 31, 34,
                                             40, 35, 42, 31, 35, 34, 50, 42, 33, 37, 28, 29, 42, 44, 32, 45, 49, 40,
                                             36, 43, 38, 39, 43, 41, 45, 46, 46, 49, 49, 47, 48, 50, 51, 52, -1};
-  std::vector<uint8_t> refV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,
+  std::vector<std::uint8_t> refV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,
                                0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 2, 0, 2, 3, 3, 3, 4, 0, 0, 5, 6, 12, 13};
 
   auto [t, nm] = mln::morpho::experimental::alphatree(
       ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
 
-  mln_foreach (auto p, nm.domain())
-  {
-    ASSERT_EQ(nm(p), refNm(p));
-  }
-
   ASSERT_VEC_EQ(refP, t.parent);
   ASSERT_VEC_EQ(refV, t.values);
+  ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }*/
 
-/*TEST(Morpho, AlphaTree)
+TEST(AlphaTree, cutImage2d)
 {
+  mln::image2d<int> ima = {
+      {128, 124, 150, 137, 106}, //
+      {116, 128, 156, 165, 117}, //
+      {117, 90, 131, 108, 151},  //
+      {107, 87, 118, 109, 167},  //
+      {107, 73, 125, 157, 117},  //
+  };
+  auto [t, node_map] = mln::morpho::experimental::alphatree(
+      ima, mln::c4, [](const auto& a, const auto& b) -> int { return mln::functional::l2dist(a, b); });
 
-  const mln::image2d<int> image = {{4, 7, 3, 2}, {1, 2, 5, 3}, {1, 1, 5, 7}};
+  mln::image2d<int> ref_0 = {
+      {0, 1, 2, 3, 4},      //
+      {5, 6, 7, 8, 9},      //
+      {10, 11, 12, 13, 14}, //
+      {15, 16, 17, 18, 19}, //
+      {15, 20, 21, 22, 23}, //
+  };
 
-  auto [t, nm] =
-      mln::morpho::experimental::alphatree(image, mln::c4, [](const auto& a, const auto& b) -> std::uint16_t {
-        if (a > b)
-          return a - b;
-        else
-          return b - a;
-      });
+  mln::image2d<int> ref_1 = {
+      {0, 1, 2, 3, 4},      //
+      {10, 6, 7, 8, 9},     //
+      {10, 11, 12, 18, 14}, //
+      {15, 16, 17, 18, 19}, //
+      {15, 20, 21, 22, 23}, //
+  };
 
-  auto [t2, nm2] = mln::morpho::alphatree(image, mln::c4, [](const auto& a, const auto& b) -> std::uint16_t {
-    if (a > b)
-      return a - b;
-    else
-      return b - a;
-  });
+  mln::image2d<int> ref_10 = {
+      {6, 6, 7, 3, 4},      //
+      {10, 6, 7, 8, 9},     //
+      {10, 16, 12, 18, 14}, //
+      {15, 16, 21, 18, 19}, //
+      {15, 20, 21, 22, 23}, //
+  };
 
-  ASSERT_VEC_EQ(t.parent, t2.parent);
-}*/
+
+  mln::image2d<int> ref_11 = {
+      {6, 6, 7, 3, 9},      //
+      {10, 6, 7, 8, 9},     //
+      {10, 16, 12, 18, 14}, //
+      {15, 16, 21, 18, 19}, //
+      {15, 20, 21, 22, 23}, //
+  };
+
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 0), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 1), ref_1);
+  ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 10), ref_10);
+  ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 11), ref_11);
+}

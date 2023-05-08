@@ -111,20 +111,19 @@ TEST(AlphaTree, imageInt)
   ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }
 
-/*TEST(AlphaTree, Image3d)
+TEST(AlphaTree, Image3d)
 {
   const mln::image3d<std::uint8_t> ima = {{{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},
-                                     {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}},
-                                     {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}};
+                                          {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}},
+                                          {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}};
 
-  const mln::image3d<std::uint8_t> refNm = {{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}},
-                                            {{9, 10, 11}, {12, 13, 14}, {15, 16, 17}},
-                                            {{18, 19, 20}, {21, 22, 23}, {24, 25, 26}}};
-  std::vector<int>                 refP  = {27, 30, 30, 27, 30, 30, 37, 49, 52, 40, 44, 35, 40, 42, 33, 51, 31, 34,
-                                            40, 35, 42, 31, 35, 34, 50, 42, 33, 37, 28, 29, 42, 44, 32, 45, 49, 40,
-                                            36, 43, 38, 39, 43, 41, 45, 46, 46, 49, 49, 47, 48, 50, 51, 52, -1};
-  std::vector<std::uint8_t> refV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,
-                               0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 2, 0, 2, 3, 3, 3, 4, 0, 0, 5, 6, 12, 13};
+  const mln::image3d<int>   refNm = {{{16, 15, 15}, {16, 15, 15}, {17, 18, 19}},
+                                     {{20, 21, 22}, {23, 24, 25}, {26, 14, 27}},
+                                     {{28, 29, 30}, {14, 31, 32}, {33, 34, 35}}};
+  std::vector<int>          refP  = {0, 0, 1, 2, 3,  3, 4, 4,  5, 7,  7, 9,  3, 5,  6,  8, 10, 10,
+                                     3, 0, 9, 6, 11, 9, 8, 13, 1, 12, 9, 11, 8, 11, 12, 2, 8,  13};
+  std::vector<std::uint8_t> refV  = {13, 12, 6, 5, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0,
+                                     0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   auto [t, nm] = mln::morpho::experimental::alphatree(
       ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
@@ -132,7 +131,7 @@ TEST(AlphaTree, imageInt)
   ASSERT_VEC_EQ(refP, t.parent);
   ASSERT_VEC_EQ(refV, t.values);
   ASSERT_IMAGES_EQ_EXP(refNm, nm);
-}*/
+}
 
 TEST(AlphaTree, cutImage2d)
 {
@@ -184,4 +183,180 @@ TEST(AlphaTree, cutImage2d)
   ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 1), ref_1);
   ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 10), ref_10);
   ASSERT_IMAGES_EQ_EXP(cut(t, node_map, 11), ref_11);
+}
+
+TEST(Morpho, AlphaTreeParentRelation)
+{
+  mln::image2d<int> ima = {
+      {4, 0, 0, 1},  //
+      {5, 0, 8, 1},  //
+      {6, 0, 9, 1},  //
+      {7, 0, 10, 1}, //
+      {2, 3, 4, 5},  //
+  };
+
+  auto [t, _] = mln::morpho::experimental::alphatree(ima, mln::c4, [](const auto& a, const auto& b) -> int {
+        if (a > b)
+          return a - b;
+        else
+          return b - a;
+      });
+
+  for (std::size_t i = 0; i < t.parent.size(); ++i)
+    ASSERT_TRUE(static_cast<int>(i) >= t.parent[i]);
+}
+
+TEST(Morpho, AlphaTreeCanonized)
+{
+  mln::image2d<int> ima = {
+      {4, 0, 0, 1},  //
+      {5, 0, 8, 1},  //
+      {6, 0, 9, 1},  //
+      {7, 0, 10, 1}, //
+      {2, 3, 4, 5},  //
+  };
+
+  auto [t, _] = mln::morpho::experimental::alphatree(ima, mln::c4, [](const auto& a, const auto& b) -> int {
+        if (a > b)
+          return a - b;
+        else
+          return b - a;
+      });
+
+  for (std::size_t i = 1; i < t.parent.size(); ++i)
+    ASSERT_TRUE(t.values[i] != t.values[t.parent[i]]);
+}
+
+TEST(Morpho, AlphaTreeRGB8Uint16Distance)
+{
+  const mln::image2d<mln::rgb8> ima = {
+      {{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},   //
+      {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}}, //
+      {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}    //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint16_t { return mln::functional::l2dist(a, b); });
+
+  const mln::image2d<int> ref_0 = {
+      {0, 0, 1}, //
+      {2, 3, 4}, //
+      {5, 6, 7}  //
+  };
+
+  const mln::image2d<int> ref_8 = {
+      {3, 3, 1}, //
+      {2, 3, 4}, //
+      {5, 6, 7}  //
+  };
+
+  const mln::image2d<int> ref_16 = {
+      {3, 3, 1}, //
+      {5, 3, 4}, //
+      {5, 6, 7}  //
+  };
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0u), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 8u), ref_8);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16u), ref_16);
+}
+
+TEST(Morpho, AlphaTreeRGB8FloatDistance)
+{
+  const mln::image2d<mln::rgb8> ima = {
+      {{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},   //
+      {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}}, //
+      {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}    //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::float_t { return mln::functional::l2dist(a, b); });
+
+  const mln::image2d<int> ref_0 = {
+      {0, 0, 1}, //
+      {2, 3, 4}, //
+      {5, 6, 7}  //
+  };
+
+  const mln::image2d<int> ref_16 = {
+      {3, 3, 1}, //
+      {2, 3, 4}, //
+      {5, 6, 7}  //
+  };
+
+  const mln::image2d<int> ref_32 = {
+      {3, 3, 1}, //
+      {5, 3, 4}, //
+      {5, 6, 7}  //
+  };
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0.f), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16.f), ref_16);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 32.f), ref_32);
+}
+
+TEST(Morpho, AlphaTree8C)
+{
+  mln::image2d<std::uint32_t> ima = {
+      {128, 124, 150, 137, 106}, //
+      {116, 128, 156, 165, 117}, //
+      {117, 90, 131, 108, 151},  //
+      {107, 87, 118, 109, 167},  //
+      {107, 73, 125, 157, 117},  //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c8, [](const auto& a, const auto& b) -> std::uint32_t { return mln::functional::l2dist(a, b); });
+
+  mln::image2d<int> ref_0 = {
+      {0, 1, 2, 3, 4},      //
+      {5, 0, 6, 7, 8},      //
+      {9, 10, 11, 12, 13},  //
+      {14, 15, 16, 17, 18}, //
+      {14, 19, 20, 21, 22}, //
+  };
+
+  mln::image2d<int> ref_16 = {
+      {1, 1, 3, 3, 4},     //
+      {5, 1, 6, 13, 12},     //
+      {9, 15, 11, 12, 13},   //
+      {9, 15, 17, 17, 21}, //
+      {9, 19, 20, 21, 22}, //
+  };
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0.f), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16.f), ref_16);
+}
+
+TEST(Morpho, AlphaTree8CHQUEUE)
+{
+  mln::image2d<std::uint8_t> ima = {
+      {128, 124, 150, 137, 106}, //
+      {116, 128, 156, 165, 117}, //
+      {117, 90, 131, 108, 151},  //
+      {107, 87, 118, 109, 167},  //
+      {107, 73, 125, 157, 117},  //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c8, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
+
+  mln::image2d<int> ref_0 = {
+      {0, 1, 2, 3, 4},      //
+      {5, 0, 6, 7, 8},      //
+      {9, 10, 11, 12, 13},  //
+      {14, 15, 16, 17, 18}, //
+      {14, 19, 20, 21, 22}, //
+  };
+
+  mln::image2d<int> ref_16 = {
+      {0, 1, 2, 3, 4},      //
+      {5, 0, 2, 7, 8},      //
+      {5, 10, 0, 12, 13},   //
+      {14, 10, 16, 12, 18}, //
+      {14, 19, 16, 18, 22}, //
+  };
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0.f), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16.f), ref_16);
 }

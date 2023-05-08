@@ -125,9 +125,10 @@ namespace mln::morpho::experimental
     auto edges = internal::make_edges(input, nbh, map, distance);
 
     auto visitor =
-        mln::morpho::experimental::canvas::kruskal_visitor_canonized<I, std::invoke_result_t<F, I, I>>(id, std::move(map));
+        mln::morpho::experimental::canvas::kruskal_visitor_canonized<mln::image_ch_value_t<I, int>,
+                                                                     std::invoke_result_t<F, I, I>>(id, std::move(map));
     mln::morpho::experimental::canvas::kruskal(visitor, edges);
-    
+
     component_tree<std::invoke_result_t<F, I, I>> tree;
     tree.values = visitor.value;
     tree.parent = visitor.parent;

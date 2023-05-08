@@ -254,7 +254,7 @@ namespace mln::morpho::experimental::canvas
       this->parent = canonized;
       this->make_tree();
       int i = this->parent.size();
-      mln_foreach(auto p, this->nodemap.domain())
+      mln_foreach (auto p, this->nodemap.domain())
       {
         if (this->value[this->nodemap(p)] != 0)
         {
@@ -270,8 +270,8 @@ namespace mln::morpho::experimental::canvas
     void make_tree()
     {
       std::vector<int> npar = {};
-      std::vector<W> nval = {};
-      int              nb  = 0;
+      std::vector<W>   nval = {};
+      int              nb   = 0;
       for (auto i = this->m_size - 1; i > this->m_size / 2; --i)
       {
         if (this->parent[i] == i)
@@ -297,7 +297,7 @@ namespace mln::morpho::experimental::canvas
       }
 
       this->parent = std::move(npar);
-      this->value = std::move(nval);
+      this->value  = std::move(nval);
     }
   };
 

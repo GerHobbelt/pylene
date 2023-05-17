@@ -1,10 +1,10 @@
 #include <mln/accu/accumulators/mean.hpp>
 #include <mln/core/colors.hpp>
+#include <mln/core/functional_ops.hpp>
 #include <mln/core/image/ndimage.hpp>
 #include <mln/core/neighborhood/c26.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>
-#include <mln/morpho/alphatree.hpp>
 #include <mln/morpho/experimental/alphatree.hpp>
 #include <mln/morpho/experimental/canvas/kruskal.hpp>
 
@@ -46,20 +46,20 @@ I cut(const mln::morpho::component_tree<V>& t, I& node_map, T alpha)
 }
 
 template <typename T>
-void ASSERT_VEC_EQ(T const& ref, T const& vec)
+void compare_vec_assert(std::vector<T> vec1, std::vector<T> vec2)
 {
-  EXPECT_EQ(ref.size(), vec.size());
+  EXPECT_EQ(vec1.size(), vec2.size());
 
-  auto itref = ref.begin();
-  auto itvec = vec.begin();
+  auto itvec1 = vec1.begin();
+  auto itvec2 = vec2.begin();
 
-  for (; itref != ref.end() && itvec != vec.end(); itref++, itvec++)
+  for (; itvec1 != vec1.end() && itvec2 != vec2.end(); itvec1++, itvec2++)
   {
-    EXPECT_EQ(*itref, *itvec);
+    EXPECT_EQ(*itvec1, *itvec2);
   }
 }
 
-TEST(AlphaTree, edges)
+TEST(Morpho, AlphaTreeEdges)
 {
   using I = mln::image2d<std::uint8_t>;
   using W = int;
@@ -87,10 +87,10 @@ TEST(AlphaTree, edges)
           return b - a;
       });
 
-  ASSERT_VEC_EQ(ref, edges);
+  compare_vec_assert(ref, edges);
 }
 
-TEST(AlphaTree, imageInt)
+TEST(Morpho, AlphaTreeImageInt)
 {
   const mln::image2d<int> image = {{4, 7, 3, 2}, {1, 2, 5, 3}, {1, 1, 5, 7}};
 
@@ -106,12 +106,33 @@ TEST(AlphaTree, imageInt)
   std::vector<int>           refP  = {0, 0, 0, 1, 2, 1, 0, 0, 3, 3, 2, 3, 1};
   std::vector<std::uint16_t> refV  = {3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  ASSERT_VEC_EQ(refP, t.parent);
-  ASSERT_VEC_EQ(refV, t.values);
+  compare_vec_assert(refP, t.parent);
+  compare_vec_assert(refV, t.values);
   ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }
 
-TEST(AlphaTree, Image3d)
+TEST(Morpho, AlphaTreeImageFloat)
+{
+  const mln::image2d<float> image = {{4.5, 7.1, 3.3, 2.8}, {1.8, 2.5, 5.4, 3.2}, {1.8, 1.9, 5.33, 7.25}};
+
+  auto [t, nm] =
+      mln::morpho::experimental::alphatree(image, mln::c4, [](const auto& a, const auto& b) -> float {
+        if (a > b)
+          return a - b;
+        else
+          return b - a;
+      });
+
+  const mln::image2d<int>    refNm = {{11, 12, 13, 14}, {10, 15, 16, 17}, {10, 18, 19, 20}};
+  std::vector<int>           refP  = {0, 0, 1, 0, 3, 1, 3, 6, 5, 4, 8, 2, 2, 6, 7, 5, 9, 7, 8, 9, 4};
+  std::vector<float> refV  = {2.9000001, 2.70000005, 2.5999999, 2.10000014, 1.92000008, 0.600000024, 0.5, 0.400000095, 0.100000024, 0.0700001717, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  compare_vec_assert(refP, t.parent);
+  compare_vec_assert(refV, t.values);
+  ASSERT_IMAGES_EQ_EXP(refNm, nm);
+}
+
+TEST(Morpho, AlphaTreeImage3d)
 {
   const mln::image3d<std::uint8_t> ima = {{{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},
                                           {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}},
@@ -128,12 +149,12 @@ TEST(AlphaTree, Image3d)
   auto [t, nm] = mln::morpho::experimental::alphatree(
       ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
 
-  ASSERT_VEC_EQ(refP, t.parent);
-  ASSERT_VEC_EQ(refV, t.values);
+  compare_vec_assert(refP, t.parent);
+  compare_vec_assert(refV, t.values);
   ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }
 
-TEST(AlphaTree, cutImage2d)
+TEST(Morpho, AlphaTreeCutImage2d)
 {
   mln::image2d<int> ima = {
       {128, 124, 150, 137, 106}, //
@@ -196,11 +217,11 @@ TEST(Morpho, AlphaTreeParentRelation)
   };
 
   auto [t, _] = mln::morpho::experimental::alphatree(ima, mln::c4, [](const auto& a, const auto& b) -> int {
-        if (a > b)
-          return a - b;
-        else
-          return b - a;
-      });
+    if (a > b)
+      return a - b;
+    else
+      return b - a;
+  });
 
   for (std::size_t i = 0; i < t.parent.size(); ++i)
     ASSERT_TRUE(static_cast<int>(i) >= t.parent[i]);
@@ -217,11 +238,11 @@ TEST(Morpho, AlphaTreeCanonized)
   };
 
   auto [t, _] = mln::morpho::experimental::alphatree(ima, mln::c4, [](const auto& a, const auto& b) -> int {
-        if (a > b)
-          return a - b;
-        else
-          return b - a;
-      });
+    if (a > b)
+      return a - b;
+    else
+      return b - a;
+  });
 
   for (std::size_t i = 1; i < t.parent.size(); ++i)
     ASSERT_TRUE(t.values[i] != t.values[t.parent[i]]);
@@ -318,8 +339,8 @@ TEST(Morpho, AlphaTree8C)
 
   mln::image2d<int> ref_16 = {
       {1, 1, 3, 3, 4},     //
-      {5, 1, 6, 13, 12},     //
-      {9, 15, 11, 12, 13},   //
+      {5, 1, 6, 13, 12},   //
+      {9, 15, 11, 12, 13}, //
       {9, 15, 17, 17, 21}, //
       {9, 19, 20, 21, 22}, //
   };
@@ -350,13 +371,106 @@ TEST(Morpho, AlphaTree8CHQUEUE)
   };
 
   mln::image2d<int> ref_16 = {
-      {0, 1, 2, 3, 4},      //
-      {5, 0, 2, 7, 8},      //
-      {5, 10, 0, 12, 13},   //
-      {14, 10, 16, 12, 18}, //
-      {14, 19, 16, 18, 22}, //
+      {11, 1, 6, 3, 4},     //
+      {9, 11, 6, 7, 8},     //
+      {9, 15, 11, 17, 13},  //
+      {14, 15, 20, 17, 21}, //
+      {14, 19, 20, 21, 22}, //
   };
 
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0.f), ref_0);
   ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16.f), ref_16);
+}
+
+TEST(Morpho, AlphaTree3DImage)
+{
+  const mln::image3d<uint32_t> ima = {
+      {{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},   //
+      {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}}, //
+      {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}    //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint32_t { return mln::functional::l2dist(a, b); });
+
+  const mln::image3d<int> ref_0 = {
+      {{0, 1, 1}, {0, 1, 1}, {2, 3, 4}},         //
+      {{5, 6, 7}, {8, 9, 10}, {11, 12, 13}},     //
+      {{14, 15, 16}, {12, 17, 18}, {19, 20, 21}} //
+  };
+
+  const mln::image3d<int> ref_16 = {
+      {{0, 2, 2}, {0, 2, 2}, {2, 3, 4}},        //
+      {{14, 6, 7}, {8, 20, 21}, {11, 0, 18}},   //
+      {{14, 17, 20}, {0, 17, 18}, {19, 20, 21}} //
+  };
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0u), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16u), ref_16);
+}
+
+TEST(Morpho, AlphaTree3DImageHQUEUE)
+{
+  const mln::image3d<uint8_t> ima = {
+      {{10, 0, 0}, {10, 0, 0}, {12, 20, 38}},   //
+      {{13, 22, 16}, {15, 2, 6}, {37, 25, 12}}, //
+      {{11, 18, 0}, {25, 17, 11}, {9, 0, 5}}    //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c26, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
+
+  const mln::image3d<int> ref_0 = {
+      {{0, 1, 1}, {0, 1, 1}, {2, 3, 4}},         //
+      {{5, 6, 7}, {8, 9, 10}, {11, 12, 13}},     //
+      {{14, 15, 16}, {12, 17, 18}, {19, 20, 21}} //
+  };
+
+  const mln::image3d<int> ref_16 = {
+      {{2, 20, 20}, {2, 20, 20}, {2, 3, 4}},    //
+      {{14, 6, 17}, {14, 20, 21}, {11, 6, 18}}, //
+      {{14, 17, 20}, {6, 17, 18}, {19, 20, 21}} //
+  };
+
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 0u), ref_0);
+  ASSERT_IMAGES_EQ_EXP(cut(t, nm, 16u), ref_16);
+}
+
+TEST(Morpho, AlphaTreeCutMeanLabelization)
+{
+  mln::image2d<std::uint8_t> ima = {
+      {1, 1, 5}, //
+      {2, 5, 6}, //
+      {0, 1, 4}  //
+  };
+  mln::image2d<std::uint8_t> cut_1 = {
+      {1, 1, 5}, //
+      {1, 5, 5}, //
+      {0, 0, 4}  //
+  };
+  mln::image2d<std::uint8_t> cut_2 = {
+      {1, 1, 5}, //
+      {1, 5, 5}, //
+      {1, 1, 5}  //
+  };
+  mln::image2d<std::uint8_t> cut_3 = {
+      {2, 2, 2}, //
+      {2, 2, 2}, //
+      {2, 2, 2}  //
+  };
+
+  auto [t, nm] = mln::morpho::experimental::alphatree(
+      ima, mln::c4, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
+  auto val = t.compute_attribute_on_values(nm, ima, mln::accu::accumulators::mean<std::uint8_t, std::uint8_t>());
+
+  // Renaming t and nm because clang does not allow to capture structured bindings
+  auto make_cut = [&lt = t, &lnm = nm, &val](auto threshold) {
+    auto lbl = lt.horizontal_cut(threshold, lnm);
+    return lt.reconstruct_from(lbl, ::ranges::make_span(val));
+  };
+
+  ASSERT_IMAGES_EQ_EXP(make_cut(0), ima);
+  ASSERT_IMAGES_EQ_EXP(make_cut(1), cut_1);
+  ASSERT_IMAGES_EQ_EXP(make_cut(2), cut_2);
+  ASSERT_IMAGES_EQ_EXP(make_cut(3), cut_3);
 }

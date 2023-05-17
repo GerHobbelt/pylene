@@ -11,6 +11,7 @@ namespace mln::morpho::experimental::canvas
 {
   namespace internal
   {
+    /// \brief Canvas for the edges in the alphatree.
     template <typename W>
     class edge
     {
@@ -29,6 +30,10 @@ namespace mln::morpho::experimental::canvas
       bool operator==(edge<W> o) const { return a == o.a && b == o.b && w == o.w; }
     };
   } // namespace internal
+
+  /// \brief Base visitor for kruskal
+  ///
+  /// Contains parent and nodemap
   template <class I>
   class kruskal_visitor_base
   {
@@ -139,7 +144,9 @@ namespace mln::morpho::experimental::canvas
     int              m_size;
   };
 
-
+  /// \brief MST visitor for kruskal
+  ///
+  /// Contains the mst in the form of a vector of edges
   template <class I, class W>
   class kruskal_visitor_mst : public kruskal_visitor_base<I>
   {
@@ -173,6 +180,9 @@ namespace mln::morpho::experimental::canvas
     std::vector<internal::edge<W>> mst;
   };
 
+  /// \brief Values visitor for kruskal
+  ///
+  /// Contains the values of each pixels in the form of a vector
   template <class I, class W>
   class kruskal_visitor_values : public kruskal_visitor_base<I>
   {
@@ -216,6 +226,10 @@ namespace mln::morpho::experimental::canvas
     std::vector<W> value;
   };
 
+  /// \brief canonized visitor for kruskal
+  ///
+  /// Modified version of the values visitor
+  /// Modify the output for parents, nodemap and values
   template <class I, class W>
   class kruskal_visitor_canonized : public kruskal_visitor_values<I, W>
   {
@@ -224,6 +238,7 @@ namespace mln::morpho::experimental::canvas
       : kruskal_visitor_values<I, W>(size, nd)
     {
     }
+
     void on_finish()
     {
       for (int i = 1; i < this->m_size / 2; i++)
@@ -301,12 +316,15 @@ namespace mln::morpho::experimental::canvas
     }
   };
 
+  /// \brief Kruskal Minimum Spanning Tree canvas
+  /// \param visitor Visitor for the pattern
+  /// \param edges List of edges
   template <class V, class E>
-  void kruskal(V& visitor, std::vector<E>& adjList)
+  void kruskal(V& visitor, std::vector<E> edges)
   {
     visitor.on_start();
-    std::stable_sort(adjList.begin(), adjList.end(), [](E a, E b) -> bool { return a.w < b.w; });
-    for (auto e : adjList)
+    std::stable_sort(edges.begin(), edges.end(), [](E a, E b) -> bool { return a.w < b.w; });
+    for (auto e : edges)
     {
       int cx = visitor.on_find(e.a);
       int cy = visitor.on_find(e.b);

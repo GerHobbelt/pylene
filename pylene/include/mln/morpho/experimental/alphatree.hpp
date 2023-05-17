@@ -10,6 +10,7 @@ namespace mln::morpho::experimental
 {
   namespace internal
   {
+    /// \brief Canvas for the edges in the alphatree.
     template <typename W>
     class edge
     {
@@ -28,6 +29,7 @@ namespace mln::morpho::experimental
       bool operator==(edge<W> o) const { return a == o.a && b == o.b && w == o.w; }
     };
 
+    /// \brief Computes edges representing the input image
     template <class I, class N, class F>
     std::vector<edge<std::invoke_result_t<F, I, I>>> make_edges(I input, N nbh, image_ch_value_t<I, int> map,
                                                                 F distance)
@@ -46,71 +48,22 @@ namespace mln::morpho::experimental
 
       return edges;
     }
-
-    int get_edge(int n, int nbNodes)
-    {
-      return n - nbNodes;
-    }
-
-    template <typename M>
-    int weight_node(int n, int nbNodes, M MST)
-    {
-      int i = get_edge(n, nbNodes);
-      return MST[i - 1].w;
-    }
-
-    template <typename M>
-    std::vector<int> canonize_qbt(std::vector<int> parent, M MST, int size)
-    {
-      std::vector<int> res = std::vector<int>(size, 0);
-      for (int n = 0; n < size; n++)
-      {
-        res[n] = parent[n];
-      }
-      for (int n = size - 2; n > size / 2; n--)
-      {
-        auto p = res[n];
-        if (weight_node(p, size / 2, MST) == weight_node(n, size / 2, MST))
-        {
-          for (int c = 0; c < size; c++)
-          {
-            if (parent[c] == n)
-            {
-              res[c] = p;
-            }
-          }
-          res[n] = n;
-        }
-      }
-      return res;
-    }
-
-    template <typename W>
-    component_tree<W> make_tree(std::vector<int> qt, std::vector<edge<W>> MST)
-    {
-      component_tree<W> tree;
-
-      auto vals = std::vector<W>(qt.size(), 0);
-      int  size = qt.size();
-      for (int i = size / 2 + 1; i < size; i++)
-      {
-        if (qt[i] == i)
-          vals[i] = 0;
-        else
-          vals[i] = weight_node(i, size / 2, MST);
-      }
-      tree.values = vals;
-      tree.parent = std::move(qt);
-
-      return tree;
-    }
-
   } // namespace internal
 
+  /// \brief the alphatree of an image
+  ///
+  /// \param I The input image
+  /// \param N The neighborhood relation
+  /// \param F Distance function
   template <class I, class N, class F>
   std::pair<component_tree<std::invoke_result_t<F, I, I>>, image_ch_value_t<I, int>> alphatree(I input, N nbh,
                                                                                                F distance)
   {
+
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
+    static_assert(::ranges::cpp20::invocable<F, image_value_t<I>, image_value_t<I>>);
+
     mln::image_ch_value_t<I, int> map = imchvalue<int>(input);
     auto                          dom = map.domain();
     int                           id  = 0;
@@ -120,19 +73,19 @@ namespace mln::morpho::experimental
       map(p) = id;
       id++;
     }
-    // mln::iota
+    // mln::iota(map, 0);
 
-    auto edges = internal::make_edges(input, nbh, map, distance);
+    auto edges = internal::make_edges(std::move(input), std::move(nbh), map, std::move(distance));
 
     auto visitor =
         mln::morpho::experimental::canvas::kruskal_visitor_canonized<mln::image_ch_value_t<I, int>,
                                                                      std::invoke_result_t<F, I, I>>(id, std::move(map));
-    mln::morpho::experimental::canvas::kruskal(visitor, edges);
+    mln::morpho::experimental::canvas::kruskal(visitor, std::move(edges));
 
     component_tree<std::invoke_result_t<F, I, I>> tree;
-    tree.values = visitor.value;
-    tree.parent = visitor.parent;
+    tree.values = std::move(visitor.value);
+    tree.parent = std::move(visitor.parent);
 
-    return {tree, visitor.nodemap};
+    return {std::move(tree), std::move(visitor.nodemap)};
   }
 } // namespace mln::morpho::experimental

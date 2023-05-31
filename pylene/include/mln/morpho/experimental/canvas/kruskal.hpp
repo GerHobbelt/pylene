@@ -34,18 +34,16 @@ namespace mln::morpho::experimental::canvas
   /// \brief Base visitor for kruskal
   ///
   /// Contains parent and nodemap
-  template <class I>
   class kruskal_visitor_base
   {
   public:
-    kruskal_visitor_base(int size, I nd)
+    kruskal_visitor_base(int size)
       : parent(2 * size - 1)
       , m_root(size)
       , m_parent_c(size, -1)
       , m_rank(size, 0)
       , m_size(size)
     {
-      nodemap = nd;
       for (int i = 0; i < m_size; i++)
       {
         m_root[i] = i;
@@ -115,15 +113,6 @@ namespace mln::morpho::experimental::canvas
         res.push_back(parent[parent[i]]);
       }
 
-      int  i   = 0;
-      auto dom = nodemap.domain();
-
-      mln_foreach (auto p, dom)
-      {
-        nodemap(p) = parent[parent[i]];
-        i++;
-      }
-
       parent = std::move(res);
     }
 
@@ -135,7 +124,6 @@ namespace mln::morpho::experimental::canvas
 
   public:
     std::vector<int> parent;
-    I                nodemap;
 
   protected:
     std::vector<int> m_root;
@@ -147,12 +135,12 @@ namespace mln::morpho::experimental::canvas
   /// \brief MST visitor for kruskal
   ///
   /// Contains the mst in the form of a vector of edges
-  template <class I, class W>
-  class kruskal_visitor_mst : public kruskal_visitor_base<I>
+  template <class W>
+  class kruskal_visitor_mst : public kruskal_visitor_base
   {
   public:
-    kruskal_visitor_mst(int size, I nd)
-      : kruskal_visitor_base<I>(size, nd)
+    kruskal_visitor_mst(int size)
+      : kruskal_visitor_base(size)
       , mst()
     {
     }
@@ -184,13 +172,14 @@ namespace mln::morpho::experimental::canvas
   ///
   /// Contains the values of each pixels in the form of a vector
   template <class I, class W>
-  class kruskal_visitor_values : public kruskal_visitor_base<I>
+  class kruskal_visitor_values : public kruskal_visitor_base
   {
   public:
     kruskal_visitor_values(int size, I nd)
-      : kruskal_visitor_base<I>(size, nd)
+      : kruskal_visitor_base(size)
       , value(size, 0)
     {
+      nodemap = nd;
     }
 
     void on_finish()
@@ -222,8 +211,46 @@ namespace mln::morpho::experimental::canvas
       value.insert(value.begin(), e.w);
     }
 
+  protected:
+    void make_tree()
+    {
+      std::vector<int> res = {};
+      int              nb  = 0;
+      for (auto i = m_size - 1; i > m_size / 2; --i)
+      {
+        if (parent[i] == i)
+          continue;
+        if (nb == 0)
+        {
+          res.push_back(0);
+        }
+        else
+        {
+          res.push_back(parent[parent[i]]);
+        }
+        parent[i] = nb;
+        nb++;
+      }
+      for (auto i = 0; i < m_size / 2 + 1; i++)
+      {
+        res.push_back(parent[parent[i]]);
+      }
+
+      int  i   = 0;
+      auto dom = nodemap.domain();
+
+      mln_foreach (auto p, dom)
+      {
+        nodemap(p) = parent[parent[i]];
+        i++;
+      }
+
+      parent = std::move(res);
+    }
+
   public:
     std::vector<W> value;
+    I              nodemap;
   };
 
   /// \brief canonized visitor for kruskal
@@ -315,6 +342,89 @@ namespace mln::morpho::experimental::canvas
       this->value  = std::move(nval);
     }
   };
+
+template <class I>
+  class kruskal_visitor_values_erased : public kruskal_visitor_base
+  {
+  public:
+    kruskal_visitor_values_erased(int size, I nd)
+      : kruskal_visitor_base(size)
+      , value(size, 0)
+    {
+      nodemap = nd;
+    }
+
+    void on_finish()
+    {
+      this->make_tree();
+      for (int i = 1; i < this->m_size / 2; i++)
+      {
+        if (this->parent[i] == i)
+          value[i] = 0;
+      }
+    }
+
+    void on_union(int cx, int cy, auto e)
+    {
+      int tu           = this->m_root[cx];
+      int tv           = this->m_root[cy];
+      this->parent[tu] = this->m_size;
+      this->parent[tv] = this->m_size;
+
+      if (this->m_rank[cx] > this->m_rank[cy])
+        std::swap(cx, cy);
+      if (this->m_rank[cx] == this->m_rank[cy])
+        this->m_rank[cy] += 1;
+      this->m_parent_c[cx] = cy;
+      int c                = cy;
+
+      this->m_root[c] = this->m_size;
+      this->make_set(this->m_size);
+      value.insert(value.begin(), e.w);
+    }
+
+  protected:
+    void make_tree()
+    {
+      std::vector<int> res = {};
+      int              nb  = 0;
+      for (auto i = m_size - 1; i > m_size / 2; --i)
+      {
+        if (parent[i] == i)
+          continue;
+        if (nb == 0)
+        {
+          res.push_back(0);
+        }
+        else
+        {
+          res.push_back(parent[parent[i]]);
+        }
+        parent[i] = nb;
+        nb++;
+      }
+      for (auto i = 0; i < m_size / 2 + 1; i++)
+      {
+        res.push_back(parent[parent[i]]);
+      }
+
+      int  i   = 0;
+      auto dom = nodemap.domain();
+
+      mln_foreach (auto p, dom)
+      {
+        nodemap(p) = parent[parent[i]];
+        i++;
+      }
+
+      parent = std::move(res);
+    }
+
+  public:
+    std::vector<std::any> value;
+    I              nodemap;
+  };
+  
 
   /// \brief Kruskal Minimum Spanning Tree canvas
   /// \param visitor Visitor for the pattern

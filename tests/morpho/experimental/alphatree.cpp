@@ -5,6 +5,7 @@
 #include <mln/core/neighborhood/c26.hpp>
 #include <mln/core/neighborhood/c4.hpp>
 #include <mln/core/neighborhood/c8.hpp>
+#include <mln/core/neighborhood/dyn_nbh_2d.hpp>
 #include <mln/morpho/experimental/alphatree.hpp>
 #include <mln/morpho/experimental/canvas/kruskal.hpp>
 
@@ -43,6 +44,25 @@ I cut(const mln::morpho::component_tree<V>& t, I& node_map, T alpha)
     px.val() = labels[node_map(px.point())];
 
   return imlabel;
+}
+
+void iota(mln::ndbuffer_image& a)
+{
+  assert(a.sample_type() == mln::sample_type_id::UINT32);
+
+  int i = 0;
+  for (int w = 0; w < a.size(3); ++w)
+    for (int z = 0; z < a.depth(); ++z)
+      for (int y = 0; y < a.height(); ++y)
+      {
+        std::uint32_t* lineptr =
+            reinterpret_cast<std::uint32_t*>(a.buffer()) + y * a.stride(1) + z * a.stride(2) + w * a.stride(3);
+        int width = a.width();
+        for (int x = 0; x < width; ++x)
+          lineptr[x] = i++;
+      }
+
+  EXPECT_EQ(i, a.domain().size());
 }
 
 template <typename T>
@@ -115,20 +135,25 @@ TEST(Morpho, AlphaTreeImageFloat)
 {
   const mln::image2d<float> image = {{4.5, 7.1, 3.3, 2.8}, {1.8, 2.5, 5.4, 3.2}, {1.8, 1.9, 5.33, 7.25}};
 
-  auto [t, nm] =
-      mln::morpho::experimental::alphatree(image, mln::c4, [](const auto& a, const auto& b) -> float {
-        if (a > b)
-          return a - b;
-        else
-          return b - a;
-      });
+  auto [t, nm] = mln::morpho::experimental::alphatree(image, mln::c4, [](const auto& a, const auto& b) -> float {
+    if (a > b)
+      return a - b;
+    else
+      return b - a;
+  });
 
-  const mln::image2d<int>    refNm = {{11, 12, 13, 14}, {10, 15, 16, 17}, {10, 18, 19, 20}};
-  std::vector<int>           refP  = {0, 0, 1, 0, 3, 1, 3, 6, 5, 4, 8, 2, 2, 6, 7, 5, 9, 7, 8, 9, 4};
-  std::vector<float> refV  = {2.9000001, 2.70000005, 2.5999999, 2.10000014, 1.92000008, 0.600000024, 0.5, 0.400000095, 0.100000024, 0.0700001717, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  const mln::image2d<int> refNm = {{11, 12, 13, 14}, {10, 15, 16, 17}, {10, 18, 19, 20}};
+  std::vector<int>        refP  = {0, 0, 1, 0, 3, 1, 3, 6, 5, 4, 8, 2, 2, 6, 7, 5, 9, 7, 8, 9, 4};
+  std::vector<float>      refV  = {2.90, 2.70, 2.60, 2.10, 1.92, 0.60, 0.50, 0.40, 0.10, 0.070, 0,
+                                   0,    0,    0,    0,    0,    0,    0,    0,    0,    0};
 
   compare_vec_assert(refP, t.parent);
-  compare_vec_assert(refV, t.values);
+  auto itvec1 = refV.begin();
+  auto itvec2 = t.values.begin();
+  for (; itvec1 != refV.end() && itvec2 != t.values.end(); itvec1++, itvec2++)
+  {
+    ASSERT_TRUE(std::abs(*itvec1 - *itvec2) < 0.001);
+  }
   ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }
 
@@ -473,4 +498,19 @@ TEST(Morpho, AlphaTreeCutMeanLabelization)
   ASSERT_IMAGES_EQ_EXP(make_cut(1), cut_1);
   ASSERT_IMAGES_EQ_EXP(make_cut(2), cut_2);
   ASSERT_IMAGES_EQ_EXP(make_cut(3), cut_3);
+}
+
+TEST(test, test)
+{
+  mln::ndbuffer_image a   = {{4, 7, 3, 2}, {1, 2, 5, 3}, {1, 1, 5, 7}};
+  auto                nbh = mln::dyn_nbh_2d_t(mln::c4);
+
+  auto [t, nm] = mln::morpho::experimental::__alphatree(
+      a, nbh, [](const auto& a, const auto& b) -> std::uint8_t { return mln::functional::l2dist(a, b); });
+
+  const mln::image2d<int>   refNm = {{6, 7, 8, 9}, {5, 10, 4, 11}, {5, 5, 4, 12}};
+  std::vector<std::uint8_t> refV  = {3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  compare_vec_assert(refV, t.values);
+  ASSERT_IMAGES_EQ_EXP(refNm, nm);
 }

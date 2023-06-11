@@ -24,6 +24,9 @@ namespace scribo::internal
     int                             discontinuity_absolute;
     double                          discontinuity_relative;
     int                             minimum_for_fusion;
+    int                             isolated_point;
+    long unsigned int               slope_checking_threshold;
+    float                           slope_max;
 
     // MATCHING
     int   nb_values_to_keep;

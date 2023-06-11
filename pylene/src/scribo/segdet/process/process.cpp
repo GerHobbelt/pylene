@@ -14,10 +14,6 @@
 
 namespace scribo::internal
 {
-  static constexpr int   isolated_point  = 2;
-  static constexpr int   slope_threshold = 10;
-  static constexpr float slope_max       = 1.2f; // tan(50)
-
   /**
    * Say if a value is between two other
    * @param min
@@ -195,7 +191,7 @@ namespace scribo::internal
   bool tracker_has_to_continue(const Tracker& f, int t, const Descriptor& descriptor)
   {
     // Isolated point
-    if (f.impl->last_integration - f.impl->first <= isolated_point)
+    if (f.impl->last_integration - f.impl->first <= descriptor.isolated_point)
       return false;
 
     // Discontinuity
@@ -231,7 +227,7 @@ namespace scribo::internal
       Tracker&& f = std::move(trackers[fi]);
 
       // Early stoping on high slopes
-      if (f.impl->n_values.size() > slope_threshold && std::abs(f.impl->current_slope) > slope_max)
+      if (f.impl->n_values.size() > descriptor.slope_checking_threshold && std::abs(f.impl->current_slope) > descriptor.slope_max)
       {
         fi++;
         continue;

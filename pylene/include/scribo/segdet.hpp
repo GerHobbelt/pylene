@@ -55,11 +55,11 @@ namespace scribo
     e_segdet_preprocess             preprocess = e_segdet_preprocess::NONE;         ///< Preprocess applied
     e_segdet_process_tracking       tracker    = e_segdet_process_tracking::KALMAN; ///< Tracker used
     e_segdet_process_traversal_mode traversal_mode =
-        e_segdet_process_traversal_mode::HORIZONTAL_VERTICAL; ///< Traversal performed
+        e_segdet_process_traversal_mode::HORIZONTAL_VERTICAL;                       ///< Traversal performed
     e_segdet_process_extraction extraction_type =
-        e_segdet_process_extraction::BINARY; ///< Extraction type for observations
+        e_segdet_process_extraction::BINARY;          ///< Extraction type for observations
 
-    bool negate_image = false; ///< Say if image has to be reversed before processing
+    bool negate_image = false;                        ///< Say if image has to be reversed before processing
 
     float dyn                               = 0.6f;   ///< Dynamic when Black-Top-Hat preprocess is applied
     int   size_mask                         = 11;     ///< Filter size when Black-Top-Hat preprocess is applied
@@ -70,30 +70,35 @@ namespace scribo
     float one_euro_mincutoff                = 1.0f;   ///< Min cutoff used in one euro tracker if chosen
     float one_euro_dcutoff                  = 1.0f;   ///< Dcutoff used in one euro tracker if chosen
 
-    int bucket_size = 32; ///< Bucket size during traversal
+    int bucket_size = 32;                             ///< Bucket size during traversal
 
-    int nb_values_to_keep = 30; ///< Memory of tracker to compute variances for the matching
+    int nb_values_to_keep = 30;                       ///< Memory of tracker to compute variances for the matching
     int discontinuity_relative =
         0; ///< Percentage. Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
     int discontinuity_absolute =
         0; ///< Discontinuity = discontinuity_absolute + discontinuity_relative * current_segment_size
     int minimum_for_fusion = 15; ///< Threshold to merge trackers following same observation
+    int isolated_point     = 2;  ///< Threshold to say if a point is isolated and has to be removed
+    unsigned int slope_checking_threshold =
+        10; ///< Threshold after which the slope is taken into account to remove the segment if not in the bounderies
+    unsigned int slope_max =
+        50; ///< Max slope allowed in degrees. Has to be less than 90 or equal if there is not boundery
 
-    int default_sigma_position   = 2;  ///< Position default variance value
-    int default_sigma_thickness  = 2;  ///< Thickness default variance value
-    int default_sigma_luminosity = 57; ///< Luminosity default variance value
+    int default_sigma_position   = 2;    ///< Position default variance value
+    int default_sigma_thickness  = 2;    ///< Thickness default variance value
+    int default_sigma_luminosity = 57;   ///< Luminosity default variance value
 
-    int   min_nb_values_sigma  = 10;    ///< Threshold to compute variance and not use defauld values
-    float sigma_pos_min        = 1.f;   ///< Minimum position variance value
-    float sigma_thickness_min  = 0.64f; ///< Minimum thickness variance value
-    float sigma_luminosity_min = 13.f;  ///< Minimum luminosity variance value
+    int   min_nb_values_sigma  = 10;     ///< Threshold to compute variance and not use defauld values
+    float sigma_pos_min        = 1.f;    ///< Minimum position variance value
+    float sigma_thickness_min  = 0.64f;  ///< Minimum thickness variance value
+    float sigma_luminosity_min = 13.f;   ///< Minimum luminosity variance value
 
-    int   gradient_threshold = 30;  ///< Gradient threshold when gradient preprocess is applied
-    int   llumi              = 225; ///< First threshold for observation ternary extraction
-    int   blumi              = 225; ///< Second threshold for observation ternary extraction
-    float ratio_lum          = 1.f; ///< Ratio of kept luminosity in observation extraction
+    int   gradient_threshold = 30;       ///< Gradient threshold when gradient preprocess is applied
+    int   llumi              = 225;      ///< First threshold for observation ternary extraction
+    int   blumi              = 225;      ///< Second threshold for observation ternary extraction
+    float ratio_lum          = 1.f;      ///< Ratio of kept luminosity in observation extraction
 
-    int max_thickness = 100; ///< Max allowed (vertical|horizontal) thickness of segment to detect
+    int max_thickness = 100;             ///< Max allowed (vertical|horizontal) thickness of segment to detect
 
     float threshold_intersection = 0.8f; ///< Threshold for duplication removal
     bool  remove_duplicates      = true; ///< Say if duplication removal has to be computed

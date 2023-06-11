@@ -12,12 +12,15 @@ namespace scribo::internal
       size_mask = params.size_mask;
     }
 
-    traversal_mode         = params.traversal_mode;
-    bucket_size            = params.bucket_size;
-    min_length_embryo      = std::min(min_length / 4 + 1, 10);
-    discontinuity_relative = static_cast<double>(params.discontinuity_relative) / 100;
-    discontinuity_absolute = params.discontinuity_absolute;
-    minimum_for_fusion     = params.minimum_for_fusion;
+    traversal_mode           = params.traversal_mode;
+    bucket_size              = params.bucket_size;
+    min_length_embryo        = std::min(min_length / 4 + 1, 10);
+    discontinuity_relative   = static_cast<double>(params.discontinuity_relative) / 100;
+    discontinuity_absolute   = params.discontinuity_absolute;
+    minimum_for_fusion       = params.minimum_for_fusion;
+    isolated_point           = params.isolated_point;
+    slope_checking_threshold = params.slope_checking_threshold;
+    slope_max                = tan(params.slope_max * M_PI / 180);
 
     nb_values_to_keep        = params.nb_values_to_keep;
     default_sigma_position   = params.default_sigma_position;

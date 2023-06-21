@@ -18,9 +18,8 @@ void compare_vec_assert(std::vector<T> vec1, std::vector<T> vec2)
     EXPECT_EQ(*itvec1, *itvec2);
   }
 }
-
-template <typename T>
-void compare_vec_assert_cast(std::vector<T> vec1, std::vector<std::any> vec2)
+template<typename T>
+void compare_vec_assert_cast(std::vector<T> vec1, std::vector<void*> vec2)
 {
   EXPECT_EQ(vec1.size(), vec2.size());
 
@@ -29,14 +28,7 @@ void compare_vec_assert_cast(std::vector<T> vec1, std::vector<std::any> vec2)
 
   for (; itvec1 != vec1.end() && itvec2 != vec2.end(); itvec1++, itvec2++)
   {
-    try
-    {
-      EXPECT_EQ(*itvec1, std::any_cast<T>(*itvec2));
-    }
-    catch (const std::bad_any_cast& e)
-    {
-      EXPECT_EQ(*itvec1, std::any_cast<int>(*itvec2));
-    }
+    EXPECT_EQ(*itvec1, reinterpret_cast<long>(*itvec2));
   }
 }
 
@@ -47,6 +39,7 @@ TEST(Kruskal, KruskalVisitorBase)
   std::vector<E> edges = {{0, 1, 3},  {0, 4, 3},  {1, 2, 4}, {1, 5, 5},  {2, 3, 1},  {2, 6, 2},
                           {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
                           {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
+  std::stable_sort(edges.begin(), edges.end(), [](E a, E b) -> bool { return a.w < b.w; });
 
   std::vector<int> refP = {0, 0, 1, 0, 3, 1, 4, 6, 5, 4, 8, 2, 2, 7, 7, 10, 5, 9, 6, 10, 8, 9, 3};
 
@@ -64,6 +57,7 @@ TEST(Kruskal, KruskalVisitorMst)
   std::vector<E> edges = {{0, 1, 3},  {0, 4, 3},  {1, 2, 4}, {1, 5, 5},  {2, 3, 1},  {2, 6, 2},
                           {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
                           {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
+  std::stable_sort(edges.begin(), edges.end(), [](E a, E b) -> bool { return a.w < b.w; });
 
   std::vector<int> refP   = {0, 0, 1, 0, 3, 1, 4, 6, 5, 4, 8, 2, 2, 7, 7, 10, 5, 9, 6, 10, 8, 9, 3};
   std::vector<E>   refMST = {{4, 8, 0}, {6, 10, 0},  {8, 9, 0}, {2, 3, 1}, {3, 7, 1}, {4, 5, 1},
@@ -86,6 +80,7 @@ TEST(Kruskal, KruskalVisitorValues)
                                               {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
                                               {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
   const mln::image2d<std::uint8_t> nodemap = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+  std::stable_sort(edges.begin(), edges.end(), [](E a, E b) -> bool { return a.w < b.w; });
 
   std::vector<int>                 refP  = {0, 0, 1, 0, 3, 1, 4, 6, 5, 4, 8, 2, 2, 7, 7, 10, 5, 9, 6, 10, 8, 9, 3};
   std::vector<std::int16_t>        refV  = {3, 3, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -109,6 +104,7 @@ TEST(Kruskal, KruskalVisitorCanonized)
                                               {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
                                               {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
   const mln::image2d<std::uint8_t> nodemap = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+  std::stable_sort(edges.begin(), edges.end(), [](E a, E b) -> bool { return a.w < b.w; });
 
   std::vector<int>                 refP  = {0, 0, 0, 1, 2, 1, 0, 0, 3, 3, 2, 3, 1};
   std::vector<std::int16_t>        refV  = {3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -125,19 +121,59 @@ TEST(Kruskal, KruskalVisitorCanonized)
 
 TEST(Kruskal, KruskalVisitorValueErased)
 {
-  using E = mln::morpho::experimental::canvas::internal::edge<std::int16_t>;
-  using I = mln::image2d<std::uint8_t>;
+  using E      = mln::morpho::experimental::canvas::internal::edge<int>;
+  using Erased = mln::morpho::experimental::canvas::internal::edge<void*>;
+  using I      = mln::image2d<int>;
 
-  std::vector<E>                   edges   = {{0, 1, 3},  {0, 4, 3},  {1, 2, 4}, {1, 5, 5},  {2, 3, 1},  {2, 6, 2},
-                                              {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
-                                              {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
-  const mln::image2d<std::uint8_t> nodemap = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+  std::vector<E>      tmp   = {{0, 1, 3},  {0, 4, 3},  {1, 2, 4}, {1, 5, 5},  {2, 3, 1},  {2, 6, 2},
+                               {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
+                               {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
+  std::stable_sort(tmp.begin(), tmp.end(), [](E a, E b) -> bool { return a.w < b.w; });
 
-  std::vector<int>                 refP  = {0, 0, 1, 0, 3, 1, 4, 6, 5, 4, 8, 2, 2, 7, 7, 10, 5, 9, 6, 10, 8, 9, 3};
-  std::vector<std::int16_t>        refV  = {3, 3, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  const mln::image2d<std::uint8_t> refNm = {{2, 2, 7, 7}, {10, 5, 9, 6}, {10, 8, 9, 3}};
+  std::vector<Erased> edges = {};
+  for (auto e : tmp)
+  {
+    edges.push_back({e.a, e.b, reinterpret_cast<void*>(e.w)});
+  }
+  const mln::image2d<int> nodemap = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+
+  std::vector<int> refP = {0, 0, 1, 0, 3, 1, 4, 6, 5, 4, 8, 2, 2, 7, 7, 10, 5, 9, 6, 10, 8, 9, 3};
+  std::vector<int>        refV  = {3, 3, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  const mln::image2d<int> refNm = {{2, 2, 7, 7}, {10, 5, 9, 6}, {10, 8, 9, 3}};
 
   mln::morpho::experimental::canvas::kruskal_visitor_values_erased<I> v = {12, nodemap};
+
+  mln::morpho::experimental::canvas::kruskal(v, edges);
+
+  compare_vec_assert(refP, v.parent);
+  compare_vec_assert_cast(refV, v.value);
+  ASSERT_IMAGES_EQ_EXP(refNm, v.nodemap);
+}
+
+TEST(Kruskal, KruskalVisitorCanonizedErased)
+{
+  using E      = mln::morpho::experimental::canvas::internal::edge<std::uint8_t>;
+  using Erased = mln::morpho::experimental::canvas::internal::edge<void*>;
+  using I      = mln::image2d<int>;
+
+  std::vector<E>      tmp   = {{0, 1, 3},  {0, 4, 3},  {1, 2, 4}, {1, 5, 5},  {2, 3, 1},  {2, 6, 2},
+                               {3, 7, 1},  {4, 5, 1},  {4, 8, 0}, {5, 6, 3},  {5, 9, 1},  {6, 7, 2},
+                               {6, 10, 0}, {7, 11, 4}, {8, 9, 0}, {9, 10, 4}, {10, 11, 2}};
+  std::stable_sort(tmp.begin(), tmp.end(), [](E a, E b) -> bool { return a.w < b.w; });
+  std::vector<Erased> edges = {};
+  for (auto e : tmp)
+  {
+    edges.push_back({e.a, e.b, reinterpret_cast<void*>(e.w)});
+  }
+  const mln::image2d<int> nodemap = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+
+  std::vector<int>                 refP  = {0, 0, 0, 1, 2, 1, 0, 0, 3, 3, 2, 3, 1};
+  std::vector<std::uint8_t>        refV  = {3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  const mln::image2d<int> refNm = {{6, 7, 8, 9}, {4, 10, 5, 11}, {4, 4, 5, 12}};
+
+  auto func = mln::morpho::experimental::functor{};
+
+  mln::morpho::experimental::canvas::kruskal_visitor_canonized_erased<I> v = {12, nodemap, func, mln::sample_type_id::UINT8};
 
   mln::morpho::experimental::canvas::kruskal(v, edges);
 

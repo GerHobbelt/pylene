@@ -313,7 +313,7 @@ pages:
     <<: *documentation-base
     variables:
         CURRENT_BRANCH: ${CI_COMMIT_REF_SLUG}
-    script:
+    after_script:
         - /usr/bin/bash utils/retrieve-artifacts.sh
         - python3 utils/write-index.py
     only:

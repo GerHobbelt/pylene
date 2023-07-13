@@ -90,7 +90,6 @@ distcheck-linux-gcc10-release:
         - if: $CI_MERGE_REQUEST_ID
         - if: $CI_COMMIT_BRANCH == "master"
 
-
 distcheck-linux-gcc10-debug:
     <<: *distcheck-linux-base
     image: ${FEDORA_32}
@@ -351,14 +350,6 @@ deploy-all-docs-to-pages:
 
 .deploy-package-base:
     stage: deploy
-    dependencies: []
-    script:
-        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
-        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:fPIC=True
-        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:shared=True
-
-.deploy-package-base:
-    stage: deploy
     extends: .package-base
     after_script:
         - conan remote login -p $CONAN_PASSWORD lrde-public $CONAN_LOGIN_USERNAME
@@ -390,17 +381,6 @@ distcheck-package-create:
         CONAN_CHANNEL: "unstable"
     only:
         - next
-
-.package-gcc-10:
-    image: ${FEDORA_32}
-    extends: .deploy-package-base
-    variables:
-        CC: "gcc"
-        CXX: "g++"
-
-   variables:
-        CONAN_BASE_PROFILE: gcc-11
-
 
 .package-gcc-10:
     image: ${FEDORA_32}

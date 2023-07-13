@@ -62,13 +62,6 @@ class Pylene(ConanFile):
                 accepted_e = [f"{comp}-{ver}" for comp in accepted_compilers for ver in accepted_compilers_dict[comp]]
                 raise ConanInvalidConfiguration(f"Compiler {self.settings.compiler} version {self.settings.compiler} not handled on Linux (Accepted: {accepted_e})")
 
-        if self.settings.compiler in ["gcc", "clang"] and tools.Version(self.settings.compiler.version) < 10:
-            raise ConanInvalidConfiguration("Invalid compiler version for {} (Got {}, should be greater or equal to 10)".format(self.settings.compiler, self.settings.compiler.version))
-
-            if not str(self.settings.compiler) in accepted_compilers or not str(self.settings.compiler.version) in accepted_compilers_dict[str(self.settings.compiler)]:
-                accepted_e = [f"{comp}-{ver}" for comp in accepted_compilers for ver in accepted_compilers_dict[comp]]
-                raise ConanInvalidConfiguration(f"Compiler {self.settings.compiler} version {self.settings.compiler} not handled on Linux (Accepted: {accepted_e})")
-
     def _conditional_delete_fPIC(self, cond: bool):
         if cond and self.options.get_safe("fPIC") is not None:
             del self.options.fPIC

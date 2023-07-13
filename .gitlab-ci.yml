@@ -19,13 +19,14 @@ variables:
     CONAN_CMAKE_GENERATOR: Ninja
     CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
     CCACHE_MAXSIZE: 2G
+    DOC_PERSIST_BRANCHES: "next" #"master:next"
 
 before_script:
-        - pip install --upgrade conan
-        - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
-        - conan profile detect
-        - ccache -p
-        - ccache -s
+    - pip install --upgrade conan
+    - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
+    - conan profile detect
+    - ccache -p
+    - ccache -s
 
 ########
 # Test #
@@ -47,10 +48,10 @@ windows-debug:
         reports:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 1 week
-    tags: [ windows ]
+    tags: [windows]
     rules:
-#        - if: $CI_MERGE_REQUEST_ID
-#        - if: $CI_COMMIT_BRANCH == "master"
+        #        - if: $CI_MERGE_REQUEST_ID
+        #        - if: $CI_COMMIT_BRANCH == "master"
         - when: manual
           allow_failure: true
     variables:
@@ -230,7 +231,7 @@ distcheck-linux-coverage:
     <<: *distcheck-linux-base
     image: ${FEDORA_32}
     after_script:
-        - mkdir coverage 
+        - mkdir coverage
         - cd build && gcovr --root .. --filter '\.\./pylene' . -s --xml ../coverage/cobertura-coverage.xml --html-details ../coverage/index.html --gcov-ignore-parse-errors
     variables:
         PYLENE_CONFIGURATION: "Debug"
@@ -265,7 +266,7 @@ distcheck-linux-coverage:
         - cmake --build . --target build-bench
         - cmake --build . --target run-all-benchmarks
         - ctest -L SpeedTests -V
-    tags: [ "pylene-benchmarks" ]
+    tags: ["pylene-benchmarks"]
     when: manual
     dependencies: []
     artifacts:
@@ -281,13 +282,11 @@ distbench-linux-gcc11-release:
         CXX: "g++"
         CC: "gcc"
 
-
-
 #################
 # Documentation #
 #################
 
-.documentation-base:  &documentation-base
+.documentation-base: &documentation-base
     image: ${FEDORA_34}
     stage: build
     script:
@@ -295,8 +294,7 @@ distbench-linux-gcc11-release:
         - conan install .. --build missing -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -s build_type=Release -r lrde-public
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
         - cmake --build . --target build-doc
-        - DOCDIR="public/"
-        - if [ "${CI_COMMIT_REF_SLUG}" != "master" ]; then DOCDIR="public/${CI_COMMIT_REF_SLUG}/"; fi
+        - DOCDIR="public/${CI_COMMIT_REF_SLUG}"
         - mkdir -p ../${DOCDIR} && mv doc/sphinx/* ../${DOCDIR}
     artifacts:
         name: "documentation"
@@ -314,15 +312,46 @@ documentation:
 # Deploy documentation
 pages:
     <<: *documentation-base
+    variables:
+        CURRENT_BRANCH: ${CI_COMMIT_REF_SLUG}
+    after_script:
+        - /usr/bin/bash utils/retrieve-artifacts.sh
+        - python3 utils/write-index.py
     only:
         - master
         - next
+
+deploy-all-docs-to-pages:
+    image: ${FEDORA_34}
+    stage: deploy
+    rules:
+        - when: manual
+          allow_failure: true
+    variables:
+        CURRENT_BRANCH: "None"
+    script:
+        - mkdir -p public
+        - /usr/bin/bash utils/retrieve-artifacts.sh
+        - python3 utils/write-index.py
+    artifacts:
+        name: "all-documentation"
+        expire_in: 1 week
+        paths:
+            - public/
 
 ##########
 # Deploy #
 ##########
 
 .package-base:
+    script:
+        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
+        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:fPIC=True
+        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:shared=True
+
+.deploy-package-base:
+    stage: deploy
+    dependencies: []
     script:
         - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
         - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:fPIC=True
@@ -395,8 +424,8 @@ distcheck-package-create:
         CXX: "g++"
 
 gcc-10-deploy-stable:
-    extends: 
-        - .package-gcc-10 
+    extends:
+        - .package-gcc-10
         - .stable-deploy
 
 gcc-11-deploy-stable:

@@ -21,6 +21,7 @@ namespace mln::se
     : public neighborhood_facade<periodic_line2d>
 #endif
   {
+
     class rng_t : public ::ranges::view_facade<rng_t>
     {
       friend ::ranges::range_access;

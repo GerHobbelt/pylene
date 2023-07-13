@@ -242,7 +242,7 @@ distbench-linux-gcc9-release:
 #################
 
 .documentation-base:  &documentation-base
-    image: ${FEDORA_31}
+    image: ${FEDORA_34}
     stage: build
     script:
         - dnf install -y cairo-devel
@@ -250,7 +250,9 @@ distbench-linux-gcc9-release:
         - conan install -u .. -pr gcc-11 --build missing --build openjpeg -s compiler.cppstd=20
         - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
         - cmake --build . --target build-doc
-        - mkdir ../public && mv doc/sphinx/* ../public/
+        - DOCDIR="public/"
+        - if [ "${CI_COMMIT_REF_SLUG}" != "master" ]; then DOCDIR="public/${CI_COMMIT_REF_SLUG}/"; fi
+        - mkdir -p ../${DOCDIR} && mv doc/sphinx/* ../${DOCDIR}
     artifacts:
         name: "documentation"
         expire_in: 1 week
@@ -262,6 +264,7 @@ documentation:
     <<: *documentation-base
     except:
         - master
+        - next
 
 
 ##########
@@ -272,6 +275,7 @@ pages:
     <<: *documentation-base
     only:
         - master
+        - next
 
 .package:
     stage: deploy
@@ -281,6 +285,8 @@ pages:
     rules:
         - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "schedule"
         - if: $CI_COMMIT_BRANCH == "next"
+    variables:
+        CONAN_REVISIONS_ENABLED: 1
 
 
 package gcc-10:

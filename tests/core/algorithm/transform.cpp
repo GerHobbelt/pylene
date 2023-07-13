@@ -5,7 +5,7 @@
 
 #include <functional>
 #include <utility>
-
+#include <tbb/task_scheduler_init.h>
 #include <gtest/gtest.h>
 
 TEST(Core, Algorithm_Transform)

@@ -14,6 +14,7 @@ Include :file:`<mln/core/algorithm/paste.hpp>`
             dst(px.point()) = px.val();
 
     The source and destination images should not alias. 
+    This function has a parallel implementation, see following section for an example.
 
 
     :param src: The source image
@@ -35,6 +36,14 @@ Examples
     mln::image2d<mln::rgb8> g(f, mln::init());
     mln::box2d roi = {{50,50}, {100,100}};
     mln::paste(mln::view::clip(f, roi), g);
+
+#. Using parallel paste to paste a part of the image into a larger one::
+
+    mln::image2d<mln::rgb8> f = lena();
+    mln::image2d<mln::rgb8> g(f, mln::init());
+    mln::box2d roi = {{50,50}, {100,100}};
+    mln::parallel::paste(mln::view::clip(f, roi), g);
+ 
 
 Complexity
 ----------

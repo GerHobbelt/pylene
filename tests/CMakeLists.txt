@@ -16,10 +16,8 @@ function(add_core_test Executable)
   set_target_properties(${core_test_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
   add_test(NAME ${core_test_NAME} COMMAND ${core_test_NAME} --gtest_output=xml:${core_test_NAME}.xml WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-  target_link_libraries(${core_test_NAME} PRIVATE Fixtures::ImagePath Fixtures::ImageCompare Pylene::Pylene GTest::GTest ${FreeImage_LIBRARIES})
   set_tests_properties(${core_test_NAME} PROPERTIES LABELS UnitTests)
   add_dependencies(build-tests ${core_test_NAME})
-
 endfunction(add_core_test)
 
 # Windows required DLLs to be located near tests (suppose TBB is installed with conan)
@@ -33,7 +31,6 @@ if (WIN32 AND EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 add_subdirectory(accu)
 add_subdirectory(core)
 add_subdirectory(io)

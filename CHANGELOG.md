@@ -2,11 +2,13 @@
 
 ## Version 0.2
 
-### Contributors
+### Maintainer
 
 * Edwin Carlinet <edwin1.carlinet@epita.fr>
 * Baptiste Esteban <baptiste.esteban@epita.fr>
 * Michaël Roynard <michael.roynard@epita.fr>
+
+### Contributors
 
 * Philippe Bernet <philippe.bernet@epita.fr>
 * Alexandre Bourquelot <alexandre.bourquelot@epita.fr>
@@ -28,7 +30,7 @@
 * Scribo module
   * line detection on document images
 * Watershed and waterfall based on user input markers
-* Haugh line transform
+* Hough line transform
 * Implement the subtractive rule for component-tree filtering
 * Conan v2 compatibility
 
@@ -38,9 +40,7 @@
 * New transform function signatures taking advantage of concepts
 * Fix bug  #72
 * Pylene <-> NumPy image conversion
-* Fix Pybind11 issue with `cmake_find_package` generator
 * Update Python module documentation
-* Fix cmake_find_package generator with pybind11
 * Tile type for buffer primitive
 * Improve alphatree in the library
 * New conan/cmake targets
@@ -52,7 +52,6 @@
 * Fix Conan deployment after the addition of the Scribo component
 * Fix issue #90
 * Write documentation about the IO operations
-* Migrate conan with new CMakeDeps generator
 * Remove dependencies on boost::concepts
 * Check minimum compiler version for Clang and GCC
 * Fix bug in cvxhull impl

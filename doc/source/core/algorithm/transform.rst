@@ -18,6 +18,8 @@ Include :file:`<mln/core/algorithm/transform.hpp>`
         for (auto&& [vin, vout] : ranges::zip(in.values(), out.values())
             vout = f(vin);
 
+    This function has a parallel implementation, see following section for an example.
+
     :param in: The input image.
     :param out: The output image.
     :param f: The function to apply on values.
@@ -46,6 +48,10 @@ Examples
 
     mln::image2d<uint8_t> out = mln::transform(ima, &V::first);
   
+#. Using parallel transform to add one to the values of an image::
+
+    mln::image2d<uint8_t> ima = { {1, 2, 3}, {4, 5, 6} };
+    auto out = mln::parallel::transform(ima, [](uint8_t x) -> uint8_t { return x + 1; });
  
 Complexity
 ----------

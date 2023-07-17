@@ -146,7 +146,7 @@ namespace mln
     template <typename Ret = reference>
     std::enable_if_t<accessible::value, Ret> at(point_type p)
     {
-      auto g = [p](auto&&... images) { return std::forward_as_tuple(images.at(p)...); };
+      auto g = [p](auto&&... images) -> Ret { return std::forward_as_tuple(images.at(p)...); };
       return std::apply(g, m_images);
     }
 

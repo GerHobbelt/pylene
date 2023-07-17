@@ -9,7 +9,7 @@ namespace mln::ranges::view
   template <MDRange Rng, class Pred>
   [[gnu::always_inline]] inline auto filter(Rng&& rng, Pred pred)
   {
-    using R = ::concepts::remove_cvref_t<Rng>;
+    using R = std::remove_cvref_t<Rng>;
     using P = ::ranges::logical_negate<Pred>;
     P neg   = ::ranges::not_fn(std::move(pred));
     return remove_if_mdview<R, P>{std::forward<Rng>(rng), std::move(neg)};

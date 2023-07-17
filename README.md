@@ -23,16 +23,11 @@ Under [Mozilla Public License, v. 2.0](http://mozilla.org/MPL/2.0/).
 Pylene is developed in modern C++ so you need a recent C++ compiler. The followings compilers are currently supported
 and tested:
 
-* GCC 9 and 10
-* Clang 10
-* Microsoft Visual Studio 2019
+* GCC 10, 11, 12
+* Clang 12, 13, 14, 15
+* ~~Microsoft Visual Studio 2019~~ (Dependencies issue from Conan Center Index)
 
-This project relies on:
-
-* [FreeImage](www.freeimage.sourceforge.net) (only for IO)
-* [range-v3](https://github.com/ericniebler/range-v3)
-* [Boost](https://www.boost.org/)
-* [{fmt}](https://fmt.dev/)
+This project relies on some third part libraries, which are handled by the [Conan Package Manager](https://conan.io/) (version 2.0.1 minimum)
 
 # Quick Start
 
@@ -41,27 +36,45 @@ This project relies on:
 The preferred and strongly recommended way to use Pylene is using Conan, a C++ package manager, and CMake. For using the
 library by other means, refer to the [documentation](http://olena.pages.lre.epita.fr/pylene/next/tutorial/installation)
 
+1. Add to the Conan remote the artifactory of the LRE, where the Pylene artifact is stored:
+
 ```
 conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
 ```
 
-1. Install the library with Conan (with C++20 standard)
+2. At the root of your project, create a Conan recipe (``conanfile.txt``) containing at least the following:
 
 ```
-conan install pylene/head@lrde/stable -g cmake_find_package -s compiler.cppstd=20
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[requires]
+pylene/head@lrde/stable
 ```
 
-2. Edit your ``CMakeLists.txt`` to include the paths to the library:
+3. Create a ``CMakeLists.txt`` containing at least the following to link Pylene to your executable:
 
 ```
-find_package(Pylene)
+target_link_libraries(your_target PUBLIC Pylene::core) # Minimal
 ```
 
-3. Links with target ``Pylene::Pylene``:
+or to execute the following code sample
 
 ```
-target_link_libraries(MyTarget PRIVATE Pylene::Pylene)
+target_link_libraries(your_target PUBLIC Pylene::io-freeimage)
 ```
+
+4. Configure the project and build it:
+
+```
+$ mkdir build && cd build
+$ conan install .. -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 --build missing --build openjpeg*
+$ cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
+$ cmake --build .
+```
+
+For more information or details about the installation process, please refer to the documentation.
 
 ## Code sample
 
@@ -116,4 +129,5 @@ Have a look on the [introduction](http://olena.pages.lrde.epita.fr/pylene/intro)
 
 Other resources (mind the dates, the library probably has changed since then):
 
+* [A Modern C++ Point of View of Programming in Image Processing (GPCE'22)](https://www.lrde.epita.fr/dload/papers/roynard.22.gpce.pdf)
 * [A Modern C++ Library for Generic and Efficient Image Processing (GTGDMM'18)](https://www.lrde.epita.fr/dload/presentations/2018-06-19-geraud.2018.gtgdmmm.pdf)

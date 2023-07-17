@@ -148,15 +148,16 @@ A :cpp:class:`component_tree` `t` has the following methods.
 
 .. cpp:namespace-push::  template <class V> component_tree
 
-.. cpp:function:: auto accumulate_on_points(Image node_map, Accumulator accu) const
-                  auto accumulate_on_values(Image node_map, Image values, Accumulator accu) const
-                  auto accumulate_on_pixels(Image node_map, Image values, Accumulator accu) const
+.. cpp:function:: auto compute_attribute_on_points(Image node_map, Accumulator accu, bool propagate) const
+                  auto compute_attribute_on_values(Image node_map, Image values, Accumulator accu, bool propagate) const
+                  auto compute_attribute_on_pixels(Image node_map, Image values, Accumulator accu, bool propagate) const
 
     Accumulate the points of each component.
 
     :param node_map: An image thats maps: point -> node id
     :param values: An image where values to accumlate are taken from
     :param accu: The feature to compute
+    :param propagate: Option to propagate the values to the parent (default: true)
 
     :return: A vector mapping for each node the result of accumulation.
 
@@ -190,7 +191,7 @@ Example: computing the size (number of points) of the components.
 
     #include <mln/accu/accumulators/count.hpp>
 
-    auto sizes = tree.accumulate_on_points(node_map, mln::accu::features::count<>());
+    auto sizes = tree.compute_attribute_on_points(node_map, mln::accu::features::count<>());
 
 .. cpp:function:: auto compute_depth() const
 
@@ -255,6 +256,7 @@ A :cpp:class:`component_tree` `t` has the following methods.
         auto pred = [&](int id) { nchildren > 1; };      
         t.filter(CT_FILTER_DIRECT, pred);
 
+
 Image reconstruction
 --------------------
 
@@ -279,7 +281,43 @@ the image from the filtered tree.
         t.filter(CT_FILTER_DIRECT, [&area](int id) { return area[id] > 20; });
         auto out = t.reconstruct(node_map);
 
+Horizontal cut
+--------------
+When the tree is a hierarchy of partition, such as the :doc:`alphatree`, it is possible
+to make an horizontal cut of this tree.
 
+.. cpp:function::   I horizontal_cut(const T threshold, I nodemap) const
+                    I horizontal_cut_from_levels(const T threshold, I nodemap, ::ranges::span<V> levels) const
+
+    Make an horizontal cut at threshold ``threshold`` of the tree and return the nodemap associated to the cut.
+
+    :param threshold: The threshold of the horizontal cut
+    :param nodemap: An image thats maps ``point -> node id``
+    :param levels: (Optional) The altitude of each node in the tree (for example the :math:`\alpha` associated to each node for the alphatree).
+
+Saliency Computation
+--------------------
+It is also possible to compute the saliency map to obtain another visualization.
+
+.. cpp:function:: auto saliency(image2d<int> node_map, ranges::span<double> values) const
+
+    Compute and return the saliency map of the tree. **Works only for 2D images and with tree node values of type** ``double``.
+
+    :param node_map: An image thats maps ``point -> node id``
+    :param values: the levels of the tree for each node
+
+    :return: The saliency map as an image
+
+.. list-table::
+
+   * - .. image:: /images/lena_gray.jpg
+          :width: 100%
+
+     - .. image:: /images/saliency_watershed.png
+          :width: 100%
+
+   * - Original image
+     - Saliency map of the watershed hierarchy by area
 
 A complete example
 ------------------

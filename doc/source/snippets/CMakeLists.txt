@@ -54,22 +54,38 @@ add_image("area_filter"
   morpho_area_filter_out.png)
 
 
-
 add_image("blobs_watershed" "${DOCUMENTATION_IMAGE_DIR}/blobs_binary.png" blobs_distance_transform.png blobs_segmentation.png)
+add_image("watershed_from_markers" "${PYLENE_IMAGE_DIR}/lena.png" marker_on_gradient.png lena_ws_marker.png)
 
+add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.ppm" alphatree_cut_color.png)
+add_image("alphatree_example" "${PYLENE_IMAGE_DIR}/lena.pgm" alphatree_cut_gray.png)
+
+add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.ppm" watershed_hierarchy_area_color.png)
+add_image("watershed_hierarchy_example" "${PYLENE_IMAGE_DIR}/lena.pgm" watershed_hierarchy_area_gray.png)
+
+add_image("saliency_example" "${PYLENE_IMAGE_DIR}/lena.pgm" saliency_watershed.png)
+
+add_image("mtos_example" "${PYLENE_IMAGE_DIR}/lena.ppm" depth_map.png mtos_rec.png)
+add_image("hough_lines" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.pbm" "staff_hough_lines.png")
+add_image("segdet" "${DOCUMENTATION_IMAGE_DIR}/staff_lines.png" "staff_scribo_lines_vector.png"  "staff_scribo_lines_pixel.png")
+add_image("waterfall;4" "${PYLENE_IMAGE_DIR}/lena.pgm" "waterfall_nodemap.png" "waterfall_cut.png")
+add_image("waterfall;1" "${PYLENE_IMAGE_DIR}/lena.pgm" "waterfall_seed_nodemap.png" "waterfall_seed_cut.png" "lena_seeds.png")
 
 add_custom_target(build-images
                   DEPENDS "${DOCUMENTATION_IMAGES}")
 
 add_library(doc-lib lut.cpp)
-target_link_libraries(doc-lib Pylene::Pylene)
+target_link_libraries(doc-lib Pylene::Core)
 
 
 
 
-link_libraries(Pylene::Pylene)
+link_libraries(Pylene::Core Pylene::IO-freeimage)
 link_libraries(doc-lib)
 
+add_executable(alphatree_example alphatree_example.cpp)
+add_executable(watershed_hierarchy_example watershed_hierarchy_example.cpp)
+add_executable(saliency_example saliency_example.cpp)
 add_executable(erosion-cli erosion-cli.cpp)
 add_executable(staff_lines staff_lines.cpp)
 add_executable(component_tree_1 component_tree_1.cpp)
@@ -79,12 +95,12 @@ add_executable(area_filter area_filter.cpp)
 add_executable(cdt cdt.cpp)
 add_executable(first_start_1 first_start_1.cpp)
 add_executable(intro-1 intro-1.cpp)
+add_executable(mtos_example mtos_example.cpp)
+add_executable(hough_lines hough_lines.cpp)
+target_link_libraries(hough_lines -lcairo)
+add_executable(segdet segdet.cpp)
+target_link_libraries(segdet Pylene::Scribo -lcairo)
+add_executable(watershed_from_markers watershed_from_markers.cpp)
+add_executable(waterfall waterfall.cpp)
 
 target_compile_definitions(erosion-cli PRIVATE BOOST_ALL_NO_LIB)
-
-# for program_options, need to separate CONAN and regular FindBoost
-if (TARGET Boost::program_options)
-  target_link_libraries(erosion-cli PRIVATE Boost::program_options)
-elseif (TARGET Boost::Boost)
-  target_link_libraries(erosion-cli PRIVATE Boost::Boost)
-endif()

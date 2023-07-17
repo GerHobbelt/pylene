@@ -7,7 +7,7 @@ Include :file:`<mln/morpho/watershed.hpp>`
 
 
 .. cpp:function::  template <class Label_t, class I, class N> \
-                   image_ch_value_t<I, Label_t> watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel)
+                   image_ch_value_t<I, Label_t> watershed(const Image<I>& ima, const Neighborhood<N>& nbh, int& nlabel, bool waterline=true)
 
    Watershed by immersion as defined in [BM92]_. The catchment basins are
    labeled from 1 to n, and the special label 0 is used for watershed lines.
@@ -17,10 +17,27 @@ Include :file:`<mln/morpho/watershed.hpp>`
    :param input: Input image
    :param nbh: Neighborhood considered
    :param nlabel (out): Number of catchment basins
+   :param waterline: Add the watershed lines in the resulting segmentation
 
    :return: A labelized image
 
    :exception: N/A
+
+.. cpp:function:: template <class Label_t, class I, class N, class S> \
+                 image_ch_value_t<I, Label_t> watershed_from_markers(I&& input, N&& nbh, S&& seeds, int& nlabel)
+
+   Watershed by immersion as defined in [BM92]_ with given markers. A marker is **one pixel** on the seed image which is greater than 0.
+
+   :tparam Label_t: The type of label (must be *signed* :cpp:concept:`Integral`)
+    and the maximum value of this type must be higher or equal to the maximum
+    value of the markers image value type.
+
+   :param input: Input image
+   :param nbh: The considered neighborhood
+   :param seeds: An image with markers. The markers label should be greater than 0.
+   :param nlabel (out): The number of catchment basins
+
+   :return: A labelized image
 
 Notes
 -----
@@ -69,5 +86,30 @@ Example 1: Cell segmentation
 
    Segmented blobs and watershed lines (labels displayed in false colors).
 
+Example 2: Watershed from markers
+---------------------------------
 
+This example demonstrates how to use the watershed based on input markers.
 
+.. code-block::
+
+   // (1) Get input image and markers image
+   mln::image2d<std::uint8_t> input = ...;
+   mln::image2d<std::uint16_t> seeds = ...;
+
+   // (2) Compute the Beucher gradient
+   auto grad = mln::morpho::gradient(input, mln::se::disc(3));
+
+   // (3) Compute the watershed
+    auto out = mln::morpho::watershed_from_markers<std::int32_t>(grad, mln::c8, seeds, nlbl); 
+
+.. list-table::
+
+   * - .. image:: /images/marker_on_gradient.png
+          :width: 100%
+
+     - .. image:: /images/lena_ws_marker.png
+          :width: 100%
+
+   * - Input image (with markers in red)
+     - Segmented image with watershed lines (labels are displayed in false colors).

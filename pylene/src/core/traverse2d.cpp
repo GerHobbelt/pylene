@@ -26,7 +26,7 @@ namespace mln::canvas::details
 
     assert(dx != 0 || dy != 0);
 
-    auto count = [](int start, int end, int step) { return (end - start - 1) / step + 1; };
+    auto count = [](int start, int end, int step) { return start >= end ? 0 : ((end - start - 1) / step + 1); };
 
     // Top border pixels
     if (dy != 0)

@@ -7,15 +7,16 @@
 #include <mln/core/neighborhood/neighborhood.hpp>
 #include <mln/core/trace.hpp>
 
+#include <mln/core/utils/dontcare.hpp>
+#include <mln/labeling/blobs.hpp>
 #include <mln/labeling/local_extrema.hpp>
 #include <mln/morpho/private/pqueue.hpp>
 
 namespace mln::morpho
 {
-
   template <class Label_t, class InputImage, class Neighborhood>
   image_ch_value_t<std::remove_reference_t<InputImage>, Label_t> //
-  watershed(InputImage&& ima, Neighborhood&& nbh, int& nlabel);
+  watershed(InputImage&& ima, Neighborhood&& nbh, int& nlabel, bool waterline = true);
 
 
   /******************************************/
@@ -24,16 +25,16 @@ namespace mln::morpho
 
   namespace impl
   {
-
-
     template <class I, class N, class O>
-    int watershed(I input, N nbh, O output)
+    int watershed(I input, N nbh, O output, bool markers = false)
     {
       using Label_t = image_value_t<O>;
       using V       = image_value_t<I>;
 
       // 1. Labelize minima (note that output is initialized to -1)
-      const int nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>());
+      int nlabel = 0;
+      if (!markers)
+        nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>());
 
       constexpr int kUnlabeled = -2;
       constexpr int kInqueue   = -1;
@@ -48,7 +49,7 @@ namespace mln::morpho
       {
         output.extension().fill(kWaterline);
 
-        mln_foreach(auto px, output.pixels())
+        mln_foreach (auto px, output.pixels())
         {
           // Not a local minimum => early exit
           if (px.val() != 0)
@@ -88,7 +89,7 @@ namespace mln::morpho
           bool    has_single_adjacent_marker = false;
           for (auto nxOut : nbh(pxOut))
           {
-            int nlbl = nxOut.val();
+            const int nlbl = nxOut.val();
             if (nlbl <= 0)
               continue;
             else if (common_label == kWaterline)
@@ -136,11 +137,55 @@ namespace mln::morpho
 
       return nlabel;
     }
-  }
+
+    template <class I, class N, class O>
+    int watershed_partition(I input, N nbh, O output, bool markers = false)
+    {
+      using V = image_value_t<I>;
+
+      int nlabel = 0;
+      if (!markers)
+        nlabel = mln::labeling::impl::local_minima(input, nbh, output, std::less<V>());
+
+      constexpr auto impl_type = mln::morpho::details::pqueue_impl::linked_list;
+      mln::morpho::details::pqueue_fifo<I, impl_type, /* reversed = */ true> pqueue(input);
+      {
+        output.extension().fill(-1);
+        mln_foreach (auto pix, output.pixels())
+        {
+          if (pix.val() <= 0)
+            continue;
+          for (auto p : nbh(pix))
+          {
+            if (p.val() == 0)
+            {
+              pqueue.push(input(pix.point()), pix.point());
+              break;
+            }
+          }
+        }
+
+        while (!pqueue.empty())
+        {
+          auto [lvl, p] = pqueue.top();
+          pqueue.pop();
+          for (auto q : nbh(p))
+          {
+            if (output.at(q) == 0) // If extension then -1
+            {
+              output(q) = output(p);
+              pqueue.push(input(q), q);
+            }
+          }
+        }
+      }
+      return nlabel;
+    }
+  } // namespace impl
 
   template <class Label_t, class InputImage, class Neighborhood>
   image_ch_value_t<std::remove_reference_t<InputImage>, Label_t> //
-  watershed(InputImage&& ima, Neighborhood&& nbh, int& nlabel)
+  watershed(InputImage&& ima, Neighborhood&& nbh, int& nlabel, bool waterline)
   {
     using I = std::remove_reference_t<InputImage>;
     using N = std::remove_reference_t<Neighborhood>;
@@ -158,22 +203,53 @@ namespace mln::morpho
     image_build_error_code err = IMAGE_BUILD_OK;
 
     auto output = imchvalue<Label_t>(ima) //
-      .adjust(nbh)
-      .set_init_value(kUninitialized)
-      .get_status(&err)
-      .build();
+                      .adjust(nbh)
+                      .set_init_value(kUninitialized)
+                      .get_status(&err)
+                      .build();
 
     if (err == IMAGE_BUILD_OK)
     {
-      nlabel = impl::watershed(ima, nbh, output);
+      if (waterline)
+        nlabel = impl::watershed(ima, nbh, output);
+      else
+        nlabel = impl::watershed_partition(ima, nbh, output);
     }
     else
     {
       mln::trace::warn("[Performance] The extension is not wide enough");
       auto out = view::value_extended(output, kUninitialized);
-      nlabel   = impl::watershed(ima, nbh, out);
+      if (waterline)
+        nlabel = impl::watershed(ima, nbh, out);
+      else
+        nlabel = impl::watershed_partition(ima, nbh, out);
     }
     return output;
   }
 
-} // namespace mln::morpho::
+  template <class Label_t, class InputImage, class SeedImage, class Neighborhood>
+  image_ch_value_t<std::remove_reference_t<InputImage>, Label_t> //
+  watershed_from_markers(InputImage&& ima, Neighborhood&& nbh, SeedImage&& seeds, int& nlabel)
+  {
+    using I = std::remove_reference_t<InputImage>;
+    using N = std::remove_reference_t<Neighborhood>;
+    using S = std::remove_reference_t<SeedImage>;
+
+    static_assert(mln::is_a<I, mln::details::Image>());
+    static_assert(mln::is_a<N, mln::details::Neighborhood>());
+
+    static_assert(std::is_integral<Label_t>::value, "The label type must integral.");
+    static_assert(std::is_signed<Label_t>::value, "The label type must be signed.");
+    static_assert(std::numeric_limits<Label_t>::max() >= std::numeric_limits<image_value_t<S>>::max());
+
+    mln_entering("mln::morpho::watershed_from_markers");
+    assert(ima.domain() == seeds.domain());
+
+    auto output = mln::labeling::blobs<Label_t>(seeds, nbh, nlabel);
+    if (output.border() < nbh.radial_extent())
+      impl::watershed(ima, nbh, view::value_extended(output, 0), true);
+    else
+      impl::watershed(ima, nbh, output, true);
+    return output;
+  }
+} // namespace mln::morpho

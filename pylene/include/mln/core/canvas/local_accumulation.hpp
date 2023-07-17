@@ -3,8 +3,6 @@
 #include <mln/core/canvas/local_algorithm.hpp>
 #include <mln/core/box.hpp>
 
-//#include <boost/container/small_vector.hpp>
-
 namespace mln::canvas
 {
 

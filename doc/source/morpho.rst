@@ -47,8 +47,10 @@ Component Trees & Hierarchical Representations
     morpho/component_tree
     morpho/maxtree
     morpho/tos
+    morpho/multivariate_component_tree
     morpho/alphatree
-
+    morpho/watershed_hierarchy
+    morpho/waterfall
 
 
 

@@ -7,6 +7,7 @@
 
 #include <range/v3/iterator/insert_iterators.hpp>
 #include <range/v3/algorithm/copy.hpp>
+#include <range/v3/range/conversion.hpp>
 
 #include <vector>
 
@@ -28,7 +29,7 @@ TEST(Range, transform_on_containers)
 
   static_assert(::ranges::cpp20::forward_range<decltype(v)>);
   static_assert(::ranges::cpp20::forward_range<decltype(rng)>);
-  ASSERT_EQ(std::vector({4, 6}), ::ranges::to_vector(rng));
+  ASSERT_EQ(std::vector({4, 6}), ::ranges::to<std::vector>(rng));
 }
 
 
@@ -81,7 +82,7 @@ TEST(Range, transform2_on_containers)
   std::vector<int> v2  = {3, 4};
   auto             rng = mln::ranges::view::transform(v, v2, [](int x, int y) { return x + y; });
 
-  ASSERT_EQ(std::vector({5, 7}), ::ranges::to_vector(rng));
+  ASSERT_EQ(std::vector({5, 7}), ::ranges::to<std::vector>(rng));
 }
 
 

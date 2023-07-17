@@ -105,3 +105,22 @@ TEST(Morpho, DISABLED_opening_non_symetric)
   ASSERT_IMAGES_EQ_EXP(g_1, ref_1);
 }
 
+TEST(Morpho, opening_cross_signed)
+{
+  mln::image2d<int16_t> f =
+    {{1, 0, 1, 0}, //
+     {1, 1, 1, 1}, //
+     {1, 0, 1, 0}}; //
+
+  // With no border
+  mln::image2d<int16_t> ref =
+    {{1, 0, 1, 0}, //
+     {1, 1, 1, 1}, //
+     {1, 0, 1, 0}}; //
+
+  mln::se::mask2d m = {{0,1,0}, {1, 1, 1}, {0, 1, 0}};
+
+  auto g = mln::morpho::opening(f, m);
+
+  ASSERT_IMAGES_EQ_EXP(g, ref);
+}

@@ -3,9 +3,6 @@
 #include <type_traits>
 #include <algorithm>
 
-#include <concepts/type_traits.hpp>
-
-
 namespace mln
 {
   // Forward declaration
@@ -87,7 +84,9 @@ namespace mln
     // Constructors
     // \{
     _point() = default;
-    _point(const _point&) = default;
+
+    // Defaulted
+    //_point(const _point&) = default;
 
     // Special case for dynamic coord
     template <int d = Impl::ndim, class = std::enable_if_t<d == -1 && has_value_semantic>>
@@ -202,7 +201,9 @@ namespace mln
 
 
       pcontainer() = default;
-      pcontainer(const pcontainer& other) = default;
+
+      // Defaulted copy constructor
+      // pcontainer(const pcontainer& other) = default;
 
       // From a span
       constexpr pcontainer([[maybe_unused]]  int dim, const T* data) noexcept
@@ -580,7 +581,7 @@ namespace mln
 
 
 // Specialization of std::common_reference
-namespace concepts
+namespace std
 {
   template <class UImpl, class VImpl, template<class> class TQual, template<class> class UQual>
     struct basic_common_reference<mln::_point<UImpl>, mln::_point<VImpl>, TQual, UQual>

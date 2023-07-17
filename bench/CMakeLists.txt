@@ -39,7 +39,7 @@ add_library(BenchImpl
 
 set_target_properties(BenchImpl PROPERTIES COMPILE_FLAGS ${STANDALONE_COMPILE_FLAGS})
 target_include_directories(BenchImpl PUBLIC include)
-target_link_libraries(BenchImpl PUBLIC Pylene::Pylene)
+target_link_libraries(BenchImpl PUBLIC Pylene::Core Pylene::IO-freeimage)
 
 
 add_subdirectory(tests)
@@ -63,6 +63,8 @@ add_benchmark(BMMorphoBase              BMMorphoBase.cpp)
 add_benchmark(BMMorphers                BMMorphers.cpp BMMorphers_main.cpp)
 add_benchmark(BMReference_Linear        BMReference_Linear.cpp BMReference_Linear_Reversed.cpp BMReference_Linear_main.cpp)
 add_benchmark(BMReference_Neighborhood  BMReference_Neighborhood_main.cpp)
-
+add_benchmark(BMBufferPrimitives        BMBufferPrimitives.cpp)
+add_benchmark(BMAlphaTree               BMAlphaTree.cpp)
+add_benchmark(BMWatershedHierarchy      BMWatershedHierarchy.cpp)
 
 ExternalData_Add_Target(fetch-external-data)

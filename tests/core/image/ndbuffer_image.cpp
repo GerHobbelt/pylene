@@ -808,6 +808,65 @@ TEST(ndbuffer_image, clip_invalid_roi)
   EXPECT_THROW(img.clip(roi), std::runtime_error);
 }
 
+
+/********************************************************************/
+/****             Test Slicing                                   ****/
+/********************************************************************/
+
+
+TEST(ndbuffer_image, slice2d)
+{
+  mln::image_build_params params;
+  params.border = 0;
+
+  {
+    mln::ndbuffer_image img(kSampleType, kWidth, kHeight, params);
+    iota(img);
+
+    auto f = img.row(1);
+    EXPECT_EQ(f.width(), kWidth);
+    EXPECT_EQ(f.pdim(), 1);
+    EXPECT_EQ(*static_cast<const uint32_t*>(f({0})), kWidth);
+  }
+  {
+    mln::image2d<uint32_t> img(kWidth, kHeight, params);
+    iota(img);
+
+    mln::image1d<uint32_t> f = img.row(1);
+    EXPECT_EQ(f.width(), kWidth);
+    EXPECT_EQ(f.pdim(), 1);
+    EXPECT_EQ(f({0}), kWidth);
+  }
+}
+
+TEST(ndbuffer_image, slice3d)
+{
+  mln::image_build_params params;
+  params.border = 0;
+
+  {
+    mln::ndbuffer_image img(kSampleType, kWidth, kHeight, kDepth, params);
+    iota(img);
+
+    auto f = img.slice(1);
+    EXPECT_EQ(f.width(), kWidth);
+    EXPECT_EQ(f.height(), kHeight);
+    EXPECT_EQ(f.pdim(), 2);
+    EXPECT_EQ(*static_cast<const uint32_t*>(f({0,0})), kWidth * kHeight);
+  }
+  {
+    mln::image3d<uint32_t> img(kWidth, kHeight, kDepth, params);
+    iota(img);
+
+    mln::image2d<uint32_t> f = img.slice(1);
+    EXPECT_EQ(f.width(), kWidth);
+    EXPECT_EQ(f.height(), kHeight);
+    EXPECT_EQ(f.pdim(), 2);
+    EXPECT_EQ(f({0,0}), kWidth * kHeight);
+  }
+}
+
+
 /********************************************************************/
 /****             Test Border Size Computation                   ****/
 /********************************************************************/
@@ -1395,6 +1454,4 @@ TEST(image2d, pixel_range_write)
   }
 
 }
-
-
 

@@ -1,25 +1,26 @@
 #pragma once
 
+#include <concepts>
 
 namespace mln::concepts
 {
 
   // Value
   template <typename Val>
-  concept Value = ::concepts::semiregular<Val>;
+  concept Value = std::semiregular<Val>;
 
 
   // ComparableValue
   template <typename RegVal>
   concept ComparableValue =
-    ::concepts::regular<RegVal>;
+    std::regular<RegVal>;
 
 
   // OrderedValue
   template <typename STORegVal>
   concept OrderedValue =
-    ::concepts::regular<STORegVal> &&
-    ::concepts::totally_ordered<STORegVal>;
+    std::regular<STORegVal> &&
+    std::totally_ordered<STORegVal>;
 
   // clang-format on
 

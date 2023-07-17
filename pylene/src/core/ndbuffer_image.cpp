@@ -143,6 +143,7 @@ namespace mln
   }
 
 
+
   void __ndbuffer_image<void, -1>::__init(alloc_fun_t __allocate, sample_type_id sample_type,
                                           std::size_t sample_type_size, int dim, const int topleft[], const int sizes[],
                                           const std::ptrdiff_t byte_strides[], const image_build_params& params)
@@ -433,6 +434,39 @@ namespace mln
     }
   }
 
+  void __ndbuffer_image<void, -1>::shift_domain_topleft(ConstPointRef p) noexcept
+  {
+    int dp[PYLENE_NDBUFFER_MAX_DIM];
+
+    assert(p.dim() == m_pdim);
+    for (int i = 0; i < m_pdim; ++i)
+    {
+      m_axes[i].domain_begin += p[i];
+      m_axes[i].domain_end += p[i];
+      m_axes[i].vbox_begin += p[i];
+      m_axes[i].vbox_end += p[i];
+      dp[i] = -p[i];
+    }
+    this->m_buffer = reinterpret_cast<std::byte*>(Impl::get_pointer(this, dp));
+  }
+
+  void __ndbuffer_image<void, -1>::set_domain_topleft(ConstPointRef p) noexcept
+  {
+    int dp[PYLENE_NDBUFFER_MAX_DIM];
+
+    assert(p.dim() == m_pdim);
+    for (int i = 0; i < m_pdim; ++i)
+    {
+      int delta = p[i] - m_axes[i].domain_begin;
+      m_axes[i].domain_begin += delta;
+      m_axes[i].domain_end += delta;
+      m_axes[i].vbox_begin += delta;
+      m_axes[i].vbox_end += delta;
+      dp[i] = -delta;
+    }
+    this->m_buffer = reinterpret_cast<std::byte*>(Impl::get_pointer(this, dp));
+  }
+
 
 
 
@@ -588,6 +622,16 @@ namespace mln
     auto out = *this;
     Impl::select(&out, 2, begin, end);
     return out;
+  }
+
+  std::shared_ptr<internal::ndbuffer_image_data>& __ndbuffer_image<void, -1>::__data()
+  {
+    return m_data;
+  }
+
+  const std::shared_ptr<internal::ndbuffer_image_data>& __ndbuffer_image<void, -1>::__data() const
+  {
+    return m_data;
   }
 
 

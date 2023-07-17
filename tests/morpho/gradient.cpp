@@ -120,7 +120,7 @@ TEST(Morpho, gradient_grayscale)
 
 
 // This test is disabled because of a lifetime problem on the filter view (the domain lifetime depends on the image which might be a temporary).
-TEST(Morpho, DISABLED_gradient_on_view)
+/*TEST(Morpho, DISABLED_gradient_on_view)
 {
   using namespace mln::view::ops;
   mln::image2d<uint8_t> ima(10, 5);
@@ -151,7 +151,7 @@ TEST(Morpho, DISABLED_gradient_on_view)
 
   //mln::paste(out, out2);
   ASSERT_IMAGES_EQ_EXP(out2, ref);
-}
+}*/
 
 
 // On colors

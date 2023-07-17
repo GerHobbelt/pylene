@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mln/core/range/private/mdrange_facade.hpp>
-#include <concepts/type_traits.hpp>
 
 #include <range/v3/view/transform.hpp>
 
@@ -205,15 +204,15 @@ namespace mln::ranges
     template <MDRange Rng, class Fun>
     [[gnu::always_inline]] inline auto transform(Rng&& rng, Fun fun)
     {
-      using R = ::concepts::remove_cvref_t<Rng>;
+      using R = std::remove_cvref_t<Rng>;
       return transform_mdview<R, Fun>{std::forward<Rng>(rng), std::move(fun)};
     }
 
     template <MDRange Rng1, MDRange Rng2, class Fun>
     [[gnu::always_inline]] inline auto transform(Rng1&& rng1, Rng2&& rng2, Fun fun)
     {
-      using R1 = ::concepts::remove_cvref_t<Rng1>;
-      using R2 = ::concepts::remove_cvref_t<Rng2>;
+      using R1 = std::remove_cvref_t<Rng1>;
+      using R2 = std::remove_cvref_t<Rng2>;
       return transform2_mdview<R1, R2, Fun>{std::forward<Rng1>(rng1), std::forward<Rng2>(rng2), std::move(fun)};
     }
 

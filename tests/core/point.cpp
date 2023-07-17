@@ -1,10 +1,10 @@
 #include <mln/core/point.hpp>
 
 #include <mln/core/concepts/point.hpp>
-#include <concepts/concepts.hpp>
 
 #include <gtest/gtest.h>
 
+#include <concepts>
 
 template <typename U, typename V = U>
 concept AddableWith = requires(U a, V b)
@@ -15,10 +15,10 @@ concept AddableWith = requires(U a, V b)
   { b += a } -> V&;
   { b -= a } -> V&;
 #else
-  { a += b } -> ::concepts::same_as<U&>;
-  { a -= b } -> ::concepts::same_as<U&>;
-  { b += a } -> ::concepts::same_as<V&>;
-  { b -= a } -> ::concepts::same_as<V&>;
+  { a += b } -> std::same_as<U&>;
+  { a -= b } -> std::same_as<U&>;
+  { b += a } -> std::same_as<V&>;
+  { b -= a } -> std::same_as<V&>;
 #endif
   { a + b };
   { a - b };
@@ -28,7 +28,7 @@ concept AddableWith = requires(U a, V b)
 
 
 template <typename U, typename V>
-concept Interopable = AddableWith<U, V> && ::concepts::totally_ordered_with<U, V>; // Implies EqualityComparable<U, V>
+concept Interopable = AddableWith<U, V> && std::totally_ordered_with<U, V>; // Implies EqualityComparable<U, V>
 
 
 TEST(Point, ConceptChecking)
@@ -45,32 +45,32 @@ TEST(Point, ConceptChecking)
   static_assert(mln::concepts::Point<mln::ConstPointRef>);
 
   // Static to * conversion
-  static_assert(::concepts::convertible_to<mln::ndpoint<+1, short>, mln::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpoint<+1, short>, mln::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpoint<+1, int>&, mln::ndpointref<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpoint<+1, int>&, mln::ndpointref<+1, int>>);
-  static_assert(::concepts::convertible_to<const mln::ndpoint<+1, int>&, mln::ndpointref<-1, const int>>);
-  static_assert(::concepts::convertible_to<const mln::ndpoint<+1, int>&, mln::ndpointref<+1, const int>>);
+  static_assert(std::convertible_to<mln::ndpoint<+1, short>, mln::ndpoint<+1, int>>);
+  static_assert(std::convertible_to<mln::ndpoint<+1, short>, mln::ndpoint<-1, int>>);
+  static_assert(std::convertible_to<mln::ndpoint<+1, int>&, mln::ndpointref<-1, int>>);
+  static_assert(std::convertible_to<mln::ndpoint<+1, int>&, mln::ndpointref<+1, int>>);
+  static_assert(std::convertible_to<const mln::ndpoint<+1, int>&, mln::ndpointref<-1, const int>>);
+  static_assert(std::convertible_to<const mln::ndpoint<+1, int>&, mln::ndpointref<+1, const int>>);
 
   // Dynamic to * conversion
-  static_assert(::concepts::convertible_to<mln::ndpoint<-1, short>, mln::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpoint<-1, short>, mln::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpoint<-1, int>&, mln::ndpointref<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpoint<-1, int>&, mln::ndpointref<+1, int>>);
-  static_assert(::concepts::convertible_to<const mln::ndpoint<-1, int>&, mln::ndpointref<-1, const int>>);
-  static_assert(::concepts::convertible_to<const mln::ndpoint<-1, int>&, mln::ndpointref<+1, const int>>);
+  static_assert(std::convertible_to<mln::ndpoint<-1, short>, mln::ndpoint<+1, int>>);
+  static_assert(std::convertible_to<mln::ndpoint<-1, short>, mln::ndpoint<-1, int>>);
+  static_assert(std::convertible_to<mln::ndpoint<-1, int>&, mln::ndpointref<-1, int>>);
+  static_assert(std::convertible_to<mln::ndpoint<-1, int>&, mln::ndpointref<+1, int>>);
+  static_assert(std::convertible_to<const mln::ndpoint<-1, int>&, mln::ndpointref<-1, const int>>);
+  static_assert(std::convertible_to<const mln::ndpoint<-1, int>&, mln::ndpointref<+1, const int>>);
 
   // Static Ref to * conversion
-  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpointref<-1, const short>>);
-  static_assert(::concepts::convertible_to<mln::ndpointref<+1, short>, mln::ndpointref<+1, short>>);
+  static_assert(std::convertible_to<mln::ndpointref<+1, short>, mln::ndpoint<+1, int>>);
+  static_assert(std::convertible_to<mln::ndpointref<+1, short>, mln::ndpoint<-1, int>>);
+  static_assert(std::convertible_to<mln::ndpointref<+1, short>, mln::ndpointref<-1, const short>>);
+  static_assert(std::convertible_to<mln::ndpointref<+1, short>, mln::ndpointref<+1, short>>);
 
   // Dynamic Ref to * conversion
-  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpoint<+1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpoint<-1, int>>);
-  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpointref<-1, short>>);
-  static_assert(::concepts::convertible_to<mln::ndpointref<-1, short>, mln::ndpointref<+1, const short>>);
+  static_assert(std::convertible_to<mln::ndpointref<-1, short>, mln::ndpoint<+1, int>>);
+  static_assert(std::convertible_to<mln::ndpointref<-1, short>, mln::ndpoint<-1, int>>);
+  static_assert(std::convertible_to<mln::ndpointref<-1, short>, mln::ndpointref<-1, short>>);
+  static_assert(std::convertible_to<mln::ndpointref<-1, short>, mln::ndpointref<+1, const short>>);
 
 
 

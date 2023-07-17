@@ -22,11 +22,11 @@ namespace
   }
 } // namespace
 
-void test_direction(mln::point2d dir)
+void test_direction(mln::point2d dir, mln::box2d roi)
 {
   using namespace mln::view::ops;
 
-  mln::box2d roi(20, 10);
+
 
   mln::image_build_params params;
   params.init_value = 0;
@@ -41,25 +41,64 @@ void test_direction(mln::point2d dir)
 }
 
 
-TEST(Dilation, Traverse)
+TEST(TraverseByDirection, TraverseBox)
 {
+  mln::box2d roi(20, 10);
   // Positive offsets
-  test_direction({+0, +1});
-  test_direction({+1, +0});
-  test_direction({+1, +3});
-  test_direction({+3, +1});
-  test_direction({-1, -3});
-  test_direction({-3, -1});
+  test_direction({+0, +1}, roi);
+  test_direction({+1, +0}, roi);
+  test_direction({+1, +3}, roi);
+  test_direction({+3, +1}, roi);
+  test_direction({-1, -3}, roi);
+  test_direction({-3, -1}, roi);
 
   // Negative
-  test_direction({+0, -1});
-  test_direction({-1, +0});
-  test_direction({+1, -3});
-  test_direction({+3, -1});
-  test_direction({-1, +3});
-  test_direction({-3, +1});
-
-
-
-
+  test_direction({+0, -1}, roi);
+  test_direction({-1, +0}, roi);
+  test_direction({+1, -3}, roi);
+  test_direction({+3, -1}, roi);
+  test_direction({-1, +3}, roi);
+  test_direction({-3, +1}, roi);
 }
+
+TEST(TraverseByDirection, TraverseOneLine)
+{
+  mln::box2d roi(20, 1);
+  // Positive offsets
+  test_direction({+0, +1}, roi);
+  test_direction({+1, +0}, roi);
+  test_direction({+1, +3}, roi);
+  test_direction({+3, +1}, roi);
+  test_direction({-1, -3}, roi);
+  test_direction({-3, -1}, roi);
+
+  // Negative
+  test_direction({+0, -1}, roi);
+  test_direction({-1, +0}, roi);
+  test_direction({+1, -3}, roi);
+  test_direction({+3, -1}, roi);
+  test_direction({-1, +3}, roi);
+  test_direction({-3, +1}, roi);
+}
+
+TEST(TraverseByDirection, TraverseOneColumn)
+{
+  mln::box2d roi(1, 10);
+  // Positive offsets
+  test_direction({+0, +1}, roi);
+  test_direction({+1, +0}, roi);
+  test_direction({+1, +3}, roi);
+  test_direction({+3, +1}, roi);
+  test_direction({-1, -3}, roi);
+  test_direction({-3, -1}, roi);
+
+  // Negative
+  test_direction({+0, -1}, roi);
+  test_direction({-1, +0}, roi);
+  test_direction({+1, -3}, roi);
+  test_direction({+3, -1}, roi);
+  test_direction({-1, +3}, roi);
+  test_direction({-3, +1}, roi);
+}
+
+

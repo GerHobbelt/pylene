@@ -10,3 +10,7 @@ compile_commands.json
 /venv_*/
 /**/.DS_Store
 .nfs*
+.history
+CMakeUserPresets.json
+.vscode
+.cache

@@ -2,7 +2,6 @@
 
 #include <mln/core/concepts/structuring_element.hpp>
 
-#include <concepts/concepts.hpp>
 #include <range/v3/range/concepts.hpp>
 
 namespace mln::details
@@ -27,8 +26,8 @@ namespace mln::concepts
       { se.before(px) } -> ::ranges::cpp20::forward_range;
       { se.after(px) }  -> ::ranges::cpp20::forward_range;
 
-      requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se.before(p))>, P>;
-      requires ::concepts::convertible_to<::ranges::range_value_t<decltype(se.after(p))>, P>;
+      requires std::convertible_to<::ranges::range_value_t<decltype(se.before(p))>, P>;
+      requires std::convertible_to<::ranges::range_value_t<decltype(se.after(p))>, P>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se.before(px))>>;
       requires concepts::Pixel<::ranges::range_value_t<decltype(se.after(px))>>;
     };

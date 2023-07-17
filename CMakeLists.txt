@@ -1,28 +1,11 @@
-cmake_minimum_required(VERSION 3.8.2)
+cmake_minimum_required(VERSION 3.14)
 project(Pylene)
 
 # Add FindTBB directory to CMake's module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-
-
-if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  include("${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-  conan_set_rpath()
-  conan_set_std()
-  conan_set_fpic()
-  conan_check_compiler()
-  conan_set_libcxx()
-  conan_set_vs_runtime()
-endif()
-
-
-if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
-  include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake")
-endif ()
-
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${CMAKE_BINARY_DIR}")
 
 find_package(FreeImage REQUIRED)
-
 
 # CONFIGURE COMPILER LAUNCHERS
 
@@ -62,6 +45,9 @@ option(PYLENE_BUILD_TESTING "ON to build the test suite" ON)
 
 # Compiler configurations
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10")
+    message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler minimum version required is 10 (Got ${CMAKE_CXX_COMPILER_VERSION})")
+  endif()
   add_compile_options(
     "-Wextra"
     "-Wall"
@@ -95,6 +81,8 @@ endif ()
 #### Configuration of the Compiler ###
 
 # Subdirectories
+add_library(Pylene INTERFACE)
+add_library(Pylene::Pylene ALIAS Pylene)
 add_subdirectory(pylene)
 
 if (NOT PYLENE_BUILD_LIBS_ONLY)
@@ -115,6 +103,64 @@ if (NOT PYLENE_BUILD_LIBS_ONLY)
   add_custom_target(build-doc)
   add_subdirectory(doc)
 endif ()
+
+
+####################################################
+####### Installation & CMAKE module files ##########
+####################################################
+
+target_link_libraries(Pylene INTERFACE Pylene::Core)
+
+include(GNUInstallDirs)
+
+set(PyleneTargets Pylene Pylene-core Pylene-bp Pylene-io-freeimage)
+set(OptionalPyleneTargets Pylene-io-fits Pylene-scribo)
+
+foreach(tgt ${OptionalPyleneTargets})
+  if (TARGET ${tgt})
+    list(APPEND PyleneTargets ${tgt})
+  endif()
+endforeach()
+
+install(TARGETS ${PyleneTargets}
+        EXPORT PyleneTargets)
+
+write_basic_package_version_file(
+    pylene/PyleneConfigVersion.cmake
+    VERSION 0.1
+    COMPATIBILITY AnyNewerVersion
+    )
+
+configure_file(
+    pylene/PyleneConfig.cmake.in
+    pylene/PyleneConfig.cmake
+    @ONLY
+    )
+
+install(EXPORT PyleneTargets
+        FILE PyleneTargets.cmake
+        NAMESPACE Pylene::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene
+        )
+
+install(DIRECTORY pylene/include/mln TYPE INCLUDE)
+if (TARGET Pylene-scribo)
+  install(DIRECTORY pylene/include/scribo
+    TYPE INCLUDE
+    PATTERN private EXCLUDE)
+endif (TARGET Pylene-scribo)
+
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/pylene/PyleneConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pylene)
+
+
+
+####################################################
+#######          Packaging                ##########
+####################################################
 
 
 set(CPACK_SOURCE_GENERATOR "TBZ2")

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <concepts/concepts.hpp>
+#include <concepts>
 
 namespace mln::concepts
 {
 
   // clang-format off
   template <typename Idx>
-  concept Index = ::concepts::signed_integral<Idx>;
+  concept Index = std::signed_integral<Idx>;
 
   // clang-format on
 

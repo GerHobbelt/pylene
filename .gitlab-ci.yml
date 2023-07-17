@@ -19,7 +19,7 @@ variables:
     CONAN_CMAKE_GENERATOR: Ninja
     CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
     CCACHE_MAXSIZE: 2G
-    DOC_PERSIST_BRANCHES: "next" #"master:next"
+    DOC_PERSIST_BRANCHES: "master:next"
 
 before_script:
     - pip install --upgrade conan

@@ -36,6 +36,8 @@ This project relies on some third part libraries, which are handled by the [Cona
 The preferred and strongly recommended way to use Pylene is using Conan, a C++ package manager, and CMake. For using the
 library by other means, refer to the [documentation](http://olena.pages.lre.epita.fr/pylene/next/tutorial/installation)
 
+Documentation for all versions can be found [here](http://olena.pages.lre.epita.fr/pylene/).
+
 1. Add to the Conan remote the artifactory of the LRE, where the Pylene artifact is stored:
 
 ```

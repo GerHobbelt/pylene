@@ -43,7 +43,7 @@ target_include_directories(Pylene-core PUBLIC
 
 target_include_directories(Pylene-core SYSTEM PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
 target_link_libraries(Pylene-core PUBLIC range-v3::range-v3 xsimd)
-target_link_libraries(Pylene-core PUBLIC fmt::fmt)
+target_link_libraries(Pylene-core PRIVATE fmt::fmt)
 
 add_library(Pylene-bp OBJECT
   src/bp/transpose.cpp
@@ -107,7 +107,7 @@ target_include_directories(Pylene-io-freeimage PUBLIC
                            $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(Pylene-io-freeimage PUBLIC Pylene-core)
-target_link_libraries(Pylene-io-freeimage PRIVATE freeimage::FreeImage)
+target_link_libraries(Pylene-io-freeimage PRIVATE fmt::fmt freeimage::FreeImage)
 
 if (cfitsio_FOUND)
   add_library(Pylene-io-fits)
@@ -121,7 +121,7 @@ if (cfitsio_FOUND)
                              $<INSTALL_INTERFACE:include>
   )
   target_link_libraries(Pylene-io-fits PUBLIC Pylene-core)
-  target_link_libraries(Pylene-io-fits PRIVATE cfitsio::cfitsio)
+  target_link_libraries(Pylene-io-fits PRIVATE fmt::fmt cfitsio::cfitsio)
 endif(cfitsio_FOUND)
 
 if (Eigen3_FOUND)

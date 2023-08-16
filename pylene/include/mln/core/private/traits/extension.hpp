@@ -37,10 +37,10 @@ namespace mln
   template <typename E>
   struct extension_traits
   {
-    typedef typename E::support_fill        support_fill;
-    typedef typename E::support_mirror      support_mirror;
-    typedef typename E::support_periodize   support_periodize;
-    typedef typename E::support_clamp       support_clamp;
-    typedef typename E::support_extend_with support_extend_with;
+    using support_fill        = typename E::support_fill;
+    using support_mirror      = typename E::support_mirror;
+    using support_periodize   = typename E::support_periodize;
+    using support_clamp       = typename E::support_clamp;
+    using support_extend_with = typename E::support_extend_with;
   };
 } // namespace mln

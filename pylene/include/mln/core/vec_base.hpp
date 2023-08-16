@@ -4,6 +4,7 @@
 #include <mln/core/config.hpp>
 #include <mln/core/literal/vectorial.hpp>
 
+#include <concepts>
 #include <iostream>
 #include <type_traits>
 
@@ -12,8 +13,7 @@
 // w = u + v; <=> w[i] = u[i] + v[i] forall i
 #define VEC_BASE_GEN_EW_OP(Trait, Op)                                                                                  \
   template <typename U>                                                                                                \
-  requires (vec_base_traits<tag>::Trait)                                                                               \
-  vec_base& operator Op(const vec_base<U, dim, tag>& o)                                                                \
+  requires(vec_base_traits<tag>::Trait) vec_base& operator Op(const vec_base<U, dim, tag>& o)                          \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       v_[i] Op o.v_[i];                                                                                                \
@@ -25,8 +25,7 @@
 // u = v + a; <=> u[i] = v[i] + a forall i
 #define VEC_BASE_GEN_EXT_OP(Trait, Op)                                                                                 \
   template <typename U>                                                                                                \
-  requires(vec_base_traits<tag>::Trait)                                                                                \
-  vec_base& operator Op(const U& o)                                                                                    \
+  requires(vec_base_traits<tag>::Trait) vec_base& operator Op(const U& o)                                              \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       v_[i] Op o;                                                                                                      \
@@ -38,8 +37,7 @@
 // u < v iif u[i] = v[i] forall i
 #define VEC_BASE_GEN_REL(Trait, Op)                                                                                    \
   template <typename U>                                                                                                \
-  requires(vec_base_traits<tag>::Trait)                                                                                \
-  bool operator Op(const vec_base<U, dim, tag>& o) const                                                               \
+  requires(vec_base_traits<tag>::Trait) bool operator Op(const vec_base<U, dim, tag>& o) const                         \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       if (!(v_[i] Op o.v_[i]))                                                                                         \
@@ -52,8 +50,7 @@
 // u op v iif u[i] op v[i] forall i
 #define VEC_BASE_GEN_REL_ALL(Trait, Op)                                                                                \
   template <typename U>                                                                                                \
-  requires(vec_base_traits<tag>::Trait)                                                                                \
-  bool operator Op(const vec_base<U, dim, tag>& o) const                                                               \
+  requires(vec_base_traits<tag>::Trait) bool operator Op(const vec_base<U, dim, tag>& o) const                         \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       if (!(v_[i] Op o[i]))                                                                                            \
@@ -66,8 +63,7 @@
 // u op v iif exists i u[i] op v[i]
 #define VEC_BASE_GEN_REL_ANY(Trait, Op)                                                                                \
   template <typename U>                                                                                                \
-  requires(vec_base_traits<tag>::Trait)                                                                                \
-  bool operator Op(const vec_base<U, dim, tag>& o) const                                                               \
+  requires(vec_base_traits<tag>::Trait) bool operator Op(const vec_base<U, dim, tag>& o) const                         \
   {                                                                                                                    \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       if (v_[i] Op o[i])                                                                                               \
@@ -78,12 +74,11 @@
 // Outside class, Element-wise operator
 #define VEC_BASE_GEN_EW_OP_EXT(TraitName, Op)                                                                          \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
-  requires(vec_base_traits<tag>::TraitName)                                                                            \
-  vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>inline                                            \
-      operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                      \
+  requires(vec_base_traits<tag>::TraitName) vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>        \
+  inline operator Op(const vec_base<T, dim, tag>& x, const vec_base<U, dim, tag>& y)                                   \
   {                                                                                                                    \
     using R = vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>;                                     \
-    R                                                                           r;                                     \
+    R r;                                                                                                               \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = x[i] Op y[i];                                                                                             \
     return r;                                                                                                          \
@@ -92,24 +87,24 @@
 // Outside class, Relational operator
 #define VEC_BASE_GEN_EXT_OP_EXT(TraitName, Op)                                                                         \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
-  requires(vec_base_traits<tag>::TraitName && std::is_convertible_v<U, T>)                                             \
-  vec_base_helper_t<std::common_type<T, U>, dim, tag> inline                                                           \
-      operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                          \
+  requires(vec_base_traits<tag>::TraitName && std::convertible_to<U, T>)                                               \
+      vec_base_helper_t<std::common_type<T, U>, dim, tag>                                                              \
+  inline operator Op(const vec_base<T, dim, tag>& x, const U& y)                                                       \
   {                                                                                                                    \
     using R = vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>;                                     \
-    R                                                                           r;                                     \
+    R r;                                                                                                               \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = x[i] Op y;                                                                                                \
     return r;                                                                                                          \
   }                                                                                                                    \
                                                                                                                        \
   template <typename T, typename U, unsigned dim, typename tag>                                                        \
-  requires(vec_base_traits<tag>::TraitName && std::is_convertible<U, T>::value)                                        \
-  vec_base_helper_t<std::common_type<T, U>, dim, tag> inline                                                           \
-      operator Op(const U& y, const vec_base<T, dim, tag>& x)                                                          \
+  requires(vec_base_traits<tag>::TraitName && std::convertible_to<U, T>)                                               \
+      vec_base_helper_t<std::common_type<T, U>, dim, tag>                                                              \
+  inline operator Op(const U& y, const vec_base<T, dim, tag>& x)                                                       \
   {                                                                                                                    \
-    typedef vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag> R;                                     \
-    R                                                                           r;                                     \
+    using R = vec_base<decltype(std::declval<T>() + std::declval<U>()), dim, tag>;                                     \
+    R r;                                                                                                               \
     for (unsigned i = 0; i < dim; ++i)                                                                                 \
       r[i] = y Op x[i];                                                                                                \
     return r;                                                                                                          \
@@ -147,15 +142,15 @@ namespace mln
       friend struct vec_base;
 
     public:
-      using value_type = T;
-      using pointer = T*;
-      using reference = T&;
-      using iterator = T*;
-      using const_iterator = const T*;
-      using reverse_iterator = std::reverse_iterator<T*>;
+      using value_type             = T;
+      using pointer                = T*;
+      using reference              = T&;
+      using iterator               = T*;
+      using const_iterator         = const T*;
+      using reverse_iterator       = std::reverse_iterator<T*>;
       using const_reverse_iterator = std::reverse_iterator<const T*>;
-      using size_type = size_t;
-      using difference_type = std::ptrdiff_t;
+      using size_type              = size_t;
+      using difference_type        = std::ptrdiff_t;
 
       static constexpr unsigned ndim = dim;
 
@@ -190,13 +185,13 @@ namespace mln
           v_[i] = x;
       }
 
-      constexpr vec_base(const T& x, const T& y) requires (dim == 2)
+      constexpr vec_base(const T& x, const T& y) requires(dim == 2)
       {
         v_[0] = x;
         v_[1] = y;
       }
 
-      constexpr vec_base(const T& x, const T& y, const T& z) requires (dim == 3)
+      constexpr vec_base(const T& x, const T& y, const T& z) requires(dim == 3)
       {
         v_[0] = x;
         v_[1] = y;
@@ -281,8 +276,8 @@ namespace mln
 
       vec_base<decltype(+std::declval<T>()), dim, tag> operator-() const
       {
-        typedef vec_base<decltype(+std::declval<T>()), dim, tag> R;
-        R                                                        out;
+        using R = vec_base<decltype(+std::declval<T>()), dim, tag>;
+        R out;
         for (unsigned i = 0; i < dim; ++i)
           out.v_[i] = -v_[i];
         return out;
@@ -290,8 +285,8 @@ namespace mln
 
       /* RELATIONAL */
       template <typename U>
-      requires(vec_base_traits<tag>::is_equality_comparable && std::is_convertible_v<T, U>)
-      bool operator==(const vec_base<U, dim, tag>& o) const
+      requires(vec_base_traits<tag>::is_equality_comparable&& std::convertible_to<T, U>) bool
+      operator==(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (!(v_[i] == o[i]))
@@ -300,8 +295,8 @@ namespace mln
       }
 
       template <typename U>
-      requires(vec_base_traits<tag>::is_equality_comparable && std::is_convertible_v<T, U>)
-      bool operator!=(const vec_base<U, dim, tag>& o) const
+      requires(vec_base_traits<tag>::is_equality_comparable&& std::convertible_to<T, U>) bool
+      operator!=(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (v_[i] != o[i])
@@ -310,8 +305,8 @@ namespace mln
       }
 
       template <typename U>
-      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
-      bool operator<(const vec_base<U, dim, tag>& o) const
+      requires(vec_base_traits<tag>::is_less_than_comparable&& std::convertible_to<T, U>) bool
+      operator<(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (v_[i] < o[i])
@@ -322,8 +317,8 @@ namespace mln
       }
 
       template <typename U>
-      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
-      bool operator<=(const vec_base<U, dim, tag>& o) const
+      requires(vec_base_traits<tag>::is_less_than_comparable&& std::convertible_to<T, U>) bool
+      operator<=(const vec_base<U, dim, tag>& o) const
       {
         for (unsigned i = 0; i < dim; ++i)
           if (v_[i] < o.v_[i])
@@ -334,15 +329,15 @@ namespace mln
       }
 
       template <typename U>
-      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
-      bool operator>(const vec_base<U, dim, tag>& o) const
+      requires(vec_base_traits<tag>::is_less_than_comparable&& std::convertible_to<T, U>) bool
+      operator>(const vec_base<U, dim, tag>& o) const
       {
         return not(*this <= o);
       }
 
       template <typename U>
-      requires(vec_base_traits<tag>::is_less_than_comparable && std::is_convertible_v<T, U>)
-      bool operator>=(const vec_base<U, dim, tag>& o) const
+      requires(vec_base_traits<tag>::is_less_than_comparable&& std::convertible_to<T, U>) bool
+      operator>=(const vec_base<U, dim, tag>& o) const
       {
         return not(*this < o);
       }
@@ -458,18 +453,18 @@ namespace std
   template <typename T, unsigned dim, typename tag>
   struct make_signed<mln::internal::vec_base<T, dim, tag>>
   {
-    typedef mln::internal::vec_base<typename make_signed<T>::type, dim, tag> type;
+    using type = mln::internal::vec_base<typename make_signed<T>::type, dim, tag>;
   };
 
   template <typename T, unsigned dim, typename tag>
   struct make_unsigned<mln::internal::vec_base<T, dim, tag>>
   {
-    typedef mln::internal::vec_base<typename make_unsigned<T>::type, dim, tag> type;
+    using type = mln::internal::vec_base<typename make_unsigned<T>::type, dim, tag>;
   };
 
   template <typename T1, typename T2, unsigned dim, typename Tag>
   struct common_type<mln::internal::vec_base<T1, dim, Tag>, mln::internal::vec_base<T2, dim, Tag>>
   {
-    typedef mln::internal::vec_base<typename std::common_type<T1, T2>::type, dim, Tag> type;
+    using type = mln::internal::vec_base<typename std::common_type<T1, T2>::type, dim, Tag>;
   };
 } // namespace std

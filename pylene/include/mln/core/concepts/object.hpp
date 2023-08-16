@@ -42,7 +42,7 @@ namespace mln
 
       static std::false_type foo(...) { return std::false_type(); }
 
-      typedef decltype(foo(std::declval<T>())) type;
+      using type = decltype(foo(std::declval<T>()));
     };
   } // namespace internal
 
@@ -102,16 +102,16 @@ namespace mln
   template <typename E>
   struct Object
   {
-    typedef E exact_type;
+    using exact_type = E;
 
     E*       exact() { return static_cast<E*>(this); }
     const E* exact() const { return static_cast<const E*>(this); }
 
   protected:
-    Object(const Object&) = default;
-    Object(Object&&)      = default;
-    Object()              = default;
-    Object& operator=(Object&&) = default;
+    Object(const Object&)            = default;
+    Object(Object&&)                 = default;
+    Object()                         = default;
+    Object& operator=(Object&&)      = default;
     Object& operator=(const Object&) = default;
   };
 
@@ -128,13 +128,13 @@ namespace mln
   template <typename E>
   struct exact_type
   {
-    typedef typename E::exact_type type;
+    using type = typename E::exact_type;
   };
 
   template <typename E>
   struct exact_type<const E>
   {
-    typedef const typename E::exact_type type;
+    using type = const typename E::exact_type;
   };
 
 } // namespace mln

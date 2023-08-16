@@ -2,8 +2,8 @@
 
 #include <mln/core/extension/private/by_image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-#include <mln/core/range/view/transform.hpp>
 #include <mln/core/private/traits/extension.hpp>
+#include <mln/core/range/view/transform.hpp>
 
 #include <range/v3/utility/common_type.hpp> // common_reference
 
@@ -70,29 +70,16 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, reference> operator()(point_type p)
-    {
-      return this->at(p);
-    }
+    reference operator()(point_type p) requires(image_accessible_v<I>) { return this->at(p); }
 
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
+    reference at(point_type p) requires(image_accessible_v<I>)
     {
       return this->domain().has(p) ? this->base().at(p) : get_value_from_extension(p);
     }
 
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
-    {
-      return this->pixel_at(p);
-    }
+    pixel_type pixel(point_type p) requires(image_accessible_v<I>) { return this->pixel_at(p); }
 
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
-    {
-      return {this->base().pixel_at(p), this};
-    }
+    pixel_type pixel_at(point_type p) requires(image_accessible_v<I>) { return {this->base().pixel_at(p), this}; }
     /// \}
 
     auto pixels()

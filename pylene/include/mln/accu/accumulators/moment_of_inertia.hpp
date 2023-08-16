@@ -88,8 +88,8 @@ namespace mln
       struct moment_of_inertia
         : accumulator_base<moment_of_inertia<T, SumType, SumSqrType>, T, double, features::moment_of_inertia<>>
       {
-        typedef T      argument_type;
-        typedef double result_type;
+        using argument_type = T;
+        using result_type   = double;
 
         moment_of_inertia()
           : m_count{0}

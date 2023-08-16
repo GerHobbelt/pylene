@@ -1,8 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/vec_base.hpp>
-#include <algorithm>
 
 
 namespace mln
@@ -81,7 +81,7 @@ namespace mln
   struct value_traits<internal::vec_base<U, dim, tag>, std::less<internal::vec_base<U, dim, tag>>>
   {
   private:
-    typedef internal::vec_base<U, dim, tag> Vec;
+    using Vec = internal::vec_base<U, dim, tag>;
 
     static void __check()
     {
@@ -107,7 +107,7 @@ namespace mln
   struct value_traits<internal::vec_base<U, dim, tag>, lexicographicalorder_less<internal::vec_base<U, dim, tag>>>
   {
   private:
-    typedef internal::vec_base<U, dim, tag> Vec;
+    using Vec = internal::vec_base<U, dim, tag>;
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;
@@ -126,7 +126,7 @@ namespace mln
   struct value_traits<internal::vec_base<U, dim, tag>, productorder_less<internal::vec_base<U, dim, tag>>>
   {
   private:
-    typedef internal::vec_base<U, dim, tag> Vec;
+    using Vec = internal::vec_base<U, dim, tag>;
 
   public:
     static constexpr unsigned quant = value_traits<U>::quant;

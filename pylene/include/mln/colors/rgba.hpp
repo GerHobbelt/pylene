@@ -33,7 +33,7 @@ namespace mln
     template <typename T>
     using rgba = internal::vec_base<T, 4, rgba_tag>;
 
-    typedef rgba<std::uint8_t>  rgba8;
-    typedef rgba<std::uint16_t> rgba16;
+    using rgba8  = rgba<std::uint8_t>;
+    using rgba16 = rgba<std::uint16_t>;
   } // namespace colors
 } // namespace mln

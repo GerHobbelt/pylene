@@ -86,7 +86,7 @@ namespace mln
     struct lpnorm_t
     {
       using result_type = decltype(lpnorm<p>(std::declval<T>()));
-      auto operator()(const T& x) const -> decltype(lpnorm<p>(x)) { return lpnorm<p>(x); }
+      auto operator()(const T& x) const { return lpnorm<p>(x); }
     };
     template <unsigned p>
     struct lpnorm_t<p, void>

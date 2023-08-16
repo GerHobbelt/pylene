@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clamp_extended.hpp>
 #include <mln/core/image/view/extended.hpp>
@@ -9,6 +8,7 @@
 #include <mln/core/image/view/none_extended.hpp>
 #include <mln/core/image/view/periodize_extended.hpp>
 #include <mln/core/image/view/value_extended.hpp>
+#include <mln/core/private/traits/extension.hpp>
 #include <mln/core/range/view/transform.hpp>
 
 
@@ -217,29 +217,19 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, reference> operator()(point_type p)
+    reference operator()(point_type p) requires(image_accessible_v<I>)
     {
       return std::visit([p](auto&& ima) -> reference { return ima(p); }, m_adapted_image);
     }
 
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, reference> at(point_type p)
+    reference at(point_type p) requires(image_accessible_v<I>)
     {
       return std::visit([p](auto&& ima) -> reference { return ima.at(p); }, m_adapted_image);
     }
 
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel(point_type p)
-    {
-      return {this->base().pixel(p), this};
-    }
+    pixel_type pixel(point_type p) requires(image_accessible_v<I>) { return {this->base().pixel(p), this}; }
 
-    template <class J = I>
-    std::enable_if_t<image_accessible_v<J>, pixel_type> pixel_at(point_type p)
-    {
-      return {this->base().pixel(p), this};
-    }
+    pixel_type pixel_at(point_type p) requires(image_accessible_v<I>) { return {this->base().pixel(p), this}; }
     /// \}
 
     auto pixels()

@@ -66,20 +66,20 @@ namespace mln
     /// \{
     struct pixel_type : mln::details::Pixel<pixel_type>
     {
-      using reference               = zip_view::reference;
-      using value_type              = zip_view::value_type;
-      using site_type[[deprecated]] = zip_view::point_type;
-      using point_type              = zip_view::point_type;
+      using reference                = zip_view::reference;
+      using value_type               = zip_view::value_type;
+      using site_type [[deprecated]] = zip_view::point_type;
+      using point_type               = zip_view::point_type;
 
       pixel_type(image_pixel_t<Images>... pixels)
         : m_pixels{std::move(pixels)...}
       {
       }
 
-      pixel_type(const pixel_type&) = default;
-      pixel_type(pixel_type&&)      = default;
+      pixel_type(const pixel_type&)            = default;
+      pixel_type(pixel_type&&)                 = default;
       pixel_type& operator=(const pixel_type&) = delete;
-      pixel_type& operator=(pixel_type&&) = delete;
+      pixel_type& operator=(pixel_type&&)      = delete;
 
       point_type point() const { return std::get<0>(m_pixels).point(); }
       reference  val() const
@@ -104,10 +104,10 @@ namespace mln
     {
     }
 
-    zip_view(const zip_view<Images...>&) = default;
-    zip_view(zip_view<Images...>&&)      = default;
+    zip_view(const zip_view<Images...>&)                       = default;
+    zip_view(zip_view<Images...>&&)                            = default;
     zip_view<Images...>& operator=(const zip_view<Images...>&) = delete;
-    zip_view<Images...>& operator=(zip_view<Images...>&&) = delete;
+    zip_view<Images...>& operator=(zip_view<Images...>&&)      = delete;
 
     auto domain() const { return std::get<0>(m_images).domain(); }
 
@@ -136,29 +136,25 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
+    reference operator()(point_type p) requires(accessible::value)
     {
       mln_precondition(all_domain_has(p));
       return this->at(p);
     }
 
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> at(point_type p)
+    reference at(point_type p) requires(accessible::value)
     {
-      auto g = [p](auto&&... images) -> Ret { return std::forward_as_tuple(images.at(p)...); };
+      auto g = [p](auto&&... images) -> reference { return std::forward_as_tuple(images.at(p)...); };
       return std::apply(g, m_images);
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+    pixel_type pixel(point_type p) requires(accessible::value)
     {
       mln_precondition(all_domain_has(p));
       return this->pixel_at(p);
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
+    pixel_type pixel_at(point_type p) requires(accessible::value)
     {
       auto g = [p](auto&&... images) { return pixel_type(images.pixel_at(p)...); };
       return std::apply(g, m_images);
@@ -166,8 +162,7 @@ namespace mln
     /// \}
 
   private:
-    template <typename dummy = bool>
-    std::enable_if_t<accessible::value, dummy> all_domain_has(point_type p)
+    bool all_domain_has(point_type p) requires(accessible::value)
     {
       auto g_has = [p](auto&&... images) { return (images.domain().has(p) && ...); };
       return std::apply(g_has, m_images);

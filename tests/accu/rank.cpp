@@ -8,7 +8,7 @@ TEST(Accu, Rank)
 {
   using namespace mln::accu;
 
-  typedef std::ratio<1, 2> R;
+  using R = std::ratio<1, 2>;
 
   {
     accumulators::h_rank<uint8_t, R> acc;

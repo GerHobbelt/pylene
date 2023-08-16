@@ -51,7 +51,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::minmax<T, Compare> type;
+          using type = accumulators::minmax<T, Compare>;
         };
 
         template <typename T>
@@ -70,7 +70,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::minmax<T> type;
+          using type = accumulators::minmax<T>;
         };
 
         template <typename T>

@@ -6,7 +6,7 @@ TEST(Colors, LSH)
 {
   using namespace mln;
 
-  typedef vec3i V;
+  using V = vec3i;
   {
     rgb8 v   = {0, 0, 0};
     auto res = lsh2rgb(rgb2lsh(v));

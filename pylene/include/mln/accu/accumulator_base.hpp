@@ -19,12 +19,12 @@ namespace mln
     template <typename E, typename ArgumentType, typename ResultType, typename Feature>
     struct accumulator_base : Accumulator<E>
     {
-      typedef ArgumentType             argument_type;
-      typedef ResultType               result_type;
-      typedef Feature                  feature;
-      typedef boost::mpl::set<Feature> provides;
+      using argument_type = ArgumentType;
+      using result_type   = ResultType;
+      using feature       = Feature;
+      using provides      = boost::mpl::set<Feature>;
 
-      typedef std::false_type has_untake;
+      using has_untake = std::false_type;
 
       // You mut implement the following function
       // void init()

@@ -56,7 +56,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef typename accumulators::h_rank<T, Ratio> type;
+          using type = typename accumulators::h_rank<T, Ratio>;
         };
 
         template <typename T>
@@ -71,7 +71,7 @@ namespace mln
     {
 
       template <typename Ratio, typename A>
-      auto h_rank(const Accumulator<A>& acc) -> decltype(extract(exact(acc), std::declval<features::h_rank<Ratio>>()))
+      auto h_rank(const Accumulator<A>& acc)
       {
         return extract(exact(acc), features::h_rank<Ratio>());
       }
@@ -83,10 +83,10 @@ namespace mln
       template <class T, class Ratio>
       struct h_rank : accumulator_base<h_rank<T, Ratio>, T, T, features::h_rank<Ratio>>
       {
-        typedef T                                        argument_type;
-        typedef T                                        result_type;
-        typedef boost::mpl::set<features::h_rank<Ratio>> provides;
-        typedef std::true_type                           has_untake;
+        using argument_type = T;
+        using result_type   = T;
+        using provides      = boost::mpl::set<features::h_rank<Ratio>>;
+        using has_untake    = std::true_type;
 
         static_assert(std::is_unsigned<T>::value, "T must be unsigned");
         static_assert(value_traits<T>::quant <= 16, "T must be low quantized");
@@ -193,10 +193,10 @@ namespace mln
       template <class Ratio>
       struct h_rank<bool, Ratio> : accumulator_base<h_rank<bool, Ratio>, bool, bool, features::h_rank<Ratio>>
       {
-        typedef bool                                     argument_type;
-        typedef bool                                     result_type;
-        typedef boost::mpl::set<features::h_rank<Ratio>> provides;
-        typedef std::true_type                           has_untake;
+        using argument_type = bool;
+        using result_type   = bool;
+        using provides      = boost::mpl::set<features::h_rank<Ratio>>;
+        using has_untake    = std::true_type;
 
         static_assert(Ratio::num < Ratio::den, "Invalid ratio (must be [0,1)");
 

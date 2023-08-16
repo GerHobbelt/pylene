@@ -22,7 +22,7 @@ namespace mln
       struct accu4;
       template <typename T>
       struct accu5;
-    }
+    } // namespace accumulators
 
     namespace features
     {
@@ -46,27 +46,27 @@ namespace mln
       template <>
       struct depends<f1>
       {
-        typedef boost::mpl::set<f2> type;
+        using type = boost::mpl::set<f2>;
       };
 
       template <>
       struct depends<f2>
       {
-        typedef boost::mpl::set<f2, f3> type;
+        using type = boost::mpl::set<f2, f3>;
       };
 
       template <>
       struct depends<f3>
       {
-        typedef boost::mpl::set<f4, f5> type;
+        using type = boost::mpl::set<f4, f5>;
       };
 
       template <>
       struct depends<f5>
       {
-        typedef boost::mpl::set<f4> type;
+        using type = boost::mpl::set<f4>;
       };
-    }
+    } // namespace features
 
     namespace accumulators
     {
@@ -75,10 +75,10 @@ namespace mln
   template <typename T>                                                                                                \
   struct accu##N : composite_accumulator_facade<accu##N<T>, T, T, features::f##N>                                      \
   {                                                                                                                    \
-    typedef T                               argument_type;                                                             \
-    typedef boost::mpl::set<features::f##N> provides;                                                                  \
-    void                                    init(){};                                                                  \
-    void                                    take(const T&){};                                                          \
+    using argument_type = T;                                                                                           \
+    using provides      = boost::mpl::set<features::f##N>;                                                             \
+    void init(){};                                                                                                     \
+    void take(const T&){};                                                                                             \
     template <typename Other>                                                                                          \
     void take(const Accumulator<Other>&)                                                                               \
     {                                                                                                                  \
@@ -91,16 +91,16 @@ namespace mln
       DEF_ACCU(3);
       DEF_ACCU(4);
       DEF_ACCU(5);
-    }
-  }
-}
+    } // namespace accumulators
+  }   // namespace accu
+} // namespace mln
 
 TEST(Accu, Features)
 {
   using namespace mln::accu;
 
-  typedef boost::mpl::set<features::f1>                     Set;
-  typedef typename internal::resolve_dependances<Set>::type Features;
+  using Set      = boost::mpl::set<features::f1>;
+  using Features = typename internal::resolve_dependances<Set>::type;
 
   static_assert(boost::mpl::has_key<Features, features::f1>::value, "");
   static_assert(boost::mpl::has_key<Features, features::f2>::value, "");

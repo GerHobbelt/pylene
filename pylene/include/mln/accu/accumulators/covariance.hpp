@@ -61,7 +61,7 @@ namespace mln
     {
 
       template <typename A>
-      inline auto covariance(const Accumulator<A>& acc) -> decltype(extract(exact(acc), features::covariance<>()))
+      inline auto covariance(const Accumulator<A>& acc)
       {
         return extract(exact(acc), features::covariance<>());
       }
@@ -80,15 +80,15 @@ namespace mln
         {
           ndim = value_traits<T>::ndim
         };
-        typedef Eigen::Array<SumType, ndim, 1>       vec_t;
-        typedef Eigen::Array<SumSqrType, ndim, ndim> matrix_t;
+        using vec_t    = int;
+        using matrix_t = int;
 
       public:
-        typedef Eigen::Array<double, ndim, 1>    mean_result_type;
-        typedef T                                argument_type;
-        typedef Eigen::Array<double, ndim, ndim> result_type;
+        using mean_result_type = int;
+        using argument_type    = T;
+        using result_type      = int;
 
-        // typedef boost::mpl::set< features::covariance<>, features::covariance<SumType> > provides;
+        // using provides = boost::mpl::set<features::covariance<>, features::covariance<SumType>>;
 
         covariance()
           : m_count{0}

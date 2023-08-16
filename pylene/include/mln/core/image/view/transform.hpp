@@ -33,9 +33,9 @@ namespace mln
 
     /// Traits & Image Properties
     /// \{
-    using accessible         = image_accessible_t<I>;
-    using indexable          = image_indexable_t<I>;
-    using view               = std::true_type;
+    using accessible = image_accessible_t<I>;
+    using indexable  = image_indexable_t<I>;
+    using view       = std::true_type;
 
     // The extension could be preserved if F returns a reference. Otherwise extension().fill() would
     // require to inverse F to fill with the good extension
@@ -54,10 +54,10 @@ namespace mln
     /// \{
     struct pixel_type : pixel_adaptor<image_pixel_t<I>>, mln::details::Pixel<pixel_type>
     {
-      using point_type              = transform_view::point_type;
-      using site_type[[deprecated]] = transform_view::point_type;
-      using reference               = transform_view::reference;
-      using value_type              = transform_view::value_type;
+      using point_type               = transform_view::point_type;
+      using site_type [[deprecated]] = transform_view::point_type;
+      using reference                = transform_view::reference;
+      using value_type               = transform_view::value_type;
 
       pixel_type(fun_t fun, image_pixel_t<I> px)
         : pixel_type::pixel_adaptor{px}
@@ -134,31 +134,21 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
+    reference operator()(point_type p) requires(accessible::value)
     {
       mln_precondition(this->domain().has(p));
       return std::invoke(fun_, this->base()(p));
     }
 
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> at(point_type p)
-    {
-      return std::invoke(fun_, this->base().at(p));
-    }
+    reference at(point_type p) requires(accessible::value) { return std::invoke(fun_, this->base().at(p)); }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+    pixel_type pixel(point_type p) requires(accessible::value)
     {
       mln_precondition(this->domain().has(p));
       return {fun_, this->base().pixel(p)};
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
-    {
-      return {fun_, this->base().pixel_at(p)};
-    }
+    pixel_type pixel_at(point_type p) requires(accessible::value) { return {fun_, this->base().pixel_at(p)}; }
     /// \}
 
 
@@ -209,10 +199,10 @@ namespace mln
     struct pixel_type : mln::details::Pixel<pixel_type>
     {
     public:
-      using point_type              = transform2_view::point_type;
-      using site_type[[deprecated]] = transform2_view::point_type;
-      using reference               = transform2_view::reference;
-      using value_type              = transform2_view::value_type;
+      using point_type               = transform2_view::point_type;
+      using site_type [[deprecated]] = transform2_view::point_type;
+      using reference                = transform2_view::reference;
+      using value_type               = transform2_view::value_type;
 
 
       pixel_type(fun_t fun, image_pixel_t<I1> px1, image_pixel_t<I2> px2)
@@ -261,10 +251,7 @@ namespace mln
 
     auto domain() const { return m_ima1.domain(); }
 
-    auto values()
-    {
-      return mln::ranges::view::transform(m_ima1.values(), m_ima2.values(), fun_);
-    }
+    auto values() { return mln::ranges::view::transform(m_ima1.values(), m_ima2.values(), fun_); }
 
     auto pixels()
     {
@@ -277,30 +264,23 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
+    reference operator()(point_type p) requires(accessible::value)
     {
       mln_precondition(m_ima1.domain().has(p));
       mln_precondition(m_ima2.domain().has(p));
       return std::invoke(fun_, m_ima1.at(p), m_ima2.at(p));
     }
 
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> at(point_type p)
-    {
-      return std::invoke(fun_, m_ima1.at(p), m_ima2.at(p));
-    }
+    reference at(point_type p) requires(accessible::value) { return std::invoke(fun_, m_ima1.at(p), m_ima2.at(p)); }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+    pixel_type pixel(point_type p) requires(accessible::value)
     {
       mln_precondition(m_ima1.domain().has(p));
       mln_precondition(m_ima2.domain().has(p));
       return {fun_, m_ima1.pixel(p), m_ima2.pixel(p)};
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
+    pixel_type pixel_at(point_type p) requires(accessible::value)
     {
       return {fun_, m_ima1.pixel_at(p), m_ima2.pixel_at(p)};
     }

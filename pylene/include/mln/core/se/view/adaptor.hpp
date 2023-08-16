@@ -4,6 +4,7 @@
 #include <mln/core/image/image.hpp>
 #include <mln/core/se/private/se_facade.hpp>
 
+#include <concepts>
 
 namespace mln
 {
@@ -17,49 +18,35 @@ namespace mln
     };
 
     // Dynamic
-    template <class SE, class = void>
-    struct se_adaptor_dynamic
-    {
-    };
     template <class SE>
-    struct se_adaptor_dynamic<
-        SE, std::enable_if_t<std::is_convertible_v<typename SE::category, mln::dynamic_neighborhood_tag>>>
-      : se_adaptor_base<SE>
+    requires std::convertible_to<typename SE::category, mln::dynamic_neighborhood_tag> //
+    struct se_adaptor_dynamic : se_adaptor_base<SE>
     {
       int radial_extent() const { return this->base().radial_extent(); }
     };
 
     // Decomposable
-    template <class SE, class = void>
-    struct se_adaptor_decomposable
-    {
-    };
     template <class SE>
-    struct se_adaptor_decomposable<SE, std::enable_if_t<SE::decomposable::value>> : se_adaptor_base<SE>
+    requires SE::decomposable::value //
+        struct se_adaptor_decomposable : se_adaptor_base<SE>
     {
       bool is_decomposable() const { return this->base().is_decomposable(); }
       auto decompose() const { return this->base().decompose(); }
     };
 
     // Separable
-    template <class SE, class = void>
-    struct se_adaptor_separable
-    {
-    };
     template <class SE>
-    struct se_adaptor_separable<SE, std::enable_if_t<SE::separable::value>> : se_adaptor_base<SE>
+    requires SE::separable::value //
+        struct se_adaptor_separable : se_adaptor_base<SE>
     {
       bool is_separable() const { return this->base().is_separable(); }
       auto separate() const { return this->base().separate(); }
     };
 
     // Incrementable
-    template <class SE, class = void>
-    struct se_adaptor_incremental
-    {
-    };
     template <class SE>
-    struct se_adaptor_incremental<SE, std::enable_if_t<SE::incrementable::value>> : se_adaptor_base<SE>
+    requires SE::incrementable::value //
+        struct se_adaptor_incremental : se_adaptor_base<SE>
     {
       auto inc() const { return this->base().inc(); }
       auto dec() const { return this->base().dec(); }

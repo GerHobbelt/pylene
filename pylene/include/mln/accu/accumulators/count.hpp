@@ -42,7 +42,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::count<CountType> type;
+          using type = accumulators::count<CountType>;
         };
 
         template <typename T>
@@ -69,10 +69,10 @@ namespace mln
       template <typename CountType>
       struct count : accumulator_base<count<CountType>, dontcare_t, CountType, features::count<>>
       {
-        typedef dontcare_t                         argument_type;
-        typedef CountType                          result_type;
-        typedef boost::mpl::set<features::count<>> provides;
-        typedef std::true_type                     has_untake;
+        using argument_type = dontcare_t;
+        using result_type   = CountType;
+        using provides      = boost::mpl::set<features::count<>>;
+        using has_untake    = std::true_type;
 
         count()
           : m_count(0)

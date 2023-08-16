@@ -55,7 +55,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::maximal_elements<T, Compare> type;
+          using type = accumulators::maximal_elements<T, Compare>;
         };
 
         template <typename T>
@@ -84,7 +84,7 @@ namespace mln
     {
 
       template <typename A>
-      auto maximal_elements(const Accumulator<A>& acc) -> decltype(extract(exact(acc), features::maximal_elements<>()))
+      auto maximal_elements(const Accumulator<A>& acc)
       {
         return extract(exact(acc), features::maximal_elements<>());
       }
@@ -96,9 +96,9 @@ namespace mln
       template <typename T, typename Compare>
       struct maximal_elements : accumulator_base<maximal_elements<T, Compare>, T, T, features::maximal_elements<>>
       {
-        typedef T              argument_type;
-        typedef std::vector<T> return_type;
-        // typedef features::max<> feature;
+        using argument_type = T;
+        using return_type   = std::vector<T>;
+        // using feature = features::max<>;
 
         maximal_elements(const Compare& cmp = Compare())
           : m_cmp(cmp)

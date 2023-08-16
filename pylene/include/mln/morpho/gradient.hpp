@@ -1,13 +1,13 @@
 #pragma once
 
 #include <mln/core/algorithm/transform.hpp>
+#include <mln/core/concepts/structuring_element.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/trace.hpp>
-#include <mln/core/concepts/structuring_element.hpp>
 
+#include <mln/core/private/maths_ops.hpp>
 #include <mln/morpho/dilation.hpp>
 #include <mln/morpho/erosion.hpp>
-#include <mln/core/private/maths_ops.hpp>
 
 /// \file
 
@@ -46,7 +46,7 @@ namespace mln::morpho
 
   namespace details
   {
-    template <class T, class enable = void>
+    template <class T>
     struct grad_op
     {
       using result_type = decltype(l2norm(std::declval<T>()));
@@ -55,7 +55,8 @@ namespace mln::morpho
     };
 
     template <class T>
-    struct grad_op<T, std::enable_if_t<std::is_arithmetic_v<T>>>
+    requires std::is_arithmetic_v<T> //
+    struct grad_op<T>
     {
       using result_type = T;
 
@@ -64,7 +65,7 @@ namespace mln::morpho
 
     template <class I>
     using gradient_result_t = image_ch_value_t<I, typename grad_op<image_value_t<I>>::result_type>;
-  }
+  } // namespace details
 
 
   template <class InputImage, class SE>
@@ -133,4 +134,4 @@ namespace mln::morpho
     return out;
   }
 
-} // namespace mln::morpho::
+} // namespace mln::morpho

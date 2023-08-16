@@ -59,7 +59,7 @@ namespace mln
     template <typename AccuLike, typename T, typename Extractor = default_extractor>
     struct result_of
     {
-      typedef unspecified type;
+      using type = unspecified;
     };
 
     /// \brief The defaut extractor
@@ -88,28 +88,29 @@ namespace mln
 
 #endif
 
-    template <typename AccuLike, typename T, typename Enable = void>
+    template <typename AccuLike, typename T>
     struct accu_of
     {
       static_assert(is_a<AccuLike, Accumulator>::value, "First template parameter is not an Accumulator");
 
-      typedef AccuLike type;
+      using type = AccuLike;
     };
 
     template <typename AccuLike, typename T>
-    struct accu_of<AccuLike, T, typename std::enable_if<is_a<AccuLike, FeatureSet>::value>::type>
+    requires is_a<AccuLike, FeatureSet>::value //
+        struct accu_of<AccuLike, T>
     {
-      typedef typename AccuLike::template apply<T>::type type;
+      using type = typename AccuLike::template apply<T>::type;
     };
 
     template <typename AccuLike, typename T, typename Extractor = default_extractor>
     struct result_of
     {
     private:
-      typedef typename accu_of<AccuLike, T>::type accu_type;
+      using accu_type = typename accu_of<AccuLike, T>::type;
 
     public:
-      typedef typename std::invoke_result<Extractor, accu_type>::type type;
+      using type = typename std::invoke_result<Extractor, accu_type>::type;
     };
 
     template <class A, class T, class E = default_extractor>

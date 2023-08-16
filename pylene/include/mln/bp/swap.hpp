@@ -1,10 +1,12 @@
 #pragma once
-#include <cstddef>
-#include <type_traits>
-#include <algorithm>
-#include <cstring>
 
 #include <mln/bp/utils.hpp>
+
+#include <algorithm>
+#include <concepts>
+#include <cstddef>
+#include <cstring>
+#include <type_traits>
 
 
 namespace mln::bp
@@ -48,10 +50,8 @@ namespace mln::bp
     }
 
 
-
-
-    [[gnu::always_inline]]
-    inline void swap_buffer(void* __restrict a, void* __restrict b, void* __restrict tmp, std::size_t n)
+    [[gnu::always_inline]] inline void swap_buffer(void* __restrict a, void* __restrict b, void* __restrict tmp,
+                                                   std::size_t n)
     {
       std::memcpy(tmp, a, n);
       std::memcpy(a, b, n);
@@ -59,8 +59,8 @@ namespace mln::bp
     }
 
 
-    [[gnu::noinline]]
-    void swap_raw(std::byte* __restrict a, std::byte* __restrict b, std::size_t len, int h, std::ptrdiff_t a_stride, std::ptrdiff_t b_stride) noexcept;
+    [[gnu::noinline]] void swap_raw(std::byte* __restrict a, std::byte* __restrict b, std::size_t len, int h,
+                                    std::ptrdiff_t a_stride, std::ptrdiff_t b_stride) noexcept;
 
 
   } // namespace impl
@@ -77,8 +77,8 @@ namespace mln::bp
 
   // Specialization of trivially copyable type
   template <class T>
-  requires std::is_trivially_copyable_v<T>
-  inline void swap(T* __restrict a, T* __restrict b, int width, int height, std::ptrdiff_t a_stride, std::ptrdiff_t b_stride)
+  inline void swap(T* __restrict a, T* __restrict b, int width, int height, std::ptrdiff_t a_stride,
+                   std::ptrdiff_t b_stride) requires(std::copyable<T>)
   {
     impl::swap_raw((std::byte*)a, (std::byte*)b, width * sizeof(T), height, a_stride, b_stride);
   }
@@ -95,4 +95,4 @@ namespace mln::bp
       impl::swap_buffer((std::byte*)a + y * a_stride, (std::byte*)b + y * b_stride, tmp, width * sizeof(T));
   }
 
-}
+} // namespace mln::bp

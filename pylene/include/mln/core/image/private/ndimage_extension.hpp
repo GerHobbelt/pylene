@@ -1,7 +1,10 @@
 #pragma once
 
-#include <type_traits>
+#include <mln/core/concepts/object.hpp>
+#include <mln/core/private/traits/neighborhood.hpp>
+
 #include <cstddef>
+#include <type_traits>
 
 
 namespace mln::internal
@@ -39,28 +42,28 @@ namespace mln::internal
 
   private:
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type _fill(char* ptr, const T& v);
+    void _fill(char* ptr, const T& v) requires(d < dim);
 
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type _fill(char* ptr, const T& v);
+    void _fill(char* ptr, const T& v) requires(d == dim);
 
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type _fillall(char* ptr, const T& v);
+    void _fillall(char* ptr, const T& v) requires(d < dim);
 
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type _fillall(char* ptr, const T& v);
+    void _fillall(char* ptr, const T& v) requires(d == dim);
 
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type _mirror(char* ptr, [[maybe_unused]] std::size_t padding);
+    void _mirror(char* ptr, [[maybe_unused]] std::size_t padding) requires(d < dim);
 
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type _mirror(char* ptr, [[maybe_unused]] std::size_t padding);
+    void _mirror(char* ptr, [[maybe_unused]] std::size_t padding) requires(d == dim);
 
     template <unsigned d>
-    typename std::enable_if<(d < dim)>::type _copy_line(char* src, char* dest);
+    void _copy_line(char* src, char* dest) requires(d < dim);
 
     template <unsigned d>
-    typename std::enable_if<(d == dim)>::type _copy_line(char* src, char* dest);
+    void _copy_line(char* src, char* dest) requires(d == dim);
 
   private:
     size_t m_strides[dim];
@@ -81,7 +84,7 @@ namespace mln::internal
     m_ptr = ptr;
     for (unsigned i = 0; i < dim; ++i)
     {
-      m_dims[i]     = dims[i];
+      m_dims[i]    = dims[i];
       m_strides[i] = strides[i];
       m_ptr -= m_strides[i] * border;
     }
@@ -154,8 +157,7 @@ namespace mln::internal
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_mirror(char*                        ptr,
-                                                                              [[maybe_unused]] std::size_t padding)
+  void ndimage_extension<T, dim>::_mirror(char* ptr, [[maybe_unused]] std::size_t padding) requires(d < dim)
   {
     char* pori = ptr + m_border * m_strides[d];
     char* p    = pori;
@@ -180,15 +182,14 @@ namespace mln::internal
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_mirror(char*                        ptr,
-                                                                               [[maybe_unused]] std::size_t padding)
+  void ndimage_extension<T, dim>::_mirror(char* ptr, [[maybe_unused]] std::size_t padding) requires(d == dim)
   {
     (void)ptr;
   }
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
+  void ndimage_extension<T, dim>::_copy_line(char* src, char* dest) requires(d < dim)
   {
     for (int k = 0; k < m_dims[d] + 2 * m_border; ++k)
     {
@@ -200,14 +201,14 @@ namespace mln::internal
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_copy_line(char* src, char* dest)
+  void ndimage_extension<T, dim>::_copy_line(char* src, char* dest) requires(d == dim)
   {
     *(reinterpret_cast<T*>(dest)) = *(reinterpret_cast<T*>(src));
   }
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
+  void ndimage_extension<T, dim>::_fill(char* ptr, const T& v) requires(d < dim)
   {
     for (int i = 0; i < m_border; ++i, ptr += m_strides[d])
       _fillall<d + 1>(ptr, v);
@@ -221,7 +222,7 @@ namespace mln::internal
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_fill(char* ptr, const T& v)
+  void ndimage_extension<T, dim>::_fill(char* ptr, const T& v) requires(d == dim)
   {
     (void)ptr;
     (void)v;
@@ -229,7 +230,7 @@ namespace mln::internal
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d < dim)>::type ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+  void ndimage_extension<T, dim>::_fillall(char* ptr, const T& v) requires(d < dim)
   {
     for (int i = 0; i < m_dims[d] + (2 * m_border); ++i, ptr += m_strides[d])
       _fillall<d + 1>(ptr, v);
@@ -237,7 +238,7 @@ namespace mln::internal
 
   template <typename T, unsigned dim>
   template <unsigned d>
-  typename std::enable_if<(d == dim)>::type ndimage_extension<T, dim>::_fillall(char* ptr, const T& v)
+  void ndimage_extension<T, dim>::_fillall(char* ptr, const T& v) requires(d == dim)
   {
     *(reinterpret_cast<T*>(ptr)) = v;
   }

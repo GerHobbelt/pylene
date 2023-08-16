@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mln/core/domain/where.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
 #include <mln/core/image/view/clip.hpp>
-#include <mln/core/domain/where.hpp>
 
 #include <mln/core/range/view/filter.hpp>
 #include <mln/core/range/view/remove_if.hpp>
@@ -103,49 +103,42 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
+    reference operator()(point_type p) requires(accessible::value)
     {
       mln_precondition(domain().has(p));
       mln_precondition(std::invoke(f, this->base()(p)));
       return this->base()(p);
     }
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> at(point_type p)
-    {
-      return this->base().at(p);
-    }
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+
+    reference at(point_type p) requires(accessible::value) { return this->base().at(p); }
+
+    pixel_type pixel(point_type p) requires(accessible::value)
     {
       mln_precondition(domain().has(p));
       mln_precondition(std::invoke(f, this->base().at(p)));
       return this->base().pixel(p);
     }
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
-    {
-      return this->base().pixel_at(p);
-    }
+
+    pixel_type pixel_at(point_type p) requires(accessible::value) { return this->base().pixel_at(p); }
     /// \}
 
 
     /// IndexableAndAccessible-image related methods
     /// \{
     template <typename dummy = I>
-    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> index_of_point(point_type p) const
+    image_index_t<dummy> index_of_point(point_type p) const requires(indexable::value&& accessible::value)
     {
       return this->base().index_of_point(p);
     }
 
     template <typename dummy = I>
-    point_type point_at_index(std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> i) const
+    point_type point_at_index(image_index_t<dummy> i) const requires(indexable::value&& accessible::value)
     {
       return this->base().point_at_index(i);
     }
 
     template <typename dummy = I>
-    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> delta_index(point_type p) const
+    image_index_t<dummy> delta_index(point_type p) const requires(indexable::value&& accessible::value)
     {
       return this->base().delta_index(p);
     }

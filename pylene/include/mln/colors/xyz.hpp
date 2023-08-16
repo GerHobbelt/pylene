@@ -16,7 +16,7 @@ namespace mln
   template <typename T>
   using xyz = internal::vec_base<T, 3, xyz_tag>;
 
-  typedef xyz<uint8> xyz8;
+  using xyz8 = xyz<std::uint8_t>;
 
   namespace internal
   {

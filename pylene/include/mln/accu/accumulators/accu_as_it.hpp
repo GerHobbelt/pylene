@@ -16,8 +16,8 @@ namespace mln
       template <class Accu>
       struct accu_as_it : Accumulator<accu_as_it<Accu>>
       {
-        typedef typename Accu::argument_type argument_type;
-        typedef Accu                         result_type;
+        using argument_type = typename Accu::argument_type;
+        using result_type   = Accu;
 
         accu_as_it() = default;
 

@@ -18,7 +18,7 @@ namespace mln
   template <typename T>
   using lsh = internal::vec_base<T, 3, lsh_tag>;
 
-  typedef lsh<uint8_t> lsh8;
+  using lsh8 = lsh<std::uint8_t>;
 
   namespace internal
   {

@@ -21,7 +21,7 @@ namespace mln
 
   /* Element wise operators */
   template <class U, class V, unsigned dim, class tag>
-  auto  pow(const internal::vec_base<U, dim, tag>& x, V exp);
+  auto pow(const internal::vec_base<U, dim, tag>& x, V exp);
 
   template <class T, unsigned dim, class tag>
   auto sqr(const internal::vec_base<T, dim, tag>& x);
@@ -97,9 +97,8 @@ namespace mln
 
   template <typename T, unsigned dim, class tag>
   auto linfdist(const internal::vec_base<T, dim, tag>& x, const internal::vec_base<T, dim, tag>& y);
- 
 
- 
+
   /*****************************/
   /**   Implementation       ***/
   /*****************************/
@@ -124,7 +123,7 @@ namespace mln
   template <class U, class V, unsigned dim, class tag>
   auto pow(const internal::vec_base<U, dim, tag>& x, V exp)
   {
-    typedef decltype(pow(std::declval<U>(), std::declval<V>())) R;
+    using R = decltype(pow(std::declval<U>(), std::declval<V>()));
     internal::vec_base<R, dim, tag> res;
     for (unsigned i = 0; i < dim; ++i)
       res[i] = pow(x[i], exp);
@@ -133,7 +132,7 @@ namespace mln
 
   template <class U, class V, unsigned dim, class tag>
   auto dot(const internal::vec_base<U, dim, tag>& x, const internal::vec_base<V, dim, tag>& y)
-    -> details::_promote_t<U, V>
+      -> details::_promote_t<U, V>
   {
     details::_promote_t<U, V> res = 0;
     for (int i = 0; i < static_cast<int>(dim); ++i)
@@ -172,7 +171,7 @@ namespace mln
   }
 
   template <typename T, unsigned dim, class tag>
-  auto prod(const internal::vec_base<T, dim, tag>& x) -> details::_promote_t<T> 
+  auto prod(const internal::vec_base<T, dim, tag>& x) -> details::_promote_t<T>
   {
     details::_promote_t<T> res = x[0];
     for (unsigned i = 1; i < dim; ++i)

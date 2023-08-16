@@ -38,7 +38,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::mean<T, SumType> type;
+          using type = accumulators::mean<T, SumType>;
         };
 
         template <typename T>
@@ -54,7 +54,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::mean<T> type;
+          using type = accumulators::mean<T>;
         };
 
         template <typename T>
@@ -67,7 +67,7 @@ namespace mln
       template <typename SumType>
       struct depends<mean<SumType>>
       {
-        typedef boost::mpl::set<sum<SumType>, count<>> type;
+        using type = boost::mpl::set<sum<SumType>, count<>>;
       };
     } // namespace features
 
@@ -87,9 +87,9 @@ namespace mln
       template <typename T, typename SumType>
       struct mean : composite_accumulator_facade<mean<T, SumType>, T, SumType, features::mean<SumType>>
       {
-        typedef T                                                          argument_type;
-        typedef SumType                                                    result_type;
-        typedef boost::mpl::set<features::mean<>, features::mean<SumType>> provides;
+        using argument_type = T;
+        using result_type   = SumType;
+        using provides      = boost::mpl::set<features::mean<>, features::mean<SumType>>;
 
         friend SumType extract(const mean& accu, features::mean<SumType>) { return extract(accu, features::mean<>()); }
 

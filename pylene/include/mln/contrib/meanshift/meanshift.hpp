@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mln/core/image/ndimage.hpp>
-#include <mln/core/se/rect2d.hpp>
 #include <mln/core/range/foreach.hpp>
+#include <mln/core/se/rect2d.hpp>
 
 #include <mln/core/value/value_traits.hpp>
 #include <mln/core/vec.hpp>
@@ -15,15 +15,15 @@ namespace mln
     template <class V>
     mln::image2d<V> meanshift(const mln::image2d<V>& f, float hs, float hr)
     {
-      int    SR    = 5;   // Spatial window radius
-      int    NITER = 30;  // Maximal number of iteration
+      int    SR    = 5;    // Spatial window radius
+      int    NITER = 30;   // Maximal number of iteration
       float  eps   = 0.1f; //
       double hs2   = hs * hs;
       double hr2   = hr * hr;
       double eps2  = eps * eps;
 
-      typedef vec<double, value_traits<V>::ndim> value_t;
-      typedef vec<double, 2>                     site_t;
+      using value_t = vec<double, value_traits<V>::ndim>;
+      using site_t  = vec<double, 2>;
 
       mln::image2d<V> out;
       resize(out, f);
@@ -33,8 +33,8 @@ namespace mln
       auto g = [](double x) -> double { return std::exp(-x); };
       mln_foreach (auto p, f.domain())
       {
-        site_t   py = {static_cast<double>(p.x()), static_cast<double>(p.y())};
-        value_t  vy = f(p).as_vec();
+        site_t  py = {static_cast<double>(p.x()), static_cast<double>(p.y())};
+        value_t vy = f(p).as_vec();
 
         bool stop = false;
         for (int i = 0; i <= NITER and (not stop); ++i)

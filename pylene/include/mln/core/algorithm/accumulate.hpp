@@ -9,10 +9,10 @@ namespace mln
 
   template <typename InputImage, class AccuLike, class Extractor = accu::default_extractor>
   typename accu::result_of<AccuLike, image_value_t<InputImage>, Extractor>::type
-      accumulate(InputImage input, const AccumulatorLike<AccuLike>& accu, const Extractor& ex = Extractor());
+  accumulate(InputImage input, const AccumulatorLike<AccuLike>& accu, const Extractor& ex = Extractor());
 
   template <typename InputImage, class V, class BinaryOperator>
-  std::enable_if_t<!is_a<V, AccumulatorLike>::value, V> accumulate(InputImage input, V init, BinaryOperator op);
+  V accumulate(InputImage input, V init, BinaryOperator op) requires(not is_a<V, AccumulatorLike>::value);
 
   /*********************/
   /*** Implementation  */
@@ -20,7 +20,7 @@ namespace mln
 
   template <typename InputImage, class AccuLike, class Extractor>
   typename accu::result_of<AccuLike, image_value_t<InputImage>, Extractor>::type
-      accumulate(InputImage input, const AccumulatorLike<AccuLike>& accu, const Extractor& ex)
+  accumulate(InputImage input, const AccumulatorLike<AccuLike>& accu, const Extractor& ex)
   {
     static_assert(mln::is_a<InputImage, mln::details::Image>());
 
@@ -33,7 +33,7 @@ namespace mln
   }
 
   template <typename InputImage, class V, class BinaryOperator>
-  std::enable_if_t<!is_a<V, AccumulatorLike>::value, V> accumulate(InputImage input, V init, BinaryOperator op)
+  V accumulate(InputImage input, V init, BinaryOperator op) requires(not is_a<V, AccumulatorLike>::value)
   {
     static_assert(mln::is_a<InputImage, mln::details::Image>());
 

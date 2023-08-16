@@ -1,11 +1,9 @@
 #pragma once
 
 #include <mln/core/domain/where.hpp>
-#include <mln/core/range/view/transform_if.hpp>
 #include <mln/core/image/image.hpp>
 #include <mln/core/image/view/adaptor.hpp>
-
-
+#include <mln/core/range/view/transform_if.hpp>
 
 
 #include <type_traits>
@@ -18,13 +16,19 @@ namespace mln
     struct first_of_two
     {
       template <class A1, class A2>
-      A1 operator()(A1&& arg1, A2&&) const { return arg1; }
+      A1 operator()(A1&& arg1, A2&&) const
+      {
+        return arg1;
+      }
     };
 
     struct second_of_two
     {
       template <class A1, class A2>
-      A2 operator()(A1&&, A2&& arg2) const { return arg2; }
+      A2 operator()(A1&&, A2&& arg2) const
+      {
+        return arg2;
+      }
     };
   } // namespace details
 
@@ -73,7 +77,7 @@ namespace mln
 
     template <class I2, class D2>
     mask_view(const mask_view<I2, D2>& other, const image_build_params& params)
-      : mask_view::image_adaptor{ imchvalue<value_type>(other.base()).set_params(params).build() }
+      : mask_view::image_adaptor{imchvalue<value_type>(other.base()).set_params(params).build()}
       , m_mask{other.m_mask}
     {
     }
@@ -82,43 +86,42 @@ namespace mln
     image_builder<concrete_type, mask_view> concretize() const { return {*this}; }
 
     template <class U>
-    image_builder<ch_value_type<U>, mask_view> ch_value() const { return {*this}; }
+    image_builder<ch_value_type<U>, mask_view> ch_value() const
+    {
+      return {*this};
+    }
 
     domain_type domain() const { return mln::where(m_mask); }
 
     auto values()
     {
-      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().values(), m_mask.values());
+      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().values(),
+                                             m_mask.values());
     }
 
     auto pixels()
     {
-      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().pixels(), m_mask.values());
+      return mln::ranges::view::transform_if(details::first_of_two{}, details::second_of_two{}, this->base().pixels(),
+                                             m_mask.values());
     }
 
     /// Accessible-image related methods (overwritten from adaptor)
     /// \{
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
+    reference operator()(point_type p) requires(accessible::value)
     {
       mln_precondition(m_mask.domain().has(p));
       mln_precondition(this->base().domain().has(p));
       return this->base()(p);
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
+    pixel_type pixel(point_type p) requires(accessible::value)
     {
       mln_precondition(m_mask.domain().has(p));
       mln_precondition(this->base().domain().has(p));
       return this->base().pixel(p);
     }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
-    {
-      return this->base().pixel_at(p);
-    }
+    pixel_type pixel_at(point_type p) requires(accessible::value) { return this->base().pixel_at(p); }
     /// \}
 
 

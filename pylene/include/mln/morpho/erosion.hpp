@@ -11,24 +11,26 @@
 
 #include <mln/morpho/dilation.hpp>
 
+#include <concepts>
+
 namespace mln::morpho
 {
 
   template <class InputImage, class SE>
-  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se);
+  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&&                                image,
+                                                                const mln::details::StructuringElement<SE>& se);
 
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-          std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>* = nullptr);
+  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+          BorderManager bm) requires(not mln::is_a<BorderManager, mln::details::Image>::value);
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out);
+  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+               OutputImage&& out) requires(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value);
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                OutputImage&& out);
+  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm, OutputImage&& out);
 
 
   /******************************************/
@@ -66,23 +68,23 @@ namespace mln::morpho
     struct erosion_value_set_base
     {
       static inline constexpr erosion_sup_t<V> sup  = {};
-      static inline constexpr auto zero = mln::value_traits<V>::sup();
+      static inline constexpr auto             zero = mln::value_traits<V>::sup();
     };
 
 
-    template <class V, class = void>
+    template <class V>
     struct erosion_value_set : erosion_value_set_base<V>
     {
-      using has_incremental_sup = std::false_type;
+      using has_incremental_sup             = std::false_type;
       static inline constexpr auto accu_sup = mln::accu::accumulators::inf<V>{};
     };
 
     template <class V>
-    struct erosion_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16) && std::is_unsigned_v<V>>>
-      : erosion_value_set_base<V>
+    requires(std::unsigned_integral<V>&& value_traits<V>::quant <= 16) //
+        struct erosion_value_set<V> : erosion_value_set_base<V>
     {
-      using has_incremental_sup = std::true_type;
-      static inline constexpr auto accu_sup = mln::accu::accumulators::inf<V>{};
+      using has_incremental_sup                         = std::true_type;
+      static inline constexpr auto accu_sup             = mln::accu::accumulators::inf<V>{};
       static inline constexpr auto accu_incremental_sup = mln::accu::accumulators::h_inf<V>{};
     };
 
@@ -90,8 +92,7 @@ namespace mln::morpho
   } // namespace details
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                OutputImage&& out)
+  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm, OutputImage&& out)
   {
     mln_entering("mln::morpho::erosion");
 
@@ -102,7 +103,8 @@ namespace mln::morpho
 
 
   template <class InputImage, class SE>
-  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se)
+  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&&                                image,
+                                                                const mln::details::StructuringElement<SE>& se)
   {
     using I = std::remove_reference_t<InputImage>;
 
@@ -112,8 +114,9 @@ namespace mln::morpho
   }
 
   template <class InputImage, class SE, class BorderManager>
-  image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                                                                std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>*)
+  image_concrete_t<std::remove_reference_t<InputImage>>
+  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+          BorderManager bm) requires(not mln::is_a<BorderManager, mln::details::Image>::value)
   {
     using I = std::remove_reference_t<InputImage>;
 
@@ -123,28 +126,26 @@ namespace mln::morpho
   }
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-  erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out)
+  void erosion(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+               OutputImage&& out) requires(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value)
   {
     using I = std::remove_reference_t<InputImage>;
-    erosion(image, se, mln::extension::bm::fill(mln::value_traits<image_value_t<I>>::sup()),  out);
+    erosion(image, se, mln::extension::bm::fill(mln::value_traits<image_value_t<I>>::sup()), out);
   }
-
 
 
   namespace parallel
   {
-
     template <class InputImage, class SE, class OutputImage>
     void erosion(InputImage&& image, const SE& se, OutputImage&& out, int tile_width, int tile_height)
     {
-      using I = std::remove_reference_t<InputImage>;
+      using I  = std::remove_reference_t<InputImage>;
       using VS = morpho::details::erosion_value_set<image_value_t<I>>;
 
       static_assert(std::is_same_v<image_domain_t<std::remove_reference_t<InputImage>>, mln::box2d>);
       static_assert(std::is_same_v<image_domain_t<std::remove_reference_t<OutputImage>>, mln::box2d>);
 
-      VS vs;
+      VS   vs;
       bool parallel = true;
       morpho::details::dilation2d(std::forward<InputImage>(image), std::forward<OutputImage>(out), se, vs, tile_width,
                                   tile_height, parallel);
@@ -164,10 +165,10 @@ namespace mln::morpho
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> erosion(InputImage&& image, const SE& se)
     {
-      constexpr int kDefaultTileWidth = 128;
+      constexpr int kDefaultTileWidth  = 128;
       constexpr int kDefaultTileHeight = 128;
       return erosion(image, se, kDefaultTileWidth, kDefaultTileHeight);
     }
   } // namespace parallel
 
-}
+} // namespace mln::morpho

@@ -84,17 +84,17 @@ namespace mln::view
         return ::mln::view::transform(static_cast<const I1&>(ima1), static_cast<const I2&>(ima2), equalFP_t{eps});
       }
 
-      template <class I, class Scalar,
-                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::details::Image>::value>>
-      auto equalFP(const ::mln::details::Image<I>& ima1, Scalar s, double eps)
+      template <class I, class Scalar>
+      auto equalFP(const ::mln::details::Image<I>& ima1, Scalar s,
+                   double eps) requires(not mln::is_a<Scalar, ::mln::details::Image>::value)
       {
         auto g = [f_ = equalFP_t{eps}, s_ = s](auto&& arg) { return f_(arg, s_); };
         return ::mln::view::transform(static_cast<const I&>(ima1), g);
       }
 
-      template <class Scalar, class I,
-                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::details::Image>::value>>
-      auto equalFP(Scalar s, const ::mln::details::Image<I>& ima2, double eps)
+      template <class Scalar, class I>
+      auto equalFP(Scalar s, const ::mln::details::Image<I>& ima2,
+                   double eps) requires(not mln::is_a<Scalar, ::mln::details::Image>::value)
       {
         auto g = [f_ = equalFP_t{eps}, s_ = s](auto&& arg) { return f_(s_, arg); };
         return ::mln::view::transform(static_cast<const I&>(ima2), g);
@@ -102,10 +102,9 @@ namespace mln::view
     } /* namespace impl */
 
     /* This overload is there to be a best match wrt old API impl */
-    template <class A, class B,
-              class = std::enable_if_t<(::mln::is_a<A, ::mln::details::Image>::value ||
-                                        ::mln::is_a<B, ::mln::details::Image>::value)>>
-    auto equalFP(const A& lhs, const B& rhs, double eps)
+    template <class A, class B>
+    auto equalFP(const A& lhs, const B& rhs, double eps) requires(mln::is_a<A, ::mln::details::Image>::value ||
+                                                                  mln::is_a<B, ::mln::details::Image>::value)
     {
       return impl::equalFP(lhs, rhs, eps);
     }
@@ -114,14 +113,12 @@ namespace mln::view
 
   namespace details
   {
-    template <class ICond, class ITrue, class IFalse, class = void>
+    template <class ICond, class ITrue, class IFalse>
     struct ifelse_fn;
 
-
     template <class ICond, class ITrue, class IFalse>
-    struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(is_a<ITrue, mln::details::Image>::value &&
-                                       is_a<IFalse, mln::details::Image>::value)>>
+    requires(is_a<ITrue, mln::details::Image>::value&& is_a<IFalse, mln::details::Image>::value) //
+        struct ifelse_fn<ICond, ITrue, IFalse>
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse iffalse) const
       {
@@ -135,9 +132,19 @@ namespace mln::view
     };
 
     template <class ICond, class ITrue, class IFalse>
-    struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(!is_a<ITrue, mln::details::Image>::value &&
-                                       is_a<IFalse, mln::details::Image>::value)>>
+    requires(not is_a<ITrue, mln::details::Image>::value && not is_a<IFalse, mln::details::Image>::value) //
+        struct ifelse_fn<ICond, ITrue, IFalse>
+    {
+      auto operator()(const ICond& cond, ITrue vtrue, IFalse vfalse) const
+      {
+        auto g = [vtrue, vfalse](bool vcond) { return (vcond) ? vtrue : vfalse; };
+        return view::transform(cond, g);
+      }
+    };
+
+    template <class ICond, class ITrue, class IFalse>
+    requires(not is_a<ITrue, mln::details::Image>::value && is_a<IFalse, mln::details::Image>::value) //
+        struct ifelse_fn<ICond, ITrue, IFalse>
     {
       auto operator()(const ICond& cond, ITrue vtrue, IFalse iffalse) const
       {
@@ -150,9 +157,8 @@ namespace mln::view
     };
 
     template <class ICond, class ITrue, class IFalse>
-    struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(is_a<ITrue, mln::details::Image>::value &&
-                                       !is_a<IFalse, mln::details::Image>::value)>>
+    requires(is_a<ITrue, mln::details::Image>::value && not is_a<IFalse, mln::details::Image>::value) //
+        struct ifelse_fn<ICond, ITrue, IFalse>
     {
       auto operator()(const ICond& cond, ITrue iftrue, IFalse vfalse) const
       {
@@ -161,19 +167,6 @@ namespace mln::view
         };
 
         return view::transform(cond, std::move(iftrue), g);
-      }
-    };
-
-
-    template <class ICond, class ITrue, class IFalse>
-    struct ifelse_fn<ICond, ITrue, IFalse,
-                     std::enable_if_t<(!is_a<ITrue, mln::details::Image>::value &&
-                                       !is_a<IFalse, mln::details::Image>::value)>>
-    {
-      auto operator()(const ICond& cond, ITrue vtrue, IFalse vfalse) const
-      {
-        auto g = [vtrue, vfalse](bool vcond) { return (vcond) ? vtrue : vfalse; };
-        return view::transform(cond, g);
       }
     };
   } // namespace details

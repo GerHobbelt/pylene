@@ -52,7 +52,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::min<T, Compare> type;
+          using type = accumulators::min<T, Compare>;
         };
 
         template <typename T>
@@ -93,9 +93,9 @@ namespace mln
       template <typename T, typename Compare>
       struct min : accumulator_base<min<T, Compare>, T, T, features::min<>>
       {
-        typedef T argument_type;
-        typedef T return_type;
-        // typedef features::min<> feature;
+        using argument_type = T;
+        using return_type   = T;
+        // using feature = features::min<>;
 
         min(const Compare& cmp = Compare())
           : m_val(value_traits<T, Compare>::max())

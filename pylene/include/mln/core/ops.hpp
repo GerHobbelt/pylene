@@ -1,10 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <functional>
-#include <type_traits>
-#include <tuple>
 #include <range/v3/detail/adl_get.hpp> // for ADL get(x)
+#include <tuple>
+#include <type_traits>
 
 
 /**
@@ -194,21 +195,19 @@ namespace mln
   namespace details::_getter
   {
     template <std::size_t N, class C>
-    requires(std::is_scalar_v<std::remove_reference_t<C>>)
-    decltype(auto) get(C&& obj)
+    decltype(auto) get(C&& obj) requires(std::is_scalar_v<std::remove_reference_t<C>>)
     {
       static_assert(N == 0, "N must be 0 for scalar type");
       return std::forward<C>(obj);
     }
 
     template <std::size_t N, class C>
-    requires (!std::is_scalar_v<std::remove_reference_t<C>>)
-    decltype(auto) get(C&& obj)
+    decltype(auto) get(C&& obj) requires(not std::is_scalar_v<std::remove_reference_t<C>>)
     {
       // Force ADL look up
       return ::ranges::detail::adl_get<N>(std::forward<C>(obj));
     }
-  }
+  } // namespace details::_getter
 
   template <size_t N>
   struct getter

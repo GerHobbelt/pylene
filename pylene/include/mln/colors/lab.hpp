@@ -18,7 +18,7 @@ namespace mln
   template <typename T>
   using lab = internal::vec_base<T, 3, lab_tag>;
 
-  typedef lab<uint8> lab8;
+  using lab8 = lab<std::uint8_t>;
 
   namespace internal
   {

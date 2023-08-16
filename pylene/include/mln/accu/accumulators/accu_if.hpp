@@ -15,9 +15,9 @@ namespace mln
       struct accu_if : accumulator_base<accu_if<Accu, Predicate, ArgType>, ArgType, typename Accu::result_type,
                                         typename Accu::feature>
       {
-        typedef ArgType                    argument_type;
-        typedef typename Accu::result_type result_type;
-        typedef typename Accu::feature     feature;
+        using argument_type = ArgType;
+        using result_type   = typename Accu::result_type;
+        using feature       = typename Accu::feature;
 
         accu_if(const Accu& accu = Accu(), const Predicate& pred = Predicate())
           : m_accu(accu)

@@ -22,8 +22,8 @@ namespace mln
   template <typename N>
   struct neighborhood_traits
   {
-    typedef typename N::category       category;
-    typedef typename N::is_incremental is_incremental;
+    using category       = typename N::category;
+    using is_incremental = typename N::is_incremental;
   };
 
   // Some traits helper

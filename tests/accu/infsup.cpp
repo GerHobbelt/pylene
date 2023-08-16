@@ -10,7 +10,7 @@ TEST(Accu, Infsup)
   using namespace mln;
   using namespace mln::accu;
 
-  typedef vec3i Vec;
+  using Vec = vec3i;
 
   // product order comparison
   {
@@ -38,7 +38,7 @@ TEST(Accu, Infsup)
 
   // colors are partially ordered
   {
-    typedef rgb<int>          Vec;
+    using Vec = rgb<int>;
     accumulators::infsup<Vec> acc;
 
     acc.take(Vec(4, -5, 6));
@@ -52,7 +52,7 @@ TEST(Accu, Infsup)
   // colors are not totally ordered => this does not compile
   /*
   {
-    typedef rgb<int> Vec;
+    using Vec = rgb<int>;
     accumulators::minmax<Vec> acc;
 
     acc.take(Vec(4,-5,6));

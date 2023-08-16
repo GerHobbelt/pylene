@@ -25,7 +25,7 @@ namespace mln
         template <typename P>
         struct apply
         {
-          typedef accumulators::cvxhull<P> type;
+          using type = accumulators::cvxhull<P>;
         };
 
         template <typename P>
@@ -40,7 +40,7 @@ namespace mln
         template <typename P>
         struct apply
         {
-          typedef accumulators::cvxhull<P> type;
+          using type = accumulators::cvxhull<P>;
         };
 
         template <typename P>
@@ -54,13 +54,13 @@ namespace mln
     namespace extractor
     {
       template <typename A>
-      auto cvxhull(const Accumulator<A>& accu) -> decltype(extract(accu, features::cvxhull()))
+      auto cvxhull(const Accumulator<A>& accu)
       {
         return extract(accu, features::cvxhull());
       }
 
       template <typename A>
-      auto pvector(const Accumulator<A>& accu) -> decltype(extract(accu, features::pvector()))
+      auto pvector(const Accumulator<A>& accu)
       {
         return extract(accu, features::pvector());
       }
@@ -72,10 +72,10 @@ namespace mln
       template <typename P>
       struct cvxhull : accumulator_base<cvxhull<P>, P, std::vector<P>, features::cvxhull>
       {
-        typedef P                        argument_type;
-        typedef std::vector<P>           result_type;
-        typedef features::cvxhull        feature;
-        typedef boost::mpl::set<feature> provides;
+        using argument_type = P;
+        using result_type   = std::vector<P>;
+        using feature       = features::cvxhull;
+        using provides      = boost::mpl::set<feature>;
 
         cvxhull() { init(); }
 
@@ -122,8 +122,8 @@ namespace mln
         }
 
       private:
-        mutable        std::vector<P> m_points;
-        bool           m_newline;
+        mutable std::vector<P> m_points;
+        bool                   m_newline;
       };
     } // namespace accumulators
   }   // namespace accu

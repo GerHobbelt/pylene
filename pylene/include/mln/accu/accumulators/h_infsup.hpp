@@ -5,6 +5,8 @@
 #include <mln/core/value/indexer.hpp>
 #include <mln/core/value/value_traits.hpp>
 
+#include <concepts>
+
 #ifdef _MSC_VER
 #pragma warning(disable : 4800)
 #endif
@@ -53,17 +55,13 @@ namespace mln
     namespace accumulators
     {
 
-      template <typename E, typename T, typename F, typename Enable = void>
-      struct h_infsup_base;
-
       template <typename E, typename T, typename F>
-      struct h_infsup_base<E, T, F,
-                           typename std::enable_if<std::is_integral<T>::value and value_traits<T>::quant <= 16>::type>
-        : accumulator_base<E, T, T, F>
+      requires(std::integral<T>and value_traits<T>::quant <= 16) //
+          struct h_infsup_base : accumulator_base<E, T, T, F>
       {
-        typedef T                                                                                   argument_type;
-        typedef T                                                                                   result_type;
-        typedef boost::mpl::set<features::h_sup, features::h_inf, features::inf<>, features::sup<>> provides;
+        using argument_type = T;
+        using result_type   = T;
+        using provides      = boost::mpl::set<features::h_sup, features::h_inf, features::inf<>, features::sup<>>;
 
         using has_untake = std::true_type;
 

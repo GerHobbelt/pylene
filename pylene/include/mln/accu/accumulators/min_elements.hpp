@@ -48,7 +48,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::minimal_elements<T, Compare> type;
+          using type = accumulators::minimal_elements<T, Compare>;
         };
 
         template <typename T>
@@ -77,7 +77,7 @@ namespace mln
     {
 
       template <typename A>
-      auto minimal_elements(const Accumulator<A>& acc) -> decltype(extract(exact(acc), features::minimal_elements<>()))
+      auto minimal_elements(const Accumulator<A>& acc)
       {
         return extract(exact(acc), features::minimal_elements<>());
       }
@@ -89,9 +89,9 @@ namespace mln
       template <typename T, typename Compare>
       struct minimal_elements : accumulator_base<minimal_elements<T, Compare>, T, T, features::minimal_elements<>>
       {
-        typedef T              argument_type;
-        typedef std::vector<T> return_type;
-        // typedef features::min<> feature;
+        using argument_type = T;
+        using return_type   = std::vector<T>;
+        // using feature = features::min<>;
 
         minimal_elements(const Compare& cmp = Compare())
           : m_cmp(cmp)

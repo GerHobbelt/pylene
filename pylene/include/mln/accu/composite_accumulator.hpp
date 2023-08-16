@@ -46,31 +46,31 @@ namespace mln
       struct whatdepends
       {
 
-        typedef mpl::quote1<features::depends>                                                             meta_depends;
-        typedef typename mpl::transform<FeatureSet, meta_depends, mpl_set_inserter<mpl::set<>>>::type      dependances;
-        typedef typename mpl::fold<dependances, mpl::set<>, whatdepends_helper_copy<ph::_1, ph::_2>>::type type;
+        using meta_depends = mpl::quote1<mln::accu::features::depends>;
+        using dependances  = typename mpl::transform<FeatureSet, meta_depends, mpl_set_inserter<mpl::set<>>>::type;
+        using type         = typename mpl::fold<dependances, mpl::set<>, whatdepends_helper_copy<ph::_1, ph::_2>>::type;
       };
 
       template <typename FeatureSet, typename Depends>
       struct get_unresolved
       {
-        typedef
-            typename mpl::remove_if<Depends, mpl::has_key<FeatureSet, ph::_1>, mpl_set_inserter<mpl::set<>>>::type type;
+        using type =
+            typename mpl::remove_if<Depends, mpl::has_key<FeatureSet, ph::_1>, mpl_set_inserter<mpl::set<>>>::type;
       };
 
       template <typename FeatureSet, typename Depends = typename whatdepends<FeatureSet>::type,
                 bool empty = mpl::empty<Depends>::value>
       struct resolve_dependances
       {
-        typedef typename get_unresolved<FeatureSet, Depends>::type                 unresolved;
-        typedef typename mpl::copy<unresolved, mpl_set_inserter<FeatureSet>>::type new_feature_set;
-        typedef typename resolve_dependances<new_feature_set, typename whatdepends<unresolved>::type>::type type;
+        using unresolved      = typename get_unresolved<FeatureSet, Depends>::type;
+        using new_feature_set = typename mpl::copy<unresolved, mpl_set_inserter<FeatureSet>>::type;
+        using type = typename resolve_dependances<new_feature_set, typename whatdepends<unresolved>::type>::type;
       };
 
       template <typename FeatureSet, typename Depends>
       struct resolve_dependances<FeatureSet, Depends, true>
       {
-        typedef FeatureSet type;
+        using type = FeatureSet;
       };
 
       template <typename T>
@@ -79,7 +79,7 @@ namespace mln
         template <typename F>
         struct apply
         {
-          typedef typename F::template apply<T>::type type;
+          using type = typename F::template apply<T>::type;
         };
       };
 
@@ -134,39 +134,31 @@ namespace mln
         template <typename Accu>
         struct apply
         {
-          typedef typename boost::mpl::has_key<typename Accu::provides, Feature>::type type;
+          using type = typename boost::mpl::has_key<typename Accu::provides, Feature>::type;
         };
       };
 
       template <typename AccuList, typename Feature>
       struct acculist_has_feature
       {
-        typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature>>::type iterator;
-        typedef typename boost::fusion::result_of::end<AccuList>::type                                end;
+        using iterator = typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature>>::type;
+        using end      = typename boost::fusion::result_of::end<AccuList>::type;
         static constexpr bool value = not boost::fusion::result_of::equal_to<iterator, end>::value;
 
         // static constexpr iterator x = end ();
       };
 
-      template <typename AccuList, typename Feature>
-      struct acculist_get_feature
-      {
-        typedef typename boost::fusion::result_of::find_if<AccuList, accu_has_feature<Feature>>::type iterator;
-        typedef typename boost::fusion::result_of::deref<iterator>::type                              accu;
-
-        typedef decltype(extract(std::declval<accu>(), Feature())) type;
-      };
     } // namespace internal
 
     template <typename E, typename T, typename FeatureSet>
     struct composite_accumulator_base : Accumulator<E>
     {
-      typedef T                                                                                      argument_type;
-      typedef typename internal::resolve_dependances<typename FeatureSet::features>::type            fset;
-      typedef typename boost::mpl::transform<fset, internal::feature_to_accu_helper<T>,
-                                             boost::mpl::back_inserter<boost::fusion::list<>>>::type acculist;
+      using argument_type = T;
+      using fset          = typename internal::resolve_dependances<typename FeatureSet::features>::type;
+      using acculist      = typename boost::mpl::transform<fset, internal::feature_to_accu_helper<T>,
+                                                      boost::mpl::back_inserter<boost::fusion::list<>>>::type;
 
-      typedef E result_type;
+      using result_type = E;
 
       void init() { boost::fusion::for_each(m_accus, internal::accu_init()); }
 
@@ -181,9 +173,8 @@ namespace mln
       void untake(const argument_type& x) { boost::fusion::for_each(m_accus, internal::accu_untake<argument_type>(x)); }
 
       template <typename Feature>
-      friend typename boost::lazy_enable_if_c<internal::acculist_has_feature<acculist, Feature>::value,
-                                              internal::acculist_get_feature<acculist, Feature>>::type
-          extract(const composite_accumulator_base& accu, Feature feat)
+      friend auto extract(const composite_accumulator_base& accu,
+                          Feature feat) requires internal::acculist_has_feature<acculist, Feature>::value
       {
         auto res = boost::fusion::find_if<internal::accu_has_feature<Feature>>(accu.m_accus);
 
@@ -206,9 +197,9 @@ namespace mln
       : composite_accumulator_base<E, ArgumentType,
                                    features::composite_feature<typename features::depends<Feature>::type>>
     {
-      typedef ArgumentType argument_type;
-      typedef ResultType   result_type;
-      typedef Feature      feature;
+      using argument_type = ArgumentType;
+      using result_type   = ResultType;
+      using feature       = Feature;
 
       ResultType to_result() const { return extract(mln::exact(*this), Feature()); }
     };

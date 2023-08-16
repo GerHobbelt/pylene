@@ -3,8 +3,8 @@
 #include <mln/core/private/weighted_pixel.hpp>
 
 #include <meta/meta.hpp>
-#include <range/v3/view/adaptor.hpp>
 #include <range/v3/range/concepts.hpp>
+#include <range/v3/view/adaptor.hpp>
 
 namespace mln::details
 {
@@ -72,11 +72,11 @@ namespace mln::details
       {
       }
 
-      auto read(::ranges::iterator_t<Rng> it) const -> mln::weighted_pixel<Pixel, decltype(it->weight())>
+      auto read(::ranges::iterator_t<Rng> it) const
       {
         Pixel tmp = m_pix;
         tmp.shift(it->point());
-        return {tmp, it->weight()};
+        return mln::weighted_pixel{tmp, it->weight()};
       }
     };
 
@@ -99,4 +99,4 @@ namespace mln::details
       return ::ranges::size(this->base());
     }
   };
-}
+} // namespace mln::details

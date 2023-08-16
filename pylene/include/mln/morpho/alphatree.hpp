@@ -12,6 +12,7 @@
 #include <mln/morpho/private/directional_hqueue.hpp>
 
 #include <algorithm>
+#include <concepts>
 #include <type_traits>
 
 #include <range/v3/functional/concepts.hpp>
@@ -27,7 +28,7 @@ namespace mln::morpho
   template <class I, class N, class F = mln::functional::l2dist_t<>>
   std::pair<component_tree<std::invoke_result_t<F, image_value_t<I>, image_value_t<I>>>, image_ch_value_t<I, int>> //
   alphatree(I input, N nbh, F distance = F{});
-  
+
 
   /******************************************/
   /****          Implementation          ****/
@@ -42,7 +43,8 @@ namespace mln::morpho
     class alphatree_edges;
 
     template <typename P, typename N, typename W, bool HQ>
-    requires(std::is_integral_v<W>&& std::is_unsigned_v<W> && sizeof(W) <= 2 && HQ) class alphatree_edges<P, N, W, HQ>
+    requires(std::unsigned_integral<W> && sizeof(W) <= 2 && HQ) //
+        class alphatree_edges<P, N, W, HQ>
     {
     public:
       void                push(int dir, W w, P p) { m_cont.insert(dir, w, p); }
@@ -237,10 +239,9 @@ namespace mln::morpho
     }
 
     template <class W, class I>
-    std::pair<std::vector<int>, std::vector<W>> canonize_component_tree(const std::vector<int>& par,        //
-                                                                        const std::vector<W>&   levels,     //
-                                                                        I node_map
-                                                                        )
+    std::pair<std::vector<int>, std::vector<W>> canonize_component_tree(const std::vector<int>& par,    //
+                                                                        const std::vector<W>&   levels, //
+                                                                        I                       node_map)
     {
       std::vector<int> canonized_par;
       std::vector<W>   canonized_levels;
@@ -268,7 +269,9 @@ namespace mln::morpho
           translation_map[i] = translation_map[par[i]];
       }
 
-      mln::for_each(node_map, [&translation_map, node_count=par.size()](int& id) { id = translation_map[static_cast<int>(node_count) - id - 1]; });
+      mln::for_each(node_map, [&translation_map, node_count = par.size()](int& id) {
+        id = translation_map[static_cast<int>(node_count) - id - 1];
+      });
 
       return {canonized_par, canonized_levels};
     }
@@ -291,8 +294,8 @@ namespace mln::morpho
       if (canonize_tree)
       {
         auto [canonized_par, canonized_levels] = internal::canonize_component_tree(par, levels, node_map);
-        t.parent = std::move(canonized_par);
-        t.values = std::move(canonized_levels);
+        t.parent                               = std::move(canonized_par);
+        t.values                               = std::move(canonized_levels);
       }
       else
       {

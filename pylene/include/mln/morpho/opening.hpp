@@ -30,21 +30,20 @@ namespace mln::morpho
   /// \param[out] out (optional) Output image \p g to write in.
   /// \param[in] bm (optional) Border management function
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-               OutputImage&& out);
+  void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm, OutputImage&& out);
 
   template <class InputImage, class SE>
-  image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&&                                     image,
+  image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&&                                image,
                                                                 const mln::details::StructuringElement<SE>& se);
 
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-          std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>* = nullptr);
+  opening(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+          BorderManager bm) requires(not mln::is_a<BorderManager, mln::details::Image>::value);
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-  opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out);
+  void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out) //
+      requires(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value);
 
 
   /******************************************/
@@ -52,15 +51,15 @@ namespace mln::morpho
   /******************************************/
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
-  void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                OutputImage&& out)
+  void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm, OutputImage&& out)
   {
     mln_entering("mln::morpho::opening");
 
     // To enable when we can concept check that domain are comparable
     // assert(image.domain() == out.domain());
 
-    if (! (bm.method() == mln::extension::BorderManagementMethod::Fill || bm.method() == mln::extension::BorderManagementMethod::User))
+    if (!(bm.method() == mln::extension::BorderManagementMethod::Fill ||
+          bm.method() == mln::extension::BorderManagementMethod::User))
       throw std::runtime_error("Invalid border management method (should be FILL or USER)");
 
     auto tmp = mln::morpho::erosion(image, se, bm);
@@ -68,8 +67,8 @@ namespace mln::morpho
   }
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-  opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out)
+  void opening(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+               OutputImage&& out) requires(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value)
   {
     mln_entering("mln::morpho::opening");
     auto tmp = mln::morpho::erosion(image, se);
@@ -77,7 +76,8 @@ namespace mln::morpho
   }
 
   template <class InputImage, class SE>
-  image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&& image, const mln::details::StructuringElement<SE>& se)
+  image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&&                                image,
+                                                                const mln::details::StructuringElement<SE>& se)
   {
     auto out = imconcretize(image).build();
     mln::morpho::opening(image, se, out);
@@ -85,8 +85,9 @@ namespace mln::morpho
   }
 
   template <class InputImage, class SE, class BorderManager>
-  image_concrete_t<std::remove_reference_t<InputImage>> opening(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                                                                std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>*)
+  image_concrete_t<std::remove_reference_t<InputImage>>
+  opening(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+          BorderManager bm) requires(not mln::is_a<BorderManager, mln::details::Image>::value)
   {
     auto out = imconcretize(image).build();
     mln::morpho::opening(image, se, bm, out);
@@ -94,4 +95,4 @@ namespace mln::morpho
   }
 
 
-} // namespace mln::morpho::
+} // namespace mln::morpho

@@ -4,6 +4,7 @@
 #include <mln/core/ops.hpp>
 #include <mln/core/value/value_traits.hpp>
 
+#include <concepts>
 #include <utility>
 
 
@@ -59,7 +60,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::inf<T, Compare> type;
+          using type = accumulators::inf<T, Compare>;
         };
 
         template <typename T>
@@ -80,7 +81,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::inf<T> type;
+          using type = accumulators::inf<T>;
         };
 
         template <typename T>
@@ -101,7 +102,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::sup<T, Compare> type;
+          using type = accumulators::sup<T, Compare>;
         };
 
         template <typename T>
@@ -122,7 +123,7 @@ namespace mln
         template <typename T>
         struct apply
         {
-          typedef accumulators::sup<T> type;
+          using type = accumulators::sup<T>;
         };
 
         template <typename T>
@@ -155,9 +156,9 @@ namespace mln
       template <typename T, typename Compare>
       struct infsup : Accumulator<infsup<T, Compare>>
       {
-        typedef T                                                 argument_type;
-        typedef std::pair<T, T>                                   result_type;
-        typedef boost::mpl::set<features::inf<>, features::sup<>> provides;
+        using argument_type = T;
+        using result_type   = std::pair<T, T>;
+        using provides      = boost::mpl::set<features::inf<>, features::sup<>>;
 
         infsup(const Compare& cmp = Compare())
           : m_inf(value_traits<T, Compare>::sup())
@@ -206,8 +207,8 @@ namespace mln
       template <typename T, typename Compare>
       struct inf : accumulator_base<inf<T, Compare>, T, T, features::inf<>>
       {
-        typedef T argument_type;
-        typedef T result_type;
+        using argument_type = T;
+        using result_type   = T;
 
         constexpr inf(const Compare& cmp = Compare())
           : m_cmp(cmp)
@@ -231,11 +232,7 @@ namespace mln
           m_inf  = inf(m_inf, vinf, m_cmp);
         }
 
-        template <class dummy = bool>
-        typename std::enable_if<std::is_same<T, bool>::value, dummy>::type stop() const
-        {
-          return m_inf == value_traits<bool, Compare>::inf();
-        }
+        bool stop() const requires(std::same_as<T, bool>) { return m_inf == value_traits<bool, Compare>::inf(); }
 
         friend T extract(const inf& accu, features::inf<>) { return accu.m_inf; }
 
@@ -247,8 +244,8 @@ namespace mln
       template <typename T, typename Compare>
       struct sup : accumulator_base<sup<T, Compare>, T, T, features::sup<>>
       {
-        typedef T argument_type;
-        typedef T result_type;
+        using argument_type = T;
+        using result_type   = T;
 
         constexpr sup(const Compare& cmp = Compare())
           : m_cmp(cmp)
@@ -272,11 +269,7 @@ namespace mln
           m_sup  = sup(m_sup, vsup, m_cmp);
         }
 
-        template <class dummy = bool>
-        typename std::enable_if<std::is_same<T, bool>::value, dummy>::type stop() const
-        {
-          return m_sup == value_traits<bool, Compare>::sup();
-        }
+        bool stop() const requires(std::same_as<T, bool>) { return m_sup == value_traits<bool, Compare>::sup(); }
 
         friend T extract(const sup& accu, features::sup<>) { return accu.m_sup; }
 

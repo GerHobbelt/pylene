@@ -3,6 +3,7 @@
 #include <mln/core/colors.hpp>
 #include <mln/core/vec_base.hpp>
 
+#include <concepts>
 
 namespace mln
 {
@@ -14,7 +15,7 @@ namespace mln
   template <typename T>
   using ycbcr = internal::vec_base<T, 3, ycbcr_tag>;
 
-  typedef ycbcr<uint8> ycbcr8;
+  using ycbcr8 = ycbcr<std::uint8_t>;
 
   namespace internal
   {
@@ -52,7 +53,7 @@ namespace mln
   inline ycbcr<T> rgb2ycbcr(const rgb<T>& v)
   {
     static constexpr double bias =
-        std::is_integral<T>::value ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
+        std::integral<T> ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
 
     T y  = 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2];
     T cb = -0.1687 * v[0] - 0.3313 * v[1] + 0.5 * v[2] + bias;
@@ -65,7 +66,7 @@ namespace mln
   inline rgb<T> ycbcr2rgb(const ycbcr<T>& v)
   {
     static constexpr double bias =
-        std::is_integral<T>::value ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
+        std::integral<T> ? (((double)value_traits<T>::min() + (double)value_traits<T>::max()) / 2) : 0;
 
     T r = v[0] + 1.402 * (v[2] - bias);
     T g = v[0] - 0.34454 * (v[1] - bias) - 0.71414 * (v[2] - bias);

@@ -10,8 +10,10 @@
 #include <mln/core/trace.hpp>
 #include <mln/core/value/value_traits.hpp>
 
-#include <mln/morpho/private/localmax.hpp>
 #include <mln/morpho/private/dilation.2d.hpp>
+#include <mln/morpho/private/localmax.hpp>
+
+#include <concepts>
 
 namespace mln::morpho
 {
@@ -22,12 +24,13 @@ namespace mln::morpho
 
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-           std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>* = nullptr);
+  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+           BorderManager bm) requires(not mln::is_a<BorderManager, mln::details::Image>::value);
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out);
+  void
+  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+           OutputImage&& out) requires(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value);
 
   template <class InputImage, class SE, class BorderManager, class OutputImage>
   void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
@@ -83,12 +86,11 @@ namespace mln::morpho
     };
 
 
-
     template <class V>
     struct dilation_value_set_base
     {
       static inline constexpr dilation_sup_t<V> sup  = {};
-      static inline constexpr auto  zero = mln::value_traits<V>::inf();
+      static inline constexpr auto              zero = mln::value_traits<V>::inf();
     };
 
 
@@ -100,8 +102,8 @@ namespace mln::morpho
     };
 
     template <class V>
-    struct dilation_value_set<V, std::enable_if_t<std::is_integral_v<V> && (value_traits<V>::quant <= 16) && std::is_unsigned_v<V>>>
-      : dilation_value_set_base<V>
+    requires(std::unsigned_integral<V>&& value_traits<V>::quant <= 16) //
+        struct dilation_value_set<V> : dilation_value_set_base<V>
     {
       using has_incremental_sup                         = std::true_type;
       static inline constexpr auto accu_sup             = mln::accu::accumulators::sup<V>{};
@@ -109,11 +111,10 @@ namespace mln::morpho
     };
 
 
-
-
     // Generic implementation
     template <class InputImage, class SE, class ValueSet, class BorderManager, class OutputImage>
-    void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm, ValueSet& vs, OutputImage&& out)
+    void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm, ValueSet& vs,
+                  OutputImage&& out)
     {
       mln_entering("mln::morpho::dilation");
 
@@ -129,11 +130,11 @@ namespace mln::morpho
 
     // Specialisation for 2D images
     template <class InputImage, class SE, class ValueSet, class BorderManager, class OutputImage>
-    requires(std::same_as<image_domain_t<std::remove_reference_t<InputImage>>, mln::box2d>&& //
-             std::same_as<image_domain_t<std::remove_reference_t<OutputImage>>, mln::box2d>) //
+    requires(std::same_as<image_domain_t<std::remove_reference_t<InputImage>>, mln::box2d>&&     //
+                 std::same_as<image_domain_t<std::remove_reference_t<OutputImage>>, mln::box2d>) //
 
-    void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-                  ValueSet& vs, OutputImage&& out)
+        void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
+                      ValueSet& vs, OutputImage&& out)
     {
       using V = image_value_t<std::remove_reference_t<InputImage>>;
       mln_entering("mln::morpho::dilation (2d spe)");
@@ -141,7 +142,6 @@ namespace mln::morpho
       if (!(bm.method() == mln::extension::BorderManagementMethod::Fill ||
             bm.method() == mln::extension::BorderManagementMethod::User))
         throw std::runtime_error("Invalid border management method (should be FILL or USER)");
-
 
 
       int  tile_width  = 128;
@@ -182,8 +182,8 @@ namespace mln::morpho
 
   template <class InputImage, class SE, class BorderManager>
   image_concrete_t<std::remove_reference_t<InputImage>>
-  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, BorderManager bm,
-           std::enable_if_t<!mln::is_a<BorderManager, mln::details::Image>::value>*)
+  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+           BorderManager bm) requires(not mln::is_a<BorderManager, mln::details::Image>::value)
   {
     using I = std::remove_reference_t<InputImage>;
 
@@ -193,8 +193,8 @@ namespace mln::morpho
   }
 
   template <class InputImage, class SE, class OutputImage>
-  std::enable_if_t<mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value>
-  dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se, OutputImage&& out)
+  void dilation(InputImage&& image, const mln::details::StructuringElement<SE>& se,
+                OutputImage&& out) requires(mln::is_a<std::remove_reference_t<OutputImage>, mln::details::Image>::value)
   {
     using I = std::remove_reference_t<InputImage>;
     dilation(image, se, mln::extension::bm::fill(mln::value_traits<image_value_t<I>>::inf()), out);
@@ -206,13 +206,13 @@ namespace mln::morpho
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out, int tile_width, int tile_height)
     {
-      using I = std::remove_reference_t<InputImage>;
+      using I  = std::remove_reference_t<InputImage>;
       using VS = morpho::details::dilation_value_set<image_value_t<I>>;
 
       static_assert(std::is_same_v<image_domain_t<std::remove_reference_t<InputImage>>, mln::box2d>);
       static_assert(std::is_same_v<image_domain_t<std::remove_reference_t<OutputImage>>, mln::box2d>);
 
-      VS vs;
+      VS   vs;
       bool parallel = true;
       morpho::details::dilation2d(std::forward<InputImage>(image), std::forward<OutputImage>(out), se, vs, tile_width,
                                   tile_height, parallel);
@@ -221,7 +221,7 @@ namespace mln::morpho
     template <class InputImage, class SE, class OutputImage>
     void dilation(InputImage&& image, const SE& se, OutputImage&& out)
     {
-      constexpr int kDefaultTileWidth = 128;
+      constexpr int kDefaultTileWidth  = 128;
       constexpr int kDefaultTileHeight = 128;
       return dilation(image, se, out, kDefaultTileWidth, kDefaultTileHeight);
     }
@@ -241,7 +241,7 @@ namespace mln::morpho
     template <class InputImage, class SE>
     image_concrete_t<std::remove_reference_t<InputImage>> dilation(InputImage&& image, const SE& se)
     {
-      constexpr int kDefaultTileWidth = 128;
+      constexpr int kDefaultTileWidth  = 128;
       constexpr int kDefaultTileHeight = 128;
       return dilation(image, se, kDefaultTileWidth, kDefaultTileHeight);
     }

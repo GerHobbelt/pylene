@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mln/accu/concept/accumulator.hpp>
+
 #include <boost/fusion/container/list.hpp>
 #include <boost/fusion/include/find_if.hpp>
 #include <boost/fusion/include/for_each.hpp>
@@ -9,7 +11,6 @@
 #include <boost/mpl/inserter.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/set.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <type_traits>
 
@@ -45,12 +46,12 @@ namespace mln
       template <typename FSet>
       struct composite_feature : FeatureSet<composite_feature<FSet>>
       {
-        typedef FSet features;
+        using features = FSet;
 
         template <typename T>
         struct apply
         {
-          typedef composite_accumulator<T, composite_feature<FSet>> type;
+          using type = composite_accumulator<T, composite_feature<FSet>>;
         };
 
         // Create an accumulator for a composite feature
@@ -67,7 +68,7 @@ namespace mln
       template <typename F>
       struct simple_feature : FeatureSet<F>
       {
-        typedef boost::mpl::set<F> features;
+        using features = boost::mpl::set<F>;
 
         // Create an accumulator for a simple feature
         // May me reimplemented in features that have
@@ -89,12 +90,12 @@ namespace mln
       template <typename F, template <typename> class A>
       struct simple_feature_facade : FeatureSet<F>
       {
-        typedef boost::mpl::set<F> features;
+        using features = boost::mpl::set<F>;
 
         template <typename T>
         struct apply
         {
-          typedef A<T> type;
+          using type = A<T>;
         };
 
         template <typename T>
@@ -110,7 +111,7 @@ namespace mln
       composite_feature<typename boost::mpl::copy<
           typename fsetA::features,
           boost::mpl::inserter<typename fsetB::features, boost::mpl::insert<ph::_1, ph::_2>>>::type>
-          operator&(const FeatureSet<fsetA>&, const FeatureSet<fsetB>&)
+      operator&(const FeatureSet<fsetA>&, const FeatureSet<fsetB>&)
       {
         return composite_feature<typename boost::mpl::copy<
             typename fsetA::features,
@@ -120,13 +121,13 @@ namespace mln
       template <typename F>
       struct depends
       {
-        typedef boost::mpl::set<> type;
+        using type = boost::mpl::set<>;
       };
 
       template <typename F>
       struct depends<simple_feature<F>>
       {
-        typedef boost::mpl::set<> type;
+        using type = boost::mpl::set<>;
       };
 
     } // namespace features

@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <type_traits>
 #include <vector>
 
@@ -89,25 +90,17 @@ namespace mln
     /// \brief Returns the depth of the box
     constexpr int depth() const noexcept requires(Impl::ndim == -1 || Impl::ndim >= 3) { return size(2); }
 
-    using typename Impl::cursor;
-    using typename Impl::backward_cursor;
     using Impl::begin_cursor;
     using Impl::end_cursor;
     using Impl::rbegin_cursor;
     using Impl::rend_cursor;
+    using typename Impl::backward_cursor;
+    using typename Impl::cursor;
 
 
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto rows() const
-    {
-      return this->Impl::rows();
-    }
+    auto rows() const requires(ndim != -1) { return this->Impl::rows(); }
 
-    template <int d = ndim, class = std::enable_if_t<d != -1>>
-    auto rrows() const
-    {
-      return this->Impl::rrows();
-    }
+    auto rrows() const requires(ndim != -1) { return this->Impl::rrows(); }
 
 
     /// \brief Returns the top-left corner point
@@ -157,7 +150,10 @@ namespace mln
     }
 
     /// \brief Return the box transposed.
-    constexpr auto transposed() const noexcept requires(Impl::ndim == 2) { return mln::box2d{y(), x(), width(), height()}; }
+    constexpr auto transposed() const noexcept requires(Impl::ndim == 2)
+    {
+      return mln::box2d{y(), x(), width(), height()};
+    }
 
 
     /// \brief Returns the bottom-right (past-the-end) corner point
@@ -183,25 +179,13 @@ namespace mln
     constexpr void set_size(int k, int size) noexcept { this->__end(k) = this->__begin(k) + size; }
 
     /// \brief Set the width of the box to a new width (does not move top-left corner)
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 1>>
-    constexpr void set_width(int width) noexcept
-    {
-      this->set_size(0, width);
-    }
+    constexpr void set_width(int width) noexcept requires(ndim == -1 || ndim >= 1) { this->set_size(0, width); }
 
     /// \brief Set the height of the box to a new height (does not move top-left corner)
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 2>>
-    constexpr void set_height(int height) noexcept
-    {
-      this->set_size(1, height);
-    }
+    constexpr void set_height(int height) noexcept requires(ndim == -1 || ndim >= 2) { this->set_size(1, height); }
 
     /// \brief Set the depth of the box to a new depth (does not move top-left corner)
-    template <int d = ndim, class = std::enable_if_t<d == -1 || d >= 3>>
-    constexpr void set_depth(int depth) noexcept
-    {
-      this->set_size(2, depth);
-    }
+    constexpr void set_depth(int depth) noexcept requires(ndim == -1 || ndim >= 3) { this->set_size(2, depth); }
 
     /// \brief Inflate (or deflate) the box
     constexpr void inflate(int k) noexcept;
@@ -253,7 +237,6 @@ namespace mln
     template <class _p>
     point_type periodize(_point<_p> x) const noexcept;
     /// \}
-
 
 
   private:
@@ -358,7 +341,7 @@ namespace mln
       }
 
 
-      constexpr _bstorage(int width, int height) requires (D == 2)
+      constexpr _bstorage(int width, int height) requires(D == 2)
         : m_begin{0, 0}
         , m_end{width, height}
       {
@@ -387,20 +370,19 @@ namespace mln
       }
 
 
-      constexpr _bstorage(int width, int height, int depth, int duration) requires (D == 4)
+      constexpr _bstorage(int width, int height, int depth, int duration) requires(D == 4)
         : m_begin{0, 0, 0, 0}
         , m_end{width, height, depth, duration}
       {
         assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
       }
 
-      constexpr _bstorage(int x, int y, int z, int w, int width, int height, int depth, int duration) requires (D == 4)
+      constexpr _bstorage(int x, int y, int z, int w, int width, int height, int depth, int duration) requires(D == 4)
         : m_begin{x, y, z, w}
         , m_end{x + width, y + height, z + depth, w + duration}
       {
         assert(width >= 0 && height >= 0 && depth >= 0 && duration >= 0);
       }
-
 
 
       static constexpr int dim() noexcept { return D; }
@@ -591,7 +573,7 @@ namespace mln
       void rbegin_cursor() const {};
       void end_cursor() const {}
       void rend_cursor() const {};
-      using cursor = void;
+      using cursor          = void;
       using backward_cursor = void;
 
 
@@ -684,15 +666,14 @@ namespace mln
         return ret;
       }
 
-      int begin() const { return 0; }
-      int end() const { return 1; }
+      int  begin() const { return 0; }
+      int  end() const { return 1; }
       void begin_cursor() const {}
       void rbegin_cursor() const {};
       void end_cursor() const {}
       void rend_cursor() const {};
-      using cursor = void;
+      using cursor          = void;
       using backward_cursor = void;
-
 
 
       int m_dim;
@@ -894,7 +875,7 @@ namespace mln
     return q;
   }
 
-} // namespace mln::
+} // namespace mln
 
 
 // Specialization of std::common_reference
@@ -907,15 +888,13 @@ namespace std
                   "Incompatible number of dimensions.");
     using type = mln::ndbox<(UImpl::ndim == VImpl::ndim) ? UImpl::ndim : -1>;
   };
-}
+} // namespace std
 
 
 namespace ranges
 {
   template <typename Impl>
-  struct range_cardinality<mln::_box<Impl>, void> :
-    std::integral_constant<cardinality, finite>
+  struct range_cardinality<mln::_box<Impl>, void> : std::integral_constant<cardinality, finite>
   {
   };
-}
-
+} // namespace ranges

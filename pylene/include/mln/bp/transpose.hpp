@@ -1,10 +1,13 @@
 #pragma once
-#include <cstdint>
+
+#include <mln/bp/utils.hpp>
+
+#include <concepts>
 #include <cstddef>
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 
-#include <mln/bp/utils.hpp>
 
 namespace mln::bp
 {
@@ -21,8 +24,8 @@ namespace mln::bp
 
 
   /// @brief Transpose the data from \p src into \p dst
-  /// 
-  /// @tparam T 
+  ///
+  /// @tparam T
   /// @param src Source buffer
   /// @param dst Destination buffer
   /// @param width Width of the *destination* buffer
@@ -30,8 +33,8 @@ namespace mln::bp
   /// @param src_stride Pitch (in bytes) of the source buffer
   /// @param dst_stride Pitch (in bytes) of the destination buffer
   template <class T>
-  void transpose(const T* src, T* dst, int width, int height, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept(std::is_nothrow_swappable_v<T>);
-
+  void transpose(const T* src, T* dst, int width, int height, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept(std::is_nothrow_swappable_v<T>);
 
 
   void transpose_inplace(uint8_t* buffer, int n, std::ptrdiff_t byte_stride, int block_size);
@@ -127,8 +130,8 @@ namespace mln::bp
 
 
   template <class T>
-  requires(std::is_trivially_copyable_v<T> && (sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8)) //
-  void transpose_inplace(T* buffer, int n, std::ptrdiff_t byte_stride) noexcept
+  requires(std::copyable<T> && (sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8)) //
+      void transpose_inplace(T* buffer, int n, std::ptrdiff_t byte_stride) noexcept
   {
     switch (sizeof(T))
     {
@@ -157,22 +160,31 @@ namespace mln::bp
   }
 
 
-  void transpose(const uint8_t*  src, uint8_t*  dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const int8_t*   src, int8_t*   dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const uint16_t* src, uint16_t* dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const int16_t*  src, int16_t*  dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const uint32_t* src, uint32_t* dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const int32_t*  src, int32_t*  dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const uint64_t* src, uint64_t* dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const int64_t*  src, int64_t*  dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const float*    src, float*    dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-  void transpose(const double*   src, double*   dst, int w, int h, std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept;
-
+  void transpose(const uint8_t* src, uint8_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const int8_t* src, int8_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const uint16_t* src, uint16_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const int16_t* src, int16_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const uint32_t* src, uint32_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const int32_t* src, int32_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const uint64_t* src, uint64_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const int64_t* src, int64_t* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const float* src, float* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
+  void transpose(const double* src, double* dst, int w, int h, std::ptrdiff_t src_stride,
+                 std::ptrdiff_t dst_stride) noexcept;
 
 
   template <class T>
-  requires(std::is_trivially_copyable_v<T> && (sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8)) //
-    void transpose(const T* __restrict src, T* __restrict dst, int width, int height,                               //
+  requires(std::copyable<T> && (sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8)) //
+      void transpose(const T* __restrict src, T* __restrict dst, int width, int height,                //
                      std::ptrdiff_t src_stride, std::ptrdiff_t dst_stride) noexcept
   {
     switch (sizeof(T))

@@ -1,8 +1,10 @@
 #pragma once
 
-#include <mln/core/private/traits/pixel.hpp>
 #include <mln/core/private/traits/image.hpp>
+#include <mln/core/private/traits/pixel.hpp>
 
+#include <concepts>
+#include <utility>
 
 namespace mln
 {
@@ -25,10 +27,10 @@ namespace mln
     }
 
     // no default constructor as Pix may not be default constructible
-    pixel_adaptor(const pixel_adaptor&) = default;
-    pixel_adaptor(pixel_adaptor&&)      = default;
+    pixel_adaptor(const pixel_adaptor&)            = default;
+    pixel_adaptor(pixel_adaptor&&)                 = default;
     pixel_adaptor& operator=(const pixel_adaptor&) = delete;
-    pixel_adaptor& operator=(pixel_adaptor&&) = delete;
+    pixel_adaptor& operator=(pixel_adaptor&&)      = delete;
 
   protected:
     Pix&       base() { return m_pix; }
@@ -70,25 +72,26 @@ namespace mln
 
   namespace detail
   {
-    template <class I, class = void>
+    template <class I>
     struct image_adaptor_base_indexable
     {
     };
 
     template <class I>
-    struct image_adaptor_base_indexable<I, std::enable_if_t<I::indexable::value>>
+    requires I::indexable::value //
+        struct image_adaptor_base_indexable<I>
     {
       using index_type = image_index_t<I>;
     };
 
-    template <class I, class = void>
+    template <class I>
     struct image_adaptor_base_with_extension
     {
     };
 
     template <class I>
-    struct image_adaptor_base_with_extension<
-        I, std::enable_if_t<not std::is_same_v<image_extension_category_t<I>, mln::extension::none_extension_tag>>>
+    requires(not std::same_as<image_extension_category_t<I>, mln::extension::none_extension_tag>) //
+        struct image_adaptor_base_with_extension<I>
     {
       using extension_type = image_extension_t<I>;
     };
@@ -136,10 +139,10 @@ namespace mln
     }
 
     // no default constructor as I may not be default constructible
-    image_adaptor(const image_adaptor<I>&) = default;
-    image_adaptor(image_adaptor<I>&&)      = default;
+    image_adaptor(const image_adaptor<I>&)               = default;
+    image_adaptor(image_adaptor<I>&&)                    = default;
     image_adaptor<I>& operator=(const image_adaptor<I>&) = delete;
-    image_adaptor<I>& operator=(image_adaptor<I>&&) = delete;
+    image_adaptor<I>& operator=(image_adaptor<I>&&)      = delete;
 
     auto domain() const { return m_ima.domain(); }
     auto values() { return m_ima.values(); }
@@ -165,48 +168,32 @@ namespace mln
 
     /// Accessible-image related methods
     /// \{
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> operator()(point_type p)
-    {
-      return m_ima(p);
-    }
+    reference operator()(point_type p) requires(accessible::value) { return m_ima(p); }
 
-    template <typename Ret = reference>
-    std::enable_if_t<accessible::value, Ret> at(point_type p)
-    {
-      return m_ima.at(p);
-    }
+    reference at(point_type p) requires(accessible::value) { return m_ima.at(p); }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel(point_type p)
-    {
-      return m_ima.pixel(p);
-    }
+    pixel_type pixel(point_type p) requires(accessible::value) { return m_ima.pixel(p); }
 
-    template <typename Ret = pixel_type>
-    std::enable_if_t<accessible::value, Ret> pixel_at(point_type p)
-    {
-      return m_ima.pixel_at(p);
-    }
+    pixel_type pixel_at(point_type p) requires(accessible::value) { return m_ima.pixel_at(p); }
     /// \}
 
 
     /// IndexableAndAccessible-image related methods
     /// \{
-    template <typename dummy = I>
-    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> index_of_point(point_type p) const
+    template <class dummy = I>
+    image_index_t<dummy> index_of_point(point_type p) const requires(indexable::value&& accessible::value)
+
     {
       return m_ima.index_of_point(p);
     }
-
-    template <typename dummy = I>
-    point_type point_at_index(std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> i) const
+    template <class dummy = I>
+    point_type point_at_index(image_index_t<dummy> i) const requires(indexable::value&& accessible::value)
     {
       return m_ima.point_at_index(i);
     }
 
-    template <typename dummy = I>
-    std::enable_if_t<(indexable::value && accessible::value), image_index_t<dummy>> delta_index(point_type p) const
+    template <class dummy = I>
+    image_index_t<dummy> delta_index(point_type p) const requires(indexable::value&& accessible::value)
     {
       return m_ima.delta_index(p);
     }
@@ -215,20 +202,19 @@ namespace mln
 
     /// Raw-image related methods
     /// \{
-    template <typename dummy = I>
-    decltype(std::declval<dummy>().data()) data() const
+    template <class dummy = I>
+    auto data() const
     {
       return m_ima.data();
     }
 
-    template <typename dummy = I>
-    decltype(std::declval<dummy>().data()) data()
+    template <class dummy = I>
+    auto data()
     {
       return m_ima.data();
     }
 
-    template <typename Ret = std::ptrdiff_t>
-    std::enable_if_t<std::is_base_of_v<raw_image_tag, category_type>, Ret> stride(int dim) const
+    std::ptrdiff_t stride(int dim) const requires(std::derived_from<category_type, raw_image_tag>)
     {
       return m_ima.strides(dim);
     }
@@ -237,26 +223,21 @@ namespace mln
 
     /// WithExtension-image related methods
     /// \{
-    template <typename dummy = I>
-    std::enable_if_t<not std::is_same_v<extension_category, mln::extension::none_extension_tag>,
-                     image_extension_t<dummy>>
-        extension() const
-    {
-      return m_ima.extension();
-    }
-    template <typename dummy = I>
-    std::enable_if_t<not std::is_same_v<extension_category, mln::extension::none_extension_tag>,
-                     image_extension_t<dummy>>
-        extension()
+    template <class dummy = I>
+    image_extension_t<dummy> extension() const
+        requires(not std::same_as<extension_category, mln::extension::none_extension_tag>)
     {
       return m_ima.extension();
     }
 
-    template <typename U = I>
-    auto border() const -> decltype(std::declval<const U>().border())
+    template <class dummy = I>
+    image_extension_t<dummy>
+    extension() requires(not std::same_as<extension_category, mln::extension::none_extension_tag>)
     {
-      return m_ima.border();
+      return m_ima.extension();
     }
+
+    auto border() const { return m_ima.border(); }
     /// \}
 
   protected:

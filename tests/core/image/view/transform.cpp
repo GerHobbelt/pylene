@@ -11,16 +11,16 @@
 #include <mln/core/range/foreach.hpp>
 #include <mln/core/range/view/zip.hpp>
 
-#include <vector>
 #include <range/v3/algorithm/copy.hpp>
 #include <range/v3/iterator/insert_iterators.hpp>
+#include <vector>
 
-#include <gtest/gtest.h>
 #include <fixtures/ImageCompare/image_compare.hpp>
+#include <gtest/gtest.h>
 
 TEST(Core, Transform_Supports_RValue_Lambda)
 {
-  mln::box2d dom({-2, -1}, {3, 3});
+  mln::box2d        dom({-2, -1}, {3, 3});
   mln::image2d<int> ima(dom);
 
   mln::iota(ima, 0);
@@ -90,7 +90,7 @@ TEST(Core, Transform_Supports_PointerToMemberFunction)
 {
   using V = std::pair<int, int>;
 
-  mln::box2d dom({-2, -1}, {3, 3});
+  mln::box2d              dom({-2, -1}, {3, 3});
   mln::image_build_params params;
   params.border = 3;
 
@@ -140,7 +140,7 @@ TEST(Core, Transform_Twice)
 
 TEST(Core, Transform_Support_Writable)
 {
-  typedef std::pair<int, int> V;
+  using V = std::pair<int, int>;
 
   mln::box2d      dom({-2, -1}, {3, 3});
   mln::image2d<V> ima(dom);
@@ -213,7 +213,7 @@ TEST(Core, Transformed2Image_transform_byval_chain)
   std::vector<int> ref = {3, 4, 5, 6, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39};
 
   std::vector<int> tmp;
-  auto&& vals = out.values();
+  auto&&           vals = out.values();
   for (auto&& r : mln::ranges::rows(vals))
     ::ranges::copy(r, ::ranges::back_inserter(tmp));
 

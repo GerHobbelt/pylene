@@ -27,8 +27,8 @@ namespace mln::view
     MLN_PRIVATE_DEFINE_UNARY_OPERATOR(l2norm, functional::l2norm_t<>());
     MLN_PRIVATE_DEFINE_UNARY_OPERATOR(l2norm_sqr, functional::l2norm_sqr_t<>());
     MLN_PRIVATE_DEFINE_UNARY_OPERATOR(linfnorm, functional::linfnorm_t<>());
-    template <unsigned p, class I, class = std::enable_if_t<::mln::is_a<I, ::mln::details::Image>::value>>
-    auto lpnorm(const I& ima)
+    template <unsigned p, class I>
+    auto lpnorm(const I& ima) requires(mln::is_a<I, ::mln::details::Image>::value)
     {
       return ::mln::view::transform(static_cast<const I&>(ima), functional::lpnorm_t<p>{});
     }
@@ -47,17 +47,17 @@ namespace mln::view
                                       functional::lpdist_t<p>{});
       }
 
-      template <unsigned p, class I, class Scalar,
-                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::details::Image>::value>>
-      auto lpdist(const ::mln::details::Image<I>& ima1, Scalar s)
+      template <unsigned p, class I, class Scalar>
+      auto lpdist(const ::mln::details::Image<I>& ima1,
+                  Scalar                          s) requires(not mln::is_a<Scalar, ::mln::details::Image>::value)
       {
         auto g = [f_ = functional::lpdist_t<p>{}, s_ = s](auto&& arg) { return f_(arg, s_); };
         return ::mln::view::transform(static_cast<const I&>(ima1), g);
       }
 
-      template <unsigned p, class Scalar, class I,
-                class = std::enable_if_t<!::mln::is_a<Scalar, ::mln::details::Image>::value>>
-      auto lpdist(Scalar s, const ::mln::details::Image<I>& ima2)
+      template <unsigned p, class Scalar, class I>
+      auto lpdist(Scalar                          s,
+                  const ::mln::details::Image<I>& ima2) requires(not mln::is_a<Scalar, ::mln::details::Image>::value)
       {
         auto g = [f_ = functional::lpdist_t<p>{}, s_ = s](auto&& arg) { return f_(s_, arg); };
         return ::mln::view::transform(static_cast<const I&>(ima2), g);
@@ -65,10 +65,9 @@ namespace mln::view
     } /* namespace impl */
 
     /* This overload is there to be a best match wrt old API impl */
-    template <unsigned p, class A, class B,
-              class = std::enable_if_t<(::mln::is_a<A, ::mln::details::Image>::value ||
-                                        ::mln::is_a<B, ::mln::details::Image>::value)>>
-    auto lpdist(const A& lhs, const B& rhs)
+    template <unsigned p, class A, class B>
+    auto lpdist(const A& lhs, const B& rhs) requires(mln::is_a<A, ::mln::details::Image>::value ||
+                                                     mln::is_a<B, ::mln::details::Image>::value)
     {
       return impl::lpdist<p>(lhs, rhs);
     }

@@ -205,10 +205,10 @@ namespace mln
   };
 
   template <typename T>
-  struct value_traits<Index<T, std::less<T>>, std::less<Index<T, std::less<T>>>, void>
+  struct value_traits<Index<T, std::less<T>>, std::less<Index<T, std::less<T>>>>
   {
   private:
-    typedef Index<T, std::less<T>> index_t;
+    using index_t = Index<T, std::less<T>>;
 
   public:
     static constexpr unsigned quant = value_traits<T>::quant;
@@ -219,10 +219,10 @@ namespace mln
   };
 
   template <typename T>
-  struct value_traits<Index<T, std::greater<T>>, std::less<Index<T, std::greater<T>>>, void>
+  struct value_traits<Index<T, std::greater<T>>, std::less<Index<T, std::greater<T>>>>
   {
   private:
-    typedef Index<T, std::greater<T>> index_t;
+    using index_t = Index<T, std::greater<T>>;
 
   public:
     static constexpr unsigned quant = value_traits<T>::quant;
@@ -233,14 +233,14 @@ namespace mln
   };
 
   template <typename T>
-  struct value_traits<Index<T, std::less<T>>, productorder_less<Index<T, std::less<T>>>, void>
-    : value_traits<Index<T, std::less<T>>, std::less<Index<T, std::less<T>>>, void>
+  struct value_traits<Index<T, std::less<T>>, productorder_less<Index<T, std::less<T>>>>
+    : value_traits<Index<T, std::less<T>>, std::less<Index<T, std::less<T>>>>
   {
   };
 
   template <typename T>
-  struct value_traits<Index<T, std::greater<T>>, productorder_less<Index<T, std::greater<T>>>, void>
-    : value_traits<Index<T, std::greater<T>>, std::less<Index<T, std::greater<T>>>, void>
+  struct value_traits<Index<T, std::greater<T>>, productorder_less<Index<T, std::greater<T>>>>
+    : value_traits<Index<T, std::greater<T>>, std::less<Index<T, std::greater<T>>>>
   {
   };
 } // namespace mln

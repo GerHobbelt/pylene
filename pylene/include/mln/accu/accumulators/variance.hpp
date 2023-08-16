@@ -62,7 +62,7 @@ namespace mln
     {
 
       template <typename A>
-      inline auto variance(const Accumulator<A>& acc) -> decltype(extract(exact(acc), features::variance<>()))
+      inline auto variance(const Accumulator<A>& acc)
       {
         return extract(exact(acc), features::variance<>());
       }
@@ -74,11 +74,11 @@ namespace mln
       template <typename T, typename SumType, typename SumSqrType>
       struct variance : accumulator_base<variance<T, SumType, SumSqrType>, T, double, features::variance<>>
       {
-        typedef T argument_type;
-        // typedef typename std::common_type<SumType, SumSqrType>::type result_type;
-        typedef double result_type;
+        using argument_type = T;
+        // using result_type = typename std::common_type<SumType, SumSqrType>::type;
+        using result_type = double;
 
-        // typedef boost::mpl::set< features::variance<>, features::variance<SumType> > provides;
+        // using provides = boost::mpl::set<features::variance<>, features::variance<SumType>>;
 
         variance()
           : m_count{0}

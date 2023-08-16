@@ -7,6 +7,11 @@
 
 namespace mln
 {
+  namespace details
+  {
+    template <typename T>
+    inline constexpr bool always_false_v = false;
+  }
   /// \brief Object function for a comparison between
   /// two vectorial types using the lexicographical order.
   ///
@@ -53,27 +58,22 @@ namespace mln
   struct productorder_greater_equal;
 
   template <typename U, typename V>
-  std::enable_if_t<std::is_arithmetic_v<U> and std::is_arithmetic_v<V>, bool> //
-  vecprod_isless(const U&, const V&);
+  bool vecprod_isless(const U&, const V&) requires(std::is_arithmetic_v<U>and std::is_arithmetic_v<V>);
 
   template <typename U, typename V>
-  std::enable_if_t<std::is_arithmetic_v<U> and std::is_arithmetic_v<V>, bool> //
-  vecprod_islessequal(const U&, const V&);
+  bool vecprod_islessequal(const U&, const V&) requires(std::is_arithmetic_v<U>and std::is_arithmetic_v<V>);
 
   template <typename U, typename V>
-  std::enable_if_t<std::is_arithmetic_v<U> and std::is_arithmetic_v<V>, bool> //
-  vecprod_isgreater(const U&, const V&);
+  bool vecprod_isgreater(const U&, const V&) requires(std::is_arithmetic_v<U>and std::is_arithmetic_v<V>);
 
   template <typename U, typename V>
-  std::enable_if_t<std::is_arithmetic_v<U> and std::is_arithmetic_v<V>, bool> //
-  vecprod_isgreaterequal(const U&, const V&);
+  bool vecprod_isgreaterequal(const U&, const V&) requires(std::is_arithmetic_v<U>and std::is_arithmetic_v<V>);
 
 
-
-  template <typename V, typename Ordering = productorder_less<V>, class Enable = void>
+  template <typename V, typename Ordering = productorder_less<V>>
   struct value_traits
   {
-    static_assert(!std::is_same<Enable, void>::value, "You must specialize this trait for your types.");
+    static_assert(details::always_false_v<V>, "You must specialize this trait for your types.");
   };
 
 
@@ -82,20 +82,17 @@ namespace mln
   /******************************************/
 
   template <typename U, typename V>
-  std::enable_if_t<std::is_arithmetic_v<U> and std::is_arithmetic_v<V>, bool> //
-  vecprod_isless(const U& u, const V& v)
+  bool vecprod_isless(const U& u, const V& v) requires(std::is_arithmetic_v<U>and std::is_arithmetic_v<V>)
   {
     return u < v;
   }
 
 
   template <typename U, typename V>
-  std::enable_if_t<std::is_arithmetic_v<U> and std::is_arithmetic_v<V>, bool> //
-  vecprod_islessequal(const U& u, const V& v)
+  bool vecprod_islessequal(const U& u, const V& v) requires(std::is_arithmetic_v<U>and std::is_arithmetic_v<V>)
   {
     return u <= v;
   }
-
 
 
   template <typename U, typename V>
@@ -117,22 +114,22 @@ namespace mln
   };
 
 
-
   // Default traits for std::greater
-  template <typename V, class Enable>
-  struct value_traits<V, std::greater<V>, Enable>
+  template <typename V>
+  struct value_traits<V, std::greater<V>>
   {
-    static constexpr unsigned ndim  = value_traits<V, std::less<V>, Enable>::ndim;
-    static constexpr unsigned quant = value_traits<V, std::less<V>, Enable>::quant;
-    static constexpr V        min() { return value_traits<V, std::less<V>, Enable>::max(); }
-    static constexpr V        max() { return value_traits<V, std::less<V>, Enable>::min(); }
-    static constexpr V        inf() { return value_traits<V, std::less<V>, Enable>::sup(); }
-    static constexpr V        sup() { return value_traits<V, std::less<V>, Enable>::inf(); }
+    static constexpr unsigned ndim  = value_traits<V, std::less<V>>::ndim;
+    static constexpr unsigned quant = value_traits<V, std::less<V>>::quant;
+    static constexpr V        min() { return value_traits<V, std::less<V>>::max(); }
+    static constexpr V        max() { return value_traits<V, std::less<V>>::min(); }
+    static constexpr V        inf() { return value_traits<V, std::less<V>>::sup(); }
+    static constexpr V        sup() { return value_traits<V, std::less<V>>::inf(); }
   };
 
   // Specialization for primitive types
   template <typename V>
-  struct value_traits<V, std::less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
+  requires std::is_arithmetic_v<V> //
+  struct value_traits<V, std::less<V>>
   {
     static constexpr unsigned ndim  = 1;
     static constexpr unsigned quant = sizeof(V) * 8;
@@ -143,14 +140,14 @@ namespace mln
   };
 
   template <typename V>
-  struct value_traits<V, productorder_less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits<V, std::less<V>>
+  requires std::is_arithmetic_v<V> //
+  struct value_traits<V, productorder_less<V>> : value_traits<V, std::less<V>>
   {
   };
 
   template <typename V>
-  struct value_traits<V, lexicographicalorder_less<V>, typename std::enable_if<std::is_arithmetic<V>::value>::type>
-    : value_traits<V, std::less<V>>
+  requires std::is_arithmetic_v<V> //
+  struct value_traits<V, lexicographicalorder_less<V>> : value_traits<V, std::less<V>>
   {
   };
 } // namespace mln

@@ -1,0 +1,14 @@
+{
+ "remotes": [
+  {
+   "name": "lrde-public",
+   "url": "https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public",
+   "verify_ssl": true
+  },
+  {
+    "name": "conancenter",
+    "url": "https://center.conan.io",
+    "verify_ssl": true
+  }
+ ]
+}

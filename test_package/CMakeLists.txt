@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.17)
 project(PyleneTest)
-cmake_minimum_required(VERSION 3.11)
 
 find_package(pylene REQUIRED COMPONENTS io-freeimage)
 

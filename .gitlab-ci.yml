@@ -6,7 +6,7 @@ stages:
 
 cache:
     paths:
-        - .cache/conan/data
+        - .cache/conan/
         - .cache/ccache/data
 
 variables:
@@ -15,18 +15,18 @@ variables:
     FEDORA_35: "${CI_REGISTRY}/olena/pylene-dockers/fedora-35"
     FEDORA_36: "${CI_REGISTRY}/olena/pylene-dockers/fedora-36"
     FEDORA_37: "${CI_REGISTRY}/olena/pylene-dockers/fedora-37"
+    UBUNTU: "${CI_REGISTRY}/olena/pylene-dockers/ubuntu-toolchain:23.04"
     CMAKE_BUILD_PARALLEL_LEVEL: 6
-    CONAN_CMAKE_GENERATOR: Ninja
     CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
     CCACHE_MAXSIZE: 2G
     DOC_PERSIST_BRANCHES: "master:next"
 
 before_script:
     - pip install --upgrade conan
-    - conan remote add lrde-public https://artifactory.lrde.epita.fr/artifactory/api/conan/lrde-public
     - conan profile detect
-    - ccache -p
-    - ccache -s
+    - conan config install ci/conan
+    #- ccache -p
+    #- ccache -s
 
 ########
 # Test #
@@ -34,15 +34,14 @@ before_script:
 
 windows-debug:
     before_script:
-        - Invoke-BatchFile -Path "${env:VCVAR2019}" -Parameters "${env:ARCH}"
+        - Invoke-BatchFile -Path "${env:VCVAR2022}" -Parameters "${env:ARCH}"
     stage: build
     script:
-        - mkdir build; cd build
-        - conan install .. -s build_type=Debug -s compiler.cppstd=20 --build missing
-        - cmake .. -D CMAKE_TOOLCHAIN_FILE=.\conan_toolchain.cmake -D CMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-        - cmake --build . --target build-tests --config Debug
-        - $env:PATH = -join($env:PATH, ";", $(Get-Location));
-        - ctest -C Debug -L UnitTests --schedule-random --output-on-failure
+        - conan install . -s build_type=Debug -s compiler.cppstd=20 -of . --build missing --deployer=./utils/copy-dlls --deployer-folder=./dlls
+        - cmake -S . -B build --preset conan-default
+        - cmake --build build --target build-tests --config Debug --preset conan-debug --parallel 4
+        - $env:PATH = -join($env:PATH, ";",  $(Join-Path -Path $(Get-Location) -ChildPath dlls))
+        - ctest -C Debug -L UnitTests --test-dir build --schedule-random --output-on-failure
     dependencies: []
     artifacts:
         reports:
@@ -50,194 +49,95 @@ windows-debug:
         expire_in: 1 week
     tags: [windows]
     rules:
-        #        - if: $CI_MERGE_REQUEST_ID
-        #        - if: $CI_COMMIT_BRANCH == "master"
         - when: manual
           allow_failure: true
     variables:
         VCVAR2019: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat'
+        VCVAR2022: 'C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat'
         ARCH: x64
         CONAN_USE_ALWAYS_SHORT_PATHS: 1
 
-.job-build-linux-base: &distcheck-linux-base
+.distcheck-linux-base:
     stage: build
     script:
-        - mkdir build; cd build
-        - conan install .. --build missing --build openjpeg -s compiler.cppstd=20 -s build_type=$PYLENE_CONFIGURATION -r lrde-public
-        - cmake -G Ninja .. -D CMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$PYLENE_CONFIGURATION
-        - cmake --build . --target Pylene-core
-        - cmake --build . --target build-tests
-        - ctest -L UnitTests --schedule-random --output-on-failure
+        - conan install . --build missing -s build_type=${build_type} -r lrde-public --profile $CONAN_PROFILE -of ./build
+        - cmake -S . -B ./build --preset ${cmake_preset}
+        - cmake --build ./build --target Pylene-core
+        - cmake --build ./build --target build-tests
+        - ctest --test-dir ./build -L UnitTests --schedule-random --output-on-failure
     dependencies: []
     artifacts:
         reports:
             junit: [build/tests/UT*.xml, build/bench/tests/UT*.xml]
         expire_in: 1 week
 
+.distcheck-release:
+    extends: .distcheck-linux-base
+    variables:
+        build_type: "Release"
+        cmake_preset: "conan-release"
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+        - if: $CI_COMMIT_BRANCH == "master"
+
+.distcheck-debug:
+    extends: .distcheck-linux-base
+    variables:
+        build_type: "Debug"
+        cmake_preset: "conan-debug"
+        CFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+
+
+
 # Msan not available for gcc. It requires instrumented libstdc++ and instrumented thirdparties so it is disabled for now.
 # No tsan because no multithreaded code for now
 # Asan, memsan and tsan are incompatible with each other within the same binary
 # Asan and ubsan can work together
 
-distcheck-linux-gcc10-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_32}
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+
+distcheck:
+    parallel:
+        matrix:
+            - PROFILE: [gcc-10, gcc-11, gcc-12, clang-13, clang-14, clang-15] # gcc-13 disabled because of OpenEXR.
+              BUILD_TYPE: [debug, release]
+    image: ${UBUNTU} 
+    extends: .distcheck-linux-base
     variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
+        CONAN_PROFILE: ${PROFILE}
     rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
+        - if: $BUILD_TYPE == "debug"
+          variables:
+            build_type: "Debug"
+            cmake_preset: "conan-debug"
+            CFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+            CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+        - if: $BUILD_TYPE == "release"
+          variables:
+            build_type: "Release"
+            cmake_preset: "conan-release"
+        - if: $BUILD_TYPE == "release" && $CI_MERGE_REQUEST_ID
+        - if: $BUILD_TYPE == "release" && $CI_COMMIT_BRANCH == "master"
+        - if: $BUILD_TYPE == "debug"
 
-distcheck-linux-gcc10-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_32}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 
-distcheck-linux-gcc11-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_34}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-distcheck-linux-gcc11-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_34}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-
-distcheck-linux-gcc12-release:
-    <<: *distcheck-linux-base
+linux-coverage:
+    extends: .distcheck-debug
     image: ${FEDORA_36}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "g++"
-        CC: "gcc"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-distcheck-linux-gcc12-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_36}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-
-distcheck-linux-clang12-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_34}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-distcheck-linux-clang12-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_34}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-
-distcheck-linux-clang13-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_35}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-distcheck-linux-clang13-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_35}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-
-distcheck-linux-clang14-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_36}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-distcheck-linux-clang14-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_36}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-
-distcheck-linux-clang15-release:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_37}
-    variables:
-        PYLENE_CONFIGURATION: "Release"
-        CXX: "clang++"
-        CC: "clang"
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-        - if: $CI_COMMIT_BRANCH == "master"
-
-distcheck-linux-clang15-debug:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_37}
-    variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "clang++"
-        CC: "clang"
-        CCFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-        CXXFLAGS: -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
-
-distcheck-linux-coverage:
-    <<: *distcheck-linux-base
-    image: ${FEDORA_32}
     after_script:
         - mkdir coverage
         - cd build && gcovr --root .. --filter '\.\./pylene' . -s --xml ../coverage/cobertura-coverage.xml --html-details ../coverage/index.html --gcov-ignore-parse-errors
     variables:
-        PYLENE_CONFIGURATION: "Debug"
-        CXX: "g++"
-        CC: "gcc"
-        CXXFLAGS: "-fprofile-arcs -ftest-coverage"
-        CFLAGS: "-fprofile-arcs -ftest-coverage"
+        CONAN_PROFILE: native
+        CXXFLAGS: -fprofile-arcs -ftest-coverage
+        CFLAGS: -fprofile-arcs -ftest-coverage
     artifacts:
         paths:
             - coverage/
@@ -255,16 +155,16 @@ distcheck-linux-coverage:
 # Bench #
 #########
 
-.job-bench-linux-base: &distbench-linux-base
+distbench-linux-gcc12-release:
     stage: bench
+    image: ${FEDORA_36}
     script:
-        - mkdir build && cd build
-        - conan install .. --build missing -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -s build_type=Release
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
-        - cmake --build . --target fetch-external-data
-        - cmake --build . --target build-bench
-        - cmake --build . --target run-all-benchmarks
-        - ctest -L SpeedTests -V
+        - conan install . --build missing --profile native -of ./build -r lrde-public
+        - cmake -S . -B ./build --preset conan-release
+        - cmake --build ./build --target fetch-external-data
+        - cmake --build ./build --target build-bench
+        - cmake --build ./build --target run-all-benchmarks
+        - ctest --test-dir ./build -L SpeedTests -V
     tags: ["pylene-benchmarks"]
     when: manual
     dependencies: []
@@ -274,45 +174,37 @@ distcheck-linux-coverage:
             - build/bench/*.json
         expire_in: 1 week
 
-distbench-linux-gcc11-release:
-    <<: *distbench-linux-base
-    image: ${FEDORA_34}
-    variables:
-        CXX: "g++"
-        CC: "gcc"
+
 
 #################
 # Documentation #
 #################
 
-.documentation-base: &documentation-base
-    image: ${FEDORA_34}
+.documentation-base:
+    image: ${FEDORA_36}
     stage: build
     script:
-        - mkdir build && cd build
-        - conan install .. --build missing -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -s build_type=Release -r lrde-public
-        - cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake
-        - cmake --build . --target build-doc
-        - DOCDIR="public/${CI_COMMIT_REF_SLUG}"
-        - mkdir -p ../${DOCDIR} && mv doc/sphinx/* ../${DOCDIR}
+        - conan install . --build missing --profile native -of ./build -r lrde-public
+        - cmake -S . -B ./build --preset conan-release
+        - cmake --build ./build --target build-doc
+        - mkdir -p ${DOCDIR} && mv build/doc/sphinx/* ${DOCDIR}
     artifacts:
         name: "documentation"
         expire_in: 1 week
-        paths:
-            - public/
+        paths: [ public/ ]
+    variables: { DOCDIR: "public/${CI_COMMIT_REF_SLUG}" }
 
 # Generate doc only
 documentation:
-    <<: *documentation-base
+    extends: .documentation-base
     except:
         - master
         - next
 
 # Deploy documentation
 pages:
-    <<: *documentation-base
-    variables:
-        CURRENT_BRANCH: ${CI_COMMIT_REF_SLUG}
+    extends: .documentation-base
+    variables: { CURRENT_BRANCH: "${CI_COMMIT_REF_SLUG}" }
     after_script:
         - /usr/bin/bash utils/retrieve-artifacts.sh
         - python3 utils/write-index.py
@@ -321,13 +213,12 @@ pages:
         - next
 
 deploy-all-docs-to-pages:
-    image: ${FEDORA_34}
+    image: ${FEDORA_36}
     stage: deploy
     rules:
         - when: manual
           allow_failure: true
-    variables:
-        CURRENT_BRANCH: "None"
+    variables: { CURRENT_BRANCH: "None" }
     script:
         - mkdir -p public
         - /usr/bin/bash utils/retrieve-artifacts.sh
@@ -335,100 +226,43 @@ deploy-all-docs-to-pages:
     artifacts:
         name: "all-documentation"
         expire_in: 1 week
-        paths:
-            - public/
+        paths: [ public/ ]
 
 ##########
 # Deploy #
 ##########
 
-.package-base:
-    script:
-        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11
-        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:fPIC=True
-        - conan create . --build missing --build openjpeg* --version head --user lrde --channel $CONAN_CHANNEL -s build_type=Release -s compiler.cppstd=20 -s compiler.libcxx=libstdc++11 -o pylene/*:shared=True
-
-.deploy-package-base:
-    stage: deploy
-    extends: .package-base
-    after_script:
-        - conan remote login -p $CONAN_PASSWORD lrde-public $CONAN_LOGIN_USERNAME
-        - conan upload pylene/head@lrde/$CONAN_CHANNEL -r lrde-public
-        - conan remote logout lrde-public
-    variables:
-        CONAN_REVISIONS_ENABLED: 1
-
 # Ensure package creation on merge request
-distcheck-package-create:
+create-package:
     stage: build
-    image: ${FEDORA_34}
-    extends: .package-base
+    image: ${FEDORA_32}
+    script:
+        - conan create . --profile native --build missing --build openjpeg* --version head --user lrde --channel ${CONAN_CHANNEL}
+        - conan create . --profile native --build missing --build openjpeg* --version head --user lrde --channel ${CONAN_CHANNEL} -o pylene/*:fPIC=True
+        - conan create . --profile native --build missing --build openjpeg* --version head --user lrde --channel ${CONAN_CHANNEL} -o pylene/*:shared=True
     variables:
-        CC: "gcc"
-        CXX: "g++"
         CONAN_CHANNEL: "unstable"
     rules:
         - if: $CI_MERGE_REQUEST_ID
 
-.stable-deploy:
+deploy-package:
+    parallel:
+        matrix:
+            - FEDORA_VERSION: ${FEDORA_32} # GCC-10
+              CONAN_CHANNEL: ["stable", "unstable"]
+            - FEDORA_VERSION: ${FEDORA_34} # GCC-11
+              CONAN_CHANNEL: ["stable", "unstable"]
+            - FEDORA_VERSION: ${FEDORA_36} # GCC-12
+              CONAN_CHANNEL: ["stable", "unstable"]
+    stage: deploy
+    script: !reference [create-package, script]
+    after_script:
+        - conan remote login -p $CONAN_PASSWORD lrde-public $CONAN_LOGIN_USERNAME
+        - conan upload pylene/head@lrde/$CONAN_CHANNEL -r lrde-public
+        - conan remote logout lrde-public
+    image: ${FEDORA_VERSION}
     variables:
-        CONAN_CHANNEL: "stable"
-    only:
-        - master
-
-.unstable-deploy:
-    variables:
-        CONAN_CHANNEL: "unstable"
-    only:
-        - next
-
-.package-gcc-10:
-    image: ${FEDORA_32}
-    extends: .deploy-package-base
-    variables:
-        CC: "gcc"
-        CXX: "g++"
-
-.package-gcc-11:
-    image: ${FEDORA_34}
-    extends: .deploy-package-base
-    variables:
-        CC: "gcc"
-        CXX: "g++"
-
-.package-gcc-12:
-    image: ${FEDORA_36}
-    extends: .deploy-package-base
-    variables:
-        CC: "gcc"
-        CXX: "g++"
-
-gcc-10-deploy-stable:
-    extends:
-        - .package-gcc-10
-        - .stable-deploy
-
-gcc-11-deploy-stable:
-    extends:
-        - .package-gcc-11
-        - .stable-deploy
-
-gcc-12-deploy-stable:
-    extends:
-        - .package-gcc-12
-        - .stable-deploy
-
-gcc-10-deploy-unstable:
-    extends:
-        - .package-gcc-10
-        - .unstable-deploy
-
-gcc-11-deploy-unstable:
-    extends:
-        - .package-gcc-11
-        - .unstable-deploy
-
-gcc-12-deploy-unstable:
-    extends:
-        - .package-gcc-12
-        - .unstable-deploy
+        CONAN_REVISIONS_ENABLED: 1
+    rules:
+        - if: $CONAN_CHANNEL == "stable" && $CI_COMMIT_BRANCH == "master"
+        - if: $CONAN_CHANNEL == "unstable" && $CI_COMMIT_BRANCH == "next"

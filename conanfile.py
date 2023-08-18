@@ -25,29 +25,26 @@ class Pylene(ConanFile):
         "boost/*:header_only": True,
         "freeimage/*:shared": True
     }
+    package_type = "library"
 
     exports_sources = ["pylene/*", "cmake/*", "CMakeLists.txt", "LICENSE"]
 
-
-    requires = [
-        "cfitsio/4.1.0@lrde/stable",
-        "freeimage/3.18.0@lrde/stable"
-    ]
-
     def build_requirements(self):
-        self.test_requires("gtest/1.11.0", options={"shared": False})
-        self.test_requires("benchmark/1.7.1")
+        self.test_requires("gtest/[^1.12]", options={"shared": True})
+        self.test_requires("benchmark/[^1.7]", options={"shared": True})
 
     def requirements(self):
+        # Private dependencies
+        self.requires("freeimage/3.18.0@lrde")
+        self.requires("cfitsio/4.2.0")
+        self.requires("onetbb/2021.7.0")
+        self.requires("eigen/3.4.0")
+
+        # Public dependencies
         self.requires("range-v3/0.12.0", transitive_headers=True)
         self.requires("fmt/9.0.0", transitive_headers=True, transitive_libs=True)
-        self.requires("onetbb/2021.7.0", transitive_headers=True)
         self.requires("xsimd/7.4.6", transitive_headers=True)
-        self.requires("eigen/3.4.0", transitive_headers=True)
         self.requires("boost/1.81.0", transitive_headers=True)
-        self.requires("zlib/1.2.13", override=True)
-        self.requires("libwebp/1.2.4", override=True)
-        
 
     def _check_configuration(self):
         check_min_cppstd(self, "20")
@@ -62,18 +59,18 @@ class Pylene(ConanFile):
                 accepted_e = [f"{comp}-{ver}" for comp in accepted_compilers for ver in accepted_compilers_dict[comp]]
                 raise ConanInvalidConfiguration(f"Compiler {self.settings.compiler} version {self.settings.compiler} not handled on Linux (Accepted: {accepted_e})")
 
-    def _conditional_delete_fPIC(self, cond: bool):
-        if cond and self.options.get_safe("fPIC") is not None:
-            del self.options.fPIC
+
 
     def validate(self):
         self._check_configuration()
 
     def config_options(self):
-        self._conditional_delete_fPIC(self.settings.os == "Windows")
+        if self.settings.os == "Windows":
+            del self.options.fPIC
 
     def configure(self):
-        self._conditional_delete_fPIC(self.options.shared)
+        if self.options.shared:
+            self.options.rm_safe("fPIC")
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -120,9 +117,10 @@ class Pylene(ConanFile):
         cmake = CMake(self)
         cmake.configure(variables)
         cmake.build()
-        cmake.install()
 
     def package(self):
+        cmake = CMake(self)
+        cmake.install()
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):

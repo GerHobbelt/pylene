@@ -47,9 +47,8 @@ namespace mln::io::fits
         void read_next_line(std::byte* __restrict buffer) final
         {
           int anynul;
-          int nullpix = 0;
           int status = 0;
-          fits_read_img(file, datatype, m_line * m_dims[0] + 1, m_dims[0], &nullpix, buffer, &anynul, &status);
+          fits_read_img(file, datatype, m_line * m_dims[0] + 1, m_dims[0], nullptr, buffer, &anynul, &status);
           if (status)
           {
             char msg[80];

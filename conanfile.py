@@ -52,7 +52,7 @@ class Pylene(ConanFile):
         if self.settings.os == "Linux":
             accepted_compilers = ["gcc", "clang"]
             accepted_compilers_dict = {
-                "gcc": [str(i) for i in range(10, 13)],
+                "gcc": [str(i) for i in range(10, 14)],
                 "clang": [str(i) for i in range(11, 16)]
             }
             if not str(self.settings.compiler) in accepted_compilers or not str(self.settings.compiler.version) in accepted_compilers_dict[str(self.settings.compiler)]:

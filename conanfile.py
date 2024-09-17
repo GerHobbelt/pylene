@@ -35,7 +35,7 @@ class Pylene(ConanFile):
 
     def requirements(self):
         # Private dependencies
-        self.requires("freeimage/3.18.0@lrde")
+        self.requires("freeimage/3.19.7@lrde")
         self.requires("cfitsio/4.2.0")
         self.requires("onetbb/2021.7.0")
         self.requires("eigen/3.4.0")

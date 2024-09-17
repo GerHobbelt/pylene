@@ -71,7 +71,6 @@ namespace mln
   struct se_adaptor : detail::se_adaptor_dynamic<SE>,
                       detail::se_adaptor_decomposable<SE>,
                       detail::se_adaptor_incremental<SE>,
-                      detail::se_adaptor_base<SE>,
                       se_facade<se_adaptor<SE>>
   {
     using category     = typename SE::category;

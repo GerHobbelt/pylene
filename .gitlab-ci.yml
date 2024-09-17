@@ -60,7 +60,7 @@ windows-debug:
 .distcheck-linux-base:
     stage: build
     script:
-        - conan install . --build missing -s build_type=${build_type} -r lrde-public --profile $CONAN_PROFILE -of ./build
+        - conan install . --build missing -s build_type=${build_type} -r lrde-public --profile $CONAN_PROFILE
         - cmake -S . -B ./build --preset ${cmake_preset}
         - cmake --build ./build --target Pylene-core
         - cmake --build ./build --target build-tests
@@ -184,7 +184,7 @@ distbench-linux-gcc12-release:
     image: ${FEDORA_36}
     stage: build
     script:
-        - conan install . --build missing --profile native -of ./build -r lrde-public
+        - conan install . --build missing --profile native -r lrde-public
         - cmake -S . -B ./build --preset conan-release
         - cmake --build ./build --target build-doc
         - mkdir -p ${DOCDIR} && mv build/doc/sphinx/* ${DOCDIR}

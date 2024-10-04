@@ -42,7 +42,7 @@ public:
   }
 
 
-  friend void PrintTo(const MatrixView& m, std::ostream* os)
+  friend void PrintTo(const MatrixView& m, std::ostream* os) requires (fmt::formattable<T>)
   {
     *os << "\n";
     for (int y = 0; y < m.m_height; ++y)

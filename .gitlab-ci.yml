@@ -15,7 +15,7 @@ variables:
     FEDORA_35: "${CI_REGISTRY}/olena/pylene-dockers/fedora-35"
     FEDORA_36: "${CI_REGISTRY}/olena/pylene-dockers/fedora-36"
     FEDORA_37: "${CI_REGISTRY}/olena/pylene-dockers/fedora-37"
-    UBUNTU: "${CI_REGISTRY}/olena/pylene-dockers/ubuntu-toolchain:23.04"
+    UBUNTU: "${CI_REGISTRY}/olena/pylene-dockers/ubuntu-toolchain:24.04"
     CMAKE_BUILD_PARALLEL_LEVEL: 6
     CCACHE_DIR: "${CI_PROJECT_DIR}/.cache/ccache/data"
     CCACHE_MAXSIZE: 2G
@@ -106,9 +106,9 @@ workflow:
 distcheck:
     parallel:
         matrix:
-            - PROFILE: [gcc-10, gcc-11, gcc-12, clang-13, clang-14, clang-15] # gcc-13 disabled because of OpenEXR.
+            - PROFILE: [gcc-10, gcc-11, gcc-12, gcc-13, gcc-14, clang-14, clang-15, clang-16, clang-17, clang-18]
               BUILD_TYPE: [debug, release]
-    image: ${UBUNTU} 
+    image: ${UBUNTU}
     extends: .distcheck-linux-base
     variables:
         CONAN_PROFILE: ${PROFILE}
@@ -235,7 +235,14 @@ deploy-all-docs-to-pages:
 # Ensure package creation on merge request
 create-package:
     stage: build
-    image: ${FEDORA_32}
+    image: gcc:10
+    before_script:
+        - which funzip || ( apt-get update -qq && apt-get install -qq -y unzip && apt-get clean -qq )                                                                                                         # Install funzip
+        - wget -q https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-linux.zip -O - | funzip > /usr/local/bin/ninja && chmod +x /usr/local/bin/ninja            # Install ninja
+        - wget -q https://github.com/Kitware/CMake/releases/download/v3.30.4/cmake-3.30.4-linux-x86_64.sh -O /tmp/cmake.sh && sh /tmp/cmake.sh --skip-license --prefix=/usr/local # Install cmake
+        - wget -q https://github.com/conan-io/conan/releases/download/2.8.0/conan-2.8.0-linux-x86_64.tgz -O - | tar -xzf - -C /usr/local                                          # Install conan
+        - conan profile detect
+        - conan config install ci/conan
     script:
         - conan create . --profile native --build missing --build openjpeg* --version head --user lrde --channel ${CONAN_CHANNEL}
         - conan create . --profile native --build missing --build openjpeg* --version head --user lrde --channel ${CONAN_CHANNEL} -o pylene/*:fPIC=True
@@ -248,21 +255,19 @@ create-package:
 deploy-package:
     parallel:
         matrix:
-            - FEDORA_VERSION: ${FEDORA_32} # GCC-10
-              CONAN_CHANNEL: ["stable", "unstable"]
-            - FEDORA_VERSION: ${FEDORA_34} # GCC-11
-              CONAN_CHANNEL: ["stable", "unstable"]
-            - FEDORA_VERSION: ${FEDORA_36} # GCC-12
-              CONAN_CHANNEL: ["stable", "unstable"]
+            - GCC: ["gcc:10", "gcc:11", "gcc:12", "gcc:13", "gcc:14"]
     stage: deploy
+    before_script: !reference [create-package, before_script]
     script: !reference [create-package, script]
     after_script:
         - conan remote login -p $CONAN_PASSWORD lrde-public $CONAN_LOGIN_USERNAME
         - conan upload pylene/head@lrde/$CONAN_CHANNEL -r lrde-public
         - conan remote logout lrde-public
-    image: ${FEDORA_VERSION}
+    image: ${GCC}
     variables:
         CONAN_REVISIONS_ENABLED: 1
     rules:
-        - if: $CONAN_CHANNEL == "stable" && $CI_COMMIT_BRANCH == "master"
-        - if: $CONAN_CHANNEL == "unstable" && $CI_COMMIT_BRANCH == "next"
+        - if: $CI_COMMIT_BRANCH == "master"
+          variables: { CONAN_CHANNEL: "stable" }
+        - if: $CI_COMMIT_BRANCH == "next"
+          variables: { CONAN_CHANNEL: "unstable" }

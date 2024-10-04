@@ -34,7 +34,7 @@ namespace fmt {
   struct formatter<mln::rgb8> : formatter<uint8_t>
   {
     template <typename FormatContext>
-    auto format(const mln::rgb8& c, FormatContext& ctx)
+    auto format(const mln::rgb8& c, FormatContext& ctx) const
     {
       return format_to(ctx.out(), "({}, {}, {})", c[0], c[1], c[2]);
     }
@@ -50,7 +50,7 @@ namespace fmt {
     }
 
     template <typename FormatContext>
-    auto format(const mln::ndpoint<2, T>& p, FormatContext& ctx)
+    auto format(const mln::ndpoint<2, T>& p, FormatContext& ctx) const
     {
       return format_to(ctx.out(), "({:d}, {:d})", p[0], p[1]);
     }

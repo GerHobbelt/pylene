@@ -119,17 +119,11 @@ namespace mln::se
 
   std::shared_ptr<disc::cache_data_t> disc::_get_data() const
   {
-    // Note that const method can be called from several threads
-    auto data = std::atomic_load(&m_data);
-    if (data == nullptr)
-    {
-      data = this->__compute_data();
-
-      std::shared_ptr<disc::cache_data_t> expected = nullptr;
-      if (!std::atomic_compare_exchange_strong(&m_data, &expected, data))
-        data = std::move(expected);
+    // Note that reading/writing a shared-ptr is thread-safe
+    if (m_data == nullptr) {
+      m_data = this->__compute_data();
     }
-    return data;
+    return m_data;
   }
 
 

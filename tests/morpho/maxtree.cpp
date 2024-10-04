@@ -56,7 +56,7 @@ make_parent_image(const int* par, std::size_t n,
 template <>
 struct fmt::formatter<mln::point2d>
 {
-  auto parse(format_parse_context& ctx)
+  constexpr auto parse(format_parse_context& ctx)
   {
     int x = 0;
     auto c = ctx.begin();
@@ -74,7 +74,7 @@ struct fmt::formatter<mln::point2d>
 
   // parse is inherited from formatter<string_view>.
   template <typename FormatContext>
-  auto format(mln::point2d p, FormatContext& ctx)
+  auto format(mln::point2d p, FormatContext& ctx) const
   {
     return format_to(ctx.out(), " ({:d},{:d})", p.x(), p.y());
   }

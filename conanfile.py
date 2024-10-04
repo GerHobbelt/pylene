@@ -42,7 +42,7 @@ class Pylene(ConanFile):
 
         # Public dependencies
         self.requires("range-v3/0.12.0", transitive_headers=True)
-        self.requires("fmt/9.0.0", transitive_headers=True, transitive_libs=True)
+        self.requires("fmt/11.0.2", transitive_headers=True, transitive_libs=True)
         self.requires("xsimd/7.4.6", transitive_headers=True)
         self.requires("boost/1.81.0", transitive_headers=True)
 
@@ -52,8 +52,8 @@ class Pylene(ConanFile):
         if self.settings.os == "Linux":
             accepted_compilers = ["gcc", "clang"]
             accepted_compilers_dict = {
-                "gcc": [str(i) for i in range(10, 14)],
-                "clang": [str(i) for i in range(11, 16)]
+                "gcc": [str(i) for i in range(10, 15)],
+                "clang": [str(i) for i in range(11, 19)]
             }
             if not str(self.settings.compiler) in accepted_compilers or not str(self.settings.compiler.version) in accepted_compilers_dict[str(self.settings.compiler)]:
                 accepted_e = [f"{comp}-{ver}" for comp in accepted_compilers for ver in accepted_compilers_dict[comp]]
